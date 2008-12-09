@@ -12,6 +12,7 @@
 
 #include "debugger.h"
 #include "cubeqcpu.h"
+#include "cpuexec.h"
 
 
 /***************************************************************************
@@ -124,11 +125,12 @@ typedef struct
 	int prev_ipram;
 	int prev_ipwrt;
 
-	void (*dac_w)(UINT16 data);
+	cubeqst_dac_w_func dac_w;
 	UINT16 *sound_data;
 
 	const device_config *device;
 	const address_space *program;
+	int icount;
 } cquestsnd_state;
 
 
@@ -167,7 +169,9 @@ typedef struct
 	UINT8 clkcnt;
 
 	const device_config *device;
+	const device_config *lindevice;
 	const address_space *program;
+	int icount;
 } cquestrot_state;
 
 
@@ -211,105 +215,38 @@ typedef struct
 	UINT32	*o_stack;
 
 	const device_config *device;
+	const device_config *rotdevice;
 	const address_space *program;
-
+	int icount;
 } cquestlin_state;
-
-/***************************************************************************
-    PUBLIC GLOBAL VARIABLES
-***************************************************************************/
-
-static int cquestsnd_icount;
-static int cquestrot_icount;
-static int cquestlin_icount;
-
-/***************************************************************************
-    PRIVATE GLOBAL VARIABLES
-***************************************************************************/
-
-static cquestsnd_state cquestsnd;
-static cquestrot_state cquestrot;
-static cquestlin_state cquestlin;
 
 /***************************************************************************
     MEMORY ACCESSORS FOR 68000
 ***************************************************************************/
 
-WRITE16_HANDLER( write_sndram )
+WRITE16_DEVICE_HANDLER( cubeqcpu_sndram_w )
 {
-	COMBINE_DATA(&cquestsnd.sram[offset]);
+	cquestsnd_state *cpustate = device->token;
+	COMBINE_DATA(&cpustate->sram[offset]);
 }
 
-READ16_HANDLER( read_sndram )
+READ16_DEVICE_HANDLER( cubeqcpu_sndram_r )
 {
-	return cquestsnd.sram[offset];
-}
-
-
-WRITE16_HANDLER( write_rotram )
-{
-	COMBINE_DATA(&cquestrot.dram[offset]);
-}
-
-READ16_HANDLER( read_rotram )
-{
-	return cquestrot.dram[offset];
-}
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-
-/***************************************************************************
-    CONTEXT SWITCHING
-***************************************************************************/
-
-static CPU_GET_CONTEXT( cquestsnd )
-{
-	/* Copy the context */
-	if (dst)
-		*(cquestsnd_state *)dst = cquestsnd;
+	cquestsnd_state *cpustate = device->token;
+	return cpustate->sram[offset];
 }
 
 
-static CPU_SET_CONTEXT( cquestsnd )
+WRITE16_DEVICE_HANDLER( cubeqcpu_rotram_w )
 {
-	/* Copy the context */
-	if (src)
-		cquestsnd = *(cquestsnd_state *)src;
+	cquestrot_state *cpustate = device->token;
+	COMBINE_DATA(&cpustate->dram[offset]);
 }
 
-
-static CPU_GET_CONTEXT( cquestrot )
+READ16_DEVICE_HANDLER( cubeqcpu_rotram_r )
 {
-	/* Copy the context */
-	if (dst)
-		*(cquestrot_state *)dst = cquestrot;
-}
-
-
-static CPU_SET_CONTEXT( cquestrot )
-{
-	/* Copy the context */
-	if (src)
-		cquestrot = *(cquestrot_state *)src;
-}
-
-
-static CPU_GET_CONTEXT( cquestlin )
-{
-	/* Copy the context */
-	if (dst)
-		*(cquestlin_state *)dst = cquestlin;
-}
-
-
-static CPU_SET_CONTEXT( cquestlin )
-{
-	/* Copy the context */
-	if (src)
-		cquestlin = *(cquestlin_state *)src;
+	cquestrot_state *cpustate = device->token;
+	return cpustate->dram[offset];
 }
 
 /***************************************************************************
@@ -321,56 +258,58 @@ static STATE_POSTLOAD( cquestsnd_postload )
 
 }
 
-static void cquestsnd_state_register(const device_config *device, const char *type)
+static void cquestsnd_state_register(const device_config *device)
 {
-	state_save_register_device_item_array(device, 0, cquestsnd.ram);
-	state_save_register_device_item(device, 0, cquestsnd.q);
-	state_save_register_device_item(device, 0, cquestsnd.f);
-	state_save_register_device_item(device, 0, cquestsnd.y);
-	state_save_register_device_item(device, 0, cquestsnd.cflag);
-	state_save_register_device_item(device, 0, cquestsnd.vflag);
+	cquestsnd_state *cpustate = device->token;
+	state_save_register_device_item_array(device, 0, cpustate->ram);
+	state_save_register_device_item(device, 0, cpustate->q);
+	state_save_register_device_item(device, 0, cpustate->f);
+	state_save_register_device_item(device, 0, cpustate->y);
+	state_save_register_device_item(device, 0, cpustate->cflag);
+	state_save_register_device_item(device, 0, cpustate->vflag);
 
-	state_save_register_device_item(device, 0, cquestsnd.pc);
-	state_save_register_device_item(device, 0, cquestsnd.platch);
-	state_save_register_device_item(device, 0, cquestsnd.rtnlatch);
-	state_save_register_device_item(device, 0, cquestsnd.adrcntr);
-	state_save_register_device_item(device, 0, cquestsnd.adrlatch);
-	state_save_register_device_item(device, 0, cquestsnd.dinlatch);
-	state_save_register_device_item(device, 0, cquestsnd.ramwlatch);
-	state_save_register_device_item(device, 0, cquestsnd.prev_ipram);
-	state_save_register_device_item(device, 0, cquestsnd.prev_ipwrt);
+	state_save_register_device_item(device, 0, cpustate->pc);
+	state_save_register_device_item(device, 0, cpustate->platch);
+	state_save_register_device_item(device, 0, cpustate->rtnlatch);
+	state_save_register_device_item(device, 0, cpustate->adrcntr);
+	state_save_register_device_item(device, 0, cpustate->adrlatch);
+	state_save_register_device_item(device, 0, cpustate->dinlatch);
+	state_save_register_device_item(device, 0, cpustate->ramwlatch);
+	state_save_register_device_item(device, 0, cpustate->prev_ipram);
+	state_save_register_device_item(device, 0, cpustate->prev_ipwrt);
 
 	state_save_register_postload(device->machine, cquestsnd_postload, (void *)device);
 }
 
 static CPU_INIT( cquestsnd )
 {
+	cquestsnd_state *cpustate = device->token;
 	cubeqst_snd_config* _config = (cubeqst_snd_config*)device->static_config;
 
-	memset(&cquestsnd, 0, sizeof(cquestsnd));
+	memset(cpustate, 0, sizeof(*cpustate));
 
-	cquestsnd.dac_w = _config->dac_w;
-	cquestsnd.sound_data = (UINT16*)memory_region(device->machine, _config->sound_data_region);
+	cpustate->dac_w = _config->dac_w;
+	cpustate->sound_data = (UINT16*)memory_region(device->machine, _config->sound_data_region);
 
-	cquestsnd.device = device;
-	cquestsnd.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* Allocate RAM shared with 68000 */
-	cquestsnd.sram = malloc(4096);
+	cpustate->sram = auto_malloc(4096);
 
-	cquestsnd_state_register(device, "cquestsnd");
+	cquestsnd_state_register(device);
 }
 
 
 static CPU_RESET( cquestsnd )
 {
-	cquestsnd.pc = 0;
+	cquestsnd_state *cpustate = device->token;
+	cpustate->pc = 0;
 }
 
 
 static CPU_EXIT( cquestsnd )
 {
-	free(cquestsnd.sram);
 }
 
 
@@ -383,65 +322,68 @@ static STATE_POSTLOAD( cquestrot_postload )
 
 }
 
-static void cquestrot_state_register(const device_config *device, const char *type)
+static void cquestrot_state_register(const device_config *device)
 {
-	state_save_register_device_item_array(device, 0, cquestrot.ram);
-	state_save_register_device_item(device, 0, cquestrot.q);
-	state_save_register_device_item(device, 0, cquestrot.f);
-	state_save_register_device_item(device, 0, cquestrot.y);
-	state_save_register_device_item(device, 0, cquestrot.cflag);
-	state_save_register_device_item(device, 0, cquestrot.vflag);
+	cquestrot_state *cpustate = device->token;
+	state_save_register_device_item_array(device, 0, cpustate->ram);
+	state_save_register_device_item(device, 0, cpustate->q);
+	state_save_register_device_item(device, 0, cpustate->f);
+	state_save_register_device_item(device, 0, cpustate->y);
+	state_save_register_device_item(device, 0, cpustate->cflag);
+	state_save_register_device_item(device, 0, cpustate->vflag);
 
-	state_save_register_device_item(device, 0, cquestrot.pc);
-	state_save_register_device_item(device, 0, cquestrot.seqcnt);
-	state_save_register_device_item(device, 0, cquestrot.dsrclatch);
-	state_save_register_device_item(device, 0, cquestrot.rsrclatch);
-	state_save_register_device_item(device, 0, cquestrot.dynaddr);
-	state_save_register_device_item(device, 0, cquestrot.dyndata);
-	state_save_register_device_item(device, 0, cquestrot.yrlatch);
-	state_save_register_device_item(device, 0, cquestrot.ydlatch);
-	state_save_register_device_item(device, 0, cquestrot.dinlatch);
-	state_save_register_device_item(device, 0, cquestrot.divreg);
-	state_save_register_device_item(device, 0, cquestrot.linedata);
-	state_save_register_device_item(device, 0, cquestrot.lineaddr);
-	state_save_register_device_item(device, 0, cquestrot.prev_dred);
-	state_save_register_device_item(device, 0, cquestrot.prev_dwrt);
-	state_save_register_device_item(device, 0, cquestrot.wc);
+	state_save_register_device_item(device, 0, cpustate->pc);
+	state_save_register_device_item(device, 0, cpustate->seqcnt);
+	state_save_register_device_item(device, 0, cpustate->dsrclatch);
+	state_save_register_device_item(device, 0, cpustate->rsrclatch);
+	state_save_register_device_item(device, 0, cpustate->dynaddr);
+	state_save_register_device_item(device, 0, cpustate->dyndata);
+	state_save_register_device_item(device, 0, cpustate->yrlatch);
+	state_save_register_device_item(device, 0, cpustate->ydlatch);
+	state_save_register_device_item(device, 0, cpustate->dinlatch);
+	state_save_register_device_item(device, 0, cpustate->divreg);
+	state_save_register_device_item(device, 0, cpustate->linedata);
+	state_save_register_device_item(device, 0, cpustate->lineaddr);
+	state_save_register_device_item(device, 0, cpustate->prev_dred);
+	state_save_register_device_item(device, 0, cpustate->prev_dwrt);
+	state_save_register_device_item(device, 0, cpustate->wc);
 
-	state_save_register_device_item_pointer(device, 0, cquestrot.dram, 16384);
-	state_save_register_device_item_pointer(device, 0, cquestrot.sram, 2048);
+	state_save_register_device_item_pointer(device, 0, cpustate->dram, 16384);
+	state_save_register_device_item_pointer(device, 0, cpustate->sram, 2048);
 
 	state_save_register_postload(device->machine, cquestrot_postload, (void *)device);
 }
 
 static CPU_INIT( cquestrot )
 {
-	memset(&cquestrot, 0, sizeof(cquestrot));
+	const cubeqst_rot_config *rotconfig = device->static_config;
+	cquestrot_state *cpustate = device->token;
+	memset(cpustate, 0, sizeof(*cpustate));
 
 	/* Allocate RAM */
-	cquestrot.dram = malloc(16384 * sizeof(UINT16));  /* Shared with 68000 */
-	cquestrot.sram = malloc(2048 * sizeof(UINT16));   /* Private */
+	cpustate->dram = auto_malloc(16384 * sizeof(UINT16));  /* Shared with 68000 */
+	cpustate->sram = auto_malloc(2048 * sizeof(UINT16));   /* Private */
 
-	cquestrot.device = device;
-	cquestrot.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->device = device;
+	cpustate->lindevice = cputag_get_cpu(device->machine, rotconfig->lin_cpu_tag);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	cquestrot_state_register(device, "cquestrot");
+	cquestrot_state_register(device);
 }
 
 
 static CPU_RESET( cquestrot )
 {
-	cquestrot.pc = 0;
-	cquestrot.wc = 0;
-	cquestrot.prev_dred = 1;
-	cquestrot.prev_dwrt = 1;
+	cquestrot_state *cpustate = device->token;
+	cpustate->pc = 0;
+	cpustate->wc = 0;
+	cpustate->prev_dred = 1;
+	cpustate->prev_dwrt = 1;
 }
 
 
 static CPU_EXIT( cquestrot )
 {
-	free(cquestrot.dram);
-	free(cquestrot.sram);
 }
 
 
@@ -458,72 +400,74 @@ static STATE_POSTLOAD( cquestlin_postload )
 
 }
 
-static void cquestlin_state_register(const device_config *device, const char *type)
+static void cquestlin_state_register(const device_config *device)
 {
-	state_save_register_device_item_array(device, 0, cquestlin.ram);
-	state_save_register_device_item(device, 0, cquestlin.q);
-	state_save_register_device_item(device, 0, cquestlin.f);
-	state_save_register_device_item(device, 0, cquestlin.y);
-	state_save_register_device_item(device, 0, cquestlin.cflag);
-	state_save_register_device_item(device, 0, cquestlin.vflag);
+	cquestlin_state *cpustate = device->token;
 
-	state_save_register_device_item(device, 0, cquestlin.pc[0]);
-	state_save_register_device_item(device, 0, cquestlin.pc[1]);
-	state_save_register_device_item(device, 0, cquestlin.seqcnt);
-	state_save_register_device_item(device, 0, cquestlin.clatch);
-	state_save_register_device_item(device, 0, cquestlin.zlatch);
-	state_save_register_device_item(device, 0, cquestlin.xcnt);
-	state_save_register_device_item(device, 0, cquestlin.ycnt);
-	state_save_register_device_item(device, 0, cquestlin.sreg);
-	state_save_register_device_item(device, 0, cquestlin.fadlatch);
-	state_save_register_device_item(device, 0, cquestlin.badlatch);
-	state_save_register_device_item(device, 0, cquestlin.sramdlatch);
-	state_save_register_device_item(device, 0, cquestlin.fglatch);
-	state_save_register_device_item(device, 0, cquestlin.bglatch);
-	state_save_register_device_item(device, 0, cquestlin.gt0reg);
-	state_save_register_device_item(device, 0, cquestlin.fdxreg);
-	state_save_register_device_item(device, 0, cquestlin.field);
-	state_save_register_device_item(device, 0, cquestlin.clkcnt);
+	state_save_register_device_item_array(device, 0, cpustate->ram);
+	state_save_register_device_item(device, 0, cpustate->q);
+	state_save_register_device_item(device, 0, cpustate->f);
+	state_save_register_device_item(device, 0, cpustate->y);
+	state_save_register_device_item(device, 0, cpustate->cflag);
+	state_save_register_device_item(device, 0, cpustate->vflag);
 
-	state_save_register_device_item_pointer(device, 0, cquestlin.sram, 4096);
-	state_save_register_device_item_pointer(device, 0, cquestlin.ptr_ram, 1024);
-	state_save_register_device_item_pointer(device, 0, cquestlin.e_stack, 32768);
-	state_save_register_device_item_pointer(device, 0, cquestlin.o_stack, 32768);
+	state_save_register_device_item(device, 0, cpustate->pc[0]);
+	state_save_register_device_item(device, 0, cpustate->pc[1]);
+	state_save_register_device_item(device, 0, cpustate->seqcnt);
+	state_save_register_device_item(device, 0, cpustate->clatch);
+	state_save_register_device_item(device, 0, cpustate->zlatch);
+	state_save_register_device_item(device, 0, cpustate->xcnt);
+	state_save_register_device_item(device, 0, cpustate->ycnt);
+	state_save_register_device_item(device, 0, cpustate->sreg);
+	state_save_register_device_item(device, 0, cpustate->fadlatch);
+	state_save_register_device_item(device, 0, cpustate->badlatch);
+	state_save_register_device_item(device, 0, cpustate->sramdlatch);
+	state_save_register_device_item(device, 0, cpustate->fglatch);
+	state_save_register_device_item(device, 0, cpustate->bglatch);
+	state_save_register_device_item(device, 0, cpustate->gt0reg);
+	state_save_register_device_item(device, 0, cpustate->fdxreg);
+	state_save_register_device_item(device, 0, cpustate->field);
+	state_save_register_device_item(device, 0, cpustate->clkcnt);
+
+	state_save_register_device_item_pointer(device, 0, cpustate->sram, 4096);
+	state_save_register_device_item_pointer(device, 0, cpustate->ptr_ram, 1024);
+	state_save_register_device_item_pointer(device, 0, cpustate->e_stack, 32768);
+	state_save_register_device_item_pointer(device, 0, cpustate->o_stack, 32768);
 
 	state_save_register_postload(device->machine, cquestlin_postload, (void *)device);
 }
 
 static CPU_INIT( cquestlin )
 {
-	memset(&cquestlin, 0, sizeof(cquestlin));
+	const cubeqst_lin_config *linconfig = device->static_config;
+	cquestlin_state *cpustate = device->token;
+	memset(cpustate, 0, sizeof(*cpustate));
 
 	/* Allocate RAM */
-	cquestlin.sram = malloc(4096 * sizeof(UINT16));      /* Shared with rotate CPU */
-	cquestlin.ptr_ram = malloc(1024);                    /* Pointer RAM */
-	cquestlin.e_stack = malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
-	cquestlin.o_stack = malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
+	cpustate->sram = auto_malloc(4096 * sizeof(UINT16));      /* Shared with rotate CPU */
+	cpustate->ptr_ram = auto_malloc(1024);                    /* Pointer RAM */
+	cpustate->e_stack = auto_malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
+	cpustate->o_stack = auto_malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
 
-	cquestlin.device = device;
-	cquestlin.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->device = device;
+	cpustate->rotdevice = cputag_get_cpu(device->machine, linconfig->rot_cpu_tag);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	cquestlin_state_register(device, "cquestlin");
+	cquestlin_state_register(device);
 }
 
 
 static CPU_RESET( cquestlin )
 {
-	cquestlin.clkcnt = 0;
-	cquestlin.pc[FOREGROUND] = 0;
-	cquestlin.pc[BACKGROUND] = 0x80;
+	cquestlin_state *cpustate = device->token;
+	cpustate->clkcnt = 0;
+	cpustate->pc[FOREGROUND] = 0;
+	cpustate->pc[BACKGROUND] = 0x80;
 }
 
 
 static CPU_EXIT( cquestlin )
 {
-	free(cquestlin.sram);
-	free(cquestlin.e_stack);
-	free(cquestlin.o_stack);
-	free(cquestlin.ptr_ram);
 }
 
 
@@ -531,8 +475,8 @@ static CPU_EXIT( cquestlin )
     SOUND CORE EXECUTION LOOP
 ***************************************************************************/
 
-#define SND_PC			(cquestsnd.pc)
-#define SND_DATA_IN		(_ramen ? cquestsnd.sound_data[cquestsnd.platch] : cquestsnd.dinlatch)
+#define SND_PC			(cpustate->pc)
+#define SND_DATA_IN		(_ramen ? cpustate->sound_data[cpustate->platch] : cpustate->dinlatch)
 
 enum snd_latch_type
 {
@@ -541,16 +485,16 @@ enum snd_latch_type
 	ADLATCH = 2,
 };
 
-static int do_sndjmp(int jmp)
+static int do_sndjmp(cquestsnd_state *cpustate, int jmp)
 {
 	switch (jmp)
 	{
 		/* JUMP */ case 0: return 1;
-		/* MSB  */ case 2: return cquestsnd.f & 0x8000 ? 0 : 1;
-		/* !MSB */ case 3: return cquestsnd.f & 0x8000 ? 1 : 0;
-		/* ZERO */ case 5: return cquestsnd.f == 0 ? 0 : 1;
-		/* OVR  */ case 6: return cquestsnd.vflag ? 0 : 1;
-		/* LOOP */ case 7: return cquestsnd.adrcntr & 0x80 ? 0: 1;
+		/* MSB  */ case 2: return cpustate->f & 0x8000 ? 0 : 1;
+		/* !MSB */ case 3: return cpustate->f & 0x8000 ? 1 : 0;
+		/* ZERO */ case 5: return cpustate->f == 0 ? 0 : 1;
+		/* OVR  */ case 6: return cpustate->vflag ? 0 : 1;
+		/* LOOP */ case 7: return cpustate->adrcntr & 0x80 ? 0: 1;
 	}
 
 	return 0;
@@ -558,15 +502,16 @@ static int do_sndjmp(int jmp)
 
 static CPU_EXECUTE( cquestsnd )
 {
+	cquestsnd_state *cpustate = device->token;
 	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
-	cquestsnd_icount = cycles;
+	cpustate->icount = cycles;
 
 	/* Core execution loop */
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = memory_decrypted_read_qword(cquestsnd.program, SND_PC << 3);
+		UINT64 inst = memory_decrypted_read_qword(cpustate->program, SND_PC << 3);
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
 
@@ -588,11 +533,11 @@ static CPU_EXECUTE( cquestsnd )
 		int _rin    = (inslow >> 26) & 1;
 
 		if (calldebugger)
-			debugger_instruction_hook(device, cquestsnd.pc);
+			debugger_instruction_hook(device, cpustate->pc);
 
 		/* Don't think this matters, but just in case */
 		if (rtn)
-			t = cquestsnd.rtnlatch;
+			t = cpustate->rtnlatch;
 
 		/* Handle the AM2901 ALU instruction */
 		{
@@ -606,13 +551,13 @@ static CPU_EXECUTE( cquestsnd )
 			/* Determine the ALU sources */
 			switch (i2_0)
 			{
-				case AQ: r = cquestsnd.ram[a]; s = cquestsnd.q;      break;
-				case AB: r = cquestsnd.ram[a]; s = cquestsnd.ram[b]; break;
-				case ZQ: r = 0;                s = cquestsnd.q;      break;
-				case ZB: r = 0;                s = cquestsnd.ram[b]; break;
-				case ZA: r = 0;                s = cquestsnd.ram[a]; break;
-				case DA: r = SND_DATA_IN;      s = cquestsnd.ram[a]; break;
-				case DQ: r = SND_DATA_IN;      s = cquestsnd.q;      break;
+				case AQ: r = cpustate->ram[a]; s = cpustate->q;      break;
+				case AB: r = cpustate->ram[a]; s = cpustate->ram[b]; break;
+				case ZQ: r = 0;                s = cpustate->q;      break;
+				case ZB: r = 0;                s = cpustate->ram[b]; break;
+				case ZA: r = 0;                s = cpustate->ram[a]; break;
+				case DA: r = SND_DATA_IN;      s = cpustate->ram[a]; break;
+				case DQ: r = SND_DATA_IN;      s = cpustate->q;      break;
 				case DZ: r = SND_DATA_IN;      s = 0;                break;
 			}
 
@@ -651,112 +596,112 @@ static CPU_EXECUTE( cquestsnd )
 					break;
 			}
 
-			cquestsnd.f = res;
-			cquestsnd.cflag = cflag;
-			cquestsnd.vflag = vflag;
+			cpustate->f = res;
+			cpustate->cflag = cflag;
+			cpustate->vflag = vflag;
 
 			switch (i8_6)
 			{
 				case QREG:
-					cquestsnd.q = cquestsnd.f;
-					cquestsnd.y = cquestsnd.f;
+					cpustate->q = cpustate->f;
+					cpustate->y = cpustate->f;
 					break;
 				case NOP:
-					cquestsnd.y = cquestsnd.f;
+					cpustate->y = cpustate->f;
 					break;
 				case RAMA:
-					cquestsnd.y = cquestsnd.ram[a];
-					cquestsnd.ram[b] = cquestsnd.f;
+					cpustate->y = cpustate->ram[a];
+					cpustate->ram[b] = cpustate->f;
 					break;
 				case RAMF:
-					cquestsnd.ram[b] = cquestsnd.f;
-					cquestsnd.y = cquestsnd.f;
+					cpustate->ram[b] = cpustate->f;
+					cpustate->y = cpustate->f;
 					break;
 				case RAMQD:
 				{
 					UINT16 qin;
 
-					cquestsnd.ram[b] = (_rin ? 0 : 0x8000) | (cquestsnd.f >> 1);
-					cquestsnd.q >>= 1;
-					cquestsnd.y = cquestsnd.f;
+					cpustate->ram[b] = (_rin ? 0 : 0x8000) | (cpustate->f >> 1);
+					cpustate->q >>= 1;
+					cpustate->y = cpustate->f;
 
 					/* When right shifting Q, we need to OR in a value */
-					qin = (((cquestsnd.y >> 15) ^ (cquestsnd.y >> 1)) & 1) ? 0 : 0x8000;
+					qin = (((cpustate->y >> 15) ^ (cpustate->y >> 1)) & 1) ? 0 : 0x8000;
 
-					cquestsnd.q |= qin;
+					cpustate->q |= qin;
 					break;
 				}
 				case RAMD:
-					cquestsnd.ram[b] = (_rin ? 0 : 0x8000) | (cquestsnd.f >> 1);
-					cquestsnd.y = cquestsnd.f;
+					cpustate->ram[b] = (_rin ? 0 : 0x8000) | (cpustate->f >> 1);
+					cpustate->y = cpustate->f;
 					break;
 				case RAMQU:
-					cquestsnd.ram[b] = (cquestsnd.f << 1) | (_rin ? 0 : 0x0001);
-					cquestsnd.q <<= 1;
-					cquestsnd.y = cquestsnd.f;
+					cpustate->ram[b] = (cpustate->f << 1) | (_rin ? 0 : 0x0001);
+					cpustate->q <<= 1;
+					cpustate->y = cpustate->f;
 					break;
 				case RAMU:
-					cquestsnd.ram[b] = (cquestsnd.f << 1) | (_rin ? 0 : 0x0001);
-					cquestsnd.y = cquestsnd.f;
+					cpustate->ram[b] = (cpustate->f << 1) | (_rin ? 0 : 0x0001);
+					cpustate->y = cpustate->f;
 					break;
 			 }
 		}
 
 		/* Now handle any SRAM accesses from the previous cycle */
-		if (!cquestsnd.prev_ipram)
+		if (!cpustate->prev_ipram)
 		{
-		  UINT16 addr = cquestsnd.adrlatch | (cquestsnd.adrcntr & 0x7f);
+		  UINT16 addr = cpustate->adrlatch | (cpustate->adrcntr & 0x7f);
 
-		  if (!cquestsnd.prev_ipwrt)
-			cquestsnd.sram[addr] = cquestsnd.ramwlatch;
+		  if (!cpustate->prev_ipwrt)
+			cpustate->sram[addr] = cpustate->ramwlatch;
 		  else
-			cquestsnd.dinlatch = cquestsnd.sram[addr];
+			cpustate->dinlatch = cpustate->sram[addr];
 		}
 
 		/* Handle latches */
 		if (latch == PLTCH)
 		{
-			cquestsnd.platch = ((t & 3) << 9) | ((cquestsnd.y >> 6) & 0x1ff);
+			cpustate->platch = ((t & 3) << 9) | ((cpustate->y >> 6) & 0x1ff);
 		}
 		else if (latch == DAC)
 		{
-			cquestsnd.dac_w((cquestsnd.y & 0xfff0) | ((cquestsnd.adrcntr >> 3) & 0xf));
+			cpustate->dac_w(cpustate->device, (cpustate->y & 0xfff0) | ((cpustate->adrcntr >> 3) & 0xf));
 		}
 		else if (latch == ADLATCH)
 		{
 			/* Load the SRAM address counter - this value is instantly loaded */
-			cquestsnd.adrcntr = cquestsnd.y & 0x7f;
+			cpustate->adrcntr = cpustate->y & 0x7f;
 
 			/* Also load the SRAM address latch */
-			cquestsnd.adrlatch = cquestsnd.y & 0x780;
+			cpustate->adrlatch = cpustate->y & 0x780;
 		}
 
 		/* Check for jump/return */
-		if ( do_sndjmp(jmp) )
-			cquestsnd.pc = rtn ? cquestsnd.rtnlatch : t;
+		if ( do_sndjmp(cpustate, jmp) )
+			cpustate->pc = rtn ? cpustate->rtnlatch : t;
 		else
-			cquestsnd.pc++;
+			cpustate->pc++;
 
 		/* Load the return latch? (Obviously a load and a ret in the same cycle are invalid) */
 		if (rtnltch)
-		  cquestsnd.rtnlatch = t;
+		  cpustate->rtnlatch = t;
 
 		/* Only increment the sound counter if not loading */
 		if (inca && latch != ADLATCH)
-		  cquestsnd.adrcntr++;
+		  cpustate->adrcntr++;
 
 		/* Latch data for a RAM write (do actual write on the next cycle) */
 		if (!_ipwrt)
-		  cquestsnd.ramwlatch = cquestsnd.y;
+		  cpustate->ramwlatch = cpustate->y;
 
 		/* Save level sensitive bits */
-		cquestsnd.prev_ipram = _ipram;
-		cquestsnd.prev_ipwrt = _ipwrt;
+		cpustate->prev_ipram = _ipram;
+		cpustate->prev_ipwrt = _ipwrt;
 
-		cquestsnd_icount--;
-	} while (cquestsnd_icount > 0);
+		cpustate->icount--;
+	} while (cpustate->icount > 0);
 
-	return cycles - cquestsnd_icount;
+	return cycles - cpustate->icount;
 }
 
 
@@ -835,7 +780,7 @@ static CPU_DISASSEMBLE( cquestsnd )
     ROTATE CORE EXECUTION LOOP
 ***************************************************************************/
 
-#define ROT_PC			(cquestrot.pc & 0x1ff)
+#define ROT_PC			(cpustate->pc & 0x1ff)
 
 enum rot_spf
 {
@@ -867,40 +812,42 @@ enum rot_yout
 /* The Dynamic RAM latch clocks in a value at the end of this cycle */
 /* So CPU waits for sync before reading from DRAM */
 
-INLINE int do_rotjmp(int jmp)
+INLINE int do_rotjmp(cquestrot_state *cpustate, int jmp)
 {
 	int ret = 0;
 
 	switch (jmp & 7)
 	{
 		/*        */ case 0: ret = 0;                         break;
-		/* SEQ    */ case 1: ret = (cquestrot.seqcnt == 0xf); break;
-		/* CAROUT */ case 2: ret = cquestrot.cflag;           break;
-		/* SYNC   */ case 3: ret = !(cquestrot.clkcnt & 0x3); break;
+		/* SEQ    */ case 1: ret = (cpustate->seqcnt == 0xf); break;
+		/* CAROUT */ case 2: ret = cpustate->cflag;           break;
+		/* SYNC   */ case 3: ret = !(cpustate->clkcnt & 0x3); break;
 		/* LDWAIT */ case 4: ret = 0;                         break;
-		/* MSB    */ case 5: ret = BIT(cquestrot.f, 15);      break;
-		/* >=1    */ case 6: ret = (!_BIT(cquestrot.f, 15) && !(cquestrot.f == 0)); break;
-		/* ZERO   */ case 7: ret = (cquestrot.f == 0);        break;
+		/* MSB    */ case 5: ret = BIT(cpustate->f, 15);      break;
+		/* >=1    */ case 6: ret = (!_BIT(cpustate->f, 15) && !(cpustate->f == 0)); break;
+		/* ZERO   */ case 7: ret = (cpustate->f == 0);        break;
 	}
 
 	return !(!ret ^ BIT(jmp, 3));
 }
 
 
-#define ROT_SRAM_ADDRESS	((cquestrot.dsrclatch & 2) ? cquestrot.yrlatch : (cquestrot.rsrclatch | 0x700))
+#define ROT_SRAM_ADDRESS	((cpustate->dsrclatch & 2) ? cpustate->yrlatch : (cpustate->rsrclatch | 0x700))
 
 
 static CPU_EXECUTE( cquestrot )
 {
+	cquestrot_state *cpustate = device->token;
+	cquestlin_state *lincpustate = cpustate->lindevice->token;
 	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
-	cquestrot_icount = cycles;
+	cpustate->icount = cycles;
 
 	/* Core execution loop */
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = memory_decrypted_read_qword(cquestrot.program, ROT_PC << 3);
+		UINT64 inst = memory_decrypted_read_qword(cpustate->program, ROT_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
@@ -927,45 +874,45 @@ static CPU_EXECUTE( cquestrot )
 			debugger_instruction_hook(device, ROT_PC);
 
 		/* Handle DRAM accesses - I ought to check this... */
-		if (!(cquestrot.clkcnt & 3))
+		if (!(cpustate->clkcnt & 3))
 		{
-			if (cquestrot.wc)
+			if (cpustate->wc)
 			{
-				cquestrot.wc = 0;
-				cquestrot.dram[cquestrot.dynaddr & 0x3fff] = cquestrot.dyndata;
+				cpustate->wc = 0;
+				cpustate->dram[cpustate->dynaddr & 0x3fff] = cpustate->dyndata;
 			}
-			if (cquestrot.rc)
+			if (cpustate->rc)
 			{
-				cquestrot.rc = 0;
-				cquestrot.dinlatch = cquestrot.dram[cquestrot.dynaddr & 0x3fff];
+				cpustate->rc = 0;
+				cpustate->dinlatch = cpustate->dram[cpustate->dynaddr & 0x3fff];
 			}
 		}
 
 		/* Flag pending DRAM accesses */
-		if (!cquestrot.prev_dwrt)
-			cquestrot.wc = 1;
-		else if (!cquestrot.prev_dred)
-			cquestrot.rc = 1;
+		if (!cpustate->prev_dwrt)
+			cpustate->wc = 1;
+		else if (!cpustate->prev_dred)
+			cpustate->rc = 1;
 
 		/* What's on the D-Bus? */
-		if (~cquestrot.dsrclatch & 0x10)
-			data_in = cquestrot.dinlatch;
-		else if (~cquestrot.dsrclatch & 0x20)
-			data_in = cquestrot.sram[ROT_SRAM_ADDRESS];
-		else if (~cquestrot.dsrclatch & 0x40)
-			data_in = cquestrot.ydlatch;
-		else if (~cquestrot.dsrclatch & 0x80)
+		if (~cpustate->dsrclatch & 0x10)
+			data_in = cpustate->dinlatch;
+		else if (~cpustate->dsrclatch & 0x20)
+			data_in = cpustate->sram[ROT_SRAM_ADDRESS];
+		else if (~cpustate->dsrclatch & 0x40)
+			data_in = cpustate->ydlatch;
+		else if (~cpustate->dsrclatch & 0x80)
 			data_in = t & 0xfff;
 
 		/* What's on the T-Bus? */
-		if ((spf == SPF_RET) && (cquestrot.dsrclatch & 0x80))
+		if ((spf == SPF_RET) && (cpustate->dsrclatch & 0x80))
 			t = data_in;
 		else if (spf == SPF_OP)
 			t = (t & ~0xf) | (data_in >> 12);
 
 
-		if (~cquestrot.dsrclatch & 1)
-			cquestrot.sram[ROT_SRAM_ADDRESS] = data_in;
+		if (~cpustate->dsrclatch & 1)
+			cpustate->sram[ROT_SRAM_ADDRESS] = data_in;
 
 
 		/* Sign extend ALU input? */
@@ -982,24 +929,24 @@ static CPU_EXECUTE( cquestrot )
 			UINT32 vflag = 0;
 
 			/* First, determine correct I1 bit */
-			if ((spf == SPF_MULT) && !_BIT(cquestrot.q, 0))
+			if ((spf == SPF_MULT) && !_BIT(cpustate->q, 0))
 				i2_0 |= 2;
 
 			/* Determine the ALU sources */
 			switch (i2_0)
 			{
-				case 0: r = cquestrot.ram[a]; s = cquestrot.q;      break;
-				case 1: r = cquestrot.ram[a]; s = cquestrot.ram[b]; break;
-				case 2: r = 0;                s = cquestrot.q;      break;
-				case 3: r = 0;                s = cquestrot.ram[b]; break;
-				case 4: r = 0;                s = cquestrot.ram[a]; break;
-				case 5: r = data_in;		  s = cquestrot.ram[a]; break;
-				case 6: r = data_in;		  s = cquestrot.q;      break;
+				case 0: r = cpustate->ram[a]; s = cpustate->q;      break;
+				case 1: r = cpustate->ram[a]; s = cpustate->ram[b]; break;
+				case 2: r = 0;                s = cpustate->q;      break;
+				case 3: r = 0;                s = cpustate->ram[b]; break;
+				case 4: r = 0;                s = cpustate->ram[a]; break;
+				case 5: r = data_in;		  s = cpustate->ram[a]; break;
+				case 6: r = data_in;		  s = cpustate->q;      break;
 				case 7: r = data_in;		  s = 0;                break;
 			}
 
 			/* Next, determine the I3 and carry bits */
-			if ((spf == SPF_DIV) && cquestrot.divreg)
+			if ((spf == SPF_DIV) && cpustate->divreg)
 			{
 				i5_3 |= 1;
 				ci = 1;
@@ -1040,31 +987,31 @@ static CPU_EXECUTE( cquestrot )
 					break;
 			}
 
-			cquestrot.f = res;
-			cquestrot.cflag = cflag;
-			cquestrot.vflag = vflag;
+			cpustate->f = res;
+			cpustate->cflag = cflag;
+			cpustate->vflag = vflag;
 
 			switch (i8_6)
 			{
 				case QREG:
-					cquestrot.q = cquestrot.f;
-					cquestrot.y = cquestrot.f;
+					cpustate->q = cpustate->f;
+					cpustate->y = cpustate->f;
 					break;
 				case NOP:
-					cquestrot.y = cquestrot.f;
+					cpustate->y = cpustate->f;
 					break;
 				case RAMA:
-					cquestrot.y = cquestrot.ram[a];
-					cquestrot.ram[b] = cquestrot.f;
+					cpustate->y = cpustate->ram[a];
+					cpustate->ram[b] = cpustate->f;
 					break;
 				case RAMF:
-					cquestrot.ram[b] = cquestrot.f;
-					cquestrot.y = cquestrot.f;
+					cpustate->ram[b] = cpustate->f;
+					cpustate->y = cpustate->f;
 					break;
 				case RAMQD:
 				{
-					UINT16 q0 = cquestrot.q & 1;
-					UINT16 r0 = cquestrot.f & 1;
+					UINT16 q0 = cpustate->q & 1;
+					UINT16 r0 = cpustate->f & 1;
 					UINT16 q15 = 0;
 					UINT16 r15 = 0;
 
@@ -1079,18 +1026,18 @@ static CPU_EXECUTE( cquestrot )
 								r15 = r0 << 15;
 								break;
 						case 3: q15 = r0 << 15;
-								r15 = (cquestrot.vflag ^ BIT(cquestrot.f, 15)) << 15;
+								r15 = (cpustate->vflag ^ BIT(cpustate->f, 15)) << 15;
 								break;
 					}
 
-					cquestrot.ram[b] = r15 | (cquestrot.f >> 1);
-					cquestrot.q = q15 | (cquestrot.q >> 1);
-					cquestrot.y = cquestrot.f;
+					cpustate->ram[b] = r15 | (cpustate->f >> 1);
+					cpustate->q = q15 | (cpustate->q >> 1);
+					cpustate->y = cpustate->f;
 					break;
 				}
 				case RAMD:
 				{
-					UINT16 r0 = cquestrot.f & 1;
+					UINT16 r0 = cpustate->f & 1;
 					UINT16 r15 = 0;
 
 					switch (sel)
@@ -1099,18 +1046,18 @@ static CPU_EXECUTE( cquestrot )
 						case 1: r15 = 0x8000;	break;
 						case 2: r15 = r0 << 15;	break;
 						case 3:
-							r15 = (cquestrot.vflag ^ BIT(cquestrot.f, 15)) << 15;
+							r15 = (cpustate->vflag ^ BIT(cpustate->f, 15)) << 15;
 							break;
 					}
 
-					cquestrot.ram[b] = r15 | (cquestrot.f >> 1);
-					cquestrot.y = cquestrot.f;
+					cpustate->ram[b] = r15 | (cpustate->f >> 1);
+					cpustate->y = cpustate->f;
 					break;
 				}
 				case RAMQU:
 				{
-					UINT16 q15 = BIT(cquestrot.q, 15);
-					UINT16 r15 = BIT(cquestrot.f, 15);
+					UINT16 q15 = BIT(cpustate->q, 15);
+					UINT16 r15 = BIT(cpustate->f, 15);
 					UINT16 q0 = 0;
 					UINT16 r0 = 0;
 
@@ -1121,22 +1068,22 @@ static CPU_EXECUTE( cquestrot )
 						case 2: q0 = q15; r0 = r15; break;
 						case 3:
 						{
-							q0 = (spf == SPF_DIV) && !BIT(cquestrot.f, 15);
+							q0 = (spf == SPF_DIV) && !BIT(cpustate->f, 15);
 							r0 = q15;
 							break;
 						}
 					}
 
-					cquestrot.ram[b] = (cquestrot.f << 1) | r0;
-					cquestrot.q = (cquestrot.q << 1) | q0;
-					cquestrot.y = cquestrot.f;
+					cpustate->ram[b] = (cpustate->f << 1) | r0;
+					cpustate->q = (cpustate->q << 1) | q0;
+					cpustate->y = cpustate->f;
 					break;
 				}
 				case RAMU:
 				{
 
-					UINT16 q15 = BIT(cquestrot.q, 15);
-					UINT16 r15 = BIT(cquestrot.f, 15);
+					UINT16 q15 = BIT(cpustate->q, 15);
+					UINT16 r15 = BIT(cpustate->f, 15);
 					UINT16 r0 = 0;
 
 					switch (sel)
@@ -1147,24 +1094,24 @@ static CPU_EXECUTE( cquestrot )
 						case 3: r0 = q15;	break;
 					}
 
-					cquestrot.ram[b] = (cquestrot.f << 1) | r0;
-					cquestrot.y = cquestrot.f;
+					cpustate->ram[b] = (cpustate->f << 1) | r0;
+					cpustate->y = cpustate->f;
 					break;
 				}
 			 }
 		}
 
 		/* Check for jump */
-		if ( do_rotjmp(jmp) )
-			cquestrot.pc = t;
+		if ( do_rotjmp(cpustate, jmp) )
+			cpustate->pc = t;
 		else
-			cquestrot.pc = (cquestrot.pc + 1) & 0xfff;
+			cpustate->pc = (cpustate->pc + 1) & 0xfff;
 
 		/* Rising edge; update the sequence counter */
 		if (spf == SPF_SQLTCH)
-			cquestrot.seqcnt = t & 0xf;
+			cpustate->seqcnt = t & 0xf;
 		else if ( (spf == SPF_MULT) || (spf == SPF_DIV) )
-			cquestrot.seqcnt = (cquestrot.seqcnt + 1) & 0xf;
+			cpustate->seqcnt = (cpustate->seqcnt + 1) & 0xf;
 
 		/* Rising edge; write data source reg */
 		dsrclatch =
@@ -1173,43 +1120,43 @@ static CPU_EXECUTE( cquestrot )
 				| !(spf == SPF_SWRT);
 
 		/* R-latch is written on rising edge of dsrclatch bit 2 */
-		if (!_BIT(cquestrot.dsrclatch, 2) && _BIT(dsrclatch, 2))
-			cquestrot.rsrclatch = t & 0xff;
+		if (!_BIT(cpustate->dsrclatch, 2) && _BIT(dsrclatch, 2))
+			cpustate->rsrclatch = t & 0xff;
 
-		cquestrot.dsrclatch = dsrclatch;
+		cpustate->dsrclatch = dsrclatch;
 
 		/* Handle latching on rising edge */
 		switch (yout)
 		{
 			case YOUT_Y2LDA:
 			{
-				cquestrot.lineaddr = cquestrot.y & 0xfff;
+				cpustate->lineaddr = cpustate->y & 0xfff;
 				break;
 			}
 			case YOUT_Y2LDD:
 			{
-				cquestrot.linedata = ((t & 0xf) << 12) | (cquestrot.y & 0xfff);
-				cquestlin.sram[cquestrot.lineaddr] = cquestrot.linedata;
+				cpustate->linedata = ((t & 0xf) << 12) | (cpustate->y & 0xfff);
+				lincpustate->sram[cpustate->lineaddr] = cpustate->linedata;
 				break;
 			}
-			case YOUT_Y2DAD: cquestrot.dynaddr = cquestrot.y & 0x3fff;  break;
-			case YOUT_Y2DYN: cquestrot.dyndata = cquestrot.y & 0xffff;	break;
-			case YOUT_Y2R:   cquestrot.yrlatch = cquestrot.y & 0x7ff;	break;
-			case YOUT_Y2D:	 cquestrot.ydlatch = cquestrot.y;			break;
+			case YOUT_Y2DAD: cpustate->dynaddr = cpustate->y & 0x3fff;  break;
+			case YOUT_Y2DYN: cpustate->dyndata = cpustate->y & 0xffff;	break;
+			case YOUT_Y2R:   cpustate->yrlatch = cpustate->y & 0x7ff;	break;
+			case YOUT_Y2D:	 cpustate->ydlatch = cpustate->y;			break;
 		}
 
 		/* Clock in the divide register */
-		cquestrot.divreg = (spf == SPF_DIV) && !_BIT(cquestrot.f, 15);
+		cpustate->divreg = (spf == SPF_DIV) && !_BIT(cpustate->f, 15);
 
 		/* DRAM accessing */
-		cquestrot.prev_dred = !(spf == SPF_DRED);
-		cquestrot.prev_dwrt = !(spf == SPF_DWRT);
+		cpustate->prev_dred = !(spf == SPF_DRED);
+		cpustate->prev_dwrt = !(spf == SPF_DWRT);
 
-		cquestrot.clkcnt++;
-		cquestrot_icount--;
-	} while (cquestrot_icount > 0);
+		cpustate->clkcnt++;
+		cpustate->icount--;
+	} while (cpustate->icount > 0);
 
-	return cycles - cquestrot_icount;
+	return cycles - cpustate->icount;
 }
 
 
@@ -1312,7 +1259,7 @@ static CPU_DISASSEMBLE( cquestrot )
     LINE DRAWER CORE EXECUTION LOOP
 ***************************************************************************/
 
-#define VISIBLE_FIELD	!cquestlin.field
+#define VISIBLE_FIELD	!cpustate->field
 
 enum line_spf
 {
@@ -1350,18 +1297,18 @@ enum sreg_bits
 	SREG_LDX    = 7,
 };
 
-INLINE int do_linjmp(int jmp)
+INLINE int do_linjmp(cquestlin_state *cpustate, int jmp)
 {
 	int ret = 0;
 
 	switch (jmp & 7)
 	{
 		/*        */ case 0: ret = 0; break;
-		/* MSB    */ case 1: ret = BIT(cquestlin.f, 11); break;
-		/* SEQ    */ case 2: ret = (cquestlin.seqcnt == 0xfff); break;
-		/* >0     */ case 3: ret = !(cquestlin.f == 0) && !_BIT(cquestlin.f, 11); break;
-		/* CAROUT */ case 4: ret = (cquestlin.cflag); break;
-		/* ZERO   */ case 5: ret = (cquestlin.f == 0); break;
+		/* MSB    */ case 1: ret = BIT(cpustate->f, 11); break;
+		/* SEQ    */ case 2: ret = (cpustate->seqcnt == 0xfff); break;
+		/* >0     */ case 3: ret = !(cpustate->f == 0) && !_BIT(cpustate->f, 11); break;
+		/* CAROUT */ case 4: ret = (cpustate->cflag); break;
+		/* ZERO   */ case 5: ret = (cpustate->f == 0); break;
 	}
 
 	return !(!ret ^ BIT(jmp, 3));
@@ -1369,60 +1316,66 @@ INLINE int do_linjmp(int jmp)
 
 
 
-void cubeqcpu_swap_line_banks(void)
+void cubeqcpu_swap_line_banks(const device_config *device)
 {
-	cquestlin.field = cquestlin.field ^ 1;
+	cquestlin_state *cpustate = device->token;
+	cpustate->field = cpustate->field ^ 1;
 }
 
 
-void clear_stack(void)
+void cubeqcpu_clear_stack(const device_config *device)
 {
-	memset(&cquestlin.ptr_ram[cquestlin.field * 256], 0, 256);
+	cquestlin_state *cpustate = device->token;
+	memset(&cpustate->ptr_ram[cpustate->field * 256], 0, 256);
 }
 
-UINT8 get_ptr_ram_val(int i)
+UINT8 cubeqcpu_get_ptr_ram_val(const device_config *device, int i)
 {
-	return cquestlin.ptr_ram[(VISIBLE_FIELD * 256) + i];
+	cquestlin_state *cpustate = device->token;
+	return cpustate->ptr_ram[(VISIBLE_FIELD * 256) + i];
 }
 
-UINT32* get_stack_ram(void)
+UINT32* cubeqcpu_get_stack_ram(const device_config *device)
 {
+	cquestlin_state *cpustate = device->token;
 	if (VISIBLE_FIELD == ODD_FIELD)
-		return cquestlin.o_stack;
+		return cpustate->o_stack;
 	else
-		return cquestlin.e_stack;
+		return cpustate->e_stack;
 }
 
 
 static CPU_EXECUTE( cquestlin )
 {
-#define LINE_PC ((cquestlin.pc[prog] & 0x7f) | ((prog == BACKGROUND) ? 0x80 : 0))
+#define LINE_PC ((cpustate->pc[prog] & 0x7f) | ((prog == BACKGROUND) ? 0x80 : 0))
 
+	cquestlin_state *cpustate = device->token;
+	cquestrot_state *rotcpustate = cpustate->rotdevice->token;
 	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 	UINT32	*stack_ram;
 	UINT8	*ptr_ram;
 
 	/* Check the field and set the stack/pointer RAM pointers appropriately */
-	if (cquestlin.field == ODD_FIELD)
+	if (cpustate->field == ODD_FIELD)
 	{
-		stack_ram = cquestlin.o_stack;
-		ptr_ram = &cquestlin.ptr_ram[0];
+		stack_ram = cpustate->o_stack;
+		ptr_ram = &cpustate->ptr_ram[0];
 	}
 	else
 	{
-		stack_ram = cquestlin.e_stack;
-		ptr_ram = &cquestlin.ptr_ram[0x100];
+		stack_ram = cpustate->e_stack;
+		ptr_ram = &cpustate->ptr_ram[0x100];
 	}
 
-	cquestlin_icount = cycles;
+	cpustate->icount = cycles;
 
 	/* Core execution loop */
 	do
 	{
 		/* Are we executing the foreground or backgroud program? */
-		int prog = (cquestlin.clkcnt & 3) ? BACKGROUND : FOREGROUND;
+		int prog = (cpustate->clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
-		UINT64 inst = memory_decrypted_read_qword(cquestlin.program, LINE_PC << 3);
+		UINT64 inst = memory_decrypted_read_qword(cpustate->program, LINE_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
@@ -1443,45 +1396,45 @@ static CPU_EXECUTE( cquestlin )
 		UINT16	data_in = 0;
 
 		if (calldebugger)
-			debugger_instruction_hook(device, cquestlin.pc[prog]);
+			debugger_instruction_hook(device, cpustate->pc[prog]);
 
 		/* Handle accesses to and from shared SRAM */
 		if (prog == FOREGROUND)
 		{
-			if (!_BIT(cquestlin.fglatch, 5))
-				data_in = cquestlin.sram[cquestlin.fadlatch];
+			if (!_BIT(cpustate->fglatch, 5))
+				data_in = cpustate->sram[cpustate->fadlatch];
 			else
-				data_in = cquestrot.linedata;
+				data_in = rotcpustate->linedata;
 		}
 		else
 		{
-			if (!_BIT(cquestlin.bglatch, 4))
-				cquestlin.sram[cquestlin.badlatch] = cquestlin.sramdlatch;
-			else if (_BIT(cquestlin.bglatch, 2))
-				data_in = cquestlin.sram[cquestlin.badlatch];
+			if (!_BIT(cpustate->bglatch, 4))
+				cpustate->sram[cpustate->badlatch] = cpustate->sramdlatch;
+			else if (_BIT(cpustate->bglatch, 2))
+				data_in = cpustate->sram[cpustate->badlatch];
 			else
-				data_in = cquestrot.linedata;
+				data_in = rotcpustate->linedata;
 		}
 
 		/* Handle a write to stack RAM (/DOWRT) */
-		if ((cquestlin.clkcnt & 3) == 1)
+		if ((cpustate->clkcnt & 3) == 1)
 		{
-			if (_BIT(cquestlin.fglatch, 4) && (cquestlin.ycnt < 256))
+			if (_BIT(cpustate->fglatch, 4) && (cpustate->ycnt < 256))
 			{
 				/* 20-bit words */
 				UINT32 data;
-				UINT16 h = cquestlin.xcnt;
-				UINT8 v = cquestlin.ycnt & 0xff;
+				UINT16 h = cpustate->xcnt;
+				UINT8 v = cpustate->ycnt & 0xff;
 
 				/* Clamp H between 0 and 319 */
 				if (h >= 320)
 					h = (h & 0x800) ? 0 : 319;
 
 				/* Stack word type depends on STOP/#START bit */
-				if ( _BIT(cquestlin.fglatch, 3) )
-					data = (0 << 19) | (h << 8) | cquestlin.zlatch;
+				if ( _BIT(cpustate->fglatch, 3) )
+					data = (0 << 19) | (h << 8) | cpustate->zlatch;
 				else
-					data = (1 << 19) | ((cquestlin.clatch & 0x100) << 9) | (h << 8) | (cquestlin.clatch & 0xff);
+					data = (1 << 19) | ((cpustate->clatch & 0x100) << 9) | (h << 8) | (cpustate->clatch & 0xff);
 
 				stack_ram[(v << 7) | (ptr_ram[v] & 0x7f)] = data;
 
@@ -1495,12 +1448,12 @@ static CPU_EXECUTE( cquestlin )
 			t = (t & ~0xf) | (data_in >> 12);
 
 		/* Determine the correct I1 bit  */
-		if ((spf == LSPF_MULT) && !_BIT(cquestlin.q, 0))
+		if ((spf == LSPF_MULT) && !_BIT(cpustate->q, 0))
 			i2_0 |= 2;
 
 		/* Determine A0 (BRESA0) */
-		if ((prog == FOREGROUND) && !_BIT(cquestlin.fglatch, 2))
-			a |= cquestlin.gt0reg;
+		if ((prog == FOREGROUND) && !_BIT(cpustate->fglatch, 2))
+			a |= cpustate->gt0reg;
 
 		/* Now do the ALU operation */
 		{
@@ -1514,13 +1467,13 @@ static CPU_EXECUTE( cquestlin )
 			/* Determine the ALU sources */
 			switch (i2_0)
 			{
-				case 0: r = cquestlin.ram[a];	s = cquestlin.q;      break;
-				case 1: r = cquestlin.ram[a];	s = cquestlin.ram[b]; break;
-				case 2: r = 0;					s = cquestlin.q;      break;
-				case 3: r = 0;					s = cquestlin.ram[b]; break;
-				case 4: r = 0;					s = cquestlin.ram[a]; break;
-				case 5: r = data_in;		  	s = cquestlin.ram[a]; break;
-				case 6: r = data_in;		  	s = cquestlin.q;      break;
+				case 0: r = cpustate->ram[a];	s = cpustate->q;      break;
+				case 1: r = cpustate->ram[a];	s = cpustate->ram[b]; break;
+				case 2: r = 0;					s = cpustate->q;      break;
+				case 3: r = 0;					s = cpustate->ram[b]; break;
+				case 4: r = 0;					s = cpustate->ram[a]; break;
+				case 5: r = data_in;		  	s = cpustate->ram[a]; break;
+				case 6: r = data_in;		  	s = cpustate->q;      break;
 				case 7: r = data_in;		  	s = 0;                break;
 			}
 
@@ -1563,43 +1516,43 @@ static CPU_EXECUTE( cquestlin )
 					break;
 			}
 
-			cquestlin.f = res & 0xfff;
-			cquestlin.cflag = cflag;
-			cquestlin.vflag = vflag;
+			cpustate->f = res & 0xfff;
+			cpustate->cflag = cflag;
+			cpustate->vflag = vflag;
 
 			switch (i8_6)
 			{
 				case QREG:
-					cquestlin.q = cquestlin.f;
-					cquestlin.y = cquestlin.f;
+					cpustate->q = cpustate->f;
+					cpustate->y = cpustate->f;
 					break;
 				case NOP:
-					cquestlin.y = cquestlin.f;
+					cpustate->y = cpustate->f;
 					break;
 				case RAMA:
-					cquestlin.y = cquestlin.ram[a];
-					cquestlin.ram[b] = cquestlin.f;
+					cpustate->y = cpustate->ram[a];
+					cpustate->ram[b] = cpustate->f;
 					break;
 				case RAMF:
-					cquestlin.ram[b] = cquestlin.f;
-					cquestlin.y = cquestlin.f;
+					cpustate->ram[b] = cpustate->f;
+					cpustate->y = cpustate->f;
 					break;
 				case RAMQD:
 				{
-					UINT16 r11 = (BIT(cquestlin.f, 11) ^ cquestlin.vflag) ? 0x800 : 0;
+					UINT16 r11 = (BIT(cpustate->f, 11) ^ cpustate->vflag) ? 0x800 : 0;
 					UINT16 q11 = (prog == BACKGROUND) ? 0x800 : 0;
 
-					cquestlin.ram[b] = r11 | (cquestlin.f >> 1);
-					cquestlin.q = q11 | (cquestlin.q >> 1);
-					cquestlin.y = cquestlin.f;
+					cpustate->ram[b] = r11 | (cpustate->f >> 1);
+					cpustate->q = q11 | (cpustate->q >> 1);
+					cpustate->y = cpustate->f;
 					break;
 				}
 				case RAMD:
 				{
-					UINT16 r11 = (BIT(cquestlin.f, 11) ^ cquestlin.vflag) ? 0x800 : 0;
+					UINT16 r11 = (BIT(cpustate->f, 11) ^ cpustate->vflag) ? 0x800 : 0;
 
-					cquestlin.ram[b] = r11 | (cquestlin.f >> 1);
-					cquestlin.y = cquestlin.f;
+					cpustate->ram[b] = r11 | (cpustate->f >> 1);
+					cpustate->y = cpustate->f;
 					break;
 				}
 				case RAMQU:
@@ -1608,86 +1561,86 @@ static CPU_EXECUTE( cquestlin )
 					UINT16 r0 = (prog == BACKGROUND);
 
 					/* This should never happen - Q0 will be invalid */
-					cquestlin.ram[b] = (cquestlin.f << 1) | r0;
-					cquestlin.q = (cquestlin.q << 1) | 0;
-					cquestlin.y = cquestlin.f;
+					cpustate->ram[b] = (cpustate->f << 1) | r0;
+					cpustate->q = (cpustate->q << 1) | 0;
+					cpustate->y = cpustate->f;
 					break;
 				}
 				case RAMU:
 				{
 					UINT16 r0 = (prog == BACKGROUND);
 
-					cquestlin.ram[b] = (cquestlin.f << 1) | r0;
-					cquestlin.y = cquestlin.f;
+					cpustate->ram[b] = (cpustate->f << 1) | r0;
+					cpustate->y = cpustate->f;
 					break;
 				}
 			 }
 		}
 
 		/* Adjust program counter */
-		if ( do_linjmp(jmp) )
-			cquestlin.pc[prog] = t & 0x7f;
+		if ( do_linjmp(cpustate, jmp) )
+			cpustate->pc[prog] = t & 0x7f;
 		else
-			cquestlin.pc[prog] = (cquestlin.pc[prog] + 1) & 0x7f;
+			cpustate->pc[prog] = (cpustate->pc[prog] + 1) & 0x7f;
 
 		if (prog == BACKGROUND)
-			cquestlin.pc[prog] |= 0x80;
+			cpustate->pc[prog] |= 0x80;
 		else
 		{
 			/* Handle events that happen during FG execution */
 			if (latch == LLATCH_XLATCH)
-				cquestlin.xcnt = cquestlin.y & 0xfff;
+				cpustate->xcnt = cpustate->y & 0xfff;
 			else
 			{
 				int _xcet;
-				int mux_sel = (BIT(cquestlin.sreg, SREG_DX_DY) << 1) | (BIT(cquestlin.sreg, SREG_DX) ^ BIT(cquestlin.sreg, SREG_DY));
+				int mux_sel = (BIT(cpustate->sreg, SREG_DX_DY) << 1) | (BIT(cpustate->sreg, SREG_DX) ^ BIT(cpustate->sreg, SREG_DY));
 
 				if (mux_sel == 0)
 					_xcet = !(spf == LSPF_BRES);
 				else if (mux_sel == 1)
-					_xcet = _BIT(cquestlin.fglatch, 1);
+					_xcet = _BIT(cpustate->fglatch, 1);
 				else if (mux_sel == 2)
-					_xcet = !(cquestlin.gt0reg && (spf == LSPF_BRES));
+					_xcet = !(cpustate->gt0reg && (spf == LSPF_BRES));
 				else
-					_xcet = _BIT(cquestlin.fglatch, 0);
+					_xcet = _BIT(cpustate->fglatch, 0);
 
 				if (!_xcet)
-					cquestlin.xcnt = (cquestlin.xcnt + (_BIT(cquestlin.sreg, SREG_DX) ? 1 : -1)) & 0xfff;
+					cpustate->xcnt = (cpustate->xcnt + (_BIT(cpustate->sreg, SREG_DX) ? 1 : -1)) & 0xfff;
 			}
 
 			if (latch == LLATCH_YLATCH)
-				cquestlin.ycnt = cquestlin.y & 0xfff;
+				cpustate->ycnt = cpustate->y & 0xfff;
 			else
 			{
 				int _ycet;
-				int mux_sel = (BIT(cquestlin.sreg, SREG_DX_DY) << 1) | (BIT(cquestlin.sreg, SREG_DX) ^ BIT(cquestlin.sreg, SREG_DY));
+				int mux_sel = (BIT(cpustate->sreg, SREG_DX_DY) << 1) | (BIT(cpustate->sreg, SREG_DX) ^ BIT(cpustate->sreg, SREG_DY));
 
 				if (mux_sel == 0)
-					_ycet = !(cquestlin.gt0reg && (spf == LSPF_BRES));
+					_ycet = !(cpustate->gt0reg && (spf == LSPF_BRES));
 				else if (mux_sel == 1)
-					_ycet = _BIT(cquestlin.fglatch, 0);
+					_ycet = _BIT(cpustate->fglatch, 0);
 				else if (mux_sel == 2)
 					_ycet = !(spf == LSPF_BRES);
 				else
-					_ycet = _BIT(cquestlin.fglatch, 1);
+					_ycet = _BIT(cpustate->fglatch, 1);
 
 				if (!_ycet)
-					cquestlin.ycnt = (cquestlin.ycnt + (_BIT(cquestlin.sreg, SREG_DY) ? 1 : -1)) & 0xfff;
+					cpustate->ycnt = (cpustate->ycnt + (_BIT(cpustate->sreg, SREG_DY) ? 1 : -1)) & 0xfff;
 			}
 		}
 
 		if (latch == LLATCH_CLATCH)
-			cquestlin.clatch = cquestlin.y & 0x1ff;
+			cpustate->clatch = cpustate->y & 0x1ff;
 		else if (latch == LLATCH_ZLATCH)
-			cquestlin.zlatch = cquestlin.y & 0xff;
+			cpustate->zlatch = cpustate->y & 0xff;
 		else if (latch == LLATCH_FADLATCH)
-			cquestlin.fadlatch = cquestlin.y & 0xfff;
+			cpustate->fadlatch = cpustate->y & 0xfff;
 		else if (latch == LLATCH_BADLATCH)
-			cquestlin.badlatch = cquestlin.y & 0xfff;
+			cpustate->badlatch = cpustate->y & 0xfff;
 
 		/* What about the SRAM dlatch? */
-		if ( !_BIT(cquestlin.bglatch, 5) )
-			cquestlin.sramdlatch = ((t & 0xf) << 12) | (cquestlin.y & 0x0fff);
+		if ( !_BIT(cpustate->bglatch, 5) )
+			cpustate->sramdlatch = ((t & 0xf) << 12) | (cpustate->y & 0x0fff);
 
 		/* BG and FG latches */
 		if (prog == FOREGROUND)
@@ -1704,33 +1657,33 @@ static CPU_EXECUTE( cquestlin )
 			}
 			else if (mux_sel == 1)
 			{
-				dowrt = cquestlin.fdxreg ^ BIT(cquestlin.sreg, SREG_DX);
-				start_stop = cquestlin.fdxreg;
+				dowrt = cpustate->fdxreg ^ BIT(cpustate->sreg, SREG_DX);
+				start_stop = cpustate->fdxreg;
 			}
 			else if (mux_sel == 2)
 			{
-				dowrt = BIT(cquestlin.sreg, SREG_LDX) ^ BIT(cquestlin.sreg, SREG_DX);
-				start_stop = BIT(cquestlin.sreg, SREG_DX);
+				dowrt = BIT(cpustate->sreg, SREG_LDX) ^ BIT(cpustate->sreg, SREG_DX);
+				start_stop = BIT(cpustate->sreg, SREG_DX);
 			}
 			else
 			{
-				dowrt = (spf == LSPF_BRES) && (_BIT(cquestlin.sreg, SREG_DX_DY) || cquestlin.gt0reg);
-				start_stop = BIT(cquestlin.sreg, SREG_DY);
+				dowrt = (spf == LSPF_BRES) && (_BIT(cpustate->sreg, SREG_DX_DY) || cpustate->gt0reg);
+				start_stop = BIT(cpustate->sreg, SREG_DY);
 			}
 
-			cquestlin.fglatch =
+			cpustate->fglatch =
 					(!(latch == LLATCH_FADLATCH) << 5)
 					| (dowrt << 4)
 					| (start_stop << 3)
 					| (_pbcs << 2)
 					| (!(spf == LSPF_BRES) << 1)
-					| !(cquestlin.gt0reg && (spf == LSPF_BRES));
+					| !(cpustate->gt0reg && (spf == LSPF_BRES));
 		}
 		else
 		{
-			int _lpwrt = BIT(cquestlin.bglatch, 5);
+			int _lpwrt = BIT(cpustate->bglatch, 5);
 
-			cquestlin.bglatch =
+			cpustate->bglatch =
 					(!(spf == LSPF_PWRT) << 5)
 					| (_lpwrt << 4)
 					| ((!_lpwrt || (!(spf == LSPF_PWRT) && (latch == LLATCH_BADLATCH))) << 2);
@@ -1740,34 +1693,34 @@ static CPU_EXECUTE( cquestlin )
 		if (spf == LSPF_SREG)
 		{
 			/* The sign bit is inverted */
-			cquestlin.sreg = (cquestlin.sreg << 1) | !BIT(cquestlin.f, 11);
+			cpustate->sreg = (cpustate->sreg << 1) | !BIT(cpustate->f, 11);
 
 			/* Also latch the >0 reg */
-			cquestlin.gt0reg = !(cquestlin.f == 0) && !_BIT(cquestlin.f, 11);
+			cpustate->gt0reg = !(cpustate->f == 0) && !_BIT(cpustate->f, 11);
 		}
 		else if (spf == LSPF_FSTRT)
 		{
-			cquestlin.fdxreg = BIT(cquestlin.sreg, 3);
+			cpustate->fdxreg = BIT(cpustate->sreg, 3);
 		}
 
 		/* Load or increment sequence counter? */
 		if (latch == LLATCH_SEQLATCH)
 		{
-			cquestlin.seqcnt = cquestlin.y & 0xfff;
+			cpustate->seqcnt = cpustate->y & 0xfff;
 		}
 		else if (spf == LSPF_BRES)
 		{
-			cquestlin.seqcnt = (cquestlin.seqcnt + 1) & 0xfff;
+			cpustate->seqcnt = (cpustate->seqcnt + 1) & 0xfff;
 
 			/* Also latch the >0 reg */
-			cquestlin.gt0reg = !(cquestlin.f == 0) && !_BIT(cquestlin.f, 11);
+			cpustate->gt0reg = !(cpustate->f == 0) && !_BIT(cpustate->f, 11);
 		}
 
-		cquestlin_icount--;
-		cquestlin.clkcnt++;
-	} while (cquestlin_icount > 0);
+		cpustate->icount--;
+		cpustate->clkcnt++;
+	} while (cpustate->icount > 0);
 
-	return cycles - cquestlin_icount;
+	return cycles - cpustate->icount;
 }
 
 
@@ -1862,32 +1815,33 @@ static CPU_DISASSEMBLE( cquestlin )
 
 static CPU_SET_INFO( cquestsnd )
 {
+	cquestsnd_state *cpustate = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CQUESTSND_PC:		cquestsnd.pc = info->i;				break;
-		case CPUINFO_INT_REGISTER + CQUESTSND_Q:		cquestsnd.q = info->i;				break;
-		case CPUINFO_INT_REGISTER + CQUESTSND_RTNLATCH:	cquestsnd.rtnlatch = info->i;		break;
-		case CPUINFO_INT_REGISTER + CQUESTSND_ADRCNTR:	cquestsnd.adrcntr = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_DINLATCH:	cquestsnd.dinlatch = info->i;		break;
+		case CPUINFO_INT_REGISTER + CQUESTSND_PC:		cpustate->pc = info->i;				break;
+		case CPUINFO_INT_REGISTER + CQUESTSND_Q:		cpustate->q = info->i;				break;
+		case CPUINFO_INT_REGISTER + CQUESTSND_RTNLATCH:	cpustate->rtnlatch = info->i;		break;
+		case CPUINFO_INT_REGISTER + CQUESTSND_ADRCNTR:	cpustate->adrcntr = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_DINLATCH:	cpustate->dinlatch = info->i;		break;
 
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM0:  cquestsnd.ram[0x0] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM1:  cquestsnd.ram[0x1] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM2:  cquestsnd.ram[0x2] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM3:  cquestsnd.ram[0x3] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM4:  cquestsnd.ram[0x4] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM5:  cquestsnd.ram[0x5] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM6:  cquestsnd.ram[0x6] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM7:  cquestsnd.ram[0x7] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM8:  cquestsnd.ram[0x8] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM9:  cquestsnd.ram[0x9] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMA:  cquestsnd.ram[0xa] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMB:  cquestsnd.ram[0xb] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMC:  cquestsnd.ram[0xc] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMD:  cquestsnd.ram[0xd] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAME:  cquestsnd.ram[0xe] = info->i; 			break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMF:  cquestsnd.ram[0xf] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM0:  cpustate->ram[0x0] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM1:  cpustate->ram[0x1] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM2:  cpustate->ram[0x2] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM3:  cpustate->ram[0x3] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM4:  cpustate->ram[0x4] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM5:  cpustate->ram[0x5] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM6:  cpustate->ram[0x6] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM7:  cpustate->ram[0x7] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM8:  cpustate->ram[0x8] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM9:  cpustate->ram[0x9] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMA:  cpustate->ram[0xa] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMB:  cpustate->ram[0xb] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMC:  cpustate->ram[0xc] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMD:  cpustate->ram[0xd] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAME:  cpustate->ram[0xe] = info->i; 			break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMF:  cpustate->ram[0xf] = info->i; 			break;
 	}
 }
 
@@ -1897,11 +1851,12 @@ static CPU_SET_INFO( cquestsnd )
 
 CPU_GET_INFO( cquestsnd )
 {
+	cquestsnd_state *cpustate = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestsnd);			break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestsnd_state);		break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;
@@ -1920,21 +1875,21 @@ CPU_GET_INFO( cquestsnd )
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CQUESTSND_PC:			info->i = cquestsnd.pc;				break;
-		case CPUINFO_INT_REGISTER + CQUESTSND_RTNLATCH:		info->i = cquestsnd.rtnlatch;		break;
-		case CPUINFO_INT_REGISTER + CQUESTSND_ADRCNTR:		info->i = cquestsnd.adrcntr;		break;
+		case CPUINFO_INT_REGISTER + CQUESTSND_PC:			info->i = cpustate->pc;				break;
+		case CPUINFO_INT_REGISTER + CQUESTSND_RTNLATCH:		info->i = cpustate->rtnlatch;		break;
+		case CPUINFO_INT_REGISTER + CQUESTSND_ADRCNTR:		info->i = cpustate->adrcntr;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestsnd);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cquestsnd);break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cquestsnd);break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestsnd);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestsnd);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestsnd);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestsnd);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestsnd);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cquestsnd_icount;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "Sound CPU");break;
@@ -1944,27 +1899,27 @@ CPU_GET_INFO( cquestsnd )
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
 
 		case CPUINFO_STR_FLAGS:							sprintf(info->s, ".......");			 break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_PC:  		sprintf(info->s, "PC:  %02X", cquestsnd.pc); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_Q:  		sprintf(info->s, "Q:   %04X", cquestsnd.q); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RTNLATCH: sprintf(info->s, "RTN: %02X", cquestsnd.rtnlatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_ADRCNTR:  sprintf(info->s, "CNT: %02X", cquestsnd.adrcntr); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_DINLATCH:	sprintf(info->s, "DIN: %04X", cquestsnd.dinlatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM0:		sprintf(info->s, "RAM[0]: %04X", cquestsnd.ram[0x0]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM1:		sprintf(info->s, "RAM[1]: %04X", cquestsnd.ram[0x1]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM2:		sprintf(info->s, "RAM[2]: %04X", cquestsnd.ram[0x2]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM3:		sprintf(info->s, "RAM[3]: %04X", cquestsnd.ram[0x3]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM4:		sprintf(info->s, "RAM[4]: %04X", cquestsnd.ram[0x4]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM5:		sprintf(info->s, "RAM[5]: %04X", cquestsnd.ram[0x5]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM6:		sprintf(info->s, "RAM[6]: %04X", cquestsnd.ram[0x6]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM7:		sprintf(info->s, "RAM[7]: %04X", cquestsnd.ram[0x7]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM8:		sprintf(info->s, "RAM[8]: %04X", cquestsnd.ram[0x8]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAM9:		sprintf(info->s, "RAM[9]: %04X", cquestsnd.ram[0x9]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMA:		sprintf(info->s, "RAM[A]: %04X", cquestsnd.ram[0xa]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMB:		sprintf(info->s, "RAM[B]: %04X", cquestsnd.ram[0xb]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMC:		sprintf(info->s, "RAM[C]: %04X", cquestsnd.ram[0xc]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMD:		sprintf(info->s, "RAM[D]: %04X", cquestsnd.ram[0xd]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAME:		sprintf(info->s, "RAM[E]: %04X", cquestsnd.ram[0xe]); break;
-		case CPUINFO_STR_REGISTER + CQUESTSND_RAMF:		sprintf(info->s, "RAM[F]: %04X", cquestsnd.ram[0xf]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_PC:  		sprintf(info->s, "PC:  %02X", cpustate->pc); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_Q:  		sprintf(info->s, "Q:   %04X", cpustate->q); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RTNLATCH: sprintf(info->s, "RTN: %02X", cpustate->rtnlatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_ADRCNTR:  sprintf(info->s, "CNT: %02X", cpustate->adrcntr); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_DINLATCH:	sprintf(info->s, "DIN: %04X", cpustate->dinlatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM0:		sprintf(info->s, "RAM[0]: %04X", cpustate->ram[0x0]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM1:		sprintf(info->s, "RAM[1]: %04X", cpustate->ram[0x1]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM2:		sprintf(info->s, "RAM[2]: %04X", cpustate->ram[0x2]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM3:		sprintf(info->s, "RAM[3]: %04X", cpustate->ram[0x3]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM4:		sprintf(info->s, "RAM[4]: %04X", cpustate->ram[0x4]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM5:		sprintf(info->s, "RAM[5]: %04X", cpustate->ram[0x5]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM6:		sprintf(info->s, "RAM[6]: %04X", cpustate->ram[0x6]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM7:		sprintf(info->s, "RAM[7]: %04X", cpustate->ram[0x7]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM8:		sprintf(info->s, "RAM[8]: %04X", cpustate->ram[0x8]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAM9:		sprintf(info->s, "RAM[9]: %04X", cpustate->ram[0x9]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMA:		sprintf(info->s, "RAM[A]: %04X", cpustate->ram[0xa]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMB:		sprintf(info->s, "RAM[B]: %04X", cpustate->ram[0xb]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMC:		sprintf(info->s, "RAM[C]: %04X", cpustate->ram[0xc]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMD:		sprintf(info->s, "RAM[D]: %04X", cpustate->ram[0xd]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAME:		sprintf(info->s, "RAM[E]: %04X", cpustate->ram[0xe]); break;
+		case CPUINFO_STR_REGISTER + CQUESTSND_RAMF:		sprintf(info->s, "RAM[F]: %04X", cpustate->ram[0xf]); break;
 	}
 }
 
@@ -1975,37 +1930,38 @@ CPU_GET_INFO( cquestsnd )
 
 static CPU_SET_INFO( cquestrot )
 {
+	cquestrot_state *cpustate = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CQUESTROT_PC:	cquestrot.pc = info->i;					break;
-		case CPUINFO_INT_REGISTER + CQUESTROT_Q:	cquestrot.q = info->i;					break;
+		case CPUINFO_INT_REGISTER + CQUESTROT_PC:	cpustate->pc = info->i;					break;
+		case CPUINFO_INT_REGISTER + CQUESTROT_Q:	cpustate->q = info->i;					break;
 
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM0:		cquestrot.ram[0x0] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM1:		cquestrot.ram[0x1] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM2:		cquestrot.ram[0x2] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM3:		cquestrot.ram[0x3] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM4:		cquestrot.ram[0x4] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM5:		cquestrot.ram[0x5] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM6:		cquestrot.ram[0x6] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM7:		cquestrot.ram[0x7] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM8:		cquestrot.ram[0x8] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM9:		cquestrot.ram[0x9] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMA:		cquestrot.ram[0xa] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMB:		cquestrot.ram[0xb] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMC:		cquestrot.ram[0xc] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMD:		cquestrot.ram[0xd] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAME:		cquestrot.ram[0xe] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMF:		cquestrot.ram[0xf] = info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_SEQCNT:	cquestrot.seqcnt	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DYNADDR:	cquestrot.dynaddr	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DYNDATA:	cquestrot.dyndata	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_YRLATCH:	cquestrot.yrlatch	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_YDLATCH:	cquestrot.ydlatch	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DINLATCH:	cquestrot.dinlatch	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DSRCLATCH:cquestrot.dsrclatch	= info->i; 		break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RSRCLATCH:cquestrot.rsrclatch	= info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM0:		cpustate->ram[0x0] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM1:		cpustate->ram[0x1] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM2:		cpustate->ram[0x2] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM3:		cpustate->ram[0x3] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM4:		cpustate->ram[0x4] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM5:		cpustate->ram[0x5] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM6:		cpustate->ram[0x6] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM7:		cpustate->ram[0x7] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM8:		cpustate->ram[0x8] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM9:		cpustate->ram[0x9] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMA:		cpustate->ram[0xa] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMB:		cpustate->ram[0xb] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMC:		cpustate->ram[0xc] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMD:		cpustate->ram[0xd] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAME:		cpustate->ram[0xe] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMF:		cpustate->ram[0xf] = info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_SEQCNT:	cpustate->seqcnt	= info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DYNADDR:	cpustate->dynaddr	= info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DYNDATA:	cpustate->dyndata	= info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_YRLATCH:	cpustate->yrlatch	= info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_YDLATCH:	cpustate->ydlatch	= info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DINLATCH:	cpustate->dinlatch	= info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DSRCLATCH:cpustate->dsrclatch	= info->i; 		break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RSRCLATCH:cpustate->rsrclatch	= info->i; 		break;
 	}
 }
 
@@ -2015,11 +1971,12 @@ static CPU_SET_INFO( cquestrot )
 
 CPU_GET_INFO( cquestrot )
 {
+	cquestrot_state *cpustate = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestrot);			break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestrot_state);		break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;
@@ -2038,19 +1995,19 @@ CPU_GET_INFO( cquestrot )
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CQUESTROT_PC:		info->i = cquestrot.pc;					break;
+		case CPUINFO_INT_REGISTER + CQUESTROT_PC:		info->i = cpustate->pc;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestrot);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cquestrot);break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cquestrot);break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestrot);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestrot);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestrot);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestrot);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestrot);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cquestrot_icount;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "Rotate CPU");break;
@@ -2059,37 +2016,37 @@ CPU_GET_INFO( cquestrot )
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
 
-		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c", cquestrot.cflag ? 'C' : '.',
-																				   cquestrot.vflag ? 'V' : '.',
-																				   cquestrot.f ? '.' : 'Z');	break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_PC:  		sprintf(info->s, "PC:  %02X", cquestrot.pc); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_Q:		sprintf(info->s, "Q:   %04X", cquestrot.q); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM0:		sprintf(info->s, "RAM[0]: %04X", cquestrot.ram[0x0]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM1:		sprintf(info->s, "RAM[1]: %04X", cquestrot.ram[0x1]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM2:		sprintf(info->s, "RAM[2]: %04X", cquestrot.ram[0x2]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM3:		sprintf(info->s, "RAM[3]: %04X", cquestrot.ram[0x3]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM4:		sprintf(info->s, "RAM[4]: %04X", cquestrot.ram[0x4]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM5:		sprintf(info->s, "RAM[5]: %04X", cquestrot.ram[0x5]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM6:		sprintf(info->s, "RAM[6]: %04X", cquestrot.ram[0x6]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM7:		sprintf(info->s, "RAM[7]: %04X", cquestrot.ram[0x7]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM8:		sprintf(info->s, "RAM[8]: %04X", cquestrot.ram[0x8]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAM9:		sprintf(info->s, "RAM[9]: %04X", cquestrot.ram[0x9]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMA:		sprintf(info->s, "RAM[A]: %04X", cquestrot.ram[0xa]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMB:		sprintf(info->s, "RAM[B]: %04X", cquestrot.ram[0xb]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMC:		sprintf(info->s, "RAM[C]: %04X", cquestrot.ram[0xc]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMD:		sprintf(info->s, "RAM[D]: %04X", cquestrot.ram[0xd]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAME:		sprintf(info->s, "RAM[E]: %04X", cquestrot.ram[0xe]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RAMF:		sprintf(info->s, "RAM[F]: %04X", cquestrot.ram[0xf]); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_SEQCNT:	sprintf(info->s, "SEQCNT: %01X", cquestrot.seqcnt); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DYNADDR:	sprintf(info->s, "DYNADDR: %04X", cquestrot.dynaddr); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DYNDATA:	sprintf(info->s, "DYNDATA: %04X", cquestrot.dyndata); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_YRLATCH:	sprintf(info->s, "YRLATCH: %04X", cquestrot.yrlatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_YDLATCH:	sprintf(info->s, "YDLATCH: %04X", cquestrot.ydlatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DINLATCH:	sprintf(info->s, "DINLATCH: %04X", cquestrot.dinlatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_DSRCLATCH:sprintf(info->s, "DSRCLATCH: %04X", cquestrot.dsrclatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_RSRCLATCH:sprintf(info->s, "RSRCLATCH: %04X", cquestrot.rsrclatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_LDADDR:	sprintf(info->s, "LDADDR : %04X", cquestrot.lineaddr); break;
-		case CPUINFO_STR_REGISTER + CQUESTROT_LDDATA:	sprintf(info->s, "LDDATA : %04X", cquestrot.linedata); break;
+		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c", cpustate->cflag ? 'C' : '.',
+																				   cpustate->vflag ? 'V' : '.',
+																				   cpustate->f ? '.' : 'Z');	break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_PC:  		sprintf(info->s, "PC:  %02X", cpustate->pc); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_Q:		sprintf(info->s, "Q:   %04X", cpustate->q); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM0:		sprintf(info->s, "RAM[0]: %04X", cpustate->ram[0x0]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM1:		sprintf(info->s, "RAM[1]: %04X", cpustate->ram[0x1]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM2:		sprintf(info->s, "RAM[2]: %04X", cpustate->ram[0x2]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM3:		sprintf(info->s, "RAM[3]: %04X", cpustate->ram[0x3]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM4:		sprintf(info->s, "RAM[4]: %04X", cpustate->ram[0x4]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM5:		sprintf(info->s, "RAM[5]: %04X", cpustate->ram[0x5]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM6:		sprintf(info->s, "RAM[6]: %04X", cpustate->ram[0x6]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM7:		sprintf(info->s, "RAM[7]: %04X", cpustate->ram[0x7]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM8:		sprintf(info->s, "RAM[8]: %04X", cpustate->ram[0x8]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAM9:		sprintf(info->s, "RAM[9]: %04X", cpustate->ram[0x9]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMA:		sprintf(info->s, "RAM[A]: %04X", cpustate->ram[0xa]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMB:		sprintf(info->s, "RAM[B]: %04X", cpustate->ram[0xb]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMC:		sprintf(info->s, "RAM[C]: %04X", cpustate->ram[0xc]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMD:		sprintf(info->s, "RAM[D]: %04X", cpustate->ram[0xd]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAME:		sprintf(info->s, "RAM[E]: %04X", cpustate->ram[0xe]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RAMF:		sprintf(info->s, "RAM[F]: %04X", cpustate->ram[0xf]); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_SEQCNT:	sprintf(info->s, "SEQCNT: %01X", cpustate->seqcnt); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DYNADDR:	sprintf(info->s, "DYNADDR: %04X", cpustate->dynaddr); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DYNDATA:	sprintf(info->s, "DYNDATA: %04X", cpustate->dyndata); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_YRLATCH:	sprintf(info->s, "YRLATCH: %04X", cpustate->yrlatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_YDLATCH:	sprintf(info->s, "YDLATCH: %04X", cpustate->ydlatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DINLATCH:	sprintf(info->s, "DINLATCH: %04X", cpustate->dinlatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_DSRCLATCH:sprintf(info->s, "DSRCLATCH: %04X", cpustate->dsrclatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_RSRCLATCH:sprintf(info->s, "RSRCLATCH: %04X", cpustate->rsrclatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_LDADDR:	sprintf(info->s, "LDADDR : %04X", cpustate->lineaddr); break;
+		case CPUINFO_STR_REGISTER + CQUESTROT_LDDATA:	sprintf(info->s, "LDDATA : %04X", cpustate->linedata); break;
 	}
 }
 
@@ -2100,30 +2057,31 @@ CPU_GET_INFO( cquestrot )
 
 static CPU_SET_INFO( cquestlin )
 {
+	cquestlin_state *cpustate = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CQUESTLIN_FGPC:	cquestlin.pc[FOREGROUND] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CQUESTLIN_BGPC:	cquestlin.pc[BACKGROUND] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CQUESTLIN_Q:	cquestlin.q = info->i;					break;
+		case CPUINFO_INT_REGISTER + CQUESTLIN_FGPC:	cpustate->pc[FOREGROUND] = info->i;		break;
+		case CPUINFO_INT_REGISTER + CQUESTLIN_BGPC:	cpustate->pc[BACKGROUND] = info->i;		break;
+		case CPUINFO_INT_REGISTER + CQUESTLIN_Q:	cpustate->q = info->i;					break;
 
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM0:		cquestlin.ram[0x0] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM1:		cquestlin.ram[0x1] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM2:		cquestlin.ram[0x2] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM3:		cquestlin.ram[0x3] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM4:		cquestlin.ram[0x4] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM5:		cquestlin.ram[0x5] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM6:		cquestlin.ram[0x6] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM7:		cquestlin.ram[0x7] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM8:		cquestlin.ram[0x8] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM9:		cquestlin.ram[0x9] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMA:		cquestlin.ram[0xa] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMB:		cquestlin.ram[0xb] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMC:		cquestlin.ram[0xc] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMD:		cquestlin.ram[0xd] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAME:		cquestlin.ram[0xe] = info->i;		break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMF:		cquestlin.ram[0xf] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM0:		cpustate->ram[0x0] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM1:		cpustate->ram[0x1] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM2:		cpustate->ram[0x2] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM3:		cpustate->ram[0x3] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM4:		cpustate->ram[0x4] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM5:		cpustate->ram[0x5] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM6:		cpustate->ram[0x6] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM7:		cpustate->ram[0x7] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM8:		cpustate->ram[0x8] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM9:		cpustate->ram[0x9] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMA:		cpustate->ram[0xa] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMB:		cpustate->ram[0xb] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMC:		cpustate->ram[0xc] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMD:		cpustate->ram[0xd] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAME:		cpustate->ram[0xe] = info->i;		break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMF:		cpustate->ram[0xf] = info->i;		break;
 	}
 }
 
@@ -2133,11 +2091,12 @@ static CPU_SET_INFO( cquestlin )
 
 CPU_GET_INFO( cquestlin )
 {
+	cquestlin_state *cpustate = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestlin);			break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestlin_state);		break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;
@@ -2156,19 +2115,19 @@ CPU_GET_INFO( cquestlin )
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CQUESTLIN_FGPC:		info->i = cquestlin.pc[cquestlin.clkcnt & 3 ? BACKGROUND : FOREGROUND];	break;
+		case CPUINFO_INT_REGISTER + CQUESTLIN_FGPC:		info->i = cpustate->pc[cpustate->clkcnt & 3 ? BACKGROUND : FOREGROUND];	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestlin);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cquestlin);break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cquestlin);break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestlin);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestlin);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestlin);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestlin);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestlin);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cquestlin_icount;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "Line CPU");			break;
@@ -2177,36 +2136,36 @@ CPU_GET_INFO( cquestlin )
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
 
-		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c|%cG",	cquestlin.cflag ? 'C' : '.',
-																						cquestlin.vflag ? 'V' : '.',
-																						cquestlin.f ? '.' : 'Z',
-																						cquestlin.clkcnt & 3 ? 'B' : 'F'); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_FGPC:  	sprintf(info->s, "FPC:  %02X", cquestlin.pc[FOREGROUND]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_BGPC:  	sprintf(info->s, "BPC:  %02X", cquestlin.pc[BACKGROUND]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_Q:		sprintf(info->s, "Q:   %04X", cquestlin.q); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM0:		sprintf(info->s, "RAM[0]: %04X", cquestlin.ram[0x0]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM1:		sprintf(info->s, "RAM[1]: %04X", cquestlin.ram[0x1]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM2:		sprintf(info->s, "RAM[2]: %04X", cquestlin.ram[0x2]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM3:		sprintf(info->s, "RAM[3]: %04X", cquestlin.ram[0x3]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM4:		sprintf(info->s, "RAM[4]: %04X", cquestlin.ram[0x4]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM5:		sprintf(info->s, "RAM[5]: %04X", cquestlin.ram[0x5]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM6:		sprintf(info->s, "RAM[6]: %04X", cquestlin.ram[0x6]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM7:		sprintf(info->s, "RAM[7]: %04X", cquestlin.ram[0x7]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM8:		sprintf(info->s, "RAM[8]: %04X", cquestlin.ram[0x8]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM9:		sprintf(info->s, "RAM[9]: %04X", cquestlin.ram[0x9]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMA:		sprintf(info->s, "RAM[A]: %04X", cquestlin.ram[0xa]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMB:		sprintf(info->s, "RAM[B]: %04X", cquestlin.ram[0xb]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMC:		sprintf(info->s, "RAM[C]: %04X", cquestlin.ram[0xc]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMD:		sprintf(info->s, "RAM[D]: %04X", cquestlin.ram[0xd]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAME:		sprintf(info->s, "RAM[E]: %04X", cquestlin.ram[0xe]); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMF:		sprintf(info->s, "RAM[F]: %04X", cquestlin.ram[0xf]); break;
+		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c|%cG",	cpustate->cflag ? 'C' : '.',
+																						cpustate->vflag ? 'V' : '.',
+																						cpustate->f ? '.' : 'Z',
+																						cpustate->clkcnt & 3 ? 'B' : 'F'); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_FGPC:  	sprintf(info->s, "FPC:  %02X", cpustate->pc[FOREGROUND]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_BGPC:  	sprintf(info->s, "BPC:  %02X", cpustate->pc[BACKGROUND]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_Q:		sprintf(info->s, "Q:   %04X", cpustate->q); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM0:		sprintf(info->s, "RAM[0]: %04X", cpustate->ram[0x0]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM1:		sprintf(info->s, "RAM[1]: %04X", cpustate->ram[0x1]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM2:		sprintf(info->s, "RAM[2]: %04X", cpustate->ram[0x2]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM3:		sprintf(info->s, "RAM[3]: %04X", cpustate->ram[0x3]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM4:		sprintf(info->s, "RAM[4]: %04X", cpustate->ram[0x4]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM5:		sprintf(info->s, "RAM[5]: %04X", cpustate->ram[0x5]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM6:		sprintf(info->s, "RAM[6]: %04X", cpustate->ram[0x6]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM7:		sprintf(info->s, "RAM[7]: %04X", cpustate->ram[0x7]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM8:		sprintf(info->s, "RAM[8]: %04X", cpustate->ram[0x8]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAM9:		sprintf(info->s, "RAM[9]: %04X", cpustate->ram[0x9]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMA:		sprintf(info->s, "RAM[A]: %04X", cpustate->ram[0xa]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMB:		sprintf(info->s, "RAM[B]: %04X", cpustate->ram[0xb]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMC:		sprintf(info->s, "RAM[C]: %04X", cpustate->ram[0xc]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMD:		sprintf(info->s, "RAM[D]: %04X", cpustate->ram[0xd]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAME:		sprintf(info->s, "RAM[E]: %04X", cpustate->ram[0xe]); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_RAMF:		sprintf(info->s, "RAM[F]: %04X", cpustate->ram[0xf]); break;
 
-		case CPUINFO_STR_REGISTER + CQUESTLIN_FADLATCH:	sprintf(info->s, "FADDR:  %04X", cquestlin.fadlatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_BADLATCH:	sprintf(info->s, "BADDR:  %04X", cquestlin.badlatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_SREG:		sprintf(info->s, "SREG:   %04X", cquestlin.sreg);	break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_XCNT:		sprintf(info->s, "XCNT:   %03X", cquestlin.xcnt);	break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_YCNT:		sprintf(info->s, "YCNT:   %03X", cquestlin.ycnt);	break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_CLATCH:	sprintf(info->s, "CLATCH: %04X", cquestlin.clatch); break;
-		case CPUINFO_STR_REGISTER + CQUESTLIN_ZLATCH:	sprintf(info->s, "ZLATCH: %04X", cquestlin.zlatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_FADLATCH:	sprintf(info->s, "FADDR:  %04X", cpustate->fadlatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_BADLATCH:	sprintf(info->s, "BADDR:  %04X", cpustate->badlatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_SREG:		sprintf(info->s, "SREG:   %04X", cpustate->sreg);	break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_XCNT:		sprintf(info->s, "XCNT:   %03X", cpustate->xcnt);	break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_YCNT:		sprintf(info->s, "YCNT:   %03X", cpustate->ycnt);	break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_CLATCH:	sprintf(info->s, "CLATCH: %04X", cpustate->clatch); break;
+		case CPUINFO_STR_REGISTER + CQUESTLIN_ZLATCH:	sprintf(info->s, "ZLATCH: %04X", cpustate->zlatch); break;
 	}
 }
