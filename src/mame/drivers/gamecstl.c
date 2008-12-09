@@ -668,11 +668,9 @@ static MACHINE_DRIVER_START(gamecstl)
 
 	MDRV_PIT8254_ADD( "pit8254", gamecstl_pit8254_config )
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
 
-	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
-	MDRV_DEVICE_CONFIG( dma8237_2_config )
+	MDRV_DMA8237_ADD( "dma8237_2", dma8237_2_config )
 
 	MDRV_PIC8259_ADD( "pic8259_1", gamecstl_pic8259_1_config )
 

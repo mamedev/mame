@@ -844,8 +844,7 @@ static MACHINE_DRIVER_START( filetto )
 	MDRV_PPI8255_ADD( "ppi8255_0", filetto_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", filetto_ppi8255_intf[1] )
 
-	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
-	MDRV_DEVICE_CONFIG( dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
 
 	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
 

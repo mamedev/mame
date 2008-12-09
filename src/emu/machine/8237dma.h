@@ -42,6 +42,15 @@ struct dma8237_interface
 };
 
 
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_DMA8237_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, DMA8237) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+
 /* device interface */
 DEVICE_GET_INFO( dma8237 );
 READ8_DEVICE_HANDLER( dma8237_r );
