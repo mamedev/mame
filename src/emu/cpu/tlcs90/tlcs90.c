@@ -10,6 +10,19 @@
 #include "cpuexec.h"
 #include "tlcs90.h"
 
+typedef enum					{	UNKNOWN,	NOP,	EX,		EXX,	LD,		LDW,	LDA,	LDI,	LDIR,	LDD,	LDDR,	CPI,	CPIR,	CPD,	CPDR,	PUSH,	POP,	JP,		JR,		CALL,	CALLR,		RET,	RETI,	HALT,	DI,		EI,		SWI,	DAA,	CPL,	NEG,	LDAR,	RCF,	SCF,	CCF,	TSET,	BIT,	SET,	RES,	INC,	DEC,	INCX,	DECX,	INCW,	DECW,	ADD,	ADC,	SUB,	SBC,	AND,	XOR,	OR,		CP,		RLC,	RRC,	RL,		RR,		SLA,	SRA,	SLL,	SRL,	RLD,	RRD,	DJNZ,	MUL,	DIV		}	e_op;
+static const char *const op_names[] =	{	"??",		"nop",	"ex",	"exx",	"ld",	"ldw",	"lda",	"ldi",	"ldir",	"ldd",	"lddr",	"cpi",	"cpir",	"cpd",	"cpdr",	"push",	"pop",	"jp",	"jr",	"call",	"callr",	"ret",	"reti",	"halt",	"di",	"ei",	"swi",	"daa",	"cpl",	"neg",	"ldar",	"rcf",	"scf",	"ccf",	"tset",	"bit",	"set",	"res",	"inc",	"dec",	"incx",	"decx",	"incw",	"decw",	"add",	"adc",	"sub",	"sbc",	"and",	"xor",	"or",	"cp",	"rlc",	"rrc",	"rl",	"rr",	"sla",	"sra",	"sll",	"srl",	"rld",	"rrd",	"djnz",	"mul",	"div"	};
+
+typedef enum	{
+	MODE_NONE,	MODE_BIT8,	MODE_CC,
+	MODE_I8,	MODE_D8,	MODE_R8,
+	MODE_I16,	MODE_D16,	MODE_R16,
+	MODE_MI16,	MODE_MR16,	MODE_MR16D8,	MODE_MR16R8,
+	MODE_R16D8,	MODE_R16R8
+}	e_mode;
+
+typedef UINT16 e_r;
+
 typedef struct
 {
 	PAIR		prvpc,pc,sp,af,bc,de,hl,ix,iy;
@@ -20,6 +33,7 @@ typedef struct
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
+	int		icount;
 	int			extra_cycles;		// extra cycles for interrupts
 	UINT8		internal_registers[48];
 	UINT32		ixbase,iybase;
@@ -30,17 +44,26 @@ typedef struct
 	UINT16		timer4_value;
 	attotime	timer_period;
 
-}	t90_Regs;
+	// Work registers
+	e_op		op;
 
-static t90_Regs T90;
+	e_mode	mode1;
+	e_r		r1,r1b;
+
+	e_mode	mode2;
+	e_r		r2,r2b;
+
+	int	cyc_t,cyc_f;
+
+	UINT32	addr;
+
+}	t90_Regs;
 
 enum	{
 		T90_B,	T90_C,	T90_D,	T90_E,	T90_H,	T90_L,	T90_A,
 		T90_BC,	T90_DE,	T90_HL,	T90_XX,	T90_IX,	T90_IY,	T90_SP,
 		T90_AF, T90_PC
 };
-
-static int t90_ICount;
 
 // Regs
 
@@ -64,8 +87,7 @@ static int t90_ICount;
 #define	AF2	8
 #define	PC	9
 
-typedef UINT16 e_r;
-#define F	T90.af.b.l
+#define F	cpustate->af.b.l
 
 static const char *const r8_names[]	=	{	"b",	"c",	"d",	"e",	"h",	"l",	"a"								};
 static const char *const r16_names[]	=	{	"bc",	"de",	"hl",	"??",	"ix",	"iy",	"sp",	"af",	"af'",	"pc"	};
@@ -116,73 +138,55 @@ static const char *const cc_names[]	=	{	"f",	"lt",	"le",	"ule",	"ov",	"mi",	"z",
 // Opcodes
 
 #define OP_16 0x80
-typedef enum					{	UNKNOWN,	NOP,	EX,		EXX,	LD,		LDW,	LDA,	LDI,	LDIR,	LDD,	LDDR,	CPI,	CPIR,	CPD,	CPDR,	PUSH,	POP,	JP,		JR,		CALL,	CALLR,		RET,	RETI,	HALT,	DI,		EI,		SWI,	DAA,	CPL,	NEG,	LDAR,	RCF,	SCF,	CCF,	TSET,	BIT,	SET,	RES,	INC,	DEC,	INCX,	DECX,	INCW,	DECW,	ADD,	ADC,	SUB,	SBC,	AND,	XOR,	OR,		CP,		RLC,	RRC,	RL,		RR,		SLA,	SRA,	SLL,	SRL,	RLD,	RRD,	DJNZ,	MUL,	DIV		}	e_op;
-static const char *const op_names[] =	{	"??",		"nop",	"ex",	"exx",	"ld",	"ldw",	"lda",	"ldi",	"ldir",	"ldd",	"lddr",	"cpi",	"cpir",	"cpd",	"cpdr",	"push",	"pop",	"jp",	"jr",	"call",	"callr",	"ret",	"reti",	"halt",	"di",	"ei",	"swi",	"daa",	"cpl",	"neg",	"ldar",	"rcf",	"scf",	"ccf",	"tset",	"bit",	"set",	"res",	"inc",	"dec",	"incx",	"decx",	"incw",	"decw",	"add",	"adc",	"sub",	"sbc",	"and",	"xor",	"or",	"cp",	"rlc",	"rrc",	"rl",	"rr",	"sla",	"sra",	"sll",	"srl",	"rld",	"rrd",	"djnz",	"mul",	"div"	};
 
-typedef enum	{
-	MODE_NONE,	MODE_BIT8,	MODE_CC,
-	MODE_I8,	MODE_D8,	MODE_R8,
-	MODE_I16,	MODE_D16,	MODE_R16,
-	MODE_MI16,	MODE_MR16,	MODE_MR16D8,	MODE_MR16R8,
-	MODE_R16D8,	MODE_R16R8
-}	e_mode;
 
-static e_op		op;
 
-static e_mode	mode1;
-static e_r		r1,r1b;
 
-static e_mode	mode2;
-static e_r		r2,r2b;
 
-static int		cyc_t,cyc_f;
-
-static UINT32	addr;
-
-#define OP(   X,CT )		op = X;		cyc_t = (CT*2);
+#define OP(   X,CT )		cpustate->op = X;		cpustate->cyc_t = (CT*2);
 #define OP16( X,CT )		OP( (X)|OP_16,CT )
 
-#define OPCC(   X,CF,CT )	OP( X, CT )	cyc_f = (CF*2);
+#define OPCC(   X,CF,CT )	OP( X, CT )	cpustate->cyc_f = (CF*2);
 #define OPCC16( X,CF,CT )	OPCC( (X)|OP_16,CF,CT )
 
-#define BIT8( N,I )			mode##N = MODE_BIT8;	r##N = I;
-#define I8( N,I )			mode##N = MODE_I8;		r##N = I;
-#define D8( N,I )			mode##N = MODE_D8;		r##N = I;
-#define I16( N,I )			mode##N = MODE_I16;		r##N = I;
-#define D16( N,I )			mode##N = MODE_D16;		r##N = I;
-#define R8( N,R )			mode##N = MODE_R8;		r##N = R;
-#define R16( N,R )			mode##N = MODE_R16;		r##N = R;
-#define Q16( N,R )			mode##N = MODE_R16;		r##N = R;	if (r##N == SP) r##N = AF;
-#define MI16( N,I )			mode##N = MODE_MI16;	r##N = I;
-#define MR16( N,R )			mode##N = MODE_MR16;	r##N = R;
-#define MR16D8( N,R,I )		mode##N = MODE_MR16D8;	r##N = R;	r##N##b = I;
-#define MR16R8( N,R,g )		mode##N = MODE_MR16R8;	r##N = R;	r##N##b = g;
-#define NONE( N )			mode##N = MODE_NONE;
-#define CC( N,cc )			mode##N = MODE_CC;		r##N = cc;
-#define R16D8( N,R,I )		mode##N = MODE_R16D8;	r##N = R;	r##N##b = I;
-#define R16R8( N,R,g )		mode##N = MODE_R16R8;	r##N = R;	r##N##b = g;
+#define BIT8( N,I )			cpustate->mode##N = MODE_BIT8;	cpustate->r##N = I;
+#define I8( N,I )			cpustate->mode##N = MODE_I8;		cpustate->r##N = I;
+#define D8( N,I )			cpustate->mode##N = MODE_D8;		cpustate->r##N = I;
+#define I16( N,I )			cpustate->mode##N = MODE_I16;		cpustate->r##N = I;
+#define D16( N,I )			cpustate->mode##N = MODE_D16;		cpustate->r##N = I;
+#define R8( N,R )			cpustate->mode##N = MODE_R8;		cpustate->r##N = R;
+#define R16( N,R )			cpustate->mode##N = MODE_R16;		cpustate->r##N = R;
+#define Q16( N,R )			cpustate->mode##N = MODE_R16;		cpustate->r##N = R;	if (cpustate->r##N == SP) cpustate->r##N = AF;
+#define MI16( N,I )			cpustate->mode##N = MODE_MI16;	cpustate->r##N = I;
+#define MR16( N,R )			cpustate->mode##N = MODE_MR16;	cpustate->r##N = R;
+#define MR16D8( N,R,I )		cpustate->mode##N = MODE_MR16D8;	cpustate->r##N = R;	cpustate->r##N##b = I;
+#define MR16R8( N,R,g )		cpustate->mode##N = MODE_MR16R8;	cpustate->r##N = R;	cpustate->r##N##b = g;
+#define NONE( N )			cpustate->mode##N = MODE_NONE;
+#define CC( N,cc )			cpustate->mode##N = MODE_CC;		cpustate->r##N = cc;
+#define R16D8( N,R,I )		cpustate->mode##N = MODE_R16D8;	cpustate->r##N = R;	cpustate->r##N##b = I;
+#define R16R8( N,R,g )		cpustate->mode##N = MODE_R16R8;	cpustate->r##N = R;	cpustate->r##N##b = g;
 
-INLINE UINT8  RM8 (UINT32 a)	{ return memory_read_byte_8le( T90.program, a ); }
-INLINE UINT16 RM16(UINT32 a)	{ return RM8(a) | (RM8( (a+1) & 0xffff ) << 8); }
+INLINE UINT8  RM8 (t90_Regs *cpustate, UINT32 a)	{ return memory_read_byte_8le( cpustate->program, a ); }
+INLINE UINT16 RM16(t90_Regs *cpustate, UINT32 a)	{ return RM8(cpustate,a) | (RM8( cpustate, (a+1) & 0xffff ) << 8); }
 
-INLINE void WM8 (UINT32 a, UINT8  v)	{ memory_write_byte_8le( T90.program, a, v ); }
-INLINE void WM16(UINT32 a, UINT16 v)	{ WM8(a,v);	WM8( (a+1) & 0xffff, v >> 8); }
+INLINE void WM8 (t90_Regs *cpustate, UINT32 a, UINT8  v)	{ memory_write_byte_8le( cpustate->program, a, v ); }
+INLINE void WM16(t90_Regs *cpustate, UINT32 a, UINT16 v)	{ WM8(cpustate,a,v);	WM8( cpustate, (a+1) & 0xffff, v >> 8); }
 
-INLINE UINT8  RX8 (UINT32 a, UINT32 base)	{ return memory_read_byte_8le( T90.program, base | a ); }
-INLINE UINT16 RX16(UINT32 a, UINT32 base)	{ return RX8(a,base) | (RX8( (a+1) & 0xffff, base ) << 8); }
+INLINE UINT8  RX8 (t90_Regs *cpustate, UINT32 a, UINT32 base)	{ return memory_read_byte_8le( cpustate->program, base | a ); }
+INLINE UINT16 RX16(t90_Regs *cpustate, UINT32 a, UINT32 base)	{ return RX8(cpustate,a,base) | (RX8( cpustate, (a+1) & 0xffff, base ) << 8); }
 
-INLINE void WX8 (UINT32 a, UINT8  v, UINT32 base)	{ memory_write_byte_8le( T90.program, base | a, v ); }
-INLINE void WX16(UINT32 a, UINT16 v, UINT32 base)	{ WX8(a,v,base);	WX8( (a+1) & 0xffff, v >> 8, base); }
+INLINE void WX8 (t90_Regs *cpustate, UINT32 a, UINT8  v, UINT32 base)	{ memory_write_byte_8le( cpustate->program, base | a, v ); }
+INLINE void WX16(t90_Regs *cpustate, UINT32 a, UINT16 v, UINT32 base)	{ WX8(cpustate,a,v,base);	WX8( cpustate, (a+1) & 0xffff, v >> 8, base); }
 
-INLINE UINT8  READ8(void)	{ UINT8 b0 = RM8( addr++ ); addr &= 0xffff; return b0; }
-INLINE UINT16 READ16(void)	{ UINT8 b0 = READ8(); return b0 | (READ8() << 8); }
+INLINE UINT8  READ8(t90_Regs *cpustate)	{ UINT8 b0 = RM8( cpustate, cpustate->addr++ ); cpustate->addr &= 0xffff; return b0; }
+INLINE UINT16 READ16(t90_Regs *cpustate)	{ UINT8 b0 = READ8(cpustate); return b0 | (READ8(cpustate) << 8); }
 
-static void decode(void)
+static void decode(t90_Regs *cpustate)
 {
 	UINT8  b0, b1, b2, b3;
 	UINT16 imm16;
 
-	b0 = READ8();
+	b0 = READ8(cpustate);
 
 	switch ( b0 )
 	{
@@ -197,7 +201,7 @@ static void decode(void)
 			OP( EI,2 )			NONE( 1 )					NONE( 2 )						return;		// EI
 
 		case 0x07:
-			OPCC( INCX,6,10 )	MI16( 1, 0xFF00|READ8() )	NONE( 2 )						return;		// INCX ($FF00+n)
+			OPCC( INCX,6,10 )	MI16( 1, 0xFF00|READ8(cpustate) )	NONE( 2 )						return;		// INCX ($FF00+n)
 
 		case 0x08:
 			OP( EX,2 )			R16( 1, DE )				R16( 2, HL )					return;		// EX DE,HL
@@ -217,7 +221,7 @@ static void decode(void)
 			OP( CCF,2 )			NONE( 1 )					NONE( 2 )						return;		// CCF
 
 		case 0x0f:
-			OPCC( DECX,6,10 )	MI16( 1, 0xFF00|READ8() )	NONE( 2 )						return;		// DECX ($FF00+n)
+			OPCC( DECX,6,10 )	MI16( 1, 0xFF00|READ8(cpustate) )	NONE( 2 )						return;		// DECX ($FF00+n)
 
 		case 0x10:
 			OP( CPL,2 )			R8( 1, A )					NONE( 2 )						return;		// CPL A
@@ -226,28 +230,28 @@ static void decode(void)
 
 		case 0x12:																						// MUL HL,n
 		case 0x13:																						// DIV HL,n
-			OP( MUL+b0-0x12,16)	R16( 1, HL )				I8( 2, READ8() )				return;
+			OP( MUL+b0-0x12,16)	R16( 1, HL )				I8( 2, READ8(cpustate) )				return;
 
 		case 0x14:	case 0x15:	case 0x16:
-			OP16( ADD,6 )		R16( 1, IX+b0-0x14 )		I16( 2, READ16() )				return;		// ADD ix,mn
+			OP16( ADD,6 )		R16( 1, IX+b0-0x14 )		I16( 2, READ16(cpustate) )				return;		// ADD ix,mn
 
 		case 0x17:
-			OP( LDAR,8 )		R16( 1, HL )				D16( 2, READ16() )				return;		// LDAR HL,+cd
+			OP( LDAR,8 )		R16( 1, HL )				D16( 2, READ16(cpustate) )				return;		// LDAR HL,+cd
 
 		case 0x18:
-			OP( DJNZ,10 )		D8( 1, READ8() )			NONE( 2 )						return;		// DJNZ +d
+			OP( DJNZ,10 )		D8( 1, READ8(cpustate) )			NONE( 2 )						return;		// DJNZ +d
 		case 0x19:
-			OP16( DJNZ,10 )		R16( 1, BC )				D8( 2, READ8() )				return;		// DJNZ BC,+d
+			OP16( DJNZ,10 )		R16( 1, BC )				D8( 2, READ8(cpustate) )				return;		// DJNZ BC,+d
 
 		case 0x1a:
-			OPCC( JP,8,8 )		CC( 1, T )					I16( 2, READ16() )				return;		// JP T,mn
+			OPCC( JP,8,8 )		CC( 1, T )					I16( 2, READ16(cpustate) )				return;		// JP T,mn
 		case 0x1b:
-			OPCC16( JR,10,10 )	CC( 1, T )					D16( 2, READ16() )				return;		// JR T,+cd
+			OPCC16( JR,10,10 )	CC( 1, T )					D16( 2, READ16(cpustate) )				return;		// JR T,+cd
 
 		case 0x1c:
-			OPCC( CALL,14,14 )	CC( 1, T )					I16( 2, READ16() )				return;		// CALL T,mn
+			OPCC( CALL,14,14 )	CC( 1, T )					I16( 2, READ16(cpustate) )				return;		// CALL T,mn
 		case 0x1d:
-			OP( CALLR,16 )		D16( 1, READ16() )			NONE( 2 )						return;		// CALLR +cd
+			OP( CALLR,16 )		D16( 1, READ16(cpustate) )			NONE( 2 )						return;		// CALLR +cd
 
 		case 0x1e:
 			OPCC( RET,10,10 )	CC( 1, T )					NONE( 2 )						return;		// RET T
@@ -258,37 +262,37 @@ static void decode(void)
 			OP( LD,2 )			R8( 1, A )					R8( 2, b0 - 0x20 )				return;		// LD A,r
 
 		case 0x27:
-			OP( LD,8 )			R8( 1, A )					MI16( 2, 0xFF00|READ8() )		return;		// LD A,($FF00+n)
+			OP( LD,8 )			R8( 1, A )					MI16( 2, 0xFF00|READ8(cpustate) )		return;		// LD A,($FF00+n)
 
 		case 0x28:	case 0x29:	case 0x2a:	case 0x2b:	case 0x2c:	case 0x2d:	case 0x2e:
 			OP( LD,2 )			R8( 1, b0 - 0x28 )			R8( 2, A )						return;		// LD r,A
 
 		case 0x2f:
-			OP( LD,8 )			MI16( 1, 0xFF00|READ8() )	R8( 2, A )						return;		// LD ($FF00+n), A
+			OP( LD,8 )			MI16( 1, 0xFF00|READ8(cpustate) )	R8( 2, A )						return;		// LD ($FF00+n), A
 
 		case 0x30:	case 0x31:	case 0x32:	case 0x33:	case 0x34:	case 0x35:	case 0x36:
-			OP( LD,4 )			R8( 1, b0 - 0x30 )			I8( 2, READ8() )				return;		// LD r,n
+			OP( LD,4 )			R8( 1, b0 - 0x30 )			I8( 2, READ8(cpustate) )				return;		// LD r,n
 
 		case 0x37:
-			OP( LD,10 )			MI16( 1, 0xFF00|READ8() )	I8( 2, READ8() )				return;		// LD ($FF00+w),n
+			OP( LD,10 )			MI16( 1, 0xFF00|READ8(cpustate) )	I8( 2, READ8(cpustate) )				return;		// LD ($FF00+w),n
 
 		case 0x38:	case 0x39:	case 0x3a:	/*case 0x3b:*/	case 0x3c:	case 0x3d:	case 0x3e:
-			OP16( LD,6 )		R16( 1, b0 - 0x38 )			I16( 2, READ16() )				return;		// LD rr,nn
+			OP16( LD,6 )		R16( 1, b0 - 0x38 )			I16( 2, READ16(cpustate) )				return;		// LD rr,nn
 
 		case 0x3f:
-			OP( LDW,14 )		MI16( 1, 0xFF00|READ8() )	I16( 2, READ16() )				return;		// LDW ($FF00+w),mn
+			OP( LDW,14 )		MI16( 1, 0xFF00|READ8(cpustate) )	I16( 2, READ16(cpustate) )				return;		// LDW ($FF00+w),mn
 
 		case 0x40:	case 0x41:	case 0x42:	/*case 0x43:*/	case 0x44:	case 0x45:	case 0x46:
 			OP16( LD,4 )		R16( 1, HL )				R16( 2, b0 - 0x40 )				return;		// LD HL,rr
 
 		case 0x47:
-			OP16( LD,10 )		R16( 1, HL )				MI16( 2, 0xFF00|READ8() )		return;		// LD HL,($FF00+n)
+			OP16( LD,10 )		R16( 1, HL )				MI16( 2, 0xFF00|READ8(cpustate) )		return;		// LD HL,($FF00+n)
 
 		case 0x48:	case 0x49:	case 0x4a:	/*case 0x4b:*/	case 0x4c:	case 0x4d:	case 0x4e:
 			OP16( LD,4 )		R16( 1, b0 - 0x48 )			R16( 2, HL )					return;		// LD rr,HL
 
 		case 0x4f:
-			OP16( LD,10 )		MI16( 1, 0xFF00|READ8() )	R16( 2, HL )					return;		// LD ($FF00+n), HL
+			OP16( LD,10 )		MI16( 1, 0xFF00|READ8(cpustate) )	R16( 2, HL )					return;		// LD ($FF00+n), HL
 
 		case 0x50:	case 0x51:	case 0x52:	/*case 0x53:*/	case 0x54:	case 0x55:	case 0x56:
 			OP( PUSH,8 )		Q16( 1, b0 - 0x50 )			NONE( 2 )						return;		// PUSH qq
@@ -303,7 +307,7 @@ static void decode(void)
 		case 0x65:																						// XOR A,($FF00+n)
 		case 0x66:																						// OR  A,($FF00+n)
 		case 0x67:																						// CP  A,($FF00+n)
-			OP( ADD+b0-0x60,8 )	R8( 1, A )					MI16( 2, 0xFF00|READ8() )		return;
+			OP( ADD+b0-0x60,8 )	R8( 1, A )					MI16( 2, 0xFF00|READ8(cpustate) )		return;
 
 		case 0x68:																						// ADD A,n
 		case 0x69:																						// ADC A,n
@@ -313,7 +317,7 @@ static void decode(void)
 		case 0x6d:																						// XOR A,n
 		case 0x6e:																						// OR  A,n
 		case 0x6f:																						// CP  A,n
-			OP( ADD+b0-0x68,4 )	R8( 1, A )					I8( 2, READ8() )				return;
+			OP( ADD+b0-0x68,4 )	R8( 1, A )					I8( 2, READ8(cpustate) )				return;
 
 		case 0x70:																						// ADD HL,($FF00+n)
 		case 0x71:																						// ADC HL,($FF00+n)
@@ -323,7 +327,7 @@ static void decode(void)
 		case 0x75:																						// XOR HL,($FF00+n)
 		case 0x76:																						// OR  HL,($FF00+n)
 		case 0x77:																						// CP  HL,($FF00+n)
-			OP16( ADD+b0-0x70,10 )	R16( 1, HL )			MI16( 2, 0xFF00|READ8() )		return;
+			OP16( ADD+b0-0x70,10 )	R16( 1, HL )			MI16( 2, 0xFF00|READ8(cpustate) )		return;
 
 		case 0x78:																						// ADD HL,mn
 		case 0x79:																						// ADC HL,mn
@@ -333,26 +337,26 @@ static void decode(void)
 		case 0x7d:																						// XOR HL,mn
 		case 0x7e:																						// OR  HL,mn
 		case 0x7f:																						// CP  HL,mn
-			OP16( ADD+b0-0x78,6 )	R16( 1, HL )			I16( 2, READ16() )				return;
+			OP16( ADD+b0-0x78,6 )	R16( 1, HL )			I16( 2, READ16(cpustate) )				return;
 
 		case 0x80:	case 0x81:	case 0x82:	case 0x83:	case 0x84:	case 0x85:	case 0x86:
 			OP( INC,2 )			R8( 1, b0 - 0x80 )			NONE( 2 )						return;		// INC r
 		case 0x87:
-			OP( INC,10 )		MI16( 1, 0xFF00|READ8() )	NONE( 2 )						return;		// INC ($FF00+n)
+			OP( INC,10 )		MI16( 1, 0xFF00|READ8(cpustate) )	NONE( 2 )						return;		// INC ($FF00+n)
 
 		case 0x88:	case 0x89:	case 0x8a:	case 0x8b:	case 0x8c:	case 0x8d:	case 0x8e:
 			OP( DEC,2 )			R8( 1, b0 - 0x88 )			NONE( 2 )						return;		// DEC r
 		case 0x8f:
-			OP( DEC,10 )		MI16( 1, 0xFF00|READ8() )	NONE( 2 )						return;		// DEC ($FF00+n)
+			OP( DEC,10 )		MI16( 1, 0xFF00|READ8(cpustate) )	NONE( 2 )						return;		// DEC ($FF00+n)
 
 		case 0x90:	case 0x91:	case 0x92:	/*case 0x93:*/	case 0x94:	case 0x95:	case 0x96:
 			OP16( INC,4 )		R16( 1, b0 - 0x90 )			NONE( 2 )						return;		// INC rr
 		case 0x97:
-			OP( INCW,14 )		MI16( 1, 0xFF00|READ8() )	NONE( 2 )						return;		// INCW ($FF00+n)
+			OP( INCW,14 )		MI16( 1, 0xFF00|READ8(cpustate) )	NONE( 2 )						return;		// INCW ($FF00+n)
 		case 0x98:	case 0x99:	case 0x9a:	/*case 0x9b:*/	case 0x9c:	case 0x9d:	case 0x9e:
 			OP16( DEC,4 )		R16( 1, b0 - 0x98 )			NONE( 2 )						return;		// DEC rr
 		case 0x9f:
-			OP( DECW,14 )		MI16( 1, 0xFF00|READ8() )	NONE( 2 )						return;		// DECW ($FF00+n)
+			OP( DECW,14 )		MI16( 1, 0xFF00|READ8(cpustate) )	NONE( 2 )						return;		// DECW ($FF00+n)
 
 		case 0xa0:																						// RLC A
 		case 0xa1:																						// RRC A
@@ -365,18 +369,18 @@ static void decode(void)
 			OP( RLC+b0-0xa0,2 )	R8( 1, A )					NONE( 2 )						return;
 
 		case 0xa8:	case 0xa9:	case 0xaa:	case 0xab:	case 0xac:	case 0xad:	case 0xae:	case 0xaf:
-			OP( BIT,8 )			BIT8( 1, b0 - 0xa8 )		MI16( 2, 0xFF00|READ8() )		return;		// BIT b,($FF00+n)
+			OP( BIT,8 )			BIT8( 1, b0 - 0xa8 )		MI16( 2, 0xFF00|READ8(cpustate) )		return;		// BIT b,($FF00+n)
 		case 0xb0:	case 0xb1:	case 0xb2:	case 0xb3:	case 0xb4:	case 0xb5:	case 0xb6:	case 0xb7:
-			OP( RES,12 )		BIT8( 1, b0 - 0xb0 )		MI16( 2, 0xFF00|READ8() )		return;		// RES b,($FF00+n)
+			OP( RES,12 )		BIT8( 1, b0 - 0xb0 )		MI16( 2, 0xFF00|READ8(cpustate) )		return;		// RES b,($FF00+n)
 		case 0xb8:	case 0xb9:	case 0xba:	case 0xbb:	case 0xbc:	case 0xbd:	case 0xbe:	case 0xbf:
-			OP( SET,12 )		BIT8( 1, b0 - 0xb8 )		MI16( 2, 0xFF00|READ8() )		return;		// SET b,($FF00+n)
+			OP( SET,12 )		BIT8( 1, b0 - 0xb8 )		MI16( 2, 0xFF00|READ8(cpustate) )		return;		// SET b,($FF00+n)
 
 		case 0xc0:	case 0xc1:	case 0xc2:	case 0xc3:	case 0xc4:	case 0xc5:	case 0xc6:	case 0xc7:
 		case 0xc8:	case 0xc9:	case 0xca:	case 0xcb:	case 0xcc:	case 0xcd:	case 0xce:	case 0xcf:
-			OPCC( JR,4,8 )		CC( 1, b0 - 0xc0 )			D8( 2, READ8() )				return;		// JR cc,+d
+			OPCC( JR,4,8 )		CC( 1, b0 - 0xc0 )			D8( 2, READ8(cpustate) )				return;		// JR cc,+d
 
 		case 0xe0:	case 0xe1:	case 0xe2:	/*case 0xe3:*/	case 0xe4:	case 0xe5:	case 0xe6:
-			b1 = READ8();
+			b1 = READ8(cpustate);
 			switch ( b1 )	{
 				case 0x10:																				// RLD (gg)
 				case 0x11:																				// RRD (gg)
@@ -447,8 +451,8 @@ static void decode(void)
 					OP( SET,10 )			BIT8( 1, b1 - 0xb8 )	MR16( 2, b0 - 0xe0 )	return;		// SET b,(gg)
 			}	break;
 		case 0xe3:
-			imm16 = READ16();
-			b3 = READ8();
+			imm16 = READ16(cpustate);
+			b3 = READ8(cpustate);
 			switch ( b3 )	{
 				case 0x10:																				// RLD (mn)
 				case 0x11:																				// RRD (mn)
@@ -520,8 +524,8 @@ static void decode(void)
 			}	break;
 
 		case 0xe7:
-			b1 = READ8();
-			b2 = READ8();
+			b1 = READ8(cpustate);
+			b2 = READ8(cpustate);
 			switch ( b2 )	{
 				case 0x10:																				// RLD ($FF00+n)
 				case 0x11:																				// RRD ($FF00+n)
@@ -556,14 +560,14 @@ static void decode(void)
 			}	break;
 
 		case 0xe8:	case 0xe9:	case 0xea:	/*case 0xeb:*/	case 0xec:	case 0xed:	case 0xee:
-			b1 = READ8();
+			b1 = READ8(cpustate);
 			switch ( b1 )	{
 				case 0x20:	case 0x21:	case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
 					OP( LD,6 )				MR16( 1, b0 - 0xe8 )	R8( 2, b1 - 0x20 )		return;		// LD (gg),r
 				case 0x37:
-					OP( LD,8 )				MR16( 1, b0 - 0xe8 )	I8( 2, READ8() )		return;		// LD (gg),n
+					OP( LD,8 )				MR16( 1, b0 - 0xe8 )	I8( 2, READ8(cpustate) )		return;		// LD (gg),n
 				case 0x3f:
-					OP( LDW,12 )			MR16( 1, b0 - 0xe8 )	I16( 2, READ16() )		return;		// LDW (gg),mn
+					OP( LDW,12 )			MR16( 1, b0 - 0xe8 )	I16( 2, READ16(cpustate) )		return;		// LDW (gg),mn
 				case 0x40:	case 0x41:	case 0x42:	/*case 0x43:*/	case 0x44:	case 0x45:	case 0x46:
 					OP16( LD,8 )			MR16( 1, b0 - 0xe8 )	R16( 2, b1 - 0x40 )		return;		// LD (gg),rr
 
@@ -574,9 +578,9 @@ static void decode(void)
 				case 0x6c:																				// AND (gg),n
 				case 0x6d:																				// XOR (gg),n
 				case 0x6e:																				// OR  (gg),n
-					OP( ADD+b1-0x68,10 )	MR16( 1, b0 - 0xe8 )	I8( 2, READ8() )		return;
+					OP( ADD+b1-0x68,10 )	MR16( 1, b0 - 0xe8 )	I8( 2, READ8(cpustate) )		return;
 				case 0x6f:																				// CP  (gg),n
-					OP( CP,8 )				MR16( 1, b0 - 0xe8 )	I8( 2, READ8() )		return;
+					OP( CP,8 )				MR16( 1, b0 - 0xe8 )	I8( 2, READ8(cpustate) )		return;
 
 				case 0xc0:	case 0xc1:	case 0xc2:	case 0xc3:	case 0xc4:	case 0xc5:	case 0xc6:	case 0xc7:
 				case 0xc8:	case 0xc9:	case 0xca:	case 0xcb:	case 0xcc:	case 0xcd:	case 0xce:	case 0xcf:
@@ -586,15 +590,15 @@ static void decode(void)
 					OPCC( CALL,6,14 )		CC( 1, b1 - 0xd0 )		R16( 2, b0 - 0xe8 )		return;		// CALL [cc,]gg
 			}	break;
 		case 0xeb:
-			imm16 = READ16();
-			b3 = READ8();
+			imm16 = READ16(cpustate);
+			b3 = READ8(cpustate);
 			switch ( b3 )	{
 				case 0x20:	case 0x21:	case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
 					OP( LD,10 )				MI16( 1, imm16 )		R8( 2, b3 - 0x20 )		return;		// LD (mn),r
 				case 0x37:
-					OP( LD,12 )				MI16( 1, imm16 )		I8( 2, READ8() )		return;		// LD (vw),n
+					OP( LD,12 )				MI16( 1, imm16 )		I8( 2, READ8(cpustate) )		return;		// LD (vw),n
 				case 0x3f:
-					OP( LDW,16 )			MI16( 1, imm16 )		I16( 2, READ16() )		return;		// LDW (vw),mn
+					OP( LDW,16 )			MI16( 1, imm16 )		I16( 2, READ16(cpustate) )		return;		// LDW (vw),mn
 				case 0x40:	case 0x41:	case 0x42:	/*case 0x43:*/	case 0x44:	case 0x45:	case 0x46:
 					OP16( LD,12 )			MI16( 1, imm16 )		R16( 2, b3 - 0x40 )		return;		// LD (mn),rr
 
@@ -605,9 +609,9 @@ static void decode(void)
 				case 0x6c:																				// AND (vw),n
 				case 0x6d:																				// XOR (vw),n
 				case 0x6e:																				// OR  (vw),n
-					OP( ADD+b3-0x68,14 )	MI16( 1, imm16 )		I8( 2, READ8() ) 		return;
+					OP( ADD+b3-0x68,14 )	MI16( 1, imm16 )		I8( 2, READ8(cpustate) ) 		return;
 				case 0x6f:																				// CP  (vw),n
-					OP( ADD+b3-0x68,12 )	MI16( 1, imm16 )		I8( 2, READ8() ) 		return;
+					OP( ADD+b3-0x68,12 )	MI16( 1, imm16 )		I8( 2, READ8(cpustate) ) 		return;
 
 				case 0xc0:	case 0xc1:	case 0xc2:	case 0xc3:	case 0xc4:	case 0xc5:	case 0xc6:	case 0xc7:
 				case 0xc8:	case 0xc9:	case 0xca:	case 0xcb:	case 0xcc:	case 0xcd:	case 0xce:	case 0xcf:
@@ -618,8 +622,8 @@ static void decode(void)
 			}	break;
 
 		case 0xef:
-			b1 = READ8();
-			b2 = READ8();
+			b1 = READ8(cpustate);
+			b2 = READ8(cpustate);
 			switch ( b2 )	{
 				case 0x20:	case 0x21:	case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
 					OP( LD,8 )				MI16( 1, 0xFF00|b1 )	R8( 2, b2 - 0x20 )		return;		// LD ($FF00+n),r
@@ -633,14 +637,14 @@ static void decode(void)
 				case 0x6c:																				// AND ($FF00+w),n
 				case 0x6d:																				// XOR ($FF00+w),n
 				case 0x6e:																				// OR  ($FF00+w),n
-					OP( ADD+b2-0x68,12 )	MI16( 1, 0xFF00|b1 )	I8( 2, READ8() ) 		return;
+					OP( ADD+b2-0x68,12 )	MI16( 1, 0xFF00|b1 )	I8( 2, READ8(cpustate) ) 		return;
 				case 0x6f:																				// CP  ($FF00+w),n
-					OP( ADD+b2-0x68,10 )	MI16( 1, 0xFF00|b1 )	I8( 2, READ8() ) 		return;
+					OP( ADD+b2-0x68,10 )	MI16( 1, 0xFF00|b1 )	I8( 2, READ8(cpustate) ) 		return;
 			}	break;
 
 		case 0xf0:	case 0xf1:	case 0xf2:
-			b1 = READ8();
-			b2 = READ8();
+			b1 = READ8(cpustate);
+			b2 = READ8(cpustate);
 			switch ( b2 )	{
 				case 0x10:																				// RLD (ix+d)
 				case 0x11:																				// RRD (ix+d)
@@ -712,7 +716,7 @@ static void decode(void)
 			}	break;
 
 		case 0xf3:
-			b1 = READ8();
+			b1 = READ8(cpustate);
 			switch ( b1 )	{
 				case 0x10:																				// RLD (HL+A)
 				case 0x11:																				// RRD (HL+A)
@@ -784,17 +788,17 @@ static void decode(void)
 			}	break;
 
 		case 0xf4:	case 0xf5:	case 0xf6:
-			b1 = READ8();
-			b2 = READ8();
+			b1 = READ8(cpustate);
+			b2 = READ8(cpustate);
 			switch ( b2 )	{
 				case 0x20:	case 0x21:	case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
 					OP( LD,10 )		MR16D8( 1, IX + b0 - 0xf4, b1 )	R8( 2, b2 - 0x20 )		return;		// LD (ix+d),r
 				case 0x37:
-					OP( LD,12 )		MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8() )		return;		// LD (ix+d),n
+					OP( LD,12 )		MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8(cpustate) )		return;		// LD (ix+d),n
 				case 0x38:	case 0x39:	case 0x3a:	/*case 0x3b:*/	case 0x3c:	case 0x3d:	case 0x3e:
 					OP( LDA,10 )	R16( 1, b2 - 0x38 )		R16D8( 2, IX + b0 - 0xf4, b1 )	return;		// LDA rr,ix+d
 				case 0x3f:
-					OP( LDW,16 )	MR16D8( 1, IX + b0 - 0xf4, b1 )	I16( 2, READ16() )		return;		// LDW (ix+d),mn
+					OP( LDW,16 )	MR16D8( 1, IX + b0 - 0xf4, b1 )	I16( 2, READ16(cpustate) )		return;		// LDW (ix+d),mn
 				case 0x40:	case 0x41:	case 0x42:	/*case 0x43:*/	case 0x44:	case 0x45:	case 0x46:
 					OP16( LD,12 )	MR16D8( 1, IX + b0 - 0xf4, b1 )	R16( 2, b2 - 0x40 )		return;		// LD (ix+d),rr
 
@@ -805,9 +809,9 @@ static void decode(void)
 				case 0x6c:																				// AND (ix+d),n
 				case 0x6d:																				// XOR (ix+d),n
 				case 0x6e:																				// OR  (ix+d),n
-					OP( ADD+b2-0x68,14)	MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8() ) 	return;
+					OP( ADD+b2-0x68,14)	MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8(cpustate) ) 	return;
 				case 0x6f:																				// CP  (ix+d),n
-					OP( ADD+b2-0x68,12)	MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8() ) 	return;
+					OP( ADD+b2-0x68,12)	MR16D8( 1, IX + b0 - 0xf4, b1 )	I8( 2, READ8(cpustate) ) 	return;
 
 				case 0xc0:	case 0xc1:	case 0xc2:	case 0xc3:	case 0xc4:	case 0xc5:	case 0xc6:	case 0xc7:
 				case 0xc8:	case 0xc9:	case 0xca:	case 0xcb:	case 0xcc:	case 0xcd:	case 0xce:	case 0xcf:
@@ -818,16 +822,16 @@ static void decode(void)
 			}	break;
 
 		case 0xf7:
-			b1 = READ8();
+			b1 = READ8(cpustate);
 			switch ( b1 )	{
 				case 0x20:	case 0x21:	case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
 					OP( LD,14 )			MR16R8( 1, HL, A )		R8( 2, b1 - 0x20 )			return;		// LD (HL+A),r
 				case 0x37:
-					OP( LD,16 )			MR16R8( 1, HL, A )		I8( 2, READ8() )			return;		// LD (HL+A),n
+					OP( LD,16 )			MR16R8( 1, HL, A )		I8( 2, READ8(cpustate) )			return;		// LD (HL+A),n
 				case 0x38:	case 0x39:	case 0x3a:	/*case 0x3b:*/	case 0x3c:	case 0x3d:	case 0x3e:
 					OP( LDA,14 )		R16( 1, b1 - 0x38 )		R16R8( 2, HL, A )			return;		// LDA rr,HL+A
 				case 0x3f:
-					OP( LDW,20 )		MR16R8( 1, HL, A )		I16( 2, READ16() )			return;		// LDW (HL+A),mn
+					OP( LDW,20 )		MR16R8( 1, HL, A )		I16( 2, READ16(cpustate) )			return;		// LDW (HL+A),mn
 				case 0x40:	case 0x41:	case 0x42:	/*case 0x43:*/	case 0x44:	case 0x45:	case 0x46:
 					OP16( LD,16 )		MR16R8( 1, HL, A )		R16( 2, b1 - 0x40 )			return;		// LD (HL+A),rr
 
@@ -838,9 +842,9 @@ static void decode(void)
 				case 0x6c:																				// AND (HL+A),n
 				case 0x6d:																				// XOR (HL+A),n
 				case 0x6e:																				// OR  (HL+A),n
-					OP( ADD+b1-0x68,18)	MR16R8( 1, HL, A )		I8( 2, READ8() ) 			return;
+					OP( ADD+b1-0x68,18)	MR16R8( 1, HL, A )		I8( 2, READ8(cpustate) ) 			return;
 				case 0x6f:																				// CP  (HL+A),n
-					OP( ADD+b1-0x68,16)	MR16R8( 1, HL, A )		I8( 2, READ8() ) 			return;
+					OP( ADD+b1-0x68,16)	MR16R8( 1, HL, A )		I8( 2, READ8(cpustate) ) 			return;
 
 				case 0xc0:	case 0xc1:	case 0xc2:	case 0xc3:	case 0xc4:	case 0xc5:	case 0xc6:	case 0xc7:
 				case 0xc8:	case 0xc9:	case 0xca:	case 0xcb:	case 0xcc:	case 0xcd:	case 0xce:	case 0xcf:
@@ -851,7 +855,7 @@ static void decode(void)
 			}	break;
 
 		case 0xf8:	case 0xf9:	case 0xfa:	case 0xfb:	case 0xfc:	case 0xfd:	case 0xfe:
-			b1 = READ8();
+			b1 = READ8(cpustate);
 			switch ( b1 )	{
 				case 0x12:																				// MUL HL,g
 				case 0x13:																				// DIV HL,g
@@ -895,7 +899,7 @@ static void decode(void)
 				case 0x6d:																				// XOR g,n
 				case 0x6e:																				// OR  g,n
 				case 0x6f:																				// CP  g,n
-					OP( ADD+b1-0x68,6 )	R8( 1, b0 - 0xf8 )		I8( 2, READ8() ) 			return;
+					OP( ADD+b1-0x68,6 )	R8( 1, b0 - 0xf8 )		I8( 2, READ8(cpustate) ) 			return;
 
 				case 0x70:																				// ADD HL,gg
 				case 0x71:																				// ADC HL,gg
@@ -993,146 +997,147 @@ static int sprint_arg(char *buffer, UINT32 pc, const char *pre, const e_mode mod
 
 CPU_DISASSEMBLE( t90 )
 {
+	t90_Regs *cpustate = device->token;
 	int len;
 
-	addr = pc;
+	cpustate->addr = pc;
 
-	decode();
-	op &= ~OP_16;
+	decode(cpustate);
+	cpustate->op &= ~OP_16;
 
-	buffer	+=	sprintf		( buffer,			"%-5s",				op_names[ op ] );	// strlen("callr") == 5
-	len		=	sprint_arg	( buffer, pc,		" ",				mode1, r1, r1b );
+	buffer	+=	sprintf		( buffer,			"%-5s",				op_names[ cpustate->op ] );	// strlen("callr") == 5
+	len		=	sprint_arg	( buffer, pc,		" ",				cpustate->mode1, cpustate->r1, cpustate->r1b );
 	buffer	+=	len;
-	buffer	+=	sprint_arg	( buffer, pc,		(len>1)?",":"",		mode2, r2, r2b );
+	buffer	+=	sprint_arg	( buffer, pc,		(len>1)?",":"",		cpustate->mode2, cpustate->r2, cpustate->r2b );
 
-	return (addr - pc) | DASMFLAG_SUPPORTED;
+	return (cpustate->addr - pc) | DASMFLAG_SUPPORTED;
 }
 
 
-INLINE UINT16 r8( const e_r r )
+INLINE UINT16 r8( t90_Regs *cpustate, const e_r r )
 {
 	switch( r )
 	{
-		case A:	return T90.af.b.h;
-		case B:	return T90.bc.b.h;
-		case C:	return T90.bc.b.l;
-		case D:	return T90.de.b.h;
-		case E:	return T90.de.b.l;
-		case H:	return T90.hl.b.h;
-		case L:	return T90.hl.b.l;
+		case A:	return cpustate->af.b.h;
+		case B:	return cpustate->bc.b.h;
+		case C:	return cpustate->bc.b.l;
+		case D:	return cpustate->de.b.h;
+		case E:	return cpustate->de.b.l;
+		case H:	return cpustate->hl.b.h;
+		case L:	return cpustate->hl.b.l;
 
 		default:
-			fatalerror("%04x: unimplemented r8 register index = %d\n",T90.pc.w.l,r);
+			fatalerror("%04x: unimplemented r8 register index = %d\n",cpustate->pc.w.l,r);
 	}
 }
 
-INLINE void w8( const e_r r, UINT16 value )
+INLINE void w8( t90_Regs *cpustate, const e_r r, UINT16 value )
 {
 	switch( r )
 	{
-		case A:	T90.af.b.h = value;	return;
-		case B:	T90.bc.b.h = value;	return;
-		case C:	T90.bc.b.l = value;	return;
-		case D:	T90.de.b.h = value;	return;
-		case E:	T90.de.b.l = value;	return;
-		case H:	T90.hl.b.h = value;	return;
-		case L:	T90.hl.b.l = value;	return;
+		case A:	cpustate->af.b.h = value;	return;
+		case B:	cpustate->bc.b.h = value;	return;
+		case C:	cpustate->bc.b.l = value;	return;
+		case D:	cpustate->de.b.h = value;	return;
+		case E:	cpustate->de.b.l = value;	return;
+		case H:	cpustate->hl.b.h = value;	return;
+		case L:	cpustate->hl.b.l = value;	return;
 
 		default:
-			fatalerror("%04x: unimplemented w8 register index = %d\n",T90.pc.w.l,r);
+			fatalerror("%04x: unimplemented w8 register index = %d\n",cpustate->pc.w.l,r);
 	}
 }
 
-INLINE UINT16 r16( const e_r r )
+INLINE UINT16 r16( t90_Regs *cpustate, const e_r r )
 {
 	switch( r )
 	{
-		case BC:	return T90.bc.w.l;
-		case DE:	return T90.de.w.l;
-		case HL:	return T90.hl.w.l;
-		case IX:	return T90.ix.w.l;
-		case IY:	return T90.iy.w.l;
-		case SP:	return T90.sp.w.l;
-		case AF:	return T90.af.w.l;
-//      case AF2:   return T90.af2.w.l;
+		case BC:	return cpustate->bc.w.l;
+		case DE:	return cpustate->de.w.l;
+		case HL:	return cpustate->hl.w.l;
+		case IX:	return cpustate->ix.w.l;
+		case IY:	return cpustate->iy.w.l;
+		case SP:	return cpustate->sp.w.l;
+		case AF:	return cpustate->af.w.l;
+//      case AF2:   return cpustate->af2.w.l;
 // one interrupt flip-flop? Needed by e.g. mjifb
-case AF2:	return (T90.af2.w.l & (~IF)) | (T90.af.w.l & IF);
-		case PC:	return T90.pc.w.l;
+		case AF2:	return (cpustate->af2.w.l & (~IF)) | (cpustate->af.w.l & IF);
+		case PC:	return cpustate->pc.w.l;
 
 		default:
-			fatalerror("%04x: unimplemented r16 register index = %d\n",T90.pc.w.l,r);
+			fatalerror("%04x: unimplemented r16 register index = %d\n",cpustate->pc.w.l,r);
 	}
 }
 
-INLINE void w16( const e_r r, UINT16 value )
+INLINE void w16( t90_Regs *cpustate, const e_r r, UINT16 value )
 {
 	switch( r )
 	{
-		case BC:	T90.bc.w.l  = value;	return;
-		case DE:	T90.de.w.l  = value;	return;
-		case HL:	T90.hl.w.l  = value;	return;
-		case IX:	T90.ix.w.l  = value;	return;
-		case IY:	T90.iy.w.l  = value;	return;
-		case SP:	T90.sp.w.l  = value;	return;
-		case AF:	T90.af.w.l  = value;	return;
-		case AF2:	T90.af2.w.l = value;	return;
-		case PC:	T90.pc.d = value;	return;
+		case BC:	cpustate->bc.w.l  = value;	return;
+		case DE:	cpustate->de.w.l  = value;	return;
+		case HL:	cpustate->hl.w.l  = value;	return;
+		case IX:	cpustate->ix.w.l  = value;	return;
+		case IY:	cpustate->iy.w.l  = value;	return;
+		case SP:	cpustate->sp.w.l  = value;	return;
+		case AF:	cpustate->af.w.l  = value;	return;
+		case AF2:	cpustate->af2.w.l = value;	return;
+		case PC:	cpustate->pc.d = value;	return;
 
 		default:
-			fatalerror("%04x: unimplemented w16 register index = %d\n",T90.pc.w.l,r);
+			fatalerror("%04x: unimplemented w16 register index = %d\n",cpustate->pc.w.l,r);
 	}
 }
 
 
 #define READ_FN( N ) \
-INLINE UINT8 Read##N##_8(void)	{ \
-	switch ( mode##N )	{ \
+INLINE UINT8 Read##N##_8(t90_Regs *cpustate)	{ \
+	switch ( cpustate->mode##N )	{ \
 		case MODE_CC: \
 		case MODE_BIT8: \
-		case MODE_I8:		return (UINT8)r##N; \
-		case MODE_D8:		return (UINT8)r##N; \
-		case MODE_R8:		return (UINT8)r8(r##N); \
-		case MODE_MI16: 	return RM8(r##N); \
-		case MODE_MR16R8:	return RM8((UINT16)(r16(r##N) + (INT8)r8(r##N##b))); \
+		case MODE_I8:		return (UINT8)cpustate->r##N; \
+		case MODE_D8:		return (UINT8)cpustate->r##N; \
+		case MODE_R8:		return (UINT8)r8(cpustate, cpustate->r##N); \
+		case MODE_MI16: 	return RM8(cpustate, cpustate->r##N); \
+		case MODE_MR16R8:	return RM8(cpustate, (UINT16)(r16(cpustate, cpustate->r##N) + (INT8)r8(cpustate, cpustate->r##N##b))); \
 		case MODE_MR16: \
-			switch( r##N ) { \
-				case IX:	return RX8(T90.ix.w.l,T90.ixbase); \
-				case IY:	return RX8(T90.iy.w.l,T90.iybase); \
+			switch( cpustate->r##N ) { \
+				case IX:	return RX8(cpustate, cpustate->ix.w.l,cpustate->ixbase); \
+				case IY:	return RX8(cpustate, cpustate->iy.w.l,cpustate->iybase); \
 			} \
-			return RM8(r16(r##N)); \
+			return RM8(cpustate, r16(cpustate, cpustate->r##N)); \
 		case MODE_MR16D8: \
-			switch( r##N ) { \
-				case IX:	return RX8((UINT16)(T90.ix.w.l + (INT8)r##N##b),T90.ixbase); \
-				case IY:	return RX8((UINT16)(T90.iy.w.l + (INT8)r##N##b),T90.iybase); \
+			switch( cpustate->r##N ) { \
+				case IX:	return RX8(cpustate, (UINT16)(cpustate->ix.w.l + (INT8)cpustate->r##N##b),cpustate->ixbase); \
+				case IY:	return RX8(cpustate, (UINT16)(cpustate->iy.w.l + (INT8)cpustate->r##N##b),cpustate->iybase); \
 			} \
-			return RM8((UINT16)(r16(r##N) + (INT8)r##N##b)); \
+			return RM8(cpustate, (UINT16)(r16(cpustate, cpustate->r##N) + (INT8)cpustate->r##N##b)); \
 		default: \
-			fatalerror("%04x: unimplemented Read%d_8 mode = %d\n",T90.pc.w.l,N,mode##N); \
+			fatalerror("%04x: unimplemented Read%d_8 mode = %d\n",cpustate->pc.w.l,N,cpustate->mode##N); \
 	} \
 	return 0; \
 } \
-INLINE UINT16 Read##N##_16(void)	{ \
-	switch ( mode##N )	{ \
-		case MODE_I16:		return r##N; \
-		case MODE_R16:		return r16(r##N); \
-		case MODE_R16D8:	return r16(r##N) + (INT8)r##N##b; \
-		case MODE_R16R8:	return r16(r##N) + (INT8)r8(r##N##b); \
-		case MODE_MI16: 	return RM16(r##N); \
-		case MODE_MR16R8:	return RM16((UINT16)(r16(r##N) + (INT8)r8(r##N##b))); \
+INLINE UINT16 Read##N##_16(t90_Regs *cpustate)	{ \
+	switch ( cpustate->mode##N )	{ \
+		case MODE_I16:		return cpustate->r##N; \
+		case MODE_R16:		return r16(cpustate, cpustate->r##N); \
+		case MODE_R16D8:	return r16(cpustate, cpustate->r##N) + (INT8)cpustate->r##N##b; \
+		case MODE_R16R8:	return r16(cpustate, cpustate->r##N) + (INT8)r8(cpustate, cpustate->r##N##b); \
+		case MODE_MI16: 	return RM16(cpustate, cpustate->r##N); \
+		case MODE_MR16R8:	return RM16(cpustate,(UINT16)(r16(cpustate, cpustate->r##N) + (INT8)r8(cpustate, cpustate->r##N##b))); \
 		case MODE_MR16: \
-			switch( r##N ) { \
-				case IX:	return RX16(T90.ix.w.l,T90.ixbase); \
-				case IY:	return RX16(T90.iy.w.l,T90.iybase); \
+			switch( cpustate->r##N ) { \
+				case IX:	return RX16(cpustate, cpustate->ix.w.l,cpustate->ixbase); \
+				case IY:	return RX16(cpustate, cpustate->iy.w.l,cpustate->iybase); \
 			} \
-			return RM16(r16(r##N)); \
+			return RM16(cpustate,r16(cpustate, cpustate->r##N)); \
 		case MODE_MR16D8: \
-			switch( r##N ) { \
-				case IX:	return RX16((UINT16)(T90.ix.w.l + (INT8)r##N##b),T90.ixbase); \
-				case IY:	return RX16((UINT16)(T90.iy.w.l + (INT8)r##N##b),T90.iybase); \
+			switch( cpustate->r##N ) { \
+				case IX:	return RX16(cpustate, (UINT16)(cpustate->ix.w.l + (INT8)cpustate->r##N##b),cpustate->ixbase); \
+				case IY:	return RX16(cpustate, (UINT16)(cpustate->iy.w.l + (INT8)cpustate->r##N##b),cpustate->iybase); \
 			} \
-			return RM16((UINT16)(r16(r##N) + (INT8)r##N##b)); \
+			return RM16(cpustate, (UINT16)(r16(cpustate, cpustate->r##N) + (INT8)cpustate->r##N##b)); \
 		default: \
-			fatalerror("%04x: unimplemented Read%d_16 modes = %d\n",T90.pc.w.l,N,mode##N); \
+			fatalerror("%04x: unimplemented Read%d_16 modes = %d\n",cpustate->pc.w.l,N,cpustate->mode##N); \
 	} \
 	return 0; \
 }
@@ -1140,47 +1145,47 @@ INLINE UINT16 Read##N##_16(void)	{ \
 
 
 #define WRITE_FN( N ) \
-INLINE void Write##N##_8( UINT8 value )	{ \
-	switch ( mode##N )	{ \
-		case MODE_R8:		w8(r##N,value);		return; \
-		case MODE_MI16: 	WM8(r##N, value);	return; \
-		case MODE_MR16R8:	WM8((UINT16)(r16(r##N) + (INT8)r8(r##N##b)), value);	return; \
+INLINE void Write##N##_8( t90_Regs *cpustate, UINT8 value )	{ \
+	switch ( cpustate->mode##N )	{ \
+		case MODE_R8:		w8(cpustate, cpustate->r##N,value);		return; \
+		case MODE_MI16: 	WM8(cpustate, cpustate->r##N, value);	return; \
+		case MODE_MR16R8:	WM8(cpustate, (UINT16)(r16(cpustate, cpustate->r##N) + (INT8)r8(cpustate, cpustate->r##N##b)), value);	return; \
 		case MODE_MR16: \
-			switch( r##N ) { \
-				case IX:	WX8(T90.ix.w.l,value,T90.ixbase);	return; \
-				case IY:	WX8(T90.iy.w.l,value,T90.iybase);	return; \
+			switch( cpustate->r##N ) { \
+				case IX:	WX8(cpustate, cpustate->ix.w.l,value,cpustate->ixbase);	return; \
+				case IY:	WX8(cpustate, cpustate->iy.w.l,value,cpustate->iybase);	return; \
 			} \
-		 	WM8(r16(r##N), value);	return; \
+		 	WM8(cpustate, r16(cpustate, cpustate->r##N), value);	return; \
 		case MODE_MR16D8: \
-			switch( r##N ) { \
-				case IX:	WX8((UINT16)(T90.ix.w.l + (INT8)r##N##b),value,T90.ixbase);	return; \
-				case IY:	WX8((UINT16)(T90.iy.w.l + (INT8)r##N##b),value,T90.iybase);	return; \
+			switch( cpustate->r##N ) { \
+				case IX:	WX8(cpustate, (UINT16)(cpustate->ix.w.l + (INT8)cpustate->r##N##b),value,cpustate->ixbase);	return; \
+				case IY:	WX8(cpustate, (UINT16)(cpustate->iy.w.l + (INT8)cpustate->r##N##b),value,cpustate->iybase);	return; \
 			} \
-			WM8((UINT16)(r16(r##N) + (INT8)r##N##b), value);	return; \
+			WM8(cpustate, (UINT16)(r16(cpustate, cpustate->r##N) + (INT8)cpustate->r##N##b), value);	return; \
 		default: \
-			fatalerror("%04x: unimplemented Write%d_8 mode = %d\n",T90.pc.w.l,N,mode##N); \
+			fatalerror("%04x: unimplemented Write%d_8 mode = %d\n",cpustate->pc.w.l,N,cpustate->mode##N); \
 	} \
 } \
-INLINE void Write##N##_16( UINT16 value ) \
+INLINE void Write##N##_16( t90_Regs *cpustate, UINT16 value ) \
 { \
-	switch ( mode##N )	{ \
-		case MODE_R16:		w16(r##N,value);	return; \
-		case MODE_MI16: 	WM16(r##N, value);	return; \
-		case MODE_MR16R8:	WM16((UINT16)(r16(r##N) + (INT8)r8(r##N##b)), value);	return; \
+	switch ( cpustate->mode##N )	{ \
+		case MODE_R16:		w16(cpustate, cpustate->r##N,value);	return; \
+		case MODE_MI16: 	WM16(cpustate, cpustate->r##N, value);	return; \
+		case MODE_MR16R8:	WM16(cpustate, (UINT16)(r16(cpustate, cpustate->r##N) + (INT8)r8(cpustate, cpustate->r##N##b)), value);	return; \
 		case MODE_MR16: \
-			switch( r##N ) { \
-				case IX:	WX16(T90.ix.w.l,value,T90.ixbase);	return; \
-				case IY:	WX16(T90.iy.w.l,value,T90.iybase);	return; \
+			switch( cpustate->r##N ) { \
+				case IX:	WX16(cpustate, cpustate->ix.w.l,value,cpustate->ixbase);	return; \
+				case IY:	WX16(cpustate, cpustate->iy.w.l,value,cpustate->iybase);	return; \
 			} \
-		 	WM16(r16(r##N), value);	return; \
+		 	WM16(cpustate, r16(cpustate, cpustate->r##N), value);	return; \
 		case MODE_MR16D8: \
-			switch( r##N ) { \
-				case IX:	WX16((UINT16)(T90.ix.w.l + (INT8)r##N##b),value,T90.ixbase);	return; \
-				case IY:	WX16((UINT16)(T90.iy.w.l + (INT8)r##N##b),value,T90.iybase);	return; \
+			switch( cpustate->r##N ) { \
+				case IX:	WX16(cpustate, (UINT16)(cpustate->ix.w.l + (INT8)cpustate->r##N##b),value,cpustate->ixbase);	return; \
+				case IY:	WX16(cpustate, (UINT16)(cpustate->iy.w.l + (INT8)cpustate->r##N##b),value,cpustate->iybase);	return; \
 			} \
-			WM16((UINT16)(r16(r##N) + (INT8)r##N##b), value);	return; \
+			WM16(cpustate, (UINT16)(r16(cpustate, cpustate->r##N) + (INT8)cpustate->r##N##b), value);	return; \
 		default: \
-			fatalerror("%04x: unimplemented Write%d_16 mode = %d\n",T90.pc.w.l,N,mode##N); \
+			fatalerror("%04x: unimplemented Write%d_16 mode = %d\n",cpustate->pc.w.l,N,cpustate->mode##N); \
 	} \
 }
 
@@ -1189,7 +1194,7 @@ READ_FN(2)
 WRITE_FN(1)
 WRITE_FN(2)
 
-INLINE int Test( UINT8 cond )
+INLINE int Test( t90_Regs *cpustate, UINT8 cond )
 {
 	int s,v;
 	switch ( cond )
@@ -1211,20 +1216,20 @@ INLINE int Test( UINT8 cond )
 		case NZ:	return !(F & ZF);
 		case NC:	return !(F & CF);
 		default:
-			fatalerror("%04x: unimplemented condition = %d\n",T90.pc.w.l,cond);
+			fatalerror("%04x: unimplemented condition = %d\n",cpustate->pc.w.l,cond);
 	}
 	return 0;
 }
 
-INLINE void Push( e_r rr )
+INLINE void Push( t90_Regs *cpustate, e_r rr )
 {
-	T90.sp.w.l -= 2;
-	WM16( T90.sp.w.l, r16(rr) );
+	cpustate->sp.w.l -= 2;
+	WM16( cpustate, cpustate->sp.w.l, r16(cpustate, rr) );
 }
-INLINE void Pop( e_r rr )
+INLINE void Pop( t90_Regs *cpustate, e_r rr )
 {
-	w16( rr, RM16( T90.sp.w.l ) );
-	T90.sp.w.l += 2;
+	w16( cpustate, rr, RM16( cpustate, cpustate->sp.w.l ) );
+	cpustate->sp.w.l += 2;
 }
 
 /*************************************************************************************************************
@@ -1264,32 +1269,32 @@ INT2        P82         Rising Edge     -
 
 typedef enum	{	INTSWI = 0,	INTNMI,	INTWD,	INT0,	INTT0,	INTT1,	INTT2,	INTT3,	INTT4,	INT1,	INTT5,	INT2,	INTRX,	INTTX,	INTMAX	}	e_irq;
 
-INLINE void leave_halt(void)
+INLINE void leave_halt(t90_Regs *cpustate)
 {
-	if( T90.halt )
+	if( cpustate->halt )
 	{
-		T90.halt = 0;
-		T90.pc.w.l++;
+		cpustate->halt = 0;
+		cpustate->pc.w.l++;
 	}
 }
 
-static void take_interrupt(e_irq irq)
+static void take_interrupt(t90_Regs *cpustate, e_irq irq)
 {
-	T90.irq_state &= ~(1 << irq);
+	cpustate->irq_state &= ~(1 << irq);
 
-	leave_halt();
+	leave_halt(cpustate);
 
-	Push( PC );
-	Push( AF );
+	Push( cpustate, PC );
+	Push( cpustate, AF );
 
 	F &= ~IF;
 
-	T90.pc.w.l = 0x10 + irq * 8;
+	cpustate->pc.w.l = 0x10 + irq * 8;
 
-	T90.extra_cycles += 20*2;
+	cpustate->extra_cycles += 20*2;
 }
 
-static void check_interrupts(void)
+static void check_interrupts(t90_Regs *cpustate)
 {
 	e_irq irq;
 
@@ -1297,237 +1302,238 @@ static void check_interrupts(void)
 		return;
 
 	for (irq = INT0; irq < INTMAX; irq++)
-		if ( T90.irq_state & T90.irq_mask & (1 << irq) )
-			take_interrupt( irq );
+		if ( cpustate->irq_state & cpustate->irq_mask & (1 << irq) )
+			take_interrupt( cpustate, irq );
 }
 
-static void set_irq_line(int irq, int state)
+static void set_irq_line(t90_Regs *cpustate, int irq, int state)
 {
-	if ( ((T90.irq_state >> irq)&1) == state ) return;
+	if ( ((cpustate->irq_state >> irq)&1) == state ) return;
 
 	if (state)
 	{
-		T90.irq_state |= 1 << irq;
-		check_interrupts();
+		cpustate->irq_state |= 1 << irq;
+		check_interrupts(cpustate);
 	}
 	else
 	{
-		T90.irq_state &= ~(1 << irq);
+		cpustate->irq_state &= ~(1 << irq);
 	}
 }
 
-INLINE void Cyc(void)	{	t90_ICount -= cyc_t;	}
-INLINE void Cyc_f(void)	{	t90_ICount -= cyc_f;	}
+INLINE void Cyc(t90_Regs *cpustate)	{	cpustate->icount -= cpustate->cyc_t;	}
+INLINE void Cyc_f(t90_Regs *cpustate)	{	cpustate->icount -= cpustate->cyc_f;	}
 
 static CPU_EXECUTE( t90 )
 {
+	t90_Regs *cpustate = device->token;
 	UINT8    a8,b8;
 	UINT16   a16,b16;
 	unsigned a32;
 	PAIR tmp;
 
-	t90_ICount = cycles - T90.extra_cycles;
-	T90.extra_cycles = 0;
+	cpustate->icount = cycles - cpustate->extra_cycles;
+	cpustate->extra_cycles = 0;
 
 	do
 	{
-		T90.prvpc.d = T90.pc.d;
-		debugger_instruction_hook(device, T90.pc.d);
+		cpustate->prvpc.d = cpustate->pc.d;
+		debugger_instruction_hook(device, cpustate->pc.d);
 
-		check_interrupts();
+		check_interrupts(cpustate);
 
-		addr = T90.pc.d;
-		decode();
-		T90.pc.d = addr;
+		cpustate->addr = cpustate->pc.d;
+		decode(cpustate);
+		cpustate->pc.d = cpustate->addr;
 
-		switch ( op )
+		switch ( cpustate->op )
 		{
 			case NOP:
-				Cyc();
+				Cyc(cpustate);
 				break;
 
 			case EX:
-				a16 = Read1_16();
-				Write1_16( Read2_16() );
-				Write2_16( a16 );
-				Cyc();
+				a16 = Read1_16(cpustate);
+				Write1_16( cpustate, Read2_16(cpustate) );
+				Write2_16( cpustate, a16 );
+				Cyc(cpustate);
 				break;
 			case EXX:
-				tmp = T90.bc;	T90.bc = T90.bc2;	T90.bc2 = tmp;
-				tmp = T90.de;	T90.de = T90.de2;	T90.de2 = tmp;
-				tmp = T90.hl;	T90.hl = T90.hl2;	T90.hl2 = tmp;
-				Cyc();
+				tmp = cpustate->bc;	cpustate->bc = cpustate->bc2;	cpustate->bc2 = tmp;
+				tmp = cpustate->de;	cpustate->de = cpustate->de2;	cpustate->de2 = tmp;
+				tmp = cpustate->hl;	cpustate->hl = cpustate->hl2;	cpustate->hl2 = tmp;
+				Cyc(cpustate);
 				break;
 
 			case LD:
-				Write1_8( Read2_8() );
-				Cyc();
+				Write1_8( cpustate, Read2_8(cpustate) );
+				Cyc(cpustate);
 				break;
 			case LDW:
 			case LD | OP_16:
-				Write1_16( Read2_16() );
-				Cyc();
+				Write1_16( cpustate, Read2_16(cpustate) );
+				Cyc(cpustate);
 				break;
 
 //          case LDA:
-//              Cyc();
+//              Cyc(cpustate);
 //              break;
 
 			case LDI:
 #define _LDI											\
-				WM8( T90.de.w.l, RM8(T90.hl.w.l) );		\
-				T90.de.w.l++;							\
-				T90.hl.w.l++;							\
-				T90.bc.w.l--;							\
+				WM8( cpustate, cpustate->de.w.l, RM8(cpustate, cpustate->hl.w.l) );		\
+				cpustate->de.w.l++;							\
+				cpustate->hl.w.l++;							\
+				cpustate->bc.w.l--;							\
 				F &= SF | ZF | IF | XCF | CF;			\
-				if ( T90.bc.w.l )	F |= VF;
+				if ( cpustate->bc.w.l )	F |= VF;
 
 				_LDI
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case LDIR:
 				_LDI
-				if ( T90.bc.w.l )
+				if ( cpustate->bc.w.l )
 				{
-					T90.pc.w.l -= 2;
-					Cyc();
+					cpustate->pc.w.l -= 2;
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 
 			case LDD:
 #define _LDD											\
-				WM8( T90.de.w.l, RM8(T90.hl.w.l) );		\
-				T90.de.w.l--;							\
-				T90.hl.w.l--;							\
-				T90.bc.w.l--;							\
+				WM8( cpustate, cpustate->de.w.l, RM8(cpustate, cpustate->hl.w.l) );		\
+				cpustate->de.w.l--;							\
+				cpustate->hl.w.l--;							\
+				cpustate->bc.w.l--;							\
 				F &= SF | ZF | IF | XCF | CF;			\
-				if ( T90.bc.w.l )	F |= VF;
+				if ( cpustate->bc.w.l )	F |= VF;
 
 				_LDD
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case LDDR:
 				_LDD
-				if ( T90.bc.w.l )
+				if ( cpustate->bc.w.l )
 				{
-					T90.pc.w.l -= 2;
-					Cyc();
+					cpustate->pc.w.l -= 2;
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 
 
 //          case CPD:
-//              Cyc();
+//              Cyc(cpustate);
 //              break;
 //          case CPDR:
-//              Cyc();
+//              Cyc(cpustate);
 //              break;
 			case CPI:
-				a8 = RM8(T90.hl.w.l);
-				b8 = T90.af.b.h - a8;
-				T90.hl.w.l++;
-				T90.bc.w.l--;
-				F = (F & (IF | CF)) | SZ[b8] | ((T90.af.b.h^a8^b8)&HF) | NF;
-				if ( T90.bc.w.l ) F |= VF;
-				Cyc();
+				a8 = RM8(cpustate, cpustate->hl.w.l);
+				b8 = cpustate->af.b.h - a8;
+				cpustate->hl.w.l++;
+				cpustate->bc.w.l--;
+				F = (F & (IF | CF)) | SZ[b8] | ((cpustate->af.b.h^a8^b8)&HF) | NF;
+				if ( cpustate->bc.w.l ) F |= VF;
+				Cyc(cpustate);
 				break;
 			case CPIR:
-				a8 = RM8(T90.hl.w.l);
-				b8 = T90.af.b.h - a8;
-				T90.hl.w.l++;
-				T90.bc.w.l--;
-				F = (F & (IF | CF)) | SZ[b8] | ((T90.af.b.h^a8^b8)&HF) | NF;
-				if ( T90.bc.w.l )
+				a8 = RM8(cpustate, cpustate->hl.w.l);
+				b8 = cpustate->af.b.h - a8;
+				cpustate->hl.w.l++;
+				cpustate->bc.w.l--;
+				F = (F & (IF | CF)) | SZ[b8] | ((cpustate->af.b.h^a8^b8)&HF) | NF;
+				if ( cpustate->bc.w.l )
 				{
 					F |= VF;
-					T90.pc.w.l -= 2;
-					Cyc();
+					cpustate->pc.w.l -= 2;
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 
 			case PUSH:
-				Push( r1 );
-				Cyc();
+				Push( cpustate, cpustate->r1 );
+				Cyc(cpustate);
 				break;
 			case POP:
-				Pop( r1 );
-				Cyc();
+				Pop( cpustate, cpustate->r1 );
+				Cyc(cpustate);
 				break;
 
 			case JP:
-				if ( Test( Read1_8() ) )
+				if ( Test( cpustate, Read1_8(cpustate) ) )
 				{
-					T90.pc.w.l = Read2_16();
-					Cyc();
+					cpustate->pc.w.l = Read2_16(cpustate);
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 			case JR:
-				if ( Test( Read1_8() ) )
+				if ( Test( cpustate, Read1_8(cpustate) ) )
 				{
-					T90.pc.w.l += /*2 +*/ (INT8)Read2_8();
-					Cyc();
+					cpustate->pc.w.l += /*2 +*/ (INT8)Read2_8(cpustate);
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 			case JR | OP_16:
-				if ( Test( Read1_8() ) )
+				if ( Test( cpustate, Read1_8(cpustate) ) )
 				{
-					T90.pc.w.l += /*2 +*/ Read2_16();
-					Cyc();
+					cpustate->pc.w.l += /*2 +*/ Read2_16(cpustate);
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 
 
 			case CALL:
-				if ( Test( Read1_8() ) )
+				if ( Test( cpustate, Read1_8(cpustate) ) )
 				{
-					Push( PC );
-					T90.pc.w.l = Read2_16();
-					Cyc();
+					Push( cpustate, PC );
+					cpustate->pc.w.l = Read2_16(cpustate);
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 			case CALLR:
-				Push( PC );
-				T90.pc.w.l += /*2 +*/ Read1_16();
-				Cyc();
+				Push( cpustate, PC );
+				cpustate->pc.w.l += /*2 +*/ Read1_16(cpustate);
+				Cyc(cpustate);
 				break;
 
 			case RET:
-				if ( Test( Read1_8() ) )
+				if ( Test( cpustate, Read1_8(cpustate) ) )
 				{
-					Pop( PC );
-					Cyc();
+					Pop( cpustate, PC );
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 			case RETI:
-				Pop( AF );
-				Pop( PC );
-				Cyc();
+				Pop( cpustate, AF );
+				Pop( cpustate, PC );
+				Cyc(cpustate);
 				break;
 
 //          case HALT:
-//              Cyc();
+//              Cyc(cpustate);
 //              break;
 			case DI:
-				T90.after_EI = 0;
+				cpustate->after_EI = 0;
 				F &= ~IF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case EI:
-				T90.after_EI = !(F & IF);
-				Cyc();
+				cpustate->after_EI = !(F & IF);
+				Cyc(cpustate);
 				break;
 
 			case SWI:
-				Cyc();
-				take_interrupt( INTSWI );
+				Cyc(cpustate);
+				take_interrupt( cpustate, INTSWI );
 				break;
 
 			case DAA:
@@ -1536,8 +1542,8 @@ static CPU_EXECUTE( t90 )
 				cf = F & CF;
 				nf = F & NF;
 				hf = F & HF;
-				lo = T90.af.b.h & 15;
-				hi = T90.af.b.h / 16;
+				lo = cpustate->af.b.h & 15;
+				hi = cpustate->af.b.h / 16;
 
 				if (cf)
 				{
@@ -1561,164 +1567,164 @@ static CPU_EXECUTE( t90 )
 						}
 					}
 				}
-				if (nf) T90.af.b.h -= diff;
-				else T90.af.b.h += diff;
+				if (nf) cpustate->af.b.h -= diff;
+				else cpustate->af.b.h += diff;
 
 				F = SZP[A] | (F & (IF | NF));
 				if (cf || (lo <= 9 ? hi >= 10 : hi >= 9)) F |= XCF | CF;
 				if (nf ? hf && lo <= 5 : lo >= 10)	F |= HF;
 			}
-				Cyc();
+				Cyc(cpustate);
 				break;
 
 
 			case CPL:
-				T90.af.b.h ^= 0xff;
+				cpustate->af.b.h ^= 0xff;
 				F |= HF | NF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case NEG:
 				a8 = 0;
-				b8 = T90.af.b.h;
+				b8 = cpustate->af.b.h;
 				a32 = a8 - b8;
 				F = (F & IF) | SZ[(UINT8)a32] | NF;
 				if (a32 & 0x100)			F |= CF | XCF;	//X?
 				if ((a8 ^ a32 ^ b8) & 0x10)	F |= HF;
 				if ((b8 ^ a8) & (a8 ^ a32) & 0x80)	F |= VF;
-				T90.af.b.h = a32;
-				Cyc();
+				cpustate->af.b.h = a32;
+				Cyc(cpustate);
 				break;
 
 			case LDAR:
-				T90.hl.w.l = T90.pc.w.l + /*2 +*/ Read2_16();
-				Cyc();
+				cpustate->hl.w.l = cpustate->pc.w.l + /*2 +*/ Read2_16(cpustate);
+				Cyc(cpustate);
 				break;
 
 			case RCF:
 				F &= SF | ZF | IF | VF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case SCF:
 				F = (F & (SF | ZF | IF | VF)) | XCF | CF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case CCF:
 				F = (F & (SF | ZF | IF | VF)) | ((F & CF)?HF:(XCF | CF));
-				Cyc();
+				Cyc(cpustate);
 				break;
 
 //          case TSET:
-//              Cyc();
+//              Cyc(cpustate);
 //              break;
 			case BIT:
-				F = (F & (IF | CF)) | HF | SZ_BIT[ Read2_8() & (1 << Read1_8()) ];
-				Cyc();
+				F = (F & (IF | CF)) | HF | SZ_BIT[ Read2_8(cpustate) & (1 << Read1_8(cpustate)) ];
+				Cyc(cpustate);
 				break;
 			case SET:
-				Write2_8( Read2_8() | (1 << Read1_8()) );
-				Cyc();
+				Write2_8( cpustate, Read2_8(cpustate) | (1 << Read1_8(cpustate)) );
+				Cyc(cpustate);
 				break;
 			case RES:
-				Write2_8( Read2_8() & (~(1 << Read1_8())) );
-				Cyc();
+				Write2_8( cpustate, Read2_8(cpustate) & (~(1 << Read1_8(cpustate))) );
+				Cyc(cpustate);
 				break;
 
 			case INC:
-				a8 = Read1_8() + 1;
-				Write1_8( a8 );
+				a8 = Read1_8(cpustate) + 1;
+				Write1_8( cpustate, a8 );
 				F = (F & (IF | CF)) | SZHV_inc[a8];
 				if (a8 == 0)	F |= XCF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case INCX:
 				if ( F & XCF )
 				{
-					a8 = Read1_8() + 1;
-					Write1_8( a8 );
+					a8 = Read1_8(cpustate) + 1;
+					Write1_8( cpustate, a8 );
 					F = (F & (IF | CF)) | SZHV_inc[a8];
 					if (a8 == 0)	F |= XCF;
-					Cyc();
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 			case INC | OP_16:
-				a16 = Read1_16() + 1;
-				Write1_16( a16 );
+				a16 = Read1_16(cpustate) + 1;
+				Write1_16( cpustate, a16 );
 				if (a16 == 0)	F |=  XCF;
 				else			F &= ~XCF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case INCW:
-				a16 = Read1_16();
+				a16 = Read1_16(cpustate);
 				a32 = a16 + 1;
-				Write1_16( a32 );
+				Write1_16( cpustate, a32 );
 				F &= IF | CF;
 				if ((UINT16)a32 == 0)	F |= ZF | XCF;
 				if (a32 & 0x8000)		F |= SF;
 				if ((a16 ^ 0x8000) & a32 & 0x8000)	F |= VF;
 				if ((a16 ^ a32 ^ 1) & 0x1000)	F |= HF;	//??
-				Cyc();
+				Cyc(cpustate);
 				break;
 
 
 			case DEC:
-				a8 = Read1_8() - 1;
-				Write1_8( a8 );
+				a8 = Read1_8(cpustate) - 1;
+				Write1_8( cpustate, a8 );
 				F = (F & (IF | CF)) | SZHV_dec[a8];
 				if (a8 == 0)	F |= XCF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case DECX:
 				if ( F & XCF )
 				{
-					a8 = Read1_8() - 1;
-					Write1_8( a8 );
+					a8 = Read1_8(cpustate) - 1;
+					Write1_8( cpustate, a8 );
 					F = (F & (IF | CF)) | SZHV_dec[a8];
 					if (a8 == 0)	F |= XCF;
-					Cyc();
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 			case DEC | OP_16:
-				a16 = Read1_16() - 1;
-				Write1_16( a16 );
+				a16 = Read1_16(cpustate) - 1;
+				Write1_16( cpustate, a16 );
 				if (a16 == 0)	F |=  XCF;
 				else			F &= ~XCF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case DECW:
-				a16 = Read1_16();
+				a16 = Read1_16(cpustate);
 				a32 = a16 - 1;
-				Write1_16( a32 );
+				Write1_16( cpustate, a32 );
 				F = (F & (IF | CF)) | NF;
 				if ((UINT16)a32 == 0)	F |= ZF | XCF;
 				if (a32 & 0x8000)		F |= SF;
 				if (a16 == 0x8000)		F |= VF;
 				if ((a16 ^ a32 ^ 1) & 0x1000)	F |= HF;	//??
-				Cyc();
+				Cyc(cpustate);
 				break;
 
 			case ADD:
 			case ADC:
-				a8 = Read1_8();
-				b8 = Read2_8();
+				a8 = Read1_8(cpustate);
+				b8 = Read2_8(cpustate);
 				a32 = a8 + b8;
-				if ( (op == ADC) && (F & CF) )	a32 += 1;
-				Write1_8( a32 );
+				if ( (cpustate->op == ADC) && (F & CF) )	a32 += 1;
+				Write1_8( cpustate, a32 );
 				F = (F & IF) | SZ[(UINT8)a32];
 				if (a32 & 0x100)			F |= CF | XCF;	//X?
 				if ((a8 ^ a32 ^ b8) & 0x10)	F |= HF;
 				if ((b8 ^ a8 ^ 0x80) & (b8 ^ a32) & 0x80)	F |= VF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case ADD | OP_16:
 			case ADC | OP_16:
-				a16 = Read1_16();
-				b16 = Read2_16();
+				a16 = Read1_16(cpustate);
+				b16 = Read2_16(cpustate);
 				a32 = a16 + b16;
-				if ( (op == (ADC | OP_16)) && (F & CF) )	a32 += 1;
-				Write1_16( a32 );
-				if ( (op == (ADD | OP_16)) && mode2 == MODE_R16 )
+				if ( (cpustate->op == (ADC | OP_16)) && (F & CF) )	a32 += 1;
+				Write1_16( cpustate, a32 );
+				if ( (cpustate->op == (ADD | OP_16)) && cpustate->mode2 == MODE_R16 )
 				{
 					F &= SF | ZF | IF | VF;
 				}
@@ -1731,240 +1737,241 @@ static CPU_EXECUTE( t90 )
 				}
 				if (a32 & 0x10000)				F |= CF | XCF;	//X?
 				if ((a16 ^ a32 ^ b16) & 0x1000)	F |= HF;	//??
-				Cyc();
+				Cyc(cpustate);
 				break;
 
 			case CP:
 			case SUB:
 			case SBC:
-				a8 = Read1_8();
-				b8 = Read2_8();
+				a8 = Read1_8(cpustate);
+				b8 = Read2_8(cpustate);
 				a32 = a8 - b8;
-				if ( (op == SBC) && (F & CF) )	a32 -= 1;
+				if ( (cpustate->op == SBC) && (F & CF) )	a32 -= 1;
 				F = (F & IF) | SZ[(UINT8)a32] | NF;
 				if (a32 & 0x100)			F |= CF | XCF;	//X?
 				if ((a8 ^ a32 ^ b8) & 0x10)	F |= HF;
 				if ((b8 ^ a8) & (a8 ^ a32) & 0x80)	F |= VF;
-				if (op != CP)
-					Write1_8( a32 );
-				Cyc();
+				if (cpustate->op != CP)
+					Write1_8( cpustate, a32 );
+				Cyc(cpustate);
 				break;
 			case CP | OP_16:
 			case SUB | OP_16:
 			case SBC | OP_16:
-				a16 = Read1_16();
-				b16 = Read2_16();
+				a16 = Read1_16(cpustate);
+				b16 = Read2_16(cpustate);
 				a32 = a16 - b16;
-				if ( (op == (SBC | OP_16)) && (F & CF) )	a32 -= 1;
+				if ( (cpustate->op == (SBC | OP_16)) && (F & CF) )	a32 -= 1;
 				F = (F & IF) | NF;
 				if ((UINT16)a32 == 0)			F |= ZF;
 				if (a32 & 0x8000)				F |= SF;
 				if (a32 & 0x10000)				F |= CF | XCF;	//X?
 				if ((a16 ^ a32 ^ b16) & 0x1000)	F |= HF;	//??
 				if ((b16 ^ a16) & (a16 ^ a32) & 0x8000)	F |= VF;
-				if (op != (CP | OP_16))
-					Write1_16( a32 );
-				Cyc();
+				if (cpustate->op != (CP | OP_16))
+					Write1_16( cpustate, a32 );
+				Cyc(cpustate);
 				break;
 
 			case AND:
-				a8 = Read1_8() & Read2_8();
-				Write1_8( a8 );
+				a8 = Read1_8(cpustate) & Read2_8(cpustate);
+				Write1_8( cpustate, a8 );
 				F = (F & IF) | SZP[a8] | HF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case AND | OP_16:
-				a16 = Read1_16() & Read2_16();
-				Write1_16( a16 );
+				a16 = Read1_16(cpustate) & Read2_16(cpustate);
+				Write1_16( cpustate, a16 );
 				F = (F & IF) | HF;
 				if (a16 == 0)		F |= ZF;
 				if (a16 & 0x8000)	F |= SF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case XOR:
-				a8 = Read1_8() ^ Read2_8();
-				Write1_8( a8 );
+				a8 = Read1_8(cpustate) ^ Read2_8(cpustate);
+				Write1_8( cpustate, a8 );
 				F = (F & IF) | SZP[a8];
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case XOR | OP_16:
-				a16 = Read1_16() ^ Read2_16();
-				Write1_16( a16 );
+				a16 = Read1_16(cpustate) ^ Read2_16(cpustate);
+				Write1_16( cpustate, a16 );
 				F &= IF;
 				if (a16 == 0)		F |= ZF;
 				if (a16 & 0x8000)	F |= SF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case OR:
-				a8 = Read1_8() | Read2_8();
-				Write1_8( a8 );
+				a8 = Read1_8(cpustate) | Read2_8(cpustate);
+				Write1_8( cpustate, a8 );
 				F = (F & IF) | SZP[a8];
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case OR | OP_16:
-				a16 = Read1_16() | Read2_16();
-				Write1_16( a16 );
+				a16 = Read1_16(cpustate) | Read2_16(cpustate);
+				Write1_16( cpustate, a16 );
 				F &= IF;
 				if (a16 == 0)		F |= ZF;
 				if (a16 & 0x8000)	F |= SF;
-				Cyc();
+				Cyc(cpustate);
 				break;
 
 			case RLC:
-				a8 = Read1_8();
+				a8 = Read1_8(cpustate);
 				a8 = (a8 << 1) | (a8 >> 7);
-				Write1_8( a8 );
-				if ( mode1 == MODE_R8 && r1 == A )	F &= SF | ZF | IF | PF;
+				Write1_8( cpustate, a8 );
+				if ( cpustate->mode1 == MODE_R8 && cpustate->r1 == A )	F &= SF | ZF | IF | PF;
 				else								F = (F & IF) | SZP[a8];
 				if (a8 & 0x01)						F |= CF | XCF;	// X?
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case RRC:
-				a8 = Read1_8();
+				a8 = Read1_8(cpustate);
 				a8 = (a8 >> 1) | (a8 << 7);
-				Write1_8( a8 );
-				if ( mode1 == MODE_R8 && r1 == A )	F &= SF | ZF | IF | PF;
+				Write1_8( cpustate, a8 );
+				if ( cpustate->mode1 == MODE_R8 && cpustate->r1 == A )	F &= SF | ZF | IF | PF;
 				else								F = (F & IF) | SZP[a8];
 				if (a8 & 0x80)						F |= CF | XCF;	// X?
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case RL:
-				a8 = Read1_8();
+				a8 = Read1_8(cpustate);
 				b8 = a8 & 0x80;
 				a8 <<= 1;
 				if (F & CF)	a8 |= 0x01;
-				Write1_8( a8 );
-				if ( mode1 == MODE_R8 && r1 == A )	F &= SF | ZF | IF | PF;
+				Write1_8( cpustate, a8 );
+				if ( cpustate->mode1 == MODE_R8 && cpustate->r1 == A )	F &= SF | ZF | IF | PF;
 				else								F = (F & IF) | SZP[a8];
 				if (b8)								F |= CF | XCF;	// X?
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case RR:
-				a8 = Read1_8();
+				a8 = Read1_8(cpustate);
 				b8 = a8 & 0x01;
 				a8 >>= 1;
 				if (F & CF)	a8 |= 0x80;
-				Write1_8( a8 );
-				if ( mode1 == MODE_R8 && r1 == A )	F &= SF | ZF | IF | PF;
+				Write1_8( cpustate, a8 );
+				if ( cpustate->mode1 == MODE_R8 && cpustate->r1 == A )	F &= SF | ZF | IF | PF;
 				else								F = (F & IF) | SZP[a8];
 				if (b8)								F |= CF | XCF;	// X?
-				Cyc();
+				Cyc(cpustate);
 				break;
 
 			case SLA:
 			case SLL:
-				a8 = Read1_8();
+				a8 = Read1_8(cpustate);
 				b8 = a8 & 0x80;
 				a8 <<= 1;
-				Write1_8( a8 );
-				if ( mode1 == MODE_R8 && r1 == A )	F &= SF | ZF | IF | PF;
+				Write1_8( cpustate, a8 );
+				if ( cpustate->mode1 == MODE_R8 && cpustate->r1 == A )	F &= SF | ZF | IF | PF;
 				else								F = (F & IF) | SZP[a8];
 				if (b8)								F |= CF | XCF;	// X?
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case SRA:
-				a8 = Read1_8();
+				a8 = Read1_8(cpustate);
 				b8 = a8 & 0x01;
 				a8 = (a8 & 0x80) | (a8 >> 1);
-				Write1_8( a8 );
-				if ( mode1 == MODE_R8 && r1 == A )	F &= SF | ZF | IF | PF;
+				Write1_8( cpustate, a8 );
+				if ( cpustate->mode1 == MODE_R8 && cpustate->r1 == A )	F &= SF | ZF | IF | PF;
 				else								F = (F & IF) | SZP[a8];
 				if (b8)								F |= CF | XCF;	// X?
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case SRL:
-				a8 = Read1_8();
+				a8 = Read1_8(cpustate);
 				b8 = a8 & 0x01;
 				a8 >>= 1;
-				Write1_8( a8 );
-				if ( mode1 == MODE_R8 && r1 == A )	F &= SF | ZF | IF | PF;
+				Write1_8( cpustate, a8 );
+				if ( cpustate->mode1 == MODE_R8 && cpustate->r1 == A )	F &= SF | ZF | IF | PF;
 				else								F = (F & IF) | SZP[a8];
 				if (b8)								F |= CF | XCF;	// X?
-				Cyc();
+				Cyc(cpustate);
 				break;
 			case RLD:
-				a8 = T90.af.b.h;
-				b8 = Read1_8();
-				Write1_8( (b8 << 4) | (a8 & 0x0f) );
+				a8 = cpustate->af.b.h;
+				b8 = Read1_8(cpustate);
+				Write1_8( cpustate, (b8 << 4) | (a8 & 0x0f) );
 				a8 = (a8 & 0xf0) | (b8 >> 4);
 				F = (F & (IF | CF)) | SZP[a8];
-				T90.af.b.h = a8;
-				Cyc();
+				cpustate->af.b.h = a8;
+				Cyc(cpustate);
 				break;
 			case RRD:
-				a8 = T90.af.b.h;
-				b8 = Read1_8();
-				Write1_8( (b8 >> 4) | (a8 << 4) );
+				a8 = cpustate->af.b.h;
+				b8 = Read1_8(cpustate);
+				Write1_8( cpustate, (b8 >> 4) | (a8 << 4) );
 				a8 = (a8 & 0xf0) | (b8 & 0x0f);
 				F = (F & (IF | CF)) | SZP[a8];
-				T90.af.b.h = a8;
-				Cyc();
+				cpustate->af.b.h = a8;
+				Cyc(cpustate);
 				break;
 
 			case DJNZ:
-				if ( --T90.bc.b.h )
+				if ( --cpustate->bc.b.h )
 				{
-					T90.pc.w.l += /*2 +*/ (INT8)Read1_8();
-					Cyc();
+					cpustate->pc.w.l += /*2 +*/ (INT8)Read1_8(cpustate);
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 			case DJNZ | OP_16:
-				if ( --T90.bc.w.l )
+				if ( --cpustate->bc.w.l )
 				{
-					T90.pc.w.l += /*2 +*/ (INT8)Read2_8();
-					Cyc();
+					cpustate->pc.w.l += /*2 +*/ (INT8)Read2_8(cpustate);
+					Cyc(cpustate);
 				}
-				else	Cyc_f();
+				else	Cyc_f(cpustate);
 				break;
 
 			case MUL:
-				T90.hl.w.l = (UINT16)T90.hl.b.l * (UINT16)Read2_8();
-				Cyc();
+				cpustate->hl.w.l = (UINT16)cpustate->hl.b.l * (UINT16)Read2_8(cpustate);
+				Cyc(cpustate);
 				break;
 			case DIV:
-				a16 = T90.hl.w.l;
-				b16 = (UINT16)Read2_8();
+				a16 = cpustate->hl.w.l;
+				b16 = (UINT16)Read2_8(cpustate);
 				if (b16 == 0)
 				{
 					F |= VF;
-					T90.hl.w.l = (a16 << 8) | ((a16 >> 8) ^ 0xff);
+					cpustate->hl.w.l = (a16 << 8) | ((a16 >> 8) ^ 0xff);
 				}
 				else
 				{
-					T90.hl.b.h = a16 % b16;
+					cpustate->hl.b.h = a16 % b16;
 					a16 /= b16;
 					if (a16 > 0xff)	F |=  VF;
 					else			F &= ~VF;
-					T90.hl.b.l = a16;
+					cpustate->hl.b.l = a16;
 				}
-				Cyc();
+				Cyc(cpustate);
 				break;
 
 			default:
-				fatalerror("%04x: unimplemented opcode, op=%02x\n",cpu_get_pc(device),op);
+				fatalerror("%04x: unimplemented opcode, op=%02x\n",cpu_get_pc(device),cpustate->op);
 		}
 
-		if ( op != EI )
-			if (T90.after_EI)
+		if ( cpustate->op != EI )
+			if (cpustate->after_EI)
 			{
 				F |= IF;
-				T90.after_EI = 0;
+				cpustate->after_EI = 0;
 			}
 
-	} while( t90_ICount > 0 );
+	} while( cpustate->icount > 0 );
 
-	t90_ICount -= T90.extra_cycles;
-	T90.extra_cycles = 0;
+	cpustate->icount -= cpustate->extra_cycles;
+	cpustate->extra_cycles = 0;
 
-	return cycles - t90_ICount;
+	return cycles - cpustate->icount;
 }
 
 static CPU_RESET( t90 )
 {
-	T90.irq_state = 0;
-	T90.irq_mask = 0;
-	T90.pc.d = 0x0000;
+	t90_Regs *cpustate = device->token;
+	cpustate->irq_state = 0;
+	cpustate->irq_mask = 0;
+	cpustate->pc.d = 0x0000;
 	F &= ~IF;
 /*
     P0/D0-D7 P1/A0-A7 P2/A8-A15 P6 P7 = INPUT
@@ -1981,19 +1988,8 @@ static CPU_EXIT( t90 )
 
 static CPU_BURN( t90 )
 {
-	t90_ICount -= 4 * ((cycles + 3) / 4);
-}
-
-static CPU_GET_CONTEXT( t90 )
-{
-	if( dst )
-		*(t90_Regs*)dst = T90;
-}
-
-static CPU_SET_CONTEXT( t90 )
-{
-	if( src )
-		T90 = *(t90_Regs*)src;
+	t90_Regs *cpustate = device->token;
+	cpustate->icount -= 4 * ((cycles + 3) / 4);
 }
 
 
@@ -2270,9 +2266,11 @@ FFED    BX      R/W     Reset   Description
 
 static READ8_HANDLER( t90_internal_registers_r )
 {
-	#define RIO		memory_read_byte_8le( T90.io, T90_IOBASE+offset )
+	t90_Regs *cpustate = space->cpu->token;
 
-	UINT8 data = T90.internal_registers[offset];
+	#define RIO		memory_read_byte_8le( cpustate->io, T90_IOBASE+offset )
+
+	UINT8 data = cpustate->internal_registers[offset];
 	switch ( T90_IOBASE + offset )
 	{
 		case T90_P3:	// 7,4,1,0
@@ -2297,14 +2295,14 @@ static READ8_HANDLER( t90_internal_registers_r )
 	return data;
 }
 
-static void t90_start_timer(int i)
+static void t90_start_timer(t90_Regs *cpustate, int i)
 {
 	int prescaler;
 	attotime period;
 
-	T90.timer_value[i] = 0;
+	cpustate->timer_value[i] = 0;
 
-	switch((T90.internal_registers[ T90_TMOD - T90_IOBASE ] >> (i * 2)) & 0x03)
+	switch((cpustate->internal_registers[ T90_TMOD - T90_IOBASE ] >> (i * 2)) & 0x03)
 	{
 		case 0:
 			// 8-bit mode
@@ -2313,22 +2311,22 @@ static void t90_start_timer(int i)
 			// 16-bit mode
 			if (i & 1)
 			{
-				logerror("%04X: CPU Timer %d clocked by Timer %d overflow signal\n", T90.pc.w.l, i,i-1);
+				logerror("%04X: CPU Timer %d clocked by Timer %d overflow signal\n", cpustate->pc.w.l, i,i-1);
 				return;
 			}
 			break;
 		case 2:
-			logerror("%04X: CPU Timer %d, unsupported PPG mode\n", T90.pc.w.l, i);
+			logerror("%04X: CPU Timer %d, unsupported PPG mode\n", cpustate->pc.w.l, i);
 			return;
 		case 3:
-			logerror("%04X: CPU Timer %d, unsupported PWM mode\n", T90.pc.w.l, i);
+			logerror("%04X: CPU Timer %d, unsupported PWM mode\n", cpustate->pc.w.l, i);
 			return;
 	}
 
-	switch((T90.internal_registers[ T90_TCLK - T90_IOBASE ] >> (i * 2)) & 0x03)
+	switch((cpustate->internal_registers[ T90_TCLK - T90_IOBASE ] >> (i * 2)) & 0x03)
 	{
-		case 0:	if (i & 1)	logerror("%04X: CPU Timer %d clocked by Timer %d match signal\n", T90.pc.w.l, i,i-1);
-				else		logerror("%04X: CPU Timer %d, unsupported TCLK = 0\n", T90.pc.w.l, i);
+		case 0:	if (i & 1)	logerror("%04X: CPU Timer %d clocked by Timer %d match signal\n", cpustate->pc.w.l, i,i-1);
+				else		logerror("%04X: CPU Timer %d, unsupported TCLK = 0\n", cpustate->pc.w.l, i);
 				return;
 		case 2:	prescaler =  16;	break;
 		case 3:	prescaler = 256;	break;
@@ -2337,64 +2335,65 @@ static void t90_start_timer(int i)
 	}
 
 
-	period = attotime_mul(T90.timer_period, prescaler);
+	period = attotime_mul(cpustate->timer_period, prescaler);
 
-	timer_adjust_periodic(T90.timer[i], period, i, period);
+	timer_adjust_periodic(cpustate->timer[i], period, i, period);
 
-	logerror("%04X: CPU Timer %d started at %lf Hz\n", T90.pc.w.l, i, 1.0 / attotime_to_double(period));
+	logerror("%04X: CPU Timer %d started at %lf Hz\n", cpustate->pc.w.l, i, 1.0 / attotime_to_double(period));
 }
 
-static void t90_start_timer4(void)
+static void t90_start_timer4(t90_Regs *cpustate)
 {
 	int prescaler;
 	attotime period;
 
-	T90.timer4_value = 0;
+	cpustate->timer4_value = 0;
 
-	switch(T90.internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03)
+	switch(cpustate->internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03)
 	{
 		case 1:		prescaler =   1;	break;
 		case 2:		prescaler =  16;	break;
-		default:	logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", T90.pc.w.l,T90.internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03);
+		default:	logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", cpustate->pc.w.l,cpustate->internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03);
 					return;
 	}
 
-	period = attotime_mul(T90.timer_period, prescaler);
+	period = attotime_mul(cpustate->timer_period, prescaler);
 
-	timer_adjust_periodic(T90.timer[4], period, 4, period);
+	timer_adjust_periodic(cpustate->timer[4], period, 4, period);
 
-	logerror("%04X: CPU Timer 4 started at %lf Hz\n", T90.pc.w.l, 1.0 / attotime_to_double(period));
+	logerror("%04X: CPU Timer 4 started at %lf Hz\n", cpustate->pc.w.l, 1.0 / attotime_to_double(period));
 }
 
 
-static void t90_stop_timer(int i)
+static void t90_stop_timer(t90_Regs *cpustate, int i)
 {
-	timer_adjust_oneshot(T90.timer[i], attotime_never, i);
-	logerror("%04X: CPU Timer %d stopped\n", T90.pc.w.l, i);
+	timer_adjust_oneshot(cpustate->timer[i], attotime_never, i);
+	logerror("%04X: CPU Timer %d stopped\n", cpustate->pc.w.l, i);
 }
 
-static void t90_stop_timer4(void)
+static void t90_stop_timer4(t90_Regs *cpustate)
 {
-	t90_stop_timer(4);
+	t90_stop_timer(cpustate, 4);
 }
 
 static TIMER_CALLBACK( t90_timer_callback )
 {
+	t90_Regs *cpustate = ptr;
 	int is16bit;
 	int i = param;
 
-	if ( (T90.internal_registers[ T90_TRUN - T90_IOBASE ] & (1 << i)) == 0 )
+	if ( (cpustate->internal_registers[ T90_TRUN - T90_IOBASE ] & (1 << i)) == 0 )
 		return;
 
-//  logerror("CPU Timer %d fired! value = %d\n", i,(unsigned)T90.timer_value[i]);
+//  logerror("CPU Timer %d fired! value = %d\n", i,(unsigned)cpustate->timer_value[i]);
 
-	T90.timer_value[i]++;
+	cpustate->timer_value[i]++;
 
-	is16bit = ((T90.internal_registers[ T90_TMOD - T90_IOBASE ] >> (i/2 * 2 + 2)) & 0x03) == 1;
+	is16bit = ((cpustate->internal_registers[ T90_TMOD - T90_IOBASE ] >> (i/2 * 2 + 2)) & 0x03) == 1;
 
 	// Match
 
-	if ( T90.timer_value[i] == T90.internal_registers[ T90_TREG0+i - T90_IOBASE ] )
+	if ( cpustate->timer_value[i] == cpustate->internal_registers[ T90_TREG0+i - T90_IOBASE ] )
 	{
 //      logerror("CPU Timer %d match\n", i);
 
@@ -2402,21 +2401,21 @@ static TIMER_CALLBACK( t90_timer_callback )
 		{
 			if (i & 1)
 			{
-				if ( T90.timer_value[i-1] == T90.internal_registers[ T90_TREG0+i-1 - T90_IOBASE ] )
+				if ( cpustate->timer_value[i-1] == cpustate->internal_registers[ T90_TREG0+i-1 - T90_IOBASE ] )
 				{
-					T90.timer_value[i]   = 0;
-					T90.timer_value[i-1] = 0;
+					cpustate->timer_value[i]   = 0;
+					cpustate->timer_value[i-1] = 0;
 
-					set_irq_line(INTT0 + i, 1);
+					set_irq_line(cpustate, INTT0 + i, 1);
 				}
 			}
 			else
-				set_irq_line(INTT0 + i, 1);
+				set_irq_line(cpustate, INTT0 + i, 1);
 		}
 		else
 		{
-			T90.timer_value[i] = 0;
-			set_irq_line(INTT0 + i, 1);
+			cpustate->timer_value[i] = 0;
+			set_irq_line(cpustate, INTT0 + i, 1);
 		}
 
 		switch (i)
@@ -2424,15 +2423,15 @@ static TIMER_CALLBACK( t90_timer_callback )
 			case 0:
 			case 2:
 				if ( !is16bit )
-					if ( (T90.internal_registers[ T90_TCLK - T90_IOBASE ] & (0x03 << (i * 2 + 2))) == 0 )	// T0/T1 match signal clocks T1/T3
-						t90_timer_callback(machine, NULL, i+1);
+					if ( (cpustate->internal_registers[ T90_TCLK - T90_IOBASE ] & (0x03 << (i * 2 + 2))) == 0 )	// T0/T1 match signal clocks T1/T3
+						t90_timer_callback(machine, cpustate, i+1);
 				break;
 		}
 	}
 
 	// Overflow
 
-	if ( T90.timer_value[i] == 0 )
+	if ( cpustate->timer_value[i] == 0 )
 	{
 //      logerror("CPU Timer %d overflow\n", i);
 
@@ -2441,7 +2440,7 @@ static TIMER_CALLBACK( t90_timer_callback )
 			case 0:
 			case 2:
 				if ( is16bit )	// T0/T1 overflow signal clocks T1/T3
-					t90_timer_callback(machine, NULL, i+1);
+					t90_timer_callback(machine, cpustate, i+1);
 				break;
 		}
 	}
@@ -2449,28 +2448,29 @@ static TIMER_CALLBACK( t90_timer_callback )
 
 static TIMER_CALLBACK( t90_timer4_callback )
 {
-//  logerror("CPU Timer 4 fired! value = %d\n", (unsigned)T90.timer_value[4]);
+//  logerror("CPU Timer 4 fired! value = %d\n", (unsigned)cpustate->timer_value[4]);
 
-	T90.timer4_value++;
+	t90_Regs *cpustate = ptr;
+	cpustate->timer4_value++;
 
 	// Match
 
-	if ( T90.timer4_value == (T90.internal_registers[ T90_TREG4L - T90_IOBASE ] + (T90.internal_registers[ T90_TREG4H - T90_IOBASE ] << 8)) )
+	if ( cpustate->timer4_value == (cpustate->internal_registers[ T90_TREG4L - T90_IOBASE ] + (cpustate->internal_registers[ T90_TREG4H - T90_IOBASE ] << 8)) )
 	{
 //      logerror("CPU Timer 4 matches TREG4\n");
-		set_irq_line(INTT4, 1);
+		set_irq_line(cpustate, INTT4, 1);
 	}
-	if ( T90.timer4_value == (T90.internal_registers[ T90_TREG5L - T90_IOBASE ] + (T90.internal_registers[ T90_TREG5H - T90_IOBASE ] << 8)) )
+	if ( cpustate->timer4_value == (cpustate->internal_registers[ T90_TREG5L - T90_IOBASE ] + (cpustate->internal_registers[ T90_TREG5H - T90_IOBASE ] << 8)) )
 	{
 //      logerror("CPU Timer 4 matches TREG5\n");
-		set_irq_line(INTT5, 1);
-		if (T90.internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x04)
-			T90.timer4_value = 0;
+		set_irq_line(cpustate, INTT5, 1);
+		if (cpustate->internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x04)
+			cpustate->timer4_value = 0;
 	}
 
 	// Overflow
 
-	if ( T90.timer_value == 0 )
+	if ( cpustate->timer_value == 0 )
 	{
 //      logerror("CPU Timer 4 overflow\n");
 	}
@@ -2478,10 +2478,11 @@ static TIMER_CALLBACK( t90_timer4_callback )
 
 static WRITE8_HANDLER( t90_internal_registers_w )
 {
-	#define WIO		memory_write_byte_8le( T90.io, T90_IOBASE+offset, data )
+	#define WIO		memory_write_byte_8le( cpustate->io, T90_IOBASE+offset, data )
 
+	t90_Regs *cpustate = space->cpu->token;
 	UINT8 out_mask;
-	UINT8 old = T90.internal_registers[offset];
+	UINT8 old = cpustate->internal_registers[offset];
 	switch ( T90_IOBASE + offset )
 	{
 		case T90_TRUN:
@@ -2492,21 +2493,21 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 			{
 				if ( (old ^ data) & (0x20 | (1 << i)) )	// if timer bit or prescaler bit changed
 				{
-					if ( data == (0x20 | (1 << i)) )	t90_start_timer(i);
-					else								t90_stop_timer(i);
+					if ( data == (0x20 | (1 << i)) )	t90_start_timer(cpustate, i);
+					else								t90_stop_timer(cpustate, i);
 				}
 			}
 			// Timer 4
 			if ( (old ^ data) & (0x20 | 0x10) )
 			{
-				if ( data == (0x20 | 0x10) )	t90_start_timer4();
-				else							t90_stop_timer4();
+				if ( data == (0x20 | 0x10) )	t90_start_timer4(cpustate);
+				else							t90_stop_timer4(cpustate);
 			}
 			break;
 		}
 
 		case T90_INTEL:
-			T90.irq_mask	&=	~(	(1 << INTT2 ) |
+			cpustate->irq_mask	&=	~(	(1 << INTT2 ) |
 									(1 << INTT3 ) |
 									(1 << INTT4 ) |
 									(1 << INT1  ) |
@@ -2515,7 +2516,7 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 									(1 << INTRX ) |
 									(1 << INTTX )	);
 
-			T90.irq_mask	|=	((data & 0x80) ? (1 << INTT2 ) : 0) |
+			cpustate->irq_mask	|=	((data & 0x80) ? (1 << INTT2 ) : 0) |
 								((data & 0x40) ? (1 << INTT3 ) : 0) |
 								((data & 0x20) ? (1 << INTT4 ) : 0) |
 								((data & 0x10) ? (1 << INT1  ) : 0) |
@@ -2526,11 +2527,11 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 			break;
 
 		case T90_INTEH:
-			T90.irq_mask	&=	~(	(1 << INT0 ) |
+			cpustate->irq_mask	&=	~(	(1 << INT0 ) |
 									(1 << INTT0) |
 									(1 << INTT1)	);
 
-			T90.irq_mask	|=	((data & 0x04) ? (1 << INT0 ) : 0) |
+			cpustate->irq_mask	|=	((data & 0x04) ? (1 << INT0 ) : 0) |
 								((data & 0x02) ? (1 << INTT0) : 0) |
 								((data & 0x01) ? (1 << INTT1) : 0) ;
 			break;
@@ -2542,7 +2543,7 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 
 		case T90_P4:
 			data &= 0x0f;
-			out_mask = (~T90.internal_registers[ T90_P4CR - T90_IOBASE ]) & 0x0f;
+			out_mask = (~cpustate->internal_registers[ T90_P4CR - T90_IOBASE ]) & 0x0f;
 			if (out_mask)
 			{
 				data &= out_mask;
@@ -2551,8 +2552,8 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 			break;
 
 		case T90_P6:
-			out_mask = T90.internal_registers[ T90_P67CR - T90_IOBASE ] & 0x0f;
-			switch (T90.internal_registers[ T90_SMMOD - T90_IOBASE ] & 0x03)
+			out_mask = cpustate->internal_registers[ T90_P67CR - T90_IOBASE ] & 0x0f;
+			switch (cpustate->internal_registers[ T90_SMMOD - T90_IOBASE ] & 0x03)
 			{
 				case 1:
 					data &= ~0x01;
@@ -2573,8 +2574,8 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 			break;
 
 		case T90_P7:
-			out_mask = (T90.internal_registers[ T90_P67CR - T90_IOBASE ] & 0xf0) >> 4;
-			switch ((T90.internal_registers[ T90_SMMOD - T90_IOBASE ]>>4) & 0x03)
+			out_mask = (cpustate->internal_registers[ T90_P67CR - T90_IOBASE ] & 0xf0) >> 4;
+			switch ((cpustate->internal_registers[ T90_SMMOD - T90_IOBASE ]>>4) & 0x03)
 			{
 				case 1:
 					data &= ~0x01;
@@ -2596,7 +2597,7 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 
 		case T90_P8:
 			data &= 0x0f;
-			out_mask = (~T90.internal_registers[ T90_P8CR - T90_IOBASE ]) & 0x08;
+			out_mask = (~cpustate->internal_registers[ T90_P8CR - T90_IOBASE ]) & 0x08;
 			if (out_mask)
 			{
 				data &= out_mask;
@@ -2605,17 +2606,18 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 			break;
 
 		case T90_BX:
-			T90.ixbase = (data & 0xf) << 16;
+			cpustate->ixbase = (data & 0xf) << 16;
 			break;
 		case T90_BY:
-			T90.iybase = (data & 0xf) << 16;
+			cpustate->iybase = (data & 0xf) << 16;
 			break;
 	}
-	T90.internal_registers[offset] = data;
+	cpustate->internal_registers[offset] = data;
 }
 
 static CPU_INIT( t90 )
 {
+	t90_Regs *cpustate = device->token;
 	int i, p;
 
 //  state_save_register_device_item(device, 0, Z80.prvpc.w.l);
@@ -2644,13 +2646,13 @@ static CPU_INIT( t90 )
 		if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
 	}
 
-	memset(&T90, 0, sizeof(T90));
-	T90.irq_callback = irqcallback;
-	T90.device = device;
-	T90.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	T90.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	memset(cpustate, 0, sizeof(t90_Regs));
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	T90.timer_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(device)), 8);
+	cpustate->timer_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(device)), 8);
 
 	// Reset registers to their initial values
 
@@ -2660,9 +2662,9 @@ static CPU_INIT( t90 )
 	// Timers
 
 	for (i = 0; i < 4; i++)
-		T90.timer[i] = timer_alloc(device->machine, t90_timer_callback, NULL);
+		cpustate->timer[i] = timer_alloc(device->machine, t90_timer_callback, cpustate);
 
-	T90.timer[4] = timer_alloc(device->machine, t90_timer4_callback, NULL);
+	cpustate->timer[4] = timer_alloc(device->machine, t90_timer4_callback, cpustate);
 }
 
 static ADDRESS_MAP_START(tmp90840_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -2689,42 +2691,46 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( t90 )
 {
+	t90_Regs *cpustate = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line( INTNMI, info->i);				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:		set_irq_line( INT0,   info->i);				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ1:		set_irq_line( INT1,   info->i);				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ2:		set_irq_line( INT2,   info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line(cpustate, INTNMI, info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:		set_irq_line(cpustate, INT0,   info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ1:		set_irq_line(cpustate, INT1,   info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ2:		set_irq_line(cpustate, INT2,   info->i);				break;
 
-		case CPUINFO_INT_PC:								T90.pc.d = info->i;			break;
-		case CPUINFO_INT_REGISTER + T90_PC:					T90.pc.w.l = info->i;						break;
-		case CPUINFO_INT_SP:								T90.sp.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_SP:					T90.sp.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_A:					T90.af.b.h = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_B:					T90.bc.b.h = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_C:					T90.bc.b.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_D:					T90.de.b.h = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_E:					T90.de.b.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_H:					T90.hl.b.h = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_L:					T90.hl.b.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_AF:					T90.af.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_BC:					T90.bc.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_DE:					T90.de.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_HL:					T90.hl.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_IX:					T90.ix.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + T90_IY:					T90.iy.w.l = info->i;						break;
+		case CPUINFO_INT_PC:								cpustate->pc.d = info->i;			break;
+		case CPUINFO_INT_REGISTER + T90_PC:					cpustate->pc.w.l = info->i;						break;
+		case CPUINFO_INT_SP:								cpustate->sp.w.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_SP:					cpustate->sp.w.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_A:					cpustate->af.b.h = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_B:					cpustate->bc.b.h = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_C:					cpustate->bc.b.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_D:					cpustate->de.b.h = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_E:					cpustate->de.b.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_H:					cpustate->hl.b.h = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_L:					cpustate->hl.b.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_AF:					cpustate->af.w.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_BC:					cpustate->bc.w.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_DE:					cpustate->de.w.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_HL:					cpustate->hl.w.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_IX:					cpustate->ix.w.l = info->i;						break;
+		case CPUINFO_INT_REGISTER + T90_IY:					cpustate->iy.w.l = info->i;						break;
 	}
 }
 
 CPU_GET_INFO( tmp90840 )
 {
+	t90_Regs *cpustate = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
-		case CPUINFO_INT_CONTEXT_SIZE:								info->i = sizeof(T90);			break;
+		case CPUINFO_INT_CONTEXT_SIZE:								info->i = sizeof(t90_Regs);			break;
 		case CPUINFO_INT_INPUT_LINES:								info->i = 1;					break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:						info->i = 0xff;					break;
 		case CPUINFO_INT_ENDIANNESS:								info->i = ENDIANNESS_LITTLE;			break;
@@ -2747,42 +2753,42 @@ CPU_GET_INFO( tmp90840 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:			info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:			info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:				info->i = T90.irq_state & (1 << INTNMI);	break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:				info->i = T90.irq_state & (1 << INT0);		break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ1:				info->i = T90.irq_state & (1 << INT1);		break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ2:				info->i = T90.irq_state & (1 << INT2);		break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:				info->i = cpustate->irq_state & (1 << INTNMI);	break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ0:				info->i = cpustate->irq_state & (1 << INT0);		break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ1:				info->i = cpustate->irq_state & (1 << INT1);		break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ2:				info->i = cpustate->irq_state & (1 << INT2);		break;
 
-		case CPUINFO_INT_PREVIOUSPC:								info->i = T90.prvpc.w.l;		break;
-		case CPUINFO_INT_PC:										info->i = T90.pc.d;				break;
-		case CPUINFO_INT_REGISTER + T90_PC:							info->i = T90.pc.w.l;			break;
-		case CPUINFO_INT_SP:										info->i = T90.sp.d;				break;
-		case CPUINFO_INT_REGISTER + T90_SP:							info->i = T90.sp.w.l;			break;
-		case CPUINFO_INT_REGISTER + T90_A:							info->i = T90.af.b.h;			break;
-		case CPUINFO_INT_REGISTER + T90_B:							info->i = T90.bc.b.h;			break;
-		case CPUINFO_INT_REGISTER + T90_C:							info->i = T90.bc.b.l;			break;
-		case CPUINFO_INT_REGISTER + T90_D:							info->i = T90.de.b.h;			break;
-		case CPUINFO_INT_REGISTER + T90_E:							info->i = T90.de.b.l;			break;
-		case CPUINFO_INT_REGISTER + T90_H:							info->i = T90.hl.b.h;			break;
-		case CPUINFO_INT_REGISTER + T90_L:							info->i = T90.hl.b.l;			break;
-		case CPUINFO_INT_REGISTER + T90_AF:							info->i = T90.af.w.l;			break;
-		case CPUINFO_INT_REGISTER + T90_BC:							info->i = T90.bc.w.l;			break;
-		case CPUINFO_INT_REGISTER + T90_DE:							info->i = T90.de.w.l;			break;
-		case CPUINFO_INT_REGISTER + T90_HL:							info->i = T90.hl.w.l;			break;
-		case CPUINFO_INT_REGISTER + T90_IX:							info->i = T90.ix.w.l;			break;
-		case CPUINFO_INT_REGISTER + T90_IY:							info->i = T90.iy.w.l;			break;
+		case CPUINFO_INT_PREVIOUSPC:								info->i = cpustate->prvpc.w.l;		break;
+		case CPUINFO_INT_PC:										info->i = cpustate->pc.d;				break;
+		case CPUINFO_INT_REGISTER + T90_PC:							info->i = cpustate->pc.w.l;			break;
+		case CPUINFO_INT_SP:										info->i = cpustate->sp.d;				break;
+		case CPUINFO_INT_REGISTER + T90_SP:							info->i = cpustate->sp.w.l;			break;
+		case CPUINFO_INT_REGISTER + T90_A:							info->i = cpustate->af.b.h;			break;
+		case CPUINFO_INT_REGISTER + T90_B:							info->i = cpustate->bc.b.h;			break;
+		case CPUINFO_INT_REGISTER + T90_C:							info->i = cpustate->bc.b.l;			break;
+		case CPUINFO_INT_REGISTER + T90_D:							info->i = cpustate->de.b.h;			break;
+		case CPUINFO_INT_REGISTER + T90_E:							info->i = cpustate->de.b.l;			break;
+		case CPUINFO_INT_REGISTER + T90_H:							info->i = cpustate->hl.b.h;			break;
+		case CPUINFO_INT_REGISTER + T90_L:							info->i = cpustate->hl.b.l;			break;
+		case CPUINFO_INT_REGISTER + T90_AF:							info->i = cpustate->af.w.l;			break;
+		case CPUINFO_INT_REGISTER + T90_BC:							info->i = cpustate->bc.w.l;			break;
+		case CPUINFO_INT_REGISTER + T90_DE:							info->i = cpustate->de.w.l;			break;
+		case CPUINFO_INT_REGISTER + T90_HL:							info->i = cpustate->hl.w.l;			break;
+		case CPUINFO_INT_REGISTER + T90_IX:							info->i = cpustate->ix.w.l;			break;
+		case CPUINFO_INT_REGISTER + T90_IY:							info->i = cpustate->iy.w.l;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 
 		case CPUINFO_PTR_SET_INFO:									info->setinfo = CPU_SET_INFO_NAME(t90);		break;
-		case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = CPU_GET_CONTEXT_NAME(t90);	break;
-		case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = CPU_SET_CONTEXT_NAME(t90);	break;
+		case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:										info->init = CPU_INIT_NAME(t90);				break;
 		case CPUINFO_PTR_RESET:										info->reset = CPU_RESET_NAME(t90);			break;
 		case CPUINFO_PTR_EXIT:										info->exit = CPU_EXIT_NAME(t90);				break;
 		case CPUINFO_PTR_EXECUTE:									info->execute = CPU_EXECUTE_NAME(t90);		break;
 		case CPUINFO_PTR_BURN:										info->burn = CPU_BURN_NAME(t90);				break;
 		case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = CPU_DISASSEMBLE_NAME(t90);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &t90_ICount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &cpustate->icount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(tmp90840_mem); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2805,21 +2811,21 @@ CPU_GET_INFO( tmp90840 )
 				F & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + T90_PC:		sprintf(info->s, "PC:%04X", T90.pc.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_SP:		sprintf(info->s, "SP:%04X", T90.sp.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_A:		sprintf(info->s, "~A:%02X", T90.af.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_B:		sprintf(info->s, "~B:%02X", T90.bc.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_C:		sprintf(info->s, "~C:%02X", T90.bc.b.l);	break;
-		case CPUINFO_STR_REGISTER + T90_D:		sprintf(info->s, "~D:%02X", T90.de.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_E:		sprintf(info->s, "~E:%02X", T90.de.b.l);	break;
-		case CPUINFO_STR_REGISTER + T90_H:		sprintf(info->s, "~H:%02X", T90.hl.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_L:		sprintf(info->s, "~L:%02X", T90.hl.b.l);	break;
-		case CPUINFO_STR_REGISTER + T90_AF:		sprintf(info->s, "AF:%04X", T90.af.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_BC:		sprintf(info->s, "BC:%04X", T90.bc.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_DE:		sprintf(info->s, "DE:%04X", T90.de.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_HL:		sprintf(info->s, "HL:%04X", T90.hl.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_IX:		sprintf(info->s, "IX:%04X", T90.ix.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_IY:		sprintf(info->s, "IY:%04X", T90.iy.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_PC:		sprintf(info->s, "PC:%04X", cpustate->pc.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_SP:		sprintf(info->s, "SP:%04X", cpustate->sp.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_A:		sprintf(info->s, "~A:%02X", cpustate->af.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_B:		sprintf(info->s, "~B:%02X", cpustate->bc.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_C:		sprintf(info->s, "~C:%02X", cpustate->bc.b.l);	break;
+		case CPUINFO_STR_REGISTER + T90_D:		sprintf(info->s, "~D:%02X", cpustate->de.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_E:		sprintf(info->s, "~E:%02X", cpustate->de.b.l);	break;
+		case CPUINFO_STR_REGISTER + T90_H:		sprintf(info->s, "~H:%02X", cpustate->hl.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_L:		sprintf(info->s, "~L:%02X", cpustate->hl.b.l);	break;
+		case CPUINFO_STR_REGISTER + T90_AF:		sprintf(info->s, "AF:%04X", cpustate->af.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_BC:		sprintf(info->s, "BC:%04X", cpustate->bc.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_DE:		sprintf(info->s, "DE:%04X", cpustate->de.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_HL:		sprintf(info->s, "HL:%04X", cpustate->hl.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_IX:		sprintf(info->s, "IX:%04X", cpustate->ix.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_IY:		sprintf(info->s, "IY:%04X", cpustate->iy.w.l);	break;
 	}
 }
 

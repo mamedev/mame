@@ -5,10 +5,10 @@
 
 #include "cpuintrf.h"
 
-void tmp90840_get_info(UINT32, cpuinfo*);
-void tmp90841_get_info(UINT32, cpuinfo*);
-void tmp91640_get_info(UINT32, cpuinfo*);
-void tmp91641_get_info(UINT32, cpuinfo*);
+CPU_GET_INFO( tmp90840 );
+CPU_GET_INFO( tmp90841 );
+CPU_GET_INFO( tmp91640 );
+CPU_GET_INFO( tmp91641 );
 
 CPU_DISASSEMBLE( t90 );
 
