@@ -19,9 +19,9 @@
 ***************************************************************************/
 
 /* transmit and receive data callbacks types */
-typedef INT32 (*RX_CALLBACK)(int port);
-typedef void  (*TX_CALLBACK)(int port, INT32 data);
-typedef void  (*ADSP2100_TIMER_CALLBACK)(int enable);
+typedef INT32 (*adsp21xx_rx_func)(const device_config *device, int port);
+typedef void  (*adsp21xx_tx_func)(const device_config *device, int port, INT32 data);
+typedef void  (*adsp21xx_timer_func)(const device_config *device, int enable);
 
 
 /***************************************************************************
@@ -162,5 +162,22 @@ extern UINT16 adsp2181_idma_addr_r(const device_config *device);
 extern void adsp2181_idma_data_w(const device_config *device, UINT16 data);
 extern UINT16 adsp2181_idma_data_r(const device_config *device);
 #endif /* (HAS_ADSP2181) */
+
+
+INLINE void adsp21xx_set_rx_handler(const device_config *device, adsp21xx_rx_func handler)
+{
+	cpu_set_info_fct(device, CPUINFO_PTR_ADSP2100_RX_HANDLER, (genf *)handler);
+}
+
+INLINE void adsp21xx_set_tx_handler(const device_config *device, adsp21xx_tx_func handler)
+{
+	cpu_set_info_fct(device, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)handler);
+}
+
+INLINE void adsp21xx_set_timer_handler(const device_config *device, adsp21xx_timer_func handler)
+{
+	cpu_set_info_fct(device, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)handler);
+}
+
 
 #endif /* __ADSP2100_H__ */

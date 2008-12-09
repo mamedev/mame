@@ -408,12 +408,12 @@ static WRITE16_HANDLER( output_latch_w );
 static READ16_HANDLER( output_control_r );
 static WRITE16_HANDLER( output_control_w );
 
-static void timer_enable_callback(int enable);
+static void timer_enable_callback(const device_config *device, int enable);
 static TIMER_CALLBACK( internal_timer_callback );
 static TIMER_CALLBACK( dcs_irq );
 static TIMER_CALLBACK( sport0_irq );
 static void recompute_sample_rate(running_machine *machine);
-static void sound_tx_callback(int port, INT32 data);
+static void sound_tx_callback(const device_config *device, int port, INT32 data);
 
 static READ16_HANDLER( dcs_polling_r );
 
@@ -919,8 +919,8 @@ void dcs_init(running_machine *machine)
 	dcs.channels = 1;
 
 	/* initialize the ADSP Tx and timer callbacks */
-	cpu_set_info_fct(dcs.cpu, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
-	cpu_set_info_fct(dcs.cpu, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
+	adsp21xx_set_tx_handler(dcs.cpu, sound_tx_callback);
+	adsp21xx_set_timer_handler(dcs.cpu, timer_enable_callback);
 
 	/* configure boot and sound ROMs */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -972,8 +972,8 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs.channels = 2;
 
 	/* initialize the ADSP Tx and timer callbacks */
-	cpu_set_info_fct(dcs.cpu, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
-	cpu_set_info_fct(dcs.cpu, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
+	adsp21xx_set_tx_handler(dcs.cpu, sound_tx_callback);
+	adsp21xx_set_timer_handler(dcs.cpu, timer_enable_callback);
 
 	/* always boot from the base of "dcs" */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -1773,14 +1773,14 @@ static void reset_timer(running_machine *machine)
 }
 
 
-static void timer_enable_callback(int enable)
+static void timer_enable_callback(const device_config *device, int enable)
 {
 	dcs.timer_enable = enable;
 	dcs.timer_ignore = 0;
 	if (enable)
 	{
 //      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_period + 1)));
-		reset_timer(Machine);
+		reset_timer(device->machine);
 	}
 	else
 	{
@@ -1948,8 +1948,7 @@ static TIMER_CALLBACK( dcs_irq )
 		reg = dcs.ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		cpu_set_input_line(dcs.cpu, ADSP2105_IRQ1, ASSERT_LINE);
-		cpu_set_input_line(dcs.cpu, ADSP2105_IRQ1, CLEAR_LINE);
+		generic_pulse_irq_line(dcs.cpu, ADSP2105_IRQ1);
 	}
 
 	/* store it */
@@ -1992,7 +1991,7 @@ static void recompute_sample_rate(running_machine *machine)
 }
 
 
-static void sound_tx_callback(int port, INT32 data)
+static void sound_tx_callback(const device_config *device, int port, INT32 data)
 {
 	/* check if it's for SPORT1 */
 	if (port != 1)
@@ -2015,15 +2014,15 @@ static void sound_tx_callback(int port, INT32 data)
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = cpu_get_reg(dcs.cpu, ADSP2100_I0 + dcs.ireg);
-			dcs.incs = cpu_get_reg(dcs.cpu, ADSP2100_M0 + mreg);
-			dcs.size = cpu_get_reg(dcs.cpu, ADSP2100_L0 + lreg);
+			source = cpu_get_reg(device, ADSP2100_I0 + dcs.ireg);
+			dcs.incs = cpu_get_reg(device, ADSP2100_M0 + mreg);
+			dcs.size = cpu_get_reg(device, ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= dcs.incs;
 
 			/* make it go back one so we dont lose the first sample */
-			cpu_set_reg(dcs.cpu, ADSP2100_I0 + dcs.ireg, source);
+			cpu_set_reg(device, ADSP2100_I0 + dcs.ireg, source);
 
 			/* save it as it is now */
 			dcs.ireg_base = source;

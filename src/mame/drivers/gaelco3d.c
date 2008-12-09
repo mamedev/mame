@@ -143,7 +143,6 @@ REF. 970429
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
@@ -169,7 +168,7 @@ static UINT16 *adsp_fastram_base;
 static UINT8 adsp_ireg;
 static offs_t adsp_ireg_base, adsp_incs, adsp_size;
 
-static void adsp_tx_callback(int port, INT32 data);
+static void adsp_tx_callback(const device_config *device, int port, INT32 data);
 static TIMER_CALLBACK( adsp_autobuffer_irq );
 
 
@@ -195,7 +194,7 @@ static MACHINE_RESET( common )
 	}
 
 	/* initialize the ADSP Tx callback */
-	cpu_set_info_fct(machine->cpu[2], CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)adsp_tx_callback);
+	adsp21xx_set_tx_handler(machine->cpu[2], adsp_tx_callback);
 
 	/* allocate a timer for feeding the autobuffer */
 	adsp_autobuffer_timer = timer_alloc(machine, adsp_autobuffer_irq, NULL);
@@ -562,8 +561,7 @@ static TIMER_CALLBACK( adsp_autobuffer_irq )
 		reg = adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		cpu_set_input_line(machine->cpu[2], ADSP2105_IRQ1, ASSERT_LINE);
-		cpu_set_input_line(machine->cpu[2], ADSP2105_IRQ1, CLEAR_LINE);
+		generic_pulse_irq_line(machine->cpu[2], ADSP2105_IRQ1);
 	}
 
 	/* store it */
@@ -571,7 +569,7 @@ static TIMER_CALLBACK( adsp_autobuffer_irq )
 }
 
 
-static void adsp_tx_callback(int port, INT32 data)
+static void adsp_tx_callback(const device_config *device, int port, INT32 data)
 {
 	/* check if it's for SPORT1 */
 	if (port != 1)
@@ -595,15 +593,15 @@ static void adsp_tx_callback(int port, INT32 data)
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = cpu_get_reg(Machine->cpu[2], ADSP2100_I0 + adsp_ireg);
-			adsp_incs = cpu_get_reg(Machine->cpu[2], ADSP2100_M0 + mreg);
-			adsp_size = cpu_get_reg(Machine->cpu[2], ADSP2100_L0 + lreg);
+			source = cpu_get_reg(device, ADSP2100_I0 + adsp_ireg);
+			adsp_incs = cpu_get_reg(device, ADSP2100_M0 + mreg);
+			adsp_size = cpu_get_reg(device, ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= adsp_incs;
 
 			/* make it go back one so we dont lose the first sample */
-			cpu_set_reg(Machine->cpu[2], ADSP2100_I0 + adsp_ireg, source);
+			cpu_set_reg(device, ADSP2100_I0 + adsp_ireg, source);
 
 			/* save it as it is now */
 			adsp_ireg_base = source;
@@ -611,7 +609,7 @@ static void adsp_tx_callback(int port, INT32 data)
 			/* calculate how long until we generate an interrupt */
 
 			/* period per each bit sent */
-			sample_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(Machine->cpu[2])), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			sample_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(device)), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			/* now put it down to samples, so we know what the channel frequency has to be */
 			sample_period = attotime_mul(sample_period, 16 * SOUND_CHANNELS);
