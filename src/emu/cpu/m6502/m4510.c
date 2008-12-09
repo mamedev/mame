@@ -155,8 +155,6 @@ struct _m4510_Regs {
 	m6510_port_write_func port_write;
 };
 
-static void *token;
-
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
@@ -190,8 +188,6 @@ static void default_wrmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m4510 )
 {
 	m4510_Regs *cpustate = device->token;
-
-	token = device->token;
 
 	cpustate->interrupt_inhibit = 0;
 	cpustate->rdmem_id = default_rdmem_id;
@@ -235,21 +231,6 @@ static CPU_EXIT( m4510 )
 {
 	/* nothing to do yet */
 }
-
-static CPU_GET_CONTEXT( m4510 )
-{
-}
-
-static CPU_SET_CONTEXT( m4510 )
-{
-	m4510_Regs *cpustate;
-	if( src )
-	{
-		token = src;
-		cpustate = token;
-	}
-}
-
 
 INLINE void m4510_take_irq(m4510_Regs *cpustate)
 {
@@ -353,7 +334,7 @@ static UINT8 m4510_get_port(m4510_Regs *cpustate)
 static READ8_HANDLER( m4510_read_0000 )
 {
 	UINT8 result = 0x00;
-	m4510_Regs *cpustate = token;
+	m4510_Regs *cpustate = space->cpu->token;
 
 	switch(offset)
 	{
@@ -371,7 +352,7 @@ static READ8_HANDLER( m4510_read_0000 )
 
 static WRITE8_HANDLER( m4510_write_0000 )
 {
-	m4510_Regs *cpustate = token;
+	m4510_Regs *cpustate = space->cpu->token;
 
 	switch(offset)
 	{
@@ -512,8 +493,8 @@ CPU_GET_INFO( m4510 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m4510);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m4510);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m4510);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m4510);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m4510);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m4510);				break;

@@ -92,8 +92,6 @@ struct _m6502_Regs
 };
 
 
-static void *token;
-
 static UINT8 default_rdmem_id(const address_space *space, offs_t offset) { return memory_read_byte_8le(space, offset); }
 static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 data) { memory_write_byte_8le(space, offset, data); }
 
@@ -135,8 +133,6 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
 static void m6502_common_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = device->token;
-
-	token = device->token;	// temporary
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -191,21 +187,6 @@ static CPU_RESET( m6502 )
 static CPU_EXIT( m6502 )
 {
 	/* nothing to do yet */
-}
-
-static CPU_GET_CONTEXT( m6502 )
-{
-}
-
-static CPU_SET_CONTEXT( m6502 )
-{
-	m6502_Regs *cpustate;
-
-	if( src )
-	{
-		token = src;
-		cpustate = token;
-	}
 }
 
 INLINE void m6502_take_irq(m6502_Regs *cpustate)
@@ -374,7 +355,7 @@ static UINT8 m6510_get_port(m6502_Regs *cpustate)
 
 static READ8_HANDLER( m6510_read_0000 )
 {
-	m6502_Regs *cpustate = token;
+	m6502_Regs *cpustate = space->cpu->token;
 	UINT8 result = 0x00;
 
 	switch(offset)
@@ -393,7 +374,7 @@ static READ8_HANDLER( m6510_read_0000 )
 
 static WRITE8_HANDLER( m6510_write_0000 )
 {
-	m6502_Regs *cpustate = token;
+	m6502_Regs *cpustate = space->cpu->token;
 
 	switch(offset)
 	{
@@ -758,8 +739,8 @@ CPU_GET_INFO( m6502 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6502);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m6502);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m6502);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6502);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6502);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6502);				break;

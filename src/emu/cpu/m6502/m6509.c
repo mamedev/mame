@@ -86,7 +86,6 @@ struct _m6509_Regs {
 	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
 };
 
-static void *token;
 
 /***************************************************************
  * include the opcode macros, functions and tables
@@ -135,8 +134,6 @@ static CPU_INIT( m6509 )
 {
 	m6509_Regs *cpustate = device->token;
 
-	token = device->token;	// temporary
-
 	cpustate->rdmem_id = default_rdmem_id;
 	cpustate->wrmem_id = default_wdmem_id;
 	cpustate->irq_callback = irqcallback;
@@ -169,23 +166,6 @@ static CPU_EXIT( m6509 )
 {
 	/* nothing to do yet */
 }
-
-static CPU_GET_CONTEXT( m6509 )
-{
-}
-
-static CPU_SET_CONTEXT( m6509 )
-{
-	m6509_Regs *cpustate;
-
-	if( src )
-	{
-		token = src;
-		cpustate = token;
-	}
-}
-
-
 
 INLINE void m6509_take_irq(	m6509_Regs *cpustate)
 {
@@ -383,8 +363,8 @@ CPU_GET_INFO( m6509 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6509);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m6509);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m6509);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6509);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6509);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6509);				break;
