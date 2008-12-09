@@ -715,14 +715,9 @@ static CPU_GET_CONTEXT( tms34020 ) { }
     Set all registers to given values
 ***************************************************************************/
 
-static CPU_SET_CONTEXT( tms34010 )
-{
-}
+static CPU_SET_CONTEXT( tms34010 ) { }
 
-
-static CPU_SET_CONTEXT( tms34020 )
-{
-}
+static CPU_SET_CONTEXT( tms34020 ) { }
 
 
 

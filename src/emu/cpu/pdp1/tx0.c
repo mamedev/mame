@@ -156,9 +156,7 @@ static CPU_GET_CONTEXT( tx0 )
 {
 }
 
-static CPU_SET_CONTEXT( tx0 )
-{
-}
+static CPU_SET_CONTEXT( tx0 ) { }
 
 
 /* execute instructions on this CPU until icount expires */

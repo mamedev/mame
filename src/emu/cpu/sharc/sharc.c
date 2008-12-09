@@ -604,13 +604,9 @@ static CPU_EXIT( sharc )
 	/* TODO */
 }
 
-static CPU_GET_CONTEXT( sharc )
-{
-}
+static CPU_GET_CONTEXT( sharc ) { }
 
-static CPU_SET_CONTEXT( sharc )
-{
-}
+static CPU_SET_CONTEXT( sharc ) { }
 
 static void sharc_set_irq_line(SHARC_REGS *cpustate, int irqline, int state)
 {
