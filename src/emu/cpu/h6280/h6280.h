@@ -34,8 +34,47 @@ enum
 #define H6280_IRQ1_VEC	0xfff8
 #define H6280_IRQ2_VEC	0xfff6			/* Aka BRK vector */
 
-CPU_GET_INFO( h6280 );
 
+/****************************************************************************
+ * The 6280 registers.
+ ****************************************************************************/
+typedef struct
+{
+	int ICount;
+
+	PAIR  ppc;			/* previous program counter */
+    PAIR  pc;           /* program counter */
+    PAIR  sp;           /* stack pointer (always 100 - 1FF) */
+    PAIR  zp;           /* zero page address */
+    PAIR  ea;           /* effective address */
+    UINT8 a;            /* Accumulator */
+    UINT8 x;            /* X index register */
+    UINT8 y;            /* Y index register */
+    UINT8 p;            /* Processor status */
+    UINT8 mmr[8];       /* Hu6280 memory mapper registers */
+    UINT8 irq_mask;     /* interrupt enable/disable */
+    UINT8 timer_status; /* timer status */
+	UINT8 timer_ack;	/* timer acknowledge */
+    UINT8 clocks_per_cycle; /* 4 = low speed mode, 1 = high speed mode */
+    INT32 timer_value;    /* timer interrupt */
+    INT32 timer_load;		/* reload value */
+    UINT8 nmi_state;
+    UINT8 irq_state[3];
+	UINT8 irq_pending;
+	cpu_irq_callback irq_callback;
+	const device_config *device;
+	const address_space *program;
+	const address_space *io;
+
+#if LAZY_FLAGS
+    INT32 NZ;			/* last value (lazy N and Z flag) */
+#endif
+	UINT8 io_buffer;	/* last value written to the PSG, timer, and interrupt pages */
+} h6280_Regs;
+
+
+
+CPU_GET_INFO( h6280 );
 
 READ8_HANDLER( h6280_irq_status_r );
 WRITE8_HANDLER( h6280_irq_status_w );
@@ -44,8 +83,8 @@ READ8_HANDLER( h6280_timer_r );
 WRITE8_HANDLER( h6280_timer_w );
 
 /* functions for use by the PSG and joypad port only! */
-UINT8 h6280io_get_buffer(void);
-void h6280io_set_buffer(UINT8);
+UINT8 h6280io_get_buffer(device_config*);
+void h6280io_set_buffer(device_config*, UINT8);
 
 CPU_DISASSEMBLE( h6280 );
 

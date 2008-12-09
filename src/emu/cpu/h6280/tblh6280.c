@@ -11,7 +11,7 @@
 ******************************************************************************/
 
 #undef	OP
-#define OP(nnn) INLINE void h6280##nnn(void)
+#define OP(nnn) INLINE void h6280##nnn(h6280_Regs* cpustate)
 
 /*****************************************************************************
  *****************************************************************************
@@ -21,7 +21,7 @@
  *****************************************************************************
  * op     temp     cycles             rdmem   opc   wrmem   ******************/
 OP(_000) {		   H6280_CYCLES(8);		  BRK;		   } // 8 BRK
-OP(_020) {		   H6280_CYCLES(7); EA_ABS; JSR;		   } // 7 JSR  ABS
+OP(_020) {		   H6280_CYCLES(7); EA_ABS; JSR;	   } // 7 JSR  ABS
 OP(_040) {		   H6280_CYCLES(7);		  RTI;		   } // 7 RTI
 OP(_060) {		   H6280_CYCLES(7);		  RTS;		   } // 7 RTS
 OP(_080) { int tmp;  				          BRA(1);	   } // 4 BRA  REL
@@ -308,7 +308,7 @@ OP(_0bf) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(3);	   } // 6/8 BBS3 ZPG,REL
 OP(_0df) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(5);	   } // 6/8 BBS5 ZPG,REL
 OP(_0ff) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(7);	   } // 6/8 BBS7 ZPG,REL
 
-static void (*const insnh6280[0x100])(void) = {
+static void (*const insnh6280[0x100])(h6280_Regs* cpustate) = {
 	h6280_000,h6280_001,h6280_002,h6280_003,h6280_004,h6280_005,h6280_006,h6280_007,
 	h6280_008,h6280_009,h6280_00a,h6280_00b,h6280_00c,h6280_00d,h6280_00e,h6280_00f,
 	h6280_010,h6280_011,h6280_012,h6280_013,h6280_014,h6280_015,h6280_016,h6280_017,
