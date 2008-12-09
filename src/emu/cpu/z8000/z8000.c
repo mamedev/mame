@@ -605,10 +605,10 @@ CPU_GET_INFO( z8000 )
 				cpustate->fcw & 0x0001 ? '?':'.');
             break;
 
-		case CPUINFO_STR_REGISTER + Z8000_PC:			sprintf(info->s, "cpustate->pc :%04X", cpustate->pc);		break;
+		case CPUINFO_STR_REGISTER + Z8000_PC:			sprintf(info->s, "pc :%04X", cpustate->pc);		break;
 		case CPUINFO_STR_REGISTER + Z8000_NSP:			sprintf(info->s, "SP :%04X", cpustate->nsp);	break;
-		case CPUINFO_STR_REGISTER + Z8000_FCW:			sprintf(info->s, "cpustate->fcw:%04X", cpustate->fcw);	break;
-		case CPUINFO_STR_REGISTER + Z8000_PSAP:			sprintf(info->s, "cpustate->nsp:%04X", cpustate->psap);	break;
+		case CPUINFO_STR_REGISTER + Z8000_FCW:			sprintf(info->s, "fcw:%04X", cpustate->fcw);	break;
+		case CPUINFO_STR_REGISTER + Z8000_PSAP:			sprintf(info->s, "nsp:%04X", cpustate->psap);	break;
 		case CPUINFO_STR_REGISTER + Z8000_REFRESH:		sprintf(info->s, "REFR:%04X", cpustate->refresh); break;
 		case CPUINFO_STR_REGISTER + Z8000_IRQ_REQ:		sprintf(info->s, "IRQR:%04X", cpustate->irq_req); break;
 		case CPUINFO_STR_REGISTER + Z8000_IRQ_SRV:		sprintf(info->s, "IRQS:%04X", cpustate->irq_srv); break;
