@@ -1053,11 +1053,9 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
 	MDRV_DEVICE_CONFIG( dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
-	MDRV_DEVICE_CONFIG( mediagx_pic8259_1_config )
+	MDRV_PIC8259_ADD( "pic8259_master", mediagx_pic8259_1_config )
 
-	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
-	MDRV_DEVICE_CONFIG( mediagx_pic8259_2_config )
+	MDRV_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 

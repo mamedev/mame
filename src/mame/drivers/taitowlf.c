@@ -624,11 +624,9 @@ static MACHINE_DRIVER_START(taitowlf)
 	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
 	MDRV_DEVICE_CONFIG( dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_1", PIC8259 )
-	MDRV_DEVICE_CONFIG( taitowlf_pic8259_1_config )
+	MDRV_PIC8259_ADD( "pic8259_1", taitowlf_pic8259_1_config )
 
-	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
-	MDRV_DEVICE_CONFIG( taitowlf_pic8259_2_config )
+	MDRV_PIC8259_ADD( "pic8259_2", taitowlf_pic8259_2_config )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
