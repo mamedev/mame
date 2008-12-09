@@ -610,9 +610,11 @@ static TIMER_CALLBACK( irq_pulse_clear )
 
 void generic_pulse_irq_line(const device_config *device, int irqline)
 {
+	int multiplier = cpu_get_clock_multiplier(device);
+	int clocks = (cpu_get_min_cycles(device) * cpu_get_clock_divider(device) + multiplier - 1) / multiplier;
 	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET);
 	cpu_set_input_line(device, irqline, ASSERT_LINE);
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 1), (void *)device, irqline, irq_pulse_clear);
+	timer_set(device->machine, cpu_clocks_to_attotime(device, MAX(clocks, 1)), (void *)device, irqline, irq_pulse_clear);
 }
 
 
