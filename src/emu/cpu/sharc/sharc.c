@@ -604,10 +604,6 @@ static CPU_EXIT( sharc )
 	/* TODO */
 }
 
-static CPU_GET_CONTEXT( sharc ) { }
-
-static CPU_SET_CONTEXT( sharc ) { }
-
 static void sharc_set_irq_line(SHARC_REGS *cpustate, int irqline, int state)
 {
 	if (state)
@@ -1201,8 +1197,8 @@ static CPU_GET_INFO( sharc )
 		case CPUINFO_INT_REGISTER + SHARC_B15:			info->i = cpustate->dag2.b[7];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(sharc);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(sharc);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sharc);		break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sharc);	break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(sharc);		break;

@@ -36,12 +36,12 @@ static WRITE8_HANDLER( tryout_nmi_ack_w )
 static WRITE8_HANDLER( tryout_sound_w )
 {
 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1], 0, PULSE_LINE );
+	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( tryout_sound_irq_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE );
+	cpu_set_input_line(space->cpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( tryout_bankswitch_w )

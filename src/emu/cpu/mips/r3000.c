@@ -281,17 +281,6 @@ static void set_irq_line(r3000_state *r3000, int irqline, int state)
 
 
 /***************************************************************************
-    CONTEXT SWITCHING
-***************************************************************************/
-
-static CPU_GET_CONTEXT( r3000 ) { }
-
-
-static CPU_SET_CONTEXT( r3000 ) { }
-
-
-
-/***************************************************************************
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
@@ -1253,8 +1242,8 @@ static CPU_GET_INFO( r3000 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(r3000);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(r3000);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(r3000);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r3000);				break;
 		case CPUINFO_PTR_RESET:							/* provided per-CPU */							break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(r3000);				break;

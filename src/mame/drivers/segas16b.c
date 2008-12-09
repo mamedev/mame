@@ -1353,7 +1353,7 @@ static void upd7759_generate_nmi(int state)
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpu_set_input_line(space->machine->cpu[2], 1, PULSE_LINE);
+	generic_pulse_irq_line(space->machine->cpu[2], 1);
 }
 #endif
 

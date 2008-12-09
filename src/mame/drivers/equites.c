@@ -445,7 +445,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			cpu_set_input_line(space->machine->cpu[1], I8085_RST75_LINE, PULSE_LINE);
+			generic_pulse_irq_line(space->machine->cpu[1], I8085_RST75_LINE);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)

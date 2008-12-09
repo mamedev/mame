@@ -238,26 +238,6 @@ static void t11_check_irqs(t11_state *cpustate)
 
 /*************************************
  *
- *  Fetch current context into buffer
- *
- *************************************/
-
-static CPU_GET_CONTEXT( t11 ) { }
-
-
-
-/*************************************
- *
- *  Retrieve context from buffer
- *
- *************************************/
-
-static CPU_SET_CONTEXT( t11 ) { }
-
-
-
-/*************************************
- *
  *  Low-level initialization/cleanup
  *
  *************************************/
@@ -470,8 +450,8 @@ CPU_GET_INFO( t11 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(t11);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(t11);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(t11);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(t11);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(t11);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(t11);			break;

@@ -107,6 +107,7 @@ struct _m6800_state
 	UINT8	cc; 			/* Condition codes */
 	UINT8	wai_state;		/* WAI opcode state ,(or sleep opcode state) */
 	UINT8	nmi_state;		/* NMI line state */
+	UINT8	nmi_pending;	/* NMI pending */
 	UINT8	irq_state[2];	/* IRQ line state [IRQ1,TIN] */
 	UINT8	ic_eddge;		/* InputCapture eddge , b.0=fall,b.1=raise */
 
@@ -118,7 +119,6 @@ struct _m6800_state
     const address_space *data;
     const address_space *io;
 
-	int 	extra_cycles;	/* cycles used for interrupts */
 	void	(* const * insn)(m6800_state *);	/* instruction table */
 	const UINT8 *cycles;			/* clock cycle of instruction table */
 	/* internal registers */
@@ -536,7 +536,7 @@ static void enter_interrupt(m6800_state *cpustate, const char *message,UINT16 ir
 	if( cpustate->wai_state & (M6800_WAI|M6800_SLP) )
 	{
 		if( cpustate->wai_state & M6800_WAI )
-			cpustate->extra_cycles += 4;
+			cpustate->icount -= 4;
 		cpustate->wai_state &= ~(M6800_WAI|M6800_SLP);
 	}
 	else
@@ -546,7 +546,7 @@ static void enter_interrupt(m6800_state *cpustate, const char *message,UINT16 ir
 		PUSHBYTE(A);
 		PUSHBYTE(B);
 		PUSHBYTE(CC);
-		cpustate->extra_cycles += 12;
+		cpustate->icount -= 12;
 	}
 	SEI;
 	PCD = RM16(cpustate,  irq_vector );
@@ -582,7 +582,12 @@ static void m6800_check_irq2(m6800_state *cpustate)
 /* check the IRQ lines for pending interrupts */
 INLINE void CHECK_IRQ_LINES(m6800_state *cpustate)
 {
-	if( !(CC & 0x10) )
+	if (cpustate->nmi_pending)
+	{
+		cpustate->nmi_pending = FALSE;
+		enter_interrupt(cpustate, "M6800 '%s' take NMI\n",0xfffc);
+	}
+	else if( !(CC & 0x10) )
 	{
 		if( cpustate->irq_state[M6800_IRQ_LINE] != CLEAR_LINE )
 		{	/* standard IRQ */
@@ -845,6 +850,7 @@ static void state_register(m6800_state *cpustate, const char *type)
 	state_save_register_device_item(cpustate->device, 0, cpustate->cc);
 	state_save_register_device_item(cpustate->device, 0, cpustate->wai_state);
 	state_save_register_device_item(cpustate->device, 0, cpustate->nmi_state);
+	state_save_register_device_item(cpustate->device, 0, cpustate->nmi_pending);
 	state_save_register_device_item_array(cpustate->device, 0, cpustate->irq_state);
 	state_save_register_device_item(cpustate->device, 0, cpustate->ic_eddge);
 
@@ -905,6 +911,7 @@ static CPU_RESET( m6800 )
 
 	cpustate->wai_state = 0;
 	cpustate->nmi_state = 0;
+	cpustate->nmi_pending = 0;
 	cpustate->irq_state[M6800_IRQ_LINE] = 0;
 	cpustate->irq_state[M6800_TIN_LINE] = 0;
 	cpustate->ic_eddge = 0;
@@ -937,51 +944,24 @@ static CPU_EXIT( m6800 )
 	/* nothing to do */
 }
 
-/****************************************************************************
- * Get all registers in given buffer
- ****************************************************************************/
-static CPU_GET_CONTEXT( m6800 )
-{
-}
-
-
-/****************************************************************************
- * Set all registers to given values
- ****************************************************************************/
-static CPU_SET_CONTEXT( m6800 )
-{
-	m6800_state *cpustate = src;
-
-	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
-}
-
 
 static void set_irq_line(m6800_state *cpustate, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (cpustate->nmi_state == state) return;
-		LOG(("M6800 '%s' set_nmi_line %d \n", cpustate->device->tag, state));
+		if (!cpustate->nmi_state && state != CLEAR_LINE)
+			cpustate->nmi_pending = TRUE;
 		cpustate->nmi_state = state;
-		if (state == CLEAR_LINE) return;
-
-		/* NMI */
-		enter_interrupt(cpustate, "M6800 '%s' take NMI\n",0xfffc);
 	}
 	else
 	{
 		int eddge;
 
-		if (cpustate->irq_state[irqline] == state) return;
 		LOG(("M6800 '%s' set_irq_line %d,%d\n", cpustate->device->tag, irqline, state));
 		cpustate->irq_state[irqline] = state;
 
-		switch(irqline)
+		if (irqline == M6800_TIN_LINE && state != cpustate->irq_state[irqline])
 		{
-		case M6800_IRQ_LINE:
-			if (state == CLEAR_LINE) return;
-			break;
-		case M6800_TIN_LINE:
 			eddge = (state == CLEAR_LINE ) ? 2 : 0;
 			if( ((cpustate->tcsr&TCSR_IEDG) ^ (state==CLEAR_LINE ? TCSR_IEDG : 0))==0 )
 				return;
@@ -990,13 +970,7 @@ static void set_irq_line(m6800_state *cpustate, int irqline, int state)
 			cpustate->pending_tcsr |= TCSR_ICF;
 			cpustate->input_capture = CT;
 			MODIFIED_tcsr;
-			if( !(CC & 0x10) )
-				m6800_check_irq2(cpustate);
-			break;
-		default:
-			return;
 		}
-		CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 	}
 }
 
@@ -1276,9 +1250,9 @@ static CPU_EXECUTE( m6800 )
 	UINT8 ireg;
 	cpustate->icount = cycles;
 
+	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
+
 	CLEANUP_COUNTERS();
-	increment_counter(cpustate, cpustate->extra_cycles);
-	cpustate->extra_cycles = 0;
 
 	do
 	{
@@ -1296,9 +1270,6 @@ static CPU_EXECUTE( m6800 )
 			increment_counter(cpustate, cycles_6800[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	increment_counter(cpustate, cpustate->extra_cycles);
-	cpustate->extra_cycles = 0;
 
 	return cycles - cpustate->icount;
 }
@@ -1651,9 +1622,9 @@ static CPU_EXECUTE( m6803 )
 	UINT8 ireg;
 	cpustate->icount = cycles;
 
+	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
+
 	CLEANUP_COUNTERS();
-	increment_counter(cpustate, cpustate->extra_cycles);
-	cpustate->extra_cycles = 0;
 
 	do
 	{
@@ -1671,9 +1642,6 @@ static CPU_EXECUTE( m6803 )
 			increment_counter(cpustate, cycles_6803[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	increment_counter(cpustate, cpustate->extra_cycles);
-	cpustate->extra_cycles = 0;
 
 	return cycles - cpustate->icount;
 }
@@ -2014,9 +1982,9 @@ static CPU_EXECUTE( hd63701 )
 	UINT8 ireg;
 	cpustate->icount = cycles;
 
+	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
+
 	CLEANUP_COUNTERS();
-	increment_counter(cpustate, cpustate->extra_cycles);
-	cpustate->extra_cycles = 0;
 
 	do
 	{
@@ -2034,9 +2002,6 @@ static CPU_EXECUTE( hd63701 )
 			increment_counter(cpustate, cycles_63701[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	increment_counter(cpustate, cpustate->extra_cycles);
-	cpustate->extra_cycles = 0;
 
 	return cycles - cpustate->icount;
 }
@@ -2365,9 +2330,9 @@ static CPU_EXECUTE( nsc8105 )
 	UINT8 ireg;
 	cpustate->icount = cycles;
 
+	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
+
 	CLEANUP_COUNTERS();
-	increment_counter(cpustate, cpustate->extra_cycles);
-	cpustate->extra_cycles = 0;
 
 	do
 	{
@@ -2385,9 +2350,6 @@ static CPU_EXECUTE( nsc8105 )
 			increment_counter(cpustate, cycles_nsc8105[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	increment_counter(cpustate, cpustate->extra_cycles);
-	cpustate->extra_cycles = 0;
 
 	return cycles - cpustate->icount;
 }
@@ -2763,8 +2725,8 @@ CPU_GET_INFO( m6800 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6800);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m6800);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m6800);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6800);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6800);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6800);				break;

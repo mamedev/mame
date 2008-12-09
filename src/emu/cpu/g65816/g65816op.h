@@ -2323,7 +2323,7 @@ TABLE_FUNCTION(void, set_line, (g65816i_cpu_struct *cpustate, int line, int stat
 			}
 			if(!LINE_NMI)
 			{
-				LINE_NMI = state != PULSE_LINE;
+				LINE_NMI = 1;
 				CPU_STOPPED &= ~STOP_LEVEL_WAI;
 				if(!CPU_STOPPED)
 					g65816i_interrupt_nmi(cpustate);

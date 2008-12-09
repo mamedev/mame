@@ -315,7 +315,6 @@ WRITE8_HANDLER( mexico86_68705_portB_w )
 	if ((ddrB & 0x20) && (data & 0x20) && (~portB_out & 0x20))
 	{
 		cpu_set_input_line_vector(space->machine->cpu[0],0,mexico86_protection_ram[0]);
-		//cpu_set_input_line(space->machine->cpu[0],0,PULSE_LINE);
 		cpu_set_input_line(space->machine->cpu[0], 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
 	}
 	if ((ddrB & 0x40) && (~data & 0x40) && (portB_out & 0x40))

@@ -353,17 +353,6 @@ static void set_irq_line(tms32031_state *tms, int irqline, int state)
 
 
 /***************************************************************************
-    CONTEXT SWITCHING
-***************************************************************************/
-
-static CPU_GET_CONTEXT( tms32031 ) { }
-
-
-static CPU_SET_CONTEXT( tms32031 ) { }
-
-
-
-/***************************************************************************
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
@@ -787,8 +776,8 @@ CPU_GET_INFO( tms32031 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32031);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms32031); break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms32031); break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy); break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy); break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32031);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32031);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32031);				break;

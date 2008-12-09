@@ -308,7 +308,7 @@ static READ32_HANDLER( arm7_latch_arm_r )
 #ifdef PGMARM7SPEEDHACK
 static TIMER_CALLBACK( arm_irq )
 {
-	cpu_set_input_line(machine->cpu[2], ARM7_FIRQ_LINE, PULSE_LINE);
+	generic_pulse_irq_line(machine->cpu[2], ARM7_FIRQ_LINE);
 }
 #endif
 
@@ -356,7 +356,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, arm_irq); // i don't know how long..
 	cpu_spinuntil_trigger(space->cpu, 1002);
 #else
-	cpu_set_input_line(space->machine->cpu[2], ARM7_FIRQ_LINE, PULSE_LINE);
+	generic_pulse_irq_line(space->machine->cpu[2], ARM7_FIRQ_LINE);
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
 	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[2], 200)); // give the arm time to respond (just boosting the interleave doesn't help
 #endif

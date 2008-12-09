@@ -591,6 +591,46 @@ static TIMER_CALLBACK( clear_all_lines )
 
 
 /*-------------------------------------------------
+    irq_pulse_clear - clear a "pulsed" IRQ line
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( irq_pulse_clear )
+{
+	const device_config *device = ptr;
+	int irqline = param;
+	cpu_set_input_line(device, irqline, CLEAR_LINE);
+}
+
+
+/*-------------------------------------------------
+    generic_pulse_irq_line - "pulse" an IRQ line by
+    asserting it and then clearing it 1 cycle
+    later
+-------------------------------------------------*/
+
+void generic_pulse_irq_line(const device_config *device, int irqline)
+{
+	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET);
+	cpu_set_input_line(device, irqline, ASSERT_LINE);
+	timer_set(device->machine, cpu_clocks_to_attotime(device, 1), (void *)device, irqline, irq_pulse_clear);
+}
+
+
+/*-------------------------------------------------
+    generic_pulse_irq_line_and_vector - "pulse" an 
+    IRQ line by asserting it and then clearing it 
+    1 cycle later, specifying a vector
+-------------------------------------------------*/
+
+void generic_pulse_irq_line_and_vector(const device_config *device, int irqline, int vector)
+{
+	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET);
+	cpu_set_input_line_and_vector(device, irqline, ASSERT_LINE, vector);
+	timer_set(device->machine, cpu_clocks_to_attotime(device, 1), (void *)device, irqline, irq_pulse_clear);
+}
+
+
+/*-------------------------------------------------
     cpu_interrupt_enable - controls the enable/
     disable value for global interrupts
 -------------------------------------------------*/
@@ -660,35 +700,35 @@ INTERRUPT_GEN( nmi_line_assert )	{ irqn_line_set(device, INPUT_LINE_NMI, ASSERT_
 -------------------------------------------------*/
 
 INTERRUPT_GEN( irq0_line_hold )		{ irqn_line_set(device, 0, HOLD_LINE); }
-INTERRUPT_GEN( irq0_line_pulse )	{ irqn_line_set(device, 0, PULSE_LINE); }
+INTERRUPT_GEN( irq0_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 0); }
 INTERRUPT_GEN( irq0_line_assert )	{ irqn_line_set(device, 0, ASSERT_LINE); }
 
 INTERRUPT_GEN( irq1_line_hold )		{ irqn_line_set(device, 1, HOLD_LINE); }
-INTERRUPT_GEN( irq1_line_pulse )	{ irqn_line_set(device, 1, PULSE_LINE); }
+INTERRUPT_GEN( irq1_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 1); }
 INTERRUPT_GEN( irq1_line_assert )	{ irqn_line_set(device, 1, ASSERT_LINE); }
 
 INTERRUPT_GEN( irq2_line_hold )		{ irqn_line_set(device, 2, HOLD_LINE); }
-INTERRUPT_GEN( irq2_line_pulse )	{ irqn_line_set(device, 2, PULSE_LINE); }
+INTERRUPT_GEN( irq2_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 2); }
 INTERRUPT_GEN( irq2_line_assert )	{ irqn_line_set(device, 2, ASSERT_LINE); }
 
 INTERRUPT_GEN( irq3_line_hold )		{ irqn_line_set(device, 3, HOLD_LINE); }
-INTERRUPT_GEN( irq3_line_pulse )	{ irqn_line_set(device, 3, PULSE_LINE); }
+INTERRUPT_GEN( irq3_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 3); }
 INTERRUPT_GEN( irq3_line_assert )	{ irqn_line_set(device, 3, ASSERT_LINE); }
 
 INTERRUPT_GEN( irq4_line_hold )		{ irqn_line_set(device, 4, HOLD_LINE); }
-INTERRUPT_GEN( irq4_line_pulse )	{ irqn_line_set(device, 4, PULSE_LINE); }
+INTERRUPT_GEN( irq4_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 4); }
 INTERRUPT_GEN( irq4_line_assert )	{ irqn_line_set(device, 4, ASSERT_LINE); }
 
 INTERRUPT_GEN( irq5_line_hold )		{ irqn_line_set(device, 5, HOLD_LINE); }
-INTERRUPT_GEN( irq5_line_pulse )	{ irqn_line_set(device, 5, PULSE_LINE); }
+INTERRUPT_GEN( irq5_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 5); }
 INTERRUPT_GEN( irq5_line_assert )	{ irqn_line_set(device, 5, ASSERT_LINE); }
 
 INTERRUPT_GEN( irq6_line_hold )		{ irqn_line_set(device, 6, HOLD_LINE); }
-INTERRUPT_GEN( irq6_line_pulse )	{ irqn_line_set(device, 6, PULSE_LINE); }
+INTERRUPT_GEN( irq6_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 6); }
 INTERRUPT_GEN( irq6_line_assert )	{ irqn_line_set(device, 6, ASSERT_LINE); }
 
 INTERRUPT_GEN( irq7_line_hold )		{ irqn_line_set(device, 7, HOLD_LINE); }
-INTERRUPT_GEN( irq7_line_pulse )	{ irqn_line_set(device, 7, PULSE_LINE); }
+INTERRUPT_GEN( irq7_line_pulse )	{ if (interrupt_enable[cpu_get_index(device)]) generic_pulse_irq_line(device, 7); }
 INTERRUPT_GEN( irq7_line_assert )	{ irqn_line_set(device, 7, ASSERT_LINE); }
 
 

@@ -1127,7 +1127,7 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( hotchase_sound_timer )
 {
-	cpu_set_input_line(device, M6809_FIRQ_LINE, PULSE_LINE );
+	generic_pulse_irq_line(device, M6809_FIRQ_LINE);
 }
 
 static MACHINE_DRIVER_START( hotchase )

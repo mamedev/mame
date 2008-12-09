@@ -806,10 +806,6 @@ static CPU_EXIT( s2650 )
 	/* nothing to do */
 }
 
-static CPU_GET_CONTEXT( s2650 ) { }
-
-static CPU_SET_CONTEXT( s2650 ) { }
-
 static void set_irq_line(s2650_regs *s2650c, int irqline, int state)
 {
 	if (irqline == 1)
@@ -1561,8 +1557,8 @@ CPU_GET_INFO( s2650 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(s2650);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(s2650);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(s2650);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(s2650);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(s2650);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(s2650);				break;

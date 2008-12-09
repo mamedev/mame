@@ -18,7 +18,7 @@ static int starshp1_analog_in_select;
 static INTERRUPT_GEN( starshp1_interrupt )
 {
 	if ((input_port_read(device->machine, "SYSTEM") & 0x90) != 0x90)
-		cpu_set_input_line(device, 0, PULSE_LINE);
+		generic_pulse_irq_line(device, 0);
 }
 
 

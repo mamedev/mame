@@ -55,7 +55,7 @@ static TIMER_CALLBACK( interrupt_callback )
 {
 	int scanline = param;
 
-	cpu_set_input_line(machine->cpu[0], 0, PULSE_LINE);
+	generic_pulse_irq_line(machine->cpu[0], 0);
 
 	scanline = scanline + 32;
 

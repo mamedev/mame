@@ -3485,16 +3485,6 @@ static CPU_BURN( z80 )
 }
 
 /****************************************************************************
- * Get all registers in given buffer
- ****************************************************************************/
-static CPU_GET_CONTEXT( z80 ) { }
-
-/****************************************************************************
- * Set all registers to given values
- ****************************************************************************/
-static CPU_SET_CONTEXT( z80 ) { }
-
-/****************************************************************************
  * Set IRQ line state
  ****************************************************************************/
 static void set_irq_line(z80_state *z80, int irqline, int state)
@@ -3640,8 +3630,8 @@ CPU_GET_INFO( z80 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(z80);			break;
-		case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = CPU_GET_CONTEXT_NAME(z80);	break;
-		case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = CPU_SET_CONTEXT_NAME(z80);	break;
+		case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:						info->init = CPU_INIT_NAME(z80);				break;
 		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(z80);				break;
 		case CPUINFO_PTR_EXIT:						info->exit = CPU_EXIT_NAME(z80);				break;

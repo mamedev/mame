@@ -315,7 +315,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( quasar_interrupt )
 {
-	cpu_set_input_line_and_vector(device,0,PULSE_LINE,0x03);
+	generic_pulse_irq_line_and_vector(device,0,0x03);
 }
 
 // ************************(***************

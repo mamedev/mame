@@ -142,7 +142,7 @@ static UINT8 last = 0;
 	if (last != (input_port_read(device->machine, "INPUT") & 0x0f))
 	{
 		last = input_port_read(device->machine, "INPUT") & 0x0f;
-		cpu_set_input_line(device, 0, PULSE_LINE);
+		generic_pulse_irq_line(device, 0);
 	}
 	pia_set_input_a(0, input_port_read(device->machine, "INPUT") & 0x0f, 0);
 

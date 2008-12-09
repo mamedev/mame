@@ -282,13 +282,6 @@ static void set_irq_line(int irqline, int state)
 {
 	logerror("DSP56k set irq line %d %d\n", irqline, state);
 
-	/* I seem to recall this is an okay thing to do */
-	if (state == PULSE_LINE)
-	{
-		logerror("WARNING: The dsp56k does not support pulsed interrupts.\n");
-		return;
-	}
-
 	switch(irqline)
 	{
 		case DSP56K_IRQ_MODA:

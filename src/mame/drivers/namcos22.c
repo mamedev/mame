@@ -2600,7 +2600,7 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 				int i;
 				for (i = 0; i < 16; i++)
 				{
-					cpu_set_input_line(space->machine->cpu[3], M37710_LINE_TIMERA3TICK, PULSE_LINE);
+					generic_pulse_irq_line(space->machine->cpu[3], M37710_LINE_TIMERA3TICK);
 				}
 			}
 

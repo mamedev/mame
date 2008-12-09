@@ -213,7 +213,7 @@ static void multigam3_mmc3_scanline_cb( int num, int scanline, int vblank, int b
 		if ( --multigam3_mmc3_scanline_counter == -1 )
 		{
 			multigam3_mmc3_scanline_counter = multigam3_mmc3_scanline_latch;
-			cpu_set_input_line(Machine->cpu[0], 0, PULSE_LINE );
+			generic_pulse_irq_line(Machine->cpu[0], 0);
 		}
 	}
 }

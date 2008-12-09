@@ -404,10 +404,6 @@ static CPU_EXECUTE( z8000 )
 
 }
 
-static CPU_GET_CONTEXT( z8000 ) { }
-
-static CPU_SET_CONTEXT( z8000 ) { }
-
 static void set_irq_line(z8000_state *cpustate, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
@@ -572,8 +568,8 @@ CPU_GET_INFO( z8000 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(z8000);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(z8000);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(z8000);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(z8000);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(z8000);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(z8000);				break;

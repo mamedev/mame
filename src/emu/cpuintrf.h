@@ -749,6 +749,9 @@ genf *cputype_get_info_fct(cpu_type cputype, UINT32 state);
 const char *cputype_get_info_string(cpu_type cputype, UINT32 state);
 
 
+/* temporary */
+extern CPU_GET_CONTEXT( dummy );
+extern CPU_SET_CONTEXT( dummy );
 
 
 /***************************************************************************

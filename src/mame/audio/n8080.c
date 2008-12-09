@@ -201,7 +201,7 @@ static void spacefev_sound_pins_changed(void)
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		cpu_set_input_line(Machine->cpu[1], 0, PULSE_LINE);
+		generic_pulse_irq_line(Machine->cpu[1], 0);
 	}
 }
 
@@ -224,7 +224,7 @@ static void sheriff_sound_pins_changed(void)
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		cpu_set_input_line(Machine->cpu[1], 0, PULSE_LINE);
+		generic_pulse_irq_line(Machine->cpu[1], 0);
 	}
 }
 
@@ -239,7 +239,7 @@ static void helifire_sound_pins_changed(void)
 
 	if (changes & (1 << 6))
 	{
-		cpu_set_input_line(Machine->cpu[1], 0, PULSE_LINE);
+		generic_pulse_irq_line(Machine->cpu[1], 0);
 	}
 }
 

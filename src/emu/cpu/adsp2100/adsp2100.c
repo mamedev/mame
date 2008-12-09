@@ -536,21 +536,7 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
 
     /* update the absolute state */
     adsp->irq_state[irqline] = state;
-
-	/* check for IRQs */
-    if (state != CLEAR_LINE)
-    	check_irqs(adsp);
 }
-
-
-
-/***************************************************************************
-    CONTEXT SWITCHING
-***************************************************************************/
-
-static CPU_GET_CONTEXT( adsp21xx ) { }
-
-static CPU_SET_CONTEXT( adsp21xx ) { }
 
 
 
@@ -1901,8 +1887,8 @@ static CPU_GET_INFO( adsp21xx )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						/* set per CPU */						break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(adsp21xx);break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(adsp21xx);break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);break;
 		case CPUINFO_PTR_INIT:							/* set per CPU */						break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(adsp21xx);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(adsp21xx);				break;
@@ -2088,7 +2074,6 @@ CPU_GET_INFO( adsp2100 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2100);					break;
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2100);			break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(adsp21xx); 	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2100");				break;

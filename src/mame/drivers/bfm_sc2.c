@@ -522,7 +522,7 @@ static INTERRUPT_GEN( timer_irq )
 		irq_timer_stat = 0x01;
 		irq_status     = 0x02;
 
-		cpu_set_input_line(device, M6809_IRQ_LINE, PULSE_LINE );
+		generic_pulse_irq_line(device, M6809_IRQ_LINE);
 	}
 }
 

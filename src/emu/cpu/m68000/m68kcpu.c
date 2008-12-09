@@ -572,10 +572,6 @@ static CPU_RESET( m68k )
 	m68k->run_mode = RUN_MODE_NORMAL;
 }
 
-static CPU_GET_CONTEXT( m68k ) { }
-
-static CPU_SET_CONTEXT( m68k ) { }
-
 static CPU_DISASSEMBLE( m68k )
 {
 	m68ki_cpu_core *m68k = device->token;
@@ -650,8 +646,8 @@ static CPU_GET_INFO( m68k )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:					/* set per-core */								break;
-		case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = CPU_GET_CONTEXT_NAME(m68k);	break;
-		case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = CPU_SET_CONTEXT_NAME(m68k);	break;
+		case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:						/* set per-core */								break;
 		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(m68k);				break;
 		case CPUINFO_PTR_EXECUTE:					info->execute = CPU_EXECUTE_NAME(m68k);			break;

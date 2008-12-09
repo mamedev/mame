@@ -1009,19 +1009,6 @@ static CPU_EXECUTE( i8x41 )
 
 
 /****************************************************************************
- *  Get all registers in given buffer
- ****************************************************************************/
-
-static CPU_GET_CONTEXT( i8x41 ) { }
-
-
-/****************************************************************************
- *  Set all registers to given values
- ****************************************************************************/
-
-static CPU_SET_CONTEXT( i8x41 ) { }
-
-/****************************************************************************
  *  Set IRQ line state
  ****************************************************************************/
 
@@ -1267,8 +1254,8 @@ CPU_GET_INFO( i8041 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i8x41);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(i8x41);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(i8x41);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8x41);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i8x41);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(i8x41);				break;

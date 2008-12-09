@@ -423,8 +423,7 @@ static void v60_try_irq(v60_state *cpustate)
 		vector = cpustate->irq_cb(cpustate->device, 0);
 
 		v60_do_irq(cpustate, vector + 0x40);
-	} else if(cpustate->irq_line == PULSE_LINE)
-		cpustate->irq_line = CLEAR_LINE;
+	}
 }
 
 static void set_irq_line(v60_state *cpustate, int irqline, int state)
@@ -439,11 +438,6 @@ static void set_irq_line(v60_state *cpustate, int irqline, int state)
 			break;
 		case CLEAR_LINE:
 			cpustate->nmi_line = CLEAR_LINE;
-			break;
-		case HOLD_LINE:
-		case PULSE_LINE:
-			cpustate->nmi_line = CLEAR_LINE;
-			v60_do_irq(cpustate, 2);
 			break;
 		}
 	} else {
@@ -476,10 +470,6 @@ static CPU_EXECUTE( v60 )
 
 	return cycles - cpustate->icount;
 }
-
-static CPU_GET_CONTEXT( v60 ) { }
-
-static CPU_SET_CONTEXT( v60 ) { }
 
 
 CPU_DISASSEMBLE( v60 );
@@ -666,8 +656,8 @@ CPU_GET_INFO( v60 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(v60);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(v60);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(v60);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v60);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(v60);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(v60);				break;

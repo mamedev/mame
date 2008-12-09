@@ -432,7 +432,7 @@ static INTERRUPT_GEN( bishjan_interrupt )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line(device, 0, PULSE_LINE);
+			generic_pulse_irq_line(device, 0);
 			break;
 		default:
 			cpu_set_input_line(device->machine->cpu[0], H8_METRO_TIMER_HACK, HOLD_LINE);

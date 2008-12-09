@@ -127,10 +127,6 @@ static CPU_EXIT( m65ce02 )
 	/* nothing to do yet */
 }
 
-static CPU_GET_CONTEXT( m65ce02 ) { }
-
-static CPU_SET_CONTEXT( m65ce02 ) { }
-
 INLINE void m65ce02_take_irq(m65ce02_Regs *cpustate)
 {
 	if( !(P & F_I) )
@@ -312,8 +308,8 @@ CPU_GET_INFO( m65ce02 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m65ce02);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m65ce02);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m65ce02);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m65ce02);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m65ce02);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m65ce02);				break;

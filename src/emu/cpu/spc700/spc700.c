@@ -1227,12 +1227,6 @@ CPU_EXIT( spc700 )
 }
 
 
-/* Get the current CPU context */
-CPU_GET_CONTEXT( spc700 ) { }
-
-/* Set the current CPU context */
-CPU_SET_CONTEXT( spc700 ) { }
-
 /* Get the current Program Counter */
 unsigned spc700_get_pc(spc700i_cpu *cpustate)
 {
@@ -1656,8 +1650,8 @@ CPU_GET_INFO( spc700 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(spc700);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(spc700);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(spc700);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:						info->init = CPU_INIT_NAME(spc700);			break;
 		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(spc700);			break;
 		case CPUINFO_PTR_EXIT:						info->exit = CPU_EXIT_NAME(spc700);			break;

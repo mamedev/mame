@@ -1466,8 +1466,8 @@ static CPU_INIT( dummy ) { }
 static CPU_RESET( dummy ) { }
 static CPU_EXIT( dummy ) { }
 static CPU_EXECUTE( dummy ) { return cycles; }
-static CPU_GET_CONTEXT( dummy ) { }
-static CPU_SET_CONTEXT( dummy ) { }
+CPU_GET_CONTEXT( dummy ) { }
+CPU_SET_CONTEXT( dummy ) { }
 
 static CPU_DISASSEMBLE( dummy )
 {

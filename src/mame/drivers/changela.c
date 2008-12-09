@@ -480,7 +480,7 @@ static INTERRUPT_GEN( chl_interrupt )
 	//so we should cause an INT on the cpu 1 here, as well.
 	//but only once per frame !
 	if (vector == 0xdf) /* only on vblank */
-		cpu_set_input_line(device->machine->cpu[1], 0, PULSE_LINE );
+		generic_pulse_irq_line(device->machine->cpu[1], 0);
 
 }
 

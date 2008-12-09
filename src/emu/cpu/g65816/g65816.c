@@ -240,12 +240,6 @@ static CPU_EXECUTE( g65816 )
 }
 
 
-/* Get the current CPU context */
-static CPU_GET_CONTEXT( g65816 ) { }
-
-/* Set the current CPU context */
-static CPU_SET_CONTEXT( g65816 ) { }
-
 /* Get the current Program Counter */
 static unsigned g65816_get_pc(g65816i_cpu_struct *cpustate)
 {
@@ -460,8 +454,8 @@ CPU_GET_INFO( g65816 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(g65816);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(g65816);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(g65816);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(g65816);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(g65816);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(g65816);				break;

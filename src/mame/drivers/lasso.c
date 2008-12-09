@@ -50,7 +50,7 @@ static UINT8 *lasso_chip_data;
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[1], 0, PULSE_LINE);
+	generic_pulse_irq_line(space->machine->cpu[1], 0);
 }
 
 static WRITE8_HANDLER( pinbo_sound_command_w )

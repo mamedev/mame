@@ -389,17 +389,6 @@ static void set_irq_line(asap_state *asap, int irqline, int state)
 
 
 /***************************************************************************
-    CONTEXT SWITCHING
-***************************************************************************/
-
-static CPU_GET_CONTEXT( asap ) { }
-
-
-static CPU_SET_CONTEXT( asap ) { }
-
-
-
-/***************************************************************************
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
@@ -1778,8 +1767,8 @@ CPU_GET_INFO( asap )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(asap);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(asap);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(asap);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(asap);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(asap);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(asap);				break;

@@ -1732,7 +1732,10 @@ static TIMER_CALLBACK( internal_timer_callback )
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
 		timer_adjust_oneshot(dcs.internal_timer, cpu_clocks_to_attotime(dcs.cpu, target_cycles), 0);
-	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, PULSE_LINE);
+
+	/* the IRQ line is edge triggered */
+	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, ASSERT_LINE);
+	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, CLEAR_LINE);
 }
 
 
@@ -1945,7 +1948,8 @@ static TIMER_CALLBACK( dcs_irq )
 		reg = dcs.ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		cpu_set_input_line(dcs.cpu, ADSP2105_IRQ1, PULSE_LINE);
+		cpu_set_input_line(dcs.cpu, ADSP2105_IRQ1, ASSERT_LINE);
+		cpu_set_input_line(dcs.cpu, ADSP2105_IRQ1, CLEAR_LINE);
 	}
 
 	/* store it */
@@ -1960,7 +1964,10 @@ static TIMER_CALLBACK( sport0_irq )
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
 	/* so we skip the SPORT interrupt if we read with output_control within the last 5 cycles */
 	if ((cpu_get_total_cycles(dcs.cpu) - dcs.output_control_cycles) > 5)
-		cpu_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, PULSE_LINE);
+	{
+		cpu_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, ASSERT_LINE);
+		cpu_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, CLEAR_LINE);
+	}
 }
 
 

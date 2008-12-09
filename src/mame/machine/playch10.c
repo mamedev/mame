@@ -675,7 +675,7 @@ static void gboard_scanline_cb( int num, int scanline, int vblank, int blanked )
 		if ( --gboard_scanline_counter == -1 )
 		{
 			gboard_scanline_counter = gboard_scanline_latch;
-			cpu_set_input_line(Machine->cpu[1], 0, PULSE_LINE );
+			generic_pulse_irq_line(Machine->cpu[1], 0);
 		}
 	}
 }

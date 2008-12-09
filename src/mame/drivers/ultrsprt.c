@@ -270,9 +270,9 @@ MACHINE_DRIVER_END
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		/*cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ5, PULSE_LINE)*/;
+		/*generic_pulse_irq_line(machine->cpu[1], INPUT_LINE_IRQ5)*/;
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ6, PULSE_LINE);
+		generic_pulse_irq_line(machine->cpu[1], INPUT_LINE_IRQ6);
 }
 
 static DRIVER_INIT( ultrsprt )

@@ -985,22 +985,6 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    mcs48_get_context - copy the context to the
-    destination
--------------------------------------------------*/
-
-static CPU_GET_CONTEXT( mcs48 ) { }
-
-
-/*-------------------------------------------------
-    mcs48_set_context - set the current context
-    from the source
--------------------------------------------------*/
-
-static CPU_SET_CONTEXT( mcs48 ) { }
-
-
-/*-------------------------------------------------
     mcs48_set_info - set a piece of information
     on the CPU core
 -------------------------------------------------*/
@@ -1093,8 +1077,8 @@ static CPU_GET_INFO( mcs48 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:								info->setinfo = CPU_SET_INFO_NAME(mcs48);			break;
-		case CPUINFO_PTR_GET_CONTEXT:							info->getcontext = CPU_GET_CONTEXT_NAME(mcs48);	break;
-		case CPUINFO_PTR_SET_CONTEXT:							info->setcontext = CPU_SET_CONTEXT_NAME(mcs48);	break;
+		case CPUINFO_PTR_GET_CONTEXT:							info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:							info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:									/*info->init = CPU_INIT_NAME(i8039);*/			break;
 		case CPUINFO_PTR_RESET:									info->reset = CPU_RESET_NAME(mcs48);				break;
 		case CPUINFO_PTR_EXECUTE:								info->execute = CPU_EXECUTE_NAME(mcs48);			break;

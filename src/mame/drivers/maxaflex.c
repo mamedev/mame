@@ -154,7 +154,7 @@ static TIMER_CALLBACK( mcu_timer_proc )
 		if ( (tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			cpu_set_input_line(machine->cpu[1], M68705_INT_TIMER, PULSE_LINE );
+			generic_pulse_irq_line(machine->cpu[1], M68705_INT_TIMER);
 		}
 	}
 }

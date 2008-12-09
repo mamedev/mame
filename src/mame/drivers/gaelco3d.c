@@ -562,7 +562,8 @@ static TIMER_CALLBACK( adsp_autobuffer_irq )
 		reg = adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		cpu_set_input_line(machine->cpu[2], ADSP2105_IRQ1, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[2], ADSP2105_IRQ1, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], ADSP2105_IRQ1, CLEAR_LINE);
 	}
 
 	/* store it */
