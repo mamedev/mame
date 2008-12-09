@@ -322,7 +322,7 @@ static WRITE8_HANDLER( vga_vram_w )
 /*end of Video HW file*/
 
 static struct {
-	const device_config	*pit8254;
+	const device_config	*pit8253;
 	const device_config	*pic8259_1;
 	const device_config	*pic8259_2;
 	const device_config	*dma8237_1;
@@ -825,7 +825,7 @@ static MACHINE_RESET( filetto )
 	lastvalue = -1;
 	hv_blank = 0;
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
-	filetto_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
+	filetto_devices.pit8253 = device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
 	filetto_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
 	filetto_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
 	filetto_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
@@ -839,8 +839,7 @@ static MACHINE_DRIVER_START( filetto )
 
 	MDRV_MACHINE_RESET( filetto )
 
-	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
-	MDRV_DEVICE_CONFIG( pc_pit8253_config )
+	MDRV_PIT8253_ADD( "pit8253", pc_pit8253_config )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", filetto_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", filetto_ppi8255_intf[1] )

@@ -1044,8 +1044,7 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_PCI_BUS_ADD("pcibus", 0)
 	MDRV_PCI_BUS_DEVICE(18, NULL, NULL, cx5510_pci_r, cx5510_pci_w)
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( mediagx_pit8254_config )
+	MDRV_PIT8254_ADD( "pit8254", mediagx_pit8254_config )
 
 	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
 	MDRV_DEVICE_CONFIG( dma8237_1_config )

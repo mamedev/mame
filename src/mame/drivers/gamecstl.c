@@ -666,8 +666,7 @@ static MACHINE_DRIVER_START(gamecstl)
 	MDRV_PCI_BUS_DEVICE(0, NULL, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MDRV_PCI_BUS_DEVICE(7, NULL, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
-	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
-	MDRV_DEVICE_CONFIG( gamecstl_pit8254_config )
+	MDRV_PIT8254_ADD( "pit8254", gamecstl_pit8254_config )
 
 	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
 	MDRV_DEVICE_CONFIG( dma8237_1_config )

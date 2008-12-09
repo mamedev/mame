@@ -29,6 +29,20 @@ struct pit8253_config
 };
 
 
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_PIT8253_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, PIT8253) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+
+#define MDRV_PIT8254_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, PIT8254) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+
 /* device interface */
 DEVICE_GET_INFO( pit8253 );
 DEVICE_GET_INFO( pit8254 );
