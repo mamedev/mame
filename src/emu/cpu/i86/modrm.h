@@ -12,81 +12,81 @@ static struct
 	} RM;
 } Mod_RM;
 
-#define RegWord(ModRM) I.regs.w[Mod_RM.reg.w[ModRM]]
-#define RegByte(ModRM) I.regs.b[Mod_RM.reg.b[ModRM]]
+#define RegWord(ModRM) cpustate->regs.w[Mod_RM.reg.w[ModRM]]
+#define RegByte(ModRM) cpustate->regs.b[Mod_RM.reg.b[ModRM]]
 
 #define GetRMWord(ModRM) \
-	((ModRM) >= 0xc0 ? I.regs.w[Mod_RM.RM.w[ModRM]] : ( (*GetEA[ModRM])(), ReadWord( EA ) ))
+	((ModRM) >= 0xc0 ? cpustate->regs.w[Mod_RM.RM.w[ModRM]] : ( (*GetEA[ModRM])(cpustate), ReadWord( cpustate->ea ) ))
 
 #define PutbackRMWord(ModRM,val) \
 { \
-	if (ModRM >= 0xc0) I.regs.w[Mod_RM.RM.w[ModRM]]=val; \
-    else WriteWord(EA,val); \
+	if (ModRM >= 0xc0) cpustate->regs.w[Mod_RM.RM.w[ModRM]]=val; \
+    else WriteWord(cpustate->ea,val); \
 }
 
-#define GetnextRMWord ReadWord(EA+2)
+#define GetnextRMWord ReadWord(cpustate->ea+2)
 
 #define GetRMWordOffset(offs) \
-		ReadWord(EA-EO+(UINT16)(EO+offs))
+		ReadWord(cpustate->ea-cpustate->eo+(UINT16)(cpustate->eo+offs))
 
 #define GetRMByteOffset(offs) \
-		ReadByte(EA-EO+(UINT16)(EO+offs))
+		ReadByte(cpustate->ea-cpustate->eo+(UINT16)(cpustate->eo+offs))
 
 #define PutRMWord(ModRM,val)				\
 {											\
 	if (ModRM >= 0xc0)						\
-		I.regs.w[Mod_RM.RM.w[ModRM]]=val;	\
+		cpustate->regs.w[Mod_RM.RM.w[ModRM]]=val;	\
 	else {									\
-		(*GetEA[ModRM])();					\
-		WriteWord( EA ,val);				\
+		(*GetEA[ModRM])(cpustate);					\
+		WriteWord( cpustate->ea ,val);				\
 	}										\
 }
 
 #define PutRMWordOffset(offs, val) \
-		WriteWord( EA-EO+(UINT16)(EO+offs), val)
+		WriteWord( cpustate->ea-cpustate->eo+(UINT16)(cpustate->eo+offs), val)
 
 #define PutRMByteOffset(offs, val) \
-		WriteByte( EA-EO+(UINT16)(EO+offs), val)
+		WriteByte( cpustate->ea-cpustate->eo+(UINT16)(cpustate->eo+offs), val)
 
 #define PutImmRMWord(ModRM) 				\
 {											\
 	WORD val;								\
 	if (ModRM >= 0xc0)						\
-		FETCHWORD(I.regs.w[Mod_RM.RM.w[ModRM]]) \
+		FETCHWORD(cpustate->regs.w[Mod_RM.RM.w[ModRM]]) \
 	else {									\
-		(*GetEA[ModRM])();					\
+		(*GetEA[ModRM])(cpustate);					\
 		FETCHWORD(val)						\
-		WriteWord( EA , val);				\
+		WriteWord( cpustate->ea , val);				\
 	}										\
 }
 
 #define GetRMByte(ModRM) \
-	((ModRM) >= 0xc0 ? I.regs.b[Mod_RM.RM.b[ModRM]] : ReadByte( (*GetEA[ModRM])() ))
+	((ModRM) >= 0xc0 ? cpustate->regs.b[Mod_RM.RM.b[ModRM]] : ReadByte( (*GetEA[ModRM])(cpustate) ))
 
 #define PutRMByte(ModRM,val)				\
 {											\
 	if (ModRM >= 0xc0)						\
-		I.regs.b[Mod_RM.RM.b[ModRM]]=val;	\
+		cpustate->regs.b[Mod_RM.RM.b[ModRM]]=val;	\
 	else									\
-		WriteByte( (*GetEA[ModRM])() ,val); \
+		WriteByte( (*GetEA[ModRM])(cpustate) ,val); \
 }
 
 #define PutImmRMByte(ModRM) 				\
 {											\
 	if (ModRM >= 0xc0)						\
-		I.regs.b[Mod_RM.RM.b[ModRM]]=FETCH; \
+		cpustate->regs.b[Mod_RM.RM.b[ModRM]]=FETCH; \
 	else {									\
-		(*GetEA[ModRM])();					\
-		WriteByte( EA , FETCH );			\
+		(*GetEA[ModRM])(cpustate);					\
+		WriteByte( cpustate->ea , FETCH );			\
 	}										\
 }
 
 #define PutbackRMByte(ModRM,val)			\
 {											\
 	if (ModRM >= 0xc0)						\
-		I.regs.b[Mod_RM.RM.b[ModRM]]=val;	\
+		cpustate->regs.b[Mod_RM.RM.b[ModRM]]=val;	\
 	else									\
-		WriteByte(EA,val);					\
+		WriteByte(cpustate->ea,val);					\
 }
 
 #define DEF_br8(dst,src)					\
@@ -111,9 +111,9 @@ static struct
 
 #define DEF_ald8(dst,src)					\
 	unsigned src = FETCHOP; 				\
-	unsigned dst = I.regs.b[AL]
+	unsigned dst = cpustate->regs.b[AL]
 
 #define DEF_axd16(dst,src)					\
 	unsigned src = FETCHOP; 				\
-	unsigned dst = I.regs.w[AX];			\
+	unsigned dst = cpustate->regs.w[AX];			\
     src += (FETCH << 8)

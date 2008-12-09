@@ -4,14 +4,14 @@
 
 #ifdef I8086
 #if (HAS_I8088||HAS_I80188)
-static void configure_memory_8bit(void)
+static void configure_memory_8bit(i8086_state *cpustate)
 {
-	I.mem.fetch_xor = 0;
+	cpustate->mem.fetch_xor = 0;
 
-	I.mem.rbyte = memory_read_byte_8le;
-	I.mem.rword = memory_read_word_8le;
-	I.mem.wbyte = memory_write_byte_8le;
-	I.mem.wword = memory_write_word_8le;
+	cpustate->mem.rbyte = memory_read_byte_8le;
+	cpustate->mem.rword = memory_read_word_8le;
+	cpustate->mem.wbyte = memory_write_byte_8le;
+	cpustate->mem.wword = memory_write_word_8le;
 }
 #endif
 #endif
@@ -43,12 +43,12 @@ static void write_word_16le(const address_space *space, offs_t addr, UINT16 data
 	}
 }
 
-static void configure_memory_16bit(void)
+static void configure_memory_16bit(i8086_state *cpustate)
 {
-	I.mem.fetch_xor = BYTE_XOR_LE(0);
+	cpustate->mem.fetch_xor = BYTE_XOR_LE(0);
 
-	I.mem.rbyte = memory_read_byte_16le;
-	I.mem.rword = read_word_16le;
-	I.mem.wbyte = memory_write_byte_16le;
-	I.mem.wword = write_word_16le;
+	cpustate->mem.rbyte = memory_read_byte_16le;
+	cpustate->mem.rword = read_word_16le;
+	cpustate->mem.wbyte = memory_write_byte_16le;
+	cpustate->mem.wword = write_word_16le;
 }

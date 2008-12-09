@@ -27,24 +27,24 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,SIH,SIL,DIH,DIL } BREGS;
 
 /* parameter x = result, y = source 1, z = source 2 */
 
-#define SetTF(x)			(I.TF = (x))
-#define SetIF(x)			(I.IF = (x))
-#define SetDF(x)			(I.DirVal = (x) ? -1 : 1)
+#define SetTF(x)			(cpustate->TF = (x))
+#define SetIF(x)			(cpustate->IF = (x))
+#define SetDF(x)			(cpustate->DirVal = (x) ? -1 : 1)
 
-#define SetOFW_Add(x,y,z)	(I.OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x8000)
-#define SetOFB_Add(x,y,z)	(I.OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x80)
-#define SetOFW_Sub(x,y,z)	(I.OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x8000)
-#define SetOFB_Sub(x,y,z)	(I.OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x80)
+#define SetOFW_Add(x,y,z)	(cpustate->OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x8000)
+#define SetOFB_Add(x,y,z)	(cpustate->OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x80)
+#define SetOFW_Sub(x,y,z)	(cpustate->OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x8000)
+#define SetOFB_Sub(x,y,z)	(cpustate->OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x80)
 
-#define SetCFB(x)			(I.CarryVal = (x) & 0x100)
-#define SetCFW(x)			(I.CarryVal = (x) & 0x10000)
-#define SetAF(x,y,z)		(I.AuxVal = ((x) ^ ((y) ^ (z))) & 0x10)
-#define SetSF(x)			(I.SignVal = (x))
-#define SetZF(x)			(I.ZeroVal = (x))
-#define SetPF(x)			(I.ParityVal = (x))
+#define SetCFB(x)			(cpustate->CarryVal = (x) & 0x100)
+#define SetCFW(x)			(cpustate->CarryVal = (x) & 0x10000)
+#define SetAF(x,y,z)		(cpustate->AuxVal = ((x) ^ ((y) ^ (z))) & 0x10)
+#define SetSF(x)			(cpustate->SignVal = (x))
+#define SetZF(x)			(cpustate->ZeroVal = (x))
+#define SetPF(x)			(cpustate->ParityVal = (x))
 
-#define SetSZPF_Byte(x) 	(I.ParityVal = I.SignVal = I.ZeroVal = (INT8)(x))
-#define SetSZPF_Word(x) 	(I.ParityVal = I.SignVal = I.ZeroVal = (INT16)(x))
+#define SetSZPF_Byte(x) 	(cpustate->ParityVal = cpustate->SignVal = cpustate->ZeroVal = (INT8)(x))
+#define SetSZPF_Word(x) 	(cpustate->ParityVal = cpustate->SignVal = cpustate->ZeroVal = (INT16)(x))
 
 #define ADDB(dst,src) { unsigned res=dst+src; SetCFB(res); SetOFB_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
 #define ADDW(dst,src) { unsigned res=dst+src; SetCFW(res); SetOFW_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
@@ -52,40 +52,40 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,SIH,SIL,DIH,DIL } BREGS;
 #define SUBB(dst,src) { unsigned res=dst-src; SetCFB(res); SetOFB_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
 #define SUBW(dst,src) { unsigned res=dst-src; SetCFW(res); SetOFW_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
 
-#define ORB(dst,src) 		dst |= src; I.CarryVal = I.OverVal = I.AuxVal = 0; SetSZPF_Byte(dst)
-#define ORW(dst,src) 		dst |= src; I.CarryVal = I.OverVal = I.AuxVal = 0; SetSZPF_Word(dst)
+#define ORB(dst,src) 		dst |= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
+#define ORW(dst,src) 		dst |= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
 
-#define ANDB(dst,src) 		dst &= src; I.CarryVal = I.OverVal = I.AuxVal = 0; SetSZPF_Byte(dst)
-#define ANDW(dst,src) 		dst &= src; I.CarryVal = I.OverVal = I.AuxVal = 0; SetSZPF_Word(dst)
+#define ANDB(dst,src) 		dst &= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
+#define ANDW(dst,src) 		dst &= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
 
-#define XORB(dst,src) 		dst ^= src; I.CarryVal = I.OverVal = I.AuxVal = 0; SetSZPF_Byte(dst)
-#define XORW(dst,src) 		dst ^= src; I.CarryVal = I.OverVal = I.AuxVal = 0; SetSZPF_Word(dst)
+#define XORB(dst,src) 		dst ^= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Byte(dst)
+#define XORW(dst,src) 		dst ^= src; cpustate->CarryVal = cpustate->OverVal = cpustate->AuxVal = 0; SetSZPF_Word(dst)
 
-#define CF					(I.CarryVal != 0)
-#define SF					(I.SignVal < 0)
-#define ZF					(I.ZeroVal == 0)
-#define PF					parity_table[I.ParityVal]
-#define AF					(I.AuxVal != 0)
-#define OF					(I.OverVal != 0)
-#define DF					(I.DirVal < 0)
-
-/************************************************************************/
-
-#define read_byte(a)			(*I.mem.rbyte)(I.program, a)
-#define read_word(a)			(*I.mem.rword)(I.program, a)
-#define write_byte(a,d)			(*I.mem.wbyte)(I.program, (a),(d))
-#define write_word(a,d)			(*I.mem.wword)(I.program, (a),(d))
-
-#define read_port_byte(a)		(*I.mem.rbyte)(I.io, a)
-#define read_port_word(a)		(*I.mem.rword)(I.io, a)
-#define write_port_byte(a,d)	(*I.mem.wbyte)(I.io, (a),(d))
-#define write_port_word(a,d)	(*I.mem.wword)(I.io, (a),(d))
+#define CF					(cpustate->CarryVal != 0)
+#define SF					(cpustate->SignVal < 0)
+#define ZF					(cpustate->ZeroVal == 0)
+#define PF					parity_table[cpustate->ParityVal]
+#define AF					(cpustate->AuxVal != 0)
+#define OF					(cpustate->OverVal != 0)
+#define DF					(cpustate->DirVal < 0)
 
 /************************************************************************/
 
-#define SegBase(Seg) 			(I.sregs[Seg] << 4)
+#define read_byte(a)			(*cpustate->mem.rbyte)(cpustate->program, a)
+#define read_word(a)			(*cpustate->mem.rword)(cpustate->program, a)
+#define write_byte(a,d)			(*cpustate->mem.wbyte)(cpustate->program, (a),(d))
+#define write_word(a,d)			(*cpustate->mem.wword)(cpustate->program, (a),(d))
 
-#define DefaultBase(Seg) 		((seg_prefix && (Seg == DS || Seg == SS)) ? prefix_base : I.base[Seg])
+#define read_port_byte(a)		(*cpustate->mem.rbyte)(cpustate->io, a)
+#define read_port_word(a)		(*cpustate->mem.rword)(cpustate->io, a)
+#define write_port_byte(a,d)	(*cpustate->mem.wbyte)(cpustate->io, (a),(d))
+#define write_port_word(a,d)	(*cpustate->mem.wword)(cpustate->io, (a),(d))
+
+/************************************************************************/
+
+#define SegBase(Seg) 			(cpustate->sregs[Seg] << 4)
+
+#define DefaultBase(Seg) 		((cpustate->seg_prefix && (Seg == DS || Seg == SS)) ? cpustate->prefix_base : cpustate->base[Seg])
 
 #define GetMemB(Seg,Off)		(read_byte((DefaultBase(Seg) + (Off)) & AMASK))
 #define GetMemW(Seg,Off)		(read_word((DefaultBase(Seg) + (Off)) & AMASK))
@@ -98,32 +98,32 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,SIH,SIL,DIH,DIL } BREGS;
 #define WriteByte(ea,val)		write_byte((ea) & AMASK, val);
 #define WriteWord(ea,val)		write_word((ea) & AMASK, val);
 
-#define FETCH_XOR(a)			((a) ^ I.mem.fetch_xor)
-#define FETCH					(memory_raw_read_byte(I.program, FETCH_XOR(I.pc++)))
-#define FETCHOP					(memory_decrypted_read_byte(I.program, FETCH_XOR(I.pc++)))
-#define PEEKOP(addr)			(memory_decrypted_read_byte(I.program, FETCH_XOR(addr)))
-#define FETCHWORD(var) 			{ var = memory_raw_read_byte(I.program, FETCH_XOR(I.pc)); var += (memory_raw_read_byte(I.program, FETCH_XOR(I.pc + 1)) << 8); I.pc += 2; }
+#define FETCH_XOR(a)			((a) ^ cpustate->mem.fetch_xor)
+#define FETCH					(memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc++)))
+#define FETCHOP					(memory_decrypted_read_byte(cpustate->program, FETCH_XOR(cpustate->pc++)))
+#define PEEKOP(addr)			(memory_decrypted_read_byte(cpustate->program, FETCH_XOR(addr)))
+#define FETCHWORD(var) 			{ var = memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc)); var += (memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc + 1)) << 8); cpustate->pc += 2; }
 #define CHANGE_PC(addr)
-#define PUSH(val)				{ I.regs.w[SP] -= 2; WriteWord(((I.base[SS] + I.regs.w[SP]) & AMASK), val); }
-#define POP(var)				{ var = ReadWord(((I.base[SS] + I.regs.w[SP]) & AMASK)); I.regs.w[SP] += 2; }
+#define PUSH(val)				{ cpustate->regs.w[SP] -= 2; WriteWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK), val); }
+#define POP(var)				{ var = ReadWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK)); cpustate->regs.w[SP] += 2; }
 
 /************************************************************************/
 
 #define CompressFlags() (WORD)(CF | (PF << 2) | (AF << 4) | (ZF << 6) \
-				| (SF << 7) | (I.TF << 8) | (I.IF << 9) \
+				| (SF << 7) | (cpustate->TF << 8) | (cpustate->IF << 9) \
 				| (DF << 10) | (OF << 11))
 
 #define ExpandFlags(f) \
 { \
-	  I.CarryVal = (f) & 1; \
-	  I.ParityVal = !((f) & 4); \
-	  I.AuxVal = (f) & 16; \
-	  I.ZeroVal = !((f) & 64); \
-	  I.SignVal = ((f) & 128) ? -1 : 0; \
-	  I.TF = ((f) & 256) >> 8; \
-	  I.IF = ((f) & 512) >> 9; \
-	  I.DirVal = ((f) & 1024) ? -1 : 1; \
-	  I.OverVal = (f) & 2048; \
+	  cpustate->CarryVal = (f) & 1; \
+	  cpustate->ParityVal = !((f) & 4); \
+	  cpustate->AuxVal = (f) & 16; \
+	  cpustate->ZeroVal = !((f) & 64); \
+	  cpustate->SignVal = ((f) & 128) ? -1 : 0; \
+	  cpustate->TF = ((f) & 256) >> 8; \
+	  cpustate->IF = ((f) & 512) >> 9; \
+	  cpustate->DirVal = ((f) & 1024) ? -1 : 1; \
+	  cpustate->OverVal = (f) & 2048; \
 }
 
 #endif /* __I86_H__ */
