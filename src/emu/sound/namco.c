@@ -386,9 +386,9 @@ static SND_START( namco )
 
 	/* get stream channels */
 	if (intf->stereo)
-		chip->stream = stream_create(0, 2, chip->sample_rate, chip, namco_update_stereo);
+		chip->stream = stream_create(device, 0, 2, chip->sample_rate, chip, namco_update_stereo);
 	else
-		chip->stream = stream_create(0, 1, chip->sample_rate, chip, namco_update_mono);
+		chip->stream = stream_create(device, 0, 1, chip->sample_rate, chip, namco_update_mono);
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	chip->sound_enable = 1;

@@ -50,7 +50,7 @@ static SND_START( ym2151 )
 	rate = clock/64;
 
 	/* stream setup */
-	info->stream = stream_create(0,2,rate,info,ym2151_update);
+	info->stream = stream_create(device,0,2,rate,info,ym2151_update);
 
 	info->chip = ym2151_init(device,clock,rate);
 

@@ -45,7 +45,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 
 
 
@@ -348,9 +347,9 @@ void streams_update(running_machine *machine)
     stream_create - create a new stream
 -------------------------------------------------*/
 
-sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *param, stream_update_func callback)
+sound_stream *stream_create(const device_config *device, int inputs, int outputs, int sample_rate, void *param, stream_update_func callback)
 {
-	running_machine *machine = Machine;
+	running_machine *machine = device->machine;
 	streams_private *strdata = machine->streams_data;
 	int inputnum, outputnum;
 	sound_stream *stream;

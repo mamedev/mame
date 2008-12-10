@@ -1180,7 +1180,7 @@ static SND_START( sp0256 )
 	if( sp->drq ) sp->drq(ASSERT_LINE);
 	if( sp->sby ) sp->sby(sp->sby_line = ASSERT_LINE);
 
-	sp->stream = stream_create(0, 1, clock / CLOCK_DIVIDER, sp, sp0256_update);
+	sp->stream = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, sp, sp0256_update);
 
     /* -------------------------------------------------------------------- */
     /*  Configure our internal variables.                                   */

@@ -39,7 +39,7 @@ static SND_START( speaker )
 {
 	struct speaker *sp = auto_malloc(sizeof(*sp));
 
-	sp->channel = stream_create(0, 1, device->machine->sample_rate, sp, speaker_sound_update);
+	sp->channel = stream_create(device, 0, 1, device->machine->sample_rate, sp, speaker_sound_update);
 	sp->num_levels = 2;
 	sp->levels = default_levels;
 	sp->level = 0;

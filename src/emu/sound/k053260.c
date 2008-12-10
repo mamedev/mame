@@ -227,7 +227,7 @@ static SND_START( k053260 )
 
 	ic->delta_table = ( unsigned long * )auto_malloc( 0x1000 * sizeof( unsigned long ) );
 
-	ic->channel = stream_create( 0, 2, rate, ic, k053260_update );
+	ic->channel = stream_create( device, 0, 2, rate, ic, k053260_update );
 
 	InitDeltaTable( ic, rate, clock );
 

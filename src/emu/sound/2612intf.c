@@ -104,7 +104,7 @@ static SND_START( ym2612 )
 	info->timer[1] = timer_alloc(device->machine, timer_callback_2612_1, info);
 
 	/* stream system initialize */
-	info->stream = stream_create(0,2,rate,info,ym2612_stream_update);
+	info->stream = stream_create(device,0,2,rate,info,ym2612_stream_update);
 
 	/**** initialize YM2612 ****/
 	info->chip = ym2612_init(info,device,clock,rate,timer_handler,IRQHandler);

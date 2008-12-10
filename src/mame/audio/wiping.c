@@ -167,7 +167,7 @@ CUSTOM_START( wiping_sh_start )
 	sound_channel *voice;
 
 	/* get stream channels */
-	stream = stream_create(0, 1, samplerate, NULL, wiping_update_mono);
+	stream = stream_create(device, 0, 1, samplerate, NULL, wiping_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	mixer_buffer = auto_malloc(2 * sizeof(short) * samplerate);

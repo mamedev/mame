@@ -132,7 +132,7 @@ static SND_START( ym2203 )
 	info->timer[1] = timer_alloc(device->machine, timer_callback_2203_1, info);
 
 	/* stream system initialize */
-	info->stream = stream_create(0,1,rate,info,ym2203_stream_update);
+	info->stream = stream_create(device,0,1,rate,info,ym2203_stream_update);
 
 	/* Initialize FM emurator */
 	info->chip = ym2203_init(info,device,clock,rate,timer_handler,IRQHandler,&psgintf);

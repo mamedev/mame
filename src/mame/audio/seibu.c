@@ -179,7 +179,7 @@ static CUSTOM_START( seibu_adpcm_start )
 			struct seibu_adpcm_state *state = &seibu_adpcm[i];
 			state->allocated = 1;
 			state->playing = 0;
-			state->stream = stream_create(0, 1, clock, state, seibu_adpcm_callback);
+			state->stream = stream_create(device, 0, 1, clock, state, seibu_adpcm_callback);
 			state->base = memory_region(machine, "adpcm");
 			reset_adpcm(&state->adpcm);
 			return state;

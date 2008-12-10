@@ -635,7 +635,7 @@ static SND_START( upd7759 )
 	memset(chip, 0, sizeof(*chip));
 
 	/* allocate a stream channel */
-	chip->channel = stream_create(0, 1, clock/4, chip, upd7759_update);
+	chip->channel = stream_create(device, 0, 1, clock/4, chip, upd7759_update);
 
 	/* compute the stepping rate based on the chip's clock speed */
 	chip->step = 4 * FRAC_ONE;

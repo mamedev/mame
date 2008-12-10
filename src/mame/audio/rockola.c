@@ -635,7 +635,7 @@ CUSTOM_START( rockola_sh_start )
 	// 38.99 Hz update (according to schematic)
 	rockola_set_music_clock(M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
-	tone_stream = stream_create(0, 1, SAMPLE_RATE, NULL, rockola_tone_update);
+	tone_stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, rockola_tone_update);
 
 	return auto_malloc(1);
 }

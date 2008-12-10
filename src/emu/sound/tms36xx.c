@@ -496,7 +496,7 @@ static SND_START( tms36xx )
 
 	tms->intf = config;
 
-   tms->channel = stream_create(0, 1, clock * 64, tms, tms36xx_sound_update);
+   tms->channel = stream_create(device, 0, 1, clock * 64, tms, tms36xx_sound_update);
 	tms->samplerate = clock * 64;
 	tms->basefreq = clock;
 	enable = 0;

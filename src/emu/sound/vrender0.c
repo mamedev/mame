@@ -107,7 +107,7 @@ static SND_START( vrender0 )
 	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
 	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));
 
-	VR0->stream = stream_create(0, 2, 44100, VR0, VR0_Update);
+	VR0->stream = stream_create(device, 0, 2, 44100, VR0, VR0_Update);
 
 	return VR0;
 }

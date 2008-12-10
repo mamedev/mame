@@ -157,7 +157,7 @@ static SND_START( namco_52xx )
 	filter2_setup(FILTER_LOWPASS,  chip->intf->lp_filt_fc, Q_TO_DAMP(chip->intf->lp_filt_q), chip->intf->filt_gain, &chip->n52_lp_filter);
 
 
-	chip->stream = stream_create(0, 1, rate, chip, namco_52xx_stream_update_one);
+	chip->stream = stream_create(device, 0, 1, rate, chip, namco_52xx_stream_update_one);
 
 	namco_52xx_reset(chip);
 

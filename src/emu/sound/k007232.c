@@ -326,7 +326,7 @@ static SND_START( k007232 )
 
 	for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
 
-	info->stream = stream_create(0,2,clock/128,info,KDAC_A_update);
+	info->stream = stream_create(device,0,2,clock/128,info,KDAC_A_update);
 
 	KDAC_A_make_fncode(info);
 

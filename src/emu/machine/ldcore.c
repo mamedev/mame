@@ -946,7 +946,7 @@ static void process_track_data(const device_config *device)
 static CUSTOM_START( custom_start )
 {
 	sound_token *token = auto_malloc(sizeof(*token));
-	token->stream = stream_create(0, 2, 48000, token, custom_stream_callback);
+	token->stream = stream_create(device, 0, 2, 48000, token, custom_stream_callback);
 	token->ld = NULL;
 	return token;
 }

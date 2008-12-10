@@ -337,14 +337,14 @@ static void exidy_stream_update(void *param, stream_sample_t **inputs, stream_sa
  *
  *************************************/
 
-static void *common_sh_start(int clock, const custom_sound_interface *config)
+static void *common_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
 	int sample_rate = SH8253_CLOCK;
 
 	sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
-	exidy_stream = stream_create(0, 1, sample_rate, NULL, exidy_stream_update);
+	exidy_stream = stream_create(device, 0, 1, sample_rate, NULL, exidy_stream_update);
 
 	return auto_malloc(1);
 }
@@ -356,7 +356,7 @@ CUSTOM_START( exidy_sh6840_sh_start )
 	has_tms5220 = FALSE;
 	has_mc3417 = FALSE;
 
-	return common_sh_start(clock, config);
+	return common_sh_start(device, clock, config);
 }
 
 
@@ -640,7 +640,7 @@ static void *venture_common_sh_start(const device_config *device, int clock, con
 	running_machine *machine = device->machine;
 	int i;
 
-	void *ret = common_sh_start(clock, config);
+	void *ret = common_sh_start(device, clock, config);
 
 	riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
 

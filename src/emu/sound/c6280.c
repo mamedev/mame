@@ -322,7 +322,7 @@ static SND_START( c6280 )
    c6280_init(info, clock, rate);
 
    /* Create stereo stream */
-   info->stream = stream_create(0, 2, rate, info, c6280_update);
+   info->stream = stream_create(device, 0, 2, rate, info, c6280_update);
 
     return info;
 }

@@ -84,7 +84,7 @@ static SND_START( tms3615 )
 	tms = auto_malloc(sizeof(*tms));
 	memset(tms, 0, sizeof(*tms));
 
-	tms->channel = stream_create(0, 2, clock/8, tms, tms3615_sound_update);
+	tms->channel = stream_create(device, 0, 2, clock/8, tms, tms3615_sound_update);
 	tms->samplerate = clock/8;
 	tms->basefreq = clock;
 

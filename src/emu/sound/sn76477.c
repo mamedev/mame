@@ -2404,7 +2404,7 @@ static SND_START( sn76477 )
 
 	sn->device = device;
 
-	sn->channel = stream_create(0, 1, device->machine->sample_rate, sn, SN76477_update);
+	sn->channel = stream_create(device, 0, 1, device->machine->sample_rate, sn, SN76477_update);
 
 	if (clock > 0)
 	{

@@ -79,7 +79,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "cpu/i86/i186intf.h"
 #include "cpu/z80/z80.h"
 #include "leland.h"
@@ -141,7 +140,7 @@ CUSTOM_START( leland_sh_start )
 	dac_bufout[0] = dac_bufout[1] = 0;
 
 	/* allocate the stream */
-	dac_stream = stream_create(0, 1, 256*60, NULL, leland_update);
+	dac_stream = stream_create(device, 0, 1, 256*60, NULL, leland_update);
 
 	/* allocate memory */
 	dac_buffer[0] = auto_malloc(DAC_BUFFER_SIZE);
@@ -503,9 +502,9 @@ static void leland_80186_extern_update(void *param, stream_sample_t **inputs, st
 static TIMER_CALLBACK( internal_timer_int );
 static TIMER_CALLBACK( dma_timer_callback );
 
-void *common_sh_start(int clock, const custom_sound_interface *config)
+static void *common_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
 {
-	running_machine *machine = Machine;
+	running_machine *machine = device->machine;
 	const address_space *dmaspace = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
 	int i;
 
@@ -516,14 +515,14 @@ void *common_sh_start(int clock, const custom_sound_interface *config)
 			has_ym2151 = 1;
 
 	/* allocate separate streams for the DMA and non-DMA DACs */
-	dma_stream = stream_create(0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
-	nondma_stream = stream_create(0, 1, OUTPUT_RATE, NULL, leland_80186_dac_update);
+	dma_stream = stream_create(device, 0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
+	nondma_stream = stream_create(device, 0, 1, OUTPUT_RATE, NULL, leland_80186_dac_update);
 
 	/* if we have a 2151, install an externally driven DAC stream */
 	if (has_ym2151)
 	{
 		ext_base = memory_region(machine, "dac");
-		extern_stream = stream_create(0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
+		extern_stream = stream_create(device, 0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
 	}
 
 	/* create timers here so they stick around */
@@ -545,13 +544,13 @@ void *common_sh_start(int clock, const custom_sound_interface *config)
 CUSTOM_START( leland_80186_sh_start )
 {
 	is_redline = 0;
-	return common_sh_start(clock, config);
+	return common_sh_start(device, clock, config);
 }
 
 CUSTOM_START( redline_80186_sh_start )
 {
 	is_redline = 1;
-	return common_sh_start(clock, config);
+	return common_sh_start(device, clock, config);
 }
 
 

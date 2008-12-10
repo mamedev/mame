@@ -1302,7 +1302,7 @@ static SND_START( aica )
 	{
 		AICA->IntARMCB = intf->irq_callback;
 
-		AICA->stream = stream_create(0, 2, 44100, AICA, AICA_Update);
+		AICA->stream = stream_create(device, 0, 2, 44100, AICA, AICA_Update);
 	}
 
 	return AICA;

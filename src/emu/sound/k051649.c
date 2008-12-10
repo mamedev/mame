@@ -136,7 +136,7 @@ static SND_START( k051649 )
 
 	/* get stream channels */
 	info->rate = clock/16;
-	info->stream = stream_create(0, 1, info->rate, info, k051649_update);
+	info->stream = stream_create(device, 0, 1, info->rate, info, k051649_update);
 	info->mclock = clock;
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */

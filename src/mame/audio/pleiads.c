@@ -478,7 +478,7 @@ static void *common_sh_start(const device_config *device, const custom_sound_int
 		poly18[i] = bits;
 	}
 
-	channel = stream_create(0, 1, machine->sample_rate, NULL, pleiads_sound_update);
+	channel = stream_create(device, 0, 1, machine->sample_rate, NULL, pleiads_sound_update);
 
 	/* just a dummy alloc to make the caller happy */
 	return auto_malloc(1);

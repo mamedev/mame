@@ -545,11 +545,11 @@ static SND_START( samples )
 
 	/* allocate channels */
 	info->numchannels = intf->channels;
-    assert(info->numchannels < MAX_CHANNELS);
+	assert(info->numchannels < MAX_CHANNELS);
 	info->channel = auto_malloc(sizeof(*info->channel) * info->numchannels);
 	for (i = 0; i < info->numchannels; i++)
 	{
-	    info->channel[i].stream = stream_create(0, 1, device->machine->sample_rate, &info->channel[i], sample_update_sound);
+	    info->channel[i].stream = stream_create(device, 0, 1, device->machine->sample_rate, &info->channel[i], sample_update_sound);
 
 		info->channel[i].source = NULL;
 		info->channel[i].source_num = -1;

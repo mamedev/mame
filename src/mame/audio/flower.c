@@ -161,7 +161,7 @@ CUSTOM_START( flower_sh_start )
 	int i;
 
 	/* get stream channels */
-	stream = stream_create(0, 1, samplerate, 0, flower_update_mono);
+	stream = stream_create(device, 0, 1, samplerate, 0, flower_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	mixer_buffer = auto_malloc(2 * sizeof(short) * samplerate);

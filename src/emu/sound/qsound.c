@@ -120,7 +120,7 @@ static SND_START( qsound )
 	{
 		/* Allocate stream */
 		chip->stream = stream_create(
-			0, 2,
+			device, 0, 2,
 			clock / QSOUND_CLOCKDIV,
 			chip,
 			qsound_update );

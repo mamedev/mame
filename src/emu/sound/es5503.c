@@ -267,7 +267,7 @@ static SND_START( es5503 )
 	chip->oscsenabled = 1;
 
 	chip->output_rate = (clock/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
-	chip->stream = stream_create(0, 2, chip->output_rate, chip, es5503_pcm_update);
+	chip->stream = stream_create(device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
 
 	return chip;
 }

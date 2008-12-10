@@ -78,7 +78,7 @@ static CUSTOM_START( mjkjidai_adpcm_start )
 	running_machine *machine = device->machine;
 	struct mjkjidai_adpcm_state *state = &mjkjidai_adpcm;
 	state->playing = 0;
-	state->stream = stream_create(0, 1, clock, state, mjkjidai_adpcm_callback);
+	state->stream = stream_create(device, 0, 1, clock, state, mjkjidai_adpcm_callback);
 	state->base = memory_region(machine, "adpcm");
 	reset_adpcm(&state->adpcm);
 	return state;

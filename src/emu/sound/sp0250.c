@@ -202,7 +202,7 @@ static SND_START( sp0250 )
 	sp->drq(ASSERT_LINE);
 	timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(clock), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
 
-	sp->stream = stream_create(0, 1, clock / CLOCK_DIVIDER, sp, sp0250_update);
+	sp->stream = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, sp, sp0250_update);
 
 	return sp;
 }

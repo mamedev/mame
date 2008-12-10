@@ -270,7 +270,7 @@ static SND_START( astrocade )
 		chip->bitswap[i] = BITSWAP8(i, 0,1,2,3,4,5,6,7);
 
 	/* allocate a stream for output */
-	chip->stream = stream_create(0, 1, clock, chip, astrocade_update);
+	chip->stream = stream_create(device, 0, 1, clock, chip, astrocade_update);
 
 	/* reset state */
 	astrocade_reset(chip);

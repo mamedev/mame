@@ -648,7 +648,7 @@ static SND_START( ymz280b )
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */
-	chip->stream = stream_create(0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
+	chip->stream = stream_create(device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
 
 	/* allocate memory */
 	chip->scratch = auto_malloc(sizeof(chip->scratch[0]) * MAX_SAMPLE_CHUNK);

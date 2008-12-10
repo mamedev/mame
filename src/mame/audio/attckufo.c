@@ -212,7 +212,7 @@ CUSTOM_START( attckufo_custom_start )
 {
 	int i;
 
-	channel = stream_create(0, 1, OUTPUT_RATE, 0, attckufo_update);
+	channel = stream_create(device, 0, 1, OUTPUT_RATE, 0, attckufo_update);
 
 
 	/* buffer for fastest played sample for 5 second

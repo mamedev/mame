@@ -106,7 +106,7 @@ static SND_START( dmadac )
 	info->volume = 0x100;
 
 	/* allocate a stream channel */
-	info->channel = stream_create(0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
+	info->channel = stream_create(device, 0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
 
 	/* register with the save state system */
 	state_save_register_device_item(device, 0, info->bufin);

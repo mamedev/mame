@@ -88,7 +88,7 @@ static SND_START( beep )
 	pBeep = auto_malloc(sizeof(*pBeep));
 	memset(pBeep, 0, sizeof(*pBeep));
 
-	pBeep->stream = stream_create(0, 1, BEEP_RATE, pBeep, beep_sound_update );
+	pBeep->stream = stream_create(device, 0, 1, BEEP_RATE, pBeep, beep_sound_update );
 	pBeep->enable = 0;
 	pBeep->frequency = 3250;
 	pBeep->incr = 0;

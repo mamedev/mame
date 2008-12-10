@@ -129,7 +129,7 @@ static SND_START( rf5c68 )
 	memset(chip->data, 0xff, sizeof(chip->data));
 
 	/* allocate the stream */
-	chip->stream = stream_create(0, 2, clock / 384, chip, rf5c68_update);
+	chip->stream = stream_create(device, 0, 2, clock / 384, chip, rf5c68_update);
 	return chip;
 }
 

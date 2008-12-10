@@ -696,7 +696,7 @@ static SND_START( nesapu )
 	/* Initialize individual chips */
 	(info->APU.dpcm).memory = cputag_get_address_space(device->machine, intf->cpu_tag, ADDRESS_SPACE_PROGRAM);
 
-	info->stream = stream_create(0, 1, rate, info, nes_psg_update_sound);
+	info->stream = stream_create(device, 0, 1, rate, info, nes_psg_update_sound);
 
 	/* register for save */
 	for (i = 0; i < 2; i++)

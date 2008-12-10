@@ -24,7 +24,7 @@ static SND_START( tia )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->channel = stream_create(0, 1, clock, info, tia_update);
+	info->channel = stream_create(device, 0, 1, clock, info, tia_update);
 
 	info->chip = tia_sound_init(clock, clock, 16);
 	if (!info->chip)

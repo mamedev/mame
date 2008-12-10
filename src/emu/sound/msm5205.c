@@ -188,7 +188,7 @@ static SND_START( msm5205 )
 	ComputeTables (voice);
 
 	/* stream system initialize */
-	voice->stream = stream_create(0,1,clock,voice,MSM5205_update);
+	voice->stream = stream_create(device,0,1,clock,voice,MSM5205_update);
 	voice->timer = timer_alloc(device->machine, MSM5205_vclk_callback, voice);
 
 	/* initialize */

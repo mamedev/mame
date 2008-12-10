@@ -1239,7 +1239,7 @@ static SND_START( scsp )
 	{
 		SCSP->Int68kCB = intf->irq_callback;
 
-		SCSP->stream = stream_create(0, 2, 44100, SCSP, SCSP_Update);
+		SCSP->stream = stream_create(device, 0, 2, 44100, SCSP, SCSP_Update);
 	}
 
 	return SCSP;

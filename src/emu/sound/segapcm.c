@@ -101,7 +101,7 @@ static SND_START( segapcm )
 
 	spcm->bankmask = mask & (rom_mask >> spcm->bankshift);
 
-	spcm->stream = stream_create(0, 2, clock / 128, spcm, SEGAPCM_update);
+	spcm->stream = stream_create(device, 0, 2, clock / 128, spcm, SEGAPCM_update);
 
 	state_save_register_device_item_array(device, 0, spcm->low);
 	state_save_register_device_item_pointer(device, 0, spcm->ram, 0x800);

@@ -706,7 +706,7 @@ void *ay8910_start_ym(sound_type chip_type, const device_config *device, int clo
 
 	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
 	/* This handled by the step parameter. Consequently we use a divider of 8 here. */
-	info->channel = stream_create(0,info->streams,clock / 8 ,info,ay8910_update);
+	info->channel = stream_create(device, 0, info->streams, clock / 8, info, ay8910_update);
 
 	ay8910_set_clock_ym(info,clock);
 	ay8910_statesave(info, device);

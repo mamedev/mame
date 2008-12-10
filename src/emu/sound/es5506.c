@@ -839,7 +839,7 @@ static void *es5506_start_common(const device_config *device, int sndindex, int 
 		return NULL;
 
 	/* create the stream */
-	chip->stream = stream_create(0, 2, clock / (16*32), chip, es5506_update);
+	chip->stream = stream_create(device, 0, 2, clock / (16*32), chip, es5506_update);
 
 	/* initialize the regions */
 	chip->region_base[0] = intf->region0 ? (UINT16 *)memory_region(device->machine, intf->region0) : NULL;

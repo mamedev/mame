@@ -214,7 +214,7 @@ CUSTOM_START( warpwarp_sh_start )
     for( i = 0; i < 0x8000; i++ )
 		decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
-	channel = stream_create(0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
+	channel = stream_create(device, 0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
 
 	sound_volume_timer = timer_alloc(machine, sound_volume_decay, NULL);
 	music_volume_timer = timer_alloc(machine, music_volume_decay, NULL);

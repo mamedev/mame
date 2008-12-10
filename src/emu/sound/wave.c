@@ -64,7 +64,7 @@ static SND_START( wave )
 #ifdef MESS
 	image = device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, device->tag );
 #endif
-	stream_create(0, 1, device->machine->sample_rate, (void *)image, wave_sound_update);
+	stream_create(device, 0, 1, device->machine->sample_rate, (void *)image, wave_sound_update);
 	return (void *) (FPTR)(sndindex | WAVE_TOKEN_MASK);
 }
 

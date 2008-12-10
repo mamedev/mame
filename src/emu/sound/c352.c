@@ -542,7 +542,7 @@ static SND_START( c352 )
 
 	info->sample_rate_base = clock / 192;
 
-	info->stream = stream_create(0, 4, info->sample_rate_base, info, c352_update);
+	info->stream = stream_create(device, 0, 4, info->sample_rate_base, info, c352_update);
 
 	c352_init(info, device);
 

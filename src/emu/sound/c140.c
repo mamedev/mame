@@ -466,7 +466,7 @@ static SND_START( c140 )
 
 	info->banking_type = intf->banking_type;
 
-	info->stream = stream_create(0,2,info->sample_rate,info,update_stereo);
+	info->stream = stream_create(device,0,2,info->sample_rate,info,update_stereo);
 
 	info->pRom=device->region;
 

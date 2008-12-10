@@ -278,12 +278,12 @@ static void SN76496_set_gain(struct SN76496 *R,int gain)
 
 
 
-static int SN76496_init(struct SN76496 *R,int clock)
+static int SN76496_init(const device_config *device, int clock, struct SN76496 *R)
 {
 	int sample_rate = clock/16;
 	int i;
 
-	R->Channel = stream_create(0,1, sample_rate,R,SN76496Update);
+	R->Channel = stream_create(device,0,1,sample_rate,R,SN76496Update);
 
 	R->SampleRate = sample_rate;
 
@@ -321,7 +321,7 @@ static void *generic_start(const device_config *device, int clock, int feedbackm
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	if (SN76496_init(chip,clock) != 0)
+	if (SN76496_init(device,clock,chip) != 0)
 		return NULL;
 	SN76496_set_gain(chip, 0);
 

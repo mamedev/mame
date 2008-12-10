@@ -110,7 +110,7 @@ static SND_START( cdp1869 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->stream = stream_create(0, 1, device->machine->sample_rate, info, cdp1869_update );
+	info->stream = stream_create(device, 0, 1, device->machine->sample_rate, info, cdp1869_update );
 	info->incr = 0;
 	info->signal = 0x07fff;
 

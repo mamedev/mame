@@ -582,7 +582,7 @@ static CUSTOM_START( sega005_custom_start )
 	running_machine *machine = device->machine;
 
 	/* create the stream */
-	sega005_stream = stream_create(0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
+	sega005_stream = stream_create(device, 0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
 
 	/* create a timer for the 555 */
 	sega005_sound_timer = timer_alloc(machine, sega005_auto_timer, NULL);

@@ -171,10 +171,10 @@ static void redbaron_sound_update(void *param, stream_sample_t **inputs, stream_
 
 CUSTOM_START( redbaron_sh_start )
 {
-    int i;
+	int i;
 
 	vol_lookup = (INT16 *)auto_malloc(32768 * sizeof(INT16));
-    for( i = 0; i < 0x8000; i++ )
+	for( i = 0; i < 0x8000; i++ )
 		vol_lookup[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
 	for( i = 0; i < 16; i++ )
@@ -205,9 +205,9 @@ CUSTOM_START( redbaron_sh_start )
 		r0 = 1.0/r0;
 		r1 = 1.0/r1;
 		vol_crash[i] = 32767 * r0 / (r0 + r1);
-    }
+	}
 
-	channel = stream_create(0, 1, OUTPUT_RATE, 0, redbaron_sound_update);
+	channel = stream_create(device, 0, 1, OUTPUT_RATE, 0, redbaron_sound_update);
 
-    return auto_malloc(1);
+	return auto_malloc(1);
 }

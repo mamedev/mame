@@ -72,7 +72,7 @@ static void *start_common(const device_config *device, int clock,
 	chip->last_clock_state = 0;
 
 	/* create the stream */
-	chip->channel = stream_create(0, 1, SAMPLE_RATE, chip, hc55516_update);
+	chip->channel = stream_create(device, 0, 1, SAMPLE_RATE, chip, hc55516_update);
 
 	state_save_register_device_item(device, 0, chip->last_clock_state);
 	state_save_register_device_item(device, 0, chip->digit);

@@ -199,7 +199,7 @@ static SND_START( okim6258 )
 	info->output_bits = intf->output_12bits ? 12 : 10;
 	info->divider = dividers[intf->divider];
 
-	info->stream = stream_create(0, 1, clock/info->divider, info, okim6258_update);
+	info->stream = stream_create(device, 0, 1, clock/info->divider, info, okim6258_update);
 
 	info->signal = -2;
 	info->step = 0;

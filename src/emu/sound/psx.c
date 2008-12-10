@@ -349,7 +349,7 @@ static SND_START( psxspu )
 	chip->intf->spu_install_read_handler( 4, spu_read );
 	chip->intf->spu_install_write_handler( 4, spu_write );
 
-	chip->stream = stream_create( 0, 2, 44100, chip, PSXSPU_update );
+	chip->stream = stream_create( device, 0, 2, 44100, chip, PSXSPU_update );
 	return chip;
 }
 

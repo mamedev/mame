@@ -789,7 +789,7 @@ static SND_START( msm5232 )
 
 	msm5232_init(chip, intf, clock, rate);
 
-	chip->stream = stream_create(0,11,rate,chip,MSM5232_update_one);
+	chip->stream = stream_create(device,0,11,rate,chip,MSM5232_update_one);
 	return chip;
 }
 

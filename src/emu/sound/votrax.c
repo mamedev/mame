@@ -111,7 +111,7 @@ static SND_START( votrax )
 	votrax->frequency = 8000;
 	votrax->volume = 230;
 
-	votrax->channel = stream_create(0, 1, device->machine->sample_rate, votrax, votrax_update_sound);
+	votrax->channel = stream_create(device, 0, 1, device->machine->sample_rate, votrax, votrax_update_sound);
 
 	votrax->sample = NULL;
 	votrax->step = 0;

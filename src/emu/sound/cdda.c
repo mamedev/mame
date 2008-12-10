@@ -56,7 +56,7 @@ static SND_START( cdda )
 
 	intf = config;
 
-	info->stream = stream_create(0, 2, 44100, info, cdda_update);
+	info->stream = stream_create(device, 0, 2, 44100, info, cdda_update);
 
 	state_save_register_device_item( device, 0, info->audio_playing );
 	state_save_register_device_item( device, 0, info->audio_pause );

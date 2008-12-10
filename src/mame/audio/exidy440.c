@@ -161,7 +161,7 @@ static CUSTOM_START( exidy440_sh_start )
 	channel_frequency[3] = clock/2;
 
 	/* get stream channels */
-	stream = stream_create(0, 2, clock, NULL, channel_update);
+	stream = stream_create(device, 0, 2, clock, NULL, channel_update);
 
 	/* allocate the sample cache */
 	length = memory_region_length(machine, "cvsd") * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);

@@ -279,7 +279,7 @@ CUSTOM_START( tx1_sh_start )
 
 
 	/* Allocate the stream */
-	stream = stream_create(0, 2, machine->sample_rate, NULL, tx1_stream_update);
+	stream = stream_create(device, 0, 2, machine->sample_rate, NULL, tx1_stream_update);
 	freq_to_step = (double)(1 << TX1_FRAC) / (double)machine->sample_rate;
 
 	/* Compute the engine resistor weights */
@@ -512,7 +512,7 @@ CUSTOM_START( buggyboy_sh_start )
 		buggyboy_eng_voltages[i] = combine_4_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
-	stream = stream_create(0, 2, machine->sample_rate, NULL, buggyboy_stream_update);
+	stream = stream_create(device, 0, 2, machine->sample_rate, NULL, buggyboy_stream_update);
 	freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
 
 	return auto_malloc(1);

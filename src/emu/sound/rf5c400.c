@@ -334,7 +334,7 @@ static void rf5c400_init_chip(const device_config *device, struct rf5c400_info *
 		state_save_register_device_item(device, i, info->channels[i].env_scale);
 	}
 
-	info->stream = stream_create(0, 2, clock/384, info, rf5c400_update);
+	info->stream = stream_create(device, 0, 2, clock/384, info, rf5c400_update);
 }
 
 

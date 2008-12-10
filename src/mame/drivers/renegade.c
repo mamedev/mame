@@ -170,7 +170,7 @@ static CUSTOM_START( renegade_adpcm_start )
 	running_machine *machine = device->machine;
 	struct renegade_adpcm_state *state = &renegade_adpcm;
 	state->playing = 0;
-	state->stream = stream_create(0, 1, clock, state, renegade_adpcm_callback);
+	state->stream = stream_create(device, 0, 1, clock, state, renegade_adpcm_callback);
 	state->base = memory_region(machine, "adpcm");
 	reset_adpcm(&state->adpcm);
 	return state;

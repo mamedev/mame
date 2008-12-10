@@ -376,7 +376,7 @@ static SAMPLES_START( galaxian_sh_start )
 	pitch = 0xff;
 	vol = 0;
 
-	tone_stream = stream_create(0,1,SOUND_CLOCK/STEPS,NULL,tone_update);
+	tone_stream = stream_create(device,0,1,SOUND_CLOCK/STEPS,NULL,tone_update);
 	stream_set_output_gain(tone_stream, 0, TOOTHSAW_VOLUME);
 
 	sample_set_volume(CHANNEL_NOISE,0);

@@ -68,7 +68,7 @@ discrete_info *discrete_current_context = NULL;
 
 static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const device_config *device);
 static void find_input_nodes(discrete_info *info, discrete_sound_block *block_list);
-static void setup_output_nodes(discrete_info *info);
+static void setup_output_nodes(const device_config *device, discrete_info *info);
 static void setup_disc_logs(discrete_info *info);
 static SND_RESET( discrete );
 
@@ -314,7 +314,7 @@ static SND_START( discrete )
 	find_input_nodes(info, intf);
 
 	/* then set up the output nodes */
-	setup_output_nodes(info);
+	setup_output_nodes(device, info);
 
 	setup_disc_logs(info);
 
@@ -693,10 +693,10 @@ static void find_input_nodes(discrete_info *info, discrete_sound_block *block_li
  *
  *************************************/
 
-static void setup_output_nodes(discrete_info *info)
+static void setup_output_nodes(const device_config *device, discrete_info *info)
 {
 	/* initialize the stream(s) */
-	info->discrete_stream = stream_create(info->discrete_input_streams, info->discrete_outputs, info->sample_rate, info, discrete_stream_update);
+	info->discrete_stream = stream_create(device, info->discrete_input_streams, info->discrete_outputs, info->sample_rate, info, discrete_stream_update);
 }
 
 

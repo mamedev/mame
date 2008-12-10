@@ -68,7 +68,7 @@ CUSTOM_START( gridlee_sh_start )
 	running_machine *machine = device->machine;
 
 	/* allocate the stream */
-	gridlee_stream = stream_create(0, 1, machine->sample_rate, NULL, gridlee_stream_update);
+	gridlee_stream = stream_create(device, 0, 1, machine->sample_rate, NULL, gridlee_stream_update);
 
 	freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
 

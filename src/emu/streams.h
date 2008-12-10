@@ -46,7 +46,7 @@ void streams_update(running_machine *machine);
 /* ----- stream configuration and setup ----- */
 
 /* create a new stream */
-sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *param, stream_update_func callback);
+sound_stream *stream_create(const device_config *device, int inputs, int outputs, int sample_rate, void *param, stream_update_func callback);
 
 /* configure a stream's input */
 void stream_set_input(sound_stream *stream, int index, sound_stream *input_stream, int output_index, float gain);

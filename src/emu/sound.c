@@ -396,7 +396,7 @@ static void route_sound(running_machine *machine)
 		speaker_info *info = curspeak->token;
 		if (info->inputs != 0)
 		{
-			info->mixer_stream = stream_create(info->inputs, 1, machine->sample_rate, info, mixer_update);
+			info->mixer_stream = stream_create(curspeak, info->inputs, 1, machine->sample_rate, info, mixer_update);
 			state_save_register_postload(machine, mixer_postload, info->mixer_stream);
 			info->input = auto_malloc(info->inputs * sizeof(*info->input));
 			info->inputs = 0;

@@ -273,13 +273,13 @@ static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sam
 
 CUSTOM_START( bzone_sh_start )
 {
-    int i;
+	int i;
 
 	discharge = (INT16 *)auto_malloc(32768 * sizeof(INT16));
-    for( i = 0; i < 0x8000; i++ )
+	for( i = 0; i < 0x8000; i++ )
 		discharge[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
-	channel = stream_create(0, 1, OUTPUT_RATE, 0, bzone_sound_update);
+	channel = stream_create(device, 0, 1, OUTPUT_RATE, 0, bzone_sound_update);
 
-    return auto_malloc(1);
+	return auto_malloc(1);
 }

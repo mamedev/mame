@@ -288,7 +288,7 @@ CUSTOM_START( tiamc1_sh_start )
 	timer8253_reset(&timer0);
 	timer8253_reset(&timer1);
 
-	channel = stream_create(0, 1, clock / CLOCK_DIVIDER, 0, tiamc1_sound_update);
+	channel = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, 0, tiamc1_sound_update);
 
 	timer1_divider = 0;
 

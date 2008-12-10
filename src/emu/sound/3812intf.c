@@ -95,7 +95,7 @@ static SND_START( ym3812 )
 	if (!info->chip)
 		return NULL;
 
-	info->stream = stream_create(0,1,rate,info,ym3812_stream_update);
+	info->stream = stream_create(device,0,1,rate,info,ym3812_stream_update);
 
 	/* YM3812 setup */
 	ym3812_set_timer_handler (info->chip, TimerHandler_3812, info);
@@ -264,7 +264,7 @@ static SND_START( ym3526 )
 	if (!info->chip)
 		return NULL;
 
-	info->stream = stream_create(0,1,rate,info,ym3526_stream_update);
+	info->stream = stream_create(device,0,1,rate,info,ym3526_stream_update);
 	/* YM3526 setup */
 	ym3526_set_timer_handler (info->chip, TimerHandler_3526, info);
 	ym3526_set_irq_handler   (info->chip, IRQHandler_3526, info);
@@ -471,7 +471,7 @@ static SND_START( y8950 )
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(info->chip, device->region, device->regionbytes);
 
-	info->stream = stream_create(0,1,rate,info,y8950_stream_update);
+	info->stream = stream_create(device,0,1,rate,info,y8950_stream_update);
 
 	/* port and keyboard handler */
 	y8950_set_port_handler(info->chip, Y8950PortHandler_w, Y8950PortHandler_r, info);

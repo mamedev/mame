@@ -102,7 +102,7 @@ static void engine_sound_update(void *param, stream_sample_t **inputs, stream_sa
 /************************************/
 CUSTOM_START( polepos_sh_start )
 {
-	stream = stream_create(0, 1, OUTPUT_RATE, NULL, engine_sound_update);
+	stream = stream_create(device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
 	sample_msb = sample_lsb = 0;
 	sample_enable = 0;
 

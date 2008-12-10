@@ -664,7 +664,7 @@ static SND_START( pokey )
 	chip->serout_w = chip->intf.serout_w;
 	chip->interrupt_cb = chip->intf.interrupt_cb;
 
-	chip->channel = stream_create(0, 1, sample_rate, chip, pokey_update);
+	chip->channel = stream_create(device, 0, 1, sample_rate, chip, pokey_update);
 
 	register_for_save(chip, device);
 

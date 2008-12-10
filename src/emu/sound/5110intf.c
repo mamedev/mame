@@ -80,7 +80,7 @@ static SND_START( tms5110 )
 	sndintrf_register_token(info);
 
 	/* initialize a stream */
-	info->stream = stream_create(0, 1, clock / 80, info, tms5110_update);
+	info->stream = stream_create(device, 0, 1, clock / 80, info, tms5110_update);
 
 	if (info->table == NULL)
 	{

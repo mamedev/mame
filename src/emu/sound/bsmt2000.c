@@ -115,7 +115,7 @@ static SND_START( bsmt2000 )
 	memset(chip, 0, sizeof(*chip));
 
 	/* create a stream at a nominal sample rate (real one specified later) */
-	chip->stream = stream_create(0, 2, clock / 1000, chip, bsmt2000_update);
+	chip->stream = stream_create(device, 0, 2, clock / 1000, chip, bsmt2000_update);
 	chip->clock = clock;
 
 	/* initialize the regions */

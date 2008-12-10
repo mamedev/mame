@@ -338,7 +338,7 @@ static SND_START( okim6295 )
 	info->master_clock = clock;
 
 	/* generate the name and create the stream */
-	info->stream = stream_create(0, 1, clock/divisor, info, okim6295_update);
+	info->stream = stream_create(device, 0, 1, clock/divisor, info, okim6295_update);
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6295_VOICES; voice++)

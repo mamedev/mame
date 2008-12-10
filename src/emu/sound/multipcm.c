@@ -496,7 +496,7 @@ static SND_START( multipcm )
 	ptChip->ROM=(INT8 *)device->region;
 	ptChip->Rate=(float) clock / MULTIPCM_CLOCKDIV;
 
-	ptChip->stream = stream_create(0, 2, ptChip->Rate, ptChip, MultiPCM_update);
+	ptChip->stream = stream_create(device, 0, 2, ptChip->Rate, ptChip, MultiPCM_update);
 
 	//Volume+pan table
 	for(i=0;i<0x800;++i)

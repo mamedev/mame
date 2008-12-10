@@ -277,6 +277,6 @@ CUSTOM_START( amiga_sh_start )
 	}
 
 	/* create the stream */
-	audio_state->stream = stream_create(0, 4, clock / CLOCK_DIVIDER, audio_state, amiga_stream_update);
+	audio_state->stream = stream_create(device, 0, 4, clock / CLOCK_DIVIDER, audio_state, amiga_stream_update);
 	return audio_state;
 }

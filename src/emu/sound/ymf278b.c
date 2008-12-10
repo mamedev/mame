@@ -680,7 +680,7 @@ static SND_START( ymf278b )
 	intf = (config != NULL) ? config : &defintrf;
 
 	ymf278b_init(device->machine, chip, device->region, intf->irq_callback, clock);
-	chip->stream = stream_create(0, 2, clock/768, chip, ymf278b_pcm_update);
+	chip->stream = stream_create(device, 0, 2, clock/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB
 	for(i = 0; i < 256; i++)

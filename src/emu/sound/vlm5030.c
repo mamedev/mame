@@ -664,7 +664,7 @@ static SND_START( vlm5030 )
 	else
 		chip->address_mask = chip->intf->memory_size-1;
 
-	chip->channel = stream_create(0, 1, emulation_rate,chip,vlm5030_update_callback);
+	chip->channel = stream_create(device, 0, 1, emulation_rate,chip,vlm5030_update_callback);
 
 	/* don't restore "UINT8 *chip->rom" when use vlm5030_set_rom() */
 

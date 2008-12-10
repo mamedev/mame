@@ -642,7 +642,7 @@ static void usb_stream_update(void *param, stream_sample_t **inputs, stream_samp
 
 static CUSTOM_START( usb_start )
 {
-	running_machine *machine = Machine;
+	running_machine *machine = device->machine;
 	filter_state temp;
 	int tchan, tgroup;
 
@@ -654,7 +654,7 @@ static CUSTOM_START( usb_start )
 	usb.work_ram = auto_malloc(0x400);
 
 	/* create a sound stream */
-	usb.stream = stream_create(0, 1, SAMPLE_RATE, NULL, usb_stream_update);
+	usb.stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, usb_stream_update);
 
 	/* initialize state */
 	usb.noise_shift = 0x15555;

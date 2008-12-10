@@ -134,7 +134,7 @@ static SND_START( st0016 )
 
 	info->sound_ram = intf->p_soundram;
 
-	info->stream = stream_create(0, 2, 44100, info, st0016_update);
+	info->stream = stream_create(device, 0, 2, 44100, info, st0016_update);
 
 	return info;
 }

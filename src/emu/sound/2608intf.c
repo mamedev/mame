@@ -149,7 +149,7 @@ static SND_START( ym2608 )
 	info->timer[1] = timer_alloc(device->machine, timer_callback_2608_1, info);
 
 	/* stream system initialize */
-	info->stream = stream_create(0,2,rate,info,ym2608_stream_update);
+	info->stream = stream_create(device,0,2,rate,info,ym2608_stream_update);
 	/* setup adpcm buffers */
 	pcmbufa  = device->region;
 	pcmsizea = device->regionbytes;

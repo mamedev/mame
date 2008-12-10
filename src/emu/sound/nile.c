@@ -225,7 +225,7 @@ static SND_START( nile )
 
 	info->sound_ram = device->region;
 
-	info->stream = stream_create(0, 2, 44100, info, nile_update);
+	info->stream = stream_create(device, 0, 2, 44100, info, nile_update);
 
 	return info;
 }

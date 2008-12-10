@@ -543,7 +543,7 @@ CUSTOM_START( phoenix_sh_start )
 		poly18[i] = bits;
 	}
 
-	channel = stream_create(0, 1, machine->sample_rate, 0, phoenix_sound_update);
+	channel = stream_create(device, 0, 1, machine->sample_rate, 0, phoenix_sound_update);
 
 	state_save_register_global_pointer(machine, poly18, (1ul << (18-5)) );
 

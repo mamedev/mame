@@ -1152,7 +1152,7 @@ CUSTOM_START( snes_sh_start )
 		spc_port_out[ii] = 0;
 	}
 
-	channel = stream_create( 0, 2, 32000, NULL, snes_sh_update );
+	channel = stream_create( device, 0, 2, 32000, NULL, snes_sh_update );
 
 	/* Initialize the timers */
 	timers[0].timer = timer_alloc(machine, snes_spc_timer , NULL);

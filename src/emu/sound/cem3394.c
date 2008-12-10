@@ -329,7 +329,7 @@ static SND_START( cem3394 )
 	chip->inv_sample_rate = 1.0 / (double)chip->sample_rate;
 
 	/* allocate stream channels, 1 per chip */
-	chip->stream = stream_create(0, 1, chip->sample_rate, chip, cem3394_update);
+	chip->stream = stream_create(device, 0, 1, chip->sample_rate, chip, cem3394_update);
 	chip->external = intf->external;
 	chip->vco_zero_freq = intf->vco_zero_freq;
 	chip->filter_zero_freq = intf->filter_zero_freq;

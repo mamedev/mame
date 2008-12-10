@@ -466,7 +466,7 @@ static void k054539_init_chip(const device_config *device, struct k054539_info *
 		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
 		timer_pulse(device->machine, ATTOTIME_IN_HZ(480), info, 0, k054539_irq);
 
-	info->stream = stream_create(0, 2, clock, info, k054539_update);
+	info->stream = stream_create(device, 0, 2, clock, info, k054539_update);
 
 	state_save_register_device_item_array(device, 0, info->regs);
 	state_save_register_device_item_pointer(device, 0, info->ram,  0x4000);

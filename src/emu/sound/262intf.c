@@ -83,7 +83,7 @@ static SND_START( ymf262 )
 	if (info->chip == NULL)
 		return NULL;
 
-	info->stream = stream_create(0,4,rate,info,ymf262_stream_update);
+	info->stream = stream_create(device,0,4,rate,info,ymf262_stream_update);
 
 	/* YMF262 setup */
 	ymf262_set_timer_handler (info->chip, timer_handler_262, info);
