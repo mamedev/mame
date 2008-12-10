@@ -4,17 +4,27 @@ Millenium Nuovo 4000 / Nuovo Millenium 4000 (c) 2000 Sure Milano
 
 driver by David Haywood and Angelo Salese
 
+
 Notes:
--At first start-up,an Italian msg pops up: "(translated) pcb has been hacked from external
-agent,it's advised to add an anti-spark device". Press F2 to enter Service Mode,then press
-Hold 5 to exit Service Mode.
--HW name (stamped on the pcb) is "CHP4";
+
+- At first start-up,an Italian msg pops up: "(translated) pcb has been hacked from external
+  agent,it's advised to add an anti-spark device". Press F2 to enter Service Mode,then press
+  Hold 5 to exit Service Mode.
+
+- This game is supposed to have 3 kind of graphics: billiard/pool balls, numbers and cans.
+  If you go to the settings mode (F2), and then in "Impostazioni del Gioco" you disable all
+  3 graphics (Simboli Biliardo, Simboli Numeri, and Simboli Barattoli --> "Non Abilitato"),
+  The game will start using normal poker cards. A "illegal easter egg"... ;-)
+
+- HW name (stamped on the pcb) is "CHP4";
+
 
 TODO:
--Add Touch Screen support;
--H/V-blank bits emulation;
--Inputs/outputs are grossly mapped;
--Protection PIC is unused?
+
+- Add Touch Screen support;
+- H/V-blank bits emulation;
+- Protection PIC is unused?
+
 
 ============================================================================================
 
@@ -35,6 +45,10 @@ ROMs
 1x PALCE22V10H (u74)(read protected)
 2x A40MX04-PL840010 (u2,u3)(read protected)
 
+RAM:
+4x CY62256L-70PC - 32K x 8 Static RAM.
+2x CY7C199-15PC  - 32K x 8 Static RAM 
+
 Note
 1x 28x2 edge connector
 1x RS232 9pins connector
@@ -42,11 +56,27 @@ Note
 1x 2positon jumper
 1x pushbutton (reset)
 
+============================================================================================
+
+Changes (2008-12-10, Roberto Fresca):
+
+- Completed normal Inputs/Outputs.
+- Added button-lamps calculation.
+- Created button-lamps layout.
+- Documented the PCB RAM.
+- Fixed NVRAM size based on PCB picture (2x CY62256L-70PC near the battery).
+- Added notes about the method to make appear the real poker cards.
+- Fixed the OKI 6295 frequency (1000 kHz resonator near). Now the game has more decent sounds.
+- Corrected CPU clock to 12 MHz. (main Xtal).
+
+
 *******************************************************************************************/
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "mil4000.lh"
+
 
 static UINT16 *sc0_vram,*sc1_vram,*sc2_vram,*sc3_vram;
 static tilemap *sc0_tilemap,*sc1_tilemap,*sc2_tilemap,*sc3_tilemap;
@@ -195,17 +225,25 @@ static WRITE16_HANDLER( output_w )
 	static int i;
 
 	for(i=0;i<3;i++)
-		coin_counter_w(i,data & 0x2000);
+		coin_counter_w(i, data & 0x2000);
 
-//  popmessage("%04x\n",data);
+	output_set_lamp_value(0, (data) & 1);		/* HOLD1 */
+	output_set_lamp_value(1, (data >> 1) & 1);	/* HOLD2 */
+	output_set_lamp_value(2, (data >> 2) & 1);	/* HOLD3 */
+	output_set_lamp_value(3, (data >> 3) & 1);	/* HOLD4 */
+	output_set_lamp_value(4, (data >> 4) & 1);	/* HOLD5 */
+	output_set_lamp_value(5, (data >> 5) & 1);	/* START */
+	output_set_lamp_value(6, (data >> 6) & 1);	/* PREMIO */
+
+//	popmessage("%04x\n",data);
 }
 
 static ADDRESS_MAP_START( mil4000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&sc0_vram)
-	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE(&sc1_vram)
-	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE(&sc2_vram)
-	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_BASE(&sc3_vram)
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&sc0_vram)	// CY62256L-70, U77
+	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE(&sc1_vram)	// CY62256L-70, U77
+	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE(&sc2_vram)	// CY62256L-70, U78
+	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_BASE(&sc3_vram)	// CY62256L-70, U78
 
 	AM_RANGE(0x708000, 0x708001) AM_READ_PORT("IN0")
 	AM_RANGE(0x708002, 0x708003) AM_READ_PORT("IN1")
@@ -216,7 +254,7 @@ static ADDRESS_MAP_START( mil4000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70801e, 0x70801f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 
 	AM_RANGE(0x780000, 0x780fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size) //probably not all of it.
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size) // 2x CY62256L-70 (U7 & U8).
 
 ADDRESS_MAP_END
 
@@ -224,130 +262,56 @@ static INPUT_PORTS_START( mil4000 )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
-	PORT_DIPNAME( 0x0004, 0x0004, "IN0" )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x0040, 0x0040, "Key out" ) //key out
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key Out") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x0004, 0x0004, "IN1" )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0080, 0x0080, "Prize" )//premio / prize (ticket?)
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Premio") PORT_CODE(KEYCODE_T)	//premio / prize (ticket?)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN3 )//key in
-	PORT_DIPNAME( 0x0002, 0x0002, "IN2" )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key In") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout tilelayout =
@@ -368,7 +332,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( mil4000 )
-	MDRV_CPU_ADD("main", M68000, 8000000 )	// ?
+	MDRV_CPU_ADD("main", M68000, 12000000 )	// ?
 	MDRV_CPU_PROGRAM_MAP(mil4000_map,0)
 	// irq 2/4/5 point to the same place, others invalid
 	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
@@ -388,7 +352,7 @@ static MACHINE_DRIVER_START( mil4000 )
 	MDRV_VIDEO_UPDATE(mil4000)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, 2500000) //pin 7 high & frequency not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000) // frequency from 1000 kHz resonator. pin 7 high not verified.
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -439,5 +403,5 @@ ROM_START( mil4000a )
 ROM_END
 
 
-GAME( 2000, mil4000,    0,        mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 2.0)", 0 )
-GAME( 2000, mil4000a,   mil4000,  mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.8)", 0 )
+GAMEL( 2000, mil4000,    0,        mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 2.0)", 0, layout_mil4000 )
+GAMEL( 2000, mil4000a,   mil4000,  mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.8)", 0, layout_mil4000 )

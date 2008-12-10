@@ -1767,6 +1767,8 @@ $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 
 $(DRIVERS)/midzeus.o:	$(LAYOUT)/crusnexo.lh
 
+$(DRIVERS)/mil4000.o:	$(LAYOUT)/mil4000.lh
+
 $(DRIVERS)/nbmj8688.o:	$(LAYOUT)/nbmj8688.lh
 
 $(DRIVERS)/neogeo.o:	$(LAYOUT)/neogeo.lh
