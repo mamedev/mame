@@ -349,7 +349,7 @@ return 0x4;
 	if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
 	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
 
-	// return 0x0004 ^ 0xffff; // 0x0004
+	return 0x0004 ^ 0xffff; // 0x0004
 	switch (mame_rand(space->machine) & 3)
 	{
 		case 0:
@@ -392,11 +392,11 @@ static READ16_HANDLER(test1_r)
     }
 }
 */
-
+/*
 static READ16_HANDLER(rh1_r)
 {
 // printf("ra=%04x ",register_active);
-/*
+
     if ((register_active == 0x0e) || (register_active == 0x0e) || (register_active == 0x0e))
         {
     if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
@@ -417,7 +417,7 @@ static READ16_HANDLER(rh1_r)
     if (input_code_pressed(KEYCODE_K)) return 0x8000 ^ 0xffff;
 
         }
-*/
+
 	switch (mame_rand(space->machine) & 3)
 	{
 		case 0:
@@ -428,15 +428,47 @@ static READ16_HANDLER(rh1_r)
 			return mame_rand(space->machine) % 0xffff;
 	}
 }
-
+*/
+/*
 static WRITE16_HANDLER(wh1_w)
 {
 	// register_active = data;
 }
+*/
 
 static WRITE16_HANDLER(wh2_w)
 {
 	register_active = data;
+}
+
+static READ16_HANDLER(t2_r)
+{
+ static UINT16 vblank = 0,hblank = 0;
+
+ vblank ^=0x40;
+ hblank ^=0x20;
+
+    if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_A)) return 0x0100 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_S)) return 0x0200 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_D)) return 0x0400 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_F)) return 0x0800 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_G)) return 0x1000 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_H)) return 0x2000 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_J)) return 0x4000 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_K)) return 0x8000 ^ 0xffff;
+// return mame_rand(space->machine) & 0x00f0;
+
+ popmessage("%08x",cpu_get_pc(space->cpu));
+// return 0x0000;
+ return 0xff9f | vblank | hblank;
 }
 
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -444,8 +476,8 @@ static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE(test_r,wh2_w) //related to input
-	AM_RANGE(0x800140, 0x800141) AM_READWRITE(rh1_r,wh1_w) //18b too
-	AM_RANGE(0x800142, 0x800143) AM_READWRITE(rh1_r,wh1_w) //18b too
+	AM_RANGE(0x800140, 0x800141) AM_READWRITE(t2_r,ay8910_control_port_0_lsb_w) //18b too
+	AM_RANGE(0x800142, 0x800143) AM_READWRITE(ay8910_read_port_0_lsb_r,ay8910_write_port_0_lsb_w) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
 //  AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
 //  AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
@@ -644,5 +676,5 @@ GAME( 1990, backgamn,        0, backgamn,    adp,    0, ROT0,  "ADP", "Backgammo
 GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
 GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
 GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
-GAME( 1997, fashiong,        0, skattv,      adp,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
-GAME( 1999, funlddlx,        0, skattv,      adp,    0, ROT0,  "Stella", "Funny Land de Luxe", GAME_NOT_WORKING )
+GAME( 1997, fashiong,        0, skattv,      skattv,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
+GAME( 1999, funlddlx,        0, skattv,      skattv,    0, ROT0,  "Stella", "Funny Land de Luxe", GAME_NOT_WORKING )
