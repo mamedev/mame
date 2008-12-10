@@ -29,7 +29,7 @@ Gekisou                   1985  8304 (post)
 The Koukouyakyuh          1985  8304 (post)
 High Voltage              1985  8404?(post says 8404, but readme says 8304)
 
-ALPHA8201: "44801A75" -> HD44801 , ROM code = A75
+alpha8201: "44801A75" -> HD44801 , ROM code = A75
 ALPHA8302: "44801B35" -> HD44801 , ROM code = B35
 ALPHA8303: "44801B42" -> HD44801 , ROM code = B42
 ALPHA8304: ?
@@ -98,16 +98,16 @@ R0-R7   : internal? RAM register 8bitx8 (x8 bank)
 
 A       : 8bit
 
-IX0/1   : memory indirect 'read' access pointer
+cpustate->IX0/1   : memory indirect 'read' access pointer
 
-IX2     : memory indirect 'write' access pointer
+cpustate->IX2     : memory indirect 'write' access pointer
 
 RXB     : unknown , looks index register
 
-LP0/1/2 : loop count register used by DJNZ operation
+cpustate->LP0/1/2 : loop count register used by DJNZ operation
 
-CF      : carry flag
-ZF      : zero flag
+cpustate->cf      : carry flag
+cpustate->zf      : zero flag
 
 -----------------------
 Memoy Space
@@ -165,12 +165,13 @@ Timming
 /* MAME is unnecessary */
 #define HANDLE_HALT_LINE 0
 
-#define M_RDMEM(A)		ALPHA8201_RDMEM(A)
-#define M_WRMEM(A,V)	ALPHA8201_WRMEM(A,V)
-#define M_RDOP(A)		ALPHA8201_RDOP(A)
-#define M_RDOP_ARG(A)	ALPHA8201_RDOP_ARG(A)
+#define M_RDMEM(A)		memory_read_byte_8le(cpustate->program, A)
+#define M_WRMEM(A,V)	memory_write_byte_8le(cpustate->program, A, V)
+#define M_RDOP(A)		memory_decrypted_read_byte(cpustate->program, A)
+#define M_RDOP_ARG(A)	memory_raw_read_byte(cpustate->program, A)
 
-typedef struct
+typedef struct _alpha8201_state alpha8201_state;
+struct _alpha8201_state
 {
 	UINT8 RAM[8*8];  /* internal GP register 8 * 8bank       */
 	unsigned PREVPC;
@@ -198,328 +199,322 @@ typedef struct
 
 	const device_config *device;
 	const address_space *program;
-} ALPHA8201_Regs;
+	int icount;
+	int inst_cycles;
+};
 
 /* The opcode table now is a combination of cycle counts and function pointers */
 typedef struct {
 	unsigned cycles;
-	void (*function) (void);
+	void (*function) (alpha8201_state *cpustate);
 }	s_opcode;
 
-static ALPHA8201_Regs R;
-static int	   ALPHA8201_ICount;
-static int    inst_cycles;
 
-#define regRAM	R.RAM
-#define regPTR	R.regPtr
-
-#define PC	R.pc.w.l
-#define PCL	 R.pc.b.l
-#define RD_REG(x)	regRAM[(regPTR<<3)+(x)]
-#define WR_REG(x,d)	regRAM[(regPTR<<3)+(x)]=(d)
-#define ZF	R.zf
-#define CF	R.cf
-#define IX0	R.ix0.b.l
-#define IX1	R.ix1.b.l
-#define IX2	R.ix2.b.l
-#define BIX0	R.ix0.w.l
-#define BIX1	R.ix1.w.l
-#define BIX2	R.ix2.w.l
-#define LP0	R.lp0
-#define LP1	R.lp1
-#define LP2	R.lp2
+#define PC				pc.w.l
+#define PCL	 			pc.b.l
+#define RD_REG(x)		cpustate->RAM[(cpustate->regPtr<<3)+(x)]
+#define WR_REG(x,d)		cpustate->RAM[(cpustate->regPtr<<3)+(x)]=(d)
+#define IX0				ix0.b.l
+#define IX1				ix1.b.l
+#define IX2				ix2.b.l
+#define BIX0			ix0.w.l
+#define BIX1			ix1.w.l
+#define BIX2			ix2.w.l
+#define LP0				lp0
+#define LP1				lp1
+#define LP2				lp2
 
 /* Get next opcode argument and increment program counter */
-INLINE unsigned M_RDMEM_OPCODE (void)
+INLINE unsigned M_RDMEM_OPCODE (alpha8201_state *cpustate)
 {
 	unsigned retval;
-	retval=M_RDOP_ARG(PC);
-	PCL++;
+	retval=M_RDOP_ARG(cpustate->PC);
+	cpustate->PCL++;
 	return retval;
 }
 
-INLINE void M_ADD(UINT8 dat)
+INLINE void M_ADD(alpha8201_state *cpustate, UINT8 dat)
 {
-	UINT16 temp = R.A + dat;
-	R.A = temp & 0xff;
-	ZF = (R.A==0);
-	CF = temp>>8;
+	UINT16 temp = cpustate->A + dat;
+	cpustate->A = temp & 0xff;
+	cpustate->zf = (cpustate->A==0);
+	cpustate->cf = temp>>8;
 }
 
-INLINE void M_ADDB(UINT8 dat)
+INLINE void M_ADDB(alpha8201_state *cpustate, UINT8 dat)
 {
-	UINT16 temp = R.B + dat;
-	R.B = temp & 0xff;
-	ZF = (R.B==0);
-	CF = temp>>8;
+	UINT16 temp = cpustate->B + dat;
+	cpustate->B = temp & 0xff;
+	cpustate->zf = (cpustate->B==0);
+	cpustate->cf = temp>>8;
 }
 
-INLINE void M_SUB(UINT8 dat)
+INLINE void M_SUB(alpha8201_state *cpustate, UINT8 dat)
 {
-	CF = (R.A>=dat);	// CF is No Borrow
-	R.A -= dat;
-	ZF = (R.A==0);
+	cpustate->cf = (cpustate->A>=dat);	// cpustate->cf is No Borrow
+	cpustate->A -= dat;
+	cpustate->zf = (cpustate->A==0);
 }
 
-INLINE void M_AND(UINT8 dat)
+INLINE void M_AND(alpha8201_state *cpustate, UINT8 dat)
 {
-	R.A &= dat;
-	ZF = (R.A==0);
+	cpustate->A &= dat;
+	cpustate->zf = (cpustate->A==0);
 }
 
-INLINE void M_OR(UINT8 dat)
+INLINE void M_OR(alpha8201_state *cpustate, UINT8 dat)
 {
-	R.A |= dat;
-	ZF = (R.A==0);
+	cpustate->A |= dat;
+	cpustate->zf = (cpustate->A==0);
 }
 
-INLINE void M_XOR(UINT8 dat)
+INLINE void M_XOR(alpha8201_state *cpustate, UINT8 dat)
 {
-	R.A ^= dat;
-	ZF = (R.A==0);
-	CF = 0;
+	cpustate->A ^= dat;
+	cpustate->zf = (cpustate->A==0);
+	cpustate->cf = 0;
 }
 
-INLINE void M_JMP(UINT8 dat)
+INLINE void M_JMP(alpha8201_state *cpustate, UINT8 dat)
 {
-	PCL = dat;
+	cpustate->PCL = dat;
 	/* update pc page */
-	R.pc.b.h  = R.ix0.b.h = R.ix1.b.h = R.ix2.b.h = R.mb & 3;
+	cpustate->pc.b.h  = cpustate->ix0.b.h = cpustate->ix1.b.h = cpustate->ix2.b.h = cpustate->mb & 3;
 }
 
-INLINE void M_UNDEFINED(void)
+INLINE void M_UNDEFINED(alpha8201_state *cpustate)
 {
-	logerror("ALPHA8201:  PC = %03x,  Unimplemented opcode = %02x\n", PC-1, M_RDMEM(PC-1));
+	logerror("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x\n", cpustate->PC-1, M_RDMEM(cpustate->PC-1));
 #if SHOW_MESSAGE_CONSOLE
-	mame_printf_debug("ALPHA8201:  PC = %03x,  Unimplemented opcode = %02x\n", PC-1, M_RDMEM(PC-1));
+	mame_printf_debug("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x\n", cpustate->PC-1, M_RDMEM(cpustate->PC-1));
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
 	debugger_break(Machine);
 #endif
 }
 
-INLINE void M_UNDEFINED2(void)
+INLINE void M_UNDEFINED2(alpha8201_state *cpustate)
 {
-	UINT8 op  = M_RDOP(PC-1);
-	UINT8 imm = M_RDMEM_OPCODE();
-	logerror("ALPHA8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", PC-2, op,imm);
+	UINT8 op  = M_RDOP(cpustate->PC-1);
+	UINT8 imm = M_RDMEM_OPCODE(cpustate);
+	logerror("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x,%02x\n", cpustate->PC-2, op,imm);
 #if SHOW_MESSAGE_CONSOLE
-	mame_printf_debug("ALPHA8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", PC-2, op,imm);
+	mame_printf_debug("alpha8201:  cpustate->PC = %03x,  Unimplemented opcode = %02x,%02x\n", cpustate->PC-2, op,imm);
 #endif
 #if BREAK_ON_UNKNOWN_OPCODE
 	debugger_break(Machine);
 #endif
 }
 
-static void undefined(void)	{ M_UNDEFINED(); }
-static void undefined2(void)	{ M_UNDEFINED2(); }
+static void undefined(alpha8201_state *cpustate)	{ M_UNDEFINED(cpustate); }
+static void undefined2(alpha8201_state *cpustate)	{ M_UNDEFINED2(cpustate); }
 
-static void nop(void)		 { }
-static void rora(void)		 { CF = R.A &1;     R.A = (R.A>>1) | (R.A<<7); }
-static void rola(void)		 { CF = (R.A>>7)&1; R.A = (R.A<<1) | (R.A>>7); }
-static void inc_b(void)	 	 { M_ADDB(0x02); }
-static void dec_b(void)	 	 { M_ADDB(0xfe); }
-static void inc_a(void)		 { M_ADD(0x01); }
-static void dec_a(void)		 { M_ADD(0xff); }
-static void cpl(void)		 { R.A ^= 0xff; };
+static void nop(alpha8201_state *cpustate)		 { }
+static void rora(alpha8201_state *cpustate)		 { cpustate->cf = cpustate->A &1;     cpustate->A = (cpustate->A>>1) | (cpustate->A<<7); }
+static void rola(alpha8201_state *cpustate)		 { cpustate->cf = (cpustate->A>>7)&1; cpustate->A = (cpustate->A<<1) | (cpustate->A>>7); }
+static void inc_b(alpha8201_state *cpustate)	 	 { M_ADDB(cpustate, 0x02); }
+static void dec_b(alpha8201_state *cpustate)	 	 { M_ADDB(cpustate, 0xfe); }
+static void inc_a(alpha8201_state *cpustate)		 { M_ADD(cpustate, 0x01); }
+static void dec_a(alpha8201_state *cpustate)		 { M_ADD(cpustate, 0xff); }
+static void cpl(alpha8201_state *cpustate)		 { cpustate->A ^= 0xff; };
 
-static void ld_a_ix0_0(void) { R.A = M_RDMEM(BIX0+0); }
-static void ld_a_ix0_1(void) { R.A = M_RDMEM(BIX0+1); }
-static void ld_a_ix0_2(void) { R.A = M_RDMEM(BIX0+2); }
-static void ld_a_ix0_3(void) { R.A = M_RDMEM(BIX0+3); }
-static void ld_a_ix0_4(void) { R.A = M_RDMEM(BIX0+4); }
-static void ld_a_ix0_5(void) { R.A = M_RDMEM(BIX0+5); }
-static void ld_a_ix0_6(void) { R.A = M_RDMEM(BIX0+6); }
-static void ld_a_ix0_7(void) { R.A = M_RDMEM(BIX0+7); }
+static void ld_a_ix0_0(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+0); }
+static void ld_a_ix0_1(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+1); }
+static void ld_a_ix0_2(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+2); }
+static void ld_a_ix0_3(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+3); }
+static void ld_a_ix0_4(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+4); }
+static void ld_a_ix0_5(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+5); }
+static void ld_a_ix0_6(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+6); }
+static void ld_a_ix0_7(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+7); }
 
-static void ld_a_ix1_0(void) { R.A = M_RDMEM(BIX1+0); }
-static void ld_a_ix1_1(void) { R.A = M_RDMEM(BIX1+1); }
-static void ld_a_ix1_2(void) { R.A = M_RDMEM(BIX1+2); }
-static void ld_a_ix1_3(void) { R.A = M_RDMEM(BIX1+3); }
-static void ld_a_ix1_4(void) { R.A = M_RDMEM(BIX1+4); }
-static void ld_a_ix1_5(void) { R.A = M_RDMEM(BIX1+5); }
-static void ld_a_ix1_6(void) { R.A = M_RDMEM(BIX1+6); }
-static void ld_a_ix1_7(void) { R.A = M_RDMEM(BIX1+7); }
+static void ld_a_ix1_0(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+0); }
+static void ld_a_ix1_1(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+1); }
+static void ld_a_ix1_2(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+2); }
+static void ld_a_ix1_3(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+3); }
+static void ld_a_ix1_4(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+4); }
+static void ld_a_ix1_5(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+5); }
+static void ld_a_ix1_6(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+6); }
+static void ld_a_ix1_7(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX1+7); }
 
-static void ld_ix2_0_a(void) { M_WRMEM(BIX2+0,R.A); }
-static void ld_ix2_1_a(void) { M_WRMEM(BIX2+1,R.A); }
-static void ld_ix2_2_a(void) { M_WRMEM(BIX2+2,R.A); }
-static void ld_ix2_3_a(void) { M_WRMEM(BIX2+3,R.A); }
-static void ld_ix2_4_a(void) { M_WRMEM(BIX2+4,R.A); }
-static void ld_ix2_5_a(void) { M_WRMEM(BIX2+5,R.A); }
-static void ld_ix2_6_a(void) { M_WRMEM(BIX2+6,R.A); }
-static void ld_ix2_7_a(void) { M_WRMEM(BIX2+7,R.A); }
+static void ld_ix2_0_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+0,cpustate->A); }
+static void ld_ix2_1_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+1,cpustate->A); }
+static void ld_ix2_2_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+2,cpustate->A); }
+static void ld_ix2_3_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+3,cpustate->A); }
+static void ld_ix2_4_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+4,cpustate->A); }
+static void ld_ix2_5_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+5,cpustate->A); }
+static void ld_ix2_6_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+6,cpustate->A); }
+static void ld_ix2_7_a(alpha8201_state *cpustate) { M_WRMEM(cpustate->BIX2+7,cpustate->A); }
 
-static void ld_ix0_0_b(void) { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0+0); }
-static void ld_ix0_1_b(void) { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0+1); }
-static void ld_ix0_2_b(void) { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0+2); }
-static void ld_ix0_3_b(void) { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0+3); }
-static void ld_ix0_4_b(void) { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0+4); }
-static void ld_ix0_5_b(void) { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0+5); }
-static void ld_ix0_6_b(void) { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0+6); }
-static void ld_ix0_7_b(void) { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0+7); }
+static void ld_ix0_0_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+0); }
+static void ld_ix0_1_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+1); }
+static void ld_ix0_2_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+2); }
+static void ld_ix0_3_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+3); }
+static void ld_ix0_4_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+4); }
+static void ld_ix0_5_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+5); }
+static void ld_ix0_6_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+6); }
+static void ld_ix0_7_b(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0+7); }
 
-static void bit_r0_0(void)	 { ZF = RD_REG(0)&(1<<0)?0:1; }
-static void bit_r0_1(void)	 { ZF = RD_REG(0)&(1<<1)?0:1; }
-static void bit_r0_2(void)	 { ZF = RD_REG(0)&(1<<2)?0:1; }
-static void bit_r0_3(void)	 { ZF = RD_REG(0)&(1<<3)?0:1; }
-static void bit_r0_4(void)	 { ZF = RD_REG(0)&(1<<4)?0:1; }
-static void bit_r0_5(void)	 { ZF = RD_REG(0)&(1<<5)?0:1; }
-static void bit_r0_6(void)	 { ZF = RD_REG(0)&(1<<6)?0:1; }
-static void bit_r0_7(void)	 { ZF = RD_REG(0)&(1<<7)?0:1; }
+static void bit_r0_0(alpha8201_state *cpustate)	 { cpustate->zf = RD_REG(0)&(1<<0)?0:1; }
+static void bit_r0_1(alpha8201_state *cpustate)	 { cpustate->zf = RD_REG(0)&(1<<1)?0:1; }
+static void bit_r0_2(alpha8201_state *cpustate)	 { cpustate->zf = RD_REG(0)&(1<<2)?0:1; }
+static void bit_r0_3(alpha8201_state *cpustate)	 { cpustate->zf = RD_REG(0)&(1<<3)?0:1; }
+static void bit_r0_4(alpha8201_state *cpustate)	 { cpustate->zf = RD_REG(0)&(1<<4)?0:1; }
+static void bit_r0_5(alpha8201_state *cpustate)	 { cpustate->zf = RD_REG(0)&(1<<5)?0:1; }
+static void bit_r0_6(alpha8201_state *cpustate)	 { cpustate->zf = RD_REG(0)&(1<<6)?0:1; }
+static void bit_r0_7(alpha8201_state *cpustate)	 { cpustate->zf = RD_REG(0)&(1<<7)?0:1; }
 
-static void ld_a_n(void)	 { R.A = M_RDMEM_OPCODE(); }
+static void ld_a_n(alpha8201_state *cpustate)	 { cpustate->A = M_RDMEM_OPCODE(cpustate); }
 
-static void ld_a_r0(void)	 { R.A = RD_REG(0); ZF = (R.A==0); }
-static void ld_a_r1(void)	 { R.A = RD_REG(1); ZF = (R.A==0); }
-static void ld_a_r2(void)	 { R.A = RD_REG(2); ZF = (R.A==0); }
-static void ld_a_r3(void)	 { R.A = RD_REG(3); ZF = (R.A==0); }
-static void ld_a_r4(void)	 { R.A = RD_REG(4); ZF = (R.A==0); }
-static void ld_a_r5(void)	 { R.A = RD_REG(5); ZF = (R.A==0); }
-static void ld_a_r6(void)	 { R.A = RD_REG(6); ZF = (R.A==0); }
-static void ld_a_r7(void)	 { R.A = RD_REG(7); ZF = (R.A==0); }
+static void ld_a_r0(alpha8201_state *cpustate)	 { cpustate->A = RD_REG(0); cpustate->zf = (cpustate->A==0); }
+static void ld_a_r1(alpha8201_state *cpustate)	 { cpustate->A = RD_REG(1); cpustate->zf = (cpustate->A==0); }
+static void ld_a_r2(alpha8201_state *cpustate)	 { cpustate->A = RD_REG(2); cpustate->zf = (cpustate->A==0); }
+static void ld_a_r3(alpha8201_state *cpustate)	 { cpustate->A = RD_REG(3); cpustate->zf = (cpustate->A==0); }
+static void ld_a_r4(alpha8201_state *cpustate)	 { cpustate->A = RD_REG(4); cpustate->zf = (cpustate->A==0); }
+static void ld_a_r5(alpha8201_state *cpustate)	 { cpustate->A = RD_REG(5); cpustate->zf = (cpustate->A==0); }
+static void ld_a_r6(alpha8201_state *cpustate)	 { cpustate->A = RD_REG(6); cpustate->zf = (cpustate->A==0); }
+static void ld_a_r7(alpha8201_state *cpustate)	 { cpustate->A = RD_REG(7); cpustate->zf = (cpustate->A==0); }
 
-static void ld_r0_a(void)	 { WR_REG(0,R.A); }
-static void ld_r1_a(void)	 { WR_REG(1,R.A); }
-static void ld_r2_a(void)	 { WR_REG(2,R.A); }
-static void ld_r3_a(void)	 { WR_REG(3,R.A); }
-static void ld_r4_a(void)	 { WR_REG(4,R.A); }
-static void ld_r5_a(void)	 { WR_REG(5,R.A); }
-static void ld_r6_a(void)	 { WR_REG(6,R.A); }
-static void ld_r7_a(void)	 { WR_REG(7,R.A); }
+static void ld_r0_a(alpha8201_state *cpustate)	 { WR_REG(0,cpustate->A); }
+static void ld_r1_a(alpha8201_state *cpustate)	 { WR_REG(1,cpustate->A); }
+static void ld_r2_a(alpha8201_state *cpustate)	 { WR_REG(2,cpustate->A); }
+static void ld_r3_a(alpha8201_state *cpustate)	 { WR_REG(3,cpustate->A); }
+static void ld_r4_a(alpha8201_state *cpustate)	 { WR_REG(4,cpustate->A); }
+static void ld_r5_a(alpha8201_state *cpustate)	 { WR_REG(5,cpustate->A); }
+static void ld_r6_a(alpha8201_state *cpustate)	 { WR_REG(6,cpustate->A); }
+static void ld_r7_a(alpha8201_state *cpustate)	 { WR_REG(7,cpustate->A); }
 
-static void add_a_n(void)	 { M_ADD(M_RDMEM_OPCODE()); }
+static void add_a_n(alpha8201_state *cpustate)	 { M_ADD(cpustate, M_RDMEM_OPCODE(cpustate)); }
 
-static void add_a_r0(void)	 { M_ADD(RD_REG(0)); }
-static void add_a_r1(void)	 { M_ADD(RD_REG(1)); }
-static void add_a_r2(void)	 { M_ADD(RD_REG(2)); }
-static void add_a_r3(void)	 { M_ADD(RD_REG(3)); }
-static void add_a_r4(void)	 { M_ADD(RD_REG(4)); }
-static void add_a_r5(void)	 { M_ADD(RD_REG(5)); }
-static void add_a_r6(void)	 { M_ADD(RD_REG(6)); }
-static void add_a_r7(void)	 { M_ADD(RD_REG(7)); }
+static void add_a_r0(alpha8201_state *cpustate)	 { M_ADD(cpustate, RD_REG(0)); }
+static void add_a_r1(alpha8201_state *cpustate)	 { M_ADD(cpustate, RD_REG(1)); }
+static void add_a_r2(alpha8201_state *cpustate)	 { M_ADD(cpustate, RD_REG(2)); }
+static void add_a_r3(alpha8201_state *cpustate)	 { M_ADD(cpustate, RD_REG(3)); }
+static void add_a_r4(alpha8201_state *cpustate)	 { M_ADD(cpustate, RD_REG(4)); }
+static void add_a_r5(alpha8201_state *cpustate)	 { M_ADD(cpustate, RD_REG(5)); }
+static void add_a_r6(alpha8201_state *cpustate)	 { M_ADD(cpustate, RD_REG(6)); }
+static void add_a_r7(alpha8201_state *cpustate)	 { M_ADD(cpustate, RD_REG(7)); }
 
-static void sub_a_n(void)	 { M_SUB(M_RDMEM_OPCODE()); }
+static void sub_a_n(alpha8201_state *cpustate)	 { M_SUB(cpustate, M_RDMEM_OPCODE(cpustate)); }
 
-static void sub_a_r0(void)	 { M_SUB(RD_REG(0)); }
-static void sub_a_r1(void)	 { M_SUB(RD_REG(1)); }
-static void sub_a_r2(void)	 { M_SUB(RD_REG(2)); }
-static void sub_a_r3(void)	 { M_SUB(RD_REG(3)); }
-static void sub_a_r4(void)	 { M_SUB(RD_REG(4)); }
-static void sub_a_r5(void)	 { M_SUB(RD_REG(5)); }
-static void sub_a_r6(void)	 { M_SUB(RD_REG(6)); }
-static void sub_a_r7(void)	 { M_SUB(RD_REG(7)); }
+static void sub_a_r0(alpha8201_state *cpustate)	 { M_SUB(cpustate, RD_REG(0)); }
+static void sub_a_r1(alpha8201_state *cpustate)	 { M_SUB(cpustate, RD_REG(1)); }
+static void sub_a_r2(alpha8201_state *cpustate)	 { M_SUB(cpustate, RD_REG(2)); }
+static void sub_a_r3(alpha8201_state *cpustate)	 { M_SUB(cpustate, RD_REG(3)); }
+static void sub_a_r4(alpha8201_state *cpustate)	 { M_SUB(cpustate, RD_REG(4)); }
+static void sub_a_r5(alpha8201_state *cpustate)	 { M_SUB(cpustate, RD_REG(5)); }
+static void sub_a_r6(alpha8201_state *cpustate)	 { M_SUB(cpustate, RD_REG(6)); }
+static void sub_a_r7(alpha8201_state *cpustate)	 { M_SUB(cpustate, RD_REG(7)); }
 
-static void and_a_n(void)	 { M_AND(M_RDMEM_OPCODE()); }
+static void and_a_n(alpha8201_state *cpustate)	 { M_AND(cpustate, M_RDMEM_OPCODE(cpustate)); }
 
-static void and_a_r0(void)	 { M_AND(RD_REG(0)); }
-static void and_a_r1(void)	 { M_AND(RD_REG(1)); }
-static void and_a_r2(void)	 { M_AND(RD_REG(2)); }
-static void and_a_r3(void)	 { M_AND(RD_REG(3)); }
-static void and_a_r4(void)	 { M_AND(RD_REG(4)); }
-static void and_a_r5(void)	 { M_AND(RD_REG(5)); }
-static void and_a_r6(void)	 { M_AND(RD_REG(6)); }
-static void and_a_r7(void)	 { M_AND(RD_REG(7)); }
+static void and_a_r0(alpha8201_state *cpustate)	 { M_AND(cpustate, RD_REG(0)); }
+static void and_a_r1(alpha8201_state *cpustate)	 { M_AND(cpustate, RD_REG(1)); }
+static void and_a_r2(alpha8201_state *cpustate)	 { M_AND(cpustate, RD_REG(2)); }
+static void and_a_r3(alpha8201_state *cpustate)	 { M_AND(cpustate, RD_REG(3)); }
+static void and_a_r4(alpha8201_state *cpustate)	 { M_AND(cpustate, RD_REG(4)); }
+static void and_a_r5(alpha8201_state *cpustate)	 { M_AND(cpustate, RD_REG(5)); }
+static void and_a_r6(alpha8201_state *cpustate)	 { M_AND(cpustate, RD_REG(6)); }
+static void and_a_r7(alpha8201_state *cpustate)	 { M_AND(cpustate, RD_REG(7)); }
 
-static void or_a_n(void)	 { M_OR(M_RDMEM_OPCODE()); }
+static void or_a_n(alpha8201_state *cpustate)	 { M_OR(cpustate, M_RDMEM_OPCODE(cpustate)); }
 
-static void or_a_r0(void)	 { M_OR(RD_REG(0)); }
-static void or_a_r1(void)	 { M_OR(RD_REG(1)); }
-static void or_a_r2(void)	 { M_OR(RD_REG(2)); }
-static void or_a_r3(void)	 { M_OR(RD_REG(3)); }
-static void or_a_r4(void)	 { M_OR(RD_REG(4)); }
-static void or_a_r5(void)	 { M_OR(RD_REG(5)); }
-static void or_a_r6(void)	 { M_OR(RD_REG(6)); }
-static void or_a_r7(void)	 { M_OR(RD_REG(7)); }
+static void or_a_r0(alpha8201_state *cpustate)	 { M_OR(cpustate, RD_REG(0)); }
+static void or_a_r1(alpha8201_state *cpustate)	 { M_OR(cpustate, RD_REG(1)); }
+static void or_a_r2(alpha8201_state *cpustate)	 { M_OR(cpustate, RD_REG(2)); }
+static void or_a_r3(alpha8201_state *cpustate)	 { M_OR(cpustate, RD_REG(3)); }
+static void or_a_r4(alpha8201_state *cpustate)	 { M_OR(cpustate, RD_REG(4)); }
+static void or_a_r5(alpha8201_state *cpustate)	 { M_OR(cpustate, RD_REG(5)); }
+static void or_a_r6(alpha8201_state *cpustate)	 { M_OR(cpustate, RD_REG(6)); }
+static void or_a_r7(alpha8201_state *cpustate)	 { M_OR(cpustate, RD_REG(7)); }
 
-static void add_ix0_0(void)	 { }
-static void add_ix0_1(void)	 { IX0 += 1; }
-static void add_ix0_2(void)	 { IX0 += 2; }
-static void add_ix0_3(void)	 { IX0 += 3; }
-static void add_ix0_4(void)	 { IX0 += 4; }
-static void add_ix0_5(void)	 { IX0 += 5; }
-static void add_ix0_6(void)	 { IX0 += 6; }
-static void add_ix0_7(void)	 { IX0 += 7; }
-static void add_ix0_8(void)	 { IX0 += 8; }
-static void add_ix0_9(void)	 { IX0 += 9; }
-static void add_ix0_a(void)	 { IX0 += 10; }
-static void add_ix0_b(void)	 { IX0 += 11; }
-static void add_ix0_c(void)	 { IX0 += 12; }
-static void add_ix0_d(void)	 { IX0 += 13; }
-static void add_ix0_e(void)	 { IX0 += 14; }
-static void add_ix0_f(void)	 { IX0 += 15; }
+static void add_ix0_0(alpha8201_state *cpustate)	 { }
+static void add_ix0_1(alpha8201_state *cpustate)	 { cpustate->IX0 += 1; }
+static void add_ix0_2(alpha8201_state *cpustate)	 { cpustate->IX0 += 2; }
+static void add_ix0_3(alpha8201_state *cpustate)	 { cpustate->IX0 += 3; }
+static void add_ix0_4(alpha8201_state *cpustate)	 { cpustate->IX0 += 4; }
+static void add_ix0_5(alpha8201_state *cpustate)	 { cpustate->IX0 += 5; }
+static void add_ix0_6(alpha8201_state *cpustate)	 { cpustate->IX0 += 6; }
+static void add_ix0_7(alpha8201_state *cpustate)	 { cpustate->IX0 += 7; }
+static void add_ix0_8(alpha8201_state *cpustate)	 { cpustate->IX0 += 8; }
+static void add_ix0_9(alpha8201_state *cpustate)	 { cpustate->IX0 += 9; }
+static void add_ix0_a(alpha8201_state *cpustate)	 { cpustate->IX0 += 10; }
+static void add_ix0_b(alpha8201_state *cpustate)	 { cpustate->IX0 += 11; }
+static void add_ix0_c(alpha8201_state *cpustate)	 { cpustate->IX0 += 12; }
+static void add_ix0_d(alpha8201_state *cpustate)	 { cpustate->IX0 += 13; }
+static void add_ix0_e(alpha8201_state *cpustate)	 { cpustate->IX0 += 14; }
+static void add_ix0_f(alpha8201_state *cpustate)	 { cpustate->IX0 += 15; }
 
-static void add_ix1_0(void)	 { }
-static void add_ix1_1(void)	 { IX1 += 1; }
-static void add_ix1_2(void)	 { IX1 += 2; }
-static void add_ix1_3(void)	 { IX1 += 3; }
-static void add_ix1_4(void)	 { IX1 += 4; }
-static void add_ix1_5(void)	 { IX1 += 5; }
-static void add_ix1_6(void)	 { IX1 += 6; }
-static void add_ix1_7(void)	 { IX1 += 7; }
-static void add_ix1_8(void)	 { IX1 += 8; }
-static void add_ix1_9(void)	 { IX1 += 9; }
-static void add_ix1_a(void)	 { IX1 += 10; }
-static void add_ix1_b(void)	 { IX1 += 11; }
-static void add_ix1_c(void)	 { IX1 += 12; }
-static void add_ix1_d(void)	 { IX1 += 13; }
-static void add_ix1_e(void)	 { IX1 += 14; }
-static void add_ix1_f(void)	 { IX1 += 15; }
+static void add_ix1_0(alpha8201_state *cpustate)	 { }
+static void add_ix1_1(alpha8201_state *cpustate)	 { cpustate->IX1 += 1; }
+static void add_ix1_2(alpha8201_state *cpustate)	 { cpustate->IX1 += 2; }
+static void add_ix1_3(alpha8201_state *cpustate)	 { cpustate->IX1 += 3; }
+static void add_ix1_4(alpha8201_state *cpustate)	 { cpustate->IX1 += 4; }
+static void add_ix1_5(alpha8201_state *cpustate)	 { cpustate->IX1 += 5; }
+static void add_ix1_6(alpha8201_state *cpustate)	 { cpustate->IX1 += 6; }
+static void add_ix1_7(alpha8201_state *cpustate)	 { cpustate->IX1 += 7; }
+static void add_ix1_8(alpha8201_state *cpustate)	 { cpustate->IX1 += 8; }
+static void add_ix1_9(alpha8201_state *cpustate)	 { cpustate->IX1 += 9; }
+static void add_ix1_a(alpha8201_state *cpustate)	 { cpustate->IX1 += 10; }
+static void add_ix1_b(alpha8201_state *cpustate)	 { cpustate->IX1 += 11; }
+static void add_ix1_c(alpha8201_state *cpustate)	 { cpustate->IX1 += 12; }
+static void add_ix1_d(alpha8201_state *cpustate)	 { cpustate->IX1 += 13; }
+static void add_ix1_e(alpha8201_state *cpustate)	 { cpustate->IX1 += 14; }
+static void add_ix1_f(alpha8201_state *cpustate)	 { cpustate->IX1 += 15; }
 
-static void add_ix2_0(void)	 { }
-static void add_ix2_1(void)	 { IX2 += 1; }
-static void add_ix2_2(void)	 { IX2 += 2; }
-static void add_ix2_3(void)	 { IX2 += 3; }
-static void add_ix2_4(void)	 { IX2 += 4; }
-static void add_ix2_5(void)	 { IX2 += 5; }
-static void add_ix2_6(void)	 { IX2 += 6; }
-static void add_ix2_7(void)	 { IX2 += 7; }
-static void add_ix2_8(void)	 { IX2 += 8; }
-static void add_ix2_9(void)	 { IX2 += 9; }
-static void add_ix2_a(void)	 { IX2 += 10; }
-static void add_ix2_b(void)	 { IX2 += 11; }
-static void add_ix2_c(void)	 { IX2 += 12; }
-static void add_ix2_d(void)	 { IX2 += 13; }
-static void add_ix2_e(void)	 { IX2 += 14; }
-static void add_ix2_f(void)	 { IX2 += 15; }
+static void add_ix2_0(alpha8201_state *cpustate)	 { }
+static void add_ix2_1(alpha8201_state *cpustate)	 { cpustate->IX2 += 1; }
+static void add_ix2_2(alpha8201_state *cpustate)	 { cpustate->IX2 += 2; }
+static void add_ix2_3(alpha8201_state *cpustate)	 { cpustate->IX2 += 3; }
+static void add_ix2_4(alpha8201_state *cpustate)	 { cpustate->IX2 += 4; }
+static void add_ix2_5(alpha8201_state *cpustate)	 { cpustate->IX2 += 5; }
+static void add_ix2_6(alpha8201_state *cpustate)	 { cpustate->IX2 += 6; }
+static void add_ix2_7(alpha8201_state *cpustate)	 { cpustate->IX2 += 7; }
+static void add_ix2_8(alpha8201_state *cpustate)	 { cpustate->IX2 += 8; }
+static void add_ix2_9(alpha8201_state *cpustate)	 { cpustate->IX2 += 9; }
+static void add_ix2_a(alpha8201_state *cpustate)	 { cpustate->IX2 += 10; }
+static void add_ix2_b(alpha8201_state *cpustate)	 { cpustate->IX2 += 11; }
+static void add_ix2_c(alpha8201_state *cpustate)	 { cpustate->IX2 += 12; }
+static void add_ix2_d(alpha8201_state *cpustate)	 { cpustate->IX2 += 13; }
+static void add_ix2_e(alpha8201_state *cpustate)	 { cpustate->IX2 += 14; }
+static void add_ix2_f(alpha8201_state *cpustate)	 { cpustate->IX2 += 15; }
 
-static void ld_base_0(void)	 { regPTR = 0; }
-static void ld_base_1(void)	 { regPTR = 1; }
-static void ld_base_2(void)	 { regPTR = 2; }
-static void ld_base_3(void)	 { regPTR = 3; }
-static void ld_base_4(void)	 { regPTR = 4; }
-static void ld_base_5(void)	 { regPTR = 5; }
-static void ld_base_6(void)	 { regPTR = 6; }
-static void ld_base_7(void)	 { regPTR = 7; }
+static void ld_base_0(alpha8201_state *cpustate)	 { cpustate->regPtr = 0; }
+static void ld_base_1(alpha8201_state *cpustate)	 { cpustate->regPtr = 1; }
+static void ld_base_2(alpha8201_state *cpustate)	 { cpustate->regPtr = 2; }
+static void ld_base_3(alpha8201_state *cpustate)	 { cpustate->regPtr = 3; }
+static void ld_base_4(alpha8201_state *cpustate)	 { cpustate->regPtr = 4; }
+static void ld_base_5(alpha8201_state *cpustate)	 { cpustate->regPtr = 5; }
+static void ld_base_6(alpha8201_state *cpustate)	 { cpustate->regPtr = 6; }
+static void ld_base_7(alpha8201_state *cpustate)	 { cpustate->regPtr = 7; }
 
-static void ld_bank_0(void)	 { R.mb = 0; }
-static void ld_bank_1(void)	 { R.mb = 1; }
-static void ld_bank_2(void)	 { R.mb = 2; }
-static void ld_bank_3(void)	 { R.mb = 3; }
+static void ld_bank_0(alpha8201_state *cpustate)	 { cpustate->mb = 0; }
+static void ld_bank_1(alpha8201_state *cpustate)	 { cpustate->mb = 1; }
+static void ld_bank_2(alpha8201_state *cpustate)	 { cpustate->mb = 2; }
+static void ld_bank_3(alpha8201_state *cpustate)	 { cpustate->mb = 3; }
 
-static void stop(void)
+static void stop(alpha8201_state *cpustate)
 {
 	UINT8 pcptr = M_RDMEM(0x001) & 0x1f;
 	M_WRMEM(pcptr,(M_RDMEM(pcptr)&0xf)+0x08); /* mark entry point ODD to HALT */
-	R.mb |= 0x08;        /* mark internal HALT state */
+	cpustate->mb |= 0x08;        /* mark internal HALT state */
 }
 
-static void ld_ix0_n(void)	 { IX0 = M_RDMEM_OPCODE(); }
-static void ld_ix1_n(void)	 { IX1 = M_RDMEM_OPCODE(); }
-static void ld_ix2_n(void)	 { IX2 = M_RDMEM_OPCODE(); }
-static void ld_lp0_n(void)	 { LP0 = M_RDMEM_OPCODE(); }
-static void ld_lp1_n(void)	 { LP1 = M_RDMEM_OPCODE(); }
-static void ld_lp2_n(void)	 { LP2 = M_RDMEM_OPCODE(); }
-static void ld_b_n(void)	 { R.B = M_RDMEM_OPCODE(); }
+static void ld_ix0_n(alpha8201_state *cpustate)	 { cpustate->IX0 = M_RDMEM_OPCODE(cpustate); }
+static void ld_ix1_n(alpha8201_state *cpustate)	 { cpustate->IX1 = M_RDMEM_OPCODE(cpustate); }
+static void ld_ix2_n(alpha8201_state *cpustate)	 { cpustate->IX2 = M_RDMEM_OPCODE(cpustate); }
+static void ld_lp0_n(alpha8201_state *cpustate)	 { cpustate->LP0 = M_RDMEM_OPCODE(cpustate); }
+static void ld_lp1_n(alpha8201_state *cpustate)	 { cpustate->LP1 = M_RDMEM_OPCODE(cpustate); }
+static void ld_lp2_n(alpha8201_state *cpustate)	 { cpustate->LP2 = M_RDMEM_OPCODE(cpustate); }
+static void ld_b_n(alpha8201_state *cpustate)	 { cpustate->B = M_RDMEM_OPCODE(cpustate); }
 
-static void djnz_lp0(void)	{ UINT8 i=M_RDMEM_OPCODE(); LP0--; if (LP0 != 0) M_JMP(i); }
-static void djnz_lp1(void)	{ UINT8 i=M_RDMEM_OPCODE(); LP1--; if (LP1 != 0) M_JMP(i); }
-static void djnz_lp2(void)	{ UINT8 i=M_RDMEM_OPCODE(); LP2--; if (LP2 != 0) M_JMP(i); }
-static void jnz(void)	{ UINT8 i=M_RDMEM_OPCODE(); if (!ZF) M_JMP(i); }
-static void jnc(void)	{ UINT8 i=M_RDMEM_OPCODE(); if (!CF) M_JMP(i);}
-static void jz(void)	{ UINT8 i=M_RDMEM_OPCODE(); if ( ZF) M_JMP(i); }
-static void jc(void)	{ UINT8 i=M_RDMEM_OPCODE(); if ( CF) M_JMP(i);}
-static void jmp(void)	{ M_JMP( M_RDMEM_OPCODE() ); }
+static void djnz_lp0(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate); cpustate->LP0--; if (cpustate->LP0 != 0) M_JMP(cpustate, i); }
+static void djnz_lp1(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate); cpustate->LP1--; if (cpustate->LP1 != 0) M_JMP(cpustate, i); }
+static void djnz_lp2(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate); cpustate->LP2--; if (cpustate->LP2 != 0) M_JMP(cpustate, i); }
+static void jnz(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate); if (!cpustate->zf) M_JMP(cpustate, i); }
+static void jnc(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate); if (!cpustate->cf) M_JMP(cpustate, i);}
+static void jz(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate); if ( cpustate->zf) M_JMP(cpustate, i); }
+static void jc(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate); if ( cpustate->cf) M_JMP(cpustate, i);}
+static void jmp(alpha8201_state *cpustate)	{ M_JMP(cpustate,  M_RDMEM_OPCODE(cpustate) ); }
 
 #if (HAS_ALPHA8201)
 static const s_opcode opcode_8201[256]=
@@ -567,55 +562,55 @@ static const s_opcode opcode_8201[256]=
 #if (HAS_ALPHA8301)
 
 /* ALPHA 8301 : added instruction */
-static void exg_a_ix0(void)  { UINT8 t=R.A; R.A = IX0; IX0 = t; }
-static void exg_a_ix1(void)  { UINT8 t=R.A; R.A = IX1; IX1 = t; }
-static void exg_a_ix2(void)  { UINT8 t=R.A; R.A = IX2; IX2 = t; }
-static void exg_a_lp0(void)  { UINT8 t=R.A; R.A = LP0; LP0 = t; }
-static void exg_a_lp1(void)  { UINT8 t=R.A; R.A = LP1; LP1 = t; }
-static void exg_a_lp2(void)  { UINT8 t=R.A; R.A = LP2; LP2 = t; }
-static void exg_a_b(void)    { UINT8 t=R.A; R.A = R.B; R.B = t; }
-static void exg_a_rb(void)   { UINT8 t=R.A; R.A = regPTR; regPTR = t; }
+static void exg_a_ix0(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->IX0; cpustate->IX0 = t; }
+static void exg_a_ix1(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->IX1; cpustate->IX1 = t; }
+static void exg_a_ix2(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->IX2; cpustate->IX2 = t; }
+static void exg_a_lp0(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->LP0; cpustate->LP0 = t; }
+static void exg_a_lp1(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->LP1; cpustate->LP1 = t; }
+static void exg_a_lp2(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->LP2; cpustate->LP2 = t; }
+static void exg_a_b(alpha8201_state *cpustate)    { UINT8 t=cpustate->A; cpustate->A = cpustate->B; cpustate->B = t; }
+static void exg_a_rb(alpha8201_state *cpustate)   { UINT8 t=cpustate->A; cpustate->A = cpustate->regPtr; cpustate->regPtr = t; }
 
-static void ld_ix0_a(void)    { IX0 = R.A; }
-static void ld_ix1_a(void)    { IX1 = R.A; }
-static void ld_ix2_a(void)    { IX2 = R.A; }
-static void ld_lp0_a(void)    { LP0 = R.A; }
-static void ld_lp1_a(void)    { LP1 = R.A; }
-static void ld_lp2_a(void)    { LP2 = R.A; }
-static void ld_b_a(void)      { R.B = R.A; }
-static void ld_rb_a(void)     { regPTR = R.A; }
+static void ld_ix0_a(alpha8201_state *cpustate)    { cpustate->IX0 = cpustate->A; }
+static void ld_ix1_a(alpha8201_state *cpustate)    { cpustate->IX1 = cpustate->A; }
+static void ld_ix2_a(alpha8201_state *cpustate)    { cpustate->IX2 = cpustate->A; }
+static void ld_lp0_a(alpha8201_state *cpustate)    { cpustate->LP0 = cpustate->A; }
+static void ld_lp1_a(alpha8201_state *cpustate)    { cpustate->LP1 = cpustate->A; }
+static void ld_lp2_a(alpha8201_state *cpustate)    { cpustate->LP2 = cpustate->A; }
+static void ld_b_a(alpha8201_state *cpustate)      { cpustate->B = cpustate->A; }
+static void ld_rb_a(alpha8201_state *cpustate)     { cpustate->regPtr = cpustate->A; }
 
-static void exg_ix0_ix1(void)  { UINT8 t=IX1; IX1 = IX0; IX0 = t; }
-static void exg_ix0_ix2(void)  { UINT8 t=IX2; IX2 = IX0; IX0 = t; }
+static void exg_ix0_ix1(alpha8201_state *cpustate)  { UINT8 t=cpustate->IX1; cpustate->IX1 = cpustate->IX0; cpustate->IX0 = t; }
+static void exg_ix0_ix2(alpha8201_state *cpustate)  { UINT8 t=cpustate->IX2; cpustate->IX2 = cpustate->IX0; cpustate->IX0 = t; }
 
-static void op_d4(void) { R.A = M_RDMEM( ((regRAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE() ); }
-static void op_d5(void) { M_WRMEM( ((regRAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(), R.A ); }
-static void op_d6(void) { LP0 = M_RDMEM( ((regRAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE() ); }
-static void op_d7(void) { M_WRMEM( ((regRAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(), LP0 ); }
+static void op_d4(alpha8201_state *cpustate) { cpustate->A = M_RDMEM( ((cpustate->RAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(cpustate) ); }
+static void op_d5(alpha8201_state *cpustate) { M_WRMEM( ((cpustate->RAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(cpustate), cpustate->A ); }
+static void op_d6(alpha8201_state *cpustate) { cpustate->LP0 = M_RDMEM( ((cpustate->RAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(cpustate) ); }
+static void op_d7(alpha8201_state *cpustate) { M_WRMEM( ((cpustate->RAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(cpustate), cpustate->LP0 ); }
 
-static void ld_a_abs(void) { R.A = M_RDMEM( ((R.mb & 3) << 8) | M_RDMEM_OPCODE() ); }
-static void ld_abs_a(void) { M_WRMEM( ((R.mb & 3) << 8) | M_RDMEM_OPCODE(), R.A ); }
+static void ld_a_abs(alpha8201_state *cpustate) { cpustate->A = M_RDMEM( ((cpustate->mb & 3) << 8) | M_RDMEM_OPCODE(cpustate) ); }
+static void ld_abs_a(alpha8201_state *cpustate) { M_WRMEM( ((cpustate->mb & 3) << 8) | M_RDMEM_OPCODE(cpustate), cpustate->A ); }
 
-static void ld_a_r(void) { R.A = regRAM[(M_RDMEM_OPCODE()>>1)&0x3f]; }
-static void ld_r_a(void) { regRAM[(M_RDMEM_OPCODE()>>1)&0x3f] = R.A; }
-static void op_rep_ld_ix2_b(void) { do { M_WRMEM(BIX2, regRAM[(R.B>>1)&0x3f]); IX2++; R.B+=2; LP0--; } while (LP0 != 0); }
-static void op_rep_ld_b_ix0(void) { do { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0); IX0++; R.B+=2; LP0--; } while (LP0 != 0); }
-static void ld_rxb_a(void) { regRAM[(R.B>>1)&0x3f] = R.A; }
-static void ld_a_rxb(void) { R.A = regRAM[(R.B>>1)&0x3f]; }
-static void cmp_a_rxb(void) { UINT8 i=regRAM[(R.B>>1)&0x3f];  ZF = (R.A==i); CF = (R.A>=i); }
-static void xor_a_rxb(void) { M_XOR( regRAM[(R.B>>1)&0x3f] ); }
+static void ld_a_r(alpha8201_state *cpustate) { cpustate->A = cpustate->RAM[(M_RDMEM_OPCODE(cpustate)>>1)&0x3f]; }
+static void ld_r_a(alpha8201_state *cpustate) { cpustate->RAM[(M_RDMEM_OPCODE(cpustate)>>1)&0x3f] = cpustate->A; }
+static void op_rep_ld_ix2_b(alpha8201_state *cpustate) { do { M_WRMEM(cpustate->BIX2, cpustate->RAM[(cpustate->B>>1)&0x3f]); cpustate->IX2++; cpustate->B+=2; cpustate->LP0--; } while (cpustate->LP0 != 0); }
+static void op_rep_ld_b_ix0(alpha8201_state *cpustate) { do { cpustate->RAM[(cpustate->B>>1)&0x3f] = M_RDMEM(cpustate->BIX0); cpustate->IX0++; cpustate->B+=2; cpustate->LP0--; } while (cpustate->LP0 != 0); }
+static void ld_rxb_a(alpha8201_state *cpustate) { cpustate->RAM[(cpustate->B>>1)&0x3f] = cpustate->A; }
+static void ld_a_rxb(alpha8201_state *cpustate) { cpustate->A = cpustate->RAM[(cpustate->B>>1)&0x3f]; }
+static void cmp_a_rxb(alpha8201_state *cpustate) { UINT8 i=cpustate->RAM[(cpustate->B>>1)&0x3f];  cpustate->zf = (cpustate->A==i); cpustate->cf = (cpustate->A>=i); }
+static void xor_a_rxb(alpha8201_state *cpustate) { M_XOR(cpustate, cpustate->RAM[(cpustate->B>>1)&0x3f] ); }
 
-static void add_a_cf(void) { if (CF) inc_a(); }
-static void sub_a_cf(void) { if (CF) dec_a(); }
-static void tst_a(void)	 { ZF = (R.A==0); }
-static void clr_a(void)	 { R.A = 0; ZF = (R.A==0); }
-static void cmp_a_n(void)	{ UINT8 i=M_RDMEM_OPCODE();  ZF = (R.A==i); CF = (R.A>=i); }
-static void xor_a_n(void)	{ M_XOR( M_RDMEM_OPCODE() ); }
-static void call(void) { UINT8 i=M_RDMEM_OPCODE(); R.retptr.w.l = PC; M_JMP(i); };
-static void ld_a_ix0_a(void) { R.A = M_RDMEM(BIX0+R.A); }
-static void ret(void) { R.mb = R.retptr.b.h; M_JMP( R.retptr.b.l ); };
-static void save_zc(void) { R.savez = ZF; R.savec = CF; };
-static void rest_zc(void) { ZF = R.savez; CF = R.savec; };
+static void add_a_cf(alpha8201_state *cpustate) { if (cpustate->cf) inc_a(cpustate); }
+static void sub_a_cf(alpha8201_state *cpustate) { if (cpustate->cf) dec_a(cpustate); }
+static void tst_a(alpha8201_state *cpustate)	 { cpustate->zf = (cpustate->A==0); }
+static void clr_a(alpha8201_state *cpustate)	 { cpustate->A = 0; cpustate->zf = (cpustate->A==0); }
+static void cmp_a_n(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate);  cpustate->zf = (cpustate->A==i); cpustate->cf = (cpustate->A>=i); }
+static void xor_a_n(alpha8201_state *cpustate)	{ M_XOR(cpustate, M_RDMEM_OPCODE(cpustate) ); }
+static void call(alpha8201_state *cpustate) { UINT8 i=M_RDMEM_OPCODE(cpustate); cpustate->retptr.w.l = cpustate->PC; M_JMP(cpustate, i); };
+static void ld_a_ix0_a(alpha8201_state *cpustate) { cpustate->A = M_RDMEM(cpustate->BIX0+cpustate->A); }
+static void ret(alpha8201_state *cpustate) { cpustate->mb = cpustate->retptr.b.h; M_JMP(cpustate,  cpustate->retptr.b.l ); };
+static void save_zc(alpha8201_state *cpustate) { cpustate->savez = cpustate->zf; cpustate->savec = cpustate->cf; };
+static void rest_zc(alpha8201_state *cpustate) { cpustate->zf = cpustate->savez; cpustate->cf = cpustate->savec; };
 
 static const s_opcode opcode_8301[256]=
 {
@@ -664,60 +659,63 @@ static const s_opcode opcode_8301[256]=
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
-static CPU_INIT( ALPHA8201 )
+static CPU_INIT( alpha8201 )
 {
-	R.device = device;
-	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	alpha8201_state *cpustate = device->token;
 
-	state_save_register_device_item_array(device, 0, R.RAM);
-	state_save_register_device_item(device, 0, R.PREVPC);
-	state_save_register_device_item(device, 0, PC);
-	state_save_register_device_item(device, 0, regPTR);
-	state_save_register_device_item(device, 0, ZF);
-	state_save_register_device_item(device, 0, CF);
-	state_save_register_device_item(device, 0, R.mb);
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+
+	state_save_register_device_item_array(device, 0, cpustate->RAM);
+	state_save_register_device_item(device, 0, cpustate->PREVPC);
+	state_save_register_device_item(device, 0, cpustate->PC);
+	state_save_register_device_item(device, 0, cpustate->regPtr);
+	state_save_register_device_item(device, 0, cpustate->zf);
+	state_save_register_device_item(device, 0, cpustate->cf);
+	state_save_register_device_item(device, 0, cpustate->mb);
 #if HANDLE_HALT_LINE
-	state_save_register_device_item(device, 0, R.halt);
+	state_save_register_device_item(device, 0, cpustate->halt);
 #endif
-	state_save_register_device_item(device, 0, IX0);
-	state_save_register_device_item(device, 0, IX1);
-	state_save_register_device_item(device, 0, IX2);
-	state_save_register_device_item(device, 0, LP0);
-	state_save_register_device_item(device, 0, LP1);
-	state_save_register_device_item(device, 0, LP2);
-	state_save_register_device_item(device, 0, R.A);
-	state_save_register_device_item(device, 0, R.B);
-	state_save_register_device_item(device, 0, R.retptr);
-	state_save_register_device_item(device, 0, R.savec);
-	state_save_register_device_item(device, 0, R.savez);
+	state_save_register_device_item(device, 0, cpustate->IX0);
+	state_save_register_device_item(device, 0, cpustate->IX1);
+	state_save_register_device_item(device, 0, cpustate->IX2);
+	state_save_register_device_item(device, 0, cpustate->LP0);
+	state_save_register_device_item(device, 0, cpustate->LP1);
+	state_save_register_device_item(device, 0, cpustate->LP2);
+	state_save_register_device_item(device, 0, cpustate->A);
+	state_save_register_device_item(device, 0, cpustate->B);
+	state_save_register_device_item(device, 0, cpustate->retptr);
+	state_save_register_device_item(device, 0, cpustate->savec);
+	state_save_register_device_item(device, 0, cpustate->savez);
 }
 /****************************************************************************
  * Reset registers to their initial values
  ****************************************************************************/
-static CPU_RESET( ALPHA8201 )
+static CPU_RESET( alpha8201 )
 {
-	PC     = 0;
-	regPTR = 0;
-	ZF     = 0;
-	CF     = 0;
-	R.mb   = 0;
-	BIX0   = 0;
-	BIX1   = 0;
-	BIX2   = 0;
-	LP0    = 0;
-	LP1    = 0;
-	LP2    = 0;
-	R.A    = 0;
-	R.B   = 0;
+	alpha8201_state *cpustate = device->token;
+	cpustate->PC     = 0;
+	cpustate->regPtr = 0;
+	cpustate->zf     = 0;
+	cpustate->cf     = 0;
+	cpustate->mb   = 0;
+	cpustate->BIX0   = 0;
+	cpustate->BIX1   = 0;
+	cpustate->BIX2   = 0;
+	cpustate->LP0    = 0;
+	cpustate->LP1    = 0;
+	cpustate->LP2    = 0;
+	cpustate->A    = 0;
+	cpustate->B   = 0;
 #if HANDLE_HALT_LINE
-	R.halt = 0;
+	cpustate->halt = 0;
 #endif
 }
 
 /****************************************************************************
  * Shut down CPU emulation
  ****************************************************************************/
-static CPU_EXIT( ALPHA8201 )
+static CPU_EXIT( alpha8201 )
 {
 	/* nothing to do ? */
 }
@@ -728,86 +726,87 @@ static CPU_EXIT( ALPHA8201 )
 
 static int alpha8xxx_execute(const device_config *device,const s_opcode *op_map,int cycles)
 {
+	alpha8201_state *cpustate = device->token;
 	unsigned opcode;
 	UINT8 pcptr;
 
-	ALPHA8201_ICount = cycles;
+	cpustate->icount = cycles;
 
 #if HANDLE_HALT_LINE
-	if(R.halt)
+	if(cpustate->halt)
 		return cycles;
 #endif
 
 	/* setup address bank & fall safe */
-	R.ix0.b.h =
-	R.ix1.b.h =
-	R.ix2.b.h = (R.pc.b.h &= 3);
+	cpustate->ix0.b.h =
+	cpustate->ix1.b.h =
+	cpustate->ix2.b.h = (cpustate->pc.b.h &= 3);
 
 	/* reset start hack */
-	if(PC<0x20)
-		R.mb |= 0x08;
+	if(cpustate->PC<0x20)
+		cpustate->mb |= 0x08;
 
 	do
 	{
-		if(R.mb & 0x08)
+		if(cpustate->mb & 0x08)
 		{
 			pcptr = M_RDMEM(0x001) & 0x1f; /* pointer of entry point */
-			ALPHA8201_ICount -= C1;
+			cpustate->icount -= C1;
 
 			/* entry point scan phase */
 			if( (pcptr&1) == 0)
 			{
-				/* EVEN , get PC low */
-				R.pc.b.l = M_RDMEM(pcptr);
-//mame_printf_debug("ALPHA8201 load PCL ENTRY=%02X PCL=%02X\n",pcptr, R.pc.b.l);
-				ALPHA8201_ICount -= C1;
+				/* EVEN , get cpustate->PC low */
+				cpustate->pc.b.l = M_RDMEM(pcptr);
+//mame_printf_debug("alpha8201 load PCL ENTRY=%02X PCL=%02X\n",pcptr, cpustate->pc.b.l);
+				cpustate->icount -= C1;
 				M_WRMEM(0x001,pcptr+1);
 				continue;
 			}
 
 			/* ODD , check HALT flag */
-			R.mb   = M_RDMEM(pcptr) & (0x08|0x03);
-			ALPHA8201_ICount -= C1;
+			cpustate->mb   = M_RDMEM(pcptr) & (0x08|0x03);
+			cpustate->icount -= C1;
 
 			/* not entryaddress 000,001 */
-			if(pcptr<2) R.mb |= 0x08;
+			if(pcptr<2) cpustate->mb |= 0x08;
 
-			if(R.mb & 0x08)
+			if(cpustate->mb & 0x08)
 			{
 				/* HALTED current entry point . next one */
 				pcptr = (pcptr+1)&0x1f;
 				M_WRMEM(0x001,pcptr);
-				ALPHA8201_ICount -= C1;
+				cpustate->icount -= C1;
 				continue;
 			}
 
 			/* goto run phase */
-			M_JMP(R.pc.b.l);
+			M_JMP(cpustate, cpustate->pc.b.l);
 
 #if SHOW_ENTRY_POINT
-logerror("ALPHA8201 START ENTRY=%02X PC=%03X\n",pcptr,PC);
-mame_printf_debug("ALPHA8201 START ENTRY=%02X PC=%03X\n",pcptr,PC);
+logerror("alpha8201 START ENTRY=%02X cpustate->PC=%03X\n",pcptr,cpustate->PC);
+mame_printf_debug("alpha8201 START ENTRY=%02X cpustate->PC=%03X\n",pcptr,cpustate->PC);
 #endif
 		}
 
 		/* run */
-		R.PREVPC = PC;
-		debugger_instruction_hook(device, PC);
-		opcode =M_RDOP(PC);
+		cpustate->PREVPC = cpustate->PC;
+		debugger_instruction_hook(device, cpustate->PC);
+		opcode =M_RDOP(cpustate->PC);
 #if TRACE_PC
-mame_printf_debug("ALPHA8201:  PC = %03x,  opcode = %02x\n", PC, opcode);
+mame_printf_debug("alpha8201:  cpustate->PC = %03x,  opcode = %02x\n", cpustate->PC, opcode);
 #endif
-		PCL++;
-		inst_cycles = op_map[opcode].cycles;
-		(*(op_map[opcode].function))();
-		ALPHA8201_ICount -= inst_cycles;
-	} while (ALPHA8201_ICount>0);
+		cpustate->PCL++;
+		cpustate->inst_cycles = op_map[opcode].cycles;
+		(*(op_map[opcode].function))(cpustate);
+		cpustate->icount -= cpustate->inst_cycles;
+	} while (cpustate->icount>0);
 
-	return cycles - ALPHA8201_ICount;
+	return cycles - cpustate->icount;
 }
 
 #if (HAS_ALPHA8201)
-static CPU_EXECUTE( ALPHA8201 ) { return alpha8xxx_execute(device,opcode_8201,cycles); }
+static CPU_EXECUTE( alpha8201 ) { return alpha8xxx_execute(device,opcode_8201,cycles); }
 #endif
 
 #if (HAS_ALPHA8301)
@@ -815,33 +814,15 @@ static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(device,opcode_8301,cy
 #endif
 
 /****************************************************************************
- * Get all registers in given buffer
- ****************************************************************************/
-static CPU_GET_CONTEXT( ALPHA8201 )
-{
-	if( dst )
-		*(ALPHA8201_Regs*)dst = R;
-}
-
-/****************************************************************************
- * Set all registers to given values
- ****************************************************************************/
-static CPU_SET_CONTEXT( ALPHA8201 )
-{
-	if( src )
-		R = *(ALPHA8201_Regs*)src;
-}
-
-/****************************************************************************
  * Set IRQ line state
  ****************************************************************************/
 #if HANDLE_HALT_LINE
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(alpha8201_state *cpustate, int irqline, int state)
 {
 	if(irqline == INPUT_LINE_HALT)
 	{
-		R.halt = (state==ASSERT_LINE) ? 1 : 0;
-/* mame_printf_debug("ALPHA8201 HALT %d\n",R.halt); */
+		cpustate->halt = (state==ASSERT_LINE) ? 1 : 0;
+/* mame_printf_debug("alpha8201 HALT %d\n",cpustate->halt); */
 	}
 }
 #endif
@@ -850,31 +831,32 @@ static void set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static CPU_SET_INFO( ALPHA8201 )
+static CPU_SET_INFO( alpha8201 )
 {
+	alpha8201_state *cpustate = device->token;
 	switch (state)
 	{
 #if HANDLE_HALT_LINE
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_HALT:	set_irq_line(INPUT_LINE_HALT, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_HALT:	set_irq_line(cpustate, INPUT_LINE_HALT, info->i);	break;
 #endif
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ALPHA8201_PC:			PC = info->i;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_PC:			cpustate->PC = info->i;						break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + ALPHA8201_SP:			M_WRMEM(0x001,info->i);				break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_RB:			regPTR = info->i & 7;				break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_MB:			R.mb = info->i & 0x03;				break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_RB:			cpustate->regPtr = info->i & 7;				break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_MB:			cpustate->mb = info->i & 0x03;				break;
 #if 0
-		case CPUINFO_INT_REGISTER + ALPHA8201_ZF:			ZF= info->i & 0x01;				break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_CF:			CF= info->i & 0x01;				break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_ZF:			cpustate->zf= info->i & 0x01;				break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_CF:			cpustate->cf= info->i & 0x01;				break;
 #endif
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX0:			IX0 = info->i;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX1:			IX1 = info->i;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX2:			IX2 = info->i;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP0:			LP0 = info->i;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP1:			LP1 = info->i;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP2:			LP2 = info->i;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_A:			R.A = info->i;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_B:			R.B = info->i;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_IX0:			cpustate->IX0 = info->i;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_IX1:			cpustate->IX1 = info->i;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_IX2:			cpustate->IX2 = info->i;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_LP0:			cpustate->LP0 = info->i;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_LP1:			cpustate->LP1 = info->i;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_LP2:			cpustate->LP2 = info->i;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_A:			cpustate->A = info->i;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_B:			cpustate->B = info->i;						break;
 		case CPUINFO_INT_REGISTER + ALPHA8201_R0:			WR_REG(0,info->i);					break;
 		case CPUINFO_INT_REGISTER + ALPHA8201_R1:			WR_REG(1,info->i);					break;
 		case CPUINFO_INT_REGISTER + ALPHA8201_R2:			WR_REG(2,info->i);					break;
@@ -895,10 +877,11 @@ static CPU_SET_INFO( ALPHA8201 )
 /* 8201 and 8301 */
 static CPU_GET_INFO( alpha8xxx )
 {
+	alpha8201_state *cpustate = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(R);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(alpha8201_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
@@ -919,25 +902,25 @@ static CPU_GET_INFO( alpha8xxx )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 6;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 #if HANDLE_HALT_LINE
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_HALT:		info->i = R.halt ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_HALT:		info->i = cpustate->halt ? ASSERT_LINE : CLEAR_LINE; break;
 #endif
-		case CPUINFO_INT_PREVIOUSPC:						info->i = R.PREVPC;					break;
+		case CPUINFO_INT_PREVIOUSPC:						info->i = cpustate->PREVPC;					break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ALPHA8201_PC:			info->i = PC & 0x3ff;				break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_PC:			info->i = cpustate->PC & 0x3ff;				break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + ALPHA8201_SP:			info->i = M_RDMEM(0x001);			break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_RB:			info->i = regPTR;					break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_MB:			info->i = R.mb;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_ZF:			info->i = ZF;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_CF:			info->i = CF;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX0:			info->i = IX0;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX1:			info->i = IX1;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_IX2:			info->i = IX2;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP0:			info->i = LP0;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP1:			info->i = LP1;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_LP2:			info->i = LP2;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_A:			info->i = R.A;						break;
-		case CPUINFO_INT_REGISTER + ALPHA8201_B:			info->i = R.B;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_RB:			info->i = cpustate->regPtr;					break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_MB:			info->i = cpustate->mb;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_ZF:			info->i = cpustate->zf;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_CF:			info->i = cpustate->cf;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_IX0:			info->i = cpustate->IX0;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_IX1:			info->i = cpustate->IX1;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_IX2:			info->i = cpustate->IX2;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_LP0:			info->i = cpustate->LP0;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_LP1:			info->i = cpustate->LP1;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_LP2:			info->i = cpustate->LP2;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_A:			info->i = cpustate->A;						break;
+		case CPUINFO_INT_REGISTER + ALPHA8201_B:			info->i = cpustate->B;						break;
 		case CPUINFO_INT_REGISTER + ALPHA8201_R0:			info->i = RD_REG(0);				break;
 		case CPUINFO_INT_REGISTER + ALPHA8201_R1:			info->i = RD_REG(1);				break;
 		case CPUINFO_INT_REGISTER + ALPHA8201_R2:			info->i = RD_REG(2);				break;
@@ -948,38 +931,38 @@ static CPU_GET_INFO( alpha8xxx )
 		case CPUINFO_INT_REGISTER + ALPHA8201_R7:			info->i = RD_REG(7);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ALPHA8201);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(ALPHA8201); break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(ALPHA8201); break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ALPHA8201);			break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ALPHA8201);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ALPHA8201);			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(alpha8201);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy); break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy); break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(alpha8201);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(alpha8201);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(alpha8201);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ALPHA8201);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ALPHA8201_ICount;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(alpha8201);		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "AlphaDenshi MCU");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.1");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Tatsuyuki Satoh"); break;
-		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c", CF?'C':'.',ZF?'Z':'.'); break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_PC:		sprintf(info->s, "PC:%03X", PC);		break;
+		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c", cpustate->cf?'C':'.',cpustate->zf?'Z':'.'); break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_PC:		sprintf(info->s, "cpustate->PC:%03X", cpustate->PC);		break;
 		case CPUINFO_STR_REGISTER + ALPHA8201_SP:		sprintf(info->s, "SP:%02X", M_RDMEM(0x001) ); break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_RB:		sprintf(info->s, "RB:%X", regPTR);		break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_MB:		sprintf(info->s, "MB:%X", R.mb);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_RB:		sprintf(info->s, "RB:%X", cpustate->regPtr);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_MB:		sprintf(info->s, "MB:%X", cpustate->mb);		break;
 #if 0
-		case CPUINFO_STR_REGISTER + ALPHA8201_ZF:		sprintf(info->s, "ZF:%X", ZF);		break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_CF:		sprintf(info->s, "CF:%X", CF);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_ZF:		sprintf(info->s, "cpustate->zf:%X", cpustate->zf);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_CF:		sprintf(info->s, "cpustate->cf:%X", cpustate->cf);		break;
 #endif
-		case CPUINFO_STR_REGISTER + ALPHA8201_IX0:		sprintf(info->s, "IX0:%02X", IX0);		break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_IX1:		sprintf(info->s, "IX1:%02X", IX1);		break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_IX2:		sprintf(info->s, "IX2:%02X", IX2);		break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_LP0:		sprintf(info->s, "LP0:%02X", LP0);		break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_LP1:		sprintf(info->s, "LP1:%02X", LP1);		break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_LP2:		sprintf(info->s, "LP2:%02X", LP2);		break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_A:		sprintf(info->s, "A:%02X", R.A);		break;
-		case CPUINFO_STR_REGISTER + ALPHA8201_B:		sprintf(info->s, "B:%02X", R.B);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_IX0:		sprintf(info->s, "cpustate->IX0:%02X", cpustate->IX0);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_IX1:		sprintf(info->s, "cpustate->IX1:%02X", cpustate->IX1);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_IX2:		sprintf(info->s, "cpustate->IX2:%02X", cpustate->IX2);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_LP0:		sprintf(info->s, "cpustate->LP0:%02X", cpustate->LP0);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_LP1:		sprintf(info->s, "cpustate->LP1:%02X", cpustate->LP1);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_LP2:		sprintf(info->s, "cpustate->LP2:%02X", cpustate->LP2);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_A:		sprintf(info->s, "A:%02X", cpustate->A);		break;
+		case CPUINFO_STR_REGISTER + ALPHA8201_B:		sprintf(info->s, "B:%02X", cpustate->B);		break;
 		case CPUINFO_STR_REGISTER + ALPHA8201_R0:		sprintf(info->s, "R0:%02X", RD_REG(0));		break;
 		case CPUINFO_STR_REGISTER + ALPHA8201_R1:		sprintf(info->s, "R1:%02X", RD_REG(1));		break;
 		case CPUINFO_STR_REGISTER + ALPHA8201_R2:		sprintf(info->s, "R2:%02X", RD_REG(2));		break;
@@ -996,7 +979,7 @@ CPU_GET_INFO( alpha8201 )
 	switch (state)
 	{
 	case CPUINFO_STR_NAME:							strcpy(info->s, "ALPHA-8201");				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ALPHA8201);			break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(alpha8201);			break;
 	default:
 		/* 8201 / 8301 */
 		CPU_GET_INFO_CALL(alpha8xxx);
