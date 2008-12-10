@@ -26,385 +26,385 @@
  *
  *****************************************************************************/
 
-INLINE UINT8 READ_OP(void)
+INLINE UINT8 READ_OP(sc61860_state *cpustate)
 {
-	return memory_decrypted_read_byte(sc61860.program, sc61860.pc++);
+	return memory_decrypted_read_byte(cpustate->program, cpustate->pc++);
 }
 
-INLINE UINT8 READ_OP_ARG(void)
+INLINE UINT8 READ_OP_ARG(sc61860_state *cpustate)
 {
-	return memory_raw_read_byte(sc61860.program, sc61860.pc++);
+	return memory_raw_read_byte(cpustate->program, cpustate->pc++);
 }
 
-INLINE UINT16 READ_OP_ARG_WORD(void)
+INLINE UINT16 READ_OP_ARG_WORD(sc61860_state *cpustate)
 {
-	UINT16 t=memory_decrypted_read_byte(sc61860.program, sc61860.pc++)<<8;
-	t|=memory_decrypted_read_byte(sc61860.program, sc61860.pc++);
+	UINT16 t=memory_decrypted_read_byte(cpustate->program, cpustate->pc++)<<8;
+	t|=memory_decrypted_read_byte(cpustate->program, cpustate->pc++);
 	return t;
 }
 
-INLINE UINT8 READ_BYTE(UINT16 adr)
+INLINE UINT8 READ_BYTE(sc61860_state *cpustate, UINT16 adr)
 {
-	return memory_read_byte(sc61860.program, adr);
+	return memory_read_byte(cpustate->program, adr);
 }
 
-INLINE void WRITE_BYTE(UINT16 a,UINT8 v)
+INLINE void WRITE_BYTE(sc61860_state *cpustate, UINT16 a,UINT8 v)
 {
-	memory_write_byte(sc61860.program, a,v);
+	memory_write_byte(cpustate->program, a,v);
 }
 
-#define PUSH(v) sc61860.ram[--sc61860.r]=v
-#define POP() sc61860.ram[sc61860.r++]
+#define PUSH(v) cpustate->ram[--cpustate->r]=v
+#define POP(cpustate) cpustate->ram[cpustate->r++]
 
-INLINE void sc61860_load_imm(int r, UINT8 v)
+INLINE void sc61860_load_imm(sc61860_state *cpustate, int r, UINT8 v)
 {
-	sc61860.ram[r]=v;
+	cpustate->ram[r]=v;
 }
 
-INLINE void sc61860_load(void)
+INLINE void sc61860_load(sc61860_state *cpustate)
 {
-	sc61860.ram[A]=sc61860.ram[sc61860.p];
+	cpustate->ram[A]=cpustate->ram[cpustate->p];
 }
 
-INLINE void sc61860_load_imm_p(UINT8 v)
+INLINE void sc61860_load_imm_p(sc61860_state *cpustate, UINT8 v)
 {
-	sc61860.p=v&0x7f;
+	cpustate->p=v&0x7f;
 }
 
-INLINE void sc61860_load_imm_q(UINT8 v)
+INLINE void sc61860_load_imm_q(sc61860_state *cpustate, UINT8 v)
 {
-	sc61860.q=v&0x7f;
+	cpustate->q=v&0x7f;
 }
 
-INLINE void sc61860_load_r(void)
+INLINE void sc61860_load_r(sc61860_state *cpustate)
 {
-	sc61860.r=sc61860.ram[A]&0x7f;
+	cpustate->r=cpustate->ram[A]&0x7f;
 }
 
-INLINE void sc61860_load_ext(int r)
+INLINE void sc61860_load_ext(sc61860_state *cpustate, int r)
 {
-	sc61860.ram[r]=READ_BYTE(sc61860.dp);
+	cpustate->ram[r]=READ_BYTE(cpustate, cpustate->dp);
 }
 
-INLINE void sc61860_load_dp(void)
+INLINE void sc61860_load_dp(sc61860_state *cpustate)
 {
-	sc61860.dp=READ_OP_ARG_WORD();
+	cpustate->dp=READ_OP_ARG_WORD(cpustate);
 }
 
-INLINE void sc61860_load_dl(void)
+INLINE void sc61860_load_dl(sc61860_state *cpustate)
 {
-	sc61860.dp=(sc61860.dp&~0xff)|READ_OP_ARG();
+	cpustate->dp=(cpustate->dp&~0xff)|READ_OP_ARG(cpustate);
 }
 
-INLINE void sc61860_store_p(void)
+INLINE void sc61860_store_p(sc61860_state *cpustate)
 {
-	sc61860.ram[A]=sc61860.p;
+	cpustate->ram[A]=cpustate->p;
 }
 
-INLINE void sc61860_store_q(void)
+INLINE void sc61860_store_q(sc61860_state *cpustate)
 {
-	sc61860.ram[A]=sc61860.q;
+	cpustate->ram[A]=cpustate->q;
 }
 
-INLINE void sc61860_store_r(void)
+INLINE void sc61860_store_r(sc61860_state *cpustate)
 {
-	sc61860.ram[A]=sc61860.r;
+	cpustate->ram[A]=cpustate->r;
 }
 
-INLINE void sc61860_store_ext(int r)
+INLINE void sc61860_store_ext(sc61860_state *cpustate, int r)
 {
-	WRITE_BYTE(sc61860.dp, sc61860.ram[r]);
+	WRITE_BYTE(cpustate, cpustate->dp, cpustate->ram[r]);
 }
 
-INLINE void sc61860_exam(int a, int b)
+INLINE void sc61860_exam(sc61860_state *cpustate, int a, int b)
 {
-	UINT8 t=sc61860.ram[a];
-	sc61860.ram[a]=sc61860.ram[b];
-	sc61860.ram[b]=t;
+	UINT8 t=cpustate->ram[a];
+	cpustate->ram[a]=cpustate->ram[b];
+	cpustate->ram[b]=t;
 }
 
-INLINE void sc61860_test(int reg, UINT8 value)
+INLINE void sc61860_test(sc61860_state *cpustate, int reg, UINT8 value)
 {
-	sc61860.zero=(sc61860.ram[reg]&value)==0;
+	cpustate->zero=(cpustate->ram[reg]&value)==0;
 }
 
-INLINE void sc61860_test_ext(void)
+INLINE void sc61860_test_ext(sc61860_state *cpustate)
 {
-	sc61860.zero=(READ_BYTE(sc61860.dp)&READ_OP_ARG())==0;
+	cpustate->zero=(READ_BYTE(cpustate, cpustate->dp)&READ_OP_ARG(cpustate))==0;
 }
 
-INLINE void sc61860_and(int reg, UINT8 value)
+INLINE void sc61860_and(sc61860_state *cpustate, int reg, UINT8 value)
 {
-	sc61860.zero=(sc61860.ram[reg]&=value)==0;
+	cpustate->zero=(cpustate->ram[reg]&=value)==0;
 }
 
-INLINE void sc61860_and_ext(void)
+INLINE void sc61860_and_ext(sc61860_state *cpustate)
 {
-	UINT8 t=READ_BYTE(sc61860.dp)&READ_OP_ARG();
-	sc61860.zero=t==0;
-    WRITE_BYTE(sc61860.dp,t);
+	UINT8 t=READ_BYTE(cpustate, cpustate->dp)&READ_OP_ARG(cpustate);
+	cpustate->zero=t==0;
+    WRITE_BYTE(cpustate, cpustate->dp,t);
 }
 
-INLINE void sc61860_or(int reg, UINT8 value)
+INLINE void sc61860_or(sc61860_state *cpustate, int reg, UINT8 value)
 {
-	sc61860.zero=(sc61860.ram[reg]|=value)==0;
+	cpustate->zero=(cpustate->ram[reg]|=value)==0;
 }
 
-INLINE void sc61860_or_ext(void)
+INLINE void sc61860_or_ext(sc61860_state *cpustate)
 {
-	UINT8 t=READ_BYTE(sc61860.dp)|READ_OP_ARG();
-	sc61860.zero=t==0;
-    WRITE_BYTE(sc61860.dp,t);
+	UINT8 t=READ_BYTE(cpustate, cpustate->dp)|READ_OP_ARG(cpustate);
+	cpustate->zero=t==0;
+    WRITE_BYTE(cpustate, cpustate->dp,t);
 }
 
-INLINE void sc61860_rotate_right(void)
+INLINE void sc61860_rotate_right(sc61860_state *cpustate)
 {
-	int t=sc61860.ram[A];
-	if (sc61860.carry) t|=0x100;
-	sc61860.carry=t&1;
-	sc61860.ram[A]=t>>1;
+	int t=cpustate->ram[A];
+	if (cpustate->carry) t|=0x100;
+	cpustate->carry=t&1;
+	cpustate->ram[A]=t>>1;
 }
 
-INLINE void sc61860_rotate_left(void)
+INLINE void sc61860_rotate_left(sc61860_state *cpustate)
 {
-	int t=sc61860.ram[A]<<1;
-	if (sc61860.carry) t|=1;
-	sc61860.carry=t&0x100;
-	sc61860.ram[A]=t;
+	int t=cpustate->ram[A]<<1;
+	if (cpustate->carry) t|=1;
+	cpustate->carry=t&0x100;
+	cpustate->ram[A]=t;
 }
 
-INLINE void sc61860_swap(void)
+INLINE void sc61860_swap(sc61860_state *cpustate)
 {
-	int t=sc61860.ram[A];
-	sc61860.ram[A]=(t<<4)|((t>>4)&0xf);
-}
-
-// q=reg sideeffect
-INLINE void sc61860_inc(int reg)
-{
-	sc61860.q=reg;
-	sc61860.ram[reg]++;
-	sc61860.zero=sc61860.carry=sc61860.ram[reg]==0;
-}
-
-INLINE void sc61860_inc_p(void)
-{
-	sc61860.p++;
+	int t=cpustate->ram[A];
+	cpustate->ram[A]=(t<<4)|((t>>4)&0xf);
 }
 
 // q=reg sideeffect
-INLINE void sc61860_dec(int reg)
+INLINE void sc61860_inc(sc61860_state *cpustate, int reg)
 {
-	sc61860.q=reg;
-	sc61860.ram[reg]--;
-	sc61860.zero=sc61860.ram[reg]==0;
-	sc61860.carry=sc61860.ram[reg]==0xff;
+	cpustate->q=reg;
+	cpustate->ram[reg]++;
+	cpustate->zero=cpustate->carry=cpustate->ram[reg]==0;
 }
 
-INLINE void sc61860_dec_p(void)
+INLINE void sc61860_inc_p(sc61860_state *cpustate)
 {
-	sc61860.p--;
+	cpustate->p++;
 }
 
-INLINE void sc61860_add(int reg, UINT8 value)
+// q=reg sideeffect
+INLINE void sc61860_dec(sc61860_state *cpustate, int reg)
 {
-	int t=sc61860.ram[reg]+value;
-	sc61860.zero=(sc61860.ram[reg]=t)==0;
-	sc61860.carry=t>=0x100;
+	cpustate->q=reg;
+	cpustate->ram[reg]--;
+	cpustate->zero=cpustate->ram[reg]==0;
+	cpustate->carry=cpustate->ram[reg]==0xff;
 }
 
-INLINE void sc61860_add_carry(void)
+INLINE void sc61860_dec_p(sc61860_state *cpustate)
 {
-	int t=sc61860.ram[sc61860.p]+sc61860.ram[A];
-	if (sc61860.carry) t++;
-	sc61860.zero=(sc61860.ram[sc61860.p]=t)==0;
-	sc61860.carry=t>=0x100;
+	cpustate->p--;
+}
+
+INLINE void sc61860_add(sc61860_state *cpustate, int reg, UINT8 value)
+{
+	int t=cpustate->ram[reg]+value;
+	cpustate->zero=(cpustate->ram[reg]=t)==0;
+	cpustate->carry=t>=0x100;
+}
+
+INLINE void sc61860_add_carry(sc61860_state *cpustate)
+{
+	int t=cpustate->ram[cpustate->p]+cpustate->ram[A];
+	if (cpustate->carry) t++;
+	cpustate->zero=(cpustate->ram[cpustate->p]=t)==0;
+	cpustate->carry=t>=0x100;
 }
 
 // p++ sideeffect
-INLINE void sc61860_add_word(void)
+INLINE void sc61860_add_word(sc61860_state *cpustate)
 {
-	int t=sc61860.ram[sc61860.p]+sc61860.ram[A],t2;
-	sc61860.ram[sc61860.p]=t;
-	sc61860.p++;
-	t2=sc61860.ram[sc61860.p]+sc61860.ram[B];
+	int t=cpustate->ram[cpustate->p]+cpustate->ram[A],t2;
+	cpustate->ram[cpustate->p]=t;
+	cpustate->p++;
+	t2=cpustate->ram[cpustate->p]+cpustate->ram[B];
 	if (t>=0x100) t2++;
-	sc61860.ram[sc61860.p]=t2;
-	sc61860.zero=(t2&0xff)==0 &&(t&0xff)==0;
-	sc61860.carry=t2>=0x100;
+	cpustate->ram[cpustate->p]=t2;
+	cpustate->zero=(t2&0xff)==0 &&(t&0xff)==0;
+	cpustate->carry=t2>=0x100;
 }
 
 
-INLINE void sc61860_sub(int reg, UINT8 value)
+INLINE void sc61860_sub(sc61860_state *cpustate, int reg, UINT8 value)
 {
-	int t=sc61860.ram[reg]-value;
-	sc61860.zero=(sc61860.ram[reg]=t)==0;
-	sc61860.carry=t<0;
+	int t=cpustate->ram[reg]-value;
+	cpustate->zero=(cpustate->ram[reg]=t)==0;
+	cpustate->carry=t<0;
 }
 
-INLINE void sc61860_sub_carry(void)
+INLINE void sc61860_sub_carry(sc61860_state *cpustate)
 {
-	int t=sc61860.ram[sc61860.p]-sc61860.ram[A];
-	if (sc61860.carry) t--;
-	sc61860.zero=(sc61860.ram[sc61860.p]=t)==0;
-	sc61860.carry=t<0;
+	int t=cpustate->ram[cpustate->p]-cpustate->ram[A];
+	if (cpustate->carry) t--;
+	cpustate->zero=(cpustate->ram[cpustate->p]=t)==0;
+	cpustate->carry=t<0;
 }
 
 
 // p++ sideeffect
-INLINE void sc61860_sub_word(void)
+INLINE void sc61860_sub_word(sc61860_state *cpustate)
 {
-	int t=sc61860.ram[sc61860.p]-sc61860.ram[A],t2;
-	sc61860.ram[sc61860.p]=t;
-	sc61860.p++;
-	t2=sc61860.ram[sc61860.p]-sc61860.ram[B];
+	int t=cpustate->ram[cpustate->p]-cpustate->ram[A],t2;
+	cpustate->ram[cpustate->p]=t;
+	cpustate->p++;
+	t2=cpustate->ram[cpustate->p]-cpustate->ram[B];
 	if (t<0) t2--;
-	sc61860.ram[sc61860.p]=t2;
-	sc61860.zero=(t2&0xff)==0 && (t&0xff)==0;
-	sc61860.carry=t2<0;
+	cpustate->ram[cpustate->p]=t2;
+	cpustate->zero=(t2&0xff)==0 && (t&0xff)==0;
+	cpustate->carry=t2<0;
 }
 
-INLINE void sc61860_cmp(int reg, UINT8 value)
+INLINE void sc61860_cmp(sc61860_state *cpustate, int reg, UINT8 value)
 {
-	int t=sc61860.ram[reg]-value;
-	sc61860.zero=t==0;
-	sc61860.carry=t<0;
+	int t=cpustate->ram[reg]-value;
+	cpustate->zero=t==0;
+	cpustate->carry=t<0;
 }
 
-INLINE void sc61860_pop(void)
+INLINE void sc61860_pop(sc61860_state *cpustate)
 {
-	sc61860.ram[A]=POP();
+	cpustate->ram[A]=POP(cpustate);
 }
 
-INLINE void sc61860_push(void)
+INLINE void sc61860_push(sc61860_state *cpustate)
 {
-	PUSH(sc61860.ram[A]);
+	PUSH(cpustate->ram[A]);
 }
 
-INLINE void sc61860_prepare_table_call(void)
+INLINE void sc61860_prepare_table_call(sc61860_state *cpustate)
 {
 	int adr;
-	sc61860.h=READ_OP();
-	adr=READ_OP_ARG_WORD();
+	cpustate->h=READ_OP(cpustate);
+	adr=READ_OP_ARG_WORD(cpustate);
 	PUSH(adr>>8);
 	PUSH(adr&0xff);
 }
 
-INLINE void sc61860_execute_table_call(void)
+INLINE void sc61860_execute_table_call(sc61860_state *cpustate)
 {
 	int i, v, adr;
-	for (i=0; i<sc61860.h; i++) {
-		v=READ_OP();
-		adr=READ_OP_ARG_WORD();
-		sc61860.zero=v==sc61860.ram[A];
-		if (sc61860.zero) {
-			sc61860.pc=adr;
+	for (i=0; i<cpustate->h; i++) {
+		v=READ_OP(cpustate);
+		adr=READ_OP_ARG_WORD(cpustate);
+		cpustate->zero=v==cpustate->ram[A];
+		if (cpustate->zero) {
+			cpustate->pc=adr;
 			return;
 		}
 	}
-	sc61860.pc=READ_OP_ARG_WORD();
+	cpustate->pc=READ_OP_ARG_WORD(cpustate);
 }
 
 
-INLINE void sc61860_call(UINT16 adr)
+INLINE void sc61860_call(sc61860_state *cpustate, UINT16 adr)
 {
-	PUSH(sc61860.pc>>8);
-	PUSH(sc61860.pc&0xff);
-	sc61860.pc=adr;
+	PUSH(cpustate->pc>>8);
+	PUSH(cpustate->pc&0xff);
+	cpustate->pc=adr;
 }
 
-INLINE void sc61860_return(void)
+INLINE void sc61860_return(sc61860_state *cpustate)
 {
-	UINT16 t=POP();
-	t|=POP()<<8;
-	sc61860.pc=t;
+	UINT16 t=POP(cpustate);
+	t|=POP(cpustate)<<8;
+	cpustate->pc=t;
 }
 
-INLINE void sc61860_jump(int yes)
+INLINE void sc61860_jump(sc61860_state *cpustate, int yes)
 {
-	UINT16 adr=READ_OP_ARG_WORD();
+	UINT16 adr=READ_OP_ARG_WORD(cpustate);
 	if (yes) {
-		sc61860.pc=adr;
+		cpustate->pc=adr;
 	}
 }
 
-INLINE void sc61860_jump_rel_plus(int yes)
+INLINE void sc61860_jump_rel_plus(sc61860_state *cpustate, int yes)
 {
-	UINT16 adr=sc61860.pc;
-	adr+=READ_OP_ARG();
+	UINT16 adr=cpustate->pc;
+	adr+=READ_OP_ARG(cpustate);
 	if (yes) {
-		sc61860.pc=adr;
-		sc61860_ICount-=3;
+		cpustate->pc=adr;
+		cpustate->icount-=3;
 	}
 }
 
-INLINE void sc61860_jump_rel_minus(int yes)
+INLINE void sc61860_jump_rel_minus(sc61860_state *cpustate, int yes)
 {
-	UINT16 adr=sc61860.pc;
-	adr-=READ_OP_ARG();
+	UINT16 adr=cpustate->pc;
+	adr-=READ_OP_ARG(cpustate);
 	if (yes) {
-		sc61860.pc=adr;
-		sc61860_ICount-=3;
+		cpustate->pc=adr;
+		cpustate->icount-=3;
 	}
 }
 
-INLINE void sc61860_loop(void)
+INLINE void sc61860_loop(sc61860_state *cpustate)
 {
-	UINT16 adr=sc61860.pc;
-	adr-=READ_OP_ARG();
-	sc61860.ram[sc61860.r]--;
-	sc61860.zero=sc61860.ram[sc61860.r]==0;
-	sc61860.carry=sc61860.ram[sc61860.r]==0xff;
-	if (!sc61860.carry) {
-		sc61860.pc=adr;
-		adr=POP();
-		sc61860_ICount-=3;
+	UINT16 adr=cpustate->pc;
+	adr-=READ_OP_ARG(cpustate);
+	cpustate->ram[cpustate->r]--;
+	cpustate->zero=cpustate->ram[cpustate->r]==0;
+	cpustate->carry=cpustate->ram[cpustate->r]==0xff;
+	if (!cpustate->carry) {
+		cpustate->pc=adr;
+		adr=POP(cpustate);
+		cpustate->icount-=3;
 	}
 }
 
-INLINE void sc61860_leave(void)
+INLINE void sc61860_leave(sc61860_state *cpustate)
 {
-	sc61860.ram[sc61860.r]=0;
+	cpustate->ram[cpustate->r]=0;
 }
 
-INLINE void sc61860_wait(void)
+INLINE void sc61860_wait(sc61860_state *cpustate)
 {
-	int t=READ_OP();
-	sc61860_ICount-=t;
-	sc61860_ICount-=t;
-	sc61860_ICount-=3;
+	int t=READ_OP(cpustate);
+	cpustate->icount-=t;
+	cpustate->icount-=t;
+	cpustate->icount-=3;
 }
 
-INLINE void sc61860_set_carry(void)
+INLINE void sc61860_set_carry(sc61860_state *cpustate)
 {
-	sc61860.carry=1;
-	sc61860.zero=1;
+	cpustate->carry=1;
+	cpustate->zero=1;
 }
 
-INLINE void sc61860_reset_carry(void)
+INLINE void sc61860_reset_carry(sc61860_state *cpustate)
 {
-	sc61860.carry=0;
-	sc61860.zero=1;
+	cpustate->carry=0;
+	cpustate->zero=1;
 }
 
-INLINE void sc61860_out_a(void)
+INLINE void sc61860_out_a(sc61860_state *cpustate)
 {
-	sc61860.q=IA;
-	if (sc61860.config&&sc61860.config->outa)
-	    sc61860.config->outa(sc61860.ram[IA]);
+	cpustate->q=IA;
+	if (cpustate->config&&cpustate->config->outa)
+	    cpustate->config->outa(cpustate->device, cpustate->ram[IA]);
 }
 
-INLINE void sc61860_out_b(void)
+INLINE void sc61860_out_b(sc61860_state *cpustate)
 {
-	sc61860.q=IB;
-	if (sc61860.config&&sc61860.config->outb)
-	    sc61860.config->outb(sc61860.ram[IB]);
+	cpustate->q=IB;
+	if (cpustate->config&&cpustate->config->outb)
+	    cpustate->config->outb(cpustate->device, cpustate->ram[IB]);
 }
 
-INLINE void sc61860_out_f(void)
+INLINE void sc61860_out_f(sc61860_state *cpustate)
 {
-	sc61860.q=F0;
-	/*sc61860.ram[F0]; */
+	cpustate->q=F0;
+	/*cpustate->ram[F0]; */
 }
 
 
@@ -415,28 +415,28 @@ INLINE void sc61860_out_f(void)
    c4 beeper frequency (1 4khz, 0 2khz), or (c5=0) membran pos1/pos2
    c5 beeper on
    c6 beeper steuerung*/
-INLINE void sc61860_out_c(void)
+INLINE void sc61860_out_c(sc61860_state *cpustate)
 {
-    sc61860.q=C;
-    if (sc61860.config&&sc61860.config->outc)
-	sc61860.config->outc(sc61860.ram[C]);
-    sc61860.c=sc61860.ram[C];
+    cpustate->q=C;
+    if (cpustate->config&&cpustate->config->outc)
+	cpustate->config->outc(cpustate->device, cpustate->ram[C]);
+    cpustate->c=cpustate->ram[C];
 }
 
-INLINE void sc61860_in_a(void)
+INLINE void sc61860_in_a(sc61860_state *cpustate)
 {
 	int data=0;
-	if (sc61860.config&&sc61860.config->ina) data=sc61860.config->ina();
-	sc61860.ram[A]=data;
-	sc61860.zero=data==0;
+	if (cpustate->config&&cpustate->config->ina) data=cpustate->config->ina(cpustate->device);
+	cpustate->ram[A]=data;
+	cpustate->zero=data==0;
 }
 
-INLINE void sc61860_in_b(void)
+INLINE void sc61860_in_b(sc61860_state *cpustate)
 {
 	int data=0;
-	if (sc61860.config&&sc61860.config->inb) data=sc61860.config->inb();
-	sc61860.ram[A]=data;
-	sc61860.zero=data==0;
+	if (cpustate->config&&cpustate->config->inb) data=cpustate->config->inb(cpustate->device);
+	cpustate->ram[A]=data;
+	cpustate->zero=data==0;
 }
 
 /* 0 systemclock 512ms
@@ -447,16 +447,16 @@ INLINE void sc61860_in_b(void)
    5 ?
    6 reset
    7 cassette input */
-INLINE void sc61860_test_special(void)
+INLINE void sc61860_test_special(sc61860_state *cpustate)
 {
 	int t=0;
-	if (sc61860.timer.t512ms) t|=1;
-	if (sc61860.timer.t2ms) t|=2;
-	if (sc61860.config&&sc61860.config->brk&&sc61860.config->brk()) t|=8;
-	if (sc61860.config&&sc61860.config->reset&&sc61860.config->reset()) t|=0x40;
-	if (sc61860.config&&sc61860.config->x&&sc61860.config->x()) t|=0x80;
+	if (cpustate->timer.t512ms) t|=1;
+	if (cpustate->timer.t2ms) t|=2;
+	if (cpustate->config&&cpustate->config->brk&&cpustate->config->brk(cpustate->device)) t|=8;
+	if (cpustate->config&&cpustate->config->reset&&cpustate->config->reset(cpustate->device)) t|=0x40;
+	if (cpustate->config&&cpustate->config->x&&cpustate->config->x(cpustate->device)) t|=0x80;
 
-	sc61860.zero=(t&READ_OP())==0;
+	cpustate->zero=(t&READ_OP(cpustate))==0;
 }
 
 /************************************************************************************
@@ -464,259 +464,259 @@ INLINE void sc61860_test_special(void)
 ***********************************************************************************/
 
 // p-=I+1 sideeffect
-INLINE void sc61860_add_bcd_a(void)
+INLINE void sc61860_add_bcd_a(sc61860_state *cpustate)
 {
- UINT8 help = sc61860.ram[A];
- int i, hlp, hlp1 = 0; sc61860.zero=1;
- for ( i=0; i <= sc61860.ram[I]; i++)
+ UINT8 help = cpustate->ram[A];
+ int i, hlp, hlp1 = 0; cpustate->zero=1;
+ for ( i=0; i <= cpustate->ram[I]; i++)
  {
-  hlp1 = (sc61860.ram[sc61860.p] & 0x0f) + (help & 0x0f ) + hlp1;
+  hlp1 = (cpustate->ram[cpustate->p] & 0x0f) + (help & 0x0f ) + hlp1;
   if (hlp1 > 9) { hlp = hlp1 - 0x0a; hlp1 = 0x10; }
   else {hlp = hlp1; hlp1 = 0x00;}
-  hlp1 = (sc61860.ram[sc61860.p] & 0xf0) + (help & 0xf0) + hlp1;
-  if (hlp1 > 0x90) { sc61860.ram[sc61860.p] = hlp1 - 0xa0 + hlp; hlp1 = 1; }
-  else {sc61860.ram[sc61860.p] = hlp1 + hlp; hlp1 = 0;}
-  if ( sc61860.ram[sc61860.p--] != 0 ) sc61860.zero = 0;
+  hlp1 = (cpustate->ram[cpustate->p] & 0xf0) + (help & 0xf0) + hlp1;
+  if (hlp1 > 0x90) { cpustate->ram[cpustate->p] = hlp1 - 0xa0 + hlp; hlp1 = 1; }
+  else {cpustate->ram[cpustate->p] = hlp1 + hlp; hlp1 = 0;}
+  if ( cpustate->ram[cpustate->p--] != 0 ) cpustate->zero = 0;
   help = 0;
  }
- sc61860.carry= ( hlp1 ) ? 1 : 0;
- sc61860_ICount-=3*(sc61860.ram[I]+1);
+ cpustate->carry= ( hlp1 ) ? 1 : 0;
+ cpustate->icount-=3*(cpustate->ram[I]+1);
 }
 
 
 // p-=I+1, q-=I+2 sideeffect
-INLINE void sc61860_add_bcd(void)
+INLINE void sc61860_add_bcd(sc61860_state *cpustate)
 {
- int i, hlp, hlp1 = 0; sc61860.zero=1;
- for ( i=0; i <= sc61860.ram[I]; i++)
+ int i, hlp, hlp1 = 0; cpustate->zero=1;
+ for ( i=0; i <= cpustate->ram[I]; i++)
  {
-  hlp1 = (sc61860.ram[sc61860.p] & 0x0f) + (sc61860.ram[sc61860.q] & 0x0f ) +
+  hlp1 = (cpustate->ram[cpustate->p] & 0x0f) + (cpustate->ram[cpustate->q] & 0x0f ) +
 hlp1;
   if (hlp1 > 9) { hlp = hlp1 - 0x0a; hlp1 = 0x10; }
   else {hlp = hlp1; hlp1 = 0x00;}
-  hlp1 = (sc61860.ram[sc61860.p] & 0xf0) + (sc61860.ram[sc61860.q--] & 0xf0) +
+  hlp1 = (cpustate->ram[cpustate->p] & 0xf0) + (cpustate->ram[cpustate->q--] & 0xf0) +
 hlp1;
-  if (hlp1 > 0x90) { sc61860.ram[sc61860.p] = hlp1 - 0xa0 + hlp; hlp1 = 1; }
-  else {sc61860.ram[sc61860.p] = hlp1 + hlp; hlp1 = 0;}
-  if ( sc61860.ram[sc61860.p--] != 0 ) sc61860.zero = 0;
+  if (hlp1 > 0x90) { cpustate->ram[cpustate->p] = hlp1 - 0xa0 + hlp; hlp1 = 1; }
+  else {cpustate->ram[cpustate->p] = hlp1 + hlp; hlp1 = 0;}
+  if ( cpustate->ram[cpustate->p--] != 0 ) cpustate->zero = 0;
  }
- sc61860.carry= ( hlp1 ) ? 1 : 0;
- sc61860_ICount-=3*(sc61860.ram[I]+1);
- sc61860.q--;
+ cpustate->carry= ( hlp1 ) ? 1 : 0;
+ cpustate->icount-=3*(cpustate->ram[I]+1);
+ cpustate->q--;
 }
 
 
 // p-=I+1 sideeffect
-INLINE void sc61860_sub_bcd_a(void)
+INLINE void sc61860_sub_bcd_a(sc61860_state *cpustate)
 {
- UINT8 help = sc61860.ram[A];
- int i, hlp, hlp1 = 0; sc61860.zero=1;
- for ( i=0; i <= sc61860.ram[I]; i++)
+ UINT8 help = cpustate->ram[A];
+ int i, hlp, hlp1 = 0; cpustate->zero=1;
+ for ( i=0; i <= cpustate->ram[I]; i++)
  {
-  hlp1 = (sc61860.ram[sc61860.p]&0x0f) - (help&0x0f) - hlp1;
+  hlp1 = (cpustate->ram[cpustate->p]&0x0f) - (help&0x0f) - hlp1;
   if ( hlp1 < 0 ) { hlp = hlp1 + 0x0a; hlp1 = 0x10;}
   else { hlp = hlp1; hlp1 = 0x00;}
-  hlp1 = (sc61860.ram[sc61860.p]&0xf0) - (help&0xf0) - hlp1;
-  if ( hlp1 < 0 ) { sc61860.ram[sc61860.p] = hlp1 + 0xa0 + hlp; hlp1 = 1;}
-  else {sc61860.ram[sc61860.p] = hlp1 + hlp; hlp1 = 0;}
-  if ( sc61860.ram[sc61860.p--] != 0 ) sc61860.zero = 0;
+  hlp1 = (cpustate->ram[cpustate->p]&0xf0) - (help&0xf0) - hlp1;
+  if ( hlp1 < 0 ) { cpustate->ram[cpustate->p] = hlp1 + 0xa0 + hlp; hlp1 = 1;}
+  else {cpustate->ram[cpustate->p] = hlp1 + hlp; hlp1 = 0;}
+  if ( cpustate->ram[cpustate->p--] != 0 ) cpustate->zero = 0;
   help = 0;
  }
- sc61860.carry= ( hlp1 ) ? 1 : 0;
- sc61860_ICount-=3*(sc61860.ram[I]+1);
+ cpustate->carry= ( hlp1 ) ? 1 : 0;
+ cpustate->icount-=3*(cpustate->ram[I]+1);
 }
 
 
 // p-=I+1, q-=I+2 sideeffect
-INLINE void sc61860_sub_bcd(void)
+INLINE void sc61860_sub_bcd(sc61860_state *cpustate)
 {
- int i, hlp, hlp1 = 0; sc61860.zero=1;
- for ( i=0; i <= sc61860.ram[I]; i++)
+ int i, hlp, hlp1 = 0; cpustate->zero=1;
+ for ( i=0; i <= cpustate->ram[I]; i++)
  {
-  hlp1 = (sc61860.ram[sc61860.p]&0x0f) - (sc61860.ram[sc61860.q]&0x0f) - hlp1;
+  hlp1 = (cpustate->ram[cpustate->p]&0x0f) - (cpustate->ram[cpustate->q]&0x0f) - hlp1;
   if ( hlp1 < 0 ) { hlp = hlp1 + 0x0a; hlp1 = 0x10;}
   else { hlp = hlp1; hlp1 = 0x00;}
-  hlp1 = (sc61860.ram[sc61860.p]&0xf0) - (sc61860.ram[sc61860.q--]&0xf0) -
+  hlp1 = (cpustate->ram[cpustate->p]&0xf0) - (cpustate->ram[cpustate->q--]&0xf0) -
 hlp1;
-  if ( hlp1 < 0 ) { sc61860.ram[sc61860.p] = hlp1 + 0xa0 + hlp; hlp1 = 1;}
-  else {sc61860.ram[sc61860.p] = hlp1 + hlp; hlp1 = 0;}
-  if ( sc61860.ram[sc61860.p--] != 0 ) sc61860.zero = 0;
+  if ( hlp1 < 0 ) { cpustate->ram[cpustate->p] = hlp1 + 0xa0 + hlp; hlp1 = 1;}
+  else {cpustate->ram[cpustate->p] = hlp1 + hlp; hlp1 = 0;}
+  if ( cpustate->ram[cpustate->p--] != 0 ) cpustate->zero = 0;
  }
- sc61860.carry= ( hlp1 ) ? 1 : 0;
- sc61860_ICount-=3*(sc61860.ram[I]+1);
- sc61860.q--;
+ cpustate->carry= ( hlp1 ) ? 1 : 0;
+ cpustate->icount-=3*(cpustate->ram[I]+1);
+ cpustate->q--;
 }
 
 /* side effect p-i-1 -> p correct! */
-INLINE void sc61860_shift_left_nibble(void)
+INLINE void sc61860_shift_left_nibble(sc61860_state *cpustate)
 {
 	int i,t=0;
-	for (i=0; i<=sc61860.ram[I]; i++) {
-		t|=sc61860.ram[sc61860.p]<<4;
-		sc61860.ram[sc61860.p--]=t;
+	for (i=0; i<=cpustate->ram[I]; i++) {
+		t|=cpustate->ram[cpustate->p]<<4;
+		cpustate->ram[cpustate->p--]=t;
 		t>>=8;
-		sc61860_ICount--;
+		cpustate->icount--;
 	}
 }
 
 /* side effect p+i+1 -> p correct! */
-INLINE void sc61860_shift_right_nibble(void)
+INLINE void sc61860_shift_right_nibble(sc61860_state *cpustate)
 {
 	int i,t=0;
-	for (i=0; i<=sc61860.ram[I]; i++) {
-		t|=sc61860.ram[sc61860.p];
-		sc61860.ram[sc61860.p++]=t>>4;
+	for (i=0; i<=cpustate->ram[I]; i++) {
+		t|=cpustate->ram[cpustate->p];
+		cpustate->ram[cpustate->p++]=t>>4;
 		t=(t<<8)&0xf00;
-		sc61860_ICount--;
+		cpustate->icount--;
 	}
 }
 
 // q=reg+1 sideeffect
-INLINE void sc61860_inc_load_dp(int reg)
+INLINE void sc61860_inc_load_dp(sc61860_state *cpustate, int reg)
 {
-    if (++sc61860.ram[reg]==0) sc61860.ram[reg+1]++;
-    sc61860.dp=sc61860.ram[reg]|(sc61860.ram[reg+1]<<8);
-    sc61860.q=reg+1;
+    if (++cpustate->ram[reg]==0) cpustate->ram[reg+1]++;
+    cpustate->dp=cpustate->ram[reg]|(cpustate->ram[reg+1]<<8);
+    cpustate->q=reg+1;
 }
 
 // q=reg+1 sideeffect
-INLINE void sc61860_dec_load_dp(int reg)
+INLINE void sc61860_dec_load_dp(sc61860_state *cpustate, int reg)
 {
-    if (--sc61860.ram[reg]==0xff) sc61860.ram[reg+1]--;
-    sc61860.dp=sc61860.ram[reg]|(sc61860.ram[reg+1]<<8);
-    sc61860.q=reg+1;
+    if (--cpustate->ram[reg]==0xff) cpustate->ram[reg+1]--;
+    cpustate->dp=cpustate->ram[reg]|(cpustate->ram[reg+1]<<8);
+    cpustate->q=reg+1;
 }
 
 // q=XH sideeffect
-INLINE void sc61860_inc_load_dp_load(void)
+INLINE void sc61860_inc_load_dp_load(sc61860_state *cpustate)
 {
-    if (++sc61860.ram[XL]==0) sc61860.ram[XH]++;
-    sc61860.dp=sc61860.ram[XL]|(sc61860.ram[XH]<<8);
-    sc61860.q=XH; // hopefully correct before real read
-    sc61860.ram[A]=READ_BYTE(sc61860.dp);
+    if (++cpustate->ram[XL]==0) cpustate->ram[XH]++;
+    cpustate->dp=cpustate->ram[XL]|(cpustate->ram[XH]<<8);
+    cpustate->q=XH; // hopefully correct before real read
+    cpustate->ram[A]=READ_BYTE(cpustate, cpustate->dp);
 }
 
 // q=XH sideeffect
-INLINE void sc61860_dec_load_dp_load(void)
+INLINE void sc61860_dec_load_dp_load(sc61860_state *cpustate)
 {
-    if (--sc61860.ram[XL]==0xff) sc61860.ram[XH]--;
-    sc61860.dp=sc61860.ram[XL]|(sc61860.ram[XH]<<8);
-    sc61860.q=XH; // hopefully correct before real read
-    sc61860.ram[A]=READ_BYTE(sc61860.dp);
+    if (--cpustate->ram[XL]==0xff) cpustate->ram[XH]--;
+    cpustate->dp=cpustate->ram[XL]|(cpustate->ram[XH]<<8);
+    cpustate->q=XH; // hopefully correct before real read
+    cpustate->ram[A]=READ_BYTE(cpustate, cpustate->dp);
 }
 
 // q=YH sideeffect
-INLINE void sc61860_inc_load_dp_store(void)
+INLINE void sc61860_inc_load_dp_store(sc61860_state *cpustate)
 {
-    if (++sc61860.ram[YL]==0) sc61860.ram[YH]++;
-    sc61860.dp=sc61860.ram[YL]|(sc61860.ram[YH]<<8);
-    sc61860.q=YH; // hopefully correct before real write!
-    WRITE_BYTE(sc61860.dp,sc61860.ram[A]);
+    if (++cpustate->ram[YL]==0) cpustate->ram[YH]++;
+    cpustate->dp=cpustate->ram[YL]|(cpustate->ram[YH]<<8);
+    cpustate->q=YH; // hopefully correct before real write!
+    WRITE_BYTE(cpustate, cpustate->dp,cpustate->ram[A]);
 }
 
 // q=YH sideeffect
-INLINE void sc61860_dec_load_dp_store(void)
+INLINE void sc61860_dec_load_dp_store(sc61860_state *cpustate)
 {
-    if (--sc61860.ram[YL]==0xff) sc61860.ram[YH]--;
-    sc61860.dp=sc61860.ram[YL]|(sc61860.ram[YH]<<8);
-    sc61860.q=XH; // hopefully correct before real write!
-    WRITE_BYTE(sc61860.dp,sc61860.ram[A]);
+    if (--cpustate->ram[YL]==0xff) cpustate->ram[YH]--;
+    cpustate->dp=cpustate->ram[YL]|(cpustate->ram[YH]<<8);
+    cpustate->q=XH; // hopefully correct before real write!
+    WRITE_BYTE(cpustate, cpustate->dp,cpustate->ram[A]);
 }
 
-INLINE void sc61860_fill(void)
+INLINE void sc61860_fill(sc61860_state *cpustate)
 {
 	int i;
-	for (i=0;i<=sc61860.ram[I];i++) {
-		sc61860.ram[sc61860.p++]=sc61860.ram[A]; /* could be overwritten? */
-		sc61860_ICount--;
+	for (i=0;i<=cpustate->ram[I];i++) {
+		cpustate->ram[cpustate->p++]=cpustate->ram[A]; /* could be overwritten? */
+		cpustate->icount--;
 	}
 }
 
-INLINE void sc61860_fill_ext(void)
+INLINE void sc61860_fill_ext(sc61860_state *cpustate)
 {
 	int i;
-	for (i=0;i<=sc61860.ram[I];i++) {
-		WRITE_BYTE(sc61860.dp, sc61860.ram[A]);
-		if (i!=sc61860.ram[I]) sc61860.dp++;
-		sc61860_ICount-=3;
+	for (i=0;i<=cpustate->ram[I];i++) {
+		WRITE_BYTE(cpustate, cpustate->dp, cpustate->ram[A]);
+		if (i!=cpustate->ram[I]) cpustate->dp++;
+		cpustate->icount-=3;
 	}
 }
 
 // p+=count+1, q+=count+1 sideeffects
-INLINE void sc61860_copy(int count)
+INLINE void sc61860_copy(sc61860_state *cpustate, int count)
 {
 	int i;
 	for (i=0; i<=count; i++) {
-		sc61860.ram[sc61860.p++]=sc61860.ram[sc61860.q++];
-		sc61860_ICount-=2;
+		cpustate->ram[cpustate->p++]=cpustate->ram[cpustate->q++];
+		cpustate->icount-=2;
 	}
 
 }
 
 // p+=count+1, dp+=count sideeffects
-INLINE void sc61860_copy_ext(int count)
+INLINE void sc61860_copy_ext(sc61860_state *cpustate, int count)
 {
 	int i;
 	for (i=0; i<=count; i++) {
-		sc61860.ram[sc61860.p++]=READ_BYTE(sc61860.dp);
-		if (i!=count) sc61860.dp++;
-		sc61860_ICount-=4;
+		cpustate->ram[cpustate->p++]=READ_BYTE(cpustate, cpustate->dp);
+		if (i!=count) cpustate->dp++;
+		cpustate->icount-=4;
 	}
 }
 
-INLINE void sc61860_copy_int(int count)
+INLINE void sc61860_copy_int(sc61860_state *cpustate, int count)
 {
 	int i;
 	for (i=0; i<=count; i++) {
-		sc61860.ram[sc61860.p++]=
-			READ_BYTE((sc61860.ram[A]|(sc61860.ram[B]<<8)) ); /* internal rom! */
+		cpustate->ram[cpustate->p++]=
+			READ_BYTE(cpustate, (cpustate->ram[A]|(cpustate->ram[B]<<8)) ); /* internal rom! */
 		if (i!=count) {
-			if (++sc61860.ram[A]==0) sc61860.ram[B]++;
+			if (++cpustate->ram[A]==0) cpustate->ram[B]++;
 		}
-		sc61860_ICount-=4;
+		cpustate->icount-=4;
 	}
 }
 
-INLINE void sc61860_exchange(int count)
+INLINE void sc61860_exchange(sc61860_state *cpustate, int count)
 {
 	int i;
 	UINT8 t;
 	for (i=0; i<=count; i++) {
-		t=sc61860.ram[sc61860.p];
-		sc61860.ram[sc61860.p++]=sc61860.ram[sc61860.q];
-		sc61860.ram[sc61860.q++]=t;
-		sc61860_ICount-=3;
+		t=cpustate->ram[cpustate->p];
+		cpustate->ram[cpustate->p++]=cpustate->ram[cpustate->q];
+		cpustate->ram[cpustate->q++]=t;
+		cpustate->icount-=3;
 	}
 }
 
-INLINE void sc61860_exchange_ext(int count)
+INLINE void sc61860_exchange_ext(sc61860_state *cpustate, int count)
 {
 	int i;
 	UINT8 t;
 	for (i=0; i<=count; i++) {
-		t=sc61860.ram[sc61860.p];
-		sc61860.ram[sc61860.p++]=READ_BYTE(sc61860.dp);
-		WRITE_BYTE(sc61860.dp, t);
-		if (i!=count) sc61860.dp++;
-		sc61860_ICount-=6;
+		t=cpustate->ram[cpustate->p];
+		cpustate->ram[cpustate->p++]=READ_BYTE(cpustate, cpustate->dp);
+		WRITE_BYTE(cpustate, cpustate->dp, t);
+		if (i!=count) cpustate->dp++;
+		cpustate->icount-=6;
 	}
 }
 
 // undocumented
 // only 1 opcode working in pc1403
 // both opcodes working in pc1350
-INLINE void sc61860_wait_x(int level)
+INLINE void sc61860_wait_x(sc61860_state *cpustate, int level)
 {
     int c;
-    sc61860.zero=level;
+    cpustate->zero=level;
 
-    if (sc61860.config&&sc61860.config->x) {
-	for (c=sc61860.ram[I]; c>=0; c--) {
-//      sc61860.ram[sc61860.p]=(sc61860.ram[sc61860.p]+1)%0x60;
-	    sc61860.ram[sc61860.p]=(sc61860.ram[sc61860.p]+1)&0x7f;
-	    sc61860.zero=sc61860.config->x();
-	    sc61860_ICount-=4;
-	    if ( level != sc61860.zero) break;
+    if (cpustate->config&&cpustate->config->x) {
+	for (c=cpustate->ram[I]; c>=0; c--) {
+//      cpustate->ram[cpustate->p]=(cpustate->ram[cpustate->p]+1)%0x60;
+	    cpustate->ram[cpustate->p]=(cpustate->ram[cpustate->p]+1)&0x7f;
+	    cpustate->zero=cpustate->config->x(cpustate->device);
+	    cpustate->icount-=4;
+	    if ( level != cpustate->zero) break;
 	}
     }
 }
