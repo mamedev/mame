@@ -18,6 +18,10 @@ enum
 	CPUINFO_INT_I8085_SID = CPUINFO_INT_CPU_SPECIFIC
 };
 
+typedef void (*i8085_sod_func)(const device_config *device, int state);
+typedef int (*i8085_sid_func)(const device_config *device);
+
+
 #define I8085_INTR_LINE     0
 #define I8085_RST55_LINE	1
 #define I8085_RST65_LINE	2
@@ -54,5 +58,20 @@ CPU_GET_INFO( i8080 );
 #endif
 
 CPU_DISASSEMBLE( i8085 );
+
+INLINE void i8085_set_sod_callback(const device_config *device, i8085_sod_func callback)
+{
+	cpu_set_info_fct(device, CPUINFO_PTR_I8085_SOD_CALLBACK, (genf *)callback);
+}
+
+INLINE void i8085_set_sid_callback(const device_config *device, i8085_sid_func callback)
+{
+	cpu_set_info_fct(device, CPUINFO_PTR_I8085_SID_CALLBACK, (genf *)callback);
+}
+
+INLINE void i8085_set_sid(const device_config *device, int sid)
+{
+	cpu_set_info_int(device, CPUINFO_INT_I8085_SID, sid);
+}
 
 #endif

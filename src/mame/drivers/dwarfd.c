@@ -534,7 +534,7 @@ static VIDEO_UPDATE( dwarfd )
 	return 0;
 }
 
-static void dwarfd_sod_callback(int nSO)
+static void dwarfd_sod_callback(const device_config *device, int nSO)
 {
 	crt_access=nSO;
 }
@@ -544,7 +544,7 @@ static INTERRUPT_GEN( dwarfd_interrupt )
 {
 	if(cpu_getiloops(device) < NUM_LINES)
 	{
-		cpu_set_info_fct(device, CPUINFO_PTR_I8085_SOD_CALLBACK, (void*)dwarfd_sod_callback);
+		i8085_set_sod_callback(device, dwarfd_sod_callback);
 		cpu_set_input_line(device,I8085_RST65_LINE,HOLD_LINE); // 34 - every 8th line
 		line=cpu_getiloops(device);
 		idx=0;
@@ -776,7 +776,7 @@ static DRIVER_INIT(dwarfd)
 	//      src[i] = src[i]&0xe0;
 	}
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_I8085_SOD_CALLBACK, (void*)dwarfd_sod_callback);
+	i8085_set_sod_callback(machine->cpu[0], dwarfd_sod_callback);
 
 	videobuf=auto_malloc(0x8000);
 	dwarfd_ram=auto_malloc(0x1000);

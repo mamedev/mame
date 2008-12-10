@@ -1020,7 +1020,7 @@ static DRIVER_INIT( condor )
 
 static DRIVER_INIT( survival )
 {
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_I8085_SID_CALLBACK, (void*)survival_sid_callback);
+	i8085_set_sid_callback(machine->cpu[0], survival_sid_callback);
 }
 
 

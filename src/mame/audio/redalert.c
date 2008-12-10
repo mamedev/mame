@@ -169,13 +169,13 @@ WRITE8_HANDLER( redalert_voice_command_w )
 }
 
 
-static void sod_callback(int data)
+static void sod_callback(const device_config *device, int data)
 {
 	hc55516_digit_w(0, data);
 }
 
 
-static int sid_callback(void)
+static int sid_callback(const device_config *device)
 {
 	return hc55516_clock_state_r(0);
 }
@@ -183,8 +183,8 @@ static int sid_callback(void)
 
 static SOUND_START( redalert_voice )
 {
-	cpu_set_info_fct(machine->cpu[2], CPUINFO_PTR_I8085_SOD_CALLBACK, (void *)sod_callback);
-	cpu_set_info_fct(machine->cpu[2], CPUINFO_PTR_I8085_SID_CALLBACK, (void *)sid_callback);
+	i8085_set_sod_callback(machine->cpu[2], sod_callback);
+	i8085_set_sid_callback(machine->cpu[2], sid_callback);
 }
 
 
