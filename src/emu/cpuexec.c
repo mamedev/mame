@@ -919,11 +919,9 @@ void cpu_set_input_line_and_vector(const device_config *device, int line, int st
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
-#ifdef MAME_DEBUG
 	/* catch errors where people use PULSE_LINE for CPUs that don't support it */
 	if (state == PULSE_LINE && line != INPUT_LINE_NMI && line != INPUT_LINE_RESET)
 		fatalerror("CPU %s: PULSE_LINE can only be used for NMI and RESET lines\n", device->tag);
-#endif
 
 	if (line >= 0 && line < MAX_INPUT_LINES)
 	{
