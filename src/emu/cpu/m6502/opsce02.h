@@ -962,7 +962,7 @@
 	SPL = X;									\
 	if (PEEK_OP() == 0x2b /*TYS*/ ) {			\
 		UINT8 op = RDOP();						\
-		(*cpustate->insn[op])(m65ce02);			\
+		(*cpustate->insn[op])(cpustate);			\
 	}
 
 
