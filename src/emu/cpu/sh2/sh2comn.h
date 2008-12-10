@@ -83,7 +83,7 @@ do {											\
 	if (sh2->pending_irq & (1 << 15)) irq = 15;	\
 	if ((sh2->internal_irq_level != -1) && (sh2->internal_irq_level > irq)) irq = sh2->internal_irq_level; \
 	if (irq >= 0)								\
-		sh2_exception(message,irq); 			\
+		sh2_exception(sh2,message,irq);			\
 } while(0)
 
 typedef struct
@@ -174,10 +174,10 @@ typedef struct
 TIMER_CALLBACK( sh2_timer_callback );
 TIMER_CALLBACK( sh2_dmac_callback );
 
-void sh2_common_init(int alloc, const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
-void sh2_recalc_irq(void);
-void sh2_set_irq_line(int irqline, int state);
+void sh2_common_init(SH2 *sh2, const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
+void sh2_recalc_irq(SH2 *sh2);
+void sh2_set_irq_line(SH2 *sh2, int irqline, int state);
 void sh2_set_frt_input(const device_config *device, int state);
-void sh2_exception(const char *message, int irqline);
+void sh2_exception(SH2 *sh2, const char *message, int irqline);
 
 #endif /* __SH2COMN_H__ */
