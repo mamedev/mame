@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   saturn.h
+ *   cpustate->h
  *   portable saturn emulator interface
  *   (hp calculators)
  *
@@ -54,14 +54,14 @@ HP38G             09/??/95              1LT8             Yorke
 typedef struct _saturn_cpu_core saturn_cpu_core;
 struct _saturn_cpu_core
 {
-	void (*out)(running_machine*,int);
-	int (*in)(running_machine*);
-	void (*reset)(running_machine*);
-	void (*config)(running_machine*,int v);
-	void (*unconfig)(running_machine*,int v);
-	int (*id)(running_machine*);
-	void (*crc)(running_machine*,int addr, int data);
-	void (*rsi)(running_machine*);
+	void (*out)(const device_config*,int);
+	int (*in)(const device_config*);
+	void (*reset)(const device_config*);
+	void (*config)(const device_config*,int v);
+	void (*unconfig)(const device_config*,int v);
+	int (*id)(const device_config*);
+	void (*crc)(const device_config*,int addr, int data);
+	void (*rsi)(const device_config*);
 };
 
 enum
