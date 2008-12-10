@@ -15,7 +15,9 @@ TODO:
 -inputs are grossly mapped;
 -add the sound chip into MAME (OkiM6376),it's an alternative version of the more common OkiM6295.
 -NVRAM emulation?
+-Hook-up the V-Blank bit (check if it is really a V-Blank etc.)
 -I don't really know if the manufacturer is really New High Video,I've got that name from f205v.
+-Why Bra$il harass the player with that "memory sub-game"? Broken logic or BTANB?
 
 *************************************************************************************************/
 
@@ -89,6 +91,7 @@ VIDEO_UPDATE(vidpokr2)
 
 /*Some sort of status registers,probably blitter/vblank related.*/
 static UINT16 unk_latch;
+static UINT16 vblank_bit;
 
 /*Bra$il*/
 static READ16_HANDLER( blit_status_r )
@@ -96,10 +99,9 @@ static READ16_HANDLER( blit_status_r )
 	switch(offset*2)
 	{
 		case 0:
-		if(input_code_pressed_once(KEYCODE_L)) // use this to skip tests etc...
-			return 0xffdc;
+		vblank_bit^=0x10;
 
-		return 3;
+		return 3 | vblank_bit;
 		case 2: return (unk_latch & 3); //and 0x3f
 	}
 
@@ -185,8 +187,6 @@ static WRITE16_HANDLER( paletteram_io_w )
 	}
 }
 
-static UINT16 vblank_bit;
-
 /*There's a reset button located there too.*/
 static READ16_HANDLER( vidpokr2_vblank_r )
 {
@@ -222,12 +222,14 @@ static READ16_HANDLER( read3_r )
 static WRITE16_HANDLER( write1_w )
 {
 	t1 = data;
-//  popmessage("%04x %04x",t1,t3);
+//	popmessage("%04x %04x",t1,t3);
 }
 
 static WRITE16_HANDLER( write2_w )
 {
 	static int i;
+
+//	popmessage("%04x",data);
 
 	for(i=0;i<4;i++)
 	{
@@ -236,10 +238,24 @@ static WRITE16_HANDLER( write2_w )
 	}
 }
 
+/*Different coin-lockout in this one*/
+static WRITE16_HANDLER( fashion_write2_w )
+{
+	static int i;
+
+//	popmessage("%04x",data);
+
+	for(i=0;i<4;i++)
+	{
+		coin_counter_w(i,data & 0x20);
+		coin_lockout_w(i,~data & 0x01);
+	}
+}
+
 static WRITE16_HANDLER( write3_w )
 {
 	t3 = data;
-//  popmessage("%04x %04x",t1,t3);
+// 	popmessage("%04x %04x",t1,t3);
 }
 
 static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -287,7 +303,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( brasil )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Take Button") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Take Button") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
@@ -334,6 +350,125 @@ static INPUT_PORTS_START( brasil )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+/*Slightly different inputs*/
+static INPUT_PORTS_START( fashion )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Take Button") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Stock 2") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3 / Risk Button") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Stock 3 / Note") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Stock 1 / Ticket") PORT_CODE(KEYCODE_Q)
+	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Stock 5") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Stock 4") PORT_CODE(KEYCODE_R)
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -548,6 +683,11 @@ ROM_START( fashion )
 	ROM_LOAD( "sound-fashion-v-1-memory4m.u16", 0x00000, 0x80000, CRC(2927c799) SHA1(f11cad096a23fee10bfdff5bf944c96e30f4a8b8) )
 ROM_END
 
-GAME( 19??, newmcard,  0,      vidpokr2,    brasil,   0, ROT0,  "New High Video?", "New Magic Card", GAME_NO_SOUND )
-GAME( 2000, brasil,    0,      brasil,      brasil,   0, ROT0,  "New High Video?", "Bra$il (Version 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 2000, fashion,   brasil, brasil,      brasil,   0, ROT0,  "New High Video?", "Fashion (Version 2.14)", GAME_NOT_WORKING | GAME_NO_SOUND )
+static DRIVER_INIT( fashion )
+{
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0002, 0x0003, 0, 0, fashion_write2_w );
+}
+
+GAME( 19??, newmcard,  0,      vidpokr2,    brasil,   0,       ROT0,  "New High Video?", "New Magic Card", GAME_NO_SOUND )
+GAME( 2000, brasil,    0,      brasil,      brasil,   0,       ROT0,  "New High Video?", "Bra$il (Version 3)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 2000, fashion,   brasil, brasil,      fashion,  fashion, ROT0,  "New High Video?", "Fashion (Version 2.14)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
