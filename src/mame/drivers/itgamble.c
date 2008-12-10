@@ -508,6 +508,52 @@ ROM_START( euro2k2a )
 ROM_END
 
 
+/* Europa 2002 Space (Ver 3.0)
+
+Year:    2002  
+Company: Nazionale Elettronica  
+
+CPU:
+
+1x HD64F3048F16 (main)(ic1)
+1x ispLSI2064-80LJ (ic12)
+1x U6295 (equivalent to M6295) (ic24)(sound)
+1x TDA2003 (sound)(ic26)
+1x LM358N (sound)(ic27)
+1x oscillator 30MHz (close to main)(osc1)
+1x blue resonator (close to sound) (x1)  
+
+ROMs:
+
+1x MX27C1000 (1)
+2x M27C2001 (2,3)
+2x M27C4001 (4,5)  
+
+Note:
+
+1x 28x2 edge connector
+1x 12 legs connector
+1x 50 legs flat cable connector
+1x trimmer (volume)
+1x trimmer (spark)
+
+*/
+
+ROM_START( euro2k2s )
+	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_LOAD( "euro2k2s_ver3.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "europa2002space4.ic18", 0x000000, 0x80000, CRC(cf4db4f1) SHA1(6c03e54e30eb83778d1cad5ade17c26a370ea8a3) )
+	ROM_LOAD( "europa2002space5.ic17", 0x080000, 0x80000, CRC(1070b4ac) SHA1(3492de52cd0c784479d2774f6050b24cf4591484) )
+	ROM_LOAD( "europa2002_2-a.ic20",   0x100000, 0x40000, CRC(971bc33b) SHA1(c385e5bef57cdb52a86c1e38fca471ef5ab3da7c) )
+	ROM_LOAD( "europa2002space3.ic19", 0x140000, 0x40000, CRC(d82dba04) SHA1(63d407dd036d3c7f190ad7b6d694288e9a9e56d0) ) /* identical halves */
+
+	ROM_REGION( 0x20000, "oki", 0 ) /* M6295 samples */
+	ROM_LOAD( "1-a.ic25", 0x00000, 0x20000, CRC(8fcb283d) SHA1(9e95c72967da13606eed6d16f84145273b9ffddf) )
+ROM_END
+
+
 /********** DIFFERENT HARDWARE **********/
 
 
@@ -562,6 +608,7 @@ GAME( 2002, laperla,  0,       itgamble, itgamble, 0,   ROT0, "Nazionale Elettro
 GAME( 2001, laperlag, 0,       itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  GAME_NOT_WORKING )
 GAME( 2001, euro2k2,  0,       itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  GAME_NOT_WORKING )
 GAME( 2001, euro2k2a, euro2k2, itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  GAME_NOT_WORKING )
+GAME( 2002, euro2k2s, euro2k2, itgamble, itgamble, 0,   ROT0, "Nazionale Elettronica", "Europa 2002 Space (Ver 3.0)",   GAME_NOT_WORKING )
 
 /* different hardware */
 GAME( 200?, mnumber,  0,       mnumber,  itgamble, 0,   ROT0, "M.M. - B.R.L.",         "Mystery Number",                GAME_NOT_WORKING )

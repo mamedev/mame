@@ -8375,6 +8375,7 @@ Other Sun games
 	DRIVER( capcor )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2 )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2a )	/* (c) 2001 Nazionale Elettronica */
+	DRIVER( euro2k2s )	/* (c) 2002 Nazionale Elettronica */
 	DRIVER( mnumber )	/* (c) 200? M.M. - B.R.L. */
 
 	/* H8/3337 italian gambling games */
