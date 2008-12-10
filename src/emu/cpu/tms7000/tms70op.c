@@ -21,13 +21,13 @@
 
 #include "cpuintrf.h"
 
-static void illegal( void )
+static void illegal(tms7000_state *cpustate)
 {
 	/* This is a guess */
-	tms7000_icount -= 4;
+	cpustate->icount -= 4;
 }
 
-static void adc_b2a( void )
+static void adc_b2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -39,10 +39,10 @@ static void adc_b2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void adc_r2a( void )
+static void adc_r2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	v;
@@ -57,10 +57,10 @@ static void adc_r2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void adc_r2b( void )
+static void adc_r2b(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	v;
@@ -75,10 +75,10 @@ static void adc_r2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void adc_r2r( void )
+static void adc_r2r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i,j;
@@ -94,10 +94,10 @@ static void adc_r2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void adc_i2a( void )
+static void adc_i2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	v;
@@ -112,10 +112,10 @@ static void adc_i2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void adc_i2b( void )
+static void adc_i2b(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	v;
@@ -130,10 +130,10 @@ static void adc_i2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void adc_i2r( void )
+static void adc_i2r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i,j;
@@ -149,10 +149,10 @@ static void adc_i2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void add_b2a( void )
+static void add_b2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -164,10 +164,10 @@ static void add_b2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void add_r2a( void )
+static void add_r2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	v;
@@ -182,10 +182,10 @@ static void add_r2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void add_r2b( void )
+static void add_r2b(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	v;
@@ -200,10 +200,10 @@ static void add_r2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void add_r2r( void )
+static void add_r2r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i,j;
@@ -219,10 +219,10 @@ static void add_r2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void add_i2a( void )
+static void add_i2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	v;
@@ -237,10 +237,10 @@ static void add_i2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void add_i2b( void )
+static void add_i2b(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	v;
@@ -255,10 +255,10 @@ static void add_i2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void add_i2r( void )
+static void add_i2r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i,j;
@@ -274,10 +274,10 @@ static void add_i2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void and_b2a( void )
+static void and_b2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 
@@ -288,10 +288,10 @@ static void and_b2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void and_r2a( void )
+static void and_r2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -305,10 +305,10 @@ static void and_r2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void and_r2b( void )
+static void and_r2b(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -322,10 +322,10 @@ static void and_r2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void and_r2r( void )
+static void and_r2r(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	i,j;
@@ -340,10 +340,10 @@ static void and_r2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void and_i2a( void )
+static void and_i2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -357,10 +357,10 @@ static void and_i2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void and_i2b( void )
+static void and_i2b(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -374,10 +374,10 @@ static void and_i2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void and_i2r( void )
+static void and_i2r(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	i,j;
@@ -392,10 +392,10 @@ static void and_i2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void andp_a2p( void )
+static void andp_a2p(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -408,10 +408,10 @@ static void andp_a2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void andp_b2p( void )
+static void andp_b2p(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -424,11 +424,11 @@ static void andp_b2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
 
-static void movp_i2p( void )
+static void movp_i2p(tms7000_state *cpustate)
 {
 	UINT8	i,v;
 
@@ -440,10 +440,10 @@ static void movp_i2p( void )
 	SET_N8(i);
 	SET_Z8(i);
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 
-static void andp_i2p( void )
+static void andp_i2p(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	i,v;
@@ -457,38 +457,38 @@ static void andp_i2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 
-static void br_dir( void )
+static void br_dir(tms7000_state *cpustate)
 {
 	PAIR p;
 
 	IMMWORD( p );
 	pPC = p.d;
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void br_ind( void )
+static void br_ind(tms7000_state *cpustate)
 {
 	UINT8	v;
 
 	IMMBYTE( v );
-	PC.w.l = RRF16(v);
+	PC.w.l = RRF16(cpustate,v);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void br_inx( void )
+static void br_inx(tms7000_state *cpustate)
 {
 	PAIR p;
 
 	IMMWORD( p );
 	pPC = p.w.l + RDB;
-	tms7000_icount -= 12;
+	cpustate->icount -= 12;
 }
 
-static void btjo_b2a( void )
+static void btjo_b2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 
@@ -504,16 +504,16 @@ static void btjo_b2a( void )
 
 		SIMMBYTE( j );
 		pPC += j;
-		tms7000_icount -= 9;
+		cpustate->icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 }
 
-static void btjo_r2a( void )
+static void btjo_r2a(tms7000_state *cpustate)
 {
 	UINT8	t,r;
 
@@ -530,16 +530,16 @@ static void btjo_r2a( void )
 
 		SIMMBYTE( j );
 		pPC += j;
-		tms7000_icount -= 9;
+		cpustate->icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 }
 
-static void btjo_r2b( void )
+static void btjo_r2b(tms7000_state *cpustate)
 {
 	UINT8	t,r;
 
@@ -556,16 +556,16 @@ static void btjo_r2b( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 12;
+		cpustate->icount -= 12;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 10;
+		cpustate->icount -= 10;
 	}
 }
 
-static void btjo_r2r( void )
+static void btjo_r2r(tms7000_state *cpustate)
 {
 	UINT8	t,r,s;
 
@@ -583,16 +583,16 @@ static void btjo_r2r( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 14;
+		cpustate->icount -= 14;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 12;
+		cpustate->icount -= 12;
 	}
 }
 
-static void btjo_i2a( void )
+static void btjo_i2a(tms7000_state *cpustate)
 {
 	UINT8	t,r;
 
@@ -609,16 +609,16 @@ static void btjo_i2a( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 11;
+		cpustate->icount -= 11;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 9;
+		cpustate->icount -= 9;
 	}
 }
 
-static void btjo_i2b( void )
+static void btjo_i2b(tms7000_state *cpustate)
 {
 	UINT8	t,i;
 
@@ -635,16 +635,16 @@ static void btjo_i2b( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 11;
+		cpustate->icount -= 11;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 9;
+		cpustate->icount -= 9;
 	}
 }
 
-static void btjo_i2r( void )
+static void btjo_i2r(tms7000_state *cpustate)
 {
 	UINT8	t,i,r;
 
@@ -662,16 +662,16 @@ static void btjo_i2r( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 13;
+		cpustate->icount -= 13;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 11;
+		cpustate->icount -= 11;
 	}
 }
 
-static void btjop_ap( void )
+static void btjop_ap(tms7000_state *cpustate)
 {
 	UINT8	t,p;
 
@@ -689,16 +689,16 @@ static void btjop_ap( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 13;
+		cpustate->icount -= 13;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 11;
+		cpustate->icount -= 11;
 	}
 }
 
-static void btjop_bp( void )
+static void btjop_bp(tms7000_state *cpustate)
 {
 	UINT8	t,p;
 
@@ -716,16 +716,16 @@ static void btjop_bp( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 12;
+		cpustate->icount -= 12;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 10;
+		cpustate->icount -= 10;
 	}
 }
 
-static void btjop_ip( void )
+static void btjop_ip(tms7000_state *cpustate)
 {
 	UINT8	t,p,i;
 
@@ -744,16 +744,16 @@ static void btjop_ip( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 14;
+		cpustate->icount -= 14;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 12;
+		cpustate->icount -= 12;
 	}
 }
 
-static void btjz_b2a( void )
+static void btjz_b2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 
@@ -769,16 +769,16 @@ static void btjz_b2a( void )
 
 		SIMMBYTE( j );
 		pPC += j;
-		tms7000_icount -= 9;
+		cpustate->icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 }
 
-static void btjz_r2a( void )
+static void btjz_r2a(tms7000_state *cpustate)
 {
 	UINT8	t,r;
 
@@ -795,16 +795,16 @@ static void btjz_r2a( void )
 
 		SIMMBYTE( j );
 		pPC += j;
-		tms7000_icount -= 9;
+		cpustate->icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 }
 
-static void btjz_r2b( void )
+static void btjz_r2b(tms7000_state *cpustate)
 {
 	UINT8	t,r;
 
@@ -821,16 +821,16 @@ static void btjz_r2b( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 12;
+		cpustate->icount -= 12;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 10;
+		cpustate->icount -= 10;
 	}
 }
 
-static void btjz_r2r( void )
+static void btjz_r2r(tms7000_state *cpustate)
 {
 	UINT8	t,r,s;
 
@@ -848,16 +848,16 @@ static void btjz_r2r( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 14;
+		cpustate->icount -= 14;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 12;
+		cpustate->icount -= 12;
 	}
 }
 
-static void btjz_i2a( void )
+static void btjz_i2a(tms7000_state *cpustate)
 {
 	UINT8	t,r;
 
@@ -874,16 +874,16 @@ static void btjz_i2a( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 11;
+		cpustate->icount -= 11;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 9;
+		cpustate->icount -= 9;
 	}
 }
 
-static void btjz_i2b( void )
+static void btjz_i2b(tms7000_state *cpustate)
 {
 	UINT8	t,i;
 
@@ -900,16 +900,16 @@ static void btjz_i2b( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 11;
+		cpustate->icount -= 11;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 9;
+		cpustate->icount -= 9;
 	}
 }
 
-static void btjz_i2r( void )
+static void btjz_i2r(tms7000_state *cpustate)
 {
 	UINT8	t,i,r;
 
@@ -927,16 +927,16 @@ static void btjz_i2r( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 13;
+		cpustate->icount -= 13;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 11;
+		cpustate->icount -= 11;
 	}
 }
 
-static void btjzp_ap( void )
+static void btjzp_ap(tms7000_state *cpustate)
 {
 	UINT8	t,p;
 
@@ -954,16 +954,16 @@ static void btjzp_ap( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 13;
+		cpustate->icount -= 13;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 11;
+		cpustate->icount -= 11;
 	}
 }
 
-static void btjzp_bp( void )
+static void btjzp_bp(tms7000_state *cpustate)
 {
 	UINT8	t,p;
 
@@ -981,16 +981,16 @@ static void btjzp_bp( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 12;
+		cpustate->icount -= 12;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 10;
+		cpustate->icount -= 10;
 	}
 }
 
-static void btjzp_ip( void )
+static void btjzp_ip(tms7000_state *cpustate)
 {
 	UINT8	t,p,i;
 
@@ -1009,16 +1009,16 @@ static void btjzp_ip( void )
 
 		SIMMBYTE(j);
 		pPC += j;
-		tms7000_icount -= 14;
+		cpustate->icount -= 14;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 12;
+		cpustate->icount -= 12;
 	}
 }
 
-static void call_dir( void )
+static void call_dir(tms7000_state *cpustate)
 {
 	PAIR	tPC;
 
@@ -1026,52 +1026,52 @@ static void call_dir( void )
 	PUSHWORD( PC );
 	pPC = tPC.d;
 
-	tms7000_icount -= 14;
+	cpustate->icount -= 14;
 }
 
-static void call_ind( void )
+static void call_ind(tms7000_state *cpustate)
 {
 	UINT8	v;
 
 	IMMBYTE( v );
 	PUSHWORD( PC );
-	PC.w.l = RRF16(v);
+	PC.w.l = RRF16(cpustate,v);
 
-	tms7000_icount -= 13;
+	cpustate->icount -= 13;
 }
 
-static void call_inx( void )
+static void call_inx(tms7000_state *cpustate)
 {
 	PAIR	tPC;
 
 	IMMWORD( tPC );
 	PUSHWORD( PC );
 	pPC = tPC.w.l + RDB;
-	tms7000_icount -= 16;
+	cpustate->icount -= 16;
 }
 
-static void clr_a( void )
+static void clr_a(tms7000_state *cpustate)
 {
 	WRA(0);
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void clr_b( void )
+static void clr_b(tms7000_state *cpustate)
 {
 	WRB(0);
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void clr_r( void )
+static void clr_r(tms7000_state *cpustate)
 {
 	UINT8	r;
 
 	IMMBYTE(r);
 	WM(r,0);
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void clrc( void )
+static void clrc(tms7000_state *cpustate)
 {
 	UINT8	a;
 
@@ -1081,10 +1081,10 @@ static void clrc( void )
 	SET_N8(a);
 	SET_Z8(a);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void cmp_ba( void )
+static void cmp_ba(tms7000_state *cpustate)
 {
 	UINT16 t;
 
@@ -1099,10 +1099,10 @@ static void cmp_ba( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void cmp_ra( void )
+static void cmp_ra(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -1119,10 +1119,10 @@ static void cmp_ra( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void cmp_rb( void )
+static void cmp_rb(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -1139,10 +1139,10 @@ static void cmp_rb( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void cmp_rr( void )
+static void cmp_rr(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r,s;
@@ -1160,10 +1160,10 @@ static void cmp_rr( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void cmp_ia( void )
+static void cmp_ia(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i;
@@ -1180,10 +1180,10 @@ static void cmp_ia( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void cmp_ib( void )
+static void cmp_ib(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i;
@@ -1200,10 +1200,10 @@ static void cmp_ib( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void cmp_ir( void )
+static void cmp_ir(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i,r;
@@ -1221,10 +1221,10 @@ static void cmp_ir( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void cmpa_dir( void )
+static void cmpa_dir(tms7000_state *cpustate)
 {
 	UINT16	t;
 	PAIR	i;
@@ -1241,17 +1241,17 @@ static void cmpa_dir( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 12;
+	cpustate->icount -= 12;
 }
 
-static void cmpa_ind( void )
+static void cmpa_ind(tms7000_state *cpustate)
 {
 	UINT16	t;
 	PAIR	p;
 	INT8	i;
 
 	IMMBYTE(i);
-	p.w.l = RRF16(i);
+	p.w.l = RRF16(cpustate,i);
 	t = RDA - RM(p.w.l);
 
 	CLR_NZC;
@@ -1263,10 +1263,10 @@ static void cmpa_ind( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 
-static void cmpa_inx( void )
+static void cmpa_inx(tms7000_state *cpustate)
 {
 	UINT16	t;
 	PAIR	i;
@@ -1283,10 +1283,10 @@ static void cmpa_inx( void )
 	else
 		SET_C8( ~t );
 
-	tms7000_icount -= 14;
+	cpustate->icount -= 14;
 }
 
-static void dac_b2a( void )
+static void dac_b2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -1302,10 +1302,10 @@ static void dac_b2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void dac_r2a( void )
+static void dac_r2a(tms7000_state *cpustate)
 {
 	UINT8	r;
 	UINT16	t;
@@ -1324,10 +1324,10 @@ static void dac_r2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void dac_r2b( void )
+static void dac_r2b(tms7000_state *cpustate)
 {
 	UINT8	r;
 	UINT16	t;
@@ -1346,10 +1346,10 @@ static void dac_r2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void dac_r2r( void )
+static void dac_r2r(tms7000_state *cpustate)
 {
 	UINT8	r,s;
 	UINT16	t;
@@ -1369,10 +1369,10 @@ static void dac_r2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 12;
+	cpustate->icount -= 12;
 }
 
-static void dac_i2a( void )
+static void dac_i2a(tms7000_state *cpustate)
 {
 	UINT8	i;
 	UINT16	t;
@@ -1391,10 +1391,10 @@ static void dac_i2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void dac_i2b( void )
+static void dac_i2b(tms7000_state *cpustate)
 {
 	UINT8	i;
 	UINT16	t;
@@ -1413,10 +1413,10 @@ static void dac_i2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void dac_i2r( void )
+static void dac_i2r(tms7000_state *cpustate)
 {
 	UINT8	i,r;
 	UINT16	t;
@@ -1436,10 +1436,10 @@ static void dac_i2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 
-static void dec_a( void )
+static void dec_a(tms7000_state *cpustate)
 {
 	UINT16 t;
 
@@ -1452,10 +1452,10 @@ static void dec_a( void )
 	SET_Z8(t);
 	SET_C8(~t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void dec_b( void )
+static void dec_b(tms7000_state *cpustate)
 {
 	UINT16 t;
 
@@ -1468,10 +1468,10 @@ static void dec_b( void )
 	SET_Z8(t);
 	SET_C8(~t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void dec_r( void )
+static void dec_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -1487,17 +1487,17 @@ static void dec_r( void )
 	SET_Z8(t);
 	SET_C8(~t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void decd_a( void )
+static void decd_a(tms7000_state *cpustate)
 {
 	PAIR	t;
 
 	t.w.h = 0;
-	t.w.l = RRF16(0);
+	t.w.l = RRF16(cpustate,0);
 	t.d -= 1;
-	WRF16(0,t);
+	WRF16(cpustate,0,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
@@ -1505,17 +1505,17 @@ static void decd_a( void )
 
 	SET_C16(~(t.d));
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void decd_b( void )
+static void decd_b(tms7000_state *cpustate)
 {
 	PAIR	t;
 
 	t.w.h = 0;
-	t.w.l = RRF16(1);
+	t.w.l = RRF16(cpustate,1);
 	t.d -= 1;
-	WRF16(1,t);
+	WRF16(cpustate,1,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
@@ -1523,19 +1523,19 @@ static void decd_b( void )
 
 	SET_C16(~(t.d));
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void decd_r( void )
+static void decd_r(tms7000_state *cpustate)
 {
 	UINT8	r;
 	PAIR	t;
 
 	IMMBYTE(r);
 	t.w.h = 0;
-	t.w.l = RRF16(r);
+	t.w.l = RRF16(cpustate,r);
 	t.d -= 1;
-	WRF16(r,t);
+	WRF16(cpustate,r,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
@@ -1543,16 +1543,16 @@ static void decd_r( void )
 
 	SET_C16(~(t.d));
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 
-static void dint( void )
+static void dint(tms7000_state *cpustate)
 {
 	CLR_NZCI;
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void djnz_a( void )
+static void djnz_a(tms7000_state *cpustate)
 {
 	UINT16 t;
 
@@ -1570,16 +1570,16 @@ static void djnz_a( void )
 
 		SIMMBYTE(s);
 		pPC += s;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 2;
+		cpustate->icount -= 2;
 	}
 }
 
-static void djnz_b( void )
+static void djnz_b(tms7000_state *cpustate)
 {
 	UINT16 t;
 
@@ -1597,16 +1597,16 @@ static void djnz_b( void )
 
 		SIMMBYTE(s);
 		pPC += s;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 2;
+		cpustate->icount -= 2;
 	}
 }
 
-static void djnz_r( void )
+static void djnz_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -1627,16 +1627,16 @@ static void djnz_r( void )
 
 		SIMMBYTE(s);
 		pPC += s;
-		tms7000_icount -= 9;
+		cpustate->icount -= 9;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 3;
+		cpustate->icount -= 3;
 	}
 }
 
-static void dsb_b2a( void )
+static void dsb_b2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -1652,10 +1652,10 @@ static void dsb_b2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void dsb_r2a( void )
+static void dsb_r2a(tms7000_state *cpustate)
 {
 	UINT8	r;
 	UINT16	t;
@@ -1674,10 +1674,10 @@ static void dsb_r2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void dsb_r2b( void )
+static void dsb_r2b(tms7000_state *cpustate)
 {
 	UINT8	r;
 	UINT16	t;
@@ -1696,10 +1696,10 @@ static void dsb_r2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void dsb_r2r( void )
+static void dsb_r2r(tms7000_state *cpustate)
 {
 	UINT8	r,s;
 	UINT16	t;
@@ -1719,10 +1719,10 @@ static void dsb_r2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 12;
+	cpustate->icount -= 12;
 }
 
-static void dsb_i2a( void )
+static void dsb_i2a(tms7000_state *cpustate)
 {
 	UINT8	i;
 	UINT16	t;
@@ -1741,10 +1741,10 @@ static void dsb_i2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void dsb_i2b( void )
+static void dsb_i2b(tms7000_state *cpustate)
 {
 	UINT8	i;
 	UINT16	t;
@@ -1763,10 +1763,10 @@ static void dsb_i2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void dsb_i2r( void )
+static void dsb_i2r(tms7000_state *cpustate)
 {
 	UINT8	r,i;
 	UINT16	t;
@@ -1786,23 +1786,23 @@ static void dsb_i2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 
-static void eint( void )
+static void eint(tms7000_state *cpustate)
 {
 	pSR |= (SR_N|SR_Z|SR_C|SR_I);
-	tms7000_icount -= 5;
-	tms7000_check_IRQ_lines();
+	cpustate->icount -= 5;
+	tms7000_check_IRQ_lines(cpustate);
 }
 
-static void idle( void )
+static void idle(tms7000_state *cpustate)
 {
-	tms7000.idle_state = 1;
-	tms7000_icount -= 6;
+	cpustate->idle_state = 1;
+	cpustate->icount -= 6;
 }
 
-static void inc_a( void )
+static void inc_a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -1815,10 +1815,10 @@ static void inc_a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void inc_b( void )
+static void inc_b(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -1831,10 +1831,10 @@ static void inc_b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void inc_r( void )
+static void inc_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -1850,10 +1850,10 @@ static void inc_r( void )
 	SET_Z8(t);
 	SET_C8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void inv_a( void )
+static void inv_a(tms7000_state *cpustate)
 {
 	UINT16 t;
 
@@ -1864,10 +1864,10 @@ static void inv_a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void inv_b( void )
+static void inv_b(tms7000_state *cpustate)
 {
 	UINT16 t;
 
@@ -1878,10 +1878,10 @@ static void inv_b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void inv_r( void )
+static void inv_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -1896,10 +1896,10 @@ static void inv_r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void jc( void )
+static void jc(tms7000_state *cpustate)
 {
 	if( pSR & SR_C )
 	{
@@ -1907,16 +1907,16 @@ static void jc( void )
 
 		SIMMBYTE( s );
 		pPC += s;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 5;
+		cpustate->icount -= 5;
 	}
 }
 
-static void jeq( void )
+static void jeq(tms7000_state *cpustate)
 {
 	if( pSR & SR_Z )
 	{
@@ -1924,21 +1924,21 @@ static void jeq( void )
 
 		SIMMBYTE( s );
 		pPC += s;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 5;
+		cpustate->icount -= 5;
 	}
 }
 
-static void jl( void )
+static void jl(tms7000_state *cpustate)
 {
 	if( pSR & SR_C )
 	{
 		pPC++;
-		tms7000_icount -= 5;
+		cpustate->icount -= 5;
 	}
 	else
 	{
@@ -1946,20 +1946,20 @@ static void jl( void )
 
 		SIMMBYTE( s );
 		pPC += s;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 }
 
-static void jmp( void )
+static void jmp(tms7000_state *cpustate)
 {
 	INT8 s;
 
 	SIMMBYTE( s );
 	pPC += s;
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void j_jn( void )
+static void j_jn(tms7000_state *cpustate)
 {
 	if( pSR & SR_N )
 	{
@@ -1967,22 +1967,22 @@ static void j_jn( void )
 
 		SIMMBYTE( s );
 		pPC += s;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 5;
+		cpustate->icount -= 5;
 	}
 
 }
 
-static void jne( void )
+static void jne(tms7000_state *cpustate)
 {
 	if( pSR & SR_Z )
 	{
 		pPC++;
-		tms7000_icount -= 5;
+		cpustate->icount -= 5;
 	}
 	else
 	{
@@ -1990,16 +1990,16 @@ static void jne( void )
 
 		SIMMBYTE( s );
 		pPC += s;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 }
 
-static void jp( void )
+static void jp(tms7000_state *cpustate)
 {
 	if( pSR & (SR_Z|SR_N) )
 	{
 		pPC++;
-		tms7000_icount -= 5;
+		cpustate->icount -= 5;
 	}
 	else
 	{
@@ -2007,11 +2007,11 @@ static void jp( void )
 
 		SIMMBYTE( s );
 		pPC += s;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 }
 
-static void jpz( void )
+static void jpz(tms7000_state *cpustate)
 {
 	if ((pSR & SR_N) == 0 && (pSR & SR_Z) != 0)
 	{
@@ -2019,16 +2019,16 @@ static void jpz( void )
 
 		SIMMBYTE( s );
 		pPC += s;
-		tms7000_icount -= 7;
+		cpustate->icount -= 7;
 	}
 	else
 	{
 		pPC++;
-		tms7000_icount -= 5;
+		cpustate->icount -= 5;
 	}
 }
 
-static void lda_dir( void )
+static void lda_dir(tms7000_state *cpustate)
 {
 	UINT16	t;
 	PAIR	i;
@@ -2041,17 +2041,17 @@ static void lda_dir( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 
-static void lda_ind( void )
+static void lda_ind(tms7000_state *cpustate)
 {
 	UINT16	t;
 	PAIR	p;
 	INT8	i;
 
 	IMMBYTE(i);
-	p.w.l=RRF16(i);
+	p.w.l=RRF16(cpustate,i);
 	t = RM(p.w.l);
 	WRA(t);
 
@@ -2059,10 +2059,10 @@ static void lda_ind( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void lda_inx( void )
+static void lda_inx(tms7000_state *cpustate)
 {
 	UINT16	t;
 	PAIR	i;
@@ -2075,16 +2075,16 @@ static void lda_inx( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 13;
+	cpustate->icount -= 13;
 }
 
-static void ldsp( void )
+static void ldsp(tms7000_state *cpustate)
 {
 	pSP = RDB;
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void mov_a2b( void )
+static void mov_a2b(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2095,10 +2095,10 @@ static void mov_a2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void mov_b2a( void )
+static void mov_b2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2109,11 +2109,11 @@ static void mov_b2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
 
-static void mov_a2r( void )
+static void mov_a2r(tms7000_state *cpustate)
 {
 	UINT8	r;
 	UINT16	t;
@@ -2127,10 +2127,10 @@ static void mov_a2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void mov_b2r( void )
+static void mov_b2r(tms7000_state *cpustate)
 {
 	UINT8	r;
 	UINT16	t;
@@ -2144,10 +2144,10 @@ static void mov_b2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void mov_r2a( void )
+static void mov_r2a(tms7000_state *cpustate)
 {
 	UINT8	r;
 	UINT16	t;
@@ -2160,10 +2160,10 @@ static void mov_r2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void mov_r2b( void )
+static void mov_r2b(tms7000_state *cpustate)
 {
 	UINT8	r;
 	UINT16	t;
@@ -2176,10 +2176,10 @@ static void mov_r2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void mov_r2r( void )
+static void mov_r2r(tms7000_state *cpustate)
 {
 	UINT8	r,s;
 	UINT16	t;
@@ -2193,10 +2193,10 @@ static void mov_r2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void mov_i2a( void )
+static void mov_i2a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2207,10 +2207,10 @@ static void mov_i2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void mov_i2b( void )
+static void mov_i2b(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2221,10 +2221,10 @@ static void mov_i2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void mov_i2r( void )
+static void mov_i2r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -2237,45 +2237,45 @@ static void mov_i2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void movd_imm( void )
+static void movd_imm(tms7000_state *cpustate)
 {
 	PAIR	t;
 	UINT8	r;
 
 	IMMWORD(t);
 	IMMBYTE(r);
-	WRF16(r,t);
+	WRF16(cpustate,r,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 15;
+	cpustate->icount -= 15;
 
 }
 
-static void movd_r( void )
+static void movd_r(tms7000_state *cpustate)
 {
 	PAIR	t;
 	UINT8	r,s;
 
 	IMMBYTE(r);
 	IMMBYTE(s);
-	t.w.l = RRF16(r);
-	WRF16(s,t);
+	t.w.l = RRF16(cpustate,r);
+	WRF16(cpustate,s,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 14;
+	cpustate->icount -= 14;
 
 }
 
-static void movd_inx( void )
+static void movd_inx(tms7000_state *cpustate)
 {
 	PAIR	t;
 	UINT8	r;
@@ -2283,16 +2283,16 @@ static void movd_inx( void )
 	IMMWORD(t);
 	t.w.l += RDB;
 	IMMBYTE(r);
-	WRF16(r,t);
+	WRF16(cpustate,r,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 17;
+	cpustate->icount -= 17;
 }
 
-static void movp_a2p( void )
+static void movp_a2p(tms7000_state *cpustate)
 {
 	UINT8	p;
 	UINT16	t;
@@ -2305,10 +2305,10 @@ static void movp_a2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void movp_b2p( void )
+static void movp_b2p(tms7000_state *cpustate)
 {
 	UINT8	p;
 	UINT16	t;
@@ -2321,12 +2321,12 @@ static void movp_b2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
 #if 0
 /* this appears to be unused */
-static void movp_r2p( void )
+static void movp_r2p(tms7000_state *cpustate)
 {
 	UINT8	p,r;
 	UINT16	t;
@@ -2340,11 +2340,11 @@ static void movp_r2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 #endif
 
-static void movp_p2a( void )
+static void movp_p2a(tms7000_state *cpustate)
 {
 	UINT8	p;
 	UINT16	t;
@@ -2357,10 +2357,10 @@ static void movp_p2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void movp_p2b( void )
+static void movp_p2b(tms7000_state *cpustate)
 {
 	UINT8	p;
 	UINT16	t;
@@ -2373,26 +2373,26 @@ static void movp_p2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void mpy_ba( void )
+static void mpy_ba(tms7000_state *cpustate)
 {
 	PAIR t;
 
 	t.w.l = RDA * RDB;
 
-	WRF16(0x01,t);
+	WRF16(cpustate,0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 43;
+	cpustate->icount -= 43;
 
 }
 
-static void mpy_ra( void )
+static void mpy_ra(tms7000_state *cpustate)
 {
 	PAIR	t;
 	UINT8	r;
@@ -2401,17 +2401,17 @@ static void mpy_ra( void )
 
 	t.w.l = RDA * RM(r);
 
-	WRF16(0x01,t);
+	WRF16(cpustate,0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 46;
+	cpustate->icount -= 46;
 
 }
 
-static void mpy_rb( void )
+static void mpy_rb(tms7000_state *cpustate)
 {
 	PAIR	t;
 	UINT8	r;
@@ -2420,17 +2420,17 @@ static void mpy_rb( void )
 
 	t.w.l = RDB * RM(r);
 
-	WRF16(0x01,t);
+	WRF16(cpustate,0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 46;
+	cpustate->icount -= 46;
 
 }
 
-static void mpy_rr( void )
+static void mpy_rr(tms7000_state *cpustate)
 {
 	PAIR	t;
 	UINT8	r,s;
@@ -2440,17 +2440,17 @@ static void mpy_rr( void )
 
 	t.w.l = RM(s) * RM(r);
 
-	WRF16(0x01,t);
+	WRF16(cpustate,0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 48;
+	cpustate->icount -= 48;
 
 }
 
-static void mpy_ia( void )
+static void mpy_ia(tms7000_state *cpustate)
 {
 	PAIR	t;
 	UINT8	i;
@@ -2459,17 +2459,17 @@ static void mpy_ia( void )
 
 	t.w.l = RDA * i;
 
-	WRF16(0x01,t);
+	WRF16(cpustate,0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 45;
+	cpustate->icount -= 45;
 
 }
 
-static void mpy_ib( void )
+static void mpy_ib(tms7000_state *cpustate)
 {
 	PAIR	t;
 	UINT8	i;
@@ -2478,17 +2478,17 @@ static void mpy_ib( void )
 
 	t.w.l = RDB * i;
 
-	WRF16(0x01,t);
+	WRF16(cpustate,0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 45;
+	cpustate->icount -= 45;
 
 }
 
-static void mpy_ir( void )
+static void mpy_ir(tms7000_state *cpustate)
 {
 	PAIR	t;
 	UINT8	i,r;
@@ -2498,22 +2498,22 @@ static void mpy_ir( void )
 
 	t.w.l = RM(r) * i;
 
-	WRF16(0x01,t);
+	WRF16(cpustate,0x01,t);
 
 	CLR_NZC;
 	SET_N8(t.b.h);
 	SET_Z8(t.b.h);
 
-	tms7000_icount -= 47;
+	cpustate->icount -= 47;
 
 }
 
-static void nop( void )
+static void nop(tms7000_state *cpustate)
 {
-	tms7000_icount -= 4;
+	cpustate->icount -= 4;
 }
 
-static void or_b2a( void )
+static void or_b2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 
@@ -2524,10 +2524,10 @@ static void or_b2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void or_r2a( void )
+static void or_r2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -2541,10 +2541,10 @@ static void or_r2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void or_r2b( void )
+static void or_r2b(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -2558,10 +2558,10 @@ static void or_r2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void or_r2r( void )
+static void or_r2r(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	i,j;
@@ -2576,10 +2576,10 @@ static void or_r2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void or_i2a( void )
+static void or_i2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -2593,10 +2593,10 @@ static void or_i2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void or_i2b( void )
+static void or_i2b(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -2610,10 +2610,10 @@ static void or_i2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void or_i2r( void )
+static void or_i2r(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	i,j;
@@ -2628,10 +2628,10 @@ static void or_i2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void orp_a2p( void )
+static void orp_a2p(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -2644,10 +2644,10 @@ static void orp_a2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void orp_b2p( void )
+static void orp_b2p(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -2660,10 +2660,10 @@ static void orp_b2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void orp_i2p( void )
+static void orp_i2p(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	i,v;
@@ -2677,10 +2677,10 @@ static void orp_i2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 
-static void pop_a( void )
+static void pop_a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2691,10 +2691,10 @@ static void pop_a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void pop_b( void )
+static void pop_b(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2705,10 +2705,10 @@ static void pop_b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void pop_r( void )
+static void pop_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -2721,20 +2721,20 @@ static void pop_r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void pop_st( void )
+static void pop_st(tms7000_state *cpustate)
 {
 	UINT16	t;
 
 	PULLBYTE(t);
 	pSR = t;
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void push_a( void )
+static void push_a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2745,10 +2745,10 @@ static void push_a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void push_b( void )
+static void push_b(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2759,10 +2759,10 @@ static void push_b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void push_r( void )
+static void push_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	INT8	r;
@@ -2775,34 +2775,34 @@ static void push_r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void push_st( void )
+static void push_st(tms7000_state *cpustate)
 {
 	UINT16	t;
 	t = pSR;
 	PUSHBYTE(t);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void reti( void )
+static void reti(tms7000_state *cpustate)
 {
 	PULLWORD( PC );
 	PULLBYTE( pSR );
 
-	tms7000_icount -= 9;
-	tms7000_check_IRQ_lines();
+	cpustate->icount -= 9;
+	tms7000_check_IRQ_lines(cpustate);
 }
 
-static void rets( void )
+static void rets(tms7000_state *cpustate)
 {
 	PULLWORD( PC );
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void rl_a( void )
+static void rl_a(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2818,10 +2818,10 @@ static void rl_a( void )
 	SET_Z8(t);
 	WRA(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void rl_b( void )
+static void rl_b(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -2837,10 +2837,10 @@ static void rl_b( void )
 	SET_Z8(t);
 	WRB(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void rl_r( void )
+static void rl_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -2858,10 +2858,10 @@ static void rl_r( void )
 	SET_Z8(t);
 	WM(r,t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void rlc_a( void )
+static void rlc_a(tms7000_state *cpustate)
 {
 	UINT16	t;
 	int		old_carry;
@@ -2880,10 +2880,10 @@ static void rlc_a( void )
 	SET_Z8(t);
 	WRA(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void rlc_b( void )
+static void rlc_b(tms7000_state *cpustate)
 {
 	UINT16	t;
 	int		old_carry;
@@ -2902,10 +2902,10 @@ static void rlc_b( void )
 	SET_Z8(t);
 	WRB(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void rlc_r( void )
+static void rlc_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -2926,10 +2926,10 @@ static void rlc_r( void )
 	SET_Z8(t);
 	WM(r,t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void rr_a( void )
+static void rr_a(tms7000_state *cpustate)
 {
 	UINT16	t;
 	int		old_bit0;
@@ -2952,10 +2952,10 @@ static void rr_a( void )
 
 	WRA(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void rr_b( void )
+static void rr_b(tms7000_state *cpustate)
 {
 	UINT16	t;
 	int		old_bit0;
@@ -2978,10 +2978,10 @@ static void rr_b( void )
 
 	WRB(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void rr_r( void )
+static void rr_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -3007,10 +3007,10 @@ static void rr_r( void )
 
 	WM(r,t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void rrc_a( void )
+static void rrc_a(tms7000_state *cpustate)
 {
 	UINT16	t;
 	int		old_bit0;
@@ -3031,10 +3031,10 @@ static void rrc_a( void )
 
 	WRA(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void rrc_b( void )
+static void rrc_b(tms7000_state *cpustate)
 {
 	UINT16	t;
 	int		old_bit0;
@@ -3055,10 +3055,10 @@ static void rrc_b( void )
 
 	WRB(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void rrc_r( void )
+static void rrc_r(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -3081,10 +3081,10 @@ static void rrc_r( void )
 
 	WM(r,t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void sbb_ba( void )
+static void sbb_ba(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -3096,10 +3096,10 @@ static void sbb_ba( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void sbb_ra( void )
+static void sbb_ra(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -3113,10 +3113,10 @@ static void sbb_ra( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void sbb_rb( void )
+static void sbb_rb(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -3130,10 +3130,10 @@ static void sbb_rb( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void sbb_rr( void )
+static void sbb_rr(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r,s;
@@ -3148,10 +3148,10 @@ static void sbb_rr( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void sbb_ia( void )
+static void sbb_ia(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i;
@@ -3165,10 +3165,10 @@ static void sbb_ia( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void sbb_ib( void )
+static void sbb_ib(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i;
@@ -3182,10 +3182,10 @@ static void sbb_ib( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void sbb_ir( void )
+static void sbb_ir(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r,i;
@@ -3200,18 +3200,18 @@ static void sbb_ir( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void setc( void )
+static void setc(tms7000_state *cpustate)
 {
 	CLR_NZC;
 	pSR |= (SR_C|SR_Z);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void sta_dir( void )
+static void sta_dir(tms7000_state *cpustate)
 {
 	UINT16	t;
 	PAIR	i;
@@ -3225,17 +3225,17 @@ static void sta_dir( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }
 
-static void sta_ind( void )
+static void sta_ind(tms7000_state *cpustate)
 {
 	UINT16	t;
 	PAIR	p;
 	INT8	r;
 
 	IMMBYTE(r);
-	p.w.l = RRF16(r);
+	p.w.l = RRF16(cpustate,r);
 	t = RDA;
 	WM(p.w.l,t);
 
@@ -3243,10 +3243,10 @@ static void sta_ind( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void sta_inx( void )
+static void sta_inx(tms7000_state *cpustate)
 {
 	UINT16	t;
 	PAIR	i;
@@ -3259,17 +3259,17 @@ static void sta_inx( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 13;
+	cpustate->icount -= 13;
 }
 
-static void stsp( void )
+static void stsp(tms7000_state *cpustate)
 {
 	WRB(pSP);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void sub_ba( void )
+static void sub_ba(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -3281,10 +3281,10 @@ static void sub_ba( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void sub_ra( void )
+static void sub_ra(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -3298,10 +3298,10 @@ static void sub_ra( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void sub_rb( void )
+static void sub_rb(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r;
@@ -3315,10 +3315,10 @@ static void sub_rb( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void sub_rr( void )
+static void sub_rr(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r,s;
@@ -3333,10 +3333,10 @@ static void sub_rr( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void sub_ia( void )
+static void sub_ia(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i;
@@ -3350,10 +3350,10 @@ static void sub_ia( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void sub_ib( void )
+static void sub_ib(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	i;
@@ -3367,10 +3367,10 @@ static void sub_ib( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void sub_ir( void )
+static void sub_ir(tms7000_state *cpustate)
 {
 	UINT16	t;
 	UINT8	r,i;
@@ -3385,178 +3385,178 @@ static void sub_ir( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void trap_0( void )
+static void trap_0(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xfffe);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xfffe);
+	cpustate->icount -= 14;
 }
 
-static void trap_1( void )
+static void trap_1(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xfffc);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xfffc);
+	cpustate->icount -= 14;
 }
 
-static void trap_2( void )
+static void trap_2(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xfffa);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xfffa);
+	cpustate->icount -= 14;
 }
 
-static void trap_3( void )
+static void trap_3(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xfff8);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xfff8);
+	cpustate->icount -= 14;
 }
 
-static void trap_4( void )
+static void trap_4(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xfff6);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xfff6);
+	cpustate->icount -= 14;
 }
 
-static void trap_5( void )
+static void trap_5(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xfff4);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xfff4);
+	cpustate->icount -= 14;
 }
 
-static void trap_6( void )
+static void trap_6(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xfff2);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xfff2);
+	cpustate->icount -= 14;
 }
 
-static void trap_7( void )
+static void trap_7(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xfff0);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xfff0);
+	cpustate->icount -= 14;
 }
 
-static void trap_8( void )
+static void trap_8(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffee);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffee);
+	cpustate->icount -= 14;
 }
 
-static void trap_9( void )
+static void trap_9(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffec);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffec);
+	cpustate->icount -= 14;
 }
 
-static void trap_10( void )
+static void trap_10(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffea);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffea);
+	cpustate->icount -= 14;
 }
 
-static void trap_11( void )
+static void trap_11(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffe8);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffe8);
+	cpustate->icount -= 14;
 }
 
-static void trap_12( void )
+static void trap_12(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffe6);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffe6);
+	cpustate->icount -= 14;
 }
 
-static void trap_13( void )
+static void trap_13(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffe4);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffe4);
+	cpustate->icount -= 14;
 }
 
-static void trap_14( void )
+static void trap_14(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffe2);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffe2);
+	cpustate->icount -= 14;
 }
 
-static void trap_15( void )
+static void trap_15(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffe0);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffe0);
+	cpustate->icount -= 14;
 }
 
-static void trap_16( void )
+static void trap_16(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffde);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffde);
+	cpustate->icount -= 14;
 }
 
-static void trap_17( void )
+static void trap_17(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffdc);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffdc);
+	cpustate->icount -= 14;
 }
 
-static void trap_18( void )
+static void trap_18(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffda);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffda);
+	cpustate->icount -= 14;
 }
 
-static void trap_19( void )
+static void trap_19(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffd8);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffd8);
+	cpustate->icount -= 14;
 }
 
-static void trap_20( void )
+static void trap_20(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffd6);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffd6);
+	cpustate->icount -= 14;
 }
 
-static void trap_21( void )
+static void trap_21(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffd4);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffd4);
+	cpustate->icount -= 14;
 }
 
-static void trap_22( void )
+static void trap_22(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffd2);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffd2);
+	cpustate->icount -= 14;
 }
 
-static void trap_23( void )
+static void trap_23(tms7000_state *cpustate)
 {
 	PUSHWORD( PC );
-	pPC = RM16(0xffd0);
-	tms7000_icount -= 14;
+	pPC = RM16(cpustate, 0xffd0);
+	cpustate->icount -= 14;
 }
 
-static void swap_a( void )
+static void swap_a(tms7000_state *cpustate)
 {
 	UINT8	a,b;
 	UINT16	t;
@@ -3575,10 +3575,10 @@ static void swap_a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -=8;
+	cpustate->icount -=8;
 }
 
-static void swap_b( void )
+static void swap_b(tms7000_state *cpustate)
 {
 	UINT8	a,b;
 	UINT16	t;
@@ -3597,10 +3597,10 @@ static void swap_b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -=8;
+	cpustate->icount -=8;
 }
 
-static void swap_r( void )
+static void swap_r(tms7000_state *cpustate)
 {
 	UINT8	a,b,r;
 	UINT16	t;
@@ -3620,10 +3620,10 @@ static void swap_r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -=8;
+	cpustate->icount -=8;
 }
 
-static void swap_r_exl( void )
+static void swap_r_exl(tms7000_state *cpustate)
 {
 	UINT8	a,b,r;
 	UINT16	t;
@@ -3641,7 +3641,7 @@ static void swap_r_exl( void )
 		SET_N8(t);
 		SET_Z8(t);
 
-		tms7000_icount -= 9;	/* ?????? */
+		cpustate->icount -= 9;	/* ?????? */
 	}
 	else
 	{	/* stright swap Rn instruction */
@@ -3659,11 +3659,11 @@ static void swap_r_exl( void )
 		SET_N8(t);
 		SET_Z8(t);
 
-		tms7000_icount -=8;
+		cpustate->icount -=8;
 	}
 }
 
-static void tstb( void )
+static void tstb(tms7000_state *cpustate)
 {
 	UINT16	t;
 
@@ -3673,10 +3673,10 @@ static void tstb( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void xchb_a( void )
+static void xchb_a(tms7000_state *cpustate)
 {
 	UINT16	t,u;
 
@@ -3690,10 +3690,10 @@ static void xchb_a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void xchb_b( void )
+static void xchb_b(tms7000_state *cpustate)
 {
 	UINT16	t;
 /*  UINT16  u;  */
@@ -3708,10 +3708,10 @@ static void xchb_b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 6;
+	cpustate->icount -= 6;
 }
 
-static void xchb_r( void )
+static void xchb_r(tms7000_state *cpustate)
 {
 	UINT16	t,u;
 	UINT8	r;
@@ -3728,10 +3728,10 @@ static void xchb_r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void xor_b2a( void )
+static void xor_b2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 
@@ -3742,10 +3742,10 @@ static void xor_b2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 5;
+	cpustate->icount -= 5;
 }
 
-static void xor_r2a( void )
+static void xor_r2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -3759,10 +3759,10 @@ static void xor_r2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void xor_r2b( void )
+static void xor_r2b(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -3776,10 +3776,10 @@ static void xor_r2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 8;
+	cpustate->icount -= 8;
 }
 
-static void xor_r2r( void )
+static void xor_r2r(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	i,j;
@@ -3794,10 +3794,10 @@ static void xor_r2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void xor_i2a( void )
+static void xor_i2a(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -3811,10 +3811,10 @@ static void xor_i2a( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void xor_i2b( void )
+static void xor_i2b(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -3828,10 +3828,10 @@ static void xor_i2b( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 7;
+	cpustate->icount -= 7;
 }
 
-static void xor_i2r( void )
+static void xor_i2r(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	i,j;
@@ -3846,10 +3846,10 @@ static void xor_i2r( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void xorp_a2p( void )
+static void xorp_a2p(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -3862,10 +3862,10 @@ static void xorp_a2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 10;
+	cpustate->icount -= 10;
 }
 
-static void xorp_b2p( void )
+static void xorp_b2p(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	v;
@@ -3878,10 +3878,10 @@ static void xorp_b2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 9;
+	cpustate->icount -= 9;
 }
 
-static void xorp_i2p( void )
+static void xorp_i2p(tms7000_state *cpustate)
 {
 	UINT8	t;
 	UINT8	i,v;
@@ -3895,5 +3895,5 @@ static void xorp_i2p( void )
 	SET_N8(t);
 	SET_Z8(t);
 
-	tms7000_icount -= 11;
+	cpustate->icount -= 11;
 }

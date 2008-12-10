@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   tms7000.h (c header file)
+ *   cpustate->h (c header file)
  *   Portable TMS7000 emulator (Texas Instruments 7000)
  *
  *   Copyright tim lindner, all rights reserved.

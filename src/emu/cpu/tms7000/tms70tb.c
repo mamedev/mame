@@ -17,7 +17,7 @@
  *
  *****************************************************************************/
 
-static void (*const opfn[0x100])(void) = {
+static void (*const opfn[0x100])(tms7000_state *cpustate) = {
 /*          0xX0,   0xX1,     0xX2,    0xX3,    0xX4,    0xX5,    0xX6,    0xX7,
             0xX8,   0xX9,     0xXA,    0xXB,    0xXC,    0xXD,    0xXE,    0xXF   */
 
@@ -70,7 +70,7 @@ static void (*const opfn[0x100])(void) = {
             trap_7,  trap_6,  trap_5,  trap_4,  trap_3,  trap_2,  trap_1,  trap_0
 };
 
-static void (*const opfn_exl[0x100])(void) = {
+static void (*const opfn_exl[0x100])(tms7000_state *cpustate) = {
 /*          0xX0,   0xX1,     0xX2,    0xX3,    0xX4,    0xX5,    0xX6,    0xX7,
             0xX8,   0xX9,     0xXA,    0xXB,    0xXC,    0xXD,    0xXE,    0xXF   */
 
