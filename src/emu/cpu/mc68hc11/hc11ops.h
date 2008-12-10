@@ -3,7 +3,7 @@ struct _hc11_opcode_list_struct
 {
 	int page;
 	int opcode;
-	void (*handler)(void);
+	void (*handler)(hc11_state *cpustate);
 };
 
 static const hc11_opcode_list_struct hc11_opcode_list[] =
