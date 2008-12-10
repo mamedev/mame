@@ -45,7 +45,8 @@ enum
 	LH5801_IRQ_STATE
 };
 
-typedef struct
+typedef struct _lh5810_state lh5801_state;
+struct _lh5810_state
 {
 	const lh5801_cpu_core *config;
 	const device_config *device;
@@ -63,23 +64,20 @@ typedef struct
 	int irq_state;
 
 	int idle;
-} LH5801_Regs;
+	int icount;
+};
 
-static int lh5801_icount = 0;
-
-static LH5801_Regs lh5801= { 0 };
-
-#define P lh5801.p.w.l
-#define S lh5801.s.w.l
-#define U lh5801.u.w.l
-#define UL lh5801.u.b.l
-#define UH lh5801.u.b.h
-#define X lh5801.x.w.l
-#define XL lh5801.x.b.l
-#define XH lh5801.x.b.h
-#define Y lh5801.y.w.l
-#define YL lh5801.y.b.l
-#define YH lh5801.y.b.h
+#define P cpustate->p.w.l
+#define S cpustate->s.w.l
+#define U cpustate->u.w.l
+#define UL cpustate->u.b.l
+#define UH cpustate->u.b.h
+#define X cpustate->x.w.l
+#define XL cpustate->x.b.l
+#define XH cpustate->x.b.h
+#define Y cpustate->y.w.l
+#define YL cpustate->y.b.l
+#define YH cpustate->y.b.h
 
 #define C 0x01
 #define IE 0x02
@@ -94,56 +92,48 @@ static LH5801_Regs lh5801= { 0 };
 
 static CPU_INIT( lh5801 )
 {
-	memset(&lh5801, 0, sizeof(lh5801));
-	lh5801.config = (const lh5801_cpu_core *) device->static_config;
-	lh5801.device = device;
-	lh5801.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	lh5801_state *cpustate = device->token;
+	
+	memset(cpustate, 0, sizeof(*cpustate));
+	cpustate->config = (const lh5801_cpu_core *) device->static_config;
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( lh5801 )
 {
-	P = (memory_read_byte(lh5801.program, 0xfffe)<<8) | memory_read_byte(lh5801.program, 0xffff);
+	lh5801_state *cpustate = device->token;
 
-	lh5801.idle=0;
-}
+	P = (memory_read_byte(cpustate->program, 0xfffe)<<8) | memory_read_byte(cpustate->program, 0xffff);
 
-static CPU_GET_CONTEXT( lh5801 )
-{
-	if( dst )
-		*(LH5801_Regs*)dst = lh5801;
-}
-
-static CPU_SET_CONTEXT( lh5801 )
-{
-	if( src )
-	{
-		lh5801 = *(LH5801_Regs*)src;
-	}
+	cpustate->idle=0;
 }
 
 static CPU_EXECUTE( lh5801 )
 {
-	lh5801_icount = cycles;
+	lh5801_state *cpustate = device->token;
 
-	if (lh5801.idle) {
-		lh5801_icount=0;
+	cpustate->icount = cycles;
+
+	if (cpustate->idle) {
+		cpustate->icount=0;
 	} else {
 		do
 		{
-			lh5801.oldpc = P;
+			cpustate->oldpc = P;
 
 			debugger_instruction_hook(device, P);
-			lh5801_instruction();
+			lh5801_instruction(cpustate);
 
-		} while (lh5801_icount > 0);
+		} while (cpustate->icount > 0);
 	}
 
-	return cycles - lh5801_icount;
+	return cycles - cpustate->icount;
 }
 
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(lh5801_state *cpustate, int irqline, int state)
 {
-	lh5801.idle=0;
+	cpustate->idle=0;
 }
 
 
@@ -154,10 +144,11 @@ static void set_irq_line(int irqline, int state)
 
 static CPU_SET_INFO( lh5801 )
 {
+	lh5801_state *cpustate = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE:					set_irq_line(0, info->i);				break;
+		case CPUINFO_INT_INPUT_STATE:					set_irq_line(cpustate, 0, info->i);				break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + LH5801_P:			P = info->i;							break;
@@ -166,12 +157,12 @@ static CPU_SET_INFO( lh5801 )
 		case CPUINFO_INT_REGISTER + LH5801_U:			U = info->i;							break;
 		case CPUINFO_INT_REGISTER + LH5801_X:			X = info->i;							break;
 		case CPUINFO_INT_REGISTER + LH5801_Y:			Y = info->i;							break;
-		case CPUINFO_INT_REGISTER + LH5801_T:			lh5801.t = info->i;						break;
-		case CPUINFO_INT_REGISTER + LH5801_TM:			lh5801.tm = info->i;					break;
-		case CPUINFO_INT_REGISTER + LH5801_BF:			lh5801.bf = info->i;					break;
-		case CPUINFO_INT_REGISTER + LH5801_PV:			lh5801.pv = info->i;					break;
-		case CPUINFO_INT_REGISTER + LH5801_PU:			lh5801.pu = info->i;					break;
-		case CPUINFO_INT_REGISTER + LH5801_DP:			lh5801.dp = info->i;					break;
+		case CPUINFO_INT_REGISTER + LH5801_T:			cpustate->t = info->i;						break;
+		case CPUINFO_INT_REGISTER + LH5801_TM:			cpustate->tm = info->i;					break;
+		case CPUINFO_INT_REGISTER + LH5801_BF:			cpustate->bf = info->i;					break;
+		case CPUINFO_INT_REGISTER + LH5801_PV:			cpustate->pv = info->i;					break;
+		case CPUINFO_INT_REGISTER + LH5801_PU:			cpustate->pu = info->i;					break;
+		case CPUINFO_INT_REGISTER + LH5801_DP:			cpustate->dp = info->i;					break;
 	}
 }
 
@@ -183,10 +174,12 @@ static CPU_SET_INFO( lh5801 )
 
 CPU_GET_INFO( lh5801 )
 {
+	lh5801_state *cpustate = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(lh5801);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(lh5801_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
@@ -207,9 +200,9 @@ CPU_GET_INFO( lh5801 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE:					info->i = lh5801.irq_state;				break;
+		case CPUINFO_INT_INPUT_STATE:					info->i = cpustate->irq_state;				break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = lh5801.oldpc;					break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->oldpc;					break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + LH5801_P:			info->i = P;							break;
@@ -218,25 +211,25 @@ CPU_GET_INFO( lh5801 )
 		case CPUINFO_INT_REGISTER + LH5801_U:			info->i = U;							break;
 		case CPUINFO_INT_REGISTER + LH5801_X:			info->i = X;							break;
 		case CPUINFO_INT_REGISTER + LH5801_Y:			info->i = Y;							break;
-		case CPUINFO_INT_REGISTER + LH5801_T:			info->i = lh5801.t;						break;
-		case CPUINFO_INT_REGISTER + LH5801_TM:			info->i = lh5801.tm;					break;
-		case CPUINFO_INT_REGISTER + LH5801_IN:			info->i = lh5801.config->in();			break;
-		case CPUINFO_INT_REGISTER + LH5801_BF:			info->i = lh5801.bf;					break;
-		case CPUINFO_INT_REGISTER + LH5801_PV:			info->i = lh5801.pv;					break;
-		case CPUINFO_INT_REGISTER + LH5801_PU:			info->i = lh5801.pu;					break;
-		case CPUINFO_INT_REGISTER + LH5801_DP:			info->i = lh5801.dp;					break;
+		case CPUINFO_INT_REGISTER + LH5801_T:			info->i = cpustate->t;						break;
+		case CPUINFO_INT_REGISTER + LH5801_TM:			info->i = cpustate->tm;					break;
+		case CPUINFO_INT_REGISTER + LH5801_IN:			info->i = cpustate->config->in(device);			break;
+		case CPUINFO_INT_REGISTER + LH5801_BF:			info->i = cpustate->bf;					break;
+		case CPUINFO_INT_REGISTER + LH5801_PV:			info->i = cpustate->pv;					break;
+		case CPUINFO_INT_REGISTER + LH5801_PU:			info->i = cpustate->pu;					break;
+		case CPUINFO_INT_REGISTER + LH5801_DP:			info->i = cpustate->dp;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(lh5801);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(lh5801);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(lh5801);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(lh5801);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(lh5801);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(lh5801);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(lh5801);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &lh5801_icount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "LH5801"); break;
@@ -247,28 +240,28 @@ CPU_GET_INFO( lh5801 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%s%s%s%s%s%s%s%s",
-				lh5801.t&0x80?"1":"0",
-				lh5801.t&0x40?"1":"0",
-				lh5801.t&0x20?"1":"0",
-				lh5801.t&0x10?"H":".",
-				lh5801.t&8?"V":".",
-				lh5801.t&4?"Z":".",
-				lh5801.t&2?"I":".",
-				lh5801.t&1?"C":".");
+				cpustate->t&0x80?"1":"0",
+				cpustate->t&0x40?"1":"0",
+				cpustate->t&0x20?"1":"0",
+				cpustate->t&0x10?"H":".",
+				cpustate->t&8?"V":".",
+				cpustate->t&4?"Z":".",
+				cpustate->t&2?"I":".",
+				cpustate->t&1?"C":".");
 			break;
 
-		case CPUINFO_STR_REGISTER + LH5801_P:			sprintf(info->s, "P:%04X", lh5801.p.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_S:			sprintf(info->s, "S:%04X", lh5801.s.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_U:			sprintf(info->s, "U:%04X", lh5801.u.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_X:			sprintf(info->s, "X:%04X", lh5801.x.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_Y:			sprintf(info->s, "Y:%04X", lh5801.y.w.l); break;
-		case CPUINFO_STR_REGISTER + LH5801_T:			sprintf(info->s, "T:%02X", lh5801.t); break;
-		case CPUINFO_STR_REGISTER + LH5801_A:			sprintf(info->s, "A:%02X", lh5801.a); break;
-		case CPUINFO_STR_REGISTER + LH5801_TM:			sprintf(info->s, "TM:%03X", lh5801.tm); break;
-		case CPUINFO_STR_REGISTER + LH5801_IN:			sprintf(info->s, "IN:%02X", lh5801.config->in()); break;
-		case CPUINFO_STR_REGISTER + LH5801_PV:			sprintf(info->s, "PV:%04X", lh5801.pv); break;
-		case CPUINFO_STR_REGISTER + LH5801_PU:			sprintf(info->s, "PU:%04X", lh5801.pu); break;
-		case CPUINFO_STR_REGISTER + LH5801_BF:			sprintf(info->s, "BF:%04X", lh5801.bf); break;
-		case CPUINFO_STR_REGISTER + LH5801_DP:			sprintf(info->s, "DP:%04X", lh5801.dp); break;
+		case CPUINFO_STR_REGISTER + LH5801_P:			sprintf(info->s, "P:%04X", cpustate->p.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_S:			sprintf(info->s, "S:%04X", cpustate->s.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_U:			sprintf(info->s, "U:%04X", cpustate->u.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_X:			sprintf(info->s, "X:%04X", cpustate->x.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_Y:			sprintf(info->s, "Y:%04X", cpustate->y.w.l); break;
+		case CPUINFO_STR_REGISTER + LH5801_T:			sprintf(info->s, "T:%02X", cpustate->t); break;
+		case CPUINFO_STR_REGISTER + LH5801_A:			sprintf(info->s, "A:%02X", cpustate->a); break;
+		case CPUINFO_STR_REGISTER + LH5801_TM:			sprintf(info->s, "TM:%03X", cpustate->tm); break;
+		case CPUINFO_STR_REGISTER + LH5801_IN:			sprintf(info->s, "IN:%02X", cpustate->config->in(device)); break;
+		case CPUINFO_STR_REGISTER + LH5801_PV:			sprintf(info->s, "PV:%04X", cpustate->pv); break;
+		case CPUINFO_STR_REGISTER + LH5801_PU:			sprintf(info->s, "PU:%04X", cpustate->pu); break;
+		case CPUINFO_STR_REGISTER + LH5801_BF:			sprintf(info->s, "BF:%04X", cpustate->bf); break;
+		case CPUINFO_STR_REGISTER + LH5801_DP:			sprintf(info->s, "DP:%04X", cpustate->dp); break;
 	}
 }
