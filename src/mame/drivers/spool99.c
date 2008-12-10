@@ -20,12 +20,14 @@ TODO:
 -EEPROM barely hooked up,enough to let this to boot but it doesn't save settings at the
  moment;
 -An "input BAD" msg pops up at start-up,probably because there are inputs not yet hooked up.
+-Visible area might be wrong (384x240),but this doesn't even have a cross-hatch test,so I
+ need a snapshot from the original thing...
 
 ============================================================================================
 
-Anno	1998
-Produttore
-N.revisione	0.36
+Year	1998
+Manufacturer Electronic Projects
+Revision N.	0.36
 
 CPU
 
@@ -54,9 +56,9 @@ Note
 
 --- 2nd pcb
 
-Anno	1993
-Produttore	Hi-Tech Software
-N.revisione
+Year	1998
+Manufacturer Electronic Projects
+Revision N. 0.31
 
 CPU
 
@@ -273,7 +275,7 @@ static MACHINE_DRIVER_START( spool99 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(7*8, 55*8-1, 1*8, 31*8-1) //384x240,raw guess
 
 	MDRV_PALETTE_LENGTH(0x200)
 
@@ -305,8 +307,8 @@ ROM_END
 
 ROM_START( spool99a )
 	ROM_REGION( 0x40000, "main", 0 ) // z80 code
-	ROM_LOAD( "u2.bin", 0x00000, 0x10000, BAD_DUMP CRC(488dd1bf) SHA1(7289b639fa56722d1f60d8c4bda566d726f8e00b) ) // first half empty!
-	ROM_CONTINUE(0x00000,0x10000) // 0x0000 - 0xafff used
+	ROM_LOAD( "u2.bin", 0x00000, 0x10000, CRC(488dd1bf) SHA1(7289b639fa56722d1f60d8c4bda566d726f8e00b) ) // first half empty!
+	ROM_CONTINUE( 0x00000, 0x10000) // 0x0000 - 0xafff used
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "u32.bin", 0x00000, 0x40000, CRC(1b7aa54c) SHA1(87fc4da8d2a85bc3ce00d8f0f03fef0027e8454a) )
