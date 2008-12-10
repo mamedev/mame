@@ -3,6 +3,8 @@
 #ifndef __RSP_H__
 #define __RSP_H__
 
+typedef void (*rsp_set_status_func)(const device_config *device, UINT32 status);
+
 typedef struct _rsp_config rsp_config;
 struct _rsp_config
 {
@@ -10,7 +12,7 @@ struct _rsp_config
 	write32_space_func dp_reg_w;
 	read32_space_func sp_reg_r;
 	write32_space_func sp_reg_w;
-	void (*sp_set_status)(UINT32 status);
+	rsp_set_status_func sp_set_status;
 };
 
 enum

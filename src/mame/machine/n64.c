@@ -205,24 +205,24 @@ static void sp_dma(int direction)
 	}
 }
 
-static void sp_set_status(UINT32 status)
+static void sp_set_status(const device_config *device, UINT32 status)
 {
 	if (status & 0x1)
 	{
 		//cpuexec_trigger(Machine, 6789);
 
-		cpu_set_input_line(Machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-        cpu_set_reg(Machine->cpu[1], RSP_SR, cpu_get_reg(Machine->cpu[1], RSP_SR) | RSP_STATUS_HALT);
+		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
+        cpu_set_reg(device, RSP_SR, cpu_get_reg(device, RSP_SR) | RSP_STATUS_HALT);
 		//rsp_sp_status |= SP_STATUS_HALT;
 	}
 	if (status & 0x2)
 	{
 		//rsp_sp_status |= SP_STATUS_BROKE;
-        cpu_set_reg(Machine->cpu[1], RSP_SR, cpu_get_reg(Machine->cpu[1], RSP_SR) | RSP_STATUS_BROKE);
+        cpu_set_reg(device, RSP_SR, cpu_get_reg(device, RSP_SR) | RSP_STATUS_BROKE);
 
-        if (cpu_get_reg(Machine->cpu[1], RSP_SR) & RSP_STATUS_INTR_BREAK)
+        if (cpu_get_reg(device, RSP_SR) & RSP_STATUS_INTR_BREAK)
 		{
-			signal_rcp_interrupt(Machine, SP_INTERRUPT);
+			signal_rcp_interrupt(device->machine, SP_INTERRUPT);
 		}
 	}
 }
