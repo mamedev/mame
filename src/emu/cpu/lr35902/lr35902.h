@@ -5,12 +5,14 @@
 
 #include "cpuintrf.h"
 
+typedef void (*lr35902_timer_fired_func)(const device_config *device, int cycles);
+
 typedef struct _lr35902_cpu_core lr35902_cpu_core;
 struct _lr35902_cpu_core
 {
 	const UINT16	*regs;
-	UINT8	features;
-	void	(*timer_fired_func)(int cycles);
+	UINT8			features;
+	lr35902_timer_fired_func timer_fired_func;
 };
 
 enum
