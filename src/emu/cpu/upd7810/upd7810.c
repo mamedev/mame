@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   upd7810.c
+ *   upd7810.h
  *   Portable uPD7810/11, 7810H/11H, 78C10/C11/C14 emulator V0.3
  *
  *   Copyright Juergen Buchmueller, all rights reserved.
@@ -45,7 +45,7 @@
  *  "NEC Electronics User's Manual, April 1987"
  *
  * NS20030115:
- * - fixed INRW_wa()
+ * - fixed INRW_wa(cpustate)
  * - TODO: add 7807, differences are listed below.
  *       I only added support for these opcodes needed by homedata.c (yes, I am
  *       lazy):
@@ -407,8 +407,100 @@ STOP            01001000  10111011          12  stop
 #include "debugger.h"
 #include "upd7810.h"
 
-static UPD7810 upd7810;
-static int upd7810_icount;
+typedef struct _upd7810_state upd7810_state;
+struct _upd7810_state
+{
+	PAIR	ppc;	/* previous program counter */
+	PAIR	pc; 	/* program counter */
+	PAIR	sp; 	/* stack pointer */
+	UINT8	op; 	/* opcode */
+	UINT8	op2;	/* opcode part 2 */
+	UINT8	iff;	/* interrupt enable flip flop */
+	UINT8	psw;	/* processor status word */
+	PAIR	ea; 	/* extended accumulator */
+	PAIR	va; 	/* accumulator + vector register */
+	PAIR	bc; 	/* 8bit B and C registers / 16bit BC register */
+	PAIR	de; 	/* 8bit D and E registers / 16bit DE register */
+	PAIR	hl; 	/* 8bit H and L registers / 16bit HL register */
+	PAIR	ea2;	/* alternate register set */
+	PAIR	va2;
+	PAIR	bc2;
+	PAIR	de2;
+	PAIR	hl2;
+	PAIR	cnt;	/* 8 bit timer counter */
+	PAIR	tm; 	/* 8 bit timer 0/1 comparator inputs */
+	PAIR	ecnt;	/* timer counter register / capture register */
+	PAIR	etm;	/* timer 0/1 comparator inputs */
+	UINT8	ma; 	/* port A input or output mask */
+	UINT8	mb; 	/* port B input or output mask */
+	UINT8	mcc;	/* port C control/port select */
+	UINT8	mc; 	/* port C input or output mask */
+	UINT8	mm; 	/* memory mapping */
+	UINT8	mf; 	/* port F input or output mask */
+	UINT8	tmm;	/* timer 0 and timer 1 operating parameters */
+	UINT8	etmm;	/* 16-bit multifunction timer/event counter */
+	UINT8	eom;	/* 16-bit timer/event counter output control */
+	UINT8	sml;	/* serial interface parameters low */
+	UINT8	smh;	/* -"- high */
+	UINT8	anm;	/* analog to digital converter operating parameters */
+	UINT8	mkl;	/* interrupt mask low */
+	UINT8	mkh;	/* -"- high */
+	UINT8	zcm;	/* bias circuitry for ac zero-cross detection */
+	UINT8	pa_in;	/* port A,B,C,D,F inputs */
+	UINT8	pb_in;
+	UINT8	pc_in;
+	UINT8	pd_in;
+	UINT8	pf_in;
+	UINT8	pa_out; /* port A,B,C,D,F outputs */
+	UINT8	pb_out;
+	UINT8	pc_out;
+	UINT8	pd_out;
+	UINT8	pf_out;
+	UINT8	cr0;	/* analog digital conversion register 0 */
+	UINT8	cr1;	/* analog digital conversion register 1 */
+	UINT8	cr2;	/* analog digital conversion register 2 */
+	UINT8	cr3;	/* analog digital conversion register 3 */
+	UINT8	txb;	/* transmitter buffer */
+	UINT8	rxb;	/* receiver buffer */
+	UINT8	txd;	/* port C control line states */
+	UINT8	rxd;
+	UINT8	sck;
+	UINT8	ti;
+	UINT8	to;
+	UINT8	ci;
+	UINT8	co0;
+	UINT8	co1;
+	UINT16	irr;	/* interrupt request register */
+	UINT16	itf;	/* interrupt test flag register */
+
+/* internal helper variables */
+	UINT16	txs;	/* transmitter shift register */
+	UINT16	rxs;	/* receiver shift register */
+	UINT8	txcnt;	/* transmitter shift register bit count */
+	UINT8	rxcnt;	/* receiver shift register bit count */
+	UINT8	txbuf;	/* transmitter buffer was written */
+	INT32	ovc0;	/* overflow counter for timer 0 (for clock div 12/384) */
+	INT32	ovc1;	/* overflow counter for timer 0 (for clock div 12/384) */
+	INT32	ovce;	/* overflow counter for ecnt */
+	INT32	ovcf;	/* overflow counter for fixed clock div 3 mode */
+	INT32	ovcs;	/* overflow counter for serial I/O */
+	UINT8	edges;	/* rising/falling edge flag for serial I/O */
+	const struct opcode_s *opXX;	/* opcode table */
+	const struct opcode_s *op48;
+	const struct opcode_s *op4C;
+	const struct opcode_s *op4D;
+	const struct opcode_s *op60;
+	const struct opcode_s *op64;
+	const struct opcode_s *op70;
+	const struct opcode_s *op74;
+	void (*handle_timers)(upd7810_state *cpustate, int cycles);
+	UPD7810_CONFIG config;
+	cpu_irq_callback irq_callback;
+	const device_config *device;
+	const address_space *program;
+	const address_space *io;
+	int icount;
+};
 
 #define CY	0x01
 #define F1	0x02
@@ -441,104 +533,104 @@ static int upd7810_icount;
 #define INTAN7	0x0008
 #define INTSB	0x0010
 
-#define PPC 	upd7810.ppc.w.l
-#define PC		upd7810.pc.w.l
-#define PCL 	upd7810.pc.b.l
-#define PCH 	upd7810.pc.b.h
-#define PCD 	upd7810.pc.d
-#define SP		upd7810.sp.w.l
-#define SPL 	upd7810.sp.b.l
-#define SPH 	upd7810.sp.b.h
-#define SPD 	upd7810.sp.d
-#define PSW 	upd7810.psw
-#define OP		upd7810.op
-#define OP2 	upd7810.op2
-#define IFF 	upd7810.iff
-#define EA		upd7810.ea.w.l
-#define EAL 	upd7810.ea.b.l
-#define EAH 	upd7810.ea.b.h
-#define VA		upd7810.va.w.l
-#define V		upd7810.va.b.h
-#define A		upd7810.va.b.l
-#define VAD 	upd7810.va.d
-#define BC		upd7810.bc.w.l
-#define B		upd7810.bc.b.h
-#define C		upd7810.bc.b.l
-#define DE		upd7810.de.w.l
-#define D		upd7810.de.b.h
-#define E		upd7810.de.b.l
-#define HL		upd7810.hl.w.l
-#define H		upd7810.hl.b.h
-#define L		upd7810.hl.b.l
-#define EA2 	upd7810.ea2.w.l
-#define VA2 	upd7810.va2.w.l
-#define BC2 	upd7810.bc2.w.l
-#define DE2 	upd7810.de2.w.l
-#define HL2 	upd7810.hl2.w.l
+#define PPC 	cpustate->ppc.w.l
+#define PC		cpustate->pc.w.l
+#define PCL 	cpustate->pc.b.l
+#define PCH 	cpustate->pc.b.h
+#define PCD 	cpustate->pc.d
+#define SP		cpustate->sp.w.l
+#define SPL 	cpustate->sp.b.l
+#define SPH 	cpustate->sp.b.h
+#define SPD 	cpustate->sp.d
+#define PSW 	cpustate->psw
+#define OP		cpustate->op
+#define OP2 	cpustate->op2
+#define IFF 	cpustate->iff
+#define EA		cpustate->ea.w.l
+#define EAL 	cpustate->ea.b.l
+#define EAH 	cpustate->ea.b.h
+#define VA		cpustate->va.w.l
+#define V		cpustate->va.b.h
+#define A		cpustate->va.b.l
+#define VAD 	cpustate->va.d
+#define BC		cpustate->bc.w.l
+#define B		cpustate->bc.b.h
+#define C		cpustate->bc.b.l
+#define DE		cpustate->de.w.l
+#define D		cpustate->de.b.h
+#define E		cpustate->de.b.l
+#define HL		cpustate->hl.w.l
+#define H		cpustate->hl.b.h
+#define L		cpustate->hl.b.l
+#define EA2 	cpustate->ea2.w.l
+#define VA2 	cpustate->va2.w.l
+#define BC2 	cpustate->bc2.w.l
+#define DE2 	cpustate->de2.w.l
+#define HL2 	cpustate->hl2.w.l
 
-#define OVC0	upd7810.ovc0
-#define OVC1	upd7810.ovc1
-#define OVCE	upd7810.ovce
-#define OVCF	upd7810.ovcf
-#define OVCS	upd7810.ovcs
-#define EDGES	upd7810.edges
+#define OVC0	cpustate->ovc0
+#define OVC1	cpustate->ovc1
+#define OVCE	cpustate->ovce
+#define OVCF	cpustate->ovcf
+#define OVCS	cpustate->ovcs
+#define EDGES	cpustate->edges
 
-#define CNT0	upd7810.cnt.b.l
-#define CNT1	upd7810.cnt.b.h
-#define TM0 	upd7810.tm.b.l
-#define TM1 	upd7810.tm.b.h
-#define ECNT	upd7810.ecnt.w.l
-#define ECPT	upd7810.ecnt.w.h
-#define ETM0	upd7810.etm.w.l
-#define ETM1	upd7810.etm.w.h
+#define CNT0	cpustate->cnt.b.l
+#define CNT1	cpustate->cnt.b.h
+#define TM0 	cpustate->tm.b.l
+#define TM1 	cpustate->tm.b.h
+#define ECNT	cpustate->ecnt.w.l
+#define ECPT	cpustate->ecnt.w.h
+#define ETM0	cpustate->etm.w.l
+#define ETM1	cpustate->etm.w.h
 
-#define MA		upd7810.ma
-#define MB		upd7810.mb
-#define MCC 	upd7810.mcc
-#define MC		upd7810.mc
-#define MM		upd7810.mm
-#define MF		upd7810.mf
-#define TMM 	upd7810.tmm
-#define ETMM	upd7810.etmm
-#define EOM 	upd7810.eom
-#define SML 	upd7810.sml
-#define SMH 	upd7810.smh
-#define ANM 	upd7810.anm
-#define MKL 	upd7810.mkl
-#define MKH 	upd7810.mkh
-#define ZCM 	upd7810.zcm
+#define MA		cpustate->ma
+#define MB		cpustate->mb
+#define MCC 	cpustate->mcc
+#define MC		cpustate->mc
+#define MM		cpustate->mm
+#define MF		cpustate->mf
+#define TMM 	cpustate->tmm
+#define ETMM	cpustate->etmm
+#define EOM 	cpustate->eom
+#define SML 	cpustate->sml
+#define SMH 	cpustate->smh
+#define ANM 	cpustate->anm
+#define MKL 	cpustate->mkl
+#define MKH 	cpustate->mkh
+#define ZCM 	cpustate->zcm
 
-#define CR0 	upd7810.cr0
-#define CR1 	upd7810.cr1
-#define CR2 	upd7810.cr2
-#define CR3 	upd7810.cr3
-#define RXB 	upd7810.rxb
-#define TXB 	upd7810.txb
+#define CR0 	cpustate->cr0
+#define CR1 	cpustate->cr1
+#define CR2 	cpustate->cr2
+#define CR3 	cpustate->cr3
+#define RXB 	cpustate->rxb
+#define TXB 	cpustate->txb
 
-#define RXD 	upd7810.rxd
-#define TXD 	upd7810.txd
-#define SCK 	upd7810.sck
-#define TI		upd7810.ti
-#define TO		upd7810.to
-#define CI		upd7810.ci
-#define CO0 	upd7810.co0
-#define CO1 	upd7810.co1
+#define RXD 	cpustate->rxd
+#define TXD 	cpustate->txd
+#define SCK 	cpustate->sck
+#define TI		cpustate->ti
+#define TO		cpustate->to
+#define CI		cpustate->ci
+#define CO0 	cpustate->co0
+#define CO1 	cpustate->co1
 
-#define IRR 	upd7810.irr
-#define ITF 	upd7810.itf
+#define IRR 	cpustate->irr
+#define ITF 	cpustate->itf
 
 struct opcode_s {
-	void (*opfunc)(void);
+	void (*opfunc)(upd7810_state *cpustate);
 	UINT8 oplen;
 	UINT8 cycles;
 	UINT8 cycles_skip;
 	UINT8 mask_l0_l1;
 };
 
-#define RDOP(O) 	O = memory_decrypted_read_byte(upd7810.program, PCD); PC++
-#define RDOPARG(A)	A = memory_raw_read_byte(upd7810.program, PCD); PC++
-#define RM(A)		memory_read_byte_8le(upd7810.program, A)
-#define WM(A,V) 	memory_write_byte_8le(upd7810.program, A,V)
+#define RDOP(O) 	O = memory_decrypted_read_byte(cpustate->program, PCD); PC++
+#define RDOPARG(A)	A = memory_raw_read_byte(cpustate->program, PCD); PC++
+#define RM(A)		memory_read_byte_8le(cpustate->program, A)
+#define WM(A,V) 	memory_write_byte_8le(cpustate->program, A,V)
 
 #define ZHC_ADD(after,before,carry) 	\
 	if (after == 0) PSW |= Z; else PSW &= ~Z; \
@@ -572,51 +664,51 @@ struct opcode_s {
 #define SKIP_NZ 	if (0 == (PSW & Z)) PSW |= SK
 #define SET_Z(n)	if (n) PSW &= ~Z; else PSW |= Z
 
-static UINT8 RP(offs_t port)
+static UINT8 RP(upd7810_state *cpustate, offs_t port)
 {
 	UINT8 data = 0xff;
 	switch (port)
 	{
 	case UPD7810_PORTA:
-		if (upd7810.ma)	// NS20031301 no need to read if the port is set as output
-			upd7810.pa_in = memory_read_byte_8le(upd7810.io, port);
-		data = (upd7810.pa_in & upd7810.ma) | (upd7810.pa_out & ~upd7810.ma);
+		if (cpustate->ma)	// NS20031301 no need to read if the port is set as output
+			cpustate->pa_in = memory_read_byte_8le(cpustate->io, port);
+		data = (cpustate->pa_in & cpustate->ma) | (cpustate->pa_out & ~cpustate->ma);
 		break;
 	case UPD7810_PORTB:
-		if (upd7810.mb)	// NS20031301 no need to read if the port is set as output
-			upd7810.pb_in = memory_read_byte_8le(upd7810.io, port);
-		data = (upd7810.pb_in & upd7810.mb) | (upd7810.pb_out & ~upd7810.mb);
+		if (cpustate->mb)	// NS20031301 no need to read if the port is set as output
+			cpustate->pb_in = memory_read_byte_8le(cpustate->io, port);
+		data = (cpustate->pb_in & cpustate->mb) | (cpustate->pb_out & ~cpustate->mb);
 		break;
 	case UPD7810_PORTC:
-		if (upd7810.mc)	// NS20031301 no need to read if the port is set as output
-			upd7810.pc_in = memory_read_byte_8le(upd7810.io, port);
-		data = (upd7810.pc_in & upd7810.mc) | (upd7810.pc_out & ~upd7810.mc);
-		if (upd7810.mcc & 0x01) 	/* PC0 = TxD output */
-			data = (data & ~0x01) | (upd7810.txd & 1 ? 0x01 : 0x00);
-		if (upd7810.mcc & 0x02) 	/* PC1 = RxD input */
-			data = (data & ~0x02) | (upd7810.rxd & 1 ? 0x02 : 0x00);
-		if (upd7810.mcc & 0x04) 	/* PC2 = SCK input/output */
-			data = (data & ~0x04) | (upd7810.sck & 1 ? 0x04 : 0x00);
-		if (upd7810.mcc & 0x08) 	/* PC3 = TI input */
-			data = (data & ~0x08) | (upd7810.ti & 1 ? 0x08 : 0x00);
-		if (upd7810.mcc & 0x10) 	/* PC4 = TO output */
-			data = (data & ~0x10) | (upd7810.to & 1 ? 0x10 : 0x00);
-		if (upd7810.mcc & 0x20) 	/* PC5 = CI input */
-			data = (data & ~0x20) | (upd7810.ci & 1 ? 0x20 : 0x00);
-		if (upd7810.mcc & 0x40) 	/* PC6 = CO0 output */
-			data = (data & ~0x40) | (upd7810.co0 & 1 ? 0x40 : 0x00);
-		if (upd7810.mcc & 0x80) 	/* PC7 = CO1 output */
-			data = (data & ~0x80) | (upd7810.co1 & 1 ? 0x80 : 0x00);
+		if (cpustate->mc)	// NS20031301 no need to read if the port is set as output
+			cpustate->pc_in = memory_read_byte_8le(cpustate->io, port);
+		data = (cpustate->pc_in & cpustate->mc) | (cpustate->pc_out & ~cpustate->mc);
+		if (cpustate->mcc & 0x01) 	/* PC0 = TxD output */
+			data = (data & ~0x01) | (cpustate->txd & 1 ? 0x01 : 0x00);
+		if (cpustate->mcc & 0x02) 	/* PC1 = RxD input */
+			data = (data & ~0x02) | (cpustate->rxd & 1 ? 0x02 : 0x00);
+		if (cpustate->mcc & 0x04) 	/* PC2 = SCK input/output */
+			data = (data & ~0x04) | (cpustate->sck & 1 ? 0x04 : 0x00);
+		if (cpustate->mcc & 0x08) 	/* PC3 = TI input */
+			data = (data & ~0x08) | (cpustate->ti & 1 ? 0x08 : 0x00);
+		if (cpustate->mcc & 0x10) 	/* PC4 = TO output */
+			data = (data & ~0x10) | (cpustate->to & 1 ? 0x10 : 0x00);
+		if (cpustate->mcc & 0x20) 	/* PC5 = CI input */
+			data = (data & ~0x20) | (cpustate->ci & 1 ? 0x20 : 0x00);
+		if (cpustate->mcc & 0x40) 	/* PC6 = CO0 output */
+			data = (data & ~0x40) | (cpustate->co0 & 1 ? 0x40 : 0x00);
+		if (cpustate->mcc & 0x80) 	/* PC7 = CO1 output */
+			data = (data & ~0x80) | (cpustate->co1 & 1 ? 0x80 : 0x00);
 		break;
 	case UPD7810_PORTD:
-		upd7810.pd_in = memory_read_byte_8le(upd7810.io, port);
-		switch (upd7810.mm & 0x07)
+		cpustate->pd_in = memory_read_byte_8le(cpustate->io, port);
+		switch (cpustate->mm & 0x07)
 		{
 		case 0x00:			/* PD input mode, PF port mode */
-			data = upd7810.pd_in;
+			data = cpustate->pd_in;
 			break;
 		case 0x01:			/* PD output mode, PF port mode */
-			data = upd7810.pd_out;
+			data = cpustate->pd_out;
 			break;
 		default:			/* PD extension mode, PF port/extension mode */
 			data = 0xff;	/* what do we see on the port here? */
@@ -624,18 +716,18 @@ static UINT8 RP(offs_t port)
 		}
 		break;
 	case UPD7810_PORTF:
-		upd7810.pf_in = memory_read_byte_8le(upd7810.io, port);
-		switch (upd7810.mm & 0x06)
+		cpustate->pf_in = memory_read_byte_8le(cpustate->io, port);
+		switch (cpustate->mm & 0x06)
 		{
 		case 0x00:			/* PD input/output mode, PF port mode */
-			data = (upd7810.pf_in & upd7810.mf) | (upd7810.pf_out & ~upd7810.mf);
+			data = (cpustate->pf_in & cpustate->mf) | (cpustate->pf_out & ~cpustate->mf);
 			break;
 		case 0x02:			/* PD extension mode, PF0-3 extension mode, PF4-7 port mode */
-			data = (upd7810.pf_in & upd7810.mf) | (upd7810.pf_out & ~upd7810.mf);
+			data = (cpustate->pf_in & cpustate->mf) | (cpustate->pf_out & ~cpustate->mf);
 			data |= 0x0f;	/* what would we see on the lower bits here? */
 			break;
 		case 0x04:			/* PD extension mode, PF0-5 extension mode, PF6-7 port mode */
-			data = (upd7810.pf_in & upd7810.mf) | (upd7810.pf_out & ~upd7810.mf);
+			data = (cpustate->pf_in & cpustate->mf) | (cpustate->pf_out & ~cpustate->mf);
 			data |= 0x3f;	/* what would we see on the lower bits here? */
 			break;
 		case 0x06:
@@ -644,71 +736,71 @@ static UINT8 RP(offs_t port)
 		}
 		break;
 	case UPD7807_PORTT:	// NS20031301 partial implementation
-		data = memory_read_byte_8le(upd7810.io, port);
+		data = memory_read_byte_8le(cpustate->io, port);
 		break;
 	default:
-		logerror("uPD7810 internal error: RP() called with invalid port number\n");
+		logerror("uPD7810 internal error: RP(cpustate) called with invalid port number\n");
 	}
 	return data;
 }
 
-static void WP(offs_t port, UINT8 data)
+static void WP(upd7810_state *cpustate, offs_t port, UINT8 data)
 {
 	switch (port)
 	{
 	case UPD7810_PORTA:
-		upd7810.pa_out = data;
-//      data = (data & ~upd7810.ma) | (upd7810.pa_in & upd7810.ma);
-		data = (data & ~upd7810.ma) | (upd7810.ma);	// NS20031401
-		memory_write_byte_8le(upd7810.io, port, data);
+		cpustate->pa_out = data;
+//      data = (data & ~cpustate->ma) | (cpustate->pa_in & cpustate->ma);
+		data = (data & ~cpustate->ma) | (cpustate->ma);	// NS20031401
+		memory_write_byte_8le(cpustate->io, port, data);
 		break;
 	case UPD7810_PORTB:
-		upd7810.pb_out = data;
-//      data = (data & ~upd7810.mb) | (upd7810.pb_in & upd7810.mb);
-		data = (data & ~upd7810.mb) | (upd7810.mb);	// NS20031401
-		memory_write_byte_8le(upd7810.io, port, data);
+		cpustate->pb_out = data;
+//      data = (data & ~cpustate->mb) | (cpustate->pb_in & cpustate->mb);
+		data = (data & ~cpustate->mb) | (cpustate->mb);	// NS20031401
+		memory_write_byte_8le(cpustate->io, port, data);
 		break;
 	case UPD7810_PORTC:
-		upd7810.pc_out = data;
-//      data = (data & ~upd7810.mc) | (upd7810.pc_in & upd7810.mc);
-		data = (data & ~upd7810.mc) | (upd7810.mc);	// NS20031401
-		if (upd7810.mcc & 0x01) 	/* PC0 = TxD output */
-			data = (data & ~0x01) | (upd7810.txd & 1 ? 0x01 : 0x00);
-		if (upd7810.mcc & 0x02) 	/* PC1 = RxD input */
-			data = (data & ~0x02) | (upd7810.rxd & 1 ? 0x02 : 0x00);
-		if (upd7810.mcc & 0x04) 	/* PC2 = SCK input/output */
-			data = (data & ~0x04) | (upd7810.sck & 1 ? 0x04 : 0x00);
-		if (upd7810.mcc & 0x08) 	/* PC3 = TI input */
-			data = (data & ~0x08) | (upd7810.ti & 1 ? 0x08 : 0x00);
-		if (upd7810.mcc & 0x10) 	/* PC4 = TO output */
-			data = (data & ~0x10) | (upd7810.to & 1 ? 0x10 : 0x00);
-		if (upd7810.mcc & 0x20) 	/* PC5 = CI input */
-			data = (data & ~0x20) | (upd7810.ci & 1 ? 0x20 : 0x00);
-		if (upd7810.mcc & 0x40) 	/* PC6 = CO0 output */
-			data = (data & ~0x40) | (upd7810.co0 & 1 ? 0x40 : 0x00);
-		if (upd7810.mcc & 0x80) 	/* PC7 = CO1 output */
-			data = (data & ~0x80) | (upd7810.co1 & 1 ? 0x80 : 0x00);
-		memory_write_byte_8le(upd7810.io, port, data);
+		cpustate->pc_out = data;
+//      data = (data & ~cpustate->mc) | (cpustate->pc_in & cpustate->mc);
+		data = (data & ~cpustate->mc) | (cpustate->mc);	// NS20031401
+		if (cpustate->mcc & 0x01) 	/* PC0 = TxD output */
+			data = (data & ~0x01) | (cpustate->txd & 1 ? 0x01 : 0x00);
+		if (cpustate->mcc & 0x02) 	/* PC1 = RxD input */
+			data = (data & ~0x02) | (cpustate->rxd & 1 ? 0x02 : 0x00);
+		if (cpustate->mcc & 0x04) 	/* PC2 = SCK input/output */
+			data = (data & ~0x04) | (cpustate->sck & 1 ? 0x04 : 0x00);
+		if (cpustate->mcc & 0x08) 	/* PC3 = TI input */
+			data = (data & ~0x08) | (cpustate->ti & 1 ? 0x08 : 0x00);
+		if (cpustate->mcc & 0x10) 	/* PC4 = TO output */
+			data = (data & ~0x10) | (cpustate->to & 1 ? 0x10 : 0x00);
+		if (cpustate->mcc & 0x20) 	/* PC5 = CI input */
+			data = (data & ~0x20) | (cpustate->ci & 1 ? 0x20 : 0x00);
+		if (cpustate->mcc & 0x40) 	/* PC6 = CO0 output */
+			data = (data & ~0x40) | (cpustate->co0 & 1 ? 0x40 : 0x00);
+		if (cpustate->mcc & 0x80) 	/* PC7 = CO1 output */
+			data = (data & ~0x80) | (cpustate->co1 & 1 ? 0x80 : 0x00);
+		memory_write_byte_8le(cpustate->io, port, data);
 		break;
 	case UPD7810_PORTD:
-		upd7810.pd_out = data;
-		switch (upd7810.mm & 0x07)
+		cpustate->pd_out = data;
+		switch (cpustate->mm & 0x07)
 		{
 		case 0x00:			/* PD input mode, PF port mode */
-			data = upd7810.pd_in;
+			data = cpustate->pd_in;
 			break;
 		case 0x01:			/* PD output mode, PF port mode */
-			data = upd7810.pd_out;
+			data = cpustate->pd_out;
 			break;
 		default:			/* PD extension mode, PF port/extension mode */
 			return;
 		}
-		memory_write_byte_8le(upd7810.io, port, data);
+		memory_write_byte_8le(cpustate->io, port, data);
 		break;
 	case UPD7810_PORTF:
-		upd7810.pf_out = data;
-		data = (data & ~upd7810.mf) | (upd7810.pf_in & upd7810.mf);
-		switch (upd7810.mm & 0x06)
+		cpustate->pf_out = data;
+		data = (data & ~cpustate->mf) | (cpustate->pf_in & cpustate->mf);
+		switch (cpustate->mm & 0x06)
 		{
 		case 0x00:			/* PD input/output mode, PF port mode */
 			break;
@@ -722,14 +814,14 @@ static void WP(offs_t port, UINT8 data)
 			data |= 0xff;	/* what would come out for the lower bits here? */
 			break;
 		}
-		memory_write_byte_8le(upd7810.io, port, data);
+		memory_write_byte_8le(cpustate->io, port, data);
 		break;
 	default:
-		logerror("uPD7810 internal error: RP() called with invalid port number\n");
+		logerror("uPD7810 internal error: RP(cpustate) called with invalid port number\n");
 	}
 }
 
-static void upd7810_take_irq(void)
+static void upd7810_take_irq(upd7810_state *cpustate)
 {
 	UINT16 vector = 0;
 	int irqline = 0;
@@ -741,7 +833,7 @@ static void upd7810_take_irq(void)
 	/* check the interrupts in priority sequence */
 	if ((IRR & INTFT0)	&& 0 == (MKL & 0x02))
 	{
-	    switch (upd7810.config.type)
+	    switch (cpustate->config.type)
 		{
 			case TYPE_7810_GAMEMASTER:
 				vector = 0xff2a;
@@ -755,7 +847,7 @@ static void upd7810_take_irq(void)
 	else
 	if ((IRR & INTFT1)	&& 0 == (MKL & 0x04))
 	{
-	    switch (upd7810.config.type)
+	    switch (cpustate->config.type)
 		{
 			case TYPE_7810_GAMEMASTER:
 				vector = 0xff2a;
@@ -783,7 +875,7 @@ static void upd7810_take_irq(void)
 	else
 	if ((IRR & INTFE0)	&& 0 == (MKL & 0x20))
 	{
-	    switch (upd7810.config.type)
+	    switch (cpustate->config.type)
 		{
 			case TYPE_7810_GAMEMASTER:
 				vector = 0xff2d;
@@ -797,7 +889,7 @@ static void upd7810_take_irq(void)
 	else
 	if ((IRR & INTFE1)	&& 0 == (MKL & 0x40))
 	{
-	    switch (upd7810.config.type)
+	    switch (cpustate->config.type)
 		{
 		    case TYPE_7810_GAMEMASTER:
 				vector = 0xff2d;
@@ -833,7 +925,7 @@ static void upd7810_take_irq(void)
 	{
 		/* acknowledge external IRQ */
 		if (irqline)
-			(*upd7810.irq_callback)(upd7810.device, irqline);
+			(*cpustate->irq_callback)(cpustate->device, irqline);
 		SP--;
 		WM( SP, PSW );
 		SP--;
@@ -846,7 +938,7 @@ static void upd7810_take_irq(void)
 	}
 }
 
-static void upd7810_write_EOM(void)
+static void upd7810_write_EOM(upd7810_state *cpustate)
 {
 	if (EOM & 0x01) /* output LV0 content ? */
 	{
@@ -880,34 +972,34 @@ static void upd7810_write_EOM(void)
 	}
 }
 
-static void upd7810_write_TXB(void)
+static void upd7810_write_TXB(upd7810_state *cpustate)
 {
-	upd7810.txbuf = 1;
+	cpustate->txbuf = 1;
 }
 
 #define PAR7(n) ((((n)>>6)^((n)>>5)^((n)>>4)^((n)>>3)^((n)>>2)^((n)>>1)^((n)))&1)
 #define PAR8(n) ((((n)>>7)^((n)>>6)^((n)>>5)^((n)>>4)^((n)>>3)^((n)>>2)^((n)>>1)^((n)))&1)
 
-static void upd7810_sio_output(void)
+static void upd7810_sio_output(upd7810_state *cpustate)
 {
 	/* shift out more bits? */
-	if (upd7810.txcnt > 0)
+	if (cpustate->txcnt > 0)
 	{
-		TXD = upd7810.txs & 1;
-		if (upd7810.config.io_callback)
-			(*upd7810.config.io_callback)(UPD7810_TXD,TXD);
-		upd7810.txs >>= 1;
-		upd7810.txcnt--;
-		if (0 == upd7810.txcnt)
+		TXD = cpustate->txs & 1;
+		if (cpustate->config.io_callback)
+			(*cpustate->config.io_callback)(UPD7810_TXD,TXD);
+		cpustate->txs >>= 1;
+		cpustate->txcnt--;
+		if (0 == cpustate->txcnt)
 			IRR |= INTFST;		/* serial transfer completed */
 	}
 	else
 	if (SMH & 0x04) /* send enable ? */
 	{
 		/* nothing written into the transmitter buffer ? */
-        if (0 == upd7810.txbuf)
+        if (0 == cpustate->txbuf)
 			return;
-        upd7810.txbuf = 0;
+        cpustate->txbuf = 0;
 
         if (SML & 0x03)         /* asynchronous mode ? */
 		{
@@ -916,88 +1008,88 @@ static void upd7810_sio_output(void)
 			case 0x48:	/* 7bits, no parity, 1 stop bit */
 			case 0x68:	/* 7bits, no parity, 1 stop bit (parity select = 1 but parity is off) */
 				/* insert start bit in bit0, stop bit int bit8 */
-				upd7810.txs = (TXB << 1) | (1 << 8);
-				upd7810.txcnt = 9;
+				cpustate->txs = (TXB << 1) | (1 << 8);
+				cpustate->txcnt = 9;
 				break;
 			case 0x4c:	/* 8bits, no parity, 1 stop bit */
 			case 0x6c:	/* 8bits, no parity, 1 stop bit (parity select = 1 but parity is off) */
 				/* insert start bit in bit0, stop bit int bit9 */
-				upd7810.txs = (TXB << 1) | (1 << 9);
-				upd7810.txcnt = 10;
+				cpustate->txs = (TXB << 1) | (1 << 9);
+				cpustate->txcnt = 10;
 				break;
 			case 0x58:	/* 7bits, odd parity, 1 stop bit */
 				/* insert start bit in bit0, parity in bit 8, stop bit in bit9 */
-				upd7810.txs = (TXB << 1) | (PAR7(TXB) << 8) | (1 << 9);
-				upd7810.txcnt = 10;
+				cpustate->txs = (TXB << 1) | (PAR7(TXB) << 8) | (1 << 9);
+				cpustate->txcnt = 10;
 				break;
 			case 0x5c:	/* 8bits, odd parity, 1 stop bit */
 				/* insert start bit in bit0, parity in bit 9, stop bit int bit10 */
-				upd7810.txs = (TXB << 1) | (PAR8(TXB) << 9) | (1 << 10);
-				upd7810.txcnt = 11;
+				cpustate->txs = (TXB << 1) | (PAR8(TXB) << 9) | (1 << 10);
+				cpustate->txcnt = 11;
 				break;
 			case 0x78:	/* 7bits, even parity, 1 stop bit */
 				/* insert start bit in bit0, parity in bit 8, stop bit in bit9 */
-				upd7810.txs = (TXB << 1) | ((PAR7(TXB) ^ 1) << 8) | (1 << 9);
-				upd7810.txcnt = 10;
+				cpustate->txs = (TXB << 1) | ((PAR7(TXB) ^ 1) << 8) | (1 << 9);
+				cpustate->txcnt = 10;
 				break;
 			case 0x7c:	/* 8bits, even parity, 1 stop bit */
 				/* insert start bit in bit0, parity in bit 9, stop bit int bit10 */
-				upd7810.txs = (TXB << 1) | ((PAR8(TXB) ^ 1) << 9) | (1 << 10);
-				upd7810.txcnt = 11;
+				cpustate->txs = (TXB << 1) | ((PAR8(TXB) ^ 1) << 9) | (1 << 10);
+				cpustate->txcnt = 11;
 				break;
 			case 0xc8:	/* 7bits, no parity, 2 stop bits */
 			case 0xe8:	/* 7bits, no parity, 2 stop bits (parity select = 1 but parity is off) */
 				/* insert start bit in bit0, stop bits int bit8+9 */
-				upd7810.txs = (TXB << 1) | (3 << 8);
-				upd7810.txcnt = 10;
+				cpustate->txs = (TXB << 1) | (3 << 8);
+				cpustate->txcnt = 10;
 				break;
 			case 0xcc:	/* 8bits, no parity, 2 stop bits */
 			case 0xec:	/* 8bits, no parity, 2 stop bits (parity select = 1 but parity is off) */
 				/* insert start bit in bit0, stop bits in bits9+10 */
-				upd7810.txs = (TXB << 1) | (3 << 9);
-				upd7810.txcnt = 11;
+				cpustate->txs = (TXB << 1) | (3 << 9);
+				cpustate->txcnt = 11;
 				break;
 			case 0xd8:	/* 7bits, odd parity, 2 stop bits */
 				/* insert start bit in bit0, parity in bit 8, stop bits in bits9+10 */
-				upd7810.txs = (TXB << 1) | (PAR7(TXB) << 8) | (3 << 9);
-				upd7810.txcnt = 11;
+				cpustate->txs = (TXB << 1) | (PAR7(TXB) << 8) | (3 << 9);
+				cpustate->txcnt = 11;
 				break;
 			case 0xdc:	/* 8bits, odd parity, 2 stop bits */
 				/* insert start bit in bit0, parity in bit 9, stop bits int bit10+11 */
-				upd7810.txs = (TXB << 1) | (PAR8(TXB) << 9) | (3 << 10);
-				upd7810.txcnt = 12;
+				cpustate->txs = (TXB << 1) | (PAR8(TXB) << 9) | (3 << 10);
+				cpustate->txcnt = 12;
 				break;
 			case 0xf8:	/* 7bits, even parity, 2 stop bits */
 				/* insert start bit in bit0, parity in bit 8, stop bits in bit9+10 */
-				upd7810.txs = (TXB << 1) | ((PAR7(TXB) ^ 1) << 8) | (3 << 9);
-				upd7810.txcnt = 11;
+				cpustate->txs = (TXB << 1) | ((PAR7(TXB) ^ 1) << 8) | (3 << 9);
+				cpustate->txcnt = 11;
 				break;
 			case 0xfc:	/* 8bits, even parity, 2 stop bits */
 				/* insert start bit in bit0, parity in bit 9, stop bits int bits10+10 */
-				upd7810.txs = (TXB << 1) | ((PAR8(TXB) ^ 1) << 9) | (1 << 10);
-				upd7810.txcnt = 12;
+				cpustate->txs = (TXB << 1) | ((PAR8(TXB) ^ 1) << 9) | (1 << 10);
+				cpustate->txcnt = 12;
 				break;
 			}
 		}
 		else
 		{
 			/* synchronous mode */
-			upd7810.txs = TXB;
-			upd7810.txcnt = 8;
+			cpustate->txs = TXB;
+			cpustate->txcnt = 8;
 		}
 	}
 }
 
-static void upd7810_sio_input(void)
+static void upd7810_sio_input(upd7810_state *cpustate)
 {
 	/* sample next bit? */
-	if (upd7810.rxcnt > 0)
+	if (cpustate->rxcnt > 0)
 	{
-		if (upd7810.config.io_callback)
-			RXD = (*upd7810.config.io_callback)(UPD7810_RXD,RXD);
-		upd7810.rxs = (upd7810.rxs >> 1) | ((UINT16)RXD << 15);
-		upd7810.rxcnt--;
-		if (0 == upd7810.rxcnt)
+		if (cpustate->config.io_callback)
+			RXD = (*cpustate->config.io_callback)(UPD7810_RXD,RXD);
+		cpustate->rxs = (cpustate->rxs >> 1) | ((UINT16)RXD << 15);
+		cpustate->rxcnt--;
+		if (0 == cpustate->rxcnt)
 		{
 			/* reset the TSK bit */
 			SMH &= ~0x40;
@@ -1010,107 +1102,107 @@ static void upd7810_sio_input(void)
 				{
 				case 0x48:	/* 7bits, no parity, 1 stop bit */
 				case 0x68:	/* 7bits, no parity, 1 stop bit (parity select = 1 but parity is off) */
-					upd7810.rxs >>= 16 - 9;
-					RXB = (upd7810.rxs >> 1) & 0x7f;
-					if ((1 << 8) != (upd7810.rxs & (1 | (1 << 8))))
+					cpustate->rxs >>= 16 - 9;
+					RXB = (cpustate->rxs >> 1) & 0x7f;
+					if ((1 << 8) != (cpustate->rxs & (1 | (1 << 8))))
 						IRR |= INTER;	/* framing error */
 					break;
 				case 0x4c:	/* 8bits, no parity, 1 stop bit */
 				case 0x6c:	/* 8bits, no parity, 1 stop bit (parity select = 1 but parity is off) */
-					upd7810.rxs >>= 16 - 10;
-					RXB = (upd7810.rxs >> 1) & 0xff;
-					if ((1 << 9) != (upd7810.rxs & (1 | (1 << 9))))
+					cpustate->rxs >>= 16 - 10;
+					RXB = (cpustate->rxs >> 1) & 0xff;
+					if ((1 << 9) != (cpustate->rxs & (1 | (1 << 9))))
 						IRR |= INTER;	/* framing error */
 					break;
 				case 0x58:	/* 7bits, odd parity, 1 stop bit */
-					upd7810.rxs >>= 16 - 10;
-					RXB = (upd7810.rxs >> 1) & 0x7f;
-					if ((1 << 9) != (upd7810.rxs & (1 | (1 << 9))))
+					cpustate->rxs >>= 16 - 10;
+					RXB = (cpustate->rxs >> 1) & 0x7f;
+					if ((1 << 9) != (cpustate->rxs & (1 | (1 << 9))))
 						IRR |= INTER;	/* framing error */
-					if (PAR7(RXB) != ((upd7810.rxs >> 8) & 1))
+					if (PAR7(RXB) != ((cpustate->rxs >> 8) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				case 0x5c:	/* 8bits, odd parity, 1 stop bit */
-					upd7810.rxs >>= 16 - 11;
-					RXB = (upd7810.rxs >> 1) & 0xff;
-					if ((1 << 10) != (upd7810.rxs & (1 | (1 << 10))))
+					cpustate->rxs >>= 16 - 11;
+					RXB = (cpustate->rxs >> 1) & 0xff;
+					if ((1 << 10) != (cpustate->rxs & (1 | (1 << 10))))
 						IRR |= INTER;	/* framing error */
-					if (PAR8(RXB) != ((upd7810.rxs >> 9) & 1))
+					if (PAR8(RXB) != ((cpustate->rxs >> 9) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				case 0x78:	/* 7bits, even parity, 1 stop bit */
-					upd7810.rxs >>= 16 - 10;
-					RXB = (upd7810.rxs >> 1) & 0x7f;
-					if ((1 << 9) != (upd7810.rxs & (1 | (1 << 9))))
+					cpustate->rxs >>= 16 - 10;
+					RXB = (cpustate->rxs >> 1) & 0x7f;
+					if ((1 << 9) != (cpustate->rxs & (1 | (1 << 9))))
 						IRR |= INTER;	/* framing error */
-					if (PAR7(RXB) != ((upd7810.rxs >> 8) & 1))
+					if (PAR7(RXB) != ((cpustate->rxs >> 8) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				case 0x7c:	/* 8bits, even parity, 1 stop bit */
-					upd7810.rxs >>= 16 - 11;
-					RXB = (upd7810.rxs >> 1) & 0xff;
-					if ((1 << 10) != (upd7810.rxs & (1 | (1 << 10))))
+					cpustate->rxs >>= 16 - 11;
+					RXB = (cpustate->rxs >> 1) & 0xff;
+					if ((1 << 10) != (cpustate->rxs & (1 | (1 << 10))))
 						IRR |= INTER;	/* framing error */
-					if (PAR8(RXB) != ((upd7810.rxs >> 9) & 1))
+					if (PAR8(RXB) != ((cpustate->rxs >> 9) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				case 0xc8:	/* 7bits, no parity, 2 stop bits */
 				case 0xe8:	/* 7bits, no parity, 2 stop bits (parity select = 1 but parity is off) */
-					upd7810.rxs >>= 16 - 10;
-					RXB = (upd7810.rxs >> 1) & 0x7f;
-					if ((3 << 9) != (upd7810.rxs & (1 | (3 << 9))))
+					cpustate->rxs >>= 16 - 10;
+					RXB = (cpustate->rxs >> 1) & 0x7f;
+					if ((3 << 9) != (cpustate->rxs & (1 | (3 << 9))))
 						IRR |= INTER;	/* framing error */
-					if (PAR7(RXB) != ((upd7810.rxs >> 8) & 1))
+					if (PAR7(RXB) != ((cpustate->rxs >> 8) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				case 0xcc:	/* 8bits, no parity, 2 stop bits */
 				case 0xec:	/* 8bits, no parity, 2 stop bits (parity select = 1 but parity is off) */
-					upd7810.rxs >>= 16 - 11;
-					RXB = (upd7810.rxs >> 1) & 0xff;
-					if ((3 << 10) != (upd7810.rxs & (1 | (3 << 10))))
+					cpustate->rxs >>= 16 - 11;
+					RXB = (cpustate->rxs >> 1) & 0xff;
+					if ((3 << 10) != (cpustate->rxs & (1 | (3 << 10))))
 						IRR |= INTER;	/* framing error */
-					if (PAR8(RXB) != ((upd7810.rxs >> 9) & 1))
+					if (PAR8(RXB) != ((cpustate->rxs >> 9) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				case 0xd8:	/* 7bits, odd parity, 2 stop bits */
-					upd7810.rxs >>= 16 - 11;
-					RXB = (upd7810.rxs >> 1) & 0x7f;
-					if ((3 << 10) != (upd7810.rxs & (1 | (3 << 10))))
+					cpustate->rxs >>= 16 - 11;
+					RXB = (cpustate->rxs >> 1) & 0x7f;
+					if ((3 << 10) != (cpustate->rxs & (1 | (3 << 10))))
 						IRR |= INTER;	/* framing error */
-					if (PAR7(RXB) != ((upd7810.rxs >> 8) & 1))
+					if (PAR7(RXB) != ((cpustate->rxs >> 8) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				case 0xdc:	/* 8bits, odd parity, 2 stop bits */
-					upd7810.rxs >>= 16 - 12;
-					RXB = (upd7810.rxs >> 1) & 0xff;
-					if ((3 << 11) != (upd7810.rxs & (1 | (3 << 11))))
+					cpustate->rxs >>= 16 - 12;
+					RXB = (cpustate->rxs >> 1) & 0xff;
+					if ((3 << 11) != (cpustate->rxs & (1 | (3 << 11))))
 						IRR |= INTER;	/* framing error */
-					if (PAR8(RXB) != ((upd7810.rxs >> 9) & 1))
+					if (PAR8(RXB) != ((cpustate->rxs >> 9) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				case 0xf8:	/* 7bits, even parity, 2 stop bits */
-					upd7810.rxs >>= 16 - 11;
-					RXB = (upd7810.rxs >> 1) & 0x7f;
-					if ((3 << 10) != (upd7810.rxs & (1 | (3 << 10))))
+					cpustate->rxs >>= 16 - 11;
+					RXB = (cpustate->rxs >> 1) & 0x7f;
+					if ((3 << 10) != (cpustate->rxs & (1 | (3 << 10))))
 						IRR |= INTER;	/* framing error */
-					if (PAR7(RXB) != ((upd7810.rxs >> 8) & 1))
+					if (PAR7(RXB) != ((cpustate->rxs >> 8) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				case 0xfc:	/* 8bits, even parity, 2 stop bits */
-					upd7810.rxs >>= 16 - 12;
-					RXB = (upd7810.rxs >> 1) & 0xff;
-					if ((3 << 11) != (upd7810.rxs & (1 | (3 << 11))))
+					cpustate->rxs >>= 16 - 12;
+					RXB = (cpustate->rxs >> 1) & 0xff;
+					if ((3 << 11) != (cpustate->rxs & (1 | (3 << 11))))
 						IRR |= INTER;	/* framing error */
-					if (PAR8(RXB) != ((upd7810.rxs >> 9) & 1))
+					if (PAR8(RXB) != ((cpustate->rxs >> 9) & 1))
 						IRR |= INTER;	/* parity error */
 					break;
 				}
 			}
 			else
 			{
-				upd7810.rxs >>= 16 - 8;
-				RXB = upd7810.rxs;
-//              upd7810.rxcnt = 8;
+				cpustate->rxs >>= 16 - 8;
+				RXB = cpustate->rxs;
+//              cpustate->rxcnt = 8;
 			}
 		}
 	}
@@ -1123,43 +1215,43 @@ static void upd7810_sio_input(void)
 			{
 			case 0x48:	/* 7bits, no parity, 1 stop bit */
 			case 0x68:	/* 7bits, no parity, 1 stop bit (parity select = 1 but parity is off) */
-				upd7810.rxcnt = 9;
+				cpustate->rxcnt = 9;
 				break;
 			case 0x4c:	/* 8bits, no parity, 1 stop bit */
 			case 0x6c:	/* 8bits, no parity, 1 stop bit (parity select = 1 but parity is off) */
-				upd7810.rxcnt = 10;
+				cpustate->rxcnt = 10;
 				break;
 			case 0x58:	/* 7bits, odd parity, 1 stop bit */
-				upd7810.rxcnt = 10;
+				cpustate->rxcnt = 10;
 				break;
 			case 0x5c:	/* 8bits, odd parity, 1 stop bit */
-				upd7810.rxcnt = 11;
+				cpustate->rxcnt = 11;
 				break;
 			case 0x78:	/* 7bits, even parity, 1 stop bit */
-				upd7810.rxcnt = 10;
+				cpustate->rxcnt = 10;
 				break;
 			case 0x7c:	/* 8bits, even parity, 1 stop bit */
-				upd7810.rxcnt = 11;
+				cpustate->rxcnt = 11;
 				break;
 			case 0xc8:	/* 7bits, no parity, 2 stop bits */
 			case 0xe8:	/* 7bits, no parity, 2 stop bits (parity select = 1 but parity is off) */
-				upd7810.rxcnt = 10;
+				cpustate->rxcnt = 10;
 				break;
 			case 0xcc:	/* 8bits, no parity, 2 stop bits */
 			case 0xec:	/* 8bits, no parity, 2 stop bits (parity select = 1 but parity is off) */
-				upd7810.rxcnt = 11;
+				cpustate->rxcnt = 11;
 				break;
 			case 0xd8:	/* 7bits, odd parity, 2 stop bits */
-				upd7810.rxcnt = 11;
+				cpustate->rxcnt = 11;
 				break;
 			case 0xdc:	/* 8bits, odd parity, 2 stop bits */
-				upd7810.rxcnt = 12;
+				cpustate->rxcnt = 12;
 				break;
 			case 0xf8:	/* 7bits, even parity, 2 stop bits */
-				upd7810.rxcnt = 11;
+				cpustate->rxcnt = 11;
 				break;
 			case 0xfc:	/* 8bits, even parity, 2 stop bits */
-				upd7810.rxcnt = 12;
+				cpustate->rxcnt = 12;
 				break;
 			}
 		}
@@ -1167,12 +1259,12 @@ static void upd7810_sio_input(void)
 		/* TSK bit set ? */
 		if (SMH & 0x40)
 		{
-			upd7810.rxcnt = 8;
+			cpustate->rxcnt = 8;
 		}
 	}
 }
 
-static void upd7810_timers(int cycles)
+static void upd7810_timers(upd7810_state *cpustate, int cycles)
 {
 	/**** TIMER 0 ****/
 	if (TMM & 0x10) 		/* timer 0 upcounter reset ? */
@@ -1195,8 +1287,8 @@ static void upd7810_timers(int cycles)
 					if (0x00 == (TMM & 0x03))
 					{
 						TO ^= 1;
-						if (upd7810.config.io_callback)
-							(*upd7810.config.io_callback)(UPD7810_TO,TO);
+						if (cpustate->config.io_callback)
+							(*cpustate->config.io_callback)(UPD7810_TO,TO);
 					}
 					/* timer 1 chained with timer 0 ? */
 					if ((TMM & 0xe0) == 0x60)
@@ -1210,8 +1302,8 @@ static void upd7810_timers(int cycles)
 							if (0x01 == (TMM & 0x03))
 							{
 								TO ^= 1;
-								if (upd7810.config.io_callback)
-									(*upd7810.config.io_callback)(UPD7810_TO,TO);
+								if (cpustate->config.io_callback)
+									(*cpustate->config.io_callback)(UPD7810_TO,TO);
 							}
 						}
 					}
@@ -1232,8 +1324,8 @@ static void upd7810_timers(int cycles)
 					if (0x00 == (TMM & 0x03))
 					{
 						TO ^= 1;
-						if (upd7810.config.io_callback)
-							(*upd7810.config.io_callback)(UPD7810_TO,TO);
+						if (cpustate->config.io_callback)
+							(*cpustate->config.io_callback)(UPD7810_TO,TO);
 					}
 					/* timer 1 chained with timer 0 ? */
 					if ((TMM & 0xe0) == 0x60)
@@ -1247,8 +1339,8 @@ static void upd7810_timers(int cycles)
 							if (0x01 == (TMM & 0x03))
 							{
 								TO ^= 1;
-								if (upd7810.config.io_callback)
-									(*upd7810.config.io_callback)(UPD7810_TO,TO);
+								if (cpustate->config.io_callback)
+									(*cpustate->config.io_callback)(UPD7810_TO,TO);
 							}
 						}
 					}
@@ -1283,8 +1375,8 @@ static void upd7810_timers(int cycles)
 					if (0x01 == (TMM & 0x03))
 					{
 						TO ^= 1;
-						if (upd7810.config.io_callback)
-							(*upd7810.config.io_callback)(UPD7810_TO,TO);
+						if (cpustate->config.io_callback)
+							(*cpustate->config.io_callback)(UPD7810_TO,TO);
 					}
 				}
 			}
@@ -1303,8 +1395,8 @@ static void upd7810_timers(int cycles)
 					if (0x01 == (TMM & 0x03))
 					{
 						TO ^= 1;
-						if (upd7810.config.io_callback)
-							(*upd7810.config.io_callback)(UPD7810_TO,TO);
+						if (cpustate->config.io_callback)
+							(*cpustate->config.io_callback)(UPD7810_TO,TO);
 					}
 				}
 			}
@@ -1324,8 +1416,8 @@ static void upd7810_timers(int cycles)
 		while (OVCF >= 3)
 		{
 			TO ^= 1;
-			if (upd7810.config.io_callback)
-				(*upd7810.config.io_callback)(UPD7810_TO,TO);
+			if (cpustate->config.io_callback)
+				(*cpustate->config.io_callback)(UPD7810_TO,TO);
 			OVCF -= 3;
 		}
 	}
@@ -1484,9 +1576,9 @@ static void upd7810_timers(int cycles)
 		{
 			OVCS -= 384;
 			if (0 == (EDGES ^= 1))
-				upd7810_sio_input();
+				upd7810_sio_input(cpustate);
 			else
-				upd7810_sio_output();
+				upd7810_sio_output(cpustate);
 		}
 		break;
 	case 0x02:		/* internal clock divided by 24 */
@@ -1495,33 +1587,33 @@ static void upd7810_timers(int cycles)
 		{
 			OVCS -= 24;
 			if (0 == (EDGES ^= 1))
-				upd7810_sio_input();
+				upd7810_sio_input(cpustate);
 			else
-				upd7810_sio_output();
+				upd7810_sio_output(cpustate);
 		}
 		break;
 	}
 }
 
-//static void upd7801_timers(int cycles)
+//static void upd7801_timers(upd7810_state *cpustate, int cycles)
 //{
 //}
 
-static void upd78c05_timers(int cycles)
+static void upd78c05_timers(upd7810_state *cpustate, int cycles)
 {
-	if ( upd7810.ovc0 ) {
-		upd7810.ovc0 -= cycles;
+	if ( cpustate->ovc0 ) {
+		cpustate->ovc0 -= cycles;
 
-		if ( upd7810.ovc0 <= 0 ) {
+		if ( cpustate->ovc0 <= 0 ) {
 			IRR |= INTFT0;
 			if (0x00 == (TMM & 0x03)) {
 				TO ^= 1;
-				if (upd7810.config.io_callback)
-					(*upd7810.config.io_callback)(UPD7810_TO,TO);
+				if (cpustate->config.io_callback)
+					(*cpustate->config.io_callback)(UPD7810_TO,TO);
 			}
 
-			while ( upd7810.ovc0 <= 0 ) {
-				upd7810.ovc0 += ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
+			while ( cpustate->ovc0 <= 0 ) {
+				cpustate->ovc0 += ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
 			}
 		}
 	}
@@ -1529,74 +1621,76 @@ static void upd78c05_timers(int cycles)
 
 static CPU_INIT( upd7810 )
 {
-	upd7810.config = *(const UPD7810_CONFIG*) device->static_config;
-	upd7810.irq_callback = irqcallback;
-	upd7810.device = device;
-	upd7810.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	upd7810.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	upd7810_state *cpustate = device->token;
+	
+	cpustate->config = *(const UPD7810_CONFIG*) device->static_config;
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_device_item(device, 0, upd7810.ppc.w.l);
-	state_save_register_device_item(device, 0, upd7810.pc.w.l);
-	state_save_register_device_item(device, 0, upd7810.sp.w.l);
-	state_save_register_device_item(device, 0, upd7810.psw);
-	state_save_register_device_item(device, 0, upd7810.op);
-	state_save_register_device_item(device, 0, upd7810.op2);
-	state_save_register_device_item(device, 0, upd7810.iff);
-	state_save_register_device_item(device, 0, upd7810.ea.w.l);
-	state_save_register_device_item(device, 0, upd7810.va.w.l);
-	state_save_register_device_item(device, 0, upd7810.bc.w.l);
-	state_save_register_device_item(device, 0, upd7810.de.w.l);
-	state_save_register_device_item(device, 0, upd7810.hl.w.l);
-	state_save_register_device_item(device, 0, upd7810.ea2.w.l);
-	state_save_register_device_item(device, 0, upd7810.va2.w.l);
-	state_save_register_device_item(device, 0, upd7810.bc2.w.l);
-	state_save_register_device_item(device, 0, upd7810.de2.w.l);
-	state_save_register_device_item(device, 0, upd7810.hl2.w.l);
-	state_save_register_device_item(device, 0, upd7810.cnt.d);
-	state_save_register_device_item(device, 0, upd7810.tm.d);
-	state_save_register_device_item(device, 0, upd7810.ecnt.d);
-	state_save_register_device_item(device, 0, upd7810.etm.d);
-	state_save_register_device_item(device, 0, upd7810.ma);
-	state_save_register_device_item(device, 0, upd7810.mb);
-	state_save_register_device_item(device, 0, upd7810.mcc);
-	state_save_register_device_item(device, 0, upd7810.mc);
-	state_save_register_device_item(device, 0, upd7810.mm);
-	state_save_register_device_item(device, 0, upd7810.mf);
-	state_save_register_device_item(device, 0, upd7810.tmm);
-	state_save_register_device_item(device, 0, upd7810.etmm);
-	state_save_register_device_item(device, 0, upd7810.eom);
-	state_save_register_device_item(device, 0, upd7810.sml);
-	state_save_register_device_item(device, 0, upd7810.smh);
-	state_save_register_device_item(device, 0, upd7810.anm);
-	state_save_register_device_item(device, 0, upd7810.mkl);
-	state_save_register_device_item(device, 0, upd7810.mkh);
-	state_save_register_device_item(device, 0, upd7810.zcm);
-	state_save_register_device_item(device, 0, upd7810.pa_out);
-	state_save_register_device_item(device, 0, upd7810.pb_out);
-	state_save_register_device_item(device, 0, upd7810.pc_out);
-	state_save_register_device_item(device, 0, upd7810.pd_out);
-	state_save_register_device_item(device, 0, upd7810.pf_out);
-	state_save_register_device_item(device, 0, upd7810.cr0);
-	state_save_register_device_item(device, 0, upd7810.cr1);
-	state_save_register_device_item(device, 0, upd7810.cr2);
-	state_save_register_device_item(device, 0, upd7810.cr3);
-	state_save_register_device_item(device, 0, upd7810.txb);
-	state_save_register_device_item(device, 0, upd7810.rxb);
-	state_save_register_device_item(device, 0, upd7810.txd);
-	state_save_register_device_item(device, 0, upd7810.rxd);
-	state_save_register_device_item(device, 0, upd7810.sck);
-	state_save_register_device_item(device, 0, upd7810.ti);
-	state_save_register_device_item(device, 0, upd7810.to);
-	state_save_register_device_item(device, 0, upd7810.ci);
-	state_save_register_device_item(device, 0, upd7810.co0);
-	state_save_register_device_item(device, 0, upd7810.co1);
-	state_save_register_device_item(device, 0, upd7810.irr);
-	state_save_register_device_item(device, 0, upd7810.itf);
-	state_save_register_device_item(device, 0, upd7810.ovc0);
-	state_save_register_device_item(device, 0, upd7810.ovc1);
-	state_save_register_device_item(device, 0, upd7810.ovcf);
-	state_save_register_device_item(device, 0, upd7810.ovcs);
-	state_save_register_device_item(device, 0, upd7810.edges);
+	state_save_register_device_item(device, 0, cpustate->ppc.w.l);
+	state_save_register_device_item(device, 0, cpustate->pc.w.l);
+	state_save_register_device_item(device, 0, cpustate->sp.w.l);
+	state_save_register_device_item(device, 0, cpustate->psw);
+	state_save_register_device_item(device, 0, cpustate->op);
+	state_save_register_device_item(device, 0, cpustate->op2);
+	state_save_register_device_item(device, 0, cpustate->iff);
+	state_save_register_device_item(device, 0, cpustate->ea.w.l);
+	state_save_register_device_item(device, 0, cpustate->va.w.l);
+	state_save_register_device_item(device, 0, cpustate->bc.w.l);
+	state_save_register_device_item(device, 0, cpustate->de.w.l);
+	state_save_register_device_item(device, 0, cpustate->hl.w.l);
+	state_save_register_device_item(device, 0, cpustate->ea2.w.l);
+	state_save_register_device_item(device, 0, cpustate->va2.w.l);
+	state_save_register_device_item(device, 0, cpustate->bc2.w.l);
+	state_save_register_device_item(device, 0, cpustate->de2.w.l);
+	state_save_register_device_item(device, 0, cpustate->hl2.w.l);
+	state_save_register_device_item(device, 0, cpustate->cnt.d);
+	state_save_register_device_item(device, 0, cpustate->tm.d);
+	state_save_register_device_item(device, 0, cpustate->ecnt.d);
+	state_save_register_device_item(device, 0, cpustate->etm.d);
+	state_save_register_device_item(device, 0, cpustate->ma);
+	state_save_register_device_item(device, 0, cpustate->mb);
+	state_save_register_device_item(device, 0, cpustate->mcc);
+	state_save_register_device_item(device, 0, cpustate->mc);
+	state_save_register_device_item(device, 0, cpustate->mm);
+	state_save_register_device_item(device, 0, cpustate->mf);
+	state_save_register_device_item(device, 0, cpustate->tmm);
+	state_save_register_device_item(device, 0, cpustate->etmm);
+	state_save_register_device_item(device, 0, cpustate->eom);
+	state_save_register_device_item(device, 0, cpustate->sml);
+	state_save_register_device_item(device, 0, cpustate->smh);
+	state_save_register_device_item(device, 0, cpustate->anm);
+	state_save_register_device_item(device, 0, cpustate->mkl);
+	state_save_register_device_item(device, 0, cpustate->mkh);
+	state_save_register_device_item(device, 0, cpustate->zcm);
+	state_save_register_device_item(device, 0, cpustate->pa_out);
+	state_save_register_device_item(device, 0, cpustate->pb_out);
+	state_save_register_device_item(device, 0, cpustate->pc_out);
+	state_save_register_device_item(device, 0, cpustate->pd_out);
+	state_save_register_device_item(device, 0, cpustate->pf_out);
+	state_save_register_device_item(device, 0, cpustate->cr0);
+	state_save_register_device_item(device, 0, cpustate->cr1);
+	state_save_register_device_item(device, 0, cpustate->cr2);
+	state_save_register_device_item(device, 0, cpustate->cr3);
+	state_save_register_device_item(device, 0, cpustate->txb);
+	state_save_register_device_item(device, 0, cpustate->rxb);
+	state_save_register_device_item(device, 0, cpustate->txd);
+	state_save_register_device_item(device, 0, cpustate->rxd);
+	state_save_register_device_item(device, 0, cpustate->sck);
+	state_save_register_device_item(device, 0, cpustate->ti);
+	state_save_register_device_item(device, 0, cpustate->to);
+	state_save_register_device_item(device, 0, cpustate->ci);
+	state_save_register_device_item(device, 0, cpustate->co0);
+	state_save_register_device_item(device, 0, cpustate->co1);
+	state_save_register_device_item(device, 0, cpustate->irr);
+	state_save_register_device_item(device, 0, cpustate->itf);
+	state_save_register_device_item(device, 0, cpustate->ovc0);
+	state_save_register_device_item(device, 0, cpustate->ovc1);
+	state_save_register_device_item(device, 0, cpustate->ovcf);
+	state_save_register_device_item(device, 0, cpustate->ovcs);
+	state_save_register_device_item(device, 0, cpustate->edges);
 }
 
 #include "7810tbl.c"
@@ -1604,36 +1698,37 @@ static CPU_INIT( upd7810 )
 
 static CPU_RESET( upd7810 )
 {
+	upd7810_state *cpustate = device->token;
 	UPD7810_CONFIG save_config;
 	cpu_irq_callback save_irqcallback;
 
-	save_config = upd7810.config;
-	save_irqcallback = upd7810.irq_callback;
-	memset(&upd7810, 0, sizeof(upd7810));
-	upd7810.config = save_config;
-	upd7810.irq_callback = save_irqcallback;
-	upd7810.device = device;
-	upd7810.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	upd7810.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	save_config = cpustate->config;
+	save_irqcallback = cpustate->irq_callback;
+	memset(cpustate, 0, sizeof(*cpustate));
+	cpustate->config = save_config;
+	cpustate->irq_callback = save_irqcallback;
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	upd7810.opXX = opXX_7810;
-	upd7810.op48 = op48;
-	upd7810.op4C = op4C;
-	upd7810.op4D = op4D;
-	upd7810.op60 = op60;
-	upd7810.op64 = op64;
-	upd7810.op70 = op70;
-	upd7810.op74 = op74;
+	cpustate->opXX = opXX_7810;
+	cpustate->op48 = op48;
+	cpustate->op4C = op4C;
+	cpustate->op4D = op4D;
+	cpustate->op60 = op60;
+	cpustate->op64 = op64;
+	cpustate->op70 = op70;
+	cpustate->op74 = op74;
 	ETMM = 0xff;
 	TMM = 0xff;
 	MA = 0xff;
 	MB = 0xff;
-	switch (upd7810.config.type)
+	switch (cpustate->config.type)
 	{
 		case TYPE_7810_GAMEMASTER:
 		    // needed for lcd screen/ram selection; might be internal in cpu and therefor not needed; 0x10 written in some games
 			MC = 0xff&~0x7;
-			WP( UPD7810_PORTC, 1 ); //hyper space
+			WP( cpustate, UPD7810_PORTC, 1 ); //hyper space
 			PCD=0x8000;
 			break;
 		default:
@@ -1643,58 +1738,62 @@ static CPU_RESET( upd7810 )
 	// gamemaster falling block "and"s to enable interrupts
 	MKL = 0xff;
 	MKH = 0xff; //?
-	upd7810.handle_timers = upd7810_timers;
+	cpustate->handle_timers = upd7810_timers;
 }
 
 static CPU_RESET( upd7807 )
 {
+	upd7810_state *cpustate = device->token;
 	CPU_RESET_CALL(upd7810);
-	upd7810.opXX = opXX_7807;
+	cpustate->opXX = opXX_7807;
 }
 
 static CPU_RESET( upd7801 )
 {
+	upd7810_state *cpustate = device->token;
 	CPU_RESET_CALL(upd7810);
-	upd7810.op48 = op48_7801;
-	upd7810.op4C = op4C_7801;
-	upd7810.op4D = op4D_7801;
-	upd7810.op60 = op60_7801;
-	upd7810.op64 = op64_7801;
-	upd7810.op70 = op70_7801;
-	upd7810.op74 = op74_7801;
-	upd7810.opXX = opXX_7801;
+	cpustate->op48 = op48_7801;
+	cpustate->op4C = op4C_7801;
+	cpustate->op4D = op4D_7801;
+	cpustate->op60 = op60_7801;
+	cpustate->op64 = op64_7801;
+	cpustate->op70 = op70_7801;
+	cpustate->op74 = op74_7801;
+	cpustate->opXX = opXX_7801;
 }
 
 static CPU_RESET( upd78c05 )
 {
+	upd7810_state *cpustate = device->token;
 	CPU_RESET_CALL(upd7810);
-	upd7810.op48 = op48_78c05;
-	upd7810.op4C = op4C_78c05;
-	upd7810.op4D = op4D_78c05;
-	upd7810.op60 = op60_78c05;
-	upd7810.op64 = op64_78c05;
-	upd7810.op70 = op70_78c05;
-	upd7810.op74 = op74_78c05;
-	upd7810.opXX = opXX_78c05;
+	cpustate->op48 = op48_78c05;
+	cpustate->op4C = op4C_78c05;
+	cpustate->op4D = op4D_78c05;
+	cpustate->op60 = op60_78c05;
+	cpustate->op64 = op64_78c05;
+	cpustate->op70 = op70_78c05;
+	cpustate->op74 = op74_78c05;
+	cpustate->opXX = opXX_78c05;
 	MA = 0;		/* All outputs */
 	MC = 0xFF;	/* All inputs */
 	V = 0xFF;	/* The vector register is always pointing to FF00 */
-	upd7810.handle_timers = upd78c05_timers;
+	cpustate->handle_timers = upd78c05_timers;
 	TM0 = 0xFF;	/* Timer seems to be running from boot */
-	upd7810.ovc0 = ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
+	cpustate->ovc0 = ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
 }
 
 static CPU_RESET( upd78c06 )
 {
+	upd7810_state *cpustate = device->token;
 	CPU_RESET_CALL(upd7810);
-	upd7810.op48 = op48_78c06;
-	upd7810.op4C = op4C_78c06;
-	upd7810.op4D = op4D_78c06;
-	upd7810.op60 = op60_78c06;
-	upd7810.op64 = op64_78c06;
-	upd7810.op70 = op70_78c06;
-	upd7810.op74 = op74_78c06;
-	upd7810.opXX = opXX_78c06;
+	cpustate->op48 = op48_78c06;
+	cpustate->op4C = op4C_78c06;
+	cpustate->op4D = op4D_78c06;
+	cpustate->op60 = op60_78c06;
+	cpustate->op64 = op64_78c06;
+	cpustate->op70 = op70_78c06;
+	cpustate->op74 = op74_78c06;
+	cpustate->opXX = opXX_78c06;
 }
 
 static CPU_EXIT( upd7810 )
@@ -1703,7 +1802,8 @@ static CPU_EXIT( upd7810 )
 
 static CPU_EXECUTE( upd7810 )
 {
-	upd7810_icount = cycles;
+	upd7810_state *cpustate = device->token;
+	cpustate->icount = cycles;
 
 	do
 	{
@@ -1719,15 +1819,15 @@ static CPU_EXECUTE( upd7810 )
          * L0   for "MVI L,xx" or "LXI H,xxxx"
          * L1   for "MVI A,xx"
          */
-		PSW &= ~upd7810.opXX[OP].mask_l0_l1;
+		PSW &= ~cpustate->opXX[OP].mask_l0_l1;
 
 		/* skip flag set and not SOFTI opcode? */
 		if ((PSW & SK) && (OP != 0x72))
 		{
-			if (upd7810.opXX[OP].cycles)
+			if (cpustate->opXX[OP].cycles)
 			{
-				cc = upd7810.opXX[OP].cycles_skip;
-				PC += upd7810.opXX[OP].oplen - 1;
+				cc = cpustate->opXX[OP].cycles_skip;
+				PC += cpustate->opXX[OP].oplen - 1;
 			}
 			else
 			{
@@ -1735,67 +1835,55 @@ static CPU_EXECUTE( upd7810 )
 				switch (OP)
 				{
 				case 0x48:
-					cc = upd7810.op48[OP2].cycles_skip;
-					PC += upd7810.op48[OP2].oplen - 2;
+					cc = cpustate->op48[OP2].cycles_skip;
+					PC += cpustate->op48[OP2].oplen - 2;
 					break;
 				case 0x4c:
-					cc = upd7810.op4C[OP2].cycles_skip;
-					PC += upd7810.op4C[OP2].oplen - 2;
+					cc = cpustate->op4C[OP2].cycles_skip;
+					PC += cpustate->op4C[OP2].oplen - 2;
 					break;
 				case 0x4d:
-					cc = upd7810.op4D[OP2].cycles_skip;
-					PC += upd7810.op4D[OP2].oplen - 2;
+					cc = cpustate->op4D[OP2].cycles_skip;
+					PC += cpustate->op4D[OP2].oplen - 2;
 					break;
 				case 0x60:
-					cc = upd7810.op60[OP2].cycles_skip;
-					PC += upd7810.op60[OP2].oplen - 2;
+					cc = cpustate->op60[OP2].cycles_skip;
+					PC += cpustate->op60[OP2].oplen - 2;
 					break;
 				case 0x64:
-					cc = upd7810.op64[OP2].cycles_skip;
-					PC += upd7810.op64[OP2].oplen - 2;
+					cc = cpustate->op64[OP2].cycles_skip;
+					PC += cpustate->op64[OP2].oplen - 2;
 					break;
 				case 0x70:
-					cc = upd7810.op70[OP2].cycles_skip;
-					PC += upd7810.op70[OP2].oplen - 2;
+					cc = cpustate->op70[OP2].cycles_skip;
+					PC += cpustate->op70[OP2].oplen - 2;
 					break;
 				case 0x74:
-					cc = upd7810.op74[OP2].cycles_skip;
-					PC += upd7810.op74[OP2].oplen - 2;
+					cc = cpustate->op74[OP2].cycles_skip;
+					PC += cpustate->op74[OP2].oplen - 2;
 					break;
 				default:
 					fatalerror("uPD7810 internal error: check cycle counts for main");
 				}
 			}
 			PSW &= ~SK;
-			upd7810.handle_timers( cc );
+			cpustate->handle_timers( cpustate, cc );
 		}
 		else
 		{
-			cc = upd7810.opXX[OP].cycles;
-			upd7810.handle_timers( cc );
-			(*upd7810.opXX[OP].opfunc)();
+			cc = cpustate->opXX[OP].cycles;
+			cpustate->handle_timers( cpustate, cc );
+			(*cpustate->opXX[OP].opfunc)(cpustate);
 		}
-		upd7810_icount -= cc;
-		upd7810_take_irq();
+		cpustate->icount -= cc;
+		upd7810_take_irq(cpustate);
 
-	} while (upd7810_icount > 0);
+	} while (cpustate->icount > 0);
 
-	return cycles - upd7810_icount;
+	return cycles - cpustate->icount;
 }
 
-static CPU_GET_CONTEXT( upd7810 )
-{
-	if (dst)
-		memcpy(dst, &upd7810, sizeof(upd7810));
-}
-
-static CPU_SET_CONTEXT( upd7810 )
-{
-	if (src)
-		memcpy(&upd7810, src, sizeof(upd7810));
-}
-
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(upd7810_state *cpustate, int irqline, int state)
 {
 	if (state != CLEAR_LINE)
 	{
@@ -1839,13 +1927,14 @@ static void set_irq_line(int irqline, int state)
 
 static CPU_SET_INFO( upd7810 )
 {
+	upd7810_state *cpustate = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(INPUT_LINE_NMI, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF1:	set_irq_line(UPD7810_INTF1, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF2:	set_irq_line(UPD7810_INTF2, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + UPD7810_INTFE1:	set_irq_line(UPD7810_INTFE1, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF1:	set_irq_line(cpustate, UPD7810_INTF1, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF2:	set_irq_line(cpustate, UPD7810_INTF2, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + UPD7810_INTFE1:	set_irq_line(cpustate, UPD7810_INTFE1, info->i);	break;
 
 		case CPUINFO_INT_PC:							PC = info->i; 							break;
 		case CPUINFO_INT_REGISTER + UPD7810_PC:			PC = info->i; 							break;
@@ -1912,10 +2001,11 @@ static CPU_SET_INFO( upd7810 )
 
 CPU_GET_INFO( upd7810 )
 {
+	upd7810_state *cpustate = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(upd7810);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(upd7810_state);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
@@ -1998,15 +2088,15 @@ CPU_GET_INFO( upd7810 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(upd7810);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(upd7810);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(upd7810);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(upd7810);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7810);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(upd7810);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(upd7810);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7810);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &upd7810_icount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7810");				break;
@@ -2017,66 +2107,66 @@ CPU_GET_INFO( upd7810 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%s:%s:%s:%s:%s:%s",
-				upd7810.psw & 0x40 ? "ZF":"--",
-				upd7810.psw & 0x20 ? "SK":"--",
-				upd7810.psw & 0x10 ? "HC":"--",
-				upd7810.psw & 0x08 ? "L1":"--",
-				upd7810.psw & 0x04 ? "L0":"--",
-				upd7810.psw & 0x01 ? "CY":"--");
+				cpustate->psw & 0x40 ? "ZF":"--",
+				cpustate->psw & 0x20 ? "SK":"--",
+				cpustate->psw & 0x10 ? "HC":"--",
+				cpustate->psw & 0x08 ? "L1":"--",
+				cpustate->psw & 0x04 ? "L0":"--",
+				cpustate->psw & 0x01 ? "CY":"--");
 			break;
 
-		case CPUINFO_STR_REGISTER + UPD7810_PC:			sprintf(info->s, "PC  :%04X", upd7810.pc.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_SP:			sprintf(info->s, "SP  :%04X", upd7810.sp.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_PSW:		sprintf(info->s, "PSW :%02X", upd7810.psw); break;
-		case CPUINFO_STR_REGISTER + UPD7810_A:			sprintf(info->s, "A   :%02X", upd7810.va.b.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_V:			sprintf(info->s, "V   :%02X", upd7810.va.b.h); break;
-		case CPUINFO_STR_REGISTER + UPD7810_EA:			sprintf(info->s, "EA  :%04X", upd7810.ea.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_BC:			sprintf(info->s, "BC  :%04X", upd7810.bc.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_DE:			sprintf(info->s, "DE  :%04X", upd7810.de.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_HL:			sprintf(info->s, "HL  :%04X", upd7810.hl.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_A2:			sprintf(info->s, "A'  :%02X", upd7810.va2.b.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_V2:			sprintf(info->s, "V'  :%02X", upd7810.va2.b.h); break;
-		case CPUINFO_STR_REGISTER + UPD7810_EA2:		sprintf(info->s, "EA' :%04X", upd7810.ea2.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_BC2:		sprintf(info->s, "BC' :%04X", upd7810.bc2.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_DE2:		sprintf(info->s, "DE' :%04X", upd7810.de2.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_HL2:		sprintf(info->s, "HL' :%04X", upd7810.hl2.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_CNT0:		sprintf(info->s, "CNT0:%02X", upd7810.cnt.b.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_CNT1:		sprintf(info->s, "CNT1:%02X", upd7810.cnt.b.h); break;
-		case CPUINFO_STR_REGISTER + UPD7810_TM0:		sprintf(info->s, "TM0 :%02X", upd7810.tm.b.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_TM1:		sprintf(info->s, "TM1 :%02X", upd7810.tm.b.h); break;
-		case CPUINFO_STR_REGISTER + UPD7810_ECNT:		sprintf(info->s, "ECNT:%04X", upd7810.ecnt.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_ECPT:		sprintf(info->s, "ECPT:%04X", upd7810.ecnt.w.h); break;
-		case CPUINFO_STR_REGISTER + UPD7810_ETM0:		sprintf(info->s, "ETM0:%04X", upd7810.etm.w.l); break;
-		case CPUINFO_STR_REGISTER + UPD7810_ETM1:		sprintf(info->s, "ETM1:%04X", upd7810.etm.w.h); break;
-		case CPUINFO_STR_REGISTER + UPD7810_MA:			sprintf(info->s, "MA  :%02X", upd7810.ma); break;
-		case CPUINFO_STR_REGISTER + UPD7810_MB:			sprintf(info->s, "MB  :%02X", upd7810.mb); break;
-		case CPUINFO_STR_REGISTER + UPD7810_MCC:		sprintf(info->s, "MCC :%02X", upd7810.mcc); break;
-		case CPUINFO_STR_REGISTER + UPD7810_MC:			sprintf(info->s, "MC  :%02X", upd7810.mc); break;
-		case CPUINFO_STR_REGISTER + UPD7810_MM:			sprintf(info->s, "MM  :%02X", upd7810.mm); break;
-		case CPUINFO_STR_REGISTER + UPD7810_MF:			sprintf(info->s, "MF  :%02X", upd7810.mf); break;
-		case CPUINFO_STR_REGISTER + UPD7810_TMM:		sprintf(info->s, "TMM :%02X", upd7810.tmm); break;
-		case CPUINFO_STR_REGISTER + UPD7810_ETMM:		sprintf(info->s, "ETMM:%02X", upd7810.etmm); break;
-		case CPUINFO_STR_REGISTER + UPD7810_EOM:		sprintf(info->s, "EOM :%02X", upd7810.eom); break;
-		case CPUINFO_STR_REGISTER + UPD7810_SML:		sprintf(info->s, "SML :%02X", upd7810.sml); break;
-		case CPUINFO_STR_REGISTER + UPD7810_SMH:		sprintf(info->s, "SMH :%02X", upd7810.smh); break;
-		case CPUINFO_STR_REGISTER + UPD7810_ANM:		sprintf(info->s, "ANM :%02X", upd7810.anm); break;
-		case CPUINFO_STR_REGISTER + UPD7810_MKL:		sprintf(info->s, "MKL :%02X", upd7810.mkl); break;
-		case CPUINFO_STR_REGISTER + UPD7810_MKH:		sprintf(info->s, "MKH :%02X", upd7810.mkh); break;
-		case CPUINFO_STR_REGISTER + UPD7810_ZCM:		sprintf(info->s, "ZCM :%02X", upd7810.zcm); break;
-		case CPUINFO_STR_REGISTER + UPD7810_CR0:		sprintf(info->s, "CR0 :%02X", upd7810.cr0); break;
-		case CPUINFO_STR_REGISTER + UPD7810_CR1:		sprintf(info->s, "CR1 :%02X", upd7810.cr1); break;
-		case CPUINFO_STR_REGISTER + UPD7810_CR2:		sprintf(info->s, "CR2 :%02X", upd7810.cr2); break;
-		case CPUINFO_STR_REGISTER + UPD7810_CR3:		sprintf(info->s, "CR3 :%02X", upd7810.cr3); break;
-		case CPUINFO_STR_REGISTER + UPD7810_RXB:		sprintf(info->s, "RXB :%02X", upd7810.rxb); break;
-		case CPUINFO_STR_REGISTER + UPD7810_TXB:		sprintf(info->s, "TXB :%02X", upd7810.txb); break;
-		case CPUINFO_STR_REGISTER + UPD7810_TXD:		sprintf(info->s, "TXD :%d", upd7810.txd); break;
-		case CPUINFO_STR_REGISTER + UPD7810_RXD:		sprintf(info->s, "RXD :%d", upd7810.rxd); break;
-		case CPUINFO_STR_REGISTER + UPD7810_SCK:		sprintf(info->s, "SCK :%d", upd7810.sck); break;
-		case CPUINFO_STR_REGISTER + UPD7810_TI:			sprintf(info->s, "TI  :%d", upd7810.ti); break;
-		case CPUINFO_STR_REGISTER + UPD7810_TO:			sprintf(info->s, "TO  :%d", upd7810.to); break;
-		case CPUINFO_STR_REGISTER + UPD7810_CI:			sprintf(info->s, "CI  :%d", upd7810.ci); break;
-		case CPUINFO_STR_REGISTER + UPD7810_CO0:		sprintf(info->s, "CO0 :%d", upd7810.co0 & 1); break;
-		case CPUINFO_STR_REGISTER + UPD7810_CO1:		sprintf(info->s, "CO1 :%d", upd7810.co1 & 1); break;
+		case CPUINFO_STR_REGISTER + UPD7810_PC:			sprintf(info->s, "PC  :%04X", cpustate->pc.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_SP:			sprintf(info->s, "SP  :%04X", cpustate->sp.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_PSW:		sprintf(info->s, "PSW :%02X", cpustate->psw); break;
+		case CPUINFO_STR_REGISTER + UPD7810_A:			sprintf(info->s, "A   :%02X", cpustate->va.b.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_V:			sprintf(info->s, "V   :%02X", cpustate->va.b.h); break;
+		case CPUINFO_STR_REGISTER + UPD7810_EA:			sprintf(info->s, "EA  :%04X", cpustate->ea.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_BC:			sprintf(info->s, "BC  :%04X", cpustate->bc.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_DE:			sprintf(info->s, "DE  :%04X", cpustate->de.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_HL:			sprintf(info->s, "HL  :%04X", cpustate->hl.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_A2:			sprintf(info->s, "A'  :%02X", cpustate->va2.b.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_V2:			sprintf(info->s, "V'  :%02X", cpustate->va2.b.h); break;
+		case CPUINFO_STR_REGISTER + UPD7810_EA2:		sprintf(info->s, "EA' :%04X", cpustate->ea2.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_BC2:		sprintf(info->s, "BC' :%04X", cpustate->bc2.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_DE2:		sprintf(info->s, "DE' :%04X", cpustate->de2.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_HL2:		sprintf(info->s, "HL' :%04X", cpustate->hl2.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_CNT0:		sprintf(info->s, "CNT0:%02X", cpustate->cnt.b.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_CNT1:		sprintf(info->s, "CNT1:%02X", cpustate->cnt.b.h); break;
+		case CPUINFO_STR_REGISTER + UPD7810_TM0:		sprintf(info->s, "TM0 :%02X", cpustate->tm.b.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_TM1:		sprintf(info->s, "TM1 :%02X", cpustate->tm.b.h); break;
+		case CPUINFO_STR_REGISTER + UPD7810_ECNT:		sprintf(info->s, "ECNT:%04X", cpustate->ecnt.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_ECPT:		sprintf(info->s, "ECPT:%04X", cpustate->ecnt.w.h); break;
+		case CPUINFO_STR_REGISTER + UPD7810_ETM0:		sprintf(info->s, "ETM0:%04X", cpustate->etm.w.l); break;
+		case CPUINFO_STR_REGISTER + UPD7810_ETM1:		sprintf(info->s, "ETM1:%04X", cpustate->etm.w.h); break;
+		case CPUINFO_STR_REGISTER + UPD7810_MA:			sprintf(info->s, "MA  :%02X", cpustate->ma); break;
+		case CPUINFO_STR_REGISTER + UPD7810_MB:			sprintf(info->s, "MB  :%02X", cpustate->mb); break;
+		case CPUINFO_STR_REGISTER + UPD7810_MCC:		sprintf(info->s, "MCC :%02X", cpustate->mcc); break;
+		case CPUINFO_STR_REGISTER + UPD7810_MC:			sprintf(info->s, "MC  :%02X", cpustate->mc); break;
+		case CPUINFO_STR_REGISTER + UPD7810_MM:			sprintf(info->s, "MM  :%02X", cpustate->mm); break;
+		case CPUINFO_STR_REGISTER + UPD7810_MF:			sprintf(info->s, "MF  :%02X", cpustate->mf); break;
+		case CPUINFO_STR_REGISTER + UPD7810_TMM:		sprintf(info->s, "TMM :%02X", cpustate->tmm); break;
+		case CPUINFO_STR_REGISTER + UPD7810_ETMM:		sprintf(info->s, "ETMM:%02X", cpustate->etmm); break;
+		case CPUINFO_STR_REGISTER + UPD7810_EOM:		sprintf(info->s, "EOM :%02X", cpustate->eom); break;
+		case CPUINFO_STR_REGISTER + UPD7810_SML:		sprintf(info->s, "SML :%02X", cpustate->sml); break;
+		case CPUINFO_STR_REGISTER + UPD7810_SMH:		sprintf(info->s, "SMH :%02X", cpustate->smh); break;
+		case CPUINFO_STR_REGISTER + UPD7810_ANM:		sprintf(info->s, "ANM :%02X", cpustate->anm); break;
+		case CPUINFO_STR_REGISTER + UPD7810_MKL:		sprintf(info->s, "MKL :%02X", cpustate->mkl); break;
+		case CPUINFO_STR_REGISTER + UPD7810_MKH:		sprintf(info->s, "MKH :%02X", cpustate->mkh); break;
+		case CPUINFO_STR_REGISTER + UPD7810_ZCM:		sprintf(info->s, "ZCM :%02X", cpustate->zcm); break;
+		case CPUINFO_STR_REGISTER + UPD7810_CR0:		sprintf(info->s, "CR0 :%02X", cpustate->cr0); break;
+		case CPUINFO_STR_REGISTER + UPD7810_CR1:		sprintf(info->s, "CR1 :%02X", cpustate->cr1); break;
+		case CPUINFO_STR_REGISTER + UPD7810_CR2:		sprintf(info->s, "CR2 :%02X", cpustate->cr2); break;
+		case CPUINFO_STR_REGISTER + UPD7810_CR3:		sprintf(info->s, "CR3 :%02X", cpustate->cr3); break;
+		case CPUINFO_STR_REGISTER + UPD7810_RXB:		sprintf(info->s, "RXB :%02X", cpustate->rxb); break;
+		case CPUINFO_STR_REGISTER + UPD7810_TXB:		sprintf(info->s, "TXB :%02X", cpustate->txb); break;
+		case CPUINFO_STR_REGISTER + UPD7810_TXD:		sprintf(info->s, "TXD :%d", cpustate->txd); break;
+		case CPUINFO_STR_REGISTER + UPD7810_RXD:		sprintf(info->s, "RXD :%d", cpustate->rxd); break;
+		case CPUINFO_STR_REGISTER + UPD7810_SCK:		sprintf(info->s, "SCK :%d", cpustate->sck); break;
+		case CPUINFO_STR_REGISTER + UPD7810_TI:			sprintf(info->s, "TI  :%d", cpustate->ti); break;
+		case CPUINFO_STR_REGISTER + UPD7810_TO:			sprintf(info->s, "TO  :%d", cpustate->to); break;
+		case CPUINFO_STR_REGISTER + UPD7810_CI:			sprintf(info->s, "CI  :%d", cpustate->ci); break;
+		case CPUINFO_STR_REGISTER + UPD7810_CO0:		sprintf(info->s, "CO0 :%d", cpustate->co0 & 1); break;
+		case CPUINFO_STR_REGISTER + UPD7810_CO1:		sprintf(info->s, "CO1 :%d", cpustate->co1 & 1); break;
 	}
 }
 
