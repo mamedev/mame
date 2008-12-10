@@ -1967,6 +1967,7 @@ src/mame/drivers/speedspn.c svneol=native#text/plain
 src/mame/drivers/speglsht.c svneol=native#text/plain
 src/mame/drivers/spiders.c svneol=native#text/plain
 src/mame/drivers/splash.c svneol=native#text/plain
+src/mame/drivers/spool99.c svneol=native#text/plain
 src/mame/drivers/sprcros2.c svneol=native#text/plain
 src/mame/drivers/sprint2.c svneol=native#text/plain
 src/mame/drivers/sprint4.c svneol=native#text/plain
