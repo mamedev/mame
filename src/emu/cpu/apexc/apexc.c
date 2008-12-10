@@ -1,5 +1,5 @@
 /*
-    cpu/apexc/cpustate->c: APE(X)C CPU emulation
+    cpu/apexc/apexc.c: APE(X)C CPU emulation
 
     By Raphael Nabet
 
@@ -40,7 +40,7 @@
       be accessed at a time (the 16 first ones, plus 16 others chosen by the programmer),
       and the rotation rate is 3750rpm (62.5 rotations per second).
     * two I/O units: tape reader and tape puncher.  A teletyper was designed to read
-      specially-encoded punched tapes and print decoded text.  (See /systems/cpustate->c)
+      specially-encoded punched tapes and print decoded text.  (See /systems/apexc.c)
     * machine code has 15 instructions (!), including add, substract, shift, multiply (!),
       test and branch, input and punch.  A so-called vector mode allow to repeat the same
       operation 32 times with 32 successive memory locations.  Note the lack of bitwise
@@ -49,7 +49,7 @@
       time: 16ms, which would allow about 60IPS when no optimization is made)
     * there is no indirect addressing whatever, although dynamic modification of opcodes (!)
       allows to simulate it...
-    * a control panel allows operation and debugging of the machine.  (See /systems/cpustate->c)
+    * a control panel allows operation and debugging of the machine.  (See /systems/apexc.c)
 
     Conventions:
     Bits are numbered in big-endian order, starting with 1: bit #1 is the

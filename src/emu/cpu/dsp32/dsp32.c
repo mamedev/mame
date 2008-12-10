@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    cpustate->c
+    dsp32.c
     Core implementation for the portable DSP32 emulator.
     Written by Aaron Giles
 

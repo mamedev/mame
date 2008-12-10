@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    cpustate->c
+    mb86233.c
     Core implementation for the portable Fujitsu MB86233 series DSP emulator.
 
     Written by ElSemi
