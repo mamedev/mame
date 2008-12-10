@@ -343,17 +343,13 @@
 #define LOG_EXTRA 0
 #define LOG_IOT_EXTRA 0
 
-
-static void execute_instruction(void);
-static void null_iot (int op2, int nac, int mb, int *io, int ac);
-static void lem_eem_iot(int op2, int nac, int mb, int *io, int ac);
-static void sbs_iot(int op2, int nac, int mb, int *io, int ac);
-static void type_20_sbs_iot(int op2, int nac, int mb, int *io, int ac);
-static void pulse_start_clear(void);
+#define READ_PDP_18BIT(A) ((signed)memory_read_dword_32be(cpustate->program, (A)<<2))
+#define WRITE_PDP_18BIT(A,V) (memory_write_dword_32be(cpustate->program, (A)<<2,(V)))
 
 
 /* PDP1 Registers */
-typedef struct
+typedef struct _pdp1_state pdp1_state;
+struct _pdp1_state
 {
 	/* processor registers */
 	UINT32 pc;		/* program counter (12, 15 or 16 bits) */
@@ -402,12 +398,12 @@ typedef struct
 	int sbs_restore;		/* set when a jump instruction is an interrupt return */
 	int no_sequence_break;	/* disable sequence break recognition for one cycle */
 
-	/* callback for the iot instruction */
-	void (*extern_iot[64])(int op2, int nac, int mb, int *io, int ac);
-	/* read a word from the perforated tape reader */
-	void (*read_binary_word)(void);
-	/* called when sc is pulsed: IO devices should reset */
-	void (*io_sc_callback)(void);
+	/* callbacks for iot instructions (required for any I/O) */
+	pdp1_extern_iot_func extern_iot[64];
+	/* read a word from the perforated tape reader (required for read-in mode) */
+	pdp1_read_binary_word_func read_binary_word;
+	/* callback called when sc is pulsed: IO devices should reset */
+	pdp1_io_sc_func io_sc_callback;
 
 	/* 0: no extend support, 1: extend with 15-bit address, 2: extend with 16-bit address */
 	int extend_support;
@@ -423,39 +419,42 @@ typedef struct
 
 	const device_config *device;
 	const address_space *program;
-}
-pdp1_Regs;
+	int icount;
+};
+
+static void execute_instruction(pdp1_state *cpustate);
+static void null_iot (const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void lem_eem_iot(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void sbs_iot(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void type_20_sbs_iot(const device_config *device, int op2, int nac, int mb, int *io, int ac);
+static void pulse_start_clear(pdp1_state *cpustate);
 
 
-static pdp1_Regs pdp1;
 
-#define PC		pdp1.pc
-#define IR		pdp1.ir
-#define MB		pdp1.mb
-#define MA		pdp1.ma
-#define AC		pdp1.ac
-#define IO		pdp1.io
-#define OV		pdp1.ov
-#define EXD		pdp1.exd
+#define PC		cpustate->pc
+#define IR		cpustate->ir
+#define MB		cpustate->mb
+#define MA		cpustate->ma
+#define AC		cpustate->ac
+#define IO		cpustate->io
+#define OV		cpustate->ov
+#define EXD		cpustate->exd
 /* note that we start counting flags/sense switches at 1, therefore n is in [1,6] */
-#define FLAGS	pdp1.pf
-#define READFLAG(n)	((pdp1.pf >> (6-(n))) & 1)
-#define WRITEFLAG(n, data)	(pdp1.pf = (pdp1.pf & ~(1 << (6-(n)))) | (((data) & 1) << (6-(n))))
-#define SENSE_SW	pdp1.ss
-#define READSENSE(n)	((pdp1.ss >> (6-(n))) & 1)
-#define WRITESENSE(n, data)	(pdp1.ss = (pdp1.ss & ~(1 << (6-(n)))) | (((data) & 1) << (6-(n))))
+#define FLAGS	cpustate->pf
+#define READFLAG(n)	((cpustate->pf >> (6-(n))) & 1)
+#define WRITEFLAG(n, data)	(cpustate->pf = (cpustate->pf & ~(1 << (6-(n)))) | (((data) & 1) << (6-(n))))
+#define SENSE_SW	cpustate->ss
+#define READSENSE(n)	((cpustate->ss >> (6-(n))) & 1)
+#define WRITESENSE(n, data)	(cpustate->ss = (cpustate->ss & ~(1 << (6-(n)))) | (((data) & 1) << (6-(n))))
 
-#define EXTENDED_ADDRESS_MASK	pdp1.extended_address_mask
-#define ADDRESS_EXTENSION_MASK	pdp1.address_extension_mask
+#define EXTENDED_ADDRESS_MASK	cpustate->extended_address_mask
+#define ADDRESS_EXTENSION_MASK	cpustate->address_extension_mask
 #define BASE_ADDRESS_MASK		0007777
 
 #define INCREMENT_PC	(PC = (PC & ADDRESS_EXTENSION_MASK) | ((PC+1) & BASE_ADDRESS_MASK))
 #define DECREMENT_PC	(PC = (PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
 #define INCREMENT_MA	(MA = (MA & ADDRESS_EXTENSION_MASK) | ((MA+1) & BASE_ADDRESS_MASK))
 #define PREVIOUS_PC		((PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
-
-/* public globals */
-static signed int pdp1_ICount;
 
 
 
@@ -476,54 +475,54 @@ static signed int pdp1_ICount;
     More details can be found in the handbook and the maintenance manual.
 */
 /*
-    This function MUST be called every time pdp1.sbm, pdp1.b4, pdp1.irq_state or pdp1.b2 change.
+    This function MUST be called every time cpustate->sbm, cpustate->b4, cpustate->irq_state or cpustate->b2 change.
 */
-static void field_interrupt(void)
+static void field_interrupt(pdp1_state *cpustate)
 {
 	/* current_irq: 1 bit for each active pending interrupt request
-    Pending interrupts are in b3 (simulated by (pdp1.irq_state & pdp1.b1) | pdp1.b2)), but they
+    Pending interrupts are in b3 (simulated by (cpustate->irq_state & cpustate->b1) | cpustate->b2)), but they
     are only honored if no higher priority interrupt routine is in execution (one bit set in b4
-    for each routine in execution).  The revelant mask is created with (pdp1.b4 | (- pdp1.b4)),
+    for each routine in execution).  The revelant mask is created with (cpustate->b4 | (- cpustate->b4)),
     as the carry chain (remember that -b4 = (~ b4) + 1) does precisely what we want.
     b4:    0001001001000
     -b4:   1110110111000
     b4|-b4:1111111111000
     Neat, uh?
      */
-	int current_irq = ((pdp1.irq_state & pdp1.b1) | pdp1.b2) & ~ (pdp1.b4 | (- pdp1.b4));
+	int current_irq = ((cpustate->irq_state & cpustate->b1) | cpustate->b2) & ~ (cpustate->b4 | (- cpustate->b4));
 	int i;
 
-	if (pdp1.sbm && current_irq)
+	if (cpustate->sbm && current_irq)
 	{
-		pdp1.sbs_request = 1;
+		cpustate->sbs_request = 1;
 		for (i=0; /*i<16 &&*/ (! ((current_irq >> i) & 1)); i++)
 			;
-		pdp1.sbs_level = i;
+		cpustate->sbs_level = i;
 	}
 	else
-		pdp1.sbs_request = 0;
+		cpustate->sbs_request = 0;
 }
 
-static void pdp1_set_irq_line (int irqline, int state)
+static void pdp1_set_irq_line (pdp1_state *cpustate, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
 		/* no specific NMI line */
 	}
-	else if ((irqline >= 0) && (irqline < (pdp1.type_20_sbs ? 1 : 16)))
+	else if ((irqline >= 0) && (irqline < (cpustate->type_20_sbs ? 1 : 16)))
 	{
 		unsigned int new_state = state ? 1 : 0;
 
-		if (((pdp1.irq_state >> irqline) & 1) != new_state)
+		if (((cpustate->irq_state >> irqline) & 1) != new_state)
 		{
-			pdp1.irq_state = (pdp1.irq_state & ~ (1 << irqline)) | (new_state << irqline);
+			cpustate->irq_state = (cpustate->irq_state & ~ (1 << irqline)) | (new_state << irqline);
 
-			if ((new_state) && ((pdp1.b1 >> irqline) & 1))
-				pdp1.b2 |= (new_state << irqline);
+			if ((new_state) && ((cpustate->b1 >> irqline) & 1))
+				cpustate->b2 |= (new_state << irqline);
 
-			/*pdp1.b3 = pdp1.irq_state | pdp1.b2;*/
+			/*cpustate->b3 = cpustate->irq_state | cpustate->b2;*/
 
-			field_interrupt();  /* interrupt state has changed */
+			field_interrupt(cpustate);  /* interrupt state has changed */
 		}
 	}
 }
@@ -532,76 +531,64 @@ static void pdp1_set_irq_line (int irqline, int state)
 static CPU_INIT( pdp1 )
 {
 	const pdp1_reset_param_t *param = device->static_config;
+	pdp1_state *cpustate = device->token;
 	int i;
 
 	/* clean-up */
-	memset (&pdp1, 0, sizeof (pdp1));
-	pdp1.device = device;
-	pdp1.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	memset (cpustate, 0, sizeof (*cpustate));
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* set up params and callbacks */
 	for (i=0; i<64; i++)
 	{
-		pdp1.extern_iot[i] = (param && param->extern_iot[i])
+		cpustate->extern_iot[i] = (param && param->extern_iot[i])
 										? param->extern_iot[i]
 										: null_iot;
 	}
-	pdp1.read_binary_word = (param) ? param->read_binary_word : NULL;
-	pdp1.io_sc_callback = (param) ? param->io_sc_callback : NULL;
-	pdp1.extend_support = (param) ? param->extend_support : 0;
-	pdp1.hw_mul_div = (param) ? param->hw_mul_div : 0;
-	pdp1.type_20_sbs = (param) ? param->type_20_sbs : 0;
+	cpustate->read_binary_word = (param) ? param->read_binary_word : NULL;
+	cpustate->io_sc_callback = (param) ? param->io_sc_callback : NULL;
+	cpustate->extend_support = (param) ? param->extend_support : 0;
+	cpustate->hw_mul_div = (param) ? param->hw_mul_div : 0;
+	cpustate->type_20_sbs = (param) ? param->type_20_sbs : 0;
 
-	switch (pdp1.extend_support)
+	switch (cpustate->extend_support)
 	{
 	default:
-		pdp1.extend_support = 0;
+		cpustate->extend_support = 0;
 	case 0:		/* no extension */
-		pdp1.extended_address_mask = 07777;
-		pdp1.address_extension_mask = 00000;
+		cpustate->extended_address_mask = 07777;
+		cpustate->address_extension_mask = 00000;
 		break;
 	case 1:		/* 15-bit extension */
-		pdp1.extended_address_mask = 077777;
-		pdp1.address_extension_mask = 070000;
+		cpustate->extended_address_mask = 077777;
+		cpustate->address_extension_mask = 070000;
 		break;
 	case 2:		/* 16-bit extension */
-		pdp1.extended_address_mask = 0177777;
-		pdp1.address_extension_mask = 0170000;
+		cpustate->extended_address_mask = 0177777;
+		cpustate->address_extension_mask = 0170000;
 		break;
 	}
 
-	if (pdp1.extend_support)
+	if (cpustate->extend_support)
 	{
-		pdp1.extern_iot[074] = lem_eem_iot;
+		cpustate->extern_iot[074] = lem_eem_iot;
 	}
-	pdp1.extern_iot[054] = pdp1.extern_iot[055] = pdp1.extern_iot[056] = sbs_iot;
-	if (pdp1.type_20_sbs)
+	cpustate->extern_iot[054] = cpustate->extern_iot[055] = cpustate->extern_iot[056] = sbs_iot;
+	if (cpustate->type_20_sbs)
 	{
-		pdp1.extern_iot[050] = pdp1.extern_iot[051] = pdp1.extern_iot[052] = pdp1.extern_iot[053]
+		cpustate->extern_iot[050] = cpustate->extern_iot[051] = cpustate->extern_iot[052] = cpustate->extern_iot[053]
 				= type_20_sbs_iot;
 	}
 
 	/* reset CPU flip-flops */
-	pulse_start_clear();
+	pulse_start_clear(cpustate);
 }
 
 static CPU_RESET( pdp1 )
 {
 	/* nothing to do */
 }
-
-static CPU_GET_CONTEXT( pdp1 )
-{
-	if (dst)
-		*(pdp1_Regs *) dst = pdp1;
-}
-
-static CPU_SET_CONTEXT( pdp1 )
-{
-	if (src)
-		pdp1 = *(pdp1_Regs *) src;
-}
-
 
 /*
     flags:
@@ -625,7 +612,9 @@ static const char instruction_kind[32] =
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( pdp1 )
 {
-	pdp1_ICount = cycles;
+	pdp1_state *cpustate = device->token;
+
+	cpustate->icount = cycles;
 
 	do
 	{
@@ -634,50 +623,50 @@ static CPU_EXECUTE( pdp1 )
 
 		/* ioh should be cleared at the end of the instruction cycle, and ios at the
         start of next instruction cycle, but who cares? */
-		if (pdp1.ioh && pdp1.ios)
+		if (cpustate->ioh && cpustate->ios)
 		{
-			pdp1.ioh = 0;
-			pdp1.ios = 0;
+			cpustate->ioh = 0;
+			cpustate->ios = 0;
 		}
 
 
-		if ((! pdp1.run) && (! pdp1.rim))
-			pdp1_ICount = 0;	/* if processor is stopped, just burn cycles */
-		else if (pdp1.rim)
+		if ((! cpustate->run) && (! cpustate->rim))
+			cpustate->icount = 0;	/* if processor is stopped, just burn cycles */
+		else if (cpustate->rim)
 		{
-			switch (pdp1.rim_step)
+			switch (cpustate->rim_step)
 			{
 			case 0:
 				/* read first word as instruction */
-				if (pdp1.read_binary_word)
-					(*pdp1.read_binary_word)();		/* data will be transferred to IO register */
-				pdp1.rim_step = 1;
+				if (cpustate->read_binary_word)
+					(*cpustate->read_binary_word)(cpustate->device);		/* data will be transferred to IO register */
+				cpustate->rim_step = 1;
 				break;
 
 			case 1:
-				if (! pdp1.ios)
+				if (! cpustate->ios)
 				{	/* transfer incomplete: wait some more */
-					pdp1_ICount = 0;
+					cpustate->icount = 0;
 				}
 				else
 				{	/* data transfer complete */
-					pdp1.ios = 0;
+					cpustate->ios = 0;
 
 					MB = IO;
 					IR = MB >> 13;		/* basic opcode */
 					if (IR == JMP)		/* jmp instruction ? */
 					{
 						PC = (MA & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
-						pdp1.rim = 0;	/* exit read-in mode */
-						pdp1.run = 1;
-						pdp1.rim_step = 0;
+						cpustate->rim = 0;	/* exit read-in mode */
+						cpustate->run = 1;
+						cpustate->rim_step = 0;
 					}
 					else if ((IR == DIO) || (IR == DAC))	/* dio or dac instruction ? */
 					{	/* there is a discrepancy: the pdp1 handbook tells that only dio should be used,
                         but the lisp tape uses the dac instruction instead */
 						/* Yet maintainance manual p. 6-25 states clearly that the data is located
                         in IO and transfered to MB, so DAC is likely to be a mistake. */
-						pdp1.rim_step = 2;
+						cpustate->rim_step = 2;
 					}
 					else
 					{
@@ -685,34 +674,34 @@ static CPU_EXECUTE( pdp1 )
 						if (LOG)
 							logerror("It seems this tape should not be operated in read-in mode\n");
 
-						pdp1.rim = 0;		/* exit read-in mode (right???) */
-						pdp1.rim_step = 0;
+						cpustate->rim = 0;		/* exit read-in mode (right???) */
+						cpustate->rim_step = 0;
 					}
 				}
 				break;
 
 			case 2:
 				/* read second word as data */
-				if (pdp1.read_binary_word)
-					(*pdp1.read_binary_word)();		/* data will be transferred to IO register */
-				pdp1.rim_step = 3;
+				if (cpustate->read_binary_word)
+					(*cpustate->read_binary_word)(cpustate->device);		/* data will be transferred to IO register */
+				cpustate->rim_step = 3;
 				break;
 
 			case 3:
-				if (! pdp1.ios)
+				if (! cpustate->ios)
 				{	/* transfer incomplete: wait some more */
-					pdp1_ICount = 0;
+					cpustate->icount = 0;
 				}
 				else
 				{	/* data transfer complete */
-					pdp1.ios = 0;
+					cpustate->ios = 0;
 
 					MA = (PC & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
 
 					MB = IO;
 					WRITE_PDP_18BIT(MA, MB);
 
-					pdp1.rim_step = 0;
+					cpustate->rim_step = 0;
 				}
 				break;
 			}
@@ -723,54 +712,54 @@ static CPU_EXECUTE( pdp1 )
 			/* Note that break cannot occur during a one-cycle jump that is deferred only once,
             or another break cycle.  Also, it cannot interrupt the long cycle 1 of automatic
             multiply/divide.  (maintainance manual 6-19) */
-			if (pdp1.sbs_request && (! pdp1.no_sequence_break) && (! pdp1.brk_ctr))
+			if (cpustate->sbs_request && (! cpustate->no_sequence_break) && (! cpustate->brk_ctr))
 			{	/* begin sequence break */
-				pdp1.brk_ctr = 1;
+				cpustate->brk_ctr = 1;
 			}
-			if (pdp1.brk_ctr)
+			if (cpustate->brk_ctr)
 			{	/* sequence break in progress */
-				switch (pdp1.brk_ctr)
+				switch (cpustate->brk_ctr)
 				{
 				case 1:
-					if (pdp1.cycle)
+					if (cpustate->cycle)
 						DECREMENT_PC;	/* set PC to point to aborted instruction, so that it can be re-run */
 
-					pdp1.b4 |= (1 << pdp1.sbs_level);	/* set "interrupt in progress" flag */
-					pdp1.b2 &= ~(1 << pdp1.sbs_level);	/* clear interrupt request */
-					field_interrupt();
-					MA = pdp1.sbs_level << 2;	/* always 0 with standard sequence break system */
+					cpustate->b4 |= (1 << cpustate->sbs_level);	/* set "interrupt in progress" flag */
+					cpustate->b2 &= ~(1 << cpustate->sbs_level);	/* clear interrupt request */
+					field_interrupt(cpustate);
+					MA = cpustate->sbs_level << 2;	/* always 0 with standard sequence break system */
 					MB = AC;			/* save AC to MB */
 					AC = (OV << 17) | (EXD << 16) | PC;	/* save OV/EXD/PC to AC */
 					EXD = OV = 0;		/* according to maintainance manual p. 8-17 and ?-?? */
-					pdp1.cycle = pdp1.defer = pdp1.exc = 0;	/* mere guess */
+					cpustate->cycle = cpustate->defer = cpustate->exc = 0;	/* mere guess */
 					WRITE_PDP_18BIT(MA, MB);	/* save former AC to memory */
 					INCREMENT_MA;
-					pdp1_ICount -= 5;
-					pdp1.brk_ctr++;
+					cpustate->icount -= 5;
+					cpustate->brk_ctr++;
 					break;
 
 				case 2:
 					WRITE_PDP_18BIT(MA, MB = AC);	/* save former OV/EXD/PC to memory */
 					INCREMENT_MA;
-					pdp1_ICount -= 5;
-					pdp1.brk_ctr++;
+					cpustate->icount -= 5;
+					cpustate->brk_ctr++;
 					break;
 
 				case 3:
 					WRITE_PDP_18BIT(MA, MB = IO);	/* save IO to memory */
 					INCREMENT_MA;
 					PC = MA;
-					pdp1_ICount -= 5;
-					pdp1.brk_ctr = 0;
+					cpustate->icount -= 5;
+					cpustate->brk_ctr = 0;
 					break;
 				}
 			}
 			else
 			{
-				if (pdp1.no_sequence_break)
-					pdp1.no_sequence_break = 0;
+				if (cpustate->no_sequence_break)
+					cpustate->no_sequence_break = 0;
 
-				if (! pdp1.cycle)
+				if (! cpustate->cycle)
 				{	/* no instruction in progress: time to fetch a new instruction, I guess */
 					MB = READ_PDP_18BIT(MA = PC);
 					INCREMENT_PC;
@@ -778,99 +767,101 @@ static CPU_EXECUTE( pdp1 )
 
 					if ((instruction_kind[IR] & 1) && (MB & 010000))
 					{
-						pdp1.defer = 1;
-						pdp1.cycle = 1;			/* instruction shall be executed later */
+						cpustate->defer = 1;
+						cpustate->cycle = 1;			/* instruction shall be executed later */
 
 						/* detect deferred one-cycle jumps */
 						if ((IR == JMP) || (IR == JSP))
 						{
-							pdp1.no_sequence_break = 1;
+							cpustate->no_sequence_break = 1;
 							/* detect JMP *(4*n+1) to memory module 0 if in sequence break mode */
-							if (((MB & 0777703) == 0610001) && (pdp1.sbm) && ! (MA & 0170000))
+							if (((MB & 0777703) == 0610001) && (cpustate->sbm) && ! (MA & 0170000))
 							{
 								int level = (MB & 0000074) >> 2;
 
-								if ((pdp1.type_20_sbs) || (level == 0))
+								if ((cpustate->type_20_sbs) || (level == 0))
 								{
-									pdp1.b4 &= ~(1 << level);
-									field_interrupt();
-									if (pdp1.extend_support)
+									cpustate->b4 &= ~(1 << level);
+									field_interrupt(cpustate);
+									if (cpustate->extend_support)
 										EXD = 1;	/* according to maintainance manual p. 6-33 */
-									pdp1.sbs_restore = 1;
+									cpustate->sbs_restore = 1;
 								}
 							}
 						}
 					}
 					else if (instruction_kind[IR] & 2)
-						pdp1.cycle = 1;			/* instruction shall be executed later */
+						cpustate->cycle = 1;			/* instruction shall be executed later */
 					else
-						execute_instruction();	/* execute instruction at once */
+						execute_instruction(cpustate);	/* execute instruction at once */
 
-					pdp1_ICount -= 5;
+					cpustate->icount -= 5;
 				}
-				else if (pdp1.defer)
+				else if (cpustate->defer)
 				{	/* defer cycle : handle indirect addressing */
 					MA = (PC & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
 
 					MB = READ_PDP_18BIT(MA);
 
-					/* determinate new value of pdp1.defer */
+					/* determinate new value of cpustate->defer */
 					if (EXD)
 					{
-						pdp1.defer = 0;
-						pdp1.exc = 1;
+						cpustate->defer = 0;
+						cpustate->exc = 1;
 					}
 					else
-						pdp1.defer = (MB & 010000) ? 1 : 0;
+						cpustate->defer = (MB & 010000) ? 1 : 0;
 
 					/* execute JMP and JSP immediately if applicable */
-					if ((! pdp1.defer) && (! (instruction_kind[IR] & 2)))
+					if ((! cpustate->defer) && (! (instruction_kind[IR] & 2)))
 					{
-						execute_instruction();	/* execute instruction at once */
-						/*pdp1.cycle = 0;*/
-						pdp1.exc = 0;
+						execute_instruction(cpustate);	/* execute instruction at once */
+						/*cpustate->cycle = 0;*/
+						cpustate->exc = 0;
 
-						if (pdp1.sbs_restore)
+						if (cpustate->sbs_restore)
 						{	/* interrupt return: according to maintainance manual p. 6-33 */
-							if (pdp1.extend_support)
+							if (cpustate->extend_support)
 								EXD = (MB >> 16) & 1;
 							OV = (MB >> 17) & 1;
-							pdp1.sbs_restore = 0;
+							cpustate->sbs_restore = 0;
 						}
 					}
 
-					pdp1_ICount -= 5;
+					cpustate->icount -= 5;
 				}
 				else
 				{	/* memory reference instruction in cycle 1 */
-					if (pdp1.exc)
+					if (cpustate->exc)
 					{
 						MA = MB & EXTENDED_ADDRESS_MASK;
-						pdp1.exc = 0;
+						cpustate->exc = 0;
 					}
 					else
 						MA = (PC & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
 
-					execute_instruction();	/* execute instruction */
+					execute_instruction(cpustate);	/* execute instruction */
 
-					pdp1_ICount -= 5;
+					cpustate->icount -= 5;
 				}
 
-				if ((pdp1.sngl_inst) && (! pdp1.cycle))
-					pdp1.run = 0;
+				if ((cpustate->sngl_inst) && (! cpustate->cycle))
+					cpustate->run = 0;
 			}
-			if (pdp1.sngl_step)
-				pdp1.run = 0;
+			if (cpustate->sngl_step)
+				cpustate->run = 0;
 		}
 	}
-	while (pdp1_ICount > 0);
+	while (cpustate->icount > 0);
 
-	return cycles - pdp1_ICount;
+	return cycles - cpustate->icount;
 }
 
 
 static CPU_SET_INFO( pdp1 )
 {
+	pdp1_state *cpustate = device->token;
+
 	switch (state)
 	{
 	/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -889,7 +880,7 @@ static CPU_SET_INFO( pdp1 )
 	case CPUINFO_INT_INPUT_STATE + 12:
 	case CPUINFO_INT_INPUT_STATE + 13:
 	case CPUINFO_INT_INPUT_STATE + 14:
-	case CPUINFO_INT_INPUT_STATE + 15:			pdp1_set_irq_line(state-CPUINFO_INT_INPUT_STATE, info->i); break;
+	case CPUINFO_INT_INPUT_STATE + 15:			pdp1_set_irq_line(cpustate, state-CPUINFO_INT_INPUT_STATE, info->i); break;
 
 	case CPUINFO_INT_SP:						(void) info->i;	/* no SP */					break;
 	case CPUINFO_INT_PC:
@@ -907,8 +898,8 @@ static CPU_SET_INFO( pdp1 )
 	case CPUINFO_INT_REGISTER + PDP1_PF4:		WRITEFLAG(4, info->i ? 1 : 0);				break;
 	case CPUINFO_INT_REGISTER + PDP1_PF5:		WRITEFLAG(5, info->i ? 1 : 0);				break;
 	case CPUINFO_INT_REGISTER + PDP1_PF6:		WRITEFLAG(6, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_TA:		pdp1.ta = info->i & 0177777 /*07777 with simpler control panel*/; break;
-	case CPUINFO_INT_REGISTER + PDP1_TW:		pdp1.tw = info->i & 0777777;				break;
+	case CPUINFO_INT_REGISTER + PDP1_TA:		cpustate->ta = info->i & 0177777 /*07777 with simpler control panel*/; break;
+	case CPUINFO_INT_REGISTER + PDP1_TW:		cpustate->tw = info->i & 0777777;				break;
 	case CPUINFO_INT_REGISTER + PDP1_SS:		SENSE_SW = info->i & 077;					break;
 	case CPUINFO_INT_REGISTER + PDP1_SS1:		WRITESENSE(1, info->i ? 1 : 0);				break;
 	case CPUINFO_INT_REGISTER + PDP1_SS2:		WRITESENSE(2, info->i ? 1 : 0);				break;
@@ -916,31 +907,33 @@ static CPU_SET_INFO( pdp1 )
 	case CPUINFO_INT_REGISTER + PDP1_SS4:		WRITESENSE(4, info->i ? 1 : 0);				break;
 	case CPUINFO_INT_REGISTER + PDP1_SS5:		WRITESENSE(5, info->i ? 1 : 0);				break;
 	case CPUINFO_INT_REGISTER + PDP1_SS6:		WRITESENSE(6, info->i ? 1 : 0);				break;
-	case CPUINFO_INT_REGISTER + PDP1_SNGL_STEP:	pdp1.sngl_step = info->i ? 1 : 0;			break;
-	case CPUINFO_INT_REGISTER + PDP1_SNGL_INST:	pdp1.sngl_inst = info->i ? 1 : 0;			break;
-	case CPUINFO_INT_REGISTER + PDP1_EXTEND_SW:	pdp1.extend_sw = info->i ? 1 : 0;			break;
-	case CPUINFO_INT_REGISTER + PDP1_RUN:		pdp1.run = info->i ? 1 : 0;					break;
+	case CPUINFO_INT_REGISTER + PDP1_SNGL_STEP:	cpustate->sngl_step = info->i ? 1 : 0;			break;
+	case CPUINFO_INT_REGISTER + PDP1_SNGL_INST:	cpustate->sngl_inst = info->i ? 1 : 0;			break;
+	case CPUINFO_INT_REGISTER + PDP1_EXTEND_SW:	cpustate->extend_sw = info->i ? 1 : 0;			break;
+	case CPUINFO_INT_REGISTER + PDP1_RUN:		cpustate->run = info->i ? 1 : 0;					break;
 	case CPUINFO_INT_REGISTER + PDP1_CYC:		if (LOG) logerror("pdp1_set_reg to cycle flip-flop ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + PDP1_DEFER:		if (LOG) logerror("pdp1_set_reg to defer flip-flop ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + PDP1_BRK_CTR:	if (LOG) logerror("pdp1_set_reg to break counter ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_RIM:		pdp1.rim = info->i ? 1 : 0;					break;
-	case CPUINFO_INT_REGISTER + PDP1_SBM:		pdp1.sbm = info->i ? 1 : 0;					break;
-	case CPUINFO_INT_REGISTER + PDP1_EXD:		EXD = (pdp1.extend_support && info->i) ? 1 : 0; break;
+	case CPUINFO_INT_REGISTER + PDP1_RIM:		cpustate->rim = info->i ? 1 : 0;					break;
+	case CPUINFO_INT_REGISTER + PDP1_SBM:		cpustate->sbm = info->i ? 1 : 0;					break;
+	case CPUINFO_INT_REGISTER + PDP1_EXD:		EXD = (cpustate->extend_support && info->i) ? 1 : 0; break;
 	case CPUINFO_INT_REGISTER + PDP1_IOC:		if (LOG) logerror("pdp1_set_reg to ioc flip-flop ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + PDP1_IOH:		if (LOG) logerror("pdp1_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + PDP1_IOS:		if (LOG) logerror("pdp1_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_START_CLEAR:	pulse_start_clear();					break;
-	case CPUINFO_INT_REGISTER + PDP1_IO_COMPLETE:	pdp1.ios = 1;							break;
+	case CPUINFO_INT_REGISTER + PDP1_START_CLEAR:	pulse_start_clear(cpustate);					break;
+	case CPUINFO_INT_REGISTER + PDP1_IO_COMPLETE:	cpustate->ios = 1;							break;
 	}
 }
 
 
 CPU_GET_INFO( pdp1 )
 {
+	pdp1_state *cpustate = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(pdp1);					break;
+	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(pdp1_state);					break;
 	case CPUINFO_INT_INPUT_LINES:						info->i = 16;							break;
 	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 	case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;	/*don't care*/	break;
@@ -980,7 +973,7 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_INT_INPUT_STATE + 12:
 	case CPUINFO_INT_INPUT_STATE + 13:
 	case CPUINFO_INT_INPUT_STATE + 14:
-	case CPUINFO_INT_INPUT_STATE + 15:				info->i = (pdp1.irq_state >> (state-CPUINFO_INT_INPUT_STATE)) & 1;	break;
+	case CPUINFO_INT_INPUT_STATE + 15:				info->i = (cpustate->irq_state >> (state-CPUINFO_INT_INPUT_STATE)) & 1;	break;
 
 	case CPUINFO_INT_REGISTER + PDP1_PC:			info->i = PC;							break;
 	case CPUINFO_INT_REGISTER + PDP1_IR:			info->i = IR;							break;
@@ -996,8 +989,8 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_INT_REGISTER + PDP1_PF4:			info->i = READFLAG(4);					break;
 	case CPUINFO_INT_REGISTER + PDP1_PF5:			info->i = READFLAG(5);					break;
 	case CPUINFO_INT_REGISTER + PDP1_PF6:			info->i = READFLAG(6);					break;
-	case CPUINFO_INT_REGISTER + PDP1_TA:			info->i = pdp1.ta;						break;
-	case CPUINFO_INT_REGISTER + PDP1_TW:			info->i = pdp1.tw;						break;
+	case CPUINFO_INT_REGISTER + PDP1_TA:			info->i = cpustate->ta;						break;
+	case CPUINFO_INT_REGISTER + PDP1_TW:			info->i = cpustate->tw;						break;
 	case CPUINFO_INT_REGISTER + PDP1_SS:			info->i = SENSE_SW;						break;
 	case CPUINFO_INT_REGISTER + PDP1_SS1:			info->i = READSENSE(1);					break;
 	case CPUINFO_INT_REGISTER + PDP1_SS2:			info->i = READSENSE(2);					break;
@@ -1005,31 +998,31 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_INT_REGISTER + PDP1_SS4:			info->i = READSENSE(4);					break;
 	case CPUINFO_INT_REGISTER + PDP1_SS5:			info->i = READSENSE(5);					break;
 	case CPUINFO_INT_REGISTER + PDP1_SS6:			info->i = READSENSE(6);					break;
-	case CPUINFO_INT_REGISTER + PDP1_SNGL_STEP:		info->i = pdp1.sngl_step;				break;
-	case CPUINFO_INT_REGISTER + PDP1_SNGL_INST:		info->i = pdp1.sngl_inst;				break;
-	case CPUINFO_INT_REGISTER + PDP1_EXTEND_SW:		info->i = pdp1.extend_sw;				break;
-	case CPUINFO_INT_REGISTER + PDP1_RUN:			info->i = pdp1.run;						break;
-	case CPUINFO_INT_REGISTER + PDP1_CYC:			info->i = pdp1.cycle;					break;
-	case CPUINFO_INT_REGISTER + PDP1_DEFER:			info->i = pdp1.defer;					break;
-	case CPUINFO_INT_REGISTER + PDP1_BRK_CTR:		info->i = pdp1.brk_ctr;					break;
-	case CPUINFO_INT_REGISTER + PDP1_RIM:			info->i = pdp1.rim;						break;
-	case CPUINFO_INT_REGISTER + PDP1_SBM:			info->i = pdp1.sbm;						break;
+	case CPUINFO_INT_REGISTER + PDP1_SNGL_STEP:		info->i = cpustate->sngl_step;				break;
+	case CPUINFO_INT_REGISTER + PDP1_SNGL_INST:		info->i = cpustate->sngl_inst;				break;
+	case CPUINFO_INT_REGISTER + PDP1_EXTEND_SW:		info->i = cpustate->extend_sw;				break;
+	case CPUINFO_INT_REGISTER + PDP1_RUN:			info->i = cpustate->run;						break;
+	case CPUINFO_INT_REGISTER + PDP1_CYC:			info->i = cpustate->cycle;					break;
+	case CPUINFO_INT_REGISTER + PDP1_DEFER:			info->i = cpustate->defer;					break;
+	case CPUINFO_INT_REGISTER + PDP1_BRK_CTR:		info->i = cpustate->brk_ctr;					break;
+	case CPUINFO_INT_REGISTER + PDP1_RIM:			info->i = cpustate->rim;						break;
+	case CPUINFO_INT_REGISTER + PDP1_SBM:			info->i = cpustate->sbm;						break;
 	case CPUINFO_INT_REGISTER + PDP1_EXD:			info->i = EXD;							break;
-	case CPUINFO_INT_REGISTER + PDP1_IOC:			info->i = pdp1.ioc;						break;
-	case CPUINFO_INT_REGISTER + PDP1_IOH:			info->i = pdp1.ioh;						break;
-	case CPUINFO_INT_REGISTER + PDP1_IOS:			info->i = pdp1.ios;						break;
+	case CPUINFO_INT_REGISTER + PDP1_IOC:			info->i = cpustate->ioc;						break;
+	case CPUINFO_INT_REGISTER + PDP1_IOH:			info->i = cpustate->ioh;						break;
+	case CPUINFO_INT_REGISTER + PDP1_IOS:			info->i = cpustate->ios;						break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(pdp1);			break;
-	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(pdp1);	break;
-	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(pdp1);	break;
+	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
+	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(pdp1);					break;
 	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(pdp1);				break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(pdp1);			break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(pdp1);			break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &pdp1_ICount;			break;
+	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	case CPUINFO_STR_NAME: 							strcpy(info->s, "PDP1");	break;
@@ -1074,8 +1067,8 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_STR_REGISTER + PDP1_PF4:			sprintf(info->s, "FLAG4:%X", READFLAG(4)); break;
 	case CPUINFO_STR_REGISTER + PDP1_PF5:			sprintf(info->s, "FLAG5:%X", READFLAG(5)); break;
 	case CPUINFO_STR_REGISTER + PDP1_PF6:			sprintf(info->s, "FLAG6:%X", READFLAG(6)); break;
-	case CPUINFO_STR_REGISTER + PDP1_TA:			sprintf(info->s, "TA:0%06o", pdp1.ta); break;
-	case CPUINFO_STR_REGISTER + PDP1_TW:			sprintf(info->s, "TW:0%06o", pdp1.tw); break;
+	case CPUINFO_STR_REGISTER + PDP1_TA:			sprintf(info->s, "TA:0%06o", cpustate->ta); break;
+	case CPUINFO_STR_REGISTER + PDP1_TW:			sprintf(info->s, "TW:0%06o", cpustate->tw); break;
 	case CPUINFO_STR_REGISTER + PDP1_SS:			sprintf(info->s, "SS:0%02o", SENSE_SW); break;
 	case CPUINFO_STR_REGISTER + PDP1_SS1:			sprintf(info->s, "SENSE1:%X", READSENSE(1)); break;
 	case CPUINFO_STR_REGISTER + PDP1_SS2:			sprintf(info->s, "SENSE2:%X", READSENSE(2)); break;
@@ -1083,25 +1076,25 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_STR_REGISTER + PDP1_SS4:			sprintf(info->s, "SENSE4:%X", READSENSE(4)); break;
 	case CPUINFO_STR_REGISTER + PDP1_SS5:			sprintf(info->s, "SENSE5:%X", READSENSE(5)); break;
 	case CPUINFO_STR_REGISTER + PDP1_SS6:			sprintf(info->s, "SENSE6:%X", READSENSE(6)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SNGL_STEP:		sprintf(info->s, "SNGLSTEP:%X", pdp1.sngl_step); break;
-	case CPUINFO_STR_REGISTER + PDP1_SNGL_INST:		sprintf(info->s, "SNGLINST:%X", pdp1.sngl_inst); break;
-	case CPUINFO_STR_REGISTER + PDP1_EXTEND_SW:		sprintf(info->s, "EXS:%X", pdp1.extend_sw); break;
-	case CPUINFO_STR_REGISTER + PDP1_RUN:			sprintf(info->s, "RUN:%X", pdp1.run); break;
-	case CPUINFO_STR_REGISTER + PDP1_CYC:			sprintf(info->s, "CYC:%X", pdp1.cycle); break;
-	case CPUINFO_STR_REGISTER + PDP1_DEFER:			sprintf(info->s, "DF:%X", pdp1.defer); break;
-	case CPUINFO_STR_REGISTER + PDP1_BRK_CTR:		sprintf(info->s, "BRKCTR:%X", pdp1.brk_ctr); break;
-	case CPUINFO_STR_REGISTER + PDP1_RIM:			sprintf(info->s, "RIM:%X", pdp1.rim); break;
-	case CPUINFO_STR_REGISTER + PDP1_SBM:			sprintf(info->s, "SBM:%X", pdp1.sbm); break;
+	case CPUINFO_STR_REGISTER + PDP1_SNGL_STEP:		sprintf(info->s, "SNGLSTEP:%X", cpustate->sngl_step); break;
+	case CPUINFO_STR_REGISTER + PDP1_SNGL_INST:		sprintf(info->s, "SNGLINST:%X", cpustate->sngl_inst); break;
+	case CPUINFO_STR_REGISTER + PDP1_EXTEND_SW:		sprintf(info->s, "EXS:%X", cpustate->extend_sw); break;
+	case CPUINFO_STR_REGISTER + PDP1_RUN:			sprintf(info->s, "RUN:%X", cpustate->run); break;
+	case CPUINFO_STR_REGISTER + PDP1_CYC:			sprintf(info->s, "CYC:%X", cpustate->cycle); break;
+	case CPUINFO_STR_REGISTER + PDP1_DEFER:			sprintf(info->s, "DF:%X", cpustate->defer); break;
+	case CPUINFO_STR_REGISTER + PDP1_BRK_CTR:		sprintf(info->s, "BRKCTR:%X", cpustate->brk_ctr); break;
+	case CPUINFO_STR_REGISTER + PDP1_RIM:			sprintf(info->s, "RIM:%X", cpustate->rim); break;
+	case CPUINFO_STR_REGISTER + PDP1_SBM:			sprintf(info->s, "SBM:%X", cpustate->sbm); break;
 	case CPUINFO_STR_REGISTER + PDP1_EXD:			sprintf(info->s, "EXD:%X", EXD); break;
-	case CPUINFO_STR_REGISTER + PDP1_IOC:			sprintf(info->s, "IOC:%X", pdp1.ioc); break;
-	case CPUINFO_STR_REGISTER + PDP1_IOH:			sprintf(info->s, "IOH:%X", pdp1.ioh); break;
-	case CPUINFO_STR_REGISTER + PDP1_IOS:			sprintf(info->s, "IOS:%X", pdp1.ios); break;
+	case CPUINFO_STR_REGISTER + PDP1_IOC:			sprintf(info->s, "IOC:%X", cpustate->ioc); break;
+	case CPUINFO_STR_REGISTER + PDP1_IOH:			sprintf(info->s, "IOH:%X", cpustate->ioh); break;
+	case CPUINFO_STR_REGISTER + PDP1_IOS:			sprintf(info->s, "IOS:%X", cpustate->ios); break;
 	}
 }
 
 
 /* execute one instruction */
-static void execute_instruction(void)
+static void execute_instruction(pdp1_state *cpustate)
 {
 	switch (IR)
 	{
@@ -1119,17 +1112,17 @@ static void execute_instruction(void)
 		IR = MB >> 13;		/* basic opcode */
 		if ((instruction_kind[IR] & 1) && (MB & 010000))
 		{
-			pdp1.defer = 1;
-			/*pdp1.cycle = 1;*/			/* instruction shall be executed later */
+			cpustate->defer = 1;
+			/*cpustate->cycle = 1;*/			/* instruction shall be executed later */
 			goto no_fetch;			/* fall through to next instruction */
 		}
 		else if (instruction_kind[IR] & 2)
 		{
-			/*pdp1.cycle = 1;*/			/* instruction shall be executed later */
+			/*cpustate->cycle = 1;*/			/* instruction shall be executed later */
 			goto no_fetch;			/* fall through to next instruction */
 		}
 		else
-			execute_instruction();	/* execute instruction at once */
+			execute_instruction(cpustate);	/* execute instruction at once */
 		break;
 	case CALJDA:	/* Call subroutine and Jump and Deposit Accumulator instructions */
 		if (MB & 010000)
@@ -1255,7 +1248,7 @@ static void execute_instruction(void)
 			INCREMENT_PC;
 		break;
 	case MUS_MUL:	/* Multiply Step or Multiply */
-		if (pdp1.hw_mul_div)
+		if (cpustate->hw_mul_div)
 		{	/* MUL */
 			int scr;
 			int smb, srm;
@@ -1300,7 +1293,7 @@ static void execute_instruction(void)
 				IO = IO ^ 0777777;
 			}
 
-			pdp1_ICount -= etime+.5;	/* round to closest */
+			cpustate->icount -= etime+.5;	/* round to closest */
 		}
 		else
 		{	/* MUS */
@@ -1318,7 +1311,7 @@ static void execute_instruction(void)
 		}
 		break;
 	case DIS_DIV:	/* Divide Step or Divide */
-		if (pdp1.hw_mul_div)
+		if (cpustate->hw_mul_div)
 		{	/* DIV */
 			/* As a side note, the order of -0 detection and overflow checking does not matter,
             because the sum of two positive number cannot give 0777777 (since positive
@@ -1425,7 +1418,7 @@ static void execute_instruction(void)
 			else
 				etime += 2;			/* approximative */
 
-			pdp1_ICount -= etime+.5;	/* round to closest */
+			cpustate->icount -= etime+.5;	/* round to closest */
 		}
 		else
 		{	/* DIS */
@@ -1447,14 +1440,14 @@ static void execute_instruction(void)
 		}
 		break;
 	case JMP:		/* Jump */
-		if (pdp1.exc)
+		if (cpustate->exc)
 			PC = MB & EXTENDED_ADDRESS_MASK;
 		else
 			PC = (MA & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
 		break;
 	case JSP:		/* Jump and Save Program Counter */
 		AC = (OV << 17) | (EXD << 16) | PC;
-		if (pdp1.exc)
+		if (cpustate->exc)
 			PC = MB & EXTENDED_ADDRESS_MASK;
 		else
 			PC = (MA & ADDRESS_EXTENSION_MASK) | (MB & BASE_ADDRESS_MASK);
@@ -1627,32 +1620,32 @@ static void execute_instruction(void)
         */
 		if (MB & 010000)
 		{	/* IOT with IO wait */
-			if (pdp1.ioc)
+			if (cpustate->ioc)
 			{	/* the iot command line is pulsed only if ioc is asserted */
-				(*pdp1.extern_iot[MB & 0000077])(MB & 0000077, (MB & 0004000) == 0, MB, &IO, AC);
+				(*cpustate->extern_iot[MB & 0000077])(cpustate->device, MB & 0000077, (MB & 0004000) == 0, MB, &IO, AC);
 
-				pdp1.ioh = 1;	/* enable io wait */
+				cpustate->ioh = 1;	/* enable io wait */
 
-				pdp1.ioc = 0;	/* actually happens at the start of next memory cycle */
+				cpustate->ioc = 0;	/* actually happens at the start of next memory cycle */
 
 				/* test ios now in case the IOT callback has sent a completion pulse immediately */
-				if (pdp1.ioh && pdp1.ios)
+				if (cpustate->ioh && cpustate->ios)
 				{
 					/* ioh should be cleared at the end of the instruction cycle, and ios at the
                     start of next instruction cycle, but who cares? */
-					pdp1.ioh = 0;
-					pdp1.ios = 0;
+					cpustate->ioh = 0;
+					cpustate->ios = 0;
 				}
 			}
 
-			if (pdp1.ioh)
+			if (cpustate->ioh)
 				DECREMENT_PC;
 			else
-				pdp1.ioc = 1;	/* actually happens at the start of next memory cycle */
+				cpustate->ioc = 1;	/* actually happens at the start of next memory cycle */
 		}
 		else
 		{	/* IOT with no IO wait */
-			(*pdp1.extern_iot[MB & 0000077])(MB & 0000077, (MB & 0004000) != 0, MB, &IO, AC);
+			(*cpustate->extern_iot[MB & 0000077])(cpustate->device, MB & 0000077, (MB & 0004000) != 0, MB, &IO, AC);
 		}
 		break;
 	case OPR:		/* Operate Instruction Group */
@@ -1664,7 +1657,7 @@ static void execute_instruction(void)
 			if (MB & 04000)		/* clear I/O register */
 				IO = 0;
 			if (MB & 02000)		/* load Accumulator from Test Word */
-				AC |= pdp1.tw;
+				AC |= cpustate->tw;
 			if (MB & 00100)		/* load Accumulator with Program Counter */
 				AC |= (OV << 17) | (EXD << 16) | PC;
 			nflag = MB & 7;
@@ -1682,7 +1675,7 @@ static void execute_instruction(void)
 				if (LOG_EXTRA)
 					logerror("PDP1 Program executed HALT: at 0%06o\n", PREVIOUS_PC);
 
-				pdp1.run = 0;
+				cpustate->run = 0;
 			}
 			break;
 		}
@@ -1691,11 +1684,11 @@ static void execute_instruction(void)
 			logerror("Illegal instruction: 0%06o at 0%06o\n", MB, PREVIOUS_PC);
 
 		/* let us stop the CPU, like a real pdp-1 */
-		pdp1.run = 0;
+		cpustate->run = 0;
 
 		break;
 	}
-	pdp1.cycle = 0;
+	cpustate->cycle = 0;
 no_fetch:
 	;
 }
@@ -1704,8 +1697,9 @@ no_fetch:
 /*
     Handle unimplemented IOT
 */
-static void null_iot(int op2, int nac, int mb, int *io, int ac)
+static void null_iot(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
+	pdp1_state *cpustate = device->token;
 	/* Note that the dummy IOT 0 is used to wait for the completion pulse
     generated by the a pending IOT (IOT with completion pulse but no IO wait) */
 	if (LOG_IOT_EXTRA)
@@ -1726,9 +1720,10 @@ static void null_iot(int op2, int nac, int mb, int *io, int ac)
 
     IOT 74: LEM/EEM
 */
-static void lem_eem_iot(int op2, int nac, int mb, int *io, int ac)
+static void lem_eem_iot(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
-	if (! pdp1.extend_support)	/* extend mode supported? */
+	pdp1_state *cpustate = device->token;
+	if (! cpustate->extend_support)	/* extend mode supported? */
 	{
 		if (LOG)
 			logerror("Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
@@ -1736,7 +1731,7 @@ static void lem_eem_iot(int op2, int nac, int mb, int *io, int ac)
 	}
 	if (LOG_EXTRA)
 	{
-		logerror("EEM/LEM instruction: mb=0%06o, pc=0%06o\n", mb, pdp1.pc);
+		logerror("EEM/LEM instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 	}
 	EXD = (mb & 0004000) ? 1 : 0;
 }
@@ -1749,31 +1744,32 @@ static void lem_eem_iot(int op2, int nac, int mb, int *io, int ac)
     IOT 55: esm
     IOT 56: cbs
 */
-static void sbs_iot(int op2, int nac, int mb, int *io, int ac)
+static void sbs_iot(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
+	pdp1_state *cpustate = device->token;
 	switch (op2)
 	{
 	case 054:	/* LSM */
 		if (LOG_EXTRA)
-			logerror("LSM instruction: mb=0%06o, pc=0%06o\n", mb, pdp1.pc);
+			logerror("LSM instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
-		pdp1.sbm = 0;
-		field_interrupt();
+		cpustate->sbm = 0;
+		field_interrupt(cpustate);
 		break;
 	case 055:	/* ESM */
 		if (LOG_EXTRA)
-			logerror("ESM instruction: mb=0%06o, pc=0%06o\n", mb, pdp1.pc);
+			logerror("ESM instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
-		pdp1.sbm = 1;
-		field_interrupt();
+		cpustate->sbm = 1;
+		field_interrupt(cpustate);
 		break;
 	case 056:	/* CBS */
 		if (LOG_EXTRA)
-			logerror("CBS instruction: mb=0%06o, pc=0%06o\n", mb, pdp1.pc);
+			logerror("CBS instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
-		/*pdp1.b3 = 0;*/
-		pdp1.b4 = 0;
-		field_interrupt();
+		/*cpustate->b3 = 0;*/
+		cpustate->b4 = 0;
+		field_interrupt(cpustate);
 		break;
 	default:
 		if (LOG)
@@ -1792,10 +1788,11 @@ static void sbs_iot(int op2, int nac, int mb, int *io, int ac)
     IOT 52: isb
     IOT 53: cac
 */
-static void type_20_sbs_iot(int op2, int nac, int mb, int *io, int ac)
+static void type_20_sbs_iot(const device_config *device, int op2, int nac, int mb, int *io, int ac)
 {
+	pdp1_state *cpustate = device->token;
 	int channel, mask;
-	if (! pdp1.type_20_sbs)	/* type 20 sequence break system supported? */
+	if (! cpustate->type_20_sbs)	/* type 20 sequence break system supported? */
 	{
 		if (LOG)
 			logerror("Ignoring internal error in file " __FILE__ " line %d.\n", __LINE__);
@@ -1807,31 +1804,31 @@ static void type_20_sbs_iot(int op2, int nac, int mb, int *io, int ac)
 	{
 	case 050:	/* DSC */
 		if (LOG_EXTRA)
-			logerror("DSC instruction: mb=0%06o, pc=0%06o\n", mb, pdp1.pc);
+			logerror("DSC instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
-		pdp1.b1 &= ~mask;
-		field_interrupt();
+		cpustate->b1 &= ~mask;
+		field_interrupt(cpustate);
 		break;
 	case 051:	/* ASC */
 		if (LOG_EXTRA)
-			logerror("ASC instruction: mb=0%06o, pc=0%06o\n", mb, pdp1.pc);
+			logerror("ASC instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
-		pdp1.b1 |= mask;
-		field_interrupt();
+		cpustate->b1 |= mask;
+		field_interrupt(cpustate);
 		break;
 	case 052:	/* ISB */
 		if (LOG_EXTRA)
-			logerror("ISB instruction: mb=0%06o, pc=0%06o\n", mb, pdp1.pc);
+			logerror("ISB instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
-		pdp1.b2 |= mask;
-		field_interrupt();
+		cpustate->b2 |= mask;
+		field_interrupt(cpustate);
 		break;
 	case 053:	/* CAC */
 		if (LOG_EXTRA)
-			logerror("CAC instruction: mb=0%06o, pc=0%06o\n", mb, pdp1.pc);
+			logerror("CAC instruction: mb=0%06o, pc=0%06o\n", mb, cpustate->pc);
 
-		pdp1.b1 = 0;
-		field_interrupt();
+		cpustate->b1 = 0;
+		field_interrupt(cpustate);
 		break;
 	default:
 		if (LOG)
@@ -1848,7 +1845,7 @@ static void type_20_sbs_iot(int op2, int nac, int mb, int *io, int ac)
     reset most registers and flip-flops, and initialize a few emulator state
     variables.
 */
-static void pulse_start_clear(void)
+static void pulse_start_clear(pdp1_state *cpustate)
 {
 	/* processor registers */
 	PC = 0;			/* according to maintainance manual p. 6-17 */
@@ -1860,31 +1857,31 @@ static void pulse_start_clear(void)
 	/*PF = 0;*/		/* ??? */
 
 	/* processor state flip-flops */
-	pdp1.run = 0;		/* ??? */
-	pdp1.cycle = 0;		/* mere guess */
-	pdp1.defer = 0;		/* mere guess */
-	pdp1.brk_ctr = 0;	/* mere guess */
-	pdp1.ov = 0;		/* according to maintainance manual p. 7-18 */
-	pdp1.rim = 0;		/* ??? */
-	pdp1.sbm = 0;		/* ??? */
+	cpustate->run = 0;		/* ??? */
+	cpustate->cycle = 0;		/* mere guess */
+	cpustate->defer = 0;		/* mere guess */
+	cpustate->brk_ctr = 0;	/* mere guess */
+	cpustate->ov = 0;		/* according to maintainance manual p. 7-18 */
+	cpustate->rim = 0;		/* ??? */
+	cpustate->sbm = 0;		/* ??? */
 	EXD = 0;			/* according to maintainance manual p. 8-16 */
-	pdp1.exc = 0;		/* according to maintainance manual p. 8-16 */
-	pdp1.ioc = 1;		/* according to maintainance manual p. 6-10 */
-	pdp1.ioh = 0;		/* according to maintainance manual p. 6-10 */
-	pdp1.ios = 0;		/* according to maintainance manual p. 6-10 */
+	cpustate->exc = 0;		/* according to maintainance manual p. 8-16 */
+	cpustate->ioc = 1;		/* according to maintainance manual p. 6-10 */
+	cpustate->ioh = 0;		/* according to maintainance manual p. 6-10 */
+	cpustate->ios = 0;		/* according to maintainance manual p. 6-10 */
 
-	pdp1.b1 = pdp1.type_20_sbs ? 0 : 1;	/* mere guess */
-	pdp1.b2 = 0;		/* mere guess */
-	pdp1.b4 = 0;		/* mere guess */
+	cpustate->b1 = cpustate->type_20_sbs ? 0 : 1;	/* mere guess */
+	cpustate->b2 = 0;		/* mere guess */
+	cpustate->b4 = 0;		/* mere guess */
 
 
-	pdp1.rim_step = 0;
-	pdp1.sbs_restore = 0;		/* mere guess */
-	pdp1.no_sequence_break = 0;	/* mere guess */
+	cpustate->rim_step = 0;
+	cpustate->sbs_restore = 0;		/* mere guess */
+	cpustate->no_sequence_break = 0;	/* mere guess */
 
-	field_interrupt();
+	field_interrupt(cpustate);
 
 	/* now, we kindly ask IO devices to reset, too */
-	if (pdp1.io_sc_callback)
-		(*pdp1.io_sc_callback)();
+	if (cpustate->io_sc_callback)
+		(*cpustate->io_sc_callback)(cpustate->device);
 }
