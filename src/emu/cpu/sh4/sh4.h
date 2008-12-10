@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   sh4.h
+ *   sh4->h
  *   Portable Hitachi SH-4 (SH7750 family) emulator interface
  *
  *   By R. Belmont, based on sh2.c by Juergen Buchmueller, Mariusz Wojcieszek,

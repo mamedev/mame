@@ -24,17 +24,17 @@
 #define NMIPRI()			EXPPRI(3,0,16,SH4_INTC_NMI)
 #define INTPRI(p,n)			EXPPRI(4,2,p,n)
 
-#define FP_RS(r) sh4.fr[(r)] // binary representation of single precision floating point register r
-#define FP_RFS(r) *( (float  *)(sh4.fr+(r)) ) // single precision floating point register r
-#define FP_RFD(r) *( (double *)(sh4.fr+(r)) ) // double precision floating point register r
-#define FP_XS(r) sh4.xf[(r)] // binary representation of extended single precision floating point register r
-#define FP_XFS(r) *( (float  *)(sh4.xf+(r)) ) // single precision extended floating point register r
-#define FP_XFD(r) *( (double *)(sh4.xf+(r)) ) // double precision extended floating point register r
+#define FP_RS(r) sh4->fr[(r)] // binary representation of single precision floating point register r
+#define FP_RFS(r) *( (float  *)(sh4->fr+(r)) ) // single precision floating point register r
+#define FP_RFD(r) *( (double *)(sh4->fr+(r)) ) // double precision floating point register r
+#define FP_XS(r) sh4->xf[(r)] // binary representation of extended single precision floating point register r
+#define FP_XFS(r) *( (float  *)(sh4->xf+(r)) ) // single precision extended floating point register r
+#define FP_XFD(r) *( (double *)(sh4->xf+(r)) ) // double precision extended floating point register r
 #ifdef LSB_FIRST
-#define FP_RS2(r) sh4.fr[(r) ^ sh4.fpu_pr]
-#define FP_RFS2(r) *( (float  *)(sh4.fr+((r) ^ sh4.fpu_pr)) )
-#define FP_XS2(r) sh4.xf[(r) ^ sh4.fpu_pr]
-#define FP_XFS2(r) *( (float  *)(sh4.xf+((r) ^ sh4.fpu_pr)) )
+#define FP_RS2(r) sh4->fr[(r) ^ sh4->fpu_pr]
+#define FP_RFS2(r) *( (float  *)(sh4->fr+((r) ^ sh4->fpu_pr)) )
+#define FP_XS2(r) sh4->xf[(r) ^ sh4->fpu_pr]
+#define FP_XFS2(r) *( (float  *)(sh4->xf+((r) ^ sh4->fpu_pr)) )
 #endif
 
 typedef struct
@@ -81,7 +81,7 @@ typedef struct
 	int     dma_timer_active[4];
 
 	int 	sh4_icount;
-	int     is_slave, cpu_number;
+	int     is_slave;
 	int		cpu_clock, bus_clock, pm_clock;
 	int		fpu_sz, fpu_pr;
 	int		ioport16_pullup, ioport16_direction;
@@ -89,8 +89,6 @@ typedef struct
 
 	void	(*ftcsr_read_callback)(UINT32 data);
 } SH4;
-
-extern SH4 sh4;
 
 enum
 {
@@ -126,26 +124,26 @@ enum
 #define Rn	((opcode>>8)&15)
 #define Rm	((opcode>>4)&15)
 
-void sh4_exception_recompute(void); // checks if there is any interrupt with high enough priority
-void sh4_exception_request(int exception); // start requesting an exception
-void sh4_exception_unrequest(int exception); // stop requesting an exception
-void sh4_exception_checkunrequest(int exception);
-void sh4_exception(const char *message, int exception); // handle exception
-void sh4_change_register_bank(int to);
-void sh4_syncronize_register_bank(int to);
-void sh4_swap_fp_registers(void);
-void sh4_default_exception_priorities(void); // setup default priorities for exceptions
-void sh4_parse_configuration(const struct sh4_config *conf);
-void sh4_dma_ddt(struct sh4_ddt_dma *s);
-void sh4_set_irq_line(int irqline, int state); // set state of external interrupt line
+void sh4_exception_recompute(SH4 *sh4); // checks if there is any interrupt with high enough priority
+void sh4_exception_request(SH4 *sh4, int exception); // start requesting an exception
+void sh4_exception_unrequest(SH4 *sh4, int exception); // stop requesting an exception
+void sh4_exception_checkunrequest(SH4 *sh4, int exception);
+void sh4_exception(SH4 *sh4, const char *message, int exception); // handle exception
+void sh4_change_register_bank(SH4 *sh4, int to);
+void sh4_syncronize_register_bank(SH4 *sh4, int to);
+void sh4_swap_fp_registers(SH4 *sh4);
+void sh4_default_exception_priorities(SH4 *sh4); // setup default priorities for exceptions
+void sh4_parse_configuration(SH4 *sh4, const struct sh4_config *conf);
+void sh4_dma_ddt(SH4 *sh4, struct sh4_ddt_dma *s);
+void sh4_set_irq_line(SH4 *sh4, int irqline, int state); // set state of external interrupt line
 void sh4_set_frt_input(const device_config *device, int state);
 void sh4_set_irln_input(const device_config *device, int value);
 #ifdef LSB_FIRST
-void sh4_swap_fp_couples(void);
+void sh4_swap_fp_couples(SH4 *sh4);
 #endif
 void sh4_common_init(const device_config *device);
 
-INLINE void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
+INLINE void sh4_check_pending_irq(SH4 *sh4, const char *message) // look for highest priority active exception and handle it
 {
 	int a,irq,z;
 
@@ -153,18 +151,18 @@ INLINE void sh4_check_pending_irq(const char *message) // look for highest prior
 	z = -1;
 	for (a=0;a <= SH4_INTC_ROVI;a++)
 	{
-		if (sh4.exception_requesting[a])
+		if (sh4->exception_requesting[a])
 		{
-			if ((int)sh4.exception_priority[a] > z)
+			if ((int)sh4->exception_priority[a] > z)
 			{
-				z = sh4.exception_priority[a];
+				z = sh4->exception_priority[a];
 				irq = a;
 			}
 		}
 	}
 	if (z >= 0)
 	{
-		sh4_exception(message, irq);
+		sh4_exception(sh4, message, irq);
 	}
 }
 
