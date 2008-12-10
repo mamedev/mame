@@ -8,11 +8,6 @@
 #include "cpuintrf.h"
 #include "tms32051.h"
 
-static void delay_slot(UINT16 startpc);
-static void save_interrupt_context(void);
-static void restore_interrupt_context(void);
-static void check_interrupts(void);
-
 #define INTERRUPT_INT1		0
 #define INTERRUPT_INT2		1
 #define INTERRUPT_INT3		2
@@ -84,7 +79,9 @@ typedef struct
 	UINT16 pm;
 } ST1;
 
-typedef struct {
+typedef struct _tms32051_state tms32051_state;
+struct _tms32051_state
+{
 	UINT16 pc;
 	UINT16 op;
 	INT32 acc;
@@ -149,62 +146,66 @@ typedef struct {
 	const device_config *device;
 	const address_space *program;
 	const address_space *data;
-} TMS_REGS;
+	int icount;
+};
 
-static TMS_REGS tms;
-static int tms_icount;
+static void delay_slot(tms32051_state *cpustate, UINT16 startpc);
+static void save_interrupt_context(tms32051_state *cpustate);
+static void restore_interrupt_context(tms32051_state *cpustate);
+static void check_interrupts(tms32051_state *cpustate);
 
-#define CYCLES(x)		(tms_icount -= x)
 
-#define ROPCODE()		memory_decrypted_read_word(tms.program, (tms.pc++) << 1)
+#define CYCLES(x)		(cpustate->icount -= x)
 
-INLINE void CHANGE_PC(UINT16 new_pc)
+#define ROPCODE(cpustate)		memory_decrypted_read_word(cpustate->program, (cpustate->pc++) << 1)
+
+INLINE void CHANGE_PC(tms32051_state *cpustate, UINT16 new_pc)
 {
-	tms.pc = new_pc;
+	cpustate->pc = new_pc;
 }
 
-INLINE UINT16 PM_READ16(UINT16 address)
+INLINE UINT16 PM_READ16(tms32051_state *cpustate, UINT16 address)
 {
-	return memory_read_word_16le(tms.program, address << 1);
+	return memory_read_word_16le(cpustate->program, address << 1);
 }
 
-INLINE void PM_WRITE16(UINT16 address, UINT16 data)
+INLINE void PM_WRITE16(tms32051_state *cpustate, UINT16 address, UINT16 data)
 {
-	memory_write_word_16le(tms.program, address << 1, data);
+	memory_write_word_16le(cpustate->program, address << 1, data);
 }
 
-INLINE UINT16 DM_READ16(UINT16 address)
+INLINE UINT16 DM_READ16(tms32051_state *cpustate, UINT16 address)
 {
-	return memory_read_word_16le(tms.data, address << 1);
+	return memory_read_word_16le(cpustate->data, address << 1);
 }
 
-INLINE void DM_WRITE16(UINT16 address, UINT16 data)
+INLINE void DM_WRITE16(tms32051_state *cpustate, UINT16 address, UINT16 data)
 {
-	memory_write_word_16le(tms.data, address << 1, data);
+	memory_write_word_16le(cpustate->data, address << 1, data);
 }
 
 #include "32051ops.c"
 #include "32051ops.h"
 
-static void op_group_be(void)
+static void op_group_be(tms32051_state *cpustate)
 {
-	tms32051_opcode_table_be[tms.op & 0xff]();
+	tms32051_opcode_table_be[cpustate->op & 0xff](cpustate);
 }
 
-static void op_group_bf(void)
+static void op_group_bf(tms32051_state *cpustate)
 {
-	tms32051_opcode_table_bf[tms.op & 0xff]();
+	tms32051_opcode_table_bf[cpustate->op & 0xff](cpustate);
 }
 
-static void delay_slot(UINT16 startpc)
+static void delay_slot(tms32051_state *cpustate, UINT16 startpc)
 {
-	tms.op = ROPCODE();
-	tms32051_opcode_table[tms.op >> 8]();
+	cpustate->op = ROPCODE(cpustate);
+	tms32051_opcode_table[cpustate->op >> 8](cpustate);
 
-	while (tms.pc - startpc < 2)
+	while (cpustate->pc - startpc < 2)
 	{
-		tms.op = ROPCODE();
-		tms32051_opcode_table[tms.op >> 8]();
+		cpustate->op = ROPCODE(cpustate);
+		tms32051_opcode_table[cpustate->op >> 8](cpustate);
 	}
 }
 
@@ -212,109 +213,112 @@ static void delay_slot(UINT16 startpc)
 
 static CPU_INIT( tms )
 {
-	tms.device = device;
-	tms.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	tms.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	tms32051_state *cpustate = device->token;
+
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 }
 
 static CPU_RESET( tms )
 {
+	tms32051_state *cpustate = device->token;
 	int i;
 	UINT16 src, dst, length;
 
 	src = 0x7800;
-	dst = DM_READ16(src++);
-	length = DM_READ16(src++);
+	dst = DM_READ16(cpustate, src++);
+	length = DM_READ16(cpustate, src++);
 
-	CHANGE_PC(dst);
+	CHANGE_PC(cpustate, dst);
 
 	for (i=0; i < length; i++)
 	{
-		UINT16 data = DM_READ16(src++);
-		PM_WRITE16(dst++, data);
+		UINT16 data = DM_READ16(cpustate, src++);
+		PM_WRITE16(cpustate, dst++, data);
 	}
 
-	tms.st0.intm	= 1;
-	tms.st0.ov		= 0;
-	tms.st1.c		= 1;
-	tms.st1.cnf		= 0;
-	tms.st1.hm		= 1;
-	tms.st1.pm		= 0;
-	tms.st1.sxm		= 1;
-	tms.st1.xf		= 1;
-	tms.pmst.avis	= 0;
-	tms.pmst.braf	= 0;
-	tms.pmst.iptr	= 0;
-	tms.pmst.ndx	= 0;
-	tms.pmst.ovly	= 0;
-	tms.pmst.ram	= 0;
-	tms.pmst.trm	= 0;
-	tms.ifr			= 0;
-	tms.cbcr		= 0;
-	tms.rptc		= -1;
+	cpustate->st0.intm	= 1;
+	cpustate->st0.ov		= 0;
+	cpustate->st1.c		= 1;
+	cpustate->st1.cnf		= 0;
+	cpustate->st1.hm		= 1;
+	cpustate->st1.pm		= 0;
+	cpustate->st1.sxm		= 1;
+	cpustate->st1.xf		= 1;
+	cpustate->pmst.avis	= 0;
+	cpustate->pmst.braf	= 0;
+	cpustate->pmst.iptr	= 0;
+	cpustate->pmst.ndx	= 0;
+	cpustate->pmst.ovly	= 0;
+	cpustate->pmst.ram	= 0;
+	cpustate->pmst.trm	= 0;
+	cpustate->ifr			= 0;
+	cpustate->cbcr		= 0;
+	cpustate->rptc		= -1;
 }
 
-static void check_interrupts(void)
+static void check_interrupts(tms32051_state *cpustate)
 {
 	int i;
 
-	if (tms.st0.intm == 0 && tms.ifr != 0)
+	if (cpustate->st0.intm == 0 && cpustate->ifr != 0)
 	{
 		for (i=0; i < 16; i++)
 		{
-			if (tms.ifr & (1 << i))
+			if (cpustate->ifr & (1 << i))
 			{
-				tms.st0.intm = 1;
-				PUSH_STACK(tms.pc);
+				cpustate->st0.intm = 1;
+				PUSH_STACK(cpustate, cpustate->pc);
 
-				tms.pc = (tms.pmst.iptr << 11) | ((i+1) << 1);
-				tms.ifr &= ~(1 << i);
+				cpustate->pc = (cpustate->pmst.iptr << 11) | ((i+1) << 1);
+				cpustate->ifr &= ~(1 << i);
 
-				save_interrupt_context();
+				save_interrupt_context(cpustate);
 				break;
 			}
 		}
 	}
 }
 
-static void save_interrupt_context(void)
+static void save_interrupt_context(tms32051_state *cpustate)
 {
-	tms.shadow.acc		= tms.acc;
-	tms.shadow.accb		= tms.accb;
-	tms.shadow.arcr		= tms.arcr;
-	tms.shadow.indx		= tms.indx;
-	tms.shadow.preg		= tms.preg;
-	tms.shadow.treg0	= tms.treg0;
-	tms.shadow.treg1	= tms.treg1;
-	tms.shadow.treg2	= tms.treg2;
-	memcpy(&tms.shadow.pmst, &tms.pmst, sizeof(PMST));
-	memcpy(&tms.shadow.st0, &tms.st0, sizeof(ST0));
-	memcpy(&tms.shadow.st1, &tms.st1, sizeof(ST1));
+	cpustate->shadow.acc		= cpustate->acc;
+	cpustate->shadow.accb		= cpustate->accb;
+	cpustate->shadow.arcr		= cpustate->arcr;
+	cpustate->shadow.indx		= cpustate->indx;
+	cpustate->shadow.preg		= cpustate->preg;
+	cpustate->shadow.treg0	= cpustate->treg0;
+	cpustate->shadow.treg1	= cpustate->treg1;
+	cpustate->shadow.treg2	= cpustate->treg2;
+	memcpy(&cpustate->shadow.pmst, &cpustate->pmst, sizeof(PMST));
+	memcpy(&cpustate->shadow.st0, &cpustate->st0, sizeof(ST0));
+	memcpy(&cpustate->shadow.st1, &cpustate->st1, sizeof(ST1));
 }
 
-static void restore_interrupt_context(void)
+static void restore_interrupt_context(tms32051_state *cpustate)
 {
-	tms.acc				= tms.shadow.acc;
-	tms.accb			= tms.shadow.accb;
-	tms.arcr			= tms.shadow.arcr;
-	tms.indx			= tms.shadow.indx;
-	tms.preg			= tms.shadow.preg;
-	tms.treg0			= tms.shadow.treg0;
-	tms.treg1			= tms.shadow.treg1;
-	tms.treg2			= tms.shadow.treg2;
-	memcpy(&tms.pmst, &tms.shadow.pmst, sizeof(PMST));
-	memcpy(&tms.st0, &tms.shadow.st0, sizeof(ST0));
-	memcpy(&tms.st1, &tms.shadow.st1, sizeof(ST1));
+	cpustate->acc				= cpustate->shadow.acc;
+	cpustate->accb			= cpustate->shadow.accb;
+	cpustate->arcr			= cpustate->shadow.arcr;
+	cpustate->indx			= cpustate->shadow.indx;
+	cpustate->preg			= cpustate->shadow.preg;
+	cpustate->treg0			= cpustate->shadow.treg0;
+	cpustate->treg1			= cpustate->shadow.treg1;
+	cpustate->treg2			= cpustate->shadow.treg2;
+	memcpy(&cpustate->pmst, &cpustate->shadow.pmst, sizeof(PMST));
+	memcpy(&cpustate->st0, &cpustate->shadow.st0, sizeof(ST0));
+	memcpy(&cpustate->st1, &cpustate->shadow.st1, sizeof(ST1));
 }
 
-static void tms_interrupt(int irq)
+static void tms_interrupt(tms32051_state *cpustate, int irq)
 {
-	if ((tms.imr & (1 << irq)) != 0)
+	if ((cpustate->imr & (1 << irq)) != 0)
 	{
-		tms.ifr |= 1 << irq;
+		cpustate->ifr |= 1 << irq;
 	}
 
-	check_interrupts();
+	check_interrupts(cpustate);
 }
 
 static CPU_EXIT( tms )
@@ -322,83 +326,69 @@ static CPU_EXIT( tms )
 	/* TODO */
 }
 
-static CPU_GET_CONTEXT( tms )
-{
-	/* copy the context */
-	if (dst)
-		*(TMS_REGS *)dst = tms;
-}
-
-static CPU_SET_CONTEXT( tms )
-{
-	/* copy the context */
-	if (src)
-		tms = *(TMS_REGS *)src;
-
-	CHANGE_PC(tms.pc);
-}
-
 static CPU_EXECUTE( tms )
 {
-	tms_icount = cycles;
+	tms32051_state *cpustate = device->token;
+	
+	cpustate->icount = cycles;
 
-	while(tms_icount > 0)
+	while(cpustate->icount > 0)
 	{
 		UINT16 ppc;
 
 		// handle block repeat
-		if (tms.pmst.braf)
+		if (cpustate->pmst.braf)
 		{
-			if (tms.pc == tms.paer)
+			if (cpustate->pc == cpustate->paer)
 			{
-				if (tms.brcr > 0)
+				if (cpustate->brcr > 0)
 				{
-					CHANGE_PC(tms.pasr);
+					CHANGE_PC(cpustate, cpustate->pasr);
 				}
 
-				tms.brcr--;
-				if (tms.brcr <= 0)
+				cpustate->brcr--;
+				if (cpustate->brcr <= 0)
 				{
-					tms.pmst.braf = 0;
+					cpustate->pmst.braf = 0;
 				}
 			}
 		}
 
-		ppc = tms.pc;
-		debugger_instruction_hook(device, tms.pc);
+		ppc = cpustate->pc;
+		debugger_instruction_hook(device, cpustate->pc);
 
-		tms.op = ROPCODE();
-		tms32051_opcode_table[tms.op >> 8]();
+		cpustate->op = ROPCODE(cpustate);
+		tms32051_opcode_table[cpustate->op >> 8](cpustate);
 
 		// handle single repeat
-		if (tms.rptc > 0)
+		if (cpustate->rptc > 0)
 		{
-			if (ppc == tms.rpt_end)
+			if (ppc == cpustate->rpt_end)
 			{
-				CHANGE_PC(tms.rpt_start);
-				tms.rptc--;
+				CHANGE_PC(cpustate, cpustate->rpt_start);
+				cpustate->rptc--;
 			}
 		}
 		else
 		{
-			tms.rptc = 0;
+			cpustate->rptc = 0;
 		}
 
-		tms.timer.psc--;
-		if (tms.timer.psc <= 0)
+		cpustate->timer.psc--;
+		if (cpustate->timer.psc <= 0)
 		{
-			tms.timer.psc = tms.timer.tddr;
-			tms.timer.tim--;
-			if (tms.timer.tim <= 0)
+			cpustate->timer.psc = cpustate->timer.tddr;
+			cpustate->timer.tim--;
+			if (cpustate->timer.tim <= 0)
 			{
 				// reset timer
-				tms.timer.tim = tms.timer.prd;
+				cpustate->timer.tim = cpustate->timer.prd;
 
-				tms_interrupt(INTERRUPT_TINT);
+				tms_interrupt(cpustate, INTERRUPT_TINT);
 			}
 		}
 	}
-	return cycles - tms_icount;
+	return cycles - cpustate->icount;
 }
 
 
@@ -406,49 +396,51 @@ static CPU_EXECUTE( tms )
 
 static READ16_HANDLER( cpuregs_r )
 {
+	tms32051_state *cpustate = space->cpu->token;
+	
 	switch (offset)
 	{
-		case 0x04:	return tms.imr;
-		case 0x06:	return tms.ifr;
+		case 0x04:	return cpustate->imr;
+		case 0x06:	return cpustate->ifr;
 
 		case 0x07:		// PMST
 		{
 			UINT16 r = 0;
-			r |= tms.pmst.iptr << 11;
-			r |= tms.pmst.avis << 7;
-			r |= tms.pmst.ovly << 5;
-			r |= tms.pmst.ram << 4;
-			r |= tms.pmst.mpmc << 3;
-			r |= tms.pmst.ndx << 2;
-			r |= tms.pmst.trm << 1;
-			r |= tms.pmst.braf << 0;
+			r |= cpustate->pmst.iptr << 11;
+			r |= cpustate->pmst.avis << 7;
+			r |= cpustate->pmst.ovly << 5;
+			r |= cpustate->pmst.ram << 4;
+			r |= cpustate->pmst.mpmc << 3;
+			r |= cpustate->pmst.ndx << 2;
+			r |= cpustate->pmst.trm << 1;
+			r |= cpustate->pmst.braf << 0;
 			return r;
 		}
 
-		case 0x09:	return tms.brcr;
-		case 0x10:	return tms.ar[0];
-		case 0x11:	return tms.ar[1];
-		case 0x12:	return tms.ar[2];
-		case 0x13:	return tms.ar[3];
-		case 0x14:	return tms.ar[4];
-		case 0x15:	return tms.ar[5];
-		case 0x16:	return tms.ar[6];
-		case 0x17:	return tms.ar[7];
-		case 0x1e:	return tms.cbcr;
-		case 0x1f:	return tms.bmar;
-		case 0x24:	return tms.timer.tim;
-		case 0x25:	return tms.timer.prd;
+		case 0x09:	return cpustate->brcr;
+		case 0x10:	return cpustate->ar[0];
+		case 0x11:	return cpustate->ar[1];
+		case 0x12:	return cpustate->ar[2];
+		case 0x13:	return cpustate->ar[3];
+		case 0x14:	return cpustate->ar[4];
+		case 0x15:	return cpustate->ar[5];
+		case 0x16:	return cpustate->ar[6];
+		case 0x17:	return cpustate->ar[7];
+		case 0x1e:	return cpustate->cbcr;
+		case 0x1f:	return cpustate->bmar;
+		case 0x24:	return cpustate->timer.tim;
+		case 0x25:	return cpustate->timer.prd;
 
 		case 0x26:		// TCR
 		{
 			UINT16 r = 0;
-			r |= (tms.timer.psc & 0xf) << 6;
-			r |= (tms.timer.tddr & 0xf);
+			r |= (cpustate->timer.psc & 0xf) << 6;
+			r |= (cpustate->timer.tddr & 0xf);
 			return r;
 		}
 
 		case 0x28:	return 0;	// PDWSR
-		default:	fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, tms.pc-1);
+		default:	fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, cpustate->pc-1);
 	}
 
 	return 0;
@@ -456,10 +448,12 @@ static READ16_HANDLER( cpuregs_r )
 
 static WRITE16_HANDLER( cpuregs_w )
 {
+	tms32051_state *cpustate = space->cpu->token;
+
 	switch (offset)
 	{
 		case 0x00:	break;
-		case 0x04:	tms.imr = data; break;
+		case 0x04:	cpustate->imr = data; break;
 		case 0x06:		// IFR
 		{
 			int i;
@@ -467,7 +461,7 @@ static WRITE16_HANDLER( cpuregs_w )
 			{
 				if (data & (1 << i))
 				{
-					tms.ifr &= ~(1 << i);
+					cpustate->ifr &= ~(1 << i);
 				}
 			}
 			break;
@@ -475,54 +469,54 @@ static WRITE16_HANDLER( cpuregs_w )
 
 		case 0x07:		// PMST
 		{
-			tms.pmst.iptr = (data >> 11) & 0x1f;
-			tms.pmst.avis = (data & 0x80) ? 1 : 0;
-			tms.pmst.ovly = (data & 0x20) ? 1 : 0;
-			tms.pmst.ram = (data & 0x10) ? 1 : 0;
-			tms.pmst.mpmc = (data & 0x08) ? 1 : 0;
-			tms.pmst.ndx = (data & 0x04) ? 1 : 0;
-			tms.pmst.trm = (data & 0x02) ? 1 : 0;
-			tms.pmst.braf = (data & 0x01) ? 1 : 0;
+			cpustate->pmst.iptr = (data >> 11) & 0x1f;
+			cpustate->pmst.avis = (data & 0x80) ? 1 : 0;
+			cpustate->pmst.ovly = (data & 0x20) ? 1 : 0;
+			cpustate->pmst.ram = (data & 0x10) ? 1 : 0;
+			cpustate->pmst.mpmc = (data & 0x08) ? 1 : 0;
+			cpustate->pmst.ndx = (data & 0x04) ? 1 : 0;
+			cpustate->pmst.trm = (data & 0x02) ? 1 : 0;
+			cpustate->pmst.braf = (data & 0x01) ? 1 : 0;
 			break;
 		}
 
-		case 0x09:	tms.brcr = data; break;
-		case 0x0e:	tms.treg2 = data; break;
-		case 0x0f:	tms.dbmr = data; break;
-		case 0x10:	tms.ar[0] = data; break;
-		case 0x11:	tms.ar[1] = data; break;
-		case 0x12:	tms.ar[2] = data; break;
-		case 0x13:	tms.ar[3] = data; break;
-		case 0x14:	tms.ar[4] = data; break;
-		case 0x15:	tms.ar[5] = data; break;
-		case 0x16:	tms.ar[6] = data; break;
-		case 0x17:	tms.ar[7] = data; break;
-		case 0x18:	tms.indx = data; break;
-		case 0x19:	tms.arcr = data; break;
-		case 0x1a:	tms.cbsr1 = data; break;
-		case 0x1b:	tms.cber1 = data; break;
-		case 0x1c:	tms.cbsr2 = data; break;
-		case 0x1d:	tms.cber2 = data; break;
-		case 0x1e:	tms.cbcr = data; break;
-		case 0x1f:	tms.bmar = data; break;
-		case 0x24:	tms.timer.tim = data; break;
-		case 0x25:	tms.timer.prd = data; break;
+		case 0x09:	cpustate->brcr = data; break;
+		case 0x0e:	cpustate->treg2 = data; break;
+		case 0x0f:	cpustate->dbmr = data; break;
+		case 0x10:	cpustate->ar[0] = data; break;
+		case 0x11:	cpustate->ar[1] = data; break;
+		case 0x12:	cpustate->ar[2] = data; break;
+		case 0x13:	cpustate->ar[3] = data; break;
+		case 0x14:	cpustate->ar[4] = data; break;
+		case 0x15:	cpustate->ar[5] = data; break;
+		case 0x16:	cpustate->ar[6] = data; break;
+		case 0x17:	cpustate->ar[7] = data; break;
+		case 0x18:	cpustate->indx = data; break;
+		case 0x19:	cpustate->arcr = data; break;
+		case 0x1a:	cpustate->cbsr1 = data; break;
+		case 0x1b:	cpustate->cber1 = data; break;
+		case 0x1c:	cpustate->cbsr2 = data; break;
+		case 0x1d:	cpustate->cber2 = data; break;
+		case 0x1e:	cpustate->cbcr = data; break;
+		case 0x1f:	cpustate->bmar = data; break;
+		case 0x24:	cpustate->timer.tim = data; break;
+		case 0x25:	cpustate->timer.prd = data; break;
 
 		case 0x26:		// TCR
 		{
-			tms.timer.tddr = data & 0xf;
-			tms.timer.psc = (data >> 6) & 0xf;
+			cpustate->timer.tddr = data & 0xf;
+			cpustate->timer.psc = (data >> 6) & 0xf;
 
 			if (data & 0x20)
 			{
-				tms.timer.tim = tms.timer.prd;
-				tms.timer.psc = tms.timer.tddr;
+				cpustate->timer.tim = cpustate->timer.prd;
+				cpustate->timer.psc = cpustate->timer.tddr;
 			}
 			break;
 		}
 
 		case 0x28:	break;		// PDWSR
-		default:	fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, tms.pc-1);
+		default:	fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, cpustate->pc-1);
 	}
 }
 
@@ -548,32 +542,37 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( tms )
 {
+	tms32051_state *cpustate = device->token;
+
 	switch (state)
 	{
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + TMS32051_PC:		tms.pc = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_PC:		cpustate->pc = info->i;						break;
 	}
 }
 
 static CPU_READ( tms )
 {
+	tms32051_state *cpustate = device->token;
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
-		*value = (PM_READ16(offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
+		*value = (PM_READ16(cpustate, offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
 	}
 	else if (space == ADDRESS_SPACE_DATA)
 	{
-		*value = (DM_READ16(offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
+		*value = (DM_READ16(cpustate, offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
 	}
 	return 1;
 }
 
 static CPU_GET_INFO( tms )
 {
+	tms32051_state *cpustate = (device != NULL) ? device->token : NULL;
+
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms32051_state);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 6;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
@@ -599,34 +598,34 @@ static CPU_GET_INFO( tms )
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + TMS32051_PC:		info->i = tms.pc;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_ACC:		info->i = tms.acc;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_ACCB:		info->i = tms.accb;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_PREG:		info->i = tms.preg;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_TREG0:		info->i = tms.treg0;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_TREG1:		info->i = tms.treg1;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_TREG2:		info->i = tms.treg2;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_BMAR:		info->i = tms.bmar;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_RPTC:		info->i = tms.rptc;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_BRCR:		info->i = tms.brcr;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_INDX:		info->i = tms.indx;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_DBMR:		info->i = tms.dbmr;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_ARCR:		info->i = tms.arcr;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_DP:		info->i = tms.st0.dp;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_ARP:		info->i = tms.st0.arp;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_ARB:		info->i = tms.st1.arb;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR0:		info->i = tms.ar[0];					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR1:		info->i = tms.ar[1];					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR2:		info->i = tms.ar[2];					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR3:		info->i = tms.ar[3];					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR4:		info->i = tms.ar[4];					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR5:		info->i = tms.ar[5];					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR6:		info->i = tms.ar[6];					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR7:		info->i = tms.ar[7];					break;
+		case CPUINFO_INT_REGISTER + TMS32051_PC:		info->i = cpustate->pc;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_ACC:		info->i = cpustate->acc;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_ACCB:		info->i = cpustate->accb;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_PREG:		info->i = cpustate->preg;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_TREG0:		info->i = cpustate->treg0;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_TREG1:		info->i = cpustate->treg1;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_TREG2:		info->i = cpustate->treg2;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_BMAR:		info->i = cpustate->bmar;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_RPTC:		info->i = cpustate->rptc;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_BRCR:		info->i = cpustate->brcr;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_INDX:		info->i = cpustate->indx;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_DBMR:		info->i = cpustate->dbmr;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_ARCR:		info->i = cpustate->arcr;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_DP:		info->i = cpustate->st0.dp;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_ARP:		info->i = cpustate->st0.arp;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_ARB:		info->i = cpustate->st1.arb;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR0:		info->i = cpustate->ar[0];					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR1:		info->i = cpustate->ar[1];					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR2:		info->i = cpustate->ar[2];					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR3:		info->i = cpustate->ar[3];					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR4:		info->i = cpustate->ar[4];					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR5:		info->i = cpustate->ar[5];					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR6:		info->i = cpustate->ar[6];					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR7:		info->i = cpustate->ar[7];					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms);		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms);					break;
@@ -634,7 +633,7 @@ static CPU_GET_INFO( tms )
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32051);		break;
 		case CPUINFO_PTR_READ:							info->read = CPU_READ_NAME(tms);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms_icount;				break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(internal_pgm); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: info->internal_map16 = ADDRESS_MAP_NAME(internal_data); break;
 
@@ -646,36 +645,38 @@ static CPU_GET_INFO( tms )
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 
-		case CPUINFO_STR_REGISTER + TMS32051_PC:		sprintf(info->s, "PC: %04X", tms.pc); break;
-		case CPUINFO_STR_REGISTER + TMS32051_ACC:		sprintf(info->s, "ACC: %08X", tms.acc); break;
-		case CPUINFO_STR_REGISTER + TMS32051_ACCB:		sprintf(info->s, "ACCB: %08X", tms.accb); break;
-		case CPUINFO_STR_REGISTER + TMS32051_PREG:		sprintf(info->s, "PREG: %08X", tms.preg); break;
-		case CPUINFO_STR_REGISTER + TMS32051_TREG0:		sprintf(info->s, "TREG0: %04X", tms.treg0); break;
-		case CPUINFO_STR_REGISTER + TMS32051_TREG1:		sprintf(info->s, "TREG1: %04X", tms.treg1); break;
-		case CPUINFO_STR_REGISTER + TMS32051_TREG2:		sprintf(info->s, "TREG2: %04X", tms.treg2); break;
-		case CPUINFO_STR_REGISTER + TMS32051_BMAR:		sprintf(info->s, "BMAR: %08X", tms.bmar); break;
-		case CPUINFO_STR_REGISTER + TMS32051_RPTC:		sprintf(info->s, "RPTC: %08X", tms.rptc); break;
-		case CPUINFO_STR_REGISTER + TMS32051_BRCR:		sprintf(info->s, "BRCR: %08X", tms.brcr); break;
-		case CPUINFO_STR_REGISTER + TMS32051_INDX:		sprintf(info->s, "INDX: %04X", tms.indx); break;
-		case CPUINFO_STR_REGISTER + TMS32051_DBMR:		sprintf(info->s, "DBMR: %04X", tms.dbmr); break;
-		case CPUINFO_STR_REGISTER + TMS32051_ARCR:		sprintf(info->s, "ARCR: %04X", tms.arcr); break;
-		case CPUINFO_STR_REGISTER + TMS32051_DP:		sprintf(info->s, "DP: %04X", tms.st0.dp); break;
-		case CPUINFO_STR_REGISTER + TMS32051_ARP:		sprintf(info->s, "ARP: %04X", tms.st0.arp); break;
-		case CPUINFO_STR_REGISTER + TMS32051_ARB:		sprintf(info->s, "ARB: %04X", tms.st1.arb); break;
-		case CPUINFO_STR_REGISTER + TMS32051_AR0:		sprintf(info->s, "AR0: %04X", tms.ar[0]); break;
-		case CPUINFO_STR_REGISTER + TMS32051_AR1:		sprintf(info->s, "AR1: %04X", tms.ar[1]); break;
-		case CPUINFO_STR_REGISTER + TMS32051_AR2:		sprintf(info->s, "AR2: %04X", tms.ar[2]); break;
-		case CPUINFO_STR_REGISTER + TMS32051_AR3:		sprintf(info->s, "AR3: %04X", tms.ar[3]); break;
-		case CPUINFO_STR_REGISTER + TMS32051_AR4:		sprintf(info->s, "AR4: %04X", tms.ar[4]); break;
-		case CPUINFO_STR_REGISTER + TMS32051_AR5:		sprintf(info->s, "AR5: %04X", tms.ar[5]); break;
-		case CPUINFO_STR_REGISTER + TMS32051_AR6:		sprintf(info->s, "AR6: %04X", tms.ar[6]); break;
-		case CPUINFO_STR_REGISTER + TMS32051_AR7:		sprintf(info->s, "AR7: %04X", tms.ar[7]); break;
+		case CPUINFO_STR_REGISTER + TMS32051_PC:		sprintf(info->s, "PC: %04X", cpustate->pc); break;
+		case CPUINFO_STR_REGISTER + TMS32051_ACC:		sprintf(info->s, "ACC: %08X", cpustate->acc); break;
+		case CPUINFO_STR_REGISTER + TMS32051_ACCB:		sprintf(info->s, "ACCB: %08X", cpustate->accb); break;
+		case CPUINFO_STR_REGISTER + TMS32051_PREG:		sprintf(info->s, "PREG: %08X", cpustate->preg); break;
+		case CPUINFO_STR_REGISTER + TMS32051_TREG0:		sprintf(info->s, "TREG0: %04X", cpustate->treg0); break;
+		case CPUINFO_STR_REGISTER + TMS32051_TREG1:		sprintf(info->s, "TREG1: %04X", cpustate->treg1); break;
+		case CPUINFO_STR_REGISTER + TMS32051_TREG2:		sprintf(info->s, "TREG2: %04X", cpustate->treg2); break;
+		case CPUINFO_STR_REGISTER + TMS32051_BMAR:		sprintf(info->s, "BMAR: %08X", cpustate->bmar); break;
+		case CPUINFO_STR_REGISTER + TMS32051_RPTC:		sprintf(info->s, "RPTC: %08X", cpustate->rptc); break;
+		case CPUINFO_STR_REGISTER + TMS32051_BRCR:		sprintf(info->s, "BRCR: %08X", cpustate->brcr); break;
+		case CPUINFO_STR_REGISTER + TMS32051_INDX:		sprintf(info->s, "INDX: %04X", cpustate->indx); break;
+		case CPUINFO_STR_REGISTER + TMS32051_DBMR:		sprintf(info->s, "DBMR: %04X", cpustate->dbmr); break;
+		case CPUINFO_STR_REGISTER + TMS32051_ARCR:		sprintf(info->s, "ARCR: %04X", cpustate->arcr); break;
+		case CPUINFO_STR_REGISTER + TMS32051_DP:		sprintf(info->s, "DP: %04X", cpustate->st0.dp); break;
+		case CPUINFO_STR_REGISTER + TMS32051_ARP:		sprintf(info->s, "ARP: %04X", cpustate->st0.arp); break;
+		case CPUINFO_STR_REGISTER + TMS32051_ARB:		sprintf(info->s, "ARB: %04X", cpustate->st1.arb); break;
+		case CPUINFO_STR_REGISTER + TMS32051_AR0:		sprintf(info->s, "AR0: %04X", cpustate->ar[0]); break;
+		case CPUINFO_STR_REGISTER + TMS32051_AR1:		sprintf(info->s, "AR1: %04X", cpustate->ar[1]); break;
+		case CPUINFO_STR_REGISTER + TMS32051_AR2:		sprintf(info->s, "AR2: %04X", cpustate->ar[2]); break;
+		case CPUINFO_STR_REGISTER + TMS32051_AR3:		sprintf(info->s, "AR3: %04X", cpustate->ar[3]); break;
+		case CPUINFO_STR_REGISTER + TMS32051_AR4:		sprintf(info->s, "AR4: %04X", cpustate->ar[4]); break;
+		case CPUINFO_STR_REGISTER + TMS32051_AR5:		sprintf(info->s, "AR5: %04X", cpustate->ar[5]); break;
+		case CPUINFO_STR_REGISTER + TMS32051_AR6:		sprintf(info->s, "AR6: %04X", cpustate->ar[6]); break;
+		case CPUINFO_STR_REGISTER + TMS32051_AR7:		sprintf(info->s, "AR7: %04X", cpustate->ar[7]); break;
 	}
 }
 
 #if (HAS_TMS32051)
 static CPU_SET_INFO( tms32051 )
 {
+	tms32051_state *cpustate = device->token;
+
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{
 		return;
@@ -683,29 +684,29 @@ static CPU_SET_INFO( tms32051 )
 	switch(state)
 	{
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + TMS32051_PC:		tms.pc = info->i; 						break;
-		case CPUINFO_INT_REGISTER + TMS32051_ACC:		tms.acc = info->i; 						break;
-		case CPUINFO_INT_REGISTER + TMS32051_ACCB:		tms.accb = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_PREG:		tms.preg = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_TREG0:		tms.treg0 = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_TREG1:		tms.treg1 = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_TREG2:		tms.treg2 = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_BMAR:		tms.bmar = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_BRCR:		tms.brcr = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_INDX:		tms.indx = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_DBMR:		tms.dbmr = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_ARCR:		tms.arcr = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32051_DP:		tms.st0.dp = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_ARP:		tms.st0.arp = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_ARB:		tms.st1.arb = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR0:		tms.ar[0] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR1:		tms.ar[1] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR2:		tms.ar[2] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR3:		tms.ar[3] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR4:		tms.ar[4] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR5:		tms.ar[5] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR6:		tms.ar[6] = info->i; 					break;
-		case CPUINFO_INT_REGISTER + TMS32051_AR7:		tms.ar[7] = info->i; 					break;
+		case CPUINFO_INT_REGISTER + TMS32051_PC:		cpustate->pc = info->i; 						break;
+		case CPUINFO_INT_REGISTER + TMS32051_ACC:		cpustate->acc = info->i; 						break;
+		case CPUINFO_INT_REGISTER + TMS32051_ACCB:		cpustate->accb = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_PREG:		cpustate->preg = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_TREG0:		cpustate->treg0 = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_TREG1:		cpustate->treg1 = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_TREG2:		cpustate->treg2 = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_BMAR:		cpustate->bmar = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_BRCR:		cpustate->brcr = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_INDX:		cpustate->indx = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_DBMR:		cpustate->dbmr = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_ARCR:		cpustate->arcr = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32051_DP:		cpustate->st0.dp = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_ARP:		cpustate->st0.arp = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_ARB:		cpustate->st1.arb = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR0:		cpustate->ar[0] = info->i; 					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR1:		cpustate->ar[1] = info->i; 					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR2:		cpustate->ar[2] = info->i; 					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR3:		cpustate->ar[3] = info->i; 					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR4:		cpustate->ar[4] = info->i; 					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR5:		cpustate->ar[5] = info->i; 					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR6:		cpustate->ar[6] = info->i; 					break;
+		case CPUINFO_INT_REGISTER + TMS32051_AR7:		cpustate->ar[7] = info->i; 					break;
 
 		default:										CPU_SET_INFO_CALL(tms);				break;
 	}

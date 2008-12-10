@@ -1,4 +1,4 @@
-static void (*const tms32051_opcode_table[256])(void) =
+static void (*const tms32051_opcode_table[256])(tms32051_state *cpustate) =
 {
 	/* 0x00 - 0x0f */
 	op_lar_mem,		op_lar_mem,		op_lar_mem,		op_lar_mem,
@@ -82,7 +82,7 @@ static void (*const tms32051_opcode_table[256])(void) =
 	op_retcd,		op_retcd,		op_retcd,		op_retcd
 };
 
-static void (*const tms32051_opcode_table_be[256])(void) =
+static void (*const tms32051_opcode_table_be[256])(tms32051_state *cpustate) =
 {
 	/* 0x00 - 0x0f */
 	op_abs,			op_cmpl,		op_neg,			op_pac,
@@ -166,7 +166,7 @@ static void (*const tms32051_opcode_table_be[256])(void) =
 	op_invalid,		op_invalid,		op_invalid,		op_invalid,
 };
 
-static void (*const tms32051_opcode_table_bf[256])(void) =
+static void (*const tms32051_opcode_table_bf[256])(tms32051_state *cpustate) =
 {
 	/* 0x00 - 0x0f */
 	op_spm,			op_spm,			op_spm,			op_spm,
