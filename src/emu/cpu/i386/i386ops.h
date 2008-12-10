@@ -1,8 +1,8 @@
 typedef struct {
 	UINT8 opcode;
 	UINT32 flags;
-	void (*handler16)(void);
-	void (*handler32)(void);
+	void (*handler16)(i386_state *cpustate);
+	void (*handler32)(i386_state *cpustate);
 } X86_OPCODE;
 
 #define OP_I386			0x1
