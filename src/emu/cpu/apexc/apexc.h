@@ -20,21 +20,6 @@ enum
 
 CPU_GET_INFO( apexc );
 
-#ifndef SUPPORT_ODD_WORD_SIZES
-#define apexc_readmem(address)	memory_read_dword_32be(apexc.program, (address)<<2)
-#define apexc_writemem(address, data)	memory_write_dword_32be(apexc.program, (address)<<2, (data))
-/* eewww ! - Fortunately, there is no memory mapped I/O, so we can simulate masked write
-without danger */
-#define apexc_writemem_masked(address, data, mask)										\
-	apexc_writemem((address), (apexc_readmem(address) & ~(mask)) | ((data) & (mask)))
-#else
-#define apexc_readmem(address)	cpu_readmem13_32(address)
-#define apexc_writemem(address, data)	cpu_writemem13_32((address), (data))
-#define apexc_writemem_masked(address, data, mask)	cpu_writemem13_32masked((address), (data), (mask))
-#endif
-
 CPU_DISASSEMBLE( apexc );
-
-#define apexc_readop(address)	apexc_readmem(address)
 
 #endif /* __APEXC_H__ */
