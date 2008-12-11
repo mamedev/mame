@@ -1746,7 +1746,35 @@ ROM_START( shimpact )
 ROM_END
 
 
-ROM_START( shimpacp )
+ROM_START( shimpap6 )
+	ROM_REGION( 0x90000, "cvsd", 0 )	/* sound CPU */
+	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
+	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
+	ROM_LOAD (  "shiu20.bin", 0x50000, 0x20000, CRC(1b4a71c1) SHA1(74b7b4ae76ebe65f1f46b2117970bfefefbb5344) )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "pro6.105",  0xc0000, 0x20000, CRC(33e1978d) SHA1(a88af5551d6b4777e0c5f5e3844b2f1d61bbb35d) )
+	ROM_LOAD16_BYTE( "pro6.89",   0xc0001, 0x20000, CRC(6c070978) SHA1(ca6657c48810d78496c51eb750f45a3e08132ce3) )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD ( "shiu111.bin",  0x000000, 0x40000, CRC(80ae2a86) SHA1(1ff76e3064c7636f6877e426f4a88c094d1a6325) )
+	ROM_LOAD ( "shiu112.bin",  0x040000, 0x40000, CRC(3ffc27e9) SHA1(ec337629c17daaa2445fb344e08243de7f09536e) )
+	ROM_LOAD ( "shiu113.bin",  0x080000, 0x40000, CRC(01549d00) SHA1(40604e949cef056f90031850bdb91782135e7ec2) )
+	ROM_LOAD ( "shiu114.bin",  0x0c0000, 0x40000, CRC(a68af319) SHA1(9ed2e620a952dce26e08d0931f52eaeb638fc14d) )
+
+	ROM_LOAD (  "shiu95.bin",  0x200000, 0x40000, CRC(e8f56ef5) SHA1(7cb0b6bad3f0be822ef9b92e6523572e45776969) )
+	ROM_LOAD (  "shiu96.bin",  0x240000, 0x40000, CRC(24ed04f9) SHA1(f4e91640713c0c376861652f3f0db33bff32656d) )
+	ROM_LOAD (  "shiu97.bin",  0x280000, 0x40000, CRC(dd7f41a9) SHA1(a14a285ccc593f8f1d50b0d5574af4845a1e287e) )
+	ROM_LOAD (  "shiu98.bin",  0x2c0000, 0x40000, CRC(23ef65dd) SHA1(58400c305dfad1de18b84a8c118f72529b507414) )
+
+	ROM_LOAD ( "shiu106.bin",  0x400000, 0x40000, CRC(6f5bf337) SHA1(5b1a0d927302c7e1727976c2d8c612a80b8f1484) )
+	ROM_LOAD ( "shiu107.bin",  0x440000, 0x40000, CRC(a8815dad) SHA1(627d916a4b0ab03a943d123ca0eabd514634ad30) )
+	ROM_LOAD ( "shiu108.bin",  0x480000, 0x40000, CRC(d39685a3) SHA1(84e5da34a9946b954635befd37760683850d310b) )
+	ROM_LOAD ( "shiu109.bin",  0x4c0000, 0x40000, CRC(36e0b2b2) SHA1(96d76698a09cd884349bf0c4c1b75423b4404432) )
+ROM_END
+
+
+ROM_START( shimpap5 )
 	ROM_REGION( 0x90000, "cvsd", 0 )	/* sound CPU */
 	ROM_LOAD (   "shiu4.bin", 0x10000, 0x20000, CRC(1e5a012c) SHA1(4077fc266799a01738b7f88e867535f1fbacd557) )
 	ROM_LOAD (  "shiu19.bin", 0x30000, 0x20000, CRC(10f9684e) SHA1(1fdc5364f87fb65f4f2a438841e0fe847f765aaf) )
@@ -2220,7 +2248,8 @@ GAME( 1990, hiimpact, 0,        yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0,
 GAME( 1990, hiimpac3, hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (rev LA3 12/27/90)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hiimpacp, hiimpact, yunit_cvsd_6bit_slow,  trog,     hiimpact, ROT0, "Williams", "High Impact Football (prototype, rev 8.6 12/09/90)", GAME_SUPPORTS_SAVE )
 GAME( 1991, shimpact, 0,        yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (rev LA1 09/30/91)", GAME_SUPPORTS_SAVE )
-GAME( 1991, shimpacp, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, shimpap6, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 6.0 09/23/91)", GAME_SUPPORTS_SAVE )
+GAME( 1991, shimpap5, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 5.0 09/15/91)", GAME_SUPPORTS_SAVE )
 GAME( 1991, shimpap4, shimpact, yunit_cvsd_6bit_slow,  trog,     shimpact, ROT0, "Midway",   "Super High Impact (prototype, rev 4.0 09/10/91)", GAME_SUPPORTS_SAVE ) /* See notes about factory restore above */
 
 GAME( 1991, term2,    0,        yunit_adpcm_6bit_faster, term2,    term2,    ORIENTATION_FLIP_X, "Midway",   "Terminator 2 - Judgment Day (rev LA3 03/27/92)", GAME_SUPPORTS_SAVE )

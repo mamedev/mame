@@ -6162,7 +6162,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hiimpac3 )	/* (c) 1990 Williams */
 	DRIVER( hiimpacp )	/* (c) 1990 Williams */
 	DRIVER( shimpact )	/* (c) 1991 Midway */
-	DRIVER( shimpacp )	/* (c) 1991 Midway */
+	DRIVER( shimpap6 )	/* (c) 1991 Midway */
+	DRIVER( shimpap5 )	/* (c) 1991 Midway */
 	DRIVER( shimpap4 )	/* (c) 1991 Midway */
 	DRIVER( strkforc )	/* (c) 1991 Midway */
 	DRIVER( mk )		/* (c) 1992 Midway */
