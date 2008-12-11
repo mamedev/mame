@@ -62,7 +62,6 @@ struct pit8253_timer
 
 	emu_timer *updatetimer;			/* MAME timer to process updates */
 
-	UINT8 programmed;				/* Has this counter been programmed by writing to the control word */
 	UINT16 value;					/* current counter value ("CE" in Intel docs) */
 	UINT16 latch;					/* latched counter value ("OL" in Intel docs) */
 	UINT16 count;					/* new counter value ("CR" in Intel docs) */
@@ -652,8 +651,7 @@ static void	update(const device_config *device, struct pit8253_timer *timer)
 		timer->last_updated = now;
 	}
 
-	if ( timer->programmed )
-		simulate(device, timer, elapsed_cycles);
+	simulate(device, timer, elapsed_cycles);
 }
 
 
@@ -886,16 +884,12 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 		else {
 			LOG1(("pit8253_write(): timer=%d bytes=%d mode=%d bcd=%d\n", (data >> 6) & 3, (data >> 4) & 3, (data >> 1) & 7,data & 1));
 
-			if ( ( CTRL_MODE(timer->control) != CTRL_MODE(data) ) || ! timer->programmed )
-			{
-				timer->control = (data & 0x3f);
-				timer->null_count =	1;
-				timer->wmsb	= timer->rmsb =	0;
-				/* Phase 0 is always the phase after a mode control write */
-				timer->phase = 0;
-				set_output(device, timer, CTRL_MODE(timer->control) ? 1 : 0);
-				timer->programmed = 1;
-			}
+			timer->control = (data & 0x3f);
+			timer->null_count =	1;
+			timer->wmsb	= timer->rmsb =	0;
+			/* Phase 0 is always the phase after a mode control write */
+			timer->phase = 0;
+			set_output(device, timer, CTRL_MODE(timer->control) ? 1 : 0);
 		}
 	}
 	else
@@ -1081,7 +1075,6 @@ static device_start_err common_start( const device_config *device, int device_ty
 		state_save_register_device_item(device, timerno, timer->cycles_to_output);
 		state_save_register_device_item(device, timerno, timer->last_updated.seconds);
 		state_save_register_device_item(device, timerno, timer->last_updated.attoseconds);
-		state_save_register_device_item(device, timerno, timer->programmed);
 		state_save_register_device_item(device, timerno, timer->clock);
 	}
 
