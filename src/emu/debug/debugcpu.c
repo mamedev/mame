@@ -272,12 +272,15 @@ void debug_cpu_init(running_machine *machine)
 void debug_cpu_flush_traces(running_machine *machine)
 {
 	int cpunum;
-
+	
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 		if (machine->cpu[cpunum] != NULL)
 		{
 			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
-			if (info->trace.file != NULL)
+			
+			/* this can be called on exit even when no debugging is enabled, so
+			   make sure the info is valid before proceeding */
+			if (info != NULL && info->trace.file != NULL)
 				fflush(info->trace.file);
 		}
 }

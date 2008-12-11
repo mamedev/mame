@@ -273,10 +273,12 @@ INLINE void invalid_instruction(UINT32 op)
 /***************************************************************************
     IRQ HANDLING
 ***************************************************************************/
+#ifdef UNUSED_FUNCTION
 static void check_irqs(void)
 {
 	//logerror("Dsp56k check irqs\n");
 }
+#endif
 
 static void set_irq_line(int irqline, int state)
 {
