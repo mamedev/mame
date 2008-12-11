@@ -1779,13 +1779,17 @@ int render_target_map_point_input(render_target *target, INT32 target_x, INT32 t
 
 static int load_layout_files(render_target *target, const char *layoutfile, int singlefile)
 {
+	running_machine *machine = target->machine;
+	const game_driver *gamedrv = machine->gamedrv;
+	const machine_config *config = machine->config;
+	const char *basename = machine->basename;
 	layout_file **nextfile = &target->filelist;
 	const game_driver *cloneof;
 
 	/* if there's an explicit file, load that first */
 	if (layoutfile != NULL)
 	{
-		*nextfile = layout_file_load(target->machine->basename, layoutfile);
+		*nextfile = layout_file_load(config, basename, layoutfile);
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
@@ -1795,44 +1799,44 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 		return (nextfile == &target->filelist) ? 1 : 0;
 
 	/* try to load a file based on the driver name */
-	*nextfile = layout_file_load(target->machine->basename, target->machine->gamedrv->name);
+	*nextfile = layout_file_load(config, basename, gamedrv->name);
 	if (*nextfile == NULL)
-		*nextfile = layout_file_load(target->machine->basename, "default");
+		*nextfile = layout_file_load(config, basename, "default");
 	if (*nextfile != NULL)
 		nextfile = &(*nextfile)->next;
 
 	/* if a default view has been specified, use that as a fallback */
-	if (target->machine->gamedrv->default_layout != NULL)
+	if (gamedrv->default_layout != NULL)
 	{
-		*nextfile = layout_file_load(NULL, target->machine->gamedrv->default_layout);
+		*nextfile = layout_file_load(config, NULL, gamedrv->default_layout);
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
-	if (target->machine->config->default_layout != NULL)
+	if (config->default_layout != NULL)
 	{
-		*nextfile = layout_file_load(NULL, target->machine->config->default_layout);
+		*nextfile = layout_file_load(config, NULL, config->default_layout);
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
 
 	/* try to load another file based on the parent driver name */
-	cloneof = driver_get_clone(target->machine->gamedrv);
+	cloneof = driver_get_clone(gamedrv);
 	if (cloneof != NULL)
 	{
-		*nextfile = layout_file_load(cloneof->name, cloneof->name);
+		*nextfile = layout_file_load(config, cloneof->name, cloneof->name);
 		if (*nextfile == NULL)
-			*nextfile = layout_file_load(cloneof->name, "default");
+			*nextfile = layout_file_load(config, cloneof->name, "default");
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
 
 	/* now do the built-in layouts for single-screen games */
-	if (video_screen_count(target->machine->config) == 1)
+	if (video_screen_count(config) == 1)
 	{
-		if (target->machine->gamedrv->flags & ORIENTATION_SWAP_XY)
-			*nextfile = layout_file_load(NULL, layout_vertical);
+		if (gamedrv->flags & ORIENTATION_SWAP_XY)
+			*nextfile = layout_file_load(config, NULL, layout_vertical);
 		else
-			*nextfile = layout_file_load(NULL, layout_horizont);
+			*nextfile = layout_file_load(config, NULL, layout_horizont);
 		assert_always(*nextfile != NULL, "Couldn't parse default layout??");
 		nextfile = &(*nextfile)->next;
 	}

@@ -62,7 +62,6 @@
 #include "output.h"
 #include "xmlfile.h"
 #include "png.h"
-#include "deprecat.h"
 
 
 
@@ -157,14 +156,14 @@ static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *boun
 static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
 
 /* layout file parsing */
-static layout_element *load_layout_element(xml_data_node *elemnode, const char *dirname);
-static element_component *load_element_component(xml_data_node *compnode, const char *dirname);
-static layout_view *load_layout_view(xml_data_node *viewnode, layout_element *elemlist);
-static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemlist);
+static layout_element *load_layout_element(const machine_config *config, xml_data_node *elemnode, const char *dirname);
+static element_component *load_element_component(const machine_config *config, xml_data_node *compnode, const char *dirname);
+static layout_view *load_layout_view(const machine_config *config, xml_data_node *viewnode, layout_element *elemlist);
+static view_item *load_view_item(const machine_config *config, xml_data_node *itemnode, layout_element *elemlist);
 static bitmap_t *load_component_bitmap(const char *dirname, const char *file, const char *alphafile, int *hasalpha);
-static int load_bounds(xml_data_node *boundsnode, render_bounds *bounds);
-static int load_color(xml_data_node *colornode, render_color *color);
-static int load_orientation(xml_data_node *orientnode, int *orientation);
+static int load_bounds(const machine_config *config, xml_data_node *boundsnode, render_bounds *bounds);
+static int load_color(const machine_config *config, xml_data_node *colornode, render_color *color);
+static int load_orientation(const machine_config *config, xml_data_node *orientnode, int *orientation);
 static void layout_view_free(layout_view *view);
 static void layout_element_free(layout_element *element);
 
@@ -1331,16 +1330,16 @@ static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *boun
     a variable in an XML attribute
 -------------------------------------------------*/
 
-static int get_variable_value(const char *string, char **outputptr)
+static int get_variable_value(const machine_config *config, const char *string, char **outputptr)
 {
 	const device_config *device;
 	int num, den;
 	char temp[100];
 
 	/* screen 0 parameters */
-	for (device = video_screen_first(Machine->config); device != NULL; device = video_screen_next(device))
+	for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
 	{
-		int scrnum = device_list_index(Machine->config->devicelist, VIDEO_SCREEN, device->tag);
+		int scrnum = device_list_index(config->devicelist, VIDEO_SCREEN, device->tag);
 		const screen_config *scrconfig = device->inline_config;
 
 		/* native X aspect factor */
@@ -1395,7 +1394,7 @@ static int get_variable_value(const char *string, char **outputptr)
     substitution
 -------------------------------------------------*/
 
-static const char *xml_get_attribute_string_with_subst(xml_data_node *node, const char *attribute, const char *defvalue)
+static const char *xml_get_attribute_string_with_subst(const machine_config *config, xml_data_node *node, const char *attribute, const char *defvalue)
 {
 	const char *str = xml_get_attribute_string(node, attribute, NULL);
 	static char buffer[1000];
@@ -1419,7 +1418,7 @@ static const char *xml_get_attribute_string_with_subst(xml_data_node *node, cons
 
 		/* extract the variable */
 		else
-			s += get_variable_value(s, &d);
+			s += get_variable_value(config, s, &d);
 	}
 	*d = 0;
 	return buffer;
@@ -1432,9 +1431,9 @@ static const char *xml_get_attribute_string_with_subst(xml_data_node *node, cons
     substitution
 -------------------------------------------------*/
 
-static int xml_get_attribute_int_with_subst(xml_data_node *node, const char *attribute, int defvalue)
+static int xml_get_attribute_int_with_subst(const machine_config *config, xml_data_node *node, const char *attribute, int defvalue)
 {
-	const char *string = xml_get_attribute_string_with_subst(node, attribute, NULL);
+	const char *string = xml_get_attribute_string_with_subst(config, node, attribute, NULL);
 	int value;
 
 	if (string == NULL)
@@ -1455,9 +1454,9 @@ static int xml_get_attribute_int_with_subst(xml_data_node *node, const char *att
     substitution
 -------------------------------------------------*/
 
-static float xml_get_attribute_float_with_subst(xml_data_node *node, const char *attribute, float defvalue)
+static float xml_get_attribute_float_with_subst(const machine_config *config, xml_data_node *node, const char *attribute, float defvalue)
 {
-	const char *string = xml_get_attribute_string_with_subst(node, attribute, NULL);
+	const char *string = xml_get_attribute_string_with_subst(config, node, attribute, NULL);
 	float value;
 
 	if (!string || sscanf(string, "%f", &value) != 1)
@@ -1471,7 +1470,7 @@ static float xml_get_attribute_float_with_subst(xml_data_node *node, const char 
     into a layout_file
 -------------------------------------------------*/
 
-layout_file *layout_file_load(const char *dirname, const char *filename)
+layout_file *layout_file_load(const machine_config *config, const char *dirname, const char *filename)
 {
 	xml_data_node *rootnode, *mamelayoutnode, *elemnode, *viewnode;
 	layout_element **elemnext;
@@ -1528,7 +1527,7 @@ layout_file *layout_file_load(const char *dirname, const char *filename)
 	elemnext = &file->elemlist;
 	for (elemnode = xml_get_sibling(mamelayoutnode->child, "element"); elemnode; elemnode = xml_get_sibling(elemnode->next, "element"))
 	{
-		layout_element *element = load_layout_element(elemnode, dirname);
+		layout_element *element = load_layout_element(config, elemnode, dirname);
 		if (element == NULL)
 			goto error;
 
@@ -1542,7 +1541,7 @@ layout_file *layout_file_load(const char *dirname, const char *filename)
 	viewnext = &file->viewlist;
 	for (viewnode = xml_get_sibling(mamelayoutnode->child, "view"); viewnode; viewnode = xml_get_sibling(viewnode->next, "view"))
 	{
-		layout_view *view = load_layout_view(viewnode, file->elemlist);
+		layout_view *view = load_layout_view(config, viewnode, file->elemlist);
 		if (view == NULL)
 			goto error;
 
@@ -1566,7 +1565,7 @@ error:
     node from the layout file
 -------------------------------------------------*/
 
-static layout_element *load_layout_element(xml_data_node *elemnode, const char *dirname)
+static layout_element *load_layout_element(const machine_config *config, xml_data_node *elemnode, const char *dirname)
 {
 	render_bounds bounds = { 0 };
 	element_component **nextcomp;
@@ -1584,14 +1583,14 @@ static layout_element *load_layout_element(xml_data_node *elemnode, const char *
 	memset(element, 0, sizeof(*element));
 
 	/* extract the name */
-	name = xml_get_attribute_string_with_subst(elemnode, "name", NULL);
+	name = xml_get_attribute_string_with_subst(config, elemnode, "name", NULL);
 	if (name == NULL)
 	{
 		logerror("All layout elements must have a name!\n");
 		goto error;
 	}
 	element->name = copy_string(name);
-	element->defstate = xml_get_attribute_int_with_subst(elemnode, "defstate", -1);
+	element->defstate = xml_get_attribute_int_with_subst(config, elemnode, "defstate", -1);
 
 	/* parse components in order */
 	first = TRUE;
@@ -1599,7 +1598,7 @@ static layout_element *load_layout_element(xml_data_node *elemnode, const char *
 	for (compnode = elemnode->child; compnode; compnode = compnode->next)
 	{
 		/* allocate a new component */
-		element_component *component = load_element_component(compnode, dirname);
+		element_component *component = load_element_component(config, compnode, dirname);
 		if (component == NULL)
 			goto error;
 
@@ -1664,7 +1663,7 @@ error:
     XML node (image/rect/disk)
 -------------------------------------------------*/
 
-static element_component *load_element_component(xml_data_node *compnode, const char *dirname)
+static element_component *load_element_component(const machine_config *config, xml_data_node *compnode, const char *dirname)
 {
 	element_component *component;
 
@@ -1673,17 +1672,17 @@ static element_component *load_element_component(xml_data_node *compnode, const 
 	memset(component, 0, sizeof(*component));
 
 	/* fetch common data */
-	component->state = xml_get_attribute_int_with_subst(compnode, "state", -1);
-	if (load_bounds(xml_get_sibling(compnode->child, "bounds"), &component->bounds))
+	component->state = xml_get_attribute_int_with_subst(config, compnode, "state", -1);
+	if (load_bounds(config, xml_get_sibling(compnode->child, "bounds"), &component->bounds))
 		goto error;
-	if (load_color(xml_get_sibling(compnode->child, "color"), &component->color))
+	if (load_color(config, xml_get_sibling(compnode->child, "color"), &component->color))
 		goto error;
 
 	/* image nodes */
 	if (strcmp(compnode->name, "image") == 0)
 	{
-		const char *file = xml_get_attribute_string_with_subst(compnode, "file", NULL);
-		const char *afile = xml_get_attribute_string_with_subst(compnode, "alphafile", NULL);
+		const char *file = xml_get_attribute_string_with_subst(config, compnode, "file", NULL);
+		const char *afile = xml_get_attribute_string_with_subst(config, compnode, "alphafile", NULL);
 
 		/* load and allocate the bitmap */
 		component->type = COMPONENT_TYPE_IMAGE;
@@ -1695,7 +1694,7 @@ static element_component *load_element_component(xml_data_node *compnode, const 
 	/* text nodes */
 	else if (strcmp(compnode->name, "text") == 0)
 	{
-		const char *text = xml_get_attribute_string_with_subst(compnode, "string", "");
+		const char *text = xml_get_attribute_string_with_subst(config, compnode, "string", "");
 		char *string;
 
 		/* allocate a copy of the string */
@@ -1749,7 +1748,7 @@ error:
     load_layout_view - parse a view XML node
 -------------------------------------------------*/
 
-static layout_view *load_layout_view(xml_data_node *viewnode, layout_element *elemlist)
+static layout_view *load_layout_view(const machine_config *config, xml_data_node *viewnode, layout_element *elemlist)
 {
 	xml_data_node *boundsnode;
 	view_item **itemnext;
@@ -1761,11 +1760,11 @@ static layout_view *load_layout_view(xml_data_node *viewnode, layout_element *el
 	memset(view, 0, sizeof(*view));
 
 	/* allocate a copy of the name */
-	view->name = copy_string(xml_get_attribute_string_with_subst(viewnode, "name", ""));
+	view->name = copy_string(xml_get_attribute_string_with_subst(config, viewnode, "name", ""));
 
 	/* if we have a bounds item, load it */
 	boundsnode = xml_get_sibling(viewnode->child, "bounds");
-	if (boundsnode != NULL && load_bounds(xml_get_sibling(boundsnode, "bounds"), &view->expbounds))
+	if (boundsnode != NULL && load_bounds(config, xml_get_sibling(boundsnode, "bounds"), &view->expbounds))
 		goto error;
 
 	/* loop over all the layer types we support */
@@ -1781,7 +1780,7 @@ static layout_view *load_layout_view(xml_data_node *viewnode, layout_element *el
 		/* parse all of the elements of that type */
 		for (itemnode = xml_get_sibling(viewnode->child, layer_node_name[layer]); itemnode; itemnode = xml_get_sibling(itemnode->next, layer_node_name[layer]))
 		{
-			view_item *item = load_view_item(itemnode, elemlist);
+			view_item *item = load_view_item(config, itemnode, elemlist);
 			if (!item)
 				goto error;
 
@@ -1805,7 +1804,7 @@ error:
     load_view_item - parse an item XML node
 -------------------------------------------------*/
 
-static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemlist)
+static view_item *load_view_item(const machine_config *config, xml_data_node *itemnode, layout_element *elemlist)
 {
 	view_item *item;
 	const char *name;
@@ -1815,13 +1814,13 @@ static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemli
 	memset(item, 0, sizeof(*item));
 
 	/* allocate a copy of the output name */
-	item->output_name = copy_string(xml_get_attribute_string_with_subst(itemnode, "name", ""));
+	item->output_name = copy_string(xml_get_attribute_string_with_subst(config, itemnode, "name", ""));
 
 	/* allocate a copy of the input tag */
-	item->input_tag = copy_string(xml_get_attribute_string_with_subst(itemnode, "inputtag", ""));
+	item->input_tag = copy_string(xml_get_attribute_string_with_subst(config, itemnode, "inputtag", ""));
 
 	/* find the associated element */
-	name = xml_get_attribute_string_with_subst(itemnode, "element", NULL);
+	name = xml_get_attribute_string_with_subst(config, itemnode, "element", NULL);
 	if (name != NULL)
 	{
 		layout_element *element;
@@ -1838,15 +1837,15 @@ static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemli
 	}
 
 	/* fetch common data */
-	item->index = xml_get_attribute_int_with_subst(itemnode, "index", -1);
-	item->input_mask = xml_get_attribute_int_with_subst(itemnode, "inputmask", 0);
+	item->index = xml_get_attribute_int_with_subst(config, itemnode, "index", -1);
+	item->input_mask = xml_get_attribute_int_with_subst(config, itemnode, "inputmask", 0);
 	if (item->output_name[0] != 0 && item->element != 0)
 		output_set_value(item->output_name, item->element->defstate);
-	if (load_bounds(xml_get_sibling(itemnode->child, "bounds"), &item->rawbounds))
+	if (load_bounds(config, xml_get_sibling(itemnode->child, "bounds"), &item->rawbounds))
 		goto error;
-	if (load_color(xml_get_sibling(itemnode->child, "color"), &item->color))
+	if (load_color(config, xml_get_sibling(itemnode->child, "color"), &item->color))
 		goto error;
-	if (load_orientation(xml_get_sibling(itemnode->child, "orientation"), &item->orientation))
+	if (load_orientation(config, xml_get_sibling(itemnode->child, "orientation"), &item->orientation))
 		goto error;
 
 	/* sanity checks */
@@ -1920,7 +1919,7 @@ static bitmap_t *load_component_bitmap(const char *dirname, const char *file, co
     load_bounds - parse a bounds XML node
 -------------------------------------------------*/
 
-static int load_bounds(xml_data_node *boundsnode, render_bounds *bounds)
+static int load_bounds(const machine_config *config, xml_data_node *boundsnode, render_bounds *bounds)
 {
 	/* skip if nothing */
 	if (boundsnode == NULL)
@@ -1934,18 +1933,18 @@ static int load_bounds(xml_data_node *boundsnode, render_bounds *bounds)
 	if (xml_get_attribute(boundsnode, "left") != NULL)
 	{
 		/* left/right/top/bottom format */
-		bounds->x0 = xml_get_attribute_float_with_subst(boundsnode, "left", 0.0f);
-		bounds->x1 = xml_get_attribute_float_with_subst(boundsnode, "right", 1.0f);
-		bounds->y0 = xml_get_attribute_float_with_subst(boundsnode, "top", 0.0f);
-		bounds->y1 = xml_get_attribute_float_with_subst(boundsnode, "bottom", 1.0f);
+		bounds->x0 = xml_get_attribute_float_with_subst(config, boundsnode, "left", 0.0f);
+		bounds->x1 = xml_get_attribute_float_with_subst(config, boundsnode, "right", 1.0f);
+		bounds->y0 = xml_get_attribute_float_with_subst(config, boundsnode, "top", 0.0f);
+		bounds->y1 = xml_get_attribute_float_with_subst(config, boundsnode, "bottom", 1.0f);
 	}
 	else if (xml_get_attribute(boundsnode, "x") != NULL)
 	{
 		/* x/y/width/height format */
-		bounds->x0 = xml_get_attribute_float_with_subst(boundsnode, "x", 0.0f);
-		bounds->x1 = bounds->x0 + xml_get_attribute_float_with_subst(boundsnode, "width", 1.0f);
-		bounds->y0 = xml_get_attribute_float_with_subst(boundsnode, "y", 0.0f);
-		bounds->y1 = bounds->y0 + xml_get_attribute_float_with_subst(boundsnode, "height", 1.0f);
+		bounds->x0 = xml_get_attribute_float_with_subst(config, boundsnode, "x", 0.0f);
+		bounds->x1 = bounds->x0 + xml_get_attribute_float_with_subst(config, boundsnode, "width", 1.0f);
+		bounds->y0 = xml_get_attribute_float_with_subst(config, boundsnode, "y", 0.0f);
+		bounds->y1 = bounds->y0 + xml_get_attribute_float_with_subst(config, boundsnode, "height", 1.0f);
 	}
 	else
 	{
@@ -1967,7 +1966,7 @@ static int load_bounds(xml_data_node *boundsnode, render_bounds *bounds)
     load_color - parse a color XML node
 -------------------------------------------------*/
 
-static int load_color(xml_data_node *colornode, render_color *color)
+static int load_color(const machine_config *config, xml_data_node *colornode, render_color *color)
 {
 	/* skip if nothing */
 	if (colornode == NULL)
@@ -1977,10 +1976,10 @@ static int load_color(xml_data_node *colornode, render_color *color)
 	}
 
 	/* parse out the data */
-	color->r = xml_get_attribute_float_with_subst(colornode, "red", 1.0);
-	color->g = xml_get_attribute_float_with_subst(colornode, "green", 1.0);
-	color->b = xml_get_attribute_float_with_subst(colornode, "blue", 1.0);
-	color->a = xml_get_attribute_float_with_subst(colornode, "alpha", 1.0);
+	color->r = xml_get_attribute_float_with_subst(config, colornode, "red", 1.0);
+	color->g = xml_get_attribute_float_with_subst(config, colornode, "green", 1.0);
+	color->b = xml_get_attribute_float_with_subst(config, colornode, "blue", 1.0);
+	color->a = xml_get_attribute_float_with_subst(config, colornode, "alpha", 1.0);
 
 	/* check for errors */
 	if (color->r < 0.0 || color->r > 1.0 || color->g < 0.0 || color->g > 1.0 ||
@@ -1998,7 +1997,7 @@ static int load_color(xml_data_node *colornode, render_color *color)
     node
 -------------------------------------------------*/
 
-static int load_orientation(xml_data_node *orientnode, int *orientation)
+static int load_orientation(const machine_config *config, xml_data_node *orientnode, int *orientation)
 {
 	int rotate;
 
@@ -2010,7 +2009,7 @@ static int load_orientation(xml_data_node *orientnode, int *orientation)
 	}
 
 	/* parse out the data */
-	rotate = xml_get_attribute_int_with_subst(orientnode, "rotate", 0);
+	rotate = xml_get_attribute_int_with_subst(config, orientnode, "rotate", 0);
 	switch (rotate)
 	{
 		case 0:		*orientation = ROT0;	break;
@@ -2021,11 +2020,11 @@ static int load_orientation(xml_data_node *orientnode, int *orientation)
 			fatalerror("Invalid rotation in XML orientation node: %d", rotate);
 			return 1;
 	}
-	if (strcmp("yes", xml_get_attribute_string_with_subst(orientnode, "swapxy", "no")) == 0)
+	if (strcmp("yes", xml_get_attribute_string_with_subst(config, orientnode, "swapxy", "no")) == 0)
 		*orientation ^= ORIENTATION_SWAP_XY;
-	if (strcmp("yes", xml_get_attribute_string_with_subst(orientnode, "flipx", "no")) == 0)
+	if (strcmp("yes", xml_get_attribute_string_with_subst(config, orientnode, "flipx", "no")) == 0)
 		*orientation ^= ORIENTATION_FLIP_X;
-	if (strcmp("yes", xml_get_attribute_string_with_subst(orientnode, "flipy", "no")) == 0)
+	if (strcmp("yes", xml_get_attribute_string_with_subst(config, orientnode, "flipy", "no")) == 0)
 		*orientation ^= ORIENTATION_FLIP_Y;
 	return 0;
 }

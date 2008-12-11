@@ -166,7 +166,7 @@ void layout_view_recompute(layout_view *view, int layerconfig);
 
 
 /* ----- layout file parsing ----- */
-layout_file *layout_file_load(const char *dirname, const char *filename);
+layout_file *layout_file_load(const machine_config *config, const char *dirname, const char *filename);
 void layout_file_free(layout_file *file);
 
 
