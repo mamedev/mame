@@ -340,8 +340,6 @@ CPU_GET_INFO( minx )
 	case CPUINFO_INT_REGISTER + MINX_YI:						info->i = minx_get_reg( state - CPUINFO_INT_REGISTER ); break;
 	case CPUINFO_INT_PREVIOUSPC:								info->i = 0x0000; break;
 	case CPUINFO_PTR_SET_INFO:									info->setinfo = CPU_SET_INFO_NAME(minx); break;
-	case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = CPU_GET_CONTEXT_NAME(dummy); break;
-	case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = CPU_SET_CONTEXT_NAME(dummy); break;
 	case CPUINFO_PTR_INIT:										info->init = CPU_INIT_NAME(minx); break;
 	case CPUINFO_PTR_RESET:										info->reset = CPU_RESET_NAME(minx); break;
 	case CPUINFO_PTR_EXIT:										info->exit = CPU_EXIT_NAME(minx); break;

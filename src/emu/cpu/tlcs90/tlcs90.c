@@ -2780,8 +2780,6 @@ CPU_GET_INFO( tmp90840 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 
 		case CPUINFO_PTR_SET_INFO:									info->setinfo = CPU_SET_INFO_NAME(t90);		break;
-		case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
-		case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:										info->init = CPU_INIT_NAME(t90);				break;
 		case CPUINFO_PTR_RESET:										info->reset = CPU_RESET_NAME(t90);			break;
 		case CPUINFO_PTR_EXIT:										info->exit = CPU_EXIT_NAME(t90);				break;

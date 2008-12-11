@@ -244,20 +244,6 @@ static void check_irqs(void)
     CORE CALLBACKS
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( mips3 )
-{
-	if (dst != NULL)
-		*(mips3_regs *)dst = mips3;
-}
-
-
-static CPU_SET_CONTEXT( mips3 )
-{
-	if (src != NULL)
-		mips3 = *(mips3_regs *)src;
-}
-
-
 static CPU_RESET( mips3 )
 {
 	/* common reset */
@@ -2128,8 +2114,6 @@ CPU_GET_INFO( mips3 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mips3);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(mips3);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(mips3);	break;
 		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mips3);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips3);			break;

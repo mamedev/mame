@@ -982,14 +982,6 @@ void cpuintrf_init(running_machine *machine)
 		(*header->get_info)(NULL, CPUINFO_PTR_SET_INFO, &info);
 		header->set_info = info.setinfo;
 
-		info.getcontext = NULL;
-		(*header->get_info)(NULL, CPUINFO_PTR_GET_CONTEXT, &info);
-		header->get_context = info.getcontext;
-
-		info.setcontext = NULL;
-		(*header->get_info)(NULL, CPUINFO_PTR_SET_CONTEXT, &info);
-		header->set_context = info.setcontext;
-
 		info.init = NULL;
 		(*header->get_info)(NULL, CPUINFO_PTR_INIT, &info);
 		header->init = info.init;
@@ -1072,7 +1064,6 @@ void cpu_init(const device_config *device, int index, int clock, cpu_irq_callbac
 	classheader->space[ADDRESS_SPACE_IO] = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	(*classheader->init)(device, index, clock, irqcallback);
-	(*classheader->get_context)(device->token);
 }
 
 
@@ -1368,8 +1359,6 @@ static CPU_INIT( dummy ) { }
 static CPU_RESET( dummy ) { }
 static CPU_EXIT( dummy ) { }
 static CPU_EXECUTE( dummy ) { return cycles; }
-CPU_GET_CONTEXT( dummy ) { }
-CPU_SET_CONTEXT( dummy ) { }
 
 static CPU_DISASSEMBLE( dummy )
 {
@@ -1415,8 +1404,6 @@ CPU_GET_INFO( dummy )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dummy); break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(dummy);		break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(dummy);	break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(dummy);		break;

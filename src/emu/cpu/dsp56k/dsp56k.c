@@ -351,7 +351,7 @@ static void set_irq_line(int irqline, int state)
 /***************************************************************************
     CONTEXT SWITCHING
 ***************************************************************************/
-
+/*
 static CPU_GET_CONTEXT( dsp56k )
 {
 	if (dst)
@@ -366,7 +366,7 @@ static CPU_SET_CONTEXT( dsp56k )
 
 	check_irqs();
 }
-
+*/
 
 
 /***************************************************************************
@@ -671,8 +671,6 @@ CPU_GET_INFO( dsp56k )
 
 		// --- the following bits of info are returned as pointers to data or functions ---
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dsp56k);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dsp56k);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dsp56k);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(dsp56k);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(dsp56k);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(dsp56k);				break;

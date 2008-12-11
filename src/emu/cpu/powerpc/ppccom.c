@@ -1158,8 +1158,6 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						/* provided by core */					break;
-		case CPUINFO_PTR_GET_CONTEXT:					/* provided by core */					break;
-		case CPUINFO_PTR_SET_CONTEXT:					/* provided by core */					break;
 		case CPUINFO_PTR_INIT:							/* provided by core */					break;
 		case CPUINFO_PTR_RESET:							/* provided by core */					break;
 		case CPUINFO_PTR_EXIT:							/* provided by core */					break;

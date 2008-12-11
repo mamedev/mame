@@ -2114,8 +2114,6 @@ CPU_GET_INFO( i960 )
 	switch(state) {
 		// Interface functions and variables
 	case CPUINFO_PTR_SET_INFO:					info->setinfo     = CPU_SET_INFO_NAME(i960);	break;
-	case CPUINFO_PTR_GET_CONTEXT:				info->getcontext  = CPU_GET_CONTEXT_NAME(dummy);	break;
-	case CPUINFO_PTR_SET_CONTEXT:				info->setcontext  = CPU_SET_CONTEXT_NAME(dummy);	break;
 	case CPUINFO_PTR_INIT:						info->init        = CPU_INIT_NAME(i960);		break;
 	case CPUINFO_PTR_RESET:						info->reset       = CPU_RESET_NAME(i960);		break;
 	case CPUINFO_PTR_EXIT:						info->exit        = 0;							break;

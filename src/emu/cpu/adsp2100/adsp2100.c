@@ -1887,8 +1887,6 @@ static CPU_GET_INFO( adsp21xx )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						/* set per CPU */						break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);break;
 		case CPUINFO_PTR_INIT:							/* set per CPU */						break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(adsp21xx);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(adsp21xx);				break;

@@ -1713,21 +1713,6 @@ static CPU_EXIT( ppc604 )
 
 
 
-static CPU_GET_CONTEXT( ppc )
-{
-	/* copy the context */
-	if (dst)
-		*(PPC_REGS *)dst = ppc;
-}
-
-
-static CPU_SET_CONTEXT( ppc )
-{
-	/* copy the context */
-	if (src)
-		ppc = *(PPC_REGS *)src;
-}
-
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
@@ -1891,8 +1876,6 @@ static CPU_GET_INFO( ppc )
 
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(ppc);		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(ppc);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppc);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ppc_icount;				break;

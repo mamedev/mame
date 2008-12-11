@@ -2094,7 +2094,7 @@ static CPU_EXECUTE( tms32025 )
 	return (cycles - tms32025_icount);
 }
 
-
+#if 0
 /****************************************************************************
  *  Get all registers in given buffer
  ****************************************************************************/
@@ -2121,7 +2121,7 @@ static CPU_SET_CONTEXT( tms32025 )
 		memcpy(&tms32025_pgmmap[500], &R.pgmmap_save, sizeof(R.pgmmap_save));
 	}
 }
-
+#endif
 
 /****************************************************************************
  *  Set IRQ line state
@@ -2387,8 +2387,6 @@ CPU_GET_INFO( tms32025 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32025);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms32025); break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms32025); break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32025);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32025);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32025);				break;

@@ -131,8 +131,6 @@ enum
 		CPUINFO_PTR_EXIT = DEVINFO_FCT_STOP,				/* R/O: void (*exit)(const device_config *device) */
 
 		CPUINFO_PTR_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, INT64 data, void *ptr) */
-		CPUINFO_PTR_GET_CONTEXT,							/* R/O: void (*get_context)(void *buffer) */
-		CPUINFO_PTR_SET_CONTEXT,							/* R/O: void (*set_context)(void *buffer) */
 		CPUINFO_PTR_INIT,									/* R/O: void (*init)(const device_config *device, int index, int clock, int (*irqcallback)(const device_config *device, int)) */
 		CPUINFO_PTR_EXECUTE,								/* R/O: int (*execute)(const device_config *device, int cycles) */
 		CPUINFO_PTR_BURN,									/* R/O: void (*burn)(const device_config *device, int cycles) */
@@ -502,14 +500,6 @@ typedef enum _cpu_type cpu_type;
 #define CPU_VALIDITY_CHECK(name)		int CPU_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const void *config)
 #define CPU_VALIDITY_CHECK_CALL(name)	CPU_VALIDITY_CHECK_NAME(name)(driver, config)
 
-#define CPU_GET_CONTEXT_NAME(name)	cpu_get_context_##name
-#define CPU_GET_CONTEXT(name)		void CPU_GET_CONTEXT_NAME(name)(void *dst)
-#define CPU_GET_CONTEXT_CALL(name)	CPU_GET_CONTEXT_NAME(name)(buffer)
-
-#define CPU_SET_CONTEXT_NAME(name)	cpu_set_context_##name
-#define CPU_SET_CONTEXT(name)		void CPU_SET_CONTEXT_NAME(name)(void *src)
-#define CPU_SET_CONTEXT_CALL(name)	CPU_SET_CONTEXT_NAME(name)(buffer)
-
 
 /* helpers for accessing common CPU state */
 #define cpu_get_context_size(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_CONTEXT_SIZE)
@@ -607,8 +597,6 @@ typedef void (*cpu_debug_init_func)(const device_config *device);
 typedef offs_t (*cpu_disassemble_func)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
 typedef int (*cpu_validity_check_func)(const game_driver *driver, const void *config);
-typedef void (*cpu_get_context_func)(void *buffer);
-typedef void (*cpu_set_context_func)(void *buffer);
 
 
 /* cpuinfo union used to pass data to/from the get_info/set_info functions */
@@ -620,8 +608,6 @@ union _cpuinfo
 	char *					s;							/* generic strings */
 
 	cpu_set_info_func		setinfo;					/* CPUINFO_PTR_SET_INFO */
-	cpu_get_context_func	getcontext;					/* CPUINFO_PTR_GET_CONTEXT */
-	cpu_set_context_func	setcontext;					/* CPUINFO_PTR_SET_CONTEXT */
 	cpu_init_func			init;						/* CPUINFO_PTR_INIT */
 	cpu_reset_func			reset;						/* CPUINFO_PTR_RESET */
 	cpu_exit_func			exit;						/* CPUINFO_PTR_EXIT */
@@ -654,8 +640,6 @@ struct _cpu_class_header
 	/* table of core functions */
 	cpu_get_info_func		get_info;
 	cpu_set_info_func		set_info;
-	cpu_get_context_func	get_context;
-	cpu_set_context_func	set_context;
 	cpu_init_func			init;
 	cpu_reset_func			reset;
 	cpu_exit_func			exit;
@@ -742,10 +726,6 @@ void *cputype_get_info_ptr(cpu_type cputype, UINT32 state);
 genf *cputype_get_info_fct(cpu_type cputype, UINT32 state);
 const char *cputype_get_info_string(cpu_type cputype, UINT32 state);
 
-
-/* temporary */
-extern CPU_GET_CONTEXT( dummy );
-extern CPU_SET_CONTEXT( dummy );
 
 
 /***************************************************************************

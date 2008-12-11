@@ -1881,8 +1881,6 @@ CPU_GET_INFO( cquestsnd )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestsnd);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestsnd);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestsnd);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestsnd);			break;
@@ -1999,8 +1997,6 @@ CPU_GET_INFO( cquestrot )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestrot);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestrot);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestrot);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestrot);			break;
@@ -2119,8 +2115,6 @@ CPU_GET_INFO( cquestlin )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestlin);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestlin);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestlin);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestlin);			break;

@@ -911,8 +911,6 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_INT_REGISTER + APEXC_ML_FULL:		info->i = effective_address(cpustate, cpustate->ml);	break;
 
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(apexc);			break;
-	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy);	break;
-	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy);	break;
 	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(apexc);				break;
 	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(apexc);				break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(apexc);			break;

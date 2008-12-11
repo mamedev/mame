@@ -2239,20 +2239,6 @@ static CPU_EXECUTE( sh2 )
 	return cycles - sh2_icount;
 }
 
-/* Get registers, return context size */
-static CPU_GET_CONTEXT( sh2 )
-{
-	if( dst )
-		*(SH2 **)dst = sh2;
-}
-
-/* Set registers */
-static CPU_SET_CONTEXT( sh2 )
-{
-	if( src )
-		sh2 = *(SH2 **)src;
-}
-
 static CPU_DISASSEMBLE( sh2 )
 {
 	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
@@ -2412,8 +2398,6 @@ CPU_GET_INFO( sh2 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sh2);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(sh2);		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(sh2);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sh2);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sh2);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh2);			break;

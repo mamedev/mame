@@ -757,9 +757,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 		}
 
 		/* check the CPU for incompleteness */
-		if (cputype_get_info_fct(cpu->type, CPUINFO_PTR_GET_CONTEXT) == NULL ||
-			cputype_get_info_fct(cpu->type, CPUINFO_PTR_SET_CONTEXT) == NULL ||
-			cputype_get_info_fct(cpu->type, CPUINFO_PTR_RESET) == NULL ||
+		if (cputype_get_info_fct(cpu->type, CPUINFO_PTR_RESET) == NULL ||
 			cputype_get_info_fct(cpu->type, CPUINFO_PTR_EXECUTE) == NULL)
 		{
 			mame_printf_error("%s: %s uses an incomplete CPU\n", driver->source_file, driver->name);
