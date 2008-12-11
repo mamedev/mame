@@ -42,7 +42,7 @@ enum
  *  the value if known (available in HEX dumps of the ROM).
  */
 
-void pic16c5x_config(int data);
+void pic16c5x_set_config(const device_config *cpu, int data);
 
 
 /****************************************************************************
@@ -50,21 +50,21 @@ void pic16c5x_config(int data);
  */
 
 #define PIC16C5x_T0		0x10
-#define PIC16C5x_T0_In (memory_read_byte_8le(R.io, PIC16C5x_T0))
+#define PIC16C5x_T0_In (memory_read_byte_8le(cpustate->io, PIC16C5x_T0))
 
 
 /****************************************************************************
  *  Input a word from given I/O port
  */
 
-#define PIC16C5x_In(Port) ((UINT8)memory_read_byte_8le(R.io, (Port)))
+#define PIC16C5x_In(Port) ((UINT8)memory_read_byte_8le(cpustate->io, (Port)))
 
 
 /****************************************************************************
  *  Output a word to given I/O port
  */
 
-#define PIC16C5x_Out(Port,Value) (memory_write_byte_8le(R.io, (Port),Value))
+#define PIC16C5x_Out(Port,Value) (memory_write_byte_8le(cpustate->io, (Port),Value))
 
 
 
@@ -72,14 +72,14 @@ void pic16c5x_config(int data);
  *  Read a word from given RAM memory location
  */
 
-#define PIC16C5x_RAM_RDMEM(A) ((UINT8)memory_read_byte_8le(R.data, A))
+#define PIC16C5x_RAM_RDMEM(A) ((UINT8)memory_read_byte_8le(cpustate->data, A))
 
 
 /****************************************************************************
  *  Write a word to given RAM memory location
  */
 
-#define PIC16C5x_RAM_WRMEM(A,V) (memory_write_byte_8le(R.data, A,V))
+#define PIC16C5x_RAM_WRMEM(A,V) (memory_write_byte_8le(cpustate->data, A,V))
 
 
 
@@ -89,7 +89,7 @@ void pic16c5x_config(int data);
  *  can be used to greatly speed up emulation
  */
 
-#define PIC16C5x_RDOP(A) (memory_decrypted_read_word(R.program, (A)<<1))
+#define PIC16C5x_RDOP(A) (memory_decrypted_read_word(cpustate->program, (A)<<1))
 
 
 /****************************************************************************
@@ -98,7 +98,7 @@ void pic16c5x_config(int data);
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define PIC16C5x_RDOP_ARG(A) (memory_raw_read_word(R.program, (A)<<1))
+#define PIC16C5x_RDOP_ARG(A) (memory_raw_read_word(cpustate->program, (A)<<1))
 
 
 

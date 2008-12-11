@@ -55,16 +55,13 @@
 #include "pic16c5x.h"
 
 
-#define CLK 1	/* 1 cycle equals 4 Q-clock ticks */
-
-
 #ifndef INLINE
 #define INLINE static inline
 #endif
 
 
-#define M_RDRAM(A)		(((A) < 8) ? R.internalram[A] : PIC16C5x_RAM_RDMEM(A))
-#define M_WRTRAM(A,V)	do { if ((A) < 8) R.internalram[A] = (V); else PIC16C5x_RAM_WRMEM(A,V); } while (0)
+#define M_RDRAM(A)		(((A) < 8) ? cpustate->internalram[A] : PIC16C5x_RAM_RDMEM(A))
+#define M_WRTRAM(A,V)	do { if ((A) < 8) cpustate->internalram[A] = (V); else PIC16C5x_RAM_WRMEM(A,V); } while (0)
 #define M_RDOP(A)		PIC16C5x_RDOP(A)
 #define M_RDOP_ARG(A)	PIC16C5x_RDOP_ARG(A)
 #define P_IN(A)			PIC16C5x_In(A)
@@ -75,7 +72,8 @@
 
 
 
-typedef struct
+typedef struct _pic16c5x_state pic16c5x_state;
+struct _pic16c5x_state
 {
 	/******************** CPU Internal Registers *******************/
 	UINT16	PC;
@@ -92,24 +90,41 @@ typedef struct
 	UINT16	prescaler;	/* Note: this is really an 8-bit register */
 	PAIR	opcode;
 	UINT8	internalram[8];
-	const device_config *device;
-	const address_space *program;
-	const address_space *data;
-	const address_space *io;
-} pic16C5x_Regs;
 
-static pic16C5x_Regs R;
-static UINT16 temp_config;
-static UINT8  old_T0;
-static INT8   old_data;
-static UINT8  picRAMmask;
-static int    inst_cycles;
-static int    delay_timer;
-static int    picmodel;
-static int    pic16C5x_reset_vector;
-static int    pic16C5x_icount;
-typedef void (*opcode_fn) (void);
-static const unsigned cycles_000_other[16];
+	int		icount;
+	int		reset_vector;
+	int		picmodel;
+	int		delay_timer;
+	UINT16	temp_config;
+	UINT8	old_T0;
+	INT8	old_data;
+	UINT8	picRAMmask;
+	int		inst_cycles;
+
+
+	const	device_config *device;
+	const	address_space *program;
+	const	address_space *data;
+	const	address_space *io;
+};
+
+
+/* opcode table entry */
+typedef struct _pic16c5x_opcode pic16c5x_opcode;
+struct _pic16c5x_opcode
+{
+	UINT8	cycles;
+	void 	(*function)(pic16c5x_state *);
+};
+/* opcode table entry (Opcode 00? has sub-opcodes) */
+typedef struct _pic16c5x_opcode_00x pic16c5x_opcode_00x;
+struct _pic16c5x_opcode_00x
+{
+	UINT8	cycles;
+	void 	(*function)(pic16c5x_state *);
+};
+
+
 
 
 #define TMR0	internalram[1]
@@ -119,12 +134,12 @@ static const unsigned cycles_000_other[16];
 #define PORTA	internalram[5]
 #define PORTB	internalram[6]
 #define PORTC	internalram[7]
-#define INDF	M_RDRAM(R.FSR)
+#define INDF	M_RDRAM(cpustate->FSR)
 
-#define ADDR	(R.opcode.b.l & 0x1f)
+#define ADDR	(cpustate->opcode.b.l & 0x1f)
 
-#define POSITIVE_EDGE_T0  (( (int)(T0_in-old_T0) > 0) ? 1 : 0)
-#define NEGATIVE_EDGE_T0  (( (int)(old_T0-T0_in) > 0) ? 1 : 0)
+#define POSITIVE_EDGE_T0  (( (int)(T0_in - cpustate->old_T0) > 0) ? 1 : 0)
+#define NEGATIVE_EDGE_T0  (( (int)(cpustate->old_T0 - T0_in) > 0) ? 1 : 0)
 
 
 /********  The following is the Status Flag register definition.  *********/
@@ -137,12 +152,12 @@ static const unsigned cycles_000_other[16];
 #define DC_FLAG		0x02	/* DC   Digit Carry/Borrow flag (Nibble) */
 #define C_FLAG		0x01	/* C    Carry/Borrow Flag (Byte) */
 
-#define PA		(R.STATUS & PA_REG)
-#define TO		(R.STATUS & TO_FLAG)
-#define PD		(R.STATUS & PD_FLAG)
-#define ZERO	(R.STATUS & Z_FLAG)
-#define DC		(R.STATUS & DC_FLAG)
-#define CARRY	(R.STATUS & C_FLAG)
+#define PA		(cpustate->STATUS & PA_REG)
+#define TO		(cpustate->STATUS & TO_FLAG)
+#define PD		(cpustate->STATUS & PD_FLAG)
+#define ZERO	(cpustate->STATUS & Z_FLAG)
+#define DC		(cpustate->STATUS & DC_FLAG)
+#define CARRY	(cpustate->STATUS & C_FLAG)
 
 
 /********  The following is the Option Flag register definition.  *********/
@@ -153,10 +168,10 @@ static const unsigned cycles_000_other[16];
 #define PSA_FLAG	0x08	/* PSA      Prescaler Assignment bit */
 #define PS_REG		0x07	/* PS       Prescaler Rate select */
 
-#define T0CS	(R.OPTION & T0CS_FLAG)
-#define T0SE	(R.OPTION & T0SE_FLAG)
-#define PSA		(R.OPTION & PSA_FLAG)
-#define PS		(R.OPTION & PS_REG)
+#define T0CS	(cpustate->OPTION & T0CS_FLAG)
+#define T0SE	(cpustate->OPTION & T0SE_FLAG)
+#define PSA		(cpustate->OPTION & PSA_FLAG)
+#define PS		(cpustate->OPTION & PS_REG)
 
 
 /********  The following is the Config Flag register definition.  *********/
@@ -166,8 +181,8 @@ static const unsigned cycles_000_other[16];
 #define WDTE_FLAG	0x04	/* WDTE     WatchDog Timer enable */
 #define FOSC_FLAG	0x03	/* FOSC     Oscillator source select */
 
-#define WDTE	(R.CONFIG & WDTE_FLAG)
-#define FOSC	(R.CONFIG & FOSC_FLAG)
+#define WDTE	(cpustate->CONFIG & WDTE_FLAG)
+#define FOSC	(cpustate->CONFIG & FOSC_FLAG)
 
 
 /************************************************************************
@@ -175,108 +190,108 @@ static const unsigned cycles_000_other[16];
  ************************************************************************/
 
 /* Easy bit position selectors */
-#define POS	 ((R.opcode.b.l >> 5) & 7)
+#define POS	 ((cpustate->opcode.b.l >> 5) & 7)
 static const unsigned int bit_clr[8] = { 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f };
 static const unsigned int bit_set[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
 
-INLINE void CLR(UINT16 flag) { R.STATUS &= ~flag; }
-INLINE void SET(UINT16 flag) { R.STATUS |=  flag; }
+INLINE void CLR(pic16c5x_state *cpustate, UINT16 flag) { cpustate->STATUS &= ~flag; }
+INLINE void SET(pic16c5x_state *cpustate, UINT16 flag) { cpustate->STATUS |=  flag; }
 
 
 
-INLINE void CALCULATE_Z_FLAG(void)
+INLINE void CALCULATE_Z_FLAG(pic16c5x_state *cpustate)
 {
-	if (R.ALU == 0) SET(Z_FLAG);
-	else CLR(Z_FLAG);
+	if (cpustate->ALU == 0) SET(cpustate, Z_FLAG);
+	else CLR(cpustate, Z_FLAG);
 }
 
-INLINE void CALCULATE_ADD_CARRY(void)
+INLINE void CALCULATE_ADD_CARRY(pic16c5x_state *cpustate)
 {
-	if ((UINT8)(old_data) > (UINT8)(R.ALU)) {
-		SET(C_FLAG);
+	if ((UINT8)(cpustate->old_data) > (UINT8)(cpustate->ALU)) {
+		SET(cpustate, C_FLAG);
 	}
 	else {
-		CLR(C_FLAG);
+		CLR(cpustate, C_FLAG);
 	}
 }
 
-INLINE void CALCULATE_ADD_DIGITCARRY(void)
+INLINE void CALCULATE_ADD_DIGITCARRY(pic16c5x_state *cpustate)
 {
-	if (((UINT8)(old_data) & 0x0f) > ((UINT8)(R.ALU) & 0x0f)) {
-		SET(DC_FLAG);
+	if (((UINT8)(cpustate->old_data) & 0x0f) > ((UINT8)(cpustate->ALU) & 0x0f)) {
+		SET(cpustate, DC_FLAG);
 	}
 	else {
-		CLR(DC_FLAG);
+		CLR(cpustate, DC_FLAG);
 	}
 }
 
-INLINE void CALCULATE_SUB_CARRY(void)
+INLINE void CALCULATE_SUB_CARRY(pic16c5x_state *cpustate)
 {
-	if ((UINT8)(old_data) < (UINT8)(R.ALU)) {
-		CLR(C_FLAG);
+	if ((UINT8)(cpustate->old_data) < (UINT8)(cpustate->ALU)) {
+		CLR(cpustate, C_FLAG);
 	}
 	else {
-		SET(C_FLAG);
+		SET(cpustate, C_FLAG);
 	}
 }
 
-INLINE void CALCULATE_SUB_DIGITCARRY(void)
+INLINE void CALCULATE_SUB_DIGITCARRY(pic16c5x_state *cpustate)
 {
-	if (((UINT8)(old_data) & 0x0f) < ((UINT8)(R.ALU) & 0x0f)) {
-		CLR(DC_FLAG);
+	if (((UINT8)(cpustate->old_data) & 0x0f) < ((UINT8)(cpustate->ALU) & 0x0f)) {
+		CLR(cpustate, DC_FLAG);
 	}
 	else {
-		SET(DC_FLAG);
+		SET(cpustate, DC_FLAG);
 	}
 }
 
 
 
-INLINE UINT16 POP_STACK(void)
+INLINE UINT16 POP_STACK(pic16c5x_state *cpustate)
 {
-	UINT16 data = R.STACK[1];
-	R.STACK[1] = R.STACK[0];
+	UINT16 data = cpustate->STACK[1];
+	cpustate->STACK[1] = cpustate->STACK[0];
 	return (data & ADDR_MASK);
 }
-INLINE void PUSH_STACK(UINT16 data)
+INLINE void PUSH_STACK(pic16c5x_state *cpustate, UINT16 data)
 {
-	R.STACK[0] = R.STACK[1];
-	R.STACK[1] = (data & ADDR_MASK);
+	cpustate->STACK[0] = cpustate->STACK[1];
+	cpustate->STACK[1] = (data & ADDR_MASK);
 }
 
 
-INLINE UINT8 GET_REGFILE(offs_t addr)	/* Read from internal memory */
+INLINE UINT8 GET_REGFILE(pic16c5x_state *cpustate, offs_t addr)	/* Read from internal memory */
 {
 	UINT8 data;
 
-	if ((picmodel == 0x16C57) || (picmodel == 0x16C58))
+	if ((cpustate->picmodel == 0x16C57) || (cpustate->picmodel == 0x16C58))
 	{
-		addr |= (R.FSR & 0x60);		/* FSR used for banking */
+		addr |= (cpustate->FSR & 0x60);		/* FSR used for banking */
 	}
 	if ((addr & 0x10) == 0) addr &= 0x0f;
 
 	switch(addr)
 	{
-		case 00:	addr = (R.FSR & picRAMmask);
+		case 00:	addr = (cpustate->FSR & cpustate->picRAMmask);
 					if (addr == 0) { data = 0; break; }
 					if ((addr & 0x10) == 0) addr &= 0x0f;
 					data = M_RDRAM(addr);			/* Indirect address */
 					break;
-		case 04:	data = (R.FSR | (~picRAMmask)); break;
+		case 04:	data = (cpustate->FSR | (~cpustate->picRAMmask)); break;
 		case 05:	data = P_IN(0);
-					data &= R.TRISA;
-					data |= (~R.TRISA & R.PORTA);
+					data &= cpustate->TRISA;
+					data |= (~cpustate->TRISA & cpustate->PORTA);
 					data &= 0xf;		/* 4-bit port (only lower 4 bits used) */
 					break;
 		case 06:	data = P_IN(1);
-					data &= R.TRISB;
-					data |= (~R.TRISB & R.PORTB);
+					data &= cpustate->TRISB;
+					data |= (~cpustate->TRISB & cpustate->PORTB);
 					break;
-		case 07:	if ((picmodel == 0x16C55) || (picmodel == 0x16C57)) {
+		case 07:	if ((cpustate->picmodel == 0x16C55) || (cpustate->picmodel == 0x16C57)) {
 						data = P_IN(2);
-						data &= R.TRISC;
-						data |= (~R.TRISC & R.PORTC);
+						data &= cpustate->TRISC;
+						data |= (~cpustate->TRISC & cpustate->PORTC);
 					}
 					else {		/* PIC16C54, PIC16C56, PIC16C58 */
 						data = M_RDRAM(addr);
@@ -288,33 +303,33 @@ INLINE UINT8 GET_REGFILE(offs_t addr)	/* Read from internal memory */
 	return data;
 }
 
-INLINE void STORE_REGFILE(offs_t addr, UINT8 data)	/* Write to internal memory */
+INLINE void STORE_REGFILE(pic16c5x_state *cpustate, offs_t addr, UINT8 data)	/* Write to internal memory */
 {
-	if ((picmodel == 0x16C57) || (picmodel == 0x16C58))
+	if ((cpustate->picmodel == 0x16C57) || (cpustate->picmodel == 0x16C58))
 	{
-		addr |= (R.FSR & 0x60);
+		addr |= (cpustate->FSR & 0x60);
 	}
 	if ((addr & 0x10) == 0) addr &= 0x0f;
 
 	switch(addr)
 	{
-		case 00:	addr = (R.FSR & picRAMmask);
+		case 00:	addr = (cpustate->FSR & cpustate->picRAMmask);
 					if (addr == 0) break;
 					if ((addr & 0x10) == 0) addr &= 0x0f;
 					M_WRTRAM(addr, data); break;	/* Indirect address */
-		case 01:	delay_timer = 2;		/* Timer starts after next two instructions */
-					if (PSA == 0) R.prescaler = 0;	/* Must clear the Prescaler */
-					R.TMR0 = data; break;
-		case 02:	R.PCL = data;
-					R.PC = ((R.STATUS & PA_REG) << 4) | data; break;
-		case 03:	R.STATUS &= ~PA_REG; R.STATUS |= (data & PA_REG); break;
-		case 04:	R.FSR = (data | (~picRAMmask)); break;
+		case 01:	cpustate->delay_timer = 2;		/* Timer starts after next two instructions */
+					if (PSA == 0) cpustate->prescaler = 0;	/* Must clear the Prescaler */
+					cpustate->TMR0 = data; break;
+		case 02:	cpustate->PCL = data;
+					cpustate->PC = ((cpustate->STATUS & PA_REG) << 4) | data; break;
+		case 03:	cpustate->STATUS &= ~PA_REG; cpustate->STATUS |= (data & PA_REG); break;
+		case 04:	cpustate->FSR = (data | (~cpustate->picRAMmask)); break;
 		case 05:	data &= 0xf;		/* 4-bit port (only lower 4 bits used) */
-					P_OUT(0,data & (~R.TRISA)); R.PORTA = data; break;
-		case 06:	P_OUT(1,data & (~R.TRISB)); R.PORTB = data; break;
-		case 07:	if ((picmodel == 0x16C55) || (picmodel == 0x16C57)) {
-						P_OUT(2,data & (~R.TRISC));
-						R.PORTC = data;
+					P_OUT(0,data & (~cpustate->TRISA)); cpustate->PORTA = data; break;
+		case 06:	P_OUT(1,data & (~cpustate->TRISB)); cpustate->PORTB = data; break;
+		case 07:	if ((cpustate->picmodel == 0x16C55) || (cpustate->picmodel == 0x16C57)) {
+						P_OUT(2,data & (~cpustate->TRISC));
+						cpustate->PORTC = data;
 					}
 					else {		/* PIC16C54, PIC16C56, PIC16C58 */
 						M_WRTRAM(addr, data);
@@ -325,15 +340,15 @@ INLINE void STORE_REGFILE(offs_t addr, UINT8 data)	/* Write to internal memory *
 }
 
 
-INLINE void STORE_RESULT(offs_t addr, UINT8 data)
+INLINE void STORE_RESULT(pic16c5x_state *cpustate, offs_t addr, UINT8 data)
 {
-	if (R.opcode.b.l & 0x20)
+	if (cpustate->opcode.b.l & 0x20)
 	{
-		STORE_REGFILE(addr, data);
+		STORE_REGFILE(cpustate, addr, data);
 	}
 	else
 	{
-		R.W = data;
+		cpustate->W = data;
 	}
 }
 
@@ -346,343 +361,319 @@ INLINE void STORE_RESULT(offs_t addr, UINT8 data)
 /* the opcode call function. This function is never called. */
 
 
-static void illegal(void)
+static void illegal(pic16c5x_state *cpustate)
 {
-	logerror("PIC16C5x:  PC=%03x,  Illegal opcode = %04x\n", (R.PC-1), R.opcode.w.l);
+	logerror("PIC16C5x:  PC=%03x,  Illegal opcode = %04x\n", (cpustate->PC-1), cpustate->opcode.w.l);
 }
 
 
-static void addwf(void)
+static void addwf(pic16c5x_state *cpustate)
 {
-	old_data = GET_REGFILE(ADDR);
-	R.ALU = old_data + R.W;
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
-	CALCULATE_ADD_CARRY();
-	CALCULATE_ADD_DIGITCARRY();
+	cpustate->old_data = GET_REGFILE(cpustate, ADDR);
+	cpustate->ALU = cpustate->old_data + cpustate->W;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
+	CALCULATE_ADD_CARRY(cpustate);
+	CALCULATE_ADD_DIGITCARRY(cpustate);
 }
 
-static void andwf(void)
+static void andwf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR) & R.W;
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR) & cpustate->W;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
 }
 
-static void andlw(void)
+static void andlw(pic16c5x_state *cpustate)
 {
-	R.ALU = R.opcode.b.l & R.W;
-	R.W = R.ALU;
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = cpustate->opcode.b.l & cpustate->W;
+	cpustate->W = cpustate->ALU;
+	CALCULATE_Z_FLAG(cpustate);
 }
 
-static void bcf(void)
+static void bcf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR);
-	R.ALU &= bit_clr[POS];
-	STORE_REGFILE(ADDR, R.ALU);
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR);
+	cpustate->ALU &= bit_clr[POS];
+	STORE_REGFILE(cpustate, ADDR, cpustate->ALU);
 }
 
-static void bsf(void)
+static void bsf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR);
-	R.ALU |= bit_set[POS];
-	STORE_REGFILE(ADDR, R.ALU);
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR);
+	cpustate->ALU |= bit_set[POS];
+	STORE_REGFILE(cpustate, ADDR, cpustate->ALU);
 }
 
-static void btfss(void)
+static void btfss(pic16c5x_state *cpustate)
 {
-	if ((GET_REGFILE(ADDR) & bit_set[POS]) == bit_set[POS])
+	if ((GET_REGFILE(cpustate, ADDR) & bit_set[POS]) == bit_set[POS])
 	{
-		R.PC++ ;
-		R.PCL = R.PC & 0xff;
-		inst_cycles += cycles_000_other[0];		/* Add NOP cycles */
+		cpustate->PC++ ;
+		cpustate->PCL = cpustate->PC & 0xff;
+		cpustate->inst_cycles += 1;		/* Add NOP cycles */
 	}
 }
 
-static void btfsc(void)
+static void btfsc(pic16c5x_state *cpustate)
 {
-	if ((GET_REGFILE(ADDR) & bit_set[POS]) == 0)
+	if ((GET_REGFILE(cpustate, ADDR) & bit_set[POS]) == 0)
 	{
-		R.PC++ ;
-		R.PCL = R.PC & 0xff;
-		inst_cycles += cycles_000_other[0];		/* Add NOP cycles */
+		cpustate->PC++ ;
+		cpustate->PCL = cpustate->PC & 0xff;
+		cpustate->inst_cycles += 1;		/* Add NOP cycles */
 	}
 }
 
-static void call(void)
+static void call(pic16c5x_state *cpustate)
 {
-	PUSH_STACK(R.PC);
-	R.PC = ((R.STATUS & PA_REG) << 4) | R.opcode.b.l;
-	R.PC &= 0x6ff;
-	R.PCL = R.PC & 0xff;
+	PUSH_STACK(cpustate, cpustate->PC);
+	cpustate->PC = ((cpustate->STATUS & PA_REG) << 4) | cpustate->opcode.b.l;
+	cpustate->PC &= 0x6ff;
+	cpustate->PCL = cpustate->PC & 0xff;
 }
 
-static void clrw(void)
+static void clrw(pic16c5x_state *cpustate)
 {
-	R.W = 0;
-	SET(Z_FLAG);
+	cpustate->W = 0;
+	SET(cpustate, Z_FLAG);
 }
 
-static void clrf(void)
+static void clrf(pic16c5x_state *cpustate)
 {
-	STORE_REGFILE(ADDR, 0);
-	SET(Z_FLAG);
+	STORE_REGFILE(cpustate, ADDR, 0);
+	SET(cpustate, Z_FLAG);
 }
 
-static void clrwdt(void)
+static void clrwdt(pic16c5x_state *cpustate)
 {
-	R.WDT = 0;
-	if (PSA) R.prescaler = 0;
-	SET(TO_FLAG);
-	SET(PD_FLAG);
+	cpustate->WDT = 0;
+	if (PSA) cpustate->prescaler = 0;
+	SET(cpustate, TO_FLAG);
+	SET(cpustate, PD_FLAG);
 }
 
-static void comf(void)
+static void comf(pic16c5x_state *cpustate)
 {
-	R.ALU = ~(GET_REGFILE(ADDR));
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = ~(GET_REGFILE(cpustate, ADDR));
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
 }
 
-static void decf(void)
+static void decf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR) - 1;
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR) - 1;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
 }
 
-static void decfsz(void)
+static void decfsz(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR) - 1;
-	STORE_RESULT(ADDR, R.ALU);
-	if (R.ALU == 0)
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR) - 1;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	if (cpustate->ALU == 0)
 	{
-		R.PC++ ;
-		R.PCL = R.PC & 0xff;
-		inst_cycles += cycles_000_other[0];		/* Add NOP cycles */
+		cpustate->PC++ ;
+		cpustate->PCL = cpustate->PC & 0xff;
+		cpustate->inst_cycles += 1;		/* Add NOP cycles */
 	}
 }
 
-static void goto_op(void)
+static void goto_op(pic16c5x_state *cpustate)
 {
-	R.PC = ((R.STATUS & PA_REG) << 4) | (R.opcode.w.l & 0x1ff);
-	R.PC &= ADDR_MASK;
-	R.PCL = R.PC & 0xff;
+	cpustate->PC = ((cpustate->STATUS & PA_REG) << 4) | (cpustate->opcode.w.l & 0x1ff);
+	cpustate->PC &= ADDR_MASK;
+	cpustate->PCL = cpustate->PC & 0xff;
 }
 
-static void incf(void)
+static void incf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR) + 1;
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR) + 1;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
 }
 
-static void incfsz(void)
+static void incfsz(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR) + 1;
-	STORE_RESULT(ADDR, R.ALU);
-	if (R.ALU == 0)
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR) + 1;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	if (cpustate->ALU == 0)
 	{
-		R.PC++ ;
-		R.PCL = R.PC & 0xff;
-		inst_cycles += cycles_000_other[0];		/* Add NOP cycles */
+		cpustate->PC++ ;
+		cpustate->PCL = cpustate->PC & 0xff;
+		cpustate->inst_cycles += 1;		/* Add NOP cycles */
 	}
 }
 
-static void iorlw(void)
+static void iorlw(pic16c5x_state *cpustate)
 {
-	R.ALU = R.opcode.b.l | R.W;
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = cpustate->opcode.b.l | cpustate->W;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
 }
 
-static void iorwf(void)
+static void iorwf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR) | R.W;
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR) | cpustate->W;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
 }
 
-static void movf(void)
+static void movf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR);
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR);
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
 }
 
-static void movlw(void)
+static void movlw(pic16c5x_state *cpustate)
 {
-	R.W = R.opcode.b.l;
+	cpustate->W = cpustate->opcode.b.l;
 }
 
-static void movwf(void)
+static void movwf(pic16c5x_state *cpustate)
 {
-	STORE_REGFILE(ADDR, R.W);
+	STORE_REGFILE(cpustate, ADDR, cpustate->W);
 }
 
-static void nop(void)
+static void nop(pic16c5x_state *cpustate)
 {
 	/* Do nothing */
 }
 
-static void option(void)
+static void option(pic16c5x_state *cpustate)
 {
-	R.OPTION = R.W & 0x3f;
+	cpustate->OPTION = cpustate->W & 0x3f;
 }
 
-static void retlw(void)
+static void retlw(pic16c5x_state *cpustate)
 {
-	R.W = R.opcode.b.l;
-	R.PC = POP_STACK();
-	R.PCL = R.PC & 0xff;
+	cpustate->W = cpustate->opcode.b.l;
+	cpustate->PC = POP_STACK(cpustate);
+	cpustate->PCL = cpustate->PC & 0xff;
 }
 
-static void rlf(void)
+static void rlf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR);
-	R.ALU <<= 1;
-	if (R.STATUS & C_FLAG) R.ALU |= 1;
-	if (GET_REGFILE(ADDR) & 0x80) SET(C_FLAG);
-	else CLR(C_FLAG);
-	STORE_RESULT(ADDR, R.ALU);
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR);
+	cpustate->ALU <<= 1;
+	if (cpustate->STATUS & C_FLAG) cpustate->ALU |= 1;
+	if (GET_REGFILE(cpustate, ADDR) & 0x80) SET(cpustate, C_FLAG);
+	else CLR(cpustate, C_FLAG);
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
 }
 
-static void rrf(void)
+static void rrf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR);
-	R.ALU >>= 1;
-	if (R.STATUS & C_FLAG) R.ALU |= 0x80;
-	if (GET_REGFILE(ADDR) & 1) SET(C_FLAG);
-	else CLR(C_FLAG);
-	STORE_RESULT(ADDR, R.ALU);
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR);
+	cpustate->ALU >>= 1;
+	if (cpustate->STATUS & C_FLAG) cpustate->ALU |= 0x80;
+	if (GET_REGFILE(cpustate, ADDR) & 1) SET(cpustate, C_FLAG);
+	else CLR(cpustate, C_FLAG);
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
 }
 
-static void sleepic(void)
+static void sleepic(pic16c5x_state *cpustate)
 {
-	if (WDTE) R.WDT = 0;
-	if (PSA) R.prescaler = 0;
-	SET(TO_FLAG);
-	CLR(PD_FLAG);
+	if (WDTE) cpustate->WDT = 0;
+	if (PSA) cpustate->prescaler = 0;
+	SET(cpustate, TO_FLAG);
+	CLR(cpustate, PD_FLAG);
 }
 
-static void subwf(void)
+static void subwf(pic16c5x_state *cpustate)
 {
-	old_data = GET_REGFILE(ADDR);
-	R.ALU = old_data - R.W;
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
-	CALCULATE_SUB_CARRY();
-	CALCULATE_SUB_DIGITCARRY();
+	cpustate->old_data = GET_REGFILE(cpustate, ADDR);
+	cpustate->ALU = cpustate->old_data - cpustate->W;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
+	CALCULATE_SUB_CARRY(cpustate);
+	CALCULATE_SUB_DIGITCARRY(cpustate);
 }
 
-static void swapf(void)
+static void swapf(pic16c5x_state *cpustate)
 {
-	R.ALU  = ((GET_REGFILE(ADDR) << 4) & 0xf0);
-	R.ALU |= ((GET_REGFILE(ADDR) >> 4) & 0x0f);
-	STORE_RESULT(ADDR, R.ALU);
+	cpustate->ALU  = ((GET_REGFILE(cpustate, ADDR) << 4) & 0xf0);
+	cpustate->ALU |= ((GET_REGFILE(cpustate, ADDR) >> 4) & 0x0f);
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
 }
 
-static void tris(void)
+static void tris(pic16c5x_state *cpustate)
 {
-	switch(R.opcode.b.l & 0x7)
+	switch(cpustate->opcode.b.l & 0x7)
 	{
-		case 05:	if (R.TRISA == R.W) break;
-					else R.TRISA = R.W; P_OUT(0,R.PORTA & (~R.TRISA) & 0xf); break;
-		case 06:	if (R.TRISB == R.W) break;
-					else R.TRISB = R.W; P_OUT(1,R.PORTB & (~R.TRISB)); break;
-		case 07:	if (R.TRISC == R.W) break;
-					else R.TRISC = R.W; P_OUT(2,R.PORTC & (~R.TRISC)); break;
-		default:	illegal(); break;
+		case 05:	if (cpustate->TRISA == cpustate->W) break;
+					else cpustate->TRISA = cpustate->W; P_OUT(0,cpustate->PORTA & (~cpustate->TRISA) & 0xf); break;
+		case 06:	if (cpustate->TRISB == cpustate->W) break;
+					else cpustate->TRISB = cpustate->W; P_OUT(1,cpustate->PORTB & (~cpustate->TRISB)); break;
+		case 07:	if (cpustate->TRISC == cpustate->W) break;
+					else cpustate->TRISC = cpustate->W; P_OUT(2,cpustate->PORTC & (~cpustate->TRISC)); break;
+		default:	illegal(cpustate); break;
 	}
 }
 
-static void xorlw(void)
+static void xorlw(pic16c5x_state *cpustate)
 {
-	R.ALU = R.W ^ R.opcode.b.l;
-	R.W = R.ALU;
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = cpustate->W ^ cpustate->opcode.b.l;
+	cpustate->W = cpustate->ALU;
+	CALCULATE_Z_FLAG(cpustate);
 }
 
-static void xorwf(void)
+static void xorwf(pic16c5x_state *cpustate)
 {
-	R.ALU = GET_REGFILE(ADDR) ^ R.W;
-	STORE_RESULT(ADDR, R.ALU);
-	CALCULATE_Z_FLAG();
+	cpustate->ALU = GET_REGFILE(cpustate, ADDR) ^ cpustate->W;
+	STORE_RESULT(cpustate, ADDR, cpustate->ALU);
+	CALCULATE_Z_FLAG(cpustate);
 }
+
 
 
 
 /***********************************************************************
- *  Cycle Timings
+ *  Opcode Table (Cycles, Instruction)
  ***********************************************************************/
 
-static const unsigned cycles_main[256]=
+static const pic16c5x_opcode opcode_main[256]=
 {
-/*00*/	1*CLK, 0*CLK, 1*CLK, 1*CLK, 1*CLK, 0*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*10*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*20*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*30*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*40*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*50*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*60*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*70*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*80*/	2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*90*/	2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*A0*/	2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*B0*/	2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*C0*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*D0*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*E0*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*F0*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK
-};
-
-static const opcode_fn opcode_main[256]=
-{
-/*00*/  nop,	illegal,movwf,	movwf,	clrw,	illegal,clrf,	clrf,
-/*08*/  subwf,	subwf,	subwf,	subwf,	decf,	decf,	decf,	decf,
-/*10*/  iorwf,	iorwf,	iorwf,	iorwf,	andwf,	andwf,	andwf,	andwf,
-/*18*/  xorwf,	xorwf,	xorwf,	xorwf,	addwf,	addwf,	addwf,	addwf,
-/*20*/  movf,	movf,	movf,	movf,	comf,	comf,	comf,	comf,
-/*28*/  incf,	incf,	incf,	incf,	decfsz,	decfsz,	decfsz,	decfsz,
-/*30*/  rrf,	rrf,	rrf,	rrf,	rlf,	rlf,	rlf,	rlf,
-/*38*/  swapf,	swapf,	swapf,	swapf,	incfsz,	incfsz,	incfsz,	incfsz,
-/*40*/  bcf,	bcf,	bcf,	bcf,	bcf,	bcf,	bcf,	bcf,
-/*48*/  bcf,	bcf,	bcf,	bcf,	bcf,	bcf,	bcf,	bcf,
-/*50*/  bsf,	bsf,	bsf,	bsf,	bsf,	bsf,	bsf,	bsf,
-/*58*/  bsf,	bsf,	bsf,	bsf,	bsf,	bsf,	bsf,	bsf,
-/*60*/  btfsc,	btfsc,	btfsc,	btfsc,	btfsc,	btfsc,	btfsc,	btfsc,
-/*68*/  btfsc,	btfsc,	btfsc,	btfsc,	btfsc,	btfsc,	btfsc,	btfsc,
-/*70*/  btfss,	btfss,	btfss,	btfss,	btfss,	btfss,	btfss,	btfss,
-/*78*/  btfss,	btfss,	btfss,	btfss,	btfss,	btfss,	btfss,	btfss,
-/*80*/  retlw,	retlw,	retlw,	retlw,	retlw,	retlw,	retlw,	retlw,
-/*88*/  retlw,	retlw,	retlw,	retlw,	retlw,	retlw,	retlw,	retlw,
-/*90*/  call,	call,	call,	call,	call,	call,	call,	call,
-/*98*/  call,	call,	call,	call,	call,	call,	call,	call,
-/*A0*/  goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,
-/*A8*/  goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,
-/*B0*/  goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,
-/*B8*/  goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,goto_op,
-/*C0*/  movlw,	movlw,	movlw,	movlw,	movlw,	movlw,	movlw,	movlw,
-/*C8*/  movlw,	movlw,	movlw,	movlw,	movlw,	movlw,	movlw,	movlw,
-/*D0*/  iorlw,	iorlw,	iorlw,	iorlw,	iorlw,	iorlw,	iorlw,	iorlw,
-/*D8*/  iorlw,	iorlw,	iorlw,	iorlw,	iorlw,	iorlw,	iorlw,	iorlw,
-/*E0*/  andlw,	andlw,	andlw,	andlw,	andlw,	andlw,	andlw,	andlw,
-/*E8*/  andlw,	andlw,	andlw,	andlw,	andlw,	andlw,	andlw,	andlw,
-/*F0*/  xorlw,	xorlw,	xorlw,	xorlw,	xorlw,	xorlw,	xorlw,	xorlw,
-/*F8*/  xorlw,	xorlw,	xorlw,	xorlw,	xorlw,	xorlw,	xorlw,	xorlw
+/*00*/  {1, nop,	},{0, illegal	},{1, movwf		},{1, movwf		},{1, clrw		},{0, illegal	},{1, clrf		},{1, clrf		},
+/*08*/  {1, subwf	},{1, subwf		},{1, subwf		},{1, subwf		},{1, decf		},{1, decf		},{1, decf		},{1, decf		},
+/*10*/  {1, iorwf	},{1, iorwf		},{1, iorwf		},{1, iorwf		},{1, andwf		},{1, andwf		},{1, andwf		},{1, andwf		},
+/*18*/  {1, xorwf	},{1, xorwf		},{1, xorwf		},{1, xorwf		},{1, addwf		},{1, addwf		},{1, addwf		},{1, addwf		},
+/*20*/  {1, movf	},{1, movf		},{1, movf		},{1, movf		},{1, comf		},{1, comf		},{1, comf		},{1, comf		},
+/*28*/  {1, incf	},{1, incf		},{1, incf		},{1, incf		},{1, decfsz	},{1, decfsz	},{1, decfsz	},{1, decfsz	},
+/*30*/  {1, rrf		},{1, rrf		},{1, rrf		},{1, rrf		},{1, rlf		},{1, rlf		},{1, rlf		},{1, rlf		},
+/*38*/  {1, swapf	},{1, swapf		},{1, swapf		},{1, swapf		},{1, incfsz	},{1, incfsz	},{1, incfsz	},{1, incfsz	},
+/*40*/  {1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},
+/*48*/  {1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},{1, bcf		},
+/*50*/  {1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},
+/*58*/  {1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},{1, bsf		},
+/*60*/  {1, btfsc	},{1, btfsc		},{1, btfsc		},{1, btfsc		},{1, btfsc		},{1, btfsc		},{1, btfsc		},{1, btfsc		},
+/*68*/  {1, btfsc	},{1, btfsc		},{1, btfsc		},{1, btfsc		},{1, btfsc		},{1, btfsc		},{1, btfsc		},{1, btfsc		},
+/*70*/  {1, btfss	},{1, btfss		},{1, btfss		},{1, btfss		},{1, btfss		},{1, btfss		},{1, btfss		},{1, btfss		},
+/*78*/  {1, btfss	},{1, btfss		},{1, btfss		},{1, btfss		},{1, btfss		},{1, btfss		},{1, btfss		},{1, btfss		},
+/*80*/  {2, retlw	},{2, retlw		},{2, retlw		},{2, retlw		},{2, retlw		},{2, retlw		},{2, retlw		},{2, retlw		},
+/*88*/  {2, retlw	},{2, retlw		},{2, retlw		},{2, retlw		},{2, retlw		},{2, retlw		},{2, retlw		},{2, retlw		},
+/*90*/  {2, call	},{2, call		},{2, call		},{2, call		},{2, call		},{2, call		},{2, call		},{2, call		},
+/*98*/  {2, call	},{2, call		},{2, call		},{2, call		},{2, call		},{2, call		},{2, call		},{2, call		},
+/*A0*/  {2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},
+/*A8*/  {2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},
+/*B0*/  {2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},
+/*B8*/  {2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},{2, goto_op	},
+/*C0*/  {1, movlw	},{1, movlw		},{1, movlw		},{1, movlw		},{1, movlw		},{1, movlw		},{1, movlw		},{1, movlw		},
+/*C8*/  {1, movlw	},{1, movlw		},{1, movlw		},{1, movlw		},{1, movlw		},{1, movlw		},{1, movlw		},{1, movlw		},
+/*D0*/  {1, iorlw	},{1, iorlw		},{1, iorlw		},{1, iorlw		},{1, iorlw		},{1, iorlw		},{1, iorlw		},{1, iorlw		},
+/*D8*/  {1, iorlw	},{1, iorlw		},{1, iorlw		},{1, iorlw		},{1, iorlw		},{1, iorlw		},{1, iorlw		},{1, iorlw		},
+/*E0*/  {1, andlw	},{1, andlw		},{1, andlw		},{1, andlw		},{1, andlw		},{1, andlw		},{1, andlw		},{1, andlw		},
+/*E8*/  {1, andlw	},{1, andlw		},{1, andlw		},{1, andlw		},{1, andlw		},{1, andlw		},{1, andlw		},{1, andlw		},
+/*F0*/  {1, xorlw	},{1, xorlw		},{1, xorlw		},{1, xorlw		},{1, xorlw		},{1, xorlw		},{1, xorlw		},{1, xorlw		},
+/*F8*/  {1, xorlw	},{1, xorlw		},{1, xorlw		},{1, xorlw		},{1, xorlw		},{1, xorlw		},{1, xorlw		},{1, xorlw		}
 };
 
 
-static const unsigned cycles_000_other[16]=
+static const pic16c5x_opcode_00x opcode_00x[16]=
 {
-/*00*/	1*CLK, 0*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK
-};
-
-static const opcode_fn opcode_000_other[16]=
-{
-/*00*/  nop,	illegal,option,	sleepic,clrwdt,	tris,	tris,	tris,
-/*08*/  illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal
+/*00*/  {1, nop		},{0, illegal	},{1, option	},{1, sleepic	},{1, clrwdt	},{1, tris		},{1, tris		},{1, tris		},
+/*08*/  {0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	}
 };
 
 
@@ -693,38 +684,45 @@ static const opcode_fn opcode_000_other[16]=
 
 static CPU_INIT( pic16C5x )
 {
-	state_save_register_device_item(device, 0, old_data);
-	state_save_register_device_item(device, 0, R.W);
-	state_save_register_device_item(device, 0, R.ALU);
-	state_save_register_device_item(device, 0, R.OPTION);
-	state_save_register_device_item(device, 0, R.TMR0);
-	state_save_register_device_item(device, 0, R.PCL);
-	state_save_register_device_item(device, 0, R.STATUS);
-	state_save_register_device_item(device, 0, R.FSR);
-	state_save_register_device_item(device, 0, R.PORTA);
-	state_save_register_device_item(device, 0, R.PORTB);
-	state_save_register_device_item(device, 0, R.PORTC);
-	state_save_register_device_item(device, 0, R.TRISA);
-	state_save_register_device_item(device, 0, R.TRISB);
-	state_save_register_device_item(device, 0, R.TRISC);
-	state_save_register_device_item(device, 0, old_T0);
-	state_save_register_device_item(device, 0, picRAMmask);
-	state_save_register_device_item(device, 0, R.WDT);
-	state_save_register_device_item(device, 0, R.prescaler);
-	state_save_register_device_item(device, 0, R.STACK[0]);
-	state_save_register_device_item(device, 0, R.STACK[1]);
-	state_save_register_device_item(device, 0, R.PC);
-	state_save_register_device_item(device, 0, R.PREVPC);
-	state_save_register_device_item(device, 0, R.CONFIG);
-	state_save_register_device_item(device, 0, R.opcode.d);
-	state_save_register_device_item(device, 0, delay_timer);
-	state_save_register_device_item(device, 0, picmodel);
-	state_save_register_device_item(device, 0, pic16C5x_reset_vector);
+	pic16c5x_state *cpustate = device->token;
 
-	R.device = device;
-	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	R.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	R.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	state_save_register_device_item(device, 0, cpustate->W);
+	state_save_register_device_item(device, 0, cpustate->ALU);
+	state_save_register_device_item(device, 0, cpustate->OPTION);
+	state_save_register_device_item(device, 0, cpustate->TMR0);
+	state_save_register_device_item(device, 0, cpustate->PCL);
+	state_save_register_device_item(device, 0, cpustate->STATUS);
+	state_save_register_device_item(device, 0, cpustate->FSR);
+	state_save_register_device_item(device, 0, cpustate->PORTA);
+	state_save_register_device_item(device, 0, cpustate->PORTB);
+	state_save_register_device_item(device, 0, cpustate->PORTC);
+	state_save_register_device_item(device, 0, cpustate->TRISA);
+	state_save_register_device_item(device, 0, cpustate->TRISB);
+	state_save_register_device_item(device, 0, cpustate->TRISC);
+	state_save_register_device_item(device, 0, cpustate->old_T0);
+	state_save_register_device_item(device, 0, cpustate->old_data);
+	state_save_register_device_item(device, 0, cpustate->picRAMmask);
+	state_save_register_device_item(device, 0, cpustate->WDT);
+	state_save_register_device_item(device, 0, cpustate->prescaler);
+	state_save_register_device_item(device, 0, cpustate->STACK[0]);
+	state_save_register_device_item(device, 0, cpustate->STACK[1]);
+	state_save_register_device_item(device, 0, cpustate->PC);
+	state_save_register_device_item(device, 0, cpustate->PREVPC);
+	state_save_register_device_item(device, 0, cpustate->CONFIG);
+	state_save_register_device_item(device, 0, cpustate->opcode.d);
+	state_save_register_device_item(device, 0, cpustate->delay_timer);
+	state_save_register_device_item(device, 0, cpustate->picmodel);
+	state_save_register_device_item(device, 0, cpustate->reset_vector);
+
+	state_save_register_device_item(device, 0, cpustate->icount);
+	state_save_register_device_item(device, 0, cpustate->temp_config);
+	state_save_register_device_item(device, 0, cpustate->inst_cycles);
+
+
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 
@@ -732,33 +730,35 @@ static CPU_INIT( pic16C5x )
  *  Reset registers to their initial values
  ****************************************************************************/
 
-static void pic16C5x_reset_regs(void)
+static void pic16C5x_reset_regs(pic16c5x_state *cpustate)
 {
-	R.PC     = pic16C5x_reset_vector;
-	R.CONFIG = temp_config;
-	R.TRISA  = 0xff;
-	R.TRISB  = 0xff;
-	R.TRISC  = 0xff;
-	R.OPTION = 0x3f;
-	R.PCL    = 0xff;
-	R.FSR   |= (~picRAMmask);
-	R.PORTA &= 0x0f;
-	R.prescaler = 0;
-	delay_timer = 0;
-	old_T0      = 0;
-	inst_cycles = 0;
+	cpustate->PC     = cpustate->reset_vector;
+	cpustate->CONFIG = cpustate->temp_config;
+	cpustate->TRISA  = 0xff;
+	cpustate->TRISB  = 0xff;
+	cpustate->TRISC  = 0xff;
+	cpustate->OPTION = 0x3f;
+	cpustate->PCL    = 0xff;
+	cpustate->FSR   |= (~cpustate->picRAMmask);
+	cpustate->PORTA &= 0x0f;
+	cpustate->prescaler = 0;
+	cpustate->delay_timer = 0;
+	cpustate->old_T0 = 0;
+	cpustate->inst_cycles = 0;
 }
 
-static void pic16C5x_soft_reset(void)
+static void pic16C5x_soft_reset(pic16c5x_state *cpustate)
 {
-	R.STATUS &= 0x1f;
-	pic16C5x_reset_regs();
+	cpustate->STATUS &= 0x1f;
+	pic16C5x_reset_regs(cpustate);
 }
 
-void pic16c5x_config(int data)
+void pic16c5x_set_config(const device_config *cpu, int data)
 {
+	pic16c5x_state *cpustate = cpu->token;
+
 	logerror("Writing %04x to the PIC16C5x config register\n",data);
-	temp_config = (data & 0xfff);
+	cpustate->temp_config = (data & 0xfff);
 }
 
 
@@ -776,7 +776,7 @@ static CPU_EXIT( pic16C5x )
  *  WatchDog
  ****************************************************************************/
 
-static void pic16C5x_update_watchdog(int counts)
+static void pic16C5x_update_watchdog(pic16c5x_state *cpustate, int counts)
 {
 	/* WatchDog is set up to count 18,000 (0x464f hex) ticks to provide */
 	/* the timeout period of 0.018ms based on a 4MHz input clock. */
@@ -785,29 +785,29 @@ static void pic16C5x_update_watchdog(int counts)
 
 	/* If the current instruction is CLRWDT or SLEEP, don't update the WDT */
 
-	if ((R.opcode.w.l != 3) && (R.opcode.w.l != 4))
+	if ((cpustate->opcode.w.l != 3) && (cpustate->opcode.w.l != 4))
 	{
-		UINT16 old_WDT = R.WDT;
+		UINT16 old_WDT = cpustate->WDT;
 
-		R.WDT -= counts;
+		cpustate->WDT -= counts;
 
-		if (R.WDT > 0x464f) {
-			R.WDT = 0x464f - (0xffff - R.WDT);
+		if (cpustate->WDT > 0x464f) {
+			cpustate->WDT = 0x464f - (0xffff - cpustate->WDT);
 		}
 
-		if (((old_WDT != 0) && (old_WDT < R.WDT)) || (R.WDT == 0))
+		if (((old_WDT != 0) && (old_WDT < cpustate->WDT)) || (cpustate->WDT == 0))
 		{
 			if (PSA) {
-				R.prescaler++;
-				if (R.prescaler >= (1 << PS)) {	/* Prescale values from 1 to 128 */
-					R.prescaler = 0;
-					CLR(TO_FLAG);
-					pic16C5x_soft_reset();
+				cpustate->prescaler++;
+				if (cpustate->prescaler >= (1 << PS)) {	/* Prescale values from 1 to 128 */
+					cpustate->prescaler = 0;
+					CLR(cpustate, TO_FLAG);
+					pic16C5x_soft_reset(cpustate);
 				}
 			}
 			else {
-				CLR(TO_FLAG);
-				pic16C5x_soft_reset();
+				CLR(cpustate, TO_FLAG);
+				pic16C5x_soft_reset(cpustate);
 			}
 		}
 	}
@@ -818,17 +818,17 @@ static void pic16C5x_update_watchdog(int counts)
  *  Update Timer
  ****************************************************************************/
 
-static void pic16C5x_update_timer(int counts)
+static void pic16C5x_update_timer(pic16c5x_state *cpustate, int counts)
 {
 	if (PSA == 0) {
-		R.prescaler += counts;
-		if (R.prescaler >= (2 << PS)) {	/* Prescale values from 2 to 256 */
-			R.TMR0 += (R.prescaler / (2 << PS));
-			R.prescaler %= (2 << PS);	/* Overflow prescaler */
+		cpustate->prescaler += counts;
+		if (cpustate->prescaler >= (2 << PS)) {	/* Prescale values from 2 to 256 */
+			cpustate->TMR0 += (cpustate->prescaler / (2 << PS));
+			cpustate->prescaler %= (2 << PS);	/* Overflow prescaler */
 		}
 	}
 	else {
-		R.TMR0 += counts;
+		cpustate->TMR0 += counts;
 	}
 }
 
@@ -839,93 +839,73 @@ static void pic16C5x_update_timer(int counts)
 
 static CPU_EXECUTE( pic16C5x )
 {
+	pic16c5x_state *cpustate = device->token;
 	int T0_in;
-	pic16C5x_icount = cycles;
+	cpustate->icount = cycles;
 
 	do
 	{
 		if (PD == 0)						/* Sleep Mode */
 		{
-			inst_cycles = (1*CLK);
-			debugger_instruction_hook(device, R.PC);
+			cpustate->inst_cycles = 1;
+			debugger_instruction_hook(device, cpustate->PC);
 			if (WDTE) {
-				pic16C5x_update_watchdog(1*CLK);
+				pic16C5x_update_watchdog(cpustate, 1);
 			}
 		}
 		else
 		{
-			R.PREVPC = R.PC;
+			cpustate->PREVPC = cpustate->PC;
 
-			debugger_instruction_hook(device, R.PC);
+			debugger_instruction_hook(device, cpustate->PC);
 
-			R.opcode.d = M_RDOP(R.PC);
-			R.PC++;
-			R.PCL++;
+			cpustate->opcode.d = M_RDOP(cpustate->PC);
+			cpustate->PC++;
+			cpustate->PCL++;
 
-			if ((R.opcode.w.l & 0xff0) != 0x000)	{	/* Do all opcodes except the 00? ones */
-				inst_cycles = cycles_main[((R.opcode.w.l >> 4) & 0xff)];
-				(*(opcode_main[((R.opcode.w.l >> 4) & 0xff)]))();
+			if ((cpustate->opcode.w.l & 0xff0) != 0x000)	{	/* Do all opcodes except the 00? ones */
+				cpustate->inst_cycles = opcode_main[((cpustate->opcode.w.l >> 4) & 0xff)].cycles;
+				(*opcode_main[((cpustate->opcode.w.l >> 4) & 0xff)].function)(cpustate);
 			}
 			else {	/* Opcode 0x00? has many opcodes in its minor nibble */
-				inst_cycles = cycles_000_other[(R.opcode.b.l & 0x1f)];
-				(*(opcode_000_other[(R.opcode.b.l & 0x1f)]))();
+				cpustate->inst_cycles = opcode_00x[(cpustate->opcode.b.l & 0x1f)].cycles;
+				(*opcode_00x[(cpustate->opcode.b.l & 0x1f)].function)(cpustate);
 			}
 
 			if (T0CS) {						/* Count mode */
 				T0_in = S_T0_IN;
 				if (T0SE) {					/* Count rising edge */
 					if (POSITIVE_EDGE_T0) {
-						pic16C5x_update_timer(1);
+						pic16C5x_update_timer(cpustate, 1);
 					}
 				}
 				else {						/* Count falling edge */
 					if (NEGATIVE_EDGE_T0) {
-						pic16C5x_update_timer(1);
+						pic16C5x_update_timer(cpustate, 1);
 					}
 				}
-				old_T0 = T0_in;
+				cpustate->old_T0 = T0_in;
 			}
 			else {							/* Timer mode */
-				if (delay_timer) {
-					delay_timer--;
+				if (cpustate->delay_timer) {
+					cpustate->delay_timer--;
 				}
 				else {
-					pic16C5x_update_timer((inst_cycles/CLK));
+					pic16C5x_update_timer(cpustate, cpustate->inst_cycles);
 				}
 			}
 			if (WDTE) {
-				pic16C5x_update_watchdog((inst_cycles/CLK));
+				pic16C5x_update_watchdog(cpustate, cpustate->inst_cycles);
 			}
 		}
 
-		pic16C5x_icount -= inst_cycles;
+		cpustate->icount -= cpustate->inst_cycles;
 
-	} while (pic16C5x_icount>0);
+	} while (cpustate->icount > 0);
 
-	return cycles - pic16C5x_icount;
+	return cycles - cpustate->icount;
 }
 
-
-/****************************************************************************
- *  Get all registers in given buffer
- ****************************************************************************/
-
-static CPU_GET_CONTEXT( pic16C5x )
-{
-	if( dst )
-		*(pic16C5x_Regs*)dst = R;
-}
-
-
-/****************************************************************************
- *  Set all registers to given values
- ****************************************************************************/
-
-static CPU_SET_CONTEXT( pic16C5x )
-{
-	if (src)
-		R = *(pic16C5x_Regs*)src;
-}
 
 
 /**************************************************************************
@@ -934,27 +914,29 @@ static CPU_SET_CONTEXT( pic16C5x )
 
 static CPU_SET_INFO( pic16C5x )
 {
+	pic16c5x_state *cpustate = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + PIC16C5x_PC:		R.PC = info->i; R.PCL = info->i & 0xff ;break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PC:		cpustate->PC = info->i; cpustate->PCL = info->i & 0xff ;break;
 		/* This is actually not a stack pointer, but the stack contents */
 		/* Stack is a 2 level First In Last Out stack */
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + PIC16C5x_STK1:		R.STACK[1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_STK0:		R.STACK[0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_W:		    R.W      = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_ALU:		R.ALU    = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_STR:		R.STATUS = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_OPT:		R.OPTION = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_TMR0:		R.TMR0   = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_WDT:		R.WDT    = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_PSCL:		R.prescaler = info->i;					break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_PRTA:		R.PORTA  = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_PRTB:		R.PORTB  = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_PRTC:		R.PORTC  = info->i;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_FSR:		R.FSR    = (info->i & picRAMmask);		break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_STK1:		cpustate->STACK[1] = info->i;					break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_STK0:		cpustate->STACK[0] = info->i;					break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_W:		    cpustate->W      = info->i;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_ALU:		cpustate->ALU    = info->i;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_STR:		cpustate->STATUS = info->i;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_OPT:		cpustate->OPTION = info->i;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_TMR0:		cpustate->TMR0   = info->i;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_WDT:		cpustate->WDT    = info->i;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PSCL:		cpustate->prescaler = info->i;					break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PRTA:		cpustate->PORTA  = info->i;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PRTB:		cpustate->PORTB  = info->i;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PRTC:		cpustate->PORTC  = info->i;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_FSR:		cpustate->FSR    = (info->i & cpustate->picRAMmask);	break;
 	}
 }
 
@@ -966,19 +948,21 @@ static CPU_SET_INFO( pic16C5x )
 
 static CPU_GET_INFO( pic16C5x )
 {
+	pic16c5x_state *cpustate = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(R);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(pic16c5x_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1*CLK;						break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 10*CLK;						break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 10;							break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 9;					break;
@@ -990,37 +974,37 @@ static CPU_GET_INFO( pic16C5x )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 5;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = R.PREVPC;						break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->PREVPC;						break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + PIC16C5x_PC:		info->i = R.PC;							break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PC:		info->i = cpustate->PC;							break;
 		/* This is actually not a stack pointer, but the stack contents */
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + PIC16C5x_STK1:		info->i = R.STACK[1];					break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_STK0:		info->i = R.STACK[0];					break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_W:   		info->i = R.W;							break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_ALU: 		info->i = R.ALU;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_STR: 		info->i = R.STATUS;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_OPT: 		info->i = R.OPTION;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_TMR0:		info->i = R.TMR0;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_WDT: 		info->i = R.WDT;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_PSCL:		info->i = R.prescaler;					break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_PRTA:		info->i = R.PORTA;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_PRTB:		info->i = R.PORTB;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_PRTC:		info->i = R.PORTC;						break;
-		case CPUINFO_INT_REGISTER + PIC16C5x_FSR: 		info->i = (R.FSR & picRAMmask);			break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_STK1:		info->i = cpustate->STACK[1];					break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_STK0:		info->i = cpustate->STACK[0];					break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_W:   		info->i = cpustate->W;							break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_ALU: 		info->i = cpustate->ALU;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_STR: 		info->i = cpustate->STATUS;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_OPT: 		info->i = cpustate->OPTION;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_TMR0:		info->i = cpustate->TMR0;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_WDT: 		info->i = cpustate->WDT;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PSCL:		info->i = cpustate->prescaler;					break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PRTA:		info->i = cpustate->PORTA;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PRTB:		info->i = cpustate->PORTB;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_PRTC:		info->i = cpustate->PORTC;						break;
+		case CPUINFO_INT_REGISTER + PIC16C5x_FSR: 		info->i = (cpustate->FSR & cpustate->picRAMmask);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(pic16C5x);		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(pic16C5x); break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(pic16C5x); break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(pic16C5x);				break;
-		case CPUINFO_PTR_RESET:							/* set per-CPU */						break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(pic16C5x);				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(pic16C5x);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(dummy); break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(dummy); break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(pic16C5x);			break;
+		case CPUINFO_PTR_RESET:							/* set per-CPU */								break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(pic16C5x);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(pic16C5x);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
+		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(pic16C5x);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &pic16C5x_icount;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PIC16C5x");			break;
@@ -1031,36 +1015,36 @@ static CPU_GET_INFO( pic16C5x )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%01x%c%c%c%c%c %c%c%c%03x",
-				(R.STATUS & 0xe0) >> 5,
-				R.STATUS & 0x10 ? '.':'O',		/* WDT Overflow */
-				R.STATUS & 0x08 ? 'P':'D',		/* Power/Down */
-				R.STATUS & 0x04 ? 'Z':'.',		/* Zero */
-				R.STATUS & 0x02 ? 'c':'b',		/* Nibble Carry/Borrow */
-				R.STATUS & 0x01 ? 'C':'B',		/* Carry/Borrow */
+				(cpustate->STATUS & 0xe0) >> 5,
+				cpustate->STATUS & 0x10 ? '.':'O',		/* WDT Overflow */
+				cpustate->STATUS & 0x08 ? 'P':'D',		/* Power/Down */
+				cpustate->STATUS & 0x04 ? 'Z':'.',		/* Zero */
+				cpustate->STATUS & 0x02 ? 'c':'b',		/* Nibble Carry/Borrow */
+				cpustate->STATUS & 0x01 ? 'C':'B',		/* Carry/Borrow */
 
-				R.OPTION & 0x20 ? 'C':'T',		/* Counter/Timer */
-				R.OPTION & 0x10 ? 'N':'P',		/* Negative/Positive */
-				R.OPTION & 0x08 ? 'W':'T',		/* WatchDog/Timer */
-				R.OPTION & 0x08 ? (1<<(R.OPTION&7)) : (2<<(R.OPTION&7)) );
+				cpustate->OPTION & 0x20 ? 'C':'T',		/* Counter/Timer */
+				cpustate->OPTION & 0x10 ? 'N':'P',		/* Negative/Positive */
+				cpustate->OPTION & 0x08 ? 'W':'T',		/* WatchDog/Timer */
+				cpustate->OPTION & 0x08 ? (1<<(cpustate->OPTION&7)) : (2<<(cpustate->OPTION&7)) );
 			break;
 
-		case CPUINFO_STR_REGISTER + PIC16C5x_PC:   		sprintf(info->s, "PC:%03X",   R.PC); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_W:    		sprintf(info->s, "W:%02X",    R.W); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_ALU:  		sprintf(info->s, "ALU:%02X",  R.ALU); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_STR:  		sprintf(info->s, "STR:%02X",  R.STATUS); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_TMR0: 		sprintf(info->s, "TMR:%02X",  R.TMR0); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_WDT:  		sprintf(info->s, "WDT:%04X",  R.WDT); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_OPT:  		sprintf(info->s, "OPT:%02X",  R.OPTION); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_STK0: 		sprintf(info->s, "STK0:%03X", R.STACK[0]); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_STK1: 		sprintf(info->s, "STK1:%03X", R.STACK[1]); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_PRTA: 		sprintf(info->s, "PRTA:%01X", ((R.PORTA) & 0xf)); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_PRTB: 		sprintf(info->s, "PRTB:%02X", R.PORTB); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_PRTC: 		sprintf(info->s, "PRTC:%02X", R.PORTC); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_TRSA: 		sprintf(info->s, "TRSA:%01X", ((R.TRISA) & 0xf)); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_TRSB: 		sprintf(info->s, "TRSB:%02X", R.TRISB); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_TRSC: 		sprintf(info->s, "TRSC:%02X", R.TRISC); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_FSR:  		sprintf(info->s, "FSR:%02X",  ((R.FSR) & picRAMmask)); break;
-		case CPUINFO_STR_REGISTER + PIC16C5x_PSCL: 		sprintf(info->s, "PSCL:%c%02X", ((R.OPTION & 0x08) ? 'W':'T'), R.prescaler); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_PC:   		sprintf(info->s, "PC:%03X",   cpustate->PC); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_W:    		sprintf(info->s, "W:%02X",    cpustate->W); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_ALU:  		sprintf(info->s, "ALU:%02X",  cpustate->ALU); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_STR:  		sprintf(info->s, "STR:%02X",  cpustate->STATUS); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_TMR0: 		sprintf(info->s, "TMR:%02X",  cpustate->TMR0); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_WDT:  		sprintf(info->s, "WDT:%04X",  cpustate->WDT); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_OPT:  		sprintf(info->s, "OPT:%02X",  cpustate->OPTION); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_STK0: 		sprintf(info->s, "STK0:%03X", cpustate->STACK[0]); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_STK1: 		sprintf(info->s, "STK1:%03X", cpustate->STACK[1]); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_PRTA: 		sprintf(info->s, "PRTA:%01X", ((cpustate->PORTA) & 0xf)); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_PRTB: 		sprintf(info->s, "PRTB:%02X", cpustate->PORTB); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_PRTC: 		sprintf(info->s, "PRTC:%02X", cpustate->PORTC); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_TRSA: 		sprintf(info->s, "TRSA:%01X", ((cpustate->TRISA) & 0xf)); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_TRSB: 		sprintf(info->s, "TRSB:%02X", cpustate->TRISB); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_TRSC: 		sprintf(info->s, "TRSC:%02X", cpustate->TRISC); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_FSR:  		sprintf(info->s, "FSR:%02X",  ((cpustate->FSR) & cpustate->picRAMmask)); break;
+		case CPUINFO_STR_REGISTER + PIC16C5x_PSCL: 		sprintf(info->s, "PSCL:%c%02X", ((cpustate->OPTION & 0x08) ? 'W':'T'), cpustate->prescaler); break;
 	}
 }
 
@@ -1086,13 +1070,15 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16C54 )
 {
-	picmodel = 0x16C54;
-	picRAMmask = 0x1f;
-	pic16C5x_reset_vector = 0x1ff;
-	pic16C5x_reset_regs();
-	R.STATUS = 0x00;
-	SET(TO_FLAG);
-	SET(PD_FLAG);
+	pic16c5x_state *cpustate = device->token;
+
+	cpustate->picmodel = 0x16C54;
+	cpustate->picRAMmask = 0x1f;
+	cpustate->reset_vector = 0x1ff;
+	pic16C5x_reset_regs(cpustate);
+	cpustate->STATUS = 0x00;
+	SET(cpustate, TO_FLAG);
+	SET(cpustate, PD_FLAG);
 }
 
 
@@ -1138,13 +1124,15 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16C55 )
 {
-	picmodel = 0x16C55;
-	picRAMmask = 0x1f;
-	pic16C5x_reset_vector = 0x1ff;
-	pic16C5x_reset_regs();
-	R.STATUS = 0x00;
-	SET(TO_FLAG);
-	SET(PD_FLAG);
+	pic16c5x_state *cpustate = device->token;
+
+	cpustate->picmodel = 0x16C55;
+	cpustate->picRAMmask = 0x1f;
+	cpustate->reset_vector = 0x1ff;
+	pic16C5x_reset_regs(cpustate);
+	cpustate->STATUS = 0x00;
+	SET(cpustate, TO_FLAG);
+	SET(cpustate, PD_FLAG);
 }
 
 
@@ -1190,13 +1178,15 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16C56 )
 {
-	picmodel = 0x16C56;
-	picRAMmask = 0x1f;
-	pic16C5x_reset_vector = 0x3ff;
-	pic16C5x_reset_regs();
-	R.STATUS = 0x00;
-	SET(TO_FLAG);
-	SET(PD_FLAG);
+	pic16c5x_state *cpustate = device->token;
+
+	cpustate->picmodel = 0x16C56;
+	cpustate->picRAMmask = 0x1f;
+	cpustate->reset_vector = 0x3ff;
+	pic16C5x_reset_regs(cpustate);
+	cpustate->STATUS = 0x00;
+	SET(cpustate, TO_FLAG);
+	SET(cpustate, PD_FLAG);
 }
 
 
@@ -1247,13 +1237,15 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16C57 )
 {
-	picmodel = 0x16C57;
-	picRAMmask = 0x7f;
-	pic16C5x_reset_vector = 0x7ff;
-	pic16C5x_reset_regs();
-	R.STATUS = 0x00;
-	SET(TO_FLAG);
-	SET(PD_FLAG);
+	pic16c5x_state *cpustate = device->token;
+
+	cpustate->picmodel = 0x16C57;
+	cpustate->picRAMmask = 0x7f;
+	cpustate->reset_vector = 0x7ff;
+	pic16C5x_reset_regs(cpustate);
+	cpustate->STATUS = 0x00;
+	SET(cpustate, TO_FLAG);
+	SET(cpustate, PD_FLAG);
 }
 
 
@@ -1305,13 +1297,15 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16C58 )
 {
-	picmodel = 0x16C58;
-	picRAMmask = 0x7f;
-	pic16C5x_reset_vector = 0x7ff;
-	pic16C5x_reset_regs();
-	R.STATUS = 0x00;
-	SET(TO_FLAG);
-	SET(PD_FLAG);
+	pic16c5x_state *cpustate = device->token;
+
+	cpustate->picmodel = 0x16C58;
+	cpustate->picRAMmask = 0x7f;
+	cpustate->reset_vector = 0x7ff;
+	pic16C5x_reset_regs(cpustate);
+	cpustate->STATUS = 0x00;
+	SET(cpustate, TO_FLAG);
+	SET(cpustate, PD_FLAG);
 }
 
 
