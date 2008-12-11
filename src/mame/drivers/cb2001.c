@@ -34,13 +34,7 @@ Note
 In title screen (c) is 2001
 In test mode (c) is 2000
 
-------
-
-emulation notes:
-
-doesn't do anything, is it really and x86? is it encrypted? is there an internal rom?
-startup code is at the right location for x86, but isn't valid for 186 / v30 at least,
-could be something newer?
+------------------------------
 
 
 *************************************************************************************************/
