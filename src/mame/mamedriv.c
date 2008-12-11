@@ -8409,4 +8409,6 @@ Other Sun games
 	/* Astro Corp. */
 	DRIVER( showhand )	/* (c) 1999? Astro Corp. */
 
+	/* Dyna */
+	DRIVER ( cb2001 )
 #endif	/* DRIVER_RECURSIVE */

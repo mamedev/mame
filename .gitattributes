@@ -1314,6 +1314,7 @@ src/mame/drivers/carjmbre.c svneol=native#text/plain
 src/mame/drivers/carpolo.c svneol=native#text/plain
 src/mame/drivers/carrera.c svneol=native#text/plain
 src/mame/drivers/cave.c svneol=native#text/plain
+src/mame/drivers/cb2001.c svneol=native#text/plain
 src/mame/drivers/cball.c svneol=native#text/plain
 src/mame/drivers/cbasebal.c svneol=native#text/plain
 src/mame/drivers/cbuster.c svneol=native#text/plain
