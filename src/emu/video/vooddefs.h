@@ -1671,6 +1671,7 @@ struct _voodoo_state
 	UINT8				index;					/* index of board */
 	const device_config *device;				/* pointer to our containing device */
 	const device_config *screen;				/* the screen we are acting on */
+	const device_config *cpu;					/* the CPU we interact with */
 	UINT8				type;					/* type of system */
 	UINT8				chipmask;				/* mask for which chips are available */
 	UINT32				freq;					/* operating frequency */
@@ -1696,7 +1697,7 @@ struct _voodoo_state
 
 	voodoo_stats 		stats;					/* internal statistics */
 
-	offs_t				last_status_pc;			/* PC of last status read (for logging) */
+	offs_t				last_status_pc;			/* PC of last status description (for logging) */
 	UINT32				last_status_value;		/* value of last status read (for logging) */
 
 	int					next_rasterizer;		/* next rasterizer index */

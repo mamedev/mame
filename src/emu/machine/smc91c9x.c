@@ -377,7 +377,7 @@ READ16_DEVICE_HANDLER( smc91c9x_r )
 	}
 
 	if (LOG_ETHERNET && offset != EREG_BANK)
-		logerror("%08X:smc91c9x_r(%s) = %04X & %04X\n", cpu_get_pc(device->machine->activecpu), ethernet_regname[offset], result, mem_mask);
+		logerror("%s:smc91c9x_r(%s) = %04X & %04X\n", cpuexec_describe_context(device->machine), ethernet_regname[offset], result, mem_mask);
 	return result;
 }
 
@@ -402,7 +402,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 	COMBINE_DATA(&smc->reg[offset]);
 
 	if (LOG_ETHERNET && offset != 7)
-		logerror("%08X:smc91c9x_w(%s) = %04X & %04X\n", cpu_get_pc(device->machine->activecpu), ethernet_regname[offset], data, mem_mask);
+		logerror("%s:smc91c9x_w(%s) = %04X & %04X\n", cpuexec_describe_context(device->machine), ethernet_regname[offset], data, mem_mask);
 
 	/* handle it */
 	switch (offset)

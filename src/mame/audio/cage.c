@@ -461,13 +461,11 @@ static void update_control_lines(running_machine *machine)
 	}
 
 	/* set the IOF input lines */
-	cpu_push_context(cage_cpu);
 	val = cpu_get_reg(cage_cpu, TMS32031_IOF);
 	val &= ~0x88;
 	if (cpu_to_cage_ready) val |= 0x08;
 	if (cage_to_cpu_ready) val |= 0x80;
 	cpu_set_reg(cage_cpu, TMS32031_IOF, val);
-	cpu_pop_context();
 }
 
 
@@ -513,7 +511,7 @@ static READ32_HANDLER( cage_io_status_r )
 UINT16 main_from_cage_r(const address_space *space)
 {
 	if (LOG_COMM)
-		logerror("%06X:main read data = %04X\n", cpu_get_pc(space->machine->activecpu), soundlatch_word_r(space, 0, 0));
+		logerror("%s:main read data = %04X\n", cpuexec_describe_context(space->machine), soundlatch_word_r(space, 0, 0));
 	cage_to_cpu_ready = 0;
 	update_control_lines(space->machine);
 	return soundlatch_word_r(space, 0, 0xffff);
@@ -532,7 +530,7 @@ static TIMER_CALLBACK( deferred_cage_w )
 void main_to_cage_w(UINT16 data)
 {
 	if (LOG_COMM)
-		logerror("%06X:Command to CAGE = %04X\n", cpu_get_pc(Machine->activecpu), data);
+		logerror("%s:Command to CAGE = %04X\n", cpuexec_describe_context(Machine), data);
 	timer_call_after_resynch(Machine, NULL, data, deferred_cage_w);
 }
 

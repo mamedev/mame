@@ -180,7 +180,7 @@ INLINE void PUSH_STACK(tms32010_state *cpustate, UINT16 data)
 	cpustate->STACK[3] = (data & cpustate->addr_mask);
 }
 
-inline void UPDATE_AR(tms32010_state *cpustate)
+INLINE void UPDATE_AR(tms32010_state *cpustate)
 {
 	if (cpustate->opcode.b.l & 0x30) {
 		UINT16 tmpAR = cpustate->AR[ARP];

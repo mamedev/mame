@@ -1491,13 +1491,11 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	cpu_push_context(space->cpu);
 	for (i = offset; i <= endoffset; i++)
 	{
 		UINT8 byte = debug_read_byte(space, i, TRUE);
 		fwrite(&byte, 1, 1, f);
 	}
-	cpu_pop_context();
 
 	/* close the file */
 	fclose(f);
@@ -1550,7 +1548,6 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	cpu_push_context(space->cpu);
 	for (i = offset; i <= endoffset; i += 16)
 	{
 		char output[200];
@@ -1659,7 +1656,6 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 		/* output the result */
 		fprintf(f, "%s\n", output);
 	}
-	cpu_pop_context();
 
 	/* close the file */
 	fclose(f);
@@ -1733,7 +1729,6 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now search */
-	cpu_push_context(space->cpu);
 	for (i = offset; i <= endoffset; i += data_size[0])
 	{
 		int suboffset = 0;
@@ -1760,7 +1755,6 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 			debug_console_printf(machine, "Found at %*X\n", space->logaddrchars, (UINT32)memory_byte_to_address(space, i));
 		}
 	}
-	cpu_pop_context();
 
 	/* print something if not found */
 	if (found == 0)
@@ -1809,7 +1803,6 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	cpu_push_context(space->cpu);
 	for (i = 0; i < length; )
 	{
 		int pcbyte = memory_address_to_byte(space, offset + i) & space->bytemask;
@@ -1898,7 +1891,6 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		/* output the result */
 		fprintf(f, "%s\n", output);
 	}
-	cpu_pop_context();
 
 	/* close the file */
 	fclose(f);
@@ -2011,7 +2003,6 @@ static void execute_history(running_machine *machine, int ref, int params, const
 	cpuinfo = cpu_get_debug_data(space->cpu);
 
 	/* loop over lines */
-	cpu_push_context(space->cpu);
 	for (i = 0; i < count; i++)
 	{
 		offs_t pc = cpuinfo->pc_history[(cpuinfo->pc_history_index + DEBUG_HISTORY_SIZE - count + i) % DEBUG_HISTORY_SIZE];
@@ -2033,7 +2024,6 @@ static void execute_history(running_machine *machine, int ref, int params, const
 
 		debug_console_printf(machine, "%0*X: %s\n", space->logaddrchars, pc, buffer);
 	}
-	cpu_pop_context();
 }
 
 

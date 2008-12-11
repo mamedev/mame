@@ -180,7 +180,7 @@ static READ64_DEVICE_HANDLER(cf_card_data_r)
 
 			default:
 			{
-				fatalerror("cf_card_data_r: IDE reg %02X at %08X\n", offset & 0xf, cpu_get_pc(device->machine->activecpu));
+				fatalerror("%s:cf_card_data_r: IDE reg %02X\n", cpuexec_describe_context(device->machine), offset & 0xf);
 			}
 		}
 	}
@@ -201,7 +201,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_data_w)
 
 			default:
 			{
-				fatalerror("cf_card_data_w: IDE reg %02X, %04X at %08X\n", offset & 0xf, (UINT16)(data >> 16), cpu_get_pc(device->machine->activecpu));
+				fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", cpuexec_describe_context(device->machine), offset & 0xf, (UINT16)(data >> 16));
 			}
 		}
 	}
@@ -247,7 +247,7 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 
 				default:
 				{
-					printf("compact_flash_r: IDE reg %02X at %08X\n", offset & 0xf, cpu_get_pc(device->machine->activecpu));
+					printf("%s:compact_flash_r: IDE reg %02X\n", cpuexec_describe_context(device->machine), offset & 0xf);
 				}
 			}
 		}
@@ -263,7 +263,7 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 			}
 			else
 			{
-				fatalerror("compact_flash_r: reg %02X at %08X\n", reg, cpu_get_pc(device->machine->activecpu));
+				fatalerror("%s:compact_flash_r: reg %02X\n", cpuexec_describe_context(device->machine), reg);
 			}
 		}
 	}
@@ -272,7 +272,7 @@ static READ64_DEVICE_HANDLER(cf_card_r)
 
 static WRITE64_DEVICE_HANDLER(cf_card_w)
 {
-	//printf("compact_flash_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), cpu_get_pc(machine->activecpu));
+	//printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", cpuexec_describe_context(device->machine), (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -310,7 +310,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 
 				default:
 				{
-					fatalerror("compact_flash_w: IDE reg %02X, data %04X at %08X\n", offset & 0xf, (UINT16)((data >> 16) & 0xffff), cpu_get_pc(device->machine->activecpu));
+					fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", cpuexec_describe_context(device->machine), offset & 0xf, (UINT16)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -336,7 +336,7 @@ static WRITE64_DEVICE_HANDLER(cf_card_w)
 				}
 				default:
 				{
-					fatalerror("compact_flash_w: reg %02X, data %04X at %08X\n", offset, (UINT16)((data >> 16) & 0xffff), cpu_get_pc(device->machine->activecpu));
+					fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", cpuexec_describe_context(device->machine), offset, (UINT16)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -612,6 +612,7 @@ static MACHINE_DRIVER_START(viper)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "main")
+	MDRV_3DFX_VOODOO_CPU("main")
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

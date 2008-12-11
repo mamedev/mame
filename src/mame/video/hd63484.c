@@ -973,7 +973,7 @@ static void HD63484_command_w(running_machine *machine, UINT16 cmd)
 	{
 		int i;
 
-		logerror("PC %05x: HD63484 command %s (%04x) ",cpu_get_pc(machine->activecpu),instruction_name[fifo[0]>>10],fifo[0]);
+		logerror("%s: HD63484 command %s (%04x) ",cpuexec_describe_context(machine),instruction_name[fifo[0]>>10],fifo[0]);
 		for (i = 1;i < fifo_counter;i++)
 			logerror("%04x ",fifo[i]);
 		logerror("\n");

@@ -108,8 +108,18 @@ void cpuexec_timeslice(running_machine *machine);
 /* temporarily boosts the interleave factor */
 void cpuexec_boost_interleave(running_machine *machine, attotime timeslice_time, attotime boost_duration);
 
+
+
+/* ----- global helpers ----- */
+
 /* return a pointer to the given CPU by tag */
 const device_config *cputag_get_cpu(running_machine *machine, const char *tag);
+
+/* abort execution for the current timeslice */
+void cpuexec_abort_timeslice(running_machine *machine);
+
+/* return a string describing which CPUs are currently executing and their PC */
+const char *cpuexec_describe_context(running_machine *machine);
 
 
 
@@ -165,7 +175,7 @@ void cpu_eat_cycles(const device_config *device, int cycles);
 /* apply a +/- to the current icount */
 void cpu_adjust_icount(const device_config *device, int delta);
 
-/* aborts the timeslice for the active CPU */
+/* abort execution for the current timeslice, allowing other CPUs to run before we run again */
 void cpu_abort_timeslice(const device_config *device);
 
 

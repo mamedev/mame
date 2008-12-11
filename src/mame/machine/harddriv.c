@@ -1200,7 +1200,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	logerror("%06X:hd68k_ds3_gdata_r(%04X)\n", cpu_get_previouspc(space->cpu), ds3_gdata);
 
 	/* attempt to optimize the transfer if conditions are right */
-	if (space->machine->activecpu == space->machine->cpu[0] && pc == hdds3_transfer_pc &&
+	if (space->cpu == space->machine->cpu[0] && pc == hdds3_transfer_pc &&
 		!(!ds3_g68flag && ds3_g68irqs) && !(ds3_gflag && ds3_gfirqs))
 	{
 		UINT32 destaddr = cpu_get_reg(space->cpu, M68K_A1);

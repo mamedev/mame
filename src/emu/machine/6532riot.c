@@ -100,7 +100,7 @@ INLINE void update_irqstate(const device_config *device)
 	if (riot->intf->irq_func != NULL)
 		(*riot->intf->irq_func)(device, (state != 0) ? ASSERT_LINE : CLEAR_LINE);
 	else
-		logerror("6532RIOT chip #%d: no irq callback function. PC: %08X\n", riot->index, safe_cpu_get_pc(device->machine->activecpu));
+		logerror("%s:6532RIOT chip #%d: no irq callback function\n", cpuexec_describe_context(device->machine), riot->index);
 }
 
 
@@ -263,7 +263,7 @@ WRITE8_DEVICE_HANDLER( riot6532_w )
 			if (port->out_func != NULL)
 				(*port->out_func)(device, data, olddata);
 			else
-				logerror("6532RIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag, 'A' + (offset & 1), safe_cpu_get_pc(device->machine->activecpu), data);
+				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", cpuexec_describe_context(device->machine), device->tag, 'A' + (offset & 1), data);
 		}
 
 		/* writes to port A need to update the PA7 state */
@@ -332,7 +332,7 @@ READ8_DEVICE_HANDLER( riot6532_r )
 					update_pa7_state(device);
 			}
 			else
-				logerror("6532RIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag, 'A' + (offset & 1), safe_cpu_get_pc(device->machine->activecpu));
+				logerror("%s:6532RIOT chip %s: Port %c is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag, 'A' + (offset & 1));
 
 			/* apply the DDR to the result */
 			val = apply_ddr(port);

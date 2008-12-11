@@ -116,14 +116,14 @@ static void cd32_cia_0_porta_w(const device_config *device, UINT8 data)
 static UINT8 cd32_cia_0_portb_r(const device_config *device)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_r\n", cpu_get_pc(device->machine->activecpu));
+	logerror("%s:CIA0_portb_r\n", cpuexec_describe_context(device->machine));
 	return 0xff;
 }
 
 static void cd32_cia_0_portb_w(const device_config *device, UINT8 data)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_w(%02x)\n", cpu_get_pc(device->machine->activecpu), data);
+	logerror("%s:CIA0_portb_w(%02x)\n", cpuexec_describe_context(device->machine), data);
 }
 
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )

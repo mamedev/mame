@@ -187,7 +187,7 @@ static void namcoio_51XX_write(running_machine *machine,int chip,int data)
 {
 	data &= 0x07;
 
-	LOG(("%04x: custom 51XX write %02x\n",cpu_get_pc(machine->activecpu),data));
+	LOG(("%s: custom 51XX write %02x\n",cpuexec_describe_context(machine),data));
 
 	if (io[chip].coincred_mode)
 	{
@@ -285,7 +285,7 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-	LOG(("%04x: custom 51XX read\n",cpu_get_pc(machine->activecpu)));
+	LOG(("%s: custom 51XX read\n",cpuexec_describe_context(machine)));
 
 	if (io[chip].mode == 0)	/* switch mode */
 	{
@@ -878,7 +878,7 @@ static UINT8 namcoio_53XX_digdug_read(running_machine *machine, int chip)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-	LOG(("%04x: custom 53XX read\n",cpu_get_pc(machine->activecpu)));
+	LOG(("%s: custom 53XX read\n",cpuexec_describe_context(machine)));
 
 	switch ((io[chip].in_count++) % 2)
 	{
@@ -893,7 +893,7 @@ static UINT8 namcoio_53XX_polepos_read(running_machine *machine,int chip)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-	LOG(("%04x: custom 53XX read\n",cpu_get_pc(machine->activecpu)));
+	LOG(("%s: custom 53XX read\n",cpuexec_describe_context(machine)));
 
 	switch ((io[chip].in_count++) % 8)
 	{
@@ -916,7 +916,7 @@ static UINT8 namco_06xx_data_read(running_machine *machine, int chipnum)
 		case NAMCOIO_53XX_DIGDUG:  return namcoio_53XX_digdug_read(machine, chipnum);
 		case NAMCOIO_53XX_POLEPOS: return namcoio_53XX_polepos_read(machine, chipnum);
 		default:
-			logerror("%04x: custom IO type %d unsupported read\n",cpu_get_pc(machine->activecpu),io[chipnum].type);
+			logerror("%s: custom IO type %d unsupported read\n",cpuexec_describe_context(machine),io[chipnum].type);
 			return 0xff;
 	}
 }
@@ -934,7 +934,7 @@ static void namco_06xx_data_write(running_machine *machine,int chipnum,UINT8 dat
 		case NAMCOIO_52XX:   namcoio_52xx_write(data); break;
 		case NAMCOIO_54XX:   namco_54xx_write(data); break;
 		default:
-			logerror("%04x: custom IO type %d unsupported write\n",cpu_get_pc(machine->activecpu),io[chipnum].type);
+			logerror("%s: custom IO type %d unsupported write\n",cpuexec_describe_context(machine),io[chipnum].type);
 			break;
 	}
 }
@@ -949,7 +949,7 @@ static void namco_06xx_read_request(running_machine *machine, int chipnum)
 		case NAMCOIO_50XX:   namco_50xx_read_request(machine); break;
 		case NAMCOIO_50XX_2: namco_50xx_2_read_request(machine); break;
 		default:
-			logerror("%04x: custom IO type %d read_request unsupported\n",cpu_get_pc(machine->activecpu),io[chipnum].type);
+			logerror("%s: custom IO type %d read_request unsupported\n",cpuexec_describe_context(machine),io[chipnum].type);
 			break;
 	}
 }
@@ -957,11 +957,11 @@ static void namco_06xx_read_request(running_machine *machine, int chipnum)
 
 static UINT8 namco_06xx_data_r(running_machine *machine,int chip,int offset)
 {
-	LOG(("%04x: 06XX #%d read offset %d\n",cpu_get_pc(machine->activecpu),chip,offset));
+	LOG(("%s: 06XX #%d read offset %d\n",cpuexec_describe_context(machine),chip,offset));
 
 	if (!(customio_command[chip] & 0x10))
 	{
-		logerror("%04x: 06XX #%d read in write mode %02x\n",cpu_get_pc(machine->activecpu),chip,customio_command[chip]);
+		logerror("%s: 06XX #%d read in write mode %02x\n",cpuexec_describe_context(machine),chip,customio_command[chip]);
 		return 0;
 	}
 
@@ -972,7 +972,7 @@ static UINT8 namco_06xx_data_r(running_machine *machine,int chip,int offset)
 		case 0x4: return namco_06xx_data_read(machine, 4*chip + 2); break;
 		case 0x8: return namco_06xx_data_read(machine, 4*chip + 3); break;
 		default:
-			logerror("%04x: 06XX #%d read in unsupported mode %02x\n",cpu_get_pc(machine->activecpu),chip,customio_command[chip]);
+			logerror("%s: 06XX #%d read in unsupported mode %02x\n",cpuexec_describe_context(machine),chip,customio_command[chip]);
 			return 0xff;
 	}
 }
@@ -980,11 +980,11 @@ static UINT8 namco_06xx_data_r(running_machine *machine,int chip,int offset)
 
 static void namco_06xx_data_w(running_machine *machine,int chip,int offset,int data)
 {
-	LOG(("%04x: 06XX #%d write offset %d = %02x\n",cpu_get_pc(machine->activecpu),chip,offset,data));
+	LOG(("%s: 06XX #%d write offset %d = %02x\n",cpuexec_describe_context(machine),chip,offset,data));
 
 	if (customio_command[chip] & 0x10)
 	{
-		logerror("%04x: 06XX #%d write in read mode %02x\n",cpu_get_pc(machine->activecpu),chip,customio_command[chip]);
+		logerror("%s: 06XX #%d write in read mode %02x\n",cpuexec_describe_context(machine),chip,customio_command[chip]);
 		return;
 	}
 
@@ -995,7 +995,7 @@ static void namco_06xx_data_w(running_machine *machine,int chip,int offset,int d
 		case 0x4: namco_06xx_data_write(machine,4*chip + 2,data); break;
 		case 0x8: namco_06xx_data_write(machine,4*chip + 3,data); break;
 		default:
-			logerror("%04x: 06XX #%d write in unsupported mode %02x\n",cpu_get_pc(machine->activecpu),chip,customio_command[chip]);
+			logerror("%s: 06XX #%d write in unsupported mode %02x\n",cpuexec_describe_context(machine),chip,customio_command[chip]);
 			break;
 	}
 }
@@ -1003,13 +1003,13 @@ static void namco_06xx_data_w(running_machine *machine,int chip,int offset,int d
 
 static UINT8 namco_06xx_ctrl_r(running_machine *machine, int chip)
 {
-	LOG(("%04x: 06XX #%d ctrl_r\n",cpu_get_pc(machine->activecpu),chip));
+	LOG(("%s: 06XX #%d ctrl_r\n",cpuexec_describe_context(machine),chip));
 	return customio_command[chip];
 }
 
 static void namco_06xx_ctrl_w(running_machine *machine, int chip,int data)
 {
-	LOG(("%04x: 06XX #%d command %02x\n",cpu_get_pc(machine->activecpu),chip,data));
+	LOG(("%s: 06XX #%d command %02x\n",cpuexec_describe_context(machine),chip,data));
 
 	customio_command[chip] = data;
 
@@ -1037,7 +1037,7 @@ static void namco_06xx_ctrl_w(running_machine *machine, int chip,int data)
 				case 0x4: namco_06xx_read_request(machine, 4*chip + 2); break;
 				case 0x8: namco_06xx_read_request(machine, 4*chip + 3); break;
 				default:
-					logerror("%04x: 06XX #%d read in unsupported mode %02x\n",cpu_get_pc(machine->activecpu),chip,customio_command[chip]);
+					logerror("%s: 06XX #%d read in unsupported mode %02x\n",cpuexec_describe_context(machine),chip,customio_command[chip]);
 			}
 		}
 	}

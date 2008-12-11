@@ -409,9 +409,9 @@ INLINE UINT8* blitter_get_addr(running_machine *machine, UINT32 addr)
     The Flare One blitter is a simpler design with slightly different parameters
     and will require hardware tests to figure everything out correctly.
 */
-static void RunBlit(running_machine *machine)
+static void RunBlit(const address_space *space)
 {
-#define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(machine, blitter.program.addr++))
+#define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(space->machine, blitter.program.addr++))
 
 	int cycles_used = 0;
 
@@ -439,7 +439,7 @@ static void RunBlit(running_machine *machine)
 		/* This debug is now wrong ! */
 		if (DEBUG_BLITTER)
 		{
-			mame_printf_debug("\nBlitter (%x): Running command from 0x%.5x\n\n", cpu_get_previouspc(machine->activecpu), blitter.program.addr - 12);
+			mame_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", cpuexec_describe_context(device->machine), blitter.program.addr - 12);
 			mame_printf_debug("Command Reg         %.2x",	blitter.command);
 			mame_printf_debug("		%s %s %s %s %s %s %s\n",
 				blitter.command & CMD_RUN ? "RUN" : "     ",
@@ -521,7 +521,7 @@ static void RunBlit(running_machine *machine)
 						blitter.source.addr0 -=blitter.step;
 					}
 
-					*blitter_get_addr(machine, blitter.dest.addr) = blitter.pattern;
+					*blitter_get_addr(space->machine, blitter.dest.addr) = blitter.pattern;
 					cycles_used++;
 
 				} while (--innercnt);
@@ -535,7 +535,7 @@ static void RunBlit(running_machine *machine)
 
 				if (LOOPTYPE == 3 && innercnt == blitter.innercnt)
 				{
-					srcdata = *(blitter_get_addr(machine, blitter.source.addr & 0xfffff));
+					srcdata = *(blitter_get_addr(space->machine, blitter.source.addr & 0xfffff));
 					blitter.source.loword++;
 					cycles_used++;
 				}
@@ -545,7 +545,7 @@ static void RunBlit(running_machine *machine)
 				{
 					if (LOOPTYPE == 0 || LOOPTYPE == 1)
 					{
-						srcdata = *(blitter_get_addr(machine, blitter.source.addr & 0xfffff));
+						srcdata = *(blitter_get_addr(space->machine, blitter.source.addr & 0xfffff));
 						cycles_used++;
 
 						if (blitter.modectl & MODE_SSIGN)
@@ -560,7 +560,7 @@ static void RunBlit(running_machine *machine)
 				/* Read destination pixel? */
 				if (LOOPTYPE == 0)
 				{
-					dstdata = *blitter_get_addr(machine, blitter.dest.addr & 0xfffff);
+					dstdata = *blitter_get_addr(space->machine, blitter.dest.addr & 0xfffff);
 					cycles_used++;
 				}
 
@@ -629,10 +629,10 @@ static void RunBlit(running_machine *machine)
                             The existing destination pixel is used as a lookup
                             into the table and the colours is replaced.
                         */
-						UINT8 dest = *blitter_get_addr(machine, blitter.dest.addr);
-						UINT8 newcol = *(blitter_get_addr(machine, (blitter.source.addr + dest) & 0xfffff));
+						UINT8 dest = *blitter_get_addr(space->machine, blitter.dest.addr);
+						UINT8 newcol = *(blitter_get_addr(space->machine, (blitter.source.addr + dest) & 0xfffff));
 
-						*blitter_get_addr(machine, blitter.dest.addr) = newcol;
+						*blitter_get_addr(space->machine, blitter.dest.addr) = newcol;
 						cycles_used += 3;
 					}
 					else
@@ -651,7 +651,7 @@ static void RunBlit(running_machine *machine)
 						if (blitter.compfunc & CMPFUNC_LOG0)
 							final_result |= ~result & ~dstdata;
 
-						*blitter_get_addr(machine, blitter.dest.addr) = final_result;
+						*blitter_get_addr(space->machine, blitter.dest.addr) = final_result;
 						cycles_used++;
 					}
 				}
@@ -691,7 +691,7 @@ static void RunBlit(running_machine *machine)
 	} while (blitter.command  & CMD_RUN);
 
 	/* Burn Z80 cycles while blitter is in operation */
-	cpu_spinuntil_time(machine->activecpu,  ATTOTIME_IN_NSEC( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
+	cpu_spinuntil_time(space->cpu,  ATTOTIME_IN_NSEC( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
 }
 
 
@@ -944,7 +944,7 @@ static WRITE8_HANDLER( chipset_w )
 			blitter.command = data;
 
 			if (data & CMD_RUN)
-				RunBlit(space->machine);
+				RunBlit(space);
 			else
 				mame_printf_debug("Blitter stopped by IO.\n");
 

@@ -17,15 +17,15 @@ static int eolith_speedup_resume_scanline;
 static int eolith_vblank = 0;
 static int eolith_scanline = 0;
 
-void eolith_speedup_read(running_machine *machine)
+void eolith_speedup_read(const address_space *space)
 {
 	/* for debug */
-//  if ((cpu_get_pc(machine->activecpu)!=eolith_speedup_address) && (eolith_vblank!=1) )
-//      printf("%06x eolith speedup_read data %02x\n",cpu_get_pc(machine->activecpu), eolith_vblank);
+//  if ((cpu_get_pc(space->cpu)!=eolith_speedup_address) && (eolith_vblank!=1) )
+//      printf("%s:eolith speedup_read data %02x\n",cpuexec_describe_context(space->machine), eolith_vblank);
 
-	if (cpu_get_pc(machine->activecpu)==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
+	if (cpu_get_pc(space->cpu)==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
 	{
-		cpu_spinuntil_trigger(machine->activecpu, 1000);
+		cpu_spinuntil_trigger(space->cpu, 1000);
 	}
 
 }

@@ -1365,9 +1365,7 @@ static void voodoo_stall(const device_config *device, int stall)
 				galileo.dma_stalled_on_voodoo[which] = FALSE;
 
 				/* resume execution */
-				cpu_push_context(space->cpu);
 				galileo_perform_dma(space, which);
-				cpu_pop_context();
 				break;
 			}
 
@@ -1729,11 +1727,19 @@ PCI Mem  = 08000000-09FFFFFF
 
 */
 
+static READ32_DEVICE_HANDLER( seattle_ide_r )
+{
+	/* note that blitz times out if we don't have this cycle stealing */
+	if (offset == 0x3f6/4)
+		cpu_eat_cycles(device->machine->cpu[0], 100);
+	return ide_controller32_r(device, offset, mem_mask);
+}
+
 static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD(VOODOO_GRAPHICS, "voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
-	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_controller32_r, ide_controller32_w)
+	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", seattle_ide_r, ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
 	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_bus_master32_r, ide_bus_master32_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
@@ -2476,6 +2482,7 @@ static MACHINE_DRIVER_START( seattle_common )
 	MDRV_IDE_BUS_MASTER_SPACE("main", PROGRAM)
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "main")
+	MDRV_3DFX_VOODOO_CPU("main")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
 	MDRV_3DFX_VOODOO_STALL(voodoo_stall)

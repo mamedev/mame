@@ -388,13 +388,13 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 
 static WRITE8_DEVICE_HANDLER( konami_portc_0_w )
 {
-	logerror("%04X:ppi0_portc_w = %02X\n", cpu_get_pc(device->machine->activecpu), data);
+	logerror("%s:ppi0_portc_w = %02X\n", cpuexec_describe_context(device->machine), data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( konami_portc_1_w )
 {
-	logerror("%04X:ppi1_portc_w = %02X\n", cpu_get_pc(device->machine->activecpu), data);
+	logerror("%s:ppi1_portc_w = %02X\n", cpuexec_describe_context(device->machine), data);
 }
 
 

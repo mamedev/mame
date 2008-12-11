@@ -1414,18 +1414,15 @@ WRITE32_HANDLER( dsio_idma_addr_w )
 {
 	if (LOG_DCS_TRANSFERS)
 		logerror("%08X:IDMA_addr = %04X\n", cpu_get_pc(space->cpu), data);
-	cpu_push_context(dcs.cpu);
 	adsp2181_idma_addr_w(dcs.cpu, data);
 	if (data == 0)
 		dsio.start_on_next_write = 2;
-	cpu_pop_context();
 }
 
 
 WRITE32_HANDLER( dsio_idma_data_w )
 {
 	UINT32 pc = cpu_get_pc(space->cpu);
-	cpu_push_context(dcs.cpu);
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS)
@@ -1438,7 +1435,6 @@ WRITE32_HANDLER( dsio_idma_data_w )
 			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(dcs.cpu), data >> 16);
 		adsp2181_idma_data_w(dcs.cpu, data >> 16);
 	}
-	cpu_pop_context();
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
 		logerror("Starting DSIO CPU\n");
@@ -1450,9 +1446,7 @@ WRITE32_HANDLER( dsio_idma_data_w )
 READ32_HANDLER( dsio_idma_data_r )
 {
 	UINT32 result;
-	cpu_push_context(dcs.cpu);
 	result = adsp2181_idma_data_r(dcs.cpu);
-	cpu_pop_context();
 	if (LOG_DCS_TRANSFERS)
 		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(space->cpu), adsp2181_idma_addr_r(dcs.cpu), result);
 	return result;
@@ -1492,7 +1486,7 @@ void dcs_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		logerror("%08x: DCS reset = %d\n", safe_cpu_get_pc(Machine->activecpu), state);
+		logerror("%s: DCS reset = %d\n", cpuexec_describe_context(Machine), state);
 
 		/* just run through the init code again */
 		timer_call_after_resynch(Machine, NULL, 0, dcs_reset);
@@ -1537,7 +1531,7 @@ static READ16_HANDLER( fifo_input_r )
 static void dcs_delayed_data_w(running_machine *machine, int data)
 {
 	if (LOG_DCS_IO)
-		logerror("%08X:dcs_data_w(%04X)\n", cpu_get_pc(machine->activecpu), data);
+		logerror("%s:dcs_data_w(%04X)\n", cpuexec_describe_context(machine), data);
 
 	/* boost the interleave temporarily */
 	cpuexec_boost_interleave(machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
@@ -1643,7 +1637,7 @@ int dcs_data_r(void)
 		delayed_ack_w();
 
 	if (LOG_DCS_IO)
-		logerror("%08X:dcs_data_r(%04X)\n", cpu_get_pc(Machine->activecpu), dcs.output_data);
+		logerror("%s:dcs_data_r(%04X)\n", cpuexec_describe_context(Machine), dcs.output_data);
 	return dcs.output_data;
 }
 
@@ -1755,7 +1749,6 @@ static void reset_timer(running_machine *machine)
 	{
 		/* Road Burners: @ 28: JMP $0032  18032F, same code at $32 */
 
-		cpu_push_context(dcs.cpu);
 		if (memory_read_dword(dcs.program, 0x18*4) == 0x0c0030 &&		/* ENA SEC_REG */
 			memory_read_dword(dcs.program, 0x19*4) == 0x804828 &&		/* SI = DM($0482) */
 			memory_read_dword(dcs.program, 0x1a*4) == 0x904828 &&		/* DM($0482) = SI */
@@ -1764,7 +1757,6 @@ static void reset_timer(running_machine *machine)
 		{
 			dcs.timer_ignore = TRUE;
 		}
-		cpu_pop_context();
 	}
 
 	/* adjust the timer if not optimized */
@@ -1929,13 +1921,11 @@ static TIMER_CALLBACK( dcs_irq )
 		INT16 buffer[0x400];
 		int i;
 
-		cpu_push_context(dcs.cpu);
 		for (i = 0; i < count; i++)
 		{
 			buffer[i] = memory_read_word(dcs.data, reg * 2);
 			reg += dcs.incs;
 		}
-		cpu_pop_context();
 
 		if (dcs.channels)
 			dmadac_transfer(0, dcs.channels, 1, dcs.channels, (dcs.size / 2) / dcs.channels, buffer);
@@ -2128,7 +2118,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 			if (data == 0x001a)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%08X:DCS Transfer command %04X\n", cpu_get_pc(machine->activecpu), data);
+					logerror("%s:DCS Transfer command %04X\n", cpuexec_describe_context(machine), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2138,7 +2128,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 			else if (data == 0x002a)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%08X:DCS State change %04X\n", cpu_get_pc(machine->activecpu), data);
+					logerror("%s:DCS State change %04X\n", cpuexec_describe_context(machine), data);
 				transfer.dcs_state = 1;
 			}
 
@@ -2219,7 +2209,6 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 			if (transfer.hle_enabled)
 			{
 				/* write the new data to memory */
-				cpu_push_context(dcs.cpu);
 				if (transfer.type == 0)
 				{
 					if (transfer.writes_left & 1)
@@ -2229,7 +2218,6 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 				}
 				else
 					memory_write_word(dcs.data, transfer.start++ * 2, data);
-				cpu_pop_context();
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
@@ -2266,7 +2254,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 			if (data == 0x55d0 || data == 0x55d1)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%08X:DCS Transfer command %04X\n", cpu_get_pc(machine->activecpu), data);
+					logerror("%s:DCS Transfer command %04X\n", cpuexec_describe_context(machine), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2276,7 +2264,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 			else
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%08X:Command: %04X\n", cpu_get_pc(machine->activecpu), data);
+					logerror("%s:Command: %04X\n", cpuexec_describe_context(machine), data);
 			}
 			break;
 

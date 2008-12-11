@@ -230,7 +230,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	}
 	else
 	{
-		//mame_printf_verbose("ROM: read mask %llx @ %x (PC=%x)\n", mem_mask, offset, activecpu_get_pc());
+		//mame_printf_verbose("%s:ROM: read mask %llx @ %x\n", cpuexec_describe_context(machine), mem_mask, offset);
 	}
 
 	return U64(0xffffffffffffffff);
@@ -269,7 +269,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 	{
 		// ROM_DATA
 		// Doa2 writes here (16 bit decryption key ?)
-		//mame_printf_verbose("ROM: write %llx to 5f7008 (PC=%x)\n", data, activecpu_get_pc());
+		//mame_printf_verbose("%s:ROM: write %llx to 5f7008\n", cpuexec_describe_context(machine), data);
 	}
 	else if ((offset == 15) && ACCESSING_BITS_0_15)
 	{
@@ -306,7 +306,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 	}
 	else
 	{
-		//mame_printf_verbose("ROM: write %llx to %x, mask %llx (PC=%x)\n", data, offset, mem_mask, activecpu_get_pc());
+		//mame_printf_verbose("%s: ROM: write %llx to %x, mask %llx\n", cpuexec_describe_context(machine), data, offset, mem_mask);
 	}
 }
 

@@ -311,7 +311,7 @@ static void blit(int offset)
 
 #if HALLEYS_DEBUG
 if (0) {
-	logerror("%04x:[%04x]", cpu_get_pc(machine->activecpu), offset);
+	logerror("%s:[%04x]", cpuexec_describe_context(machine), offset);
 	for (ecx=0; ecx<16; ecx++) logerror(" %02x", param[ecx]);
 	logerror("\n"); }
 #endif

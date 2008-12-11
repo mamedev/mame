@@ -121,15 +121,11 @@ WRITE8_HANDLER( pitnrun_68705_portB_w )
 	}
 	if (~data & 0x10)
 	{
-    cpu_push_context(cpu0space->cpu);
 		memory_write_byte(cpu0space, address, portA_out);
-    cpu_pop_context();
 	}
 	if (~data & 0x20)
 	{
-        cpu_push_context(cpu0space->cpu);
-				portA_in = memory_read_byte(cpu0space, address);
-        cpu_pop_context();
+		portA_in = memory_read_byte(cpu0space, address);
 	}
 	if (~data & 0x40)
 	{

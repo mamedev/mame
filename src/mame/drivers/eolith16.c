@@ -44,7 +44,7 @@ static WRITE16_HANDLER( eeprom_w )
 
 static READ16_HANDLER( eolith16_custom_r )
 {
-	eolith_speedup_read(space->machine);
+	eolith_speedup_read(space);
 	return input_port_read(space->machine, "SPECIAL");
 }
 

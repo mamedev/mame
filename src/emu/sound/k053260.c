@@ -8,6 +8,7 @@
 #include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "k053260.h"
 
 /* 2004-02-28: Fixed ppcm decoding. Games sound much better now.*/
@@ -399,7 +400,7 @@ static UINT8 k053260_read( int chip, offs_t offset )
 				ic->channels[0].pos += ( 1 << 16 );
 
 				if ( offs > ic->rom_size ) {
-					logerror("%06x: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n",cpu_get_pc(Machine->activecpu),offs,ic->rom_size );
+					logerror("%s: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n", cpuexec_describe_context(Machine),offs,ic->rom_size );
 
 					return 0;
 				}

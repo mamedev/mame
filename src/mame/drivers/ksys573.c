@@ -232,14 +232,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( Machine->activecpu != NULL )
-		{
-			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
-		}
-		else
-		{
-			logerror( "(timer) : %s", buf );
-		}
+		logerror( "%s: %s", cpuexec_describe_context(Machine), buf );
 	}
 }
 

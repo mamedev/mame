@@ -108,7 +108,6 @@ static TIMER_CALLBACK( snes_scanline_tick )
 {
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	cpu_push_context(space->cpu);
 
 	/* Increase current line - we want to latch on this line during it, not after it */
 	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
@@ -233,8 +232,6 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		cpu_set_input_line(machine->cpu[0], G65816_LINE_NMI, CLEAR_LINE );
 	}
 
-	cpu_pop_context();
-
 	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
 	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, hblank_offset*snes_htmult), 0);
 }
@@ -250,9 +247,6 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	/* make sure we halt */
 	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
 
-	// we must guarantee the 65816's context for HDMA to work
-  	cpu_push_context(cpu0space->cpu);
-
 	/* draw a scanline */
 	if (snes_ppu.beam.current_vert <= snes_ppu.beam.last_visible_line)
 	{
@@ -265,8 +259,6 @@ static TIMER_CALLBACK( snes_hblank_tick )
 			video_screen_update_partial(machine->primary_screen, snes_ppu.beam.current_vert-1);
 		}
 	}
-
-	cpu_pop_context();
 
 	// signal hblank
 	snes_ram[HVBJOY] |= 0x40;
@@ -1545,12 +1537,10 @@ static void snes_init_ram(running_machine *machine)
 
 	/* Init work RAM - 0x55 isn't exactly right but it's close */
 	/* make sure it happens to the 65816 (CPU 0) */
-	cpu_push_context(cpu0space->cpu);
 	for (i = 0; i < (128*1024); i++)
 	{
 		memory_write_byte(cpu0space, 0x7e0000 + i, 0x55);
 	}
-	cpu_pop_context();
 
 	/* Inititialize registers/variables */
 	snes_ppu.update_windows = 1;

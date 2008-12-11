@@ -898,9 +898,6 @@ static TIMER_CALLBACK( scanline_callback )
 	int enabled;
 	int master;
 
-	/* set the CPU context */
-	cpu_push_context(tms->device);
-
 	/* fetch the core timing parameters */
 	current_visarea = video_screen_get_visible_area(tms->screen);
 	enabled = SMART_IOREG(tms, DPYCTL) & 0x8000;
@@ -1029,9 +1026,6 @@ static TIMER_CALLBACK( scanline_callback )
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
 	timer_adjust_oneshot(tms->scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(tms->screen, vcount, 0), !master), cpunum | (vcount << 8));
-
-	/* restore the context */
-	cpu_pop_context();
 }
 
 
@@ -1558,9 +1552,6 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 	tms34010_state *tms = cpu->token;
 	unsigned int addr;
 
-	/* swap to the target cpu */
-	cpu_push_context(cpu);
-
 	switch (reg)
 	{
 		/* upper 16 bits of the address */
@@ -1603,9 +1594,6 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 			logerror("tms34010_host_control_w called on invalid register %d\n", reg);
 			break;
 	}
-
-	/* swap back */
-	cpu_pop_context();
 }
 
 
@@ -1639,9 +1627,7 @@ int tms34010_host_r(const device_config *cpu, int reg)
 
 			/* read from the address */
 			addr = (IOREG(tms, REG_HSTADRH) << 16) | IOREG(tms, REG_HSTADRL);
-			cpu_push_context(cpu);
 			result = TMS34010_RDMEM_WORD(tms, TOBYTE(addr & 0xfffffff0));
-			cpu_pop_context();
 
 			/* optional postincrement (it says preincrement, but data is preloaded, so it
                is effectively a postincrement */

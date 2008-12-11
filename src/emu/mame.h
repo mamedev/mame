@@ -126,6 +126,7 @@ typedef void (*output_callback_func)(void *param, const char *format, va_list ar
 
 /* forward type declarations */
 typedef struct _mame_private mame_private;
+typedef struct _cpuexec_private cpuexec_private;
 typedef struct _timer_private timer_private;
 typedef struct _state_private state_private;
 typedef struct _memory_private memory_private;
@@ -148,7 +149,6 @@ struct _running_machine
 	const input_port_config *portconfig;		/* points to a list of input port configurations */
 
 	/* CPU information */
-	const device_config *	activecpu;			/* active CPU (or NULL) -- deprecated soon */
 	const device_config *	cpu[MAX_CPU];		/* array of CPU devices */
 
 	/* game-related information */
@@ -173,6 +173,7 @@ struct _running_machine
 
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */
+	cpuexec_private *		cpuexec_data;		/* internal data from cpuexec.c */
 	timer_private *			timer_data;			/* internal data from timer.c */
 	state_private *			state_data;			/* internal data from state.c */
 	memory_private *		memory_data;		/* internal data from memory.c */

@@ -1293,10 +1293,10 @@ static void vblank_assert(const device_config *device, int state)
 	vblank_state = state;
 
 	/* if we have stalled DMA, restart */
-//  if (dma_pending_on_vblank[0]) { cpu_push_context(machine->cpu[0]); perform_dma(0); cpu_pop_context(); }
-//  if (dma_pending_on_vblank[1]) { cpu_push_context(machine->cpu[0]); perform_dma(1); cpu_pop_context(); }
-//  if (dma_pending_on_vblank[2]) { cpu_push_context(machine->cpu[0]); perform_dma(2); cpu_pop_context(); }
-//  if (dma_pending_on_vblank[3]) { cpu_push_context(machine->cpu[0]); perform_dma(3); cpu_pop_context(); }
+//  if (dma_pending_on_vblank[0]) { perform_dma(0); }
+//  if (dma_pending_on_vblank[1]) { perform_dma(1); }
+//  if (dma_pending_on_vblank[2]) { perform_dma(2); }
+//  if (dma_pending_on_vblank[3]) { perform_dma(3); }
 }
 
 
@@ -2235,6 +2235,7 @@ static MACHINE_DRIVER_START( vegascore )
 	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
 
 	MDRV_3DFX_VOODOO_2_ADD("voodoo", STD_VOODOO_2_CLOCK, 2, "main")
+	MDRV_3DFX_VOODOO_CPU("main")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 4)
 	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
@@ -2282,6 +2283,7 @@ static MACHINE_DRIVER_START( vegasban )
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo")
 	MDRV_3DFX_VOODOO_BANSHEE_ADD("voodoo", STD_VOODOO_BANSHEE_CLOCK, 16, "main")
+	MDRV_3DFX_VOODOO_CPU("main")
 	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
 MACHINE_DRIVER_END
 
@@ -2292,6 +2294,7 @@ static MACHINE_DRIVER_START( vegasv3 )
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo")
 	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "main")
+	MDRV_3DFX_VOODOO_CPU("main")
 	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
 MACHINE_DRIVER_END
 
@@ -2305,6 +2308,7 @@ static MACHINE_DRIVER_START( denver )
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo")
 	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "main")
+	MDRV_3DFX_VOODOO_CPU("main")
 	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
 MACHINE_DRIVER_END
 

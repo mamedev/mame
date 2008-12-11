@@ -1963,9 +1963,6 @@ static void disasm_view_update(debug_view *view)
 	pc = cpu_get_pc(space->cpu);
 	pcbyte = memory_address_to_byte(space, pc) & space->logbytemask;
 
-	/* switch to the CPU's context */
-	cpu_push_context(space->cpu);
-
 	/* if our expression is dirty, fix it */
 	if (dasmdata->expression.dirty)
 	{
@@ -2138,9 +2135,6 @@ recompute:
 			col++;
 		}
 	}
-
-	/* restore the original CPU context */
-	cpu_pop_context();
 }
 
 
@@ -2624,10 +2618,6 @@ static void memory_view_update(debug_view *view)
 	/* get positional data */
 	posdata = &memory_pos_table[memdata->bytes_per_chunk];
 
-	/* switch to the CPU's context */
-	if (space != NULL)
-		cpu_push_context(space->cpu);
-
 	/* loop over visible rows */
 	for (row = 0; row < view->visible.y; row++)
 	{
@@ -2696,10 +2686,6 @@ static void memory_view_update(debug_view *view)
 			}
 		}
 	}
-
-	/* restore the context */
-	if (memdata->desc->base == NULL)
-		cpu_pop_context();
 }
 
 
@@ -3019,7 +3005,6 @@ static UINT64 memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t of
 		const address_space *space = memdata->desc->space;
 		UINT64 result = ~(UINT64)0;
 
-		cpu_push_context(space->cpu);
 		switch (size)
 		{
 			case 1:	result = debug_read_byte(space, offs, !memdata->no_translation); break;
@@ -3027,7 +3012,6 @@ static UINT64 memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t of
 			case 4:	result = debug_read_dword(space, offs, !memdata->no_translation); break;
 			case 8:	result = debug_read_qword(space, offs, !memdata->no_translation); break;
 		}
-		cpu_pop_context();
 		return result;
 	}
 
@@ -3061,7 +3045,6 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 	{
 		const address_space *space = memdata->desc->space;
 
-		cpu_push_context(space->cpu);
 		switch (size)
 		{
 			case 1:	debug_write_byte(space, offs, data, !memdata->no_translation); break;
@@ -3069,7 +3052,6 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 			case 4:	debug_write_dword(space, offs, data, !memdata->no_translation); break;
 			case 8:	debug_write_qword(space, offs, data, !memdata->no_translation); break;
 		}
-		cpu_pop_context();
 		return;
 	}
 

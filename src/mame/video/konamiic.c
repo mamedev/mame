@@ -2589,7 +2589,7 @@ static int K051960_fetchromdata(running_machine *machine, int byte)
 	addr = (code << 7) | (off1 << 2) | byte;
 	addr &= memory_region_length(machine, K051960_memory_region)-1;
 
-//  popmessage("%04x: addr %06x",cpu_get_pc(machine->activecpu),addr);
+//  popmessage("%s: addr %06x",cpuexec_describe_context(machine),addr);
 
 	return memory_region(machine, K051960_memory_region)[addr];
 }
@@ -3135,7 +3135,7 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 			| ((offset & 3) ^ 1);
 		addr &= memory_region_length(machine, K053245_memory_region[chip])-1;
 
-//  popmessage("%04x: offset %02x addr %06x",cpu_get_pc(machine->activecpu),offset&3,addr);
+//  popmessage("%s: offset %02x addr %06x",cpuexec_describe_context(machine),offset&3,addr);
 
 		return memory_region(machine, K053245_memory_region[chip])[addr];
 	}
@@ -3146,7 +3146,7 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 	}
 	else
 	{
-//logerror("%04x: read from unknown 053244 address %x\n",cpu_get_pc(machine->activecpu),offset);
+//logerror("%s: read from unknown 053244 address %x\n",cpuexec_describe_context(machine),offset);
 		return 0;
 	}
 }
@@ -3166,7 +3166,7 @@ static void K053244_chip_w(int chip, int offset, int data)
 //          popmessage("053244 reg 05 = %02x",data);
 		/* bit 2 = unknown, Parodius uses it */
 		/* bit 5 = unknown, Rollergames uses it */
-//      logerror("%04x: write %02x to 053244 address 5\n",cpu_get_pc(machine->activecpu),data);
+//      logerror("%s: write %02x to 053244 address 5\n",cpuexec_describe_context(machine),data);
 		break;
 	}
 	case 0x06:
@@ -4798,13 +4798,13 @@ static int K051316_rom_r(running_machine *machine, int chip, int offset)
 		if (K051316_bpp[chip] <= 4) addr /= 2;
 		addr &= memory_region_length(machine, K051316_memory_region[chip])-1;
 
-//  popmessage("%04x: offset %04x addr %04x",cpu_get_pc(machine->activecpu),offset,addr);
+//  popmessage("%s: offset %04x addr %04x",cpuexec_describe_context(machine),offset,addr);
 
 		return memory_region(machine, K051316_memory_region[chip])[addr];
 	}
 	else
 	{
-//logerror("%04x: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n",cpu_get_pc(machine->activecpu),offset);
+//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n",cpuexec_describe_context(machine),offset);
 		return 0;
 	}
 }
@@ -4829,7 +4829,7 @@ READ8_HANDLER( K051316_rom_2_r )
 static void K051316_ctrl_w(int chip,int offset,int data)
 {
 	K051316_ctrlram[chip][offset] = data;
-//if (offset >= 0x0c) logerror("%04x: write %02x to 051316 reg %x\n",cpu_get_pc(machine->activecpu),data,offset);
+//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n",cpuexec_describe_context(machine),data,offset);
 }
 
 WRITE8_HANDLER( K051316_ctrl_0_w )

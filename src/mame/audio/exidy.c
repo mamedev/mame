@@ -420,11 +420,11 @@ static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 oldd
 		if ((olddata & 0x01) && !(newdata & 0x01))
 		{
 			riot6532_porta_in_set(riot, tms5220_status_r(space, 0), 0xff);
-			logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc(device->machine->activecpu), tms5220_status_r(space, 0));
+			logerror("(%f)%s:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpuexec_describe_context(device->machine), tms5220_status_r(space, 0));
 		}
 		if ((olddata & 0x02) && !(newdata & 0x02))
 		{
-			logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_previouspc(device->machine->activecpu), riot6532_porta_out_get(riot));
+			logerror("(%f)%s:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time(device->machine)), cpuexec_describe_context(device->machine), riot6532_porta_out_get(riot));
 			tms5220_data_w(space, 0, riot6532_porta_out_get(riot));
 		}
 	}

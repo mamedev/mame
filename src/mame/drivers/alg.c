@@ -219,7 +219,7 @@ static UINT8 alg_cia_0_porta_r(const device_config *device)
 
 static UINT8 alg_cia_0_portb_r(const device_config *device)
 {
-	logerror("%06x:alg_cia_0_portb_r\n", cpu_get_pc(device->machine->activecpu));
+	logerror("%s:alg_cia_0_portb_r\n", cpuexec_describe_context(device->machine));
 	return 0xff;
 }
 
@@ -227,20 +227,20 @@ static UINT8 alg_cia_0_portb_r(const device_config *device)
 static void alg_cia_0_portb_w(const device_config *device, UINT8 data)
 {
 	/* parallel port */
-	logerror("%06x:alg_cia_0_portb_w(%02x)\n", cpu_get_pc(device->machine->activecpu), data);
+	logerror("%s:alg_cia_0_portb_w(%02x)\n", cpuexec_describe_context(device->machine), data);
 }
 
 
 static UINT8 alg_cia_1_porta_r(const device_config *device)
 {
-	logerror("%06x:alg_cia_1_porta_r\n", cpu_get_pc(device->machine->activecpu));
+	logerror("%s:alg_cia_1_porta_r\n", cpuexec_describe_context(device->machine));
 	return 0xff;
 }
 
 
 static void alg_cia_1_porta_w(const device_config *device, UINT8 data)
 {
-	logerror("%06x:alg_cia_1_porta_w(%02x)\n", cpu_get_pc(device->machine->activecpu), data);
+	logerror("%s:alg_cia_1_porta_w(%02x)\n", cpuexec_describe_context(device->machine), data);
 }
 
 

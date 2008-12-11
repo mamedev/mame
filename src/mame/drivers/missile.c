@@ -547,7 +547,7 @@ INLINE offs_t get_bit3_addr(offs_t pixaddr)
 }
 
 
-static void write_vram(running_machine *machine, offs_t address, UINT8 data)
+static void write_vram(const address_space *space, offs_t address, UINT8 data)
 {
 	static const UINT8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	offs_t vramaddr;
@@ -572,12 +572,12 @@ static void write_vram(running_machine *machine, offs_t address, UINT8 data)
 		videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
-		cpu_adjust_icount(machine->activecpu, -1);
+		cpu_adjust_icount(space->cpu, -1);
 	}
 }
 
 
-static UINT8 read_vram(running_machine *machine, offs_t address)
+static UINT8 read_vram(const address_space *space, offs_t address)
 {
 	offs_t vramaddr;
 	UINT8 vramdata;
@@ -606,7 +606,7 @@ static UINT8 read_vram(running_machine *machine, offs_t address)
 			result &= ~0x20;
 
 		/* account for the extra clock cycle */
-		cpu_adjust_icount(machine->activecpu, -1);
+		cpu_adjust_icount(space->cpu, -1);
 	}
 	return result;
 }
@@ -665,7 +665,7 @@ static WRITE8_HANDLER( missile_w )
 	/* if we're in MADSEL mode, write to video RAM */
 	if (get_madsel(space))
 	{
-		write_vram(space->machine, offset, data);
+		write_vram(space, offset, data);
 		return;
 	}
 
@@ -722,7 +722,7 @@ static READ8_HANDLER( missile_r )
 
 	/* if we're in MADSEL mode, read from video RAM */
 	if (get_madsel(space))
-		return read_vram(space->machine, offset);
+		return read_vram(space, offset);
 
 	/* otherwise, strip A15 and handle manually */
 	offset &= 0x7fff;

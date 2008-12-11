@@ -208,7 +208,7 @@ UINT8 midway_serial_pic_status_r(void)
 
 UINT8 midway_serial_pic_r(void)
 {
-	logerror("%08X:security R = %04X\n", safe_cpu_get_pc(Machine->activecpu), serial.buffer);
+	logerror("%s:security R = %04X\n", cpuexec_describe_context(Machine), serial.buffer);
 	serial.status = 1;
 	return serial.buffer;
 }
@@ -216,7 +216,7 @@ UINT8 midway_serial_pic_r(void)
 
 void midway_serial_pic_w(UINT8 data)
 {
-	logerror("%08X:security W = %04X\n", safe_cpu_get_pc(Machine->activecpu), data);
+	logerror("%s:security W = %04X\n", cpuexec_describe_context(Machine), data);
 
 	/* status seems to reflect the clock bit */
 	serial.status = (data >> 4) & 1;
@@ -308,7 +308,7 @@ UINT8 midway_serial_pic2_status_r(void)
 		result = 1;
 	}
 
-	logerror("%06X:PIC status %d\n", safe_cpu_get_pc(Machine->activecpu), result);
+	logerror("%s:PIC status %d\n", cpuexec_describe_context(Machine), result);
 	return result;
 }
 
@@ -318,7 +318,7 @@ UINT8 midway_serial_pic2_r(void)
 	UINT8 result = 0;
 
 	/* PIC data register */
-	logerror("%06X:PIC data read (index=%d total=%d latch=%03X) =", safe_cpu_get_pc(Machine->activecpu), pic.index, pic.total, pic.latch);
+	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", cpuexec_describe_context(Machine), pic.index, pic.total, pic.latch);
 
 	/* return the current result */
 	if (pic.latch & 0xf00)
@@ -341,9 +341,9 @@ void midway_serial_pic2_w(running_machine *machine, UINT8 data)
 
 	/* PIC command register */
 	if (pic.state == 0)
-		logerror("%06X:PIC command %02X\n", safe_cpu_get_pc(machine->activecpu), data);
+		logerror("%s:PIC command %02X\n", cpuexec_describe_context(machine), data);
 	else
-		logerror("%06X:PIC data %02X\n", safe_cpu_get_pc(machine->activecpu), data);
+		logerror("%s:PIC data %02X\n", cpuexec_describe_context(machine), data);
 
 	/* store in the latch, along with a bit to indicate we have data */
 	pic.latch = (data & 0x00f) | 0x480;
@@ -745,7 +745,7 @@ static UINT16 ioasic_fifo_r(const device_config *device)
 		/* main CPU is handling the I/O ASIC interrupt */
 		if (ioasic.fifo_bytes == 0 && ioasic.has_dcs)
 		{
-			ioasic.fifo_force_buffer_empty_pc = safe_cpu_get_pc(device->machine->activecpu);
+			ioasic.fifo_force_buffer_empty_pc = safe_cpu_get_pc(ioasic.dcs_cpu);
 			if (LOG_FIFO)
 				logerror("fifo_r(%04X): FIFO empty, PC = %04X\n", result, ioasic.fifo_force_buffer_empty_pc);
 		}
@@ -775,7 +775,7 @@ static UINT16 ioasic_fifo_status_r(const device_config *device)
 	/* sure the FIFO clear bit is set */
 	if (ioasic.fifo_force_buffer_empty_pc && device == ioasic.dcs_cpu)
 	{
-		offs_t currpc = safe_cpu_get_pc(device);
+		offs_t currpc = safe_cpu_get_pc(ioasic.dcs_cpu);
 		if (currpc >= ioasic.fifo_force_buffer_empty_pc && currpc < ioasic.fifo_force_buffer_empty_pc + 0x10)
 		{
 			ioasic.fifo_force_buffer_empty_pc = 0;
@@ -801,7 +801,7 @@ void midway_ioasic_fifo_reset_w(running_machine *machine, int state)
 		update_ioasic_irq(machine);
 	}
 	if (LOG_FIFO)
-		logerror("%08X:fifo_reset(%d)\n", safe_cpu_get_pc(machine->activecpu), state);
+		logerror("%s:fifo_reset(%d)\n", cpuexec_describe_context(machine), state);
 }
 
 

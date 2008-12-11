@@ -594,8 +594,8 @@ static void blit_vert_line(void)
 INLINE void log_blit(running_machine *machine, int data)
 {
 #if 1
-	logerror("%06x: blit src %06x x %03x y %03x flags %02x layer %02x pen %02x penmode %02x w %03x h %03x linelen %03x clip: ctrl %x xy %03x %03x wh %03x %03x\n",
-			cpu_get_pc(machine->activecpu),
+	logerror("%s: blit src %06x x %03x y %03x flags %02x layer %02x pen %02x penmode %02x w %03x h %03x linelen %03x clip: ctrl %x xy %03x %03x wh %03x %03x\n",
+			cpuexec_describe_context(machine),
 			ddenlovr_blit_address,ddenlovr_blit_x,ddenlovr_blit_y,data,
 			ddenlovr_dest_layer,ddenlovr_blit_pen,ddenlovr_blit_pen_mode,ddenlovr_rect_width,ddenlovr_rect_height,ddenlovr_line_length,
 			ddenlovr_clip_ctrl,ddenlovr_clip_x,ddenlovr_clip_y, ddenlovr_clip_width,ddenlovr_clip_height	);
@@ -903,7 +903,7 @@ profiler_mark(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x",data);
-					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(machine->activecpu), data);
+					logerror("%s: unknown blitter command %02x\n", cpuexec_describe_context(machine), data);
 				#endif
 			}
 
@@ -911,7 +911,7 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", cpu_get_pc(machine->activecpu), blitter, ddenlovr_blit_reg[blitter], data);
+			logerror("%s: Blitter %d reg %02x = %02x\n", cpuexec_describe_context(machine), blitter, ddenlovr_blit_reg[blitter], data);
 			break;
 		}
 	}
@@ -2503,7 +2503,7 @@ static void mjchuuka_get_romdata(running_machine *machine)
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(machine->activecpu), address);
+		logerror("%s: Error, Blitter address %06X out of range\n", cpuexec_describe_context(machine), address);
 		address %= size;
 	}
 

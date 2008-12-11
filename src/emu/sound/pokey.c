@@ -53,6 +53,7 @@
 #include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "pokey.h"
 
 /*
@@ -855,7 +856,7 @@ static int pokey_register_r(int chip, int offs)
 			}
 		}
 		else
-		logerror("PC %04x: warning - read p[chip] #%d POT%d\n", cpu_get_pc(Machine->activecpu), chip, pot);
+		logerror("%s: warning - read p[chip] #%d POT%d\n", cpuexec_describe_context(Machine), chip, pot);
 		break;
 
     case ALLPOT_C:

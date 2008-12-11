@@ -129,6 +129,7 @@ static void timer_remove(emu_timer *which);
 
 INLINE attotime get_current_time(running_machine *machine)
 {
+	extern attotime cpuexec_override_local_time(running_machine *machine, attotime default_time);
 	timer_private *global = machine->timer_data;
 
 	/* if we're currently in a callback, use the timer's expiration time as a base */
@@ -136,11 +137,8 @@ INLINE attotime get_current_time(running_machine *machine)
 		return global->callback_timer_expire_time;
 
 	/* if we're executing as a particular CPU, use its local time as a base */
-	if (machine->activecpu != NULL)
-		return cpu_get_local_time(machine->activecpu);
-
-	/* otherwise, return the current global base time */
-	return global->basetime;
+	/* otherwise, return the global base time */
+	return cpuexec_override_local_time(machine, global->basetime);
 }
 
 
@@ -737,8 +735,8 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 
 	/* if this was inserted as the head, abort the current timeslice and resync */
 	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
-	if (which == global->activelist && which->machine->activecpu != NULL)
-		cpu_abort_timeslice(which->machine->activecpu);
+	if (which == global->activelist)
+		cpuexec_abort_timeslice(which->machine);
 }
 
 

@@ -45,6 +45,7 @@ struct _voodoo_config
 	UINT8				tmumem0;
 	UINT8				tmumem1;
 	const char *		screen;
+	const char *		cputag;
 	voodoo_vblank_func	vblank;
 	voodoo_stall_func	stall;
 };
@@ -82,6 +83,9 @@ struct _voodoo_config
 
 #define MDRV_3DFX_VOODOO_STALL(_stall) \
 	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, stall, _stall)
+
+#define MDRV_3DFX_VOODOO_CPU(_cputag) \
+	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, cputag, _cputag)
 
 #define MDRV_3DFX_VOODOO_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag, VOODOO_GRAPHICS)

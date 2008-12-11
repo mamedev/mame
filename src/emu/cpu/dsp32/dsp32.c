@@ -500,8 +500,6 @@ void dsp32c_pio_w(const device_config *device, int reg, int data)
 	UINT16 mask;
 	UINT8 mode;
 
-	cpu_push_context(device);
-
 	/* look up register and mask */
 	mode = ((cpustate->pcr >> 8) & 2) | ((cpustate->pcr >> 1) & 1);
 	reg = regmap[mode][reg];
@@ -567,8 +565,6 @@ void dsp32c_pio_w(const device_config *device, int reg, int data)
 			logerror("dsp32_pio_w called on invalid register %d\n", reg);
 			break;
 	}
-
-	cpu_pop_context();
 }
 
 
@@ -582,8 +578,6 @@ int dsp32c_pio_r(const device_config *device, int reg)
 	dsp32_state *cpustate = device->token;
 	UINT16 mask, result = 0xffff;
 	UINT8 mode, shift = 0;
-
-	cpu_push_context(device);
 
 	/* look up register and mask */
 	mode = ((cpustate->pcr >> 8) & 2) | ((cpustate->pcr >> 1) & 1);
@@ -643,7 +637,6 @@ int dsp32c_pio_r(const device_config *device, int reg)
 			break;
 	}
 
-	cpu_pop_context();
 	return (result >> shift) & ~mask;
 }
 

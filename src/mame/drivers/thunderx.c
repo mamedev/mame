@@ -1024,7 +1024,7 @@ static KONAMI_SETLINES_CALLBACK( thunderx_banking )
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs;
 
-//  logerror("thunderx %04x: bank select %02x\n", cpu_get_pc(machine->activecpu), lines );
+//  logerror("thunderx %04x: bank select %02x\n", cpu_get_pc(device->cpu), lines );
 
 	offs = 0x10000 + (((lines & 0x0f) ^ 0x08) * 0x2000);
 	if (offs >= 0x28000) offs -= 0x20000;

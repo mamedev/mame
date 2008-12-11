@@ -422,7 +422,7 @@ WRITE8_DEVICE_HANDLER( acia6850_data_w )
 	}
 	else
 	{
-		logerror("ACIA %p: Data write while in reset! (%x)\n", device, cpu_get_previouspc(device->machine->activecpu));
+		logerror("%s:ACIA %p: Data write while in reset!\n", cpuexec_describe_context(device->machine), device);
 	}
 }
 

@@ -130,7 +130,7 @@ static UINT8 mxtc_config_r(const device_config *busdevice, const device_config *
 
 static void mxtc_config_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("MXTC: write %d, %02X, %02X at %08X\n", function, reg, data, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", cpuexec_describe_context(machine), function, reg, data);
 
 	switch(reg)
 	{
@@ -214,7 +214,7 @@ static UINT8 piix4_config_r(const device_config *busdevice, const device_config 
 
 static void piix4_config_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("PIIX4: write %d, %02X, %02X at %08X\n", function, reg, data, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", cpuexec_describe_context(machine), function, reg, data);
 	piix4_config_reg[function][reg] = data;
 }
 
@@ -367,15 +367,10 @@ static WRITE8_HANDLER(at_page8_w)
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
 	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 result;
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
-	result = memory_read_byte(space, page_offset + offset);
-	cpu_pop_context();
-
-	return result;
+	return memory_read_byte(space, page_offset + offset);
 }
 
 
@@ -385,9 +380,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
 	memory_write_byte(space, page_offset + offset, data);
-	cpu_pop_context();
 }
 
 

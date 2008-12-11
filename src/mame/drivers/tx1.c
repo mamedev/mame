@@ -98,21 +98,13 @@ static INTERRUPT_GEN( z80_irq )
 static READ16_HANDLER( z80_shared_r )
 {
 	const address_space *cpu2space = cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
-	UINT16	result = 0xffff;
-
-	cpu_push_context(cpu2space->cpu);
-	result = memory_read_byte(cpu2space, offset);
-	cpu_pop_context();
-
-	return result;
+	return memory_read_byte(cpu2space, offset);
 }
 
 static WRITE16_HANDLER( z80_shared_w )
 {
 	const address_space *cpu2space = cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
-	cpu_push_context(cpu2space->cpu);
 	memory_write_byte(cpu2space, offset, data & 0xff);
-	cpu_pop_context();
 }
 
 

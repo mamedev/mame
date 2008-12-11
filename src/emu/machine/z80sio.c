@@ -340,7 +340,7 @@ WRITE8_DEVICE_HANDLER( z80sio_c_w )
 	UINT8 old = chan->regs[reg];
 
 	if (reg != 0 || (reg & 0xf8))
-		VPRINTF(("%04X:sio_reg_w(%c,%d) = %02X\n", cpu_get_pc(device->machine->activecpu), 'A' + ch, reg, data));
+		VPRINTF(("%s:sio_reg_w(%c,%d) = %02X\n", cpuexec_describe_context(device->machine), 'A' + ch, reg, data));
 
 	/* write a new value to the selected register */
 	chan->regs[reg] = data;
@@ -357,7 +357,7 @@ WRITE8_DEVICE_HANDLER( z80sio_c_w )
 			switch (data & SIO_WR0_COMMAND_MASK)
 			{
 				case SIO_WR0_COMMAND_CH_RESET:
-					VPRINTF(("%04X:SIO reset channel %c\n", cpu_get_pc(device->machine->activecpu), 'A' + ch));
+					VPRINTF(("%s:SIO reset channel %c\n", cpuexec_describe_context(device->machine), 'A' + ch));
 					reset_channel(device, ch);
 					break;
 
@@ -424,7 +424,7 @@ READ8_DEVICE_HANDLER( z80sio_c_r )
 			break;
 	}
 
-	VPRINTF(("%04X:sio_reg_r(%c,%d) = %02x\n", cpu_get_pc(device->machine->activecpu), 'A' + ch, reg, chan->status[reg]));
+	VPRINTF(("%s:sio_reg_r(%c,%d) = %02x\n", cpuexec_describe_context(device->machine), 'A' + ch, reg, chan->status[reg]));
 
 	return chan->status[reg];
 }
@@ -446,7 +446,7 @@ WRITE8_DEVICE_HANDLER( z80sio_d_w )
 	int ch = offset & 1;
 	sio_channel *chan = &sio->chan[ch];
 
-	VPRINTF(("%04X:sio_data_w(%c) = %02X\n", cpu_get_pc(device->machine->activecpu), 'A' + ch, data));
+	VPRINTF(("%s:sio_data_w(%c) = %02X\n", cpuexec_describe_context(device->machine), 'A' + ch, data));
 
 	/* if tx not enabled, just ignore it */
 	if (!(chan->regs[5] & SIO_WR5_TX_ENABLE))
@@ -481,7 +481,7 @@ READ8_DEVICE_HANDLER( z80sio_d_r )
 	sio->int_state[INT_CHA_RECEIVE - 4*ch] &= ~Z80_DAISY_INT;
 	interrupt_check(device);
 
-	VPRINTF(("%04X:sio_data_r(%c) = %02X\n", cpu_get_pc(device->machine->activecpu), 'A' + ch, chan->inbuf));
+	VPRINTF(("%s:sio_data_r(%c) = %02X\n", cpuexec_describe_context(device->machine), 'A' + ch, chan->inbuf));
 
 	return chan->inbuf;
 }

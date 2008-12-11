@@ -123,8 +123,6 @@ static TIMER_CALLBACK( cop400_serial_tick )
 {
 	cop400_state *cop400 = ptr;
 
-    cpu_push_context(cop400->device);
-
 	if (BIT(EN, 0))
 	{
 		/*
@@ -194,8 +192,6 @@ static TIMER_CALLBACK( cop400_serial_tick )
 
 		SIO = ((SIO << 1) | IN_SI()) & 0x0f;
 	}
-
-	cpu_pop_context();
 }
 
 INLINE void WRITE_Q(cop400_state *cop400, UINT8 data)

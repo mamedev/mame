@@ -318,7 +318,7 @@ INLINE void blt_write(const address_space *space, const int tmap, const offs_t o
 		case 2:	hyprduel_vram_1_w(space,offs,data,mask);	break;
 		case 3:	hyprduel_vram_2_w(space,offs,data,mask);	break;
 	}
-//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",cpu_get_pc(machine->activecpu),tmap,offs,data,mask);
+//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n",cpuexec_describe_context(space->machine),tmap,offs,data,mask);
 }
 
 

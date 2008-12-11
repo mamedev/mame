@@ -919,7 +919,7 @@ static void set_output_latch(running_machine *machine, UINT8 data)
     	led2_value = ~output_data;
 
   	if (falling_bits & 0xc7)
-		logerror("PC: %x  Unmaped LED write.  Data: %x\n", cpu_get_pc(machine->activecpu), falling_bits);
+		logerror("%s  Unmaped LED write.  Data: %x\n", cpuexec_describe_context(machine), falling_bits);
 
 	output_latch = data;
 

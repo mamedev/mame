@@ -166,7 +166,7 @@ static WRITE32_DEVICE_HANDLER( zeus2_timekeeper_w )
 	if (bitlatch[2] && !cmos_protected)
 		timekeeper_w(device, offset, data);
 	else
-		logerror("%06X:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(device->machine->activecpu), bitlatch[2], cmos_protected);
+		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpuexec_describe_context(device->machine), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 

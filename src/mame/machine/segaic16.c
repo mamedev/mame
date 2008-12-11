@@ -240,18 +240,14 @@ static void memory_mapper_w(const address_space *space, struct memory_mapper_chi
 			{
 				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
-				cpu_push_context(targetspace->cpu);
 				memory_write_word(targetspace, addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
-				cpu_pop_context();
 			}
 			else if (data == 0x02)
 			{
 				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
-				cpu_push_context(targetspace->cpu);
 				result = memory_read_word(targetspace, addr);
-				cpu_pop_context();
 				chip->regs[0x00] = result >> 8;
 				chip->regs[0x01] = result;
 			}
@@ -552,7 +548,7 @@ static void divide_w(const address_space *space, int which, offs_t offset, UINT1
 	int a4 = offset & 8;
 	int a3 = offset & 4;
 
-	if (LOG_DIVIDE) logerror("%06X:divide%d_w(%X) = %04X\n", cpu_get_pc(space->machine->activecpu), which, offset, data);
+	if (LOG_DIVIDE) logerror("%s:divide%d_w(%X) = %04X\n", cpuexec_describe_context(space->machine), which, offset, data);
 
 	/* only 4 effective write registers */
 	offset &= 3;
@@ -650,7 +646,7 @@ static void timer_interrupt_ack(running_machine *machine, int which)
 static UINT16 compare_timer_r(const address_space *space, int which, offs_t offset, UINT16 mem_mask)
 {
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%06X:compare%d_r(%X) = %04X\n", cpu_get_pc(space->machine->activecpu), which, offset, compare_timer[which].regs[offset]);
+	if (LOG_COMPARE) logerror("%s:compare%d_r(%X) = %04X\n", cpuexec_describe_context(space->machine), which, offset, compare_timer[which].regs[offset]);
 	switch (offset)
 	{
 		case 0x0:	return compare_timer[which].regs[0];
@@ -671,7 +667,7 @@ static UINT16 compare_timer_r(const address_space *space, int which, offs_t offs
 static void compare_timer_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%06X:compare%d_w(%X) = %04X\n", cpu_get_pc(space->machine->activecpu), which, offset, data);
+	if (LOG_COMPARE) logerror("%s:compare%d_w(%X) = %04X\n", cpuexec_describe_context(space->machine), which, offset, data);
 	switch (offset)
 	{
 		case 0x0:	COMBINE_DATA(&compare_timer[which].regs[0]); update_compare(which, 0); break;

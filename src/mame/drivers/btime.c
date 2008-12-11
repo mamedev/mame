@@ -83,7 +83,7 @@ INLINE UINT8 swap_bits_5_6(UINT8 data)
 }
 
 
-static void btime_decrypt(running_machine *machine)
+static void btime_decrypt(const address_space *space)
 {
 	UINT8 *src, *src1;
 	int addr, addr1;
@@ -95,17 +95,17 @@ static void btime_decrypt(running_machine *machine)
 	/* xxxx xxx1 xxxx x1xx are encrypted. */
 
 	/* get the address of the next opcode */
-	addr = cpu_get_pc(machine->activecpu);
+	addr = cpu_get_pc(space->cpu);
 
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
-	addr1 = cpu_get_previouspc(machine->activecpu);
-	src1 = (addr1 < 0x9000) ? rambase : memory_region(machine, "main");
+	addr1 = cpu_get_previouspc(space->cpu);
+	src1 = (addr1 < 0x9000) ? rambase : memory_region(space->machine, "main");
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1+1] + 256 * src1[addr1+2];
 
 	/* If the address of the next instruction is xxxx xxx1 xxxx x1xx, decode it. */
-	src = (addr < 0x9000) ? rambase : memory_region(machine, "main");
+	src = (addr < 0x9000) ? rambase : memory_region(space->machine, "main");
 	if ((addr & 0x0104) == 0x0104)
 	{
 		/* 76543210 -> 65342710 bit rotation */
@@ -164,7 +164,7 @@ static WRITE8_HANDLER( btime_w )
 
 	rambase[offset] = data;
 
-	btime_decrypt(space->machine);
+	btime_decrypt(space);
 }
 
 static WRITE8_HANDLER( tisland_w )
@@ -184,7 +184,7 @@ static WRITE8_HANDLER( tisland_w )
 
 	rambase[offset] = data;
 
-	btime_decrypt(space->machine);
+	btime_decrypt(space);
 }
 
 static WRITE8_HANDLER( zoar_w )
@@ -202,7 +202,7 @@ static WRITE8_HANDLER( zoar_w )
 
 	rambase[offset] = data;
 
-	btime_decrypt(space->machine);
+	btime_decrypt(space);
 }
 
 static WRITE8_HANDLER( disco_w )
@@ -216,7 +216,7 @@ static WRITE8_HANDLER( disco_w )
 
 	rambase[offset] = data;
 
-	btime_decrypt(space->machine);
+	btime_decrypt(space);
 }
 
 

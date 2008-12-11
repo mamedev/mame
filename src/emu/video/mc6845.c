@@ -230,7 +230,7 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 
-	if (LOG)  logerror("M6845 PC %04x: reg 0x%02x = 0x%02x\n", cpu_get_pc(device->machine->activecpu), mc6845->register_address_latch, data);
+	if (LOG)  logerror("%s:M6845 reg 0x%02x = 0x%02x\n", cpuexec_describe_context(device->machine), mc6845->register_address_latch, data);
 
 	switch (mc6845->register_address_latch)
 	{

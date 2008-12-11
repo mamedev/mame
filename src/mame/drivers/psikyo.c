@@ -111,7 +111,7 @@ static CUSTOM_INPUT( z80_nmi_r )
 		/* main CPU might be waiting for sound CPU to finish NMI,
            so set a timer to give sound CPU a chance to run */
 		timer_call_after_resynch(field->port->machine, NULL, 0, NULL);
-//      logerror("PC %06X - Read coin port during Z80 NMI\n", cpu_get_pc(machine->activecpu));
+//      logerror("%s - Read coin port during Z80 NMI\n", cpuexec_describe_context(machine));
 	}
 
 	return ret;

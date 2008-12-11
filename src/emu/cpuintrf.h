@@ -166,16 +166,16 @@ enum
 /* get_reg/set_reg constants */
 enum
 {
-	/* This value is passed to activecpu_get_reg to retrieve the previous
+	/* This value is passed to cpu_get_reg to retrieve the previous
      * program counter value, ie. before a CPU emulation started
      * to fetch opcodes and arguments for the current instrution. */
 	REG_PREVIOUSPC = CPUINFO_INT_PREVIOUSPC - CPUINFO_INT_REGISTER,
 
-	/* This value is passed to activecpu_get_reg to retrieve the current
+	/* This value is passed to cpu_get_reg to retrieve the current
      * program counter value. */
 	REG_PC = CPUINFO_INT_PC - CPUINFO_INT_REGISTER,
 
-	/* This value is passed to activecpu_get_reg to retrieve the current
+	/* This value is passed to cpu_get_reg to retrieve the current
      * stack pointer value. */
 	REG_SP = CPUINFO_INT_SP - CPUINFO_INT_REGISTER
 };
@@ -689,12 +689,6 @@ char *cpuintrf_temp_str(void);
 
 
 /* ----- live context control ----- */
-
-/* remember the current context and push a new one on the stack */
-void cpu_push_context(const device_config *cpu);
-
-/* restore the previously saved context */
-void cpu_pop_context(void);
 
 /* find a CPU in the machine by searching */
 int cpu_get_index_slow(const device_config *cpu);

@@ -579,8 +579,8 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 
 	if (reg != 0x70 && chip == 0)
 	{
-		//printf("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
-		//logerror("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+		//printf("%s:gcu%d_w: %08X, %08X, %08X at %08X\n", cpuexec_describe_context(machine), chip, data, offset, mem_mask);
+		//logerror("%s:gcu%d_w: %08X, %08X, %08X at %08X\n", ccpuexec_describe_context(machine), hip, data, offset, mem_mask);
 	}
 
 	switch(reg)
@@ -974,7 +974,7 @@ static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 
 	if (reg == ATAPI_REG_DATA)
 	{
-//      printf("ATAPI: packet write %04x at %08X\n", data, cpu_get_pc(machine->activecpu));
+//      printf("%s:ATAPI: packet write %04x\n", cpuexec_describe_context(device->machine), data);
 		atapi_data[atapi_data_ptr] = data;
 		atapi_data_ptr++;
 

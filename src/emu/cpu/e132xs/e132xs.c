@@ -635,8 +635,6 @@ static TIMER_CALLBACK( e132xs_timer_callback )
 	hyperstone_state *cpustate = device->token;
 	int update = param;
 
-	cpu_push_context(device);
-
 	/* update the values if necessary */
 	if (update)
 		update_timer_prescale(cpustate);
@@ -648,8 +646,6 @@ static TIMER_CALLBACK( e132xs_timer_callback )
 	/* adjust ourselves for the next time */
 	else
 		adjust_timer_interrupt(cpustate);
-
-	cpu_pop_context();
 }
 
 

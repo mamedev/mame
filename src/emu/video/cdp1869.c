@@ -43,6 +43,7 @@ struct _cdp1869_t
 {
 	const cdp1869_interface *intf;	/* interface */
 	const device_config *screen;	/* screen */
+	const device_config *cpu;		/* CPU */
 	sound_stream *stream;			/* sound output */
 
 	/* video state */
@@ -150,9 +151,9 @@ static STATE_POSTLOAD( cdp1869_state_save_postload )
 
 /* CDP1802 X Register */
 
-static UINT16 cdp1802_get_r_x(running_machine *machine)
+static UINT16 cdp1802_get_r_x(cdp1869_t *cdp1869)
 {
-	return cpu_get_reg(machine->activecpu, CDP1802_R0 + cpu_get_reg(machine->activecpu, CDP1802_X));
+	return cpu_get_reg(cdp1869->cpu, CDP1802_R0 + cpu_get_reg(cdp1869->cpu, CDP1802_X));
 }
 
 /* Palette Initialization */
@@ -383,7 +384,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out4_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x(device->machine);
+	UINT16 word = cdp1802_get_r_x(cdp1869);
 
 	/*
       bit   description
@@ -422,7 +423,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x(device->machine);
+	UINT16 word = cdp1802_get_r_x(cdp1869);
 
 	/*
       bit   description
@@ -479,7 +480,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out6_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x(device->machine);
+	UINT16 word = cdp1802_get_r_x(cdp1869);
 
 	/*
       bit   description
@@ -509,7 +510,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out7_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x(device->machine);
+	UINT16 word = cdp1802_get_r_x(cdp1869);
 
 	/*
       bit   description
@@ -799,8 +800,13 @@ static DEVICE_START( cdp1869 )
 
 	// get the screen device
 
-	cdp1869->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, cdp1869->intf->screen_tag);
+	cdp1869->screen = devtag_get_device(device->machine, VIDEO_SCREEN, cdp1869->intf->screen_tag);
 	assert(cdp1869->screen != NULL);
+
+	// get the CPU device
+
+	cdp1869->cpu = cputag_get_cpu(device->machine, cdp1869->intf->cpu_tag);
+	assert(cdp1869->cpu != NULL);
 
 	// allocate timers
 

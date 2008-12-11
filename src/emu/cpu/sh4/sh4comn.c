@@ -257,7 +257,6 @@ static TIMER_CALLBACK( sh4_refresh_timer_callback )
 {
 	SH4 *sh4 = ptr;
 
-	cpu_push_context(sh4->device);
 	sh4->m[RTCNT] = 0;
 	sh4_refresh_timer_recompute(sh4);
 	sh4->m[RTCSR] |= 128;
@@ -270,7 +269,6 @@ static TIMER_CALLBACK( sh4_refresh_timer_callback )
 			sh4->m[RTCSR] |= 4;
 		}
 	}
-	cpu_pop_context();
 }
 
 static void increment_rtc_time(SH4 *sh4, int mode)
@@ -370,7 +368,6 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 {
 	SH4 *sh4 = ptr;
 
-	cpu_push_context(sh4->device);
 	timer_adjust_oneshot(sh4->rtc_timer, ATTOTIME_IN_HZ(128), 0);
 	sh4->m[R64CNT] = (sh4->m[R64CNT]+1) & 0x7f;
 	if (sh4->m[R64CNT] == 64)
@@ -379,7 +376,6 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 		increment_rtc_time(sh4, 0);
 		//sh4_exception_request(sh4, SH4_INTC_NMI); // TEST
 	}
-	cpu_pop_context();
 }
 
 static TIMER_CALLBACK( sh4_timer_callback )
@@ -389,13 +385,11 @@ static TIMER_CALLBACK( sh4_timer_callback )
 	int which = param;
 	int idx = tcr[which];
 
-	cpu_push_context(sh4->device);
 	sh4->m[tcnt[which]] = sh4->m[tcor[which]];
 	sh4_timer_recompute(sh4, which);
 	sh4->m[idx] = sh4->m[idx] | 0x100;
 	if (sh4->m[idx] & 0x20)
 		sh4_exception_request(sh4, tuni[which]);
-	cpu_pop_context();
 }
 
 static TIMER_CALLBACK( sh4_dmac_callback )
@@ -403,7 +397,6 @@ static TIMER_CALLBACK( sh4_dmac_callback )
 	SH4 *sh4 = ptr;
 	int channel = param;
 
-	cpu_push_context(sh4->device);
 	LOG(("SH4 '%s': DMA %d complete\n", sh4->device->tag, channel));
 	sh4->dma_timer_active[channel] = 0;
 	switch (channel)
@@ -433,7 +426,6 @@ static TIMER_CALLBACK( sh4_dmac_callback )
 			sh4_exception_request(sh4, SH4_INTC_DMTE3);
 		break;
 	}
-	cpu_pop_context();
 }
 
 static int sh4_dma_transfer(SH4 *sh4, int channel, int timermode, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
@@ -976,10 +968,7 @@ void sh4_set_frt_input(const device_config *device, int state)
 		return;
 	}
 
-	cpu_push_context(device);
-
 	if(sh4->frt_input == state) {
-		cpu_pop_context();
 		return;
 	}
 
@@ -987,12 +976,10 @@ void sh4_set_frt_input(const device_config *device, int state)
 
 	if(sh4->m[5] & 0x8000) {
 		if(state == CLEAR_LINE) {
-			cpu_pop_context();
 			return;
 		}
 	} else {
 		if(state == ASSERT_LINE) {
-			cpu_pop_context();
 			return;
 		}
 	}
@@ -1004,7 +991,6 @@ void sh4_set_frt_input(const device_config *device, int state)
 	logerror("SH4 '%s': ICF activated (%x)\n", sh4->device->tag, sh4->pc & AM);
 	sh4_recalc_irq();
 #endif
-	cpu_pop_context();
 }
 
 void sh4_set_irln_input(const device_config *device, int value)

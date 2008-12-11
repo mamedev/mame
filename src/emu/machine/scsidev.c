@@ -28,7 +28,7 @@ static int scsidev_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			return 0;
 
 		default:
-			logerror( "%08x: SCSIDEV unknown command %02x\n", cpu_get_pc(Machine->activecpu), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown command %02x\n", cpuexec_describe_context(Machine), command[ 0 ] );
 			return 0;
 	}
 }
@@ -43,7 +43,7 @@ static void scsidev_read_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 	switch( command[ 0 ] )
 	{
 		default:
-			logerror( "%08x: SCSIDEV unknown read %02x\n", cpu_get_pc(Machine->activecpu), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown read %02x\n", cpuexec_describe_context(Machine), command[ 0 ] );
 			break;
 	}
 }
@@ -58,7 +58,7 @@ static void scsidev_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dat
 	switch( command[ 0 ] )
 	{
 		default:
-			logerror( "%08x: SCSIDEV unknown write %02x\n", cpu_get_pc(Machine->activecpu), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown write %02x\n", cpuexec_describe_context(Machine), command[ 0 ] );
 			break;
 	}
 }

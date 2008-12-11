@@ -642,7 +642,7 @@ static void akiko_update_cdrom(const address_space *space)
 
 				if ( cmdbuf[7] == 0x80 )
 				{
-					if (LOG_AKIKO_CD) logerror( "AKIKO CD: PC:%06x Data read - start lba: %08x - end lba: %08x\n", safe_cpu_get_pc(space->machine->activecpu), startpos, endpos );
+					if (LOG_AKIKO_CD) logerror( "%s:AKIKO CD: Data read - start lba: %08x - end lba: %08x\n", cpuexec_describe_context(space->machine), startpos, endpos );
 					akiko.cdrom_speed = (cmdbuf[8] & 0x40) ? 2 : 1;
 					akiko.cdrom_lba_start = startpos;
 					akiko.cdrom_lba_end = endpos;

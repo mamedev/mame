@@ -331,7 +331,7 @@ static void hbarrel_i8751_write(int data)
 			break;
 		case 0x06:	/* Controls appearance & placement of special weapons */
 			i8751_return=weapons_table[level][data&0x1f];
-			//logerror("CPU #0 PC %06x: warning - write %02x to i8751, returning %04x\n",cpu_get_pc(machine->activecpu),data,i8751_return);
+			//logerror("%s: warning - write %02x to i8751, returning %04x\n",cpuexec_describe_context(machine),data,i8751_return);
 			break;
 		case 0xb:	/* Initialise the variables? */
 			i8751_return=0;
@@ -358,7 +358,7 @@ static void hbarrel_i8751_write(int data)
 		/* We have to use a state as the microcontroller remembers previous commands */
 	}
 
-//logerror("CPU #0 PC %06x: warning - write %02x to i8751\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%s: warning - write %02x to i8751\n",cpuexec_describe_context(machine),data);
 }
 
 static void baddudes_i8751_write(running_machine *machine, int data)
@@ -384,7 +384,7 @@ static void baddudes_i8751_write(running_machine *machine, int data)
 		case 0x75b: i8751_return=0x70f; break;
 	}
 
-	if (!i8751_return) logerror("%04x: warning - write unknown command %02x to 8571\n",cpu_get_pc(machine->activecpu),data);
+	if (!i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",cpuexec_describe_context(machine),data);
 }
 
 static void birdtry_i8751_write(running_machine *machine, int data)
@@ -453,7 +453,7 @@ static void birdtry_i8751_write(running_machine *machine, int data)
 		/*These are activated after a shot (???)*/
 		case 0x6ca: i8751_return = 0xff;      break;
 		case 0x7ff: i8751_return = 0x200;     break;
-		default: logerror("%04x: warning - write unknown command %02x to 8571\n",cpu_get_pc(machine->activecpu),data);
+		default: logerror("%s: warning - write unknown command %02x to 8571\n",cpuexec_describe_context(machine),data);
 	}
 }
 
@@ -494,7 +494,7 @@ See the code about 0xb60 (USA version)
 
 */
 
-logerror("CPU #0 PC %06x: warning - write %02x to i8751\n",cpu_get_pc(machine->activecpu),data);
+logerror("%s: warning - write %02x to i8751\n",cpuexec_describe_context(machine),data);
 
 }
 

@@ -147,23 +147,23 @@ static CUSTOM_INPUT( prot_r )
 //  static int prot = 0xa3;
 	int bit;
 
-//  logerror("%06x: IN1_r\n",cpu_get_pc(machine->activecpu));
+//  logerror("%s: IN1_r\n",cpuexec_describe_context(field->port->machine));
 
 #if 0
 	/* Pirates protection workaround. It more complicated than this... see code at
        602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	if (cpu_get_pc(machine->activecpu) == 0x6134)
+	if (cpu_get_pc(field->port->machine->cpu[0]) == 0x6134)
 	{
 		bit = prot & 1;
 		prot = (prot >> 1) | (bit << 7);
 	}
-	else if (cpu_get_pc(machine->activecpu) == 0x6020)
+	else if (cpu_get_pc(field->port->machine->cpu[0]) == 0x6020)
 		bit = 0;
-	else if (cpu_get_pc(machine->activecpu) == 0x6168)
+	else if (cpu_get_pc(field->port->machine->cpu[0]) == 0x6168)
 		bit = 0;
-	else if (cpu_get_pc(machine->activecpu) == 0x61cc)
+	else if (cpu_get_pc(field->port->machine->cpu[0]) == 0x61cc)
 		bit = 1;
 	else
 #endif

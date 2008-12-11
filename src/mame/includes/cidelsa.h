@@ -4,6 +4,7 @@
 #include "cpu/cdp1802/cdp1802.h"
 #include "video/cdp1869.h"
 
+#define MAIN_CPU_TAG	"main"
 #define DESTRYER_CHR1	3579000.0 // unverified
 #define DESTRYER_CHR2	XTAL_5_7143MHz
 #define ALTAIR_CHR1		3579000.0 // unverified

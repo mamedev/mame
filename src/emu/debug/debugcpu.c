@@ -2350,7 +2350,6 @@ static UINT64 expression_read_address_space(const address_space *space, offs_t a
 		address = memory_address_to_byte(space, address);
 
 		/* switch contexts and do the read */
-		cpu_push_context(space->cpu);
 		switch (size)
 		{
 			case 1:		result = debug_read_byte(space, address, TRUE);		break;
@@ -2358,7 +2357,6 @@ static UINT64 expression_read_address_space(const address_space *space, offs_t a
 			case 4:		result = debug_read_dword(space, address, TRUE);	break;
 			case 8:		result = debug_read_qword(space, address, TRUE);	break;
 		}
-		cpu_pop_context();
 	}
 	return result;
 }
@@ -2558,7 +2556,6 @@ static void expression_write_address_space(const address_space *space, offs_t ad
 		address = memory_address_to_byte(space, address);
 
 		/* switch contexts and do the write */
-		cpu_push_context(space->cpu);
 		switch (size)
 		{
 			case 1:		debug_write_byte(space, address, data, TRUE);	break;
@@ -2566,7 +2563,6 @@ static void expression_write_address_space(const address_space *space, offs_t ad
 			case 4:		debug_write_dword(space, address, data, TRUE);	break;
 			case 8:		debug_write_qword(space, address, data, TRUE);	break;
 		}
-		cpu_pop_context();
 	}
 }
 

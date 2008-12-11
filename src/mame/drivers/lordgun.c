@@ -116,7 +116,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 	if (data & ~0xfd)
 	{
 //      popmessage("EE: %02x", data);
-		logerror("PC %06X - Unknown EEPROM bit written %02X\n",cpu_get_pc(device->machine->activecpu),data);
+		logerror("%s - Unknown EEPROM bit written %02X\n",cpuexec_describe_context(device->machine),data);
 	}
 
 	coin_counter_w(0, data & 0x01);

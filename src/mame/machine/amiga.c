@@ -952,14 +952,14 @@ static TIMER_CALLBACK( amiga_blitter_proc )
  *
  *************************************/
 
-static void blitter_setup(void)
+static void blitter_setup(const address_space *space)
 {
 	int ticks, width, height, blittime;
 
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		logerror("PC: %08x - This program is playing tricks with the blitter\n", safe_cpu_get_pc(Machine->activecpu) );
+		logerror("%s - This program is playing tricks with the blitter\n", cpuexec_describe_context(space->machine) );
 		return;
 	}
 
@@ -992,7 +992,7 @@ static void blitter_setup(void)
 	if ( CUSTOM_REG(REG_DMACON) & 0x0400 )
 	{
 		/* simulate the 68k not running while the blit is going */
-		cpu_adjust_icount( Machine->activecpu, -(blittime/2) );
+		cpu_adjust_icount( space->cpu, -(blittime/2) );
 
 		blittime = BLITTER_NASTY_DELAY;
 	}
@@ -1005,7 +1005,7 @@ static void blitter_setup(void)
  	CUSTOM_REG(REG_DMACON) |= 0x4000;
 
 	/* set a timer */
-	timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( Machine->activecpu, blittime ), 0);
+	timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( space->cpu, blittime ), 0);
 }
 
 
@@ -1289,7 +1289,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(REG_BLTSIZH) = data & 0x3f;
 			if ( CUSTOM_REG(REG_BLTSIZV) == 0 ) CUSTOM_REG(REG_BLTSIZV) = 0x400;
 			if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x40;
-			blitter_setup();
+			blitter_setup(space);
 			break;
 
 		case REG_BLTSIZV:	/* ECS-AGA only */
@@ -1305,7 +1305,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			{
 				CUSTOM_REG(REG_BLTSIZH) = data & 0x7ff;
 				if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x800;
-				blitter_setup();
+				blitter_setup(space);
 			}
 			break;
 
@@ -1374,7 +1374,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
-				timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( space->machine->activecpu, BLITTER_NASTY_DELAY ), 0);
+				timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( space->cpu, BLITTER_NASTY_DELAY ), 0);
 
 			break;
 
@@ -1385,7 +1385,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
-				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( space->machine->activecpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
+				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( space->cpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
 			else /* if we're disabling irq's, process right away */
 				update_irqs(space->machine);
 			break;

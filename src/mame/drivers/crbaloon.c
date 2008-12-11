@@ -79,7 +79,7 @@ static CUSTOM_INPUT( pc3092_r )
 	else
 		ret = 0x00;
 
-	if (LOG_PC3092) logerror("%04X:  read  PC3092 = 0x%02x\n", safe_cpu_get_pc(field->port->machine->activecpu), ret);
+	if (LOG_PC3092) logerror("%s:  read  PC3092 = 0x%02x\n", cpuexec_describe_context(field->port->machine), ret);
 
 	return ret;
 }

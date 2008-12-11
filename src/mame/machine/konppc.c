@@ -273,7 +273,7 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 		}
 	}
 
-//  printf("cgboard_dsp_comm_w_sharc: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+//  printf("%s:cgboard_dsp_comm_w_sharc: %08X, %08X, %08X\n", cpuexec_describe_context(space->machine), data, offset, mem_mask);
 
 	dsp_comm_sharc[board][offset] = data;
 }
@@ -430,7 +430,7 @@ static UINT32 K033906_r(int chip, int reg)
 		case 0x0f:		return K033906_reg[chip][0x0f];		// interrupt_line, interrupt_pin, min_gnt, max_lat
 
 		default:
-			fatalerror("K033906_r: %d, %08X at %08X", chip, reg, cpu_get_pc(Machine->activecpu));
+			fatalerror("%s:K033906_r: %d, %08X", cpuexec_describe_context(Machine), chip, reg);
 	}
 	return 0;
 }
@@ -479,7 +479,7 @@ static void K033906_w(running_machine *machine, int chip, int reg, UINT32 data)
 			break;
 
 		default:
-			fatalerror("K033906_w: %d, %08X, %08X at %08X", chip, data, reg, cpu_get_pc(machine->activecpu));
+			fatalerror("%s:K033906_w: %d, %08X, %08X", cpuexec_describe_context(machine), chip, data, reg);
 	}
 }
 

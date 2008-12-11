@@ -1333,7 +1333,7 @@ void ppu2c0x_spriteram_dma (const address_space *space, int num, const UINT8 pag
 	}
 
 	// should last 513 CPU cycles.
-	cpu_adjust_icount(chips[num].machine->activecpu, -513);
+	cpu_adjust_icount(space->cpu, -513);
 
 	// ????TODO : need to account for PPU rendering - this is roughly 4.5 scanlines eaten up.
 	// Because the DMA is only useful during vblank, this may not be strictly necessary since

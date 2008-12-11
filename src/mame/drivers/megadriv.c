@@ -624,7 +624,7 @@ static void megadrive_vdp_set_register(running_machine *machine, int regnum, UIN
 //  if (regnum == 0x0a)
 //      mame_printf_debug("Set HINT Reload Register to %d on scanline %d\n",value, genesis_scanline_counter);
 
-//  mame_printf_debug("%06x Setting VDP Register #%02x to %02x\n",cpu_get_pc(machine->activecpu), regnum,value);
+//  mame_printf_debug("%s: Setting VDP Register #%02x to %02x\n",cpuexec_describe_context(machine), regnum,value);
 }
 
 static void update_megadrive_vdp_code_and_address(void)
@@ -719,7 +719,7 @@ static void megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length)
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	cpu_spinuntil_time(Machine->activecpu, ATTOTIME_IN_NSEC(length*1000/3500));
+	cpu_spinuntil_time(Machine->cpu[0], ATTOTIME_IN_NSEC(length*1000/3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
@@ -804,7 +804,7 @@ static void handle_dma_bits(running_machine *machine)
 		UINT16 length;
 		source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0xff)<<16))<<1;
 		length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
-	//  mame_printf_debug("%06x 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", cpu_get_pc(machine->activecpu), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
+	//  mame_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", cpuexec_describe_context(machine), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
 
 	}
 
@@ -3634,7 +3634,7 @@ INLINE void overwrite_write(UINT16 *dst, UINT16 d)
 	if (d & 0x000f) { *dst &= ~0x000f; *dst |= d & 0x000f; }
 }
 
-static UINT32 pm_io(running_machine *machine, int reg, int write, UINT32 d)
+static UINT32 pm_io(const address_space *space, int reg, int write, UINT32 d)
 {
 	if (svp.emu_status & SSP_PMC_SET)
 	{
@@ -3648,7 +3648,7 @@ static UINT32 pm_io(running_machine *machine, int reg, int write, UINT32 d)
 		svp.emu_status &= ~SSP_PMC_HAVE_ADDR;
 	}
 
-	if (reg == 4 || (cpu_get_reg(machine->activecpu, SSP_ST) & 0x60))
+	if (reg == 4 || (cpu_get_reg(space->cpu, SSP_ST) & 0x60))
 	{
 		#define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
 		UINT16 *dram = (UINT16 *)svp.dram;
@@ -3689,7 +3689,7 @@ static UINT32 pm_io(running_machine *machine, int reg, int write, UINT32 d)
 			int addr = svp.pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *) memory_region(machine, "main");
+				UINT16 *ROM = (UINT16 *) memory_region(space->machine, "main");
 				svp.pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
@@ -3718,7 +3718,7 @@ static UINT32 pm_io(running_machine *machine, int reg, int write, UINT32 d)
 
 static READ16_HANDLER( read_PM0 )
 {
-	UINT32 d = pm_io(space->machine, 0, 0, 0);
+	UINT32 d = pm_io(space, 0, 0, 0);
 	if (d != (UINT32)-1) return d;
 	d = svp.XST2;
 	svp.XST2 &= ~2; // ?
@@ -3727,14 +3727,14 @@ static READ16_HANDLER( read_PM0 )
 
 static WRITE16_HANDLER( write_PM0 )
 {
-	UINT32 r = pm_io(space->machine, 0, 1, data);
+	UINT32 r = pm_io(space, 0, 1, data);
 	if (r != (UINT32)-1) return;
 	svp.XST2 = data; // ?
 }
 
 static READ16_HANDLER( read_PM1 )
 {
-	UINT32 r = pm_io(space->machine, 1, 0, 0);
+	UINT32 r = pm_io(space, 1, 0, 0);
 	if (r != (UINT32)-1) return r;
 	logerror("svp: PM1 acces in non PM mode?\n");
 	return 0;
@@ -3742,14 +3742,14 @@ static READ16_HANDLER( read_PM1 )
 
 static WRITE16_HANDLER( write_PM1 )
 {
-	UINT32 r = pm_io(space->machine, 1, 1, data);
+	UINT32 r = pm_io(space, 1, 1, data);
 	if (r != (UINT32)-1) return;
 	logerror("svp: PM1 acces in non PM mode?\n");
 }
 
 static READ16_HANDLER( read_PM2 )
 {
-	UINT32 r = pm_io(space->machine, 2, 0, 0);
+	UINT32 r = pm_io(space, 2, 0, 0);
 	if (r != (UINT32)-1) return r;
 	logerror("svp: PM2 acces in non PM mode?\n");
 	return 0;
@@ -3757,14 +3757,14 @@ static READ16_HANDLER( read_PM2 )
 
 static WRITE16_HANDLER( write_PM2 )
 {
-	UINT32 r = pm_io(space->machine, 2, 1, data);
+	UINT32 r = pm_io(space, 2, 1, data);
 	if (r != (UINT32)-1) return;
 	logerror("svp: PM2 acces in non PM mode?\n");
 }
 
 static READ16_HANDLER( read_XST )
 {
-	UINT32 d = pm_io(space->machine, 3, 0, 0);
+	UINT32 d = pm_io(space, 3, 0, 0);
 	if (d != (UINT32)-1) return d;
 
 	return svp.XST;
@@ -3772,7 +3772,7 @@ static READ16_HANDLER( read_XST )
 
 static WRITE16_HANDLER( write_XST )
 {
-	UINT32 r = pm_io(space->machine, 3, 1, data);
+	UINT32 r = pm_io(space, 3, 1, data);
 	if (r != (UINT32)-1) return;
 
 	svp.XST2 |= 1;
@@ -3781,12 +3781,12 @@ static WRITE16_HANDLER( write_XST )
 
 static READ16_HANDLER( read_PM4 )
 {
-	return pm_io(space->machine, 4, 0, 0);
+	return pm_io(space, 4, 0, 0);
 }
 
 static WRITE16_HANDLER( write_PM4 )
 {
-	pm_io(space->machine, 4, 1, data);
+	pm_io(space, 4, 1, data);
 }
 
 static READ16_HANDLER( read_PMC )

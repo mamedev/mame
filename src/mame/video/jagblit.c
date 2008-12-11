@@ -195,7 +195,7 @@ static void FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	{
 		if (LOG_BAD_BLITS)
 		{
-		logerror("%08X:Blit!\n", cpu_get_previouspc(Machine->activecpu));
+		logerror("%s:Blit!\n", cpuexec_describe_context(Machine));
 		logerror("  a1_base  = %08X\n", a1_base);
 		logerror("  a2_base  = %08X\n", a2_base);
 		}
@@ -275,7 +275,7 @@ static void FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 
 	if (LOG_BLITS)
 	{
-	logerror("%08X:Blit!\n", cpu_get_previouspc(Machine->activecpu));
+	logerror("%s:Blit!\n", cpuexec_describe_context(Machine));
 	logerror("  a1_base  = %08X\n", a1_base);
 	logerror("  a1_pitch = %d\n", a1_pitch);
 	logerror("  a1_psize = %d\n", 1 << ((A1FIXED >> 3) & 7));

@@ -178,7 +178,7 @@ static void via_set_int (running_machine *machine, int which, int data)
 
 	v->ifr |= data;
 #ifdef TRACE_VIA
-logerror("6522VIA chip %d: IFR = %02X.  PC: %08X\n", which, v->ifr, safe_cpu_get_pc(machine->activecpu));
+logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), which, v->ifr);
 #endif
 
 	if (v->ier & v->ifr)
@@ -187,7 +187,7 @@ logerror("6522VIA chip %d: IFR = %02X.  PC: %08X\n", which, v->ifr, safe_cpu_get
 		if (v->intf->irq_func)
 			(*v->intf->irq_func)(machine, ASSERT_LINE);
 		else
-			logerror("6522VIA chip %d: Interrupt is asserted but there is no callback function.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+			logerror("%s:6522VIA chip %d: Interrupt is asserted but there is no callback function\n", cpuexec_describe_context(machine), which);
     }
 }
 
@@ -198,7 +198,7 @@ static void via_clear_int (running_machine *machine, int which, int data)
 
 	v->ifr = (v->ifr & ~data) & 0x7f;
 #ifdef TRACE_VIA
-logerror("6522VIA chip %d: IFR = %02X.  PC: %08X\n", which, v->ifr, safe_cpu_get_pc(machine->activecpu));
+logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), which, v->ifr);
 #endif
 
 	if (v->ifr & v->ier)
@@ -208,7 +208,7 @@ logerror("6522VIA chip %d: IFR = %02X.  PC: %08X\n", which, v->ifr, safe_cpu_get
 		if (v->intf->irq_func)
 			(*v->intf->irq_func)(machine, CLEAR_LINE);
 //      else
-//          logerror("6522VIA chip %d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+//          logerror("%s:6522VIA chip %d: Interrupt is cleared but there is no callback function\n", cpuexec_describe_context(machine), which);
 	}
 }
 
@@ -343,7 +343,7 @@ static TIMER_CALLBACK( via_t1_timeout )
 		if (v->intf->out_b_func)
 			v->intf->out_b_func(space, 0, write_data);
 		else
-			logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
+			logerror("%s:6522VIA chip %d: Port B is being written to but has no handler. %02X\n", cpuexec_describe_context(machine), which, write_data);
 	}
 
 	if (!(v->ifr & INT_T1))
@@ -411,7 +411,7 @@ int via_read(running_machine *machine, int which, int offset)
 			if (v->intf->in_b_func)
 				v->in_b = v->intf->in_b_func(space, 0);
 			else
-				logerror("6522VIA chip %d: Port B is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+				logerror("%s:6522VIA chip %d: Port B is being read but has no handler\n", cpuexec_describe_context(machine), which);
 		}
 
 		CLR_PB_INT(v, which);
@@ -430,7 +430,7 @@ int via_read(running_machine *machine, int which, int offset)
 			if (v->intf->in_a_func)
 				v->in_a = v->intf->in_a_func(space, 0);
 			else
-				logerror("6522VIA chip %d: Port A is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+				logerror("%s:6522VIA chip %d: Port A is being read but has no handler\n", cpuexec_describe_context(machine), which);
 		}
 
 		/* combine input and output values */
@@ -451,7 +451,7 @@ int via_read(running_machine *machine, int which, int offset)
 				if (v->intf->out_ca2_func)
 					v->intf->out_ca2_func(space, 0, 0);
 				else
-					logerror("6522VIA chip %d: Port CA2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 0);
+					logerror("%s:6522VIA chip %d: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 0);
 			}
 		}
 
@@ -464,7 +464,7 @@ int via_read(running_machine *machine, int which, int offset)
 			if (v->intf->in_a_func)
 				v->in_a = v->intf->in_a_func(space, 0);
 			else
-				logerror("6522VIA chip %d: Port A is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+				logerror("%s:6522VIA chip %d: Port A is being read but has no handler\n", cpuexec_describe_context(machine), which);
 		}
 
 		/* combine input and output values */
@@ -576,7 +576,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			if (v->intf->out_b_func)
 				v->intf->out_b_func(space, 0, write_data);
 			else
-				logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
+				logerror("%s:6522VIA chip %d: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
 		}
 
 		CLR_PB_INT(v, which);
@@ -594,7 +594,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				if (v->intf->out_cb2_func)
 					v->intf->out_cb2_func(space, 0, 0);
 				else
-					logerror("6522VIA chip %d: Port CB2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 0);
+					logerror("%s:6522VIA chip %d: Port CB2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 0);
 			}
 		}
 		break;
@@ -609,7 +609,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			if (v->intf->out_a_func)
 				v->intf->out_a_func(space, 0, write_data);
 			else
-				logerror("6522VIA chip %d: Port A is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
+				logerror("%s:6522VIA chip %d: Port A is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
 		}
 
 		CLR_PA_INT(v, which);
@@ -625,7 +625,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				v->intf->out_ca2_func(space, 0, 1);
 			}
 			else
-				logerror("6522VIA chip %d: Port CA2 is being pulsed but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+				logerror("%s:6522VIA chip %d: Port CA2 is being pulsed but has no handler\n", cpuexec_describe_context(machine), which);
 
 			/* set CA2 (shouldn't be needed) */
 			v->out_ca2 = 1;
@@ -641,7 +641,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				if (v->intf->out_ca2_func)
 					v->intf->out_ca2_func(space, 0, 0);
 				else
-					logerror("6522VIA chip %d: Port CA2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 0);
+					logerror("%s:6522VIA chip %d: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 0);
 			}
 		}
 
@@ -657,7 +657,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			if (v->intf->out_a_func)
 				v->intf->out_a_func(space, 0, write_data);
 			else
-				logerror("6522VIA chip %d: Port A is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
+				logerror("%s:6522VIA chip %d: Port A is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
 		}
 
 		break;
@@ -675,7 +675,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				if (v->intf->out_b_func)
 					v->intf->out_b_func(space, 0, write_data);
 				else
-					logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
+					logerror("%s:6522VIA chip %d: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
 			}
 		}
 		break;
@@ -693,7 +693,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				if (v->intf->out_a_func)
 					v->intf->out_a_func(space, 0, write_data);
 				else
-					logerror("6522VIA chip %d: Port A is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
+					logerror("%s:6522VIA chip %d: Port A is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
 			}
 		}
 		break;
@@ -725,7 +725,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				if (v->intf->out_b_func)
 					v->intf->out_b_func(space, 0, write_data);
 				else
-					logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
+					logerror("%s:6522VIA chip %d: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
 			}
 		}
 		timer_adjust_oneshot(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which);
@@ -766,7 +766,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
     case VIA_PCR:
 		v->pcr = data;
 #ifdef TRACE_VIA
-logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_cpu_get_pc(machine->activecpu));
+logerror("%s:6522VIA chip %d: PCR = %02X\n", cpuexec_describe_context(machine), which, data);
 #endif
 
 		if (CA2_FIX_OUTPUT(data) && CA2_OUTPUT_LEVEL(data) ^ v->out_ca2)
@@ -775,7 +775,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 			if (v->intf->out_ca2_func)
 				v->intf->out_ca2_func(space, 0, v->out_ca2);
 			else
-				logerror("6522VIA chip %d: Port CA2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), v->out_ca2);
+				logerror("%s:6522VIA chip %d: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, v->out_ca2);
 		}
 
 		if (CB2_FIX_OUTPUT(data) && CB2_OUTPUT_LEVEL(data) ^ v->out_cb2)
@@ -784,7 +784,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 			if (v->intf->out_cb2_func)
 				v->intf->out_cb2_func(space, 0, v->out_cb2);
 			else
-				logerror("6522VIA chip %d: Port CB2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), v->out_cb2);
+				logerror("%s:6522VIA chip %d: Port CB2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, v->out_cb2);
 		}
 		break;
 
@@ -806,7 +806,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 					if (v->intf->out_b_func)
 						v->intf->out_b_func(space, 0, write_data);
 					else
-						logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
+						logerror("%s:6522VIA chip %d: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
 				}
 			}
 			if (T1_CONTINUOUS(data))
@@ -831,7 +831,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 				if (v->intf->irq_func)
 					(*v->intf->irq_func)(machine, CLEAR_LINE);
 //              else
-//                  logerror("6522VIA chip %d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+//                  logerror("%s:6522VIA chip %d: Interrupt is cleared but there is no callback function\n", cpuexec_describe_context(machine), which);
 			}
 		}
 		else
@@ -842,7 +842,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 				if (v->intf->irq_func)
 					(*v->intf->irq_func)(machine, ASSERT_LINE);
 				else
-					logerror("6522VIA chip %d: Interrupt is asserted but there is no callback function.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+					logerror("%s:6522VIA chip %d: Interrupt is asserted but there is no callback function\n", cpuexec_describe_context(machine), which);
 			}
 		}
 		break;
@@ -880,7 +880,7 @@ void via_set_input_ca1(running_machine *machine, int which, int data)
 	if (data != v->in_ca1)
     {
 #ifdef TRACE_VIA
-logerror("6522VIA chip %d: CA1 = %02X.  PC: %08X\n", which, data, safe_cpu_get_pc(machine->activecpu));
+logerror("%s:6522VIA chip %d: CA1 = %02X\n", cpuexec_describe_context(machine), which, data);
 #endif
 		if ((CA1_LOW_TO_HIGH(v->pcr) && data) || (CA1_HIGH_TO_LOW(v->pcr) && !data))
 		{
@@ -889,7 +889,7 @@ logerror("6522VIA chip %d: CA1 = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 				if (v->intf->in_a_func)
 					v->in_a = v->intf->in_a_func(space, 0);
 				else
-					logerror("6522VIA chip %d: Port A is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+					logerror("%s:6522VIA chip %d: Port A is being read but has no handler\n", cpuexec_describe_context(machine), which);
 			}
 
 			via_set_int (machine, which, INT_CA1);
@@ -907,7 +907,7 @@ logerror("6522VIA chip %d: CA1 = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 					if (v->intf->out_ca2_func)
 						v->intf->out_ca2_func(space, 0, 1);
 					else
-						logerror("6522VIA chip %d: Port CA2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 1);
+						logerror("%s:6522VIA chip %d: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 1);
 				}
 			}
 		}
@@ -978,7 +978,7 @@ void via_set_input_cb1(running_machine *machine, int which, int data)
 				if (v->intf->in_b_func)
 					v->in_b = v->intf->in_b_func(space, 0);
 				else
-					logerror("6522VIA chip %d: Port B is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
+					logerror("%s:6522VIA chip %d: Port B is being read but has no handler\n", cpuexec_describe_context(machine), which);
 			}
 			if (SO_EXT_CONTROL(v->acr) || SI_EXT_CONTROL(v->acr))
 				via_shift (machine, which);
@@ -998,7 +998,7 @@ void via_set_input_cb1(running_machine *machine, int which, int data)
 					if (v->intf->out_cb2_func)
 						v->intf->out_cb2_func(space, 0, 1);
 					else
-						logerror("6522VIA chip %d: Port CB2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 1);
+						logerror("%s:6522VIA chip %d: Port CB2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 1);
 				}
 			}
 		}

@@ -104,6 +104,7 @@ has twice the steps, happening twice as fast.
 #include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "ay8910.h"
 
 /*************************************
@@ -800,7 +801,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->intf->portAread)
 			psg->regs[AY_PORTA] = (*psg->intf->portAread)(space, 0);
 		else
-			logerror("PC %04x: warning - read 8910 '%s' Port A\n",cpu_get_pc(Machine->activecpu),psg->device->tag);
+			logerror("%s: warning - read 8910 '%s' Port A\n",cpuexec_describe_context(Machine),psg->device->tag);
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
@@ -808,7 +809,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->intf->portBread)
 			psg->regs[AY_PORTB] = (*psg->intf->portBread)(space, 0);
 		else
-			logerror("PC %04x: warning - read 8910 '%s' Port B\n",cpu_get_pc(Machine->activecpu),psg->device->tag);
+			logerror("%s: warning - read 8910 '%s' Port B\n",cpuexec_describe_context(Machine),psg->device->tag);
 		break;
 	}
 	return psg->regs[r];

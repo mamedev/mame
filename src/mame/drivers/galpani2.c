@@ -144,7 +144,7 @@ static void galpani2_mcu_nmi(running_machine *machine)
 			mcu_size	=	(memory_read_byte(srcspace, mcu_address + 8)<<8) +
 							(memory_read_byte(srcspace, mcu_address + 9)<<0) ;
 
-			logerror("CPU #0 PC %06X : MCU executes command $A, %04X %02X-> %04x\n",cpu_get_pc(machine->activecpu),mcu_src,mcu_size,mcu_dst);
+			logerror("%s : MCU executes command $A, %04X %02X-> %04x\n",cpuexec_describe_context(machine),mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
@@ -164,7 +164,7 @@ static void galpani2_mcu_nmi(running_machine *machine)
 			memory_write_byte(srcspace,mcu_address+0,0xff);
 			memory_write_byte(srcspace,mcu_address+1,0xff);
 
-			logerror("CPU #0 PC %06X : MCU ERROR, unknown command %02X\n",cpu_get_pc(machine->activecpu),mcu_command);
+			logerror("%s : MCU ERROR, unknown command %02X\n",cpuexec_describe_context(machine),mcu_command);
 		}
 
 		/* Erase command? */

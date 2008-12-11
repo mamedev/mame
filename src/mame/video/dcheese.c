@@ -222,7 +222,7 @@ static void do_blit(running_machine *machine)
 	if (blitter_xparam[8] != 0 || blitter_xparam[9] != 0 || blitter_xparam[10] != 0 || blitter_xparam[11] != 0 ||
 		blitter_yparam[8] != 0 || blitter_yparam[9] != 0 || blitter_yparam[10] != 0 || blitter_yparam[11] != 0)
 	{
-		logerror("%06X:blit! (%04X)\n", cpu_get_pc(machine->activecpu), blitter_color[0]);
+		logerror("%s:blit! (%04X)\n", cpuexec_describe_context(machine), blitter_color[0]);
 		logerror("   %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
 				blitter_xparam[0], blitter_xparam[1], blitter_xparam[2], blitter_xparam[3],
 				blitter_xparam[4], blitter_xparam[5], blitter_xparam[6], blitter_xparam[7],

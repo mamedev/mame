@@ -783,7 +783,7 @@ static UINT16 get_video_control(running_machine *machine)
 
 	ret = (v_counter << 7) | (neogeo_get_auto_animation_counter() & 0x0007);
 
-	if (VERBOSE) logerror("PC %06x: video_control read (%04x)\n", cpu_get_pc(machine->activecpu), ret);
+	if (VERBOSE) logerror("%s: video_control read (%04x)\n", cpuexec_describe_context(machine), ret);
 
 	return ret;
 }
@@ -792,7 +792,7 @@ static UINT16 get_video_control(running_machine *machine)
 static void set_video_control(running_machine *machine, UINT16 data)
 {
 	/* this does much more than this, but I'm not sure exactly what */
-	if (VERBOSE) logerror("%06x: video control write %04x\n", cpu_get_pc(machine->activecpu), data);
+	if (VERBOSE) logerror("%s: video control write %04x\n", cpuexec_describe_context(machine), data);
 
 	set_auto_animation_speed(data >> 8);
 	set_auto_animation_disabled(data & 0x0008);

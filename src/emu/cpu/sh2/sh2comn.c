@@ -114,7 +114,6 @@ TIMER_CALLBACK( sh2_timer_callback )
 	SH2 *sh2 = ptr;
 	UINT16 frc;
 
-	cpu_push_context(sh2->device);
 	sh2_timer_resync(sh2);
 
 	frc = sh2->frc;
@@ -135,8 +134,6 @@ TIMER_CALLBACK( sh2_timer_callback )
 
 	sh2_recalc_irq(sh2);
 	sh2_timer_activate(sh2);
-
-	cpu_pop_context();
 }
 
 TIMER_CALLBACK( sh2_dmac_callback )
@@ -144,12 +141,10 @@ TIMER_CALLBACK( sh2_dmac_callback )
 	int dma = param & 1;
 	SH2 *sh2 = ptr;
 
-	cpu_push_context(sh2->device);
 	LOG(("SH2.%d: DMA %d complete\n", cpu_get_index(sh2->device), dma));
 	sh2->m[0x63+4*dma] |= 2;
 	sh2->dma_timer_active[dma] = 0;
 	sh2_recalc_irq(sh2);
-	cpu_pop_context();
 }
 
 static void sh2_dmac_check(SH2 *sh2, int dma)
@@ -519,10 +514,7 @@ void sh2_set_frt_input(const device_config *device, int state)
 		return;
 	}
 
-	cpu_push_context(device);
-
 	if(sh2->frt_input == state) {
-		cpu_pop_context();
 		return;
 	}
 
@@ -530,12 +522,10 @@ void sh2_set_frt_input(const device_config *device, int state)
 
 	if(sh2->m[5] & 0x8000) {
 		if(state == CLEAR_LINE) {
-			cpu_pop_context();
 			return;
 		}
 	} else {
 		if(state == ASSERT_LINE) {
-			cpu_pop_context();
 			return;
 		}
 	}
@@ -545,7 +535,6 @@ void sh2_set_frt_input(const device_config *device, int state)
 	sh2->m[4] |= ICF;
 	logerror("SH2.%d: ICF activated (%x)\n", cpu_get_index(sh2->device), sh2->pc & AM);
 	sh2_recalc_irq(sh2);
-	cpu_pop_context();
 }
 
 void sh2_set_irq_line(SH2 *sh2, int irqline, int state)

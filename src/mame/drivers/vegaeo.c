@@ -76,7 +76,7 @@ static WRITE32_HANDLER( vega_misc_w )
 
 static READ32_HANDLER( vegaeo_custom_read )
 {
-	eolith_speedup_read(space->machine);
+	eolith_speedup_read(space);
 	return input_port_read(space->machine, "SYSTEM");
 }
 

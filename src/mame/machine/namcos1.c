@@ -739,8 +739,8 @@ static void namcos1_bankswitch(running_machine *machine, int cpu, offs_t offset,
 	/* unmapped bank warning */
 	if( namcos1_active_bank[bank].bank_handler_r == unknown_r)
 	{
-		logerror("CPU #%d PC %04x:warning unknown chip selected bank %x=$%04x\n", cpu , cpu_get_pc(machine->activecpu), bank , chip[bank] );
-//          if (chip) popmessage("CPU #%d PC %04x:unknown chip selected bank %x=$%04x", cpu , cpu_get_pc(machine->activecpu), bank , chip[bank] );
+		logerror("%s:warning unknown chip selected bank %x=$%04x\n", cpuexec_describe_context(machine), bank , chip[bank] );
+//          if (chip) popmessage("%s:unknown chip selected bank %x=$%04x", cpu , cpuexec_describe_context(machine), bank , chip[bank] );
 	}
 }
 

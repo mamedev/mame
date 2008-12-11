@@ -300,7 +300,7 @@ static void borntofi_adpcm_start(int voice)
 	msm5205_reset_w(voice,0);
 	borntofi_adpcm[voice].playing = 1;
 	borntofi_adpcm[voice].nibble  = 0;
-//  logerror("CPU #0 PC = %04X: adpcm start = %06x, stop = %06x\n", cpu_get_pc(machine->activecpu), borntofi_adpcm[voice].addr[0], borntofi_adpcm[voice].addr[1]);
+//  logerror("%s: adpcm start = %06x, stop = %06x\n", cpuexec_describe_context(device->machine), borntofi_adpcm[voice].addr[0], borntofi_adpcm[voice].addr[1]);
 }
 
 static void borntofi_adpcm_stop(int voice)

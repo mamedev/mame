@@ -141,7 +141,7 @@ static CDP1869_ON_PRD_CHANGED(cidelsa_prd_changed)
 
 	// PRD is inverted
 
-	cputag_set_input_line(device->machine, "main", INPUT_LINE_IRQ0, !prd);
+	cputag_set_input_line(device->machine, MAIN_CPU_TAG, INPUT_LINE_IRQ0, !prd);
 	state->cdp1869_prd = !prd;
 }
 
@@ -157,6 +157,7 @@ static CDP1869_ON_PRD_CHANGED(draco_prd_changed)
 static CDP1869_INTERFACE( destryer_cdp1869_intf )
 {
 	SCREEN_TAG,
+	MAIN_CPU_TAG,
 	DESTRYER_CHR2,
 	0,
 	CDP1869_PAL,
@@ -171,6 +172,7 @@ static CDP1869_INTERFACE( destryer_cdp1869_intf )
 static CDP1869_INTERFACE( altair_cdp1869_intf )
 {
 	SCREEN_TAG,
+	MAIN_CPU_TAG,
 	ALTAIR_CHR2,
 	0,
 	CDP1869_PAL,
@@ -185,6 +187,7 @@ static CDP1869_INTERFACE( altair_cdp1869_intf )
 static CDP1869_INTERFACE( draco_cdp1869_intf )
 {
 	SCREEN_TAG,
+	MAIN_CPU_TAG,
 	DRACO_CHR2,
 	0,
 	CDP1869_PAL,

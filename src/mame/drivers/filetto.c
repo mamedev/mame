@@ -552,15 +552,10 @@ static UINT8 at_pages[0x10];
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
 	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 result;
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
-	result = memory_read_byte(space, page_offset + offset);
-	cpu_pop_context();
-
-	return result;
+	return memory_read_byte(space, page_offset + offset);
 }
 
 
@@ -570,9 +565,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
 	memory_write_byte(space, page_offset + offset, data);
-	cpu_pop_context();
 }
 
 static READ8_HANDLER(dma_page_select_r)

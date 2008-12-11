@@ -607,7 +607,7 @@ void viper_bankswitch(running_machine *machine)
 	address = &master_base[bank_list[alternate_bank & 3]];
 	if (bank_list[alternate_bank & 3] >= master_length)
 	{
-		logerror("%04X:Master bank %02X out of range!\n", safe_cpu_get_pc(machine->activecpu), alternate_bank & 3);
+		logerror("%s:Master bank %02X out of range!\n", cpuexec_describe_context(machine), alternate_bank & 3);
 		address = &master_base[bank_list[0]];
 	}
 	memory_set_bankptr(machine, 1, address);
@@ -628,7 +628,7 @@ void offroad_bankswitch(running_machine *machine)
 	address = &master_base[bank_list[alternate_bank & 7]];
 	if (bank_list[alternate_bank & 7] >= master_length)
 	{
-		logerror("%04X:Master bank %02X out of range!\n", safe_cpu_get_pc(machine->activecpu), alternate_bank & 7);
+		logerror("%s:Master bank %02X out of range!\n", cpuexec_describe_context(machine), alternate_bank & 7);
 		address = &master_base[bank_list[0]];
 	}
 	memory_set_bankptr(machine, 1, address);
@@ -653,7 +653,7 @@ void ataxx_bankswitch(running_machine *machine)
 	address = &master_base[bank_list[master_bank & 15]];
 	if (bank_list[master_bank & 15] >= master_length)
 	{
-		logerror("%04X:Master bank %02X out of range!\n", safe_cpu_get_pc(machine->activecpu), master_bank & 15);
+		logerror("%s:Master bank %02X out of range!\n", cpuexec_describe_context(machine), master_bank & 15);
 		address = &master_base[bank_list[0]];
 	}
 	memory_set_bankptr(machine, 1, address);
@@ -991,7 +991,7 @@ static int keycard_r(running_machine *machine)
 {
 	int result = 0;
 
-	if (LOG_KEYCARDS_FULL) logerror("  (%04X:keycard_r)\n", safe_cpu_get_pc(machine->activecpu));
+	if (LOG_KEYCARDS_FULL) logerror("  (%s:keycard_r)\n", cpuexec_describe_context(machine));
 
 	/* if we have a valid keycard read state, we're reading from the keycard */
 	if (keycard_state & 0x80)
@@ -1015,7 +1015,7 @@ static void keycard_w(running_machine *machine, int data)
 	int new_state = data & 0xb0;
 	int new_clock = data & 0x40;
 
-	if (LOG_KEYCARDS_FULL) logerror("  (%04X:keycard_w=%02X)\n", safe_cpu_get_pc(machine->activecpu), data);
+	if (LOG_KEYCARDS_FULL) logerror("  (%s:keycard_w=%02X)\n", cpuexec_describe_context(machine), data);
 
 	/* check for going active */
 	if (!keycard_state && new_state)

@@ -96,7 +96,7 @@ static READ32_HANDLER( f32_input_port_1_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 	if ((cpu_get_pc(space->cpu) == 0x000379de) ||
-	    (cpu_get_pc(space->cpu) == 0x000379cc) ) cpu_adjust_icount(space->cpu, -100);
+	    (cpu_get_pc(space->cpu) == 0x000379cc) ) cpu_eat_cycles(space->cpu, 100);
 	//else printf("PC %08x\n", cpu_get_pc(space->cpu) );
 	return input_port_read(space->machine, "SYSTEM_P2");
 }

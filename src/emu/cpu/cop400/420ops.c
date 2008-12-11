@@ -26,8 +26,6 @@ static TIMER_CALLBACK( cop400_counter_tick )
 {
 	cop400_state *cop400 = ptr;
 
-    cpu_push_context(cop400->device);
-
 	T++;
 
 	if (T == 0)
@@ -40,8 +38,6 @@ static TIMER_CALLBACK( cop400_counter_tick )
 			cop400->halt = 0;
 		}
 	}
-
-	cpu_pop_context();
 }
 
 /* IN Latches */
@@ -51,8 +47,6 @@ static TIMER_CALLBACK( cop400_inil_tick )
 	cop400_state *cop400 = ptr;
 	UINT8 in;
 	int i;
-
-    cpu_push_context(cop400->device);
 
 	in = IN_IN();
 
@@ -65,8 +59,6 @@ static TIMER_CALLBACK( cop400_inil_tick )
 			IL |= (1 << i);
 		}
 	}
-
-	cpu_pop_context();
 }
 
 /* Microbus */
@@ -75,8 +67,6 @@ static TIMER_CALLBACK( cop400_microbus_tick )
 {
 	cop400_state *cop400 = ptr;
 	UINT8 in;
-
-    cpu_push_context(cop400->device);
 
 	in = IN_IN();
 
@@ -101,8 +91,6 @@ static TIMER_CALLBACK( cop400_microbus_tick )
 			cop400->microbus_int = 0;
 		}
 	}
-
-	cpu_pop_context();
 }
 
 /* Arithmetic Instructions */

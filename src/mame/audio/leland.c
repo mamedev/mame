@@ -377,7 +377,6 @@ static void leland_80186_dma_update(void *param, stream_sample_t **inputs, strea
 	memset(buffer, 0, length * sizeof(*buffer));
 
 	/* loop over DMA buffers */
-	cpu_push_context(dmaspace->cpu);
 	for (i = 0; i < 2; i++)
 	{
 		struct dma_state *d = &i80186.dma[i];
@@ -447,7 +446,6 @@ static void leland_80186_dma_update(void *param, stream_sample_t **inputs, strea
 			}
 		}
 	}
-	cpu_pop_context();
 }
 
 
@@ -614,12 +612,12 @@ void leland_80186_sound_init(void)
  *
  *************************************/
 
-static IRQ_CALLBACK(int_callback)
+static IRQ_CALLBACK( int_callback )
 {
 	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time(device->machine)), i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	cpu_set_info_int(device->machine->activecpu, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
+	cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
 	i80186.intr.pending = 0;
 
 	/* clear the request and set the in-service bit */
@@ -752,7 +750,7 @@ static void handle_eoi(running_machine *machine, int data)
 			case 0x0d:	i80186.intr.in_service &= ~0x20;	break;
 			case 0x0e:	i80186.intr.in_service &= ~0x40;	break;
 			case 0x0f:	i80186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->activecpu), data & 0x1f);
+			default:	logerror("%s:ERROR - 80186 EOI with unknown vector %02X\n", cpuexec_describe_context(machine), data & 0x1f);
 		}
 		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time(machine)), data & 0x1f);
 	}
@@ -1709,7 +1707,7 @@ WRITE8_HANDLER( leland_80186_control_w )
 
 static TIMER_CALLBACK( command_lo_sync )
 {
-	if (LOG_COMM) logerror("%04X:Write sound command latch lo = %02X\n", cpu_get_previouspc(machine->activecpu), param);
+	if (LOG_COMM) logerror("%s:Write sound command latch lo = %02X\n", cpuexec_describe_context(machine), param);
 	sound_command = (sound_command & 0xff00) | param;
 }
 

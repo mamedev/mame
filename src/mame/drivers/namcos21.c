@@ -569,7 +569,7 @@ ReadWordFromSlaveInput( void )
 		{
 			mpDspState->slaveBytesAdvertised--;
 		}
-		logerror( "-%04x(0x%04x) %x\n", data, mpDspState->slaveBytesAvailable, cpu_get_pc(Machine->activecpu) );
+		logerror( "%s:-%04x(0x%04x)\n", cpuexec_describe_context(Machine), data, mpDspState->slaveBytesAvailable );
 	}
 	return data;
 } /* ReadWordFromSlaveInput */

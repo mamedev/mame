@@ -442,11 +442,11 @@ static void rf5c400_w(int chipnum, int offset, UINT16 data)
 
 			default:
 			{
-				//mame_printf_debug("rf5c400_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+				//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", cpuexec_describe_context(Machine), data, offset, mem_mask);
 				break;
 			}
 		}
-		//mame_printf_debug("rf5c400_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+		//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", cpuexec_describe_context(Machine), data, offset, mem_mask);
 	}
 	else
 	{

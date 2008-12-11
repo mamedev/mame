@@ -264,13 +264,11 @@ static TIMER_CALLBACK( m37710_timer_cb )
 	int which = param;
 	int curirq = M37710_LINE_TIMERA0 - which;
 
-	cpu_push_context(cpustate->device);
 	timer_adjust_oneshot(cpustate->timers[which], cpustate->reload[which], param);
 
 	cpustate->m37710_regs[m37710_irq_levels[curirq]] |= 0x04;
 	m37710_set_irq_line(cpustate, curirq, PULSE_LINE);
 	cpu_triggerint(cpustate->device);
-	cpu_pop_context();
 }
 
 static void m37710_external_tick(m37710i_cpu_struct *cpustate, int timer, int state)

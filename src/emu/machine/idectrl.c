@@ -1182,7 +1182,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 
 	/* logit */
 //  if (offset != IDE_ADDR_DATA && offset != IDE_ADDR_STATUS_COMMAND && offset != IDE_ADDR_STATUS_CONTROL)
-		LOG(("%08X:IDE read at %03X, size=%d\n", cpu_get_previouspc(device->machine->activecpu), offset, size));
+		LOG(("%s:IDE read at %03X, size=%d\n", cpuexec_describe_context(device->machine), offset, size));
 
 	switch (offset)
 	{
@@ -1217,7 +1217,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%08X:IDE completed PIO read\n", cpu_get_previouspc(device->machine->activecpu)));
+					LOG(("%s:IDE completed PIO read\n", cpuexec_describe_context(device->machine)));
 					continue_read(ide);
 				}
 			}
@@ -1264,14 +1264,11 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 				if (ide->interrupt_pending)
 					clear_interrupt(ide);
 			}
-
-			/* take a bit of time to speed up people who poll hard */
-			cpu_adjust_icount(device->machine->activecpu, -100);
 			break;
 
 		/* log anything else */
 		default:
-			logerror("%08X:unknown IDE read at %03X, size=%d\n", cpu_get_previouspc(device->machine->activecpu), offset, size);
+			logerror("%s:unknown IDE read at %03X, size=%d\n", cpuexec_describe_context(device->machine), offset, size);
 			break;
 	}
 
@@ -1293,7 +1290,7 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 
 	/* logit */
 	if (offset != IDE_ADDR_DATA)
-		LOG(("%08X:IDE write to %03X = %08X, size=%d\n", cpu_get_previouspc(device->machine->activecpu), offset, data, size));
+		LOG(("%s:IDE write to %03X = %08X, size=%d\n", cpuexec_describe_context(device->machine), offset, data, size));
 
 	switch (offset)
 	{
@@ -1330,7 +1327,7 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%08X:IDE completed PIO write\n", cpu_get_previouspc(device->machine->activecpu)));
+					LOG(("%s:IDE completed PIO write\n", cpuexec_describe_context(device->machine)));
 					if (ide->command != IDE_COMMAND_SECURITY_UNLOCK)
 						continue_write(ide);
 					else
@@ -1440,7 +1437,7 @@ static UINT32 ide_bus_master_read(const device_config *device, offs_t offset, in
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%08X:ide_bus_master_read(%d, %d)\n", cpu_get_previouspc(device->machine->activecpu), offset, size));
+	LOG(("%s:ide_bus_master_read(%d, %d)\n", cpuexec_describe_context(device->machine), offset, size));
 
 	/* command register */
 	if (offset == 0)
@@ -1469,7 +1466,7 @@ static void ide_bus_master_write(const device_config *device, offs_t offset, int
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%08X:ide_bus_master_write(%d, %d, %08X)\n", cpu_get_previouspc(device->machine->activecpu), offset, size, data));
+	LOG(("%s:ide_bus_master_write(%d, %d, %08X)\n", cpuexec_describe_context(device->machine), offset, size, data));
 
 	/* command register */
 	if (offset == 0)

@@ -50,11 +50,11 @@ WRITE8_DEVICE_HANDLER( at28c16_w )
 
 	if( c->last_write >= 0 )
 	{
-//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) busy\n", cpu_get_pc(machine->activecpu), chip, offset, data );
+//      logerror( "%s: at28c16_write( %d, %04x, %02x ) busy\n", cpuexec_describe_context(machine), chip, offset, data );
 	}
 	else if( c->oe_12v )
 	{
-//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) erase\n", cpu_get_pc(machine->activecpu), chip, offset, data );
+//      logerror( "%s: at28c16_write( %d, %04x, %02x ) erase\n", cpuexec_describe_context(machine), chip, offset, data );
 		memset( c->data, 0xff, SIZE_DATA );
 		memset( c->id, 0xff, SIZE_ID );
 		c->last_write = 0xff;
@@ -62,14 +62,14 @@ WRITE8_DEVICE_HANDLER( at28c16_w )
 	}
 	else if( offset >= OFFSET_ID && c->a9_12v )
 	{
-//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) id\n", cpu_get_pc(machine->activecpu), chip, offset, data );
+//      logerror( "%s: at28c16_write( %d, %04x, %02x ) id\n", cpuexec_describe_context(machine), chip, offset, data );
 		c->id[ offset - OFFSET_ID ] = data;
 		c->last_write = data;
 		timer_adjust_oneshot( c->write_timer, ATTOTIME_IN_USEC( 200 ), 0 );
 	}
 	else
 	{
-//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) data\n", cpu_get_pc(machine->activecpu), chip, offset, data );
+//      logerror( "%s: at28c16_write( %d, %04x, %02x ) data\n", cpuexec_describe_context(machine), chip, offset, data );
 		c->data[ offset ] = data;
 		c->last_write = data;
 		timer_adjust_oneshot( c->write_timer, ATTOTIME_IN_USEC( 200 ), 0 );
@@ -93,7 +93,7 @@ READ8_DEVICE_HANDLER( at28c16_r )
 	}
 	else
 	{
-//      logerror( "%08x: at28c16_read( %d, %04x ) %02x data\n", cpu_get_pc(machine->activecpu), chip, offset, c->data[ offset ] );
+//      logerror( "%s: at28c16_read( %d, %04x ) %02x data\n", cpuexec_describe_context(machine), chip, offset, c->data[ offset ] );
 		return c->data[ offset ];
 	}
 }

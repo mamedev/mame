@@ -601,7 +601,6 @@ INLINE void apu_update(struct nesapu_info *info, stream_sample_t *buffer16, int 
 {
    int accum;
 
-	cpu_push_context( info->APU.dpcm.memory->cpu );
    while (samples--)
    {
       accum = apu_square(info, &info->APU.squ[0]);
@@ -618,7 +617,6 @@ INLINE void apu_update(struct nesapu_info *info, stream_sample_t *buffer16, int 
 
       *(buffer16++)=accum<<8;
    }
-	cpu_pop_context();
 }
 
 /* READ VALUES FROM REGISTERS */

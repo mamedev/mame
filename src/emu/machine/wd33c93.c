@@ -294,7 +294,7 @@ static void wd33c93_complete_cmd( UINT8 status )
 /* command handlers */
 static void wd33c93_invalid_cmd( void )
 {
-	logerror( "Unknown/Unimplemented SCSI controller command: %02x (PC=%x)\n", scsi_data.regs[WD_COMMAND], cpu_get_pc(Machine->activecpu) );
+	logerror( "%s:Unknown/Unimplemented SCSI controller command: %02x\n", cpuexec_describe_context(Machine), scsi_data.regs[WD_COMMAND] );
 
 	/* complete the command */
 	wd33c93_complete_cmd( CSR_INVALID );

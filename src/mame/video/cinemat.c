@@ -225,9 +225,7 @@ VIDEO_UPDATE( cinemat )
 	VIDEO_UPDATE_CALL(vector);
 	vector_clear_list();
 
-	cpu_push_context(screen->machine->cpu[0]);
 	ccpu_wdt_timer_trigger(screen->machine->cpu[0]);
-	cpu_pop_context();
 
 	return 0;
 }

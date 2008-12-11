@@ -773,15 +773,10 @@ static WRITE8_HANDLER(at_page8_w)
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
 	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 result;
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
-	result = memory_read_byte(space, page_offset + offset);
-	cpu_pop_context();
-
-	return result;
+	return memory_read_byte(space, page_offset + offset);
 }
 
 
@@ -791,9 +786,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(space->cpu);
 	memory_write_byte(space, page_offset + offset, data);
-	cpu_pop_context();
 }
 
 
@@ -1132,28 +1125,28 @@ struct _speedup_entry
 static speedup_entry *speedup_table;
 static int speedup_count;
 
-INLINE UINT32 generic_speedup(running_machine *machine, speedup_entry *entry)
+INLINE UINT32 generic_speedup(const address_space *space, speedup_entry *entry)
 {
-	if (cpu_get_pc(machine->activecpu) == entry->pc)
+	if (cpu_get_pc(space->cpu) == entry->pc)
 	{
 		entry->hits++;
-		cpu_spinuntil_int(machine->activecpu);
+		cpu_spinuntil_int(space->cpu);
 	}
 	return main_ram[entry->offset/4];
 }
 
-static READ32_HANDLER( speedup0_r ) { return generic_speedup(space->machine, &speedup_table[0]); }
-static READ32_HANDLER( speedup1_r ) { return generic_speedup(space->machine, &speedup_table[1]); }
-static READ32_HANDLER( speedup2_r ) { return generic_speedup(space->machine, &speedup_table[2]); }
-static READ32_HANDLER( speedup3_r ) { return generic_speedup(space->machine, &speedup_table[3]); }
-static READ32_HANDLER( speedup4_r ) { return generic_speedup(space->machine, &speedup_table[4]); }
-static READ32_HANDLER( speedup5_r ) { return generic_speedup(space->machine, &speedup_table[5]); }
-static READ32_HANDLER( speedup6_r ) { return generic_speedup(space->machine, &speedup_table[6]); }
-static READ32_HANDLER( speedup7_r ) { return generic_speedup(space->machine, &speedup_table[7]); }
-static READ32_HANDLER( speedup8_r ) { return generic_speedup(space->machine, &speedup_table[8]); }
-static READ32_HANDLER( speedup9_r ) { return generic_speedup(space->machine, &speedup_table[9]); }
-static READ32_HANDLER( speedup10_r ) { return generic_speedup(space->machine, &speedup_table[10]); }
-static READ32_HANDLER( speedup11_r ) { return generic_speedup(space->machine, &speedup_table[11]); }
+static READ32_HANDLER( speedup0_r ) { return generic_speedup(space, &speedup_table[0]); }
+static READ32_HANDLER( speedup1_r ) { return generic_speedup(space, &speedup_table[1]); }
+static READ32_HANDLER( speedup2_r ) { return generic_speedup(space, &speedup_table[2]); }
+static READ32_HANDLER( speedup3_r ) { return generic_speedup(space, &speedup_table[3]); }
+static READ32_HANDLER( speedup4_r ) { return generic_speedup(space, &speedup_table[4]); }
+static READ32_HANDLER( speedup5_r ) { return generic_speedup(space, &speedup_table[5]); }
+static READ32_HANDLER( speedup6_r ) { return generic_speedup(space, &speedup_table[6]); }
+static READ32_HANDLER( speedup7_r ) { return generic_speedup(space, &speedup_table[7]); }
+static READ32_HANDLER( speedup8_r ) { return generic_speedup(space, &speedup_table[8]); }
+static READ32_HANDLER( speedup9_r ) { return generic_speedup(space, &speedup_table[9]); }
+static READ32_HANDLER( speedup10_r ) { return generic_speedup(space, &speedup_table[10]); }
+static READ32_HANDLER( speedup11_r ) { return generic_speedup(space, &speedup_table[11]); }
 
 static const read32_space_func speedup_handlers[] =
 {

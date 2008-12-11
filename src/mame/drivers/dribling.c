@@ -112,7 +112,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 	/* bit 1 = (10) = PC1 */
 	/* bit 0 = (32) = PC0 */
 	input_mux = data & 7;
-	logerror("%04X:misc_w(%02X)\n", cpu_get_previouspc(device->machine->activecpu), data);
+	logerror("%s:misc_w(%02X)\n", cpuexec_describe_context(device->machine), data);
 }
 
 
@@ -126,14 +126,14 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	/* bit 2 = folla a */
 	/* bit 1 = folla m */
 	/* bit 0 = folla b */
-	logerror("%04X:sound_w(%02X)\n", cpu_get_previouspc(device->machine->activecpu), data);
+	logerror("%s:sound_w(%02X)\n", cpuexec_describe_context(device->machine), data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( pb_w )
 {
 	/* write PB0-7 */
-	logerror("%04X:pb_w(%02X)\n", cpu_get_previouspc(device->machine->activecpu), data);
+	logerror("%s:pb_w(%02X)\n", cpuexec_describe_context(device->machine), data);
 }
 
 

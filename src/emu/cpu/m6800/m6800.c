@@ -665,7 +665,6 @@ static TIMER_CALLBACK(m6800_tx_tick)
 {
     m6800_state *cpustate = ptr;
 
-    cpu_push_context(cpustate->device);
 	if (cpustate->trcsr & M6800_TRCSR_TE)
 	{
 		// force Port 2 bit 4 as output
@@ -734,14 +733,12 @@ static TIMER_CALLBACK(m6800_tx_tick)
 	}
 
 	m6800_tx(cpustate, cpustate->tx);
-	cpu_pop_context();
 }
 
 static TIMER_CALLBACK(m6800_rx_tick)
 {
     m6800_state *cpustate =ptr;
 
-    cpu_push_context(cpustate->device);
 	if (cpustate->trcsr & M6800_TRCSR_RE)
 	{
 		if (cpustate->trcsr & M6800_TRCSR_WU)
@@ -833,7 +830,6 @@ static TIMER_CALLBACK(m6800_rx_tick)
 			}
 		}
 	}
-	cpu_pop_context();
 }
 #endif
 

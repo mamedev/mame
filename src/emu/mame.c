@@ -235,6 +235,26 @@ static void logfile_callback(running_machine *machine, const char *buffer);
 ***************************************************************************/
 
 /*-------------------------------------------------
+    eat_all_cpu_cycles - eat a ton of cycles on
+    all CPUs to force a quick exit
+-------------------------------------------------*/
+
+INLINE void eat_all_cpu_cycles(running_machine *machine)
+{
+	int cpunum;
+
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+			cpu_eat_cycles(machine->cpu[cpunum], 1000000000);
+}
+
+
+
+/***************************************************************************
+    CORE IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
     mame_execute - run the core emulation
 -------------------------------------------------*/
 
@@ -559,8 +579,7 @@ void mame_schedule_exit(running_machine *machine)
 		mame->exit_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	if (machine->activecpu != NULL)
-		cpu_eat_cycles(machine->activecpu, 1000000000);
+	eat_all_cpu_cycles(machine);
 
 	/* if we're autosaving on exit, schedule a save as well */
 	if (options_get_bool(mame_options(), OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
@@ -579,8 +598,7 @@ void mame_schedule_hard_reset(running_machine *machine)
 	mame->hard_reset_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	if (machine->activecpu != NULL)
-		cpu_eat_cycles(machine->activecpu, 1000000000);
+	eat_all_cpu_cycles(machine);
 }
 
 
@@ -599,8 +617,7 @@ void mame_schedule_soft_reset(running_machine *machine)
 	mame_pause(machine, FALSE);
 
 	/* if we're executing, abort out immediately */
-	if (machine->activecpu != NULL)
-		cpu_eat_cycles(machine->activecpu, 1000000000);
+	eat_all_cpu_cycles(machine);
 }
 
 
@@ -616,8 +633,7 @@ void mame_schedule_new_driver(running_machine *machine, const game_driver *drive
 	mame->new_driver_pending = driver;
 
 	/* if we're executing, abort out immediately */
-	if (machine->activecpu != NULL)
-		cpu_eat_cycles(machine->activecpu, 1000000000);
+	eat_all_cpu_cycles(machine);
 }
 
 
@@ -1732,14 +1748,10 @@ static void handle_save(running_machine *machine)
 		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 			if (machine->cpu[cpunum] != NULL)
 			{
-				cpu_push_context(machine->cpu[cpunum]);
-
 				/* save the CPU data */
 				state_save_push_tag(cpunum + 1);
 				state_save_save_continue(machine);
 				state_save_pop_tag();
-
-				cpu_pop_context();
 			}
 
 		/* finish and close */
@@ -1812,14 +1824,10 @@ static void handle_load(running_machine *machine)
 			for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 				if (machine->cpu[cpunum] != NULL)
 				{
-					cpu_push_context(machine->cpu[cpunum]);
-
 					/* load the CPU data */
 					state_save_push_tag(cpunum + 1);
 					state_save_load_continue(machine);
 					state_save_pop_tag();
-
-					cpu_pop_context();
 				}
 
 			/* finish and close */

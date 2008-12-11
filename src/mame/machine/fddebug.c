@@ -279,7 +279,7 @@ static void execute_fdcset(running_machine *machine, int ref, int params, const 
 static void execute_fdclist(running_machine *machine, int ref, int params, const char **param);
 static void execute_fdcsearch(running_machine *machine, int ref, int params, const char **param);
 
-static fd1094_possibility *try_all_possibilities(running_machine *machine, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata);
+static fd1094_possibility *try_all_possibilities(const address_space *space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata);
 static void tag_possibility(running_machine *machine, fd1094_possibility *possdata, UINT8 status);
 
 static void perform_constrained_search(running_machine *machine);
@@ -289,8 +289,8 @@ static int does_key_work_for_constraints(const UINT16 *base, UINT8 *key);
 static UINT32 reconstruct_base_seed(int keybaseaddr, UINT32 startseed);
 
 static void build_optable(void);
-static int validate_ea(running_machine *machine, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
-static int validate_opcode(running_machine *machine, UINT32 pc, const UINT8 *opdata, int maxwords);
+static int validate_ea(const address_space *space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
+static int validate_opcode(const address_space *space, UINT32 pc, const UINT8 *opdata, int maxwords);
 
 
 
@@ -431,14 +431,14 @@ INLINE void print_possibilities(running_machine *machine)
     0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int pc_is_valid(running_machine *machine, UINT32 pc, UINT32 flags)
+INLINE int pc_is_valid(const address_space *space, UINT32 pc, UINT32 flags)
 {
 	/* if we're odd or out of range, fail */
 	if ((pc & 1) == 1)
 		return 0;
 	if (pc & 0xff000000)
 		return 0;
-	if (memory_decrypted_read_ptr(cpu_get_address_space(machine->activecpu, ADDRESS_SPACE_PROGRAM), pc) == NULL)
+	if (memory_decrypted_read_ptr(space, pc) == NULL)
 		return 0;
 	return 1;
 }
@@ -449,11 +449,11 @@ INLINE int pc_is_valid(running_machine *machine, UINT32 pc, UINT32 flags)
     valid? 0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int addr_is_valid(running_machine *machine, UINT32 addr, UINT32 flags)
+INLINE int addr_is_valid(const address_space *space, UINT32 addr, UINT32 flags)
 {
 	/* if this a JMP, the address is a PC */
 	if (flags & OF_JMP)
-		return pc_is_valid(machine, addr, flags);
+		return pc_is_valid(space, addr, flags);
 
 	/* if we're odd or out of range, fail */
 	if ((flags & OF_SIZEMASK) != OF_BYTE && (addr & 1) == 1)
@@ -462,7 +462,7 @@ INLINE int addr_is_valid(running_machine *machine, UINT32 addr, UINT32 flags)
 		return 0;
 
 	/* if we're invalid, fail */
-	if (strcmp(memory_get_handler_string(cpu_get_address_space(machine->activecpu, ADDRESS_SPACE_PROGRAM), 0, addr), "segaic16_memory_mapper_lsb_r") == 0)
+	if (strcmp(memory_get_handler_string(space, 0, addr), "segaic16_memory_mapper_lsb_r") == 0)
 		return 2;
 
 	return 1;
@@ -723,7 +723,7 @@ static int instruction_hook(const device_config *device, offs_t curpc)
 	}
 
 	/* try all possible decodings at the current pc */
-	posscount = try_all_possibilities(device->machine, curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
+	posscount = try_all_possibilities(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
 	if (keydirty)
 		fd1094_regenerate_key();
 
@@ -890,13 +890,14 @@ static void execute_fdeliminate(running_machine *machine, int ref, int params, c
 
 static void execute_fdunlock(running_machine *machine, int ref, int params, const char **param)
 {
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
 	int reps = keystatus_words / KEY_SIZE;
 	int keyaddr, repnum;
 	UINT64 offset;
 
 	/* support 0 or 1 parameters */
 	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
- 		offset = cpu_get_pc(machine->activecpu);
+ 		offset = cpu_get_pc(cpu);
  	keyaddr = addr_to_keyaddr(offset / 2);
 
 	/* toggle the ignore PC status */
@@ -927,6 +928,7 @@ static void execute_fdunlock(running_machine *machine, int ref, int params, cons
 
 static void execute_fdignore(running_machine *machine, int ref, int params, const char **param)
 {
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
 	UINT64 offset;
 
 	/* support 0 or 1 parameters */
@@ -937,7 +939,7 @@ static void execute_fdignore(running_machine *machine, int ref, int params, cons
 		return;
 	}
 	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
- 		offset = cpu_get_pc(machine->activecpu);
+ 		offset = cpu_get_pc(cpu);
  	offset /= 2;
 
 	/* toggle the ignore PC status */
@@ -1031,17 +1033,18 @@ static void execute_fdstate(running_machine *machine, int ref, int params, const
 
 static void execute_fdpc(running_machine *machine, int ref, int params, const char **param)
 {
+	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
 	UINT64 newpc;
 
 	/* support 0 or 1 parameters */
 	if (!debug_command_parameter_number(machine, param[0], &newpc))
- 		newpc = cpu_get_pc(machine->activecpu);
+ 		newpc = cpu_get_pc(cpu);
 
  	/* set the new PC */
- 	cpu_set_reg(machine->activecpu, REG_PC, newpc);
+ 	cpu_set_reg(cpu, REG_PC, newpc);
 
  	/* recompute around that */
- 	instruction_hook(machine->activecpu, newpc);
+ 	instruction_hook(cpu, newpc);
 }
 
 
@@ -1052,7 +1055,8 @@ static void execute_fdpc(running_machine *machine, int ref, int params, const ch
 
 static void execute_fdsearch(running_machine *machine, int ref, int params, const char **param)
 {
-	int pc = cpu_get_pc(machine->activecpu);
+	const address_space *space = cpu_get_address_space(debug_cpu_get_visible_cpu(machine), ADDRESS_SPACE_PROGRAM);
+	int pc = cpu_get_pc(space->cpu);
 	int length, first = TRUE;
 	UINT8 instrdata[2];
 	UINT16 decoded;
@@ -1090,8 +1094,8 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 			}
 
 			/* set this as our current PC and run the instruction hook */
-			cpu_set_reg(machine->activecpu, REG_PC, pc);
-			if (instruction_hook(machine->activecpu, pc))
+			cpu_set_reg(space->cpu, REG_PC, pc);
+			if (instruction_hook(space->cpu, pc))
 				break;
 		}
 		keystatus[pc/2] |= SEARCH_MASK;
@@ -1103,7 +1107,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 		instrdata[1] = decoded;
 
 		/* get the opcode */
-		length = validate_opcode(machine, pc, instrdata, 1);
+		length = validate_opcode(space, pc, instrdata, 1);
 		if (length < 0)
 			length = -length;
 		if (length == 0)
@@ -1177,6 +1181,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 
 static void execute_fddasm(running_machine *machine, int ref, int params, const char **param)
 {
+	const address_space *space = cpu_get_address_space(debug_cpu_get_visible_cpu(machine), ADDRESS_SPACE_PROGRAM);
 	int origstate = fd1094_set_state(keyregion, -1);
 	const char *filename;
 	int skipped = FALSE;
@@ -1263,7 +1268,7 @@ static void execute_fddasm(running_machine *machine, int ref, int params, const 
 		if (unknowns > 0)
 		{
 			UINT8 keybuffer[5];
-			int posscount = try_all_possibilities(machine, pcaddr * 2, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
+			int posscount = try_all_possibilities(space, pcaddr * 2, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
 			for (pnum = 0; pnum < posscount; pnum++)
 				if (strcmp(disasm, posslist[pnum].dasm) != 0)
 				{
@@ -1383,7 +1388,7 @@ static void execute_fdcsearch(running_machine *machine, int ref, int params, con
     length
 -----------------------------------------------*/
 
-static fd1094_possibility *try_all_possibilities(running_machine *machine, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata)
+static fd1094_possibility *try_all_possibilities(const address_space *space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata)
 {
 	UINT8 keymask, keystat;
 	UINT16 possvalue[4];
@@ -1458,7 +1463,7 @@ static fd1094_possibility *try_all_possibilities(running_machine *machine, int b
 			/* first make sure we are a valid instruction */
 			if ((possvalue[i] & 0xf000) == 0xa000 || (possvalue[i] & 0xf000) == 0xf000)
 				continue;
-			length = validate_opcode(machine, basepc, instrbuffer, 1);
+			length = validate_opcode(space, basepc, instrbuffer, 1);
 			if (length == 0)
 				continue;
 			if (length < 0)
@@ -1467,7 +1472,7 @@ static fd1094_possibility *try_all_possibilities(running_machine *machine, int b
 
 		/* if we're not at our target length, recursively call ourselves */
 		if (offset < length - 1)
-			possdata = try_all_possibilities(machine, basepc, offset + 1, length, instrbuffer, keybuffer, possdata);
+			possdata = try_all_possibilities(space, basepc, offset + 1, length, instrbuffer, keybuffer, possdata);
 
 		/* otherwise, output what we have */
 		else
@@ -1478,7 +1483,7 @@ static fd1094_possibility *try_all_possibilities(running_machine *machine, int b
 			m68k_disassemble_raw(possdata->dasm, basepc, instrbuffer, instrbuffer, M68K_CPU_TYPE_68000);
 
 			/* validate the opcode */
-			tlen = validate_opcode(machine, basepc, instrbuffer, length);
+			tlen = validate_opcode(space, basepc, instrbuffer, length);
 			if (tlen == 0)
 			{
 				printf("Eliminated: %s [", possdata->dasm);
@@ -2224,7 +2229,7 @@ static void build_optable(void)
     valid or not, and return the length
 -----------------------------------------------*/
 
-static int validate_ea(running_machine *machine, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags)
+static int validate_ea(const address_space *space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags)
 {
 	UINT32 addr;
 	int valid;
@@ -2257,15 +2262,15 @@ static int validate_ea(running_machine *machine, UINT32 pc, UINT8 modereg, const
 			{
 				case 0:	/* (xxx).W -- make sure it is not odd for word/long */
 					addr = (INT16)((parambase[0] << 8) | parambase[1]);
-					valid = addr_is_valid(machine, addr & 0xffffff, flags);
+					valid = addr_is_valid(space, addr & 0xffffff, flags);
 					return (valid == 0) ? 1000 : (valid == 2) ? -1 : 1;
 
 				case 1:	/* (xxx).L -- make sure it is not odd for word/long, and make sure upper byte of addr is 0 */
-					valid = addr_is_valid(machine, (parambase[0] << 24) | (parambase[1] << 16) | (parambase[2] << 8) | parambase[3], flags);
+					valid = addr_is_valid(space, (parambase[0] << 24) | (parambase[1] << 16) | (parambase[2] << 8) | parambase[3], flags);
 					return (valid == 0) ? 1000 : (valid == 2) ? -2 : 2;
 
 				case 2:	/* (d16,PC) -- make sure it is not odd for word/long */
-					valid = addr_is_valid(machine, pc + (INT16)((parambase[0] << 8) | parambase[1]), flags);
+					valid = addr_is_valid(space, pc + (INT16)((parambase[0] << 8) | parambase[1]), flags);
 					return (valid == 0) ? 1000 : (valid == 2) ? -1 : 1;
 
 				case 3:	/* (d8,PC,Xn) -- odd displacements are a warning for word/long */
@@ -2294,7 +2299,7 @@ static int validate_ea(running_machine *machine, UINT32 pc, UINT8 modereg, const
     the length specified
 -----------------------------------------------*/
 
-static int validate_opcode(running_machine *machine, UINT32 pc, const UINT8 *opdata, int maxwords)
+static int validate_opcode(const address_space *space, UINT32 pc, const UINT8 *opdata, int maxwords)
 {
 	UINT32 immvalue = 0;
 	int iffy = FALSE;
@@ -2371,7 +2376,7 @@ static int validate_opcode(running_machine *machine, UINT32 pc, const UINT8 *opd
 			pc += immvalue;
 
 		/* if we're odd or out of range, fail */
-		valid = pc_is_valid(machine, pc, flags);
+		valid = pc_is_valid(space, pc, flags);
 		if (valid == 0)
 			return 0;
 		if (valid == 2)
@@ -2382,7 +2387,7 @@ static int validate_opcode(running_machine *machine, UINT32 pc, const UINT8 *opd
 	if (flags & (OF_EASRC | OF_EADST))
 	{
 		int modereg = opcode & 0x003f;
-		int ealen = validate_ea(machine, pc + offset*2, modereg, &opdata[offset*2], flags);
+		int ealen = validate_ea(space, pc + offset*2, modereg, &opdata[offset*2], flags);
 
 		/* if the ea was invalid, forward that result */
 		if (ealen == 1000)
@@ -2403,7 +2408,7 @@ static int validate_opcode(running_machine *machine, UINT32 pc, const UINT8 *opd
 	if (flags & OF_MOVE)
 	{
 		int modereg = ((opcode & 0x01c0) >> 3) | ((opcode & 0x0e00) >> 9);
-		int ealen = validate_ea(machine, pc + offset*2, modereg, &opdata[offset*2], flags);
+		int ealen = validate_ea(space, pc + offset*2, modereg, &opdata[offset*2], flags);
 
 		/* if the ea was invalid, forward that result */
 		if (ealen == 1000)

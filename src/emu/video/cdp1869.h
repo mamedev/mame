@@ -109,6 +109,7 @@ typedef struct _cdp1869_interface cdp1869_interface;
 struct _cdp1869_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
+	const char *cpu_tag;		/* CPU we work together with */
 	int pixel_clock;			/* the dot clock of the chip */
 	int color_clock;			/* the chroma clock of the chip */
 

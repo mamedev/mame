@@ -1147,7 +1147,7 @@ static void slapstic_log(running_machine *machine, offs_t offset)
 			fprintf(slapsticlog, "------------------------------------\n");
 		last_time = time;
 
-		fprintf(slapsticlog, "%06X: %04X B=%d ", cpu_get_previouspc(machine->activecpu), offset, current_bank);
+		fprintf(slapsticlog, "%s: %04X B=%d ", cpuexec_describe_context(machine), offset, current_bank);
 		switch (state)
 		{
 			case DISABLED:

@@ -90,7 +90,7 @@ static void f1dream_protection_w(const address_space *space)
 {
 	int indx;
 	int value = 255;
-	int prevpc = cpu_get_previouspc(space->machine->activecpu);
+	int prevpc = cpu_get_previouspc(space->cpu);
 
 	if (prevpc == 0x244c)
 	{

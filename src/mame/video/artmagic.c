@@ -112,8 +112,8 @@ static void execute_blit(running_machine *machine)
 	static int hit_index;
 	static FILE *f;
 
-	logerror("%08X:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-				cpu_get_pc(machine->activecpu), offset, x, y, w, h,
+	logerror("%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
+				cpuexec_describe_context(machine), offset, x, y, w, h,
 				blitter_data[0], blitter_data[1],
 				blitter_data[2], blitter_data[3],
 				blitter_data[4], blitter_data[5],
@@ -130,8 +130,8 @@ static void execute_blit(running_machine *machine)
 		hit_list[hit_index++] = offset;
 
 		fprintf(f, "----------------------\n"
-				   "%08X:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-					cpu_get_pc(machine->activecpu), offset, x, y, w, h,
+				   "%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
+					cpuexec_describe_context(machine), offset, x, y, w, h,
 					blitter_data[0], blitter_data[1],
 					blitter_data[2], blitter_data[3],
 					blitter_data[4], blitter_data[5],
