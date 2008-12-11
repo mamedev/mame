@@ -1476,6 +1476,7 @@ src/mame/drivers/flower.c svneol=native#text/plain
 src/mame/drivers/flstory.c svneol=native#text/plain
 src/mame/drivers/flyball.c svneol=native#text/plain
 src/mame/drivers/foodf.c svneol=native#text/plain
+src/mame/drivers/forte2.c svneol=native#text/plain
 src/mame/drivers/fortecar.c svneol=native#text/plain
 src/mame/drivers/freekick.c svneol=native#text/plain
 src/mame/drivers/fromanc2.c svneol=native#text/plain
