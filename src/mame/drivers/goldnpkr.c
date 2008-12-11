@@ -3262,7 +3262,7 @@ GAMEL( 1991, bsuerten, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown"
 GAMEL( 1991, bsuerteo, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 16)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuertep, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 17)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuerteq, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 18)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, bet 19)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 19)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuertes, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 20)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuertet, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 21)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuerteu, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 22)",          0,                layout_goldnpkr )

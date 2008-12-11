@@ -997,6 +997,7 @@ $(MAMEOBJ)/midway.a: \
 	$(AUDIO)/wow.o \
 
 $(MAMEOBJ)/msx.a: \
+	$(DRIVERS)/forte2.o \
 	$(DRIVERS)/sangho.o \
 
 $(MAMEOBJ)/namco.a: \
