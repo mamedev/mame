@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/rp5h01.h"
 
 /****************************************************************************/
@@ -26,7 +25,7 @@ static RP5H01 RP5H01_state[MAX_RP5H01];
 
 /****************************************************************************/
 
-int RP5H01_init( const struct RP5H01_interface *interface ) {
+int RP5H01_init( running_machine *machine, const struct RP5H01_interface *interface ) {
 	int i;
 
 	/* setup our local copy of the interface */
@@ -41,7 +40,7 @@ int RP5H01_init( const struct RP5H01_interface *interface ) {
 	for( i = 0; i < intf->num; i++ ) {
 		RP5H01_state[i].counter = 0;
 		RP5H01_state[i].counter_mode = COUNTER_MODE_6_BITS;
-		RP5H01_state[i].data = &( memory_region( Machine, intf->region[i] )[ intf->offset[i] ] );
+		RP5H01_state[i].data = &( memory_region( machine, intf->region[i] )[ intf->offset[i] ] );
 		RP5H01_state[i].enabled = 0;
 		RP5H01_state[i].old_reset = -1;
 		RP5H01_state[i].old_clock = -1;

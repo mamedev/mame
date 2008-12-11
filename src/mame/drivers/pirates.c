@@ -119,7 +119,7 @@ static NVRAM_HANDLER( pirates )
 	if (read_or_write) eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 		if (file) eeprom_load(file);
 	}
 }

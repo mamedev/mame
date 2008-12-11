@@ -653,7 +653,7 @@ static TIMER_CALLBACK( behind_the_beam_update );
 
 static MACHINE_START( itech8 )
 {
-	pia_config(0, &pia_interface);
+	pia_config(machine, 0, &pia_interface);
 }
 
 static MACHINE_START( sstrike )

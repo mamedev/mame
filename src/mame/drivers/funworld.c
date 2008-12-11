@@ -2555,8 +2555,8 @@ ROM_END
 static DRIVER_INIT( funworld )
 {
 	/* Initializing PIAs... */
-	pia_config(0, &pia0_intf);
-	pia_config(1, &pia1_intf);
+	pia_config(machine, 0, &pia0_intf);
+	pia_config(machine, 1, &pia1_intf);
 }
 
 static DRIVER_INIT( tabblue )
@@ -2596,8 +2596,8 @@ static DRIVER_INIT( tabblue )
 	}
 
 	/* Initializing PIAs... */
-	pia_config(0, &pia0_intf);
-	pia_config(1, &pia1_intf);
+	pia_config(machine, 0, &pia0_intf);
+	pia_config(machine, 1, &pia1_intf);
 }
 
 static DRIVER_INIT( jolyc980 )
@@ -2622,8 +2622,8 @@ static DRIVER_INIT( jolyc980 )
 //  ROM[0xc1fe] = 0x80;
 
 	/* Initializing PIAs... */
-	pia_config(0, &pia0_intf);
-	pia_config(1, &pia1_intf);
+	pia_config(machine, 0, &pia0_intf);
+	pia_config(machine, 1, &pia1_intf);
 }
 
 static DRIVER_INIT( magicd2a )
@@ -2646,8 +2646,8 @@ static DRIVER_INIT( magicd2a )
 	ROM[0xc1c6] = 0x92;
 
 	/* Initializing PIAs... */
-	pia_config(0, &pia0_intf);
-	pia_config(1, &pia1_intf);
+	pia_config(machine, 0, &pia0_intf);
+	pia_config(machine, 1, &pia1_intf);
 }
 
 static DRIVER_INIT( magicd2b )
@@ -2671,8 +2671,8 @@ static DRIVER_INIT( magicd2b )
 	ROM[0xc1c6] = 0x92;
 
 	/* Initializing PIAs... */
-	pia_config(0, &pia0_intf);
-	pia_config(1, &pia1_intf);
+	pia_config(machine, 0, &pia0_intf);
+	pia_config(machine, 1, &pia1_intf);
 }
 
 static DRIVER_INIT( soccernw )
@@ -2691,8 +2691,8 @@ static DRIVER_INIT( soccernw )
 //  ROM[0xa33c] = 0xea;
 
 	/* Initializing PIAs... */
-	pia_config(0, &pia0_intf);
-	pia_config(1, &pia1_intf);
+	pia_config(machine, 0, &pia0_intf);
+	pia_config(machine, 1, &pia1_intf);
 }
 
 static DRIVER_INIT( saloon )

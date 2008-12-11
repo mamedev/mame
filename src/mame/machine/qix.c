@@ -206,12 +206,12 @@ static const pia6821_interface slither_pia_3_intf =
 MACHINE_START( qix )
 {
 	/* configure the PIAs */
-	pia_config(0, &qix_pia_0_intf);
-	pia_config(1, &qix_pia_1_intf);
-	pia_config(2, &qix_pia_2_intf);
-	pia_config(3, &qix_pia_3_intf);
-	pia_config(4, &qix_pia_4_intf);
-	pia_config(5, &qix_pia_5_intf);
+	pia_config(machine, 0, &qix_pia_0_intf);
+	pia_config(machine, 1, &qix_pia_1_intf);
+	pia_config(machine, 2, &qix_pia_2_intf);
+	pia_config(machine, 3, &qix_pia_3_intf);
+	pia_config(machine, 4, &qix_pia_4_intf);
+	pia_config(machine, 5, &qix_pia_5_intf);
 }
 
 MACHINE_RESET( qix )
@@ -231,12 +231,12 @@ MACHINE_START( qixmcu )
 	qix_state *state = machine->driver_data;
 
 	/* configure the PIAs */
-	pia_config(0, &qixmcu_pia_0_intf);
-	pia_config(1, &qix_pia_1_intf);
-	pia_config(2, &qixmcu_pia_2_intf);
-	pia_config(3, &qix_pia_3_intf);
-	pia_config(4, &qix_pia_4_intf);
-	pia_config(5, &qix_pia_5_intf);
+	pia_config(machine, 0, &qixmcu_pia_0_intf);
+	pia_config(machine, 1, &qix_pia_1_intf);
+	pia_config(machine, 2, &qixmcu_pia_2_intf);
+	pia_config(machine, 3, &qix_pia_3_intf);
+	pia_config(machine, 4, &qix_pia_4_intf);
+	pia_config(machine, 5, &qix_pia_5_intf);
 
 	/* set up save states */
 	state_save_register_global_array(machine, state->_68705_port_in);
@@ -246,10 +246,10 @@ MACHINE_START( qixmcu )
 MACHINE_START( slither )
 {
 	/* configure the PIAs */
-	pia_config(0, &qix_pia_0_intf);
-	pia_config(1, &slither_pia_1_intf);
-	pia_config(2, &slither_pia_2_intf);
-	pia_config(3, &slither_pia_3_intf);
+	pia_config(machine, 0, &qix_pia_0_intf);
+	pia_config(machine, 1, &slither_pia_1_intf);
+	pia_config(machine, 2, &slither_pia_2_intf);
+	pia_config(machine, 3, &slither_pia_3_intf);
 }
 
 

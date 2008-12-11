@@ -1858,14 +1858,14 @@ static const acia6850_interface acia6850_intf =
 
 static MACHINE_START( sys903 )
 {
-	pia_config(0, &sys903_pia0_intf);
-	pia_config(1, &sys903_pia1_intf);
+	pia_config(machine, 0, &sys903_pia0_intf);
+	pia_config(machine, 1, &sys903_pia1_intf);
 }
 
 static MACHINE_START( sys905 )
 {
-	pia_config(0, &sys905_pia0_intf);
-	pia_config(1, &sys905_pia1_intf);
+	pia_config(machine, 0, &sys905_pia0_intf);
+	pia_config(machine, 1, &sys905_pia1_intf);
 }
 
 static MACHINE_RESET( calomega )

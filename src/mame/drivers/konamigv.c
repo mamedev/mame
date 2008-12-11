@@ -142,7 +142,7 @@ static NVRAM_HANDLER( konamigv_93C46 )
 	}
 	else
 	{
-		eeprom_init( &eeprom_interface_93C46 );
+		eeprom_init( machine, &eeprom_interface_93C46 );
 
 		if( file )
 		{
@@ -311,7 +311,7 @@ static DRIVER_INIT( konamigv )
 	psx_driver_init(machine);
 
 	/* init the scsi controller and hook up it's DMA */
-	am53cf96_init(&scsi_intf);
+	am53cf96_init(machine, &scsi_intf);
 	add_exit_callback(machine, konamigv_exit);
 	psx_dma_install_read_handler(5, scsi_dma_read);
 	psx_dma_install_write_handler(5, scsi_dma_write);
@@ -537,10 +537,10 @@ static READ32_HANDLER( unknown_r )
 
 static DRIVER_INIT( simpbowl )
 {
-	intelflash_init( 0, FLASH_FUJITSU_29F016A, NULL );
-	intelflash_init( 1, FLASH_FUJITSU_29F016A, NULL );
-	intelflash_init( 2, FLASH_FUJITSU_29F016A, NULL );
-	intelflash_init( 3, FLASH_FUJITSU_29F016A, NULL );
+	intelflash_init( machine, 0, FLASH_FUJITSU_29F016A, NULL );
+	intelflash_init( machine, 1, FLASH_FUJITSU_29F016A, NULL );
+	intelflash_init( machine, 2, FLASH_FUJITSU_29F016A, NULL );
+	intelflash_init( machine, 3, FLASH_FUJITSU_29F016A, NULL );
 
 	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, flash_r, flash_w );
 	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c7, 0, 0, trackball_r );
@@ -628,7 +628,7 @@ static NVRAM_HANDLER( btchamp )
 
 static DRIVER_INIT( btchamp )
 {
-	intelflash_init( 0, FLASH_SHARP_LH28F400, NULL );
+	intelflash_init( machine, 0, FLASH_SHARP_LH28F400, NULL );
 
 	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r, btc_trackball_w );
 	memory_install_write32_handler    ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, SMH_NOP );
@@ -715,7 +715,7 @@ static WRITE32_HANDLER( kdeadeye_0_w )
 
 static DRIVER_INIT( kdeadeye )
 {
-	intelflash_init( 0, FLASH_SHARP_LH28F400, NULL );
+	intelflash_init( machine, 0, FLASH_SHARP_LH28F400, NULL );
 
 	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, input_port_read_handler32(machine->portconfig, "GUNX1") );
 	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, input_port_read_handler32(machine->portconfig, "GUNY1") );

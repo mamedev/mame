@@ -504,7 +504,7 @@ static NVRAM_HANDLER( galgames )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&galgames_eeprom_interface);
+		eeprom_init(machine, &galgames_eeprom_interface);
 		if (file)	eeprom_load(file);
 	}
 }
@@ -744,7 +744,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( tmaster )
 {
-	microtouch_init(microtouch_tx, 0);
+	microtouch_init(machine, microtouch_tx, 0);
 }
 
 static MACHINE_RESET( tmaster )

@@ -1887,7 +1887,7 @@ static DRIVER_INIT( cerberus )
 		0x3f,0x001d,
 		0xffff
 	};
-	leland_init_eeprom(0x00, cerberus_eeprom_data, 0, SERIAL_TYPE_NONE);
+	leland_init_eeprom(machine, 0x00, cerberus_eeprom_data, 0, SERIAL_TYPE_NONE);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = cerberus_bankswitch;
@@ -1935,7 +1935,7 @@ static DRIVER_INIT( mayhem )
 		0x3f,0x0818,
 		0xffff
 	};
-	leland_init_eeprom(0x00, mayhem_eeprom_data, 0x28, SERIAL_TYPE_ADD);
+	leland_init_eeprom(machine, 0x00, mayhem_eeprom_data, 0x28, SERIAL_TYPE_ADD);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = mayhem_bankswitch;
@@ -1964,7 +1964,7 @@ static DRIVER_INIT( powrplay )
 		0x2c,0xfffb,
 		0xffff
 	};
-	leland_init_eeprom(0xff, powrplay_eeprom_data, 0x2d, SERIAL_TYPE_ADD_XOR);
+	leland_init_eeprom(machine, 0xff, powrplay_eeprom_data, 0x2d, SERIAL_TYPE_ADD_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = mayhem_bankswitch;
@@ -1985,7 +1985,7 @@ static DRIVER_INIT( wseries )
 		0x1d,0x00ff,
 		0xffff
 	};
-	leland_init_eeprom(0xff, wseries_eeprom_data, 0x12, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, wseries_eeprom_data, 0x12, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = mayhem_bankswitch;
@@ -2008,7 +2008,7 @@ static DRIVER_INIT( alleymas )
 		0x37,0x00ff,
 		0xffff
 	};
-	leland_init_eeprom(0xff, alleymas_eeprom_data, 0x0c, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, alleymas_eeprom_data, 0x0c, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = mayhem_bankswitch;
@@ -2038,7 +2038,7 @@ static DRIVER_INIT( upyoural )
 		0x37,0x00ff,
 		0xffff
 	};
-	leland_init_eeprom(0xff, upyoural_eeprom_data, 0x0c, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, upyoural_eeprom_data, 0x0c, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = mayhem_bankswitch;
@@ -2063,7 +2063,7 @@ static DRIVER_INIT( dangerz )
 		0x3a,0x8007,
 		0xffff
 	};
-	leland_init_eeprom(0xff, dangerz_eeprom_data, 0x10, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, dangerz_eeprom_data, 0x10, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = dangerz_bankswitch;
@@ -2089,7 +2089,7 @@ static DRIVER_INIT( basebal2 )
 		0x1d,0x00ff,
 		0xffff
 	};
-	leland_init_eeprom(0xff, basebal2_eeprom_data, 0x12, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, basebal2_eeprom_data, 0x12, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = basebal2_bankswitch;
@@ -2111,7 +2111,7 @@ static DRIVER_INIT( dblplay )
 		0x3b,0xffe1,
 		0xffff
 	};
-	leland_init_eeprom(0xff, dblplay_eeprom_data, 0x11, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, dblplay_eeprom_data, 0x11, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = basebal2_bankswitch;
@@ -2133,7 +2133,7 @@ static DRIVER_INIT( strkzone )
 		0x1b,0xffe1,
 		0xffff
 	};
-	leland_init_eeprom(0xff, strkzone_eeprom_data, 0x0f, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, strkzone_eeprom_data, 0x0f, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = basebal2_bankswitch;
@@ -2154,7 +2154,7 @@ static DRIVER_INIT( redlin2p )
 		0x22,0xfffe,
 		0xffff
 	};
-	leland_init_eeprom(0xff, redlin2p_eeprom_data, 0x18, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, redlin2p_eeprom_data, 0x18, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = redline_bankswitch;
@@ -2185,7 +2185,7 @@ static DRIVER_INIT( quarterb )
 		0x3a,0xffd9,
 		0xffff
 	};
-	leland_init_eeprom(0xff, quarterb_eeprom_data, 0x24, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, quarterb_eeprom_data, 0x24, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
@@ -2210,7 +2210,7 @@ static DRIVER_INIT( viper )
 		0x1b,0xfffe,
 		0xffff
 	};
-	leland_init_eeprom(0xff, viper_eeprom_data, 0x0c, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, viper_eeprom_data, 0x0c, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
@@ -2241,7 +2241,7 @@ static DRIVER_INIT( teamqb )
 		0x3b,0xffd9,
 		0xffff
 	};
-	leland_init_eeprom(0xff, teamqb_eeprom_data, 0x1a, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, teamqb_eeprom_data, 0x1a, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
@@ -2271,7 +2271,7 @@ static DRIVER_INIT( aafb )
 		0x3b,0xffd9,
 		0xffff
 	};
-	leland_init_eeprom(0xff, aafb_eeprom_data, 0x1a, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, aafb_eeprom_data, 0x1a, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
@@ -2301,7 +2301,7 @@ static DRIVER_INIT( aafbb )
 		0x3b,0xffd9,
 		0xffff
 	};
-	leland_init_eeprom(0xff, aafb_eeprom_data, 0x1a, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, aafb_eeprom_data, 0x1a, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
@@ -2331,7 +2331,7 @@ static DRIVER_INIT( aafbd2p )
 		0x3b,0xffd9,
 		0xffff
 	};
-	leland_init_eeprom(0xff, aafb_eeprom_data, 0x1a, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, aafb_eeprom_data, 0x1a, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = viper_bankswitch;
@@ -2366,7 +2366,7 @@ static DRIVER_INIT( offroad )
 		0x3b,0xffad,
 		0xffff
 	};
-	leland_init_eeprom(0xff, offroad_eeprom_data, 0x00, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, offroad_eeprom_data, 0x00, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = offroad_bankswitch;
@@ -2403,7 +2403,7 @@ static DRIVER_INIT( offroadt )
 		0x3b,0xffad,
 		0xffff
 	};
-	leland_init_eeprom(0xff, offroadt_eeprom_data, 0x00, SERIAL_TYPE_ENCRYPT_XOR);
+	leland_init_eeprom(machine, 0xff, offroadt_eeprom_data, 0x00, SERIAL_TYPE_ENCRYPT_XOR);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = offroad_bankswitch;
@@ -2437,7 +2437,7 @@ static DRIVER_INIT( pigout )
 		0x3b,0xfffc,
 		0xffff
 	};
-	leland_init_eeprom(0xff, pigout_eeprom_data, 0x00, SERIAL_TYPE_ENCRYPT);
+	leland_init_eeprom(machine, 0xff, pigout_eeprom_data, 0x00, SERIAL_TYPE_ENCRYPT);
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = offroad_bankswitch;

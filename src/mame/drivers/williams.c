@@ -2599,9 +2599,9 @@ ROM_END
 	williams2_tilemap_config = x
 
 #define CONFIGURE_PIAS(a,b,c) \
-	pia_config(0, &a);\
-	pia_config(1, &b);\
-	pia_config(2, &c)
+	pia_config(machine, 0, &a);\
+	pia_config(machine, 1, &b);\
+	pia_config(machine, 2, &c)
 
 
 
@@ -2721,7 +2721,7 @@ static DRIVER_INIT( spdball )
 	CONFIGURE_PIAS(williams_pia_0_intf, williams_pia_1_intf, williams_snd_pia_intf);
 
 	/* add a third PIA */
-	pia_config(3, &spdball_pia_3_intf);
+	pia_config(machine, 3, &spdball_pia_3_intf);
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc808, 0xc80b, 0, 0, pia_3_r, pia_3_w);
 
 	/* install extra input handlers */

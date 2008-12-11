@@ -459,7 +459,7 @@ static NVRAM_HANDLER( simpl156 )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);// 93c45
+		eeprom_init(machine, &eeprom_interface_93C46);// 93c45
 
 		if (file) eeprom_load(file);
 		else

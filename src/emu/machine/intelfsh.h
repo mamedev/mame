@@ -14,7 +14,7 @@
 #define FLASH_INTEL_TE28F160 ( 4 )
 #define FLASH_SHARP_LH28F016S ( 5 )
 
-extern void intelflash_init( int chip, int type, void *data );
+extern void intelflash_init( running_machine *machine, int chip, int type, void *data );
 extern UINT32 intelflash_read( int chip, UINT32 address );
 extern void intelflash_write( int chip, UINT32 address, UINT32 value );
 extern void nvram_handler_intelflash( running_machine *machine, int chip, mame_file *file, int read_or_write );

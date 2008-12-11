@@ -332,7 +332,7 @@ static void eeprom_handler(running_machine *machine, mame_file *file, int read_o
 	}
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 		if (file)
 		{
 			eeprom_load(file);

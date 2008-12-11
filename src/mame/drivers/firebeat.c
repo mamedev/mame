@@ -1844,7 +1844,7 @@ static NVRAM_HANDLER(firebeat)
 	}
 	else
 	{
-		rtc65271_init(xram, NULL);
+		rtc65271_init(machine, xram, NULL);
 
 		if (file != NULL)
 		{
@@ -2277,11 +2277,11 @@ static void init_firebeat(running_machine *machine)
 	UINT8 *rom = memory_region(machine, "user2");
 
 	atapi_init(machine);
-	intelflash_init(0, FLASH_FUJITSU_29F016A, NULL);
-	intelflash_init(1, FLASH_FUJITSU_29F016A, NULL);
-	intelflash_init(2, FLASH_FUJITSU_29F016A, NULL);
+	intelflash_init(machine, 0, FLASH_FUJITSU_29F016A, NULL);
+	intelflash_init(machine, 1, FLASH_FUJITSU_29F016A, NULL);
+	intelflash_init(machine, 2, FLASH_FUJITSU_29F016A, NULL);
 
-	rtc65271_init(xram, NULL);
+	rtc65271_init(machine, xram, NULL);
 
 	pc16552d_init(0, 19660800, comm_uart_irq_callback, 0);		// Network UART
 	pc16552d_init(1, 24000000, midi_uart_irq_callback, 0);		// MIDI UART

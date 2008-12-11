@@ -378,7 +378,7 @@ static const pia6821_interface demoneye_pia_intf =
 
 static SOUND_START( demoneye )
 {
-	pia_config(0, &demoneye_pia_intf);
+	pia_config(machine, 0, &demoneye_pia_intf);
 
 	state_save_register_global(machine, ay8910_latch_1);
 	state_save_register_global(machine, ay8910_latch_2);

@@ -48,7 +48,7 @@ struct TTL7474_interface
 };
 
 
-void TTL7474_config(int which, const struct TTL7474_interface *intf);
+void TTL7474_config(running_machine *machine, int which, const struct TTL7474_interface *intf);
 
 /* must call TTL7474_update() after setting the inputs */
 void TTL7474_update(int which);

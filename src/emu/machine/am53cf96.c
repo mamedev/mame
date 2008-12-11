@@ -10,7 +10,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "am53cf96.h"
 
 static UINT8 scsi_regs[32], fifo[16], fptr = 0, xfer_state, last_id;
@@ -209,9 +208,8 @@ WRITE32_HANDLER( am53cf96_w )
 	}
 }
 
-void am53cf96_init( const struct AM53CF96interface *interface )
+void am53cf96_init( running_machine *machine, const struct AM53CF96interface *interface )
 {
-	running_machine *machine = Machine;
 	int i;
 
 	// save interface pointer for later

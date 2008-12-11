@@ -9,7 +9,7 @@
 
 #define X76F041_MAXCHIP ( 2 )
 
-extern void x76f041_init( int chip, UINT8 *data );
+extern void x76f041_init( running_machine *machine, int chip, UINT8 *data );
 extern void x76f041_cs_write( int chip, int cs );
 extern void x76f041_rst_write( int chip, int rst );
 extern void x76f041_scl_write( int chip, int scl );

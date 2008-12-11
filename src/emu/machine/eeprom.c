@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "eeprom.h"
 
 #define VERBOSE 0
@@ -112,7 +111,7 @@ NVRAM_HANDLER( 93C46 )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)	eeprom_load(file);
 	}
 }
@@ -123,14 +122,13 @@ NVRAM_HANDLER( 93C66B )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C66B);
+		eeprom_init(machine, &eeprom_interface_93C66B);
 		if (file)	eeprom_load(file);
 	}
 }
 
-void eeprom_init(const eeprom_interface *interface)
+void eeprom_init(running_machine *machine, const eeprom_interface *interface)
 {
-	running_machine *machine = Machine;
 	intf = interface;
 
 	if ((1 << intf->address_bits) * intf->data_bits / 8 > MEMORY_SIZE)

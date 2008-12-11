@@ -1361,7 +1361,7 @@ static void flash_init( running_machine *machine )
 			*( flash_init[ i ].start ) = flash_chips;
 			for( chip = 0; chip < flash_init[ i ].chips; chip++ )
 			{
-				intelflash_init( flash_chips, flash_init[ i ].type, data + size );
+				intelflash_init( machine, flash_chips, flash_init[ i ].type, data + size );
 				size += flash_init[ i ].size;
 				flash_chips++;
 			}
@@ -1419,7 +1419,7 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 		switch( eeprom_length )
 		{
 		case 0x224:
-			x76f041_init( cart, eeprom_rom );
+			x76f041_init( machine, cart, eeprom_rom );
 			chiptype[ cart ] = 1;
 
 			switch( cart )
@@ -1435,7 +1435,7 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 			break;
 
 		case 0x84:
-			x76f100_init( cart, eeprom_rom );
+			x76f100_init( machine, cart, eeprom_rom );
 			chiptype[ cart ] = 2;
 
 			switch( cart )
@@ -1478,7 +1478,7 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 
 	if( chiptype[ cart ] != 3 && ds2401_rom != NULL )
 	{
-		ds2401_init( cart, ds2401_rom );
+		ds2401_init( machine, cart, ds2401_rom );
 		has_ds2401[ cart ] = 1;
 	}
 	else
@@ -1511,7 +1511,7 @@ static DRIVER_INIT( konami573 )
 	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_target );
 	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_start );
 
-	adc083x_init( 0, ADC0834, analogue_inputs_callback );
+	adc083x_init( machine, 0, ADC0834, analogue_inputs_callback );
 	flash_init(machine);
 }
 
@@ -1674,7 +1674,7 @@ static DRIVER_INIT( ge765pwbba )
 {
 	DRIVER_INIT_CALL(konami573);
 
-	uPD4701_init( 0 );
+	uPD4701_init( machine, 0 );
 
 	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
 }
@@ -2326,7 +2326,7 @@ static void gx894pwbba_init( running_machine *machine, void (*output_callback_fu
 	gx894_ram_read_offset = 0;
 	gx894_ram = auto_malloc( gx894_ram_size );
 
-	ds2401_init( 2, ds2401_xid ); /* todo: load this from roms */
+	ds2401_init( machine, 2, ds2401_xid ); /* todo: load this from roms */
 
 	state_save_register_global_array(machine,  gx894pwbba_output_data );
 	state_save_register_global_pointer(machine,  gx894_ram, gx894_ram_size / 4 );

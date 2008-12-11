@@ -205,7 +205,7 @@ static INPUT_PORTS_START( ultrsprt )
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0xfff) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static void eeprom_handler(mame_file *file, int read_or_write)
+static NVRAM_HANDLER(ultrsprt)
 {
 	if (read_or_write)
 	{
@@ -213,17 +213,12 @@ static void eeprom_handler(mame_file *file, int read_or_write)
 	}
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)
 		{
 			eeprom_load(file);
 		}
 	}
-}
-
-static NVRAM_HANDLER(ultrsprt)
-{
-	eeprom_handler(file, read_or_write);
 }
 
 static INTERRUPT_GEN( ultrsprt_vblank )

@@ -63,8 +63,8 @@ void viper_bankswitch(running_machine *machine);
 void offroad_bankswitch(running_machine *machine);
 void ataxx_bankswitch(running_machine *machine);
 
-void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
-void ataxx_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset);
+void leland_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
+void ataxx_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset);
 
 READ8_HANDLER( ataxx_eeprom_r );
 WRITE8_HANDLER( ataxx_eeprom_w );

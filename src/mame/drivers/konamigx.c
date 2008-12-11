@@ -468,7 +468,7 @@ static NVRAM_HANDLER(konamigx_93C46)
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 
 		if (file)
 		{
@@ -3331,7 +3331,7 @@ static DRIVER_INIT(konamigx)
 	int i, match;
 	int readback = 0;
 
-	adc083x_init( 0, ADC0834, adc0834_callback );
+	adc083x_init( machine, 0, ADC0834, adc0834_callback );
 
 	konamigx_cfgport = -1;
 	last_prot_op = -1;

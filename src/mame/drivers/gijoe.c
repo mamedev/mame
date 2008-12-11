@@ -63,21 +63,13 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-#if 0
-static void eeprom_init(void)
-{
-	eeprom_init(&eeprom_intf);
-	init_eeprom_count = 0;
-}
-#endif
-
 static NVRAM_HANDLER( gijoe )
 {
 	if (read_or_write)
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file)
 		{

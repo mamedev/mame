@@ -349,7 +349,7 @@ static NVRAM_HANDLER( gunbustr )
 	if (read_or_write)
 		eeprom_save(file);
 	else {
-		eeprom_init(&gunbustr_eeprom_interface);
+		eeprom_init(machine, &gunbustr_eeprom_interface);
 		if (file)
 			eeprom_load(file);
 		else

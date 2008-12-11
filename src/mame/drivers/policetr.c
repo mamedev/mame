@@ -262,7 +262,7 @@ static NVRAM_HANDLER( policetr )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_policetr);
+		eeprom_init(machine, &eeprom_interface_policetr);
 		if (file)	eeprom_load(file);
 	}
 }

@@ -17,7 +17,7 @@ struct _eeprom_interface
 };
 
 
-void eeprom_init(const eeprom_interface *interface);
+void eeprom_init(running_machine *machine, const eeprom_interface *interface);
 
 void eeprom_write_bit(int bit);
 int eeprom_read_bit(void);

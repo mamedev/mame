@@ -9615,8 +9615,8 @@ static DRIVER_INIT( inttoote )
 	ROM[0x368a/2] = 0x50f9;	// betting count down
 
 	/* Initializing PIAs... (to be done) */
-	pia_config(0, &inttoote_pia0_intf);
-	pia_config(1, &inttoote_pia1_intf);
+	pia_config(machine, 0, &inttoote_pia0_intf);
+	pia_config(machine, 1, &inttoote_pia1_intf);
 }
 
 /***************************************************************************

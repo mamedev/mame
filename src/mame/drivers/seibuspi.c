@@ -1648,7 +1648,7 @@ static NVRAM_HANDLER( spi )
 	if( read_or_write ) {
 		DS2404_save(file);
 	} else {
-		DS2404_init(1995, 1, 1);
+		DS2404_init(machine, 1995, 1, 1);
 
 		if(file) {
 			DS2404_load(file);
@@ -1678,7 +1678,7 @@ static NVRAM_HANDLER( sxx2f )
 	if( read_or_write ) {
 		eeprom_save(file);
 	} else {
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if(file)
 			eeprom_load(file);
@@ -1943,8 +1943,8 @@ static READ32_HANDLER ( rfjet_speedup_r )
 
 static void init_spi(running_machine *machine)
 {
-	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
-	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
 
 	seibuspi_text_decrypt(memory_region(machine, "gfx1"));
 	seibuspi_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
@@ -2005,8 +2005,8 @@ static DRIVER_INIT( viprp1o )
 
 static void init_rf2(running_machine *machine)
 {
-	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
-	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
 
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
 	seibuspi_rise10_text_decrypt(memory_region(machine, "gfx1"));
@@ -2029,8 +2029,8 @@ static DRIVER_INIT( rdft2us )
 
 static DRIVER_INIT( rfjet )
 {
-	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
-	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
+	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
 
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
 	seibuspi_rise11_text_decrypt(memory_region(machine, "gfx1"));

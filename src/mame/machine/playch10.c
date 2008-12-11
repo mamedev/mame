@@ -272,7 +272,7 @@ static const struct RP5H01_interface rp5h01_interface =
 DRIVER_INIT( playch10 )
 {
 	/* initialize the security chip */
-	if ( RP5H01_init( &rp5h01_interface ) )
+	if ( RP5H01_init( machine, &rp5h01_interface ) )
 	{
 		fatalerror("rp5h01_interface initualization failed");
 	}

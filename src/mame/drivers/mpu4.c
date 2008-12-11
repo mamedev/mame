@@ -1241,12 +1241,12 @@ static const stepper_interface barcrest_reel_interface =
 /* Common configurations */
 static void mpu4_config_common(running_machine *machine)
 {
-	pia_config(0,&pia_ic3_intf);
-	pia_config(1,&pia_ic4_intf);
-	pia_config(2,&pia_ic5_intf);
-	pia_config(3,&pia_ic6_intf);
-	pia_config(4,&pia_ic7_intf);
-	pia_config(5,&pia_ic8_intf);
+	pia_config(machine, 0,&pia_ic3_intf);
+	pia_config(machine, 1,&pia_ic4_intf);
+	pia_config(machine, 2,&pia_ic5_intf);
+	pia_config(machine, 3,&pia_ic6_intf);
+	pia_config(machine, 4,&pia_ic7_intf);
+	pia_config(machine, 5,&pia_ic8_intf);
 
 	ic24_timer = timer_alloc(machine, ic24_timeout, NULL);
 	/* setup 6840ptm */

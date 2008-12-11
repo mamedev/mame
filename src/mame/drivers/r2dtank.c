@@ -275,8 +275,8 @@ static const pia6821_interface pia_audio_intf =
 
 static MACHINE_START( r2dtank )
 {
-	pia_config(0, &pia_main_intf);
-	pia_config(1, &pia_audio_intf);
+	pia_config(machine, 0, &pia_main_intf);
+	pia_config(machine, 1, &pia_audio_intf);
 
 	/* setup for save states */
 	state_save_register_global(machine, flipscreen);

@@ -1116,7 +1116,7 @@ static void init_mediagx(running_machine *machine)
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
 	mc146818_init(machine, MC146818_STANDARD);
 
-	kbdc8042_init(&at8042);
+	kbdc8042_init(machine, &at8042);
 }
 
 #if SPEEDUP_HACKS

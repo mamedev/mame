@@ -31,7 +31,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/pd4990a.h"
 
 
@@ -327,9 +326,8 @@ WRITE16_HANDLER( pd4990a_control_16_w )
 	pd4990a_serial_control(data&0x7);
 }
 
-void pd4990a_init(void)
+void pd4990a_init(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	pd4990a = pd4990a_initval;
 	shiftlo = 0;
 	shifthi = 0;

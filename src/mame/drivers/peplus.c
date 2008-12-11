@@ -1025,10 +1025,10 @@ MACHINE_DRIVER_END
 *****************/
 
 /* Normal board */
-static void peplus_init(void)
+static void peplus_init(running_machine *machine)
 {
     /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, eeprom_NVRAM_SIZE, NULL);
+	i2cmem_init(machine, 0, I2CMEM_SLAVE_ADDRESS, 8, eeprom_NVRAM_SIZE, NULL);
 
 	/* default : no address to patch in program RAM to enable autohold feature */
 	autohold_addr = 0;
@@ -1042,7 +1042,7 @@ static void peplus_init(void)
 /* Normal board */
 static DRIVER_INIT( peplus )
 {
-	peplus_init();
+	peplus_init(machine);
 }
 
 /* Superboard */
@@ -1058,7 +1058,7 @@ static DRIVER_INIT( peplussb )
     memcpy(sd000_ram, &super_data[0xd000], 0x1000);
     memcpy(sf000_ram, &super_data[0xf000], 0x1000);
 
-	peplus_init();
+	peplus_init(machine);
 }
 
 /*************************

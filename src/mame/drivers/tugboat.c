@@ -173,8 +173,8 @@ static TIMER_CALLBACK( interrupt_gen )
 
 static MACHINE_START( tugboat )
 {
-	pia_config(0, &pia0_intf);
-	pia_config(1, &pia1_intf);
+	pia_config(machine, 0, &pia0_intf);
+	pia_config(machine, 1, &pia1_intf);
 }
 
 static MACHINE_RESET( tugboat )

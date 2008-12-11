@@ -111,7 +111,7 @@ static NVRAM_HANDLER( konamigq_93C46 )
 	}
 	else
 	{
-		eeprom_init( &eeprom_interface_93C46 );
+		eeprom_init( machine, &eeprom_interface_93C46 );
 		if( file )
 		{
 			eeprom_load( file );
@@ -349,7 +349,7 @@ static void konamigq_exit(running_machine *machine)
 static MACHINE_START( konamigq )
 {
 	/* init the scsi controller and hook up it's DMA */
-	am53cf96_init(&scsi_intf);
+	am53cf96_init(machine, &scsi_intf);
 	add_exit_callback(machine, konamigq_exit);
 	psx_dma_install_read_handler(5, scsi_dma_read);
 	psx_dma_install_write_handler(5, scsi_dma_write);

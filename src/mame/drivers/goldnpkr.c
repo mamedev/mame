@@ -3158,14 +3158,14 @@ ROM_END
 
 static DRIVER_INIT( goldnpkr )
 {
-	pia_config(0, &goldnpkr_pia0_intf);
-	pia_config(1, &goldnpkr_pia1_intf);
+	pia_config(machine, 0, &goldnpkr_pia0_intf);
+	pia_config(machine, 1, &goldnpkr_pia1_intf);
 }
 
 static DRIVER_INIT( pottnpkr )
 {
-	pia_config(0, &pottnpkr_pia0_intf);
-	pia_config(1, &pottnpkr_pia1_intf);
+	pia_config(machine, 0, &pottnpkr_pia0_intf);
+	pia_config(machine, 1, &pottnpkr_pia1_intf);
 }
 
 /*
@@ -3214,8 +3214,8 @@ static DRIVER_INIT( royale )
 //  ROM[0x60bb] = 0xea;
 //  ROM[0x60bc] = 0xea;
 
-	pia_config(0, &pottnpkr_pia0_intf);
-	pia_config(1, &pottnpkr_pia1_intf);
+	pia_config(machine, 0, &pottnpkr_pia0_intf);
+	pia_config(machine, 1, &pottnpkr_pia1_intf);
 }
 
 /*************************

@@ -379,9 +379,9 @@ MACHINE_RESET( mcr68 )
 MACHINE_START( zwackery )
 {
 	/* append our PIA state onto the existing one and reinit */
-	pia_config(2, &zwackery_pia_2_intf);
-	pia_config(3, &zwackery_pia_3_intf);
-	pia_config(4, &zwackery_pia_4_intf);
+	pia_config(machine, 2, &zwackery_pia_2_intf);
+	pia_config(machine, 3, &zwackery_pia_3_intf);
+	pia_config(machine, 4, &zwackery_pia_4_intf);
 
 	MACHINE_START_CALL(mcr68);
 }

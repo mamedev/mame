@@ -108,9 +108,8 @@ static struct x76f041_chip x76f041[ X76F041_MAXCHIP ];
 #define STATE_READ_CONFIGURATION_REGISTERS ( 8 )
 #define STATE_WRITE_CONFIGURATION_REGISTERS ( 9 )
 
-void x76f041_init( int chip, UINT8 *data )
+void x76f041_init( running_machine *machine, int chip, UINT8 *data )
 {
-	running_machine *machine = Machine;
 	int offset;
 	struct x76f041_chip *c;
 

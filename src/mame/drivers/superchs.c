@@ -400,7 +400,7 @@ static NVRAM_HANDLER( superchs )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&superchs_eeprom_interface);
+		eeprom_init(machine, &superchs_eeprom_interface);
 
 		if (file)
 			eeprom_load(file);

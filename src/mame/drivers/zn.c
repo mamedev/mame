@@ -1179,7 +1179,7 @@ static DRIVER_INIT( coh1000ta )
 	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size1 - 1 ), 0, 0, SMH_BANK2, SMH_BANK2 );
 
 	zn_driver_init(machine);
-	mb3773_init();
+	mb3773_init(machine);
 }
 
 static MACHINE_RESET( coh1000ta )
@@ -1279,7 +1279,7 @@ static DRIVER_INIT( coh1000tb )
 	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size2 - 1 ), 0, 0, SMH_BANK3, SMH_BANK3 );
 
 	zn_driver_init(machine);
-	mb3773_init();
+	mb3773_init(machine);
 }
 
 static MACHINE_RESET( coh1000tb )

@@ -48,7 +48,7 @@ struct _pia6821_interface
 
 /*------------------ Configuration -----------------------*/
 
-void pia_config(int which, const pia6821_interface *intf);
+void pia_config(running_machine *machine, int which, const pia6821_interface *intf);
 
 
 

@@ -759,7 +759,7 @@ static DRIVER_INIT( cps3 )
 	// flash roms
 
 	for (i=0;i<48;i++)
-		intelflash_init( i, FLASH_FUJITSU_29F016A, NULL );
+		intelflash_init( machine, i, FLASH_FUJITSU_29F016A, NULL );
 
 	cps3_eeprom = auto_malloc(0x400);
 
@@ -2366,7 +2366,7 @@ static void cps3_exit(running_machine *machine)
 
 static MACHINE_START( cps3 )
 {
-	wd33c93_init(&scsi_intf);
+	wd33c93_init(machine, &scsi_intf);
 	add_exit_callback(machine, cps3_exit);
 }
 

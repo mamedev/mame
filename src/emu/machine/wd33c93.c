@@ -779,7 +779,7 @@ READ8_HANDLER(wd33c93_r)
 	return 0;
 }
 
-extern void wd33c93_init( const struct WD33C93interface *interface )
+void wd33c93_init( running_machine *machine, const struct WD33C93interface *interface )
 {
 	int i;
 
@@ -796,14 +796,14 @@ extern void wd33c93_init( const struct WD33C93interface *interface )
 	}
 
 	/* allocate a timer for commands */
-	scsi_data.cmd_timer = timer_alloc(Machine, wd33c93_complete_cb, NULL);
+	scsi_data.cmd_timer = timer_alloc(machine, wd33c93_complete_cb, NULL);
 
 	scsi_data.temp_input = auto_malloc( TEMP_INPUT_LEN );
 
-//  state_save_register_item_array(Machine, "wd33c93", NULL, 0, scsi_data);
+//  state_save_register_item_array(machine, "wd33c93", NULL, 0, scsi_data);
 }
 
-extern void wd33c93_exit( const struct WD33C93interface *interface )
+void wd33c93_exit( const struct WD33C93interface *interface )
 {
 	int i;
 

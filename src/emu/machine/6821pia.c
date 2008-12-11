@@ -114,9 +114,8 @@ static pia6821 pias[MAX_PIA];
  *
  *************************************/
 
-void pia_config(int which, const pia6821_interface *intf)
+void pia_config(running_machine *machine, int which, const pia6821_interface *intf)
 {
-	running_machine *machine = Machine;
 	pia6821 *p;
 
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call pia_config at init time!");

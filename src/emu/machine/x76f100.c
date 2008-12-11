@@ -77,9 +77,8 @@ static struct x76f100_chip x76f100[ X76F100_MAXCHIP ];
 #define STATE_READ_DATA ( 6 )
 #define STATE_WRITE_DATA ( 7 )
 
-void x76f100_init( int chip, UINT8 *data )
+void x76f100_init( running_machine *machine, int chip, UINT8 *data )
 {
-	running_machine *machine = Machine;
 	int offset;
 	struct x76f100_chip *c;
 

@@ -6,7 +6,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/upd4701.h"
 
 struct uPD4701_chip
@@ -32,14 +31,13 @@ static struct uPD4701_chip uPD4701[ UPD4701_MAXCHIP ];
 #define MASK_SWITCHES ( 7 )
 #define MASK_COUNTER ( 0xfff )
 
-void uPD4701_init( int chip )
+void uPD4701_init( running_machine *machine, int chip )
 {
-	running_machine *machine = Machine;
 	struct uPD4701_chip *c;
 
 	if( chip < 0 || chip >= UPD4701_MAXCHIP )
 	{
-		logerror( "uPD4701_init( %d ) invalid chip\n", chip );
+		logerror( "uPD4701_init( machine, %d ) invalid chip\n", chip );
 		return;
 	}
 

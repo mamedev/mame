@@ -174,7 +174,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "memconv.h"
 
 #include "machine/pckeybrd.h"
@@ -267,7 +266,7 @@ static TIMER_CALLBACK( kbdc8042_time )
 
 
 
-void kbdc8042_init(const struct kbdc8042_interface *intf)
+void kbdc8042_init(running_machine *machine, const struct kbdc8042_interface *intf)
 {
 	poll_delay = 10;
 	memset(&kbdc8042, 0, sizeof(kbdc8042));
@@ -280,7 +279,7 @@ void kbdc8042_init(const struct kbdc8042_interface *intf)
 	kbdc8042.inport = 0xa0;
 	at_8042_set_outport(0xfe, 1);
 
-	timer_pulse(Machine, ATTOTIME_IN_HZ(60), NULL, 0, kbdc8042_time);
+	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, kbdc8042_time);
 }
 
 static void at_8042_receive(UINT8 data)

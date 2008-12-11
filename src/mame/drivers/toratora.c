@@ -303,9 +303,9 @@ static const pia6821_interface pia_u3_intf =
 
 static MACHINE_START( toratora )
 {
-	pia_config(0, &pia_u1_intf);
-	pia_config(1, &pia_u3_intf);
-	pia_config(2, &pia_u2_intf);
+	pia_config(machine, 0, &pia_u1_intf);
+	pia_config(machine, 1, &pia_u3_intf);
+	pia_config(machine, 2, &pia_u2_intf);
 }
 
 

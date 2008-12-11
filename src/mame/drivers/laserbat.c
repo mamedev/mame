@@ -670,7 +670,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( catnmous )
 {
-	pia_config(0, &pia_0_intf);
+	pia_config(machine, 0, &pia_0_intf);
 }
 
 static MACHINE_RESET( catnmous )

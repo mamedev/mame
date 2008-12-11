@@ -246,8 +246,8 @@ static const ppi8255_interface ppi8255_intf =
 
 static MACHINE_START( zaccaria )
 {
-	pia_config(0, &pia_0_intf);
-	pia_config(1, &pia_1_intf);
+	pia_config(machine, 0, &pia_0_intf);
+	pia_config(machine, 1, &pia_1_intf);
 }
 
 static MACHINE_RESET( zaccaria )

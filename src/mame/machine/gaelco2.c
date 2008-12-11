@@ -282,7 +282,7 @@ NVRAM_HANDLER( gaelco2 )
 	if (read_or_write){
 		eeprom_save(file);
 	} else {
-		eeprom_init(&gaelco2_eeprom_interface);
+		eeprom_init(machine, &gaelco2_eeprom_interface);
 
 		if (file) eeprom_load(file);
 	}

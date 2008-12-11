@@ -418,7 +418,7 @@ static NVRAM_HANDLER( cave )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 
 		if (file) eeprom_load(file);
 		else
@@ -449,7 +449,7 @@ static NVRAM_HANDLER( korokoro )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46_8bit);
+		eeprom_init(machine, &eeprom_interface_93C46_8bit);
 
 		if (file) eeprom_load(file);
 		else

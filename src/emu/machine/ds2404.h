@@ -1,7 +1,7 @@
 #ifndef DS2404_H
 #define DS2404_H
 
-void DS2404_init(int ref_year, int ref_month, int ref_day);
+void DS2404_init(running_machine *machine, int ref_year, int ref_month, int ref_day);
 void DS2404_load(mame_file *file);
 void DS2404_save(mame_file *file);
 

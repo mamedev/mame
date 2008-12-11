@@ -530,7 +530,7 @@ static NVRAM_HANDLER( 93C46_vamphalf )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)
 		{
 			eeprom_load(file);
@@ -552,7 +552,7 @@ static NVRAM_HANDLER( finalgdr )
 	}
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)
 		{
 			eeprom_load(file);

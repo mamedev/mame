@@ -272,7 +272,7 @@ static NVRAM_HANDLER( undrfire )
 	if (read_or_write)
 		eeprom_save(file);
 	else {
-		eeprom_init(&undrfire_eeprom_interface);
+		eeprom_init(machine, &undrfire_eeprom_interface);
 		if (file)
 			eeprom_load(file);
 		else

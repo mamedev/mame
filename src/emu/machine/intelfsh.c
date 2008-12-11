@@ -12,7 +12,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "intelfsh.h"
 
 enum
@@ -78,9 +77,8 @@ void* intelflash_getmemptr(int chip)
 	return c->flash_memory;
 }
 
-void intelflash_init(int chip, int type, void *data)
+void intelflash_init(running_machine *machine, int chip, int type, void *data)
 {
-	running_machine *machine = Machine;
 	struct flash_chip *c;
 	if( chip >= FLASH_CHIPS_MAX )
 	{

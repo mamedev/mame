@@ -55,7 +55,7 @@ static NVRAM_HANDLER( xorworld )
 	}
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 
 		if (file)
 		{

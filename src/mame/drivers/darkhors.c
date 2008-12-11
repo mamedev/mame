@@ -220,7 +220,7 @@ static NVRAM_HANDLER( darkhors )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file) eeprom_load(file);
 		else

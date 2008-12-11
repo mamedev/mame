@@ -848,7 +848,7 @@ static void init_zr107(running_machine *machine)
 
 	K056800_init(machine, sound_irq_callback);
 
-	adc083x_init(0, ADC0838, adc0838_callback);
+	adc083x_init(machine, 0, ADC0838, adc0838_callback);
 }
 
 static DRIVER_INIT(zr107)

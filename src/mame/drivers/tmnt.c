@@ -444,7 +444,7 @@ static NVRAM_HANDLER( eeprom )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 
 		if (file)
 		{
@@ -544,7 +544,7 @@ static NVRAM_HANDLER( thndrx2 )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&thndrx2_eeprom_interface);
+		eeprom_init(machine, &thndrx2_eeprom_interface);
 
 		if (file)
 		{

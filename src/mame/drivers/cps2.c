@@ -713,7 +713,7 @@ static NVRAM_HANDLER( cps2 )
 		eeprom_save(file);
 	else
 	{
-        eeprom_init(&cps2_eeprom_interface);
+        eeprom_init(machine, &cps2_eeprom_interface);
 
 		if (file)
 			eeprom_load(file);

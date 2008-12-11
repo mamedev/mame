@@ -1846,7 +1846,7 @@ static NVRAM_HANDLER(tattass)
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_tattass);
+		eeprom_init(machine, &eeprom_interface_tattass);
 		if (file) eeprom_load(file);
 		else memcpy(eeprom_get_data_pointer(NULL,NULL),tattass_default_eprom,0x160);
 	}

@@ -1230,7 +1230,7 @@ static NVRAM_HANDLER( bbakraid )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C66);
+		eeprom_init(machine, &eeprom_interface_93C66);
 
 		if (file) eeprom_load(file);
 		else

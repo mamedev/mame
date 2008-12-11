@@ -186,7 +186,7 @@ static UINT8 duart_input(const device_config *device)
 
 static MACHINE_START( skattv )
 {
-	microtouch_init(microtouch_tx, 0);
+	microtouch_init(machine, microtouch_tx, 0);
 }
 
 static MACHINE_RESET( skattv )

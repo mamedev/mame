@@ -181,7 +181,7 @@ static NVRAM_HANDLER(93C56)
 	}
 	else
 	{
-		eeprom_init(&eeprom_interface_93C56);
+		eeprom_init(machine, &eeprom_interface_93C56);
 		if (file)
 		{
 			eeprom_load(file);

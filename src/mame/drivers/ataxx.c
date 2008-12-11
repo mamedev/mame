@@ -659,7 +659,7 @@ static DRIVER_INIT( ataxx )
 		0x14,0x5a04,
 		0xffff
 	};
-	ataxx_init_eeprom(0x00, ataxx_eeprom_data, 0x00);
+	ataxx_init_eeprom(machine, 0x00, ataxx_eeprom_data, 0x00);
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -682,7 +682,7 @@ static DRIVER_INIT( ataxxj )
 		0x3f,0x3c0c,
 		0xffff
 	};
-	ataxx_init_eeprom(0x00, ataxxj_eeprom_data, 0x00);
+	ataxx_init_eeprom(machine, 0x00, ataxxj_eeprom_data, 0x00);
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -705,7 +705,7 @@ static DRIVER_INIT( wsf )
 		0x28,0xff00,
 		0xffff
 	};
-	ataxx_init_eeprom(0x00, wsf_eeprom_data, 0x00);
+	ataxx_init_eeprom(machine, 0x00, wsf_eeprom_data, 0x00);
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -730,7 +730,7 @@ static DRIVER_INIT( indyheat )
 		0x31,0xfafa,
 		0xffff
 	};
-	ataxx_init_eeprom(0x00, indyheat_eeprom_data, 0x00);
+	ataxx_init_eeprom(machine, 0x00, indyheat_eeprom_data, 0x00);
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -760,7 +760,7 @@ static DRIVER_INIT( brutforc )
 		0x36,0x0104,
 		0xffff
 	};
-	ataxx_init_eeprom(0x00, brutforc_eeprom_data, 0x00);
+	ataxx_init_eeprom(machine, 0x00, brutforc_eeprom_data, 0x00);
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");
@@ -785,7 +785,7 @@ static DRIVER_INIT( asylum )
 		0x07,0x0400,
 		0xffff
 	};
-	ataxx_init_eeprom(0x00, asylum_eeprom_data, 0x00);
+	ataxx_init_eeprom(machine, 0x00, asylum_eeprom_data, 0x00);
 
 	leland_rotate_memory(machine, "master");
 	leland_rotate_memory(machine, "slave");

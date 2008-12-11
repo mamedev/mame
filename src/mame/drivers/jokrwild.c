@@ -420,8 +420,8 @@ static DRIVER_INIT( jokrwild )
 	}
 
 	/* Initializing PIAs... */
-//  pia_config(0, &pia0_intf);
-//  pia_config(1, &pia1_intf);
+//  pia_config(machine, 0, &pia0_intf);
+//  pia_config(machine, 1, &pia1_intf);
 }
 
 

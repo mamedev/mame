@@ -664,8 +664,9 @@ static void *venture_common_sh_start(const device_config *device, int clock, con
 
 static CUSTOM_START( venture_sh_start )
 {
-	pia_config(0, &venture_pia_0_intf);
-	pia_config(1, &venture_pia_1_intf);
+	running_machine *machine = device->machine;
+	pia_config(machine, 0, &venture_pia_0_intf);
+	pia_config(machine, 1, &venture_pia_1_intf);
 
 	return venture_common_sh_start(device, clock, config, FALSE);
 }
@@ -861,7 +862,7 @@ static const pia6821_interface victory_pia_e5_intf =
 static CUSTOM_START( victory_sh_start )
 {
 	running_machine *machine = device->machine;
-	pia_config(1, &victory_pia_e5_intf);
+	pia_config(machine, 1, &victory_pia_e5_intf);
 
 	state_save_register_global(machine, victory_sound_response_ack_clk);
 

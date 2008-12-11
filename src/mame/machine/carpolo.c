@@ -513,8 +513,8 @@ static const struct TTL7474_interface TTL7474_2U_2_intf =
 MACHINE_START( carpolo )
 {
 	/* set up the PIA's */
-	pia_config(0, &pia_0_intf);
-	pia_config(1, &pia_1_intf);
+	pia_config(machine, 0, &pia_0_intf);
+	pia_config(machine, 1, &pia_1_intf);
 }
 
 MACHINE_RESET( carpolo )
@@ -525,10 +525,10 @@ MACHINE_RESET( carpolo )
 
 
 	/* set up the coin handling flip-flops */
-	TTL7474_config(TTL7474_2S_1, &TTL7474_2S_1_intf);
-	TTL7474_config(TTL7474_2S_2, &TTL7474_2S_2_intf);
-	TTL7474_config(TTL7474_2U_1, &TTL7474_2U_1_intf);
-	TTL7474_config(TTL7474_2U_2, &TTL7474_2U_2_intf);
+	TTL7474_config(machine, TTL7474_2S_1, &TTL7474_2S_1_intf);
+	TTL7474_config(machine, TTL7474_2S_2, &TTL7474_2S_2_intf);
+	TTL7474_config(machine, TTL7474_2U_1, &TTL7474_2U_1_intf);
+	TTL7474_config(machine, TTL7474_2U_2, &TTL7474_2U_2_intf);
 
 	TTL7474_d_w     (TTL7474_2S_1, 1);
 	TTL7474_preset_w(TTL7474_2S_1, 1);
@@ -544,14 +544,14 @@ MACHINE_RESET( carpolo )
 
 
 	/* set up the steering handling flip-flops */
-	TTL7474_config(TTL7474_1F_1, 0);
-	TTL7474_config(TTL7474_1F_2, 0);
-	TTL7474_config(TTL7474_1D_1, 0);
-	TTL7474_config(TTL7474_1D_2, 0);
-	TTL7474_config(TTL7474_1C_1, 0);
-	TTL7474_config(TTL7474_1C_2, 0);
-	TTL7474_config(TTL7474_1A_1, 0);
-	TTL7474_config(TTL7474_1A_2, 0);
+	TTL7474_config(machine, TTL7474_1F_1, 0);
+	TTL7474_config(machine, TTL7474_1F_2, 0);
+	TTL7474_config(machine, TTL7474_1D_1, 0);
+	TTL7474_config(machine, TTL7474_1D_2, 0);
+	TTL7474_config(machine, TTL7474_1C_1, 0);
+	TTL7474_config(machine, TTL7474_1C_2, 0);
+	TTL7474_config(machine, TTL7474_1A_1, 0);
+	TTL7474_config(machine, TTL7474_1A_2, 0);
 
 	TTL7474_d_w     (TTL7474_1F_1, 1);
 	TTL7474_preset_w(TTL7474_1F_1, 1);

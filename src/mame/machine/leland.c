@@ -677,7 +677,7 @@ void ataxx_bankswitch(running_machine *machine)
  *
  *************************************/
 
-void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type)
+void leland_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type)
 {
 	static const eeprom_interface eeprom_intf =
 	{
@@ -759,7 +759,7 @@ void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offs
 		}
 	}
 
-	eeprom_init(&eeprom_intf);
+	eeprom_init(machine, &eeprom_intf);
 }
 
 
@@ -770,7 +770,7 @@ void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offs
  *
  *************************************/
 
-void ataxx_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset)
+void ataxx_init_eeprom(running_machine *machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset)
 {
 	static const eeprom_interface eeprom_intf =
 	{
@@ -836,7 +836,7 @@ void ataxx_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offse
 		eeprom_data[0x7f * 2 + 0] = (sum >> 8) & 0xff;
 		eeprom_data[0x7f * 2 + 1] = sum & 0xff;
 
-		eeprom_init(&eeprom_intf);
+		eeprom_init(machine, &eeprom_intf);
 	}
 }
 

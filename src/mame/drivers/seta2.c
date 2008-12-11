@@ -494,7 +494,7 @@ static NVRAM_HANDLER(93C46_gundamex)
 	}
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)
 		{
 			eeprom_load(file);

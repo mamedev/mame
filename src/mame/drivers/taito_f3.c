@@ -389,7 +389,7 @@ static NVRAM_HANDLER( taito_f3 )
 
 		// RecalH does not initialise it's eeprom on first boot, so we provide one.
 		// Same applies to gseeker.
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 		if (file)
 			eeprom_load(file);
 		else if (f3_game==RECALH)

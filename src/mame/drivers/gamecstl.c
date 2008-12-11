@@ -733,7 +733,7 @@ static DRIVER_INIT( gamecstl )
 
 	intel82439tx_init();
 
-	kbdc8042_init(&at8042);
+	kbdc8042_init(machine, &at8042);
 }
 
 /*****************************************************************************/

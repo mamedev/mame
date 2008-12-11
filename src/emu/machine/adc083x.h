@@ -27,7 +27,7 @@
 #define ADC0834 ( 2 )
 #define ADC0838 ( 3 )
 
-void adc083x_init( int chip, int type, double (*input_callback)( int input ) );
+void adc083x_init( running_machine *machine, int chip, int type, double (*input_callback)( int input ) );
 extern void adc083x_cs_write( int chip, int cs );
 extern void adc083x_clk_write( int chip, int clk );
 extern void adc083x_di_write( int chip, int di );

@@ -211,9 +211,10 @@ static const struct TTL7474_interface sfx_sh_7474_intf =
 
 void scramble_sh_init(void)
 {
-	cpu_set_irq_callback(Machine->cpu[1], scramble_sh_irq_callback);
+	running_machine *machine = Machine;
+	cpu_set_irq_callback(machine->cpu[1], scramble_sh_irq_callback);
 
-	TTL7474_config(2, &scramble_sh_7474_intf);
+	TTL7474_config(machine, 2, &scramble_sh_7474_intf);
 
 	/* PR is always 0, D is always 1 */
 	TTL7474_d_w(2, 1);
@@ -221,9 +222,10 @@ void scramble_sh_init(void)
 
 void sfx_sh_init(void)
 {
-	cpu_set_irq_callback(Machine->cpu[2], sfx_sh_irq_callback);
+	running_machine *machine = Machine;
+	cpu_set_irq_callback(machine->cpu[2], sfx_sh_irq_callback);
 
-	TTL7474_config(3, &sfx_sh_7474_intf);
+	TTL7474_config(machine, 3, &sfx_sh_7474_intf);
 
 	/* PR is always 0, D is always 1 */
 	TTL7474_d_w(3, 1);

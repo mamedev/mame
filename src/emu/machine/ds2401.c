@@ -139,9 +139,8 @@ static TIMER_CALLBACK( ds2401_tick )
 	}
 }
 
-void ds2401_init( int which, const UINT8 *data )
+void ds2401_init( running_machine *machine, int which, const UINT8 *data )
 {
-	running_machine *machine = Machine;
 	struct ds2401_chip *c = &ds2401[ which ];
 
 	c->state = STATE_IDLE;

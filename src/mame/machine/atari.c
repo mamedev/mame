@@ -755,7 +755,7 @@ static void atari_machine_start(running_machine *machine, int type, const pia682
 	/* PIA */
 	if (pia_intf)
 	{
-		pia_config(0, pia_intf);
+		pia_config(machine, 0, pia_intf);
 		add_reset_callback(machine, _pia_reset);
 	}
 

@@ -143,7 +143,7 @@ static NVRAM_HANDLER( groundfx )
 	if (read_or_write)
 		eeprom_save(file);
 	else {
-		eeprom_init(&groundfx_eeprom_interface);
+		eeprom_init(machine, &groundfx_eeprom_interface);
 		if (file)
 			eeprom_load(file);
 		else

@@ -368,7 +368,7 @@ static NVRAM_HANDLER( gdfs )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&eeprom_interface_93C46);
+		eeprom_init(machine, &eeprom_interface_93C46);
 
 		if (file) eeprom_load(file);
 		else

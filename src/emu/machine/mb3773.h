@@ -7,6 +7,6 @@
 #define MB3773_H ( 1 )
 
 extern void mb3773_set_ck( UINT8 new_ck );
-extern void mb3773_init( void );
+extern void mb3773_init( running_machine *machine );
 
 #endif

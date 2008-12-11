@@ -9,7 +9,7 @@
 
 #define UPD4701_MAXCHIP ( 1 )
 
-extern void uPD4701_init( int chip );
+extern void uPD4701_init( running_machine *machine, int chip );
 extern void uPD4701_cs_w( int chip, int cs );
 extern void uPD4701_xy_w( int chip, int xy );
 extern void uPD4701_ul_w( int chip, int ul );

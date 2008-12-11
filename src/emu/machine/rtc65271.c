@@ -16,7 +16,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "rtc65271.h"
 
 static void field_interrupts(void);
@@ -311,15 +310,15 @@ int rtc65271_file_save(mame_file *file)
     interrupt_callback: callback called when interrupt pin state changes (may
         be NULL)
 */
-void rtc65271_init(UINT8 *xram, void (*interrupt_callback)(int state))
+void rtc65271_init(running_machine *machine, UINT8 *xram, void (*interrupt_callback)(int state))
 {
 	memset(&rtc, 0, sizeof(rtc));
 
 	rtc.xram = xram;
 
-	rtc.update_timer = timer_alloc(Machine, rtc_begin_update_callback, NULL);
+	rtc.update_timer = timer_alloc(machine, rtc_begin_update_callback, NULL);
 	timer_adjust_periodic(rtc.update_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
-	rtc.SQW_timer = timer_alloc(Machine, rtc_SQW_callback, NULL);
+	rtc.SQW_timer = timer_alloc(machine, rtc_SQW_callback, NULL);
 	rtc.interrupt_callback = interrupt_callback;
 }
 

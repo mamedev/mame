@@ -261,19 +261,20 @@ MACHINE_DRIVER_END
 
 void williams_cvsd_init(int pianum)
 {
+	running_machine *machine = Machine;
 	UINT8 *ROM;
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = cputag_get_cpu(Machine, "cvsd");
+	sound_cpu = cputag_get_cpu(machine, "cvsd");
 	soundalt_cpu = NULL;
 
 	/* configure the PIA */
 	williams_pianum = pianum;
-	pia_config(pianum, &cvsd_pia_intf);
+	pia_config(machine, pianum, &cvsd_pia_intf);
 
 	/* configure master CPU banks */
-	ROM = memory_region(Machine, "cvsd");
+	ROM = memory_region(machine, "cvsd");
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -282,16 +283,16 @@ void williams_cvsd_init(int pianum)
             D3 -> A16
          */
 		offs_t offset = 0x8000 * ((bank >> 2) & 3) + 0x20000 * (bank & 3);
-		memory_configure_bank(Machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bank(sound_cpu->machine, 5, 0);
+	memory_set_bank(machine, 5, 0);
 
 	/* reset the IRQ state */
 	pia_set_input_ca1(williams_pianum, 1);
 
 	/* register for save states */
-	state_save_register_global(sound_cpu->machine, williams_sound_int_state);
-	state_save_register_global(sound_cpu->machine, audio_talkback);
+	state_save_register_global(machine, williams_sound_int_state);
+	state_save_register_global(machine, audio_talkback);
 }
 
 

@@ -28,7 +28,7 @@ struct kbdc8042_interface
 
 
 
-void kbdc8042_init(const struct kbdc8042_interface *intf);
+void kbdc8042_init(running_machine *machine, const struct kbdc8042_interface *intf);
 
 READ8_HANDLER(kbdc8042_8_r);
 WRITE8_HANDLER(kbdc8042_8_w);

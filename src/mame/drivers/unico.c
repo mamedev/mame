@@ -656,7 +656,7 @@ static NVRAM_HANDLER( zeropnt2 )
 		eeprom_save(file);
 	else
 	{
-		eeprom_init(&zeropnt2_eeprom_interface);
+		eeprom_init(machine, &zeropnt2_eeprom_interface);
 		if (file)	eeprom_load(file);
 	}
 }

@@ -38,7 +38,6 @@
 *****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "7474.h"
 
 
@@ -139,9 +138,8 @@ int TTL7474_output_comp_r(int which)
 }
 
 
-void TTL7474_config(int which, const struct TTL7474_interface *intf)
+void TTL7474_config(running_machine *machine, int which, const struct TTL7474_interface *intf)
 {
-	running_machine *machine = Machine;
 	struct TTL7474 *chip = &chips[which];
 
 	if (which >= MAX_TTL7474)

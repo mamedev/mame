@@ -10,7 +10,7 @@ struct RP5H01_interface {
 	int offset[MAX_RP5H01];		/* memory offset within the above region where data resides */
 };
 
-int RP5H01_init( const struct RP5H01_interface *interface );
+int RP5H01_init( running_machine *machine, const struct RP5H01_interface *interface );
 void RP5H01_enable_w( int which, int data );				/* /CE */
 void RP5H01_reset_w( int which, int data );				/* RESET */
 void RP5H01_clock_w( int which, int data );				/* DATA CLOCK (active low) */

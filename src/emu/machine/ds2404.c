@@ -1,7 +1,6 @@
 /* Dallas DS2404 RTC/NVRAM */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "ds2404.h"
 #include <time.h>
 
@@ -283,7 +282,7 @@ static TIMER_CALLBACK( DS2404_tick )
 	}
 }
 
-void DS2404_init(int ref_year, int ref_month, int ref_day)
+void DS2404_init(running_machine *machine, int ref_year, int ref_month, int ref_day)
 {
 	struct tm ref_tm;
 	time_t ref_time;
@@ -306,7 +305,7 @@ void DS2404_init(int ref_year, int ref_month, int ref_day)
 	ds2404.rtc[ 3 ] = ( current_time >> 16 ) & 0xff;
 	ds2404.rtc[ 4 ] = ( current_time >> 24 ) & 0xff;
 
-	timer = timer_alloc( Machine, DS2404_tick , NULL);
+	timer = timer_alloc( machine, DS2404_tick , NULL);
 	timer_adjust_periodic( timer, ATTOTIME_IN_HZ( 256 ), 0, ATTOTIME_IN_HZ( 256 ) );
 }
 

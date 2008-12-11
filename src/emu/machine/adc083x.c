@@ -63,9 +63,8 @@ struct adc083x_chip
 
 static struct adc083x_chip adc083x[ MAX_ADC083X_CHIPS ];
 
-void adc083x_init( int chip, int type, double (*input_callback)(int input) )
+void adc083x_init( running_machine *machine, int chip, int type, double (*input_callback)(int input) )
 {
-	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )

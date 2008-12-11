@@ -19,7 +19,7 @@ I2C Memory
 #define I2CMEM_SLAVE_ADDRESS ( 0xa0 )
 #define I2CMEM_SLAVE_ADDRESS_ALT ( 0xb0 )
 
-extern void i2cmem_init( int chip, int slave_address, int page_size, int data_size, unsigned char *data );
+extern void i2cmem_init( running_machine *machine, int chip, int slave_address, int page_size, int data_size, unsigned char *data );
 extern void i2cmem_write( int chip, int line, int data );
 extern int i2cmem_read( int chip, int line );
 extern NVRAM_HANDLER( i2cmem_0 );

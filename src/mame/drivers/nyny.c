@@ -233,8 +233,8 @@ static const ttl74123_config ic48_1_config =
 
 static MACHINE_START( nyny )
 {
-	pia_config(1, &pia_1_intf);
-	pia_config(2, &pia_2_intf);
+	pia_config(machine, 1, &pia_1_intf);
+	pia_config(machine, 2, &pia_2_intf);
 
 	/* setup for save states */
 	state_save_register_global(machine, flipscreen);
