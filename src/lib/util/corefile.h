@@ -26,6 +26,11 @@
 
 #define OPEN_FLAG_NO_BOM		0x0100		/* don't output BOM */
 
+#define FCOMPRESS_NONE			0			/* no compression */
+#define FCOMPRESS_MIN			1			/* minimal compression */
+#define FCOMPRESS_MEDIUM		6			/* standard compression */
+#define FCOMPRESS_MAX			9			/* maximum compression */
+
 
 
 /***************************************************************************
@@ -55,8 +60,8 @@ file_error core_fopen_ram_copy(const void *data, size_t length, UINT32 openflags
 /* close an open file */
 void core_fclose(core_file *file);
 
-/* enable/disable streaming file compression via zlib */
-file_error core_fcompress(core_file *file, int compress);
+/* enable/disable streaming file compression via zlib; level is 0 to disable compression, or up to 9 for max compression */
+file_error core_fcompress(core_file *file, int level);
 
 
 

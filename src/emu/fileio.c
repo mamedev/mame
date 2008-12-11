@@ -386,12 +386,13 @@ void mame_fclose(mame_file *file)
 
 /*-------------------------------------------------
     mame_fcompress - enable/disable streaming file
-    compression via zlib
+    compression via zlib; level is 0 to disable
+    compression, or up to 9 for max compression
 -------------------------------------------------*/
 
-file_error mame_fcompress(mame_file *file, int compress)
+file_error mame_fcompress(mame_file *file, int level)
 {
-	return core_fcompress(file->file, compress);
+	return core_fcompress(file->file, level);
 }
 
 

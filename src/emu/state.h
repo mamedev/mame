@@ -28,6 +28,22 @@ typedef void (*state_postload_func)(running_machine *machine, void *param);
 
 
 /***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+enum _state_save_error
+{
+	STATERR_NONE,
+	STATERR_ILLEGAL_REGISTRATIONS,
+	STATERR_INVALID_HEADER,
+	STATERR_READ_ERROR,
+	STATERR_WRITE_ERROR
+};
+typedef enum _state_save_error state_save_error;
+
+
+
+/***************************************************************************
     MACROS
 ***************************************************************************/
 
@@ -124,16 +140,6 @@ int state_save_get_reg_count(running_machine *machine);
 
 
 
-/* ----- tagging ----- */
-
-/* push the current tag onto the stack and set a new tag */
-void state_save_push_tag(int tag);
-
-/* pop the tag from the top of the stack */
-void state_save_pop_tag(void);
-
-
-
 /* ----- registration handling ----- */
 
 /* allow/disallow registrations to happen (called by the core) */
@@ -167,36 +173,16 @@ void state_destructor(void *ptr, size_t size);
 
 
 
-/* ----- state file validation ----- */
+/* ----- save state file processing ----- */
 
 /* check if a file is a valid save state */
-int state_save_check_file(running_machine *machine, mame_file *file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
+state_save_error state_save_check_file(running_machine *machine, mame_file *file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
 
+/* write out the save state file */
+state_save_error state_save_write_file(running_machine *machine, mame_file *file);
 
-
-/* ----- save state processing ----- */
-
-/* begin the process of saving */
-int state_save_save_begin(running_machine *machine, mame_file *file);
-
-/* save within the current tag */
-void state_save_save_continue(running_machine *machine);
-
-/* finish saving the file by writing the header and closing */
-void state_save_save_finish(running_machine *machine);
-
-
-
-/* ----- load state processing ----- */
-
-/* begin the process of loading the state */
-int state_save_load_begin(running_machine *machine, mame_file *file);
-
-/* load all state in the current tag */
-void state_save_load_continue(running_machine *machine);
-
-/* complete the process of loading the state */
-void state_save_load_finish(running_machine *machine);
+/* read in a save state file */
+state_save_error state_save_read_file(running_machine *machine, mame_file *file);
 
 
 

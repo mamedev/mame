@@ -296,11 +296,9 @@ void timer_init(running_machine *machine)
 	global->callback_timer_modified = FALSE;
 
 	/* register with the save state system */
-	state_save_push_tag(0);
 	state_save_register_item(machine, "timer", NULL, 0, global->basetime.seconds);
 	state_save_register_item(machine, "timer", NULL, 0, global->basetime.attoseconds);
 	state_save_register_postload(machine, timer_postload, NULL);
-	state_save_pop_tag();
 
 	/* initialize the lists */
 	global->activelist = NULL;
@@ -523,7 +521,6 @@ static void timer_register_save(emu_timer *timer)
 			count++;
 
 	/* use different instances to differentiate the bits */
-	state_save_push_tag(0);
 	state_save_register_item(timer->machine, "timer", timer->func, count, timer->param);
 	state_save_register_item(timer->machine, "timer", timer->func, count, timer->enabled);
 	state_save_register_item(timer->machine, "timer", timer->func, count, timer->period.seconds);
@@ -532,7 +529,6 @@ static void timer_register_save(emu_timer *timer)
 	state_save_register_item(timer->machine, "timer", timer->func, count, timer->start.attoseconds);
 	state_save_register_item(timer->machine, "timer", timer->func, count, timer->expire.seconds);
 	state_save_register_item(timer->machine, "timer", timer->func, count, timer->expire.attoseconds);
-	state_save_pop_tag();
 }
 
 

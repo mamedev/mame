@@ -98,7 +98,7 @@ file_error mame_fopen_ram(const void *data, UINT32 length, UINT32 openflags, mam
 /* close an open file */
 void mame_fclose(mame_file *file);
 
-/* enable/disable streaming file compression via zlib */
+/* enable/disable streaming file compression via zlib; level is 0 to disable compression, or up to 9 for max compression */
 file_error mame_fcompress(mame_file *file, int compress);
 
 

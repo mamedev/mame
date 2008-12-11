@@ -262,11 +262,9 @@ void cpuexec_init(running_machine *machine)
 				classdata->timedint_timer = timer_alloc(machine, trigger_periodic_interrupt, device);
 
 			/* initialize this CPU */
-			state_save_push_tag(cpunum + 1);
 			num_regs = state_save_get_reg_count(machine);
 			cpu_init(device, cpunum, classdata->clock, standard_irq_callback);
 			num_regs = state_save_get_reg_count(machine) - num_regs;
-			state_save_pop_tag();
 
 			/* fetch post-initialization data */
 			classdata->icount = cpu_get_icount_ptr(device);

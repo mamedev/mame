@@ -11,12 +11,15 @@
 
     Save state file format:
 
-     0.. 7  'MAMESAVE"
-     8      Format version (this is format 1)
-     9      Flags
-     a..13  Game name padded with \0
-    14..17  Signature
-    18..end Save game data
+    00..07  'MAMESAVE'
+    08      Format version (this is format 2)
+    09      Flags
+    0A..1B  Game name padded with \0
+    1C..1F  Signature
+    20..end Save game data (compressed)
+    
+    Data is always written as native-endian.
+    Data is converted from the endiannness it was written upon load.
 
 ***************************************************************************/
 
@@ -40,9 +43,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SAVE_VERSION		1
-
-#define TAG_STACK_SIZE		4
+#define SAVE_VERSION		2
+#define HEADER_SIZE			32
 
 /* Available flags */
 enum
@@ -65,7 +67,6 @@ struct _state_entry
 	astring *			name;				/* full name */
 	UINT8				typesize;			/* size of the raw data type */
 	UINT32				typecount;			/* number of items */
-	int					tag;				/* saving tag */
 	UINT32				offset;				/* offset within the final structure */
 };
 
@@ -76,7 +77,6 @@ struct _state_callback
 	state_callback *	next;				/* pointer to next entry */
 	running_machine *	machine;			/* pointer back to the owning machine */
 	void *				param;				/* function parameter */
-	int					tag;				/* saving tag */
 	union
 	{
 		state_presave_func presave;			/* presave callback */
@@ -106,11 +106,6 @@ struct _state_private
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/* this stuff goes away when CPU cores are fully pointer-ized */
-static int ss_tag_stack[TAG_STACK_SIZE];
-static int ss_tag_stack_index;
-static int ss_current_tag;
-
 #ifdef MESS
 static const char ss_magic_num[8] = { 'M', 'E', 'S', 'S', 'S', 'A', 'V', 'E' };
 #else
@@ -120,14 +115,42 @@ static const char ss_magic_num[8] = { 'M', 'A', 'M', 'E', 'S', 'A', 'V', 'E' };
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
+    INLINE FUNCTIONS
 ***************************************************************************/
 
-static void ss_c2(UINT8 *, UINT32);
-static void ss_c4(UINT8 *, UINT32);
-static void ss_c8(UINT8 *, UINT32);
+/*-------------------------------------------------
+    flip_data - reverse the endianness of a
+    block of  data
+-------------------------------------------------*/
 
-static void (*const ss_conv[])(UINT8 *, UINT32) = { 0, 0, ss_c2, 0, ss_c4, 0, 0, 0, ss_c8 };
+INLINE void flip_data(state_entry *entry)
+{
+	UINT16 *data16;
+	UINT32 *data32;
+	UINT64 *data64;
+	int count;
+	
+	switch (entry->typesize)
+	{
+		case 2:
+			data16 = entry->data;
+			for (count = 0; count < entry->typecount; count++)
+				data16[count] = FLIPENDIAN_INT16(data16[count]);
+			break;
+
+		case 4:
+			data32 = entry->data;
+			for (count = 0; count < entry->typecount; count++)
+				data32[count] = FLIPENDIAN_INT32(data32[count]);
+			break;
+
+		case 8:
+			data64 = entry->data;
+			for (count = 0; count < entry->typecount; count++)
+				data64[count] = FLIPENDIAN_INT64(data64[count]);
+			break;
+	}
+}	
 
 
 
@@ -158,43 +181,11 @@ int state_save_get_reg_count(running_machine *machine)
 	state_entry *entry;
 	int count = 0;
 
-	/* iterate over entries with matching tags */
+	/* count entries */
 	for (entry = global->entrylist; entry != NULL; entry = entry->next)
 		count++;
 
 	return count;
-}
-
-
-
-/***************************************************************************
-    TAGGING
-***************************************************************************/
-
-/*-------------------------------------------------
-    state_save_push_tag - push the current tag
-    onto the stack and set a new tag
--------------------------------------------------*/
-
-void state_save_push_tag(int tag)
-{
-	if (ss_tag_stack_index == TAG_STACK_SIZE - 1)
-		fatalerror("state_save tag stack overflow");
-	ss_tag_stack[ss_tag_stack_index++] = ss_current_tag;
-	ss_current_tag = tag;
-}
-
-
-/*-------------------------------------------------
-    state_save_pop_tag - pop the tag from the top
-    of the stack
--------------------------------------------------*/
-
-void state_save_pop_tag(void)
-{
-	if (ss_tag_stack_index == 0)
-		fatalerror("state_save tag stack underflow");
-	ss_current_tag = ss_tag_stack[--ss_tag_stack_index];
 }
 
 
@@ -254,9 +245,9 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 	/* create the full name */
 	totalname = astring_alloc();
 	if (tag != NULL)
-		astring_printf(totalname, "%X/%s/%s/%X/%s", ss_current_tag, module, tag, index, name);
+		astring_printf(totalname, "%s/%s/%X/%s", module, tag, index, name);
 	else
-		astring_printf(totalname, "%X/%s/%X/%s", ss_current_tag, module, index, name);
+		astring_printf(totalname, "%s/%X/%s", module, index, name);
 
 	/* look for duplicates and an entry to insert in front of */
 	for (entryptr = &global->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next)
@@ -267,8 +258,8 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 			break;
 
 		/* error if we are equal */
-		if ((*entryptr)->tag == ss_current_tag && cmpval == 0)
-			fatalerror("Duplicate save state registration entry (%d, %s)", ss_current_tag, astring_c(totalname));
+		if (cmpval == 0)
+			fatalerror("Duplicate save state registration entry (%s)", astring_c(totalname));
 	}
 
 	/* didn't find one; allocate a new one */
@@ -283,7 +274,6 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 	(*entryptr)->name      = totalname;
 	(*entryptr)->typesize  = valsize;
 	(*entryptr)->typecount = valcount;
-	(*entryptr)->tag       = ss_current_tag;
 	restrack_register_object(OBJTYPE_STATEREG, *entryptr, 0, __FILE__, __LINE__);
 }
 
@@ -320,8 +310,8 @@ void state_save_register_presave(running_machine *machine, state_presave_func fu
 
 	/* scan for duplicates and push through to the end */
 	for (cbptr = &global->prefunclist; *cbptr != NULL; cbptr = &(*cbptr)->next)
-		if ((*cbptr)->func.presave == func && (*cbptr)->param == param && (*cbptr)->tag == ss_current_tag)
-			fatalerror("Duplicate save state function (%d, %p, %p)", ss_current_tag, param, func);
+		if ((*cbptr)->func.presave == func && (*cbptr)->param == param)
+			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	/* allocate a new entry */
 	*cbptr = malloc_or_die(sizeof(state_callback));
@@ -331,7 +321,6 @@ void state_save_register_presave(running_machine *machine, state_presave_func fu
 	(*cbptr)->machine      = machine;
 	(*cbptr)->func.presave = func;
 	(*cbptr)->param        = param;
-	(*cbptr)->tag          = ss_current_tag;
 	restrack_register_object(OBJTYPE_STATEREG, *cbptr, 1, __FILE__, __LINE__);
 }
 
@@ -352,8 +341,8 @@ void state_save_register_postload(running_machine *machine, state_postload_func 
 
 	/* scan for duplicates and push through to the end */
 	for (cbptr = &global->postfunclist; *cbptr != NULL; cbptr = &(*cbptr)->next)
-		if ((*cbptr)->func.postload == func && (*cbptr)->param == param && (*cbptr)->tag == ss_current_tag)
-			fatalerror("Duplicate save state function (%d, %p, %p)", ss_current_tag, param, func);
+		if ((*cbptr)->func.postload == func && (*cbptr)->param == param)
+			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	/* allocate a new entry */
 	*cbptr = malloc_or_die(sizeof(state_callback));
@@ -363,7 +352,6 @@ void state_save_register_postload(running_machine *machine, state_postload_func 
 	(*cbptr)->machine       = machine;
 	(*cbptr)->func.postload = func;
 	(*cbptr)->param         = param;
-	(*cbptr)->tag           = ss_current_tag;
 	restrack_register_object(OBJTYPE_STATEREG, *cbptr, 2, __FILE__, __LINE__);
 }
 
@@ -448,81 +436,8 @@ void state_destructor(void *ptr, size_t size)
 
 
 /***************************************************************************
-    ENDIAN CONVERSION
-***************************************************************************/
-
-/*-------------------------------------------------
-    ss_c2 - byte swap an array of 16-bit data
--------------------------------------------------*/
-
-static void ss_c2(UINT8 *data, UINT32 size)
-{
-	UINT16 *convert = (UINT16 *)data;
-	unsigned i;
-
-	for (i = 0; i < size; i++)
-		convert[i] = FLIPENDIAN_INT16(convert[i]);
-}
-
-
-/*-------------------------------------------------
-    ss_c4 - byte swap an array of 32-bit data
--------------------------------------------------*/
-
-static void ss_c4(UINT8 *data, UINT32 size)
-{
-	UINT32 *convert = (UINT32 *)data;
-	unsigned i;
-
-	for (i = 0; i < size; i++)
-		convert[i] = FLIPENDIAN_INT32(convert[i]);
-}
-
-
-/*-------------------------------------------------
-    ss_c8 - byte swap an array of 64-bit data
--------------------------------------------------*/
-
-static void ss_c8(UINT8 *data, UINT32 size)
-{
-	UINT64 *convert = (UINT64 *)data;
-	unsigned i;
-
-	for (i = 0; i < size; i++)
-		convert[i] = FLIPENDIAN_INT64(convert[i]);
-}
-
-
-
-/***************************************************************************
     PROCESSING HELPERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    compute_size_and_offsets - compute the total
-    size and offsets of each individual item
--------------------------------------------------*/
-
-static int compute_size_and_offsets(state_private *global)
-{
-	state_entry *entry;
-	int total_size;
-
-	/* start with the header size */
-	total_size = 0x18;
-
-	/* iterate over entries */
-	for (entry = global->entrylist; entry; entry = entry->next)
-	{
-		/* note the offset and accumulate a total size */
-		entry->offset = total_size;
-		total_size += entry->typesize * entry->typecount;
-	}
-
-	/* return the total size */
-	return total_size;
-}
-
 
 /*-------------------------------------------------
     get_signature - compute the signature, which
@@ -536,7 +451,7 @@ static UINT32 get_signature(running_machine *machine)
 	UINT32 crc = 0;
 
 	/* iterate over entries */
-	for (entry = global->entrylist; entry; entry = entry->next)
+	for (entry = global->entrylist; entry != NULL; entry = entry->next)
 	{
 		UINT32 temp[2];
 
@@ -546,7 +461,7 @@ static UINT32 get_signature(running_machine *machine)
 		/* add the type and size to the CRC */
 		temp[0] = LITTLE_ENDIANIZE_INT32(entry->typecount);
 		temp[1] = LITTLE_ENDIANIZE_INT32(entry->typesize);
-		crc = crc32(crc, (UINT8 *)&temp[0], 8);
+		crc = crc32(crc, (UINT8 *)&temp[0], sizeof(temp));
 	}
 
 	return crc;
@@ -555,7 +470,7 @@ static UINT32 get_signature(running_machine *machine)
 
 
 /***************************************************************************
-    STATE FILE VALIDATION
+    SAVE STATE FILE PROCESSING
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -563,46 +478,45 @@ static UINT32 get_signature(running_machine *machine)
     header
 -------------------------------------------------*/
 
-static int validate_header(const UINT8 *header, const char *gamename, UINT32 signature,
+static state_save_error validate_header(const UINT8 *header, const char *gamename, UINT32 signature,
 	void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix)
 {
 	/* check magic number */
 	if (memcmp(header, ss_magic_num, 8))
 	{
-		if (errormsg)
-			errormsg("%sThis is not a " APPNAME " save file", error_prefix);
-		return -1;
+		if (errormsg != NULL)
+			(*errormsg)("%sThis is not a " APPNAME " save file", error_prefix);
+		return STATERR_INVALID_HEADER;
 	}
 
 	/* check save state version */
 	if (header[8] != SAVE_VERSION)
 	{
-		if (errormsg)
-			errormsg("%sWrong version in save file (%d, 1 expected)", error_prefix, header[8]);
-		return -1;
+		if (errormsg != NULL)
+			(*errormsg)("%sWrong version in save file (version %d, expected %d)", error_prefix, header[8], SAVE_VERSION);
+		return STATERR_INVALID_HEADER;
 	}
 
 	/* check gamename, if we were asked to */
-	if (gamename && strcmp(gamename, (const char *)&header[10]))
+	if (gamename != NULL && strncmp(gamename, (const char *)&header[0x0a], 0x1c - 0x0a))
 	{
-		if (errormsg)
-			errormsg("%s'%s' is not a valid savestate file for game '%s'.", error_prefix, gamename);
-		return -1;
+		if (errormsg != NULL)
+			(*errormsg)("%s'File is not a valid savestate file for game '%s'.", error_prefix, gamename);
+		return STATERR_INVALID_HEADER;
 	}
 
 	/* check signature, if we were asked to */
-	if (signature)
+	if (signature != 0)
 	{
-		UINT32 rawsig = *(UINT32 *)&header[0x14];
-		UINT32 filesig = LITTLE_ENDIANIZE_INT32(rawsig);
-		if (signature != filesig)
+		UINT32 rawsig = *(UINT32 *)&header[0x1c];
+		if (signature != LITTLE_ENDIANIZE_INT32(rawsig))
 		{
-			if (errormsg)
-				errormsg("%sIncompatible save file (signature %08x, expected %08x)", error_prefix, filesig, signature);
-			return -1;
+			if (errormsg != NULL)
+				(*errormsg)("%sIncompatible save file (signature %08x, expected %08x)", error_prefix, LITTLE_ENDIANIZE_INT32(rawsig), signature);
+			return STATERR_INVALID_HEADER;
 		}
 	}
-	return 0;
+	return STATERR_NONE;
 }
 
 
@@ -611,22 +525,23 @@ static int validate_header(const UINT8 *header, const char *gamename, UINT32 sig
     a valid save state
 -------------------------------------------------*/
 
-int state_save_check_file(running_machine *machine, mame_file *file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
+state_save_error state_save_check_file(running_machine *machine, mame_file *file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
 {
+	UINT8 header[HEADER_SIZE];
 	UINT32 signature = 0;
-	UINT8 header[0x18];
 
 	/* if we want to validate the signature, compute it */
 	if (machine != NULL)
 		signature = get_signature(machine);
 
 	/* seek to the beginning and read the header */
+	mame_fcompress(file, FCOMPRESS_NONE);
 	mame_fseek(file, 0, SEEK_SET);
 	if (mame_fread(file, header, sizeof(header)) != sizeof(header))
 	{
-		if (errormsg)
-			errormsg("Could not read " APPNAME " save file header");
-		return -1;
+		if (errormsg != NULL)
+			(*errormsg)("Could not read " APPNAME " save file header");
+		return STATERR_READ_ERROR;
 	}
 
 	/* let the generic header check work out the rest */
@@ -634,215 +549,109 @@ int state_save_check_file(running_machine *machine, mame_file *file, const char 
 }
 
 
-
-/***************************************************************************
-    SAVE STATE PROCESSING
-***************************************************************************/
-
 /*-------------------------------------------------
-    state_save_save_begin - begin the process of
-    saving
+    state_save_write_file - writes the data to
+    a file
 -------------------------------------------------*/
 
-int state_save_save_begin(running_machine *machine, mame_file *file)
+state_save_error state_save_write_file(running_machine *machine, mame_file *file)
 {
 	state_private *global = machine->state_data;
+	UINT32 signature = get_signature(machine);
+	UINT8 header[HEADER_SIZE];
+	state_callback *func;
+	state_entry *entry;
 
 	/* if we have illegal registrations, return an error */
 	if (global->illegal_regs > 0)
-		return 1;
+		return STATERR_ILLEGAL_REGISTRATIONS;
 
-	LOG(("Beginning save\n"));
-	global->iofile = file;
-
-	/* compute the total dump size and the offsets of each element */
-	global->ioarraysize = compute_size_and_offsets(global);
-	LOG(("   total size %u\n", global->ioarraysize));
-
-	/* allocate memory for the array */
-	global->ioarray = malloc_or_die(global->ioarraysize);
-	return 0;
-}
-
-
-/*-------------------------------------------------
-    state_save_save_continue - save within the
-    current tag
--------------------------------------------------*/
-
-void state_save_save_continue(running_machine *machine)
-{
-	state_private *global = machine->state_data;
-	state_entry *entry;
-	state_callback *func;
-	int count = 0;
-
-	LOG(("Saving tag %d\n", ss_current_tag));
-
+	/* generate the header */
+	memcpy(&header[0], ss_magic_num, 8);
+	header[8] = SAVE_VERSION;
+#ifdef LSB_FIRST
+	header[9] = 0;
+#else
+	header[9] = SS_MSB_FIRST;
+#endif
+	strncpy((char *)&header[0x0a], machine->gamedrv->name, 0x1c - 0x0a);
+	*(UINT32 *)&header[0x1c] = LITTLE_ENDIANIZE_INT32(signature);
+	
+	/* write the header and turn on compression for the rest of the file */
+	mame_fcompress(file, FCOMPRESS_NONE);
+	mame_fseek(file, 0, SEEK_SET);
+	if (mame_fwrite(file, header, sizeof(header)) != sizeof(header))
+		return STATERR_WRITE_ERROR;
+	mame_fcompress(file, FCOMPRESS_MEDIUM);
+	
 	/* call the pre-save functions */
-	LOG(("  calling pre-save functions\n"));
-
-	/* iterate over the list of functions */
 	for (func = global->prefunclist; func != NULL; func = func->next)
-		if (func->tag == ss_current_tag)
-		{
-			count++;
-			(*func->func.presave)(machine, func->param);
-		}
-	LOG(("    %d functions called\n", count));
-
-	/* then copy in all the data */
-	LOG(("  copying data\n"));
-
-	/* iterate over entries with matching tags */
+		(*func->func.presave)(machine, func->param);
+	
+	/* then write all the data */
 	for (entry = global->entrylist; entry != NULL; entry = entry->next)
-		if (entry->tag == ss_current_tag)
-		{
-			memcpy(global->ioarray + entry->offset, entry->data, entry->typesize * entry->typecount);
-			LOG(("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
-		}
+	{
+		UINT32 totalsize = entry->typesize * entry->typecount;
+		if (mame_fwrite(file, entry->data, totalsize) != totalsize)
+			return STATERR_WRITE_ERROR;
+	}
+	return STATERR_NONE;
 }
 
 
 /*-------------------------------------------------
-    state_save_save_finish - finish saving the
-    file by writing the header and closing
+    state_save_read_file - read the data from a
+    file
 -------------------------------------------------*/
 
-void state_save_save_finish(running_machine *machine)
+state_save_error state_save_read_file(running_machine *machine, mame_file *file)
 {
 	state_private *global = machine->state_data;
-	UINT32 signature;
-	UINT8 flags = 0;
+	UINT32 signature = get_signature(machine);
+	UINT8 header[HEADER_SIZE];
+	state_callback *func;
+	state_entry *entry;
+	int flip;
+	
+	/* if we have illegal registrations, return an error */
+	if (global->illegal_regs > 0)
+		return STATERR_ILLEGAL_REGISTRATIONS;
+	
+	/* read the header and turn on compression for the rest of the file */
+	mame_fcompress(file, FCOMPRESS_NONE);
+	mame_fseek(file, 0, SEEK_SET);
+	if (mame_fread(file, header, sizeof(header)) != sizeof(header))
+		return STATERR_READ_ERROR;
+	mame_fcompress(file, FCOMPRESS_MEDIUM);
+	
+	/* verify the header and report an error if it doesn't match */
+	if (validate_header(header, machine->gamedrv->name, signature, popmessage, "Error: ")  != STATERR_NONE)
+		return STATERR_INVALID_HEADER;
 
-	LOG(("Finishing save\n"));
-
-	/* compute the flags */
-#ifndef LSB_FIRST
-	flags |= SS_MSB_FIRST;
+	/* determine whether or not to flip the data when done */
+#ifdef LSB_FIRST
+	flip = ((header[9] & SS_MSB_FIRST) != 0);
+#else
+	flip = ((header[9] & SS_MSB_FIRST) == 0);
 #endif
 
-	/* build up the header */
-	memcpy(global->ioarray, ss_magic_num, 8);
-	global->ioarray[8] = SAVE_VERSION;
-	global->ioarray[9] = flags;
-	memset(global->ioarray+0xa, 0, 10);
-	strcpy((char *)global->ioarray+0xa, machine->gamedrv->name);
-
-	/* copy in the signature */
-	signature = get_signature(machine);
-	*(UINT32 *)&global->ioarray[0x14] = LITTLE_ENDIANIZE_INT32(signature);
-
-	/* write the file */
-	mame_fwrite(global->iofile, global->ioarray, global->ioarraysize);
-
-	/* free memory and reset the global states */
-	free(global->ioarray);
-	global->ioarray = NULL;
-	global->ioarraysize = 0;
-	global->iofile = NULL;
-}
-
-
-
-/***************************************************************************
-    LOAD STATE PROCESSING
-***************************************************************************/
-
-/*-------------------------------------------------
-    state_save_load_begin - begin the process
-    of loading the state
--------------------------------------------------*/
-
-int state_save_load_begin(running_machine *machine, mame_file *file)
-{
-	state_private *global = machine->state_data;
-
-	LOG(("Beginning load\n"));
-
-	/* read the file into memory */
-	global->ioarraysize = mame_fsize(file);
-	global->ioarray = malloc_or_die(global->ioarraysize);
-	global->iofile = file;
-	mame_fread(global->iofile, global->ioarray, global->ioarraysize);
-
-	/* verify the header and report an error if it doesn't match */
-	if (validate_header(global->ioarray, NULL, get_signature(machine), popmessage, "Error: "))
+	/* read all the data, flipping if necessary */
+	for (entry = global->entrylist; entry != NULL; entry = entry->next)
 	{
-		free(global->ioarray);
-		global->ioarray = NULL;
-		global->ioarraysize = 0;
-		global->iofile = NULL;
-		return 1;
+		UINT32 totalsize = entry->typesize * entry->typecount;
+		if (mame_fread(file, entry->data, totalsize) != totalsize)
+			return STATERR_READ_ERROR;
+		
+		/* handle flipping */
+		if (flip)
+			flip_data(entry);
 	}
 
-	/* compute the total size and offset of all the entries */
-	compute_size_and_offsets(global);
-	return 0;
-}
-
-
-/*-------------------------------------------------
-    state_save_load_continue - load all state in
-    the current tag
--------------------------------------------------*/
-
-void state_save_load_continue(running_machine *machine)
-{
-	state_private *global = machine->state_data;
-	state_entry *entry;
-	state_callback *func;
-	int need_convert;
-	int count = 0;
-
-	/* first determine whether or not we need to convert the endianness of the data */
-#ifdef LSB_FIRST
-	need_convert = (global->ioarray[9] & SS_MSB_FIRST) != 0;
-#else
-	need_convert = (global->ioarray[9] & SS_MSB_FIRST) == 0;
-#endif
-
-	LOG(("Loading tag %d\n", ss_current_tag));
-	LOG(("  copying data\n"));
-
-	/* iterate over entries with matching tags */
-	for (entry = global->entrylist; entry != NULL; entry = entry->next)
-		if (entry->tag == ss_current_tag)
-		{
-			memcpy(entry->data, global->ioarray + entry->offset, entry->typesize * entry->typecount);
-			if (need_convert && ss_conv[entry->typesize])
-				(*ss_conv[entry->typesize])(entry->data, entry->typecount);
-			LOG(("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
-		}
-
 	/* call the post-load functions */
-	LOG(("  calling post-load functions\n"));
 	for (func = global->postfunclist; func != NULL; func = func->next)
-		if (func->tag == ss_current_tag)
-		{
-			count++;
-			(*func->func.postload)(machine, func->param);
-		}
-	LOG(("    %d functions called\n", count));
-}
+		(*func->func.postload)(machine, func->param);
 
-
-/*-------------------------------------------------
-    state_save_load_finish - complete the process
-    of loading the state
--------------------------------------------------*/
-
-void state_save_load_finish(running_machine *machine)
-{
-	state_private *global = machine->state_data;
-
-	LOG(("Finishing load\n"));
-
-	/* free memory and reset the global states */
-	free(global->ioarray);
-	global->ioarray = NULL;
-	global->ioarraysize = 0;
-	global->iofile = NULL;
+	return STATERR_NONE;
 }
 
 

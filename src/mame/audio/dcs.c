@@ -1507,7 +1507,7 @@ static READ16_HANDLER( latch_status_r )
 	if (IS_OUTPUT_EMPTY())
 		result |= 0x40;
 	if (dcs.fifo_status_r != NULL && (!transfer.hle_enabled || transfer.state == 0))
-		result |= (*dcs.fifo_status_r)(NULL) & 0x38;
+		result |= (*dcs.fifo_status_r)(dcs.cpu) & 0x38;
 	if (transfer.hle_enabled && transfer.state != 0)
 		result |= 0x08;
 	return result;
@@ -1517,7 +1517,7 @@ static READ16_HANDLER( latch_status_r )
 static READ16_HANDLER( fifo_input_r )
 {
 	if (dcs.fifo_data_r)
-		return (*dcs.fifo_data_r)(NULL);
+		return (*dcs.fifo_data_r)(dcs.cpu);
 	else
 		return 0xffff;
 }
@@ -2064,7 +2064,7 @@ void dcs_fifo_notify(int count, int max)
 	if (transfer.state != 5 || transfer.fifo_entries == transfer.writes_left || transfer.fifo_entries >= 256)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(Machine, (*dcs.fifo_data_r)(NULL));
+			preprocess_write(Machine, (*dcs.fifo_data_r)(dcs.cpu));
 	}
 }
 
@@ -2076,7 +2076,7 @@ static TIMER_CALLBACK( transfer_watchdog_callback )
 	if (transfer.fifo_entries && starting_writes_left == transfer.writes_left)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(machine, (*dcs.fifo_data_r)(NULL));
+			preprocess_write(machine, (*dcs.fifo_data_r)(dcs.cpu));
 	}
 	timer_adjust_oneshot(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left);
 }

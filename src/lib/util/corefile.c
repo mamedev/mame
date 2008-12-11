@@ -213,7 +213,7 @@ void core_fclose(core_file *file)
 {
 	/* close files and free memory */
 	if (file->zdata != NULL)
-		core_fcompress(file, FALSE);
+		core_fcompress(file, FCOMPRESS_NONE);
 	if (file->file != NULL)
 		osd_close(file->file);
 	if (file->data != NULL && file->data_allocated)
@@ -224,10 +224,11 @@ void core_fclose(core_file *file)
 
 /*-------------------------------------------------
     core_fcompress - enable/disable streaming file
-    compression via zlib
+    compression via zlib; level is 0 to disable
+    compression, or up to 9 for max compression
 -------------------------------------------------*/
 
-file_error core_fcompress(core_file *file, int compress)
+file_error core_fcompress(core_file *file, int level)
 {
 	file_error result = FILERR_NONE;
 
@@ -236,7 +237,7 @@ file_error core_fcompress(core_file *file, int compress)
 		return FILERR_INVALID_ACCESS;
 
 	/* if we have been compressing, flush and free the data */
-	if (file->zdata != NULL && !compress)
+	if (file->zdata != NULL && level == FCOMPRESS_NONE)
 	{
 		int zerr = Z_OK;
 
@@ -278,7 +279,7 @@ file_error core_fcompress(core_file *file, int compress)
 	}
 
 	/* if we are just starting to compress, allocate a new buffer */
-	if (file->zdata == NULL && compress)
+	if (file->zdata == NULL && level > FCOMPRESS_NONE)
 	{
 		int zerr;
 
@@ -293,7 +294,7 @@ file_error core_fcompress(core_file *file, int compress)
 		{
 			file->zdata->stream.next_out = file->zdata->buffer;
 			file->zdata->stream.avail_out = sizeof(file->zdata->buffer);
-			zerr = deflateInit(&file->zdata->stream, Z_BEST_COMPRESSION);
+			zerr = deflateInit(&file->zdata->stream, level);
 		}
 		else
 			zerr = inflateInit(&file->zdata->stream);
