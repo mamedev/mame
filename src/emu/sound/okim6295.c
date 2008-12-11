@@ -451,7 +451,7 @@ static void okim6295_data_w(int num, int data)
 
 
 		/* the manual explicitly says that it's not possible to start multiple voices at the same time */
-		if (temp != 1 && temp != 2 && temp != 4 && temp != 8)
+		if (temp != 0 && temp != 1 && temp != 2 && temp != 4 && temp != 8)
 			popmessage("OKI6295 start %x contact MAMEDEV", temp);
 
 		/* update the stream */
