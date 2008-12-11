@@ -129,6 +129,12 @@ static VIDEO_START (statriv2)
 	statriv2_tilemap = tilemap_create(get_statriv2_tile_info,tilemap_scan_rows,8,16,64, 16);
 }
 
+static VIDEO_START (statriv2v)
+{
+	statriv2_tilemap = tilemap_create(get_statriv2_tile_info,tilemap_scan_rows,16,8,32, 32);
+}
+
+
 static VIDEO_UPDATE (statriv2)
 {
 	tilemap_draw(bitmap,cliprect,statriv2_tilemap,0,0);
@@ -596,6 +602,22 @@ static GFXDECODE_START( statriv2 )
 GFXDECODE_END
 
 
+static const gfx_layout statriv2_tiles16x8_layout =
+{
+	16,8,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 64+0, 64+1, 64+2, 64+3, 64+4, 64+5, 64+6, 64+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	128,
+};
+
+static GFXDECODE_START( statriv2v )
+	GFXDECODE_ENTRY( "gfx1", 0, statriv2_tiles16x8_layout, 0, 64 )
+GFXDECODE_END
+
+
 static INTERRUPT_GEN( statriv2_interrupt )
 {
 	cpu_set_input_line(device, I8085_RST75_LINE, HOLD_LINE);
@@ -632,6 +654,21 @@ static MACHINE_DRIVER_START( statriv2 )
 	MDRV_SOUND_ADD("ay", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( statriv2v )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(statriv2)
+
+	MDRV_VIDEO_START(statriv2v)
+
+	MDRV_GFXDECODE(statriv2v)
+
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0, 30*8-1)
+MACHINE_DRIVER_END
+
+
+
 
 static MACHINE_DRIVER_START( statriv4 )
 	/* basic machine hardware */
@@ -737,6 +774,35 @@ ROM_START( statriv2 )
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
+ROM_START( statrv2v )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "status.u7",    0x00000, 0x01000, CRC(4acc2060) SHA1(04f841fa7fba2231f312904dbd1d352fd2dbc287) )
+	ROM_LOAD( "status.u8",    0x01000, 0x01000, CRC(f2de3867) SHA1(ec891d4aa4e8dc0780cf187d8b1548d7e00d4321) )
+	ROM_LOAD( "status.u9",    0x02000, 0x01000, CRC(d70f5dbf) SHA1(1b21a6d9cc17c7cd03a43056070ab55f3c5d4c58))
+
+	ROM_REGION( 0x1000,  "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "status.u36",    0x00000, 0x00800, CRC(ae1d07c0) SHA1(2b657ba58e3ae7cceb8cf23cba3e1f0d20817933) ) // first half is garbage?
+	ROM_CONTINUE(0x0000, 0x800)
+
+	/* other roms were not from this set, missing sub-board?, but as the game is 'triv two' like the parent
+	   it seems compatible with the same question board */
+
+	ROM_REGION( 0x10000, "user1", 0 ) /* question data */
+	ROM_LOAD( "statuspb.u1", 0x00000, 0x02000, CRC(a50c0313) SHA1(f9bf84613e2ebb952a81a10ee1da49a37423b717) )
+	ROM_LOAD( "statuspb.u2", 0x02000, 0x02000, CRC(0bc03294) SHA1(c4873cd065c9eb237b03a4195332b7629abac327) )
+	ROM_LOAD( "statuspb.u3", 0x04000, 0x02000, CRC(d1732f3b) SHA1(c4e862bd98f237e1d2ecad430226cba6aba4ebb8) )
+	ROM_LOAD( "statuspb.u4", 0x06000, 0x02000, CRC(e51d45b8) SHA1(7cd0ced0245dbd55a225182e43b89d55d8d33197) )
+	ROM_LOAD( "statuspb.u5", 0x08000, 0x02000, CRC(b3e49c5d) SHA1(bc42ba21bb0d411c2f484076499484b104f0b4ea) )
+	ROM_LOAD( "statuspb.u6", 0x0a000, 0x02000, CRC(7ee1cea0) SHA1(00ef768524e54890ebd1fdb3dd52d0080a18fc03) )
+	ROM_LOAD( "statuspb.u7", 0x0c000, 0x02000, CRC(121d6976) SHA1(2e4da8f2c3620c8f46fd4951551b0747b3c38caf) )
+	ROM_LOAD( "statuspb.u8", 0x0e000, 0x02000, CRC(5080df10) SHA1(b5cb0868d844bbb598159177fd5ce65ff3f18eda) )
+
+	ROM_REGION( 0x0140, "proms", 0 ) /* unknown */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+ROM_END
+
 ROM_START( statriv4 )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "triv4.u07",    0x00000, 0x01000, CRC(38800e01) SHA1(3d174c4194169eae7c033e8bb30bd02779170d42) )
@@ -812,6 +878,7 @@ ROM_START( supertr2 )
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
+
 
 ROM_START( supertr3 )
 	ROM_REGION( 0x10000, "main", 0 )
@@ -915,11 +982,12 @@ ROM_START( sextriv )
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
-GAME( 1984, hangman,  0, hangman,  hangman,  0, ROT0, "Status Games", "Hangman", 0 )
-GAME( 1984, trivquiz, 0, trivquiz, statriv2, 0, ROT0, "Status Games", "Triv Quiz", 0 )
-GAME( 1984, statriv2, 0, statriv2, statriv2, 0, ROT0, "Status Games", "Triv Two", 0 )
-GAME( 1985, statriv4, 0, statriv4, statriv4, 0, ROT0, "Status Games", "Triv Four", 0 )
-GAME( 1985, sextriv,  0, sextriv,  sextriv,  0, ROT0, "Status Games", "Sex Triv", 0 )
-GAME( 1985, quaquiz2, 0, quaquiz2, quaquiz2, 0, ROT0, "Status Games", "Quadro Quiz II", GAME_NOT_WORKING )
-GAME( 1986, supertr2, 0, supertr2, supertr2, 0, ROT0, "Status Games", "Super Triv II", 0 )
-GAME( 1988, supertr3, 0, supertr3, supertr2, 0, ROT0, "Status Games", "Super Triv III", GAME_IMPERFECT_GRAPHICS)
+GAME( 1984, hangman,  0,        hangman,   hangman,  0, ROT0, "Status Games", "Hangman", 0 )
+GAME( 1984, trivquiz, 0,        trivquiz,  statriv2, 0, ROT0, "Status Games", "Triv Quiz", 0 )
+GAME( 1984, statriv2, 0,        statriv2,  statriv2, 0, ROT0, "Status Games", "Triv Two", 0 )
+GAME( 1985, statrv2v, statriv2, statriv2v, statriv2, 0, ROT90,"Status Games", "Triv Two (Vertical)", 0 )
+GAME( 1985, statriv4, 0,        statriv4,  statriv4, 0, ROT0, "Status Games", "Triv Four", 0 )
+GAME( 1985, sextriv,  0,        sextriv,   sextriv,  0, ROT0, "Status Games", "Sex Triv", 0 )
+GAME( 1985, quaquiz2, 0,        quaquiz2,  quaquiz2, 0, ROT0, "Status Games", "Quadro Quiz II", GAME_NOT_WORKING )
+GAME( 1986, supertr2, 0,        supertr2,  supertr2, 0, ROT0, "Status Games", "Super Triv II", 0 )
+GAME( 1988, supertr3, 0,        supertr3,  supertr2, 0, ROT0, "Status Games", "Super Triv III", GAME_IMPERFECT_GRAPHICS)

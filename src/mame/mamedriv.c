@@ -7895,6 +7895,7 @@ Other Sun games
 	DRIVER( hangman )	/* (c) 1984 Status Games */
 	DRIVER( trivquiz )	/* (c) 1984 Status Games */
 	DRIVER( statriv2 )	/* (c) 1984 Status Games */
+	DRIVER( statrv2v )	/* (c) 1984 Status Games */
 	DRIVER( statriv4 )	/* (c) 1985 Status Games */
 	DRIVER( sextriv )	/* (c) 1985 Status Games */
 	DRIVER( quaquiz2 )	/* (c) 1985 Status Games */
