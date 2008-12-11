@@ -61,7 +61,6 @@
  #  Correct the mulit-cycle instruction cycle counts
  #  Add support to set ROM & RAM as Internal/External in order to correctly
     compute cycle timings
- #  Possibly add internal memory into here (instead of having it in the driver)
  #  Check (read) Hold signal level during execution loop ?
  #  Fix bugs
  #  Fix more bugs :-)
@@ -129,22 +128,21 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #endif
 
 
-static UINT16 *tms32025_pgmmap[0x200];
-static UINT16 *tms32025_datamap[0x200];
+#define SET_PC(x)	do { cpustate->PC = (x); } while (0)
 
-#define SET_PC(x)	do { R.PC = (x); } while (0)
+#define P_IN(A)			(memory_read_word_16be(cpustate->io, (A)<<1))
+#define P_OUT(A,V)		(memory_write_word_16be(cpustate->io, ((A)<<1),(V)))
+#define S_IN(A)			(memory_read_word_16be(cpustate->io, (A)<<1))
+#define S_OUT(A,V)		(memory_write_word_16be(cpustate->io, ((A)<<1),(V)))
 
-#define P_IN(A)			(memory_read_word_16be(R.io, (A)<<1))
-#define P_OUT(A,V)		(memory_write_word_16be(R.io, ((A)<<1),(V)))
-#define S_IN(A)			(memory_read_word_16be(R.io, (A)<<1))
-#define S_OUT(A,V)		(memory_write_word_16be(R.io, ((A)<<1),(V)))
-
-#define M_RDOP(A)		((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(R.program, (A)<<1))
-#define M_RDOP_ARG(A)	((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(R.program, (A)<<1))
+#define M_RDOP(A)		((cpustate->pgmmap[(A) >> 7]) ? (cpustate->pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(cpustate->program, (A)<<1))
+#define M_RDOP_ARG(A)	((cpustate->pgmmap[(A) >> 7]) ? (cpustate->pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(cpustate->program, (A)<<1))
 
 
 
-typedef struct			/* Page 3-6 (45) shows all registers */
+typedef struct _tms32025_state tms32025_state;		/* Page 3-6 (45) shows all registers */
+struct _tms32025_state
+
 {
 	/******************** CPU Internal Registers *******************/
 	UINT16	PREVPC;		/* previous program counter */
@@ -171,28 +169,53 @@ typedef struct			/* Page 3-6 (45) shows all registers */
 	int		tms32025_irq_cycles;
 	int		tms32025_dec_cycles;
 	cpu_irq_callback irq_callback;
+
+	PAIR	oldacc;
+	UINT32	memaccess;
+	int		icount;
+	int		mHackIgnoreARP;			 /* special handling for lst, lst1 instructions */
+
 	const device_config *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
-	UINT16 *datamap_save[16];
-	UINT16 *pgmmap_save[12];
-} tms32025_Regs;
 
-static tms32025_Regs R;
-static PAIR  oldacc;
-static UINT32 memaccess;
-static int tms32025_icount;
-typedef void (*opcode_fn) (void);
+	UINT16 *pgmmap[0x200];
+	UINT16 *datamap[0x200];
+};
+
+
+/* opcode table entry */
+typedef struct _tms32025_opcode tms32025_opcode;
+struct _tms32025_opcode
+{
+	UINT8	cycles;
+	void 	(*function)(tms32025_state *);
+};
+/* opcode table entry (Opcode CE has sub-opcodes) */
+typedef struct _tms32025_opcode_CE tms32025_opcode_CE;
+struct _tms32025_opcode_CE
+{
+	UINT8	cycles;
+	void 	(*function)(tms32025_state *);
+};
+/* opcode table entry (Opcode Dx has sub-opcodes) */
+typedef struct _tms32025_opcode_Dx tms32025_opcode_Dx;
+struct _tms32025_opcode_Dx
+{
+	UINT8	cycles;
+	void 	(*function)(tms32025_state *);
+};
+
 
 
 /************************** Memory mapped registers ****************/
-#define DRR 	R.intRAM[0]
-#define DXR 	R.intRAM[1]
-#define TIM 	R.intRAM[2]
-#define PRD 	R.intRAM[3]
-#define IMR 	R.intRAM[4]
-#define GREG	R.intRAM[5]
+#define DRR 	cpustate->intRAM[0]
+#define DXR 	cpustate->intRAM[1]
+#define TIM 	cpustate->intRAM[2]
+#define PRD 	cpustate->intRAM[3]
+#define IMR 	cpustate->intRAM[4]
+#define GREG	cpustate->intRAM[5]
 
 
 
@@ -231,79 +254,103 @@ typedef void (*opcode_fn) (void);
 #define PM_REG		0x0003	/* PM   (Product shift Mode) */
 
 
-#define OV		( R.STR0 & OV_FLAG)			/* OV   (Overflow flag) */
-#define OVM		( R.STR0 & OVM_FLAG)		/* OVM  (Overflow Mode bit) 1 indicates an overflow */
-#define INTM	( R.STR0 & INTM_FLAG)		/* INTM (Interrupt enable flag) 0 enables maskable interrupts */
-#define ARP		((R.STR0 & ARP_REG) >> 13)	/* ARP  (Auxiliary Register Pointer) */
-#define DP		((R.STR0 & DP_REG) << 7)	/* DP   (Data memory Pointer bit) */
-#define ARB		( R.STR1 & ARB_REG)			/* ARB  (Backup Auxiliary Register pointer) */
-#define CNF0	( R.STR1 & CNF0_REG)		/* CNF0 (Onchip Ram Config register) */
-#define TC		( R.STR1 & TC_FLAG)			/* TC   (Test Control Flag) */
-#define SXM		( R.STR1 & SXM_FLAG)		/* SXM  (Sign Extension Mode) */
-#define CARRY	( R.STR1 & C_FLAG)			/* C    (Carry Flag for accumulator) */
-#define HM		( R.STR1 & HM_FLAG)			/* HM   (Processor Hold Mode) */
-#define FSM		( R.STR1 & FSM_FLAG)		/* FSM  (Frame Synchronization Mode - for serial port) */
-#define XF		( R.STR1 & FSM_FLAG)		/* XF   (XF output pin status) */
-#define FO		( R.STR1 & FO_FLAG)			/* FO   (Serial port Format In/Out mode) */
-#define TXM		( R.STR1 & TXM_FLAG)		/* TXM  (Transmit Mode - for serial port) */
-#define PM		( R.STR1 & PM_REG)			/* PM   (P register shift Mode. See SHIFT_Preg_TO_ALU below )*/
+#define OV		( cpustate->STR0 & OV_FLAG)			/* OV   (Overflow flag) */
+#define OVM		( cpustate->STR0 & OVM_FLAG)		/* OVM  (Overflow Mode bit) 1 indicates an overflow */
+#define INTM	( cpustate->STR0 & INTM_FLAG)		/* INTM (Interrupt enable flag) 0 enables maskable interrupts */
+#define ARP		((cpustate->STR0 & ARP_REG) >> 13)	/* ARP  (Auxiliary Register Pointer) */
+#define DP		((cpustate->STR0 & DP_REG) << 7)	/* DP   (Data memory Pointer bit) */
+#define ARB		( cpustate->STR1 & ARB_REG)			/* ARB  (Backup Auxiliary Register pointer) */
+#define CNF0	( cpustate->STR1 & CNF0_REG)		/* CNF0 (Onchip Ram Config register) */
+#define TC		( cpustate->STR1 & TC_FLAG)			/* TC   (Test Control Flag) */
+#define SXM		( cpustate->STR1 & SXM_FLAG)		/* SXM  (Sign Extension Mode) */
+#define CARRY	( cpustate->STR1 & C_FLAG)			/* C    (Carry Flag for accumulator) */
+#define HM		( cpustate->STR1 & HM_FLAG)			/* HM   (Processor Hold Mode) */
+#define FSM		( cpustate->STR1 & FSM_FLAG)		/* FSM  (Frame Synchronization Mode - for serial port) */
+#define XF		( cpustate->STR1 & FSM_FLAG)		/* XF   (XF output pin status) */
+#define FO		( cpustate->STR1 & FO_FLAG)			/* FO   (Serial port Format In/Out mode) */
+#define TXM		( cpustate->STR1 & TXM_FLAG)		/* TXM  (Transmit Mode - for serial port) */
+#define PM		( cpustate->STR1 & PM_REG)			/* PM   (P register shift Mode. See SHIFT_Preg_TO_ALU below )*/
 
-#define DMA		(DP | (R.opcode.b.l & 0x7f))	/* address used in direct memory access operations */
-#define DMApg0	(R.opcode.b.l & 0x7f)			/* address used in direct memory access operations for sst instruction */
-#define IND		R.AR[ARP]						/* address used in indirect memory access operations */
+#define DMA		(DP | (cpustate->opcode.b.l & 0x7f))	/* address used in direct memory access operations */
+#define DMApg0	(cpustate->opcode.b.l & 0x7f)			/* address used in direct memory access operations for sst instruction */
+#define IND		cpustate->AR[ARP]						/* address used in indirect memory access operations */
 
-INLINE void CLR0(UINT16 flag) { R.STR0 &= ~flag; R.STR0 |= 0x0400; }
-INLINE void SET0(UINT16 flag) { R.STR0 |=  flag; R.STR0 |= 0x0400; }
-INLINE void CLR1(UINT16 flag) { R.STR1 &= ~flag; R.STR1 |= 0x0180; }
-INLINE void SET1(UINT16 flag) { R.STR1 |=  flag; R.STR1 |= 0x0180; }
-INLINE void MODIFY_DP (int data) { R.STR0 &= ~DP_REG;  R.STR0 |= (data & DP_REG); R.STR0 |= 0x0400; }
-INLINE void MODIFY_PM (int data) { R.STR1 &= ~PM_REG;  R.STR1 |= (data & PM_REG); R.STR1 |= 0x0180; }
-INLINE void MODIFY_ARP(int data) { R.STR1 &= ~ARB_REG; R.STR1 |= (R.STR0 & ARP_REG); R.STR1 |= 0x0180;
-								   R.STR0 &= ~ARP_REG; R.STR0 |= ((data << 13) & ARP_REG); R.STR0 |= 0x0400; }
+INLINE void CLR0(tms32025_state *cpustate, UINT16 flag) { cpustate->STR0 &= ~flag; cpustate->STR0 |= 0x0400; }
+INLINE void SET0(tms32025_state *cpustate, UINT16 flag) { cpustate->STR0 |=  flag; cpustate->STR0 |= 0x0400; }
+INLINE void CLR1(tms32025_state *cpustate, UINT16 flag) { cpustate->STR1 &= ~flag; cpustate->STR1 |= 0x0180; }
+INLINE void SET1(tms32025_state *cpustate, UINT16 flag) { cpustate->STR1 |=  flag; cpustate->STR1 |= 0x0180; }
+
+INLINE void MODIFY_DP(tms32025_state *cpustate, int data)
+{
+	cpustate->STR0 &= ~DP_REG;
+	cpustate->STR0 |= (data & DP_REG);
+	cpustate->STR0 |= 0x0400;
+}
+INLINE void MODIFY_PM(tms32025_state *cpustate, int data)
+{
+	cpustate->STR1 &= ~PM_REG;
+	cpustate->STR1 |= (data & PM_REG);
+	cpustate->STR1 |= 0x0180;
+}
+INLINE void MODIFY_ARP(tms32025_state *cpustate, int data)
+{
+	cpustate->STR1 &= ~ARB_REG;
+	cpustate->STR1 |= (cpustate->STR0 & ARP_REG);
+	cpustate->STR1 |= 0x0180;
+	cpustate->STR0 &= ~ARP_REG;
+	cpustate->STR0 |= ((data << 13) & ARP_REG);
+	cpustate->STR0 |= 0x0400;
+}
+
+
 #ifdef UNUSED_FUNCTION
-INLINE void MODIFY_ARB(int data) { R.STR1 &= ~ARB_REG; R.STR1 |= ((data << 13) & ARB_REG); R.STR1 |= 0x0180; }
+INLINE void MODIFY_ARB(tms32025_state *cpustate, int data)
+{
+	cpustate->STR1 &= ~ARB_REG;
+	cpustate->STR1 |= ((data << 13) & ARB_REG);
+	cpustate->STR1 |= 0x0180;
+}
 #endif
 
-static int mHackIgnoreARP; /* special handling for lst, lst1 instructions */
 
-INLINE UINT16 M_RDROM(offs_t addr)
+INLINE UINT16 M_RDROM(tms32025_state *cpustate, offs_t addr)
 {
 	UINT16 *ram;
 	addr &= 0xffff;
-	ram = tms32025_pgmmap[addr >> 7];
+	ram = cpustate->pgmmap[addr >> 7];
 	if (ram) return ram[addr & 0x7f];
-	return memory_read_word_16be(R.program, addr << 1);
+	return memory_read_word_16be(cpustate->program, addr << 1);
 }
 
-INLINE void M_WRTROM(offs_t addr, UINT16 data)
+INLINE void M_WRTROM(tms32025_state *cpustate, offs_t addr, UINT16 data)
 {
 	UINT16 *ram;
 	addr &= 0xffff;
-	ram = tms32025_pgmmap[addr >> 7];
+	ram = cpustate->pgmmap[addr >> 7];
 	if (ram) { ram[addr & 0x7f] = data; }
-	else memory_write_word_16be(R.program, addr << 1, data);
+	else memory_write_word_16be(cpustate->program, addr << 1, data);
 }
 
-INLINE UINT16 M_RDRAM(offs_t addr)
+INLINE UINT16 M_RDRAM(tms32025_state *cpustate, offs_t addr)
 {
 	UINT16 *ram;
 	addr &= 0xffff;
-	ram = tms32025_datamap[addr >> 7];
+	ram = cpustate->datamap[addr >> 7];
 	if (ram) return ram[addr & 0x7f];
-	return memory_read_word_16be(R.data, addr << 1);
+	return memory_read_word_16be(cpustate->data, addr << 1);
 }
 
-INLINE void M_WRTRAM(offs_t addr, UINT16 data)
+INLINE void M_WRTRAM(tms32025_state *cpustate, offs_t addr, UINT16 data)
 {
 	UINT16 *ram;
 	addr &= 0xffff;
-	ram = tms32025_datamap[addr >> 7];
+	ram = cpustate->datamap[addr >> 7];
 	if (ram) { ram[addr & 0x7f] = data; }
-	else memory_write_word_16be(R.data, addr << 1, data);
+	else memory_write_word_16be(cpustate->data, addr << 1, data);
 }
 
 
-static UINT16 reverse_carry_add( UINT16 arg0, UINT16 arg1 )
+static UINT16 reverse_carry_add(UINT16 arg0, UINT16 arg1 )
 {
 	UINT16 result = 0;
 	int carry = 0;
@@ -319,1411 +366,1334 @@ static UINT16 reverse_carry_add( UINT16 arg0, UINT16 arg1 )
 	return result;
 }
 
-INLINE void MODIFY_AR_ARP(void)
+INLINE void MODIFY_AR_ARP(tms32025_state *cpustate)
 { /* modify address register referenced by ARP */
-	switch (R.opcode.b.l & 0x70)		/* Cases ordered by predicted useage */
+	switch (cpustate->opcode.b.l & 0x70)		/* Cases ordered by predicted useage */
 	{
 		case 0x00: /* 000   nop      */
 			break;
 
 		case 0x10: /* 001   *-       */
-			R.AR[ARP] -- ;
+			cpustate->AR[ARP] -- ;
 			break;
 
 		case 0x20: /* 010   *+       */
-			R.AR[ARP] ++ ;
+			cpustate->AR[ARP] ++ ;
 			break;
 
 		case 0x30: /* 011   reserved */
 			break;
 
 		case 0x40: /* 100   *BR0-    */
-			R.AR[ARP] = reverse_carry_add(R.AR[ARP],-R.AR[0]);
+			cpustate->AR[ARP] = reverse_carry_add(cpustate->AR[ARP],-cpustate->AR[0]);
 			break;
 
 		case 0x50: /* 101   *0-      */
-			R.AR[ARP] -= R.AR[0];
+			cpustate->AR[ARP] -= cpustate->AR[0];
 			break;
 
 		case 0x60: /* 110   *0+      */
-			R.AR[ARP] += R.AR[0];
+			cpustate->AR[ARP] += cpustate->AR[0];
 			break;
 
 		case 0x70: /* 111   *BR0+    */
-			R.AR[ARP] += reverse_carry_add(R.AR[ARP],R.AR[0]);
+			cpustate->AR[ARP] += reverse_carry_add(cpustate->AR[ARP],cpustate->AR[0]);
 			break;
 
 		default:
 			break;
 	}
 
-	if( !mHackIgnoreARP )
+	if( !cpustate->mHackIgnoreARP )
 	{
-		if (R.opcode.b.l & 8)
+		if (cpustate->opcode.b.l & 8)
 		{ /* bit 3 determines if new value is loaded into ARP */
-			MODIFY_ARP(R.opcode.b.l & 7);
+			MODIFY_ARP(cpustate, (cpustate->opcode.b.l & 7) );
 		}
 	}
 }
 
-INLINE void CALCULATE_ADD_CARRY(void)
+INLINE void CALCULATE_ADD_CARRY(tms32025_state *cpustate)
 {
-	if ( (UINT32)(oldacc.d) > (UINT32)(R.ACC.d) ) {
-		SET1(C_FLAG);
+	if ( (UINT32)(cpustate->oldacc.d) > (UINT32)(cpustate->ACC.d) ) {
+		SET1(cpustate, C_FLAG);
 	}
 	else {
-		CLR1(C_FLAG);
+		CLR1(cpustate, C_FLAG);
 	}
 }
 
-INLINE void CALCULATE_SUB_CARRY(void)
+INLINE void CALCULATE_SUB_CARRY(tms32025_state *cpustate)
 {
-	if ( (UINT32)(oldacc.d) < (UINT32)(R.ACC.d) ) {
-		CLR1(C_FLAG);
+	if ( (UINT32)(cpustate->oldacc.d) < (UINT32)(cpustate->ACC.d) ) {
+		CLR1(cpustate, C_FLAG);
 	}
 	else {
-		SET1(C_FLAG);
+		SET1(cpustate, C_FLAG);
 	}
 }
 
-INLINE void CALCULATE_ADD_OVERFLOW(INT32 addval)
+INLINE void CALCULATE_ADD_OVERFLOW(tms32025_state *cpustate, INT32 addval)
 {
-	if ((INT32)(~(oldacc.d ^ addval) & (oldacc.d ^ R.ACC.d)) < 0)
+	if ((INT32)(~(cpustate->oldacc.d ^ addval) & (cpustate->oldacc.d ^ cpustate->ACC.d)) < 0)
 	{
-		SET0(OV_FLAG);
+		SET0(cpustate, OV_FLAG);
 		if (OVM)
 		{
 		// Stroff:HACK! support for overflow capping as implemented results in bad DSP floating point math in many
 		// System22 games - for example, the score display in Prop Cycle.
-		//  R.ACC.d = ((INT32)oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+		//  cpustate->ACC.d = ((INT32)cpustate->oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 		}
 	}
 }
-INLINE void CALCULATE_SUB_OVERFLOW(INT32 subval)
+INLINE void CALCULATE_SUB_OVERFLOW(tms32025_state *cpustate, INT32 subval)
 {
-	if ((INT32)((oldacc.d ^ subval) & (oldacc.d ^ R.ACC.d)) < 0)
+	if ((INT32)((cpustate->oldacc.d ^ subval) & (cpustate->oldacc.d ^ cpustate->ACC.d)) < 0)
 	{
-		SET0(OV_FLAG);
+		SET0(cpustate, OV_FLAG);
 		if (OVM)
 		{
-			R.ACC.d = ((INT32)oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+			cpustate->ACC.d = ((INT32)cpustate->oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 		}
 	}
 }
 
-INLINE UINT16 POP_STACK(void)
+INLINE UINT16 POP_STACK(tms32025_state *cpustate)
 {
-	UINT16 data = R.STACK[7];
-	R.STACK[7] = R.STACK[6];
-	R.STACK[6] = R.STACK[5];
-	R.STACK[5] = R.STACK[4];
-	R.STACK[4] = R.STACK[3];
-	R.STACK[3] = R.STACK[2];
-	R.STACK[2] = R.STACK[1];
-	R.STACK[1] = R.STACK[0];
+	UINT16 data = cpustate->STACK[7];
+	cpustate->STACK[7] = cpustate->STACK[6];
+	cpustate->STACK[6] = cpustate->STACK[5];
+	cpustate->STACK[5] = cpustate->STACK[4];
+	cpustate->STACK[4] = cpustate->STACK[3];
+	cpustate->STACK[3] = cpustate->STACK[2];
+	cpustate->STACK[2] = cpustate->STACK[1];
+	cpustate->STACK[1] = cpustate->STACK[0];
 	return data;
 }
-INLINE void PUSH_STACK(UINT16 data)
+INLINE void PUSH_STACK(tms32025_state *cpustate, UINT16 data)
 {
-	R.STACK[0] = R.STACK[1];
-	R.STACK[1] = R.STACK[2];
-	R.STACK[2] = R.STACK[3];
-	R.STACK[3] = R.STACK[4];
-	R.STACK[4] = R.STACK[5];
-	R.STACK[5] = R.STACK[6];
-	R.STACK[6] = R.STACK[7];
-	R.STACK[7] = data;
+	cpustate->STACK[0] = cpustate->STACK[1];
+	cpustate->STACK[1] = cpustate->STACK[2];
+	cpustate->STACK[2] = cpustate->STACK[3];
+	cpustate->STACK[3] = cpustate->STACK[4];
+	cpustate->STACK[4] = cpustate->STACK[5];
+	cpustate->STACK[5] = cpustate->STACK[6];
+	cpustate->STACK[6] = cpustate->STACK[7];
+	cpustate->STACK[7] = data;
 }
 
-INLINE void SHIFT_Preg_TO_ALU(void)
+INLINE void SHIFT_Preg_TO_ALU(tms32025_state *cpustate)
 {
 	switch(PM)		/* PM (in STR1) is the shift mode for Preg */
 	{
-		case 0:		R.ALU.d = R.Preg.d; break;
-		case 1:		R.ALU.d = (R.Preg.d << 1); break;
-		case 2:		R.ALU.d = (R.Preg.d << 4); break;
-		case 3:		R.ALU.d = (R.Preg.d >> 6); if (R.Preg.d & 0x80000000) R.ALU.d |= 0xfc000000; break;
+		case 0:		cpustate->ALU.d = cpustate->Preg.d; break;
+		case 1:		cpustate->ALU.d = (cpustate->Preg.d << 1); break;
+		case 2:		cpustate->ALU.d = (cpustate->Preg.d << 4); break;
+		case 3:		cpustate->ALU.d = (cpustate->Preg.d >> 6); if (cpustate->Preg.d & 0x80000000) cpustate->ALU.d |= 0xfc000000; break;
 		default:	break;
 	}
 }
 
-INLINE void GETDATA(int shift,int signext)
+INLINE void GETDATA(tms32025_state *cpustate, int shift,int signext)
 {
-	if (R.opcode.b.l & 0x80)
+	if (cpustate->opcode.b.l & 0x80)
 	{ /* indirect memory access */
-		memaccess = IND;
+		cpustate->memaccess = IND;
 	}
 	else
 	{ /* direct memory address */
-		memaccess = DMA;
+		cpustate->memaccess = DMA;
 	}
 
-	if (memaccess >= 0x800)
+	if (cpustate->memaccess >= 0x800)
 	{
-		R.external_mem_access = 1;	/* Pause if hold pin is active */
+		cpustate->external_mem_access = 1;	/* Pause if hold pin is active */
 	}
 	else
 	{
-		R.external_mem_access = 0;
+		cpustate->external_mem_access = 0;
 	}
 
-	R.ALU.d = (UINT16)M_RDRAM(memaccess);
-	if (signext) R.ALU.d = (INT16)R.ALU.d;
-	R.ALU.d <<= shift;
+	cpustate->ALU.d = (UINT16)M_RDRAM(cpustate, cpustate->memaccess);
+	if (signext) cpustate->ALU.d = (INT16)cpustate->ALU.d;
+	cpustate->ALU.d <<= shift;
 
 	/* next ARP */
-	if (R.opcode.b.l & 0x80) MODIFY_AR_ARP();
+	if (cpustate->opcode.b.l & 0x80) MODIFY_AR_ARP(cpustate);
 }
 
-INLINE void PUTDATA(UINT16 data)
+INLINE void PUTDATA(tms32025_state *cpustate, UINT16 data)
 {
-	if (R.opcode.b.l & 0x80) {
-		if (memaccess >= 0x800) R.external_mem_access = 1;	/* Pause if hold pin is active */
-		else R.external_mem_access = 0;
+	if (cpustate->opcode.b.l & 0x80) {
+		if (cpustate->memaccess >= 0x800) cpustate->external_mem_access = 1;	/* Pause if hold pin is active */
+		else cpustate->external_mem_access = 0;
 
-		M_WRTRAM(IND,data);
-		MODIFY_AR_ARP();
+		M_WRTRAM(cpustate, IND, data);
+		MODIFY_AR_ARP(cpustate);
 	}
 	else {
-		if (memaccess >= 0x800) R.external_mem_access = 1;	/* Pause if hold pin is active */
-		else R.external_mem_access = 0;
+		if (cpustate->memaccess >= 0x800) cpustate->external_mem_access = 1;	/* Pause if hold pin is active */
+		else cpustate->external_mem_access = 0;
 
-		M_WRTRAM(DMA,data);
+		M_WRTRAM(cpustate, DMA, data);
 	}
 }
-INLINE void PUTDATA_SST(UINT16 data)
+INLINE void PUTDATA_SST(tms32025_state *cpustate, UINT16 data)
 {
-	if (R.opcode.b.l & 0x80) memaccess = IND;
-	else memaccess = DMApg0;
+	if (cpustate->opcode.b.l & 0x80) cpustate->memaccess = IND;
+	else cpustate->memaccess = DMApg0;
 
-	if (memaccess >= 0x800) R.external_mem_access = 1;		/* Pause if hold pin is active */
-	else R.external_mem_access = 0;
+	if (cpustate->memaccess >= 0x800) cpustate->external_mem_access = 1;		/* Pause if hold pin is active */
+	else cpustate->external_mem_access = 0;
 
-	if (R.opcode.b.l & 0x80) {
-		R.opcode.b.l &= 0xf7;					/* Stop ARP changes */
-		MODIFY_AR_ARP();
+	if (cpustate->opcode.b.l & 0x80) {
+		cpustate->opcode.b.l &= 0xf7;					/* Stop ARP changes */
+		MODIFY_AR_ARP(cpustate);
 	}
-	M_WRTRAM(memaccess,data);
+	M_WRTRAM(cpustate, cpustate->memaccess, data);
 }
 
 
 /* The following functions are here to fill the void for the */
 /* opcode call functions. These functions are never actually called. */
-static void opcodes_CE(void) { }
-static void opcodes_DX(void) { }
+static void opcodes_CE(tms32025_state *cpustate) { }
+static void opcodes_Dx(tms32025_state *cpustate) { }
 
-static void illegal(void)
+static void illegal(tms32025_state *cpustate)
 {
-		logerror("TMS32025:  PC = %04x,  Illegal opcode = %04x\n", (R.PC-1), R.opcode.w.l);
+	logerror("TMS32025:  PC = %04x,  Illegal opcode = %04x\n", (cpustate->PC-1), cpustate->opcode.w.l);
 }
 
-static void abst(void)
+static void abst(tms32025_state *cpustate)
 {
-		if ( (INT32)(R.ACC.d) < 0 ) {
-			R.ACC.d = -R.ACC.d;
-			if (R.ACC.d == 0x80000000)
-			{
-				SET0(OV_FLAG);
-				if (OVM) R.ACC.d-- ;
-			}
+	if ( (INT32)(cpustate->ACC.d) < 0 ) {
+		cpustate->ACC.d = -cpustate->ACC.d;
+		if (cpustate->ACC.d == 0x80000000) {
+			SET0(cpustate, OV_FLAG);
+			if (OVM) cpustate->ACC.d-- ;
 		}
-		CLR1(C_FLAG);
+	}
+	CLR1(cpustate, C_FLAG);
 }
-static void add(void)		/* #### add carry support - see page 3-31 (70) #### */
-{							/* page 10-13 (348) spru031d */
-		oldacc.d = R.ACC.d;
-		GETDATA((R.opcode.b.h & 0xf),SXM);
-		R.ACC.d += R.ALU.d;
+static void add(tms32025_state *cpustate)		/* #### add carry support - see page 3-31 (70) #### */
+{						/* page 10-13 (348) spru031d */
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, (cpustate->opcode.b.h & 0xf), SXM);
+	cpustate->ACC.d += cpustate->ALU.d;
 
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
 }
-static void addc(void)
+static void addc(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		if (CARRY) R.ALU.d++;
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	if (CARRY) cpustate->ALU.d++;
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
 }
-static void addh(void)
+static void addh(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		R.ACC.w.h += R.ALU.w.l;
-		if ((INT16)(~(oldacc.w.h ^ R.ALU.w.l) & (oldacc.w.h ^ R.ACC.w.h)) < 0) {
-			SET0(OV_FLAG);
-			if (OVM)
-				R.ACC.w.h = ((INT16)oldacc.w.h < 0) ? 0x8000 : 0x7fff;
-		}
-		if ( ((INT16)(oldacc.w.h) < 0) && ((INT16)(R.ACC.w.h) >= 0) ) {
-			SET1(C_FLAG);
-		}
-		/* Carry flag is not cleared, if no carry occured */
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.w.h += cpustate->ALU.w.l;
+	if ((INT16)(~(cpustate->oldacc.w.h ^ cpustate->ALU.w.l) & (cpustate->oldacc.w.h ^ cpustate->ACC.w.h)) < 0) {
+		SET0(cpustate, OV_FLAG);
+		if (OVM)
+			cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+	}
+	if ( ((INT16)(cpustate->oldacc.w.h) < 0) && ((INT16)(cpustate->ACC.w.h) >= 0) ) {
+		SET1(cpustate, C_FLAG);
+	}
+	/* Carry flag is not cleared, if no carry occured */
 }
-static void addk(void)
+static void addk(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		R.ALU.d = (UINT8)R.opcode.b.l;
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	cpustate->ALU.d = (UINT8)cpustate->opcode.b.l;
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
 }
-static void adds(void)
+static void adds(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
 }
-static void addt(void)
+static void addt(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA((R.Treg & 0xf),SXM);
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, (cpustate->Treg & 0xf), SXM);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
 }
-static void adlk(void)
+static void adlk(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		if (SXM) R.ALU.d =  (INT16)M_RDOP_ARG(R.PC);
-		else     R.ALU.d = (UINT16)M_RDOP_ARG(R.PC);
-		R.PC++;
-		R.ALU.d <<= (R.opcode.b.h & 0xf);
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	if (SXM) cpustate->ALU.d =  (INT16)M_RDOP_ARG(cpustate->PC);
+	else     cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
+	cpustate->PC++;
+	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
 }
-static void adrk(void)
+static void adrk(tms32025_state *cpustate)
 {
-		R.AR[ARP] += R.opcode.b.l;
+	cpustate->AR[ARP] += cpustate->opcode.b.l;
 }
-static void and(void)
+static void and(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		R.ACC.d &= R.ALU.d;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.d &= cpustate->ALU.d;
 }
-static void andk(void)
+static void andk(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		R.ALU.d = (UINT16)M_RDOP_ARG(R.PC);
-		R.PC++;
-		R.ALU.d <<= (R.opcode.b.h & 0xf);
-		R.ACC.d &= R.ALU.d;
-		R.ACC.d &= 0x7fffffff;
+	cpustate->oldacc.d = cpustate->ACC.d;
+	cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
+	cpustate->PC++;
+	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
+	cpustate->ACC.d &= cpustate->ALU.d;
+	cpustate->ACC.d &= 0x7fffffff;
 }
-static void apac(void)
+static void apac(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
 }
-static void br(void)
+static void br(tms32025_state *cpustate)
 {
-		SET_PC(M_RDOP_ARG(R.PC));
-		MODIFY_AR_ARP();
+	SET_PC(M_RDOP_ARG(cpustate->PC));
+	MODIFY_AR_ARP(cpustate);
 }
-static void bacc(void)
+static void bacc(tms32025_state *cpustate)
 {
-		SET_PC(R.ACC.w.l);
+	SET_PC(cpustate->ACC.w.l);
 }
-static void banz(void)
+static void banz(tms32025_state *cpustate)
 {
-		if (R.AR[ARP]) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if (cpustate->AR[ARP]) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bbnz(void)
+static void bbnz(tms32025_state *cpustate)
 {
-		if (TC) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if (TC) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bbz(void)
+static void bbz(tms32025_state *cpustate)
 {
-		if (TC == 0) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if (TC == 0) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bc(void)
+static void bc(tms32025_state *cpustate)
 {
-		if (CARRY) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if (CARRY) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bgez(void)
+static void bgez(tms32025_state *cpustate)
 {
-		if ( (INT32)(R.ACC.d) >= 0 ) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if ( (INT32)(cpustate->ACC.d) >= 0 ) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bgz(void)
+static void bgz(tms32025_state *cpustate)
 {
-		if ( (INT32)(R.ACC.d) > 0 ) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if ( (INT32)(cpustate->ACC.d) > 0 ) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bioz(void)
+static void bioz(tms32025_state *cpustate)
 {
-		if (S_IN(TMS32025_BIO) != CLEAR_LINE) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if (S_IN(TMS32025_BIO) != CLEAR_LINE) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bit(void)
+static void bit(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		if (R.ALU.d & (0x8000 >> (R.opcode.b.h & 0xf))) SET1(TC_FLAG);
-		else CLR1(TC_FLAG);
+	GETDATA(cpustate, 0, 0);
+	if (cpustate->ALU.d & (0x8000 >> (cpustate->opcode.b.h & 0xf))) SET1(cpustate, TC_FLAG);
+	else CLR1(cpustate, TC_FLAG);
 }
-static void bitt(void)
+static void bitt(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		if (R.ALU.d & (0x8000 >> (R.Treg & 0xf))) SET1(TC_FLAG);
-		else CLR1(TC_FLAG);
+	GETDATA(cpustate, 0, 0);
+	if (cpustate->ALU.d & (0x8000 >> (cpustate->Treg & 0xf))) SET1(cpustate, TC_FLAG);
+	else CLR1(cpustate, TC_FLAG);
 }
-static void blez(void)
+static void blez(tms32025_state *cpustate)
 {
-		if ( (INT32)(R.ACC.d) <= 0 ) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if ( (INT32)(cpustate->ACC.d) <= 0 ) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void blkd(void)
+static void blkd(tms32025_state *cpustate)
 {										/** Fix cycle timing **/
-		if (R.init_load_addr) {
-			R.PFC = M_RDOP_ARG(R.PC);
-			R.PC++;
-		}
-		R.ALU.d = M_RDRAM(R.PFC);
-		PUTDATA(R.ALU.d);
-		R.PFC++;
-		R.tms32025_dec_cycles += (1*CLK);
+	if (cpustate->init_load_addr) {
+		cpustate->PFC = M_RDOP_ARG(cpustate->PC);
+		cpustate->PC++;
+	}
+	cpustate->ALU.d = M_RDRAM(cpustate, cpustate->PFC);
+	PUTDATA(cpustate, cpustate->ALU.d);
+	cpustate->PFC++;
+	cpustate->tms32025_dec_cycles += (1*CLK);
 }
-static void blkp(void)
+static void blkp(tms32025_state *cpustate)
 {										/** Fix cycle timing **/
-		if (R.init_load_addr) {
-			R.PFC = M_RDOP_ARG(R.PC);
-			R.PC++;
-		}
-		R.ALU.d = M_RDROM(R.PFC);
-		PUTDATA(R.ALU.d);
-		R.PFC++;
-		R.tms32025_dec_cycles += (2*CLK);
+	if (cpustate->init_load_addr) {
+		cpustate->PFC = M_RDOP_ARG(cpustate->PC);
+		cpustate->PC++;
+	}
+	cpustate->ALU.d = M_RDROM(cpustate, cpustate->PFC);
+	PUTDATA(cpustate, cpustate->ALU.d);
+	cpustate->PFC++;
+	cpustate->tms32025_dec_cycles += (2*CLK);
 }
-static void blz(void)
+static void blz(tms32025_state *cpustate)
 {
-		if ( (INT32)(R.ACC.d) <  0 ) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if ( (INT32)(cpustate->ACC.d) <  0 ) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bnc(void)
+static void bnc(tms32025_state *cpustate)
 {
-		if (CARRY == 0) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if (CARRY == 0) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bnv(void)
+static void bnv(tms32025_state *cpustate)
 {
-		if (OV == 0) SET_PC(M_RDOP_ARG(R.PC));
-		else {
-			R.PC++ ;
-			CLR0(OV_FLAG);
-		}
-		MODIFY_AR_ARP();
+	if (OV == 0) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else {
+		cpustate->PC++ ;
+		CLR0(cpustate, OV_FLAG);
+	}
+	MODIFY_AR_ARP(cpustate);
 }
-static void bnz(void)
+static void bnz(tms32025_state *cpustate)
 {
-		if (R.ACC.d != 0) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if (cpustate->ACC.d != 0) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bv(void)
+static void bv(tms32025_state *cpustate)
 {
-		if (OV) {
-			SET_PC(M_RDOP_ARG(R.PC));
-			CLR0(OV_FLAG);
-		}
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if (OV) {
+		SET_PC(M_RDOP_ARG(cpustate->PC));
+		CLR0(cpustate, OV_FLAG);
+	}
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void bz(void)
+static void bz(tms32025_state *cpustate)
 {
-		if (R.ACC.d == 0) SET_PC(M_RDOP_ARG(R.PC));
-		else R.PC++ ;
-		MODIFY_AR_ARP();
+	if (cpustate->ACC.d == 0) SET_PC(M_RDOP_ARG(cpustate->PC));
+	else cpustate->PC++ ;
+	MODIFY_AR_ARP(cpustate);
 }
-static void cala(void)
+static void cala(tms32025_state *cpustate)
 {
-		PUSH_STACK(R.PC);
-		SET_PC(R.ACC.w.l);
+	PUSH_STACK(cpustate, cpustate->PC);
+	SET_PC(cpustate->ACC.w.l);
 }
-static void call(void)
+static void call(tms32025_state *cpustate)
 {
-		R.PC++ ;
-		PUSH_STACK(R.PC);
-		SET_PC(M_RDOP_ARG((R.PC - 1)));
-		MODIFY_AR_ARP();
+	cpustate->PC++ ;
+	PUSH_STACK(cpustate, cpustate->PC);
+	SET_PC(M_RDOP_ARG((cpustate->PC - 1)));
+	MODIFY_AR_ARP(cpustate);
 }
-static void cmpl(void)
+static void cmpl(tms32025_state *cpustate)
 {
-		R.ACC.d = (~R.ACC.d);
+	cpustate->ACC.d = (~cpustate->ACC.d);
 }
-static void cmpr(void)
+static void cmpr(tms32025_state *cpustate)
 {
-		switch (R.opcode.b.l & 3)
-		{
-			case 00:	if ( (UINT16)(R.AR[ARP]) == (UINT16)(R.AR[0]) ) SET1(TC_FLAG); else CLR1(TC_FLAG); break;
-			case 01:	if ( (UINT16)(R.AR[ARP]) <  (UINT16)(R.AR[0]) ) SET1(TC_FLAG); else CLR1(TC_FLAG); break;
-			case 02:	if ( (UINT16)(R.AR[ARP])  > (UINT16)(R.AR[0]) ) SET1(TC_FLAG); else CLR1(TC_FLAG); break;
-			case 03:	if ( (UINT16)(R.AR[ARP]) != (UINT16)(R.AR[0]) ) SET1(TC_FLAG); else CLR1(TC_FLAG); break;
-			default:	break;
-		}
+	switch (cpustate->opcode.b.l & 3)
+	{
+		case 00:	if ( (UINT16)(cpustate->AR[ARP]) == (UINT16)(cpustate->AR[0]) ) SET1(cpustate, TC_FLAG);
+					else CLR1(cpustate, TC_FLAG);
+					break;
+		case 01:	if ( (UINT16)(cpustate->AR[ARP]) <  (UINT16)(cpustate->AR[0]) ) SET1(cpustate, TC_FLAG);
+					else CLR1(cpustate, TC_FLAG);
+					break;
+		case 02:	if ( (UINT16)(cpustate->AR[ARP])  > (UINT16)(cpustate->AR[0]) ) SET1(cpustate, TC_FLAG);
+					else CLR1(cpustate, TC_FLAG);
+					break;
+		case 03:	if ( (UINT16)(cpustate->AR[ARP]) != (UINT16)(cpustate->AR[0]) ) SET1(cpustate, TC_FLAG);
+					else CLR1(cpustate, TC_FLAG);
+					break;
+		default:	break;
+	}
 }
-static void cnfd(void)	/** next two fetches need to use previous CNF value ! **/
+static void cnfd(tms32025_state *cpustate)	/** next two fetches need to use previous CNF value ! **/
 {
-		CLR1(CNF0_REG);
-		tms32025_datamap[4] = &R.intRAM[0x200];			/* B0 */
-		tms32025_datamap[5] = &R.intRAM[0x280];			/* B0 */
-		tms32025_pgmmap[510] = NULL;
-		tms32025_pgmmap[511] = NULL;
+	CLR1(cpustate, CNF0_REG);
+	cpustate->datamap[4] = &cpustate->intRAM[0x200];			/* B0 */
+	cpustate->datamap[5] = &cpustate->intRAM[0x280];			/* B0 */
+	cpustate->pgmmap[510] = NULL;
+	cpustate->pgmmap[511] = NULL;
 }
-static void cnfp(void)	/** next two fetches need to use previous CNF value ! **/
+static void cnfp(tms32025_state *cpustate)	/** next two fetches need to use previous CNF value ! **/
 {
-		SET1(CNF0_REG);
-		tms32025_datamap[4] = NULL;						/* B0 */
-		tms32025_datamap[5] = NULL;						/* B0 */
-		tms32025_pgmmap[510] = &R.intRAM[0x200];
-		tms32025_pgmmap[511] = &R.intRAM[0x280];
+	SET1(cpustate, CNF0_REG);
+	cpustate->datamap[4] = NULL;						/* B0 */
+	cpustate->datamap[5] = NULL;						/* B0 */
+	cpustate->pgmmap[510] = &cpustate->intRAM[0x200];
+	cpustate->pgmmap[511] = &cpustate->intRAM[0x280];
 }
-static void conf(void)	/** Need to reconfigure the memory blocks */
+static void conf(tms32025_state *cpustate)	/** Need to reconfigure the memory blocks */
 {
-		switch (R.opcode.b.l & 3)
-		{
-			case 00:	CLR1(CNF1_REG); CLR1(CNF0_REG);
-						tms32025_datamap[4] = &R.intRAM[0x200];	/* B0 */
-						tms32025_datamap[5] = &R.intRAM[0x280];	/* B0 */
-						tms32025_datamap[6] = &R.intRAM[0x300];	/* B0 */
-						tms32025_datamap[7] = &R.intRAM[0x380];	/* B0 */
-						tms32025_datamap[8] = &R.intRAM[0x400];	/* B1 */
-						tms32025_datamap[9] = &R.intRAM[0x480];	/* B1 */
-						tms32025_datamap[10] = &R.intRAM[0x500];	/* B1 */
-						tms32025_datamap[11] = &R.intRAM[0x580];	/* B1 */
-						tms32025_datamap[12] = &R.intRAM[0x600];	/* B3 */
-						tms32025_datamap[13] = &R.intRAM[0x680];	/* B3 */
-						tms32025_datamap[14] = &R.intRAM[0x700];	/* B3 */
-						tms32025_datamap[15] = &R.intRAM[0x780];	/* B3 */
-						tms32025_pgmmap[500] = NULL;
-						tms32025_pgmmap[501] = NULL;
-						tms32025_pgmmap[502] = NULL;
-						tms32025_pgmmap[503] = NULL;
-						tms32025_pgmmap[504] = NULL;
-						tms32025_pgmmap[505] = NULL;
-						tms32025_pgmmap[506] = NULL;
-						tms32025_pgmmap[507] = NULL;
-						tms32025_pgmmap[508] = NULL;
-						tms32025_pgmmap[509] = NULL;
-						tms32025_pgmmap[510] = NULL;
-						tms32025_pgmmap[511] = NULL;
-						break;
-			case 01:	CLR1(CNF1_REG); SET1(CNF0_REG);
-						tms32025_datamap[4] = NULL;
-						tms32025_datamap[5] = NULL;
-						tms32025_datamap[6] = NULL;
-						tms32025_datamap[7] = NULL;
-						tms32025_datamap[8] = &R.intRAM[0x400];	/* B1 */
-						tms32025_datamap[9] = &R.intRAM[0x480];	/* B1 */
-						tms32025_datamap[10] = &R.intRAM[0x500];	/* B1 */
-						tms32025_datamap[11] = &R.intRAM[0x580];	/* B1 */
-						tms32025_datamap[12] = &R.intRAM[0x600];	/* B3 */
-						tms32025_datamap[13] = &R.intRAM[0x680];	/* B3 */
-						tms32025_datamap[14] = &R.intRAM[0x700];	/* B3 */
-						tms32025_datamap[15] = &R.intRAM[0x780];	/* B3 */
-						tms32025_pgmmap[500] = &R.intRAM[0x200];	/* B0 */
-						tms32025_pgmmap[501] = &R.intRAM[0x280];	/* B0 */
-						tms32025_pgmmap[502] = &R.intRAM[0x300];	/* B0 */
-						tms32025_pgmmap[503] = &R.intRAM[0x380];	/* B0 */
-						tms32025_pgmmap[504] = NULL;
-						tms32025_pgmmap[505] = NULL;
-						tms32025_pgmmap[506] = NULL;
-						tms32025_pgmmap[507] = NULL;
-						tms32025_pgmmap[508] = NULL;
-						tms32025_pgmmap[509] = NULL;
-						tms32025_pgmmap[510] = NULL;
-						tms32025_pgmmap[511] = NULL;
-						break;
-			case 02:	SET1(CNF1_REG); CLR1(CNF0_REG);
-						tms32025_datamap[4] = NULL;
-						tms32025_datamap[5] = NULL;
-						tms32025_datamap[6] = NULL;
-						tms32025_datamap[7] = NULL;
-						tms32025_datamap[8] = NULL;
-						tms32025_datamap[9] = NULL;
-						tms32025_datamap[10] = NULL;
-						tms32025_datamap[11] = NULL;
-						tms32025_datamap[12] = &R.intRAM[0x600];	/* B3 */
-						tms32025_datamap[13] = &R.intRAM[0x680];	/* B3 */
-						tms32025_datamap[14] = &R.intRAM[0x700];	/* B3 */
-						tms32025_datamap[15] = &R.intRAM[0x780];	/* B3 */
-						tms32025_pgmmap[500] = &R.intRAM[0x200];	/* B0 */
-						tms32025_pgmmap[501] = &R.intRAM[0x280];	/* B0 */
-						tms32025_pgmmap[502] = &R.intRAM[0x300];	/* B0 */
-						tms32025_pgmmap[503] = &R.intRAM[0x380];	/* B0 */
-						tms32025_pgmmap[504] = &R.intRAM[0x400];	/* B1 */
-						tms32025_pgmmap[505] = &R.intRAM[0x480];	/* B1 */
-						tms32025_pgmmap[506] = &R.intRAM[0x500];	/* B1 */
-						tms32025_pgmmap[507] = &R.intRAM[0x580];	/* B1 */
-						tms32025_pgmmap[508] = NULL;
-						tms32025_pgmmap[509] = NULL;
-						tms32025_pgmmap[510] = NULL;
-						tms32025_pgmmap[511] = NULL;
-						break;
-			case 03:	SET1(CNF1_REG); SET1(CNF0_REG);
-						tms32025_datamap[4] = NULL;
-						tms32025_datamap[5] = NULL;
-						tms32025_datamap[6] = NULL;
-						tms32025_datamap[7] = NULL;
-						tms32025_datamap[8] = NULL;
-						tms32025_datamap[9] = NULL;
-						tms32025_datamap[10] = NULL;
-						tms32025_datamap[11] = NULL;
-						tms32025_datamap[12] = NULL;
-						tms32025_datamap[13] = NULL;
-						tms32025_datamap[14] = NULL;
-						tms32025_datamap[15] = NULL;
-						tms32025_pgmmap[500] = &R.intRAM[0x200];	/* B0 */
-						tms32025_pgmmap[501] = &R.intRAM[0x280];	/* B0 */
-						tms32025_pgmmap[502] = &R.intRAM[0x300];	/* B0 */
-						tms32025_pgmmap[503] = &R.intRAM[0x380];	/* B0 */
-						tms32025_pgmmap[504] = &R.intRAM[0x400];	/* B1 */
-						tms32025_pgmmap[505] = &R.intRAM[0x480];	/* B1 */
-						tms32025_pgmmap[506] = &R.intRAM[0x500];	/* B1 */
-						tms32025_pgmmap[507] = &R.intRAM[0x580];	/* B1 */
-						tms32025_pgmmap[508] = &R.intRAM[0x600];	/* B3 */
-						tms32025_pgmmap[509] = &R.intRAM[0x680];	/* B3 */
-						tms32025_pgmmap[510] = &R.intRAM[0x700];	/* B3 */
-						tms32025_pgmmap[511] = &R.intRAM[0x780];	/* B3 */
-						break;
-			default:	break;
-		}
-}
-static void dint(void)
-{
-		SET0(INTM_FLAG);
-}
-static void dmov(void)	/** Careful with how memory is configured !! */
-{
-		GETDATA(0,0);
-		M_WRTRAM((memaccess + 1),R.ALU.w.l);
-}
-static void eint(void)
-{
-		CLR0(INTM_FLAG);
-}
-static void fort(void)
-{
-		if (R.opcode.b.l & 1) SET1(FO_FLAG);
-		else CLR1(FO_FLAG);
-}
-static void idle(void)
-{
-		CLR0(INTM_FLAG);
-		R.idle = 1;
-}
-static void in(void)
-{
-		R.ALU.w.l = P_IN( (R.opcode.b.h & 0xf) );
-		PUTDATA(R.ALU.w.l);
-}
-static void lac(void)
-{
-		GETDATA( (R.opcode.b.h & 0xf),SXM );
-		R.ACC.d = R.ALU.d;
-}
-static void lack(void)		/* ZAC is a subset of this instruction */
-{
-		R.ACC.d = (UINT8)R.opcode.b.l;
-}
-static void lact(void)
-{
-		GETDATA( (R.Treg & 0xf),SXM );
-		R.ACC.d = R.ALU.d;
-}
-static void lalk(void)
-{
-		if (SXM) {
-			R.ALU.d = (INT16)M_RDOP_ARG(R.PC);
-			R.ACC.d = R.ALU.d << (R.opcode.b.h & 0xf);
-		}
-		else {
-			R.ALU.d = (UINT16)M_RDOP_ARG(R.PC);
-			R.ACC.d = R.ALU.d << (R.opcode.b.h & 0xf);
-			R.ACC.d &= 0x7fffffff;
-		}
-		R.PC++;
-}
-static void lar_ar0(void)	{ GETDATA(0,0); R.AR[0] = R.ALU.w.l; }
-static void lar_ar1(void)	{ GETDATA(0,0); R.AR[1] = R.ALU.w.l; }
-static void lar_ar2(void)	{ GETDATA(0,0); R.AR[2] = R.ALU.w.l; }
-static void lar_ar3(void)	{ GETDATA(0,0); R.AR[3] = R.ALU.w.l; }
-static void lar_ar4(void)	{ GETDATA(0,0); R.AR[4] = R.ALU.w.l; }
-static void lar_ar5(void)	{ GETDATA(0,0); R.AR[5] = R.ALU.w.l; }
-static void lar_ar6(void)	{ GETDATA(0,0); R.AR[6] = R.ALU.w.l; }
-static void lar_ar7(void)	{ GETDATA(0,0); R.AR[7] = R.ALU.w.l; }
-static void lark_ar0(void)	{ R.AR[0] = R.opcode.b.l; }
-static void lark_ar1(void)	{ R.AR[1] = R.opcode.b.l; }
-static void lark_ar2(void)	{ R.AR[2] = R.opcode.b.l; }
-static void lark_ar3(void)	{ R.AR[3] = R.opcode.b.l; }
-static void lark_ar4(void)	{ R.AR[4] = R.opcode.b.l; }
-static void lark_ar5(void)	{ R.AR[5] = R.opcode.b.l; }
-static void lark_ar6(void)	{ R.AR[6] = R.opcode.b.l; }
-static void lark_ar7(void)	{ R.AR[7] = R.opcode.b.l; }
-static void ldp(void)
-{
-		GETDATA(0,0);
-		MODIFY_DP(R.ALU.d & 0x1ff);
-}
-static void ldpk(void)
-{
-		MODIFY_DP(R.opcode.w.l & 0x1ff);
-}
-static void lph(void)
-{
-		GETDATA(0,0);
-		R.Preg.w.h = R.ALU.w.l;
-}
-static void lrlk(void)
-{
-		R.ALU.d = (UINT16)M_RDOP_ARG(R.PC);
-		R.PC++;
-		R.AR[R.opcode.b.h & 7] = R.ALU.w.l;
-}
-static void lst(void)
-{
-		mHackIgnoreARP = 1;
-		GETDATA(0,0);
-		mHackIgnoreARP = 0;
+	switch (cpustate->opcode.b.l & 3)
+	{
+		case 00:	CLR1(cpustate, CNF1_REG); CLR1(cpustate, CNF0_REG);
+					cpustate->datamap[4] = &cpustate->intRAM[0x200];	/* B0 */
+					cpustate->datamap[5] = &cpustate->intRAM[0x280];	/* B0 */
+					cpustate->datamap[6] = &cpustate->intRAM[0x300];	/* B0 */
+					cpustate->datamap[7] = &cpustate->intRAM[0x380];	/* B0 */
+					cpustate->datamap[8] = &cpustate->intRAM[0x400];	/* B1 */
+					cpustate->datamap[9] = &cpustate->intRAM[0x480];	/* B1 */
+					cpustate->datamap[10] = &cpustate->intRAM[0x500];	/* B1 */
+					cpustate->datamap[11] = &cpustate->intRAM[0x580];	/* B1 */
+					cpustate->datamap[12] = &cpustate->intRAM[0x600];	/* B3 */
+					cpustate->datamap[13] = &cpustate->intRAM[0x680];	/* B3 */
+					cpustate->datamap[14] = &cpustate->intRAM[0x700];	/* B3 */
+					cpustate->datamap[15] = &cpustate->intRAM[0x780];	/* B3 */
+					cpustate->pgmmap[500] = NULL;
+					cpustate->pgmmap[501] = NULL;
+					cpustate->pgmmap[502] = NULL;
+					cpustate->pgmmap[503] = NULL;
+					cpustate->pgmmap[504] = NULL;
+					cpustate->pgmmap[505] = NULL;
+					cpustate->pgmmap[506] = NULL;
+					cpustate->pgmmap[507] = NULL;
+					cpustate->pgmmap[508] = NULL;
+					cpustate->pgmmap[509] = NULL;
+					cpustate->pgmmap[510] = NULL;
+					cpustate->pgmmap[511] = NULL;
+					break;
 
-		R.ALU.w.l &= (~INTM_FLAG);
-		R.STR0 &= INTM_FLAG;
-		R.STR0 |= R.ALU.w.l;		/* Must not affect INTM */
-		R.STR0 |= 0x0400;
-}
-static void lst1(void)
-{
-		mHackIgnoreARP = 1;
-		GETDATA(0,0);
-		mHackIgnoreARP = 0;
+		case 01:	CLR1(cpustate, CNF1_REG); SET1(cpustate, CNF0_REG);
+					cpustate->datamap[4] = NULL;
+					cpustate->datamap[5] = NULL;
+					cpustate->datamap[6] = NULL;
+					cpustate->datamap[7] = NULL;
+					cpustate->datamap[8] = &cpustate->intRAM[0x400];	/* B1 */
+					cpustate->datamap[9] = &cpustate->intRAM[0x480];	/* B1 */
+					cpustate->datamap[10] = &cpustate->intRAM[0x500];	/* B1 */
+					cpustate->datamap[11] = &cpustate->intRAM[0x580];	/* B1 */
+					cpustate->datamap[12] = &cpustate->intRAM[0x600];	/* B3 */
+					cpustate->datamap[13] = &cpustate->intRAM[0x680];	/* B3 */
+					cpustate->datamap[14] = &cpustate->intRAM[0x700];	/* B3 */
+					cpustate->datamap[15] = &cpustate->intRAM[0x780];	/* B3 */
+					cpustate->pgmmap[500] = &cpustate->intRAM[0x200];	/* B0 */
+					cpustate->pgmmap[501] = &cpustate->intRAM[0x280];	/* B0 */
+					cpustate->pgmmap[502] = &cpustate->intRAM[0x300];	/* B0 */
+					cpustate->pgmmap[503] = &cpustate->intRAM[0x380];	/* B0 */
+					cpustate->pgmmap[504] = NULL;
+					cpustate->pgmmap[505] = NULL;
+					cpustate->pgmmap[506] = NULL;
+					cpustate->pgmmap[507] = NULL;
+					cpustate->pgmmap[508] = NULL;
+					cpustate->pgmmap[509] = NULL;
+					cpustate->pgmmap[510] = NULL;
+					cpustate->pgmmap[511] = NULL;
+					break;
 
-		R.STR1 = R.ALU.w.l;
-		R.STR1 |= 0x0180;
-		R.STR0 &= (~ARP_REG);		/* ARB also gets copied to ARP */
-		R.STR0 |= (R.STR1 & ARB_REG);
+		case 02:	SET1(cpustate, CNF1_REG); CLR1(cpustate, CNF0_REG);
+					cpustate->datamap[4] = NULL;
+					cpustate->datamap[5] = NULL;
+					cpustate->datamap[6] = NULL;
+					cpustate->datamap[7] = NULL;
+					cpustate->datamap[8] = NULL;
+					cpustate->datamap[9] = NULL;
+					cpustate->datamap[10] = NULL;
+					cpustate->datamap[11] = NULL;
+					cpustate->datamap[12] = &cpustate->intRAM[0x600];	/* B3 */
+					cpustate->datamap[13] = &cpustate->intRAM[0x680];	/* B3 */
+					cpustate->datamap[14] = &cpustate->intRAM[0x700];	/* B3 */
+					cpustate->datamap[15] = &cpustate->intRAM[0x780];	/* B3 */
+					cpustate->pgmmap[500] = &cpustate->intRAM[0x200];	/* B0 */
+					cpustate->pgmmap[501] = &cpustate->intRAM[0x280];	/* B0 */
+					cpustate->pgmmap[502] = &cpustate->intRAM[0x300];	/* B0 */
+					cpustate->pgmmap[503] = &cpustate->intRAM[0x380];	/* B0 */
+					cpustate->pgmmap[504] = &cpustate->intRAM[0x400];	/* B1 */
+					cpustate->pgmmap[505] = &cpustate->intRAM[0x480];	/* B1 */
+					cpustate->pgmmap[506] = &cpustate->intRAM[0x500];	/* B1 */
+					cpustate->pgmmap[507] = &cpustate->intRAM[0x580];	/* B1 */
+					cpustate->pgmmap[508] = NULL;
+					cpustate->pgmmap[509] = NULL;
+					cpustate->pgmmap[510] = NULL;
+					cpustate->pgmmap[511] = NULL;
+					break;
+
+		case 03:	SET1(cpustate, CNF1_REG); SET1(cpustate, CNF0_REG);
+					cpustate->datamap[4] = NULL;
+					cpustate->datamap[5] = NULL;
+					cpustate->datamap[6] = NULL;
+					cpustate->datamap[7] = NULL;
+					cpustate->datamap[8] = NULL;
+					cpustate->datamap[9] = NULL;
+					cpustate->datamap[10] = NULL;
+					cpustate->datamap[11] = NULL;
+					cpustate->datamap[12] = NULL;
+					cpustate->datamap[13] = NULL;
+					cpustate->datamap[14] = NULL;
+					cpustate->datamap[15] = NULL;
+					cpustate->pgmmap[500] = &cpustate->intRAM[0x200];	/* B0 */
+					cpustate->pgmmap[501] = &cpustate->intRAM[0x280];	/* B0 */
+					cpustate->pgmmap[502] = &cpustate->intRAM[0x300];	/* B0 */
+					cpustate->pgmmap[503] = &cpustate->intRAM[0x380];	/* B0 */
+					cpustate->pgmmap[504] = &cpustate->intRAM[0x400];	/* B1 */
+					cpustate->pgmmap[505] = &cpustate->intRAM[0x480];	/* B1 */
+					cpustate->pgmmap[506] = &cpustate->intRAM[0x500];	/* B1 */
+					cpustate->pgmmap[507] = &cpustate->intRAM[0x580];	/* B1 */
+					cpustate->pgmmap[508] = &cpustate->intRAM[0x600];	/* B3 */
+					cpustate->pgmmap[509] = &cpustate->intRAM[0x680];	/* B3 */
+					cpustate->pgmmap[510] = &cpustate->intRAM[0x700];	/* B3 */
+					cpustate->pgmmap[511] = &cpustate->intRAM[0x780];	/* B3 */
+					break;
+
+		default:	break;
+	}
 }
-static void lt(void)
+static void dint(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		R.Treg = R.ALU.w.l;
+	SET0(cpustate, INTM_FLAG);
 }
-static void lta(void)
+static void dmov(tms32025_state *cpustate)	/** Careful with how memory is configured !! */
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		R.Treg = R.ALU.w.l;
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
+	GETDATA(cpustate, 0, 0);
+	M_WRTRAM(cpustate, (cpustate->memaccess + 1), cpustate->ALU.w.l);
 }
-static void ltd(void)	/** Careful with how memory is configured !! */
+static void eint(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		R.Treg = R.ALU.w.l;
-		M_WRTRAM((memaccess+1),R.ALU.w.l);
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
+	CLR0(cpustate, INTM_FLAG);
 }
-static void ltp(void)
+static void fort(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		R.Treg = R.ALU.w.l;
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d = R.ALU.d;
+	if (cpustate->opcode.b.l & 1) SET1(cpustate, FO_FLAG);
+	else CLR1(cpustate, FO_FLAG);
 }
-static void lts(void)
+static void idle(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		R.Treg = R.ALU.w.l;
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d -= R.ALU.d;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
+	CLR0(cpustate, INTM_FLAG);
+	cpustate->idle = 1;
 }
-static void mac(void)			/** RAM blocks B0,B1,B2 may be important ! */
+static void in(tms32025_state *cpustate)
+{
+	cpustate->ALU.w.l = P_IN( (cpustate->opcode.b.h & 0xf) );
+	PUTDATA(cpustate, cpustate->ALU.w.l);
+}
+static void lac(tms32025_state *cpustate)
+{
+	GETDATA(cpustate, (cpustate->opcode.b.h & 0xf), SXM);
+	cpustate->ACC.d = cpustate->ALU.d;
+}
+static void lack(tms32025_state *cpustate)		/* ZAC is a subset of this instruction */
+{
+	cpustate->ACC.d = (UINT8)cpustate->opcode.b.l;
+}
+static void lact(tms32025_state *cpustate)
+{
+	GETDATA(cpustate, (cpustate->Treg & 0xf), SXM);
+	cpustate->ACC.d = cpustate->ALU.d;
+}
+static void lalk(tms32025_state *cpustate)
+{
+	if (SXM) {
+		cpustate->ALU.d = (INT16)M_RDOP_ARG(cpustate->PC);
+		cpustate->ACC.d = cpustate->ALU.d << (cpustate->opcode.b.h & 0xf);
+	}
+	else {
+		cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
+		cpustate->ACC.d = cpustate->ALU.d << (cpustate->opcode.b.h & 0xf);
+		cpustate->ACC.d &= 0x7fffffff;
+	}
+	cpustate->PC++;
+}
+static void lar_ar0(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[0] = cpustate->ALU.w.l; }
+static void lar_ar1(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[1] = cpustate->ALU.w.l; }
+static void lar_ar2(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[2] = cpustate->ALU.w.l; }
+static void lar_ar3(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[3] = cpustate->ALU.w.l; }
+static void lar_ar4(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[4] = cpustate->ALU.w.l; }
+static void lar_ar5(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[5] = cpustate->ALU.w.l; }
+static void lar_ar6(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[6] = cpustate->ALU.w.l; }
+static void lar_ar7(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[7] = cpustate->ALU.w.l; }
+static void lark_ar0(tms32025_state *cpustate)	{ cpustate->AR[0] = cpustate->opcode.b.l; }
+static void lark_ar1(tms32025_state *cpustate)	{ cpustate->AR[1] = cpustate->opcode.b.l; }
+static void lark_ar2(tms32025_state *cpustate)	{ cpustate->AR[2] = cpustate->opcode.b.l; }
+static void lark_ar3(tms32025_state *cpustate)	{ cpustate->AR[3] = cpustate->opcode.b.l; }
+static void lark_ar4(tms32025_state *cpustate)	{ cpustate->AR[4] = cpustate->opcode.b.l; }
+static void lark_ar5(tms32025_state *cpustate)	{ cpustate->AR[5] = cpustate->opcode.b.l; }
+static void lark_ar6(tms32025_state *cpustate)	{ cpustate->AR[6] = cpustate->opcode.b.l; }
+static void lark_ar7(tms32025_state *cpustate)	{ cpustate->AR[7] = cpustate->opcode.b.l; }
+static void ldp(tms32025_state *cpustate)
+{
+	GETDATA(cpustate, 0, 0);
+	MODIFY_DP(cpustate, cpustate->ALU.d & 0x1ff);
+}
+static void ldpk(tms32025_state *cpustate)
+{
+	MODIFY_DP(cpustate, cpustate->opcode.w.l & 0x1ff);
+}
+static void lph(tms32025_state *cpustate)
+{
+	GETDATA(cpustate, 0, 0);
+	cpustate->Preg.w.h = cpustate->ALU.w.l;
+}
+static void lrlk(tms32025_state *cpustate)
+{
+	cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
+	cpustate->PC++;
+	cpustate->AR[cpustate->opcode.b.h & 7] = cpustate->ALU.w.l;
+}
+static void lst(tms32025_state *cpustate)
+{
+	cpustate->mHackIgnoreARP = 1;
+	GETDATA(cpustate, 0, 0);
+	cpustate->mHackIgnoreARP = 0;
+
+	cpustate->ALU.w.l &= (~INTM_FLAG);
+	cpustate->STR0 &= INTM_FLAG;
+	cpustate->STR0 |= cpustate->ALU.w.l;		/* Must not affect INTM */
+	cpustate->STR0 |= 0x0400;
+}
+static void lst1(tms32025_state *cpustate)
+{
+	cpustate->mHackIgnoreARP = 1;
+	GETDATA(cpustate, 0, 0);
+	cpustate->mHackIgnoreARP = 0;
+
+	cpustate->STR1 = cpustate->ALU.w.l;
+	cpustate->STR1 |= 0x0180;
+	cpustate->STR0 &= (~ARP_REG);		/* ARB also gets copied to ARP */
+	cpustate->STR0 |= (cpustate->STR1 & ARB_REG);
+}
+static void lt(tms32025_state *cpustate)
+{
+	GETDATA(cpustate, 0, 0);
+	cpustate->Treg = cpustate->ALU.w.l;
+}
+static void lta(tms32025_state *cpustate)
+{
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	cpustate->Treg = cpustate->ALU.w.l;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
+}
+static void ltd(tms32025_state *cpustate)	/** Careful with how memory is configured !! */
+{
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	cpustate->Treg = cpustate->ALU.w.l;
+	M_WRTRAM(cpustate, (cpustate->memaccess+1), cpustate->ALU.w.l);
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
+}
+static void ltp(tms32025_state *cpustate)
+{
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	cpustate->Treg = cpustate->ALU.w.l;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d = cpustate->ALU.d;
+}
+static void lts(tms32025_state *cpustate)
+{
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	cpustate->Treg = cpustate->ALU.w.l;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d -= cpustate->ALU.d;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
+}
+static void mac(tms32025_state *cpustate)			/** RAM blocks B0,B1,B2 may be important ! */
 {								/** Fix cycle timing **/
-		oldacc.d = R.ACC.d;
-		if (R.init_load_addr) {
-			R.PFC = M_RDOP_ARG(R.PC);
-			R.PC++;
-		}
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
-		GETDATA(0,0);
-		R.Treg = R.ALU.w.l;
-		R.Preg.d = ( (INT16)R.ALU.w.l * (INT16)M_RDROM(R.PFC) );
-		R.PFC++;
-		R.tms32025_dec_cycles += (2*CLK);
+	cpustate->oldacc.d = cpustate->ACC.d;
+	if (cpustate->init_load_addr) {
+		cpustate->PFC = M_RDOP_ARG(cpustate->PC);
+		cpustate->PC++;
+	}
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
+	GETDATA(cpustate, 0, 0);
+	cpustate->Treg = cpustate->ALU.w.l;
+	cpustate->Preg.d = ( (INT16)cpustate->ALU.w.l * (INT16)M_RDROM(cpustate, cpustate->PFC) );
+	cpustate->PFC++;
+	cpustate->tms32025_dec_cycles += (2*CLK);
 }
-static void macd(void)			/** RAM blocks B0,B1,B2 may be important ! */
-{								/** Fix cycle timing **/
-		oldacc.d = R.ACC.d;
-		if (R.init_load_addr) {
-			R.PFC = M_RDOP_ARG(R.PC);
-			R.PC++;
-		}
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
-		GETDATA(0,0);
-		if ( (R.opcode.b.l & 0x80) || R.init_load_addr ) {	/* No writing during repitition, or DMA mode */
-			M_WRTRAM((memaccess+1),R.ALU.w.l);
-		}
-		R.Treg = R.ALU.w.l;
-		R.Preg.d = ( (INT16)R.ALU.w.l * (INT16)M_RDROM(R.PFC) );
-		R.PFC++;
-		R.tms32025_dec_cycles += (2*CLK);
+static void macd(tms32025_state *cpustate)			/** RAM blocks B0,B1,B2 may be important ! */
+{													/** Fix cycle timing **/
+	cpustate->oldacc.d = cpustate->ACC.d;
+	if (cpustate->init_load_addr) {
+		cpustate->PFC = M_RDOP_ARG(cpustate->PC);
+		cpustate->PC++;
+	}
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
+	GETDATA(cpustate, 0, 0);
+	if ( (cpustate->opcode.b.l & 0x80) || cpustate->init_load_addr ) {	/* No writing during repitition, or DMA mode */
+		M_WRTRAM(cpustate, (cpustate->memaccess+1), cpustate->ALU.w.l);
+	}
+	cpustate->Treg = cpustate->ALU.w.l;
+	cpustate->Preg.d = ( (INT16)cpustate->ALU.w.l * (INT16)M_RDROM(cpustate, cpustate->PFC) );
+	cpustate->PFC++;
+	cpustate->tms32025_dec_cycles += (2*CLK);
 }
-static void mar(void)		/* LARP and NOP are a subset of this instruction */
+static void mar(tms32025_state *cpustate)		/* LARP and NOP are a subset of this instruction */
 {
-		if (R.opcode.b.l & 0x80) MODIFY_AR_ARP();
+	if (cpustate->opcode.b.l & 0x80) MODIFY_AR_ARP(cpustate);
 }
-static void mpy(void)
+static void mpy(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		R.Preg.d = (INT16)(R.ALU.w.l) * (INT16)(R.Treg);
+	GETDATA(cpustate, 0, 0);
+	cpustate->Preg.d = (INT16)(cpustate->ALU.w.l) * (INT16)(cpustate->Treg);
 }
-static void mpya(void)
+static void mpya(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
-		GETDATA(0,0);
-		R.Preg.d = (INT16)(R.ALU.w.l) * (INT16)(R.Treg);
+	cpustate->oldacc.d = cpustate->ACC.d;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
+	GETDATA(cpustate, 0, 0);
+	cpustate->Preg.d = (INT16)(cpustate->ALU.w.l) * (INT16)(cpustate->Treg);
 }
-static void mpyk(void)
+static void mpyk(tms32025_state *cpustate)
 {
-		R.Preg.d = (INT16)R.Treg * ((INT16)(R.opcode.w.l << 3) >> 3);
+	cpustate->Preg.d = (INT16)cpustate->Treg * ((INT16)(cpustate->opcode.w.l << 3) >> 3);
 
 }
-static void mpys(void)
+static void mpys(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d -= R.ALU.d;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
-		GETDATA(0,0);
-		R.Preg.d = (INT16)(R.ALU.w.l) * (INT16)(R.Treg);
+	cpustate->oldacc.d = cpustate->ACC.d;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d -= cpustate->ALU.d;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
+	GETDATA(cpustate, 0, 0);
+	cpustate->Preg.d = (INT16)(cpustate->ALU.w.l) * (INT16)(cpustate->Treg);
 }
-static void mpyu(void)
+static void mpyu(tms32025_state *cpustate)
 {
-		GETDATA(0,0); R.Preg.d = (UINT16)(R.ALU.w.l) * (UINT16)(R.Treg);
+	GETDATA(cpustate, 0, 0);
+	cpustate->Preg.d = (UINT16)(cpustate->ALU.w.l) * (UINT16)(cpustate->Treg);
 }
-static void neg(void)
+static void neg(tms32025_state *cpustate)
 {
-		if (R.ACC.d == 0x80000000) {
-			SET0(OV_FLAG);
-			if (OVM) R.ACC.d = 0x7fffffff;
-		}
-		else R.ACC.d = -R.ACC.d;
-		if (R.ACC.d) CLR0(C_FLAG);
-		else SET0(C_FLAG);
+	if (cpustate->ACC.d == 0x80000000) {
+		SET0(cpustate, OV_FLAG);
+		if (OVM) cpustate->ACC.d = 0x7fffffff;
+	}
+	else cpustate->ACC.d = -cpustate->ACC.d;
+	if (cpustate->ACC.d) CLR0(cpustate, C_FLAG);
+	else SET0(cpustate, C_FLAG);
 }
 /*
-static void nop(void) { }   // NOP is a subset of the MAR instruction
+static void nop(tms32025_state *cpustate) { }   // NOP is a subset of the MAR instruction
 */
-static void norm(void)
+static void norm(tms32025_state *cpustate)
 {
-	UINT32 acc = R.ACC.d;
+	UINT32 acc = cpustate->ACC.d;
 
-	if( acc == 0 || ((acc^(acc<<1))&(1<<31))!=0 )
-	{
-		SET1(TC_FLAG); /* 1 -> TC */
+	if( acc == 0 || ((acc^(acc<<1))&(1<<31))!=0 ) {
+		SET1(cpustate, TC_FLAG); /* 1 -> TC */
 	}
-	else
-	{
-		CLR1(TC_FLAG); /* 0 -> TC */
-		R.ACC.d <<= 1; /* (ACC)*2 -> ACC */
-		MODIFY_AR_ARP();
+	else {
+		CLR1(cpustate, TC_FLAG); /* 0 -> TC */
+		cpustate->ACC.d <<= 1; /* (ACC)*2 -> ACC */
+		MODIFY_AR_ARP(cpustate);
 	}
 }
-static void or(void)
+static void or(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		R.ACC.w.l |= R.ALU.w.l;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.w.l |= cpustate->ALU.w.l;
 }
-static void ork(void)
+static void ork(tms32025_state *cpustate)
 {
-		R.ALU.d = (UINT16)M_RDOP_ARG(R.PC);
-		R.PC++;
-		R.ALU.d <<= (R.opcode.b.h & 0xf);
-		R.ACC.d |=  (R.ALU.d & 0x7fffffff);
+	cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
+	cpustate->PC++;
+	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
+	cpustate->ACC.d |=  (cpustate->ALU.d & 0x7fffffff);
 }
-static void out(void)
+static void out(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		P_OUT( (R.opcode.b.h & 0xf), R.ALU.w.l );
+	GETDATA(cpustate, 0, 0);
+	P_OUT( (cpustate->opcode.b.h & 0xf), cpustate->ALU.w.l );
 }
-static void pac(void)
+static void pac(tms32025_state *cpustate)
 {
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d = R.ALU.d;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d = cpustate->ALU.d;
 }
-static void pop(void)
+static void pop(tms32025_state *cpustate)
 {
-		R.ACC.d = (UINT16)POP_STACK();
+	cpustate->ACC.d = (UINT16)POP_STACK(cpustate);
 }
-static void popd(void)
+static void popd(tms32025_state *cpustate)
 {
-		R.ALU.d = (UINT16)POP_STACK();
-		PUTDATA(R.ALU.w.l);
+	cpustate->ALU.d = (UINT16)POP_STACK(cpustate);
+	PUTDATA(cpustate, cpustate->ALU.w.l);
 }
-static void pshd(void)
+static void pshd(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		PUSH_STACK(R.ALU.w.l);
+	GETDATA(cpustate, 0, 0);
+	PUSH_STACK(cpustate, cpustate->ALU.w.l);
 }
-static void push(void)
+static void push(tms32025_state *cpustate)
 {
-		PUSH_STACK(R.ACC.w.l);
+	PUSH_STACK(cpustate, cpustate->ACC.w.l);
 }
-static void rc(void)
+static void rc(tms32025_state *cpustate)
 {
-		CLR1(C_FLAG);
+	CLR1(cpustate, C_FLAG);
 }
-static void ret(void)
+static void ret(tms32025_state *cpustate)
 {
-		SET_PC(POP_STACK());
+	SET_PC(POP_STACK(cpustate));
 }
-static void rfsm(void)				/** serial port mode */
+static void rfsm(tms32025_state *cpustate)				/** serial port mode */
 {
-		CLR1(FSM_FLAG);
+	CLR1(cpustate, FSM_FLAG);
 }
-static void rhm(void)
+static void rhm(tms32025_state *cpustate)
 {
-		CLR1(HM_FLAG);
+	CLR1(cpustate, HM_FLAG);
 }
-static void rol(void)
+static void rol(tms32025_state *cpustate)
 {
-		R.ALU.d = R.ACC.d;
-		R.ACC.d <<= 1;
-		if (CARRY) R.ACC.d |= 1;
-		if (R.ALU.d & 0x80000000) SET1(C_FLAG);
-		else CLR1(C_FLAG);
+	cpustate->ALU.d = cpustate->ACC.d;
+	cpustate->ACC.d <<= 1;
+	if (CARRY) cpustate->ACC.d |= 1;
+	if (cpustate->ALU.d & 0x80000000) SET1(cpustate, C_FLAG);
+	else CLR1(cpustate, C_FLAG);
 }
-static void ror(void)
+static void ror(tms32025_state *cpustate)
 {
-		R.ALU.d = R.ACC.d;
-		R.ACC.d >>= 1;
-		if (CARRY) R.ACC.d |= 0x80000000;
-		if (R.ALU.d & 1) SET1(C_FLAG);
-		else CLR1(C_FLAG);
+	cpustate->ALU.d = cpustate->ACC.d;
+	cpustate->ACC.d >>= 1;
+	if (CARRY) cpustate->ACC.d |= 0x80000000;
+	if (cpustate->ALU.d & 1) SET1(cpustate, C_FLAG);
+	else CLR1(cpustate, C_FLAG);
 }
-static void rovm(void)
+static void rovm(tms32025_state *cpustate)
 {
-		CLR0(OVM_FLAG);
+	CLR0(cpustate, OVM_FLAG);
 }
-static void rpt(void)
+static void rpt(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		R.RPTC = R.ALU.b.l;
-		R.init_load_addr = 2;		/* Initiate repeat mode */
+	GETDATA(cpustate, 0, 0);
+	cpustate->RPTC = cpustate->ALU.b.l;
+	cpustate->init_load_addr = 2;		/* Initiate repeat mode */
 }
-static void rptk(void)
+static void rptk(tms32025_state *cpustate)
 {
-		R.RPTC = R.opcode.b.l;
-		R.init_load_addr = 2;		/* Initiate repeat mode */
+	cpustate->RPTC = cpustate->opcode.b.l;
+	cpustate->init_load_addr = 2;		/* Initiate repeat mode */
 }
-static void rsxm(void)
+static void rsxm(tms32025_state *cpustate)
 {
-		CLR1(SXM_FLAG);
+	CLR1(cpustate, SXM_FLAG);
 }
-static void rtc(void)
+static void rtc(tms32025_state *cpustate)
 {
-		CLR1(TC_FLAG);
+	CLR1(cpustate, TC_FLAG);
 }
-static void rtxm(void)				/** serial port stuff */
+static void rtxm(tms32025_state *cpustate)	/** Serial port stuff */
 {
-		CLR1(TXM_FLAG);
+	CLR1(cpustate, TXM_FLAG);
 }
-static void rxf(void)
+static void rxf(tms32025_state *cpustate)
 {
-		CLR1(XF_FLAG);
-		S_OUT(TMS32025_XF,CLEAR_LINE);
+	CLR1(cpustate, XF_FLAG);
+	S_OUT(TMS32025_XF,CLEAR_LINE);
 }
-static void sach(void)
+static void sach(tms32025_state *cpustate)
 {
-		R.ALU.d = (R.ACC.d << (R.opcode.b.h & 7));
-		PUTDATA(R.ALU.w.h);
+	cpustate->ALU.d = (cpustate->ACC.d << (cpustate->opcode.b.h & 7));
+	PUTDATA(cpustate, cpustate->ALU.w.h);
 }
-static void sacl(void)
+static void sacl(tms32025_state *cpustate)
 {
-		R.ALU.d = (R.ACC.d << (R.opcode.b.h & 7));
-		PUTDATA(R.ALU.w.l);
+	cpustate->ALU.d = (cpustate->ACC.d << (cpustate->opcode.b.h & 7));
+	PUTDATA(cpustate, cpustate->ALU.w.l);
 }
-static void sar_ar0(void)	{ PUTDATA(R.AR[0]); }
-static void sar_ar1(void)	{ PUTDATA(R.AR[1]); }
-static void sar_ar2(void)	{ PUTDATA(R.AR[2]); }
-static void sar_ar3(void)	{ PUTDATA(R.AR[3]); }
-static void sar_ar4(void)	{ PUTDATA(R.AR[4]); }
-static void sar_ar5(void)	{ PUTDATA(R.AR[5]); }
-static void sar_ar6(void)	{ PUTDATA(R.AR[6]); }
-static void sar_ar7(void)	{ PUTDATA(R.AR[7]); }
+static void sar_ar0(tms32025_state *cpustate)	{ PUTDATA(cpustate, cpustate->AR[0]); }
+static void sar_ar1(tms32025_state *cpustate)	{ PUTDATA(cpustate, cpustate->AR[1]); }
+static void sar_ar2(tms32025_state *cpustate)	{ PUTDATA(cpustate, cpustate->AR[2]); }
+static void sar_ar3(tms32025_state *cpustate)	{ PUTDATA(cpustate, cpustate->AR[3]); }
+static void sar_ar4(tms32025_state *cpustate)	{ PUTDATA(cpustate, cpustate->AR[4]); }
+static void sar_ar5(tms32025_state *cpustate)	{ PUTDATA(cpustate, cpustate->AR[5]); }
+static void sar_ar6(tms32025_state *cpustate)	{ PUTDATA(cpustate, cpustate->AR[6]); }
+static void sar_ar7(tms32025_state *cpustate)	{ PUTDATA(cpustate, cpustate->AR[7]); }
 
-static void sblk(void)
+static void sblk(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		if (SXM) R.ALU.d =  (INT16)M_RDOP_ARG(R.PC);
-		else     R.ALU.d = (UINT16)M_RDOP_ARG(R.PC);
-		R.PC++;
-		R.ALU.d <<= (R.opcode.b.h & 0xf);
-		R.ACC.d -= R.ALU.d;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	if (SXM) cpustate->ALU.d =  (INT16)M_RDOP_ARG(cpustate->PC);
+	else     cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
+	cpustate->PC++;
+	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
+	cpustate->ACC.d -= cpustate->ALU.d;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
 }
-static void tms_sbrk(void)
+static void sbrk_tms(tms32025_state *cpustate)
 {
-		R.AR[ARP] -= R.opcode.b.l;
+	cpustate->AR[ARP] -= cpustate->opcode.b.l;
 }
-static void sc(void)
+static void sc(tms32025_state *cpustate)
 {
-		SET1(C_FLAG);
+	SET1(cpustate, C_FLAG);
 }
-static void sfl(void)
+static void sfl(tms32025_state *cpustate)
 {
-		R.ALU.d = R.ACC.d;
-		R.ACC.d <<= 1;
-		if (R.ALU.d & 0x80000000) SET1(C_FLAG);
-		else CLR1(C_FLAG);
+	cpustate->ALU.d = cpustate->ACC.d;
+	cpustate->ACC.d <<= 1;
+	if (cpustate->ALU.d & 0x80000000) SET1(cpustate, C_FLAG);
+	else CLR1(cpustate, C_FLAG);
 }
-static void sfr(void)
+static void sfr(tms32025_state *cpustate)
 {
-		R.ALU.d = R.ACC.d;
-		R.ACC.d >>= 1;
-		if (SXM) {
-			if (R.ALU.d & 0x80000000) R.ACC.d |= 0x80000000;
-		}
-		if (R.ALU.d & 1) SET1(C_FLAG);
-		else CLR1(C_FLAG);
+	cpustate->ALU.d = cpustate->ACC.d;
+	cpustate->ACC.d >>= 1;
+	if (SXM) {
+		if (cpustate->ALU.d & 0x80000000) cpustate->ACC.d |= 0x80000000;
+	}
+	if (cpustate->ALU.d & 1) SET1(cpustate, C_FLAG);
+	else CLR1(cpustate, C_FLAG);
 }
-static void sfsm(void)				/** serial port mode */
+static void sfsm(tms32025_state *cpustate)	/** Serial port mode */
 {
-		SET1(FSM_FLAG);
+	SET1(cpustate, FSM_FLAG);
 }
-static void shm(void)
+static void shm(tms32025_state *cpustate)
 {
-		SET1(HM_FLAG);
+	SET1(cpustate, HM_FLAG);
 }
-static void sovm(void)
+static void sovm(tms32025_state *cpustate)
 {
-		SET0(OVM_FLAG);
+	SET0(cpustate, OVM_FLAG);
 }
-static void spac(void)
+static void spac(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d -= R.ALU.d;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d -= cpustate->ALU.d;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
 }
-static void sph(void)
+static void sph(tms32025_state *cpustate)
 {
-		SHIFT_Preg_TO_ALU();
-		PUTDATA(R.ALU.w.h);
+	SHIFT_Preg_TO_ALU(cpustate);
+	PUTDATA(cpustate, cpustate->ALU.w.h);
 }
-static void spl(void)
+static void spl(tms32025_state *cpustate)
 {
-		SHIFT_Preg_TO_ALU();
-		PUTDATA(R.ALU.w.l);
+	SHIFT_Preg_TO_ALU(cpustate);
+	PUTDATA(cpustate, cpustate->ALU.w.l);
 }
-static void spm(void)
+static void spm(tms32025_state *cpustate)
 {
-		MODIFY_PM( (R.opcode.b.l & 3) );
+	MODIFY_PM(cpustate, (cpustate->opcode.b.l & 3) );
 }
-static void sqra(void)
+static void sqra(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d += R.ALU.d;
-		CALCULATE_ADD_OVERFLOW(R.ALU.d);
-		CALCULATE_ADD_CARRY();
-		GETDATA(0,0);
-		R.Treg = R.ALU.w.l;
-		R.Preg.d = ((INT16)R.ALU.w.l * (INT16)R.ALU.w.l);
+	cpustate->oldacc.d = cpustate->ACC.d;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d += cpustate->ALU.d;
+	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_ADD_CARRY(cpustate);
+	GETDATA(cpustate, 0, 0);
+	cpustate->Treg = cpustate->ALU.w.l;
+	cpustate->Preg.d = ((INT16)cpustate->ALU.w.l * (INT16)cpustate->ALU.w.l);
 }
-static void sqrs(void)
+static void sqrs(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		SHIFT_Preg_TO_ALU();
-		R.ACC.d -= R.ALU.d;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
-		GETDATA(0,0);
-		R.Treg = R.ALU.w.l;
-		R.Preg.d = ((INT16)R.ALU.w.l * (INT16)R.ALU.w.l);
+	cpustate->oldacc.d = cpustate->ACC.d;
+	SHIFT_Preg_TO_ALU(cpustate);
+	cpustate->ACC.d -= cpustate->ALU.d;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
+	GETDATA(cpustate, 0, 0);
+	cpustate->Treg = cpustate->ALU.w.l;
+	cpustate->Preg.d = ((INT16)cpustate->ALU.w.l * (INT16)cpustate->ALU.w.l);
 }
-static void sst(void)
+static void sst(tms32025_state *cpustate)
 {
-		PUTDATA_SST(R.STR0);
+	PUTDATA_SST(cpustate, cpustate->STR0);
 }
-static void sst1(void)
+static void sst1(tms32025_state *cpustate)
 {
-		PUTDATA_SST(R.STR1);
+	PUTDATA_SST(cpustate, cpustate->STR1);
 }
-static void ssxm(void)
-{		/** Check instruction description, and make sure right instructions use SXM */
-		SET1(SXM_FLAG);
+static void ssxm(tms32025_state *cpustate)
+{	/** Check instruction description, and make sure right instructions use SXM */
+	SET1(cpustate, SXM_FLAG);
 }
-static void stc(void)
+static void stc(tms32025_state *cpustate)
 {
-		SET1(TC_FLAG);
+	SET1(cpustate, TC_FLAG);
 }
-static void stxm(void)				/** serial port stuff */
+static void stxm(tms32025_state *cpustate)		/** Serial port stuff */
 {
-		SET1(TXM_FLAG);
+	SET1(cpustate, TXM_FLAG);
 }
-static void sub(void)
+static void sub(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA((R.opcode.b.h & 0xf),SXM);
-		R.ACC.d -= R.ALU.d;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, (cpustate->opcode.b.h & 0xf), SXM);
+	cpustate->ACC.d -= cpustate->ALU.d;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
 }
-static void subb(void)
+static void subb(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		if (CARRY == 0) R.ALU.d--;
-		R.ACC.d -= R.ALU.d;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	if (CARRY == 0) cpustate->ALU.d--;
+	cpustate->ACC.d -= cpustate->ALU.d;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
 }
 
 
-static void subc(void)
+static void subc(tms32025_state *cpustate)
 {
 	/**
-     * conditional subtraction, which may be used for division
-     * execute 16 times for 16-bit division
-     *
-     * input:   32 bit numerator in accumulator
-     *          16 bit denominator in data memory
-     *
-     * output:  remainder in upper 16 bits
-     *          quotient in lower 16 bits
-     */
-	GETDATA(15,SXM);
-	if( R.ACC.d >= R.ALU.d )
-	{
-		R.ACC.d = (R.ACC.d - R.ALU.d)*2+1;
+	* conditional subtraction, which may be used for division
+	* execute 16 times for 16-bit division
+	*
+	* input:   32 bit numerator in accumulator
+	*          16 bit denominator in data memory
+	*
+	* output:  remainder in upper 16 bits
+	*          quotient in lower 16 bits
+	*/
+	GETDATA(cpustate, 15, SXM);
+	if( cpustate->ACC.d >= cpustate->ALU.d ) {
+		cpustate->ACC.d = (cpustate->ACC.d - cpustate->ALU.d)*2+1;
 	}
-	else
-	{
-		R.ACC.d = R.ACC.d*2;
+	else {
+		cpustate->ACC.d = cpustate->ACC.d*2;
 	}
 // Stroff: HACK! support for overflow capping as implemented results in bad DSP floating point math in many
 // System22 games - for example, the score display in Prop Cycle.
-//  R.ACC.d = ((INT32)oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
+//  cpustate->ACC.d = ((INT32)cpustate->oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 
-//      if ((INT32)((oldacc.d ^ subval ) & (oldacc.d ^ R.ALU.d)) < 0)
-//      {
-//          SET0(OV_FLAG);
-//      }
-//      CALCULATE_SUB_CARRY();
+//	if ((INT32)((cpustate->oldacc.d ^ subval ) & (cpustate->oldacc.d ^ cpustate->ALU.d)) < 0) {
+//		SET0(cpustate, OV_FLAG);
+//	}
+//	CALCULATE_SUB_CARRY(cpustate);
 }
 
-static void subh(void)
+static void subh(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		R.ACC.w.h -= R.ALU.w.l;
-		if ((INT16)((oldacc.w.h ^ R.ALU.w.l) & (oldacc.w.h ^ R.ACC.w.h)) < 0) {
-			SET0(OV_FLAG);
-			if (OVM)
-				R.ACC.w.h = ((INT16)oldacc.w.h < 0) ? 0x8000 : 0x7fff;
-		}
-		if ( ((INT16)(oldacc.w.h) >= 0) && ((INT16)(R.ACC.w.h) < 0) ) {
-			CLR1(C_FLAG);
-		}
-		/* Carry flag is not affected, if no borrow occured */
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.w.h -= cpustate->ALU.w.l;
+	if ((INT16)((cpustate->oldacc.w.h ^ cpustate->ALU.w.l) & (cpustate->oldacc.w.h ^ cpustate->ACC.w.h)) < 0) {
+		SET0(cpustate, OV_FLAG);
+		if (OVM)
+			cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+	}
+	if ( ((INT16)(cpustate->oldacc.w.h) >= 0) && ((INT16)(cpustate->ACC.w.h) < 0) ) {
+		CLR1(cpustate, C_FLAG);
+	}
+	/* Carry flag is not affected, if no borrow occured */
 }
-static void subk(void)
+static void subk(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		R.ALU.d = (UINT8)R.opcode.b.l;
-		R.ACC.d -= R.ALU.b.l;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	cpustate->ALU.d = (UINT8)cpustate->opcode.b.l;
+	cpustate->ACC.d -= cpustate->ALU.b.l;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
 }
-static void subs(void)
+static void subs(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA(0,0);
-		R.ACC.d -= R.ALU.w.l;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.d -= cpustate->ALU.w.l;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
 }
-static void subt(void)
+static void subt(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		GETDATA((R.Treg & 0xf),SXM);
-		R.ACC.d -= R.ALU.d;
-		CALCULATE_SUB_OVERFLOW(R.ALU.d);
-		CALCULATE_SUB_CARRY();
+	cpustate->oldacc.d = cpustate->ACC.d;
+	GETDATA(cpustate, (cpustate->Treg & 0xf), SXM);
+	cpustate->ACC.d -= cpustate->ALU.d;
+	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
+	CALCULATE_SUB_CARRY(cpustate);
 }
-static void sxf(void)
+static void sxf(tms32025_state *cpustate)
 {
-		SET1(XF_FLAG);
-		S_OUT(TMS32025_XF,ASSERT_LINE);
+	SET1(cpustate, XF_FLAG);
+	S_OUT(TMS32025_XF,ASSERT_LINE);
 }
-static void tblr(void)
+static void tblr(tms32025_state *cpustate)
 {
-		if (R.init_load_addr)
-		{
-			R.PFC = R.ACC.w.l;
-		}
-		R.ALU.w.l = M_RDROM(R.PFC);
-		if ( (CNF0) && ( (UINT16)(R.PFC) >= 0xff00 ) ) {}	/** TMS32025 only */
-		else R.tms32025_dec_cycles += (1*CLK);
-		PUTDATA(R.ALU.w.l);
-		R.PFC++;
+	if (cpustate->init_load_addr) {
+		cpustate->PFC = cpustate->ACC.w.l;
+	}
+	cpustate->ALU.w.l = M_RDROM(cpustate, cpustate->PFC);
+	if ( (CNF0) && ( (UINT16)(cpustate->PFC) >= 0xff00 ) ) {}	/** TMS32025 only */
+	else cpustate->tms32025_dec_cycles += (1*CLK);
+	PUTDATA(cpustate, cpustate->ALU.w.l);
+	cpustate->PFC++;
 }
-static void tblw(void)
+static void tblw(tms32025_state *cpustate)
 {
-		if (R.init_load_addr)
-		{
-			R.PFC = R.ACC.w.l;
-		}
-		R.tms32025_dec_cycles += (1*CLK);
-		GETDATA(0,0);
-		if (R.external_mem_access) R.tms32025_dec_cycles += (1*CLK);
-		M_WRTROM(R.PFC, R.ALU.w.l);
-		R.PFC++;
+	if (cpustate->init_load_addr) {
+		cpustate->PFC = cpustate->ACC.w.l;
+	}
+	cpustate->tms32025_dec_cycles += (1*CLK);
+	GETDATA(cpustate, 0, 0);
+	if (cpustate->external_mem_access) cpustate->tms32025_dec_cycles += (1*CLK);
+	M_WRTROM(cpustate, cpustate->PFC, cpustate->ALU.w.l);
+	cpustate->PFC++;
 }
-static void trap(void)
+static void trap(tms32025_state *cpustate)
 {
-		PUSH_STACK(R.PC);
-		SET_PC(0x001E);		/* Trap vector */
+	PUSH_STACK(cpustate, cpustate->PC);
+	SET_PC(0x001E);		/* Trap vector */
 }
-static void xor(void)
+static void xor(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		R.ACC.w.l ^= R.ALU.w.l;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.w.l ^= cpustate->ALU.w.l;
 }
-static void xork(void)
+static void xork(tms32025_state *cpustate)
 {
-		oldacc.d = R.ACC.d;
-		R.ALU.d = M_RDOP_ARG(R.PC);
-		R.PC++;
-		R.ALU.d <<= (R.opcode.b.h & 0xf);
-		R.ACC.d ^= R.ALU.d;
-		R.ACC.d |= (oldacc.d & 0x80000000);
+	cpustate->oldacc.d = cpustate->ACC.d;
+	cpustate->ALU.d = M_RDOP_ARG(cpustate->PC);
+	cpustate->PC++;
+	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
+	cpustate->ACC.d ^= cpustate->ALU.d;
+	cpustate->ACC.d |= (cpustate->oldacc.d & 0x80000000);
 }
-static void zalh(void)
+static void zalh(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		R.ACC.w.h = R.ALU.w.l;
-		R.ACC.w.l = 0x0000;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.w.h = cpustate->ALU.w.l;
+	cpustate->ACC.w.l = 0x0000;
 }
-static void zalr(void)
+static void zalr(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		R.ACC.w.h = R.ALU.w.l;
-		R.ACC.w.l = 0x8000;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.w.h = cpustate->ALU.w.l;
+	cpustate->ACC.w.l = 0x8000;
 }
-static void zals(void)
+static void zals(tms32025_state *cpustate)
 {
-		GETDATA(0,0);
-		R.ACC.w.l = R.ALU.w.l;
-		R.ACC.w.h = 0x0000;
+	GETDATA(cpustate, 0, 0);
+	cpustate->ACC.w.l = cpustate->ALU.w.l;
+	cpustate->ACC.w.h = 0x0000;
 }
 
 
 /***********************************************************************
- *  Cycle Timings
+ *  Opcode Table (Cycles, Instruction)
  ***********************************************************************/
 
-static const unsigned cycles_main[256]=
+static const tms32025_opcode opcode_main[256]=
 {
-/*00*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*08*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*10*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*18*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*20*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*28*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*30*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*38*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*40*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*48*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*50*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*58*/		3*CLK, 2*CLK, 1*CLK, 1*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*60*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*68*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*70*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*78*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*80*/		2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*88*/		2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*90*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*98*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*A0*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*A8*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*B0*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*B8*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*C0*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*C8*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*D0*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 0*CLK,
-/*D8*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*E0*/		2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*E8*/		2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*F0*/		2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK,
-/*F8*/		2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK
+/*00*/ {1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},
+/*08*/ {1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},{1*CLK, add		},
+/*10*/ {1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},
+/*18*/ {1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},{1*CLK, sub		},
+/*20*/ {1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},
+/*28*/ {1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},{1*CLK, lac		},
+/*30*/ {1*CLK, lar_ar0	},{1*CLK, lar_ar1	},{1*CLK, lar_ar2	},{1*CLK, lar_ar3	},{1*CLK, lar_ar4	},{1*CLK, lar_ar5	},{1*CLK, lar_ar6	},{1*CLK, lar_ar7	},
+/*38*/ {1*CLK, mpy		},{1*CLK, sqra		},{1*CLK, mpya		},{1*CLK, mpys		},{1*CLK, lt		},{1*CLK, lta		},{1*CLK, ltp		},{1*CLK, ltd		},
+/*40*/ {1*CLK, zalh		},{1*CLK, zals		},{1*CLK, lact		},{1*CLK, addc		},{1*CLK, subh		},{1*CLK, subs		},{1*CLK, subt		},{1*CLK, subc		},
+/*48*/ {1*CLK, addh		},{1*CLK, adds		},{1*CLK, addt		},{1*CLK, rpt		},{1*CLK, xor		},{1*CLK, or		},{1*CLK, and		},{1*CLK, subb		},
+/*50*/ {1*CLK, lst		},{1*CLK, lst1		},{1*CLK, ldp		},{1*CLK, lph		},{1*CLK, pshd		},{1*CLK, mar		},{1*CLK, dmov		},{1*CLK, bitt		},
+/*58*/ {3*CLK, tblr		},{2*CLK, tblw		},{1*CLK, sqrs		},{1*CLK, lts		},{2*CLK, macd		},{2*CLK, mac		},{2*CLK, bc		},{2*CLK, bnc		},
+/*60*/ {1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},
+/*68*/ {1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},
+/*70*/ {1*CLK, sar_ar0	},{1*CLK, sar_ar1	},{1*CLK, sar_ar2	},{1*CLK, sar_ar3	},{1*CLK, sar_ar4	},{1*CLK, sar_ar5	},{1*CLK, sar_ar6	},{1*CLK, sar_ar7	},
+/*78*/ {1*CLK, sst		},{1*CLK, sst1		},{1*CLK, popd		},{1*CLK, zalr		},{1*CLK, spl		},{1*CLK, sph		},{1*CLK, adrk		},{1*CLK, sbrk_tms	},
+/*80*/ {2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},
+/*88*/ {2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},
+/*90*/ {1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},
+/*98*/ {1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},
+/*A0*/ {1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},
+/*A8*/ {1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},
+/*B0*/ {1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},
+/*B8*/ {1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},{1*CLK, mpyk		},
+/*C0*/ {1*CLK, lark_ar0	},{1*CLK, lark_ar1	},{1*CLK, lark_ar2	},{1*CLK, lark_ar3	},{1*CLK, lark_ar4	},{1*CLK, lark_ar5	},{1*CLK, lark_ar6	},{1*CLK, lark_ar7	},
+/*C8*/ {1*CLK, ldpk		},{1*CLK, ldpk		},{1*CLK, lack		},{1*CLK, rptk		},{1*CLK, addk		},{1*CLK, subk		},{1*CLK, opcodes_CE},{1*CLK, mpyu		},
+/*D0*/ {1*CLK,opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{0*CLK, opcodes_Dx},
+/*D8*/ {1*CLK,opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},{1*CLK, opcodes_Dx},
+/*E0*/ {2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},
+/*E8*/ {2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},{2*CLK, out		},
+/*F0*/ {2*CLK, bv		},{2*CLK, bgz		},{2*CLK, blez		},{2*CLK, blz		},{2*CLK, bgez		},{2*CLK, bnz		},{2*CLK, bz		},{2*CLK, bnv		},
+/*F8*/ {2*CLK, bbz		},{2*CLK, bbnz		},{2*CLK, bioz		},{2*CLK, banz		},{2*CLK, blkp		},{2*CLK, blkd		},{2*CLK, call		},{2*CLK, br		}
 };
 
-static const unsigned cycles_DX_subset[8]=
+static const tms32025_opcode_CE opcode_CE_subset[256]=	/* Instructions living under the CExx opcode */
 {
-/*00*/		2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 0
+/*00*/ {1*CLK, eint		},{1*CLK, dint		},{1*CLK, rovm		},{1*CLK, sovm		},{1*CLK, cnfd		},{1*CLK, cnfp		},{1*CLK, rsxm		},{1*CLK, ssxm		},
+/*08*/ {1*CLK, spm		},{1*CLK, spm		},{1*CLK, spm		},{1*CLK, spm		},{1*CLK, rxf		},{1*CLK, sxf		},{1*CLK, fort		},{1*CLK, fort		},
+/*10*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, pac		},{1*CLK, apac		},{1*CLK, spac		},{0*CLK, illegal	},
+/*18*/ {1*CLK, sfl		},{1*CLK, sfr		},{0*CLK, illegal	},{1*CLK, abst		},{1*CLK, push		},{1*CLK, pop		},{2*CLK, trap		},{3*CLK, idle		},
+/*20*/ {1*CLK, rtxm		},{1*CLK, stxm		},{0*CLK, illegal	},{1*CLK, neg		},{2*CLK, cala		},{2*CLK, bacc		},{2*CLK, ret		},{1*CLK, cmpl		},
+/*28*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*30*/ {1*CLK, rc		},{1*CLK, sc		},{1*CLK, rtc		},{1*CLK, stc		},{1*CLK, rol		},{1*CLK, ror		},{1*CLK, rfsm		},{1*CLK, sfsm		},
+/*38*/ {1*CLK, rhm		},{1*CLK, shm		},{0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, conf		},{1*CLK, conf		},{1*CLK, conf		},{1*CLK, conf		},
+/*40*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*48*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*50*/ {1*CLK, cmpr		},{1*CLK, cmpr		},{1*CLK, cmpr		},{1*CLK, cmpr		},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*58*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*60*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*68*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*70*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*78*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*80*/ {0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, norm		},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*88*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*90*/ {0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, norm		},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*98*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*A0*/ {0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, norm		},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*A8*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*B0*/ {0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, norm		},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*B8*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*C0*/ {0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, norm		},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*C8*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*D0*/ {0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, norm		},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*D8*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*E0*/ {0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, norm		},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*E8*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*F0*/ {0*CLK, illegal	},{0*CLK, illegal	},{1*CLK, norm		},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},
+/*F8*/ {0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	},{0*CLK, illegal	}
 };
 
-static const unsigned cycles_CE_subset[256]=
+static const tms32025_opcode_Dx opcode_Dx_subset[8]=	/* Instructions living under the Dxxx opcode */
 {
-/*00*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*08*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*10*/		0*CLK, 0*CLK, 0*CLK, 0*CLK, 1*CLK, 1*CLK, 1*CLK, 0*CLK,
-/*18*/		1*CLK, 1*CLK, 0*CLK, 1*CLK, 1*CLK, 1*CLK, 2*CLK, 3*CLK,
-/*20*/		1*CLK, 1*CLK, 0*CLK, 1*CLK, 2*CLK, 2*CLK, 2*CLK, 1*CLK,
-/*28*/		0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*30*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*38*/		1*CLK, 1*CLK, 0*CLK, 0*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
-/*40*/		0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*48*/		0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*50*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*58*/		0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*60*/		0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*68*/		0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*70*/		0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*78*/		0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*80*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*88*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*90*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*98*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*A0*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*A8*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*B0*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*B8*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*C0*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*C8*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*D0*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*D8*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*E0*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*E8*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*F0*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK,
-/*F8*/		0*CLK, 0*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK
-};
-
-
-/***********************************************************************
- *  Opcode Table
- ***********************************************************************/
-
-static const opcode_fn opcode_main[256]=
-{
-/*00*/ add,			add,		add,		add,		add,		add,		add,		add,
-/*08*/ add,			add,		add,		add,		add,		add,		add,		add,
-/*10*/ sub,			sub,		sub,		sub,		sub,		sub,		sub,		sub,
-/*18*/ sub,			sub,		sub,		sub,		sub,		sub,		sub,		sub,
-/*20*/ lac,			lac,		lac,		lac,		lac,		lac,		lac,		lac,
-/*28*/ lac,			lac,		lac,		lac,		lac,		lac,		lac,		lac,
-/*30*/ lar_ar0,		lar_ar1,	lar_ar2,	lar_ar3,	lar_ar4,	lar_ar5,	lar_ar6,	lar_ar7,
-/*38*/ mpy,			sqra,		mpya,		mpys,		lt,			lta,		ltp,		ltd,
-/*40*/ zalh,		zals,		lact,		addc,		subh,		subs,		subt,		subc,
-/*48*/ addh,		adds,		addt,		rpt,		xor,		or,			and,		subb,
-/*50*/ lst,			lst1,		ldp,		lph,		pshd,		mar,		dmov,		bitt,
-/*58*/ tblr,		tblw,		sqrs,		lts,		macd,		mac,		bc,			bnc,
-/*60*/ sacl,		sacl,		sacl,		sacl,		sacl,		sacl,		sacl,		sacl,
-/*68*/ sach,		sach,		sach,		sach,		sach,		sach,		sach,		sach,
-/*70*/ sar_ar0,		sar_ar1,	sar_ar2,	sar_ar3,	sar_ar4,	sar_ar5,	sar_ar6,	sar_ar7,
-/*78*/ sst,			sst1,		popd,		zalr,		spl,		sph,		adrk,		tms_sbrk,
-/*80*/ in,			in,			in,			in,			in,			in,			in,			in,
-/*88*/ in,			in,			in,			in,			in,			in,			in,			in,
-/*90*/ bit,			bit,		bit,		bit,		bit,		bit,		bit,		bit,
-/*98*/ bit,			bit,		bit,		bit,		bit,		bit,		bit,		bit,
-/*A0*/ mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,
-/*A8*/ mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,
-/*B0*/ mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,
-/*B8*/ mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,		mpyk,
-/*C0*/ lark_ar0,	lark_ar1,	lark_ar2,	lark_ar3,	lark_ar4,	lark_ar5,	lark_ar6,	lark_ar7,
-/*C8*/ ldpk,		ldpk,		lack,		rptk,		addk,		subk,		opcodes_CE,	mpyu,
-/*D0*/ opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,
-/*D8*/ opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,	opcodes_DX,
-/*E0*/ out,			out,		out,		out,		out,		out,		out,		out,
-/*E8*/ out,			out,		out,		out,		out,		out,		out,		out,
-/*F0*/ bv,			bgz,		blez,		blz,		bgez,		bnz,		bz,			bnv,
-/*F8*/ bbz,			bbnz,		bioz,		banz,		blkp,		blkd,		call,		br
-};
-
-static const opcode_fn opcode_DX_subset[8]=	/* Instructions living under the Dxxx opcode */
-{
-/*00*/ lrlk,		lalk,		adlk,		sblk,		andk,		ork,		xork,		illegal
-};
-
-static const opcode_fn opcode_CE_subset[256]=
-{
-/*00*/ eint,		dint,		rovm,		sovm,		cnfd,		cnfp,		rsxm,		ssxm,
-/*08*/ spm,			spm,		spm,		spm,		rxf,		sxf,		fort,		fort,
-/*10*/ illegal,		illegal,	illegal,	illegal,	pac,		apac,		spac,		illegal,
-/*18*/ sfl,			sfr,		illegal,	abst,		push,		pop,		trap,		idle,
-/*20*/ rtxm,		stxm,		illegal,	neg,		cala,		bacc,		ret,		cmpl,
-/*28*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*30*/ rc,			sc,			rtc,		stc,		rol,		ror,		rfsm,		sfsm,
-/*38*/ rhm,			shm,		illegal,	illegal,	conf,		conf,		conf,		conf,
-/*40*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*48*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*50*/ cmpr,		cmpr,		cmpr,		cmpr,		illegal,	illegal,	illegal,	illegal,
-/*58*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*60*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*68*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*70*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*78*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*80*/ illegal,		illegal,	norm,		illegal,	illegal,	illegal,	illegal,	illegal,
-/*88*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*90*/ illegal,		illegal,	norm,		illegal,	illegal,	illegal,	illegal,	illegal,
-/*98*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*A0*/ illegal,		illegal,	norm,		illegal,	illegal,	illegal,	illegal,	illegal,
-/*A8*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*B0*/ illegal,		illegal,	norm,		illegal,	illegal,	illegal,	illegal,	illegal,
-/*B8*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*C0*/ illegal,		illegal,	norm,		illegal,	illegal,	illegal,	illegal,	illegal,
-/*C8*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*D0*/ illegal,		illegal,	norm,		illegal,	illegal,	illegal,	illegal,	illegal,
-/*D8*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*E0*/ illegal,		illegal,	norm,		illegal,	illegal,	illegal,	illegal,	illegal,
-/*E8*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
-/*F0*/ illegal,		illegal,	norm,		illegal,	illegal,	illegal,	illegal,	illegal,
-/*F8*/ illegal,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal
+/*00*/ {2*CLK, lrlk		},{2*CLK, lalk		},{2*CLK, adlk		},{2*CLK, sblk		},{2*CLK, andk		},{2*CLK, ork		},{2*CLK, xork		},{0*CLK, illegal	}
 };
 
 
@@ -1733,45 +1703,54 @@ static const opcode_fn opcode_CE_subset[256]=
  ****************************************************************************/
 static CPU_INIT( tms32025 )
 {
-	R.intRAM = auto_malloc(0x800*2);
-	R.irq_callback = irqcallback;
-	R.device = device;
-	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	R.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
-	R.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	tms32025_state *cpustate = device->token;
 
-	state_save_register_device_item(device, 0, R.PC);
-	state_save_register_device_item(device, 0, R.STR0);
-	state_save_register_device_item(device, 0, R.STR1);
-	state_save_register_device_item(device, 0, R.PFC);
-	state_save_register_device_item(device, 0, R.IFR);
-	state_save_register_device_item(device, 0, R.RPTC);
-	state_save_register_device_item(device, 0, R.ACC.d);
-	state_save_register_device_item(device, 0, R.ALU.d);
-	state_save_register_device_item(device, 0, R.Preg.d);
-	state_save_register_device_item(device, 0, R.Treg);
-	state_save_register_device_item(device, 0, R.AR[0]);
-	state_save_register_device_item(device, 0, R.AR[1]);
-	state_save_register_device_item(device, 0, R.AR[2]);
-	state_save_register_device_item(device, 0, R.AR[3]);
-	state_save_register_device_item(device, 0, R.AR[4]);
-	state_save_register_device_item(device, 0, R.AR[5]);
-	state_save_register_device_item(device, 0, R.AR[6]);
-	state_save_register_device_item(device, 0, R.AR[7]);
-	state_save_register_device_item(device, 0, R.STACK[0]);
-	state_save_register_device_item(device, 0, R.STACK[1]);
-	state_save_register_device_item(device, 0, R.STACK[2]);
-	state_save_register_device_item(device, 0, R.STACK[3]);
-	state_save_register_device_item(device, 0, R.STACK[4]);
-	state_save_register_device_item(device, 0, R.STACK[5]);
-	state_save_register_device_item(device, 0, R.STACK[6]);
-	state_save_register_device_item(device, 0, R.STACK[7]);
+	cpustate->intRAM = auto_malloc(0x800*2);
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_device_item(device, 0, R.idle);
-	state_save_register_device_item(device, 0, R.hold);
-	state_save_register_device_item(device, 0, R.external_mem_access);
-	state_save_register_device_item(device, 0, R.init_load_addr);
-	state_save_register_device_item(device, 0, R.PREVPC);
+	state_save_register_device_item(device, 0, cpustate->PC);
+	state_save_register_device_item(device, 0, cpustate->STR0);
+	state_save_register_device_item(device, 0, cpustate->STR1);
+	state_save_register_device_item(device, 0, cpustate->PFC);
+	state_save_register_device_item(device, 0, cpustate->IFR);
+	state_save_register_device_item(device, 0, cpustate->RPTC);
+	state_save_register_device_item(device, 0, cpustate->ACC.d);
+	state_save_register_device_item(device, 0, cpustate->ALU.d);
+	state_save_register_device_item(device, 0, cpustate->Preg.d);
+	state_save_register_device_item(device, 0, cpustate->Treg);
+	state_save_register_device_item(device, 0, cpustate->AR[0]);
+	state_save_register_device_item(device, 0, cpustate->AR[1]);
+	state_save_register_device_item(device, 0, cpustate->AR[2]);
+	state_save_register_device_item(device, 0, cpustate->AR[3]);
+	state_save_register_device_item(device, 0, cpustate->AR[4]);
+	state_save_register_device_item(device, 0, cpustate->AR[5]);
+	state_save_register_device_item(device, 0, cpustate->AR[6]);
+	state_save_register_device_item(device, 0, cpustate->AR[7]);
+	state_save_register_device_item(device, 0, cpustate->STACK[0]);
+	state_save_register_device_item(device, 0, cpustate->STACK[1]);
+	state_save_register_device_item(device, 0, cpustate->STACK[2]);
+	state_save_register_device_item(device, 0, cpustate->STACK[3]);
+	state_save_register_device_item(device, 0, cpustate->STACK[4]);
+	state_save_register_device_item(device, 0, cpustate->STACK[5]);
+	state_save_register_device_item(device, 0, cpustate->STACK[6]);
+	state_save_register_device_item(device, 0, cpustate->STACK[7]);
+
+	state_save_register_device_item(device, 0, cpustate->oldacc);
+	state_save_register_device_item(device, 0, cpustate->memaccess);
+	state_save_register_device_item(device, 0, cpustate->icount);
+	state_save_register_device_item(device, 0, cpustate->mHackIgnoreARP);
+
+	state_save_register_device_item(device, 0, cpustate->idle);
+	state_save_register_device_item(device, 0, cpustate->hold);
+	state_save_register_device_item(device, 0, cpustate->external_mem_access);
+	state_save_register_device_item(device, 0, cpustate->init_load_addr);
+	state_save_register_device_item(device, 0, cpustate->PREVPC);
+
+//	state_save_register_device_item_pointer(device, 0, cpustate->intRAM, 0x800*2);
 }
 
 /****************************************************************************
@@ -1779,13 +1758,15 @@ static CPU_INIT( tms32025 )
  ****************************************************************************/
 static CPU_RESET( tms32025 )
 {
+	tms32025_state *cpustate = device->token;
+
 	SET_PC(0);			/* Starting address on a reset */
-	R.STR0 |= 0x0600;	/* INTM and unused bit set to 1 */
-	R.STR0 &= 0xefff;	/* OV cleared to 0. Remaining bits undefined */
-	R.STR1 |= 0x07f0;	/* SXM, C, HM, FSM, XF and unused bits set to 1 */
-	R.STR1 &= 0xeff0;	/* CNF, FO, TXM, PM bits cleared to 0. Remaining bits undefined */
-	R.RPTC = 0;			/* Reset repeat counter to 0 */
-	R.IFR = 0;			/* IRQ pending flags */
+	cpustate->STR0 |= 0x0600;	/* INTM and unused bit set to 1 */
+	cpustate->STR0 &= 0xefff;	/* OV cleared to 0. Remaining bits undefined */
+	cpustate->STR1 |= 0x07f0;	/* SXM, C, HM, FSM, XF and unused bits set to 1 */
+	cpustate->STR1 &= 0xeff0;	/* CNF, FO, TXM, PM bits cleared to 0. Remaining bits undefined */
+	cpustate->RPTC = 0;			/* Reset repeat counter to 0 */
+	cpustate->IFR = 0;			/* IRQ pending flags */
 
 	S_OUT(TMS32025_XF,ASSERT_LINE);	/* XF flag is high. Must set the pin */
 
@@ -1795,43 +1776,45 @@ static CPU_RESET( tms32025 )
 	PRD  = 0xffff;
 	IMR  = 0xffc0;
 
-	R.idle = 0;
-	R.hold = 0;
-	R.init_load_addr = 1;
+	cpustate->idle = 0;
+	cpustate->hold = 0;
+	cpustate->init_load_addr = 1;
 
 	/* Reset the Data/Program address banks */
-	memset(tms32025_pgmmap, 0, sizeof(tms32025_pgmmap));
-	memset(tms32025_datamap, 0, sizeof(tms32025_datamap));
+	memset(cpustate->pgmmap, 0, sizeof(cpustate->pgmmap));
+	memset(cpustate->datamap, 0, sizeof(cpustate->datamap));
 
-	tms32025_datamap[0] = &R.intRAM[0x000];			/* B2 */
-	tms32025_datamap[4] = &R.intRAM[0x200];			/* B0 */
-	tms32025_datamap[5] = &R.intRAM[0x280];			/* B0 */
-	tms32025_datamap[6] = &R.intRAM[0x300];			/* B1 */
-	tms32025_datamap[7] = &R.intRAM[0x380];			/* B1 */
+	cpustate->datamap[0] = &cpustate->intRAM[0x000];			/* B2 */
+	cpustate->datamap[4] = &cpustate->intRAM[0x200];			/* B0 */
+	cpustate->datamap[5] = &cpustate->intRAM[0x280];			/* B0 */
+	cpustate->datamap[6] = &cpustate->intRAM[0x300];			/* B1 */
+	cpustate->datamap[7] = &cpustate->intRAM[0x380];			/* B1 */
 }
 
 #if (HAS_TMS32026)
 static CPU_RESET( tms32026 )
 {
+	tms32025_state *cpustate = device->token;
+
 	CPU_RESET_CALL(tms32025);
 
 	/* Reset the Data/Program address banks */
-	memset(tms32025_pgmmap, 0, sizeof(tms32025_pgmmap));
-	memset(tms32025_datamap, 0, sizeof(tms32025_datamap));
+	memset(cpustate->pgmmap, 0, sizeof(cpustate->pgmmap));
+	memset(cpustate->datamap, 0, sizeof(cpustate->datamap));
 
-	tms32025_datamap[0] = &R.intRAM[0x000];			/* B2 */
-	tms32025_datamap[4] = &R.intRAM[0x200];			/* B0 */
-	tms32025_datamap[5] = &R.intRAM[0x280];			/* B0 */
-	tms32025_datamap[6] = &R.intRAM[0x300];			/* B0 */
-	tms32025_datamap[7] = &R.intRAM[0x380];			/* B0 */
-	tms32025_datamap[8] = &R.intRAM[0x400];			/* B1 */
-	tms32025_datamap[9] = &R.intRAM[0x480];			/* B1 */
-	tms32025_datamap[10] = &R.intRAM[0x500];			/* B1 */
-	tms32025_datamap[11] = &R.intRAM[0x580];			/* B1 */
-	tms32025_datamap[12] = &R.intRAM[0x600];			/* B3 */
-	tms32025_datamap[13] = &R.intRAM[0x680];			/* B3 */
-	tms32025_datamap[14] = &R.intRAM[0x700];			/* B3 */
-	tms32025_datamap[15] = &R.intRAM[0x780];			/* B3 */
+	cpustate->datamap[0] = &cpustate->intRAM[0x000];			/* B2 */
+	cpustate->datamap[4] = &cpustate->intRAM[0x200];			/* B0 */
+	cpustate->datamap[5] = &cpustate->intRAM[0x280];			/* B0 */
+	cpustate->datamap[6] = &cpustate->intRAM[0x300];			/* B0 */
+	cpustate->datamap[7] = &cpustate->intRAM[0x380];			/* B0 */
+	cpustate->datamap[8] = &cpustate->intRAM[0x400];			/* B1 */
+	cpustate->datamap[9] = &cpustate->intRAM[0x480];			/* B1 */
+	cpustate->datamap[10] = &cpustate->intRAM[0x500];			/* B1 */
+	cpustate->datamap[11] = &cpustate->intRAM[0x580];			/* B1 */
+	cpustate->datamap[12] = &cpustate->intRAM[0x600];			/* B3 */
+	cpustate->datamap[13] = &cpustate->intRAM[0x680];			/* B3 */
+	cpustate->datamap[14] = &cpustate->intRAM[0x700];			/* B3 */
+	cpustate->datamap[15] = &cpustate->intRAM[0x780];			/* B3 */
 }
 #endif
 
@@ -1847,89 +1830,90 @@ static CPU_EXIT( tms32025 )
 /****************************************************************************
  *  Issue an interrupt if necessary
  ****************************************************************************/
-static int process_IRQs(void)
+static int process_IRQs(tms32025_state *cpustate)
 {
 	/********** Interrupt Flag Register (IFR) **********
         |  5  |  4  |  3  |  2  |  1  |  0  |
         | XINT| RINT| TINT| INT2| INT1| INT0|
     */
-	R.tms32025_irq_cycles = 0;
+
+	cpustate->tms32025_irq_cycles = 0;
 
 	/* Dont service Interrupts if masked, or prev instruction was EINT ! */
 
-	if ( (INTM == 0) && (R.opcode.w.l != 0xce00) && (R.IFR & IMR) )
+	if ( (INTM == 0) && (cpustate->opcode.w.l != 0xce00) && (cpustate->IFR & IMR) )
 	{
-		R.tms32025_irq_cycles = (3*CLK);	/* 3 clock cycles used due to PUSH and DINT operation ? */
-		PUSH_STACK(R.PC);
+		cpustate->tms32025_irq_cycles = (3*CLK);	/* 3 clock cycles used due to PUSH and DINT operation ? */
+		PUSH_STACK(cpustate, cpustate->PC);
 
-		if ((R.IFR & 0x01) && (IMR & 0x01)) {		/* IRQ line 0 */
+		if ((cpustate->IFR & 0x01) && (IMR & 0x01)) {		/* IRQ line 0 */
 			//logerror("TMS32025:  Active INT0\n");
 			SET_PC(0x0002);
-			(*R.irq_callback)(R.device, 0);
-			R.idle = 0;
-			R.IFR &= (~0x01);
-			SET0(INTM_FLAG);
-			return R.tms32025_irq_cycles;
+			(*cpustate->irq_callback)(cpustate->device, 0);
+			cpustate->idle = 0;
+			cpustate->IFR &= (~0x01);
+			SET0(cpustate, INTM_FLAG);
+			return cpustate->tms32025_irq_cycles;
 		}
-		if ((R.IFR & 0x02) && (IMR & 0x02)) {		/* IRQ line 1 */
+		if ((cpustate->IFR & 0x02) && (IMR & 0x02)) {		/* IRQ line 1 */
 			//logerror("TMS32025:  Active INT1\n");
 			SET_PC(0x0004);
-			(*R.irq_callback)(R.device, 1);
-			R.idle = 0;
-			R.IFR &= (~0x02);
-			SET0(INTM_FLAG);
-			return R.tms32025_irq_cycles;
+			(*cpustate->irq_callback)(cpustate->device, 1);
+			cpustate->idle = 0;
+			cpustate->IFR &= (~0x02);
+			SET0(cpustate, INTM_FLAG);
+			return cpustate->tms32025_irq_cycles;
 		}
-		if ((R.IFR & 0x04) && (IMR & 0x04)) {		/* IRQ line 2 */
+		if ((cpustate->IFR & 0x04) && (IMR & 0x04)) {		/* IRQ line 2 */
 			//logerror("TMS32025:  Active INT2\n");
 			SET_PC(0x0006);
-			(*R.irq_callback)(R.device, 2);
-			R.idle = 0;
-			R.IFR &= (~0x04);
-			SET0(INTM_FLAG);
-			return R.tms32025_irq_cycles;
+			(*cpustate->irq_callback)(cpustate->device, 2);
+			cpustate->idle = 0;
+			cpustate->IFR &= (~0x04);
+			SET0(cpustate, INTM_FLAG);
+			return cpustate->tms32025_irq_cycles;
 		}
-		if ((R.IFR & 0x08) && (IMR & 0x08)) {		/* Timer IRQ (internal) */
-//          logerror("TMS32025:  Active TINT (Timer)\n");
+		if ((cpustate->IFR & 0x08) && (IMR & 0x08)) {		/* Timer IRQ (internal) */
+//			logerror("TMS32025:  Active TINT (Timer)\n");
 			SET_PC(0x0018);
-			R.idle = 0;
-			R.IFR &= (~0x08);
-			SET0(INTM_FLAG);
-			return R.tms32025_irq_cycles;
+			cpustate->idle = 0;
+			cpustate->IFR &= (~0x08);
+			SET0(cpustate, INTM_FLAG);
+			return cpustate->tms32025_irq_cycles;
 		}
-		if ((R.IFR & 0x10) && (IMR & 0x10)) {		/* Serial port receive IRQ (internal) */
-//          logerror("TMS32025:  Active RINT (Serial recieve)\n");
+		if ((cpustate->IFR & 0x10) && (IMR & 0x10)) {		/* Serial port receive IRQ (internal) */
+//			logerror("TMS32025:  Active RINT (Serial recieve)\n");
 			DRR = S_IN(TMS32025_DR);
 			SET_PC(0x001A);
-			R.idle = 0;
-			R.IFR &= (~0x10);
-			SET0(INTM_FLAG);
-			return R.tms32025_irq_cycles;
+			cpustate->idle = 0;
+			cpustate->IFR &= (~0x10);
+			SET0(cpustate, INTM_FLAG);
+			return cpustate->tms32025_irq_cycles;
 		}
-		if ((R.IFR & 0x20) && (IMR & 0x20)) {		/* Serial port transmit IRQ (internal) */
-//          logerror("TMS32025:  Active XINT (Serial transmit)\n");
+		if ((cpustate->IFR & 0x20) && (IMR & 0x20)) {		/* Serial port transmit IRQ (internal) */
+//			logerror("TMS32025:  Active XINT (Serial transmit)\n");
 			S_OUT(TMS32025_DX,DXR);
 			SET_PC(0x001C);
-			R.idle = 0;
-			R.IFR &= (~0x20);
-			SET0(INTM_FLAG);
-			return R.tms32025_irq_cycles;
+			cpustate->idle = 0;
+			cpustate->IFR &= (~0x20);
+			SET0(cpustate, INTM_FLAG);
+			return cpustate->tms32025_irq_cycles;
 		}
 	}
-	return R.tms32025_irq_cycles;
+	return cpustate->tms32025_irq_cycles;
 }
 
-INLINE void process_timer(int clocks)
+INLINE void process_timer(tms32025_state *cpustate, int clocks)
 {
 	int preclocks, ticks;
 
 	/* easy case: no actual ticks */
 again:
-	preclocks = CLK - R.timerover;
+	preclocks = CLK - cpustate->timerover;
 	if (clocks < preclocks)
 	{
-		R.timerover += clocks;
-		tms32025_icount -= clocks;
+		cpustate->timerover += clocks;
+		cpustate->icount -= clocks;
 		return;
 	}
 
@@ -1937,20 +1921,20 @@ again:
 	ticks = 1 + (clocks - preclocks) / CLK;
 	if (ticks <= TIM)
 	{
-		tms32025_icount -= clocks;
-		R.timerover = clocks - (ticks - 1) * CLK - preclocks;
+		cpustate->icount -= clocks;
+		cpustate->timerover = clocks - (ticks - 1) * CLK - preclocks;
 		TIM -= ticks;
 	}
 
 	/* otherwise, overflow the timer and signal an interrupt */
 	else
 	{
-		tms32025_icount -= preclocks + CLK * TIM;
-		R.timerover = 0;
+		cpustate->icount -= preclocks + CLK * TIM;
+		cpustate->timerover = 0;
 		TIM = PRD;
 
-		R.IFR |= 0x08;
-		clocks = process_IRQs();		/* Handle Timer IRQ */
+		cpustate->IFR |= 0x08;
+		clocks = process_IRQs(cpustate);		/* Handle Timer IRQ */
 		goto again;
 	}
 }
@@ -1961,179 +1945,153 @@ again:
  ****************************************************************************/
 static CPU_EXECUTE( tms32025 )
 {
-	tms32025_icount = cycles;
+	tms32025_state *cpustate = device->token;
+	cpustate->icount = cycles;
 
 
 	/**** Respond to external hold signal */
 	if (S_IN(TMS32025_HOLD) == ASSERT_LINE) {
-		if (R.hold == 0) {
+		if (cpustate->hold == 0) {
 			S_OUT(TMS32025_HOLDA,ASSERT_LINE);	/* Hold-Ack (active low) */
 		}
-		R.hold = 1;
+		cpustate->hold = 1;
 		if (HM) {
-			tms32025_icount = 0;		/* Exit */
+			cpustate->icount = 0;		/* Exit */
 		}
 		else {
-			if (R.external_mem_access) {
-				tms32025_icount = 0;	/* Exit */
+			if (cpustate->external_mem_access) {
+				cpustate->icount = 0;	/* Exit */
 			}
 		}
 	}
 	else {
-		if (R.hold == 1) {
+		if (cpustate->hold == 1) {
 			S_OUT(TMS32025_HOLDA,CLEAR_LINE);	/* Hold-Ack (active low) */
-			process_timer(3);
+			process_timer(cpustate, 3);
 		}
-		R.hold = 0;
+		cpustate->hold = 0;
 	}
 
 	/**** If idling, update timer and/or exit execution */
-	while (R.idle && tms32025_icount > 0)
-		process_timer(tms32025_icount);
+	while (cpustate->idle && cpustate->icount > 0)
+		process_timer(cpustate, cpustate->icount);
 
-	if (tms32025_icount <= 0) debugger_instruction_hook(device, R.PC);
+	if (cpustate->icount <= 0) debugger_instruction_hook(device, cpustate->PC);
 
 
-	while (tms32025_icount > 0)
+	while (cpustate->icount > 0)
 	{
-		R.tms32025_dec_cycles = (1*CLK);
+		cpustate->tms32025_dec_cycles = (1*CLK);
 
-		if (R.IFR) {	/* Check IRQ Flag Register for pending IRQs */
-			R.tms32025_dec_cycles += process_IRQs();
+		if (cpustate->IFR) {	/* Check IRQ Flag Register for pending IRQs */
+			cpustate->tms32025_dec_cycles += process_IRQs(cpustate);
 		}
 
-		R.PREVPC = R.PC;
+		cpustate->PREVPC = cpustate->PC;
 
-		debugger_instruction_hook(device, R.PC);
+		debugger_instruction_hook(device, cpustate->PC);
 
-		R.opcode.d = M_RDOP(R.PC);
-		R.PC++;
+		cpustate->opcode.d = M_RDOP(cpustate->PC);
+		cpustate->PC++;
 
-		if (R.opcode.b.h == 0xCE)	/* Opcode 0xCExx has many opcodes in its minor byte */
+		if (cpustate->opcode.b.h == 0xCE)	/* Opcode 0xCExx has many sub-opcodes in its minor byte */
 		{
-			R.tms32025_dec_cycles = cycles_CE_subset[R.opcode.b.l];
-			(*(opcode_CE_subset[R.opcode.b.l]))();
+			cpustate->tms32025_dec_cycles = opcode_CE_subset[cpustate->opcode.b.l].cycles;
+			(*opcode_CE_subset[cpustate->opcode.b.l].function)(cpustate);
 		}
-		else if ((R.opcode.w.l & 0xf0f8) == 0xd000)	/* Opcode 0xDxxx has many opcodes in its minor byte */
+		else if ((cpustate->opcode.w.l & 0xf0f8) == 0xd000)	/* Opcode 0xDxxx has many sub-opcodes in its minor byte */
 		{
-			R.tms32025_dec_cycles = cycles_DX_subset[R.opcode.b.l];
-			(*(opcode_DX_subset[R.opcode.b.l]))();
+			cpustate->tms32025_dec_cycles = opcode_Dx_subset[cpustate->opcode.b.l].cycles;
+			(*opcode_Dx_subset[cpustate->opcode.b.l].function)(cpustate);
 		}
 		else			/* Do all opcodes except the CExx and Dxxx ones */
 		{
-			R.tms32025_dec_cycles = cycles_main[R.opcode.b.h];
-			(*(opcode_main[R.opcode.b.h]))();
+			cpustate->tms32025_dec_cycles = opcode_main[cpustate->opcode.b.h].cycles;
+			(*opcode_main[cpustate->opcode.b.h].function)(cpustate);
 		}
 
 
-		if (R.init_load_addr == 2) {		/* Repeat next instruction */
-			R.PREVPC = R.PC;
+		if (cpustate->init_load_addr == 2) {		/* Repeat next instruction */
+			cpustate->PREVPC = cpustate->PC;
 
-			debugger_instruction_hook(device, R.PC);
+			debugger_instruction_hook(device, cpustate->PC);
 
-			R.opcode.d = M_RDOP(R.PC);
-			R.PC++;
-			R.tms32025_dec_cycles += (1*CLK);
+			cpustate->opcode.d = M_RDOP(cpustate->PC);
+			cpustate->PC++;
+			cpustate->tms32025_dec_cycles += (1*CLK);
 
 			do {
-				if (R.opcode.b.h == 0xCE)
+				if (cpustate->opcode.b.h == 0xCE)
 				{							/* Do all 0xCExx Opcodes */
-					if (R.init_load_addr) {
-						R.tms32025_dec_cycles += (1*CLK);
+					if (cpustate->init_load_addr) {
+						cpustate->tms32025_dec_cycles += (1*CLK);
 					}
 					else {
-						R.tms32025_dec_cycles += (1*CLK);
+						cpustate->tms32025_dec_cycles += (1*CLK);
 					}
-					(*(opcode_CE_subset[R.opcode.b.l]))();
+					(*opcode_CE_subset[cpustate->opcode.b.l].function)(cpustate);
 				}
-				if ((R.opcode.w.l & 0xf0f8) == 0xd000)
+				if ((cpustate->opcode.w.l & 0xf0f8) == 0xd000)
 				{							/* Do all valid 0xDxxx Opcodes */
-					if (R.init_load_addr) {
-						R.tms32025_dec_cycles += (1*CLK);
+					if (cpustate->init_load_addr) {
+						cpustate->tms32025_dec_cycles += (1*CLK);
 					}
 					else {
-						R.tms32025_dec_cycles += (1*CLK);
+						cpustate->tms32025_dec_cycles += (1*CLK);
 					}
-					(*(opcode_DX_subset[R.opcode.b.l]))();
+					(*opcode_Dx_subset[cpustate->opcode.b.l].function)(cpustate);
 				}
 				else
 				{							/* Do all other opcodes */
-					if (R.init_load_addr) {
-						R.tms32025_dec_cycles += (1*CLK);
+					if (cpustate->init_load_addr) {
+						cpustate->tms32025_dec_cycles += (1*CLK);
 					}
 					else {
-						R.tms32025_dec_cycles += (1*CLK);
+						cpustate->tms32025_dec_cycles += (1*CLK);
 					}
-					(*(opcode_main[R.opcode.b.h]))();
+					(*opcode_main[cpustate->opcode.b.h].function)(cpustate);
 				}
-				R.init_load_addr = 0;
-				R.RPTC-- ;
-			} while ((INT8)(R.RPTC) != -1);
-			R.RPTC = 0;
-			R.PFC = R.PC;
-			R.init_load_addr = 1;
+				cpustate->init_load_addr = 0;
+				cpustate->RPTC-- ;
+			} while ((INT8)(cpustate->RPTC) != -1);
+			cpustate->RPTC = 0;
+			cpustate->PFC = cpustate->PC;
+			cpustate->init_load_addr = 1;
 		}
 
-		process_timer(R.tms32025_dec_cycles);
+		process_timer(cpustate, cpustate->tms32025_dec_cycles);
 
 		/**** If device is put into idle mode, exit and wait for an interrupt */
-		while (R.idle && tms32025_icount > 0)
-			process_timer(tms32025_icount);
+		while (cpustate->idle && cpustate->icount > 0)
+			process_timer(cpustate, cpustate->icount);
 
 
 		/**** If hold pin is active, exit if accessing external memory or if HM is set */
-		if (R.hold) {
-			if (R.external_mem_access || (HM)) {
-				if (tms32025_icount > 0) {
-					tms32025_icount = 0;
+		if (cpustate->hold) {
+			if (cpustate->external_mem_access || (HM)) {
+				if (cpustate->icount > 0) {
+					cpustate->icount = 0;
 				}
 			}
 		}
 	}
 
-	return (cycles - tms32025_icount);
-}
-
-#if 0
-/****************************************************************************
- *  Get all registers in given buffer
- ****************************************************************************/
-static CPU_GET_CONTEXT( tms32025 )
-{
-	if (dst)
-	{
-		memcpy(&R.datamap_save, &tms32025_datamap[0], sizeof(R.datamap_save));
-		memcpy(&R.pgmmap_save, &tms32025_pgmmap[500], sizeof(R.pgmmap_save));
-		*(tms32025_Regs*)dst = R;
-	}
+	return (cycles - cpustate->icount);
 }
 
 
-/****************************************************************************
- *  Set all registers to given values
- ****************************************************************************/
-static CPU_SET_CONTEXT( tms32025 )
-{
-	if (src)
-	{
-		R = *(tms32025_Regs*)src;
-		memcpy(&tms32025_datamap[0], &R.datamap_save, sizeof(R.datamap_save));
-		memcpy(&tms32025_pgmmap[500], &R.pgmmap_save, sizeof(R.pgmmap_save));
-	}
-}
-#endif
 
 /****************************************************************************
  *  Set IRQ line state
  ****************************************************************************/
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(tms32025_state *cpustate, int irqline, int state)
 {
 	/* Pending IRQs cannot be cleared */
 
 	if (state != CLEAR_LINE)
 	{
-		R.IFR |= (1 << irqline);
-//      R.IFR &= 0x07;
+		cpustate->IFR |= (1 << irqline);
+//		cpustate->IFR &= 0x07;
 	}
 }
 
@@ -2143,13 +2101,15 @@ static void set_irq_line(int irqline, int state)
  ****************************************************************************/
 static CPU_READOP( tms32025 )
 {
+	tms32025_state *cpustate = device->token;
+
 	void *ptr;
 
 	/* skip if not custom */
-	if (!tms32025_pgmmap[offset >> 8])
+	if (!cpustate->pgmmap[offset >> 8])
 		return 0;
 
-	ptr = &((UINT8 *)&tms32025_pgmmap[offset >> 8])[offset & 0xff];
+	ptr = &((UINT8 *)&cpustate->pgmmap[offset >> 8])[offset & 0xff];
 	switch (size)
 	{
 		case 1:	*value = *((UINT8 *) ptr);
@@ -2166,19 +2126,21 @@ static CPU_READOP( tms32025 )
  ****************************************************************************/
 static CPU_READ( tms32025 )
 {
+	tms32025_state *cpustate = device->token;
+
 	void *ptr = NULL;
 	UINT64 temp = 0;
 
 	switch (space)
 	{
 		case ADDRESS_SPACE_PROGRAM:
-			ptr = tms32025_pgmmap[offset >> 8];
+			ptr = cpustate->pgmmap[offset >> 8];
 			if (!ptr)
 				return 0;
 			break;
 
 		case ADDRESS_SPACE_DATA:
-			ptr = tms32025_datamap[offset >> 8];
+			ptr = cpustate->datamap[offset >> 8];
 			if (!ptr)
 				return 0;
 			break;
@@ -2217,18 +2179,20 @@ static CPU_READ( tms32025 )
  ****************************************************************************/
 static CPU_WRITE( tms32025 )
 {
+	tms32025_state *cpustate = device->token;
+
 	void *ptr = NULL;
 
 	switch (space)
 	{
 		case ADDRESS_SPACE_PROGRAM:
-			ptr = tms32025_pgmmap[offset >> 8];
+			ptr = cpustate->pgmmap[offset >> 8];
 			if (!ptr)
 				return 0;
 			break;
 
 		case ADDRESS_SPACE_DATA:
-			ptr = tms32025_datamap[offset >> 8];
+			ptr = cpustate->datamap[offset >> 8];
 			if (!ptr)
 				return 0;
 			break;
@@ -2264,49 +2228,51 @@ static CPU_WRITE( tms32025 )
 
 static CPU_SET_INFO( tms32025 )
 {
+	tms32025_state *cpustate = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + TMS32025_INT0:		set_irq_line(TMS32025_INT0, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_INT1:		set_irq_line(TMS32025_INT1, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_INT2:		set_irq_line(TMS32025_INT2, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_TINT:		set_irq_line(TMS32025_TINT, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_RINT:		set_irq_line(TMS32025_RINT, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_XINT:		set_irq_line(TMS32025_XINT, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_INT0:		set_irq_line(cpustate, TMS32025_INT0, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_INT1:		set_irq_line(cpustate, TMS32025_INT1, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_INT2:		set_irq_line(cpustate, TMS32025_INT2, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_TINT:		set_irq_line(cpustate, TMS32025_TINT, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_RINT:		set_irq_line(cpustate, TMS32025_RINT, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_XINT:		set_irq_line(cpustate, TMS32025_XINT, info->i);	break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + TMS32025_PC:		R.PC = info->i;							break;
+		case CPUINFO_INT_REGISTER + TMS32025_PC:		cpustate->PC = info->i;							break;
 		/* This is actually not a stack pointer, but the stack contents */
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + TMS32025_STK7: 		R.STACK[7] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK6: 		R.STACK[6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK5: 		R.STACK[5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK4: 		R.STACK[4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK3: 		R.STACK[3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK2: 		R.STACK[2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK1: 		R.STACK[1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK0: 		R.STACK[0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STR0: 		R.STR0 = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_STR1: 		R.STR1 = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_IFR:  		R.IFR = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_RPTC: 		R.RPTC = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_ACC:  		R.ACC.d = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_PREG: 		R.Preg.d = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_TREG: 		R.Treg = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR0:  		R.AR[0] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR1:  		R.AR[1] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR2:  		R.AR[2] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR3:  		R.AR[3] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR4:  		R.AR[4] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR5:  		R.AR[5] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR6:  		R.AR[6] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR7:  		R.AR[7] = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_DRR:		M_WRTRAM(0,info->i);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_DXR:		M_WRTRAM(1,info->i);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_TIM:		M_WRTRAM(2,info->i);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_PRD:		M_WRTRAM(3,info->i);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_IMR:		M_WRTRAM(4,info->i);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_GREG:		M_WRTRAM(5,info->i);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK7: 		cpustate->STACK[7] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK6: 		cpustate->STACK[6] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK5: 		cpustate->STACK[5] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK4: 		cpustate->STACK[4] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK3: 		cpustate->STACK[3] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK2: 		cpustate->STACK[2] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK1: 		cpustate->STACK[1] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK0: 		cpustate->STACK[0] = info->i;					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STR0: 		cpustate->STR0 = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_STR1: 		cpustate->STR1 = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_IFR:  		cpustate->IFR = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_RPTC: 		cpustate->RPTC = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_ACC:  		cpustate->ACC.d = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_PREG: 		cpustate->Preg.d = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_TREG: 		cpustate->Treg = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR0:  		cpustate->AR[0] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR1:  		cpustate->AR[1] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR2:  		cpustate->AR[2] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR3:  		cpustate->AR[3] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR4:  		cpustate->AR[4] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR5:  		cpustate->AR[5] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR6:  		cpustate->AR[6] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR7:  		cpustate->AR[7] = info->i;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_DRR:		M_WRTRAM(cpustate, 0,info->i);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_DXR:		M_WRTRAM(cpustate, 1,info->i);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_TIM:		M_WRTRAM(cpustate, 2,info->i);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_PRD:		M_WRTRAM(cpustate, 3,info->i);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_IMR:		M_WRTRAM(cpustate, 4,info->i);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_GREG:		M_WRTRAM(cpustate, 5,info->i);					break;
 	}
 }
 
@@ -2318,13 +2284,15 @@ static CPU_SET_INFO( tms32025 )
 
 CPU_GET_INFO( tms32025 )
 {
+	tms32025_state *cpustate = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(R);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms32025_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 6;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -2342,61 +2310,61 @@ CPU_GET_INFO( tms32025 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 17;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = -1;					break;
 
-		case CPUINFO_INT_INPUT_STATE + TMS32025_INT0:		info->i = (R.IFR & 0x01) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_INT1:		info->i = (R.IFR & 0x02) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_INT2:		info->i = (R.IFR & 0x04) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_TINT:		info->i = (R.IFR & 0x08) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_RINT:		info->i = (R.IFR & 0x10) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + TMS32025_XINT:		info->i = (R.IFR & 0x20) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_INT0:		info->i = (cpustate->IFR & 0x01) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_INT1:		info->i = (cpustate->IFR & 0x02) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_INT2:		info->i = (cpustate->IFR & 0x04) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_TINT:		info->i = (cpustate->IFR & 0x08) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_RINT:		info->i = (cpustate->IFR & 0x10) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_XINT:		info->i = (cpustate->IFR & 0x20) ? ASSERT_LINE : CLEAR_LINE; break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = R.PREVPC;						break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->PREVPC;						break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + TMS32025_PC:		info->i = R.PC;							break;
+		case CPUINFO_INT_REGISTER + TMS32025_PC:		info->i = cpustate->PC;							break;
 		/* This is actually not a stack pointer, but the stack contents */
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + TMS32025_STK7:		info->i = R.STACK[7];					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK6:		info->i = R.STACK[6];					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK5:		info->i = R.STACK[5];					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK4:		info->i = R.STACK[4];					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK3:		info->i = R.STACK[3];					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK2:		info->i = R.STACK[2];					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK1:		info->i = R.STACK[1];					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STK0:		info->i = R.STACK[0];					break;
-		case CPUINFO_INT_REGISTER + TMS32025_STR0:		info->i = R.STR0;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_STR1:		info->i = R.STR1;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_IFR: 		info->i = R.IFR;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_RPTC:		info->i = R.RPTC;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_ACC: 		info->i = R.ACC.d;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_PREG:		info->i = R.Preg.d;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_TREG:		info->i = R.Treg;						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR0: 		info->i = R.AR[0];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR1: 		info->i = R.AR[1];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR2: 		info->i = R.AR[2];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR3: 		info->i = R.AR[3];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR4: 		info->i = R.AR[4];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR5: 		info->i = R.AR[5];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR6: 		info->i = R.AR[6];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_AR7: 		info->i = R.AR[7];						break;
-		case CPUINFO_INT_REGISTER + TMS32025_DRR: 		info->i = M_RDRAM(0);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_DXR: 		info->i = M_RDRAM(1);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_TIM: 		info->i = M_RDRAM(2);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_PRD: 		info->i = M_RDRAM(3);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_IMR: 		info->i = M_RDRAM(4);					break;
-		case CPUINFO_INT_REGISTER + TMS32025_GREG:		info->i = M_RDRAM(5);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK7:		info->i = cpustate->STACK[7];					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK6:		info->i = cpustate->STACK[6];					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK5:		info->i = cpustate->STACK[5];					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK4:		info->i = cpustate->STACK[4];					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK3:		info->i = cpustate->STACK[3];					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK2:		info->i = cpustate->STACK[2];					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK1:		info->i = cpustate->STACK[1];					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STK0:		info->i = cpustate->STACK[0];					break;
+		case CPUINFO_INT_REGISTER + TMS32025_STR0:		info->i = cpustate->STR0;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_STR1:		info->i = cpustate->STR1;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_IFR: 		info->i = cpustate->IFR;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_RPTC:		info->i = cpustate->RPTC;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_ACC: 		info->i = cpustate->ACC.d;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_PREG:		info->i = cpustate->Preg.d;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_TREG:		info->i = cpustate->Treg;						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR0: 		info->i = cpustate->AR[0];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR1: 		info->i = cpustate->AR[1];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR2: 		info->i = cpustate->AR[2];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR3: 		info->i = cpustate->AR[3];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR4: 		info->i = cpustate->AR[4];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR5: 		info->i = cpustate->AR[5];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR6: 		info->i = cpustate->AR[6];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_AR7: 		info->i = cpustate->AR[7];						break;
+		case CPUINFO_INT_REGISTER + TMS32025_DRR: 		info->i = M_RDRAM(cpustate, 0);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_DXR: 		info->i = M_RDRAM(cpustate, 1);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_TIM: 		info->i = M_RDRAM(cpustate, 2);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_PRD: 		info->i = M_RDRAM(cpustate, 3);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_IMR: 		info->i = M_RDRAM(cpustate, 4);					break;
+		case CPUINFO_INT_REGISTER + TMS32025_GREG:		info->i = M_RDRAM(cpustate, 5);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32025);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32025);				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32025);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32025);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32025);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32025);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32025);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms32025);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32025);		break;
+		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32025);	break;
 		case CPUINFO_PTR_READ:							info->read = CPU_READ_NAME(tms32025);				break;
 		case CPUINFO_PTR_WRITE:							info->write = CPU_WRITE_NAME(tms32025);			break;
 		case CPUINFO_PTR_READOP:						info->readop = CPU_READOP_NAME(tms32025);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms32025_icount;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32025");			break;
@@ -2407,58 +2375,58 @@ CPU_GET_INFO( tms32025 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",
-				(R.STR0 & 0xe000) >> 13,
-				R.STR0 & 0x1000 ? 'O':'.',
-				R.STR0 & 0x0800 ? 'M':'.',
-				R.STR0 & 0x0400 ? '.':'?',
-				R.STR0 & 0x0200 ? 'I':'.',
-				(R.STR0 & 0x01ff),
+				(cpustate->STR0 & 0xe000) >> 13,
+				cpustate->STR0 & 0x1000 ? 'O':'.',
+				cpustate->STR0 & 0x0800 ? 'M':'.',
+				cpustate->STR0 & 0x0400 ? '.':'?',
+				cpustate->STR0 & 0x0200 ? 'I':'.',
+				(cpustate->STR0 & 0x01ff),
 
-				(R.STR1 & 0xe000) >> 13,
-				R.STR1 & 0x1000 ? 'P':'D',
-				R.STR1 & 0x0800 ? 'T':'.',
-				R.STR1 & 0x0400 ? 'S':'.',
-				R.STR1 & 0x0200 ? 'C':'?',
-				R.STR0 & 0x0100 ? '.':'?',
-				R.STR1 & 0x0080 ? '.':'?',
-				R.STR1 & 0x0040 ? 'H':'.',
-				R.STR1 & 0x0020 ? 'F':'.',
-				R.STR1 & 0x0010 ? 'X':'.',
-				R.STR1 & 0x0008 ? 'f':'.',
-				R.STR1 & 0x0004 ? 'o':'i',
-				(R.STR1 & 0x0003) );
+				(cpustate->STR1 & 0xe000) >> 13,
+				cpustate->STR1 & 0x1000 ? 'P':'D',
+				cpustate->STR1 & 0x0800 ? 'T':'.',
+				cpustate->STR1 & 0x0400 ? 'S':'.',
+				cpustate->STR1 & 0x0200 ? 'C':'?',
+				cpustate->STR0 & 0x0100 ? '.':'?',
+				cpustate->STR1 & 0x0080 ? '.':'?',
+				cpustate->STR1 & 0x0040 ? 'H':'.',
+				cpustate->STR1 & 0x0020 ? 'F':'.',
+				cpustate->STR1 & 0x0010 ? 'X':'.',
+				cpustate->STR1 & 0x0008 ? 'f':'.',
+				cpustate->STR1 & 0x0004 ? 'o':'i',
+				(cpustate->STR1 & 0x0003) );
 			break;
 
-		case CPUINFO_STR_REGISTER + TMS32025_PC:		sprintf(info->s, "PC:%04X",  R.PC); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STR0:		sprintf(info->s, "STR0:%04X", R.STR0); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STR1:		sprintf(info->s, "STR1:%04X", R.STR1); break;
-		case CPUINFO_STR_REGISTER + TMS32025_IFR:		sprintf(info->s, "IFR:%04X", R.IFR); break;
-		case CPUINFO_STR_REGISTER + TMS32025_RPTC:		sprintf(info->s, "RPTC:%02X", R.RPTC); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STK7:		sprintf(info->s, "STK7:%04X", R.STACK[7]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STK6:		sprintf(info->s, "STK6:%04X", R.STACK[6]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STK5:		sprintf(info->s, "STK5:%04X", R.STACK[5]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STK4:		sprintf(info->s, "STK4:%04X", R.STACK[4]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STK3:		sprintf(info->s, "STK3:%04X", R.STACK[3]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STK2:		sprintf(info->s, "STK2:%04X", R.STACK[2]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STK1:		sprintf(info->s, "STK1:%04X", R.STACK[1]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_STK0:		sprintf(info->s, "STK0:%04X", R.STACK[0]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_ACC:		sprintf(info->s, "ACC:%08X", R.ACC.d); break;
-		case CPUINFO_STR_REGISTER + TMS32025_PREG:		sprintf(info->s, "P:%08X", R.Preg.d); break;
-		case CPUINFO_STR_REGISTER + TMS32025_TREG:		sprintf(info->s, "T:%04X", R.Treg); break;
-		case CPUINFO_STR_REGISTER + TMS32025_AR0:		sprintf(info->s, "AR0:%04X", R.AR[0]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_AR1:		sprintf(info->s, "AR1:%04X", R.AR[1]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_AR2:		sprintf(info->s, "AR2:%04X", R.AR[2]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_AR3:		sprintf(info->s, "AR3:%04X", R.AR[3]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_AR4:		sprintf(info->s, "AR4:%04X", R.AR[4]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_AR5:		sprintf(info->s, "AR5:%04X", R.AR[5]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_AR6:		sprintf(info->s, "AR6:%04X", R.AR[6]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_AR7:		sprintf(info->s, "AR7:%04X", R.AR[7]); break;
-		case CPUINFO_STR_REGISTER + TMS32025_DRR:		sprintf(info->s, "DRR:%04X", M_RDRAM(0)); break;
-		case CPUINFO_STR_REGISTER + TMS32025_DXR:		sprintf(info->s, "DXR:%04X", M_RDRAM(1)); break;
-		case CPUINFO_STR_REGISTER + TMS32025_TIM:		sprintf(info->s, "TIM:%04X", M_RDRAM(2)); break;
-		case CPUINFO_STR_REGISTER + TMS32025_PRD:		sprintf(info->s, "PRD:%04X", M_RDRAM(3)); break;
-		case CPUINFO_STR_REGISTER + TMS32025_IMR:		sprintf(info->s, "IMR:%04X", M_RDRAM(4)); break;
-		case CPUINFO_STR_REGISTER + TMS32025_GREG:		sprintf(info->s, "GREG:%04X", M_RDRAM(5)); break;
+		case CPUINFO_STR_REGISTER + TMS32025_PC:		sprintf(info->s, "PC:%04X",  cpustate->PC); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STR0:		sprintf(info->s, "STR0:%04X", cpustate->STR0); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STR1:		sprintf(info->s, "STR1:%04X", cpustate->STR1); break;
+		case CPUINFO_STR_REGISTER + TMS32025_IFR:		sprintf(info->s, "IFR:%04X", cpustate->IFR); break;
+		case CPUINFO_STR_REGISTER + TMS32025_RPTC:		sprintf(info->s, "RPTC:%02X", cpustate->RPTC); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STK7:		sprintf(info->s, "STK7:%04X", cpustate->STACK[7]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STK6:		sprintf(info->s, "STK6:%04X", cpustate->STACK[6]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STK5:		sprintf(info->s, "STK5:%04X", cpustate->STACK[5]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STK4:		sprintf(info->s, "STK4:%04X", cpustate->STACK[4]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STK3:		sprintf(info->s, "STK3:%04X", cpustate->STACK[3]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STK2:		sprintf(info->s, "STK2:%04X", cpustate->STACK[2]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STK1:		sprintf(info->s, "STK1:%04X", cpustate->STACK[1]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_STK0:		sprintf(info->s, "STK0:%04X", cpustate->STACK[0]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_ACC:		sprintf(info->s, "ACC:%08X", cpustate->ACC.d); break;
+		case CPUINFO_STR_REGISTER + TMS32025_PREG:		sprintf(info->s, "P:%08X", cpustate->Preg.d); break;
+		case CPUINFO_STR_REGISTER + TMS32025_TREG:		sprintf(info->s, "T:%04X", cpustate->Treg); break;
+		case CPUINFO_STR_REGISTER + TMS32025_AR0:		sprintf(info->s, "AR0:%04X", cpustate->AR[0]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_AR1:		sprintf(info->s, "AR1:%04X", cpustate->AR[1]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_AR2:		sprintf(info->s, "AR2:%04X", cpustate->AR[2]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_AR3:		sprintf(info->s, "AR3:%04X", cpustate->AR[3]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_AR4:		sprintf(info->s, "AR4:%04X", cpustate->AR[4]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_AR5:		sprintf(info->s, "AR5:%04X", cpustate->AR[5]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_AR6:		sprintf(info->s, "AR6:%04X", cpustate->AR[6]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_AR7:		sprintf(info->s, "AR7:%04X", cpustate->AR[7]); break;
+		case CPUINFO_STR_REGISTER + TMS32025_DRR:		sprintf(info->s, "DRR:%04X", M_RDRAM(cpustate, 0)); break;
+		case CPUINFO_STR_REGISTER + TMS32025_DXR:		sprintf(info->s, "DXR:%04X", M_RDRAM(cpustate, 1)); break;
+		case CPUINFO_STR_REGISTER + TMS32025_TIM:		sprintf(info->s, "TIM:%04X", M_RDRAM(cpustate, 2)); break;
+		case CPUINFO_STR_REGISTER + TMS32025_PRD:		sprintf(info->s, "PRD:%04X", M_RDRAM(cpustate, 3)); break;
+		case CPUINFO_STR_REGISTER + TMS32025_IMR:		sprintf(info->s, "IMR:%04X", M_RDRAM(cpustate, 4)); break;
+		case CPUINFO_STR_REGISTER + TMS32025_GREG:		sprintf(info->s, "GREG:%04X", M_RDRAM(cpustate, 5)); break;
 	}
 }
 
@@ -2473,7 +2441,7 @@ CPU_GET_INFO( tms32026 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32026);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32026);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32026");			break;
