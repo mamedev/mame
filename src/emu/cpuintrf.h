@@ -698,9 +698,6 @@ void cpu_set_info_int(const device_config *cpu, UINT32 state, INT64 data);
 void cpu_set_info_ptr(const device_config *cpu, UINT32 state, void *data);
 void cpu_set_info_fct(const device_config *cpu, UINT32 state, genf *data);
 
-/* execute the requested cycles on a given CPU */
-int cpu_execute(const device_config *cpu, int cycles);
-
 /* signal a reset for a given CPU */
 void cpu_reset(const device_config *cpu);
 
@@ -731,17 +728,6 @@ const char *cputype_get_info_string(cpu_type cputype, UINT32 state);
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    safe_cpu_get_pc - return the current PC or ~0
-    if the CPU is invalid
--------------------------------------------------*/
-
-INLINE offs_t safe_cpu_get_pc(const device_config *cpu)
-{
-	return (cpu != NULL) ? cpu_get_pc(cpu) : ~0;
-}
-
 
 /*-------------------------------------------------
     cpu_get_index - return the index of the
@@ -776,6 +762,18 @@ INLINE const address_space *cpu_get_address_space(const device_config *cpu, int 
 {
 	cpu_class_header *classheader = cpu->classtoken;
 	return classheader->space[spacenum];
+}
+
+
+/*-------------------------------------------------
+    cpu_execute - execute the requested cycles on
+    a given CPU
+-------------------------------------------------*/
+
+INLINE int cpu_execute(const device_config *device, int cycles)
+{
+	cpu_class_header *classheader = device->classtoken;
+	return (*classheader->execute)(device, cycles);
 }
 
 

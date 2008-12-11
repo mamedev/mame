@@ -742,7 +742,7 @@ static READ32_HANDLER( geo_r )
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	mame_printf_debug("geo_r: PC:%08x - %08X\n", safe_cpu_get_pc(space->cpu), address);
+	mame_printf_debug("geo_r: PC:%08x - %08X\n", cpu_get_pc(space->cpu), address);
 
 	return 0;
 }

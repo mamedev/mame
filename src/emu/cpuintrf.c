@@ -1161,21 +1161,6 @@ void cpu_set_info_fct(const device_config *device, UINT32 state, genf *data)
 
 
 /*-------------------------------------------------
-    cpu_execute - execute the requested cycles on
-    a given CPU
--------------------------------------------------*/
-
-int cpu_execute(const device_config *device, int cycles)
-{
-	cpu_class_header *classheader = get_safe_classheader(device);
-	int ran;
-
-	ran = (*classheader->execute)(device, cycles);
-	return ran;
-}
-
-
-/*-------------------------------------------------
     cpu_reset - signal a reset for a given CPU
 -------------------------------------------------*/
 

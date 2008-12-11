@@ -762,7 +762,7 @@ static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
 
 static READ8_HANDLER( scorpion_sound_status_r )
 {
-	logerror("%04X:scorpion_sound_status_r()\n", safe_cpu_get_pc(space->cpu));
+	logerror("%04X:scorpion_sound_status_r()\n", cpu_get_pc(space->cpu));
 	return 1;
 }
 
@@ -770,7 +770,7 @@ static READ8_HANDLER( scorpion_sound_status_r )
 static WRITE8_HANDLER( scorpion_sound_data_w )
 {
 	scorpion_sound_data = data;
-//  logerror("%04X:scorpion_sound_data_w(%02X)\n", safe_cpu_get_pc(space->cpu), data);
+//  logerror("%04X:scorpion_sound_data_w(%02X)\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -778,7 +778,7 @@ static WRITE8_HANDLER( scorpion_sound_control_w )
 {
 	if (!(data & 0x04))
 		mame_printf_debug("Secondary sound = %02X\n", scorpion_sound_data);
-//  logerror("%04X:scorpion_sound_control_w(%02X)\n", safe_cpu_get_pc(space->cpu), data);
+//  logerror("%04X:scorpion_sound_control_w(%02X)\n", cpu_get_pc(space->cpu), data);
 }
 
 

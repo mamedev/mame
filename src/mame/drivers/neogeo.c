@@ -691,7 +691,7 @@ static void set_audio_cpu_banking(running_machine *machine)
 
 static void audio_cpu_bank_select(const address_space *space, int region, UINT8 bank)
 {
-	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", safe_cpu_get_pc(space->cpu), region, bank);
+	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", cpu_get_pc(space->cpu), region, bank);
 
 	audio_cpu_banks[region] = bank;
 
@@ -828,7 +828,7 @@ static WRITE16_HANDLER( system_control_w )
 			break;
 		}
 
-		if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", safe_cpu_get_pc(space->cpu), offset & 0x07, bit);
+		if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", cpu_get_pc(space->cpu), offset & 0x07, bit);
 	}
 }
 

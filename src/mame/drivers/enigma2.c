@@ -363,7 +363,7 @@ static READ8_HANDLER( sound_latch_r )
 
 static WRITE8_HANDLER( protection_data_w )
 {
-if (LOG_PROT) logerror("Protection Data Write: %x at %x\n", data, safe_cpu_get_pc(space->cpu));
+if (LOG_PROT) logerror("Protection Data Write: %x at %x\n", data, cpu_get_pc(space->cpu));
 	protection_data = data;
 }
 

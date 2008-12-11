@@ -527,7 +527,7 @@ WRITE8_HANDLER(wd33c93_w)
 
 		case 1:
 		{
-			LOG(( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", safe_cpu_get_pc(space->cpu), scsi_data.sasr, data ));
+			LOG(( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", cpu_get_pc(space->cpu), scsi_data.sasr, data ));
 
 			/* update the register */
 			scsi_data.regs[scsi_data.sasr] = data;
@@ -535,7 +535,7 @@ WRITE8_HANDLER(wd33c93_w)
 			/* if we receive a command, schedule to process it */
 			if ( scsi_data.sasr == WD_COMMAND )
 			{
-				LOG(( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", safe_cpu_get_pc(space->cpu), data, wd33c93_getunit() ));
+				LOG(( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", cpu_get_pc(space->cpu), data, wd33c93_getunit() ));
 
 				/* signal we're processing it */
 				scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
@@ -686,7 +686,7 @@ READ8_HANDLER(wd33c93_r)
 					intf->irq_callback(space->machine, 0);
 				}
 
-				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", safe_cpu_get_pc(space->cpu), scsi_data.regs[WD_SCSI_STATUS] ));
+				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", cpu_get_pc(space->cpu), scsi_data.regs[WD_SCSI_STATUS] ));
 			}
 			else if ( scsi_data.sasr == WD_DATA )
 			{
@@ -755,7 +755,7 @@ READ8_HANDLER(wd33c93_r)
 				}
 			}
 
-			LOG(( "WD33C93: PC=%08x - Data read (%02x)\n", safe_cpu_get_pc(space->cpu), scsi_data.regs[WD_DATA] ));
+			LOG(( "WD33C93: PC=%08x - Data read (%02x)\n", cpu_get_pc(space->cpu), scsi_data.regs[WD_DATA] ));
 
 			/* get the register value */
 			ret = scsi_data.regs[scsi_data.sasr];

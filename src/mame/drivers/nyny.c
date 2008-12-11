@@ -447,7 +447,7 @@ static WRITE8_HANDLER( nyny_ay8910_37_port_a_w )
 {
 	/* not sure what this does */
 
-	/*logerror("%x PORT A write %x at  Y=%x X=%x\n", safe_cpu_get_pc(space->cpu), data, video_screen_get_vpos(space->machine->primary_screen), video_screen_get_hpos(space->machine->primary_screen));*/
+	/*logerror("%x PORT A write %x at  Y=%x X=%x\n", cpu_get_pc(space->cpu), data, video_screen_get_vpos(space->machine->primary_screen), video_screen_get_hpos(space->machine->primary_screen));*/
 }
 
 

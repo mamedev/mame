@@ -91,7 +91,7 @@ static READ8_HANDLER( audio_command_r )
 {
 	UINT8 ret = soundlatch_r(space, 0);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", safe_cpu_get_pc(space->cpu), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", cpu_get_pc(space->cpu), ret);
 
 	return ret;
 }
@@ -102,14 +102,14 @@ static WRITE8_HANDLER( audio_command_w )
 	soundlatch_w(space, 0, ~data);
 	cpu_set_input_line(space->machine->cpu[1], M6800_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", safe_cpu_get_pc(space->cpu), data^0xff);
+if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", cpu_get_pc(space->cpu), data^0xff);
 }
 
 
 static READ8_HANDLER( audio_answer_r )
 {
 	UINT8 ret = soundlatch2_r(space, 0);
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", safe_cpu_get_pc(space->cpu), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", cpu_get_pc(space->cpu), ret);
 
 	return ret;
 }
@@ -118,13 +118,13 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", safe_cpu_ge
 static WRITE8_HANDLER( audio_answer_w )
 {
 	/* HACK - prevents lock-up, but causes game to end some in-between sreens prematurely */
-	if (safe_cpu_get_pc(space->cpu) == 0xfb12)
+	if (cpu_get_pc(space->cpu) == 0xfb12)
 		data = 0x00;
 
 	soundlatch2_w(space, 0, data);
 	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", safe_cpu_get_pc(space->cpu), data);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -139,7 +139,7 @@ static WRITE8_HANDLER( AY8910_select_w )
        D5-D7 - not used */
 	AY8910_selected = data;
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910_select_w: %x\n", safe_cpu_get_pc(space->cpu), data);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910_select_w: %x\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -150,12 +150,12 @@ static READ8_HANDLER( AY8910_port_r )
 	if (AY8910_selected & 0x08)
 {
 		ret = ay8910_read_port_0_r(space, offset);
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Read: %x\n", safe_cpu_get_pc(space->cpu), ret);}
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Read: %x\n", cpu_get_pc(space->cpu), ret);}
 
 	if (AY8910_selected & 0x10)
 {
 		ret = ay8910_read_port_1_r(space, offset);
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Read: %x\n", safe_cpu_get_pc(space->cpu), ret);}
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Read: %x\n", cpu_get_pc(space->cpu), ret);}
 
 	return ret;
 }
@@ -166,23 +166,23 @@ static WRITE8_HANDLER( AY8910_port_w )
 	if (AY8910_selected & 0x04)
 	{
 		if (AY8910_selected & 0x08)
-{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Control Write: %x\n", safe_cpu_get_pc(space->cpu), data);
+{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Control Write: %x\n", cpu_get_pc(space->cpu), data);
 			ay8910_control_port_0_w(space, offset, data);
 }
 		if (AY8910_selected & 0x10)
-{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Control Write: %x\n", safe_cpu_get_pc(space->cpu), data);
+{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Control Write: %x\n", cpu_get_pc(space->cpu), data);
 			ay8910_control_port_1_w(space, offset, data);
 }
 	}
 	else
 	{
 		if (AY8910_selected & 0x08)
-{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Write: %x\n", safe_cpu_get_pc(space->cpu), data);
+{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Write: %x\n", cpu_get_pc(space->cpu), data);
 			ay8910_write_port_0_w(space, offset, data);
 }
 
 		if (AY8910_selected & 0x10)
-{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Write: %x\n", safe_cpu_get_pc(space->cpu), data);
+{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Write: %x\n", cpu_get_pc(space->cpu), data);
 			ay8910_write_port_1_w(space, offset, data);
 }
 	}

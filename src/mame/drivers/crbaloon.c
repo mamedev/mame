@@ -63,7 +63,7 @@ static WRITE8_HANDLER( pc3092_w )
 {
 	pc3092_data[offset] = data & 0x0f;
 
-	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", safe_cpu_get_pc(space->cpu), offset, pc3092_data[offset]);
+	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", cpu_get_pc(space->cpu), offset, pc3092_data[offset]);
 
 	pc3092_update();
 }
@@ -143,7 +143,7 @@ static READ8_HANDLER( pc3259_r )
 		break;
 	}
 
-	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", safe_cpu_get_pc(space->cpu), reg, ret);
+	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", cpu_get_pc(space->cpu), reg, ret);
 
 	return ret | (input_port_read(space->machine, "DSW1") & 0xf0);
 }
