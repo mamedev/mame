@@ -401,7 +401,7 @@ static const cia6526_interface cia_0_intf =
 static const cia6526_interface cia_1_intf =
 {
 	amiga_cia_1_irq,								/* irq_func */
-	0,												/* clock */
+	AMIGA_68000_NTSC_CLOCK / 10,					/* clock */
 	0,												/* tod_clock */
 	{
 		{ alg_cia_1_porta_r, alg_cia_1_porta_w, },	/* port A */
