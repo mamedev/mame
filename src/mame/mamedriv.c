@@ -6243,7 +6243,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( calspeda )	/* (c) 1996 Atari Games */
 	DRIVER( vaportrx )	/* (c) 1998 Atari Games */
 	DRIVER( vaportrp )	/* (c) 1998 Atari Games */
-	DRIVER( carnevil )	/* (c) 1998 Midway Games */
+	DRIVER( carnevil )	/* (c) 1998 Midway Games (v1.0.3) */
+	DRIVER( carnevi1 )	/* (c) 1998 Midway Games (v1.0.1) */
 	DRIVER( biofreak )	/* (c) 1997 Midway Games (prototype) */
 	DRIVER( blitz )		/* (c) 1997 Midway Games */
 	DRIVER( blitz11 )	/* (c) 1997 Midway Games */

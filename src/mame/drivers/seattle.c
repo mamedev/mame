@@ -2739,7 +2739,19 @@ ROM_START( carnevil )
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 1.9 */
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
-	DISK_REGION( "ide" )	/* Hard Drive v1.0.1  12/11/99 */
+	DISK_REGION( "ide" )	/* Hard Drive v1.0.3  Diagnostics v3.4 / Feb 1 1999 16:00:07 */
+	DISK_IMAGE( "carnevil", 0, MD5(cba5ecd6c59b6fb56f574558f4f2b509) SHA1(ba32b7ef9721d730ce58bd753d47fb947b6ae9b6) )
+ROM_END
+
+
+ROM_START( carnevi1 )
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
+	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) /* Boot Rom Version 1.9 */
+	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
+
+	DISK_REGION( "ide" )	/* Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41 */
 	DISK_IMAGE( "carnevil", 0, BAD_DUMP MD5(6eafae86091c0a915cf8cfdc3d73adc2) SHA1(5e6524d4b97de141c38e301a17e8af15661cb5d6) )
 ROM_END
 
@@ -2974,5 +2986,6 @@ GAME( 1997, blitz,    0,        seattle150,        blitz,    blitz,    ROT0, "Mi
 GAME( 1997, blitz11,  blitz,    seattle150,        blitz,    blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", GAME_SUPPORTS_SAVE )
 GAME( 1998, blitz99,  0,        seattle150,        blitz99,  blitz99,  ROT0, "Midway Games", "NFL Blitz '99", GAME_SUPPORTS_SAVE )
 GAME( 1999, blitz2k,  0,        seattle150,        blitz99,  blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition", GAME_SUPPORTS_SAVE )
-GAME( 1998, carnevil, 0,        seattle150,        carnevil, carnevil, ROT0, "Midway Games", "CarnEvil", GAME_SUPPORTS_SAVE )
+GAME( 1998, carnevil, 0,        seattle150,        carnevil, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", GAME_SUPPORTS_SAVE )
+GAME( 1998, carnevi1, carnevil, seattle150,        carnevil, carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", GAME_SUPPORTS_SAVE )
 GAME( 1998, hyprdriv, 0,        seattle200_widget, hyprdriv, hyprdriv, ROT0, "Midway Games", "Hyperdrive", GAME_SUPPORTS_SAVE )
