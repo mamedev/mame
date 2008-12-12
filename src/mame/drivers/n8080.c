@@ -12,11 +12,12 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "cpu/i8085/i8085.h"
 #include "includes/n8080.h"
 
 static unsigned shift_data;
 static unsigned shift_bits;
-
+static int inte;
 
 static WRITE8_HANDLER( n8080_shift_bits_w )
 {
@@ -33,16 +34,6 @@ static READ8_HANDLER( n8080_shift_r )
 	return shift_data >> (8 - shift_bits);
 }
 
-
-static INTERRUPT_GEN( interrupt )
-{
-	if (video_screen_get_vblank(device->machine->primary_screen))
-		cpu_set_input_line_and_vector(device, 0, PULSE_LINE, 0xcf);  /* RST $08 */
-	else
-		cpu_set_input_line_and_vector(device, 0, PULSE_LINE, 0xd7);  /* RST $10 */
-}
-
-
 static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -55,7 +46,6 @@ static ADDRESS_MAP_START( helifire_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&colorram)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
@@ -72,6 +62,39 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITE(n8080_video_control_w)
 ADDRESS_MAP_END
 
+/* Interrupts */
+
+static TIMER_DEVICE_CALLBACK( rst1_tick )
+{
+	/* V7 = 1, V6 = 0 */
+	cpu_set_input_line_and_vector(cputag_get_cpu(timer->machine, "main"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+}
+
+static TIMER_DEVICE_CALLBACK( rst2_tick )
+{
+	/* vblank */
+	cpu_set_input_line_and_vector(cputag_get_cpu(timer->machine, "main"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
+}
+
+static n8080_inte_callback(const device_config *device, int state)
+{
+	inte = state;
+}
+
+static n8080_status_callback(const device_config *device, UINT8 status)
+{
+	if (BIT(status, 0))
+	{
+		/* interrupt acknowledge */
+		cpu_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+}
+
+static MACHINE_START( spacefev )
+{
+	i8085_set_status_callback(cputag_get_cpu(machine, "main"), n8080_status_callback);
+	i8085_set_inte_callback(cputag_get_cpu(machine, "main"), n8080_inte_callback);
+}
 
 static MACHINE_DRIVER_START( spacefev )
 
@@ -79,7 +102,8 @@ static MACHINE_DRIVER_START( spacefev )
 	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt, 2)
+
+	MDRV_MACHINE_START(spacefev)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -93,6 +117,9 @@ static MACHINE_DRIVER_START( spacefev )
 	MDRV_VIDEO_START(spacefev)
 	MDRV_VIDEO_UPDATE(spacefev)
 
+	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "main", 128, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "main", 240, 256)
+
 	/* sound hardware */
 	MDRV_IMPORT_FROM( spacefev_sound )
 MACHINE_DRIVER_END
@@ -104,7 +131,8 @@ static MACHINE_DRIVER_START( sheriff )
 	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt, 2)
+
+	MDRV_MACHINE_START(spacefev)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -118,6 +146,9 @@ static MACHINE_DRIVER_START( sheriff )
 	MDRV_VIDEO_START(sheriff)
 	MDRV_VIDEO_UPDATE(sheriff)
 
+	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "main", 128, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "main", 240, 256)
+
 	/* sound hardware */
 	MDRV_IMPORT_FROM( sheriff_sound )
 MACHINE_DRIVER_END
@@ -129,7 +160,8 @@ static MACHINE_DRIVER_START( helifire )
 	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
 	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt, 2)
+
+	MDRV_MACHINE_START(spacefev)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -143,6 +175,9 @@ static MACHINE_DRIVER_START( helifire )
 	MDRV_VIDEO_START(helifire)
 	MDRV_VIDEO_UPDATE(helifire)
 	MDRV_VIDEO_EOF(helifire)
+
+	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "main", 128, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "main", 240, 256)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( helifire_sound )

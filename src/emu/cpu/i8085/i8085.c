@@ -155,6 +155,8 @@ struct _i8085_state
 	const address_space *io;
 	i8085_sod_func sod_callback;
 	i8085_sid_func sid_callback;
+	i8085_inte_func inte_callback;
+	i8085_status_func status_callback;
 	int		icount;
 	UINT8 	rim_ien;
 };
@@ -197,6 +199,9 @@ static void WM(i8085_state *cpustate, UINT32 a, UINT8 v)
 
 INLINE void execute_one(i8085_state *cpustate, int opcode)
 {
+	/* output state word */
+	if (cpustate->status_callback) (*cpustate->status_callback)(cpustate->device, cpustate->STATUS);
+
 	switch (opcode)
 	{
 		case 0x00: cpustate->icount -= 4;	/* NOP  */
@@ -1129,6 +1134,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0xf3: cpustate->icount -= 4;	/* DI   */
 			/* remove interrupt enable */
 			cpustate->IM &= ~IM_IEN;
+			if (cpustate->inte_callback) (*cpustate->inte_callback)(cpustate->device, (cpustate->IM & IM_IEN) ? 1 : 0);
 			break;
 		case 0xf4: cpustate->icount -= 11;	/* CP   nnnn */
 			M_CALL( !(cpustate->AF.b.l & SF) );
@@ -1156,6 +1162,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0xfb: cpustate->icount -= 4;	/* EI */
 			/* set interrupt enable */
 			cpustate->IM |= IM_IEN;
+			if (cpustate->inte_callback) (*cpustate->inte_callback)(cpustate->device, (cpustate->IM & IM_IEN) ? 1 : 0);
 			/* remove serviced IRQ flag */
 			cpustate->IREQ &= ~cpustate->ISRV;
 			/* reset serviced IRQ */
@@ -1310,6 +1317,7 @@ static CPU_EXECUTE( i8085 )
 	do
 	{
 		debugger_instruction_hook(device, cpustate->PC.d);
+
 		/* interrupts enabled or TRAP pending ? */
 		if ( (cpustate->IM & IM_IEN) || (cpustate->IREQ & IM_TRAP) )
 		{
@@ -1395,21 +1403,29 @@ static CPU_RESET( i8085 )
 	cpu_irq_callback save_irqcallback;
 	i8085_sod_func save_sodcallback;
 	i8085_sid_func save_sidcallback;
+	i8085_inte_func save_intecallback;
+	i8085_status_func save_statuscallback;
 	int cputype_bak = cpustate->cputype;
 
 	init_tables();
 	save_irqcallback = cpustate->irq_callback;
 	save_sodcallback = cpustate->sod_callback;
 	save_sidcallback = cpustate->sid_callback;
+	save_intecallback = cpustate->inte_callback;
+	save_statuscallback = cpustate->status_callback;
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->sod_callback = save_sodcallback;
 	cpustate->sid_callback = save_sidcallback;
+	cpustate->inte_callback = save_intecallback;
+	cpustate->status_callback = save_statuscallback;
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	cpustate->cputype = cputype_bak;
+
+	if (cpustate->inte_callback) (*cpustate->inte_callback)(cpustate->device, (cpustate->IM & IM_IEN) ? 1 : 0);
 }
 
 /****************************************************************************
@@ -1667,6 +1683,8 @@ static CPU_SET_INFO( i8085 )
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_I8085_SOD_CALLBACK:			cpustate->sod_callback = (i8085_sod_func)info->f; break;
 		case CPUINFO_PTR_I8085_SID_CALLBACK:			cpustate->sid_callback = (i8085_sid_func)info->f; break;
+		case CPUINFO_PTR_I8085_INTE_CALLBACK:			cpustate->inte_callback = (i8085_inte_func)info->f; break;
+		case CPUINFO_PTR_I8085_STATUS_CALLBACK:			cpustate->status_callback = (i8085_status_func)info->f; break;
 	}
 }
 
