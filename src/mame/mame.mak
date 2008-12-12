@@ -1710,6 +1710,8 @@ $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
 
 $(DRIVERS)/avalnche.o:	$(LAYOUT)/avalnche.lh
 
+$(DRIVERS)/brasil.o:	$(LAYOUT)/fashion.lh
+
 $(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
 
 $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \

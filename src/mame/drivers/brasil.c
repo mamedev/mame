@@ -22,6 +22,7 @@ TODO:
 *************************************************************************************************/
 
 #include "driver.h"
+#include "fashion.lh"
 
 static UINT16 *blit_ram;
 
@@ -222,6 +223,24 @@ static READ16_HANDLER( read3_r )
 static WRITE16_HANDLER( write1_w )
 {
 	t1 = data;
+/*
+    - Lbits -
+    7654 3210
+    =========
+    ---- ---x  Hold1 lamp.
+    ---- --x-  Hold2 lamp.
+    ---- -x--  Hold3 lamp.
+    ---- x---  Hold4 lamp.
+    ---x ----  Hold5 lamp.
+    --x- ----  Start lamp.
+*/
+	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - HOLD 1 */
+	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - HOLD 2 */
+	output_set_lamp_value(3, (data >> 2) & 1);		/* Lamp 3 - HOLD 3 */
+	output_set_lamp_value(4, (data >> 3) & 1);		/* Lamp 4 - HOLD 4 */
+	output_set_lamp_value(5, (data >> 4) & 1);		/* Lamp 5 - HOLD 5 */
+	output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
+
 //	popmessage("%04x %04x",t1,t3);
 }
 
@@ -688,6 +707,6 @@ static DRIVER_INIT( fashion )
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0002, 0x0003, 0, 0, fashion_write2_w );
 }
 
-GAME( 19??, newmcard,  0,      vidpokr2,    brasil,   0,       ROT0,  "New High Video?", "New Magic Card", GAME_NO_SOUND )
-GAME( 2000, brasil,    0,      brasil,      brasil,   0,       ROT0,  "New High Video?", "Bra$il (Version 3)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 2000, fashion,   brasil, brasil,      fashion,  fashion, ROT0,  "New High Video?", "Fashion (Version 2.14)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAMEL( 19??, newmcard,  0,      vidpokr2,    brasil,   0,       ROT0,  "New High Video?", "New Magic Card",         GAME_NO_SOUND,                           layout_fashion )
+GAMEL( 2000, brasil,    0,      brasil,      brasil,   0,       ROT0,  "New High Video?", "Bra$il (Version 3)",     GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_fashion )
+GAMEL( 2000, fashion,   brasil, brasil,      fashion,  fashion, ROT0,  "New High Video?", "Fashion (Version 2.14)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_fashion )

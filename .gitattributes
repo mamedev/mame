@@ -2503,6 +2503,7 @@ src/mame/layout/darius.lay svneol=native#text/plain
 src/mame/layout/deadeye.lay svneol=native#text/plain
 src/mame/layout/dlair.lay svneol=native#text/plain
 src/mame/layout/elecyoyo.lay svneol=native#text/plain
+src/mame/layout/fashion.lay svneol=native#text/plain
 src/mame/layout/firebeat.lay svneol=native#text/plain
 src/mame/layout/funworld.lay svneol=native#text/plain
 src/mame/layout/galaxi.lay -text svneol=native#plain/text
