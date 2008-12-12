@@ -1910,7 +1910,7 @@ static DRIVER_INIT( yamato )
 
 static DRIVER_INIT( toprollr )
 {
-	toprollr_decode(machine,"user1");
+	toprollr_decode(machine, "main", "user1");
 }
 
 

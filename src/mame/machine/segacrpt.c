@@ -430,7 +430,7 @@ void yamato_decode(running_machine *machine, const char *cputag)
 	sega_decode(machine, cputag, convtable);
 }
 
-void toprollr_decode(running_machine *machine, const char *cputag)
+void toprollr_decode(running_machine *machine, const char *cputag, const char *regiontag)
 {
 	/* same tables as in Yamato, but encrypted ROM is banked */
 	UINT8 *decrypted;
@@ -460,7 +460,7 @@ void toprollr_decode(running_machine *machine, const char *cputag)
 	int A;
 
 	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, cputag);
+	UINT8 *rom = memory_region(machine, regiontag);
 	int bankstart;
 	decrypted = auto_malloc(0x6000*3);
 
@@ -491,7 +491,7 @@ void toprollr_decode(running_machine *machine, const char *cputag)
 		rom[A+bankstart] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
 	}
 
-	memory_configure_bank(machine, 1,0,3, memory_region(machine, cputag),0x6000);
+	memory_configure_bank(machine, 1,0,3, memory_region(machine, regiontag),0x6000);
 	memory_configure_bank_decrypted(machine, 1,0,3,decrypted,0x6000);
 	memory_set_decrypted_region(space, 0x0000, 0x5fff, decrypted);
 	memory_set_bank(space->machine, 1, 0);

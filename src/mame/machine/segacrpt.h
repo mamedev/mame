@@ -3,7 +3,7 @@ void pengo_decode(running_machine *machine, const char *cputag);
 void szaxxon_decode(running_machine *machine, const char *cputag);
 void suprloco_decode(running_machine *machine, const char *cputag);
 void yamato_decode(running_machine *machine, const char *cputag);
-void toprollr_decode(running_machine *machine, const char *cputag);
+void toprollr_decode(running_machine *machine, const char *cputag, const char *regiontag);
 void sindbadm_decode(running_machine *machine, const char *cputag);
 void regulus_decode(running_machine *machine, const char *cputag);
 void mrviking_decode(running_machine *machine, const char *cputag);
