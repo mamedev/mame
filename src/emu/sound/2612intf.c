@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "sound/fm.h"
 #include "sound/2612intf.h"
@@ -24,6 +23,7 @@ struct ym2612_info
 	emu_timer *	timer[2];
 	void *			chip;
 	const ym2612_interface *intf;
+	const device_config *device;
 };
 
 /*------------------------- TM2612 -------------------------------*/
@@ -31,7 +31,7 @@ struct ym2612_info
 static void IRQHandler(void *param,int irq)
 {
 	struct ym2612_info *info = param;
-	if(info->intf->handler) info->intf->handler(Machine, irq);
+	if(info->intf->handler) info->intf->handler(info->device->machine, irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -97,6 +97,7 @@ static SND_START( ym2612 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
+	info->device = device;
 
 	/* FM init */
 	/* Timer Handler set */

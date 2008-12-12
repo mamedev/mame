@@ -101,7 +101,6 @@ has twice the steps, happening twice as fast.
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "cpuexec.h"
@@ -388,7 +387,7 @@ INLINE UINT16 mix_3D(ay8910_context *psg)
 static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(psg->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
 	psg->regs[r] = v;
@@ -782,9 +781,9 @@ void ay8910_write_ym(void *chip, int addr, int data)
 
 int ay8910_read_ym(void *chip)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	ay8910_context *psg = chip;
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(psg->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int r = psg->register_latch;
 
 	if (r > 15) return 0;
@@ -801,7 +800,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->intf->portAread)
 			psg->regs[AY_PORTA] = (*psg->intf->portAread)(space, 0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port A\n",cpuexec_describe_context(Machine),psg->device->tag);
+			logerror("%s: warning - read 8910 '%s' Port A\n",cpuexec_describe_context(psg->device->machine),psg->device->tag);
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
@@ -809,7 +808,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->intf->portBread)
 			psg->regs[AY_PORTB] = (*psg->intf->portBread)(space, 0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port B\n",cpuexec_describe_context(Machine),psg->device->tag);
+			logerror("%s: warning - read 8910 '%s' Port B\n",cpuexec_describe_context(psg->device->machine),psg->device->tag);
 		break;
 	}
 	return psg->regs[r];

@@ -17,12 +17,12 @@ the variable VotraxBaseFrequency, this is defaulted to 8000
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "samples.h"
 
 
 struct votrax_info
 {
+	const device_config *device;
 	int		stream;
 	int		frequency;		/* Some games (Qbert) change this */
 	int 	volume;
@@ -107,6 +107,7 @@ static SND_START( votrax )
 	votrax = auto_malloc(sizeof(*votrax));
 	memset(votrax, 0, sizeof(*votrax));
 
+	votrax->device = device;
 	votrax->samples = readsamples(VotraxTable,"votrax");
 	votrax->frequency = 8000;
 	votrax->volume = 230;
@@ -140,7 +141,7 @@ void votrax_w(int data)
 		info->sample = &info->samples->sample[Phoneme];
 		info->pos = 0;
 		info->frac = 0;
-		info->step = ((INT64)(info->sample->frequency + (256*Intonation)) << FRAC_BITS) / Machine->sample_rate;
+		info->step = ((INT64)(info->sample->frequency + (256*Intonation)) << FRAC_BITS) / info->device->machine->sample_rate;
 		stream_set_output_gain(info->channel, 0, (info->volume + (8*Intonation)*100/255) / 100.0);
 	}
 }

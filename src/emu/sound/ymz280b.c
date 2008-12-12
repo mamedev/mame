@@ -24,7 +24,6 @@
 #include <math.h>
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "ymz280b.h"
 
@@ -100,6 +99,7 @@ struct YMZ280BChip
 #endif
 
 	INT16 *scratch;
+	const device_config *device;
 };
 
 /* step size index shift table */
@@ -145,14 +145,14 @@ INLINE void update_irq_state(struct YMZ280BChip *chip)
 	{
 		chip->irq_state = 1;
 		if (chip->irq_callback)
-			(*chip->irq_callback)(Machine, 1);
+			(*chip->irq_callback)(chip->device->machine, 1);
 		else logerror("YMZ280B: IRQ generated, but no callback specified!");
 	}
 	else if (!irq_bits && chip->irq_state)
 	{
 		chip->irq_state = 0;
 		if (chip->irq_callback)
-			(*chip->irq_callback)(Machine, 0);
+			(*chip->irq_callback)(chip->device->machine, 0);
 		else logerror("YMZ280B: IRQ generated, but no callback specified!");
 	}
 }
@@ -576,7 +576,7 @@ static void ymz280b_update(void *param, stream_sample_t **inputs, stream_sample_
 				voice->playing = 0;
 
 				/* set update_irq_state_timer. IRQ is signaled on next CPU execution. */
-				timer_set(Machine, attotime_zero, chip, 0, update_irq_state_cb[v]);
+				timer_set(chip->device->machine, attotime_zero, chip, 0, update_irq_state_cb[v]);
 				voice->irq_schedule = 1;
 			}
 		}
@@ -636,6 +636,7 @@ static SND_START( ymz280b )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
+	chip->device = device;
 	chip->ext_ram_read = intf->ext_read;
 	chip->ext_ram_write = intf->ext_write;
 
@@ -868,7 +869,7 @@ static void write_to_register(struct YMZ280BChip *chip, int data)
 				if (chip->ext_ram_write)
 				{
 					/* temporary hack until this is converted to a device */
-					const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+					const address_space *space = cpu_get_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 					chip->ext_ram_write(space, chip->rom_readback_addr, data);
 				}
 				else

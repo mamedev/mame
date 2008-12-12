@@ -55,7 +55,6 @@
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "c6280.h"
 
 typedef struct {
@@ -72,6 +71,7 @@ typedef struct {
 
 typedef struct {
 	sound_stream *stream;
+	const device_config *device;
     UINT8 select;
     UINT8 balance;
     UINT8 lfo_frequency;
@@ -85,13 +85,8 @@ typedef struct {
 /* only needed for io_buffer */
 #include "cpu/h6280/h6280.h"
 
-/* Local function prototypes */
-static void c6280_init(c6280_t *p, double clk, double rate);
-static void c6280_write(c6280_t *p, int offset, int data);
-static void c6280_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
 
-
-static void c6280_init(c6280_t *p, double clk, double rate)
+static void c6280_init(const device_config *device, c6280_t *p, double clk, double rate)
 {
     int i;
     double step;
@@ -101,6 +96,8 @@ static void c6280_init(c6280_t *p, double clk, double rate)
 
     /* Clear context */
     memset(p, 0, sizeof(c6280_t));
+
+    p->device = device;
 
     /* Make waveform frequency table */
     for(i = 0; i < 4096; i += 1)
@@ -268,7 +265,7 @@ static void c6280_update(void *param, stream_sample_t **inputs, stream_sample_t 
                     p->channel[ch].noise_counter += step;
                     if(p->channel[ch].noise_counter >= 0x800)
                     {
-                        data = (mame_rand(Machine) & 1) ? 0x1F : 0;
+                        data = (mame_rand(p->device->machine) & 1) ? 0x1F : 0;
                     }
                     p->channel[ch].noise_counter &= 0x7FF;
                     buffer[0][i] += (INT16)(vll * (data - 16));
@@ -318,11 +315,11 @@ static SND_START( c6280 )
     info = auto_malloc(sizeof(*info));
     memset(info, 0, sizeof(*info));
 
-   /* Initialize PSG emulator */
-   c6280_init(info, clock, rate);
+    /* Initialize PSG emulator */
+    c6280_init(device, info, clock, rate);
 
-   /* Create stereo stream */
-   info->stream = stream_create(device, 0, 2, rate, info, c6280_update);
+    /* Create stereo stream */
+    info->stream = stream_create(device, 0, 2, rate, info, c6280_update);
 
     return info;
 }

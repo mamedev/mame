@@ -1,7 +1,6 @@
 /* machine/n64.c - contains N64 hardware emulation shared between MAME and MESS */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mips/mips3.h"
 #include "sound/custom.h"
 #include "streams.h"
@@ -209,7 +208,7 @@ static void sp_set_status(const device_config *device, UINT32 status)
 {
 	if (status & 0x1)
 	{
-		//cpuexec_trigger(Machine, 6789);
+		//cpuexec_trigger(device->machine, 6789);
 
 		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
         cpu_set_reg(device, RSP_SR, cpu_get_reg(device, RSP_SR) | RSP_STATUS_HALT);

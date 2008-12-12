@@ -1,10 +1,10 @@
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "flt_rc.h"
 
 struct filter_rc_info
 {
+	const device_config *device;
 	sound_stream *	stream;
 	int				k;
 	int				memory;
@@ -76,7 +76,7 @@ static void set_RC_info(struct filter_rc_info *info, int type, double R1, double
 
 	/* Cut Frequency = 1/(2*Pi*Req*C) */
 	/* k = (1-(EXP(-TIMEDELTA/RC)))    */
-	info->k = 0x10000 - 0x10000 * (exp(-1 / (Req * C) / Machine->sample_rate));
+	info->k = 0x10000 - 0x10000 * (exp(-1 / (Req * C) / info->device->machine->sample_rate));
 }
 
 
@@ -88,6 +88,7 @@ static SND_START( filter_rc )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
+	info->device = device;
 	info->stream = stream_create(device, 1, 1, device->machine->sample_rate, info, filter_rc_update);
 	if (conf)
 		set_RC_info(info, conf->type, conf->R1, conf->R2, conf->R3, conf->C);

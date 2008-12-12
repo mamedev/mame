@@ -2105,7 +2105,7 @@ static void megadrive_io_write_data_port_6button(running_machine *machine, int p
 		if (((megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			io_stage[portnum]++;
-			timer_adjust_oneshot(io_timeout[portnum], cpu_clocks_to_attotime(Machine->cpu[0],8192), 0);
+			timer_adjust_oneshot(io_timeout[portnum], cpu_clocks_to_attotime(machine->cpu[0],8192), 0);
 		}
 
 	}
@@ -3916,7 +3916,7 @@ static UINT16 vdp_get_word_from_68k_mem_svp(UINT32 source)
 /* emulate testmode plug */
 static UINT8 megadrive_io_read_data_port_svp(running_machine *machine, int portnum)
 {
-	if (portnum == 0 && input_port_read_safe(Machine, "MEMORY_TEST", 0x00))
+	if (portnum == 0 && input_port_read_safe(machine, "MEMORY_TEST", 0x00))
 	{
 		return (megadrive_io_data_regs[0] & 0xc0);
 	}

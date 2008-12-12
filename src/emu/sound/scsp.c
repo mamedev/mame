@@ -29,7 +29,6 @@
 #include "streams.h"
 #include "cpuintrf.h"
 #include "cpuexec.h"
-#include "deprecat.h"
 #include "scsp.h"
 #include "scspdsp.h"
 
@@ -225,6 +224,8 @@ struct _SCSP
 	int ARTABLE[64], DRTABLE[64];
 
 	struct _SCSPDSP DSP;
+
+	const device_config *device;
 };
 
 static void dma_scsp(const address_space *space, struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
@@ -260,7 +261,7 @@ static void CheckPendingIRQ(struct _SCSP *SCSP)
 {
 	UINT32 pend=SCSP->udata.data[0x20/2];
 	UINT32 en=SCSP->udata.data[0x1e/2];
-	running_machine *machine = Machine;
+	running_machine *machine = SCSP->device->machine;
 
 	if(SCSP->MidiW!=SCSP->MidiR)
 	{
@@ -301,7 +302,7 @@ static void CheckPendingIRQ(struct _SCSP *SCSP)
 static void ResetInterrupts(struct _SCSP *SCSP)
 {
 	UINT32 reset = SCSP->udata.data[0x22/2];
-	running_machine *machine = Machine;
+	running_machine *machine = SCSP->device->machine;
 
 	if (reset & 0x40)
 	{
@@ -512,6 +513,7 @@ static void SCSP_Init(const device_config *device, struct _SCSP *SCSP, const scs
 {
 	int i;
 
+	SCSP->device = device;
 	SCSP->IrqTimA = SCSP->IrqTimBC = SCSP->IrqMidi = 0;
 	SCSP->MidiR=SCSP->MidiW=0;
 	SCSP->MidiOutR=SCSP->MidiOutW=0;
@@ -698,7 +700,7 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(SCSP->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:
@@ -839,7 +841,7 @@ static void SCSP_UpdateRegR(struct _SCSP *SCSP, int reg)
 				unsigned short v=SCSP->udata.data[0x5/2];
 				v&=0xff00;
 				v|=SCSP->MidiStack[SCSP->MidiR];
-				SCSP[0].Int68kCB(Machine, -SCSP->IrqMidi);	// cancel the IRQ
+				SCSP[0].Int68kCB(SCSP->device->machine, -SCSP->IrqMidi);	// cancel the IRQ
 				if(SCSP->MidiR!=SCSP->MidiW)
 				{
 					++SCSP->MidiR;

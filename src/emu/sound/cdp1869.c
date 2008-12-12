@@ -12,11 +12,11 @@
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "sound/cdp1869.h"
 
 struct CDP1869
 {
+	const device_config *device;
 	sound_stream *stream;	/* returned by stream_create() */
 	int clock;			/* chip's base frequency */
 
@@ -42,7 +42,7 @@ struct CDP1869
 
 static void cdp1869_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
 {
-	struct CDP1869 *info = (struct CDP1869 *) param;
+	struct CDP1869 *info = param;
 	INT16 signal = info->signal;
 	stream_sample_t *buffer = _buffer[0];
 
@@ -53,7 +53,7 @@ static void cdp1869_update(void *param, stream_sample_t **inputs, stream_sample_
 		double frequency = (info->clock / 2) / (512 >> info->tonefreq) / (info->tonediv + 1);
 //      double amplitude = info->toneamp * ((0.78*5) / 15);
 
-		int rate = Machine->sample_rate / 2;
+		int rate = info->device->machine->sample_rate / 2;
 
 		/* get progress through wave */
 		int incr = info->incr;
@@ -110,6 +110,7 @@ static SND_START( cdp1869 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
+	info->device = device;
 	info->stream = stream_create(device, 0, 1, device->machine->sample_rate, info, cdp1869_update );
 	info->incr = 0;
 	info->signal = 0x07fff;

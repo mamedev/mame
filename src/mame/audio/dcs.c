@@ -2018,7 +2018,7 @@ static void sound_tx_callback(const device_config *device, int port, INT32 data)
 			dcs.ireg_base = source;
 
 			/* recompute the sample rate and timer */
-			recompute_sample_rate(Machine);
+			recompute_sample_rate(device->machine);
 			return;
 		}
 		else

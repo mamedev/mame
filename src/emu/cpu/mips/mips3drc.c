@@ -31,7 +31,6 @@
 #include "cpuexec.h"
 #include "mips3com.h"
 #include "mips3fe.h"
-#include "deprecat.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -1220,7 +1219,7 @@ static void static_generate_memory_accessor(mips3_state *mips3, int mode, int si
 	UML_JMPc(block, IF_Z, tlbmiss = label++);										// jmp     tlbmiss,z
 	UML_ROLINS(block, IREG(0), IREG(3), IMM(0), IMM(0xfffff000));					// rolins  i0,i3,0,0xfffff000
 
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if ((mips3->device->machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 		for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
 			if (mips3->impstate->fastram[ramnum].base != NULL && (!iswrite || !mips3->impstate->fastram[ramnum].readonly))
 			{
@@ -1551,7 +1550,7 @@ static void generate_sequence_instruction(mips3_state *mips3, drcuml_block *bloc
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((mips3->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		UML_MOV(block, MEM(&mips3->pc), IMM(desc->pc));								// mov     [pc],desc->pc
 		save_fast_iregs(mips3, block);

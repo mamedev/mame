@@ -1,6 +1,5 @@
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "2203intf.h"
 #include "fm.h"
@@ -13,6 +12,7 @@ struct ym2203_info
 	void *			chip;
 	void *			psg;
 	const ym2203_interface *intf;
+	const device_config *device;
 };
 
 
@@ -52,7 +52,7 @@ static const ssg_callbacks psgintf =
 static void IRQHandler(void *param,int irq)
 {
 	struct ym2203_info *info = param;
-	if(info->intf->handler) info->intf->handler(Machine, irq);
+	if(info->intf->handler) info->intf->handler(info->device->machine, irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -124,6 +124,7 @@ static SND_START( ym2203 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
+	info->device = device;
 	info->psg = ay8910_start_ym(SOUND_YM2203, device, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;
 

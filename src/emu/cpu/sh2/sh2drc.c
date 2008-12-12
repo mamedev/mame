@@ -16,7 +16,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "sh2.h"
 #include "sh2comn.h"
 #include "eminline.h"
@@ -1572,7 +1571,7 @@ static void generate_sequence_instruction(SH2 *sh2, drcuml_block *block, compile
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((sh2->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		UML_MOV(block, MEM(&sh2->pc), IMM(desc->pc));								// mov     [pc],desc->pc
 		save_fast_iregs(sh2, block);

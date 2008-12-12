@@ -21,7 +21,6 @@
 #include "debugger.h"
 #include "ppccom.h"
 #include "ppcfe.h"
-#include "deprecat.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -1499,7 +1498,7 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 		UML_AND(block, IREG(0), IREG(0), IMM(0x7fffffff));									// and     i0,i0,0x7fffffff
 	UML_XOR(block, IREG(0), IREG(0), IMM((mode & MODE_LITTLE_ENDIAN) ? (8 - size) : 0));	// xor     i0,i0,8-size
 
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((ppc->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		for (ramnum = 0; ramnum < PPC_MAX_FASTRAM; ramnum++)
 			if (ppc->impstate->fastram[ramnum].base != NULL && (!iswrite || !ppc->impstate->fastram[ramnum].readonly))
 			{
@@ -2132,7 +2131,7 @@ static void generate_sequence_instruction(powerpc_state *ppc, drcuml_block *bloc
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((ppc->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		UML_MOV(block, MEM(&ppc->pc), IMM(desc->pc));										// mov     [pc],desc->pc
 		save_fast_iregs(ppc, block);														// <save fastregs>

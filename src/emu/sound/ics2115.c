@@ -7,7 +7,6 @@
 
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "cpuexec.h"
@@ -42,8 +41,10 @@
 
 enum { V_ON = 1, V_DONE = 2 };
 
-struct ics2115{
+struct ics2115
+{
 	const ics2115_interface *intf;
+	const device_config *device;
 	int index;
 	UINT8 *rom;
 	INT16 *ulaw;
@@ -79,7 +80,7 @@ static void recalc_irq(struct ics2115 *chip)
 	if(irq != chip->irq_on) {
 		chip->irq_on = irq;
 		if(chip->intf->irq_cb)
-			chip->intf->irq_cb(Machine, irq ? ASSERT_LINE : CLEAR_LINE);
+			chip->intf->irq_cb(chip->device->machine, irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -192,11 +193,13 @@ static void recalc_timer(struct ics2115 *chip, int timer)
 
 static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 {
+	running_machine *machine = chip->device->machine;
+
 	switch(reg) {
 	case 0x00: // [osc] Oscillator Configuration
 		if(msb) {
 			chip->voice[chip->osc].conf = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: conf = %02x\n", cpuexec_describe_context(Machine), chip->osc,
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: conf = %02x\n", cpuexec_describe_context(machine), chip->osc,
 					 chip->voice[chip->osc].conf);
 		}
 		break;
@@ -207,7 +210,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 			chip->voice[chip->osc].fc = (chip->voice[chip->osc].fc & 0xff)|(data << 8);
 		else
 			chip->voice[chip->osc].fc = (chip->voice[chip->osc].fc & 0xff00)|data;
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: fc = %04x (%dHz)\n", cpuexec_describe_context(Machine), chip->osc,
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: fc = %04x (%dHz)\n", cpuexec_describe_context(machine), chip->osc,
 				 chip->voice[chip->osc].fc, chip->voice[chip->osc].fc*33075/1024);
 		break;
 
@@ -216,14 +219,14 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 			chip->voice[chip->osc].strth = (chip->voice[chip->osc].strth & 0xff)|(data << 8);
 		else
 			chip->voice[chip->osc].strth = (chip->voice[chip->osc].strth & 0xff00)|data;
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: strth = %04x\n", cpuexec_describe_context(Machine), chip->osc,
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: strth = %04x\n", cpuexec_describe_context(machine), chip->osc,
 				 chip->voice[chip->osc].strth);
 		break;
 
 	case 0x03: // [osc] Wavesample loop start address 3-0.3-0
 		if(msb) {
 			chip->voice[chip->osc].strtl = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: strtl = %02x\n", cpuexec_describe_context(Machine), chip->osc,
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: strtl = %02x\n", cpuexec_describe_context(machine), chip->osc,
 					 chip->voice[chip->osc].strtl);
 		}
 		break;
@@ -233,14 +236,14 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 			chip->voice[chip->osc].endh = (chip->voice[chip->osc].endh & 0xff)|(data << 8);
 		else
 			chip->voice[chip->osc].endh = (chip->voice[chip->osc].endh & 0xff00)|data;
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: endh = %04x\n", cpuexec_describe_context(Machine), chip->osc,
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: endh = %04x\n", cpuexec_describe_context(machine), chip->osc,
 				 chip->voice[chip->osc].endh);
 		break;
 
 	case 0x05: // [osc] Wavesample loop end address 3-0.3-0
 		if(msb) {
 			chip->voice[chip->osc].endl = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: endl = %02x\n", cpuexec_describe_context(Machine), chip->osc,
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: endl = %02x\n", cpuexec_describe_context(machine), chip->osc,
 					 chip->voice[chip->osc].endl);
 		}
 		break;
@@ -248,7 +251,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x07: // [osc] Volume Start
 		if(msb) {
 			chip->voice[chip->osc].vstart = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: vstart = %02x\n", cpuexec_describe_context(Machine), chip->osc,
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: vstart = %02x\n", cpuexec_describe_context(machine), chip->osc,
 					 chip->voice[chip->osc].vstart);
 		}
 		break;
@@ -256,7 +259,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x08: // [osc] Volume End
 		if(msb) {
 			chip->voice[chip->osc].vend = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: vend = %02x\n", cpuexec_describe_context(Machine), chip->osc,
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: vend = %02x\n", cpuexec_describe_context(machine), chip->osc,
 					 chip->voice[chip->osc].vend);
 		}
 		break;
@@ -266,7 +269,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 			chip->voice[chip->osc].volacc = (chip->voice[chip->osc].volacc & 0xff)|(data << 8);
 		else
 			chip->voice[chip->osc].volacc = (chip->voice[chip->osc].volacc & 0xff00)|data;
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: volacc = %04x\n", cpuexec_describe_context(Machine), chip->osc,
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: volacc = %04x\n", cpuexec_describe_context(machine), chip->osc,
 				 chip->voice[chip->osc].volacc);
 		break;
 
@@ -275,7 +278,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 			chip->voice[chip->osc].addrh = (chip->voice[chip->osc].addrh & 0xff)|(data << 8);
 		else
 			chip->voice[chip->osc].addrh = (chip->voice[chip->osc].addrh & 0xff00)|data;
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: addrh = %04x\n", cpuexec_describe_context(Machine), chip->osc,
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: addrh = %04x\n", cpuexec_describe_context(machine), chip->osc,
 				 chip->voice[chip->osc].addrh);
 		break;
 
@@ -284,7 +287,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 			chip->voice[chip->osc].addrl = (chip->voice[chip->osc].addrl & 0xff)|(data << 8);
 		else
 			chip->voice[chip->osc].addrl = (chip->voice[chip->osc].addrl & 0xff00)|data;
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: addrl = %04x\n", cpuexec_describe_context(Machine), chip->osc,
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: addrl = %04x\n", cpuexec_describe_context(machine), chip->osc,
 				 chip->voice[chip->osc].addrl);
 		break;
 
@@ -292,7 +295,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x0c: // [osc] Pan
 		if(msb) {
 			chip->voice[chip->osc].pan = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: pan = %02x\n", cpuexec_describe_context(Machine), chip->osc,
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: pan = %02x\n", cpuexec_describe_context(machine), chip->osc,
 					 chip->voice[chip->osc].pan);
 		}
 		break;
@@ -300,7 +303,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x0d: // [osc] Volume Enveloppe Control
 		if(msb) {
 			chip->voice[chip->osc].vctl = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: vctl = %02x\n", cpuexec_describe_context(Machine), chip->osc,
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: vctl = %02x\n", cpuexec_describe_context(machine), chip->osc,
 					 chip->voice[chip->osc].vctl);
 		}
 		break;
@@ -308,7 +311,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x10: // [osc] Oscillator Control
 		if(msb) {
 			chip->voice[chip->osc].ctl = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: ctl = %02x\n", cpuexec_describe_context(Machine), chip->osc,
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: ctl = %02x\n", cpuexec_describe_context(machine), chip->osc,
 					 chip->voice[chip->osc].ctl);
 			if(data == 0)
 				keyon(chip, chip->osc);
@@ -318,7 +321,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x11: // [osc] Wavesample static address 27-20
 		if(msb) {
 			chip->voice[chip->osc].saddr = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: saddr = %02x\n", cpuexec_describe_context(Machine), chip->osc,
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: saddr = %02x\n", cpuexec_describe_context(machine), chip->osc,
 					 chip->voice[chip->osc].saddr);
 		}
 		break;
@@ -326,7 +329,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x40: // Timer 1 Preset
 		if(!msb) {
 			chip->timer[0].preset = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: t1preset = %d\n", cpuexec_describe_context(Machine), chip->timer[0].preset);
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: t1preset = %d\n", cpuexec_describe_context(machine), chip->timer[0].preset);
 			recalc_timer(chip, 0);
 		}
 		break;
@@ -334,7 +337,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x41: // Timer 2 Preset
 		if(!msb) {
 			chip->timer[1].preset = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: t2preset = %d\n", cpuexec_describe_context(Machine), chip->timer[1].preset);
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: t2preset = %d\n", cpuexec_describe_context(machine), chip->timer[1].preset);
 			recalc_timer(chip, 1);
 		}
 		break;
@@ -342,7 +345,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x42: // Timer 1 Prescaler
 		if(!msb) {
 			chip->timer[0].scale = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: t1scale = %d\n", cpuexec_describe_context(Machine), chip->timer[0].scale);
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: t1scale = %d\n", cpuexec_describe_context(machine), chip->timer[0].scale);
 			recalc_timer(chip, 0);
 		}
 		break;
@@ -350,7 +353,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x43: // Timer 2 Prescaler
 		if(!msb) {
 			chip->timer[1].scale = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: t2scale = %d\n", cpuexec_describe_context(Machine), chip->timer[1].scale);
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: t2scale = %d\n", cpuexec_describe_context(machine), chip->timer[1].scale);
 			recalc_timer(chip, 1);
 		}
 		break;
@@ -358,7 +361,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x4a: // IRQ Enable
 		if(!msb) {
 			chip->irq_en = data;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: irq_en = %02x\n", cpuexec_describe_context(Machine), chip->irq_en);
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: irq_en = %02x\n", cpuexec_describe_context(machine), chip->irq_en);
 			recalc_irq(chip);
 		}
 		break;
@@ -366,20 +369,22 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	case 0x4f: // Oscillator Address being Programmed
 		if(!msb) {
 			chip->osc = data & 31;
-			if (ICS2115LOGERROR) logerror("%s:ICS2115: oscnumber = %d\n", cpuexec_describe_context(Machine), chip->osc);
+			if (ICS2115LOGERROR) logerror("%s:ICS2115: oscnumber = %d\n", cpuexec_describe_context(machine), chip->osc);
 		}
 		break;
 
 	default:
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: write %02x, %02x:%d\n", cpuexec_describe_context(Machine), reg, data, msb);
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: write %02x, %02x:%d\n", cpuexec_describe_context(machine), reg, data, msb);
 	}
 }
 
 static UINT16 ics2115_reg_r(struct ics2115 *chip, UINT8 reg)
 {
+	running_machine *machine = chip->device->machine;
+
 	switch(reg) {
 	case 0x0d: // [osc] Volume Enveloppe Control
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: read vctl\n", cpuexec_describe_context(Machine), chip->osc);
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: read vctl\n", cpuexec_describe_context(machine), chip->osc);
 		//      res = chip->voice[chip->osc].vctl << 8;
 		// may expect |8 on voice irq with &40 == 0
 		// may expect |8 on reg 0 on voice irq with &80 == 0
@@ -396,40 +401,40 @@ static UINT16 ics2115_reg_r(struct ics2115 *chip, UINT8 reg)
 				res = 0x40 | osc; // 0x40 ? 0x80 ?
 				break;
 			}
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: read irqv %02x\n", cpuexec_describe_context(Machine), res);
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: read irqv %02x\n", cpuexec_describe_context(machine), res);
 		return res << 8;
 	}
 
 	case 0x40: // Timer 0 clear irq
-		//      if (ICS2115LOGERROR) logerror("%s:ICS2115: clear timer 0\n", cpuexec_describe_context(Machine));
+		//      if (ICS2115LOGERROR) logerror("%s:ICS2115: clear timer 0\n", cpuexec_describe_context(machine));
 		chip->irq_pend &= ~(1<<0);
 		recalc_irq(chip);
 		return chip->timer[0].preset;
 
 	case 0x41: // Timer 1 clear irq
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: clear timer 1\n", cpuexec_describe_context(Machine));
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: clear timer 1\n", cpuexec_describe_context(machine));
 		chip->irq_pend &= ~(1<<1);
 		recalc_irq(chip);
 		return chip->timer[1].preset;
 
 	case 0x43: // Timer status
-		//      if (ICS2115LOGERROR) logerror("%s:ICS2115: read timer status %02x\n", cpuexec_describe_context(Machine), chip->irq_pend & 3);
+		//      if (ICS2115LOGERROR) logerror("%s:ICS2115: read timer status %02x\n", cpuexec_describe_context(machine), chip->irq_pend & 3);
 		return chip->irq_pend & 3;
 
 	case 0x4a: // IRQ Pending
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: read irq_pend %02x\n", cpuexec_describe_context(Machine), chip->irq_pend);
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: read irq_pend %02x\n", cpuexec_describe_context(machine), chip->irq_pend);
 		return chip->irq_pend;
 
 	case 0x4b: // Address of Interrupting Oscillator
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: read intoscaddr\n", cpuexec_describe_context(Machine), chip->osc);
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: %2d: read intoscaddr\n", cpuexec_describe_context(machine), chip->osc);
 		return 0x80;
 
 	case 0x4c: // Chip revision
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: read revision\n", cpuexec_describe_context(Machine));
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: read revision\n", cpuexec_describe_context(machine));
 		return 0x01;
 
 	default:
-		if (ICS2115LOGERROR) logerror("%s:ICS2115: read %02x unmapped\n", cpuexec_describe_context(Machine), reg);
+		if (ICS2115LOGERROR) logerror("%s:ICS2115: read %02x unmapped\n", cpuexec_describe_context(machine), reg);
 		return 0;
 	}
 }
@@ -443,6 +448,7 @@ static SND_START( ics2115 )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
+	chip->device = device;
 	chip->intf = config;
 	chip->index = sndindex;
 	chip->rom = device->region;
@@ -483,7 +489,7 @@ READ8_HANDLER( ics2115_r )
 					break;
 				}
 		}
-		//      if (ICS2115LOGERROR) logerror("%s:ICS2115: read status %02x\n", cpuexec_describe_context(Machine), res);
+		//      if (ICS2115LOGERROR) logerror("%s:ICS2115: read status %02x\n", cpuexec_describe_context(space->machine), res);
 
 		return res;
 	}
@@ -511,7 +517,7 @@ WRITE8_HANDLER( ics2115_w )
 		ics2115_reg_w(chip, chip->reg, data, 1);
 		break;
 	}
-	//  if (ICS2115LOGERROR) logerror("ICS2115: wi %d, %02x\n", cpuexec_describe_context(Machine), offset, data);
+	//  if (ICS2115LOGERROR) logerror("ICS2115: wi %d, %02x\n", cpuexec_describe_context(space->machine), offset, data);
 }
 
 static SND_RESET( ics2115 )

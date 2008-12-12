@@ -89,7 +89,6 @@
 #include "drcuml.h"
 #include "drcbeut.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "x86emit.h"
 #include "eminline.h"
 #undef REG_SP
@@ -3221,7 +3220,7 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((drcbe->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		drcuml_parameter pcp;
 
@@ -3229,7 +3228,7 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		param_normalize_1(drcbe, inst, &pcp, PTYPE_MRI);
 
 		/* test and branch */
-		emit_test_m32_imm(&dst, MABS(&Machine->debug_flags), DEBUG_FLAG_CALL_HOOK);		// test  [Machine->debug_flags],DEBUG_FLAG_CALL_HOOK
+		emit_test_m32_imm(&dst, MABS(&drcbe->device->machine->debug_flags), DEBUG_FLAG_CALL_HOOK);		// test  [debug_flags],DEBUG_FLAG_CALL_HOOK
 		emit_jcc_short_link(&dst, COND_Z, &skip);										// jz    skip
 
 		/* push the parameter */

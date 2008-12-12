@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "ay8910.h"
 #include "2608intf.h"
@@ -25,6 +24,7 @@ struct ym2608_info
 	void *			chip;
 	void *			psg;
 	const ym2608_interface *intf;
+	const device_config *device;
 };
 
 
@@ -66,7 +66,7 @@ static const ssg_callbacks psgintf =
 static void IRQHandler(void *param,int irq)
 {
 	struct ym2608_info *info = param;
-	if(info->intf->handler) info->intf->handler(Machine, irq);
+	if(info->intf->handler) info->intf->handler(info->device->machine, irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -140,6 +140,8 @@ static SND_START( ym2608 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
+	info->device = device;
+
 	/* FIXME: Force to use simgle output */
 	info->psg = ay8910_start_ym(SOUND_YM2608, device, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;

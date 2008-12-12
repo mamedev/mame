@@ -14,7 +14,6 @@
 #include "sndintrf.h"
 #include "streams.h"
 #include "cpuintrf.h"
-#include "deprecat.h"
 #include "aica.h"
 #include "aicadsp.h"
 
@@ -203,6 +202,7 @@ struct _AICA
 	int ARTABLE[64], DRTABLE[64];
 
 	struct _AICADSP DSP;
+	const device_config *device;
 };
 
 static const float SDLT[16]={-1000000.0,-42.0,-39.0,-36.0,-33.0,-30.0,-27.0,-24.0,-21.0,-18.0,-15.0,-12.0,-9.0,-6.0,-3.0,0.0};
@@ -231,7 +231,7 @@ static void ResetInterrupts(struct _AICA *AICA)
 {
 #if 0
 	UINT32 reset = AICA->udata.data[0xa4/2];
-	running_machine *machine = Machine;
+	running_machine *machine = AICA->device->machine;
 
 	if (reset & 0x40)
 		AICA->IntARMCB(machine, -AICA->IrqTimA);
@@ -244,7 +244,7 @@ static void CheckPendingIRQ(struct _AICA *AICA)
 {
 	UINT32 pend=AICA->udata.data[0xa0/2];
 	UINT32 en=AICA->udata.data[0x9c/2];
-	running_machine *machine = Machine;
+	running_machine *machine = AICA->device->machine;
 
 	if(AICA->MidiW!=AICA->MidiR)
 	{
@@ -517,6 +517,7 @@ static void AICA_Init(const device_config *device, struct _AICA *AICA, const aic
 {
 	int i;
 
+	AICA->device = device;
 	AICA->IrqTimA = AICA->IrqTimBC = AICA->IrqMidi = 0;
 	AICA->MidiR=AICA->MidiW=0;
 	AICA->MidiOutR=AICA->MidiOutW=0;
@@ -719,7 +720,7 @@ static void AICA_UpdateSlotReg(struct _AICA *AICA,int s,int r)
 static void AICA_UpdateReg(struct _AICA *AICA, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(AICA->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(reg&0xff)
 	{
 		case 0x4:
@@ -860,7 +861,7 @@ static void AICA_UpdateRegR(struct _AICA *AICA, int reg)
 				unsigned short v=AICA->udata.data[0x8/2];
 				v&=0xff00;
 				v|=AICA->MidiStack[AICA->MidiR];
-				AICA->IntARMCB(Machine, 0);	// cancel the IRQ
+				AICA->IntARMCB(AICA->device->machine, 0);	// cancel the IRQ
 				if(AICA->MidiR!=AICA->MidiW)
 				{
 					++AICA->MidiR;
@@ -926,7 +927,7 @@ static void AICA_w16(struct _AICA *AICA,unsigned int addr,unsigned short val)
 
 			if (val)
 			{
-				AICA->IntARMCB(Machine, 0);
+				AICA->IntARMCB(AICA->device->machine, 0);
 			}
 		}
 	}

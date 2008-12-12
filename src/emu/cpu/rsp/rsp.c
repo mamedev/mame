@@ -6,7 +6,6 @@
 
 #include "cpuintrf.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "rsp.h"
 
 #define LOG_INSTRUCTION_EXECUTION		0

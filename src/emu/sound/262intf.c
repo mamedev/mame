@@ -6,7 +6,6 @@
 
 ***************************************************************************/
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "262intf.h"
 #include "ymf262.h"
@@ -18,6 +17,7 @@ struct ymf262_info
 	emu_timer *	timer[2];
 	void *			chip;
 	const ymf262_interface *intf;
+	const device_config *device;
 };
 
 
@@ -26,7 +26,7 @@ struct ymf262_info
 static void IRQHandler_262(void *param,int irq)
 {
 	struct ymf262_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(Machine, irq);
+	if (info->intf->handler) (info->intf->handler)(info->device->machine, irq);
 }
 
 static TIMER_CALLBACK( timer_callback_262_0 )
@@ -77,6 +77,7 @@ static SND_START( ymf262 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = config ? config : &dummy;
+	info->device = device;
 
 	/* stream system initialize */
 	info->chip = ymf262_init(clock,rate);

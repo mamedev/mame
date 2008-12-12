@@ -16,7 +16,6 @@
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "msm5205.h"
 
 /*
@@ -225,7 +224,7 @@ void msm5205_vclk_w (int num, int vclk)
 		if( voice->vclk != vclk)
 		{
 			voice->vclk = vclk;
-			if( !vclk ) MSM5205_vclk_callback(Machine, voice, 0);
+			if( !vclk ) MSM5205_vclk_callback(voice->device->machine, voice, 0);
 		}
 	}
 }

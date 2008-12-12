@@ -28,7 +28,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/pci.h"
 #include "memconv.h"

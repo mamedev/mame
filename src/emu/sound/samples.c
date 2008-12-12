@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "samples.h"
 
 
@@ -20,6 +19,7 @@ struct sample_channel
 
 struct samples_info
 {
+	const device_config *device;
 	int			numchannels;	/* how many channels */
 	struct sample_channel *channel;/* array of channels */
 	struct loaded_samples *samples;/* array of samples */
@@ -261,7 +261,7 @@ void sample_start_n(int num,int channel,int samplenum,int loop)
 	chan->pos = 0;
 	chan->frac = 0;
 	chan->basefreq = sample->frequency;
-	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / Machine->sample_rate;
+	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine->sample_rate;
 	chan->loop = loop;
 }
 
@@ -290,7 +290,7 @@ void sample_start_raw_n(int num,int channel,const INT16 *sampledata,int samples,
 	chan->pos = 0;
 	chan->frac = 0;
 	chan->basefreq = frequency;
-	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / Machine->sample_rate;
+	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine->sample_rate;
 	chan->loop = loop;
 }
 
@@ -312,7 +312,7 @@ void sample_set_freq_n(int num,int channel,int freq)
 	/* force an update before we start */
 	stream_update(chan->stream);
 
-	chan->step = ((INT64)freq << FRAC_BITS) / Machine->sample_rate;
+	chan->step = ((INT64)freq << FRAC_BITS) / info->device->machine->sample_rate;
 }
 
 void sample_set_freq(int channel,int freq)
@@ -537,6 +537,7 @@ static SND_START( samples )
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
+	info->device = device;
 	sndintrf_register_token(info);
 
 	/* read audio samples */

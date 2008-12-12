@@ -21,7 +21,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "xmlfile.h"
 #include "debugcmt.h"
 #include "debugcpu.h"
@@ -86,7 +85,7 @@ static comment_group *debug_comments;
 
 static int debug_comment_load_xml(running_machine *machine, mame_file *file);
 static void debug_comment_exit(running_machine *machine);
-static void debug_comment_free(void);
+static void debug_comment_free(running_machine *machine);
 
 
 
@@ -556,7 +555,7 @@ error:
 static void debug_comment_exit(running_machine *machine)
 {
 	debug_comment_save(machine);
-	debug_comment_free();
+	debug_comment_free(machine);
 }
 
 
@@ -564,12 +563,12 @@ static void debug_comment_exit(running_machine *machine)
     debug_comment_free - cleans up memory
 -------------------------------------------------------------------------*/
 
-static void debug_comment_free(void)
+static void debug_comment_free(running_machine *machine)
 {
 	int i, j;
 
-	for (i = 0; i < ARRAY_LENGTH(Machine->cpu); i++)
-		if (Machine->cpu[i] != NULL)
+	for (i = 0; i < ARRAY_LENGTH(machine->cpu); i++)
+		if (machine->cpu[i] != NULL)
 		{
 			for (j = 0; j < debug_comments[i].comment_count; j++)
 			{

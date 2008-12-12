@@ -173,7 +173,6 @@
 #include "drcuml.h"
 #include "drcbeut.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "x86emit.h"
 #include "eminline.h"
 #undef REG_SP
@@ -3093,7 +3092,7 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if ((drcbe->device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		drcuml_parameter pcp;
 
