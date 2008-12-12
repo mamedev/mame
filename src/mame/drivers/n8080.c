@@ -80,12 +80,12 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 	cpu_set_input_line_and_vector(cputag_get_cpu(timer->machine, "main"), INPUT_LINE_IRQ0, state, 0xd7);
 }
 
-static n8080_inte_callback(const device_config *device, int state)
+static void n8080_inte_callback(const device_config *device, int state)
 {
 	inte = state;
 }
 
-static n8080_status_callback(const device_config *device, UINT8 status)
+static void n8080_status_callback(const device_config *device, UINT8 status)
 {
 	if (BIT(status, 0))
 	{
