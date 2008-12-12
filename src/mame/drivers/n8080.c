@@ -66,14 +66,18 @@ ADDRESS_MAP_END
 
 static TIMER_DEVICE_CALLBACK( rst1_tick )
 {
+	int state = inte ? ASSERT_LINE : CLEAR_LINE;
+
 	/* V7 = 1, V6 = 0 */
-	cpu_set_input_line_and_vector(cputag_get_cpu(timer->machine, "main"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+	cpu_set_input_line_and_vector(cputag_get_cpu(timer->machine, "main"), INPUT_LINE_IRQ0, state, 0xcf);
 }
 
 static TIMER_DEVICE_CALLBACK( rst2_tick )
 {
+	int state = inte ? ASSERT_LINE : CLEAR_LINE;
+
 	/* vblank */
-	cpu_set_input_line_and_vector(cputag_get_cpu(timer->machine, "main"), INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
+	cpu_set_input_line_and_vector(cputag_get_cpu(timer->machine, "main"), INPUT_LINE_IRQ0, state, 0xd7);
 }
 
 static n8080_inte_callback(const device_config *device, int state)
