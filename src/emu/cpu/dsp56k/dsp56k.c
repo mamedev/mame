@@ -35,199 +35,15 @@
 #include "dsp56def.h"
 
 /***************************************************************************
-    LOCAL DECLARATIONS
+    FUNCTION PROTOTYPES
 ***************************************************************************/
-static CPU_INIT( dsp56k );
 static CPU_RESET( dsp56k );
-static CPU_EXIT( dsp56k );
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-/***************************************************************************
-    STRUCTURES & TYPEDEFS
-***************************************************************************/
-// 5-4 Host Interface
-typedef struct
-{
-	// **** Dsp56k side **** //
-	// Host Control Register
-	UINT16* hcr;
-
-	// Host Status Register
-	UINT16* hsr;
-
-	// Host Transmit/Receive Data
-	UINT16* htrx;
-
-	// **** Host CPU side **** //
-	// Interrupt Control Register
-	UINT8 icr;
-
-	// Command Vector Register
-	UINT8 cvr;
-
-	// Interrupt Status Register
-	UINT8 isr;
-
-	// Interrupt Vector Register
-	UINT8 ivr;
-
-	// Transmit / Receive Registers
-	UINT8 trxh;
-	UINT8 trxl;
-
-	// HACK - Host interface bootstrap write offset
-	UINT16 bootstrap_offset;
-
-} dsp56k_host_interface;
-
-// 1-9 ALU
-typedef struct
-{
-	// Four 16-bit input registers (can be accessed as 2 32-bit registers)
-	PAIR x;
-	PAIR y;
-
-	// Two 32-bit accumulator registers + 8-bit accumulator extension registers
-	PAIR64 a;
-	PAIR64 b;
-
-	// An accumulation shifter
-	// One data bus shifter/limiter
-	// A parallel, single cycle, non-pipelined Multiply-Accumulator (MAC) unit
-	// Basics
-} dsp56k_data_alu;
-
-// 1-10 Address Generation Unit (AGU)
-typedef struct
-{
-	// Four address registers
-	UINT16 r0;
-	UINT16 r1;
-	UINT16 r2;
-	UINT16 r3;
-
-	// Four offset registers
-	UINT16 n0;
-	UINT16 n1;
-	UINT16 n2;
-	UINT16 n3;
-
-	// Four modifier registers
-	UINT16 m0;
-	UINT16 m1;
-	UINT16 m2;
-	UINT16 m3;
-
-	// Used in loop processing
-	UINT16 temp;
-
-	// FM.4-5 - hmmm?
-	// UINT8 status;
-
-	// Basics
-} dsp56k_agu;
-
-// 1-11 Program Control Unit (PCU)
-typedef struct
-{
-	// Program Counter
-	UINT16 pc;
-
-	// Loop Address
-	UINT16 la;
-
-	// Loop Counter
-	UINT16 lc;
-
-	// Status Register
-	UINT16 sr;
-
-	// Operating Mode Register
-	UINT16 omr;
-
-	// Stack Pointer
-	UINT16 sp;
-
-	// Stack (TODO: 15-level?)
-	PAIR ss[16];
-
-	// Controls IRQ processing
-	void (*service_interrupts)(void);
-
-	// A list of pending interrupts (indices into dsp56k_interrupt_sources array)
-	INT8 pending_interrupts[32];
-
-	// Basics
-
-	// Other PCU internals
-	UINT16 reset_vector;
-
-} dsp56k_pcu;
-
-// 1-8 The dsp56156 CORE
-typedef struct
-{
-	// PROGRAM CONTROLLER
-	dsp56k_pcu PCU;
-
-	// ADR ALU (AGU)
-	dsp56k_agu AGU;
-
-	// CLOCK GEN
-	//static emu_timer *dsp56k_timer;   // 1-5, 1-8 - Clock gen
-
-	// DATA ALU
-	dsp56k_data_alu ALU;
-
-	// OnCE
-
-	// IBS and BITFIELD UNIT
-
-	// Host Interface
-	dsp56k_host_interface HI;
-
-	// IRQ line states
-	UINT8 modA_state;
-	UINT8 modB_state;
-	UINT8 modC_state;
-	UINT8 reset_state;
-
-	// HACK - Bootstrap mode state variable.
-	UINT8 bootstrap_mode;
-
-	UINT8	repFlag;	// Knowing if we're in a 'repeat' state (dunno how the processor does this)
-	UINT32	repAddr;	// The address of the instruction to repeat...
-
-
-	/* MAME internal stuff */
-	UINT32			ppc;
-	UINT32			op;
-	int				interrupt_cycles;
-	void			(*output_pins_changed)(UINT32 pins);
-	const device_config *device;
-	const address_space *program;
-	const address_space *data;
-} dsp56k_core;
-
 
 /***************************************************************************
     ONBOARD MEMORY ALLOCATION
 ***************************************************************************/
 static UINT16 *dsp56k_peripheral_ram;
 static UINT16 *dsp56k_program_ram;
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-/***************************************************************************
-    PRIVATE GLOBAL VARIABLES
-***************************************************************************/
-static dsp56k_core core;
-static int dsp56k_icount;
 
 /***************************************************************************
     COMPONENT FUNCTIONALITY
@@ -250,37 +66,13 @@ static int dsp56k_icount;
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
-#define ROPCODE(pc)   memory_decrypted_read_word(core.program, pc)
-
-
-/***************************************************************************
-    EXECEPTION HANDLING
-***************************************************************************/
-
-#ifdef UNUSED_FUNCTION
-INLINE void generate_exception(int exception)
-{
-}
-#endif
-
-#ifdef UNUSED_FUNCTION
-INLINE void invalid_instruction(UINT32 op)
-{
-}
-#endif
+#define ROPCODE(pc)   memory_decrypted_read_word(cpustate->program, pc)
 
 
 /***************************************************************************
     IRQ HANDLING
 ***************************************************************************/
-#ifdef UNUSED_FUNCTION
-static void check_irqs(void)
-{
-	//logerror("Dsp56k check irqs\n");
-}
-#endif
-
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(dsp56k_core* cpustate, int irqline, int state)
 {
 	logerror("DSP56k set irq line %d %d\n", irqline, state);
 
@@ -288,51 +80,51 @@ static void set_irq_line(int irqline, int state)
 	{
 		case DSP56K_IRQ_MODA:
 			// TODO: 1-12 Get this triggering right
-			if (irqa_trigger())
+			if (irqa_trigger(cpustate))
 				logerror("DSP56k IRQA is set to fire on the \"Negative Edge\".\n");
 
 			if (state != CLEAR_LINE)
-				core.modA_state = TRUE;
+				cpustate->modA_state = TRUE;
 			else
-				core.modA_state = FALSE;
+				cpustate->modA_state = FALSE;
 
-			if (core.reset_state != TRUE)
-				dsp56k_add_pending_interrupt("IRQA");
+			if (cpustate->reset_state != TRUE)
+				dsp56k_add_pending_interrupt(cpustate, "IRQA");
 			break;
 
 		case DSP56K_IRQ_MODB:
 			// TODO: 1-12 Get this triggering right
-			if (irqb_trigger())
+			if (irqb_trigger(cpustate))
 				logerror("DSP56k IRQB is set to fire on the \"Negative Edge\".\n");
 
 			if (state != CLEAR_LINE)
-				core.modB_state = TRUE;
+				cpustate->modB_state = TRUE;
 			else
-				core.modB_state = FALSE;
+				cpustate->modB_state = FALSE;
 
-			if (core.reset_state != TRUE)
-				dsp56k_add_pending_interrupt("IRQB");
+			if (cpustate->reset_state != TRUE)
+				dsp56k_add_pending_interrupt(cpustate, "IRQB");
 			break;
 
 		case DSP56K_IRQ_MODC:
 			if (state != CLEAR_LINE)
-				core.modC_state = TRUE;
+				cpustate->modC_state = TRUE;
 			else
-				core.modC_state = FALSE;
+				cpustate->modC_state = FALSE;
 
 			// TODO : Set bus mode or whatever
 			break;
 
 		case DSP56K_IRQ_RESET:
 			if (state != CLEAR_LINE)
-				core.reset_state = TRUE;
+				cpustate->reset_state = TRUE;
 			else
 			{
 				/* If it changes state from asserted to cleared.  Call the reset function. */
-				if (core.reset_state == TRUE)
-					cpu_reset_dsp56k(core.device);
+				if (cpustate->reset_state == TRUE)
+					cpu_reset_dsp56k(cpustate->device);
 
-				core.reset_state = FALSE;
+				cpustate->reset_state = FALSE;
 			}
 
 			// dsp56k_add_pending_interrupt("Hardware RESET");
@@ -345,30 +137,9 @@ static void set_irq_line(int irqline, int state)
 
 	// If the reset line isn't asserted, service interrupts
 	// TODO: Is it right to immediately service interrupts?
-	//if (core.reset_state != TRUE)
+	//if (cpustate->reset_state != TRUE)
 	//  pcu_service_interrupts();
 }
-
-
-/***************************************************************************
-    CONTEXT SWITCHING
-***************************************************************************/
-/*
-static CPU_GET_CONTEXT( dsp56k )
-{
-	if (dst)
-		*(dsp56k_core *)dst = core;
-}
-
-
-static CPU_SET_CONTEXT( dsp56k )
-{
-	if (src)
-		core = *(dsp56k_core *)src;
-
-	check_irqs();
-}
-*/
 
 
 /***************************************************************************
@@ -376,32 +147,34 @@ static CPU_SET_CONTEXT( dsp56k )
 ***************************************************************************/
 static CPU_INIT( dsp56k )
 {
+	dsp56k_core* cpustate = device->token;
+
 	// Call specific module inits
-	pcu_init(index);
-	// agu_init(index);
-	// alu_init(index);
+	pcu_init(cpustate, index);
+	// agu_init(cpustate, index);
+	// alu_init(cpustate, index);
 
 	// HACK - You're not in bootstrap mode upon bootup
-	core.bootstrap_mode = BOOTSTRAP_OFF;
+	cpustate->bootstrap_mode = BOOTSTRAP_OFF;
 
 	// Clear the irq states
-	core.modA_state = FALSE;
-	core.modB_state = FALSE;
-	core.modC_state = FALSE;
-	core.reset_state = FALSE;
+	cpustate->modA_state = FALSE;
+	cpustate->modB_state = FALSE;
+	cpustate->modC_state = FALSE;
+	cpustate->reset_state = FALSE;
 
 	/* Save the core's state */
 	// state_save_register_device_item(device, 0, modA_state);
 	// ...
 
-	//core.config = device->static_config;
-	//core.irq_callback = irqcallback;
-	core.device = device;
-	core.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	core.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	//cpustate->config = device->static_config;
+	//cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 }
 
-static void agu_reset(void)
+static void agu_reset(dsp56k_core* cpustate)
 {
 	// FM.4-3
 	R0 = 0x0000;
@@ -422,7 +195,7 @@ static void agu_reset(void)
 	TEMP = 0x0000;
 }
 
-static void alu_reset(void)
+static void alu_reset(dsp56k_core* cpustate)
 {
 	X = 0x00000000;
 	Y = 0x00000000;
@@ -430,24 +203,24 @@ static void alu_reset(void)
 	B = 0x0000000000;
 }
 
-
 static CPU_RESET( dsp56k )
 {
+	dsp56k_core* cpustate = device->token;
 	logerror("Dsp56k reset\n");
 
-	core.interrupt_cycles = 0;
-	core.ppc = 0x0000;
+	cpustate->interrupt_cycles = 0;
+	cpustate->ppc = 0x0000;
 
-	core.repFlag = 0;
-	core.repAddr = 0x0000;
+	cpustate->repFlag = 0;
+	cpustate->repAddr = 0x0000;
 
-	pcu_reset();
-	mem_reset();
-	agu_reset();
-	alu_reset();
+	pcu_reset(cpustate);
+	mem_reset(cpustate);
+	agu_reset(cpustate);
+	alu_reset(cpustate);
 
 	/* HACK - Put a jump to 0x0000 at 0x0000 - this keeps the CPU put in MAME */
-	memory_write_word_16le(core.program, 0x0000, 0x0124);
+	memory_write_word_16le(cpustate->program, 0x0000, 0x0124);
 }
 
 
@@ -460,9 +233,9 @@ static CPU_EXIT( dsp56k )
 /***************************************************************************
     CORE INCLUDE
 ***************************************************************************/
-
-#define OP (core.op)
+#define OP (cpustate->op)
 #include "dsp56ops.c"
+
 
 /***************************************************************************
     CORE EXECUTION LOOP
@@ -470,28 +243,30 @@ static CPU_EXIT( dsp56k )
 
 static CPU_EXECUTE( dsp56k )
 {
+	dsp56k_core* cpustate = device->token;
+
 	/* If reset line is asserted, do nothing */
-	if (core.reset_state)
+	if (cpustate->reset_state)
 		return cycles;
 
 	// HACK - if you're in bootstrap mode, simply pretend you ate up all your cycles waiting for data.
-	if (core.bootstrap_mode != BOOTSTRAP_OFF)
+	if (cpustate->bootstrap_mode != BOOTSTRAP_OFF)
 		return cycles;
 
-	dsp56k_icount = cycles;
-	dsp56k_icount -= core.interrupt_cycles;
-	core.interrupt_cycles = 0;
+	cpustate->icount = cycles;
+	cpustate->icount -= cpustate->interrupt_cycles;
+	cpustate->interrupt_cycles = 0;
 
-	while(dsp56k_icount > 0)
+	while(cpustate->icount > 0)
 	{
-		execute_one();
-		pcu_service_interrupts();		/* TODO: There is definitely something un-right about this */
+		execute_one(cpustate);
+		pcu_service_interrupts(cpustate);		/* TODO: There is definitely something un-right about this */
 	}
 
-	dsp56k_icount -= core.interrupt_cycles;
-	core.interrupt_cycles = 0;
+	cpustate->icount -= cpustate->interrupt_cycles;
+	cpustate->interrupt_cycles = 0;
 
-	return cycles - dsp56k_icount;
+	return cycles - cpustate->icount;
 }
 
 
@@ -522,12 +297,14 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( dsp56k )
 {
+	dsp56k_core* cpustate = device->token;
+
 	switch (state)
 	{
-		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODA:   set_irq_line(DSP56K_IRQ_MODA, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:   set_irq_line(DSP56K_IRQ_MODB, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODC:   set_irq_line(DSP56K_IRQ_MODC, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_RESET:  set_irq_line(DSP56K_IRQ_RESET, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODA:   set_irq_line(cpustate, DSP56K_IRQ_MODA, info->i);  break;
+		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODB:   set_irq_line(cpustate, DSP56K_IRQ_MODB, info->i);  break;
+		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_MODC:   set_irq_line(cpustate, DSP56K_IRQ_MODC, info->i);  break;
+		case CPUINFO_INT_INPUT_STATE + DSP56K_IRQ_RESET:  set_irq_line(cpustate, DSP56K_IRQ_RESET, info->i); break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + DSP56K_PC:			PC  = info->i & 0xffff;					break;
@@ -588,13 +365,15 @@ static CPU_SET_INFO( dsp56k )
 
 CPU_GET_INFO( dsp56k )
 {
+	dsp56k_core* cpustate = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		// --- the following bits of info are returned as 64-bit signed integers ---
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(core);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(dsp56k_core);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0x0000;						break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
@@ -618,7 +397,7 @@ CPU_GET_INFO( dsp56k )
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + DSP56K_PC:			info->i = PC;							break;
-		case CPUINFO_INT_PREVIOUSPC:					info->i = core.ppc;						break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc;				break;
 
 		case CPUINFO_INT_REGISTER + DSP56K_SR:			info->i = SR;							break;
 		case CPUINFO_INT_REGISTER + DSP56K_LC:			info->i = LC;							break;
@@ -672,23 +451,23 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_REGISTER + DSP56K_ST15:		info->i = ST15;							break;
 
 		// --- the following bits of info are returned as pointers to data or functions ---
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dsp56k);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(dsp56k);				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(dsp56k);			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(dsp56k);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(dsp56k);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(dsp56k);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(dsp56k);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(dsp56k);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(dsp56k);		break;
+		case CPUINFO_PTR_BURN:							info->burn = NULL;									break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(dsp56k);	break;
 		case CPUINFO_PTR_DEBUG_INIT:					info->debug_init = NULL;				break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = NULL;					break;
 		case CPUINFO_PTR_READ:							info->read = NULL;						break;
 		case CPUINFO_PTR_WRITE:							info->write = NULL;						break;
 		case CPUINFO_PTR_READOP:						info->readop = NULL;					break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &dsp56k_icount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
- 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_x_data_map);								break;
+ 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_x_data_map);						break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
- 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_program_map);							break;
+ 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_program_map);						break;
 
 		// --- the following bits of info are returned as NULL-terminated strings ---
 		case CPUINFO_STR_NAME:							strcpy(info->s, "DSP56156");			break;
@@ -700,21 +479,21 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%s%s %s%s%s%s%s%s%s%s %s%s",
 				/* Status Register */
-				LF_bit() ? "L" : ".",
-				FV_bit() ? "F" : ".",
+				LF_bit(cpustate) ? "L" : ".",
+				FV_bit(cpustate) ? "F" : ".",
 
-				S_bit() ? "S" : ".",
-				L_bit() ? "L" : ".",
-				E_bit() ? "E" : ".",
-				U_bit() ? "U" : ".",
-				N_bit() ? "N" : ".",
-				Z_bit() ? "Z" : ".",
-				V_bit() ? "V" : ".",
-				C_bit() ? "C" : ".",
+				S_bit(cpustate) ? "S" : ".",
+				L_bit(cpustate) ? "L" : ".",
+				E_bit(cpustate) ? "E" : ".",
+				U_bit(cpustate) ? "U" : ".",
+				N_bit(cpustate) ? "N" : ".",
+				Z_bit(cpustate) ? "Z" : ".",
+				V_bit(cpustate) ? "V" : ".",
+				C_bit(cpustate) ? "C" : ".",
 
 				/* Stack Pointer */
-				UF_bit() ? "U" : ".",
-				SE_bit() ? "S" : ".");
+				UF_bit(cpustate) ? "U" : ".",
+				SE_bit(cpustate) ? "S" : ".");
             break;
 
 		case CPUINFO_STR_REGISTER + DSP56K_PC:			sprintf(info->s, "PC : %04x", PC);		break;
