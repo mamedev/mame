@@ -588,6 +588,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
+#include "sound/okim6295.h" // gigamn2 bootleg
 #include "chd.h"
 
 #include "cps1.h"       /* External CPS1 definitions */
@@ -751,7 +752,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	/* bit 7 - */
 
         /* Z80 Reset */
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+	if (space->machine->cpu[1])	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 	coin_counter_w(0, data & 0x0001);
 	if( (strncmp(space->machine->gamedrv->name,"pzloop2",8)==0) ||
@@ -1269,6 +1270,19 @@ static MACHINE_DRIVER_START( dead_cps2 )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(cps2_readmem,dead_cps2_writemem)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gigamn2 )
+	MDRV_IMPORT_FROM(cps2)
+
+	MDRV_CPU_REMOVE("audio")
+
+	MDRV_SOUND_REMOVE("qsound")
+
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.47)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)
 MACHINE_DRIVER_END
 
 /*************************************
@@ -3367,6 +3381,43 @@ ROM_START( rckman2j )
 	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
 	ROM_LOAD16_WORD_SWAP( "rm2.11m",   0x000000, 0x200000, CRC(2106174d) SHA1(0a35d9ca8ebcad74904b20648d5320f839d6377e) )
 	ROM_LOAD16_WORD_SWAP( "rm2.12m",   0x200000, 0x200000, CRC(546c1636) SHA1(f96b172ab899f2c6ee17a5dd1fb61af9432e3cd2) )
+ROM_END
+
+/*
+
+Gigaman 2 - 2004 Chinese rebuild Bootleg
+
+Just dumped the program roms. Other 3 are soldered and are MX26L6420MC-90
+Probably a rebuild for chinese market
+Copyrighted J-TECH 2004 on game :)
+
+
+CPU : Motorola 68000 16 mhz
+video : Actel A54SX16A-F
+Sound : Atmel AT89C4051-24PI + M6295 (noted AD-65)
+
+*/
+
+ROM_START( gigamn2 )
+	ROM_REGION(CODE_SIZE, "main", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "prog.bin", 0x000000, 0x400000, CRC(2eaa5e10) SHA1(79f9a137bf5b3317579c548f346c1dc1cccdb771) )
+
+	ROM_REGION(0x10000, "mcu", 0 )      /* sound MCU code */
+	ROM_LOAD( "89c4051.bin", 0x000000, 0x10000, NO_DUMP )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_FILL(              0x000000, 0x800000, 0 )
+	/* you can use the original CPS2 gfx roms, but the 'GIGA part of GIGAMAN2 is missing, on real HW it isn't, roms are different */
+//	ROMX_LOAD( "rm2.14m",  0x800000, 0x200000, CRC(9b1f00b4) SHA1(c1c5c2d9d00121425ae6598444d704f420ef4eef) , ROM_GROUPWORD | ROM_SKIP(6) )
+//	ROMX_LOAD( "rm2.16m",  0x800002, 0x200000, CRC(c2bb0c24) SHA1(38724c49d9db49765a4ed9bc2dc8f57cec45ec7c) , ROM_GROUPWORD | ROM_SKIP(6) )
+//	ROMX_LOAD( "rm2.18m",  0x800004, 0x200000, CRC(12257251) SHA1(20cb58afda0e6200991277817485340a6a41ae2b) , ROM_GROUPWORD | ROM_SKIP(6) )
+//	ROMX_LOAD( "rm2.20m",  0x800006, 0x200000, CRC(f9b6e786) SHA1(aeb4acff7208e66a35198143fd2478039fdaa3a6) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_LOAD( "gfx1.bin", 0x800000, 0x400000, NO_DUMP )
+	ROM_LOAD( "gfx2.bin", 0xc00000, 0x400000, NO_DUMP )
+
+	ROM_REGION( 0x400000, "oki", 0 ) /* QSound samples */
+	/* No Qsound, OKI instead.. */
+	ROM_LOAD( "oki.bin", 0x000000, 0x400000, NO_DUMP )
 ROM_END
 
 ROM_START( mmatrix )
@@ -7328,6 +7379,24 @@ static DRIVER_INIT ( pzloop2 )
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
 }
 
+static UINT16* gigamn2_dummyqsound_ram;
+static READ16_HANDLER( gigamn2_dummyqsound_r ) { return gigamn2_dummyqsound_ram[offset]; };
+static WRITE16_HANDLER( gigamn2_dummyqsound_w ) { gigamn2_dummyqsound_ram[offset] = data; };
+
+static DRIVER_INIT( gigamn2 )
+{
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	int length = memory_region_length(machine, "main");
+
+	DRIVER_INIT_CALL(cps2);
+
+	gigamn2_dummyqsound_ram = auto_malloc(0x20000);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
+	memory_set_decrypted_region(space, 0x000000, (length) - 1, &rom[length/4]);
+	m68k_set_encrypted_opcode_range(machine->cpu[0],0,length);
+}
+
 
 /*************************************
  *
@@ -7459,6 +7528,7 @@ GAME( 1996, spf2ta,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Su
 GAME( 1996, megaman2, 0,        cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (USA 960708)", 0 )
 GAME( 1996, megamn2a, megaman2, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)", 0 )
 GAME( 1996, rckman2j, megaman2, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Rockman 2: The Power Fighters (Japan 960708)", 0 )
+GAME( 1996, gigamn2,  megaman2, gigamn2, cps2_2p3b, gigamn2,  ROT0,   "bootleg", "Giga Man 2: The Power Fighters (bootleg of Mega Man 2: The Power Fighters)", GAME_NOT_WORKING ) // flash roms aren't dumped, layer offsets different, different sound system
 GAME( 1996, qndream,  0,        cps2, qndream,   cps2,     ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 960826)", 0 )
 GAME( 1996, xmvsf,    0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 961004)", 0 )
 GAME( 1996, xmvsfr1,  xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 960910)", 0 )
