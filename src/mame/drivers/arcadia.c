@@ -283,7 +283,7 @@ static const custom_sound_interface amiga_custom_interface =
 static const cia6526_interface cia_0_intf =
 {
 	amiga_cia_0_irq,										/* irq_func */
-	AMIGA_68000_NTSC_CLOCK,									/* clock */
+	AMIGA_68000_NTSC_CLOCK / 10,							/* clock */
 	0,														/* tod_clock */
 	{
 		{ arcadia_cia_0_porta_r, arcadia_cia_0_porta_w },	/* port A */

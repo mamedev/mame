@@ -282,6 +282,8 @@ static void amiga_m68k_reset(const device_config *device)
 	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(space->cpu));
 
 	/* Initialize the various chips */
+	devtag_reset(device->machine, CIA8520, "cia_0");
+	devtag_reset(device->machine, CIA8520, "cia_1");
 	custom_reset();
 	autoconfig_reset();
 
