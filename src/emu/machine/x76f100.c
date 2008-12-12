@@ -15,7 +15,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -24,7 +24,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(Machine), buf );
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -77,7 +77,7 @@ void x76f100_init( running_machine *machine, int chip, UINT8 *data )
 
 	if( chip >= X76F100_MAXCHIP )
 	{
-		verboselog( 0, "x76f100_init( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "x76f100_init( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -129,11 +129,12 @@ void x76f100_init( running_machine *machine, int chip, UINT8 *data )
 
 void x76f100_cs_write( int chip, int cs )
 {
+	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
 	{
-		verboselog( 0, "x76f100_cs_write( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "x76f100_cs_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -141,7 +142,7 @@ void x76f100_cs_write( int chip, int cs )
 
 	if( c->cs != cs )
 	{
-		verboselog( 2, "x76f100(%d) cs=%d\n", chip, cs );
+		verboselog( machine, 2, "x76f100(%d) cs=%d\n", chip, cs );
 	}
 	if( c->cs != 0 && cs == 0 )
 	{
@@ -160,11 +161,12 @@ void x76f100_cs_write( int chip, int cs )
 
 void x76f100_rst_write( int chip, int rst )
 {
+	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
 	{
-		verboselog( 0, "x76f100_rst_write( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "x76f100_rst_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -172,11 +174,11 @@ void x76f100_rst_write( int chip, int rst )
 
 	if( c->rst != rst )
 	{
-		verboselog( 2, "x76f100(%d) rst=%d\n", chip, rst );
+		verboselog( machine, 2, "x76f100(%d) rst=%d\n", chip, rst );
 	}
 	if( c->rst == 0 && rst != 0 && c->cs == 0 )
 	{
-		verboselog( 1, "x76f100(%d) goto response to reset\n", chip );
+		verboselog( machine, 1, "x76f100(%d) goto response to reset\n", chip );
 		c->state = STATE_RESPONSE_TO_RESET;
 		c->bit = 0;
 		c->byte = 0;
@@ -219,11 +221,12 @@ static int x76f100_data_offset( struct x76f100_chip *c )
 
 void x76f100_scl_write( int chip, int scl )
 {
+	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
 	{
-		verboselog( 0, "x76f100_scl_write( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "x76f100_scl_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -231,7 +234,7 @@ void x76f100_scl_write( int chip, int scl )
 
 	if( c->scl != scl )
 	{
-		verboselog( 2, "x76f100(%d) scl=%d\n", chip, scl );
+		verboselog( machine, 2, "x76f100(%d) scl=%d\n", chip, scl );
 	}
 	if( c->cs == 0 )
 	{
@@ -246,7 +249,7 @@ void x76f100_scl_write( int chip, int scl )
 				if( c->bit == 0 )
 				{
 					c->shift = c->response_to_reset[ c->byte ];
-					verboselog( 1, "x76f100(%d) <- response_to_reset[%d]: %02x\n", chip, c->byte, c->shift );
+					verboselog( machine, 1, "x76f100(%d) <- response_to_reset[%d]: %02x\n", chip, c->byte, c->shift );
 				}
 
 				c->sdar = c->shift & 1;
@@ -273,7 +276,7 @@ void x76f100_scl_write( int chip, int scl )
 			{
 				if( c->bit < 8 )
 				{
-					verboselog( 2, "x76f100(%d) clock\n", chip );
+					verboselog( machine, 2, "x76f100(%d) clock\n", chip );
 					c->shift <<= 1;
 					if( c->sdaw != 0 )
 					{
@@ -289,13 +292,13 @@ void x76f100_scl_write( int chip, int scl )
 					{
 					case STATE_LOAD_COMMAND:
 						c->command = c->shift;
-						verboselog( 1, "x76f100(%d) -> command: %02x\n", chip, c->command );
+						verboselog( machine, 1, "x76f100(%d) -> command: %02x\n", chip, c->command );
 						/* todo: verify command is valid? */
 						c->state = STATE_LOAD_PASSWORD;
 						break;
 
 					case STATE_LOAD_PASSWORD:
-						verboselog( 1, "x76f100(%d) -> password: %02x\n", chip, c->shift );
+						verboselog( machine, 1, "x76f100(%d) -> password: %02x\n", chip, c->shift );
 						c->write_buffer[ c->byte++ ] = c->shift;
 						if( c->byte == SIZE_WRITE_BUFFER )
 						{
@@ -304,7 +307,7 @@ void x76f100_scl_write( int chip, int scl )
 						break;
 
 					case STATE_VERIFY_PASSWORD:
-						verboselog( 1, "x76f100(%d) -> verify password: %02x\n", chip, c->shift );
+						verboselog( machine, 1, "x76f100(%d) -> verify password: %02x\n", chip, c->shift );
 						/* todo: this should probably be handled as a command */
 						if( c->shift == COMMAND_ACK_PASSWORD )
 						{
@@ -321,7 +324,7 @@ void x76f100_scl_write( int chip, int scl )
 						break;
 
 					case STATE_WRITE_DATA:
-						verboselog( 1, "x76f100(%d) -> data: %02x\n", chip, c->shift );
+						verboselog( machine, 1, "x76f100(%d) -> data: %02x\n", chip, c->shift );
 						c->write_buffer[ c->byte++ ] = c->shift;
 						if( c->byte == SIZE_WRITE_BUFFER )
 						{
@@ -331,7 +334,7 @@ void x76f100_scl_write( int chip, int scl )
 							}
 							c->byte = 0;
 
-							verboselog( 1, "x76f100(%d) data flushed\n", chip );
+							verboselog( machine, 1, "x76f100(%d) data flushed\n", chip );
 						}
 						break;
 					}
@@ -353,7 +356,7 @@ void x76f100_scl_write( int chip, int scl )
 						{
 						case STATE_READ_DATA:
 							c->shift = c->data[ x76f100_data_offset( c ) ];
-							verboselog( 1, "x76f100(%d) <- data: %02x\n", chip, c->shift );
+							verboselog( machine, 1, "x76f100(%d) <- data: %02x\n", chip, c->shift );
 							break;
 						}
 					}
@@ -367,12 +370,12 @@ void x76f100_scl_write( int chip, int scl )
 					c->sdar = 0;
 					if( c->sdaw == 0 )
 					{
-						verboselog( 2, "x76f100(%d) ack <-\n", chip );
+						verboselog( machine, 2, "x76f100(%d) ack <-\n", chip );
 						c->byte++;
 					}
 					else
 					{
-						verboselog( 2, "x76f100(%d) nak <-\n", chip );
+						verboselog( machine, 2, "x76f100(%d) nak <-\n", chip );
 					}
 				}
 			}
@@ -384,11 +387,12 @@ void x76f100_scl_write( int chip, int scl )
 
 void x76f100_sda_write( int chip, int sda )
 {
+	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
 	{
-		verboselog( 0, "x76f100_sda_write( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "x76f100_sda_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -396,13 +400,13 @@ void x76f100_sda_write( int chip, int sda )
 
 	if( c->sdaw != sda )
 	{
-		verboselog( 2, "x76f100(%d) sdaw=%d\n", chip, sda );
+		verboselog( machine, 2, "x76f100(%d) sdaw=%d\n", chip, sda );
 	}
 	if( c->cs == 0 && c->scl != 0 )
 	{
 		if( c->sdaw == 0 && sda != 0 )
 		{
-			verboselog( 1, "x76f100(%d) goto stop\n", chip );
+			verboselog( machine, 1, "x76f100(%d) goto stop\n", chip );
 			c->state = STATE_STOP;
 			c->sdar = 0;
 		}
@@ -411,23 +415,23 @@ void x76f100_sda_write( int chip, int sda )
 			switch( c->state )
 			{
 			case STATE_STOP:
-				verboselog( 1, "x76f100(%d) goto start\n", chip );
+				verboselog( machine, 1, "x76f100(%d) goto start\n", chip );
 				c->state = STATE_LOAD_COMMAND;
 				break;
 
 			case STATE_LOAD_PASSWORD:
 				/* todo: this will be the 0xc0 command, but it's not handled as a command yet. */
-				verboselog( 1, "x76f100(%d) goto start\n", chip );
+				verboselog( machine, 1, "x76f100(%d) goto start\n", chip );
 				break;
 
 			case STATE_READ_DATA:
-				verboselog( 1, "x76f100(%d) continue reading??\n", chip );
-//              verboselog( 1, "x76f100(%d) goto load address\n", chip );
+				verboselog( machine, 1, "x76f100(%d) continue reading??\n", chip );
+//              verboselog( machine, 1, "x76f100(%d) goto load address\n", chip );
 //              c->state = STATE_LOAD_ADDRESS;
 				break;
 
 			default:
-				verboselog( 1, "x76f100(%d) skipped start (default)\n", chip );
+				verboselog( machine, 1, "x76f100(%d) skipped start (default)\n", chip );
 				break;
 			}
 
@@ -442,11 +446,12 @@ void x76f100_sda_write( int chip, int sda )
 
 int x76f100_sda_read( int chip )
 {
+	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
 	{
-		verboselog( 0, "x76f100_sda_read( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "x76f100_sda_read( %d ) chip out of range\n", chip );
 		return 1;
 	}
 
@@ -454,10 +459,10 @@ int x76f100_sda_read( int chip )
 
 	if( c->cs != 0 )
 	{
-		verboselog( 2, "x76f100(%d) not selected\n", chip );
+		verboselog( machine, 2, "x76f100(%d) not selected\n", chip );
 		return 1;
 	}
-	verboselog( 2, "x76f100(%d) sdar=%d\n", chip, c->sdar );
+	verboselog( machine, 2, "x76f100(%d) sdar=%d\n", chip, c->sdar );
 	return c->sdar;
 }
 
@@ -467,7 +472,7 @@ static void nvram_handler_x76f100( int chip, running_machine *machine, mame_file
 
 	if( chip >= X76F100_MAXCHIP )
 	{
-		verboselog( 0, "nvram_handler_x76f100( %d ) chip out of range\n", chip );
+		verboselog( machine, 0, "nvram_handler_x76f100( %d ) chip out of range\n", chip );
 		return;
 	}
 

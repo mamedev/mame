@@ -26,7 +26,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -35,7 +35,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(Machine), buf );
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -186,7 +186,7 @@ static emu_timer *dip_timer;
 
 static READ32_HANDLER( znsecsel_r )
 {
-	verboselog( 2, "znsecsel_r( %08x, %08x )\n", offset, mem_mask );
+	verboselog( space->machine, 2, "znsecsel_r( %08x, %08x )\n", offset, mem_mask );
 	return m_n_znsecsel;
 }
 
@@ -224,6 +224,8 @@ static void sio_znsec1_handler( int n_data )
 
 static void sio_pad_handler( int n_data )
 {
+	running_machine *machine = Machine;
+
 	if( ( n_data & PSX_SIO_OUT_DTR ) != 0 )
 	{
 		m_b_znsecport = 1;
@@ -233,8 +235,8 @@ static void sio_pad_handler( int n_data )
 		m_b_znsecport = 0;
 	}
 
-	verboselog( 2, "read pad %04x %04x %02x\n", m_n_znsecsel, m_b_znsecport, n_data );
-	psx_sio_input( Machine, 0, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR );
+	verboselog( machine, 2, "read pad %04x %04x %02x\n", m_n_znsecsel, m_b_znsecport, n_data );
+	psx_sio_input( machine, 0, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR );
 }
 
 static void sio_dip_handler( int n_data )
@@ -243,9 +245,10 @@ static void sio_dip_handler( int n_data )
 	{
 		if( m_b_lastclock )
 		{
-			int bit = ( ( input_port_read(Machine, "DSW") >> m_n_dip_bit ) & 1 );
-			verboselog( 2, "read dip %02x -> %02x\n", n_data, bit * PSX_SIO_IN_DATA );
-			psx_sio_input( Machine, 0, PSX_SIO_IN_DATA, bit * PSX_SIO_IN_DATA );
+			running_machine *machine = Machine;
+			int bit = ( ( input_port_read(machine, "DSW") >> m_n_dip_bit ) & 1 );
+			verboselog( machine, 2, "read dip %02x -> %02x\n", n_data, bit * PSX_SIO_IN_DATA );
+			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, bit * PSX_SIO_IN_DATA );
 			m_n_dip_bit++;
 			m_n_dip_bit &= 7;
 		}
@@ -289,7 +292,7 @@ static WRITE32_HANDLER( znsecsel_w )
 		timer_adjust_oneshot( dip_timer, cpu_clocks_to_attotime( space->cpu, 100 ), 1 );
 	}
 
-	verboselog( 2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
 static TIMER_CALLBACK( dip_timer_fired )
@@ -335,7 +338,7 @@ static READ32_HANDLER( boardconfig_r )
 
 static READ32_HANDLER( unknown_r )
 {
-	verboselog( 0, "unknown_r( %08x, %08x )\n", offset, mem_mask );
+	verboselog( space->machine, 0, "unknown_r( %08x, %08x )\n", offset, mem_mask );
 	return 0xffffffff;
 }
 
@@ -349,7 +352,7 @@ static WRITE32_HANDLER( coin_w )
     */
 	if( ( data & ~0x23 ) != 0 )
 	{
-		verboselog( 0, "coin_w %08x\n", data );
+		verboselog( space->machine, 0, "coin_w %08x\n", data );
 	}
 }
 
@@ -628,7 +631,7 @@ Notes:
 static READ32_HANDLER( capcom_kickharness_r )
 {
 	/* required for buttons 4,5&6 */
-	verboselog( 2, "capcom_kickharness_r( %08x, %08x )\n", offset, mem_mask );
+	verboselog( space->machine, 2, "capcom_kickharness_r( %08x, %08x )\n", offset, mem_mask );
 	return 0xffffffff;
 }
 
@@ -1136,7 +1139,7 @@ static UINT8 *taitofx1_eeprom2 = NULL;
 static WRITE32_HANDLER( bank_coh1000t_w )
 {
 	mb3773_set_ck( ( data & 0x20 ) >> 5 );
-	verboselog( 1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	memory_set_bankptr(space->machine,  1, memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
 }
 
@@ -1243,18 +1246,18 @@ MACHINE_DRIVER_END
 
 static WRITE32_HANDLER( taitofx1b_volume_w )
 {
-	verboselog( 1, "taitofx1_volume_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "taitofx1_volume_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
 static WRITE32_HANDLER( taitofx1b_sound_w )
 {
-	verboselog( 1, "taitofx1_sound_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "taitofx1_sound_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
 static READ32_HANDLER( taitofx1b_sound_r )
 {
 	UINT32 data = 0; // bit 0 = busy?
-	verboselog( 1, "taitofx1_sound_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "taitofx1_sound_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -2268,31 +2271,31 @@ static UINT8 *nbajamex_eeprom;
 
 static WRITE32_HANDLER( acpsx_00_w )
 {
-	verboselog( 0, "acpsx_00_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 0, "acpsx_00_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
 static WRITE32_HANDLER( acpsx_10_w )
 {
-	verboselog( 0, "acpsx_10_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 0, "acpsx_10_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
 static WRITE32_HANDLER( nbajamex_80_w )
 {
-	verboselog( 0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	psx_irq_set(space->machine, 0x400);
 }
 
 static READ32_HANDLER( nbajamex_08_r )
 {
 	UINT32 data = 0xffffffff;
-	verboselog( 0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 static READ32_HANDLER( nbajamex_80_r )
 {
 	UINT32 data = 0xffffffff;
-	verboselog( 0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -2699,7 +2702,7 @@ Notes:
 
 static WRITE32_HANDLER( coh1002m_bank_w )
 {
-	verboselog( 1, "coh1002m_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "coh1002m_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	memory_set_bankptr(space->machine,  1, memory_region( space->machine, "user2" ) + ((data>>16) * 0x800000));
 }
 

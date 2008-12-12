@@ -931,7 +931,7 @@ Notes:
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -940,7 +940,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(Machine), buf );
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -948,13 +948,13 @@ static UINT32 *namcos12_sharedram;
 
 static WRITE32_HANDLER( sharedram_w )
 {
-	verboselog( 1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
+	verboselog( space->machine, 1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
 	COMBINE_DATA( &namcos12_sharedram[ offset ] );
 }
 
 static READ32_HANDLER( sharedram_r )
 {
-	verboselog( 1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, namcos12_sharedram[ offset ] );
+	verboselog( space->machine, 1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, namcos12_sharedram[ offset ] );
 	return namcos12_sharedram[ offset ];
 }
 
@@ -996,7 +996,7 @@ static WRITE32_HANDLER( bankoffset_w )
 
 	memory_set_bank(space->machine,  1, m_n_bankoffset );
 
-	verboselog( 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
+	verboselog( space->machine, 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
 
 static UINT32 m_n_dmaoffset;
@@ -1013,11 +1013,12 @@ static WRITE32_HANDLER( dmaoffset_w )
 	{
 		m_n_dmaoffset = ( ( offset + 2 ) * 4 ) | ( data & 0xffff0000 );
 	}
-	verboselog( 1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_dmaoffset );
+	verboselog( space->machine, 1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_dmaoffset );
 }
 
 static void namcos12_rom_read( UINT32 n_address, INT32 n_size )
 {
+	running_machine *machine = Machine;
 	const char *n_region;
 	int n_offset;
 
@@ -1031,32 +1032,32 @@ static void namcos12_rom_read( UINT32 n_address, INT32 n_size )
 	{
 		n_region =  "user1";
 		n_offset = m_n_dmaoffset & 0x003fffff;
-		verboselog( 1, "namcos12_rom_read( %08x, %08x ) boot %08x\n", n_address, n_size, n_offset );
+		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) boot %08x\n", n_address, n_size, n_offset );
 	}
 	else if( m_n_tektagdmaoffset >= 0x00000000 && m_n_tektagdmaoffset <= 0x03800000 )
 	{
 		n_region = "user2";
 		n_offset = m_n_tektagdmaoffset & 0x7fffffff;
-		verboselog( 1, "namcos12_rom_read( %08x, %08x ) tektag1 %08x\n", n_address, n_size, n_offset );
+		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) tektag1 %08x\n", n_address, n_size, n_offset );
 	}
 	else if( m_n_tektagdmaoffset >= 0x04000000 && m_n_tektagdmaoffset <= 0x04400000 )
 	{
 		n_region = "user1";
 		n_offset = m_n_tektagdmaoffset & 0x003fffff;
-		verboselog( 1, "namcos12_rom_read( %08x, %08x ) tektag2 %08x\n", n_address, n_size, n_offset );
+		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) tektag2 %08x\n", n_address, n_size, n_offset );
 	}
 	else
 	{
 		n_region = "user2";
 		n_offset = m_n_dmaoffset & 0x7fffffff;
-		verboselog( 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
+		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
 	}
 
-	p_n_src = (UINT32 *)( memory_region( Machine, n_region ) + n_offset );
-	n_romleft = ( memory_region_length( Machine, n_region ) - n_offset ) / 4;
+	p_n_src = (UINT32 *)( memory_region( machine, n_region ) + n_offset );
+	n_romleft = ( memory_region_length( machine, n_region ) - n_offset ) / 4;
 	if( n_size > n_romleft )
 	{
-		verboselog( 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
+		verboselog( machine, 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
 		n_size = n_romleft;
 	}
 
@@ -1064,7 +1065,7 @@ static void namcos12_rom_read( UINT32 n_address, INT32 n_size )
 	n_ramleft = ( g_n_psxramsize - n_address ) / 4;
 	if( n_size > n_ramleft )
 	{
-		verboselog( 1, "namcos12_rom_read dma truncated %d to %d passed end of ram\n", n_size, n_ramleft );
+		verboselog( machine, 1, "namcos12_rom_read dma truncated %d to %d passed end of ram\n", n_size, n_ramleft );
 		n_size = n_ramleft;
 	}
 
@@ -1125,11 +1126,11 @@ static WRITE32_HANDLER( system11gun_w )
 		/* !(data & 0x02) */
 		/* blowback 2 */
 		/* !(data & 0x01) */
-		verboselog( 1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
+		verboselog( space->machine, 1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		verboselog( 2, "system11gun_w: start reading (%08x %08x)\n", data, mem_mask );
+		verboselog( space->machine, 2, "system11gun_w: start reading (%08x %08x)\n", data, mem_mask );
 	}
 }
 
@@ -1151,7 +1152,7 @@ static READ32_HANDLER( system11gun_r )
 		data = ( input_port_read(space->machine, "LIGHT1_Y") ) | ( ( input_port_read(space->machine, "LIGHT1_Y") + 1 ) << 16 );
 		break;
 	}
-	verboselog( 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -1176,25 +1177,25 @@ static WRITE32_HANDLER( kcon_w )
 static WRITE32_HANDLER( tektagt_protection_1_w )
 {
 	m_n_tektagdmaoffset = data;
-	verboselog( 1, "tektagt_protection_1_w( %08x, %08x, %08x)\n", offset, mem_mask, data );
+	verboselog( space->machine, 1, "tektagt_protection_1_w( %08x, %08x, %08x)\n", offset, mem_mask, data );
 }
 
 static READ32_HANDLER( tektagt_protection_1_r )
 {
 	UINT32 data = 0x8000;
-	verboselog( 1, "tektagt_protection_1_r( %08x, %08x, %08x)\n", offset, mem_mask, data );
+	verboselog( space->machine, 1, "tektagt_protection_1_r( %08x, %08x, %08x)\n", offset, mem_mask, data );
 	return data;
 }
 
 static WRITE32_HANDLER( tektagt_protection_2_w )
 {
-	verboselog( 1, "tektagt_protection_2_w( %08x, %08x, %08x)\n", offset, mem_mask, data );
+	verboselog( space->machine, 1, "tektagt_protection_2_w( %08x, %08x, %08x)\n", offset, mem_mask, data );
 }
 
 static READ32_HANDLER( tektagt_protection_2_r )
 {
 	UINT32 data = 0x36e2;
-	verboselog( 1, "tektagt_protection_2_r( %08x, %08x, %08x)\n", offset, mem_mask, data );
+	verboselog( space->machine, 1, "tektagt_protection_2_r( %08x, %08x, %08x)\n", offset, mem_mask, data );
 	return data;
 }
 

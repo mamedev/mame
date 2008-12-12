@@ -18,7 +18,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -27,7 +27,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(Machine), buf );
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -215,16 +215,17 @@ static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 static void spu_read( UINT32 n_address, INT32 n_size )
 {
+	running_machine *machine = Machine;
 	struct psxinfo *chip = sndti_token(SOUND_PSXSPU, 0);
-	verboselog( 1, "spu_read( %08x, %08x )\n", n_address, n_size );
+	verboselog( machine, 1, "spu_read( %08x, %08x )\n", n_address, n_size );
 
 	while( n_size > 0 )
 	{
 		chip->g_p_n_psxram[ n_address / 4 ] =
 			( chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] << 0 ) |
 			( chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] << 16 );
-		verboselog( 2, "%08x > %04x\n", chip->m_n_spuoffset + 0, chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] );
-		verboselog( 2, "%08x > %04x\n", chip->m_n_spuoffset + 1, chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] );
+		verboselog( machine, 2, "%08x > %04x\n", chip->m_n_spuoffset + 0, chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] );
+		verboselog( machine, 2, "%08x > %04x\n", chip->m_n_spuoffset + 1, chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] );
 		chip->m_n_spuoffset += 2;
 		chip->m_n_spuoffset %= ( SPU_RAM_SIZE / 2 );
 		n_address += 4;
@@ -234,15 +235,16 @@ static void spu_read( UINT32 n_address, INT32 n_size )
 
 static void spu_write( UINT32 n_address, INT32 n_size )
 {
+	running_machine *machine = Machine;
 	struct psxinfo *chip = sndti_token(SOUND_PSXSPU, 0);
-	verboselog( 1, "spu_write( %08x, %08x )\n", n_address, n_size );
+	verboselog( machine, 1, "spu_write( %08x, %08x )\n", n_address, n_size );
 
 	while( n_size > 0 )
 	{
 		chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] = ( chip->g_p_n_psxram[ n_address / 4 ] >> 0 );
 		chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] = ( chip->g_p_n_psxram[ n_address / 4 ] >> 16 );
-		verboselog( 2, "%08x < %04x\n", chip->m_n_spuoffset + 0, chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] );
-		verboselog( 2, "%08x < %04x\n", chip->m_n_spuoffset + 1, chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] );
+		verboselog( machine, 2, "%08x < %04x\n", chip->m_n_spuoffset + 0, chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] );
+		verboselog( machine, 2, "%08x < %04x\n", chip->m_n_spuoffset + 1, chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] );
 		chip->m_n_spuoffset += 2;
 		chip->m_n_spuoffset %= ( SPU_RAM_SIZE / 2 );
 		n_address += 4;
@@ -360,17 +362,18 @@ static UINT32 psx_spu_delay = 0;
 WRITE32_HANDLER( psx_spu_delay_w )
 {
 	COMBINE_DATA( &psx_spu_delay );
-	verboselog( 1, "psx_spu_delay_w( %08x %08x )\n", data, mem_mask );
+	verboselog( space->machine, 1, "psx_spu_delay_w( %08x %08x )\n", data, mem_mask );
 }
 
 READ32_HANDLER( psx_spu_delay_r )
 {
-	verboselog( 1, "psx_spu_delay_r( %08x )\n", mem_mask );
+	verboselog( space->machine, 1, "psx_spu_delay_r( %08x )\n", mem_mask );
 	return psx_spu_delay;
 }
 
 READ32_HANDLER( psx_spu_r )
 {
+	running_machine *machine = space->machine;
 	struct psxinfo *chip = sndti_token(SOUND_PSXSPU, 0);
 	int n_channel;
 	n_channel = offset / 4;
@@ -381,25 +384,25 @@ READ32_HANDLER( psx_spu_r )
 		case SPU_CHANNEL_REG( 0x8 ):
 			if( ACCESSING_BITS_0_15 )
 			{
-				verboselog( 1, "psx_spu_r() channel %d attack/decay/sustain = %04x\n", n_channel, chip->m_p_n_attackdecaysustain[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_r() channel %d attack/decay/sustain = %04x\n", n_channel, chip->m_p_n_attackdecaysustain[ n_channel ] );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
-				verboselog( 1, "psx_spu_r() channel %d sustain/release = %04x\n", n_channel, chip->m_p_n_sustainrelease[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_r() channel %d sustain/release = %04x\n", n_channel, chip->m_p_n_sustainrelease[ n_channel ] );
 			}
 			return ( chip->m_p_n_sustainrelease[ n_channel ] << 16 ) | chip->m_p_n_attackdecaysustain[ n_channel ];
 		case SPU_CHANNEL_REG( 0xc ):
 			if( ACCESSING_BITS_0_15 )
 			{
-				verboselog( 1, "psx_spu_r() channel %d adsr volume = %04x\n", n_channel, chip->m_p_n_adsrvolume[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_r() channel %d adsr volume = %04x\n", n_channel, chip->m_p_n_adsrvolume[ n_channel ] );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
-				verboselog( 1, "psx_spu_r() channel %d repeat address = %04x\n", n_channel, chip->m_p_n_repeataddress[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_r() channel %d repeat address = %04x\n", n_channel, chip->m_p_n_repeataddress[ n_channel ] );
 			}
 			return ( chip->m_p_n_repeataddress[ n_channel ] << 16 ) | chip->m_p_n_adsrvolume[ n_channel ];
 		default:
-			verboselog( 0, "psx_spu_r( %08x, %08x ) channel %d reg %d\n", offset, mem_mask, n_channel, offset % 4 );
+			verboselog( machine, 0, "psx_spu_r( %08x, %08x ) channel %d reg %d\n", offset, mem_mask, n_channel, offset % 4 );
 			return 0;
 		}
 	}
@@ -408,31 +411,31 @@ READ32_HANDLER( psx_spu_r )
 		switch( offset )
 		{
 		case SPU_REG( 0xd88 ):
-			verboselog( 1, "psx_spu_r( %08x ) voice on = %08x\n", mem_mask, chip->m_n_voiceon );
+			verboselog( machine, 1, "psx_spu_r( %08x ) voice on = %08x\n", mem_mask, chip->m_n_voiceon );
 			return chip->m_n_voiceon;
 		case SPU_REG( 0xd8c ):
-			verboselog( 1, "psx_spu_r( %08x ) voice off = %08x\n", mem_mask, chip->m_n_voiceoff );
+			verboselog( machine, 1, "psx_spu_r( %08x ) voice off = %08x\n", mem_mask, chip->m_n_voiceoff );
 			return chip->m_n_voiceoff;
 		case SPU_REG( 0xd90 ):
-			verboselog( 1, "psx_spu_r( %08x ) modulation mode = %08x\n", mem_mask, chip->m_n_modulationmode );
+			verboselog( machine, 1, "psx_spu_r( %08x ) modulation mode = %08x\n", mem_mask, chip->m_n_modulationmode );
 			return chip->m_n_modulationmode;
 		case SPU_REG( 0xd94 ):
-			verboselog( 1, "psx_spu_r( %08x ) noise mode = %08x\n", mem_mask, chip->m_n_noisemode );
+			verboselog( machine, 1, "psx_spu_r( %08x ) noise mode = %08x\n", mem_mask, chip->m_n_noisemode );
 			return chip->m_n_noisemode;
 		case SPU_REG( 0xd98 ):
-			verboselog( 1, "psx_spu_r( %08x ) reverb mode = %08x\n", mem_mask, chip->m_n_reverbmode );
+			verboselog( machine, 1, "psx_spu_r( %08x ) reverb mode = %08x\n", mem_mask, chip->m_n_reverbmode );
 			return chip->m_n_reverbmode;
 		case SPU_REG( 0xda4 ):
-			verboselog( 1, "psx_spu_r( %08x ) dma/irq address = %08x\n", mem_mask, ( ( chip->m_n_spuoffset / 4 ) << 16 ) | chip->m_n_irqaddress );
+			verboselog( machine, 1, "psx_spu_r( %08x ) dma/irq address = %08x\n", mem_mask, ( ( chip->m_n_spuoffset / 4 ) << 16 ) | chip->m_n_irqaddress );
 			return ( ( chip->m_n_spuoffset / 4 ) << 16 ) | chip->m_n_irqaddress;
 		case SPU_REG( 0xda8 ):
-			verboselog( 1, "psx_spu_r( %08x ) spu control/data = %08x\n", mem_mask, ( chip->m_n_spucontrol << 16 ) | chip->m_n_spudata );
+			verboselog( machine, 1, "psx_spu_r( %08x ) spu control/data = %08x\n", mem_mask, ( chip->m_n_spucontrol << 16 ) | chip->m_n_spudata );
 			return chip->m_n_spudata | ( chip->m_n_spucontrol << 16 );
 		case SPU_REG( 0xdac ):
-			verboselog( 1, "psx_spu_r( %08x ) spu status = %08x\n", mem_mask, chip->m_n_spustatus );
+			verboselog( machine, 1, "psx_spu_r( %08x ) spu status = %08x\n", mem_mask, chip->m_n_spustatus );
 			return chip->m_n_spustatus;
 		default:
-			verboselog( 0, "psx_spu_r( %08x, %08x ) %08x\n", offset, mem_mask, 0xc00 + ( offset * 4 ) );
+			verboselog( machine, 0, "psx_spu_r( %08x, %08x ) %08x\n", offset, mem_mask, 0xc00 + ( offset * 4 ) );
 			return 0;
 		}
 	}
@@ -440,6 +443,7 @@ READ32_HANDLER( psx_spu_r )
 
 WRITE32_HANDLER( psx_spu_w )
 {
+	running_machine *machine = space->machine;
 	struct psxinfo *chip = sndti_token(SOUND_PSXSPU, 0);
 	int n_channel;
 	n_channel = offset / 4;
@@ -451,52 +455,52 @@ WRITE32_HANDLER( psx_spu_w )
 			if( ACCESSING_BITS_0_15 )
 			{
 				chip->m_p_n_volumeleft[ n_channel ] = data & 0xffff;
-				verboselog( 1, "psx_spu_w() channel %d volume left = %04x\n", n_channel, chip->m_p_n_volumeleft[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_w() channel %d volume left = %04x\n", n_channel, chip->m_p_n_volumeleft[ n_channel ] );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_p_n_volumeright[ n_channel ] = data >> 16;
-				verboselog( 1, "psx_spu_w() channel %d volume right = %04x\n", n_channel, chip->m_p_n_volumeright[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_w() channel %d volume right = %04x\n", n_channel, chip->m_p_n_volumeright[ n_channel ] );
 			}
 			break;
 		case SPU_CHANNEL_REG( 0x4 ):
 			if( ACCESSING_BITS_0_15 )
 			{
 				chip->m_p_n_pitch[ n_channel ] = data & 0xffff;
-				verboselog( 1, "psx_spu_w() channel %d pitch = %04x\n", n_channel, chip->m_p_n_pitch[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_w() channel %d pitch = %04x\n", n_channel, chip->m_p_n_pitch[ n_channel ] );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_p_n_address[ n_channel ] = data >> 16;
-				verboselog( 1, "psx_spu_w() channel %d address = %04x\n", n_channel, chip->m_p_n_address[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_w() channel %d address = %04x\n", n_channel, chip->m_p_n_address[ n_channel ] );
 			}
 			break;
 		case SPU_CHANNEL_REG( 0x8 ):
 			if( ACCESSING_BITS_0_15 )
 			{
 				chip->m_p_n_attackdecaysustain[ n_channel ] = data & 0xffff;
-				verboselog( 1, "psx_spu_w() channel %d attack/decay/sustain = %04x\n", n_channel, chip->m_p_n_attackdecaysustain[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_w() channel %d attack/decay/sustain = %04x\n", n_channel, chip->m_p_n_attackdecaysustain[ n_channel ] );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_p_n_sustainrelease[ n_channel ] = data >> 16;
-				verboselog( 1, "psx_spu_w() channel %d sustain/release = %04x\n", n_channel, chip->m_p_n_sustainrelease[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_w() channel %d sustain/release = %04x\n", n_channel, chip->m_p_n_sustainrelease[ n_channel ] );
 			}
 			break;
 		case SPU_CHANNEL_REG( 0xc ):
 			if( ACCESSING_BITS_0_15 )
 			{
 				chip->m_p_n_adsrvolume[ n_channel ] = data & 0xffff;
-				verboselog( 1, "psx_spu_w() channel %d adsr volume = %04x\n", n_channel, chip->m_p_n_adsrvolume[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_w() channel %d adsr volume = %04x\n", n_channel, chip->m_p_n_adsrvolume[ n_channel ] );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_p_n_repeataddress[ n_channel ] = data >> 16;
-				verboselog( 1, "psx_spu_w() channel %d repeat address = %04x\n", n_channel, chip->m_p_n_repeataddress[ n_channel ] );
+				verboselog( machine, 1, "psx_spu_w() channel %d repeat address = %04x\n", n_channel, chip->m_p_n_repeataddress[ n_channel ] );
 			}
 			break;
 		default:
-			verboselog( 0, "psx_spu_w( %08x, %08x, %08x ) channel %d reg %d\n", offset, mem_mask, data, n_channel, offset % 4 );
+			verboselog( machine, 0, "psx_spu_w( %08x, %08x, %08x ) channel %d reg %d\n", offset, mem_mask, data, n_channel, offset % 4 );
 			break;
 		}
 	}
@@ -508,30 +512,30 @@ WRITE32_HANDLER( psx_spu_w )
 			if( ACCESSING_BITS_0_15 )
 			{
 				chip->m_n_mainvolumeleft = data & 0xffff;
-				verboselog( 1, "psx_spu_w() main volume left = %04x\n", chip->m_n_mainvolumeleft );
+				verboselog( machine, 1, "psx_spu_w() main volume left = %04x\n", chip->m_n_mainvolumeleft );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_n_mainvolumeright = data >> 16;
-				verboselog( 1, "psx_spu_w() main volume right = %04x\n", chip->m_n_mainvolumeright );
+				verboselog( machine, 1, "psx_spu_w() main volume right = %04x\n", chip->m_n_mainvolumeright );
 			}
 			break;
 		case SPU_REG( 0xd84 ):
 			if( ACCESSING_BITS_0_15 )
 			{
 				chip->m_n_reverberationdepthleft = data & 0xffff;
-				verboselog( 1, "psx_spu_w() reverberation depth left = %04x\n", chip->m_n_reverberationdepthleft );
+				verboselog( machine, 1, "psx_spu_w() reverberation depth left = %04x\n", chip->m_n_reverberationdepthleft );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_n_reverberationdepthright = data >> 16;
-				verboselog( 1, "psx_spu_w() reverberation depth right = %04x\n", chip->m_n_reverberationdepthright );
+				verboselog( machine, 1, "psx_spu_w() reverberation depth right = %04x\n", chip->m_n_reverberationdepthright );
 			}
 			break;
 		case SPU_REG( 0xd88 ):
 			chip->m_n_voiceon = 0;
 			COMBINE_DATA( &chip->m_n_voiceon );
-			verboselog( 1, "psx_spu_w() voice on = %08x\n", chip->m_n_voiceon );
+			verboselog( machine, 1, "psx_spu_w() voice on = %08x\n", chip->m_n_voiceon );
 			for( n_channel = 0; n_channel < 32; n_channel++ )
 			{
 				if( ( chip->m_n_voiceon & ( 1 << n_channel ) ) != 0 )
@@ -547,46 +551,46 @@ WRITE32_HANDLER( psx_spu_w )
 		case SPU_REG( 0xd8c ):
 			chip->m_n_voiceoff = 0;
 			COMBINE_DATA( &chip->m_n_voiceoff );
-			verboselog( 1, "psx_spu_w() voice off = %08x\n", chip->m_n_voiceoff );
+			verboselog( machine, 1, "psx_spu_w() voice off = %08x\n", chip->m_n_voiceoff );
 			break;
 		case SPU_REG( 0xd90 ):
 			COMBINE_DATA( &chip->m_n_modulationmode );
-			verboselog( 1, "psx_spu_w() modulation mode = %08x\n", chip->m_n_modulationmode );
+			verboselog( machine, 1, "psx_spu_w() modulation mode = %08x\n", chip->m_n_modulationmode );
 			break;
 		case SPU_REG( 0xd94 ):
 			COMBINE_DATA( &chip->m_n_noisemode );
-			verboselog( 1, "psx_spu_w() noise mode = %08x\n", chip->m_n_noisemode );
+			verboselog( machine, 1, "psx_spu_w() noise mode = %08x\n", chip->m_n_noisemode );
 			break;
 		case SPU_REG( 0xd98 ):
 			COMBINE_DATA( &chip->m_n_reverbmode );
-			verboselog( 1, "psx_spu_w() reverb mode = %08x\n", chip->m_n_reverbmode );
+			verboselog( machine, 1, "psx_spu_w() reverb mode = %08x\n", chip->m_n_reverbmode );
 			break;
 		case SPU_REG( 0xd9c ):
 			COMBINE_DATA( &chip->m_n_channelonoff );
-			verboselog( 1, "psx_spu_w() channel on/off = %08x\n", chip->m_n_channelonoff );
+			verboselog( machine, 1, "psx_spu_w() channel on/off = %08x\n", chip->m_n_channelonoff );
 			break;
 		case SPU_REG( 0xda0 ):
 			if( ACCESSING_BITS_0_15 )
 			{
-				verboselog( 0, "psx_spu_w( %08x, %08x, %08x ) %08x\n", offset, mem_mask, data, 0xc00 + ( offset * 4 ) );
+				verboselog( machine, 0, "psx_spu_w( %08x, %08x, %08x ) %08x\n", offset, mem_mask, data, 0xc00 + ( offset * 4 ) );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_n_reverbworkareastart = data >> 16;
-				verboselog( 1, "psx_spu_w() reverb work area start = %04x\n", chip->m_n_reverbworkareastart );
+				verboselog( machine, 1, "psx_spu_w() reverb work area start = %04x\n", chip->m_n_reverbworkareastart );
 			}
 			break;
 		case SPU_REG( 0xda4 ):
 			if( ACCESSING_BITS_0_15 )
 			{
 				chip->m_n_irqaddress = data & 0xffff;
-				verboselog( 1, "psx_spu_w() irq address = %04x\n", chip->m_n_irqaddress );
+				verboselog( machine, 1, "psx_spu_w() irq address = %04x\n", chip->m_n_irqaddress );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_n_spuoffset = ( data >> 16 ) * 4;
 				chip->m_n_spuoffset %= ( SPU_RAM_SIZE / 2 );
-				verboselog( 1, "psx_spu_w() spu offset = %04x\n", chip->m_n_spuoffset );
+				verboselog( machine, 1, "psx_spu_w() spu offset = %04x\n", chip->m_n_spuoffset );
 			}
 			break;
 		case SPU_REG( 0xda8 ):
@@ -595,41 +599,41 @@ WRITE32_HANDLER( psx_spu_w )
 				chip->m_n_spudata = data & 0xffff;
 				chip->m_p_n_spuram[ chip->m_n_spuoffset++ ] = chip->m_n_spudata;
 				chip->m_n_spuoffset %= ( SPU_RAM_SIZE / 2 );
-				verboselog( 1, "psx_spu_w() spu data = %04x\n", chip->m_n_spudata );
+				verboselog( machine, 1, "psx_spu_w() spu data = %04x\n", chip->m_n_spudata );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_n_spucontrol = data >> 16;
-				verboselog( 1, "psx_spu_w() spu control = %04x\n", chip->m_n_spucontrol );
+				verboselog( machine, 1, "psx_spu_w() spu control = %04x\n", chip->m_n_spucontrol );
 			}
 			break;
 		case SPU_REG( 0xdac ):
 			COMBINE_DATA( &chip->m_n_spustatus );
 			chip->m_n_spustatus &= 0xf800ffff;
-			verboselog( 1, "psx_spu_w() spu status = %08x\n", chip->m_n_spustatus );
+			verboselog( machine, 1, "psx_spu_w() spu status = %08x\n", chip->m_n_spustatus );
 			break;
 		case SPU_REG( 0xdb0 ):
 			if( ACCESSING_BITS_0_15 )
 			{
 				chip->m_n_cdvolumeleft = data & 0xffff;
-				verboselog( 1, "psx_spu_w() cd volume left = %04x\n", chip->m_n_cdvolumeleft );
+				verboselog( machine, 1, "psx_spu_w() cd volume left = %04x\n", chip->m_n_cdvolumeleft );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_n_cdvolumeright = data >> 16;
-				verboselog( 1, "psx_spu_w() cd volume right = %04x\n", chip->m_n_cdvolumeright );
+				verboselog( machine, 1, "psx_spu_w() cd volume right = %04x\n", chip->m_n_cdvolumeright );
 			}
 			break;
 		case SPU_REG( 0xdb4 ):
 			if( ACCESSING_BITS_0_15 )
 			{
 				chip->m_n_externalvolumeleft = data & 0xffff;
-				verboselog( 1, "psx_spu_w() external volume left = %04x\n", chip->m_n_externalvolumeleft );
+				verboselog( machine, 1, "psx_spu_w() external volume left = %04x\n", chip->m_n_externalvolumeleft );
 			}
 			if( ACCESSING_BITS_16_31 )
 			{
 				chip->m_n_externalvolumeright = data >> 16;
-				verboselog( 1, "psx_spu_w() external volume right = %04x\n", chip->m_n_externalvolumeright );
+				verboselog( machine, 1, "psx_spu_w() external volume right = %04x\n", chip->m_n_externalvolumeright );
 			}
 			break;
 		case SPU_REG( 0xdc0 ):
@@ -649,10 +653,10 @@ WRITE32_HANDLER( psx_spu_w )
 		case SPU_REG( 0xdf8 ):
 		case SPU_REG( 0xdfc ):
 			COMBINE_DATA( &chip->m_p_n_effect[ offset & 0x0f ] );
-			verboselog( 1, "psx_spu_w() effect %d = %04x\n", offset & 0x0f, chip->m_p_n_effect[ offset & 0x0f ] );
+			verboselog( machine, 1, "psx_spu_w() effect %d = %04x\n", offset & 0x0f, chip->m_p_n_effect[ offset & 0x0f ] );
 			break;
 		default:
-			verboselog( 0, "psx_spu_w( %08x, %08x, %08x ) %08x\n", offset, mem_mask, data, 0xc00 + ( offset * 4 ) );
+			verboselog( machine, 0, "psx_spu_w( %08x, %08x, %08x ) %08x\n", offset, mem_mask, data, 0xc00 + ( offset * 4 ) );
 			break;
 		}
 	}

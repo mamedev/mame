@@ -26,7 +26,7 @@ Up to 4096 bytes can be addressed.
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -35,7 +35,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(Machine), buf );
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -79,7 +79,7 @@ void i2cmem_init( running_machine *machine, int chip, int slave_address, int pag
 
 	if( chip >= I2CMEM_MAXCHIP )
 	{
-		verboselog( 0, "i2cmem_init( %d ) invalid chip\n", chip );
+		verboselog( machine, 0, "i2cmem_init( %d ) invalid chip\n", chip );
 		return;
 	}
 
@@ -149,11 +149,12 @@ static int data_offset( struct i2cmem_chip *c )
 
 void i2cmem_write( int chip, int line, int data )
 {
+	running_machine *machine = Machine;
 	struct i2cmem_chip *c;
 
 	if( chip >= I2CMEM_MAXCHIP )
 	{
-		verboselog( 0, "i2cmem_write( %d, %d, %d ) invalid chip\n", chip, line, data );
+		verboselog( machine, 0, "i2cmem_write( %d, %d, %d ) invalid chip\n", chip, line, data );
 		return;
 	}
 
@@ -167,7 +168,7 @@ void i2cmem_write( int chip, int line, int data )
 		if( c->e0 != data )
 		{
 			c->e0 = data;
-			verboselog( 2, "i2cmem_write( %d, I2CMEM_E0, %d )\n", chip, c->e0 );
+			verboselog( machine, 2, "i2cmem_write( %d, I2CMEM_E0, %d )\n", chip, c->e0 );
 		}
 		break;
 
@@ -175,7 +176,7 @@ void i2cmem_write( int chip, int line, int data )
 		if( c->e1 != data )
 		{
 			c->e1 = data;
-			verboselog( 2, "i2cmem_write( %d, I2CMEM_E1, %d )\n", chip, c->e1 );
+			verboselog( machine, 2, "i2cmem_write( %d, I2CMEM_E1, %d )\n", chip, c->e1 );
 		}
 		break;
 
@@ -183,7 +184,7 @@ void i2cmem_write( int chip, int line, int data )
 		if( c->e2 != data )
 		{
 			c->e2 = data;
-			verboselog( 2, "i2cmem_write( %d, I2CMEM_E2, %d )\n", chip, c->e2 );
+			verboselog( machine, 2, "i2cmem_write( %d, I2CMEM_E2, %d )\n", chip, c->e2 );
 		}
 		break;
 
@@ -191,19 +192,19 @@ void i2cmem_write( int chip, int line, int data )
 		if( c->sdaw != data )
 		{
 			c->sdaw = data;
-			verboselog( 2, "i2cmem_write( %d, I2CMEM_SDA, %d )\n", chip, c->sdaw );
+			verboselog( machine, 2, "i2cmem_write( %d, I2CMEM_SDA, %d )\n", chip, c->sdaw );
 
 			if( c->scl )
 			{
 				if( c->sdaw )
 				{
-					verboselog( 1, "i2cmem(%d) stop\n", chip );
+					verboselog( machine, 1, "i2cmem(%d) stop\n", chip );
 					c->state = STATE_IDLE;
 					c->byteaddr = 0;
 				}
 				else
 				{
-					verboselog( 2, "i2cmem(%d) start\n", chip );
+					verboselog( machine, 2, "i2cmem(%d) start\n", chip );
 					c->state = STATE_DEVSEL;
 					c->bits = 0;
 				}
@@ -217,7 +218,7 @@ void i2cmem_write( int chip, int line, int data )
 		if( c->scl != data )
 		{
 			c->scl = data;
-			verboselog( 2, "i2cmem_write( %d, I2CMEM_SCL, %d )\n", chip, c->scl );
+			verboselog( machine, 2, "i2cmem_write( %d, I2CMEM_SCL, %d )\n", chip, c->scl );
 
 			switch( c->state )
 			{
@@ -243,17 +244,17 @@ void i2cmem_write( int chip, int line, int data )
 
 							if( !select_device( c ) )
 							{
-								verboselog( 1, "i2cmem(%d) devsel %02x: not this device\n", chip, c->devsel );
+								verboselog( machine, 1, "i2cmem(%d) devsel %02x: not this device\n", chip, c->devsel );
 								c->state = STATE_IDLE;
 							}
 							else if( ( c->devsel & DEVSEL_RW ) == 0 )
 							{
-								verboselog( 1, "i2cmem(%d) devsel %02x: write\n", chip, c->devsel );
+								verboselog( machine, 1, "i2cmem(%d) devsel %02x: write\n", chip, c->devsel );
 								c->state = STATE_BYTEADDR;
 							}
 							else
 							{
-								verboselog( 1, "i2cmem(%d) devsel %02x: read\n", chip, c->devsel );
+								verboselog( machine, 1, "i2cmem(%d) devsel %02x: read\n", chip, c->devsel );
 								c->state = STATE_DATAOUT;
 							}
 							break;
@@ -262,7 +263,7 @@ void i2cmem_write( int chip, int line, int data )
 							c->byteaddr = c->shift;
 							c->page_offset = 0;
 
-							verboselog( 1, "i2cmem(%d) byteaddr %02x\n", chip, c->byteaddr );
+							verboselog( machine, 1, "i2cmem(%d) byteaddr %02x\n", chip, c->byteaddr );
 
 							c->state = STATE_DATAIN;
 							break;
@@ -270,13 +271,13 @@ void i2cmem_write( int chip, int line, int data )
 						case STATE_DATAIN:
 							if( c->wc )
 							{
-								verboselog( 0, "i2cmem(%d) write not enabled\n", chip );
+								verboselog( machine, 0, "i2cmem(%d) write not enabled\n", chip );
 								c->state = STATE_IDLE;
 							}
 							else if( c->page_size > 0 )
 							{
 								c->page[ c->page_offset ] = c->shift;
-								verboselog( 1, "i2cmem(%d) page[ %04x ] <- %02x\n", chip, c->page_offset, c->page[ c->page_offset ] );
+								verboselog( machine, 1, "i2cmem(%d) page[ %04x ] <- %02x\n", chip, c->page_offset, c->page[ c->page_offset ] );
 
 								c->page_offset++;
 								if( c->page_offset == c->page_size )
@@ -284,7 +285,7 @@ void i2cmem_write( int chip, int line, int data )
 									int offset = data_offset( c ) & ~( c->page_size - 1 );
 
 									memcpy( &c->data[ offset ], c->page, c->page_size );
-									verboselog( 1, "i2cmem(%d) data[ %04x to %04x ] = page\n", chip, offset, offset + c->page_size - 1 );
+									verboselog( machine, 1, "i2cmem(%d) data[ %04x to %04x ] = page\n", chip, offset, offset + c->page_size - 1 );
 
 									c->page_offset = 0;
 								}
@@ -294,7 +295,7 @@ void i2cmem_write( int chip, int line, int data )
 								int offset = data_offset( c );
 
 								c->data[ offset ] = c->shift;
-								verboselog( 1, "i2cmem(%d) data[ %04x ] <- %02x\n", chip, offset, c->data[ offset ] );
+								verboselog( machine, 1, "i2cmem(%d) data[ %04x ] <- %02x\n", chip, offset, c->data[ offset ] );
 
 								c->byteaddr++;
 							}
@@ -328,7 +329,7 @@ void i2cmem_write( int chip, int line, int data )
 							int offset = data_offset( c );
 
 							c->shift = c->data[ offset ];
-							verboselog( 1, "i2cmem(%d) data[ %04x ] -> %02x\n", chip, offset, c->data[ offset ] );
+							verboselog( machine, 1, "i2cmem(%d) data[ %04x ] -> %02x\n", chip, offset, c->data[ offset ] );
 							c->byteaddr++;
 						}
 
@@ -344,7 +345,7 @@ void i2cmem_write( int chip, int line, int data )
 					{
 						if( c->sdaw )
 						{
-							verboselog( 1, "i2cmem(%d) sleep\n", chip );
+							verboselog( machine, 1, "i2cmem(%d) sleep\n", chip );
 							c->state = STATE_IDLE;
 						}
 
@@ -371,23 +372,24 @@ void i2cmem_write( int chip, int line, int data )
 		if( c->wc != data )
 		{
 			c->wc = data;
-			verboselog( 2, "i2cmem_write( %d, I2CMEM_WC, %d )\n", chip, c->wc );
+			verboselog( machine, 2, "i2cmem_write( %d, I2CMEM_WC, %d )\n", chip, c->wc );
 		}
 		break;
 
 	default:
-		verboselog( 0, "i2cmem_write( %d, %d, %d ) invalid line\n", chip, line, data );
+		verboselog( machine, 0, "i2cmem_write( %d, %d, %d ) invalid line\n", chip, line, data );
 		break;
 	}
 }
 
 int i2cmem_read( int chip, int line )
 {
+	running_machine *machine = Machine;
 	struct i2cmem_chip *c;
 
 	if( chip >= I2CMEM_MAXCHIP )
 	{
-		verboselog( 0, "i2cmem_read( %d, %d ) invalid chip\n", chip, line );
+		verboselog( machine, 0, "i2cmem_read( %d, %d ) invalid chip\n", chip, line );
 		return 0;
 	}
 
@@ -396,11 +398,11 @@ int i2cmem_read( int chip, int line )
 	switch( line )
 	{
 	case I2CMEM_SDA:
-		verboselog( 2, "i2cmem_read( %d, I2CMEM_SDA ) %d\n", chip, c->sdar & c->sdaw );
+		verboselog( machine, 2, "i2cmem_read( %d, I2CMEM_SDA ) %d\n", chip, c->sdar & c->sdaw );
 		return c->sdar & c->sdaw;
 
 	default:
-		verboselog( 0, "i2cmem_read( %d, %d ) invalid line\n", chip, line );
+		verboselog( machine, 0, "i2cmem_read( %d, %d ) invalid line\n", chip, line );
 		break;
 	}
 
@@ -413,7 +415,7 @@ static void nvram_handler_i2cmem( int chip, running_machine *machine, mame_file 
 
 	if( chip >= I2CMEM_MAXCHIP )
 	{
-		verboselog( 0, "nvram_handler_i2cmem( %d ) invalid chip\n", chip );
+		verboselog( machine, 0, "nvram_handler_i2cmem( %d ) invalid chip\n", chip );
 		return;
 	}
 

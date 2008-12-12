@@ -272,7 +272,7 @@ Notes:
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -281,7 +281,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(Machine), buf );
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -291,7 +291,7 @@ static size_t namcos11_keycus_size;
 
 static WRITE32_HANDLER( keycus_w )
 {
-	verboselog( 1, "keycus_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	COMBINE_DATA( &namcos11_keycus[ offset ] );
 }
 
@@ -312,7 +312,7 @@ static READ32_HANDLER( keycus_c406_r )
 			( ( namcos11_keycus[ 1 ] >> 8 ) & 0xf );
 		break;
 	}
-	verboselog( 1, "keycus_c406_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_c406_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -329,7 +329,7 @@ static READ32_HANDLER( keycus_c409_r )
 		data = ( data & 0x0000ffff ) | 0x000f0000;
 		break;
 	}
-	verboselog( 1, "keycus_c409_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_c409_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -363,7 +363,7 @@ static READ32_HANDLER( keycus_c410_r )
 			( ( ( n_value / 10000 ) % 10 ) << 16 );
 		break;
 	}
-	verboselog( 1, "keycus_c410_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_c410_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -396,7 +396,7 @@ static READ32_HANDLER( keycus_c411_r )
 		break;
 	}
 
-	verboselog( 1, "keycus_c411_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_c411_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -430,7 +430,7 @@ static READ32_HANDLER( keycus_c430_r )
 			( ( ( n_value / 1 ) % 10 ) << 16 );
 		break;
 	}
-	verboselog( 1, "keycus_c430_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_c430_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -462,7 +462,7 @@ static READ32_HANDLER( keycus_c431_r )
 		data = ( data & 0xffff0000 ) | ( ( n_value / 10000 ) % 10 );
 		break;
 	}
-	verboselog( 1, "keycus_c431_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_c431_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -495,7 +495,7 @@ static READ32_HANDLER( keycus_c432_r )
 		break;
 	}
 
-	verboselog( 1, "keycus_c432_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_c432_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -516,7 +516,7 @@ static READ32_HANDLER( keycus_c442_r )
 		}
 		break;
 	}
-	verboselog( 1, "keycus_c442_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_c442_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
@@ -549,19 +549,19 @@ static READ32_HANDLER( keycus_c443_r )
 		}
 		break;
 	}
-	verboselog( 1, "keycus_c443_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "keycus_c443_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 static WRITE32_HANDLER( sharedram_w )
 {
-	verboselog( 1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ) + 0x4000, data, mem_mask );
+	verboselog( space->machine, 1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ) + 0x4000, data, mem_mask );
 	COMBINE_DATA( &namcos11_sharedram[ offset ] );
 }
 
 static READ32_HANDLER( sharedram_r )
 {
-	verboselog( 1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ) + 0x4000, mem_mask, namcos11_sharedram[ offset ] );
+	verboselog( space->machine, 1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ) + 0x4000, mem_mask, namcos11_sharedram[ offset ] );
 	return namcos11_sharedram[ offset ];
 }
 
@@ -645,7 +645,7 @@ INLINE void bankswitch_rom8( int n_bank, int n_data )
 
 static WRITE32_HANDLER( bankswitch_rom32_w )
 {
-	verboselog( 2, "bankswitch_rom32_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 2, "bankswitch_rom32_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	if( ACCESSING_BITS_0_15 )
 	{
@@ -659,7 +659,7 @@ static WRITE32_HANDLER( bankswitch_rom32_w )
 
 static WRITE32_HANDLER( bankswitch_rom64_upper_w )
 {
-	verboselog( 2, "bankswitch_rom64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 2, "bankswitch_rom64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	if( ACCESSING_BITS_0_15 )
 	{
@@ -679,7 +679,7 @@ INLINE void bankswitch_rom64( int n_bank, int n_data )
 
 static WRITE32_HANDLER( bankswitch_rom64_w )
 {
-	verboselog( 2, "bankswitch_rom64_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 2, "bankswitch_rom64_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	if( ACCESSING_BITS_0_15 )
 	{
@@ -700,11 +700,11 @@ static WRITE32_HANDLER( lightgun_w )
 		output_set_value( "recoil0", !( data & 0x02 ) );
 		output_set_value( "recoil1", !( data & 0x01 ) );
 
-		verboselog( 1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
+		verboselog( space->machine, 1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		verboselog( 2, "lightgun_w: start reading (%08x %08x)\n", data, mem_mask );
+		verboselog( space->machine, 2, "lightgun_w: start reading (%08x %08x)\n", data, mem_mask );
 	}
 }
 
@@ -726,7 +726,7 @@ static READ32_HANDLER( lightgun_r )
 		data = ( input_port_read(space->machine,  "GUN2Y" ) ) | ( ( input_port_read(space->machine,  "GUN2Y" ) + 1 ) << 16 );
 		break;
 	}
-	verboselog( 2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 

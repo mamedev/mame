@@ -13,7 +13,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -22,7 +22,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", cpuexec_describe_context(Machine), buf );
+		logerror( "%s: %s", cpuexec_describe_context(machine), buf );
 	}
 }
 
@@ -46,12 +46,12 @@ static UINT32 psx_com_delay = 0;
 WRITE32_HANDLER( psx_com_delay_w )
 {
 	COMBINE_DATA( &psx_com_delay );
-	verboselog( 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
+	verboselog( space->machine, 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
 }
 
 READ32_HANDLER( psx_com_delay_r )
 {
-	verboselog( 1, "psx_com_delay_r( %08x )\n", mem_mask );
+	verboselog( space->machine, 1, "psx_com_delay_r( %08x )\n", mem_mask );
 	return psx_com_delay;
 }
 
@@ -64,52 +64,56 @@ static void psx_irq_update( running_machine *machine )
 {
 	if( ( m_n_irqdata & m_n_irqmask ) != 0 )
 	{
-		verboselog( 2, "psx irq assert\n" );
+		verboselog( machine, 2, "psx irq assert\n" );
 		cpu_set_input_line(machine->cpu[0], PSXCPU_IRQ0, ASSERT_LINE );
 	}
 	else
 	{
-		verboselog( 2, "psx irq clear\n" );
+		verboselog( machine, 2, "psx irq clear\n" );
 		cpu_set_input_line(machine->cpu[0], PSXCPU_IRQ0, CLEAR_LINE );
 	}
 }
 
 WRITE32_HANDLER( psx_irq_w )
 {
+	running_machine *machine = space->machine;
+
 	switch( offset )
 	{
 	case 0x00:
-		verboselog( 2, "psx irq data ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqdata, ( m_n_irqdata & ~mem_mask ) | ( m_n_irqdata & m_n_irqmask & data ) );
+		verboselog( machine, 2, "psx irq data ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqdata, ( m_n_irqdata & ~mem_mask ) | ( m_n_irqdata & m_n_irqmask & data ) );
 		m_n_irqdata = ( m_n_irqdata & ~mem_mask ) | ( m_n_irqdata & m_n_irqmask & data );
 		psx_irq_update(space->machine);
 		break;
 	case 0x01:
-		verboselog( 2, "psx irq mask ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqmask, ( m_n_irqmask & ~mem_mask ) | data );
+		verboselog( machine, 2, "psx irq mask ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqmask, ( m_n_irqmask & ~mem_mask ) | data );
 		m_n_irqmask = ( m_n_irqmask & ~mem_mask ) | data;
 		if( ( m_n_irqmask & ~( 0x1 | 0x08 | 0x10 | 0x20 | 0x40 | 0x80 | 0x100 | 0x200 | 0x400 ) ) != 0 )
 		{
-			verboselog( 0, "psx_irq_w( %08x, %08x, %08x ) unknown irq\n", offset, data, mem_mask );
+			verboselog( machine, 0, "psx_irq_w( %08x, %08x, %08x ) unknown irq\n", offset, data, mem_mask );
 		}
 		psx_irq_update(space->machine);
 		break;
 	default:
-		verboselog( 0, "psx_irq_w( %08x, %08x, %08x ) unknown register\n", offset, data, mem_mask );
+		verboselog( machine, 0, "psx_irq_w( %08x, %08x, %08x ) unknown register\n", offset, data, mem_mask );
 		break;
 	}
 }
 
 READ32_HANDLER( psx_irq_r )
 {
+	running_machine *machine = space->machine;
+
 	switch( offset )
 	{
 	case 0x00:
-		verboselog( 1, "psx_irq_r irq data %08x\n", m_n_irqdata );
+		verboselog( machine, 1, "psx_irq_r irq data %08x\n", m_n_irqdata );
 		return m_n_irqdata;
 	case 0x01:
-		verboselog( 1, "psx_irq_r irq mask %08x\n", m_n_irqmask );
+		verboselog( machine, 1, "psx_irq_r irq mask %08x\n", m_n_irqmask );
 		return m_n_irqmask;
 	default:
-		verboselog( 0, "psx_irq_r unknown register %d\n", offset );
+		verboselog( machine, 0, "psx_irq_r unknown register %d\n", offset );
 		break;
 	}
 	return 0;
@@ -117,7 +121,7 @@ READ32_HANDLER( psx_irq_r )
 
 void psx_irq_set( running_machine *machine, UINT32 data )
 {
-	verboselog( 2, "psx_irq_set %08x\n", data );
+	verboselog( machine, 2, "psx_irq_set %08x\n", data );
 	m_n_irqdata |= data;
 	psx_irq_update(machine);
 }
@@ -170,18 +174,18 @@ static void dma_interrupt_update( running_machine *machine )
 
 	if( ( n_mask & 0x80 ) != 0 && ( n_int & n_mask ) != 0 )
 	{
-		verboselog( 2, "dma_interrupt_update( %02x, %02x ) interrupt triggered\n", n_int, n_mask );
+		verboselog( machine, 2, "dma_interrupt_update( %02x, %02x ) interrupt triggered\n", n_int, n_mask );
 		m_n_dicr |= 0x80000000;
 		psx_irq_set( machine, 0x0008 );
 	}
 	else if( ( m_n_dicr & 0x80000000 ) != 0 )
 	{
-		verboselog( 2, "dma_interrupt_update( %02x, %02x ) interrupt cleared\n", n_int, n_mask );
+		verboselog( machine, 2, "dma_interrupt_update( %02x, %02x ) interrupt cleared\n", n_int, n_mask );
 		m_n_dicr &= ~0x80000000;
 	}
 	else if( n_int != 0 )
 	{
-		verboselog( 2, "dma_interrupt_update( %02x, %02x ) interrupt not enabled\n", n_int, n_mask );
+		verboselog( machine, 2, "dma_interrupt_update( %02x, %02x ) interrupt not enabled\n", n_int, n_mask );
 	}
 
 	m_n_dicr &= 0x00ffffff | ( m_n_dicr << 8 );
@@ -264,6 +268,7 @@ void psx_dma_install_write_handler( int n_channel, psx_dma_read_handler p_fn_dma
 
 WRITE32_HANDLER( psx_dma_w )
 {
+	running_machine *machine = space->machine;
 	static int n_channel;
 	n_channel = offset / 4;
 	if( n_channel < 7 )
@@ -271,15 +276,15 @@ WRITE32_HANDLER( psx_dma_w )
 		switch( offset % 4 )
 		{
 		case 0:
-			verboselog( 2, "dmabase( %d ) = %08x\n", n_channel, data );
+			verboselog( machine, 2, "dmabase( %d ) = %08x\n", n_channel, data );
 			m_p_n_dmabase[ n_channel ] = data;
 			break;
 		case 1:
-			verboselog( 2, "dmablockcontrol( %d ) = %08x\n", n_channel, data );
+			verboselog( machine, 2, "dmablockcontrol( %d ) = %08x\n", n_channel, data );
 			m_p_n_dmablockcontrol[ n_channel ] = data;
 			break;
 		case 2:
-			verboselog( 2, "dmachannelcontrol( %d ) = %08x\n", n_channel, data );
+			verboselog( machine, 2, "dmachannelcontrol( %d ) = %08x\n", n_channel, data );
 			m_p_n_dmachannelcontrol[ n_channel ] = data;
 			if( ( m_p_n_dmachannelcontrol[ n_channel ] & ( 1L << 0x18 ) ) != 0 && ( m_n_dpcp & ( 1 << ( 3 + ( n_channel * 4 ) ) ) ) != 0 )
 			{
@@ -306,14 +311,14 @@ WRITE32_HANDLER( psx_dma_w )
 				if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000000 &&
 					m_p_fn_dma_read[ n_channel ] != NULL )
 				{
-					verboselog( 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
+					verboselog( machine, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_read[ n_channel ]( n_address, n_size );
 					dma_finished( space->machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000200 &&
 					m_p_fn_dma_read[ n_channel ] != NULL )
 				{
-					verboselog( 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
+					verboselog( machine, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_read[ n_channel ]( n_address, n_size );
 					if( n_channel == 1 )
 					{
@@ -327,7 +332,7 @@ WRITE32_HANDLER( psx_dma_w )
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000201 &&
 					m_p_fn_dma_write[ n_channel ] != NULL )
 				{
-					verboselog( 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
+					verboselog( machine, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_write[ n_channel ]( n_address, n_size );
 					dma_finished( space->machine, n_channel );
 				}
@@ -335,7 +340,7 @@ WRITE32_HANDLER( psx_dma_w )
 					m_p_fn_dma_write[ n_channel ] != NULL )
 				{
 					/* todo: check this is a write not a read... */
-					verboselog( 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
+					verboselog( machine, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_write[ n_channel ]( n_address, n_size );
 					dma_finished( space->machine, n_channel );
 				}
@@ -343,7 +348,7 @@ WRITE32_HANDLER( psx_dma_w )
 					m_p_fn_dma_write[ n_channel ] != NULL )
 				{
 					/* todo: check this is a write not a read... */
-					verboselog( 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
+					verboselog( machine, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_write[ n_channel ]( n_address, n_size );
 					dma_finished( space->machine, n_channel );
 				}
@@ -351,7 +356,7 @@ WRITE32_HANDLER( psx_dma_w )
 					n_channel == 2 &&
 					m_p_fn_dma_write[ n_channel ] != NULL )
 				{
-					verboselog( 1, "dma %d write linked list %08x\n",
+					verboselog( machine, 1, "dma %d write linked list %08x\n",
 						n_channel, m_p_n_dmabase[ n_channel ] );
 
 					dma_finished( space->machine, n_channel );
@@ -359,7 +364,7 @@ WRITE32_HANDLER( psx_dma_w )
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11000002 &&
 					n_channel == 6 )
 				{
-					verboselog( 1, "dma 6 reverse clear %08x %08x\n",
+					verboselog( machine, 1, "dma 6 reverse clear %08x %08x\n",
 						m_p_n_dmabase[ n_channel ], m_p_n_dmablockcontrol[ n_channel ] );
 					if( n_size > 0 )
 					{
@@ -377,16 +382,16 @@ WRITE32_HANDLER( psx_dma_w )
 				}
 				else
 				{
-					verboselog( 0, "dma %d unknown mode %08x\n", n_channel, m_p_n_dmachannelcontrol[ n_channel ] );
+					verboselog( machine, 0, "dma %d unknown mode %08x\n", n_channel, m_p_n_dmachannelcontrol[ n_channel ] );
 				}
 			}
 			else if( m_p_n_dmachannelcontrol[ n_channel ] != 0 )
 			{
-				verboselog( 1, "psx_dma_w( %04x, %08x, %08x ) channel not enabled\n", offset, m_p_n_dmachannelcontrol[ n_channel ], mem_mask );
+				verboselog( machine, 1, "psx_dma_w( %04x, %08x, %08x ) channel not enabled\n", offset, m_p_n_dmachannelcontrol[ n_channel ], mem_mask );
 			}
 			break;
 		default:
-			verboselog( 1, "psx_dma_w( %04x, %08x, %08x ) Unknown dma channel register\n", offset, data, mem_mask );
+			verboselog( machine, 1, "psx_dma_w( %04x, %08x, %08x ) Unknown dma channel register\n", offset, data, mem_mask );
 			break;
 		}
 	}
@@ -395,7 +400,7 @@ WRITE32_HANDLER( psx_dma_w )
 		switch( offset % 4 )
 		{
 		case 0x0:
-			verboselog( 1, "psx_dma_w( %04x, %08x, %08x ) dpcp\n", offset, data, mem_mask );
+			verboselog( machine, 1, "psx_dma_w( %04x, %08x, %08x ) dpcp\n", offset, data, mem_mask );
 			m_n_dpcp = ( m_n_dpcp & ~mem_mask ) | data;
 			break;
 		case 0x1:
@@ -410,11 +415,11 @@ WRITE32_HANDLER( psx_dma_w )
                 m_n_dicr &= ~0x80000000;
             }
 */
-			verboselog( 1, "psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", offset, data, mem_mask, m_n_dicr );
+			verboselog( machine, 1, "psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", offset, data, mem_mask, m_n_dicr );
 			dma_interrupt_update(space->machine);
 			break;
 		default:
-			verboselog( 0, "psx_dma_w( %04x, %08x, %08x ) Unknown dma control register\n", offset, data, mem_mask );
+			verboselog( machine, 0, "psx_dma_w( %04x, %08x, %08x ) Unknown dma control register\n", offset, data, mem_mask );
 			break;
 		}
 	}
@@ -422,6 +427,7 @@ WRITE32_HANDLER( psx_dma_w )
 
 READ32_HANDLER( psx_dma_r )
 {
+	running_machine *machine = space->machine;
 	static int n_channel;
 	n_channel = offset / 4;
 	if( n_channel < 7 )
@@ -429,16 +435,16 @@ READ32_HANDLER( psx_dma_r )
 		switch( offset % 4 )
 		{
 		case 0:
-			verboselog( 1, "psx_dma_r dmabase[ %d ] ( %08x )\n", n_channel, m_p_n_dmabase[ n_channel ] );
+			verboselog( machine, 1, "psx_dma_r dmabase[ %d ] ( %08x )\n", n_channel, m_p_n_dmabase[ n_channel ] );
 			return m_p_n_dmabase[ n_channel ];
 		case 1:
-			verboselog( 1, "psx_dma_r dmablockcontrol[ %d ] ( %08x )\n", n_channel, m_p_n_dmablockcontrol[ n_channel ] );
+			verboselog( machine, 1, "psx_dma_r dmablockcontrol[ %d ] ( %08x )\n", n_channel, m_p_n_dmablockcontrol[ n_channel ] );
 			return m_p_n_dmablockcontrol[ n_channel ];
 		case 2:
-			verboselog( 1, "psx_dma_r dmachannelcontrol[ %d ] ( %08x )\n", n_channel, m_p_n_dmachannelcontrol[ n_channel ] );
+			verboselog( machine, 1, "psx_dma_r dmachannelcontrol[ %d ] ( %08x )\n", n_channel, m_p_n_dmachannelcontrol[ n_channel ] );
 			return m_p_n_dmachannelcontrol[ n_channel ];
 		default:
-			verboselog( 0, "psx_dma_r( %08x, %08x ) Unknown dma channel register\n", offset, mem_mask );
+			verboselog( machine, 0, "psx_dma_r( %08x, %08x ) Unknown dma channel register\n", offset, mem_mask );
 			break;
 		}
 	}
@@ -447,13 +453,13 @@ READ32_HANDLER( psx_dma_r )
 		switch( offset % 4 )
 		{
 		case 0x0:
-			verboselog( 1, "psx_dma_r dpcp ( %08x )\n", m_n_dpcp );
+			verboselog( machine, 1, "psx_dma_r dpcp ( %08x )\n", m_n_dpcp );
 			return m_n_dpcp;
 		case 0x1:
-			verboselog( 1, "psx_dma_r dicr ( %08x )\n", m_n_dicr );
+			verboselog( machine, 1, "psx_dma_r dicr ( %08x )\n", m_n_dicr );
 			return m_n_dicr;
 		default:
-			verboselog( 0, "psx_dma_r( %08x, %08x ) Unknown dma control register\n", offset, mem_mask );
+			verboselog( machine, 0, "psx_dma_r( %08x, %08x ) Unknown dma control register\n", offset, mem_mask );
 			break;
 		}
 	}
@@ -559,7 +565,7 @@ static TIMER_CALLBACK( root_finished )
 {
 	int n_counter = param;
 
-	verboselog( 2, "root_finished( %d ) %04x\n", n_counter, root_current( n_counter ) );
+	verboselog( machine, 2, "root_finished( %d ) %04x\n", n_counter, root_current( n_counter ) );
 //  if( ( m_p_n_root_mode[ n_counter ] & RC_COUNTTARGET ) != 0 )
 	{
 		/* TODO: wrap should be handled differently as RC_COUNTTARGET & RC_IRQTARGET don't have to be the same. */
@@ -581,7 +587,7 @@ WRITE32_HANDLER( psx_counter_w )
 {
 	int n_counter;
 
-	verboselog( 1, "psx_counter_w ( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( space->machine, 1, "psx_counter_w ( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	n_counter = offset / 4;
 
@@ -611,7 +617,7 @@ WRITE32_HANDLER( psx_counter_w )
 		m_p_n_root_target[ n_counter ] = data;
 		break;
 	default:
-		verboselog( 0, "psx_counter_w( %08x, %08x, %08x ) unknown register\n", offset, mem_mask, data );
+		verboselog( space->machine, 0, "psx_counter_w( %08x, %08x, %08x ) unknown register\n", offset, mem_mask, data );
 		return;
 	}
 
@@ -637,10 +643,10 @@ READ32_HANDLER( psx_counter_r )
 		data = m_p_n_root_target[ n_counter ];
 		break;
 	default:
-		verboselog( 0, "psx_counter_r( %08x, %08x ) unknown register\n", offset, mem_mask );
+		verboselog( space->machine, 0, "psx_counter_r( %08x, %08x ) unknown register\n", offset, mem_mask );
 		return 0;
 	}
-	verboselog( 1, "psx_counter_r ( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( space->machine, 1, "psx_counter_r ( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -683,7 +689,7 @@ static psx_sio_handler m_p_f_sio_handler[ 2 ];
 
 static void sio_interrupt( running_machine *machine, int n_port )
 {
-	verboselog( 1, "sio_interrupt( %d )\n", n_port );
+	verboselog( machine, 1, "sio_interrupt( %d )\n", n_port );
 	m_p_n_sio_status[ n_port ] |= SIO_STATUS_IRQ;
 	if( n_port == 0 )
 	{
@@ -697,6 +703,7 @@ static void sio_interrupt( running_machine *machine, int n_port )
 
 static void sio_timer_adjust( int n_port )
 {
+	running_machine *machine = Machine;
 	attotime n_time;
 	if( ( m_p_n_sio_status[ n_port ] & SIO_STATUS_TX_EMPTY ) == 0 || m_p_n_sio_tx_bits[ n_port ] != 0 )
 	{
@@ -721,18 +728,18 @@ static void sio_timer_adjust( int n_port )
 		if( m_p_n_sio_baud[ n_port ] != 0 && n_prescaler != 0 )
 		{
 			n_time = attotime_mul(ATTOTIME_IN_HZ(33868800), n_prescaler * m_p_n_sio_baud[n_port]);
-			verboselog( 2, "sio_timer_adjust( %d ) = %s ( %d x %d )\n", n_port, attotime_string(n_time, 9), n_prescaler, m_p_n_sio_baud[ n_port ] );
+			verboselog( machine, 2, "sio_timer_adjust( %d ) = %s ( %d x %d )\n", n_port, attotime_string(n_time, 9), n_prescaler, m_p_n_sio_baud[ n_port ] );
 		}
 		else
 		{
 			n_time = attotime_never;
-			verboselog( 0, "sio_timer_adjust( %d ) invalid baud rate ( %d x %d )\n", n_port, n_prescaler, m_p_n_sio_baud[ n_port ] );
+			verboselog( machine, 0, "sio_timer_adjust( %d ) invalid baud rate ( %d x %d )\n", n_port, n_prescaler, m_p_n_sio_baud[ n_port ] );
 		}
 	}
 	else
 	{
 		n_time = attotime_never;
-		verboselog( 2, "sio_timer_adjust( %d ) finished\n", n_port );
+		verboselog( machine, 2, "sio_timer_adjust( %d ) finished\n", n_port );
 	}
 	timer_adjust_oneshot( m_p_timer_sio[ n_port ], n_time, n_port);
 }
@@ -740,7 +747,7 @@ static void sio_timer_adjust( int n_port )
 static TIMER_CALLBACK( sio_clock )
 {
 	int n_port = param;
-	verboselog( 2, "sio tick\n" );
+	verboselog( machine, 2, "sio tick\n" );
 
 	if( m_p_n_sio_tx_bits[ n_port ] == 0 &&
 		( m_p_n_sio_control[ n_port ] & SIO_CONTROL_TX_ENA ) != 0 &&
@@ -809,7 +816,7 @@ static TIMER_CALLBACK( sio_clock )
 
 void psx_sio_input( running_machine *machine, int n_port, int n_mask, int n_data )
 {
-	verboselog( 1, "psx_sio_input( %d, %02x, %02x )\n", n_port, n_mask, n_data );
+	verboselog( machine, 1, "psx_sio_input( %d, %02x, %02x )\n", n_port, n_mask, n_data );
 	m_p_n_sio_rx[ n_port ] = ( m_p_n_sio_rx[ n_port ] & ~n_mask ) | ( n_data & n_mask );
 
 	if( ( m_p_n_sio_rx[ n_port ] & PSX_SIO_IN_DSR ) != 0 )
@@ -830,6 +837,7 @@ void psx_sio_input( running_machine *machine, int n_port, int n_mask, int n_data
 
 WRITE32_HANDLER( psx_sio_w )
 {
+	running_machine *machine = space->machine;
 	int n_port;
 
 	n_port = offset / 4;
@@ -837,35 +845,35 @@ WRITE32_HANDLER( psx_sio_w )
 	switch( offset % 4 )
 	{
 	case 0:
-		verboselog( 1, "psx_sio_w %d data %02x (%08x)\n", n_port, data, mem_mask );
+		verboselog( machine, 1, "psx_sio_w %d data %02x (%08x)\n", n_port, data, mem_mask );
 		m_p_n_sio_tx_data[ n_port ] = data;
 		m_p_n_sio_status[ n_port ] &= ~( SIO_STATUS_TX_RDY );
 		m_p_n_sio_status[ n_port ] &= ~( SIO_STATUS_TX_EMPTY );
 		sio_timer_adjust( n_port );
 		break;
 	case 1:
-		verboselog( 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+		verboselog( machine, 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 		break;
 	case 2:
 		if( ACCESSING_BITS_0_15 )
 		{
 			m_p_n_sio_mode[ n_port ] = data & 0xffff;
-			verboselog( 1, "psx_sio_w %d mode %04x\n", n_port, data & 0xffff );
+			verboselog( machine, 1, "psx_sio_w %d mode %04x\n", n_port, data & 0xffff );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			verboselog( 1, "psx_sio_w %d control %04x\n", n_port, data >> 16 );
+			verboselog( machine, 1, "psx_sio_w %d control %04x\n", n_port, data >> 16 );
 			m_p_n_sio_control[ n_port ] = data >> 16;
 
 			if( ( m_p_n_sio_control[ n_port ] & SIO_CONTROL_RESET ) != 0 )
 			{
-				verboselog( 1, "psx_sio_w reset\n" );
+				verboselog( machine, 1, "psx_sio_w reset\n" );
 				m_p_n_sio_status[ n_port ] |= SIO_STATUS_TX_EMPTY | SIO_STATUS_TX_RDY;
 				m_p_n_sio_status[ n_port ] &= ~( SIO_STATUS_RX_RDY | SIO_STATUS_OVERRUN | SIO_STATUS_IRQ );
 			}
 			if( ( m_p_n_sio_control[ n_port ] & SIO_CONTROL_IACK ) != 0 )
 			{
-				verboselog( 1, "psx_sio_w iack\n" );
+				verboselog( machine, 1, "psx_sio_w iack\n" );
 				m_p_n_sio_status[ n_port ] &= ~( SIO_STATUS_IRQ );
 				m_p_n_sio_control[ n_port ] &= ~( SIO_CONTROL_IACK );
 			}
@@ -892,22 +900,23 @@ WRITE32_HANDLER( psx_sio_w )
 	case 3:
 		if( ACCESSING_BITS_0_15 )
 		{
-			verboselog( 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+			verboselog( machine, 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
 			m_p_n_sio_baud[ n_port ] = data >> 16;
-			verboselog( 1, "psx_sio_w %d baud %04x\n", n_port, data >> 16 );
+			verboselog( machine, 1, "psx_sio_w %d baud %04x\n", n_port, data >> 16 );
 		}
 		break;
 	default:
-		verboselog( 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+		verboselog( machine, 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 		break;
 	}
 }
 
 READ32_HANDLER( psx_sio_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data;
 	int n_port;
 
@@ -919,44 +928,44 @@ READ32_HANDLER( psx_sio_r )
 		data = m_p_n_sio_rx_data[ n_port ];
 		m_p_n_sio_status[ n_port ] &= ~( SIO_STATUS_RX_RDY );
 		m_p_n_sio_rx_data[ n_port ] = 0xff;
-		verboselog( 1, "psx_sio_r %d data %02x (%08x)\n", n_port, data, mem_mask );
+		verboselog( machine, 1, "psx_sio_r %d data %02x (%08x)\n", n_port, data, mem_mask );
 		break;
 	case 1:
 		data = m_p_n_sio_status[ n_port ];
 		if( ACCESSING_BITS_0_15 )
 		{
-			verboselog( 1, "psx_sio_r %d status %04x\n", n_port, data & 0xffff );
+			verboselog( machine, 1, "psx_sio_r %d status %04x\n", n_port, data & 0xffff );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			verboselog( 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+			verboselog( machine, 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 		}
 		break;
 	case 2:
 		data = ( m_p_n_sio_control[ n_port ] << 16 ) | m_p_n_sio_mode[ n_port ];
 		if( ACCESSING_BITS_0_15 )
 		{
-			verboselog( 1, "psx_sio_r %d mode %04x\n", n_port, data & 0xffff );
+			verboselog( machine, 1, "psx_sio_r %d mode %04x\n", n_port, data & 0xffff );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			verboselog( 1, "psx_sio_r %d control %04x\n", n_port, data >> 16 );
+			verboselog( machine, 1, "psx_sio_r %d control %04x\n", n_port, data >> 16 );
 		}
 		break;
 	case 3:
 		data = m_p_n_sio_baud[ n_port ] << 16;
 		if( ACCESSING_BITS_0_15 )
 		{
-			verboselog( 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+			verboselog( machine, 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			verboselog( 1, "psx_sio_r %d baud %04x\n", n_port, data >> 16 );
+			verboselog( machine, 1, "psx_sio_r %d baud %04x\n", n_port, data >> 16 );
 		}
 		break;
 	default:
 		data = 0;
-		verboselog( 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+		verboselog( machine, 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 		break;
 	}
 	return data;
@@ -1332,19 +1341,20 @@ static void mdec_yuv2_to_rgb24( void )
 
 static void mdec0_write( UINT32 n_address, INT32 n_size )
 {
+	running_machine *machine = Machine;
 	int n_index;
 
-	verboselog( 2, "mdec0_write( %08x, %08x )\n", n_address, n_size );
+	verboselog( machine, 2, "mdec0_write( %08x, %08x )\n", n_address, n_size );
 	switch( m_n_mdec0_command >> 28 )
 	{
 	case 0x3:
-		verboselog( 1, "mdec decode %08x %08x %08x\n", m_n_mdec0_command, n_address, n_size );
+		verboselog( machine, 1, "mdec decode %08x %08x %08x\n", m_n_mdec0_command, n_address, n_size );
 		m_n_mdec0_address = n_address;
 		m_n_mdec0_size = n_size * 4;
 		m_n_mdec1_status |= ( 1L << 29 );
 		break;
 	case 0x4:
-		verboselog( 1, "mdec quantize table %08x %08x %08x\n", m_n_mdec0_command, n_address, n_size );
+		verboselog( machine, 1, "mdec quantize table %08x %08x %08x\n", m_n_mdec0_command, n_address, n_size );
 		n_index = 0;
 		while( n_size > 0 )
 		{
@@ -1368,7 +1378,7 @@ static void mdec0_write( UINT32 n_address, INT32 n_size )
 		}
 		break;
 	case 0x6:
-		verboselog( 1, "mdec cosine table %08x %08x %08x\n", m_n_mdec0_command, n_address, n_size );
+		verboselog( machine, 1, "mdec cosine table %08x %08x %08x\n", m_n_mdec0_command, n_address, n_size );
 		n_index = 0;
 		while( n_size > 0 )
 		{
@@ -1381,7 +1391,7 @@ static void mdec0_write( UINT32 n_address, INT32 n_size )
 		mdec_cos_precalc();
 		break;
 	default:
-		verboselog( 0, "mdec unknown command %08x %08x %08x\n", m_n_mdec0_command, n_address, n_size );
+		verboselog( machine, 0, "mdec unknown command %08x %08x %08x\n", m_n_mdec0_command, n_address, n_size );
 		break;
 	}
 }
@@ -1391,7 +1401,7 @@ static void mdec1_read( UINT32 n_address, INT32 n_size )
 	UINT32 n_this;
 	UINT32 n_nextaddress;
 
-	verboselog( 2, "mdec1_read( %08x, %08x )\n", n_address, n_size );
+	verboselog( Machine, 2, "mdec1_read( %08x, %08x )\n", n_address, n_size );
 	if( ( m_n_mdec0_command & ( 1L << 29 ) ) != 0 && m_n_mdec0_size != 0 )
 	{
 		while( n_size > 0 )
@@ -1450,11 +1460,11 @@ WRITE32_HANDLER( psx_mdec_w )
 	switch( offset )
 	{
 	case 0:
-		verboselog( 2, "mdec 0 command %08x\n", data );
+		verboselog( space->machine, 2, "mdec 0 command %08x\n", data );
 		m_n_mdec0_command = data;
 		break;
 	case 1:
-		verboselog( 2, "mdec 1 command %08x\n", data );
+		verboselog( space->machine, 2, "mdec 1 command %08x\n", data );
 		m_n_mdec1_command = data;
 		break;
 	}
@@ -1465,10 +1475,10 @@ READ32_HANDLER( psx_mdec_r )
 	switch( offset )
 	{
 	case 0:
-		verboselog( 2, "mdec 0 status %08x\n", 0 );
+		verboselog( space->machine, 2, "mdec 0 status %08x\n", 0 );
 		return 0;
 	case 1:
-		verboselog( 2, "mdec 1 status %08x\n", m_n_mdec1_status );
+		verboselog( space->machine, 2, "mdec 1 status %08x\n", m_n_mdec1_status );
 		return m_n_mdec1_status;
 	}
 	return 0;
