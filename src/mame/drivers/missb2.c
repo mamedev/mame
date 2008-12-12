@@ -431,6 +431,17 @@ ROM_START( missb2 )
 	ROM_LOAD( "a71-25.bin",  0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing - taken from bublbobl */
 ROM_END
 
+static void configure_banks(running_machine* machine)
+{
+	UINT8 *ROM = memory_region(machine, "main");
+	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
+}
+
+static DRIVER_INIT( missb2 )
+{
+	configure_banks(machine);
+}
+
 /* Game Drivers */
 
-GAME( 1996, missb2, 0, missb2, missb2, 0, ROT0,  "Alpha Co", "Miss Bubble 2", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, missb2, 0, missb2, missb2, missb2, ROT0,  "Alpha Co", "Miss Bubble 2", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
