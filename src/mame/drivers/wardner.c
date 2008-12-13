@@ -137,13 +137,15 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 	if (wardner_membank != data) {
 		int bankaddress = 0;
 
+		const address_space *mainspace;
 		UINT8 *RAM = memory_region(space->machine, "main");
 
+		mainspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 		wardner_membank = data;
 
 		if (data)
 		{
-			memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(mainspace, 0x8000, 0xffff, 0, 0, SMH_BANK1);
 			switch (data)
 			{
 				case 2:  bankaddress = 0x10000; break;
@@ -159,10 +161,10 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		}
 		else
 		{
-			memory_install_read8_handler(space, 0x8000, 0x8fff, 0, 0, wardner_sprite_r);
-			memory_install_read8_handler(space, 0xa000, 0xadff, 0, 0, SMH_BANK4);
-			memory_install_read8_handler(space, 0xae00, 0xafff, 0, 0, SMH_BANK2);
-			memory_install_read8_handler(space, 0xc000, 0xc7ff, 0, 0, SMH_BANK3);
+			memory_install_read8_handler(mainspace, 0x8000, 0x8fff, 0, 0, wardner_sprite_r);
+			memory_install_read8_handler(mainspace, 0xa000, 0xadff, 0, 0, SMH_BANK4);
+			memory_install_read8_handler(mainspace, 0xae00, 0xafff, 0, 0, SMH_BANK2);
+			memory_install_read8_handler(mainspace, 0xc000, 0xc7ff, 0, 0, SMH_BANK3);
 			memory_set_bankptr(space->machine, 1, &RAM[0x0000]);
 			memory_set_bankptr(space->machine, 2, rambase_ae00);
 			memory_set_bankptr(space->machine, 3, rambase_c000);
@@ -649,6 +651,6 @@ static DRIVER_INIT( wardner )
 
 
 
-GAME( 1987, wardner,  0,       wardner, wardner,  wardner, ROT0, "[Toaplan] Taito Corporation Japan", "Wardner (World)", 0 )
-GAME( 1987, pyros,    wardner, wardner, pyros,    wardner, ROT0, "[Toaplan] Taito America Corporation", "Pyros (US)", 0 )
-GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner, ROT0, "[Toaplan] Taito Corporation", "Wardner no Mori (Japan)", 0 )
+GAME( 1987, wardner,  0,       wardner, wardner,  wardner, ROT0, "[Toaplan] Taito Corporation Japan", "Wardner (World)", GAME_SUPPORTS_SAVE )
+GAME( 1987, pyros,    wardner, wardner, pyros,    wardner, ROT0, "[Toaplan] Taito America Corporation", "Pyros (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wardnerj, wardner, wardner, wardnerj, wardner, ROT0, "[Toaplan] Taito Corporation", "Wardner no Mori (Japan)", GAME_SUPPORTS_SAVE )
