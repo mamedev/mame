@@ -666,7 +666,7 @@ void toxboy_handle_04_subcommand(running_machine* machine,UINT8 mcu_subcmd, UINT
 
 	for (x=0;x<romlength;x++)
 	{
-		dst[(ramdest+x)] = src[(romstart+x)];
+		dst[BYTE_XOR_LE(ramdest+x)] = src[(romstart+x)];
 	}
 }
 
