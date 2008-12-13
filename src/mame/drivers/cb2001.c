@@ -49,13 +49,13 @@ const UINT8 cb2001_decryption_table[256] = {
 //	pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0x3a,xxxx,xxxx,xxxx, /* 10 */
 //	                                                             ????
-	xxxx,0x8e,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
-//	     !!!!                                               ????
+	xxxx,0x8e,xxxx,xxxx,xxxx,0x49,xxxx,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
+//	     !!!!                ????                           pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 30 */
-//	                              ????
+//	                              pppp
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
 //	     !!!!                gggg
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x49,xxxx, xxxx,xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx, /* 50 */
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx, /* 50 */
 //	                              ????                           ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
 //	                                                                       gggg
@@ -64,15 +64,15 @@ const UINT8 cb2001_decryption_table[256] = {
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 80 */
 //	
 	xxxx,xxxx,0xe9,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
-//	          ????                                               ????
+//	          ????                                               pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xb8, xxxx,xxxx,0xfa,xxxx,xxxx,xxxx,xxxx,xxxx, /* A0 */
 //	                                   !!!!            ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* B0 */
 //	
-	xxxx,xxxx,0xee,xxxx,xxxx,0x75,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* C0 */
+	xxxx,xxxx,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* C0 */
 //	          ????           pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,xxxx, /* D0 */
-//                                             ????                     ???? !!!!
+	xxxx,xxxx,0x46,xxxx,xxxx,xxxx,xxxx,xxxx, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,xxxx, /* D0 */
+//              ????                           ????                     ???? !!!!
 	xxxx,xxxx,xxxx,0xc6,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 //	               !!!!
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
@@ -80,17 +80,19 @@ const UINT8 cb2001_decryption_table[256] = {
 };
 
 /* robiza notes:
-9c -> it's a counter (like mov cw,#value) -> not sure the register (cw,bw,....)
-56 -> decrement the counter (like dec cw) -> not sure the register (cw,bw,....)
 
-2b -> conditional jmp for sure
+
+56 -> ????
+
+
 5c -> conditional jmp for sure
-36 -> be ????
+
 aa -> ????
 92 -> e9 (probably)
 1c ????
 d8 ????
 dd -> fa (di)
+
 
 guessed:
 45 -> b0 (mov al,#value)
@@ -98,11 +100,15 @@ guessed:
 c2 -> ee (out dw,al)
 
 
+
 probably:
 00 -> e8 (call)
+2b -> conditional jmp for sure (75)
+36 -> be 
 41 -> ea (jmp_far)
 70 -> c3 (ret)
-c5 -> 75 (jne)
+9c -> it's a counter (like mov cw,#value) -> not sure the register (cw,bw,....) -> b9 (cw)
+c5 -> 75 (loop?)
 
 checked against gussun and quizf1 (start up code):
 21 -> 8e
