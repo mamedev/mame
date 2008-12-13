@@ -189,6 +189,7 @@ MACHINE_RESET( balsente )
 	memory_configure_bank(machine, 2, 0, numbanks, &memory_region(machine, "main")[0x12000], 0x6000);
 	memory_set_bank(space->machine, 1, 0);
 	memory_set_bank(space->machine, 2, 0);
+	cpu_reset(machine->cpu[0]);
 
 	/* start a timer to generate interrupts */
 	scanline_timer = timer_alloc(machine, interrupt_timer, NULL);
