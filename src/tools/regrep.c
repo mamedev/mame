@@ -1020,7 +1020,7 @@ static void create_linked_file(const astring *dirname, const summary_file *curfi
 	astring_printf(filename, "%s.html", curfile->name);
 
 	/* output header */
-	astring_printf(title, "%s Regressions", curfile->name);
+	astring_printf(title, "%s Regressions (%s)", curfile->name, curfile->source);
 	astring_printf(linkname, "%s" PATH_SEPARATOR "%s", astring_c(dirname), astring_c(filename));
 	linkfile = create_file_and_output_header(linkname, tempheader, title);
 	if (linkfile == NULL)
