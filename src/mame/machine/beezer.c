@@ -18,7 +18,7 @@ static WRITE8_HANDLER( b_via_1_pa_w );
 static WRITE8_HANDLER( b_via_1_pb_w );
 static void b_via_1_irq (running_machine *machine, int level);
 
-static const struct via6522_interface b_via_0_interface =
+static const via6522_interface b_via_0_interface =
 {
 	/*inputs : A/B         */ 0, b_via_0_pb_r,
 	/*inputs : CA/B1,CA/B2 */ 0, via_1_ca2_r, b_via_0_ca2_r, via_1_ca1_r,
@@ -27,7 +27,7 @@ static const struct via6522_interface b_via_0_interface =
 	/*irq                  */ b_via_0_irq
 };
 
-static const struct via6522_interface b_via_1_interface =
+static const via6522_interface b_via_1_interface =
 {
 	/*inputs : A/B         */ b_via_1_pa_r, b_via_1_pb_r,
 	/*inputs : CA/B1,CA/B2 */ via_0_cb2_r, 0, via_0_cb1_r, 0,

@@ -26,13 +26,24 @@
 #include "deprecat.h"
 #include "6522via.h"
 
-//#define TRACE_VIA
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+#define TRACE_VIA		0
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 /******************* internal VIA data structure *******************/
 
-struct via6522
+typedef struct _via6522_t via6522_t;
+struct _via6522_t
 {
-	const struct via6522_interface *intf;
+	const via6522_interface *intf;
 
 	UINT8 in_a;
 	UINT8 in_ca1;
@@ -75,7 +86,9 @@ struct via6522
 };
 
 
-/******************* convenince macros and defines *******************/
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
 /* Macros for PCR */
 #define CA1_LOW_TO_HIGH(c)		(c & 0x01)
@@ -145,16 +158,64 @@ struct via6522
 
 /******************* static variables *******************/
 
-static struct via6522 via[MAX_VIA];
+static via6522_t via[MAX_VIA];
 
-/******************* configuration *******************/
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static TIMER_CALLBACK( via_shift_callback );
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE attotime v_cycles_to_time(via6522_t *v, int c)
+{
+	return attotime_mul(ATTOTIME_IN_HZ(v->clock), c);
+}
+
+
+INLINE UINT32 v_time_to_cycles(via6522_t *v, attotime t)
+{
+	return attotime_to_double(attotime_mul(t, v->clock));
+}
+
+
+INLINE UINT16 v_get_counter1_value(via6522_t *v)
+{
+	UINT16 val;
+
+	if (v->t1_active) {
+		val = v_time_to_cycles(v, timer_timeleft(v->t1)) - IFR_DELAY;
+	} else {
+		val = 0xFFFF - v_time_to_cycles(v, attotime_sub(timer_get_time(Machine), v->time1));
+	}
+	return val;
+}
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    via_set_clock
+-------------------------------------------------*/
 
 void via_set_clock(int which,int clock)
 {
 	via[which].clock = clock;
 }
 
-void via_config(int which, const struct via6522_interface *intf)
+
+/*-------------------------------------------------
+    via_config
+-------------------------------------------------*/
+
+void via_config(int which, const via6522_interface *intf)
 {
 	assert(which < MAX_VIA);
 
@@ -169,17 +230,19 @@ void via_config(int which, const struct via6522_interface *intf)
 	via_set_clock (which, cpu_get_clock(Machine->cpu[0]));
 }
 
-/******************* external interrupt check *******************/
+
+/*-------------------------------------------------
+    via_set_int - external interrupt check
+-------------------------------------------------*/
 
 static void via_set_int (running_machine *machine, int which, int data)
 {
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 
 	v->ifr |= data;
-#ifdef TRACE_VIA
-logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), which, v->ifr);
-#endif
+	if (TRACE_VIA)
+		logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), which, v->ifr);
 
 	if (v->ier & v->ifr)
     {
@@ -191,15 +254,20 @@ logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), 
     }
 }
 
+
+/*-------------------------------------------------
+    via_clear_int - external interrupt check
+-------------------------------------------------*/
+
 static void via_clear_int (running_machine *machine, int which, int data)
 {
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 
 	v->ifr = (v->ifr & ~data) & 0x7f;
-#ifdef TRACE_VIA
-logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), which, v->ifr);
-#endif
+
+	if (TRACE_VIA)
+		logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), which, v->ifr);
 
 	if (v->ifr & v->ier)
 		v->ifr |= INT_ANY;
@@ -213,39 +281,15 @@ logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), 
 }
 
 
-INLINE attotime v_cycles_to_time(struct via6522 *v, int c)
-{
-	return attotime_mul(ATTOTIME_IN_HZ(v->clock), c);
-}
-
-
-INLINE UINT32 v_time_to_cycles(struct via6522 *v, attotime t)
-{
-	return attotime_to_double(attotime_mul(t, v->clock));
-}
-
-
-INLINE UINT16 v_get_counter1_value(struct via6522 *v) {
-	UINT16 val;
-
-	if (v->t1_active) {
-		val = v_time_to_cycles(v, timer_timeleft(v->t1)) - IFR_DELAY;
-	} else {
-		val = 0xFFFF - v_time_to_cycles(v, attotime_sub(timer_get_time(Machine), v->time1));
-	}
-	return val;
-}
-
-
-/************************ shift register ************************/
-
-static TIMER_CALLBACK( via_shift_callback );
+/*-------------------------------------------------
+    via_shift
+-------------------------------------------------*/
 
 static void via_shift(running_machine *machine, int which)
 {
 	/* temporary hack until this is converted to a device */
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 	if (SO_O2_CONTROL(v->acr))
 	{
@@ -308,19 +352,27 @@ static void via_shift(running_machine *machine, int which)
 	}
 }
 
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( via_shift_callback )
+-------------------------------------------------*/
+
 static TIMER_CALLBACK( via_shift_callback )
 {
 	via_shift(machine, param);
 }
 
-/******************* Timer timeouts *************************/
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( via_t1_timeout )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( via_t1_timeout )
 {
 	/* temporary hack until this is converted to a device */
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int which = param;
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 
 	if (T1_CONTINUOUS (v->acr))
@@ -350,10 +402,15 @@ static TIMER_CALLBACK( via_t1_timeout )
 		via_set_int (machine, which, INT_T1);
 }
 
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( via_t2_timeout )
+-------------------------------------------------*/
+
 static TIMER_CALLBACK( via_t2_timeout )
 {
 	int which = param;
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 	v->t2_active = 0;
 	v->time2 = timer_get_time(machine);
@@ -362,12 +419,15 @@ static TIMER_CALLBACK( via_t2_timeout )
 		via_set_int (machine, which, INT_T2);
 }
 
-/******************* reset *******************/
+
+/*-------------------------------------------------
+    via_reset
+-------------------------------------------------*/
 
 void via_reset(void)
 {
 	int i;
-	struct via6522 v;
+	via6522_t v;
 
 	memset(&v, 0, sizeof(v));
 
@@ -391,13 +451,16 @@ void via_reset(void)
     }
 }
 
-/******************* CPU interface for VIA read *******************/
+
+/*-------------------------------------------------
+    via_read - CPU interface for VIA read
+-------------------------------------------------*/
 
 int via_read(running_machine *machine, int which, int offset)
 {
 	/* temporary hack until this is converted to a device */
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 	int val = 0;
 
 	offset &= 0xf;
@@ -551,13 +614,15 @@ int via_read(running_machine *machine, int which, int offset)
 }
 
 
-/******************* CPU interface for VIA write *******************/
+/*-------------------------------------------------
+    via_write - CPU interface for VIA write
+-------------------------------------------------*/
 
 void via_write(running_machine *machine, int which, int offset, int data)
 {
 	/* temporary hack until this is converted to a device */
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 	offset &=0x0f;
 
@@ -765,9 +830,9 @@ void via_write(running_machine *machine, int which, int offset, int data)
 
     case VIA_PCR:
 		v->pcr = data;
-#ifdef TRACE_VIA
-logerror("%s:6522VIA chip %d: PCR = %02X\n", cpuexec_describe_context(machine), which, data);
-#endif
+
+		if (TRACE_VIA)
+			logerror("%s:6522VIA chip %d: PCR = %02X\n", cpuexec_describe_context(machine), which, data);
 
 		if (CA2_FIX_OUTPUT(data) && CA2_OUTPUT_LEVEL(data) ^ v->out_ca2)
 		{
@@ -855,23 +920,31 @@ logerror("%s:6522VIA chip %d: PCR = %02X\n", cpuexec_describe_context(machine), 
     }
 }
 
-/******************* interface setting VIA port A input *******************/
+
+/*-------------------------------------------------
+    via_set_input_a - interface setting VIA port
+	A input
+-------------------------------------------------*/
 
 void via_set_input_a(int which, int data)
 {
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 	/* set the input, what could be easier? */
 	v->in_a = data;
 }
 
-/******************* interface setting VIA port CA1 input *******************/
+
+/*-------------------------------------------------
+    via_set_input_ca1 - interface setting VIA port
+	CA1 input
+-------------------------------------------------*/
 
 void via_set_input_ca1(running_machine *machine, int which, int data)
 {
 	/* temporary hack until this is converted to a device */
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
@@ -879,9 +952,9 @@ void via_set_input_ca1(running_machine *machine, int which, int data)
 	/* handle the active transition */
 	if (data != v->in_ca1)
     {
-#ifdef TRACE_VIA
-logerror("%s:6522VIA chip %d: CA1 = %02X\n", cpuexec_describe_context(machine), which, data);
-#endif
+		if (TRACE_VIA)
+			logerror("%s:6522VIA chip %d: CA1 = %02X\n", cpuexec_describe_context(machine), which, data);
+
 		if ((CA1_LOW_TO_HIGH(v->pcr) && data) || (CA1_HIGH_TO_LOW(v->pcr) && !data))
 		{
 			if (PA_LATCH_ENABLE(v->acr))
@@ -916,11 +989,15 @@ logerror("%s:6522VIA chip %d: CA1 = %02X\n", cpuexec_describe_context(machine), 
     }
 }
 
-/******************* interface setting VIA port CA2 input *******************/
+
+/*-------------------------------------------------
+    via_set_input_ca2 - interface setting VIA port
+	CA2 input
+-------------------------------------------------*/
 
 void via_set_input_ca2(running_machine *machine, int which, int data)
 {
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
@@ -945,25 +1022,31 @@ void via_set_input_ca2(running_machine *machine, int which, int data)
 
 }
 
-/******************* interface setting VIA port B input *******************/
+
+/*-------------------------------------------------
+    via_set_input_b - interface setting VIA port
+	B input
+-------------------------------------------------*/
 
 void via_set_input_b(int which, int data)
 {
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 	/* set the input, what could be easier? */
 	v->in_b = data;
 }
 
 
-
-/******************* interface setting VIA port CB1 input *******************/
+/*-------------------------------------------------
+    via_set_input_cb1 - interface setting VIA port
+	CB1 input
+-------------------------------------------------*/
 
 void via_set_input_cb1(running_machine *machine, int which, int data)
 {
 	/* temporary hack until this is converted to a device */
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
@@ -1006,11 +1089,15 @@ void via_set_input_cb1(running_machine *machine, int which, int data)
     }
 }
 
-/******************* interface setting VIA port CB2 input *******************/
+
+/*-------------------------------------------------
+    via_set_input_cb2 - interface setting VIA port
+	CB2 input
+-------------------------------------------------*/
 
 void via_set_input_cb2(running_machine *machine, int which, int data)
 {
-	struct via6522 *v = via + which;
+	via6522_t *v = via + which;
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
@@ -1160,6 +1247,3 @@ READ8_HANDLER( via_4_cb2_r) { return via[4].in_cb2; }
 READ8_HANDLER( via_5_cb2_r) { return via[5].in_cb2; }
 READ8_HANDLER( via_6_cb2_r) { return via[6].in_cb2; }
 READ8_HANDLER( via_7_cb2_r) { return via[7].in_cb2; }
-
-
-#undef TRACE_VIA

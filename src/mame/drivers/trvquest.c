@@ -163,7 +163,7 @@ static void via_irq(running_machine *machine, int state)
 }
 
 
-static const struct via6522_interface via_1_interface =
+static const via6522_interface via_1_interface =
 {
 	/*inputs : A/B         */ input_port_0_r, input_port_1_r,
 	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
@@ -172,7 +172,7 @@ static const struct via6522_interface via_1_interface =
 	/*irq                  */ NULL
 };
 
-static const struct via6522_interface via_2_interface =
+static const via6522_interface via_2_interface =
 {
 	/*inputs : A/B         */ input_port_2_r, input_port_3_r,
 	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,

@@ -108,7 +108,7 @@ static WRITE8_HANDLER( coin_w )
 }
 
 
-static const struct via6522_interface via_1_interface =
+static const via6522_interface via_1_interface =
 {
 	io_port_r, 0,	 /*inputs : A/B         */
 	0, 0, 0, 0,		 /*inputs : CA/B1,CA/B2 */
@@ -151,7 +151,7 @@ static WRITE8_HANDLER( audio_trigger_w )
 }
 
 
-static const struct via6522_interface via_2_interface =
+static const via6522_interface via_2_interface =
 {
 	0, soundlatch_r,					  /*inputs : A/B         */
 	0, 0, 0, 0,							  /*inputs : CA/B1,CA/B2 */

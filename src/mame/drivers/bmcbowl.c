@@ -471,7 +471,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static const struct via6522_interface via_interface =
+static const via6522_interface via_interface =
 {
 	/*inputs : A/B         */ 0, via_b_in,
 	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,

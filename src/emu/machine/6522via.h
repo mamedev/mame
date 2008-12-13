@@ -11,9 +11,13 @@
 
 **********************************************************************/
 
-#ifndef VIA_6522
-#define VIA_6522
+#ifndef __6522VIA_H__
+#define __6522VIA_H__
 
+
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
 #define MAX_VIA 8
 
@@ -34,7 +38,13 @@
 #define	VIA_IER    14
 #define	VIA_PANH   15
 
-struct via6522_interface
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _via6522_interface via6522_interface;
+struct _via6522_interface
 {
 	read8_space_func in_a_func;
 	read8_space_func in_b_func;
@@ -51,8 +61,13 @@ struct via6522_interface
 	void (*irq_func)(running_machine *machine, int state);
 };
 
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
 void via_set_clock(int which,int clck);
-void via_config(int which, const struct via6522_interface *intf);
+void via_config(int which, const via6522_interface *intf);
 void via_reset(void);
 int via_read(running_machine *machine, int which, int offset);
 void via_write(running_machine *machine, int which, int offset, int data);
@@ -191,5 +206,4 @@ READ8_HANDLER( via_5_cb2_r );
 READ8_HANDLER( via_6_cb2_r );
 READ8_HANDLER( via_7_cb2_r );
 
-#endif
-
+#endif /* __6522VIA_H__ */

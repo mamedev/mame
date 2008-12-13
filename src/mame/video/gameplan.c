@@ -231,7 +231,7 @@ static READ8_HANDLER( vblank_r )
 }
 
 
-static const struct via6522_interface gameplan_via_0_interface =
+static const via6522_interface gameplan_via_0_interface =
 {
 	0, vblank_r,							/*inputs : A/B         */
 	0, 0, 0, 0,								/*inputs : CA/B1,CA/B2 */
@@ -241,7 +241,7 @@ static const struct via6522_interface gameplan_via_0_interface =
 };
 
 
-static const struct via6522_interface leprechn_via_0_interface =
+static const via6522_interface leprechn_via_0_interface =
 {
 	0, vblank_r,							/*inputs : A/B         */
 	0, 0, 0, 0,								/*inputs : CA/B1,CA/B2 */
@@ -251,7 +251,7 @@ static const struct via6522_interface leprechn_via_0_interface =
 };
 
 
-static const struct via6522_interface trvquest_via_0_interface =
+static const via6522_interface trvquest_via_0_interface =
 {
 	0, vblank_r,							/*inputs : A/B         */
 	0, 0, 0, 0,								/*inputs : CA/B1,CA/B2 */

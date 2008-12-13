@@ -373,7 +373,7 @@ static READ8_HANDLER( via_pb_r )
 }
 
 
-static const struct via6522_interface via_interface =
+static const via6522_interface via_interface =
 {
 	/*inputs : A/B         */ via_pa_r, via_pb_r,
 	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
