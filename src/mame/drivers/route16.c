@@ -155,7 +155,7 @@ static WRITE8_HANDLER( stratvox_sn76477_w )
 
 /*************************************
  *
- *  TT Mahjong's multiplixed ports
+ *  T.T Mahjong's multiplixed ports
  *
  *************************************/
 
@@ -963,4 +963,4 @@ GAME( 1980, speakres, 0,        speakres, speakres, 0,        ROT270, "Sun Elect
 GAME( 1980, stratvox, speakres, stratvox, stratvox, 0,        ROT270, "[Sun Electronics] (Taito license)", "Stratovox", 0 )
 GAME( 1980, stratvob, speakres, stratvox, stratvox, 0,        ROT270, "bootleg", "Stratovox (bootleg)", 0 )
 GAME( 1980, spacecho, speakres, spacecho, spacecho, 0,        ROT270, "bootleg", "Space Echo", 0 )
-GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, 0,        ROT0,   "Taito", "Mahjong", 0 )
+GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, 0,        ROT0,   "Taito", "T.T Mahjong", 0 )
