@@ -1536,6 +1536,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/1945kiii.o \
 	$(DRIVERS)/2mindril.o \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
+	$(DRIVERS)/4roses.o \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/adp.o \
 	$(DRIVERS)/ambush.o $(VIDEO)/ambush.o \
