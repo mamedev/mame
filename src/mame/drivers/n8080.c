@@ -11,7 +11,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 #include "includes/n8080.h"
 
