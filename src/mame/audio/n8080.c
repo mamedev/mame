@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/sn76477.h"
 #include "sound/dac.h"
@@ -86,7 +85,7 @@ static const sn76477_interface spacefev_sn76477_interface =
 };
 
 
-static void spacefev_update_SN76477_status(void)
+static void spacefev_update_SN76477_status(running_machine *machine)
 {
 	double dblR0 = RES_M(1.0);
 	double dblR1 = RES_M(1.5);
@@ -115,7 +114,7 @@ static void spacefev_update_SN76477_status(void)
 }
 
 
-static void sheriff_update_SN76477_status(void)
+static void sheriff_update_SN76477_status(running_machine *machine)
 {
 	if (mono_flop[1])
 	{
@@ -136,34 +135,34 @@ static void sheriff_update_SN76477_status(void)
 }
 
 
-static void update_SN76477_status(void)
+static void update_SN76477_status(running_machine *machine)
 {
 	if (n8080_hardware == 1)
 	{
-		spacefev_update_SN76477_status();
+		spacefev_update_SN76477_status(machine);
 	}
 	if (n8080_hardware == 2)
 	{
-		sheriff_update_SN76477_status();
+		sheriff_update_SN76477_status(machine);
 	}
 }
 
 
-static void start_mono_flop(int n, attotime expire)
+static void start_mono_flop(running_machine *machine, int n, attotime expire)
 {
 	mono_flop[n] = 1;
 
-	update_SN76477_status();
+	update_SN76477_status(machine);
 
 	timer_adjust_oneshot(sound_timer[n], expire, n);
 }
 
 
-static void stop_mono_flop(int n)
+static void stop_mono_flop(running_machine *machine, int n)
 {
 	mono_flop[n] = 0;
 
-	update_SN76477_status();
+	update_SN76477_status(machine);
 
 	timer_adjust_oneshot(sound_timer[n], attotime_never, n);
 }
@@ -171,65 +170,65 @@ static void stop_mono_flop(int n)
 
 static TIMER_CALLBACK( stop_mono_flop_callback )
 {
-	stop_mono_flop(param);
+	stop_mono_flop(machine, param);
 }
 
 
-static void spacefev_sound_pins_changed(void)
+static void spacefev_sound_pins_changed(running_machine *machine)
 {
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
 
 	if (changes & (1 << 0x3))
 	{
-		stop_mono_flop(1);
+		stop_mono_flop(machine, 1);
 	}
 	if (changes & ((1 << 0x3) | (1 << 0x6)))
 	{
-		stop_mono_flop(2);
+		stop_mono_flop(machine, 2);
 	}
 	if (changes & (1 << 0x3))
 	{
-		start_mono_flop(0, ATTOTIME_IN_USEC(550 * 36 * 100));
+		start_mono_flop(machine, 0, ATTOTIME_IN_USEC(550 * 36 * 100));
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(1, ATTOTIME_IN_USEC(550 * 22 * 33));
+		start_mono_flop(machine, 1, ATTOTIME_IN_USEC(550 * 22 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(2, ATTOTIME_IN_USEC(550 * 22 * 33));
+		start_mono_flop(machine, 2, ATTOTIME_IN_USEC(550 * 22 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(Machine->cpu[1], 0);
+		generic_pulse_irq_line(machine->cpu[1], 0);
 	}
 }
 
 
-static void sheriff_sound_pins_changed(void)
+static void sheriff_sound_pins_changed(running_machine *machine)
 {
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
 
 	if (changes & (1 << 0x6))
 	{
-		stop_mono_flop(1);
+		stop_mono_flop(machine, 1);
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(0, ATTOTIME_IN_USEC(550 * 33 * 33));
+		start_mono_flop(machine, 0, ATTOTIME_IN_USEC(550 * 33 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(1, ATTOTIME_IN_USEC(550 * 33 * 33));
+		start_mono_flop(machine, 1, ATTOTIME_IN_USEC(550 * 33 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
-		generic_pulse_irq_line(Machine->cpu[1], 0);
+		generic_pulse_irq_line(machine->cpu[1], 0);
 	}
 }
 
 
-static void helifire_sound_pins_changed(void)
+static void helifire_sound_pins_changed(running_machine *machine)
 {
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
 
@@ -239,31 +238,31 @@ static void helifire_sound_pins_changed(void)
 
 	if (changes & (1 << 6))
 	{
-		generic_pulse_irq_line(Machine->cpu[1], 0);
+		generic_pulse_irq_line(machine->cpu[1], 0);
 	}
 }
 
 
-static void sound_pins_changed(void)
+static void sound_pins_changed(running_machine *machine)
 {
 	if (n8080_hardware == 1)
 	{
-		spacefev_sound_pins_changed();
+		spacefev_sound_pins_changed(machine);
 	}
 	if (n8080_hardware == 2)
 	{
-		sheriff_sound_pins_changed();
+		sheriff_sound_pins_changed(machine);
 	}
 	if (n8080_hardware == 3)
 	{
-		helifire_sound_pins_changed();
+		helifire_sound_pins_changed(machine);
 	}
 
 	prev_sound_pins = curr_sound_pins;
 }
 
 
-static void delayed_sound_1(int data)
+static void delayed_sound_1(running_machine *machine, int data)
 {
 	static UINT8 prev_data = 0;
 
@@ -286,13 +285,13 @@ static void delayed_sound_1(int data)
 	{
 		if (data & ~prev_data & 0x10)
 		{
-			spacefev_start_red_cannon();
+			spacefev_start_red_cannon(machine);
 		}
 
 		spacefev_red_screen = data & 0x08;
 	}
 
-	sound_pins_changed();
+	sound_pins_changed(machine);
 
 	prev_data = data;
 }
@@ -300,11 +299,11 @@ static void delayed_sound_1(int data)
 
 static TIMER_CALLBACK( delayed_sound_1_callback )
 {
-	delayed_sound_1(param);
+	delayed_sound_1(machine, param);
 }
 
 
-static void delayed_sound_2(int data)
+static void delayed_sound_2(running_machine *machine, int data)
 {
 	curr_sound_pins &= ~(
 		(1 << 0x8) |
@@ -330,13 +329,13 @@ static void delayed_sound_2(int data)
 		helifire_flash = data & 0x20;
 	}
 
-	sound_pins_changed();
+	sound_pins_changed(machine);
 }
 
 
 static TIMER_CALLBACK( delayed_sound_2_callback )
 {
-	delayed_sound_2(param);
+	delayed_sound_2(machine, param);
 }
 
 
@@ -344,6 +343,7 @@ WRITE8_HANDLER( n8080_sound_1_w )
 {
 	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_1_callback); /* force CPUs to sync */
 }
+
 WRITE8_HANDLER( n8080_sound_2_w )
 {
 	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_2_callback); /* force CPUs to sync */
@@ -480,8 +480,8 @@ static MACHINE_RESET( spacefev_sound )
 	mono_flop[1] = 0;
 	mono_flop[2] = 0;
 
-	delayed_sound_1(0);
-	delayed_sound_2(0);
+	delayed_sound_1(machine, 0);
+	delayed_sound_2(machine, 0);
 }
 
 
@@ -495,8 +495,8 @@ static MACHINE_RESET( sheriff_sound )
 	mono_flop[0] = 0;
 	mono_flop[1] = 0;
 
-	delayed_sound_1(0);
-	delayed_sound_2(0);
+	delayed_sound_1(machine, 0);
+	delayed_sound_2(machine, 0);
 }
 
 
@@ -509,8 +509,8 @@ static MACHINE_RESET( helifire_sound )
 	helifire_dac_volume = 1;
 	helifire_dac_timing = 0;
 
-	delayed_sound_1(0);
-	delayed_sound_2(0);
+	delayed_sound_1(machine, 0);
+	delayed_sound_2(machine, 0);
 
 	helifire_dac_phase = 0;
 }

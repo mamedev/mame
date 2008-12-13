@@ -60,7 +60,7 @@ PALETTE_INIT( helifire )
 }
 
 
-void spacefev_start_red_cannon(void)
+void spacefev_start_red_cannon(running_machine *machine)
 {
 	spacefev_red_cannon = 1;
 

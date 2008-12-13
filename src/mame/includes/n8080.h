@@ -18,8 +18,7 @@ VIDEO_UPDATE( sheriff );
 VIDEO_UPDATE( helifire );
 VIDEO_EOF( helifire );
 
-void spacefev_start_red_cannon(void);
-
+void spacefev_start_red_cannon(running_machine *machine);
 
 /*----------- defined in audio/n8080.c -----------*/
 
