@@ -650,13 +650,17 @@ void cpu_set_clockscale(const device_config *device, double clockscale)
     clock ticks to an attotime
 -------------------------------------------------*/
 
-attotime cpu_clocks_to_attotime(const device_config *device, UINT32 clocks)
+attotime cpu_clocks_to_attotime(const device_config *device, UINT64 clocks)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 	if (clocks < classdata->cycles_per_second)
 		return attotime_make(0, clocks * classdata->attoseconds_per_cycle);
 	else
-		return attotime_make(clocks / classdata->cycles_per_second, (clocks % classdata->cycles_per_second) * classdata->attoseconds_per_cycle);
+	{
+		UINT32 remainder;
+		UINT32 quotient = divu_64x32_rem(clocks, classdata->cycles_per_second, &remainder);
+		return attotime_make(quotient, (UINT64)remainder * (UINT64)classdata->attoseconds_per_cycle);
+	}
 }
 
 
@@ -665,10 +669,10 @@ attotime cpu_clocks_to_attotime(const device_config *device, UINT32 clocks)
     as attotime to CPU clock ticks
 -------------------------------------------------*/
 
-UINT32 cpu_attotime_to_clocks(const device_config *device, attotime duration)
+UINT64 cpu_attotime_to_clocks(const device_config *device, attotime duration)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
-	return duration.seconds * classdata->cycles_per_second + duration.attoseconds / classdata->attoseconds_per_cycle;
+	return mulu_32x32(duration.seconds, classdata->cycles_per_second) + (UINT64)duration.attoseconds * (UINT64)classdata->attoseconds_per_cycle;
 }
 
 
