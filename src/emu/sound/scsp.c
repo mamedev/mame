@@ -513,32 +513,30 @@ static void SCSP_Init(const device_config *device, struct _SCSP *SCSP, const scs
 {
 	int i;
 
+	memset(SCSP,0,sizeof(*SCSP));
+
 	SCSP->device = device;
 	SCSP->IrqTimA = SCSP->IrqTimBC = SCSP->IrqMidi = 0;
 	SCSP->MidiR=SCSP->MidiW=0;
 	SCSP->MidiOutR=SCSP->MidiOutW=0;
 
 	// get SCSP RAM
+	if (sndindex == 0)
 	{
-		memset(SCSP,0,sizeof(*SCSP));
+		SCSP->Master=1;
+	}
+	else
+	{
+		SCSP->Master=0;
+	}
 
-		if (sndindex == 0)
-		{
-			SCSP->Master=1;
-		}
-		else
-		{
-			SCSP->Master=0;
-		}
-
-		SCSP->SCSPRAM = device->region;
-		if (SCSP->SCSPRAM)
-		{
-			SCSP->SCSPRAM_LENGTH = device->regionbytes;
-			SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
-			SCSP->DSP.SCSPRAM_LENGTH = SCSP->SCSPRAM_LENGTH/2;
-			SCSP->SCSPRAM += intf->roffset;
-		}
+	SCSP->SCSPRAM = device->region;
+	if (SCSP->SCSPRAM)
+	{
+		SCSP->SCSPRAM_LENGTH = device->regionbytes;
+		SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
+		SCSP->DSP.SCSPRAM_LENGTH = SCSP->SCSPRAM_LENGTH/2;
+		SCSP->SCSPRAM += intf->roffset;
 	}
 
 	SCSP->timerA = timer_alloc(device->machine, timerA_cb, SCSP);
