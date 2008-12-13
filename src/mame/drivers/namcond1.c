@@ -268,7 +268,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 {
     if( namcond1_h8_irq5_enabled )
     {
-    	cpu_set_input_line(device, H8_IRQ5, PULSE_LINE);
+    	generic_pulse_irq_line(device, H8_IRQ5);
     }
 }
 

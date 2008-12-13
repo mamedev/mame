@@ -142,6 +142,8 @@ enum
 		CPUINFO_PTR_DEBUG_INIT,								/* R/O: void (*debug_init)(const device_config *device) */
 		CPUINFO_PTR_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const game_driver *driver, const void *config) */
 
+	CPUINFO_FCT_CPU_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC,	/* R/W: CPU-specific values start here */
+
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	CPUINFO_STR_FIRST = DEVINFO_STR_FIRST,
 

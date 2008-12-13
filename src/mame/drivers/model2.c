@@ -889,7 +889,7 @@ static int snd_68k_ready_r(const address_space *space)
 
 static void snd_latch_to_68k_w(const address_space *space, int data)
 {
-	while (!snd_68k_ready_r(space))
+	if (!snd_68k_ready_r(space))
 	{
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 	}
