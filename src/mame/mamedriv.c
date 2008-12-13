@@ -411,6 +411,8 @@ const game_driver * const drivers[] =
 	DRIVER( hyhoo )		/* (c) 1987 */
 	DRIVER( hyhoo2 )	/* (c) 1987 */
 
+	DRIVER( jangou )    /* (c) 1983 */
+
 	DRIVER( pastelg )	/* (c) 1985 */
 
 	DRIVER( crystalg )	/* (c) 1986 */

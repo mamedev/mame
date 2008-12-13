@@ -1063,6 +1063,7 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/galivan.o $(VIDEO)/galivan.o \
 	$(DRIVERS)/gomoku.o $(AUDIO)/gomoku.o $(VIDEO)/gomoku.o \
 	$(DRIVERS)/hyhoo.o $(VIDEO)/hyhoo.o \
+	$(DRIVERS)/jangou.o \
 	$(DRIVERS)/magmax.o $(VIDEO)/magmax.o \
 	$(DRIVERS)/nbmj8688.o $(VIDEO)/nbmj8688.o \
 	$(DRIVERS)/nbmj8891.o $(VIDEO)/nbmj8891.o \
