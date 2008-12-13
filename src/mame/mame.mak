@@ -999,6 +999,7 @@ $(MAMEOBJ)/midway.a: \
 $(MAMEOBJ)/msx.a: \
 	$(DRIVERS)/forte2.o \
 	$(DRIVERS)/sangho.o \
+	$(DRIVERS)/sfkick.o \
 
 $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/20pacgal.o $(VIDEO)/20pacgal.o \
@@ -1650,7 +1651,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/rbmk.o \
 	$(DRIVERS)/rcorsair.o \
 	$(DRIVERS)/re900.o \
-	$(DRIVERS)/sfkick.o \
 	$(DRIVERS)/shangkid.o $(VIDEO)/shangkid.o \
 	$(DRIVERS)/skyarmy.o \
 	$(DRIVERS)/skylncr.o \
