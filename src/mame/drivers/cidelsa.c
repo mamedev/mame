@@ -282,7 +282,7 @@ static CDP1852_INTERFACE( altair_cdp1852_out1_intf )
 
 static CDP1852_INTERFACE( draco_cdp1852_out1_intf )
 {
-	ALTAIR_CHR1 / 8, // CDP1802 TPB
+	DRACO_CHR1 / 8, // CDP1802 TPB
 	CDP1852_MODE_OUTPUT,
 	NULL,
 	draco_out1_w,
