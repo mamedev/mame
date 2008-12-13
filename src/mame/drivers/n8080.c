@@ -69,7 +69,7 @@ static TIMER_DEVICE_CALLBACK( rst1_tick )
 	int state = inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
-	cpu_set_input_line_and_vector(cputag_get_cpu(timer->machine, "main"), INPUT_LINE_IRQ0, state, 0xcf);
+	cputag_set_input_line_and_vector(timer->machine, "main", INPUT_LINE_IRQ0, state, 0xcf);
 }
 
 static TIMER_DEVICE_CALLBACK( rst2_tick )
@@ -77,7 +77,7 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 	int state = inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
-	cpu_set_input_line_and_vector(cputag_get_cpu(timer->machine, "main"), INPUT_LINE_IRQ0, state, 0xd7);
+	cputag_set_input_line_and_vector(timer->machine, "main", INPUT_LINE_IRQ0, state, 0xd7);
 }
 
 static void n8080_inte_callback(const device_config *device, int state)
@@ -96,8 +96,10 @@ static void n8080_status_callback(const device_config *device, UINT8 status)
 
 static MACHINE_START( spacefev )
 {
-	i8085_set_status_callback(cputag_get_cpu(machine, "main"), n8080_status_callback);
-	i8085_set_inte_callback(cputag_get_cpu(machine, "main"), n8080_inte_callback);
+	const device_config *cpu = cputag_get_cpu(machine, "main");
+
+	i8085_set_status_callback(cpu, n8080_status_callback);
+	i8085_set_inte_callback(cpu, n8080_inte_callback);
 }
 
 static MACHINE_DRIVER_START( spacefev )
@@ -793,8 +795,8 @@ GAME( 1979, spacefev, 0,        spacefev, spacefev, 0, ROT270, "Nintendo", "Spac
 GAME( 1979, spacefva, spacefev, spacefev, spacefev, 0, ROT270, "Nintendo", "Space Fever (set 2)", 0 )
 GAME( 1979, highsplt, 0,        spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", 0 )
 GAME( 1979, highspla, highsplt, spacefev, highsplt, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", 0 )
-GAME( 1979, spacelnc, 0,        spacefev, spacelnc, 0, ROT270, "Nintendo", "Space Launcher", 0 )
+GAME( 1979, spacelnc, 0,        spacefev, spacelnc, 0, ROT270, "Nintendo", "Space Launcher", GAME_NOT_WORKING )
 GAME( 1979, sheriff,  0,        sheriff,  sheriff,  0, ROT270, "Nintendo", "Sheriff", 0 )
 GAME( 1980, bandido,  sheriff,  sheriff,  bandido,  0, ROT270, "Exidy",    "Bandido", 0 )
-GAME( 1980, helifire, 0,        helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1980, helifira, helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1980, helifire, 0,        helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 1)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAME( 1980, helifira, helifire, helifire, helifire, 0, ROT270, "Nintendo", "HeliFire (set 2)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
