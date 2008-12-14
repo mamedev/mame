@@ -1241,8 +1241,11 @@ static CPU_INIT( v33 )
 
 	nec_init(device, index, clock, irqcallback, 2);
 	nec_state->chip_type=V33;
-	nec_state->prefetch_size = 6;		/* ???? */
-	nec_state->prefetch_cycles = 2;		/* two cycles per byte / four per word */
+	nec_state->prefetch_size = 6;		
+	/* FIXME: Need information about prefetch size and cycles for V33.
+	 * complete guess below, nbbatman will not work 
+	 * properly without. */
+	nec_state->prefetch_cycles = 1;		/* two cycles per byte / four per word */
 
 	configure_memory_16bit(nec_state);
 }
