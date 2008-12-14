@@ -363,7 +363,7 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 
 			memcpy(&gl, &ppu_charlayout, sizeof(gl));
 			gl.total = total;
-			machine->gfx[intf->gfx_layout_number[i]] = allocgfx( &gl );
+			machine->gfx[intf->gfx_layout_number[i]] = allocgfx( machine, &gl );
 			decodegfx( machine->gfx[intf->gfx_layout_number[i]], src, 0, machine->gfx[intf->gfx_layout_number[i]]->total_elements );
 			machine->gfx[intf->gfx_layout_number[i]]->total_colors = 8;
 		}

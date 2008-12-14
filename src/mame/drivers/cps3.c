@@ -859,13 +859,13 @@ static VIDEO_START(cps3)
 	state_save_register_global_pointer(machine, cps3_char_ram, 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = allocgfx(&cps3_tiles8x8_layout);
+	machine->gfx[0] = allocgfx(machine, &cps3_tiles8x8_layout);
 	machine->gfx[0]->total_colors = machine->config->total_colors / 16;
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[1] = allocgfx(&cps3_tiles16x16_layout);
+	machine->gfx[1] = allocgfx(machine, &cps3_tiles16x16_layout);
 	machine->gfx[1]->total_colors = machine->config->total_colors / 64;
 	machine->gfx[1]->color_granularity=64;
 

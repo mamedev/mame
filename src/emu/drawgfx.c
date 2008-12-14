@@ -13,7 +13,6 @@
 
 #include "driver.h"
 #include "profiler.h"
-#include "deprecat.h"
 
 
 /***************************************************************************
@@ -221,7 +220,7 @@ void decodechar(gfx_element *gfx, int num, const UINT8 *src)
     based on a given layout
 -------------------------------------------------*/
 
-gfx_element *allocgfx(const gfx_layout *gl)
+gfx_element *allocgfx(running_machine *machine, const gfx_layout *gl)
 {
 	int israw = (gl->planeoffset[0] == GFX_RAW);
 	int planes = gl->planes;
@@ -233,6 +232,8 @@ gfx_element *allocgfx(const gfx_layout *gl)
 	/* allocate memory for the gfx_element structure */
 	gfx = malloc_or_die(sizeof(*gfx));
 	memset(gfx, 0, sizeof(*gfx));
+
+	gfx->machine = machine;
 
 	/* copy the layout */
 	gfx->layout = *gl;
@@ -487,6 +488,7 @@ int pdrawgfx_shadow_lowpri = 0;
 #define HMODULO 1
 #define VMODULO dstmodulo
 #define COMMON_ARGS														\
+		pen_t *palette_shadow_table,									\
 		const UINT8 *srcdata,int srcwidth,int srcheight,int srcmodulo,	\
 		int leftskip,int topskip,int flipx,int flipy,					\
 		DATA_TYPE *dstdata,int dstwidth,int dstheight,int dstmodulo
@@ -597,6 +599,7 @@ INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c)
 #define HMODULO 1
 #define VMODULO dstmodulo
 #define COMMON_ARGS														\
+		pen_t *palette_shadow_table,									\
 		const UINT8 *srcdata,int srcwidth,int srcheight,int srcmodulo,	\
 		int leftskip,int topskip,int flipx,int flipy,					\
 		DATA_TYPE *dstdata,int dstwidth,int dstheight,int dstmodulo
@@ -1183,7 +1186,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 	if (dest_bmp->bpp == 16)
 	{
 		int colorbase = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
-		const pen_t *pal = &Machine->pens[colorbase];
+		const pen_t *pal = &gfx->machine->pens[colorbase];
 		UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 		int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -1514,7 +1517,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 				/* case 3: TRANSPARENCY_PEN_TABLE */
 				if (transparency == TRANSPARENCY_PEN_TABLE)
 				{
-					pen_t *palette_shadow_table = Machine->shadow_table;
+					pen_t *palette_shadow_table = gfx->machine->shadow_table;
 					if (pri_buffer)
 					{
 						UINT8 al = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
@@ -1702,7 +1705,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 	/* 32-bit destination bitmap */
 	else
 	{
-		const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 		int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -1944,7 +1947,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 				/* case 3: TRANSPARENCY_PEN_TABLE */
 				if (transparency == TRANSPARENCY_PEN_TABLE)
 				{
-					pen_t *palette_shadow_table = Machine->shadow_table;
+					pen_t *palette_shadow_table = gfx->machine->shadow_table;
 					UINT8 *source;
 					UINT8 *pri;
 					UINT32 *dest;
@@ -2205,7 +2208,6 @@ void mdrawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 #if (RAW == 0)
 DECLARE_SWAP_RAW_PRI(blockmove_8toN_opaque,(COMMON_ARGS, COLOR_ARG),
 {
-	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
 
 	(void)palette_shadow_table;
@@ -2280,7 +2282,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_opaque,(COMMON_ARGS, COLOR_ARG),
 #if (RAW == 0)
 DECLARE_SWAP_RAW_PRI(blockmove_4toN_opaque,(COMMON_ARGS, COLOR_ARG),
 {
-	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_4
 
 	(void)palette_shadow_table;
@@ -2376,7 +2377,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_4toN_opaque,(COMMON_ARGS, COLOR_ARG),
 
 DECLARE_SWAP_RAW_PRI(blockmove_8toN_transpen,(COMMON_ARGS, COLOR_ARG, int transpen),
 {
-	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
 
 	(void)palette_shadow_table;
@@ -2487,7 +2487,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_transpen,(COMMON_ARGS, COLOR_ARG, int transp
 
 DECLARE_SWAP_RAW_PRI(blockmove_4toN_transpen,(COMMON_ARGS, COLOR_ARG, int transpen),
 {
-	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_4
 
 	(void)palette_shadow_table;
@@ -2565,7 +2564,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_4toN_transpen,(COMMON_ARGS, COLOR_ARG, int transp
 
 DECLARE_SWAP_RAW_PRI(blockmove_8toN_transmask,(COMMON_ARGS, COLOR_ARG, int transmask),
 {
-	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
 
 	(void)palette_shadow_table;
@@ -2673,7 +2671,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_transmask,(COMMON_ARGS, COLOR_ARG, int trans
 #if (DEPTH == 32)
 DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS, COLOR_ARG, int transcolor),
 {
-	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
 
 	(void)palette_shadow_table;
@@ -2750,7 +2747,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS, COLOR_ARG, int trans
 #else
 DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS, COLOR_ARG, int transcolor),
 {
-	pen_t *palette_shadow_table = Machine->shadow_table;
 	int eax = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
 
 	ADJUST_8
@@ -2832,7 +2828,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS, COLOR_ARG, int trans
 #if (RAW == 0)
 DECLARE_SWAP_RAW_PRI(blockmove_8toN_alpha,(COMMON_ARGS, COLOR_ARG, int transpen),
 {
-	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
 
 	(void)palette_shadow_table;
@@ -2944,7 +2939,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_alpha,(COMMON_ARGS, COLOR_ARG, int transpen)
 /* pjp 02/06/02 */
 DECLARE_SWAP_RAW_PRI(blockmove_8toN_alpharange,(COMMON_ARGS, COLOR_ARG, int transpen),
 {
-	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
 
 	(void)palette_shadow_table;
@@ -3084,6 +3078,7 @@ DECLARE(drawgfx_core,(
 	if (sy > ey) return;
 
 	{
+		pen_t *st = gfx->machine->shadow_table;
 		UINT8 *sd = gfx->gfxdata + code * gfx->char_modulo;		/* source data */
 		int sw = gfx->width;									/* source width */
 		int sh = gfx->height;									/* source height */
@@ -3095,7 +3090,7 @@ DECLARE(drawgfx_core,(
 		int dh = ey-sy+1;										/* dest height */
 		int dm = dest->rowpixels;								/* dest modulo */
 		int colorbase = gfx->color_base + gfx->color_granularity * color;
-		const pen_t *paldata = &Machine->pens[colorbase];
+		const pen_t *paldata = &gfx->machine->pens[colorbase];
 		UINT8 *pribuf = (pri_buffer) ? BITMAP_ADDR8(pri_buffer, sy, sx) : NULL;
 
 		switch (transparency)
@@ -3104,16 +3099,16 @@ DECLARE(drawgfx_core,(
 				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
-						BLOCKMOVEPRI(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask));
+						BLOCKMOVEPRI(4toN_opaque,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask));
 					else
-						BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata));
+						BLOCKMOVELU(4toN_opaque,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata));
 				}
 				else
 				{
 					if (pribuf)
-						BLOCKMOVEPRI(8toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask));
+						BLOCKMOVEPRI(8toN_opaque,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask));
 					else
-						BLOCKMOVELU(8toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata));
+						BLOCKMOVELU(8toN_opaque,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata));
 				}
 				break;
 
@@ -3121,16 +3116,16 @@ DECLARE(drawgfx_core,(
 				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
-						BLOCKMOVEPRI(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
+						BLOCKMOVEPRI(4toN_transpen,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 					else
-						BLOCKMOVELU(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
+						BLOCKMOVELU(4toN_transpen,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				}
 				else
 				{
 					if (pribuf)
-						BLOCKMOVEPRI(8toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
+						BLOCKMOVEPRI(8toN_transpen,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 					else
-						BLOCKMOVELU(8toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
+						BLOCKMOVELU(8toN_transpen,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				}
 				break;
 
@@ -3138,45 +3133,45 @@ DECLARE(drawgfx_core,(
 				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
-						BLOCKMOVERAWPRI(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,pribuf,pri_mask,transparent_color));
+						BLOCKMOVERAWPRI(4toN_transpen,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,pribuf,pri_mask,transparent_color));
 					else
-						BLOCKMOVERAW(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,transparent_color));
+						BLOCKMOVERAW(4toN_transpen,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,transparent_color));
 				}
 				else
 				{
 					if (pribuf)
-						BLOCKMOVERAWPRI(8toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,pribuf,pri_mask,transparent_color));
+						BLOCKMOVERAWPRI(8toN_transpen,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,pribuf,pri_mask,transparent_color));
 					else
-						BLOCKMOVERAW(8toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,transparent_color));
+						BLOCKMOVERAW(8toN_transpen,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,color,transparent_color));
 				}
 				break;
 
 			case TRANSPARENCY_PENS:
 				if (pribuf)
-					BLOCKMOVEPRI(8toN_transmask,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
+					BLOCKMOVEPRI(8toN_transmask,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 				else
-					BLOCKMOVELU(8toN_transmask,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
+					BLOCKMOVELU(8toN_transmask,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				break;
 
 			case TRANSPARENCY_PEN_TABLE:
 				if (pribuf)
-					BLOCKMOVEPRI(8toN_pen_table,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
+					BLOCKMOVEPRI(8toN_pen_table,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 				else
-					BLOCKMOVELU(8toN_pen_table,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
+					BLOCKMOVELU(8toN_pen_table,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				break;
 
 			case TRANSPARENCY_ALPHA:
 				if (pribuf)
-					BLOCKMOVEPRI(8toN_alpha,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
+					BLOCKMOVEPRI(8toN_alpha,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 				else
-					BLOCKMOVELU(8toN_alpha,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
+					BLOCKMOVELU(8toN_alpha,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				break;
 
 			case TRANSPARENCY_ALPHARANGE:
 				if (pribuf)
-					BLOCKMOVEPRI(8toN_alpharange,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
+					BLOCKMOVEPRI(8toN_alpharange,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 				else
-					BLOCKMOVELU(8toN_alpharange,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
+					BLOCKMOVELU(8toN_alpharange,(st,sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				break;
 
 			default:

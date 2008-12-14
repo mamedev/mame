@@ -583,7 +583,7 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 		glcopy.total = total;
 
 		/* allocate the graphics */
-		machine->gfx[i] = allocgfx(&glcopy);
+		machine->gfx[i] = allocgfx(machine, &glcopy);
 
 		/* if we have a remapped colortable, point our local colortable to it */
 		machine->gfx[i]->total_colors = gfxdecodeinfo[i].total_color_codes;

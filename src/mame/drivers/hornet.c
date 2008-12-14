@@ -452,7 +452,7 @@ static int K037122_vh_start(running_machine *machine, int chip)
 	memset(K037122_dirty_map[chip], 0, K037122_NUM_TILES);
 	memset(K037122_reg[chip], 0, 0x400);
 
-	machine->gfx[K037122_gfx_index[chip]] = allocgfx(&K037122_char_layout);
+	machine->gfx[K037122_gfx_index[chip]] = allocgfx(machine, &K037122_char_layout);
 	decodegfx(machine->gfx[K037122_gfx_index[chip]], (UINT8*)K037122_char_ram[chip], 0, machine->gfx[K037122_gfx_index[chip]]->total_elements);
 
 	machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;

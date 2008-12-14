@@ -463,7 +463,7 @@ VIDEO_START( st0016 )
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[gfx_index] = allocgfx(&charlayout);
+	machine->gfx[gfx_index] = allocgfx(machine, &charlayout);
 	chardirty = auto_malloc(ST0016_MAX_CHAR_BANK);
 	memset(chardirty, 1, ST0016_MAX_CHAR_BANK);
 

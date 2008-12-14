@@ -1618,7 +1618,7 @@ namco_road_init(running_machine *machine, int gfxbank )
 		mbRoadSomethingIsDirty = 0;
 		mpRoadRAM = auto_malloc(0x20000);
 		{
-			gfx_element *pGfx = allocgfx( &RoadTileLayout );
+			gfx_element *pGfx = allocgfx( machine, &RoadTileLayout );
 				decodegfx(pGfx, 0x10000+(UINT8 *)mpRoadRAM, 0, pGfx->total_elements);
 				pGfx->color_base = 0xf00;
 				pGfx->total_colors = 0x3f;

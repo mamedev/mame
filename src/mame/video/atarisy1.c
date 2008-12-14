@@ -671,15 +671,15 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 	switch (bpp)
 	{
 	case 4:
-		machine->gfx[gfx_index] = allocgfx(&objlayout_4bpp);
+		machine->gfx[gfx_index] = allocgfx(machine, &objlayout_4bpp);
 		break;
 
 	case 5:
-		machine->gfx[gfx_index] = allocgfx(&objlayout_5bpp);
+		machine->gfx[gfx_index] = allocgfx(machine, &objlayout_5bpp);
 		break;
 
 	case 6:
-		machine->gfx[gfx_index] = allocgfx(&objlayout_6bpp);
+		machine->gfx[gfx_index] = allocgfx(machine, &objlayout_6bpp);
 		break;
 
 	default:

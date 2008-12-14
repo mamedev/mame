@@ -127,7 +127,7 @@ static void update_palette(running_machine *machine)
 static VIDEO_START(srmp6)
 {
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = allocgfx(&tiles8x8_layout);
+	machine->gfx[0] = allocgfx(machine, &tiles8x8_layout);
 	machine->gfx[0]->total_colors = machine->config->total_colors / 256;
 	machine->gfx[0]->color_granularity=256;
 

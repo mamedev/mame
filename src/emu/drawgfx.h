@@ -137,6 +137,7 @@ struct _gfx_element
 	UINT8 *			gfxdata;			/* pixel data, 8bpp or 4bpp (if GFX_ELEMENT_PACKED) */
 	UINT32			line_modulo;		/* bytes between each row of data */
 	UINT32			char_modulo;		/* bytes between each element */
+	running_machine *	machine;		/* pointer to the owning machine */
 	gfx_layout		layout;				/* copy of the original layout */
 };
 
@@ -187,7 +188,7 @@ void drawgfx_init(running_machine *machine);
 
 
 void decodechar(gfx_element *gfx,int num,const unsigned char *src);
-gfx_element *allocgfx(const gfx_layout *gl);
+gfx_element *allocgfx(running_machine *machine, const gfx_layout *gl);
 void decodegfx(gfx_element *gfx, const UINT8 *src, UINT32 first, UINT32 count);
 void freegfx(gfx_element *gfx);
 

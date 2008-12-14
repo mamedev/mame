@@ -341,15 +341,15 @@ VIDEO_START( namcona1 )
 	cgram			     = auto_malloc( 0x1000*0x40 );
 	dirtychar		     = auto_malloc( 0x1000 );
 
-	gfx0 = allocgfx( &cg_layout_8bpp );
+	gfx0 = allocgfx( machine, &cg_layout_8bpp );
 	gfx0->total_colors = machine->config->total_colors/256;
 	machine->gfx[0] = gfx0;
 
-	gfx1 = allocgfx( &cg_layout_4bpp );
+	gfx1 = allocgfx( machine, &cg_layout_4bpp );
 	gfx1->total_colors = machine->config->total_colors/16;
 	machine->gfx[1] = gfx1;
 
-	gfx2 = allocgfx( &shape_layout );
+	gfx2 = allocgfx( machine, &shape_layout );
 	gfx2->total_colors = machine->config->total_colors/2;
 	machine->gfx[2] = gfx2;
 } /* namcona1_vh_start */

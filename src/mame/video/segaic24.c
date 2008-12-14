@@ -171,7 +171,7 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 	memset(sys24_char_dirtymap, 1, SYS24_TILES);
 	sys24_char_dirty = 1;
 
-	machine->gfx[sys24_char_gfx_index] = allocgfx(&sys24_char_layout);
+	machine->gfx[sys24_char_gfx_index] = allocgfx(machine, &sys24_char_layout);
 
 	machine->gfx[sys24_char_gfx_index]->total_colors = machine->config->total_colors / 16;
 

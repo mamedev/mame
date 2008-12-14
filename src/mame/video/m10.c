@@ -99,7 +99,7 @@ VIDEO_START( m10 )
 	tilemap_set_scrolldx(tx_tilemap, 0, 62);
 	tilemap_set_scrolldy(tx_tilemap, 0, 0);
 
-	back_gfx = allocgfx(&backlayout);
+	back_gfx = allocgfx(machine, &backlayout);
 	back_gfx->total_colors = 8;
 
 	machine->gfx[1] = back_gfx;
@@ -110,7 +110,7 @@ VIDEO_START( m15 )
 {
 	m10_state *state = machine->driver_data;
 
-	machine->gfx[0] = allocgfx(&charlayout);
+	machine->gfx[0] = allocgfx(machine, &charlayout);
 	machine->gfx[0]->total_colors = 8;
 
 	decodegfx(machine->gfx[0], state->chargen,0,256);

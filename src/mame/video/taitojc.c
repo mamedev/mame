@@ -220,7 +220,7 @@ VIDEO_START( taitojc )
 	memset(taitojc_tile_ram, 0, 0x4000);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[taitojc_gfx_index] = allocgfx(&taitojc_char_layout);
+	machine->gfx[taitojc_gfx_index] = allocgfx(machine, &taitojc_char_layout);
 
 	/* set the color information */
 	machine->gfx[taitojc_gfx_index]->total_colors = machine->config->total_colors / 16;

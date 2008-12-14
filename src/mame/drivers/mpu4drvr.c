@@ -996,10 +996,10 @@ static VIDEO_START( mpu4_vid )
 	assert(mpu4_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[mpu4_gfx_index+0] = allocgfx(&mpu4_vid_char_8x8_layout);
-	machine->gfx[mpu4_gfx_index+1] = allocgfx(&mpu4_vid_char_8x16_layout);
-	machine->gfx[mpu4_gfx_index+2] = allocgfx(&mpu4_vid_char_16x8_layout);
-	machine->gfx[mpu4_gfx_index+3] = allocgfx(&mpu4_vid_char_16x16_layout);
+	machine->gfx[mpu4_gfx_index+0] = allocgfx(machine, &mpu4_vid_char_8x8_layout);
+	machine->gfx[mpu4_gfx_index+1] = allocgfx(machine, &mpu4_vid_char_8x16_layout);
+	machine->gfx[mpu4_gfx_index+2] = allocgfx(machine, &mpu4_vid_char_16x8_layout);
+	machine->gfx[mpu4_gfx_index+3] = allocgfx(machine, &mpu4_vid_char_16x16_layout);
 
 	/* set the color information */
 	machine->gfx[mpu4_gfx_index+0]->total_colors = machine->config->total_colors / 16;

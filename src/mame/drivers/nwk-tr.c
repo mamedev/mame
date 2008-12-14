@@ -458,9 +458,9 @@ int K001604_vh_start(running_machine *machine, int chip)
 	memset(K001604_reg[chip], 0, 0x400);
 
 
-	machine->gfx[K001604_gfx_index[chip][0]] = allocgfx(&K001604_char_layout_layer_8x8);
+	machine->gfx[K001604_gfx_index[chip][0]] = allocgfx(machine, &K001604_char_layout_layer_8x8);
 	decodegfx(machine->gfx[K001604_gfx_index[chip][0]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][0]]->total_elements);
-	machine->gfx[K001604_gfx_index[chip][1]] = allocgfx(&K001604_char_layout_layer_16x16);
+	machine->gfx[K001604_gfx_index[chip][1]] = allocgfx(machine, &K001604_char_layout_layer_16x16);
 	decodegfx(machine->gfx[K001604_gfx_index[chip][1]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][1]]->total_elements);
 
 	machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->config->total_colors / 16;

@@ -1212,7 +1212,7 @@ static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UIN
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	machine->gfx[gfx_index] = allocgfx(&gl);
+	machine->gfx[gfx_index] = allocgfx(machine, &gl);
 	decodegfx(machine->gfx[gfx_index], data, 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */

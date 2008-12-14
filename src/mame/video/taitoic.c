@@ -1552,7 +1552,7 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 		assert(gfx_index != MAX_GFX_ELEMENTS);
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
-		machine->gfx[gfx_index] = allocgfx(&TC0080VCO_charlayout);
+		machine->gfx[gfx_index] = allocgfx(machine, &TC0080VCO_charlayout);
 
 		/* set the color information */
 		machine->gfx[gfx_index]->total_colors = 64;	// is this correct ?
@@ -2326,7 +2326,7 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 		assert(gfx_index != MAX_GFX_ELEMENTS);
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
-		machine->gfx[gfx_index] = allocgfx(&TC0100SCN_charlayout);
+		machine->gfx[gfx_index] = allocgfx(machine, &TC0100SCN_charlayout);
 
 		/* set the color information */
 		machine->gfx[gfx_index]->total_colors = 64;
@@ -3195,7 +3195,7 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 		assert(gfx_index != MAX_GFX_ELEMENTS);
 
 		/* create the char set (gfx will then be updated dynamically from RAM) */
-		machine->gfx[gfx_index] = allocgfx(&TC0480SCP_charlayout);
+		machine->gfx[gfx_index] = allocgfx(machine, &TC0480SCP_charlayout);
 
 		/* set the color information */
 		machine->gfx[gfx_index]->total_colors = 64;
