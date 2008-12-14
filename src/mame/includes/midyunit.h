@@ -52,8 +52,8 @@ READ16_HANDLER( midyunit_gfxrom_r );
 WRITE16_HANDLER( midyunit_vram_w );
 READ16_HANDLER( midyunit_vram_r );
 
-void midyunit_to_shiftreg(UINT32 address, UINT16 *shiftreg);
-void midyunit_from_shiftreg(UINT32 address, UINT16 *shiftreg);
+void midyunit_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
+void midyunit_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
 
 WRITE16_HANDLER( midyunit_control_w );
 WRITE16_HANDLER( midyunit_paletteram_w );

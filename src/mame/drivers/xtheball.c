@@ -7,7 +7,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "machine/ticket.h"
@@ -95,25 +94,25 @@ static void xtheball_scanline_update(const device_config *screen, bitmap_t *bitm
  *
  *************************************/
 
-static void xtheball_to_shiftreg(UINT32 address, UINT16 *shiftreg)
+static void xtheball_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	if (address >= 0x01000000 && address <= 0x010fffff)
 		memcpy(shiftreg, &vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(shiftreg, &vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_to_shiftreg(%08X)\n", cpuexec_describe_context(Machine), address);
+		logerror("%s:xtheball_to_shiftreg(%08X)\n", cpuexec_describe_context(space->machine), address);
 }
 
 
-static void xtheball_from_shiftreg(UINT32 address, UINT16 *shiftreg)
+static void xtheball_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	if (address >= 0x01000000 && address <= 0x010fffff)
 		memcpy(&vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(&vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else
-		logerror("%s:xtheball_from_shiftreg(%08X)\n", cpuexec_describe_context(Machine), address);
+		logerror("%s:xtheball_from_shiftreg(%08X)\n", cpuexec_describe_context(space->machine), address);
 }
 
 

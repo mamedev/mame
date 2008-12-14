@@ -11,7 +11,6 @@
  ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "tms34061.h"
 
 
@@ -167,7 +166,7 @@ static TIMER_CALLBACK( tms34061_interrupt )
  *
  *************************************/
 
-static void register_w(offs_t offset, UINT8 data)
+static void register_w(const address_space *space, offs_t offset, UINT8 data)
 {
 	int scanline;
 	int regnum = offset >> 2;
@@ -187,7 +186,7 @@ static void register_w(offs_t offset, UINT8 data)
 	}
 
 	/* log it */
-	if (VERBOSE) logerror("%s:tms34061 %s = %04x\n", cpuexec_describe_context(Machine), regnames[regnum], tms34061.regs[regnum]);
+	if (VERBOSE) logerror("%s:tms34061 %s = %04x\n", cpuexec_describe_context(space->machine), regnames[regnum], tms34061.regs[regnum]);
 
 	/* update the state of things */
 	switch (regnum)
@@ -238,7 +237,7 @@ static void register_w(offs_t offset, UINT8 data)
  *
  *************************************/
 
-static UINT8 register_r(offs_t offset)
+static UINT8 register_r(const address_space *space, offs_t offset)
 {
 	int regnum = offset >> 2;
 	UINT16 result;
@@ -265,7 +264,7 @@ static UINT8 register_r(offs_t offset)
 	}
 
 	/* log it */
-	if (VERBOSE) logerror("%s:tms34061 %s read = %04X\n", cpuexec_describe_context(Machine), regnames[regnum], result);
+	if (VERBOSE) logerror("%s:tms34061 %s read = %04X\n", cpuexec_describe_context(space->machine), regnames[regnum], result);
 	return (offset & 0x02) ? (result >> 8) : result;
 }
 
@@ -360,7 +359,7 @@ INLINE void adjust_xyaddress(int offset)
 }
 
 
-static void xypixel_w(int offset, UINT8 data)
+static void xypixel_w(const address_space *space, int offset, UINT8 data)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = tms34061.regs[TMS34061_XYADDRESS];
@@ -372,7 +371,7 @@ static void xypixel_w(int offset, UINT8 data)
 
 	/* mask to the VRAM size */
 	pixeloffs &= tms34061.vrammask;
-	if (VERBOSE) logerror("%s:tms34061 xy (%04x) = %02x/%02x\n", cpuexec_describe_context(Machine), pixeloffs, data, tms34061.latchdata);
+	if (VERBOSE) logerror("%s:tms34061 xy (%04x) = %02x/%02x\n", cpuexec_describe_context(space->machine), pixeloffs, data, tms34061.latchdata);
 
 	/* set the pixel data */
 	tms34061.vram[pixeloffs] = data;
@@ -380,7 +379,7 @@ static void xypixel_w(int offset, UINT8 data)
 }
 
 
-static UINT8 xypixel_r(int offset)
+static UINT8 xypixel_r(const address_space *space, int offset)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = tms34061.regs[TMS34061_XYADDRESS];
@@ -405,7 +404,7 @@ static UINT8 xypixel_r(int offset)
  *
  *************************************/
 
-void tms34061_w(int col, int row, int func, UINT8 data)
+void tms34061_w(const address_space *space, int col, int row, int func, UINT8 data)
 {
 	offs_t offs;
 
@@ -415,12 +414,12 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 		/* both 0 and 2 map to register access */
 		case 0:
 		case 2:
-			register_w(col, data);
+			register_w(space, col, data);
 			break;
 
 		/* function 1 maps to XY access; col is the address adjustment */
 		case 1:
-			xypixel_w(col, data);
+			xypixel_w(space, col, data);
 			break;
 
 		/* function 3 maps to direct access */
@@ -428,7 +427,7 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 			offs = ((row << tms34061.intf.rowshift) | col) & tms34061.vrammask;
 			if (tms34061.regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (tms34061.regs[TMS34061_CONTROL2] & 3) << 16;
-			if (VERBOSE) logerror("%s:tms34061 direct (%04x) = %02x/%02x\n", cpuexec_describe_context(Machine), offs, data, tms34061.latchdata);
+			if (VERBOSE) logerror("%s:tms34061 direct (%04x) = %02x/%02x\n", cpuexec_describe_context(space->machine), offs, data, tms34061.latchdata);
 			if (tms34061.vram[offs] != data || tms34061.latchram[offs] != tms34061.latchdata)
 			{
 				tms34061.vram[offs] = data;
@@ -442,7 +441,7 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 			if (tms34061.regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (tms34061.regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= tms34061.vrammask;
-			if (VERBOSE) logerror("%s:tms34061 shiftreg write (%04x)\n", cpuexec_describe_context(Machine), offs);
+			if (VERBOSE) logerror("%s:tms34061 shiftreg write (%04x)\n", cpuexec_describe_context(space->machine), offs);
 
 			memcpy(&tms34061.vram[offs], tms34061.shiftreg, (size_t)1 << tms34061.intf.rowshift);
 			memset(&tms34061.latchram[offs], tms34061.latchdata, (size_t)1 << tms34061.intf.rowshift);
@@ -454,20 +453,20 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 			if (tms34061.regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (tms34061.regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= tms34061.vrammask;
-			if (VERBOSE) logerror("%s:tms34061 shiftreg read (%04x)\n", cpuexec_describe_context(Machine), offs);
+			if (VERBOSE) logerror("%s:tms34061 shiftreg read (%04x)\n", cpuexec_describe_context(space->machine), offs);
 
 			tms34061.shiftreg = &tms34061.vram[offs];
 			break;
 
 		/* log anything else */
 		default:
-			logerror("%s:Unsupported TMS34061 function %d\n", cpuexec_describe_context(Machine), func);
+			logerror("%s:Unsupported TMS34061 function %d\n", cpuexec_describe_context(space->machine), func);
 			break;
 	}
 }
 
 
-UINT8 tms34061_r(int col, int row, int func)
+UINT8 tms34061_r(const address_space *space, int col, int row, int func)
 {
 	int result = 0;
 	offs_t offs;
@@ -478,12 +477,12 @@ UINT8 tms34061_r(int col, int row, int func)
 		/* both 0 and 2 map to register access */
 		case 0:
 		case 2:
-			result = register_r(col);
+			result = register_r(space, col);
 			break;
 
 		/* function 1 maps to XY access; col is the address adjustment */
 		case 1:
-			result = xypixel_r(col);
+			result = xypixel_r(space, col);
 			break;
 
 		/* funtion 3 maps to direct access */
@@ -515,7 +514,7 @@ UINT8 tms34061_r(int col, int row, int func)
 
 		/* log anything else */
 		default:
-			logerror("%s:Unsupported TMS34061 function %d\n", cpuexec_describe_context(Machine),
+			logerror("%s:Unsupported TMS34061 function %d\n", cpuexec_describe_context(space->machine),
 					func);
 			break;
 	}

@@ -220,13 +220,13 @@ READ16_HANDLER( midtunit_vram_color_r )
  *
  *************************************/
 
-void midtunit_to_shiftreg(UINT32 address, UINT16 *shiftreg)
+void midtunit_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &local_videoram[address >> 3], 2 * 512 * sizeof(UINT16));
 }
 
 
-void midtunit_from_shiftreg(UINT32 address, UINT16 *shiftreg)
+void midtunit_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&local_videoram[address >> 3], shiftreg, 2 * 512 * sizeof(UINT16));
 }

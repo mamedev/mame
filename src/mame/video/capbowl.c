@@ -67,7 +67,7 @@ WRITE8_HANDLER( capbowl_tms34061_w )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(col, *capbowl_rowaddress, func, data);
+	tms34061_w(space, col, *capbowl_rowaddress, func, data);
 }
 
 
@@ -82,7 +82,7 @@ READ8_HANDLER( capbowl_tms34061_r )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(col, *capbowl_rowaddress, func);
+	return tms34061_r(space, col, *capbowl_rowaddress, func);
 }
 
 

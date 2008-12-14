@@ -232,17 +232,17 @@ WRITE16_HANDLER( hd68k_irq_ack_w )
 }
 
 
-void hdgsp_irq_gen(int state)
+void hdgsp_irq_gen(const device_config *device, int state)
 {
 	gsp_irq_state = state;
-	atarigen_update_interrupts(Machine);
+	atarigen_update_interrupts(device->machine);
 }
 
 
-void hdmsp_irq_gen(int state)
+void hdmsp_irq_gen(const device_config *device, int state)
 {
 	msp_irq_state = state;
-	atarigen_update_interrupts(Machine);
+	atarigen_update_interrupts(device->machine);
 }
 
 
@@ -757,14 +757,14 @@ static TIMER_CALLBACK( stmsp_sync_update )
 }
 
 
-INLINE void stmsp_sync_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void stmsp_sync_w(const address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
 {
 	UINT16 newdata = stmsp_sync[which][offset];
 	COMBINE_DATA(&newdata);
 
 	/* if being written from the 68000, synchronize on it */
 	if (hd34010_host_access)
-		timer_call_after_resynch(Machine, NULL, newdata | (offset << 16) | (which << 28), stmsp_sync_update);
+		timer_call_after_resynch(space->machine, NULL, newdata | (offset << 16) | (which << 28), stmsp_sync_update);
 
 	/* otherwise, just update */
 	else
@@ -774,19 +774,19 @@ INLINE void stmsp_sync_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 
 WRITE16_HANDLER( stmsp_sync0_w )
 {
-	stmsp_sync_w(0, offset, data, mem_mask);
+	stmsp_sync_w(space, offset, data, mem_mask, 0);
 }
 
 
 WRITE16_HANDLER( stmsp_sync1_w )
 {
-	stmsp_sync_w(1, offset, data, mem_mask);
+	stmsp_sync_w(space, offset, data, mem_mask, 1);
 }
 
 
 WRITE16_HANDLER( stmsp_sync2_w )
 {
-	stmsp_sync_w(2, offset, data, mem_mask);
+	stmsp_sync_w(space, offset, data, mem_mask, 2);
 }
 
 

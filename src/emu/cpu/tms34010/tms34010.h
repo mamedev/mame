@@ -196,9 +196,9 @@ struct _tms34010_config
 	UINT32	pixclock;							/* the pixel clock (0 means don't adjust screen size) */
 	int		pixperclock;						/* pixels per clock */
 	void	(*scanline_callback)(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
-	void	(*output_int)(int state);			/* output interrupt callback */
-	void	(*to_shiftreg)(offs_t, UINT16 *);	/* shift register write */
-	void	(*from_shiftreg)(offs_t, UINT16 *);	/* shift register read */
+	void	(*output_int)(const device_config *device, int state);			/* output interrupt callback */
+	void	(*to_shiftreg)(const address_space *space, offs_t, UINT16 *);	/* shift register write */
+	void	(*from_shiftreg)(const address_space *space, offs_t, UINT16 *);	/* shift register read */
 };
 
 

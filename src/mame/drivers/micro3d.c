@@ -396,9 +396,9 @@ static INPUT_PORTS_START( f15se )
 INPUT_PORTS_END
 
 
-static void tms_interrupt(int state)
+static void tms_interrupt(const device_config *device, int state)
 {
-   m68901_int_gen(Machine, GPIP4);
+   m68901_int_gen(device->machine, GPIP4);
 }
 
 static INTERRUPT_GEN( micro3d_vblank )

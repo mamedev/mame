@@ -78,7 +78,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
 #include "jpmimpct.h"
@@ -818,10 +817,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void jpmimpct_tms_irq(int state)
+static void jpmimpct_tms_irq(const device_config *device, int state)
 {
 	tms_irq = state;
-	update_irqs(Machine);
+	update_irqs(device->machine);
 }
 
 static const tms34010_config tms_config =

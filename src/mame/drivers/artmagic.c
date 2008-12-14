@@ -22,7 +22,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "artmagic.h"
@@ -62,10 +61,10 @@ static void update_irq_state(running_machine *machine)
 }
 
 
-static void m68k_gen_int(int state)
+static void m68k_gen_int(const device_config *device, int state)
 {
 	tms_irq = state;
-	update_irq_state(Machine);
+	update_irq_state(device->machine);
 }
 
 

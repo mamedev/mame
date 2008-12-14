@@ -203,13 +203,13 @@ READ16_HANDLER( midyunit_vram_r )
  *
  *************************************/
 
-void midyunit_to_shiftreg(UINT32 address, UINT16 *shiftreg)
+void midyunit_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &local_videoram[address >> 3], 2 * 512 * sizeof(UINT16));
 }
 
 
-void midyunit_from_shiftreg(UINT32 address, UINT16 *shiftreg)
+void midyunit_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&local_videoram[address >> 3], shiftreg, 2 * 512 * sizeof(UINT16));
 }

@@ -55,8 +55,8 @@ MACHINE_RESET( harddriv );
 
 INTERRUPT_GEN( hd68k_irq_gen );
 WRITE16_HANDLER( hd68k_irq_ack_w );
-void hdgsp_irq_gen(int state);
-void hdmsp_irq_gen(int state);
+void hdgsp_irq_gen(const device_config *device, int state);
+void hdmsp_irq_gen(const device_config *device, int state);
 
 READ16_HANDLER( hd68k_gsp_io_r );
 WRITE16_HANDLER( hd68k_gsp_io_w );
@@ -224,8 +224,8 @@ extern UINT16 *hdgsp_paletteram_hi;
 extern size_t hdgsp_vram_size;
 
 VIDEO_START( harddriv );
-void hdgsp_write_to_shiftreg(UINT32 address, UINT16 *shiftreg);
-void hdgsp_read_from_shiftreg(UINT32 address, UINT16 *shiftreg);
+void hdgsp_write_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
+void hdgsp_read_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
 
 READ16_HANDLER( hdgsp_control_lo_r );
 WRITE16_HANDLER( hdgsp_control_lo_w );

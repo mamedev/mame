@@ -549,7 +549,7 @@ WRITE8_HANDLER( itech8_tms34061_w )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(col, 0xff, func, data);
+	tms34061_w(space, col, 0xff, func, data);
 }
 
 
@@ -564,7 +564,7 @@ READ8_HANDLER( itech8_tms34061_r )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(col, 0xff, func);
+	return tms34061_r(space, col, 0xff, func);
 }
 
 

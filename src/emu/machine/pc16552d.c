@@ -6,7 +6,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "pc16552d.h"
 
 #define REG_RECV_BUFFER			0x0		// Read
@@ -388,7 +387,7 @@ static void duart_w(running_machine *machine, int chip, int reg, UINT8 data)
 
 /*****************************************************************************/
 
-void pc16552d_init(int chip, int frequency, void (* irq_handler)(running_machine *machine, int channel, int value), void (* tx_callback)(int channel, int count, UINT8* data))
+void pc16552d_init(running_machine *machine, int chip, int frequency, void (* irq_handler)(running_machine *machine, int channel, int value), void (* tx_callback)(int channel, int count, UINT8* data))
 {
 	memset(&duart[chip], 0, sizeof(PC16552D_REGS));
 
@@ -401,10 +400,10 @@ void pc16552d_init(int chip, int frequency, void (* irq_handler)(running_machine
 	duart[chip].ch[1].pending_interrupt = 0;
 
 	// allocate transmit timers
-	duart[chip].ch[0].tx_fifo_timer = timer_alloc(Machine, tx_fifo_timer_callback, NULL);
+	duart[chip].ch[0].tx_fifo_timer = timer_alloc(machine, tx_fifo_timer_callback, NULL);
 	timer_adjust_oneshot(duart[chip].ch[0].tx_fifo_timer, attotime_never, (chip * 2) + 0);
 
-	duart[chip].ch[1].tx_fifo_timer = timer_alloc(Machine, tx_fifo_timer_callback, NULL);
+	duart[chip].ch[1].tx_fifo_timer = timer_alloc(machine, tx_fifo_timer_callback, NULL);
 	timer_adjust_oneshot(duart[chip].ch[1].tx_fifo_timer, attotime_never, (chip * 2) + 1);
 }
 

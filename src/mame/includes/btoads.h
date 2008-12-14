@@ -34,7 +34,7 @@ WRITE16_HANDLER( btoads_vram_fg_draw_w );
 READ16_HANDLER( btoads_vram_fg_display_r );
 READ16_HANDLER( btoads_vram_fg_draw_r );
 
-void btoads_to_shiftreg(UINT32 address, UINT16 *shiftreg);
-void btoads_from_shiftreg(UINT32 address, UINT16 *shiftreg);
+void btoads_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
+void btoads_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
 
 void btoads_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);

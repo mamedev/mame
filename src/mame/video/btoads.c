@@ -7,7 +7,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "btoads.h"
@@ -285,7 +284,7 @@ static void render_sprite_row(UINT16 *sprite_source, UINT32 address)
  *
  *************************************/
 
-void btoads_to_shiftreg(UINT32 address, UINT16 *shiftreg)
+void btoads_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	address &= ~0x40000000;
 
@@ -308,11 +307,11 @@ void btoads_to_shiftreg(UINT32 address, UINT16 *shiftreg)
 	}
 
 	else
-		logerror("%s:btoads_to_shiftreg(%08X)\n", cpuexec_describe_context(Machine), address);
+		logerror("%s:btoads_to_shiftreg(%08X)\n", cpuexec_describe_context(space->machine), address);
 }
 
 
-void btoads_from_shiftreg(UINT32 address, UINT16 *shiftreg)
+void btoads_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	address &= ~0x40000000;
 
@@ -333,7 +332,7 @@ void btoads_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 		render_sprite_row(shiftreg, address);
 
 	else
-		logerror("%s:btoads_from_shiftreg(%08X)\n", cpuexec_describe_context(Machine), address);
+		logerror("%s:btoads_from_shiftreg(%08X)\n", cpuexec_describe_context(space->machine), address);
 }
 
 

@@ -872,7 +872,7 @@ static MACHINE_START(meritm_crt260)
 	meritm_psd_a15 = 0;
 	meritm_switch_banks();
 	MACHINE_START_CALL(merit_common);
-	pc16552d_init(0, UART_CLK, NULL, pc16650d_tx_callback);
+	pc16552d_init(machine, 0, UART_CLK, NULL, pc16650d_tx_callback);
 	microtouch_init(machine, meritm_microtouch_tx_callback, meritm_touch_coord_transform);
 	state_save_register_global(machine, meritm_bank);
 	state_save_register_global(machine, meritm_psd_a15);

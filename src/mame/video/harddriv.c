@@ -145,7 +145,7 @@ VIDEO_START( harddriv )
  *
  *************************************/
 
-void hdgsp_write_to_shiftreg(UINT32 address, UINT16 *shiftreg)
+void hdgsp_write_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	/* access to the 1bpp/2bpp area */
 	if (address >= 0x02000000 && address <= 0x020fffff)
@@ -171,7 +171,7 @@ void hdgsp_write_to_shiftreg(UINT32 address, UINT16 *shiftreg)
 }
 
 
-void hdgsp_read_from_shiftreg(UINT32 address, UINT16 *shiftreg)
+void hdgsp_read_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	if (!shiftreg_enable)
 		return;

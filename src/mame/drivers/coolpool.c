@@ -125,13 +125,13 @@ static void coolpool_scanline(const device_config *screen, bitmap_t *bitmap, int
  *
  *************************************/
 
-static void coolpool_to_shiftreg(UINT32 address, UINT16 *shiftreg)
+static void coolpool_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &vram_base[TOWORD(address) & ~TOWORD(0xfff)], TOBYTE(0x1000));
 }
 
 
-static void coolpool_from_shiftreg(UINT32 address, UINT16 *shiftreg)
+static void coolpool_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&vram_base[TOWORD(address) & ~TOWORD(0xfff)], shiftreg, TOBYTE(0x1000));
 }

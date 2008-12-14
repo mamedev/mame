@@ -103,10 +103,10 @@ static WRITE16_HANDLER( guab_tms34061_w )
 		col = offset <<= 1;
 
 	if (ACCESSING_BITS_8_15)
-		tms34061_w(col, row, func, data >> 8);
+		tms34061_w(space, col, row, func, data >> 8);
 
 	if (ACCESSING_BITS_0_7)
-		tms34061_w(col | 1, row, func, data & 0xff);
+		tms34061_w(space, col | 1, row, func, data & 0xff);
 }
 
 
@@ -123,10 +123,10 @@ static READ16_HANDLER( guab_tms34061_r )
 		col = offset <<= 1;
 
 	if (ACCESSING_BITS_8_15)
-		data |= tms34061_r(col, row, func) << 8;
+		data |= tms34061_r(space, col, row, func) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= tms34061_r(col | 1, row, func);
+		data |= tms34061_r(space, col | 1, row, func);
 
 	return data;
 }

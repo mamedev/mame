@@ -98,12 +98,12 @@ READ16_HANDLER( bt477_r )
  *
  *************************************/
 
-void jpmimpct_to_shiftreg(UINT32 address, UINT16 *shiftreg)
+void jpmimpct_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &tms_vram[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
-void jpmimpct_from_shiftreg(UINT32 address, UINT16 *shiftreg)
+void jpmimpct_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&tms_vram[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }

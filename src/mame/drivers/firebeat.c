@@ -2283,8 +2283,8 @@ static void init_firebeat(running_machine *machine)
 
 	rtc65271_init(machine, xram, NULL);
 
-	pc16552d_init(0, 19660800, comm_uart_irq_callback, 0);		// Network UART
-	pc16552d_init(1, 24000000, midi_uart_irq_callback, 0);		// MIDI UART
+	pc16552d_init(machine, 0, 19660800, comm_uart_irq_callback, 0);		// Network UART
+	pc16552d_init(machine, 1, 24000000, midi_uart_irq_callback, 0);		// MIDI UART
 
 	extend_board_irq_enable = 0x3f;
 	extend_board_irq_active = 0x00;
