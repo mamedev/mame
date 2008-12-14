@@ -1876,8 +1876,9 @@ static MACHINE_DRIVER_START( f1gpstr2 )
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_sound_readmem,f1gpstr2_sound_writemem)
 
-	MDRV_CPU_ADD("cpu5", M68000, 10000000)
+	MDRV_CPU_ADD("cpu5", M68000, 12000000/* was 10000000 */)
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_io_readmem,f1gpstr2_io_writemem)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 MACHINE_DRIVER_END
 
 
