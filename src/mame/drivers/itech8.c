@@ -561,13 +561,20 @@ static const pia6821_interface pia_interface =
  *
  *************************************/
 
-static void via_irq(running_machine *machine, int state);
+static void via_irq(const device_config *device, int state);
+
+static WRITE8_DEVICE_HANDLER( via_pia_portb_out )
+{
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_portb_out(space, offset, data);
+}
+
 
 static const via6522_interface via_interface =
 {
 	/*inputs : A/B         */ 0, 0,
 	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*outputs: A/B         */ 0, pia_portb_out,
+	/*outputs: A/B         */ 0, via_pia_portb_out,
 	/*outputs: CA/B1,CA/B2 */ 0, 0, 0, 0,
 	/*irq                  */ via_irq
 };
@@ -675,11 +682,6 @@ static MACHINE_RESET( itech8 )
 
 	/* reset the PIA (if used) */
 	pia_reset();
-
-	/* reset the VIA chip (if used) */
-	via_config(0, &via_interface);
-	via_set_clock(0, CLOCK_8MHz/4);
-	via_reset();
 
 	/* reset the ticket dispenser */
 	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
@@ -844,12 +846,12 @@ static READ8_HANDLER( sound_data_r )
  *
  *************************************/
 
-static void via_irq(running_machine *machine, int state)
+static void via_irq(const device_config *device, int state)
 {
 	if (state)
-		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -1026,7 +1028,7 @@ static ADDRESS_MAP_START( sound3812_external_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
-	AM_RANGE(0x5000, 0x500f) AM_READWRITE(via_0_r, via_0_w)
+	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1765,6 +1767,9 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", CLOCK_8MHz/4, via_interface)
 MACHINE_DRIVER_END
 
 

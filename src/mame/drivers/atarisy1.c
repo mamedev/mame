@@ -336,20 +336,21 @@ static READ8_HANDLER( switch_6502_r )
  *          D5 =    LED (out)
  */
 
-static WRITE8_HANDLER( via_pa_w )
+static WRITE8_DEVICE_HANDLER( via_pa_w )
 {
 	tms5220_out_data = data;
 }
 
 
-static READ8_HANDLER( via_pa_r )
+static READ8_DEVICE_HANDLER( via_pa_r )
 {
 	return tms5220_in_data;
 }
 
 
-static WRITE8_HANDLER( via_pb_w )
+static WRITE8_DEVICE_HANDLER( via_pb_w )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 old = tms5220_ctl;
 	tms5220_ctl = data;
 
@@ -367,7 +368,7 @@ static WRITE8_HANDLER( via_pb_w )
 }
 
 
-static READ8_HANDLER( via_pb_r )
+static READ8_DEVICE_HANDLER( via_pb_r )
 {
 	return (!tms5220_ready_r() << 2) | (!tms5220_int_r() << 3);
 }
@@ -439,7 +440,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_READWRITE(via_0_r, via_0_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(ym2151_register_port_0_w)
 	AM_RANGE(0x1800, 0x1801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x1810, 0x1810) AM_READWRITE(atarigen_6502_sound_r, atarigen_6502_sound_w)
@@ -738,6 +739,9 @@ static MACHINE_DRIVER_START( atarisy1 )
 	MDRV_SOUND_ADD("tms", TMS5220, ATARI_CLOCK_14MHz/2/11)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 0, via_interface)
 MACHINE_DRIVER_END
 
 
@@ -2141,8 +2145,6 @@ ROM_END
 
 static DRIVER_INIT( marble )
 {
-	via_config(0, &via_interface);
-
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(machine, 0, 0x080000, 0, 103);
 
@@ -2153,8 +2155,6 @@ static DRIVER_INIT( marble )
 
 static DRIVER_INIT( peterpak )
 {
-	via_config(0, &via_interface);
-
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(machine, 0, 0x080000, 0, 107);
 
@@ -2165,8 +2165,6 @@ static DRIVER_INIT( peterpak )
 
 static DRIVER_INIT( indytemp )
 {
-	via_config(0, &via_interface);
-
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(machine, 0, 0x080000, 0, 105);
 
@@ -2177,8 +2175,6 @@ static DRIVER_INIT( indytemp )
 
 static DRIVER_INIT( roadrunn )
 {
-	via_config(0, &via_interface);
-
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(machine, 0, 0x080000, 0, 108);
 
@@ -2189,8 +2185,6 @@ static DRIVER_INIT( roadrunn )
 
 static DRIVER_INIT( roadb109 )
 {
-	via_config(0, &via_interface);
-
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(machine, 0, 0x080000, 0, 109);
 
@@ -2201,8 +2195,6 @@ static DRIVER_INIT( roadb109 )
 
 static DRIVER_INIT( roadb110 )
 {
-	via_config(0, &via_interface);
-
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(machine, 0, 0x080000, 0, 110);
 

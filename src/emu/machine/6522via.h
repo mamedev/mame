@@ -2,7 +2,7 @@
 
     Rockwell 6522 VIA interface and emulation
 
-    This function emulates all the functionality of up to 8 6522
+    This function emulates all the functionality of 6522
     versatile interface adapters.
 
     This is based on the M6821 emulation in MAME.
@@ -19,7 +19,15 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MAX_VIA 8
+#define VIA6522		DEVICE_GET_INFO_NAME(via6522)
+
+#define MDRV_VIA6522_ADD(_tag, _clock, _intrf) \
+	MDRV_DEVICE_ADD(_tag, VIA6522) \
+	MDRV_DEVICE_CONFIG_DATA32(via6522_inline_config, clck, _clock) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_VIA6522_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, VIA6522)
 
 #define	VIA_PB	    0
 #define	VIA_PA	    1
@@ -46,19 +54,25 @@
 typedef struct _via6522_interface via6522_interface;
 struct _via6522_interface
 {
-	read8_space_func in_a_func;
-	read8_space_func in_b_func;
-	read8_space_func in_ca1_func;
-	read8_space_func in_cb1_func;
-	read8_space_func in_ca2_func;
-	read8_space_func in_cb2_func;
-	write8_space_func out_a_func;
-	write8_space_func out_b_func;
-	write8_space_func out_ca1_func;
-	write8_space_func out_cb1_func;
-	write8_space_func out_ca2_func;
-	write8_space_func out_cb2_func;
-	void (*irq_func)(running_machine *machine, int state);
+	read8_device_func in_a_func;
+	read8_device_func in_b_func;
+	read8_device_func in_ca1_func;
+	read8_device_func in_cb1_func;
+	read8_device_func in_ca2_func;
+	read8_device_func in_cb2_func;
+	write8_device_func out_a_func;
+	write8_device_func out_b_func;
+	write8_device_func out_ca1_func;
+	write8_device_func out_cb1_func;
+	write8_device_func out_ca2_func;
+	write8_device_func out_cb2_func;
+	void (*irq_func)(const device_config *device, int state);
+};
+
+typedef struct _via6522_inline_config via6522_inline_config;
+struct _via6522_inline_config
+{
+	int clck;
 };
 
 
@@ -66,144 +80,27 @@ struct _via6522_interface
     PROTOTYPES
 ***************************************************************************/
 
-void via_set_clock(int which,int clck);
-void via_config(int which, const via6522_interface *intf);
-void via_reset(void);
-int via_read(running_machine *machine, int which, int offset);
-void via_write(running_machine *machine, int which, int offset, int data);
-void via_set_input_a(int which, int data);
-void via_set_input_ca1(running_machine *machine, int which, int data);
-void via_set_input_ca2(running_machine *machine, int which, int data);
-void via_set_input_b(int which, int data);
-void via_set_input_cb1(running_machine *machine, int which, int data);
-void via_set_input_cb2(running_machine *machine, int which, int data);
+DEVICE_GET_INFO(via6522);
 
-/******************* Standard 8-bit CPU interfaces, D0-D7 *******************/
+READ8_DEVICE_HANDLER(via_r);
+WRITE8_DEVICE_HANDLER(via_w);
 
-READ8_HANDLER( via_0_r );
-READ8_HANDLER( via_1_r );
-READ8_HANDLER( via_2_r );
-READ8_HANDLER( via_3_r );
-READ8_HANDLER( via_4_r );
-READ8_HANDLER( via_5_r );
-READ8_HANDLER( via_6_r );
-READ8_HANDLER( via_7_r );
+READ8_DEVICE_HANDLER(via_porta_r);
+WRITE8_DEVICE_HANDLER(via_porta_w);
 
-WRITE8_HANDLER( via_0_w );
-WRITE8_HANDLER( via_1_w );
-WRITE8_HANDLER( via_2_w );
-WRITE8_HANDLER( via_3_w );
-WRITE8_HANDLER( via_4_w );
-WRITE8_HANDLER( via_5_w );
-WRITE8_HANDLER( via_6_w );
-WRITE8_HANDLER( via_7_w );
+READ8_DEVICE_HANDLER(via_portb_r);
+WRITE8_DEVICE_HANDLER(via_portb_w);
 
-/******************* 8-bit A/B port interfaces *******************/
+READ8_DEVICE_HANDLER(via_ca1_r);
+WRITE8_DEVICE_HANDLER(via_ca1_w);
 
-WRITE8_HANDLER( via_0_porta_w );
-WRITE8_HANDLER( via_1_porta_w );
-WRITE8_HANDLER( via_2_porta_w );
-WRITE8_HANDLER( via_3_porta_w );
-WRITE8_HANDLER( via_4_porta_w );
-WRITE8_HANDLER( via_5_porta_w );
-WRITE8_HANDLER( via_6_porta_w );
-WRITE8_HANDLER( via_7_porta_w );
+READ8_DEVICE_HANDLER(via_ca2_r);
+WRITE8_DEVICE_HANDLER(via_ca2_w);
 
-WRITE8_HANDLER( via_0_portb_w );
-WRITE8_HANDLER( via_1_portb_w );
-WRITE8_HANDLER( via_2_portb_w );
-WRITE8_HANDLER( via_3_portb_w );
-WRITE8_HANDLER( via_4_portb_w );
-WRITE8_HANDLER( via_5_portb_w );
-WRITE8_HANDLER( via_6_portb_w );
-WRITE8_HANDLER( via_7_portb_w );
+READ8_DEVICE_HANDLER(via_cb1_r);
+WRITE8_DEVICE_HANDLER(via_cb1_w);
 
-READ8_HANDLER( via_0_porta_r );
-READ8_HANDLER( via_1_porta_r );
-READ8_HANDLER( via_2_porta_r );
-READ8_HANDLER( via_3_porta_r );
-READ8_HANDLER( via_4_porta_r );
-READ8_HANDLER( via_5_porta_r );
-READ8_HANDLER( via_6_porta_r );
-READ8_HANDLER( via_7_porta_r );
-
-READ8_HANDLER( via_0_portb_r );
-READ8_HANDLER( via_1_portb_r );
-READ8_HANDLER( via_2_portb_r );
-READ8_HANDLER( via_3_portb_r );
-READ8_HANDLER( via_4_portb_r );
-READ8_HANDLER( via_5_portb_r );
-READ8_HANDLER( via_6_portb_r );
-READ8_HANDLER( via_7_portb_r );
-
-/******************* 1-bit CA1/CA2/CB1/CB2 port interfaces *******************/
-
-WRITE8_HANDLER( via_0_ca1_w );
-WRITE8_HANDLER( via_1_ca1_w );
-WRITE8_HANDLER( via_2_ca1_w );
-WRITE8_HANDLER( via_3_ca1_w );
-WRITE8_HANDLER( via_4_ca1_w );
-WRITE8_HANDLER( via_5_ca1_w );
-WRITE8_HANDLER( via_6_ca1_w );
-WRITE8_HANDLER( via_7_ca1_w );
-WRITE8_HANDLER( via_0_ca2_w );
-WRITE8_HANDLER( via_1_ca2_w );
-WRITE8_HANDLER( via_2_ca2_w );
-WRITE8_HANDLER( via_3_ca2_w );
-WRITE8_HANDLER( via_4_ca2_w );
-WRITE8_HANDLER( via_5_ca2_w );
-WRITE8_HANDLER( via_6_ca2_w );
-WRITE8_HANDLER( via_7_ca2_w );
-
-WRITE8_HANDLER( via_0_cb1_w );
-WRITE8_HANDLER( via_1_cb1_w );
-WRITE8_HANDLER( via_2_cb1_w );
-WRITE8_HANDLER( via_3_cb1_w );
-WRITE8_HANDLER( via_4_cb1_w );
-WRITE8_HANDLER( via_5_cb1_w );
-WRITE8_HANDLER( via_6_cb1_w );
-WRITE8_HANDLER( via_7_cb1_w );
-WRITE8_HANDLER( via_0_cb2_w );
-WRITE8_HANDLER( via_1_cb2_w );
-WRITE8_HANDLER( via_2_cb2_w );
-WRITE8_HANDLER( via_3_cb2_w );
-WRITE8_HANDLER( via_4_cb2_w );
-WRITE8_HANDLER( via_5_cb2_w );
-WRITE8_HANDLER( via_6_cb2_w );
-WRITE8_HANDLER( via_7_cb2_w );
-
-READ8_HANDLER( via_0_ca1_r );
-READ8_HANDLER( via_1_ca1_r );
-READ8_HANDLER( via_2_ca1_r );
-READ8_HANDLER( via_3_ca1_r );
-READ8_HANDLER( via_4_ca1_r );
-READ8_HANDLER( via_5_ca1_r );
-READ8_HANDLER( via_6_ca1_r );
-READ8_HANDLER( via_7_ca1_r );
-READ8_HANDLER( via_0_ca2_r );
-READ8_HANDLER( via_1_ca2_r );
-READ8_HANDLER( via_2_ca2_r );
-READ8_HANDLER( via_3_ca2_r );
-READ8_HANDLER( via_4_ca2_r );
-READ8_HANDLER( via_5_ca2_r );
-READ8_HANDLER( via_6_ca2_r );
-READ8_HANDLER( via_7_ca2_r );
-
-READ8_HANDLER( via_0_cb1_r );
-READ8_HANDLER( via_1_cb1_r );
-READ8_HANDLER( via_2_cb1_r );
-READ8_HANDLER( via_3_cb1_r );
-READ8_HANDLER( via_4_cb1_r );
-READ8_HANDLER( via_5_cb1_r );
-READ8_HANDLER( via_6_cb1_r );
-READ8_HANDLER( via_7_cb1_r );
-READ8_HANDLER( via_0_cb2_r );
-READ8_HANDLER( via_1_cb2_r );
-READ8_HANDLER( via_2_cb2_r );
-READ8_HANDLER( via_3_cb2_r );
-READ8_HANDLER( via_4_cb2_r );
-READ8_HANDLER( via_5_cb2_r );
-READ8_HANDLER( via_6_cb2_r );
-READ8_HANDLER( via_7_cb2_r );
+READ8_DEVICE_HANDLER(via_cb2_r);
+WRITE8_DEVICE_HANDLER(via_cb2_w);
 
 #endif /* __6522VIA_H__ */

@@ -23,7 +23,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "6522via.h"
 
 
@@ -43,8 +42,6 @@
 typedef struct _via6522_t via6522_t;
 struct _via6522_t
 {
-	const via6522_interface *intf;
-
 	UINT8 in_a;
 	UINT8 in_ca1;
 	UINT8 in_ca2;
@@ -80,6 +77,8 @@ struct _via6522_t
 	emu_timer *t2;
 	attotime time2;
 	UINT8 t2_active;
+
+	emu_timer *shift_timer;
 	UINT8 shift_counter;
 
 	int clock;
@@ -148,50 +147,74 @@ struct _via6522_t
 #define INT_T1	0x40
 #define INT_ANY	0x80
 
-#define CLR_PA_INT(v, which)	via_clear_int (machine, which, INT_CA1 | ((!CA2_IND_IRQ(v->pcr)) ? INT_CA2: 0))
-#define CLR_PB_INT(v, which)	via_clear_int (machine, which, INT_CB1 | ((!CB2_IND_IRQ(v->pcr)) ? INT_CB2: 0))
+#define CLR_PA_INT(device)	via_clear_int (device, INT_CA1 | ((!CA2_IND_IRQ(get_token(device)->pcr)) ? INT_CA2: 0))
+#define CLR_PB_INT(device)	via_clear_int (device, INT_CB1 | ((!CB2_IND_IRQ(get_token(device)->pcr)) ? INT_CB2: 0))
 
 #define IFR_DELAY 3
 
 #define TIMER1_VALUE(v) (v->t1ll+(v->t1lh<<8))
 #define TIMER2_VALUE(v) (v->t2ll+(v->t2lh<<8))
 
-/******************* static variables *******************/
-
-static via6522_t via[MAX_VIA];
-
-
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
 
 static TIMER_CALLBACK( via_shift_callback );
+static TIMER_CALLBACK( via_t1_timeout );
+static TIMER_CALLBACK( via_t2_timeout );
 
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE attotime v_cycles_to_time(via6522_t *v, int c)
+INLINE via6522_t *get_token(const device_config *device)
 {
+	assert(device != NULL);
+	assert((device->type == VIA6522));
+	return (via6522_t *) device->token;
+}
+
+
+INLINE const via6522_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == VIA6522));
+	return (const via6522_interface *) device->static_config;
+}
+
+
+INLINE const via6522_inline_config *get_inline_config(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == VIA6522));
+	return (const via6522_inline_config *) device->inline_config;
+}
+
+
+INLINE attotime v_cycles_to_time(const device_config *device, int c)
+{
+	via6522_t *v = get_token(device);
 	return attotime_mul(ATTOTIME_IN_HZ(v->clock), c);
 }
 
 
-INLINE UINT32 v_time_to_cycles(via6522_t *v, attotime t)
+INLINE UINT32 v_time_to_cycles(const device_config *device, attotime t)
 {
+	via6522_t *v = get_token(device);
 	return attotime_to_double(attotime_mul(t, v->clock));
 }
 
 
-INLINE UINT16 v_get_counter1_value(via6522_t *v)
+INLINE UINT16 v_get_counter1_value(const device_config *device)
 {
+	via6522_t *v = get_token(device);
 	UINT16 val;
 
 	if (v->t1_active) {
-		val = v_time_to_cycles(v, timer_timeleft(v->t1)) - IFR_DELAY;
+		val = v_time_to_cycles(device, timer_timeleft(v->t1)) - IFR_DELAY;
 	} else {
-		val = 0xFFFF - v_time_to_cycles(v, attotime_sub(timer_get_time(Machine), v->time1));
+		val = 0xFFFF - v_time_to_cycles(device, attotime_sub(timer_get_time(device->machine), v->time1));
 	}
 	return val;
 }
@@ -202,32 +225,29 @@ INLINE UINT16 v_get_counter1_value(via6522_t *v)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    via_set_clock
+    DEVICE_START( via6522 )
 -------------------------------------------------*/
 
-void via_set_clock(int which,int clock)
+static DEVICE_START( via6522 )
 {
-	via[which].clock = clock;
-}
+	via6522_t *v = get_token(device);
+	const via6522_inline_config *inline_config = get_inline_config(device);
 
-
-/*-------------------------------------------------
-    via_config
--------------------------------------------------*/
-
-void via_config(int which, const via6522_interface *intf)
-{
-	assert(which < MAX_VIA);
-
-	via[which].intf = intf;
-	via[which].t1ll = 0xf3; /* via at 0x9110 in vic20 show these values */
-	via[which].t1lh = 0xb5; /* ports are not written by kernel! */
-	via[which].t2ll = 0xff; /* taken from vice */
-	via[which].t2lh = 0xff;
-	via[which].time2 = via[which].time1 = timer_get_time(Machine);
+	memset(v, 0, sizeof(*v));
+	v->t1ll = 0xf3; /* via at 0x9110 in vic20 show these values */
+	v->t1lh = 0xb5; /* ports are not written by kernel! */
+	v->t2ll = 0xff; /* taken from vice */
+	v->t2lh = 0xff;
+	v->time2 = v->time1 = timer_get_time(device->machine);
+	v->t1 = timer_alloc(device->machine, via_t1_timeout, (void *) device);
+	v->t2 = timer_alloc(device->machine, via_t2_timeout, (void *) device);
+	v->shift_timer = timer_alloc(device->machine, via_shift_callback, (void *) device);
 
 	/* Default clock is from CPU1 */
-	via_set_clock (which, cpu_get_clock(Machine->cpu[0]));
+	v->clock = (inline_config != NULL) && (inline_config->clck != 0)
+		? inline_config->clck
+		: cpu_get_clock(device->machine->cpu[0]);
+	return DEVICE_START_OK;
 }
 
 
@@ -235,22 +255,22 @@ void via_config(int which, const via6522_interface *intf)
     via_set_int - external interrupt check
 -------------------------------------------------*/
 
-static void via_set_int (running_machine *machine, int which, int data)
+static void via_set_int (const device_config *device, int data)
 {
-	via6522_t *v = via + which;
-
+	via6522_t *v = get_token(device);
+	const via6522_interface *intf = get_interface(device);
 
 	v->ifr |= data;
 	if (TRACE_VIA)
-		logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), which, v->ifr);
+		logerror("%s:6522VIA chip %s: IFR = %02X\n", cpuexec_describe_context(device->machine), device->tag, v->ifr);
 
 	if (v->ier & v->ifr)
     {
 		v->ifr |= INT_ANY;
-		if (v->intf->irq_func)
-			(*v->intf->irq_func)(machine, ASSERT_LINE);
+		if (intf->irq_func)
+			(*intf->irq_func)(device, ASSERT_LINE);
 		else
-			logerror("%s:6522VIA chip %d: Interrupt is asserted but there is no callback function\n", cpuexec_describe_context(machine), which);
+			logerror("%s:6522VIA chip %s: Interrupt is asserted but there is no callback function\n", cpuexec_describe_context(device->machine), device->tag);
     }
 }
 
@@ -259,24 +279,24 @@ static void via_set_int (running_machine *machine, int which, int data)
     via_clear_int - external interrupt check
 -------------------------------------------------*/
 
-static void via_clear_int (running_machine *machine, int which, int data)
+static void via_clear_int (const device_config *device, int data)
 {
-	via6522_t *v = via + which;
-
+	via6522_t *v = get_token(device);
+	const via6522_interface *intf = get_interface(device);
 
 	v->ifr = (v->ifr & ~data) & 0x7f;
 
 	if (TRACE_VIA)
-		logerror("%s:6522VIA chip %d: IFR = %02X\n", cpuexec_describe_context(machine), which, v->ifr);
+		logerror("%s:6522VIA chip %s: IFR = %02X\n", cpuexec_describe_context(device->machine), device->tag, v->ifr);
 
 	if (v->ifr & v->ier)
 		v->ifr |= INT_ANY;
 	else
 	{
-		if (v->intf->irq_func)
-			(*v->intf->irq_func)(machine, CLEAR_LINE);
+		if (intf->irq_func)
+			(*intf->irq_func)(device, CLEAR_LINE);
 //      else
-//          logerror("%s:6522VIA chip %d: Interrupt is cleared but there is no callback function\n", cpuexec_describe_context(machine), which);
+//          logerror("%s:6522VIA chip %s: Interrupt is cleared but there is no callback function\n", cpuexec_describe_context(device->machine), device->tag);
 	}
 }
 
@@ -285,36 +305,35 @@ static void via_clear_int (running_machine *machine, int which, int data)
     via_shift
 -------------------------------------------------*/
 
-static void via_shift(running_machine *machine, int which)
+static void via_shift(const device_config *device)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	via6522_t *v = via + which;
+	via6522_t *v = get_token(device);
+	const via6522_interface *intf = get_interface(device);
 
 	if (SO_O2_CONTROL(v->acr))
 	{
 		v->out_cb2 = (v->sr >> 7) & 1;
 		v->sr =  (v->sr << 1) | v->out_cb2;
 
-		if (v->intf->out_cb2_func)
-			v->intf->out_cb2_func(space, 0, v->out_cb2);
+		if (intf->out_cb2_func)
+			(*intf->out_cb2_func)(device, 0, v->out_cb2);
 
 		v->in_cb1=1;
-		if (v->intf->out_cb1_func)
+		if (intf->out_cb1_func)
 		{
 			/* this should be one cycle wide */
-			v->intf->out_cb1_func(space, 0, 0);
-			v->intf->out_cb1_func(space, 0, 1);
+			(*intf->out_cb1_func)(device, 0, 0);
+			(*intf->out_cb1_func)(device, 0, 1);
 		}
 
 		v->shift_counter = (v->shift_counter + 1) % 8;
 
 		if (v->shift_counter)
-			timer_set(machine, v_cycles_to_time(v, 2), NULL, which, via_shift_callback);
+			timer_adjust_oneshot(v->shift_timer, v_cycles_to_time(device, 2), 0);
 		else
 		{
 			if (!(v->ifr & INT_SR))
-				via_set_int(machine, which, INT_SR);
+				via_set_int(device, INT_SR);
 		}
 	}
 	if (SO_EXT_CONTROL(v->acr))
@@ -322,21 +341,21 @@ static void via_shift(running_machine *machine, int which)
 		v->out_cb2 = (v->sr >> 7) & 1;
 		v->sr =  (v->sr << 1) | v->out_cb2;
 
-		if (v->intf->out_cb2_func)
-			v->intf->out_cb2_func(space, 0, v->out_cb2);
+		if (intf->out_cb2_func)
+			(*intf->out_cb2_func)(device, 0, v->out_cb2);
 
 		v->shift_counter = (v->shift_counter + 1) % 8;
 
 		if (v->shift_counter == 0)
 		{
 			if (!(v->ifr & INT_SR))
-				via_set_int(machine, which, INT_SR);
+				via_set_int(device, INT_SR);
 		}
 	}
 	if (SI_EXT_CONTROL(v->acr))
 	{
-		if (v->intf->in_cb2_func)
-			v->in_cb2 = v->intf->in_cb2_func(space, 0);
+		if (intf->in_cb2_func)
+			v->in_cb2 = (*intf->in_cb2_func)(device, 0);
 
 		v->sr =  (v->sr << 1) | (v->in_cb2 & 1);
 
@@ -346,7 +365,7 @@ static void via_shift(running_machine *machine, int which)
 		{
 			if (!(v->ifr & INT_SR))
 			{
-				via_set_int(machine, which, INT_SR);
+				via_set_int(device, INT_SR);
 			}
 		}
 	}
@@ -359,7 +378,8 @@ static void via_shift(running_machine *machine, int which)
 
 static TIMER_CALLBACK( via_shift_callback )
 {
-	via_shift(machine, param);
+	const device_config *device = ptr;
+	via_shift(device);
 }
 
 
@@ -369,37 +389,35 @@ static TIMER_CALLBACK( via_shift_callback )
 
 static TIMER_CALLBACK( via_t1_timeout )
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	int which = param;
-	via6522_t *v = via + which;
-
+	const device_config *device = ptr;
+	via6522_t *v = get_token(device);
+	const via6522_interface *intf = get_interface(device);
 
 	if (T1_CONTINUOUS (v->acr))
     {
 		if (T1_SET_PB7(v->acr))
 			v->out_b ^= 0x80;
-		timer_adjust_oneshot(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which);
+		timer_adjust_oneshot(v->t1, v_cycles_to_time(device, TIMER1_VALUE(v) + IFR_DELAY), 0);
     }
 	else
     {
 		if (T1_SET_PB7(v->acr))
 			v->out_b |= 0x80;
 		v->t1_active = 0;
-		v->time1 = timer_get_time(machine);
+		v->time1 = timer_get_time(device->machine);
     }
 	if (v->ddr_b)
 	{
 		UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
-		if (v->intf->out_b_func)
-			v->intf->out_b_func(space, 0, write_data);
+		if (intf->out_b_func)
+			(*intf->out_b_func)(device, 0, write_data);
 		else
-			logerror("%s:6522VIA chip %d: Port B is being written to but has no handler. %02X\n", cpuexec_describe_context(machine), which, write_data);
+			logerror("%s:6522VIA chip %s: Port B is being written to but has no handler. %02X\n", cpuexec_describe_context(device->machine), device->tag, write_data);
 	}
 
 	if (!(v->ifr & INT_T1))
-		via_set_int (machine, which, INT_T1);
+		via_set_int (device, INT_T1);
 }
 
 
@@ -409,58 +427,61 @@ static TIMER_CALLBACK( via_t1_timeout )
 
 static TIMER_CALLBACK( via_t2_timeout )
 {
-	int which = param;
-	via6522_t *v = via + which;
+	const device_config *device = ptr;
+	via6522_t *v = get_token(device);
 
 	v->t2_active = 0;
-	v->time2 = timer_get_time(machine);
+	v->time2 = timer_get_time(device->machine);
 
 	if (!(v->ifr & INT_T2))
-		via_set_int (machine, which, INT_T2);
+		via_set_int (device, INT_T2);
 }
 
 
 /*-------------------------------------------------
-    via_reset
+    DEVICE_RESET( via6522 )
 -------------------------------------------------*/
 
-void via_reset(void)
+static DEVICE_RESET( via6522 )
 {
-	int i;
-	via6522_t v;
+	via6522_t *v = get_token(device);
+	v->in_a = 0;
+	v->in_ca1 = 0;
+	v->in_ca2 = 0;
+	v->out_a = 0;
+	v->out_ca2 = 0;
+	v->ddr_a = 0;
+	v->in_b = 0;
+	v->in_cb1 = 0;
+	v->in_cb2 = 0;
+	v->out_b = 0;
+	v->out_cb2 = 0;
+	v->ddr_b = 0;
 
-	memset(&v, 0, sizeof(v));
+	v->t1cl = 0;
+	v->t1ch = 0;
+	v->t2cl = 0;
+	v->t2ch = 0;
 
-	for (i = 0; i < MAX_VIA; i++)
-    {
-		v.intf = via[i].intf;
-		v.t1ll = via[i].t1ll;
-		v.t1lh = via[i].t1lh;
-		v.t2ll = via[i].t2ll;
-		v.t2lh = via[i].t2lh;
-		v.time1 = via[i].time1;
-		v.time2 = via[i].time2;
-		v.clock = via[i].clock;
-
-		v.t1 = timer_alloc(Machine, via_t1_timeout, NULL);
-		v.t1_active = 0;
-		v.t2 = timer_alloc(Machine, via_t2_timeout, NULL);
-		v.t2_active = 0;
-
-		via[i] = v;
-    }
+	v->sr = 0;
+	v->pcr = 0;
+	v->acr = 0;
+	v->ier = 0;
+	v->ifr = 0;
+	v->t1_active = 0;
+	v->t2_active = 0;
+	v->shift_counter = 0;
 }
 
 
 /*-------------------------------------------------
-    via_read - CPU interface for VIA read
+    via_r - CPU interface for VIA read
 -------------------------------------------------*/
 
-int via_read(running_machine *machine, int which, int offset)
+READ8_DEVICE_HANDLER(via_r)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	via6522_t *v = via + which;
+	via6522_t *v = get_token(device);
+	const via6522_interface *intf = get_interface(device);
 	int val = 0;
 
 	offset &= 0xf;
@@ -471,13 +492,13 @@ int via_read(running_machine *machine, int which, int offset)
 		/* update the input */
 		if (PB_LATCH_ENABLE(v->acr) == 0)
 		{
-			if (v->intf->in_b_func)
-				v->in_b = v->intf->in_b_func(space, 0);
+			if (intf->in_b_func)
+				v->in_b = (*intf->in_b_func)(device, 0);
 			else
-				logerror("%s:6522VIA chip %d: Port B is being read but has no handler\n", cpuexec_describe_context(machine), which);
+				logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 		}
 
-		CLR_PB_INT(v, which);
+		CLR_PB_INT(device);
 
 		/* combine input and output values, hold DDRB bit 7 high if T1_SET_PB7 */
 		if (T1_SET_PB7(v->acr))
@@ -490,16 +511,16 @@ int via_read(running_machine *machine, int which, int offset)
 		/* update the input */
 		if (PA_LATCH_ENABLE(v->acr) == 0)
 		{
-			if (v->intf->in_a_func)
-				v->in_a = v->intf->in_a_func(space, 0);
+			if (intf->in_a_func)
+				v->in_a = (*intf->in_a_func)(device, 0);
 			else
-				logerror("%s:6522VIA chip %d: Port A is being read but has no handler\n", cpuexec_describe_context(machine), which);
+				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 		}
 
 		/* combine input and output values */
 		val = (v->out_a & v->ddr_a) + (v->in_a & ~v->ddr_a);
 
-		CLR_PA_INT(v, which);
+		CLR_PA_INT(device);
 
 		/* If CA2 is configured as output and in pulse or handshake mode,
            CA2 is set now */
@@ -511,10 +532,10 @@ int via_read(running_machine *machine, int which, int offset)
 				v->out_ca2 = 0;
 
 				/* call the CA2 output function */
-				if (v->intf->out_ca2_func)
-					v->intf->out_ca2_func(space, 0, 0);
+				if (intf->out_ca2_func)
+					(*intf->out_ca2_func)(device, 0, 0);
 				else
-					logerror("%s:6522VIA chip %d: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 0);
+					logerror("%s:6522VIA chip %s: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, 0);
 			}
 		}
 
@@ -524,10 +545,10 @@ int via_read(running_machine *machine, int which, int offset)
 		/* update the input */
 		if (PA_LATCH_ENABLE(v->acr) == 0)
 		{
-			if (v->intf->in_a_func)
-				v->in_a = v->intf->in_a_func(space, 0);
+			if (intf->in_a_func)
+				v->in_a = (*intf->in_a_func)(device, 0);
 			else
-				logerror("%s:6522VIA chip %d: Port A is being read but has no handler\n", cpuexec_describe_context(machine), which);
+				logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 		}
 
 		/* combine input and output values */
@@ -543,12 +564,12 @@ int via_read(running_machine *machine, int which, int offset)
 		break;
 
     case VIA_T1CL:
-		via_clear_int (machine, which, INT_T1);
-		val = v_get_counter1_value(v) & 0xFF;
+		via_clear_int (device, INT_T1);
+		val = v_get_counter1_value(device) & 0xFF;
 		break;
 
     case VIA_T1CH:
-		val = v_get_counter1_value(v) >> 8;
+		val = v_get_counter1_value(device) >> 8;
 		break;
 
     case VIA_T1LL:
@@ -560,37 +581,37 @@ int via_read(running_machine *machine, int which, int offset)
 		break;
 
     case VIA_T2CL:
-		via_clear_int (machine, which, INT_T2);
+		via_clear_int (device, INT_T2);
 		if (v->t2_active)
-			val = v_time_to_cycles(v, timer_timeleft(v->t2)) & 0xff;
+			val = v_time_to_cycles(device, timer_timeleft(v->t2)) & 0xff;
 		else
 		{
 			if (T2_COUNT_PB6(v->acr))
 				val = v->t2cl;
 			else
-				val = (0x10000- (v_time_to_cycles(v, attotime_sub(timer_get_time(machine), v->time2)) & 0xffff) - 1) & 0xff;
+				val = (0x10000- (v_time_to_cycles(device, attotime_sub(timer_get_time(device->machine), v->time2)) & 0xffff) - 1) & 0xff;
 		}
 		break;
 
     case VIA_T2CH:
 		if (v->t2_active)
-			val = v_time_to_cycles(v, timer_timeleft(v->t2)) >> 8;
+			val = v_time_to_cycles(device, timer_timeleft(v->t2)) >> 8;
 		else
 		{
 			if (T2_COUNT_PB6(v->acr))
 				val = v->t2ch;
 			else
-				val = (0x10000- (v_time_to_cycles(v, attotime_sub(timer_get_time(machine), v->time2)) & 0xffff) - 1) >> 8;
+				val = (0x10000- (v_time_to_cycles(device, attotime_sub(timer_get_time(device->machine), v->time2)) & 0xffff) - 1) >> 8;
 		}
 		break;
 
     case VIA_SR:
 		val = v->sr;
-		via_clear_int(machine, which, INT_SR);
+		via_clear_int(device, INT_SR);
 		if (SO_O2_CONTROL(v->acr))
 		{
 			v->shift_counter=0;
-			timer_set(machine, v_cycles_to_time(v, 2), NULL, which,via_shift_callback);
+			timer_adjust_oneshot(v->shift_timer, v_cycles_to_time(device, 2), 0);
 		}
 		break;
 
@@ -615,14 +636,13 @@ int via_read(running_machine *machine, int which, int offset)
 
 
 /*-------------------------------------------------
-    via_write - CPU interface for VIA write
+    via_w - CPU interface for VIA write
 -------------------------------------------------*/
 
-void via_write(running_machine *machine, int which, int offset, int data)
+WRITE8_DEVICE_HANDLER(via_w)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	via6522_t *v = via + which;
+	via6522_t *v = get_token(device);
+	const via6522_interface *intf = get_interface(device);
 
 	offset &=0x0f;
 
@@ -638,13 +658,13 @@ void via_write(running_machine *machine, int which, int offset, int data)
 		{
 			UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
-			if (v->intf->out_b_func)
-				v->intf->out_b_func(space, 0, write_data);
+			if (intf->out_b_func)
+				(*intf->out_b_func)(device, 0, write_data);
 			else
-				logerror("%s:6522VIA chip %d: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
+				logerror("%s:6522VIA chip %s: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, write_data);
 		}
 
-		CLR_PB_INT(v, which);
+		CLR_PB_INT(device);
 
 		/* If CB2 is configured as output and in pulse or handshake mode,
            CB2 is set now */
@@ -656,10 +676,10 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				v->out_cb2 = 0;
 
 				/* call the CB2 output function */
-				if (v->intf->out_cb2_func)
-					v->intf->out_cb2_func(space, 0, 0);
+				if (intf->out_cb2_func)
+					(*intf->out_cb2_func)(device, 0, 0);
 				else
-					logerror("%s:6522VIA chip %d: Port CB2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 0);
+					logerror("%s:6522VIA chip %s: Port CB2 is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, 0);
 			}
 		}
 		break;
@@ -671,26 +691,26 @@ void via_write(running_machine *machine, int which, int offset, int data)
 		{
 			UINT8 write_data = (v->out_a & v->ddr_a) | (v->ddr_a ^ 0xff);
 
-			if (v->intf->out_a_func)
-				v->intf->out_a_func(space, 0, write_data);
+			if (intf->out_a_func)
+				(*intf->out_a_func)(device, 0, write_data);
 			else
-				logerror("%s:6522VIA chip %d: Port A is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
+				logerror("%s:6522VIA chip %s: Port A is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, write_data);
 		}
 
-		CLR_PA_INT(v, which);
+		CLR_PA_INT(device);
 
 		/* If CA2 is configured as output and in pulse or handshake mode,
            CA2 is set now */
 		if (CA2_PULSE_OUTPUT(v->pcr))
 		{
 			/* call the CA2 output function */
-			if (v->intf->out_ca2_func)
+			if (intf->out_ca2_func)
 			{
-				v->intf->out_ca2_func(space, 0, 0);
-				v->intf->out_ca2_func(space, 0, 1);
+				(*intf->out_ca2_func)(device, 0, 0);
+				(*intf->out_ca2_func)(device, 0, 1);
 			}
 			else
-				logerror("%s:6522VIA chip %d: Port CA2 is being pulsed but has no handler\n", cpuexec_describe_context(machine), which);
+				logerror("%s:6522VIA chip %s: Port CA2 is being pulsed but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 
 			/* set CA2 (shouldn't be needed) */
 			v->out_ca2 = 1;
@@ -703,10 +723,10 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				v->out_ca2 = 0;
 
 				/* call the CA2 output function */
-				if (v->intf->out_ca2_func)
-					v->intf->out_ca2_func(space, 0, 0);
+				if (intf->out_ca2_func)
+					(*intf->out_ca2_func)(device, 0, 0);
 				else
-					logerror("%s:6522VIA chip %d: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 0);
+					logerror("%s:6522VIA chip %s: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, 0);
 			}
 		}
 
@@ -719,10 +739,10 @@ void via_write(running_machine *machine, int which, int offset, int data)
 		{
 			UINT8 write_data = (v->out_a & v->ddr_a) | (v->ddr_a ^ 0xff);
 
-			if (v->intf->out_a_func)
-				v->intf->out_a_func(space, 0, write_data);
+			if (intf->out_a_func)
+				(*intf->out_a_func)(device, 0, write_data);
 			else
-				logerror("%s:6522VIA chip %d: Port A is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
+				logerror("%s:6522VIA chip %s: Port A is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, write_data);
 		}
 
 		break;
@@ -737,10 +757,10 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			{
 				UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
-				if (v->intf->out_b_func)
-					v->intf->out_b_func(space, 0, write_data);
+				if (intf->out_b_func)
+					(*intf->out_b_func)(device, 0, write_data);
 				else
-					logerror("%s:6522VIA chip %d: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
+					logerror("%s:6522VIA chip %s: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, write_data);
 			}
 		}
 		break;
@@ -755,10 +775,10 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			{
 				UINT8 write_data = (v->out_a & v->ddr_a) | (v->ddr_a ^ 0xff);
 
-				if (v->intf->out_a_func)
-					v->intf->out_a_func(space, 0, write_data);
+				if (intf->out_a_func)
+					(*intf->out_a_func)(device, 0, write_data);
 				else
-					logerror("%s:6522VIA chip %d: Port A is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
+					logerror("%s:6522VIA chip %s: Port A is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, write_data);
 			}
 		}
 		break;
@@ -770,14 +790,14 @@ void via_write(running_machine *machine, int which, int offset, int data)
 
 	case VIA_T1LH:
 	    v->t1lh = data;
-	    via_clear_int (machine, which, INT_T1);
+	    via_clear_int (device, INT_T1);
 	    break;
 
     case VIA_T1CH:
 		v->t1ch = v->t1lh = data;
 		v->t1cl = v->t1ll;
 
-		via_clear_int (machine, which, INT_T1);
+		via_clear_int (device, INT_T1);
 
 		if (T1_SET_PB7(v->acr))
 		{
@@ -787,13 +807,13 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			{
 				UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
-				if (v->intf->out_b_func)
-					v->intf->out_b_func(space, 0, write_data);
+				if (intf->out_b_func)
+					(*intf->out_b_func)(device, 0, write_data);
 				else
-					logerror("%s:6522VIA chip %d: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
+					logerror("%s:6522VIA chip %s: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, write_data);
 			}
 		}
-		timer_adjust_oneshot(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which);
+		timer_adjust_oneshot(v->t1, v_cycles_to_time(device, TIMER1_VALUE(v) + IFR_DELAY), 0);
 		v->t1_active = 1;
 		break;
 
@@ -805,26 +825,26 @@ void via_write(running_machine *machine, int which, int offset, int data)
 		v->t2ch = v->t2lh = data;
 		v->t2cl = v->t2ll;
 
-		via_clear_int (machine, which, INT_T2);
+		via_clear_int (device, INT_T2);
 
 		if (!T2_COUNT_PB6(v->acr))
 		{
-			timer_adjust_oneshot(v->t2, v_cycles_to_time(v, TIMER2_VALUE(v) + IFR_DELAY), which);
+			timer_adjust_oneshot(v->t2, v_cycles_to_time(device, TIMER2_VALUE(v) + IFR_DELAY), 0);
 			v->t2_active = 1;
 		}
 		else
 		{
-			v->time2 = timer_get_time(machine);
+			v->time2 = timer_get_time(device->machine);
 		}
 		break;
 
     case VIA_SR:
 		v->sr = data;
 		v->shift_counter=0;
-		via_clear_int(machine, which, INT_SR);
+		via_clear_int(device, INT_SR);
 		if (SO_O2_CONTROL(v->acr))
 		{
-			timer_set(machine, v_cycles_to_time(v, 2), NULL, which, via_shift_callback);
+			timer_set(device->machine, v_cycles_to_time(device, 2), (void *) device, 0, via_shift_callback);
 		}
 		break;
 
@@ -832,30 +852,30 @@ void via_write(running_machine *machine, int which, int offset, int data)
 		v->pcr = data;
 
 		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %d: PCR = %02X\n", cpuexec_describe_context(machine), which, data);
+			logerror("%s:6522VIA chip %s: PCR = %02X\n", cpuexec_describe_context(device->machine), device->tag, data);
 
 		if (CA2_FIX_OUTPUT(data) && CA2_OUTPUT_LEVEL(data) ^ v->out_ca2)
 		{
 			v->out_ca2 = CA2_OUTPUT_LEVEL(data);
-			if (v->intf->out_ca2_func)
-				v->intf->out_ca2_func(space, 0, v->out_ca2);
+			if (intf->out_ca2_func)
+				(*intf->out_ca2_func)(device, 0, v->out_ca2);
 			else
-				logerror("%s:6522VIA chip %d: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, v->out_ca2);
+				logerror("%s:6522VIA chip %s: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, v->out_ca2);
 		}
 
 		if (CB2_FIX_OUTPUT(data) && CB2_OUTPUT_LEVEL(data) ^ v->out_cb2)
 		{
 			v->out_cb2 = CB2_OUTPUT_LEVEL(data);
-			if (v->intf->out_cb2_func)
-				v->intf->out_cb2_func(space, 0, v->out_cb2);
+			if (intf->out_cb2_func)
+				(*intf->out_cb2_func)(device, 0, v->out_cb2);
 			else
-				logerror("%s:6522VIA chip %d: Port CB2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, v->out_cb2);
+				logerror("%s:6522VIA chip %s: Port CB2 is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, v->out_cb2);
 		}
 		break;
 
     case VIA_ACR:
 		{
-			UINT16 counter1 = v_get_counter1_value(v);
+			UINT16 counter1 = v_get_counter1_value(device);
 			v->acr = data;
 			if (T1_SET_PB7(v->acr))
 			{
@@ -868,15 +888,15 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				{
 					UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
-					if (v->intf->out_b_func)
-						v->intf->out_b_func(space, 0, write_data);
+					if (intf->out_b_func)
+						(*intf->out_b_func)(device, 0, write_data);
 					else
-						logerror("%s:6522VIA chip %d: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, write_data);
+						logerror("%s:6522VIA chip %s: Port B is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, write_data);
 				}
 			}
 			if (T1_CONTINUOUS(data))
 			{
-				timer_adjust_oneshot(v->t1, v_cycles_to_time(v, counter1 + IFR_DELAY), which);
+				timer_adjust_oneshot(v->t1, v_cycles_to_time(device, counter1 + IFR_DELAY), 0);
 				v->t1_active = 1;
 			}
 		}
@@ -893,10 +913,10 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			if (((v->ifr & v->ier) & 0x7f) == 0)
 			{
 				v->ifr &= ~INT_ANY;
-				if (v->intf->irq_func)
-					(*v->intf->irq_func)(machine, CLEAR_LINE);
+				if (intf->irq_func)
+					(*intf->irq_func)(device, CLEAR_LINE);
 //              else
-//                  logerror("%s:6522VIA chip %d: Interrupt is cleared but there is no callback function\n", cpuexec_describe_context(machine), which);
+//                  logerror("%s:6522VIA chip %s: Interrupt is cleared but there is no callback function\n", cpuexec_describe_context(device->machine), device->tag);
 			}
 		}
 		else
@@ -904,10 +924,10 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			if ((v->ier & v->ifr) & 0x7f)
 			{
 				v->ifr |= INT_ANY;
-				if (v->intf->irq_func)
-					(*v->intf->irq_func)(machine, ASSERT_LINE);
+				if (intf->irq_func)
+					(*intf->irq_func)(device, ASSERT_LINE);
 				else
-					logerror("%s:6522VIA chip %d: Interrupt is asserted but there is no callback function\n", cpuexec_describe_context(machine), which);
+					logerror("%s:6522VIA chip %s: Interrupt is asserted but there is no callback function\n", cpuexec_describe_context(device->machine), device->tag);
 			}
 		}
 		break;
@@ -915,20 +935,20 @@ void via_write(running_machine *machine, int which, int offset, int data)
 	case VIA_IFR:
 		if (data & INT_ANY)
 			data = 0x7f;
-		via_clear_int (machine, which, data);
+		via_clear_int (device, data);
 		break;
     }
 }
 
 
 /*-------------------------------------------------
-    via_set_input_a - interface setting VIA port
+    via_porta_w - interface setting VIA port
 	A input
 -------------------------------------------------*/
 
-void via_set_input_a(int which, int data)
+WRITE8_DEVICE_HANDLER(via_porta_w)
 {
-	via6522_t *v = via + which;
+	via6522_t *v = get_token(device);
 
 	/* set the input, what could be easier? */
 	v->in_a = data;
@@ -936,15 +956,26 @@ void via_set_input_a(int which, int data)
 
 
 /*-------------------------------------------------
-    via_set_input_ca1 - interface setting VIA port
+    via_ca1_r - interface retrieving VIA port
 	CA1 input
 -------------------------------------------------*/
 
-void via_set_input_ca1(running_machine *machine, int which, int data)
+READ8_DEVICE_HANDLER(via_ca1_r)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	via6522_t *v = via + which;
+	via6522_t *v = get_token(device);
+	return v->in_ca1;
+}
+
+
+/*-------------------------------------------------
+    via_ca1_w - interface setting VIA port
+	CA1 input
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(via_ca1_w)
+{
+	via6522_t *v = get_token(device);
+	const via6522_interface *intf = get_interface(device);
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
@@ -953,19 +984,19 @@ void via_set_input_ca1(running_machine *machine, int which, int data)
 	if (data != v->in_ca1)
     {
 		if (TRACE_VIA)
-			logerror("%s:6522VIA chip %d: CA1 = %02X\n", cpuexec_describe_context(machine), which, data);
+			logerror("%s:6522VIA chip %s: CA1 = %02X\n", cpuexec_describe_context(device->machine), device->tag, data);
 
 		if ((CA1_LOW_TO_HIGH(v->pcr) && data) || (CA1_HIGH_TO_LOW(v->pcr) && !data))
 		{
 			if (PA_LATCH_ENABLE(v->acr))
 			{
-				if (v->intf->in_a_func)
-					v->in_a = v->intf->in_a_func(space, 0);
+				if (intf->in_a_func)
+					v->in_a = (*intf->in_a_func)(device, 0);
 				else
-					logerror("%s:6522VIA chip %d: Port A is being read but has no handler\n", cpuexec_describe_context(machine), which);
+					logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 			}
 
-			via_set_int (machine, which, INT_CA1);
+			via_set_int (device, INT_CA1);
 
 			/* CA2 is configured as output and in pulse or handshake mode,
                CA2 is cleared now */
@@ -977,10 +1008,10 @@ void via_set_input_ca1(running_machine *machine, int which, int data)
 					v->out_ca2 = 1;
 
 					/* call the CA2 output function */
-					if (v->intf->out_ca2_func)
-						v->intf->out_ca2_func(space, 0, 1);
+					if (intf->out_ca2_func)
+						(*intf->out_ca2_func)(device, 0, 1);
 					else
-						logerror("%s:6522VIA chip %d: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 1);
+						logerror("%s:6522VIA chip %s: Port CA2 is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, 1);
 				}
 			}
 		}
@@ -991,13 +1022,25 @@ void via_set_input_ca1(running_machine *machine, int which, int data)
 
 
 /*-------------------------------------------------
-    via_set_input_ca2 - interface setting VIA port
+    via_ca2_r - interface retrieving VIA port
 	CA2 input
 -------------------------------------------------*/
 
-void via_set_input_ca2(running_machine *machine, int which, int data)
+READ8_DEVICE_HANDLER(via_ca2_r)
 {
-	via6522_t *v = via + which;
+	via6522_t *v = get_token(device);
+	return v->in_ca2;
+}
+
+
+/*-------------------------------------------------
+    via_ca2_w - interface setting VIA port
+	CA2 input
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(via_ca2_w)
+{
+	via6522_t *v = get_token(device);
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
@@ -1012,7 +1055,7 @@ void via_set_input_ca2(running_machine *machine, int which, int data)
 			if ((data && CA2_LOW_TO_HIGH(v->pcr)) || (!data && CA2_HIGH_TO_LOW(v->pcr)))
 			{
 				/* mark the IRQ */
-				via_set_int (machine, which, INT_CA2);
+				via_set_int (device, INT_CA2);
 			}
 			/* set the new value for CA2 */
 			v->in_ca2 = data;
@@ -1024,13 +1067,25 @@ void via_set_input_ca2(running_machine *machine, int which, int data)
 
 
 /*-------------------------------------------------
-    via_set_input_b - interface setting VIA port
+    via_portb_r - interface retrieving VIA port
 	B input
 -------------------------------------------------*/
 
-void via_set_input_b(int which, int data)
+READ8_DEVICE_HANDLER(via_portb_r)
 {
-	via6522_t *v = via + which;
+	via6522_t *v = get_token(device);
+	return v->in_b;
+}
+
+
+/*-------------------------------------------------
+    via_portb_w - interface setting VIA port
+	B input
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(via_portb_w)
+{
+	via6522_t *v = get_token(device);
 
 	/* set the input, what could be easier? */
 	v->in_b = data;
@@ -1038,15 +1093,26 @@ void via_set_input_b(int which, int data)
 
 
 /*-------------------------------------------------
-    via_set_input_cb1 - interface setting VIA port
+    via_cb1_r - interface retrieving VIA port
 	CB1 input
 -------------------------------------------------*/
 
-void via_set_input_cb1(running_machine *machine, int which, int data)
+READ8_DEVICE_HANDLER(via_cb1_r)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	via6522_t *v = via + which;
+	via6522_t *v = get_token(device);
+	return v->in_cb1;
+}
+
+
+/*-------------------------------------------------
+    via_cb1_w - interface setting VIA port
+	CB1 input
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(via_cb1_w)
+{
+	via6522_t *v = get_token(device);
+	const via6522_interface *intf = get_interface(device);
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
@@ -1058,15 +1124,15 @@ void via_set_input_cb1(running_machine *machine, int which, int data)
 		{
 			if (PB_LATCH_ENABLE(v->acr))
 			{
-				if (v->intf->in_b_func)
-					v->in_b = v->intf->in_b_func(space, 0);
+				if (intf->in_b_func)
+					v->in_b = (*intf->in_b_func)(device, 0);
 				else
-					logerror("%s:6522VIA chip %d: Port B is being read but has no handler\n", cpuexec_describe_context(machine), which);
+					logerror("%s:6522VIA chip %s: Port B is being read but has no handler\n", cpuexec_describe_context(device->machine), device->tag);
 			}
 			if (SO_EXT_CONTROL(v->acr) || SI_EXT_CONTROL(v->acr))
-				via_shift (machine, which);
+				via_shift (device);
 
-			via_set_int (machine, which, INT_CB1);
+			via_set_int (device, INT_CB1);
 
 			/* CB2 is configured as output and in pulse or handshake mode,
                CB2 is cleared now */
@@ -1078,10 +1144,10 @@ void via_set_input_cb1(running_machine *machine, int which, int data)
 					v->out_cb2 = 1;
 
 					/* call the CB2 output function */
-					if (v->intf->out_cb2_func)
-						v->intf->out_cb2_func(space, 0, 1);
+					if (intf->out_cb2_func)
+						(*intf->out_cb2_func)(device, 0, 1);
 					else
-						logerror("%s:6522VIA chip %d: Port CB2 is being written to but has no handler - %02X\n", cpuexec_describe_context(machine), which, 1);
+						logerror("%s:6522VIA chip %s: Port CB2 is being written to but has no handler - %02X\n", cpuexec_describe_context(device->machine), device->tag, 1);
 				}
 			}
 		}
@@ -1091,13 +1157,25 @@ void via_set_input_cb1(running_machine *machine, int which, int data)
 
 
 /*-------------------------------------------------
-    via_set_input_cb2 - interface setting VIA port
+    via_cb2_r - interface retrieving VIA port
 	CB2 input
 -------------------------------------------------*/
 
-void via_set_input_cb2(running_machine *machine, int which, int data)
+READ8_DEVICE_HANDLER(via_cb2_r)
 {
-	via6522_t *v = via + which;
+	via6522_t *v = get_token(device);
+	return v->in_cb2;
+}
+
+
+/*-------------------------------------------------
+    via_cb2_w - interface setting VIA port
+	CB2 input
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(via_cb2_w)
+{
+	via6522_t *v = get_token(device);
 
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
@@ -1112,7 +1190,7 @@ void via_set_input_cb2(running_machine *machine, int which, int data)
 			if ((data && CB2_LOW_TO_HIGH(v->pcr)) || (!data && CB2_HIGH_TO_LOW(v->pcr)))
 			{
 				/* mark the IRQ */
-				via_set_int (machine, which, INT_CB2);
+				via_set_int (device, INT_CB2);
 			}
 			/* set the new value for CB2 */
 			v->in_cb2 = data;
@@ -1120,130 +1198,44 @@ void via_set_input_cb2(running_machine *machine, int which, int data)
     }
 }
 
-/******************* Standard 8-bit CPU interfaces, D0-D7 *******************/
 
-READ8_HANDLER( via_0_r) { return via_read(space->machine, 0, offset); }
-READ8_HANDLER( via_1_r) { return via_read(space->machine, 1, offset); }
-READ8_HANDLER( via_2_r) { return via_read(space->machine, 2, offset); }
-READ8_HANDLER( via_3_r) { return via_read(space->machine, 3, offset); }
-READ8_HANDLER( via_4_r) { return via_read(space->machine, 4, offset); }
-READ8_HANDLER( via_5_r) { return via_read(space->machine, 5, offset); }
-READ8_HANDLER( via_6_r) { return via_read(space->machine, 6, offset); }
-READ8_HANDLER( via_7_r) { return via_read(space->machine, 7, offset); }
+/*-------------------------------------------------
+    DEVICE_SET_INFO( via6522 )
+-------------------------------------------------*/
 
-WRITE8_HANDLER( via_0_w) { via_write(space->machine, 0, offset, data); }
-WRITE8_HANDLER( via_1_w) { via_write(space->machine, 1, offset, data); }
-WRITE8_HANDLER( via_2_w) { via_write(space->machine, 2, offset, data); }
-WRITE8_HANDLER( via_3_w) { via_write(space->machine, 3, offset, data); }
-WRITE8_HANDLER( via_4_w) { via_write(space->machine, 4, offset, data); }
-WRITE8_HANDLER( via_5_w) { via_write(space->machine, 5, offset, data); }
-WRITE8_HANDLER( via_6_w) { via_write(space->machine, 6, offset, data); }
-WRITE8_HANDLER( via_7_w) { via_write(space->machine, 7, offset, data); }
+static DEVICE_SET_INFO( via6522 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
 
-/******************* 8-bit A/B port interfaces *******************/
 
-WRITE8_HANDLER( via_0_porta_w) { via_set_input_a(0, data); }
-WRITE8_HANDLER( via_1_porta_w) { via_set_input_a(1, data); }
-WRITE8_HANDLER( via_2_porta_w) { via_set_input_a(2, data); }
-WRITE8_HANDLER( via_3_porta_w) { via_set_input_a(3, data); }
-WRITE8_HANDLER( via_4_porta_w) { via_set_input_a(4, data); }
-WRITE8_HANDLER( via_5_porta_w) { via_set_input_a(5, data); }
-WRITE8_HANDLER( via_6_porta_w) { via_set_input_a(6, data); }
-WRITE8_HANDLER( via_7_porta_w) { via_set_input_a(7, data); }
+/*-------------------------------------------------
+    DEVICE_GET_INFO( via6522 )
+-------------------------------------------------*/
 
-WRITE8_HANDLER( via_0_portb_w) { via_set_input_b(0, data); }
-WRITE8_HANDLER( via_1_portb_w) { via_set_input_b(1, data); }
-WRITE8_HANDLER( via_2_portb_w) { via_set_input_b(2, data); }
-WRITE8_HANDLER( via_3_portb_w) { via_set_input_b(3, data); }
-WRITE8_HANDLER( via_4_portb_w) { via_set_input_b(4, data); }
-WRITE8_HANDLER( via_5_portb_w) { via_set_input_b(5, data); }
-WRITE8_HANDLER( via_6_portb_w) { via_set_input_b(6, data); }
-WRITE8_HANDLER( via_7_portb_w) { via_set_input_b(7, data); }
+DEVICE_GET_INFO(via6522)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(via6522_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(via6522_inline_config);	break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
-READ8_HANDLER( via_0_porta_r) { return via[0].in_a; }
-READ8_HANDLER( via_1_porta_r) { return via[1].in_a; }
-READ8_HANDLER( via_2_porta_r) { return via[2].in_a; }
-READ8_HANDLER( via_3_porta_r) { return via[3].in_a; }
-READ8_HANDLER( via_4_porta_r) { return via[4].in_a; }
-READ8_HANDLER( via_5_porta_r) { return via[5].in_a; }
-READ8_HANDLER( via_6_porta_r) { return via[6].in_a; }
-READ8_HANDLER( via_7_porta_r) { return via[7].in_a; }
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(via6522); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(via6522);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(via6522);	break;
 
-READ8_HANDLER( via_0_portb_r) { return via[0].in_b; }
-READ8_HANDLER( via_1_portb_r) { return via[1].in_b; }
-READ8_HANDLER( via_2_portb_r) { return via[2].in_b; }
-READ8_HANDLER( via_3_portb_r) { return via[3].in_b; }
-READ8_HANDLER( via_4_portb_r) { return via[4].in_b; }
-READ8_HANDLER( via_5_portb_r) { return via[5].in_b; }
-READ8_HANDLER( via_6_portb_r) { return via[6].in_b; }
-READ8_HANDLER( via_7_portb_r) { return via[7].in_b; }
-
-/******************* 1-bit CA1/CA2/CB1/CB2 port interfaces *******************/
-
-WRITE8_HANDLER( via_0_ca1_w) { via_set_input_ca1(space->machine, 0, data); }
-WRITE8_HANDLER( via_1_ca1_w) { via_set_input_ca1(space->machine, 1, data); }
-WRITE8_HANDLER( via_2_ca1_w) { via_set_input_ca1(space->machine, 2, data); }
-WRITE8_HANDLER( via_3_ca1_w) { via_set_input_ca1(space->machine, 3, data); }
-WRITE8_HANDLER( via_4_ca1_w) { via_set_input_ca1(space->machine, 4, data); }
-WRITE8_HANDLER( via_5_ca1_w) { via_set_input_ca1(space->machine, 5, data); }
-WRITE8_HANDLER( via_6_ca1_w) { via_set_input_ca1(space->machine, 6, data); }
-WRITE8_HANDLER( via_7_ca1_w) { via_set_input_ca1(space->machine, 7, data); }
-WRITE8_HANDLER( via_0_ca2_w) { via_set_input_ca2(space->machine, 0, data); }
-WRITE8_HANDLER( via_1_ca2_w) { via_set_input_ca2(space->machine, 1, data); }
-WRITE8_HANDLER( via_2_ca2_w) { via_set_input_ca2(space->machine, 2, data); }
-WRITE8_HANDLER( via_3_ca2_w) { via_set_input_ca2(space->machine, 3, data); }
-WRITE8_HANDLER( via_4_ca2_w) { via_set_input_ca2(space->machine, 4, data); }
-WRITE8_HANDLER( via_5_ca2_w) { via_set_input_ca2(space->machine, 5, data); }
-WRITE8_HANDLER( via_6_ca2_w) { via_set_input_ca2(space->machine, 6, data); }
-WRITE8_HANDLER( via_7_ca2_w) { via_set_input_ca2(space->machine, 7, data); }
-
-WRITE8_HANDLER( via_0_cb1_w) { via_set_input_cb1(space->machine, 0, data); }
-WRITE8_HANDLER( via_1_cb1_w) { via_set_input_cb1(space->machine, 1, data); }
-WRITE8_HANDLER( via_2_cb1_w) { via_set_input_cb1(space->machine, 2, data); }
-WRITE8_HANDLER( via_3_cb1_w) { via_set_input_cb1(space->machine, 3, data); }
-WRITE8_HANDLER( via_4_cb1_w) { via_set_input_cb1(space->machine, 4, data); }
-WRITE8_HANDLER( via_5_cb1_w) { via_set_input_cb1(space->machine, 5, data); }
-WRITE8_HANDLER( via_6_cb1_w) { via_set_input_cb1(space->machine, 6, data); }
-WRITE8_HANDLER( via_7_cb1_w) { via_set_input_cb1(space->machine, 7, data); }
-WRITE8_HANDLER( via_0_cb2_w) { via_set_input_cb2(space->machine, 0, data); }
-WRITE8_HANDLER( via_1_cb2_w) { via_set_input_cb2(space->machine, 1, data); }
-WRITE8_HANDLER( via_2_cb2_w) { via_set_input_cb2(space->machine, 2, data); }
-WRITE8_HANDLER( via_3_cb2_w) { via_set_input_cb2(space->machine, 3, data); }
-WRITE8_HANDLER( via_4_cb2_w) { via_set_input_cb2(space->machine, 4, data); }
-WRITE8_HANDLER( via_5_cb2_w) { via_set_input_cb2(space->machine, 5, data); }
-WRITE8_HANDLER( via_6_cb2_w) { via_set_input_cb2(space->machine, 6, data); }
-WRITE8_HANDLER( via_7_cb2_w) { via_set_input_cb2(space->machine, 7, data); }
-
-READ8_HANDLER( via_0_ca1_r) { return via[0].in_ca1; }
-READ8_HANDLER( via_1_ca1_r) { return via[1].in_ca1; }
-READ8_HANDLER( via_2_ca1_r) { return via[2].in_ca1; }
-READ8_HANDLER( via_3_ca1_r) { return via[3].in_ca1; }
-READ8_HANDLER( via_4_ca1_r) { return via[4].in_ca1; }
-READ8_HANDLER( via_5_ca1_r) { return via[5].in_ca1; }
-READ8_HANDLER( via_6_ca1_r) { return via[6].in_ca1; }
-READ8_HANDLER( via_7_ca1_r) { return via[7].in_ca1; }
-READ8_HANDLER( via_0_ca2_r) { return via[0].in_ca2; }
-READ8_HANDLER( via_1_ca2_r) { return via[1].in_ca2; }
-READ8_HANDLER( via_2_ca2_r) { return via[2].in_ca2; }
-READ8_HANDLER( via_3_ca2_r) { return via[3].in_ca2; }
-READ8_HANDLER( via_4_ca2_r) { return via[4].in_ca2; }
-READ8_HANDLER( via_5_ca2_r) { return via[5].in_ca2; }
-READ8_HANDLER( via_6_ca2_r) { return via[6].in_ca2; }
-READ8_HANDLER( via_7_ca2_r) { return via[7].in_ca2; }
-
-READ8_HANDLER( via_0_cb1_r) { return via[0].in_cb1; }
-READ8_HANDLER( via_1_cb1_r) { return via[1].in_cb1; }
-READ8_HANDLER( via_2_cb1_r) { return via[2].in_cb1; }
-READ8_HANDLER( via_3_cb1_r) { return via[3].in_cb1; }
-READ8_HANDLER( via_4_cb1_r) { return via[4].in_cb1; }
-READ8_HANDLER( via_5_cb1_r) { return via[5].in_cb1; }
-READ8_HANDLER( via_6_cb1_r) { return via[6].in_cb1; }
-READ8_HANDLER( via_7_cb1_r) { return via[7].in_cb1; }
-READ8_HANDLER( via_0_cb2_r) { return via[0].in_cb2; }
-READ8_HANDLER( via_1_cb2_r) { return via[1].in_cb2; }
-READ8_HANDLER( via_2_cb2_r) { return via[2].in_cb2; }
-READ8_HANDLER( via_3_cb2_r) { return via[3].in_cb2; }
-READ8_HANDLER( via_4_cb2_r) { return via[4].in_cb2; }
-READ8_HANDLER( via_5_cb2_r) { return via[5].in_cb2; }
-READ8_HANDLER( via_6_cb2_r) { return via[6].in_cb2; }
-READ8_HANDLER( via_7_cb2_r) { return via[7].in_cb2; }
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "6522 VIA";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "6522 VIA";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
+}

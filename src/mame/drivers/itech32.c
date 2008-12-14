@@ -412,9 +412,6 @@ static MACHINE_RESET( itech32 )
 	sound_return = 0;
 	sound_int_state = 0;
 
-	/* reset the VIA chip (if used) */
-	via_reset();
-
 	/* reset the ticket dispenser */
 	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
@@ -667,8 +664,9 @@ static READ8_HANDLER( sound_data_buffer_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( drivedge_portb_out )
+static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 0 controls the fan light */
@@ -685,14 +683,15 @@ static WRITE8_HANDLER( drivedge_portb_out )
 }
 
 
-static WRITE8_HANDLER( drivedge_turbo_light )
+static WRITE8_DEVICE_HANDLER( drivedge_turbo_light )
 {
 	set_led_status(0, data);
 }
 
 
-static WRITE8_HANDLER( pia_portb_out )
+static WRITE8_DEVICE_HANDLER( pia_portb_out )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 4 controls the ticket dispenser */
@@ -710,12 +709,12 @@ static WRITE8_HANDLER( pia_portb_out )
  *
  *************************************/
 
-static void via_irq(running_machine *machine, int state)
+static void via_irq(const device_config *device, int state)
 {
 	if (state)
-		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -1060,7 +1059,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0880, 0x08bf) AM_READ(es5506_data_0_r)
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* noisy */
-	AM_RANGE(0x1400, 0x140f) AM_READWRITE(via_0_r, via_0_w)
+	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1709,6 +1708,9 @@ static MACHINE_DRIVER_START( timekill )
 	MDRV_SOUND_ADD("ensoniq", ES5506, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(es5506_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", SOUND_CLOCK/8, via_interface)
 MACHINE_DRIVER_END
 
 
@@ -1760,6 +1762,9 @@ static MACHINE_DRIVER_START( sftm )
 	MDRV_CPU_VBLANK_INT_HACK(irq1_line_assert,4)
 
 	MDRV_NVRAM_HANDLER(itech020)
+
+	/* via */
+	MDRV_VIA6522_REMOVE("via6522_0")
 MACHINE_DRIVER_END
 
 
@@ -3837,8 +3842,6 @@ static void init_program_rom(running_machine *machine)
 static DRIVER_INIT( timekill )
 {
 	init_program_rom(machine);
-	via_config(0, &via_interface);
-	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 512;
 	itech32_planes = 2;
 	is_drivedge = 0;
@@ -3848,8 +3851,6 @@ static DRIVER_INIT( timekill )
 static DRIVER_INIT( hardyard )
 {
 	init_program_rom(machine);
-	via_config(0, &via_interface);
-	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 1024;
 	itech32_planes = 1;
 	is_drivedge = 0;
@@ -3859,8 +3860,6 @@ static DRIVER_INIT( hardyard )
 static DRIVER_INIT( bloodstm )
 {
 	init_program_rom(machine);
-	via_config(0, &via_interface);
-	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 1024;
 	itech32_planes = 1;
 	is_drivedge = 0;
@@ -3870,8 +3869,6 @@ static DRIVER_INIT( bloodstm )
 static DRIVER_INIT( drivedge )
 {
 	init_program_rom(machine);
-	via_config(0, &drivedge_via_interface);
-	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 1024;
 	itech32_planes = 1;
 	is_drivedge = 1;
@@ -3890,8 +3887,6 @@ static DRIVER_INIT( wcbowl )
           Sound P/N 1060 Rev 0 (see Hot Memory PCB layout above)
     */
 	init_program_rom(machine);
-	via_config(0, &via_interface);
-	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 1024;
 	itech32_planes = 1;
 

@@ -116,25 +116,25 @@ static VIDEO_UPDATE( leprechn )
  *
  *************************************/
 
-static WRITE8_HANDLER( video_data_w )
+static WRITE8_DEVICE_HANDLER( video_data_w )
 {
-	gameplan_state *state = space->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data;
 
 	state->video_data = data;
 }
 
 
-static WRITE8_HANDLER( gameplan_video_command_w )
+static WRITE8_DEVICE_HANDLER( gameplan_video_command_w )
 {
-	gameplan_state *state = space->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data;
 
 	state->video_command = data & 0x07;
 }
 
 
-static WRITE8_HANDLER( leprechn_video_command_w )
+static WRITE8_DEVICE_HANDLER( leprechn_video_command_w )
 {
-	gameplan_state *state = space->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data;
 
 	state->video_command = (data >> 3) & 0x07;
 }
@@ -142,16 +142,16 @@ static WRITE8_HANDLER( leprechn_video_command_w )
 
 static TIMER_CALLBACK( clear_screen_done_callback )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *via = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 
 	/* indicate that the we are done clearing the screen */
-	via_0_ca1_w(space, 0, 0);
+	via_ca1_w(via, 0, 0);
 }
 
 
-static WRITE8_HANDLER( video_command_trigger_w )
+static WRITE8_DEVICE_HANDLER( video_command_trigger_w )
 {
-	gameplan_state *state = space->machine->driver_data;
+	gameplan_state *state = device->machine->driver_data;
 
 	if (data == 0)
 	{
@@ -194,14 +194,17 @@ static WRITE8_HANDLER( video_command_trigger_w )
 		/* clear screen */
 		case 3:
 			/* indicate that the we are busy */
-			via_0_ca1_w(space, 0, 1);
+			{
+				const device_config *via = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
+				via_ca1_w(via, 0, 1);
+			}
 
 			memset(state->videoram, state->video_data & 0x0f, state->videoram_size);
 
 			/* set a timer for an arbitrarily short period.
                The real time it takes to clear to screen is not
                important to the software */
-			timer_call_after_resynch(space->machine, NULL, 0, clear_screen_done_callback);
+			timer_call_after_resynch(device->machine, NULL, 0, clear_screen_done_callback);
 
 			break;
 		}
@@ -215,23 +218,23 @@ static TIMER_CALLBACK( via_irq_delayed )
 }
 
 
-static void via_irq(running_machine *machine, int state)
+static void via_irq(const device_config *device, int state)
 {
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
        cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
        leave time for the program to see the flag change. */
-	timer_set(machine, ATTOTIME_IN_USEC(50), NULL, state, via_irq_delayed);
+	timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, state, via_irq_delayed);
 }
 
 
-static READ8_HANDLER( vblank_r )
+static READ8_DEVICE_HANDLER( vblank_r )
 {
 	/* this is needed for trivia quest */
 	return 0x20;
 }
 
 
-static const via6522_interface gameplan_via_0_interface =
+const via6522_interface gameplan_via_0_interface =
 {
 	0, vblank_r,							/*inputs : A/B         */
 	0, 0, 0, 0,								/*inputs : CA/B1,CA/B2 */
@@ -241,7 +244,7 @@ static const via6522_interface gameplan_via_0_interface =
 };
 
 
-static const via6522_interface leprechn_via_0_interface =
+const via6522_interface leprechn_via_0_interface =
 {
 	0, vblank_r,							/*inputs : A/B         */
 	0, 0, 0, 0,								/*inputs : CA/B1,CA/B2 */
@@ -251,7 +254,7 @@ static const via6522_interface leprechn_via_0_interface =
 };
 
 
-static const via6522_interface trvquest_via_0_interface =
+const via6522_interface trvquest_via_0_interface =
 {
 	0, vblank_r,							/*inputs : A/B         */
 	0, 0, 0, 0,								/*inputs : CA/B1,CA/B2 */
@@ -264,10 +267,10 @@ static const via6522_interface trvquest_via_0_interface =
 static TIMER_CALLBACK( via_0_ca1_timer_callback )
 {
 	gameplan_state *state = machine->driver_data;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *via = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
 
 	/* !VBLANK is connected to CA1 */
-	via_0_ca1_w(space, 0, (UINT8)param);
+	via_ca1_w(via, 0, (UINT8)param);
 
 	if (param)
 		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
@@ -315,24 +318,18 @@ static VIDEO_START( common )
 
 static VIDEO_START( gameplan )
 {
-	via_config(0, &gameplan_via_0_interface);
-
 	VIDEO_START_CALL(common);
 }
 
 
 static VIDEO_START( leprechn )
 {
-	via_config(0, &leprechn_via_0_interface);
-
 	VIDEO_START_CALL(common);
 }
 
 
 static VIDEO_START( trvquest )
 {
-	via_config(0, &trvquest_via_0_interface);
-
 	VIDEO_START_CALL(common);
 }
 
@@ -346,7 +343,6 @@ static VIDEO_START( trvquest )
 
 static VIDEO_RESET( gameplan )
 {
-	via_reset();
 	start_via_0_timer(machine, machine->driver_data);
 }
 

@@ -213,39 +213,41 @@ static WRITE16_HANDLER( scroll_w )
 }
 
 
-static READ16_HANDLER(via_r)
+static READ16_HANDLER(bmcbowl_via_r)
 {
-	return via_0_r(space,offset);
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	return via_r(via_0, offset);
 }
 
-static WRITE16_HANDLER(via_w)
+static WRITE16_HANDLER(bmcbowl_via_w)
 {
-	via_0_w(space,offset,data);
+	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	via_w(via_0, offset, data);
 }
 
-static READ8_HANDLER(via_b_in)
+static READ8_DEVICE_HANDLER(via_b_in)
 {
-	return input_port_read(space->machine, "IN3");
+	return input_port_read(device->machine, "IN3");
 }
 
 
-static WRITE8_HANDLER(via_a_out)
+static WRITE8_DEVICE_HANDLER(via_a_out)
 {
 	// related to video hw ? BG scroll ?
 }
 
-static WRITE8_HANDLER(via_b_out)
+static WRITE8_DEVICE_HANDLER(via_b_out)
 {
 	//used
 }
 
-static WRITE8_HANDLER(via_ca2_out)
+static WRITE8_DEVICE_HANDLER(via_ca2_out)
 {
 	//used
 }
 
 
-static void via_irq(running_machine *machine, int state)
+static void via_irq(const device_config *device, int state)
 {
 	//used
 }
@@ -333,7 +335,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x091000, 0x091001) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x091800, 0x091801) AM_WRITE(scroll_w)
 
-	AM_RANGE(0x092000, 0x09201f) AM_READWRITE(via_r,via_w)
+	AM_RANGE(0x092000, 0x09201f) AM_READWRITE(bmcbowl_via_r, bmcbowl_via_w)
 
 	AM_RANGE(0x093000, 0x093003) AM_WRITE(SMH_NOP)  // related to music
 	AM_RANGE(0x092800, 0x092801) AM_WRITE(ay8910_write_port_0_msb_w		)
@@ -482,7 +484,6 @@ static const via6522_interface via_interface =
 
 static MACHINE_RESET( bmcbowl )
 {
-	via_reset();
 }
 
 static INTERRUPT_GEN( bmc_interrupt )
@@ -525,6 +526,9 @@ static MACHINE_DRIVER_START( bmcbowl )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 1000000, via_interface)
 MACHINE_DRIVER_END
 
 ROM_START( bmcbowl )
@@ -547,8 +551,6 @@ ROM_END
 
 static DRIVER_INIT(bmcbowl)
 {
-	via_config(0, &via_interface);
-	via_set_clock(0, 1000000);//1 MHz ?
 	colorram=auto_malloc(768);
 }
 

@@ -6,6 +6,7 @@ driver by Chris Moore
 
 ***************************************************************************/
 
+#include "machine/6522via.h"
 
 #define GAMEPLAN_MAIN_MASTER_CLOCK		(XTAL_3_579545MHz)
 #define GAMEPLAN_AUDIO_MASTER_CLOCK		(XTAL_3_579545MHz)
@@ -35,6 +36,10 @@ struct _gameplan_state
 
 
 /*----------- defined in video/gameplan.c -----------*/
+
+extern const via6522_interface gameplan_via_0_interface;
+extern const via6522_interface leprechn_via_0_interface;
+extern const via6522_interface trvquest_via_0_interface;
 
 MACHINE_DRIVER_EXTERN( gameplan_video );
 MACHINE_DRIVER_EXTERN( leprechn_video );

@@ -23,7 +23,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 //  AM_RANGE(0x1000, 0x10ff) AM_READWRITE(beezer_6840_r, beezer_6840_w)
-	AM_RANGE(0x1800, 0x18ff) AM_READWRITE(via_1_r, via_1_w)
+	AM_RANGE(0x1800, 0x18ff) AM_DEVREADWRITE(VIA6522, "via6522_1", via_r, via_w)
 //  AM_RANGE(0x8000, 0x9fff) AM_WRITE(beezer_dac_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -98,6 +98,10 @@ static MACHINE_DRIVER_START( beezer )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 0, b_via_0_interface)
+	MDRV_VIA6522_ADD("via6522_1", 0, b_via_1_interface)
 MACHINE_DRIVER_END
 
 /***************************************************************************

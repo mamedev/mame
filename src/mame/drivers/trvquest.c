@@ -46,12 +46,12 @@ static READ8_HANDLER( trvquest_question_r )
 	return memory_region(space->machine, "questions")[*state->trvquest_question * 0x2000 + offset];
 }
 
-static WRITE8_HANDLER( trvquest_coin_w )
+static WRITE8_DEVICE_HANDLER( trvquest_coin_w )
 {
 	coin_counter_w(0,~data & 1);
 }
 
-static WRITE8_HANDLER( trvquest_misc_w )
+static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
 {
 	// data & 1 -> led on/off ?
 }
@@ -59,9 +59,9 @@ static WRITE8_HANDLER( trvquest_misc_w )
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) // cmos ram
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
-	AM_RANGE(0x3800, 0x380f) AM_READWRITE(via_1_r, via_1_w)
-	AM_RANGE(0x3810, 0x381f) AM_READWRITE(via_2_r, via_2_w)
-	AM_RANGE(0x3820, 0x382f) AM_READWRITE(via_0_r, via_0_w)
+	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE(VIA6522, "via6522_1", via_r, via_w)
+	AM_RANGE(0x3810, 0x381f) AM_DEVREADWRITE(VIA6522, "via6522_2", via_r, via_w)
+	AM_RANGE(0x3820, 0x382f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
 	AM_RANGE(0x3830, 0x3830) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x3831, 0x3831) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x3840, 0x3840) AM_WRITE(ay8910_control_port_1_w)
@@ -152,20 +152,31 @@ static TIMER_CALLBACK( via_irq_delayed )
 	cpu_set_input_line(machine->cpu[0], 0, param);
 }
 
-static void via_irq(running_machine *machine, int state)
+static void via_irq(const device_config *device, int state)
 {
 	// from gameplan.c
 
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
        cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
        leave time for the program to see the flag change. */
-	timer_set(machine, ATTOTIME_IN_USEC(50), NULL, state, via_irq_delayed);
+	timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, state, via_irq_delayed);
 }
 
 
+static input_port_value input_port_read_indexed(running_machine *machine, int portnum)
+{
+	const input_port_config *port = input_port_by_index(machine->portconfig, portnum);
+	return input_port_read_direct(port);
+}
+
+static READ8_DEVICE_HANDLER( via_input_port_0_r ) { return input_port_read_indexed(device->machine, 0); }
+static READ8_DEVICE_HANDLER( via_input_port_1_r ) { return input_port_read_indexed(device->machine, 1); }
+static READ8_DEVICE_HANDLER( via_input_port_2_r ) { return input_port_read_indexed(device->machine, 2); }
+static READ8_DEVICE_HANDLER( via_input_port_3_r ) { return input_port_read_indexed(device->machine, 3); }
+
 static const via6522_interface via_1_interface =
 {
-	/*inputs : A/B         */ input_port_0_r, input_port_1_r,
+	/*inputs : A/B         */ via_input_port_0_r, via_input_port_1_r,
 	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
 	/*outputs: A/B         */ NULL, NULL,
 	/*outputs: CA/B1,CA/B2 */ NULL, NULL, trvquest_coin_w, NULL,
@@ -174,7 +185,7 @@ static const via6522_interface via_1_interface =
 
 static const via6522_interface via_2_interface =
 {
-	/*inputs : A/B         */ input_port_2_r, input_port_3_r,
+	/*inputs : A/B         */ via_input_port_2_r, via_input_port_3_r,
 	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
 	/*outputs: A/B         */ NULL, NULL,
 	/*outputs: CA/B1,CA/B2 */ NULL, NULL, trvquest_misc_w, NULL,
@@ -184,20 +195,17 @@ static const via6522_interface via_2_interface =
 
 static MACHINE_START( trvquest )
 {
-	via_config(1, &via_1_interface);
-	via_config(2, &via_2_interface);
 }
 
 static MACHINE_RESET( trvquest )
 {
-	via_reset();
 }
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	via_2_ca1_w(space,0,1);
-	via_2_ca1_w(space,0,0);
+	const device_config *via_2 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_2");
+	via_ca1_w(via_2, 0, 1);
+	via_ca1_w(via_2, 0, 0);
 }
 
 static MACHINE_DRIVER_START( trvquest )
@@ -223,6 +231,11 @@ static MACHINE_DRIVER_START( trvquest )
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_6MHz/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* via */
+	MDRV_VIA6522_ADD("via6522_0", 0, trvquest_via_0_interface)
+	MDRV_VIA6522_ADD("via6522_1", 0, via_1_interface)
+	MDRV_VIA6522_ADD("via6522_2", 0, via_2_interface)
 MACHINE_DRIVER_END
 
 ROM_START( trvquest )
