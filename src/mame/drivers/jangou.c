@@ -636,12 +636,12 @@ static MACHINE_DRIVER_START( jngolady )
 	MDRV_CPU_MODIFY("cpu0")
 	MDRV_CPU_PROGRAM_MAP(0, jngolady_cpu0_map)
 
-	MDRV_CPU_ADD("nsc", NSC8105, MASTER_CLOCK / 16)
-	MDRV_CPU_PROGRAM_MAP(nsc_map, 0)
-
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(0, jngolady_cpu1_map)
 	MDRV_CPU_IO_MAP(0, jngolady_cpu1_io)
+
+	MDRV_CPU_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
+	MDRV_CPU_PROGRAM_MAP(nsc_map, 0)
 
 	/* sound hardware */
 	MDRV_SOUND_START(NULL)
