@@ -1876,7 +1876,7 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 		int numbytes = 0;
 
 		/* convert PC to a byte offset */
-		pcbyte = memory_address_to_byte(space, pc) & space->bytemask;
+		pcbyte = memory_address_to_byte(space, pc);
 
 		/* save a copy of the previous line as a backup if we're only doing one line */
 		if (lines == 1)
@@ -1992,7 +1992,7 @@ static void disasm_view_update(debug_view *view)
 		exprerr = expression_execute(dasmdata->expression.parsed, &result);
 		if (exprerr == EXPRERR_NONE && result != dasmdata->expression.result)
 		{
-			offs_t resultbyte = memory_address_to_byte(space, result) & space->bytemask;
+			offs_t resultbyte = memory_address_to_byte(space, result);
 
 			/* update the result */
 			dasmdata->expression.result = result;
@@ -2100,7 +2100,7 @@ recompute:
 			{
 				const cpu_debug_data *cpuinfo = cpu_get_debug_data(space->cpu);
 				for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
-					if (dasmdata->byteaddress[effrow] == (memory_address_to_byte(space, bp->address) & space->bytemask))
+					if (dasmdata->byteaddress[effrow] == memory_address_to_byte(space, bp->address))
 						attrib = DCA_CHANGED;
 			}
 

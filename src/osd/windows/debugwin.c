@@ -157,17 +157,12 @@ struct _debugwin_info
 
 
 //============================================================
-//  GLOBAL VARIABLES
-//============================================================
-
-
-
-//============================================================
 //  LOCAL VARIABLES
 //============================================================
 
 static debugwin_info *window_list;
 static debugwin_info *main_console;
+static UINT32 main_console_regwidth;
 
 static UINT8 waiting_for_debugger;
 
@@ -179,7 +174,6 @@ static UINT32 debug_font_ascent;
 static UINT32 hscroll_height;
 static UINT32 vscroll_width;
 
-static DWORD last_debugger_update;
 
 
 //============================================================
@@ -263,7 +257,6 @@ void osd_wait_for_debugger(const device_config *device, int firststop)
 
 	// get and process messages
 	GetMessage(&message, NULL, 0, 0);
-	last_debugger_update = GetTickCount();
 
 	switch (message.message)
 	{
@@ -2328,13 +2321,13 @@ void console_create_window(running_machine *machine)
 	int bestwidth, bestheight;
 	RECT bounds, work_bounds;
 	HMENU optionsmenu;
+	UINT32 conchars;
 
 	// create the window
 	info = debugwin_window_create(machine, "Debug", NULL);
 	if (info == NULL)
 		return;
 	main_console = info;
-	console_set_cpu(machine->cpu[0]);
 
 	// create the views
 	if (!debugwin_view_create(info, 0, DVT_DISASSEMBLY))
@@ -2374,33 +2367,40 @@ void console_create_window(running_machine *machine)
 	info->recompute_children = console_recompute_children;
 	info->process_string = console_process_string;
 
-	// loop over all CPUs and compute the sizes
+	// loop over all register views and get the maximum size
+	main_console_regwidth = 0;
+	for (regsubview = registers_view_get_subview_list(info->view[1].view); regsubview != NULL; regsubview = regsubview->next)
+	{
+		UINT32 regchars;
+		
+		// set the view and fetch the width
+		registers_view_set_subview(info->view[1].view, regsubview->index);
+		regchars = debug_view_get_total_size(info->view[1].view).x;
+		
+		// track the maximum
+		main_console_regwidth = MAX(regchars, main_console_regwidth);
+	}
+	
+	// determine the width of the console (this is fixed)
+	conchars = debug_view_get_total_size(info->view[2].view).x;
+
+	// loop over all CPUs and compute the width range based on dasm width
 	info->minwidth = 0;
 	info->maxwidth = 0;
 	for (dasmsubview = disasm_view_get_subview_list(info->view[0].view); dasmsubview != NULL; dasmsubview = dasmsubview->next)
-		for (regsubview = registers_view_get_subview_list(info->view[1].view); regsubview != NULL; regsubview = regsubview->next)
-			if (dasmsubview->space->cpu == regsubview->device)
-			{
-				UINT32 regchars, dischars, conchars;
-				UINT32 minwidth, maxwidth;
+	{
+		UINT32 minwidth, maxwidth, dischars;
 
-				// point all views to the appropriate index
-				disasm_view_set_subview(info->view[0].view, dasmsubview->index);
-				registers_view_set_subview(info->view[1].view, regsubview->index);
-
-				// get the total width of all three children
-				dischars = debug_view_get_total_size(info->view[0].view).x;
-				regchars = debug_view_get_total_size(info->view[1].view).x;
-				conchars = debug_view_get_total_size(info->view[2].view).x;
-
-				// compute the preferred width
-				minwidth = EDGE_WIDTH + regchars * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + 100 + EDGE_WIDTH;
-				maxwidth = EDGE_WIDTH + regchars * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + ((dischars > conchars) ? dischars : conchars) * debug_font_width + vscroll_width + EDGE_WIDTH;
-				if (minwidth > info->minwidth)
-					info->minwidth = minwidth;
-				if (maxwidth > info->maxwidth)
-					info->maxwidth = maxwidth;
-			}
+		// set the view and fetch the width
+		disasm_view_set_subview(info->view[0].view, dasmsubview->index);
+		dischars = debug_view_get_total_size(info->view[0].view).x;
+		
+		// compute the preferred width
+		minwidth = EDGE_WIDTH + main_console_regwidth * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + 100 + EDGE_WIDTH;
+		maxwidth = EDGE_WIDTH + main_console_regwidth * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + MAX(dischars, conchars) * debug_font_width + vscroll_width + EDGE_WIDTH;
+		info->minwidth = MAX(info->minwidth, minwidth);
+		info->maxwidth = MAX(info->maxwidth, maxwidth);
+	}
 
 	// get the work bounds
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &work_bounds, 0);
@@ -2425,7 +2425,7 @@ void console_create_window(running_machine *machine)
 				SWP_SHOWWINDOW);
 
 	// recompute the children
-	console_recompute_children(info);
+	console_set_cpu(debug_cpu_get_visible_cpu(machine));
 
 	// mark the edit box as the default focus and set it
 	info->focuswnd = info->editwnd;
@@ -2457,7 +2457,7 @@ static void console_recompute_children(debugwin_info *info)
 
 	// get the total width of all three children
 	dischars = debug_view_get_total_size(info->view[0].view).x;
-	regchars = debug_view_get_total_size(info->view[1].view).x;
+	regchars = main_console_regwidth;
 	conchars = debug_view_get_total_size(info->view[2].view).x;
 
 	// registers always get their desired width, and span the entire height
@@ -2548,6 +2548,9 @@ static void console_set_cpu(const device_config *device)
 		if (strcmp(title, curtitle) != 0)
 			win_set_window_text_utf8(main_console->wnd, title);
 	}
+	
+	// and recompute the children
+	console_recompute_children(main_console);
 }
 
 
