@@ -8,6 +8,8 @@ TODO:
 -convert the video hw to true 4bpp;
 -some charset transparency pens are wrong,likely that the buffer trigger isn't correct;
 -unemulated screen flipping;
+-jngolady: if you do a soft reset sometimes the z80<->mcu communication fails,causing a
+ black screen after the title screen.
 
 ============================================================================================
 Debug cheats:
@@ -26,12 +28,44 @@ SOUND: AY-3-8910
 Location 2-P: HARRIS HCI-55536-5
 Location 3-G: MB7051
 
+---
+
+Jangou Lady
+(c)1984 Nihon Bussan
+
+CPU:	Z80 x2 (#1,#2)
+	(40pin unknown:#3)
+SOUND:	AY-3-8910
+	MSM5218RS
+OSC:	19.968MHz
+	400KHz
+
+
+1.5N    chr.
+2.5M
+3.5L
+
+4.9P    Z80#1 prg.
+5.9N
+6.9M
+7.9L
+
+8.9H    Z80#2 prg.
+9.9G
+10.9F
+11.9E
+12.9D
+
+M13.13  CPU#3 prg. (?)
+
+JL.3G   color
+
 *******************************************************************************************/
 
 #include "driver.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
-
+#include "sound/msm5205.h"
 
 #define MASTER_CLOCK	XTAL_19_968MHz
 
@@ -39,10 +73,46 @@ static UINT8 *blit_buffer;
 static UINT8 pen_data[0x10];
 static UINT8 blit_data[6];
 
+/* Jangou CVSD Sound */
 static emu_timer *cvsd_bit_timer;
 static UINT8 cvsd_shiftreg;
-static int shift_cnt;
+static int cvsd_shift_cnt;
 
+/* Jangou Lady ADPCM Sound */
+static UINT8 adpcm_byte;
+static int msm5205_vclk_toggle;
+
+
+/*************************************
+ *
+ *  Video Hardware
+ *
+ *************************************/
+
+static PALETTE_INIT( jangou )
+{
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x10; ++i)
+	{
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
 
 static VIDEO_START( jangou )
 {
@@ -187,6 +257,13 @@ static WRITE8_HANDLER( blit_vregs_w )
 	pen_data[offset] = data;
 }
 
+
+/*************************************
+ *
+ *  I/O
+ *
+ *************************************/
+
 static UINT8 mux_data;
 
 static WRITE8_HANDLER( mux_w )
@@ -197,7 +274,7 @@ static WRITE8_HANDLER( mux_w )
 static WRITE8_HANDLER( output_w )
 {
 	/*
-	--x- ---- ? (polls between high and low in irq routine)
+	--x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
 	---- -x-- flip screen
 	---- ---x coin counter
 	*/
@@ -228,9 +305,13 @@ static READ8_HANDLER( input_system_r )
 	return input_port_read(space->machine, "SYSTEM");
 }
 
-/*
-	Sound CPU and CVSD
-*/
+
+/*************************************
+ *
+ *  Sample Player CPU
+ *
+ *************************************/
+
 static WRITE8_HANDLER( sound_latch_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
@@ -243,6 +324,7 @@ static READ8_HANDLER( sound_latch_r )
 	return soundlatch_r(space, 0);
 }
 
+/* Jangou HC-55516 CVSD */
 static WRITE8_HANDLER( cvsd_w )
 {
 	cvsd_shiftreg = data;
@@ -255,10 +337,68 @@ static TIMER_CALLBACK( cvsd_bit_timer_callback )
 	cvsd_shiftreg <<= 1;
 
 	/* Trigger an IRQ for every 8 shifted bits */
-	if ((++shift_cnt & 7) == 0)
+	if ((++cvsd_shift_cnt & 7) == 0)
 		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
+
+/* Jangou Lady MSM5218 (MSM5205-compatible) ADPCM */
+static WRITE8_HANDLER( adpcm_w )
+{
+	adpcm_byte = data;
+}
+
+static void jngolady_vclk_cb(const device_config *device)
+{
+	if (msm5205_vclk_toggle == 0)
+	{
+		msm5205_data_w(0, adpcm_byte >> 4);
+	}
+	else
+	{
+		msm5205_data_w(0, adpcm_byte & 0xf);
+		cpu_set_input_line(device->machine->cpu[1], 0, HOLD_LINE);
+	}
+
+	msm5205_vclk_toggle ^= 1;
+}
+
+
+/*************************************
+ *
+ *  Jangou Lady NSC8105 CPU
+ *
+ *************************************/
+
+static UINT8 nsc_latch;
+
+static READ8_HANDLER( master_com_r )
+{
+	return nsc_latch;
+}
+
+static WRITE8_HANDLER( master_com_w )
+{
+	nsc_latch = data;
+	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
+}
+
+static READ8_HANDLER( slave_com_r )
+{
+	return nsc_latch;
+}
+
+static WRITE8_HANDLER( slave_com_w )
+{
+	nsc_latch = data;
+//	cpu_set_input_line(space->machine->cpu[0], 0, HOLD_LINE);
+}
+
+/*************************************
+ *
+ *  Jangou Memory Map
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -290,6 +430,47 @@ static ADDRESS_MAP_START( cpu1_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01,0x01) AM_WRITE(cvsd_w)
 	AM_RANGE(0x02,0x02) AM_WRITE(SMH_NOP) // Echoes sound command - acknowledge?
 ADDRESS_MAP_END
+
+
+/*************************************
+ *
+ *  Jangou Lady Memory Map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( jngolady_cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(master_com_r,master_com_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( jngolady_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jngolady_cpu1_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00,0x00) AM_READ(sound_latch_r)
+	AM_RANGE(0x01,0x01) AM_WRITE(adpcm_w)
+	AM_RANGE(0x02,0x02) AM_WRITE(SMH_NOP)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x007f) AM_RAM //internal ram for irq etc.
+	AM_RANGE(0x8000, 0x8000) AM_WRITENOP //write-only,irq related?
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(slave_com_r,slave_com_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+/*************************************
+ *
+ *  Input Port Definitions
+ *
+ *************************************/
 
 static INPUT_PORTS_START( jangou )
 	PORT_START("PL1_1")
@@ -366,30 +547,23 @@ static INPUT_PORTS_START( jangou )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static PALETTE_INIT( jangou )
-{
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+static INPUT_PORTS_START( jngolady )
+	PORT_INCLUDE( jangou )
 
-	for (i = 0; i < 0x10; ++i)
-	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+	PORT_MODIFY("PL1_3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start / P1 Mahjong Flip Flop")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Ready")
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-		color_prom++;
-	}
-}
+	PORT_MODIFY("PL2_3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Start / P2 Mahjong Flip Flop")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P2 Ready")
+INPUT_PORTS_END
+
+/*************************************
+ *
+ *  Sound HW Config
+ *
+ *************************************/
 
 static const ay8910_interface ay8910_config =
 {
@@ -399,6 +573,12 @@ static const ay8910_interface ay8910_config =
 	input_system_r,
 	NULL,
 	NULL
+};
+
+static const msm5205_interface msm5205_config =
+{
+	jngolady_vclk_cb,
+	MSM5205_S96_4B
 };
 
 static SOUND_START( jangou )
@@ -449,6 +629,29 @@ static MACHINE_DRIVER_START( jangou )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( jngolady )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(jangou)
+
+	MDRV_CPU_MODIFY("cpu0")
+	MDRV_CPU_PROGRAM_MAP(0, jngolady_cpu0_map)
+
+	MDRV_CPU_MODIFY("cpu1")
+	MDRV_CPU_PROGRAM_MAP(0, jngolady_cpu1_map)
+	MDRV_CPU_IO_MAP(0, jngolady_cpu1_io)
+
+	MDRV_CPU_ADD("nsc", NSC8105, MASTER_CLOCK / 8)
+	MDRV_CPU_PROGRAM_MAP(nsc_map, 0)
+
+	/* sound hardware */
+	MDRV_SOUND_START(NULL)
+	MDRV_SOUND_REMOVE("cvsd")
+
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
+	MDRV_SOUND_CONFIG(msm5205_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_DRIVER_END
+
 
 ROM_START( jangou )
 	ROM_REGION( 0x10000, "cpu0", 0 )
@@ -469,4 +672,31 @@ ROM_START( jangou )
 	ROM_LOAD( "jg3_g.bin", 0x00, 0x20,  CRC(d389549d) SHA1(763486052b34f8a38247820109b114118a9f829f) )
 ROM_END
 
-GAME( 1983, jangou, 0, jangou, jangou, 0, ROT0, "Nichibutsu", "Jangou", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+ROM_START( jngolady )
+	ROM_REGION( 0xa000, "cpu0", 0 )
+	ROM_LOAD( "8.9h",  0x08000, 0x02000, CRC(69e31165) SHA1(81b166c101136ed453a4f4cd88445eb1da5dd0aa) )
+	ROM_LOAD( "9.9g",  0x06000, 0x02000, CRC(2faba771) SHA1(d88d0673c9b8cf3783b23c7290253475c9bf397e) )
+	ROM_LOAD( "10.9f", 0x04000, 0x02000, CRC(dd311ff9) SHA1(be39ed25343796dc062a612fe82ca19ceb06a9e7) )
+	ROM_LOAD( "11.9e", 0x02000, 0x02000, CRC(66cad038) SHA1(c60713615d58a9888e21bfec62fee53558a98eaa) )
+	ROM_LOAD( "12.9d", 0x00000, 0x02000, CRC(99c5cc06) SHA1(3a9b3810bb542e252521923ec3026f10f176fa82) )
+
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "4.9p", 0x00000, 0x02000, CRC(34cc2c71) SHA1(b407fed069baf3df316f0006a559a6c5e0be5bd0) )
+	ROM_LOAD( "5.9n", 0x02000, 0x02000, CRC(42ed7832) SHA1(2681a532049fee494e1d1779d9dc08b17ce6e134) )
+	ROM_LOAD( "6.9m", 0x04000, 0x02000, CRC(9e0e7ef4) SHA1(c68d30e60377c1027f4f053c528a80df09b8ee08) )
+	ROM_LOAD( "7.9l", 0x06000, 0x02000, CRC(048615d9) SHA1(3c79830db8792ae0746513ed9849cc5d43051ed6) )
+
+	ROM_REGION( 0x10000, "nsc", 0 )
+	ROM_LOAD( "m13.13", 0x0f000, 0x01000, CRC(5b20b0e2) SHA1(228d2d931e6daab3572a1f128b5686f84b6a5a29) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "jl.3g", 0x00, 0x20, CRC(15ffff8c) SHA1(5782697f9c9a6bb04bbf7824cd49033c962899f0) )
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	ROM_LOAD( "1.5n", 0x00000, 0x02000, CRC(54027dee) SHA1(0616c12dbf3a0515cf4312fc5e238a61c97f8084) )
+	ROM_LOAD( "2.5m", 0x02000, 0x02000, CRC(323dfad5) SHA1(5908acbf80e4b609ee8e5c313ac99717860dd19c) )
+	ROM_LOAD( "3.5l", 0x04000, 0x04000, CRC(14688574) SHA1(241eaf1838239e38d11dff3556fb0a609a4b46aa) )
+ROM_END
+
+GAME( 1983, jangou,    0,    jangou,   jangou,    0, ROT0, "Nichibutsu", "Jangou",      GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+GAME( 1984, jngolady,  0,    jngolady, jngolady,  0, ROT0, "Nichibutsu", "Jangou Lady", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
