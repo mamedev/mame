@@ -37,6 +37,7 @@
 #define __ATTOTIME_H__
 
 #include "mamecore.h"
+#include "eminline.h"
 #include <math.h>
 
 
@@ -227,10 +228,10 @@ INLINE attoseconds_t attotime_to_attoseconds(attotime _time)
     clock ticks at the given frequency
 -------------------------------------------------*/
 
-INLINE INT64 attotime_to_ticks(attotime _time, INT32 frequency)
+INLINE UINT64 attotime_to_ticks(attotime _time, UINT32 frequency)
 {
-	INT32 fracticks = attotime_mul(attotime_make(0, _time.attoseconds), frequency).seconds;
-	return (INT64)_time.seconds * (INT64)frequency + fracticks;
+	UINT32 fracticks = attotime_mul(attotime_make(0, _time.attoseconds), frequency).seconds;
+	return mulu_32x32(_time.seconds, frequency) + fracticks;
 }
 
 
@@ -239,11 +240,22 @@ INLINE INT64 attotime_to_ticks(attotime _time, INT32 frequency)
     the given frequency to an attotime
 -------------------------------------------------*/
 
-INLINE attotime ticks_to_attotime(INT64 ticks, INT32 frequency)
+INLINE attotime ticks_to_attotime(UINT64 ticks, UINT32 frequency)
 {
+	attoseconds_t attos_per_tick = HZ_TO_ATTOSECONDS(frequency);
 	attotime result;
-	result.seconds = ticks / frequency;
-	result.attoseconds = HZ_TO_ATTOSECONDS(frequency) * (ticks - (INT64)result.seconds * (INT64)frequency);
+	
+	if (ticks < frequency)
+	{
+		result.seconds = 0;
+		result.attoseconds = ticks * attos_per_tick;
+	}
+	else
+	{
+		UINT32 remainder;
+		result.seconds = divu_64x32_rem(ticks, frequency, &remainder);
+		result.attoseconds = (UINT64)remainder * attos_per_tick;
+	}
 	return result;
 }
 
