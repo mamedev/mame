@@ -290,8 +290,8 @@ struct _mcs51_state_t
 
 	/* Serial Port TX/RX Callbacks */
 	// TODO: Move to special port r/w
-	void    (*serial_tx_callback)(int data);	//Call back funciton when sending data out of serial port
-	int		(*serial_rx_callback)(void);		//Call back function to retrieve data when receiving serial port data
+	mcs51_serial_tx_func serial_tx_callback;	//Call back funciton when sending data out of serial port
+	mcs51_serial_rx_func serial_rx_callback;	//Call back function to retrieve data when receiving serial port data
 
 	/* DS5002FP */
 	struct {
@@ -632,13 +632,6 @@ struct _mcs51_state_t
 #define CLEAR_CURRENT_IRQ() clear_current_irq(mcs51_state)
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-static void (*hold_serial_tx_callback)(int data);
-static int (*hold_serial_rx_callback)(void);
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
@@ -910,7 +903,7 @@ INLINE void transmit_receive(mcs51_state_t *mcs51_state, int source)
 			if(mcs51_state->uart.bits_to_send == 0) {
 				//Call the callback function
 				if(mcs51_state->serial_tx_callback)
-					mcs51_state->serial_tx_callback(mcs51_state->uart.data_out);
+					mcs51_state->serial_tx_callback(mcs51_state->device, mcs51_state->uart.data_out);
 				//Set Interrupt Flag
 				SET_TI(1);
 			}
@@ -929,7 +922,7 @@ INLINE void transmit_receive(mcs51_state_t *mcs51_state, int source)
 				int data = 0;
 				//Call our callball function to retrieve the data
 				if(mcs51_state->serial_rx_callback)
-					data = mcs51_state->serial_rx_callback();
+					data = mcs51_state->serial_rx_callback(mcs51_state->device);
 				LOG(("RX Deliver %d\n", data));
 				SET_SBUF(data);
 				//Flag the IRQ
@@ -1264,16 +1257,16 @@ INLINE void	update_irq_prio(mcs51_state_t *mcs51_state, UINT8 ipl, UINT8 iph)
 ***************************************************************************/
 
 
-void i8051_set_serial_tx_callback(void (*callback)(int data))
+void i8051_set_serial_tx_callback(const device_config *device, mcs51_serial_tx_func tx_func)
 {
-	//Hold in static variable since this function can get called before reset has run, which wipes i8051 memory clean
-	hold_serial_tx_callback = callback;
+	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state->serial_tx_callback = tx_func;
 }
 
-void i8051_set_serial_rx_callback(int (*callback)(void))
+void i8051_set_serial_rx_callback(const device_config *device, mcs51_serial_rx_func rx_func)
 {
-	//Hold in static variable since this function can get called before reset has run, which wipes i8051 memory clean
-	hold_serial_rx_callback = callback;
+	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state->serial_rx_callback = rx_func;
 }
 
 /***************************************************************************
@@ -2099,11 +2092,6 @@ static CPU_RESET( mcs51 )
 	mcs51_state_t *mcs51_state = device->token;
 
 	update_ptrs(mcs51_state);
-	//Set up serial call back handlers
-	mcs51_state->serial_tx_callback = hold_serial_tx_callback;
-	hold_serial_tx_callback = NULL;
-	mcs51_state->serial_rx_callback = hold_serial_rx_callback;
-	hold_serial_rx_callback = NULL;
 
 	mcs51_state->last_line_state = 0;
 	mcs51_state->t0_cnt = 0;

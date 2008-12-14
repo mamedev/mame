@@ -105,25 +105,25 @@ enum{   RX=0,TX,STATUS,SYN1,SYN2,DLE,MODE1,MODE2,COMMAND
 
 
 /* Probably wrong and a bit crap */
-static int data_to_i8031(void)
+static int data_to_i8031(const device_config *device)
 {
 	mame_printf_debug("68k sent data: %x\n",M68681.TBB);
     M68681.SRB |=0x0400;                   // Data has been sent - TX ready for more.
     // Write to sound board
     if(M68681.IMR & 0x1000)
     {
-    	cpu_set_input_line_and_vector(Machine->cpu[0],3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
+    	cpu_set_input_line_and_vector(device->machine->cpu[0],3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
     }
 	return M68681.TBB;
 }
 
-static void data_from_i8031(int data)
+static void data_from_i8031(const device_config *device, int data)
 {
 	M68681.RBB  = data<<8;                         // Put into receive buffer.
 	M68681.SRB |= 0x0100;                          // Set Receiver B ready.
 	if(M68681.IMR & 0x1000)
 	{
-		cpu_set_input_line_and_vector(Machine->cpu[0],3, HOLD_LINE, M68681.IVR);    // Generate a receiver interrupt.
+		cpu_set_input_line_and_vector(device->machine->cpu[0],3, HOLD_LINE, M68681.IVR);    // Generate a receiver interrupt.
 		mame_printf_debug("INTERRUPT!!!\n");
 	}
 	mame_printf_debug("8031 sent data: %x\n",data);
@@ -169,8 +169,8 @@ static void micro3d_scanline_update(const device_config *screen, bitmap_t *bitma
 
 static MACHINE_RESET( micro3d )
 {
-        i8051_set_serial_tx_callback(data_from_i8031);
-        i8051_set_serial_rx_callback(data_to_i8031);
+        i8051_set_serial_tx_callback(machine->cpu[2], data_from_i8031);
+        i8051_set_serial_rx_callback(machine->cpu[2], data_to_i8031);
         ti_uart[STATUS]=1;
         M68681.SRA=0x0500;
         M68681.SRB=0x0500;
