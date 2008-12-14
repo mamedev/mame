@@ -2783,9 +2783,9 @@ V-V                           TP-027
 
 	/* Capcom CPS3 games */
 	DRIVER( sfiii )		/* 04/02/1997 (c) 1997 Capcom */
-	DRIVER( sfiiiu )	/* 04/02/1997 (c) 1997 Capcom */
+	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 Capcom */
 	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 Capcom */
-	DRIVER( sfiii2u )	/* 30/09/1997 (c) 1997 Capcom */
+	DRIVER( sfiii2j )	/* 30/09/1997 (c) 1997 Capcom */
 	DRIVER( sfiii3 )	/* 12/05/1999 (c) 1999 Capcom */
 	DRIVER( sfiii3a )	/* 08/06/1999 (c) 1999 Capcom */
 	DRIVER( jojo )		/* 02/12/1998 (c) 1998 Capcom */

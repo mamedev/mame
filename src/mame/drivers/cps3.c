@@ -2671,7 +2671,7 @@ MACHINE_DRIVER_END
 
 ROM_START( sfiii )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "sfiii_japan.29f400.u2", 0x000000, 0x080000, CRC(74205250) SHA1(c3e83ace7121d32da729162662ec6b5285a31211) )
+	ROM_LOAD( "sfiii_usa.29f400.u2", 0x000000, 0x080000, CRC(fb172a8e) SHA1(48ebf59910f246835f7dc0c588da30f7a908072f) )
 
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
@@ -2680,9 +2680,9 @@ ROM_START( sfiii )
 	DISK_IMAGE_READONLY( "sf3000", 0, MD5(cdc5c5423bd8c053de7cdd927dc60da7) SHA1(cc72c9eb2096f4d51f2cf6df18f29fd79d05067c) )
 ROM_END
 
-ROM_START( sfiiiu )
+ROM_START( sfiiij )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "sfiii_usa.29f400.u2", 0x000000, 0x080000, CRC(fb172a8e) SHA1(48ebf59910f246835f7dc0c588da30f7a908072f) )
+	ROM_LOAD( "sfiii_japan.29f400.u2", 0x000000, 0x080000, CRC(74205250) SHA1(c3e83ace7121d32da729162662ec6b5285a31211) )
 
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
@@ -2693,7 +2693,7 @@ ROM_END
 
 ROM_START( sfiii2 )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "sfiii2_japan.29f400.u2", 0x000000, 0x080000, CRC(faea0a3e) SHA1(a03cd63bcf52e4d57f7a598c8bc8e243694624ec) )
+	ROM_LOAD( "sfiii2_usa.29f400.u2", 0x000000, 0x080000, CRC(75dd72e0) SHA1(5a12d6ea6734df5de00ecee6f9ef470749d2f242) )
 
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
@@ -2702,9 +2702,9 @@ ROM_START( sfiii2 )
 	DISK_IMAGE_READONLY( "3ga000", 0, MD5(941c7e8d0838db9880ea7bf169ad310d) SHA1(76e9fdef020c4b85a10aa8828a63e67c7dca22bd) )
 ROM_END
 
-ROM_START( sfiii2u )
+ROM_START( sfiii2j )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "sfiii2_usa.29f400.u2", 0x000000, 0x080000, CRC(75dd72e0) SHA1(5a12d6ea6734df5de00ecee6f9ef470749d2f242) )
+	ROM_LOAD( "sfiii2_japan.29f400.u2", 0x000000, 0x080000, CRC(faea0a3e) SHA1(a03cd63bcf52e4d57f7a598c8bc8e243694624ec) )
 
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* Program Code Region */
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
@@ -3085,11 +3085,11 @@ ROM_END
 
 /* todo: use BIOS for the bios roms, having clones only for CD / No CD */
 
-GAME( 1997, sfiii,   0,        cps3, cps3, cps3,  ROT0,   "Capcom", "Street Fighter III: New Generation (Japan, 970204)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiiu,  sfiii,    cps3, cps3, cps3,  ROT0,   "Capcom", "Street Fighter III: New Generation (USA, 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii,   0,        cps3, cps3, cps3,  ROT0,   "Capcom", "Street Fighter III: New Generation (USA, 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiij,  sfiii,    cps3, cps3, cps3,  ROT0,   "Capcom", "Street Fighter III: New Generation (Japan, 970204)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1997, sfiii2,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan, 970930)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiii2u, sfiii2,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA, 970930)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA, 970930)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2j, sfiii2,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan, 970930)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1999, sfiii3,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990512)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, sfiii3a, sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990608)", GAME_IMPERFECT_GRAPHICS )
