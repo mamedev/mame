@@ -691,8 +691,9 @@ static LRESULT CALLBACK debugwin_window_proc(HWND wnd, UINT message, WPARAM wpar
 		}
 
 		// sizing: recompute child window locations
+		case WM_SIZE:
 		case WM_SIZING:
-			if (info->recompute_children)
+			if (info->recompute_children != NULL)
 				(*info->recompute_children)(info);
 			InvalidateRect(wnd, NULL, FALSE);
 			break;
