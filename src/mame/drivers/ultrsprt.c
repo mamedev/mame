@@ -97,6 +97,8 @@ static MACHINE_START( ultrsprt )
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
+
+
 static ADDRESS_MAP_START( ultrsprt_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&vram)
 	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE(eeprom_r, eeprom_w)
@@ -267,13 +269,11 @@ static void sound_irq_callback(running_machine *machine, int irq)
 	if (irq == 0)
 		/*generic_pulse_irq_line(machine->cpu[1], INPUT_LINE_IRQ5)*/;
 	else
-		generic_pulse_irq_line(machine->cpu[1], INPUT_LINE_IRQ6);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ6, HOLD_LINE);
 }
 
 static DRIVER_INIT( ultrsprt )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-
 	K056800_init(machine, sound_irq_callback);
 }
 
