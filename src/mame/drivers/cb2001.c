@@ -51,8 +51,8 @@ const UINT8 cb2001_decryption_table[256] = {
 //	                                         ????                ????
 	xxxx,0x8e,xxxx,xxxx,xxxx,0x49,xxxx,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
 //	     !!!!                ????                           pppp
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 30 */
-//	                              pppp
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xb0,xxxx, /* 30 */
+//	                              pppp                                     ????
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
 //	     !!!!                gggg
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0x78,xxxx,xxxx,xxxx, /* 50 */
@@ -60,7 +60,7 @@ const UINT8 cb2001_decryption_table[256] = {
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
 //	                                                                       gggg
 	0xc3,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
-//	pppp
+//	pppp                                               ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 80 */
 //	                                   ????
 	xxxx,xxxx,0xe9,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */

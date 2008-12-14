@@ -22,10 +22,6 @@ Notes:
   selection moves too fast with the clock set at 16 MHz. It's still fast at
   8 MHz, but at least it's usable.
 
-To do:
-
-- Risky Challenge / Gussun Oyoyo use a raster effect to split the screen at the line water
-
 *****************************************************************************/
 
 #include "driver.h"
