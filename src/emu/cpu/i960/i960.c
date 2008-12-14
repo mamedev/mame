@@ -886,7 +886,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
-				set_ri(i960, opcode, ((~t2) ^ (~t1)));
+				set_ri(i960, opcode, ((~t2) & (~t1)));
 				break;
 
 			case 0x9: // xnor
@@ -914,6 +914,13 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2 & ~(1<<(t1 & 31)));
+				break;
+
+			case 0xd: // notor
+				i960->icount--;
+				t1 = get_1_ri(i960, opcode);
+				t2 = get_2_ri(i960, opcode);
+				set_ri(i960, opcode, (~t2) | t1);
 				break;
 
 			case 0xe: // nand
