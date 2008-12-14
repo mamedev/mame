@@ -72,6 +72,7 @@ static MACHINE_RESET( flyball )
 
 	for (i = 0; i < 0x1000; i++)
 		rombase[i] = ROM[i ^ 0x1ff];
+	cpu_reset(machine->cpu[0]);
 
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, flyball_quarter_callback);
 }
