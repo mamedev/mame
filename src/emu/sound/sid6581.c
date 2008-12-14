@@ -37,6 +37,7 @@ static void *sid_start(const device_config *device, int clock, SIDTYPE sidtype)
 	sid = (SID6581 *) auto_malloc(sizeof(*sid));
 	memset(sid, 0, sizeof(*sid));
 
+	sid->device = device;
 	sid->mixer_channel = stream_create (device, 0, 1,  device->machine->sample_rate, (void *) sid, sid_update);
 	sid->PCMfreq = device->machine->sample_rate;
 	sid->clock = clock;

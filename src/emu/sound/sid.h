@@ -15,6 +15,7 @@
 /* private area */
 typedef struct _SID6581
 {
+    const device_config *device;
     sound_stream *mixer_channel; // mame stream/ mixer channel
 
     int (*ad_read) (int which);
@@ -63,14 +64,6 @@ void sid6581_port_w (SID6581 *This, int offset, int data);
 
 void sid_set_type(SID6581 *This, SIDTYPE type);
 
-void initMixerEngine(void);
-void filterTableInit(void);
-extern void MixerInit(int threeVoiceAmplify);
-
 void sidEmuFillBuffer(SID6581 *This, stream_sample_t *buffer, UINT32 bufferLen );
-
-#if 0
-void sidFilterTableInit(void);
-#endif
 
 #endif /* __SID_H__ */

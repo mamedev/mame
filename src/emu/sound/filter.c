@@ -1,6 +1,5 @@
-#include "filter.h"
 #include "sndintrf.h"
-#include "deprecat.h"
+#include "filter.h"
 
 static filter* filter_alloc(void) {
 	filter* f = malloc_or_die(sizeof(filter));
@@ -132,18 +131,19 @@ filter* filter_lp_fir_alloc(double freq, int order) {
 }
 
 
-void filter2_setup(int type, double fc, double d, double gain,
+void filter2_setup(const device_config *device, int type, double fc, double d, double gain,
 					filter2_context *filter2)
 {
+	int sample_rate = device->machine->sample_rate;
 	double w;	/* cutoff freq, in radians/sec */
 	double w_squared;
 	double den;	/* temp variable */
-	double two_over_T = 2*Machine->sample_rate;
+	double two_over_T = 2*sample_rate;
 	double two_over_T_squared = two_over_T * two_over_T;
 
 	/* calculate digital filter coefficents */
 	/*w = 2.0*M_PI*fc; no pre-warping */
-	w = Machine->sample_rate*2.0*tan(M_PI*fc/Machine->sample_rate); /* pre-warping */
+	w = sample_rate*2.0*tan(M_PI*fc/sample_rate); /* pre-warping */
 	w_squared = w*w;
 
 	den = two_over_T_squared + d*w*two_over_T + w_squared;
@@ -202,7 +202,7 @@ void filter2_step(filter2_context *filter2)
 
 
 /* Setup a filter2 structure based on an op-amp multipole bandpass circuit. */
-void filter_opamp_m_bandpass_setup(double r1, double r2, double r3, double c1, double c2,
+void filter_opamp_m_bandpass_setup(const device_config *device, double r1, double r2, double r3, double c1, double c2,
 					filter2_context *filter2)
 {
 	double	r_in, fc, d, gain;
@@ -228,5 +228,5 @@ void filter_opamp_m_bandpass_setup(double r1, double r2, double r3, double c1, d
 	d = (c1 + c2) / sqrt(r3 / r_in * c1 * c2);
 	gain *= -r3 / r_in * c2 / (c1 + c2);
 
-	filter2_setup(FILTER_BANDPASS, fc, d, gain, filter2);
+	filter2_setup(device, FILTER_BANDPASS, fc, d, gain, filter2);
 }

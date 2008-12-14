@@ -118,14 +118,11 @@
 #include <math.h>
 
 #ifndef __RAINE__
-#include "deprecat.h"
 #include "sndintrf.h"		/* use M.A.M.E. */
 #else
 #include "deftypes.h"		/* use RAINE */
 #include "support.h"		/* use RAINE */
 #endif
-
-//#include "ay8910.h"
 #include "fm.h"
 
 
@@ -643,6 +640,7 @@ typedef struct
 
 typedef struct
 {
+	const device_config *device;
 	void *		param;				/* this chip parameter  */
 	int			clock;				/* master clock  (Hz)   */
 	int			rate;				/* sampling rate (Hz)   */
@@ -895,7 +893,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 {
 	if( COMPARE_TIMES(ST->busy_expiry_time, UNDEFINED_TIME) != 0 )
 	{
-		if (COMPARE_TIMES(ST->busy_expiry_time, FM_GET_TIME_NOW(Machine)) > 0)
+		if (COMPARE_TIMES(ST->busy_expiry_time, FM_GET_TIME_NOW(ST->device->machine)) > 0)
 			return ST->status | 0x80;	/* with busy */
 		/* expire */
 		FM_BUSY_CLEAR(ST);
@@ -905,7 +903,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 INLINE void FM_BUSY_SET(FM_ST *ST,int busyclock )
 {
 	TIME_TYPE expiry_period = MULTIPLY_TIME_BY_INT(ATTOTIME_IN_HZ(ST->clock), busyclock * ST->timer_prescaler);
-	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(Machine), expiry_period);
+	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(ST->device->machine), expiry_period);
 }
 #else
 #define FM_STATUS_FLAG(ST) ((ST)->status)
@@ -2439,6 +2437,7 @@ void * ym2203_init(void *param, const device_config *device, int clock, int rate
 	F2203->OPN.ST.param = param;
 	F2203->OPN.type = TYPE_YM2203;
 	F2203->OPN.P_CH = F2203->CH;
+	F2203->OPN.ST.device = device;
 	F2203->OPN.ST.clock = clock;
 	F2203->OPN.ST.rate = rate;
 
@@ -3662,6 +3661,7 @@ void * ym2608_init(void *param, const device_config *device, int clock, int rate
 	F2608->OPN.ST.param = param;
 	F2608->OPN.type = TYPE_YM2608;
 	F2608->OPN.P_CH = F2608->CH;
+	F2608->OPN.ST.device = device;
 	F2608->OPN.ST.clock = clock;
 	F2608->OPN.ST.rate = rate;
 
@@ -4349,6 +4349,7 @@ void *ym2610_init(void *param, const device_config *device, int clock, int rate,
 	F2610->OPN.ST.param = param;
 	F2610->OPN.type = TYPE_YM2610;
 	F2610->OPN.P_CH = F2610->CH;
+	F2610->OPN.ST.device = device;
 	F2610->OPN.ST.clock = clock;
 	F2610->OPN.ST.rate = rate;
 	/* Extend handler */
@@ -4813,6 +4814,7 @@ void * ym2612_init(void *param, const device_config *device, int clock, int rate
 	F2612->OPN.ST.param = param;
 	F2612->OPN.type = TYPE_YM2612;
 	F2612->OPN.P_CH = F2612->CH;
+	F2612->OPN.ST.device = device;
 	F2612->OPN.ST.clock = clock;
 	F2612->OPN.ST.rate = rate;
 	/* F2612->OPN.ST.irq = 0; */

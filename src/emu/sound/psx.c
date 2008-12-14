@@ -10,7 +10,6 @@
 
 #include <stdarg.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "cpuexec.h"
@@ -39,6 +38,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 struct psxinfo
 {
 	const psx_spu_interface *intf;
+	const device_config *device;
 
 	UINT32 *g_p_n_psxram;
 	UINT16 m_n_mainvolumeleft;
@@ -156,7 +156,7 @@ static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t
 					( chip->m_n_irqaddress * 4 ) >= chip->m_p_n_blockaddress[ n_channel ] &&
 					( chip->m_n_irqaddress * 4 ) <= chip->m_p_n_blockaddress[ n_channel ] + 7 )
 				{
-					chip->intf->irq_set( Machine, 0x0200 );
+					chip->intf->irq_set( chip->device->machine, 0x0200 );
 				}
 
 				n_shift =   ( chip->m_p_n_spuram[ chip->m_p_n_blockaddress[ n_channel ] ] >> 0 ) & 0x0f;
@@ -215,8 +215,8 @@ static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 static void spu_read( UINT32 n_address, INT32 n_size )
 {
-	running_machine *machine = Machine;
 	struct psxinfo *chip = sndti_token(SOUND_PSXSPU, 0);
+	running_machine *machine = chip->device->machine;
 	verboselog( machine, 1, "spu_read( %08x, %08x )\n", n_address, n_size );
 
 	while( n_size > 0 )
@@ -235,8 +235,8 @@ static void spu_read( UINT32 n_address, INT32 n_size )
 
 static void spu_write( UINT32 n_address, INT32 n_size )
 {
-	running_machine *machine = Machine;
 	struct psxinfo *chip = sndti_token(SOUND_PSXSPU, 0);
+	running_machine *machine = chip->device->machine;
 	verboselog( machine, 1, "spu_write( %08x, %08x )\n", n_address, n_size );
 
 	while( n_size > 0 )
@@ -262,6 +262,7 @@ static SND_START( psxspu )
 	memset(chip, 0, sizeof(*chip));
 
 	chip->intf = config;
+	chip->device = device;
 	chip->g_p_n_psxram = *(chip->intf->p_psxram);
 
 	chip->m_n_mainvolumeleft = 0;

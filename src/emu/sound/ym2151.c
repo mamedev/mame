@@ -7,7 +7,6 @@
 #include <math.h>
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "ym2151.h"
 
@@ -165,6 +164,7 @@ typedef struct
 	void (*irqhandler)(running_machine *machine, int irq);		/* IRQ function handler */
 	write8_space_func porthandler;		/* port write function handler */
 
+	const device_config *device;
 	unsigned int clock;					/* chip clock in Hz (passed from 2151intf.c) */
 	unsigned int sampfreq;				/* sampling frequency in Hz (passed from 2151intf.c) */
 } YM2151;
@@ -1044,9 +1044,9 @@ INLINE void refresh_EG(YM2151Operator * op)
 /* write a register on YM2151 chip number 'n' */
 void ym2151_write_reg(void *_chip, int r, int v)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	YM2151 *chip = _chip;
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	YM2151Operator *op = &chip->oper[ (r&0x07)*4+((r&0x18)>>3) ];
 
 	/* adjust bus to 8 bits */
@@ -1105,7 +1105,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~1;
-				timer_set(Machine, attotime_zero,chip,0,irqAoff_callback);
+				timer_set(chip->device->machine, attotime_zero,chip,0,irqAoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~1;
@@ -1117,7 +1117,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~2;
-				timer_set(Machine, attotime_zero,chip,0,irqBoff_callback);
+				timer_set(chip->device->machine, attotime_zero,chip,0,irqBoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~2;
@@ -1519,6 +1519,7 @@ void * ym2151_init(const device_config *device, int clock, int rate)
 
 	init_tables();
 
+	PSG->device = device;
 	PSG->clock = clock;
 	/*rate = clock/64;*/
 	PSG->sampfreq = rate ? rate : 44100;	/* avoid division by 0 in init_chip_tables() */

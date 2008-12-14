@@ -80,7 +80,7 @@ static SND_START( ymf262 )
 	info->device = device;
 
 	/* stream system initialize */
-	info->chip = ymf262_init(clock,rate);
+	info->chip = ymf262_init(device,clock,rate);
 	if (info->chip == NULL)
 		return NULL;
 

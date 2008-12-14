@@ -16,7 +16,6 @@
 #include "sidvoice.h"
 #include "sidenvel.h"
 #include "sid.h"
-#include "deprecat.h"
 
 static float *filterTable;
 static float *bandPassParam;
@@ -31,7 +30,7 @@ static UINT16 mix16mono[256*maxLogicalVoices];
 static UINT16 zero16bit=0;  /* either signed or unsigned */
 //UINT32 splitBufferLen;
 
-void MixerInit(int threeVoiceAmplify)
+static void MixerInit(int threeVoiceAmplify)
 {
 	long si;
 	UINT16 ui;
@@ -150,8 +149,9 @@ int sidEmuReset(SID6581 *This)
 }
 
 
-void filterTableInit(void)
+static void filterTableInit(running_machine *machine)
 {
+	int sample_rate = machine->sample_rate;
 	UINT16 uk;
 	/* Parameter calculation has not been moved to a separate function */
 	/* by purpose. */
@@ -173,7 +173,7 @@ void filterTableInit(void)
 	for ( rk = 0; rk < 0x800; rk++ )
 	{
 		filterTable[uk] = (((exp(rk/0x800*log(400.0))/60.0)+0.05)
-			*filterRefFreq) / Machine->sample_rate;
+			*filterRefFreq) / sample_rate;
 		if ( filterTable[uk] < yMin )
 			filterTable[uk] = yMin;
 		if ( filterTable[uk] > yMax )
@@ -190,7 +190,7 @@ void filterTableInit(void)
 	/* Some C++ compilers still have non-local scope! */
 	for ( rk2 = 0; rk2 < 0x800; rk2++ )
 	{
-		bandPassParam[uk] = (yTmp*filterRefFreq) / Machine->sample_rate;
+		bandPassParam[uk] = (yTmp*filterRefFreq) / sample_rate;
 		yTmp += yAdd;
 		uk++;
 	}
@@ -234,7 +234,7 @@ void sid6581_init (SID6581 *This)
 	This->filter.Enabled = TRUE;
 
 	sidInitMixerEngine();
-	filterTableInit();
+	filterTableInit(This->device->machine);
 
 	sidInitWaveformTables(This->type);
 

@@ -107,13 +107,13 @@ CUSTOM_START( polepos_sh_start )
 	sample_enable = 0;
 
 	/* setup the filters */
-	filter_opamp_m_bandpass_setup(RES_K(220), RES_K(33), RES_K(390), CAP_U(.01),  CAP_U(.01),
+	filter_opamp_m_bandpass_setup(device, RES_K(220), RES_K(33), RES_K(390), CAP_U(.01),  CAP_U(.01),
 									&filter_engine[0]);
-	filter_opamp_m_bandpass_setup(RES_K(150), RES_K(22), RES_K(330), CAP_U(.0047),  CAP_U(.0047),
+	filter_opamp_m_bandpass_setup(device, RES_K(150), RES_K(22), RES_K(330), CAP_U(.0047),  CAP_U(.0047),
 									&filter_engine[1]);
 	/* Filter 3 is a little different.  Because of the input capacitor, it is
      * a high pass filter. */
-	filter2_setup(FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1,
+	filter2_setup(device, FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1,
 									&filter_engine[2]);
 
 	return auto_malloc(1);

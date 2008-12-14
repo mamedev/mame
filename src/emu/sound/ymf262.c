@@ -54,9 +54,7 @@ differences between OPL2 and OPL3 shown in datasheets:
 */
 
 #include <math.h>
-
-#include "sndintrf.h"		/* use M.A.M.E. */
-#include "deprecat.h"
+#include "sndintrf.h"
 #include "ymf262.h"
 
 
@@ -2246,7 +2244,7 @@ static TIMER_CALLBACK( cymfile_callback )
 }
 
 /* lock/unlock for common table */
-static int OPL3_LockTable(void)
+static int OPL3_LockTable(const device_config *device)
 {
 	num_lock++;
 	if(num_lock>1) return 0;
@@ -2265,7 +2263,7 @@ static int OPL3_LockTable(void)
 	{
 		cymfile = fopen("ymf262_.cym","wb");
 		if (cymfile)
-			timer_pulse ( Machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+			timer_pulse ( device->machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create ymf262_.cym file\n");
 	}
@@ -2333,11 +2331,11 @@ static void OPL3ResetChip(OPL3 *chip)
 /* Create one of virtual YMF262 */
 /* 'clock' is chip clock in Hz  */
 /* 'rate'  is sampling rate  */
-static OPL3 *OPL3Create(int type, int clock, int rate)
+static OPL3 *OPL3Create(const device_config *device, int clock, int rate, int type)
 {
 	OPL3 *chip;
 
-	if (OPL3_LockTable() ==-1) return NULL;
+	if (OPL3_LockTable(device) == -1) return NULL;
 
 	/* allocate memory block */
 	chip = (OPL3 *)malloc(sizeof(OPL3));
@@ -2465,9 +2463,9 @@ static int OPL3TimerOver(OPL3 *chip,int c)
 
 
 
-void * ymf262_init(int clock, int rate)
+void * ymf262_init(const device_config *device, int clock, int rate)
 {
-	return OPL3Create(OPL3_TYPE_YMF262,clock,rate);
+	return OPL3Create(device,clock,rate,OPL3_TYPE_YMF262);
 }
 
 void ymf262_shutdown(void *chip)

@@ -3280,11 +3280,11 @@
 #define DISCRETE_STEP_NAME( _func )  _func ## _step
 #define DISCRETE_RESET_NAME( _func ) _func ## _reset
 
-#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (node_description *node)
-#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (node_description *node)
+#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (const device_config *device, node_description *node)
+#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (const device_config *device, node_description *node)
 
-#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (node)
-#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (node)
+#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (device, node)
+#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (device, node)
 
 /*************************************
  *
@@ -3539,8 +3539,8 @@ struct _discrete_module
 	const char *	name;
 	int				num_output;				/* Total number of output nodes, i.e. Master node + 1 */
 	size_t			contextsize;
-	void (*reset)(node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(node_description *node);	/* Called to execute one time delta of output update */
+	void (*reset)(const device_config *device, node_description *node);	/* Called to reset a node after creation or system reset */
+	void (*step)(const device_config *device, node_description *node);	/* Called to execute one time delta of output update */
 };
 
 
@@ -3583,6 +3583,8 @@ struct _node_description
 typedef struct _discrete_info discrete_info;
 struct _discrete_info
 {
+	const device_config *device;
+
 	/* emulation info */
 	int		sndindex;
 	int		sample_rate;
@@ -3880,8 +3882,8 @@ struct _discrete_adsr
 typedef struct _discrete_custom_info discrete_custom_info;
 struct _discrete_custom_info
 {
-	void (*reset)(node_description *node);	/* Called to reset a node after creation or system reset */
-	void (*step)(node_description *node);	/* Called to execute one time delta of output update */
+	void (*reset)(const device_config *device, node_description *node);	/* Called to reset a node after creation or system reset */
+	void (*step)(const device_config *device, node_description *node);	/* Called to execute one time delta of output update */
 	size_t contextsize;
 	const void *custom;						/* Custom function specific initialisation data */
 };

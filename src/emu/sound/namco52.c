@@ -153,8 +153,8 @@ static SND_START( namco_52xx )
 	{
 		chip->n52_step = chip->intf->play_rate / rate;
 	}
-	filter2_setup(FILTER_HIGHPASS, chip->intf->hp_filt_fc, Q_TO_DAMP(chip->intf->hp_filt_q), 1, &chip->n52_hp_filter);
-	filter2_setup(FILTER_LOWPASS,  chip->intf->lp_filt_fc, Q_TO_DAMP(chip->intf->lp_filt_q), chip->intf->filt_gain, &chip->n52_lp_filter);
+	filter2_setup(device, FILTER_HIGHPASS, chip->intf->hp_filt_fc, Q_TO_DAMP(chip->intf->hp_filt_q), 1, &chip->n52_hp_filter);
+	filter2_setup(device, FILTER_LOWPASS,  chip->intf->lp_filt_fc, Q_TO_DAMP(chip->intf->lp_filt_q), chip->intf->filt_gain, &chip->n52_lp_filter);
 
 
 	chip->stream = stream_create(device, 0, 1, rate, chip, namco_52xx_stream_update_one);

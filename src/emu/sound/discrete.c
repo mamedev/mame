@@ -36,7 +36,6 @@
 #include "sndintrf.h"
 #include "streams.h"
 #include "inptport.h"
-#include "deprecat.h"
 #include "wavwrite.h"
 #include "discrete.h"
 
@@ -255,6 +254,7 @@ static SND_START( discrete )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
+	info->device = device;
 	info->sndindex = sndindex;
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
@@ -406,11 +406,11 @@ static SND_RESET( discrete )
 
 		/* if the node has a reset function, call it */
 		if (node->module.reset)
-			(*node->module.reset)(node);
+			(*node->module.reset)(device, node);
 
 		/* otherwise, just step it */
 		else if (node->module.step)
-			(*node->module.step)(node);
+			(*node->module.step)(device, node);
 	}
 
 	discrete_current_context = NULL;
@@ -452,7 +452,7 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
 			node->run_time -= osd_profiling_ticks();
 #endif
 			if (node->module.step)
-				(*node->module.step)(node);
+				(*node->module.step)(info->device, node);
 #if (DISCRETE_PROFILING)
 			node->run_time += osd_profiling_ticks();
 #endif

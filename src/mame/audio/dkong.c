@@ -302,7 +302,7 @@ struct dkong_custom_mixer_context
 	double exp[2];
 };
 
-static void dkong_custom_mixer_step(node_description *node)
+static DISCRETE_STEP( dkong_custom_mixer )
 {
 	struct dkong_custom_mixer_context *context = node->context;
 
@@ -321,7 +321,7 @@ static void dkong_custom_mixer_step(node_description *node)
 
 #define	NE555_CV_R		RES_2_PARALLEL(RES_K(5), RES_K(10))
 
-static void dkong_custom_mixer_reset(node_description *node)
+static DISCRETE_RESET( dkong_custom_mixer )
 {
 	struct dkong_custom_mixer_context *context = node->context;
 
@@ -344,8 +344,8 @@ static void dkong_custom_mixer_reset(node_description *node)
 
 static const discrete_custom_info dkong_custom_mixer_info =
 {
-	&dkong_custom_mixer_reset,
-	&dkong_custom_mixer_step,
+	DISCRETE_RESET_NAME( dkong_custom_mixer ),
+	DISCRETE_STEP_NAME( dkong_custom_mixer ),
 	sizeof(struct dkong_custom_mixer_context),
 	NULL
 };

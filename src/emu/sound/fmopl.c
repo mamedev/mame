@@ -68,12 +68,8 @@ Revision History:
 */
 
 #include <math.h>
-
-#include "sndintrf.h"		/* use M.A.M.E. */
-#include "deprecat.h"		/* use M.A.M.E. */
-
+#include "sndintrf.h"
 #include "ymdeltat.h"
-
 #include "fmopl.h"
 
 
@@ -1726,7 +1722,7 @@ static TIMER_CALLBACK( cymfile_callback )
 }
 
 /* lock/unlock for common table */
-static int OPL_LockTable(void)
+static int OPL_LockTable(const device_config *device)
 {
 	num_lock++;
 	if(num_lock>1) return 0;
@@ -1745,7 +1741,7 @@ static int OPL_LockTable(void)
 	{
 		cymfile = fopen("3812_.cym","wb");
 		if (cymfile)
-			timer_pulse ( Machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+			timer_pulse ( device->machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 3812_.cym\n");
 	}
@@ -1966,13 +1962,13 @@ static void OPL_save_state(FM_OPL *OPL, const device_config *device)
 /* Create one of virtual YM3812/YM3526/Y8950 */
 /* 'clock' is chip clock in Hz  */
 /* 'rate'  is sampling rate  */
-static FM_OPL *OPLCreate(int type, UINT32 clock, UINT32 rate)
+static FM_OPL *OPLCreate(const device_config *device, UINT32 clock, UINT32 rate, int type)
 {
 	char *ptr;
 	FM_OPL *OPL;
 	int state_size;
 
-	if (OPL_LockTable() ==-1) return NULL;
+	if (OPL_LockTable(device) == -1) return NULL;
 
 	/* calculate OPL state size */
 	state_size  = sizeof(FM_OPL);
@@ -2162,7 +2158,7 @@ static int OPLTimerOver(FM_OPL *OPL,int c)
 void * ym3812_init(const device_config *device, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
-	FM_OPL *YM3812 = OPLCreate(OPL_TYPE_YM3812,clock,rate);
+	FM_OPL *YM3812 = OPLCreate(device,clock,rate,OPL_TYPE_YM3812);
 	if (YM3812)
 	{
 		OPL_save_state(YM3812, device);
@@ -2298,7 +2294,7 @@ void ym3812_update_one(void *chip, OPLSAMPLE *buffer, int length)
 void *ym3526_init(const device_config *device, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
-	FM_OPL *YM3526 = OPLCreate(OPL_TYPE_YM3526,clock,rate);
+	FM_OPL *YM3526 = OPLCreate(device,clock,rate,OPL_TYPE_YM3526);
 	if (YM3526)
 	{
 		OPL_save_state(YM3526, device);
@@ -2445,7 +2441,7 @@ static void Y8950_deltat_status_reset(void *chip, UINT8 changebits)
 void *y8950_init(const device_config *device, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
-	FM_OPL *Y8950 = OPLCreate(OPL_TYPE_Y8950,clock,rate);
+	FM_OPL *Y8950 = OPLCreate(device,clock,rate,OPL_TYPE_Y8950);
 	if (Y8950)
 	{
 		Y8950->deltat->status_set_handler = Y8950_deltat_status_set;

@@ -38,9 +38,7 @@ to do:
 */
 
 #include <math.h>
-
-#include "sndintrf.h"		/* use M.A.M.E. */
-#include "deprecat.h"
+#include "sndintrf.h"
 #include "ym2413.h"
 
 
@@ -1918,7 +1916,7 @@ static TIMER_CALLBACK( cymfile_callback )
 }
 
 /* lock/unlock for common table */
-static int OPLL_LockTable(void)
+static int OPLL_LockTable(const device_config *device)
 {
 	num_lock++;
 	if(num_lock>1) return 0;
@@ -1937,7 +1935,7 @@ static int OPLL_LockTable(void)
 	{
 		cymfile = fopen("2413_.cym","wb");
 		if (cymfile)
-			timer_pulse ( Machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+			timer_pulse ( device->machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 2413_.cym\n");
 	}
@@ -2002,13 +2000,13 @@ static void OPLLResetChip(YM2413 *chip)
 /* Create one of virtual YM2413 */
 /* 'clock' is chip clock in Hz  */
 /* 'rate'  is sampling rate  */
-static YM2413 *OPLLCreate(int clock, int rate, const device_config *device)
+static YM2413 *OPLLCreate(const device_config *device, int clock, int rate)
 {
 	char *ptr;
 	YM2413 *chip;
 	int state_size;
 
-	if (OPLL_LockTable() ==-1) return NULL;
+	if (OPLL_LockTable(device) == -1) return NULL;
 
 	/* calculate chip state size */
 	state_size  = sizeof(YM2413);
@@ -2078,10 +2076,10 @@ static unsigned char OPLLRead(YM2413 *chip,int a)
 
 
 
-void * ym2413_init(int clock, int rate, const device_config *device)
+void * ym2413_init(const device_config *device, int clock, int rate)
 {
 	/* emulator create */
-	return OPLLCreate(clock, rate, device);
+	return OPLLCreate(device, clock, rate);
 }
 
 void ym2413_shutdown(void *chip)
