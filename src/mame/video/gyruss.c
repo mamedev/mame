@@ -120,7 +120,7 @@ static TILE_GET_INFO( gyruss_get_tile_info )
 
 VIDEO_START( gyruss )
 {
-	gyruss_tilemap = tilemap_create(gyruss_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	gyruss_tilemap = tilemap_create(machine, gyruss_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transmask(gyruss_tilemap, 0, 0x00, 0);	/* opaque */
 	tilemap_set_transmask(gyruss_tilemap, 1, 0x0f, 0);  /* transparent */
 }

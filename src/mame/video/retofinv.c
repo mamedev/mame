@@ -112,8 +112,8 @@ static TILE_GET_INFO( fg_get_tile_info )
 
 VIDEO_START( retofinv )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan,8,8,36,28);
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan,8,8,36,28);
+	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan,8,8,36,28);
+	fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan,8,8,36,28);
 
 	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 0);
 

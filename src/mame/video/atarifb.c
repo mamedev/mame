@@ -99,9 +99,9 @@ WRITE8_HANDLER( atarifb_field_videoram_w )
 
 VIDEO_START( atarifb )
 {
-	alpha1_tilemap = tilemap_create(alpha1_get_tile_info, tilemap_scan_cols,  8,8,  3,32);
-	alpha2_tilemap = tilemap_create(alpha2_get_tile_info, tilemap_scan_cols,  8,8,  3,32);
-	field_tilemap  = tilemap_create(field_get_tile_info,  tilemap_scan_rows,  8,8, 32,32);
+	alpha1_tilemap = tilemap_create(machine, alpha1_get_tile_info, tilemap_scan_cols,  8,8,  3,32);
+	alpha2_tilemap = tilemap_create(machine, alpha2_get_tile_info, tilemap_scan_cols,  8,8,  3,32);
+	field_tilemap  = tilemap_create(machine, field_get_tile_info,  tilemap_scan_rows,  8,8, 32,32);
 }
 
 

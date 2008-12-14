@@ -76,8 +76,8 @@ WRITE16_HANDLER( targeth_vram_w )
 
 VIDEO_START( targeth )
 {
-	pant[0] = tilemap_create(get_tile_info_targeth_screen0,tilemap_scan_rows,16,16,64,32);
-	pant[1] = tilemap_create(get_tile_info_targeth_screen1,tilemap_scan_rows,16,16,64,32);
+	pant[0] = tilemap_create(machine, get_tile_info_targeth_screen0,tilemap_scan_rows,16,16,64,32);
+	pant[1] = tilemap_create(machine, get_tile_info_targeth_screen1,tilemap_scan_rows,16,16,64,32);
 
 	tilemap_set_transparent_pen(pant[0],0);
 }

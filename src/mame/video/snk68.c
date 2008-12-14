@@ -62,14 +62,14 @@ static void common_video_start(running_machine *machine)
 
 VIDEO_START( pow )
 {
-	fg_tilemap = tilemap_create(get_pow_tile_info,tilemap_scan_cols,8,8,32,32);
+	fg_tilemap = tilemap_create(machine, get_pow_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	common_video_start(machine);
 }
 
 VIDEO_START( searchar )
 {
-	fg_tilemap = tilemap_create(get_searchar_tile_info,tilemap_scan_cols,8,8,32,32);
+	fg_tilemap = tilemap_create(machine, get_searchar_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	common_video_start(machine);
 }

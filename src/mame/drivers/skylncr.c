@@ -70,10 +70,10 @@ static TILEMAP_MAPPER( skylncr_tilemap_scan_pages )
 static VIDEO_START( skylncr )
 {
 
-	tmap = tilemap_create(	get_tile_info, tilemap_scan_rows,
+	tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows,
 							8,8, 0x40,0x20	);
 
-	tmap2 = tilemap_create(	get_tile_info2, skylncr_tilemap_scan_pages,
+	tmap2 = tilemap_create(	machine, get_tile_info2, skylncr_tilemap_scan_pages,
 							8,32,
 							TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y );
 

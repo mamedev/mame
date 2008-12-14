@@ -108,7 +108,7 @@ static TILE_GET_INFO( get_spool99_tile_info )
 
 VIDEO_START(spool99)
 {
-	sc0_tilemap = tilemap_create(get_spool99_tile_info,tilemap_scan_rows,8,8,64,32);
+	sc0_tilemap = tilemap_create(machine, get_spool99_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
 VIDEO_UPDATE(spool99)

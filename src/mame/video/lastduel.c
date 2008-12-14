@@ -87,9 +87,9 @@ static TILE_GET_INFO( get_fix_info )
 
 VIDEO_START( lastduel )
 {
-	bg_tilemap = tilemap_create(ld_get_bg_tile_info,tilemap_scan_rows,16,16,64,64);
-	fg_tilemap = tilemap_create(ld_get_fg_tile_info,tilemap_scan_rows,16,16,64,64);
-	tx_tilemap = tilemap_create(get_fix_info,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap = tilemap_create(machine, ld_get_bg_tile_info,tilemap_scan_rows,16,16,64,64);
+	fg_tilemap = tilemap_create(machine, ld_get_fg_tile_info,tilemap_scan_rows,16,16,64,64);
+	tx_tilemap = tilemap_create(machine, get_fix_info,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0xf07f,0x0f81);
@@ -102,9 +102,9 @@ VIDEO_START( lastduel )
 
 VIDEO_START( madgear )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,16,16,64,32);
-	tx_tilemap = tilemap_create(get_fix_info,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,64,32);
+	tx_tilemap = tilemap_create(machine, get_fix_info,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x8000);
 	tilemap_set_transmask(fg_tilemap,1,0x80ff,0xff00);

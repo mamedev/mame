@@ -403,7 +403,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void m62_start( running_machine *machine, tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	m62_background = tilemap_create( tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2 );
+	m62_background = tilemap_create( machine, tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2 );
 
 	m62_background_hscroll = 0;
 	m62_background_vscroll = 0;
@@ -420,9 +420,9 @@ static void m62_start( running_machine *machine, tile_get_info_func tile_get_inf
 	}
 }
 
-static void m62_textlayer( tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+static void m62_textlayer( running_machine *machine, tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	m62_foreground = tilemap_create( tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2 );
+	m62_foreground = tilemap_create( machine, tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2 );
 
 	if( rows != 0 )
 	{
@@ -624,7 +624,7 @@ static TILE_GET_INFO( get_battroad_fg_tile_info )
 VIDEO_START( battroad )
 {
 	m62_start( machine, get_battroad_bg_tile_info, 1, 1, 8, 8, 64, 32 );
-	m62_textlayer( get_battroad_fg_tile_info, 1, 1, 8, 8, 32, 32 );
+	m62_textlayer( machine, get_battroad_fg_tile_info, 1, 1, 8, 8, 32, 32 );
 	tilemap_set_transmask(m62_background,0,0xffff,0x0000);	/* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(m62_background,1,0x0001,0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }
@@ -699,7 +699,7 @@ static TILE_GET_INFO( get_lotlot_fg_tile_info )
 VIDEO_START( lotlot )
 {
 	m62_start( machine, get_lotlot_bg_tile_info, 1, 1, 12, 10, 32, 64 );
-	m62_textlayer( get_lotlot_fg_tile_info, 1, 1, 12, 10, 32, 64 );
+	m62_textlayer( machine, get_lotlot_fg_tile_info, 1, 1, 12, 10, 32, 64 );
 }
 
 VIDEO_UPDATE( lotlot )
@@ -757,7 +757,7 @@ static TILE_GET_INFO( get_kidniki_fg_tile_info )
 
 VIDEO_START( kidniki )
 {
-	m62_background = tilemap_create( get_kidniki_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32 );
+	m62_background = tilemap_create( machine, get_kidniki_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32 );
 
 	m62_background_hscroll = 0;
 	m62_background_vscroll = 0;
@@ -767,7 +767,7 @@ VIDEO_START( kidniki )
 
 	register_savestate(machine);
 
-	m62_textlayer( get_kidniki_fg_tile_info, 1, 1, 12, 8, 32, 64 );
+	m62_textlayer( machine, get_kidniki_fg_tile_info, 1, 1, 12, 8, 32, 64 );
 }
 
 VIDEO_UPDATE( kidniki )
@@ -817,7 +817,7 @@ if (color&0xe0) popmessage("fg tilemap %x %x",tile_index,color&0xe0);
 VIDEO_START( spelunkr )
 {
 	m62_start( machine, get_spelunkr_bg_tile_info, 1, 1, 8, 8, 64, 64 );
-	m62_textlayer( get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32 );
+	m62_textlayer( machine, get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32 );
 }
 
 VIDEO_UPDATE( spelunkr )
@@ -859,7 +859,7 @@ static TILE_GET_INFO( get_spelunk2_bg_tile_info )
 VIDEO_START( spelunk2 )
 {
 	m62_start( machine, get_spelunk2_bg_tile_info, 1, 1, 8, 8, 64, 64 );
-	m62_textlayer( get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32 );
+	m62_textlayer( machine, get_spelunkr_fg_tile_info, 1, 1, 12, 8, 32, 32 );
 }
 
 VIDEO_UPDATE( spelunk2 )
@@ -906,7 +906,7 @@ static TILE_GET_INFO( get_youjyudn_fg_tile_info )
 VIDEO_START( youjyudn )
 {
 	m62_start( machine, get_youjyudn_bg_tile_info, 1, 0, 8, 16, 64, 16 );
-	m62_textlayer( get_youjyudn_fg_tile_info, 1, 1, 12, 8, 32, 32 );
+	m62_textlayer( machine, get_youjyudn_fg_tile_info, 1, 1, 12, 8, 32, 32 );
 	tilemap_set_transmask(m62_background,0,0xffff,0x0000);	/* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(m62_background,1,0x0001,0xfffe);	/* split type 1 has pen 0 transparent in front half */
 }

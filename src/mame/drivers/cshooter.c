@@ -139,7 +139,7 @@ static WRITE8_HANDLER(cshooter_txram_w)
 
 static VIDEO_START(cshooter)
 {
-	cshooter_txtilemap = tilemap_create(get_cstx_tile_info,tilemap_scan_rows, 8,8,32, 32);
+	cshooter_txtilemap = tilemap_create(machine, get_cstx_tile_info,tilemap_scan_rows, 8,8,32, 32);
 	tilemap_set_transparent_pen(cshooter_txtilemap, 3);
 }
 

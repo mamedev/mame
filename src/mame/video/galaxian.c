@@ -444,7 +444,7 @@ VIDEO_START( galaxian )
 	if (!galaxian_sfx_tilemap)
 	{
 		/* normal galaxian hardware is row-based and individually scrolling columns */
-		bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows, GALAXIAN_XSCALE*8,8, 32,32);
+		bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows, GALAXIAN_XSCALE*8,8, 32,32);
 		tilemap_set_scroll_cols(bg_tilemap, 32);
 		tilemap_set_scrolldx(bg_tilemap, 0, -GALAXIAN_XSCALE * 128);
 		tilemap_set_scrolldy(bg_tilemap, 0, 8);
@@ -452,7 +452,7 @@ VIDEO_START( galaxian )
 	else
 	{
 		/* sfx hardware is column-based and individually scrolling rows */
-		bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_cols, GALAXIAN_XSCALE*8,8, 32,32);
+		bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_cols, GALAXIAN_XSCALE*8,8, 32,32);
 		tilemap_set_scroll_rows(bg_tilemap, 32);
 		tilemap_set_scrolldx(bg_tilemap, 0, -GALAXIAN_XSCALE * 128);
 		tilemap_set_scrolldy(bg_tilemap, 0, 8);

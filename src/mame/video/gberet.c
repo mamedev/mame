@@ -125,7 +125,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( gberet )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 0x10);
 	tilemap_set_scroll_rows(bg_tilemap, 32);

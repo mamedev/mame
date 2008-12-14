@@ -86,7 +86,7 @@ VIDEO_START(rng)
 	K053936_wraparound_enable(0, 0);
 	K053936_set_offset(0, 34, 9);
 
-	rng_936_tilemap = tilemap_create(get_rng_936_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
+	rng_936_tilemap = tilemap_create(machine, get_rng_936_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
 	tilemap_set_transparent_pen(rng_936_tilemap, 0);
 
 	/* find first empty slot to decode gfx */
@@ -103,7 +103,7 @@ VIDEO_START(rng)
 	machine->gfx[ttl_gfx_index]->total_colors = machine->config->total_colors / 16;
 
 	// create the tilemap
-	ttl_tilemap = tilemap_create(ttl_get_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	ttl_tilemap = tilemap_create(machine, ttl_get_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 

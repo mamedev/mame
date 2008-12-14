@@ -453,11 +453,11 @@ static TILE_GET_INFO( toproller_get_bg_tile_info )
 
 VIDEO_START( cclimber )
 {
-	pf_tilemap = tilemap_create(cclimber_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	pf_tilemap = tilemap_create(machine, cclimber_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(pf_tilemap, 0);
 	tilemap_set_scroll_cols(pf_tilemap, 32);
 
-	bs_tilemap = tilemap_create(cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(bs_tilemap, 1);
 	tilemap_set_scroll_rows(bs_tilemap, 1);
 	tilemap_set_transmask(bs_tilemap, 0, 0x01, 0);	/* pen 0 is transaprent */
@@ -467,11 +467,11 @@ VIDEO_START( cclimber )
 
 VIDEO_START( swimmer )
 {
-	pf_tilemap = tilemap_create(swimmer_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	pf_tilemap = tilemap_create(machine, swimmer_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(pf_tilemap, 0);
 	tilemap_set_scroll_cols(pf_tilemap, 32);
 
-	bs_tilemap = tilemap_create(cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	bs_tilemap = tilemap_create(machine, cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(bs_tilemap, 1);
 	tilemap_set_scroll_rows(bs_tilemap, 1);
 	tilemap_set_transmask(bs_tilemap, 0, 0x01, 0);	/* pen 0 is transaprent */
@@ -481,13 +481,13 @@ VIDEO_START( swimmer )
 
 VIDEO_START( toprollr )
 {
-	pf_tilemap = tilemap_create(toprollr_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	pf_tilemap = tilemap_create(machine, toprollr_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(pf_tilemap, 0);
 
-	toproller_bg_tilemap = tilemap_create(toproller_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	toproller_bg_tilemap = tilemap_create(machine, toproller_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_rows(toproller_bg_tilemap, 1);
 
-	bs_tilemap = tilemap_create(toprollr_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	bs_tilemap = tilemap_create(machine, toprollr_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(bs_tilemap, 1);
 	tilemap_set_scroll_rows(bs_tilemap, 1);
 	tilemap_set_transmask(bs_tilemap, 0, 0x01, 0);	/* pen 0 is transaprent */

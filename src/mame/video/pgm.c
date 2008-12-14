@@ -304,10 +304,10 @@ static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 
 VIDEO_START( pgm )
 {
-	pgm_tx_tilemap= tilemap_create(get_pgm_tx_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	pgm_tx_tilemap= tilemap_create(machine, get_pgm_tx_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	tilemap_set_transparent_pen(pgm_tx_tilemap,15);
 
-	pgm_bg_tilemap = tilemap_create(get_pgm_bg_tilemap_tile_info,tilemap_scan_rows, 32, 32,64,64);
+	pgm_bg_tilemap = tilemap_create(machine, get_pgm_bg_tilemap_tile_info,tilemap_scan_rows, 32, 32,64,64);
 	tilemap_set_transparent_pen(pgm_bg_tilemap,31);
 	tilemap_set_scroll_rows(pgm_bg_tilemap,64*32);
 

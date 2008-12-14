@@ -145,18 +145,18 @@ WRITE16_HANDLER( esd16_tilemap0_color_w )
 
 VIDEO_START( esd16 )
 {
-	esdtilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
+	esdtilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 											8,8,	0x80,0x40);
 
-	esdtilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
+	esdtilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 									8,8,	0x80,0x40);
 
 	/* swatpolc changes tilemap 0 to 16x16 at various times */
-	esdtilemap_0_16x16 = tilemap_create(	get_tile_info_0_16x16, tilemap_scan_rows,
+	esdtilemap_0_16x16 = tilemap_create(	machine, get_tile_info_0_16x16, tilemap_scan_rows,
 									16,16,	0x40,0x40);
 
 	/* hedpanic changes tilemap 1 to 16x16 at various times */
-	esdtilemap_1_16x16 = tilemap_create(	get_tile_info_1_16x16, tilemap_scan_rows,
+	esdtilemap_1_16x16 = tilemap_create(	machine, get_tile_info_1_16x16, tilemap_scan_rows,
 									16,16,	0x40,0x40);
 
 	tilemap_set_scrolldx(esdtilemap_0, -0x60 + 2, -0x60     );

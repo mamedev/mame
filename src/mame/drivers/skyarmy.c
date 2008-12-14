@@ -99,7 +99,7 @@ static PALETTE_INIT( skyarmy )
 
 static VIDEO_START( skyarmy )
 {
-        skyarmy_tilemap = tilemap_create(get_skyarmy_tile_info,tilemap_scan_rows,8,8,32,32);
+        skyarmy_tilemap = tilemap_create(machine, get_skyarmy_tile_info,tilemap_scan_rows,8,8,32,32);
         tilemap_set_scroll_cols(skyarmy_tilemap,32);
 }
 

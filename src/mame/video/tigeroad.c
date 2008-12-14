@@ -142,10 +142,10 @@ static TILEMAP_MAPPER( tigeroad_tilemap_scan )
 
 VIDEO_START( tigeroad )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tigeroad_tilemap_scan,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tigeroad_tilemap_scan,
 		 32, 32, 128, 128);
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
 	tilemap_set_transmask(bg_tilemap, 0, 0xffff, 0);

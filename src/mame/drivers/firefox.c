@@ -157,7 +157,7 @@ static WRITE8_HANDLER( tileram_w )
 
 static VIDEO_START( firefox )
 {
-	bgtiles = tilemap_create(bgtile_get_info, tilemap_scan_rows, 8,8, 64,64);
+	bgtiles = tilemap_create(machine, bgtile_get_info, tilemap_scan_rows, 8,8, 64,64);
 	tilemap_set_transparent_pen(bgtiles, 0);
 	tilemap_set_scrolldy(bgtiles, video_screen_get_visible_area(machine->primary_screen)->min_y, 0);
 }

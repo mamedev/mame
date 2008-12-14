@@ -183,7 +183,7 @@ VIDEO_START( namcofl )
 	old_coin_state = 0x00;
 	//input_port_read(machine, "IN3") & 0x30;
 
-	namco_tilemap_init( NAMCONB1_TILEGFX, memory_region(machine, NAMCONB1_TILEMASKREGION), TilemapCB );
+	namco_tilemap_init( machine, NAMCONB1_TILEGFX, memory_region(machine, NAMCONB1_TILEMASKREGION), TilemapCB );
 	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);
-	namco_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
+	namco_roz_init(machine,NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
 } /* namcofl_vh_start */

@@ -174,12 +174,12 @@ static TILE_GET_INFO( apple10_get_bg_tile_info )
 
 VIDEO_START( snookr10 )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
 }
 
 VIDEO_START( apple10 )
 {
-	bg_tilemap = tilemap_create(apple10_get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
+	bg_tilemap = tilemap_create(machine, apple10_get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
 }
 
 VIDEO_UPDATE( snookr10 )

@@ -207,7 +207,7 @@ VIDEO_START( karnov )
 	/* Allocate bitmaps */
 	bitmap_f = auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
 
-	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_rows,8,8,32,32);
+	fix_tilemap=tilemap_create(machine, get_fix_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }
@@ -217,7 +217,7 @@ VIDEO_START( wndrplnt )
 	/* Allocate bitmaps */
 	bitmap_f = auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
 
-	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_cols,8,8,32,32);
+	fix_tilemap=tilemap_create(machine, get_fix_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }

@@ -40,7 +40,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( darius )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
 
 	spritelist = auto_malloc(0x800 * sizeof(*spritelist));
 

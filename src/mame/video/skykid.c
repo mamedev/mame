@@ -111,8 +111,8 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 VIDEO_START( skykid )
 {
-	tx_tilemap = tilemap_create(tx_get_tile_info,tx_tilemap_scan,  8,8,36,28);
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,     8,8,64,32);
+	tx_tilemap = tilemap_create(machine, tx_get_tile_info,tx_tilemap_scan,  8,8,36,28);
+	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,     8,8,64,32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0);
 

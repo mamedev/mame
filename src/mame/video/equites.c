@@ -123,10 +123,10 @@ VIDEO_START( equites )
 {
 	equites_fg_videoram = auto_malloc(0x800);
 
-	fg_tilemap = tilemap_create(equites_fg_info, tilemap_scan_cols,  8, 8, 32, 32);
+	fg_tilemap = tilemap_create(machine, equites_fg_info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
-	bg_tilemap = tilemap_create(equites_bg_info, tilemap_scan_rows, 16, 16, 16, 16);
+	bg_tilemap = tilemap_create(machine, equites_bg_info, tilemap_scan_rows, 16, 16, 16, 16);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 0, -10);
 }
@@ -137,11 +137,11 @@ VIDEO_START( splndrbt )
 
 	equites_fg_videoram = auto_malloc(0x800);
 
-	fg_tilemap = tilemap_create(splndrbt_fg_info, tilemap_scan_cols,  8, 8, 32, 32);
+	fg_tilemap = tilemap_create(machine, splndrbt_fg_info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scrolldx(fg_tilemap, 8, -8);
 
-	bg_tilemap = tilemap_create(splndrbt_bg_info, tilemap_scan_rows, 16, 16, 32, 32);
+	bg_tilemap = tilemap_create(machine, splndrbt_bg_info, tilemap_scan_rows, 16, 16, 32, 32);
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[1], 0x10);
 
 	fg_char_bank = 0;

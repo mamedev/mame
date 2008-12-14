@@ -192,7 +192,7 @@ static TILEMAP_MAPPER( taotaido_tilemap_scan_rows )
 
 VIDEO_START(taotaido)
 {
-	bg_tilemap = tilemap_create(taotaido_bg_tile_info,taotaido_tilemap_scan_rows,     16,16,128,64);
+	bg_tilemap = tilemap_create(machine, taotaido_bg_tile_info,taotaido_tilemap_scan_rows,     16,16,128,64);
 
 	taotaido_spriteram_old = auto_malloc(0x2000);
 	taotaido_spriteram_older = auto_malloc(0x2000);

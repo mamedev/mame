@@ -286,7 +286,7 @@ static void sprite_render_list(running_machine *machine);
  *
  *************************************/
 
-static void common_start(int multi32)
+static void common_start(running_machine *machine, int multi32)
 {
 	int tmap;
 
@@ -302,7 +302,7 @@ static void common_start(int multi32)
 	{
 		struct cache_entry *entry = auto_malloc(sizeof(struct cache_entry));
 
-		entry->tmap = tilemap_create(get_tile_info, tilemap_scan_rows,  16,16, 32,16);
+		entry->tmap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  16,16, 32,16);
 		entry->page = 0xff;
 		entry->bank = 0;
 		entry->next = cache_head;
@@ -332,13 +332,13 @@ static void common_start(int multi32)
 
 VIDEO_START( system32 )
 {
-	common_start(0);
+	common_start(machine, 0);
 }
 
 
 VIDEO_START( multi32 )
 {
-	common_start(1);
+	common_start(machine, 1);
 }
 
 

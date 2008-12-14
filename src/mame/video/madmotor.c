@@ -113,10 +113,10 @@ static TILE_GET_INFO( get_pf3a_tile_info )
 
 VIDEO_START( madmotor )
 {
-	madmotor_pf1_tilemap = tilemap_create(get_pf1_tile_info, pf1_scan,  8, 8, 64,64);
-	madmotor_pf2_tilemap = tilemap_create(get_pf2_tile_info, pf2_scan, 16,16, 32,32);
-	madmotor_pf3_tilemap = tilemap_create(get_pf3_tile_info, pf3_scan,      16,16, 32,64);
-	madmotor_pf3a_tilemap= tilemap_create(get_pf3a_tile_info,pf3a_scan,     16,16,128,16);
+	madmotor_pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, pf1_scan,  8, 8, 64,64);
+	madmotor_pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, pf2_scan, 16,16, 32,32);
+	madmotor_pf3_tilemap = tilemap_create(machine, get_pf3_tile_info, pf3_scan,      16,16, 32,64);
+	madmotor_pf3a_tilemap= tilemap_create(machine, get_pf3a_tile_info,pf3a_scan,     16,16,128,16);
 
 	tilemap_set_transparent_pen(madmotor_pf1_tilemap,0);
 	tilemap_set_transparent_pen(madmotor_pf2_tilemap,0);

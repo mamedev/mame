@@ -948,19 +948,19 @@ VIDEO_START( wecleman )
 
 	sprite_list = sprite_list_create(NUM_SPRITES);
 
-	bg_tilemap = tilemap_create(wecleman_get_bg_tile_info,
+	bg_tilemap = tilemap_create(machine, wecleman_get_bg_tile_info,
 								tilemap_scan_rows,
 									/* We draw part of the road below */
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2 );
 
-	fg_tilemap = tilemap_create(wecleman_get_fg_tile_info,
+	fg_tilemap = tilemap_create(machine, wecleman_get_fg_tile_info,
 								tilemap_scan_rows,
 
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2);
 
-	txt_tilemap = tilemap_create(wecleman_get_txt_tile_info,
+	txt_tilemap = tilemap_create(machine, wecleman_get_txt_tile_info,
 								 tilemap_scan_rows,
 
 								 8,8,

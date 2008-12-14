@@ -185,13 +185,13 @@ WRITE16_HANDLER( joe_tilemaps_yscroll_w )
 
 VIDEO_START( ashnojoe )
 {
-	joetilemap  =  tilemap_create(get_joe_tile_info,  tilemap_scan_rows, 8, 8,64,32);
-	joetilemap2 =  tilemap_create(get_joe_tile_info_2,tilemap_scan_rows,16,16,32,32);
-	joetilemap3 =  tilemap_create(get_joe_tile_info_3,tilemap_scan_rows, 8, 8,64,64);
-	joetilemap4 =  tilemap_create(get_joe_tile_info_4,tilemap_scan_rows, 8, 8,64,64);
-	joetilemap5 =  tilemap_create(get_joe_tile_info_5,tilemap_scan_rows,16,16,32,32);
-	joetilemap6 =  tilemap_create(get_joe_tile_info_6,tilemap_scan_rows,		16,16,32,32);
-	joetilemap7 =  tilemap_create(get_joe_tile_info_7,tilemap_scan_rows,		16,16,32,32);
+	joetilemap  =  tilemap_create(machine, get_joe_tile_info,  tilemap_scan_rows, 8, 8,64,32);
+	joetilemap2 =  tilemap_create(machine, get_joe_tile_info_2,tilemap_scan_rows,16,16,32,32);
+	joetilemap3 =  tilemap_create(machine, get_joe_tile_info_3,tilemap_scan_rows, 8, 8,64,64);
+	joetilemap4 =  tilemap_create(machine, get_joe_tile_info_4,tilemap_scan_rows, 8, 8,64,64);
+	joetilemap5 =  tilemap_create(machine, get_joe_tile_info_5,tilemap_scan_rows,16,16,32,32);
+	joetilemap6 =  tilemap_create(machine, get_joe_tile_info_6,tilemap_scan_rows,		16,16,32,32);
+	joetilemap7 =  tilemap_create(machine, get_joe_tile_info_7,tilemap_scan_rows,		16,16,32,32);
 
 	tilemap_set_transparent_pen(joetilemap, 15);
 	tilemap_set_transparent_pen(joetilemap2,15);

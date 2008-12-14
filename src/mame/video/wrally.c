@@ -69,8 +69,8 @@ static TILE_GET_INFO( get_tile_info_wrally_screen1 )
 
 VIDEO_START( wrally )
 {
-	wrally_pant[0] = tilemap_create(get_tile_info_wrally_screen0,tilemap_scan_rows,16,16,64,32);
-	wrally_pant[1] = tilemap_create(get_tile_info_wrally_screen1,tilemap_scan_rows,16,16,64,32);
+	wrally_pant[0] = tilemap_create(machine, get_tile_info_wrally_screen0,tilemap_scan_rows,16,16,64,32);
+	wrally_pant[1] = tilemap_create(machine, get_tile_info_wrally_screen1,tilemap_scan_rows,16,16,64,32);
 
 	tilemap_set_transmask(wrally_pant[0],0,0xff01,0x00ff); /* this layer is split in two (pens 1..7, pens 8-15) */
 	tilemap_set_transparent_pen(wrally_pant[1],0);

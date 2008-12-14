@@ -22,7 +22,7 @@ VIDEO_START( hangon )
 	segaic16_palette_init(0x800);
 
 	/* initialize the tile/text layers */
-	segaic16_tilemap_init(0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2);
+	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2);
 
 	/* initialize the sprites */
 	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_HANGON, 0x400, 0);
@@ -38,7 +38,7 @@ VIDEO_START( sharrier )
 	segaic16_palette_init(0x800);
 
 	/* initialize the tile/text layers */
-	segaic16_tilemap_init(0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2);
+	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_HANGON, 0x000, 0, 2);
 
 	/* initialize the sprites */
 	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_SHARRIER, 0x400, 0);

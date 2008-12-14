@@ -106,8 +106,8 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( fastlane )
 {
-	layer0 = tilemap_create(get_tile_info0,tilemap_scan_rows,8,8,32,32);
-	layer1 = tilemap_create(get_tile_info1,tilemap_scan_rows,8,8,32,32);
+	layer0 = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,32,32);
+	layer1 = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_scroll_rows( layer0, 32 );
 

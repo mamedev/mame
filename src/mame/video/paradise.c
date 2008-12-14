@@ -154,9 +154,9 @@ WRITE8_HANDLER( paradise_pixmap_w )
 
 VIDEO_START( paradise )
 {
-	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows, 8,8, 0x20,0x20 );
-	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows, 8,8, 0x20,0x20 );
-	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows, 8,8, 0x20,0x20 );
+	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows, 8,8, 0x20,0x20 );
+	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows, 8,8, 0x20,0x20 );
+	tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows, 8,8, 0x20,0x20 );
 
 	/* pixmap */
 	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);

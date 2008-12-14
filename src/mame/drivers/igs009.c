@@ -75,8 +75,8 @@ static WRITE8_HANDLER( fg_color_w )
 
 static VIDEO_START(jingbell)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,	8, 32,	0x80,0x20);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8, 32,	0x80,0x20);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_transparent_pen(fg_tilemap, 0);

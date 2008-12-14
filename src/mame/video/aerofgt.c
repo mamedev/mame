@@ -97,7 +97,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( pspikes )
 {
-	bg1_tilemap = tilemap_create(get_pspikes_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info,tilemap_scan_rows,8,8,64,32);
 	/* no bg2 in this game */
 
 	sprite_gfx = 1;
@@ -106,8 +106,8 @@ VIDEO_START( pspikes )
 
 VIDEO_START( karatblz )
 {
-	bg1_tilemap = tilemap_create(karatblz_bg1_tile_info,tilemap_scan_rows,     8,8,64,64);
-	bg2_tilemap = tilemap_create(karatblz_bg2_tile_info,tilemap_scan_rows,8,8,64,64);
+	bg1_tilemap = tilemap_create(machine, karatblz_bg1_tile_info,tilemap_scan_rows,     8,8,64,64);
+	bg2_tilemap = tilemap_create(machine, karatblz_bg2_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	tilemap_set_transparent_pen(bg2_tilemap,15);
 
@@ -120,8 +120,8 @@ VIDEO_START( spinlbrk )
 {
 	int i;
 
-	bg1_tilemap = tilemap_create(spinlbrk_bg1_tile_info,tilemap_scan_rows,     8,8,64,64);
-	bg2_tilemap = tilemap_create(karatblz_bg2_tile_info,tilemap_scan_rows,8,8,64,64);
+	bg1_tilemap = tilemap_create(machine, spinlbrk_bg1_tile_info,tilemap_scan_rows,     8,8,64,64);
+	bg2_tilemap = tilemap_create(machine, karatblz_bg2_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	tilemap_set_transparent_pen(bg2_tilemap,15);
 
@@ -145,8 +145,8 @@ VIDEO_START( spinlbrk )
 
 VIDEO_START( turbofrc )
 {
-	bg1_tilemap = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,     8,8,64,64);
-	bg2_tilemap = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,8,8,64,64);
+	bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows,     8,8,64,64);
+	bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	tilemap_set_transparent_pen(bg2_tilemap,15);
 
@@ -157,7 +157,7 @@ VIDEO_START( turbofrc )
 
 VIDEO_START( wbbc97 )
 {
-	bg1_tilemap = tilemap_create(get_pspikes_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info,tilemap_scan_rows,8,8,64,32);
 	/* no bg2 in this game */
 
 	tilemap_set_transparent_pen(bg1_tilemap,15);

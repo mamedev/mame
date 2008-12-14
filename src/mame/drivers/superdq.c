@@ -43,7 +43,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( superdq )
 {
-	superdq_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows, 8, 8, 32, 32);
+	superdq_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static VIDEO_UPDATE( superdq )

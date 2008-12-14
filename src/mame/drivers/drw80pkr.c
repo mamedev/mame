@@ -107,7 +107,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( drw80pkr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
 }
 
 static VIDEO_UPDATE( drw80pkr )

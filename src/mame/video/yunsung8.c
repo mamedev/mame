@@ -165,10 +165,10 @@ static TILE_GET_INFO( get_tile_info_1 )
 
 VIDEO_START( yunsung8 )
 {
-	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
+	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 8,8, DIM_NX_0, DIM_NY_0 );
 
-	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
+	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 8,8, DIM_NX_1, DIM_NY_1 );
 
 		tilemap_set_transparent_pen(tilemap_1,0);

@@ -183,7 +183,7 @@ static void suna8_vh_start_common(int dim)
 	}
 
 #if TILEMAPS
-	bg_tilemap = tilemap_create(	get_tile_info, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(	machine, get_tile_info, tilemap_scan_cols,
 
 								8,8,0x20*((suna8_text_dim > 0)?4:8),0x20);
 

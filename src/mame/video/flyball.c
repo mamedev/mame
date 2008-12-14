@@ -49,7 +49,7 @@ static TILE_GET_INFO( flyball_get_tile_info )
 
 VIDEO_START( flyball )
 {
-	flyball_tilemap = tilemap_create(flyball_get_tile_info,
+	flyball_tilemap = tilemap_create(machine, flyball_get_tile_info,
 		flyball_get_memory_offset,  8, 16, 32, 16);
 }
 

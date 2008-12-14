@@ -958,11 +958,11 @@ VIDEO_START( dkong )
 		    /* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
-			state->bg_tilemap = tilemap_create(dkong_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+			state->bg_tilemap = tilemap_create(machine, dkong_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 			tilemap_set_scrolldx(state->bg_tilemap, 0, 128);
 			break;
 		case HARDWARE_TRS01:
-			state->bg_tilemap = tilemap_create(radarsc1_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+			state->bg_tilemap = tilemap_create(machine, radarsc1_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 			tilemap_set_scrolldx(state->bg_tilemap, 0, 128);
 
 			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);

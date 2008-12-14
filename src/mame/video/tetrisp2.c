@@ -272,15 +272,15 @@ VIDEO_START( tetrisp2 )
 {
 	flipscreen_old = -1;
 
-	tilemap_bg = tilemap_create(	get_tile_info_bg,tilemap_scan_rows,
+	tilemap_bg = tilemap_create(	machine, get_tile_info_bg,tilemap_scan_rows,
 
 								16,16,NX_0,NY_0);
 
-	tilemap_fg = tilemap_create(	get_tile_info_fg,tilemap_scan_rows,
+	tilemap_fg = tilemap_create(	machine, get_tile_info_fg,tilemap_scan_rows,
 
 								8,8,NX_1,NY_1);
 
-	tilemap_rot = tilemap_create(	get_tile_info_rot,tilemap_scan_rows,
+	tilemap_rot = tilemap_create(	machine, get_tile_info_rot,tilemap_scan_rows,
 
 								16,16,NX_0*2,NY_0*2);
 
@@ -299,15 +299,15 @@ VIDEO_START( rockntread )
 {
 	flipscreen_old = -1;
 
-	tilemap_bg = tilemap_create(	get_tile_info_bg,tilemap_scan_rows,
+	tilemap_bg = tilemap_create(	machine, get_tile_info_bg,tilemap_scan_rows,
 
 								16, 16, 256, 16);	// rockn ms(main),1,2,3,4
 
-	tilemap_fg = tilemap_create(	get_tile_info_fg,tilemap_scan_rows,
+	tilemap_fg = tilemap_create(	machine, get_tile_info_fg,tilemap_scan_rows,
 
 								8, 8, 64, 64);
 
-	tilemap_rot = tilemap_create(	get_tile_info_rot,tilemap_scan_rows,
+	tilemap_rot = tilemap_create(	machine, get_tile_info_rot,tilemap_scan_rows,
 
 								16, 16, 128, 128);
 
@@ -321,15 +321,15 @@ VIDEO_START( rocknms )
 {
 	VIDEO_START_CALL( rockntread );
 
-	tilemap_sub_bg = tilemap_create(get_tile_info_rocknms_sub_bg,tilemap_scan_rows,
+	tilemap_sub_bg = tilemap_create(machine, get_tile_info_rocknms_sub_bg,tilemap_scan_rows,
 
 					16, 16, 32, 256);	// rockn ms(sub)
 
-	tilemap_sub_fg = tilemap_create(get_tile_info_rocknms_sub_fg,tilemap_scan_rows,
+	tilemap_sub_fg = tilemap_create(machine, get_tile_info_rocknms_sub_fg,tilemap_scan_rows,
 
 					8, 8, 64, 64);
 
-	tilemap_sub_rot = tilemap_create( get_tile_info_rocknms_sub_rot,tilemap_scan_rows,
+	tilemap_sub_rot = tilemap_create( machine, get_tile_info_rocknms_sub_rot,tilemap_scan_rows,
 
 					16, 16, 128, 128);
 

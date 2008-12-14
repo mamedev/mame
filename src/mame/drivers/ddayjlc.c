@@ -340,7 +340,7 @@ static TILE_GET_INFO( get_tile_info_bg )
 
 static VIDEO_START( ddayjlc )
 {
-	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,8,8,32,32);
+	bg_tilemap = tilemap_create(machine, get_tile_info_bg,tilemap_scan_rows,8,8,32,32);
 }
 
 static VIDEO_UPDATE( ddayjlc )

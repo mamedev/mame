@@ -126,12 +126,12 @@ static WRITE8_HANDLER( statriv2_videoram_w )
 
 static VIDEO_START (statriv2)
 {
-	statriv2_tilemap = tilemap_create(get_statriv2_tile_info,tilemap_scan_rows,8,16,64, 16);
+	statriv2_tilemap = tilemap_create(machine, get_statriv2_tile_info,tilemap_scan_rows,8,16,64, 16);
 }
 
 static VIDEO_START (statriv2v)
 {
-	statriv2_tilemap = tilemap_create(get_statriv2_tile_info,tilemap_scan_rows,16,8,32, 32);
+	statriv2_tilemap = tilemap_create(machine, get_statriv2_tile_info,tilemap_scan_rows,16,8,32, 32);
 }
 
 

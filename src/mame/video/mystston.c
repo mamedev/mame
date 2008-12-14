@@ -221,9 +221,9 @@ static VIDEO_START( mystston )
 {
 	mystston_state *state = machine->driver_data;
 
-	state->bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flip_x, 16, 16, 16, 32);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_x, 16, 16, 16, 32);
 
-	state->fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols_flip_x,  8,  8, 32, 32);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols_flip_x,  8,  8, 32, 32);
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
 	/* create the interrupt timer */

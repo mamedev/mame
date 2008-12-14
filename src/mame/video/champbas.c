@@ -153,7 +153,7 @@ static TILE_GET_INFO( exctsccr_get_bg_tile_info )
 
 VIDEO_START( champbas )
 {
-	bg_tilemap = tilemap_create(champbas_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(machine, champbas_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	// talbot has only 1 bank
 	gfx_bank = 0;
@@ -162,7 +162,7 @@ VIDEO_START( champbas )
 
 VIDEO_START( exctsccr )
 {
-	bg_tilemap = tilemap_create(exctsccr_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(machine, exctsccr_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 

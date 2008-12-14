@@ -695,15 +695,15 @@ static TILE_GET_INFO( get_pf3_tile_info )
 
 VIDEO_START( dec0_nodma )
 {
-	pf1_tilemap_0 = tilemap_create(get_pf1_tile_info,tile_shape0_8x8_scan, 8, 8,128, 32);
-	pf1_tilemap_1 = tilemap_create(get_pf1_tile_info,tile_shape1_8x8_scan, 8, 8, 64, 64);
-	pf1_tilemap_2 = tilemap_create(get_pf1_tile_info,tile_shape2_8x8_scan, 8, 8, 32,128);
-	pf2_tilemap_0 = tilemap_create(get_pf2_tile_info,tile_shape0_scan,    16,16, 64, 16);
-	pf2_tilemap_1 = tilemap_create(get_pf2_tile_info,tile_shape1_scan,    16,16, 32, 32);
-	pf2_tilemap_2 = tilemap_create(get_pf2_tile_info,tile_shape2_scan,    16,16, 16, 64);
-	pf3_tilemap_0 = tilemap_create(get_pf3_tile_info,tile_shape0_scan,    16,16, 64, 16);
-	pf3_tilemap_1 = tilemap_create(get_pf3_tile_info,tile_shape1_scan,    16,16, 32, 32);
-	pf3_tilemap_2 = tilemap_create(get_pf3_tile_info,tile_shape2_scan,    16,16, 16, 64);
+	pf1_tilemap_0 = tilemap_create(machine, get_pf1_tile_info,tile_shape0_8x8_scan, 8, 8,128, 32);
+	pf1_tilemap_1 = tilemap_create(machine, get_pf1_tile_info,tile_shape1_8x8_scan, 8, 8, 64, 64);
+	pf1_tilemap_2 = tilemap_create(machine, get_pf1_tile_info,tile_shape2_8x8_scan, 8, 8, 32,128);
+	pf2_tilemap_0 = tilemap_create(machine, get_pf2_tile_info,tile_shape0_scan,    16,16, 64, 16);
+	pf2_tilemap_1 = tilemap_create(machine, get_pf2_tile_info,tile_shape1_scan,    16,16, 32, 32);
+	pf2_tilemap_2 = tilemap_create(machine, get_pf2_tile_info,tile_shape2_scan,    16,16, 16, 64);
+	pf3_tilemap_0 = tilemap_create(machine, get_pf3_tile_info,tile_shape0_scan,    16,16, 64, 16);
+	pf3_tilemap_1 = tilemap_create(machine, get_pf3_tile_info,tile_shape1_scan,    16,16, 32, 32);
+	pf3_tilemap_2 = tilemap_create(machine, get_pf3_tile_info,tile_shape2_scan,    16,16, 16, 64);
 
 	dec0_spriteram=spriteram16;
 }

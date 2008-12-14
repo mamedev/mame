@@ -91,7 +91,7 @@ C102 - Controls CPU access to ROZ Memory Area.
 /*----------- defined in drivers/namcoic.c -----------*/
 
 void namco_tilemap_init(
-		int gfxbank, void *pMaskROM,
+		running_machine *machine, int gfxbank, void *pMaskROM,
 		void (*cb)( UINT16 code, int *gfx, int *mask) );
 void namco_tilemap_draw( bitmap_t *bitmap, const rectangle *cliprect, int pri );
 void namco_tilemap_invalidate( void );
@@ -141,7 +141,7 @@ READ32_HANDLER( namco_spritepos32_r );
 /***********************************************************************************/
 /* C169 ROZ Layer Emulation */
 
-void namco_roz_init( int gfxbank, const char *maskregion );
+void namco_roz_init( running_machine *machine, int gfxbank, const char *maskregion );
 void namco_roz_draw( bitmap_t *bitmap, const rectangle *cliprect, int pri );
 
 READ16_HANDLER( namco_rozcontrol16_r );

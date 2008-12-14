@@ -63,7 +63,7 @@ static TILE_GET_INFO( zwackery_get_fg_tile_info )
 VIDEO_START( mcr68 )
 {
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,  16,16, 32,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16,16, 32,32);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 }
 
@@ -76,10 +76,10 @@ VIDEO_START( zwackery )
 	int code, y, x;
 
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(zwackery_get_bg_tile_info, tilemap_scan_rows,  16,16, 32,32);
+	bg_tilemap = tilemap_create(machine, zwackery_get_bg_tile_info, tilemap_scan_rows,  16,16, 32,32);
 
 	/* initialize the foreground tilemap */
-	fg_tilemap = tilemap_create(zwackery_get_fg_tile_info, tilemap_scan_rows,  16,16, 32,32);
+	fg_tilemap = tilemap_create(machine, zwackery_get_fg_tile_info, tilemap_scan_rows,  16,16, 32,32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
 	/* "colorize" each code */

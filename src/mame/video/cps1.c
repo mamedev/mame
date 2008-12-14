@@ -2040,9 +2040,9 @@ static VIDEO_START( cps )
 
 	MACHINE_RESET_CALL(cps);
 
-	cps1_bg_tilemap[0] = tilemap_create(get_tile0_info,tilemap0_scan, 8, 8,64,64);
-	cps1_bg_tilemap[1] = tilemap_create(get_tile1_info,tilemap1_scan,16,16,64,64);
-	cps1_bg_tilemap[2] = tilemap_create(get_tile2_info,tilemap2_scan,32,32,64,64);
+	cps1_bg_tilemap[0] = tilemap_create(machine, get_tile0_info,tilemap0_scan, 8, 8,64,64);
+	cps1_bg_tilemap[1] = tilemap_create(machine, get_tile1_info,tilemap1_scan,16,16,64,64);
+	cps1_bg_tilemap[2] = tilemap_create(machine, get_tile2_info,tilemap2_scan,32,32,64,64);
 
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();

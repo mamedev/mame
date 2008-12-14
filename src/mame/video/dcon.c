@@ -131,10 +131,10 @@ static TILE_GET_INFO( get_text_tile_info )
 
 VIDEO_START( dcon )
 {
-	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,     16,16,32,32);
-	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
-	midground_layer =  tilemap_create(get_mid_tile_info, tilemap_scan_rows,16,16,32,32);
-	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,     16,16,32,32);
+	foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
+	midground_layer =  tilemap_create(machine, get_mid_tile_info, tilemap_scan_rows,16,16,32,32);
+	text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
 	tilemap_set_transparent_pen(midground_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);

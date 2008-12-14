@@ -445,7 +445,7 @@ static TILE_GET_INFO( get_magicfly_tile_info )
 
 static VIDEO_START(magicfly)
 {
-	bg_tilemap = tilemap_create(get_magicfly_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
+	bg_tilemap = tilemap_create(machine, get_magicfly_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
 static TILE_GET_INFO( get_7mezzo_tile_info )
@@ -475,7 +475,7 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
 
 static VIDEO_START( 7mezzo )
 {
-	bg_tilemap = tilemap_create(get_7mezzo_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
+	bg_tilemap = tilemap_create(machine, get_7mezzo_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
 static VIDEO_UPDATE( magicfly )

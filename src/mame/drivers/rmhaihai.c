@@ -58,7 +58,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( rmhaihai )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		8, 8, 64, 32);
 }
 

@@ -55,7 +55,7 @@ VIDEO_START( sprint4 )
 {
 	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	playfield = tilemap_create(sprint4_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	playfield = tilemap_create(machine, sprint4_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 

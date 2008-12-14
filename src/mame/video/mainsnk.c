@@ -41,8 +41,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START(mainsnk)
 {
-	tx_tilemap = tilemap_create(get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,    8, 8, 32, 32);
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,    8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 	tilemap_set_scrolldy(tx_tilemap, 8, 8);

@@ -135,9 +135,9 @@ static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectang
 
 VIDEO_START( goal92 )
 {
-	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,16,16,32,32);
-	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
-	text_layer       = tilemap_create(get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	background_layer = tilemap_create(machine, get_back_tile_info,tilemap_scan_rows,16,16,32,32);
+	foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
+	text_layer       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
 	buffered_spriteram16 = auto_malloc(0x400*2);
 

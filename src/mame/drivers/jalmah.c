@@ -203,25 +203,25 @@ static TILE_GET_INFO( get_sc3_tile_info )
 
 static VIDEO_START( jalmah )
 {
-	sc0_tilemap_0 = tilemap_create(get_sc0_tile_info,range0_16x16,16,16,256,32);
-	sc0_tilemap_1 = tilemap_create(get_sc0_tile_info,range1_16x16,16,16,128,64);
-	sc0_tilemap_2 = tilemap_create(get_sc0_tile_info,range2_16x16,16,16,64,128);
-	sc0_tilemap_3 = tilemap_create(get_sc0_tile_info,range3_16x16,16,16,32,256);
+	sc0_tilemap_0 = tilemap_create(machine, get_sc0_tile_info,range0_16x16,16,16,256,32);
+	sc0_tilemap_1 = tilemap_create(machine, get_sc0_tile_info,range1_16x16,16,16,128,64);
+	sc0_tilemap_2 = tilemap_create(machine, get_sc0_tile_info,range2_16x16,16,16,64,128);
+	sc0_tilemap_3 = tilemap_create(machine, get_sc0_tile_info,range3_16x16,16,16,32,256);
 
-	sc1_tilemap_0 = tilemap_create(get_sc1_tile_info,range0_16x16,16,16,256,32);
-	sc1_tilemap_1 = tilemap_create(get_sc1_tile_info,range1_16x16,16,16,128,64);
-	sc1_tilemap_2 = tilemap_create(get_sc1_tile_info,range2_16x16,16,16,64,128);
-	sc1_tilemap_3 = tilemap_create(get_sc1_tile_info,range3_16x16,16,16,32,256);
+	sc1_tilemap_0 = tilemap_create(machine, get_sc1_tile_info,range0_16x16,16,16,256,32);
+	sc1_tilemap_1 = tilemap_create(machine, get_sc1_tile_info,range1_16x16,16,16,128,64);
+	sc1_tilemap_2 = tilemap_create(machine, get_sc1_tile_info,range2_16x16,16,16,64,128);
+	sc1_tilemap_3 = tilemap_create(machine, get_sc1_tile_info,range3_16x16,16,16,32,256);
 
-	sc2_tilemap_0 = tilemap_create(get_sc2_tile_info,range0_16x16,16,16,256,32);
-	sc2_tilemap_1 = tilemap_create(get_sc2_tile_info,range1_16x16,16,16,128,64);
-	sc2_tilemap_2 = tilemap_create(get_sc2_tile_info,range2_16x16,16,16,64,128);
-	sc2_tilemap_3 = tilemap_create(get_sc2_tile_info,range3_16x16,16,16,32,256);
+	sc2_tilemap_0 = tilemap_create(machine, get_sc2_tile_info,range0_16x16,16,16,256,32);
+	sc2_tilemap_1 = tilemap_create(machine, get_sc2_tile_info,range1_16x16,16,16,128,64);
+	sc2_tilemap_2 = tilemap_create(machine, get_sc2_tile_info,range2_16x16,16,16,64,128);
+	sc2_tilemap_3 = tilemap_create(machine, get_sc2_tile_info,range3_16x16,16,16,32,256);
 
-	sc3_tilemap_0 = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
-//  sc3_tilemap_1 = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
-	sc3_tilemap_2 = tilemap_create(get_sc3_tile_info,range2_8x8,8,8,128,64);
-	sc3_tilemap_3 = tilemap_create(get_sc3_tile_info,range3_8x8,8,8,64,128);
+	sc3_tilemap_0 = tilemap_create(machine, get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
+//  sc3_tilemap_1 = tilemap_create(machine, get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
+	sc3_tilemap_2 = tilemap_create(machine, get_sc3_tile_info,range2_8x8,8,8,128,64);
+	sc3_tilemap_3 = tilemap_create(machine, get_sc3_tile_info,range3_8x8,8,8,64,128);
 
 	jm_scrollram = auto_malloc(0x80);
 	jm_vregs = auto_malloc(0x40);
@@ -248,8 +248,8 @@ static VIDEO_START( jalmah )
 
 static VIDEO_START( urashima )
 {
-	sc0_tilemap_0 = tilemap_create(get_sc0_tile_info,range0_16x16,16,16,256,32);
-	sc3_tilemap_0 = tilemap_create(get_sc3_tile_info,range2_8x8,8,8,128,64);
+	sc0_tilemap_0 = tilemap_create(machine, get_sc0_tile_info,range0_16x16,16,16,256,32);
+	sc3_tilemap_0 = tilemap_create(machine, get_sc3_tile_info,range2_8x8,8,8,128,64);
 
 	jm_scrollram = auto_malloc(0x80);
 	jm_vregs = auto_malloc(0x40);

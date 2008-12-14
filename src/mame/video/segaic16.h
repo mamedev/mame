@@ -32,7 +32,7 @@ WRITE16_HANDLER( segaic16_paletteram_w );
 #define SEGAIC16_TILEMAP_BACKGROUND	1
 #define SEGAIC16_TILEMAP_TEXT		2
 
-void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks);
+void segaic16_tilemap_init(running_machine *machine, int which, int type, int colorbase, int xoffs, int numbanks);
 void segaic16_tilemap_reset(running_machine *machine, int which);
 void segaic16_tilemap_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark);
 void segaic16_tilemap_set_bank(running_machine *machine, int which, int banknum, int offset);

@@ -32,7 +32,7 @@ VIDEO_START( xboard )
 	segaic16_palette_init(0x2000);
 
 	/* initialize the tile/text layers */
-	segaic16_tilemap_init(0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2);
+	segaic16_tilemap_init(machine, 0, SEGAIC16_TILEMAP_16B, 0x1c00, 0, 2);
 
 	/* initialize the sprites */
 	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_XBOARD, 0x000, 0);

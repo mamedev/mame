@@ -211,10 +211,10 @@ VIDEO_START( nemesis )
 	int i;
 	spriteram_words = spriteram_size / 2;
 
-	background = tilemap_create(
+	background = tilemap_create(machine,
 		get_bg_tile_info, tilemap_scan_rows,  8,8, 64,32 );
 
-	foreground = tilemap_create(
+	foreground = tilemap_create(machine,
 		get_fg_tile_info, tilemap_scan_rows,  8,8, 64,32 );
 
 	tilemap_set_transparent_pen( background, 0 );

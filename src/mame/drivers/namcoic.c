@@ -52,7 +52,7 @@ static TILE_GET_INFO( get_tile_info4 ) { get_tile_info(machine,tileinfo,tile_ind
 static TILE_GET_INFO( get_tile_info5 ) { get_tile_info(machine,tileinfo,tile_index,&mTilemapInfo.videoram[0x4408]); }
 
 void
-namco_tilemap_init( int gfxbank, void *maskBaseAddr,
+namco_tilemap_init( running_machine *machine, int gfxbank, void *maskBaseAddr,
 	void (*cb)( UINT16 code, int *gfx, int *mask) )
 {
 	int i;
@@ -62,14 +62,14 @@ namco_tilemap_init( int gfxbank, void *maskBaseAddr,
 	mTilemapInfo.videoram = auto_malloc( 0x10000*2 );
 
 		/* four scrolling tilemaps */
-		mTilemapInfo.tmap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,8,8,64,64);
-		mTilemapInfo.tmap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,8,8,64,64);
-		mTilemapInfo.tmap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,8,8,64,64);
-		mTilemapInfo.tmap[3] = tilemap_create(get_tile_info3,tilemap_scan_rows,8,8,64,64);
+		mTilemapInfo.tmap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,64);
+		mTilemapInfo.tmap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,64,64);
+		mTilemapInfo.tmap[2] = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,8,8,64,64);
+		mTilemapInfo.tmap[3] = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,8,8,64,64);
 
 		/* two non-scrolling tilemaps */
-		mTilemapInfo.tmap[4] = tilemap_create(get_tile_info4,tilemap_scan_rows,8,8,36,28);
-		mTilemapInfo.tmap[5] = tilemap_create(get_tile_info5,tilemap_scan_rows,8,8,36,28);
+		mTilemapInfo.tmap[4] = tilemap_create(machine, get_tile_info4,tilemap_scan_rows,8,8,36,28);
+		mTilemapInfo.tmap[5] = tilemap_create(machine, get_tile_info5,tilemap_scan_rows,8,8,36,28);
 
 		/* define offsets for scrolling */
 		for( i=0; i<4; i++ )
@@ -1119,7 +1119,7 @@ TILEMAP_MAPPER( namco_roz_scan )
 } /* namco_roz_scan*/
 
 void
-namco_roz_init( int gfxbank, const char * maskregion )
+namco_roz_init( running_machine *machine, int gfxbank, const char * maskregion )
 {
 	int i;
 	static const tile_get_info_func roz_info[ROZ_TILEMAP_COUNT] =
@@ -1137,7 +1137,7 @@ namco_roz_init( int gfxbank, const char * maskregion )
 
 		for( i=0; i<ROZ_TILEMAP_COUNT; i++ )
 		{
-			mRozTilemap[i] = tilemap_create(
+			mRozTilemap[i] = tilemap_create(machine,
 				roz_info[i],
 				namco_roz_scan,
 				16,16,
@@ -1624,7 +1624,7 @@ namco_road_init(running_machine *machine, int gfxbank )
 				pGfx->total_colors = 0x3f;
 
 				machine->gfx[gfxbank] = pGfx;
-				mpRoadTilemap = tilemap_create(
+				mpRoadTilemap = tilemap_create(machine,
 					get_road_info,tilemap_scan_rows,
 					ROAD_TILE_SIZE,ROAD_TILE_SIZE,
 					ROAD_COLS,ROAD_ROWS);

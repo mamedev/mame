@@ -101,11 +101,11 @@ static TILE_GET_INFO( get_tx_tile_info )
     Start the video hardware emulation.
 ***************************************************************************/
 
-static void twincobr_create_tilemaps(void)
+static void twincobr_create_tilemaps(running_machine *machine)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(tx_tilemap,0);
@@ -118,7 +118,7 @@ VIDEO_START( toaplan0 )
 	twincobr_bgvideoram_size = 0x2000;	/* banked two times 0x1000 */
 	twincobr_fgvideoram_size = 0x1000;
 
-	twincobr_create_tilemaps();
+	twincobr_create_tilemaps(machine);
 
 	twincobr_txvideoram16 = auto_malloc(twincobr_txvideoram_size*2);
 	memset(twincobr_txvideoram16,0,twincobr_txvideoram_size*2);

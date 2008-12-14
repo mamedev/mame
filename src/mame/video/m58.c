@@ -184,7 +184,7 @@ VIDEO_START( yard )
 	bitmap_format format = video_screen_get_format(machine->primary_screen);
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	bg_tilemap = tilemap_create(yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
+	bg_tilemap = tilemap_create(machine, yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
 	tilemap_set_scrolldx(bg_tilemap, visarea->min_x, width - (visarea->max_x + 1));
 	tilemap_set_scrolldy(bg_tilemap, visarea->min_y - 8, height + 16 - (visarea->max_y + 1));
 

@@ -640,7 +640,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( goldnpkr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
 static VIDEO_UPDATE( goldnpkr )

@@ -505,7 +505,7 @@ static VIDEO_START( laserbat )
 	int screen_width = video_screen_get_width(machine->primary_screen);
 	int screen_height = video_screen_get_height(machine->primary_screen);
 
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32,32);
+	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	videoram = (UINT8 *)auto_malloc(0x400);
 	colorram = (UINT8 *)auto_malloc(0x400);

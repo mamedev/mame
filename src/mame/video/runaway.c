@@ -76,13 +76,13 @@ static TILE_GET_INFO( qwak_get_tile_info )
 
 VIDEO_START( runaway )
 {
-	bg_tilemap = tilemap_create(runaway_get_tile_info, tilemap_scan_rows,  8, 8, 32, 30);
+	bg_tilemap = tilemap_create(machine, runaway_get_tile_info, tilemap_scan_rows,  8, 8, 32, 30);
 }
 
 
 VIDEO_START( qwak )
 {
-	bg_tilemap = tilemap_create(qwak_get_tile_info, tilemap_scan_rows,  8, 8, 32, 30);
+	bg_tilemap = tilemap_create(machine, qwak_get_tile_info, tilemap_scan_rows,  8, 8, 32, 30);
 }
 
 

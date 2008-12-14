@@ -50,7 +50,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
 
 VIDEO_START( shangkid )
 {
-	background = tilemap_create(get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
+	background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
 WRITE8_HANDLER( shangkid_videoram_w )

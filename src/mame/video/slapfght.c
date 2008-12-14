@@ -76,15 +76,15 @@ static TILE_GET_INFO( get_fix_tile_info )
 
 VIDEO_START( perfrman )
 {
-	pf1_tilemap = tilemap_create(get_pf_tile_info,tilemap_scan_rows,8,8,64,32);
+	pf1_tilemap = tilemap_create(machine, get_pf_tile_info,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 }
 
 VIDEO_START( slapfight )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_rows,8,8,64,32);
-	fix_tilemap = tilemap_create(get_fix_tile_info,tilemap_scan_rows,8,8,64,32);
+	pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,tilemap_scan_rows,8,8,64,32);
+	fix_tilemap = tilemap_create(machine, get_fix_tile_info,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }

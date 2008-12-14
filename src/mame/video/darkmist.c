@@ -122,9 +122,9 @@ static void set_pens(colortable_t *colortable)
 
 VIDEO_START(darkmist)
 {
-	bgtilemap = tilemap_create( get_bgtile_info,tilemap_scan_rows,16,16,512,64 );
-	fgtilemap = tilemap_create( get_fgtile_info,tilemap_scan_rows,16,16,64,256 );
-	txtilemap = tilemap_create( get_txttile_info,tilemap_scan_rows,8,8,32,32 );
+	bgtilemap = tilemap_create( machine, get_bgtile_info,tilemap_scan_rows,16,16,512,64 );
+	fgtilemap = tilemap_create( machine, get_fgtile_info,tilemap_scan_rows,16,16,64,256 );
+	txtilemap = tilemap_create( machine, get_txttile_info,tilemap_scan_rows,8,8,32,32 );
 	tilemap_set_transparent_pen(fgtilemap, 0);
 	tilemap_set_transparent_pen(txtilemap, 0);
 }

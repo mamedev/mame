@@ -53,8 +53,8 @@ static TILE_GET_INFO( fg_get_tile_info )
 
 VIDEO_START( ppking )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,8,8,32,64);
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,8,8,32,64);
+	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,8,8,32,64);
+	fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,8,8,32,64);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
@@ -65,8 +65,8 @@ VIDEO_START( ppking )
 
 VIDEO_START( gladiatr )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,8,8,64,32);
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,8,8,64,32);
+	fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 

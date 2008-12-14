@@ -44,7 +44,7 @@ WRITE8_HANDLER( djboy_videoram_w )
 
 VIDEO_START( djboy )
 {
-	background = tilemap_create(get_bg_tile_info,tilemap_scan_rows,16,16,64,32);
+	background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,16,16,64,32);
 	pandora_start(machine,0,0,0);
 }
 

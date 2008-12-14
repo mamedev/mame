@@ -951,10 +951,10 @@ static TILE_GET_INFO( get_ll_pf4_tile_info )
 
 VIDEO_START( captaven )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,    tilemap_scan_rows, 8, 8,64,32);
-	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_ca_pf3_tile_info, tilemap_scan_rows,16,16,32,32);
+	pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,    tilemap_scan_rows, 8, 8,64,32);
+	pf1a_tilemap =tilemap_create(machine, get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
+	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(machine, get_ca_pf3_tile_info, tilemap_scan_rows,16,16,32,32);
 	deco32_raster_display_list=auto_malloc(10 * 256);
 	memset(deco32_raster_display_list, 0, 10 * 256);
 
@@ -970,10 +970,10 @@ VIDEO_START( captaven )
 
 VIDEO_START( fghthist )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info, tilemap_scan_rows, 8, 8,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info, deco16_scan_rows,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
-	pf4_tilemap = tilemap_create(get_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
+	pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, tilemap_scan_rows, 8, 8,64,32);
+	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(machine, get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
+	pf4_tilemap = tilemap_create(machine, get_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 
@@ -990,11 +990,11 @@ VIDEO_START( fghthist )
 
 VIDEO_START( dragngun )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,    tilemap_scan_rows, 8, 8,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_ll_pf3_tile_info, deco16_scan_rows,16,16,64,32);
-	pf4_tilemap = tilemap_create(get_ll_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
-	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
+	pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,    tilemap_scan_rows, 8, 8,64,32);
+	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(machine, get_ll_pf3_tile_info, deco16_scan_rows,16,16,64,32);
+	pf4_tilemap = tilemap_create(machine, get_ll_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
+	pf1a_tilemap =tilemap_create(machine, get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
 	dirty_palette = auto_malloc(4096);
 	deco32_raster_display_list = auto_malloc(10 * 256);
 
@@ -1013,11 +1013,11 @@ VIDEO_START( dragngun )
 
 VIDEO_START( lockload )
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,    tilemap_scan_rows, 8, 8,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_ll_pf3_tile_info, deco16_scan_rows,16,16,32,32);
-	pf4_tilemap = tilemap_create(get_ll_pf4_tile_info, deco16_scan_rows,     16,16,32,32);
-	pf1a_tilemap =tilemap_create(get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
+	pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,    tilemap_scan_rows, 8, 8,64,32);
+	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(machine, get_ll_pf3_tile_info, deco16_scan_rows,16,16,32,32);
+	pf4_tilemap = tilemap_create(machine, get_ll_pf4_tile_info, deco16_scan_rows,     16,16,32,32);
+	pf1a_tilemap =tilemap_create(machine, get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
 	dirty_palette = auto_malloc(4096);
 	deco32_raster_display_list = auto_malloc(10 * 256);
 	memset(deco32_raster_display_list, 0, 10 * 256);
@@ -1039,10 +1039,10 @@ VIDEO_START( nslasher )
 {
 	int width, height;
 
-	pf1_tilemap = tilemap_create(get_pf1_tile_info, tilemap_scan_rows, 8, 8,64,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info, deco16_scan_rows,16,16,64,32);
-	pf3_tilemap = tilemap_create(get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
-	pf4_tilemap = tilemap_create(get_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
+	pf1_tilemap = tilemap_create(machine, get_pf1_tile_info, tilemap_scan_rows, 8, 8,64,32);
+	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, deco16_scan_rows,16,16,64,32);
+	pf3_tilemap = tilemap_create(machine, get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
+	pf4_tilemap = tilemap_create(machine, get_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 

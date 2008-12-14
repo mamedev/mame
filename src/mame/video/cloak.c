@@ -172,7 +172,7 @@ static STATE_POSTLOAD( cloak_postload )
 
 VIDEO_START( cloak )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	bitmap_videoram1 = auto_malloc(256*256);
 	bitmap_videoram2 = auto_malloc(256*256);

@@ -148,8 +148,8 @@ VIDEO_START( ninjakd2 )
 {
 	videoram_alloc(machine, 0);
 
-	fg_tilemap = tilemap_create(         get_fg_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
-	bg_tilemap = tilemap_create(ninjakd2_get_bg_tile_info, tilemap_scan_rows,  16, 16, 32, 32);
+	fg_tilemap = tilemap_create(         machine, get_fg_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+	bg_tilemap = tilemap_create(machine, ninjakd2_get_bg_tile_info, tilemap_scan_rows,  16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
@@ -160,8 +160,8 @@ VIDEO_START( mnight )
 {
 	videoram_alloc(machine, 0);
 
-	fg_tilemap = tilemap_create(       get_fg_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
-	bg_tilemap = tilemap_create(mnight_get_bg_tile_info, tilemap_scan_rows,  16, 16, 32, 32);
+	fg_tilemap = tilemap_create(       machine, get_fg_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+	bg_tilemap = tilemap_create(machine, mnight_get_bg_tile_info, tilemap_scan_rows,  16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
@@ -174,10 +174,10 @@ VIDEO_START( robokid )
 
 	videoram_alloc(machine, 0x0800);
 
-	fg_tilemap  = tilemap_create(        get_fg_tile_info,  tilemap_scan_rows,   8,  8, 32, 32);
-	bg0_tilemap = tilemap_create(robokid_get_bg0_tile_info, robokid_bg_scan,    16, 16, 32, 32);
-	bg1_tilemap = tilemap_create(robokid_get_bg1_tile_info, robokid_bg_scan,    16, 16, 32, 32);
-	bg2_tilemap = tilemap_create(robokid_get_bg2_tile_info, robokid_bg_scan,    16, 16, 32, 32);
+	fg_tilemap  = tilemap_create(        machine, get_fg_tile_info,  tilemap_scan_rows,   8,  8, 32, 32);
+	bg0_tilemap = tilemap_create(machine, robokid_get_bg0_tile_info, robokid_bg_scan,    16, 16, 32, 32);
+	bg1_tilemap = tilemap_create(machine, robokid_get_bg1_tile_info, robokid_bg_scan,    16, 16, 32, 32);
+	bg2_tilemap = tilemap_create(machine, robokid_get_bg2_tile_info, robokid_bg_scan,    16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap,  15);
 	tilemap_set_transparent_pen(bg1_tilemap, 15);
@@ -192,10 +192,10 @@ VIDEO_START( omegaf )
 
 	videoram_alloc(machine, 0x2000);
 
-	fg_tilemap  = tilemap_create(        get_fg_tile_info,  tilemap_scan_rows,   8,  8,  32, 32);
-	bg0_tilemap = tilemap_create(robokid_get_bg0_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
-	bg1_tilemap = tilemap_create(robokid_get_bg1_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
-	bg2_tilemap = tilemap_create(robokid_get_bg2_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
+	fg_tilemap  = tilemap_create(        machine, get_fg_tile_info,  tilemap_scan_rows,   8,  8,  32, 32);
+	bg0_tilemap = tilemap_create(machine, robokid_get_bg0_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
+	bg1_tilemap = tilemap_create(machine, robokid_get_bg1_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
+	bg2_tilemap = tilemap_create(machine, robokid_get_bg2_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap,  15);
 	tilemap_set_transparent_pen(bg0_tilemap, 15);

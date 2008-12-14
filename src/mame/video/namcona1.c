@@ -328,12 +328,12 @@ VIDEO_START( namcona1 )
 	int i;
 	gfx_element *gfx0,*gfx1,*gfx2;
 
-	roz_tilemap = tilemap_create( roz_get_info, tilemap_scan_rows, 8,8,64,64 );
+	roz_tilemap = tilemap_create( machine, roz_get_info, tilemap_scan_rows, 8,8,64,64 );
 	roz_palette = -1;
 
 	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
 	{
-		bg_tilemap[i] = tilemap_create( get_info[i], tilemap_scan_rows, 8,8,64,64 );
+		bg_tilemap[i] = tilemap_create( machine, get_info[i], tilemap_scan_rows, 8,8,64,64 );
 		tilemap_palette_bank[i] = -1;
 	}
 

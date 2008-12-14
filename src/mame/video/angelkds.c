@@ -263,13 +263,13 @@ WRITE8_HANDLER( angelkds_paletteram_w )
 VIDEO_START( angelkds )
 {
 
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
 	tilemap_set_transparent_pen(tx_tilemap,0);
 
-	bgbot_tilemap = tilemap_create(get_bgbot_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	bgbot_tilemap = tilemap_create(machine, get_bgbot_tile_info,tilemap_scan_rows, 8, 8,32,32);
 	tilemap_set_transparent_pen(bgbot_tilemap,15);
 
-	bgtop_tilemap = tilemap_create(get_bgtop_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	bgtop_tilemap = tilemap_create(machine, get_bgtop_tile_info,tilemap_scan_rows, 8, 8,32,32);
 	tilemap_set_transparent_pen(bgtop_tilemap,15);
 }
 

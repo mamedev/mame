@@ -24,7 +24,7 @@ VIDEO_START( mayumi )
 {
 	mayumi_videoram = auto_malloc(0x1800);
 
-	mayumi_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,8,8,64,32 );
+	mayumi_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,64,32 );
 }
 
 WRITE8_HANDLER( mayumi_videoram_w )

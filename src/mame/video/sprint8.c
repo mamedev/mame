@@ -128,8 +128,8 @@ VIDEO_START( sprint8 )
 	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	tilemap1 = tilemap_create(get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
-	tilemap2 = tilemap_create(get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
+	tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 16, 8, 32, 32);
+	tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 16, 8, 32, 32);
 
 	tilemap_set_scrolly(tilemap1, 0, +24);
 	tilemap_set_scrolly(tilemap2, 0, +24);

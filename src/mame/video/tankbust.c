@@ -83,10 +83,10 @@ static TILE_GET_INFO( get_txt_tile_info )
 VIDEO_START( tankbust )
 {
 	/* not scrollable */
-	txt_tilemap = tilemap_create(get_txt_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	txt_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
 	/* scrollable */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
 
 	tilemap_set_transparent_pen(txt_tilemap, 0);

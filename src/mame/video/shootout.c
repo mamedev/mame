@@ -72,8 +72,8 @@ WRITE8_HANDLER( shootout_textram_w ){
 }
 
 VIDEO_START( shootout ){
-	background = tilemap_create(get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
-	foreground = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
+	background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
+	foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
 		tilemap_set_transparent_pen( foreground, 0 );
 }
 

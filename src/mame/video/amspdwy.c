@@ -78,7 +78,7 @@ static TILEMAP_MAPPER( tilemap_scan_cols_back )
 
 VIDEO_START( amspdwy )
 {
-	bg_tilemap	=	tilemap_create(	get_tile_info,	tilemap_scan_cols_back,
+	bg_tilemap	=	tilemap_create(	machine, get_tile_info,	tilemap_scan_cols_back,
 									8,8,	0x20, 0x20 );
 }
 

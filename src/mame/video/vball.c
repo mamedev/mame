@@ -51,7 +51,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( vb )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan, 8, 8,64,64);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan, 8, 8,64,64);
 
 	tilemap_set_scroll_rows(bg_tilemap,32);
 }

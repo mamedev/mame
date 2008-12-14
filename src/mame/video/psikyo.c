@@ -168,48 +168,48 @@ VIDEO_START( psikyo )
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
        the various sized tilemaps now as opposed to later */
 
-	tilemap_0_size0	=	tilemap_create(	get_tile_info_0,
+	tilemap_0_size0	=	tilemap_create(	machine, get_tile_info_0,
 									tilemap_scan_rows,
 
 									16,16,
 									0x20, 0x80 );
-	tilemap_0_size1	=	tilemap_create(	get_tile_info_0,
+	tilemap_0_size1	=	tilemap_create(	machine, get_tile_info_0,
 									tilemap_scan_rows,
 
 									16,16,
 									0x40, 0x40 );
 
-	tilemap_0_size2	=	tilemap_create(	get_tile_info_0,
+	tilemap_0_size2	=	tilemap_create(	machine, get_tile_info_0,
 									tilemap_scan_rows,
 
 									16,16,
 									0x80, 0x20 );
 
-	tilemap_0_size3	=	tilemap_create(	get_tile_info_0,
+	tilemap_0_size3	=	tilemap_create(	machine, get_tile_info_0,
 									tilemap_scan_rows,
 
 									16,16,
 									0x100, 0x10 );
 
-	tilemap_1_size0	=	tilemap_create(	get_tile_info_1,
+	tilemap_1_size0	=	tilemap_create(	machine, get_tile_info_1,
 									tilemap_scan_rows,
 
 									16,16,
 									0x20, 0x80 );
 
-	tilemap_1_size1	=	tilemap_create(	get_tile_info_1,
+	tilemap_1_size1	=	tilemap_create(	machine, get_tile_info_1,
 									tilemap_scan_rows,
 
 									16,16,
 									0x40, 0x40 );
 
-	tilemap_1_size2	=	tilemap_create(	get_tile_info_1,
+	tilemap_1_size2	=	tilemap_create(	machine, get_tile_info_1,
 									tilemap_scan_rows,
 
 									16,16,
 									0x80, 0x20 );
 
-	tilemap_1_size3	=	tilemap_create(	get_tile_info_1,
+	tilemap_1_size3	=	tilemap_create(	machine, get_tile_info_1,
 									tilemap_scan_rows,
 
 									16,16,

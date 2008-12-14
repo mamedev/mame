@@ -144,7 +144,7 @@ VIDEO_START( mario )
 {
 	mario_state	*state = machine->driver_data;
 
-	state->bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
 	state->gfx_bank = 0;

@@ -237,8 +237,8 @@ VIDEO_START( firetrk )
 	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	tilemap1 = tilemap_create(firetrk_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
-	tilemap2 = tilemap_create(firetrk_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
+	tilemap1 = tilemap_create(machine, firetrk_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
+	tilemap2 = tilemap_create(machine, firetrk_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
 }
 
 
@@ -247,8 +247,8 @@ VIDEO_START( superbug )
 	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	tilemap1 = tilemap_create(superbug_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
-	tilemap2 = tilemap_create(superbug_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
+	tilemap1 = tilemap_create(machine, superbug_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
+	tilemap2 = tilemap_create(machine, superbug_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
 }
 
 
@@ -257,8 +257,8 @@ VIDEO_START( montecar )
 	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	tilemap1 = tilemap_create(montecar_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
-	tilemap2 = tilemap_create(montecar_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
+	tilemap1 = tilemap_create(machine, montecar_get_tile_info1, tilemap_scan_rows, 16, 16, 16, 16);
+	tilemap2 = tilemap_create(machine, montecar_get_tile_info2, tilemap_scan_rows, 16, 16, 16, 16);
 }
 
 

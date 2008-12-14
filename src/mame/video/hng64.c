@@ -1257,7 +1257,7 @@ VIDEO_UPDATE( hng64 )
         tilemap2Offset = hng64_videoregs[0xc] ;
 
         tilemap_dispose(hng64_tilemap1) ;
-        hng64_tilemap1 = tilemap_create(get_hng64_tile2_info,tilemap_scan_rows, 16, 16, 128,128); // 128x128x4 = 0x10000
+        hng64_tilemap1 = tilemap_create(machine, get_hng64_tile2_info,tilemap_scan_rows, 16, 16, 128,128); // 128x128x4 = 0x10000
     }
     */
 
@@ -1302,10 +1302,10 @@ VIDEO_START( hng64 )
 {
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	hng64_tilemap0 = tilemap_create(get_hng64_tile0_info, tilemap_scan_rows,  8,   8, 128,128); /* 128x128x4 = 0x10000 */
-	hng64_tilemap1 = tilemap_create(get_hng64_tile1_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
-	hng64_tilemap2 = tilemap_create(get_hng64_tile2_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
-	hng64_tilemap3 = tilemap_create(get_hng64_tile3_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap0 = tilemap_create(machine, get_hng64_tile0_info, tilemap_scan_rows,  8,   8, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap1 = tilemap_create(machine, get_hng64_tile1_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap2 = tilemap_create(machine, get_hng64_tile2_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
+	hng64_tilemap3 = tilemap_create(machine, get_hng64_tile3_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
 	tilemap_set_transparent_pen(hng64_tilemap0,0);
 	tilemap_set_transparent_pen(hng64_tilemap1,0);
 	tilemap_set_transparent_pen(hng64_tilemap2,0);

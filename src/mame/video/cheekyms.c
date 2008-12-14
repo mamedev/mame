@@ -100,7 +100,7 @@ static TILE_GET_INFO( cheekyms_get_tile_info )
 
 VIDEO_START( cheekyms )
 {
-	cheekyms_tilemap = tilemap_create(cheekyms_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	cheekyms_tilemap = tilemap_create(machine, cheekyms_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(cheekyms_tilemap, 0);
 }
 

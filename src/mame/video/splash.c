@@ -178,8 +178,8 @@ static void draw_bitmap(bitmap_t *bitmap,const rectangle *cliprect)
 
 VIDEO_START( splash )
 {
-	bg_tilemap[0] = tilemap_create(get_tile_info_splash_tilemap0,tilemap_scan_rows, 8, 8,64,32);
-	bg_tilemap[1] = tilemap_create(get_tile_info_splash_tilemap1,tilemap_scan_rows,16,16,32,32);
+	bg_tilemap[0] = tilemap_create(machine, get_tile_info_splash_tilemap0,tilemap_scan_rows, 8, 8,64,32);
+	bg_tilemap[1] = tilemap_create(machine, get_tile_info_splash_tilemap1,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_transparent_pen(bg_tilemap[0],0);
 	tilemap_set_transparent_pen(bg_tilemap[1],0);

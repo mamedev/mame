@@ -336,8 +336,8 @@ VIDEO_START( rallyx )
 {
 	int i;
 
-	bg_tilemap = tilemap_create(rallyx_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
-	fg_tilemap = tilemap_create(rallyx_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
+	bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	fg_tilemap = tilemap_create(machine, rallyx_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
 
 	/* the scrolling tilemap is slightly misplaced in Rally X */
 	tilemap_set_scrolldx(bg_tilemap,3,3);
@@ -366,8 +366,8 @@ VIDEO_START( jungler )
 {
 	int i;
 
-	bg_tilemap = tilemap_create(rallyx_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
-	fg_tilemap = tilemap_create(rallyx_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
+	bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	fg_tilemap = tilemap_create(machine, rallyx_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
 
 	spriteram_base = 0x14;
 
@@ -395,8 +395,8 @@ VIDEO_START( locomotn )
 {
 	int i;
 
-	bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
-	fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
+	bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
 
 	/* handle reduced visible area in some games */
 	if (video_screen_get_visible_area(machine->primary_screen)->max_x == 32*8-1)
@@ -431,8 +431,8 @@ VIDEO_START( commsega )
 {
 	int i;
 
-	bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
-	fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
+	bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
 
 	/* handle reduced visible area in some games */
 	if (video_screen_get_visible_area(machine->primary_screen)->max_x == 32*8-1)

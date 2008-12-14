@@ -111,8 +111,8 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 static VIDEO_START(chanbara )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,8, 8, 32, 32);
-	bg2_tilemap = tilemap_create(get_bg2_tile_info, tilemap_scan_rows,16, 16, 16, 32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,8, 8, 32, 32);
+	bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,16, 16, 16, 32);
 	tilemap_set_transparent_pen(bg_tilemap,0);
 }
 

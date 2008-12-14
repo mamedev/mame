@@ -142,13 +142,13 @@ static TILE_GET_INFO( s2k_get_bg_tile_info )
 
 VIDEO_START(ampoker2)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 64, 32);
 }
 
 VIDEO_START(sigma2k)
 {
-	bg_tilemap = tilemap_create(s2k_get_bg_tile_info, tilemap_scan_rows,
+	bg_tilemap = tilemap_create(machine, s2k_get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 64, 32);
 }
 

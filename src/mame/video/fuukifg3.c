@@ -109,16 +109,16 @@ VIDEO_START( fuuki32 )
 	buffered_spriteram32   = auto_malloc(spriteram_size);
 	buffered_spriteram32_2 = auto_malloc(spriteram_size);
 
-	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
+	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 16, 16, 64,32);
 
-	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
+	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16, 16, 64,32);
 
-	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
+	tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
 								  8,  8, 64,32);
 
-	tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
+	tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
 								  8,  8, 64,32);
 
 	tilemap_set_transparent_pen(tilemap_0,0xff);	// 8 bits

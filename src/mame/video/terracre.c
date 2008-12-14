@@ -187,8 +187,8 @@ WRITE16_HANDLER( amazon_scrollx_w )
 
 VIDEO_START( amazon )
 {
-	background = tilemap_create(get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
-	foreground = tilemap_create(get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
+	background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
+	foreground = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
 	tilemap_set_transparent_pen(foreground,0xf);
 
 	/* register for saving */

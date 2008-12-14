@@ -143,12 +143,12 @@ static TILEMAP_MAPPER( armwrest_bs1_scan_flipx )
 
 VIDEO_START( punchout )
 {
-	bg_top_tilemap = tilemap_create(top_get_info, tilemap_scan_rows,  8,8, 32,32);
-	bg_bot_tilemap = tilemap_create(bot_get_info, tilemap_scan_rows,  8,8, 64,32);
+	bg_top_tilemap = tilemap_create(machine, top_get_info, tilemap_scan_rows,  8,8, 32,32);
+	bg_bot_tilemap = tilemap_create(machine, bot_get_info, tilemap_scan_rows,  8,8, 64,32);
 	tilemap_set_scroll_rows(bg_bot_tilemap, 32);
 
-	spr1_tilemap = tilemap_create(bs1_get_info, tilemap_scan_rows,  8,8, 16,32);
-	spr2_tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
+	spr1_tilemap = tilemap_create(machine, bs1_get_info, tilemap_scan_rows,  8,8, 16,32);
+	spr2_tilemap = tilemap_create(machine, bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
 
 	fg_tilemap = NULL;
 
@@ -159,13 +159,13 @@ VIDEO_START( punchout )
 
 VIDEO_START( armwrest )
 {
-	bg_top_tilemap = tilemap_create(armwrest_top_get_info, tilemap_scan_rows,  8,8, 32,32);
-	bg_bot_tilemap = tilemap_create(armwrest_bot_get_info, tilemap_scan_rows,  8,8, 32,32);
+	bg_top_tilemap = tilemap_create(machine, armwrest_top_get_info, tilemap_scan_rows,  8,8, 32,32);
+	bg_bot_tilemap = tilemap_create(machine, armwrest_bot_get_info, tilemap_scan_rows,  8,8, 32,32);
 
-	spr1_tilemap =       tilemap_create(bs1_get_info, armwrest_bs1_scan,  8,8, 32,16);
-	spr1_tilemap_flipx = tilemap_create(bs1_get_info, armwrest_bs1_scan_flipx,  8,8, 32,16);
-	spr2_tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
-	fg_tilemap = tilemap_create(armwrest_fg_get_info, tilemap_scan_rows,  8,8, 32,32);
+	spr1_tilemap =       tilemap_create(machine, bs1_get_info, armwrest_bs1_scan,  8,8, 32,16);
+	spr1_tilemap_flipx = tilemap_create(machine, bs1_get_info, armwrest_bs1_scan_flipx,  8,8, 32,16);
+	spr2_tilemap = tilemap_create(machine, bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
+	fg_tilemap = tilemap_create(machine, armwrest_fg_get_info, tilemap_scan_rows,  8,8, 32,32);
 
 	tilemap_set_transparent_pen(spr1_tilemap, 0x07);
 	tilemap_set_transparent_pen(spr1_tilemap_flipx, 0x07);

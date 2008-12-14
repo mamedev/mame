@@ -126,10 +126,10 @@ static TILE_GET_INFO( get_tile_info3 ) { get_tile_info(machine,tileinfo,tile_ind
 
 VIDEO_START( namcos86 )
 {
-	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,8,8,64,32);
-	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,8,8,64,32);
-	bg_tilemap[2] = tilemap_create(get_tile_info2,tilemap_scan_rows,8,8,64,32);
-	bg_tilemap[3] = tilemap_create(get_tile_info3,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap[2] = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap[3] = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transparent_pen(bg_tilemap[0],7);
 	tilemap_set_transparent_pen(bg_tilemap[1],7);

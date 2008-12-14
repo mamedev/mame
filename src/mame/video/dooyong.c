@@ -630,11 +630,11 @@ VIDEO_START( lastday )
 	tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -667,11 +667,11 @@ VIDEO_START( gulfstrm )
 	tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -703,11 +703,11 @@ VIDEO_START( pollux )
 	tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -739,13 +739,13 @@ VIDEO_START( bluehawk )
 	tx_tilemap_mode = 1;
 
 	/* Create tilemaps */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	fg2_tilemap = tilemap_create(get_fg2_tile_info, tilemap_scan_cols,
+	fg2_tilemap = tilemap_create(machine, get_fg2_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -776,11 +776,11 @@ VIDEO_START( flytiger )
 	tx_tilemap_mode = 0;
 
 	/* Create tilemaps */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	fg_tilemap = tilemap_create(flytiger_get_fg_tile_info, tilemap_scan_cols,
+	fg_tilemap = tilemap_create(machine, flytiger_get_fg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -811,11 +811,11 @@ VIDEO_START( primella )
 	tx_tilemap_mode = 1;
 
 	/* Create tilemaps */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
-	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_cols,
 		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -850,13 +850,13 @@ VIDEO_START( rshark )
 	fg2_gfx = 1;
 
 	/* Create tilemaps */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 16, 16, 64, 32);
-	bg2_tilemap = tilemap_create(get_bg2_tile_info, tilemap_scan_cols,
+	bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_cols,
 		 16, 16, 64, 32);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols,
 		 16, 16, 64, 32);
-	fg2_tilemap = tilemap_create(get_fg2_tile_info, tilemap_scan_cols,
+	fg2_tilemap = tilemap_create(machine, get_fg2_tile_info, tilemap_scan_cols,
 		 16, 16, 64, 32);
 
 	/* Configure tilemap transparency */
@@ -884,7 +884,7 @@ VIDEO_START( popbingo )
 	bg_gfx = 1;
 
 	/* Create tilemaps */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
 	bg2_tilemap = fg_tilemap = fg2_tilemap = NULL;	/* Stop scroll handler from crashing on these */
 

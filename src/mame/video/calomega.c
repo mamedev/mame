@@ -56,7 +56,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( calomega )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
 }
 
 VIDEO_UPDATE( calomega )

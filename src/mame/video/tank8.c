@@ -119,7 +119,7 @@ VIDEO_START( tank8 )
 	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	helper3 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	tank8_tilemap = tilemap_create(tank8_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
+	tank8_tilemap = tilemap_create(machine, tank8_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
 	/* VBLANK starts on scanline #256 and ends on scanline #24 */
 

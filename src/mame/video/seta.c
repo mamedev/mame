@@ -446,18 +446,18 @@ VIDEO_START( seta_2_layers )
        at any given time */
 
 	/* layer 0 */
-	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
+	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
+	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16,16, 64,32 );
 
 
 	/* layer 1 */
-	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
+	tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-	tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
+	tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
 								 16,16, 64,32 );
 
 		tilemaps_flip = 0;
@@ -479,10 +479,10 @@ VIDEO_START( seta_1_layer )
        at any given time */
 
 	/* layer 0 */
-	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
+	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
+	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16,16, 64,32 );
 
 
@@ -505,10 +505,10 @@ VIDEO_START( twineagl_1_layer )
        at any given time */
 
 	/* layer 0 */
-	tilemap_0 = tilemap_create(	twineagl_get_tile_info_0, tilemap_scan_rows,
+	tilemap_0 = tilemap_create(	machine, twineagl_get_tile_info_0, tilemap_scan_rows,
 								 16,16, 64,32 );
 
-	tilemap_1 = tilemap_create(	twineagl_get_tile_info_1, tilemap_scan_rows,
+	tilemap_1 = tilemap_create(	machine, twineagl_get_tile_info_1, tilemap_scan_rows,
 								 16,16, 64,32 );
 
 

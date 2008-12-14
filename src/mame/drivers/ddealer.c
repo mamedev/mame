@@ -138,7 +138,7 @@ static TILE_GET_INFO( get_back_tile_info )
 static VIDEO_START( ddealer )
 {
 	ddealer_flipscreen = 0;
-	back_tilemap = tilemap_create(get_back_tile_info,tilemap_scan_cols,8,8,64,32);
+	back_tilemap = tilemap_create(machine, get_back_tile_info,tilemap_scan_cols,8,8,64,32);
 }
 
 static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t* bitmap, const rectangle *cliprect, int flipy)

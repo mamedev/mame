@@ -149,12 +149,12 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START(funworld)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 96, 29);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 4, 8, 96, 29);
 }
 
 VIDEO_START(magicrd2)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 112, 34);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 4, 8, 112, 34);
 }
 
 VIDEO_UPDATE(funworld)

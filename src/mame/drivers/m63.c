@@ -247,10 +247,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static VIDEO_START( m63 )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		8, 8, 32, 32);
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
 		8, 8, 32, 32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);

@@ -52,7 +52,7 @@ static void zoom_callback(int *code,int *color,int *flags)
 
 VIDEO_START( tail2nos )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,64,32);
 
 	K051316_vh_start_0(machine,"gfx3",-4,TRUE,0,zoom_callback);
 

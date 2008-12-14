@@ -58,7 +58,7 @@ WRITE16_HANDLER( VS920A_1_vram_w )
 	tilemap_mark_tile_dirty(VS920A[1].tmap, offset);
 }
 
-static void VS920A_init(int numchips)
+static void VS920A_init(running_machine *machine, int numchips)
 {
 	int i;
 
@@ -67,7 +67,7 @@ static void VS920A_init(int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		VS920A[i].tmap = tilemap_create(VS920A_get_tile_info,tilemap_scan_rows,8,8,64,32);
+		VS920A[i].tmap = tilemap_create(machine, VS920A_get_tile_info,tilemap_scan_rows,8,8,64,32);
 
 		tilemap_set_transparent_pen(VS920A[i].tmap, 0);
 	}
@@ -216,7 +216,7 @@ static TILEMAP_MAPPER( twc94_scan )
 	return (row*64) + (col&63) + ((col&64)<<6);
 }
 
-static void MB60553_init(int numchips)
+static void MB60553_init(running_machine *machine, int numchips)
 {
 	int i;
 
@@ -225,7 +225,7 @@ static void MB60553_init(int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		MB60553[i].tmap = tilemap_create(MB60553_get_tile_info,twc94_scan, 16,16,128,64);
+		MB60553[i].tmap = tilemap_create(machine, MB60553_get_tile_info,twc94_scan, 16,16,128,64);
 
 		tilemap_set_transparent_pen(MB60553[i].tmap, 0);
 	}
@@ -567,13 +567,13 @@ VIDEO_START(gstriker)
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
-	VS920A_init(1);
+	VS920A_init(machine, 1);
 	VS920A_set_gfx_region(0, 0);
 	VS920A_set_pal_base(0, 0x30);
 	tilemap_set_transparent_pen(VS920A_get_tilemap(0),  0xf);
 
 	// Initalize the chip for the screen plane
-	MB60553_init(1);
+	MB60553_init(machine, 1);
 	MB60553_set_gfx_region(0, 1);
 	MB60553_set_pal_base(0, 0);
 	tilemap_set_transparent_pen(MB60553_get_tilemap(0), 0xf);
@@ -590,13 +590,13 @@ VIDEO_START(twrldc94)
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
-	VS920A_init(1);
+	VS920A_init(machine, 1);
 	VS920A_set_gfx_region(0, 0);
 	VS920A_set_pal_base(0, 0x40);
 	tilemap_set_transparent_pen(VS920A_get_tilemap(0),  0xf);
 
 	// Initalize the chip for the screen plane
-	MB60553_init(1);
+	MB60553_init(machine, 1);
 	MB60553_set_gfx_region(0, 1);
 	MB60553_set_pal_base(0, 0x50);
 	tilemap_set_transparent_pen(MB60553_get_tilemap(0), 0xf);
@@ -613,13 +613,13 @@ VIDEO_START(vgoalsoc)
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
-	VS920A_init(1);
+	VS920A_init(machine, 1);
 	VS920A_set_gfx_region(0, 0);
 	VS920A_set_pal_base(0, 0x30);
 	tilemap_set_transparent_pen(VS920A_get_tilemap(0),  0xf);
 
 	// Initalize the chip for the screen plane
-	MB60553_init(1);
+	MB60553_init(machine, 1);
 	MB60553_set_gfx_region(0, 1);
 	MB60553_set_pal_base(0, 0x20);
 	tilemap_set_transparent_pen(MB60553_get_tilemap(0), 0xf);

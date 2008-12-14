@@ -112,7 +112,7 @@ static TILEMAP_MAPPER( tilemap_scan_rows_thehand )
 
 VIDEO_START( gotya )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows_thehand,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_thehand,
 		 8, 8, 64, 32);
 }
 

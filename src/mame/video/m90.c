@@ -95,10 +95,10 @@ static TILE_GET_INFO( dynablsb_get_pf2w_tile_info ) { dynablsb_get_tile_info(mac
 
 VIDEO_START( m90 )
 {
-	pf1_layer =      tilemap_create(get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
-	pf1_wide_layer = tilemap_create(get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
-	pf2_layer =      tilemap_create(get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
-	pf2_wide_layer = tilemap_create(get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
+	pf1_layer =      tilemap_create(machine, get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
+	pf1_wide_layer = tilemap_create(machine, get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
+	pf2_layer =      tilemap_create(machine, get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
+	pf2_wide_layer = tilemap_create(machine, get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
 
 	tilemap_set_transparent_pen(pf1_layer,0);
 	tilemap_set_transparent_pen(pf1_wide_layer,0);
@@ -108,10 +108,10 @@ VIDEO_START( m90 )
 
 VIDEO_START( bomblord )
 {
-	pf1_layer =      tilemap_create(bomblord_get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
-	pf1_wide_layer = tilemap_create(bomblord_get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
-	pf2_layer =      tilemap_create(bomblord_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
-	pf2_wide_layer = tilemap_create(bomblord_get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
+	pf1_layer =      tilemap_create(machine, bomblord_get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
+	pf1_wide_layer = tilemap_create(machine, bomblord_get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
+	pf2_layer =      tilemap_create(machine, bomblord_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
+	pf2_wide_layer = tilemap_create(machine, bomblord_get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
 
 	tilemap_set_transparent_pen(pf2_layer,0);
 	tilemap_set_transparent_pen(pf2_wide_layer,0);
@@ -123,10 +123,10 @@ VIDEO_START( bomblord )
 
 VIDEO_START( dynablsb )
 {
-	pf1_layer =      tilemap_create(dynablsb_get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
-	pf1_wide_layer = tilemap_create(dynablsb_get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
-	pf2_layer =      tilemap_create(dynablsb_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
-	pf2_wide_layer = tilemap_create(dynablsb_get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
+	pf1_layer =      tilemap_create(machine, dynablsb_get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
+	pf1_wide_layer = tilemap_create(machine, dynablsb_get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
+	pf2_layer =      tilemap_create(machine, dynablsb_get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
+	pf2_wide_layer = tilemap_create(machine, dynablsb_get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
 
 	tilemap_set_transparent_pen(pf2_layer,0);
 	tilemap_set_transparent_pen(pf2_wide_layer,0);

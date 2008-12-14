@@ -53,7 +53,7 @@ WRITE8_HANDLER( xyonix_vidram_w )
 
 VIDEO_START(xyonix)
 {
-	xyonix_tilemap = tilemap_create(get_xyonix_tile_info,tilemap_scan_rows, 4, 8,80,32);
+	xyonix_tilemap = tilemap_create(machine, get_xyonix_tile_info,tilemap_scan_rows, 4, 8,80,32);
 }
 
 VIDEO_UPDATE(xyonix)

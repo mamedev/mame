@@ -85,8 +85,8 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 VIDEO_START( rpunch )
 {
 	/* allocate tilemaps for the backgrounds */
-	background[0] = tilemap_create(get_bg0_tile_info,tilemap_scan_cols,     8,8,64,64);
-	background[1] = tilemap_create(get_bg1_tile_info,tilemap_scan_cols,8,8,64,64);
+	background[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_cols,     8,8,64,64);
+	background[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_cols,8,8,64,64);
 
 	/* configure the tilemaps */
 	tilemap_set_transparent_pen(background[1],15);

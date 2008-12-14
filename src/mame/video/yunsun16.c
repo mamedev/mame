@@ -101,12 +101,12 @@ static int sprites_scrolldx, sprites_scrolldy;
 
 VIDEO_START( yunsun16 )
 {
-	tilemap_0 = tilemap_create(	get_tile_info_0,yunsun16_tilemap_scan_pages,
+	tilemap_0 = tilemap_create(	machine, get_tile_info_0,yunsun16_tilemap_scan_pages,
 
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
-	tilemap_1 = tilemap_create(	get_tile_info_1,yunsun16_tilemap_scan_pages,
+	tilemap_1 = tilemap_create(	machine, get_tile_info_1,yunsun16_tilemap_scan_pages,
 
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);

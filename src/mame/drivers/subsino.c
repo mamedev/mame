@@ -61,7 +61,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( subsino )
 {
-	tmap = tilemap_create(	get_tile_info, tilemap_scan_rows, 8,8, 0x40,0x20 );
+	tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows, 8,8, 0x40,0x20 );
 	tilemap_set_transparent_pen( tmap, 0 );
 	tiles_offset = 0;
 }

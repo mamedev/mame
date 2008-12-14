@@ -86,10 +86,10 @@ WRITE8_HANDLER( sauro_scroll_fg_w )
 
 VIDEO_START( sauro )
 {
-	bg_tilemap = tilemap_create(get_tile_info_bg, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols,
 		 8, 8, 32, 32);
 
-	fg_tilemap = tilemap_create(get_tile_info_fg, tilemap_scan_cols,
+	fg_tilemap = tilemap_create(machine, get_tile_info_fg, tilemap_scan_cols,
 		 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
@@ -159,7 +159,7 @@ WRITE8_HANDLER ( trckydoc_spriteram_mirror_w )
 
 VIDEO_START( trckydoc )
 {
-	bg_tilemap = tilemap_create(get_tile_info_bg, tilemap_scan_cols,
+	bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols,
 		 8, 8, 32, 32);
 }
 

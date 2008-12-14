@@ -44,9 +44,9 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
 static VIDEO_START( cultures )
 {
-	bg2_tilemap = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,8,8,512,512);
-	bg1_tilemap = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,8,8,512,512);
-	bg0_tilemap = tilemap_create(get_bg0_tile_info,tilemap_scan_rows,8,8, 64,128);
+	bg2_tilemap = tilemap_create(machine, get_bg2_tile_info,tilemap_scan_rows,8,8,512,512);
+	bg1_tilemap = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_rows,8,8,512,512);
+	bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_rows,8,8, 64,128);
 
 	tilemap_set_transparent_pen(bg1_tilemap,0);
 	tilemap_set_transparent_pen(bg0_tilemap,0);

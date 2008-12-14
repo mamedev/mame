@@ -80,9 +80,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( dynduke )
 {
-	bg_layer = tilemap_create(get_bg_tile_info,tilemap_scan_cols,      16,16,32,32);
-	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_cols,16,16,32,32);
-	tx_layer = tilemap_create(get_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	bg_layer = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,      16,16,32,32);
+	fg_layer = tilemap_create(machine, get_fg_tile_info,tilemap_scan_cols,16,16,32,32);
+	tx_layer = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_layer,15);
 	tilemap_set_transparent_pen(tx_layer,15);

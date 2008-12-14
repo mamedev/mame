@@ -52,7 +52,7 @@ VIDEO_START( pang )
 	paletteram=NULL;
 
 
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transparent_pen(bg_tilemap,15);
 

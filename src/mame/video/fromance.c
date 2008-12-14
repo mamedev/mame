@@ -113,8 +113,8 @@ static void init_common(running_machine *machine)
 VIDEO_START( fromance )
 {
 	/* allocate tilemaps */
-	bg_tilemap = tilemap_create(get_fromance_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
-	fg_tilemap = tilemap_create(get_fromance_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
+	bg_tilemap = tilemap_create(machine, get_fromance_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
+	fg_tilemap = tilemap_create(machine, get_fromance_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
 
 	init_common(machine);
 }
@@ -122,8 +122,8 @@ VIDEO_START( fromance )
 VIDEO_START( nekkyoku )
 {
 	/* allocate tilemaps */
-	bg_tilemap = tilemap_create(get_nekkyoku_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
-	fg_tilemap = tilemap_create(get_nekkyoku_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
+	bg_tilemap = tilemap_create(machine, get_nekkyoku_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
+	fg_tilemap = tilemap_create(machine, get_nekkyoku_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
 
 	init_common(machine);
 }

@@ -60,8 +60,8 @@ static TILE_GET_INFO( get_t2_tile_info )
 
 static VIDEO_START( koftball )
 {
-	tilemap_1 = tilemap_create(get_t1_tile_info,tilemap_scan_rows,8,8,64,32);
-	tilemap_2 = tilemap_create(get_t2_tile_info,tilemap_scan_rows,8,8,64,32);
+	tilemap_1 = tilemap_create(machine, get_t1_tile_info,tilemap_scan_rows,8,8,64,32);
+	tilemap_2 = tilemap_create(machine, get_t2_tile_info,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transparent_pen(tilemap_1,0);
 }

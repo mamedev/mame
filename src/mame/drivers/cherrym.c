@@ -97,7 +97,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_START(cm)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		8, 8, 64, 32);
 }
 

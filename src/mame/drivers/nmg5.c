@@ -798,8 +798,8 @@ static TILE_GET_INFO( bg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_i
 
 static VIDEO_START( nmg5 )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,8,8,64,64);
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,8,8,64,64);
+	bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,8,8,64,64);
+	fg_tilemap = tilemap_create(machine, fg_get_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }

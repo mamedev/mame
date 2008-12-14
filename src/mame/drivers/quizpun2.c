@@ -77,8 +77,8 @@ static WRITE8_HANDLER( fg_ram_w )
 
 static VIDEO_START(quizpun2)
 {
-	bg_tmap = tilemap_create(	get_bg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
-	fg_tmap = tilemap_create(	get_fg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
+	bg_tmap = tilemap_create(	machine, get_bg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
+	fg_tmap = tilemap_create(	machine, get_fg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
 
 	tilemap_set_transparent_pen(bg_tmap, 0);
 	tilemap_set_transparent_pen(fg_tmap, 0);

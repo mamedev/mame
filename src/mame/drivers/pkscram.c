@@ -225,9 +225,9 @@ static TIMER_CALLBACK( scanline_callback )
 
 static VIDEO_START( pkscramble )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8,32,32);
-	md_tilemap = tilemap_create(get_md_tile_info, tilemap_scan_rows, 8, 8,32,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8,32,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8,32,32);
+	md_tilemap = tilemap_create(machine, get_md_tile_info, tilemap_scan_rows, 8, 8,32,32);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(md_tilemap,15);
 	tilemap_set_transparent_pen(fg_tilemap,15);

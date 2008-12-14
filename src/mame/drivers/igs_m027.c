@@ -132,10 +132,10 @@ static WRITE32_HANDLER( igs_pallete32_w )
 
 static VIDEO_START(igs_majhong)
 {
-	igs_tx_tilemap= tilemap_create(get_tx_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	igs_tx_tilemap= tilemap_create(machine, get_tx_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	tilemap_set_transparent_pen(igs_tx_tilemap,15);
-	igs_bg_tilemap= tilemap_create(get_bg_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
-	//igs_bg_tilemap= tilemap_create(get_bg_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	igs_bg_tilemap= tilemap_create(machine, get_bg_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	//igs_bg_tilemap= tilemap_create(machine, get_bg_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	//tilemap_set_transparent_pen(igs_bg_tilemap,15);
 	logerror("Video START OK!\n");
 }

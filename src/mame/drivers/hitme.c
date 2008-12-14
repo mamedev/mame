@@ -57,13 +57,13 @@ static WRITE8_HANDLER( hitme_vidram_w )
 
 static VIDEO_START(hitme)
 {
-	hitme_tilemap = tilemap_create(get_hitme_tile_info,tilemap_scan_rows, 8,10, 40,19);
+	hitme_tilemap = tilemap_create(machine, get_hitme_tile_info,tilemap_scan_rows, 8,10, 40,19);
 }
 
 
 static VIDEO_START(barricad)
 {
-	hitme_tilemap = tilemap_create(get_hitme_tile_info,tilemap_scan_rows, 8,8, 32,24);
+	hitme_tilemap = tilemap_create(machine, get_hitme_tile_info,tilemap_scan_rows, 8,8, 32,24);
 }
 
 

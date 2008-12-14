@@ -140,10 +140,10 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( tiamc1 )
 {
-	bg_tilemap1 = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,
+	bg_tilemap1 = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	bg_tilemap2 = tilemap_create(get_bg2_tile_info, tilemap_scan_rows,
+	bg_tilemap2 = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
 	tiamc1_bg_vshift = 0;

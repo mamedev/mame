@@ -191,7 +191,7 @@
         VIDEO_START( mydriver )
         {
             // first create the tilemap
-            tmap = tilemap_create(
+            tmap = tilemap_create(machine,
                     my_get_info,            // pointer to your get_info
                     tilemap_scan_rows,      // standard row-major mapper
                     8,8,                    // 8x8 tiles
@@ -431,7 +431,7 @@ void tilemap_init(running_machine *machine);
 /* ----- tilemap creation and configuration ----- */
 
 /* create a new tilemap; note that tilemaps are tracked by the core so there is no dispose */
-tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
+tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows);
 
 /* specify a parameter to be passed into the tile_get_info callback */
 void tilemap_set_user_data(tilemap *tmap, void *user_data);

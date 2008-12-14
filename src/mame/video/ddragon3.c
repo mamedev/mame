@@ -93,10 +93,10 @@ VIDEO_START( ddragon3 )
     state_save_register_global(machine, ddragon3_fg_scrolly);
     state_save_register_global(machine, ddragon3_bg_tilebase);
 
-    bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+    bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 16, 16, 32, 32);
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
 		 16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);

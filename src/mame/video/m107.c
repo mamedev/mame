@@ -133,7 +133,7 @@ VIDEO_START( m107 )
 		pf_layer_info *layer = &pf_layer[laynum];
 
 		/* allocate a tilemaps per layer */
-		layer->tmap = tilemap_create(get_pf_tile_info, tilemap_scan_rows,  8,8, 64,64);
+		layer->tmap = tilemap_create(machine, get_pf_tile_info, tilemap_scan_rows,  8,8, 64,64);
 
 		/* set the user data to point to the layer */
 		tilemap_set_user_data(layer->tmap, &pf_layer[laynum]);

@@ -54,7 +54,7 @@ VIDEO_START( ultratnk )
 {
 	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	playfield = tilemap_create(ultratnk_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	playfield = tilemap_create(machine, ultratnk_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 

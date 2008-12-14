@@ -33,7 +33,7 @@ VIDEO_START( triplhnt )
 {
 	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
+	bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 }
 
 

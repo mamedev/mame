@@ -502,10 +502,10 @@ static TILE_GET_INFO( lemnangl_get_info1_1 ) { lemnangl_info( machine, tileinfo,
 
 VIDEO_START( mrokumei )
 {
-	bg_tilemap[0][0] = tilemap_create( mrokumei_get_info0_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[0][1] = tilemap_create( mrokumei_get_info0_1, tilemap_scan_rows,  8, 8, 64,32 );
-	bg_tilemap[1][0] = tilemap_create( mrokumei_get_info1_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[1][1] = tilemap_create( mrokumei_get_info1_1, tilemap_scan_rows,  8, 8, 64,32 );
+	bg_tilemap[0][0] = tilemap_create( machine, mrokumei_get_info0_0, tilemap_scan_rows,       8, 8, 64,32 );
+	bg_tilemap[0][1] = tilemap_create( machine, mrokumei_get_info0_1, tilemap_scan_rows,  8, 8, 64,32 );
+	bg_tilemap[1][0] = tilemap_create( machine, mrokumei_get_info1_0, tilemap_scan_rows,       8, 8, 64,32 );
+	bg_tilemap[1][1] = tilemap_create( machine, mrokumei_get_info1_1, tilemap_scan_rows,  8, 8, 64,32 );
 
 	tilemap_set_transparent_pen(bg_tilemap[0][1],0);
 	tilemap_set_transparent_pen(bg_tilemap[1][1],0);
@@ -513,14 +513,14 @@ VIDEO_START( mrokumei )
 
 VIDEO_START( reikaids )
 {
-	bg_tilemap[0][0] = tilemap_create( reikaids_get_info0_0, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[0][1] = tilemap_create( reikaids_get_info0_1, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[0][2] = tilemap_create( reikaids_get_info0_2, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[0][3] = tilemap_create( reikaids_get_info0_3, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[1][0] = tilemap_create( reikaids_get_info1_0, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[1][1] = tilemap_create( reikaids_get_info1_1, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[1][2] = tilemap_create( reikaids_get_info1_2, tilemap_scan_rows,  8, 8, 32, 32 );
-	bg_tilemap[1][3] = tilemap_create( reikaids_get_info1_3, tilemap_scan_rows,  8, 8, 32, 32 );
+	bg_tilemap[0][0] = tilemap_create( machine, reikaids_get_info0_0, tilemap_scan_rows,  8, 8, 32, 32 );
+	bg_tilemap[0][1] = tilemap_create( machine, reikaids_get_info0_1, tilemap_scan_rows,  8, 8, 32, 32 );
+	bg_tilemap[0][2] = tilemap_create( machine, reikaids_get_info0_2, tilemap_scan_rows,  8, 8, 32, 32 );
+	bg_tilemap[0][3] = tilemap_create( machine, reikaids_get_info0_3, tilemap_scan_rows,  8, 8, 32, 32 );
+	bg_tilemap[1][0] = tilemap_create( machine, reikaids_get_info1_0, tilemap_scan_rows,  8, 8, 32, 32 );
+	bg_tilemap[1][1] = tilemap_create( machine, reikaids_get_info1_1, tilemap_scan_rows,  8, 8, 32, 32 );
+	bg_tilemap[1][2] = tilemap_create( machine, reikaids_get_info1_2, tilemap_scan_rows,  8, 8, 32, 32 );
+	bg_tilemap[1][3] = tilemap_create( machine, reikaids_get_info1_3, tilemap_scan_rows,  8, 8, 32, 32 );
 
 	tilemap_set_transparent_pen(bg_tilemap[0][0],0xff);
 	tilemap_set_transparent_pen(bg_tilemap[0][1],0xff);
@@ -534,10 +534,10 @@ VIDEO_START( reikaids )
 
 VIDEO_START( pteacher )
 {
-	bg_tilemap[0][0] = tilemap_create( pteacher_get_info0_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[0][1] = tilemap_create( pteacher_get_info0_1, tilemap_scan_rows,  8, 8, 64,32 );
-	bg_tilemap[1][0] = tilemap_create( pteacher_get_info1_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[1][1] = tilemap_create( pteacher_get_info1_1, tilemap_scan_rows,  8, 8, 64,32 );
+	bg_tilemap[0][0] = tilemap_create( machine, pteacher_get_info0_0, tilemap_scan_rows,       8, 8, 64,32 );
+	bg_tilemap[0][1] = tilemap_create( machine, pteacher_get_info0_1, tilemap_scan_rows,  8, 8, 64,32 );
+	bg_tilemap[1][0] = tilemap_create( machine, pteacher_get_info1_0, tilemap_scan_rows,       8, 8, 64,32 );
+	bg_tilemap[1][1] = tilemap_create( machine, pteacher_get_info1_1, tilemap_scan_rows,  8, 8, 64,32 );
 
 	tilemap_set_transparent_pen(bg_tilemap[0][1],0xff);
 	tilemap_set_transparent_pen(bg_tilemap[1][1],0xff);
@@ -545,10 +545,10 @@ VIDEO_START( pteacher )
 
 VIDEO_START( lemnangl )
 {
-	bg_tilemap[0][0] = tilemap_create( lemnangl_get_info0_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[0][1] = tilemap_create( lemnangl_get_info0_1, tilemap_scan_rows,  8, 8, 64,32 );
-	bg_tilemap[1][0] = tilemap_create( lemnangl_get_info1_0, tilemap_scan_rows,       8, 8, 64,32 );
-	bg_tilemap[1][1] = tilemap_create( lemnangl_get_info1_1, tilemap_scan_rows,  8, 8, 64,32 );
+	bg_tilemap[0][0] = tilemap_create( machine, lemnangl_get_info0_0, tilemap_scan_rows,       8, 8, 64,32 );
+	bg_tilemap[0][1] = tilemap_create( machine, lemnangl_get_info0_1, tilemap_scan_rows,  8, 8, 64,32 );
+	bg_tilemap[1][0] = tilemap_create( machine, lemnangl_get_info1_0, tilemap_scan_rows,       8, 8, 64,32 );
+	bg_tilemap[1][1] = tilemap_create( machine, lemnangl_get_info1_1, tilemap_scan_rows,  8, 8, 64,32 );
 
 	tilemap_set_transparent_pen(bg_tilemap[0][1],0x0f);
 	tilemap_set_transparent_pen(bg_tilemap[1][1],0x0f);

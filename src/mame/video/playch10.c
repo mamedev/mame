@@ -106,7 +106,7 @@ VIDEO_START( playch10 )
 	const UINT8 *bios = memory_region(machine, "main");
 	pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
 	ppu2c0x_init(machine, &ppu_interface );
@@ -117,7 +117,7 @@ VIDEO_START( playch10_hboard )
 	const UINT8 *bios = memory_region(machine, "main");
 	pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
 
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
 	ppu2c0x_init(machine, &ppu_interface_hboard );

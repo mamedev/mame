@@ -209,9 +209,9 @@ static VIDEO_START( taitob_core )
 	framebuffer[1] = auto_bitmap_alloc(512,256, video_screen_get_format(machine->primary_screen));
 	pixel_bitmap = NULL;  /* only hitice needs this */
 
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,     16,16,64,64);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,16,16,64,64);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     16,16,64,64);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,16,16,64,64);
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(tx_tilemap,0);

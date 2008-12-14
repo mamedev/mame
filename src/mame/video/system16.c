@@ -777,28 +777,28 @@ VIDEO_START( system16 ){
 		);
 
 	if( !sys16_bg1_trans )
-		background = tilemap_create(
+		background = tilemap_create(machine,
 			get_bg_tile_info,
 			sys16_bg_map,
 
 			8,8,
 			64*2,32*2 );
 	else
-		background = tilemap_create(
+		background = tilemap_create(machine,
 			get_bg_tile_info,
 			sys16_bg_map,
 
 			8,8,
 			64*2,32*2 );
 
-	foreground = tilemap_create(
+	foreground = tilemap_create(machine,
 		get_fg_tile_info,
 		sys16_bg_map,
 
 		8,8,
 		64*2,32*2 );
 
-	text_layer = tilemap_create(
+	text_layer = tilemap_create(machine,
 		get_text_tile_info,
 		sys16_text_map,
 
@@ -864,14 +864,14 @@ VIDEO_START( system18old ){
 		sys18_ddcrew_bankregs[i]=-1;
 	}
 
-	background2 = tilemap_create(
+	background2 = tilemap_create(machine,
 		get_bg2_tile_info,
 		sys16_bg_map,
 
 		8,8,
 		64*2,32*2 );
 
-	foreground2 = tilemap_create(
+	foreground2 = tilemap_create(machine,
 		get_fg2_tile_info,
 		sys16_bg_map,
 

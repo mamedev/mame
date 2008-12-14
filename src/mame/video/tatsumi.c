@@ -191,7 +191,7 @@ static TILE_GET_INFO( get_tile_info_bigfight_1 )
 
 VIDEO_START( apache3 )
 {
-	tx_layer = tilemap_create(get_text_tile_info,tilemap_scan_rows,8,8,64,64);
+	tx_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,64,64);
 	shadow_pen_array = auto_malloc(8192);
 	temp_bitmap = auto_bitmap_alloc(512, 512, BITMAP_FORMAT_RGB32);
 
@@ -201,7 +201,7 @@ VIDEO_START( apache3 )
 
 VIDEO_START( roundup5 )
 {
-	tx_layer = tilemap_create(get_text_tile_info,tilemap_scan_rows,8,8,128,64);
+	tx_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,128,64);
 	shadow_pen_array = auto_malloc(8192);
 	roundup5_vram = auto_malloc(0x48000 * 4);
 
@@ -211,11 +211,11 @@ VIDEO_START( roundup5 )
 
 VIDEO_START( cyclwarr )
 {
-	layer0 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,8,8,64,512);
-	//layer1 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,8,8,64,512);
-	layer1 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,8,8,128,256);
-	layer2 = tilemap_create(get_tile_info_bigfight_1,tilemap_scan_rows,8,8,64,512);
-	layer3 = tilemap_create(get_tile_info_bigfight_1,tilemap_scan_rows,8,8,64,512);
+	layer0 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,64,512);
+	//layer1 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,64,512);
+	layer1 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,128,256);
+	layer2 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,64,512);
+	layer3 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,64,512);
 
 	shadow_pen_array = auto_malloc(8192);
 	memset(shadow_pen_array, 0, 8192);
@@ -223,10 +223,10 @@ VIDEO_START( cyclwarr )
 
 VIDEO_START( bigfight )
 {
-	layer0 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,8,8,128,256);
-	layer1 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,8,8,128,256);
-	layer2 = tilemap_create(get_tile_info_bigfight_1,tilemap_scan_rows,8,8,128,256);
-	layer3 = tilemap_create(get_tile_info_bigfight_1,tilemap_scan_rows,8,8,128,256);
+	layer0 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,128,256);
+	layer1 = tilemap_create(machine, get_tile_info_bigfight_0,tilemap_scan_rows,8,8,128,256);
+	layer2 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,128,256);
+	layer3 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,128,256);
 
 	shadow_pen_array = auto_malloc(8192);
 	memset(shadow_pen_array, 0, 8192);

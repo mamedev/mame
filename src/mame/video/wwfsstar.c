@@ -205,10 +205,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( wwfsstar )
 {
-	fg0_tilemap = tilemap_create(get_fg0_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	fg0_tilemap = tilemap_create(machine, get_fg0_tile_info,tilemap_scan_rows, 8, 8,32,32);
 	tilemap_set_transparent_pen(fg0_tilemap,0);
 
-	bg0_tilemap = tilemap_create(get_bg0_tile_info,bg0_scan, 16, 16,32,32);
+	bg0_tilemap = tilemap_create(machine, get_bg0_tile_info,bg0_scan, 16, 16,32,32);
 	tilemap_set_transparent_pen(fg0_tilemap,0);
 }
 

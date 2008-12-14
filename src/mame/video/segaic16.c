@@ -1199,7 +1199,7 @@ static void segaic16_tilemap_16b_reset(running_machine *machine, struct tilemap_
  *
  *************************************/
 
-void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks)
+void segaic16_tilemap_init(running_machine *machine, int which, int type, int colorbase, int xoffs, int numbanks)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 	tile_get_info_func get_text_info;
@@ -1268,7 +1268,7 @@ void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int nu
 	}
 
 	/* create the tilemap for the text layer */
-	info->textmap = tilemap_create(get_text_info, tilemap_scan_rows,  8,8, 64,28);
+	info->textmap = tilemap_create(machine, get_text_info, tilemap_scan_rows,  8,8, 64,28);
 
 	/* configure it */
 	info->textmap_info.rambase = info->textram;
@@ -1284,7 +1284,7 @@ void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int nu
 	for (pagenum = 0; pagenum < info->numpages; pagenum++)
 	{
 		/* each page is 64x32 */
-		info->tilemaps[pagenum] = tilemap_create(get_tile_info, tilemap_scan_rows,  8,8, 64,32);
+		info->tilemaps[pagenum] = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8,8, 64,32);
 
 		/* configure the tilemap */
 		info->tilemap_info[pagenum].rambase = info->tileram + pagenum * 64*32;

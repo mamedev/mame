@@ -269,7 +269,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( wink )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static VIDEO_UPDATE( wink )

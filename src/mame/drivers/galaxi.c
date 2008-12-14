@@ -108,12 +108,12 @@ static WRITE16_HANDLER( galaxi_fg_w )
 
 static VIDEO_START(galaxi)
 {
-	bg1_tmap = tilemap_create( get_bg1_tile_info, tilemap_scan_rows, 16,16, 0x20,0x10 );
-	bg2_tmap = tilemap_create( get_bg2_tile_info, tilemap_scan_rows, 16,16, 0x20,0x10 );
-	bg3_tmap = tilemap_create( get_bg3_tile_info, tilemap_scan_rows, 16,16, 0x20,0x10 );
-	bg4_tmap = tilemap_create( get_bg4_tile_info, tilemap_scan_rows, 16,16, 0x20,0x10 );
+	bg1_tmap = tilemap_create( machine, get_bg1_tile_info, tilemap_scan_rows, 16,16, 0x20,0x10 );
+	bg2_tmap = tilemap_create( machine, get_bg2_tile_info, tilemap_scan_rows, 16,16, 0x20,0x10 );
+	bg3_tmap = tilemap_create( machine, get_bg3_tile_info, tilemap_scan_rows, 16,16, 0x20,0x10 );
+	bg4_tmap = tilemap_create( machine, get_bg4_tile_info, tilemap_scan_rows, 16,16, 0x20,0x10 );
 
-	fg_tmap  = tilemap_create( get_fg_tile_info, tilemap_scan_rows, 8,8,   0x40,0x20 );
+	fg_tmap  = tilemap_create( machine, get_fg_tile_info, tilemap_scan_rows, 8,8,   0x40,0x20 );
 
 	tilemap_set_transparent_pen(bg1_tmap, 0);
 	tilemap_set_transparent_pen(bg2_tmap, 0);

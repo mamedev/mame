@@ -79,7 +79,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( spdodgeb )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,8,8,64,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan,8,8,64,32);
 }
 
 

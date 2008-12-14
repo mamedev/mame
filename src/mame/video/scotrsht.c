@@ -124,7 +124,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( scotrsht )
 {
-	bg_tilemap = tilemap_create(scotrsht_get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	bg_tilemap = tilemap_create(machine, scotrsht_get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 64);
 }

@@ -59,8 +59,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( gundealr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,      8, 8,32,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,gundealr_scan,    16,16,64,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,      8, 8,32,32);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info,gundealr_scan,    16,16,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
 }

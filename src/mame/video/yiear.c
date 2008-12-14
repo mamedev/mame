@@ -104,7 +104,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( yiear )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 }
 

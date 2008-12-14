@@ -156,8 +156,8 @@ static TILE_GET_INFO( get_pf1_tile_info )
 
 VIDEO_START( stadhero )
 {
-	pf1_tilemap =     tilemap_create(get_pf1_tile_info,tilemap_scan_rows, 8, 8,32,32);
-	pf2_tilemap =     tilemap_create(get_pf2_tile_info,stadhero_scan,     16,16,64,64);
+	pf1_tilemap =     tilemap_create(machine, get_pf1_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	pf2_tilemap =     tilemap_create(machine, get_pf2_tile_info,stadhero_scan,     16,16,64,64);
 
 	stadhero_pf2_data = auto_malloc(0x2000 * 2);
 

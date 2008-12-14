@@ -137,8 +137,8 @@ VIDEO_START( gunsmoke )
 	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x4000);
 
 	/* create tilemaps */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,  32, 32, 2048, 8);
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,  32, 32, 2048, 8);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
 	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 0x4f);
 

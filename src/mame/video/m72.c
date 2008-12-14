@@ -121,8 +121,8 @@ static void register_savestate(running_machine *machine)
 
 VIDEO_START( m72 )
 {
-	bg_tilemap = tilemap_create(m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	fg_tilemap = tilemap_create(m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+	bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	m72_spriteram = auto_malloc(spriteram_size);
 
@@ -148,8 +148,8 @@ VIDEO_START( m72 )
 
 VIDEO_START( rtype2 )
 {
-	bg_tilemap = tilemap_create(rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	fg_tilemap = tilemap_create(rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+	bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	m72_spriteram = auto_malloc(spriteram_size);
 
@@ -186,9 +186,9 @@ VIDEO_START( majtitle )
 {
 // The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
 // The layout ramains 256x64, the right half is just not displayed.
-//  bg_tilemap = tilemap_create(rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,256,64);
-	bg_tilemap = tilemap_create(rtype2_get_bg_tile_info,majtitle_scan_rows,8,8,128,64);
-	fg_tilemap = tilemap_create(rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
+//  bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,256,64);
+	bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,majtitle_scan_rows,8,8,128,64);
+	fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	m72_spriteram = auto_malloc(spriteram_size);
 
@@ -213,8 +213,8 @@ VIDEO_START( majtitle )
 
 VIDEO_START( hharry )
 {
-	bg_tilemap = tilemap_create(hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
-	fg_tilemap = tilemap_create(m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
+	bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
+	fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
 
 	m72_spriteram = auto_malloc(spriteram_size);
 

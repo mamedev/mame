@@ -222,9 +222,9 @@ VIDEO_START( marvins )
 {
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
-	tx_tilemap = tilemap_create(marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	fg_tilemap = tilemap_create(marvins_get_fg_tile_info, tilemap_scan_cols,    8, 8, 64, 32);
-	bg_tilemap = tilemap_create(marvins_get_bg_tile_info, tilemap_scan_cols,    8, 8, 64, 32);
+	tx_tilemap = tilemap_create(machine, marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
+	fg_tilemap = tilemap_create(machine, marvins_get_fg_tile_info, tilemap_scan_cols,    8, 8, 64, 32);
+	bg_tilemap = tilemap_create(machine, marvins_get_bg_tile_info, tilemap_scan_cols,    8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 	tilemap_set_scrolldy(tx_tilemap, 8, 8);
@@ -241,8 +241,8 @@ VIDEO_START( jcross )
 {
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
-	tx_tilemap = tilemap_create(marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	bg_tilemap = tilemap_create(aso_get_bg_tile_info,     tilemap_scan_cols,    8, 8, 64, 64);
+	tx_tilemap = tilemap_create(machine, marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
+	bg_tilemap = tilemap_create(machine, aso_get_bg_tile_info,     tilemap_scan_cols,    8, 8, 64, 64);
 
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 	tilemap_set_scrolldy(tx_tilemap, 8, 8);
@@ -258,8 +258,8 @@ VIDEO_START( sgladiat )
 {
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
-	tx_tilemap = tilemap_create(marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	bg_tilemap = tilemap_create(aso_get_bg_tile_info,     tilemap_scan_cols,    8, 8, 64, 32);
+	tx_tilemap = tilemap_create(machine, marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
+	bg_tilemap = tilemap_create(machine, aso_get_bg_tile_info,     tilemap_scan_cols,    8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 	tilemap_set_scrolldy(tx_tilemap, 8, 8);
@@ -296,8 +296,8 @@ VIDEO_START( tnk3 )
 {
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
-	tx_tilemap = tilemap_create(marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
-	bg_tilemap = tilemap_create(tnk3_get_bg_tile_info,    tilemap_scan_cols,    8, 8, 64, 64);
+	tx_tilemap = tilemap_create(machine, marvins_get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
+	bg_tilemap = tilemap_create(machine, tnk3_get_bg_tile_info,    tilemap_scan_cols,    8, 8, 64, 64);
 
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 	tilemap_set_scrolldy(tx_tilemap, 8, 8);
@@ -313,8 +313,8 @@ VIDEO_START( ikari )
 {
 	VIDEO_START_CALL(snk_3bpp_shadow);
 
-	tx_tilemap = tilemap_create(ikari_get_tx_tile_info, marvins_tx_scan_cols,  8,  8, 36, 28);
-	bg_tilemap = tilemap_create(ikari_get_bg_tile_info, tilemap_scan_cols,    16, 16, 32, 32);
+	tx_tilemap = tilemap_create(machine, ikari_get_tx_tile_info, marvins_tx_scan_cols,  8,  8, 36, 28);
+	bg_tilemap = tilemap_create(machine, ikari_get_bg_tile_info, tilemap_scan_cols,    16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 	tilemap_set_scrolldy(tx_tilemap, 8, 8);
@@ -327,8 +327,8 @@ VIDEO_START( gwar )
 {
 	memset(empty_tile,0xf,sizeof(empty_tile));
 
-	tx_tilemap = tilemap_create(gwar_get_tx_tile_info, tilemap_scan_cols,  8,  8, 50, 32);
-	bg_tilemap = tilemap_create(gwar_get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
+	tx_tilemap = tilemap_create(machine, gwar_get_tx_tile_info, tilemap_scan_cols,  8,  8, 50, 32);
+	bg_tilemap = tilemap_create(machine, gwar_get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 

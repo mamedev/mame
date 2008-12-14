@@ -77,9 +77,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 VIDEO_START( gaiden )
 {
 	/* set up tile layers */
-	background = tilemap_create(get_bg_tile_info, tilemap_scan_rows,  16, 16, 64, 32);
-	foreground = tilemap_create(get_fg_tile_info, tilemap_scan_rows,  16, 16, 64, 32);
-	text_layer = tilemap_create(get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+	background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16, 16, 64, 32);
+	foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 64, 32);
+	text_layer = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
 
 	tilemap_set_transparent_pen(background, 0);
 	tilemap_set_transparent_pen(foreground, 0);
@@ -95,9 +95,9 @@ VIDEO_START( raiga )
 	tile_bitmap_bg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	tile_bitmap_fg = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 
-	background = tilemap_create(get_bg_tile_info,	   tilemap_scan_rows,16,16,64,32);
-	foreground = tilemap_create(get_fg_tile_info_raiga,tilemap_scan_rows,16,16,64,32);
-	text_layer = tilemap_create(get_tx_tile_info,	   tilemap_scan_rows, 8, 8,32,32);
+	background = tilemap_create(machine, get_bg_tile_info,	   tilemap_scan_rows,16,16,64,32);
+	foreground = tilemap_create(machine, get_fg_tile_info_raiga,tilemap_scan_rows,16,16,64,32);
+	text_layer = tilemap_create(machine, get_tx_tile_info,	   tilemap_scan_rows, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(background,0);
 	tilemap_set_transparent_pen(foreground,0);
@@ -110,9 +110,9 @@ VIDEO_START( raiga )
 VIDEO_START( drgnbowl )
 {
 	/* set up tile layers */
-	background = tilemap_create(get_bg_tile_info, tilemap_scan_rows,       16, 16, 64, 32);
-	foreground = tilemap_create(get_fg_tile_info, tilemap_scan_rows,  16, 16, 64, 32);
-	text_layer = tilemap_create(get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+	background = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,       16, 16, 64, 32);
+	foreground = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 64, 32);
+	text_layer = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
 
 	tilemap_set_transparent_pen(foreground, 15);
 	tilemap_set_transparent_pen(text_layer, 15);

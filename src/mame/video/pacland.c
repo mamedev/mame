@@ -205,8 +205,8 @@ VIDEO_START( pacland )
 	fg_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	bitmap_fill(fg_bitmap, NULL, 0xffff);
 
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_scroll_rows(fg_tilemap, 32);
 

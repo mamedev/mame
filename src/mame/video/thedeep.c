@@ -108,8 +108,8 @@ PALETTE_INIT( thedeep )
 
 VIDEO_START( thedeep )
 {
-	tilemap_0  = tilemap_create(get_tile_info_0,tilemap_scan_rows_back,16,16,0x20,0x20);
-	tilemap_1  = tilemap_create(get_tile_info_1,tilemap_scan_rows,8,8,0x20,0x20);
+	tilemap_0  = tilemap_create(machine, get_tile_info_0,tilemap_scan_rows_back,16,16,0x20,0x20);
+	tilemap_1  = tilemap_create(machine, get_tile_info_1,tilemap_scan_rows,8,8,0x20,0x20);
 
 	tilemap_set_transparent_pen( tilemap_0,  0 );
 	tilemap_set_transparent_pen( tilemap_1,  0 );

@@ -86,7 +86,7 @@ static void init_penmask(void)
 
 VIDEO_START( centiped )
 {
-	bg_tilemap = tilemap_create(centiped_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	bg_tilemap = tilemap_create(machine, centiped_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	init_penmask();
 
@@ -99,7 +99,7 @@ VIDEO_START( centiped )
 
 VIDEO_START( warlords )
 {
-	bg_tilemap = tilemap_create(warlords_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	bg_tilemap = tilemap_create(machine, warlords_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	centiped_flipscreen = 0;
 }
@@ -107,7 +107,7 @@ VIDEO_START( warlords )
 
 VIDEO_START( milliped )
 {
-	bg_tilemap = tilemap_create(milliped_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	bg_tilemap = tilemap_create(machine, milliped_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	init_penmask();
 
@@ -119,7 +119,7 @@ VIDEO_START( milliped )
 
 VIDEO_START( bullsdrt )
 {
-	bg_tilemap = tilemap_create(bullsdrt_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
+	bg_tilemap = tilemap_create(machine, bullsdrt_get_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	init_penmask();
 

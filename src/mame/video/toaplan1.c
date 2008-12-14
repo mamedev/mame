@@ -253,12 +253,12 @@ static TILE_GET_INFO( get_pf4_tile_info )
 
 ***************************************************************************/
 
-static void toaplan1_create_tilemaps(void)
+static void toaplan1_create_tilemaps(running_machine *machine)
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_rows,8,8,64,64);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,8,8,64,64);
-	pf3_tilemap = tilemap_create(get_pf3_tile_info,tilemap_scan_rows,8,8,64,64);
-	pf4_tilemap = tilemap_create(get_pf4_tile_info,tilemap_scan_rows,8,8,64,64);
+	pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,tilemap_scan_rows,8,8,64,64);
+	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info,tilemap_scan_rows,8,8,64,64);
+	pf3_tilemap = tilemap_create(machine, get_pf3_tile_info,tilemap_scan_rows,8,8,64,64);
+	pf4_tilemap = tilemap_create(machine, get_pf4_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);
@@ -331,7 +331,7 @@ static STATE_POSTLOAD( toaplan1_flipscreen )
 
 VIDEO_START( rallybik )
 {
-	toaplan1_create_tilemaps();
+	toaplan1_create_tilemaps(machine);
 	toaplan1_paletteram_alloc();
 	toaplan1_vram_alloc();
 
@@ -374,7 +374,7 @@ VIDEO_START( rallybik )
 
 VIDEO_START( toaplan1 )
 {
-	toaplan1_create_tilemaps();
+	toaplan1_create_tilemaps(machine);
 	toaplan1_paletteram_alloc();
 	toaplan1_vram_alloc();
 	toaplan1_spritevram_alloc();

@@ -96,16 +96,16 @@ PALETTE_INIT( fuuki16 )
 
 VIDEO_START( fuuki16 )
 {
-	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
+	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 16, 16, 64,32);
 
-	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
+	tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16, 16, 64,32);
 
-	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
+	tilemap_2 = tilemap_create(	machine, get_tile_info_2, tilemap_scan_rows,
 								  8,  8, 64,32);
 
-	tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
+	tilemap_3 = tilemap_create(	machine, get_tile_info_3, tilemap_scan_rows,
 								  8,  8, 64,32);
 
 	tilemap_set_transparent_pen(tilemap_0,0x0f);	// 4 bits

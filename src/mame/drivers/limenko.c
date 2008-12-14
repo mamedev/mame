@@ -434,9 +434,9 @@ static void copy_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *s
 
 static VIDEO_START( limenko )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,8,8,128,64);
-	md_tilemap = tilemap_create(get_md_tile_info,tilemap_scan_rows,8,8,128,64);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,128,64);
+	md_tilemap = tilemap_create(machine, get_md_tile_info,tilemap_scan_rows,8,8,128,64);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
 
 	tilemap_set_transparent_pen(md_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);

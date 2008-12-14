@@ -142,10 +142,10 @@ VIDEO_START(mil4000)
 	for (i=0;i<0x800;i++)
 		palette_set_color(space->machine, i, MAKE_RGB(0, 0, 0));
 
-	sc0_tilemap = tilemap_create(get_sc0_tile_info,tilemap_scan_rows,8,8,64,64);
-	sc1_tilemap = tilemap_create(get_sc1_tile_info,tilemap_scan_rows,8,8,64,64);
-	sc2_tilemap = tilemap_create(get_sc2_tile_info,tilemap_scan_rows,8,8,64,64);
-	sc3_tilemap = tilemap_create(get_sc3_tile_info,tilemap_scan_rows,8,8,64,64);
+	sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,64,64);
+	sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,tilemap_scan_rows,8,8,64,64);
+	sc2_tilemap = tilemap_create(machine, get_sc2_tile_info,tilemap_scan_rows,8,8,64,64);
+	sc3_tilemap = tilemap_create(machine, get_sc3_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	tilemap_set_transparent_pen(sc1_tilemap,0);
 	tilemap_set_transparent_pen(sc2_tilemap,0);

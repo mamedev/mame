@@ -591,16 +591,16 @@ static VIDEO_START(deroon)
 	bitmap_fill(tmp_tilemap_renderbitmap, NULL, 0x0000);
 
 
-	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
+	txt_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
 	tilemap_set_transparent_pen(txt_tilemap,0);
 
-	bg0tilemap = tilemap_create(get_bg0tile_info,tilemap_scan_rows,16,16,32,32);
+	bg0tilemap = tilemap_create(machine, get_bg0tile_info,tilemap_scan_rows,16,16,32,32);
 	tilemap_set_transparent_pen(bg0tilemap,0);
 
-	bg1tilemap = tilemap_create(get_bg1tile_info,tilemap_scan_rows,16,16,32,32);
+	bg1tilemap = tilemap_create(machine, get_bg1tile_info,tilemap_scan_rows,16,16,32,32);
 	tilemap_set_transparent_pen(bg1tilemap,0);
 
-	bg2tilemap = tilemap_create(get_bg2tile_info,tilemap_scan_rows,16,16,32,32);
+	bg2tilemap = tilemap_create(machine, get_bg2tile_info,tilemap_scan_rows,16,16,32,32);
 	tilemap_set_transparent_pen(bg2tilemap,0);
 
 }
