@@ -148,6 +148,7 @@ struct _i8085_state
 	UINT32	IRQ2;		/* scheduled interrupt address */
 	UINT32	IRQ1;		/* executed interrupt address */
 	UINT8   STATUS;		/* status word */
+	UINT8	after_ei;	/* are we in the EI shadow? */
 	INT8	irq_state[4];
 	cpu_irq_callback irq_callback;
 	const device_config *device;
@@ -1163,52 +1164,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			/* set interrupt enable */
 			cpustate->IM |= IM_IEN;
 			if (cpustate->inte_callback) (*cpustate->inte_callback)(cpustate->device, (cpustate->IM & IM_IEN) ? 1 : 0);
-			/* remove serviced IRQ flag */
-			cpustate->IREQ &= ~cpustate->ISRV;
-			/* reset serviced IRQ */
-			cpustate->ISRV = 0;
-			if( cpustate->irq_state[I8085_INTR_LINE] != CLEAR_LINE ) {
-				LOG(("i8085 EI sets INTR\n"));
-				cpustate->IREQ |= IM_INTR;
-				cpustate->INTR = I8085_INTR;
-			}
-			if( cpustate->cputype ) {
-				if( cpustate->irq_state[I8085_RST55_LINE] != CLEAR_LINE ) {
-					LOG(("i8085 EI sets RST5.5\n"));
-					cpustate->IREQ |= IM_RST55;
-				}
-				if( cpustate->irq_state[I8085_RST65_LINE] != CLEAR_LINE ) {
-					LOG(("i8085 EI sets RST6.5\n"));
-					cpustate->IREQ |= IM_RST65;
-				}
-				if( cpustate->irq_state[I8085_RST75_LINE] != CLEAR_LINE ) {
-					LOG(("i8085 EI sets RST7.5\n"));
-					cpustate->IREQ |= IM_RST75;
-					cpustate->irq_state[I8085_RST75_LINE] = CLEAR_LINE;	/* clear latch */
-				}
-				/* find highest priority IREQ flag with
-                   IM enabled and schedule for execution */
-				if( !(cpustate->IM & IM_RST75) && (cpustate->IREQ & IM_RST75) ) {
-					cpustate->ISRV = IM_RST75;
-					cpustate->IRQ2 = ADDR_RST75;
-				}
-				else
-				if( !(cpustate->IM & IM_RST65) && (cpustate->IREQ & IM_RST65) ) {
-					cpustate->ISRV = IM_RST65;
-					cpustate->IRQ2 = ADDR_RST65;
-				} else if( !(cpustate->IM & IM_RST55) && (cpustate->IREQ & IM_RST55) ) {
-					cpustate->ISRV = IM_RST55;
-					cpustate->IRQ2 = ADDR_RST55;
-				} else if( !(cpustate->IM & IM_INTR) && (cpustate->IREQ & IM_INTR) ) {
-					cpustate->ISRV = IM_INTR;
-					cpustate->IRQ2 = cpustate->INTR;
-				}
-			} else {
-				if( !(cpustate->IM & IM_INTR) && (cpustate->IREQ & IM_INTR) ) {
-					cpustate->ISRV = IM_INTR;
-					cpustate->IRQ2 = cpustate->INTR;
-				}
-			}
+			cpustate->after_ei = TRUE;
 			break;
 		case 0xfc: cpustate->icount -= 11;	/* CM   nnnn */
 			M_CALL( cpustate->AF.b.l & SF );
@@ -1247,7 +1203,7 @@ static void Interrupt(i8085_state *cpustate)
 	cpustate->IREQ &= ~cpustate->ISRV; // remove serviced IRQ flag
 	cpustate->rim_ien = (cpustate->ISRV==IM_TRAP) ? cpustate->IM & IM_IEN : 0; // latch general interrupt enable bit on TRAP or NMI
 //ZT
-	//cpustate->IM &= ~IM_IEN;      /* remove general interrupt enable bit */
+	cpustate->IM &= ~IM_IEN;      /* remove general interrupt enable bit */
 
 	if( cpustate->ISRV == IM_INTR )
 	{
@@ -1319,7 +1275,7 @@ static CPU_EXECUTE( i8085 )
 		debugger_instruction_hook(device, cpustate->PC.d);
 
 		/* interrupts enabled or TRAP pending ? */
-		if ( (cpustate->IM & IM_IEN) || (cpustate->IREQ & IM_TRAP) )
+		if ( ((cpustate->IM & IM_IEN) && (!cpustate->after_ei)) || (cpustate->IREQ & IM_TRAP) )
 		{
 			/* copy scheduled to executed interrupt request */
 			cpustate->IRQ1 = cpustate->IRQ2;
@@ -1329,6 +1285,7 @@ static CPU_EXECUTE( i8085 )
 			if (cpustate->IRQ1) Interrupt(cpustate);
 		}
 
+		cpustate->after_ei = FALSE;
 		/* here we go... */
 		execute_one(cpustate, ROP(cpustate));
 
@@ -1391,6 +1348,7 @@ static CPU_INIT( i8085 )
 	state_save_register_device_item(device, 0, cpustate->IRQ2);
 	state_save_register_device_item(device, 0, cpustate->IRQ1);
 	state_save_register_device_item(device, 0, cpustate->STATUS);
+	state_save_register_device_item(device, 0, cpustate->after_ei);
 	state_save_register_device_item_array(device, 0, cpustate->irq_state);
 }
 
@@ -1424,6 +1382,7 @@ static CPU_RESET( i8085 )
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	cpustate->cputype = cputype_bak;
+	cpustate->after_ei = FALSE;
 
 	if (cpustate->inte_callback) (*cpustate->inte_callback)(cpustate->device, (cpustate->IM & IM_IEN) ? 1 : 0);
 }
