@@ -3879,7 +3879,7 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(400)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
