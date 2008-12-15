@@ -7397,6 +7397,10 @@ Other Sun games
 	DRIVER( moonlght )	/* bootleg */
 	DRIVER( chry10 )	/* bootleg */
 	DRIVER( chryigld )	/* bootleg */
+	DRIVER( ncb3 )		/* (c) 19?? Dyna/bootleg? */
+	DRIVER( cb3 )		/* (c) 19?? Dyna/bootleg? */
+	DRIVER( cmv801 )	/* (c) 198? Corsica */
+	DRIVER( cmaster )	/* (c) 1991 Dyna */
  	DRIVER( cpoker )	/* (c) 1993? IGS */
  	DRIVER( cpokert )	/* (c) 1993? Tuning */
 	DRIVER( csk227it )	/* (c) 198? IGS */
