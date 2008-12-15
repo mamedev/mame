@@ -8417,4 +8417,8 @@ Other Sun games
 
 	/* Dyna */
 	DRIVER ( cb2001 )
+
+	/* STG? */
+	DRIVER ( queen )
+
 #endif	/* DRIVER_RECURSIVE */

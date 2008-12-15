@@ -1855,6 +1855,7 @@ src/mame/drivers/qdrmfgp.c svneol=native#text/plain
 src/mame/drivers/qix.c svneol=native#text/plain
 src/mame/drivers/quantum.c svneol=native#text/plain
 src/mame/drivers/quasar.c svneol=native#text/plain
+src/mame/drivers/queen.c svneol=native#text/plain
 src/mame/drivers/quizdna.c svneol=native#text/plain
 src/mame/drivers/quizo.c svneol=native#text/plain
 src/mame/drivers/quizpani.c svneol=native#text/plain
