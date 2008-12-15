@@ -17,7 +17,7 @@
     0A..1B  Game name padded with \0
     1C..1F  Signature
     20..end Save game data (compressed)
-    
+
     Data is always written as native-endian.
     Data is converted from the endiannness it was written upon load.
 
@@ -129,7 +129,7 @@ INLINE void flip_data(state_entry *entry)
 	UINT32 *data32;
 	UINT64 *data64;
 	int count;
-	
+
 	switch (entry->typesize)
 	{
 		case 2:
@@ -150,7 +150,7 @@ INLINE void flip_data(state_entry *entry)
 				data64[count] = FLIPENDIAN_INT64(data64[count]);
 			break;
 	}
-}	
+}
 
 
 
@@ -576,18 +576,18 @@ state_save_error state_save_write_file(running_machine *machine, mame_file *file
 #endif
 	strncpy((char *)&header[0x0a], machine->gamedrv->name, 0x1c - 0x0a);
 	*(UINT32 *)&header[0x1c] = LITTLE_ENDIANIZE_INT32(signature);
-	
+
 	/* write the header and turn on compression for the rest of the file */
 	mame_fcompress(file, FCOMPRESS_NONE);
 	mame_fseek(file, 0, SEEK_SET);
 	if (mame_fwrite(file, header, sizeof(header)) != sizeof(header))
 		return STATERR_WRITE_ERROR;
 	mame_fcompress(file, FCOMPRESS_MEDIUM);
-	
+
 	/* call the pre-save functions */
 	for (func = global->prefunclist; func != NULL; func = func->next)
 		(*func->func.presave)(machine, func->param);
-	
+
 	/* then write all the data */
 	for (entry = global->entrylist; entry != NULL; entry = entry->next)
 	{
@@ -612,18 +612,18 @@ state_save_error state_save_read_file(running_machine *machine, mame_file *file)
 	state_callback *func;
 	state_entry *entry;
 	int flip;
-	
+
 	/* if we have illegal registrations, return an error */
 	if (global->illegal_regs > 0)
 		return STATERR_ILLEGAL_REGISTRATIONS;
-	
+
 	/* read the header and turn on compression for the rest of the file */
 	mame_fcompress(file, FCOMPRESS_NONE);
 	mame_fseek(file, 0, SEEK_SET);
 	if (mame_fread(file, header, sizeof(header)) != sizeof(header))
 		return STATERR_READ_ERROR;
 	mame_fcompress(file, FCOMPRESS_MEDIUM);
-	
+
 	/* verify the header and report an error if it doesn't match */
 	if (validate_header(header, machine->gamedrv->name, signature, popmessage, "Error: ")  != STATERR_NONE)
 		return STATERR_INVALID_HEADER;
@@ -641,7 +641,7 @@ state_save_error state_save_read_file(running_machine *machine, mame_file *file)
 		UINT32 totalsize = entry->typesize * entry->typecount;
 		if (mame_fread(file, entry->data, totalsize) != totalsize)
 			return STATERR_READ_ERROR;
-		
+
 		/* handle flipping */
 		if (flip)
 			flip_data(entry);

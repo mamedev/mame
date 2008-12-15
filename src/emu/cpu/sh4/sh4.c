@@ -3628,7 +3628,7 @@ ADDRESS_MAP_END
 CPU_GET_INFO( sh4 )
 {
 	SH4 *sh4 = (device != NULL) ? device->token : NULL;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

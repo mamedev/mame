@@ -1484,15 +1484,15 @@ static void subb(tms32025_state *cpustate)
 static void subc(tms32025_state *cpustate)
 {
 	/**
-	* conditional subtraction, which may be used for division
-	* execute 16 times for 16-bit division
-	*
-	* input:   32 bit numerator in accumulator
-	*          16 bit denominator in data memory
-	*
-	* output:  remainder in upper 16 bits
-	*          quotient in lower 16 bits
-	*/
+    * conditional subtraction, which may be used for division
+    * execute 16 times for 16-bit division
+    *
+    * input:   32 bit numerator in accumulator
+    *          16 bit denominator in data memory
+    *
+    * output:  remainder in upper 16 bits
+    *          quotient in lower 16 bits
+    */
 	GETDATA(cpustate, 15, SXM);
 	if( cpustate->ACC.d >= cpustate->ALU.d ) {
 		cpustate->ACC.d = (cpustate->ACC.d - cpustate->ALU.d)*2+1;
@@ -1504,10 +1504,10 @@ static void subc(tms32025_state *cpustate)
 // System22 games - for example, the score display in Prop Cycle.
 //  cpustate->ACC.d = ((INT32)cpustate->oldacc.d < 0) ? 0x80000000 : 0x7fffffff;
 
-//	if ((INT32)((cpustate->oldacc.d ^ subval ) & (cpustate->oldacc.d ^ cpustate->ALU.d)) < 0) {
-//		SET0(cpustate, OV_FLAG);
-//	}
-//	CALCULATE_SUB_CARRY(cpustate);
+//  if ((INT32)((cpustate->oldacc.d ^ subval ) & (cpustate->oldacc.d ^ cpustate->ALU.d)) < 0) {
+//      SET0(cpustate, OV_FLAG);
+//  }
+//  CALCULATE_SUB_CARRY(cpustate);
 }
 
 static void subh(tms32025_state *cpustate)
@@ -1750,7 +1750,7 @@ static CPU_INIT( tms32025 )
 	state_save_register_device_item(device, 0, cpustate->init_load_addr);
 	state_save_register_device_item(device, 0, cpustate->PREVPC);
 
-//	state_save_register_device_item_pointer(device, 0, cpustate->intRAM, 0x800*2);
+//  state_save_register_device_item_pointer(device, 0, cpustate->intRAM, 0x800*2);
 }
 
 /****************************************************************************
@@ -1874,7 +1874,7 @@ static int process_IRQs(tms32025_state *cpustate)
 			return cpustate->tms32025_irq_cycles;
 		}
 		if ((cpustate->IFR & 0x08) && (IMR & 0x08)) {		/* Timer IRQ (internal) */
-//			logerror("TMS32025:  Active TINT (Timer)\n");
+//          logerror("TMS32025:  Active TINT (Timer)\n");
 			SET_PC(0x0018);
 			cpustate->idle = 0;
 			cpustate->IFR &= (~0x08);
@@ -1882,7 +1882,7 @@ static int process_IRQs(tms32025_state *cpustate)
 			return cpustate->tms32025_irq_cycles;
 		}
 		if ((cpustate->IFR & 0x10) && (IMR & 0x10)) {		/* Serial port receive IRQ (internal) */
-//			logerror("TMS32025:  Active RINT (Serial recieve)\n");
+//          logerror("TMS32025:  Active RINT (Serial recieve)\n");
 			DRR = S_IN(TMS32025_DR);
 			SET_PC(0x001A);
 			cpustate->idle = 0;
@@ -1891,7 +1891,7 @@ static int process_IRQs(tms32025_state *cpustate)
 			return cpustate->tms32025_irq_cycles;
 		}
 		if ((cpustate->IFR & 0x20) && (IMR & 0x20)) {		/* Serial port transmit IRQ (internal) */
-//			logerror("TMS32025:  Active XINT (Serial transmit)\n");
+//          logerror("TMS32025:  Active XINT (Serial transmit)\n");
 			S_OUT(TMS32025_DX,DXR);
 			SET_PC(0x001C);
 			cpustate->idle = 0;
@@ -2091,7 +2091,7 @@ static void set_irq_line(tms32025_state *cpustate, int irqline, int state)
 	if (state != CLEAR_LINE)
 	{
 		cpustate->IFR |= (1 << irqline);
-//		cpustate->IFR &= 0x07;
+//      cpustate->IFR &= 0x07;
 	}
 }
 

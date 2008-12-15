@@ -350,7 +350,7 @@ static CPU_INIT( z8000 )
 static CPU_RESET( z8000 )
 {
 	z8000_state *cpustate = device->token;
-	
+
 	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;

@@ -130,7 +130,7 @@ static void unimplemented(dsp32_state *cpustate, UINT32 op)
 INLINE void execute_one(dsp32_state *cpustate)
 {
 	UINT32 op;
-	
+
 	PROCESS_DEFERRED_MEMORY(cpustate);
 	debugger_instruction_hook(cpustate->device, cpustate->PC);
 	op = ROPCODE(cpustate, cpustate->PC);

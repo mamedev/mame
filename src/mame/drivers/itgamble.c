@@ -510,8 +510,8 @@ ROM_END
 
 /* Europa 2002 Space (Ver 3.0)
 
-Year:    2002  
-Company: Nazionale Elettronica  
+Year:    2002
+Company: Nazionale Elettronica
 
 CPU:
 
@@ -521,13 +521,13 @@ CPU:
 1x TDA2003 (sound)(ic26)
 1x LM358N (sound)(ic27)
 1x oscillator 30MHz (close to main)(osc1)
-1x blue resonator (close to sound) (x1)  
+1x blue resonator (close to sound) (x1)
 
 ROMs:
 
 1x MX27C1000 (1)
 2x M27C2001 (2,3)
-2x M27C4001 (4,5)  
+2x M27C4001 (4,5)
 
 Note:
 

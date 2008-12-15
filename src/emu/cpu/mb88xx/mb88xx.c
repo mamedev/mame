@@ -100,7 +100,7 @@ struct _mb88_state
 static CPU_INIT( mb88 )
 {
 	mb88_state *cpustate = device->token;
-	
+
 	if ( device->static_config )
 	{
 		const mb88_cpu_core *_config = (const mb88_cpu_core*)device->static_config;

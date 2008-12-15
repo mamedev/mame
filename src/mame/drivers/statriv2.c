@@ -785,7 +785,7 @@ ROM_START( statrv2v )
 	ROM_CONTINUE(0x0000, 0x800)
 
 	/* other roms were not from this set, missing sub-board?, but as the game is 'triv two' like the parent
-	   it seems compatible with the same question board */
+       it seems compatible with the same question board */
 
 	ROM_REGION( 0x10000, "user1", 0 ) /* question data */
 	ROM_LOAD( "statuspb.u1", 0x00000, 0x02000, CRC(a50c0313) SHA1(f9bf84613e2ebb952a81a10ee1da49a37423b717) )

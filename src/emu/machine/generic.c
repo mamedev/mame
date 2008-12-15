@@ -619,8 +619,8 @@ void generic_pulse_irq_line(const device_config *device, int irqline)
 
 
 /*-------------------------------------------------
-    generic_pulse_irq_line_and_vector - "pulse" an 
-    IRQ line by asserting it and then clearing it 
+    generic_pulse_irq_line_and_vector - "pulse" an
+    IRQ line by asserting it and then clearing it
     1 cycle later, specifying a vector
 -------------------------------------------------*/
 

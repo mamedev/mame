@@ -154,7 +154,7 @@ INLINE void WRF16( tms7000_state *cpustate, UINT32 mAddr, PAIR p )	/*Write regis
 static CPU_INIT( tms7000 )
 {
 	tms7000_state *cpustate = device->token;
-	
+
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);

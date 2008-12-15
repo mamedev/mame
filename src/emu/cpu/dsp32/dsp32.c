@@ -368,7 +368,7 @@ static CPU_EXECUTE( dsp32c )
 	cpustate->abufcycle[1] += cpustate->icount;
 	cpustate->abufcycle[2] += cpustate->icount;
 	cpustate->abufcycle[3] += cpustate->icount;
-	
+
 	/* handle interrupts */
 	check_irqs(cpustate);
 

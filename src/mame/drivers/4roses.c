@@ -317,10 +317,10 @@ static const gfx_layout charlayout =
 /* WRONG... Must be changed */
 	4,
 	8,
-//	0x1000,
+//  0x1000,
 	RGN_FRAC(1,2),
 	4,
-//	{ 0, 4, 0x8000*8, 0x8000*8+4 },
+//  { 0, 4, 0x8000*8, 0x8000*8+4 },
 	{ RGN_FRAC(0,2), RGN_FRAC(0,2) + 4, RGN_FRAC(1,2), RGN_FRAC(1,2) + 4 },
 	{ 3, 2, 1, 0 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
@@ -362,7 +362,7 @@ static MACHINE_DRIVER_START( 4roses )
 	MDRV_CPU_PROGRAM_MAP(4roses_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-//	MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_HANDLER(generic_0fill)
 
     /* video hardware */
 

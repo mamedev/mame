@@ -2969,7 +2969,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x028:	/* SUBFx */
 		case 0x228:	/* SUBFOx */
 			UML_SUB(block, R32(G_RD(op)), R32(G_RB(op)), R32(G_RA(op)));					// sub     rd,rb,ra
-			generate_compute_flags(ppc, block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);	
+			generate_compute_flags(ppc, block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);
 																							// <update flags>
 			return TRUE;
 
@@ -3010,7 +3010,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x068:	/* NEGx */
 		case 0x268:	/* NEGOx */
 			UML_SUB(block, R32(G_RD(op)), IMM(0), R32(G_RA(op)));							// sub     rd,0,ra
-			generate_compute_flags(ppc, block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);	
+			generate_compute_flags(ppc, block, desc, op & M_RC, (op & M_OE) ? XER_OV : 0, TRUE);
 																							// <update flags>
 			return TRUE;
 

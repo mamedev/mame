@@ -102,7 +102,7 @@ struct _saturn_state
 static CPU_INIT( saturn )
 {
 	saturn_state *cpustate = device->token;
-	
+
 	cpustate->config = (saturn_cpu_core *) device->static_config;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -136,7 +136,7 @@ static CPU_INIT( saturn )
 static CPU_RESET( saturn )
 {
 	saturn_state *cpustate = device->token;
-	
+
 	cpustate->pc=0;
 	cpustate->sleeping = 0;
 	cpustate->irq_enable = 0;
@@ -160,7 +160,7 @@ INLINE void saturn_take_irq(saturn_state *cpustate)
 static CPU_EXECUTE( saturn )
 {
 	saturn_state *cpustate = device->token;
-	
+
 	cpustate->icount = cycles;
 
 	do
@@ -239,7 +239,7 @@ static void IntReg64(Saturn64 r, INT64 d)
 static CPU_SET_INFO( saturn )
 {
 	saturn_state *cpustate = device->token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -296,7 +296,7 @@ static INT64 Reg64Int(Saturn64 r)
 CPU_GET_INFO( saturn )
 {
 	saturn_state *cpustate = (device != NULL) ? device->token : NULL;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

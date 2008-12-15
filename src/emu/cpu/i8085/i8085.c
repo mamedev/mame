@@ -1268,7 +1268,7 @@ static void Interrupt(i8085_state *cpustate)
 static CPU_EXECUTE( i8085 )
 {
 	i8085_state *cpustate = device->token;
-	
+
 	cpustate->icount = cycles;
 	do
 	{

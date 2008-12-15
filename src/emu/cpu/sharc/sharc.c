@@ -674,7 +674,7 @@ static void check_interrupts(SHARC_REGS *cpustate)
 
 static CPU_EXECUTE( sharc )
 {
-	SHARC_REGS *cpustate = device->token;	
+	SHARC_REGS *cpustate = device->token;
 	cpustate->icount = cycles;
 
 	if (cpustate->idle && cpustate->irq_active == 0)

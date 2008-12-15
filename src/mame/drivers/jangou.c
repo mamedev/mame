@@ -33,12 +33,12 @@ Location 3-G: MB7051
 Jangou Lady
 (c)1984 Nihon Bussan
 
-CPU:	Z80 x2 (#1,#2)
-	(40pin unknown:#3)
-SOUND:	AY-3-8910
-	MSM5218RS
-OSC:	19.968MHz
-	400KHz
+CPU:    Z80 x2 (#1,#2)
+    (40pin unknown:#3)
+SOUND:  AY-3-8910
+    MSM5218RS
+OSC:    19.968MHz
+    400KHz
 
 
 1.5N    chr.
@@ -195,7 +195,7 @@ static WRITE8_HANDLER( blitter_process_w )
 	/*trigger blitter write to ram,might not be correct...*/
 	if(offset == 5)
 	{
-//		printf("%02x %02x %02x %02x %02x %02x\n",blit_data[0],blit_data[1],blit_data[2],blit_data[3],blit_data[4],blit_data[5]);
+//      printf("%02x %02x %02x %02x %02x %02x\n",blit_data[0],blit_data[1],blit_data[2],blit_data[3],blit_data[4],blit_data[5]);
 		w = (blit_data[4] & 0xff)+1;
 		h = (blit_data[5] & 0xff)+1;
 		src = ((blit_data[1]<<8)|(blit_data[0]<<0));
@@ -274,14 +274,14 @@ static WRITE8_HANDLER( mux_w )
 static WRITE8_HANDLER( output_w )
 {
 	/*
-	--x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
-	---- -x-- flip screen
-	---- ---x coin counter
-	*/
-//	printf("%02x\n",data);
+    --x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
+    ---- -x-- flip screen
+    ---- ---x coin counter
+    */
+//  printf("%02x\n",data);
 	coin_counter_w(0,data & 0x01);
-//	flip_screen_set(data & 0x04);
-//	coin_lockout_w(0,~data & 0x20);
+//  flip_screen_set(data & 0x04);
+//  coin_lockout_w(0,~data & 0x20);
 }
 
 static READ8_HANDLER( input_mux_r )
@@ -295,7 +295,7 @@ static READ8_HANDLER( input_mux_r )
 		case 0x10: return input_port_read(space->machine, "PL1_3");
 		case 0x20: return input_port_read(space->machine, "PL2_3");
 	}
-//	printf("%04x\n",mux_data);
+//  printf("%04x\n",mux_data);
 
 	return 0xff;
 }
@@ -391,7 +391,7 @@ static READ8_HANDLER( slave_com_r )
 static WRITE8_HANDLER( slave_com_w )
 {
 	nsc_latch = data;
-//	cpu_set_input_line(space->machine->cpu[0], 0, HOLD_LINE);
+//  cpu_set_input_line(space->machine->cpu[0], 0, HOLD_LINE);
 }
 
 /*************************************

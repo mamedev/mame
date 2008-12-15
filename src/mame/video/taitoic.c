@@ -601,7 +601,7 @@ int TC0100SCN_count(running_machine *machine)
 		has_write_handler(machine, 0, TC0100SCN_triple_screen_w)) ? 1 : 0;
 	mask |= has_write_handler(machine, 0, TC0100SCN_word_1_w) << 1;
 	mask |= has_write_handler(machine, 0, TC0100SCN_word_2_w) << 2;
-	
+
 	/* Catch illegal configurations */
 	/* TODO: we should give an appropriate warning */
 	assert_always(mask == 0 || mask == 1 || mask == 3 || mask == 7, "Invalid TC0110PCR configuration");

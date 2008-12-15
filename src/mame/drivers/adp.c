@@ -418,21 +418,21 @@ static READ16_HANDLER(rh1_r)
 
         }
 
-	switch (mame_rand(space->machine) & 3)
-	{
-		case 0:
-			return 0;
-		case 1:
-			return 0xffff;
-		default:
-			return mame_rand(space->machine) % 0xffff;
-	}
+    switch (mame_rand(space->machine) & 3)
+    {
+        case 0:
+            return 0;
+        case 1:
+            return 0xffff;
+        default:
+            return mame_rand(space->machine) % 0xffff;
+    }
 }
 */
 /*
 static WRITE16_HANDLER(wh1_w)
 {
-	// register_active = data;
+    // register_active = data;
 }
 */
 

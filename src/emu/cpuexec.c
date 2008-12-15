@@ -206,7 +206,7 @@ const device_config *cpuexec_create_cpu_device(const cpu_config *config)
 void cpuexec_init(running_machine *machine)
 {
 	int cpunum;
-	
+
 	/* allocate global state */
 	machine->cpuexec_data = auto_malloc(sizeof(*machine->cpuexec_data));
 	memset(machine->cpuexec_data, 0, sizeof(*machine->cpuexec_data));

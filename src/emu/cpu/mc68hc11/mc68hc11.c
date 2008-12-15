@@ -371,7 +371,7 @@ static CPU_EXIT( hc11 )
 static CPU_EXECUTE( hc11 )
 {
 	hc11_state *cpustate = device->token;
-	
+
 	cpustate->icount = cycles;
 
 	while(cpustate->icount > 0)

@@ -181,7 +181,7 @@ static const int CyclesCB[256] =
 static CPU_INIT( lr35902 )
 {
 	lr35902_state *cpustate = device->token;
-	
+
 	cpustate->w.config = (const lr35902_cpu_core *) device->static_config;
 	cpustate->w.irq_callback = irqcallback;
 	cpustate->w.device = device;
@@ -196,7 +196,7 @@ static CPU_INIT( lr35902 )
 static CPU_RESET( lr35902 )
 {
 	lr35902_state *cpustate = device->token;
-	
+
 	cpustate->w.AF = 0x0000;
 	cpustate->w.BC = 0x0000;
 	cpustate->w.DE = 0x0000;
@@ -301,7 +301,7 @@ INLINE void lr35902_ProcessInterrupts (lr35902_state *cpustate)
 static CPU_EXECUTE( lr35902 )
 {
 	lr35902_state *cpustate = device->token;
-	
+
 	cpustate->w.icount = cycles;
 
 	do
@@ -337,7 +337,7 @@ static CPU_EXECUTE( lr35902 )
 static CPU_BURN( lr35902 )
 {
 	lr35902_state *cpustate = device->token;
-	
+
     if( cycles > 0 )
     {
         /* NOP takes 4 cycles per instruction */
@@ -379,7 +379,7 @@ static void lr35902_clear_pending_interrupts (lr35902_state *cpustate)
 static CPU_SET_INFO( lr35902 )
 {
 	lr35902_state *cpustate = device->token;
-	
+
 	switch (state)
 	{
 	/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -407,7 +407,7 @@ static CPU_SET_INFO( lr35902 )
 CPU_GET_INFO( lr35902 )
 {
 	lr35902_state *cpustate = (device != NULL) ? device->token : NULL;
-	
+
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */

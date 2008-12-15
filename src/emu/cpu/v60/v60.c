@@ -69,7 +69,7 @@ struct _v60_flags
 
 // v60 Register Inside (Hm... It's not a pentium inside :-))) )
 typedef struct _v60_state v60_state;
-struct _v60_state 
+struct _v60_state
 {
 	struct cpu_info 	info;
 	UINT32 				reg[68];
@@ -345,7 +345,7 @@ static void base_init(const device_config *device, cpu_irq_callback irqcallback)
 static CPU_INIT( v60 )
 {
 	v60_state *cpustate = device->token;
-	
+
 	base_init(device, irqcallback);
 	// Set cpustate->PIR (Processor ID) for NEC cpustate-> LSB is reserved to NEC,
 	// so I don't know what it contains.

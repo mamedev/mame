@@ -1016,7 +1016,7 @@ ROM_END
 
 /* arkgcbl - dump from citylan:
 
-Anno 1986 
+Anno 1986
 N.revisione 06.09.86
 CPU:
 1x MK3880N-4-Z80CPU (main)

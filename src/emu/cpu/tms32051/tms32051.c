@@ -329,7 +329,7 @@ static CPU_EXIT( tms )
 static CPU_EXECUTE( tms )
 {
 	tms32051_state *cpustate = device->token;
-	
+
 	cpustate->icount = cycles;
 
 	while(cpustate->icount > 0)
@@ -397,7 +397,7 @@ static CPU_EXECUTE( tms )
 static READ16_HANDLER( cpuregs_r )
 {
 	tms32051_state *cpustate = space->cpu->token;
-	
+
 	switch (offset)
 	{
 		case 0x04:	return cpustate->imr;

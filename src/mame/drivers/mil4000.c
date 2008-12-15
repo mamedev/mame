@@ -47,7 +47,7 @@ ROMs
 
 RAM:
 4x CY62256L-70PC - 32K x 8 Static RAM.
-2x CY7C199-15PC  - 32K x 8 Static RAM 
+2x CY7C199-15PC  - 32K x 8 Static RAM
 
 Note
 1x 28x2 edge connector
@@ -235,7 +235,7 @@ static WRITE16_HANDLER( output_w )
 	output_set_lamp_value(5, (data >> 5) & 1);	/* START */
 	output_set_lamp_value(6, (data >> 6) & 1);	/* PREMIO */
 
-//	popmessage("%04x\n",data);
+//  popmessage("%04x\n",data);
 }
 
 static ADDRESS_MAP_START( mil4000_map, ADDRESS_SPACE_PROGRAM, 16 )

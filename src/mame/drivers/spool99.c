@@ -25,9 +25,9 @@ TODO:
 
 ============================================================================================
 
-Year	1998
+Year    1998
 Manufacturer Electronic Projects
-Revision N.	0.36
+Revision N. 0.36
 
 CPU
 
@@ -56,7 +56,7 @@ Note
 
 --- 2nd pcb
 
-Year	1998
+Year    1998
 Manufacturer Electronic Projects
 Revision N. 0.31
 
@@ -135,12 +135,12 @@ static READ8_HANDLER( spool99_io_r )
 {
 	UINT8 *ROM = memory_region(space->machine, "main");
 
-//	if(!(io_switch))
+//  if(!(io_switch))
 	{
 		switch(offset+0xaf00)
 		{
 			case 0xafd8: return input_port_read(space->machine,"COIN1");
-//			case 0xafd9: return 1;
+//          case 0xafd9: return 1;
 			case 0xafda: return input_port_read(space->machine,"COIN2");
 			case 0xafdb: return 1;
 			case 0xafdc: return input_port_read(space->machine,"SERVICE1");//attract mode
@@ -152,13 +152,13 @@ static READ8_HANDLER( spool99_io_r )
 			case 0xafe2: return input_port_read(space->machine,"START");
 			case 0xafe3: return input_port_read(space->machine,"BET");//system 2
 			case 0xafe4: return input_port_read(space->machine,"SERVICE2");//attract mode
-//			case 0xafe5: return 1;
-//			case 0xafe6: return 1;
+//          case 0xafe5: return 1;
+//          case 0xafe6: return 1;
 			case 0xafe7: return eeprom_read_bit();
 			case 0xaff8: return okim6295_status_0_r(space,0);
 		}
 	}
-//	printf("%04x %d\n",offset+0xaf00,io_switch);
+//  printf("%04x %d\n",offset+0xaf00,io_switch);
 
 	return ROM[0xaf00+offset];
 }
@@ -322,7 +322,7 @@ ROM_END
 static DRIVER_INIT( spool99 )
 {
 	UINT8 *ROM = memory_region(machine, "main");
-//	vram = auto_malloc(0x2000);
+//  vram = auto_malloc(0x2000);
 	memcpy(spool99_main, ROM, 0xae00);
 }
 

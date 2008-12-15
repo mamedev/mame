@@ -841,8 +841,8 @@ ROM_END
 
 /*
 
-Anno	199x
-Produttore	IGS
+Anno    199x
+Produttore  IGS
 N.revisione
 
 CPU

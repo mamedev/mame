@@ -2,10 +2,10 @@
 
 /*
 
-Produttore	STG
+Produttore  STG
 N.revisione
-CPU	main PCB is a standard EPIA
-ROMs	epia BIOS + solid state HD
+CPU main PCB is a standard EPIA
+ROMs    epia BIOS + solid state HD
 
 
 

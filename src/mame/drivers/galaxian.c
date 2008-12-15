@@ -2494,7 +2494,7 @@ static DRIVER_INIT( zigzag )
 	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "main") + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
-	   the fixed area only extends to 0x1fff */
+       the fixed area only extends to 0x1fff */
 	memory_install_read8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK3);
 	memory_set_bankptr(machine, 3, memory_region(machine, "main") + 0x0000);
 

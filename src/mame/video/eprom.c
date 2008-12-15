@@ -30,11 +30,11 @@ static void update_palette(running_machine *machine)
 		UINT16 const data = paletteram16[color];
 
 		/* FIXME this is only a very crude approximation of the palette output.
-		 * The circuit involves a dozen transistors and probably has an output
-		 * which is quite different from this.
-		 * This is, however, good enough to match the video and description
-		 * of MAMETesters bug #02677.
-		 */
+         * The circuit involves a dozen transistors and probably has an output
+         * which is quite different from this.
+         * This is, however, good enough to match the video and description
+         * of MAMETesters bug #02677.
+         */
 		i = (((data >> 12) & 15) + 1) * (4 - eprom_screen_intensity);
 		if (i < 0)
 			i = 0;

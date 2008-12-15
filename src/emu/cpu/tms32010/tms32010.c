@@ -705,7 +705,7 @@ static const tms32010_opcode_7F opcode_7F[32]=
 static CPU_INIT( tms32010 )
 {
 	tms32010_state *cpustate = device->token;
-	
+
 	state_save_register_device_item(device, 0, cpustate->PC);
 	state_save_register_device_item(device, 0, cpustate->PREVPC);
 	state_save_register_device_item(device, 0, cpustate->STR);

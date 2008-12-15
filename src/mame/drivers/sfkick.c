@@ -1,8 +1,8 @@
-/* 
+/*
   Super Free Kick / Spinkick by HEC (Haesung Enterprise Co.)
-     	
+
     driver by Tomasz Slanina
-    
+
   Hacked MSX2 home computer hardware. Romset contains
   modifed ( (c) strings removed and patched boot sequence)
   MSX2 bios. Yamaha VDP v9938 is hidden in huge epoxy block.
@@ -72,7 +72,7 @@ static int sfkick_bank_cfg;
 static int sfkick_bank[8];
 static int sfkick_input_mux;
 static READ8_DEVICE_HANDLER( ppi_port_b_r )
-{ 
+{
 	switch(sfkick_input_mux&0x0f)
 	{
 		case 0: return input_port_read(device->machine, "IN0");
@@ -96,7 +96,7 @@ void sfkick_remap_banks(running_machine *machine)
 			memory_set_bankptr (machine,2, mem+0x2000);
 		}
 		break;
-			
+
 		case 1: /* ext rom */
 		{
 			UINT8 *mem = memory_region(machine, "extrom");
@@ -104,7 +104,7 @@ void sfkick_remap_banks(running_machine *machine)
 			memory_set_bankptr (machine,2, mem+0x6000);
 		}
 		break;
-			
+
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
@@ -112,7 +112,7 @@ void sfkick_remap_banks(running_machine *machine)
 			memory_set_bankptr (machine,2, mem+0x2000*sfkick_bank[1]);
 		}
 		break;
-			
+
 		case 3: /* unknown */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
@@ -132,7 +132,7 @@ void sfkick_remap_banks(running_machine *machine)
 			memory_set_bankptr (machine,4, mem+0x6000);
 		}
 		break;
-			
+
 		case 1:  /* unknown */
 		case 3:
 		{
@@ -141,7 +141,7 @@ void sfkick_remap_banks(running_machine *machine)
 			memory_set_bankptr(machine,4, mem+0x18000);
 		}
 		break;
-		
+
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
@@ -161,7 +161,7 @@ void sfkick_remap_banks(running_machine *machine)
 			memory_set_bankptr(machine,6, mem+0x6000);
 		}
 		break;
-			
+
 		case 1: /* unknown */
 		case 3:
 		{
@@ -170,7 +170,7 @@ void sfkick_remap_banks(running_machine *machine)
 			memory_set_bankptr(machine,6, mem+0x18000);
 		}
 		break;
-			
+
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
@@ -179,7 +179,7 @@ void sfkick_remap_banks(running_machine *machine)
 		}
 		break;
 	}
-	
+
 	/* c000-fffff */
 	switch((sfkick_bank_cfg>>6)&3)
 	{
@@ -191,7 +191,7 @@ void sfkick_remap_banks(running_machine *machine)
 			memory_set_bankptr(machine,8, mem+0x18000);
 		}
 		break;
-			
+
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
@@ -199,7 +199,7 @@ void sfkick_remap_banks(running_machine *machine)
 			memory_set_bankptr (machine,8, mem+0x2000*sfkick_bank[7]);
 		}
 		break;
-		
+
 		case 3: /* RAM */
 		{
 			memory_set_bankptr(machine,7, main_mem);
@@ -332,12 +332,12 @@ static ADDRESS_MAP_START (sound_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
-ADDRESS_MAP_END	
+ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER ( ppi_port_c_w )
 {
 	sfkick_input_mux=data;
-} 
+}
 
 static const ppi8255_interface ppi8255_intf =
 {
@@ -346,7 +346,7 @@ static const ppi8255_interface ppi8255_intf =
 	NULL,
 	ppi_port_a_w,
 	NULL,
-	ppi_port_c_w 
+	ppi_port_c_w
 
 };
 
@@ -355,24 +355,24 @@ static INPUT_PORTS_START( sfkick )
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    
+
     PORT_START("IN1")
     PORT_BIT( 0x71, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
     PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
-    
+
     PORT_START("DIAL")
     PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(-20)
-    
+
     PORT_START("DSW1") /* bitswapped at read! 76543210 -> 45673210 */
     PORT_DIPNAME(   0x82, 0x02, DEF_STR( Unknown ) )  /* unknown, code @ $98a8 */
  	PORT_DIPSETTING(      0x00, "3" )
 	PORT_DIPSETTING(      0x02, "2" )
 	PORT_DIPSETTING(      0x80, "1" )
 	PORT_DIPSETTING(      0x82, "0" )
-    PORT_DIPNAME(   0x0c, 0x08, DEF_STR( Difficulty ) ) /* not sure, code @ $9877 */ 
+    PORT_DIPNAME(   0x0c, 0x08, DEF_STR( Difficulty ) ) /* not sure, code @ $9877 */
    	PORT_DIPSETTING(      0x0c, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x04, DEF_STR( Medium ) )
@@ -386,7 +386,7 @@ static INPUT_PORTS_START( sfkick )
 	PORT_DIPSETTING(      0x01, "3" )
 	PORT_DIPSETTING(      0x40, "2" )
 	PORT_DIPSETTING(      0x41, "1" )
-    
+
     PORT_START("DSW2") /* bitswapped at read! 76543210 -> 45673210 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* unused ? */
     PORT_DIPNAME(   0x02, 0x02,  "Test Mode" )
@@ -443,7 +443,7 @@ static INTERRUPT_GEN( sfkick_interrupt )
 {
 	v9938_interrupt(0);
 }
-static void irqhandler(running_machine *machine, int irq)	
+static void irqhandler(running_machine *machine, int irq)
 {
 	cpu_set_input_line_and_vector(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
@@ -464,9 +464,9 @@ static MACHINE_DRIVER_START( sfkick )
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(main_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(sfkick_interrupt,262)
-	
-	MDRV_INTERLEAVE(1000)	
-	
+
+	MDRV_INTERLEAVE(1000)
+
 	MDRV_CPU_ADD("sound",Z80,MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(sound_mem,0)
 	MDRV_CPU_IO_MAP(sound_io,0)
@@ -481,14 +481,14 @@ static MACHINE_DRIVER_START( sfkick )
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
-	
+
 	MDRV_MACHINE_RESET(sfkick)
 
 	MDRV_PALETTE_INIT( v9938 )
 
 	MDRV_VIDEO_START(sfkick)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
-	
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/6)
 	MDRV_SOUND_CONFIG(ym2203_config)
@@ -496,7 +496,7 @@ static MACHINE_DRIVER_START( sfkick )
 	MDRV_SOUND_ROUTE(1, "mono", 0.25)
 	MDRV_SOUND_ROUTE(2, "mono", 0.25)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
-	
+
 MACHINE_DRIVER_END
 
 static DRIVER_INIT(sfkick)
@@ -505,46 +505,46 @@ static DRIVER_INIT(sfkick)
 }
 
 ROM_START( sfkick )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF ) 
-	
+	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+
 	ROM_REGION(0x20000,  "banked", ROMREGION_ERASEFF)
 	ROM_LOAD( "sfkick2.a7", 0x00000, 0x8000, CRC(1dcaec5e) SHA1(7e063d46fb6606df2d772866cc55f207035b98c4) )
 	ROM_LOAD( "sfkick3.c7", 0x08000, 0x8000, CRC(639d3cf2) SHA1(950fd28058d32e4532eb6e99454dcaef092a955e) )
 	ROM_LOAD( "sfkick4.d7", 0x10000, 0x8000, CRC(ee1b344e) SHA1(d33fbad017cc4838192e9c540621537edb7e8dc4) )
 	/* 0x18000-0x1ffff = empty */
-	
-	ROM_REGION(0x8000,  "extrom", 0) 
+
+	ROM_REGION(0x8000,  "extrom", 0)
 	ROM_LOAD( "sfkick5.h7", 0x00000, 0x8000, CRC(8e8bd9cf) SHA1(f493de40147fdd67a48d4c90b01170fbd6ea074e) )
 
 	ROM_REGION(0x8000,  "cartridge", 0)
 	ROM_LOAD( "sfkick6.j7", 0x0000, 0x8000, CRC(7a91ac4b) SHA1(afc5e2c2fe0cd108235ac6ae2775cc9a0b1c9f76) )
-	
+
 	ROM_REGION(0x8000,  "bios", 0)
 	ROM_LOAD( "sfkick7.l7", 0x00000, 0x8000, CRC(8cd94c63) SHA1(e6dba66c8716593b8ab88f79f7205211938d1598) )
-	
+
 	ROM_REGION(0x10000,  "sound", 0)
 	ROM_LOAD( "sfkick1.c5", 0x00000, 0x8000, CRC(2f5e3b7a) SHA1(d2ff566b415ab10c0681fa1eb221a56e3c137ecf) )
 ROM_END
 
 
 ROM_START( spinkick )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF ) 
-	
+	ROM_REGION( 0x10000, "main", ROMREGION_ERASEFF )
+
 	ROM_REGION(0x20000,  "banked", ROMREGION_ERASEFF)
 	ROM_LOAD( "spinkick.r2", 0x00000, 0x8000, CRC(1dcaec5e) SHA1(7e063d46fb6606df2d772866cc55f207035b98c4) )
 	ROM_LOAD( "spinkick.r3", 0x08000, 0x8000, CRC(e86a194a) SHA1(19a02375ec463e795770403c3e948d754919458b) )
 	ROM_LOAD( "spinkick.r4", 0x10000, 0x8000, CRC(ee1b344e) SHA1(d33fbad017cc4838192e9c540621537edb7e8dc4) )
 	/* 0x18000-0x1ffff = empty */
-	
+
 	ROM_REGION(0x8000,  "extrom", 0)
 	ROM_LOAD( "spinkick.r5", 0x00000, 0x8000, CRC(8e8bd9cf) SHA1(f493de40147fdd67a48d4c90b01170fbd6ea074e) )
 
 	ROM_REGION(0x8000,  "cartridge", 0)
 	ROM_LOAD( "spinkick.r6", 0x0000, 0x8000, CRC(7a91ac4b) SHA1(afc5e2c2fe0cd108235ac6ae2775cc9a0b1c9f76) )
-	
+
 	ROM_REGION(0x8000,  "bios", 0)
 	ROM_LOAD( "spinkick.r7", 0x00000, 0x8000, CRC(8cd94c63) SHA1(e6dba66c8716593b8ab88f79f7205211938d1598) )
-	
+
 	ROM_REGION(0x10000,  "sound", 0)
 	ROM_LOAD( "spinkick.r1", 0x00000, 0x8000, CRC(2f5e3b7a) SHA1(d2ff566b415ab10c0681fa1eb221a56e3c137ecf) )
 ROM_END

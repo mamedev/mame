@@ -1777,7 +1777,7 @@ static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state
 static TIMER_CALLBACK( decrementer_callback )
 {
 	tms99xx_state *cpustate = ptr;
-	
+
 	/* request decrementer interrupt */
 	cpustate->int_latch |= 0x8;
 	cpustate->flag |= 0x8;

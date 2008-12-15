@@ -1016,12 +1016,12 @@ static CPU_RESET( v810 )
 static CPU_EXECUTE( v810 )
 {
 	v810_state *cpustate = device->token;
-	
+
 	cpustate->icount = cycles;
 	while(cpustate->icount>=0)
 	{
 		UINT32 op;
-		
+
 		cpustate->PPC=cpustate->PC;
 		debugger_instruction_hook(device, cpustate->PC);
 		op=R_OP(cpustate,cpustate->PC);

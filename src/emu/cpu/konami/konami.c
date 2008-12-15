@@ -356,7 +356,7 @@ static void check_irq_lines(konami_state *cpustate)
 		PCD = RM16(cpustate, 0xfff6);
 		(void)(*cpustate->irq_callback)(cpustate->device, KONAMI_FIRQ_LINE);
 	}
-	
+
 	else if (cpustate->irq_state[KONAMI_IRQ_LINE] != CLEAR_LINE && !(CC & CC_II))
 	{
 		/* standard IRQ */
@@ -377,7 +377,7 @@ static void check_irq_lines(konami_state *cpustate)
 			PUSHBYTE(cpustate, B);
 			PUSHBYTE(cpustate, A);
 			PUSHBYTE(cpustate, CC);
-			cpustate->icount -= 19;	
+			cpustate->icount -= 19;
 		}
 		CC |= CC_II;					/* inhibit IRQ */
 		PCD = RM16(cpustate, 0xfff8);
@@ -392,7 +392,7 @@ static void check_irq_lines(konami_state *cpustate)
 static CPU_INIT( konami )
 {
 	konami_state *cpustate = device->token;
-	
+
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -442,7 +442,7 @@ static void set_irq_line(konami_state *cpustate, int irqline, int state)
 {
 	if (state != CLEAR_LINE)
 		cpustate->int_state &= ~KONAMI_SYNC;
-	
+
 	if (irqline == INPUT_LINE_NMI)
 	{
 		if (cpustate->nmi_state == CLEAR_LINE && state != CLEAR_LINE)
@@ -476,7 +476,7 @@ static CPU_EXECUTE( konami )
 		do
 		{
 			UINT8 ireg;
-			
+
 			pPPC = pPC;
 
 			debugger_instruction_hook(device, PCD);

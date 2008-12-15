@@ -660,7 +660,7 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 static void main_cpu_banking_init(running_machine *machine)
 {
 	const address_space *mainspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	
+
 	/* create vector banks */
 	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, "mainbios"), 0);
 	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, memory_region(machine, "main"), 0);

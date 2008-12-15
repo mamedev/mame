@@ -93,7 +93,7 @@ struct _lh5810_state
 static CPU_INIT( lh5801 )
 {
 	lh5801_state *cpustate = device->token;
-	
+
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->config = (const lh5801_cpu_core *) device->static_config;
 	cpustate->device = device;

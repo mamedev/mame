@@ -1184,10 +1184,10 @@ ROM_START( gradius2 )
 	ROM_LOAD16_WORD_SWAP( "gr2.p13",	0x100000, 0x80000, CRC(5bd239ac) SHA1(9c96f6069d06a1d80c04650ed56bc5e1508db657) ) /* 785f15.p13 byteswapped */
 	ROM_LOAD16_WORD_SWAP( "gr2.p15",	0x180000, 0x80000, CRC(95c6b8a3) SHA1(0a906af72d08993fd83f23d72ffb919801aa17af) ) /* 785f16.p15 byteswapped */
 
-//	ROM_LOAD16_WORD( "785f17.p16",	0x000000, 0x80000, CRC(8fbec1a4) SHA1(71cbdb25470b5a2ca7e80c92f12fc47e28085793) ) /* not working in a original PCB */
-//	ROM_LOAD16_WORD( "785f18.p18",	0x080000, 0x80000, CRC(50d61e38) SHA1(051d332d93d435d19571e22d69ffc5395dbb16a4) ) /* not working in a original PCB */
-//	ROM_LOAD16_WORD( "785f15.p13",	0x100000, 0x80000, CRC(af96aef3) SHA1(a58e26a8b134ab6e7938cd4fa342c04c236efd99) ) /* not working in a original PCB */
-//	ROM_LOAD16_WORD( "785f16.p15",	0x180000, 0x80000, CRC(b858df1f) SHA1(c434da7ba54d59643fe6ca30bceccf16413904c3) ) /* not working in a original PCB */
+//  ROM_LOAD16_WORD( "785f17.p16",  0x000000, 0x80000, CRC(8fbec1a4) SHA1(71cbdb25470b5a2ca7e80c92f12fc47e28085793) ) /* not working in a original PCB */
+//  ROM_LOAD16_WORD( "785f18.p18",  0x080000, 0x80000, CRC(50d61e38) SHA1(051d332d93d435d19571e22d69ffc5395dbb16a4) ) /* not working in a original PCB */
+//  ROM_LOAD16_WORD( "785f15.p13",  0x100000, 0x80000, CRC(af96aef3) SHA1(a58e26a8b134ab6e7938cd4fa342c04c236efd99) ) /* not working in a original PCB */
+//  ROM_LOAD16_WORD( "785f16.p15",  0x180000, 0x80000, CRC(b858df1f) SHA1(c434da7ba54d59643fe6ca30bceccf16413904c3) ) /* not working in a original PCB */
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )	// tile data; mapped at 0x80000 on CPUB
 

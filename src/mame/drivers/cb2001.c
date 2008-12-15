@@ -3,7 +3,7 @@
   Cherry Bonus 2001  (c)2000/2001 Dyna
 
 
-Produttore	Dyna
+Produttore  Dyna
 N.revisione
 CPU
 
@@ -46,37 +46,37 @@ In test mode (c) is 2000
 
 const UINT8 cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
-//	pppp
+//  pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,xxxx,xxxx,0x3a,xxxx,xxxx,xxxx, /* 10 */
-//	                                         ????                ????
+//                                           ????                ????
 	xxxx,0x8e,xxxx,xxxx,xxxx,0x49,xxxx,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
-//	     !!!!                ????                           pppp
+//       !!!!                ????                           pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xb0,xxxx, /* 30 */
-//	                              pppp                                     ????
+//                                pppp                                     ????
 	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
-//	     !!!!                gggg
+//       !!!!                gggg
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0x78,xxxx,xxxx,xxxx, /* 50 */
-//	                              ????                           ????
+//                                ????                           ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
-//	                                                                       gggg
+//                                                                         gggg
 	0xc3,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 70 */
-//	pppp                                               ????
+//  pppp                                               ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x34, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 80 */
-//	                                   ????
+//                                     ????
 	xxxx,xxxx,0xe9,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xb9,xxxx,xxxx,xxxx, /* 90 */
-//	          ????                                               pppp
+//            ????                                               pppp
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0xb8, xxxx,xxxx,0xfa,xxxx,xxxx,xxxx,xxxx,xxxx, /* A0 */
-//	                                   !!!!            ????
+//                                     !!!!            ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* B0 */
-//	
+//
 	xxxx,xxxx,0xee,xxxx,xxxx,0xe2,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* C0 */
-//	          ????           pppp
+//            ????           pppp
 	xxxx,xxxx,0x46,xxxx,xxxx,xxxx,xxxx,xxxx, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,xxxx, /* D0 */
 //              ????                           ????                     ???? !!!!
 	0xb0,xxxx,xxxx,0xc6,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
-//	????           !!!!
+//  ????           !!!!
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
-//	
+//
 };
 
 /* robiza notes:
@@ -104,7 +104,7 @@ c2 -> ee (out dw,al)
 probably:
 00 -> e8 (call)
 2b -> conditional jmp for sure (75)
-36 -> be 
+36 -> be
 41 -> ea (jmp_far)
 70 -> c3 (ret)
 9c -> it's a counter (like mov cw,#value) -> not sure the register (cw,bw,....) -> b9 (cw)
@@ -142,7 +142,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-//	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
+//  cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
 }
 
 static const nec_config cb2001_config = { cb2001_decryption_table, };

@@ -1300,7 +1300,7 @@ ROM_START( hotmind )
 	/* ROM will be copied here by the init code from "user1" */
 
 	/* original PIC (which is the one from Hard Times) was protected, but it works with the Excelsior one
-	   because it uses only 1 bank of samples */
+       because it uses only 1 bank of samples */
 	ROM_REGION( 0x3000, "user1", ROMREGION_DISPOSE )
 	ROM_LOAD( "pic16c57-hs.i015", 0x0000, 0x2d4c, BAD_DUMP CRC(022c6941) SHA1(8ead40bfa7aa783b1ce62bd6cfa673cb876e29e7) )
 

@@ -846,7 +846,7 @@ static CPU_RESET( sh1 )
 static void code_flush_cache(SH2 *sh2)
 {
 	drcuml_state *drcuml = sh2->drcuml;
-	
+
 	/* empty the transient cache contents */
 	drcuml_reset(drcuml);
 

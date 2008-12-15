@@ -543,7 +543,7 @@ void z8000_init_tables(void)
 {
 	const Z8000_init *init;
 	int i;
-	
+
 	/* allocate the opcode execution and disassembler array */
 	z8000_exec = (Z8000_exec *)malloc(0x10000 * sizeof(Z8000_exec));
 	if( !z8000_exec )

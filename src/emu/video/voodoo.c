@@ -4011,11 +4011,11 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
 		/* Input status 0 */
 		case 0x3c2:
 			/*
-				bit 7 = Interrupt Status. When its value is ?1?, denotes that an interrupt is pending.
-				bit 6:5 = Feature Connector. These 2 bits are readable bits from the feature connector.
-				bit 4 = Sense. This bit reflects the state of the DAC monitor sense logic.
-				bit 3:0 = Reserved. Read back as 0.
-			*/
+                bit 7 = Interrupt Status. When its value is ?1?, denotes that an interrupt is pending.
+                bit 6:5 = Feature Connector. These 2 bits are readable bits from the feature connector.
+                bit 4 = Sense. This bit reflects the state of the DAC monitor sense logic.
+                bit 3:0 = Reserved. Read back as 0.
+            */
 			result = 0x00;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_vga_r(%X)\n", cpuexec_describe_context(device->machine), 0x300+offset);
@@ -4063,14 +4063,14 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
 		/* Input status 1 */
 		case 0x3da:
 			/*
-				bit 7:6 = Reserved. These bits read back 0.
-				bit 5:4 = Display Status. These 2 bits reflect 2 of the 8 pixel data outputs from the Attribute
-							controller, as determined by the Attribute controller index 0x12 bits 4 and 5.
-				bit 3 = Vertical sync Status. A ?1? indicates vertical retrace is in progress.
-				bit 2:1 = Reserved. These bits read back 0x2.
-				bit 0 = Display Disable. When this bit is 1, either horizontal or vertical display end has occurred,
-							otherwise video data is being displayed.
-			*/
+                bit 7:6 = Reserved. These bits read back 0.
+                bit 5:4 = Display Status. These 2 bits reflect 2 of the 8 pixel data outputs from the Attribute
+                            controller, as determined by the Attribute controller index 0x12 bits 4 and 5.
+                bit 3 = Vertical sync Status. A ?1? indicates vertical retrace is in progress.
+                bit 2:1 = Reserved. These bits read back 0x2.
+                bit 0 = Display Disable. When this bit is 1, either horizontal or vertical display end has occurred,
+                            otherwise video data is being displayed.
+            */
 			result = 0x04;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_vga_r(%X)\n", cpuexec_describe_context(device->machine), 0x300+offset);
@@ -4432,11 +4432,11 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 
 
 /***************************************************************************
-	DEVICE INTERFACE
+    DEVICE INTERFACE
 ***************************************************************************/
 
 /*-------------------------------------------------
-	device start callback
+    device start callback
 -------------------------------------------------*/
 
 static DEVICE_START( voodoo )
@@ -4620,7 +4620,7 @@ static DEVICE_START( voodoo )
 
 
 /*-------------------------------------------------
-	device exit callback
+    device exit callback
 -------------------------------------------------*/
 
 static DEVICE_STOP( voodoo )
@@ -4634,7 +4634,7 @@ static DEVICE_STOP( voodoo )
 
 
 /*-------------------------------------------------
-	device reset callback
+    device reset callback
 -------------------------------------------------*/
 
 static DEVICE_RESET( voodoo )
@@ -4645,7 +4645,7 @@ static DEVICE_RESET( voodoo )
 
 
 /*-------------------------------------------------
-	device set info callback
+    device set info callback
 -------------------------------------------------*/
 
 static DEVICE_SET_INFO( voodoo )
@@ -4658,7 +4658,7 @@ static DEVICE_SET_INFO( voodoo )
 
 
 /*-------------------------------------------------
-	device get info callback
+    device get info callback
 -------------------------------------------------*/
 
 DEVICE_GET_INFO( voodoo )

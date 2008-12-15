@@ -2372,15 +2372,15 @@ void console_create_window(running_machine *machine)
 	for (regsubview = registers_view_get_subview_list(info->view[1].view); regsubview != NULL; regsubview = regsubview->next)
 	{
 		UINT32 regchars;
-		
+
 		// set the view and fetch the width
 		registers_view_set_subview(info->view[1].view, regsubview->index);
 		regchars = debug_view_get_total_size(info->view[1].view).x;
-		
+
 		// track the maximum
 		main_console_regwidth = MAX(regchars, main_console_regwidth);
 	}
-	
+
 	// determine the width of the console (this is fixed)
 	conchars = debug_view_get_total_size(info->view[2].view).x;
 
@@ -2394,7 +2394,7 @@ void console_create_window(running_machine *machine)
 		// set the view and fetch the width
 		disasm_view_set_subview(info->view[0].view, dasmsubview->index);
 		dischars = debug_view_get_total_size(info->view[0].view).x;
-		
+
 		// compute the preferred width
 		minwidth = EDGE_WIDTH + main_console_regwidth * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + 100 + EDGE_WIDTH;
 		maxwidth = EDGE_WIDTH + main_console_regwidth * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + MAX(dischars, conchars) * debug_font_width + vscroll_width + EDGE_WIDTH;
@@ -2548,7 +2548,7 @@ static void console_set_cpu(const device_config *device)
 		if (strcmp(title, curtitle) != 0)
 			win_set_window_text_utf8(main_console->wnd, title);
 	}
-	
+
 	// and recompute the children
 	console_recompute_children(main_console);
 }

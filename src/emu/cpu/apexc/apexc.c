@@ -868,7 +868,7 @@ static CPU_SET_INFO( apexc )
 CPU_GET_INFO( apexc )
 {
 	apexc_state *cpustate = (device != NULL) ? device->token : NULL;
-	
+
 	switch (state)
 	{
 	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(apexc_state);			break;

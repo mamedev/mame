@@ -244,7 +244,7 @@ INLINE attotime ticks_to_attotime(UINT64 ticks, UINT32 frequency)
 {
 	attoseconds_t attos_per_tick = HZ_TO_ATTOSECONDS(frequency);
 	attotime result;
-	
+
 	if (ticks < frequency)
 	{
 		result.seconds = 0;

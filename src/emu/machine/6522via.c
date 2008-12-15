@@ -943,7 +943,7 @@ WRITE8_DEVICE_HANDLER(via_w)
 
 /*-------------------------------------------------
     via_porta_w - interface setting VIA port
-	A input
+    A input
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER(via_porta_w)
@@ -957,7 +957,7 @@ WRITE8_DEVICE_HANDLER(via_porta_w)
 
 /*-------------------------------------------------
     via_ca1_r - interface retrieving VIA port
-	CA1 input
+    CA1 input
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER(via_ca1_r)
@@ -969,7 +969,7 @@ READ8_DEVICE_HANDLER(via_ca1_r)
 
 /*-------------------------------------------------
     via_ca1_w - interface setting VIA port
-	CA1 input
+    CA1 input
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER(via_ca1_w)
@@ -1023,7 +1023,7 @@ WRITE8_DEVICE_HANDLER(via_ca1_w)
 
 /*-------------------------------------------------
     via_ca2_r - interface retrieving VIA port
-	CA2 input
+    CA2 input
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER(via_ca2_r)
@@ -1035,7 +1035,7 @@ READ8_DEVICE_HANDLER(via_ca2_r)
 
 /*-------------------------------------------------
     via_ca2_w - interface setting VIA port
-	CA2 input
+    CA2 input
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER(via_ca2_w)
@@ -1068,7 +1068,7 @@ WRITE8_DEVICE_HANDLER(via_ca2_w)
 
 /*-------------------------------------------------
     via_portb_r - interface retrieving VIA port
-	B input
+    B input
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER(via_portb_r)
@@ -1080,7 +1080,7 @@ READ8_DEVICE_HANDLER(via_portb_r)
 
 /*-------------------------------------------------
     via_portb_w - interface setting VIA port
-	B input
+    B input
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER(via_portb_w)
@@ -1094,7 +1094,7 @@ WRITE8_DEVICE_HANDLER(via_portb_w)
 
 /*-------------------------------------------------
     via_cb1_r - interface retrieving VIA port
-	CB1 input
+    CB1 input
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER(via_cb1_r)
@@ -1106,7 +1106,7 @@ READ8_DEVICE_HANDLER(via_cb1_r)
 
 /*-------------------------------------------------
     via_cb1_w - interface setting VIA port
-	CB1 input
+    CB1 input
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER(via_cb1_w)
@@ -1158,7 +1158,7 @@ WRITE8_DEVICE_HANDLER(via_cb1_w)
 
 /*-------------------------------------------------
     via_cb2_r - interface retrieving VIA port
-	CB2 input
+    CB2 input
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER(via_cb2_r)
@@ -1170,7 +1170,7 @@ READ8_DEVICE_HANDLER(via_cb2_r)
 
 /*-------------------------------------------------
     via_cb2_w - interface setting VIA port
-	CB2 input
+    CB2 input
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER(via_cb2_w)

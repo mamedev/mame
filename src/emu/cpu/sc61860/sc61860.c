@@ -62,7 +62,7 @@ struct _sc61860_state
 UINT8 *sc61860_internal_ram(const device_config *device)
 {
 	sc61860_state *cpustate = device->token;
-	return cpustate->ram; 
+	return cpustate->ram;
 }
 
 static TIMER_CALLBACK(sc61860_2ms_tick)

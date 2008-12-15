@@ -1731,10 +1731,10 @@ static void handle_save(running_machine *machine)
 	{
 		astring *fullname = astring_dupc(mame_file_full_name(file));
 		state_save_error staterr;
-		
+
 		/* write the save state */
 		staterr = state_save_write_file(machine, file);
-		
+
 		/* handle the result */
 		switch (staterr)
 		{
@@ -1745,14 +1745,14 @@ static void handle_save(running_machine *machine)
 			case STATERR_WRITE_ERROR:
 				popmessage("Error: Unable to save state due to a write error. Verify there is enough disk space.");
 				break;
-			
+
 			case STATERR_NONE:
 				if (!(machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
 					popmessage("State successfully saved.\nWarning: Save states are not officially supported for this game.");
 				else
 					popmessage("State successfully saved.");
 				break;
-			
+
 			default:
 				popmessage("Error: Unknwon error during state save.");
 				break;
@@ -1811,10 +1811,10 @@ static void handle_load(running_machine *machine)
 	if (filerr == FILERR_NONE)
 	{
 		state_save_error staterr;
-		
+
 		/* write the save state */
 		staterr = state_save_read_file(machine, file);
-		
+
 		/* handle the result */
 		switch (staterr)
 		{
@@ -1825,18 +1825,18 @@ static void handle_load(running_machine *machine)
 			case STATERR_INVALID_HEADER:
 				popmessage("Error: Unable to load state due to an invalid header. Make sure the save state is correct for this game.");
 				break;
-			
+
 			case STATERR_READ_ERROR:
 				popmessage("Error: Unable to load state due to a read error (file is likely corrupt).");
 				break;
-			
+
 			case STATERR_NONE:
 				if (!(machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
 					popmessage("State successfully loaded.\nWarning: Save states are not officially supported for this game.");
 				else
 					popmessage("State successfully loaded.");
 				break;
-			
+
 			default:
 				popmessage("Error: Unknwon error during state load.");
 				break;

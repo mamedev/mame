@@ -241,14 +241,14 @@ static WRITE16_HANDLER( write1_w )
 	output_set_lamp_value(5, (data >> 4) & 1);		/* Lamp 5 - HOLD 5 */
 	output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
 
-//	popmessage("%04x %04x",t1,t3);
+//  popmessage("%04x %04x",t1,t3);
 }
 
 static WRITE16_HANDLER( write2_w )
 {
 	static int i;
 
-//	popmessage("%04x",data);
+//  popmessage("%04x",data);
 
 	for(i=0;i<4;i++)
 	{
@@ -262,7 +262,7 @@ static WRITE16_HANDLER( fashion_write2_w )
 {
 	static int i;
 
-//	popmessage("%04x",data);
+//  popmessage("%04x",data);
 
 	for(i=0;i<4;i++)
 	{
@@ -274,7 +274,7 @@ static WRITE16_HANDLER( fashion_write2_w )
 static WRITE16_HANDLER( write3_w )
 {
 	t3 = data;
-// 	popmessage("%04x %04x",t1,t3);
+//  popmessage("%04x %04x",t1,t3);
 }
 
 static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
