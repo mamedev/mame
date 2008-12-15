@@ -841,6 +841,67 @@ ROM_END
 
 /*
 
+Anno	199x
+Produttore	IGS
+N.revisione
+
+CPU
+
+1x Z0840006PSC (main)
+2x D8255AC
+1x unknown AMT001
+1x unknown IGS002
+1x UM3567 (sound)
+1x oscillator 12.000MHz
+1x oscillator 3.579645
+
+ROMs
+
+2x D27128A (1,3)
+1x MBM27128 (2)
+3x 27C010 (4,5,6)
+1x D27512 (7sv)
+1x MBM27C512 (v110)
+1x unknown (DIP20 mil300)(jack3)
+3x PEEL18CV8PC (read protected)
+1x TIBPAL16L8 (read protected)
+
+Note
+
+1x 36x2 edge connector
+1x 10x2 edge connector (payout system)
+1x trimmer (volume)
+1x pushbutton
+1x battery
+5x 8x2 switches dip
+
+*/
+ROM_START( jackie )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "jackiev110.u23",   0x0000, 0x10000, CRC(1b78a619) SHA1(a6eb6b6e544efa55225f2e947483614afb6ece3b) )
+
+	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "6.u6",  0x00000, 0x20000, CRC(d2ed60a9) SHA1(40e2280384aa5c9e72e87a3b9e673172ff695676) )
+	ROM_LOAD( "5.u5",  0x20000, 0x20000, CRC(dc01fe7c) SHA1(683834ce2f13a923c0467209b93fef693d9c3e38) )
+	ROM_LOAD( "4.u4",  0x40000, 0x20000, CRC(38a42dcd) SHA1(8cc08ff4143281d9022210d6577146d725df9044) )
+
+	ROM_REGION( 0x30000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "3.u3",  0x00000, 0x4000, CRC(c69e962b) SHA1(492427ad1ac959cdf22d23439e0eb5932b60ec88) )
+	ROM_LOAD( "2.u2",  0x10000, 0x4000, CRC(8900ffba) SHA1(065cf1810ec9738718e4c94613f726e85ba4314d) )
+	ROM_LOAD( "1.u1",  0x20000, 0x4000, CRC(071d20f0) SHA1(77c87486803dccaa63732ff959c223b1313820e3) )
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "jackie7sv.u22",   0x0000, 0x10000, CRC(8b4eb6da) SHA1(480784917dfaf9a0343c1d56eb590b32bf5e94fd) )
+
+	ROM_REGION( 0x10000, "misc", 0 )
+	ROM_LOAD( "16l8.u31",   0x0000, 0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "18cv8.u14",  0x0000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
+	ROM_LOAD( "18cv8.u8",   0x0000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
+	ROM_LOAD( "18cv8.u9",   0x0000, 0x155, BAD_DUMP CRC(996e8f59) SHA1(630d9b91f6e8eda781061e2a8ff6fb0fecaf034c) )
+ROM_END
+
+/*
+
 Stelle e Cubi
 
 -- most of the roms on this seem to be the wrong size / missing data
@@ -944,6 +1005,53 @@ static DRIVER_INIT( cska )
 	}
 }
 
+static DRIVER_INIT( jackie )
+{
+
+	int A;
+	UINT8 *rom = memory_region(machine, "main");
+
+	for (A = 0;A < 0x10000;A++)
+	{
+		rom[A] = rom[A] ^ 0x21;
+
+		if (((A & 0x0080) == 0x0000) && ((A & 0x0008) == 0x0000))
+			rom[A] = rom[A] ^ 0x20;
+
+
+		// there are      00 00 01 01 00 00 01 01 00 00 01 01 patterns
+		// and additional 02 02 02 02 02 02 02 02 02 02 02 02 overlays
+		//
+		// e.g 1f80
+		//     CB80
+		//     CE80
+		//     CF80
+		//     D080
+		//     DF80
+
+		// taken from cpoker, is it right?
+
+
+		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
+		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
+	}
+
+
+
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"igs_%s.decrypted", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(rom, 0x10000, 1, fp);
+			fclose(fp);
+		}
+	}
+
+}
+
 /*
 
 1x ZILOG Z0840006PSC-Z80CPU (main)
@@ -1005,5 +1113,6 @@ GAME( 1993?, cpoker,   0,        cpoker,   cpoker, cpoker,  ROT0, "IGS",    "Cha
 GAME( 1993?, cpokert,  cpoker,   cpoker,   cpoker, cpokert, ROT0, "Tuning", "Champion Poker (v200G)",                    0 )
 GAME( 198?,  csk227it, 0,        csk227it, csk227, cska,    ROT0, "IGS",    "Champion Skill (with Ability)",             0 ) /* SU 062 */
 GAME( 198?,  csk234it, csk227it, csk234it, csk234, cska,    ROT0, "IGS",    "Champion Skill (Ability, Poker & Symbols)", 0 ) /* SU 062 */
+GAME( 199?,  jackie,   0,        cpoker,   cpoker, jackie,  ROT0, "IGS",    "Jackie (v110U)",                    GAME_NOT_WORKING )
 
 GAME( 1998, stellecu, 0,        csk234it, csk234, 0,       ROT0, "Sure",   "Stelle e Cubi (Italy)",                     GAME_NOT_WORKING )
