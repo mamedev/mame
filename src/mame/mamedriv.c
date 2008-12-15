@@ -8089,6 +8089,7 @@ Other Sun games
 	DRIVER( jolyccra )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolyccrb )	/* (c) 1993 Soft Design */
 	DRIVER( jolycdit )	/* 199? bootleg */
+	DRIVER( jolycdib )	/* 1990 bootleg */
 	DRIVER( sjcd2kx3 )	/* (c) 1985 M.P.*/
 	DRIVER( jolycdab )	/* (c) 1986 Inter Games */
 	DRIVER( bigdeal )	/* (c) 1986 Funworld */

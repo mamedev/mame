@@ -7,8 +7,7 @@
     Rewrite and aditional work:     Roberto Fresca.
 
 
-
-    Games running in this hardware:
+    Games running on this hardware:
 
     * Jolly Card (austrian),                            TAB-Austria,        1985.
     * Jolly Card (3x3 deal),                            TAB-Austria,        1985.
@@ -17,6 +16,7 @@
     * Jolly Card (croatian, set 1),                     TAB-Austria,        1985.
     * Jolly Card (croatian, set 2),                     Soft Design,        1993.
     * Jolly Card (italian, blue TAB board, encrypted),  bootleg,            199?.
+    * Jolly Card (italian, encrypted bootleg),          bootleg,            1990.
     * Super Joly 2000 - 3x,                             M.P.                1985.
     * Jolly Card (austrian, Funworld, bootleg),         Inter Games,        1986.
     * Big Deal (hungarian, set 1),                      Funworld,           1986.
@@ -458,6 +458,23 @@
     - 1x 18x2 edge connector
     - 1x trimmer (volume)(missing)
 
+
+    Jolly Card (italian encrypted bootleg)
+    --------------------------------------
+
+    - 1x UM6845P
+    - 1x R65C02P3 (main CPU)
+    - 1x AY-3-8910 (sound)
+    - 2x MC68B21P
+    - 1x oscillator 16.000 MHz
+    - ROMs  3x 27256.
+    - 1x PROM M1-7649-5 (not dumped)
+    - 2x PLD HY18CV8S (not dumped)
+    - 1x PAL16L8ACN (not dumped)
+    - 1x 22x2 edge connector
+    - 1x 18x2 edge connector
+    - 1x trimmer (volume)
+    - 1x 8x2 DIP switches.
 
 
     Big Deal (hungarian)
@@ -976,6 +993,13 @@
     - Renamed the sets magiccrd, magiccda and magiccdb, to magicrd2, magicd2a and magicd2b.
     - Updated technical notes.
 
+    [2008/12/15]
+    - Added new set: Jolly Card (italian, encrypted bootleg).
+      No coins... Only remote credits. After nvram init, set the Payout DIP to 'manual'
+      to allow the remote credits mode to work.
+    - Created inputs from the scratch for jolycdib.
+    - Updated technical notes.
+
 
     *** TO DO ***
 
@@ -1306,6 +1330,67 @@ static INPUT_PORTS_START( jolycdit )
 	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, "Auto Hold" )
 	PORT_DIPSETTING(    0x40, "No Auto Hold" )
+
+	/* after nvram init, set the following one to 'manual'
+    to allow the remote credits mode to work */
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jolycdib )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Remote") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_NAME("Stop (Hold) 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )	PORT_NAME("Cancel / Autohold / Accredito (Take)") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )		PORT_NAME("Start / Doppio (Double)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_NAME("Stop (Hold) 5 / Bet / Half Gamble") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )	PORT_NAME("Stop (Hold) 4 / Alta (High)") PORT_CODE(KEYCODE_V)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_NAME("Stop (Hold) 2 / Bassa (Low)") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_NAME("Stop (Hold) 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test1") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test2") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test3") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test4") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test5") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test6") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test7") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test8") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test9") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test10") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("test11") PORT_CODE(KEYCODE_R)
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Remote" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
+	PORT_DIPSETTING(    0x02, "100 Points/Pulse" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )	/* also enable Five of a Kind */
+	PORT_DIPSETTING(    0x20, "Without Joker" )
+	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	/* when is ON, allow the player to activate/deactivate the autohold through CANCEL button */
 
 	/* after nvram init, set the following one to 'manual'
     to allow the remote credits mode to work */
@@ -2057,9 +2142,33 @@ ROM_START( jolyccrb )	/* Jolly Card (croatian, set 2) */
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
-ROM_START( jolycdit )	/* encrypted graphics */
+ROM_START( jolycdit )	/* blue TAB PCB, encrypted graphics */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "jn.bin", 0x8000, 0x8000, CRC(6ae00ed0) SHA1(5921c2882aeb5eadd0e04a477fa505ad35e9d98c) )
+
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(46805150) SHA1(63687ac44f6ace6d8924b2629536bcc7d3979ed2) )
+	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(43bcb2df) SHA1(5022bc3a0b852a7cd433e25c3c90a720e6328261) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "gal16v8b.bin", 0x0000, 0x0117, CRC(3ad712b1) SHA1(54214841fb178e4b59bf6051522718f7667bad28) )
+ROM_END
+
+/* jolycdit vs jolycdib:
+
+1.BIN                   1.BIN                   IDENTICAL
+2.BIN                   2.bin                   IDENTICAL
+jn.BIN                  3.BIN                   97.726440%
+
+jolycdib program seems to be the original for blue TAB PCB.
+jolycdit has some code patches and redirected parts to suspicious offsets (as d500, d000, etc)
+*/
+ROM_START( jolycdib )	/* bootleg PCB, encrypted graphics */
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "3.bin", 0x8000, 0x8000, CRC(c76fdc79) SHA1(fc75c274d64fa9c99a546d424f38e79f1acf2576) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(46805150) SHA1(63687ac44f6ace6d8924b2629536bcc7d3979ed2) )
@@ -2816,6 +2925,7 @@ GAME( 1998, jolycdev, jollycrd, funworld, funworld, funworld, ROT0, "TAB/Evona",
 GAME( 1985, jolyccra, jollycrd, cuoreuno, jolycdcr, funworld, ROT0, "TAB-Austria",     "Jolly Card (croatian, set 1)",                    0 )
 GAME( 1993, jolyccrb, jollycrd, cuoreuno, jolycdcr, funworld, ROT0, "Soft Design",     "Jolly Card (croatian, set 2)",                    0 )
 GAME( 199?, jolycdit, jollycrd, cuoreuno, jolycdit, tabblue,  ROT0, "bootleg",         "Jolly Card (italian, blue TAB board, encrypted)", 0 )
+GAME( 1990, jolycdib, jollycrd, cuoreuno, jolycdib, tabblue,  ROT0, "bootleg",         "Jolly Card (italian, encrypted bootleg)",         0 )	/* not a real TAB blue PCB */
 GAME( 1985, sjcd2kx3, jollycrd, funworld, funworld, funworld, ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0 )
 GAME( 1986, jolycdab, jollycrd, funworld, funworld, funworld, ROT0, "Inter Games",     "Jolly Card (austrian, Funworld, bootleg)",        GAME_NOT_WORKING )
 GAME( 1986, bigdeal,  0,        funworld, bigdeal,  funworld, ROT0, "Funworld",        "Big Deal (hungarian, set 1)",                     GAME_IMPERFECT_COLORS )
