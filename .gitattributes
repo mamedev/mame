@@ -2514,6 +2514,7 @@ src/mame/layout/geebee.lay svneol=native#text/plain
 src/mame/layout/gldncrwn.lay svneol=native#text/plain
 src/mame/layout/goldnpkr.lay svneol=native#text/plain
 src/mame/layout/gorf.lay svneol=native#text/plain
+src/mame/layout/gridiron.lay svneol=native#text/plain
 src/mame/layout/gypsyjug.lay svneol=native#text/plain
 src/mame/layout/invad2ct.lay svneol=native#text/plain
 src/mame/layout/invaders.lay svneol=native#text/plain

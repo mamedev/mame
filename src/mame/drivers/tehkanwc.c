@@ -2,11 +2,7 @@
 
   fixed gridiron079gre (shared access to spriteram was broken)
 
-  This driver is antiquated.. the LED drawing in the video file is one giant
-  hack, we should change it to use the artwork system, not hack it to draw
-  characters from the gfx roms onscreen..
-
-  The inputs also seem to be a hacky mess (although there was reportedly a
+  The inputs seem to be a hacky mess (although there was reportedly a
   hardware joystick hack for tehkanwc via plugin logic subboard, is this
   attempting to simulate it?
 
@@ -28,8 +24,6 @@ robbiex@rocketmail.com
 TODO:
 - dip switches and input ports for Gridiron and Tee'd Off
 
-NOTES:
-- Samples MUST be on Memory Region 4
 
 Additional notes (Steph 2002.01.14)
 
@@ -98,7 +92,7 @@ TO DO :
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-
+#include "gridiron.lh"
 
 extern UINT8 *tehkanwc_videoram2;
 
@@ -900,5 +894,5 @@ ROM_END
 
 GAME( 1985, tehkanwc, 0,        tehkanwc, tehkanwc, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 1)", 0 )
 GAME( 1985, tehkanwb, tehkanwc, tehkanwc, tehkanwc, 0,        ROT0,  "Tehkan", "Tehkan World Cup (set 2, bootleg?)", 0 )
-GAME( 1985, gridiron, 0,        tehkanwc, gridiron, 0,        ROT0,  "Tehkan", "Gridiron Fight", 0 )
+GAMEL( 1985, gridiron, 0,        tehkanwc, gridiron, 0,        ROT0,  "Tehkan", "Gridiron Fight", 0, layout_gridiron )
 GAME( 1986, teedoff,  0,        tehkanwc, teedoff,  teedoff,  ROT90, "Tecmo", "Tee'd Off (Japan)", 0 )

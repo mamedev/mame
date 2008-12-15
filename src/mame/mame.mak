@@ -1805,6 +1805,8 @@ $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 
 $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
 
+$(DRIVERS)/tehkanwc.o:	$(LAYOUT)/gridiron.lh
+
 $(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
 
 $(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh

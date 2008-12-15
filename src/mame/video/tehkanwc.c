@@ -103,8 +103,6 @@ VIDEO_START( tehkanwc )
 /*
    Gridiron Fight has a LED display on the control panel, to let each player
    choose the formation without letting the other know.
-   We emulate it by showing a character on the corner of the screen; the
-   association between the bits of the port and the led segments is:
 
     ---0---
    |       |
@@ -121,38 +119,10 @@ VIDEO_START( tehkanwc )
 
 static void gridiron_draw_led(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 led,int player)
 {
-	int i;
-
-
-	static const UINT8 ledvalues[] =
-			{ 0x86, 0xdb, 0xcf, 0xe6, 0xed, 0xfd, 0x87, 0xff, 0xf3, 0xf1 };
-
-
-	if ((led & 0x80) == 0) return;
-
-	for (i = 0;i < 10;i++)
-	{
-		if (led == ledvalues[i] ) break;
-	}
-
-	if (i < 10)
-	{
-		if (player == 0)
-			drawgfx(bitmap,machine->gfx[0],
-					0xc0 + i,
-					0x0a,
-					0,0,
-					0,232,
-					cliprect,TRANSPARENCY_NONE,0);
+	if (led&0x80)
+		output_set_digit_value(player, led&0x7f);
 		else
-			drawgfx(bitmap,machine->gfx[0],
-					0xc0 + i,
-					0x03,
-					1,1,
-					0,16,
-					cliprect,TRANSPARENCY_NONE,0);
-	}
-else logerror("unknown LED %02x for player %d\n",led,player);
+		output_set_digit_value(player, 0x00);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
