@@ -271,7 +271,7 @@ static MACHINE_RESET( gladiator )
 	{
 		UINT8 *rom = memory_region(machine, "audio") + 0x10000;
 		memory_set_bankptr(machine, 2,rom);
-		cpu_reset(machine->cpu[2]);
+		device_reset(machine->cpu[2]);
 	}
 }
 

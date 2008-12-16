@@ -65,27 +65,27 @@ CPU_DISASSEMBLE( i8085 );
 
 INLINE void i8085_set_sod_callback(const device_config *device, i8085_sod_func callback)
 {
-	cpu_set_info_fct(device, CPUINFO_PTR_I8085_SOD_CALLBACK, (genf *)callback);
+	device_set_info_fct(device, CPUINFO_PTR_I8085_SOD_CALLBACK, (genf *)callback);
 }
 
 INLINE void i8085_set_sid_callback(const device_config *device, i8085_sid_func callback)
 {
-	cpu_set_info_fct(device, CPUINFO_PTR_I8085_SID_CALLBACK, (genf *)callback);
+	device_set_info_fct(device, CPUINFO_PTR_I8085_SID_CALLBACK, (genf *)callback);
 }
 
 INLINE void i8085_set_inte_callback(const device_config *device, i8085_inte_func callback)
 {
-	cpu_set_info_fct(device, CPUINFO_PTR_I8085_INTE_CALLBACK, (genf *)callback);
+	device_set_info_fct(device, CPUINFO_PTR_I8085_INTE_CALLBACK, (genf *)callback);
 }
 
 INLINE void i8085_set_status_callback(const device_config *device, i8085_status_func callback)
 {
-	cpu_set_info_fct(device, CPUINFO_PTR_I8085_STATUS_CALLBACK, (genf *)callback);
+	device_set_info_fct(device, CPUINFO_PTR_I8085_STATUS_CALLBACK, (genf *)callback);
 }
 
 INLINE void i8085_set_sid(const device_config *device, int sid)
 {
-	cpu_set_info_int(device, CPUINFO_INT_I8085_SID, sid);
+	device_set_info_int(device, CPUINFO_INT_I8085_SID, sid);
 }
 
 #endif

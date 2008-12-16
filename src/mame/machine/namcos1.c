@@ -873,7 +873,7 @@ MACHINE_RESET( namcos1 )
 	namcos1_bankswitch(machine, 1, 0x0e01, 0xff);
 
 	/* reset Cpu 0 and stop all other CPUs */
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);

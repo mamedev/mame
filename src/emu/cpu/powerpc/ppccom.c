@@ -1714,7 +1714,7 @@ updateirq:
 
 static READ8_HANDLER( ppc4xx_spu_r )
 {
-	powerpc_state *ppc = cpu_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = device_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
 	UINT8 result = 0xff;
 
 	switch (offset)
@@ -1741,7 +1741,7 @@ static READ8_HANDLER( ppc4xx_spu_r )
 
 static WRITE8_HANDLER( ppc4xx_spu_w )
 {
-	powerpc_state *ppc = cpu_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = device_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)

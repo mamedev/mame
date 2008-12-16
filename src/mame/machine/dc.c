@@ -237,7 +237,7 @@ int level;
 	}
 
 	level=dc_compute_interrupt_level(machine);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH4_IRLn_INPUT, 15-level);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH4_IRLn_INPUT, 15-level);
 }
 
 READ64_HANDLER( dc_sysctrl_r )
@@ -279,7 +279,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			ddtdata.direction=0;
 			ddtdata.channel=2;
 			ddtdata.mode=25; //011001
-			cpu_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+			device_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 			#if DEBUG_SYSCTRL
 			if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
 				if (dc_sysctrl_regs[SB_LMMODE0])
@@ -386,7 +386,7 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.direction=0;	// 0 source to buffer, 1 buffer to source
 					ddtdata.channel= -1;	// not used
 					ddtdata.mode= -1;		// copy from/to buffer
-					cpu_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
+					device_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
 
 					maple_regs[reg] = 0;
 					endflag=buff[0] & 0x80000000;
@@ -418,7 +418,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								cpu_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+								device_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 								chk=0;
 								for (a=1;a < length;a++)
 								{
@@ -446,7 +446,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								cpu_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+								device_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 
 								subcommand = buff[0] & 0xff;
 								#if DEBUG_MAPLE
@@ -656,7 +656,7 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.destination=destination;
 					ddtdata.buffer=buff;
 					ddtdata.direction=1;
-					cpu_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+					device_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 
 					if (endflag)
 					{
@@ -773,7 +773,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			ddtdata.channel= -1;	// not used
 			ddtdata.mode= -1;		// copy from/to buffer
  			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dmaoffset, g1bus_regs[SB_GDSTAR]);
-			cpu_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
+			device_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
 			g1bus_regs[SB_GDST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 		}

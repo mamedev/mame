@@ -36,129 +36,8 @@
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-static char temp_string_pool[TEMP_STRING_POOL_ENTRIES][MAX_STRING_LENGTH];
-static int temp_string_pool_index;
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    get_temp_string_buffer - return a pointer to
-    a temporary string buffer
--------------------------------------------------*/
-
-INLINE char *get_temp_string_buffer(void)
-{
-	char *string = &temp_string_pool[temp_string_pool_index++ % TEMP_STRING_POOL_ENTRIES][0];
-	string[0] = 0;
-	return string;
-}
-
-
-
-/***************************************************************************
-    GLOBAL MANAGEMENT
-***************************************************************************/
-
-/*-------------------------------------------------
-    cpuintrf_init - initialize global structures
--------------------------------------------------*/
-
-void cpuintrf_init(running_machine *machine)
-{
-}
-
-
-
-/***************************************************************************
     LIVE CPU ACCESSORS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    cpu_get_info_* - return information about a
-    live CPU
--------------------------------------------------*/
-
-INT64 cpu_get_info_int(const device_config *device, UINT32 state)
-{
-	const cpu_config *config = device->inline_config;
-	cpuinfo info;
-
-	info.i = 0;
-	(*config->type)(device, state, &info);
-	return info.i;
-}
-
-void *cpu_get_info_ptr(const device_config *device, UINT32 state)
-{
-	const cpu_config *config = device->inline_config;
-	cpuinfo info;
-
-	info.p = NULL;
-	(*config->type)(device, state, &info);
-	return info.p;
-}
-
-genf *cpu_get_info_fct(const device_config *device, UINT32 state)
-{
-	const cpu_config *config = device->inline_config;
-	cpuinfo info;
-
-	info.f = NULL;
-	(*config->type)(device, state, &info);
-	return info.f;
-}
-
-const char *cpu_get_info_string(const device_config *device, UINT32 state)
-{
-	const cpu_config *config = device->inline_config;
-	cpuinfo info;
-
-	info.s = get_temp_string_buffer();
-	(*config->type)(device, state, &info);
-	return info.s;
-}
-
-
-/*-------------------------------------------------
-    cpu_set_info_* - set information about a
-    live CPU
--------------------------------------------------*/
-
-void cpu_set_info_int(const device_config *device, UINT32 state, INT64 data)
-{
-	cpu_class_header *classheader = cpu_get_class_header(device);
-	cpuinfo info;
-
-	info.i = data;
-	(*classheader->set_info)(device, state, &info);
-}
-
-void cpu_set_info_ptr(const device_config *device, UINT32 state, void *data)
-{
-	cpu_class_header *classheader = cpu_get_class_header(device);
-	cpuinfo info;
-
-	info.p = data;
-	(*classheader->set_info)(device, state, &info);
-}
-
-void cpu_set_info_fct(const device_config *device, UINT32 state, genf *data)
-{
-	cpu_class_header *classheader = cpu_get_class_header(device);
-	cpuinfo info;
-
-	info.f = data;
-	(*classheader->set_info)(device, state, &info);
-}
-
-
 
 /*-------------------------------------------------
     cpu_get_physical_pc_byte - return the PC,
@@ -171,7 +50,7 @@ offs_t cpu_get_physical_pc_byte(const device_config *device)
 	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	offs_t pc;
 
-	pc = memory_address_to_byte(space, cpu_get_info_int(device, CPUINFO_INT_PC));
+	pc = memory_address_to_byte(space, device_get_info_int(device, CPUINFO_INT_PC));
 	memory_address_physical(space, TRANSLATE_FETCH, &pc);
 	return pc;
 }
@@ -250,64 +129,13 @@ void cpu_set_dasm_override(const device_config *device, cpu_disassemble_func das
 
 
 /***************************************************************************
-    CPU TYPE ACCESSORS
-***************************************************************************/
-
-/*-------------------------------------------------
-    cputype_get_info_* - return information about a
-    given CPU type
--------------------------------------------------*/
-
-INT64 cputype_get_info_int(cpu_type cputype, UINT32 state)
-{
-	cpuinfo info;
-
-	assert(cputype != NULL);
-	info.i = 0;
-	(*cputype)(NULL, state, &info);
-	return info.i;
-}
-
-void *cputype_get_info_ptr(cpu_type cputype, UINT32 state)
-{
-	cpuinfo info;
-
-	assert(cputype != NULL);
-	info.p = NULL;
-	(*cputype)(NULL, state, &info);
-	return info.p;
-}
-
-genf *cputype_get_info_fct(cpu_type cputype, UINT32 state)
-{
-	cpuinfo info;
-
-	assert(cputype != NULL);
-	info.f = NULL;
-	(*cputype)(NULL, state, &info);
-	return info.f;
-}
-
-const char *cputype_get_info_string(cpu_type cputype, UINT32 state)
-{
-	cpuinfo info;
-
-	assert(cputype != NULL);
-	info.s = get_temp_string_buffer();
-	(*cputype)(NULL, state, &info);
-	return info.s;
-}
-
-
-
-/***************************************************************************
     DUMMY CPU DEFINITION
 ***************************************************************************/
 
 typedef struct _dummy_context dummy_context;
 struct _dummy_context
 {
-	UINT32		icount;
+	int		icount;
 };
 
 static CPU_INIT( dummy ) { }

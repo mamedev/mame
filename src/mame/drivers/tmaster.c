@@ -832,7 +832,7 @@ static MACHINE_RESET( galgames )
 	memory_set_bank(machine, 2, 0);	// ram
 	memory_set_bank(machine, 4, 0);	// ram
 
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 }
 
 static MACHINE_DRIVER_START( galgames )

@@ -681,7 +681,7 @@ static MACHINE_RESET( itech8 )
 	if (main_cpu_type == CPU_M6809 || main_cpu_type == CPU_HD6309)
 	{
 		memory_set_bankptr(machine, 1, &memory_region(machine, "main")[0x4000]);
-		cpu_reset(machine->cpu[0]);
+		device_reset(machine->cpu[0]);
 	}
 
 	/* reset the PIA (if used) */

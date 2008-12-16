@@ -725,7 +725,7 @@ static DRIVER_INIT( cps3 )
 	int i;
 
 	// set strict verify
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
 
 	cps3_key1 = -1;
 	cps3_key2 = -1;

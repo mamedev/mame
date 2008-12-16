@@ -33,7 +33,7 @@ CPU_DISASSEMBLE( konami );
 
 INLINE void konami_configure_set_lines(const device_config *device, konami_set_lines_func func)
 {
-	cpu_set_info_fct(device, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)func);
+	device_set_info_fct(device, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)func);
 }
 
 #endif /* __KONAMI_H__ */

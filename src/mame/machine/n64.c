@@ -465,13 +465,13 @@ WRITE32_HANDLER( n64_sp_reg_w )
         {
             case 0x00/4:        // SP_PC_REG
                 //printf( "Setting PC to: %08x\n", 0x04001000 | (data & 0xfff ) );
-                if( cpu_get_info_int(space->machine->cpu[1], CPUINFO_INT_REGISTER + RSP_NEXTPC) != 0xffffffff )
+                if( device_get_info_int(space->machine->cpu[1], CPUINFO_INT_REGISTER + RSP_NEXTPC) != 0xffffffff )
                 {
-                    cpu_set_info_int(space->machine->cpu[1], CPUINFO_INT_REGISTER + RSP_NEXTPC, 0x04001000 | (data & 0xfff));
+                    device_set_info_int(space->machine->cpu[1], CPUINFO_INT_REGISTER + RSP_NEXTPC, 0x04001000 | (data & 0xfff));
                 }
                 else
                 {
-                    cpu_set_info_int(space->machine->cpu[1], CPUINFO_INT_REGISTER + RSP_PC, 0x04001000 | (data & 0xfff));
+                    device_set_info_int(space->machine->cpu[1], CPUINFO_INT_REGISTER + RSP_PC, 0x04001000 | (data & 0xfff));
                 }
                 break;
 
@@ -1628,14 +1628,14 @@ void n64_machine_reset(running_machine *machine)
 
 	cic_status = 0;
 
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 		/* configure fast RAM regions for DRC */
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x007fffff);
-	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rdram);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x007fffff);
+	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rdram);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
 	audio_timer = timer_alloc(machine, audio_timer_callback, NULL);
 	timer_adjust_oneshot(audio_timer, attotime_never, 0);

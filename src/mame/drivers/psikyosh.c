@@ -1139,13 +1139,13 @@ ROM_END
 
 static DRIVER_INIT( soldivid )
 {
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_0;
 }
 
 static DRIVER_INIT( s1945ii )
 {
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
@@ -1153,13 +1153,13 @@ static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DARAKU;
 }
 
 static DRIVER_INIT( sbomberb )
 {
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
@@ -1167,7 +1167,7 @@ static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
@@ -1175,25 +1175,25 @@ static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_S1945III;
 }
 
 static DRIVER_INIT( dragnblz )
 {
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DRAGNBLZ;
 }
 
 static DRIVER_INIT( gnbarich )
 {
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_GNBARICH;
 }
 
 static DRIVER_INIT( mjgtaste )
 {
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }

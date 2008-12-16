@@ -617,7 +617,7 @@ static IRQ_CALLBACK( int_callback )
 	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time(device->machine)), i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
+	device_set_info_int(device, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
 	i80186.intr.pending = 0;
 
 	/* clear the request and set the in-service bit */

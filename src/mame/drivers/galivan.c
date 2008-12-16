@@ -53,7 +53,7 @@ static MACHINE_RESET( galivan )
 	UINT8 *RAM = memory_region(machine, "main");
 
 	memory_set_bankptr(machine, 1,&RAM[0x10000]);
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 //  layers = 0x60;
 }
 

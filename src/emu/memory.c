@@ -760,7 +760,7 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 	memset(map, 0, sizeof(*map));
 
 	/* append the internal CPU map (first so it takes priority) */
-	internal_map = (const addrmap_token *)cputype_get_info_ptr(cpuconfig->type, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
+	internal_map = (const addrmap_token *)device_get_info_ptr(device, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
 	if (internal_map != NULL)
 		map_detokenize(map, driver, device->tag, internal_map);
 

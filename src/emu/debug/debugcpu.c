@@ -206,9 +206,9 @@ void debug_cpu_init(running_machine *machine)
 		info->opwidth = cpu_get_min_opcode_bytes(info->device);
 
 		/* fetch the memory accessors */
-		info->read = (cpu_read_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READ);
-		info->write = (cpu_write_func)cpu_get_info_fct(info->device, CPUINFO_PTR_WRITE);
-		info->readop = (cpu_readop_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READOP);
+		info->read = (cpu_read_func)device_get_info_fct(info->device, CPUINFO_PTR_READ);
+		info->write = (cpu_write_func)device_get_info_fct(info->device, CPUINFO_PTR_WRITE);
+		info->readop = (cpu_readop_func)device_get_info_fct(info->device, CPUINFO_PTR_READOP);
 
 		/* allocate a symbol table */
 		info->symtable = symtable_alloc(global->symtable, (void *)cpu);

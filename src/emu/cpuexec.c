@@ -384,15 +384,12 @@ static DEVICE_START( cpu )
 	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		header->space[spacenum] = memory_find_address_space(device, spacenum);
 	
-	header->set_info = (cpu_set_info_func)cpu_get_info_fct(device, CPUINFO_PTR_SET_INFO);
-	header->execute = (cpu_execute_func)cpu_get_info_fct(device, CPUINFO_PTR_EXECUTE);
-	header->burn = (cpu_burn_func)cpu_get_info_fct(device, CPUINFO_PTR_BURN);
-	header->translate = (cpu_translate_func)cpu_get_info_fct(device, CPUINFO_PTR_TRANSLATE);
-	header->disassemble = (cpu_disassemble_func)cpu_get_info_fct(device, CPUINFO_PTR_DISASSEMBLE);
+	header->set_info = (cpu_set_info_func)device_get_info_fct(device, CPUINFO_PTR_SET_INFO);
+	header->execute = (cpu_execute_func)device_get_info_fct(device, CPUINFO_PTR_EXECUTE);
+	header->burn = (cpu_burn_func)device_get_info_fct(device, CPUINFO_PTR_BURN);
+	header->translate = (cpu_translate_func)device_get_info_fct(device, CPUINFO_PTR_TRANSLATE);
+	header->disassemble = (cpu_disassemble_func)device_get_info_fct(device, CPUINFO_PTR_DISASSEMBLE);
 	header->dasm_override = NULL;
-
-	header->clock_divider = cpu_get_clock_divider(device);
-	header->clock_multiplier = cpu_get_clock_multiplier(device);
 
 	/* fill in the input states and IRQ callback information */
 	for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
@@ -409,7 +406,7 @@ static DEVICE_START( cpu )
 	classdata->inttrigger = index + TRIGGER_INT;
 
 	/* fill in the clock and timing information */
-	classdata->clock = (UINT64)config->clock * header->clock_multiplier / header->clock_divider;
+	classdata->clock = (UINT64)config->clock * cpu_get_clock_multiplier(device) / cpu_get_clock_divider(device);
 	classdata->clockscale = 1.0;
 
 	/* allocate timers if we need them */
@@ -420,7 +417,7 @@ static DEVICE_START( cpu )
 
 	/* initialize this CPU */
 	num_regs = state_save_get_reg_count(device->machine);
-	init = (cpu_init_func)cpu_get_info_fct(device, CPUINFO_PTR_INIT);
+	init = (cpu_init_func)device_get_info_fct(device, CPUINFO_PTR_INIT);
 	(*init)(device, index, classdata->clock, standard_irq_callback);
 	num_regs = state_save_get_reg_count(device->machine) - num_regs;
 	
@@ -470,7 +467,7 @@ static DEVICE_RESET( cpu )
 	classdata->totalcycles = 0;
 
 	/* then reset the CPU directly */
-	reset = (cpu_reset_func)cpu_get_info_fct(device, CPUINFO_PTR_RESET);
+	reset = (cpu_reset_func)device_get_info_fct(device, CPUINFO_PTR_RESET);
 	if (reset != NULL)
 		(*reset)(device);
 
@@ -520,7 +517,7 @@ static DEVICE_STOP( cpu )
 	cpu_exit_func exit;
 	
 	/* call the CPU's exit function if present */
-	exit = (cpu_exit_func)cpu_get_info_fct(device, CPUINFO_PTR_EXIT);
+	exit = (cpu_exit_func)device_get_info_fct(device, CPUINFO_PTR_EXIT);
 	if (exit != NULL)
 		(*exit)(device);
 }
@@ -540,7 +537,7 @@ static DEVICE_SET_INFO( cpu )
 	if (header != NULL)
 		set_info = header->set_info;
 	else
-		set_info = (cpu_set_info_func)cpu_get_info_fct(device, CPUINFO_PTR_SET_INFO);
+		set_info = (cpu_set_info_func)device_get_info_fct(device, CPUINFO_PTR_SET_INFO);
 	
 	switch (state)
 	{
@@ -1181,7 +1178,7 @@ static void compute_perfect_interleave(running_machine *machine)
 	if (machine->cpu[0] != NULL && machine->cpu[0]->token != NULL)
 	{
 		cpu_class_data *classdata = cpu_get_class_data(machine->cpu[0]);
-		attoseconds_t smallest = classdata->attoseconds_per_cycle * cputype_get_min_cycles(cpu_get_type(machine->cpu[0]));
+		attoseconds_t smallest = classdata->attoseconds_per_cycle * cpu_get_min_cycles(machine->cpu[0]);
 		attoseconds_t perfect = ATTOSECONDS_PER_SECOND - 1;
 		const device_config *cpu;
 
@@ -1378,17 +1375,17 @@ static TIMER_CALLBACK( empty_event_queue )
 			switch (state)
 			{
 				case PULSE_LINE:
-					cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
-					cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
+					device_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
+					device_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
 					break;
 
 				case HOLD_LINE:
 				case ASSERT_LINE:
-					cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
+					device_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
 					break;
 
 				case CLEAR_LINE:
-					cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
+					device_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
 					break;
 
 				default:
@@ -1425,7 +1422,7 @@ static IRQ_CALLBACK( standard_irq_callback )
 	if (inputline->curstate == HOLD_LINE)
 	{
 		LOG(("->set_irq_line('%s',%d,%d)\n", device->tag, irqline, CLEAR_LINE));
-		cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + irqline, CLEAR_LINE);
+		device_set_info_int(device, CPUINFO_INT_INPUT_STATE + irqline, CLEAR_LINE);
 		inputline->curstate = CLEAR_LINE;
 	}
 

@@ -1011,7 +1011,7 @@ static MACHINE_RESET( neogeo )
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
 		system_control_w(space, offs, 0, 0x00ff);
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 
 	neogeo_reset_rng();
 

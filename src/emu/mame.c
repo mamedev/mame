@@ -25,7 +25,6 @@
             - calls init_machine() [mame.c]
 
             init_machine() [mame.c]
-                - calls cpuintrf_init() [cpuintrf.c] to determine which CPUs are available
                 - calls sndintrf_init() [sndintrf.c] to determine which sound chips are available
                 - calls fileio_init() [fileio.c] to initialize file I/O info
                 - calls config_init() [config.c] to initialize configuration system
@@ -1470,7 +1469,6 @@ static void init_machine(running_machine *machine)
 	time_t newbase;
 
 	/* initialize basic can't-fail systems here */
-	cpuintrf_init(machine);
 	sndintrf_init(machine);
 	fileio_init(machine);
 	config_init(machine);

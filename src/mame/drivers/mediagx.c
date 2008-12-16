@@ -957,7 +957,7 @@ static MACHINE_RESET(mediagx)
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	memcpy(bios_ram, rom, 0x40000);
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 
 	dacl = auto_malloc(65536 * sizeof(INT16));
 	dacr = auto_malloc(65536 * sizeof(INT16));

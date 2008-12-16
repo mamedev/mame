@@ -6492,7 +6492,7 @@ static void megadriv_init_common(running_machine *machine)
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_TAS_CALLBACK, (void *)megadriv_tas_callback);
+	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_TAS_CALLBACK, (void *)megadriv_tas_callback);
 
 	if ((machine->gamedrv->ipt==ipt_megadri6) || (machine->gamedrv->ipt==ipt_ssf2ghw))
 	{
@@ -6706,8 +6706,8 @@ DRIVER_INIT( _32x )
 	_32x_240mode = 0;
 
 // checking if these help brutal, they don't.
-	cpu_set_info_int(machine->cpu[2], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
-	cpu_set_info_int(machine->cpu[3], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
+	device_set_info_int(machine->cpu[2], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
+	device_set_info_int(machine->cpu[3], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
 
 	DRIVER_INIT_CALL(megadriv);
 }

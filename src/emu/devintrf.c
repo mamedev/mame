@@ -644,7 +644,6 @@ INT64 device_get_info_int(const device_config *device, UINT32 state)
 	deviceinfo info;
 
 	assert(device != NULL);
-	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
 

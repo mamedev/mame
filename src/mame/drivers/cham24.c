@@ -203,7 +203,7 @@ static MACHINE_RESET( cham24 )
 
 	memcpy( &dst[0x8000], &src[0x0f8000], 0x4000 );
 	memcpy( &dst[0xc000], &src[0x0f8000], 0x4000 );
-	cpu_reset(machine->cpu[0]);
+	device_reset(machine->cpu[0]);
 
 	/* reset the ppu */
 	ppu2c0x_reset( machine, 0, 1 );
