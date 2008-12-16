@@ -847,24 +847,25 @@ static WRITE32_HANDLER( sound020_w )
 
 static READ32_HANDLER( adc0834_r )
 {
-	return adc083x_do_read( 0 ) << 24;
+	return adc083x_do_read( space->machine, 0 ) << 24;
 }
 
 static WRITE32_HANDLER( adc0834_w )
 {
-	adc083x_clk_write( 0, ( data >> 24 ) & 1 );
-	adc083x_di_write( 0, ( data >> 25 ) & 1 );
-	adc083x_cs_write( 0, ( data >> 26 ) & 1 );
+	running_machine *machine = space->machine;
+	adc083x_clk_write( machine, 0, ( data >> 24 ) & 1 );
+	adc083x_di_write( machine, 0, ( data >> 25 ) & 1 );
+	adc083x_cs_write( machine, 0, ( data >> 26 ) & 1 );
 }
 
-static double adc0834_callback( int input )
+static double adc0834_callback( running_machine *machine, int input )
 {
 	switch( input )
 	{
 	case ADC083X_CH0:
-		return ( (double)5 * input_port_read(Machine,  "AN0" ) ) / 255; // steer
+		return ( (double)5 * input_port_read(machine,  "AN0" ) ) / 255; // steer
 	case ADC083X_CH1:
-		return ( (double)5 * input_port_read(Machine,  "AN1" ) ) / 255; // gas
+		return ( (double)5 * input_port_read(machine,  "AN1" ) ) / 255; // gas
 	case ADC083X_VREF:
 		return 5;
 	}

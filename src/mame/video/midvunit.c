@@ -77,7 +77,7 @@ static void midvunit_exit(running_machine *machine)
 VIDEO_START( midvunit )
 {
 	scanline_timer = timer_alloc(machine, scanline_timer_cb, NULL);
-	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, midvunit_exit);
 
 	state_save_register_global_array(machine, video_regs);

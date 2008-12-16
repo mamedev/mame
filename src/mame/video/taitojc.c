@@ -198,7 +198,7 @@ VIDEO_START( taitojc )
 
 	taitojc_char_dirty = 1;
 
-	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, taitojc_exit);
 
  	/* find first empty slot to decode gfx */

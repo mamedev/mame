@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/amiga.h"
 #include "cdrom.h"
 #include "coreutil.h"
@@ -160,18 +159,18 @@ void amiga_akiko_init(running_machine* machine)
 	}
 }
 
-static void akiko_nvram_write(UINT32 data)
+static void akiko_nvram_write(running_machine *machine, UINT32 data)
 {
 	akiko.i2c_scl_out = BIT(data,31);
 	akiko.i2c_sda_out = BIT(data,30);
 	akiko.i2c_scl_dir = BIT(data,15);
 	akiko.i2c_sda_dir = BIT(data,14);
 
-	i2cmem_write( 0, I2CMEM_SCL, akiko.i2c_scl_out );
-	i2cmem_write( 0, I2CMEM_SDA, akiko.i2c_sda_out );
+	i2cmem_write( machine, 0, I2CMEM_SCL, akiko.i2c_scl_out );
+	i2cmem_write( machine, 0, I2CMEM_SDA, akiko.i2c_sda_out );
 }
 
-static UINT32 akiko_nvram_read(void)
+static UINT32 akiko_nvram_read(running_machine *machine)
 {
 	UINT32	v = 0;
 
@@ -190,7 +189,7 @@ static UINT32 akiko_nvram_read(void)
 	}
 	else
 	{
-		v |= i2cmem_read( 0, I2CMEM_SDA ) << 30;
+		v |= i2cmem_read( machine, 0, I2CMEM_SDA ) << 30;
 	}
 
 	v |= akiko.i2c_scl_dir << 15;
@@ -350,14 +349,14 @@ static UINT8 akiko_cdda_getstatus( UINT32 *lba )
 	return 0x15;	/* no audio status */
 }
 
-static void akiko_set_cd_status( UINT32 status )
+static void akiko_set_cd_status( running_machine *machine, UINT32 status )
 {
 	akiko.cdrom_status[0] |= status;
 
 	if ( akiko.cdrom_status[0] & akiko.cdrom_status[1] )
 	{
 		if (LOG_AKIKO_CD) logerror( "Akiko CD IRQ\n" );
-		amiga_custom_w(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+		amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 }
 
@@ -373,7 +372,7 @@ static TIMER_CALLBACK(akiko_frame_proc)
 
 		if ( s == 0x11 )
 		{
-			akiko_set_cd_status( 0x80000000 );	/* subcode ready */
+			akiko_set_cd_status( machine, 0x80000000 );	/* subcode ready */
 		}
 
 		timer_adjust_oneshot( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0 );
@@ -477,7 +476,7 @@ static TIMER_CALLBACK(akiko_dma_proc)
 	}
 
 	if ( akiko.cdrom_readreqmask == 0 )
-		akiko_set_cd_status(0x04000000);
+		akiko_set_cd_status(machine, 0x04000000);
 	else
 		timer_adjust_oneshot( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0 );
 }
@@ -522,7 +521,7 @@ static void akiko_setup_response( const address_space *space, int len, UINT8 *r1
 
 	akiko.cdrom_cmd_resp = (akiko.cdrom_cmd_resp+len) & 0xff;
 
-	akiko_set_cd_status( 0x10000000 ); /* new data available */
+	akiko_set_cd_status( space->machine, 0x10000000 ); /* new data available */
 }
 
 static TIMER_CALLBACK( akiko_cd_delayed_cmd )
@@ -796,7 +795,7 @@ READ32_HANDLER(amiga_akiko32_r)
 			return retval;
 
 		case 0x30/4:	/* NVRAM */
-			return akiko_nvram_read();
+			return akiko_nvram_read(space->machine);
 
 		case 0x38/4:	/* C2P */
 			return akiko_c2p_read();
@@ -871,7 +870,7 @@ WRITE32_HANDLER(amiga_akiko32_w)
 			break;
 
 		case 0x30/4:
-			akiko_nvram_write(data);
+			akiko_nvram_write(space->machine, data);
 			break;
 
 		case 0x38/4:

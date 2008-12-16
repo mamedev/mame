@@ -289,37 +289,38 @@ static READ32_HANDLER( mb89371_r )
 
 static READ32_HANDLER( jamma_r )
 {
+	running_machine *machine = space->machine;
 	UINT32 data = 0;
 
 	switch (offset)
 	{
 	case 0:
-		data = input_port_read(space->machine, "IN0");
+		data = input_port_read(machine, "IN0");
 		break;
 	case 1:
 	{
-		data = input_port_read(space->machine, "IN1");
+		data = input_port_read(machine, "IN1");
 		data |= 0x000000c0;
 
 		if( has_ds2401[ security_cart_number ] )
 		{
-			data |= ds2401_read( security_cart_number ) << 14;
+			data |= ds2401_read( machine, security_cart_number ) << 14;
 		}
 
-		data |= adc083x_do_read( 0 ) << 16;
+		data |= adc083x_do_read( machine, 0 ) << 16;
 
 		switch( chiptype[ security_cart_number ] )
 		{
 		case 1:
-			data |= x76f041_sda_read( security_cart_number ) << 18;
+			data |= x76f041_sda_read( machine, security_cart_number ) << 18;
 			break;
 
 		case 2:
-			data |= x76f100_sda_read( security_cart_number ) << 18;
+			data |= x76f100_sda_read( machine, security_cart_number ) << 18;
 			break;
 
 		case 3:
-			data |= zs01_sda_read( security_cart_number ) << 18;
+			data |= zs01_sda_read( machine, security_cart_number ) << 18;
 			break;
 		}
 
@@ -334,33 +335,34 @@ static READ32_HANDLER( jamma_r )
 		break;
 	}
 	case 2:
-		data = input_port_read(space->machine, "IN2");
+		data = input_port_read(machine, "IN2");
 		break;
 	case 3:
-		data = input_port_read(space->machine, "IN3");
+		data = input_port_read(machine, "IN3");
 		break;
 	}
 
-	verboselog( space->machine, 2, "jamma_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine, 2, "jamma_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	return data;
 }
 
 static WRITE32_HANDLER( jamma_w )
 {
-	verboselog( space->machine, 2, "jamma_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	running_machine *machine = space->machine;
+	verboselog( machine, 2, "jamma_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
 	case 0:
-		adc083x_cs_write( 0, ( data >> 1 ) & 1 );
-		adc083x_clk_write( 0, ( data >> 2 ) & 1 );
-		adc083x_di_write( 0, ( data >> 0 ) & 1 );
-		adc083x_se_write( 0, 0 );
+		adc083x_cs_write( machine, 0, ( data >> 1 ) & 1 );
+		adc083x_clk_write( machine, 0, ( data >> 2 ) & 1 );
+		adc083x_di_write( machine, 0, ( data >> 0 ) & 1 );
+		adc083x_se_write( machine, 0, 0 );
 		break;
 
 	default:
-		verboselog( space->machine, 0, "jamma_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
+		verboselog( machine, 0, "jamma_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data );
 		break;
 	}
 }
@@ -386,7 +388,7 @@ static WRITE32_HANDLER( control_w )
 	switch( chiptype[ security_cart_number ] )
 	{
 	case 3:
-		zs01_sda_write( security_cart_number, !( ( control >> 6 ) & 1 ) ); /* 0x40 */
+		zs01_sda_write( space->machine, security_cart_number, !( ( control >> 6 ) & 1 ) ); /* 0x40 */
 		break;
 	}
 
@@ -975,12 +977,13 @@ static void cdrom_dma_write( UINT32 n_address, INT32 n_size )
 }
 
 static UINT32 m_n_security_control;
-static void (*security_bit7_write)( int data );
-static void (*security_bit6_write)( int data );
-static void (*security_bit5_write)( int data );
+static void (*security_bit7_write)( running_machine *machine, int data );
+static void (*security_bit6_write)( running_machine *machine, int data );
+static void (*security_bit5_write)( running_machine *machine, int data );
 
 static WRITE32_HANDLER( security_w )
 {
+	running_machine *machine = space->machine;
 	COMBINE_DATA( &m_n_security_control );
 
 	verboselog( space->machine, 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
@@ -990,44 +993,44 @@ static WRITE32_HANDLER( security_w )
 		switch( chiptype[ security_cart_number ] )
 		{
 		case 1:
-			x76f041_sda_write( security_cart_number, ( data >> 0 ) & 1 );
-			x76f041_scl_write( security_cart_number, ( data >> 1 ) & 1 );
-			x76f041_cs_write( security_cart_number, ( data >> 2 ) & 1 );
-			x76f041_rst_write( security_cart_number, ( data >> 3 ) & 1 );
+			x76f041_sda_write( machine, security_cart_number, ( data >> 0 ) & 1 );
+			x76f041_scl_write( machine, security_cart_number, ( data >> 1 ) & 1 );
+			x76f041_cs_write( machine, security_cart_number, ( data >> 2 ) & 1 );
+			x76f041_rst_write( machine, security_cart_number, ( data >> 3 ) & 1 );
 			break;
 
 		case 2:
-			x76f100_sda_write( security_cart_number, ( data >> 0 ) & 1 );
-			x76f100_scl_write( security_cart_number, ( data >> 1 ) & 1 );
-			x76f100_cs_write( security_cart_number, ( data >> 2 ) & 1 );
-			x76f100_rst_write( security_cart_number, ( data >> 3 ) & 1 );
+			x76f100_sda_write( machine, security_cart_number, ( data >> 0 ) & 1 );
+			x76f100_scl_write( machine, security_cart_number, ( data >> 1 ) & 1 );
+			x76f100_cs_write( machine, security_cart_number, ( data >> 2 ) & 1 );
+			x76f100_rst_write( machine, security_cart_number, ( data >> 3 ) & 1 );
 			break;
 
 		case 3:
-			zs01_scl_write( security_cart_number, ( data >> 1 ) & 1 );
-			zs01_cs_write( security_cart_number, ( data >> 2 ) & 1 );
-			zs01_rst_write( security_cart_number, ( data >> 3 ) & 1 );
+			zs01_scl_write( machine, security_cart_number, ( data >> 1 ) & 1 );
+			zs01_cs_write( machine, security_cart_number, ( data >> 2 ) & 1 );
+			zs01_rst_write( machine, security_cart_number, ( data >> 3 ) & 1 );
 			break;
 		}
 
 		if( has_ds2401[ security_cart_number ] )
 		{
-			ds2401_write( security_cart_number, !( ( data >> 4 ) & 1 ) );
+			ds2401_write( machine, security_cart_number, !( ( data >> 4 ) & 1 ) );
 		}
 
 		if( security_bit5_write != NULL )
 		{
-			security_bit5_write( ( data >> 5 ) & 1 );
+			security_bit5_write( machine, ( data >> 5 ) & 1 );
 		}
 
 		if( security_bit6_write != NULL )
 		{
-			security_bit6_write( ( data >> 6 ) & 1 );
+			security_bit6_write( machine, ( data >> 6 ) & 1 );
 		}
 
 		if( security_bit7_write != NULL )
 		{
-			security_bit7_write( ( data >> 7 ) & 1 );
+			security_bit7_write( machine, ( data >> 7 ) & 1 );
 		}
 	}
 }
@@ -1378,18 +1381,18 @@ static void flash_init( running_machine *machine )
 	state_save_register_global(machine,  control );
 }
 
-static double analogue_inputs_callback( int input )
+static double analogue_inputs_callback( running_machine *machine, int input )
 {
 	switch( input )
 	{
 	case ADC083X_CH0:
-		return (double) ( input_port_read_safe(Machine,  "analog0", 0 ) * 5 ) / 255;
+		return (double) ( input_port_read_safe(machine,  "analog0", 0 ) * 5 ) / 255;
 	case ADC083X_CH1:
-		return (double) ( input_port_read_safe(Machine,  "analog1", 0 ) * 5 ) / 255;
+		return (double) ( input_port_read_safe(machine,  "analog1", 0 ) * 5 ) / 255;
 	case ADC083X_CH2:
-		return (double) ( input_port_read_safe(Machine,  "analog2", 0 ) * 5 ) / 255;
+		return (double) ( input_port_read_safe(machine,  "analog2", 0 ) * 5 ) / 255;
 	case ADC083X_CH3:
-		return (double) ( input_port_read_safe(Machine,  "analog3", 0 ) * 5 ) / 255;
+		return (double) ( input_port_read_safe(machine,  "analog3", 0 ) * 5 ) / 255;
 	case ADC083X_AGND:
 		return 0;
 	case ADC083X_VREF:
@@ -1448,7 +1451,7 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 			break;
 
 		case 0x1014:
-			zs01_init( cart, eeprom_rom, NULL, NULL, ds2401_rom );
+			zs01_init( machine, cart, eeprom_rom, NULL, NULL, ds2401_rom );
 			chiptype[ cart ] = 3;
 
 			switch( cart )
@@ -2120,7 +2123,7 @@ static READ32_HANDLER( gx894pwbba_r )
 	case 0x3b:
 		if( ACCESSING_BITS_16_31 )
 		{
-			data |= ds2401_read( 2 ) << 28;
+			data |= ds2401_read( space->machine, 2 ) << 28;
 		}
 		break;
 	case 0x3d:
@@ -2258,7 +2261,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 	case 0x3b:
 		if( ACCESSING_BITS_16_31 )
 		{
-			ds2401_write( 2, !( ( data >> 28 ) & 1 ) );
+			ds2401_write( space->machine, 2, !( ( data >> 28 ) & 1 ) );
 		}
 		break;
 	case 0x3e:
@@ -2649,12 +2652,12 @@ static int salarymc_lamp_shift;
 static int salarymc_lamp_data;
 static int salarymc_lamp_clk;
 
-static void salarymc_lamp_data_write( int data )
+static void salarymc_lamp_data_write( running_machine *machine, int data )
 {
 	salarymc_lamp_data = data;
 }
 
-static void salarymc_lamp_rst_write( int data )
+static void salarymc_lamp_rst_write( running_machine *machine, int data )
 {
 	if( data )
 	{
@@ -2663,7 +2666,7 @@ static void salarymc_lamp_rst_write( int data )
 	}
 }
 
-static void salarymc_lamp_clk_write( int data )
+static void salarymc_lamp_clk_write( running_machine *machine, int data )
 {
 	if( salarymc_lamp_clk != data )
 	{
@@ -2683,7 +2686,7 @@ static void salarymc_lamp_clk_write( int data )
 			{
 				if( ( salarymc_lamp_shift & ~0xe38 ) != 0 )
 				{
-					verboselog( Machine, 0, "unknown bits in salarymc_lamp_shift %08x\n", salarymc_lamp_shift & ~0xe38 );
+					verboselog( machine, 0, "unknown bits in salarymc_lamp_shift %08x\n", salarymc_lamp_shift & ~0xe38 );
 				}
 
 				output_set_value( "player 1 red", ( salarymc_lamp_shift >> 11 ) & 1 );

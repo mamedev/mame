@@ -222,7 +222,7 @@ void K001005_init(running_machine *machine)
 
 	K001005_3d_fifo = auto_malloc(0x10000 * sizeof(UINT32));
 
-	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, K001005_exit);
 
 	for (i=0; i < 128; i++)

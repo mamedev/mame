@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "poly.h"
-#include "deprecat.h"
 #include "eminline.h"
 #include "mame.h"
 #include "state.h"
@@ -329,7 +328,7 @@ INLINE polygon_info *allocate_polygon(poly_manager *poly, int miny, int maxy)
     manager
 -------------------------------------------------*/
 
-poly_manager *poly_alloc(int max_polys, size_t extra_data_size, UINT8 flags)
+poly_manager *poly_alloc(running_machine *machine, int max_polys, size_t extra_data_size, UINT8 flags)
 {
 	poly_manager *poly;
 
@@ -361,7 +360,7 @@ poly_manager *poly_alloc(int max_polys, size_t extra_data_size, UINT8 flags)
 		poly->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 
 	/* request a pre-save callback for synchronization */
-	state_save_register_presave(Machine, poly_state_presave, poly);
+	state_save_register_presave(machine, poly_state_presave, poly);
 	return poly;
 }
 

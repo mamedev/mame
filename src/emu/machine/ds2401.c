@@ -8,7 +8,6 @@
 
 #include <stdarg.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "state.h"
 #include "machine/ds2401.h"
 
@@ -160,9 +159,8 @@ void ds2401_init( running_machine *machine, int which, const UINT8 *data )
 	c->reset_timer = timer_alloc(machine, ds2401_reset , NULL);
 }
 
-void ds2401_write( int which, int data )
+void ds2401_write( running_machine *machine, int which, int data )
 {
-	running_machine *machine = Machine;
 	struct ds2401_chip *c = &ds2401[ which ];
 
 	verboselog( machine, 1, "ds2401_write( %d, %d )\n", which, data );
@@ -214,11 +212,11 @@ void ds2401_write( int which, int data )
 	c->rx = data;
 }
 
-int ds2401_read( int which )
+int ds2401_read( running_machine *machine, int which )
 {
 	struct ds2401_chip *c = &ds2401[ which ];
 
-	verboselog( Machine, 2, "ds2401_read( %d ) %d\n", which, c->tx & c->rx );
+	verboselog( machine, 2, "ds2401_read( %d ) %d\n", which, c->tx & c->rx );
 	return c->tx & c->rx;
 }
 

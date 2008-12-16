@@ -4470,7 +4470,7 @@ static DEVICE_START( voodoo )
 	v->pci.stall_callback = config->stall;
 
 	/* create a multiprocessor work queue */
-	v->poly = poly_alloc(64, sizeof(poly_extra_data), 0);
+	v->poly = poly_alloc(device->machine, 64, sizeof(poly_extra_data), 0);
 	v->thread_stats = auto_malloc(sizeof(v->thread_stats[0]) * WORK_MAX_THREADS);
 
 	/* create a table of precomputed 1/n and log2(n) values */

@@ -21,7 +21,6 @@ Up to 4096 bytes can be addressed.
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/i2cmem.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -147,9 +146,8 @@ static int data_offset( struct i2cmem_chip *c )
 	return ( ( ( c->devsel << 7 ) & 0xff00 ) | ( c->byteaddr & 0xff ) ) & ( c->data_size - 1 );
 }
 
-void i2cmem_write( int chip, int line, int data )
+void i2cmem_write( running_machine *machine, int chip, int line, int data )
 {
-	running_machine *machine = Machine;
 	struct i2cmem_chip *c;
 
 	if( chip >= I2CMEM_MAXCHIP )
@@ -382,9 +380,8 @@ void i2cmem_write( int chip, int line, int data )
 	}
 }
 
-int i2cmem_read( int chip, int line )
+int i2cmem_read( running_machine *machine, int chip, int line )
 {
-	running_machine *machine = Machine;
 	struct i2cmem_chip *c;
 
 	if( chip >= I2CMEM_MAXCHIP )

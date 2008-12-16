@@ -441,7 +441,7 @@ static MACHINE_RESET(sfkick)
 
 static INTERRUPT_GEN( sfkick_interrupt )
 {
-	v9938_interrupt(0);
+	v9938_interrupt(device->machine, 0);
 }
 static void irqhandler(running_machine *machine, int irq)
 {

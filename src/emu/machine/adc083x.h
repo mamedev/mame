@@ -27,12 +27,12 @@
 #define ADC0834 ( 2 )
 #define ADC0838 ( 3 )
 
-void adc083x_init( running_machine *machine, int chip, int type, double (*input_callback)( int input ) );
-extern void adc083x_cs_write( int chip, int cs );
-extern void adc083x_clk_write( int chip, int clk );
-extern void adc083x_di_write( int chip, int di );
-extern void adc083x_se_write( int chip, int se );
-extern int adc083x_sars_read( int chip );
-extern int adc083x_do_read( int chip );
+void adc083x_init( running_machine *machine, int chip, int type, double (*input_callback)( running_machine *machine, int input ) );
+extern void adc083x_cs_write( running_machine *machine, int chip, int cs );
+extern void adc083x_clk_write( running_machine *machine, int chip, int clk );
+extern void adc083x_di_write( running_machine *machine, int chip, int di );
+extern void adc083x_se_write( running_machine *machine, int chip, int se );
+extern int adc083x_sars_read( running_machine *machine, int chip );
+extern int adc083x_do_read( running_machine *machine, int chip );
 
 #endif

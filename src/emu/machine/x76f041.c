@@ -12,7 +12,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/x76f041.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -166,9 +165,8 @@ void x76f041_init( running_machine *machine, int chip, UINT8 *data )
 	state_save_register_item_pointer( machine, "x76f041", NULL, chip, c->data, SIZE_DATA );
 }
 
-void x76f041_cs_write( int chip, int cs )
+void x76f041_cs_write( running_machine *machine, int chip, int cs )
 {
-	running_machine *machine = Machine;
 	struct x76f041_chip *c;
 
 	if( chip >= X76F041_MAXCHIP )
@@ -198,9 +196,8 @@ void x76f041_cs_write( int chip, int cs )
 	c->cs = cs;
 }
 
-void x76f041_rst_write( int chip, int rst )
+void x76f041_rst_write( running_machine *machine, int chip, int rst )
 {
-	running_machine *machine = Machine;
 	struct x76f041_chip *c;
 
 	if( chip >= X76F041_MAXCHIP )
@@ -285,9 +282,8 @@ static void x76f041_password_ok( struct x76f041_chip *c )
 	}
 }
 
-static void x76f041_load_address( int chip )
+static void x76f041_load_address( running_machine *machine, int chip )
 {
-	running_machine *machine = Machine;
 	/* todo: handle other bcr bits */
 	struct x76f041_chip *c = &x76f041[ chip ];
 	int bcr;
@@ -340,9 +336,8 @@ static int x76f041_data_offset( struct x76f041_chip *c )
 	return ( block_offset & 0x180 ) | ( ( block_offset + c->byte ) & 0x7f );
 }
 
-void x76f041_scl_write( int chip, int scl )
+void x76f041_scl_write( running_machine *machine, int chip, int scl )
 {
-	running_machine *machine = Machine;
 	struct x76f041_chip *c;
 
 	if( chip >= X76F041_MAXCHIP )
@@ -411,7 +406,7 @@ void x76f041_scl_write( int chip, int scl )
 						c->state = STATE_LOAD_ADDRESS;
 						break;
 					case STATE_LOAD_ADDRESS:
-						x76f041_load_address( chip );
+						x76f041_load_address( machine, chip );
 						break;
 					case STATE_LOAD_PASSWORD:
 						verboselog( machine, 1, "x76f041(%d) -> password: %02x\n", chip, c->shift );
@@ -512,9 +507,8 @@ void x76f041_scl_write( int chip, int scl )
 	c->scl = scl;
 }
 
-void x76f041_sda_write( int chip, int sda )
+void x76f041_sda_write( running_machine *machine, int chip, int sda )
 {
-	running_machine *machine = Machine;
 	struct x76f041_chip *c;
 
 	if( chip >= X76F041_MAXCHIP )
@@ -567,9 +561,8 @@ void x76f041_sda_write( int chip, int sda )
 	c->sdaw = sda;
 }
 
-int x76f041_sda_read( int chip )
+int x76f041_sda_read( running_machine *machine, int chip )
 {
-	running_machine *machine = Machine;
 	struct x76f041_chip *c;
 
 	if( chip >= X76F041_MAXCHIP )
@@ -589,7 +582,7 @@ int x76f041_sda_read( int chip )
 	return c->sdar;
 }
 
-static void nvram_handler_x76f041( int chip, running_machine *machine, mame_file *file, int read_or_write )
+static void nvram_handler_x76f041( running_machine *machine, mame_file *file, int read_or_write, int chip )
 {
 	struct x76f041_chip *c;
 
@@ -619,5 +612,5 @@ static void nvram_handler_x76f041( int chip, running_machine *machine, mame_file
 	}
 }
 
-NVRAM_HANDLER( x76f041_0 ) { nvram_handler_x76f041( 0, machine, file, read_or_write ); }
-NVRAM_HANDLER( x76f041_1 ) { nvram_handler_x76f041( 1, machine, file, read_or_write ); }
+NVRAM_HANDLER( x76f041_0 ) { nvram_handler_x76f041( machine, file, read_or_write, 0 ); }
+NVRAM_HANDLER( x76f041_1 ) { nvram_handler_x76f041( machine, file, read_or_write, 1 ); }

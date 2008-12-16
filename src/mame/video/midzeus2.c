@@ -268,7 +268,7 @@ VIDEO_START( midzeus2 )
 	waveram[1] = auto_malloc(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12);
 
 	/* initialize polygon engine */
-	poly = poly_alloc(10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine, 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
 	add_exit_callback(machine, exit_handler);

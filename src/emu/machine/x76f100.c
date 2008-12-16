@@ -10,7 +10,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/x76f100.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -127,9 +126,8 @@ void x76f100_init( running_machine *machine, int chip, UINT8 *data )
 	state_save_register_item_pointer( machine, "x76f100", NULL, chip, c->data, SIZE_DATA );
 }
 
-void x76f100_cs_write( int chip, int cs )
+void x76f100_cs_write( running_machine *machine, int chip, int cs )
 {
-	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
@@ -159,9 +157,8 @@ void x76f100_cs_write( int chip, int cs )
 	c->cs = cs;
 }
 
-void x76f100_rst_write( int chip, int rst )
+void x76f100_rst_write( running_machine *machine, int chip, int rst )
 {
-	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
@@ -219,9 +216,8 @@ static int x76f100_data_offset( struct x76f100_chip *c )
 	return ( block_offset * SIZE_WRITE_BUFFER ) + c->byte;
 }
 
-void x76f100_scl_write( int chip, int scl )
+void x76f100_scl_write( running_machine *machine, int chip, int scl )
 {
-	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
@@ -385,9 +381,8 @@ void x76f100_scl_write( int chip, int scl )
 	c->scl = scl;
 }
 
-void x76f100_sda_write( int chip, int sda )
+void x76f100_sda_write( running_machine *machine, int chip, int sda )
 {
-	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
@@ -444,9 +439,8 @@ void x76f100_sda_write( int chip, int sda )
 	c->sdaw = sda;
 }
 
-int x76f100_sda_read( int chip )
+int x76f100_sda_read( running_machine *machine, int chip )
 {
-	running_machine *machine = Machine;
 	struct x76f100_chip *c;
 
 	if( chip >= X76F100_MAXCHIP )
@@ -466,7 +460,7 @@ int x76f100_sda_read( int chip )
 	return c->sdar;
 }
 
-static void nvram_handler_x76f100( int chip, running_machine *machine, mame_file *file, int read_or_write )
+static void nvram_handler_x76f100( running_machine *machine, mame_file *file, int read_or_write, int chip )
 {
 	struct x76f100_chip *c;
 
@@ -492,5 +486,5 @@ static void nvram_handler_x76f100( int chip, running_machine *machine, mame_file
 	}
 }
 
-NVRAM_HANDLER( x76f100_0 ) { nvram_handler_x76f100( 0, machine, file, read_or_write ); }
-NVRAM_HANDLER( x76f100_1 ) { nvram_handler_x76f100( 1, machine, file, read_or_write ); }
+NVRAM_HANDLER( x76f100_0 ) { nvram_handler_x76f100( machine, file, read_or_write, 0 ); }
+NVRAM_HANDLER( x76f100_1 ) { nvram_handler_x76f100( machine, file, read_or_write, 1 ); }

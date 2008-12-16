@@ -2703,7 +2703,7 @@ VIDEO_START(model2)
 	sys24_tile_vh_start(machine, 0x3fff);
 	sys24_bitmap = bitmap_alloc(width, height+4, BITMAP_FORMAT_INDEXED16);
 
-	poly = poly_alloc(4000, sizeof(poly_extra_data), 0);
+	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 	add_exit_callback(machine, model2_exit);
 
 	/* initialize the geometry engine */

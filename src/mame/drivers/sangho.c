@@ -212,7 +212,7 @@ static INTERRUPT_GEN( sangho_interrupt )
 {
 	v9938_set_sprite_limit(0, 0);
 	v9938_set_resolution(0, 2);
-	v9938_interrupt(0);
+	v9938_interrupt(device->machine, 0);
 }
 
 

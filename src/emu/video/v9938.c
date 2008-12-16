@@ -15,7 +15,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "v9938.h"
 
 #define VERBOSE 0
@@ -94,13 +93,13 @@ static const char *const v9938_modes[] = {
 	"GRAPHIC 4", "GRAPHIC 5", "GRAPHIC 6", "GRAPHIC 7", "TEXT 2",
 	"UNKNOWN" };
 
-static void v9938_register_write (int reg, int data);
+static void v9938_register_write (running_machine *machine, int reg, int data);
 static void v9938_update_command (void);
 static void v9938_cpu_to_vdp (UINT8 V);
 static UINT8 v9938_command_unit_w (UINT8 Op);
 static UINT8 v9938_vdp_to_cpu (void);
 static void v9938_set_mode (void);
-static void v9938_refresh_line (bitmap_t *bmp, int line);
+static void v9938_refresh_line (running_machine *machine, bitmap_t *bmp, int line);
 
 /***************************************************************************
 
@@ -435,14 +434,14 @@ READ8_HANDLER (v9938_1_vram_r)
 	return v9938_vram_r();
 }
 
-static void v9938_command_w(UINT8 data)
+static void v9938_command_w(running_machine *machine, UINT8 data)
 	{
 	if (vdp->cmd_write_first)
 		{
 		if (data & 0x80)
 		{
 			if (!(data & 0x40))
-			v9938_register_write (data & 0x3f, vdp->cmd_write);
+			v9938_register_write (machine, data & 0x3f, vdp->cmd_write);
 		}
 		else
 			{
@@ -463,13 +462,13 @@ static void v9938_command_w(UINT8 data)
 WRITE8_HANDLER (v9938_0_command_w)
 {
 	vdp = &vdps[0];
-	v9938_command_w(data);
+	v9938_command_w(space->machine, data);
 }
 
 WRITE8_HANDLER (v9938_1_command_w)
 {
 	vdp = &vdps[1];
-	v9938_command_w(data);
+	v9938_command_w(space->machine, data);
 }
 
 /***************************************************************************
@@ -582,7 +581,7 @@ void v9938_reset (int which)
 	vdp->scanline = 0;
 }
 
-static void v9938_check_int (void)
+static void v9938_check_int (running_machine *machine)
 	{
 	UINT8 n;
 
@@ -605,7 +604,7 @@ static void v9938_check_int (void)
     ** called; because of this Mr. Ghost, Xevious and SD Snatcher don't
     ** run. As a patch it's called every scanline
     */
-	vdp->INTCallback (Machine, n);
+	vdp->INTCallback (machine, n);
 	}
 
 void v9938_set_sprite_limit (int which, int i)
@@ -634,13 +633,13 @@ void v9938_set_resolution (int which, int i)
 
 ***************************************************************************/
 
-static void v9938_register_w(UINT8 data)
+static void v9938_register_w(running_machine *machine, UINT8 data)
 {
 	int reg;
 
 	reg = vdp->contReg[17] & 0x3f;
 	if (reg != 17)
-		v9938_register_write (reg, data); /* true ? */
+		v9938_register_write (machine, reg, data); /* true ? */
 
 	if (!(vdp->contReg[17] & 0x80))
 		vdp->contReg[17] = (vdp->contReg[17] + 1) & 0x3f;
@@ -649,16 +648,16 @@ static void v9938_register_w(UINT8 data)
 WRITE8_HANDLER (v9938_0_register_w)
 {
 	vdp = &vdps[0];
-	v9938_register_w(data);
+	v9938_register_w(space->machine, data);
 }
 
 WRITE8_HANDLER (v9938_1_register_w)
 {
 	vdp = &vdps[1];
-	v9938_register_w(data);
+	v9938_register_w(space->machine, data);
 }
 
-static void v9938_register_write (int reg, int data)
+static void v9938_register_write (running_machine *machine, int reg, int data)
 {
 	static UINT8 const reg_mask[] =
 	{
@@ -689,7 +688,7 @@ static void v9938_register_write (int reg, int data)
 	case 1:
 		vdp->contReg[reg] = data;
 		v9938_set_mode ();
-		v9938_check_int ();
+		v9938_check_int (machine);
 		LOG(("V9938: mode = %s\n", v9938_modes[vdp->mode]));
 		break;
 
@@ -812,7 +811,7 @@ static void v9938_register_write (int reg, int data)
 		}
 
 	LOG(("V9938: Read %02x from S#%d\n", ret, reg));
-	v9938_check_int ();
+	v9938_check_int (machine);
 
 	return ret;
 	}
@@ -1212,9 +1211,9 @@ static void v9938_set_mode (void)
 	vdp->mode = i;
 	}
 
-static void v9938_refresh_16 (bitmap_t *bmp, int line)
+static void v9938_refresh_16 (running_machine *machine, bitmap_t *bmp, int line)
 	{
-	const pen_t *pens = Machine->pens;
+	const pen_t *pens = machine->pens;
 	int i, double_lines;
 	UINT8 col[256];
 	UINT16 *ln, *ln2 = NULL;
@@ -1272,7 +1271,7 @@ static void v9938_refresh_16 (bitmap_t *bmp, int line)
 		memcpy (ln2, ln, (512 + 32) * 2);
 	}
 
-static void v9938_refresh_line (bitmap_t *bmp, int line)
+static void v9938_refresh_line (running_machine *machine, bitmap_t *bmp, int line)
 	{
 	int ind16, ind256;
 
@@ -1285,7 +1284,7 @@ static void v9938_refresh_line (bitmap_t *bmp, int line)
 		vdp->pal_ind256[0] = vdp->pal_ind256[vdp->contReg[7]];
 		}
 
-	v9938_refresh_16 (bmp, line);
+	v9938_refresh_16 (machine, bmp, line);
 
 	if ( !(vdp->contReg[8] & 0x20) && (vdp->mode != V9938_MODE_GRAPHIC5) )
 		{
@@ -1459,7 +1458,7 @@ static void v9938_interrupt_start_vblank (void)
 	vdp->size_now = -1;
 	}
 
-int v9938_interrupt (int which)
+int v9938_interrupt (running_machine *machine, int which)
 {
 	int scanline, max, pal, scanline_start;
 
@@ -1492,7 +1491,7 @@ int v9938_interrupt (int which)
 	else
 		if ( !(vdp->contReg[0] & 0x10) ) vdp->statReg[1] &= 0xfe;
 
-	v9938_check_int ();
+	v9938_check_int (machine);
 
 	/* check for start of vblank */
 	if ((pal && (vdp->scanline == 310)) ||
@@ -1504,7 +1503,7 @@ int v9938_interrupt (int which)
 	{
 		scanline = (vdp->scanline - scanline_start) & 255;
 
-		v9938_refresh_line (vdp->bitmap, scanline);
+		v9938_refresh_line (machine, vdp->bitmap, scanline);
 	}
 
 	max = (vdp->contReg[9] & 2) ? 313 : 262;

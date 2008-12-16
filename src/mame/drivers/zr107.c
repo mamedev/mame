@@ -174,7 +174,6 @@ Check gticlub.c for details on the bottom board.
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "sound/k054539.h"
@@ -299,7 +298,7 @@ static VIDEO_UPDATE( zr107 )
 
 static CUSTOM_INPUT( adcdo_r )
 {
-	return adc083x_do_read(0);
+	return adc083x_do_read(field->port->machine, 0);
 }
 
 static READ8_HANDLER( sysreg_r )
@@ -323,7 +322,7 @@ static READ8_HANDLER( sysreg_r )
                 0x20 = SARS (A/D busy flag)
                 0x10 = EEPDO (EEPROM DO)
             */
-			r = (adc083x_sars_read(0) << 5) | (eeprom_read_bit() << 4);
+			r = (adc083x_sars_read(space->machine, 0) << 5) | (eeprom_read_bit() << 4);
 			break;
 
 		case 5:	/* Parallel data port */
@@ -382,9 +381,9 @@ static WRITE8_HANDLER( sysreg_w )
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
-			adc083x_cs_write(0, (data >> 2) & 1);
-			adc083x_di_write(0, (data >> 1) & 1);
-			adc083x_clk_write(0, (data >> 0) & 1);
+			adc083x_cs_write(space->machine, 0, (data >> 2) & 1);
+			adc083x_di_write(space->machine, 0, (data >> 1) & 1);
+			adc083x_clk_write(space->machine, 0, (data >> 0) & 1);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -399,16 +398,16 @@ static WRITE8_HANDLER( sysreg_w )
 	}
 }
 
-static double adc0838_callback(int input)
+static double adc0838_callback(running_machine *machine, int input)
 {
 	switch (input)
 	{
 		case ADC083X_CH0:
-			return (double)(5 * input_port_read(Machine, "ANALOG1")) / 255.0;
+			return (double)(5 * input_port_read(machine, "ANALOG1")) / 255.0;
 		case ADC083X_CH1:
-			return (double)(5 * input_port_read(Machine, "ANALOG2")) / 255.0;
+			return (double)(5 * input_port_read(machine, "ANALOG2")) / 255.0;
 		case ADC083X_CH2:
-			return (double)(5 * input_port_read(Machine, "ANALOG3")) / 255.0;
+			return (double)(5 * input_port_read(machine, "ANALOG3")) / 255.0;
 		case ADC083X_CH3:
 			return 0;
 		case ADC083X_COM:

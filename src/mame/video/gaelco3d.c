@@ -7,7 +7,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "eminline.h"
 #include "gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
@@ -77,7 +76,7 @@ VIDEO_START( gaelco3d )
 {
 	int width, height;
 
-	poly = poly_alloc(2000, sizeof(poly_extra_data), 0);
+	poly = poly_alloc(machine, 2000, sizeof(poly_extra_data), 0);
 	add_exit_callback(machine, gaelco3d_exit);
 
 	screenbits = video_screen_auto_bitmap_alloc(machine->primary_screen);
@@ -373,15 +372,15 @@ static void render_alphablend(void *destbase, INT32 scanline, const poly_extent 
  *
  *************************************/
 
-void gaelco3d_render(void)
+void gaelco3d_render(const device_config *screen)
 {
 	/* wait for any queued stuff to complete */
 	poly_wait(poly, "Time to render");
 
 #if DISPLAY_STATS
 {
-	int scan = video_screen_get_vpos(machine->primary_screen);
-	popmessage("Polys = %4d  Timeleft = %3d", polygons, (lastscan < scan) ? (scan - lastscan) : (scan + (lastscan - video_screen_get_visible_area(Machine->primary_screen)->max_y)));
+	int scan = video_screen_get_vpos(screen);
+	popmessage("Polys = %4d  Timeleft = %3d", polygons, (lastscan < scan) ? (scan - lastscan) : (scan + (lastscan - video_screen_get_visible_area(screen)->max_y)));
 }
 #endif
 

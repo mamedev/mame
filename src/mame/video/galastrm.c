@@ -53,7 +53,7 @@ VIDEO_START( galastrm )
 	tmpbitmaps = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	polybitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	poly = poly_alloc(16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	poly = poly_alloc(machine, 16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, galastrm_exit);
 }
 

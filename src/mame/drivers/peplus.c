@@ -426,9 +426,9 @@ static WRITE8_HANDLER( peplus_output_bank_c_w )
 
 static WRITE8_HANDLER(i2c_nvram_w)
 {
-	i2cmem_write(0, I2CMEM_SCL, BIT(data, 2));
+	i2cmem_write(space->machine, 0, I2CMEM_SCL, BIT(data, 2));
 	sda_dir = BIT(data, 1);
-	i2cmem_write(0, I2CMEM_SDA, BIT(data, 0));
+	i2cmem_write(space->machine, 0, I2CMEM_SDA, BIT(data, 0));
 }
 
 
@@ -518,7 +518,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 	UINT8 sda = 0;
 	if(!sda_dir)
 	{
-		sda = i2cmem_read(0, I2CMEM_SDA);
+		sda = i2cmem_read(space->machine, 0, I2CMEM_SDA);
 	}
 
 	if ((input_port_read_safe(space->machine, "SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {

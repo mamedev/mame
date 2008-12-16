@@ -242,7 +242,7 @@ static MACHINE_RESET( gaelco3d2 )
 
 static INTERRUPT_GEN( vblank_gen )
 {
-	gaelco3d_render();
+	gaelco3d_render(device->machine->primary_screen);
 	cpu_set_input_line(device, 2, ASSERT_LINE);
 }
 

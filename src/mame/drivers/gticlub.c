@@ -224,7 +224,6 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "machine/konamiic.h"
-#include "machine/adc083x.h"
 #include "sound/rf5c400.h"
 #include "video/voodoo.h"
 #include "video/gticlub.h"

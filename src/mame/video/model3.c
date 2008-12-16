@@ -166,7 +166,7 @@ VIDEO_START( model3 )
 {
 	int width, height;
 
-	poly = poly_alloc(4000, sizeof(poly_extra_data), 0);
+	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), 0);
 	add_exit_callback(machine, model3_exit);
 
 	width = video_screen_get_width(machine->primary_screen);

@@ -16,7 +16,7 @@
 
 void v9938_init (running_machine *machine, int which, const device_config *screen, bitmap_t *bitmap, int model, int vram_size, void (*callback)(running_machine *, int) );
 void v9938_reset (int which);
-int v9938_interrupt (int which);
+int v9938_interrupt (running_machine *machine, int which);
 void v9938_set_sprite_limit (int which, int);
 void v9938_set_resolution (int which, int);
 int v9938_get_transpen(int which);

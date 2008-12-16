@@ -224,7 +224,7 @@ READ64_DEVICE_HANDLER( naomibd_r )
 	{
 		UINT64 ret;
 
-		ret = x76f100_sda_read( 0 ) << 15;
+		ret = x76f100_sda_read( device->machine, 0 ) << 15;
 
 		return ret << 32;
 	}
@@ -273,11 +273,13 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 	}
 	else if ((offset == 15) && ACCESSING_BITS_0_15)
 	{
+		running_machine *machine = device->machine;
+
 		// NAOMI_BOARDID_WRITE
-		x76f100_cs_write(0, (data >> 2) & 1 );
-		x76f100_rst_write(0, (data >> 3) & 1 );
-		x76f100_scl_write(0, (data >> 1) & 1 );
-		x76f100_sda_write(0, (data >> 0) & 1 );
+		x76f100_cs_write(machine, 0, (data >> 2) & 1 );
+		x76f100_rst_write(machine, 0, (data >> 3) & 1 );
+		x76f100_scl_write(machine, 0, (data >> 1) & 1 );
+		x76f100_sda_write(machine, 0, (data >> 0) & 1 );
 	}
 	else if ((offset == 2) && ACCESSING_BITS_32_63)
 	{

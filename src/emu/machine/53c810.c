@@ -1,7 +1,6 @@
 /* LSI Logic LSI53C810A PCI to SCSI I/O Processor */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "53c810.h"
 
 #define DMA_MAX_ICOUNT	512		/* Maximum number of DMA Scripts opcodes to run */
@@ -46,8 +45,9 @@ static struct {
 	void (* dma_callback)(UINT32, UINT32, int, int);
 } lsi810;
 
-static void (* dma_opcode[256])(void);
-
+typedef void (*opcode_handler)(running_machine *machine);
+#define OPCODE_HANDLER(name) void name(running_machine *machine)
+static opcode_handler dma_opcode[256];
 
 INLINE UINT32 FETCH(void)
 {
@@ -67,12 +67,12 @@ static UINT32 sign_extend24(UINT32 val)
 }
 #endif
 
-static void dmaop_invalid(void)
+static OPCODE_HANDLER( dmaop_invalid )
 {
 	fatalerror("LSI53C810: Invalid SCRIPTS DMA opcode %08X at %08X", lsi810.dcmd, lsi810.dsp);
 }
 
-static void dmaop_move_memory(void)
+static OPCODE_HANDLER( dmaop_move_memory )
 {
 	UINT32 src = FETCH();
 	UINT32 dst = FETCH();
@@ -84,7 +84,7 @@ static void dmaop_move_memory(void)
 	}
 }
 
-static void dmaop_interrupt(void)
+static OPCODE_HANDLER( dmaop_interrupt )
 {
 	if(lsi810.dcmd & 0x100000) {
 		fatalerror("LSI53C810: INTFLY opcode not implemented");
@@ -95,13 +95,13 @@ static void dmaop_interrupt(void)
 	lsi810.dstat |= 0x4;	/* SIR (SCRIPTS Interrupt Instruction Received) */
 
 	if(intf->irq_callback != NULL) {
-		intf->irq_callback(Machine, 1);
+		intf->irq_callback(machine, 1);
 	}
 	lsi810.dma_icount = 0;
 	lsi810.halted = 1;
 }
 
-static void dmaop_block_move(void)
+static OPCODE_HANDLER( dmaop_block_move )
 {
 	UINT32 address;
 	UINT32 count;
@@ -145,7 +145,7 @@ static void dmaop_block_move(void)
 	}
 }
 
-static void dmaop_select(void)
+static OPCODE_HANDLER( dmaop_select )
 {
 	UINT32 operand;
 
@@ -170,7 +170,7 @@ static void dmaop_select(void)
 	}
 }
 
-static void dmaop_wait_disconnect(void)
+static OPCODE_HANDLER( dmaop_wait_disconnect )
 {
 	UINT32 operand;
 
@@ -188,7 +188,7 @@ static void dmaop_wait_disconnect(void)
 	}
 }
 
-static void dmaop_wait_reselect(void)
+static OPCODE_HANDLER( dmaop_wait_reselect )
 {
 	UINT32 operand;
 
@@ -206,7 +206,7 @@ static void dmaop_wait_reselect(void)
 	}
 }
 
-static void dmaop_set(void)
+static OPCODE_HANDLER( dmaop_set )
 {
 	UINT32 operand;
 
@@ -235,7 +235,7 @@ static void dmaop_set(void)
 	}
 }
 
-static void dmaop_clear(void)
+static OPCODE_HANDLER( dmaop_clear )
 {
 	UINT32 operand;
 
@@ -264,17 +264,17 @@ static void dmaop_clear(void)
 	}
 }
 
-static void dmaop_move_from_sfbr(void)
+static OPCODE_HANDLER( dmaop_move_from_sfbr )
 {
 	fatalerror("LSI53C810: dmaop_move_from_sfbr not implemented in target mode");
 }
 
-static void dmaop_move_to_sfbr(void)
+static OPCODE_HANDLER( dmaop_move_to_sfbr )
 {
 	fatalerror("LSI53C810: dmaop_move_to_sfbr not implemented");
 }
 
-static void dmaop_read_modify_write(void)
+static OPCODE_HANDLER( dmaop_read_modify_write )
 {
 	fatalerror("LSI53C810: dmaop_read_modify_write not implemented");
 }
@@ -366,7 +366,7 @@ static UINT32 scripts_get_jump_dest(void)
 	return dest;
 }
 
-static void dmaop_jump(void)
+static OPCODE_HANDLER( dmaop_jump )
 {
 	if (scripts_compute_branch())
 {
@@ -378,7 +378,7 @@ static void dmaop_jump(void)
 	}
 }
 
-static void dmaop_call(void)
+static OPCODE_HANDLER( dmaop_call )
 {
 	if (scripts_compute_branch())
 	{
@@ -394,7 +394,7 @@ static void dmaop_call(void)
 	}
 }
 
-static void dmaop_return(void)
+static OPCODE_HANDLER( dmaop_return )
 {
 	// is this correct?  return only happens if the condition is true?
 	if (scripts_compute_branch())
@@ -408,19 +408,19 @@ static void dmaop_return(void)
 	}
 }
 
-static void dmaop_store(void)
+static OPCODE_HANDLER( dmaop_store )
 {
 	fatalerror("LSI53C810: dmaop_store not implemented");
 }
 
-static void dmaop_load(void)
+static OPCODE_HANDLER( dmaop_load )
 {
 	fatalerror("LSI53C810: dmaop_load not implemented");
 }
 
 
 
-static void dma_exec(void)
+static void dma_exec(running_machine *machine)
 {
 	lsi810.dma_icount = DMA_MAX_ICOUNT;
 
@@ -438,7 +438,7 @@ static void dma_exec(void)
 		lsi810.dcmd = FETCH();
 
 		op = (lsi810.dcmd >> 24) & 0xff;
-		dma_opcode[op]();
+		dma_opcode[op](machine);
 
 		lsi810.dma_icount--;
 	}
@@ -593,7 +593,7 @@ WRITE8_HANDLER( lsi53c810_reg_w )
 			lsi810.dsp |= data << 24;
 			lsi810.halted = 0;
 			if((lsi810.dmode & 0x1) == 0 && !lsi810.halted) {
-				dma_exec();
+				dma_exec(space->machine);
 			}
 			break;
 		case 0x34:		/* SCRATCH A */
@@ -616,7 +616,7 @@ WRITE8_HANDLER( lsi53c810_reg_w )
 				int op;
 				lsi810.dcmd = FETCH();
 				op = (lsi810.dcmd >> 24) & 0xff;
-				dma_opcode[op]();
+				dma_opcode[op](space->machine);
 
 				lsi810.istat |= 0x3;	/* DMA interrupt pending */
 				lsi810.dstat |= 0x8;	/* SSI (Single Step Interrupt) */
@@ -626,7 +626,7 @@ WRITE8_HANDLER( lsi53c810_reg_w )
 			}
 			else if(lsi810.dcntl & 0x04 && !lsi810.halted)	/* manual start DMA */
 			{
-				dma_exec();
+				dma_exec(space->machine);
 			}
 			break;
 		case 0x40:		/* SIEN0 */
@@ -656,7 +656,7 @@ WRITE8_HANDLER( lsi53c810_reg_w )
 	}
 }
 
-static void add_opcode(UINT8 op, UINT8 mask, void (* handler)(void))
+static void add_opcode(UINT8 op, UINT8 mask, opcode_handler handler)
 {
 	int i;
 	for(i=0; i < 256; i++) {
@@ -666,7 +666,7 @@ static void add_opcode(UINT8 op, UINT8 mask, void (* handler)(void))
 	}
 }
 
-extern void lsi53c810_init(const struct LSI53C810interface *interface)
+void lsi53c810_init(const struct LSI53C810interface *interface)
 {
 	int i;
 
@@ -705,7 +705,7 @@ extern void lsi53c810_init(const struct LSI53C810interface *interface)
 	}
 }
 
-extern void lsi53c810_exit(const struct LSI53C810interface *interface)
+void lsi53c810_exit(const struct LSI53C810interface *interface)
 {
 	int i;
 

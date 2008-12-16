@@ -7,7 +7,6 @@
 
 #include <stdarg.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/adc083x.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -28,7 +27,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 struct adc083x_chip
 {
 	int type;
-	double (*input_callback)(int input);
+	double (*input_callback)(running_machine *machine, int input);
 	INT32 CS;
 	INT32 CLK;
 	INT32 DI;
@@ -56,7 +55,7 @@ struct adc083x_chip
 
 static struct adc083x_chip adc083x[ MAX_ADC083X_CHIPS ];
 
-void adc083x_init( running_machine *machine, int chip, int type, double (*input_callback)(int input) )
+void adc083x_init( running_machine *machine, int chip, int type, double (*input_callback)(running_machine *machine, int input) )
 {
 	struct adc083x_chip *c;
 
@@ -122,9 +121,8 @@ void adc083x_init( running_machine *machine, int chip, int type, double (*input_
 	state_save_register_item( machine, "adc083x", NULL, chip, c->output );
 }
 
-void adc083x_cs_write( int chip, int cs )
+void adc083x_cs_write( running_machine *machine, int chip, int cs )
 {
-	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
@@ -169,7 +167,7 @@ void adc083x_cs_write( int chip, int cs )
 	c->CS = cs;
 }
 
-static int adc083x_conversion( int chip )
+static int adc083x_conversion( running_machine *machine, int chip )
 {
 	struct adc083x_chip *c = &adc083x[ chip ];
 	int result;
@@ -177,8 +175,8 @@ static int adc083x_conversion( int chip )
 	int negative_channel = ADC083X_AGND;
 	double positive = 0;
 	double negative = 0;
-	double gnd = c->input_callback( ADC083X_AGND );
-	double vref = c->input_callback( ADC083X_VREF );
+	double gnd = c->input_callback( machine, ADC083X_AGND );
+	double vref = c->input_callback( machine, ADC083X_VREF );
 
 	switch( c->type )
 	{
@@ -223,11 +221,11 @@ static int adc083x_conversion( int chip )
 
 	if( positive_channel != ADC083X_AGND )
 	{
-		positive = c->input_callback( positive_channel ) - gnd;
+		positive = c->input_callback( machine, positive_channel ) - gnd;
 	}
 	if( negative_channel != ADC083X_AGND )
 	{
-		negative = c->input_callback( negative_channel ) - gnd;
+		negative = c->input_callback( machine, negative_channel ) - gnd;
 	}
 
 	result = (int)( ( ( positive - negative ) * 255 ) / vref );
@@ -243,9 +241,8 @@ static int adc083x_conversion( int chip )
 	return result;
 }
 
-void adc083x_clk_write( int chip, int clk )
+void adc083x_clk_write( running_machine *machine, int chip, int clk )
 {
-	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
@@ -343,7 +340,7 @@ void adc083x_clk_write( int chip, int clk )
 			{
 			case STATE_MUX_SETTLE:
 				verboselog( machine, 1, "adc083x %d mux settle\n", chip );
-				c->output = adc083x_conversion( chip );
+				c->output = adc083x_conversion( machine, chip );
 				c->state = STATE_OUTPUT_MSB_FIRST;
 				c->bit = 7;
 				if( c->type == ADC0834 || c->type == ADC0838 )
@@ -388,9 +385,8 @@ void adc083x_clk_write( int chip, int clk )
 	c->CLK = clk;
 }
 
-void adc083x_di_write( int chip, int di )
+void adc083x_di_write( running_machine *machine, int chip, int di )
 {
-	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
@@ -409,9 +405,8 @@ void adc083x_di_write( int chip, int di )
 	c->DI = di;
 }
 
-void adc083x_se_write( int chip, int se )
+void adc083x_se_write( running_machine *machine, int chip, int se )
 {
-	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
@@ -430,9 +425,8 @@ void adc083x_se_write( int chip, int se )
 	c->SE = se;
 }
 
-int adc083x_sars_read( int chip )
+int adc083x_sars_read( running_machine *machine, int chip )
 {
-	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )
@@ -447,9 +441,8 @@ int adc083x_sars_read( int chip )
 	return c->SARS;
 }
 
-int adc083x_do_read( int chip )
+int adc083x_do_read( running_machine *machine, int chip )
 {
-	running_machine *machine = Machine;
 	struct adc083x_chip *c;
 
 	if( chip >= MAX_ADC083X_CHIPS )

@@ -8,7 +8,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/zs01.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -67,9 +66,8 @@ static struct zs01_chip zs01[ ZS01_MAXCHIP ];
 #define STATE_LOAD_COMMAND ( 2 )
 #define STATE_READ_DATA ( 3 )
 
-void zs01_init( int chip, UINT8 *data, zs01_write_handler write, zs01_read_handler read, UINT8 *ds2401 )
+void zs01_init( running_machine *machine, int chip, UINT8 *data, zs01_write_handler write, zs01_read_handler read, UINT8 *ds2401 )
 {
-	running_machine *machine = Machine;
 	int offset;
 	struct zs01_chip *c;
 
@@ -134,9 +132,8 @@ void zs01_init( int chip, UINT8 *data, zs01_write_handler write, zs01_read_handl
 	state_save_register_item_pointer( machine, "zs01", NULL, chip, c->data_key, SIZE_DATA );
 }
 
-void zs01_rst_write( int chip, int rst )
+void zs01_rst_write( running_machine *machine, int chip, int rst )
 {
-	running_machine *machine = Machine;
 	struct zs01_chip *c;
 
 	if( chip >= ZS01_MAXCHIP )
@@ -161,9 +158,8 @@ void zs01_rst_write( int chip, int rst )
 	c->rst = rst;
 }
 
-void zs01_cs_write( int chip, int cs )
+void zs01_cs_write( running_machine *machine, int chip, int cs )
 {
-	running_machine *machine = Machine;
 	struct zs01_chip *c;
 
 	if( chip >= ZS01_MAXCHIP )
@@ -391,9 +387,8 @@ static int zs01_data_offset( struct zs01_chip *c )
 	return block * SIZE_DATA_BUFFER;
 }
 
-void zs01_scl_write( int chip, int scl )
+void zs01_scl_write( running_machine *machine, int chip, int scl )
 {
-	running_machine *machine = Machine;
 	struct zs01_chip *c;
 
 	if( chip >= ZS01_MAXCHIP )
@@ -601,9 +596,8 @@ void zs01_scl_write( int chip, int scl )
 	c->scl = scl;
 }
 
-void zs01_sda_write( int chip, int sda )
+void zs01_sda_write( running_machine *machine, int chip, int sda )
 {
-	running_machine *machine = Machine;
 	struct zs01_chip *c;
 
 	if( chip >= ZS01_MAXCHIP )
@@ -649,9 +643,8 @@ void zs01_sda_write( int chip, int sda )
 	c->sdaw = sda;
 }
 
-int zs01_sda_read( int chip )
+int zs01_sda_read( running_machine *machine, int chip )
 {
-	running_machine *machine = Machine;
 	struct zs01_chip *c;
 
 	if( chip >= ZS01_MAXCHIP )
