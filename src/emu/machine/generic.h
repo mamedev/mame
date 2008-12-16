@@ -121,7 +121,7 @@ void set_led_status(int num, int value);
 
 void generic_pulse_irq_line(const device_config *device, int irqline);
 void generic_pulse_irq_line_and_vector(const device_config *device, int irqline, int vector);
-void cpu_interrupt_enable(int cpu, int enabled);
+void cpu_interrupt_enable(const device_config *device, int enabled);
 READ8_HANDLER( interrupt_enable_r );
 WRITE8_HANDLER( interrupt_enable_w );
 

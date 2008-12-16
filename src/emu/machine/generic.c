@@ -272,7 +272,7 @@ mame_file *nvram_fopen(running_machine *machine, UINT32 openflags)
 void nvram_load(running_machine *machine)
 {
 	mame_file *nvram_file = NULL;
-	device_config *device;
+	const device_config *device;
 
 	if (machine->config->nvram_handler != NULL)
 	{
@@ -280,23 +280,19 @@ void nvram_load(running_machine *machine)
 		(*machine->config->nvram_handler)(machine, nvram_file, 0);
 	}
 
-	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
+	for (device = machine->config->devicelist; device != NULL; device = device->next)
 	{
-		if (device->nvram != NULL)
+		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
+		if (nvram != NULL)
 		{
 			if (nvram_file == NULL)
-			{
 				nvram_file = nvram_fopen(machine, OPEN_FLAG_READ);
-			}
-
-			(*device->nvram)(device, nvram_file, 0);
+			(*nvram)(device, nvram_file, 0);
 		}
 	}
 
 	if (nvram_file != NULL)
-	{
 		mame_fclose(nvram_file);
-	}
 }
 
 
@@ -307,7 +303,7 @@ void nvram_load(running_machine *machine)
 void nvram_save(running_machine *machine)
 {
 	mame_file *nvram_file = NULL;
-	device_config *device;
+	const device_config *device;
 
 	if (machine->config->nvram_handler != NULL)
 	{
@@ -315,23 +311,19 @@ void nvram_save(running_machine *machine)
 		(*machine->config->nvram_handler)(machine, nvram_file, 1);
 	}
 
-	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
+	for (device = machine->config->devicelist; device != NULL; device = device->next)
 	{
-		if (device->nvram != NULL)
+		device_nvram_func nvram = (device_nvram_func)device_get_info_fct(device, DEVINFO_FCT_NVRAM);
+		if (nvram != NULL)
 		{
 			if (nvram_file == NULL)
-			{
 				nvram_file = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			}
-
-			(*device->nvram)(device, nvram_file, 1);
+			(*nvram)(device, nvram_file, 1);
 		}
 	}
 
 	if (nvram_file != NULL)
-	{
 		mame_fclose(nvram_file);
-	}
 }
 
 
@@ -579,14 +571,14 @@ static void interrupt_reset(running_machine *machine)
 
 static TIMER_CALLBACK( clear_all_lines )
 {
-	int cpunum = param;
-	int inputcount = cpu_get_input_lines(machine->cpu[cpunum]);
+	const device_config *device = ptr;
+	int inputcount = cpu_get_input_lines(device);
 	int line;
 
 	/* clear NMI and all inputs */
-	cpu_set_input_line(machine->cpu[cpunum], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(device, INPUT_LINE_NMI, CLEAR_LINE);
 	for (line = 0; line < inputcount; line++)
-		cpu_set_input_line(machine->cpu[cpunum], line, CLEAR_LINE);
+		cpu_set_input_line(device, line, CLEAR_LINE);
 }
 
 
@@ -637,16 +629,18 @@ void generic_pulse_irq_line_and_vector(const device_config *device, int irqline,
     disable value for global interrupts
 -------------------------------------------------*/
 
-void cpu_interrupt_enable(int cpunum, int enabled)
+void cpu_interrupt_enable(const device_config *device, int enabled)
 {
-	assert_always(cpunum >= 0 && cpunum < ARRAY_LENGTH(Machine->cpu) && Machine->cpu[cpunum] != NULL, "cpu_interrupt_enable() called for invalid cpu num!");
+	int cpunum = cpu_get_index(device);
+
+	assert_always(device != NULL, "cpu_interrupt_enable() called for invalid cpu!");
 
 	/* set the new state */
 	interrupt_enable[cpunum] = enabled;
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)
-		timer_call_after_resynch(Machine, NULL, cpunum, clear_all_lines);
+		timer_call_after_resynch(device->machine, (void *)device, 0, clear_all_lines);
 }
 
 
@@ -657,7 +651,7 @@ void cpu_interrupt_enable(int cpunum, int enabled)
 
 WRITE8_HANDLER( interrupt_enable_w )
 {
-	cpu_interrupt_enable(cpu_get_index(space->cpu), data);
+	cpu_interrupt_enable(space->cpu, data);
 }
 
 

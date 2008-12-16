@@ -288,7 +288,7 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 			break;
 		case 6:
 			warpwarp_ball_on = data & 1;
-			cpu_interrupt_enable(0,data & 1);
+			cpu_interrupt_enable(space->machine->cpu[0],data & 1);
 			if (~data & 1)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;

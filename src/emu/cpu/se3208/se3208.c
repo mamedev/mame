@@ -27,7 +27,7 @@ struct _se3208_state_t
 	UINT8 IRQ;
 	UINT8 NMI;
 
-	int SE3208_ICount;
+	int icount;
 };
 
 #define FLAG_C		0x0080
@@ -1702,7 +1702,7 @@ static void BuildTable(void)
 		OpTable[i]=DecodeOp(i);
 }
 
-static CPU_RESET( SE3208 )
+static CPU_RESET( se3208 )
 {
 	se3208_state_t *se3208_state = device->token;
 
@@ -1745,11 +1745,11 @@ static void SE3208_Interrupt(se3208_state_t *se3208_state)
 }
 
 
-static CPU_EXECUTE( SE3208 )
+static CPU_EXECUTE( se3208 )
 {
 	se3208_state_t *se3208_state = device->token;
 
-	se3208_state->SE3208_ICount=cycles;
+	se3208_state->icount=cycles;
 	do
 	{
 		UINT16 Opcode=memory_decrypted_read_word(se3208_state->program, WORD_XOR_LE(se3208_state->PC));
@@ -1769,13 +1769,13 @@ static CPU_EXECUTE( SE3208 )
 		{
 			SE3208_Interrupt(se3208_state);
 		}
-		--(se3208_state->SE3208_ICount);
-	} while(se3208_state->SE3208_ICount>0);
+		--(se3208_state->icount);
+	} while(se3208_state->icount>0);
 
-	return cycles-se3208_state->SE3208_ICount;
+	return cycles-se3208_state->icount;
 }
 
-static CPU_INIT( SE3208 )
+static CPU_INIT( se3208 )
 {
 	se3208_state_t *se3208_state = device->token;
 
@@ -1786,7 +1786,7 @@ static CPU_INIT( SE3208 )
 	se3208_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
-static CPU_EXIT( SE3208 )
+static CPU_EXIT( se3208 )
 {
 	if(OpTable)
 		free(OpTable);
@@ -1802,7 +1802,7 @@ static void set_irq_line(se3208_state_t *se3208_state, int line,int state)
 }
 
 
-static CPU_SET_INFO( SE3208 )
+static CPU_SET_INFO( se3208 )
 {
 	se3208_state_t *se3208_state = device->token;
 
@@ -1830,7 +1830,7 @@ static CPU_SET_INFO( SE3208 )
 }
 
 
-CPU_GET_INFO( SE3208 )
+CPU_GET_INFO( se3208 )
 {
 	se3208_state_t *se3208_state = (device != NULL) ? device->token : NULL;
 
@@ -1879,14 +1879,14 @@ CPU_GET_INFO( SE3208 )
 		case CPUINFO_INT_REGISTER + SE3208_R7:			info->i = se3208_state->R[ 7];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(SE3208);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(SE3208);		break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(SE3208);	break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(SE3208);		break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(SE3208);break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(se3208);		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(se3208);		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(se3208);	break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(se3208);		break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(se3208);break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(SE3208);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &se3208_state->SE3208_ICount;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(se3208);		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &se3208_state->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "SE3208");				break;

@@ -247,7 +247,7 @@ static WRITE8_HANDLER(toprollr_rombank_w)
 
 static TIMER_CALLBACK( disable_interrupts )
 {
-	cpu_interrupt_enable(0,0);
+	cpu_interrupt_enable(machine->cpu[0],0);
 }
 
 

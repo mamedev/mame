@@ -1173,19 +1173,18 @@ static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflag
 	const device_config *device = cputag_get_cpu(machine, rgntag);
 	if (device != NULL)
 	{
-		int cputype = ((const cpu_config *)device->inline_config)->type;
 		int buswidth;
 
 		/* set the endianness */
 		startflags &= ~ROMREGION_ENDIANMASK;
-		if (cputype_get_endianness(cputype) == ENDIANNESS_LITTLE)
+		if (cpu_get_endianness(device) == ENDIANNESS_LITTLE)
 			startflags |= ROMREGION_LE;
 		else
 			startflags |= ROMREGION_BE;
 
 		/* set the width */
 		startflags &= ~ROMREGION_WIDTHMASK;
-		buswidth = cputype_get_databus_width(cputype, ADDRESS_SPACE_PROGRAM);
+		buswidth = cpu_get_databus_width(device, ADDRESS_SPACE_PROGRAM);
 		if (buswidth <= 8)
 			startflags |= ROMREGION_8BIT;
 		else if (buswidth <= 16)

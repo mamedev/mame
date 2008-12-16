@@ -1504,7 +1504,7 @@ ROM_END
 static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UINT16 spin_pc)
 {
 	/* copy over the ROM */
-	cojag_is_r3000 = (machine->config->cpu[0].type == CPU_R3041BE);
+	cojag_is_r3000 = (cpu_get_type(machine->cpu[0]) == CPU_R3041BE);
 
 	/* install synchronization hooks for GPU */
 	if (cojag_is_r3000)

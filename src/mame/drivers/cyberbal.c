@@ -971,14 +971,14 @@ static const UINT16 default_eeprom[] =
 static DRIVER_INIT( cyberbal )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarigen_slapstic_init(machine, 0, 0x018000, 0, 0);
+	atarigen_slapstic_init(machine->cpu[0], 0x018000, 0, 0);
 }
 
 
 static DRIVER_INIT( cyberbt )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarigen_slapstic_init(machine, 0, 0x018000, 0, 116);
+	atarigen_slapstic_init(machine->cpu[0], 0x018000, 0, 116);
 }
 
 

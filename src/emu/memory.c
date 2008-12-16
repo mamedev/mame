@@ -750,25 +750,25 @@ const address_space *memory_find_address_space(const device_config *cpu, int spa
     address map for a CPU's address space
 -------------------------------------------------*/
 
-address_map *address_map_alloc(const machine_config *config, const game_driver *driver, int cpunum, int spacenum)
+address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum)
 {
-	const char *cputag = config->cpu[cpunum].tag;
-	int cputype = config->cpu[cpunum].type;
-	const addrmap_token *internal_map = (const addrmap_token *)cputype_get_info_ptr(cputype, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
+	const cpu_config *cpuconfig = device->inline_config;
+	const addrmap_token *internal_map;
 	address_map *map;
 
 	map = malloc_or_die(sizeof(*map));
 	memset(map, 0, sizeof(*map));
 
 	/* append the internal CPU map (first so it takes priority) */
+	internal_map = (const addrmap_token *)cputype_get_info_ptr(cpuconfig->type, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
 	if (internal_map != NULL)
-		map_detokenize(map, driver, cputag, internal_map);
+		map_detokenize(map, driver, device->tag, internal_map);
 
 	/* construct the standard map */
-	if (config->cpu[cpunum].address_map[spacenum][0] != NULL)
-		map_detokenize(map, driver, cputag, config->cpu[cpunum].address_map[spacenum][0]);
-	if (config->cpu[cpunum].address_map[spacenum][1] != NULL)
-		map_detokenize(map, driver, cputag, config->cpu[cpunum].address_map[spacenum][1]);
+	if (cpuconfig->address_map[spacenum] != NULL)
+		map_detokenize(map, driver, device->tag, cpuconfig->address_map[spacenum]);
+	if (cpuconfig->address_map2[spacenum] != NULL)
+		map_detokenize(map, driver, device->tag, cpuconfig->address_map2[spacenum]);
 
 	return map;
 }
@@ -1328,7 +1328,7 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 int memory_address_physical(const address_space *space, int intention, offs_t *address)
 {
-	cpu_class_header *classheader = space->cpu->classtoken;
+	cpu_class_header *classheader = cpu_get_class_header(space->cpu);
 	if (classheader->translate != NULL)
 		return (*classheader->translate)(space->cpu, space->spacenum, intention, address);
 	else
@@ -1474,115 +1474,109 @@ void memory_dump(running_machine *machine, FILE *file)
 
 static void memory_init_spaces(running_machine *machine)
 {
-	const machine_config *config = machine->config;
 	memory_private *memdata = machine->memory_data;
 	address_space **nextptr = (address_space **)&memdata->spacelist;
-	int cpunum, spacenum;
+	const device_config *device;
+	int spacenum;
 
 	/* create a global watchpoint-filled table */
 	memdata->wptable = auto_malloc(1 << LEVEL1_BITS);
 	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
 	/* loop over CPUs */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			cpu_type cputype = config->cpu[cpunum].type;
+	for (device = machine->cpu[0]; device != NULL; device = device->typenext)
+		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+			if (cpu_get_addrbus_width(device, spacenum) > 0)
+			{
+				address_space *space = malloc_or_die(sizeof(*space));
+				int logbits = cpu_get_logaddr_width(device, spacenum);
+				int ashift = cpu_get_addrbus_shift(device, spacenum);
+				int abits = cpu_get_addrbus_width(device, spacenum);
+				int dbits = cpu_get_databus_width(device, spacenum);
+				int endianness = cpu_get_endianness(device);
+				int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
+				int entrynum;
 
-			/* initialize each address space with an actual address bus */
-			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-				if (cputype_get_addrbus_width(cputype, spacenum) > 0)
+				/* if logbits is 0, revert to abits */
+				if (logbits == 0)
+					logbits = abits;
+
+				/* determine the address and data bits */
+				memset(space, 0, sizeof(*space));
+				space->machine = machine;
+				space->cpu = device;
+				space->name = address_space_names[spacenum];
+				space->accessors = memory_accessors[accessorindex][(endianness == ENDIANNESS_LITTLE) ? 0 : 1];
+				space->addrmask = 0xffffffffUL >> (32 - abits);
+				space->bytemask = (ashift < 0) ? ((space->addrmask << -ashift) | ((1 << -ashift) - 1)) : (space->addrmask >> ashift);
+				space->logaddrmask = 0xffffffffUL >> (32 - logbits);
+				space->logbytemask = (ashift < 0) ? ((space->logaddrmask << -ashift) | ((1 << -ashift) - 1)) : (space->logaddrmask >> ashift);
+				space->spacenum = spacenum;
+				space->endianness = endianness;
+				space->ashift = ashift;
+				space->pageshift = cpu_get_page_shift(device, spacenum);
+				space->abits = abits;
+				space->dbits = dbits;
+				space->addrchars = (abits + 3) / 4;
+				space->logaddrchars = (logbits + 3) / 4;
+				space->log_unmap = TRUE;
+
+				/* allocate subtable information; we malloc this manually because it will be realloc'ed */
+				space->read.subtable = auto_malloc(sizeof(*space->read.subtable) * SUBTABLE_COUNT);
+				memset(space->read.subtable, 0, sizeof(*space->read.subtable) * SUBTABLE_COUNT);
+				space->write.subtable = auto_malloc(sizeof(*space->write.subtable) * SUBTABLE_COUNT);
+				memset(space->write.subtable, 0, sizeof(*space->write.subtable) * SUBTABLE_COUNT);
+
+				/* allocate the handler table */
+				space->read.handlers[0] = auto_malloc(sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
+				memset(space->read.handlers[0], 0, sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
+				space->write.handlers[0] = auto_malloc(sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
+				memset(space->write.handlers[0], 0, sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
+				for (entrynum = 1; entrynum < ARRAY_LENGTH(space->read.handlers); entrynum++)
 				{
-					address_space *space = malloc_or_die(sizeof(*space));
-					int logbits = cputype_get_logaddr_width(cputype, spacenum);
-					int ashift = cputype_get_addrbus_shift(cputype, spacenum);
-					int abits = cputype_get_addrbus_width(cputype, spacenum);
-					int dbits = cputype_get_databus_width(cputype, spacenum);
-					int endianness = cputype_get_endianness(cputype);
-					int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
-					int entrynum;
-
-					/* if logbits is 0, revert to abits */
-					if (logbits == 0)
-						logbits = abits;
-
-					/* determine the address and data bits */
-					memset(space, 0, sizeof(*space));
-					space->machine = machine;
-					space->cpu = machine->cpu[cpunum];
-					space->name = address_space_names[spacenum];
-					space->accessors = memory_accessors[accessorindex][(endianness == ENDIANNESS_LITTLE) ? 0 : 1];
-					space->addrmask = 0xffffffffUL >> (32 - abits);
-					space->bytemask = (ashift < 0) ? ((space->addrmask << -ashift) | ((1 << -ashift) - 1)) : (space->addrmask >> ashift);
-					space->logaddrmask = 0xffffffffUL >> (32 - logbits);
-					space->logbytemask = (ashift < 0) ? ((space->logaddrmask << -ashift) | ((1 << -ashift) - 1)) : (space->logaddrmask >> ashift);
-					space->spacenum = spacenum;
-					space->endianness = endianness;
-					space->ashift = ashift;
-					space->pageshift = cputype_get_page_shift(cputype, spacenum);
-					space->abits = abits;
-					space->dbits = dbits;
-					space->addrchars = (abits + 3) / 4;
-					space->logaddrchars = (logbits + 3) / 4;
-					space->log_unmap = TRUE;
-
-					/* allocate subtable information; we malloc this manually because it will be realloc'ed */
-					space->read.subtable = auto_malloc(sizeof(*space->read.subtable) * SUBTABLE_COUNT);
-					memset(space->read.subtable, 0, sizeof(*space->read.subtable) * SUBTABLE_COUNT);
-					space->write.subtable = auto_malloc(sizeof(*space->write.subtable) * SUBTABLE_COUNT);
-					memset(space->write.subtable, 0, sizeof(*space->write.subtable) * SUBTABLE_COUNT);
-
-					/* allocate the handler table */
-					space->read.handlers[0] = auto_malloc(sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
-					memset(space->read.handlers[0], 0, sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
-					space->write.handlers[0] = auto_malloc(sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
-					memset(space->write.handlers[0], 0, sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
-					for (entrynum = 1; entrynum < ARRAY_LENGTH(space->read.handlers); entrynum++)
-					{
-						space->read.handlers[entrynum] = space->read.handlers[0] + entrynum;
-						space->write.handlers[entrynum] = space->write.handlers[0] + entrynum;
-					}
-
-					/* init the static handlers */
-					for (entrynum = 0; entrynum < ENTRY_COUNT; entrynum++)
-					{
-						space->read.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 0, entrynum);
-						space->read.handlers[entrynum]->object = space;
-						space->write.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 1, entrynum);
-						space->write.handlers[entrynum]->object = space;
-					}
-
-					/* make sure we fix up the mask for the unmap and watchpoint handlers */
-					space->read.handlers[STATIC_UNMAP]->bytemask = ~0;
-					space->write.handlers[STATIC_UNMAP]->bytemask = ~0;
-					space->read.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
-					space->write.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
-
-					/* allocate memory; these aren't auto-malloc'ed as we need to expand them */
-					space->read.table = malloc_or_die(1 << LEVEL1_BITS);
-					space->write.table = malloc_or_die(1 << LEVEL1_BITS);
-
-					/* initialize everything to unmapped */
-					memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
-					memset(space->write.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
-
-					/* initialize the lookups */
-					space->readlookup = space->read.table;
-					space->writelookup = space->write.table;
-
-					/* set the direct access information base */
-					space->direct.raw = space->direct.decrypted = NULL;
-					space->direct.mask = space->bytemask;
-					space->direct.min = 1;
-					space->direct.max = 0;
-					space->direct.entry = STATIC_UNMAP;
-					space->directupdate = NULL;
-
-					/* link us in */
-					*nextptr = space;
-					nextptr = (address_space **)&space->next;
+					space->read.handlers[entrynum] = space->read.handlers[0] + entrynum;
+					space->write.handlers[entrynum] = space->write.handlers[0] + entrynum;
 				}
-		}
+
+				/* init the static handlers */
+				for (entrynum = 0; entrynum < ENTRY_COUNT; entrynum++)
+				{
+					space->read.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 0, entrynum);
+					space->read.handlers[entrynum]->object = space;
+					space->write.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 1, entrynum);
+					space->write.handlers[entrynum]->object = space;
+				}
+
+				/* make sure we fix up the mask for the unmap and watchpoint handlers */
+				space->read.handlers[STATIC_UNMAP]->bytemask = ~0;
+				space->write.handlers[STATIC_UNMAP]->bytemask = ~0;
+				space->read.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
+				space->write.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
+
+				/* allocate memory; these aren't auto-malloc'ed as we need to expand them */
+				space->read.table = malloc_or_die(1 << LEVEL1_BITS);
+				space->write.table = malloc_or_die(1 << LEVEL1_BITS);
+
+				/* initialize everything to unmapped */
+				memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
+				memset(space->write.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
+
+				/* initialize the lookups */
+				space->readlookup = space->read.table;
+				space->writelookup = space->write.table;
+
+				/* set the direct access information base */
+				space->direct.raw = space->direct.decrypted = NULL;
+				space->direct.mask = space->bytemask;
+				space->direct.min = 1;
+				space->direct.max = 0;
+				space->direct.entry = STATIC_UNMAP;
+				space->directupdate = NULL;
+
+				/* link us in */
+				*nextptr = space;
+				nextptr = (address_space **)&space->next;
+			}
 }
 
 
@@ -1607,7 +1601,7 @@ static void memory_init_preflight(running_machine *machine)
 		int entrynum;
 
 		/* allocate the address map */
-		space->map = address_map_alloc(machine->config, machine->gamedrv, cpu_get_index(space->cpu), space->spacenum);
+		space->map = address_map_alloc(space->cpu, machine->gamedrv, space->spacenum);
 
 		/* extract global parameters specified by the map */
 		space->unmap = (space->map->unmapval == 0) ? 0 : ~0;

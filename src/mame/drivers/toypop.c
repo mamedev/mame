@@ -154,30 +154,30 @@ static WRITE16_HANDLER( toypop_m68000_sharedram_w )
 
 static READ8_HANDLER( toypop_main_interrupt_enable_r )
 {
-	cpu_interrupt_enable(0,1);
+	cpu_interrupt_enable(space->machine->cpu[0],1);
 	return 0;
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_enable_w )
 {
-	cpu_interrupt_enable(0,1);
+	cpu_interrupt_enable(space->machine->cpu[0],1);
 	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
 {
-	cpu_interrupt_enable(0,0);
+	cpu_interrupt_enable(space->machine->cpu[0],0);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
 {
-	cpu_interrupt_enable(1,1);
+	cpu_interrupt_enable(space->machine->cpu[1],1);
 	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
 {
-	cpu_interrupt_enable(1,0);
+	cpu_interrupt_enable(space->machine->cpu[1],0);
 }
 
 static INTERRUPT_GEN( toypop_main_interrupt )
@@ -212,9 +212,9 @@ static WRITE8_HANDLER( toypop_m68000_assert_w )
 
 static TIMER_CALLBACK( disable_interrupts )
 {
-	cpu_interrupt_enable(0,0);
+	cpu_interrupt_enable(machine->cpu[0],0);
 	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-	cpu_interrupt_enable(1,0);
+	cpu_interrupt_enable(machine->cpu[1],0);
 	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	interrupt_enable_68k = 0;
 }

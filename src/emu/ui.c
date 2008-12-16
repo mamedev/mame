@@ -976,28 +976,30 @@ static astring *warnings_string(running_machine *machine, astring *string)
 astring *game_info_astring(running_machine *machine, astring *string)
 {
 	int scrcount = video_screen_count(machine->config);
-	int cpunum, sndnum;
+	const device_config *scandevice;
+	const device_config *device;
+	int sndnum;
 	int count;
 
 	/* print description, manufacturer, and CPU: */
 	astring_printf(string, "%s\n%s %s\n\nCPU:\n", machine->gamedrv->description, machine->gamedrv->year, machine->gamedrv->manufacturer);
 
 	/* loop over all CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU && machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum += count)
+	for (device = machine->cpu[0]; device != NULL; device = scandevice)
 	{
-		cpu_type type = machine->config->cpu[cpunum].type;
-		int clock = machine->config->cpu[cpunum].clock;
+		int clock = ((const cpu_config *)device->inline_config)->clock;
 
 		/* count how many identical CPUs we have */
-		for (count = 1; cpunum + count < MAX_CPU; count++)
-			if (machine->config->cpu[cpunum + count].type != type ||
-		        machine->config->cpu[cpunum + count].clock != clock)
-		    	break;
+		count = 1;
+		for (scandevice = device->typenext; scandevice != NULL; scandevice = device->typenext)
+			if (cpu_get_type(device) != cpu_get_type(scandevice) ||
+				clock != ((const cpu_config *)scandevice->inline_config)->clock)
+				break;
 
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
 			astring_catprintf(string, "%d" UTF8_MULTIPLY, count);
-		astring_catc(string, cputype_get_name(type));
+		astring_catc(string, cpu_get_name(device));
 
 		/* display clock in kHz or MHz */
 		if (clock >= 1000000)

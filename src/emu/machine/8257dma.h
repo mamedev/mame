@@ -22,7 +22,7 @@ typedef struct _dma8257_interface dma8257_interface;
 struct _dma8257_interface
 {
 	/* CPU to halt when DMA is active */
-	int cpunum;
+	const char *cputag;
 
 	/* clock */
 	int clockhz;

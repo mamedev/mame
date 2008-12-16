@@ -1400,7 +1400,7 @@ static _OP DecodeOp(UINT16 Opcode)
 }
 
 
-CPU_DISASSEMBLE( SE3208 )
+CPU_DISASSEMBLE( se3208 )
 {
 	UINT16 Opcode;
 

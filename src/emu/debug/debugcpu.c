@@ -160,7 +160,8 @@ void debug_cpu_init(running_machine *machine)
 {
 	const device_config *first_screen = video_screen_first(machine->config);
 	debugcpu_private *global;
-	int cpunum, regnum;
+	const device_config *cpu;
+	int regnum;
 
 	/* allocate and reset globals */
 	machine->debugcpu_data = global = auto_malloc(sizeof(*global));
@@ -189,68 +190,66 @@ void debug_cpu_init(running_machine *machine)
 	}
 
 	/* loop over CPUs and build up their info */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	{
+		cpu_class_header *classheader = cpu_get_class_header(cpu);
+		cpu_debug_data *info;
+
+		/* allocate some information */
+		info = auto_malloc(sizeof(*info));
+		memset(info, 0, sizeof(*info));
+		classheader->debug = info;
+
+		/* reset the PC data */
+		info->flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
+		info->device = cpu;
+		info->opwidth = cpu_get_min_opcode_bytes(info->device);
+
+		/* fetch the memory accessors */
+		info->read = (cpu_read_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READ);
+		info->write = (cpu_write_func)cpu_get_info_fct(info->device, CPUINFO_PTR_WRITE);
+		info->readop = (cpu_readop_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READOP);
+
+		/* allocate a symbol table */
+		info->symtable = symtable_alloc(global->symtable, (void *)cpu);
+
+		/* add a global symbol for the current instruction pointer */
+		symtable_add_register(info->symtable, "curpc", NULL, get_current_pc, 0);
+		symtable_add_register(info->symtable, "cycles", NULL, get_cycles, NULL);
+		if (classheader->space[ADDRESS_SPACE_PROGRAM] != NULL)
+			symtable_add_register(info->symtable, "logunmap", (void *)classheader->space[ADDRESS_SPACE_PROGRAM], get_logunmap, set_logunmap);
+		if (classheader->space[ADDRESS_SPACE_DATA] != NULL)
+			symtable_add_register(info->symtable, "logunmapd", (void *)classheader->space[ADDRESS_SPACE_DATA], get_logunmap, set_logunmap);
+		if (classheader->space[ADDRESS_SPACE_IO] != NULL)
+			symtable_add_register(info->symtable, "logunmapi", (void *)classheader->space[ADDRESS_SPACE_IO], get_logunmap, set_logunmap);
+
+		/* add all registers into it */
+		for (regnum = 0; regnum < MAX_REGS; regnum++)
 		{
-			const device_config *cpu = machine->cpu[cpunum];
-			cpu_class_header *classheader = cpu->classtoken;
-			cpu_debug_data *info;
+			const char *str = cpu_get_reg_string(info->device, regnum);
+			const char *colon;
+			char symname[256];
+			int charnum;
 
-			/* allocate some information */
-			info = auto_malloc(sizeof(*info));
-			memset(info, 0, sizeof(*info));
-			classheader->debug = info;
+			/* skip if we don't get a valid string, or one without a colon */
+			if (str == NULL)
+				continue;
+			if (str[0] == '~')
+				str++;
+			colon = strchr(str, ':');
+			if (colon == NULL)
+				continue;
 
-			/* reset the PC data */
-			info->flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
-			info->device = machine->cpu[cpunum];
-			info->opwidth = cpu_get_min_opcode_bytes(info->device);
+			/* strip all spaces from the name and convert to lowercase */
+			for (charnum = 0; charnum < sizeof(symname) - 1 && str < colon; str++)
+				if (!isspace(*str))
+					symname[charnum++] = tolower(*str);
+			symname[charnum] = 0;
 
-			/* fetch the memory accessors */
-			info->read = (cpu_read_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READ);
-			info->write = (cpu_write_func)cpu_get_info_fct(info->device, CPUINFO_PTR_WRITE);
-			info->readop = (cpu_readop_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READOP);
-
-			/* allocate a symbol table */
-			info->symtable = symtable_alloc(global->symtable, (void *)cpu);
-
-			/* add a global symbol for the current instruction pointer */
-			symtable_add_register(info->symtable, "curpc", NULL, get_current_pc, 0);
-			symtable_add_register(info->symtable, "cycles", NULL, get_cycles, NULL);
-			if (classheader->space[ADDRESS_SPACE_PROGRAM] != NULL)
-				symtable_add_register(info->symtable, "logunmap", (void *)classheader->space[ADDRESS_SPACE_PROGRAM], get_logunmap, set_logunmap);
-			if (classheader->space[ADDRESS_SPACE_DATA] != NULL)
-				symtable_add_register(info->symtable, "logunmapd", (void *)classheader->space[ADDRESS_SPACE_DATA], get_logunmap, set_logunmap);
-			if (classheader->space[ADDRESS_SPACE_IO] != NULL)
-				symtable_add_register(info->symtable, "logunmapi", (void *)classheader->space[ADDRESS_SPACE_IO], get_logunmap, set_logunmap);
-
-			/* add all registers into it */
-			for (regnum = 0; regnum < MAX_REGS; regnum++)
-			{
-				const char *str = cpu_get_reg_string(info->device, regnum);
-				const char *colon;
-				char symname[256];
-				int charnum;
-
-				/* skip if we don't get a valid string, or one without a colon */
-				if (str == NULL)
-					continue;
-				if (str[0] == '~')
-					str++;
-				colon = strchr(str, ':');
-				if (colon == NULL)
-					continue;
-
-				/* strip all spaces from the name and convert to lowercase */
-				for (charnum = 0; charnum < sizeof(symname) - 1 && str < colon; str++)
-					if (!isspace(*str))
-						symname[charnum++] = tolower(*str);
-				symname[charnum] = 0;
-
-				/* add the symbol to the table */
-				symtable_add_register(info->symtable, symname, (void *)(FPTR)regnum, get_cpu_reg, set_cpu_reg);
-			}
+			/* add the symbol to the table */
+			symtable_add_register(info->symtable, symname, (void *)(FPTR)regnum, get_cpu_reg, set_cpu_reg);
 		}
+	}
 
 	/* first CPU is visible by default */
 	global->visiblecpu = machine->cpu[0];
@@ -271,18 +270,17 @@ void debug_cpu_init(running_machine *machine)
 
 void debug_cpu_flush_traces(running_machine *machine)
 {
-	int cpunum;
+	const device_config *cpu;
 
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	{
+		cpu_debug_data *info = cpu_get_debug_data(cpu);
 
-			/* this can be called on exit even when no debugging is enabled, so
-               make sure the info is valid before proceeding */
-			if (info != NULL && info->trace.file != NULL)
-				fflush(info->trace.file);
-		}
+		/* this can be called on exit even when no debugging is enabled, so
+          make sure the info is valid before proceeding */
+		if (info != NULL && info->trace.file != NULL)
+			fflush(info->trace.file);
+	}
 }
 
 
@@ -923,34 +921,33 @@ int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed
 int debug_cpu_breakpoint_clear(running_machine *machine, int bpnum)
 {
 	debug_cpu_breakpoint *bp, *pbp;
-	int cpunum;
+	const device_config *cpu;
 
 	/* loop over CPUs and find the requested breakpoint */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
-			for (pbp = NULL, bp = info->bplist; bp != NULL; pbp = bp, bp = bp->next)
-				if (bp->index == bpnum)
-				{
-					/* unlink us from the list */
-					if (pbp == NULL)
-						info->bplist = bp->next;
-					else
-						pbp->next = bp->next;
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	{
+		cpu_debug_data *info = cpu_get_debug_data(cpu);
+		for (pbp = NULL, bp = info->bplist; bp != NULL; pbp = bp, bp = bp->next)
+			if (bp->index == bpnum)
+			{
+				/* unlink us from the list */
+				if (pbp == NULL)
+					info->bplist = bp->next;
+				else
+					pbp->next = bp->next;
 
-					/* free the memory */
-					if (bp->condition != NULL)
-						expression_free(bp->condition);
-					if (bp->action != NULL)
-						free(bp->action);
-					free(bp);
+				/* free the memory */
+				if (bp->condition != NULL)
+					expression_free(bp->condition);
+				if (bp->action != NULL)
+					free(bp->action);
+				free(bp);
 
-					/* update the flags */
-					breakpoint_update_flags(info);
-					return TRUE;
-				}
-		}
+				/* update the flags */
+				breakpoint_update_flags(info);
+				return TRUE;
+			}
+	}
 
 	/* we didn't find it; return an error */
 	return FALSE;
@@ -965,21 +962,20 @@ int debug_cpu_breakpoint_clear(running_machine *machine, int bpnum)
 int debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable)
 {
 	debug_cpu_breakpoint *bp;
-	int cpunum;
+	const device_config *cpu;
 
 	/* loop over CPUs and find the requested breakpoint */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
-			for (bp = info->bplist; bp != NULL; bp = bp->next)
-				if (bp->index == bpnum)
-				{
-					bp->enabled = (enable != 0);
-					breakpoint_update_flags(info);
-					return TRUE;
-				}
-		}
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	{
+		cpu_debug_data *info = cpu_get_debug_data(cpu);
+		for (bp = info->bplist; bp != NULL; bp = bp->next)
+			if (bp->index == bpnum)
+			{
+				bp->enabled = (enable != 0);
+				breakpoint_update_flags(info);
+				return TRUE;
+			}
+	}
 
 	return FALSE;
 }
@@ -1033,34 +1029,34 @@ int debug_cpu_watchpoint_set(const address_space *space, int type, offs_t addres
 int debug_cpu_watchpoint_clear(running_machine *machine, int wpnum)
 {
 	debug_cpu_watchpoint *wp, *pwp;
-	int cpunum, spacenum;
+	const device_config *cpu;
+	int spacenum;
 
 	/* loop over CPUs and find the requested watchpoint */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	{
+		cpu_debug_data *info = cpu_get_debug_data(cpu);
 
-			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-				for (pwp = NULL, wp = info->wplist[spacenum]; wp != NULL; pwp = wp, wp = wp->next)
-					if (wp->index == wpnum)
-					{
-						/* unlink us from the list */
-						if (pwp == NULL)
-							info->wplist[spacenum] = wp->next;
-						else
-							pwp->next = wp->next;
+		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+			for (pwp = NULL, wp = info->wplist[spacenum]; wp != NULL; pwp = wp, wp = wp->next)
+				if (wp->index == wpnum)
+				{
+					/* unlink us from the list */
+					if (pwp == NULL)
+						info->wplist[spacenum] = wp->next;
+					else
+						pwp->next = wp->next;
 
-						/* free the memory */
-						if (wp->condition != NULL)
-							expression_free(wp->condition);
-						if (wp->action != NULL)
-							free(wp->action);
-						free(wp);
+					/* free the memory */
+					if (wp->condition != NULL)
+						expression_free(wp->condition);
+					if (wp->action != NULL)
+						free(wp->action);
+					free(wp);
 
-						watchpoint_update_flags(cpu_get_address_space(machine->cpu[cpunum], spacenum));
-						return TRUE;
-					}
+					watchpoint_update_flags(cpu_get_address_space(cpu, spacenum));
+					return TRUE;
+				}
 	}
 
 	/* we didn't find it; return an error */
@@ -1076,23 +1072,23 @@ int debug_cpu_watchpoint_clear(running_machine *machine, int wpnum)
 int debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable)
 {
 	debug_cpu_watchpoint *wp;
-	int cpunum, spacenum;
+	const device_config *cpu;
+	int spacenum;
 
 	/* loop over CPUs and address spaces and find the requested watchpoint */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	{
+		cpu_debug_data *info = cpu_get_debug_data(cpu);
 
-			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-				for (wp = info->wplist[spacenum]; wp != NULL; wp = wp->next)
-					if (wp->index == wpnum)
-					{
-						wp->enabled = (enable != 0);
-						watchpoint_update_flags(cpu_get_address_space(machine->cpu[cpunum], spacenum));
-						return TRUE;
-					}
-		}
+		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+			for (wp = info->wplist[spacenum]; wp != NULL; wp = wp->next)
+				if (wp->index == wpnum)
+				{
+					wp->enabled = (enable != 0);
+					watchpoint_update_flags(cpu_get_address_space(cpu, spacenum));
+					return TRUE;
+				}
+	}
 	return FALSE;
 }
 
@@ -1770,36 +1766,36 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 static void debug_cpu_exit(running_machine *machine)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	int cpunum, spacenum;
+	const device_config *cpu;
+	int spacenum;
 
 	/* loop over all watchpoints and breakpoints to free their memory */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	{
+		cpu_debug_data *info = cpu_get_debug_data(cpu);
+
+		/* close any tracefiles */
+		if (info->trace.file != NULL)
+			fclose(info->trace.file);
+		if (info->trace.action != NULL)
+			free(info->trace.action);
+
+		/* free the symbol table */
+		if (info->symtable != NULL)
+			symtable_free(info->symtable);
+
+		/* free all breakpoints */
+		while (info->bplist != NULL)
+			debug_cpu_breakpoint_clear(machine, info->bplist->index);
+
+		/* loop over all address spaces */
+		for (spacenum = 0; spacenum < ARRAY_LENGTH(info->wplist); spacenum++)
 		{
-			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
-
-			/* close any tracefiles */
-			if (info->trace.file != NULL)
-				fclose(info->trace.file);
-			if (info->trace.action != NULL)
-				free(info->trace.action);
-
-			/* free the symbol table */
-			if (info->symtable != NULL)
-				symtable_free(info->symtable);
-
-			/* free all breakpoints */
-			while (info->bplist != NULL)
-				debug_cpu_breakpoint_clear(machine, info->bplist->index);
-
-			/* loop over all address spaces */
-			for (spacenum = 0; spacenum < ARRAY_LENGTH(info->wplist); spacenum++)
-			{
-				/* free all watchpoints */
-				while (info->wplist[spacenum] != NULL)
-					debug_cpu_watchpoint_clear(machine, info->wplist[spacenum]->index);
-			}
+			/* free all watchpoints */
+			while (info->wplist[spacenum] != NULL)
+				debug_cpu_watchpoint_clear(machine, info->wplist[spacenum]->index);
 		}
+	}
 
 	/* free the global symbol table */
 	if (global != NULL && global->symtable != NULL)
@@ -1826,12 +1822,11 @@ static void on_vblank(const device_config *device, void *param, int vblank_state
 
 static void reset_transient_flags(running_machine *machine)
 {
-	int cpunum;
+	const device_config *cpu;
 
 	/* loop over CPUs and reset the transient flags */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-			cpu_get_debug_data(machine->cpu[cpunum])->flags &= ~DEBUG_FLAG_TRANSIENT;
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		cpu_get_debug_data(cpu)->flags &= ~DEBUG_FLAG_TRANSIENT;
 }
 
 

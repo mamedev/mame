@@ -338,7 +338,7 @@ static WRITE8_DEVICE_HANDLER( p8257_ctl_w );
 
 static const z80dma_interface dk3_dma =
 {
-	0,
+	"main",
 	CLOCK_1H,
 
 	dk_dma_read_byte,
@@ -349,7 +349,7 @@ static const z80dma_interface dk3_dma =
 
 static const dma8257_interface dk_dma =
 {
-	0,
+	"main",
 	CLOCK_1H,
 
 	dk_dma_read_byte,
@@ -362,7 +362,7 @@ static const dma8257_interface dk_dma =
 
 static const dma8257_interface hb_dma =
 {
-	0,
+	"main",
 	CLOCK_1H,
 
 	hb_dma_read_byte,

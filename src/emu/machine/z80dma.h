@@ -13,7 +13,7 @@ typedef struct _z80dma_interface z80dma_interface;
 struct _z80dma_interface
 {
 	/* CPU to halt when DMA is active */
-	int cpunum;
+	const char *cputag;
 
 	/* clock */
 	int clockhz;

@@ -255,7 +255,7 @@ static WRITE8_HANDLER( gaplus_snd_sharedram_w )
 static WRITE8_HANDLER( gaplus_irq_1_ctrl_w )
 {
 	int bit = !BIT(offset,11);
-	cpu_interrupt_enable(0,bit);
+	cpu_interrupt_enable(space->machine->cpu[0],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( gaplus_irq_1_ctrl_w )
 static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
 {
 	int bit = !BIT(offset,13);
-	cpu_interrupt_enable(2,bit);
+	cpu_interrupt_enable(space->machine->cpu[2],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
 }
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
 static WRITE8_HANDLER( gaplus_irq_2_ctrl_w )
 {
 	int bit = offset & 1;
-	cpu_interrupt_enable(1,bit);
+	cpu_interrupt_enable(space->machine->cpu[1],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
@@ -295,7 +295,7 @@ logerror("%04x: freset %d\n",cpu_get_pc(space->cpu),bit);
 static MACHINE_RESET( gaplus )
 {
 	/* on reset, VINTON is reset, while the other flags don't seem to be affected */
-	cpu_interrupt_enable(1,0);
+	cpu_interrupt_enable(machine->cpu[1],0);
 	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 

@@ -1737,7 +1737,7 @@ static MACHINE_RESET( spi )
 static MACHINE_DRIVER_START( spi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",I386, 50000000/2)	/* Intel 386DX, 25MHz */
+	MDRV_CPU_ADD("main", I386, 50000000/2)	/* Intel 386DX, 25MHz */
 	MDRV_CPU_PROGRAM_MAP(spi_map, 0)
 	MDRV_CPU_VBLANK_INT("main", spi_interrupt)
 

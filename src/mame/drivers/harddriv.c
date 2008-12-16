@@ -3461,10 +3461,10 @@ static void init_ds3(running_machine *machine)
 	memory_install_write16_handler(cpu_get_address_space(hdcpu_main, ADDRESS_SPACE_PROGRAM), 0x823800, 0x823fff, 0, 0, hd68k_ds3_control_w);
 
 	/* if we have a sound DSP, boot it */
-	if (hdcpu_sound != NULL && ((const cpu_class_header *)hdcpu_sound->classtoken)->cputype == CPU_ADSP2105)
+	if (hdcpu_sound != NULL && cpu_get_type(hdcpu_sound) == CPU_ADSP2105)
 		adsp2105_load_boot_data((UINT8 *)(hdcpu_sound->region + 0x10000), (UINT32 *)hdcpu_sound->region);
 
-	if (hdcpu_sounddsp != NULL && ((const cpu_class_header *)hdcpu_sounddsp->classtoken)->cputype == CPU_ADSP2105)
+	if (hdcpu_sounddsp != NULL && cpu_get_type(hdcpu_sounddsp) == CPU_ADSP2105)
 		adsp2105_load_boot_data((UINT8 *)(hdcpu_sounddsp->region + 0x10000), (UINT32 *)hdcpu_sounddsp->region);
 
 /*

@@ -6,8 +6,7 @@
 
 ***************************************************************************/
 
-#include "cpuintrf.h"
-#include "mame.h"
+#include "driver.h"
 #include "z80daisy.h"
 
 

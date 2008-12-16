@@ -232,7 +232,7 @@ static WRITE8_HANDLER( pacland_led_w )
 static WRITE8_HANDLER( pacland_irq_1_ctrl_w )
 {
 	int bit = !BIT(offset,11);
-	cpu_interrupt_enable(0,bit);
+	cpu_interrupt_enable(space->machine->cpu[0],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
@@ -240,7 +240,7 @@ static WRITE8_HANDLER( pacland_irq_1_ctrl_w )
 static WRITE8_HANDLER( pacland_irq_2_ctrl_w )
 {
 	int bit = !BIT(offset,13);
-	cpu_interrupt_enable(1,bit);
+	cpu_interrupt_enable(space->machine->cpu[1],bit);
 	if (!bit)
 		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }

@@ -386,7 +386,7 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 
 static const struct dma8237_interface dma8237_1_config =
 {
-	0,
+	"main",
 	1.0e-6, // 1us
 
 	pc_dma_read_byte,
@@ -400,7 +400,7 @@ static const struct dma8237_interface dma8237_1_config =
 
 static const struct dma8237_interface dma8237_2_config =
 {
-	0,
+	"main",
 	1.0e-6, // 1us
 
 	NULL,

@@ -240,7 +240,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 			break;
 
 		case 0x01:	/* INT ON */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
@@ -284,7 +284,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x01:	/* INTST */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			break;
 
 		case 0x02:	/* MUT */

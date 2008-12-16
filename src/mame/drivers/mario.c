@@ -105,7 +105,7 @@ static WRITE8_DEVICE_HANDLER(mario_dma_write_byte);
 
 static const z80dma_interface mario_dma =
 {
-	0,
+	"main",
 	Z80_CLOCK,
 
 	mario_dma_read_byte,

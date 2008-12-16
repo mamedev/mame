@@ -137,6 +137,45 @@ enum
 #define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK(name)(driver, device)
 
 
+/* shorthand for accessing devices by machine/type/tag */
+#define devtag_get_device(mach,type,tag)					device_list_find_by_tag((mach)->config->devicelist, type, tag)
+
+#define devtag_reset(mach,type,tag)							device_reset(devtag_get_device(mach, type, tag))
+
+#define devtag_get_info_int(mach,type,tag,state)			device_get_info_int(devtag_get_device(mach, type, tag), state)
+#define devtag_get_info_ptr(mach,type,tag,state)			device_get_info_ptr(devtag_get_device(mach, type, tag), state)
+#define devtag_get_info_fct(mach,type,tag,state)			device_get_info_fct(devtag_get_device(mach, type, tag), state)
+#define devtag_get_info_string(mach,type,tag,state)			device_get_info_string(devtag_get_device(mach, type, tag), state)
+
+#define devtag_set_info_int(mach,type,tag,state,data)		device_set_info_int(devtag_get_device(mach, type, tag), state, data)
+#define devtag_set_info_ptr(mach,type,tag,state,data)		device_set_info_ptr(devtag_get_device(mach, type, tag), state, data)
+#define devtag_set_info_fct(mach,type,tag,state,data)		device_set_info_fct(devtag_get_device(mach, type, tag), state, data)
+
+
+/* shorthand for getting standard data about device types */
+#define devtype_get_name(type)								devtype_get_info_string(type, DEVINFO_STR_NAME)
+#define devtype_get_family(type) 							devtype_get_info_string(type, DEVINFO_STR_FAMILY)
+#define devtype_get_version(type) 							devtype_get_info_string(type, DEVINFO_STR_VERSION)
+#define devtype_get_source_file(type) 						devtype_get_info_string(type, DEVINFO_STR_SOURCE_FILE)
+#define devtype_get_credits(type) 							devtype_get_info_string(type, DEVINFO_STR_CREDITS)
+
+
+/* shorthand for getting standard data about devices */
+#define device_get_name(dev)								device_get_info_string(dev, DEVINFO_STR_NAME)
+#define device_get_family(dev) 								device_get_info_string(dev, DEVINFO_STR_FAMILY)
+#define device_get_version(dev) 							device_get_info_string(dev, DEVINFO_STR_VERSION)
+#define device_get_source_file(dev)							device_get_info_string(dev, DEVINFO_STR_SOURCE_FILE)
+#define device_get_credits(dev) 							device_get_info_string(dev, DEVINFO_STR_CREDITS)
+
+
+/* shorthand for getting standard data about devices by machine/type/tag */
+#define devtag_get_name(mach,type,tag)						devtag_get_info_string(mach, type, tag, DEVINFO_STR_NAME)
+#define devtag_get_family(mach,type,tag) 					devtag_get_info_string(mach, type, tag, DEVINFO_STR_FAMILY)
+#define devtag_get_version(mach,type,tag) 					devtag_get_info_string(mach, type, tag, DEVINFO_STR_VERSION)
+#define devtag_get_source_file(mach,type,tag)				devtag_get_info_string(mach, type, tag, DEVINFO_STR_SOURCE_FILE)
+#define devtag_get_credits(mach,type,tag) 					devtag_get_info_string(mach, type, tag, DEVINFO_STR_CREDITS)
+
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -184,20 +223,17 @@ union _deviceinfo
 struct _device_config
 {
 	device_config *			next;					/* next device */
+	device_config *			typenext;				/* next device of the same type */
 	device_type				type;					/* device type */
 	device_class			class;					/* device class */
 	device_set_info_func 	set_info;				/* quick pointer to set_info callback */
-	device_start_func		start;					/* quick pointer to start callback */
-	device_stop_func		stop;					/* quick pointer to stop callback */
-	device_reset_func		reset;					/* quick pointer to reset callback */
-	device_nvram_func		nvram;					/* quick pointer to nvram callback */
 	const void *			static_config;			/* static device configuration */
 	void *					inline_config;			/* inline device configuration */
 
 	/* these fields are only valid if the device is live */
 	UINT8					started;				/* TRUE if the start function has succeeded */
 	void *					token;					/* token if device is live */
-	void *					classtoken;				/* class token if device is live */
+	UINT32					tokenbytes;				/* size of the token data allocated */
 	running_machine *		machine;				/* machine if device is live */
 	UINT8 *					region;					/* pointer to region with the device's tag, or NULL */
 	UINT32					regionbytes;			/* size of the region, in bytes */
@@ -274,44 +310,30 @@ const device_config *device_list_class_find_by_index(const device_config *listhe
 
 /* ----- live device management ----- */
 
+/* "attach" a running_machine to its list of devices */
+void device_list_attach_machine(running_machine *machine);
+
 /* start the configured list of devices for a machine */
 void device_list_start(running_machine *machine);
 
 /* reset a device based on an allocated device_config */
 void device_reset(const device_config *device);
-void devtag_reset(running_machine *machine, device_type type, const char *tag);
 
 
 
 /* ----- device information getters ----- */
 
-/* return the device associated with a tag */
-const device_config *devtag_get_device(running_machine *machine, device_type type, const char *tag);
-
-/* return the token associated with an allocated device */
-void *devtag_get_token(running_machine *machine, device_type type, const char *tag);
-
-/* return a pointer to the static configuration for a device based on type and tag */
-const void *devtag_get_static_config(running_machine *machine, device_type type, const char *tag);
-
-/* return a pointer to the inline configuration for a device based on type and tag */
-const void *devtag_get_inline_config(running_machine *machine, device_type type, const char *tag);
-
 /* return an integer state value from an allocated device */
 INT64 device_get_info_int(const device_config *device, UINT32 state);
-INT64 devtag_get_info_int(running_machine *machine, device_type type, const char *tag, UINT32 state);
 
 /* return a pointer state value from an allocated device */
 void *device_get_info_ptr(const device_config *device, UINT32 state);
-void *devtag_get_info_ptr(running_machine *machine, device_type type, const char *tag, UINT32 state);
 
 /* return a function pointer state value from an allocated device */
 genf *device_get_info_fct(const device_config *device, UINT32 state);
-genf *devtag_get_info_fct(running_machine *machine, device_type type, const char *tag, UINT32 state);
 
 /* return a string value from an allocated device */
 const char *device_get_info_string(const device_config *device, UINT32 state);
-const char *devtag_get_info_string(running_machine *machine, device_type type, const char *tag, UINT32 state);
 
 
 
@@ -319,6 +341,9 @@ const char *devtag_get_info_string(running_machine *machine, device_type type, c
 
 /* return an integer value from a device type (does not need to be allocated) */
 INT64 devtype_get_info_int(device_type type, UINT32 state);
+
+/* return a function pointer from a device type (does not need to be allocated) */
+genf *devtype_get_info_fct(device_type type, UINT32 state);
 
 /* return a string value from a device type (does not need to be allocated) */
 const char *devtype_get_info_string(device_type type, UINT32 state);
@@ -329,35 +354,12 @@ const char *devtype_get_info_string(device_type type, UINT32 state);
 
 /* set an integer state value for an allocated device */
 void device_set_info_int(const device_config *device, UINT32 state, INT64 data);
-void devtag_set_info_int(running_machine *machine, device_type type, const char *tag, UINT32 state, INT64 data);
 
 /* set a pointer state value for an allocated device */
 void device_set_info_ptr(const device_config *device, UINT32 state, void *data);
-void devtag_set_info_ptr(running_machine *machine, device_type type, const char *tag, UINT32 state, void *data);
 
 /* set a function pointer state value for an allocated device */
 void device_set_info_fct(const device_config *device, UINT32 state, genf *data);
-void devtag_set_info_fct(running_machine *machine, device_type type, const char *tag, UINT32 state, genf *data);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/* return common strings based on device instances */
-INLINE const char *device_get_name(const device_config *device)			{ return device_get_info_string(device, DEVINFO_STR_NAME); }
-INLINE const char *device_get_family(const device_config *device) 		{ return device_get_info_string(device, DEVINFO_STR_FAMILY); }
-INLINE const char *device_get_version(const device_config *device) 		{ return device_get_info_string(device, DEVINFO_STR_VERSION); }
-INLINE const char *device_get_source_file(const device_config *device)	{ return device_get_info_string(device, DEVINFO_STR_SOURCE_FILE); }
-INLINE const char *device_get_credits(const device_config *device) 		{ return device_get_info_string(device, DEVINFO_STR_CREDITS); }
-
-/* return common strings based on device types */
-INLINE const char *devtype_get_name(device_type devtype)		{ return devtype_get_info_string(devtype, DEVINFO_STR_NAME); }
-INLINE const char *devtype_get_family(device_type devtype) 		{ return devtype_get_info_string(devtype, DEVINFO_STR_FAMILY); }
-INLINE const char *devtype_get_version(device_type devtype) 	{ return devtype_get_info_string(devtype, DEVINFO_STR_VERSION); }
-INLINE const char *devtype_get_source_file(device_type devtype) { return devtype_get_info_string(devtype, DEVINFO_STR_SOURCE_FILE); }
-INLINE const char *devtype_get_credits(device_type devtype) 	{ return devtype_get_info_string(devtype, DEVINFO_STR_CREDITS); }
 
 
 #endif	/* __DEVINTRF_H__ */

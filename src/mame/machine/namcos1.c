@@ -681,8 +681,8 @@ static WRITE8_HANDLER( unknown_w )
 /* Main bankswitching routine */
 static void set_bank(running_machine *machine, int banknum, const bankhandler *handler)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
-	int cpunum = (banknum >> 3) & 1;
 
 	/* for BANK handlers , memory direct and OP-code base */
 	if (handler->bank_pointer)
@@ -692,12 +692,12 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 	if (!handler->bank_handler_r)
 	{
 		if (namcos1_active_bank[banknum].bank_handler_r)
-			memory_install_read8_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_r[banknum]);
+			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_r[banknum]);
 	}
 	else
 	{
 		if (!namcos1_active_bank[banknum].bank_handler_r)
-			memory_install_read8_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_r[banknum]);
+			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_r[banknum]);
 	}
 
 	/* write handlers (except for the 0xe000-0xffff range) */
@@ -706,12 +706,12 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 		if (!handler->bank_handler_w)
 		{
 			if (namcos1_active_bank[banknum].bank_handler_w)
-				memory_install_write8_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_w[banknum]);
+				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_w[banknum]);
 		}
 		else
 		{
 			if (!namcos1_active_bank[banknum].bank_handler_r)
-				memory_install_write8_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_w[banknum]);
+				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_w[banknum]);
 		}
 	}
 

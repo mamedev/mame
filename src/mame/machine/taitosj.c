@@ -53,8 +53,8 @@ MACHINE_RESET( taitosj )
 	zaccept = 1;
 	zready = 0;
 	busreq = 0;
- 	if (machine->config->cpu[2].type != CPU_DUMMY)
-	cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
+ 	if (machine->cpu[2] != NULL)
+		cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
 
 	spacecr_prot_value = 0;
 }

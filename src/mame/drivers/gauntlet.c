@@ -1628,7 +1628,7 @@ static void gauntlet_common_init(running_machine *machine, int slapstic, int vin
 {
 	UINT8 *rom = memory_region(machine, "main");
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine, 0, 0x038000, 0, slapstic);
+	atarigen_slapstic_init(machine->cpu[0], 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	atarigen_swap_mem(rom + 0x000000, rom + 0x008000, 0x8000);

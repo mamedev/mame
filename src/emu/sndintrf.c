@@ -575,7 +575,7 @@ void sndintrf_init(running_machine *machine)
 
 static DEVICE_GET_INFO( sndclass )
 {
-	sndintrf_data *snddata = device->classtoken;
+	sndintrf_data *snddata = device->inline_config;
 	(*snddata->intf.get_info)(device, state, (sndinfo *)info);
 }
 
@@ -592,7 +592,9 @@ int sndintrf_init_sound(running_machine *machine, int sndnum, const char *tag, s
 	info->device->static_config = config;
 	info->device->region = memory_region(info->device->machine, info->device->tag);
 	info->device->regionbytes = memory_region_length(info->device->machine, info->device->tag);
-	info->device->classtoken = info;
+
+	/* hack: stash the info pointer in the inline_config */
+	info->device->inline_config = info;
 
 	/* fill in the type and interface */
 	info->intf = snd_type_header[sndtype];

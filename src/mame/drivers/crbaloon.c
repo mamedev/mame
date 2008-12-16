@@ -159,7 +159,7 @@ static READ8_HANDLER( pc3259_r )
 static WRITE8_HANDLER( port_sound_w )
 {
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
-	cpu_interrupt_enable(0, (data & 0x01) ? TRUE : FALSE);
+	cpu_interrupt_enable(space->machine->cpu[0], (data & 0x01) ? TRUE : FALSE);
 	crbaloon_set_clear_collision_address((data & 0x01) ? TRUE : FALSE);
 
 	/* D1 - SOUND STOP */

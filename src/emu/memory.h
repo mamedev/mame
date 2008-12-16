@@ -861,7 +861,7 @@ const address_space *memory_find_address_space(const device_config *cpu, int spa
 /* ----- address maps ----- */
 
 /* build and allocate an address map for a CPU's address space */
-address_map *address_map_alloc(const machine_config *drv, const game_driver *driver, int cpunum, int spacenum);
+address_map *address_map_alloc(const device_config *device, const game_driver *driver, int spacenum);
 
 /* release allocated memory for an address map */
 void address_map_free(address_map *map);

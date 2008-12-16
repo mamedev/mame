@@ -613,7 +613,7 @@ static WRITE8_HANDLER(dma_page_select_w)
 
 static const struct dma8237_interface dma8237_1_config =
 {
-	0,
+	"main",
 	1.0e-6, // 1us
 
 	pc_dma_read_byte,

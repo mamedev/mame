@@ -24,7 +24,7 @@ typedef void  (*dma8237_out_eop_func)(const device_config *device, int state);
 struct dma8237_interface
 {
 	/* CPU to halt when DMA is active */
-	int cpunum;
+	const char *cputag;
 
 	/* speed of DMA accesses (per byte) */
 	double bus_speed;

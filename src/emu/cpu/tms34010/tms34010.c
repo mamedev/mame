@@ -628,7 +628,7 @@ static CPU_INIT( tms34010 )
 
 	/* allocate a scanline timer and set it to go off at the start */
 	tms->scantimer = timer_alloc(device->machine, scanline_callback, tms);
-	timer_adjust_oneshot(tms->scantimer, attotime_zero, index);
+	timer_adjust_oneshot(tms->scantimer, attotime_zero, 0);
 
 	/* allocate the shiftreg */
 	tms->shiftreg = auto_malloc(SHIFTREG_SIZE);
@@ -737,19 +737,13 @@ static TIMER_CALLBACK( internal_interrupt_callback )
 {
 	tms34010_state *tms = ptr;
 	int type = param;
-	int cpunum;
 
 	/* call through to the CPU to generate the int */
 	IOREG(tms, REG_INTPEND) |= type;
 	LOG(("TMS34010 '%s' set internal interrupt $%04x\n", tms->device->tag, type));
 
 	/* generate triggers so that spin loops can key off them */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] == tms->device)
-		{
-			cpu_triggerint(machine->cpu[cpunum]);
-			break;
-		}
+	cpu_triggerint(tms->device);
 }
 
 
@@ -893,8 +887,7 @@ static TIMER_CALLBACK( scanline_callback )
 	tms34010_state *tms = ptr;
 	const rectangle *current_visarea;
 	int vsblnk, veblnk, vtotal;
-	int vcount = param >> 8;
-	int cpunum = param & 0xff;
+	int vcount = param;
 	int enabled;
 	int master;
 
@@ -1025,7 +1018,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	timer_adjust_oneshot(tms->scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(tms->screen, vcount, 0), !master), cpunum | (vcount << 8));
+	timer_adjust_oneshot(tms->scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(tms->screen, vcount, 0), !master), vcount);
 }
 
 
@@ -1068,23 +1061,19 @@ VIDEO_UPDATE( tms340x0 )
 	pen_t blackpen = get_black_pen(screen->machine);
 	tms34010_display_params params;
 	tms34010_state *tms = NULL;
-	int cpunum = -1;
+	const device_config *cpu;
 	int x;
 
 	/* find the owning CPU */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(screen->machine->cpu); cpunum++)
+	for (cpu = screen->machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 	{
-		const device_config *cpudevice = screen->machine->cpu[cpunum];
-		if (cpudevice != NULL)
+		cpu_type type = cpu_get_type(cpu);
+		if (type == CPU_TMS34010 || type == CPU_TMS34020)
 		{
-			const cpu_class_header *classdata = cpudevice->classtoken;
-			if (classdata->cputype == CPU_TMS34010 || classdata->cputype == CPU_TMS34020)
-			{
-				tms = cpudevice->token;
-				if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == screen)
-					break;
-				tms = NULL;
-			}
+			tms = cpu->token;
+			if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == screen)
+				break;
+			tms = NULL;
 		}
 	}
 	if (tms == NULL)
@@ -1259,7 +1248,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 	}
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
+//      logerror("%s: %s = %04X (%d)\n", cpuexec_describe_context(tms->device->machine), ioreg_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
 }
 
 
@@ -1296,7 +1285,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	IOREG(tms, offset) = data;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(space->cpu), ioreg020_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
+//      logerror("%s: %s = %04X (%d)\n", cpuexec_describe_context(device->machine), ioreg020_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
 
 	switch (offset)
 	{
@@ -1455,7 +1444,7 @@ READ16_HANDLER( tms34010_io_register_r )
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset]);
+//      logerror("%s: read %s\n", cpuexec_describe_context(device->machine), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1498,7 +1487,7 @@ READ16_HANDLER( tms34020_io_register_r )
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
-//      logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset]);
+//      logerror("%s: read %s\n", cpuexec_describe_context(device->machine), ioreg_name[offset]);
 
 	switch (offset)
 	{

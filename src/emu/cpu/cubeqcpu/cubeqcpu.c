@@ -12,7 +12,7 @@
 
 #include "debugger.h"
 #include "cubeqcpu.h"
-#include "cpuexec.h"
+#include "driver.h"
 
 
 /***************************************************************************

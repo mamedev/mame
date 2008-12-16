@@ -43,19 +43,6 @@ enum
 	MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32,
 	MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64,
 
-	MCONFIG_TOKEN_CPU_ADD,
-	MCONFIG_TOKEN_CPU_MODIFY,
-	MCONFIG_TOKEN_CPU_REMOVE,
-	MCONFIG_TOKEN_CPU_REPLACE,
-	MCONFIG_TOKEN_cpu_get_flags,
-	MCONFIG_TOKEN_CPU_CONFIG,
-	MCONFIG_TOKEN_CPU_PROGRAM_MAP,
-	MCONFIG_TOKEN_CPU_DATA_MAP,
-	MCONFIG_TOKEN_CPU_IO_MAP,
-	MCONFIG_TOKEN_CPU_VBLANK_INT,
-	MCONFIG_TOKEN_CPU_VBLANK_INT_HACK,
-	MCONFIG_TOKEN_CPU_PERIODIC_INT,
-
 	MCONFIG_TOKEN_DRIVER_DATA,
 	MCONFIG_TOKEN_INTERLEAVE,
 	MCONFIG_TOKEN_WATCHDOG_VBLANK,
@@ -124,8 +111,6 @@ struct _machine_config
 {
 	UINT32					driver_data_size;		/* amount of memory needed for driver_data */
 
-	cpu_config				cpu[MAX_CPU];			/* array of CPUs in the system */
-	astring *				cputag[MAX_CPU];		/* allocated strings for each CPU tag */
 	UINT32					cpu_slices_per_frame;	/* number of times to interleave execution per frame */
 	INT32					watchdog_vblank_count;	/* number of VBLANKs until the watchdog kills us */
 	attotime				watchdog_time;			/* length of time until the watchdog kills us */
@@ -171,7 +156,6 @@ union _machine_config_token
 	const gfx_decode_entry *gfxdecode;
 	const addrmap_token *addrmap;
 	device_type devtype;
-	void (*interrupt)(const device_config *device);
 	driver_init_func driver_init;
 	nvram_handler_func nvram_handler;
 	memcard_handler_func memcard_handler;
@@ -276,57 +260,6 @@ union _machine_config_token
 #define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val)
 #define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
 #endif
-
-
-/* add/modify/remove/replace CPUs */
-#define MDRV_CPU_ADD(_tag, _type, _clock) \
-	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_CPU_ADD, 8, CPU_##_type, 24, _clock, 32), \
-	TOKEN_STRING(_tag),
-
-#define MDRV_CPU_MODIFY(_tag) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_MODIFY, 8), \
-	TOKEN_STRING(_tag),
-
-#define MDRV_CPU_REMOVE(_tag) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_REMOVE, 8), \
-	TOKEN_STRING(_tag),
-
-#define MDRV_CPU_REPLACE(_tag, _type, _clock) \
-	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_CPU_REPLACE, 8, CPU_##_type, 24, _clock, 32), \
-	TOKEN_STRING(_tag),
-
-
-/* CPU parameters */
-#define MDRV_CPU_FLAGS(_flags) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_cpu_get_flags, 8, _flags, 24),
-
-#define MDRV_CPU_CONFIG(_config) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_CONFIG, 8), \
-	TOKEN_PTR(voidptr, &(_config)),
-
-#define MDRV_CPU_PROGRAM_MAP(_map1, _map2) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_PROGRAM_MAP, 8), \
-	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map1)), \
-	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map2)), \
-
-#define MDRV_CPU_DATA_MAP(_map1, _map2)	\
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_DATA_MAP, 8), \
-	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map1)), \
-	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map2)), \
-
-#define MDRV_CPU_IO_MAP(_map1, _map2) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_IO_MAP, 8), \
-	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map1)), \
-	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map2)), \
-
-#define MDRV_CPU_VBLANK_INT(_tag, _func) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_VBLANK_INT, 8), \
-	TOKEN_STRING(_tag), \
-	TOKEN_PTR(interrupt, _func),
-
-#define MDRV_CPU_PERIODIC_INT(_func, _rate)	\
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_CPU_PERIODIC_INT, 8, _rate, 24), \
-	TOKEN_PTR(interrupt, _func),
 
 
 /* core parameters */

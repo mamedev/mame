@@ -535,7 +535,7 @@ static DIRECT_UPDATE_HANDLER( atarigen_slapstic_setdirect )
     slapstic and sets the chip number.
 ---------------------------------------------------------------*/
 
-void atarigen_slapstic_init(running_machine *machine, int cpunum, offs_t base, offs_t mirror, int chipnum)
+void atarigen_slapstic_init(const device_config *device, offs_t base, offs_t mirror, int chipnum)
 {
 	/* reset in case we have no state */
 	atarigen_slapstic_num = chipnum;
@@ -545,10 +545,10 @@ void atarigen_slapstic_init(running_machine *machine, int cpunum, offs_t base, o
 	if (chipnum != 0)
 	{
 		/* initialize the slapstic */
-		slapstic_init(machine, chipnum);
+		slapstic_init(device->machine, chipnum);
 
 		/* install the memory handlers */
-		atarigen_slapstic = memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
+		atarigen_slapstic = memory_install_readwrite16_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
 
 		/* allocate memory for a copy of bank 0 */
 		atarigen_slapstic_bank0 = auto_malloc(0x2000);
@@ -560,7 +560,7 @@ void atarigen_slapstic_init(running_machine *machine, int cpunum, offs_t base, o
 		/* install an opcode base handler if we are a 68000 or variant */
 		atarigen_slapstic_base = base;
 		atarigen_slapstic_mirror = mirror;
-		memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), atarigen_slapstic_setdirect);
+		memory_set_direct_update_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), atarigen_slapstic_setdirect);
 	}
 }
 

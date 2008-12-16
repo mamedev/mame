@@ -72,16 +72,16 @@ VIDEO_UPDATE( brkthru );
 static WRITE8_HANDLER( brkthru_1803_w )
 {
 	/* bit 0 = NMI enable */
-	cpu_interrupt_enable(0, ~data & 1);
+	cpu_interrupt_enable(space->machine->cpu[0], ~data & 1);
 
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 static WRITE8_HANDLER( darwin_0803_w )
 {
 	/* bit 0 = NMI enable */
-	/*cpu_interrupt_enable(1, ~data & 1);*/
+	/*cpu_interrupt_enable(space->machine->cpu[1], ~data & 1);*/
 	logerror("0803 %02X\n",data);
-	cpu_interrupt_enable(0, data & 1);
+	cpu_interrupt_enable(space->machine->cpu[0], data & 1);
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 

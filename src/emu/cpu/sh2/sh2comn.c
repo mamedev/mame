@@ -104,7 +104,7 @@ static void sh2_timer_activate(SH2 *sh2)
 			sh2->frc_base = cpu_get_total_cycles(sh2->device);
 			timer_adjust_oneshot(sh2->timer, cpu_clocks_to_attotime(sh2->device, max_delta), 0);
 		} else {
-			logerror("SH2.%d: Timer event in %d cycles of external clock", cpu_get_index(sh2->device), max_delta);
+			logerror("SH2.%s: Timer event in %d cycles of external clock", sh2->device->tag, max_delta);
 		}
 	}
 }
@@ -141,7 +141,7 @@ TIMER_CALLBACK( sh2_dmac_callback )
 	int dma = param & 1;
 	SH2 *sh2 = ptr;
 
-	LOG(("SH2.%d: DMA %d complete\n", cpu_get_index(sh2->device), dma));
+	LOG(("SH2.%s: DMA %d complete\n", sh2->device->tag, dma));
 	sh2->m[0x63+4*dma] |= 2;
 	sh2->dma_timer_active[dma] = 0;
 	sh2_recalc_irq(sh2);
@@ -309,7 +309,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	case 0x04: // TIER, FTCSR, FRC
 		if((mem_mask & 0x00ffffff) != 0)
 			sh2_timer_resync(sh2);
-//      printf("SH2.%d: TIER write %04x @ %04x\n", cpu_get_index(sh2->device), data >> 16, mem_mask>>16);
+//      printf("SH2.%s: TIER write %04x @ %04x\n", sh2->device->tag, data >> 16, mem_mask>>16);
 		sh2->m[4] = (sh2->m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & sh2->m[4] & (ICF|OCFA|OCFB|OVF));
 		COMBINE_DATA(&sh2->frc);
 		if((mem_mask & 0x00ffffff) != 0)
@@ -317,7 +317,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		sh2_recalc_irq(sh2);
 		break;
 	case 0x05: // OCRx, TCR, TOCR
-//      printf("SH2.%d: TCR write %08x @ %08x\n", cpu_get_index(sh2->device), data, mem_mask);
+//      printf("SH2.%s: TCR write %08x @ %08x\n", sh2->device->tag, data, mem_mask);
 		sh2_timer_resync(sh2);
 		if(sh2->m[5] & 0x10)
 			sh2->ocrb = (sh2->ocrb & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
@@ -533,7 +533,7 @@ void sh2_set_frt_input(const device_config *device, int state)
 	sh2_timer_resync(sh2);
 	sh2->icr = sh2->frc;
 	sh2->m[4] |= ICF;
-	logerror("SH2.%d: ICF activated (%x)\n", cpu_get_index(sh2->device), sh2->pc & AM);
+	logerror("SH2.%s: ICF activated (%x)\n", sh2->device->tag, sh2->pc & AM);
 	sh2_recalc_irq(sh2);
 }
 

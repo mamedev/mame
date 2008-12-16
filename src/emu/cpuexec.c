@@ -59,10 +59,8 @@ struct _cpu_input_data
 typedef struct _cpu_class_data cpu_class_data;
 struct _cpu_class_data
 {
-	/* this item must remain first */
-	cpu_class_header header;				/* header containing public data */
-
 	/* cycle counting and executing */
+	int				profiler;				/* profiler tag */ 
 	int *			icount;					/* pointer to the icount */
 	int 			cycles_running;			/* number of cycles we are executing */
 	int				cycles_stolen;			/* number of cycles we artificially stole */
@@ -111,10 +109,6 @@ struct _cpuexec_private
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void cpuexec_exit(running_machine *machine);
-static void cpuexec_reset(running_machine *machine);
-
-static void cpu_timers_init(running_machine *machine);
 static void update_clock_information(const device_config *device);
 static void compute_perfect_interleave(running_machine *machine);
 static void on_vblank(const device_config *device, void *param, int vblank_state);
@@ -132,18 +126,16 @@ static void register_save_states(const device_config *device);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    get_safe_classtoken - makes sure that the
-    passed in device is, in fact, a CPU, and
-    return the class token
+    cpu_get_class_data - return a pointer to
+    the class data
 -------------------------------------------------*/
 
-INLINE cpu_class_data *get_safe_classtoken(const device_config *device)
+INLINE cpu_class_data *cpu_get_class_data(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->classtoken != NULL);
 	assert(device->class == DEVICE_CLASS_CPU_CHIP);
-
-	return (cpu_class_data *)device->classtoken;
+	assert(device->token != NULL);
+	return (cpu_class_data *)cpu_get_class_header(device) - 1;
 }
 
 
@@ -154,7 +146,7 @@ INLINE cpu_class_data *get_safe_classtoken(const device_config *device)
 
 INLINE void suspend_until_trigger(const device_config *device, int trigger, int eatcycles)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* suspend the CPU immediately if it's not already */
 	cpu_suspend(device, SUSPEND_REASON_TRIGGER, eatcycles);
@@ -170,185 +162,26 @@ INLINE void suspend_until_trigger(const device_config *device, int trigger, int 
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpuexec_create_cpu_device - temporary
-    function to allocate a fake CPU device for
-    each CPU
--------------------------------------------------*/
-
-static DEVICE_GET_INFO( cpuclass )
-{
-	cpu_class_data *classdata = device->classtoken;
-	(*classdata->header.get_info)(device, state, (cpuinfo *)info);
-}
-
-const device_config *cpuexec_create_cpu_device(const cpu_config *config)
-{
-	device_config *device;
-
-	/* create a fake device for the CPU -- this will be done automatically in the future */
-	device = malloc_or_die(sizeof(*device) + strlen(config->tag));
-	memset(device, 0, sizeof(*device));
-	strcpy(device->tag, config->tag);
-	device->type = DEVICE_GET_INFO_NAME(cpuclass);
-	device->class = DEVICE_CLASS_CPU_CHIP;
-	device->inline_config = (void *)config;
-	device->static_config = config->reset_param;
-
-	return device;
-}
-
-
-/*-------------------------------------------------
     cpuexec_init - initialize internal states of
     all CPUs
 -------------------------------------------------*/
 
 void cpuexec_init(running_machine *machine)
 {
-	int cpunum;
+	int numscreens = video_screen_count(machine->config);
+	attoseconds_t refresh_attosecs;
+	int ipf;
 
 	/* allocate global state */
 	machine->cpuexec_data = auto_malloc(sizeof(*machine->cpuexec_data));
 	memset(machine->cpuexec_data, 0, sizeof(*machine->cpuexec_data));
 
-	/* loop over all our CPUs */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->config->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			device_config *device = (device_config *)machine->cpu[cpunum];
-			const cpu_config *config = device->inline_config;
-			cpu_type cputype = config->type;
-			cpu_class_data *classdata;
-			int num_regs;
-			int line;
-
-			/* allocate memory for our class state */
-			classdata = auto_malloc(sizeof(*classdata));
-			memset(classdata, 0, sizeof(*classdata));
-
-			/* fill in the header */
-			classdata->header = *cputype_get_header_template(cputype);
-
-			/* make the device run */
-			device->started = FALSE;
-			device->machine = machine;
-			device->region = memory_region(machine, device->tag);
-			device->regionbytes = memory_region_length(machine, device->tag);
-			device->token = auto_malloc(cputype_get_context_size(cputype));
-			memset(device->token, 0, cputype_get_context_size(cputype));
-			device->classtoken = classdata;
-
-			/* fill in the input states and IRQ callback information */
-			for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
-			{
-				cpu_input_data *inputline = &classdata->input[line];
-				/* vector and curvector are initialized later */
-				inputline->curstate = CLEAR_LINE;
-				inputline->qindex = 0;
-			}
-
-			/* fill in the suspend states */
-			classdata->suspend = SUSPEND_REASON_RESET;
-			classdata->inttrigger = cpunum + TRIGGER_INT;
-
-			/* fill in the clock and timing information */
-			classdata->clock = (UINT64)config->clock * classdata->header.clock_multiplier / classdata->header.clock_divider;
-			classdata->clockscale = 1.0;
-
-			/* allocate timers if we need them */
-			if (config->vblank_interrupts_per_frame > 1)
-				classdata->partial_frame_timer = timer_alloc(machine, trigger_partial_frame_interrupt, device);
-			if (config->timed_interrupt_period != 0)
-				classdata->timedint_timer = timer_alloc(machine, trigger_periodic_interrupt, device);
-
-			/* initialize this CPU */
-			num_regs = state_save_get_reg_count(machine);
-			cpu_init(device, cpunum, classdata->clock, standard_irq_callback);
-			num_regs = state_save_get_reg_count(machine) - num_regs;
-
-			/* fetch post-initialization data */
-			classdata->icount = cpu_get_icount_ptr(device);
-			for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
-			{
-				cpu_input_data *inputline = &classdata->input[line];
-				inputline->vector = cpu_get_default_irq_vector(device);
-				inputline->curvector = inputline->vector;
-			}
-			update_clock_information(device);
-
-			/* if no state registered for saving, we can't save */
-			if (num_regs == 0)
-			{
-				logerror("CPU #%d (%s) did not register any state to save!\n", cpunum, cputype_get_name(cputype));
-				if (machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-					fatalerror("CPU #%d (%s) did not register any state to save!", cpunum, cputype_get_name(cputype));
-			}
-
-			/* register some internal states as well */
-			register_save_states(device);
-		}
-
-	add_reset_callback(machine, cpuexec_reset);
-	add_exit_callback(machine, cpuexec_exit);
-}
-
-
-/*-------------------------------------------------
-    cpuexec_reset - reset CPU states on a soft
-    reset
--------------------------------------------------*/
-
-static void cpuexec_reset(running_machine *machine)
-{
-	int cpunum;
-
-	/* initialize the various timers */
-	cpu_timers_init(machine);
-
-	/* first pass over CPUs */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			const device_config *device = machine->cpu[cpunum];
-			const cpu_config *config = device->inline_config;
-			cpu_class_data *classdata = device->classtoken;
-			int line;
-
-			/* enable all CPUs (except for disabled CPUs) */
-			if (!(config->flags & CPU_DISABLE))
-				cpu_resume(device, SUSPEND_ANY_REASON);
-			else
-				cpu_suspend(device, SUSPEND_REASON_DISABLE, 1);
-
-			/* reset the total number of cycles */
-			classdata->totalcycles = 0;
-
-			/* then reset the CPU directly */
-			cpu_reset(device);
-
-			/* reset the interrupt vectors and queues */
-			for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
-			{
-				cpu_input_data *inputline = &classdata->input[line];
-				inputline->vector = cpu_get_default_irq_vector(device);
-				inputline->qindex = 0;
-			}
-		}
-}
-
-
-/*-------------------------------------------------
-    cpuexec_exit - cleanup all CPUs on exit
--------------------------------------------------*/
-
-static void cpuexec_exit(running_machine *machine)
-{
-	int cpunum;
-
-	/* shut down the CPU cores */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-			cpu_exit(machine->cpu[cpunum]);
+	/* set the core scheduling quantum */
+	ipf = machine->config->cpu_slices_per_frame;
+	if (ipf <= 0)
+		ipf = 1;
+	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : video_screen_get_frame_period(machine->primary_screen).attoseconds;
+	timer_add_scheduling_quantum(machine, refresh_attosecs / ipf, attotime_never);
 }
 
 
@@ -363,25 +196,25 @@ void cpuexec_timeslice(running_machine *machine)
 	cpuexec_private *global = machine->cpuexec_data;
 	attotime target = timer_next_fire_time(machine);
 	attotime base = timer_get_time(machine);
-	int cpunum, ran;
+	const device_config *cpu;
+	int ran;
 
 	LOG(("------------------\n"));
 	LOG(("cpu_timeslice: target = %s\n", attotime_string(target, 9)));
 
 	/* apply pending suspension changes */
-	for (cpunum = 0; machine->cpu[cpunum] != NULL; cpunum++)
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 	{
-		cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
+		cpu_class_data *classdata = cpu_get_class_data(cpu);
 		classdata->suspend = classdata->nextsuspend;
 		classdata->nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
 		classdata->eatcycles = classdata->nexteatcycles;
 	}
 
 	/* loop over non-suspended CPUs */
-	for (cpunum = 0; machine->cpu[cpunum] != NULL; cpunum++)
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 	{
-		const device_config *cpu = machine->cpu[cpunum];
-		cpu_class_data *classdata = cpu->classtoken;
+		cpu_class_data *classdata = cpu_get_class_data(cpu);
 		if (classdata->suspend == 0)
 		{
 			attotime delta = attotime_sub(target, classdata->localtime);
@@ -389,12 +222,12 @@ void cpuexec_timeslice(running_machine *machine)
 			{
 				/* compute how long to run */
 				classdata->cycles_running = div_64x32(delta.attoseconds >> classdata->divshift, classdata->divisor);
-				LOG(("  cpu %d: %d cycles\n", cpunum, classdata->cycles_running));
+				LOG(("  cpu '%s': %d cycles\n", cpu->tag, classdata->cycles_running));
 
-				profiler_mark(PROFILER_CPU1 + cpunum);
+				profiler_mark(classdata->profiler);
 
 				/* note that this global variable cycles_stolen can be modified */
-				/* via the call to the cpunum_execute */
+				/* via the call to cpu_execute */
 				classdata->cycles_stolen = 0;
 				global->executingcpu = cpu;
 				if (!call_debugger)
@@ -431,9 +264,9 @@ void cpuexec_timeslice(running_machine *machine)
 	global->executingcpu = NULL;
 
 	/* update the local times of all CPUs */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL; cpunum++)
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 	{
-		cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
+		cpu_class_data *classdata = cpu_get_class_data(cpu);
 
 		/* if we're suspended and counting, process */
 		if (classdata->suspend != 0 && classdata->eatcycles && attotime_compare(classdata->localtime, target) < 0)
@@ -442,7 +275,7 @@ void cpuexec_timeslice(running_machine *machine)
 
 			/* compute how long to run */
 			classdata->cycles_running = div_64x32(delta.attoseconds >> classdata->divshift, classdata->divisor);
-			LOG(("  cpu %d: %d cycles (suspended)\n", cpunum, classdata->cycles_running));
+			LOG(("  cpu '%s': %d cycles (suspended)\n", cpu->tag, classdata->cycles_running));
 
 			classdata->totalcycles += classdata->cycles_running;
 			classdata->localtime = attotime_add_attoseconds(classdata->localtime, classdata->cycles_running * classdata->attoseconds_per_cycle);
@@ -459,28 +292,6 @@ void cpuexec_timeslice(running_machine *machine)
 }
 
 
-
-/***************************************************************************
-    GLOBAL HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    cputag_get_cpu - return a pointer to the given
-    CPU by tag
--------------------------------------------------*/
-
-const device_config *cputag_get_cpu(running_machine *machine, const char *tag)
-{
-	int cpunum;
-
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL && strcmp(tag, machine->cpu[cpunum]->tag) == 0)
-			return machine->cpu[cpunum];
-
-	return NULL;
-}
-
-
 /*-------------------------------------------------
     cpuexec_boost_interleave - temporarily boosts
     the interleave factor
@@ -492,6 +303,24 @@ void cpuexec_boost_interleave(running_machine *machine, attotime timeslice_time,
 	if (timeslice_time.seconds > 0)
 		return;
 	timer_add_scheduling_quantum(machine, timeslice_time.attoseconds, boost_duration);
+}
+
+
+
+/***************************************************************************
+    GLOBAL HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    cpuexec_abort_timeslice - abort execution
+    for the current timeslice
+-------------------------------------------------*/
+
+void cpuexec_abort_timeslice(running_machine *machine)
+{
+	const device_config *executingcpu = machine->cpuexec_data->executingcpu;
+	if (executingcpu != NULL)
+		cpu_abort_timeslice(executingcpu);
 }
 
 
@@ -518,6 +347,279 @@ const char *cpuexec_describe_context(running_machine *machine)
 
 
 /***************************************************************************
+    VIDEO SCREEN DEVICE INTERFACE
+***************************************************************************/
+
+/*-------------------------------------------------
+    device_start_cpu - device start callback
+-------------------------------------------------*/
+
+static DEVICE_START( cpu )
+{
+	int index = cpu_get_index(device);
+	cpu_class_header *header;
+	cpu_class_data *classdata;
+	const cpu_config *config;
+	cpu_init_func init;
+	int spacenum, line;
+	int num_regs;
+
+	/* validate some basic stuff */
+	assert(device != NULL);
+	assert(device->inline_config != NULL);
+	assert(device->machine != NULL);
+	assert(device->machine->config != NULL);
+
+	/* get pointers to our data */
+	config = device->inline_config;
+	header = cpu_get_class_header(device);
+	classdata = cpu_get_class_data(device);
+	
+	/* add ourself to the global array */
+	if (index < ARRAY_LENGTH(device->machine->cpu))
+		device->machine->cpu[index] = device;
+
+	/* build the header */
+	header->debug = NULL;
+	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		header->space[spacenum] = memory_find_address_space(device, spacenum);
+	
+	header->set_info = (cpu_set_info_func)cpu_get_info_fct(device, CPUINFO_PTR_SET_INFO);
+	header->execute = (cpu_execute_func)cpu_get_info_fct(device, CPUINFO_PTR_EXECUTE);
+	header->burn = (cpu_burn_func)cpu_get_info_fct(device, CPUINFO_PTR_BURN);
+	header->translate = (cpu_translate_func)cpu_get_info_fct(device, CPUINFO_PTR_TRANSLATE);
+	header->disassemble = (cpu_disassemble_func)cpu_get_info_fct(device, CPUINFO_PTR_DISASSEMBLE);
+	header->dasm_override = NULL;
+
+	header->clock_divider = cpu_get_clock_divider(device);
+	header->clock_multiplier = cpu_get_clock_multiplier(device);
+
+	/* fill in the input states and IRQ callback information */
+	for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
+	{
+		cpu_input_data *inputline = &classdata->input[line];
+		/* vector and curvector are initialized later */
+		inputline->curstate = CLEAR_LINE;
+		inputline->qindex = 0;
+	}
+
+	/* fill in the suspend states */
+	classdata->profiler = index + PROFILER_CPU1;
+	classdata->suspend = SUSPEND_REASON_RESET;
+	classdata->inttrigger = index + TRIGGER_INT;
+
+	/* fill in the clock and timing information */
+	classdata->clock = (UINT64)config->clock * header->clock_multiplier / header->clock_divider;
+	classdata->clockscale = 1.0;
+
+	/* allocate timers if we need them */
+	if (config->vblank_interrupts_per_frame > 1)
+		classdata->partial_frame_timer = timer_alloc(device->machine, trigger_partial_frame_interrupt, (void *)device);
+	if (config->timed_interrupt_period != 0)
+		classdata->timedint_timer = timer_alloc(device->machine, trigger_periodic_interrupt, (void *)device);
+
+	/* initialize this CPU */
+	num_regs = state_save_get_reg_count(device->machine);
+	init = (cpu_init_func)cpu_get_info_fct(device, CPUINFO_PTR_INIT);
+	(*init)(device, index, classdata->clock, standard_irq_callback);
+	num_regs = state_save_get_reg_count(device->machine) - num_regs;
+	
+	/* fetch post-initialization data */
+	classdata->icount = cpu_get_icount_ptr(device);
+	for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
+	{
+		cpu_input_data *inputline = &classdata->input[line];
+		inputline->vector = cpu_get_default_irq_vector(device);
+		inputline->curvector = inputline->vector;
+	}
+	update_clock_information(device);
+
+	/* if no state registered for saving, we can't save */
+	if (num_regs == 0)
+	{
+		logerror("CPU '%s' did not register any state to save!\n", cpu_get_name(device));
+		if (device->machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
+			fatalerror("CPU '%s' did not register any state to save!", cpu_get_name(device));
+	}
+
+	/* register some internal states as well */
+	register_save_states(device);
+
+	return DEVICE_START_OK;
+}
+
+
+/*-------------------------------------------------
+    device_reset_cpu - device reset callback
+-------------------------------------------------*/
+
+static DEVICE_RESET( cpu )
+{
+	cpu_class_data *classdata = cpu_get_class_data(device);
+	const cpu_config *config = device->inline_config;
+	cpu_reset_func reset;
+	int line;
+
+	/* enable all CPUs (except for disabled CPUs) */
+	if (!(config->flags & CPU_DISABLE))
+		cpu_resume(device, SUSPEND_ANY_REASON);
+	else
+		cpu_suspend(device, SUSPEND_REASON_DISABLE, 1);
+
+	/* reset the total number of cycles */
+	classdata->totalcycles = 0;
+
+	/* then reset the CPU directly */
+	reset = (cpu_reset_func)cpu_get_info_fct(device, CPUINFO_PTR_RESET);
+	if (reset != NULL)
+		(*reset)(device);
+
+	/* reset the interrupt vectors and queues */
+	for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
+	{
+		cpu_input_data *inputline = &classdata->input[line];
+		inputline->vector = cpu_get_default_irq_vector(device);
+		inputline->qindex = 0;
+	}
+
+	/* reconfingure VBLANK interrupts */
+	if (config->vblank_interrupts_per_frame > 0 || config->vblank_interrupt_screen != NULL)
+	{
+		const device_config *screen;
+
+		/* get the screen that will trigger the VBLANK */
+
+		/* new style - use screen tag directly */
+		if (config->vblank_interrupt_screen != NULL)
+			screen = devtag_get_device(device->machine, VIDEO_SCREEN, config->vblank_interrupt_screen);
+
+		/* old style 'hack' setup - use screen #0 */
+		else
+			screen = video_screen_first(device->machine->config);
+
+		assert(screen != NULL);
+		video_screen_register_vblank_callback(screen, on_vblank, NULL);
+	}
+
+	/* reconfigure periodic interrupts */
+	if (config->timed_interrupt_period != 0)
+	{
+		attotime timedint_period = UINT64_ATTOTIME_TO_ATTOTIME(config->timed_interrupt_period);
+		assert(classdata->timedint_timer != NULL);
+		timer_adjust_periodic(classdata->timedint_timer, timedint_period, 0, timedint_period);
+	}
+}
+
+
+/*-------------------------------------------------
+    device_stop_cpu - device stop callback
+-------------------------------------------------*/
+
+static DEVICE_STOP( cpu )
+{
+	cpu_exit_func exit;
+	
+	/* call the CPU's exit function if present */
+	exit = (cpu_exit_func)cpu_get_info_fct(device, CPUINFO_PTR_EXIT);
+	if (exit != NULL)
+		(*exit)(device);
+}
+
+
+/*-------------------------------------------------
+    cpu_set_info - device set info callback
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( cpu )
+{
+	cpu_class_header *header = cpu_get_class_header(device);
+	cpu_set_info_func set_info;
+	cpuinfo cinfo;
+
+	/* if we are live and have a header, save ourself a call */
+	if (header != NULL)
+		set_info = header->set_info;
+	else
+		set_info = (cpu_set_info_func)cpu_get_info_fct(device, CPUINFO_PTR_SET_INFO);
+	
+	switch (state)
+	{
+		/* no parameters to set */
+
+		default:
+			/* integer data */
+			if (state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST)
+			{
+				cinfo.i = info->i;
+				(*set_info)(device, state, &cinfo);
+			}
+
+			/* pointer data */
+			else if ((state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST) ||
+					 (state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST) ||
+					 (state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST))
+			{
+				cinfo.p = info->p;
+				(*set_info)(device, state, &cinfo);
+			}
+			break;
+	}
+}
+
+
+/*-------------------------------------------------
+    cpu_get_info - device get info
+    callback
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( cpu )
+{
+	const cpu_config *config = (device != NULL) ? device->inline_config : NULL;
+	cpuinfo cinfo = { 0 };
+	
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:
+			cinfo.i = 0;
+			(*config->type)(device, CPUINFO_INT_CONTEXT_SIZE, &cinfo);
+			info->i = cinfo.i + sizeof(cpu_class_data) + sizeof(cpu_class_header);			
+			break;
+
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(cpu_config);				break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_CPU_CHIP;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(cpu); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(cpu); 		break;
+		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(cpu); 		break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(cpu); 		break;
+
+		default:
+			/* integer data */
+			if (state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST)
+			{
+				cinfo.i = info->i;
+				(*config->type)(device, state, &cinfo);
+				info->i = cinfo.i;
+			}
+
+			/* pointer data */
+			else if ((state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST) ||
+					 (state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST) ||
+					 (state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST))
+			{
+				cinfo.p = info->p;
+				(*config->type)(device, state, &cinfo);
+				info->p = cinfo.p;
+			}
+			break;
+	}
+}
+
+
+
+/***************************************************************************
     CPU SCHEDULING
 ***************************************************************************/
 
@@ -528,7 +630,7 @@ const char *cpuexec_describe_context(running_machine *machine)
 
 void cpu_suspend(const device_config *device, int reason, int eatcycles)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* set the suspend reason and eat cycles flag */
 	classdata->nextsuspend |= reason;
@@ -546,7 +648,7 @@ void cpu_suspend(const device_config *device, int reason, int eatcycles)
 
 void cpu_resume(const device_config *device, int reason)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* clear the suspend reason and eat cycles flag */
 	classdata->nextsuspend &= ~reason;
@@ -575,7 +677,7 @@ int cpu_is_executing(const device_config *device)
 
 int cpu_is_suspended(const device_config *device, int reason)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* return true if the given reason is indicated */
 	return ((classdata->nextsuspend & reason) != 0);
@@ -594,7 +696,7 @@ int cpu_is_suspended(const device_config *device, int reason)
 
 int cpu_get_clock(const device_config *device)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* return the current clock value */
 	return classdata->clock;
@@ -608,7 +710,7 @@ int cpu_get_clock(const device_config *device)
 
 void cpu_set_clock(const device_config *device, int clock)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* set the clock and update the information */
 	classdata->clock = clock;
@@ -623,7 +725,7 @@ void cpu_set_clock(const device_config *device, int clock)
 
 double cpu_get_clockscale(const device_config *device)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* return the current clock scale factor */
 	return classdata->clockscale;
@@ -637,7 +739,7 @@ double cpu_get_clockscale(const device_config *device)
 
 void cpu_set_clockscale(const device_config *device, double clockscale)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* set the scale factor and update the information */
 	classdata->clockscale = clockscale;
@@ -652,7 +754,7 @@ void cpu_set_clockscale(const device_config *device, double clockscale)
 
 attotime cpu_clocks_to_attotime(const device_config *device, UINT64 clocks)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	if (clocks < classdata->cycles_per_second)
 		return attotime_make(0, clocks * classdata->attoseconds_per_cycle);
 	else
@@ -671,7 +773,7 @@ attotime cpu_clocks_to_attotime(const device_config *device, UINT64 clocks)
 
 UINT64 cpu_attotime_to_clocks(const device_config *device, attotime duration)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	return mulu_32x32(duration.seconds, classdata->cycles_per_second) + (UINT64)duration.attoseconds * (UINT64)classdata->attoseconds_per_cycle;
 }
 
@@ -688,7 +790,7 @@ UINT64 cpu_attotime_to_clocks(const device_config *device, attotime duration)
 
 attotime cpu_get_local_time(const device_config *device)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	attotime result;
 
 	/* if we're active, add in the time from the current slice */
@@ -725,7 +827,7 @@ attotime cpuexec_override_local_time(running_machine *machine, attotime default_
 
 UINT64 cpu_get_total_cycles(const device_config *device)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	if (device == device->machine->cpuexec_data->executingcpu)
 		return classdata->totalcycles + classdata->cycles_running - *classdata->icount;
@@ -741,7 +843,7 @@ UINT64 cpu_get_total_cycles(const device_config *device)
 
 void cpu_eat_cycles(const device_config *device, int cycles)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* ignore if not the executing CPU */
 	if (device != device->machine->cpuexec_data->executingcpu)
@@ -760,7 +862,7 @@ void cpu_eat_cycles(const device_config *device, int cycles)
 
 void cpu_adjust_icount(const device_config *device, int delta)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* ignore if not the executing CPU */
 	if (device != device->machine->cpuexec_data->executingcpu)
@@ -778,7 +880,7 @@ void cpu_adjust_icount(const device_config *device, int delta)
 
 void cpu_abort_timeslice(const device_config *device)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	int delta;
 
 	/* ignore if not the executing CPU */
@@ -793,19 +895,6 @@ void cpu_abort_timeslice(const device_config *device)
 		classdata->cycles_running -= delta;
 		*classdata->icount -= delta;
 	}
-}
-
-
-/*-------------------------------------------------
-    cpuexec_abort_timeslice - abort execution
-    for the current timeslice
--------------------------------------------------*/
-
-void cpuexec_abort_timeslice(running_machine *machine)
-{
-	const device_config *executingcpu = machine->cpuexec_data->executingcpu;
-	if (executingcpu != NULL)
-		cpu_abort_timeslice(executingcpu);
 }
 
 
@@ -857,7 +946,7 @@ void cpu_spinuntil_trigger(const device_config *device, int trigger)
 
 void cpu_spinuntil_int(const device_config *device)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* suspend until the given trigger fires */
 	suspend_until_trigger(device, classdata->inttrigger, TRUE);
@@ -893,20 +982,20 @@ void cpu_spinuntil_time(const device_config *device, attotime duration)
 
 void cpuexec_trigger(running_machine *machine, int trigger)
 {
-	int cpunum;
-
+	const device_config *cpu;
+	
 	/* look for suspended CPUs waiting for this trigger and unsuspend them */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL; cpunum++)
+	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 	{
-		cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
+		cpu_class_data *classdata = cpu_get_class_data(cpu);
 
 		/* if we're executing, for an immediate abort */
-		cpu_abort_timeslice(machine->cpu[cpunum]);
+		cpu_abort_timeslice(cpu);
 
 		/* see if this is a matching trigger */
 		if (classdata->suspend != 0 && classdata->trigger == trigger)
 		{
-			cpu_resume(machine->cpu[cpunum], SUSPEND_REASON_TRIGGER);
+			cpu_resume(cpu, SUSPEND_REASON_TRIGGER);
 			classdata->trigger = 0;
 		}
 	}
@@ -931,7 +1020,7 @@ void cpuexec_triggertime(running_machine *machine, int trigger, attotime duratio
 
 void cpu_triggerint(const device_config *device)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* signal this CPU's interrupt trigger */
 	cpuexec_trigger(device->machine, classdata->inttrigger);
@@ -951,7 +1040,7 @@ void cpu_triggerint(const device_config *device)
 
 void cpu_set_input_line(const device_config *device, int line, int state)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	int vector = (line >= 0 && line < MAX_INPUT_LINES) ? classdata->input[line].vector : 0xff;
 	cpu_set_input_line_and_vector(device, line, state, vector);
 }
@@ -965,13 +1054,13 @@ void cpu_set_input_line(const device_config *device, int line, int state)
 
 void cpu_set_input_line_vector(const device_config *device, int line, int vector)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	if (line >= 0 && line < MAX_INPUT_LINES)
 	{
 		classdata->input[line].vector = vector;
 		return;
 	}
-	LOG(("cpunum_set_input_line_vector CPU '%s' line %d > max input lines\n", device->tag, line));
+	LOG(("cpu_set_input_line_vector CPU '%s' line %d > max input lines\n", device->tag, line));
 }
 
 
@@ -983,7 +1072,7 @@ void cpu_set_input_line_vector(const device_config *device, int line, int vector
 
 void cpu_set_input_line_and_vector(const device_config *device, int line, int state, int vector)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	/* catch errors where people use PULSE_LINE for CPUs that don't support it */
 	if (state == PULSE_LINE && line != INPUT_LINE_NMI && line != INPUT_LINE_RESET)
@@ -995,7 +1084,7 @@ void cpu_set_input_line_and_vector(const device_config *device, int line, int st
 		INT32 input_event = (state & 0xff) | (vector << 8);
 		int event_index = inputline->qindex++;
 
-		LOG(("cpunum_set_input_line_and_vector('%s',%d,%d,%02x)\n", device->tag, line, state, vector));
+		LOG(("cpu_set_input_line_and_vector('%s',%d,%d,%02x)\n", device->tag, line, state, vector));
 
 		/* if we're full of events, flush the queue and log a message */
 		if (event_index >= ARRAY_LENGTH(inputline->queue))
@@ -1026,7 +1115,7 @@ void cpu_set_input_line_and_vector(const device_config *device, int line, int st
 
 void cpu_set_irq_callback(const device_config *device, cpu_irq_callback callback)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	classdata->driver_irq = callback;
 }
 
@@ -1043,7 +1132,7 @@ void cpu_set_irq_callback(const device_config *device, cpu_irq_callback callback
 
 int cpu_getiloops(const device_config *device)
 {
-	cpu_class_data *classdata = get_safe_classtoken(device);
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	return classdata->iloops;
 }
 
@@ -1054,68 +1143,13 @@ int cpu_getiloops(const device_config *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_timers_init - set up all the core timers
--------------------------------------------------*/
-
-static void cpu_timers_init(running_machine *machine)
-{
-	int numscreens = video_screen_count(machine->config);
-	attoseconds_t refresh_attosecs;
-	int cpunum, ipf;
-
-	/* set the core scheduling quantum */
-	ipf = machine->config->cpu_slices_per_frame;
-	if (ipf <= 0)
-		ipf = 1;
-	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : video_screen_get_frame_period(machine->primary_screen).attoseconds;
-	timer_add_scheduling_quantum(machine, refresh_attosecs / ipf, attotime_never);
-
-	/* register the interrupt handler callbacks */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			const device_config *device = machine->cpu[cpunum];
-			const cpu_config *config = device->inline_config;
-			cpu_class_data *classdata = device->classtoken;
-
-			/* VBLANK interrupts */
-			if (config->vblank_interrupts_per_frame > 0)
-			{
-				const device_config *screen;
-
-				/* get the screen that will trigger the VBLANK */
-
-				/* new style - use screen tag directly */
-				if (config->vblank_interrupts_per_frame == 1)
-					screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, config->vblank_interrupt_screen);
-
-				/* old style 'hack' setup - use screen #0 */
-				else
-					screen = device_list_first(machine->config->devicelist, VIDEO_SCREEN);
-
-				assert(screen != NULL);
-				video_screen_register_vblank_callback(screen, on_vblank, NULL);
-			}
-
-			/* periodic interrupts */
-			if (config->timed_interrupt_period != 0)
-			{
-				attotime timedint_period = attotime_make(0, config->timed_interrupt_period);
-				assert(classdata->timedint_timer != NULL);
-				timer_adjust_periodic(classdata->timedint_timer, timedint_period, cpunum, timedint_period);
-			}
-		}
-}
-
-
-/*-------------------------------------------------
     update_clock_information - recomputes clock
     information for the specified CPU
 -------------------------------------------------*/
 
 static void update_clock_information(const device_config *device)
 {
-	cpu_class_data *classdata = device->classtoken;
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	INT64 attos;
 
 	/* recompute cps and spc */
@@ -1144,19 +1178,19 @@ static void update_clock_information(const device_config *device)
 
 static void compute_perfect_interleave(running_machine *machine)
 {
-	if (machine->cpu[0] != NULL && machine->cpu[0]->classtoken != NULL)
+	if (machine->cpu[0] != NULL && machine->cpu[0]->token != NULL)
 	{
-		cpu_class_data *classdata = machine->cpu[0]->classtoken;
-		attoseconds_t smallest = classdata->attoseconds_per_cycle * cputype_get_min_cycles(machine->config->cpu[0].type);
+		cpu_class_data *classdata = cpu_get_class_data(machine->cpu[0]);
+		attoseconds_t smallest = classdata->attoseconds_per_cycle * cputype_get_min_cycles(cpu_get_type(machine->cpu[0]));
 		attoseconds_t perfect = ATTOSECONDS_PER_SECOND - 1;
-		int cpunum;
+		const device_config *cpu;
 
 		/* start with a huge time factor and find the 2nd smallest cycle time */
-		for (cpunum = 1; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL; cpunum++)
-			if (machine->cpu[cpunum] != NULL && machine->cpu[cpunum]->classtoken != NULL)
+		for (cpu = machine->cpu[0]->typenext; cpu != NULL; cpu = cpu->typenext)
+			if (cpu->token != NULL)
 			{
-				cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
-				attoseconds_t curtime = classdata->attoseconds_per_cycle * cputype_get_min_cycles(machine->config->cpu[cpunum].type);
+				cpu_class_data *classdata = cpu_get_class_data(cpu);
+				attoseconds_t curtime = classdata->attoseconds_per_cycle * cpu_get_min_cycles(cpu);
 
 				/* find the 2nd smallest cycle interval */
 				if (curtime < smallest)
@@ -1186,49 +1220,47 @@ static void on_vblank(const device_config *device, void *param, int vblank_state
 	/* VBLANK starting */
 	if (vblank_state)
 	{
-		int cpunum;
-
+		const device_config *cpu;
+		
 		/* find any CPUs that have this screen as their VBLANK interrupt source */
-		for (cpunum = 0; cpunum < ARRAY_LENGTH(device->machine->cpu); cpunum++)
-			if (device->machine->cpu[cpunum] != NULL)
+		for (cpu = device->machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+		{
+			const cpu_config *config = cpu->inline_config;
+			cpu_class_data *classdata = cpu_get_class_data(cpu);
+			int cpu_interested;
+
+			/* start the interrupt counter */
+			if (!(classdata->suspend & SUSPEND_REASON_DISABLE))
+				classdata->iloops = 0;
+			else
+				classdata->iloops = -1;
+
+			/* the hack style VBLANK decleration always uses the first screen */
+			if (config->vblank_interrupts_per_frame > 1)
+				cpu_interested = TRUE;
+
+			/* for new style declaration, we need to compare the tags */
+			else if (config->vblank_interrupt_screen != NULL)
+				cpu_interested = (strcmp(config->vblank_interrupt_screen, device->tag) == 0);
+
+			/* no VBLANK interrupt, not interested */
+			else
+				cpu_interested = FALSE;
+
+			/* if interested, call the interrupt handler */
+			if (cpu_interested)
 			{
-				const device_config *cpudevice = device->machine->cpu[cpunum];
-				const cpu_config *config = cpudevice->inline_config;
-				cpu_class_data *classdata = cpudevice->classtoken;
-				int cpu_interested;
+				if (!(classdata->suspend & (SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE)))
+					(*config->vblank_interrupt)(cpu);
 
-				/* start the interrupt counter */
-				if (!(classdata->suspend & SUSPEND_REASON_DISABLE))
-					classdata->iloops = 0;
-				else
-					classdata->iloops = -1;
-
-				/* the hack style VBLANK decleration always uses the first screen */
-				if (config->vblank_interrupts_per_frame > 1)
-					cpu_interested = TRUE;
-
-				/* for new style decleration, we need to compare the tags */
-				else if (config->vblank_interrupts_per_frame == 1)
-					cpu_interested = (strcmp(config->vblank_interrupt_screen, device->tag) == 0);
-
-				/* no VBLANK interrupt, not interested */
-				else
-					cpu_interested = FALSE;
-
-				/* if interested, call the interrupt handler */
-				if (cpu_interested)
+				/* if we have more than one interrupt per frame, start the timer now to trigger the rest of them */
+				if (config->vblank_interrupts_per_frame > 1 && !(classdata->suspend & SUSPEND_REASON_DISABLE))
 				{
-					if (!(classdata->suspend & (SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE)))
-						(*config->vblank_interrupt)(cpudevice);
-
-					/* if we have more than one interrupt per frame, start the timer now to trigger the rest of them */
-					if (config->vblank_interrupts_per_frame > 1 && !(classdata->suspend & SUSPEND_REASON_DISABLE))
-					{
-						classdata->partial_frame_period = attotime_div(video_screen_get_frame_period(device->machine->primary_screen), config->vblank_interrupts_per_frame);
-						timer_adjust_oneshot(classdata->partial_frame_timer, classdata->partial_frame_period, cpunum);
-					}
+					classdata->partial_frame_period = attotime_div(video_screen_get_frame_period(device->machine->primary_screen), config->vblank_interrupts_per_frame);
+					timer_adjust_oneshot(classdata->partial_frame_timer, classdata->partial_frame_period, 0);
 				}
 			}
+		}
 	}
 }
 
@@ -1242,7 +1274,7 @@ static TIMER_CALLBACK( trigger_partial_frame_interrupt )
 {
 	const device_config *device = ptr;
 	const cpu_config *config = device->inline_config;
-	cpu_class_data *classdata = device->classtoken;
+	cpu_class_data *classdata = cpu_get_class_data(device);
 
 	if (classdata->iloops == 0)
 		classdata->iloops = config->vblank_interrupts_per_frame;
@@ -1294,7 +1326,7 @@ static TIMER_CALLBACK( triggertime_callback )
 static TIMER_CALLBACK( empty_event_queue )
 {
 	const device_config *device = ptr;
-	cpu_class_data *classdata = device->classtoken;
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	cpu_input_data *inputline = &classdata->input[param];
 	int curevent;
 
@@ -1320,7 +1352,7 @@ static TIMER_CALLBACK( empty_event_queue )
 				/* if we're clearing the line that was previously asserted, or if we're just */
 				/* pulsing the line, reset the CPU */
 				if ((state == CLEAR_LINE && cpu_is_suspended(device, SUSPEND_REASON_RESET)) || state == PULSE_LINE)
-					cpu_reset(device);
+					device_reset(device);
 
 				/* if we're clearing the line, make sure the CPU is not halted */
 				cpu_resume(device, SUSPEND_REASON_RESET);
@@ -1346,8 +1378,6 @@ static TIMER_CALLBACK( empty_event_queue )
 			switch (state)
 			{
 				case PULSE_LINE:
-					/* temporary: PULSE_LINE only makes sense for NMI lines on Z80 */
-					assert(classdata->header.cputype != CPU_Z80 || param == INPUT_LINE_NMI);
 					cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
 					cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
 					break;
@@ -1385,7 +1415,7 @@ static TIMER_CALLBACK( empty_event_queue )
 
 static IRQ_CALLBACK( standard_irq_callback )
 {
-	cpu_class_data *classdata = device->classtoken;
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	cpu_input_data *inputline = &classdata->input[irqline];
 	int vector = inputline->curvector;
 
@@ -1418,7 +1448,7 @@ static IRQ_CALLBACK( standard_irq_callback )
 
 static void register_save_states(const device_config *device)
 {
-	cpu_class_data *classdata = device->classtoken;
+	cpu_class_data *classdata = cpu_get_class_data(device);
 	int line;
 
 	state_save_register_device_item(device, 0, classdata->suspend);

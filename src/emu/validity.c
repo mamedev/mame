@@ -714,51 +714,18 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 {
 	const game_driver *driver = drivers[drivnum];
 	cpu_validity_check_func cpu_validity_check;
+	const device_config *device;
 	int error = FALSE;
-	int cpunum;
 
 	/* loop over all the CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
+	for (device = cpu_first(config); device != NULL; device = cpu_next(device))
 	{
-		const cpu_config *cpu = &config->cpu[cpunum];
-		int spacenum, checknum;
-
-		/* skip empty entries */
-		if (cpu->type == CPU_DUMMY)
-			continue;
-
-		/* check for valid tag */
-		if (cpu->tag == NULL)
-		{
-			mame_printf_error("%s: %s has NULL CPU tag\n", driver->source_file, driver->name);
-			error = TRUE;
-		}
-
-		/* check for duplicate tags */
-		else
-		{
-			for (checknum = 0; checknum < cpunum; checknum++)
-				if (config->cpu[checknum].tag != NULL && strcmp(cpu->tag, config->cpu[checknum].tag) == 0)
-				{
-					mame_printf_error("%s: %s has multiple CPUs tagged as '%s'\n", driver->source_file, driver->name, cpu->tag);
-					error = TRUE;
-				}
-		}
-
-		/* validate the CPU tag */
-		error |= validate_tag(driver, "CPU", cpu->tag);
-
-		/* checks to see if this driver is using a dummy CPU */
-		if (cpu->type == CPU_DUMMY)
-		{
-			mame_printf_error("%s: %s uses non-present CPU\n", driver->source_file, driver->name);
-			error = TRUE;
-			continue;
-		}
+		const cpu_config *cpuconfig = device->inline_config;
+		int spacenum;
 
 		/* check the CPU for incompleteness */
-		if (cputype_get_info_fct(cpu->type, CPUINFO_PTR_RESET) == NULL ||
-			cputype_get_info_fct(cpu->type, CPUINFO_PTR_EXECUTE) == NULL)
+		if (cpu_get_info_fct(device, CPUINFO_PTR_RESET) == NULL ||
+			cpu_get_info_fct(device, CPUINFO_PTR_EXECUTE) == NULL)
 		{
 			mame_printf_error("%s: %s uses an incomplete CPU\n", driver->source_file, driver->name);
 			error = TRUE;
@@ -766,33 +733,30 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 		}
 
 		/* check for CPU-specific validity check */
-		cpu_validity_check = (cpu_validity_check_func) cputype_get_info_fct(cpu->type, CPUINFO_PTR_VALIDITY_CHECK);
-		if (cpu_validity_check != NULL)
-		{
-			if ((*cpu_validity_check)(driver, config->cpu[cpunum].reset_param))
-				error = TRUE;
-		}
+		cpu_validity_check = (cpu_validity_check_func) cpu_get_info_fct(device, CPUINFO_PTR_VALIDITY_CHECK);
+		if (cpu_validity_check != NULL && (*cpu_validity_check)(driver, device->static_config))
+			error = TRUE;
 
 		/* loop over all address spaces */
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 #define SPACE_SHIFT(a)		((addr_shift < 0) ? ((a) << -addr_shift) : ((a) >> addr_shift))
 #define SPACE_SHIFT_END(a)	((addr_shift < 0) ? (((a) << -addr_shift) | ((1 << -addr_shift) - 1)) : ((a) >> addr_shift))
-			int databus_width = cputype_get_databus_width(cpu->type, spacenum);
-			int addr_shift = cputype_get_addrbus_shift(cpu->type, spacenum);
+			int databus_width = cpu_get_databus_width(device, spacenum);
+			int addr_shift = cpu_get_addrbus_shift(device, spacenum);
 			int alignunit = databus_width/8;
 			address_map_entry *entry;
 			address_map *map;
 
 			/* check to see that the same map is not used twice */
-			if (cpu->address_map[spacenum][0] != NULL && cpu->address_map[spacenum][0] == cpu->address_map[spacenum][1])
+			if (cpuconfig->address_map[spacenum] != NULL && cpuconfig->address_map[spacenum] == cpuconfig->address_map2[spacenum])
 			{
-				mame_printf_error("%s: %s uses identical memory maps for CPU #%d spacenum %d\n", driver->source_file, driver->name, cpunum, spacenum);
+				mame_printf_error("%s: %s uses identical memory maps for CPU '%s' spacenum %d\n", driver->source_file, driver->name, device->tag, spacenum);
 				error = TRUE;
 			}
 
 			/* construct the maps */
-			map = address_map_alloc(config, driver, cpunum, spacenum);
+			map = address_map_alloc(device, driver, spacenum);
 
 			/* if this is an empty map, just skip it */
 			if (map->entrylist == NULL)
@@ -804,12 +768,12 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 			/* validate the global map parameters */
 			if (map->spacenum != spacenum)
 			{
-				mame_printf_error("%s: %s CPU #%d space %d has address space %d handlers!\n", driver->source_file, driver->name, cpunum, spacenum, map->spacenum);
+				mame_printf_error("%s: %s CPU '%s' space %d has address space %d handlers!\n", driver->source_file, driver->name, device->tag, spacenum, map->spacenum);
 				error = TRUE;
 			}
 			if (map->databits != databus_width)
 			{
-				mame_printf_error("%s: %s cpu #%d uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, cpunum, address_space_names[spacenum], databus_width, map->databits);
+				mame_printf_error("%s: %s cpu '%s' uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], databus_width, map->databits);
 				error = TRUE;
 			}
 
@@ -836,7 +800,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 				/* if this is a program space, auto-assign implicit ROM entries */
 				if ((FPTR)entry->read.generic == STATIC_ROM && entry->region == NULL)
 				{
-					entry->region = config->cpu[cpunum].tag;
+					entry->region = device->tag;
 					entry->rgnoffs = entry->addrstart;
 				}
 
@@ -851,7 +815,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 						/* stop if we hit an empty */
 						if (rgninfo->entries[rgnnum].tag == NULL)
 						{
-							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region \"%s\"\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
+							mame_printf_error("%s: %s CPU '%s' %s space memory map entry %X-%X references non-existant region \"%s\"\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region);
 							error = TRUE;
 							break;
 						}
@@ -862,7 +826,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 							offs_t length = rgninfo->entries[rgnnum].length;
 							if (entry->rgnoffs + (byteend - bytestart + 1) > length)
 							{
-								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
+								mame_printf_error("%s: %s CPU '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->addrstart, entry->addrend, entry->region, length);
 								error = TRUE;
 							}
 							break;
@@ -873,19 +837,19 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 				/* make sure all devices exist */
 				if (entry->read_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->read_devtype, entry->read_devtag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_get_name(entry->read_devtype), entry->read_devtag);
+					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], devtype_get_name(entry->read_devtype), entry->read_devtag);
 					error = TRUE;
 				}
 				if (entry->write_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtype, entry->write_devtag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_get_name(entry->write_devtype), entry->write_devtag);
+					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], devtype_get_name(entry->write_devtype), entry->write_devtag);
 					error = TRUE;
 				}
 
 				/* make sure ports exist */
 				if (entry->read_porttag != NULL && input_port_by_tag(portlist, entry->read_porttag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant port tag %s\n", driver->source_file, driver->name, cpunum, spacenum, entry->read_porttag);
+					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant port tag %s\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_porttag);
 					error = TRUE;
 				}
 			}
@@ -894,46 +858,43 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 			address_map_free(map);
 
 			/* validate the interrupts */
-			if (cpu->vblank_interrupt != NULL)
+			if (cpuconfig->vblank_interrupt != NULL)
 			{
 				if (video_screen_count(config) == 0)
 				{
-					mame_printf_error("%s: %s cpu #%d has a VBLANK interrupt, but the driver is screenless !\n", driver->source_file, driver->name, cpunum);
+					mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt, but the driver is screenless !\n", driver->source_file, driver->name, device->tag);
 					error = TRUE;
 				}
-				else if (cpu->vblank_interrupts_per_frame == 0)
+				else if (cpuconfig->vblank_interrupt_screen != NULL && cpuconfig->vblank_interrupts_per_frame != 0)
 				{
-					mame_printf_error("%s: %s cpu #%d has a VBLANK interrupt handler with 0 interrupts!\n", driver->source_file, driver->name, cpunum);
+					mame_printf_error("%s: %s cpu '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver->source_file, driver->name, device->tag);
 					error = TRUE;
 				}
-				else if (cpu->vblank_interrupts_per_frame == 1)
+				else if (cpuconfig->vblank_interrupt_screen != NULL && device_list_find_by_tag(config->devicelist, VIDEO_SCREEN, cpuconfig->vblank_interrupt_screen) == NULL)
 				{
-					if (cpu->vblank_interrupt_screen == NULL)
-					{
-						mame_printf_error("%s: %s cpu #%d has a valid VBLANK interrupt handler with no screen tag supplied!\n", driver->source_file, driver->name, cpunum);
-						error = TRUE;
-					}
-					else if (device_list_index(config->devicelist, VIDEO_SCREEN, cpu->vblank_interrupt_screen) == -1)
-					{
-						mame_printf_error("%s: %s cpu #%d VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, cpunum, cpu->vblank_interrupt_screen);
-						error = TRUE;
-					}
+					mame_printf_error("%s: %s cpu '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, device->tag, cpuconfig->vblank_interrupt_screen);
+					error = TRUE;
+				}
+				else if (cpuconfig->vblank_interrupt_screen == NULL && cpuconfig->vblank_interrupts_per_frame == 0)
+				{
+					mame_printf_error("%s: %s cpu '%s' has a VBLANK interrupt handler with 0 interrupts!\n", driver->source_file, driver->name, device->tag);
+					error = TRUE;
 				}
 			}
-			else if (cpu->vblank_interrupts_per_frame != 0)
+			else if (cpuconfig->vblank_interrupts_per_frame != 0)
 			{
-				mame_printf_error("%s: %s cpu #%d has no VBLANK interrupt handler but a non-0 interrupt count is given!\n", driver->source_file, driver->name, cpunum);
+				mame_printf_error("%s: %s cpu '%s' has no VBLANK interrupt handler but a non-0 interrupt count is given!\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
 
-			if ((cpu->timed_interrupt != NULL) && (cpu->timed_interrupt_period == 0))
+			if (cpuconfig->timed_interrupt != NULL && cpuconfig->timed_interrupt_period == 0)
 			{
-				mame_printf_error("%s: %s cpu #%d has a timer interrupt handler with 0 period!\n", driver->source_file, driver->name, cpunum);
+				mame_printf_error("%s: %s cpu '%s' has a timer interrupt handler with 0 period!\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
-			else if ((cpu->timed_interrupt == NULL) && (cpu->timed_interrupt_period != 0))
+			else if (cpuconfig->timed_interrupt == NULL && cpuconfig->timed_interrupt_period != 0)
 			{
-				mame_printf_error("%s: %s cpu #%d has a no timer interrupt handler but has a non-0 period given!\n", driver->source_file, driver->name, cpunum);
+				mame_printf_error("%s: %s cpu '%s' has a no timer interrupt handler but has a non-0 period given!\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
 		}

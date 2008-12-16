@@ -49,22 +49,74 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef void (*cpu_interrupt_func)(const device_config *device);
+
+
 /* CPU description for drivers */
 typedef struct _cpu_config cpu_config;
 struct _cpu_config
 {
-	cpu_type		type;						/* index for the CPU type */
-	int				flags;						/* flags; see #defines below */
-	int				clock;						/* in Hertz */
-	const addrmap_token *address_map[ADDRESS_SPACES][2]; /* 2 memory maps per address space */
-	void 			(*vblank_interrupt)(const device_config *device);	/* for interrupts tied to VBLANK */
-	int 			vblank_interrupts_per_frame;/* usually 1 */
-	const char *	vblank_interrupt_screen;	/* the screen that causes the VBLANK interrupt */
-	void 			(*timed_interrupt)(const device_config *device);	/* for interrupts not tied to VBLANK */
-	attoseconds_t 	timed_interrupt_period;		/* period for periodic interrupts */
-	const void *	reset_param;				/* parameter for cpu_reset */
-	const char *	tag;
+	cpu_type			type;						/* index for the CPU type */
+	UINT32				flags;						/* flags; see #defines below */
+	UINT32				clock;						/* in Hertz */
+	const addrmap_token *address_map[ADDRESS_SPACES]; /* 2 memory maps per address space */
+	const addrmap_token *address_map2[ADDRESS_SPACES]; /* 2 memory maps per address space */
+	cpu_interrupt_func 	vblank_interrupt;			/* for interrupts tied to VBLANK */
+	int 				vblank_interrupts_per_frame;/* usually 1 */
+	const char *		vblank_interrupt_screen;	/* the screen that causes the VBLANK interrupt */
+	cpu_interrupt_func 	timed_interrupt;			/* for interrupts not tied to VBLANK */
+	UINT64		 		timed_interrupt_period;		/* period for periodic interrupts */
 };
+
+
+
+/***************************************************************************
+    CPU DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_CPU_ADD(_tag, _type, _clock) \
+	MDRV_DEVICE_ADD(_tag, CPU) \
+	MDRV_DEVICE_CONFIG_DATA32(cpu_config, type, CPU_##_type) \
+	MDRV_DEVICE_CONFIG_DATA32(cpu_config, clock, _clock)
+
+#define MDRV_CPU_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, CPU)
+
+#define MDRV_CPU_MODIFY(_tag) \
+	MDRV_DEVICE_MODIFY(_tag, CPU)
+
+#define MDRV_CPU_REPLACE(_tag, _type, _clock) \
+	MDRV_DEVICE_REMOVE(_tag, CPU) \
+	MDRV_DEVICE_ADD(_tag, CPU) \
+	MDRV_DEVICE_CONFIG_DATA32(cpu_config, type, CPU_##_type) \
+	MDRV_DEVICE_CONFIG_DATA32(cpu_config, clock, _clock)
+
+#define MDRV_CPU_FLAGS(_flags) \
+	MDRV_DEVICE_CONFIG_DATA32(cpu_config, flags, _flags)
+
+#define MDRV_CPU_CONFIG(_config) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_CPU_PROGRAM_MAP(_map1, _map2) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_PROGRAM, ADDRESS_MAP_NAME(_map1)) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map2, ADDRESS_SPACE_PROGRAM, ADDRESS_MAP_NAME(_map2))
+
+#define MDRV_CPU_DATA_MAP(_map1, _map2) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_DATA, ADDRESS_MAP_NAME(_map1)) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map2, ADDRESS_SPACE_DATA, ADDRESS_MAP_NAME(_map2))
+
+#define MDRV_CPU_IO_MAP(_map1, _map2) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map, ADDRESS_SPACE_IO, ADDRESS_MAP_NAME(_map1)) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(cpu_config, address_map2, ADDRESS_SPACE_IO, ADDRESS_MAP_NAME(_map2))
+
+#define MDRV_CPU_VBLANK_INT(_tag, _func) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, vblank_interrupt, _func) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, vblank_interrupt_screen, _tag) \
+	MDRV_DEVICE_CONFIG_DATA32(cpu_config, vblank_interrupts_per_frame, 0)
+
+#define MDRV_CPU_PERIODIC_INT(_func, _rate)	\
+	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, timed_interrupt, _func) \
+	MDRV_DEVICE_CONFIG_DATA64(cpu_config, timed_interrupt_period, UINT64_ATTOTIME_IN_HZ(_rate))
 
 
 
@@ -73,6 +125,9 @@ struct _cpu_config
 ***************************************************************************/
 
 #define INTERRUPT_GEN(func)		void func(const device_config *device)
+
+/* return a pointer to the given CPU by tag */
+#define cputag_get_cpu(mach, tag)										devtag_get_device(mach, CPU, tag)
 
 /* helpers for using machine/cputag instead of cpu objects */
 #define cputag_suspend(mach, tag, reason, eat)							cpu_suspend(cputag_get_cpu(mach, tag), reason, eat)
@@ -96,9 +151,6 @@ struct _cpu_config
 
 /* ----- core CPU execution ----- */
 
-/* temporary function to allocate a fake CPU device for each CPU */
-const device_config *cpuexec_create_cpu_device(const cpu_config *config);
-
 /* prepare CPUs for execution */
 void cpuexec_init(running_machine *machine);
 
@@ -110,10 +162,15 @@ void cpuexec_boost_interleave(running_machine *machine, attotime timeslice_time,
 
 
 
-/* ----- global helpers ----- */
+/* ----- CPU device interface ----- */
 
-/* return a pointer to the given CPU by tag */
-const device_config *cputag_get_cpu(running_machine *machine, const char *tag);
+/* device get info callback */
+#define CPU DEVICE_GET_INFO_NAME(cpu)
+DEVICE_GET_INFO( cpu );
+
+
+
+/* ----- global helpers ----- */
 
 /* abort execution for the current timeslice */
 void cpuexec_abort_timeslice(running_machine *machine);
@@ -225,6 +282,25 @@ void cpu_set_input_line_and_vector(const device_config *cpu, int line, int state
 
 /* install a driver-specific callback for IRQ acknowledge */
 void cpu_set_irq_callback(const device_config *cpu, cpu_irq_callback callback);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+
+/*-------------------------------------------------
+    cpu_get_type - return the type of the
+    specified CPU
+-------------------------------------------------*/
+
+INLINE cpu_type cpu_get_type(const device_config *device)
+{
+	const cpu_config *config = device->inline_config;
+	return config->type;
+}
+
 
 
 #endif	/* __CPUEXEC_H__ */

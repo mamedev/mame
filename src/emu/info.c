@@ -569,19 +569,19 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 
 static void print_game_chips(FILE *out, const game_driver *game, const machine_config *config)
 {
+	const device_config *device;
 	int chipnum;
 
 	/* iterate over CPUs */
-	for (chipnum = 0; chipnum < ARRAY_LENGTH(config->cpu); chipnum++)
-		if (config->cpu[chipnum].type != CPU_DUMMY)
-		{
-			fprintf(out, "\t\t<chip");
-			fprintf(out, " type=\"cpu\"");
-			fprintf(out, " tag=\"%s\"", xml_normalize_string(config->cpu[chipnum].tag));
-			fprintf(out, " name=\"%s\"", xml_normalize_string(cputype_get_name(config->cpu[chipnum].type)));
-			fprintf(out, " clock=\"%d\"", config->cpu[chipnum].clock);
-			fprintf(out, "/>\n");
-		}
+	for (device = cpu_first(config); device != NULL; device = cpu_next(device))
+	{
+		fprintf(out, "\t\t<chip");
+		fprintf(out, " type=\"cpu\"");
+		fprintf(out, " tag=\"%s\"", xml_normalize_string(device->tag));
+		fprintf(out, " name=\"%s\"", xml_normalize_string(device_get_name(device)));
+		fprintf(out, " clock=\"%d\"", ((const cpu_config *)device->inline_config)->clock);
+		fprintf(out, "/>\n");
+	}
 
 	/* iterate over sound chips */
 	for (chipnum = 0; chipnum < ARRAY_LENGTH(config->sound); chipnum++)

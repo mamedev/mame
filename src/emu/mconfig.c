@@ -58,91 +58,19 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 
 void machine_config_free(machine_config *config)
 {
-	int cpunum, soundnum;
+	int soundnum;
 
 	/* release the device list */
 	while (config->devicelist != NULL)
 		device_list_remove(&config->devicelist, config->devicelist->type, config->devicelist->tag);
 
 	/* release the strings */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(config->cputag); cpunum++)
-		if (config->cputag[cpunum] != NULL)
-			astring_free(config->cputag[cpunum]);
 	for (soundnum = 0; soundnum < ARRAY_LENGTH(config->soundtag); soundnum++)
 		if (config->soundtag[soundnum] != NULL)
 			astring_free(config->soundtag[soundnum]);
 
 	/* release the configuration itself */
 	free(config);
-}
-
-
-/*-------------------------------------------------
-    cpu_add - add a CPU during machine driver
-    expansion
--------------------------------------------------*/
-
-static cpu_config *cpu_add(machine_config *machine, const char *tag, cpu_type type, int cpuclock)
-{
-	int cpunum;
-
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		if (machine->cpu[cpunum].type == CPU_DUMMY)
-		{
-			if (machine->cputag[cpunum] == NULL)
-				machine->cputag[cpunum] = astring_alloc();
-			astring_cpyc(machine->cputag[cpunum], tag);
-			machine->cpu[cpunum].tag = astring_c(machine->cputag[cpunum]);
-			machine->cpu[cpunum].type = type;
-			machine->cpu[cpunum].clock = cpuclock;
-			return &machine->cpu[cpunum];
-		}
-
-	fatalerror("Out of CPU's!\n");
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    cpu_find - find a tagged CPU during machine
-    driver expansion
--------------------------------------------------*/
-
-static cpu_config *cpu_find(machine_config *machine, const char *tag)
-{
-	int cpunum;
-
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		if (machine->cpu[cpunum].tag && strcmp(machine->cpu[cpunum].tag, tag) == 0)
-			return &machine->cpu[cpunum];
-
-	fatalerror("Can't find CPU '%s'!\n", tag);
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    cpu_remove - remove a tagged CPU during
-    machine driver expansion
--------------------------------------------------*/
-
-static void cpu_remove(machine_config *machine, const char *tag)
-{
-	int cpunum;
-
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		if (machine->cpu[cpunum].tag && strcmp(machine->cpu[cpunum].tag, tag) == 0)
-		{
-			if (machine->cputag[cpunum] != NULL)
-				astring_free(machine->cputag[cpunum]);
-			memmove(&machine->cpu[cpunum], &machine->cpu[cpunum + 1], sizeof(machine->cpu[0]) * (MAX_CPU - cpunum - 1));
-			memmove(&machine->cputag[cpunum], &machine->cputag[cpunum + 1], sizeof(machine->cputag[0]) * (MAX_CPU - cpunum - 1));
-			memset(&machine->cpu[MAX_CPU - 1], 0, sizeof(machine->cpu[0]));
-			memset(&machine->cputag[MAX_CPU - 1], 0, sizeof(machine->cputag[0]));
-			return;
-		}
-
-	fatalerror("Can't find CPU '%s'!\n", tag);
 }
 
 
@@ -228,7 +156,6 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	astring *tempstring = astring_alloc();
 	device_config *device = NULL;
 	sound_config *sound = NULL;
-	cpu_config *cpu = NULL;
 
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
@@ -330,90 +257,6 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				}
 				break;
 
-
-			/* add/modify/remove/replace CPUs */
-			case MCONFIG_TOKEN_CPU_ADD:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
-				tag = TOKEN_GET_STRING(tokens);
-				cpu = cpu_add(config, device_build_tag(tempstring, tagprefix, tag), type, clock);
-				break;
-
-			case MCONFIG_TOKEN_CPU_MODIFY:
-				tag = TOKEN_GET_STRING(tokens);
-				cpu = cpu_find(config, device_build_tag(tempstring, tagprefix, tag));
-				break;
-
-			case MCONFIG_TOKEN_CPU_REMOVE:
-				tag = TOKEN_GET_STRING(tokens);
-				cpu_remove(config, device_build_tag(tempstring, tagprefix, tag));
-				cpu = NULL;
-				break;
-
-			case MCONFIG_TOKEN_CPU_REPLACE:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
-				tag = TOKEN_GET_STRING(tokens);
-				cpu = cpu_find(config, device_build_tag(tempstring, tagprefix, tag));
-				if (cpu == NULL)
-					fatalerror("Unable to find CPU: tag=%s\n", astring_c(tempstring));
-				cpu->type = type;
-				cpu->clock = clock;
-				break;
-
-			/* CPU parameters */
-			case MCONFIG_TOKEN_cpu_get_flags:
-				assert(cpu != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, cpu->flags, 24);
-				break;
-
-			case MCONFIG_TOKEN_CPU_CONFIG:
-				assert(cpu != NULL);
-				cpu->reset_param = TOKEN_GET_PTR(tokens, voidptr);
-				break;
-
-			case MCONFIG_TOKEN_CPU_PROGRAM_MAP:
-				assert(cpu != NULL);
-				cpu->address_map[ADDRESS_SPACE_PROGRAM][0] = TOKEN_GET_PTR(tokens, addrmap);
-				cpu->address_map[ADDRESS_SPACE_PROGRAM][1] = TOKEN_GET_PTR(tokens, addrmap);
-				break;
-
-			case MCONFIG_TOKEN_CPU_DATA_MAP:
-				assert(cpu != NULL);
-				cpu->address_map[ADDRESS_SPACE_DATA][0] = TOKEN_GET_PTR(tokens, addrmap);
-				cpu->address_map[ADDRESS_SPACE_DATA][1] = TOKEN_GET_PTR(tokens, addrmap);
-				break;
-
-			case MCONFIG_TOKEN_CPU_IO_MAP:
-				assert(cpu != NULL);
-				cpu->address_map[ADDRESS_SPACE_IO][0] = TOKEN_GET_PTR(tokens, addrmap);
-				cpu->address_map[ADDRESS_SPACE_IO][1] = TOKEN_GET_PTR(tokens, addrmap);
-				break;
-
-			case MCONFIG_TOKEN_CPU_VBLANK_INT:
-				assert(cpu != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK1(tokens, entrytype, 8);
-				cpu->vblank_interrupt_screen = TOKEN_GET_STRING(tokens);
-				cpu->vblank_interrupt = TOKEN_GET_PTR(tokens, interrupt);
-				cpu->vblank_interrupts_per_frame = 1;
-				break;
-
-			case MCONFIG_TOKEN_CPU_VBLANK_INT_HACK:
-				assert(cpu != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, cpu->vblank_interrupts_per_frame, 24);
-				cpu->vblank_interrupt = TOKEN_GET_PTR(tokens, interrupt);
-				break;
-
-			case MCONFIG_TOKEN_CPU_PERIODIC_INT:
-				assert(cpu != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, data32, 24);
-				cpu->timed_interrupt_period = HZ_TO_ATTOSECONDS(data32);
-				cpu->timed_interrupt = TOKEN_GET_PTR(tokens, interrupt);
-				break;
 
 			/* core parameters */
 			case MCONFIG_TOKEN_DRIVER_DATA:

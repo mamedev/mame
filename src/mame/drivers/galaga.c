@@ -741,19 +741,19 @@ static WRITE8_HANDLER( bosco_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQ1 */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
-			cpu_interrupt_enable(1,bit);
+			cpu_interrupt_enable(space->machine->cpu[1],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
-			cpu_interrupt_enable(2,!bit);
+			cpu_interrupt_enable(space->machine->cpu[2],!bit);
 			break;
 
 		case 0x03:	/* RESET */

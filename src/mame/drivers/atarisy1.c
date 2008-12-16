@@ -2146,7 +2146,7 @@ ROM_END
 static DRIVER_INIT( marble )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine, 0, 0x080000, 0, 103);
+	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 103);
 
 	joystick_type = 0;	/* none */
 	trackball_type = 1;	/* rotated */
@@ -2156,7 +2156,7 @@ static DRIVER_INIT( marble )
 static DRIVER_INIT( peterpak )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine, 0, 0x080000, 0, 107);
+	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 107);
 
 	joystick_type = 1;	/* digital */
 	trackball_type = 0;	/* none */
@@ -2166,7 +2166,7 @@ static DRIVER_INIT( peterpak )
 static DRIVER_INIT( indytemp )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine, 0, 0x080000, 0, 105);
+	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 105);
 
 	joystick_type = 1;	/* digital */
 	trackball_type = 0;	/* none */
@@ -2176,7 +2176,7 @@ static DRIVER_INIT( indytemp )
 static DRIVER_INIT( roadrunn )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine, 0, 0x080000, 0, 108);
+	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 108);
 
 	joystick_type = 2;	/* analog */
 	trackball_type = 0;	/* none */
@@ -2186,7 +2186,7 @@ static DRIVER_INIT( roadrunn )
 static DRIVER_INIT( roadb109 )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine, 0, 0x080000, 0, 109);
+	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 109);
 
 	joystick_type = 3;	/* pedal */
 	trackball_type = 2;	/* steering wheel */
@@ -2196,7 +2196,7 @@ static DRIVER_INIT( roadb109 )
 static DRIVER_INIT( roadb110 )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine, 0, 0x080000, 0, 110);
+	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 110);
 
 	joystick_type = 3;	/* pedal */
 	trackball_type = 2;	/* steering wheel */

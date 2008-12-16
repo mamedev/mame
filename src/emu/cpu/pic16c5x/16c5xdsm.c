@@ -151,7 +151,7 @@ static void InitDasm16C5x(void)
 	OpInizialized = 1;
 }
 
-CPU_DISASSEMBLE( pic16C5x )
+CPU_DISASSEMBLE( pic16c5x )
 {
 	int a, b, d, f, k;	/* these can all be filled in by parsing an instruction */
 	int i;

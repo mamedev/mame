@@ -23,7 +23,7 @@ bit 0 = ? (unused?)
 WRITE8_HANDLER( mexico86_f008_w )
 {
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
- 	if (space->machine->config->cpu[2].type != CPU_DUMMY)
+ 	if (space->machine->cpu[2] != NULL)
 	{
 		// mexico 86, knight boy
 		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);

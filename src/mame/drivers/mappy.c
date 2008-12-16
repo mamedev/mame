@@ -702,13 +702,13 @@ static WRITE8_HANDLER( superpac_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(1,bit);
+			cpu_interrupt_enable(space->machine->cpu[1],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
@@ -744,19 +744,19 @@ static WRITE8_HANDLER( phozon_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:
-			cpu_interrupt_enable(1,bit);
+			cpu_interrupt_enable(space->machine->cpu[1],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x04:
-			cpu_interrupt_enable(2,bit);
+			cpu_interrupt_enable(space->machine->cpu[2],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
 			break;
@@ -790,13 +790,13 @@ static WRITE8_HANDLER( mappy_latch_w )
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			cpu_interrupt_enable(1,bit);
+			cpu_interrupt_enable(space->machine->cpu[1],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;

@@ -286,7 +286,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQON */
-			cpu_interrupt_enable(0,bit);
+			cpu_interrupt_enable(space->machine->cpu[0],bit);
 			if (!bit)
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
@@ -330,7 +330,7 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 {
 	data &= 1;
 
-	cpu_interrupt_enable(cpu_get_index(space->cpu),data);
+	cpu_interrupt_enable(space->cpu,data);
 	if (!data)
 		cpu_set_input_line(space->cpu, 0, CLEAR_LINE);
 }

@@ -19,7 +19,7 @@ static UINT8 sound_nmi_enabled;
 static TIMER_CALLBACK( interrupt_disable )
 {
 	//interrupt_enable = 0;
-	cpu_interrupt_enable(0,0);
+	cpu_interrupt_enable(machine->cpu[0],0);
 }
 
 MACHINE_RESET( espial )
