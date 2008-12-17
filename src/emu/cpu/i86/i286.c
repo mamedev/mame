@@ -194,11 +194,6 @@ static CPU_EXECUTE( i80286 )
 {
 	i80286_state *cpustate = device->token;
 
-	cpustate->base[CS] = SegBase(CS);
-	cpustate->base[DS] = SegBase(DS);
-	cpustate->base[ES] = SegBase(ES);
-	cpustate->base[SS] = SegBase(SS);
-
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 80286)
 		timing = i80286_cycles;
