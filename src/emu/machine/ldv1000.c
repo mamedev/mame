@@ -114,22 +114,6 @@ static WRITE8_DEVICE_HANDLER( ppi1_portc_w );
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    find_ldv1000 - find our device; assumes there
-    is only one
--------------------------------------------------*/
-
-INLINE laserdisc_state *find_ldv1000(running_machine *machine)
-{
-	return ldcore_get_safe_token(device_list_first(machine->config->devicelist, LASERDISC));
-}
-
-
-
-/***************************************************************************
     LD-V1000 ROM AND MACHINE INTERFACES
 ***************************************************************************/
 
@@ -248,9 +232,9 @@ static void ldv1000_init(laserdisc_state *ld)
 	memset(player, 0, sizeof(*player));
 
 	/* find our devices */
-	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "ldv1000"));
-	player->ctc = devtag_get_device(ld->device->machine, Z80CTC, device_build_tag(tempstring, ld->device->tag, "ldvctc"));
-	player->multitimer = devtag_get_device(ld->device->machine, TIMER, device_build_tag(tempstring, ld->device->tag, "multitimer"));
+	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device, "ldv1000"));
+	player->ctc = devtag_get_device(ld->device->machine, Z80CTC, device_build_tag(tempstring, ld->device, "ldvctc"));
+	player->multitimer = devtag_get_device(ld->device->machine, TIMER, device_build_tag(tempstring, ld->device, "multitimer"));
 	timer_device_set_ptr(player->multitimer, ld);
 	astring_free(tempstring);
 }
@@ -437,7 +421,7 @@ static TIMER_DEVICE_CALLBACK( multijump_timer )
 
 static void ctc_interrupt(const device_config *device, int state)
 {
-	laserdisc_state *ld = find_ldv1000(device->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(device->owner);
 	cpu_set_input_line(ld->player->cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -455,7 +439,7 @@ static WRITE8_HANDLER( decoder_display_port_w )
         Display is 6-bit
         Decoder is 4-bit
     */
-	laserdisc_state *ld = find_ldv1000(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 
 	/* writes to offset 0 select the target for reads/writes of actual data */
@@ -482,7 +466,7 @@ static WRITE8_HANDLER( decoder_display_port_w )
 
 static READ8_HANDLER( decoder_display_port_r )
 {
-	laserdisc_state *ld = find_ldv1000(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0;
 
@@ -507,7 +491,7 @@ static READ8_HANDLER( decoder_display_port_r )
 
 static READ8_HANDLER( controller_r )
 {
-	laserdisc_state *ld = find_ldv1000(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 
 	/* note that this is a cheesy implementation; the real thing relies on exquisite timing */
 	UINT8 result = ld->player->command ^ 0xff;
@@ -522,7 +506,7 @@ static READ8_HANDLER( controller_r )
 
 static WRITE8_HANDLER( controller_w )
 {
-	laserdisc_state *ld = find_ldv1000(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	if (LOG_STATUS_CHANGES && data != ld->player->status)
 		printf("%04X:CONTROLLER.W=%02X\n", cpu_get_pc(space->cpu), data);
 	ld->player->status = data;
@@ -536,7 +520,7 @@ static WRITE8_HANDLER( controller_w )
 
 static WRITE8_DEVICE_HANDLER( ppi0_porta_w )
 {
-	laserdisc_state *ld = find_ldv1000(device->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(device->owner);
 	ld->player->counter_start = data;
 	if (LOG_PORT_IO)
 		printf("%s:PORTA.0=%02X\n", cpuexec_describe_context(device->machine), data);
@@ -550,7 +534,7 @@ static WRITE8_DEVICE_HANDLER( ppi0_porta_w )
 
 static READ8_DEVICE_HANDLER( ppi0_portb_r )
 {
-	laserdisc_state *ld = find_ldv1000(device->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(device->owner);
 	return ld->player->counter;
 }
 
@@ -568,7 +552,7 @@ static READ8_DEVICE_HANDLER( ppi0_portc_r )
         $40 = TRKG LOOP (N24-1)
         $80 = DUMP (N20-1) -- code reads the state and waits for it to change
     */
-	laserdisc_state *ld = find_ldv1000(device->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(device->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0x00;
 
@@ -594,7 +578,7 @@ static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
         $04 = SCAN MODE
         $08 = n/c
     */
-	laserdisc_state *ld = find_ldv1000(device->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(device->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->portc0;
 
@@ -636,7 +620,7 @@ static READ8_DEVICE_HANDLER( ppi1_porta_r )
         $40 = /INT LOCK
         $80 = 8 INCH CHK
     */
-	laserdisc_state *ld = find_ldv1000(device->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(device->owner);
 	ldplayer_data *player = ld->player;
 	slider_position sliderpos = ldcore_get_slider_position(ld);
 	UINT8 focus_on = !(player->portb1 & 0x01);
@@ -689,7 +673,7 @@ static WRITE8_DEVICE_HANDLER( ppi1_portb_w )
         $40 = /LASER ON
         $80 = /SYNC ST0
     */
-	laserdisc_state *ld = find_ldv1000(device->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(device->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->portb1;
 	int direction;
@@ -746,7 +730,7 @@ static WRITE8_DEVICE_HANDLER( ppi1_portc_w )
         $40 = SIZE 8/12
         $80 = /LED CAV
     */
-	laserdisc_state *ld = find_ldv1000(device->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(device->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->portc1;
 

@@ -242,17 +242,6 @@ static const UINT8 text_bitmap[0x40][7] =
 ***************************************************************************/
 
 /*-------------------------------------------------
-    find_pr8210 - find our device; assumes there
-    is only one
--------------------------------------------------*/
-
-INLINE laserdisc_state *find_pr8210(running_machine *machine)
-{
-	return ldcore_get_safe_token(device_list_first(machine->config->devicelist, LASERDISC));
-}
-
-
-/*-------------------------------------------------
     update_video_squelch - update the state of
     the video squelch
 -------------------------------------------------*/
@@ -360,7 +349,7 @@ static void pr8210_init(laserdisc_state *ld)
 	player->slowtrg = curtime;
 
 	/* find our CPU */
-	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "pr8210"));
+	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device, "pr8210"));
 	astring_free(tempstring);
 
 	/* we don't have the Simutrek player overrides */
@@ -600,7 +589,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 
 static READ8_HANDLER( pr8210_pia_r )
 {
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0xff;
 
@@ -651,7 +640,7 @@ static READ8_HANDLER( pr8210_pia_r )
 
 static WRITE8_HANDLER( pr8210_pia_w )
 {
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 value;
 
@@ -735,7 +724,7 @@ static READ8_HANDLER( pr8210_bus_r )
        $02 = (in) FG via op-amp (spindle motor stop detector)
        $01 = (in) SLOW TIMER OUT
     */
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	slider_position sliderpos = ldcore_get_slider_position(ld);
 	UINT8 focus_on = !(player->port1 & 0x08);
@@ -783,7 +772,7 @@ static WRITE8_HANDLER( pr8210_port1_w )
        $02 = (out) SCAN A (/SCAN)
        $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
     */
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->port1;
 	int direction;
@@ -845,7 +834,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
        $02 = (out) ???
        $01 = (out) LASER ON
     */
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->port2;
 
@@ -873,7 +862,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 static READ8_HANDLER( pr8210_t0_r )
 {
 	/* returns VSYNC state */
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	return !ld->player->vsync;
 }
 
@@ -1096,7 +1085,7 @@ static void simutrek_init(laserdisc_state *ld)
 	player->simutrek.data_ready = 1;
 
 	/* find the Simutrek CPU */
-	player->simutrek.cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "simutrek"));
+	player->simutrek.cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device, "simutrek"));
 	astring_free(tempstring);
 }
 
@@ -1208,7 +1197,7 @@ static TIMER_CALLBACK( simutrek_latched_data_w )
 
 static READ8_HANDLER( simutrek_port2_r )
 {
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 
 	/* bit $80 is the pr8210 video squelch */
@@ -1223,7 +1212,7 @@ static READ8_HANDLER( simutrek_port2_r )
 
 static WRITE8_HANDLER( simutrek_port2_w )
 {
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->simutrek.port2;
 
@@ -1262,7 +1251,7 @@ static WRITE8_HANDLER( simutrek_port2_w )
 
 static READ8_HANDLER( simutrek_data_r )
 {
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 
 	/* acknowledge the read and clear the data ready flag */
@@ -1279,6 +1268,6 @@ static READ8_HANDLER( simutrek_data_r )
 static READ8_HANDLER( simutrek_t0_r )
 {
 	/* return 1 if data is waiting from main CPU */
-	laserdisc_state *ld = find_pr8210(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	return ld->player->simutrek.data_ready;
 }

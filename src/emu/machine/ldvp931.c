@@ -117,22 +117,6 @@ static READ8_HANDLER( t1_r );
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    find_vp931 - find our device; assumes there
-    is only one
--------------------------------------------------*/
-
-INLINE laserdisc_state *find_vp931(running_machine *machine)
-{
-	return ldcore_get_safe_token(device_list_first(machine->config->devicelist, LASERDISC));
-}
-
-
-
-/***************************************************************************
     22VP931 ROM AND MACHINE INTERFACES
 ***************************************************************************/
 
@@ -230,8 +214,8 @@ static void vp931_init(laserdisc_state *ld)
 	player->data_ready_cb = cbsave;
 
 	/* find our devices */
-	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "vp931"));
-	player->tracktimer = devtag_get_device(ld->device->machine, TIMER, device_build_tag(tempstring, ld->device->tag, "tracktimer"));
+	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device, "vp931"));
+	player->tracktimer = devtag_get_device(ld->device->machine, TIMER, device_build_tag(tempstring, ld->device, "tracktimer"));
 	timer_device_set_ptr(player->tracktimer, ld);
 	astring_free(tempstring);
 }
@@ -459,7 +443,7 @@ static TIMER_DEVICE_CALLBACK( track_timer )
 
 static WRITE8_HANDLER( output0_w )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 
 	/*
@@ -500,7 +484,7 @@ static WRITE8_HANDLER( output0_w )
 
 static WRITE8_HANDLER( output1_w )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	INT32 speed = 0;
 
@@ -592,7 +576,7 @@ static READ8_HANDLER( keypad_r )
 
 static READ8_HANDLER( datic_r )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	return ld->player->daticval;
 }
 
@@ -604,7 +588,7 @@ static READ8_HANDLER( datic_r )
 
 static READ8_HANDLER( from_controller_r )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 
 	/* clear the pending flag and return the data */
@@ -620,7 +604,7 @@ static READ8_HANDLER( from_controller_r )
 
 static WRITE8_HANDLER( to_controller_w )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 
 	/* set the pending flag and stash the data */
@@ -642,7 +626,7 @@ static WRITE8_HANDLER( to_controller_w )
 
 static READ8_HANDLER( port1_r )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0x00;
 
@@ -665,7 +649,7 @@ static READ8_HANDLER( port1_r )
 
 static WRITE8_HANDLER( port1_w )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 
 	/*
@@ -739,7 +723,7 @@ static WRITE8_HANDLER( port1_w )
 
 static READ8_HANDLER( port2_r )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0x00;
 
@@ -778,7 +762,7 @@ static WRITE8_HANDLER( port2_w )
 
 static READ8_HANDLER( t0_r )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	return ld->player->datastrobe;
 }
 
@@ -791,6 +775,6 @@ static READ8_HANDLER( t0_r )
 
 static READ8_HANDLER( t1_r )
 {
-	laserdisc_state *ld = find_vp931(space->machine);
+	laserdisc_state *ld = ldcore_get_safe_token(space->cpu->owner);
 	return ld->player->trackstate;
 }

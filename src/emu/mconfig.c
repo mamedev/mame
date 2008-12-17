@@ -23,7 +23,7 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const char *tagprefix, int depth);
+static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const device_config *owner, int depth);
 
 
 
@@ -150,13 +150,13 @@ static void sound_remove(machine_config *machine, const char *tag)
     machine config
 -------------------------------------------------*/
 
-static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const char *tagprefix, int depth)
+static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const device_config *owner, int depth)
 {
 	UINT32 entrytype = MCONFIG_TOKEN_INVALID;
 	astring *tempstring = astring_alloc();
 	device_config *device = NULL;
 	sound_config *sound = NULL;
-
+	
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
 	{
@@ -176,27 +176,29 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			/* including */
 			case MCONFIG_TOKEN_INCLUDE:
-				machine_config_detokenize(config, TOKEN_GET_PTR(tokens, tokenptr), tagprefix, depth + 1);
+				machine_config_detokenize(config, TOKEN_GET_PTR(tokens, tokenptr), owner, depth + 1);
 				break;
 
 			/* device management */
 			case MCONFIG_TOKEN_DEVICE_ADD:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device = device_list_add(&config->devicelist, devtype, device_build_tag(tempstring, tagprefix, tag));
+				device = device_list_add(&config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
+				if (device != NULL)
+					device->owner = owner;
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_REMOVE:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device_list_remove(&config->devicelist, devtype, device_build_tag(tempstring, tagprefix, tag));
+				device_list_remove(&config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
 				device = NULL;
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_MODIFY:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device = (device_config *)device_list_find_by_tag(config->devicelist, devtype, device_build_tag(tempstring, tagprefix, tag));
+				device = (device_config *)device_list_find_by_tag(config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
 				if (device == NULL)
 					fatalerror("Unable to find device: type=%s tag=%s\n", devtype_get_name(devtype), astring_c(tempstring));
 				break;
@@ -350,7 +352,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_add(config, device_build_tag(tempstring, tagprefix, tag), type, clock);
+				sound = sound_add(config, device_build_tag(tempstring, owner, tag), type, clock);
 				break;
 
 			case MCONFIG_TOKEN_SOUND_REMOVE:
@@ -359,7 +361,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			case MCONFIG_TOKEN_SOUND_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, device_build_tag(tempstring, tagprefix, tag));
+				sound = sound_find(config, device_build_tag(tempstring, owner, tag));
 				if (sound == NULL)
 					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
 				sound->routes = 0;
@@ -374,7 +376,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, device_build_tag(tempstring, tagprefix, tag));
+				sound = sound_find(config, device_build_tag(tempstring, owner, tag));
 				if (sound == NULL)
 					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
 				sound->type = type;
@@ -406,7 +408,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 		{
 			tokens = device_get_info_ptr(device, DEVINFO_PTR_MACHINE_CONFIG);
 			if (tokens != NULL)
-				machine_config_detokenize(config, tokens, device->tag, depth + 1);
+				machine_config_detokenize(config, tokens, device, depth + 1);
 		}
 
 	astring_free(tempstring);

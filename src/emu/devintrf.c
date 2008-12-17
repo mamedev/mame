@@ -174,11 +174,11 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
     the device's name and the given tag
 -------------------------------------------------*/
 
-const char *device_build_tag(astring *dest, const char *devicetag, const char *tag)
+const char *device_build_tag(astring *dest, const device_config *device, const char *tag)
 {
-	if (devicetag != NULL)
+	if (device != NULL)
 	{
-		astring_cpyc(dest, devicetag);
+		astring_cpyc(dest, device->tag);
 		astring_catc(dest, ":");
 		astring_catc(dest, tag);
 	}

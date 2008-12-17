@@ -223,6 +223,7 @@ union _deviceinfo
 struct _device_config
 {
 	device_config *			next;					/* next device */
+	device_config *			owner;					/* device that owns us, or NULL if nobody */
 	device_config *			typenext;				/* next device of the same type */
 	device_type				type;					/* device type */
 	device_class			class;					/* device class */
@@ -230,11 +231,13 @@ struct _device_config
 	const void *			static_config;			/* static device configuration */
 	void *					inline_config;			/* inline device configuration */
 
+	/* these fields are only valid once the device is attached to a machine */
+	running_machine *		machine;				/* machine if device is live */
+
 	/* these fields are only valid if the device is live */
 	UINT8					started;				/* TRUE if the start function has succeeded */
 	void *					token;					/* token if device is live */
 	UINT32					tokenbytes;				/* size of the token data allocated */
-	running_machine *		machine;				/* machine if device is live */
 	UINT8 *					region;					/* pointer to region with the device's tag, or NULL */
 	UINT32					regionbytes;			/* size of the region, in bytes */
 
@@ -257,7 +260,7 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 void device_list_remove(device_config **listheadptr, device_type type, const char *tag);
 
 /* build a tag that combines the device's name and the given tag */
-const char *device_build_tag(astring *dest, const char *devicetag, const char *tag);
+const char *device_build_tag(astring *dest, const device_config *device, const char *tag);
 
 /* build a tag with the same device prefix as the source tag*/
 const char *device_inherit_tag(astring *dest, const char *sourcetag, const char *tag);
