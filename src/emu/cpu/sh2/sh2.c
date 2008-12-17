@@ -2461,7 +2461,7 @@ CPU_GET_INFO( sh1 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:	    					strcpy(info->s, "SH-1");				break;
 
-		default:							sh2_get_info(state, info);			break;
+		default:							CPU_GET_INFO_CALL(sh2);			break;
 	}
 }
 

@@ -128,6 +128,8 @@ Recordbr: loads of unmapped IOC reads and writes.
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "taitoipt.h"
 #include "audio/taitosnd.h"
 #include "video/taitoic.h"

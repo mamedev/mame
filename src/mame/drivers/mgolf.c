@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 
 static UINT8* mgolf_video_ram;
 

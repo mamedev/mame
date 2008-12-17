@@ -87,6 +87,8 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/v60/v60.h"
 #include "deprecat.h"
 #include "sound/ymf271.h"
 #include "rendlay.h"

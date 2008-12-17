@@ -207,9 +207,11 @@ VIDEO_UPDATE( tms340x0 );
 void tms34010_get_display_params(const device_config *cpu, tms34010_display_params *params);
 
 CPU_GET_INFO( tms34010 );
+#define CPU_TMS34010 CPU_GET_INFO_NAME( tms34010 )
 
 /* PUBLIC FUNCTIONS - 34020 */
 CPU_GET_INFO( tms34020 );
+#define CPU_TMS34020 CPU_GET_INFO_NAME( tms34020 )
 
 
 /* Host control interface */

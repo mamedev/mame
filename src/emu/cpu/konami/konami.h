@@ -27,6 +27,7 @@ enum
 
 /* PUBLIC FUNCTIONS */
 CPU_GET_INFO( konami );
+#define CPU_KONAMI CPU_GET_INFO_NAME( konami )
 
 CPU_DISASSEMBLE( konami );
 

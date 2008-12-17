@@ -1020,6 +1020,7 @@
 #define MASTER_CLOCK	XTAL_16MHz
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"

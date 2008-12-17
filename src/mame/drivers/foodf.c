@@ -74,6 +74,7 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "sound/pokey.h"
 #include "foodf.h"

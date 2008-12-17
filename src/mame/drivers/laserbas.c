@@ -17,6 +17,7 @@
 ********************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 
 static UINT8 *vram1,*vram2;

@@ -37,6 +37,7 @@ So this is the correct behavior of real hardware, not an emulation bug.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

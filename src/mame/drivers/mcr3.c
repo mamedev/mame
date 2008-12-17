@@ -83,6 +83,7 @@
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "audio/mcr.h"

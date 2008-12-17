@@ -11,6 +11,7 @@ Use Player 1 joystick and button, then press START1 to go to next screen.
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 

@@ -11,6 +11,7 @@ as well.
 ****************************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 
 extern UINT8 *compgolf_bg_ram;

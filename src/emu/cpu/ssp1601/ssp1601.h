@@ -18,6 +18,7 @@ enum
 
 #if (HAS_SSP1601)
 CPU_GET_INFO( ssp1601 );
+#define CPU_SSP1601 CPU_GET_INFO_NAME( ssp1601 )
 #endif
 
 extern unsigned dasm_ssp1601(char *buffer, unsigned pc, const UINT8 *oprom);

@@ -19,6 +19,7 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"

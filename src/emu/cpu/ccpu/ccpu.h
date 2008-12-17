@@ -57,6 +57,8 @@ struct _ccpu_config
 ***************************************************************************/
 
 CPU_GET_INFO( ccpu );
+#define CPU_CCPU CPU_GET_INFO_NAME( ccpu )
+
 void ccpu_wdt_timer_trigger(const device_config *device);
 
 CPU_DISASSEMBLE( ccpu );

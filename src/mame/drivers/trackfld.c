@@ -18,6 +18,8 @@ MAIN BOARD:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"

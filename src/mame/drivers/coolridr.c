@@ -50,6 +50,8 @@ SEGA CUSTOM IC :
 */
 
 #include "driver.h"
+#include "cpu/sh2/sh2.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/scsp.h"
 

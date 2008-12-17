@@ -55,6 +55,7 @@ typedef void (*ti99xx_error_interrupt_func)(const device_config *device, int sta
 #if (HAS_TI990_10)
 
 extern CPU_GET_INFO( ti990_10 );
+#define CPU_TI990_10 CPU_GET_INFO_NAME( ti990_10 )
 
 /*
     structure with the parameters ti990_10_reset wants.
@@ -84,6 +85,7 @@ extern WRITE8_HANDLER(ti990_10_eir_cru_w);
 #if (HAS_TMS9900)
 
 extern CPU_GET_INFO( tms9900 );
+#define CPU_TMS9900 CPU_GET_INFO_NAME( tms9900 )
 
 /*
     structure with optional parameters for tms9900_reset.
@@ -98,6 +100,7 @@ typedef struct tms9900reset_param
 #if (HAS_TMS9940)
 
 extern CPU_GET_INFO( tms9940 );
+#define CPU_TMS9940 CPU_GET_INFO_NAME( tms9940 )
 
 /*
     structure with optional parameters for tms9940_reset.
@@ -112,6 +115,7 @@ typedef struct tms9940reset_param
 #if (HAS_TMS9980)
 
 extern CPU_GET_INFO( tms9980a );
+#define CPU_TMS9980 CPU_GET_INFO_NAME( tms9980a )
 
 /*
     structure with optional parameters for tms9980a_reset.
@@ -126,6 +130,7 @@ typedef struct tms9980areset_param
 #if (HAS_TMS9985)
 
 extern CPU_GET_INFO( tms9985 );
+#define CPU_TMS9986 CPU_GET_INFO_NAME( tms9985 )
 
 /*
     structure with optional parameters for tms9985_reset.
@@ -140,6 +145,7 @@ typedef struct tms9985reset_param
 #if (HAS_TMS9989)
 
 extern CPU_GET_INFO( tms9989 );
+#define CPU_TMS9989 CPU_GET_INFO_NAME( tms9989 )
 
 /*
     structure with optional parameters for tms9989_reset.
@@ -154,6 +160,7 @@ typedef struct tms9989reset_param
 #if (HAS_TMS9995)
 
 extern CPU_GET_INFO( tms9995 );
+#define CPU_TMS9995 CPU_GET_INFO_NAME( tms9995 )
 
 /*
   structure with the parameters tms9995_reset wants.
@@ -184,6 +191,7 @@ extern WRITE8_HANDLER(tms9995_internal2_w);
 #if (HAS_TMS99000)
 
 extern CPU_GET_INFO( tms99000 );
+#define CPU_TMS99000 CPU_GET_INFO_NAME( tms99000 )
 
 /*
     structure with optional parameters for tms99000_reset.
@@ -198,6 +206,7 @@ typedef struct tms99000reset_param
 #if (HAS_TMS99105A)
 
 extern CPU_GET_INFO( tms99105a );
+#define CPU_TMS99105A CPU_GET_INFO_NAME( tms99105a )
 
 /*
     structure with optional parameters for tms99105a_reset.
@@ -212,6 +221,7 @@ typedef struct tms99105areset_param
 #if (HAS_TMS99110A)
 
 extern CPU_GET_INFO( tms99110a );
+#define CPU_TMS99110A CPU_GET_INFO_NAME( tms99110a )
 
 /*
     structure with optional parameters for tms99110a_reset.

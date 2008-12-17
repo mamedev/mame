@@ -77,6 +77,9 @@ enum
 extern CPU_GET_INFO( tms32031 );
 extern CPU_GET_INFO( tms32032 );
 
+#define CPU_TMS32031 CPU_GET_INFO_NAME( tms32031 )
+#define CPU_TMS32032 CPU_GET_INFO_NAME( tms32032 )
+
 extern float convert_tms3203x_fp_to_float(UINT32 floatdata);
 extern double convert_tms3203x_fp_to_double(UINT32 floatdata);
 extern UINT32 convert_float_to_tms3203x_fp(float fval);

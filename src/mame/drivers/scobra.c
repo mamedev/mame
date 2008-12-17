@@ -33,6 +33,7 @@ Notes/Tidbits:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "galaxold.h"
 #include "sound/ay8910.h"

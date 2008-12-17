@@ -620,6 +620,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "taitoipt.h"
 #include "cpu/i8x41/i8x41.h"
 #include "sound/2203intf.h"

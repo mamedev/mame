@@ -25,6 +25,8 @@ Notes:
 *****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/nec/necintrf.h"
 #include "deprecat.h"
 #include "iremipt.h"
 #include "machine/irem_cpu.h"

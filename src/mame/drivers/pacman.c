@@ -337,6 +337,7 @@ Boards:
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "pacman.h"
 #include "cpu/s2650/s2650.h"

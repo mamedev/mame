@@ -44,6 +44,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/pokey.h"

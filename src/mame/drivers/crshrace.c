@@ -127,6 +127,8 @@ Dip locations verified with Service Mode.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "video/konamiic.h"
 #include "sound/2610intf.h"
 #include "crshrace.h"

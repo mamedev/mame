@@ -44,6 +44,9 @@ enum
 extern CPU_GET_INFO( alpha8201 );
 extern CPU_GET_INFO( alpha8301 );
 
+#define CPU_ALPHA8201 CPU_GET_INFO_NAME( alpha8201 )
+#define CPU_ALPHA8301 CPU_GET_INFO_NAME( alpha8301 )
+
 CPU_DISASSEMBLE( alpha8201 );
 
 #endif  /* __ALPH8201_H__ */

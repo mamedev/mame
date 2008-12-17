@@ -23,6 +23,7 @@ displayed.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/nec/necintrf.h"
 #include "audio/seibu.h"
 #include "video/hd63484.h"
 

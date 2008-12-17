@@ -50,6 +50,8 @@ Flying Tiger
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"

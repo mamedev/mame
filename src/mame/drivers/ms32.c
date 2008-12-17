@@ -168,6 +168,8 @@ Games marked * need dumping / redumping
 /********** BITS & PIECES **********/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/v60/v60.h"
 #include "deprecat.h"
 #include "sound/ymf271.h"
 #include "includes/ms32.h"

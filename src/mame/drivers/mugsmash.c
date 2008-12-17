@@ -40,6 +40,8 @@ behavior we use .
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 

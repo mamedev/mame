@@ -8,6 +8,7 @@
  */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 
 static READ16_HANDLER( unknown_read_0xc00000 )
 {

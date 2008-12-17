@@ -22,6 +22,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "streams.h"
 #include "sound/sn76496.h"
 #include "sound/okim6295.h"

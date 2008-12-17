@@ -17,6 +17,7 @@ TODO:
 */
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/6821pia.h"
 #include "video/s2636.h"

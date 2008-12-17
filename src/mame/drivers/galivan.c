@@ -28,6 +28,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 

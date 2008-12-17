@@ -35,6 +35,7 @@ for now. Even at 12 this slowdown still happens a little.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"

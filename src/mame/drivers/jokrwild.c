@@ -91,6 +91,7 @@
 #define MASTER_CLOCK	XTAL_8MHz	/* guess */
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 

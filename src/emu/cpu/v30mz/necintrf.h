@@ -14,5 +14,6 @@ enum
 
 /* Public functions */
 extern CPU_GET_INFO( v30mz );
+#define CPU_V30MZ CPU_GET_INFO_NAME( v30mz )
 
 #endif /* __NECINTRF_H__ */

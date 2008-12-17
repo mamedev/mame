@@ -293,6 +293,8 @@ Notes:
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/tms32031/tms32031.h"
+#include "cpu/m6800/m6800.h"
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"

@@ -21,6 +21,8 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/hd6309/hd6309.h"
 #include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/m6809/m6809.h"

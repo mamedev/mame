@@ -40,5 +40,6 @@ enum
 ***************************************************************************/
 
 extern CPU_GET_INFO( asap );
+#define CPU_ASAP CPU_GET_INFO_NAME( asap )
 
 #endif /* __ASAP_H__ */

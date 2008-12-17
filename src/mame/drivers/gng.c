@@ -21,6 +21,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"

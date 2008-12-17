@@ -11,6 +11,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/flt_rc.h"
 #include "timeplt.h"

@@ -29,6 +29,7 @@ Notes:  Support is complete with the exception of the noise generator.
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/i8085/i8085.h"
 #include "includes/blockade.h"
 #include "sound/samples.h"
 #include "sound/discrete.h"

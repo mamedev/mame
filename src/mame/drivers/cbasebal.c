@@ -13,6 +13,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "includes/cps1.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"

@@ -194,6 +194,7 @@ psoldier dip locations still need veritication.
 *****************************************************************************/
 
 #include "driver.h"
+#include "cpu/nec/necintrf.h"
 #include "m92.h"
 #include "iremipt.h"
 #include "machine/irem_cpu.h"

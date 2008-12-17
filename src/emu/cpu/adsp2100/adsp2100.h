@@ -67,6 +67,7 @@ enum
 
 #if (HAS_ADSP2100)
 extern CPU_GET_INFO( adsp2100 );
+#define CPU_ADSP2100 CPU_GET_INFO_NAME( adsp2100 )
 #endif
 
 /**************************************************************************
@@ -84,6 +85,7 @@ extern CPU_GET_INFO( adsp2100 );
 
 #if (HAS_ADSP2101)
 extern CPU_GET_INFO( adsp2101 );
+#define CPU_ADSP2101 CPU_GET_INFO_NAME( adsp2101 )
 #endif
 
 #if (HAS_ADSP2104)
@@ -101,6 +103,7 @@ extern CPU_GET_INFO( adsp2101 );
 #define ADSP2104_TIMER		5		/* internal timer IRQ */
 
 extern CPU_GET_INFO( adsp2104 );
+#define CPU_ADSP2104 CPU_GET_INFO_NAME( adsp2104 )
 extern void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 #endif /* (HAS_ADSP2104) */
 
@@ -117,6 +120,7 @@ extern void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 #define ADSP2105_TIMER		5		/* internal timer IRQ */
 
 extern CPU_GET_INFO( adsp2105 );
+#define CPU_ADSP2105 CPU_GET_INFO_NAME( adsp2105 )
 extern void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 #endif /* (HAS_ADSP2105) */
 
@@ -135,6 +139,7 @@ extern void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 #define ADSP2115_TIMER		5		/* internal timer IRQ */
 
 extern CPU_GET_INFO( adsp2115 );
+#define CPU_ADSP2115 CPU_GET_INFO_NAME( adsp2115 )
 extern void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 #endif /* (HAS_ADSP2115) */
 
@@ -156,6 +161,7 @@ extern void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 #define ADSP2181_IRQL2		8		/* IRQL2 */
 
 extern CPU_GET_INFO( adsp2181 );
+#define CPU_ADSP2181 CPU_GET_INFO_NAME( adsp2181 )
 extern void adsp2181_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 extern void adsp2181_idma_addr_w(const device_config *device, UINT16 data);
 extern UINT16 adsp2181_idma_addr_r(const device_config *device);

@@ -53,6 +53,8 @@
  ***********************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
+#include "cpu/i8x41/i8x41.h"
 #include "machine/decocass.h"
 #include "sound/ay8910.h"
 

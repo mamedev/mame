@@ -269,6 +269,8 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"

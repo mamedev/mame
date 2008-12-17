@@ -33,6 +33,8 @@ Merge with other Video System games ?
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "gstriker.h"
 #include "sound/2610intf.h"
 

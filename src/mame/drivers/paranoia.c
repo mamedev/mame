@@ -34,6 +34,8 @@ HuC6280A (Hudson)
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 #include "deprecat.h"
 #include "machine/pcecommn.h"
 #include "video/vdc.h"

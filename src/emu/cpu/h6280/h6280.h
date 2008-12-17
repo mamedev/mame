@@ -75,6 +75,7 @@ typedef struct
 
 
 CPU_GET_INFO( h6280 );
+#define CPU_H6280 CPU_GET_INFO_NAME( h6280 )
 
 READ8_HANDLER( h6280_irq_status_r );
 WRITE8_HANDLER( h6280_irq_status_w );

@@ -28,5 +28,6 @@ enum
 
 /* Public functions */
 CPU_GET_INFO( i8086 );
+#define CPU_I8086 CPU_GET_INFO_NAME( i8086 )
 
 #endif /* __I86INTF_H__ */

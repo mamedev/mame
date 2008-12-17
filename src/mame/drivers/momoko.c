@@ -42,6 +42,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 *****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 
 extern UINT8 *momoko_bg_scrollx;

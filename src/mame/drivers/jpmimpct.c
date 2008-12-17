@@ -78,6 +78,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
 #include "jpmimpct.h"

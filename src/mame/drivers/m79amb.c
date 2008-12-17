@@ -51,6 +51,7 @@ Ports:
 */
 
 #include "driver.h"
+#include "cpu/i8085/i8085.h"
 
 static UINT8 *ramtek_videoram;
 static UINT8 *mask;

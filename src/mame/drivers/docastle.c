@@ -153,6 +153,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"

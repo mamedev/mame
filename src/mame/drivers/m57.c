@@ -48,6 +48,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "iremipt.h"
 #include "m57.h"
 #include "audio/irem.h"

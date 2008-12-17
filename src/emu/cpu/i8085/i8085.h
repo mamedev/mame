@@ -32,6 +32,7 @@ typedef void (*i8085_status_func)(const device_config *device, UINT8 status);
 #define I8085_RST75_LINE	3
 
 CPU_GET_INFO( i8085 );
+#define CPU_8085A CPU_GET_INFO_NAME( i8085 )
 
 /**************************************************************************
  * I8080 section
@@ -59,6 +60,7 @@ CPU_GET_INFO( i8085 );
 #define I8080_INTR_LINE         I8085_INTR_LINE
 
 CPU_GET_INFO( i8080 );
+#define CPU_8080 CPU_GET_INFO_NAME( i8080 )
 #endif
 
 CPU_DISASSEMBLE( i8085 );

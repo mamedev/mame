@@ -24,6 +24,7 @@ confirmed for m107 games as well.
 *******************************************************************************/
 
 #include "driver.h"
+#include "cpu/nec/necintrf.h"
 #include "m107.h"
 #include "iremipt.h"
 #include "machine/irem_cpu.h"

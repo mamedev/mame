@@ -5,7 +5,8 @@
 
 #include "cpuintrf.h"
 
-void v810_get_info(UINT32, cpuinfo*);
+CPU_GET_INFO( v810 );
+#define CPU_V810 CPU_GET_INFO_NAME( v810 )
 
 CPU_DISASSEMBLE( v810 );
 

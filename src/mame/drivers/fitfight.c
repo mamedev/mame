@@ -82,6 +82,7 @@ Stephh's notes :
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/okim6295.h"
 #include "includes/fitfight.h"

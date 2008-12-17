@@ -22,6 +22,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "artmagic.h"

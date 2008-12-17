@@ -594,6 +594,7 @@
 #define CPU_CLOCK		(MASTER_CLOCK/16)
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/discrete.h"

@@ -38,6 +38,7 @@ PROMs : NEC B406 (1kx4) x2
 ***********************************************************/
 
 #include "driver.h"
+#include "cpu/i8085/i8085.h"
 #include "deprecat.h"
 #include "cpu/mcs48/mcs48.h"
 #include "video/resnet.h"

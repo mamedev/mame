@@ -79,6 +79,13 @@ CPU_GET_INFO( m68ec020 );
 CPU_GET_INFO( m68020 );
 CPU_GET_INFO( m68040 );
 
+#define CPU_M68000 CPU_GET_INFO_NAME( m68000 )
+#define CPU_M68008 CPU_GET_INFO_NAME( m68008 )
+#define CPU_M68010 CPU_GET_INFO_NAME( m68010 )
+#define CPU_M68EC020 CPU_GET_INFO_NAME( m68ec020 )
+#define CPU_M68020 CPU_GET_INFO_NAME( m68020 )
+#define CPU_M68040 CPU_GET_INFO_NAME( m68040 )
+
 void m68k_set_encrypted_opcode_range(const device_config *device, offs_t start, offs_t end);
 
 unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);

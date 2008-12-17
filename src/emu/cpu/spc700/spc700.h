@@ -152,6 +152,7 @@ void spc700_branching(unsigned int new_pc);
 #include "cpuintrf.h"
 
 extern CPU_GET_INFO( spc700 );
+#define CPU_SPC700 CPU_GET_INFO_NAME( spc700 )
 
 #define spc700_read_8(addr) memory_read_byte_8le(cpustate->program,addr)
 #define spc700_write_8(addr,data) memory_write_byte_8le(cpustate->program,addr,data)

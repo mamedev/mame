@@ -19,6 +19,7 @@ Mods by Tomasz Slanina (2008.06.12):
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"

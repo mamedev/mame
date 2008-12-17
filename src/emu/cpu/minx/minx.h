@@ -15,6 +15,9 @@ enum
         MINX_XI, MINX_YI,
 };
 
+CPU_GET_INFO( minx );
+#define CPU_MINX CPU_GET_INFO_NAME( minx )
+
 extern CPU_DISASSEMBLE( minx );
 
 #endif /* __MINX_H__ */

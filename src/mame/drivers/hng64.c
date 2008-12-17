@@ -458,6 +458,8 @@ or Fatal Fury for example).
 
 #define MASTER_CLOCK	50000000
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/nec/necintrf.h"
 #include "deprecat.h"
 #include "cpu/mips/mips3.h"
 

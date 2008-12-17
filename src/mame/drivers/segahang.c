@@ -14,6 +14,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 #include "deprecat.h"
 #include "system16.h"
 #include "machine/segaic16.h"

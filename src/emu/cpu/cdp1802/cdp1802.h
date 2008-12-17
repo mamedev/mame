@@ -88,6 +88,7 @@ enum
 };
 
 CPU_GET_INFO( cdp1802 );
+#define CPU_CDP1802 CPU_GET_INFO_NAME( cdp1802 )
 
 typedef cdp1802_control_mode (*cdp1802_mode_read_func)(const device_config *device);
 #define CDP1802_MODE_READ(name) cdp1802_control_mode name(const device_config *device)

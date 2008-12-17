@@ -13,6 +13,7 @@ replaced by a 6th button to start games. This is a feature of the PCB for privat
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "machine/ticket.h"
 #include "sound/dac.h"

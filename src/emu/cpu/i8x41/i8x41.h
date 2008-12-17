@@ -89,6 +89,12 @@ extern CPU_GET_INFO( i8042 );
 extern CPU_GET_INFO( i8242 );
 extern CPU_GET_INFO( i8742 );
 
+#define CPU_I8041 CPU_GET_INFO_NAME( i8041 )
+#define CPU_I8741 CPU_GET_INFO_NAME( i8741 )
+#define CPU_I8042 CPU_GET_INFO_NAME( i8042 )
+#define CPU_I8242 CPU_GET_INFO_NAME( i8242 )
+#define CPU_I8742 CPU_GET_INFO_NAME( i8742 )
+
 extern CPU_DISASSEMBLE( i8x41 );
 
 #endif /* __I8X41_H__ */

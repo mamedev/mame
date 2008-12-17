@@ -127,6 +127,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/i8085/i8085.h"
 #include "sound/custom.h"
 #include "warpwarp.h"
 #include "geebee.lh"

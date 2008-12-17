@@ -78,6 +78,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "sound/ay8910.h"
 

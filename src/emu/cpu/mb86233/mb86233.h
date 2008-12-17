@@ -55,5 +55,6 @@ struct _mb86233_cpu_core
 };
 
 extern CPU_GET_INFO( mb86233 );
+#define CPU_MB86233 CPU_GET_INFO_NAME( mb86233 )
 
 #endif /* __MB86233_H__ */

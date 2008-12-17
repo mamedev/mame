@@ -81,6 +81,8 @@ other supported games as well.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/nec/necintrf.h"
 #include "deprecat.h"
 #include "machine/irem_cpu.h"
 #include "audio/m72.h"

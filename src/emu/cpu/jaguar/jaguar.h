@@ -101,10 +101,12 @@ struct _jaguar_cpu_config
 ***************************************************************************/
 
 extern CPU_GET_INFO( jaguargpu );
+#define CPU_JAGUARGPU CPU_GET_INFO_NAME( jaguargpu )
 extern void jaguargpu_ctrl_w(const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask);
 extern UINT32 jaguargpu_ctrl_r(const device_config *device, offs_t offset);
 
 extern CPU_GET_INFO( jaguardsp );
+#define CPU_JAGUARDSP CPU_GET_INFO_NAME( jaguardsp )
 extern void jaguardsp_ctrl_w(const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask);
 extern UINT32 jaguardsp_ctrl_r(const device_config *device, offs_t offset);
 

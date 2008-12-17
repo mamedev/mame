@@ -45,6 +45,8 @@ Added Dip Locations based on Service Mode
 */
 
 #include "driver.h"
+#include "cpu/pic16c5x/pic16c5x.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
 static VIDEO_START( blackt96 )

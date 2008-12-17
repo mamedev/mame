@@ -170,6 +170,8 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 *******************************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/3812intf.h"
 

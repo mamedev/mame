@@ -21,6 +21,7 @@
 **************************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "render.h"
 #include "includes/amiga.h"
 #include "machine/laserdsc.h"

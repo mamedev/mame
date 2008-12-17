@@ -124,6 +124,7 @@ out:
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/tms32010/tms32010.h"
 #include "twincobr.h"
 #include "sound/3812intf.h"

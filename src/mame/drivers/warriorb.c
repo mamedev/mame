@@ -144,6 +144,7 @@ Colscroll effects?
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "taitoipt.h"
 #include "rendlay.h"
 #include "cpu/m68000/m68000.h"

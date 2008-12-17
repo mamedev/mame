@@ -293,6 +293,8 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 
 ***************************************************************************/
 #include "driver.h"
+#include "cpu/spc700/spc700.h"
+#include "cpu/g65816/g65816.h"
 #include "includes/snes.h"
 
 static ADDRESS_MAP_START( snes_map, ADDRESS_SPACE_PROGRAM, 8)

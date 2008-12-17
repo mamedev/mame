@@ -40,6 +40,7 @@ Dumping Notes:
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/laserdsc.h"
 
 /* Assumed to be the same as segald hardware */

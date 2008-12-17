@@ -6,6 +6,7 @@ driver by Nicola Salmoria
 
 ***************************************************************************/
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "audio/m72.h"
 #include "sound/dac.h"

@@ -9,6 +9,7 @@ Markham (c) 1983 Sun Electronics
 *****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 
 WRITE8_HANDLER( markham_videoram_w );

@@ -73,6 +73,8 @@ Coin B is not used
 *************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 

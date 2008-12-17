@@ -117,6 +117,8 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/atarigen.h"
 #include "machine/6522via.h"
 #include "atarisy1.h"

@@ -132,6 +132,7 @@ Region byte at offset 0x031:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"

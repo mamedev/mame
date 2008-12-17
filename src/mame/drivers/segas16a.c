@@ -144,6 +144,9 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
 #include "system16.h"
 #include "machine/8255ppi.h"
 #include "machine/fd1089.h"

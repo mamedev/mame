@@ -24,6 +24,7 @@
 */
 
 #include "driver.h"
+#include "cpu/e132xs/e132xs.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"

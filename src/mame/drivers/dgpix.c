@@ -50,6 +50,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "cpu/e132xs/e132xs.h"
 
 static UINT32 *vram;
 static int vbuffer = 0;

@@ -9,6 +9,7 @@ XX Mission (c) 1986 UPL
 *****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
 

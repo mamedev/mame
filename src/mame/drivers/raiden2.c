@@ -136,6 +136,7 @@ Current Problem(s) - in order of priority
 */
 
 #include "driver.h"
+#include "cpu/nec/necintrf.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "machine/eeprom.h"

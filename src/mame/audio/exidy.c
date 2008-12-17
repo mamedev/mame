@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/rescap.h"
 #include "streams.h"
 #include "cpu/m6502/m6502.h"

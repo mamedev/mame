@@ -52,6 +52,7 @@
  *********************************************************************/
 
 #include "driver.h"
+#include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
 

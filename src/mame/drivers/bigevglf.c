@@ -56,6 +56,7 @@ J1100072A
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"

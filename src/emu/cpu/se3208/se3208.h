@@ -9,5 +9,6 @@ enum
 #define SE3208_INT	0
 
 extern CPU_GET_INFO( se3208 );
+#define CPU_SE3208 CPU_GET_INFO_NAME( se3208 )
 
 CPU_DISASSEMBLE( se3208 );

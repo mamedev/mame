@@ -30,6 +30,7 @@ paradise: I'm not sure it's working correctly:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "paradise.h"
 #include "sound/okim6295.h"

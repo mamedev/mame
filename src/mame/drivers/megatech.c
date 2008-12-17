@@ -78,6 +78,7 @@ Sonic Hedgehog 2        171-6215A   837-6963-62       610-0239-62          MPR-1
 
 */
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "genesis.h"
 #include "rendlay.h"
 #include "megadriv.h"

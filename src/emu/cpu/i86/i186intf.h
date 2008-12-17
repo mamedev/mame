@@ -6,5 +6,6 @@
 
 /* Public functions */
 CPU_GET_INFO( i80186 );
+#define CPU_I80186 CPU_GET_INFO_NAME( i80186 )
 
 #endif /* __I186INTF_H__ */

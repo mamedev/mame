@@ -36,6 +36,7 @@ DD10 DD14  DD18     H5            DD21
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 
 static UINT8* dderby_vid;
 

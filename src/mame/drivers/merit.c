@@ -40,6 +40,7 @@ Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"

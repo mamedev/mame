@@ -96,6 +96,7 @@ write:
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 
 

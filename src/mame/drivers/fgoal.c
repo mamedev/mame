@@ -17,6 +17,7 @@ Differences between these sets include
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "includes/fgoal.h"
 
 UINT8* fgoal_video_ram;

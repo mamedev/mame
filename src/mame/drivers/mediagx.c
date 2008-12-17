@@ -64,6 +64,7 @@
 */
 
 #include "driver.h"
+#include "cpu/i386/i386intf.h"
 #include "devconv.h"
 #include "deprecat.h"
 #include "machine/8237dma.h"

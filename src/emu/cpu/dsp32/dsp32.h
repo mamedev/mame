@@ -80,6 +80,7 @@ struct _dsp32_config
 ***************************************************************************/
 
 extern CPU_GET_INFO( dsp32c );
+#define CPU_DSP32C CPU_GET_INFO_NAME( dsp32c )
 
 extern void dsp32c_pio_w(const device_config *device, int reg, int data);
 extern int dsp32c_pio_r(const device_config *device, int reg);

@@ -168,6 +168,7 @@ Cisco Heat.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "megasys1.h"
 #include "sound/2151intf.h"

@@ -6,6 +6,7 @@
 
 
 #include "driver.h"
+#include "cpu/i8085/i8085.h"
 #include "deprecat.h"
 
 

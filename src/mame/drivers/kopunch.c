@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "cpu/i8085/i8085.h"
 #include "deprecat.h"
 
 extern UINT8 *kopunch_videoram2;

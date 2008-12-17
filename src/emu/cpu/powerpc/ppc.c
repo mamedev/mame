@@ -1956,7 +1956,7 @@ CPU_GET_INFO( ppc403 )
 		case CPUINFO_STR_REGISTER + PPC_EXIER:			sprintf(info->s, "EXIER: %08X", EXIER); break;
 		case CPUINFO_STR_REGISTER + PPC_EXISR:			sprintf(info->s, "EXISR: %08X", EXISR); break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -1991,7 +1991,7 @@ CPU_GET_INFO( ppc603 )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC603");				break;
 		case CPUINFO_STR_REGISTER + PPC_DEC:			sprintf(info->s, "DEC: %08X", read_decrementer()); break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -2040,7 +2040,7 @@ CPU_GET_INFO( ppc602 )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC602");				break;
 		case CPUINFO_STR_REGISTER + PPC_IBR:			sprintf(info->s, "IBR: %08X", ppc.ibr); break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -2085,7 +2085,7 @@ CPU_GET_INFO( mpc8240 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MPC8240");				break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -2130,7 +2130,7 @@ CPU_GET_INFO( ppc601 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC601");				break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif
@@ -2175,7 +2175,7 @@ CPU_GET_INFO( ppc604 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC604");				break;
 
-		default:										ppc_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
 #endif

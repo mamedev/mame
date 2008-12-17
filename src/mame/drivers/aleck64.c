@@ -166,6 +166,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "streams.h"
 #include "sound/custom.h"

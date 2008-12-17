@@ -118,6 +118,7 @@ e000 - e7ff        R/W      Work RAM
 ******************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "nova2001.h"

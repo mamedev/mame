@@ -17,6 +17,7 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "sound/samples.h"
 

@@ -49,6 +49,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "audio/mcr.h"
 #include "audio/williams.h"
 #include "mcr.h"

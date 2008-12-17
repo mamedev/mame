@@ -34,6 +34,7 @@ MR_01-.3A    [a0b758aa]
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "decocrpt.h"
 #include "decoprot.h"
 #include "deco16ic.h"

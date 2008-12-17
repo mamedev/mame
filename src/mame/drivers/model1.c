@@ -625,6 +625,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/v60/v60.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
 #include "system16.h"

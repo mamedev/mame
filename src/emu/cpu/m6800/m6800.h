@@ -46,25 +46,31 @@ enum
 #endif
 
 CPU_GET_INFO( m6800 );
+#define CPU_M6800 CPU_GET_INFO_NAME( m6800 )
 
 #if (HAS_M6801)
 CPU_GET_INFO( m6801 );
+#define CPU_M6801 CPU_GET_INFO_NAME( m6801 )
 #endif
 
 #if (HAS_M6802)
 CPU_GET_INFO( m6802 );
+#define CPU_M6802 CPU_GET_INFO_NAME( m6802 )
 #endif
 
 #if (HAS_M6803)
 CPU_GET_INFO( m6803 );
+#define CPU_M6803 CPU_GET_INFO_NAME( m6803 )
 #endif
 
 #if (HAS_M6808)
 CPU_GET_INFO( m6808 );
+#define CPU_M6808 CPU_GET_INFO_NAME( m6808 )
 #endif
 
 #if (HAS_HD63701)
 CPU_GET_INFO( hd63701 );
+#define CPU_HD63701 CPU_GET_INFO_NAME( hd63701 )
 
 /* FIMXE: these should be replaced to use m6803 ones */
 #define HD63701_DDR1 M6803_DDR1
@@ -84,6 +90,7 @@ WRITE8_HANDLER( hd63701_internal_registers_w );
 
 #if (HAS_NSC8105)
 CPU_GET_INFO( nsc8105 );
+#define CPU_NSC8105 CPU_GET_INFO_NAME( nsc8105 )
 #endif
 
 
@@ -252,6 +259,6 @@ WRITE8_HANDLER( hd63701_internal_registers_w );
 extern CPU_GET_INFO( nsc8105 );
 #endif
 
-
 #endif
 #endif /* __M6800_H__ */
+

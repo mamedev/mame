@@ -111,6 +111,7 @@ Notes (couriersud)
 
 ***************************************************************************/
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "sound/samples.h"
 #include "machine/74123.h"

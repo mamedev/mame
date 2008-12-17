@@ -66,6 +66,7 @@ On SegaC2 the VDP never turns on the IRQ6 enable register
 
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"

@@ -69,6 +69,7 @@ TODO :  This is a skeleton driver.  Nearly everything.
 
 #include <stdio.h>
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "video/generic.h"
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )

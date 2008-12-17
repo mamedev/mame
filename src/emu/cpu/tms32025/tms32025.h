@@ -73,6 +73,8 @@ enum
 extern CPU_GET_INFO( tms32025 );
 extern CPU_GET_INFO( tms32026 );
 
+#define CPU_TMS32025 CPU_GET_INFO_NAME( tms32025 )
+#define CPU_TMS32026 CPU_GET_INFO_NAME( tms32026 )
 
 CPU_DISASSEMBLE( tms32025 );
 

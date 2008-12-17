@@ -14,7 +14,15 @@ enum
 
 /* Public functions */
 extern CPU_GET_INFO( v20 );
+extern CPU_GET_INFO( v25 );
 extern CPU_GET_INFO( v30 );
 extern CPU_GET_INFO( v33 );
+extern CPU_GET_INFO( v35 );
+
+#define CPU_V20 CPU_GET_INFO_NAME( v20 )
+#define CPU_V25 CPU_GET_INFO_NAME( v25 )
+#define CPU_V30 CPU_GET_INFO_NAME( v30 )
+#define CPU_V33 CPU_GET_INFO_NAME( v33 )
+#define CPU_V35 CPU_GET_INFO_NAME( v35 )
 
 #endif

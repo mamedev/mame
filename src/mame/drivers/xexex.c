@@ -62,6 +62,7 @@ Unresolved Issues:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/z80/z80.h"

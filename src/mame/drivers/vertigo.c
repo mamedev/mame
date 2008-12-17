@@ -10,6 +10,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
+#include "cpu/m68000/m68000.h"
 #include "video/vector.h"
 #include "vertigo.h"
 #include "exidy440.h"

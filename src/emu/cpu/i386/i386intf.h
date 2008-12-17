@@ -5,9 +5,16 @@
 
 #include "cpuintrf.h"
 
-void i386_get_info(UINT32, cpuinfo*);
-void i486_get_info(UINT32, cpuinfo*);
-void pentium_get_info(UINT32, cpuinfo*);
-void mediagx_get_info(UINT32, cpuinfo*);
+CPU_GET_INFO( i386 );
+CPU_GET_INFO( i486 );
+CPU_GET_INFO( pentium );
+CPU_GET_INFO( mediagx );
+
+#define CPU_I386 CPU_GET_INFO_NAME( i386 )
+#define CPU_I486 CPU_GET_INFO_NAME( i486 )
+#define CPU_PENTIUM CPU_GET_INFO_NAME( pentium )
+#define CPU_MEDIAGX CPU_GET_INFO_NAME( mediagx )
+
+
 
 #endif /* __I386INTF_H__ */

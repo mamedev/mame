@@ -50,6 +50,7 @@ struct _pdp1_reset_param_t
 
 /* PUBLIC FUNCTIONS */
 CPU_GET_INFO( pdp1 );
+#define CPU_PDP1 CPU_GET_INFO_NAME( pdp1 )
 
 #define AND 001
 #define IOR 002

@@ -222,6 +222,7 @@ Interrupts:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
 #include "rendlay.h"
 #include "machine/6821pia.h"
 #include "qix.h"

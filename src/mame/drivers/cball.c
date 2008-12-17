@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 
 static UINT8* cball_video_ram;
 

@@ -129,6 +129,7 @@ extern UINT8 z180_readmem(const device_config *device, offs_t offset);
 extern void z180_writemem(const device_config *device, offs_t offset, UINT8 data);
 
 extern CPU_GET_INFO( z180 );
+#define CPU_Z180 CPU_GET_INFO_NAME( z180 )
 
 CPU_DISASSEMBLE( z180 );
 

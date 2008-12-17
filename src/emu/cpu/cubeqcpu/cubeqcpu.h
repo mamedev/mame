@@ -156,5 +156,12 @@ void cubeqcpu_clear_stack(const device_config *device);
 UINT8 cubeqcpu_get_ptr_ram_val(const device_config *device, int i);
 UINT32* cubeqcpu_get_stack_ram(const device_config *device);
 
+CPU_GET_INFO( cquestsnd );
+CPU_GET_INFO( cquestrot );
+CPU_GET_INFO( cquestlin );
+
+#define CPU_CQUESTSND CPU_GET_INFO_NAME( cquestsnd )
+#define CPU_CQUESTROT CPU_GET_INFO_NAME( cquestrot )
+#define CPU_CQUESTLIN CPU_GET_INFO_NAME( cquestlin )
 
 #endif /* _CUBEQCPU_H */

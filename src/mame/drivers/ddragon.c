@@ -69,6 +69,7 @@ Dip locations verified with manual for ddragon & ddragon2
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/hd6309/hd6309.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"

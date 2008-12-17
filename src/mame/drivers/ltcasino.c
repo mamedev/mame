@@ -14,6 +14,7 @@ etc.
 */
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 
 static UINT8 *ltcasino_tile_num_ram, *ltcasino_tile_atr_ram;

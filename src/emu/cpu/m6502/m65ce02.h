@@ -36,6 +36,7 @@ enum
 #define M65CE02_IRQ_LINE				M6502_IRQ_LINE
 
 CPU_GET_INFO( m65ce02 );
+#define CPU_M65CE02 CPU_GET_INFO_NAME( m65ce02 )
 
 extern CPU_DISASSEMBLE( m65ce02 );
 

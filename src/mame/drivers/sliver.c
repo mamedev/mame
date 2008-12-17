@@ -65,6 +65,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"

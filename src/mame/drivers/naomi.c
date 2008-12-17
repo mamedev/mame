@@ -653,6 +653,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/arm7/arm7.h"
 #include "video/generic.h"
 #include "machine/eeprom.h"
 #include "naomibd.h"

@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "qix.h"
 #include "machine/6821pia.h"
 #include "sound/sn76496.h"

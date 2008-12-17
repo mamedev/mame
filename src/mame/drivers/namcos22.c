@@ -1109,6 +1109,7 @@
  */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "namcos22.h"
 #include "cpu/tms32025/tms32025.h"

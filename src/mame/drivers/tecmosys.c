@@ -182,6 +182,7 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "tecmosys.h"
 #include "cpu/m68000/m68000.h"

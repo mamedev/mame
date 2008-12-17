@@ -37,6 +37,7 @@ enum
 
 
 CPU_GET_INFO( cp1610 );
+#define CPU_CP1610 CPU_GET_INFO_NAME( cp1610 )
 
 CPU_DISASSEMBLE( cp1610 );
 

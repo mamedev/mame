@@ -47,6 +47,9 @@ struct _tx0_reset_param_t
 CPU_GET_INFO( tx0_64kw );
 CPU_GET_INFO( tx0_8kw );
 
+#define CPU_TX0_64KW CPU_GET_INFO_NAME( tx0_64kw )
+#define CPU_TX0_8KW CPU_GET_INFO_NAME( tx0_8kw )
+
 CPU_DISASSEMBLE( tx0_64kw );
 CPU_DISASSEMBLE( tx0_8kw );
 

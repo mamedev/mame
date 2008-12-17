@@ -67,6 +67,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "arabian.h"
 #include "sound/ay8910.h"
 

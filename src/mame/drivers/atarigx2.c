@@ -20,6 +20,7 @@
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"

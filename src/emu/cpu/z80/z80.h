@@ -32,6 +32,7 @@ enum
 };
 
 extern CPU_GET_INFO( z80 );
+#define CPU_Z80 CPU_GET_INFO_NAME( z80 )
 
 extern CPU_DISASSEMBLE( z80 );
 

@@ -14,6 +14,7 @@ Sound:  YM2151
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 
 /* Variables & functions defined in video: */

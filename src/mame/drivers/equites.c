@@ -364,6 +364,8 @@ D                                                                               
 // Directives
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/alph8201/alph8201.h"
 #include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"

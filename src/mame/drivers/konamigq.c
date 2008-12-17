@@ -46,6 +46,7 @@
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 #include "machine/konamigx.h"

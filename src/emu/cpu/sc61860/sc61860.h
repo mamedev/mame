@@ -57,5 +57,6 @@ CPU_DISASSEMBLE( sc61860 );
 UINT8 *sc61860_internal_ram(const device_config *device);
 
 CPU_GET_INFO( sc61860 );
+#define CPU_SC61860 CPU_GET_INFO_NAME( sc61860 )
 
 #endif /* __SC61860_H__ */

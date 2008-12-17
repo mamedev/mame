@@ -293,6 +293,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"

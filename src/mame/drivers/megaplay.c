@@ -40,6 +40,7 @@ Only a handful of games were released for this system.
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "genesis.h"
 #include "megadriv.h"

@@ -45,6 +45,7 @@ Dip locations verified with Fabtek manual for the trackball version
 ******************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "sound/2151intf.h"

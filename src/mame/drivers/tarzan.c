@@ -3,6 +3,7 @@
 /* CPU might not be z80 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 
 #if 0
 static UINT16 *file1_data;

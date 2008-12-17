@@ -217,6 +217,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/ay8910.h"

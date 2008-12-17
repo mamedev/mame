@@ -2104,7 +2104,7 @@ static CPU_SET_INFO( mips3 )
 }
 
 
-CPU_GET_INFO( mips3 )
+static CPU_GET_INFO( mips3 )
 {
 	switch (state)
 	{
@@ -2163,7 +2163,7 @@ CPU_GET_INFO( r4600be )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4600 (big)");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 
@@ -2181,7 +2181,7 @@ CPU_GET_INFO( r4600le )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4600 (little)");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 #endif
@@ -2221,7 +2221,7 @@ CPU_GET_INFO( r4650be )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "IDT R4650 (big)");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 
@@ -2239,7 +2239,7 @@ CPU_GET_INFO( r4650le )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "IDT R4650 (little)");	break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 #endif
@@ -2279,7 +2279,7 @@ CPU_GET_INFO( r4700be )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4700 (big)");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 
@@ -2298,7 +2298,7 @@ CPU_GET_INFO( r4700le )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4700 (little)");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 #endif
@@ -2338,7 +2338,7 @@ CPU_GET_INFO( r5000be )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R5000 (big)");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 
@@ -2356,7 +2356,7 @@ CPU_GET_INFO( r5000le )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R5000 (little)");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 #endif
@@ -2396,7 +2396,7 @@ CPU_GET_INFO( qed5271be )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "QED5271 (big)");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 
@@ -2414,7 +2414,7 @@ CPU_GET_INFO( qed5271le )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "QED5271 (little)");	break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 #endif
@@ -2454,7 +2454,7 @@ CPU_GET_INFO( rm7000be )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "RM7000 (big)");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 
@@ -2472,7 +2472,7 @@ CPU_GET_INFO( rm7000le )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "RM7000 (little)");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										mips3_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
 #endif

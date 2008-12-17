@@ -33,6 +33,7 @@ from 2.bin to 9.bin program eproms
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cps1.h"
 #include "sound/2203intf.h"

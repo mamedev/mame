@@ -16,6 +16,7 @@ XTal: 20.0
 **********************************/
 
 #include "driver.h"
+#include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
 
 

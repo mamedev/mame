@@ -40,6 +40,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"

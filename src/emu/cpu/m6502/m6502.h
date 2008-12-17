@@ -79,6 +79,7 @@ enum
 };
 
 extern CPU_GET_INFO( m6502 );
+#define CPU_M6502 CPU_GET_INFO_NAME( m6502 )
 
 extern CPU_DISASSEMBLE( m6502 );
 
@@ -100,6 +101,7 @@ extern CPU_DISASSEMBLE( m6502 );
 #define M6510_IRQ_LINE					M6502_IRQ_LINE
 
 extern CPU_GET_INFO( m6510 );
+#define CPU_M6510 CPU_GET_INFO_NAME( m6510 )
 
 extern CPU_DISASSEMBLE( m6510 );
 
@@ -120,6 +122,7 @@ extern CPU_DISASSEMBLE( m6510 );
 #define M6510T_IRQ_LINE					M6502_IRQ_LINE
 
 extern CPU_GET_INFO( m6510t );
+#define CPU_M6510T CPU_GET_INFO_NAME( m6510t )
 
 #endif
 
@@ -138,6 +141,7 @@ extern CPU_GET_INFO( m6510t );
 #define M7501_IRQ_LINE					M6502_IRQ_LINE
 
 extern CPU_GET_INFO( m7501 );
+#define CPU_M7501 CPU_GET_INFO_NAME( m7501 )
 #endif
 
 #if (HAS_M8502)
@@ -155,6 +159,7 @@ extern CPU_GET_INFO( m7501 );
 #define M8502_IRQ_LINE					M6502_IRQ_LINE
 
 extern CPU_GET_INFO( m8502 );
+#define CPU_M8502 CPU_GET_INFO_NAME( m8502 )
 #endif
 
 
@@ -176,6 +181,7 @@ extern CPU_GET_INFO( m8502 );
 #define N2A03_IRQ_LINE					M6502_IRQ_LINE
 
 extern CPU_GET_INFO( n2a03 );
+#define CPU_N2A03 CPU_GET_INFO_NAME( n2a03 )
 
 #define N2A03_DEFAULTCLOCK (21477272.724 / 12)
 
@@ -205,6 +211,7 @@ extern void n2a03_irq(const device_config *device);
 #define M65C02_IRQ_LINE					M6502_IRQ_LINE
 
 extern CPU_GET_INFO( m65c02 );
+#define CPU_M65C02 CPU_GET_INFO_NAME( m65c02 )
 
 extern CPU_DISASSEMBLE( m65c02 );
 
@@ -228,6 +235,7 @@ extern CPU_DISASSEMBLE( m65c02 );
 #define M65SC02_IRQ_LINE				M6502_IRQ_LINE
 
 extern CPU_GET_INFO( m65sc02 );
+#define CPU_M65SC02 CPU_GET_INFO_NAME( m65sc02 )
 
 extern CPU_DISASSEMBLE( m65sc02 );
 #endif
@@ -250,6 +258,7 @@ extern CPU_DISASSEMBLE( m65sc02 );
 #define DECO16_IRQ_LINE					M6502_IRQ_LINE
 
 extern CPU_GET_INFO( deco16 );
+#define CPU_DECO16 CPU_GET_INFO_NAME( deco16 )
 #endif
 
 extern CPU_DISASSEMBLE( deco16 );

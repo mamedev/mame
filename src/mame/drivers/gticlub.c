@@ -219,6 +219,7 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"

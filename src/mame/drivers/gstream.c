@@ -95,6 +95,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "cpu/e132xs/e132xs.h"
 #include "sound/okim6295.h"
 
 static UINT32 *gstream_vram;

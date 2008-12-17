@@ -67,6 +67,7 @@ Dumped 06/15/2000
 
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/nile.h"
 

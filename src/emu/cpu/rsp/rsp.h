@@ -72,6 +72,7 @@ enum
 #define RSP_STATUS_SIGNAL7       0x4000
 
 CPU_GET_INFO( rsp );
+#define CPU_RSP CPU_GET_INFO_NAME( rsp )
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 

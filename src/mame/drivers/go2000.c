@@ -22,6 +22,7 @@ Added Dips and Dip locations based on Service Mode.
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 
 static UINT16* go2000_video;
 static UINT16* go2000_video2;

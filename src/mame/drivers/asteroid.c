@@ -166,6 +166,7 @@ Kits are available immediately from your Atari Distributor.  To determine which 
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "rendlay.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"

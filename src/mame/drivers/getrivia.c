@@ -79,6 +79,7 @@ NOTE: Series 8 and above are version 1.03a (currently in findout.c)
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "machine/ticket.h"
 #include "sound/dac.h"

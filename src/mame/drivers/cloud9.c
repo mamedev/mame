@@ -91,6 +91,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "sound/pokey.h"
 #include "cloud9.h"
 

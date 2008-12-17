@@ -81,6 +81,8 @@ driver modified by Eisuke Watanabe
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "cpu/h83002/h8.h"
 #include "cpu/upd7810/upd7810.h"

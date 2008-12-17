@@ -65,6 +65,7 @@ enum
 
 /* Main interface function */
 CPU_GET_INFO( g65816 );
+#define CPU_G65816 CPU_GET_INFO_NAME( g65816 )
 
 #undef G65816_CALL_DEBUGGER
 #define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(cpustate->device, x)

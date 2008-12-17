@@ -82,6 +82,7 @@ PROM  : Type MB7051
 
 
 #include "driver.h"
+#include "cpu/alph8201/alph8201.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"

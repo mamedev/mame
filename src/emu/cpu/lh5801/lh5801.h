@@ -78,6 +78,7 @@ struct _lh5801_cpu_core
 #define LH5801_IRQ 1
 
 CPU_GET_INFO( lh5801 );
+#define CPU_LH5801 CPU_GET_INFO_NAME( lh5801 )
 extern CPU_DISASSEMBLE( lh5801 );
 
 #endif /* __LH5801_H__ */

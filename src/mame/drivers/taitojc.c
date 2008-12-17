@@ -350,6 +350,8 @@ Notes:
 */
 
 #include "driver.h"
+#include "cpu/tms32051/tms32051.h"
+#include "cpu/m68000/m68000.h"
 #include "taito_f3.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/es5506.h"

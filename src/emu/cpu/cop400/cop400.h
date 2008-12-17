@@ -94,11 +94,20 @@ extern CPU_GET_INFO( cop401 );
 extern CPU_GET_INFO( cop410 );
 extern CPU_GET_INFO( cop411 );
 
+#define CPU_COP401 CPU_GET_INFO_NAME( cop401 )
+#define CPU_COP410 CPU_GET_INFO_NAME( cop410 )
+#define CPU_COP411 CPU_GET_INFO_NAME( cop411 )
+
 /* COP 42x */
 extern CPU_GET_INFO( cop402 );
 extern CPU_GET_INFO( cop420 );
 extern CPU_GET_INFO( cop421 );
 extern CPU_GET_INFO( cop422 );
+
+#define CPU_COP402 CPU_GET_INFO_NAME( cop402 )
+#define CPU_COP420 CPU_GET_INFO_NAME( cop420 )
+#define CPU_COP421 CPU_GET_INFO_NAME( cop421 )
+#define CPU_COP422 CPU_GET_INFO_NAME( cop422 )
 
 /* COP 44x */
 extern CPU_GET_INFO( cop404 );
@@ -107,6 +116,13 @@ extern CPU_GET_INFO( cop425 );
 extern CPU_GET_INFO( cop426 );
 extern CPU_GET_INFO( cop444 );
 extern CPU_GET_INFO( cop445 );
+
+#define CPU_COP404 CPU_GET_INFO_NAME( cop404 )
+#define CPU_COP424 CPU_GET_INFO_NAME( cop424 )
+#define CPU_COP425 CPU_GET_INFO_NAME( cop425 )
+#define CPU_COP426 CPU_GET_INFO_NAME( cop426 )
+#define CPU_COP444 CPU_GET_INFO_NAME( cop444 )
+#define CPU_COP445 CPU_GET_INFO_NAME( cop445 )
 
 CPU_DISASSEMBLE( cop410 );
 CPU_DISASSEMBLE( cop420 );

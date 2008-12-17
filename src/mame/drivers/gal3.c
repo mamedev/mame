@@ -68,6 +68,7 @@ better notes (complete chip lists) for each board still needed
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 
 VIDEO_START(gal3)
 {

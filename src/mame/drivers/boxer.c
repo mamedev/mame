@@ -9,6 +9,7 @@ Atari Boxer (prototype) driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 
 #define MASTER_CLOCK XTAL_12_096MHz
 

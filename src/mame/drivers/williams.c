@@ -492,6 +492,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
 #include "audio/williams.h"
 #include "williams.h"

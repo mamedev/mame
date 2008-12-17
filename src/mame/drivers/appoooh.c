@@ -48,6 +48,7 @@ Credits:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "appoooh.h"
 #include "machine/segacrpt.h"
 #include "sound/msm5205.h"

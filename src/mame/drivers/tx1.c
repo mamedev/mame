@@ -41,6 +41,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/i86/i86intf.h"
 #include "sound/ay8910.h"
 #include "sound/custom.h"
 #include "cpu/i86/i86.h"

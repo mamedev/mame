@@ -2,6 +2,7 @@
 /* Nothing else is known about this set / game */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 
 static VIDEO_START(gtipoker)
 {

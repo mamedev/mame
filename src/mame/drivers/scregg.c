@@ -50,6 +50,7 @@ it as ASCII text.
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "includes/btime.h"

@@ -63,7 +63,13 @@ struct _r3000_cpu_core
 extern CPU_GET_INFO( r3000be );
 extern CPU_GET_INFO( r3000le );
 
+#define CPU_R3000BE CPU_GET_INFO_NAME( r3000be )
+#define CPU_R3000LE CPU_GET_INFO_NAME( r3000le )
+
 extern CPU_GET_INFO( r3041be );
 extern CPU_GET_INFO( r3041le );
+
+#define CPU_R3041BE CPU_GET_INFO_NAME( r3041be )
+#define CPU_R3041LE CPU_GET_INFO_NAME( r3041le )
 
 #endif /* __R3000_H__ */

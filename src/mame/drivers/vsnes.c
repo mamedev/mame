@@ -130,15 +130,13 @@ Changes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "rendlay.h"
 #include "video/ppu2c0x.h"
 #include "machine/rp5h01.h"
 #include "sound/dac.h"
 #include "sound/nes_apu.h"
 #include "includes/vsnes.h"
-
-/* clock frequency */
-#define N2A03_DEFAULTCLOCK ( 21477272.724 / 12 )
 
 #define DUAL_RBI 1
 

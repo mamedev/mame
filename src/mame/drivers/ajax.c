@@ -11,6 +11,9 @@ TO DO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/konami/konami.h"
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"

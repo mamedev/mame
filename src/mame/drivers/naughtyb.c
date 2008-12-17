@@ -103,6 +103,7 @@ TODO:
  ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/custom.h"
 #include "sound/tms36xx.h"
 #include "includes/phoenix.h"

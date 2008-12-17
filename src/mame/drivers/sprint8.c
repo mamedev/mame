@@ -5,6 +5,7 @@ Atari Sprint 8 driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "includes/sprint8.h"
 
 static int steer_dir[8];

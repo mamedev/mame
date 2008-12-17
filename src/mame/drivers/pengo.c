@@ -62,6 +62,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "pacman.h"
 #include "sound/namco.h"

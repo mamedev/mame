@@ -27,6 +27,7 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 
 
 #include "driver.h"
+#include "cpu/tms9900/tms9900.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"

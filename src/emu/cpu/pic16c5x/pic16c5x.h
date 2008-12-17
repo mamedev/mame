@@ -104,27 +104,32 @@ void pic16c5x_set_config(const device_config *cpu, int data);
 
 
 #if (HAS_PIC16C54)
-CPU_GET_INFO( pic16C54 );
+CPU_GET_INFO( pic16c54 );
+#define CPU_PIC16C54 CPU_GET_INFO_NAME( pic16c54 )
 #endif
 
 
 #if (HAS_PIC16C55)
-CPU_GET_INFO( pic16C55 );
+CPU_GET_INFO( pic16c55 );
+#define CPU_PIC16C55 CPU_GET_INFO_NAME( pic16c55 )
 #endif
 
 
 #if (HAS_PIC16C56)
-CPU_GET_INFO( pic16C56 );
+CPU_GET_INFO( pic16c56 );
+#define CPU_PIC16C56 CPU_GET_INFO_NAME( pic16c56 )
 #endif
 
 
 #if (HAS_PIC16C57)
-CPU_GET_INFO( pic16C57 );
+CPU_GET_INFO( pic16c57 );
+#define CPU_PIC16C57 CPU_GET_INFO_NAME( pic16c57 )
 #endif
 
 
 #if (HAS_PIC16C58)
-CPU_GET_INFO( pic16C58 );
+CPU_GET_INFO( pic16c58 );
+#define CPU_PIC16C58 CPU_GET_INFO_NAME( pic16c58 )
 #endif
 
 

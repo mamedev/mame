@@ -71,6 +71,8 @@ Is there another alt program rom set labeled 9 & 10?
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "includes/kaneko16.h"
 #include "sound/2203intf.h"

@@ -30,6 +30,7 @@ HW info :
 ************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
 extern UINT8 *ssrj_vram1,*ssrj_vram2,*ssrj_vram3,*ssrj_vram4,*ssrj_scrollram;

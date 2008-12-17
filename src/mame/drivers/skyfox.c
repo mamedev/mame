@@ -17,6 +17,7 @@ Verified Dip locations and recommended settings with manual
 
 ***************************************************************************/
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 
 /* Variables defined in video: */

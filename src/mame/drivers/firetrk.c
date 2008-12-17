@@ -6,6 +6,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
 #include "firetrk.h"
 #include "sound/discrete.h"
 

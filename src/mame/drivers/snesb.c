@@ -80,6 +80,8 @@ TODO:
 
 ***************************************************************************/
 #include "driver.h"
+#include "cpu/spc700/spc700.h"
+#include "cpu/g65816/g65816.h"
 #include "includes/snes.h"
 
 static INT8 *shared_ram;

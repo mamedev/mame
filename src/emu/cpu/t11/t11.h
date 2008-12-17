@@ -34,6 +34,7 @@ struct t11_setup
 
 
 extern CPU_GET_INFO( t11 );
+#define CPU_T11 CPU_GET_INFO_NAME( t11 )
 
 /****************************************************************************/
 /* Read a byte from given memory location                                   */

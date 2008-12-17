@@ -105,6 +105,7 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/vlm5030.h"
 #include "sound/nes_apu.h"

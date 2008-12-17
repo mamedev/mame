@@ -270,6 +270,7 @@ GFX:                Custom 145     ( 80 pin PQFP)
                     Custom 169     (120 pin PQFP)
 */
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "namconb1.h"
 #include "namcos2.h"

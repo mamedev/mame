@@ -63,6 +63,8 @@ JL.3G   color
 *******************************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "sound/msm5205.h"

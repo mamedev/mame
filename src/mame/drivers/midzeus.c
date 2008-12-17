@@ -25,6 +25,7 @@ The Grid         v1.2   10/18/2000
 **************************************************************************/
 
 #include "driver.h"
+#include "cpu/tms32031/tms32031.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "includes/midzeus.h"

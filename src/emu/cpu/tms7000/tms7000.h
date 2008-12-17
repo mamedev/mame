@@ -51,6 +51,9 @@ extern void tms7000_A6EC1( const device_config *device ); /* External event coun
 extern CPU_GET_INFO( tms7000 );
 extern CPU_GET_INFO( tms7000_exl );
 
+#define CPU_TMS7000 CPU_GET_INFO_NAME( tms7000 )
+#define CPU_TMS7000_EXL CPU_GET_INFO_NAME( tms7000_exl )
+
 extern CPU_DISASSEMBLE( tms7000 );
 
 #endif /* __TMS7000_H__ */

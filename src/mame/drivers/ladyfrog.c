@@ -47,6 +47,7 @@ Notes:
 #define ladyfrog_scr_size 0
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"

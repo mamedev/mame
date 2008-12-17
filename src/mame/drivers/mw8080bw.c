@@ -141,6 +141,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/i8085/i8085.h"
 #include "rendlay.h"
 #include "machine/rescap.h"
 #include "mw8080bw.h"

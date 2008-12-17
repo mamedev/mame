@@ -9,6 +9,7 @@ Copyright (C) 1992 HI-TECH Software..Brisbane, QLD Australia
 */
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
 

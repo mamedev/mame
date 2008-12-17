@@ -19,6 +19,7 @@ enum
 };
 
 CPU_GET_INFO( apexc );
+#define CPU_APEXC CPU_GET_INFO_NAME( apexc )
 
 CPU_DISASSEMBLE( apexc );
 

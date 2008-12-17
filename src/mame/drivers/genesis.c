@@ -12,6 +12,8 @@ segac2.c
 */
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "genesis.h"
 
 #define MASTER_CLOCK		53693100

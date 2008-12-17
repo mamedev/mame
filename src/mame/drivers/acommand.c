@@ -56,6 +56,7 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 *******************************************************************************************/
 
 #include "driver.h"
+#include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
 

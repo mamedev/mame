@@ -52,6 +52,7 @@ enum
  */
 
 CPU_GET_INFO( tms32010 );
+#define CPU_TMS32010 CPU_GET_INFO_NAME( tms32010 )
 
 
 

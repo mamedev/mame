@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"

@@ -36,6 +36,7 @@ TO DO:
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
 static UINT8 *cfb_ram;

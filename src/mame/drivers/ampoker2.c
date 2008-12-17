@@ -356,6 +356,7 @@
 #define MASTER_CLOCK	XTAL_6MHz
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "ampoker2.lh"
 #include "sigmapkr.lh"

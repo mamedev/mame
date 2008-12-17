@@ -60,6 +60,7 @@
 */
 
 #include "driver.h"
+#include "cpu/i386/i386intf.h"
 #include "memconv.h"
 #include "devconv.h"
 #include "deprecat.h"

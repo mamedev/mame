@@ -42,6 +42,7 @@
 // 0x3E7                    round point/passing point control?
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 
 

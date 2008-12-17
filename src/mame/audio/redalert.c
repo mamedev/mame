@@ -8,6 +8,8 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6800/m6800.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/6821pia.h"

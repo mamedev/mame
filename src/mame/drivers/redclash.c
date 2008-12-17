@@ -21,6 +21,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/z80/z80.h"
 
 
 extern WRITE8_HANDLER( redclash_videoram_w );

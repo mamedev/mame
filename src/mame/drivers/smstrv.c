@@ -285,6 +285,7 @@ U145        1Brown          PAL14H4CN
 */
 
 #include "driver.h"
+#include "cpu/i86/i88intf.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
 

@@ -5,6 +5,7 @@ Atari Sky Raider driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6502/m6502.h"
 
 extern UINT8* skyraid_alpha_num_ram;
 extern UINT8* skyraid_pos_ram;
