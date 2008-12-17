@@ -17,7 +17,8 @@ driver by Nicola Salmoria
 
 extern UINT8 *finalizr_scroll;
 extern UINT8 *finalizr_videoram2,*finalizr_colorram2;
-static UINT8 *finalizr_interrupt_enable;
+static UINT8 nmi_enable,irq_enable;
+
 
 static int finalizr_T1_line;
 
@@ -32,12 +33,12 @@ static INTERRUPT_GEN( finalizr_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
 	{
-		if (*finalizr_interrupt_enable & 2)
+		if (irq_enable)
 			cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (*finalizr_interrupt_enable & 1)
+		if (nmi_enable)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -46,6 +47,14 @@ static WRITE8_HANDLER( finalizr_coin_w )
 {
 	coin_counter_w(0,data & 0x01);
 	coin_counter_w(1,data & 0x02);
+}
+
+static WRITE8_HANDLER( finalizr_flipscreen_w )
+{
+	nmi_enable = data & 0x01;
+	irq_enable = data & 0x02;
+
+	flip_screen_set(~data & 0x08);
 }
 
 static WRITE8_HANDLER( finalizr_i8039_irq_w )
@@ -77,16 +86,8 @@ static READ8_HANDLER( i8039_T1_r )
     */
 
 	finalizr_T1_line++;
-	if ((finalizr_T1_line % 3) == 0)
-	{
-		if (finalizr_T1_line == 15)
-		{
-			finalizr_T1_line = -1;
-			return 0;
-		}
-		return 1;
-	}
-	return 0;
+	finalizr_T1_line %= 16;
+	return (!(finalizr_T1_line % 3) && (finalizr_T1_line > 0));
 }
 
 static WRITE8_HANDLER( i8039_T0_w )
@@ -99,49 +100,39 @@ static WRITE8_HANDLER( i8039_T0_w )
     */
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(SMH_RAM) AM_BASE(&finalizr_scroll)
+	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
+//  AM_RANGE(0x0020, 0x003f) AM_WRITE(SMH_RAM) AM_BASE(&finalizr_scroll)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0810, 0x0810) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0811, 0x0811) AM_READ_PORT("P1")
 	AM_RANGE(0x0812, 0x0812) AM_READ_PORT("P2")
 	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(SMH_RAM) AM_BASE(&finalizr_scroll)
-	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(SMH_RAM) AM_BASE(&finalizr_interrupt_enable)
-//  AM_RANGE(0x0020, 0x003f) AM_WRITE(SMH_RAM) AM_BASE(&finalizr_scroll)
 	AM_RANGE(0x0818, 0x0818) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
 	AM_RANGE(0x081a, 0x081a) AM_WRITE(sn76496_0_w)	/* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0x081b, 0x081b) AM_WRITE(SMH_NOP)		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
 	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_w)			/* custom sound chip */
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(SMH_RAM) AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(SMH_RAM) AM_BASE(&finalizr_colorram2)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&finalizr_videoram2)
-	AM_RANGE(0x3000, 0x31ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3200, 0x37ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x3800, 0x39ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x3a00, 0x3fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(&finalizr_colorram2)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(&finalizr_videoram2)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3200, 0x37ff) AM_RAM
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0x3a00, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff)				   AM_READ(soundlatch_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)
@@ -313,13 +304,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( finalizr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,18432000/6)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_ADD("main", M6809,XTAL_18_432MHz/6)	/* ??? */
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(finalizr_interrupt,16)	/* 1 IRQ + 8 NMI (generated by a custom IC) */
 
-	MDRV_CPU_ADD("audio", I8039,18432000/2)	/* 9.216MHz clkin ?? */
-	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
-	MDRV_CPU_IO_MAP(i8039_io_map,0)
+	MDRV_CPU_ADD("audio", I8039,XTAL_18_432MHz/2)	/* 9.216MHz clkin ?? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -339,7 +330,7 @@ static MACHINE_DRIVER_START( finalizr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76496, 18432000/12)
+	MDRV_SOUND_ADD("sn", SN76489A, XTAL_18_432MHz/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -411,6 +402,6 @@ static DRIVER_INIT( finalizr )
 }
 
 
-GAME( 1985, finalizr, 0,        finalizr, finalizr, finalizr, ROT90, "Konami", "Finalizer - Super Transformation", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1985, finalizb, finalizr, finalizr, finalizb, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1985, finalizr, 0,        finalizr, finalizr, finalizr, ROT90, "Konami", "Finalizer - Super Transformation", GAME_IMPERFECT_SOUND )
+GAME( 1985, finalizb, finalizr, finalizr, finalizb, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", GAME_IMPERFECT_SOUND )
 

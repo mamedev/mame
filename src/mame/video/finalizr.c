@@ -14,6 +14,9 @@ UINT8 *finalizr_scroll;
 UINT8 *finalizr_videoram2,*finalizr_colorram2;
 static int spriterambank,charbank;
 
+static tilemap *bg_tilemap;
+static tilemap *fg_tilemap;
+
 
 
 PALETTE_INIT( finalizr )
@@ -49,9 +52,30 @@ PALETTE_INIT( finalizr )
 	}
 }
 
+static TILE_GET_INFO( get_bg_tile_info )
+{
+	int attr = colorram[tile_index];
+	int code = videoram[tile_index] + ((attr & 0xc0) << 2) + (charbank<<10);
+	int color = attr & 0x0f;
+	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
+
+	SET_TILE_INFO(0, code, color, flags);
+}
+
+static TILE_GET_INFO( get_fg_tile_info )
+{
+	int attr = finalizr_colorram2[tile_index];
+	int code = finalizr_videoram2[tile_index] + ((attr & 0xc0) << 2);
+	int color = attr & 0x0f;
+	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
+
+	SET_TILE_INFO(0, code, color, flags);
+}
+
 VIDEO_START( finalizr )
 {
-	tmpbitmap = auto_bitmap_alloc(256,256,video_screen_get_format(machine->primary_screen));
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 }
 
 
@@ -71,48 +95,23 @@ VIDEO_UPDATE( finalizr )
 {
 	int offs;
 
+	tilemap_mark_all_tiles_dirty(bg_tilemap);
+	tilemap_mark_all_tiles_dirty(fg_tilemap);
 
-	/* for every character in the Video RAM */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
-	{
-		int sx,sy;
-
-
-		sx = offs % 32;
-		sy = offs / 32;
-
-		drawgfx(tmpbitmap,screen->machine->gfx[0],
-				videoram[offs] + ((colorram[offs] & 0xc0) << 2) + (charbank<<10),
-				(colorram[offs] & 0x0f),
-				colorram[offs] & 0x10,colorram[offs] & 0x20,
-				8*sx,8*sy,
-				0,TRANSPARENCY_NONE,0);
-	}
-
-
-	/* copy the temporary bitmap to the screen */
-	{
-		int scroll;
-
-
-		scroll = -*finalizr_scroll + 16;
-
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scroll,0,0,cliprect);
-	}
-
+	tilemap_set_scrollx(bg_tilemap, 0, *finalizr_scroll-16);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* Draw the sprites. */
 	{
-		UINT8 *sr;
+		const gfx_element *gfx1 = screen->machine->gfx[1];
+		const gfx_element *gfx2 = screen->machine->gfx[2];
+
+		UINT8 *sr = spriterambank ? spriteram_2 : spriteram;
 
 
-		if (spriterambank != 0)
-			sr = spriteram_2;
-		else sr = spriteram;
-
-		for (offs = 0;offs < spriteram_size;offs += 5)
+		for (offs = 0;offs <= spriteram_size-5;offs += 5)
 		{
-			int sx,sy,flipx,flipy,code,color;
+			int sx,sy,flipx,flipy,code,color,size;
 
 
 			sx = 16 + sr[offs+3] - ((sr[offs+4] & 0x01) << 8);
@@ -124,110 +123,125 @@ VIDEO_UPDATE( finalizr )
 
 //          (sr[offs+4] & 0x02) is used, meaning unknown
 
-			switch (sr[offs+4] & 0x1c)
+			size = sr[offs+4] & 0x1c;
+
+			if (size >= 0x10)	/* 32x32 */
 			{
-				case 0x10:	/* 32x32? */
-				case 0x14:	/* ? */
-				case 0x18:	/* ? */
-				case 0x1c:	/* ? */
-					drawgfx(bitmap,screen->machine->gfx[1],
-							code,
-							color,
-							flipx,flipy,
-							flipx?sx+16:sx,flipy?sy+16:sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,screen->machine->gfx[1],
-							code + 1,
-							color,
-							flipx,flipy,
-							flipx?sx:sx+16,flipy?sy+16:sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,screen->machine->gfx[1],
-							code + 2,
-							color,
-							flipx,flipy,
-							flipx?sx+16:sx,flipy?sy:sy+16,
-							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,screen->machine->gfx[1],
-							code + 3,
-							color,
-							flipx,flipy,
-							flipx?sx:sx+16,flipy?sy:sy+16,
-							cliprect,TRANSPARENCY_PEN,0);
-					break;
+				if (flip_screen_get())
+				{
+					sx = 256 - sx;
+					sy = 224 - sy;
+					flipx = !flipx;
+					flipy = !flipy;
+				}
 
-				case 0x00:	/* 16x16 */
-					drawgfx(bitmap,screen->machine->gfx[1],
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					break;
+				drawgfx(bitmap,gfx1,
+						code,
+						color,
+						flipx,flipy,
+						flipx?sx+16:sx,flipy?sy+16:sy,
+						cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,gfx1,
+						code + 1,
+						color,
+						flipx,flipy,
+						flipx?sx:sx+16,flipy?sy+16:sy,
+						cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,gfx1,
+						code + 2,
+						color,
+						flipx,flipy,
+						flipx?sx+16:sx,flipy?sy:sy+16,
+						cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,gfx1,
+						code + 3,
+						color,
+						flipx,flipy,
+						flipx?sx:sx+16,flipy?sy:sy+16,
+						cliprect,TRANSPARENCY_PEN,0);
+			}
+			else
+			{
+				if (flip_screen_get())
+				{
+					sx = ((size & 0x08) ? 280:272) - sx;
+					sy = ((size & 0x04) ? 248:240) - sy;
+					flipx = !flipx;
+					flipy = !flipy;
+				}
 
-				case 0x04:	/* 16x8 */
-					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,screen->machine->gfx[2],
-							code & ~1,
-							color,
-							flipx,flipy,
-							flipx?sx+8:sx,sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,screen->machine->gfx[2],
-							code | 1,
-							color,
-							flipx,flipy,
-							flipx?sx:sx+8,sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					break;
-
-				case 0x08:	/* 8x16 */
-					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,screen->machine->gfx[2],
-							code & ~2,
-							color,
-							flipx,flipy,
-							sx,flipy?sy+8:sy,
-							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,screen->machine->gfx[2],
-							code | 2,
-							color,
-							flipx,flipy,
-							sx,flipy?sy:sy+8,
-							cliprect,TRANSPARENCY_PEN,0);
-					break;
-
-				case 0x0c:	/* 8x8 */
-					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,screen->machine->gfx[2],
+				if (size == 0x00)	/* 16x16 */
+				{
+					drawgfx(bitmap,gfx1,
 							code,
 							color,
 							flipx,flipy,
 							sx,sy,
 							cliprect,TRANSPARENCY_PEN,0);
-					break;
+				}
+				else
+				{
+					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
+
+					if (size == 0x04)	/* 16x8 */
+					{
+						drawgfx(bitmap,gfx2,
+								code & ~1,
+								color,
+								flipx,flipy,
+								flipx?sx+8:sx,sy,
+								cliprect,TRANSPARENCY_PEN,0);
+						drawgfx(bitmap,gfx2,
+								code | 1,
+								color,
+								flipx,flipy,
+								flipx?sx:sx+8,sy,
+								cliprect,TRANSPARENCY_PEN,0);
+					}
+					else if (size == 0x08)	/* 8x16 */
+					{
+						drawgfx(bitmap,gfx2,
+								code & ~2,
+								color,
+								flipx,flipy,
+								sx,flipy?sy+8:sy,
+								cliprect,TRANSPARENCY_PEN,0);
+						drawgfx(bitmap,gfx2,
+								code | 2,
+								color,
+								flipx,flipy,
+								sx,flipy?sy:sy+8,
+								cliprect,TRANSPARENCY_PEN,0);
+					}
+					else if (size == 0x0c)	/* 8x8 */
+					{
+						drawgfx(bitmap,gfx2,
+								code,
+								color,
+								flipx,flipy,
+								sx,sy,
+								cliprect,TRANSPARENCY_PEN,0);
+					}
+				}
 			}
 		}
 	}
 
-	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		int sx,sy;
+		const rectangle *visarea = video_screen_get_visible_area(screen);
+		rectangle clip = *cliprect;
 
+		/* draw top status region */
+		clip.min_x = visarea->min_x;
+		clip.max_x = visarea->min_x + 15;
+		tilemap_set_scrolldx(fg_tilemap,  0,-16);
+		tilemap_draw(bitmap, &clip, fg_tilemap, 0, 0);
 
-		sx = offs % 32;
-		if (sx < 6)
-		{
-			if (sx >= 3) sx += 30;
-			sy = offs / 32;
-
-			drawgfx(bitmap,screen->machine->gfx[0],
-					finalizr_videoram2[offs] + ((finalizr_colorram2[offs] & 0xc0) << 2),
-					(finalizr_colorram2[offs] & 0x0f),
-					finalizr_colorram2[offs] & 0x10,finalizr_colorram2[offs] & 0x20,
-					8*sx,8*sy,
-					cliprect,TRANSPARENCY_NONE,0);
-		}
+		/* draw bottom status region */
+		clip.min_x = visarea->max_x - 15;
+		clip.max_x = visarea->max_x;
+		tilemap_set_scrolldx(fg_tilemap,-16,  0);
+		tilemap_draw(bitmap, &clip, fg_tilemap, 0, 0);
 	}
 	return 0;
 }
