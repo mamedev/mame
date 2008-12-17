@@ -185,7 +185,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				tag = TOKEN_GET_STRING(tokens);
 				device = device_list_add(&config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
 				if (device != NULL)
-					device->owner = owner;
+					device->owner = (device_config *)owner;
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_REMOVE:
