@@ -74,10 +74,17 @@ struct _cpu_config
     CPU DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
+#ifdef PTR64
+#define MDRV_CPU_ADD(_tag, _type, _clock) \
+	MDRV_DEVICE_ADD(_tag, CPU) \
+	MDRV_DEVICE_CONFIG_DATA64(cpu_config, type, CPU_##_type) \
+	MDRV_DEVICE_CONFIG_DATA32(cpu_config, clock, _clock)
+#else
 #define MDRV_CPU_ADD(_tag, _type, _clock) \
 	MDRV_DEVICE_ADD(_tag, CPU) \
 	MDRV_DEVICE_CONFIG_DATA32(cpu_config, type, CPU_##_type) \
 	MDRV_DEVICE_CONFIG_DATA32(cpu_config, clock, _clock)
+#endif
 
 #define MDRV_CPU_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, CPU)
@@ -85,11 +92,19 @@ struct _cpu_config
 #define MDRV_CPU_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag, CPU)
 
+#ifdef PTR64
+#define MDRV_CPU_REPLACE(_tag, _type, _clock) \
+	MDRV_DEVICE_REMOVE(_tag, CPU) \
+	MDRV_DEVICE_ADD(_tag, CPU) \
+	MDRV_DEVICE_CONFIG_DATA64(cpu_config, type, CPU_##_type) \
+	MDRV_DEVICE_CONFIG_DATA32(cpu_config, clock, _clock)
+#else
 #define MDRV_CPU_REPLACE(_tag, _type, _clock) \
 	MDRV_DEVICE_REMOVE(_tag, CPU) \
 	MDRV_DEVICE_ADD(_tag, CPU) \
 	MDRV_DEVICE_CONFIG_DATA32(cpu_config, type, CPU_##_type) \
 	MDRV_DEVICE_CONFIG_DATA32(cpu_config, clock, _clock)
+#endif
 
 #define MDRV_CPU_FLAGS(_flags) \
 	MDRV_DEVICE_CONFIG_DATA32(cpu_config, flags, _flags)
