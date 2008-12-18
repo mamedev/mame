@@ -823,7 +823,7 @@ static MACHINE_DRIVER_START( sasuke )
 	MDRV_VIDEO_START(satansat)
 	MDRV_VIDEO_UPDATE(rockola)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -898,7 +898,7 @@ static MACHINE_DRIVER_START( vanguard )
 	MDRV_VIDEO_START(rockola)
 	MDRV_VIDEO_UPDATE(rockola)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

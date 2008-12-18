@@ -504,8 +504,6 @@ static void ctc_interrupt(const device_config *device, int state)
 
 static z80ctc_interface ctc_intf =
 {
-	"sub",				/* clock comes from sub CPU */
-	0,              	/* clock (filled in from the CPU 0 clock) */
 	0,              	/* timer disables */
 	ctc_interrupt,  	/* interrupt handler */
 	0,					/* ZC/TO0 callback */
@@ -1468,7 +1466,7 @@ static MACHINE_DRIVER_START( tenpindx )
 	MDRV_CPU_PROGRAM_MAP(tenpin_sub_map,0)
 	MDRV_CPU_IO_MAP(tenpin_sub_io_map,0)
 
-	MDRV_Z80CTC_ADD("ctc", ctc_intf)
+	MDRV_Z80CTC_ADD("ctc", ASTROCADE_CLOCK/4 /* same as "sub" */, ctc_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

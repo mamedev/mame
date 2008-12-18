@@ -358,7 +358,7 @@ static MACHINE_DRIVER_START( jokrwild )
 	MDRV_VIDEO_START(jokrwild)
 	MDRV_VIDEO_UPDATE(jokrwild)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 MACHINE_DRIVER_END
 

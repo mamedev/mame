@@ -218,8 +218,6 @@ const z80_daisy_chain mcr_ipu_daisy_chain[] =
 
 const z80ctc_interface mcr_ctc_intf =
 {
-	"main",				/* clock from the main CPU */
-	0,              	/* clock (filled in from the CPU 0 clock) */
 	0,              	/* timer disables */
 	ctc_interrupt,  	/* interrupt handler */
 	z80ctc_trg1_w,		/* ZC/TO0 callback */
@@ -230,8 +228,6 @@ const z80ctc_interface mcr_ctc_intf =
 
 const z80ctc_interface nflfoot_ctc_intf =
 {
-	"ipu",				/* clock from the IPU cpu */
-	0,                  /* clock (filled in from the CPU 3 clock) */
 	0,                  /* timer disables */
 	ipu_ctc_interrupt,  /* interrupt handler */
 	0,					/* ZC/TO0 callback */
@@ -254,8 +250,6 @@ const z80pio_interface nflfoot_pio_intf =
 
 const z80sio_interface nflfoot_sio_intf =
 {
-	"ipu",				/* clock from the IPU cpu */
-	0,                  /* clock (filled in from the CPU 3 clock) */
 	ipu_ctc_interrupt,	/* interrupt handler */
 	0,					/* DTR changed handler */
 	0,					/* RTS changed handler */

@@ -45,6 +45,7 @@ struct _cdp1869_t
 	const device_config *screen;	/* screen */
 	const device_config *cpu;		/* CPU */
 	sound_stream *stream;			/* sound output */
+	int color_clock;
 
 	/* video state */
 	int dispoff;					/* display off */
@@ -728,7 +729,7 @@ static void cdp1869_sound_update(const device_config *device, stream_sample_t **
 
 	if (!cdp1869->toneoff && cdp1869->toneamp)
 	{
-		double frequency = (cdp1869->intf->pixel_clock / 2) / (512 >> cdp1869->tonefreq) / (cdp1869->tonediv + 1);
+		double frequency = (device->clock / 2) / (512 >> cdp1869->tonefreq) / (cdp1869->tonediv + 1);
 
 		int rate = device->machine->sample_rate / 2;
 
@@ -767,7 +768,7 @@ static void cdp1869_sound_update(const device_config *device, stream_sample_t **
 
         for (wndiv = 0; wndiv < 128; wndiv++)
         {
-            double frequency = (cdp1869->intf->pixel_clock / 2) / (4096 >> cdp1869->wnfreq) / (wndiv + 1);
+            double frequency = (device->clock / 2) / (4096 >> cdp1869->wnfreq) / (wndiv + 1);
 
             cdp1869_sum_square_wave(buffer, frequency, amplitude);
         }
@@ -779,6 +780,7 @@ static void cdp1869_sound_update(const device_config *device, stream_sample_t **
 
 static DEVICE_START( cdp1869 )
 {
+	const cdp1869_inline *inline_config = device->inline_config;
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
 	// validate arguments
@@ -786,6 +788,7 @@ static DEVICE_START( cdp1869 )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 	assert(device->static_config != NULL);
+	assert(inline_config != NULL);
 
 	cdp1869->intf = device->static_config;
 
@@ -800,12 +803,12 @@ static DEVICE_START( cdp1869 )
 
 	// get the screen device
 
-	cdp1869->screen = devtag_get_device(device->machine, VIDEO_SCREEN, cdp1869->intf->screen_tag);
+	cdp1869->screen = devtag_get_device(device->machine, VIDEO_SCREEN, inline_config->screen_tag);
 	assert(cdp1869->screen != NULL);
 
 	// get the CPU device
 
-	cdp1869->cpu = cputag_get_cpu(device->machine, cdp1869->intf->cpu_tag);
+	cdp1869->cpu = cputag_get_cpu(device->machine, inline_config->cpu_tag);
 	assert(cdp1869->cpu != NULL);
 
 	// allocate timers
@@ -859,7 +862,7 @@ DEVICE_GET_INFO( cdp1869_video )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1869_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(cdp1869_inline);			break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

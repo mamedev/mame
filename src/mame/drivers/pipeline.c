@@ -293,8 +293,6 @@ static void ctc0_interrupt(const device_config *device, int state)
 
 static const z80ctc_interface ctc_intf =
 {
-	"audio",			// clock from audio CPU
-	0,					// clock
 	0,					// timer disables
 	ctc0_interrupt,		// interrupt handler
 	0,					// ZC/TO0 callback
@@ -380,7 +378,7 @@ static MACHINE_DRIVER_START( pipeline )
 	MDRV_CPU_ADD("mcu", M68705, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem, 0)
 
-	MDRV_Z80CTC_ADD( "ctc", ctc_intf )
+	MDRV_Z80CTC_ADD( "ctc", 7372800/2 /* same as "audio" */, ctc_intf )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )

@@ -38,7 +38,7 @@ struct _ide_config
 ***************************************************************************/
 
 #define MDRV_IDE_CONTROLLER_ADD(_tag, _callback) \
-	MDRV_DEVICE_ADD(_tag, IDE_CONTROLLER) \
+	MDRV_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
 	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, interrupt, _callback)
 
 #define MDRV_IDE_CONTROLLER_REGIONS(_master, _slave) \

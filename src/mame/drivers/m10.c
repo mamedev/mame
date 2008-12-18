@@ -834,10 +834,8 @@ static MACHINE_DRIVER_START( m10 )
 
 	/* 74LS123 */
 
-	MDRV_DEVICE_ADD("ic8j1", TTL74123)
-	MDRV_DEVICE_CONFIG(ic8j1_intf)
-	MDRV_DEVICE_ADD("ic8j2", TTL74123)
-	MDRV_DEVICE_CONFIG(ic8j2_intf)
+	MDRV_TTL74123_ADD("ic8j1", ic8j1_intf)
+	MDRV_TTL74123_ADD("ic8j2", ic8j2_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

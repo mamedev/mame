@@ -34,12 +34,12 @@ struct pit8253_config
 ***************************************************************************/
 
 #define MDRV_PIT8253_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PIT8253) \
+	MDRV_DEVICE_ADD(_tag, PIT8253, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 
 #define MDRV_PIT8254_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PIT8254) \
+	MDRV_DEVICE_ADD(_tag, PIT8254, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 

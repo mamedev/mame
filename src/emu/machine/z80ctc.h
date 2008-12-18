@@ -29,8 +29,6 @@
 typedef struct _z80ctc_interface z80ctc_interface;
 struct _z80ctc_interface
 {
-	const char *cpu;						/* CPU whose clock we use for our base */
-	int baseclock;							/* timer clock */
 	int notimer;							/* timer disablers */
 	void (*intr)(const device_config *device, int which); /* callback when change interrupt status */
 	write8_device_func zc0;					/* ZC/TO0 callback */
@@ -44,8 +42,8 @@ struct _z80ctc_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_Z80CTC_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, Z80CTC) \
+#define MDRV_Z80CTC_ADD(_tag, _clock, _intrf) \
+	MDRV_DEVICE_ADD(_tag, Z80CTC, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_Z80CTC_REMOVE(_tag) \

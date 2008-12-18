@@ -379,7 +379,6 @@ GFXDECODE_END
 static const mc6845_interface mc6845_intf =
 {
 	"main",				/* screen we are acting on */
-	PIXEL_CLOCK / 8,  /* the clock of the chip  */
 	8,                /* number of pixels per video memory address */
 	NULL,             /* before pixel update callback */
 	NULL,             /* row update callback */
@@ -401,6 +400,5 @@ MACHINE_DRIVER_START( madalien_video )
 	MDRV_VIDEO_START(madalien)
 	MDRV_VIDEO_UPDATE(madalien)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG(mc6845_intf)
+	MDRV_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK / 8, mc6845_intf)
 MACHINE_DRIVER_END

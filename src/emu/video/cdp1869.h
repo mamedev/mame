@@ -80,6 +80,17 @@
 
 #define CDP1869_VIDEO		DEVICE_GET_INFO_NAME(cdp1869_video)
 
+#define MDRV_CDP1869_ADD(_tag, _screen, _pixclock, _chrclock, _cpu, _config) \
+	MDRV_DEVICE_ADD(_tag, CDP1869_VIDEO, _pixclock) \
+	MDRV_DEVICE_CONFIG_DATA32(cdp1869_inline, color_clock, _chrclock) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cdp1869_inline, screen_tag, _screen) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cdp1869_inline, cpu_tag, _cpu) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_CDP1869_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, CDP1869_VIDEO)
+
+
 typedef UINT8 (*cdp1869_char_ram_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
 #define CDP1869_CHAR_RAM_READ(name) UINT8 name(const device_config *device, UINT16 pma, UINT8 cma)
 
@@ -104,15 +115,20 @@ enum _cdp1869_format {
 	CDP1869_PAL
 };
 
+typedef struct _cdp1869_inline cdp1869_inline;
+struct _cdp1869_inline
+{
+	const char *screen_tag;		/* screen we are acting on */
+	const char *cpu_tag;		/* CPU we work together with */
+
+	/* pixel clock of the chip is the device clock */
+	int color_clock;			/* the chroma clock of the chip */
+};
+
 /* interface */
 typedef struct _cdp1869_interface cdp1869_interface;
 struct _cdp1869_interface
 {
-	const char *screen_tag;		/* screen we are acting on */
-	const char *cpu_tag;		/* CPU we work together with */
-	int pixel_clock;			/* the dot clock of the chip */
-	int color_clock;			/* the chroma clock of the chip */
-
 	cdp1869_format pal_ntsc;	/* screen format */
 
 	/* page memory read function */

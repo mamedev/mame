@@ -38,6 +38,14 @@ typedef void (*cdp1852_on_sr_changed_func) (const device_config *device, int lev
 
 #define CDP1852		DEVICE_GET_INFO_NAME(cdp1852)
 
+#define MDRV_CDP1852_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, CDP1852, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_CDP1852_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, CDP1852)
+
+
 typedef enum _cdp1852_mode cdp1852_mode;
 enum _cdp1852_mode {
 	CDP1852_MODE_INPUT = 0,
@@ -48,8 +56,6 @@ enum _cdp1852_mode {
 typedef struct _cdp1852_interface cdp1852_interface;
 struct _cdp1852_interface
 {
-	int clock;					/* the clock (pin 1) of the chip */
-
 	int mode;					/* operation mode */
 
 	/* this gets called for every external data read */

@@ -1151,7 +1151,7 @@ static MACHINE_DRIVER_START( midzeus2 )
 	/* sound hardware */
 	MDRV_IMPORT_FROM(dcs2_audio_2104)
 
-	MDRV_DEVICE_ADD( "m48t35", M48T35 )
+	MDRV_M48T35_ADD( "m48t35" )
 MACHINE_DRIVER_END
 
 

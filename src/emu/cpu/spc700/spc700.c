@@ -1599,7 +1599,7 @@ CPU_GET_INFO( spc700 )
 	spc700i_cpu *cpustate = (device != NULL) ? device->token : NULL;
 	uint p = 0;
 
-	if (device != NULL)
+	if (cpustate != NULL)
 	{
 		p = ((cpustate->flag_n & 0x80)			|
 					((cpustate->flag_v & 0x80) >> 1)	|

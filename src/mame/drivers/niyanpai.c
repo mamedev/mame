@@ -174,8 +174,6 @@ static void ctc0_interrupt(const device_config *device, int state)
 
 static z80ctc_interface ctc_intf =
 {
-	"audio",			/* clock from the audio CPU */
-	0,					/* clock */
 	0,					/* timer disables */
 	ctc0_interrupt,		/* interrupt handler */
 	z80ctc_trg3_w,		/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
@@ -861,7 +859,7 @@ static MACHINE_DRIVER_START( niyanpai )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
-	MDRV_Z80CTC_ADD("ctc", ctc_intf)
+	MDRV_Z80CTC_ADD("ctc", 8000000/1 /* same as "audio" */, ctc_intf)
 
 	MDRV_MACHINE_RESET(niyanpai)
 	MDRV_NVRAM_HANDLER(generic_0fill)

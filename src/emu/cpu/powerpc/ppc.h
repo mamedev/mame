@@ -114,9 +114,7 @@ enum
 
 	CPUINFO_PTR_PPC_FASTRAM_BASE = CPUINFO_PTR_CPU_SPECIFIC,
 
-	CPUINFO_PTR_SPU_TX_HANDLER,
-
-	CPUINFO_PTR_CONTEXT			/* temporary */
+	CPUINFO_FCT_SPU_TX_HANDLER = CPUINFO_FCT_CPU_SPECIFIC
 };
 
 
@@ -203,7 +201,7 @@ CPU_GET_INFO( mpc8240 );
 
 INLINE void ppc4xx_spu_set_tx_handler(const device_config *cpu, ppc4xx_spu_tx_handler handler)
 {
-	device_set_info_fct(cpu, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)handler);
+	device_set_info_fct(cpu, CPUINFO_FCT_SPU_TX_HANDLER, (genf *)handler);
 }
 
 

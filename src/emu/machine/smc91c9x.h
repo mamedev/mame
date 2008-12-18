@@ -30,11 +30,11 @@ struct _smc91c9x_config
 ***************************************************************************/
 
 #define MDRV_SMC91C94_ADD(_tag, _callback) \
-	MDRV_DEVICE_ADD(_tag, SMC91C94) \
+	MDRV_DEVICE_ADD(_tag, SMC91C94, 0) \
 	MDRV_DEVICE_CONFIG_DATAPTR(smc91c9x_config, interrupt, _callback)
 
 #define MDRV_SMC91C96_ADD(_tag, _callback) \
-	MDRV_DEVICE_ADD(_tag, SMC91C96) \
+	MDRV_DEVICE_ADD(_tag, SMC91C96, 0) \
 	MDRV_DEVICE_CONFIG_DATAPTR(smc91c9x_config, interrupt, _callback)
 
 #define MDRV_SMC91C94_REMOVE(_tag) \

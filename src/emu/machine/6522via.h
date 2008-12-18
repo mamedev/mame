@@ -22,8 +22,7 @@
 #define VIA6522		DEVICE_GET_INFO_NAME(via6522)
 
 #define MDRV_VIA6522_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, VIA6522) \
-	MDRV_DEVICE_CONFIG_DATA32(via6522_inline_config, clck, _clock) \
+	MDRV_DEVICE_ADD(_tag, VIA6522, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_VIA6522_REMOVE(_tag) \
@@ -67,12 +66,6 @@ struct _via6522_interface
 	write8_device_func out_ca2_func;
 	write8_device_func out_cb2_func;
 	void (*irq_func)(const device_config *device, int state);
-};
-
-typedef struct _via6522_inline_config via6522_inline_config;
-struct _via6522_inline_config
-{
-	int clck;
 };
 
 

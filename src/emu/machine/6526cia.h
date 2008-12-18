@@ -19,6 +19,21 @@
 #define CIA6526R2		DEVICE_GET_INFO_NAME(cia6526r1)
 #define CIA8520			DEVICE_GET_INFO_NAME(cia8520)
 
+#define MDRV_CIA6526_ADD(_tag, _variant, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, _variant, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_CIA6526_REMOVE(_tag, _variant) \
+	MDRV_DEVICE_REMOVE(_tag, _variant)
+
+#define MDRV_CIA8520_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, CIA8520, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_CIA8520_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, CIA8520)
+
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -28,7 +43,6 @@ typedef struct _cia6526_interface cia6526_interface;
 struct _cia6526_interface
 {
 	void (*irq_func)(const device_config *device, int state);
-	int clock;
 	int tod_clock;
 
 	struct

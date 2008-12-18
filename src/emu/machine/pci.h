@@ -40,7 +40,7 @@ struct _pci_bus_config
 ***************************************************************************/
 
 #define MDRV_PCI_BUS_ADD(_tag, _busnum) \
-	MDRV_DEVICE_ADD(_tag, PCI_BUS) \
+	MDRV_DEVICE_ADD(_tag, PCI_BUS, 0) \
 	MDRV_DEVICE_CONFIG_DATA32(pci_bus_config, busnum, _busnum)
 
 #define MDRV_PCI_BUS_DEVICE(_devnum, _devtype, _devtag, _configread, _configwrite) \

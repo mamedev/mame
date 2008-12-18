@@ -36,7 +36,9 @@ enum
 
 	MCONFIG_TOKEN_DEVICE_ADD,
 	MCONFIG_TOKEN_DEVICE_REMOVE,
+	MCONFIG_TOKEN_DEVICE_REPLACE,
 	MCONFIG_TOKEN_DEVICE_MODIFY,
+	MCONFIG_TOKEN_DEVICE_CLOCK,
 	MCONFIG_TOKEN_DEVICE_CONFIG,
 	MCONFIG_TOKEN_DEVICE_CONFIG_DATA32,
 	MCONFIG_TOKEN_DEVICE_CONFIG_DATA64,
@@ -194,8 +196,8 @@ union _machine_config_token
 
 
 /* add/remove/config devices */
-#define MDRV_DEVICE_ADD(_tag, _type) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_ADD, 8), \
+#define MDRV_DEVICE_ADD(_tag, _type, _clock) \
+	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_ADD, 8, _clock, 32), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
@@ -212,6 +214,9 @@ union _machine_config_token
 #define MDRV_DEVICE_CONFIG(_config) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
 	TOKEN_PTR(voidptr, &(_config)),
+
+#define MDRV_DEVICE_CLOCK(_clock) \
+	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_CLOCK, 8, _clock, 32),
 
 #define structsizeof(_struct, _field) sizeof(((_struct *)NULL)->_field)
 
@@ -335,7 +340,7 @@ union _machine_config_token
 
 /* add/remove speakers */
 #define MDRV_SPEAKER_ADD(_tag, _x, _y, _z) \
-	MDRV_DEVICE_ADD(_tag, SPEAKER_OUTPUT) \
+	MDRV_DEVICE_ADD(_tag, SPEAKER_OUTPUT, 0) \
 	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, x, _x, 24) \
 	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, y, _y, 24) \
 	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, z, _z, 24)

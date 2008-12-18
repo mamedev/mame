@@ -40,8 +40,6 @@ const z80pio_interface senjyo_pio_intf =
 /* z80 ctc */
 const z80ctc_interface senjyo_ctc_intf =
 {
-	"sub",		 	/* clock from sub CPU */
-	0,               /* clock (filled in from the CPU 0 clock */
 	NOTIMER_2,       /* timer disables */
 	daisy_interrupt, /* interrupt handler */
 	z80ctc_trg1_w, 	 /* ZC/TO0 callback */

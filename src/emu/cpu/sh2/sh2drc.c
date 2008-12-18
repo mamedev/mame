@@ -3401,7 +3401,7 @@ static CPU_SET_INFO( sh2 )
 
 CPU_GET_INFO( sh2 )
 {
-	SH2 *sh2 = (device != NULL) ? *(SH2 **)device->token : NULL;
+	SH2 *sh2 = (device != NULL && device->token != NULL) ? *(SH2 **)device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

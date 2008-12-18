@@ -8231,7 +8231,7 @@ static MACHINE_DRIVER_START( inttoote )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 

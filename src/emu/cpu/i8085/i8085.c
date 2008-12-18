@@ -1640,10 +1640,10 @@ static CPU_SET_INFO( i8085 )
 		case CPUINFO_INT_I8085_SID:						if (info->i) cpustate->IM |= IM_SID; else cpustate->IM &= ~IM_SID; break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_I8085_SOD_CALLBACK:			cpustate->sod_callback = (i8085_sod_func)info->f; break;
-		case CPUINFO_PTR_I8085_SID_CALLBACK:			cpustate->sid_callback = (i8085_sid_func)info->f; break;
-		case CPUINFO_PTR_I8085_INTE_CALLBACK:			cpustate->inte_callback = (i8085_inte_func)info->f; break;
-		case CPUINFO_PTR_I8085_STATUS_CALLBACK:			cpustate->status_callback = (i8085_status_func)info->f; break;
+		case CPUINFO_FCT_I8085_SOD_CALLBACK:			cpustate->sod_callback = (i8085_sod_func)info->f; break;
+		case CPUINFO_FCT_I8085_SID_CALLBACK:			cpustate->sid_callback = (i8085_sid_func)info->f; break;
+		case CPUINFO_FCT_I8085_INTE_CALLBACK:			cpustate->inte_callback = (i8085_inte_func)info->f; break;
+		case CPUINFO_FCT_I8085_STATUS_CALLBACK:			cpustate->status_callback = (i8085_status_func)info->f; break;
 	}
 }
 

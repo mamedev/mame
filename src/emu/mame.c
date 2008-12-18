@@ -1415,7 +1415,7 @@ static running_machine *create_machine(const game_driver *driver)
 		machine->cpu[cpunum] = machine->cpu[cpunum - 1]->typenext;
 	machine->primary_screen = video_screen_first(machine->config);
 
-	/* attach this machine to tall the devices in the configuration */
+	/* attach this machine to all the devices in the configuration */
 	device_list_attach_machine(machine);
 
 	/* fetch core options */
@@ -1521,15 +1521,15 @@ static void init_machine(running_machine *machine)
 	mess_predevice_init(machine);
 #endif /* MESS */
 
+	/* start up the devices */
+	device_list_start(machine);
+
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */
 	/* so this location in the init order is important */
 	ui_set_startup_text(machine, "Initializing...", TRUE);
 	if (machine->gamedrv->driver_init != NULL)
 		(*machine->gamedrv->driver_init)(machine);
-
-	/* start up the devices */
-	device_list_start(machine);
 
 #ifdef MESS
 	/* second MESS initialization */

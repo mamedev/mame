@@ -12,13 +12,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _riot6532_config riot6532_config;
-struct _riot6532_config
-{
-	UINT32					clock;
-};
-
-
 typedef UINT8 (*riot_read_func)(const device_config *device, UINT8 olddata);
 typedef void (*riot_write_func)(const device_config *device, UINT8 newdata, UINT8 olddata);
 typedef void (*riot_irq_func)(const device_config *device, int state);
@@ -41,8 +34,7 @@ struct _riot6532_interface
 ***************************************************************************/
 
 #define MDRV_RIOT6532_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, RIOT6532) \
-	MDRV_DEVICE_CONFIG_DATA32(riot6532_config, clock, _clock) \
+	MDRV_DEVICE_ADD(_tag, RIOT6532, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_RIOT6532_REMOVE(_tag) \

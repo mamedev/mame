@@ -47,7 +47,7 @@ struct dma8237_interface
 ***************************************************************************/
 
 #define MDRV_DMA8237_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, DMA8237) \
+	MDRV_DEVICE_ADD(_tag, DMA8237, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 

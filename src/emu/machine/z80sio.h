@@ -18,8 +18,6 @@
 typedef struct _z80sio_interface z80sio_interface;
 struct _z80sio_interface
 {
-	const char *cpu;						/* CPU whose clock we use for our base */
-	int baseclock;
 	void (*irq_cb)(const device_config *device, int state);
 	write8_device_func dtr_changed_cb;
 	write8_device_func rts_changed_cb;
@@ -34,8 +32,8 @@ struct _z80sio_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_Z80SIO_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, Z80SIO) \
+#define MDRV_Z80SIO_ADD(_tag, _clock, _intrf) \
+	MDRV_DEVICE_ADD(_tag, Z80SIO, _clock) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_Z80SIO_REMOVE(_tag) \

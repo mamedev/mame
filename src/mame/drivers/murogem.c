@@ -213,7 +213,7 @@ static MACHINE_DRIVER_START( murogem )
 	MDRV_PALETTE_INIT(murogem)
 	MDRV_VIDEO_UPDATE(murogem)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 MACHINE_DRIVER_END
 
 

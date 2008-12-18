@@ -6527,7 +6527,7 @@ static MACHINE_DRIVER_START( ddenlovr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ddenlvrj )
@@ -6644,7 +6644,7 @@ static MACHINE_DRIVER_START( quizchq )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( rongrong )
@@ -6725,7 +6725,7 @@ static MACHINE_DRIVER_START( mmpanic )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 
@@ -6789,7 +6789,7 @@ static MACHINE_DRIVER_START( hanakanz )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hkagerou )

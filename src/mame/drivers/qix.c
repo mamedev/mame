@@ -604,7 +604,8 @@ static MACHINE_DRIVER_START( slither )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(qix)
 
-	MDRV_CPU_REPLACE("main", M6809, SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
 
 	MDRV_MACHINE_START(slither)
 

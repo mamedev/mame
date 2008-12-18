@@ -381,6 +381,7 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 		gfxdata	= base_gfx + 64 * code;
 
 		/* prepare GfxElement on the fly */
+		gfx.machine = machine;
 		gfx.width = width;
 		gfx.height = height;
 		gfx.total_elements = 1;

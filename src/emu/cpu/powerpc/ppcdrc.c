@@ -795,7 +795,7 @@ static CPU_SET_INFO( ppcdrc )
 
 static CPU_GET_INFO( ppcdrc )
 {
-	powerpc_state *ppc = (device != NULL) ? *(powerpc_state **)device->token : NULL;
+	powerpc_state *ppc = (device != NULL && device->token != NULL) ? *(powerpc_state **)device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -810,7 +810,6 @@ static CPU_GET_INFO( ppcdrc )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppcdrc);		break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppcdrc);break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(ppcdrc);	break;
-		case CPUINFO_PTR_CONTEXT:						info->p = ppc;									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
@@ -4199,7 +4198,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 
 static CPU_GET_INFO( ppcdrc4xx )
 {
-	powerpc_state *ppc = (device != NULL) ? *(powerpc_state **)device->token : NULL;
+	powerpc_state *ppc = (device != NULL && device->token != NULL) ? *(powerpc_state **)device->token : NULL;
 	CPU_GET_INFO_CALL(ppcdrc);
 	ppc4xx_get_info(ppc, state, info);
 }

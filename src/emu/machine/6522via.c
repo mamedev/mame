@@ -80,8 +80,6 @@ struct _via6522_t
 
 	emu_timer *shift_timer;
 	UINT8 shift_counter;
-
-	int clock;
 };
 
 
@@ -184,25 +182,15 @@ INLINE const via6522_interface *get_interface(const device_config *device)
 }
 
 
-INLINE const via6522_inline_config *get_inline_config(const device_config *device)
-{
-	assert(device != NULL);
-	assert((device->type == VIA6522));
-	return (const via6522_inline_config *) device->inline_config;
-}
-
-
 INLINE attotime v_cycles_to_time(const device_config *device, int c)
 {
-	via6522_t *v = get_token(device);
-	return attotime_mul(ATTOTIME_IN_HZ(v->clock), c);
+	return attotime_mul(ATTOTIME_IN_HZ(device->clock), c);
 }
 
 
 INLINE UINT32 v_time_to_cycles(const device_config *device, attotime t)
 {
-	via6522_t *v = get_token(device);
-	return attotime_to_double(attotime_mul(t, v->clock));
+	return attotime_to_double(attotime_mul(t, device->clock));
 }
 
 
@@ -231,7 +219,6 @@ INLINE UINT16 v_get_counter1_value(const device_config *device)
 static DEVICE_START( via6522 )
 {
 	via6522_t *v = get_token(device);
-	const via6522_inline_config *inline_config = get_inline_config(device);
 
 	memset(v, 0, sizeof(*v));
 	v->t1ll = 0xf3; /* via at 0x9110 in vic20 show these values */
@@ -244,9 +231,9 @@ static DEVICE_START( via6522 )
 	v->shift_timer = timer_alloc(device->machine, via_shift_callback, (void *) device);
 
 	/* Default clock is from CPU1 */
-	v->clock = (inline_config != NULL) && (inline_config->clck != 0)
-		? inline_config->clck
-		: cpu_get_clock(device->machine->cpu[0]);
+	if (device->clock == 0)
+		device_set_clock(device, device->machine->cpu[0]->clock);
+
 	return DEVICE_START_OK;
 }
 
@@ -1222,7 +1209,7 @@ DEVICE_GET_INFO(via6522)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(via6522_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(via6522_inline_config);	break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

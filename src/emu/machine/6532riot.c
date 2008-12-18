@@ -49,6 +49,7 @@ struct _riot6532_port
 typedef struct _riot6532_state riot6532_state;
 struct _riot6532_state
 {
+	const device_config *device;
 	const riot6532_interface *intf;
 	int				index;
 
@@ -63,8 +64,6 @@ struct _riot6532_state
 	UINT8			timershift;
 	UINT8			timerstate;
 	emu_timer *		timer;
-
-	UINT32			clock;
 };
 
 
@@ -147,11 +146,11 @@ INLINE UINT8 get_timer(riot6532_state *riot)
 
 	/* if counting, return the number of ticks remaining */
 	else if (riot->timerstate == TIMER_COUNTING)
-		return attotime_to_ticks(timer_timeleft(riot->timer), riot->clock) >> riot->timershift;
+		return attotime_to_ticks(timer_timeleft(riot->timer), riot->device->clock) >> riot->timershift;
 
 	/* if finishing, return the number of ticks without the shift */
 	else
-		return attotime_to_ticks(timer_timeleft(riot->timer), riot->clock);
+		return attotime_to_ticks(timer_timeleft(riot->timer), riot->device->clock);
 }
 
 
@@ -176,7 +175,7 @@ static TIMER_CALLBACK( timer_end_callback )
 	if (riot->timerstate == TIMER_COUNTING)
 	{
 		riot->timerstate = TIMER_FINISHING;
-		timer_adjust_oneshot(riot->timer, ticks_to_attotime(256, riot->clock), 0);
+		timer_adjust_oneshot(riot->timer, ticks_to_attotime(256, device->clock), 0);
 
 		/* signal timer IRQ as well */
 		riot->irqstate |= TIMER_FLAG;
@@ -228,8 +227,8 @@ WRITE8_DEVICE_HANDLER( riot6532_w )
 
 		/* update the timer */
 		riot->timerstate = TIMER_COUNTING;
-		target = attotime_to_ticks(curtime, riot->clock) + 1 + (data << riot->timershift);
-		timer_adjust_oneshot(riot->timer, attotime_sub(ticks_to_attotime(target, riot->clock), curtime), 0);
+		target = attotime_to_ticks(curtime, device->clock) + 1 + (data << riot->timershift);
+		timer_adjust_oneshot(riot->timer, attotime_sub(ticks_to_attotime(target, device->clock), curtime), 0);
 	}
 
 	/* if A4 == 0 and A2 == 1, we are writing to the edge detect control */
@@ -426,7 +425,6 @@ UINT8 riot6532_portb_out_get(const device_config *device)
 
 static DEVICE_START( riot6532 )
 {
-	const riot6532_config *config = device->inline_config;
 	riot6532_state *riot = get_safe_token(device);
 
 	/* validate arguments */
@@ -435,9 +433,9 @@ static DEVICE_START( riot6532 )
 	assert(strlen(device->tag) < 20);
 
 	/* set static values */
+	riot->device = device;
 	riot->intf = device->static_config;
 	riot->index = device_list_index(device->machine->config->devicelist, RIOT6532, device->tag);
-	riot->clock = config->clock;
 
 	/* configure the ports */
 	riot->port[0].in_func = riot->intf->in_a_func;
@@ -510,7 +508,7 @@ DEVICE_GET_INFO( riot6532 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(riot6532_state);		break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(riot6532_config);		break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

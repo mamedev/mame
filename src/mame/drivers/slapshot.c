@@ -565,7 +565,7 @@ static MACHINE_DRIVER_START( slapshot )
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 
-	MDRV_DEVICE_ADD( "mk48t08", MK48T08 )
+	MDRV_MK48T08_ADD( "mk48t08" )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( opwolf3 )
@@ -605,7 +605,7 @@ static MACHINE_DRIVER_START( opwolf3 )
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 
-	MDRV_DEVICE_ADD( "mk48t08", MK48T08 )
+	MDRV_MK48T08_ADD( "mk48t08" )
 MACHINE_DRIVER_END
 
 /***************************************************************************

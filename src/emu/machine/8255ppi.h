@@ -33,7 +33,7 @@ struct _ppi8255_interface
 ***************************************************************************/
 
 #define MDRV_PPI8255_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PPI8255) \
+	MDRV_DEVICE_ADD(_tag, PPI8255, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_PPI8255_RECONFIG(_tag, _intrf) \

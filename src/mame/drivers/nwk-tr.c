@@ -1091,11 +1091,6 @@ static MACHINE_RESET( nwktr )
 	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static const timekeeper_config timekeeper_intf =
-{
-	"m48t58"
-};
-
 static MACHINE_DRIVER_START( nwktr )
 
 	/* basic machine hardware */
@@ -1138,8 +1133,7 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_DEVICE_ADD( "m48t58", M48T58 )
-	MDRV_DEVICE_CONFIG( timekeeper_intf )
+	MDRV_M48T58_ADD( "m48t58" )
 MACHINE_DRIVER_END
 
 /*****************************************************************************/
@@ -1163,8 +1157,8 @@ static DRIVER_INIT(nwktr)
 	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
 
-//  device_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
-//  device_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
+//  device_set_info_fct(machine->cpu[0], CPUINFO_FCT_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
+//  device_set_info_fct(machine->cpu[0], CPUINFO_FCT_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
 
 	adc1213x_init(0, adc12138_input_callback);
 	lanc2_init();

@@ -1044,11 +1044,6 @@ static NVRAM_HANDLER( hornet )
 	NVRAM_HANDLER_CALL(93C46);
 }
 
-static const timekeeper_config timekeeper_intf =
-{
-	"m48t58"
-};
-
 static MACHINE_DRIVER_START( hornet )
 
 	/* basic machine hardware */
@@ -1092,8 +1087,7 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_DEVICE_ADD( "m48t58", M48T58 )
-	MDRV_DEVICE_CONFIG( timekeeper_intf )
+	MDRV_M48T58_ADD( "m48t58" )
 MACHINE_DRIVER_END
 
 static MACHINE_RESET( hornet_2board )

@@ -1509,8 +1509,6 @@ static void ctc_interrupt(const device_config *device, int state)
 
 static z80ctc_interface demon_z80ctc_interface =
 {
-	"audio",		 /* clocked from the audio CPU */
-	0,               /* clock (filled in from the CPU clock) */
 	0,               /* timer disables */
 	ctc_interrupt,   /* interrupt handler */
 	0,               /* ZC/TO0 callback */
@@ -1571,7 +1569,7 @@ MACHINE_DRIVER_START( demon_sound )
 	MDRV_CPU_PROGRAM_MAP(demon_sound_map,0)
 	MDRV_CPU_IO_MAP(demon_sound_ports,0)
 
-	MDRV_Z80CTC_ADD("ctc", demon_z80ctc_interface)
+	MDRV_Z80CTC_ADD("ctc", 3579545 /* same as "audio" */, demon_z80ctc_interface)
 
 	MDRV_MACHINE_RESET(demon_sound)
 

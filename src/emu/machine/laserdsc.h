@@ -93,7 +93,7 @@ struct _laserdisc_config
 ***************************************************************************/
 
 #define MDRV_LASERDISC_ADD(_tag, _type, _screen, _sound) \
-	MDRV_DEVICE_ADD(_tag, LASERDISC) \
+	MDRV_DEVICE_ADD(_tag, LASERDISC, 0) \
 	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type) \
 	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, screen, _screen) \
 	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, sound, _sound) \

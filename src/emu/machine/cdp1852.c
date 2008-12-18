@@ -93,7 +93,7 @@ READ8_DEVICE_HANDLER( cdp1852_data_r )
 {
 	cdp1852_t *cdp1852 = get_safe_token(device);
 
-	if (cdp1852->intf->mode == CDP1852_MODE_INPUT && cdp1852->intf->clock == 0)
+	if (cdp1852->intf->mode == CDP1852_MODE_INPUT && device->clock == 0)
 	{
 		// input data into register
 		cdp1852->data = cdp1852->intf->data_r(device);
@@ -135,15 +135,15 @@ static DEVICE_START( cdp1852 )
 	}
 	else
 	{
-		assert(cdp1852->intf->clock > 0);
+		assert(device->clock > 0);
 		assert(cdp1852->intf->data_w != NULL);
 	}
 
 	/* create the timers */
-	if (cdp1852->intf->clock > 0)
+	if (device->clock > 0)
 	{
 		cdp1852->scan_timer = timer_alloc(device->machine, cdp1852_scan_tick, (void *)device);
-		timer_adjust_periodic(cdp1852->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cdp1852->intf->clock));
+		timer_adjust_periodic(cdp1852->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
 	}
 
 	/* register for state saving */

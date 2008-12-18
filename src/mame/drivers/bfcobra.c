@@ -1740,12 +1740,9 @@ static MACHINE_DRIVER_START( bfcobra )
 	MDRV_VIDEO_UPDATE(bfcobra)
 
 	/* ACIAs */
-	MDRV_DEVICE_ADD("acia6850_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(z80_acia_if)
-	MDRV_DEVICE_ADD("acia6850_1", ACIA6850)
-	MDRV_DEVICE_CONFIG(m6809_acia_if)
-	MDRV_DEVICE_ADD("acia6850_2", ACIA6850)
-	MDRV_DEVICE_CONFIG(data_acia_if)
+	MDRV_ACIA6850_ADD("acia6850_0", z80_acia_if)
+	MDRV_ACIA6850_ADD("acia6850_1", m6809_acia_if)
+	MDRV_ACIA6850_ADD("acia6850_2", data_acia_if)
 MACHINE_DRIVER_END
 
 /***************************************************************************

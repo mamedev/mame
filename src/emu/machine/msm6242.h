@@ -15,6 +15,12 @@
 
 #define MSM6242		DEVICE_GET_INFO_NAME(msm6242)
 
+#define MDRV_MSM6242_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, MSM6242, 0)
+
+#define MDRV_MSM6242_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, MSM6242)
+
 
 /* device interface */
 DEVICE_GET_INFO( msm6242 );

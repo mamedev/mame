@@ -25,6 +25,13 @@
 #define ACIA6850_STATUS_PE		0x40
 #define ACIA6850_STATUS_IRQ		0x80
 
+#define MDRV_ACIA6850_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, ACIA6850, 0) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_ACIA6850_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, ACIA6850)
+
 
 
 /***************************************************************************

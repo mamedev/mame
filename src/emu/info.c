@@ -579,7 +579,7 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 		fprintf(out, " type=\"cpu\"");
 		fprintf(out, " tag=\"%s\"", xml_normalize_string(device->tag));
 		fprintf(out, " name=\"%s\"", xml_normalize_string(device_get_name(device)));
-		fprintf(out, " clock=\"%d\"", ((const cpu_config *)device->inline_config)->clock);
+		fprintf(out, " clock=\"%d\"", device->clock);
 		fprintf(out, "/>\n");
 	}
 

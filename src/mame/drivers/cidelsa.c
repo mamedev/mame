@@ -246,7 +246,6 @@ static CDP1852_DATA_WRITE( draco_out1_w )
 
 static CDP1852_INTERFACE( cidelsa_cdp1852_in0_intf )
 {
-	CDP1852_CLOCK_HIGH, // really tied to CDP1876 CMSEL (pin 32)
 	CDP1852_MODE_INPUT,
 	cidelsa_in0_r,
 	NULL,
@@ -255,7 +254,6 @@ static CDP1852_INTERFACE( cidelsa_cdp1852_in0_intf )
 
 static CDP1852_INTERFACE( cidelsa_cdp1852_in1_intf )
 {
-	CDP1852_CLOCK_HIGH,
 	CDP1852_MODE_INPUT,
 	cidelsa_in1_r,
 	NULL,
@@ -264,7 +262,6 @@ static CDP1852_INTERFACE( cidelsa_cdp1852_in1_intf )
 
 static CDP1852_INTERFACE( cidelsa_cdp1852_in2_intf )
 {
-	CDP1852_CLOCK_HIGH,
 	CDP1852_MODE_INPUT,
 	cidelsa_in2_r,
 	NULL,
@@ -273,7 +270,6 @@ static CDP1852_INTERFACE( cidelsa_cdp1852_in2_intf )
 
 static CDP1852_INTERFACE( altair_cdp1852_out1_intf )
 {
-	ALTAIR_CHR1 / 8, // CDP1802 TPB
 	CDP1852_MODE_OUTPUT,
 	NULL,
 	altair_out1_w,
@@ -282,7 +278,6 @@ static CDP1852_INTERFACE( altair_cdp1852_out1_intf )
 
 static CDP1852_INTERFACE( draco_cdp1852_out1_intf )
 {
-	DRACO_CHR1 / 8, // CDP1802 TPB
 	CDP1852_MODE_OUTPUT,
 	NULL,
 	draco_out1_w,
@@ -651,17 +646,10 @@ static MACHINE_DRIVER_START( altair )
 
 	// input/output hardware
 
-	MDRV_DEVICE_ADD("ic23", CDP1852)
-	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in0_intf)
-
-	MDRV_DEVICE_ADD("ic24", CDP1852)
-	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in1_intf)
-
-	MDRV_DEVICE_ADD("ic25", CDP1852)
-	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in2_intf)
-
-	MDRV_DEVICE_ADD("ic26", CDP1852)
-	MDRV_DEVICE_CONFIG(altair_cdp1852_out1_intf)
+	MDRV_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1876 CMSEL (pin 32) */
+	MDRV_CDP1852_ADD("ic24", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
+	MDRV_CDP1852_ADD("ic25", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
+	MDRV_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
 
 	// video hardware
 
@@ -696,17 +684,10 @@ static MACHINE_DRIVER_START( draco )
 
 	// input/output hardware
 
-	MDRV_DEVICE_ADD("ic29", CDP1852)
-	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in0_intf)
-
-	MDRV_DEVICE_ADD("ic30", CDP1852)
-	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in1_intf)
-
-	MDRV_DEVICE_ADD("ic31", CDP1852)
-	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in2_intf)
-
-	MDRV_DEVICE_ADD("ic32", CDP1852)
-	MDRV_DEVICE_CONFIG(draco_cdp1852_out1_intf)
+	MDRV_CDP1852_ADD("ic29", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1876 CMSEL (pin 32) */
+	MDRV_CDP1852_ADD("ic30", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
+	MDRV_CDP1852_ADD("ic31", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
+	MDRV_CDP1852_ADD("ic32", DRACO_CHR1 / 8, draco_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
 
 	// video hardware
 

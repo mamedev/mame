@@ -28,7 +28,7 @@ struct pic8259_interface {
 ***************************************************************************/
 
 #define MDRV_PIC8259_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PIC8259) \
+	MDRV_DEVICE_ADD(_tag, PIC8259, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 

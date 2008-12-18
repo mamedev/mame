@@ -987,14 +987,14 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	/* loop over all CPUs */
 	for (device = machine->cpu[0]; device != NULL; device = scandevice)
 	{
-		int clock = ((const cpu_config *)device->inline_config)->clock;
-
 		/* count how many identical CPUs we have */
 		count = 1;
-		for (scandevice = device->typenext; scandevice != NULL; scandevice = device->typenext)
-			if (cpu_get_type(device) != cpu_get_type(scandevice) ||
-				clock != ((const cpu_config *)scandevice->inline_config)->clock)
+		for (scandevice = device->typenext; scandevice != NULL; scandevice = scandevice->typenext)
+		{
+			if (cpu_get_type(device) != cpu_get_type(scandevice) || device->clock != scandevice->clock)
 				break;
+			count++;
+		}
 
 		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
@@ -1002,10 +1002,10 @@ astring *game_info_astring(running_machine *machine, astring *string)
 		astring_catc(string, cpu_get_name(device));
 
 		/* display clock in kHz or MHz */
-		if (clock >= 1000000)
-			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
+		if (device->clock >= 1000000)
+			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", device->clock / 1000000, device->clock % 1000000);
 		else
-			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
+			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", device->clock / 1000, device->clock % 1000);
 	}
 
 	/* loop over all sound chips */

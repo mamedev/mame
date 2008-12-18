@@ -352,7 +352,6 @@ static MACHINE_RESET(mquake)
 static const cia6526_interface cia_0_intf =
 {
 	amiga_cia_0_irq,									/* irq_func */
-	AMIGA_68000_NTSC_CLOCK / 10,						/* clock */
 	0,													/* tod_clock */
 	{
 		{ mquake_cia_0_porta_r, mquake_cia_0_porta_w },	/* port A */
@@ -363,7 +362,6 @@ static const cia6526_interface cia_0_intf =
 static const cia6526_interface cia_1_intf =
 {
 	amiga_cia_1_irq,									/* irq_func */
-	AMIGA_68000_NTSC_CLOCK / 10,						/* clock */
 	0,													/* tod_clock */
 	{
 		{ NULL, NULL },									/* port A */
@@ -414,10 +412,8 @@ static MACHINE_DRIVER_START( mquake )
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
 	/* cia */
-	MDRV_DEVICE_ADD("cia_0", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_0_intf)
-	MDRV_DEVICE_ADD("cia_1", CIA8520)
-	MDRV_DEVICE_CONFIG(cia_1_intf)
+	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
+	MDRV_CIA8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
 MACHINE_DRIVER_END
 
 

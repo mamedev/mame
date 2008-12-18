@@ -553,13 +553,14 @@ static MACHINE_DRIVER_START( liberate )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( liberatb )
+	MDRV_IMPORT_FROM(liberate)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 2000000)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_TYPE(M6502)
 	MDRV_CPU_PROGRAM_MAP(liberatb_readmem,liberatb_writemem)
 	MDRV_CPU_VBLANK_INT("main", deco16_interrupt)
 
-	MDRV_IMPORT_FROM(liberate)
 	MDRV_CPU_REMOVE("main")
 MACHINE_DRIVER_END
 
@@ -572,13 +573,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( prosoccr )
 
+	MDRV_IMPORT_FROM(liberate)
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", DECO16, 3000000)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CLOCK(3000000)
 	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
 	MDRV_CPU_IO_MAP(deco16_io_map,0)
-
-	MDRV_IMPORT_FROM(liberate)
-	MDRV_CPU_REMOVE("main")
 
 	MDRV_VIDEO_START(prosoccr)
 	MDRV_VIDEO_UPDATE(prosoccr)

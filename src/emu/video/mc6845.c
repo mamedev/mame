@@ -126,6 +126,9 @@ static void update_hsync_changed_timers(mc6845_t *mc6845);
 static void update_vsync_changed_timers(mc6845_t *mc6845);
 
 
+mc6845_interface mc6845_null_interface = { 0 };
+
+
 /* makes sure that the passed in device is the right type */
 INLINE mc6845_t *get_safe_token(const device_config *device)
 {
@@ -748,11 +751,11 @@ static device_start_err common_start(const device_config *device, int device_typ
 
 	if (mc6845->intf != NULL)
 	{
-		assert(mc6845->intf->clock > 0);
+		assert(device->clock > 0);
 		assert(mc6845->intf->hpixels_per_column > 0);
 
 		/* copy the initial parameters */
-		mc6845->clock = mc6845->intf->clock;
+		mc6845->clock = device->clock;
 		mc6845->hpixels_per_column = mc6845->intf->hpixels_per_column;
 
 		/* get the screen device */
@@ -870,7 +873,7 @@ static DEVICE_VALIDITY_CHECK( mc6845 )
 
 	if (intf != NULL)
 	{
-		if (intf->clock <= 0)
+		if (device->clock <= 0)
 		{
 			mame_printf_error("%s: %s has an mc6845 with an invalid clock\n", driver->source_file, driver->name);
 			error = TRUE;

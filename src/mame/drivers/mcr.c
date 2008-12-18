@@ -1517,7 +1517,7 @@ static MACHINE_DRIVER_START( mcr_90009 )
 	MDRV_CPU_IO_MAP(cpu_90009_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
-	MDRV_Z80CTC_ADD("ctc", mcr_ctc_intf)
+	MDRV_Z80CTC_ADD("ctc", MAIN_OSC_MCR_I/8 /* same as "main" */, mcr_ctc_intf)
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 	MDRV_MACHINE_START(mcr)
@@ -1579,9 +1579,13 @@ static MACHINE_DRIVER_START( mcr_91490 )
 	MDRV_IMPORT_FROM(mcr_90010)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", Z80, 5000000)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CLOCK(5000000)
 	MDRV_CPU_PROGRAM_MAP(cpu_91490_map,0)
 	MDRV_CPU_IO_MAP(cpu_91490_portmap,0)
+
+	MDRV_DEVICE_MODIFY("ctc", Z80CTC)
+	MDRV_DEVICE_CLOCK(5000000 /* same as "main" */)
 MACHINE_DRIVER_END
 
 
@@ -1607,10 +1611,10 @@ static MACHINE_DRIVER_START( mcr_91490_ipu )
 	MDRV_CPU_IO_MAP(ipu_91695_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(mcr_ipu_interrupt,2)
 
-	MDRV_Z80CTC_ADD("ipu_ctc", nflfoot_ctc_intf)
+	MDRV_Z80CTC_ADD("ipu_ctc", 7372800/2 /* same as "ipu" */, nflfoot_ctc_intf)
 	MDRV_Z80PIO_ADD("ipu_pio0", nflfoot_pio_intf)
 	MDRV_Z80PIO_ADD("ipu_pio1", nflfoot_pio_intf)
-	MDRV_Z80SIO_ADD("ipu_sio", nflfoot_sio_intf)
+	MDRV_Z80SIO_ADD("ipu_sio", 7372800/2 /* same as "ipu" */, nflfoot_sio_intf)
 MACHINE_DRIVER_END
 
 

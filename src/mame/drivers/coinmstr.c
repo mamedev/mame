@@ -649,7 +649,7 @@ static MACHINE_DRIVER_START( coinmstr )
 	MDRV_VIDEO_START(coinmstr)
 	MDRV_VIDEO_UPDATE(coinmstr)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

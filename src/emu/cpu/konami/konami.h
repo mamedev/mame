@@ -17,7 +17,7 @@ enum
 
 enum
 {
-	CPUINFO_PTR_KONAMI_SETLINES_CALLBACK = CPUINFO_PTR_CPU_SPECIFIC
+	CPUINFO_FCT_KONAMI_SETLINES_CALLBACK = CPUINFO_FCT_CPU_SPECIFIC
 };
 
 #define KONAMI_SETLINES_CALLBACK(name) void name(const device_config *device, int lines)
@@ -34,7 +34,7 @@ CPU_DISASSEMBLE( konami );
 
 INLINE void konami_configure_set_lines(const device_config *device, konami_set_lines_func func)
 {
-	device_set_info_fct(device, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)func);
+	device_set_info_fct(device, CPUINFO_FCT_KONAMI_SETLINES_CALLBACK, (genf *)func);
 }
 
 #endif /* __KONAMI_H__ */

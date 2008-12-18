@@ -590,11 +590,6 @@ static MACHINE_RESET(viper)
 	devtag_reset(machine, IDE_CONTROLLER, "ide");
 }
 
-static const timekeeper_config timekeeper_intf =
-{
-	"m48t58"
-};
-
 static MACHINE_DRIVER_START(viper)
 
 	/* basic machine hardware */
@@ -627,8 +622,7 @@ static MACHINE_DRIVER_START(viper)
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_DEVICE_ADD( "m48t58", M48T58 )
-	MDRV_DEVICE_CONFIG( timekeeper_intf )
+	MDRV_M48T58_ADD( "m48t58" )
 MACHINE_DRIVER_END
 
 /*****************************************************************************/

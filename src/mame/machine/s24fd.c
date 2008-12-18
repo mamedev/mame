@@ -132,8 +132,8 @@ void s24_fd1094_machine_init(void)
 	s24_fd1094_setstate_and_decrypt(FD1094_STATE_RESET);
 	s24_fd1094_kludge_reset_values();
 
-	device_set_info_fct(Machine->cpu[1], CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)s24_fd1094_cmp_callback);
-	device_set_info_fct(Machine->cpu[1], CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)s24_fd1094_rte_callback);
+	device_set_info_fct(Machine->cpu[1], CPUINFO_FCT_M68K_CMPILD_CALLBACK, (genf *)s24_fd1094_cmp_callback);
+	device_set_info_fct(Machine->cpu[1], CPUINFO_FCT_M68K_RTE_CALLBACK, (genf *)s24_fd1094_rte_callback);
 	cpu_set_irq_callback(Machine->cpu[1], s24_fd1094_int_callback);
 
 	device_reset(Machine->cpu[1]);

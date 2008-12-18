@@ -756,10 +756,10 @@ static CPU_SET_INFO( m68k )
 		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:	m68k->pref_addr = info->i;						break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M68K_RESET_CALLBACK:		m68k->reset_instr_callback = (m68k_reset_func)info->f; break;
-		case CPUINFO_PTR_M68K_CMPILD_CALLBACK:		m68k->cmpild_instr_callback = (m68k_cmpild_func)info->f; break;
-		case CPUINFO_PTR_M68K_RTE_CALLBACK:			m68k->rte_instr_callback = (m68k_rte_func)info->f; break;
-		case CPUINFO_PTR_M68K_TAS_CALLBACK:			m68k->tas_instr_callback = (m68k_tas_func)info->f; break;
+		case CPUINFO_FCT_M68K_RESET_CALLBACK:		m68k->reset_instr_callback = (m68k_reset_func)info->f; break;
+		case CPUINFO_FCT_M68K_CMPILD_CALLBACK:		m68k->cmpild_instr_callback = (m68k_cmpild_func)info->f; break;
+		case CPUINFO_FCT_M68K_RTE_CALLBACK:			m68k->rte_instr_callback = (m68k_rte_func)info->f; break;
+		case CPUINFO_FCT_M68K_TAS_CALLBACK:			m68k->tas_instr_callback = (m68k_tas_func)info->f; break;
 	}
 }
 

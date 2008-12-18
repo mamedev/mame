@@ -20,6 +20,15 @@
 #define SY6545_1 	DEVICE_GET_INFO_NAME(sy6545_1)
 
 
+#define MDRV_MC6845_ADD(_tag, _variant, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, _variant, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_MC6845_REMOVE(_tag, _variant) \
+	MDRV_DEVICE_REMOVE(_tag, _variant)
+
+
+
 /* callback definitions */
 typedef void * (*mc6845_begin_update_func)(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 #define MC6845_BEGIN_UPDATE(name)	void *name(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
@@ -51,7 +60,6 @@ typedef struct _mc6845_interface mc6845_interface;
 struct _mc6845_interface
 {
 	const char *screen_tag;		/* screen we are acting on */
-	int clock;					/* the clock (pin 21) of the chip */
 	int hpixels_per_column;		/* number of pixels per video memory address */
 
 	/* if specified, this gets called before any pixel update,
@@ -83,6 +91,8 @@ struct _mc6845_interface
 
 	mc6845_on_update_addr_changed_func	on_update_addr_changed;
 };
+
+extern mc6845_interface mc6845_null_interface;
 
 
 /* device interface */

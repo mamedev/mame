@@ -48,9 +48,9 @@ enum
 
 enum
 {
-	CPUINFO_PTR_ADSP2100_RX_HANDLER = CPUINFO_PTR_CPU_SPECIFIC,
-	CPUINFO_PTR_ADSP2100_TX_HANDLER,
-	CPUINFO_PTR_ADSP2100_TIMER_HANDLER
+	CPUINFO_FCT_ADSP2100_RX_HANDLER = CPUINFO_FCT_CPU_SPECIFIC,
+	CPUINFO_FCT_ADSP2100_TX_HANDLER,
+	CPUINFO_FCT_ADSP2100_TIMER_HANDLER
 };
 
 
@@ -172,17 +172,17 @@ extern UINT16 adsp2181_idma_data_r(const device_config *device);
 
 INLINE void adsp21xx_set_rx_handler(const device_config *device, adsp21xx_rx_func handler)
 {
-	device_set_info_fct(device, CPUINFO_PTR_ADSP2100_RX_HANDLER, (genf *)handler);
+	device_set_info_fct(device, CPUINFO_FCT_ADSP2100_RX_HANDLER, (genf *)handler);
 }
 
 INLINE void adsp21xx_set_tx_handler(const device_config *device, adsp21xx_tx_func handler)
 {
-	device_set_info_fct(device, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)handler);
+	device_set_info_fct(device, CPUINFO_FCT_ADSP2100_TX_HANDLER, (genf *)handler);
 }
 
 INLINE void adsp21xx_set_timer_handler(const device_config *device, adsp21xx_timer_func handler)
 {
-	device_set_info_fct(device, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)handler);
+	device_set_info_fct(device, CPUINFO_FCT_ADSP2100_TIMER_HANDLER, (genf *)handler);
 }
 
 

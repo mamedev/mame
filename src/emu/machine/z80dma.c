@@ -242,7 +242,7 @@ static void z80dma_update_status(const device_config *device)
 	{
 		z80dma->is_read = 1;
 		z80dma->cur_cycle = (PORTA_IS_SOURCE(z80dma) ? PORTA_CYCLE_LEN(z80dma) : PORTB_CYCLE_LEN(z80dma));
-		next = ATTOTIME_IN_HZ(z80dma->intf->clockhz);
+		next = ATTOTIME_IN_HZ(device->clock);
 		timer_adjust_periodic(z80dma->timer,
 			attotime_zero,
 			0,

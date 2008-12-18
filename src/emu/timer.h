@@ -104,18 +104,18 @@ typedef struct _emu_timer emu_timer;
 ***************************************************************************/
 
 #define MDRV_TIMER_ADD(_tag, _callback) \
-	MDRV_DEVICE_ADD(_tag, TIMER) \
+	MDRV_DEVICE_ADD(_tag, TIMER, 0) \
 	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_GENERIC) \
 	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback) \
 
 #define MDRV_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
-	MDRV_DEVICE_ADD(_tag, TIMER) \
+	MDRV_DEVICE_ADD(_tag, TIMER, 0) \
 	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_PERIODIC) \
 	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback) \
 	MDRV_DEVICE_CONFIG_DATA64(timer_config, period, UINT64_ATTOTIME_IN_##_period)
 
 #define MDRV_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
-	MDRV_DEVICE_ADD(_tag, TIMER) \
+	MDRV_DEVICE_ADD(_tag, TIMER, 0) \
 	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_SCANLINE) \
 	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback) \
 	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, screen, _screen) \

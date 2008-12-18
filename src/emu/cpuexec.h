@@ -58,7 +58,6 @@ struct _cpu_config
 {
 	cpu_type			type;						/* index for the CPU type */
 	UINT32				flags;						/* flags; see #defines below */
-	UINT32				clock;						/* in Hertz */
 	const addrmap_token *address_map[ADDRESS_SPACES]; /* 2 memory maps per address space */
 	const addrmap_token *address_map2[ADDRESS_SPACES]; /* 2 memory maps per address space */
 	cpu_interrupt_func 	vblank_interrupt;			/* for interrupts tied to VBLANK */
@@ -75,9 +74,8 @@ struct _cpu_config
 ***************************************************************************/
 
 #define MDRV_CPU_ADD(_tag, _type, _clock) \
-	MDRV_DEVICE_ADD(_tag, CPU) \
-	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, type, CPU_##_type) \
-	MDRV_DEVICE_CONFIG_DATA32(cpu_config, clock, _clock)
+	MDRV_DEVICE_ADD(_tag, CPU, _clock) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, type, CPU_##_type)
 
 #define MDRV_CPU_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, CPU)
@@ -85,11 +83,16 @@ struct _cpu_config
 #define MDRV_CPU_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag, CPU)
 
+#define MDRV_CPU_TYPE(_type) \
+	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, type, CPU_##_type)
+
+#define MDRV_CPU_CLOCK(_clock) \
+	MDRV_DEVICE_CLOCK(_clock)
+
 #define MDRV_CPU_REPLACE(_tag, _type, _clock) \
-	MDRV_DEVICE_REMOVE(_tag, CPU) \
-	MDRV_DEVICE_ADD(_tag, CPU) \
+	MDRV_DEVICE_MODIFY(_tag, CPU) \
 	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, type, CPU_##_type) \
-	MDRV_DEVICE_CONFIG_DATA32(cpu_config, clock, _clock)
+	MDRV_DEVICE_CLOCK(_clock)
 
 #define MDRV_CPU_FLAGS(_flags) \
 	MDRV_DEVICE_CONFIG_DATA32(cpu_config, flags, _flags)

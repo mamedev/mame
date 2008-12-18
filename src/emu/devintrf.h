@@ -81,6 +81,7 @@ enum
 		DEVINFO_FCT_START,								/* R/O: device_start_func */
 		DEVINFO_FCT_STOP,								/* R/O: device_stop_func */
 		DEVINFO_FCT_RESET,								/* R/O: device_reset_func */
+		DEVINFO_FCT_EXECUTE,							/* R/O: device_execute_func */
 		DEVINFO_FCT_VALIDITY_CHECK,						/* R/O: device_validity_check_func */
 		DEVINFO_FCT_NVRAM,								/* R/O: device_nvram_func */
 
@@ -127,6 +128,10 @@ enum
 #define DEVICE_RESET_NAME(name)		device_reset_##name
 #define DEVICE_RESET(name)			void DEVICE_RESET_NAME(name)(const device_config *device)
 #define DEVICE_RESET_CALL(name)		DEVICE_RESET_NAME(name)(device)
+
+#define DEVICE_EXECUTE_NAME(name)	device_execute_##name
+#define DEVICE_EXECUTE(name)		INT32 DEVICE_EXECUTE_NAME(name)(const device_config *device, INT32 clocks)
+#define DEVICE_EXECUTE_CALL(name)	DEVICE_EXECUTE_NAME(name)(device, clocks)
 
 #define DEVICE_NVRAM_NAME(name)		device_NVRAM_##name
 #define DEVICE_NVRAM(name)			void DEVICE_NVRAM_NAME(name)(const device_config *device, mame_file *file, int read_or_write)
@@ -191,6 +196,7 @@ typedef void (*device_get_info_func)(const device_config *device, UINT32 state, 
 typedef void (*device_set_info_func)(const device_config *device, UINT32 state, const deviceinfo *info);
 typedef device_start_err (*device_start_func)(const device_config *device);
 typedef void (*device_stop_func)(const device_config *device);
+typedef INT32 (*device_execute_func)(const device_config *device, INT32 clocks);
 typedef void (*device_reset_func)(const device_config *device);
 typedef void (*device_nvram_func)(const device_config *device, mame_file *file, int read_or_write);
 typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device);
@@ -212,6 +218,7 @@ union _deviceinfo
 	device_start_func		start;					/* DEVINFO_FCT_START */
 	device_stop_func		stop;					/* DEVINFO_FCT_STOP */
 	device_reset_func		reset;					/* DEVINFO_FCT_RESET */
+	device_execute_func 	execute;				/* DEVINFO_FCT_EXECUTE */
 	device_validity_check_func validity_check;		/* DEVINFO_FCT_VALIDITY_CHECK */
 	device_nvram_func		nvram;					/* DEVINFO_FCT_NVRAM */
 	const rom_entry *		romregion;				/* DEVINFO_PTR_ROM_REGION */
@@ -222,12 +229,19 @@ union _deviceinfo
 /* the configuration for a general device */
 struct _device_config
 {
-	device_config *			next;					/* next device */
+	/* device relationships (always valid) */
+	device_config *			next;					/* next device (of any type/class) */
 	device_config *			owner;					/* device that owns us, or NULL if nobody */
 	device_config *			typenext;				/* next device of the same type */
+	device_config *			classnext;				/* next device of the same class */
+
+	/* device properties (always valid) */
 	device_type				type;					/* device type */
 	device_class			class;					/* device class */
 	device_set_info_func 	set_info;				/* quick pointer to set_info callback */
+
+	/* device configuration (always valid) */
+	UINT32					clock;					/* device clock */
 	const void *			static_config;			/* static device configuration */
 	void *					inline_config;			/* inline device configuration */
 
@@ -240,7 +254,9 @@ struct _device_config
 	UINT32					tokenbytes;				/* size of the token data allocated */
 	UINT8 *					region;					/* pointer to region with the device's tag, or NULL */
 	UINT32					regionbytes;			/* size of the region, in bytes */
+	device_execute_func 	execute;				/* quick pointer to execute callback */
 
+	/* tag (always valid; at end because it is variable-length) */
 	char					tag[1];					/* tag for this instance */
 };
 
@@ -254,7 +270,7 @@ struct _device_config
 /* ----- device configuration ----- */
 
 /* add a new device to the end of a device list */
-device_config *device_list_add(device_config **listheadptr, device_type type, const char *tag);
+device_config *device_list_add(device_config **listheadptr, const device_config *owner, device_type type, const char *tag, UINT32 clock);
 
 /* remove a device from a device list */
 void device_list_remove(device_config **listheadptr, device_type type, const char *tag);
@@ -321,6 +337,9 @@ void device_list_start(running_machine *machine);
 
 /* reset a device based on an allocated device_config */
 void device_reset(const device_config *device);
+
+/* change the clock on a device */
+void device_set_clock(const device_config *device, UINT32 clock);
 
 
 

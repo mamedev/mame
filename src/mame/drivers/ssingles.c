@@ -87,7 +87,6 @@ static MC6845_UPDATE_ROW( update_row )
 static const mc6845_interface mc6845_intf =
 {
 		"main",
-		1000000, /* ? MHz */
 		8,
 		NULL,
 		update_row,
@@ -272,8 +271,7 @@ static MACHINE_DRIVER_START( ssingles )
 	MDRV_VIDEO_START(ssingles)
 	MDRV_VIDEO_UPDATE(ssingles)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG(mc6845_intf)
+	MDRV_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, mc6845_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

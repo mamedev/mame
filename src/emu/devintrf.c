@@ -80,10 +80,10 @@ INLINE int device_matches_type(const device_config *device, device_type type)
     end of a device list
 -------------------------------------------------*/
 
-device_config *device_list_add(device_config **listheadptr, device_type type, const char *tag)
+device_config *device_list_add(device_config **listheadptr, const device_config *owner, device_type type, const char *tag, UINT32 clock)
 {
-	device_config **devptr, **typedevptr;
-	device_config *device, *typedevice;
+	device_config **devptr, **tempdevptr;
+	device_config *device, *tempdevice;
 	UINT32 configlen;
 
 	assert(listheadptr != NULL);
@@ -93,7 +93,7 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	/* find the end of the list, and ensure no duplicates along the way */
 	for (devptr = listheadptr; *devptr != NULL; devptr = &(*devptr)->next)
 		if (type == (*devptr)->type && strcmp(tag, (*devptr)->tag) == 0)
-			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", devtype_get_name(type), tag);
+			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", device_get_name(*devptr), tag);
 
 	/* get the size of the inline config */
 	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
@@ -101,18 +101,32 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	/* allocate a new device */
 	device = malloc_or_die(sizeof(*device) + strlen(tag) + configlen);
 
-	/* populate all fields */
+	/* populate device relationships */
 	device->next = NULL;
+	device->owner = (device_config *)owner;
 	device->typenext = NULL;
+	device->classnext = NULL;
+
+	/* populate device properties */
 	device->type = type;
 	device->class = devtype_get_info_int(type, DEVINFO_INT_CLASS);
+	device->set_info = (device_set_info_func)devtype_get_info_fct(type, DEVINFO_FCT_SET_INFO);
+	device->execute = NULL;
+
+	/* populate device configuration */
+	device->clock = clock;
 	device->static_config = NULL;
 	device->inline_config = (configlen == 0) ? NULL : (device->tag + strlen(tag) + 1);
+
+	/* ensure live fields are all cleared */
+	device->machine = NULL;
 	device->started = FALSE;
 	device->token = NULL;
-	device->machine = NULL;
+	device->tokenbytes = 0;
 	device->region = NULL;
 	device->regionbytes = 0;
+	
+	/* append the tag */
 	strcpy(device->tag, tag);
 
 	/* reset the inline_config to 0 */
@@ -120,14 +134,18 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 		memset(device->inline_config, 0, configlen);
 
 	/* fetch function pointers to the core functions */
-	device->set_info = (device_set_info_func)devtype_get_info_fct(type, DEVINFO_FCT_SET_INFO);
 
-	/* before adding us to the global list, add us to the end of the class list */
-	typedevice = (device_config *)device_list_first(*listheadptr, type);
-	for (typedevptr = &typedevice; *typedevptr != NULL; typedevptr = &(*typedevptr)->typenext) ;
-	*typedevptr = device;
+	/* before adding us to the global list, add us to the end of the type list */
+	tempdevice = (device_config *)device_list_first(*listheadptr, type);
+	for (tempdevptr = &tempdevice; *tempdevptr != NULL; tempdevptr = &(*tempdevptr)->typenext) ;
+	*tempdevptr = device;
 
-	/* link us to the end and return */
+	/* and to the end of the class list */
+	tempdevice = (device_config *)device_list_class_first(*listheadptr, device->class);
+	for (tempdevptr = &tempdevice; *tempdevptr != NULL; tempdevptr = &(*tempdevptr)->classnext) ;
+	*tempdevptr = device;
+
+	/* link us to the end of the master list and return */
 	*devptr = device;
 	return device;
 }
@@ -140,8 +158,8 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 
 void device_list_remove(device_config **listheadptr, device_type type, const char *tag)
 {
-	device_config **devptr, **typedevptr;
-	device_config *device, *typedevice;
+	device_config **devptr, **tempdevptr;
+	device_config *device, *tempdevice;
 
 	assert(listheadptr != NULL);
 	assert(type != NULL);
@@ -156,10 +174,16 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
 		fatalerror("Attempted to remove non-existant device: type=%s tag=%s\n", devtype_get_name(type), tag);
 
 	/* before removing us from the global list, remove us from the type list */
-	typedevice = (device_config *)device_list_first(*listheadptr, type);
-	for (typedevptr = &typedevice; *typedevptr != device; typedevptr = &(*typedevptr)->typenext) ;
-	assert(*typedevptr == device);
-	*typedevptr = device->typenext;
+	tempdevice = (device_config *)device_list_first(*listheadptr, type);
+	for (tempdevptr = &tempdevice; *tempdevptr != device; tempdevptr = &(*tempdevptr)->typenext) ;
+	assert(*tempdevptr == device);
+	*tempdevptr = device->typenext;
+
+	/* and from the class list */
+	tempdevice = (device_config *)device_list_class_first(*listheadptr, device->class);
+	for (tempdevptr = &tempdevice; *tempdevptr != device; tempdevptr = &(*tempdevptr)->classnext) ;
+	assert(*tempdevptr == device);
+	*tempdevptr = device->classnext;
 
 	/* remove the device from the list */
 	*devptr = device->next;
@@ -223,11 +247,20 @@ int device_list_items(const device_config *listhead, device_type type)
 	const device_config *curdev;
 	int count = 0;
 
-	assert(type != NULL);
-
 	/* locate all devices */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		count += device_matches_type(curdev, type);
+	if (type == DEVICE_TYPE_WILDCARD)
+	{
+		for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+			count++;
+	}
+	
+	/* locate all devices of a given type */
+	else
+	{
+		for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
+		for ( ; curdev != NULL; curdev = curdev->typenext)
+			count++;
+	}
 
 	return count;
 }
@@ -243,12 +276,13 @@ const device_config *device_list_first(const device_config *listhead, device_typ
 {
 	const device_config *curdev;
 
-	/* scan forward starting with the list head */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		if (device_matches_type(curdev, type))
-			return curdev;
+	/* first of any device type */
+	if (type == DEVICE_TYPE_WILDCARD)
+		return listhead;
 
-	return NULL;
+	/* first of a given type */
+	for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
+	return curdev;
 }
 
 
@@ -267,7 +301,8 @@ const device_config *device_list_next(const device_config *prevdevice, device_ty
 
 /*-------------------------------------------------
     device_list_find_by_tag - retrieve a device
-    configuration based on a type and tag
+    configuration based on a type and tag;
+    DEVICE_TYPE_WILDCARD is allowed
 -------------------------------------------------*/
 
 const device_config *device_list_find_by_tag(const device_config *listhead, device_type type, const char *tag)
@@ -275,11 +310,23 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 	const device_config *curdev;
 
 	assert(tag != NULL);
-
-	/* find the device in the list */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		if (device_matches_type(curdev, type) && strcmp(tag, curdev->tag) == 0)
-			return curdev;
+	
+	/* locate among all devices */
+	if (type == DEVICE_TYPE_WILDCARD)
+	{
+		for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+			if (strcmp(tag, curdev->tag) == 0)
+				return curdev;
+	}
+	
+	/* locate among all devices of a given type */
+	else
+	{
+		for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
+		for ( ; curdev != NULL; curdev = curdev->typenext)
+			if (strcmp(tag, curdev->tag) == 0)
+				return curdev;
+	}
 
 	/* fail */
 	return NULL;
@@ -297,17 +344,30 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 	const device_config *curdev;
 	int index = 0;
 
-	assert(type != NULL);
 	assert(tag != NULL);
 
-	/* locate all devices */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		if (device_matches_type(curdev, type))
+	/* locate among all devices */
+	if (type == DEVICE_TYPE_WILDCARD)
+	{
+		for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		{
 			if (strcmp(tag, curdev->tag) == 0)
 				return index;
 			index++;
 		}
+	}
+	
+	/* locate among all devices of a given type */
+	else
+	{
+		for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
+		for ( ; curdev != NULL; curdev = curdev->typenext)
+		{
+			if (strcmp(tag, curdev->tag) == 0)
+				return index;
+			index++;
+		}
+	}
 
 	return -1;
 }
@@ -322,13 +382,22 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 {
 	const device_config *curdev;
 
-	assert(type != NULL);
-	assert(index >= 0);
-
-	/* find the device in the list */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		if (device_matches_type(curdev, type) && index-- == 0)
-			return curdev;
+	/* locate among all devices */
+	if (type == DEVICE_TYPE_WILDCARD)
+	{
+		for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+			if (index-- == 0)
+				return curdev;
+	}
+	
+	/* locate among all devices of a given type */
+	else
+	{
+		for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
+		for ( ; curdev != NULL; curdev = curdev->typenext)
+			if (index-- == 0)
+				return curdev;
+	}
 
 	/* fail */
 	return NULL;
@@ -350,9 +419,10 @@ int device_list_class_items(const device_config *listhead, device_class class)
 	const device_config *curdev;
 	int count = 0;
 
-	/* locate all devices */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		count += (curdev->class == class);
+	/* locate all devices of a given class */
+	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	for ( ; curdev != NULL; curdev = curdev->classnext)
+		count++;
 
 	return count;
 }
@@ -367,12 +437,9 @@ const device_config *device_list_class_first(const device_config *listhead, devi
 {
 	const device_config *curdev;
 
-	/* scan forward starting with the list head */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		if (curdev->class == class)
-			return curdev;
-
-	return NULL;
+	/* first of a given class */
+	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	return curdev;
 }
 
 
@@ -383,16 +450,8 @@ const device_config *device_list_class_first(const device_config *listhead, devi
 
 const device_config *device_list_class_next(const device_config *prevdevice, device_class class)
 {
-	const device_config *curdev;
-
 	assert(prevdevice != NULL);
-
-	/* scan forward starting with the item after the previous one */
-	for (curdev = prevdevice->next; curdev != NULL; curdev = curdev->next)
-		if (curdev->class == class)
-			return curdev;
-
-	return NULL;
+	return prevdevice->classnext;
 }
 
 
@@ -406,10 +465,11 @@ const device_config *device_list_class_find_by_tag(const device_config *listhead
 	const device_config *curdev;
 
 	assert(tag != NULL);
-
-	/* find the device in the list */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		if (curdev->class == class && strcmp(tag, curdev->tag) == 0)
+	
+	/* locate among all devices of a given class */
+	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	for ( ; curdev != NULL; curdev = curdev->classnext)
+		if (strcmp(tag, curdev->tag) == 0)
 			return curdev;
 
 	/* fail */
@@ -429,14 +489,14 @@ int device_list_class_index(const device_config *listhead, device_class class, c
 
 	assert(tag != NULL);
 
-	/* locate all devices */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		if (curdev->class == class)
-		{
-			if (strcmp(tag, curdev->tag) == 0)
-				return index;
-			index++;
-		}
+	/* locate among all devices of a given class */
+	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	for ( ; curdev != NULL; curdev = curdev->classnext)
+	{
+		if (strcmp(tag, curdev->tag) == 0)
+			return index;
+		index++;
+	}
 
 	return -1;
 }
@@ -452,11 +512,10 @@ const device_config *device_list_class_find_by_index(const device_config *listhe
 {
 	const device_config *curdev;
 
-	assert(index >= 0);
-
-	/* find the device in the list */
-	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-		if (curdev->class == class && index-- == 0)
+	/* locate among all devices of a given class */
+	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	for ( ; curdev != NULL; curdev = curdev->classnext)
+		if (index-- == 0)
 			return curdev;
 
 	/* fail */
@@ -506,8 +565,6 @@ void device_list_start(running_machine *machine)
 	/* iterate over devices and allocate memory for them */
 	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 	{
-		deviceinfo info = { 0 };
-
 		assert(!device->started);
 		assert(device->machine == machine);
 		assert(device->token == NULL);
@@ -516,8 +573,7 @@ void device_list_start(running_machine *machine)
 		devcount++;
 
 		/* get the size of the token data; we do it directly because we can't call device_get_info_* with no token */
-		(*device->type)(device, DEVINFO_INT_TOKEN_BYTES, &info);
-		device->tokenbytes = (UINT32)info.i;
+		device->tokenbytes = device_get_info_int(device, DEVINFO_INT_TOKEN_BYTES);
 		if (device->tokenbytes == 0)
 			fatalerror("Device %s specifies a 0 token length!\n", device_get_name(device));
 
@@ -526,6 +582,7 @@ void device_list_start(running_machine *machine)
 		memset(device->token, 0, device->tokenbytes);
 
 		/* fill in the remaining runtime fields */
+		device->execute = (device_execute_func)device_get_info_fct(device, DEVINFO_FCT_EXECUTE);
 		device->machine = machine;
 		device->region = memory_region(machine, device->tag);
 		device->regionbytes = memory_region_length(machine, device->tag);
@@ -626,6 +683,20 @@ void device_reset(const device_config *device)
 	reset = (device_reset_func)device_get_info_fct(device, DEVINFO_FCT_RESET);
 	if (reset != NULL)
 		(*reset)(device);
+}
+
+
+/*-------------------------------------------------
+    device_set_clock - change the clock on a 
+    device
+-------------------------------------------------*/
+
+void device_set_clock(const device_config *device, UINT32 clock)
+{
+	device_config *devicerw = (device_config *)device;
+	
+	/* not much for now */
+	devicerw->clock = clock;
 }
 
 

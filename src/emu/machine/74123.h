@@ -48,6 +48,13 @@
 
 #define TTL74123		DEVICE_GET_INFO_NAME(ttl74123)
 
+#define MDRV_TTL74123_ADD(_tag, _config) \
+	MDRV_DEVICE_ADD(_tag, TTL74123, 0) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_TTL74123_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, TTL74123)
+
 
 /* constants for the different ways the cap/res can be connected.
    This determines the formula for calculating the pulse width */

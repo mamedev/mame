@@ -181,11 +181,11 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			/* device management */
 			case MCONFIG_TOKEN_DEVICE_ADD:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device = device_list_add(&config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
-				if (device != NULL)
-					device->owner = (device_config *)owner;
+				device = device_list_add(&config->devicelist, owner, devtype, device_build_tag(tempstring, owner, tag), clock);
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_REMOVE:
@@ -201,6 +201,12 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				device = (device_config *)device_list_find_by_tag(config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
 				if (device == NULL)
 					fatalerror("Unable to find device: type=%s tag=%s\n", devtype_get_name(devtype), astring_c(tempstring));
+				break;
+
+			case MCONFIG_TOKEN_DEVICE_CLOCK:
+				assert(device != NULL);
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, device->clock, 32);
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_CONFIG:

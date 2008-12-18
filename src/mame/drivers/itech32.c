@@ -1775,7 +1775,7 @@ static MACHINE_DRIVER_START( tourny )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sftm)
 
-	MDRV_DEVICE_ADD( "m48t02", M48T02 )
+	MDRV_M48T02_ADD( "m48t02"  )
 MACHINE_DRIVER_END
 
 

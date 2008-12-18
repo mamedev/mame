@@ -57,7 +57,7 @@ struct _z80pio
 {
 	UINT8 vector[2];                      /* interrupt vector               */
 	void (*intr)(const device_config *, int which);            /* interrupt callbacks            */
-	void (*rdyr[2])(int data);          /* RDY active callback            */
+	void (*rdyr[2])(const device_config *, int data);          /* RDY active callback            */
 	read8_device_func  port_read[2];     /* port read callbacks            */
 	write8_device_func port_write[2];    /* port write callbacks           */
 	UINT8 mode[2];                        /* mode 00=in,01=out,02=i/o,03=bit*/
@@ -108,7 +108,7 @@ INLINE void set_rdy(const device_config *device, int ch, int state)
 
 	/* call callback with state */
 	if (z80pio->rdyr[ch])
-		z80pio->rdyr[ch](z80pio->rdy[ch]);
+		z80pio->rdyr[ch](device, z80pio->rdy[ch]);
 }
 
 

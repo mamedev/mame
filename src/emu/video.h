@@ -96,7 +96,7 @@ typedef void (*vblank_state_changed_func)(const device_config *device, void *par
 ***************************************************************************/
 
 #define MDRV_SCREEN_ADD(_tag, _type) \
-	MDRV_DEVICE_ADD(_tag, VIDEO_SCREEN) \
+	MDRV_DEVICE_ADD(_tag, VIDEO_SCREEN, 0) \
 	MDRV_DEVICE_CONFIG_DATA32(screen_config, type, SCREEN_TYPE_##_type)
 
 #define MDRV_SCREEN_REMOVE(_tag) \

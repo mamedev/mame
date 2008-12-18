@@ -17,6 +17,13 @@ struct _x2212_config
 #define X2212 DEVICE_GET_INFO_NAME(x2212)
 DEVICE_GET_INFO(x2212);
 
+#define MDRV_X2212_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, X2212, 0)
+
+#define MDRV_X2212_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, X2212)
+
+
 extern void x2212_write( const device_config *device, int offset, int data );
 extern int x2212_read( const device_config *device, int offset );
 extern void x2212_store( const device_config *device, int store );

@@ -4465,7 +4465,7 @@ static DEVICE_START( voodoo )
 	v->device = device;
 
 	/* copy config data */
-	v->freq = config->clock;
+	v->freq = device->clock;
 	v->fbi.vblank_client = config->vblank;
 	v->pci.stall_callback = config->stall;
 

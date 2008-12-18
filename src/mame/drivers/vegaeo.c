@@ -183,7 +183,7 @@ static MACHINE_DRIVER_START( vega )
 	MDRV_VIDEO_UPDATE(vega)
 
 	/* sound hardware */
-	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
+	MDRV_AT28C16_ADD( "at28c16", NULL )
 MACHINE_DRIVER_END
 
 /*

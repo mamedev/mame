@@ -107,7 +107,6 @@ static WRITE8_DEVICE_HANDLER(mario_dma_write_byte);
 static const z80dma_interface mario_dma =
 {
 	"main",
-	Z80_CLOCK,
 
 	mario_dma_read_byte,
 	mario_dma_write_byte,
@@ -347,8 +346,7 @@ static MACHINE_DRIVER_START( mario_base )
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* devices */
-	MDRV_DEVICE_ADD("z80dma", Z80DMA)
-	MDRV_DEVICE_CONFIG(mario_dma)
+	MDRV_Z80DMA_ADD("z80dma", Z80_CLOCK, mario_dma)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

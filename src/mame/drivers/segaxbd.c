@@ -211,7 +211,7 @@ static MACHINE_RESET( xboard )
 	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	device_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)xboard_reset);
+	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)xboard_reset);
 
 	/* set up the compare/timer chip */
 	segaic16_compare_timer_init(0, sound_data_w, timer_ack_callback);

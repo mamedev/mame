@@ -522,7 +522,7 @@ static CPU_SET_INFO( konami )
 		case CPUINFO_INT_REGISTER + KONAMI_DP:			DP = info->i;							break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_KONAMI_SETLINES_CALLBACK:		cpustate->setlines_callback = (konami_set_lines_func)info->f; break;
+		case CPUINFO_FCT_KONAMI_SETLINES_CALLBACK:		cpustate->setlines_callback = (konami_set_lines_func)info->f; break;
 	}
 }
 
@@ -586,7 +586,7 @@ CPU_GET_INFO( konami )
 		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(konami);break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
-		case CPUINFO_PTR_KONAMI_SETLINES_CALLBACK:		info->f = (genf *)cpustate->setlines_callback;	break;
+		case CPUINFO_FCT_KONAMI_SETLINES_CALLBACK:		info->f = (genf *)cpustate->setlines_callback;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "KONAMI");				break;

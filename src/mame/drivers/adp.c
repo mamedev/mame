@@ -197,7 +197,6 @@ static MACHINE_RESET( skattv )
 
 static const duart68681_config skattv_duart68681_config =
 {
-	XTAL_8_664MHz / 2, //??
 	duart_irq_handler,
 	duart_tx,
 	duart_input,
@@ -536,8 +535,7 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
 
-	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
-	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
+	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
@@ -565,8 +563,7 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
 
-	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
-	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
+	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)

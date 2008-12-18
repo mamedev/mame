@@ -765,7 +765,7 @@ static INTERRUPT_GEN( tm3k_interrupt )
 
 static const duart68681_config tmaster_duart68681_config =
 {
-	XTAL_8_664MHz / 2, //??
+	
 	duart_irq_handler,
 	duart_tx,
 	NULL,
@@ -780,8 +780,7 @@ static MACHINE_DRIVER_START( tm3k )
 	MDRV_MACHINE_START(tmaster)
 	MDRV_MACHINE_RESET(tmaster)
 
-	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
-	MDRV_DEVICE_CONFIG( tmaster_duart68681_config )
+	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/, tmaster_duart68681_config )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

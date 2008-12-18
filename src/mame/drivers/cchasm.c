@@ -163,7 +163,7 @@ static MACHINE_DRIVER_START( cchasm )
 	MDRV_CPU_PROGRAM_MAP(sound_memmap,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
-	MDRV_Z80CTC_ADD("ctc", cchasm_ctc_intf)
+	MDRV_Z80CTC_ADD("ctc", 3584229 /* same as "audio" */, cchasm_ctc_intf)
 
 	MDRV_MACHINE_START(cchasm)
 

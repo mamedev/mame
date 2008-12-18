@@ -2718,11 +2718,6 @@ static DRIVER_INIT( salarymc )
 	state_save_register_global(machine,  salarymc_lamp_clk );
 }
 
-static const timekeeper_config timekeeper_intf =
-{
-	"m48t58"
-};
-
 static MACHINE_DRIVER_START( konami573 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",  PSXCPU, XTAL_67_7376MHz )
@@ -2758,8 +2753,7 @@ static MACHINE_DRIVER_START( konami573 )
 	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
 
-	MDRV_DEVICE_ADD( "m48t58", M48T58 )
-	MDRV_DEVICE_CONFIG( timekeeper_intf )
+	MDRV_M48T58_ADD( "m48t58" )
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( konami573 )

@@ -128,11 +128,12 @@ static void expand_sprites(running_machine *machine)
 
 ***************************************************************************/
 
-static void draw_sprite(bitmap_t *bitmap,const rectangle *cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
+static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int sx, int sy, int dimx, int dimy, int flipx, int flipy, int color, int addr)
 {
 	// prepare GfxElement on the fly
 	gfx_element gfx;
 
+	gfx.machine = machine;
 	gfx.width = dimx;
 	gfx.height = dimy;
 	gfx.total_elements = 1;
@@ -183,12 +184,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		color = (s[7] & 0xe0) >> 5;
 
-		draw_sprite(bitmap, cliprect, sx, sy, dimx, dimy, flipx, flipy, color, addr);
+		draw_sprite(machine, bitmap, cliprect, sx, sy, dimx, dimy, flipx, flipy, color, addr);
 	}
 }
 
 // A simple gfx viewer (toggle with T)
-static int debug_viewer(bitmap_t *bitmap,const rectangle *cliprect)
+static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 #ifdef MAME_DEBUG
 	static int toggle = 0;
@@ -220,7 +221,7 @@ static int debug_viewer(bitmap_t *bitmap,const rectangle *cliprect)
 
 		bitmap_fill(bitmap,cliprect,0);
 
-		draw_sprite(bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
+		draw_sprite(machine, bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
 
 		popmessage("a: %08X w: %03X p: %02X-%02x-%02x",a,w,sprites_gfx[a/3*3+0],sprites_gfx[a/3*3+1],sprites_gfx[a/3*3+2]);
 		osd_sleep(200000);
@@ -245,7 +246,7 @@ static VIDEO_UPDATE(igs_180)
 	}
 #endif
 
-	if (debug_viewer(bitmap,cliprect))
+	if (debug_viewer(screen->machine, bitmap,cliprect))
 		return 0;
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);

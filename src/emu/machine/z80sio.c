@@ -178,7 +178,6 @@ struct _z80sio
 {
 	sio_channel	chan[2];			/* 2 channels */
 	UINT8		int_state[8];		/* interrupt states */
-	UINT32		clock;				/* clock value */
 
 	void (*irq_cb)(const device_config *device, int state);
 	write8_device_func dtr_changed_cb;
@@ -786,19 +785,7 @@ static DEVICE_START( z80sio )
 	const z80sio_interface *intf = device->static_config;
 	astring *tempstring = astring_alloc();
 	z80sio *sio = get_safe_token(device);
-	const device_config *cpu = NULL;
 	void *ptr = (void *)device;
-
-	if (intf->cpu != NULL)
-	{
-		cpu = cputag_get_cpu(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
-		if (cpu == NULL)
-			fatalerror("Z80SIO:Unable to find CPU %s\n", device_inherit_tag(tempstring, device->tag, intf->cpu));
-	}
-	if (cpu != NULL)
-		sio->clock = cpu_get_clock(cpu);
-	else
-		sio->clock = intf->baseclock;
 
 	sio->chan[0].receive_timer = timer_alloc(device->machine, serial_callback, ptr);
 	sio->chan[1].receive_timer = timer_alloc(device->machine, serial_callback, ptr);

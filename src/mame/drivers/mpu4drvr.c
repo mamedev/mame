@@ -1619,7 +1619,6 @@ static MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
 static const mc6845_interface hd6845_intf =
 {
 	"main",						/* screen we are acting on */
-	MPU4_MASTER_CLOCK / 4 / 8,	/* the clock (pin 21) of the chip (educated guess)*/
 	8,							/* number of pixels per video memory address */
 	NULL,						/* before pixel update callback */
 	NULL,						/* row update callback */
@@ -1690,10 +1689,8 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
 
 	/* ACIAs */
-	MDRV_DEVICE_ADD("acia6850_0", ACIA6850)
-	MDRV_DEVICE_CONFIG(m6809_acia_if)
-	MDRV_DEVICE_ADD("acia6850_1", ACIA6850)
-	MDRV_DEVICE_CONFIG(m68k_acia_if)
+	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if)
+	MDRV_ACIA6850_ADD("acia6850_1", m68k_acia_if)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vgpoker )
@@ -1732,8 +1729,7 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT(dealem)
 
-	MDRV_DEVICE_ADD("crtc", HD6845)							/* HD68B45 */
-	MDRV_DEVICE_CONFIG(hd6845_intf)
+	MDRV_MC6845_ADD("crtc", HD6845, MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf)	/* HD68B45 */
 MACHINE_DRIVER_END
 
 

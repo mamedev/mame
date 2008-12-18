@@ -387,7 +387,6 @@ static MC6845_ON_DE_CHANGED( display_enable_changed )
 static const mc6845_interface mc6845_intf =
 {
 	"main",					/* screen we are acting on */
-	CRTC_CLOCK, 			/* the clock (pin 21) of the chip */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
@@ -550,13 +549,11 @@ static MACHINE_DRIVER_START( r2dtank )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
-	MDRV_DEVICE_CONFIG(mc6845_intf)
+	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	/* 74LS123 */
 
-	MDRV_DEVICE_ADD("74123", TTL74123)
-	MDRV_DEVICE_CONFIG(ttl74123_intf)
+	MDRV_TTL74123_ADD("74123", ttl74123_intf)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

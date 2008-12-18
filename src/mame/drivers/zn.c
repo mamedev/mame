@@ -440,11 +440,6 @@ static void zn_machine_init( running_machine *machine )
 	psx_machine_init(machine);
 }
 
-static const at28c16_config at28c16_intf =
-{
-	"at28c16", NULL
-};
-
 static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
@@ -473,8 +468,7 @@ static MACHINE_DRIVER_START( zn1_1mb_vram )
 	MDRV_SOUND_ROUTE(0, "left", 0.35)
 	MDRV_SOUND_ROUTE(1, "right", 0.35)
 
-	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
-	MDRV_DEVICE_CONFIG( at28c16_intf )
+	MDRV_AT28C16_ADD( "at28c16", NULL )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zn1_2mb_vram )
@@ -512,8 +506,7 @@ static MACHINE_DRIVER_START( zn2 )
 	MDRV_SOUND_ROUTE(0, "left", 0.35)
 	MDRV_SOUND_ROUTE(1, "right", 0.35)
 
-	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
-	MDRV_DEVICE_CONFIG( at28c16_intf )
+	MDRV_AT28C16_ADD( "at28c16", NULL )
 MACHINE_DRIVER_END
 
 /*

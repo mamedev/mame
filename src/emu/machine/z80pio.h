@@ -46,8 +46,8 @@ struct _z80pio_interface
 	read8_device_func portBread;    /* port B read callback */
 	write8_device_func portAwrite;  /* port A write callback */
 	write8_device_func portBwrite;  /* port B write callback */
-	void (*rdyA)(int data);     /* portA ready active callback (do not support yet)*/
-	void (*rdyB)(int data);     /* portB ready active callback (do not support yet)*/
+	void (*rdyA)(const device_config *device, int data);     /* portA ready active callback (do not support yet)*/
+	void (*rdyB)(const device_config *device, int data);     /* portB ready active callback (do not support yet)*/
 };
 
 
@@ -57,7 +57,7 @@ struct _z80pio_interface
 ***************************************************************************/
 
 #define MDRV_Z80PIO_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, Z80PIO) \
+	MDRV_DEVICE_ADD(_tag, Z80PIO, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_Z80PIO_REMOVE(_tag) \

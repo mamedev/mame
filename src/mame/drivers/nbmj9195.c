@@ -491,8 +491,6 @@ static INTERRUPT_GEN( ctc0_trg1 )
 
 static z80ctc_interface ctc_intf_main =
 {
-	"main",						/* clock from main CPU */
-	0,							/* clock */
 	0,							/* timer disables */
 	ctc0_interrupt,				/* interrupt handler */
 	0,							/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
@@ -502,8 +500,6 @@ static z80ctc_interface ctc_intf_main =
 
 static z80ctc_interface ctc_intf_audio =
 {
-	"audio",					/* clock from audio CPU */
-	0,							/* clock */
 	0,							/* timer disables */
 	ctc1_interrupt,				/* interrupt handler */
 	z80ctc_trg3_w,				/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
@@ -3641,8 +3637,8 @@ static MACHINE_DRIVER_START( NBMJDRV1 )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport, sound_writeport)
 
-	MDRV_Z80CTC_ADD("main_ctc", ctc_intf_main)
-	MDRV_Z80CTC_ADD("audio_ctc", ctc_intf_audio)
+	MDRV_Z80CTC_ADD("main_ctc", 12000000/2 /* same as "main" */, ctc_intf_main)
+	MDRV_Z80CTC_ADD("audio_ctc", 8000000/1 /* same as "audio" */, ctc_intf_audio)
 
 	MDRV_MACHINE_RESET(sailorws)
 

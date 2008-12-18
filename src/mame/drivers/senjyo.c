@@ -607,7 +607,7 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_MACHINE_RESET(senjyo)
 
 	MDRV_Z80PIO_ADD( "z80pio", senjyo_pio_intf )
-	MDRV_Z80CTC_ADD( "z80ctc", senjyo_ctc_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", 2000000 /* same as "sub" */, senjyo_ctc_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

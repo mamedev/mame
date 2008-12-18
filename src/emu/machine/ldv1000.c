@@ -150,8 +150,6 @@ static const ppi8255_interface ppi1intf =
 
 static const z80ctc_interface ctcintf =
 {
-	"ldv1000",
-	0,
 	0,
 	ctc_interrupt
 };
@@ -170,7 +168,7 @@ static MACHINE_DRIVER_START( ldv1000 )
 	MDRV_CPU_PROGRAM_MAP(ldv1000_map,0)
 	MDRV_CPU_IO_MAP(ldv1000_portmap,0)
 
-	MDRV_Z80CTC_ADD("ldvctc", ctcintf)
+	MDRV_Z80CTC_ADD("ldvctc", XTAL_5MHz/2 /* same as "ldv1000" */, ctcintf)
 	MDRV_PPI8255_ADD("ldvppi0", ppi0intf)
 	MDRV_PPI8255_ADD("ldvppi1", ppi1intf)
 	MDRV_TIMER_ADD("multitimer", multijump_timer)

@@ -204,7 +204,7 @@ static void dma8257_update_status(const device_config *device)
 
 	if (pending_transfer)
 	{
-		next = ATTOTIME_IN_HZ(dma8257->intf->clockhz / 4 );
+		next = ATTOTIME_IN_HZ(device->clock / 4 );
 		timer_adjust_periodic(dma8257->timer,
 			attotime_zero,
 			0,

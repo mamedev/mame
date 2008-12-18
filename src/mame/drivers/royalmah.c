@@ -2326,7 +2326,7 @@ static MACHINE_DRIVER_START( janptr96 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 
@@ -2374,7 +2374,7 @@ static MACHINE_DRIVER_START( mjtensin )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cafetime )
@@ -2388,7 +2388,7 @@ static MACHINE_DRIVER_START( cafetime )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
-	MDRV_DEVICE_ADD("rtc", MSM6242)
+	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
 
 /***************************************************************************

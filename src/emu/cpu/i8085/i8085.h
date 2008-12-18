@@ -13,10 +13,11 @@ enum
 
 enum
 {
-	CPUINFO_PTR_I8085_SOD_CALLBACK = CPUINFO_PTR_CPU_SPECIFIC,
-	CPUINFO_PTR_I8085_SID_CALLBACK = CPUINFO_PTR_CPU_SPECIFIC + 1,
-	CPUINFO_PTR_I8085_INTE_CALLBACK = CPUINFO_PTR_CPU_SPECIFIC + 2,
-	CPUINFO_PTR_I8085_STATUS_CALLBACK = CPUINFO_PTR_CPU_SPECIFIC + 3,
+	CPUINFO_FCT_I8085_SOD_CALLBACK = CPUINFO_FCT_CPU_SPECIFIC,
+	CPUINFO_FCT_I8085_SID_CALLBACK,
+	CPUINFO_FCT_I8085_INTE_CALLBACK,
+	CPUINFO_FCT_I8085_STATUS_CALLBACK,
+
 	CPUINFO_INT_I8085_SID = CPUINFO_INT_CPU_SPECIFIC
 };
 
@@ -67,22 +68,22 @@ CPU_DISASSEMBLE( i8085 );
 
 INLINE void i8085_set_sod_callback(const device_config *device, i8085_sod_func callback)
 {
-	device_set_info_fct(device, CPUINFO_PTR_I8085_SOD_CALLBACK, (genf *)callback);
+	device_set_info_fct(device, CPUINFO_FCT_I8085_SOD_CALLBACK, (genf *)callback);
 }
 
 INLINE void i8085_set_sid_callback(const device_config *device, i8085_sid_func callback)
 {
-	device_set_info_fct(device, CPUINFO_PTR_I8085_SID_CALLBACK, (genf *)callback);
+	device_set_info_fct(device, CPUINFO_FCT_I8085_SID_CALLBACK, (genf *)callback);
 }
 
 INLINE void i8085_set_inte_callback(const device_config *device, i8085_inte_func callback)
 {
-	device_set_info_fct(device, CPUINFO_PTR_I8085_INTE_CALLBACK, (genf *)callback);
+	device_set_info_fct(device, CPUINFO_FCT_I8085_INTE_CALLBACK, (genf *)callback);
 }
 
 INLINE void i8085_set_status_callback(const device_config *device, i8085_status_func callback)
 {
-	device_set_info_fct(device, CPUINFO_PTR_I8085_STATUS_CALLBACK, (genf *)callback);
+	device_set_info_fct(device, CPUINFO_FCT_I8085_STATUS_CALLBACK, (genf *)callback);
 }
 
 INLINE void i8085_set_sid(const device_config *device, int sid)

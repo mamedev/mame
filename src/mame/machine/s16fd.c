@@ -150,8 +150,8 @@ void fd1094_machine_init(const device_config *device)
 	fd1094_setstate_and_decrypt(FD1094_STATE_RESET);
 	fd1094_kludge_reset_values();
 
-	device_set_info_fct(device, CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)fd1094_cmp_callback);
-	device_set_info_fct(device, CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)fd1094_rte_callback);
+	device_set_info_fct(device, CPUINFO_FCT_M68K_CMPILD_CALLBACK, (genf *)fd1094_cmp_callback);
+	device_set_info_fct(device, CPUINFO_FCT_M68K_RTE_CALLBACK, (genf *)fd1094_rte_callback);
 	cpu_set_irq_callback(device, fd1094_int_callback);
 
 	device_reset(device);

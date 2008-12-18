@@ -250,7 +250,7 @@ static MACHINE_DRIVER_START( usg32 )
 	MDRV_VIDEO_START(usgames)
 	MDRV_VIDEO_UPDATE(usgames)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

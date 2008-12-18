@@ -1714,7 +1714,7 @@ updateirq:
 
 static READ8_HANDLER( ppc4xx_spu_r )
 {
-	powerpc_state *ppc = device_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = *(powerpc_state **)space->cpu->token;
 	UINT8 result = 0xff;
 
 	switch (offset)
@@ -1741,7 +1741,7 @@ static READ8_HANDLER( ppc4xx_spu_r )
 
 static WRITE8_HANDLER( ppc4xx_spu_w )
 {
-	powerpc_state *ppc = device_get_info_ptr(space->cpu, CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = *(powerpc_state **)space->cpu->token;
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)
@@ -1829,7 +1829,7 @@ void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PPC_RX_DATA:					ppc4xx_spu_rx_data(ppc, info->i);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SPU_TX_HANDLER:				ppc->spu.tx_handler = (ppc4xx_spu_tx_handler)info->f; break;
+		case CPUINFO_FCT_SPU_TX_HANDLER:				ppc->spu.tx_handler = (ppc4xx_spu_tx_handler)info->f; break;
 
 		/* --- everything else is handled generically --- */
 		default:										ppccom_set_info(ppc, state, info);		break;

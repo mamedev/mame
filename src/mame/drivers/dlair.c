@@ -107,8 +107,6 @@ static int serial_receive(const device_config *device, int channel)
 
 static const z80ctc_interface ctc_intf =
 {
-	"main",				/* clock comes from main CPU's clock */
-	0,                  /* clock (filled in from the CPU clock) */
 	0,              	/* timer disables */
 	dleuro_interrupt,  	/* interrupt handler */
 	0,					/* ZC/TO0 callback */
@@ -119,8 +117,6 @@ static const z80ctc_interface ctc_intf =
 
 static const z80sio_interface sio_intf =
 {
-	"main",				/* clock comes from main CPU's clock */
-	0,                  /* clock (filled in from the CPU clock) */
 	dleuro_interrupt,	/* interrupt handler */
 	0,					/* DTR changed handler */
 	0,					/* RTS changed handler */
@@ -744,8 +740,8 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_CPU_IO_MAP(dleuro_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_callback)
 
-	MDRV_Z80CTC_ADD("ctc", ctc_intf)
-	MDRV_Z80SIO_ADD("sio", sio_intf)
+	MDRV_Z80CTC_ADD("ctc", MASTER_CLOCK_EURO/4 /* same as "main" */, ctc_intf)
+	MDRV_Z80SIO_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "main" */, sio_intf)
 
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 

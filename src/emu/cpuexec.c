@@ -406,7 +406,7 @@ static DEVICE_START( cpu )
 	classdata->inttrigger = index + TRIGGER_INT;
 
 	/* fill in the clock and timing information */
-	classdata->clock = (UINT64)config->clock * cpu_get_clock_multiplier(device) / cpu_get_clock_divider(device);
+	classdata->clock = (UINT64)device->clock * cpu_get_clock_multiplier(device) / cpu_get_clock_divider(device);
 	classdata->clockscale = 1.0;
 
 	/* allocate timers if we need them */

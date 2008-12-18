@@ -691,6 +691,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 			{
 				/* prepare GfxElement on the fly */
 				gfx_element gfx;
+				gfx.machine = machine;
 				gfx.width = width;
 				gfx.height = height;
 				gfx.total_elements = 1;
@@ -721,6 +722,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 			{
 				/* prepare GfxElement on the fly */
 				gfx_element gfx;
+				gfx.machine = machine;
 				gfx.width = width;
 				gfx.height = height;
 				gfx.total_elements = 1;

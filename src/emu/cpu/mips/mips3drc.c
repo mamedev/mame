@@ -600,7 +600,7 @@ static CPU_SET_INFO( mips3 )
 
 static CPU_GET_INFO( mips3 )
 {
-	mips3_state *mips3 = (device != NULL) ? *(mips3_state **)device->token : NULL;
+	mips3_state *mips3 = (device != NULL && device->token != NULL) ? *(mips3_state **)device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

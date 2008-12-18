@@ -49,7 +49,7 @@ struct _naomibd_config
 ***************************************************************************/
 
 #define MDRV_NAOMIBD_ADD(_tag, _type) \
-	MDRV_DEVICE_ADD(_tag, NAOMI_BOARD) \
+	MDRV_DEVICE_ADD(_tag, NAOMI_BOARD, 0) \
 	MDRV_DEVICE_CONFIG_DATA32(naomibd_config, type, _type)
 
 #define MDRV_NAOMI_ROM_BOARD_ADD(_tag, _region) \

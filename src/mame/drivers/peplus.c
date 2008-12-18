@@ -217,7 +217,6 @@ static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 static const mc6845_interface mc6845_intf =
 {
 	"main",					/* screen we are acting on */
-	MC6845_CLOCK,			/* the clock (pin 21) of the chip */
 	8,						/* number of pixels per video memory address */
 	NULL,					/* before pixel update callback */
 	NULL,					/* row update callback */
@@ -1006,8 +1005,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_GFXDECODE(peplus)
 	MDRV_PALETTE_LENGTH(16*16)
 
-	MDRV_DEVICE_ADD("crtc", R6545_1)
-	MDRV_DEVICE_CONFIG(mc6845_intf)
+	MDRV_MC6845_ADD("crtc", R6545_1, MC6845_CLOCK, mc6845_intf)
 
 	MDRV_PALETTE_INIT(peplus)
 	MDRV_VIDEO_START(peplus)

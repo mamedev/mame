@@ -285,7 +285,6 @@ READ8_DEVICE_HANDLER( timekeeper_r )
 static DEVICE_START(timekeeper)
 {
 	timekeeper_state *c = get_safe_token(device);
-	const timekeeper_config *config;
 	emu_timer *timer;
 	attotime duration;
 	mame_system_time systime;
@@ -311,14 +310,10 @@ static DEVICE_START(timekeeper)
 	c->century = make_bcd( systime.local_time.year / 100 );
 	c->data = auto_malloc( c->size );
 
-	config = device->static_config;
-	if( config != NULL && config->data != NULL )
+	c->default_data = device->region;
+	if (c->default_data != NULL)
 	{
-		c->default_data = memory_region( device->machine, config->data );
-		if( c->default_data != NULL )
-		{
-			assert( memory_region_length( device->machine, config->data ) == c->size );
-		}
+		assert( device->regionbytes == c->size );
 	}
 
 	state_save_register_device_item( device, 0, c->control );
