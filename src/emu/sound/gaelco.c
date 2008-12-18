@@ -83,13 +83,13 @@ static void *	wavraw;					/* raw waveform */
             Writes length bytes to the sound buffer
   ============================================================================*/
 
-static void gaelco_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( gaelco_update )
 {
 	struct GAELCOSND *info = param;
 	int j, ch;
 
     /* fill all data needed */
-	for(j = 0; j < length; j++){
+	for(j = 0; j < samples; j++){
 		int output_l = 0, output_r = 0;
 
 		/* for each channel */
@@ -175,12 +175,12 @@ static void gaelco_update(void *param, stream_sample_t **inputs, stream_sample_t
 #endif
 
 		/* now that we have computed all channels, save current data to the output buffer */
-		buffer[0][j] = output_l;
-		buffer[1][j] = output_r;
+		outputs[0][j] = output_l;
+		outputs[1][j] = output_r;
 	}
 
 	if (wavraw)
-		wav_add_data_32lr(wavraw, buffer[0], buffer[1], length, 0);
+		wav_add_data_32lr(wavraw, outputs[0], outputs[1], samples, 0);
 }
 
 /*============================================================================

@@ -138,7 +138,7 @@ static struct renegade_adpcm_state
 	UINT8 *base;
 } renegade_adpcm;
 
-static void renegade_adpcm_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( renegade_adpcm_callback )
 {
 	struct renegade_adpcm_state *state = param;
 	stream_sample_t *dest = outputs[0];

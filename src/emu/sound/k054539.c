@@ -119,7 +119,7 @@ static void k054539_keyoff(struct k054539_info *info, int channel)
 		info->regs[0x22c] &= ~(1 << channel);
 }
 
-static void k054539_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( k054539_update )
 {
 	struct k054539_info *info = param;
 #define VOL_CAP 1.80
@@ -131,7 +131,7 @@ static void k054539_update(void *param, stream_sample_t **inputs, stream_sample_
 
 	int ch, reverb_pos;
 	short *rbase;
-	unsigned char *samples;
+	unsigned char *rom;
 	UINT32 rom_mask;
 
 	unsigned char *base1, *base2;
@@ -146,15 +146,15 @@ static void k054539_update(void *param, stream_sample_t **inputs, stream_sample_
 	reverb_pos = info->reverb_pos;
 	rbase = (short *)(info->ram);
 
-	memset(buffer[0], 0, length*sizeof(*buffer[0]));
-	memset(buffer[1], 0, length*sizeof(*buffer[1]));
+	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
 
-	samples = info->rom;
+	rom = info->rom;
 	rom_mask = info->rom_mask;
 
 	if(!(info->regs[0x22f] & 1)) return;
 
-	info->reverb_pos = (reverb_pos + length) & 0x3fff;
+	info->reverb_pos = (reverb_pos + samples) & 0x3fff;
 
 
 	for(ch=0; ch<8; ch++)
@@ -199,8 +199,8 @@ else
 
 			cur_pos = (base1[0x0c] | (base1[0x0d] << 8) | (base1[0x0e] << 16)) & rom_mask;
 
-			bufl = buffer[0];
-			bufr = buffer[1];
+			bufl = outputs[0];
+			bufr = outputs[1];
 //*
 
 			if(base2[0] & 0x20) {
@@ -233,18 +233,18 @@ else
 
 			switch(base2[0] & 0xc) {
 			case 0x0: { // 8bit pcm
-				for(i=0; i<length; i++) {
+				for(i=0; i<samples; i++) {
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
 						cur_pfrac += fdelta;
 						cur_pos += pdelta;
 
 						cur_pval = cur_val;
-						cur_val = (INT16)(samples[cur_pos] << 8);
+						cur_val = (INT16)(rom[cur_pos] << 8);
 						if(cur_val == (INT16)0x8000) {
 							if(base2[1] & 1) {
 								cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask;
-								cur_val = (INT16)(samples[cur_pos] << 8);
+								cur_val = (INT16)(rom[cur_pos] << 8);
 								if(cur_val != (INT16)0x8000)
 									continue;
 							}
@@ -261,18 +261,18 @@ else
 			case 0x4: { // 16bit pcm lsb first
 				pdelta <<= 1;
 
-				for(i=0; i<length; i++) {
+				for(i=0; i<samples; i++) {
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
 						cur_pfrac += fdelta;
 						cur_pos += pdelta;
 
 						cur_pval = cur_val;
-						cur_val = (INT16)(samples[cur_pos] | samples[cur_pos+1]<<8);
+						cur_val = (INT16)(rom[cur_pos] | rom[cur_pos+1]<<8);
 						if(cur_val == (INT16)0x8000) {
 							if(base2[1] & 1) {
 								cur_pos = (base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask;
-								cur_val = (INT16)(samples[cur_pos] | samples[cur_pos+1]<<8);
+								cur_val = (INT16)(rom[cur_pos] | rom[cur_pos+1]<<8);
 								if(cur_val != (INT16)0x8000)
 									continue;
 							}
@@ -294,18 +294,18 @@ else
 					cur_pos |= 1;
 				}
 
-				for(i=0; i<length; i++) {
+				for(i=0; i<samples; i++) {
 					cur_pfrac += delta;
 					while(cur_pfrac & ~0xffff) {
 						cur_pfrac += fdelta;
 						cur_pos += pdelta;
 
 						cur_pval = cur_val;
-						cur_val = samples[cur_pos>>1];
+						cur_val = rom[cur_pos>>1];
 						if(cur_val == 0x88) {
 							if(base2[1] & 1) {
 								cur_pos = ((base1[0x08] | (base1[0x09] << 8) | (base1[0x0a] << 16)) & rom_mask) << 1;
-								cur_val = samples[cur_pos>>1];
+								cur_val = rom[cur_pos>>1];
 								if(cur_val != 0x88)
 									goto next_iter;
 							}
@@ -351,19 +351,19 @@ else
 	//* drivers should be given the option to disable reverb when things go terribly wrong
 	if(!(info->k054539_flags & K054539_DISABLE_REVERB))
 	{
-		for(i=0; i<length; i++) {
+		for(i=0; i<samples; i++) {
 			short val = rbase[(i+reverb_pos) & 0x3fff];
-			buffer[0][i] += val;
-			buffer[1][i] += val;
+			outputs[0][i] += val;
+			outputs[1][i] += val;
 		}
 	}
 
-	if(reverb_pos + length > 0x4000) {
+	if(reverb_pos + samples > 0x4000) {
 		i = 0x4000 - reverb_pos;
 		memset(rbase + reverb_pos, 0, i*2);
-		memset(rbase, 0, (length-i)*2);
+		memset(rbase, 0, (samples-i)*2);
 	} else
-		memset(rbase + reverb_pos, 0, length*2);
+		memset(rbase + reverb_pos, 0, samples*2);
 
 	#if CHANNEL_DEBUG
 	{

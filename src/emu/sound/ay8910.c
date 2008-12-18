@@ -473,19 +473,19 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 	}
 }
 
-static void ay8910_update(void *param,stream_sample_t **inputs, stream_sample_t **buffer,int length)
+static STREAM_UPDATE( ay8910_update )
 {
 	ay8910_context *psg = param;
 	stream_sample_t *buf[NUM_CHANNELS];
 	int chan;
 
-	buf[0] = buffer[0];
+	buf[0] = outputs[0];
 	buf[1] = NULL;
 	buf[2] = NULL;
 	if (psg->streams == NUM_CHANNELS)
 	{
-		buf[1] = buffer[1];
-		buf[2] = buffer[2];
+		buf[1] = outputs[1];
+		buf[2] = outputs[2];
 	}
 
 	/* hack to prevent us from hanging when starting filtered outputs */
@@ -493,7 +493,7 @@ static void ay8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 	{
 		for (chan = 0; chan < NUM_CHANNELS; chan++)
 			if (buf[chan] != NULL)
-				memset(buf[chan], 0, length * sizeof(*buf[chan]));
+				memset(buf[chan], 0, samples * sizeof(*buf[chan]));
 	}
 
 	/* The 8910 has three outputs, each output is the mix of one of the three */
@@ -504,7 +504,7 @@ static void ay8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 	/* is 1, not 0, and can be modulated changing the volume. */
 
 	/* buffering loop */
-	while (length)
+	while (samples)
 	{
 		for (chan = 0; chan < NUM_CHANNELS; chan++)
 		{
@@ -601,7 +601,7 @@ static void ay8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 			             + vol_enabled[2] * psg->vol_table[psg->Vol[2]]) / psg->step;
 #endif
 		}
-		length--;
+		samples--;
 	}
 }
 

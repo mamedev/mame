@@ -16,14 +16,14 @@ struct segapcm
 	sound_stream * stream;
 };
 
-static void SEGAPCM_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( SEGAPCM_update )
 {
 	struct segapcm *spcm = param;
 	int ch;
 
 	/* clear the buffers */
-	memset(buffer[0], 0, length*sizeof(*buffer[0]));
-	memset(buffer[1], 0, length*sizeof(*buffer[1]));
+	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
 
 	/* loop over channels */
 	for (ch = 0; ch < 16; ch++)
@@ -43,7 +43,7 @@ static void SEGAPCM_update(void *param, stream_sample_t **inputs, stream_sample_
 			int i;
 
 			/* loop over samples on this channel */
-			for (i = 0; i < length; i++)
+			for (i = 0; i < samples; i++)
 			{
 				INT8 v = 0;
 
@@ -63,8 +63,8 @@ static void SEGAPCM_update(void *param, stream_sample_t **inputs, stream_sample_
 				v = rom[addr >> 8] - 0x80;
 
 				/* apply panning and advance */
-				buffer[0][i] += v * voll;
-				buffer[1][i] += v * volr;
+				outputs[0][i] += v * voll;
+				outputs[1][i] += v * volr;
 				addr += delta;
 			}
 

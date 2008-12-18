@@ -488,16 +488,16 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 
 ***********************************************************************************************/
 
-static void ymz280b_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( ymz280b_update )
 {
 	struct YMZ280BChip *chip = param;
-	stream_sample_t *lacc = buffer[0];
-	stream_sample_t *racc = buffer[1];
+	stream_sample_t *lacc = outputs[0];
+	stream_sample_t *racc = outputs[1];
 	int v;
 
 	/* clear out the accumulator */
-	memset(lacc, 0, length * sizeof(lacc[0]));
-	memset(racc, 0, length * sizeof(racc[0]));
+	memset(lacc, 0, samples * sizeof(lacc[0]));
+	memset(racc, 0, samples * sizeof(racc[0]));
 
 	/* loop over voices */
 	for (v = 0; v < 8; v++)
@@ -510,7 +510,7 @@ static void ymz280b_update(void *param, stream_sample_t **inputs, stream_sample_
 		INT32 *rdest = racc;
 		UINT32 new_samples, samples_left;
 		UINT32 final_pos;
-		int remaining = length;
+		int remaining = samples;
 		int lvol = voice->output_left;
 		int rvol = voice->output_right;
 
@@ -612,10 +612,10 @@ static void ymz280b_update(void *param, stream_sample_t **inputs, stream_sample_
 		voice->curr_sample = curr;
 	}
 
-	for (v = 0; v < length; v++)
+	for (v = 0; v < samples; v++)
 	{
-		buffer[0][v] /= 256;
-		buffer[1][v] /= 256;
+		outputs[0][v] /= 256;
+		outputs[1][v] /= 256;
 	}
 }
 

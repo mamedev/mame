@@ -78,7 +78,7 @@ static int make_mixer_table(int voices, int gain)
 
 
 /* generate sound to the mix buffer in mono */
-static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( gomoku_update_mono )
 {
 	stream_sample_t *buffer = outputs[0];
 	sound_channel *voice;
@@ -88,12 +88,12 @@ static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sam
 	/* if no sound, we're done */
 	if (sound_enable == 0)
 	{
-		memset(buffer, 0, length * sizeof(*buffer));
+		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
 	/* zap the contents of the mixer buffer */
-	memset(mixer_buffer, 0, length * sizeof(short));
+	memset(mixer_buffer, 0, samples * sizeof(short));
 
 	/* loop over each voice and add its contribution */
 	for (ch = 0, voice = channel_list; voice < last_channel; ch++, voice++)
@@ -115,7 +115,7 @@ static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sam
 			mix = mixer_buffer;
 
 			/* add our contribution */
-			for (i = 0; i < length; i++)
+			for (i = 0; i < samples; i++)
 			{
 				c += f;
 
@@ -156,7 +156,7 @@ static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sam
 
 	/* mix it down */
 	mix = mixer_buffer;
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 		*buffer++ = mixer_lookup[*mix++];
 }
 

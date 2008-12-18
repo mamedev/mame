@@ -120,7 +120,7 @@ static INT16 clock_adpcm(struct okim6258 *chip, UINT8 nibble)
 
 ***********************************************************************************************/
 
-static void okim6258_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( okim6258_update )
 {
 	struct okim6258 *chip = param;
 	stream_sample_t *buffer = outputs[0];

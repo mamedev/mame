@@ -25,10 +25,10 @@ struct _VR0Chip
 
 static void VR0_RenderAudio(struct _VR0Chip *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r);
 
-static void VR0_Update(void *param, stream_sample_t **inputs, stream_sample_t **buf, int samples)
+static STREAM_UPDATE( VR0_Update )
 {
 	struct _VR0Chip *VR0 = param;
-	VR0_RenderAudio(VR0, samples,buf[0],buf[1]);
+	VR0_RenderAudio(VR0, samples,outputs[0],outputs[1]);
 }
 
 //Correct table thanks to Evoga

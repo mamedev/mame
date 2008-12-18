@@ -23,13 +23,13 @@ struct speaker
 
 
 
-static void speaker_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static STREAM_UPDATE( speaker_sound_update )
 {
 	struct speaker *sp = (struct speaker *) param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 	int volume = sp->levels[sp->level];
 
-    while( length-- > 0 )
+    while( samples-- > 0 )
 		*buffer++ = volume;
 }
 

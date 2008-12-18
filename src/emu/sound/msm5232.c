@@ -703,20 +703,20 @@ INLINE void TG_group_advance(MSM5232 *chip, int groupidx)
 #endif
 
 
-static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sample_t** buffer, int samples)
+static STREAM_UPDATE( MSM5232_update_one )
 {
 	MSM5232 * chip = param;
-	stream_sample_t *buf1 = buffer[0];
-	stream_sample_t *buf2 = buffer[1];
-	stream_sample_t *buf3 = buffer[2];
-	stream_sample_t *buf4 = buffer[3];
-	stream_sample_t *buf5 = buffer[4];
-	stream_sample_t *buf6 = buffer[5];
-	stream_sample_t *buf7 = buffer[6];
-	stream_sample_t *buf8 = buffer[7];
-	stream_sample_t *bufsolo1 = buffer[8];
-	stream_sample_t *bufsolo2 = buffer[9];
-	stream_sample_t *bufnoise = buffer[10];
+	stream_sample_t *buf1 = outputs[0];
+	stream_sample_t *buf2 = outputs[1];
+	stream_sample_t *buf3 = outputs[2];
+	stream_sample_t *buf4 = outputs[3];
+	stream_sample_t *buf5 = outputs[4];
+	stream_sample_t *buf6 = outputs[5];
+	stream_sample_t *buf7 = outputs[6];
+	stream_sample_t *buf8 = outputs[7];
+	stream_sample_t *bufsolo1 = outputs[8];
+	stream_sample_t *bufsolo2 = outputs[9];
+	stream_sample_t *bufnoise = outputs[10];
 	int i;
 
 	for (i=0; i<samples; i++)

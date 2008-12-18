@@ -90,23 +90,23 @@ static void ComputeTables (struct MSM5205Voice *voice)
 }
 
 /* stream update callbacks */
-static void MSM5205_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static STREAM_UPDATE( MSM5205_update )
 {
 	struct MSM5205Voice *voice = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	/* if this voice is active */
 	if(voice->signal)
 	{
 		short val = voice->signal * 16;
-		while (length)
+		while (samples)
 		{
 			*buffer++ = val;
-			length--;
+			samples--;
 		}
 	}
 	else
-		memset (buffer,0,length*sizeof(*buffer));
+		memset (buffer,0,samples*sizeof(*buffer));
 }
 
 /* timer callback at VCLK low eddge */

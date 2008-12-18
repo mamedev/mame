@@ -336,7 +336,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 	chip->samplepos_whole++;											\
 	/* store sum of output signals into the buffer */					\
 	*buffer++ = (sum > 0x7fff) ? 0x7fff : sum;							\
-	length--
+	samples--
 
 #if HEAVY_MACRO_USAGE
 
@@ -357,7 +357,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 		sum += chip->volume[CHAN3];										\
 	if( chip->output[CHAN4] ) 											\
 		sum += chip->volume[CHAN4];										\
-    while( length > 0 )                                                 \
+    while( samples > 0 )                                                 \
 	{																	\
 		if( chip->counter[CHAN1] < chip->samplepos_whole )				\
 		{																\
@@ -486,7 +486,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 		sum += chip->volume[CHAN3];										\
 	if( chip->output[CHAN4] ) 											\
         sum += chip->volume[CHAN4];                                     \
-	while( length > 0 )                                                 \
+	while( samples > 0 )                                                 \
 	{																	\
 		UINT32 event = chip->samplepos_whole; 							\
 		UINT32 channel = SAMPLE;										\
@@ -524,10 +524,10 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 #endif
 
 
-static void pokey_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( pokey_update )
 {
 	struct POKEYregisters *chip = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 	PROCESS_POKEY(chip);
 }
 

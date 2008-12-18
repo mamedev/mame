@@ -11,7 +11,7 @@ struct filter_volume_info
 
 
 
-static void filter_volume_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( filter_volume_update )
 {
 	stream_sample_t *src = inputs[0];
 	stream_sample_t *dst = outputs[0];

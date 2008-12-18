@@ -123,12 +123,12 @@ static TIMER_CALLBACK( sp0250_timer_tick )
 	stream_update(sp->stream);
 }
 
-static void sp0250_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( sp0250_update )
 {
 	struct sp0250 *sp = param;
-	stream_sample_t *output = buffer[0];
+	stream_sample_t *output = outputs[0];
 	int i;
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		if (sp->playing)
 		{

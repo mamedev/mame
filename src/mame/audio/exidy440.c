@@ -111,7 +111,7 @@ static const int channel_bits[4] =
 
 
 /* function prototypes */
-static void channel_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length);
+static STREAM_UPDATE( channel_update );
 static void m6844_finished(int ch);
 static void play_cvsd(running_machine *machine, int ch);
 static void stop_cvsd(int ch);
@@ -277,19 +277,19 @@ static void mix_to_16(int length, stream_sample_t *dest_left, stream_sample_t *d
  *
  *************************************/
 
-static void channel_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( channel_update )
 {
 	int ch;
 
 	/* reset the mixer buffers */
-	memset(mixer_buffer_left, 0, length * sizeof(INT32));
-	memset(mixer_buffer_right, 0, length * sizeof(INT32));
+	memset(mixer_buffer_left, 0, samples * sizeof(INT32));
+	memset(mixer_buffer_right, 0, samples * sizeof(INT32));
 
 	/* loop over channels */
 	for (ch = 0; ch < 4; ch++)
 	{
 		sound_channel_data *channel = &sound_channel[ch];
-		int samples, volume, left = length;
+		int length, volume, left = samples;
 		int effective_offset;
 
 		/* if we're not active, bail */
@@ -297,22 +297,22 @@ static void channel_update(void *param, stream_sample_t **inputs, stream_sample_
 			continue;
 
 		/* see how many samples to copy */
-		samples = (left > channel->remaining) ? channel->remaining : left;
+		length = (left > channel->remaining) ? channel->remaining : left;
 
 		/* get a pointer to the sample data and copy to the left */
 		volume = sound_volume[2 * ch + 0];
 		if (volume)
-			add_and_scale_samples(ch, mixer_buffer_left, samples, volume);
+			add_and_scale_samples(ch, mixer_buffer_left, length, volume);
 
 		/* get a pointer to the sample data and copy to the left */
 		volume = sound_volume[2 * ch + 1];
 		if (volume)
-			add_and_scale_samples(ch, mixer_buffer_right, samples, volume);
+			add_and_scale_samples(ch, mixer_buffer_right, length, volume);
 
 		/* update our counters */
-		channel->offset += samples;
-		channel->remaining -= samples;
-		left -= samples;
+		channel->offset += length;
+		channel->remaining -= length;
+		left -= length;
 
 		/* update the MC6844 */
 		effective_offset = (ch & 2) ? channel->offset / 2 : channel->offset;
@@ -327,7 +327,7 @@ static void channel_update(void *param, stream_sample_t **inputs, stream_sample_
 	}
 
 	/* all done, time to mix it */
-	mix_to_16(length, outputs[0], outputs[1]);
+	mix_to_16(samples, outputs[0], outputs[1]);
 }
 
 

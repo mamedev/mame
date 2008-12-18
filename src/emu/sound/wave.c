@@ -22,7 +22,7 @@
 
 
 
-static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static STREAM_UPDATE( wave_sound_update )
 {
 #ifdef MESS
 	const device_config *image = param;
@@ -30,7 +30,7 @@ static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sampl
 	cassette_state state;
 	double time_index;
 	double duration;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 	int i;
 
 	state = cassette_get_state(image);
@@ -40,16 +40,16 @@ static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sampl
 	{
 		cassette = cassette_get_image(image);
 		time_index = cassette_get_position(image);
-		duration = ((double) length) / image->machine->sample_rate;
+		duration = ((double) samples) / image->machine->sample_rate;
 
-		cassette_get_samples(cassette, 0, time_index, duration, length, 2, buffer, CASSETTE_WAVEFORM_16BIT);
+		cassette_get_samples(cassette, 0, time_index, duration, samples, 2, buffer, CASSETTE_WAVEFORM_16BIT);
 
-		for (i = length-1; i >= 0; i--)
+		for (i = samples-1; i >= 0; i--)
 			buffer[i] = ((INT16 *) buffer)[i];
 	}
 	else
 	{
-		memset(buffer, 0, sizeof(*buffer) * length);
+		memset(buffer, 0, sizeof(*buffer) * samples);
 	}
 #endif
 }

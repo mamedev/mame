@@ -106,10 +106,10 @@ void ym2610_update_request(void *param)
 }
 
 #if BUILD_YM2610
-static void ym2610_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
+static STREAM_UPDATE( ym2610_stream_update )
 {
 	struct ym2610_info *info = param;
-	ym2610_update_one(info->chip, buffers, length);
+	ym2610_update_one(info->chip, outputs, samples);
 }
 
 
@@ -181,10 +181,10 @@ static SND_START( ym2610 )
 #endif
 
 #if BUILD_YM2610B
-static void ym2610b_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
+static STREAM_UPDATE( ym2610b_stream_update )
 {
 	struct ym2610_info *info = param;
-	ym2610b_update_one(info->chip, buffers, length);
+	ym2610b_update_one(info->chip, outputs, samples);
 }
 
 static SND_START( ym2610b )

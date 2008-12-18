@@ -62,21 +62,21 @@ struct dmadac_channel_data
  *
  *************************************/
 
-static void dmadac_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( dmadac_update )
 {
 	struct dmadac_channel_data *ch = param;
-	stream_sample_t *output = _buffer[0];
+	stream_sample_t *output = outputs[0];
 	INT16 *source = ch->buffer;
 	UINT32 curout = ch->bufout;
 	UINT32 curin = ch->bufin;
 	int volume = ch->volume;
 
 	/* feed as much as we can */
-	while (curout != curin && length-- > 0)
+	while (curout != curin && samples-- > 0)
 		*output++ = (source[curout++ % BUFFER_SIZE] * volume) >> 8;
 
 	/* fill the rest with silence */
-	while (length-- > 0)
+	while (samples-- > 0)
 		*output++ = 0;
 
 	/* save the new output pointer */

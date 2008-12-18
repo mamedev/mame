@@ -413,20 +413,20 @@ static void WriteSlot(struct _MultiPCM *ptChip,struct _SLOT *slot,int reg,unsign
 	}
 }
 
-static void MultiPCM_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
+static STREAM_UPDATE( MultiPCM_update )
 {
 	struct _MultiPCM *ptChip = param;
 	stream_sample_t  *datap[2];
 	int i,sl;
 
-	datap[0] = buffer[0];
-	datap[1] = buffer[1];
+	datap[0] = outputs[0];
+	datap[1] = outputs[1];
 
-	memset(datap[0], 0, sizeof(*datap[0])*length);
-	memset(datap[1], 0, sizeof(*datap[1])*length);
+	memset(datap[0], 0, sizeof(*datap[0])*samples);
+	memset(datap[1], 0, sizeof(*datap[1])*samples);
 
 
-	for(i=0;i<length;++i)
+	for(i=0;i<samples;++i)
 	{
 		signed int smpl=0;
 		signed int smpr=0;

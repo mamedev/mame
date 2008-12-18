@@ -45,14 +45,14 @@ struct namco_63701x
 static const int vol_table[4] = { 26, 84, 200, 258 };
 
 
-static void namco_63701x_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( namco_63701x_update )
 {
 	struct namco_63701x *chip = param;
 	int ch;
 
 	for (ch = 0;ch < 2;ch++)
 	{
-		stream_sample_t *buf = buffer[ch];
+		stream_sample_t *buf = outputs[ch];
 		voice *v = &chip->voices[ch];
 
 		if (v->playing)
@@ -62,7 +62,7 @@ static void namco_63701x_update(void *param, stream_sample_t **inputs, stream_sa
 			int vol = vol_table[v->volume];
 			int p;
 
-			for (p = 0;p < length;p++)
+			for (p = 0;p < samples;p++)
 			{
 				if (v->silence_counter)
 				{
@@ -94,7 +94,7 @@ static void namco_63701x_update(void *param, stream_sample_t **inputs, stream_sa
 			v->position = pos;
 		}
 		else
-			memset(buf, 0, length * sizeof(*buf));
+			memset(buf, 0, samples * sizeof(*buf));
 	}
 }
 

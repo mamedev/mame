@@ -1276,11 +1276,11 @@ static int AICA_IRQCB(void *param)
 }
 #endif
 
-static void AICA_Update(void *param, stream_sample_t **inputs, stream_sample_t **buf, int samples)
+static STREAM_UPDATE( AICA_Update )
 {
 	struct _AICA *AICA = param;
-	bufferl = buf[0];
-	bufferr = buf[1];
+	bufferl = outputs[0];
+	bufferr = outputs[1];
 	length = samples;
 	AICA_DoMasterSamples(AICA, samples);
 }

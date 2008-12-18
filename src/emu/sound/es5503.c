@@ -141,7 +141,7 @@ static TIMER_CALLBACK( es5503_timer_cb )
 	stream_update(chip->stream);
 }
 
-static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( es5503_pcm_update )
 {
 	INT32 mix[48000*2];
 	INT32 *mixp;
@@ -169,7 +169,7 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 			int resshift = resshifts[pOsc->resolution] - pOsc->wavetblsize;
 			UINT32 sizemask = accmasks[pOsc->wavetblsize];
 
-			for (snum = 0; snum < length; snum++)
+			for (snum = 0; snum < samples; snum++)
 			{
 				ramptr = (acc >> resshift) & sizemask;
 				altram = acc >> resshift;
@@ -216,7 +216,7 @@ static void es5503_pcm_update(void *param, stream_sample_t **inputs, stream_samp
 	}
 
 	mixp = &mix[0];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>1;
 		outputs[1][i] = (*mixp++)>>1;

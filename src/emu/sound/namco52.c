@@ -72,19 +72,19 @@ struct namco_52xx
 static void namco_52xx_reset(struct namco_52xx *chip);
 
 
-static void namco_52xx_stream_update_one(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( namco_52xx_stream_update_one )
 {
 	struct namco_52xx *chip = param;
 	int i, rom_pos, whole_pb_cycles, buf;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	if (chip->n52_start >= chip->n52_end)
 	{
-		memset(buffer, 0, length * sizeof(*buffer));
+		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		chip->n52_pb_cycle += chip->n52_step;
 		if (chip->n52_pb_cycle >= 1)
@@ -97,8 +97,8 @@ static void namco_52xx_stream_update_one(void *param, stream_sample_t **inputs, 
 		if (chip->n52_pos > chip->n52_length)
 		{
 			/* sample done */
-			memset(&buffer[i], 0, (length - i) * sizeof(INT16));
-			i = length;
+			memset(&buffer[i], 0, (samples - i) * sizeof(INT16));
+			i = samples;
 			namco_52xx_reset(chip);
 		}
 		else

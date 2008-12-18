@@ -48,7 +48,7 @@ struct hc55516_data
 static double charge, decay, leak;
 
 
-static void hc55516_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length);
+static STREAM_UPDATE( hc55516_update );
 
 
 
@@ -182,21 +182,21 @@ static void process_digit(struct hc55516_data *chip)
 }
 
 
-static void hc55516_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( hc55516_update )
 {
 	struct hc55516_data *chip = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 	int i;
 	INT32 sample, slope;
 
 	/* zero-length? bail */
-	if (length == 0)
+	if (samples == 0)
 		return;
 
 	if (!is_external_osciallator(chip))
 	{
 		/* track how many samples we've updated without a clock */
-		chip->update_count += length;
+		chip->update_count += samples;
 		if (chip->update_count > SAMPLE_RATE / 32)
 		{
 			chip->update_count = SAMPLE_RATE;
@@ -206,13 +206,13 @@ static void hc55516_update(void *param, stream_sample_t **inputs, stream_sample_
 
 	/* compute the interpolation slope */
 	sample = chip->curr_sample;
-	slope = ((INT32)chip->next_sample - sample) / length;
+	slope = ((INT32)chip->next_sample - sample) / samples;
 	chip->curr_sample = chip->next_sample;
 
 	if (is_external_osciallator(chip))
 	{
 		/* external oscillator */
-		for (i = 0; i < length; i++, sample += slope)
+		for (i = 0; i < samples; i++, sample += slope)
 		{
 			UINT8 clock_state;
 
@@ -236,7 +236,7 @@ static void hc55516_update(void *param, stream_sample_t **inputs, stream_sample_
 
 	/* software driven clock */
 	else
-		for (i = 0; i < length; i++, sample += slope)
+		for (i = 0; i < samples; i++, sample += slope)
 			*buffer++ = sample;
 }
 

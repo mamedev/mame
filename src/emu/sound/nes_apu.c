@@ -660,10 +660,10 @@ WRITE8_HANDLER( nes_psg_0_w ) {apu_write(0,offset,data);}
 WRITE8_HANDLER( nes_psg_1_w ) {apu_write(1,offset,data);}
 
 /* UPDATE APU SYSTEM */
-static void nes_psg_update_sound(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( nes_psg_update_sound )
 {
   struct nesapu_info *info = param;
-  apu_update(info, buffer[0], length);
+  apu_update(info, outputs[0], samples);
 }
 
 

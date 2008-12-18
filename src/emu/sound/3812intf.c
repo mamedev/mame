@@ -66,10 +66,10 @@ static void TimerHandler_3812(void *param,int c,attotime period)
 }
 
 
-static void ym3812_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( ym3812_stream_update )
 {
 	struct ym3812_info *info = param;
-	ym3812_update_one(info->chip, buffer[0], length);
+	ym3812_update_one(info->chip, outputs[0], samples);
 }
 
 static void _stream_update_3812(void * param, int interval)
@@ -237,10 +237,10 @@ static void TimerHandler_3526(void *param,int c,attotime period)
 }
 
 
-static void ym3526_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( ym3526_stream_update )
 {
 	struct ym3526_info *info = param;
-	ym3526_update_one(info->chip, buffer[0], length);
+	ym3526_update_one(info->chip, outputs[0], samples);
 }
 
 static void _stream_update_3526(void *param, int interval)
@@ -442,10 +442,10 @@ static void Y8950KeyboardHandler_w(void *param,unsigned char data)
 		info->intf->keyboardwrite(space,info->index,data);
 }
 
-static void y8950_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( y8950_stream_update )
 {
 	struct y8950_info *info = param;
-	y8950_update_one(info->chip, buffer[0], length);
+	y8950_update_one(info->chip, outputs[0], samples);
 }
 
 static void _stream_update_8950(void *param, int interval)

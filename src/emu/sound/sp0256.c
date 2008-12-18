@@ -1091,14 +1091,14 @@ static void sp0256_micro(struct sp0256 *sp)
     }
 }
 
-static void sp0256_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( sp0256_update )
 {
 	struct sp0256 *sp = param;
-	stream_sample_t *output = buffer[0];
+	stream_sample_t *output = outputs[0];
 	int output_index = 0;
-    int samples, did_samp, old_idx;
+	int length, did_samp, old_idx;
 
-	while( output_index < length )
+	while( output_index < samples )
 	{
 		/* ---------------------------------------------------------------- */
 		/*  First, drain as much of our scratch buffer as we can into the   */
@@ -1110,17 +1110,17 @@ static void sp0256_update(void *param, stream_sample_t **inputs, stream_sample_t
 			output[output_index++] = sp->scratch[sp->sc_tail++ & SCBUF_MASK];
 			sp->sc_tail &= SCBUF_MASK;
 
-			if( output_index > length )
+			if( output_index > samples )
 				break;
 		}
 
 		/* ---------------------------------------------------------------- */
-		/*  If output buffer is full, then we're done.                      */
+		/*  If output outputs is full, then we're done.                      */
 		/* ---------------------------------------------------------------- */
-		if( output_index > length )
+		if( output_index > samples )
 			break;
 
-		samples = length - output_index;
+		length = samples - output_index;
 
 		/* ---------------------------------------------------------------- */
 		/*  Process the current set of filter coefficients as long as the   */
@@ -1128,7 +1128,7 @@ static void sp0256_update(void *param, stream_sample_t **inputs, stream_sample_t
 		/* ---------------------------------------------------------------- */
 		did_samp = 0;
 		old_idx  = sp->sc_head;
-		if (samples > 0) do
+		if (length > 0) do
 		{
 			int do_samp;
 
@@ -1141,7 +1141,7 @@ static void sp0256_update(void *param, stream_sample_t **inputs, stream_sample_t
 			/* ------------------------------------------------------------ */
 			/*  Do as many samples as we can.                               */
 			/* ------------------------------------------------------------ */
-			do_samp = samples - did_samp;
+			do_samp = length - did_samp;
 			if (sp->sc_head + do_samp - sp->sc_tail > SCBUF_SIZE)
 				do_samp = sp->sc_tail + SCBUF_SIZE - sp->sc_head;
 
@@ -1164,7 +1164,7 @@ static void sp0256_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 			sp->sc_head &= SCBUF_MASK;
 
-		} while (sp->filt.rpt >= 0 && samples > did_samp);
+		} while (sp->filt.rpt >= 0 && length > did_samp);
 	}
 }
 

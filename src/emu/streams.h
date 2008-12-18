@@ -21,7 +21,9 @@
 
 typedef struct _sound_stream sound_stream;
 
-typedef void (*stream_update_func)(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+typedef void (*stream_update_func)(const device_config *device, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+#define STREAM_UPDATE(name) void name(const device_config *device, void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 
 
 

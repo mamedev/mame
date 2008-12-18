@@ -287,20 +287,20 @@ static int parse_frame (struct vlm5030_info *chip)
 }
 
 /* decode and buffering data */
-static void vlm5030_update_callback(void *param,stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( vlm5030_update_callback )
 {
 	struct vlm5030_info *chip = param;
 	int buf_count=0;
 	int interp_effect;
 	int i;
 	int u[11];
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	/* running */
 	if( chip->phase == PH_RUN || chip->phase == PH_STOP )
 	{
 		/* playing speech */
-		while (length > 0)
+		while (samples > 0)
 		{
 			int current_val;
 
@@ -401,7 +401,7 @@ static void vlm5030_update_callback(void *param,stream_sample_t **inputs, stream
 			if (chip->pitch_count >= chip->current_pitch )
 				chip->pitch_count = 0;
 			/* size */
-			length--;
+			samples--;
 		}
 /*      return;*/
 	}
@@ -410,7 +410,7 @@ phase_stop:
 	switch( chip->phase )
 	{
 	case PH_SETUP:
-		if( chip->sample_count <= length)
+		if( chip->sample_count <= samples)
 		{
 			chip->sample_count = 0;
 			/* logerror("VLM5030 BSY=H\n" ); */
@@ -419,11 +419,11 @@ phase_stop:
 		}
 		else
 		{
-			chip->sample_count -= length;
+			chip->sample_count -= samples;
 		}
 		break;
 	case PH_END:
-		if( chip->sample_count <= length)
+		if( chip->sample_count <= samples)
 		{
 			chip->sample_count = 0;
 			/* logerror("VLM5030 BSY=L\n" ); */
@@ -432,14 +432,14 @@ phase_stop:
 		}
 		else
 		{
-			chip->sample_count -= length;
+			chip->sample_count -= samples;
 		}
 	}
 	/* silent buffering */
-	while (length > 0)
+	while (samples > 0)
 	{
 		buffer[buf_count++] = 0x00;
-		length--;
+		samples--;
 	}
 }
 

@@ -22,10 +22,10 @@ struct ym2151_info
 };
 
 
-static void ym2151_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
+static STREAM_UPDATE( ym2151_update )
 {
 	struct ym2151_info *info = param;
-	ym2151_update_one(info->chip, buffers, length);
+	ym2151_update_one(info->chip, outputs, samples);
 }
 
 

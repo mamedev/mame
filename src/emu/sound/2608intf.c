@@ -104,10 +104,10 @@ void ym2608_update_request(void *param)
 	stream_update(info->stream);
 }
 
-static void ym2608_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
+static STREAM_UPDATE( ym2608_stream_update )
 {
 	struct ym2608_info *info = param;
-	ym2608_update_one(info->chip, buffers, length);
+	ym2608_update_one(info->chip, outputs, samples);
 }
 
 

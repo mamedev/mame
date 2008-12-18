@@ -86,7 +86,7 @@ struct _bsmt2000_chip
 
 /* core implementation */
 static void bsmt2000_reset(bsmt2000_chip *chip);
-static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
+static STREAM_UPDATE( bsmt2000_update );
 
 /* read/write access */
 static void bsmt2000_reg_write(bsmt2000_chip *chip, offs_t offset, UINT16 data);
@@ -183,17 +183,17 @@ static SND_RESET( bsmt2000 )
     sample generation
 -------------------------------------------------*/
 
-static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( bsmt2000_update )
 {
-	stream_sample_t *left = buffer[0];
-	stream_sample_t *right = buffer[1];
+	stream_sample_t *left = outputs[0];
+	stream_sample_t *right = outputs[1];
 	bsmt2000_chip *chip = param;
 	bsmt2000_voice *voice;
 	int samp, voicenum;
 
 	/* clear out the accumulator */
-	memset(left, 0, length * sizeof(left[0]));
-	memset(right, 0, length * sizeof(right[0]));
+	memset(left, 0, samples * sizeof(left[0]));
+	memset(right, 0, samples * sizeof(right[0]));
 
 	/* loop over voices */
 	for (voicenum = 0; voicenum < chip->voices; voicenum++)
@@ -211,7 +211,7 @@ static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample
 			UINT16 frac = voice->fraction;
 
 			/* loop while we still have samples to generate */
-			for (samp = 0; samp < length; samp++)
+			for (samp = 0; samp < samples; samp++)
 			{
 #if ENABLE_INTERPOLATION
 				INT32 sample = (base[pos] * (0x800 - frac) + (base[pos + 1] * frac)) >> 11;
@@ -249,7 +249,7 @@ static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample
 		UINT32 frac = voice->fraction;
 
 		/* loop while we still have samples to generate */
-		for (samp = 0; samp < length && pos < voice->loopend; samp++)
+		for (samp = 0; samp < samples && pos < voice->loopend; samp++)
 		{
 			/* apply volumes and add */
 			left[samp] += (chip->adpcm_current * lvol) >> 8;
@@ -304,7 +304,7 @@ static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample
 	}
 
 	/* reduce the overall gain */
-	for (samp = 0; samp < length; samp++)
+	for (samp = 0; samp < samples; samp++)
 	{
 		left[samp] >>= 9;
 		right[samp] >>= 9;

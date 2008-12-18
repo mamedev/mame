@@ -32,10 +32,10 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
     cdda_update - stream update callback
 -------------------------------------------------*/
 
-static void cdda_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( cdda_update )
 {
 	cdda_info *info = param;
-	get_audio_data(info, &outputs[0][0], &outputs[1][0], length);
+	get_audio_data(info, &outputs[0][0], &outputs[1][0], samples);
 }
 
 

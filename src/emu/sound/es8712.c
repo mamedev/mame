@@ -165,7 +165,7 @@ static void generate_adpcm(struct es8712 *chip, stream_sample_t *buffer, int sam
 
 ***********************************************************************************************/
 
-static void es8712_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( es8712_update )
 {
 	stream_sample_t *buffer = outputs[0];
 	struct es8712 *chip = param;

@@ -40,13 +40,13 @@ struct CDP1869
  *
  *************************************/
 
-static void cdp1869_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( cdp1869_update )
 {
 	struct CDP1869 *info = param;
 	INT16 signal = info->signal;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
-	memset( buffer, 0, length * sizeof(*buffer) );
+	memset( buffer, 0, samples * sizeof(*buffer) );
 
 	if (!info->toneoff && info->toneamp)
 	{
@@ -67,7 +67,7 @@ static void cdp1869_update(void *param, stream_sample_t **inputs, stream_sample_
 			signal = info->toneamp * (0x07fff / 15);
 		}
 
-		while( length-- > 0 )
+		while( samples-- > 0 )
 		{
 			*buffer++ = signal;
 			incr -= frequency;

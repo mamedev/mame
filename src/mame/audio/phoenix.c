@@ -10,7 +10,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "sound/custom.h"
 #include "sound/tms36xx.h"
 #include "phoenix.h"
@@ -205,12 +204,12 @@ INLINE int noise(int samplerate)
 	return sum;
 }
 
-static void phoenix_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( phoenix_sound_update )
 {
-	int samplerate = Machine->sample_rate;
+	int samplerate = device->machine->sample_rate;
 	stream_sample_t *buffer = outputs[0];
 
-	while( length-- > 0 )
+	while( samples-- > 0 )
 	{
 		int sum = 0;
 		sum = noise(samplerate) / 2;

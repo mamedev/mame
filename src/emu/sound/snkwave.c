@@ -53,13 +53,13 @@ static void update_waveform(struct snkwave_sound *chip, unsigned int offset, UIN
 
 
 /* generate sound to the mix buffer */
-static void snkwave_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( snkwave_update )
 {
 	struct snkwave_sound *chip = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	/* zap the contents of the buffer */
-	memset(buffer, 0, length * sizeof(*buffer));
+	memset(buffer, 0, samples * sizeof(*buffer));
 
 	assert(chip->counter < 0x1000);
 	assert(chip->frequency < 0x1000);
@@ -69,7 +69,7 @@ static void snkwave_update(void *param, stream_sample_t **inputs, stream_sample_
 		return;
 
 	/* generate sound into buffer while updating the counter */
-	while (length-- > 0)
+	while (samples-- > 0)
 	{
 		int loops;
 		INT16 out = 0;

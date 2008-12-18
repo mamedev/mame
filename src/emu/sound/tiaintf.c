@@ -10,10 +10,10 @@ struct tia_info
 };
 
 
-static void tia_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( tia_update )
 {
 	struct tia_info *info = param;
-	tia_process(info->chip, buffer[0], length);
+	tia_process(info->chip, outputs[0], samples);
 }
 
 

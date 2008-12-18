@@ -111,7 +111,7 @@ struct _stream_output
 struct _sound_stream
 {
 	/* linking information */
-	running_machine *	machine;				/* owning machine object */
+	const device_config *	device;				/* owning device */
 	sound_stream *		next;					/* next stream in the chain */
 	void *				tag;					/* tag (used for identification) */
 	int					index;					/* index for save states */
@@ -362,7 +362,7 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 	VPRINTF(("stream_create(%d, %d, %d) => %p\n", inputs, outputs, sample_rate, stream));
 
 	/* fill in the data */
-	stream->machine = machine;
+	stream->device = device;
 	stream->tag = strdata->current_tag;
 	stream->index = strdata->stream_index++;
 	stream->sample_rate = sample_rate;
@@ -457,7 +457,7 @@ void stream_set_input(sound_stream *stream, int index, sound_stream *input_strea
 		input->source->dependents++;
 
 	/* update sample rates now that we know the input */
-	recompute_sample_rate_data(stream->machine->streams_data, stream);
+	recompute_sample_rate_data(stream->device->machine->streams_data, stream);
 }
 
 
@@ -468,8 +468,9 @@ void stream_set_input(sound_stream *stream, int index, sound_stream *input_strea
 
 void stream_update(sound_stream *stream)
 {
-	streams_private *strdata = stream->machine->streams_data;
-	INT32 update_sampindex = time_to_sampindex(strdata, stream, timer_get_time(stream->machine));
+	running_machine *machine = stream->device->machine;
+	streams_private *strdata = machine->streams_data;
+	INT32 update_sampindex = time_to_sampindex(strdata, stream, timer_get_time(machine));
 
 	/* generate samples to get us up to the appropriate time */
 	assert(stream->output_sampindex - stream->output_base_sampindex >= 0);
@@ -538,7 +539,7 @@ void stream_set_sample_rate(sound_stream *stream, int sample_rate)
 
 attotime stream_get_time(sound_stream *stream)
 {
-	streams_private *strdata = stream->machine->streams_data;
+	streams_private *strdata = stream->device->machine->streams_data;
 	attotime base = attotime_make(strdata->last_update.seconds, 0);
 	return attotime_add_attoseconds(base, stream->output_sampindex * stream->attoseconds_per_sample);
 }
@@ -808,7 +809,7 @@ static void generate_samples(sound_stream *stream, int samples)
 
 	/* run the callback */
 	VPRINTF(("  callback(%p, %d)\n", stream, samples));
-	(*stream->callback)(stream->param, stream->input_array, stream->output_array, samples);
+	(*stream->callback)(stream->device, stream->param, stream->input_array, stream->output_array, samples);
 	VPRINTF(("  callback done\n"));
 }
 

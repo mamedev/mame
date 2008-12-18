@@ -62,11 +62,11 @@ WRITE8_HANDLER( geebee_sound_w )
     }
 }
 
-static void geebee_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( geebee_sound_update )
 {
     stream_sample_t *buffer = outputs[0];
 
-    while (length--)
+    while (samples--)
     {
 		*buffer++ = sound_signal;
 		/* 1V = HSYNC = 18.432MHz / 3 / 2 / 384 = 8000Hz */

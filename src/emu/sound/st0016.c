@@ -48,7 +48,7 @@ WRITE8_HANDLER(st0016_snd_w)
 	}
 }
 
-static void st0016_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( st0016_update )
 {
 	struct st0016_info *info = param;
 	UINT8 *sound_ram = *info->sound_ram;
@@ -59,7 +59,7 @@ static void st0016_update(void *param, stream_sample_t **inputs, stream_sample_t
 	INT16 sample;
 	int sptr, eptr, freq, lsptr, leptr;
 
-	memset(mix, 0, sizeof(mix[0])*length*2);
+	memset(mix, 0, sizeof(mix[0])*samples*2);
 
 	for (v = 0; v < 8; v++)
 	{
@@ -75,7 +75,7 @@ static void st0016_update(void *param, stream_sample_t **inputs, stream_sample_t
 			lsptr = slot[0x06]<<16 | slot[0x05]<<8 | slot[0x04];
 			leptr = slot[0x0a]<<16 | slot[0x09]<<8 | slot[0x08];
 
-			for (snum = 0; snum < length; snum++)
+			for (snum = 0; snum < samples; snum++)
 			{
 				sample = sound_ram[(sptr + info->vpos[v])&0x1fffff]<<8;
 
@@ -117,7 +117,7 @@ static void st0016_update(void *param, stream_sample_t **inputs, stream_sample_t
 	}
 
 	mixp = &mix[0];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>4;
 		outputs[1][i] = (*mixp++)>>4;

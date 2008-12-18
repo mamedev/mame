@@ -62,10 +62,10 @@ WRITE8_HANDLER( redbaron_pokey_w )
         pokey1_w(space, offset, data);
 }
 
-static void redbaron_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( redbaron_sound_update )
 {
 	stream_sample_t *buffer = outputs[0];
-	while( length-- )
+	while( samples-- )
 	{
 		int sum = 0;
 

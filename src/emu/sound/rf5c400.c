@@ -102,7 +102,7 @@ static UINT8 decode80(UINT8 val)
 	return val;
 }
 
-static void rf5c400_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( rf5c400_update )
 {
 	int i, ch;
 	struct rf5c400_info *info = param;
@@ -113,14 +113,14 @@ static void rf5c400_update(void *param, stream_sample_t **inputs, stream_sample_
 	UINT8 env_phase;
 	double env_level, env_step, env_rstep;
 
-	memset(buffer[0], 0, length * sizeof(*buffer[0]));
-	memset(buffer[1], 0, length * sizeof(*buffer[1]));
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	for (ch=0; ch < 32; ch++)
 	{
 		struct RF5C400_CHANNEL *channel = &info->channels[ch];
-		stream_sample_t *buf0 = buffer[0];
-		stream_sample_t *buf1 = buffer[1];
+		stream_sample_t *buf0 = outputs[0];
+		stream_sample_t *buf1 = outputs[1];
 
 		start = ((channel->startH & 0xFF00) << 8) | channel->startL;
 		end = ((channel->endHloopH & 0xFF) << 16) | channel->endL;
@@ -136,7 +136,7 @@ static void rf5c400_update(void *param, stream_sample_t **inputs, stream_sample_
 		env_step = channel->env_step;
 		env_rstep = env_step * channel->env_scale;
 
-		for (i=0; i < length; i++)
+		for (i=0; i < samples; i++)
 		{
 			INT16 tmp;
 			INT32 sample;

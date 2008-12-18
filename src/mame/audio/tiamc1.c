@@ -244,11 +244,11 @@ WRITE8_HANDLER( tiamc1_timer1_gate_w )
 }
 
 
-static void tiamc1_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( tiamc1_sound_update )
 {
 	int count, o0, o1, o2, len, or = 0;
 
-	len = length * CLOCK_DIVIDER;
+	len = samples * CLOCK_DIVIDER;
 
 	for (count = 0; count < len; count++) {
 		timer1_divider++;

@@ -255,7 +255,7 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	}
 }
 
-static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( ymf278b_pcm_update )
 {
 	YMF278BChip *chip = param;
 	int i, j;
@@ -265,7 +265,7 @@ static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 	INT32 *mixp;
 	INT32 vl, vr;
 
-	memset(mix, 0, sizeof(mix[0])*length*2);
+	memset(mix, 0, sizeof(mix[0])*samples*2);
 
 	rombase = chip->rom;
 
@@ -277,7 +277,7 @@ static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 		{
 			mixp = mix;
 
-			for (j = 0; j < length; j++)
+			for (j = 0; j < samples; j++)
 			{
 				switch (slot->bits)
 				{
@@ -329,7 +329,7 @@ static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 	mixp = mix;
 	vl = chip->mix_level[chip->pcm_l];
 	vr = chip->mix_level[chip->pcm_r];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++ * vl) >> 16;
 		outputs[1][i] = (*mixp++ * vr) >> 16;

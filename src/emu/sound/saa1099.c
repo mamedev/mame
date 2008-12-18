@@ -212,7 +212,7 @@ static void saa1099_envelope(struct SAA1099 *saa, int ch)
 }
 
 
-static void saa1099_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( saa1099_update )
 {
 	struct SAA1099 *saa = param;
     int j, ch;
@@ -221,8 +221,8 @@ static void saa1099_update(void *param, stream_sample_t **inputs, stream_sample_
 	if (!saa->all_ch_enable)
 	{
 		/* init output data */
-		memset(buffer[LEFT],0,length*sizeof(*buffer[LEFT]));
-		memset(buffer[RIGHT],0,length*sizeof(*buffer[RIGHT]));
+		memset(outputs[LEFT],0,samples*sizeof(*outputs[LEFT]));
+		memset(outputs[RIGHT],0,samples*sizeof(*outputs[RIGHT]));
         return;
 	}
 
@@ -238,7 +238,7 @@ static void saa1099_update(void *param, stream_sample_t **inputs, stream_sample_
 	}
 
     /* fill all data needed */
-	for( j = 0; j < length; j++ )
+	for( j = 0; j < samples; j++ )
 	{
 		int output_l = 0, output_r = 0;
 
@@ -305,8 +305,8 @@ static void saa1099_update(void *param, stream_sample_t **inputs, stream_sample_
 			}
 		}
         /* write sound data to the buffer */
-		buffer[LEFT][j] = output_l / 6;
-		buffer[RIGHT][j] = output_r / 6;
+		outputs[LEFT][j] = output_l / 6;
+		outputs[RIGHT][j] = output_r / 6;
 	}
 }
 

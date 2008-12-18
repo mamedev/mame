@@ -21,10 +21,10 @@ static SID6581 *get_sid(int indx)
 
 
 
-static void sid_update(void *token,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static STREAM_UPDATE( sid_update )
 {
-	SID6581 *sid = (SID6581 *) token;
-	sidEmuFillBuffer(sid, _buffer[0], length);
+	SID6581 *sid = (SID6581 *) param;
+	sidEmuFillBuffer(sid, outputs[0], samples);
 }
 
 

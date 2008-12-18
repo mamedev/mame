@@ -341,21 +341,21 @@ static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 
 
 
-static void tms36xx_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( tms36xx_sound_update )
 {
 	struct TMS36XX *tms = param;
 	int samplerate = tms->samplerate;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
     /* no tune played? */
 	if( !tunes[tms->tune_num] || tms->voices == 0 )
 	{
-		while (--length >= 0)
-			buffer[length] = 0;
+		while (--samples >= 0)
+			buffer[samples] = 0;
 		return;
 	}
 
-	while( length-- > 0 )
+	while( samples-- > 0 )
 	{
 		int sum = 0;
 

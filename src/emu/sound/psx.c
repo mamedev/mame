@@ -111,7 +111,7 @@ INLINE int limit( int v )
 	return v;
 }
 
-static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( PSXSPU_update )
 {
 	struct psxinfo *chip = param;
 	int v;
@@ -136,15 +136,15 @@ static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t
 		{ 122, -60 }
 	};
 
-	memset( buffer[ 0 ], 0, length * sizeof( *buffer[ 0 ] ));
-	memset( buffer[ 1 ], 0, length * sizeof( *buffer[ 1 ] ));
+	memset( outputs[ 0 ], 0, samples * sizeof( *outputs[ 0 ] ));
+	memset( outputs[ 1 ], 0, samples * sizeof( *outputs[ 1 ] ));
 
 	for( n_channel = 0; n_channel < MAX_CHANNEL; n_channel++ )
 	{
 		voll = volume( chip->m_p_n_volumeleft[ n_channel ] );
 		volr = volume( chip->m_p_n_volumeright[ n_channel ] );
 
-		for( n_sample = 0; n_sample < length; n_sample++ )
+		for( n_sample = 0; n_sample < samples; n_sample++ )
 		{
 			if( chip->m_p_n_blockoffset[ n_channel ] >= ( SAMPLES_PER_BLOCK << PITCH_SHIFT ) )
 			{
@@ -207,8 +207,8 @@ static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t
 			}
 			v = chip->m_p_n_blockbuffer[ ( n_channel * SAMPLES_PER_BLOCK ) + ( chip->m_p_n_blockoffset[ n_channel ] >> PITCH_SHIFT ) ];
 			chip->m_p_n_blockoffset[ n_channel ] += chip->m_p_n_pitch[ n_channel ];
-			buffer[ 0 ][ n_sample ] = limit( buffer[ 0 ][ n_sample ] + ( ( v * voll ) / 0x4000 ) );
-			buffer[ 1 ][ n_sample ] = limit( buffer[ 1 ][ n_sample ] + ( ( v * volr ) / 0x4000 ) );
+			outputs[ 0 ][ n_sample ] = limit( outputs[ 0 ][ n_sample ] + ( ( v * voll ) / 0x4000 ) );
+			outputs[ 1 ][ n_sample ] = limit( outputs[ 1 ][ n_sample ] + ( ( v * volr ) / 0x4000 ) );
 		}
 	}
 }

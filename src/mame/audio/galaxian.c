@@ -70,16 +70,16 @@ static emu_timer *noisetimer;
 static TIMER_CALLBACK( lfo_timer_cb );
 static TIMER_CALLBACK( galaxian_sh_update );
 
-static void tone_update(void *param, stream_sample_t **input, stream_sample_t **output, int length)
+static STREAM_UPDATE( tone_update )
 {
-	stream_sample_t *buffer = output[0];
+	stream_sample_t *buffer = outputs[0];
 	int i,j;
 	INT16 *w = tonewave[vol];
 
 	/* only update if we have non-zero volume and frequency */
 	if( pitch != 0xff )
 	{
-		for (i = 0; i < length; i++)
+		for (i = 0; i < samples; i++)
 		{
 			int mix = 0;
 
@@ -99,7 +99,7 @@ static void tone_update(void *param, stream_sample_t **input, stream_sample_t **
 	}
 	else
 	{
-		for( i = 0; i < length; i++ )
+		for( i = 0; i < samples; i++ )
 			*buffer++ = 0;
 	}
 }

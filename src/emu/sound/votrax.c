@@ -58,10 +58,10 @@ static const char *const VotraxTable[65] =
  0
 };
 
-static void votrax_update_sound(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( votrax_update_sound )
 {
 	struct votrax_info *info = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	if (info->sample)
 	{

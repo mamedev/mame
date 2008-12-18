@@ -4,7 +4,6 @@
 
 ***************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "includes/cps3.h"
 
@@ -25,14 +24,14 @@ static struct
 	UINT16     key;
 } chip;
 
-static void cps3_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( cps3_stream_update )
 {
 	int i;
-	INT8 *base = (INT8*)memory_region(Machine, "user5");
+	INT8 *base = (INT8*)memory_region(device->machine, "user5");
 
 	/* Clear the buffers */
-	memset(buffer[0], 0, length*sizeof(*buffer[0]));
-	memset(buffer[1], 0, length*sizeof(*buffer[1]));
+	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
 
 	for (i = 0; i < CPS3_VOICES; i ++)
 	{
@@ -62,7 +61,7 @@ static void cps3_stream_update(void *param, stream_sample_t **inputs, stream_sam
 			loop -= 0x400000;
 
 			/* Go through the buffer and add voice contributions */
-			for (j = 0; j < length; j ++)
+			for (j = 0; j < samples; j ++)
 			{
 				INT32 sample;
 
@@ -86,8 +85,8 @@ static void cps3_stream_update(void *param, stream_sample_t **inputs, stream_sam
 				sample = base[BYTE4_XOR_LE(start + pos)];
 				frac += step;
 
-				buffer[0][j] += (sample * (vol_l >> 8));
-				buffer[1][j] += (sample * (vol_r >> 8));
+				outputs[0][j] += (sample * (vol_l >> 8));
+				outputs[1][j] += (sample * (vol_r >> 8));
 			}
 
 			vptr->pos = pos;

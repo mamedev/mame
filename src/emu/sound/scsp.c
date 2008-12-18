@@ -1212,11 +1212,11 @@ int SCSP_IRQCB(void *param)
 }
 #endif
 
-static void SCSP_Update(void *param, stream_sample_t **inputs, stream_sample_t **buf, int samples)
+static STREAM_UPDATE( SCSP_Update )
 {
 	struct _SCSP *SCSP = param;
-	bufferl = buf[0];
-	bufferr = buf[1];
+	bufferl = outputs[0];
+	bufferr = outputs[1];
 	length = samples;
 	SCSP_DoMasterSamples(SCSP, samples);
 }

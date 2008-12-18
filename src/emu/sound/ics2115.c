@@ -85,14 +85,14 @@ static void recalc_irq(struct ics2115 *chip)
 }
 
 
-static void update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( update )
 {
 	struct ics2115 *chip = param;
 	int osc, i;
 	int rec_irq = 0;
 
-	memset(buffer[0], 0, length*sizeof(*buffer[0]));
-	memset(buffer[1], 0, length*sizeof(*buffer[0]));
+	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples*sizeof(*outputs[0]));
 
 	for(osc = 0; osc < 32; osc++)
 		if(chip->voice[osc].state & V_ON) {
@@ -108,7 +108,7 @@ static void update(void *param, stream_sample_t **inputs, stream_sample_t **buff
 			if (ICS2115LOGERROR) logerror("ICS2115: KEYRUN %02d adr=%08x end=%08x delta=%08x\n",
 					 osc, adr, end, delta);
 
-			for(i=0; i<length; i++) {
+			for(i=0; i<samples; i++) {
 				INT32 v = chip->rom[badr|(adr >> 12)];
 				if(conf & 1)
 					v = chip->ulaw[v];
@@ -116,8 +116,8 @@ static void update(void *param, stream_sample_t **inputs, stream_sample_t **buff
 					v = ((INT8)v) << 6;
 
 				v = (v*vol)>>(16+5);
-				buffer[0][i] += v;
-				buffer[1][i] += v;
+				outputs[0][i] += v;
+				outputs[1][i] += v;
 				adr += delta;
 				if(adr >= end) {
 					if (ICS2115LOGERROR) logerror("ICS2115: KEYDONE %2d\n", osc);

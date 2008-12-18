@@ -89,7 +89,7 @@ struct qsound_info
 };
 
 /* Function prototypes */
-static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length );
+static STREAM_UPDATE( qsound_update );
 static void qsound_set_command(struct qsound_info *chip, int data, int value);
 
 static SND_START( qsound )
@@ -304,7 +304,7 @@ static void qsound_set_command(struct qsound_info *chip, int data, int value)
 }
 
 
-static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
+static STREAM_UPDATE( qsound_update )
 {
 	struct qsound_info *chip = param;
 	int i,j;
@@ -312,10 +312,10 @@ static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_
 	struct QSOUND_CHANNEL *pC=&chip->channel[0];
 	stream_sample_t  *datap[2];
 
-	datap[0] = buffer[0];
-	datap[1] = buffer[1];
-	memset( datap[0], 0x00, length * sizeof(*datap[0]) );
-	memset( datap[1], 0x00, length * sizeof(*datap[1]) );
+	datap[0] = outputs[0];
+	datap[1] = outputs[1];
+	memset( datap[0], 0x00, samples * sizeof(*datap[0]) );
+	memset( datap[1], 0x00, samples * sizeof(*datap[1]) );
 
 	for (i=0; i<QSOUND_CHANNELS; i++)
 	{
@@ -326,7 +326,7 @@ static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_
 			rvol=(pC->rvol*pC->vol)>>8;
 			lvol=(pC->lvol*pC->vol)>>8;
 
-			for (j=length-1; j>=0; j--)
+			for (j=samples-1; j>=0; j--)
 			{
 				count=(pC->offset)>>16;
 				pC->offset &= 0xffff;
@@ -358,9 +358,9 @@ static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_
 	}
 
 	if (chip->fpRawDataL)
-		fwrite(datap[0], length*sizeof(QSOUND_SAMPLE), 1, chip->fpRawDataL);
+		fwrite(datap[0], samples*sizeof(QSOUND_SAMPLE), 1, chip->fpRawDataL);
 	if (chip->fpRawDataR)
-		fwrite(datap[1], length*sizeof(QSOUND_SAMPLE), 1, chip->fpRawDataR);
+		fwrite(datap[1], samples*sizeof(QSOUND_SAMPLE), 1, chip->fpRawDataR);
 }
 
 

@@ -1170,12 +1170,12 @@ CUSTOM_START( snes_sh_start )
 	return auto_malloc(1);
 }
 
-void snes_sh_update( void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length )
+STREAM_UPDATE( snes_sh_update )
 {
 	int i;
 	short mix[2];
 
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		mix[0] = mix[1] = 0;
 		DSP_Update(mix);

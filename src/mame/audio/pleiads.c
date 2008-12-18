@@ -8,7 +8,6 @@
  ****************************************************************************/
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "sound/custom.h"
 #include "sound/tms36xx.h"
 #include "includes/phoenix.h"
@@ -397,12 +396,12 @@ INLINE int noise(int samplerate)
 	return sum / 2;
 }
 
-static void pleiads_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( pleiads_sound_update )
 {
-	int rate = Machine->sample_rate;
+	int rate = device->machine->sample_rate;
 	stream_sample_t *buffer = outputs[0];
 
-	while( length-- > 0 )
+	while( samples-- > 0 )
 	{
 		int sum = tone1(rate)/2 + tone23(rate)/2 + tone4(rate) + noise(rate);
 		*buffer++ = sum < 32768 ? sum > -32768 ? sum : -32768 : 32767;

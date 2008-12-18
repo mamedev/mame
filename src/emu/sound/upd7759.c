@@ -459,14 +459,14 @@ static void advance_state(struct upd7759_chip *chip)
 
 *************************************************************/
 
-static void upd7759_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int samples)
+static STREAM_UPDATE( upd7759_update )
 {
 	struct upd7759_chip *chip = param;
 	INT32 clocks_left = chip->clocks_left;
 	INT16 sample = chip->sample;
 	UINT32 step = chip->step;
 	UINT32 pos = chip->pos;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	/* loop until done */
 	if (chip->state != STATE_IDLE)

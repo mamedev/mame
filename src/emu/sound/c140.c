@@ -259,7 +259,7 @@ INLINE int limit(INT32 in)
 	return in;
 }
 
-static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( update_stereo )
 {
 	struct c140_info *info = param;
 	int		i,j;
@@ -277,11 +277,11 @@ static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t
 
 	INT16	*lmix, *rmix;
 
-	if(length>info->sample_rate) length=info->sample_rate;
+	if(samples>info->sample_rate) samples=info->sample_rate;
 
 	/* zap the contents of the mixer buffer */
-	memset(info->mixer_buffer_left, 0, length * sizeof(INT16));
-	memset(info->mixer_buffer_right, 0, length * sizeof(INT16));
+	memset(info->mixer_buffer_left, 0, samples * sizeof(INT16));
+	memset(info->mixer_buffer_right, 0, samples * sizeof(INT16));
 
 	/* get the number of voices to update */
 	voicecnt = (info->banking_type == C140_TYPE_ASIC219) ? 16 : 24;
@@ -306,7 +306,7 @@ static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t
 			lvol=(vreg->volume_left*32)/MAX_VOICE; //32ch -> 24ch
 			rvol=(vreg->volume_right*32)/MAX_VOICE;
 
-			/* Set mixer buffer base pointers */
+			/* Set mixer outputs base pointers */
 			lmix = info->mixer_buffer_left;
 			rmix = info->mixer_buffer_right;
 
@@ -330,7 +330,7 @@ static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t
 			{
 				//compressed PCM (maybe correct...)
 				/* Loop for enough to fill sample buffer as requested */
-				for(j=0;j<length;j++)
+				for(j=0;j<samples;j++)
 				{
 					offset += delta;
 					cnt = (offset>>16)&0x7fff;
@@ -377,7 +377,7 @@ static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t
 			else
 			{
 				/* linear 8bit signed PCM */
-				for(j=0;j<length;j++)
+				for(j=0;j<samples;j++)
 				{
 					offset += delta;
 					cnt = (offset>>16)&0x7fff;
@@ -444,9 +444,9 @@ static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t
 	lmix = info->mixer_buffer_left;
 	rmix = info->mixer_buffer_right;
 	{
-		stream_sample_t *dest1 = buffer[0];
-		stream_sample_t *dest2 = buffer[1];
-		for (i = 0; i < length; i++)
+		stream_sample_t *dest1 = outputs[0];
+		stream_sample_t *dest2 = outputs[1];
+		for (i = 0; i < samples; i++)
 		{
 			*dest1++ = limit(8*(*lmix++));
 			*dest2++ = limit(8*(*rmix++));

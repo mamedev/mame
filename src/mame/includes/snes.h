@@ -1,6 +1,7 @@
 #ifndef _SNES_H_
 #define _SNES_H_
 
+#include "streams.h"
 #include "sound/custom.h"
 
 /*
@@ -493,7 +494,7 @@ extern READ8_HANDLER( spc_ram_r );
 extern WRITE8_HANDLER( spc_ram_w );
 extern READ8_HANDLER( spc_ipl_r );
 extern CUSTOM_START( snes_sh_start );
-extern void snes_sh_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length );
+extern STREAM_UPDATE( snes_sh_update );
 
 /* Stuff from OpenSPC 0.3.99 by Brad Martin */
 

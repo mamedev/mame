@@ -54,10 +54,10 @@ static void timer_handler_262(void *param,int timer, attotime period)
 	}
 }
 
-static void ymf262_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
+static STREAM_UPDATE( ymf262_stream_update )
 {
 	struct ymf262_info *info = param;
-	ymf262_update_one(info->chip, buffers, length);
+	ymf262_update_one(info->chip, outputs, samples);
 }
 
 static void _stream_update(void *param, int interval)

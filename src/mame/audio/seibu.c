@@ -141,7 +141,7 @@ static struct seibu_adpcm_state
 	UINT8 *base;
 } seibu_adpcm[2];
 
-static void seibu_adpcm_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( seibu_adpcm_callback )
 {
 	struct seibu_adpcm_state *state = param;
 	stream_sample_t *dest = outputs[0];

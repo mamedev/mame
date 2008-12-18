@@ -134,11 +134,11 @@ WRITE8_HANDLER( sn76496_3_w ) {	SN76496Write(3,data); }
 WRITE8_HANDLER( sn76496_4_w ) {	SN76496Write(4,data); }
 
 
-static void SN76496Update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static STREAM_UPDATE( SN76496Update )
 {
 	int i;
 	struct SN76496 *R = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 
 	/* If the volume is 0, increase the counter */
@@ -146,14 +146,14 @@ static void SN76496Update(void *param,stream_sample_t **inputs, stream_sample_t 
 	{
 		if (R->Volume[i] == 0)
 		{
-			/* note that I do count += length, NOT count = length + 1. You might think */
+			/* note that I do count += samples, NOT count = samples + 1. You might think */
 			/* it's the same since the volume is 0, but doing the latter could cause */
 			/* interferencies when the program is rapidly modulating the volume. */
-			if (R->Count[i] <= length*STEP) R->Count[i] += length*STEP;
+			if (R->Count[i] <= samples*STEP) R->Count[i] += samples*STEP;
 		}
 	}
 
-	while (length > 0)
+	while (samples > 0)
 	{
 		int vol[4];
 		unsigned int out;
@@ -245,7 +245,7 @@ static void SN76496Update(void *param,stream_sample_t **inputs, stream_sample_t 
 
 		*(buffer++) = out / STEP;
 
-		length--;
+		samples--;
 	}
 }
 

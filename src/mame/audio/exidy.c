@@ -222,13 +222,13 @@ INLINE int sh6840_update_noise(int clocks)
  *
  *************************************/
 
-static void exidy_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( exidy_stream_update )
 {
 	int noisy = ((sh6840_timer[0].cr & sh6840_timer[1].cr & sh6840_timer[2].cr & 0x02) == 0);
 	stream_sample_t *buffer = outputs[0];
 
 	/* loop over samples */
-	while (length--)
+	while (samples--)
 	{
 		struct sh6840_timer_channel *t;
 		struct sh8253_timer_channel *c;

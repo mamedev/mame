@@ -14,7 +14,7 @@ struct filter_rc_info
 const flt_rc_config flt_rc_ac_default = {FLT_RC_AC, 10000, 0, 0, CAP_U(1)};
 
 
-static void filter_rc_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( filter_rc_update )
 {
 	stream_sample_t *src = inputs[0];
 	stream_sample_t *dst = outputs[0];

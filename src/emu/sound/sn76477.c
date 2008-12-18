@@ -1959,7 +1959,7 @@ void sn76477_feedback_res_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void SN76477_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( SN76477_update )
 {
 	double one_shot_cap_charging_step;
 	double one_shot_cap_discharging_step;
@@ -1979,7 +1979,7 @@ static void SN76477_update(void *param, stream_sample_t **inputs, stream_sample_
 	double center_to_peak_voltage_out;
 
 	struct SN76477 *sn = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 
 #if TEST_MODE
@@ -2017,8 +2017,8 @@ static void SN76477_update(void *param, stream_sample_t **inputs, stream_sample_
 	center_to_peak_voltage_out = compute_center_to_peak_voltage_out(sn);
 
 
-	/* process 'length' number of samples */
-	while (length--)
+	/* process 'samples' number of samples */
+	while (samples--)
 	{
 		/* update the one-shot cap voltage */
 		if (!sn->one_shot_cap_voltage_ext)

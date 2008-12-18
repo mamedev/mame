@@ -55,7 +55,7 @@ struct IremGA20_chip_def
 	struct IremGA20_channel_def channel[4];
 };
 
-static void IremGA20_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
+static STREAM_UPDATE( IremGA20_update )
 {
 	struct IremGA20_chip_def *chip = param;
 	UINT32 rate[4], pos[4], frac[4], end[4], vol[4], play[4];
@@ -74,12 +74,12 @@ static void IremGA20_update( void *param, stream_sample_t **inputs, stream_sampl
 		play[i] = chip->channel[i].play;
 	}
 
-	i = length;
+	i = samples;
 	pSamples = chip->rom;
-	outL = buffer[0];
-	outR = buffer[1];
+	outL = outputs[0];
+	outR = outputs[1];
 
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		sampleout = 0;
 

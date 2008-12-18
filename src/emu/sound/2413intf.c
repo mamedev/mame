@@ -36,10 +36,10 @@ void YM2413DAC_update(int chip,stream_sample_t **inputs, stream_sample_t **_buff
 }
 #endif
 
-static void ym2413_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
+static STREAM_UPDATE( ym2413_stream_update )
 {
 	struct ym2413_info *info = param;
-	ym2413_update_one(info->chip, buffers, length);
+	ym2413_update_one(info->chip, outputs, samples);
 }
 
 static void _stream_update(void *param, int interval)

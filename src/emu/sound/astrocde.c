@@ -76,10 +76,10 @@ struct astrocade_info
  *
  *************************************/
 
-static void astrocade_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int samples)
+static STREAM_UPDATE( astrocade_update )
 {
 	struct astrocade_info *chip = param;
-	stream_sample_t *dest = buffer[0];
+	stream_sample_t *dest = outputs[0];
 	UINT16 noise_state;
 	UINT8 master_count;
 	UINT8 noise_clock;

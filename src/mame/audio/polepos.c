@@ -3,7 +3,6 @@
     Sound handler
 ****************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "sound/filter.h"
 #include "machine/rescap.h"
@@ -47,7 +46,7 @@ static const double r_filt_total = 1.0 / (1.0/RES_K(4.7) + 1.0/RES_K(7.5) + 1.0/
 /************************************/
 /* Stream updater                   */
 /************************************/
-static void engine_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( engine_sound_update )
 {
 	static UINT32 current_position;
 	UINT32 step, clock, slot;
@@ -59,21 +58,21 @@ static void engine_sound_update(void *param, stream_sample_t **inputs, stream_sa
 	/* if we're not enabled, just fill with 0 */
 	if (!sample_enable)
 	{
-		memset(buffer, 0, length * sizeof(*buffer));
+		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
 	/* determine the effective clock rate */
-	clock = (cpu_get_clock(Machine->cpu[0]) / 16) * ((sample_msb + 1) * 64 + sample_lsb + 1) / (64*64);
+	clock = (cpu_get_clock(device->machine->cpu[0]) / 16) * ((sample_msb + 1) * 64 + sample_lsb + 1) / (64*64);
 	step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */
 	slot = (sample_msb >> 3) & 7;
 	volume = volume_table[slot];
-	base = &memory_region(Machine, "engine")[slot * 0x800];
+	base = &memory_region(device->machine, "engine")[slot * 0x800];
 
 	/* fill in the sample */
-	while (length--)
+	while (samples--)
 	{
 		filter_engine[0].x0 = (3.4 / 255 * base[(current_position >> 12) & 0x7ff] - 2) * volume;
 		filter_engine[1].x0 = filter_engine[0].x0;

@@ -442,10 +442,10 @@ int sample_loaded(int samplenum)
 }
 
 
-static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( sample_update_sound )
 {
 	struct sample_channel *chan = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	if (chan->source && !chan->paused)
 	{
@@ -456,7 +456,7 @@ static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sa
 		const INT16 *sample = chan->source;
 		UINT32 sample_length = chan->source_length;
 
-		while (length--)
+		while (samples--)
 		{
 			/* do a linear interp on the sample */
 			INT32 sample1 = sample[pos];
@@ -478,8 +478,8 @@ static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sa
 				{
 					chan->source = NULL;
 					chan->source_num = -1;
-					if (length > 0)
-						memset(buffer, 0, length * sizeof(*buffer));
+					if (samples > 0)
+						memset(buffer, 0, samples * sizeof(*buffer));
 					break;
 				}
 			}
@@ -490,7 +490,7 @@ static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sa
 		chan->frac = frac;
 	}
 	else
-		memset(buffer, 0, length * sizeof(*buffer));
+		memset(buffer, 0, samples * sizeof(*buffer));
 }
 
 

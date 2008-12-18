@@ -216,13 +216,13 @@ static void KDAC_A_make_fncode( struct kdacApcm *info ){
 /*    Konami PCM update                         */
 /************************************************/
 
-static void KDAC_A_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int buffer_len)
+static STREAM_UPDATE( KDAC_A_update )
 {
   struct kdacApcm *info = param;
   int i;
 
-  memset(buffer[0],0,buffer_len * sizeof(*buffer[0]));
-  memset(buffer[1],0,buffer_len * sizeof(*buffer[1]));
+  memset(outputs[0],0,samples * sizeof(*outputs[0]));
+  memset(outputs[1],0,samples * sizeof(*outputs[1]));
 
   for( i = 0; i < KDAC_A_PCM_MAX; i++ )
     {
@@ -242,7 +242,7 @@ static void KDAC_A_update(void *param, stream_sample_t **inputs, stream_sample_t
 	  volB = (volB + cen) < 0x1fe ? (volB + cen) : 0x1fe;
 #endif
 
-	  for( j = 0; j < buffer_len; j++ )
+	  for( j = 0; j < samples; j++ )
 	    {
 	      old_addr = addr;
 	      addr = info->start[i] + ((info->addr[i]>>BASE_SHIFT)&0x000fffff);
@@ -282,8 +282,8 @@ static void KDAC_A_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 	      out = (info->pcmbuf[i][addr] & 0x7f) - 0x40;
 
-	      buffer[0][j] += out * volA;
-	      buffer[1][j] += out * volB;
+	      outputs[0][j] += out * volA;
+	      outputs[1][j] += out * volB;
 	    }
 	}
     }

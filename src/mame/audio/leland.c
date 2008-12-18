@@ -104,13 +104,13 @@ static UINT32 dac_bufout[2];
 
 static sound_stream * dac_stream;
 
-static void leland_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( leland_update )
 {
 	stream_sample_t *buffer = outputs[0];
 	int dacnum;
 
 	/* reset the buffer */
-	memset(buffer, 0, length * sizeof(*buffer));
+	memset(buffer, 0, samples * sizeof(*buffer));
 	for (dacnum = 0; dacnum < 2; dacnum++)
 	{
 		int bufout = dac_bufout[dacnum];
@@ -121,7 +121,7 @@ static void leland_update(void *param, stream_sample_t **inputs, stream_sample_t
 			UINT8 *base = dac_buffer[dacnum];
 			int i;
 
-			for (i = 0; i < length && count > 0; i++, count--)
+			for (i = 0; i < samples && count > 0; i++, count--)
 			{
 				buffer[i] += ((INT16)base[bufout] - 0x80) * 0x40;
 				bufout = (bufout + 1) & DAC_BUFFER_MASK;
@@ -304,7 +304,7 @@ static WRITE16_HANDLER( peripheral_w );
  *
  *************************************/
 
-static void leland_80186_dac_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( leland_80186_dac_update )
 {
 	stream_sample_t *buffer = outputs[0];
 	int i, j, start, stop;
@@ -312,7 +312,7 @@ static void leland_80186_dac_update(void *param, stream_sample_t **inputs, strea
 	if (LOG_SHORTAGES) logerror("----\n");
 
 	/* reset the buffer */
-	memset(buffer, 0, length * sizeof(*buffer));
+	memset(buffer, 0, samples * sizeof(*buffer));
 
 	/* if we're redline racer, we have more DACs */
 	if (!is_redline)
@@ -335,7 +335,7 @@ static void leland_80186_dac_update(void *param, stream_sample_t **inputs, strea
 			int step = d->step;
 
 			/* sample-rate convert to the output frequency */
-			for (j = 0; j < length && count > 0; j++)
+			for (j = 0; j < samples && count > 0; j++)
 			{
 				buffer[j] += base[source];
 				frac += step;
@@ -345,8 +345,8 @@ static void leland_80186_dac_update(void *param, stream_sample_t **inputs, strea
 				source &= DAC_BUFFER_SIZE_MASK;
 			}
 
-			if (LOG_SHORTAGES && j < length)
-				logerror("DAC #%d short by %d/%d samples\n", i, length - j, length);
+			if (LOG_SHORTAGES && j < samples)
+				logerror("DAC #%d short by %d/%d samples\n", i, samples - j, samples);
 
 			/* update the DAC state */
 			d->fraction = frac;
@@ -367,14 +367,14 @@ static void leland_80186_dac_update(void *param, stream_sample_t **inputs, strea
  *
  *************************************/
 
-static void leland_80186_dma_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( leland_80186_dma_update )
 {
 	const address_space *dmaspace = param;
 	stream_sample_t *buffer = outputs[0];
 	int i, j;
 
 	/* reset the buffer */
-	memset(buffer, 0, length * sizeof(*buffer));
+	memset(buffer, 0, samples * sizeof(*buffer));
 
 	/* loop over DMA buffers */
 	for (i = 0; i < 2; i++)
@@ -416,7 +416,7 @@ static void leland_80186_dma_update(void *param, stream_sample_t **inputs, strea
 				volume = dac[which].volume;
 
 				/* sample-rate convert to the output frequency */
-				for (j = 0; j < length && count > 0; j++)
+				for (j = 0; j < samples && count > 0; j++)
 				{
 					buffer[j] += ((int)memory_read_byte(dmaspace, source) - 0x80) * volume;
 					frac += step;
@@ -456,7 +456,7 @@ static void leland_80186_dma_update(void *param, stream_sample_t **inputs, strea
  *
  *************************************/
 
-static void leland_80186_extern_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( leland_80186_extern_update )
 {
 	stream_sample_t *buffer = outputs[0];
 	struct dac_state *d = &dac[7];
@@ -464,7 +464,7 @@ static void leland_80186_extern_update(void *param, stream_sample_t **inputs, st
 	int j;
 
 	/* reset the buffer */
-	memset(buffer, 0, length * sizeof(*buffer));
+	memset(buffer, 0, samples * sizeof(*buffer));
 
 	/* if we have data, process it */
 	if (count > 0 && ext_active)
@@ -474,7 +474,7 @@ static void leland_80186_extern_update(void *param, stream_sample_t **inputs, st
 		int step = d->step;
 
 		/* sample-rate convert to the output frequency */
-		for (j = 0; j < length && count > 0; j++)
+		for (j = 0; j < samples && count > 0; j++)
 		{
 			buffer[j] += ((INT16)ext_base[source] - 0x80) * d->volume;
 			frac += step;

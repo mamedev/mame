@@ -675,14 +675,14 @@ INLINE INT32 calculate_1op_fm_1(YMF271Chip *chip, int slotnum)
 	return slot_output;
 }
 
-static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( ymf271_update )
 {
 	int i, j;
 	int op;
 	INT32 *mixp;
 	YMF271Chip *chip = param;
 
-	memset(mix, 0, sizeof(mix[0])*length*2);
+	memset(mix, 0, sizeof(mix[0])*samples*2);
 
 	for (j = 0; j < 12; j++)
 	{
@@ -707,7 +707,7 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 				if (chip->slots[slot1].active)
 				{
-					for (i = 0; i < length; i++)
+					for (i = 0; i < samples; i++)
 					{
 						INT64 output1 = 0, output2 = 0, output3 = 0, output4 = 0, phase_mod1 = 0, phase_mod2 = 0;
 						switch (chip->slots[slot1].algorithm)
@@ -893,7 +893,7 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 					mixp = &mix[0];
 					if (chip->slots[slot1].active)
 					{
-						for (i = 0; i < length; i++)
+						for (i = 0; i < samples; i++)
 						{
 							INT64 output1 = 0, output2 = 0, phase_mod = 0;
 							switch (chip->slots[slot1].algorithm & 3)
@@ -946,7 +946,7 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 				if (chip->slots[slot1].active)
 				{
-					for (i = 0; i < length; i++)
+					for (i = 0; i < samples; i++)
 					{
 						INT64 output1 = 0, output2 = 0, output3 = 0, phase_mod = 0;
 						switch (chip->slots[slot1].algorithm & 7)
@@ -1028,16 +1028,16 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 					}
 				}
 
-				update_pcm(chip, j + (3*12), mixp, length);
+				update_pcm(chip, j + (3*12), mixp, samples);
 				break;
 			}
 
 			case 3:		// PCM
 			{
-				update_pcm(chip, j + (0*12), mixp, length);
-				update_pcm(chip, j + (1*12), mixp, length);
-				update_pcm(chip, j + (2*12), mixp, length);
-				update_pcm(chip, j + (3*12), mixp, length);
+				update_pcm(chip, j + (0*12), mixp, samples);
+				update_pcm(chip, j + (1*12), mixp, samples);
+				update_pcm(chip, j + (2*12), mixp, samples);
+				update_pcm(chip, j + (3*12), mixp, samples);
 				break;
 			}
 
@@ -1046,7 +1046,7 @@ static void ymf271_update(void *param, stream_sample_t **inputs, stream_sample_t
 	}
 
 	mixp = &mix[0];
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		outputs[0][i] = (*mixp++)>>2;
 		outputs[1][i] = (*mixp++)>>2;

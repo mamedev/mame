@@ -6,7 +6,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "includes/tx1.h"
 #include "video/resnet.h"
 #include "sound/custom.h"
@@ -211,21 +210,21 @@ INLINE void update_engine (int eng[4])
 }
 
 
-static void tx1_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( tx1_stream_update )
 {
 	UINT32 step_0, step_1, step_2;
 	double gain_0, gain_1, gain_2, gain_3;
 
-	stream_sample_t *fl = &buffer[0][0];
-	stream_sample_t *fr = &buffer[1][0];
+	stream_sample_t *fl = &outputs[0][0];
+	stream_sample_t *fr = &outputs[1][0];
 
 	static stream_sample_t pit0 = 0;
 	static stream_sample_t pit1 = 0;
 	static stream_sample_t pit2 = 0;
 
 	/* Clear the buffers */
-	memset(buffer[0], 0, length * sizeof(*buffer[0]));
-	memset(buffer[1], 0, length * sizeof(*buffer[1]));
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	/* 8253 outputs for the player/opponent engine sounds. */
 	step_0 = pit8253.counts[0].val ? (TX1_PIT_CLOCK / pit8253.counts[0].val) * freq_to_step : 0;
@@ -237,7 +236,7 @@ static void tx1_stream_update(void *param, stream_sample_t **inputs, stream_samp
 	gain_2 = tx1_engine_gains[ay_outputb & 0xf];
 	gain_3 = BIT(ay_outputb, 5) ? 1.0f : 1.5f;
 
-	while (length--)
+	while (samples--)
 	{
 		if (step0 & ((1 << TX1_FRAC)))
 		{
@@ -417,18 +416,18 @@ WRITE8_HANDLER( bb_ym1_b_w )
 }
 
 /* This is admittedly a bit of a hack job... */
-static void buggyboy_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( buggyboy_stream_update )
 {
 	UINT32 step_0, step_1;
 	int n1_en, n2_en;
 	double gain0, gain1_l, gain1_r;
 
-	stream_sample_t *fl = &buffer[0][0];
-	stream_sample_t *fr = &buffer[1][0];
+	stream_sample_t *fl = &outputs[0][0];
+	stream_sample_t *fr = &outputs[1][0];
 
 	/* Clear the buffers */
-	memset(buffer[0], 0, length * sizeof(*buffer[0]));
-	memset(buffer[1], 0, length * sizeof(*buffer[1]));
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	/* 8253 outputs for the player/opponent buggy engine sounds. */
 	step_0 = pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / pit8253.counts[0].val) * freq_to_step : 0;
@@ -441,7 +440,7 @@ static void buggyboy_stream_update(void *param, stream_sample_t **inputs, stream
 	gain1_l = bb_engine_gains[ym_outputa >> 4] * 5;
 	gain1_r = bb_engine_gains[ym_outputa & 0xf] * 5;
 
-	while (length--)
+	while (samples--)
 	{
 		int i;
 		stream_sample_t pit0, pit1, n1, n2;
@@ -449,7 +448,7 @@ static void buggyboy_stream_update(void *param, stream_sample_t **inputs, stream
 		pit1 = buggyboy_eng_voltages[(step1 >> 24) & 0xf];
 
 		/* Calculate the tyre screech noise source */
-		for (i = 0; i < BUGGYBOY_NOISE_CLOCK / Machine->sample_rate; ++i)
+		for (i = 0; i < BUGGYBOY_NOISE_CLOCK / device->machine->sample_rate; ++i)
 		{
 			/* CD4006 is a 4-4-1-4-4-1 shift register */
 			int p13 = BIT(noise_lfsra, 3);

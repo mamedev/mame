@@ -31,7 +31,7 @@ struct tms5220_info
 
 
 /* static function prototypes */
-static void tms5220_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
+static STREAM_UPDATE( tms5220_update );
 
 
 
@@ -195,25 +195,25 @@ int tms5220_int_r(void)
 
 ***********************************************************************************************/
 
-static void tms5220_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( tms5220_update )
 {
 	struct tms5220_info *info = param;
 	INT16 sample_data[MAX_SAMPLE_CHUNK];
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
 	/* loop while we still have samples to generate */
-	while (length)
+	while (samples)
 	{
-		int samples = (length > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : length;
+		int length = (samples > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : samples;
 		int index;
 
 		/* generate the samples and copy to the target buffer */
-		tms5220_process(info->chip, sample_data, samples);
-		for (index = 0; index < samples; index++)
+		tms5220_process(info->chip, sample_data, length);
+		for (index = 0; index < length; index++)
 			*buffer++ = sample_data[index];
 
 		/* account for the samples */
-		length -= samples;
+		samples -= length;
 	}
 }
 

@@ -42,12 +42,12 @@ static double freq_to_step;
  *
  *************************************/
 
-static void gridlee_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( gridlee_stream_update )
 {
 	stream_sample_t *buffer = outputs[0];
 
 	/* loop over samples */
-	while (length--)
+	while (samples--)
 	{
 		/* tone channel */
 		tone_fraction += tone_step;

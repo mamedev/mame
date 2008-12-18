@@ -10,7 +10,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "includes/amiga.h"
 #include "cpu/m68000/m68000.h"
 
@@ -123,7 +122,7 @@ void amiga_audio_update(void)
 
 
 
-static void amiga_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( amiga_stream_update )
 {
 	amiga_audio *audio = param;
 	int channum, sampoffs = 0;
@@ -138,11 +137,11 @@ static void amiga_stream_update(void *param, stream_sample_t **inputs, stream_sa
 
 		/* clear the sample data to 0 */
 		for (channum = 0; channum < 4; channum++)
-			memset(outputs[channum], 0, sizeof(stream_sample_t) * length);
+			memset(outputs[channum], 0, sizeof(stream_sample_t) * samples);
 		return;
 	}
 
-	length *= CLOCK_DIVIDER;
+	samples *= CLOCK_DIVIDER;
 
 	/* update the DMA states on each channel and reload if fresh */
 	for (channum = 0; channum < 4; channum++)
@@ -154,10 +153,10 @@ static void amiga_stream_update(void *param, stream_sample_t **inputs, stream_sa
 	}
 
 	/* loop until done */
-	while (length > 0)
+	while (samples > 0)
 	{
 		int nextper, nextvol;
-		int ticks = length;
+		int ticks = samples;
 
 		/* determine the number of ticks we can do in this chunk */
 		if (ticks > audio->channel[0].curticks)
@@ -242,7 +241,7 @@ static void amiga_stream_update(void *param, stream_sample_t **inputs, stream_sa
 				/* if we're in manual mode, signal an interrupt once we latch the low byte */
 				if (!chan->dmaenabled && chan->manualmode && (chan->curlocation & 1))
 				{
-					signal_irq(Machine, NULL, channum);
+					signal_irq(device->machine, NULL, channum);
 					chan->manualmode = FALSE;
 				}
 			}
@@ -250,7 +249,7 @@ static void amiga_stream_update(void *param, stream_sample_t **inputs, stream_sa
 
 		/* bump ourselves forward by the number of ticks */
 		sampoffs += ticks;
-		length -= ticks;
+		samples -= ticks;
 	}
 }
 

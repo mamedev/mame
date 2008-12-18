@@ -119,7 +119,7 @@ WRITE8_HANDLER( warpwarp_music2_w )
 
 }
 
-static void warpwarp_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( warpwarp_sound_update )
 {
     static int vcarry = 0;
     static int vcount = 0;
@@ -127,7 +127,7 @@ static void warpwarp_sound_update(void *param, stream_sample_t **inputs, stream_
 	static int mcount = 0;
 	stream_sample_t *buffer = outputs[0];
 
-    while (length--)
+    while (samples--)
     {
 		*buffer++ = (sound_signal + music_signal) / 2;
 

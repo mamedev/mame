@@ -484,12 +484,12 @@ INLINE void clock_channel(timer8253_channel *ch)
 }
 
 
-static void usb_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( usb_stream_update )
 {
 	stream_sample_t *dest = outputs[0];
 
 	/* iterate over samples */
-	while (length--)
+	while (samples--)
 	{
 		double noiseval;
 		double sample = 0;

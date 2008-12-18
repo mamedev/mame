@@ -11,7 +11,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "sound/custom.h"
 #include "sound/sn76477.h"
@@ -394,15 +393,15 @@ INLINE void validate_tone_channel(running_machine *machine, int channel)
 	}
 }
 
-static void rockola_tone_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int len)
+static STREAM_UPDATE( rockola_tone_update )
 {
 	stream_sample_t *buffer = outputs[0];
 	int i;
 
 	for (i = 0; i < CHANNELS; i++)
-		validate_tone_channel(Machine, i);
+		validate_tone_channel(device->machine, i);
 
-	while (len-- > 0)
+	while (samples-- > 0)
 	{
 		INT32 data = 0;
 
@@ -435,7 +434,7 @@ static void rockola_tone_update(void *param, stream_sample_t **inputs, stream_sa
 				tone_channels[i].offset++;
 				tone_channels[i].offset &= tone_channels[i].mask;
 
-				validate_tone_channel(Machine, i);
+				validate_tone_channel(device->machine, i);
 			}
 
 			if (tone_channels[0].offset == 0 && Sound0StopOnRollover)

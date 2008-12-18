@@ -20,14 +20,14 @@ struct TMS3615 {
 	int enable; 			/* mask which tones to play */
 };
 
-static void tms3615_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( tms3615_sound_update )
 {
 	struct TMS3615 *tms = param;
 	int samplerate = tms->samplerate;
-	stream_sample_t *buffer8 = _buffer[TMS3615_FOOTAGE_8];
-	stream_sample_t *buffer16 = _buffer[TMS3615_FOOTAGE_16];
+	stream_sample_t *buffer8 = outputs[TMS3615_FOOTAGE_8];
+	stream_sample_t *buffer16 = outputs[TMS3615_FOOTAGE_16];
 
-	while( length-- > 0 )
+	while( samples-- > 0 )
 	{
 		int sum8 = 0, sum16 = 0, tone = 0;
 

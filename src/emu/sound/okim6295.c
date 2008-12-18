@@ -251,7 +251,7 @@ static void generate_adpcm(struct okim6295 *chip, struct ADPCMVoice *voice, INT1
 
 ***********************************************************************************************/
 
-static void okim6295_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( okim6295_update )
 {
 	struct okim6295 *chip = param;
 	int i;

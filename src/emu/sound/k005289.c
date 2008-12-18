@@ -87,16 +87,16 @@ static int make_mixer_table(struct k005289_info *info, int voices)
 
 
 /* generate sound to the mix buffer */
-static void K005289_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static STREAM_UPDATE( K005289_update )
 {
 	struct k005289_info *info = param;
 	k005289_sound_channel *voice=info->channel_list;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 	short *mix;
 	int i,v,f;
 
 	/* zap the contents of the mixer buffer */
-	memset(info->mixer_buffer, 0, length * sizeof(INT16));
+	memset(info->mixer_buffer, 0, samples * sizeof(INT16));
 
 	v=voice[0].volume;
 	f=voice[0].frequency;
@@ -108,7 +108,7 @@ static void K005289_update(void *param, stream_sample_t **inputs, stream_sample_
 		mix = info->mixer_buffer;
 
 		/* add our contribution */
-		for (i = 0; i < length; i++)
+		for (i = 0; i < samples; i++)
 		{
 			int offs;
 
@@ -131,7 +131,7 @@ static void K005289_update(void *param, stream_sample_t **inputs, stream_sample_
 		mix = info->mixer_buffer;
 
 		/* add our contribution */
-		for (i = 0; i < length; i++)
+		for (i = 0; i < samples; i++)
 		{
 			int offs;
 
@@ -146,7 +146,7 @@ static void K005289_update(void *param, stream_sample_t **inputs, stream_sample_
 
 	/* mix it down */
 	mix = info->mixer_buffer;
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 		*buffer++ = info->mixer_lookup[*mix++];
 }
 

@@ -91,10 +91,10 @@ static void timer_handler(void *param,int c,int count,int clock)
 	}
 }
 
-static void ym2203_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( ym2203_stream_update )
 {
 	struct ym2203_info *info = param;
-	ym2203_update_one(info->chip, buffer[0], length);
+	ym2203_update_one(info->chip, outputs[0], samples);
 }
 
 

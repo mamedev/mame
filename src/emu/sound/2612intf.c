@@ -73,10 +73,10 @@ void ym2612_update_request(void *param)
 /*    YM2612                                               */
 /***********************************************************/
 
-static void ym2612_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
+static STREAM_UPDATE( ym2612_stream_update )
 {
 	struct ym2612_info *info = param;
-	ym2612_update_one(info->chip, buffers, length);
+	ym2612_update_one(info->chip, outputs, samples);
 }
 
 

@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "cpu/mcs48/mcs48.h"
 #include "segag80r.h"
@@ -340,7 +339,7 @@ WRITE8_HANDLER( astrob_sound_w )
 
 static SOUND_START( 005 );
 static CUSTOM_START( sega005_custom_start );
-static void sega005_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+static STREAM_UPDATE( sega005_stream_update );
 static TIMER_CALLBACK( sega005_auto_timer );
 static WRITE8_DEVICE_HANDLER( sega005_sound_a_w );
 static WRITE8_DEVICE_HANDLER( sega005_sound_b_w );
@@ -595,9 +594,9 @@ static CUSTOM_START( sega005_custom_start )
 }
 
 
-static void sega005_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+static STREAM_UPDATE( sega005_stream_update )
 {
-	const UINT8 *sound_prom = memory_region(Machine, "proms");
+	const UINT8 *sound_prom = memory_region(device->machine, "proms");
 	int i;
 
 	/* no implementation yet */

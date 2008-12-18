@@ -67,10 +67,10 @@ WRITE8_HANDLER( bzone_sounds_w )
     sound_global_enable(latch & 0x20);
 }
 
-static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
+static STREAM_UPDATE( bzone_sound_update )
 {
 	stream_sample_t *buffer = outputs[0];
-	while( length-- )
+	while( samples-- )
 	{
 		static int last_val = 0;
 		int sum = 0;

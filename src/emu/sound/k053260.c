@@ -100,7 +100,7 @@ INLINE int limit( int val, int max, int min ) {
 #define MAXOUT 0x7fff
 #define MINOUT -0x8000
 
-static void k053260_update( void * param, stream_sample_t **inputs, stream_sample_t **buffer, int length ) {
+static STREAM_UPDATE( k053260_update ) {
 	static const long dpcmcnv[] = { 0,1,2,4,8,16,32,64, -128, -64, -32, -16, -8, -4, -2, -1};
 
 	int i, j, lvol[4], rvol[4], play[4], loop[4], ppcm_data[4], ppcm[4];
@@ -126,7 +126,7 @@ static void k053260_update( void * param, stream_sample_t **inputs, stream_sampl
 			delta[i] /= 2;
 	}
 
-		for ( j = 0; j < length; j++ ) {
+		for ( j = 0; j < samples; j++ ) {
 
 			dataL = dataR = 0;
 
@@ -187,8 +187,8 @@ static void k053260_update( void * param, stream_sample_t **inputs, stream_sampl
 				}
 			}
 
-			buffer[1][j] = limit( dataL, MAXOUT, MINOUT );
-			buffer[0][j] = limit( dataR, MAXOUT, MINOUT );
+			outputs[1][j] = limit( dataL, MAXOUT, MINOUT );
+			outputs[0][j] = limit( dataR, MAXOUT, MINOUT );
 		}
 
 	/* update the regs now */

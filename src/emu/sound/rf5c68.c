@@ -39,16 +39,16 @@ struct rf5c68pcm
 /*    RF5C68 stream update                      */
 /************************************************/
 
-static void rf5c68_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static STREAM_UPDATE( rf5c68_update )
 {
 	struct rf5c68pcm *chip = param;
-	stream_sample_t *left = buffer[0];
-	stream_sample_t *right = buffer[1];
+	stream_sample_t *left = outputs[0];
+	stream_sample_t *right = outputs[1];
 	int i, j;
 
 	/* start with clean buffers */
-	memset(left, 0, length * sizeof(*left));
-	memset(right, 0, length * sizeof(*right));
+	memset(left, 0, samples * sizeof(*left));
+	memset(right, 0, samples * sizeof(*right));
 
 	/* bail if not enabled */
 	if (!chip->enable)
@@ -66,7 +66,7 @@ static void rf5c68_update(void *param, stream_sample_t **inputs, stream_sample_t
 			int rv = ((chan->pan >> 4) & 0x0f) * chan->env;
 
 			/* loop over the sample buffer */
-			for (j = 0; j < length; j++)
+			for (j = 0; j < samples; j++)
 			{
 				int sample;
 
@@ -100,7 +100,7 @@ static void rf5c68_update(void *param, stream_sample_t **inputs, stream_sample_t
 	}
 
 	/* now clamp and shift the result (output is only 10 bits) */
-	for (j = 0; j < length; j++)
+	for (j = 0; j < samples; j++)
 	{
 		stream_sample_t temp;
 

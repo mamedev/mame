@@ -132,12 +132,12 @@ void attckufo_soundport_w (int offset, int data)
 /************************************/
 /* Sound handler update             */
 /************************************/
-static void attckufo_update (void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static STREAM_UPDATE( attckufo_update )
 {
 	int i, v;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 
-	for (i = 0; i < length; i++)
+	for (i = 0; i < samples; i++)
 	{
 		v = 0;
 		if (TONE1_ON /*||(tone1pos!=0) */ )

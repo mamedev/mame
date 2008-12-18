@@ -18,13 +18,13 @@ struct dac_info
 
 
 
-static void DAC_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
+static STREAM_UPDATE( DAC_update )
 {
 	struct dac_info *info = param;
-	stream_sample_t *buffer = _buffer[0];
+	stream_sample_t *buffer = outputs[0];
 	INT16 out = info->output;
 
-	while (length--) *(buffer++) = out;
+	while (samples--) *(buffer++) = out;
 }
 
 

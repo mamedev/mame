@@ -102,7 +102,7 @@ struct x1_010_info
 /*--------------------------------------------------------------
  generate sound to the mix buffer
 --------------------------------------------------------------*/
-static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
+static STREAM_UPDATE( seta_update )
 {
 	struct x1_010_info *info = param;
 	X1_010_CHANNEL	*reg;
@@ -113,16 +113,16 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 	const UINT8 *snd1 = info->region;
 
 	// mixer buffer zero clear
-	memset( buffer[0], 0, length*sizeof(*buffer[0]) );
-	memset( buffer[1], 0, length*sizeof(*buffer[1]) );
+	memset( outputs[0], 0, samples*sizeof(*outputs[0]) );
+	memset( outputs[1], 0, samples*sizeof(*outputs[1]) );
 
 //  if( info->sound_enable == 0 ) return;
 
 	for( ch = 0; ch < SETA_NUM_CHANNELS; ch++ ) {
 		reg = (X1_010_CHANNEL *)&(info->reg[ch*sizeof(X1_010_CHANNEL)]);
 		if( (reg->status&1) != 0 ) {							// Key On
-			stream_sample_t *bufL = buffer[0];
-			stream_sample_t *bufR = buffer[1];
+			stream_sample_t *bufL = outputs[0];
+			stream_sample_t *bufR = outputs[1];
 			if( (reg->status&2) == 0 ) {						// PCM sampling
 				start    = (INT8 *)(reg->start      *0x1000+snd1);
 				end      = (INT8 *)((0x100-reg->end)*0x1000+snd1);
@@ -138,7 +138,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 					LOG_SOUND(( "Play sample %p - %p, channel %X volume %d:%d freq %X step %X offset %X\n",
 						start, end, ch, volL, volR, freq, smp_step, smp_offs ));
 				}
-				for( i = 0; i < length; i++ ) {
+				for( i = 0; i < samples; i++ ) {
 					delta = smp_offs>>FREQ_BASE_BITS;
 					// sample ended?
 					if( start+delta >= end ) {
@@ -165,7 +165,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 					LOG_SOUND(( "Play waveform %X, channel %X volume %X freq %4X step %X offset %X\n",
 						reg->volume, ch, reg->end, freq, smp_step, smp_offs ));
 				}
-				for( i = 0; i < length; i++ ) {
+				for( i = 0; i < samples; i++ ) {
 					int vol;
 					delta = env_offs>>ENV_BASE_BITS;
 	 				// Envelope one shot mode
