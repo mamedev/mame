@@ -996,15 +996,14 @@ ROM_START( boobhack )
 	ROM_LOAD( "1-n.bin",	0x10000, 0x8000, CRC(e300747a) SHA1(5875a46c215b12f1e9a889819215bca40e4459a6) )
 	ROM_LOAD( "1-o.bin",	0x18000, 0x8000, CRC(cddc6a6c) SHA1(28d12342e0ada941f68845fa65793a3f5fa21246) ) // Booby Kids gfx hack changes these 2 roms ONLY
 
-	ROM_REGION( 0x500, "proms", 0 )
+	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "kid_prom.10f", 0x000, 0x100, CRC(ca13ce23) SHA1(46f0ed22f601721fa35bab12ce8816f30b102f59) ) /* red */
 	ROM_LOAD( "kid_prom.11f", 0x100, 0x100, CRC(fb44285a) SHA1(f9605e82f63188daeff044fd48d81c1dfc4d4f2a) ) /* green */
 	ROM_LOAD( "kid_prom.12f", 0x200, 0x100, CRC(40d41237) SHA1(b33082540d739a3bfe096f68f3359fbf1360b5be) ) /* blue */
 	ROM_LOAD( "kid_prom.2g",  0x300, 0x100, CRC(4b9be0ed) SHA1(81aa7bb24fe6ea13f5dffdb67ea699adf0b3129a) ) /* clut */
-	ROM_LOAD( "kid_prom.4e",  0x400, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 
 	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, NO_DUMP ) /* ctable */
+	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, NO_DUMP CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 ROM_END
 
 static DRIVER_INIT( amazon )
