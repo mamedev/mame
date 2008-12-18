@@ -8,8 +8,8 @@
 #include "cpuintrf.h"
 
 #include "host.h"
+#include "i86priv.h"
 #include "i86.h"
-#include "i86intf.h"
 
 #include "i86mem.h"
 
@@ -268,7 +268,7 @@ static CPU_DISASSEMBLE( i8086 )
 
 #if (HAS_I80186 || HAS_I80188)
 
-#include "i186intf.h"
+#include "i86.h"
 
 #undef PREFIX
 #define PREFIX(name) i80186##name

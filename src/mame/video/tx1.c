@@ -6,8 +6,8 @@
 
 #include "driver.h"
 #include "render.h"
-#include "cpu/i86/i86.h"
 #include "video/resnet.h"
+#include "cpu/i86/i86.h"
 #include "tx1.h"
 
 

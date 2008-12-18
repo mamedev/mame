@@ -755,26 +755,25 @@ DBGOBJS += $(CPUOBJ)/i386/i386dasm.o
 endif
 
 I86DEPS = \
-	$(CPUSRC)/i86/i86.h \
+	$(CPUSRC)/i86/i86priv.h \
 	$(CPUSRC)/i86/ea.h \
 	$(CPUSRC)/i86/host.h \
 	$(CPUSRC)/i86/modrm.h
 
 $(CPUOBJ)/i86/i86.o:	$(CPUSRC)/i86/i86.c \
+						$(CPUSRC)/i86/i86.h \
 						$(CPUSRC)/i86/instr86.c \
 						$(CPUSRC)/i86/instr186.c \
-						$(CPUSRC)/i86/i86intf.h \
-						$(CPUSRC)/i86/i186intf.h \
 						$(I86DEPS)
 
-$(CPUOBJ)/i86/i286.o:	$(CPUSRC)/i86/i86.c \
+$(CPUOBJ)/i86/i286.o:	$(CPUSRC)/i86/i286.c \
+						$(CPUSRC)/i86/i286.h \
 						$(CPUSRC)/i86/instr286.c \
-						$(CPUSRC)/i86/i286intf.h \
 						$(I86DEPS)
 
 $(CPUOBJ)/i386/i386.o:	$(CPUSRC)/i386/i386.c \
 						$(CPUSRC)/i386/i386.h \
-						$(CPUSRC)/i386/i386intf.h \
+						$(CPUSRC)/i386/i386priv.h \
 						$(CPUSRC)/i386/i386op16.c \
 						$(CPUSRC)/i386/i386op32.c \
 						$(CPUSRC)/i386/i386ops.c \
@@ -1274,11 +1273,11 @@ endif
 
 $(CPUOBJ)/nec/nec.o:	$(CPUSRC)/nec/nec.c \
 						$(CPUSRC)/nec/nec.h \
-						$(CPUSRC)/nec/necintrf.h \
 						$(CPUSRC)/nec/necea.h \
 						$(CPUSRC)/nec/nechost.h \
 						$(CPUSRC)/nec/necinstr.h \
-						$(CPUSRC)/nec/necmodrm.h
+						$(CPUSRC)/nec/necmodrm.h \
+						$(CPUSRC)/nec/necpriv.h
 
 $(CPUOBJ)/v30mz/v30mz.o:	$(CPUSRC)/v30mz/v30mz.c \
 							$(CPUSRC)/v30mz/v30mz.h \
@@ -1286,7 +1285,7 @@ $(CPUOBJ)/v30mz/v30mz.o:	$(CPUSRC)/v30mz/v30mz.c \
 							$(CPUSRC)/v30mz/necinstr.h \
 							$(CPUSRC)/v30mz/necea.h \
 							$(CPUSRC)/v30mz/nechost.h \
-							$(CPUSRC)/v30mz/necintrf.h
+							$(CPUSRC)/v30mz/nec.h
 
 
 

@@ -4,7 +4,7 @@
 #ifndef __I286INTF_H__
 #define __I286INTF_H__
 
-#include "i86intf.h"
+#include "i86.h"
 
 enum
 {

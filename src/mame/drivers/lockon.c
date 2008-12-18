@@ -11,7 +11,7 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
 #include "lockon.h"

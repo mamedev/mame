@@ -66,6 +66,30 @@ typedef struct
 	int		nmi_state;
 } m6805_Regs;
 
+/****************************************************************************/
+/* Read a byte from given memory location                                   */
+/****************************************************************************/
+#define M6805_RDMEM(Addr) ((unsigned)memory_read_byte_8be(cpustate->program, Addr))
+
+/****************************************************************************/
+/* Write a byte to given memory location                                    */
+/****************************************************************************/
+#define M6805_WRMEM(Addr,Value) (memory_write_byte_8be(cpustate->program, Addr,Value))
+
+/****************************************************************************/
+/* M6805_RDOP() is identical to M6805_RDMEM() except it is used for reading */
+/* opcodes. In case of system with memory mapped I/O, this function can be  */
+/* used to greatly speed up emulation                                       */
+/****************************************************************************/
+#define M6805_RDOP(Addr) ((unsigned)memory_decrypted_read_byte(cpustate->program, Addr))
+
+/****************************************************************************/
+/* M6805_RDOP_ARG() is identical to M6805_RDOP() but it's used for reading  */
+/* opcode arguments. This difference can be used to support systems that    */
+/* use different encoding mechanisms for opcodes and opcode arguments       */
+/****************************************************************************/
+#define M6805_RDOP_ARG(Addr) ((unsigned)memory_raw_read_byte(cpustate->program, Addr))
+
 #define SUBTYPE	cpustate->subtype	/* CPU Type */
 #define SP_MASK cpustate->sp_mask	/* stack pointer mask */
 #define SP_LOW	cpustate->sp_low	/* stack pointer low water mark */

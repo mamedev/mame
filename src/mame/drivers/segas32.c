@@ -294,7 +294,7 @@ Stadium Cross EPR15093  EPR15094  EPR15018  EPR15019  EPR15192  EPR15020  EPR150
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 #include "rendlay.h"
 #include "segas32.h"
 #include "machine/eeprom.h"

@@ -50,7 +50,7 @@ typedef UINT16 WORD;
 typedef UINT32 DWORD;
 
 #include "v30mz.h"
-#include "necintrf.h"
+#include "nec.h"
 
 extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom);
 

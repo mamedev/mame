@@ -4,7 +4,7 @@
 */
 
 #include "driver.h"
-#include "cpu/i386/i386intf.h"
+#include "cpu/i386/i386.h"
 #include "memconv.h"
 #include "devconv.h"
 #include "deprecat.h"
@@ -17,7 +17,6 @@
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "cpu/i386/i386.h"
 
 static void ide_interrupt(const device_config *device, int state);
 

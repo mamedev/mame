@@ -42,7 +42,7 @@ so it could be by them instead
 */
 
 #include "driver.h"
-#include "cpu/i86/i88intf.h"
+#include "cpu/i86/i86.h"
 #include "sound/ay8910.h"
 
 static UINT8 *hotblock_ram;

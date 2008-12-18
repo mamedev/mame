@@ -79,7 +79,7 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "cpu/i86/i186intf.h"
+#include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 #include "leland.h"
 #include "sound/custom.h"

@@ -64,7 +64,7 @@
 */
 
 #include "driver.h"
-#include "cpu/i386/i386intf.h"
+#include "cpu/i386/i386.h"
 #include "devconv.h"
 #include "deprecat.h"
 #include "machine/8237dma.h"
@@ -76,7 +76,6 @@
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "cpu/i386/i386.h"
 #include "sound/dmadac.h"
 
 #define SPEEDUP_HACKS	1

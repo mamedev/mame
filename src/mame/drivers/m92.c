@@ -194,13 +194,12 @@ psoldier dip locations still need veritication.
 *****************************************************************************/
 
 #include "driver.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 #include "m92.h"
 #include "iremipt.h"
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"
-#include "cpu/nec/nec.h"
 
 static UINT8 irqvector;
 static UINT16 sound_status;

@@ -46,7 +46,7 @@ Notes:
 */
 
 #include "driver.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 
 static UINT16 *unkram;
 static UINT16 *mainram;

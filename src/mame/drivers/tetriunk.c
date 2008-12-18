@@ -9,7 +9,7 @@
 */
 
 #include "driver.h"
-#include "cpu/i86/i88intf.h"
+#include "cpu/i86/i86.h"
 
 static int crtindex;
 static int crtdata[256];

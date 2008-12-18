@@ -16,8 +16,8 @@
 
 #define INPUT_LINE_A20		1
 
-#include "i86.h"
-#include "i286intf.h"
+#include "i86priv.h"
+#include "i286.h"
 
 
 #include "i86time.c"

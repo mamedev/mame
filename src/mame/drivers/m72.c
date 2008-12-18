@@ -82,7 +82,7 @@ other supported games as well.
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 #include "deprecat.h"
 #include "machine/irem_cpu.h"
 #include "audio/m72.h"
@@ -90,7 +90,6 @@ other supported games as well.
 #include "sound/2151intf.h"
 #include "iremipt.h"
 #include "m72.h"
-#include "cpu/nec/nec.h"
 #include "cpu/mcs51/mcs51.h"
 
 #define MASTER_CLOCK		XTAL_32MHz

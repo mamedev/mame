@@ -9,6 +9,16 @@
 #define g65816i_jumping(A)
 
 
+#undef G65816_CALL_DEBUGGER
+#define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(cpustate->device, x)
+
+#define g65816_read_8(addr) 			memory_read_byte_8be(cpustate->program, addr)
+#define g65816_write_8(addr,data)		memory_write_byte_8be(cpustate->program, addr,data)
+#define g65816_read_8_immediate(A)		memory_read_byte_8be(cpustate->program, A)
+#define g65816_jumping(A)
+#define g65816_branching(A)
+
+
 /* ======================================================================== */
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */

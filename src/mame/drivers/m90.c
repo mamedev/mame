@@ -26,14 +26,13 @@ Notes:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 #include "deprecat.h"
 #include "iremipt.h"
 #include "machine/irem_cpu.h"
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
-#include "cpu/nec/nec.h"
 
 static UINT32 bankaddress;
 

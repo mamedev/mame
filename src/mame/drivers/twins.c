@@ -49,7 +49,7 @@ Electronic Devices was printed on rom labels
 */
 
 #include "driver.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 #include "sound/ay8910.h"
 
 static UINT16 *twins_videoram;

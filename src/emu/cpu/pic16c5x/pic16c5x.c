@@ -126,6 +126,60 @@ struct _pic16c5x_opcode_00x
 
 
 
+/****************************************************************************
+ *  Read the state of the T0 Clock input signal
+ */
+
+#define PIC16C5x_T0_In (memory_read_byte_8le(cpustate->io, PIC16C5x_T0))
+
+
+/****************************************************************************
+ *  Input a word from given I/O port
+ */
+
+#define PIC16C5x_In(Port) ((UINT8)memory_read_byte_8le(cpustate->io, (Port)))
+
+
+/****************************************************************************
+ *  Output a word to given I/O port
+ */
+
+#define PIC16C5x_Out(Port,Value) (memory_write_byte_8le(cpustate->io, (Port),Value))
+
+
+
+/****************************************************************************
+ *  Read a word from given RAM memory location
+ */
+
+#define PIC16C5x_RAM_RDMEM(A) ((UINT8)memory_read_byte_8le(cpustate->data, A))
+
+
+/****************************************************************************
+ *  Write a word to given RAM memory location
+ */
+
+#define PIC16C5x_RAM_WRMEM(A,V) (memory_write_byte_8le(cpustate->data, A,V))
+
+
+
+/****************************************************************************
+ *  PIC16C5X_RDOP() is identical to PIC16C5X_RDMEM() except it is used for
+ *  reading opcodes. In case of system with memory mapped I/O, this function
+ *  can be used to greatly speed up emulation
+ */
+
+#define PIC16C5x_RDOP(A) (memory_decrypted_read_word(cpustate->program, (A)<<1))
+
+
+/****************************************************************************
+ *  PIC16C5X_RDOP_ARG() is identical to PIC16C5X_RDOP() except it is used
+ *  for reading opcode arguments. This difference can be used to support systems
+ *  that use different encoding mechanisms for opcodes and opcode arguments
+ */
+
+#define PIC16C5x_RDOP_ARG(A) (memory_raw_read_word(cpustate->program, (A)<<1))
+
 
 #define TMR0	internalram[1]
 #define PCL		internalram[2]

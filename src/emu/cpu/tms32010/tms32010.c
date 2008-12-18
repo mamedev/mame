@@ -138,6 +138,75 @@ struct _tms32010_opcode_7F
 
 
 
+/****************************************************************************
+ *  Read the state of the BIO pin
+ */
+
+#define TMS32010_BIO_In (memory_read_word_16be(cpustate->io, TMS32010_BIO<<1))
+
+
+/****************************************************************************
+ *  Input a word from given I/O port
+ */
+
+#define TMS32010_In(Port) (memory_read_word_16be(cpustate->io, (Port)<<1))
+
+
+/****************************************************************************
+ *  Output a word to given I/O port
+ */
+
+#define TMS32010_Out(Port,Value) (memory_write_word_16be(cpustate->io, (Port)<<1,Value))
+
+
+
+/****************************************************************************
+ *  Read a word from given ROM memory location
+ */
+
+#define TMS32010_ROM_RDMEM(A) (memory_read_word_16be(cpustate->program, (A)<<1))
+
+
+/****************************************************************************
+ *  Write a word to given ROM memory location
+ */
+
+#define TMS32010_ROM_WRMEM(A,V) (memory_write_word_16be(cpustate->program, (A)<<1,V))
+
+
+
+/****************************************************************************
+ *  Read a word from given RAM memory location
+ */
+
+#define TMS32010_RAM_RDMEM(A) (memory_read_word_16be(cpustate->data, (A)<<1))
+
+
+/****************************************************************************
+ *  Write a word to given RAM memory location
+ */
+
+#define TMS32010_RAM_WRMEM(A,V) (memory_write_word_16be(cpustate->data, (A)<<1,V))
+
+
+
+/****************************************************************************
+ *  TMS32010_RDOP() is identical to TMS32010_RDMEM() except it is used for reading
+ *  opcodes. In case of system with memory mapped I/O, this function can be
+ *  used to greatly speed up emulation
+ */
+
+#define TMS32010_RDOP(A) (memory_decrypted_read_word(cpustate->program, (A)<<1))
+
+
+/****************************************************************************
+ *  TMS32010_RDOP_ARG() is identical to TMS32010_RDOP() except it is used
+ *  for reading opcode arguments. This difference can be used to support systems
+ *  that use different encoding mechanisms for opcodes and opcode arguments
+ */
+
+#define TMS32010_RDOP_ARG(A) (memory_raw_read_word(cpustate->program, (A)<<1))
+
 
 /************************************************************************
  *  Shortcuts

@@ -40,7 +40,6 @@ In test mode (c) is 2000
 *************************************************************************************************/
 
 #include "driver.h"
-#include "cpu/nec/necintrf.h"
 #include "cpu/nec/nec.h"
 
 #define xxxx 0x90 /* Unknown */

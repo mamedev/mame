@@ -18,6 +18,31 @@
 
 
 /* ======================================================================== */
+/* ================================= MAME ================================= */
+/* ======================================================================== */
+
+/* Clean up after the emulation core - Not used in this core - */
+CPU_EXIT( m37710 );
+
+/* Save the current CPU state to disk */
+void m37710_state_save(void *file);
+
+/* Load a CPU state from disk */
+void m37710_state_load(void *file);
+
+#undef M37710_CALL_DEBUGGER
+
+#define M37710_CALL_DEBUGGER(x) 		debugger_instruction_hook(cpustate->device, x)
+#define m37710_read_8(addr) 			memory_read_byte_16le(cpustate->program, addr)
+#define m37710_write_8(addr,data)		memory_write_byte_16le(cpustate->program, addr,data)
+#define m37710_read_8_immediate(A)		memory_read_byte_16le(cpustate->program, A)
+#define m37710_read_16(addr) 			memory_read_word_16le(cpustate->program, addr)
+#define m37710_write_16(addr,data)		memory_write_word_16le(cpustate->program, addr,data)
+#define m37710_jumping(A)
+#define m37710_branching(A)
+
+
+/* ======================================================================== */
 /* ================================ GENERAL =============================== */
 /* ======================================================================== */
 

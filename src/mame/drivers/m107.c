@@ -24,13 +24,12 @@ confirmed for m107 games as well.
 *******************************************************************************/
 
 #include "driver.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 #include "m107.h"
 #include "iremipt.h"
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"
-#include "cpu/nec/nec.h"
 
 
 #define M107_IRQ_0 ((m107_irq_vectorbase+0)/4) /* VBL interrupt*/

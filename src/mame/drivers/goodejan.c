@@ -52,7 +52,7 @@ Notes:
 *******************************************************************************************/
 
 #include "driver.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 #include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"

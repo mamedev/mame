@@ -6,8 +6,8 @@
 
 #include "driver.h"
 #include "lockon.h"
-#include "video/resnet.h"
 #include "cpu/nec/nec.h"
+#include "video/resnet.h"
 
 #define CURSOR_XPOS			168
 #define CURSOR_YPOS			239

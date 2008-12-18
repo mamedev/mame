@@ -61,7 +61,7 @@ D.9B         [f99cac4b] /
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 #include "deprecat.h"
 #include "audio/t5182.h"
 

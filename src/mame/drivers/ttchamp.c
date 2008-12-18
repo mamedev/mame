@@ -42,7 +42,7 @@ The PCB is Spanish and manufacured by Gamart.
 */
 
 #include "driver.h"
-#include "cpu/nec/necintrf.h"
+#include "cpu/nec/nec.h"
 
 static UINT16 *peno_vram;
 

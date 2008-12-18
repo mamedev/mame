@@ -57,7 +57,6 @@ struct _t11_state
 #define PSW 	psw.b.l
 
 
-
 /*************************************
  *
  *  Low-level memory operations
@@ -74,25 +73,25 @@ INLINE int ROPCODE(t11_state *cpustate)
 
 INLINE int RBYTE(t11_state *cpustate, int addr)
 {
-	return T11_RDMEM(cpustate, addr);
+	return memory_read_byte_16le(cpustate->program, addr);
 }
 
 
 INLINE void WBYTE(t11_state *cpustate, int addr, int data)
 {
-	T11_WRMEM(cpustate, addr, data);
+	memory_write_byte_16le(cpustate->program, addr, data);
 }
 
 
 INLINE int RWORD(t11_state *cpustate, int addr)
 {
-	return T11_RDMEM_WORD(cpustate, addr & 0xfffe);
+	return memory_read_word_16le(cpustate->program, addr & 0xfffe);
 }
 
 
 INLINE void WWORD(t11_state *cpustate, int addr, int data)
 {
-	T11_WRMEM_WORD(cpustate, addr & 0xfffe, data);
+	memory_write_word_16le(cpustate->program, addr & 0xfffe, data);
 }
 
 

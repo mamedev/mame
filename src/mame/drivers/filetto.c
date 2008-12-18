@@ -64,7 +64,7 @@ AH
 ******************************************************************************************/
 
 #include "driver.h"
-#include "cpu/i86/i88intf.h"
+#include "cpu/i86/i86.h"
 #include "video/generic.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"

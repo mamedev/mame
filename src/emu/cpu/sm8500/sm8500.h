@@ -6,8 +6,8 @@
 #include "cpuintrf.h"
 
 typedef struct {
-	void (*handle_dma)(int cycles);
-	void (*handle_timers)(int cycles);
+	void (*handle_dma)(const device_config *device, int cycles);
+	void (*handle_timers)(const device_config *device, int cycles);
 } SM8500_CONFIG;
 
 /* interrupts */
@@ -25,6 +25,12 @@ typedef struct {
 
 enum
 {
+	CPUINFO_PTR_SM8500_INTERNAL_RAM = CPUINFO_PTR_CPU_SPECIFIC
+};
+	
+
+enum
+{
 	/* "main" 16 bit register */
         SM8500_PC=1, SM8500_SP, SM8500_PS, SM8500_SYS16, SM8500_RR0, SM8500_RR2, SM8500_RR4, SM8500_RR6, SM8500_RR8, SM8500_RR10,
 	SM8500_RR12, SM8500_RR14,
@@ -33,26 +39,8 @@ enum
 	SM8500_SPH, SM8500_SPL, SM8500_PS0, SM8500_PS1, SM8500_P0C, SM8500_P1C, SM8500_P2C, SM8500_P3C,
 };
 
-extern UINT8* sm8500_internal_ram( void ) ;
-extern unsigned sm8500_get_reg( int regnum );
 extern CPU_GET_INFO( sm8500 );
-#define CPU_sm8500 CPU_GET_INFO_NAME( sm8500 )
-
-UINT8 sm85cpu_mem_readbyte( UINT32 offset );
-void sm85cpu_mem_writebyte( UINT32 offset, UINT8 data );
-
-INLINE UINT16 sm85cpu_mem_readword( UINT32 address )
-{
-	UINT16 value = (UINT16) sm85cpu_mem_readbyte( address ) << 8;
-	value |= sm85cpu_mem_readbyte( ( address + 1 ) & 0xffff );
-	return value;
-}
-
-INLINE void sm85cpu_mem_writeword( UINT32 address, UINT16 value )
-{
-	sm85cpu_mem_writebyte( address, value >> 8 );
-	sm85cpu_mem_writebyte( ( address + 1 ) & 0xffff, value & 0xff );
-}
+#define CPU_SM8500 CPU_GET_INFO_NAME( sm8500 )
 
 extern CPU_DISASSEMBLE( sm8500 );
 
