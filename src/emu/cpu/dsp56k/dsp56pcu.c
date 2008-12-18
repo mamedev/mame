@@ -113,7 +113,7 @@ UINT8 dsp56k_operating_mode(dsp56k_core* cpustate)
 }
 
 
-static void pcu_init(dsp56k_core* cpustate, int index)
+static void pcu_init(dsp56k_core* cpustate)
 {
 	// Init the irq table
 	dsp56k_irq_table_init();

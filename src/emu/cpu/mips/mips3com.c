@@ -70,7 +70,7 @@ INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
     structure based on the configured type
 -------------------------------------------------*/
 
-void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const device_config *device, cpu_irq_callback irqcallback)
 {
 	const mips3_config *config = device->static_config;
 	int tlbindex;
@@ -79,7 +79,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const 
 	memset(mips, 0, sizeof(*mips));
 	mips->flavor = flavor;
 	mips->bigendian = bigendian;
-	mips->cpu_clock = clock;
+	mips->cpu_clock = device->clock;
 	mips->irq_callback = irqcallback;
 	mips->device = device;
 	mips->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);

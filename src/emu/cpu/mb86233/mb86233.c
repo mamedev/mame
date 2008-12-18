@@ -97,8 +97,6 @@ static CPU_INIT( mb86233 )
 {
 	mb86233_state *cpustate = device->token;
 	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->static_config;
-	(void)index;
-	(void)clock;
 	(void)irqcallback;
 
 	memset(cpustate, 0, sizeof( *cpustate ) );

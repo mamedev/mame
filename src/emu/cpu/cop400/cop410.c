@@ -200,7 +200,7 @@ static CPU_INIT( cop410 )
 	/* allocate serial timer */
 
 	cop400->serial_timer = timer_alloc(device->machine, cop400_serial_tick, cop400);
-	timer_adjust_periodic(cop400->serial_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
+	timer_adjust_periodic(cop400->serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
 
 	/* initialize instruction length array */
 

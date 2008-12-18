@@ -118,7 +118,7 @@ static void tx0_write(tx0_state *cpustate, offs_t address, int data)
 		;
 }
 
-static void tx0_init_common(int is_64kw, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+static void tx0_init_common(int is_64kw, const device_config *device, cpu_irq_callback irqcallback)
 {
 	tx0_state *cpustate = device->token;
 
@@ -134,12 +134,12 @@ static void tx0_init_common(int is_64kw, const device_config *device, int index,
 
 static CPU_INIT( tx0_64kw )
 {
-	tx0_init_common(1, device, index, clock, irqcallback);
+	tx0_init_common(1, device, irqcallback);
 }
 
 static CPU_INIT( tx0_8kw)
 {
-	tx0_init_common(0, device, index, clock, irqcallback);
+	tx0_init_common(0, device, irqcallback);
 }
 
 static CPU_RESET( tx0 )

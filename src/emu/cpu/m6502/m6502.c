@@ -130,7 +130,7 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
  *
  *****************************************************************************/
 
-static void m6502_common_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
+static void m6502_common_init(const device_config *device, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = device->token;
 
@@ -165,7 +165,7 @@ static void m6502_common_init(const device_config *device, int index, int clock,
 
 static CPU_INIT( m6502 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_6502, insn6502, "m6502");
+	m6502_common_init(device, irqcallback, SUBTYPE_6502, insn6502, "m6502");
 }
 
 static CPU_RESET( m6502 )
@@ -313,7 +313,7 @@ static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 
 static CPU_INIT( n2a03 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_2A03, insn2a03, "n2a03");
+	m6502_common_init(device, irqcallback, SUBTYPE_2A03, insn2a03, "n2a03");
 }
 
 /* The N2A03 is integrally tied to its PSG (they're on the same die).
@@ -336,7 +336,7 @@ void n2a03_irq(const device_config *device)
 
 static CPU_INIT( m6510 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_6510, insn6510, "m6510");
+	m6502_common_init(device, irqcallback, SUBTYPE_6510, insn6510, "m6510");
 }
 
 static CPU_RESET( m6510 )
@@ -404,7 +404,7 @@ ADDRESS_MAP_END
 
 static CPU_INIT( m65c02 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_65C02, insn65c02, "m65c02");
+	m6502_common_init(device, irqcallback, SUBTYPE_65C02, insn65c02, "m65c02");
 }
 
 static CPU_RESET( m65c02 )
@@ -510,7 +510,7 @@ static void m65c02_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 #if (HAS_M65SC02)
 static CPU_INIT( m65sc02 )
 {
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_65SC02, insn65sc02, "m65sc02");
+	m6502_common_init(device, irqcallback, SUBTYPE_65SC02, insn65sc02, "m65sc02");
 }
 #endif
 
@@ -522,7 +522,7 @@ static CPU_INIT( m65sc02 )
 static CPU_INIT( deco16 )
 {
 	m6502_Regs *cpustate = device->token;
-	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
+	m6502_common_init(device, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 

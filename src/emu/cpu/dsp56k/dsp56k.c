@@ -150,9 +150,9 @@ static CPU_INIT( dsp56k )
 	dsp56k_core* cpustate = device->token;
 
 	// Call specific module inits
-	pcu_init(cpustate, index);
-	// agu_init(cpustate, index);
-	// alu_init(cpustate, index);
+	pcu_init(cpustate);
+	// agu_init(cpustate);
+	// alu_init(cpustate);
 
 	// HACK - You're not in bootstrap mode upon bootup
 	cpustate->bootstrap_mode = BOOTSTRAP_OFF;

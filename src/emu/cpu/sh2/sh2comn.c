@@ -696,7 +696,7 @@ void sh2_exception(SH2 *sh2, const char *message, int irqline)
 	#endif
 }
 
-void sh2_common_init(SH2 *sh2, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+void sh2_common_init(SH2 *sh2, const device_config *device, cpu_irq_callback irqcallback)
 {
 	const sh2_cpu_core *conf = device->static_config;
 

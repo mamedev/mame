@@ -913,7 +913,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom);
 }
 
-static void nec_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int type)
+static void nec_init(const device_config *device, cpu_irq_callback irqcallback, int type)
 {
 	v30mz_state *cpustate = device->token;
 
@@ -942,7 +942,7 @@ static void nec_init(const device_config *device, int index, int clock, cpu_irq_
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
-static CPU_INIT( v30mz ) { nec_init(device, index, clock, irqcallback, 3); }
+static CPU_INIT( v30mz ) { nec_init(device, irqcallback, 3); }
 static CPU_EXECUTE( v30mz )
 {
 	v30mz_state *cpustate = device->token;

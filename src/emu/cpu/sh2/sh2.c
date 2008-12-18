@@ -2251,7 +2251,7 @@ static CPU_INIT( sh2 )
 	memset(sh2, 0, sizeof(SH2));
 
 	/* initialize the common core parts */
-	sh2_common_init(sh2, device, index, clock, irqcallback);
+	sh2_common_init(sh2, device, irqcallback);
 }
 
 /**************************************************************************

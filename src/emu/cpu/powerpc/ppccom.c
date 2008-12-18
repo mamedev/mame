@@ -184,7 +184,7 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
     structure based on the configured type
 -------------------------------------------------*/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, cpu_irq_callback irqcallback)
 {
 	const powerpc_config *config = device->static_config;
 
@@ -194,12 +194,12 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	ppc->cap = cap;
 	ppc->cache_line_size = 32;
 	ppc->tb_divisor = tb_divisor;
-	ppc->cpu_clock = clock;
+	ppc->cpu_clock = device->clock;
 	ppc->irq_callback = irqcallback;
 	ppc->device = device;
 	ppc->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	ppc->system_clock = (config != NULL) ? config->bus_frequency : clock;
-	ppc->tb_divisor = (ppc->tb_divisor * clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
+	ppc->system_clock = (config != NULL) ? config->bus_frequency : device->clock;
+	ppc->tb_divisor = (ppc->tb_divisor * device->clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
 
 	/* allocate the virtual TLB */
 	ppc->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, (cap & PPCCAP_603_MMU) ? PPC603_FIXED_TLB_ENTRIES : 0, POWERPC_TLB_ENTRIES);

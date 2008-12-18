@@ -544,7 +544,7 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static adsp2100_state *adsp21xx_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callback irqcallback)
 {
 	adsp2100_state *adsp = device->token;
 
@@ -2034,7 +2034,7 @@ static void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 
 static CPU_INIT( adsp2100 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, index, clock, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2100;
 	adsp->mstat_mask = 0x0f;
 	adsp->imask_mask = 0x0f;
@@ -2091,7 +2091,7 @@ CPU_GET_INFO( adsp2100 )
 
 static CPU_INIT( adsp2101 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, index, clock, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2101;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
@@ -2161,7 +2161,7 @@ CPU_GET_INFO( adsp2101 )
 
 static CPU_INIT( adsp2104 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, index, clock, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2104;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
@@ -2236,7 +2236,7 @@ CPU_GET_INFO( adsp2104 )
 
 static CPU_INIT( adsp2105 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, index, clock, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2105;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
@@ -2305,7 +2305,7 @@ CPU_GET_INFO( adsp2105 )
 
 static CPU_INIT( adsp2115 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, index, clock, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2115;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
@@ -2380,7 +2380,7 @@ CPU_GET_INFO( adsp2115 )
 
 static CPU_INIT( adsp2181 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, index, clock, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2181;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3ff;

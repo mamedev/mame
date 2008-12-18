@@ -1287,7 +1287,7 @@ static CPU_INIT( m6801 )
 	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
-	cpustate->clock = clock;
+	cpustate->clock = device->clock / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
 	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
 
@@ -1333,7 +1333,7 @@ static CPU_INIT( m6803 )
 	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
-	cpustate->clock = clock;
+	cpustate->clock = device->clock / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
 	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
 
@@ -1695,7 +1695,7 @@ static CPU_INIT( hd63701 )
 	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
-	cpustate->clock = clock;
+	cpustate->clock = device->clock / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
 	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
 

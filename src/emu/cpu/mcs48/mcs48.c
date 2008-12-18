@@ -693,7 +693,7 @@ static const mcs48_opcode opcode_table[256]=
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
 
-static void mcs48_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, UINT16 romsize)
+static void mcs48_init(const device_config *device, cpu_irq_callback irqcallback, UINT16 romsize)
 {
 	mcs48_state *cpustate = device->token;
 
@@ -747,7 +747,7 @@ static void mcs48_init(const device_config *device, int index, int clock, cpu_ir
 #if (HAS_I8035 || HAS_MB8884)
 static CPU_INIT( i8035 )
 {
-	mcs48_init(device, index, clock, irqcallback, 0x0);
+	mcs48_init(device, irqcallback, 0x0);
 }
 #endif
 
@@ -761,7 +761,7 @@ static CPU_INIT( i8035 )
 #if (HAS_I8048 || HAS_I8648 || HAS_I8748 || HAS_N7751)
 static CPU_INIT( i8048 )
 {
-	mcs48_init(device, index, clock, irqcallback, 0x400);
+	mcs48_init(device, irqcallback, 0x400);
 }
 #endif
 
@@ -775,7 +775,7 @@ static CPU_INIT( i8048 )
 #if (HAS_I8039)
 static CPU_INIT( i8039 )
 {
-	mcs48_init(device, index, clock, irqcallback, 0x0);
+	mcs48_init(device, irqcallback, 0x0);
 }
 #endif
 
@@ -789,7 +789,7 @@ static CPU_INIT( i8039 )
 #if (HAS_I8049 || HAS_I8749 || HAS_M58715)
 static CPU_INIT( i8049 )
 {
-	mcs48_init(device, index, clock, irqcallback, 0x800);
+	mcs48_init(device, irqcallback, 0x800);
 }
 #endif
 

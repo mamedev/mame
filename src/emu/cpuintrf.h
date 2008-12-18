@@ -224,8 +224,8 @@ enum
 #define CPU_SET_INFO_CALL(name)		CPU_SET_INFO_NAME(name)(device, state, info)
 
 #define CPU_INIT_NAME(name)			cpu_init_##name
-#define CPU_INIT(name)				void CPU_INIT_NAME(name)(const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
-#define CPU_INIT_CALL(name)			CPU_INIT_NAME(name)(device, index, clock, irqcallback)
+#define CPU_INIT(name)				void CPU_INIT_NAME(name)(const device_config *device, cpu_irq_callback irqcallback)
+#define CPU_INIT_CALL(name)			CPU_INIT_NAME(name)(device, irqcallback)
 
 #define CPU_RESET_NAME(name)		cpu_reset_##name
 #define CPU_RESET(name)				void CPU_RESET_NAME(name)(const device_config *device)
@@ -334,7 +334,7 @@ typedef int (*cpu_irq_callback)(const device_config *device, int irqnum);
 
 typedef void (*cpu_get_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
 typedef void (*cpu_set_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
-typedef void (*cpu_init_func)(const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
+typedef void (*cpu_init_func)(const device_config *device, cpu_irq_callback irqcallback);
 typedef void (*cpu_reset_func)(const device_config *device);
 typedef void (*cpu_exit_func)(const device_config *device);
 typedef int	(*cpu_execute_func)(const device_config *device, int cycles);

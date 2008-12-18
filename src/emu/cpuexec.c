@@ -418,7 +418,7 @@ static DEVICE_START( cpu )
 	/* initialize this CPU */
 	num_regs = state_save_get_reg_count(device->machine);
 	init = (cpu_init_func)device_get_info_fct(device, CPUINFO_PTR_INIT);
-	(*init)(device, index, classdata->clock, standard_irq_callback);
+	(*init)(device, standard_irq_callback);
 	num_regs = state_save_get_reg_count(device->machine) - num_regs;
 	
 	/* fetch post-initialization data */

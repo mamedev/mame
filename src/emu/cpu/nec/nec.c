@@ -1087,7 +1087,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
-static void nec_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int type)
+static void nec_init(const device_config *device, cpu_irq_callback irqcallback, int type)
 {
 	const nec_config *config = device->static_config ? device->static_config : &default_config;
 	nec_state_t *nec_state = device->token;
@@ -1212,7 +1212,7 @@ static CPU_INIT( v20 )
 {
 	nec_state_t *nec_state = device->token;
 
-	nec_init(device, index, clock, irqcallback, 0);
+	nec_init(device, irqcallback, 0);
 	configure_memory_8bit(nec_state);
 	nec_state->chip_type=V20;
 	nec_state->prefetch_size = 4;		/* 3 words */
@@ -1225,7 +1225,7 @@ static CPU_INIT( v30 )
 {
 	nec_state_t *nec_state = device->token;
 
-	nec_init(device, index, clock, irqcallback, 1);
+	nec_init(device, irqcallback, 1);
 	configure_memory_16bit(nec_state);
 	nec_state->chip_type=V30;
 	nec_state->prefetch_size = 6;		/* 3 words */
@@ -1239,7 +1239,7 @@ static CPU_INIT( v33 )
 {
 	nec_state_t *nec_state = device->token;
 
-	nec_init(device, index, clock, irqcallback, 2);
+	nec_init(device, irqcallback, 2);
 	nec_state->chip_type=V33;
 	nec_state->prefetch_size = 6;
 	/* FIXME: Need information about prefetch size and cycles for V33.
