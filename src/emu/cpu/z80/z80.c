@@ -3582,7 +3582,8 @@ static CPU_IMPORT_STATE( z80 )
 	switch (entry->index)
 	{
 		case Z80_R:
-			cpustate->rtemp = (cpustate->r & 0x7f) | (cpustate->r2 & 0x80);
+			cpustate->r = cpustate->rtemp & 0x7f;
+			cpustate->r2 = cpustate->rtemp & 0x80;
 			break;
 		
 		default:
@@ -3599,8 +3600,7 @@ static CPU_EXPORT_STATE( z80 )
 	switch (entry->index)
 	{
 		case Z80_R:
-			cpustate->r = cpustate->rtemp & 0x7f;
-			cpustate->r2 = cpustate->rtemp & 0x80;
+			cpustate->rtemp = (cpustate->r & 0x7f) | (cpustate->r2 & 0x80);
 			break;
 
 		default:
