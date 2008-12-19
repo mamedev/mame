@@ -108,7 +108,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		color = (spriteram16[offs+1]>>12)&0xf;
 		sprite = spriteram16[offs+1]&0xfff;
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
@@ -145,7 +145,7 @@ VIDEO_UPDATE( deadang )
 	tilemap_set_enable(pf3_layer,!(deadang_scroll_ram[0x34]&1));
 	tilemap_set_enable(pf1_layer,!(deadang_scroll_ram[0x34]&2));
 	tilemap_set_enable(pf2_layer,!(deadang_scroll_ram[0x34]&4));
-	flip_screen_set( deadang_scroll_ram[0x34]&0x40 );
+	flip_screen_set(screen->machine,  deadang_scroll_ram[0x34]&0x40 );
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	bitmap_fill(priority_bitmap,cliprect,0);

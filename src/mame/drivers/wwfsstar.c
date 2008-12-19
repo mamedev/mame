@@ -222,7 +222,7 @@ static WRITE16_HANDLER ( wwfsstar_soundwrite )
 
 static WRITE16_HANDLER( wwfsstar_flipscreen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 static WRITE16_HANDLER( wwfsstar_irqack_w )

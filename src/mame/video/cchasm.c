@@ -79,7 +79,7 @@ static void cchasm_refresh (running_machine *machine)
         case LENGTH:
             if (move)
             {
-                vector_add_point (currentx, currenty, 0, 0);
+                vector_add_point (machine, currentx, currenty, 0, 0);
                 move = 0;
             }
 
@@ -89,7 +89,7 @@ static void cchasm_refresh (running_machine *machine)
             total_length += abs(data);
 
             if (color)
-                vector_add_point (currentx, currenty, color, 0xff);
+                vector_add_point (machine, currentx, currenty, color, 0xff);
             else
                 move = 1;
             break;

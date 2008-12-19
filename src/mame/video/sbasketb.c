@@ -112,9 +112,9 @@ WRITE8_HANDLER( sbasketb_colorram_w )
 
 WRITE8_HANDLER( sbasketb_flipscreen_w )
 {
-	if (flip_screen_get() != data)
+	if (flip_screen_get(space->machine) != data)
 	{
-		flip_screen_set(data);
+		flip_screen_set(space->machine, data);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }
@@ -152,7 +152,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			int flipx =  spriteram[offs + 1] & 0x40;
 			int flipy =  spriteram[offs + 1] & 0x80;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

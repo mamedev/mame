@@ -276,7 +276,7 @@ static void draw_sprites1(running_machine* machine, bitmap_t *bitmap, const rect
 		y=(y+16)%0x200;
 		x=256 - x;
 		y=256 - y;
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -348,7 +348,7 @@ static void draw_sprites2(running_machine* machine, bitmap_t *bitmap, const rect
 			inc = 1;
 		}
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -394,7 +394,7 @@ static void srdarwin_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 		fx = buffered_spriteram[offs+1] & 0x04;
 		multi = buffered_spriteram[offs+1] & 0x10;
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;
@@ -405,14 +405,14 @@ static void srdarwin_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
     	drawgfx(bitmap,machine->gfx[1],
         		code,
 				color,
-				fx,flip_screen_get(),
+				fx,flip_screen_get(machine),
 				sx,sy,
 				cliprect,TRANSPARENCY_PEN,0);
         if (multi)
     		drawgfx(bitmap,machine->gfx[1],
 				code+1,
 				color,
-				fx,flip_screen_get(),
+				fx,flip_screen_get(machine),
 				sx,sy2,
 				cliprect,TRANSPARENCY_PEN,0);
 	}
@@ -448,7 +448,7 @@ VIDEO_UPDATE( cobracom )
 	tilemap_set_scrolly( dec8_pf0_tilemap,0, (dec8_pf0_control[0x12]<<8)+dec8_pf0_control[0x13] );
 	tilemap_set_scrollx( dec8_pf1_tilemap,0, (dec8_pf1_control[0x10]<<8)+dec8_pf1_control[0x11] );
 	tilemap_set_scrolly( dec8_pf1_tilemap,0, (dec8_pf1_control[0x12]<<8)+dec8_pf1_control[0x13] );
-	flip_screen_set(dec8_pf0_control[0]>>7);
+	flip_screen_set(screen->machine, dec8_pf0_control[0]>>7);
 
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,0,0);
 	draw_sprites2(screen->machine,bitmap,cliprect,1);
@@ -573,7 +573,7 @@ VIDEO_UPDATE( oscar )
 {
 	tilemap_set_scrollx( dec8_pf0_tilemap,0, (dec8_pf0_control[0x10]<<8)+dec8_pf0_control[0x11] );
 	tilemap_set_scrolly( dec8_pf0_tilemap,0, (dec8_pf0_control[0x12]<<8)+dec8_pf0_control[0x13] );
-	flip_screen_set(dec8_pf0_control[1]>>7);
+	flip_screen_set(screen->machine, dec8_pf0_control[1]>>7);
 
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER1 | 0,0);
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER1 | 1,0);

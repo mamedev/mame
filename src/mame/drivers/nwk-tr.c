@@ -214,7 +214,6 @@ Thrill Drive 713A13  -       713A14  -
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
@@ -735,16 +734,16 @@ static VIDEO_UPDATE( nwktr )
 
 /*****************************************************************************/
 
-static double adc12138_input_callback(int input)
+static double adc12138_input_callback(running_machine *machine, int input)
 {
 	int value = 0;
 	switch (input)
 	{
-		case 0:		value = input_port_read(Machine, "ANALOG1") - 0x800; break;
-		case 1:		value = input_port_read(Machine, "ANALOG2"); break;
-		case 2:		value = input_port_read(Machine, "ANALOG3"); break;
-		case 3:		value = input_port_read(Machine, "ANALOG4"); break;
-		case 4:		value = input_port_read(Machine, "ANALOG5"); break;
+		case 0:		value = input_port_read(machine, "ANALOG1") - 0x800; break;
+		case 1:		value = input_port_read(machine, "ANALOG2"); break;
+		case 2:		value = input_port_read(machine, "ANALOG3"); break;
+		case 3:		value = input_port_read(machine, "ANALOG4"); break;
+		case 4:		value = input_port_read(machine, "ANALOG5"); break;
 	}
 
 	return (double)(value) / 2047.0;
@@ -805,7 +804,7 @@ static WRITE32_HANDLER( sysreg_w )
 			int di = (data >> 25) & 0x1;
 			int sclk = (data >> 24) & 0x1;
 
-			adc1213x_cs_w(0, cs);
+			adc1213x_cs_w(space->machine, 0, cs);
 			adc1213x_conv_w(0, conv);
 			adc1213x_di_w(0, di);
 			adc1213x_sclk_w(0, sclk);
@@ -1148,8 +1147,8 @@ static void sound_irq_callback(running_machine *machine, int irq)
 
 static DRIVER_INIT(nwktr)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_NWKTR);
-	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
+	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
+	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
 
 	sharc_dataram = auto_malloc(0x100000);
 	led_reg0 = led_reg1 = 0x7f;

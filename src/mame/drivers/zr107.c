@@ -853,13 +853,13 @@ static void init_zr107(running_machine *machine)
 
 static DRIVER_INIT(zr107)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_ZR107);
+	init_konami_cgboard(machine, 1, CGBOARD_TYPE_ZR107);
 	init_zr107(machine);
 }
 
 static DRIVER_INIT(jetwave)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_GTICLUB);
+	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
 	init_zr107(machine);
 }
 

@@ -180,7 +180,7 @@ WRITE16_HANDLER( gaiden_videoram3_w )
 WRITE16_HANDLER( gaiden_flip_w )
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(data & 1);
+		flip_screen_set(space->machine, data & 1);
 }
 
 
@@ -330,7 +330,7 @@ static void gaiden_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 			if (ypos >= 256)
 				ypos -= 512;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -426,7 +426,7 @@ static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bi
 			if (ypos >= 256)
 				ypos -= 512;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				flipx = !flipx;
 				flipy = !flipy;

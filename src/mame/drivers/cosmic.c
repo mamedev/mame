@@ -462,7 +462,7 @@ static READ8_HANDLER( nomnlnd_port_0_1_r )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data&0x80);
+	flip_screen_set(space->machine, data&0x80);
 }
 
 

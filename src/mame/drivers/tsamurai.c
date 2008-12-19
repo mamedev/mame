@@ -121,7 +121,7 @@ static WRITE8_HANDLER( sound_command3_w )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 static WRITE8_HANDLER( tsamurai_coin_counter_w )

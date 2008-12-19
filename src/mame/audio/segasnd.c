@@ -11,7 +11,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "segag80v.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/sp0250.h"
@@ -311,13 +310,13 @@ static TIMER_CALLBACK( increment_t1_clock )
 }
 
 
-void sega_usb_reset(UINT8 t1_clock_mask)
+void sega_usb_reset(running_machine *machine, UINT8 t1_clock_mask)
 {
 	/* halt the USB CPU at reset time */
 	cpu_set_input_line(usb.cpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* start the clock timer */
-	timer_pulse(Machine, attotime_mul(ATTOTIME_IN_HZ(USB_2MHZ_CLOCK), 256), NULL, 0, increment_t1_clock);
+	timer_pulse(machine, attotime_mul(ATTOTIME_IN_HZ(USB_2MHZ_CLOCK), 256), NULL, 0, increment_t1_clock);
 	usb.t1_clock_mask = t1_clock_mask;
 }
 

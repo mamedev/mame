@@ -460,7 +460,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			gfxdata		=	base_gfx + (8*8*4/8) * (((attr & 0x000f) << 16) + code);
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				flipx = !flipx;		x = max_x - x - width;
 				flipy = !flipy;		y = max_y - y - height;
@@ -652,7 +652,7 @@ VIDEO_UPDATE( hyprduel )
         ---- ---- ---- --1-     ? Blank Screen
         ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)	return 0;
-	flip_screen_set(screenctrl & 1);
+	flip_screen_set(screen->machine, screenctrl & 1);
 
 	/* If the game supports 16x16 tiles, make sure that the
        16x16 and 8x8 tilemaps of a given layer are not simultaneously

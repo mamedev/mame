@@ -543,7 +543,7 @@ static WRITE8_HANDLER (megatech_bios_port_ctrl_w)
 
 static READ8_HANDLER (megatech_bios_joypad_r)
 {
-	return megatech_bios_port_cc_dc_r(offset,bios_port_ctrl);
+	return megatech_bios_port_cc_dc_r(space->machine,offset,bios_port_ctrl);
 }
 
 

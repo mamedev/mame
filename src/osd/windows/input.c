@@ -29,7 +29,6 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "ui.h"
-#include "deprecat.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -145,6 +144,7 @@ struct _device_info
 	void					(*poll)(device_info *info);
 
 	// MAME information
+	running_machine *		machine;
 	input_device *			device;
 
 	// device state
@@ -226,7 +226,7 @@ static void device_list_poll_devices(device_info *devlist_head);
 static void device_list_reset_devices(device_info *devlist_head);
 
 // generic device management
-static device_info *generic_device_alloc(device_info **devlist_head_ptr, const TCHAR *name);
+static device_info *generic_device_alloc(running_machine *machine, device_info **devlist_head_ptr, const TCHAR *name);
 static void generic_device_free(device_info *devinfo);
 static int generic_device_index(device_info *devlist_head, device_info *devinfo);
 static void generic_device_reset(device_info *devinfo);
@@ -243,7 +243,7 @@ static void win32_lightgun_poll(device_info *devinfo);
 static void dinput_init(running_machine *machine);
 static void dinput_exit(running_machine *machine);
 static HRESULT dinput_set_dword_property(LPDIRECTINPUTDEVICE device, REFGUID property_guid, DWORD object, DWORD how, DWORD value);
-static device_info *dinput_device_create(device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level);
+static device_info *dinput_device_create(running_machine *machine, device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level);
 static void dinput_device_release(device_info *devinfo);
 static const char *dinput_device_item_name(device_info *devinfo, int offset, const TCHAR *defstring, const TCHAR *suffix);
 static HRESULT dinput_device_poll(device_info *devinfo);
@@ -258,12 +258,12 @@ static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_int
 // RawInput-specific code
 static void rawinput_init(running_machine *machine);
 static void rawinput_exit(running_machine *machine);
-static device_info *rawinput_device_create(device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device);
+static device_info *rawinput_device_create(running_machine *machine, device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device);
 static void rawinput_device_release(device_info *info);
 static TCHAR *rawinput_device_improve_name(TCHAR *name);
-static void rawinput_keyboard_enum(PRAWINPUTDEVICELIST device);
+static void rawinput_keyboard_enum(running_machine *machine, PRAWINPUTDEVICELIST device);
 static void rawinput_keyboard_update(HANDLE device, RAWKEYBOARD *data);
-static void rawinput_mouse_enum(PRAWINPUTDEVICELIST device);
+static void rawinput_mouse_enum(running_machine *machine, PRAWINPUTDEVICELIST device);
 static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data);
 static void rawinput_mouse_poll(device_info *devinfo);
 
@@ -742,7 +742,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 
 #ifdef MESS
 			case IPT_OSD_2:
-				if (ui_mess_use_new_ui(Machine))
+				if (ui_mess_use_new_ui())
 				{
 					typedesc->token = "TOGGLE_MENUBAR";
 					typedesc->name = "Toggle Menubar";
@@ -789,7 +789,7 @@ static void device_list_reset_devices(device_info *devlist_head)
 //  generic_device_alloc
 //============================================================
 
-static device_info *generic_device_alloc(device_info **devlist_head_ptr, const TCHAR *name)
+static device_info *generic_device_alloc(running_machine *machine, device_info **devlist_head_ptr, const TCHAR *name)
 {
 	device_info **curdev_ptr;
 	device_info *devinfo;
@@ -798,6 +798,7 @@ static device_info *generic_device_alloc(device_info **devlist_head_ptr, const T
 	devinfo = malloc_or_die(sizeof(*devinfo));
 	memset(devinfo, 0, sizeof(*devinfo));
 	devinfo->head = devlist_head_ptr;
+	devinfo->machine = machine;
 
 	// allocate a UTF8 copy of the name
 	devinfo->name = utf8_from_tstring(name);
@@ -889,10 +890,11 @@ static void generic_device_reset(device_info *devinfo)
 
 static INT32 generic_button_get_state(void *device_internal, void *item_internal)
 {
+	device_info *devinfo = device_internal;
 	BYTE *itemdata = item_internal;
 
 	// return the current state
-	poll_if_necessary(Machine);
+	poll_if_necessary(devinfo->machine);
 	return *itemdata >> 7;
 }
 
@@ -903,10 +905,11 @@ static INT32 generic_button_get_state(void *device_internal, void *item_internal
 
 static INT32 generic_axis_get_state(void *device_internal, void *item_internal)
 {
+	device_info *devinfo = device_internal;
 	LONG *axisdata = item_internal;
 
 	// return the current state
-	poll_if_necessary(Machine);
+	poll_if_necessary(devinfo->machine);
 	return *axisdata;
 }
 
@@ -934,7 +937,7 @@ static void win32_init(running_machine *machine)
 		int axisnum, butnum;
 
 		// allocate a device
-		devinfo = generic_device_alloc(&lightgun_list, gun_names[gunnum]);
+		devinfo = generic_device_alloc(machine, &lightgun_list, gun_names[gunnum]);
 		if (devinfo == NULL)
 			break;
 
@@ -1098,7 +1101,7 @@ static void dinput_init(running_machine *machine)
 	if (keyboard_list == NULL)
 	{
 		// enumerate the ones we have
-		result = IDirectInput_EnumDevices(dinput, didevtype_keyboard, dinput_keyboard_enum, 0, DIEDFL_ATTACHEDONLY);
+		result = IDirectInput_EnumDevices(dinput, didevtype_keyboard, dinput_keyboard_enum, machine, DIEDFL_ATTACHEDONLY);
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate keyboards (result=%08X)\n", (UINT32)result);
 	}
@@ -1107,13 +1110,13 @@ static void dinput_init(running_machine *machine)
 	if (mouse_list == NULL)
 	{
 		// enumerate the ones we have
-		result = IDirectInput_EnumDevices(dinput, didevtype_mouse, dinput_mouse_enum, 0, DIEDFL_ATTACHEDONLY);
+		result = IDirectInput_EnumDevices(dinput, didevtype_mouse, dinput_mouse_enum, machine, DIEDFL_ATTACHEDONLY);
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate mice (result=%08X)\n", (UINT32)result);
 	}
 
 	// initialize joystick devices
-	result = IDirectInput_EnumDevices(dinput, didevtype_joystick, dinput_joystick_enum, 0, DIEDFL_ATTACHEDONLY);
+	result = IDirectInput_EnumDevices(dinput, didevtype_joystick, dinput_joystick_enum, machine, DIEDFL_ATTACHEDONLY);
 	if (result != DI_OK)
 		fatalerror("DirectInput: Unable to enumerate joysticks (result=%08X)\n", (UINT32)result);
 }
@@ -1164,13 +1167,13 @@ static HRESULT dinput_set_dword_property(LPDIRECTINPUTDEVICE device, REFGUID pro
 //  dinput_device_create
 //============================================================
 
-static device_info *dinput_device_create(device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level)
+static device_info *dinput_device_create(running_machine *machine, device_info **devlist_head_ptr, LPCDIDEVICEINSTANCE instance, LPCDIDATAFORMAT format1, LPCDIDATAFORMAT format2, DWORD cooperative_level)
 {
 	device_info *devinfo;
 	HRESULT result;
 
 	// allocate memory for the device object
-	devinfo = generic_device_alloc(devlist_head_ptr, instance->tszInstanceName);
+	devinfo = generic_device_alloc(machine, devlist_head_ptr, instance->tszInstanceName);
 
 	// attempt to create a device
 	result = IDirectInput_CreateDevice(dinput, &instance->guidInstance, &devinfo->dinput.device, NULL);
@@ -1308,16 +1311,17 @@ static HRESULT dinput_device_poll(device_info *devinfo)
 
 static BOOL CALLBACK dinput_keyboard_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 {
+	running_machine *machine = ref;
 	device_info *devinfo;
 	int keynum;
 
 	// allocate and link in a new device
-	devinfo = dinput_device_create(&keyboard_list, instance, &c_dfDIKeyboard, NULL, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	devinfo = dinput_device_create(machine, &keyboard_list, instance, &c_dfDIKeyboard, NULL, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	if (devinfo == NULL)
 		goto exit;
 
 	// add the device
-	devinfo->device = input_device_add(Machine, DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
+	devinfo->device = input_device_add(machine, DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
 	devinfo->poll = dinput_keyboard_poll;
 
 	// populate it
@@ -1363,11 +1367,12 @@ static void dinput_keyboard_poll(device_info *devinfo)
 static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 {
 	device_info *devinfo, *guninfo = NULL;
+	running_machine *machine = ref;
 	int axisnum, butnum;
 	HRESULT result;
 
 	// allocate and link in a new device
-	devinfo = dinput_device_create(&mouse_list, instance, &c_dfDIMouse2, &c_dfDIMouse, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+	devinfo = dinput_device_create(machine, &mouse_list, instance, &c_dfDIMouse2, &c_dfDIMouse, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 	if (devinfo == NULL)
 		goto exit;
 
@@ -1375,7 +1380,7 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 	// we only support a single gun in dinput mode, so only add one
 	if (!lightgun_shared_axis_mode && devinfo == mouse_list)
 	{
-		guninfo = generic_device_alloc(&lightgun_list, instance->tszInstanceName);
+		guninfo = generic_device_alloc(machine, &lightgun_list, instance->tszInstanceName);
 		if (guninfo == NULL)
 			goto exit;
 	}
@@ -1389,11 +1394,11 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 	}
 
 	// add the device
-	devinfo->device = input_device_add(Machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
 	devinfo->poll = dinput_mouse_poll;
 	if (guninfo != NULL)
 	{
-		guninfo->device = input_device_add(Machine, DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
+		guninfo->device = input_device_add(machine, DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
 		guninfo->poll = win32_lightgun_poll;
 	}
 
@@ -1464,11 +1469,12 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 {
 	DWORD cooperative_level = (HAS_WINDOW_MENU ? DISCL_BACKGROUND : DISCL_FOREGROUND) | DISCL_EXCLUSIVE;
 	int axisnum, axiscount, povnum, butnum;
+	running_machine *machine = ref;
 	device_info *devinfo;
 	HRESULT result;
 
 	// allocate and link in a new device
-	devinfo = dinput_device_create(&joystick_list, instance, &c_dfDIJoystick, NULL, cooperative_level);
+	devinfo = dinput_device_create(machine, &joystick_list, instance, &c_dfDIJoystick, NULL, cooperative_level);
 	if (devinfo == NULL)
 		goto exit;
 
@@ -1493,7 +1499,7 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 	devinfo->dinput.caps.dwButtons = MIN(devinfo->dinput.caps.dwButtons, 128);
 
 	// add the device
-	devinfo->device = input_device_add(Machine, DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
+	devinfo->device = input_device_add(machine, DEVICE_CLASS_JOYSTICK, devinfo->name, devinfo);
 	devinfo->poll = dinput_joystick_poll;
 
 	// populate the axes
@@ -1593,7 +1599,7 @@ static INT32 dinput_joystick_pov_get_state(void *device_internal, void *item_int
 	DWORD pov;
 
 	// get the current state
-	poll_if_necessary(Machine);
+	poll_if_necessary(devinfo->machine);
 	pov = devinfo->joystick.state.rgdwPOV[povnum];
 
 	// if invalid, return 0
@@ -1656,11 +1662,11 @@ static void rawinput_init(running_machine *machine)
 
 		// handle keyboards
 		if (device->dwType == RIM_TYPEKEYBOARD && !FORCE_DIRECTINPUT)
-			rawinput_keyboard_enum(device);
+			rawinput_keyboard_enum(machine, device);
 
 		// handle mice
 		else if (device->dwType == RIM_TYPEMOUSE && !FORCE_DIRECTINPUT)
-			rawinput_mouse_enum(device);
+			rawinput_mouse_enum(machine, device);
 	}
 
 	// finally, register to recieve raw input WM_INPUT messages
@@ -1716,7 +1722,7 @@ static void rawinput_exit(running_machine *machine)
 //  rawinput_device_create
 //============================================================
 
-static device_info *rawinput_device_create(device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device)
+static device_info *rawinput_device_create(running_machine *machine, device_info **devlist_head_ptr, PRAWINPUTDEVICELIST device)
 {
 	device_info *devinfo = NULL;
 	TCHAR *tname = NULL;
@@ -1735,7 +1741,7 @@ static device_info *rawinput_device_create(device_info **devlist_head_ptr, PRAWI
 
 	// improve the name and then allocate a device
 	tname = rawinput_device_improve_name(tname);
-	devinfo = generic_device_alloc(devlist_head_ptr, tname);
+	devinfo = generic_device_alloc(machine, devlist_head_ptr, tname);
 	free(tname);
 
 	// copy the handle
@@ -1915,18 +1921,18 @@ exit:
 //  rawinput_keyboard_enum
 //============================================================
 
-static void rawinput_keyboard_enum(PRAWINPUTDEVICELIST device)
+static void rawinput_keyboard_enum(running_machine *machine, PRAWINPUTDEVICELIST device)
 {
 	device_info *devinfo;
 	int keynum;
 
 	// allocate and link in a new device
-	devinfo = rawinput_device_create(&keyboard_list, device);
+	devinfo = rawinput_device_create(machine, &keyboard_list, device);
 	if (devinfo == NULL)
 		return;
 
 	// add the device
-	devinfo->device = input_device_add(Machine, DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
+	devinfo->device = input_device_add(machine, DEVICE_CLASS_KEYBOARD, devinfo->name, devinfo);
 
 	// populate it
 	for (keynum = 0; keynum < MAX_KEYS; keynum++)
@@ -1980,13 +1986,13 @@ static void rawinput_keyboard_update(HANDLE device, RAWKEYBOARD *data)
 //  rawinput_mouse_enum
 //============================================================
 
-static void rawinput_mouse_enum(PRAWINPUTDEVICELIST device)
+static void rawinput_mouse_enum(running_machine *machine, PRAWINPUTDEVICELIST device)
 {
 	device_info *devinfo, *guninfo = NULL;
 	int axisnum, butnum;
 
 	// allocate and link in a new mouse device
-	devinfo = rawinput_device_create(&mouse_list, device);
+	devinfo = rawinput_device_create(machine, &mouse_list, device);
 	if (devinfo == NULL)
 		return;
 	devinfo->poll = rawinput_mouse_poll;
@@ -1994,15 +2000,15 @@ static void rawinput_mouse_enum(PRAWINPUTDEVICELIST device)
 	// allocate a second device for the gun (unless we are using the shared axis mode)
 	if (!lightgun_shared_axis_mode)
 	{
-		guninfo = rawinput_device_create(&lightgun_list, device);
+		guninfo = rawinput_device_create(machine, &lightgun_list, device);
 		assert(guninfo != NULL);
 	}
 
 	// add the device
-	devinfo->device = input_device_add(Machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
+	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
 	if (guninfo != NULL)
 	{
-		guninfo->device = input_device_add(Machine, DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
+		guninfo->device = input_device_add(machine, DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
 		guninfo->poll = (guninfo == lightgun_list) ? win32_lightgun_poll : NULL;
 		guninfo->mouse.partner = &devinfo->mouse;
 	}
@@ -2094,7 +2100,7 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 
 static void rawinput_mouse_poll(device_info *devinfo)
 {
-	poll_if_necessary(Machine);
+	poll_if_necessary(devinfo->machine);
 
 	// copy the accumulated raw state to the actual state
 	osd_lock_acquire(input_lock);

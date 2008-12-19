@@ -24,12 +24,12 @@
 */
 
 #include "driver.h"
-#include "cpu/z80/z80.h"
 #include "deprecat.h"
-#include "machine/pcecommn.h"
-#include "video/vdc.h"
+#include "cpu/z80/z80.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
+#include "machine/pcecommn.h"
+#include "video/vdc.h"
 
 static UINT8 jamma_if_control_latch = 0;
 
@@ -97,15 +97,15 @@ static READ8_HANDLER( jamma_if_read_dsw )
 	return dsw_val & 1;
 }
 
-static UINT8 jamma_if_read_joystick( void )
+static UINT8 jamma_if_read_joystick( running_machine *machine )
 {
 	if ( jamma_if_control_latch & 0x10 )
 	{
-		return input_port_read(Machine,  "JOY" );
+		return input_port_read(machine,  "JOY" );
 	}
 	else
 	{
-		return input_port_read(Machine,  "JOY" ) | 0x08;
+		return input_port_read(machine,  "JOY" ) | 0x08;
 	}
 }
 

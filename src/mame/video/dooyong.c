@@ -141,13 +141,13 @@ WRITE8_HANDLER( lastday_ctrl_w )
 	sprites_disabled = data & 0x10;
 
 	/* bit 6 is flip screen */
-	flip_screen_set(data & 0x40);
+	flip_screen_set(space->machine, data & 0x40);
 }
 
 WRITE8_HANDLER( pollux_ctrl_w )
 {
 	/* bit 0 is flip screen */
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 
 	/* bits 6 and 7 are coin counters */
 	coin_counter_w(0, data & 0x80);
@@ -169,7 +169,7 @@ WRITE8_HANDLER( primella_ctrl_w )
 	tx_pri = data & 0x08;
 
 	/* bit 4 flips screen */
-	flip_screen_set(data & 0x10);
+	flip_screen_set(space->machine, data & 0x10);
 
 	/* bit 5 used but unknown */
 
@@ -179,7 +179,7 @@ WRITE8_HANDLER( primella_ctrl_w )
 WRITE8_HANDLER( flytiger_ctrl_w )
 {
 	/* bit 0 is flip screen */
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 
 	/* bits 1, 2, 3 used but unknown */
 
@@ -192,7 +192,7 @@ WRITE16_HANDLER( rshark_ctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 flips screen */
-		flip_screen_set(data & 0x0001);
+		flip_screen_set(space->machine, data & 0x0001);
 
 		/* bit 4 changes tilemaps priority */
 		rshark_pri = data & 0x0010;
@@ -414,7 +414,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			}
 		}
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 498 - sx;
 			sy = 240 - (16 * height) - sy;
@@ -476,7 +476,7 @@ static void rshark_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 			width = buffered_spriteram16[offs+1] & 0x000f;
 			height = (buffered_spriteram16[offs+1] & 0x00f0) >> 4;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 498 - (16 * width) - sx;
 				sy = 240 - (16 * height) - sy;

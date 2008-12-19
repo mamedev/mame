@@ -235,7 +235,7 @@ WRITE8_HANDLER( stfight_vh_latch_w )
 			/* 0x40 = sprites */
 			tilemap_set_enable(bg_tilemap,data & 0x20);
 			tilemap_set_enable(fg_tilemap,data & 0x10);
-			flip_screen_set(data & 0x01);
+			flip_screen_set(space->machine, data & 0x01);
 			break;
 	}
 }
@@ -272,7 +272,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				    sx -= 0x100;
 			}
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -284,7 +284,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			pdrawgfx(bitmap,machine->gfx[4],
 				     code,
 					 color,
-					 flipx,flip_screen_get(),
+					 flipx,flip_screen_get(machine),
 					 sx,sy,
 				     cliprect,TRANSPARENCY_PEN,0x0f,
 					 pri ? 0x02 : 0);

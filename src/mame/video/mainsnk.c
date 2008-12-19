@@ -56,7 +56,7 @@ WRITE8_HANDLER(mainsnk_c600_w)
 {
 	int bank;
 
-	flip_screen_set(~data & 0x80);
+	flip_screen_set(space->machine, ~data & 0x80);
 
 	tilemap_set_palette_offset(bg_tilemap, (data & 0x07) << 4);
 	tilemap_set_palette_offset(tx_tilemap, (data & 0x07) << 4);
@@ -107,7 +107,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sx = 288-16 - sx;
 		sy += 8;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 288-16 - sx;
 			sy = 224-16 - sy;

@@ -35,9 +35,9 @@ WRITE8_HANDLER( bombjack_background_w )
 
 WRITE8_HANDLER( bombjack_flipscreen_w )
 {
-	if (flip_screen_get() != (data & 0x01))
+	if (flip_screen_get(space->machine) != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
+		flip_screen_set(space->machine, data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }
@@ -106,7 +106,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sy = 241-spriteram[offs+2];
 		flipx = spriteram[offs+1] & 0x40;
 		flipy =	spriteram[offs+1] & 0x80;
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			if (spriteram[offs+1] & 0x20)
 			{

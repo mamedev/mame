@@ -373,7 +373,7 @@ static MACHINE_RESET( cojag )
 	jaguardsp_ctrl_w(machine->cpu[2], D_CTRL, 0, 0xffffffff);
 
 	/* init the sound system */
-	cojag_sound_reset();
+	cojag_sound_reset(machine);
 
 	/* reset the IDE controller */
 	devtag_reset(machine, IDE_CONTROLLER, "ide");

@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "taitosnd.h"
 
@@ -41,11 +40,11 @@ typedef struct TC0140SYT
 static struct TC0140SYT tc0140syt;
 
 
-static void Interrupt_Controller(void)
+static void Interrupt_Controller(running_machine *machine)
 {
 	if ( tc0140syt.nmi_req && tc0140syt.nmi_enabled )
 	{
-		cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 		tc0140syt.nmi_req = 0;
 	}
 }
@@ -208,7 +207,7 @@ WRITE8_HANDLER( taitosound_slave_comm_w )
 			logerror("tc0140syt: Slave cpu written in mode [%02x] data[%02x]\n",tc0140syt.submode, data & 0xff);
 	}
 
-	Interrupt_Controller();
+	Interrupt_Controller(space->machine);
 
 }
 
@@ -250,7 +249,7 @@ READ8_HANDLER( taitosound_slave_comm_r )
 			res = 0;
 	}
 
-	Interrupt_Controller();
+	Interrupt_Controller(space->machine);
 
     return res;
 }

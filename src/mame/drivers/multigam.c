@@ -40,7 +40,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "sound/nes_apu.h"
 #include "cpu/m6502/m6502.h"
@@ -206,14 +205,14 @@ static int multigam3_mmc3_4screen;
 static int multigam3_mmc3_last_bank;
 static UINT8* multigmc_mmc3_6000_ram;
 
-static void multigam3_mmc3_scanline_cb( int num, int scanline, int vblank, int blanked )
+static void multigam3_mmc3_scanline_cb( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	if ( !vblank && !blanked )
 	{
 		if ( --multigam3_mmc3_scanline_counter == -1 )
 		{
 			multigam3_mmc3_scanline_counter = multigam3_mmc3_scanline_latch;
-			generic_pulse_irq_line(Machine->cpu[0], 0);
+			generic_pulse_irq_line(machine->cpu[0], 0);
 		}
 	}
 }
@@ -513,9 +512,9 @@ static PALETTE_INIT( multigam )
 	ppu2c0x_init_palette(machine, 0 );
 }
 
-static void ppu_irq( int num, int *ppu_regs )
+static void ppu_irq( running_machine *machine, int num, int *ppu_regs )
 {
-	cpu_set_input_line(Machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */

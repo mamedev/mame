@@ -128,12 +128,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			priority_mask = (0xf0);
 		}
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			sx = 239 - sx - 24;
 			flipx = !flipx;
 		}
-		if( flip_screen_y_get() )
+		if( flip_screen_y_get(machine) )
 		{
 			sy = 254 - 16*height - sy;
 			flipy = !flipy;
@@ -165,8 +165,8 @@ VIDEO_UPDATE( lkage )
 {
 	int bank;
 
-	flip_screen_x_set(~lkage_vreg[2] & 0x01);
-	flip_screen_y_set(~lkage_vreg[2] & 0x02);
+	flip_screen_x_set(screen->machine, ~lkage_vreg[2] & 0x01);
+	flip_screen_y_set(screen->machine, ~lkage_vreg[2] & 0x02);
 
 	bank = lkage_vreg[1]&0x08;
 	if( bg_tile_bank != bank )

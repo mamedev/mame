@@ -191,7 +191,7 @@ WRITE8_HANDLER( champbas_palette_bank_w )
 
 WRITE8_HANDLER( champbas_flipscreen_w )
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(space->machine, ~data & 1);
 }
 
 

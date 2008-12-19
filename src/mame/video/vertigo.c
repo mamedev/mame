@@ -57,8 +57,8 @@
 
 #define MC_LENGTH 512
 
-#define V_ADDPOINT(h,v,c,i) \
-	vector_add_point (((h) & 0x7ff) << 14, (0x6ff - ((v) & 0x7ff)) << 14, VECTOR_COLOR444(c), (i))
+#define V_ADDPOINT(m,h,v,c,i) \
+	vector_add_point (m, ((h) & 0x7ff) << 14, (0x6ff - ((v) & 0x7ff)) << 14, VECTOR_COLOR444(c), (i))
 
 #define ADD(r,s,c)	(((r)  + (s) + (c)) & 0xffff)
 #define SUBR(r,s,c) ((~(r) + (s) + (c)) & 0xffff)
@@ -140,6 +140,7 @@ typedef struct _am2901
 
 typedef struct _vector_generator
 {
+	running_machine *machine;
 	UINT32 sreg;	  /* shift register */
 	UINT32 l1;		  /* latch 1 adder operand only */
 	UINT32 l2;		  /* latch 2 adder operand only */
@@ -242,6 +243,7 @@ void vertigo_vproc_init(running_machine *machine)
 	memset(&vs, 0, sizeof(vs));
 	memset(&bsp, 0, sizeof(bsp));
 	memset(&vgen, 0, sizeof(vgen));
+	vgen.machine = machine;
 
 	state_save_register_item_array(machine, "vector_proc", NULL, 0, vs.sram);
 	state_save_register_item(machine, "vector_proc", NULL, 0, vs.ramlatch);
@@ -456,9 +458,9 @@ static void vertigo_vgen (vector_generator *vg)
 	if (vg->brez ^ vg->ven)
 	{
 		if (vg->brez)
-		V_ADDPOINT (vg->c_h, vg->c_v, 0, 0);
+		V_ADDPOINT (vg->machine, vg->c_h, vg->c_v, 0, 0);
 		else
-			V_ADDPOINT (vg->c_h, vg->c_v, vg->color, vg->intensity);
+			V_ADDPOINT (vg->machine, vg->c_h, vg->c_v, vg->color, vg->intensity);
 		vg->ven = vg->brez;
 	}
 }

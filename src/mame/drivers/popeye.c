@@ -444,7 +444,7 @@ static int dswbit;
 static WRITE8_HANDLER( popeye_portB_w )
 {
 	/* bit 0 flips screen */
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 
 	/* bits 1-3 select DSW1 bit to read */
 	dswbit = (data & 0x0e) >> 1;

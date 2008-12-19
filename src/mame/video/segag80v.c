@@ -179,7 +179,7 @@ static void sega_generate_vector_list(running_machine *machine)
 			/* Add a starting point to the vector list. */
 			clipped = adjust_xy(curx, cury, &adjx, &adjy);
 			if (!clipped)
-				vector_add_point(adjx, adjy, 0, 0);
+				vector_add_point(machine, adjx, adjy, 0, 0);
 
 			/* Loop until we run out of time. */
 			while (total_time > 0)
@@ -287,11 +287,11 @@ static void sega_generate_vector_list(running_machine *machine)
 					{
 						/* if we're just becoming unclipped, add an empty point */
 						if (!newclip)
-							vector_add_point(adjx, adjy, 0, 0);
+							vector_add_point(machine, adjx, adjy, 0, 0);
 
 						/* otherwise, add a colored point */
 						else
-							vector_add_point(adjx, adjy, color, intensity);
+							vector_add_point(machine, adjx, adjy, color, intensity);
 					}
 					clipped = newclip;
 
@@ -301,7 +301,7 @@ static void sega_generate_vector_list(running_machine *machine)
 
 				/* We're done; if we are not clipped, add a final point. */
 				if (!clipped)
-					vector_add_point(adjx, adjy, color, intensity);
+					vector_add_point(machine, adjx, adjy, color, intensity);
 
 				/* if the high bit of the attribute is set, we break out of   */
 				/* this loop and fetch another symbol */

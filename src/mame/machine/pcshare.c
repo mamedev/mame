@@ -21,17 +21,16 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
 #define DBG_LOG(N,M,A) \
-	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(Machine)),(char*)M ); logerror A; }
+	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); logerror A; }
 
 #define VERBOSE_JOY 0		/* JOY (joystick port) */
 #define JOY_LOG(N,M,A) \
-	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(Machine)),(char*)M ); logerror A; }
+	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); logerror A; }
 
 
 static emu_timer *pc_keyboard_timer;
@@ -75,7 +74,7 @@ UINT8 pc_keyb_read(void)
 static TIMER_CALLBACK( pc_keyb_timer )
 {
 	if ( pc_keyb.on ) {
-		pc_keyboard();
+		pc_keyboard(machine);
 	} else {
 		/* Clock has been low for more than 5 msec, start diagnostic test */
 		at_keyboard_reset();
@@ -116,7 +115,7 @@ void pc_keyb_clear(void)
 	}
 }
 
-void pc_keyboard(void)
+void pc_keyboard(running_machine *machine)
 {
 	int data;
 

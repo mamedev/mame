@@ -159,7 +159,7 @@ static WRITE16_HANDLER( spyhunt2_control_w )
 /*  turbocs_reset_w(~control_word & 0x0080);*/
 	turbocs_data_w(space, offset, (control_word >> 8) & 0x001f);
 
-	soundsgood_reset_w(~control_word & 0x2000);
+	soundsgood_reset_w(space->machine, ~control_word & 0x2000);
 	soundsgood_data_w(space, offset, (control_word >> 8) & 0x001f);
 }
 
@@ -211,7 +211,7 @@ static WRITE16_HANDLER( archrivl_control_w )
 {
 	COMBINE_DATA(&control_word);
 	williams_cvsd_reset_w(~control_word & 0x0400);
-	williams_cvsd_data_w(control_word & 0x3ff);
+	williams_cvsd_data_w(space->machine, control_word & 0x3ff);
 }
 
 

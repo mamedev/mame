@@ -44,7 +44,7 @@ WRITE8_HANDLER( wiping_sound_w );
 
 static MACHINE_RESET( clshroad )
 {
-	flip_screen_set(0);
+	flip_screen_set(machine, 0);
 }
 
 

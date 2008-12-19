@@ -30,13 +30,13 @@ WRITE8_HANDLER( jack_paletteram_w )
 
 READ8_HANDLER( jack_flipscreen_r )
 {
-	flip_screen_set(offset);
+	flip_screen_set(space->machine, offset);
 	return 0;
 }
 
 WRITE8_HANDLER( jack_flipscreen_w )
 {
-	flip_screen_set(offset);
+	flip_screen_set(space->machine, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -73,7 +73,7 @@ static void jack_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 		flipx = (spriteram[offs + 3] & 0x80);
 		flipy = (spriteram[offs + 3] & 0x40);
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -154,7 +154,7 @@ static void joinem_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 		flipx = (spriteram[offs + 3] & 0x80);
 		flipy = (spriteram[offs + 3] & 0x40);
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;

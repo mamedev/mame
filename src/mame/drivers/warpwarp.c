@@ -151,7 +151,7 @@ static READ8_HANDLER( geebee_in_r )
 	res = input_port_read_safe(space->machine, portnames[offset], 0);
 	if (offset == 3)
 	{
-		res = input_port_read(space->machine, (flip_screen_get() & 1) ? "IN2" : "IN1");	// read player 2 input in cocktail mode
+		res = input_port_read(space->machine, (flip_screen_get(space->machine) & 1) ? "IN2" : "IN1");	// read player 2 input in cocktail mode
 		if (handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
@@ -211,7 +211,7 @@ static WRITE8_HANDLER( geebee_out7_w )
 			warpwarp_ball_on = data & 1;
 			break;
 		case 7:
-			flip_screen_set(data & 1);
+			flip_screen_set(space->machine, data & 1);
 			break;
 	}
 }
@@ -234,7 +234,7 @@ static READ8_HANDLER( warpwarp_vol_r )
 {
 	int res;
 
-	res = input_port_read(space->machine, (flip_screen_get() & 1) ? "VOLIN2" : "VOLIN1");
+	res = input_port_read(space->machine, (flip_screen_get(space->machine) & 1) ? "VOLIN2" : "VOLIN1");
 	if (handle_joystick)
 	{
 		if (res & 1) return 0x0f;
@@ -294,7 +294,7 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 		case 7:
-			flip_screen_set(data & 1);
+			flip_screen_set(space->machine, data & 1);
 			break;
 	}
 }

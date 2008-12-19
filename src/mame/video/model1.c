@@ -724,7 +724,7 @@ static float compute_specular(struct vector *normal, struct vector *light,float 
 	return 0;
 }
 
-static void push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
+static void push_object(running_machine *machine, UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
 {
 	int i;
 	UINT32 flags;
@@ -889,8 +889,8 @@ static void push_object(UINT32 tex_adr, UINT32 poly_adr, UINT32 size)
 		{
 			/*float dif=mult_vector(&vn, &view.light);
             float ln=lightparams[lightmode].a + lightparams[lightmode].d*MAX(0.0,dif);
-            cquad.col = scale_color(Machine->pens[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
-            cquad.col = scale_color(Machine->pens[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
+            cquad.col = scale_color(machine->pens[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
+            cquad.col = scale_color(machine->pens[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)], MIN(1.0,ln));
             */
 			float dif=mult_vector(&vn, &view.light);
 			float spec=compute_specular(&vn,&view.light,dif,lightmode);
@@ -1065,7 +1065,7 @@ static UINT16 *push_direct(UINT16 *list)
 			b=(model1_color_xlat[(b<<8)|lumval|0x4000]>>3)&0x1f;
 			cquad.col=(r<<10)|(g<<5)|(b<<0);
 		}
-		//cquad.col  = scale_color(Machine->pens[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
+		//cquad.col  = scale_color(machine->pens[0x1000|(tgp_ram[tex_adr-0x40000] & 0x3ff)],((float) (lum>>24)) / 128.0);
 		if(flags & 0x00002000)
 			cquad.col |= MOIRE;
 
@@ -1173,7 +1173,7 @@ WRITE16_HANDLER( model1_listctl_w )
 	LOG_TGP(("VIDEO: control=%08x\n", (listctl[1]<<16)|listctl[0]));
 }
 
-static void tgp_render(bitmap_t *bitmap, const rectangle *cliprect)
+static void tgp_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	render_done = 1;
 	if((listctl[1] & 0x1f) == 0x1f) {
@@ -1202,7 +1202,7 @@ static void tgp_render(bitmap_t *bitmap, const rectangle *cliprect)
 				// 6 = ??  draw object (57bd4, 387460, 2ad)
 
 				if(1 || zz >= 666)
-					push_object(readi(list+2), readi(list+4), readi(list+6));
+					push_object(machine, readi(list+2), readi(list+4), readi(list+6));
 				list += 8;
 				break;
 			case 2:
@@ -1515,7 +1515,7 @@ VIDEO_UPDATE(model1)
 	sys24_tile_draw(screen->machine, bitmap, cliprect, 2, 0, 0);
 	sys24_tile_draw(screen->machine, bitmap, cliprect, 0, 0, 0);
 
-	tgp_render(bitmap, cliprect);
+	tgp_render(screen->machine, bitmap, cliprect);
 
 	sys24_tile_draw(screen->machine, bitmap, cliprect, 7, 0, 0);
 	sys24_tile_draw(screen->machine, bitmap, cliprect, 5, 0, 0);

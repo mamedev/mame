@@ -27,7 +27,7 @@ typedef struct
 	int output_shift_reg;
 	int end_conv;
 
-	double (*input_callback)(int input);
+	double (*input_callback)(running_machine *machine, int input);
 } ADC1213X;
 
 static ADC1213X adc1213x[MAX_ADC1213X_CHIPS];
@@ -53,7 +53,7 @@ void adc1213x_di_w(int chip, int state)
 	adc1213x[chip].data_in = state & 1;
 }
 
-static void adc1213x_convert(int chip, int channel, int bits16, int lsbfirst)
+static void adc1213x_convert(running_machine *machine, int chip, int channel, int bits16, int lsbfirst)
 {
 	int i;
 	int bits;
@@ -70,42 +70,42 @@ static void adc1213x_convert(int chip, int channel, int bits16, int lsbfirst)
 	{
 		case 0x8:		// H L L L - CH0 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(0);
+			input = adc1213x[chip].input_callback(machine, 0);
 			break;
 		}
 		case 0xc:		// H H L L - CH1 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(1);
+			input = adc1213x[chip].input_callback(machine, 1);
 			break;
 		}
 		case 0x9:		// H L L H - CH2 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(2);
+			input = adc1213x[chip].input_callback(machine, 2);
 			break;
 		}
 		case 0xd:		// H H L H - CH3 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(3);
+			input = adc1213x[chip].input_callback(machine, 3);
 			break;
 		}
 		case 0xa:		// H L H L - CH4 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(4);
+			input = adc1213x[chip].input_callback(machine, 4);
 			break;
 		}
 		case 0xe:		// H H H L - CH5 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(5);
+			input = adc1213x[chip].input_callback(machine, 5);
 			break;
 		}
 		case 0xb:		// H L H H - CH6 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(6);
+			input = adc1213x[chip].input_callback(machine, 6);
 			break;
 		}
 		case 0xf:		// H H H H - CH7 (single-ended)
 		{
-			input = adc1213x[chip].input_callback(7);
+			input = adc1213x[chip].input_callback(machine, 7);
 			break;
 		}
 		default:
@@ -139,7 +139,7 @@ static void adc1213x_convert(int chip, int channel, int bits16, int lsbfirst)
 	adc1213x[chip].output_shift_reg >>= 1;
 }
 
-void adc1213x_cs_w(int chip, int state)
+void adc1213x_cs_w(running_machine *machine, int chip, int state)
 {
 	if (state)
 	{
@@ -153,22 +153,22 @@ void adc1213x_cs_w(int chip, int state)
 			{
 				case 0x0:		// X X X X L L L L - 12 or 13 Bit MSB First conversion
 				{
-					adc1213x_convert(chip, (mode >> 4) & 0xf, 0, 0);
+					adc1213x_convert(machine, chip, (mode >> 4) & 0xf, 0, 0);
 					break;
 				}
 				case 0x1:		// X X X X L L L H - 16 or 17 Bit MSB First conversion
 				{
-					adc1213x_convert(chip, (mode >> 4) & 0xf, 1, 0);
+					adc1213x_convert(machine, chip, (mode >> 4) & 0xf, 1, 0);
 					break;
 				}
 				case 0x4:		// X X X X L H L L - 12 or 13 Bit LSB First conversion
 				{
-					adc1213x_convert(chip, (mode >> 4) & 0xf, 0, 1);
+					adc1213x_convert(machine, chip, (mode >> 4) & 0xf, 0, 1);
 					break;
 				}
 				case 0x5:		// X X X X L H L H - 16 or 17 Bit LSB First conversion
 				{
-					adc1213x_convert(chip, (mode >> 4) & 0xf, 1, 1);
+					adc1213x_convert(machine, chip, (mode >> 4) & 0xf, 1, 1);
 					break;
 				}
 
@@ -237,7 +237,7 @@ int adc1213x_eoc_r(int chip)
 	return adc1213x[chip].end_conv;
 }
 
-void adc1213x_init(int chip, double (*input_callback)( int input ))
+void adc1213x_init(int chip, double (*input_callback)( running_machine *machine, int input ))
 {
 	memset(&adc1213x[chip], 0, sizeof(ADC1213X));
 

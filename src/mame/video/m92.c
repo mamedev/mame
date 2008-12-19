@@ -339,7 +339,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				x &= 0x1ff;
 				for (i=0; i<y_multi; i++)
 				{
-					if (flip_screen_get()) {
+					if (flip_screen_get(machine)) {
 						pdrawgfx(bitmap,machine->gfx[1],
 								sprite + s_ptr,
 								colour,
@@ -463,8 +463,8 @@ VIDEO_UPDATE( m92 )
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	if (input_port_read(screen->machine, "DSW") & 0x100)
-		flip_screen_set(0);
+		flip_screen_set(screen->machine, 0);
 	else
-		flip_screen_set(1);
+		flip_screen_set(screen->machine, 1);
 	return 0;
 }

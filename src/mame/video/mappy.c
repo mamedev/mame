@@ -377,12 +377,12 @@ WRITE8_HANDLER( mappy_videoram_w )
 
 WRITE8_HANDLER( superpac_flipscreen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 READ8_HANDLER( superpac_flipscreen_r )
 {
-	flip_screen_set(1);
+	flip_screen_set(space->machine, 1);
 	return 0xff;
 }
 
@@ -430,7 +430,7 @@ void mappy_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -506,7 +506,7 @@ static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 			sy -= 8 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -562,7 +562,7 @@ VIDEO_UPDATE( superpac )
 VIDEO_UPDATE( phozon )
 {
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(mappy_spriteram[0x1f7f-0x800] & 1);
+	flip_screen_set(screen->machine, mappy_spriteram[0x1f7f-0x800] & 1);
 
 	tilemap_set_scrolldx(bg_tilemap, 0, 96);
 	tilemap_set_scrolldy(bg_tilemap, 0, 0);

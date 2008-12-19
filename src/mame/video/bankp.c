@@ -127,7 +127,7 @@ WRITE8_HANDLER( bankp_out_w )
 	interrupt_enable_w(space,0,(data & 0x10)>>4);
 
 	/* bit 5 controls screen flip */
-	flip_screen_set(data & 0x20);
+	flip_screen_set(space->machine, data & 0x20);
 
 	/* bits 6-7 unknown */
 }
@@ -166,7 +166,7 @@ VIDEO_START( bankp )
 
 VIDEO_UPDATE( bankp )
 {
-	if (flip_screen_get())
+	if (flip_screen_get(screen->machine))
 	{
 		tilemap_set_scrollx(fg_tilemap, 0, -scroll_x);
 		tilemap_set_scrollx(bg_tilemap, 0, 0);

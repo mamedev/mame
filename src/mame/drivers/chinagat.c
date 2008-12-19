@@ -126,7 +126,7 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 	ddragon_scrolly_hi = ( ( data & 0x02 ) << 7 );
 	ddragon_scrollx_hi = ( ( data & 0x01 ) << 8 );
 
-	flip_screen_set(~data & 0x04);
+	flip_screen_set(space->machine, ~data & 0x04);
 }
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )

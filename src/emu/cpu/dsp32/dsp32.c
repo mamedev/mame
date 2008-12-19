@@ -181,7 +181,7 @@ struct _dsp32_state
 	int				icount;
 	UINT8			lastpins;
 	UINT32			ppc;
-	void			(*output_pins_changed)(UINT32 pins);
+	void			(*output_pins_changed)(const device_config *device, UINT32 pins);
 	const device_config *device;
 	const address_space *program;
 };
@@ -283,7 +283,7 @@ static void update_pcr(dsp32_state *cpustate, UINT16 newval)
 		if (newoutput != cpustate->lastpins)
 		{
 			cpustate->lastpins = newoutput;
-			(*cpustate->output_pins_changed)(newoutput);
+			(*cpustate->output_pins_changed)(cpustate->device, newoutput);
 		}
 	}
 }

@@ -97,8 +97,8 @@ WRITE8_HANDLER( holeland_scroll_w )
 
 WRITE8_HANDLER( holeland_flipscreen_w )
 {
-	if (offset) flip_screen_y_set(data);
-	else        flip_screen_x_set(data);
+	if (offset) flip_screen_y_set(space->machine, data);
+	else        flip_screen_x_set(space->machine, data);
 }
 
 
@@ -120,13 +120,13 @@ static void holeland_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		flipx = spriteram[offs+3] & 0x04;
 		flipy = spriteram[offs+3] & 0x08;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
@@ -158,13 +158,13 @@ static void crzrally_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		flipx = spriteram[offs+3] & 0x04;
 		flipy = spriteram[offs+3] & 0x08;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			flipy = !flipy;
 			sy = 240 - sy;

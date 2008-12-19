@@ -58,7 +58,7 @@
 	if( sp->sby_line != line_state )           \
 	{                                          \
 		sp->sby_line = line_state;             \
-		if( sp->sby ) sp->sby(sp->sby_line);   \
+		if( sp->sby ) sp->sby(sp->device, sp->sby_line);   \
 	}                                          \
 }
 
@@ -77,9 +77,10 @@ struct lpc12_t
 
 struct sp0256
 {
+	const device_config *device;
 	sound_stream  *stream;	        /* MAME core sound stream                       */
-	void         (*drq)(int state); /* Data request callback                        */
-	void         (*sby)(int state); /* Standby callback                             */
+	void         (*drq)(const device_config *device, int state); /* Data request callback                        */
+	void         (*sby)(const device_config *device, int state); /* Standby callback                             */
 	int            sby_line;        /* Standby line state                           */
     INT16         *cur_buf;         /* Current sound buffer.                        */
     int            cur_len;         /* Fullness of current sound buffer.            */
@@ -766,7 +767,7 @@ static void sp0256_micro(struct sp0256 *sp)
             sp->ald      = 0;
             for (i = 0; i < 16; i++)
                 sp->filt.r[i] = 0;
-            if( sp->drq) sp->drq(ASSERT_LINE);
+            if( sp->drq) sp->drq(sp->device, ASSERT_LINE);
         }
 
         /* ---------------------------------------------------------------- */
@@ -1175,10 +1176,11 @@ static SND_START( sp0256 )
 
 	sp = auto_malloc(sizeof(*sp));
 	memset(sp, 0, sizeof(*sp));
+	sp->device = device;
 	sp->drq = intf->lrq_callback;
 	sp->sby = intf->sby_callback;
-	if( sp->drq ) sp->drq(ASSERT_LINE);
-	if( sp->sby ) sp->sby(sp->sby_line = ASSERT_LINE);
+	if( sp->drq ) sp->drq(device, ASSERT_LINE);
+	if( sp->sby ) sp->sby(device, sp->sby_line = ASSERT_LINE);
 
 	sp->stream = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, sp, sp0256_update);
 
@@ -1236,7 +1238,7 @@ static void sp0256_reset(struct sp0256 *sp)
 	sp->mode     = 0;
 	sp->page     = 0x1000 << 3;
 	sp->silent   = 1;
-	if( sp->drq ) sp->drq(ASSERT_LINE);
+	if( sp->drq ) sp->drq(sp->device, ASSERT_LINE);
 	SET_SBY(ASSERT_LINE)
 }
 
@@ -1265,7 +1267,7 @@ WRITE8_HANDLER( sp0256_ALD_w )
 	/* ---------------------------------------------------------------- */
 	sp->lrq = 0;
 	sp->ald = (0xFF & data) << 4;
-	if( sp->drq ) sp->drq(CLEAR_LINE);
+	if( sp->drq ) sp->drq(sp->device, CLEAR_LINE);
 	SET_SBY(CLEAR_LINE)
 
 	return;

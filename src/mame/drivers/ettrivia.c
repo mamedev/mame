@@ -65,7 +65,7 @@ static WRITE8_HANDLER( ettrivia_control_w )
 
 	coin_counter_w(0, data & 0x80);
 
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 static READ8_HANDLER( ettrivia_question_r )

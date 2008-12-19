@@ -34,7 +34,7 @@ static SND_STOP( custom )
 {
 	struct custom_info *info = device->token;
 	if (info->intf->stop)
-		(*info->intf->stop)(info->token);
+		(*info->intf->stop)(device, info->token);
 }
 
 
@@ -42,7 +42,7 @@ static SND_RESET( custom )
 {
 	struct custom_info *info = device->token;
 	if (info->intf->reset)
-		(*info->intf->reset)(info->token);
+		(*info->intf->reset)(device, info->token);
 }
 
 

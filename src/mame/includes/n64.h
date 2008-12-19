@@ -9,7 +9,7 @@ extern int fb_width;
 
 extern VIDEO_START( n64 );
 extern VIDEO_UPDATE( n64 );
-extern void rdp_process_list(void);
+extern void rdp_process_list(running_machine *machine);
 
 #define DACRATE_NTSC	(48681812)
 #define DACRATE_PAL	(49656530)

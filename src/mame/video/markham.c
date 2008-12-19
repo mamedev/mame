@@ -51,9 +51,9 @@ WRITE8_HANDLER( markham_videoram_w )
 
 WRITE8_HANDLER( markham_flipscreen_w )
 {
-	if (flip_screen_get() != (data & 0x01))
+	if (flip_screen_get(space->machine) != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
+		flip_screen_set(space->machine, data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }
@@ -84,15 +84,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int chr = spriteram[offs+1];
 		int col = spriteram[offs+2];
 
-		int fx = flip_screen_get();
-		int fy = flip_screen_get();
+		int fx = flip_screen_get(machine);
+		int fy = flip_screen_get(machine);
 
 		int x = spriteram[offs+3];
 		int y = spriteram[offs+0];
 		int px,py;
 		col &= 0x3f ;
 
-		if (flip_screen_get()==0)
+		if (flip_screen_get(machine)==0)
 		{
 			px = x-2;
 			py = 240-y;

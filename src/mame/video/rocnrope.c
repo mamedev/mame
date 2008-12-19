@@ -96,9 +96,9 @@ WRITE8_HANDLER( rocnrope_colorram_w )
 
 WRITE8_HANDLER( rocnrope_flipscreen_w )
 {
-	if (flip_screen_get() != (~data & 0x01))
+	if (flip_screen_get(space->machine) != (~data & 0x01))
 	{
-		flip_screen_set(~data & 0x01);
+		flip_screen_set(space->machine, ~data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }

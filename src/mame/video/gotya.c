@@ -87,9 +87,9 @@ WRITE8_HANDLER( gotya_video_control_w )
 
 	scroll_bit_8 = data & 0x01;
 
-	if (flip_screen_get() != (data & 0x02))
+	if (flip_screen_get(space->machine) != (data & 0x02))
 	{
-		flip_screen_set(data & 0x02);
+		flip_screen_set(space->machine, data & 0x02);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }
@@ -120,7 +120,7 @@ static void draw_status_row(running_machine *machine, bitmap_t *bitmap, const re
 {
 	int row;
 
-	if (flip_screen_get())
+	if (flip_screen_get(machine))
 	{
 		sx = 35 - sx;
 	}
@@ -129,7 +129,7 @@ static void draw_status_row(running_machine *machine, bitmap_t *bitmap, const re
 	{
 		int sy;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sy = row;
 		}
@@ -141,7 +141,7 @@ static void draw_status_row(running_machine *machine, bitmap_t *bitmap, const re
 		drawgfx(bitmap,machine->gfx[0],
 			gotya_videoram2[row * 32 + col],
 			gotya_videoram2[row * 32 + col + 0x10] & 0x0f,
-			flip_screen_x_get(), flip_screen_y_get(),
+			flip_screen_x_get(machine), flip_screen_y_get(machine),
 			8 * sx, 8 * sy,
 			cliprect,
 			TRANSPARENCY_NONE, 0);
@@ -159,14 +159,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx = 256 - spriteram[offs + 0x10] + (spriteram[offs + 0x01] & 0x01) * 256;
 		int sy = spriteram[offs + 0x00];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sy = 240 - sy;
 		}
 
 		drawgfx(bitmap,machine->gfx[1],
 			code, color,
-			flip_screen_x_get(), flip_screen_y_get(),
+			flip_screen_x_get(machine), flip_screen_y_get(machine),
 			sx, sy,
 			cliprect,
 			TRANSPARENCY_PEN, 0);

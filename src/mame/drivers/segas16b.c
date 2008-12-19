@@ -871,7 +871,6 @@ CPU  - 317-0092  |--------------------------------------------------------------
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "deprecat.h"
 #include "system16.h"
 #include "machine/segaic16.h"
 #include "machine/fd1089.h"
@@ -1345,10 +1344,10 @@ static READ8_HANDLER( upd7759_status_r )
 }
 
 
-static void upd7759_generate_nmi(int state)
+static void upd7759_generate_nmi(const device_config *device, int state)
 {
 	if (state)
-		cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

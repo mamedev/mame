@@ -56,7 +56,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			inc = 1;
 		}
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			y=240-y;
 			x=304-x;
@@ -87,7 +87,7 @@ VIDEO_START(tumblep)
 
 VIDEO_UPDATE(tumblep)
 {
-	flip_screen_set( deco16_pf12_control[0]&0x80 );
+	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
 	bitmap_fill(bitmap,cliprect,256); /* not verified */

@@ -127,7 +127,7 @@ VIDEO_UPDATE( finalizr )
 
 			if (size >= 0x10)	/* 32x32 */
 			{
-				if (flip_screen_get())
+				if (flip_screen_get(screen->machine))
 				{
 					sx = 256 - sx;
 					sy = 224 - sy;
@@ -162,7 +162,7 @@ VIDEO_UPDATE( finalizr )
 			}
 			else
 			{
-				if (flip_screen_get())
+				if (flip_screen_get(screen->machine))
 				{
 					sx = ((size & 0x08) ? 280:272) - sx;
 					sy = ((size & 0x04) ? 248:240) - sy;

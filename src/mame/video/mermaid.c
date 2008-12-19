@@ -74,12 +74,12 @@ WRITE8_HANDLER( mermaid_colorram_w )
 
 WRITE8_HANDLER( mermaid_flip_screen_x_w )
 {
-	flip_screen_x_set(data & 0x01);
+	flip_screen_x_set(space->machine, data & 0x01);
 }
 
 WRITE8_HANDLER( mermaid_flip_screen_y_w )
 {
-	flip_screen_y_set(data & 0x01);
+	flip_screen_y_set(space->machine, data & 0x01);
 }
 
 WRITE8_HANDLER( mermaid_bg_scroll_w )
@@ -187,20 +187,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		code |= rougien_gfxbank1 * 0x2800;
 		code |= rougien_gfxbank2 * 0x2400;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
 		}
 
 		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-			(flip_screen_x_get() ? &flip_spritevisiblearea : &spritevisiblearea),
+			(flip_screen_x_get(machine) ? &flip_spritevisiblearea : &spritevisiblearea),
 			TRANSPARENCY_PEN, 0);
 	}
 }
@@ -266,13 +266,13 @@ VIDEO_EOF( mermaid )
 		code |= rougien_gfxbank1 * 0x2800;
 		code |= rougien_gfxbank2 * 0x2400;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
@@ -338,13 +338,13 @@ VIDEO_EOF( mermaid )
 				code2 |= rougien_gfxbank1 * 0x2800;
 				code2 |= rougien_gfxbank2 * 0x2400;
 
-				if (flip_screen_x_get())
+				if (flip_screen_x_get(machine))
 				{
 					flipx2 = !flipx2;
 					sx2 = 240 - sx2;
 				}
 
-				if (flip_screen_y_get())
+				if (flip_screen_y_get(machine))
 				{
 					flipy2 = !flipy2;
 					sy2 = 240 - sy2;
@@ -380,13 +380,13 @@ VIDEO_EOF( mermaid )
 		code |= rougien_gfxbank1 * 0x2800;
 		code |= rougien_gfxbank2 * 0x2400;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
@@ -428,13 +428,13 @@ VIDEO_EOF( mermaid )
 				code2 |= rougien_gfxbank1 * 0x2800;
 				code2 |= rougien_gfxbank2 * 0x2400;
 
-				if (flip_screen_x_get())
+				if (flip_screen_x_get(machine))
 				{
 					flipx2 = !flipx2;
 					sx2 = 240 - sx2;
 				}
 
-				if (flip_screen_y_get())
+				if (flip_screen_y_get(machine))
 				{
 					flipy2 = !flipy2;
 					sy2 = 240 - sy2;
@@ -470,13 +470,13 @@ VIDEO_EOF( mermaid )
 		code |= rougien_gfxbank1 * 0x2800;
 		code |= rougien_gfxbank2 * 0x2400;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
@@ -518,13 +518,13 @@ VIDEO_EOF( mermaid )
 				code2 |= rougien_gfxbank1 * 0x2800;
 				code2 |= rougien_gfxbank2 * 0x2400;
 
-				if (flip_screen_x_get())
+				if (flip_screen_x_get(machine))
 				{
 					flipx2 = !flipx2;
 					sx2 = 240 - sx2;
 				}
 
-				if (flip_screen_y_get())
+				if (flip_screen_y_get(machine))
 				{
 					flipy2 = !flipy2;
 					sy2 = 240 - sy2;

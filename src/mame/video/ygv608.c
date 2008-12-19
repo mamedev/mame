@@ -30,7 +30,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "namcond1.h"   // only while debugging
 #include "video/ygv608.h"
 
@@ -51,10 +50,10 @@ static tilemap *tilemap_A = NULL;
 static tilemap *tilemap_B = NULL;
 static bitmap_t *work_bitmap = NULL;
 
-static void HandleYGV608Reset( void );
-static void HandleRomTransfers( void );
+static void HandleYGV608Reset( running_machine *machine );
+static void HandleRomTransfers( running_machine *machine );
 static void SetPreShortcuts( int reg, int data );
-static void SetPostShortcuts( int reg );
+static void SetPostShortcuts( running_machine *machine, int reg );
 
 #ifdef MAME_DEBUG
 static void ShowYGV608Registers( void );
@@ -482,7 +481,7 @@ static STATE_POSTLOAD( ygv608_postload )
 	ygv608.tilemap_resize = 1;
 
 	for(i = 0; i < 50; i++)
-		SetPostShortcuts(i);
+		SetPostShortcuts(machine, i);
 }
 
 static void ygv608_register_state_save(running_machine *machine)
@@ -1238,7 +1237,7 @@ WRITE16_HANDLER( ygv608_w )
 #endif
 			SetPreShortcuts (regNum, data);
 			ygv608.regs.b[regNum] = data;
-			SetPostShortcuts (regNum);
+			SetPostShortcuts (space->machine, regNum);
 			if (ygv608.ports.s.p5 & p5_rwai)
 			{
 				regNum ++;
@@ -1265,9 +1264,9 @@ WRITE16_HANDLER( ygv608_w )
 		case 0x07: /* P#7 - system control port */
 			ygv608.ports.b[7] = data;
 			if (ygv608.ports.b[7] & 0x3e)
-				HandleRomTransfers();
+				HandleRomTransfers(space->machine);
 			if (ygv608.ports.b[7] & 0x01)
-				HandleYGV608Reset();
+				HandleYGV608Reset(space->machine);
 			break;
 
 		default:
@@ -1276,7 +1275,7 @@ WRITE16_HANDLER( ygv608_w )
 	}
 }
 
-static void HandleYGV608Reset( void )
+static void HandleYGV608Reset( running_machine *machine )
 {
     int i;
 
@@ -1297,7 +1296,7 @@ static void HandleYGV608Reset( void )
     /* should set shortcuts here too */
     for( i=0; i<50; i++ ) {
       //SetPreShortcuts( i );
-      SetPostShortcuts( i );
+      SetPostShortcuts( machine, i );
     }
 }
 
@@ -1308,14 +1307,14 @@ static void HandleYGV608Reset( void )
     - So leave it in!
  */
 
-static void HandleRomTransfers(void)
+static void HandleRomTransfers(running_machine *machine)
 {
 #if 0
   static UINT8 *sdt = (UINT8 *)ygv608.scroll_data_table;
   static UINT8 *sat = (UINT8 *)ygv608.sprite_attribute_table.b;
 
   /* fudge copy from sprite data for now... */
-  UINT8 *RAM = Machine->memory_region[0];
+  UINT8 *RAM = machine->memory_region[0];
   int i;
 
   int src = ( ( (int)ygv608.regs.s.tb13 << 8 ) +
@@ -1420,7 +1419,7 @@ static void SetPreShortcuts( int reg, int data )
 // Set any "short-cut" variables after we have updated the YGV608 registers
 // - these are used only in optimisation of the emulation
 
-static void SetPostShortcuts( int reg )
+static void SetPostShortcuts( running_machine *machine, int reg )
 {
 	int plane, addr;
 
@@ -1431,7 +1430,7 @@ static void SetPostShortcuts( int reg )
 			UINT8 yTile = ygv608.regs.s.r0 & r0_pny;
 
 			if (yTile >= ygv608.page_y)
-				logerror ("%s:setting pny(%d) >= page_y(%d)\n", cpuexec_describe_context(Machine),
+				logerror ("%s:setting pny(%d) >= page_y(%d)\n", cpuexec_describe_context(machine),
 						yTile, ygv608.page_y );
 			yTile &= (ygv608.page_y - 1);
 			ygv608.regs.s.r0 &= ~r0_pny;
@@ -1444,7 +1443,7 @@ static void SetPostShortcuts( int reg )
 			UINT8 xTile = ygv608.regs.s.r1 & r1_pnx;
 
 			if (xTile >= ygv608.page_x)
-				logerror ("%s:setting pnx(%d) >= page_x(%d)\n", cpuexec_describe_context(Machine),
+				logerror ("%s:setting pnx(%d) >= page_x(%d)\n", cpuexec_describe_context(machine),
 						xTile, ygv608.page_x );
 			xTile &= (ygv608.page_x - 1);
 			ygv608.regs.s.r1 &= ~r1_pnx;

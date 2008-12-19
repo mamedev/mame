@@ -163,7 +163,7 @@ static UINT8 xy_check;
 	visarea.min_y = 0; \
 	visarea.max_y = _y_-1; \
 	video_screen_configure(space->machine->primary_screen, _x_, _y_, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds ); \
-	flip_screen_set(_flip_); \
+	flip_screen_set(space->machine, _flip_); \
 	} \
 
 /*TODO: numbers over 65535?*/

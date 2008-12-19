@@ -128,7 +128,7 @@ READ16_HANDLER( hd68k_ds3_program_r );
 WRITE16_HANDLER( hd68k_ds3_program_w );
 
 /* DSK board */
-void hddsk_update_pif(UINT32 pins);
+void hddsk_update_pif(const device_config *device, UINT32 pins);
 WRITE16_HANDLER( hd68k_dsk_control_w );
 READ16_HANDLER( hd68k_dsk_ram_r );
 WRITE16_HANDLER( hd68k_dsk_ram_w );

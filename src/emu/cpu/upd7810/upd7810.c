@@ -987,7 +987,7 @@ static void upd7810_sio_output(upd7810_state *cpustate)
 	{
 		TXD = cpustate->txs & 1;
 		if (cpustate->config.io_callback)
-			(*cpustate->config.io_callback)(UPD7810_TXD,TXD);
+			(*cpustate->config.io_callback)(cpustate->device,UPD7810_TXD,TXD);
 		cpustate->txs >>= 1;
 		cpustate->txcnt--;
 		if (0 == cpustate->txcnt)
@@ -1086,7 +1086,7 @@ static void upd7810_sio_input(upd7810_state *cpustate)
 	if (cpustate->rxcnt > 0)
 	{
 		if (cpustate->config.io_callback)
-			RXD = (*cpustate->config.io_callback)(UPD7810_RXD,RXD);
+			RXD = (*cpustate->config.io_callback)(cpustate->device,UPD7810_RXD,RXD);
 		cpustate->rxs = (cpustate->rxs >> 1) | ((UINT16)RXD << 15);
 		cpustate->rxcnt--;
 		if (0 == cpustate->rxcnt)
@@ -1288,7 +1288,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 					{
 						TO ^= 1;
 						if (cpustate->config.io_callback)
-							(*cpustate->config.io_callback)(UPD7810_TO,TO);
+							(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 					}
 					/* timer 1 chained with timer 0 ? */
 					if ((TMM & 0xe0) == 0x60)
@@ -1303,7 +1303,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 							{
 								TO ^= 1;
 								if (cpustate->config.io_callback)
-									(*cpustate->config.io_callback)(UPD7810_TO,TO);
+									(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 							}
 						}
 					}
@@ -1325,7 +1325,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 					{
 						TO ^= 1;
 						if (cpustate->config.io_callback)
-							(*cpustate->config.io_callback)(UPD7810_TO,TO);
+							(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 					}
 					/* timer 1 chained with timer 0 ? */
 					if ((TMM & 0xe0) == 0x60)
@@ -1340,7 +1340,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 							{
 								TO ^= 1;
 								if (cpustate->config.io_callback)
-									(*cpustate->config.io_callback)(UPD7810_TO,TO);
+									(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 							}
 						}
 					}
@@ -1376,7 +1376,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 					{
 						TO ^= 1;
 						if (cpustate->config.io_callback)
-							(*cpustate->config.io_callback)(UPD7810_TO,TO);
+							(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 					}
 				}
 			}
@@ -1396,7 +1396,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 					{
 						TO ^= 1;
 						if (cpustate->config.io_callback)
-							(*cpustate->config.io_callback)(UPD7810_TO,TO);
+							(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 					}
 				}
 			}
@@ -1417,7 +1417,7 @@ static void upd7810_timers(upd7810_state *cpustate, int cycles)
 		{
 			TO ^= 1;
 			if (cpustate->config.io_callback)
-				(*cpustate->config.io_callback)(UPD7810_TO,TO);
+				(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 			OVCF -= 3;
 		}
 	}
@@ -1609,7 +1609,7 @@ static void upd78c05_timers(upd7810_state *cpustate, int cycles)
 			if (0x00 == (TMM & 0x03)) {
 				TO ^= 1;
 				if (cpustate->config.io_callback)
-					(*cpustate->config.io_callback)(UPD7810_TO,TO);
+					(*cpustate->config.io_callback)(cpustate->device,UPD7810_TO,TO);
 			}
 
 			while ( cpustate->ovc0 <= 0 ) {

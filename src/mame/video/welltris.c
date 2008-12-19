@@ -175,7 +175,7 @@ WRITE16_HANDLER( welltris_palette_bank_w )
 			tilemap_mark_all_tiles_dirty(char_tilemap);
 		}
 
-		flip_screen_set(data & 0x80);
+		flip_screen_set(space->machine, data & 0x80);
 
 		spritepalettebank = (data & 0x20) >> 5;
 		pixelpalettebank = (data & 0x08) >> 3;

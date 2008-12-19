@@ -241,12 +241,12 @@ WRITE8_HANDLER( nova2001_scroll_y_w )
 WRITE8_HANDLER( nova2001_flipscreen_w )
 {
 	// inverted
-	flip_screen_set(~data & 1);
+	flip_screen_set(space->machine, ~data & 1);
 }
 
 WRITE8_HANDLER( pkunwar_flipscreen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 
@@ -277,7 +277,7 @@ static void nova2001_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			continue;
 		}
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -314,7 +314,7 @@ static void pkunwar_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 			continue;
 		}
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

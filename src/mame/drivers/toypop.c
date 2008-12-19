@@ -79,7 +79,7 @@ static WRITE8_HANDLER( out_coin1 )
 }
 static WRITE8_HANDLER( flip )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 /* chip #0: player inputs, buttons, coins */

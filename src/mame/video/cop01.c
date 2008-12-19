@@ -154,7 +154,7 @@ WRITE8_HANDLER( cop01_vreg_w )
 	{
 		coin_counter_w(0,data & 1);
 		coin_counter_w(1,data & 2);
-		flip_screen_set(data & 4);
+		flip_screen_set(space->machine, data & 4);
 	}
 }
 
@@ -185,7 +185,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sx = (spriteram[offs+3] - 0x80) + 256 * (attr & 0x01);
 		sy = 240 - spriteram[offs];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

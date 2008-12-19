@@ -124,9 +124,9 @@ WRITE8_HANDLER( shaolins_nmi_w )
 {
 	shaolins_nmi_enable = data;
 
-	if (flip_screen_get() != (data & 0x01))
+	if (flip_screen_get(space->machine) != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
+		flip_screen_set(space->machine, data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }
@@ -164,7 +164,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			int sx = 240 - spriteram[offs + 6];
 			int sy = 248 - spriteram[offs + 4];
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 248 - sy;

@@ -49,9 +49,9 @@ typedef void (*opcode_handler)(running_machine *machine);
 #define OPCODE_HANDLER(name) void name(running_machine *machine)
 static opcode_handler dma_opcode[256];
 
-INLINE UINT32 FETCH(void)
+INLINE UINT32 FETCH(running_machine *machine)
 {
-	UINT32 r = intf->fetch(lsi810.dsp);
+	UINT32 r = intf->fetch(machine, lsi810.dsp);
 	lsi810.dsp += 4;
 	return r;
 }
@@ -74,13 +74,13 @@ static OPCODE_HANDLER( dmaop_invalid )
 
 static OPCODE_HANDLER( dmaop_move_memory )
 {
-	UINT32 src = FETCH();
-	UINT32 dst = FETCH();
+	UINT32 src = FETCH(machine);
+	UINT32 dst = FETCH(machine);
 	int count;
 
 	count = lsi810.dcmd & 0xffffff;
 	if(intf->dma_callback != NULL) {
-		intf->dma_callback(src, dst, count, 1);
+		intf->dma_callback(machine, src, dst, count, 1);
 	}
 }
 
@@ -89,7 +89,7 @@ static OPCODE_HANDLER( dmaop_interrupt )
 	if(lsi810.dcmd & 0x100000) {
 		fatalerror("LSI53C810: INTFLY opcode not implemented");
 	}
-	lsi810.dsps = FETCH();
+	lsi810.dsps = FETCH(machine);
 
 	lsi810.istat |= 0x1;	/* DMA interrupt pending */
 	lsi810.dstat |= 0x4;	/* SIR (SCRIPTS Interrupt Instruction Received) */
@@ -107,12 +107,12 @@ static OPCODE_HANDLER( dmaop_block_move )
 	UINT32 count;
 	INT32 dsps;
 
-	address = FETCH();
+	address = FETCH(machine);
 	count = lsi810.dcmd & 0x00ffffff;
 
 	// normal indirect
 	if (lsi810.dcmd & 0x20000000)
-		address = intf->fetch(address);
+		address = intf->fetch(machine, address);
 
 	// table indirect
 	if (lsi810.dcmd & 0x10000000)
@@ -149,7 +149,7 @@ static OPCODE_HANDLER( dmaop_select )
 {
 	UINT32 operand;
 
-	operand = FETCH();
+	operand = FETCH(machine);
 
 	if (lsi810.scntl0 & 0x01)
 	{
@@ -174,7 +174,7 @@ static OPCODE_HANDLER( dmaop_wait_disconnect )
 {
 	UINT32 operand;
 
-	operand = FETCH();
+	operand = FETCH(machine);
 
 	if (lsi810.scntl0 & 0x01)
 	{
@@ -192,7 +192,7 @@ static OPCODE_HANDLER( dmaop_wait_reselect )
 {
 	UINT32 operand;
 
-	operand = FETCH();
+	operand = FETCH(machine);
 
 	if (lsi810.scntl0 & 0x01)
 	{
@@ -210,7 +210,7 @@ static OPCODE_HANDLER( dmaop_set )
 {
 	UINT32 operand;
 
-	operand = FETCH();
+	operand = FETCH(machine);
 
 	/* initiator mode */
 	if (lsi810.dcmd & 0x8)
@@ -239,7 +239,7 @@ static OPCODE_HANDLER( dmaop_clear )
 {
 	UINT32 operand;
 
-	operand = FETCH();
+	operand = FETCH(machine);
 
 	/* initiator mode */
 	if (lsi810.dcmd & 0x8)
@@ -339,12 +339,12 @@ static int scripts_compute_branch(void)
 	return passed;
 }
 
-static UINT32 scripts_get_jump_dest(void)
+static UINT32 scripts_get_jump_dest(running_machine *machine)
 {
 	INT32 dsps;
 	UINT32 dest;
 
-	dsps = FETCH();
+	dsps = FETCH(machine);
 
 	/* relative or absolute addressing? */
 	if (lsi810.dcmd & 0x00800000)
@@ -357,7 +357,7 @@ static UINT32 scripts_get_jump_dest(void)
 
 		logerror("dsps = %x, dsp = %x\n", dsps, lsi810.dsp);
 		dsps += lsi810.dsp;
-}
+	}
 
 	dest = (UINT32)dsps;
 
@@ -370,11 +370,11 @@ static OPCODE_HANDLER( dmaop_jump )
 {
 	if (scripts_compute_branch())
 {
-		lsi810.dsp = scripts_get_jump_dest();
+		lsi810.dsp = scripts_get_jump_dest(machine);
 	}
 	else
 	{
-		FETCH();	// skip operand to continue on
+		FETCH(machine);	// skip operand to continue on
 	}
 }
 
@@ -386,11 +386,11 @@ static OPCODE_HANDLER( dmaop_call )
 		lsi810.temp = lsi810.dsp;
 
 		// and go
-		lsi810.dsp = scripts_get_jump_dest();
+		lsi810.dsp = scripts_get_jump_dest(machine);
 	}
 	else
 	{
-		FETCH();	// skip operand to continue on
+		FETCH(machine);	// skip operand to continue on
 	}
 }
 
@@ -404,7 +404,7 @@ static OPCODE_HANDLER( dmaop_return )
 	}
 	else
 	{
-		FETCH();	// skip operand to continue on
+		FETCH(machine);	// skip operand to continue on
 	}
 }
 
@@ -431,11 +431,11 @@ static void dma_exec(running_machine *machine)
 		if (DASM_OPCODES)
 		{
 			char buf[256];
-			lsi53c810_dasm(buf, lsi810.dsp);
+			lsi53c810_dasm(machine, buf, lsi810.dsp);
 			logerror("0x%08X: %s\n", lsi810.dsp, buf);
 		}
 
-		lsi810.dcmd = FETCH();
+		lsi810.dcmd = FETCH(machine);
 
 		op = (lsi810.dcmd >> 24) & 0xff;
 		dma_opcode[op](machine);
@@ -614,7 +614,7 @@ WRITE8_HANDLER( lsi53c810_reg_w )
 			if(lsi810.dcntl & 0x14 && !lsi810.halted)		/* single-step & start DMA */
 			{
 				int op;
-				lsi810.dcmd = FETCH();
+				lsi810.dcmd = FETCH(space->machine);
 				op = (lsi810.dcmd >> 24) & 0xff;
 				dma_opcode[op](space->machine);
 
@@ -666,7 +666,7 @@ static void add_opcode(UINT8 op, UINT8 mask, opcode_handler handler)
 	}
 }
 
-void lsi53c810_init(const struct LSI53C810interface *interface)
+void lsi53c810_init(running_machine *machine, const struct LSI53C810interface *interface)
 {
 	int i;
 
@@ -701,7 +701,7 @@ void lsi53c810_init(const struct LSI53C810interface *interface)
 	// try to open the devices
 	for (i = 0; i < interface->scsidevs->devs_present; i++)
 	{
-		SCSIAllocInstance( interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
+		SCSIAllocInstance( machine, interface->scsidevs->devices[i].scsiClass, &devices[interface->scsidevs->devices[i].scsiID], interface->scsidevs->devices[i].diskregion );
 	}
 }
 
@@ -760,16 +760,16 @@ void *lsi53c810_get_device(int id)
  *
  *************************************/
 
-static UINT32 lsi53c810_dasm_fetch(UINT32 pc)
+static UINT32 lsi53c810_dasm_fetch(running_machine *machine, UINT32 pc)
 {
-	return intf->fetch(pc);
+	return intf->fetch(machine, pc);
 }
 
-unsigned lsi53c810_dasm(char *buf, UINT32 pc)
+unsigned lsi53c810_dasm(running_machine *machine, char *buf, UINT32 pc)
 {
 	unsigned result = 0;
 	const char *op_mnemonic = NULL;
-	UINT32 op = lsi53c810_dasm_fetch(pc);
+	UINT32 op = lsi53c810_dasm_fetch(machine, pc);
 	UINT32 dest;
 	int i;
 
@@ -782,7 +782,7 @@ unsigned lsi53c810_dasm(char *buf, UINT32 pc)
 	if ((op & 0xF8000000) == 0x40000000)
 	{
 		/* SELECT */
-		dest = lsi53c810_dasm_fetch(pc + 4);
+		dest = lsi53c810_dasm_fetch(machine, pc + 4);
 
 		buf += sprintf(buf, "SELECT%s %d, 0x%08X",
 			(op & 0x01000000) ? " ATN" : "",
@@ -841,7 +841,7 @@ unsigned lsi53c810_dasm(char *buf, UINT32 pc)
 			case 0x98000000: op_mnemonic = "INT"; break;
 		}
 
-		dest = lsi53c810_dasm_fetch(pc + 4);
+		dest = lsi53c810_dasm_fetch(machine, pc + 4);
 
 		if (op & 0x00800000)
 		{
@@ -887,7 +887,7 @@ unsigned lsi53c810_dasm(char *buf, UINT32 pc)
 	else if ((op & 0xE0000000) == 0x00000000)
 	{
 		/* MOVE FROM */
-		dest = lsi53c810_dasm_fetch(pc + 4);
+		dest = lsi53c810_dasm_fetch(machine, pc + 4);
 
 		buf += sprintf(buf, "MOVE FROM 0x%08X, WHEN %s",
 			dest, phases[(op >> 24) & 0x07]);
@@ -897,7 +897,7 @@ unsigned lsi53c810_dasm(char *buf, UINT32 pc)
 	else if ((op & 0xE0000000) == 0x20000000)
 	{
 		/* MOVE PTR */
-		dest = lsi53c810_dasm_fetch(pc + 4);
+		dest = lsi53c810_dasm_fetch(machine, pc + 4);
 
 		buf += sprintf(buf, "MOVE 0x%08X, PTR 0x%08X, WHEN %s",
 			(op & 0x00FFFFFF), dest, phases[(op >> 24) & 0x07]);

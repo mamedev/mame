@@ -76,7 +76,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 #if 0
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 static WRITE8_HANDLER( msisaac_coin_counter_w )

@@ -153,7 +153,7 @@ WRITE8_HANDLER( fortyl_pixram_sel_w )
 	if (fortyl_flipscreen != f)
 	{
 		fortyl_flipscreen = f;
-		flip_screen_set(fortyl_flipscreen);
+		flip_screen_set(space->machine, fortyl_flipscreen);
 		fortyl_pix_redraw = 1;
 
 		for (offs=0;offs<32;offs++)

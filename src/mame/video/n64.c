@@ -3,7 +3,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/n64.h"
 
 #define LOG_RDP_EXECUTION 		0
@@ -2866,71 +2865,74 @@ static int rdp_dasm(char *buffer)
 // RDP COMMANDS
 ////////////////////////
 
-static void rdp_invalid(UINT32 w1, UINT32 w2)
+typedef void (*rdp_command_func)(running_machine *machine, UINT32 w1, UINT32 w2);
+#define RDP_COMMAND(name) void name(running_machine *machine, UINT32 w1, UINT32 w2)
+
+static RDP_COMMAND( rdp_invalid )
 {
 	fatalerror("RDP: invalid command  %d, %08X %08X\n", (w1 >> 24) & 0x3f, w1, w2);
 }
 
-static void rdp_noop(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_noop )
 {
 
 }
 
-static void rdp_tri_noshade(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tri_noshade )
 {
 	//fatalerror("RDP: unhandled command tri_noshade, %08X %08X\n", w1, w2);
 	triangle(w1, w2, 0, 0, 0);
 }
 
-static void rdp_tri_noshade_z(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tri_noshade_z )
 {
 	//fatalerror("RDP: unhandled command tri_noshade_z, %08X %08X\n", w1, w2);
 	triangle(w1, w2, 0, 0, 1);
 }
 
-static void rdp_tri_tex(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tri_tex )
 {
 	//osd_die("RDP: unhandled command tri_tex, %08X %08X\n", w1, w2);
 
 	triangle(w1, w2, 0, 1, 0);
 }
 
-static void rdp_tri_tex_z(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tri_tex_z )
 {
 	//osd_die("RDP: unhandled command tri_tex_z, %08X %08X\n", w1, w2);
 
 	triangle(w1, w2, 0, 1, 1);
 }
 
-static void rdp_tri_shade(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tri_shade )
 {
 	//osd_die("RDP: unhandled command tri_shade, %08X %08X\n", w1, w2);
 
 	triangle(w1, w2, 1, 0, 0);
 }
 
-static void rdp_tri_shade_z(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tri_shade_z )
 {
 	//osd_die("RDP: unhandled command tri_shade_z, %08X %08X\n", w1, w2);
 
 	triangle(w1, w2, 1, 0, 1);
 }
 
-static void rdp_tri_texshade(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tri_texshade )
 {
 	//osd_die("RDP: unhandled command tri_texshade, %08X %08X\n", w1, w2);
 
 	triangle(w1, w2, 1, 1, 0);
 }
 
-static void rdp_tri_texshade_z(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tri_texshade_z )
 {
 	//osd_die("RDP: unhandled command tri_texshade_z, %08X %08X\n", w1, w2);
 
 	triangle(w1, w2, 1, 1, 1);
 }
 
-static void rdp_tex_rect(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tex_rect )
 {
 	UINT32 w3, w4;
 	TEX_RECTANGLE rect;
@@ -2955,7 +2957,7 @@ static void rdp_tex_rect(UINT32 w1, UINT32 w2)
 	}
 }
 
-static void rdp_tex_rect_flip(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_tex_rect_flip )
 {
 	UINT32 w3, w4;
 	TEX_RECTANGLE rect;
@@ -2980,42 +2982,42 @@ static void rdp_tex_rect_flip(UINT32 w1, UINT32 w2)
 	}
 }
 
-static void rdp_sync_load(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_sync_load )
 {
 	// Nothing to do?
 }
 
-static void rdp_sync_pipe(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_sync_pipe )
 {
 	// Nothing to do?
 }
 
-static void rdp_sync_tile(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_sync_tile )
 {
 	// Nothing to do?
 }
 
-static void rdp_sync_full(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_sync_full )
 {
-	dp_full_sync(Machine);
+	dp_full_sync(machine);
 }
 
-static void rdp_set_key_gb(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_key_gb )
 {
 	//osd_die("RDP: unhandled command set_key_gb, %08X %08X\n", w1, w2);
 }
 
-static void rdp_set_key_r(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_key_r )
 {
 	//osd_die("RDP: unhandled command set_key_r, %08X %08X\n", w1, w2);
 }
 
-static void rdp_set_convert(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_convert )
 {
 	//osd_die("RDP: unhandled command set_convert, %08X %08X\n", w1, w2);
 }
 
-static void rdp_set_scissor(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_scissor )
 {
 	clip.xh = (w1 >> 12) & 0xfff;
 	clip.yh = (w1 >>  0) & 0xfff;
@@ -3025,13 +3027,13 @@ static void rdp_set_scissor(UINT32 w1, UINT32 w2)
 	// TODO: handle f & o?
 }
 
-static void rdp_set_prim_depth(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_prim_depth )
 {
 	primitive_z = (UINT16)(w2 >> 16);
 	primitive_delta_z = (UINT16)(w1);
 }
 
-static void rdp_set_other_modes(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_other_modes )
 {
 	other_modes.cycle_type			= (w1 >> 20) & 0x3;
 	other_modes.persp_tex_en 		= (w1 & 0x80000) ? 1 : 0;
@@ -3090,7 +3092,7 @@ static void rdp_set_other_modes(UINT32 w1, UINT32 w2)
 	}
 }
 
-static void rdp_load_tlut(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_load_tlut )
 {
 	int i;
 	UINT16 sl, sh;
@@ -3127,7 +3129,7 @@ static void rdp_load_tlut(UINT32 w1, UINT32 w2)
 
 }
 
-static void rdp_set_tile_size(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_tile_size )
 {
 	int tilenum = (w2 >> 24) & 0x7;
 
@@ -3137,7 +3139,7 @@ static void rdp_set_tile_size(UINT32 w1, UINT32 w2)
 	tile[tilenum].th = (w2 >>  0) & 0xfff;
 }
 
-static void rdp_load_block(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_load_block )
 {
 	int i, width;
 	UINT16 sl, sh, tl, dxt;
@@ -3190,7 +3192,7 @@ static void rdp_load_block(UINT32 w1, UINT32 w2)
 	}
 }
 
-static void rdp_load_tile(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_load_tile )
 {
 	int i, j;
 	UINT16 sl, sh, tl, th;
@@ -3285,7 +3287,7 @@ static void rdp_load_tile(UINT32 w1, UINT32 w2)
 
 }
 
-static void rdp_set_tile(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_tile )
 {
 	int tilenum = (w2 >> 24) & 0x7;
 
@@ -3305,7 +3307,7 @@ static void rdp_set_tile(UINT32 w1, UINT32 w2)
 	// TODO: clamp & mirror parameters
 }
 
-static void rdp_fill_rect(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_fill_rect )
 {
 	RECTANGLE rect;
 	rect.xl = (w1 >> 12) & 0xfff;
@@ -3320,12 +3322,12 @@ static void rdp_fill_rect(UINT32 w1, UINT32 w2)
 	}
 }
 
-static void rdp_set_fill_color(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_fill_color )
 {
 	fill_color = w2;
 }
 
-static void rdp_set_fog_color(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_fog_color )
 {
 	fog_color.r = (w2 >> 24) & 0xff;
 	fog_color.g = (w2 >> 16) & 0xff;
@@ -3333,7 +3335,7 @@ static void rdp_set_fog_color(UINT32 w1, UINT32 w2)
 	fog_color.a = (w2 >>  0) & 0xff;
 }
 
-static void rdp_set_blend_color(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_blend_color )
 {
 	blend_color.r = (w2 >> 24) & 0xff;
 	blend_color.g = (w2 >> 16) & 0xff;
@@ -3341,7 +3343,7 @@ static void rdp_set_blend_color(UINT32 w1, UINT32 w2)
 	blend_color.a = (w2 >>  0) & 0xff;
 }
 
-static void rdp_set_prim_color(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_prim_color )
 {
 	// TODO: prim min level, prim_level
 	prim_color.r = (w2 >> 24) & 0xff;
@@ -3350,7 +3352,7 @@ static void rdp_set_prim_color(UINT32 w1, UINT32 w2)
 	prim_color.a = (w2 >>  0) & 0xff;
 }
 
-static void rdp_set_env_color(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_env_color )
 {
 	env_color.r = (w2 >> 24) & 0xff;
 	env_color.g = (w2 >> 16) & 0xff;
@@ -3358,7 +3360,7 @@ static void rdp_set_env_color(UINT32 w1, UINT32 w2)
 	env_color.a = (w2 >>  0) & 0xff;
 }
 
-static void rdp_set_combine(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_combine )
 {
 	combine.sub_a_rgb0	= (w1 >> 20) & 0xf;
 	combine.mul_rgb0	= (w1 >> 15) & 0x1f;
@@ -3397,7 +3399,7 @@ static void rdp_set_combine(UINT32 w1, UINT32 w2)
 	SET_SUB_ALPHA_INPUT(&combiner_alphaadd[1], combine.add_a1);
 }
 
-static void rdp_set_texture_image(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_texture_image )
 {
 	ti_format	= (w1 >> 21) & 0x7;
 	ti_size		= (w1 >> 19) & 0x3;
@@ -3405,12 +3407,12 @@ static void rdp_set_texture_image(UINT32 w1, UINT32 w2)
 	ti_address	= w2 & 0x01ffffff;
 }
 
-static void rdp_set_mask_image(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_mask_image )
 {
 	zb_address	= w2 & 0x01ffffff;
 }
 
-static void rdp_set_color_image(UINT32 w1, UINT32 w2)
+static RDP_COMMAND( rdp_set_color_image )
 {
 	fb_format 	= (w1 >> 21) & 0x7;
 	fb_size		= (w1 >> 19) & 0x3;
@@ -3423,7 +3425,7 @@ static void rdp_set_color_image(UINT32 w1, UINT32 w2)
 
 /*****************************************************************************/
 
-static void (*const rdp_command_table[64])(UINT32 w1, UINT32 w2) =
+static const rdp_command_func rdp_command_table[64] =
 {
 	/* 0x00 */
 	rdp_noop,			rdp_invalid,			rdp_invalid,			rdp_invalid,
@@ -3447,7 +3449,7 @@ static void (*const rdp_command_table[64])(UINT32 w1, UINT32 w2) =
 	rdp_set_combine,	rdp_set_texture_image,	rdp_set_mask_image,		rdp_set_color_image
 };
 
-void rdp_process_list(void)
+void rdp_process_list(running_machine *machine)
 {
 	int i;
 	UINT32 cmd, length, cmd_length;
@@ -3498,7 +3500,7 @@ void rdp_process_list(void)
 		}
 
 		// execute the command
-		rdp_command_table[cmd](rdp_cmd_data[rdp_cmd_cur+0], rdp_cmd_data[rdp_cmd_cur+1]);
+		rdp_command_table[cmd](machine, rdp_cmd_data[rdp_cmd_cur+0], rdp_cmd_data[rdp_cmd_cur+1]);
 
 		rdp_cmd_cur += rdp_command_length[cmd] / 4;
 	};

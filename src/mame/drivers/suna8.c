@@ -501,7 +501,7 @@ static WRITE8_HANDLER( hardhead_bankswitch_w )
 */
 static WRITE8_HANDLER( hardhead_flipscreen_w )
 {
-	flip_screen_set(    data & 0x04);
+	flip_screen_set(space->machine,     data & 0x04);
 	coin_lockout_w ( 0,	data & 0x08);
 	coin_lockout_w ( 1,	data & 0x10);
 }
@@ -559,7 +559,7 @@ static WRITE8_HANDLER( rranger_bankswitch_w )
 
 	memory_set_bank(space->machine, 1, bank);
 
-	flip_screen_set(    data & 0x20);
+	flip_screen_set(space->machine,     data & 0x20);
 	coin_lockout_w ( 0,	data & 0x40);
 	coin_lockout_w ( 1,	data & 0x80);
 }
@@ -642,7 +642,7 @@ static WRITE8_HANDLER( brickzn_spritebank_w )
 {
 	suna8_spritebank = (data >> 1) & 1;
 	if (data & ~0x03) 	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(space->cpu),data);
-	flip_screen_set( data & 0x01 );
+	flip_screen_set(space->machine,  data & 0x01 );
 }
 
 static WRITE8_HANDLER( brickzn_unknown_w )
@@ -711,7 +711,7 @@ static WRITE8_HANDLER( hardhea2_nmi_w )
 */
 static WRITE8_HANDLER( hardhea2_flipscreen_w )
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
@@ -876,7 +876,7 @@ static WRITE8_HANDLER( sparkman_nmi_w )
 */
 static WRITE8_HANDLER( sparkman_flipscreen_w )
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 	if (data & ~0x01) 	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 

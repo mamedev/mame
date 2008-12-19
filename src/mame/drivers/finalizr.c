@@ -54,7 +54,7 @@ static WRITE8_HANDLER( finalizr_flipscreen_w )
 	nmi_enable = data & 0x01;
 	irq_enable = data & 0x02;
 
-	flip_screen_set(~data & 0x08);
+	flip_screen_set(space->machine, ~data & 0x08);
 }
 
 static WRITE8_HANDLER( finalizr_i8039_irq_w )

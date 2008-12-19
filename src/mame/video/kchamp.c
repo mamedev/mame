@@ -38,7 +38,7 @@ WRITE8_HANDLER( kchamp_colorram_w )
 
 WRITE8_HANDLER( kchamp_flipscreen_w )
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -80,7 +80,7 @@ static void kchamp_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
         int sx = spriteram[offs + 3] - 8;
         int sy = 247 - spriteram[offs];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -108,7 +108,7 @@ static void kchampvs_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
         int sx = spriteram[offs + 3];
         int sy = 240 - spriteram[offs];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

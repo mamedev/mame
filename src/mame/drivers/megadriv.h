@@ -21,7 +21,7 @@ MACHINE_DRIVER_EXTERN( genesis_32x_scd );
 extern UINT16* megadriv_backupram;
 extern int megadriv_backupram_length;
 extern UINT16* megadrive_ram;
-extern UINT8 megatech_bios_port_cc_dc_r(int offset, int ctrl);
+extern UINT8 megatech_bios_port_cc_dc_r(running_machine *machine, int offset, int ctrl);
 extern void megadriv_stop_scanline_timer(void);
 
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine);

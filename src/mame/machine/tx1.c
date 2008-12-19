@@ -4,7 +4,6 @@
 
 ***************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "debugger.h"
 #include "machine/8255ppi.h"
 #include "tx1.h"
@@ -188,14 +187,14 @@ static void sn_multiply(void)
 	SN74S516.ZWfl = 0;
 }
 
-static void sn_divide(void)
+static void sn_divide(running_machine *machine)
 {
 	INT32 Z = 0;
 	INT32 W = 0;
 
 	if ( SN74S516.X == 0 )
 	{
-		mame_printf_debug("%s:SN74S516 tried to divide by zero\n", cpuexec_describe_context(Machine));
+		mame_printf_debug("%s:SN74S516 tried to divide by zero\n", cpuexec_describe_context(machine));
 		SN74S516.ZW.Z = 0xffff;
 		SN74S516.ZW.W = 0xffff;
 		SN74S516.ZWfl = 0;
@@ -237,7 +236,7 @@ static void sn_divide(void)
 	SN74S516.ZWfl = 0;
 }
 
-static void sn74s516_update(const int ins)
+static void sn74s516_update(running_machine *machine, int ins)
 {
 	SN74S516.state = state_table[SN74S516.state][ins];
 
@@ -248,12 +247,12 @@ static void sn74s516_update(const int ins)
 	}
 	else if ( SN74S516.state == 5 )
 	{
-		sn_divide();
+		sn_divide(machine);
 		SN74S516.state = 10;
 	}
 }
 
-static void kick_sn74s516(UINT16 *data, const int ins)
+static void kick_sn74s516(running_machine *machine, UINT16 *data, const int ins)
 {
 
 #define LOAD_X		(SN74S516.X = *data)
@@ -279,16 +278,16 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 			if (ins < 4)
 			{
 				LOAD_Y;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 4)
 			{
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins < 7)
 			{
 				LOAD_X;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 7)
 			{
@@ -307,27 +306,27 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 			if (ins < 4)
 			{
 				LOAD_Y;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 4)
 			{
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 5)
 			{
 				// Rounding
 				// Operation
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 6)
 			{
 				LOAD_X;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 7)
 			{
 				READ_ZW;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			break;
 		}
@@ -337,28 +336,28 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 			if (SN74S516.code == 0x6666)
 			{
 				CLEAR_SEQUENCE;
-				mame_printf_debug("%s:Code 6666: PROMADDR:%x\n", cpuexec_describe_context(Machine), math.promaddr);
+				mame_printf_debug("%s:Code 6666: PROMADDR:%x\n", cpuexec_describe_context(machine), math.promaddr);
 			}
 
 			UPDATE_SEQUENCE;
 			if (ins < 4)
 			{
 				LOAD_Y;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins < 6)
 			{
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 6)
 			{
 				LOAD_Z;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 7)
 			{
 				// Pointless operation.
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 
 			break;
@@ -369,26 +368,26 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 			if (ins < 4)
 			{
 				LOAD_Y;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 4)
 			{
 				LOAD_W;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 5)
 			{
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 6)
 			{
 				LOAD_W;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 7)
 			{
 				READ_ZW;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			break;
 		}
@@ -398,22 +397,22 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 			if (ins < 4)
 			{
 				LOAD_Y;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins < 6)
 			{
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 6)
 			{
 				// CHECK: Incomplete state
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			else if (ins == 7)
 			{
 				/* 6667 = Load X, Load Z, Load W, Clear Z */
 				SN74S516.ZW.Z = 0;
-				sn74s516_update(ins);
+				sn74s516_update(machine, ins);
 			}
 			break;
 		}
@@ -424,7 +423,7 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 	}
 
 	math.dbgaddr = math.promaddr;
-	math.dbgpc = cpu_get_previouspc(Machine->cpu[1]);
+	math.dbgpc = cpu_get_previouspc(machine->cpu[1]);
 }
 
 
@@ -548,7 +547,7 @@ static void tx1_update_state(running_machine *machine)
 				else if ( dsel == 3 )
 					data = ROL16(SWAP16(math.muxlatch), 3);
 
-				kick_sn74s516(&data, ins);
+				kick_sn74s516(machine, &data, ins);
 			}
 			/*
                 TODO: Changed ppshift to muxlatch for TX-1
@@ -564,7 +563,7 @@ static void tx1_update_state(running_machine *machine)
 			{
 				UINT16 data;
 
-				kick_sn74s516(&data, ins);
+				kick_sn74s516(machine, &data, ins);
 
 				/* All latches enabled */
 				if ( LHIEN(math.inslatch) && LLOEN(math.inslatch) )
@@ -638,13 +637,13 @@ static void tx1_update_state(running_machine *machine)
 			{
 				if ( math.mux == TX1_SEL_PPSEN )
 				{
-					kick_sn74s516(&math.ppshift, ins);
+					kick_sn74s516(machine, &math.ppshift, ins);
 				}
 				else
 				{
 					/* Bus pullups give 0xffff */
 					UINT16 data = 0xffff;
-					kick_sn74s516(&data, ins);
+					kick_sn74s516(machine, &data, ins);
 				}
 			}
 		}
@@ -677,7 +676,7 @@ READ16_HANDLER( tx1_math_r )
 		}
 
 		/* TODO What do we return? */
-		kick_sn74s516(&math.retval, ins);
+		kick_sn74s516(space->machine, &math.retval, ins);
 	}
 	/* /PPSEN */
 	else if ( offset < 0x800 )
@@ -794,7 +793,7 @@ WRITE16_HANDLER( tx1_math_w )
 			ins = (offset >> 1) & 7;
 		}
 
-		kick_sn74s516(&math.cpulatch, ins);
+		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
 	/* /PPSEN */
 	else if ( (offset & 0xc00) == 0x400 )
@@ -872,7 +871,7 @@ READ16_HANDLER( tx1_spcs_rom_r )
 		int ins = math.inslatch & 7;
 
 		TX1_SET_INS0_BIT;
-		kick_sn74s516(&math.cpulatch, ins);
+		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
 	else if ( math.mux == TX1_SEL_PPSEN )
 	{
@@ -936,7 +935,7 @@ READ16_HANDLER( tx1_spcs_ram_r )
 		int ins = math.inslatch & 7;
 
 		TX1_SET_INS0_BIT;
-		kick_sn74s516(&math.cpulatch, ins);
+		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
 	else if ( math.mux == TX1_SEL_PPSEN )
 	{
@@ -1071,11 +1070,11 @@ static void buggyboy_update_state(running_machine *machine)
 			{
 				UINT16 *romdata = (UINT16*)memory_region(machine, "user1");
 				UINT16 addr = get_bb_datarom_addr();
-				kick_sn74s516(&romdata[addr], ins);
+				kick_sn74s516(machine, &romdata[addr], ins);
 			}
 			else if ( math.mux == BB_MUX_PPOE )
 			{
-				kick_sn74s516(&math.ppshift, ins);
+				kick_sn74s516(machine, &math.ppshift, ins);
 			}
 			/* This is quite tricky. */
 			/* It can either be a read operation or */
@@ -1084,7 +1083,7 @@ static void buggyboy_update_state(running_machine *machine)
 			{
 				UINT16 data;
 
-				kick_sn74s516(&data, ins);
+				kick_sn74s516(machine, &data, ins);
 
 				if ( LHIEN(math.inslatch) && LLOEN(math.inslatch) )
 				{
@@ -1121,13 +1120,13 @@ static void buggyboy_update_state(running_machine *machine)
 			{
 				if ( math.mux == BB_MUX_PPSEN )
 				{
-					kick_sn74s516(&math.ppshift, ins);
+					kick_sn74s516(machine, &math.ppshift, ins);
 				}
 				else
 				{
 					/* Bus pullups give 0xffff */
 					UINT16 data = 0xffff;
-					kick_sn74s516(&data, ins);
+					kick_sn74s516(machine, &data, ins);
 				}
 			}
 		}
@@ -1170,7 +1169,7 @@ READ16_HANDLER( buggyboy_math_r )
 		}
 
 		/* TODO What do we return? */
-		kick_sn74s516(&math.retval, ins);
+		kick_sn74s516(space->machine, &math.retval, ins);
 
 		/* TODO */
 		//if (math.mux == BB_MUX_PPSEN)
@@ -1247,7 +1246,7 @@ WRITE16_HANDLER( buggyboy_math_w )
 			ins = (offset >> 1) & 7;
 		}
 
-		kick_sn74s516(&math.cpulatch, ins);
+		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
 	/* /PPSEN */
 	else if ( (offset & 0xc00) == 0x400 )
@@ -1326,7 +1325,7 @@ READ16_HANDLER( buggyboy_spcs_rom_r )
 		int ins = math.inslatch & 7;
 
 		BB_SET_INS0_BIT;
-		kick_sn74s516(&math.cpulatch, ins);
+		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
 	else if ( math.mux == BB_MUX_PPSEN )
 	{
@@ -1394,7 +1393,7 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 		int ins = math.inslatch & 7;
 
 		BB_SET_INS0_BIT;
-		kick_sn74s516(&math.cpulatch, ins);
+		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
 	else if ( math.mux == BB_MUX_PPSEN )
 	{

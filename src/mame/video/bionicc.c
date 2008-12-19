@@ -177,7 +177,7 @@ WRITE16_HANDLER( bionicc_gfxctrl_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		flip_screen_set(data & 0x0100);
+		flip_screen_set(space->machine, data & 0x0100);
 
 		tilemap_set_enable(bg_tilemap,data & 0x2000);	/* guess */
 		tilemap_set_enable(fg_tilemap,data & 0x1000);	/* guess */
@@ -211,7 +211,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			int sx = (INT16)buffered_spriteram16[offs+3];	/* signed */
 			int sy = (INT16)buffered_spriteram16[offs+2];	/* signed */
 			if(sy>512-16) sy-=512;
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

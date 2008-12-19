@@ -11,7 +11,6 @@
 #ifdef MESS
 #include "devices/harddriv.h"
 #endif
-#include "deprecat.h"
 #include "scsihd.h"
 
 typedef struct
@@ -225,7 +224,7 @@ static void scsihd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 
 static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
-	running_machine *machine = Machine;
+	running_machine *machine = scsiInstance->machine;
 	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 
 	our_this->lba = 0;
@@ -236,7 +235,7 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 
 #ifdef MESS
 	/* TODO: get rid of this ifdef MESS section */
-	our_this->disk = mess_hd_get_hard_disk_file( device_list_find_by_tag( Machine->config->devicelist, HARDDISK, diskregion ) );
+	our_this->disk = mess_hd_get_hard_disk_file( device_list_find_by_tag( machine->config->devicelist, HARDDISK, diskregion ) );
 #else
 	our_this->disk = hard_disk_open(get_disk_handle( diskregion ));
 

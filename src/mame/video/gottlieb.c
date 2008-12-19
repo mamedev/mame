@@ -64,16 +64,16 @@ WRITE8_HANDLER( gottlieb_video_control_w )
 	background_priority = data & 0x01;
 
 	/* bit 1 controls horizonal flip screen */
-	if (flip_screen_x_get() != (data & 0x02))
+	if (flip_screen_x_get(space->machine) != (data & 0x02))
 	{
-		flip_screen_x_set(data & 0x02);
+		flip_screen_x_set(space->machine, data & 0x02);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
 	/* bit 2 controls horizonal flip screen */
-	if (flip_screen_y_get() != (data & 0x04))
+	if (flip_screen_y_get(space->machine) != (data & 0x04))
 	{
-		flip_screen_y_set(data & 0x04);
+		flip_screen_y_set(space->machine, data & 0x04);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
@@ -194,12 +194,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sy = (spriteram[offs]) - 13;
 		int code = (255 ^ spriteram[offs + 2]) + 256 * spritebank;
 
-		if (flip_screen_x_get()) sx = 233 - sx;
-		if (flip_screen_y_get()) sy = 244 - sy;
+		if (flip_screen_x_get(machine)) sx = 233 - sx;
+		if (flip_screen_y_get(machine)) sy = 244 - sy;
 
 		drawgfx(bitmap, machine->gfx[2],
 			code, 0,
-			flip_screen_x_get(), flip_screen_y_get(),
+			flip_screen_x_get(machine), flip_screen_y_get(machine),
 			sx,sy,
 			&clip,
 			TRANSPARENCY_PEN, 0);

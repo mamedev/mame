@@ -10,7 +10,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "config.h"
 #include "generic.h"
 

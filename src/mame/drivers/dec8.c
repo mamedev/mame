@@ -368,7 +368,7 @@ static WRITE8_HANDLER( ghostb_bank_w )
 
 	if (data&1) int_enable=1; else int_enable=0;
 	if (data&2) nmi_enable=1; else nmi_enable=0;
-	flip_screen_set(data & 0x08);
+	flip_screen_set(space->machine, data & 0x08);
 }
 
 static WRITE8_HANDLER( csilver_control_w )
@@ -494,7 +494,7 @@ static WRITE8_HANDLER( shackled_int_w )
 
 static READ8_HANDLER( shackled_sprite_r ) { return spriteram[offset]; }
 static WRITE8_HANDLER( shackled_sprite_w ) { spriteram[offset]=data; }
-static WRITE8_HANDLER( flip_screen_w ) {	flip_screen_set(data); }
+static WRITE8_HANDLER( flip_screen_w ) {	flip_screen_set(space->machine, data); }
 
 /******************************************************************************/
 

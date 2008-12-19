@@ -135,7 +135,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "memconv.h"
 #include "profiler.h"
 #include "machine/atarigen.h"
@@ -214,17 +213,17 @@ static void jagobj_init(void);
 static void process_object_list(running_machine *machine, int vc, UINT16 *_scanline);
 
 /* from jagblit.c */
-static void generic_blitter(UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_09800001_010020_010020(UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_09800009_000020_000020(UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_01800009_000028_000028(UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_01800001_000018_000018(UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_01c00001_000018_000018(UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void generic_blitter(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_09800001_010020_010020(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_09800009_000020_000020(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_01800009_000028_000028(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_01800001_000018_000018(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_01c00001_000018_000018(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
 
 #ifdef MESS
-static void blitter_00010000_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_01800001_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT32 a2flags);
-static void blitter_x1800x01_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_00010000_xxxxxx_xxxxxx(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_01800001_xxxxxx_xxxxxx(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
+static void blitter_x1800x01_xxxxxx_xxxxxx(running_machine *machine, UINT32 command, UINT32 a1flags, UINT32 a2flags);
 #endif
 
 
@@ -478,9 +477,9 @@ static void jaguar_set_palette(UINT16 vmode)
  *
  *************************************/
 
-static UINT8 *get_jaguar_memory(UINT32 offset)
+static UINT8 *get_jaguar_memory(running_machine *machine, UINT32 offset)
 {
-	return memory_get_read_ptr(cpu_get_address_space(Machine->cpu[1], ADDRESS_SPACE_PROGRAM), offset);
+	return memory_get_read_ptr(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), offset);
 }
 
 
@@ -491,7 +490,7 @@ static UINT8 *get_jaguar_memory(UINT32 offset)
  *
  *************************************/
 
-static void blitter_run(void)
+static void blitter_run(running_machine *machine)
 {
 	UINT32 command = blitter_regs[B_CMD] & STATIC_COMMAND_MASK;
 	UINT32 a1flags = blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
@@ -503,29 +502,29 @@ static void blitter_run(void)
 	{
 		if (command == 0x09800001 && a1flags == 0x010020)
 		{
-			blitter_09800001_010020_010020(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
+			blitter_09800001_010020_010020(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 			return;
 		}
 		if (command == 0x09800009 && a1flags == 0x000020)
 		{
-			blitter_09800009_000020_000020(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
+			blitter_09800009_000020_000020(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 			return;
 		}
 		if (command == 0x01800009 && a1flags == 0x000028)
 		{
-			blitter_01800009_000028_000028(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
+			blitter_01800009_000028_000028(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 			return;
 		}
 
 		if (command == 0x01800001 && a1flags == 0x000018)
 		{
-			blitter_01800001_000018_000018(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
+			blitter_01800001_000018_000018(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 			return;
 		}
 
 		if (command == 0x01c00001 && a1flags == 0x000018)
 		{
-			blitter_01c00001_000018_000018(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
+			blitter_01c00001_000018_000018(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 			return;
 		}
 	}
@@ -533,19 +532,19 @@ static void blitter_run(void)
 #ifdef MESS
 	if (command == 0x00010000)
 	{
-		blitter_00010000_xxxxxx_xxxxxx(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
+		blitter_00010000_xxxxxx_xxxxxx(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 		return;
 	}
 
 	if (command == 0x01800001)
 	{
-		blitter_01800001_xxxxxx_xxxxxx(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
+		blitter_01800001_xxxxxx_xxxxxx(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 		return;
 	}
 
 	if ((command & 0x0ffff0ff) == 0x01800001)
 	{
-		blitter_x1800x01_xxxxxx_xxxxxx(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
+		blitter_x1800x01_xxxxxx_xxxxxx(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 		return;
 	}
 #endif
@@ -585,7 +584,7 @@ if (++reps % 100 == 99)
 }
 }
 
-	generic_blitter(blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
+	generic_blitter(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
 	profiler_mark(PROFILER_END);
 }
 
@@ -608,7 +607,7 @@ WRITE32_HANDLER( jaguar_blitter_w )
 {
 	COMBINE_DATA(&blitter_regs[offset]);
 	if (offset == B_CMD)
-		blitter_run();
+		blitter_run(space->machine);
 
 	if (LOG_BLITTER_WRITE)
 	logerror("%08X:Blitter write register @ F022%02X = %08X\n", cpu_get_previouspc(space->cpu), offset * 4, data);

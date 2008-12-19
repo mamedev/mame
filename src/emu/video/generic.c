@@ -10,7 +10,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "generic.h"
 
 
@@ -482,10 +481,10 @@ static void updateflip(running_machine *machine)
     flip_screen_set - set global flip
 -------------------------------------------------*/
 
-void flip_screen_set(int on)
+void flip_screen_set(running_machine *machine, int on)
 {
-	flip_screen_x_set(on);
-	flip_screen_y_set(on);
+	flip_screen_x_set(machine, on);
+	flip_screen_y_set(machine, on);
 }
 
 
@@ -494,7 +493,7 @@ void flip_screen_set(int on)
        do not call update_flip.
 -------------------------------------------------*/
 
-void flip_screen_set_no_update(int on)
+void flip_screen_set_no_update(running_machine *machine, int on)
 {
 	/* flip_screen_y is not updated on purpose
      * this function is for drivers which
@@ -509,13 +508,13 @@ void flip_screen_set_no_update(int on)
     flip_screen_x_set - set global horizontal flip
 -------------------------------------------------*/
 
-void flip_screen_x_set(int on)
+void flip_screen_x_set(running_machine *machine, int on)
 {
 	if (on) on = ~0;
 	if (flip_screen_x != on)
 	{
 		flip_screen_x = on;
-		updateflip(Machine);
+		updateflip(machine);
 	}
 }
 
@@ -524,13 +523,13 @@ void flip_screen_x_set(int on)
     flip_screen_y_set - set global vertical flip
 -------------------------------------------------*/
 
-void flip_screen_y_set(int on)
+void flip_screen_y_set(running_machine *machine, int on)
 {
 	if (on) on = ~0;
 	if (flip_screen_y != on)
 	{
 		flip_screen_y = on;
-		updateflip(Machine);
+		updateflip(machine);
 	}
 }
 
@@ -539,7 +538,7 @@ void flip_screen_y_set(int on)
     flip_screen_get - get global flip
 -------------------------------------------------*/
 
-int flip_screen_get(void)
+int flip_screen_get(running_machine *machine)
 {
 	return flip_screen_x;
 }
@@ -549,7 +548,7 @@ int flip_screen_get(void)
     flip_screen_x_get - get global x flip
 -------------------------------------------------*/
 
-int flip_screen_x_get(void)
+int flip_screen_x_get(running_machine *machine)
 {
 	return flip_screen_x;
 }
@@ -559,10 +558,11 @@ int flip_screen_x_get(void)
     flip_screen_get - get global y flip
 -------------------------------------------------*/
 
-int flip_screen_y_get(void)
+int flip_screen_y_get(running_machine *machine)
 {
 	return flip_screen_y;
 }
+
 
 
 /***************************************************************************

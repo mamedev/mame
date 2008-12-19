@@ -243,7 +243,7 @@ static WRITE8_HANDLER( mcu_p1_w )
 			coin_lockout_global_w((data & 1) ^ invert_coin_lockout);
 			break;
 		case 4:
-			flip_screen_set(data & 1);
+			flip_screen_set(space->machine, data & 1);
 			break;
 		case 5:
 			port1 = data;
@@ -305,7 +305,7 @@ static READ8_HANDLER( bootleg_in0_r )
 
 static WRITE8_HANDLER( bootleg_flipscreen_w )
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(space->machine, ~data & 1);
 }
 
 

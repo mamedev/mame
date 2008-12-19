@@ -102,7 +102,7 @@ WRITE8_HANDLER( flstory_gfxctrl_w )
 	}
 	palette_bank = (data & 0x20) >> 5;
 
-	flip_screen_set(flipscreen);
+	flip_screen_set(space->machine, flipscreen);
 
 //popmessage("%04x: gfxctrl = %02x\n",cpu_get_pc(space->cpu),data);
 
@@ -124,7 +124,7 @@ WRITE8_HANDLER( victnine_gfxctrl_w )
 	if (data & 0x04)
 	{
 		flipscreen = (data & 0x01);
-		flip_screen_set(flipscreen);
+		flip_screen_set(space->machine, flipscreen);
 	}
 
 //popmessage("%04x: gfxctrl = %02x\n",cpu_get_pc(space->cpu),data);

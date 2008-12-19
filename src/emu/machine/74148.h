@@ -45,14 +45,14 @@
 /* The interface structure */
 struct TTL74148_interface
 {
-	void (*output_cb)(void);
+	void (*output_cb)(running_machine *machine);
 };
 
 
 void TTL74148_config(int which, const struct TTL74148_interface *intf);
 
 /* must call TTL74148_update() after setting the inputs */
-void TTL74148_update(int which);
+void TTL74148_update(running_machine *machine, int which);
 
 void TTL74148_input_line_w(int which, int input_line, int data);
 void TTL74148_enable_input_w(int which, int data);

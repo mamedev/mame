@@ -8,7 +8,6 @@ Nintendo VS UniSystem and DualSystem - (c) 1984 Nintendo of America
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "includes/vsnes.h"
 
@@ -88,7 +87,7 @@ static const UINT8 rp2c05004_colortable[] =
 
 
 /* remap callback */
-static int remap_colors( int num, int addr, int data )
+static int remap_colors( running_machine *machine, int num, int addr, int data )
 {
 	/* this is the protection. color codes are shuffled around */
 	/* the ones with value 0xff are unknown */
@@ -806,9 +805,9 @@ static int MMC3_chr[6];
 static int MMC3_prg_chunks, MMC3_prg_mask;
 static int IRQ_enable, IRQ_count, IRQ_count_latch;
 
-static void mapper4_set_prg (void)
+static void mapper4_set_prg (const address_space *space)
 {
-	UINT8 *prg = memory_region( Machine, "main" );
+	UINT8 *prg = memory_region( space->machine, "main" );
 	MMC3_prg0 &= MMC3_prg_mask;
 	MMC3_prg1 &= MMC3_prg_mask;
 
@@ -825,7 +824,7 @@ static void mapper4_set_prg (void)
 	memcpy( &prg[0xa000], &prg[0x2000 * (MMC3_prg1) + 0x10000], 0x2000 );
 }
 
-static void mapper4_set_chr (void)
+static void mapper4_set_chr (const address_space *space)
 {
 	UINT8 chr_page = (MMC3_cmd & 0x80) >> 5;
 	ppu2c0x_set_videorom_bank(0, chr_page ^ 0, 2, MMC3_chr[0], 1);
@@ -839,7 +838,7 @@ static void mapper4_set_chr (void)
 #define BOTTOM_VISIBLE_SCANLINE	239		/* The bottommost visible scanline */
 #define NUM_SCANLINE 262
 
-static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
+static void mapper4_irq ( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	mame_printf_debug("entra\n");
 	if ((scanline < BOTTOM_VISIBLE_SCANLINE) || (scanline == NUM_SCANLINE-1))
@@ -849,7 +848,7 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 			if (IRQ_count == 0)
 			{
 				IRQ_count = IRQ_count_latch;
-				cpu_set_input_line (Machine->cpu[0], 0, HOLD_LINE);
+				cpu_set_input_line (machine->cpu[0], 0, HOLD_LINE);
 			}
 			IRQ_count --;
 		}
@@ -867,8 +866,8 @@ static WRITE8_HANDLER( mapper4_w )
 			if (last_bank != (data & 0xc0))
 			{
 				/* Reset the banks */
-				mapper4_set_prg ();
-				mapper4_set_chr ();
+				mapper4_set_prg (space);
+				mapper4_set_chr (space);
 
 			}
 			last_bank = data & 0xc0;
@@ -882,24 +881,24 @@ static WRITE8_HANDLER( mapper4_w )
 				case 0: case 1:
 					data &= 0xfe;
 					MMC3_chr[cmd] = data * 64;
-					mapper4_set_chr ();
+					mapper4_set_chr (space);
 
 					break;
 
 				case 2: case 3: case 4: case 5:
 					MMC3_chr[cmd] = data * 64;
-					mapper4_set_chr ();
+					mapper4_set_chr (space);
 
 					break;
 
 				case 6:
 					MMC3_prg0 = data;
-					mapper4_set_prg ();
+					mapper4_set_prg (space);
 					break;
 
 				case 7:
 					MMC3_prg1 = data;
-					mapper4_set_prg ();
+					mapper4_set_prg (space);
 					break;
 			}
 			break;

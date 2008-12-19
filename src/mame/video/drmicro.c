@@ -17,10 +17,10 @@ static tilemap *drmicro_bg2;
 
 /****************************************************************************/
 
-void drmicro_flip_w( int flip )
+void drmicro_flip_w( running_machine *machine, int flip )
 {
 	flipscreen = flip ? 1 : 0;
-	flip_screen_set(flip);
+	flip_screen_set(machine, flip);
 }
 
 WRITE8_HANDLER( drmicro_videoram_w )

@@ -76,7 +76,7 @@ out of the sprite list at that point.. (verify on real hw)
 static WRITE16_HANDLER( snowbros_flipscreen_w )
 {
 	if (ACCESSING_BITS_8_15)
-		flip_screen_set(~data & 0x8000);
+		flip_screen_set(space->machine, ~data & 0x8000);
 }
 
 

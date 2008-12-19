@@ -1245,7 +1245,7 @@ static void dambustr_draw_bullets(running_machine *machine, bitmap_t *bitmap, co
 {
 	int i, color;
 
-	if (flip_screen_x_get())  x++;
+	if (flip_screen_x_get(machine))  x++;
 
 	x = x - 6;
 
@@ -1416,7 +1416,7 @@ static void dambustr_draw_background(running_machine *machine, bitmap_t *bitmap,
 	int col1 = base + dambustr_bg_color_1;
 	int col2 = base + dambustr_bg_color_2;
 
-	if (flip_screen_x_get())
+	if (flip_screen_x_get(machine))
 	{
 		plot_box(bitmap,   0, 0, 256-dambustr_bg_split_line, 256, col2);
 		plot_box(bitmap, 256-dambustr_bg_split_line, 0, dambustr_bg_split_line, 256, col1);
@@ -1429,11 +1429,11 @@ static void dambustr_draw_background(running_machine *machine, bitmap_t *bitmap,
 
 }
 
-static void dambustr_draw_upper_background(bitmap_t *bitmap, const rectangle *cliprect)
+static void dambustr_draw_upper_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	static rectangle clip = { 0, 0, 0, 0 };
 
-	if (flip_screen_x_get())
+	if (flip_screen_x_get(machine))
 	{
 		clip.min_x = 254 - dambustr_bg_split_line;
 		clip.max_x = dambustr_bg_split_line;
@@ -1892,7 +1892,7 @@ VIDEO_UPDATE( dambustr )
 	if (dambustr_bg_priority)
 	{
 		/* draw the upper part of the background, as it has priority */
-		dambustr_draw_upper_background(bitmap, cliprect);
+		dambustr_draw_upper_background(screen->machine, bitmap, cliprect);
 
 		/* only rows with color code > 3 are stronger than the background */
 		memset(dambustr_videoram2, 0x20, 0x0400);

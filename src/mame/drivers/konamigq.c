@@ -279,7 +279,7 @@ static const k054539_interface k054539_config =
 
 static UINT8 sector_buffer[ 512 ];
 
-static void scsi_dma_read( UINT32 n_address, INT32 n_size )
+static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
 	int i;
 	int n_this;
@@ -312,7 +312,7 @@ static void scsi_dma_read( UINT32 n_address, INT32 n_size )
 	}
 }
 
-static void scsi_dma_write( UINT32 n_address, INT32 n_size )
+static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
 }
 

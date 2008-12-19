@@ -188,12 +188,12 @@ WRITE8_HANDLER( zaccaria_attributes_w )
 
 WRITE8_HANDLER( zaccaria_flip_screen_x_w )
 {
-	flip_screen_x_set(data & 1);
+	flip_screen_x_set(space->machine, data & 1);
 }
 
 WRITE8_HANDLER( zaccaria_flip_screen_y_w )
 {
-	flip_screen_y_set(data & 1);
+	flip_screen_y_set(space->machine, data & 1);
 }
 
 
@@ -209,7 +209,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	int offs;
 	rectangle clip = *cliprect;
 
-	if (flip_screen_x_get())
+	if (flip_screen_x_get(machine))
 		sect_rect(&clip, &spritevisiblearea_flipx);
 	else
 		sect_rect(&clip, &spritevisiblearea);
@@ -235,12 +235,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		int flipx = spriteram_2[offs + 2] & 0x40;
 		int flipy = spriteram_2[offs + 2] & 0x80;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -261,12 +261,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		int flipx = spriteram[offs + 1] & 0x40;
 		int flipy = spriteram[offs + 1] & 0x80;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

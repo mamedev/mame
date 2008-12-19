@@ -219,21 +219,21 @@ WRITE8_HANDLER( fastfred_colorbank2_w )
 
 WRITE8_HANDLER( fastfred_flip_screen_x_w )
 {
-	if (flip_screen_x_get() != (data & 0x01))
+	if (flip_screen_x_get(space->machine) != (data & 0x01))
 	{
-		flip_screen_x_set(data & 0x01);
+		flip_screen_x_set(space->machine, data & 0x01);
 
-		tilemap_set_flip(bg_tilemap, (flip_screen_x_get() ? TILEMAP_FLIPX : 0) | (flip_screen_y_get() ? TILEMAP_FLIPY : 0));
+		tilemap_set_flip(bg_tilemap, (flip_screen_x_get(space->machine) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine) ? TILEMAP_FLIPY : 0));
 	}
 }
 
 WRITE8_HANDLER( fastfred_flip_screen_y_w )
 {
-	if (flip_screen_y_get() != (data & 0x01))
+	if (flip_screen_y_get(space->machine) != (data & 0x01))
 	{
-		flip_screen_y_set(data & 0x01);
+		flip_screen_y_set(space->machine, data & 0x01);
 
-		tilemap_set_flip(bg_tilemap, (flip_screen_x_get() ? TILEMAP_FLIPX : 0) | (flip_screen_y_get() ? TILEMAP_FLIPY : 0));
+		tilemap_set_flip(bg_tilemap, (flip_screen_x_get(space->machine) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine) ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -287,12 +287,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -303,7 +303,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				colorbank | (fastfred_spriteram[offs + 2] & 0x07),
 				flipx,flipy,
 				sx,sy,
-				flip_screen_x_get() ? &spritevisibleareaflipx : &spritevisiblearea,TRANSPARENCY_PEN,0);
+				flip_screen_x_get(machine) ? &spritevisibleareaflipx : &spritevisiblearea,TRANSPARENCY_PEN,0);
 	}
 }
 

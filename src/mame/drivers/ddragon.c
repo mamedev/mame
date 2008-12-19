@@ -216,7 +216,7 @@ static WRITE8_HANDLER( ddragon_bankswitch_w )
 {
 	ddragon_scrollx_hi = ((data & 0x01) << 8);
 	ddragon_scrolly_hi = ((data & 0x02) << 7);
-	flip_screen_set(~data & 0x04);
+	flip_screen_set(space->machine, ~data & 0x04);
 
 	/* bit 3 unknown */
 
@@ -234,7 +234,7 @@ static WRITE8_HANDLER( toffy_bankswitch_w )
 	ddragon_scrollx_hi = ((data & 0x01) << 8);
 	ddragon_scrolly_hi = ((data & 0x02) << 7);
 
-//  flip_screen_set(~data & 0x04);
+//  flip_screen_set(space->machine, ~data & 0x04);
 
 	/* bit 3 unknown */
 
@@ -291,7 +291,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	ddragon_scrollx_hi = ((data & 0x01) << 8);
 	ddragon_scrolly_hi = ((data & 0x02) << 7);
 
-//  flip_screen_set(~data & 0x04);
+//  flip_screen_set(space->machine, ~data & 0x04);
 
 	/* bit 3 unknown */
 

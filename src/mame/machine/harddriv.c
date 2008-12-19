@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/m68000/m68000.h"
@@ -1415,10 +1414,10 @@ WRITE16_HANDLER( hd68k_ds3_program_w )
  *
  *************************************/
 
-void hddsk_update_pif(UINT32 pins)
+void hddsk_update_pif(const device_config *device, UINT32 pins)
 {
 	atarigen_sound_int_state = ((pins & DSP32_OUTPUT_PIF) != 0);
-	hd68k_update_interrupts(Machine);
+	hd68k_update_interrupts(device->machine);
 }
 
 

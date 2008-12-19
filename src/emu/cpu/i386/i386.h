@@ -7,6 +7,9 @@
 
 #include "cpuintrf.h"
 
+// mingw has this defined for 32-bit compiles
+#undef i386
+
 CPU_GET_INFO( i386 );
 CPU_GET_INFO( i486 );
 CPU_GET_INFO( pentium );

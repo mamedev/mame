@@ -33,7 +33,7 @@ void jaguar_dsp_suspend(running_machine *machine);
 void jaguar_dsp_resume(running_machine *machine);
 
 void cojag_sound_init(running_machine *machine);
-void cojag_sound_reset(void);
+void cojag_sound_reset(running_machine *machine);
 
 void jaguar_external_int(const device_config *device, int state);
 

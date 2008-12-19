@@ -54,7 +54,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx = hanaroku_spriteram1[i + 0x200] | ((hanaroku_spriteram2[i + 0x200] & 0x07) << 8);
 		int sy = 242 - hanaroku_spriteram3[i];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sy = 242 - sy;
 			flipx = !flipx;

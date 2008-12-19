@@ -529,7 +529,7 @@ WRITE32_HANDLER( n64_dp_reg_w )
 
 		case 0x04/4:		// DP_END_REG
 			dp_end = data;
-			rdp_process_list();
+			rdp_process_list(space->machine);
 			break;
 
 		case 0x0c/4:		// DP_STATUS_REG

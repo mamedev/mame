@@ -301,7 +301,7 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 {
 	airbustr_bankswitch(space->machine, "slave", 2, data);
 
-	flip_screen_set(data & 0x10);
+	flip_screen_set(space->machine, data & 0x10);
 
 	// used at the end of levels, after defeating the boss, to leave trails
 	pandora_set_clear_bitmap(data&0x20);

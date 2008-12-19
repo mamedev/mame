@@ -290,7 +290,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			int duplicate = spriteram_3[offs] & 0x80;
 			int x,y;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -319,7 +319,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( gaplus )
 {
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(gaplus_spriteram[0x1f7f-0x800] & 1);
+	flip_screen_set(screen->machine, gaplus_spriteram[0x1f7f-0x800] & 1);
 
 	bitmap_fill(bitmap, cliprect, 0);
 

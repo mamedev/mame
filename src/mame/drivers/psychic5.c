@@ -341,7 +341,7 @@ static UINT8 psychic5_bank_latch;
 static MACHINE_RESET( psychic5 )
 {
 	psychic5_bank_latch = 0xff;
-	flip_screen_set(0);
+	flip_screen_set(machine, 0);
 }
 
 /***************************************************************************
@@ -404,7 +404,7 @@ static WRITE8_HANDLER( psychic5_coin_counter_w )
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(!flip_screen_get());
+		flip_screen_set(space->machine, !flip_screen_get(space->machine));
 	}
 }
 
@@ -413,7 +413,7 @@ static WRITE8_HANDLER( bombsa_flipscreen_w )
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(!flip_screen_get());
+		flip_screen_set(space->machine, !flip_screen_get(space->machine));
 	}
 }
 

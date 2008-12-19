@@ -308,7 +308,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sx += sprite_xoffs;
 		sy -= sprite_yoffs;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = -sx - sizex;
 			sy = -sy - sizey;
@@ -343,9 +343,9 @@ VIDEO_UPDATE( namcos1 )
 	rectangle new_clip = *cliprect;
 
 	/* flip screen is embedded in the sprite control registers */
-	/* can't use flip_screen_set() because the visible area is asymmetrical */
-	flip_screen_set_no_update(spriteram[0x07f6] & 1);
-	tilemap_set_flip(ALL_TILEMAPS,flip_screen_get() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	/* can't use flip_screen_set(screen->machine, ) because the visible area is asymmetrical */
+	flip_screen_set_no_update(screen->machine, spriteram[0x07f6] & 1);
+	tilemap_set_flip(ALL_TILEMAPS,flip_screen_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 
 	/* background color */
@@ -377,7 +377,7 @@ VIDEO_UPDATE( namcos1 )
 		scrollx = ( namcos1_playfield_control[j+1] + (namcos1_playfield_control[j+0]<<8) ) - disp_x[i];
 		scrolly = ( namcos1_playfield_control[j+3] + (namcos1_playfield_control[j+2]<<8) ) + 8;
 
-		if (flip_screen_get())
+		if (flip_screen_get(screen->machine))
 		{
 			scrollx = -scrollx;
 			scrolly = -scrolly;

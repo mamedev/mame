@@ -59,12 +59,12 @@ WRITE16_HANDLER( twin16_video_register_w )
 		case 0:
 			COMBINE_DATA( &video_register );
 
-			flip_screen_x_set(video_register & TWIN16_SCREEN_FLIPX);
+			flip_screen_x_set(space->machine, video_register & TWIN16_SCREEN_FLIPX);
 
 			if (twin16_custom_video)
-				flip_screen_y_set(video_register & TWIN16_SCREEN_FLIPY);
+				flip_screen_y_set(space->machine, video_register & TWIN16_SCREEN_FLIPY);
 			else
-				flip_screen_y_set(~video_register & TWIN16_SCREEN_FLIPY);
+				flip_screen_y_set(space->machine, ~video_register & TWIN16_SCREEN_FLIPY);
 
 			break;
 

@@ -45,12 +45,12 @@ PALETTE_INIT( mouser )
 
 WRITE8_HANDLER( mouser_flip_screen_x_w )
 {
-	flip_screen_x_set(~data & 1);
+	flip_screen_x_set(space->machine, ~data & 1);
 }
 
 WRITE8_HANDLER( mouser_flip_screen_y_w )
 {
-	flip_screen_y_set(~data & 1);
+	flip_screen_y_set(space->machine, ~data & 1);
 }
 
 VIDEO_UPDATE( mouser )
@@ -68,12 +68,12 @@ VIDEO_UPDATE( mouser )
 		sx = offs % 32;
 		sy = offs / 32;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(screen->machine))
 		{
 			sx = 31 - sx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(screen->machine))
 		{
 			sy = 31 - sy;
 		}
@@ -90,7 +90,7 @@ VIDEO_UPDATE( mouser )
 		drawgfx(bitmap,screen->machine->gfx[0],
 				videoram[offs] | (colorram[color_offs]>>5)*256 | ((colorram[color_offs]>>4)&1)*512,
 				colorram[color_offs]%16,
-				flip_screen_x_get(),flip_screen_y_get(),
+				flip_screen_x_get(screen->machine),flip_screen_y_get(screen->machine),
 				8*sx,scrolled_y_position,
 				cliprect,TRANSPARENCY_NONE,0);
 	}
@@ -106,13 +106,13 @@ VIDEO_UPDATE( mouser )
 		flipx = (spriteram[offs]&0x40)>>6;
 		flipy = (spriteram[offs]&0x80)>>7;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(screen->machine))
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(screen->machine))
 		{
 			flipy = !flipy;
 			sy = 238 - sy;
@@ -136,13 +136,13 @@ VIDEO_UPDATE( mouser )
 		flipx = (spriteram[offs]&0x40)>>6;
 		flipy = (spriteram[offs]&0x80)>>7;
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(screen->machine))
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(screen->machine))
 		{
 			flipy = !flipy;
 			sy = 238 - sy;

@@ -143,7 +143,7 @@ static WRITE8_HANDLER( adpcm_w )
 
 static WRITE8_HANDLER( ctrl_w )
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 
 	// (data & 0x02) is switched on and off in service mode
 

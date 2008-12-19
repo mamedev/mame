@@ -7,7 +7,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/atari.h"
 #include "video/gtia.h"
 
@@ -1243,7 +1242,7 @@ static TIMER_CALLBACK( antic_scanline_render )
 
 
 
-INLINE void LMS(int new_cmd)
+INLINE void LMS(running_machine *machine, int new_cmd)
 {
     /**************************************************************
      * If the LMS bit (load memory scan) of the current display
@@ -1253,7 +1252,7 @@ INLINE void LMS(int new_cmd)
      **************************************************************/
     if( new_cmd & ANTIC_LMS )
     {
-    	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+    	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 		int addr = RDANTIC(space);
         antic.doffs = ++antic.doffs & DOFFS;
         addr += 256 * RDANTIC(space);
@@ -1379,77 +1378,77 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					}
 					break;
 				case 0x02:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfc) << 8;
 					antic.modelines = 8 - (vscrol_subtract & 7);
 					if( antic.w.chactl & 4 )	/* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x03:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfc) << 8;
 					antic.modelines = 10 - (vscrol_subtract & 9);
 					if( antic.w.chactl & 4 )	/* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x04:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfc) << 8;
 					antic.modelines = 8 - (vscrol_subtract & 7);
 					if( antic.w.chactl & 4 )	/* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x05:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfc) << 8;
 					antic.modelines = 16 - (vscrol_subtract & 15);
 					if( antic.w.chactl & 4 )	/* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x06:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfe) << 8;
 					antic.modelines = 8 - (vscrol_subtract & 7);
 					if( antic.w.chactl & 4 )	/* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x07:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.chbase = (antic.w.chbash & 0xfe) << 8;
 					antic.modelines = 16 - (vscrol_subtract & 15);
 					if( antic.w.chactl & 4 )	/* decrement chbasl? */
 						antic.w.chbasl = antic.modelines - 1;
 					break;
 				case 0x08:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.modelines = 8 - (vscrol_subtract & 7);
 					break;
 				case 0x09:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.modelines = 4 - (vscrol_subtract & 3);
 					break;
 				case 0x0a:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.modelines = 4 - (vscrol_subtract & 3);
 					break;
 				case 0x0b:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.modelines = 2 - (vscrol_subtract & 1);
 					break;
 				case 0x0c:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.modelines = 1;
                     break;
 				case 0x0d:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.modelines = 2 - (vscrol_subtract & 1);
 					break;
 				case 0x0e:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					antic.modelines = 1;
                     break;
 				case 0x0f:
-					LMS(new_cmd);
+					LMS(machine, new_cmd);
 					/* bits 6+7 of the priority select register determine */
 					/* if newer GTIA or plain graphics modes are used */
 					switch (gtia.w.prior >> 6)

@@ -189,8 +189,8 @@ VIDEO_START( congo )
 WRITE8_HANDLER( zaxxon_flipscreen_w )
 {
 	/* low bit controls flip; background and sprite flip are handled at render time */
-	flip_screen_set_no_update(~data & 1);
-	tilemap_set_flip(fg_tilemap, flip_screen_get() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	flip_screen_set_no_update(space->machine, ~data & 1);
+	tilemap_set_flip(fg_tilemap, flip_screen_get(space->machine) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 
@@ -313,13 +313,13 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		int colorbase = bg_color + (congo_color_bank << 8);
 		int xmask = pixmap->width - 1;
 		int ymask = pixmap->height - 1;
-		int flipmask = flip_screen_get() ? 0xff : 0x00;
-		int flipoffs = flip_screen_get() ? 0x38 : 0x40;
+		int flipmask = flip_screen_get(machine) ? 0xff : 0x00;
+		int flipoffs = flip_screen_get(machine) ? 0x38 : 0x40;
 		int x, y;
 
 		/* the starting X value is offset by 1 pixel (normal) or 7 pixels */
 		/* (flipped) due to a delay in the loading */
-		if (!flip_screen_get())
+		if (!flip_screen_get(machine))
 			flipoffs -= 1;
 		else
 			flipoffs += 7;
@@ -375,10 +375,10 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
  *
  *************************************/
 
-INLINE int find_minimum_y(UINT8 value)
+INLINE int find_minimum_y(UINT8 value, int flip)
 {
-	int flipmask = flip_screen_get() ? 0xff : 0x00;
-	int flipconst = flip_screen_get() ? 0xef : 0xf1;
+	int flipmask = flip ? 0xff : 0x00;
+	int flipconst = flip ? 0xef : 0xf1;
 	int y;
 
 	/* the sum of the Y position plus a constant based on the flip state */
@@ -406,9 +406,9 @@ INLINE int find_minimum_y(UINT8 value)
 }
 
 
-INLINE int find_minimum_x(UINT8 value)
+INLINE int find_minimum_x(UINT8 value, int flip)
 {
-	int flipmask = flip_screen_get() ? 0xff : 0x00;
+	int flipmask = flip ? 0xff : 0x00;
 	int x;
 
 	/* the sum of the X position plus a constant specifies the address within */
@@ -422,18 +422,19 @@ INLINE int find_minimum_x(UINT8 value)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
-	int flipmask = flip_screen_get() ? 0xff : 0x00;
+	int flip = flip_screen_get(machine);
+	int flipmask = flip ? 0xff : 0x00;
 	int offs;
 
 	/* only the lower half of sprite RAM is read during rendering */
 	for (offs = 0x7c; offs >= 0; offs -= 4)
 	{
-		int sy = find_minimum_y(spriteram[offs]);
+		int sy = find_minimum_y(spriteram[offs], flip);
 		int flipy = (spriteram[offs + (flipymask >> 8)] ^ flipmask) & flipymask;
 		int flipx = (spriteram[offs + (flipxmask >> 8)] ^ flipmask) & flipxmask;
 		int code = spriteram[offs + 1];
 		int color = (spriteram[offs + 2] & 0x1f) + (congo_color_bank << 5);
-		int sx = find_minimum_x(spriteram[offs + 3]);
+		int sx = find_minimum_x(spriteram[offs + 3], flip);
 
 		/* draw with 256 pixel offsets to ensure we wrap properly */
 		drawgfx(bitmap, machine->gfx[2], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);

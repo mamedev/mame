@@ -211,7 +211,7 @@ static VIDEO_UPDATE( fcrash )
 	int videocontrol=cps1_cps_a_regs[0x22/2];
 
 
-	flip_screen_set(videocontrol & 0x8000);
+	flip_screen_set(screen->machine, videocontrol & 0x8000);
 
  	layercontrol = cps1_cps_b_regs[0x20/2];
 
@@ -282,7 +282,7 @@ static VIDEO_UPDATE( kodb )
 	int videocontrol=cps1_cps_a_regs[0x22/2];
 
 
-	flip_screen_set(videocontrol & 0x8000);
+	flip_screen_set(screen->machine, videocontrol & 0x8000);
 
  	layercontrol = cps1_cps_b_regs[0x20/2];
 

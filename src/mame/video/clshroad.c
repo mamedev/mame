@@ -48,7 +48,7 @@ WRITE8_HANDLER( clshroad_flipscreen_w );
 
 WRITE8_HANDLER( clshroad_flipscreen_w )
 {
-	flip_screen_set( data & 1 );
+	flip_screen_set(space->machine,  data & 1 );
 }
 
 
@@ -305,7 +305,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int flipy	=	0;
 
 		x -= 0x4a/2;
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			y = 240 - y;
 			flipx = !flipx;

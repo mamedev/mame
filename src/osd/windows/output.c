@@ -14,7 +14,6 @@
 // MAME headers
 #include "osdepend.h"
 #include "driver.h"
-#include "deprecat.h"
 
 // MAMEOS headers
 #include "output.h"
@@ -111,6 +110,9 @@ void winoutput_init(running_machine *machine)
 						NULL);
 	assert(output_hwnd != NULL);
 
+	// set a pointer to the running machine
+	SetWindowLongPtr(output_hwnd, GWLP_USERDATA, (LONG_PTR)machine);
+
 	// allocate message ids
 	om_mame_start = RegisterWindowMessage(OM_MAME_START);
 	assert(om_mame_start != 0);
@@ -187,6 +189,9 @@ static int create_window_class(void)
 
 static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
+	LONG_PTR ptr = GetWindowLongPtr(wnd, GWLP_USERDATA);
+	running_machine *machine = (running_machine *)ptr;
+
 	// register a new client
 	if (message == om_mame_register_client)
 		return register_client((HWND)wparam, lparam);
@@ -197,7 +202,7 @@ static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam
 
 	// get a string for an ID
 	else if (message == om_mame_get_id_string)
-		return send_id_string(Machine, (HWND)wparam, lparam);
+		return send_id_string(machine, (HWND)wparam, lparam);
 
 	else
 		return DefWindowProc(wnd, message, wparam, lparam);

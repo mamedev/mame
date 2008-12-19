@@ -123,7 +123,7 @@ static void rohga_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 			inc = 1;
 		}
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			x=304-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
@@ -216,7 +216,7 @@ static void wizdfire_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 			inc = 1;
 		}
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			x=304-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
@@ -394,7 +394,7 @@ sprite 2:
 		fx = (spriteptr[offs+0]&0x4000);
 		fy = (spriteptr[offs+0]&0x8000);
 
-		if (!flip_screen_get()) { /* Inverted from Mutant Fighter! */
+		if (!flip_screen_get(machine)) { /* Inverted from Mutant Fighter! */
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 
@@ -439,7 +439,7 @@ sprite 2:
 static void update_rohga(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int is_schmeisr)
 {
 	/* Update playfields */
-	flip_screen_set( deco16_pf12_control[0]&0x80 );
+	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
@@ -496,7 +496,7 @@ VIDEO_UPDATE( schmeisr )
 VIDEO_UPDATE( wizdfire )
 {
 	/* Update playfields */
-	flip_screen_set( deco16_pf12_control[0]&0x80 );
+	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
@@ -525,7 +525,7 @@ VIDEO_UPDATE( wizdfire )
 VIDEO_UPDATE( nitrobal )
 {
 	/* Update playfields */
-	flip_screen_set( deco16_pf12_control[0]&0x80 );
+	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 

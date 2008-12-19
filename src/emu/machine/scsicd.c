@@ -11,7 +11,6 @@
 #ifdef MESS
 #include "devices/chd_cd.h"
 #endif
-#include "deprecat.h"
 #include "scsicd.h"
 
 typedef struct
@@ -673,7 +672,7 @@ static void scsicd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 
 static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
-	running_machine *machine = Machine;
+	running_machine *machine = scsiInstance->machine;
 	SCSICd *our_this = SCSIThis( &SCSIClassCDROM, scsiInstance );
 
 	our_this->lba = 0;
@@ -694,7 +693,7 @@ static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 
 #ifdef MESS
 	/* TODO: get rid of this ifdef MESS section */
-	our_this->cdrom = mess_cd_get_cdrom_file( device_list_find_by_tag( Machine->config->devicelist, CDROM, diskregion ) );
+	our_this->cdrom = mess_cd_get_cdrom_file( device_list_find_by_tag( machine->config->devicelist, CDROM, diskregion ) );
 #else
 	our_this->cdrom = cdrom_open(get_disk_handle( diskregion ));
 

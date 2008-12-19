@@ -128,7 +128,7 @@ WRITE16_HANDLER( lastduel_flip_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		flip_screen_set(data & 0x01);
+		flip_screen_set(space->machine, data & 0x01);
 
 		coin_lockout_w(0,~data & 0x10);
 		coin_lockout_w(1,~data & 0x20);
@@ -234,7 +234,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		flipy = attr & sprite_flipy_mask;	/* 0x40 for lastduel, 0x80 for madgear */
 		color = attr & 0x0f;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;

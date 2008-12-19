@@ -127,7 +127,7 @@ static WRITE8_HANDLER( sauro_coin2_w )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 static WRITE8_HANDLER( adpcm_w )
@@ -135,10 +135,10 @@ static WRITE8_HANDLER( adpcm_w )
 	sp0256_ALD_w(space, 0, data);
 }
 
-static void lrq_callback(int state)
+static void lrq_callback(const device_config *device, int state)
 {
-	//cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
-	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, state);
+	//cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, state);
 }
 
 static ADDRESS_MAP_START( sauro_readmem, ADDRESS_SPACE_PROGRAM, 8 )

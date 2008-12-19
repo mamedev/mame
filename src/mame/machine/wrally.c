@@ -28,7 +28,7 @@ WRITE16_HANDLER( wrally_vram_w )
 
 WRITE16_HANDLER( wrally_flipscreen_w )
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 }
 
 WRITE16_HANDLER( OKIM6295_bankswitch_w )

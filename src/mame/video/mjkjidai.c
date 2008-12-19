@@ -59,7 +59,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 	interrupt_enable_w(space,0,data & 1);
 
 	/* bit 1 = flip screen */
-	flip_screen_set(data & 0x02);
+	flip_screen_set(space->machine, data & 0x02);
 
 	/* bit 2 =display enable */
 	display_enable = data & 0x04;
@@ -104,7 +104,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		sx += (spriteram_2[offs] & 0x20) >> 5;	// not sure about this
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;

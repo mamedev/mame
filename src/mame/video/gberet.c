@@ -153,7 +153,7 @@ static void gberet_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 			int flipx = attr & 0x10;
 			int flipy = attr & 0x20;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -205,7 +205,7 @@ static void gberetb_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 			int flipx = attr & 0x10;
 			int flipy = attr & 0x20;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

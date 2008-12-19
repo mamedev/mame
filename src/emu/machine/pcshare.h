@@ -6,7 +6,7 @@
 
 void init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_func)(int));
 
-void pc_keyboard(void);
+void pc_keyboard(running_machine *machine);
 UINT8 pc_keyb_read(void);
 void pc_keyb_set_clock(int on);
 void pc_keyb_clear(void);

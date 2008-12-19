@@ -173,7 +173,7 @@ static WRITE16_HANDLER( io_w )
 	COMBINE_DATA(&armedf_vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
-	flip_screen_set(armedf_vreg & 0x1000);
+	flip_screen_set(space->machine, armedf_vreg & 0x1000);
 }
 
 static WRITE16_HANDLER( terraf_io_w )
@@ -181,7 +181,7 @@ static WRITE16_HANDLER( terraf_io_w )
 	COMBINE_DATA(&armedf_vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
-	flip_screen_set(armedf_vreg & 0x1000);
+	flip_screen_set(space->machine, armedf_vreg & 0x1000);
 
 
 	if ((armedf_vreg & 0x4000) && !(armedf_vreg & 0x0100))
@@ -203,7 +203,7 @@ static WRITE16_HANDLER( kodure_io_w )
 	COMBINE_DATA(&armedf_vreg);
 	/* bits 0 and 1 of armedf_vreg are coin counters */
 	/* bit 12 seems to handle screen flipping */
-	flip_screen_set(armedf_vreg & 0x1000);
+	flip_screen_set(space->machine, armedf_vreg & 0x1000);
 
 	/* This is a temporary condition specification. */
 	if (!(armedf_vreg & 0x0080))

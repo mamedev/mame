@@ -110,7 +110,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			inc = 1;
 		}
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -137,7 +137,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( twocrude )
 {
-	flip_screen_set( !(deco16_pf12_control[0]&0x80) );
+	flip_screen_set(screen->machine,  !(deco16_pf12_control[0]&0x80) );
 
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);

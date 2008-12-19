@@ -489,7 +489,7 @@ INLINE UINT8 lookup_pixel(const UINT32 *src, int i, int pitch, int depth)
  *
  *************************************/
 
-static UINT32 *process_bitmap(UINT32 *objdata, int vc, int logit)
+static UINT32 *process_bitmap(running_machine *machine, UINT32 *objdata, int vc, int logit)
 {
 	/* extract minimal data */
 	UINT32 upper = objdata[0];
@@ -498,7 +498,7 @@ static UINT32 *process_bitmap(UINT32 *objdata, int vc, int logit)
 	UINT32 height = (lower >> 14) & 0x3ff;
 	UINT32 link = (lower >> 24) | ((upper & 0x7ff) << 8);
 	UINT32 data = (upper >> 11);
-	UINT32 *src = (UINT32 *)get_jaguar_memory(data << 3);
+	UINT32 *src = (UINT32 *)get_jaguar_memory(machine, data << 3);
 
 	if (logit)
 	{
@@ -651,7 +651,7 @@ static UINT32 *process_bitmap(UINT32 *objdata, int vc, int logit)
 		objdata[1] = lower - (1 << 14);
 	}
 
-	return (UINT32 *)get_jaguar_memory(link << 3);
+	return (UINT32 *)get_jaguar_memory(machine, link << 3);
 }
 
 
@@ -662,7 +662,7 @@ static UINT32 *process_bitmap(UINT32 *objdata, int vc, int logit)
  *
  *************************************/
 
-static UINT32 *process_scaled_bitmap(UINT32 *objdata, int vc, int logit)
+static UINT32 *process_scaled_bitmap(running_machine *machine, UINT32 *objdata, int vc, int logit)
 {
 	/* extract data */
 	UINT32 upper = objdata[0];
@@ -671,7 +671,7 @@ static UINT32 *process_scaled_bitmap(UINT32 *objdata, int vc, int logit)
 	UINT32 height = (lower >> 14) & 0x3ff;
 	UINT32 link = (lower >> 24) | ((upper & 0x7ff) << 8);
 	UINT32 data = (upper >> 11);
-	UINT32 *src = (UINT32 *)get_jaguar_memory(data << 3);
+	UINT32 *src = (UINT32 *)get_jaguar_memory(machine, data << 3);
 
 	/* third phrase */
 	UINT32 lower3 = objdata[5];
@@ -824,7 +824,7 @@ static UINT32 *process_scaled_bitmap(UINT32 *objdata, int vc, int logit)
 		objdata[5] = (lower3 & ~0xff0000) | ((remainder & 0xff) << 16);
 	}
 
-	return (UINT32 *)get_jaguar_memory(link << 3);
+	return (UINT32 *)get_jaguar_memory(machine, link << 3);
 }
 
 
@@ -835,7 +835,7 @@ static UINT32 *process_scaled_bitmap(UINT32 *objdata, int vc, int logit)
  *
  *************************************/
 
-static UINT32 *process_branch(UINT32 *objdata, int vc, int logit)
+static UINT32 *process_branch(running_machine *machine, UINT32 *objdata, int vc, int logit)
 {
 	UINT32 upper = objdata[0];
 	UINT32 lower = objdata[1];
@@ -889,7 +889,7 @@ static UINT32 *process_branch(UINT32 *objdata, int vc, int logit)
 	}
 
 	/* handle the branch */
-	return taken ? (UINT32 *)get_jaguar_memory(link << 3) : (objdata + 2);
+	return taken ? (UINT32 *)get_jaguar_memory(machine, link << 3) : (objdata + 2);
 }
 
 
@@ -915,7 +915,7 @@ static void process_object_list(running_machine *machine, int vc, UINT16 *_scanl
 	logit = LOG_OBJECTS;
 
 	/* fetch the object pointer */
-	objdata = (UINT32 *)get_jaguar_memory((gpu_regs[OLP_H] << 16) | gpu_regs[OLP_L]);
+	objdata = (UINT32 *)get_jaguar_memory(machine, (gpu_regs[OLP_H] << 16) | gpu_regs[OLP_L]);
 	while (!done && objdata && count++ < 100)
 	{
 		/* the low 3 bits determine the command */
@@ -925,21 +925,21 @@ static void process_object_list(running_machine *machine, int vc, UINT16 *_scanl
 			case 0:
 				if (logit)
 					logerror("bitmap = %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3]);
-				objdata = process_bitmap(objdata, vc, logit);
+				objdata = process_bitmap(machine, objdata, vc, logit);
 				break;
 
 			/* scaled bitmap object */
 			case 1:
 				if (logit)
 					logerror("scaled = %08X-%08X %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3], objdata[4], objdata[5]);
-				objdata = process_scaled_bitmap(objdata, vc, logit);
+				objdata = process_scaled_bitmap(machine, objdata, vc, logit);
 				break;
 
 			/* branch */
 			case 3:
 				if (logit)
 					logerror("branch = %08X-%08X\n", objdata[0], objdata[1]);
-				objdata = process_branch(objdata, vc, logit);
+				objdata = process_branch(machine, objdata, vc, logit);
 				break;
 
 			/* stop */

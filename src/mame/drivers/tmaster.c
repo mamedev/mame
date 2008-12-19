@@ -158,7 +158,7 @@ static void duart_tx(const device_config *device, int channel, UINT8 data)
 	}
 };
 
-static void microtouch_tx(UINT8 data)
+static void microtouch_tx(running_machine *machine, UINT8 data)
 {
 	duart68681_rx_data(tmaster_devices.duart68681, 0, data);
 }

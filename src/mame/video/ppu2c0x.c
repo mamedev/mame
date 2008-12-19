@@ -25,7 +25,6 @@ NES-specific:
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "profiler.h"
 #include "video/ppu2c0x.h"
 
@@ -113,7 +112,7 @@ static ppu2c0x_interface *intf;
 /* chips state - allocated at init time */
 static ppu2c0x_chip *chips = 0;
 
-static void update_scanline(int num );
+static void update_scanline(running_machine *machine, int num );
 
 static TIMER_CALLBACK( scanline_callback );
 static TIMER_CALLBACK( hblank_callback );
@@ -382,10 +381,10 @@ static TIMER_CALLBACK( hblank_callback )
 	int blanked = ( ppu_regs[PPU_CONTROL1] & ( PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES ) ) == 0;
 	int vblank = ((this_ppu->scanline >= PPU_VBLANK_FIRST_SCANLINE-1) && (this_ppu->scanline < this_ppu->scanlines_per_frame-1)) ? 1 : 0;
 
-//  update_scanline (num);
+//  update_scanline (machine, num);
 
 	if (this_ppu->hblank_callback_proc)
-		(*this_ppu->hblank_callback_proc) (num, this_ppu->scanline, vblank, blanked);
+		(*this_ppu->hblank_callback_proc) (machine, num, this_ppu->scanline, vblank, blanked);
 
 	timer_adjust_oneshot(chips[num].hblank_timer, attotime_never, num);
 }
@@ -397,12 +396,12 @@ static TIMER_CALLBACK( nmi_callback )
 
 	// Actually fire the VMI
 	if (intf->nmi_handler[num])
-		(*intf->nmi_handler[num]) (num, ppu_regs);
+		(*intf->nmi_handler[num]) (machine, num, ppu_regs);
 
 	timer_adjust_oneshot(chips[num].nmi_timer, attotime_never, num);
 }
 
-static void draw_background(const int num, UINT8 *line_priority )
+static void draw_background(running_machine *machine, int num, UINT8 *line_priority )
 {
 	/* cache some values locally */
 	bitmap_t *bitmap = chips[num].bitmap;
@@ -541,7 +540,7 @@ static void draw_background(const int num, UINT8 *line_priority )
 	}
 }
 
-static void draw_sprites(const int num, UINT8 *line_priority )
+static void draw_sprites(running_machine *machine, int num, UINT8 *line_priority )
 {
 	/* cache some values locally */
 	bitmap_t *bitmap = chips[num].bitmap;
@@ -727,7 +726,7 @@ static void draw_sprites(const int num, UINT8 *line_priority )
  *  Scanline Rendering and Update
  *
  *************************************/
-static void render_scanline(int num)
+static void render_scanline(running_machine *machine, int num)
 {
 	UINT8	line_priority[VISIBLE_SCREEN_WIDTH];
 	int		*ppu_regs = &chips[num].regs[0];
@@ -743,7 +742,7 @@ static void render_scanline(int num)
 
 	/* see if we need to render the background */
 	if ( ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND )
-		draw_background(num, line_priority );
+		draw_background(machine, num, line_priority );
 	else
 	{
 		bitmap_t *bitmap = chips[num].bitmap;
@@ -768,13 +767,13 @@ static void render_scanline(int num)
 
 	/* if sprites are on, draw them */
 	if ( ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_SPRITES )
-		draw_sprites( num, line_priority );
+		draw_sprites( machine, num, line_priority );
 
  	/* done updating, whew */
 	profiler_mark(PROFILER_END);
 }
 
-static void update_scanline(int num )
+static void update_scanline(running_machine *machine, int num )
 {
 	ppu2c0x_chip* this_ppu;
 	int scanline = chips[num].scanline;
@@ -793,7 +792,7 @@ static void update_scanline(int num )
 			this_ppu->refresh_data |= ( this_ppu->refresh_latch & 0x041f );
 
 //logerror("   updating refresh_data: %04x (scanline: %d)\n", this_ppu->refresh_data, this_ppu->scanline);
-			render_scanline( num );
+			render_scanline( machine, num );
 		}
 		else
 		{
@@ -867,10 +866,10 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* if a callback is available, call it */
 	if ( this_ppu->scanline_callback_proc )
-		(*this_ppu->scanline_callback_proc)( num, this_ppu->scanline, vblank, blanked );
+		(*this_ppu->scanline_callback_proc)( machine, num, this_ppu->scanline, vblank, blanked );
 
 	/* update the scanline that just went by */
-	update_scanline( num );
+	update_scanline( machine, num );
 
 	/* increment our scanline count */
 	this_ppu->scanline++;
@@ -1027,7 +1026,7 @@ void ppu2c0x_reset(running_machine *machine, int num, int scan_scale)
  *  PPU Registers Read
  *
  *************************************/
-int ppu2c0x_r( int num, offs_t offset )
+int ppu2c0x_r( const address_space *space, offs_t offset, int num )
 {
 	ppu2c0x_chip* this_ppu;
 
@@ -1100,7 +1099,7 @@ int ppu2c0x_r( int num, offs_t offset )
  *  PPU Registers Write
  *
  *************************************/
-void ppu2c0x_w( int num, offs_t offset, UINT8 data )
+void ppu2c0x_w( const address_space *space, offs_t offset, UINT8 data, int num )
 {
 	ppu2c0x_chip* this_ppu;
 	int color_base;
@@ -1123,7 +1122,10 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 
 #ifdef MAME_DEBUG
 	if (this_ppu->scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
-		logerror("  PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, this_ppu->scanline, video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen));
+	{
+		const device_config *screen = space->machine->primary_screen;
+		logerror("  PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, this_ppu->scanline, video_screen_get_vpos(screen), video_screen_get_hpos(screen));
+	}
 #endif
 
 	switch( offset & 7 )
@@ -1225,7 +1227,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 
 				/* if there's a callback, call it now */
 				if ( this_ppu->vidaccess_callback_proc )
-					data = (*this_ppu->vidaccess_callback_proc)( num, tempAddr, data );
+					data = (*this_ppu->vidaccess_callback_proc)( space->machine, num, tempAddr, data );
 
 				/* see if it's on the chargen portion */
 				if ( tempAddr < 0x2000 )
@@ -1329,7 +1331,7 @@ void ppu2c0x_spriteram_dma (const address_space *space, int num, const UINT8 pag
 	for (i = 0; i < SPRITERAM_SIZE; i++)
 	{
 		UINT8 spriteData = memory_read_byte(space, address + i);
-		ppu2c0x_w (num, PPU_SPRITE_DATA, spriteData);
+		ppu2c0x_w (space, PPU_SPRITE_DATA, spriteData, num);
 	}
 
 	// should last 513 CPU cycles.
@@ -1415,7 +1417,7 @@ void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank
 		int count = num_pages * 0x400;
 		int rom_start = bank * bank_size * 16;
 
-		memcpy( &chips[num].videomem[vram_start], &memory_region( Machine, intf->vrom_region[num] )[rom_start], count );
+		memcpy( &chips[num].videomem[vram_start], &memory_region( chips[num].machine, intf->vrom_region[num] )[rom_start], count );
 	}
 }
 
@@ -1644,20 +1646,20 @@ void ppu2c0x_set_scanlines_per_frame( int num, int scanlines )
 
 READ8_HANDLER( ppu2c0x_0_r )
 {
-	return ppu2c0x_r( 0, offset );
+	return ppu2c0x_r( space, offset, 0 );
 }
 
 READ8_HANDLER( ppu2c0x_1_r )
 {
-	return ppu2c0x_r( 1, offset );
+	return ppu2c0x_r( space, offset, 1 );
 }
 
 WRITE8_HANDLER( ppu2c0x_0_w )
 {
-	ppu2c0x_w( 0, offset, data );
+	ppu2c0x_w( space, offset, data, 0 );
 }
 
 WRITE8_HANDLER( ppu2c0x_1_w )
 {
-	ppu2c0x_w( 1, offset, data );
+	ppu2c0x_w( space, offset, data, 1 );
 }

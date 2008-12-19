@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/7474.h"
 #include "includes/galaxold.h"
 
@@ -17,18 +16,18 @@ static emu_timer *int_timer;
 
 static UINT8 _4in1_bank;
 
-static void galaxold_7474_9M_2_callback(void)
+static void galaxold_7474_9M_2_callback(running_machine *machine)
 {
 	/* Q bar clocks the other flip-flop,
        Q is VBLANK (not visible to the CPU) */
 	TTL7474_clock_w(1, TTL7474_output_comp_r(0));
-	TTL7474_update(1);
+	TTL7474_update(machine, 1);
 }
 
-static void galaxold_7474_9M_1_callback(void)
+static void galaxold_7474_9M_1_callback(running_machine *machine)
 {
 	/* Q goes to the NMI line */
-	cpu_set_input_line(Machine->cpu[0], irq_line, TTL7474_output_r(1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], irq_line, TTL7474_output_r(1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static const struct TTL7474_interface galaxold_7474_9M_2_intf =
@@ -45,7 +44,7 @@ static const struct TTL7474_interface galaxold_7474_9M_1_intf =
 WRITE8_HANDLER( galaxold_nmi_enable_w )
 {
 	TTL7474_preset_w(1, data);
-	TTL7474_update(1);
+	TTL7474_update(space->machine, 1);
 }
 
 
@@ -61,7 +60,7 @@ static TIMER_CALLBACK( interrupt_timer )
 
 	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 
-	TTL7474_update(0);
+	TTL7474_update(machine, 0);
 }
 
 

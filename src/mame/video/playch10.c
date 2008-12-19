@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "includes/playch10.h"
 
@@ -58,9 +57,9 @@ PALETTE_INIT( playch10 )
 	ppu2c0x_init_palette(machine, 256 );
 }
 
-static void ppu_irq( int num, int *ppu_regs )
+static void ppu_irq( running_machine *machine, int num, int *ppu_regs )
 {
-	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 	pc10_int_detect = 1;
 }
 

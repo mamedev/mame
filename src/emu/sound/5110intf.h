@@ -10,7 +10,7 @@
 typedef struct _tms5110_interface tms5110_interface;
 struct _tms5110_interface
 {
-	int (*M0_callback)(void);	/* function to be called when chip requests another bit */
+	int (*M0_callback)(const device_config *device);	/* function to be called when chip requests another bit */
 	void (*load_address)(int addr);	/* speech ROM load address callback */
 };
 

@@ -176,7 +176,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (color & 1)	sx -= 256;
 		if (attr  & 1)	sy -= 256;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			flipx = !flipx;
 			flipy = !flipy;

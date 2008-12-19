@@ -99,7 +99,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		flipx=spriteram16[offs+1]&2;
 		flipy=spriteram16[offs+1]&1;	/* flip y untested */
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			x = 240 - x;
 			y = 240 - y;

@@ -727,12 +727,12 @@ static READ8_HANDLER( bosco_dsw_r )
 
 static WRITE8_HANDLER( galaga_flip_screen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 static WRITE8_HANDLER( bosco_flip_screen_w )
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(space->machine, ~data & 1);
 }
 
 

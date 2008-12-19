@@ -56,7 +56,7 @@ WRITE16_HANDLER( prehisle_control16_w )
 	case 0x23: invert_controls = data ? 0x00ff : 0x0000; break;
 	case 0x28: coin_counter_w(0, data & 1); break;
 	case 0x29: coin_counter_w(1, data & 1); break;
-	case 0x30: flip_screen_set(data & 0x01); break;
+	case 0x30: flip_screen_set(space->machine, data & 0x01); break;
 	}
 }
 
@@ -127,7 +127,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (sx & 0x200) sx = -(0xff - (sx & 0xff));	// wraparound
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

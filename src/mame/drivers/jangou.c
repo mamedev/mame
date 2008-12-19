@@ -282,7 +282,7 @@ static WRITE8_HANDLER( output_w )
     */
 //  printf("%02x\n",data);
 	coin_counter_w(0,data & 0x01);
-//  flip_screen_set(data & 0x04);
+//  flip_screen_set(space->machine, data & 0x04);
 //  coin_lockout_w(0,~data & 0x20);
 }
 

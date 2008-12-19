@@ -419,7 +419,7 @@ static void init_tunit_generic(running_machine *machine, int sound)
 	{
 		case SOUND_ADPCM:
 		case SOUND_ADPCM_LARGE:
-			williams_adpcm_init();
+			williams_adpcm_init(machine);
 			break;
 
 		case SOUND_DCS:

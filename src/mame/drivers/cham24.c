@@ -55,7 +55,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "sound/nes_apu.h"
 #include "cpu/m6502/m6502.h"
@@ -214,9 +213,9 @@ static PALETTE_INIT( cham24 )
 	ppu2c0x_init_palette(machine, 0 );
 }
 
-static void ppu_irq( int num, int *ppu_regs )
+static void ppu_irq( running_machine *machine, int num, int *ppu_regs )
 {
-	cpu_set_input_line(Machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */

@@ -176,7 +176,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		x	+=	sprites_scrolldx;
 		y	+=	sprites_scrolldy;
 
-		if (flip_screen_get())	// not used?
+		if (flip_screen_get(machine))	// not used?
 		{
 			flipx = !flipx;		x = max_x - x - 16;
 			flipy = !flipy;		y = max_y - y - 16;

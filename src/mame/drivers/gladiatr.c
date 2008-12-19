@@ -322,7 +322,7 @@ static READ8_HANDLER( glad_cpu_sound_command_r )
 
 static WRITE8_HANDLER( gladiatr_flipscreen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 

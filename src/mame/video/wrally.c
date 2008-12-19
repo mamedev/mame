@@ -126,7 +126,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (high_priority != priority) continue;
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			sy = sy + 248;
 		}
 
@@ -181,7 +181,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( wrally )
 {
 	/* set scroll registers */
-	if (!flip_screen_get()) {
+	if (!flip_screen_get(screen->machine)) {
 		tilemap_set_scrolly(wrally_pant[0], 0, wrally_vregs[0]);
 		tilemap_set_scrollx(wrally_pant[0], 0, wrally_vregs[1]+4);
 		tilemap_set_scrolly(wrally_pant[1], 0, wrally_vregs[2]);

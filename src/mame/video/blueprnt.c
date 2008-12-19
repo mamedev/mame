@@ -56,7 +56,7 @@ WRITE8_HANDLER( blueprnt_colorram_w )
 
 WRITE8_HANDLER( blueprnt_flipscreen_w )
 {
-	flip_screen_set(~data & 0x02);
+	flip_screen_set(space->machine, ~data & 0x02);
 
 	if (gfx_bank != ((data & 0x04) >> 2))
 	{
@@ -97,7 +97,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int flipx = spriteram[offs + 2] & 0x40;
 		int flipy = spriteram[offs + 2 - 4] & 0x80;	// -4? Awkward, isn't it?
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 248 - sx;
 			sy = 240 - sy;
@@ -115,7 +115,7 @@ VIDEO_UPDATE( blueprnt )
 {
 	int i;
 
-	if (flip_screen_get())
+	if (flip_screen_get(screen->machine))
 		for (i = 0; i < 32; i++)
 			tilemap_set_scrolly(bg_tilemap, i, blueprnt_scrollram[32 - i]);
 	else

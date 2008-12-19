@@ -99,7 +99,7 @@ WRITE8_HANDLER( citycon_background_w )
 
 	/* bit 0 flips screen */
 	/* it is also used to multiplex player 1 and player 2 controls */
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 
 	/* bits 1-3 are unknown */
 //  if ((data & 0x0e) != 0) logerror("background register = %02x\n",data);
@@ -119,7 +119,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sx = spriteram[offs + 3];
 		sy = 239 - spriteram[offs];
 		flipx = ~spriteram[offs + 2] & 0x10;
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 238 - sy;
@@ -129,7 +129,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		drawgfx(bitmap,machine->gfx[spriteram[offs + 1] & 0x80 ? 2 : 1],
 				spriteram[offs + 1] & 0x7f,
 				spriteram[offs + 2] & 0x0f,
-				flipx,flip_screen_get(),
+				flipx,flip_screen_get(machine),
 				sx,sy,
 				cliprect,TRANSPARENCY_PEN,0);
 	}

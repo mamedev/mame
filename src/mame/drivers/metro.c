@@ -81,9 +81,9 @@ driver modified by Eisuke Watanabe
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "cpu/h83002/h8.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/eeprom.h"
@@ -335,13 +335,13 @@ static void ymf278b_interrupt(running_machine *machine, int active)
 static UINT16 metro_soundstatus;
 static int porta, portb, busy_sndcpu;
 
-static int metro_io_callback(int ioline, int state)
+static int metro_io_callback(const device_config *device, int ioline, int state)
 {
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	UINT8 data = 0;
 
-    switch ( ioline )
+	switch ( ioline )
 	{
 		case UPD7810_RXD:	/* read the RxD line */
 			data = soundlatch_r(space,0);
@@ -350,7 +350,7 @@ static int metro_io_callback(int ioline, int state)
 			break;
 		default:
 			logerror("upd7810 ioline %d not handled\n", ioline);
-    }
+	}
 
 	return state;
 }

@@ -18,7 +18,6 @@
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "cpu/ccpu/ccpu.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
@@ -53,7 +52,7 @@
  *
  *************************************/
 
-static void (*sound_handler)(UINT8 sound_val, UINT8 bits_changed);
+static void (*sound_handler)(running_machine *,UINT8 sound_val, UINT8 bits_changed);
 static UINT8 sound_control;
 
 /* general shift register variables */
@@ -86,7 +85,7 @@ WRITE8_HANDLER( cinemat_sound_control_w )
 
 	/* if something changed, call the sound subroutine */
 	if ((sound_control != oldval) && sound_handler)
-		(*sound_handler)(sound_control, sound_control ^ oldval);
+		(*sound_handler)(space->machine, sound_control, sound_control ^ oldval);
 }
 
 
@@ -97,7 +96,7 @@ WRITE8_HANDLER( cinemat_sound_control_w )
  *
  *************************************/
 
-static void generic_init(running_machine *machine, void (*callback)(UINT8, UINT8))
+static void generic_init(running_machine *machine, void (*callback)(running_machine *,UINT8, UINT8))
 {
 	/* call the standard init */
 	MACHINE_RESET_CALL(cinemat);
@@ -160,10 +159,8 @@ static const samples_interface spacewar_samples_interface =
 	spacewar_sample_names
 };
 
-static void spacewar_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void spacewar_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_machine *machine = Machine;
-
 	/* Explosion - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
 		sample_start(0, (mame_rand(machine) & 1) ? 0 : 6, 0);
@@ -239,7 +236,7 @@ static const samples_interface barrier_samples_interface =
 	barrier_sample_names
 };
 
-static void barrier_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void barrier_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* Player die - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
@@ -290,7 +287,7 @@ static const samples_interface speedfrk_samples_interface =
 	speedfrk_sample_names
 };
 
-static void speedfrk_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void speedfrk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* on the falling edge of bit 0x08, clock the inverse of bit 0x04 into the top of the shiftreg */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
@@ -353,7 +350,7 @@ static const samples_interface starhawk_samples_interface =
 	starhawk_sample_names
 };
 
-static void starhawk_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void starhawk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -427,7 +424,7 @@ static const samples_interface sundance_samples_interface =
 	sundance_sample_names
 };
 
-static void sundance_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void sundance_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* bong - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -495,7 +492,7 @@ static const samples_interface tailg_samples_interface =
 	tailg_sample_names
 };
 
-static void tailg_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void tailg_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* the falling edge of bit 0x10 clocks bit 0x08 into the mux selected by bits 0x07 */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
@@ -581,7 +578,7 @@ static const samples_interface warrior_samples_interface =
 	warrior_sample_names
 };
 
-static void warrior_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void warrior_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* normal level - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
@@ -650,7 +647,7 @@ static const samples_interface armora_samples_interface =
 	armora_sample_names
 };
 
-static void armora_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void armora_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -749,7 +746,7 @@ static const samples_interface ripoff_samples_interface =
 	ripoff_sample_names
 };
 
-static void ripoff_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void ripoff_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* on the rising edge of bit 0x02, clock bit 0x01 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x02))
@@ -834,9 +831,8 @@ static const samples_interface starcas_samples_interface =
 	starcas_sample_names
 };
 
-static void starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void starcas_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_machine *machine = Machine;
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -947,9 +943,8 @@ static const samples_interface solarq_samples_interface =
 	solarq_sample_names
 };
 
-static void solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_machine *machine = Machine;
 	static float target_volume, current_volume;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1087,7 +1082,7 @@ static const samples_interface boxingb_samples_interface =
 	boxingb_sample_names
 };
 
-static void boxingb_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void boxingb_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -1216,9 +1211,8 @@ static const samples_interface wotw_samples_interface =
 	wotw_sample_names
 };
 
-static void wotw_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void wotw_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_machine *machine = Machine;
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1329,9 +1323,8 @@ static const samples_interface wotwc_samples_interface =
 	wotwc_sample_names
 };
 
-static void wotwc_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void wotwc_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_machine *machine = Machine;
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1429,10 +1422,8 @@ static TIMER_CALLBACK( synced_sound_w )
 }
 
 
-static void demon_sound_w(UINT8 sound_val, UINT8 bits_changed)
+static void demon_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
-	running_machine *machine = Machine;
-
 	/* all inputs are inverted */
 	sound_val = ~sound_val;
 
@@ -1599,7 +1590,7 @@ MACHINE_DRIVER_END
 static WRITE8_HANDLER( qb3_sound_w )
 {
 	UINT16 rega = cpu_get_reg(space->machine->cpu[0], CCPU_A);
-	demon_sound_w(0x00 | (~rega & 0x0f), 0x10);
+	demon_sound_w(space->machine, 0x00 | (~rega & 0x0f), 0x10);
 }
 
 

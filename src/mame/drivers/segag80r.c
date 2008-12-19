@@ -172,7 +172,7 @@ static MACHINE_START( g80r )
 
 static MACHINE_RESET( pignewt )
 {
-	sega_usb_reset(0x10);
+	sega_usb_reset(machine, 0x10);
 }
 
 

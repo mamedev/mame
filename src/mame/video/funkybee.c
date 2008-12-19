@@ -65,12 +65,12 @@ WRITE8_HANDLER( funkybee_gfx_bank_w )
 
 WRITE8_HANDLER( funkybee_scroll_w )
 {
-	tilemap_set_scrollx(bg_tilemap, 0, flip_screen_get() ? -data : data);
+	tilemap_set_scrollx(bg_tilemap, 0, flip_screen_get(space->machine) ? -data : data);
 }
 
 WRITE8_HANDLER( funkybee_flipscreen_w )
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -107,7 +107,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx = videoram[offs2 + 0x10];
 		int sy = 224 - colorram[offs2];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sy += 32;
 			flipx = !flipx;
@@ -127,7 +127,7 @@ static void draw_columns(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for (offs = 0x1f;offs >= 0;offs--)
 	{
-		int const flip = flip_screen_get();
+		int const flip = flip_screen_get(machine);
 		int code = videoram[0x1c00 + offs];
 		int color = colorram[0x1f10] & 0x03;
 		int sx = flip ? videoram[0x1f1f] : videoram[0x1f10];

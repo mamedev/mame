@@ -18,7 +18,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/psx.h"
 
 #define STOP_ON_ERROR ( 0 )
@@ -946,10 +945,8 @@ f  e| d  c| b| a  9| 8  7| 6  5| 4| 3  2  1  0
     |iy|ix|ty|     |   tp|  abr|ty|         tx
 */
 
-INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
+INLINE void decode_tpage( running_machine *machine, struct PSXGPU *p_psxgpu, UINT32 tpage )
 {
-	running_machine *machine = Machine;
-
 	if( m_n_gputype == 2 )
 	{
 		m_n_gpustatus = ( m_n_gpustatus & 0xfffff800 ) | ( tpage & 0x7ff );
@@ -1451,9 +1448,8 @@ INLINE void decode_tpage( struct PSXGPU *p_psxgpu, UINT32 tpage )
 		} \
 	}
 
-static void FlatPolygon( int n_points )
+static void FlatPolygon( running_machine *machine, int n_points )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -1607,9 +1603,8 @@ static void FlatPolygon( int n_points )
 	}
 }
 
-static void FlatTexturedPolygon( int n_points )
+static void FlatTexturedPolygon( running_machine *machine, int n_points )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -1686,7 +1681,7 @@ static void FlatTexturedPolygon( int n_points )
 	n_cu2.d = 0;
 	n_cv2.d = 0;
 
-	decode_tpage( &psxgpu, m_packet.FlatTexturedPolygon.vertex[ 1 ].n_texture.w.h );
+	decode_tpage( machine, &psxgpu, m_packet.FlatTexturedPolygon.vertex[ 1 ].n_texture.w.h );
 	TEXTURESETUP
 
 	switch( n_cmd & 0x01 )
@@ -1830,9 +1825,8 @@ static void FlatTexturedPolygon( int n_points )
 	}
 }
 
-static void GouraudPolygon( int n_points )
+static void GouraudPolygon( running_machine *machine, int n_points )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -2044,9 +2038,8 @@ static void GouraudPolygon( int n_points )
 	}
 }
 
-static void GouraudTexturedPolygon( int n_points )
+static void GouraudTexturedPolygon( running_machine *machine, int n_points )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -2141,7 +2134,7 @@ static void GouraudTexturedPolygon( int n_points )
 	n_cu2.d = 0;
 	n_cv2.d = 0;
 
-	decode_tpage( &psxgpu, m_packet.GouraudTexturedPolygon.vertex[ 1 ].n_texture.w.h );
+	decode_tpage( machine, &psxgpu, m_packet.GouraudTexturedPolygon.vertex[ 1 ].n_texture.w.h );
 	TEXTURESETUP
 
 	if( n_points == 4 )
@@ -2615,9 +2608,8 @@ static void FrameBufferRectangleDraw( void )
 	}
 }
 
-static void FlatRectangle( void )
+static void FlatRectangle( running_machine *machine )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -2681,9 +2673,8 @@ static void FlatRectangle( void )
 	}
 }
 
-static void FlatRectangle8x8( void )
+static void FlatRectangle8x8( running_machine *machine )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -2747,9 +2738,8 @@ static void FlatRectangle8x8( void )
 	}
 }
 
-static void FlatRectangle16x16( void )
+static void FlatRectangle16x16( running_machine *machine )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 
@@ -2813,9 +2803,8 @@ static void FlatRectangle16x16( void )
 	}
 }
 
-static void FlatTexturedRectangle( void )
+static void FlatTexturedRectangle( running_machine *machine )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -2912,9 +2901,8 @@ static void FlatTexturedRectangle( void )
 	}
 }
 
-static void Sprite8x8( void )
+static void Sprite8x8( running_machine *machine )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -3011,9 +2999,8 @@ static void Sprite8x8( void )
 	}
 }
 
-static void Sprite16x16( void )
+static void Sprite16x16( running_machine *machine )
 {
-	running_machine *machine = Machine;
 	INT16 n_y;
 	INT16 n_x;
 	int n_tx;
@@ -3192,10 +3179,8 @@ static void MoveImage( void )
 	}
 }
 
-void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
+void psx_gpu_write( running_machine *machine, UINT32 *p_ram, INT32 n_size )
 {
-	running_machine *machine = Machine;
-
 	while( n_size > 0 )
 	{
 		UINT32 data = *( p_ram );
@@ -3234,7 +3219,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			else
 			{
 				verboselog( machine, 1, "%02x: monochrome 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
-				FlatPolygon( 3 );
+				FlatPolygon( machine, 3 );
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3249,7 +3234,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			else
 			{
 				verboselog( machine, 1, "%02x: textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
-				FlatTexturedPolygon( 3 );
+				FlatTexturedPolygon( machine, 3 );
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3264,7 +3249,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			else
 			{
 				verboselog( machine, 1, "%02x: monochrome 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
-				FlatPolygon( 4 );
+				FlatPolygon( machine, 4 );
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3279,7 +3264,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			else
 			{
 				verboselog( machine, 1, "%02x: textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
-				FlatTexturedPolygon( 4 );
+				FlatTexturedPolygon( machine, 4 );
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3294,7 +3279,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			else
 			{
 				verboselog( machine, 1, "%02x: gouraud 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
-				GouraudPolygon( 3 );
+				GouraudPolygon( machine, 3 );
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3309,7 +3294,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			else
 			{
 				verboselog( machine, 1, "%02x: gouraud textured 3 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
-				GouraudTexturedPolygon( 3 );
+				GouraudTexturedPolygon( machine, 3 );
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3324,7 +3309,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			else
 			{
 				verboselog( machine, 1, "%02x: gouraud 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
-				GouraudPolygon( 4 );
+				GouraudPolygon( machine, 4 );
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3339,7 +3324,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			else
 			{
 				verboselog( machine, 1, "%02x: gouraud textured 4 point polygon\n", m_packet.n_entry[ 0 ] >> 24 );
-				GouraudTexturedPolygon( 4 );
+				GouraudTexturedPolygon( machine, 4 );
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3433,7 +3418,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 					m_packet.n_entry[ 0 ] >> 24,
 					(INT16)( m_packet.n_entry[ 1 ] & 0xffff ), (INT16)( m_packet.n_entry[ 1 ] >> 16 ),
 					(INT16)( m_packet.n_entry[ 2 ] & 0xffff ), (INT16)( m_packet.n_entry[ 2 ] >> 16 ) );
-				FlatRectangle();
+				FlatRectangle(machine);
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3452,7 +3437,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 					(INT16)( m_packet.n_entry[ 1 ] & 0xffff ), (INT16)( m_packet.n_entry[ 1 ] >> 16 ),
 					m_packet.n_entry[ 3 ] & 0xffff, m_packet.n_entry[ 3 ] >> 16,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 2 ] );
-				FlatTexturedRectangle();
+				FlatTexturedRectangle(machine);
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3483,7 +3468,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				verboselog( machine, 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ] );
-				FlatRectangle8x8();
+				FlatRectangle8x8(machine);
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3499,7 +3484,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				verboselog( machine, 1, "%02x: 8x8 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ] );
-				Sprite8x8();
+				Sprite8x8(machine);
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3514,7 +3499,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				verboselog( machine, 1, "%02x: 16x16 rectangle %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ] );
-				FlatRectangle16x16();
+				FlatRectangle16x16(machine);
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3530,7 +3515,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 			{
 				verboselog( machine, 1, "%02x: 16x16 sprite %08x %08x %08x\n", m_packet.n_entry[ 0 ] >> 24,
 					m_packet.n_entry[ 0 ], m_packet.n_entry[ 1 ], m_packet.n_entry[ 2 ] );
-				Sprite16x16();
+				Sprite16x16(machine);
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
@@ -3599,7 +3584,7 @@ void psx_gpu_write( UINT32 *p_ram, INT32 n_size )
 		case 0xe1:
 			verboselog( machine, 1, "%02x: draw mode %06x\n", m_packet.n_entry[ 0 ] >> 24,
 				m_packet.n_entry[ 0 ] & 0xffffff );
-			decode_tpage( &psxgpu, m_packet.n_entry[ 0 ] & 0xffffff );
+			decode_tpage( machine, &psxgpu, m_packet.n_entry[ 0 ] & 0xffffff );
 			break;
 		case 0xe2:
 			m_n_twy = ( ( ( m_packet.n_entry[ 0 ] >> 15 ) & 0x1f ) << 3 );
@@ -3682,7 +3667,7 @@ WRITE32_HANDLER( psx_gpu_w )
 	switch( offset )
 	{
 	case 0x00:
-		psx_gpu_write( &data, 1 );
+		psx_gpu_write( machine, &data, 1 );
 		break;
 	case 0x01:
 		switch( data >> 24 )
@@ -3841,10 +3826,8 @@ WRITE32_HANDLER( psx_gpu_w )
 }
 
 
-void psx_gpu_read( UINT32 *p_ram, INT32 n_size )
+void psx_gpu_read( running_machine *machine, UINT32 *p_ram, INT32 n_size )
 {
-	running_machine *machine = Machine;
-
 	while( n_size > 0 )
 	{
 		if( ( m_n_gpustatus & ( 1L << 0x1b ) ) != 0 )
@@ -3898,7 +3881,7 @@ READ32_HANDLER( psx_gpu_r )
 	switch( offset )
 	{
 	case 0x00:
-		psx_gpu_read( &data, 1 );
+		psx_gpu_read( space->machine, &data, 1 );
 		break;
 	case 0x01:
 		verboselog( space->machine, 1, "read GPU status (%08x)\n", m_n_gpustatus );

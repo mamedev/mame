@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "machine/rp5h01.h"
 #include "includes/playch10.h"
@@ -668,14 +667,14 @@ static int gboard_4screen;
 static int gboard_last_bank;
 static int gboard_command;
 
-static void gboard_scanline_cb( int num, int scanline, int vblank, int blanked )
+static void gboard_scanline_cb( running_machine *machine, int num, int scanline, int vblank, int blanked )
 {
 	if ( !vblank && !blanked )
 	{
 		if ( --gboard_scanline_counter == -1 )
 		{
 			gboard_scanline_counter = gboard_scanline_latch;
-			generic_pulse_irq_line(Machine->cpu[1], 0);
+			generic_pulse_irq_line(machine->cpu[1], 0);
 		}
 	}
 }

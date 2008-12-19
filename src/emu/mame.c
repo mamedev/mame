@@ -181,7 +181,7 @@ struct _mame_private
 ***************************************************************************/
 
 /* the active machine */
-running_machine *Machine;
+static running_machine *Machine;
 
 /* the current options */
 static core_options *mame_opts;
@@ -1144,6 +1144,7 @@ static void fatalerror_common(running_machine *machine, int exitcode, const char
 
 void CLIB_DECL fatalerror(const char *text, ...)
 {
+	extern running_machine *Machine;
 	running_machine *machine = Machine;
 	va_list arg;
 
@@ -1202,6 +1203,7 @@ void CLIB_DECL popmessage(const char *format, ...)
 
 void CLIB_DECL logerror(const char *format, ...)
 {
+	extern running_machine *Machine;
 	running_machine *machine = Machine;
 
 	/* currently, we need a machine to do this */

@@ -19,7 +19,7 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectang
 
 		base = 64 * scrollram[offs+1];
 		sx = 8*(offs/4) + scrollx;
-		if (flip_screen_get()) sx = 248 - sx;
+		if (flip_screen_get(machine)) sx = 248 - sx;
 		sx &= 0xff;
 
 		for (y = 0;y < 32;y++)
@@ -27,7 +27,7 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectang
 			int attr;
 
 			sy = 8*y + scrolly;
-			if (flip_screen_get()) sy = 248 - sy;
+			if (flip_screen_get(machine)) sy = 248 - sy;
 			sy &= 0xff;
 
 			attr = videoram[base + 2*y + 1];
@@ -37,14 +37,14 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectang
 			drawgfx(bitmap,machine->gfx[0],
 					code,
 					color,
-					flip_screen_get(),flip_screen_get(),
+					flip_screen_get(machine),flip_screen_get(machine),
 					sx,sy,
 					cliprect,TRANSPARENCY_PEN,15);
 			if (sx > 248)	/* wraparound */
 				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen_get(),flip_screen_get(),
+						flip_screen_get(machine),flip_screen_get(machine),
 						sx-256,sy,
 						cliprect,TRANSPARENCY_PEN,15);
 		}
@@ -104,7 +104,7 @@ static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const
 		base = 64 * lsasquad_scrollram[offs+1];
 		sx = scrollx+stepx;
 
-		if (flip_screen_get()) sx = 248 - sx;
+		if (flip_screen_get(machine)) sx = 248 - sx;
 		sx &= 0xff;
 
 		for (y = 0;y < 32;y++)
@@ -112,7 +112,7 @@ static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const
 			int attr;
 
 			sy = 8*y + scrolly;
-			if (flip_screen_get()) sy = 248 - sy;
+			if (flip_screen_get(machine)) sy = 248 - sy;
 			sy &= 0xff;
 
 			attr = videoram[base + 2*y + 1];
@@ -125,14 +125,14 @@ static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const
 			drawgfx(bitmap,machine->gfx[0],
 					code,
 					color,
-					flip_screen_get(),flip_screen_get(),
+					flip_screen_get(machine),flip_screen_get(machine),
 					sx,sy,
 					cliprect,TRANSPARENCY_PEN,15);
 			if (sx > 248)	/* wraparound */
 				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen_get(),flip_screen_get(),
+						flip_screen_get(machine),flip_screen_get(machine),
 						sx-256,sy,
 						cliprect,TRANSPARENCY_PEN,15);
 					}
@@ -176,7 +176,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		flipx = attr & 0x40;
 		flipy = attr & 0x80;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

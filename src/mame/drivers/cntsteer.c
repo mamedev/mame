@@ -433,7 +433,7 @@ static WRITE8_HANDLER(scrivi)
 	{
 		rotation_sign = !(data & 1);
 
-		flip_screen_set(!(data & 4));
+		flip_screen_set(space->machine, !(data & 4));
 
 		scrolly_hi = (data & 0xf0) << 4;
 

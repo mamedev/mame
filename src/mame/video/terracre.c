@@ -78,7 +78,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			color += 16 * (spritepalettebank[(tile>>1)&0xff] & 0x0f);
 		}
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 				sx=240-sx;
 				sy=240-sy;
@@ -169,7 +169,7 @@ WRITE16_HANDLER( amazon_flipscreen_w )
 	{
 		coin_counter_w( 0, data&0x01 );
 		coin_counter_w( 1, (data&0x02)>>1 );
-		flip_screen_set(data&0x04);
+		flip_screen_set(space->machine, data&0x04);
 	}
 }
 

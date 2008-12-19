@@ -309,7 +309,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -379,8 +379,8 @@ VIDEO_UPDATE( pacland )
 	int row;
 
 	for (row = 5; row < 29; row++)
-		tilemap_set_scrollx(fg_tilemap, row, flip_screen_get() ? scroll0-7 : scroll0);
-	tilemap_set_scrollx(bg_tilemap, 0, flip_screen_get() ? scroll1-4 : scroll1-3);
+		tilemap_set_scrollx(fg_tilemap, row, flip_screen_get(screen->machine) ? scroll0-7 : scroll0);
+	tilemap_set_scrollx(bg_tilemap, 0, flip_screen_get(screen->machine) ? scroll1-4 : scroll1-3);
 
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
        wherever there is a high-priority pixel; note that we draw to the bitmap

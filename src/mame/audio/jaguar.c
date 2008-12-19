@@ -143,7 +143,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "memconv.h"
 #include "includes/jaguar.h"
 #include "cpu/jaguar/jaguar.h"
@@ -209,15 +208,15 @@ void jaguar_dsp_resume(running_machine *machine)
  *
  *************************************/
 
-static void update_gpu_irq(void)
+static void update_gpu_irq(running_machine *machine)
 {
 	if (gpu_irq_state & dsp_regs[JINTCTRL] & 0x1f)
 	{
-		cpu_set_input_line(Machine->cpu[1], 1, ASSERT_LINE);
-		jaguar_gpu_resume(Machine);
+		cpu_set_input_line(machine->cpu[1], 1, ASSERT_LINE);
+		jaguar_gpu_resume(machine);
 	}
 	else
-		cpu_set_input_line(Machine->cpu[1], 1, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 1, CLEAR_LINE);
 }
 
 
@@ -227,7 +226,7 @@ void jaguar_external_int(const device_config *device, int state)
 		gpu_irq_state |= 1;
 	else
 		gpu_irq_state &= ~1;
-	update_gpu_irq();
+	update_gpu_irq(device->machine);
 }
 
 
@@ -283,12 +282,12 @@ void cojag_sound_init(running_machine *machine)
  *
  *************************************/
 
-void cojag_sound_reset(void)
+void cojag_sound_reset(running_machine *machine)
 {
 #if ENABLE_SPEEDUP_HACKS
-	serial_timer = timer_alloc(Machine, serial_chunky_callback, NULL);
+	serial_timer = timer_alloc(machine, serial_chunky_callback, NULL);
 #else
-	serial_timer = timer_alloc(Machine, serial_callback, NULL);
+	serial_timer = timer_alloc(machine, serial_callback, NULL);
 #endif
 }
 
@@ -323,7 +322,7 @@ WRITE16_HANDLER( jaguar_jerry_regs_w )
 	{
 		case JINTCTRL:
 			gpu_irq_state &= ~(dsp_regs[JINTCTRL] >> 8);
-			update_gpu_irq();
+			update_gpu_irq(space->machine);
 			break;
 	}
 

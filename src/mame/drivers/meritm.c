@@ -231,9 +231,9 @@ static void pc16650d_tx_callback(int channel, int count, UINT8* data)
 	microtouch_rx(count, data);
 };
 
-static void meritm_microtouch_tx_callback(UINT8 data)
+static void meritm_microtouch_tx_callback(running_machine *machine, UINT8 data)
 {
-	pc16552d_rx_data(Machine, 0, 0, data);
+	pc16552d_rx_data(machine, 0, 0, data);
 };
 
 /*************************************
@@ -823,13 +823,6 @@ static const z80pio_interface meritm_io_pio_intf =
 	0
 };
 
-#ifdef UNUSED_FUNCTION
-static void meritm_pio1_portb_input_changed_callback(void *param, UINT32 oldval, UINT32 newval)
-{
-    z80pio_p_w(Machine, 1, 1, (UINT8)newval);
-}
-#endif
-
 static const z80_daisy_chain meritm_daisy_chain[] =
 {
 	{ Z80PIO, "z80pio_1" },
@@ -841,7 +834,6 @@ static MACHINE_START(merit_common)
 {
 	meritm_z80pio[0] = devtag_get_device( machine, Z80PIO, "z80pio_0" );
 	meritm_z80pio[1] = devtag_get_device( machine, Z80PIO, "z80pio_1" );
-	//input_port_set_changed_callback(port_tag_to_index("PIO1_PORTB"), 0xff, meritm_pio1_portb_input_changed_callback, NULL);
 
 };
 

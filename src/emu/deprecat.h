@@ -21,21 +21,6 @@
 
 /*************************************
  *
- *  Global access to the currently
- *  executing machine.
- *
- *  Please investigate if it is
- *  possible to use a passed in
- *  'machine' argument.
- *
- *************************************/
-
-extern running_machine *Machine;
-
-
-
-/*************************************
- *
  *  Old way of allowing "VBLANK"
  *  interrupts to fire more than once
  *  a frame.

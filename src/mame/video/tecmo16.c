@@ -170,7 +170,7 @@ WRITE16_HANDLER( tecmo16_charram_w )
 WRITE16_HANDLER( tecmo16_flipscreen_w )
 {
 	flipscreen = data & 0x01;
-	flip_screen_set(flipscreen);
+	flip_screen_set(space->machine, flipscreen);
 }
 
 /******************************************************************************/

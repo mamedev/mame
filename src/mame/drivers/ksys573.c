@@ -205,7 +205,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cdrom.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
@@ -910,7 +909,7 @@ static void atapi_init(running_machine *machine)
 	{
 		if( get_disk_handle( diskregions[i] ) != NULL )
 		{
-			SCSIAllocInstance( &SCSIClassCr589, &available_cdroms[ i ], diskregions[i] );
+			SCSIAllocInstance( machine, &SCSIClassCr589, &available_cdroms[ i ], diskregions[i] );
 		}
 		else
 		{
@@ -955,16 +954,14 @@ static WRITE32_HANDLER( atapi_reset_w )
 	}
 }
 
-static void cdrom_dma_read( UINT32 n_address, INT32 n_size )
+static void cdrom_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	verboselog( Machine, 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
+	verboselog( machine, 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
 //  mame_printf_debug("DMA read: address %08x size %08x\n", n_address, n_size);
 }
 
-static void cdrom_dma_write( UINT32 n_address, INT32 n_size )
+static void cdrom_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	running_machine *machine = Machine;
-
 	verboselog( machine, 2, "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
 //  mame_printf_debug("DMA write: address %08x size %08x\n", n_address, n_size);
 
@@ -973,7 +970,7 @@ static void cdrom_dma_write( UINT32 n_address, INT32 n_size )
 	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	timer_adjust_oneshot(atapi_timer, cpu_clocks_to_attotime(Machine->cpu[0], (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+	timer_adjust_oneshot(atapi_timer, cpu_clocks_to_attotime(machine->cpu[0], (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
 }
 
 static UINT32 m_n_security_control;
@@ -1126,10 +1123,10 @@ static UINT64 m_p_n_root_start[ 3 ];
 #define RC_CLC ( 0x100 )
 #define RC_DIV ( 0x200 )
 
-static UINT64 psxcpu_gettotalcycles( void )
+static UINT64 psxcpu_gettotalcycles( running_machine *machine )
 {
 	/* TODO: should return the start of the current tick. */
-	return cpu_get_total_cycles(Machine->cpu[0]) * 2;
+	return cpu_get_total_cycles(machine->cpu[0]) * 2;
 }
 
 static int root_divider( int n_counter )
@@ -1150,7 +1147,7 @@ static int root_divider( int n_counter )
 	return 1;
 }
 
-static UINT16 root_current( int n_counter )
+static UINT16 root_current( running_machine *machine, int n_counter )
 {
 	if( ( m_p_n_root_mode[ n_counter ] & RC_STOP ) != 0 )
 	{
@@ -1159,14 +1156,14 @@ static UINT16 root_current( int n_counter )
 	else
 	{
 		UINT64 n_current;
-		n_current = psxcpu_gettotalcycles() - m_p_n_root_start[ n_counter ];
+		n_current = psxcpu_gettotalcycles(machine) - m_p_n_root_start[ n_counter ];
 		n_current /= root_divider( n_counter );
 		n_current += m_p_n_root_count[ n_counter ];
 		if( n_current > 0xffff )
 		{
 			/* TODO: use timer for wrap on 0x10000. */
 			m_p_n_root_count[ n_counter ] = n_current;
-			m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles();
+			m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(machine);
 		}
 		return n_current;
 	}
@@ -1182,7 +1179,7 @@ static int root_target( int n_counter )
 	return 0x10000;
 }
 
-static void root_timer_adjust( int n_counter )
+static void root_timer_adjust( running_machine *machine, int n_counter )
 {
 	if( ( m_p_n_root_mode[ n_counter ] & RC_STOP ) != 0 )
 	{
@@ -1192,7 +1189,7 @@ static void root_timer_adjust( int n_counter )
 	{
 		int n_duration;
 
-		n_duration = root_target( n_counter ) - root_current( n_counter );
+		n_duration = root_target( n_counter ) - root_current( machine, n_counter );
 		if( n_duration < 1 )
 		{
 			n_duration += 0x10000;
@@ -1212,11 +1209,11 @@ static TIMER_CALLBACK( root_finished )
 	{
 		/* TODO: wrap should be handled differently as RC_COUNTTARGET & RC_IRQTARGET don't have to be the same. */
 		m_p_n_root_count[ n_counter ] = 0;
-		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles();
+		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(machine);
 	}
 	if( ( m_p_n_root_mode[ n_counter ] & RC_REPEAT ) != 0 )
 	{
-		root_timer_adjust( n_counter );
+		root_timer_adjust( machine, n_counter );
 	}
 	if( ( m_p_n_root_mode[ n_counter ] & RC_IRQOVERFLOW ) != 0 ||
 		( m_p_n_root_mode[ n_counter ] & RC_IRQTARGET ) != 0 )
@@ -1235,11 +1232,11 @@ static WRITE32_HANDLER( k573_counter_w )
 	{
 	case 0:
 		m_p_n_root_count[ n_counter ] = data;
-		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles();
+		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(space->machine);
 		break;
 	case 1:
-		m_p_n_root_count[ n_counter ] = root_current( n_counter );
-		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles();
+		m_p_n_root_count[ n_counter ] = root_current( space->machine, n_counter );
+		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(space->machine);
 		m_p_n_root_mode[ n_counter ] = data;
 
 		if( ( m_p_n_root_mode[ n_counter ] & RC_RESET ) != 0 )
@@ -1262,7 +1259,7 @@ static WRITE32_HANDLER( k573_counter_w )
 		return;
 	}
 
-	root_timer_adjust( n_counter );
+	root_timer_adjust( space->machine, n_counter );
 }
 
 static READ32_HANDLER( k573_counter_r )
@@ -1275,7 +1272,7 @@ static READ32_HANDLER( k573_counter_r )
 	switch( offset % 4 )
 	{
 	case 0:
-		data = root_current( n_counter );
+		data = root_current( space->machine, n_counter );
 		break;
 	case 1:
 		data = m_p_n_root_mode[ n_counter ];
@@ -1688,7 +1685,7 @@ Analogue I/O board
 */
 
 static UINT8 gx700pwbf_output_data[ 4 ];
-static void (*gx700pwfbf_output_callback)( int offset, int data );
+static void (*gx700pwfbf_output_callback)( running_machine *machine, int offset, int data );
 
 static READ32_HANDLER( gx700pwbf_io_r )
 {
@@ -1721,7 +1718,7 @@ static READ32_HANDLER( gx700pwbf_io_r )
 	return data;
 }
 
-static void gx700pwbf_output( int offset, UINT8 data )
+static void gx700pwbf_output( running_machine *machine, int offset, UINT8 data )
 {
 	if( gx700pwfbf_output_callback != NULL )
 	{
@@ -1733,7 +1730,7 @@ static void gx700pwbf_output( int offset, UINT8 data )
 			int newbit = ( data >> shift[ i ] ) & 1;
 			if( oldbit != newbit )
 			{
-				gx700pwfbf_output_callback( ( offset * 8 ) + i, newbit );
+				gx700pwfbf_output_callback( machine, ( offset * 8 ) + i, newbit );
 			}
 		}
 	}
@@ -1750,28 +1747,28 @@ static WRITE32_HANDLER( gx700pwbf_io_w )
 
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( 0, data & 0xff );
+			gx700pwbf_output( space->machine, 0, data & 0xff );
 		}
 		break;
 
 	case 0x22:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( 1, data & 0xff );
+			gx700pwbf_output( space->machine, 1, data & 0xff );
 		}
 		break;
 
 	case 0x24:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( 2, data & 0xff );
+			gx700pwbf_output( space->machine, 2, data & 0xff );
 		}
 		break;
 
 	case 0x26:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( 3, data & 0xff );
+			gx700pwbf_output( space->machine, 3, data & 0xff );
 		}
 		break;
 
@@ -1781,7 +1778,7 @@ static WRITE32_HANDLER( gx700pwbf_io_w )
 	}
 }
 
-static void gx700pwfbf_init( running_machine *machine, void (*output_callback_func)( int offset, int data ) )
+static void gx700pwfbf_init( running_machine *machine, void (*output_callback_func)( running_machine *machine, int offset, int data ) )
 {
 	memset( gx700pwbf_output_data, 0, sizeof( gx700pwbf_output_data ) );
 
@@ -1829,7 +1826,7 @@ static void gn845pwbb_do_w( int offset, int data )
 	stage[ offset ].DO = !data;
 }
 
-static void gn845pwbb_clk_w( int offset, int data )
+static void gn845pwbb_clk_w( running_machine *machine, int offset, int data )
 {
 	int clk = !data;
 
@@ -1873,7 +1870,7 @@ static void gn845pwbb_clk_w( int offset, int data )
 		}
 	}
 
-	verboselog( Machine, 2, "stage: %dp data clk=%d state=%d d0=%d shift=%08x bit=%d stage_mask=%08x\n", offset + 1, clk, stage[ offset ].state, stage[ offset ].DO, stage[ offset ].shift, stage[ offset ].bit, stage_mask );
+	verboselog( machine, 2, "stage: %dp data clk=%d state=%d d0=%d shift=%08x bit=%d stage_mask=%08x\n", offset + 1, clk, stage[ offset ].state, stage[ offset ].DO, stage[ offset ].shift, stage[ offset ].bit, stage_mask );
 }
 
 static CUSTOM_INPUT( gn845pwbb_read )
@@ -1881,7 +1878,7 @@ static CUSTOM_INPUT( gn845pwbb_read )
 	return input_port_read(field->port->machine,  "STAGE" ) & stage_mask;
 }
 
-static void gn845pwbb_output_callback( int offset, int data )
+static void gn845pwbb_output_callback( running_machine *machine, int offset, int data )
 {
 	switch( offset )
 	{
@@ -1906,7 +1903,7 @@ static void gn845pwbb_output_callback( int offset, int data )
 		break;
 
 	case 7:
-		gn845pwbb_clk_w( 0, !data );
+		gn845pwbb_clk_w( machine, 0, !data );
 		break;
 
 	case 8:
@@ -1930,7 +1927,7 @@ static void gn845pwbb_output_callback( int offset, int data )
 		break;
 
 	case 15:
-		gn845pwbb_clk_w( 1, !data );
+		gn845pwbb_clk_w( machine, 1, !data );
 		break;
 
 	case 17:
@@ -2161,9 +2158,9 @@ static char *binary( UINT32 data )
 static UINT32 a,b,c,d;
 
 static UINT16 gx894pwbba_output_data[ 8 ];
-static void (*gx894pwbba_output_callback)( int offset, int data );
+static void (*gx894pwbba_output_callback)( running_machine *machine, int offset, int data );
 
-static void gx894pwbba_output( int offset, UINT8 data )
+static void gx894pwbba_output( running_machine *machine, int offset, UINT8 data )
 {
 	if( gx894pwbba_output_callback != NULL )
 	{
@@ -2175,7 +2172,7 @@ static void gx894pwbba_output( int offset, UINT8 data )
 			int newbit = ( data >> shift[ i ] ) & 1;
 			if( oldbit != newbit )
 			{
-				gx894pwbba_output_callback( ( offset * 4 ) + i, newbit );
+				gx894pwbba_output_callback( machine, ( offset * 4 ) + i, newbit );
 			}
 		}
 	}
@@ -2239,22 +2236,22 @@ static WRITE32_HANDLER( gx894pwbba_w )
 	case 0x38:
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( 0, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( space->machine, 0, ( data >> 28 ) & 0xf );
 		}
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894pwbba_output( 1, ( data >> 12 ) & 0xf );
+			gx894pwbba_output( space->machine, 1, ( data >> 12 ) & 0xf );
 		}
 		COMBINE_DATA( &a );
 		break;
 	case 0x39:
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( 7, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( space->machine, 7, ( data >> 28 ) & 0xf );
 		}
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894pwbba_output( 3, ( data >> 12 ) & 0xf );
+			gx894pwbba_output( space->machine, 3, ( data >> 12 ) & 0xf );
 		}
 		COMBINE_DATA( &b );
 		break;
@@ -2289,18 +2286,18 @@ static WRITE32_HANDLER( gx894pwbba_w )
 
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( 4, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( space->machine, 4, ( data >> 28 ) & 0xf );
 		}
 		COMBINE_DATA( &c );
 		break;
 	case 0x3f:
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( 2, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( space->machine, 2, ( data >> 28 ) & 0xf );
 		}
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894pwbba_output( 5, ( data >> 12 ) & 0xf );
+			gx894pwbba_output( space->machine, 5, ( data >> 12 ) & 0xf );
 		}
 		COMBINE_DATA( &d );
 		break;
@@ -2314,7 +2311,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 	}
 }
 
-static void gx894pwbba_init( running_machine *machine, void (*output_callback_func)( int offset, int data ) )
+static void gx894pwbba_init( running_machine *machine, void (*output_callback_func)( running_machine *machine, int offset, int data ) )
 {
 	int gx894_ram_size = 24 * 1024 * 1024;
 
@@ -2354,7 +2351,7 @@ static DRIVER_INIT( gtrfrkdigital )
 
 /* ddr solo */
 
-static void ddrsolo_output_callback( int offset, int data )
+static void ddrsolo_output_callback( running_machine *machine, int offset, int data )
 {
 	switch( offset )
 	{
@@ -2416,7 +2413,7 @@ static DRIVER_INIT( ddrsolo )
 
 /* drummania */
 
-static void drmn_output_callback( int offset, int data )
+static void drmn_output_callback( running_machine *machine, int offset, int data )
 {
 	switch( offset )
 	{
@@ -2496,7 +2493,7 @@ static DRIVER_INIT( drmndigital )
 
 /* dance maniax */
 
-static void dmx_output_callback( int offset, int data )
+static void dmx_output_callback( running_machine *machine, int offset, int data )
 {
 	switch( offset )
 	{

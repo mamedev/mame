@@ -46,7 +46,7 @@
 struct TTL7474
 {
 	/* callback */
-	void (*output_cb)(void);
+	void (*output_cb)(running_machine *);
 
 	/* inputs */
 	UINT8 clear;			/* pin 1/13 */
@@ -67,7 +67,7 @@ struct TTL7474
 static struct TTL7474 chips[MAX_TTL7474];
 
 
-void TTL7474_update(int which)
+void TTL7474_update(running_machine *machine, int which)
 {
 	if (!chips[which].preset && chips[which].clear)			  /* line 1 in truth table */
 	{
@@ -101,7 +101,7 @@ void TTL7474_update(int which)
 		chips[which].last_output = chips[which].output;
 		chips[which].last_output_comp = chips[which].output_comp;
 
-		chips[which].output_cb();
+		chips[which].output_cb(machine);
 	}
 }
 

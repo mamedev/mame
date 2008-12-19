@@ -4,7 +4,7 @@
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, UINT16* spriteram_base, int gfx_region)
 {
 	int offs;
-	int flipscreen=!flip_screen_get();
+	int flipscreen=!flip_screen_get(machine);
 
 	for (offs = 0x400-4;offs >= 0;offs -= 4)
 	{
@@ -158,7 +158,7 @@ VIDEO_START(boogwing)
 
 VIDEO_UPDATE(boogwing)
 {
-	flip_screen_set( deco16_pf12_control[0]&0x80 );
+	flip_screen_set(screen->machine,  deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 

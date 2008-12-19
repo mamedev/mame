@@ -9,7 +9,7 @@ ADDRESS_MAP_EXTERN( namco_54xx_map_program, 8 );
 ADDRESS_MAP_EXTERN( namco_54xx_map_data, 8 );
 ADDRESS_MAP_EXTERN( namco_54xx_map_io, 8 );
 
-void namco_54xx_write(UINT8 data);
+void namco_54xx_write(running_machine *machine, UINT8 data);
 
 /* discrete nodes */
 #define NAMCO_54XX_0_DATA		NODE_01

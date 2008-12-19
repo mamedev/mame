@@ -71,9 +71,9 @@ WRITE8_HANDLER( yiear_control_w )
 {
 	/* bit 0 flips screen */
 
-	if (flip_screen_get() != (data & 0x01))
+	if (flip_screen_get(space->machine) != (data & 0x01))
 	{
-		flip_screen_set(data & 0x01);
+		flip_screen_set(space->machine, data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
@@ -122,7 +122,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sy = 240 - spriteram[offs + 1];
 		int sx = spriteram_2[offs];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

@@ -399,7 +399,7 @@ static MACHINE_START( zaxxon )
 static MACHINE_RESET( razmataz )
 {
 	/* the timer value is unknown, but this seems to work well */
-	sega_usb_reset(0x10);
+	sega_usb_reset(machine, 0x10);
 }
 
 

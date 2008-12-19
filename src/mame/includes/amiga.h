@@ -316,9 +316,9 @@ struct _amiga_machine_interface
 	UINT16 (*dskbytr_r)(void);
 	void (*dsklen_w)(UINT16 data);
 
-	void (*serdat_w)(UINT16 data);
+	void (*serdat_w)(running_machine *, UINT16 data);
 
-	void (*scanline0_callback)(void);
+	void (*scanline0_callback)(running_machine *);
 	void (*reset_callback)(void);
 	void (*nmi_callback)(void);
 
@@ -376,10 +376,10 @@ WRITE16_HANDLER( amiga_cia_w );
 READ16_HANDLER( amiga_custom_r );
 WRITE16_HANDLER( amiga_custom_w );
 
-void amiga_serial_in_w(UINT16 data);
-attotime amiga_get_serial_char_period(void);
+void amiga_serial_in_w(running_machine *machine, UINT16 data);
+attotime amiga_get_serial_char_period(running_machine *machine);
 
-void amiga_add_autoconfig(const amiga_autoconfig_device *device);
+void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_device *device);
 READ16_HANDLER( amiga_autoconfig_r );
 WRITE16_HANDLER( amiga_autoconfig_w );
 

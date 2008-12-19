@@ -22,10 +22,32 @@
 
 
 /***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _machine_entry machine_entry;
+struct _machine_entry
+{
+	machine_entry *		next;
+	running_machine *	machine;
+};
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+static machine_entry *machine_list;
+static int atexit_registered;
+
+
+
+/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void debugger_flush_traces(void);
+static void debugger_exit(running_machine *machine);
 
 
 
@@ -42,12 +64,28 @@ void debugger_init(running_machine *machine)
 	/* only if debugging is enabled */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
+		machine_entry *entry;
+		
+		/* initialize the submodules */
 		debug_cpu_init(machine);
 		debug_command_init(machine);
 		debug_console_init(machine);
 		debug_view_init(machine);
 		debug_comment_init(machine);
-		atexit(debugger_flush_traces);
+
+		/* allocate a new entry for our global list */
+		add_exit_callback(machine, debugger_exit);
+		entry = malloc_or_die(sizeof(*entry));
+		entry->next = machine_list;
+		entry->machine = machine;
+		machine_list = entry;
+
+		/* register an atexit handler if we haven't yet */
+		if (!atexit_registered)
+			atexit(debugger_flush_all_traces_on_abnormal_exit);
+		atexit_registered = TRUE;
+
+		/* listen in on the errorlog */		
 		add_logerror_callback(machine, debug_errorlog_write_line);
 	}
 }
@@ -65,13 +103,40 @@ void debugger_refresh_display(running_machine *machine)
 
 
 /*-------------------------------------------------
-    debugger_flush_traces - flush any traces in
-    the event of an aborted execution
+    debugger_exit - remove ourself from the
+    global list of active machines for cleanup
 -------------------------------------------------*/
 
-static void debugger_flush_traces(void)
+static void debugger_exit(running_machine *machine)
 {
-	extern running_machine *Machine;
-	if (Machine != NULL)
-		debug_cpu_flush_traces(Machine);
+	machine_entry **entryptr;
+	
+	/* remove this machine from the list; it came down cleanly */
+	for (entryptr = &machine_list; *entryptr != NULL; entryptr = &(*entryptr)->next)
+		if ((*entryptr)->machine == machine)
+		{
+			machine_entry *deleteme = *entryptr;
+			*entryptr = deleteme->next;
+			free(deleteme);
+			break;
+		}
+}
+
+
+/*-------------------------------------------------
+    debugger_flush_all_traces_on_abnormal_exit - 
+    flush any traces in the event of an aborted 
+    execution
+-------------------------------------------------*/
+
+void debugger_flush_all_traces_on_abnormal_exit(void)
+{
+	/* clear out the machine list and flush traces on each one */
+	while (machine_list != NULL)
+	{
+		machine_entry *deleteme = machine_list;
+		debug_cpu_flush_traces(deleteme->machine);
+		machine_list = deleteme->next;
+		free(deleteme);
+	}
 }

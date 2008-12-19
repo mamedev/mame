@@ -933,7 +933,7 @@ static WRITE8_HANDLER( tshoot_lamp_w )
 
 MACHINE_START( joust2 )
 {
-	williams_cvsd_init(3);
+	williams_cvsd_init(machine, 3);
 }
 
 
@@ -963,6 +963,6 @@ static WRITE8_HANDLER( joust2_pia_3_cb1_w )
 static WRITE8_HANDLER( joust2_snd_cmd_w )
 {
 	joust2_current_sound_data = (joust2_current_sound_data & ~0xff) | (data & 0xff);
-	williams_cvsd_data_w(joust2_current_sound_data);
+	williams_cvsd_data_w(space->machine, joust2_current_sound_data);
 	timer_call_after_resynch(space->machine, NULL, joust2_current_sound_data, joust2_deferred_snd_cmd_w);
 }

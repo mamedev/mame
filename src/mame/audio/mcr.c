@@ -9,14 +9,12 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
-#include "audio/mcr.h"
-#include "audio/williams.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/5220intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "audio/williams.h"
 #include "includes/mcr.h"
 #include "audio/mcr.h"
 
@@ -101,7 +99,7 @@ static const pia6821_interface squawkntalk_pia1_intf;
  *
  *************************************/
 
-static void ssio_compute_ay8910_modulation(void);
+static void ssio_compute_ay8910_modulation(running_machine *machine);
 
 
 
@@ -122,7 +120,7 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	if (mcr_sound_config & MCR_SSIO)
 	{
 		ssio_sound_cpu = sound_cpu++;
-		ssio_compute_ay8910_modulation();
+		ssio_compute_ay8910_modulation(machine);
 		state_save_register_global_array(machine, ssio_data);
 		state_save_register_global(machine, ssio_status);
 		state_save_register_global(machine, ssio_14024_count);
@@ -172,48 +170,48 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	/* Advanced Audio */
 	if (mcr_sound_config & MCR_WILLIAMS_SOUND)
 	{
-		williams_cvsd_init(0);
+		williams_cvsd_init(machine, 0);
 		sound_cpu++;
 		dac_index++;
 	}
 }
 
 
-void mcr_sound_reset(void)
+void mcr_sound_reset(running_machine *machine)
 {
 	/* SSIO */
 	if (mcr_sound_config & MCR_SSIO)
 	{
-		ssio_reset_w(1);
-		ssio_reset_w(0);
+		ssio_reset_w(machine, 1);
+		ssio_reset_w(machine, 0);
 	}
 
 	/* Turbo Chip Squeak */
 	if (mcr_sound_config & MCR_TURBO_CHIP_SQUEAK)
 	{
-		turbocs_reset_w(1);
-		turbocs_reset_w(0);
+		turbocs_reset_w(machine, 1);
+		turbocs_reset_w(machine, 0);
 	}
 
 	/* Chip Squeak Deluxe */
 	if (mcr_sound_config & MCR_CHIP_SQUEAK_DELUXE)
 	{
-		csdeluxe_reset_w(1);
-		csdeluxe_reset_w(0);
+		csdeluxe_reset_w(machine, 1);
+		csdeluxe_reset_w(machine, 0);
 	}
 
 	/* Sounds Good */
 	if (mcr_sound_config & MCR_SOUNDS_GOOD)
 	{
-		soundsgood_reset_w(1);
-		soundsgood_reset_w(0);
+		soundsgood_reset_w(machine, 1);
+		soundsgood_reset_w(machine, 0);
 	}
 
 	/* Squawk n Talk */
 	if (mcr_sound_config & MCR_SQUAWK_N_TALK)
 	{
-		squawkntalk_reset_w(1);
-		squawkntalk_reset_w(0);
+		squawkntalk_reset_w(machine, 1);
+		squawkntalk_reset_w(machine, 0);
 	}
 
 	/* Advanced Audio */
@@ -269,9 +267,9 @@ void mcr_sound_reset(void)
         frequency of sound output. So we simply apply a volume
         adjustment to each voice according to the duty cycle.
 */
-static void ssio_compute_ay8910_modulation(void)
+static void ssio_compute_ay8910_modulation(running_machine *machine)
 {
-	UINT8 *prom = memory_region(Machine, "proms");
+	UINT8 *prom = memory_region(machine, "proms");
 	int volval;
 
 	/* loop over all possible values of the duty cycle */
@@ -393,14 +391,14 @@ READ8_HANDLER( ssio_status_r )
 	return ssio_status;
 }
 
-void ssio_reset_w(int state)
+void ssio_reset_w(running_machine *machine, int state)
 {
 	/* going high halts the CPU */
 	if (state)
 	{
 		int i;
 
-		cpu_set_input_line(Machine->cpu[ssio_sound_cpu], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[ssio_sound_cpu], INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* latches also get reset */
 		for (i = 0; i < 4; i++)
@@ -410,7 +408,7 @@ void ssio_reset_w(int state)
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpu_set_input_line(Machine->cpu[ssio_sound_cpu], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[ssio_sound_cpu], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 READ8_HANDLER( ssio_input_port_r )
@@ -583,9 +581,9 @@ READ8_HANDLER( csdeluxe_status_r )
 	return csdeluxe_status;
 }
 
-void csdeluxe_reset_w(int state)
+void csdeluxe_reset_w(running_machine *machine, int state)
 {
-	cpu_set_input_line(Machine->cpu[csdeluxe_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[csdeluxe_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -688,10 +686,10 @@ READ8_HANDLER( soundsgood_status_r )
 	return soundsgood_status;
 }
 
-void soundsgood_reset_w(int state)
+void soundsgood_reset_w(running_machine *machine, int state)
 {
 //if (state) mame_printf_debug("SG Reset\n");
-	cpu_set_input_line(Machine->cpu[soundsgood_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[soundsgood_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -784,9 +782,9 @@ READ8_HANDLER( turbocs_status_r )
 	return turbocs_status;
 }
 
-void turbocs_reset_w(int state)
+void turbocs_reset_w(running_machine *machine, int state)
 {
-	cpu_set_input_line(Machine->cpu[turbocs_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[turbocs_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -910,9 +908,9 @@ WRITE8_HANDLER( squawkntalk_data_w )
 	timer_call_after_resynch(space->machine, NULL, data, squawkntalk_delayed_data_w);
 }
 
-void squawkntalk_reset_w(int state)
+void squawkntalk_reset_w(running_machine *machine, int state)
 {
-	cpu_set_input_line(Machine->cpu[squawkntalk_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[squawkntalk_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

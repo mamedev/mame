@@ -109,7 +109,7 @@ WRITE16_HANDLER( sf_gfxctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		sf_active = data & 0xff;
-		flip_screen_set(data & 0x04);
+		flip_screen_set(space->machine, data & 0x04);
 		tilemap_set_enable(tx_tilemap,data & 0x08);
 		tilemap_set_enable(bg_tilemap,data & 0x20);
 		tilemap_set_enable(fg_tilemap,data & 0x40);
@@ -148,7 +148,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{
 			int c1,c2,c3,c4,t;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 480 - sx;
 				sy = 224 - sy;
@@ -203,7 +203,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		}
 		else
 		{
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 496 - sx;
 				sy = 240 - sy;

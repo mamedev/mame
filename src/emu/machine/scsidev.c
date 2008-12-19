@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "scsidev.h"
-#include "deprecat.h"
 
 typedef struct
 {
@@ -28,7 +27,7 @@ static int scsidev_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			return 0;
 
 		default:
-			logerror( "%s: SCSIDEV unknown command %02x\n", cpuexec_describe_context(Machine), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown command %02x\n", cpuexec_describe_context(scsiInstance->machine), command[ 0 ] );
 			return 0;
 	}
 }
@@ -43,7 +42,7 @@ static void scsidev_read_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 	switch( command[ 0 ] )
 	{
 		default:
-			logerror( "%s: SCSIDEV unknown read %02x\n", cpuexec_describe_context(Machine), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown read %02x\n", cpuexec_describe_context(scsiInstance->machine), command[ 0 ] );
 			break;
 	}
 }
@@ -58,7 +57,7 @@ static void scsidev_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dat
 	switch( command[ 0 ] )
 	{
 		default:
-			logerror( "%s: SCSIDEV unknown write %02x\n", cpuexec_describe_context(Machine), command[ 0 ] );
+			logerror( "%s: SCSIDEV unknown write %02x\n", cpuexec_describe_context(scsiInstance->machine), command[ 0 ] );
 			break;
 	}
 }
@@ -100,7 +99,7 @@ static int scsidev_get_command( SCSIInstance *scsiInstance, void **command )
 
 static void scsidev_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
-	running_machine *machine = Machine;
+	running_machine *machine = scsiInstance->machine;
 	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
 
 	state_save_register_item_array( machine, "scsidev", diskregion, 0, our_this->command );
@@ -141,7 +140,7 @@ static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptr
 
 		case SCSIOP_ALLOC_INSTANCE:
 			params = ptrparm;
-			params->instance = SCSIMalloc( file );
+			params->instance = SCSIMalloc( params->machine, file );
 			scsidev_alloc_instance( params->instance, params->diskregion );
 			return 0;
 

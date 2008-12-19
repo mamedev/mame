@@ -4,7 +4,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cr589.h"
 
 typedef struct
@@ -111,7 +110,7 @@ static void cr589_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 
 static void cr589_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
-	running_machine *machine = Machine;
+	running_machine *machine = scsiInstance->machine;
 	SCSICr589 *our_this = SCSIThis( &SCSIClassCr589, scsiInstance );
 
 	our_this->download = 0;

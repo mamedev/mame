@@ -173,7 +173,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		/* So I'm using this specific check. -kal 11 jul 2002 */
 //      if(sprite_type == 1) sy=sy+2;
 
-		if( flip_screen_get() )
+		if( flip_screen_get(machine) )
 		{
 			drawgfx( bitmap,gfx,
 				sprite_number&0x7f,

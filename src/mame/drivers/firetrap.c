@@ -240,7 +240,7 @@ static WRITE8_HANDLER( firetrap_adpcm_data_w )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 

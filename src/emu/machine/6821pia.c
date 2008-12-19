@@ -5,7 +5,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "6821pia.h"
 
 
@@ -24,6 +23,7 @@
 typedef struct _pia6821 pia6821;
 struct _pia6821
 {
+	running_machine *machine;
 	const pia6821_interface *intf;
 
 	UINT8 in_a;
@@ -125,6 +125,7 @@ void pia_config(running_machine *machine, int which, const pia6821_interface *in
 	p = &pias[which];
 	memset(p, 0, sizeof(pias[0]));
 
+	p->machine = machine;
 	p->intf = intf;
 
 	state_save_register_item(machine, "6821pia", NULL, which, p->in_a);
@@ -176,12 +177,14 @@ void pia_reset(void)
 	/* zap each structure, preserving the interface and swizzle */
 	for (i = 0; i < MAX_PIA; i++)
 	{
+		running_machine *machine = pias[i].machine;
 		const pia6821_interface *intf = pias[i].intf;
 
 		if (intf == NULL)  continue;
 
 		memset(&pias[i], 0, sizeof(pias[i]));
 
+		pias[i].machine = machine;
 		pias[i].intf = intf;
 
 		/*
@@ -195,8 +198,8 @@ void pia_reset(void)
 		pias[i].in_ca2 = TRUE;
 
 		/* clear the IRQs */
-		if (intf->irq_a_func) (*intf->irq_a_func)(Machine, FALSE);
-		if (intf->irq_b_func) (*intf->irq_b_func)(Machine, FALSE);
+		if (intf->irq_a_func) (*intf->irq_a_func)(machine, FALSE);
+		if (intf->irq_b_func) (*intf->irq_b_func)(machine, FALSE);
 	}
 }
 
@@ -586,24 +589,24 @@ UINT8 pia_read(int which, offs_t offset)
 		default: /* impossible */
 		case 0x00:
 			if (OUTPUT_SELECTED(p->ctl_a))
-				ret = port_a_r(Machine, which);
+				ret = port_a_r(p->machine, which);
 			else
-				ret = ddr_a_r(Machine, which);
+				ret = ddr_a_r(p->machine, which);
 			break;
 
 		case 0x01:
-			ret = control_a_r(Machine, which);
+			ret = control_a_r(p->machine, which);
 			break;
 
 		case 0x02:
 			if (OUTPUT_SELECTED(p->ctl_b))
-				ret = port_b_r(Machine, which);
+				ret = port_b_r(p->machine, which);
 			else
-				ret = ddr_b_r(Machine, which);
+				ret = ddr_b_r(p->machine, which);
 			break;
 
 		case 0x03:
-			ret = control_b_r(Machine, which);
+			ret = control_b_r(p->machine, which);
 			break;
 	}
 
@@ -821,24 +824,24 @@ void pia_write(int which, offs_t offset, UINT8 data)
 		default: /* impossible */
 		case 0x00:
 			if (OUTPUT_SELECTED(p->ctl_a))
-				port_a_w(Machine, which, data);
+				port_a_w(p->machine, which, data);
 			else
-				ddr_a_w(Machine, which, data);
+				ddr_a_w(p->machine, which, data);
 			break;
 
 		case 0x01:
-			control_a_w(Machine, which, data);
+			control_a_w(p->machine, which, data);
 			break;
 
 		case 0x02:
 			if (OUTPUT_SELECTED(p->ctl_b))
-				port_b_w(Machine, which, data);
+				port_b_w(p->machine, which, data);
 			else
-				ddr_b_w(Machine, which, data);
+				ddr_b_w(p->machine, which, data);
 			break;
 
 		case 0x03:
-			control_b_w(Machine, which, data);
+			control_b_w(p->machine, which, data);
 			break;
 	}
 }
@@ -893,7 +896,7 @@ UINT8 pia_get_output_a(int which)
 
 	p->out_a_needs_pulled = FALSE;
 
-	return get_out_a_value(Machine, which);
+	return get_out_a_value(p->machine, which);
 }
 
 
@@ -931,11 +934,11 @@ void pia_set_input_ca1(int which, int data)
 		p->irq_a1 = TRUE;
 
 		/* update externals */
-		update_interrupts(Machine, p);
+		update_interrupts(p->machine, p);
 
 		/* CA2 is configured as output and in read strobe mode and cleared by a CA1 transition */
 		if (C2_OUTPUT(p->ctl_a) && C2_STROBE_MODE(p->ctl_a) && STROBE_C1_RESET(p->ctl_a))
-			set_out_ca2(Machine, which, TRUE);
+			set_out_ca2(p->machine, which, TRUE);
 	}
 
 	/* set the new value for CA1 */
@@ -979,7 +982,7 @@ void pia_set_input_ca2(int which, int data)
 		p->irq_a2 = TRUE;
 
 		/* update externals */
-		update_interrupts(Machine, p);
+		update_interrupts(p->machine, p);
 	}
 
 	/* set the new value for CA2 */
@@ -1084,7 +1087,7 @@ void pia_set_input_cb1(int which, int data)
 		p->irq_b1 = 1;
 
 		/* update externals */
-		update_interrupts(Machine, p);
+		update_interrupts(p->machine, p);
 
 		/* If CB2 is configured as a write-strobe output which is reset by a CB1
            transition, this reset will only happen when a read from port B implicitly
@@ -1133,7 +1136,7 @@ void pia_set_input_cb2(int which, int data)
 		p->irq_b2 = 1;
 
 		/* update externals */
-		update_interrupts(Machine, p);
+		update_interrupts(p->machine, p);
 	}
 
 	/* set the new value for CA2 */

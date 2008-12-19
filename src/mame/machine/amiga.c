@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/amiga.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6526cia.h"
@@ -170,7 +169,7 @@ const char *const amiga_custom_names[0x100] =
  *
  *************************************/
 
-static void custom_reset(void);
+static void custom_reset(running_machine *machine);
 static void autoconfig_reset(void);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
@@ -284,7 +283,7 @@ static void amiga_m68k_reset(const device_config *device)
 	/* Initialize the various chips */
 	devtag_reset(device->machine, CIA8520, "cia_0");
 	devtag_reset(device->machine, CIA8520, "cia_1");
-	custom_reset();
+	custom_reset(device->machine);
 	autoconfig_reset();
 
 	/* set the overlay bit */
@@ -341,7 +340,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 		/* call the system-specific callback */
 		if (amiga_intf->scanline0_callback != NULL)
-			(*amiga_intf->scanline0_callback)();
+			(*amiga_intf->scanline0_callback)(machine);
 	}
 
 	/* on every scanline, clock the second CIA TOD */
@@ -1111,9 +1110,9 @@ void amiga_cia_1_irq(const device_config *device, int state)
  *
  *************************************/
 
-static void custom_reset(void)
+static void custom_reset(running_machine *machine)
 {
-	int clock = cpu_get_clock(Machine->cpu[0]);
+	int clock = cpu_get_clock(machine->cpu[0]);
 	UINT16	vidmode = (clock == AMIGA_68000_NTSC_CLOCK || clock == AMIGA_68EC020_NTSC_CLOCK ) ? 0x1000 : 0x0000; /* NTSC or PAL? */
 
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1280,9 +1279,9 @@ WRITE16_HANDLER( amiga_custom_w )
 
 		case REG_SERDAT:
 			if (amiga_intf->serdat_w != NULL)
-				(*amiga_intf->serdat_w)(data);
+				(*amiga_intf->serdat_w)(space->machine, data);
 			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			timer_set(space->machine, amiga_get_serial_char_period(), NULL, 0, finish_serial_write);
+			timer_set(space->machine, amiga_get_serial_char_period(space->machine), NULL, 0, finish_serial_write);
 			break;
 
 		case REG_BLTSIZE:
@@ -1469,8 +1468,9 @@ WRITE16_HANDLER( amiga_custom_w )
  *
  *************************************/
 
-void amiga_serial_in_w(UINT16 data)
+void amiga_serial_in_w(running_machine *machine, UINT16 data)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int mask = (CUSTOM_REG(REG_SERPER) & 0x8000) ? 0x1ff : 0xff;
 
 	/* copy the data to the low 8 bits of SERDATR and set RBF */
@@ -1485,14 +1485,14 @@ void amiga_serial_in_w(UINT16 data)
 	}
 
 	/* signal an interrupt */
-	amiga_custom_w(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_RBF, 0xffff);
+	amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_RBF, 0xffff);
 }
 
 
-attotime amiga_get_serial_char_period(void)
+attotime amiga_get_serial_char_period(running_machine *machine)
 {
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	UINT32 baud = cpu_get_clock(Machine->cpu[0]) / 2 / divisor;
+	UINT32 baud = cpu_get_clock(machine->cpu[0]) / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
 	return attotime_mul(ATTOTIME_IN_HZ(baud), numbits);
 }
@@ -1505,12 +1505,12 @@ attotime amiga_get_serial_char_period(void)
  *
  *************************************/
 
-void amiga_add_autoconfig(const amiga_autoconfig_device *device)
+void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_device *device)
 {
 	autoconfig_device *dev, **d;
 
 	/* validate the data */
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call amiga_add_autoconfig at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call amiga_add_autoconfig at init time!");
 	assert_always((device->size & (device->size - 1)) == 0, "device->size must be power of 2!");
 
 	/* allocate memory and link it in at the end of the list */

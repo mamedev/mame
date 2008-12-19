@@ -1656,7 +1656,7 @@ static TIMER_CALLBACK( ppc4xx_spu_callback )
 		{
 			/* if we have a transmit handler, send it that way */
 			if (ppc->spu.tx_handler != NULL)
-				(*ppc->spu.tx_handler)(ppc->spu.txbuf);
+				(*ppc->spu.tx_handler)(ppc->device, ppc->spu.txbuf);
 
 			/* indicate that we have moved it to the shift register */
 			ppc->spu.regs[SPU4XX_LINE_STATUS] |= 0x04;

@@ -53,7 +53,7 @@ static WRITE8_HANDLER( ambush_coin_counter_w )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	flip_screen_set(data);
+	flip_screen_set(space->machine, data);
 }
 
 

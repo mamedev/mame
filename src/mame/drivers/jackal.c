@@ -92,7 +92,7 @@ static READ8_HANDLER( topgunbl_rotary_r )
 static WRITE8_HANDLER( jackal_flipscreen_w )
 {
 	irq_enable = data & 0x02;
-	flip_screen_set(data & 0x08);
+	flip_screen_set(space->machine, data & 0x08);
 }
 
 /* Memory Maps */

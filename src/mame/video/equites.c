@@ -212,18 +212,18 @@ WRITE16_HANDLER(splndrbt_selchar1_w)
 
 WRITE16_HANDLER(equites_flip0_w)
 {
-	flip_screen_set(0);
+	flip_screen_set(space->machine, 0);
 }
 
 WRITE16_HANDLER(equites_flip1_w)
 {
-	flip_screen_set(1);
+	flip_screen_set(space->machine, 1);
 }
 
 WRITE16_HANDLER(splndrbt_flip0_w)
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(0);
+		flip_screen_set(space->machine, 0);
 
 	if (ACCESSING_BITS_8_15)
 		bgcolor = data >> 8;
@@ -232,7 +232,7 @@ WRITE16_HANDLER(splndrbt_flip0_w)
 WRITE16_HANDLER(splndrbt_flip1_w)
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(1);
+		flip_screen_set(space->machine, 1);
 }
 
 WRITE16_HANDLER(splndrbt_bg_scrollx_w)
@@ -269,7 +269,7 @@ static void equites_draw_sprites_block(running_machine *machine, bitmap_t *bitma
 			int sy = (spriteram16[offs] & 0x00ff);
 			int transmask = colortable_get_transpen_mask(machine->colortable, machine->gfx[2], color, 0);
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -357,7 +357,7 @@ static void splndrbt_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		sy += 16;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			// sx NOT inverted
 			fx = fx ^ 1;
@@ -409,11 +409,11 @@ static void splndrbt_copy_bg(running_machine *machine, bitmap_t *dst_bitmap, con
 	const UINT8 * const yrom = xrom + 0x2000;
 	int scroll_x = splndrbt_bg_scrollx;
 	int scroll_y = splndrbt_bg_scrolly;
-	int const dinvert = flip_screen_get() ? 0xff : 0x00;
+	int const dinvert = flip_screen_get(machine) ? 0xff : 0x00;
 	int src_y = 0;
 	int dst_y;
 
-	if (flip_screen_get())
+	if (flip_screen_get(machine))
 	{
 		scroll_x = -scroll_x - 8;
 		scroll_y = -scroll_y;

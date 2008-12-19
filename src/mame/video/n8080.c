@@ -28,7 +28,7 @@ WRITE8_HANDLER( n8080_video_control_w )
 	sheriff_color_mode = (data >> 3) & 3;
 	sheriff_color_data = (data >> 0) & 7;
 
-	flip_screen_set_no_update(data & 0x20);
+	flip_screen_set_no_update(space->machine, data & 0x20);
 }
 
 
@@ -76,7 +76,7 @@ static TIMER_CALLBACK( spacefev_stop_red_cannon )
 }
 
 
-static void helifire_next_line(void)
+static void helifire_next_line(running_machine *machine)
 {
 	helifire_mv++;
 
@@ -86,7 +86,7 @@ static void helifire_next_line(void)
 	}
 	else
 	{
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			helifire_mv %= 255;
 		}
@@ -107,7 +107,7 @@ VIDEO_START( spacefev )
 {
 	cannon_timer = timer_alloc(machine, spacefev_stop_red_cannon, NULL);
 
-	flip_screen_set_no_update(0);
+	flip_screen_set_no_update(machine, 0);
 
 	spacefev_red_screen = 0;
 	spacefev_red_cannon = 0;
@@ -116,7 +116,7 @@ VIDEO_START( spacefev )
 
 VIDEO_START( sheriff )
 {
-	flip_screen_set_no_update(0);
+	flip_screen_set_no_update(machine, 0);
 
 	sheriff_color_mode = 0;
 	sheriff_color_data = 0;
@@ -143,7 +143,7 @@ VIDEO_START( helifire )
 		helifire_LSFR[i] = data;
 	}
 
-	flip_screen_set_no_update(0);
+	flip_screen_set_no_update(machine, 0);
 
 	helifire_flash = 0;
 }
@@ -151,7 +151,7 @@ VIDEO_START( helifire )
 
 VIDEO_UPDATE( spacefev )
 {
-	UINT8 mask = flip_screen_get() ? 0xff : 0x00;
+	UINT8 mask = flip_screen_get(screen->machine) ? 0xff : 0x00;
 
 	int x;
 	int y;
@@ -222,7 +222,7 @@ VIDEO_UPDATE( spacefev )
 
 VIDEO_UPDATE( sheriff )
 {
-	UINT8 mask = flip_screen_get() ? 0xff : 0x00;
+	UINT8 mask = flip_screen_get(screen->machine) ? 0xff : 0x00;
 
 	const UINT8* pPROM = memory_region(screen->machine, "proms");
 
@@ -339,7 +339,7 @@ VIDEO_UPDATE( helifire )
 
 			for (n = 0; n < 8; n++)
 			{
-				if (flip_screen_get())
+				if (flip_screen_get(screen->machine))
 				{
 					if ((videoram[offset ^ 0x1fff] << n) & 0x80)
 					{
@@ -358,7 +358,7 @@ VIDEO_UPDATE( helifire )
 
 		/* next line */
 
-		helifire_next_line();
+		helifire_next_line(screen->machine);
 	}
 
 	helifire_mv = saved_mv;
@@ -400,6 +400,6 @@ VIDEO_EOF( helifire )
 
 	for (i = 0; i < 256; i++)
 	{
-		helifire_next_line();
+		helifire_next_line(machine);
 	}
 }

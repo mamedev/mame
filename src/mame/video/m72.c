@@ -348,7 +348,7 @@ WRITE16_HANDLER( m72_port02_w )
 		coin_counter_w(1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
+		flip_screen_set(space->machine, ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
 		video_off = data & 0x08;
@@ -374,7 +374,7 @@ WRITE16_HANDLER( rtype2_port02_w )
 		coin_counter_w(1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
+		flip_screen_set(space->machine, ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
 		video_off = data & 0x08;
@@ -424,7 +424,7 @@ static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const re
 		h = 1 << ((m72_spriteram[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 512 - 16*w - sx;
 			sy = 284 - 16*h - sy;
@@ -476,7 +476,7 @@ static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		h = 1 << ((spriteram16_2[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 512 - 16*w - sx;
 			sy = 256 - 16*h - sy;

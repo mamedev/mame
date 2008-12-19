@@ -9,10 +9,10 @@
 
 int adc1213x_do_r(int chip);
 void adc1213x_di_w(int chip, int state);
-void adc1213x_cs_w(int chip, int state);
+void adc1213x_cs_w(running_machine *machine, int chip, int state);
 void adc1213x_sclk_w(int chip, int state);
 void adc1213x_conv_w(int chip, int state);
 int adc1213x_eoc_r(int chip);
-void adc1213x_init(int chip, double (*input_callback)( int input ));
+void adc1213x_init(int chip, double (*input_callback)( running_machine *machine, int input ));
 
 #endif

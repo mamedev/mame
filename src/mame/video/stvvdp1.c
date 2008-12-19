@@ -17,7 +17,6 @@ Framebuffer todo:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/scsp.h"
 #include "includes/stv.h"
 
@@ -186,7 +185,7 @@ struct shaded_point
 
 
 
-static void stv_vdp1_process_list(void);
+static void stv_vdp1_process_list(running_machine *machine);
 
 READ32_HANDLER( stv_vdp1_regs_r )
 {
@@ -314,7 +313,7 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 			if ( STV_VDP1_PTMR == 1 )
 			{
 				if ( vdp1_sprite_log ) logerror( "VDP1: Access to register PTMR = %1X\n", STV_VDP1_PTMR );
-				stv_vdp1_process_list( );
+				stv_vdp1_process_list( space->machine );
 			}
 		}
 		else if ( ACCESSING_BITS_0_15 )
@@ -856,14 +855,14 @@ static UINT8* gfxdata;
 static UINT16 sprite_colorbank;
 
 
-static void (*drawpixel)(int x, int y, int patterndata, int offsetcnt);
+static void (*drawpixel)(running_machine *machine, int x, int y, int patterndata, int offsetcnt);
 
-static void drawpixel_poly(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_poly(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
 {
 	stv_framebuffer_draw_lines[y][x] = stv2_current_sprite.CMDCOLR;
 }
 
-static void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_8bpp_trans(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
 {
 	UINT16 pix;
 
@@ -874,7 +873,7 @@ static void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt)
 	}
 }
 
-static void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_4bpp_notrans(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
 {
 	UINT16 pix;
 
@@ -883,7 +882,7 @@ static void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt)
 	stv_framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
 }
 
-static void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_4bpp_trans(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
 {
 	UINT16 pix;
 
@@ -893,7 +892,7 @@ static void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt)
 		stv_framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
 }
 
-static void drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
+static void drawpixel_generic(running_machine *machine, int x, int y, int patterndata, int offsetcnt)
 {
 	int pix,mode,transmask, spd = stv2_current_sprite.CMDPMOD & 0x40;
 	int mesh = stv2_current_sprite.CMDPMOD & 0x100;
@@ -964,7 +963,7 @@ static void drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff80);
 				transmask = 0x7f;
 				mode = 3;
-			//  pix = mame_rand(Machine);
+			//  pix = mame_rand(machine);
 				break;
 			case 0x0020: // mode 4 256 colour bank mode (8bits) (hanagumi title)
 				pix = gfxdata[patterndata+offsetcnt];
@@ -978,7 +977,7 @@ static void drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
 				transmask = 0xffff;
 				break;
 			default: // other settings illegal
-				pix = mame_rand(Machine);
+				pix = mame_rand(machine);
 				mode = 0;
 				transmask = 0xff;
 		}
@@ -1083,7 +1082,7 @@ static void stv_vdp1_set_drawpixel(void)
 }
 
 
-static void vdp1_fill_slope(const rectangle *cliprect, int patterndata, int xsize,
+static void vdp1_fill_slope(running_machine *machine, const rectangle *cliprect, int patterndata, int xsize,
 							INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
 							INT32 u1, INT32 u2, INT32 slu1, INT32 slu2, INT32 *nu1, INT32 *nu2,
 							INT32 v1, INT32 v2, INT32 slv1, INT32 slv2, INT32 *nv1, INT32 *nv2,
@@ -1173,7 +1172,7 @@ static void vdp1_fill_slope(const rectangle *cliprect, int patterndata, int xsiz
 					xx2 = cliprect->max_x;
 
 				while(xx1 <= xx2) {
-					drawpixel(xx1,_y1,
+					drawpixel(machine,xx1,_y1,
 							  patterndata,
 							  (v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
 					xx1++;
@@ -1199,7 +1198,7 @@ static void vdp1_fill_slope(const rectangle *cliprect, int patterndata, int xsiz
 	*nv2 = v2;
 }
 
-static void vdp1_fill_line(const rectangle *cliprect, int patterndata, int xsize, INT32 y,
+static void vdp1_fill_line(running_machine *machine, const rectangle *cliprect, int patterndata, int xsize, INT32 y,
 						   INT32 x1, INT32 x2, INT32 u1, INT32 u2, INT32 v1, INT32 v2)
 {
 	int xx1 = x1>>FRAC_SHIFT;
@@ -1227,7 +1226,7 @@ static void vdp1_fill_line(const rectangle *cliprect, int patterndata, int xsize
 			xx2 = cliprect->max_x;
 
 		while(xx1 <= xx2) {
-			drawpixel(xx1,y,
+			drawpixel(machine,xx1,y,
 					  patterndata,
 					  (v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
 			xx1++;
@@ -1237,7 +1236,7 @@ static void vdp1_fill_line(const rectangle *cliprect, int patterndata, int xsize
 	}
 }
 
-static void vdp1_fill_quad(const rectangle *cliprect, int patterndata, int xsize, const struct spoint *q)
+static void vdp1_fill_quad(running_machine *machine, const rectangle *cliprect, int patterndata, int xsize, const struct spoint *q)
 {
 	INT32 sl1, sl2, slu1, slu2, slv1, slv2, cury, limy, x1, x2, u1, u2, v1, v2, delta;
 	int pmin, pmax, i, ps1, ps2;
@@ -1277,7 +1276,7 @@ static void vdp1_fill_quad(const rectangle *cliprect, int patterndata, int xsize
 				v2 = p[i].v;
 			}
 		}
-		vdp1_fill_line(cliprect, patterndata, xsize, cury, x1, x2, u1, u2, v1, v2);
+		vdp1_fill_line(machine, cliprect, patterndata, xsize, cury, x1, x2, u1, u2, v1, v2);
 		return;
 	}
 
@@ -1296,7 +1295,7 @@ static void vdp1_fill_quad(const rectangle *cliprect, int patterndata, int xsize
 
 	for(;;) {
 		if(p[ps1-1].y == p[ps2+1].y) {
-			vdp1_fill_slope(cliprect, patterndata, xsize,
+			vdp1_fill_slope(machine, cliprect, patterndata, xsize,
 							x1, x2, sl1, sl2, &x1, &x2,
 							u1, u2, slu1, slu2, &u1, &u2,
 							v1, v2, slv1, slv2, &v1, &v2,
@@ -1329,7 +1328,7 @@ static void vdp1_fill_quad(const rectangle *cliprect, int patterndata, int xsize
 			slu2 = (u2-p[ps2+1].u)/delta;
 			slv2 = (v2-p[ps2+1].v)/delta;
 		} else if(p[ps1-1].y < p[ps2+1].y) {
-			vdp1_fill_slope(cliprect, patterndata, xsize,
+			vdp1_fill_slope(machine, cliprect, patterndata, xsize,
 							x1, x2, sl1, sl2, &x1, &x2,
 							u1, u2, slu1, slu2, &u1, &u2,
 							v1, v2, slv1, slv2, &v1, &v2,
@@ -1349,7 +1348,7 @@ static void vdp1_fill_quad(const rectangle *cliprect, int patterndata, int xsize
 			slu1 = (u1-p[ps1-1].u)/delta;
 			slv1 = (v1-p[ps1-1].v)/delta;
 		} else {
-			vdp1_fill_slope(cliprect, patterndata, xsize,
+			vdp1_fill_slope(machine, cliprect, patterndata, xsize,
 							x1, x2, sl1, sl2, &x1, &x2,
 							u1, u2, slu1, slu2, &u1, &u2,
 							v1, v2, slv1, slv2, &v1, &v2,
@@ -1371,7 +1370,7 @@ static void vdp1_fill_quad(const rectangle *cliprect, int patterndata, int xsize
 		}
 	}
 	if(cury == limy)
-		vdp1_fill_line(cliprect, patterndata, xsize, cury, x1, x2, u1, u2, v1, v2);
+		vdp1_fill_line(machine, cliprect, patterndata, xsize, cury, x1, x2, u1, u2, v1, v2);
 }
 
 static int x2s(int v)
@@ -1384,7 +1383,7 @@ static int y2s(int v)
 	return (INT32)(INT16)v + stvvdp1_local_y;
 }
 
-static void stv_vdp1_draw_line( const rectangle *cliprect)
+static void stv_vdp1_draw_line(running_machine *machine, const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1400,10 +1399,10 @@ static void stv_vdp1_draw_line( const rectangle *cliprect)
 	q[0].u = q[3].u = q[1].u = q[2].u = 0;
 	q[0].v = q[1].v = q[2].v = q[3].v = 0;
 
-	vdp1_fill_quad(cliprect, 0, 1, q);
+	vdp1_fill_quad(machine, cliprect, 0, 1, q);
 }
 
-static void stv_vdp1_draw_poly_line( const rectangle *cliprect)
+static void stv_vdp1_draw_poly_line(running_machine *machine, const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1419,7 +1418,7 @@ static void stv_vdp1_draw_poly_line( const rectangle *cliprect)
 	q[0].u = q[3].u = q[1].u = q[2].u = 0;
 	q[0].v = q[1].v = q[2].v = q[3].v = 0;
 
-	vdp1_fill_quad(cliprect, 0, 1, q);
+	vdp1_fill_quad(machine, cliprect, 0, 1, q);
 
 	q[0].x = x2s(stv2_current_sprite.CMDXB);
 	q[0].y = y2s(stv2_current_sprite.CMDYB);
@@ -1433,7 +1432,7 @@ static void stv_vdp1_draw_poly_line( const rectangle *cliprect)
 	q[0].u = q[3].u = q[1].u = q[2].u = 0;
 	q[0].v = q[1].v = q[2].v = q[3].v = 0;
 
-	vdp1_fill_quad(cliprect, 0, 1, q);
+	vdp1_fill_quad(machine, cliprect, 0, 1, q);
 
 	q[0].x = x2s(stv2_current_sprite.CMDXC);
 	q[0].y = y2s(stv2_current_sprite.CMDYC);
@@ -1447,7 +1446,7 @@ static void stv_vdp1_draw_poly_line( const rectangle *cliprect)
 	q[0].u = q[3].u = q[1].u = q[2].u = 0;
 	q[0].v = q[1].v = q[2].v = q[3].v = 0;
 
-	vdp1_fill_quad(cliprect, 0, 1, q);
+	vdp1_fill_quad(machine, cliprect, 0, 1, q);
 
 	q[0].x = x2s(stv2_current_sprite.CMDXD);
 	q[0].y = y2s(stv2_current_sprite.CMDYD);
@@ -1462,11 +1461,11 @@ static void stv_vdp1_draw_poly_line( const rectangle *cliprect)
 	q[0].v = q[1].v = q[2].v = q[3].v = 0;
 
 	stv_vdp1_setup_shading(q, cliprect);
-	vdp1_fill_quad(cliprect, 0, 1, q);
+	vdp1_fill_quad(machine, cliprect, 0, 1, q);
 
 }
 
-static void stv_vpd1_draw_distorted_sprite(const rectangle *cliprect)
+static void stv_vpd1_draw_distorted_sprite(running_machine *machine, const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1521,10 +1520,10 @@ static void stv_vpd1_draw_distorted_sprite(const rectangle *cliprect)
 	}
 
 	stv_vdp1_setup_shading(q, cliprect);
-	vdp1_fill_quad(cliprect, patterndata, xsize, q);
+	vdp1_fill_quad(machine, cliprect, patterndata, xsize, q);
 }
 
-static void stv_vpd1_draw_scaled_sprite(const rectangle *cliprect)
+static void stv_vpd1_draw_scaled_sprite(running_machine *machine, const rectangle *cliprect)
 {
 	struct spoint q[4];
 
@@ -1668,11 +1667,11 @@ static void stv_vpd1_draw_scaled_sprite(const rectangle *cliprect)
 	}
 
 	stv_vdp1_setup_shading(q, cliprect);
-	vdp1_fill_quad(cliprect, patterndata, xsize, q);
+	vdp1_fill_quad(machine, cliprect, patterndata, xsize, q);
 }
 
 
-static void stv_vpd1_draw_normal_sprite(const rectangle *cliprect, int sprite_type)
+static void stv_vpd1_draw_normal_sprite(running_machine *machine, const rectangle *cliprect, int sprite_type)
 {
 	UINT16 *destline;
 
@@ -1751,14 +1750,14 @@ static void stv_vpd1_draw_normal_sprite(const rectangle *cliprect, int sprite_ty
 		su = u;
 		for (drawxpos = x; drawxpos <= maxdrawxpos; drawxpos++ )
 		{
-			drawpixel( drawxpos, drawypos, patterndata, u );
+			drawpixel( machine, drawxpos, drawypos, patterndata, u );
 			u += dux;
 		}
 		u = su + duy;
 	}
 }
 
-static void stv_vdp1_process_list()
+static void stv_vdp1_process_list(running_machine *machine)
 {
 	int position;
 	int spritecount;
@@ -1913,37 +1912,37 @@ static void stv_vdp1_process_list()
 				case 0x0000:
 					if (vdp1_sprite_log) logerror ("Sprite List Normal Sprite\n");
 					stv2_current_sprite.ispoly = 0;
-					stv_vpd1_draw_normal_sprite(cliprect, 0);
+					stv_vpd1_draw_normal_sprite(machine, cliprect, 0);
 					break;
 
 				case 0x0001:
 					if (vdp1_sprite_log) logerror ("Sprite List Scaled Sprite\n");
 					stv2_current_sprite.ispoly = 0;
-					stv_vpd1_draw_scaled_sprite(cliprect);
+					stv_vpd1_draw_scaled_sprite(machine, cliprect);
 					break;
 
 				case 0x0002:
 					if (vdp1_sprite_log) logerror ("Sprite List Distorted Sprite\n");
 					stv2_current_sprite.ispoly = 0;
-					stv_vpd1_draw_distorted_sprite(cliprect);
+					stv_vpd1_draw_distorted_sprite(machine, cliprect);
 					break;
 
 				case 0x0004:
 					if (vdp1_sprite_log) logerror ("Sprite List Polygon\n");
 					stv2_current_sprite.ispoly = 1;
-					stv_vpd1_draw_distorted_sprite(cliprect);
+					stv_vpd1_draw_distorted_sprite(machine, cliprect);
 					break;
 
 				case 0x0005:
 					if (vdp1_sprite_log) logerror ("Sprite List Polyline\n");
 					stv2_current_sprite.ispoly = 1;
-					stv_vdp1_draw_poly_line(cliprect);
+					stv_vdp1_draw_poly_line(machine, cliprect);
 					break;
 
 				case 0x0006:
 					if (vdp1_sprite_log) logerror ("Sprite List Line\n");
 					stv2_current_sprite.ispoly = 1;
-					stv_vdp1_draw_line(cliprect);
+					stv_vdp1_draw_line(machine, cliprect);
 					break;
 
 				case 0x0008:
@@ -1989,7 +1988,7 @@ static void stv_vdp1_process_list()
 
 	/* not here! this is done every frame drawn even if the cpu isn't running eg in the debugger */
 //  if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
-//      cpu_set_input_line_and_vector(Machine->cpu[0], 2, HOLD_LINE , 0x4d);
+//      cpu_set_input_line_and_vector(machine->cpu[0], 2, HOLD_LINE , 0x4d);
 
 	if (vdp1_sprite_log) logerror ("End of list processing!\n");
 }
@@ -2064,7 +2063,7 @@ void video_update_vdp1(running_machine *machine)
 			break;
 		case 2:/*Automatic Draw*/
 			if ( framebufer_changed )
-				stv_vdp1_process_list();
+				stv_vdp1_process_list(machine);
 			break;
 		case 3:	/*<invalid>*/
 			logerror("Warning: Invalid PTM mode set for VDP1!\n");

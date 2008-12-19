@@ -638,9 +638,9 @@ static TIMER_CALLBACK( mcu_timer )
 
 static UINT32 m_n_bankoffset;
 
-INLINE void bankswitch_rom8( int n_bank, int n_data )
+INLINE void bankswitch_rom8( const address_space *space, int n_bank, int n_data )
 {
-	memory_set_bank( Machine,  n_bank + 1, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
+	memory_set_bank( space->machine,  n_bank + 1, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
 }
 
 static WRITE32_HANDLER( bankswitch_rom32_w )
@@ -649,11 +649,11 @@ static WRITE32_HANDLER( bankswitch_rom32_w )
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		bankswitch_rom8( ( offset * 2 ), data & 0xffff );
+		bankswitch_rom8( space, ( offset * 2 ), data & 0xffff );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		bankswitch_rom8( ( offset * 2 ) + 1, data >> 16 );
+		bankswitch_rom8( space, ( offset * 2 ) + 1, data >> 16 );
 	}
 }
 
@@ -671,10 +671,10 @@ static WRITE32_HANDLER( bankswitch_rom64_upper_w )
 	}
 }
 
-INLINE void bankswitch_rom64( int n_bank, int n_data )
+INLINE void bankswitch_rom64( const address_space *space, int n_bank, int n_data )
 {
 	/* todo: verify behaviour */
-	memory_set_bank( Machine,  n_bank + 1, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ m_n_bankoffset ) );
+	memory_set_bank( space->machine,  n_bank + 1, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ m_n_bankoffset ) );
 }
 
 static WRITE32_HANDLER( bankswitch_rom64_w )
@@ -683,11 +683,11 @@ static WRITE32_HANDLER( bankswitch_rom64_w )
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		bankswitch_rom64( ( offset * 2 ), data & 0xffff );
+		bankswitch_rom64( space, ( offset * 2 ), data & 0xffff );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		bankswitch_rom64( ( offset * 2 ) + 1, data >> 16 );
+		bankswitch_rom64( space, ( offset * 2 ) + 1, data >> 16 );
 	}
 }
 

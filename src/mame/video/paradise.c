@@ -39,12 +39,12 @@ static UINT8 paradise_palbank, paradise_priority;
 
 WRITE8_HANDLER( paradise_flipscreen_w )
 {
-	flip_screen_set(data ? 0 : 1);
+	flip_screen_set(space->machine, data ? 0 : 1);
 }
 
 WRITE8_HANDLER( tgtball_flipscreen_w )
 {
-	flip_screen_set(data ? 1 : 0);
+	flip_screen_set(space->machine, data ? 1 : 0);
 }
 
 
@@ -192,7 +192,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		int flipx	=	0;	// ?
 		int flipy	=	0;
 
-		if (flip_screen_get())	{	x = 0xf0 - x;	flipx = !flipx;
+		if (flip_screen_get(machine))	{	x = 0xf0 - x;	flipx = !flipx;
 								y = 0xf0 - y;	flipy = !flipy;	}
 
 		drawgfx(bitmap,machine->gfx[0],
@@ -253,7 +253,7 @@ if (input_code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl&1)	tilemap_draw(bitmap,cliprect, tilemap_0, 0,0);
 	if (layers_ctrl&2)	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
-	if (layers_ctrl&4)	copybitmap_trans(bitmap,tmpbitmap,flip_screen_get(),flip_screen_get(),0,0,cliprect, 0x80f);
+	if (layers_ctrl&4)	copybitmap_trans(bitmap,tmpbitmap,flip_screen_get(screen->machine),flip_screen_get(screen->machine),0,0,cliprect, 0x80f);
 
 	if (paradise_priority & 2)
 	{

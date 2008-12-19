@@ -116,7 +116,7 @@ WRITE8_HANDLER( sonson_scrollx_w )
 
 WRITE8_HANDLER( sonson_flipscreen_w )
 {
-	flip_screen_set(~data & 0x01);
+	flip_screen_set(space->machine, ~data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -148,7 +148,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx = spriteram[offs + 3];
 		int sy = spriteram[offs + 0];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

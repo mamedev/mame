@@ -187,7 +187,7 @@ WRITE8_HANDLER( c1942_c804_w )
 
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 }
 
 
@@ -213,7 +213,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		sx = spriteram[offs + 3] - 0x10 * (spriteram[offs + 1] & 0x10);
 		sy = spriteram[offs + 2];
 		dir = 1;
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -228,7 +228,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{
 			drawgfx(bitmap,machine->gfx[2],
 					code + i,col,
-					flip_screen_get(),flip_screen_get(),
+					flip_screen_get(machine),flip_screen_get(machine),
 					sx,sy + 16 * i * dir,
 					cliprect,TRANSPARENCY_PEN,15);
 

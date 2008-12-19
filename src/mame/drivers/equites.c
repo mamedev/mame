@@ -398,7 +398,7 @@ static UINT8 eq8155_port_a,eq8155_port_c,ay_port_a,ay_port_b,eq_cymbal_ctrl;
 
 static MACHINE_RESET(equites)
 {
-	flip_screen_set(0);
+	flip_screen_set(machine, 0);
 }
 
 /******************************************************************************/

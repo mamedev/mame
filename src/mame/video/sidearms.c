@@ -70,7 +70,7 @@ WRITE8_HANDLER( sidearms_c804_w )
 	if (flipon != (data & 0x80))
 	{
 		flipon = data & 0x80;
-		flip_screen_set(flipon);
+		flip_screen_set(space->machine, flipon);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }

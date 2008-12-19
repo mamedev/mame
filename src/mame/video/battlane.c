@@ -182,7 +182,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipx = attr & 0x04;
 			flipy = attr & 0x02;
 
-			if (!flip_screen_get())
+			if (!flip_screen_get(machine))
             {
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -226,7 +226,7 @@ static void draw_fg_bitmap(running_machine *machine, bitmap_t *bitmap )
 
 			if (data)
 			{
-				if (flip_screen_get())
+				if (flip_screen_get(machine))
 					*BITMAP_ADDR16(bitmap, 255 - y, 255 - x) = data;
 				else
 					*BITMAP_ADDR16(bitmap, y, x) = data;

@@ -289,7 +289,7 @@ static WRITE8_HANDLER( led2_w )
 
 static WRITE8_DEVICE_HANDLER( misc_w )
 {
-	flip_screen_set(~data & 0x10);
+	flip_screen_set(device->machine, ~data & 0x10);
 	extra_video_bank_bit = (data & 2) << 8;
 	lscnblk = (data >> 3) & 1;
 
@@ -298,7 +298,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 
 static WRITE8_DEVICE_HANDLER( misc_couple_w )
 {
-	flip_screen_set(~data & 0x10);
+	flip_screen_set(device->machine, ~data & 0x10);
 	extra_video_bank_bit = (data & 2) << 8;
 	lscnblk = (data >> 3) & 1;
 

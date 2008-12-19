@@ -101,7 +101,6 @@ OSC:    12.000MHz
 *******************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
@@ -893,7 +892,7 @@ static WRITE16_HANDLER( jalmah_okibank_w )
 static WRITE16_HANDLER( jalmah_flip_screen_w )
 {
 	/*---- ----x flip screen*/
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 
 //  popmessage("%04x",data);
 }

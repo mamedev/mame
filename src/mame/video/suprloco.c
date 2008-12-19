@@ -119,7 +119,7 @@ WRITE8_HANDLER( suprloco_videoram_w )
 
 WRITE8_HANDLER( suprloco_scrollram_w )
 {
-	int adj = flip_screen_get() ? -8 : 8;
+	int adj = flip_screen_get(space->machine) ? -8 : 8;
 
 	suprloco_scrollram[offset] = data;
 	tilemap_set_scrollx(bg_tilemap,offset, data - adj);
@@ -145,7 +145,7 @@ WRITE8_HANDLER( suprloco_control_w )
 	coin_counter_w(0, data & 0x01);
 	coin_counter_w(1, data & 0x02);
 
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 
 	control = data;
 }
@@ -158,9 +158,9 @@ READ8_HANDLER( suprloco_control_r )
 
 
 
-INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int color)
+INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int color,int flip)
 {
-	if (flip_screen_get())
+	if (flip)
 	{
 		x = bitmap->width - x - 1;
 		y = bitmap->height - y - 1;
@@ -178,6 +178,7 @@ INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,in
 
 static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int spr_number)
 {
+	int flip = flip_screen_get(machine);
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
 	UINT8 *gfx2;
@@ -195,7 +196,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
 
-	if (!flip_screen_get())
+	if (!flip_screen_get(machine))
 	{
 		adjy = sy;
 		dy = 1;
@@ -238,11 +239,11 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 
 			if (color1 == 15) break;
 			if (color1)
-				draw_pixel(bitmap,cliprect,sx+col,  adjy,pen_base + color1);
+				draw_pixel(bitmap,cliprect,sx+col,  adjy,pen_base + color1, flip);
 
 			if (color2 == 15) break;
 			if (color2)
-				draw_pixel(bitmap,cliprect,sx+col+1,adjy,pen_base + color2);
+				draw_pixel(bitmap,cliprect,sx+col+1,adjy,pen_base + color2, flip);
 
 			col += 2;
 		}

@@ -193,16 +193,16 @@ static VIDEO_START( looping )
 static WRITE8_HANDLER( flip_screen_x_w )
 {
 	looping_state *state = space->machine->driver_data;
-	flip_screen_x_set(~data & 0x01);
-	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get() ? 128 : 0);
+	flip_screen_x_set(space->machine, ~data & 0x01);
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(space->machine) ? 128 : 0);
 }
 
 
 static WRITE8_HANDLER( flip_screen_y_w )
 {
 	looping_state *state = space->machine->driver_data;
-	flip_screen_y_set(~data & 0x01);
-	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get() ? 128 : 0);
+	flip_screen_y_set(space->machine, ~data & 0x01);
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(space->machine) ? 128 : 0);
 }
 
 
@@ -257,13 +257,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int code  = source[1] & 0x3f;
 		int color = source[2];
 
-		if (flip_screen_x_get())
+		if (flip_screen_x_get(machine))
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (flip_screen_y_get())
+		if (flip_screen_y_get(machine))
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

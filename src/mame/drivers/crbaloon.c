@@ -54,9 +54,9 @@ static void pc3092_reset(void)
 }
 
 
-static void pc3092_update(void)
+static void pc3092_update(running_machine *machine)
 {
-	flip_screen_set((pc3092_data[1] & 0x01) ? TRUE : FALSE);
+	flip_screen_set(machine, (pc3092_data[1] & 0x01) ? TRUE : FALSE);
 }
 
 
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( pc3092_w )
 
 	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", cpu_get_pc(space->cpu), offset, pc3092_data[offset]);
 
-	pc3092_update();
+	pc3092_update(space->machine);
 }
 
 

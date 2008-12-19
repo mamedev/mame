@@ -46,7 +46,7 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
         0x01    = Y Scroll MSB
     */
 
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 
 	/*
         I think that the NMI is an inhibitor. It is constantly set

@@ -187,7 +187,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 		sx = (sx & 0x1ff) - (sx & 0x200);
 		sy = (sy & 0x1ff) - (sy & 0x200);
 
-		if (flip_screen_get())
+		if (flip_screen_get(screen->machine))
 		{	flipx = !flipx;		sx = max_x - sx - xnum * 16;
 			flipy = !flipy;		sy = max_y - sy - ynum * 16;	}
 
@@ -310,12 +310,12 @@ VIDEO_UPDATE( fuuki16 )
 	tm_middle = pri_table[ fuuki16_priority[0] & 0x0f ][1];
 	tm_back   = pri_table[ fuuki16_priority[0] & 0x0f ][2];
 
-	flip_screen_set(fuuki16_vregs[0x1e/2] & 1);
+	flip_screen_set(screen->machine, fuuki16_vregs[0x1e/2] & 1);
 
 	/* Layers scrolling */
 
-	scrolly_offs = fuuki16_vregs[0xc/2] - (flip_screen_get() ? 0x103 : 0x1f3);
-	scrollx_offs = fuuki16_vregs[0xe/2] - (flip_screen_get() ? 0x2a7 : 0x3f6);
+	scrolly_offs = fuuki16_vregs[0xc/2] - (flip_screen_get(screen->machine) ? 0x103 : 0x1f3);
+	scrollx_offs = fuuki16_vregs[0xe/2] - (flip_screen_get(screen->machine) ? 0x2a7 : 0x3f6);
 
 	layer0_scrolly = fuuki16_vregs[0x0/2] + scrolly_offs;
 	layer0_scrollx = fuuki16_vregs[0x2/2] + scrollx_offs;

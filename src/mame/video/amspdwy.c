@@ -29,7 +29,7 @@ WRITE8_HANDLER( amspdwy_flipscreen_w )
 {
 	static int flip = 0;
 	flip ^= 1;
-	flip_screen_set( flip );
+	flip_screen_set(space->machine,  flip );
 }
 
 /***************************************************************************
@@ -117,7 +117,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		int flipx	=	attr & 0x80;
 		int flipy	=	attr & 0x40;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			x = max_x - x - 8;	y = max_y - y - 8;
 			flipx = !flipx;	flipy = !flipy;

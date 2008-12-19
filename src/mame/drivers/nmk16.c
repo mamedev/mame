@@ -4633,7 +4633,7 @@ static WRITE16_HANDLER( twinactn_scroll1_w )
 static WRITE16_HANDLER( twinactn_flipscreen_w )
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(data & 1);
+		flip_screen_set(space->machine, data & 1);
 
 	if (data & (~1))
 		logerror("%06x: unknown flip screen bit written %04x\n", cpu_get_pc(space->cpu), data);

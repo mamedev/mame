@@ -134,7 +134,7 @@ enum
     STRUCTURES AND TYPEDEFS
 ***************************************************************************/
 
-typedef void (*ppc4xx_spu_tx_handler)(UINT8 data);
+typedef void (*ppc4xx_spu_tx_handler)(const device_config *device, UINT8 data);
 
 typedef struct _powerpc_config powerpc_config;
 struct _powerpc_config

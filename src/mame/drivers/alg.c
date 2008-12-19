@@ -114,29 +114,29 @@ static TIMER_CALLBACK( response_timer )
 		UINT8 data = laserdisc_data_r(laserdisc);
 		if (data != 0x0a)
 			mame_printf_debug("Sending serial data = %02X\n", data);
-		amiga_serial_in_w(data);
+		amiga_serial_in_w(machine, data);
 	}
 
 	/* if there's more to come, set another timer */
 	if (laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
+		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(machine), 0);
 	else
 		serial_timer_active = FALSE;
 }
 
 
-static void vsync_callback(void)
+static void vsync_callback(running_machine *machine)
 {
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
+		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(machine), 0);
 		serial_timer_active = TRUE;
 	}
 }
 
 
-static void serial_w(UINT16 data)
+static void serial_w(running_machine *machine, UINT16 data)
 {
 	/* write to the laserdisc player */
 	laserdisc_data_w(laserdisc, data & 0xff);
@@ -144,7 +144,7 @@ static void serial_w(UINT16 data)
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(), 0);
+		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(machine), 0);
 		serial_timer_active = TRUE;
 	}
 }

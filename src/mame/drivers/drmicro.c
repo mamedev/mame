@@ -24,7 +24,7 @@ WRITE8_HANDLER( drmicro_priority_w );
 
 WRITE8_HANDLER( drmicro_videoram_w );
 
-extern void drmicro_flip_w( int flip );
+extern void drmicro_flip_w( running_machine *machine, int flip );
 
 /****************************************************************************/
 
@@ -39,7 +39,7 @@ static INTERRUPT_GEN( drmicro_interrupt )
 static WRITE8_HANDLER( nmi_enable_w )
 {	// bit2,3 unknown
 	drmicro_nmi_enable = data & 1;
-	drmicro_flip_w(data & 2);
+	drmicro_flip_w(space->machine, data & 2);
 }
 
 /****************************************************************************/

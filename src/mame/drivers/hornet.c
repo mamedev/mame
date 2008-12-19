@@ -309,7 +309,6 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/eeprom.h"
@@ -1168,9 +1167,9 @@ MACHINE_DRIVER_END
 
 /*****************************************************************************/
 
-static void jamma_jvs_cmd_exec(void);
+static void jamma_jvs_cmd_exec(running_machine *machine);
 
-static void jamma_jvs_w(UINT8 data)
+static void jamma_jvs_w(const device_config *device, UINT8 data)
 {
 	if (jvs_sdata_ptr == 0 && data != 0xe0)
 		return;
@@ -1178,12 +1177,11 @@ static void jamma_jvs_w(UINT8 data)
 	jvs_sdata_ptr++;
 
 	if (jvs_sdata_ptr >= 3 && jvs_sdata_ptr >= 3 + jvs_sdata[2])
-		jamma_jvs_cmd_exec();
+		jamma_jvs_cmd_exec(device->machine);
 }
 
-static int jvs_encode_data(UINT8 *in, int length)
+static int jvs_encode_data(running_machine *machine, UINT8 *in, int length)
 {
-	running_machine *machine = Machine;
 	int inptr = 0;
 	int sum = 0;
 
@@ -1233,9 +1231,8 @@ static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
 	return outptr;
 }
 
-static void jamma_jvs_cmd_exec(void)
+static void jamma_jvs_cmd_exec(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	UINT8 sync, node, byte_num;
 	UINT8 data[1024], rdata[1024];
 	int length;
@@ -1298,7 +1295,7 @@ static void jamma_jvs_cmd_exec(void)
 	ppc4xx_spu_receive_byte(machine->cpu[0], 0xe0);			// sync
 	ppc4xx_spu_receive_byte(machine->cpu[0], 0x00);			// node
 	ppc4xx_spu_receive_byte(machine->cpu[0], rdata_ptr+1);	// num of bytes
-	sum += jvs_encode_data(rdata, rdata_ptr);
+	sum += jvs_encode_data(machine, rdata, rdata_ptr);
 	ppc4xx_spu_receive_byte(machine->cpu[0], sum - 1);		// checksum
 
 	jvs_sdata_ptr = 0;
@@ -1321,8 +1318,8 @@ static void sound_irq_callback(running_machine *machine, int irq)
 
 static DRIVER_INIT(hornet)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
+	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
+	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
 
 	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
@@ -1334,9 +1331,9 @@ static DRIVER_INIT(hornet)
 
 static DRIVER_INIT(hornet_2board)
 {
-	init_konami_cgboard(2, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
-	set_cgboard_texture_bank(1, 6, memory_region(machine, "user5"));
+	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
+	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 1, 6, memory_region(machine, "user5"));
 
 	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);

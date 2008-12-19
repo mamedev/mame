@@ -203,7 +203,7 @@ static WRITE8_HANDLER( yumefuda_videoregs_w )
 	{
 		switch(address)
 		{
-			case 0x0d: flip_screen_set(data & 0x80); break;
+			case 0x0d: flip_screen_set(space->machine, data & 0x80); break;
 			default:
 				logerror("Video Register %02x called with %02x data\n",address,data);
 		}

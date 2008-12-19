@@ -252,7 +252,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set(bit);
+			flip_screen_set(space->machine, bit);
 			break;
 
 		case 0x04:
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set(bit);
+			flip_screen_set(space->machine, bit);
 			break;
 
 		case 0x04:	/* OUT1 */

@@ -205,7 +205,7 @@ VIDEO_UPDATE( ashnojoe )
 
 //  ashnojoe_tilemap_reg[0] & 0x10 // ?? on coin insertion
 
-	flip_screen_set(ashnojoe_tilemap_reg[0] & 1);
+	flip_screen_set(screen->machine, ashnojoe_tilemap_reg[0] & 1);
 
 	if(ashnojoe_tilemap_reg[0] & 0x02)
 		tilemap_draw(bitmap,cliprect,joetilemap7,0,0);

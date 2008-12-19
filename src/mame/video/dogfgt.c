@@ -128,7 +128,7 @@ static WRITE8_HANDLER( internal_bitmapram_w )
 
 		for (i = 0;i < 3;i++)
 			color |= ((bitmapram[offset + BITMAPRAM_SIZE/3 * i] >> subx) & 1) << i;
-		if (flip_screen_get())
+		if (flip_screen_get(space->machine))
 			*BITMAP_ADDR16(pixbitmap, y^0xff, (x+subx)^0xff) = PIXMAP_COLOR_BASE + 8*pixcolor + color;
 		else
 			*BITMAP_ADDR16(pixbitmap, y, x+subx) = PIXMAP_COLOR_BASE + 8*pixcolor + color;
@@ -172,7 +172,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 	coin_counter_w(1,data & 0x20);
 
 	/* bit 7 is screen flip */
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 
 	/* other bits unused? */
 	logerror("PC %04x: 1800 = %02x\n",cpu_get_pc(space->cpu),data);
@@ -199,7 +199,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			sy = (240 - spriteram[offs+2]) & 0xff;
 			flipx = spriteram[offs] & 0x04;
 			flipy = spriteram[offs] & 0x02;
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -224,11 +224,11 @@ VIDEO_UPDATE( dogfgt )
 	int offs;
 
 
-	if (lastflip != flip_screen_get() || lastpixcolor != pixcolor)
+	if (lastflip != flip_screen_get(screen->machine) || lastpixcolor != pixcolor)
 	{
 		const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-		lastflip = flip_screen_get();
+		lastflip = flip_screen_get(screen->machine);
 		lastpixcolor = pixcolor;
 
 		for (offs = 0;offs < BITMAPRAM_SIZE;offs++)

@@ -110,7 +110,6 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/intelfsh.h"
 #include "machine/scsicd.h"
@@ -885,9 +884,9 @@ static void atapi_init(running_machine *machine)
 	atapi_cdata_wait = 0;
 
 	// allocate two SCSI CD-ROM devices
-	SCSIAllocInstance( SCSI_DEVICE_CDROM, &atapi_device_data[0], "scsi0" );
+	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &atapi_device_data[0], "scsi0" );
 	// TODO: the slave drive can be either CD-ROM, DVD-ROM or HDD
-	SCSIAllocInstance( SCSI_DEVICE_CDROM, &atapi_device_data[1], "scsi1" );
+	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &atapi_device_data[1], "scsi1" );
 	add_exit_callback(machine, atapi_exit);
 }
 
@@ -2253,11 +2252,11 @@ static int ibutton_w(UINT8 data)
 	return r;
 }
 
-static void security_w(UINT8 data)
+static void security_w(const device_config *device, UINT8 data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)
-		ppc4xx_spu_receive_byte(Machine->cpu[0], r);
+		ppc4xx_spu_receive_byte(device->machine->cpu[0], r);
 }
 
 /*****************************************************************************/

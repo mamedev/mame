@@ -83,7 +83,7 @@ static int joinem_snd_bit = 0;
 
 static WRITE8_HANDLER( joinem_misc_w )
 {
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 	joinem_snd_bit = data & 1;
 }
 

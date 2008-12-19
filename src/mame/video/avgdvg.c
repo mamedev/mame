@@ -12,7 +12,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "avgdvg.h"
 #include "video/vector.h"
 
@@ -69,6 +68,8 @@ typedef struct _vgvector
 
 typedef struct _vgdata
 {
+	running_machine *machine;
+
 	UINT16 pc;
 	UINT8 sp;
 	UINT16 dvx;
@@ -167,14 +168,14 @@ static void avg_apply_flipping(int *x, int *y)
  *
  *************************************/
 
-static void vg_flush (void)
+static void vg_flush (running_machine *machine)
 {
 	int i;
 
 	for (i = 0; i < nvect; i++)
 	{
 		if (vectbuf[i].status == VGVECTOR)
-			vector_add_point(vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, vectbuf[i].intensity);
+			vector_add_point(machine, vectbuf[i].x, vectbuf[i].y, vectbuf[i].color, vectbuf[i].intensity);
 
 		if (vectbuf[i].status == VGCLIP)
 			vector_add_clip(vectbuf[i].x, vectbuf[i].y, vectbuf[i].arg1, vectbuf[i].arg2);
@@ -475,7 +476,7 @@ static void mhavoc_data(vgdata *vg)
 
 	if (vg->pc & 0x2000)
 	{
-		bank = &memory_region(Machine, "alpha")[0x18000];
+		bank = &memory_region(vg->machine, "alpha")[0x18000];
 		vg->data = bank[(vg->map << 13) | ((vg->pc ^ 1) & 0x1fff)];
 	}
 	else
@@ -751,7 +752,7 @@ static int avg_common_strobe2(vgdata *vg)
                  */
 
 				vector_clear_list();
-				vg_flush();
+				vg_flush(vg->machine);
 			}
 		}
 		else
@@ -804,7 +805,7 @@ static int mhavoc_strobe2(vgdata *vg)
 					| ((vg->dvy >> 1) & 2)
 					| ((vg->dvy << 1) & 4)
 					| ((vg->dvy << 2) & 8)
-					| ((mame_rand(Machine) & 0x7) << 4);
+					| ((mame_rand(vg->machine) & 0x7) << 4);
 			}
 			else
 			{
@@ -1240,7 +1241,7 @@ WRITE8_HANDLER( avgdvg_go_w )
          */
 		vector_clear_list();
 	}
-	vg_flush();
+	vg_flush(space->machine);
 
 	vgc->vggo(vg);
 	vg_set_halt(0);
@@ -1454,6 +1455,9 @@ static VIDEO_START( avg_common )
 {
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
+	vg = &vgd;
+	vg->machine = machine;
+
 	xmin = visarea->min_x;
 	ymin = visarea->min_y;
 	xmax = visarea->max_x;
@@ -1485,6 +1489,7 @@ VIDEO_START( dvg )
 
 	vgc = &dvg_default;
 	vg = &vgd;
+	vg->machine = machine;
 
 	xmin = visarea->min_x;
 	ymin = visarea->min_y;
@@ -1499,42 +1504,36 @@ VIDEO_START( dvg )
 VIDEO_START( avg )
 {
 	vgc = &avg_default;
-	vg = &vgd;
 	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_starwars )
 {
 	vgc = &avg_starwars;
-	vg = &vgd;
 	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_tempest )
 {
 	vgc = &avg_tempest;
-	vg = &vgd;
 	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_mhavoc )
 {
 	vgc = &avg_mhavoc;
-	vg = &vgd;
 	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_bzone )
 {
 	vgc = &avg_bzone;
-	vg = &vgd;
 	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_quantum )
 {
 	vgc = &avg_quantum;
-	vg = &vgd;
 	VIDEO_START_CALL(avg_common);
 }
 

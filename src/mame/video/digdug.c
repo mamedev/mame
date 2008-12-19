@@ -134,9 +134,9 @@ static TILE_GET_INFO( tx_get_tile_info )
        characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO(
 			0,
-			(code & 0x7f) | (flip_screen_get() ? 0x80 : 0),
+			(code & 0x7f) | (flip_screen_get(machine) ? 0x80 : 0),
 			color,
-			flip_screen_get() ? TILE_FLIPX : 0);
+			flip_screen_get(machine) ? TILE_FLIPX : 0);
 }
 
 
@@ -235,7 +235,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 			break;
 
 		case 7:	/* FLIP */
-			flip_screen_set(data & 1);
+			flip_screen_set(space->machine, data & 1);
 			break;
 	}
 }
@@ -280,7 +280,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 		sy -= 16 * size;
 		sy = (sy & 0xff) - 32;	// fix wraparound
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			flipx ^= 1;
 			flipy ^= 1;

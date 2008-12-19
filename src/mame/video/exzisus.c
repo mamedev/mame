@@ -138,7 +138,7 @@ VIDEO_UPDATE( exzisus )
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 
-				if (flip_screen_get())
+				if (flip_screen_get(screen->machine))
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -147,7 +147,7 @@ VIDEO_UPDATE( exzisus )
 				drawgfx(bitmap, screen->machine->gfx[0],
 						code & 0x3fff,
 						color,
-						flip_screen_get(), flip_screen_get(),
+						flip_screen_get(screen->machine), flip_screen_get(screen->machine),
 						x, y,
 						cliprect, TRANSPARENCY_PEN, 15);
 				goffs += 2;
@@ -208,7 +208,7 @@ VIDEO_UPDATE( exzisus )
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 
-				if (flip_screen_get())
+				if (flip_screen_get(screen->machine))
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -217,7 +217,7 @@ VIDEO_UPDATE( exzisus )
 				drawgfx(bitmap, screen->machine->gfx[1],
 						code & 0x3fff,
 						color,
-						flip_screen_get(), flip_screen_get(),
+						flip_screen_get(screen->machine), flip_screen_get(screen->machine),
 						x, y,
 						cliprect, TRANSPARENCY_PEN, 15);
 				goffs += 2;

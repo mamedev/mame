@@ -40,7 +40,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	int offs;
 
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(1);
+	flip_screen_set_no_update(machine, 1);
 
 	for (offs = (0x1400/4)-4;offs >= 0;offs -= 4) // 0x1400 for charlien
 	{
@@ -86,7 +86,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			inc = 1;
 		}
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			y=240-y;
 			x=304-x;

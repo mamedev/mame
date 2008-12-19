@@ -35,7 +35,7 @@ struct tms5110_info
 /* static function prototypes */
 static STREAM_UPDATE( tms5110_update );
 
-static int speech_rom_read_bit(void)
+static int speech_rom_read_bit(const device_config *device)
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
 

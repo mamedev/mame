@@ -169,7 +169,6 @@ Notes:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
@@ -342,12 +341,12 @@ static WRITE16_HANDLER( gain_control_w )
 	{
 		if (offset==0)
 		{
-			MB87078_data_w(0, data>>8, 0);
+			MB87078_data_w(space->machine, 0, data>>8, 0);
             //logerror("MB87078 dsel=0 data=%4x\n",data);
 		}
 		else
 		{
-			MB87078_data_w(0, data>>8, 1);
+			MB87078_data_w(space->machine, 0, data>>8, 1);
             //logerror("MB87078 dsel=1 data=%4x\n",data);
 		}
 	}
@@ -2388,11 +2387,11 @@ static const ym2203_interface ym2203_config =
     Both ym2610 and ym2610b generate 3 (PSG like) + 2 (fm left,right) channels.
     I use mixer_set_volume() to emulate the effect.
 */
-static void mb87078_gain_changed(int channel, int percent)
+static void mb87078_gain_changed(running_machine *machine, int channel, int percent)
 {
 	if (channel==1)
 	{
-		sound_type type = Machine->config->sound[0].type;
+		sound_type type = machine->config->sound[0].type;
 		sndti_set_output_gain(type, 0, 0, percent / 100.0);
 		sndti_set_output_gain(type, 1, 0, percent / 100.0);
 		sndti_set_output_gain(type, 2, 0, percent / 100.0);
@@ -2408,7 +2407,7 @@ static const struct MB87078interface mb87078_interface =
 
 static MACHINE_RESET( mb87078 )
 {
-	MB87078_start(0, &mb87078_interface); /*chip #0*/
+	MB87078_start(machine, 0, &mb87078_interface); /*chip #0*/
 /*
     {
         int i;

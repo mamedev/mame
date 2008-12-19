@@ -140,7 +140,7 @@ WRITE8_HANDLER( timeplt_colorram_w )
 
 WRITE8_HANDLER( timeplt_flipscreen_w )
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(space->machine, ~data & 1);
 }
 
 

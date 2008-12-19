@@ -43,7 +43,7 @@ static WRITE8_HANDLER( bogeyman_8910_control_w )
 	static int last;
 
 	// bit 0 is flipscreen
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 
 	// bit 5 goes to 8910 #0 BDIR pin
 	if ((last & 0x20) == 0x20 && (data & 0x20) == 0x00)

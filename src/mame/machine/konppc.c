@@ -1,7 +1,6 @@
 /* Konami PowerPC-based 3D games common functions */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/sharc/sharc.h"
 #include "video/voodoo.h"
 #include "konppc.h"
@@ -40,9 +39,8 @@ static UINT32 *nwk_ram[MAX_CG_BOARDS];
 
 /*****************************************************************************/
 
-void init_konami_cgboard(int num_boards, int type)
+void init_konami_cgboard(running_machine *machine, int num_boards, int type)
 {
-	running_machine *machine = Machine;
 	int i;
 	num_cgboards = num_boards;
 
@@ -119,11 +117,11 @@ int get_cgboard_id(void)
 	}
 }
 
-void set_cgboard_texture_bank(int board, int bank, UINT8 *rom)
+void set_cgboard_texture_bank(running_machine *machine, int board, int bank, UINT8 *rom)
 {
 	texture_bank[board] = bank;
 
-	memory_configure_bank(Machine, bank, 0, 2, rom, 0x800000);
+	memory_configure_bank(machine, bank, 0, 2, rom, 0x800000);
 }
 
 /*****************************************************************************/
@@ -349,27 +347,28 @@ WRITE32_HANDLER( cgboard_1_shared_sharc_w )
 
 /*****************************************************************************/
 
-static UINT32 nwk_fifo_r(int board)
+static UINT32 nwk_fifo_r(const address_space *space, int board)
 {
 	int cpu = (board == 0) ? 2 : 3;
+	const device_config *device = space->machine->cpu[cpu];
 	UINT32 data;
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
 	{
-		sharc_set_flag_input(Machine->cpu[cpu], 1, CLEAR_LINE);
+		sharc_set_flag_input(device, 1, CLEAR_LINE);
 	}
 	else
 	{
-		sharc_set_flag_input(Machine->cpu[cpu], 1, ASSERT_LINE);
+		sharc_set_flag_input(device, 1, ASSERT_LINE);
 	}
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_full)
 	{
-		sharc_set_flag_input(Machine->cpu[cpu], 2, ASSERT_LINE);
+		sharc_set_flag_input(device, 2, ASSERT_LINE);
 	}
 	else
 	{
-		sharc_set_flag_input(Machine->cpu[cpu], 2, CLEAR_LINE);
+		sharc_set_flag_input(device, 2, CLEAR_LINE);
 	}
 
 	data = nwk_fifo[board][nwk_fifo_read_ptr[board]];
@@ -379,20 +378,21 @@ static UINT32 nwk_fifo_r(int board)
 	return data;
 }
 
-static void nwk_fifo_w(int board, UINT32 data)
+static void nwk_fifo_w(running_machine *machine, int board, UINT32 data)
 {
 	int cpu = (board == 0) ? 2 : 3;
+	const device_config *device = machine->cpu[cpu];
 
 	if (nwk_fifo_write_ptr[board] < nwk_fifo_half_full_w)
 	{
-		sharc_set_flag_input(Machine->cpu[cpu], 1, ASSERT_LINE);
+		sharc_set_flag_input(device, 1, ASSERT_LINE);
 	}
 	else
 	{
-		sharc_set_flag_input(Machine->cpu[cpu], 1, CLEAR_LINE);
+		sharc_set_flag_input(device, 1, CLEAR_LINE);
 	}
 
-	sharc_set_flag_input(Machine->cpu[cpu], 2, ASSERT_LINE);
+	sharc_set_flag_input(device, 2, ASSERT_LINE);
 
 	nwk_fifo[board][nwk_fifo_write_ptr[board]] = data;
 	nwk_fifo_write_ptr[board]++;
@@ -420,7 +420,7 @@ void K033906_init(running_machine *machine)
 	}
 }
 
-static UINT32 K033906_r(int chip, int reg)
+static UINT32 K033906_r(const address_space *space, int chip, int reg)
 {
 	switch(reg)
 	{
@@ -430,12 +430,12 @@ static UINT32 K033906_r(int chip, int reg)
 		case 0x0f:		return K033906_reg[chip][0x0f];		// interrupt_line, interrupt_pin, min_gnt, max_lat
 
 		default:
-			fatalerror("%s:K033906_r: %d, %08X", cpuexec_describe_context(Machine), chip, reg);
+			fatalerror("%s:K033906_r: %d, %08X", cpuexec_describe_context(space->machine), chip, reg);
 	}
 	return 0;
 }
 
-static void K033906_w(running_machine *machine, int chip, int reg, UINT32 data)
+static void K033906_w(const address_space *space, int chip, int reg, UINT32 data)
 {
 	switch(reg)
 	{
@@ -466,7 +466,7 @@ static void K033906_w(running_machine *machine, int chip, int reg, UINT32 data)
 
 		case 0x10:		// initEnable
 		{
-			const device_config *device = device_list_find_by_index(machine->config->devicelist, VOODOO_GRAPHICS, chip);
+			const device_config *device = device_list_find_by_index(space->machine->config->devicelist, VOODOO_GRAPHICS, chip);
 			voodoo_set_init_enable(device, data);
 			break;
 		}
@@ -479,7 +479,7 @@ static void K033906_w(running_machine *machine, int chip, int reg, UINT32 data)
 			break;
 
 		default:
-			fatalerror("%s:K033906_w: %d, %08X, %08X", cpuexec_describe_context(machine), chip, data, reg);
+			fatalerror("%s:K033906_w: %d, %08X, %08X", cpuexec_describe_context(space->machine), chip, data, reg);
 	}
 }
 
@@ -487,13 +487,13 @@ READ32_HANDLER(K033906_0_r)
 {
 	if (nwk_device_sel[0] & 0x01)
 	{
-		return nwk_fifo_r(0);
+		return nwk_fifo_r(space, 0);
 	}
 	else
 	{
 		if (pci_bridge_enable[0])
 		{
-			return K033906_r(0, offset);
+			return K033906_r(space, 0, offset);
 		}
 		else
 		{
@@ -506,7 +506,7 @@ WRITE32_HANDLER(K033906_0_w)
 {
 	if (pci_bridge_enable[0])
 	{
-		K033906_w(space->machine, 0, offset, data);
+		K033906_w(space, 0, offset, data);
 	}
 	else
 	{
@@ -518,13 +518,13 @@ READ32_HANDLER(K033906_1_r)
 {
 	if (nwk_device_sel[1] & 0x01)
 	{
-		return nwk_fifo_r(1);
+		return nwk_fifo_r(space, 1);
 	}
 	else
 	{
 		if (pci_bridge_enable[1])
 		{
-			return K033906_r(1, offset);
+			return K033906_r(space, 1, offset);
 		}
 		else
 		{
@@ -537,7 +537,7 @@ WRITE32_HANDLER(K033906_1_w)
 {
 	if (pci_bridge_enable[1])
 	{
-		K033906_w(space->machine, 1, offset, data);
+		K033906_w(space, 1, offset, data);
 	}
 	else
 	{
@@ -551,7 +551,7 @@ WRITE32_DEVICE_HANDLER(nwk_fifo_0_w)
 {
 	if (nwk_device_sel[0] & 0x01)
 	{
-		nwk_fifo_w(0, data);
+		nwk_fifo_w(device->machine, 0, data);
 	}
 	else if (nwk_device_sel[0] & 0x02)
 	{
@@ -568,7 +568,7 @@ WRITE32_DEVICE_HANDLER(nwk_fifo_1_w)
 {
 	if (nwk_device_sel[1] & 0x01)
 	{
-		nwk_fifo_w(1, data);
+		nwk_fifo_w(device->machine, 1, data);
 	}
 	else if (nwk_device_sel[1] & 0x02)
 	{
@@ -609,7 +609,7 @@ WRITE32_DEVICE_HANDLER(nwk_voodoo_0_w)
 {
 	if (nwk_device_sel[0] & 0x01)
 	{
-		nwk_fifo_w(0, data);
+		nwk_fifo_w(device->machine, 0, data);
 	}
 	else if (nwk_device_sel[0] & 0x02)
 	{
@@ -626,7 +626,7 @@ WRITE32_DEVICE_HANDLER(nwk_voodoo_1_w)
 {
 	if (nwk_device_sel[1] & 0x01)
 	{
-		nwk_fifo_w(1, data);
+		nwk_fifo_w(device->machine, 1, data);
 	}
 	else if (nwk_device_sel[1] & 0x02)
 	{

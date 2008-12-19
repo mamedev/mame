@@ -119,7 +119,7 @@ WRITE8_HANDLER( quizdna_screen_ctrl_w )
 
 	quizdna_flipscreen = tmp;
 
-	flip_screen_set(tmp);
+	flip_screen_set(space->machine, tmp);
 	tilemap_set_scrolldx( quizdna_fg_tilemap, 64, -64 +16);
 }
 

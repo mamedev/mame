@@ -118,7 +118,7 @@ WRITE8_HANDLER( spdodgeb_ctrl_w )
 	UINT8 *rom = memory_region(space->machine, "main");
 
 	/* bit 0 = flip screen */
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 
 	/* bit 1 = ROM bank switch */
 	memory_set_bankptr(space->machine, 1,rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
@@ -179,7 +179,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int dy = -16;
 		int cy;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -198,7 +198,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			break;
 
 			case 1: /* double y */
-			if (flip_screen_get()) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
+			if (flip_screen_get(machine)) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
 			cy = sy + dy;
 			which &= ~1;
 			DRAW_SPRITE(0,sx,cy);

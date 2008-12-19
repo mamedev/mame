@@ -106,7 +106,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/fd1094.h"
 #include "cpu/m68000/m68kcpu.h"
 
@@ -114,6 +113,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 #include "debug/debugvw.h"
+#include "machine/fddebug.h"
 
 
 
@@ -246,7 +246,7 @@ static UINT16 *				keystatus;
 static UINT32				keystatus_words;
 
 /* key changed callback */
-static void					(*key_changed)(void);
+static void					(*key_changed)(running_machine *);
 
 
 
@@ -257,7 +257,6 @@ static void					(*key_changed)(void);
 static void set_default_key_params(running_machine *machine);
 static void load_overlay_file(running_machine *machine);
 static void save_overlay_file(running_machine *machine);
-static void fd1094_regenerate_key(void);
 
 static int instruction_hook(const device_config *device, offs_t curpc);
 
@@ -477,7 +476,7 @@ INLINE int addr_is_valid(const address_space *space, UINT32 addr, UINT32 flags)
     fd1094_init_debugging - set up debugging
 -----------------------------------------------*/
 
-void fd1094_init_debugging(running_machine *machine, const char *cpureg, const char *keyreg, const char *statreg, void (*changed)(void))
+void fd1094_init_debugging(running_machine *machine, const char *cpureg, const char *keyreg, const char *statreg, void (*changed)(running_machine *))
 {
 	/* set the key changed callback */
 	key_changed = changed;
@@ -541,7 +540,7 @@ void fd1094_init_debugging(running_machine *machine, const char *cpureg, const c
 
 	/* regenerate the key */
 	if (keydirty)
-		fd1094_regenerate_key();
+		fd1094_regenerate_key(machine);
 }
 
 
@@ -644,7 +643,7 @@ static void save_overlay_file(running_machine *machine)
     data
 -----------------------------------------------*/
 
-void fd1094_regenerate_key(void)
+void fd1094_regenerate_key(running_machine *machine)
 {
 	int reps = keystatus_words / KEY_SIZE;
 	int keyaddr, repnum;
@@ -675,11 +674,11 @@ void fd1094_regenerate_key(void)
 
 	/* update the key with the current fd1094 manager */
 	if (key_changed != NULL)
-		(*key_changed)();
+		(*key_changed)(machine);
 
 	/* force all memory and disassembly views to update */
-	debug_view_update_type(Machine, DVT_MEMORY);
-	debug_view_update_type(Machine, DVT_DISASSEMBLY);
+	debug_view_update_type(machine, DVT_MEMORY);
+	debug_view_update_type(machine, DVT_DISASSEMBLY);
 
 	/* reset keydirty */
 	keydirty = FALSE;
@@ -724,13 +723,13 @@ static int instruction_hook(const device_config *device, offs_t curpc)
 	/* try all possible decodings at the current pc */
 	posscount = try_all_possibilities(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
 	if (keydirty)
-		fd1094_regenerate_key();
+		fd1094_regenerate_key(device->machine);
 
 	/* if we only ended up with one possibility, mark that one as good */
 	if (posscount == 1)
 	{
 		tag_possibility(device->machine, &posslist[0], STATUS_LOCKED);
-		fd1094_regenerate_key();
+		fd1094_regenerate_key(device->machine);
 		return 0;
 	}
 
@@ -763,7 +762,7 @@ static void execute_fdoutput(running_machine *machine, int ref, int params, cons
 
 	/* make sure we're up-to-date */
 	if (keydirty)
-		fd1094_regenerate_key();
+		fd1094_regenerate_key(machine);
 
 	/* determin the filename and open the file */
 	filerr = mame_fopen(SEARCHPATH_RAW, param[0], OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
@@ -798,7 +797,7 @@ static void execute_fdseed(running_machine *machine, int ref, int params, const 
 	memset(keystatus, 0, keystatus_words * sizeof(keystatus[0]));
 
 	/* regenerate the key and reset the 68000 */
-	fd1094_regenerate_key();
+	fd1094_regenerate_key(machine);
 }
 
 
@@ -827,7 +826,7 @@ static void execute_fdlockguess(running_machine *machine, int ref, int params, c
 
 	/* tag this possibility as indicated by the ref parameter, and then regenerate the key */
 	tag_possibility(machine, &posslist[num1], ref);
-	fd1094_regenerate_key();
+	fd1094_regenerate_key(machine);
 }
 
 
@@ -963,7 +962,7 @@ static void execute_fdundo(running_machine *machine, int ref, int params, const 
 {
 	/* copy the undobuffer back and regenerate the key */
 	memcpy(keystatus, undobuff, keystatus_words * 2);
-	fd1094_regenerate_key();
+	fd1094_regenerate_key(machine);
 	debug_console_printf(machine, "Undid last change\n");
 }
 
@@ -1015,7 +1014,7 @@ static void execute_fdstate(running_machine *machine, int ref, int params, const
 		if (!debug_command_parameter_number(machine, param[0], &newstate))
 			return;
 		fd1094_set_state(keyregion, newstate);
-		fd1094_regenerate_key();
+		fd1094_regenerate_key(machine);
 		debug_view_update_type(machine, DVT_MEMORY);
 		debug_view_update_type(machine, DVT_DISASSEMBLY);
 	}

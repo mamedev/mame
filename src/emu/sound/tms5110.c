@@ -111,8 +111,9 @@ struct tms5110
 	UINT8  addr_bit;
 
 	/* external callback */
-	int (*M0_callback)(void);
+	int (*M0_callback)(const device_config *);
 	void (*set_load_address)(int);
+	const device_config *device;
 
 	/* these contain data describing the current and previous voice frames */
 	UINT16 old_energy;
@@ -183,6 +184,7 @@ void *tms5110_create(const device_config *device, int variant)
 	tms = malloc_or_die(sizeof(*tms));
 	memset(tms, 0, sizeof(*tms));
 
+	tms->device = device;
 	tms5110_set_variant(tms, variant);
 
 	state_save_register_device_item_array(device, 0, tms->fifo);
@@ -280,7 +282,7 @@ void tms5110_reset_chip(void *chip)
 
 ******************************************************************************************/
 
-void tms5110_set_M0_callback(void *chip, int (*func)(void))
+void tms5110_set_M0_callback(void *chip, int (*func)(const device_config *))
 {
 	struct tms5110 *tms = chip;
 	tms->M0_callback = func;
@@ -347,7 +349,7 @@ int i;
 	{
 		if (tms->M0_callback)
 		{
-			int data = (*tms->M0_callback)();
+			int data = (*tms->M0_callback)(tms->device);
 			FIFO_data_write(tms, data);
 		}
 		else
@@ -361,7 +363,7 @@ static void perform_dummy_read(struct tms5110 *tms)
 	{
 		if (tms->M0_callback)
 		{
-			int data = (*tms->M0_callback)();
+			int data = (*tms->M0_callback)(tms->device);
 				if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data&1);
 		}
 			else

@@ -44,14 +44,14 @@
 /* The interface structure */
 struct TTL7474_interface
 {
-	void (*output_cb)(void);
+	void (*output_cb)(running_machine *machine);
 };
 
 
 void TTL7474_config(running_machine *machine, int which, const struct TTL7474_interface *intf);
 
 /* must call TTL7474_update() after setting the inputs */
-void TTL7474_update(int which);
+void TTL7474_update(running_machine *machine, int which);
 
 void TTL7474_clear_w(int which, int data);
 void TTL7474_preset_w(int which, int data);

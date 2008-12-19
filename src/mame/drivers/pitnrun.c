@@ -83,12 +83,12 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static WRITE8_HANDLER(pitnrun_hflip_w)
 {
-	flip_screen_x_set(data);
+	flip_screen_x_set(space->machine, data);
 }
 
 static WRITE8_HANDLER(pitnrun_vflip_w)
 {
-	flip_screen_y_set(data);
+	flip_screen_y_set(space->machine, data);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )

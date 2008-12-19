@@ -240,7 +240,7 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 		fx = !(spritedata[offs+0]&0x4000);
 		fy = !(spritedata[offs+0]&0x8000);
 
-		if (!flip_screen_get()) {
+		if (!flip_screen_get(machine)) {
 			sx = sx & 0x01ff;
 			sy = sy & 0x01ff;
 			if (sx>0x180) sx=-(0x200 - sx);
@@ -1218,8 +1218,8 @@ VIDEO_UPDATE( captaven )
 	int pf1_enable,pf2_enable,pf3_enable;
 	static int last_pf3_bank;
 
-	flip_screen_set(deco32_pf12_control[0]&0x80);
-	tilemap_set_flip(ALL_TILEMAPS,flip_screen_get() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	flip_screen_set(screen->machine, deco32_pf12_control[0]&0x80);
+	tilemap_set_flip(ALL_TILEMAPS,flip_screen_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	deco32_setup_scroll(pf1_tilemap, 256,(deco32_pf12_control[5]>>0)&0xff,(deco32_pf12_control[6]>>0)&0xff,deco32_pf12_control[2],deco32_pf12_control[1],deco32_pf1_rowscroll,deco32_pf1_rowscroll+0x200);
 	deco32_setup_scroll(pf1a_tilemap,512,(deco32_pf12_control[5]>>0)&0xff,(deco32_pf12_control[6]>>0)&0xff,deco32_pf12_control[2],deco32_pf12_control[1],deco32_pf1_rowscroll,deco32_pf1_rowscroll+0x200);

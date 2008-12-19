@@ -82,7 +82,7 @@ static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 		}
 	}
 
-	flip_screen_set(data & 0x40);
+	flip_screen_set(space->machine, data & 0x40);
 }
 
 static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
@@ -99,7 +99,7 @@ static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 		}
 	}
 
-	flip_screen_set(data & 0x40);
+	flip_screen_set(space->machine, data & 0x40);
 }
 
 static WRITE8_HANDLER( exzisus_coincounter_w )

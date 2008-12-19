@@ -130,7 +130,7 @@ WRITE16_HANDLER( esd16_tilemap0_color_w )
 	esd16_tilemap0_color = data & 3;
 	tilemap_mark_all_tiles_dirty(esdtilemap_0);
 
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 }
 
 
@@ -233,7 +233,7 @@ static void esd16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 		sy	 =	0x100 - ((sy & 0xff)  - (sy & 0x100));
 		sy	-=	dimy*16;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{	flipx = !flipx;		sx = max_x - sx -    1 * 16 + 2;	// small offset
 			flipy = !flipy;		sy = max_y - sy - dimy * 16;	}
 
@@ -292,7 +292,7 @@ static void hedpanic_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		sy = 0x1ff-sy;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{	flipx = !flipx;		sx = max_x - sx -    1 * 16 + 2;	// small offset
 			flipy = !flipy;		sy = max_y - sy - dimy * 16;	}
 

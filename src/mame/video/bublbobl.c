@@ -78,7 +78,7 @@ VIDEO_UPDATE( bublbobl )
 				x = sx + xc * 8;
 				y = (sy + yc * 8) & 0xff;
 
-				if (flip_screen_get())
+				if (flip_screen_get(screen->machine))
 				{
 					x = 248 - x;
 					y = 248 - y;

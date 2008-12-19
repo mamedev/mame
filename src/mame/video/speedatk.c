@@ -97,7 +97,7 @@ WRITE8_HANDLER( speedatk_videoregs_w )
 		{
 			/*temporary hook-up.*/
 			case 0x0d:
-				flip_screen_set(data & 8);
+				flip_screen_set(space->machine, data & 8);
 				tilemap_set_scrolldx(bg_tilemap,0,data & 0x40);
 				break;
 			default:

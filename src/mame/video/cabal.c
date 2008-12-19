@@ -60,7 +60,7 @@ WRITE16_HANDLER( cabal_flipscreen_w )
 		tilemap_set_flip(background_layer,flip);
 		tilemap_set_flip(text_layer,flip);
 
-		flip_screen_set(data & 0x20);
+		flip_screen_set(space->machine, data & 0x20);
 	}
 }
 
@@ -119,7 +119,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			if ( sx>256 )   sx -= 512;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

@@ -49,7 +49,6 @@ The command format is very simple:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "namco54.h"
 #include "cpu/mb88xx/mb88xx.h"
 
@@ -114,14 +113,14 @@ static TIMER_CALLBACK( namco_54xx_irq_clear )
 	cpu_set_input_line(device, 0, CLEAR_LINE);
 }
 
-void namco_54xx_write(UINT8 data)
+void namco_54xx_write(running_machine *machine, UINT8 data)
 {
-	const device_config *device = cputag_get_cpu(Machine, CPUTAG_54XX);
+	const device_config *device = cputag_get_cpu(machine, CPUTAG_54XX);
 
 	if (device == NULL)
 		return;
 
-	timer_call_after_resynch(Machine, NULL, data, namco_54xx_latch_callback);
+	timer_call_after_resynch(machine, NULL, data, namco_54xx_latch_callback);
 
 	cpu_set_input_line(device, 0, ASSERT_LINE);
 
@@ -130,5 +129,5 @@ void namco_54xx_write(UINT8 data)
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	timer_set(Machine, ATTOTIME_IN_USEC(21), (void *)device, 0, namco_54xx_irq_clear);
+	timer_set(machine, ATTOTIME_IN_USEC(21), (void *)device, 0, namco_54xx_irq_clear);
 }

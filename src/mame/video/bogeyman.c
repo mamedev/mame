@@ -118,7 +118,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			if (multi) sy -= 16;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -138,7 +138,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				drawgfx(bitmap,machine->gfx[2],
 					code + 1, color,
 					flipx, flipy,
-					sx, sy + (flip_screen_get() ? -16 : 16),
+					sx, sy + (flip_screen_get(machine) ? -16 : 16),
 					cliprect,
 					TRANSPARENCY_PEN, 0);
 			}

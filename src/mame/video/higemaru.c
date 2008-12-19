@@ -80,9 +80,9 @@ WRITE8_HANDLER( higemaru_c800_w )
 	coin_counter_w(1,data & 1);
 
 	/* bit 7 flips screen */
-	if (flip_screen_get() != (data & 0x80))
+	if (flip_screen_get(space->machine) != (data & 0x80))
 	{
-		flip_screen_set(data & 0x80);
+		flip_screen_set(space->machine, data & 0x80);
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 }
@@ -114,7 +114,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sy = spriteram[offs + 8];
 		flipx = spriteram[offs + 4] & 0x10;
 		flipy = spriteram[offs + 4] & 0x20;
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

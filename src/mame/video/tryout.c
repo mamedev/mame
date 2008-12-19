@@ -151,7 +151,7 @@ WRITE8_HANDLER( tryout_vram_bankswitch_w )
 
 WRITE8_HANDLER( tryout_flipscreen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 static TILEMAP_MAPPER( get_fg_memory_offset )
@@ -199,7 +199,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		fy = 0;
 		inc = 16;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			x = 240 - x;
 			fx = !fx;
@@ -239,7 +239,7 @@ VIDEO_UPDATE( tryout )
 
 	int scrollx;
 
-	if (!flip_screen_get())
+	if (!flip_screen_get(screen->machine))
 		tilemap_set_scrollx(fg_tilemap, 0, 16); /* Assumed hard-wired */
 	else
 		tilemap_set_scrollx(fg_tilemap, 0, -8); /* Assumed hard-wired */

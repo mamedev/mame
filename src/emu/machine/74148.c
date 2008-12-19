@@ -47,7 +47,7 @@
 struct TTL74148
 {
 	/* callback */
-	void (*output_cb)(void);
+	void (*output_cb)(running_machine *machine);
 
 	/* inputs */
 	int input_lines[8];	/* pins 1-4,10-13 */
@@ -67,7 +67,7 @@ struct TTL74148
 static struct TTL74148 chips[MAX_TTL74148];
 
 
-void TTL74148_update(int which)
+void TTL74148_update(running_machine *machine, int which)
 {
 	if (chips[which].enable_input)
 	{
@@ -131,7 +131,7 @@ void TTL74148_update(int which)
 		chips[which].last_output_valid = chips[which].output_valid;
 		chips[which].last_enable_output = chips[which].enable_output;
 
-		chips[which].output_cb();
+		chips[which].output_cb(machine);
 	}
 }
 

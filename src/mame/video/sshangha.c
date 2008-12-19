@@ -86,7 +86,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		sprite &= ~multi;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			y=240-y;
 			x=304-x;
@@ -187,8 +187,8 @@ VIDEO_UPDATE( sshangha )
 	static int last_pf1_bank,last_pf2_bank;
 	int offs;
 
-	flip_screen_set_no_update(sshangha_control_0[0]&0x80);
-	tilemap_set_flip(ALL_TILEMAPS,flip_screen_x_get() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	flip_screen_set_no_update(screen->machine, sshangha_control_0[0]&0x80);
+	tilemap_set_flip(ALL_TILEMAPS,flip_screen_x_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	tilemap_set_enable( pf2_tilemap, sshangha_control_0[5]&0x8000);
 	tilemap_set_enable( pf1_8x8_tilemap, sshangha_control_0[5]&0x0080);

@@ -148,6 +148,7 @@ enum
 
 struct upd7759_chip
 {
+	const device_config *device;
 	sound_stream *channel;					/* stream channel for playback */
 
 	/* internal clock to output sample rate mapping */
@@ -161,7 +162,7 @@ struct upd7759_chip
 	UINT8		reset;						/* current state of the RESET line */
 	UINT8		start;						/* current state of the START line */
 	UINT8		drq;						/* current state of the DRQ line */
-	void (*drqcallback)(int param);			/* drq callback */
+	void (*drqcallback)(const device_config *device, int param);			/* drq callback */
 
 	/* internal state machine */
 	INT8		state;						/* current overall chip state */
@@ -536,7 +537,7 @@ static TIMER_CALLBACK( upd7759_slave_update )
 	/* if the DRQ changed, update it */
 	logerror("slave_update: DRQ %d->%d\n", olddrq, chip->drq);
 	if (olddrq != chip->drq && chip->drqcallback)
-		(*chip->drqcallback)(chip->drq);
+		(*chip->drqcallback)(chip->device, chip->drq);
 
 	/* set a timer to go off when that is done */
 	if (chip->state != STATE_IDLE)
@@ -633,6 +634,8 @@ static SND_START( upd7759 )
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
+
+	chip->device = device;
 
 	/* allocate a stream channel */
 	chip->channel = stream_create(device, 0, 1, clock/4, chip, upd7759_update);

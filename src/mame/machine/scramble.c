@@ -21,7 +21,7 @@ MACHINE_RESET( scramble )
 	MACHINE_RESET_CALL(galaxold);
 
 	if (machine->cpu[1] != NULL)
-		scramble_sh_init();
+		scramble_sh_init(machine);
 
   security_2B_counter = 0;
 }
@@ -30,7 +30,7 @@ MACHINE_RESET( sfx )
 {
 	MACHINE_RESET_CALL(scramble);
 
-	sfx_sh_init();
+	sfx_sh_init(machine);
 }
 
 static int monsterz_count = 0;
@@ -47,7 +47,7 @@ MACHINE_RESET( monsterz )
 */
 	MACHINE_RESET_CALL(scramble);
 
-	sfx_sh_init();
+	sfx_sh_init(machine);
 
 	monsterz_count = 0;
 }

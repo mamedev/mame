@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "machine/7474.h"
 #include "sound/flt_rc.h"
@@ -84,7 +83,7 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	TTL7474_clock_w(2, ~data & 0x08);
-	TTL7474_update(2);
+	TTL7474_update(device->machine, 2);
 
 	/* bit 4 is sound disable */
 	sound_global_enable(~data & 0x10);
@@ -94,21 +93,21 @@ WRITE8_HANDLER( sfx_sh_irqtrigger_w )
 {
 	/* bit 1 is connected to the flip-flop's clock */
 	TTL7474_clock_w(3, data & 0x01);
-	TTL7474_update(3);
+	TTL7474_update(space->machine, 3);
 }
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	TTL7474_clock_w(2, ~data & 0x08);
-	TTL7474_update(2);
+	TTL7474_update(device->machine, 2);
 }
 
 WRITE8_HANDLER( froggrmc_sh_irqtrigger_w )
 {
 	/* the complement of bit 0 is connected to the flip-flop's clock */
 	TTL7474_clock_w(2, ~data & 0x01);
-	TTL7474_update(2);
+	TTL7474_update(space->machine, 2);
 }
 
 
@@ -118,10 +117,10 @@ static IRQ_CALLBACK(scramble_sh_irq_callback)
        we need to pulse the CLR line because MAME's core never clears this
        line, only asserts it */
 	TTL7474_clear_w(2, 0);
-	TTL7474_update(2);
+	TTL7474_update(device->machine, 2);
 
 	TTL7474_clear_w(2, 1);
-	TTL7474_update(2);
+	TTL7474_update(device->machine, 2);
 
 	return 0xff;
 }
@@ -132,27 +131,27 @@ static IRQ_CALLBACK(sfx_sh_irq_callback)
        we need to pulse the CLR line because MAME's core never clears this
        line, only asserts it */
 	TTL7474_clear_w(3, 0);
-	TTL7474_update(3);
+	TTL7474_update(device->machine, 3);
 
 	TTL7474_clear_w(3, 1);
-	TTL7474_update(3);
+	TTL7474_update(device->machine, 3);
 
 	return 0xff;
 }
 
 
-static void scramble_sh_7474_callback(void)
+static void scramble_sh_7474_callback(running_machine *machine)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cpu_set_input_line(Machine->cpu[1], 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void sfx_sh_7474_callback(void)
+static void sfx_sh_7474_callback(running_machine *machine)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cpu_set_input_line(Machine->cpu[2], 0, !TTL7474_output_comp_r(3) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, !TTL7474_output_comp_r(3) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
@@ -209,9 +208,8 @@ static const struct TTL7474_interface sfx_sh_7474_intf =
 };
 
 
-void scramble_sh_init(void)
+void scramble_sh_init(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	cpu_set_irq_callback(machine->cpu[1], scramble_sh_irq_callback);
 
 	TTL7474_config(machine, 2, &scramble_sh_7474_intf);
@@ -220,9 +218,8 @@ void scramble_sh_init(void)
 	TTL7474_d_w(2, 1);
 }
 
-void sfx_sh_init(void)
+void sfx_sh_init(running_machine *machine)
 {
-	running_machine *machine = Machine;
 	cpu_set_irq_callback(machine->cpu[2], sfx_sh_irq_callback);
 
 	TTL7474_config(machine, 3, &sfx_sh_7474_intf);
@@ -338,9 +335,9 @@ static TIMER_CALLBACK( ad2083_step )
 		timer_set(machine, ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);
 }
 
-static int ad2083_speech_rom_read_bit(void)
+static int ad2083_speech_rom_read_bit(const device_config *device)
 {
-	UINT8 *ROM = memory_region(Machine, "tms5110");
+	UINT8 *ROM = memory_region(device->machine, "tms5110");
 	int bit;
 
 	speech_rom_address %= 4096;

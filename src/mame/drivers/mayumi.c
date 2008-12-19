@@ -37,7 +37,7 @@ static WRITE8_HANDLER( bank_sel_w )
 
 	int_enable = data & 1;
 
-	flip_screen_set(data & 2);
+	flip_screen_set(space->machine, data & 2);
 }
 
 static MACHINE_RESET( mayumi )

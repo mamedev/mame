@@ -227,7 +227,7 @@ READ8_HANDLER( atari_gtia_r )
 		case 30: return gtia.r.gtia1e;
 
 		case 31:
-			gtia.r.cons = gtia.intf.console_read ? (gtia.intf.console_read() & 0x0F) : 0x00;
+			gtia.r.cons = gtia.intf.console_read ? (gtia.intf.console_read(space) & 0x0F) : 0x00;
 			return gtia.r.cons;
     }
     return 0xff;
@@ -752,7 +752,7 @@ WRITE8_HANDLER( atari_gtia_w )
 			break;
 		gtia.w.cons  = data;
 		if (gtia.intf.console_write)
-			gtia.intf.console_write(gtia.w.cons);
+			gtia.intf.console_write(space, gtia.w.cons);
 		break;
     }
 }

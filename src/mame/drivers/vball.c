@@ -137,7 +137,7 @@ static WRITE8_HANDLER( cpu_sound_command_w ) {
 */
 static WRITE8_HANDLER( vb_scrollx_hi_w )
 {
-	flip_screen_set(~data&1);
+	flip_screen_set(space->machine, ~data&1);
 	vb_scrollx_hi = (data & 0x02) << 7;
 	vb_bgprombank_w(space->machine, (data >> 2)&0x07);
 	vb_spprombank_w(space->machine, (data >> 5)&0x07);

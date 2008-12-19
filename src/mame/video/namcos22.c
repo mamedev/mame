@@ -34,7 +34,6 @@ SPOT TABLE test
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "eminline.h"
 #include "video/rgbutil.h"
 #include "namcos22.h"
@@ -253,7 +252,7 @@ struct _poly_extra_data
 {
 	rgbint fogColor;
 	rgbint fadeColor;
-	int color;
+	const pen_t *pens;
 	int bn;
 	UINT16 flags;
 	int cmode;
@@ -280,7 +279,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 	bitmap_t *bitmap = dest;
 	const poly_extra_data *extra = extradata;
 	int bn = extra->bn * 0x1000;
-	const pen_t *pens = &Machine->pens[(extra->color&0x7f)<<8];
+	const pen_t *pens = extra->pens;
 	int fogFactor = 0xff - extra->fogFactor;
 	int fadeFactor = 0xff - extra->fadeFactor;
 	int transFactor = 0xff;
@@ -437,7 +436,7 @@ static void poly3d_DrawQuad(running_machine *machine, bitmap_t *bitmap, int text
 
 	extra = poly_get_extra_data(poly);
 
-	extra->color = color;
+	extra->pens = &machine->pens[(color&0x7f)<<8];
 	extra->bn = textureBank;
 	extra->flags = flags;
 	extra->cmode = cmode;
@@ -491,7 +490,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	int dx = extent->param[0].dpdx * 65536.0f;
 	const poly_extra_data *extra = extradata;
 	bitmap_t *destmap = destbase;
-	const pen_t *pal = &Machine->pens[extra->color];
+	const pen_t *pal = extra->pens;
 	int prioverchar = extra->prioverchar;
 	int z = extra->z;
 	int alpha = extra->alpha;
@@ -597,7 +596,7 @@ mydrawgfxzoom(
 		extra->alpha = alpha;
 		extra->prioverchar = prioverchar;
 		extra->line_modulo = gfx->line_modulo;
-		extra->color = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
+		extra->pens = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		extra->source = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 #ifdef RENDER_AS_QUADS
 		poly_render_quad_fan(poly, dest_bmp, clip, renderscanline_sprite, 2, 4, &vert[0]);

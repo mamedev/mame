@@ -202,7 +202,7 @@ VIDEO_START( yard )
 WRITE8_HANDLER( yard_flipscreen_w )
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set((data & 0x01) ^ (~input_port_read(space->machine, "DSW2") & 0x01));
+	flip_screen_set(space->machine, (data & 0x01) ^ (~input_port_read(space->machine, "DSW2") & 0x01));
 
 	coin_counter_w(0, data & 0x02);
 	coin_counter_w(1, data & 0x20);
@@ -246,7 +246,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			code2 = code1 + 0x40;
 		}
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy2 = 192 - sy1;
@@ -286,15 +286,15 @@ static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectan
 			0*8, 6*8-1,
 			1*8, 31*8-1
 		};
-		rectangle clip = flip_screen_get() ? clippanelflip : clippanel;
+		rectangle clip = flip_screen_get(machine) ? clippanelflip : clippanel;
 		const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-		int sx = flip_screen_get() ? cliprect->min_x - 8 : cliprect->max_x + 1 - SCROLL_PANEL_WIDTH;
-		int yoffs = flip_screen_get() ? -40 : -16;
+		int sx = flip_screen_get(machine) ? cliprect->min_x - 8 : cliprect->max_x + 1 - SCROLL_PANEL_WIDTH;
+		int yoffs = flip_screen_get(machine) ? -40 : -16;
 
 		clip.min_y += visarea->min_y + yoffs;
 		clip.max_y += visarea->max_y + yoffs;
 
-		copybitmap(bitmap, scroll_panel_bitmap, flip_screen_get(), flip_screen_get(),
+		copybitmap(bitmap, scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
 				   sx, visarea->min_y + yoffs, &clip);
 	}
 }

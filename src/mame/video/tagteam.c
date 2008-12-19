@@ -112,9 +112,9 @@ logerror("%04x: control = %02x\n",cpu_get_pc(space->cpu),data);
 
 WRITE8_HANDLER( tagteam_flipscreen_w )
 {
-	if (flip_screen_get() != (data &0x01))
+	if (flip_screen_get(space->machine) != (data &0x01))
 	{
-		flip_screen_set(data & 0x01);
+		flip_screen_set(space->machine, data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }
@@ -149,7 +149,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		if (!(videoram[offs] & 0x01)) continue;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -168,7 +168,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		code = videoram[offs + 0x20] + 256 * spritebank;
 		color = palettebank;
-		sy += (flip_screen_get() ? -256 : 256);
+		sy += (flip_screen_get(machine) ? -256 : 256);
 
 		drawgfx(bitmap, machine->gfx[1],
 			code, color,

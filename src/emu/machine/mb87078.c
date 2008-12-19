@@ -79,7 +79,7 @@ static int calc_gain_index(int data0, int data1)
 }
 
 
-static void gain_recalc(int which)
+static void gain_recalc(running_machine *machine, int which)
 {
 	struct MB87078 *c = chip + which;
 	int i;
@@ -90,21 +90,21 @@ static void gain_recalc(int which)
 		c->gain[i] = calc_gain_index(c->latch[i], c->latch[4+i]);
 		if (old_index != c->gain[i])
 		{
-			(*c->intf->gain_changed_cb)(i, MB87078_gain_percent[c->gain[i]] );
+			(*c->intf->gain_changed_cb)(machine, i, MB87078_gain_percent[c->gain[i]] );
 		}
 	}
 }
 
 
-void MB87078_start(int which, const struct MB87078interface *intf)
+void MB87078_start(running_machine *machine, int which, const struct MB87078interface *intf)
 {
 	if (which >= MAX_MB87078) return;
 
 	chip[which].intf = intf;
 
 	/* reset chip */
-	MB87078_reset_comp_w(which,0);
-	MB87078_reset_comp_w(which,1);
+	MB87078_reset_comp_w(machine,which,0);
+	MB87078_reset_comp_w(machine,which,1);
 }
 
 
@@ -115,7 +115,7 @@ void MB87078_stop(void)
 }
 
 
-void MB87078_reset_comp_w(int which, int level)
+void MB87078_reset_comp_w(running_machine *machine, int which, int level)
 {
 	struct MB87078 *c = chip + which;
 
@@ -133,11 +133,11 @@ void MB87078_reset_comp_w(int which, int level)
 		c->latch[6] = 0x2 | 0x4;
 		c->latch[7] = 0x3 | 0x4;
 	}
-	gain_recalc(which);
+	gain_recalc(machine, which);
 }
 
 
-void MB87078_data_w(int which, int data, int dsel)
+void MB87078_data_w(running_machine *machine, int which, int data, int dsel)
 {
 	struct MB87078 *c = chip + which;
 
@@ -152,7 +152,7 @@ void MB87078_data_w(int which, int data, int dsel)
 		c->channel_latch = data & 3;
 		c->latch[4+c->channel_latch] = data & 0x1f; //always zero bit 5
 	}
-	gain_recalc(which);
+	gain_recalc(machine, which);
 }
 
 

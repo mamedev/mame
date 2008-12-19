@@ -6,7 +6,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
 #include "sound/samples.h"
@@ -200,9 +199,9 @@ static void trigger_sample(running_machine *machine, UINT8 data)
 
 
 #ifdef UNUSED_FUNCTION
-void gottlieb_knocker(void)
+void gottlieb_knocker(running_machine *machine)
 {
-	if (!strcmp(Machine->gamedrv->name,"reactor"))	/* reactor */
+	if (!strcmp(machine->gamedrv->name,"reactor"))	/* reactor */
 	{
 	}
 	else if (sndti_exists(SOUND_SAMPLES, 0))	/* qbert */

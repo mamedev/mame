@@ -127,7 +127,7 @@ WRITE16_HANDLER( dynduke_control_w )
 		if (data&0x4) txt_enable = 0; else txt_enable = 1;
 		if (data&0x8) sprite_enable=0; else sprite_enable=1;
 
-		flip_screen_set(data & 0x40);
+		flip_screen_set(space->machine, data & 0x40);
 	}
 }
 
@@ -154,7 +154,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		sprite = buffered_spriteram16[offs+1];
 		sprite &= 0x3fff;
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;

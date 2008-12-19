@@ -108,7 +108,7 @@ WRITE8_HANDLER( ssozumo_scroll_w )
 
 WRITE8_HANDLER( ssozumo_flipscreen_w )
 {
-	flip_screen_set(data & 0x80);
+	flip_screen_set(space->machine, data & 0x80);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -154,7 +154,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			int sx = 239 - spriteram[offs + 3];
 			int sy = (240 - spriteram[offs + 2]) & 0xff;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

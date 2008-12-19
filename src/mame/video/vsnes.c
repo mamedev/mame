@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "includes/vsnes.h"
 
@@ -15,9 +14,9 @@ PALETTE_INIT( vsdual )
 	ppu2c0x_init_palette(machine, 8*4*16 );
 }
 
-static void ppu_irq( int num, int *ppu_regs )
+static void ppu_irq( running_machine *machine, int num, int *ppu_regs )
 {
-	cpu_set_input_line(Machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */

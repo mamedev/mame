@@ -803,7 +803,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 			break;
 
 		case 0x04:	/* FLIP */
-			flip_screen_set(bit);
+			flip_screen_set(space->machine, bit);
 			break;
 
 		case 0x06:	/* SOUND ON */

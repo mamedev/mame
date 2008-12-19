@@ -70,8 +70,8 @@ WRITE8_HANDLER( buggychl_ctrl_w )
     bit0 = VINV
 */
 
-	flip_screen_y_set(data & 0x01);
-	flip_screen_x_set(data & 0x02);
+	flip_screen_y_set(space->machine, data & 0x01);
+	flip_screen_x_set(space->machine, data & 0x02);
 
 	bg_on = data & 0x04;
 	sky_on = data & 0x08;
@@ -112,13 +112,13 @@ static void draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		int sx = offs % 32;
 		int sy = offs / 32;
 
-		if (flip_screen_x_get()) sx = 31 - sx;
-		if (flip_screen_y_get()) sy = 31 - sy;
+		if (flip_screen_x_get(machine)) sx = 31 - sx;
+		if (flip_screen_y_get(machine)) sy = 31 - sy;
 
 		drawgfx(tmpbitmap1,machine->gfx[0],
 				code,
 				2,
-				flip_screen_x_get(),flip_screen_y_get(),
+				flip_screen_x_get(machine),flip_screen_y_get(machine),
 				8*sx,8*sy,
 				NULL,TRANSPARENCY_NONE,0);
 	}
@@ -151,13 +151,13 @@ static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 		int code = videoram[offs];
 
-		if (flip_screen_x_get()) sx = 31 - sx;
-		if (flip_screen_y_get()) sy = 31 - sy;
+		if (flip_screen_x_get(machine)) sx = 31 - sx;
+		if (flip_screen_y_get(machine)) sy = 31 - sy;
 
 		drawgfx(bitmap,machine->gfx[0],
 				code,
 				0,
-				flip_screen_x_get(),flip_screen_y_get(),
+				flip_screen_x_get(machine),flip_screen_y_get(machine),
 				8*sx,8*sy,
 				cliprect,transp,0);
 	}
@@ -190,7 +190,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		for (y = 0;y < 64;y++)
 		{
-			int dy = flip_screen_y_get() ? (255 - sy - y) : (sy + y);
+			int dy = flip_screen_y_get(machine) ? (255 - sy - y) : (sy + y);
 
 			if ((dy & ~0xff) == 0)
 			{
@@ -219,7 +219,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						col = pendata[x];
 						if (col)
 						{
-							int dx = flip_screen_x_get() ? (255 - sx - px) : (sx + px);
+							int dx = flip_screen_x_get(machine) ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
 								*BITMAP_ADDR16(bitmap, dy, dx) = sprite_color_base + col;
 						}

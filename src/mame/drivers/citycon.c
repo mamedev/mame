@@ -25,7 +25,7 @@ VIDEO_START( citycon );
 
 static READ8_HANDLER( citycon_in_r )
 {
-	return input_port_read(space->machine, flip_screen_get() ? "P2" : "P1");
+	return input_port_read(space->machine, flip_screen_get(space->machine) ? "P2" : "P1");
 }
 
 

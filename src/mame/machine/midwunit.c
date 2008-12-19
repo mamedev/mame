@@ -5,7 +5,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/m6809/m6809.h"
 #include "audio/dcs.h"
@@ -30,7 +29,7 @@ static UINT8	security_bits;
 
 /* prototype */
 static READ16_HANDLER( midwunit_sound_state_r );
-static void midxunit_dcs_output_full(int state);
+static void midxunit_dcs_output_full(running_machine *machine, int state);
 
 
 
@@ -254,11 +253,11 @@ READ16_HANDLER( midxunit_status_r )
  *
  *************************************/
 
-void midxunit_dcs_output_full(int state)
+static void midxunit_dcs_output_full(running_machine *machine, int state)
 {
 	/* only signal if not in loopback state */
 	if (uart[1] != 0x66)
-		cpu_set_input_line(Machine->cpu[0], 1, state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -647,14 +646,14 @@ MACHINE_RESET( midxunit )
 
 READ16_HANDLER( midwunit_security_r )
 {
-	return midway_serial_pic_r();
+	return midway_serial_pic_r(space);
 }
 
 
 WRITE16_HANDLER( midwunit_security_w )
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midway_serial_pic_w(data);
+		midway_serial_pic_w(space, data);
 }
 
 
@@ -668,7 +667,7 @@ WRITE16_HANDLER( midxunit_security_w )
 WRITE16_HANDLER( midxunit_security_clock_w )
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midway_serial_pic_w(((~data & 2) << 3) | security_bits);
+		midway_serial_pic_w(space, ((~data & 2) << 3) | security_bits);
 }
 
 

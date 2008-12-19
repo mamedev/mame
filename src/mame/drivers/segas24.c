@@ -347,7 +347,7 @@ Notes:
 
 UINT16* s24_mainram1;
 
-extern void s24_fd1094_machine_init(void);
+extern void s24_fd1094_machine_init(running_machine *machine);
 extern void s24_fd1094_driver_init(running_machine *machine);
 
 VIDEO_START(system24);
@@ -697,7 +697,7 @@ static void reset_reset(running_machine *machine)
 			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 //          mame_printf_debug("enable 2nd cpu!\n");
 //          debugger_break(machine);
-			s24_fd1094_machine_init();
+			s24_fd1094_machine_init(machine);
 
 		} else
 			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);

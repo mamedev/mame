@@ -922,7 +922,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "cpu/h83002/h8.h"
 #include "includes/psx.h"
@@ -1016,9 +1015,8 @@ static WRITE32_HANDLER( dmaoffset_w )
 	verboselog( space->machine, 1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_dmaoffset );
 }
 
-static void namcos12_rom_read( UINT32 n_address, INT32 n_size )
+static void namcos12_rom_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	running_machine *machine = Machine;
 	const char *n_region;
 	int n_offset;
 

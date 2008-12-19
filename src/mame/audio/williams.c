@@ -23,7 +23,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "cpu/m6809/m6809.h"
 #include "williams.h"
@@ -259,9 +258,8 @@ MACHINE_DRIVER_END
     INITIALIZATION
 ****************************************************************************/
 
-void williams_cvsd_init(int pianum)
+void williams_cvsd_init(running_machine *machine, int pianum)
 {
-	running_machine *machine = Machine;
 	UINT8 *ROM;
 	int bank;
 
@@ -296,17 +294,17 @@ void williams_cvsd_init(int pianum)
 }
 
 
-void williams_narc_init(void)
+void williams_narc_init(running_machine *machine)
 {
 	UINT8 *ROM;
 	int bank;
 
 	/* configure the CPU */
-	sound_cpu = cputag_get_cpu(Machine, "narc1");
-	soundalt_cpu = cputag_get_cpu(Machine, "narc2");
+	sound_cpu = cputag_get_cpu(machine, "narc1");
+	soundalt_cpu = cputag_get_cpu(machine, "narc2");
 
 	/* configure master CPU banks */
-	ROM = memory_region(Machine, "narc1");
+	ROM = memory_region(machine, "narc1");
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -315,12 +313,12 @@ void williams_narc_init(void)
             D3 -> A16
          */
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		memory_configure_bank(Machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bankptr(sound_cpu->machine, 6, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	memory_set_bankptr(machine, 6, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* configure slave CPU banks */
-	ROM = memory_region(Machine, "narc2");
+	ROM = memory_region(machine, "narc2");
 	for (bank = 0; bank < 16; bank++)
 	{
 		/*
@@ -329,33 +327,33 @@ void williams_narc_init(void)
             D3 -> A16
         */
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		memory_configure_bank(Machine, 7, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(machine, 7, bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bankptr(sound_cpu->machine, 8, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	memory_set_bankptr(machine, 8, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* register for save states */
-	state_save_register_global(sound_cpu->machine, williams_sound_int_state);
-	state_save_register_global(sound_cpu->machine, audio_talkback);
-	state_save_register_global(sound_cpu->machine, audio_sync);
+	state_save_register_global(machine, williams_sound_int_state);
+	state_save_register_global(machine, audio_talkback);
+	state_save_register_global(machine, audio_sync);
 }
 
 
-void williams_adpcm_init(void)
+void williams_adpcm_init(running_machine *machine)
 {
 	UINT8 *ROM;
 
 	/* configure the CPU */
-	sound_cpu = cputag_get_cpu(Machine, "adpcm");
+	sound_cpu = cputag_get_cpu(machine, "adpcm");
 	soundalt_cpu = NULL;
 
 	/* configure banks */
-	ROM = memory_region(Machine, "adpcm");
-	memory_configure_bank(Machine, 5, 0, 8, &ROM[0x10000], 0x8000);
-	memory_set_bankptr(sound_cpu->machine, 6, &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
+	ROM = memory_region(machine, "adpcm");
+	memory_configure_bank(machine, 5, 0, 8, &ROM[0x10000], 0x8000);
+	memory_set_bankptr(machine, 6, &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	/* expand ADPCM data */
 	/* it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000 */
-	ROM = memory_region(Machine, "oki");
+	ROM = memory_region(machine, "oki");
 	memcpy(ROM + 0x1c0000, ROM + 0x080000, 0x20000);	/* expand individual banks */
 	memcpy(ROM + 0x180000, ROM + 0x0a0000, 0x20000);
 	memcpy(ROM + 0x140000, ROM + 0x0c0000, 0x20000);
@@ -373,8 +371,8 @@ void williams_adpcm_init(void)
 	memcpy(ROM + 0x020000, ROM + 0x060000, 0x20000);
 
 	/* register for save states */
-	state_save_register_global(sound_cpu->machine, williams_sound_int_state);
-	state_save_register_global(sound_cpu->machine, audio_talkback);
+	state_save_register_global(machine, williams_sound_int_state);
+	state_save_register_global(machine, audio_talkback);
 }
 
 
@@ -477,9 +475,9 @@ static TIMER_CALLBACK( williams_cvsd_delayed_data_w )
 }
 
 
-void williams_cvsd_data_w(int data)
+void williams_cvsd_data_w(running_machine *machine, int data)
 {
-	timer_call_after_resynch(Machine, NULL, data, williams_cvsd_delayed_data_w);
+	timer_call_after_resynch(machine, NULL, data, williams_cvsd_delayed_data_w);
 }
 
 

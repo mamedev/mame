@@ -83,7 +83,6 @@ Hardware Info
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/5110intf.h"
@@ -252,10 +251,10 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 }
 
 
-static void cvs_dac_cpu_interrupt(void)
+static void cvs_dac_cpu_interrupt(running_machine *machine)
 {
-	cpu_set_input_line_vector(Machine->cpu[CVS_DAC_CPU_INDEX], 0, 0x03);
-	cpu_set_input_line(Machine->cpu[CVS_DAC_CPU_INDEX], 0, HOLD_LINE);
+	cpu_set_input_line_vector(machine->cpu[CVS_DAC_CPU_INDEX], 0, 0x03);
+	cpu_set_input_line(machine->cpu[CVS_DAC_CPU_INDEX], 0, HOLD_LINE);
 }
 
 
@@ -432,13 +431,14 @@ static WRITE8_HANDLER( cvs_tms5110_pdc_w )
 }
 
 
-static int speech_rom_read_bit(void)
+static int speech_rom_read_bit(const device_config *device)
 {
-	UINT8 *ROM = memory_region(Machine, "speechdata");
-    int bit;
+	running_machine *machine = device->machine;
+	UINT8 *ROM = memory_region(machine, "speechdata");
+	int bit;
 
 	/* before reading the bit, clamp the address to the region length */
-	speech_rom_bit_address = speech_rom_bit_address & ((memory_region_length(Machine, "speechdata") * 8) - 1);
+	speech_rom_bit_address = speech_rom_bit_address & ((memory_region_length(machine, "speechdata") * 8) - 1);
 	bit = (ROM[speech_rom_bit_address >> 3] >> (speech_rom_bit_address & 0x07)) & 0x01;
 
 	/* prepare for next bit */
@@ -468,7 +468,7 @@ static WRITE8_HANDLER( audio_command_w )
 	if (data & 0x80)
 	{
 	   	soundlatch_w(space, 0, data);
-		cvs_dac_cpu_interrupt();
+		cvs_dac_cpu_interrupt(space->machine);
 
 		LOG(("%04x : CVS: Audio command = %02x\n", cpu_get_pc(space->cpu), data));
 	}

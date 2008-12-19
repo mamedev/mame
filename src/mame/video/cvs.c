@@ -361,10 +361,10 @@ VIDEO_UPDATE( cvs )
 
 			if ((y & 1) ^ ((x >> 4) & 1))
 			{
-				if (flip_screen_x_get())
+				if (flip_screen_x_get(screen->machine))
 					x = ~x;
 
-				if (flip_screen_y_get())
+				if (flip_screen_y_get(screen->machine))
 					y = ~y;
 
 				if ((y >= cliprect->min_y) && (y <= cliprect->max_y) &&

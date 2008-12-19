@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 
@@ -191,7 +190,7 @@ static void dma_interrupt_update( running_machine *machine )
 	m_n_dicr &= 0x00ffffff | ( m_n_dicr << 8 );
 }
 
-static void dma_finished(running_machine *machine, int n_channel)
+static void dma_finished(const address_space *space, int n_channel)
 {
 	if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000401 && n_channel == 2 )
 	{
@@ -225,7 +224,7 @@ static void dma_finished(running_machine *machine, int n_channel)
 				n_address &= n_adrmask;
 				n_nextaddress = g_p_n_psxram[ n_address / 4 ];
 				n_size = n_nextaddress >> 24;
-				m_p_fn_dma_write[ n_channel ]( n_address + 4, n_size );
+				m_p_fn_dma_write[ n_channel ]( space->machine, n_address + 4, n_size );
 				//FIXME:
 				// The following conditions will cause an endless loop.
 				// If stopping the transfer is correct I cannot judge
@@ -247,13 +246,14 @@ static void dma_finished(running_machine *machine, int n_channel)
 	m_p_n_dmachannelcontrol[ n_channel ] &= ~( ( 1L << 0x18 ) | ( 1L << 0x1c ) );
 
 	m_n_dicr |= 1 << ( 24 + n_channel );
-	dma_interrupt_update(machine);
+	dma_interrupt_update(space->machine);
 	dma_stop_timer( n_channel );
 }
 
 static TIMER_CALLBACK( dma_finished_callback )
 {
-	dma_finished(machine, param);
+	const address_space *space = NULL;
+	dma_finished(space, param);
 }
 
 void psx_dma_install_read_handler( int n_channel, psx_dma_read_handler p_fn_dma_read )
@@ -312,45 +312,45 @@ WRITE32_HANDLER( psx_dma_w )
 					m_p_fn_dma_read[ n_channel ] != NULL )
 				{
 					verboselog( machine, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
-					m_p_fn_dma_read[ n_channel ]( n_address, n_size );
-					dma_finished( space->machine, n_channel );
+					m_p_fn_dma_read[ n_channel ]( space->machine, n_address, n_size );
+					dma_finished( space, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000200 &&
 					m_p_fn_dma_read[ n_channel ] != NULL )
 				{
 					verboselog( machine, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
-					m_p_fn_dma_read[ n_channel ]( n_address, n_size );
+					m_p_fn_dma_read[ n_channel ]( space->machine, n_address, n_size );
 					if( n_channel == 1 )
 					{
 						dma_start_timer( n_channel, 26000 );
 					}
 					else
 					{
-						dma_finished( space->machine, n_channel );
+						dma_finished( space, n_channel );
 					}
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000201 &&
 					m_p_fn_dma_write[ n_channel ] != NULL )
 				{
 					verboselog( machine, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
-					m_p_fn_dma_write[ n_channel ]( n_address, n_size );
-					dma_finished( space->machine, n_channel );
+					m_p_fn_dma_write[ n_channel ]( space->machine, n_address, n_size );
+					dma_finished( space, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11050100 &&
 					m_p_fn_dma_write[ n_channel ] != NULL )
 				{
 					/* todo: check this is a write not a read... */
 					verboselog( machine, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
-					m_p_fn_dma_write[ n_channel ]( n_address, n_size );
-					dma_finished( space->machine, n_channel );
+					m_p_fn_dma_write[ n_channel ]( space->machine, n_address, n_size );
+					dma_finished( space, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11150100 &&
 					m_p_fn_dma_write[ n_channel ] != NULL )
 				{
 					/* todo: check this is a write not a read... */
 					verboselog( machine, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
-					m_p_fn_dma_write[ n_channel ]( n_address, n_size );
-					dma_finished( space->machine, n_channel );
+					m_p_fn_dma_write[ n_channel ]( space->machine, n_address, n_size );
+					dma_finished( space, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000401 &&
 					n_channel == 2 &&
@@ -359,7 +359,7 @@ WRITE32_HANDLER( psx_dma_w )
 					verboselog( machine, 1, "dma %d write linked list %08x\n",
 						n_channel, m_p_n_dmabase[ n_channel ] );
 
-					dma_finished( space->machine, n_channel );
+					dma_finished( space, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11000002 &&
 					n_channel == 6 )
@@ -483,10 +483,10 @@ static UINT64 m_p_n_root_start[ 3 ];
 #define RC_CLC ( 0x100 )
 #define RC_DIV ( 0x200 )
 
-static UINT64 psxcpu_gettotalcycles( void )
+static UINT64 psxcpu_gettotalcycles( running_machine *machine )
 {
 	/* TODO: should return the start of the current tick. */
-	return cpu_get_total_cycles(Machine->cpu[0]) * 2;
+	return cpu_get_total_cycles(machine->cpu[0]) * 2;
 }
 
 static int root_divider( int n_counter )
@@ -507,7 +507,7 @@ static int root_divider( int n_counter )
 	return 1;
 }
 
-static UINT16 root_current( int n_counter )
+static UINT16 root_current( running_machine *machine, int n_counter )
 {
 	if( ( m_p_n_root_mode[ n_counter ] & RC_STOP ) != 0 )
 	{
@@ -516,14 +516,14 @@ static UINT16 root_current( int n_counter )
 	else
 	{
 		UINT64 n_current;
-		n_current = psxcpu_gettotalcycles() - m_p_n_root_start[ n_counter ];
+		n_current = psxcpu_gettotalcycles(machine) - m_p_n_root_start[ n_counter ];
 		n_current /= root_divider( n_counter );
 		n_current += m_p_n_root_count[ n_counter ];
 		if( n_current > 0xffff )
 		{
 			/* TODO: use timer for wrap on 0x10000. */
 			m_p_n_root_count[ n_counter ] = n_current;
-			m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles();
+			m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(machine);
 		}
 		return n_current;
 	}
@@ -539,7 +539,7 @@ static int root_target( int n_counter )
 	return 0x10000;
 }
 
-static void root_timer_adjust( int n_counter )
+static void root_timer_adjust( running_machine *machine, int n_counter )
 {
 	if( ( m_p_n_root_mode[ n_counter ] & RC_STOP ) != 0 )
 	{
@@ -549,7 +549,7 @@ static void root_timer_adjust( int n_counter )
 	{
 		int n_duration;
 
-		n_duration = root_target( n_counter ) - root_current( n_counter );
+		n_duration = root_target( n_counter ) - root_current( machine, n_counter );
 		if( n_duration < 1 )
 		{
 			n_duration += 0x10000;
@@ -565,16 +565,16 @@ static TIMER_CALLBACK( root_finished )
 {
 	int n_counter = param;
 
-	verboselog( machine, 2, "root_finished( %d ) %04x\n", n_counter, root_current( n_counter ) );
+	verboselog( machine, 2, "root_finished( %d ) %04x\n", n_counter, root_current( machine, n_counter ) );
 //  if( ( m_p_n_root_mode[ n_counter ] & RC_COUNTTARGET ) != 0 )
 	{
 		/* TODO: wrap should be handled differently as RC_COUNTTARGET & RC_IRQTARGET don't have to be the same. */
 		m_p_n_root_count[ n_counter ] = 0;
-		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles();
+		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(machine);
 	}
 	if( ( m_p_n_root_mode[ n_counter ] & RC_REPEAT ) != 0 )
 	{
-		root_timer_adjust( n_counter );
+		root_timer_adjust( machine, n_counter );
 	}
 	if( ( m_p_n_root_mode[ n_counter ] & RC_IRQOVERFLOW ) != 0 ||
 		( m_p_n_root_mode[ n_counter ] & RC_IRQTARGET ) != 0 )
@@ -595,11 +595,11 @@ WRITE32_HANDLER( psx_counter_w )
 	{
 	case 0:
 		m_p_n_root_count[ n_counter ] = data;
-		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles();
+		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(space->machine);
 		break;
 	case 1:
-		m_p_n_root_count[ n_counter ] = root_current( n_counter );
-		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles();
+		m_p_n_root_count[ n_counter ] = root_current( space->machine, n_counter );
+		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(space->machine);
 		m_p_n_root_mode[ n_counter ] = data;
 
 		if( ( m_p_n_root_mode[ n_counter ] & RC_RESET ) != 0 )
@@ -621,7 +621,7 @@ WRITE32_HANDLER( psx_counter_w )
 		return;
 	}
 
-	root_timer_adjust( n_counter );
+	root_timer_adjust( space->machine, n_counter );
 }
 
 READ32_HANDLER( psx_counter_r )
@@ -634,7 +634,7 @@ READ32_HANDLER( psx_counter_r )
 	switch( offset % 4 )
 	{
 	case 0:
-		data = root_current( n_counter );
+		data = root_current( space->machine, n_counter );
 		break;
 	case 1:
 		data = m_p_n_root_mode[ n_counter ];
@@ -701,9 +701,8 @@ static void sio_interrupt( running_machine *machine, int n_port )
 	}
 }
 
-static void sio_timer_adjust( int n_port )
+static void sio_timer_adjust( running_machine *machine, int n_port )
 {
-	running_machine *machine = Machine;
 	attotime n_time;
 	if( ( m_p_n_sio_status[ n_port ] & SIO_STATUS_TX_EMPTY ) == 0 || m_p_n_sio_tx_bits[ n_port ] != 0 )
 	{
@@ -775,10 +774,10 @@ static TIMER_CALLBACK( sio_clock )
 			if( n_port == 0 )
 			{
 				m_p_n_sio_tx[ n_port ] &= ~PSX_SIO_OUT_CLOCK;
-				m_p_f_sio_handler[ n_port ]( m_p_n_sio_tx[ n_port ] );
+				m_p_f_sio_handler[ n_port ]( machine, m_p_n_sio_tx[ n_port ] );
 				m_p_n_sio_tx[ n_port ] |= PSX_SIO_OUT_CLOCK;
 			}
-			m_p_f_sio_handler[ n_port ]( m_p_n_sio_tx[ n_port ] );
+			m_p_f_sio_handler[ n_port ]( machine, m_p_n_sio_tx[ n_port ] );
 		}
 
 		if( m_p_n_sio_tx_bits[ n_port ] == 0 &&
@@ -811,7 +810,7 @@ static TIMER_CALLBACK( sio_clock )
 		}
 	}
 
-	sio_timer_adjust( n_port );
+	sio_timer_adjust( machine, n_port );
 }
 
 void psx_sio_input( running_machine *machine, int n_port, int n_mask, int n_data )
@@ -849,7 +848,7 @@ WRITE32_HANDLER( psx_sio_w )
 		m_p_n_sio_tx_data[ n_port ] = data;
 		m_p_n_sio_status[ n_port ] &= ~( SIO_STATUS_TX_RDY );
 		m_p_n_sio_status[ n_port ] &= ~( SIO_STATUS_TX_EMPTY );
-		sio_timer_adjust( n_port );
+		sio_timer_adjust( machine, n_port );
 		break;
 	case 1:
 		verboselog( machine, 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
@@ -890,7 +889,7 @@ WRITE32_HANDLER( psx_sio_w )
 			{
 				if( m_p_f_sio_handler[ n_port ] != NULL )
 				{
-					m_p_f_sio_handler[ n_port ]( m_p_n_sio_tx[ n_port ] );
+					m_p_f_sio_handler[ n_port ]( space->machine, m_p_n_sio_tx[ n_port ] );
 				}
 			}
 			m_p_n_sio_tx_prev[ n_port ] = m_p_n_sio_tx[ n_port ];
@@ -1339,9 +1338,8 @@ static void mdec_yuv2_to_rgb24( void )
 	mdec_decoded = ( 24 * 16 ) / 2;
 }
 
-static void mdec0_write( UINT32 n_address, INT32 n_size )
+static void mdec0_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	running_machine *machine = Machine;
 	int n_index;
 
 	verboselog( machine, 2, "mdec0_write( %08x, %08x )\n", n_address, n_size );
@@ -1396,12 +1394,12 @@ static void mdec0_write( UINT32 n_address, INT32 n_size )
 	}
 }
 
-static void mdec1_read( UINT32 n_address, INT32 n_size )
+static void mdec1_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
 	UINT32 n_this;
 	UINT32 n_nextaddress;
 
-	verboselog( Machine, 2, "mdec1_read( %08x, %08x )\n", n_address, n_size );
+	verboselog( machine, 2, "mdec1_read( %08x, %08x )\n", n_address, n_size );
 	if( ( m_n_mdec0_command & ( 1L << 29 ) ) != 0 && m_n_mdec0_size != 0 )
 	{
 		while( n_size > 0 )
@@ -1484,14 +1482,14 @@ READ32_HANDLER( psx_mdec_r )
 	return 0;
 }
 
-static void gpu_read( UINT32 n_address, INT32 n_size )
+static void gpu_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	psx_gpu_read( &g_p_n_psxram[ n_address / 4 ], n_size );
+	psx_gpu_read( machine, &g_p_n_psxram[ n_address / 4 ], n_size );
 }
 
-static void gpu_write( UINT32 n_address, INT32 n_size )
+static void gpu_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	psx_gpu_write( &g_p_n_psxram[ n_address / 4 ], n_size );
+	psx_gpu_write( machine, &g_p_n_psxram[ n_address / 4 ], n_size );
 }
 
 void psx_machine_init( running_machine *machine )
@@ -1551,12 +1549,12 @@ static STATE_POSTLOAD( psx_postload )
 
 	for( n = 0; n < 3; n++ )
 	{
-		root_timer_adjust( n );
+		root_timer_adjust( machine, n );
 	}
 
 	for( n = 0; n < 2; n++ )
 	{
-		sio_timer_adjust( n );
+		sio_timer_adjust( machine, n );
 	}
 
 	mdec_cos_precalc();

@@ -77,9 +77,9 @@ static void gpworld_draw_tiles(running_machine *machine, bitmap_t *bitmap,const 
 	}
 }
 
-INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int color)
+INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int color,int flip)
 {
-	if (flip_screen_get())
+	if (flip)
 	{
 		x = bitmap->width - x - 1;
 		y = bitmap->height - y - 1;
@@ -104,6 +104,7 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	const int SPR_SKIP_HI   = 5;
 	const int SPR_GFXOFS_LO = 6;
 	const int SPR_GFXOFS_HI = 7;
+	int flip = flip_screen_get(machine);
 
 	int i;
 
@@ -134,7 +135,7 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
             logerror("%02x %02x %02x %02x %02x %02x %02x %02x\n", spr_reg[SPR_Y_TOP], spr_reg[SPR_Y_BOTTOM], spr_reg[SPR_X_LO], spr_reg[SPR_X_HI],
                                                                   spr_reg[SPR_SKIP_LO], spr_reg[SPR_SKIP_HI], spr_reg[SPR_GFXOFS_LO], spr_reg[SPR_GFXOFS_HI]);
-            draw_pixel(bitmap,cliprect,sx,sy,0xffffffff);
+            draw_pixel(bitmap,cliprect,sx,sy,0xffffffff,flip);
 */
 
 			for (row = 0; row < height; row++)
@@ -180,10 +181,10 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 					}
 
 					/* Daphne says "don't draw the pixel if it's black". */
-					draw_pixel(bitmap,cliprect,x+0,y,palette_get_color(machine, pixel1 + (sprite_color*0x10 + 0x200)));
-					draw_pixel(bitmap,cliprect,x+1,y,palette_get_color(machine, pixel2 + (sprite_color*0x10 + 0x200)));
-					draw_pixel(bitmap,cliprect,x+2,y,palette_get_color(machine, pixel3 + (sprite_color*0x10 + 0x200)));
-					draw_pixel(bitmap,cliprect,x+3,y,palette_get_color(machine, pixel4 + (sprite_color*0x10 + 0x200)));
+					draw_pixel(bitmap,cliprect,x+0,y,palette_get_color(machine, pixel1 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+1,y,palette_get_color(machine, pixel2 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+2,y,palette_get_color(machine, pixel3 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+3,y,palette_get_color(machine, pixel4 + (sprite_color*0x10 + 0x200)),flip);
 
 					x += 4;
 

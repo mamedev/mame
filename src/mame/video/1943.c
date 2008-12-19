@@ -153,7 +153,7 @@ WRITE8_HANDLER( c1943_c804_w )
 	/* bit 5 resets the sound CPU - we ignore it */
 
 	/* bit 6 flips screen */
-	flip_screen_set(data & 0x40);
+	flip_screen_set(space->machine, data & 0x40);
 
 	/* bit 7 enables characters */
 	chon = data & 0x80;
@@ -234,7 +234,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx = spriteram[offs + 3] - ((attr & 0x10) << 4);
 		int sy = spriteram[offs + 2];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -245,7 +245,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			if (color != 0x0a && color != 0x0b)
 			{
-				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen_get(), flip_screen_get(),
+				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine),
 					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 			}
 		}
@@ -253,7 +253,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			if (color == 0x0a || color == 0x0b)
 			{
-				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen_get(), flip_screen_get(),
+				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen_get(machine), flip_screen_get(machine),
 					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 			}
 		}

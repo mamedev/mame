@@ -261,7 +261,7 @@ static READ8_HANDLER( rampage_ip4_r )
 static WRITE8_HANDLER( rampage_op6_w )
 {
 	/* bit 5 controls reset of the Sounds Good board */
-	soundsgood_reset_w((~data >> 5) & 1);
+	soundsgood_reset_w(space->machine, (~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
 	soundsgood_data_w(space, offset, data);
@@ -305,7 +305,7 @@ static WRITE8_HANDLER( powerdrv_op5_w )
 static WRITE8_HANDLER( powerdrv_op6_w )
 {
 	/* bit 5 controls reset of the Sounds Good board */
-	soundsgood_reset_w((~data >> 5) & 1);
+	soundsgood_reset_w(space->machine, (~data >> 5) & 1);
 
 	/* low 5 bits go directly to the Sounds Good board */
 	soundsgood_data_w(space, offset, data);
@@ -348,7 +348,7 @@ static WRITE8_HANDLER( stargrds_op5_w )
 static WRITE8_HANDLER( stargrds_op6_w )
 {
 	/* bit 6 controls reset of the Sounds Good board */
-	soundsgood_reset_w((~data >> 6) & 1);
+	soundsgood_reset_w(space->machine, (~data >> 6) & 1);
 
 	/* unline the other games, the STROBE is in the high bit instead of the low bit */
 	soundsgood_data_w(space, offset, (data << 1) | (data >> 7));

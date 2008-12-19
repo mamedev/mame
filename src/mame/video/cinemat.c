@@ -63,10 +63,10 @@ void cinemat_vector_callback(const device_config *device, INT16 sx, INT16 sy, IN
 
 	/* move to the starting position if we're not there already */
 	if (sx != lastx || sy != lasty)
-		vector_add_point(sx << 16, sy << 16, 0, 0);
+		vector_add_point(device->machine, sx << 16, sy << 16, 0, 0);
 
 	/* draw the vector */
-	vector_add_point(ex << 16, ey << 16, vector_color, intensity);
+	vector_add_point(device->machine, ex << 16, ey << 16, vector_color, intensity);
 
 	/* remember the last point */
 	lastx = ex;

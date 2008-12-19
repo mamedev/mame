@@ -66,7 +66,7 @@ static WRITE8_HANDLER( sound_cpu_command_w )
 
 static WRITE8_HANDLER( shootout_flipscreen_w )
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 }
 
 static WRITE8_HANDLER( shootout_coin_counter_w )

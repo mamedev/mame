@@ -375,20 +375,20 @@ static WRITE32_HANDLER( bit_reset_w )
 
 static READ32_HANDLER( offroadc_serial_status_r )
 {
-	int status = midway_serial_pic2_status_r();
+	int status = midway_serial_pic2_status_r(space);
 	return (input_port_read(space->machine, "991030")  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
 static READ32_HANDLER( offroadc_serial_data_r )
 {
-	return midway_serial_pic2_r() << 16;
+	return midway_serial_pic2_r(space) << 16;
 }
 
 
 static WRITE32_HANDLER( offroadc_serial_data_w )
 {
-	midway_serial_pic2_w(space->machine, data >> 16);
+	midway_serial_pic2_w(space, data >> 16);
 }
 
 

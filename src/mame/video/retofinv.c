@@ -147,7 +147,7 @@ WRITE8_HANDLER( retofinv_gfx_ctrl_w )
 	switch (offset)
 	{
 		case 0:
-			flip_screen_set(data & 1);
+			flip_screen_set(space->machine, data & 1);
 			break;
 
 		case 1:
@@ -206,7 +206,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			flipx ^= 1;
 			flipy ^= 1;

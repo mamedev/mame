@@ -10,7 +10,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms32031/tms32031.h"
 #include "sound/dmadac.h"
 #include "cage.h"
@@ -193,7 +192,7 @@ void cage_set_irq_handler(void (*irqhandler)(running_machine *, int))
 void cage_reset_w(int state)
 {
 	if (state)
-		cage_control_w(Machine, 0);
+		cage_control_w(cage_cpu->machine, 0);
 	cpu_set_input_line(cage_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -529,9 +528,10 @@ static TIMER_CALLBACK( deferred_cage_w )
 
 void main_to_cage_w(UINT16 data)
 {
+	running_machine *machine = cage_cpu->machine;
 	if (LOG_COMM)
-		logerror("%s:Command to CAGE = %04X\n", cpuexec_describe_context(Machine), data);
-	timer_call_after_resynch(Machine, NULL, data, deferred_cage_w);
+		logerror("%s:Command to CAGE = %04X\n", cpuexec_describe_context(machine), data);
+	timer_call_after_resynch(machine, NULL, data, deferred_cage_w);
 }
 
 

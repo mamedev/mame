@@ -79,10 +79,10 @@ typedef enum
 } ppu_t;
 
 /* callback datatypes */
-typedef void (*ppu2c0x_scanline_cb)( int num, int scanline, int vblank, int blanked );
-typedef void (*ppu2c0x_hblank_cb)( int num, int scanline, int vblank, int blanked );
-typedef void (*ppu2c0x_nmi_cb)( int num, int *ppu_regs );
-typedef int  (*ppu2c0x_vidaccess_cb)( int num, int address, int data );
+typedef void (*ppu2c0x_scanline_cb)( running_machine *machine, int num, int scanline, int vblank, int blanked );
+typedef void (*ppu2c0x_hblank_cb)( running_machine *machine, int num, int scanline, int vblank, int blanked );
+typedef void (*ppu2c0x_nmi_cb)( running_machine *machine, int num, int *ppu_regs );
+typedef int  (*ppu2c0x_vidaccess_cb)( running_machine *machine, int num, int address, int data );
 
 typedef struct _ppu2c0x_interface ppu2c0x_interface;
 struct _ppu2c0x_interface
@@ -118,8 +118,8 @@ void ppu2c0x_set_scanlines_per_frame( int num, int scanlines );
 //27/12/2002
 extern void (*ppu_latch)( offs_t offset );
 
-void ppu2c0x_w( int num, offs_t offset, UINT8 data );
-int ppu2c0x_r( int num, offs_t offset );
+void ppu2c0x_w( const address_space *space, offs_t offset, UINT8 data, int num );
+int ppu2c0x_r( const address_space *space, offs_t offset, int num );
 
 /* accesors */
 READ8_HANDLER( ppu2c0x_0_r );

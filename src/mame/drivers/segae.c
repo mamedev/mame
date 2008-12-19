@@ -297,7 +297,6 @@ covert megatech / megaplay drivers to use new code etc. etc.
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "machine/mc8123.h"
 #include "machine/segacrpt.h"
@@ -571,38 +570,38 @@ enum
 	GEN_VDP = 3   // Genesis VDP running in SMS2 Mode
 };
 
-static int sms_vdp_null_irq_callback(int status)
+static int sms_vdp_null_irq_callback(running_machine *machine, int status)
 {
 	return -1;
 }
 
-static int sms_vdp_cpu0_irq_callback(int status)
+static int sms_vdp_cpu0_irq_callback(running_machine *machine, int status)
 {
 	if (status==1)
-		cpu_set_input_line(Machine->cpu[0],0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0],0,HOLD_LINE);
 	else
-		cpu_set_input_line(Machine->cpu[0],0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0],0,CLEAR_LINE);
 
 	return 0;
 }
 
-static int sms_vdp_cpu1_irq_callback(int status)
+static int sms_vdp_cpu1_irq_callback(running_machine *machine, int status)
 {
 	if (status==1)
-		cpu_set_input_line(Machine->cpu[1],0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 	else
-		cpu_set_input_line(Machine->cpu[1],0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
 
 	return 0;
 }
 
 
-static int sms_vdp_cpu2_irq_callback(int status)
+static int sms_vdp_cpu2_irq_callback(running_machine *machine, int status)
 {
 	if (status==1)
-		cpu_set_input_line(Machine->cpu[2],0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[2],0,HOLD_LINE);
 	else
-		cpu_set_input_line(Machine->cpu[2],0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
 
 	return 0;
 }
@@ -649,7 +648,7 @@ struct sms_vdp
 	int sms_framerate;
 	emu_timer* sms_scanline_timer;
 	UINT16* cram_mamecolours; // for use on RGB_DIRECT screen
-	int	 (*set_irq)(int state);
+	int	 (*set_irq)(running_machine *machine, int state);
 
 };
 
@@ -688,7 +687,7 @@ static void *start_vdp(running_machine *machine, int type)
 	chip->vram = auto_malloc(0x4000);
 	memset(chip->vram,0x00,0x4000);
 
-	//printf("%d\n", (*chip->set_irq)(200));
+	//printf("%d\n", (*chip->set_irq)(machine, 200));
 
 	if (chip->vdp_type==GG_VDP)
 	{
@@ -826,7 +825,7 @@ static void vdp_data_w(const address_space *space, UINT8 data, struct sms_vdp* c
 
 }
 
-static UINT8 vdp_ctrl_r(struct sms_vdp *chip)
+static UINT8 vdp_ctrl_r(const address_space *space, struct sms_vdp *chip)
 {
 	UINT8 retvalue;
 
@@ -840,7 +839,7 @@ static UINT8 vdp_ctrl_r(struct sms_vdp *chip)
 	chip->sprite_collision = 0;
 	chip->sprite_overflow = 0;
 
-	(chip->set_irq)(0); // clear IRQ;
+	(chip->set_irq)(space->machine, 0); // clear IRQ;
 
 
 	return retvalue;
@@ -853,7 +852,7 @@ static void vdp_update_code_addr_regs(struct sms_vdp *chip)
 	chip->cmd_reg = (chip->cmd_part2&0xc0)>>6;
 }
 
-static void vdp_set_register(struct sms_vdp *chip)
+static void vdp_set_register(running_machine *machine, struct sms_vdp *chip)
 {
 	UINT8 reg = chip->cmd_part2&0x0f;
 	chip->regs[reg] = chip->cmd_part1;
@@ -866,11 +865,11 @@ static void vdp_set_register(struct sms_vdp *chip)
 	{
 		if ((chip->regs[0x1]&0x20) && chip->frame_irq_pending)
 		{
-			(chip->set_irq)(1); // set IRQ;
+			(chip->set_irq)(machine, 1); // set IRQ;
 		}
 		else
 		{
-			(chip->set_irq)(0); // clear IRQ;
+			(chip->set_irq)(machine, 0); // clear IRQ;
 		}
 	}
 
@@ -878,11 +877,11 @@ static void vdp_set_register(struct sms_vdp *chip)
 	{
 		if ((chip->regs[0x0]&0x10) && chip->line_irq_pending)
 		{
-			(chip->set_irq)(1); // set IRQ;
+			(chip->set_irq)(machine, 1); // set IRQ;
 		}
 		else
 		{
-			(chip->set_irq)(0); // clear IRQ;
+			(chip->set_irq)(machine, 0); // clear IRQ;
 		}
 	}
 
@@ -890,7 +889,7 @@ static void vdp_set_register(struct sms_vdp *chip)
 //  printf("VDP: setting register %01x to %02x\n",reg, chip->cmd_part1);
 }
 
-static void vdp_ctrl_w(UINT8 data, struct sms_vdp *chip)
+static void vdp_ctrl_w(const address_space *space, UINT8 data, struct sms_vdp *chip)
 {
 	if (chip->cmd_pend)
 	{ /* Part 2 of a command word write */
@@ -911,7 +910,7 @@ static void vdp_ctrl_w(UINT8 data, struct sms_vdp *chip)
 				break;
 
 			case 0x2: /* REG setting */
-				vdp_set_register(chip);
+				vdp_set_register(space->machine, chip);
 				chip->writemode = 0;
 				break;
 
@@ -947,12 +946,12 @@ WRITE8_HANDLER( md_sms_vdp_data_w )
 
 READ8_HANDLER( md_sms_vdp_ctrl_r )
 {
-	return vdp_ctrl_r(md_sms_vdp);
+	return vdp_ctrl_r(space, md_sms_vdp);
 }
 
 WRITE8_HANDLER( md_sms_vdp_ctrl_w )
 {
-	vdp_ctrl_w(data, md_sms_vdp);
+	vdp_ctrl_w(space, data, md_sms_vdp);
 }
 
 
@@ -975,12 +974,12 @@ WRITE8_HANDLER( sms_vdp_data_w )
 
 READ8_HANDLER( sms_vdp_ctrl_r )
 {
-	return vdp_ctrl_r(vdp1);
+	return vdp_ctrl_r(space, vdp1);
 }
 
 WRITE8_HANDLER( sms_vdp_ctrl_w )
 {
-	vdp_ctrl_w(data, vdp1);
+	vdp_ctrl_w(space, data, vdp1);
 }
 
 WRITE8_HANDLER( sms_sn76496_w )
@@ -1314,11 +1313,11 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
 				chip->hint_counter=chip->regs[0xa];
 				if (chip->regs[0x0]&0x10)
 				{
-					(chip->set_irq)(1); // set IRQ;
+					(chip->set_irq)(machine, 1); // set IRQ;
 				}
 				else
 				{
-					(chip->set_irq)(0); // clear IRQ;
+					(chip->set_irq)(machine, 0); // clear IRQ;
 				}
 			}
 
@@ -1334,11 +1333,11 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
 			chip->frame_irq_pending = 1;
 			if (chip->regs[0x1]&0x20)
 			{
-				(chip->set_irq)(1); // set IRQ;
+				(chip->set_irq)(machine, 1); // set IRQ;
 			}
 			else
 			{
-				(chip->set_irq)(0); // clear IRQ;
+				(chip->set_irq)(machine, 0); // clear IRQ;
 			}
 		}
 	}
@@ -2093,12 +2092,12 @@ static WRITE8_HANDLER( sms_vdp_2_data_w )
 
 static READ8_HANDLER( sms_vdp_2_ctrl_r )
 {
-	return vdp_ctrl_r(vdp2);
+	return vdp_ctrl_r(space, vdp2);
 }
 
 static WRITE8_HANDLER( sms_vdp_2_ctrl_w )
 {
-	vdp_ctrl_w(data, vdp2);
+	vdp_ctrl_w(space, data, vdp2);
 }
 
 static WRITE8_HANDLER( segasyse_videoram_w )

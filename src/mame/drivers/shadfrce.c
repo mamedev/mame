@@ -107,7 +107,7 @@ static int vblank = 0;
 
 static WRITE16_HANDLER( shadfrce_flip_screen )
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 }
 
 

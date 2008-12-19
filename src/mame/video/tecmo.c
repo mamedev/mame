@@ -151,7 +151,7 @@ WRITE8_HANDLER( tecmo_bgscroll_w )
 
 WRITE8_HANDLER( tecmo_flipscreen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 
@@ -201,7 +201,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			flipx = bank & 1;
 			flipy = bank & 2;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				xpos = 256 - (8 * size) - xpos;
 				ypos = 256 - (8 * size) - ypos;

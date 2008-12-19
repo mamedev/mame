@@ -1167,7 +1167,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 
 static DRIVER_INIT(gticlub)
 {
-	init_konami_cgboard(1, CGBOARD_TYPE_GTICLUB);
+	init_konami_cgboard(machine, 1, CGBOARD_TYPE_GTICLUB);
 
 	sharc_dataram_0 = auto_malloc(0x100000);
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
@@ -1181,9 +1181,9 @@ static DRIVER_INIT(gticlub)
 
 static DRIVER_INIT(hangplt)
 {
-	init_konami_cgboard(2, CGBOARD_TYPE_HANGPLT);
-	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
-	set_cgboard_texture_bank(1, 6, memory_region(machine, "user5"));
+	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HANGPLT);
+	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
+	set_cgboard_texture_bank(machine, 1, 6, memory_region(machine, "user5"));
 
 	sharc_dataram_0 = auto_malloc(0x100000);
 	sharc_dataram_1 = auto_malloc(0x100000);

@@ -88,7 +88,7 @@ WRITE8_HANDLER( gunsmoke_c804_w )
 	/* bit 5 resets the sound CPU? - we ignore it */
 
 	/* bit 6 flips screen */
-	flip_screen_set(data & 0x40);
+	flip_screen_set(space->machine, data & 0x40);
 
 	/* bit 7 enables characters? */
 	chon = data & 0x80;
@@ -167,7 +167,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (bank == 3) bank += sprite3bank;
 		code += 256 * bank;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

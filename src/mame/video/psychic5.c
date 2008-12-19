@@ -341,7 +341,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (attr & 0x01) sx -= 256;
 		if (attr & 0x04) sy -= 256;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 224 - sx;
 			sy = 224 - sy;
@@ -366,7 +366,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		}
 		else
 		{
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 				DRAW_SPRITE(code, sx + 16, sy + 16)
 			else
 				DRAW_SPRITE(code, sx, sy)
@@ -423,7 +423,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		case 11: case 13: clip.max_x = sx1; break;
 		}
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			int min_x,max_x,min_y,max_y;
 			min_x = 255 - clip.max_x;

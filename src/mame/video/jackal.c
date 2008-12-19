@@ -138,7 +138,7 @@ static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, cons
 		if (attr & 0x01) sx = sx - 256;
 		if (sy > 0xf0)   sy = sy - 256;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -151,7 +151,7 @@ static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, cons
 			int spritenum = sn1*4 + ((sn2 & (8+4)) >> 2) + ((sn2 & (2+1)) << 10);
 			int mod = -8;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx += 8;
 				sy -= 8;
@@ -160,7 +160,7 @@ static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, cons
 
 			if ((attr & 0x0C) == 0x0C)
 			{
-				if (flip_screen_get()) sy += 16;
+				if (flip_screen_get(machine)) sy += 16;
 				DRAW_SPRITE(bank + 1, spritenum, sx, sy)
 			}
 
@@ -183,7 +183,7 @@ static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, cons
 
 			if (attr & 0x10)
 			{
-				if (flip_screen_get())
+				if (flip_screen_get(machine))
 				{
 					sx -= 16;
 					sy -= 16;

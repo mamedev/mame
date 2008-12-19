@@ -725,7 +725,7 @@ static WRITE8_HANDLER( ym2149_portb_w )
     bit 0 contains the screen orientation.
 */
 	ym2149_portb = data;
-	flip_screen_set(data & 0x01);
+	flip_screen_set(space->machine, data & 0x01);
 }
 
 static READ8_HANDLER( usart_8251_r )

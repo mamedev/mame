@@ -427,7 +427,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 		flipx = sprite_ram[offs + 0] & 0x04;
 		flipy = sprite_ram[offs + 0] & 0x02;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + sprite_y_adjust_flip_screen;
@@ -445,7 +445,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 				sx,sy,
 				cliprect, TRANSPARENCY_PEN, 0);
 
-		sy += (flip_screen_get() ? -256 : 256);
+		sy += (flip_screen_get(machine) ? -256 : 256);
 
 		// Wrap around
 		drawgfx(bitmap,machine->gfx[1],
@@ -458,7 +458,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_missiles(bitmap_t *bitmap, const rectangle *cliprect,
+static void draw_missiles(running_machine *machine,bitmap_t *bitmap, const rectangle *cliprect,
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
 						UINT8 *missile_ram, int interleave)
 {
@@ -472,7 +472,7 @@ static void draw_missiles(bitmap_t *bitmap, const rectangle *cliprect,
 
 		sy = 255 - missile_ram[offs + 0*interleave];
 		sx = 255 - missile_ram[offs + 2*interleave];
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + missile_y_adjust_flip_screen;
@@ -488,7 +488,7 @@ static void draw_missiles(bitmap_t *bitmap, const rectangle *cliprect,
 
 		sy = 255 - missile_ram[offs + 1*interleave];
 		sx = 255 - missile_ram[offs + 3*interleave];
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + missile_y_adjust_flip_screen;
@@ -708,7 +708,7 @@ VIDEO_UPDATE( decocass )
 	}
 	tilemap_draw(bitmap,cliprect, fg_tilemap, 0, 0);
 	draw_sprites(screen->machine,bitmap,cliprect, (color_center_bot >> 1) & 1, 0, 0, decocass_fgvideoram, 0x20);
-	draw_missiles(bitmap,cliprect, 1, 0, decocass_colorram, 0x20);
+	draw_missiles(screen->machine,bitmap,cliprect, 1, 0, decocass_colorram, 0x20);
 	return 0;
 }
 

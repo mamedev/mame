@@ -292,25 +292,25 @@ static void init_generic(running_machine *machine, int bpp, int sound, int prot_
 	switch (sound)
 	{
 		case SOUND_CVSD_SMALL:
-			williams_cvsd_init(0);
+			williams_cvsd_init(machine, 0);
 			memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, cvsd_protection_w);
 			cvsd_protection_base = memory_region(machine, "cvsd") + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
-			williams_cvsd_init(0);
+			williams_cvsd_init(machine, 0);
 			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
 			memory_set_bankptr(machine, 9, auto_malloc(0x80));
 			break;
 
 		case SOUND_ADPCM:
-			williams_adpcm_init();
+			williams_adpcm_init(machine);
 			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
 			memory_set_bankptr(machine, 9, auto_malloc(0x80));
 			break;
 
 		case SOUND_NARC:
-			williams_narc_init();
+			williams_narc_init(machine);
 			memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
 			memory_set_bankptr(machine, 9, auto_malloc(0x80));
 			break;
@@ -573,7 +573,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 			case SOUND_CVSD_SMALL:
 			case SOUND_CVSD:
 				williams_cvsd_reset_w((~data & 0x100) >> 8);
-				williams_cvsd_data_w((data & 0xff) | ((data & 0x200) >> 1));
+				williams_cvsd_data_w(space->machine, (data & 0xff) | ((data & 0x200) >> 1));
 				break;
 
 			case SOUND_ADPCM:

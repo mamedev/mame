@@ -30,6 +30,9 @@ void debugger_init(running_machine *machine);
 /* redraw the current video display */
 void debugger_refresh_display(running_machine *machine);
 
+/* OSD can call this to safely flush all traces in the event of a crash */
+void debugger_flush_all_traces_on_abnormal_exit(void);
+
 
 
 /***************************************************************************

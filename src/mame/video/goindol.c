@@ -100,7 +100,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sx = sprite_ram[offs];
 		sy = 240-sprite_ram[offs+1];
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -115,15 +115,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			drawgfx(bitmap,machine->gfx[gfxbank],
 						tile,
 						palette,
-						flip_screen_get(),flip_screen_get(),
+						flip_screen_get(machine),flip_screen_get(machine),
 						sx,sy,
 						cliprect,
 						TRANSPARENCY_PEN, 0);
 			drawgfx(bitmap,machine->gfx[gfxbank],
 						tile+1,
 						palette,
-						flip_screen_get(),flip_screen_get(),
-						sx,sy + (flip_screen_get() ? -8 : 8),
+						flip_screen_get(machine),flip_screen_get(machine),
+						sx,sy + (flip_screen_get(machine) ? -8 : 8),
 						cliprect,
 						TRANSPARENCY_PEN, 0);
 		}

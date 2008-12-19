@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/konppc.h"
 #include "video/poly.h"
@@ -482,11 +481,13 @@ static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent,
 	}
 }
 
+static UINT8 *gfxrom;
+
 static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
 	bitmap_t *destmap = dest;
-	UINT8 *texrom = memory_region(Machine, "gfx1") + (extra->texture_page * 0x40000);
+	UINT8 *texrom = gfxrom + (extra->texture_page * 0x40000);
 	int pal_chip = (extra->texture_palette & 0x8) ? 1 : 0;
 	int palette_index = (extra->texture_palette & 0x7) * 256;
 	float z = extent->param[0].start;
@@ -978,6 +979,7 @@ VIDEO_START( gticlub )
 	tick = 0;
 	debug_tex_page = 0;
 	debug_tex_palette = 0;
+	gfxrom = memory_region(machine, "gfx1");
 
 	K001006_init(machine);
 	K001005_init(machine);

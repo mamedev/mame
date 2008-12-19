@@ -359,7 +359,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		zoomy = 32 - zoomy;
 
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			x = width  - x - (nx * zoomx)/2;
 			y = height - y - (ny * zoomy)/2;
@@ -434,7 +434,7 @@ VIDEO_UPDATE( psikyo )
 
 	tilemap *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~input_port_read(screen->machine, "DSW") & 0x00010000);		// hardwired to a DSW bit
+	flip_screen_set(screen->machine, ~input_port_read(screen->machine, "DSW") & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 

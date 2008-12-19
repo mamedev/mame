@@ -74,15 +74,15 @@
 
 /* The interface structure */
 struct MB87078interface {
-	void (*gain_changed_cb)(int channel, int percent /*, float decibels*/);
+	void (*gain_changed_cb)(running_machine *machine, int channel, int percent /*, float decibels*/);
 };
 
 
 void MB87078_stop(void);
-void MB87078_start(int which, const struct MB87078interface *intf);
+void MB87078_start(running_machine *machine, int which, const struct MB87078interface *intf);
 
-void MB87078_data_w(int which, int data, int dsel);
-void MB87078_reset_comp_w(int which, int level);
+void MB87078_data_w(running_machine *machine, int which, int data, int dsel);
+void MB87078_reset_comp_w(running_machine *machine, int which, int level);
 
 
 /* MB87078_gain_decibel_r will return 'channel' gain on chip 'which'.

@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "debugger.h"
 #include "midwayic.h"
 #include "machine/idectrl.h"
@@ -206,17 +205,17 @@ UINT8 midway_serial_pic_status_r(void)
 }
 
 
-UINT8 midway_serial_pic_r(void)
+UINT8 midway_serial_pic_r(const address_space *space)
 {
-	logerror("%s:security R = %04X\n", cpuexec_describe_context(Machine), serial.buffer);
+	logerror("%s:security R = %04X\n", cpuexec_describe_context(space->machine), serial.buffer);
 	serial.status = 1;
 	return serial.buffer;
 }
 
 
-void midway_serial_pic_w(UINT8 data)
+void midway_serial_pic_w(const address_space *space, UINT8 data)
 {
-	logerror("%s:security W = %04X\n", cpuexec_describe_context(Machine), data);
+	logerror("%s:security W = %04X\n", cpuexec_describe_context(space->machine), data);
 
 	/* status seems to reflect the clock bit */
 	serial.status = (data >> 4) & 1;
@@ -294,31 +293,31 @@ void midway_serial_pic2_set_default_nvram(const UINT8 *nvram)
 }
 
 
-UINT8 midway_serial_pic2_status_r(void)
+UINT8 midway_serial_pic2_status_r(const address_space *space)
 {
 	UINT8 result = 0;
 
 	/* if we're still holding the data ready bit high, do it */
 	if (pic.latch & 0xf00)
 	{
-		if (attotime_compare(timer_get_time(Machine), pic.latch_expire_time) > 0)
+		if (attotime_compare(timer_get_time(space->machine), pic.latch_expire_time) > 0)
 			pic.latch &= 0xff;
 		else
 			pic.latch -= 0x100;
 		result = 1;
 	}
 
-	logerror("%s:PIC status %d\n", cpuexec_describe_context(Machine), result);
+	logerror("%s:PIC status %d\n", cpuexec_describe_context(space->machine), result);
 	return result;
 }
 
 
-UINT8 midway_serial_pic2_r(void)
+UINT8 midway_serial_pic2_r(const address_space *space)
 {
 	UINT8 result = 0;
 
 	/* PIC data register */
-	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", cpuexec_describe_context(Machine), pic.index, pic.total, pic.latch);
+	logerror("%s:PIC data read (index=%d total=%d latch=%03X) =", cpuexec_describe_context(space->machine), pic.index, pic.total, pic.latch);
 
 	/* return the current result */
 	if (pic.latch & 0xf00)
@@ -333,8 +332,9 @@ UINT8 midway_serial_pic2_r(void)
 }
 
 
-void midway_serial_pic2_w(running_machine *machine, UINT8 data)
+void midway_serial_pic2_w(const address_space *space, UINT8 data)
 {
+	running_machine *machine = space->machine;
 	static FILE *nvramlog;
 	if (LOG_NVRAM && !nvramlog)
 		nvramlog = fopen("nvram.log", "w");
@@ -560,8 +560,8 @@ enum
 
 static UINT16 ioasic_fifo_r(const device_config *device);
 static UINT16 ioasic_fifo_status_r(const device_config *device);
-static void ioasic_input_empty(int state);
-static void ioasic_output_full(int state);
+static void ioasic_input_empty(running_machine *machine, int state);
+static void ioasic_output_full(running_machine *machine, int state);
 static void update_ioasic_irq(running_machine *machine);
 static void cage_irq_handler(running_machine *machine, int state);
 
@@ -695,25 +695,25 @@ static void cage_irq_handler(running_machine *machine, int reason)
 }
 
 
-static void ioasic_input_empty(int state)
+static void ioasic_input_empty(running_machine *machine, int state)
 {
 //  logerror("ioasic_input_empty(%d)\n", state);
 	if (state)
 		ioasic.sound_irq_state |= 0x0080;
 	else
 		ioasic.sound_irq_state &= ~0x0080;
-	update_ioasic_irq(Machine);
+	update_ioasic_irq(machine);
 }
 
 
-static void ioasic_output_full(int state)
+static void ioasic_output_full(running_machine *machine, int state)
 {
 //  logerror("ioasic_output_full(%d)\n", state);
 	if (state)
 		ioasic.sound_irq_state |= 0x0040;
 	else
 		ioasic.sound_irq_state &= ~0x0040;
-	update_ioasic_irq(Machine);
+	update_ioasic_irq(machine);
 }
 
 
@@ -925,7 +925,7 @@ READ32_HANDLER( midway_ioasic_r )
 			break;
 
 		case IOASIC_PICIN:
-			result = midway_serial_pic2_r() | (midway_serial_pic2_status_r() << 8);
+			result = midway_serial_pic2_r(space) | (midway_serial_pic2_status_r(space) << 8);
 			break;
 
 		default:
@@ -1025,11 +1025,11 @@ WRITE32_HANDLER( midway_ioasic_w )
 
 		case IOASIC_PICOUT:
 			if (ioasic.shuffle_type == MIDWAY_IOASIC_VAPORTRX)
-				midway_serial_pic2_w(space->machine, newreg ^ 0x0a);
+				midway_serial_pic2_w(space, newreg ^ 0x0a);
 			else if (ioasic.shuffle_type == MIDWAY_IOASIC_SFRUSHRK)
-				midway_serial_pic2_w(space->machine, newreg ^ 0x05);
+				midway_serial_pic2_w(space, newreg ^ 0x05);
 			else
-				midway_serial_pic2_w(space->machine, newreg);
+				midway_serial_pic2_w(space, newreg);
 			break;
 
 		case IOASIC_INTCTL:

@@ -370,7 +370,7 @@ WRITE16_HANDLER( manybloc_scroll_w )
 WRITE16_HANDLER( nmk_flipscreen_w )
 {
 	if (ACCESSING_BITS_0_7)
-		flip_screen_set(data & 0x01);
+		flip_screen_set(space->machine, data & 0x01);
 }
 
 WRITE16_HANDLER( nmk_tilebank_w )
@@ -434,7 +434,7 @@ static void nmk16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 			if(pri != priority)
 				continue;
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;
@@ -451,7 +451,7 @@ static void nmk16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 					drawgfx(bitmap,machine->gfx[2],
 							code,
 							color,
-							flip_screen_get(), flip_screen_get(),
+							flip_screen_get(machine), flip_screen_get(machine),
 							((x + 16) & 0x1ff) - 16,sy & 0x1ff,
 							cliprect,TRANSPARENCY_PEN,15);
 					code++;
@@ -488,10 +488,10 @@ static void nmk16_draw_sprites_flipsupported(running_machine *machine, bitmap_t 
 			if(pri != priority)
 				continue;
 
-			flipx ^= flip_screen_get();
-			flipy ^= flip_screen_get();
+			flipx ^= flip_screen_get(machine);
+			flipy ^= flip_screen_get(machine);
 
-			if (flip_screen_get())
+			if (flip_screen_get(machine))
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;
@@ -1068,8 +1068,8 @@ static void video_update(running_machine *machine, bitmap_t *bitmap, const recta
 	if (dsw_flipscreen)
 	{
 
-		flip_screen_x_set(~input_port_read(machine, "DSW1") & 0x0100);
-		flip_screen_y_set(~input_port_read(machine, "DSW1") & 0x0200);
+		flip_screen_x_set(machine, ~input_port_read(machine, "DSW1") & 0x0100);
+		flip_screen_y_set(machine, ~input_port_read(machine, "DSW1") & 0x0200);
 	}
 
 	tilemap_set_scrollx(tilemap_0, 0, afega_scroll_0[1] + xoffset);

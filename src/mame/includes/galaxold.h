@@ -189,8 +189,8 @@ CUSTOM_INPUT( darkplnt_custom_r );
 
 /*----------- defined in audio/scramble.c -----------*/
 
-void scramble_sh_init(void);
-void sfx_sh_init(void);
+void scramble_sh_init(running_machine *machine);
+void sfx_sh_init(running_machine *machine);
 
 WRITE8_HANDLER( scramble_filter_w );
 WRITE8_HANDLER( frogger_filter_w );

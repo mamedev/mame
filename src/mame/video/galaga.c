@@ -424,9 +424,9 @@ static TILE_GET_INFO( get_tile_info )
     int color = galaga_videoram[tile_index + 0x400] & 0x3f;
 	SET_TILE_INFO(
 			0,
-			(galaga_videoram[tile_index] & 0x7f) | (flip_screen_get() ? 0x80 : 0) | (galaga_gfxbank << 8),
+			(galaga_videoram[tile_index] & 0x7f) | (flip_screen_get(machine) ? 0x80 : 0) | (galaga_gfxbank << 8),
 			color,
-			flip_screen_get() ? TILE_FLIPX : 0);
+			flip_screen_get(machine) ? TILE_FLIPX : 0);
 	tileinfo->group = color;
 }
 
@@ -519,7 +519,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sy -= 16 * sizey;
 		sy = (sy & 0xff) - 32;	// fix wraparound
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			flipx ^= 1;
 			flipy ^= 1;

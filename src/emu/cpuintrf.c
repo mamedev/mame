@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 /* mingw-gcc defines this */
 #undef i386

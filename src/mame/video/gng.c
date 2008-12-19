@@ -103,7 +103,7 @@ WRITE8_HANDLER( gng_bgscrolly_w )
 
 WRITE8_HANDLER( gng_flipscreen_w )
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(space->machine, ~data & 1);
 }
 
 
@@ -128,7 +128,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int flipx = attributes & 0x04;
 		int flipy = attributes & 0x08;
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

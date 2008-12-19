@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "sound/pokey.h"
@@ -708,14 +707,14 @@ static void cart_reset(running_machine *machine)
 
 
 
-static UINT8 console_read(void)
+static UINT8 console_read(const address_space *space)
 {
-	return input_port_read(Machine, "console");
+	return input_port_read(space->machine, "console");
 }
 
 
 
-static void console_write(UINT8 data)
+static void console_write(const address_space *space, UINT8 data)
 {
 	if (data & 0x08)
 		dac_data_w(0, -120);

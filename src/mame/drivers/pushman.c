@@ -43,7 +43,7 @@ static WRITE16_HANDLER( pushman_flipscreen_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		flip_screen_set(data & 0x0200);
+		flip_screen_set(space->machine, data & 0x0200);
 		coin_counter_w(0, data & 0x4000);
 		coin_counter_w(1, data & 0x8000);
 	}

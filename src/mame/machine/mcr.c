@@ -284,7 +284,7 @@ MACHINE_RESET( mcr )
 	mcr_cocktail_flip = 0;
 
 	/* initialize the sound */
-	mcr_sound_reset();
+	mcr_sound_reset(machine);
 }
 
 
@@ -354,7 +354,7 @@ static void mcr68_common_init(running_machine *machine)
 	mcr_cocktail_flip = 0;
 
 	/* initialize the sound */
-	mcr_sound_reset();
+	mcr_sound_reset(machine);
 }
 
 

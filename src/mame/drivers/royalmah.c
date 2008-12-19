@@ -309,7 +309,7 @@ static WRITE8_HANDLER ( mjapinky_bank_w )
 
 static WRITE8_HANDLER( mjapinky_palbank_w )
 {
-	flip_screen_set(~data & 4);
+	flip_screen_set(space->machine, ~data & 4);
 	palette_base = (data >> 3) & 0x01;
 	coin_counter_w(0,data & 2);	// in
 	coin_counter_w(1,data & 1);	// out
@@ -534,7 +534,7 @@ static READ8_HANDLER( janptr96_unknown_r )
 
 static WRITE8_HANDLER( janptr96_coin_counter_w )
 {
-	flip_screen_set(~data & 4);
+	flip_screen_set(space->machine, ~data & 4);
 	coin_counter_w(0,data & 2);	// in
 	coin_counter_w(1,data & 1);	// out
 }
@@ -563,7 +563,7 @@ static UINT8 mjifb_rom_enable;
 
 static WRITE8_HANDLER( mjifb_coin_counter_w )
 {
-	flip_screen_set( data & 4);
+	flip_screen_set(space->machine,  data & 4);
 	coin_counter_w(0,data & 2);	// in
 	coin_counter_w(1,data & 1);	// out
 }

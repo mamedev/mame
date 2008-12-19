@@ -149,9 +149,9 @@ WRITE8_HANDLER( bking_cont1_w )
 
 	coin_lockout_global_w(~data & 0x01);
 
-	flip_screen_set_no_update(data & 0x04);
+	flip_screen_set_no_update(space->machine, data & 0x04);
 
-	tilemap_set_flip(ALL_TILEMAPS, flip_screen_get() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip(ALL_TILEMAPS, flip_screen_get(space->machine) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	controller = data & 0x02;
 
@@ -323,8 +323,8 @@ VIDEO_EOF( bking )
 		latch = 0x0400;
 	}
 
-	tilemap_set_scrollx(bg_tilemap, 0, flip_screen_get() ? -xld : xld);
-	tilemap_set_scrolly(bg_tilemap, 0, flip_screen_get() ? -yld : yld);
+	tilemap_set_scrollx(bg_tilemap, 0, flip_screen_get(machine) ? -xld : xld);
+	tilemap_set_scrolly(bg_tilemap, 0, flip_screen_get(machine) ? -yld : yld);
 
 	tilemap_draw(helper0, &rect, bg_tilemap, 0, 0);
 
@@ -350,8 +350,8 @@ VIDEO_EOF( bking )
 					int col = (xld + x) / 8 + 1;
 					int row = (yld + y) / 8 + 0;
 
-					latch |= (flip_screen_get() ? 31 - col : col) << 0;
-					latch |= (flip_screen_get() ? 31 - row : row) << 5;
+					latch |= (flip_screen_get(machine) ? 31 - col : col) << 0;
+					latch |= (flip_screen_get(machine) ? 31 - row : row) << 5;
 
 					pc3259_output[0] = (latch >> 0x0) & 0xf;
 					pc3259_output[1] = (latch >> 0x4) & 0xf;

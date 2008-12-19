@@ -25,8 +25,8 @@
 
 typedef struct _sp0256_interface sp0256_interface;
 struct _sp0256_interface {
-	void (*lrq_callback)(int state);
-	void (*sby_callback)(int state);
+	void (*lrq_callback)(const device_config *device, int state);
+	void (*sby_callback)(const device_config *device, int state);
 };
 
 void sp0256_bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);

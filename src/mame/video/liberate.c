@@ -93,7 +93,7 @@ WRITE8_HANDLER( deco16_io_w )
 				tilemap_mark_all_tiles_dirty(background_tilemap);
 			}
 			background_disable=data&0x4;
-			flip_screen_set(data&0x1);
+			flip_screen_set(space->machine, data&0x1);
 			break;
 		case 7: /* Background palette resistors? */
 			/* Todo */
@@ -214,7 +214,7 @@ static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		if (multi && fy==0) sy-=16;
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			sy=240-sy;
 			sx=240-sx;
 			if (fy)
@@ -275,7 +275,7 @@ static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 //      if (multi) sy-=16;
 		if (fy && multi) { code2=code; code++; }
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;
@@ -331,7 +331,7 @@ static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 //      if (multi) sy-=16;
 		if (fy && multi) { code2=code; code++; }
 
-		if (flip_screen_get()) {
+		if (flip_screen_get(machine)) {
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;

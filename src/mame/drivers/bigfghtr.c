@@ -288,7 +288,7 @@ static WRITE16_HANDLER( sound_command_w )
 static WRITE16_HANDLER( io_w )
 {
 	COMBINE_DATA(&vreg);
-	flip_screen_set(vreg & 0x1000);
+	flip_screen_set(space->machine, vreg & 0x1000);
 }
 
 static int read_latch=0;

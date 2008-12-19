@@ -101,7 +101,14 @@ extern const upd7759_interface sys16_upd7759_interface;
 
 extern int sys18_sound_info[4*2];
 
-extern void sys16_patch_code( int offset, int data );
+typedef struct _sys16_patch sys16_patch;
+struct _sys16_patch
+{
+	offs_t offset;
+	UINT8 data;
+};
+
+extern void sys16_patch_code( running_machine *machine, const sys16_patch *patch, int count );
 
 #define SYS16_MWA16_PALETTERAM	sys16_paletteram_w
 #define SYS16_MRA16_PALETTERAM	SMH_RAM

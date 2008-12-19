@@ -30,11 +30,11 @@ WRITE8_HANDLER( carpolo_car_ball_interrupt_clear_w );
 WRITE8_HANDLER( carpolo_car_border_interrupt_clear_w );
 WRITE8_HANDLER( carpolo_timer_interrupt_clear_w );
 
-void carpolo_generate_car_car_interrupt(int car1, int car2);
-void carpolo_generate_ball_screen_interrupt(UINT8 cause);
-void carpolo_generate_car_goal_interrupt(int car, int right_goal);
-void carpolo_generate_car_ball_interrupt(int car, int car_x, int car_y);
-void carpolo_generate_car_border_interrupt(int car, int horizontal_border);
+void carpolo_generate_car_car_interrupt(running_machine *machine, int car1, int car2);
+void carpolo_generate_ball_screen_interrupt(running_machine *machine, UINT8 cause);
+void carpolo_generate_car_goal_interrupt(running_machine *machine, int car, int right_goal);
+void carpolo_generate_car_ball_interrupt(running_machine *machine, int car, int car_x, int car_y);
+void carpolo_generate_car_border_interrupt(running_machine *machine, int car, int horizontal_border);
 
 
 /*----------- defined in video/carpolo.c -----------*/

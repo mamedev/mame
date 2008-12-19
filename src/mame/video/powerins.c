@@ -59,7 +59,7 @@ static int tile_bank;
 
 WRITE16_HANDLER( powerins_flipscreen_w )
 {
-	if (ACCESSING_BITS_0_7)	flip_screen_set( data & 1 );
+	if (ACCESSING_BITS_0_7)	flip_screen_set(space->machine,  data & 1 );
 }
 
 WRITE16_HANDLER( powerins_tilebank_w )
@@ -298,7 +298,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		/* Handle flip_screen. Apply a global offset of 32 pixels along x too */
 
-		if (flip_screen_get())
+		if (flip_screen_get(machine))
 		{	sx = screen_w - sx - dimx*16 - 32;	flipx = !flipx;
 			sy = screen_h - sy - dimy*16;		flipy = !flipy;
 			code += dimx*dimy-1;			inc = -1;	}

@@ -106,7 +106,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				int flipx = (attributes & 0x04);
 				int flipy = 0;
 
-				if (flip_screen_get()) {
+				if (flip_screen_get(machine)) {
 					flipx = !flipx;
 					flipy = !flipy;
 				}
@@ -117,7 +117,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 					vx = sx;
 					vy = sy;
-					if (flip_screen_get()) {
+					if (flip_screen_get(machine)) {
 						vx = 240 - vx;
 						vy = 240 - vy;
 					}
@@ -136,7 +136,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				vx = sx;
 				vy = sy;
-				if (flip_screen_get()) {
+				if (flip_screen_get(machine)) {
 					vx = 240 - vx;
 					vy = 240 - vy;
 				}

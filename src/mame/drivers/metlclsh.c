@@ -130,7 +130,7 @@ static WRITE8_HANDLER( metlclsh_ack_nmi2 )
 
 static WRITE8_HANDLER( metlclsh_flipscreen_w )
 {
-	flip_screen_set(data & 1);
+	flip_screen_set(space->machine, data & 1);
 }
 
 static ADDRESS_MAP_START( metlclsh_readmem2, ADDRESS_SPACE_PROGRAM, 8 )
@@ -308,7 +308,7 @@ static INTERRUPT_GEN( metlclsh_interrupt2 )
 
 static MACHINE_RESET( metlclsh )
 {
-	flip_screen_set(0);
+	flip_screen_set(machine, 0);
 }
 
 static MACHINE_DRIVER_START( metlclsh )

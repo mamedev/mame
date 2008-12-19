@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "system16.h"
 #include "sound/upd7759.h"
 
@@ -9,9 +8,8 @@ UINT16 *sys16_extraram;
 UINT16 *sys16_extraram2;
 UINT16 *sys16_extraram3;
 
-static void patch_codeX( int offset, int data, const char *cpu ){
+static void patch_codeX( UINT16 *mem, offs_t offset, int data ){
 	int aligned_offset = offset&0xfffffe;
-	UINT16 *mem = (UINT16 *)memory_region(Machine, cpu);
 	int old_word = mem[aligned_offset/2];
 
 	if( offset&1 )
@@ -22,8 +20,11 @@ static void patch_codeX( int offset, int data, const char *cpu ){
 	mem[aligned_offset/2] = data;
 }
 
-void sys16_patch_code( int offset, int data ){
-	patch_codeX(offset,data,"main");
+void sys16_patch_code( running_machine *machine, const sys16_patch *data, int count ){
+	int i;
+	UINT16 *mem = (UINT16 *)memory_region(machine, "main");
+	for (i=0; i<count; i++)
+		patch_codeX(mem, data[i].offset, data[i].data);
 }
 
 
@@ -54,9 +55,9 @@ GFXDECODE_END
 
 /* sound */
 
-static void sound_cause_nmi( int chip ){
+static void sound_cause_nmi( const device_config *device, int chip ){
 	/* upd7759 callback */
-	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

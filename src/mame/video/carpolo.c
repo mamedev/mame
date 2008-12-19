@@ -603,42 +603,42 @@ VIDEO_EOF( carpolo )
 									  car1_x, car1_y, car1_code, car1_flipy,
 									  car2_x, car2_y, car2_code, car2_flipy,
 									  &col_x, &col_y))
-		carpolo_generate_car_car_interrupt(0, 1);
+		carpolo_generate_car_car_interrupt(machine, 0, 1);
 
 	/* cars 1 and 3 */
 	else if (check_sprite_sprite_collision(machine,
 										   car1_x, car1_y, car1_code, car1_flipy,
 										   car3_x, car3_y, car3_code, car3_flipy,
 										   &col_x, &col_y))
-		carpolo_generate_car_car_interrupt(0, 2);
+		carpolo_generate_car_car_interrupt(machine, 0, 2);
 
 	/* cars 1 and 4 */
 	else if (check_sprite_sprite_collision(machine,
 										   car1_x, car1_y, car1_code, car1_flipy,
 										   car4_x, car4_y, car4_code, car4_flipy,
 										   &col_x, &col_y))
-		carpolo_generate_car_car_interrupt(0, 3);
+		carpolo_generate_car_car_interrupt(machine, 0, 3);
 
 	/* cars 2 and 3 */
 	else if (check_sprite_sprite_collision(machine,
 										   car2_x, car2_y, car2_code, car2_flipy,
 										   car3_x, car3_y, car3_code, car3_flipy,
 										   &col_x, &col_y))
-		carpolo_generate_car_car_interrupt(1, 2);
+		carpolo_generate_car_car_interrupt(machine, 1, 2);
 
 	/* cars 2 and 4 */
 	else if (check_sprite_sprite_collision(machine,
 										   car2_x, car2_y, car2_code, car2_flipy,
 										   car4_x, car4_y, car4_code, car4_flipy,
 										   &col_x, &col_y))
-		carpolo_generate_car_car_interrupt(1, 3);
+		carpolo_generate_car_car_interrupt(machine, 1, 3);
 
 	/* cars 3 and 4 */
 	else if (check_sprite_sprite_collision(machine,
 										   car3_x, car3_y, car3_code, car3_flipy,
 										   car4_x, car4_y, car4_code, car4_flipy,
 										   &col_x, &col_y))
-		carpolo_generate_car_car_interrupt(2, 3);
+		carpolo_generate_car_car_interrupt(machine, 2, 3);
 
 
 
@@ -647,51 +647,51 @@ VIDEO_EOF( carpolo )
 									  car1_x, car1_y, car1_code, car1_flipy,
 									  ball_x, ball_y, ball_code, ball_flipy,
 									  &col_x, &col_y))
-		carpolo_generate_car_ball_interrupt(0, col_x, col_y);
+		carpolo_generate_car_ball_interrupt(machine, 0, col_x, col_y);
 
 	else if (check_sprite_sprite_collision(machine,
 										   car2_x, car2_y, car2_code, car2_flipy,
 									  	   ball_x, ball_y, ball_code, ball_flipy,
 										   &col_x, &col_y))
-		carpolo_generate_car_ball_interrupt(1, col_x, col_y);
+		carpolo_generate_car_ball_interrupt(machine, 1, col_x, col_y);
 
 	else if (check_sprite_sprite_collision(machine,
 										   car3_x, car3_y, car3_code, car3_flipy,
 									  	   ball_x, ball_y, ball_code, ball_flipy,
 										   &col_x, &col_y))
-		carpolo_generate_car_ball_interrupt(2, col_x, col_y);
+		carpolo_generate_car_ball_interrupt(machine, 2, col_x, col_y);
 
 	else if (check_sprite_sprite_collision(machine,
 										   car4_x, car4_y, car4_code, car4_flipy,
 									  	   ball_x, ball_y, ball_code, ball_flipy,
 										   &col_x, &col_y))
-		carpolo_generate_car_ball_interrupt(3, col_x, col_y);
+		carpolo_generate_car_ball_interrupt(machine, 3, col_x, col_y);
 
 
 	/* check car-goal collision */
 	if (check_sprite_left_goal_collision(machine, car1_x, car1_y, car1_code, car1_flipy, 1))
-		carpolo_generate_car_goal_interrupt(0, 0);
+		carpolo_generate_car_goal_interrupt(machine, 0, 0);
 
 	else if (check_sprite_right_goal_collision(machine, car1_x, car1_y, car1_code, car1_flipy, 1))
-		carpolo_generate_car_goal_interrupt(0, 1);
+		carpolo_generate_car_goal_interrupt(machine, 0, 1);
 
 	else if (check_sprite_left_goal_collision(machine, car2_x, car2_y, car2_code, car2_flipy, 1))
-		carpolo_generate_car_goal_interrupt(1, 0);
+		carpolo_generate_car_goal_interrupt(machine, 1, 0);
 
 	else if (check_sprite_right_goal_collision(machine, car2_x, car2_y, car2_code, car2_flipy, 1))
-		carpolo_generate_car_goal_interrupt(1, 1);
+		carpolo_generate_car_goal_interrupt(machine, 1, 1);
 
 	else if (check_sprite_left_goal_collision(machine, car3_x, car3_y, car3_code, car3_flipy, 1))
-		carpolo_generate_car_goal_interrupt(2, 0);
+		carpolo_generate_car_goal_interrupt(machine, 2, 0);
 
 	else if (check_sprite_right_goal_collision(machine, car3_x, car3_y, car3_code, car3_flipy, 1))
-		carpolo_generate_car_goal_interrupt(2, 1);
+		carpolo_generate_car_goal_interrupt(machine, 2, 1);
 
 	else if (check_sprite_left_goal_collision(machine, car4_x, car4_y, car4_code, car4_flipy, 1))
-		carpolo_generate_car_goal_interrupt(3, 0);
+		carpolo_generate_car_goal_interrupt(machine, 3, 0);
 
 	else if (check_sprite_right_goal_collision(machine, car4_x, car4_y, car4_code, car4_flipy, 1))
-		carpolo_generate_car_goal_interrupt(3, 1);
+		carpolo_generate_car_goal_interrupt(machine, 3, 1);
 
 
 	/* check ball collision with static screen elements */
@@ -700,18 +700,18 @@ VIDEO_EOF( carpolo )
 
 		col = check_sprite_left_goal_collision(machine, ball_x, ball_y, ball_code, ball_flipy, 0);
 
-		if (col == 1)  carpolo_generate_ball_screen_interrupt(0x05);
-		if (col == 2)  carpolo_generate_ball_screen_interrupt(0x03);
+		if (col == 1)  carpolo_generate_ball_screen_interrupt(machine, 0x05);
+		if (col == 2)  carpolo_generate_ball_screen_interrupt(machine, 0x03);
 
 
 		col = check_sprite_right_goal_collision(machine, ball_x, ball_y, ball_code, ball_flipy, 0);
 
-		if (col == 1)  carpolo_generate_ball_screen_interrupt(0x05 | 0x08);
-		if (col == 2)  carpolo_generate_ball_screen_interrupt(0x03 | 0x08);
+		if (col == 1)  carpolo_generate_ball_screen_interrupt(machine, 0x05 | 0x08);
+		if (col == 2)  carpolo_generate_ball_screen_interrupt(machine, 0x03 | 0x08);
 
 
 		if (check_sprite_border_collision(machine, ball_x, ball_y, ball_code, ball_flipy))
-			carpolo_generate_ball_screen_interrupt(0x06);
+			carpolo_generate_ball_screen_interrupt(machine, 0x06);
 	}
 
 
@@ -722,25 +722,25 @@ VIDEO_EOF( carpolo )
 		col = check_sprite_border_collision(machine, car1_x, car1_y, car1_code, car1_flipy);
 
 		if (col)
-			carpolo_generate_car_border_interrupt(0, (col == 2));
+			carpolo_generate_car_border_interrupt(machine, 0, (col == 2));
 		else
 		{
 			col = check_sprite_border_collision(machine, car2_x, car2_y, car2_code, car2_flipy);
 
 			if (col)
-				carpolo_generate_car_border_interrupt(1, (col == 2));
+				carpolo_generate_car_border_interrupt(machine, 1, (col == 2));
 			else
 			{
 				col = check_sprite_border_collision(machine, car3_x, car3_y, car3_code, car3_flipy);
 
 				if (col)
-					carpolo_generate_car_border_interrupt(2, (col == 2));
+					carpolo_generate_car_border_interrupt(machine, 2, (col == 2));
 				else
 				{
 					col = check_sprite_border_collision(machine, car4_x, car4_y, car4_code, car4_flipy);
 
 					if (col)
-						carpolo_generate_car_border_interrupt(3, (col == 2));
+						carpolo_generate_car_border_interrupt(machine, 3, (col == 2));
 				}
 			}
 		}

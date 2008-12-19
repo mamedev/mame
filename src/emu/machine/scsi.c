@@ -1,10 +1,11 @@
 #include "scsi.h"
 
-void SCSIAllocInstance( const SCSIClass *scsiClass, SCSIInstance **instance, const char *diskregion )
+void SCSIAllocInstance( running_machine *machine, const SCSIClass *scsiClass, SCSIInstance **instance, const char *diskregion )
 {
 	SCSIAllocInstanceParams params;
 	params.instance = NULL;
 	params.diskregion = diskregion;
+	params.machine = machine;
 	scsiClass->dispatch( SCSIOP_ALLOC_INSTANCE, (void *)scsiClass, 0, &params );
 	*instance = params.instance;
 }
@@ -102,10 +103,11 @@ int SCSIBase( const SCSIClass *scsiClass, int operation, void *file, INT64 intpa
 	return scsiClass->baseClass->dispatch( operation, file, intparm, ptrparm );
 }
 
-SCSIInstance *SCSIMalloc( const SCSIClass *scsiClass )
+SCSIInstance *SCSIMalloc( running_machine *machine, const SCSIClass *scsiClass )
 {
 	SCSIInstance *scsiInstance = (SCSIInstance *) malloc_or_die( SCSISizeof( scsiClass ) );
 	scsiInstance->scsiClass = scsiClass;
+	scsiInstance->machine = machine;
 	return scsiInstance;
 }
 

@@ -3083,8 +3083,8 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 #ifdef FD1094_HACK
 	if (memdata->desc->base == memory_region(view->machine, "user2"))
 	{
-		extern void fd1094_regenerate_key(void);
-		fd1094_regenerate_key();
+		extern void fd1094_regenerate_key(running_machine *machine);
+		fd1094_regenerate_key(view->machine);
 	}
 #endif
 }
