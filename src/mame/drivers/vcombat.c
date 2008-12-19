@@ -73,11 +73,12 @@ TODO :  This is a skeleton driver.  Nearly everything.
 #include "video/generic.h"
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0xfffff) AM_ROM
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x200000, 0x201fff) AM_RAM		/* At the very least! */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3ffff) AM_ROM
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 ADDRESS_MAP_END
 
 /*
@@ -94,12 +95,29 @@ static VIDEO_UPDATE( vcombat )
 	return 0;
 }
 
+static const gfx_layout vcombat_charlayout =
+{
+	8, 8,
+	0x100000 / 0x80,
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*16,  1*16,  2*16,  3*16,  4*16,  5*16,  6*16,  7*16 },
+	{ 0*16*8, 1*16*8, 2*16*8, 3*16*8, 4*16*8, 5*16*8, 6*16*8, 7*16*8 },
+	8 * 0x80
+};
+
+static GFXDECODE_START( vcombat )
+	GFXDECODE_ENTRY( "main", 0, vcombat_charlayout, 0, 256 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( vcombat )
 	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq7_line_hold)			/* The only un-masked irq thus far */
 
 	MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+
 /*
     Virtual combat has an i860 on each of its two upper boards.
     MDRV_CPU_ADD("video", i860, XTAL_20MHz)
@@ -111,9 +129,12 @@ static MACHINE_DRIVER_START( vcombat )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_GFXDECODE(vcombat)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MDRV_PALETTE_LENGTH(0x100)
+	/*MDRV_PALETTE_LENGTH(0x100)*/
+
+	MDRV_INTERLEAVE(2000)	/* Temporary */
 
 	MDRV_VIDEO_UPDATE(vcombat)
 MACHINE_DRIVER_END
@@ -138,11 +159,11 @@ ROM_START( vcombat )
 	ROM_LOAD( "ds1220y.b53", 0x000, 0x800, CRC(b21cfe5f) SHA1(898ace3cd0913ea4b0dc84320219777773ef856f) )
 
 	/* These roms are identical on both of the upper boards */
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "9.u54",  0x000000, 0x80000, CRC(a276e18b) SHA1(6d60e519196a4858b82241504592413df498e12f) )
-	ROM_LOAD( "10.u55", 0x080000, 0x80000, CRC(8921f20e) SHA1(6e9ca2eaad3e1108ba0e1d7792fd5d0305bec201) )
-	ROM_LOAD( "11.u56", 0x100000, 0x80000, CRC(a83094ce) SHA1(c3512375fecdb5e7eb02a4aa140ae4efe0233cb8) )
-	ROM_LOAD( "12.u57", 0x180000, 0x80000, CRC(0cdffd4f) SHA1(65ace78711b3ef6e0ff9a7ad7343b5558e652f6c) )
+	ROM_REGION( 0x200000, "3d", 0 )
+	ROM_LOAD16_BYTE( "11.u56", 0x000000, 0x80000, CRC(a83094ce) SHA1(c3512375fecdb5e7eb02a4aa140ae4efe0233cb8) )
+	ROM_LOAD16_BYTE( "9.u54",  0x000001, 0x80000, CRC(a276e18b) SHA1(6d60e519196a4858b82241504592413df498e12f) )
+	ROM_LOAD16_BYTE( "12.u57", 0x100000, 0x80000, CRC(0cdffd4f) SHA1(65ace78711b3ef6e0ff9a7ad7343b5558e652f6c) )
+	ROM_LOAD16_BYTE( "10.u55", 0x100001, 0x80000, CRC(8921f20e) SHA1(6e9ca2eaad3e1108ba0e1d7792fd5d0305bec201) )
 
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "pal1_w2.u51", 0x000, 0x1f1, CRC(af497420) SHA1(03aa82189d91ae194dd5a6e7b9dbdb7cd473ddb6) )
@@ -165,11 +186,12 @@ ROM_START( shadfgtr )
 	ROM_REGION( 0x800, "user1", 0 )	/* The SRAM module */
 	ROM_LOAD( "shadfgtr.b53", 0x000, 0x800, CRC(e766a3ab) SHA1(e7696ec08d5c86f64d768480f43edbd19ded162d) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "shadfgtr.u54", 0x000000, 0x80000, CRC(c45d68d6) SHA1(a133e4f13d3af18bccf0d060a659d64ac699b159) )
-	ROM_LOAD( "shadfgtr.u55", 0x080000, 0x80000, CRC(e807631d) SHA1(9027ff7dc60b808434dac292c08f0630d3d52186) )
-	ROM_LOAD( "shadfgtr.u56", 0x100000, 0x80000, CRC(fb76db5a) SHA1(fa546f465df113c13037abed1162bfa6f9b1dc9b) )
-	ROM_LOAD( "shadfgtr.u57", 0x180000, 0x80000, CRC(60d701d7) SHA1(936473b5e3b2e9e9e3b50cf977fc5a670a097850) )
+	/* These roms are identical on both of the upper boards */
+	ROM_REGION( 0x200000, "3d", 0 )
+	ROM_LOAD16_BYTE( "shadfgtr.u56", 0x000000, 0x80000, CRC(fb76db5a) SHA1(fa546f465df113c13037abed1162bfa6f9b1dc9b) )
+	ROM_LOAD16_BYTE( "shadfgtr.u54", 0x000001, 0x80000, CRC(c45d68d6) SHA1(a133e4f13d3af18bccf0d060a659d64ac699b159) )
+	ROM_LOAD16_BYTE( "shadfgtr.u57", 0x100000, 0x80000, CRC(60d701d7) SHA1(936473b5e3b2e9e9e3b50cf977fc5a670a097850) )
+	ROM_LOAD16_BYTE( "shadfgtr.u55", 0x100001, 0x80000, CRC(e807631d) SHA1(9027ff7dc60b808434dac292c08f0630d3d52186) )
 
 	ROM_REGION( 0x200, "plds", 0 )
 	ROM_LOAD( "shadfgtr.u51", 0x000, 0x1f1, CRC(bab58337) SHA1(c4a79c8e53aeadb7f64d49d214b607b5b36f144e) )
