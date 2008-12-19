@@ -7,7 +7,7 @@
 
 enum
 {
-	Z180_PC=1,
+	Z180_PC,
 	Z180_SP,
 	Z180_AF,
 	Z180_BC,
@@ -15,6 +15,13 @@ enum
 	Z180_HL,
 	Z180_IX,
 	Z180_IY,
+	Z180_A, 
+	Z180_B, 
+	Z180_C, 
+	Z180_D, 
+	Z180_E, 
+	Z180_H, 
+	Z180_L,
 	Z180_AF2,
 	Z180_BC2,
 	Z180_DE2,
@@ -93,7 +100,11 @@ enum
 	Z180_IO3D,		/* 3d reserved */
 	Z180_OMCR,		/* 3e operation mode control register */
 	Z180_IOCR,		/* 3f I/O control register */
-	Z180_IOLINES	/* read/write I/O lines */
+	Z180_IOLINES,	/* read/write I/O lines */
+	
+	Z180_GENPC = REG_GENPC,
+	Z180_GENSP = REG_GENSP,
+	Z180_GENPCBASE = REG_GENPCBASE
 };
 
 enum

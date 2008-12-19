@@ -118,6 +118,9 @@ struct _z180_state
 	const device_config *device;
 	const address_space *program;
 	const address_space *iospace;
+	cpu_state_table state;
+	UINT8	rtemp;
+	UINT32	ioltemp;
 	int icount;
 };
 
@@ -757,6 +760,132 @@ static void set_irq_line(z180_state *cpustate, int irqline, int state);
 #define Z180_IOCR_RESET 		0x00
 #define Z180_IOCR_RMASK 		0xff
 #define Z180_IOCR_WMASK 		0xff
+
+
+/***************************************************************************
+    CPU STATE DESCRIPTION
+***************************************************************************/
+
+#define Z180_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	CPU_STATE_ENTRY(Z180_##_name, #_name, _format, z180_state, _member, _datamask, ~0, _flags)
+
+#define Z180_STATE_IO_ENTRY(_name, _flags) \
+	CPU_STATE_ENTRY(Z180_##_name, #_name, "%02X", z180_state, IO_##_name, 0xff, ~0, _flags)
+
+
+static const cpu_state_entry state_array[] =
+{
+	Z180_STATE_ENTRY(PC,  "%04X", PC.w.l, 0xffff, 0)
+	Z180_STATE_ENTRY(GENPC, "%04X", _PCD, 0xffff, CPUSTATE_NOSHOW)
+	Z180_STATE_ENTRY(GENPCBASE, "%04X", PREPC.w.l, 0xffff, CPUSTATE_NOSHOW)
+	
+	Z180_STATE_ENTRY(SP,  "%04X", _SPD, 0xffff, 0)
+	Z180_STATE_ENTRY(GENSP, "%04X", SP.w.l, 0xffff, CPUSTATE_NOSHOW)
+	
+	Z180_STATE_ENTRY(A, "%02X", _A, 0xff, CPUSTATE_NOSHOW)
+	Z180_STATE_ENTRY(B, "%02X", _B, 0xff, CPUSTATE_NOSHOW)
+	Z180_STATE_ENTRY(C, "%02X", _C, 0xff, CPUSTATE_NOSHOW)
+	Z180_STATE_ENTRY(D, "%02X", _D, 0xff, CPUSTATE_NOSHOW)
+	Z180_STATE_ENTRY(E, "%02X", _E, 0xff, CPUSTATE_NOSHOW)
+	Z180_STATE_ENTRY(H, "%02X", _H, 0xff, CPUSTATE_NOSHOW)
+	Z180_STATE_ENTRY(L, "%02X", _L, 0xff, CPUSTATE_NOSHOW)
+
+	Z180_STATE_ENTRY(AF, "%04X", AF.w.l, 0xffff, 0)
+	Z180_STATE_ENTRY(BC, "%04X", BC.w.l, 0xffff, 0)
+	Z180_STATE_ENTRY(DE, "%04X", DE.w.l, 0xffff, 0)
+	Z180_STATE_ENTRY(HL, "%04X", HL.w.l, 0xffff, 0)
+	Z180_STATE_ENTRY(IX, "%04X", IX.w.l, 0xffff, 0)
+	Z180_STATE_ENTRY(IY, "%04X", IY.w.l, 0xffff, 0)
+
+	Z180_STATE_ENTRY(AF2, "%04X", AF2.w.l, 0xffff, 0)
+	Z180_STATE_ENTRY(BC2, "%04X", BC2.w.l, 0xffff, 0)
+	Z180_STATE_ENTRY(DE2, "%04X", DE2.w.l, 0xffff, 0)
+	Z180_STATE_ENTRY(HL2, "%04X", HL2.w.l, 0xffff, 0)
+
+	Z180_STATE_ENTRY(R,      "%02X", rtemp, 0xff, CPUSTATE_EXPORT | CPUSTATE_IMPORT)
+	Z180_STATE_ENTRY(I,      "%02X", I, 0xff, 0)
+	Z180_STATE_ENTRY(IM,     "%1u", IM, 0x3, 0)
+	Z180_STATE_ENTRY(IFF1,   "%1u", IFF1, 0x1, 0)
+	Z180_STATE_ENTRY(IFF2,   "%1u", IFF2, 0x1, 0)
+	Z180_STATE_ENTRY(HALT,   "%1u", HALT, 0x1, 0)
+
+	Z180_STATE_ENTRY(IOLINES, "%06X", ioltemp, 0xffffff, CPUSTATE_IMPORT)
+
+	Z180_STATE_IO_ENTRY(CNTLA0, 0)
+	Z180_STATE_IO_ENTRY(CNTLA1, 0)
+	Z180_STATE_IO_ENTRY(CNTLB0, 0)
+	Z180_STATE_IO_ENTRY(CNTLB1, 0)
+	Z180_STATE_IO_ENTRY(STAT0, 0)
+	Z180_STATE_IO_ENTRY(STAT1, 0)
+	Z180_STATE_IO_ENTRY(TDR0, 0)
+	Z180_STATE_IO_ENTRY(TDR1, 0)
+	Z180_STATE_IO_ENTRY(RDR0, 0)
+	Z180_STATE_IO_ENTRY(RDR1, 0)
+	Z180_STATE_IO_ENTRY(CNTR, 0)
+	Z180_STATE_IO_ENTRY(TRDR, 0)
+	Z180_STATE_IO_ENTRY(TMDR0L, 0)
+	Z180_STATE_IO_ENTRY(TMDR0H, 0)
+	Z180_STATE_IO_ENTRY(RLDR0L, 0)
+	Z180_STATE_IO_ENTRY(RLDR0H, 0)
+	Z180_STATE_IO_ENTRY(TCR, 0)
+	Z180_STATE_IO_ENTRY(IO11, 0)
+	Z180_STATE_IO_ENTRY(ASEXT0, 0)
+	Z180_STATE_IO_ENTRY(ASEXT1, 0)
+	Z180_STATE_IO_ENTRY(TMDR1L, 0)
+	Z180_STATE_IO_ENTRY(TMDR1H, 0)
+	Z180_STATE_IO_ENTRY(RLDR1L, 0)
+	Z180_STATE_IO_ENTRY(RLDR1H, 0)
+	Z180_STATE_IO_ENTRY(FRC, 0)
+	Z180_STATE_IO_ENTRY(IO19, 0)
+	Z180_STATE_IO_ENTRY(ASTC0L, 0)
+	Z180_STATE_IO_ENTRY(ASTC0H, 0)
+	Z180_STATE_IO_ENTRY(ASTC1L, 0)
+	Z180_STATE_IO_ENTRY(ASTC1H, 0)
+	Z180_STATE_IO_ENTRY(CMR, 0)
+	Z180_STATE_IO_ENTRY(CCR, 0)
+	Z180_STATE_IO_ENTRY(SAR0L, 0)
+	Z180_STATE_IO_ENTRY(SAR0H, 0)
+	Z180_STATE_IO_ENTRY(SAR0B, 0)
+	Z180_STATE_IO_ENTRY(DAR0L, 0)
+	Z180_STATE_IO_ENTRY(DAR0H, 0)
+	Z180_STATE_IO_ENTRY(DAR0B, 0)
+	Z180_STATE_IO_ENTRY(BCR0L, 0)
+	Z180_STATE_IO_ENTRY(BCR0H, 0)
+	Z180_STATE_IO_ENTRY(MAR1L, 0)
+	Z180_STATE_IO_ENTRY(MAR1H, 0)
+	Z180_STATE_IO_ENTRY(MAR1B, 0)
+	Z180_STATE_IO_ENTRY(IAR1L, 0)
+	Z180_STATE_IO_ENTRY(IAR1H, 0)
+	Z180_STATE_IO_ENTRY(IAR1B, 0)
+	Z180_STATE_IO_ENTRY(BCR1L, 0)
+	Z180_STATE_IO_ENTRY(BCR1H, 0)
+	Z180_STATE_IO_ENTRY(DSTAT, 0)
+	Z180_STATE_IO_ENTRY(DMODE, 0)
+	Z180_STATE_IO_ENTRY(DCNTL, 0)
+	Z180_STATE_IO_ENTRY(IL, 0)
+	Z180_STATE_IO_ENTRY(ITC, 0)
+	Z180_STATE_IO_ENTRY(IO35, 0)
+	Z180_STATE_IO_ENTRY(RCR, 0)
+	Z180_STATE_IO_ENTRY(IO37, 0)
+	Z180_STATE_IO_ENTRY(CBR, CPUSTATE_IMPORT)
+	Z180_STATE_IO_ENTRY(BBR, CPUSTATE_IMPORT)
+	Z180_STATE_IO_ENTRY(CBAR, CPUSTATE_IMPORT)
+	Z180_STATE_IO_ENTRY(IO3B, 0)
+	Z180_STATE_IO_ENTRY(IO3C, 0)
+	Z180_STATE_IO_ENTRY(IO3D, 0)
+	Z180_STATE_IO_ENTRY(OMCR, 0)
+	Z180_STATE_IO_ENTRY(IOCR, 0)
+};
+
+static const cpu_state_table state_table_template =
+{
+	NULL,						/* pointer to the base of state (offsets are relative to this) */
+	0,							/* subtype this table refers to */
+	ARRAY_LENGTH(state_array),	/* number of entries */
+	state_array					/* array of entries */
+};
+
+
 
 static UINT8 SZ[256];		/* zero and sign flags */
 static UINT8 SZ_BIT[256];	/* zero, sign and parity/overflow (=zero) flags for BIT opcode */
@@ -1884,6 +2013,11 @@ static CPU_INIT( z180 )
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
+	/* set up the state table */
+	cpustate->state = state_table_template;
+	cpustate->state.baseptr = cpustate;
+	cpustate->state.subtypemask = 1;
+
 	state_save_register_device_item(device, 0, cpustate->AF.w.l);
 	state_save_register_device_item(device, 0, cpustate->BC.w.l);
 	state_save_register_device_item(device, 0, cpustate->DE.w.l);
@@ -1919,6 +2053,7 @@ static CPU_RESET( z180 )
 	z180_state *cpustate = device->token;
 	z80_daisy_state *save_daisy;
 	cpu_irq_callback save_irqcallback;
+	cpu_state_table save_table; 
 	int i, p;
 	int oldval, newval, val;
 	UINT8 *padd, *padc, *psub, *psbc;
@@ -1997,9 +2132,11 @@ static CPU_RESET( z180 )
 
 	save_daisy = cpustate->daisy;
 	save_irqcallback = cpustate->irq_callback;
+	save_table = cpustate->state;
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->daisy = save_daisy;
 	cpustate->irq_callback = save_irqcallback;
+	cpustate->state = save_table;
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
@@ -2303,6 +2440,60 @@ static CPU_TRANSLATE( z180 )
 	return TRUE;
 }
 
+
+/**************************************************************************
+ * STATE IMPORT/EXPORT
+ **************************************************************************/
+
+static CPU_IMPORT_STATE( z180 )
+{
+	z180_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case Z180_R:
+			cpustate->R = cpustate->rtemp & 0x7f;
+			cpustate->R2 = cpustate->rtemp & 0x80;
+			break;
+		
+		case Z180_CBR:
+		case Z180_BBR:
+		case Z180_CBAR:
+			z180_mmu(cpustate);
+			break;
+		
+		case Z180_IOLINES:
+			z180_write_iolines(cpustate, cpustate->ioltemp);
+			break;
+		
+		default:
+			fatalerror("CPU_IMPORT_STATE(z80) called for unexpected value\n");
+			break;
+	}
+}
+
+
+static CPU_EXPORT_STATE( z180 )
+{
+	z180_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case Z180_R:
+			cpustate->rtemp = (cpustate->R & 0x7f) | (cpustate->R2 & 0x80);
+			break;
+		
+		case Z180_IOLINES:
+			cpustate->ioltemp = cpustate->iol;
+			break;
+
+		default:
+			fatalerror("CPU_EXPORT_STATE(z80) called for unexpected value\n");
+			break;
+	}
+}
+
+
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
@@ -2315,94 +2506,6 @@ static CPU_SET_INFO( z180 )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + Z180_INT0:		set_irq_line(cpustate, Z180_INT0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + Z180_INT1:		set_irq_line(cpustate, Z180_INT1, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + Z180_INT2:		set_irq_line(cpustate, Z180_INT2, info->i);		break;
-
-		case CPUINFO_INT_PC:							cpustate->_PC = info->i; 							break;
-		case CPUINFO_INT_REGISTER + Z180_PC:			cpustate->PC.w.l = info->i;					break;
-		case CPUINFO_INT_SP:							cpustate->_SP = info->i;							break;
-		case CPUINFO_INT_REGISTER + Z180_SP:			cpustate->SP.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_AF:			cpustate->AF.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_BC:			cpustate->BC.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_DE:			cpustate->DE.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_HL:			cpustate->HL.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_IX:			cpustate->IX.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_IY:			cpustate->IY.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_R:				cpustate->R = info->i; cpustate->R2 = info->i & 0x80;	break;
-		case CPUINFO_INT_REGISTER + Z180_I:				cpustate->I = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z180_AF2:			cpustate->AF2.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_BC2:			cpustate->BC2.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_DE2:			cpustate->DE2.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_HL2:			cpustate->HL2.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_IM:			cpustate->IM = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z180_IFF1:			cpustate->IFF1 = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_IFF2:			cpustate->IFF2 = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_HALT:			cpustate->HALT = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z180_CNTLA0:		cpustate->io[0x00] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_CNTLA1:		cpustate->io[0x01] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_CNTLB0:		cpustate->io[0x02] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_CNTLB1:		cpustate->io[0x03] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_STAT0:			cpustate->io[0x04] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_STAT1:			cpustate->io[0x05] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_TDR0:			cpustate->io[0x06] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_TDR1:			cpustate->io[0x07] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_RDR0:			cpustate->io[0x08] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_RDR1:			cpustate->io[0x09] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_CNTR:			cpustate->io[0x0a] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_TRDR:			cpustate->io[0x0b] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_TMDR0L:		cpustate->io[0x0c] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_TMDR0H:		cpustate->io[0x0d] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_RLDR0L:		cpustate->io[0x0e] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_RLDR0H:		cpustate->io[0x0f] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_TCR:			cpustate->io[0x10] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IO11:			cpustate->io[0x11] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_ASEXT0:		cpustate->io[0x12] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_ASEXT1:		cpustate->io[0x13] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_TMDR1L:		cpustate->io[0x14] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_TMDR1H:		cpustate->io[0x15] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_RLDR1L:		cpustate->io[0x16] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_RLDR1H:		cpustate->io[0x17] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_FRC:			cpustate->io[0x18] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IO19:			cpustate->io[0x19] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_ASTC0L:		cpustate->io[0x1a] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_ASTC0H:		cpustate->io[0x1b] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_ASTC1L:		cpustate->io[0x1c] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_ASTC1H:		cpustate->io[0x1d] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_CMR:			cpustate->io[0x1e] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_CCR:			cpustate->io[0x1f] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_SAR0L:			cpustate->io[0x20] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_SAR0H:			cpustate->io[0x21] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_SAR0B:			cpustate->io[0x22] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_DAR0L:			cpustate->io[0x23] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_DAR0H:			cpustate->io[0x24] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_DAR0B:			cpustate->io[0x25] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_BCR0L:			cpustate->io[0x26] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_BCR0H:			cpustate->io[0x27] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_MAR1L:			cpustate->io[0x28] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_MAR1H:			cpustate->io[0x29] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_MAR1B:			cpustate->io[0x2a] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IAR1L:			cpustate->io[0x2b] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IAR1H:			cpustate->io[0x2c] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IAR1B:			cpustate->io[0x2d] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_BCR1L:			cpustate->io[0x2e] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_BCR1H:			cpustate->io[0x2f] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_DSTAT:			cpustate->io[0x30] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_DMODE:			cpustate->io[0x31] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_DCNTL:			cpustate->io[0x32] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IL:			cpustate->io[0x33] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_ITC:			cpustate->io[0x34] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IO35:			cpustate->io[0x35] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_RCR:			cpustate->io[0x36] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IO37:			cpustate->io[0x37] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_CBR:			cpustate->io[0x38] = info->i; z180_mmu(cpustate);	break;
-		case CPUINFO_INT_REGISTER + Z180_BBR:			cpustate->io[0x39] = info->i; z180_mmu(cpustate);	break;
-		case CPUINFO_INT_REGISTER + Z180_CBAR:			cpustate->io[0x3a] = info->i; z180_mmu(cpustate);	break;
-		case CPUINFO_INT_REGISTER + Z180_IO3B:			cpustate->io[0x3b] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IO3C:			cpustate->io[0x3c] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IO3D:			cpustate->io[0x3d] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_OMCR:			cpustate->io[0x3e] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IOCR:			cpustate->io[0x3f] = info->i;				break;
-		case CPUINFO_INT_REGISTER + Z180_IOLINES:		z180_write_iolines(cpustate, info->i);		break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: cc[Z180_TABLE_op] = info->p;			break;
@@ -2451,94 +2554,6 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_INT_INPUT_STATE + Z180_INT1:		info->i = cpustate->irq_state[1];			break;
 		case CPUINFO_INT_INPUT_STATE + Z180_INT2:		info->i = cpustate->irq_state[2];			break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->PREPC.w.l;				break;
-
-		case CPUINFO_INT_PC:							info->i = cpustate->_PCD;							break;
-		case CPUINFO_INT_REGISTER + Z180_PC:			info->i = cpustate->PC.w.l;					break;
-		case CPUINFO_INT_SP:							info->i = cpustate->_SPD;							break;
-		case CPUINFO_INT_REGISTER + Z180_SP:			info->i = cpustate->SP.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_AF:			info->i = cpustate->AF.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_BC:			info->i = cpustate->BC.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_DE:			info->i = cpustate->DE.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_HL:			info->i = cpustate->HL.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_IX:			info->i = cpustate->IX.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_IY:			info->i = cpustate->IY.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_R:				info->i = (cpustate->R & 0x7f) | (cpustate->R2 & 0x80); break;
-		case CPUINFO_INT_REGISTER + Z180_I:				info->i = cpustate->I;						break;
-		case CPUINFO_INT_REGISTER + Z180_AF2:			info->i = cpustate->AF2.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_BC2:			info->i = cpustate->BC2.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_DE2:			info->i = cpustate->DE2.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_HL2:			info->i = cpustate->HL2.w.l;					break;
-		case CPUINFO_INT_REGISTER + Z180_IM:			info->i = cpustate->IM;						break;
-		case CPUINFO_INT_REGISTER + Z180_IFF1:			info->i = cpustate->IFF1;					break;
-		case CPUINFO_INT_REGISTER + Z180_IFF2:			info->i = cpustate->IFF2;					break;
-		case CPUINFO_INT_REGISTER + Z180_HALT:			info->i = cpustate->HALT;					break;
-		case CPUINFO_INT_REGISTER + Z180_CNTLA0:		info->i = cpustate->io[0x00];				break;
-		case CPUINFO_INT_REGISTER + Z180_CNTLA1:		info->i = cpustate->io[0x01];				break;
-		case CPUINFO_INT_REGISTER + Z180_CNTLB0:		info->i = cpustate->io[0x02];				break;
-		case CPUINFO_INT_REGISTER + Z180_CNTLB1:		info->i = cpustate->io[0x03];				break;
-		case CPUINFO_INT_REGISTER + Z180_STAT0:			info->i = cpustate->io[0x04];				break;
-		case CPUINFO_INT_REGISTER + Z180_STAT1:			info->i = cpustate->io[0x05];				break;
-		case CPUINFO_INT_REGISTER + Z180_TDR0:			info->i = cpustate->io[0x06];				break;
-		case CPUINFO_INT_REGISTER + Z180_TDR1:			info->i = cpustate->io[0x07];				break;
-		case CPUINFO_INT_REGISTER + Z180_RDR0:			info->i = cpustate->io[0x08];				break;
-		case CPUINFO_INT_REGISTER + Z180_RDR1:			info->i = cpustate->io[0x09];				break;
-		case CPUINFO_INT_REGISTER + Z180_CNTR:			info->i = cpustate->io[0x0a];				break;
-		case CPUINFO_INT_REGISTER + Z180_TRDR:			info->i = cpustate->io[0x0b];				break;
-		case CPUINFO_INT_REGISTER + Z180_TMDR0L:		info->i = cpustate->io[0x0c];				break;
-		case CPUINFO_INT_REGISTER + Z180_TMDR0H:		info->i = cpustate->io[0x0d];				break;
-		case CPUINFO_INT_REGISTER + Z180_RLDR0L:		info->i = cpustate->io[0x0e];				break;
-		case CPUINFO_INT_REGISTER + Z180_RLDR0H:		info->i = cpustate->io[0x0f];				break;
-		case CPUINFO_INT_REGISTER + Z180_TCR:			info->i = cpustate->io[0x10];				break;
-		case CPUINFO_INT_REGISTER + Z180_IO11:			info->i = cpustate->io[0x11];				break;
-		case CPUINFO_INT_REGISTER + Z180_ASEXT0:		info->i = cpustate->io[0x12];				break;
-		case CPUINFO_INT_REGISTER + Z180_ASEXT1:		info->i = cpustate->io[0x13];				break;
-		case CPUINFO_INT_REGISTER + Z180_TMDR1L:		info->i = cpustate->io[0x14];				break;
-		case CPUINFO_INT_REGISTER + Z180_TMDR1H:		info->i = cpustate->io[0x15];				break;
-		case CPUINFO_INT_REGISTER + Z180_RLDR1L:		info->i = cpustate->io[0x16];				break;
-		case CPUINFO_INT_REGISTER + Z180_RLDR1H:		info->i = cpustate->io[0x17];				break;
-		case CPUINFO_INT_REGISTER + Z180_FRC:			info->i = cpustate->io[0x18];				break;
-		case CPUINFO_INT_REGISTER + Z180_IO19:			info->i = cpustate->io[0x19];				break;
-		case CPUINFO_INT_REGISTER + Z180_ASTC0L:		info->i = cpustate->io[0x1a];				break;
-		case CPUINFO_INT_REGISTER + Z180_ASTC0H:		info->i = cpustate->io[0x1b];				break;
-		case CPUINFO_INT_REGISTER + Z180_ASTC1L:		info->i = cpustate->io[0x1c];				break;
-		case CPUINFO_INT_REGISTER + Z180_ASTC1H:		info->i = cpustate->io[0x1d];				break;
-		case CPUINFO_INT_REGISTER + Z180_CMR:			info->i = cpustate->io[0x1e];				break;
-		case CPUINFO_INT_REGISTER + Z180_CCR:			info->i = cpustate->io[0x1f];				break;
-		case CPUINFO_INT_REGISTER + Z180_SAR0L:			info->i = cpustate->io[0x20];				break;
-		case CPUINFO_INT_REGISTER + Z180_SAR0H:			info->i = cpustate->io[0x21];				break;
-		case CPUINFO_INT_REGISTER + Z180_SAR0B:			info->i = cpustate->io[0x22];				break;
-		case CPUINFO_INT_REGISTER + Z180_DAR0L:			info->i = cpustate->io[0x23];				break;
-		case CPUINFO_INT_REGISTER + Z180_DAR0H:			info->i = cpustate->io[0x24];				break;
-		case CPUINFO_INT_REGISTER + Z180_DAR0B:			info->i = cpustate->io[0x25];				break;
-		case CPUINFO_INT_REGISTER + Z180_BCR0L:			info->i = cpustate->io[0x26];				break;
-		case CPUINFO_INT_REGISTER + Z180_BCR0H:			info->i = cpustate->io[0x27];				break;
-		case CPUINFO_INT_REGISTER + Z180_MAR1L:			info->i = cpustate->io[0x28];				break;
-		case CPUINFO_INT_REGISTER + Z180_MAR1H:			info->i = cpustate->io[0x29];				break;
-		case CPUINFO_INT_REGISTER + Z180_MAR1B:			info->i = cpustate->io[0x2a];				break;
-		case CPUINFO_INT_REGISTER + Z180_IAR1L:			info->i = cpustate->io[0x2b];				break;
-		case CPUINFO_INT_REGISTER + Z180_IAR1H:			info->i = cpustate->io[0x2c];				break;
-		case CPUINFO_INT_REGISTER + Z180_IAR1B:			info->i = cpustate->io[0x2d];				break;
-		case CPUINFO_INT_REGISTER + Z180_BCR1L:			info->i = cpustate->io[0x2e];				break;
-		case CPUINFO_INT_REGISTER + Z180_BCR1H:			info->i = cpustate->io[0x2f];				break;
-		case CPUINFO_INT_REGISTER + Z180_DSTAT:			info->i = cpustate->io[0x30];				break;
-		case CPUINFO_INT_REGISTER + Z180_DMODE:			info->i = cpustate->io[0x31];				break;
-		case CPUINFO_INT_REGISTER + Z180_DCNTL:			info->i = cpustate->io[0x32];				break;
-		case CPUINFO_INT_REGISTER + Z180_IL:			info->i = cpustate->io[0x33];				break;
-		case CPUINFO_INT_REGISTER + Z180_ITC:			info->i = cpustate->io[0x34];				break;
-		case CPUINFO_INT_REGISTER + Z180_IO35:			info->i = cpustate->io[0x35];				break;
-		case CPUINFO_INT_REGISTER + Z180_RCR:			info->i = cpustate->io[0x36];				break;
-		case CPUINFO_INT_REGISTER + Z180_IO37:			info->i = cpustate->io[0x37];				break;
-		case CPUINFO_INT_REGISTER + Z180_CBR:			info->i = cpustate->io[0x38];				break;
-		case CPUINFO_INT_REGISTER + Z180_BBR:			info->i = cpustate->io[0x39];				break;
-		case CPUINFO_INT_REGISTER + Z180_CBAR:			info->i = cpustate->io[0x3a];				break;
-		case CPUINFO_INT_REGISTER + Z180_IO3B:			info->i = cpustate->io[0x3b];				break;
-		case CPUINFO_INT_REGISTER + Z180_IO3C:			info->i = cpustate->io[0x3c];				break;
-		case CPUINFO_INT_REGISTER + Z180_IO3D:			info->i = cpustate->io[0x3d];				break;
-		case CPUINFO_INT_REGISTER + Z180_OMCR:			info->i = cpustate->io[0x3e];				break;
-		case CPUINFO_INT_REGISTER + Z180_IOCR:			info->i = cpustate->io[0x3f];				break;
-		case CPUINFO_INT_REGISTER + Z180_IOLINES:		info->i = cpustate->iol;						break;
-
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(z180);		break;
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(z180);				break;
@@ -2548,6 +2563,9 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(z180);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(z180);		break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;			break;
+		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(z180);break;	
+		case CPUINFO_FCT_EXPORT_STATE:					info->export_state = CPU_EXPORT_STATE_NAME(z180);break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: info->p = (void *)cc[Z180_TABLE_op];			break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: info->p = (void *)cc[Z180_TABLE_cb];			break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: info->p = (void *)cc[Z180_TABLE_ed];			break;
@@ -2573,32 +2591,5 @@ CPU_GET_INFO( z180 )
 				cpustate->AF.b.l & 0x02 ? 'N':'.',
 				cpustate->AF.b.l & 0x01 ? 'C':'.');
 			break;
-
-		case CPUINFO_STR_REGISTER + Z180_PC:			sprintf(info->s, "PC:%04X", cpustate->PC.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_SP:			sprintf(info->s, "SP:%04X", cpustate->SP.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_AF:			sprintf(info->s, "AF:%04X", cpustate->AF.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_BC:			sprintf(info->s, "BC:%04X", cpustate->BC.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_DE:			sprintf(info->s, "DE:%04X", cpustate->DE.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_HL:			sprintf(info->s, "HL:%04X", cpustate->HL.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_IX:			sprintf(info->s, "IX:%04X", cpustate->IX.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_IY:			sprintf(info->s, "IY:%04X", cpustate->IY.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_R: 			sprintf(info->s, "R   :%02X", (cpustate->R & 0x7f) | (cpustate->R2 & 0x80)); break;
-		case CPUINFO_STR_REGISTER + Z180_I: 			sprintf(info->s, "I   :%02X", cpustate->I); break;
-		case CPUINFO_STR_REGISTER + Z180_IL:			sprintf(info->s, "IL  :%02X", cpustate->io[Z180_IL-Z180_CNTLA0]); break;
-		case CPUINFO_STR_REGISTER + Z180_AF2:			sprintf(info->s, "AF2:%04X", cpustate->AF2.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_BC2:			sprintf(info->s, "BC2:%04X", cpustate->BC2.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_DE2:			sprintf(info->s, "DE2:%04X", cpustate->DE2.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_HL2:			sprintf(info->s, "HL2:%04X", cpustate->HL2.w.l); break;
-		case CPUINFO_STR_REGISTER + Z180_IM:			sprintf(info->s, "IM  :%X", cpustate->IM); break;
-		case CPUINFO_STR_REGISTER + Z180_IFF1:			sprintf(info->s, "IFF1:%X", cpustate->IFF1); break;
-		case CPUINFO_STR_REGISTER + Z180_IFF2:			sprintf(info->s, "IFF2:%X", cpustate->IFF2); break;
-		case CPUINFO_STR_REGISTER + Z180_HALT:			sprintf(info->s, "HALT:%X", cpustate->HALT); break;
-		case CPUINFO_STR_REGISTER + Z180_CCR: 			sprintf(info->s, "CCR :%02X", cpustate->io[Z180_CCR-Z180_CNTLA0]); break;
-		case CPUINFO_STR_REGISTER + Z180_ITC: 			sprintf(info->s, "ITC :%02X", cpustate->io[Z180_ITC-Z180_CNTLA0]); break;
-		case CPUINFO_STR_REGISTER + Z180_CBR: 			sprintf(info->s, "CBR :%02X", cpustate->io[Z180_CBR-Z180_CNTLA0]); break;
-		case CPUINFO_STR_REGISTER + Z180_BBR: 			sprintf(info->s, "BBR :%02X", cpustate->io[Z180_BBR-Z180_CNTLA0]); break;
-		case CPUINFO_STR_REGISTER + Z180_CBAR:			sprintf(info->s, "CBAR:%02X", cpustate->io[Z180_CBAR-Z180_CNTLA0]); break;
-		case CPUINFO_STR_REGISTER + Z180_OMCR:			sprintf(info->s, "OMCR:%02X", cpustate->io[Z180_OMCR-Z180_CNTLA0]); break;
-		case CPUINFO_STR_REGISTER + Z180_IOCR:			sprintf(info->s, "IOCR:%02X", cpustate->io[Z180_IOCR-Z180_CNTLA0]); break;
 	}
 }
