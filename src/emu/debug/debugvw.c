@@ -1268,6 +1268,8 @@ static void registers_view_recompute(debug_view *view)
 		{
 			if (regnum >= table->entrycount)
 				break;
+			if ((table->entrylist[regnum].validmask & table->subtypemask) == 0)
+				continue;
 			regid = table->entrylist[regnum].index;
 		}
 		else
