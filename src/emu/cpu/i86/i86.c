@@ -50,6 +50,9 @@ struct _i8086_state
 	INT8 irq_state;
 	INT8 test_state;	/* PJB 03/05 */
 	INT32 extra_cycles;       /* extra cycles for interrupts */
+	
+	UINT16 ip;
+	UINT32 sp;
 
 	memory_interface	mem;
 
@@ -57,11 +60,61 @@ struct _i8086_state
 	const address_space *program;
 	const address_space *io;
 	int icount;
+	cpu_state_table state;
 
 	unsigned prefix_base;		   /* base address of the latest prefix segment */
 	char seg_prefix;				   /* prefix segment indicator */
 	unsigned ea;
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
+};
+
+
+/***************************************************************************
+    CPU STATE DESCRIPTION
+***************************************************************************/
+
+#define I86_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	CPU_STATE_ENTRY(I8086_##_name, #_name, _format, i8086_state, _member, _datamask, ~0, _flags)
+
+static const cpu_state_entry state_array[] =
+{
+	I86_STATE_ENTRY(GENPC, "%9s", pc, 0xfffff, CPUSTATE_IMPORT)
+	I86_STATE_ENTRY(GENPCBASE, "%08X", pc, 0xfffff, CPUSTATE_NOSHOW)	/* not implemented */
+	I86_STATE_ENTRY(IP,    "%04X", ip, 0xffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
+	
+	I86_STATE_ENTRY(FLAGS, "%04X", flags, 0xffff, CPUSTATE_NOSHOW | CPUSTATE_IMPORT | CPUSTATE_EXPORT)
+
+	I86_STATE_ENTRY(AX,    "%04X", regs.w[AX], 0xffff, 0)
+	I86_STATE_ENTRY(BX,    "%04X", regs.w[BX], 0xffff, 0)
+	I86_STATE_ENTRY(CX,    "%04X", regs.w[CX], 0xffff, 0)
+	I86_STATE_ENTRY(DX,    "%04X", regs.w[DX], 0xffff, 0)
+	I86_STATE_ENTRY(SI,    "%04X", regs.w[SI], 0xffff, 0)
+	I86_STATE_ENTRY(DI,    "%04X", regs.w[DI], 0xffff, 0)
+	I86_STATE_ENTRY(BP,    "%04X", regs.w[BP], 0xffff, 0)
+	I86_STATE_ENTRY(SP,    "%04X", regs.w[SP], 0xffff, 0)
+	I86_STATE_ENTRY(GENSP, "%9s", sp, 0xfffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
+
+	I86_STATE_ENTRY(AL,    "%02X", regs.b[AL], 0xff, CPUSTATE_NOSHOW)
+	I86_STATE_ENTRY(BL,    "%02X", regs.b[BL], 0xff, CPUSTATE_NOSHOW)
+	I86_STATE_ENTRY(CL,    "%02X", regs.b[CL], 0xff, CPUSTATE_NOSHOW)
+	I86_STATE_ENTRY(DL,    "%02X", regs.b[DL], 0xff, CPUSTATE_NOSHOW)
+	I86_STATE_ENTRY(AH,    "%02X", regs.b[AH], 0xff, CPUSTATE_NOSHOW)
+	I86_STATE_ENTRY(BH,    "%02X", regs.b[BH], 0xff, CPUSTATE_NOSHOW)
+	I86_STATE_ENTRY(CH,    "%02X", regs.b[CH], 0xff, CPUSTATE_NOSHOW)
+	I86_STATE_ENTRY(DH,    "%02X", regs.b[DH], 0xff, CPUSTATE_NOSHOW)
+
+	I86_STATE_ENTRY(CS,    "%04X", sregs[CS], 0xffff, CPUSTATE_IMPORT)
+	I86_STATE_ENTRY(DS,    "%04X", sregs[DS], 0xffff, CPUSTATE_IMPORT)
+	I86_STATE_ENTRY(ES,    "%04X", sregs[ES], 0xffff, CPUSTATE_IMPORT)
+	I86_STATE_ENTRY(SS,    "%04X", sregs[SS], 0xffff, CPUSTATE_IMPORT)
+};
+
+static const cpu_state_table state_table_template =
+{
+	NULL,						/* pointer to the base of state (offsets are relative to this) */
+	0,							/* subtype this table refers to */
+	ARRAY_LENGTH(state_array),	/* number of entries */
+	state_array					/* array of entries */
 };
 
 
@@ -152,6 +205,11 @@ static CPU_INIT( i8086 )
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
+	/* set up the state table */
+	cpustate->state = state_table_template;
+	cpustate->state.baseptr = cpustate;
+	cpustate->state.subtypemask = 1;
+
 	i8086_state_register(device);
 	configure_memory_16bit(cpustate);
 }
@@ -170,12 +228,15 @@ static CPU_RESET( i8086 )
 	i8086_state *cpustate = device->token;
 	cpu_irq_callback save_irqcallback;
     memory_interface save_mem;
+    cpu_state_table save_state;
 
 	save_irqcallback = cpustate->irq_callback;
 	save_mem = cpustate->mem;
+    save_state = cpustate->state;
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->mem = save_mem;
+    cpustate->state = save_state;
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
@@ -224,11 +285,6 @@ static void set_test_line(i8086_state *cpustate, int state)
 static CPU_EXECUTE( i8086 )
 {
 	i8086_state *cpustate = device->token;
-
-	cpustate->base[CS] = SegBase(CS);
-	cpustate->base[DS] = SegBase(DS);
-	cpustate->base[ES] = SegBase(ES);
-	cpustate->base[SS] = SegBase(SS);
 
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 8086)
@@ -286,11 +342,6 @@ static CPU_EXECUTE( i80186 )
 {
 	i8086_state *cpustate = device->token;
 
-	cpustate->base[CS] = SegBase(CS);
-	cpustate->base[DS] = SegBase(DS);
-	cpustate->base[ES] = SegBase(ES);
-	cpustate->base[SS] = SegBase(SS);
-
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 80186)
 		timing = i80186_cycles;
@@ -324,6 +375,110 @@ static CPU_EXECUTE( i80186 )
 
 
 /**************************************************************************
+ * STATE IMPORT/EXPORT
+ **************************************************************************/
+
+static CPU_IMPORT_STATE( i8086 )
+{
+	i8086_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case I8086_GENPC:
+			if (cpustate->pc - cpustate->base[CS] >= 0x10000)
+			{
+				cpustate->base[CS] = cpustate->pc & 0xffff0;
+				cpustate->sregs[CS] = cpustate->base[CS] >> 4;
+			}
+			break;
+
+		case I8086_IP:
+			cpustate->pc = cpustate->base[CS] + cpustate->ip;
+			break;
+
+		case I8086_GENSP:
+			if (cpustate->sp - cpustate->base[SS] >= 0x10000)
+			{
+				cpustate->base[SS] = cpustate->sp & 0xffff0;
+				cpustate->sregs[SS] = cpustate->base[SS] >> 4;
+			}
+			cpustate->regs.w[SP] = cpustate->sp - cpustate->base[SS];
+			break;
+
+		case I8086_FLAGS:
+			ExpandFlags(cpustate->flags);
+			break;
+		
+		case I8086_ES:
+			cpustate->base[ES] = SegBase(ES);
+			break;
+
+		case I8086_CS:
+			cpustate->base[CS] = SegBase(CS);
+			break;
+
+		case I8086_SS:
+			cpustate->base[SS] = SegBase(SS);
+			break;
+
+		case I8086_DS:
+			cpustate->base[DS] = SegBase(DS);
+			break;
+		
+		default:
+			fatalerror("CPU_IMPORT_STATE(i8086) called for unexpected value\n");
+			break;
+	}
+}
+
+
+static CPU_EXPORT_STATE( i8086 )
+{
+	i8086_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case I8086_IP:
+			cpustate->ip = cpustate->pc - cpustate->base[CS];
+			break;
+
+		case I8086_FLAGS:
+			cpustate->flags = CompressFlags();
+			break;
+
+		case I8086_GENSP:
+			cpustate->sp = cpustate->base[SS] + cpustate->regs.w[SP];
+			break;
+		
+		default:
+			fatalerror("CPU_EXPORT_STATE(i8086) called for unexpected value\n");
+			break;
+	}
+}
+
+
+static CPU_EXPORT_STRING( i8086 )
+{
+	i8086_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case I8086_GENPC:
+			sprintf(string, "%04X:%04X", cpustate->sregs[CS] & 0xffff, (cpustate->pc - cpustate->base[CS]) & 0xffff);
+			break;
+		
+		case I8086_GENSP:
+			sprintf(string, "%04X:%04X", cpustate->sregs[SS] & 0xffff, cpustate->regs.w[SP] & 0xffff);
+			break;
+		
+		default:
+			fatalerror("CPU_EXPORT_STRING(i8086) called for unexpected value\n");
+			break;
+	}
+}
+
+
+/**************************************************************************
  * Generic set_info
  **************************************************************************/
 
@@ -337,43 +492,6 @@ static CPU_SET_INFO( i8086 )
 		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(cpustate, 0, info->i);				break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_TEST:	set_test_line(cpustate, info->i);					break; /* PJB 03/05 */
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + I8086_PC:
-			if (info->i - cpustate->base[CS] >= 0x10000)
-			{
-				cpustate->base[CS] = info->i & 0xffff0;
-				cpustate->sregs[CS] = cpustate->base[CS] >> 4;
-			}
-			cpustate->pc = info->i;
-			break;
-		case CPUINFO_INT_REGISTER + I8086_IP:			cpustate->pc = cpustate->base[CS] + info->i;			break;
-		case CPUINFO_INT_SP:
-			if (info->i - cpustate->base[SS] < 0x10000)
-			{
-				cpustate->regs.w[SP] = info->i - cpustate->base[SS];
-			}
-			else
-			{
-				cpustate->base[SS] = info->i & 0xffff0;
-				cpustate->sregs[SS] = cpustate->base[SS] >> 4;
-				cpustate->regs.w[SP] = info->i & 0x0000f;
-			}
-			break;
-		case CPUINFO_INT_REGISTER + I8086_SP:			cpustate->regs.w[SP] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I8086_FLAGS: 		cpustate->flags = info->i;	ExpandFlags(info->i); break;
-		case CPUINFO_INT_REGISTER + I8086_AX:			cpustate->regs.w[AX] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I8086_CX:			cpustate->regs.w[CX] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I8086_DX:			cpustate->regs.w[DX] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I8086_BX:			cpustate->regs.w[BX] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I8086_BP:			cpustate->regs.w[BP] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I8086_SI:			cpustate->regs.w[SI] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I8086_DI:			cpustate->regs.w[DI] = info->i; 				break;
-		case CPUINFO_INT_REGISTER + I8086_ES:			cpustate->sregs[ES] = info->i;	cpustate->base[ES] = SegBase(ES); break;
-		case CPUINFO_INT_REGISTER + I8086_CS:			cpustate->sregs[CS] = info->i;	cpustate->base[CS] = SegBase(CS); break;
-		case CPUINFO_INT_REGISTER + I8086_SS:			cpustate->sregs[SS] = info->i;	cpustate->base[SS] = SegBase(SS); break;
-		case CPUINFO_INT_REGISTER + I8086_DS:			cpustate->sregs[DS] = info->i;	cpustate->base[DS] = SegBase(DS); break;
-		case CPUINFO_INT_REGISTER + I8086_VECTOR:		cpustate->int_vector = info->i; 				break;
 	}
 }
 
@@ -418,34 +536,19 @@ CPU_GET_INFO( i8086 )
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->prevpc;						break;
 
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + I8086_PC:			info->i = cpustate->pc;							break;
-		case CPUINFO_INT_REGISTER + I8086_IP:			info->i = cpustate->pc - cpustate->base[CS];			break;
-		case CPUINFO_INT_SP:							info->i = cpustate->base[SS] + cpustate->regs.w[SP];	break;
-		case CPUINFO_INT_REGISTER + I8086_SP:			info->i = cpustate->regs.w[SP];					break;
-		case CPUINFO_INT_REGISTER + I8086_FLAGS: 		cpustate->flags = CompressFlags(); info->i = cpustate->flags; break;
-		case CPUINFO_INT_REGISTER + I8086_AX:			info->i = cpustate->regs.w[AX];					break;
-		case CPUINFO_INT_REGISTER + I8086_CX:			info->i = cpustate->regs.w[CX];					break;
-		case CPUINFO_INT_REGISTER + I8086_DX:			info->i = cpustate->regs.w[DX];					break;
-		case CPUINFO_INT_REGISTER + I8086_BX:			info->i = cpustate->regs.w[BX];					break;
-		case CPUINFO_INT_REGISTER + I8086_BP:			info->i = cpustate->regs.w[BP];					break;
-		case CPUINFO_INT_REGISTER + I8086_SI:			info->i = cpustate->regs.w[SI];					break;
-		case CPUINFO_INT_REGISTER + I8086_DI:			info->i = cpustate->regs.w[DI];					break;
-		case CPUINFO_INT_REGISTER + I8086_ES:			info->i = cpustate->sregs[ES];					break;
-		case CPUINFO_INT_REGISTER + I8086_CS:			info->i = cpustate->sregs[CS];					break;
-		case CPUINFO_INT_REGISTER + I8086_SS:			info->i = cpustate->sregs[SS];					break;
-		case CPUINFO_INT_REGISTER + I8086_DS:			info->i = cpustate->sregs[DS];					break;
-		case CPUINFO_INT_REGISTER + I8086_VECTOR:		info->i = cpustate->int_vector;					break;
-
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i8086);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8086);				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8086);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i8086);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(i8086);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(i8086);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i8086);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8086);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+		case CPUINFO_PTR_BURN:							info->burn = NULL;									break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8086);	break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;					break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;				break;
+		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(i8086);	break;	
+		case CPUINFO_FCT_EXPORT_STATE:					info->export_state = CPU_EXPORT_STATE_NAME(i8086);	break;
+		case CPUINFO_FCT_EXPORT_STRING:					info->export_string = CPU_EXPORT_STRING_NAME(i8086);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "8086");				break;
@@ -474,23 +577,6 @@ CPU_GET_INFO( i8086 )
 					cpustate->flags & 0x0002 ? 'N' : '.',
 					cpustate->flags & 0x0001 ? 'C' : '.');
 			break;
-
-		case CPUINFO_STR_REGISTER + I8086_PC: 			sprintf(info->s, "PC:%04X", cpustate->pc); break;
-		case CPUINFO_STR_REGISTER + I8086_IP: 			sprintf(info->s, "IP: %04X", cpustate->pc - cpustate->base[CS]); break;
-		case CPUINFO_STR_REGISTER + I8086_SP: 			sprintf(info->s, "SP: %04X", cpustate->regs.w[SP]); break;
-		case CPUINFO_STR_REGISTER + I8086_FLAGS:		sprintf(info->s, "F:%04X", cpustate->flags); break;
-		case CPUINFO_STR_REGISTER + I8086_AX: 			sprintf(info->s, "AX:%04X", cpustate->regs.w[AX]); break;
-		case CPUINFO_STR_REGISTER + I8086_CX: 			sprintf(info->s, "CX:%04X", cpustate->regs.w[CX]); break;
-		case CPUINFO_STR_REGISTER + I8086_DX: 			sprintf(info->s, "DX:%04X", cpustate->regs.w[DX]); break;
-		case CPUINFO_STR_REGISTER + I8086_BX: 			sprintf(info->s, "BX:%04X", cpustate->regs.w[BX]); break;
-		case CPUINFO_STR_REGISTER + I8086_BP: 			sprintf(info->s, "BP:%04X", cpustate->regs.w[BP]); break;
-		case CPUINFO_STR_REGISTER + I8086_SI: 			sprintf(info->s, "SI: %04X", cpustate->regs.w[SI]); break;
-		case CPUINFO_STR_REGISTER + I8086_DI: 			sprintf(info->s, "DI: %04X", cpustate->regs.w[DI]); break;
-		case CPUINFO_STR_REGISTER + I8086_ES: 			sprintf(info->s, "ES:%04X", cpustate->sregs[ES]); break;
-		case CPUINFO_STR_REGISTER + I8086_CS: 			sprintf(info->s, "CS:%04X", cpustate->sregs[CS]); break;
-		case CPUINFO_STR_REGISTER + I8086_SS: 			sprintf(info->s, "SS:%04X", cpustate->sregs[SS]); break;
-		case CPUINFO_STR_REGISTER + I8086_DS: 			sprintf(info->s, "DS:%04X", cpustate->sregs[DS]); break;
-		case CPUINFO_STR_REGISTER + I8086_VECTOR:		sprintf(info->s, "V:%02X", cpustate->int_vector); break;
 	}
 }
 

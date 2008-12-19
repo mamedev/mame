@@ -631,13 +631,13 @@ DEVICE_GET_INFO( naomibd )
 			switch (config->type)
 			{
 				default:
-				case ROM_BOARD:					info->s = "Naomi Rom Board";			break;
-				case DIMM_BOARD:				info->s = "Naomi Dimm Board";			break;
+				case ROM_BOARD:					strcpy(info->s, "Naomi Rom Board");				break;
+				case DIMM_BOARD:				strcpy(info->s, "Naomi Dimm Board");			break;
 			}
 			break;
-		case DEVINFO_STR_FAMILY:				info->s = "Naomi plug-in board";		break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Naomi plug-in board");			break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

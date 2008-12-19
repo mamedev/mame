@@ -235,7 +235,7 @@ union _sndinfo
 	INT64	i;											/* generic integers */
 	void *	p;											/* generic pointers */
 	genf *  f;											/* generic function pointers */
-	const char *s;										/* generic strings */
+	char *	s;											/* generic strings */
 
 	snd_set_info_func	set_info;						/* SNDINFO_PTR_SET_INFO */
 	snd_start_func		start;							/* SNDINFO_PTR_START */

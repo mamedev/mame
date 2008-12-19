@@ -639,10 +639,10 @@ SND_GET_INFO( s14001a )
 		case SNDINFO_PTR_START:						info->start = SND_START_NAME( s14001a );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:						info->s = "S14001A";		break;
-		case SNDINFO_STR_CORE_FAMILY:				info->s = "TSI S14001A";	break;
-		case SNDINFO_STR_CORE_VERSION:				info->s = "1.31";			break;
-		case SNDINFO_STR_CORE_FILE:					info->s = __FILE__;			break;
-		case SNDINFO_STR_CORE_CREDITS:				info->s = "Copyright Jonathan Gevaryahu"; break;
+		case SNDINFO_STR_NAME:						strcpy(info->s, "S14001A");						break;
+		case SNDINFO_STR_CORE_FAMILY:				strcpy(info->s, "TSI S14001A");					break;
+		case SNDINFO_STR_CORE_VERSION:				strcpy(info->s, "1.31");						break;
+		case SNDINFO_STR_CORE_FILE:					strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:				strcpy(info->s, "Copyright Jonathan Gevaryahu"); break;
 	}
 }

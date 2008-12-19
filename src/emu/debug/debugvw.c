@@ -1185,12 +1185,12 @@ static void registers_view_recompute(debug_view *view)
 {
 	debug_view_registers *regdata = view->extra_data;
 	int regnum, maxtaglen, maxvallen;
-	const int *list;
+	const cpu_state_table *table;
 
 	/* if no CPU, reset to the first one */
 	if (regdata->device == NULL)
 		regdata->device = view->machine->cpu[0];
-	list = cpu_get_debug_register_list(regdata->device);
+	table = cpu_get_state_table(regdata->device);
 
 	/* reset the view parameters */
 	view->topleft.y = 0;
@@ -1264,15 +1264,20 @@ static void registers_view_recompute(debug_view *view)
 		int regid;
 
 		/* identify the register id */
-		regid = list ? list[regnum] : regnum;
-		if (regid < 0)
-			break;
+		if (table != NULL)
+		{
+			if (regnum >= table->entrycount)
+				break;
+			regid = table->entrylist[regnum].index;
+		}
+		else
+			regid = regnum;
 
 		/* retrieve the string for this register */
 		str = cpu_get_reg_string(regdata->device, regid);
 
 		/* did we get a string? */
-		if (str && str[0] != '\0' && str[0] != '~')
+		if (str != NULL && str[0] != 0 && str[0] != '~')
 			registers_view_add_register(view, regid, str);
 	}
 

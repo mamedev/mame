@@ -81,22 +81,22 @@ static const INT32 constants[] =
 #define MSTAT_GOMODE	0x40			/* go mode enable */
 
 /* you must call this in order to change MSTAT */
-INLINE void set_mstat(adsp2100_state *adsp, int new_value)
+INLINE void update_mstat(adsp2100_state *adsp)
 {
-	if ((new_value ^ adsp->mstat) & MSTAT_BANK)
+	if ((adsp->mstat ^ adsp->mstat_prev) & MSTAT_BANK)
 	{
 		ADSPCORE temp = adsp->core;
 		adsp->core = adsp->alt;
 		adsp->alt = temp;
 	}
-	if ((new_value ^ adsp->mstat) & MSTAT_TIMER)
+	if ((adsp->mstat ^ adsp->mstat_prev) & MSTAT_TIMER)
 		if (adsp->timer_fired != NULL)
-			(*adsp->timer_fired)(adsp->device, (new_value & MSTAT_TIMER) != 0);
-	if (new_value & MSTAT_STICKYV)
+			(*adsp->timer_fired)(adsp->device, (adsp->mstat & MSTAT_TIMER) != 0);
+	if (adsp->mstat & MSTAT_STICKYV)
 		adsp->astat_clear = ~(CFLAG | NFLAG | ZFLAG);
 	else
 		adsp->astat_clear = ~(CFLAG | VFLAG | NFLAG | ZFLAG);
-	adsp->mstat = new_value;
+	adsp->mstat_prev = adsp->mstat;
 }
 
 
@@ -291,7 +291,8 @@ INLINE void stat_stack_pop(adsp2100_state *adsp)
 		if (adsp->stat_sp == 0)
 			adsp->sstat |= STATUS_EMPTY;
 	}
-	set_mstat(adsp, adsp->stat_stack[adsp->stat_sp][0]);
+	adsp->mstat = adsp->stat_stack[adsp->stat_sp][0];
+	update_mstat(adsp);
 	adsp->imask = adsp->stat_stack[adsp->stat_sp][1];
 	adsp->astat = adsp->stat_stack[adsp->stat_sp][2];
  	check_irqs(adsp);
@@ -322,6 +323,17 @@ INLINE int CONDITION(adsp2100_state *adsp, int c)
     register writing
 ===========================================================================*/
 
+INLINE void update_i(adsp2100_state *adsp, int which)
+{
+	adsp->base[which] = adsp->i[which] & adsp->lmask[which];
+}
+
+INLINE void update_l(adsp2100_state *adsp, int which)
+{
+	adsp->lmask[which] = mask_table[adsp->l[which] & 0x3fff];
+	adsp->base[which] = adsp->i[which] & adsp->lmask[which];
+}
+
 static void wr_inval(adsp2100_state *adsp, INT32 val) { logerror( "ADSP %04x: Writing to an invalid register!\n", adsp->ppc ); }
 static void wr_ax0(adsp2100_state *adsp, INT32 val)   { adsp->core.ax0.s = val; }
 static void wr_ax1(adsp2100_state *adsp, INT32 val)   { adsp->core.ax1.s = val; }
@@ -339,14 +351,14 @@ static void wr_mr1(adsp2100_state *adsp, INT32 val)   { adsp->core.mr.mrx.mr1.s 
 static void wr_mr2(adsp2100_state *adsp, INT32 val)   { adsp->core.mr.mrx.mr2.s = (INT8)val; }
 static void wr_sr0(adsp2100_state *adsp, INT32 val)   { adsp->core.sr.srx.sr0.s = val; }
 static void wr_sr1(adsp2100_state *adsp, INT32 val)   { adsp->core.sr.srx.sr1.s = val; }
-static void wr_i0(adsp2100_state *adsp, INT32 val)    { adsp->i[0] = val & 0x3fff; adsp->base[0] = val & adsp->lmask[0]; }
-static void wr_i1(adsp2100_state *adsp, INT32 val)    { adsp->i[1] = val & 0x3fff; adsp->base[1] = val & adsp->lmask[1]; }
-static void wr_i2(adsp2100_state *adsp, INT32 val)    { adsp->i[2] = val & 0x3fff; adsp->base[2] = val & adsp->lmask[2]; }
-static void wr_i3(adsp2100_state *adsp, INT32 val)    { adsp->i[3] = val & 0x3fff; adsp->base[3] = val & adsp->lmask[3]; }
-static void wr_i4(adsp2100_state *adsp, INT32 val)    { adsp->i[4] = val & 0x3fff; adsp->base[4] = val & adsp->lmask[4]; }
-static void wr_i5(adsp2100_state *adsp, INT32 val)    { adsp->i[5] = val & 0x3fff; adsp->base[5] = val & adsp->lmask[5]; }
-static void wr_i6(adsp2100_state *adsp, INT32 val)    { adsp->i[6] = val & 0x3fff; adsp->base[6] = val & adsp->lmask[6]; }
-static void wr_i7(adsp2100_state *adsp, INT32 val)    { adsp->i[7] = val & 0x3fff; adsp->base[7] = val & adsp->lmask[7]; }
+static void wr_i0(adsp2100_state *adsp, INT32 val)    { adsp->i[0] = val & 0x3fff; update_i(adsp, 0); }
+static void wr_i1(adsp2100_state *adsp, INT32 val)    { adsp->i[1] = val & 0x3fff; update_i(adsp, 1); }
+static void wr_i2(adsp2100_state *adsp, INT32 val)    { adsp->i[2] = val & 0x3fff; update_i(adsp, 2); }
+static void wr_i3(adsp2100_state *adsp, INT32 val)    { adsp->i[3] = val & 0x3fff; update_i(adsp, 3); }
+static void wr_i4(adsp2100_state *adsp, INT32 val)    { adsp->i[4] = val & 0x3fff; update_i(adsp, 4); }
+static void wr_i5(adsp2100_state *adsp, INT32 val)    { adsp->i[5] = val & 0x3fff; update_i(adsp, 5); }
+static void wr_i6(adsp2100_state *adsp, INT32 val)    { adsp->i[6] = val & 0x3fff; update_i(adsp, 6); }
+static void wr_i7(adsp2100_state *adsp, INT32 val)    { adsp->i[7] = val & 0x3fff; update_i(adsp, 7); }
 static void wr_m0(adsp2100_state *adsp, INT32 val)    { adsp->m[0] = (INT32)(val << 18) >> 18; }
 static void wr_m1(adsp2100_state *adsp, INT32 val)    { adsp->m[1] = (INT32)(val << 18) >> 18; }
 static void wr_m2(adsp2100_state *adsp, INT32 val)    { adsp->m[2] = (INT32)(val << 18) >> 18; }
@@ -355,17 +367,16 @@ static void wr_m4(adsp2100_state *adsp, INT32 val)    { adsp->m[4] = (INT32)(val
 static void wr_m5(adsp2100_state *adsp, INT32 val)    { adsp->m[5] = (INT32)(val << 18) >> 18; }
 static void wr_m6(adsp2100_state *adsp, INT32 val)    { adsp->m[6] = (INT32)(val << 18) >> 18; }
 static void wr_m7(adsp2100_state *adsp, INT32 val)    { adsp->m[7] = (INT32)(val << 18) >> 18; }
-static void wr_l0(adsp2100_state *adsp, INT32 val)    { adsp->l[0] = val & 0x3fff; adsp->lmask[0] = mask_table[val & 0x3fff]; adsp->base[0] = adsp->i[0] & adsp->lmask[0]; }
-static void wr_l1(adsp2100_state *adsp, INT32 val)    { adsp->l[1] = val & 0x3fff; adsp->lmask[1] = mask_table[val & 0x3fff]; adsp->base[1] = adsp->i[1] & adsp->lmask[1]; }
-static void wr_l2(adsp2100_state *adsp, INT32 val)    { adsp->l[2] = val & 0x3fff; adsp->lmask[2] = mask_table[val & 0x3fff]; adsp->base[2] = adsp->i[2] & adsp->lmask[2]; }
-static void wr_l3(adsp2100_state *adsp, INT32 val)    { adsp->l[3] = val & 0x3fff; adsp->lmask[3] = mask_table[val & 0x3fff]; adsp->base[3] = adsp->i[3] & adsp->lmask[3]; }
-static void wr_l4(adsp2100_state *adsp, INT32 val)    { adsp->l[4] = val & 0x3fff; adsp->lmask[4] = mask_table[val & 0x3fff]; adsp->base[4] = adsp->i[4] & adsp->lmask[4]; }
-static void wr_l5(adsp2100_state *adsp, INT32 val)    { adsp->l[5] = val & 0x3fff; adsp->lmask[5] = mask_table[val & 0x3fff]; adsp->base[5] = adsp->i[5] & adsp->lmask[5]; }
-static void wr_l6(adsp2100_state *adsp, INT32 val)    { adsp->l[6] = val & 0x3fff; adsp->lmask[6] = mask_table[val & 0x3fff]; adsp->base[6] = adsp->i[6] & adsp->lmask[6]; }
-static void wr_l7(adsp2100_state *adsp, INT32 val)    { adsp->l[7] = val & 0x3fff; adsp->lmask[7] = mask_table[val & 0x3fff]; adsp->base[7] = adsp->i[7] & adsp->lmask[7]; }
+static void wr_l0(adsp2100_state *adsp, INT32 val)    { adsp->l[0] = val & 0x3fff; update_l(adsp, 0); }
+static void wr_l1(adsp2100_state *adsp, INT32 val)    { adsp->l[1] = val & 0x3fff; update_l(adsp, 1); }
+static void wr_l2(adsp2100_state *adsp, INT32 val)    { adsp->l[2] = val & 0x3fff; update_l(adsp, 2); }
+static void wr_l3(adsp2100_state *adsp, INT32 val)    { adsp->l[3] = val & 0x3fff; update_l(adsp, 3); }
+static void wr_l4(adsp2100_state *adsp, INT32 val)    { adsp->l[4] = val & 0x3fff; update_l(adsp, 4); }
+static void wr_l5(adsp2100_state *adsp, INT32 val)    { adsp->l[5] = val & 0x3fff; update_l(adsp, 5); }
+static void wr_l6(adsp2100_state *adsp, INT32 val)    { adsp->l[6] = val & 0x3fff; update_l(adsp, 6); }
+static void wr_l7(adsp2100_state *adsp, INT32 val)    { adsp->l[7] = val & 0x3fff; update_l(adsp, 7); }
 static void wr_astat(adsp2100_state *adsp, INT32 val) { adsp->astat = val & 0x00ff; }
-static void wr_mstat(adsp2100_state *adsp, INT32 val) { set_mstat(adsp, val & adsp->mstat_mask); }
-static void wr_sstat(adsp2100_state *adsp, INT32 val) { adsp->sstat = val & 0x00ff; }
+static void wr_mstat(adsp2100_state *adsp, INT32 val) { adsp->mstat = val & adsp->mstat_mask; update_mstat(adsp); }
 static void wr_imask(adsp2100_state *adsp, INT32 val) { adsp->imask = val & adsp->imask_mask; check_irqs(adsp); }
 static void wr_icntl(adsp2100_state *adsp, INT32 val) { adsp->icntl = val & 0x001f; check_irqs(adsp); }
 static void wr_cntr(adsp2100_state *adsp, INT32 val)  { cntr_stack_push(adsp); adsp->cntr = val & 0x3fff; }

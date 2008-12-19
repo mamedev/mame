@@ -88,6 +88,10 @@ struct _cpu_class_data
 	UINT32			cycles_per_second;		/* cycles per second, adjusted for multipliers */
 	attoseconds_t	attoseconds_per_cycle;	/* attoseconds per adjusted clock cycle */
 
+	/* internal state reflection */
+	const cpu_state_table *state;			/* pointer to the base table */
+	const cpu_state_entry *regstate[MAX_REGS];/* pointer to the state entry for each register */
+
 	/* these below are hacks to support multiple interrupts per frame */
 	INT32 			iloops; 				/* number of interrupts remaining this frame */
 	emu_timer *		partial_frame_timer;	/* the timer that triggers partial frame interrupts */
@@ -118,7 +122,12 @@ static TIMER_CALLBACK( triggertime_callback );
 static TIMER_CALLBACK( empty_event_queue );
 static IRQ_CALLBACK( standard_irq_callback );
 static void register_save_states(const device_config *device);
-
+static UINT64 get_register_value(const device_config *device, void *baseptr, const cpu_state_entry *entry);
+static void set_register_value(const device_config *device, void *baseptr, const cpu_state_entry *entry, UINT64 value);
+static void get_register_string_value(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *dest);
+#ifdef UNUSED_FUNCTION
+static int get_register_string_max_width(const device_config *device, void *baseptr, const cpu_state_entry *entry);
+#endif
 
 
 /***************************************************************************
@@ -430,6 +439,25 @@ static DEVICE_START( cpu )
 		inputline->curvector = inputline->vector;
 	}
 	update_clock_information(device);
+	
+	/* fetch information about the CPU states */
+	classdata->state = cpu_get_state_table(device);
+	if (classdata->state != NULL)
+	{
+		int stateindex;
+		
+		/* loop over all states specified, and work with any that apply */
+		for (stateindex = 0; stateindex < classdata->state->entrycount; stateindex++)
+		{
+			const cpu_state_entry *entry = &classdata->state->entrylist[stateindex];
+			if (entry->validmask == 0 || (entry->validmask & classdata->state->subtypemask) != 0)
+			{
+				assert(entry->index < MAX_REGS);
+				assert(classdata->regstate[entry->index] == NULL);
+				classdata->regstate[entry->index] = entry;
+			}
+		}
+	}
 
 	/* if no state registered for saving, we can't save */
 	if (num_regs == 0)
@@ -544,6 +572,20 @@ static DEVICE_SET_INFO( cpu )
 		/* no parameters to set */
 
 		default:
+			/* if we have a state pointer, we can handle some stuff for free */
+			if (device->token != NULL)
+			{
+				const cpu_class_data *classdata = cpu_get_class_data(device);
+				if (classdata->state != NULL)
+				{
+					if (state >= CPUINFO_INT_REGISTER && state <= CPUINFO_INT_REGISTER_LAST)
+					{
+						set_register_value(device, classdata->state->baseptr, classdata->regstate[state - CPUINFO_INT_REGISTER], info->i);
+						return;
+					}
+				}
+			}
+		
 			/* integer data */
 			if (state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST)
 			{
@@ -593,6 +635,27 @@ DEVICE_GET_INFO( cpu )
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(cpu); 		break;
 
 		default:
+			/* if we have a state pointer, we can handle some stuff for free */
+			if (device->token != NULL)
+			{
+				const cpu_class_data *classdata = cpu_get_class_data(device);
+				if (classdata->state != NULL)
+				{
+					if (state >= CPUINFO_INT_REGISTER && state <= CPUINFO_INT_REGISTER_LAST)
+					{
+						info->i = get_register_value(device, classdata->state->baseptr, classdata->regstate[state - CPUINFO_INT_REGISTER]);
+						return;
+					}
+					else if (state >= CPUINFO_STR_REGISTER && state <= CPUINFO_STR_REGISTER_LAST)
+					{
+						cinfo.s = info->s;
+						get_register_string_value(device, classdata->state->baseptr, classdata->regstate[state - CPUINFO_STR_REGISTER], cinfo.s);
+						info->s = cinfo.s;
+						return;
+					}
+				}
+			}
+		
 			/* integer data */
 			if (state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST)
 			{
@@ -1471,3 +1534,333 @@ static void register_save_states(const device_config *device)
 	}
 }
 
+
+/*-------------------------------------------------
+    get_register_value - return a register value
+    of a CPU using the state table
+-------------------------------------------------*/
+
+static UINT64 get_register_value(const device_config *device, void *baseptr, const cpu_state_entry *entry)
+{
+	void *dataptr;
+	UINT64 result;
+	
+	/* NULL entry returns 0 */
+	if (entry == NULL || baseptr == NULL)
+		return 0;
+	
+	/* if we have an exporter, call it now */
+	if ((entry->flags & CPUSTATE_EXPORT) != 0)
+	{
+		cpu_state_io_func exportcb = (cpu_state_io_func)device_get_info_fct(device, CPUINFO_FCT_EXPORT_STATE);
+		assert(exportcb != NULL);
+		(*exportcb)(device, baseptr, entry);
+	}
+	
+	/* pick up the value */
+	dataptr = (UINT8 *)baseptr + entry->dataoffs;
+	switch (entry->datasize)
+	{
+		default:
+		case 1:	result = *(UINT8 *)dataptr;		break;
+		case 2:	result = *(UINT16 *)dataptr;	break;
+		case 4:	result = *(UINT32 *)dataptr;	break;
+		case 8:	result = *(UINT64 *)dataptr;	break;
+	}
+	return result & entry->mask;
+}
+
+
+/*-------------------------------------------------
+    set_register_value - set the value of a 
+    CPU register using the state table
+-------------------------------------------------*/
+
+static void set_register_value(const device_config *device, void *baseptr, const cpu_state_entry *entry, UINT64 value)
+{
+	void *dataptr;
+	
+	/* NULL entry is a no-op */
+	if (entry == NULL || baseptr == NULL)
+		return;
+	
+	/* apply the mask */
+	value &= entry->mask;
+	
+	/* sign-extend if necessary */
+	if ((entry->flags & CPUSTATE_IMPORT_SEXT) != 0 && value > (entry->mask >> 1))
+		value |= ~entry->mask;
+
+	/* store the value */
+	dataptr = (UINT8 *)baseptr + entry->dataoffs;
+	switch (entry->datasize)
+	{
+		default:
+		case 1:	*(UINT8 *)dataptr = value;		break;
+		case 2:	*(UINT16 *)dataptr = value;		break;
+		case 4:	*(UINT32 *)dataptr = value;		break;
+		case 8:	*(UINT64 *)dataptr = value;		break;
+	}
+	
+	/* if we have an importer, call it now */
+	if ((entry->flags & CPUSTATE_IMPORT) != 0)
+	{
+		cpu_state_io_func importcb = (cpu_state_io_func)device_get_info_fct(device, CPUINFO_FCT_IMPORT_STATE);
+		assert(importcb != NULL);
+		(*importcb)(device, baseptr, entry);
+	}
+}
+
+
+/*-------------------------------------------------
+    get_register_string_value - return a string
+    representation of a CPU register using the
+    state table
+-------------------------------------------------*/
+
+static void get_register_string_value(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *dest)
+{
+	static const UINT64 decdivisor[] = { 
+		1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000, 
+		U64(10000000000), 			U64(100000000000), 			U64(1000000000000), 
+		U64(10000000000000), 		U64(100000000000000), 		U64(1000000000000000), 
+		U64(10000000000000000), 	U64(100000000000000000), 	U64(1000000000000000000), 
+		U64(10000000000000000000)
+	};
+	static const char hexchars[] = "0123456789ABCDEF";
+	int leadzero = 0, width = 0, percent = 0, explicitsign = 0, hitnonzero = 0, reset;
+	const char *fptr;
+	UINT64 result;
+	
+	/* NULL entry does nothing */
+	if (entry == NULL || entry->symbol == NULL || entry->format == NULL)
+		return;
+
+	/* fetch the data */
+	result = get_register_value(device, baseptr, entry);
+	
+	/* start with the basics */
+	dest += sprintf(dest, "%s%s:", (entry->flags & CPUSTATE_NOSHOW) ? "~" : "", entry->symbol);
+	
+	/* parse the format */
+	reset = TRUE;
+	for (fptr = entry->format; *fptr != 0; fptr++)
+	{
+		int digitnum;
+		
+		/* reset any accumulated state */
+		if (reset)
+			leadzero = width = percent = explicitsign = reset = 0;
+		
+		/* if we're not within a format, then anything other than a % outputs directly */
+		if (!percent && *fptr != '%')
+		{
+			*dest++ = *fptr;
+			continue;
+		}
+
+		/* handle each character in turn */
+		switch (*fptr)
+		{
+			/* % starts a format; %% outputs a single % */
+			case '%':
+				if (!percent)
+					percent = TRUE;
+				else
+				{
+					*dest++ = *fptr;
+					percent = FALSE;
+				}
+				break;
+			
+			/* 0 means insert leading 0s, unless it follows another width digit */
+			case '0':
+				if (width == 0)
+					leadzero = TRUE;
+				else
+					width *= 10;
+				break;
+			
+			/* 1-9 accumulate into the width */
+			case '1': 	case '2': 	case '3': 	case '4':	case '5':
+			case '6':	case '7':	case '8':	case '9':
+				width = width * 10 + (*fptr - '0');
+				break;
+			
+			/* + means explicit sign */
+			case '+':
+				explicitsign = TRUE;
+				break;
+			
+			/* X outputs as hexadecimal */
+			case 'X':
+				if (width == 0)
+					fatalerror("Width required for %%X formats\n");
+				hitnonzero = FALSE;
+				while (leadzero && width > 16)
+				{
+					*dest++ = ' ';
+					width--;
+				}
+				for (digitnum = 15; digitnum >= 0; digitnum--)
+				{
+					int digit = (result >> (4 * digitnum)) & 0x0f;
+					if (digit != 0)
+						*dest++ = hexchars[digit];
+					else if (hitnonzero || (leadzero && digitnum < width) || digitnum == 0)
+						*dest++ = '0';
+					hitnonzero |= digit;
+				}
+				reset = TRUE;
+				break;
+			
+			/* d outputs as signed decimal */
+			case 'd':
+				if (width == 0)
+					fatalerror("Width required for %%d formats\n");
+				if ((result & entry->mask) > (entry->mask >> 1))
+				{
+					result = -result & entry->mask;
+					*dest++ = '-';
+					width--;
+				}
+				else if (explicitsign)
+				{
+					*dest++ = '+';
+					width--;
+				}
+				/* fall through to unsigned case */
+			
+			/* u outputs as unsigned decimal */
+			case 'u':
+				if (width == 0)
+					fatalerror("Width required for %%u formats\n");
+				hitnonzero = FALSE;
+				while (leadzero && width > ARRAY_LENGTH(decdivisor))
+				{
+					*dest++ = ' ';
+					width--;
+				}
+				for (digitnum = ARRAY_LENGTH(decdivisor); digitnum >= 0; digitnum--)
+				{
+					int digit = (result >= decdivisor[digitnum]) ? (result / decdivisor[digitnum]) % 10 : 0;
+					if (digit != 0)
+						*dest++ = '0' + digit;
+					else if (hitnonzero || (leadzero && digitnum < width) || digitnum == 0)
+						*dest++ = '0';
+					hitnonzero |= digit;
+				}
+				reset = TRUE;
+				break;
+			
+			/* s is a custom format */
+			case 's':
+			{
+				cpu_string_io_func exportstring = (cpu_string_io_func)device_get_info_fct(device, CPUINFO_FCT_EXPORT_STRING);
+				assert(exportstring != NULL);
+				(*exportstring)(device, baseptr, entry, dest);
+				dest += strlen(dest);
+				break;
+			}
+			
+			/* other formats unknown */
+			default:
+				fatalerror("Unknown format character '%c'\n", *fptr);
+				break;
+		}
+	}
+	*dest = 0;
+}
+
+
+/*-------------------------------------------------
+    get_register_string_max_width - return the
+    maximum width of a string described by a
+    format
+-------------------------------------------------*/
+
+#ifdef UNUSED_FUNCTION
+static int get_register_string_max_width(const device_config *device, void *baseptr, const cpu_state_entry *entry)
+{
+	int leadzero = 0, width = 0, percent = 0, explicitsign = 0, reset;
+	int totalwidth = 0;
+	const char *fptr;
+	
+	/* NULL entry does nothing */
+	if (entry == NULL || entry->symbol == NULL || entry->format == NULL)
+		return 0;
+
+	/* parse the format */
+	reset = TRUE;
+	for (fptr = entry->format; *fptr != 0; fptr++)
+	{
+		/* reset any accumulated state */
+		if (reset)
+			leadzero = width = percent = explicitsign = reset = 0;
+		
+		/* if we're not within a format, then anything other than a % outputs directly */
+		if (!percent && *fptr != '%')
+		{
+			totalwidth++;
+			continue;
+		}
+
+		/* handle each character in turn */
+		switch (*fptr)
+		{
+			/* % starts a format; %% outputs a single % */
+			case '%':
+				if (!percent)
+					percent = TRUE;
+				else
+				{
+					totalwidth++;
+					percent = FALSE;
+				}
+				break;
+			
+			/* 0 means insert leading 0s, unless it follows another width digit */
+			case '0':
+				if (width == 0)
+					leadzero = TRUE;
+				else
+					width *= 10;
+				break;
+			
+			/* 1-9 accumulate into the width */
+			case '1': 	case '2': 	case '3': 	case '4':	case '5':
+			case '6':	case '7':	case '8':	case '9':
+				width = width * 10 + (*fptr - '0');
+				break;
+			
+			/* + means explicit sign */
+			case '+':
+				explicitsign = TRUE;
+				break;
+			
+			/* X outputs as hexadecimal */
+			/* d outputs as signed decimal */
+			/* u outputs as unsigned decimal */
+			/* s outputs as custom format */
+			case 'X':
+			case 'd':
+			case 'u':
+			case 's':
+				totalwidth += width;
+				reset = TRUE;
+				break;
+			
+				if (width == 0)
+					fatalerror("Width required for %%d formats\n");
+				totalwidth += width;
+				break;
+			
+			/* other formats unknown */
+			default:
+				fatalerror("Unknown format character '%c'\n", *fptr);
+				break;
+		}
+	}
+	return totalwidth;
+}
+#endif

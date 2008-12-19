@@ -175,7 +175,6 @@
 #include "debugger.h"
 #include "x86emit.h"
 #include "eminline.h"
-#undef REG_SP
 #include "x86log.h"
 #include <math.h>
 #include <stddef.h>

@@ -45,6 +45,7 @@ typedef struct _tms34010_state tms34010_state;
 struct _tms34010_state
 {
 	UINT32				pc;
+	UINT32				ppc;
 	UINT32				st;
 	void (*pixel_write)(tms34010_state *tms, offs_t offset, UINT32 data);
 	UINT32 (*pixel_read)(tms34010_state *tms, offs_t offset);
@@ -76,11 +77,13 @@ struct _tms34010_state
 		XY xy;
 	} regs[31];
 
-	/* for the 34010, we only copy 32 of these into the new state */
 	UINT16 IOregs[64];
+	
+	cpu_state_table		state;
 };
 
 #include "34010ops.h"
+
 
 
 /***************************************************************************
@@ -96,6 +99,7 @@ static const tms34010_config default_config =
 static void check_interrupt(tms34010_state *tms);
 static TIMER_CALLBACK( scanline_callback );
 static STATE_POSTLOAD( tms34010_state_postload );
+
 
 
 /***************************************************************************
@@ -188,14 +192,68 @@ static STATE_POSTLOAD( tms34010_state_postload );
 
 
 /***************************************************************************
-    INLINE SHORTCUTS
+    CPU STATE DESCRIPTION
 ***************************************************************************/
 
-/* Combine indiviual flags into the Status Register */
-INLINE UINT32 GET_ST(tms34010_state *tms)
+#define TMS340X0_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	CPU_STATE_ENTRY(TMS34010_##_name, #_name, _format, tms34010_state, _member, _datamask, ~0, _flags)
+
+static const cpu_state_entry state_array[] =
 {
-	return tms->st;
-}
+	TMS340X0_STATE_ENTRY(PC,  "%08X", pc, 0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(GENPC, "%08X", pc, 0xffffffff, CPUSTATE_NOSHOW)
+	TMS340X0_STATE_ENTRY(GENPCBASE, "%08X", ppc, 0xffffffff, CPUSTATE_NOSHOW)
+	
+	TMS340X0_STATE_ENTRY(SP,  "%08X", regs[15].reg, 0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(GENSP, "%08X", regs[15].reg, 0xffffffff, CPUSTATE_NOSHOW)
+	
+	TMS340X0_STATE_ENTRY(ST,  "%08X", st, 0xffffffff, 0)
+	
+	TMS340X0_STATE_ENTRY(A0,  "%08X", regs[0].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A1,  "%08X", regs[1].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A2,  "%08X", regs[2].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A3,  "%08X", regs[3].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A4,  "%08X", regs[4].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A5,  "%08X", regs[5].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A6,  "%08X", regs[6].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A7,  "%08X", regs[7].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A8,  "%08X", regs[8].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A9,  "%08X", regs[9].reg,     0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A10, "%08X", regs[10].reg,    0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A11, "%08X", regs[11].reg,    0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A12, "%08X", regs[12].reg,    0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A13, "%08X", regs[13].reg,    0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(A14, "%08X", regs[14].reg,    0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B0,  "%08X", regs[30-0].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B1,  "%08X", regs[30-1].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B2,  "%08X", regs[30-2].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B3,  "%08X", regs[30-3].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B4,  "%08X", regs[30-4].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B5,  "%08X", regs[30-5].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B6,  "%08X", regs[30-6].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B7,  "%08X", regs[30-7].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B8,  "%08X", regs[30-8].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B9,  "%08X", regs[30-9].reg,  0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B10, "%08X", regs[30-10].reg, 0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B11, "%08X", regs[30-11].reg, 0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B12, "%08X", regs[30-12].reg, 0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B13, "%08X", regs[30-13].reg, 0xffffffff, 0)
+	TMS340X0_STATE_ENTRY(B14, "%08X", regs[30-14].reg, 0xffffffff, 0)
+};
+
+static const cpu_state_table state_table_template =
+{
+	NULL,						/* pointer to the base of state (offsets are relative to this) */
+	0,							/* subtype this table refers to */
+	ARRAY_LENGTH(state_array),	/* number of entries */
+	state_array					/* array of entries */
+};
+
+
+
+/***************************************************************************
+    INLINE SHORTCUTS
+***************************************************************************/
 
 /* Break up Status Register into indiviual flags */
 INLINE void SET_ST(tms34010_state *tms, UINT32 st)
@@ -326,7 +384,7 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 ***************************************************************************/
 
 /* No Raster Op + No Transparency */
-#define WP(T,m1,m2)  																			\
+#define WP(T,m1,m2)  																		\
 	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
 	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
 	UINT32 shiftcount = offset & m1;														\
@@ -363,7 +421,7 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 	TMS34010_WRMEM_WORD(T, a, pix);															\
 
 /* Raster Op + Transparency */
-#define WP_R_T(T,m1,m2)  																		\
+#define WP_R_T(T,m1,m2)  																	\
 	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
 	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
 	UINT32 shiftcount = offset & m1;														\
@@ -540,7 +598,7 @@ static void check_interrupt(tms34010_state *tms)
 		if (!(IOREG(tms, REG_HSTCTLH) & 0x0200))
 		{
 			PUSH(tms, tms->pc);
-			PUSH(tms, GET_ST(tms));
+			PUSH(tms, tms->st);
 		}
 
 		/* leap to the vector */
@@ -596,7 +654,7 @@ static void check_interrupt(tms34010_state *tms)
 	if (vector)
 	{
 		PUSH(tms, tms->pc);
-		PUSH(tms, GET_ST(tms));
+		PUSH(tms, tms->st);
 		RESET_ST(tms);
 		tms->pc = RLONG(tms, vector);
 		COUNT_CYCLES(tms,16);
@@ -624,7 +682,12 @@ static CPU_INIT( tms34010 )
 	tms->irq_callback = irqcallback;
 	tms->device = device;
 	tms->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	tms->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, configdata->screen_tag);
+	tms->screen = devtag_get_device(device->machine, VIDEO_SCREEN, configdata->screen_tag);
+
+	/* set up the state table */
+	tms->state = state_table_template;
+	tms->state.baseptr = tms;
+	tms->state.subtypemask = 1;
 
 	/* allocate a scanline timer and set it to go off at the start */
 	tms->scantimer = timer_alloc(device->machine, scanline_callback, tms);
@@ -656,6 +719,7 @@ static CPU_RESET( tms34010 )
 	UINT16 *shiftreg = tms->shiftreg;
 	cpu_irq_callback save_irqcallback = tms->irq_callback;
 	emu_timer *save_scantimer = tms->scantimer;
+	cpu_state_table savetable = tms->state;
 
 	memset(tms, 0, sizeof(*tms));
 
@@ -666,6 +730,7 @@ static CPU_RESET( tms34010 )
 	tms->scantimer = save_scantimer;
 	tms->device = device;
 	tms->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	tms->state = savetable;
 
 	/* fetch the initial PC and reset the state */
 	tms->pc = RLONG(tms, 0xffffffe0) & 0xfffffff0;
@@ -777,7 +842,9 @@ static CPU_EXECUTE( tms34010 )
 	{
 		do
 		{
-			UINT16 op = ROPCODE(tms);
+			UINT16 op;
+			tms->ppc = tms->pc;
+			op = ROPCODE(tms);
 			(*opcode_table[op >> 4])(tms, op);
 		} while (tms->icount > 0);
 	}
@@ -786,11 +853,8 @@ static CPU_EXECUTE( tms34010 )
 		do
 		{
 			UINT16 op;
-			if ((tms->device->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
-			{
-				tms->st = GET_ST(tms);
-				debugger_instruction_hook(tms->device, tms->pc);
-			}
+			debugger_instruction_hook(tms->device, tms->pc);
+			tms->ppc = tms->pc;
 			op = ROPCODE(tms);
 			(*opcode_table[op >> 4])(tms, op);
 		} while (tms->icount > 0);
@@ -1657,42 +1721,6 @@ static CPU_SET_INFO( tms34010 )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(tms, 0, info->i);				break;
 		case CPUINFO_INT_INPUT_STATE + 1:				set_irq_line(tms, 1, info->i);				break;
-
-		case CPUINFO_INT_PC:       						tms->pc = info->i; 							break;
-		case CPUINFO_INT_REGISTER + TMS34010_PC:		tms->pc = info->i;							break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + TMS34010_SP:		SP(tms) = info->i;							break;
-		case CPUINFO_INT_REGISTER + TMS34010_ST:		tms->st = info->i;							break;
-		case CPUINFO_INT_REGISTER + TMS34010_A0:		AREG(tms, 0) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A1:		AREG(tms, 1) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A2:		AREG(tms, 2) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A3:		AREG(tms, 3) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A4:		AREG(tms, 4) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A5:		AREG(tms, 5) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A6:		AREG(tms, 6) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A7:		AREG(tms, 7) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A8:		AREG(tms, 8) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A9:		AREG(tms, 9) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A10:		AREG(tms, 10) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A11:		AREG(tms, 11) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A12:		AREG(tms, 12) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A13:		AREG(tms, 13) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A14:		AREG(tms, 14) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B0:		BREG(tms, 0) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B1:		BREG(tms, 1) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B2:		BREG(tms, 2) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B3:		BREG(tms, 3) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B4:		BREG(tms, 4) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B5:		BREG(tms, 5) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B6:		BREG(tms, 6) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B7:		BREG(tms, 7) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B8:		BREG(tms, 8) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B9:		BREG(tms, 9) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B10:		BREG(tms, 10) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B11:		BREG(tms, 11) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B12:		BREG(tms, 12) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B13:		BREG(tms, 13) = info->i;						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B14:		BREG(tms, 14) = info->i;						break;
 	}
 }
 
@@ -1733,44 +1761,6 @@ CPU_GET_INFO( tms34010 )
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT1) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT2) ? ASSERT_LINE : CLEAR_LINE; break;
 
-		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + TMS34010_PC:		info->i = tms->pc;							break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + TMS34010_SP:		info->i = SP(tms);							break;
-		case CPUINFO_INT_REGISTER + TMS34010_ST:		info->i = tms->st;							break;
-		case CPUINFO_INT_REGISTER + TMS34010_A0:		info->i = AREG(tms, 0);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A1:		info->i = AREG(tms, 1);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A2:		info->i = AREG(tms, 2);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A3:		info->i = AREG(tms, 3);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A4:		info->i = AREG(tms, 4);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A5:		info->i = AREG(tms, 5);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A6:		info->i = AREG(tms, 6);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A7:		info->i = AREG(tms, 7);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A8:		info->i = AREG(tms, 8);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A9:		info->i = AREG(tms, 9);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A10:		info->i = AREG(tms, 10);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A11:		info->i = AREG(tms, 11);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A12:		info->i = AREG(tms, 12);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A13:		info->i = AREG(tms, 13);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_A14:		info->i = AREG(tms, 14);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B0:		info->i = BREG(tms, 0);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B1:		info->i = BREG(tms, 1);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B2:		info->i = BREG(tms, 2);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B3:		info->i = BREG(tms, 3);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B4:		info->i = BREG(tms, 4);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B5:		info->i = BREG(tms, 5);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B6:		info->i = BREG(tms, 6);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B7:		info->i = BREG(tms, 7);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B8:		info->i = BREG(tms, 8);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B9:		info->i = BREG(tms, 9);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B10:		info->i = BREG(tms, 10);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B11:		info->i = BREG(tms, 11);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B12:		info->i = BREG(tms, 12);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B13:		info->i = BREG(tms, 13);						break;
-		case CPUINFO_INT_REGISTER + TMS34010_B14:		info->i = BREG(tms, 14);						break;
-
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms34010);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms34010);				break;
@@ -1779,7 +1769,8 @@ CPU_GET_INFO( tms34010 )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms34010);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms34010);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms->icount;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms->icount;			break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &tms->state;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS34010");			break;
@@ -1809,40 +1800,6 @@ CPU_GET_INFO( tms34010 )
 				tms->st & 0x00000002 ? 'F':'.',
 				tms->st & 0x00000001 ? 'F':'.');
 			break;
-
-		case CPUINFO_STR_REGISTER + TMS34010_PC:		sprintf(info->s, "PC :%08X", tms->pc); break;
-		case CPUINFO_STR_REGISTER + TMS34010_SP:		sprintf(info->s, "SP :%08X", AREG(tms, 15)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_ST:		sprintf(info->s, "ST :%08X", tms->st); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A0:		sprintf(info->s, "A0 :%08X", AREG(tms,  0)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A1:		sprintf(info->s, "A1 :%08X", AREG(tms,  1)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A2:		sprintf(info->s, "A2 :%08X", AREG(tms,  2)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A3:		sprintf(info->s, "A3 :%08X", AREG(tms,  3)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A4:		sprintf(info->s, "A4 :%08X", AREG(tms,  4)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A5:		sprintf(info->s, "A5 :%08X", AREG(tms,  5)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A6:		sprintf(info->s, "A6 :%08X", AREG(tms,  6)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A7:		sprintf(info->s, "A7 :%08X", AREG(tms,  7)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A8:		sprintf(info->s, "A8 :%08X", AREG(tms,  8)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A9:		sprintf(info->s, "A9 :%08X", AREG(tms,  9)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A10:		sprintf(info->s,"A10:%08X", AREG(tms, 10)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A11:		sprintf(info->s,"A11:%08X", AREG(tms, 11)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A12:		sprintf(info->s,"A12:%08X", AREG(tms, 12)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A13:		sprintf(info->s,"A13:%08X", AREG(tms, 13)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_A14:		sprintf(info->s,"A14:%08X", AREG(tms, 14)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B0:		sprintf(info->s, "B0 :%08X", BREG(tms,  0)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B1:		sprintf(info->s, "B1 :%08X", BREG(tms,  1)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B2:		sprintf(info->s, "B2 :%08X", BREG(tms,  2)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B3:		sprintf(info->s, "B3 :%08X", BREG(tms,  3)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B4:		sprintf(info->s, "B4 :%08X", BREG(tms,  4)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B5:		sprintf(info->s, "B5 :%08X", BREG(tms,  5)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B6:		sprintf(info->s, "B6 :%08X", BREG(tms,  6)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B7:		sprintf(info->s, "B7 :%08X", BREG(tms,  7)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B8:		sprintf(info->s, "B8 :%08X", BREG(tms,  8)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B9:		sprintf(info->s, "B9 :%08X", BREG(tms,  9)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B10:		sprintf(info->s,"B10:%08X", BREG(tms, 10)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B11:		sprintf(info->s,"B11:%08X", BREG(tms, 11)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B12:		sprintf(info->s,"B12:%08X", BREG(tms, 12)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B13:		sprintf(info->s,"B13:%08X", BREG(tms, 13)); break;
-		case CPUINFO_STR_REGISTER + TMS34010_B14:		sprintf(info->s,"B14:%08X", BREG(tms, 14)); break;
 	}
 }
 
@@ -1856,8 +1813,6 @@ CPU_GET_INFO( tms34020 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms34010_state);		break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

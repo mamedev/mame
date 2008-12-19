@@ -339,18 +339,18 @@ SND_GET_INFO( hc55516 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_ALIAS:							info->i = SOUND_HC55516;				break;
+		case SNDINFO_INT_ALIAS:							info->i = SOUND_HC55516;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( hc55516 );			break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( hc55516 );			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( hc55516 );	break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( hc55516 );	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "HC-55516";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "CVSD";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "2.1";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "HC-55516");				break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "CVSD");					break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "2.1");						break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -359,10 +359,10 @@ SND_GET_INFO( mc3417 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( mc3417 );				break;
-		case SNDINFO_PTR_RESET:							/* chip has no reset pin */				break;
-		case SNDINFO_STR_NAME:							info->s = "MC3417";						break;
-		default: 										SND_GET_INFO_CALL(hc55516);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( mc3417 );		break;
+		case SNDINFO_PTR_RESET:							/* chip has no reset pin */					break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "MC3417");					break;
+		default: 										SND_GET_INFO_CALL(hc55516);					break;
 	}
 }
 
@@ -371,9 +371,9 @@ SND_GET_INFO( mc3418 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( mc3418 );				break;
-		case SNDINFO_PTR_RESET:							/* chip has no reset pin */				break;
-		case SNDINFO_STR_NAME:							info->s = "MC3418";						break;
-		default: 										SND_GET_INFO_CALL(hc55516);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( mc3418 );		break;
+		case SNDINFO_PTR_RESET:							/* chip has no reset pin */					break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "MC3418");					break;
+		default: 										SND_GET_INFO_CALL(hc55516);					break;
 	}
 }

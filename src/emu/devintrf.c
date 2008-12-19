@@ -50,7 +50,7 @@ static void device_list_reset(running_machine *machine);
     a temporary string buffer
 -------------------------------------------------*/
 
-INLINE char *get_temp_string_buffer(void)
+char *get_temp_string_buffer(void)
 {
 	char *string = &temp_string_pool[temp_string_pool_index++ % TEMP_STRING_POOL_ENTRIES][0];
 	string[0] = 0;

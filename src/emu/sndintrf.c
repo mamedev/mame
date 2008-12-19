@@ -753,10 +753,11 @@ genf *sndnum_get_info_fct(int sndnum, UINT32 state)
 
 const char *sndnum_get_info_string(int sndnum, UINT32 state)
 {
+	extern char *get_temp_string_buffer(void);
 	sndinfo info;
 
 	VERIFY_SNDNUM(sndnum_get_info_string);
-	info.s = NULL;
+	info.s = get_temp_string_buffer();
 	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.s;
 }
@@ -862,12 +863,13 @@ genf *sndti_get_info_fct(sound_type sndtype, int sndindex, UINT32 state)
 
 const char *sndti_get_info_string(sound_type sndtype, int sndindex, UINT32 state)
 {
+	extern char *get_temp_string_buffer(void);
 	sndinfo info;
 	int sndnum;
 
 	VERIFY_SNDTI(sndti_get_info_string);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
-	info.s = NULL;
+	info.s = get_temp_string_buffer();
 	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.s;
 }
@@ -986,11 +988,12 @@ genf *sndtype_get_info_fct(sound_type sndtype, UINT32 state)
 
 const char *sndtype_get_info_string(sound_type sndtype, UINT32 state)
 {
+	extern char *get_temp_string_buffer(void);
 	snd_class_header *classheader = &snd_type_header[sndtype];
 	sndinfo info;
 
 	VERIFY_SNDTYPE(sndtype_get_info_string);
-	info.s = NULL;
+	info.s = get_temp_string_buffer();
 	(*classheader->get_info)(NULL, state, &info);
 	return info.s;
 }
@@ -1030,10 +1033,10 @@ static SND_GET_INFO( dummy_sound )
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Dummy";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Dummy";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Dummy");				break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Dummy");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

@@ -854,10 +854,10 @@ DEVICE_GET_INFO(cia6526r1)
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cia);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "6526 CIA rev1";					break;
-		case DEVINFO_STR_FAMILY:						info->s = "6526 CIA";						break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6526 CIA rev1");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "6526 CIA");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
@@ -872,7 +872,7 @@ DEVICE_GET_INFO(cia6526r2)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "6526 CIA rev2";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "6526 CIA rev2");			break;
 		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }
@@ -887,7 +887,7 @@ DEVICE_GET_INFO(cia8520)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "8520 CIA";						break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "8520 CIA");				break;
 		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }

@@ -916,11 +916,11 @@ DEVICE_GET_INFO( mc6845 )
 		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME(mc6845); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Motorola 6845";					break;
-		case DEVINFO_STR_FAMILY:						info->s = "MC6845 CRTC";					break;
-		case DEVINFO_STR_VERSION:						info->s = "1.61";							break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Motorola 6845");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "MC6845 CRTC");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.61");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -930,7 +930,7 @@ DEVICE_GET_INFO( mc6845_1 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Motorla 6845-1";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Motorla 6845-1");			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845_1);	break;
@@ -945,7 +945,7 @@ DEVICE_GET_INFO( c6545_1 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "MOS Technology 6545-1";			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MOS Technology 6545-1");	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c6545_1);	break;
@@ -960,7 +960,7 @@ DEVICE_GET_INFO( r6545_1 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Rockwell 6545-1";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Rockwell 6545-1");			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(r6545_1);	break;
@@ -975,7 +975,7 @@ DEVICE_GET_INFO( h46505 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Hitachi 46505";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Hitachi 46505");			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(h46505);	break;
@@ -990,7 +990,7 @@ DEVICE_GET_INFO( hd6845 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Hitachi 6845";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Hitachi 6845");			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(hd6845);	break;
@@ -1005,7 +1005,7 @@ DEVICE_GET_INFO( sy6545_1 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Synertek 6545-1";				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Synertek 6545-1");			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sy6545_1);	break;

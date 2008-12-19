@@ -4682,16 +4682,16 @@ DEVICE_GET_INFO( voodoo )
 			switch (config->type)
 			{
 				default:
-				case VOODOO_1:					info->s = "3dfx Voodoo Graphics";		break;
-				case VOODOO_2:					info->s = "3dfx Voodoo 2";				break;
-				case VOODOO_BANSHEE:			info->s = "3dfx Voodoo Banshee";		break;
-				case VOODOO_3:					info->s = "3dfx Voodoo 3";				break;
+				case VOODOO_1:					strcpy(info->s, "3dfx Voodoo Graphics");break;
+				case VOODOO_2:					strcpy(info->s, "3dfx Voodoo 2");		break;
+				case VOODOO_BANSHEE:			strcpy(info->s, "3dfx Voodoo Banshee");	break;
+				case VOODOO_3:					strcpy(info->s, "3dfx Voodoo 3");		break;
 			}
 			break;
-		case DEVINFO_STR_FAMILY:				info->s = "3dfx Voodoo Graphics";		break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "3dfx Voodoo Graphics");break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

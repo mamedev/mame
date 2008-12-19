@@ -271,9 +271,9 @@ unsigned sm8500_get_reg( sm8500_state *cpustate, int regnum )
 {
 	switch( regnum )
 	{
-	case REG_PC:
+	case REG_GENPC:
 	case SM8500_PC:		return cpustate->PC;
-	case REG_SP:
+	case REG_GENSP:
 	case SM8500_SP:		return ( cpustate->SYS & 0x40 ) ? cpustate->SP : cpustate->SP & 0xFF ;
 	case SM8500_PS:		return ( cpustate->PS0 << 8 ) | cpustate->PS1;
 	case SM8500_SYS16:	return cpustate->SYS;
@@ -311,9 +311,9 @@ static void sm8500_set_reg( sm8500_state *cpustate, int regnum, unsigned val )
 {
 	switch( regnum )
 	{
-	case REG_PC:
+	case REG_GENPC:
 	case SM8500_PC:		cpustate->PC = val; break;
-	case REG_SP:
+	case REG_GENSP:
 	case SM8500_SP:		cpustate->SP = val; break;
 	case SM8500_PS:		sm8500_set_reg( cpustate, SM8500_PS0, ( val >> 8 ) & 0xFF ); sm8500_set_reg( cpustate, SM8500_PS1, val & 0xFF ); break;
 	case SM8500_SYS16:	cpustate->SYS = val; break;
@@ -497,8 +497,8 @@ CPU_GET_INFO( sm8500 )
 	case CPUINFO_INT_REGISTER + SM8500_P2C:
 	case CPUINFO_INT_REGISTER + SM8500_P3C:
 								info->i = sm8500_get_reg( cpustate, state - CPUINFO_INT_REGISTER ); break;
-	case CPUINFO_INT_REGISTER + REG_PC:			info->i = sm8500_get_reg( cpustate, SM8500_PC ); break;
-	case CPUINFO_INT_REGISTER + REG_SP:			info->i = sm8500_get_reg( cpustate, SM8500_SP ); break;
+	case CPUINFO_INT_REGISTER + REG_GENPC:			info->i = sm8500_get_reg( cpustate, SM8500_PC ); break;
+	case CPUINFO_INT_REGISTER + REG_GENSP:			info->i = sm8500_get_reg( cpustate, SM8500_SP ); break;
 	case CPUINFO_INT_PREVIOUSPC:				info->i = 0x0000; break;
 
 

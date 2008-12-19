@@ -2167,11 +2167,11 @@ SND_GET_INFO( es5505 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( es5505 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "ES5505";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq Wavetable";			break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "ES5505");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ensoniq Wavetable");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -2202,11 +2202,11 @@ SND_GET_INFO( es5506 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( es5506 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "ES5506";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq Wavetable";			break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "ES5506");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ensoniq Wavetable");				break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

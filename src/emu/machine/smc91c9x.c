@@ -624,10 +624,10 @@ static DEVICE_GET_INFO( smc91c9x )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:					/* provided by subclasses */			break;
-		case DEVINFO_STR_FAMILY:				info->s = "SMC91C9X Ethernet Controller";break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "SMC91C9X Ethernet Controller");break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -636,7 +636,7 @@ DEVICE_GET_INFO( smc91c94 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = "SMC91C94";					break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "SMC91C94");			break;
 		default:								DEVICE_GET_INFO_CALL(smc91c9x);			break;
 	}
 }
@@ -646,7 +646,7 @@ DEVICE_GET_INFO( smc91c96 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = "SMC91C96";					break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "SMC91C96");			break;
 		default:								DEVICE_GET_INFO_CALL(smc91c9x);			break;
 	}
 }

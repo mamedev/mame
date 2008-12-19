@@ -211,6 +211,7 @@ typedef struct
 	UINT32		astat;
 	UINT32		sstat;
 	UINT32		mstat;
+	UINT32		mstat_prev;
 	UINT32		astat_clear;
 	UINT32		idle;
 
@@ -261,10 +262,11 @@ typedef struct
 	adsp21xx_tx_func sport_tx_callback;
 	adsp21xx_timer_func timer_fired;
 
-	/* Memory spaces */
+	/* memory spaces */
     const address_space *program;
     const address_space *data;
     const address_space *io;
+    cpu_state_table state;
 
 } adsp2100_state;
 
@@ -281,6 +283,133 @@ static UINT8 *condition_table = 0;
 #if TRACK_HOTSPOTS
 static UINT32 pcbucket[0x4000];
 #endif
+
+
+
+/***************************************************************************
+    CPU STATE DESCRIPTION
+***************************************************************************/
+
+#define ADSP21XX_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	CPU_STATE_ENTRY(ADSP2100_##_name, #_name, _format, adsp2100_state, _member, _datamask, ~0, _flags)
+
+#define ADSP21XX_STATE_ENTRY_MASK(_name, _format, _member, _datamask, _flags, _validmask) \
+	CPU_STATE_ENTRY(ADSP2100_##_name, #_name, _format, adsp2100_state, _member, _datamask, _validmask, _flags)
+
+static const cpu_state_entry state_array[] =
+{
+	ADSP21XX_STATE_ENTRY(PC,  "%04X", pc, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(GENPC, "%04X", pc, 0xffff, CPUSTATE_NOSHOW)
+	ADSP21XX_STATE_ENTRY(GENPCBASE, "%04X", ppc, 0xffff, CPUSTATE_NOSHOW)
+	
+	ADSP21XX_STATE_ENTRY(AX0, "%04X", core.ax0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AX1, "%04X", core.ax1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AY0, "%04X", core.ay0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AY1, "%04X", core.ay1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AR,  "%04X", core.ar.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AF,  "%04X", core.af.u, 0xffff, 0)
+
+	ADSP21XX_STATE_ENTRY(MX0, "%04X", core.mx0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MX1, "%04X", core.mx1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MY0, "%04X", core.my0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MY1, "%04X", core.my1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MR0, "%04X", core.mr.mrx.mr0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MR1, "%04X", core.mr.mrx.mr1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MR2, "%02X", core.mr.mrx.mr2.u, 0xff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(MF,  "%04X", core.mf.u, 0xffff, 0)
+
+	ADSP21XX_STATE_ENTRY(SI,  "%04X", core.si.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(SE,  "%02X", core.se.u, 0xff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(SB,  "%02X", core.sb.u, 0x1f, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(SR0, "%04X", core.sr.srx.sr0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(SR1, "%04X", core.sr.srx.sr0.u, 0xffff, 0)
+
+	ADSP21XX_STATE_ENTRY(AX0_SEC, "%04X", alt.ax0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AX1_SEC, "%04X", alt.ax1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AY0_SEC, "%04X", alt.ay0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AY1_SEC, "%04X", alt.ay1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AR_SEC,  "%04X", alt.ar.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(AF_SEC,  "%04X", alt.af.u, 0xffff, 0)
+
+	ADSP21XX_STATE_ENTRY(MX0_SEC, "%04X", alt.mx0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MX1_SEC, "%04X", alt.mx1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MY0_SEC, "%04X", alt.my0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MY1_SEC, "%04X", alt.my1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MR0_SEC, "%04X", alt.mr.mrx.mr0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MR1_SEC, "%04X", alt.mr.mrx.mr1.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(MR2_SEC, "%02X", alt.mr.mrx.mr2.u, 0xff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(MF_SEC,  "%04X", alt.mf.u, 0xffff, 0)
+
+	ADSP21XX_STATE_ENTRY(SI_SEC,  "%04X", alt.si.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(SE_SEC,  "%02X", alt.se.u, 0xff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(SB_SEC,  "%02X", alt.sb.u, 0x1f, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(SR0_SEC, "%04X", alt.sr.srx.sr0.u, 0xffff, 0)
+	ADSP21XX_STATE_ENTRY(SR1_SEC, "%04X", alt.sr.srx.sr0.u, 0xffff, 0)
+
+	ADSP21XX_STATE_ENTRY(I0, "%04X", i[0], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(I1, "%04X", i[1], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(I2, "%04X", i[2], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(I3, "%04X", i[3], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(I4, "%04X", i[4], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(I5, "%04X", i[5], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(I6, "%04X", i[6], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(I7, "%04X", i[7], 0x3fff, CPUSTATE_IMPORT)
+
+	ADSP21XX_STATE_ENTRY(L0, "%04X", l[0], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(L1, "%04X", l[1], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(L2, "%04X", l[2], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(L3, "%04X", l[3], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(L4, "%04X", l[4], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(L5, "%04X", l[5], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(L6, "%04X", l[6], 0x3fff, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(L7, "%04X", l[7], 0x3fff, CPUSTATE_IMPORT)
+
+	ADSP21XX_STATE_ENTRY(M0, "%04X", m[0], 0x3fff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(M1, "%04X", m[1], 0x3fff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(M2, "%04X", m[2], 0x3fff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(M3, "%04X", m[3], 0x3fff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(M4, "%04X", m[4], 0x3fff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(M5, "%04X", m[5], 0x3fff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(M6, "%04X", m[6], 0x3fff, CPUSTATE_IMPORT_SEXT)
+	ADSP21XX_STATE_ENTRY(M7, "%04X", m[7], 0x3fff, CPUSTATE_IMPORT_SEXT)
+
+	ADSP21XX_STATE_ENTRY(PX, "%02X", px, 0xff, 0)
+	ADSP21XX_STATE_ENTRY(CNTR, "%04X", cntr, 0x3fff, 0)
+	ADSP21XX_STATE_ENTRY(ASTAT, "%02X", astat, 0xff, 0)
+	ADSP21XX_STATE_ENTRY(SSTAT, "%02X", sstat, 0xff, 0)
+	ADSP21XX_STATE_ENTRY_MASK(MSTAT, "%01X", mstat, 0x0f, CPUSTATE_IMPORT,  (1 << CHIP_TYPE_ADSP2100))
+	ADSP21XX_STATE_ENTRY_MASK(MSTAT, "%02X", mstat, 0x7f, CPUSTATE_IMPORT, ~(1 << CHIP_TYPE_ADSP2100))
+
+	ADSP21XX_STATE_ENTRY(PCSP,   "%02X", pc_sp, 0xff, 0)
+	ADSP21XX_STATE_ENTRY(GENSP,  "%02X", pc_sp, 0xff, CPUSTATE_NOSHOW)
+	ADSP21XX_STATE_ENTRY(CNTRSP, "%01X", cntr_sp, 0xf, 0)
+	ADSP21XX_STATE_ENTRY(STATSP, "%01X", stat_sp, 0xf, 0)
+	ADSP21XX_STATE_ENTRY(LOOPSP, "%01X", loop_sp, 0xf, 0)
+
+	ADSP21XX_STATE_ENTRY_MASK(IMASK, "%01X", imask, 0x00f, CPUSTATE_IMPORT,  (1 << CHIP_TYPE_ADSP2100))
+	ADSP21XX_STATE_ENTRY_MASK(IMASK, "%02X", imask, 0x03f, CPUSTATE_IMPORT, ~((1 << CHIP_TYPE_ADSP2100) | (1 << CHIP_TYPE_ADSP2181)))
+	ADSP21XX_STATE_ENTRY_MASK(IMASK, "%03X", imask, 0x3ff, CPUSTATE_IMPORT,  (1 << CHIP_TYPE_ADSP2181))
+	ADSP21XX_STATE_ENTRY(ICNTL, "%02X", icntl, 0x1f, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(IRQSTATE0, "%1u", irq_state[0], 0x1, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(IRQSTATE1, "%1u", irq_state[1], 0x1, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY(IRQSTATE2, "%1u", irq_state[2], 0x1, CPUSTATE_IMPORT)
+	ADSP21XX_STATE_ENTRY_MASK(IRQSTATE3, "%1u", irq_state[3], 0x1, CPUSTATE_IMPORT, (1 << CHIP_TYPE_ADSP2100))
+
+	ADSP21XX_STATE_ENTRY(FLAGIN, "%1u", flagin, 0x1, 0)
+	ADSP21XX_STATE_ENTRY(FLAGOUT, "%1u", flagout, 0x1, 0)
+	ADSP21XX_STATE_ENTRY(FL0, "%1u", fl0, 0x1, 0)
+	ADSP21XX_STATE_ENTRY(FL1, "%1u", fl1, 0x1, 0)
+	ADSP21XX_STATE_ENTRY(FL2, "%1u", fl2, 0x1, 0)
+};
+
+static const cpu_state_table state_table_template =
+{
+	NULL,						/* pointer to the base of state (offsets are relative to this) */
+	0,							/* subtype this table refers to */
+	ARRAY_LENGTH(state_array),	/* number of entries */
+	state_array					/* array of entries */
+};
+
 
 
 /***************************************************************************
@@ -544,7 +673,7 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callback irqcallback)
+static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callback irqcallback, int chiptype)
 {
 	adsp2100_state *adsp = device->token;
 
@@ -553,14 +682,18 @@ static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callba
 		fatalerror("creating adsp2100 tables failed");
 
 	/* set the IRQ callback */
+	adsp->chip_type = chiptype;
 	adsp->irq_callback = irqcallback;
-	adsp->device = device;
 
+	adsp->device = device;
 	adsp->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	adsp->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	adsp->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
-
+	/* set up the state table */
+	adsp->state = state_table_template;
+	adsp->state.baseptr = adsp;
+	adsp->state.subtypemask = 1 << chiptype;
 
 	/* set up ALU register pointers */
 	adsp->alu_xregs[0] = &adsp->core.ax0;
@@ -653,6 +786,7 @@ static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callba
 	state_save_register_device_item(device, 0, adsp->astat);
 	state_save_register_device_item(device, 0, adsp->sstat);
 	state_save_register_device_item(device, 0, adsp->mstat);
+	state_save_register_device_item(device, 0, adsp->mstat_prev);
 	state_save_register_device_item(device, 0, adsp->astat_clear);
 	state_save_register_device_item(device, 0, adsp->idle);
 
@@ -734,6 +868,7 @@ static CPU_RESET( adsp21xx )
 	adsp->mstat = 0;
 	adsp->sstat = 0x55;
 	adsp->idle = 0;
+	update_mstat(adsp);
 
 	/* reset stacks */
 	adsp->pc_sp = 0;
@@ -891,9 +1026,6 @@ static CPU_EXECUTE( adsp21xx )
 	adsp2100_state *adsp = device->token;
 
 	check_irqs(adsp);
-
-	/* reset the core */
-	set_mstat(adsp, adsp->mstat);
 
 	/* count cycles and interrupt cycles */
 	adsp->icount = cycles;
@@ -1086,18 +1218,17 @@ static CPU_EXECUTE( adsp21xx )
 				break;
 			case 0x0c:
 				/* 00001100 xxxxxxxx xxxxxxxx  mode control */
-				temp = adsp->mstat;
 				if (adsp->chip_type >= CHIP_TYPE_ADSP2101)
 				{
-					if (op & 0x000008) temp = (temp & ~MSTAT_GOMODE) | ((op << 5) & MSTAT_GOMODE);
-					if (op & 0x002000) temp = (temp & ~MSTAT_INTEGER) | ((op >> 8) & MSTAT_INTEGER);
-					if (op & 0x008000) temp = (temp & ~MSTAT_TIMER) | ((op >> 9) & MSTAT_TIMER);
+					if (op & 0x000008) adsp->mstat = (adsp->mstat & ~MSTAT_GOMODE) | ((op << 5) & MSTAT_GOMODE);
+					if (op & 0x002000) adsp->mstat = (adsp->mstat & ~MSTAT_INTEGER) | ((op >> 8) & MSTAT_INTEGER);
+					if (op & 0x008000) adsp->mstat = (adsp->mstat & ~MSTAT_TIMER) | ((op >> 9) & MSTAT_TIMER);
 				}
-				if (op & 0x000020) temp = (temp & ~MSTAT_BANK) | ((op >> 4) & MSTAT_BANK);
-				if (op & 0x000080) temp = (temp & ~MSTAT_REVERSE) | ((op >> 5) & MSTAT_REVERSE);
-				if (op & 0x000200) temp = (temp & ~MSTAT_STICKYV) | ((op >> 6) & MSTAT_STICKYV);
-				if (op & 0x000800) temp = (temp & ~MSTAT_SATURATE) | ((op >> 7) & MSTAT_SATURATE);
-				set_mstat(adsp, temp);
+				if (op & 0x000020) adsp->mstat = (adsp->mstat & ~MSTAT_BANK) | ((op >> 4) & MSTAT_BANK);
+				if (op & 0x000080) adsp->mstat = (adsp->mstat & ~MSTAT_REVERSE) | ((op >> 5) & MSTAT_REVERSE);
+				if (op & 0x000200) adsp->mstat = (adsp->mstat & ~MSTAT_STICKYV) | ((op >> 6) & MSTAT_STICKYV);
+				if (op & 0x000800) adsp->mstat = (adsp->mstat & ~MSTAT_SATURATE) | ((op >> 7) & MSTAT_SATURATE);
+				update_mstat(adsp);
 				break;
 			case 0x0d:
 				/* 00001101 0000xxxx xxxxxxxx  internal data move */
@@ -1641,6 +1772,58 @@ extern CPU_DISASSEMBLE( adsp21xx );
 
 
 
+/***************************************************************************
+    STATE HANDLING CALLBACKS
+***************************************************************************/
+
+static CPU_IMPORT_STATE( adsp21xx )
+{
+	adsp2100_state *adsp = device->token;
+	switch (entry->index)
+	{
+		case ADSP2100_MSTAT:
+			update_mstat(adsp);
+			break;
+		
+		case ADSP2100_IMASK:
+		case ADSP2100_ICNTL:
+		case ADSP2100_IRQSTATE0:
+		case ADSP2100_IRQSTATE1:
+		case ADSP2100_IRQSTATE2:
+		case ADSP2100_IRQSTATE3:
+			check_irqs(adsp);
+			break;
+		
+		case ADSP2100_I0:
+		case ADSP2100_I1:
+		case ADSP2100_I2:
+		case ADSP2100_I3:
+		case ADSP2100_I4:
+		case ADSP2100_I5:
+		case ADSP2100_I6:
+		case ADSP2100_I7:
+			update_i(adsp, entry->index - ADSP2100_I0);
+			break;
+		
+		case ADSP2100_L0:
+		case ADSP2100_L1:
+		case ADSP2100_L2:
+		case ADSP2100_L3:
+		case ADSP2100_L4:
+		case ADSP2100_L5:
+		case ADSP2100_L6:
+		case ADSP2100_L7:
+			update_l(adsp, entry->index - ADSP2100_L0);
+			break;
+		
+		default:
+			fatalerror("CPU_IMPORT_STATE(adsp21xx) called for unexpected value\n");
+			break;
+	}
+}
+
+
+
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
@@ -1651,104 +1834,8 @@ static CPU_SET_INFO( adsp21xx )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ADSP2100_PC:		adsp->pc = info->i;					break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_AX0:		wr_ax0(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AX1:		wr_ax1(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AY0:		wr_ay0(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AY1:		wr_ay1(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AR:		wr_ar(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AF:		adsp->core.af.u = info->i;			break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_MX0:		wr_mx0(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MX1:		wr_mx1(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MY0:		wr_my0(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MY1:		wr_my1(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR0:		wr_mr0(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR1:		wr_mr1(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR2:		wr_mr2(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MF:		adsp->core.mf.u = info->i;			break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_SI:		wr_si(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SE:		wr_se(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SB:		wr_sb(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SR0:		wr_sr0(adsp, info->i);				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SR1:		wr_sr1(adsp, info->i);				break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_AX0_SEC:	adsp->alt.ax0.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AX1_SEC:	adsp->alt.ax1.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AY0_SEC:	adsp->alt.ay0.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AY1_SEC:	adsp->alt.ay1.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AR_SEC:	adsp->alt.ar.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AF_SEC:	adsp->alt.af.u = info->i;			break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_MX0_SEC:	adsp->alt.mx0.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MX1_SEC:	adsp->alt.mx1.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MY0_SEC:	adsp->alt.my0.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MY1_SEC:	adsp->alt.my1.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR0_SEC:	adsp->alt.mr.mrx.mr0.s = info->i;	break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR1_SEC:	adsp->alt.mr.mrx.mr1.s = info->i; adsp->alt.mr.mrx.mr2.s = (INT16)info->i >> 15; break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR2_SEC:	adsp->alt.mr.mrx.mr2.s = (INT8)info->i; break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MF_SEC:	adsp->alt.mf.u = info->i;			break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_SI_SEC:	adsp->alt.si.s = info->i;			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SE_SEC:	adsp->alt.se.s = (INT8)info->i;		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SB_SEC:	adsp->alt.sb.s = (INT32)(info->i << 27) >> 27; break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SR0_SEC:	adsp->alt.sr.srx.sr0.s = info->i;	break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SR1_SEC:	adsp->alt.sr.srx.sr1.s = info->i;	break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_I0:		wr_i0(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I1:		wr_i1(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I2:		wr_i2(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I3:		wr_i3(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I4:		wr_i4(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I5:		wr_i5(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I6:		wr_i6(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I7:		wr_i7(adsp, info->i); 				break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_L0:		wr_l0(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L1:		wr_l1(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L2:		wr_l2(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L3:		wr_l3(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L4:		wr_l4(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L5:		wr_l5(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L6:		wr_l6(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L7:		wr_l7(adsp, info->i); 				break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_M0:		wr_m0(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M1:		wr_m1(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M2:		wr_m2(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M3:		wr_m3(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M4:		wr_m4(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M5:		wr_m5(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M6:		wr_m6(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M7:		wr_m7(adsp, info->i); 				break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_PX:		wr_px(adsp, info->i); 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_CNTR:		adsp->cntr = info->i; 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_ASTAT:		wr_astat(adsp, info->i); 			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SSTAT:		wr_sstat(adsp, info->i); 			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MSTAT:		wr_mstat(adsp, info->i); 			break;
-
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + ADSP2100_PCSP:		adsp->pc_sp = info->i; 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_CNTRSP:	adsp->cntr_sp = info->i; 			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_STATSP:	adsp->stat_sp = info->i; 			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_LOOPSP:	adsp->loop_sp = info->i; 			break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_IMASK:		wr_imask(adsp, info->i); 			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_ICNTL:		wr_icntl(adsp, info->i); 			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_IRQSTATE0:	adsp->irq_state[0] = info->i; 		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_IRQSTATE1:	adsp->irq_state[1] = info->i; 		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_IRQSTATE2:	adsp->irq_state[2] = info->i; 		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_IRQSTATE3:	adsp->irq_state[3] = info->i; 		break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_FLAGIN:	adsp->flagin = info->i; 			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_FLAGOUT:	adsp->flagout = info->i; 			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_FL0:		adsp->fl0 = info->i; 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_FL1:		adsp->fl1 = info->i; 				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_FL2: 		adsp->fl2 = info->i; 				break;
+		case CPUINFO_INT_PC:							adsp->pc = info->i;					break;
+		case CPUINFO_INT_SP:							adsp->pc_sp = info->i; 				break;
 	}
 }
 
@@ -1786,104 +1873,8 @@ static CPU_GET_INFO( adsp21xx )
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = adsp->ppc;					break;
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ADSP2100_PC:		info->i = adsp->pc;						break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_AX0:		info->i = adsp->core.ax0.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AX1:		info->i = adsp->core.ax1.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AY0:		info->i = adsp->core.ay0.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AY1:		info->i = adsp->core.ay1.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AR:		info->i = adsp->core.ar.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AF:		info->i = adsp->core.af.u;				break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_MX0:		info->i = adsp->core.mx0.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MX1:		info->i = adsp->core.mx1.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MY0:		info->i = adsp->core.my0.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MY1:		info->i = adsp->core.my1.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR0:		info->i = adsp->core.mr.mrx.mr0.u;		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR1:		info->i = adsp->core.mr.mrx.mr1.u;		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR2:		info->i = adsp->core.mr.mrx.mr2.u;		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MF:		info->i = adsp->core.mf.u;				break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_SI:		info->i = adsp->core.si.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SE:		info->i = adsp->core.se.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SB:		info->i = adsp->core.sb.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SR0:		info->i = adsp->core.sr.srx.sr0.u;		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SR1:		info->i = adsp->core.sr.srx.sr1.u;		break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_AX0_SEC:	info->i = adsp->alt.ax0.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AX1_SEC:	info->i = adsp->alt.ax1.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AY0_SEC:	info->i = adsp->alt.ay0.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AY1_SEC:	info->i = adsp->alt.ay1.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AR_SEC:	info->i = adsp->alt.ar.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_AF_SEC:	info->i = adsp->alt.af.u;				break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_MX0_SEC:	info->i = adsp->alt.mx0.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MX1_SEC:	info->i = adsp->alt.mx1.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MY0_SEC:	info->i = adsp->alt.my0.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MY1_SEC:	info->i = adsp->alt.my1.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR0_SEC:	info->i = adsp->alt.mr.mrx.mr0.u;		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR1_SEC:	info->i = adsp->alt.mr.mrx.mr1.u;		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MR2_SEC:	info->i = adsp->alt.mr.mrx.mr2.u;		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MF_SEC:	info->i = adsp->alt.mf.u;				break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_SI_SEC:	info->i = adsp->alt.si.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SE_SEC:	info->i = adsp->alt.se.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SB_SEC:	info->i = adsp->alt.sb.u;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SR0_SEC:	info->i = adsp->alt.sr.srx.sr0.u;		break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SR1_SEC:	info->i = adsp->alt.sr.srx.sr1.u;		break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_I0:		info->i = adsp->i[0];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I1:		info->i = adsp->i[1];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I2:		info->i = adsp->i[2];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I3:		info->i = adsp->i[3];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I4:		info->i = adsp->i[4];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I5:		info->i = adsp->i[5];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I6:		info->i = adsp->i[6];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_I7:		info->i = adsp->i[7];					break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_L0:		info->i = adsp->l[0];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L1:		info->i = adsp->l[1];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L2:		info->i = adsp->l[2];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L3:		info->i = adsp->l[3];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L4:		info->i = adsp->l[4];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L5:		info->i = adsp->l[5];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L6:		info->i = adsp->l[6];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_L7:		info->i = adsp->l[7];					break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_M0:		info->i = adsp->m[0];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M1:		info->i = adsp->m[1];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M2:		info->i = adsp->m[2];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M3:		info->i = adsp->m[3];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M4:		info->i = adsp->m[4];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M5:		info->i = adsp->m[5];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M6:		info->i = adsp->m[6];					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_M7:		info->i = adsp->m[7];					break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_PX:		info->i = adsp->px;						break;
-		case CPUINFO_INT_REGISTER + ADSP2100_CNTR:		info->i = adsp->cntr;					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_ASTAT:		info->i = adsp->astat;					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_SSTAT:		info->i = adsp->sstat;					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_MSTAT:		info->i = adsp->mstat;					break;
-
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + ADSP2100_PCSP:		info->i = adsp->pc_sp;					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_CNTRSP:	info->i = adsp->cntr_sp;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_STATSP:	info->i = adsp->stat_sp;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_LOOPSP:	info->i = adsp->loop_sp;				break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_IMASK:		info->i = adsp->imask;					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_ICNTL:		info->i = adsp->icntl;					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_IRQSTATE0:	info->i = adsp->irq_state[0];			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_IRQSTATE1:	info->i = adsp->irq_state[1];			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_IRQSTATE2:	info->i = adsp->irq_state[2];			break;
-		case CPUINFO_INT_REGISTER + ADSP2100_IRQSTATE3:	info->i = adsp->irq_state[3];			break;
-
-		case CPUINFO_INT_REGISTER + ADSP2100_FLAGIN:	info->i = adsp->flagin;					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_FLAGOUT:	info->i = adsp->flagout;				break;
-		case CPUINFO_INT_REGISTER + ADSP2100_FL0:		info->i = adsp->fl0;					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_FL1:		info->i = adsp->fl1;					break;
-		case CPUINFO_INT_REGISTER + ADSP2100_FL2:		info->i = adsp->fl2;					break;
+		case CPUINFO_INT_PC:							info->i = adsp->pc;						break;
+		case CPUINFO_INT_SP:							info->i = adsp->pc_sp;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						/* set per CPU */						break;
@@ -1893,7 +1884,9 @@ static CPU_GET_INFO( adsp21xx )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(adsp21xx);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(adsp21xx);		break;
+		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(adsp21xx);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &adsp->icount;			break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &adsp->state;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							/* set per CPU */						break;
@@ -1913,103 +1906,6 @@ static CPU_GET_INFO( adsp21xx )
 				adsp->astat & 0x02 ? 'N':'.',
 				adsp->astat & 0x01 ? 'Z':'.');
 			break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_PC:  		sprintf(info->s, "PC:  %04X", adsp->pc); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_AX0:		sprintf(info->s, "AX0: %04X", adsp->core.ax0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AX1:		sprintf(info->s, "AX1: %04X", adsp->core.ax1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AY0:		sprintf(info->s, "AY0: %04X", adsp->core.ay0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AY1:		sprintf(info->s, "AY1: %04X", adsp->core.ay1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AR:		sprintf(info->s, "AR:  %04X", adsp->core.ar.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AF:		sprintf(info->s, "AF:  %04X", adsp->core.af.u); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_MX0: 		sprintf(info->s, "MX0: %04X", adsp->core.mx0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MX1: 		sprintf(info->s, "MX1: %04X", adsp->core.mx1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MY0: 		sprintf(info->s, "MY0: %04X", adsp->core.my0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MY1: 		sprintf(info->s, "MY1: %04X", adsp->core.my1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MR0: 		sprintf(info->s, "MR0: %04X", adsp->core.mr.mrx.mr0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MR1:		sprintf(info->s, "MR1: %04X", adsp->core.mr.mrx.mr1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MR2: 		sprintf(info->s, "MR2: %02X", adsp->core.mr.mrx.mr2.u & 0x00ff); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MF:		sprintf(info->s, "MF:  %04X", adsp->core.mf.u); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_SI:		sprintf(info->s, "SI:  %04X", adsp->core.si.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_SE:		sprintf(info->s, "SE:  %02X  ", adsp->core.se.u & 0x00ff); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_SB:		sprintf(info->s, "SB:  %02X  ", adsp->core.sb.u & 0x001f); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_SR0: 		sprintf(info->s, "SR0: %04X", adsp->core.sr.srx.sr0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_SR1:		sprintf(info->s, "SR1: %04X", adsp->core.sr.srx.sr1.u); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_AX0_SEC:	sprintf(info->s, "AX0_SEC: %04X", adsp->alt.ax0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AX1_SEC:	sprintf(info->s, "AX1_SEC: %04X", adsp->alt.ax1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AY0_SEC:	sprintf(info->s, "AY0_SEC: %04X", adsp->alt.ay0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AY1_SEC:	sprintf(info->s, "AY1_SEC: %04X", adsp->alt.ay1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AR_SEC:	sprintf(info->s, "AR_SEC:  %04X", adsp->alt.ar.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_AF_SEC:	sprintf(info->s, "AF_SEC:  %04X", adsp->alt.af.u); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_MX0_SEC:	sprintf(info->s, "MX0_SEC: %04X", adsp->alt.mx0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MX1_SEC: 	sprintf(info->s, "MX1_SEC: %04X", adsp->alt.mx1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MY0_SEC: 	sprintf(info->s, "MY0_SEC: %04X", adsp->alt.my0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MY1_SEC: 	sprintf(info->s, "MY1_SEC: %04X", adsp->alt.my1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MR0_SEC: 	sprintf(info->s, "MR0_SEC: %04X", adsp->alt.mr.mrx.mr0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MR1_SEC:	sprintf(info->s, "MR1_SEC: %04X", adsp->alt.mr.mrx.mr1.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MR2_SEC: 	sprintf(info->s, "MR2_SEC: %02X", adsp->alt.mr.mrx.mr2.u & 0x00ff); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MF_SEC:	sprintf(info->s, "MF_SEC:  %04X", adsp->alt.mf.u); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_SI_SEC:	sprintf(info->s, "SI_SEC:  %04X", adsp->alt.si.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_SE_SEC:	sprintf(info->s, "SE_SEC:  %02X  ", adsp->alt.se.u & 0x00ff); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_SB_SEC:	sprintf(info->s, "SB_SEC:  %02X  ", adsp->alt.sb.u & 0x001f); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_SR0_SEC: 	sprintf(info->s, "SR0_SEC: %04X", adsp->alt.sr.srx.sr0.u); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_SR1_SEC:	sprintf(info->s, "SR1_SEC: %04X", adsp->alt.sr.srx.sr1.u); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_I0:		sprintf(info->s, "I0:  %04X", adsp->i[0]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_I1:		sprintf(info->s, "I1:  %04X", adsp->i[1]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_I2:		sprintf(info->s, "I2:  %04X", adsp->i[2]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_I3:		sprintf(info->s, "I3:  %04X", adsp->i[3]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_I4:		sprintf(info->s, "I4:  %04X", adsp->i[4]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_I5:		sprintf(info->s, "I5:  %04X", adsp->i[5]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_I6:		sprintf(info->s, "I6:  %04X", adsp->i[6]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_I7:		sprintf(info->s, "I7:  %04X", adsp->i[7]); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_L0:		sprintf(info->s, "L0:  %04X", adsp->l[0]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_L1:		sprintf(info->s, "L1:  %04X", adsp->l[1]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_L2:		sprintf(info->s, "L2:  %04X", adsp->l[2]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_L3:		sprintf(info->s, "L3:  %04X", adsp->l[3]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_L4:		sprintf(info->s, "L4:  %04X", adsp->l[4]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_L5:		sprintf(info->s, "L5:  %04X", adsp->l[5]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_L6:		sprintf(info->s, "L6:  %04X", adsp->l[6]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_L7:		sprintf(info->s, "L7:  %04X", adsp->l[7]); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_M0:		sprintf(info->s, "M0:  %04X", adsp->m[0]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_M1:		sprintf(info->s, "M1:  %04X", adsp->m[1]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_M2:		sprintf(info->s, "M2:  %04X", adsp->m[2]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_M3:		sprintf(info->s, "M3:  %04X", adsp->m[3]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_M4:		sprintf(info->s, "M4:  %04X", adsp->m[4]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_M5:		sprintf(info->s, "M5:  %04X", adsp->m[5]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_M6:		sprintf(info->s, "M6:  %04X", adsp->m[6]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_M7:		sprintf(info->s, "M7:  %04X", adsp->m[7]); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_PX:		sprintf(info->s, "PX:  %02X  ", adsp->px); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_CNTR:		sprintf(info->s, "CNTR:%04X", adsp->cntr); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_ASTAT: 	sprintf(info->s, "ASTA:%02X  ", adsp->astat); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_SSTAT: 	sprintf(info->s, "SSTA:%02X  ", adsp->sstat); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_MSTAT: 	sprintf(info->s, "MSTA:%02X  ", adsp->mstat); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_PCSP: 		sprintf(info->s, "PCSP:%02X  ", adsp->pc_sp); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_CNTRSP: 	sprintf(info->s, "CTSP:%01X   ", adsp->cntr_sp); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_STATSP: 	sprintf(info->s, "STSP:%01X   ", adsp->stat_sp); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_LOOPSP: 	sprintf(info->s, "LPSP:%01X   ", adsp->loop_sp); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_IMASK: 	sprintf(info->s, "IMSK:%03X  ", adsp->imask); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_ICNTL: 	sprintf(info->s, "ICTL:%02X  ", adsp->icntl); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_IRQSTATE0:	sprintf(info->s, "IRQ0:%X   ", adsp->irq_state[0]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_IRQSTATE1:	sprintf(info->s, "IRQ1:%X   ", adsp->irq_state[1]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_IRQSTATE2:	sprintf(info->s, "IRQ2:%X   ", adsp->irq_state[2]); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_IRQSTATE3:	sprintf(info->s, "IRQ3:%X   ", adsp->irq_state[3]); break;
-
-		case CPUINFO_STR_REGISTER + ADSP2100_FLAGIN: 	sprintf(info->s, "FI:  %X   ", adsp->flagin); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_FLAGOUT: 	sprintf(info->s, "FO:  %X   ", adsp->flagout); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_FL0: 		sprintf(info->s, "FL0: %X   ", adsp->fl0); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_FL1: 		sprintf(info->s, "FL1: %X   ", adsp->fl1); break;
-		case CPUINFO_STR_REGISTER + ADSP2100_FL2: 		sprintf(info->s, "FL2: %X   ", adsp->fl2); break;
 	}
 }
 
@@ -2034,8 +1930,7 @@ static void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 
 static CPU_INIT( adsp2100 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
-	adsp->chip_type = CHIP_TYPE_ADSP2100;
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback, CHIP_TYPE_ADSP2100);
 	adsp->mstat_mask = 0x0f;
 	adsp->imask_mask = 0x0f;
 }
@@ -2091,8 +1986,7 @@ CPU_GET_INFO( adsp2100 )
 
 static CPU_INIT( adsp2101 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
-	adsp->chip_type = CHIP_TYPE_ADSP2101;
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback, CHIP_TYPE_ADSP2101);
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
 }
@@ -2161,8 +2055,7 @@ CPU_GET_INFO( adsp2101 )
 
 static CPU_INIT( adsp2104 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
-	adsp->chip_type = CHIP_TYPE_ADSP2104;
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback, CHIP_TYPE_ADSP2104);
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
 }
@@ -2236,8 +2129,7 @@ CPU_GET_INFO( adsp2104 )
 
 static CPU_INIT( adsp2105 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
-	adsp->chip_type = CHIP_TYPE_ADSP2105;
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback, CHIP_TYPE_ADSP2105);
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
 }
@@ -2305,8 +2197,7 @@ CPU_GET_INFO( adsp2105 )
 
 static CPU_INIT( adsp2115 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
-	adsp->chip_type = CHIP_TYPE_ADSP2115;
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback, CHIP_TYPE_ADSP2115);
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
 }
@@ -2380,8 +2271,7 @@ CPU_GET_INFO( adsp2115 )
 
 static CPU_INIT( adsp2181 )
 {
-	adsp2100_state *adsp = adsp21xx_init(device, irqcallback);
-	adsp->chip_type = CHIP_TYPE_ADSP2181;
+	adsp2100_state *adsp = adsp21xx_init(device, irqcallback, CHIP_TYPE_ADSP2181);
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3ff;
 }

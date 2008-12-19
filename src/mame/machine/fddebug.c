@@ -109,7 +109,6 @@
 #include "deprecat.h"
 #include "machine/fd1094.h"
 #include "cpu/m68000/m68kcpu.h"
-#undef REG_PC
 
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
@@ -1041,7 +1040,7 @@ static void execute_fdpc(running_machine *machine, int ref, int params, const ch
  		newpc = cpu_get_pc(cpu);
 
  	/* set the new PC */
- 	cpu_set_reg(cpu, REG_PC, newpc);
+ 	cpu_set_reg(cpu, REG_GENPC, newpc);
 
  	/* recompute around that */
  	instruction_hook(cpu, newpc);
@@ -1094,7 +1093,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 			}
 
 			/* set this as our current PC and run the instruction hook */
-			cpu_set_reg(space->cpu, REG_PC, pc);
+			cpu_set_reg(space->cpu, REG_GENPC, pc);
 			if (instruction_hook(space->cpu, pc))
 				break;
 		}

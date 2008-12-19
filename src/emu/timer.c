@@ -1290,10 +1290,10 @@ DEVICE_GET_INFO( timer )
 		case DEVINFO_FCT_RESET:					/* Nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = "Generic";					break;
-		case DEVINFO_STR_FAMILY:				info->s = "Timer";						break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Generic");				break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "Timer");				break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

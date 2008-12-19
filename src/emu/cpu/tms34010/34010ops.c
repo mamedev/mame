@@ -88,7 +88,7 @@ static void unimpl(tms34010_state *tms, UINT16 op)
 		return;
 
 	PUSH(tms, tms->pc);
-	PUSH(tms, GET_ST(tms));
+	PUSH(tms, tms->st);
 	RESET_ST(tms);
 	tms->pc = RLONG(tms, 0xfffffc20);
   	COUNT_UNKNOWN_CYCLES(tms,16);
@@ -1562,7 +1562,7 @@ static void getpc_b (tms34010_state *tms, UINT16 op) { GETPC(B); }
 
 #define GETST(R)												\
 {			  													\
-	R##REG(tms,DSTREG(op)) = GET_ST(tms);								\
+	R##REG(tms,DSTREG(op)) = tms->st;								\
 	COUNT_CYCLES(tms,1);											\
 }
 static void getst_a (tms34010_state *tms, UINT16 op) { GETST(A); }
@@ -1844,7 +1844,7 @@ static void popst(tms34010_state *tms, UINT16 op)
 
 static void pushst(tms34010_state *tms, UINT16 op)
 {
-	PUSH(tms, GET_ST(tms));
+	PUSH(tms, tms->st);
 	COUNT_CYCLES(tms,2);
 }
 
@@ -1892,7 +1892,7 @@ static void trap(tms34010_state *tms, UINT16 op)
 	if (t)
 	{
 		PUSH(tms, tms->pc);
-		PUSH(tms, GET_ST(tms));
+		PUSH(tms, tms->st);
 	}
 	RESET_ST(tms);
 	tms->pc = RLONG(tms, 0xffffffe0-(t<<5));

@@ -481,11 +481,11 @@ static DEVICE_GET_INFO(timekeeper)
 		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(timekeeper); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = "Timekeeper"; break;
-		case DEVINFO_STR_FAMILY:				info->s = "EEPROM"; break;
-		case DEVINFO_STR_VERSION:				info->s = "1.0"; break;
-		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__; break;
-		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:					strcpy(info->s, "Timekeeper"); break;
+		case DEVINFO_STR_FAMILY:				strcpy(info->s, "EEPROM"); break;
+		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0"); break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__); break;
+		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -494,12 +494,12 @@ DEVICE_GET_INFO( m48t02 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "M48T02";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M48T02");					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t02);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(timekeeper);				break;
+		default: 										DEVICE_GET_INFO_CALL(timekeeper);			break;
 	}
 }
 
@@ -508,12 +508,12 @@ DEVICE_GET_INFO( m48t35 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "M48T35";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M48T35");					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t35);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(timekeeper);				break;
+		default: 										DEVICE_GET_INFO_CALL(timekeeper);			break;
 	}
 }
 
@@ -522,12 +522,12 @@ DEVICE_GET_INFO( m48t58 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "M48T58";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M48T58");					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t58);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(timekeeper);				break;
+		default: 										DEVICE_GET_INFO_CALL(timekeeper);			break;
 	}
 }
 
@@ -536,11 +536,11 @@ DEVICE_GET_INFO( mk48t08 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "MK48T08";					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MK48T08");					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mk48t08);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(timekeeper);				break;
+		default: 										DEVICE_GET_INFO_CALL(timekeeper);			break;
 	}
 }

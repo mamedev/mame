@@ -214,9 +214,9 @@ static unsigned minx_get_reg( int regnum )
 {
 	switch( regnum )
 	{
-	case REG_PC:	return GET_MINX_PC;
+	case REG_GENPC:	return GET_MINX_PC;
 	case MINX_PC:	return regs.PC;
-	case REG_SP:
+	case REG_GENSP:
 	case MINX_SP:	return regs.SP;
 	case MINX_BA:	return regs.BA;
 	case MINX_HL:	return regs.HL;
@@ -239,9 +239,9 @@ static void minx_set_reg( int regnum, unsigned val )
 {
 	switch( regnum )
 	{
-	case REG_PC:	break;
+	case REG_GENPC:	break;
 	case MINX_PC:	regs.PC = val; break;
-	case REG_SP:
+	case REG_GENSP:
 	case MINX_SP:	regs.SP = val; break;
 	case MINX_BA:	regs.BA = val; break;
 	case MINX_HL:	regs.HL = val; break;
@@ -322,8 +322,8 @@ CPU_GET_INFO( minx )
 	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:			info->i = 0; break;
 	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:			info->i = 0; break;
 	case CPUINFO_INT_INPUT_STATE + 0:							info->i = 0; break;
-	case CPUINFO_INT_REGISTER + REG_PC:							info->i = GET_MINX_PC; break;
-	case CPUINFO_INT_REGISTER + REG_SP:
+	case CPUINFO_INT_REGISTER + REG_GENPC:							info->i = GET_MINX_PC; break;
+	case CPUINFO_INT_REGISTER + REG_GENSP:
 	case CPUINFO_INT_REGISTER + MINX_PC:
 	case CPUINFO_INT_REGISTER + MINX_SP:
 	case CPUINFO_INT_REGISTER + MINX_BA:

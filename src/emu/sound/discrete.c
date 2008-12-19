@@ -764,11 +764,11 @@ SND_GET_INFO( discrete )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( discrete );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Discrete";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Analog";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.1";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Discrete");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Analog");							break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

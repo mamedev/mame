@@ -2476,11 +2476,11 @@ SND_GET_INFO( sn76477 )
 	{
 	case SNDINFO_PTR_START:			info->start = SND_START_NAME( sn76477 ); break;
 	case SNDINFO_PTR_STOP:			info->stop = SND_STOP_NAME( sn76477 ); break;
-	case SNDINFO_STR_NAME:			info->s = "SN76477"; break;
-	case SNDINFO_STR_CORE_FAMILY:	info->s = "Analog"; break;
-	case SNDINFO_STR_CORE_VERSION:	info->s = "2.1"; break;
-	case SNDINFO_STR_CORE_FILE:		info->s = __FILE__; break;
-	case SNDINFO_STR_CORE_CREDITS:	info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	case SNDINFO_STR_NAME:			strcpy(info->s, "SN76477"); break;
+	case SNDINFO_STR_CORE_FAMILY:	strcpy(info->s, "Analog"); break;
+	case SNDINFO_STR_CORE_VERSION:	strcpy(info->s, "2.1"); break;
+	case SNDINFO_STR_CORE_FILE:		strcpy(info->s, __FILE__); break;
+	case SNDINFO_STR_CORE_CREDITS:	strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

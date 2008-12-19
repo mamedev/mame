@@ -79,12 +79,6 @@ struct _debugcpu_private
 
 
 /***************************************************************************
-    LOCAL VARIABLES
-***************************************************************************/
-
-
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
@@ -214,7 +208,6 @@ void debug_cpu_init(running_machine *machine)
 		info->symtable = symtable_alloc(global->symtable, (void *)cpu);
 
 		/* add a global symbol for the current instruction pointer */
-		symtable_add_register(info->symtable, "curpc", NULL, get_current_pc, 0);
 		symtable_add_register(info->symtable, "cycles", NULL, get_cycles, NULL);
 		if (classheader->space[ADDRESS_SPACE_PROGRAM] != NULL)
 			symtable_add_register(info->symtable, "logunmap", (void *)classheader->space[ADDRESS_SPACE_PROGRAM], get_logunmap, set_logunmap);
@@ -249,6 +242,10 @@ void debug_cpu_init(running_machine *machine)
 			/* add the symbol to the table */
 			symtable_add_register(info->symtable, symname, (void *)(FPTR)regnum, get_cpu_reg, set_cpu_reg);
 		}
+		
+		/* if no curpc, add one */
+		if (symtable_find(info->symtable, "curpc") == NULL)
+			symtable_add_register(info->symtable, "curpc", NULL, get_current_pc, 0);
 	}
 
 	/* first CPU is visible by default */
@@ -319,7 +316,7 @@ int debug_cpu_within_instruction_hook(running_machine *machine)
 int debug_cpu_is_stopped(running_machine *machine)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	return global->execution_state == EXECUTION_STATE_STOPPED;
+	return (global != NULL) ? (global->execution_state == EXECUTION_STATE_STOPPED) : FALSE;
 }
 
 

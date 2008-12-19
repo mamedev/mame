@@ -244,10 +244,10 @@ DEVICE_GET_INFO( ttl74123 )
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(ttl74123);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "74123";									break;
-		case DEVINFO_STR_FAMILY:						info->s = "TTL";									break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";									break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;									break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "74123");							break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "TTL");								break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

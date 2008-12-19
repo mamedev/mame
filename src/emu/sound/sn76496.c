@@ -392,20 +392,20 @@ SND_GET_INFO( sn76496 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_ALIAS:							info->i = SOUND_SN76496;				break;
+		case SNDINFO_INT_ALIAS:							info->i = SOUND_SN76496;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sn76496 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76496 );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sn76496 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76496 );		break;
+		case SNDINFO_PTR_STOP:							/* Nothing */									break;
+		case SNDINFO_PTR_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "SN76496";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "TI PSG";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.1";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "SN76496");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "TI PSG");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");							break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -413,9 +413,9 @@ SND_GET_INFO( sn76489 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76489 );			break;
-		case SNDINFO_STR_NAME:							info->s = "SN76489";					break;
-		default: 										SND_GET_INFO_CALL(sn76496);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76489 );		break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "SN76489");						break;
+		default: 										SND_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -423,9 +423,9 @@ SND_GET_INFO( sn76489a )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76489a );			break;
-		case SNDINFO_STR_NAME:							info->s = "SN76489A";					break;
-		default: 										SND_GET_INFO_CALL(sn76496);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76489a );		break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "SN76489A");					break;
+		default: 										SND_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -433,9 +433,9 @@ SND_GET_INFO( sn76494 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76494 );			break;
-		case SNDINFO_STR_NAME:							info->s = "SN76494";					break;
-		default: 										SND_GET_INFO_CALL(sn76496);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76494 );		break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "SN76494");						break;
+		default: 										SND_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -443,9 +443,9 @@ SND_GET_INFO( gamegear )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gamegear );			break;
-		case SNDINFO_STR_NAME:							info->s = "Game Gear PSG";				break;
-		default: 										SND_GET_INFO_CALL(sn76496);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gamegear );		break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Game Gear PSG");				break;
+		default: 										SND_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
@@ -453,8 +453,8 @@ SND_GET_INFO( smsiii )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( smsiii );				break;
-		case SNDINFO_STR_NAME:							info->s = "SMSIII PSG";					break;
-		default: 										SND_GET_INFO_CALL(sn76496);	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( smsiii );			break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "SMSIII PSG");					break;
+		default: 										SND_GET_INFO_CALL(sn76496);						break;
 	}
 }

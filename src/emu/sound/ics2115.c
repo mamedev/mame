@@ -556,17 +556,17 @@ SND_GET_INFO( ics2115 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ics2115 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ics2115 );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ics2115 );			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ics2115 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ics2115 );		break;
+		case SNDINFO_PTR_STOP:							/* nothing */									break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ics2115 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "ICS2115";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "ICS";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.01";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "ICS2115");						break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "ICS");							break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.01");						break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

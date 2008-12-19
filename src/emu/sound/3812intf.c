@@ -182,11 +182,11 @@ SND_GET_INFO( ym3812 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym3812 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "YM3812";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YM3812");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -352,11 +352,11 @@ SND_GET_INFO( ym3526 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym3526 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "YM3526";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "YM3526");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -566,11 +566,11 @@ SND_GET_INFO( y8950 )
 		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( y8950 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							info->s = "Y8950";						break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "Yamaha FM";					break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
-		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case SNDINFO_STR_NAME:							strcpy(info->s, "Y8950");							break;
+		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
+		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
+		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
