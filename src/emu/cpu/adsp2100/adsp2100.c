@@ -1877,13 +1877,13 @@ static CPU_GET_INFO( adsp21xx )
 		case CPUINFO_INT_SP:							info->i = adsp->pc_sp;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						/* set per CPU */						break;
-		case CPUINFO_PTR_INIT:							/* set per CPU */						break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(adsp21xx);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(adsp21xx);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(adsp21xx);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(adsp21xx);		break;
+		case CPUINFO_FCT_SET_INFO:						/* set per CPU */						break;
+		case CPUINFO_FCT_INIT:							/* set per CPU */						break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(adsp21xx);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(adsp21xx);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(adsp21xx);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(adsp21xx);		break;
 		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(adsp21xx);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &adsp->icount;			break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &adsp->state;		break;
@@ -1965,8 +1965,8 @@ CPU_GET_INFO( adsp2100 )
 		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ3:	info->i = adsp->irq_state[ADSP2100_IRQ3]; 	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2100);					break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2100);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2100);					break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2100);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2100");				break;
@@ -2030,8 +2030,8 @@ CPU_GET_INFO( adsp2101 )
 		case CPUINFO_INT_INPUT_STATE + ADSP2101_TIMER:	info->i = adsp->irq_state[ADSP2101_TIMER]; 		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2101);						break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2101);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2101);						break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2101);				break;
 
 		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
 		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;		break;
@@ -2104,8 +2104,8 @@ CPU_GET_INFO( adsp2104 )
 		case CPUINFO_INT_INPUT_STATE + ADSP2104_TIMER:	info->i = adsp->irq_state[ADSP2104_TIMER]; 		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2104);						break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2104);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2104);						break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2104);				break;
 
 		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
 		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;		break;
@@ -2172,8 +2172,8 @@ CPU_GET_INFO( adsp2105 )
 		case CPUINFO_INT_INPUT_STATE + ADSP2105_IRQ2:	info->i = adsp->irq_state[ADSP2105_IRQ2]; 	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2105);					break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2105);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2105);					break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2105);			break;
 
 		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;	break;
 		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;	break;
@@ -2246,8 +2246,8 @@ CPU_GET_INFO( adsp2115 )
 		case CPUINFO_INT_INPUT_STATE + ADSP2115_TIMER:	info->i = adsp->irq_state[ADSP2115_TIMER]; 		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2115);						break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2115);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2115);						break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2115);				break;
 
 		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
 		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;		break;
@@ -2330,8 +2330,8 @@ CPU_GET_INFO( adsp2181 )
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = -1;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2181);						break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2181);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2181);						break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2181);				break;
 
 		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback; 		break;
 		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback; 		break;

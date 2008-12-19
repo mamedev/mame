@@ -1156,13 +1156,13 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + PPC_R31:			info->i = ppc->r[31];					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						/* provided by core */					break;
-		case CPUINFO_PTR_INIT:							/* provided by core */					break;
-		case CPUINFO_PTR_RESET:							/* provided by core */					break;
-		case CPUINFO_PTR_EXIT:							/* provided by core */					break;
-		case CPUINFO_PTR_EXECUTE:						/* provided by core */					break;
-		case CPUINFO_PTR_TRANSLATE:						/* provided by core */					break;
-		case CPUINFO_PTR_DISASSEMBLE:					/* provided by core */					break;
+		case CPUINFO_FCT_SET_INFO:						/* provided by core */					break;
+		case CPUINFO_FCT_INIT:							/* provided by core */					break;
+		case CPUINFO_FCT_RESET:							/* provided by core */					break;
+		case CPUINFO_FCT_EXIT:							/* provided by core */					break;
+		case CPUINFO_FCT_EXECUTE:						/* provided by core */					break;
+		case CPUINFO_FCT_TRANSLATE:						/* provided by core */					break;
+		case CPUINFO_FCT_DISASSEMBLE:					/* provided by core */					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ppc->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1860,7 +1860,7 @@ void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM: 	info->i = POWERPC_MIN_PAGE_SHIFT;break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
+		case CPUINFO_FCT_INIT:							/* provided per-CPU */					break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(internal_ppc4xx); break;
 
 		/* --- everything else is handled generically --- */

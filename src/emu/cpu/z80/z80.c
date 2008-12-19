@@ -134,6 +134,8 @@ struct _z80_state
 	const address_space *io;
 	int		icount;
 	z80_daisy_state *daisy;
+	cpu_state_table state;
+	UINT8 rtemp;
 };
 
 #define CF		0x01
@@ -190,6 +192,61 @@ struct _z80_state
 #define MEMPTR 	memptr.w.l
 #define MEMPTR_H memptr.b.h
 #define MEMPTR_L memptr.b.l
+
+
+/***************************************************************************
+    CPU STATE DESCRIPTION
+***************************************************************************/
+
+#define Z80_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	CPU_STATE_ENTRY(Z80_##_name, #_name, _format, z80_state, _member, _datamask, ~0, _flags)
+
+static const cpu_state_entry state_array[] =
+{
+	Z80_STATE_ENTRY(PC,  "%04X", PCD, 0xffff, 0)
+	Z80_STATE_ENTRY(GENPC, "%04X", PCD, 0xffff, CPUSTATE_NOSHOW)
+	Z80_STATE_ENTRY(GENPCBASE, "%04X", prvpc.w.l, 0xffff, CPUSTATE_NOSHOW)
+	
+	Z80_STATE_ENTRY(SP,  "%04X", SP, 0xffff, 0)
+	Z80_STATE_ENTRY(GENSP, "%04X", SPD, 0xffff, CPUSTATE_NOSHOW)
+	
+	Z80_STATE_ENTRY(A, "%02X", A, 0xff, CPUSTATE_NOSHOW)
+	Z80_STATE_ENTRY(B, "%02X", B, 0xff, CPUSTATE_NOSHOW)
+	Z80_STATE_ENTRY(C, "%02X", C, 0xff, CPUSTATE_NOSHOW)
+	Z80_STATE_ENTRY(D, "%02X", D, 0xff, CPUSTATE_NOSHOW)
+	Z80_STATE_ENTRY(E, "%02X", E, 0xff, CPUSTATE_NOSHOW)
+	Z80_STATE_ENTRY(H, "%02X", H, 0xff, CPUSTATE_NOSHOW)
+	Z80_STATE_ENTRY(L, "%02X", L, 0xff, CPUSTATE_NOSHOW)
+
+	Z80_STATE_ENTRY(AF, "%04X", AF, 0xffff, 0)
+	Z80_STATE_ENTRY(BC, "%04X", BC, 0xffff, 0)
+	Z80_STATE_ENTRY(DE, "%04X", DE, 0xffff, 0)
+	Z80_STATE_ENTRY(HL, "%04X", HL, 0xffff, 0)
+	Z80_STATE_ENTRY(IX, "%04X", IX, 0xffff, 0)
+	Z80_STATE_ENTRY(IY, "%04X", IY, 0xffff, 0)
+
+	Z80_STATE_ENTRY(AF2, "%04X", af2.w.l, 0xffff, 0)
+	Z80_STATE_ENTRY(BC2, "%04X", bc2.w.l, 0xffff, 0)
+	Z80_STATE_ENTRY(DE2, "%04X", de2.w.l, 0xffff, 0)
+	Z80_STATE_ENTRY(HL2, "%04X", hl2.w.l, 0xffff, 0)
+
+	Z80_STATE_ENTRY(MEMPTR, "%04X", MEMPTR, 0xffff, 0)
+	Z80_STATE_ENTRY(R,      "%02X", rtemp, 0xff, CPUSTATE_EXPORT | CPUSTATE_IMPORT)
+	Z80_STATE_ENTRY(I,      "%02X", i, 0xff, 0)
+	Z80_STATE_ENTRY(IM,     "%1u", im, 0x3, 0)
+	Z80_STATE_ENTRY(IFF1,   "%1u", iff1, 0x1, 0)
+	Z80_STATE_ENTRY(IFF2,   "%1u", iff2, 0x1, 0)
+	Z80_STATE_ENTRY(HALT,   "%1u", halt, 0x1, 0)
+};
+
+static const cpu_state_table state_table_template =
+{
+	NULL,						/* pointer to the base of state (offsets are relative to this) */
+	0,							/* subtype this table refers to */
+	ARRAY_LENGTH(state_array),	/* number of entries */
+	state_array					/* array of entries */
+};
+
 
 
 static UINT8 SZ[256];		/* zero and sign flags */
@@ -3394,6 +3451,11 @@ static CPU_INIT( z80 )
 	z80->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 	z80->IX = z80->IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	z80->F = ZF;			/* Zero flag is set */
+
+	/* set up the state table */
+	z80->state = state_table_template;
+	z80->state.baseptr = z80;
+	z80->state.subtypemask = 1;
 }
 
 /****************************************************************************
@@ -3510,6 +3572,45 @@ static void set_irq_line(z80_state *z80, int irqline, int state)
 
 
 /**************************************************************************
+ * STATE IMPORT/EXPORT
+ **************************************************************************/
+
+static CPU_IMPORT_STATE( z80 )
+{
+	z80_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case Z80_R:
+			cpustate->rtemp = (cpustate->r & 0x7f) | (cpustate->r2 & 0x80);
+			break;
+		
+		default:
+			fatalerror("CPU_IMPORT_STATE(z80) called for unexpected value\n");
+			break;
+	}
+}
+
+
+static CPU_EXPORT_STATE( z80 )
+{
+	z80_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case Z80_R:
+			cpustate->r = cpustate->rtemp & 0x7f;
+			cpustate->r2 = cpustate->rtemp & 0x80;
+			break;
+
+		default:
+			fatalerror("CPU_EXPORT_STATE(z80) called for unexpected value\n");
+			break;
+	}
+}
+
+
+/**************************************************************************
  * Generic set_info
  **************************************************************************/
 
@@ -3521,35 +3622,6 @@ static CPU_SET_INFO( z80 )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line(z80, INPUT_LINE_NMI, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line(z80, 0, info->i);			break;
-
-		case CPUINFO_INT_PC:								z80->PC = info->i; 						break;
-		case CPUINFO_INT_REGISTER + Z80_PC:					z80->PC = info->i;						break;
-		case CPUINFO_INT_SP:								z80->SP = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_SP:					z80->SP = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_A:					z80->A = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_B:					z80->B = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_C:					z80->C = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_D:					z80->D = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_E:					z80->E = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_H:					z80->H = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_L:					z80->L = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_AF:					z80->AF = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_BC:					z80->BC = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_DE:					z80->DE = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_HL:					z80->HL = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_IX:					z80->IX = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_IY:					z80->IY = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_MEMPTR:				z80->MEMPTR = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z80_R:					z80->r = info->i; z80->r2 = info->i & 0x80; break;
-		case CPUINFO_INT_REGISTER + Z80_I:					z80->i = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_AF2:				z80->af2.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z80_BC2:				z80->bc2.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z80_DE2:				z80->de2.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z80_HL2:				z80->hl2.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z80_IM:					z80->im = info->i;						break;
-		case CPUINFO_INT_REGISTER + Z80_IFF1:				z80->iff1 = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z80_IFF2:				z80->iff2 = info->i;					break;
-		case CPUINFO_INT_REGISTER + Z80_HALT:				z80->halt = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_op:	cc[Z80_TABLE_op] = info->p;				break;
@@ -3597,46 +3669,19 @@ CPU_GET_INFO( z80 )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = z80->nmi_state;					break;
 		case CPUINFO_INT_INPUT_STATE + 0:			info->i = z80->irq_state;						break;
 
-		case CPUINFO_INT_PREVIOUSPC:				info->i = z80->prvpc.w.l;						break;
-
-		case CPUINFO_INT_PC:						info->i = z80->PCD;								break;
-		case CPUINFO_INT_REGISTER + Z80_PC:			info->i = z80->PC;								break;
-		case CPUINFO_INT_SP:						info->i = z80->SPD;								break;
-		case CPUINFO_INT_REGISTER + Z80_SP:			info->i = z80->SP;								break;
-		case CPUINFO_INT_REGISTER + Z80_A:			info->i = z80->A;								break;
-		case CPUINFO_INT_REGISTER + Z80_B:			info->i = z80->B;								break;
-		case CPUINFO_INT_REGISTER + Z80_C:			info->i = z80->C;								break;
-		case CPUINFO_INT_REGISTER + Z80_D:			info->i = z80->D;								break;
-		case CPUINFO_INT_REGISTER + Z80_E:			info->i = z80->E;								break;
-		case CPUINFO_INT_REGISTER + Z80_H:			info->i = z80->H;								break;
-		case CPUINFO_INT_REGISTER + Z80_L:			info->i = z80->L;								break;
-		case CPUINFO_INT_REGISTER + Z80_AF:			info->i = z80->AF;								break;
-		case CPUINFO_INT_REGISTER + Z80_BC:			info->i = z80->BC;								break;
-		case CPUINFO_INT_REGISTER + Z80_DE:			info->i = z80->DE;								break;
-		case CPUINFO_INT_REGISTER + Z80_HL:			info->i = z80->HL;								break;
-		case CPUINFO_INT_REGISTER + Z80_IX:			info->i = z80->IX;								break;
-		case CPUINFO_INT_REGISTER + Z80_IY:			info->i = z80->IY;								break;
-		case CPUINFO_INT_REGISTER + Z80_MEMPTR:		info->i = z80->MEMPTR;							break;
-		case CPUINFO_INT_REGISTER + Z80_R:			info->i = (z80->r & 0x7f) | (z80->r2 & 0x80);	break;
-		case CPUINFO_INT_REGISTER + Z80_I:			info->i = z80->i;								break;
-		case CPUINFO_INT_REGISTER + Z80_AF2:		info->i = z80->af2.w.l;							break;
-		case CPUINFO_INT_REGISTER + Z80_BC2:		info->i = z80->bc2.w.l;							break;
-		case CPUINFO_INT_REGISTER + Z80_DE2:		info->i = z80->de2.w.l;							break;
-		case CPUINFO_INT_REGISTER + Z80_HL2:		info->i = z80->hl2.w.l;							break;
-		case CPUINFO_INT_REGISTER + Z80_IM:			info->i = z80->im;								break;
-		case CPUINFO_INT_REGISTER + Z80_IFF1:		info->i = z80->iff1;							break;
-		case CPUINFO_INT_REGISTER + Z80_IFF2:		info->i = z80->iff2;							break;
-		case CPUINFO_INT_REGISTER + Z80_HALT:		info->i = z80->halt;							break;
-
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(z80);			break;
-		case CPUINFO_PTR_INIT:						info->init = CPU_INIT_NAME(z80);				break;
-		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(z80);				break;
-		case CPUINFO_PTR_EXIT:						info->exit = CPU_EXIT_NAME(z80);				break;
-		case CPUINFO_PTR_EXECUTE:					info->execute = CPU_EXECUTE_NAME(z80);			break;
-		case CPUINFO_PTR_BURN:						info->burn = NULL;								break;
-		case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(z80);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:				info->icount = &z80->icount;			break;
+		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(z80);			break;
+		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(z80);				break;
+		case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(z80);				break;
+		case CPUINFO_FCT_EXIT:						info->exit = CPU_EXIT_NAME(z80);				break;
+		case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(z80);			break;
+		case CPUINFO_FCT_BURN:						info->burn = NULL;								break;
+		case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(z80);	break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount = &z80->icount;					break;
+		case CPUINFO_PTR_STATE_TABLE:				info->state_table = &z80->state;				break;
+		case CPUINFO_FCT_IMPORT_STATE:				info->import_state = CPU_IMPORT_STATE_NAME(z80);break;	
+		case CPUINFO_FCT_EXPORT_STATE:				info->export_state = CPU_EXPORT_STATE_NAME(z80);break;
+
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_op:	info->p = (void *)cc[Z80_TABLE_op];		break;
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_cb:	info->p = (void *)cc[Z80_TABLE_cb];		break;
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ed:	info->p = (void *)cc[Z80_TABLE_ed];		break;
@@ -3662,32 +3707,5 @@ CPU_GET_INFO( z80 )
 				z80->F & 0x02 ? 'N':'.',
 				z80->F & 0x01 ? 'C':'.');
 			break;
-
-		case CPUINFO_STR_REGISTER + Z80_PC:			sprintf(info->s, "PC:%04X", z80->PC);			break;
-		case CPUINFO_STR_REGISTER + Z80_SP:			sprintf(info->s, "SP:%04X", z80->SP);			break;
-		case CPUINFO_STR_REGISTER + Z80_A:			sprintf(info->s, "~A:%02X", z80->A);			break;
-		case CPUINFO_STR_REGISTER + Z80_B:			sprintf(info->s, "~B:%02X", z80->B);			break;
-		case CPUINFO_STR_REGISTER + Z80_C:			sprintf(info->s, "~C:%02X", z80->C);			break;
-		case CPUINFO_STR_REGISTER + Z80_D:			sprintf(info->s, "~D:%02X", z80->D);			break;
-		case CPUINFO_STR_REGISTER + Z80_E:			sprintf(info->s, "~E:%02X", z80->E);			break;
-		case CPUINFO_STR_REGISTER + Z80_H:			sprintf(info->s, "~H:%02X", z80->H);			break;
-		case CPUINFO_STR_REGISTER + Z80_L:			sprintf(info->s, "~L:%02X", z80->L);			break;
-		case CPUINFO_STR_REGISTER + Z80_AF:			sprintf(info->s, "AF:%04X", z80->AF);			break;
-		case CPUINFO_STR_REGISTER + Z80_BC:			sprintf(info->s, "BC:%04X", z80->BC);			break;
-		case CPUINFO_STR_REGISTER + Z80_DE:			sprintf(info->s, "DE:%04X", z80->DE);			break;
-		case CPUINFO_STR_REGISTER + Z80_HL:			sprintf(info->s, "HL:%04X", z80->HL);			break;
-		case CPUINFO_STR_REGISTER + Z80_IX:			sprintf(info->s, "IX:%04X", z80->IX);			break;
-		case CPUINFO_STR_REGISTER + Z80_IY:			sprintf(info->s, "IY:%04X", z80->IY);			break;
-		case CPUINFO_STR_REGISTER + Z80_MEMPTR:		sprintf(info->s, "MEMPTR:%04X", z80->MEMPTR); 	break;
-		case CPUINFO_STR_REGISTER + Z80_R:			sprintf(info->s, "R:%02X", (z80->r & 0x7f) | (z80->r2 & 0x80)); break;
-		case CPUINFO_STR_REGISTER + Z80_I:			sprintf(info->s, "I:%02X", z80->i);				break;
-		case CPUINFO_STR_REGISTER + Z80_AF2:		sprintf(info->s, "AF2:%04X", z80->af2.w.l);		break;
-		case CPUINFO_STR_REGISTER + Z80_BC2:		sprintf(info->s, "BC2:%04X", z80->bc2.w.l);		break;
-		case CPUINFO_STR_REGISTER + Z80_DE2:		sprintf(info->s, "DE2:%04X", z80->de2.w.l);		break;
-		case CPUINFO_STR_REGISTER + Z80_HL2:		sprintf(info->s, "HL2:%04X", z80->hl2.w.l);		break;
-		case CPUINFO_STR_REGISTER + Z80_IM:			sprintf(info->s, "IM:%X", z80->im);				break;
-		case CPUINFO_STR_REGISTER + Z80_IFF1:		sprintf(info->s, "IFF1:%X", z80->iff1);			break;
-		case CPUINFO_STR_REGISTER + Z80_IFF2:		sprintf(info->s, "IFF2:%X", z80->iff2);			break;
-		case CPUINFO_STR_REGISTER + Z80_HALT:		sprintf(info->s, "HALT:%X", z80->halt);			break;
 	}
 }

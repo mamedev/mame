@@ -950,13 +950,13 @@ CPU_GET_INFO( m6805 )
 		case CPUINFO_INT_REGISTER + M6805_CC:			info->i = CC;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6805);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6805);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6805);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6805);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6805);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6805);break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6805);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6805);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6805);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(m6805);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6805);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6805);break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->iCount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1014,9 +1014,9 @@ CPU_GET_INFO( m68705 )
 		case CPUINFO_INT_INPUT_STATE + M68705_INT_TIMER:	info->i = cpustate->irq_state[M68705_INT_TIMER]; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:							info->setinfo = CPU_SET_INFO_NAME(m68705);	break;
-		case CPUINFO_PTR_INIT:								info->init = CPU_INIT_NAME(m68705);			break;
-		case CPUINFO_PTR_RESET:								info->reset = CPU_RESET_NAME(m68705);		break;
+		case CPUINFO_FCT_SET_INFO:							info->setinfo = CPU_SET_INFO_NAME(m68705);	break;
+		case CPUINFO_FCT_INIT:								info->init = CPU_INIT_NAME(m68705);			break;
+		case CPUINFO_FCT_RESET:								info->reset = CPU_RESET_NAME(m68705);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:								strcpy(info->s, "M68705");	break;
@@ -1073,9 +1073,9 @@ CPU_GET_INFO( hd63705 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd63705);	break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd63705);		break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hd63705);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd63705);	break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd63705);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(hd63705);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63705");	break;

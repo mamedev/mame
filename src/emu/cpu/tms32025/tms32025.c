@@ -2354,16 +2354,16 @@ CPU_GET_INFO( tms32025 )
 		case CPUINFO_INT_REGISTER + TMS32025_GREG:		info->i = M_RDRAM(cpustate, 5);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32025);	break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32025);			break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32025);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32025);			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms32025);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32025);	break;
-		case CPUINFO_PTR_READ:							info->read = CPU_READ_NAME(tms32025);				break;
-		case CPUINFO_PTR_WRITE:							info->write = CPU_WRITE_NAME(tms32025);			break;
-		case CPUINFO_PTR_READOP:						info->readop = CPU_READOP_NAME(tms32025);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32025);	break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(tms32025);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(tms32025);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(tms32025);			break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms32025);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32025);	break;
+		case CPUINFO_FCT_READ:							info->read = CPU_READ_NAME(tms32025);				break;
+		case CPUINFO_FCT_WRITE:							info->write = CPU_WRITE_NAME(tms32025);			break;
+		case CPUINFO_FCT_READOP:						info->readop = CPU_READOP_NAME(tms32025);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2441,7 +2441,7 @@ CPU_GET_INFO( tms32026 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32026);	break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(tms32026);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32026");			break;

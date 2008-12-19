@@ -2113,12 +2113,12 @@ static CPU_GET_INFO( mips3 )
 		case CPUINFO_INT_PREVIOUSPC:					info->i = mips3.ppc;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mips3);			break;
-		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mips3);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips3);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mips3);			break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_GET_TRANSLATE_NAME(mips3);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mips3);			break;
+		case CPUINFO_FCT_INIT:							/* provided per-CPU */					break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(mips3);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips3);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mips3);			break;
+		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_GET_TRANSLATE_NAME(mips3);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
@@ -2157,7 +2157,7 @@ CPU_GET_INFO( r4600be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4600be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4600be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4600 (big)");			break;
@@ -2175,7 +2175,7 @@ CPU_GET_INFO( r4600le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4600le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4600le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4600 (little)");		break;
@@ -2215,7 +2215,7 @@ CPU_GET_INFO( r4650be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4650be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4650be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "IDT R4650 (big)");		break;
@@ -2233,7 +2233,7 @@ CPU_GET_INFO( r4650le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4650le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4650le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "IDT R4650 (little)");	break;
@@ -2273,7 +2273,7 @@ CPU_GET_INFO( r4700be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4700be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4700be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4700 (big)");			break;
@@ -2292,7 +2292,7 @@ CPU_GET_INFO( r4700le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4700le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r4700le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4700 (little)");		break;
@@ -2332,7 +2332,7 @@ CPU_GET_INFO( r5000be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r5000be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r5000be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R5000 (big)");			break;
@@ -2350,7 +2350,7 @@ CPU_GET_INFO( r5000le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r5000le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(r5000le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R5000 (little)");		break;
@@ -2390,7 +2390,7 @@ CPU_GET_INFO( qed5271be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(qed5271be);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(qed5271be);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "QED5271 (big)");		break;
@@ -2408,7 +2408,7 @@ CPU_GET_INFO( qed5271le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(qed5271le);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(qed5271le);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "QED5271 (little)");	break;
@@ -2448,7 +2448,7 @@ CPU_GET_INFO( rm7000be )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rm7000be);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(rm7000be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "RM7000 (big)");		break;
@@ -2466,7 +2466,7 @@ CPU_GET_INFO( rm7000le )
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rm7000le);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(rm7000le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "RM7000 (little)");		break;

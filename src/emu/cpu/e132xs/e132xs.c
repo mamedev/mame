@@ -5013,13 +5013,13 @@ static CPU_GET_INFO( hyperstone )
 		case CPUINFO_INT_REGISTER + E132XS_L63:			info->i =  cpustate->local_regs[63];	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hyperstone);	break;
-		case CPUINFO_PTR_INIT:							info->init = NULL;						break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hyperstone);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(hyperstone);			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hyperstone);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hyperstone);	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hyperstone);	break;
+		case CPUINFO_FCT_INIT:							info->init = NULL;						break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(hyperstone);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(hyperstone);			break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hyperstone);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hyperstone);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;
@@ -5180,7 +5180,7 @@ CPU_GET_INFO( e116t )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e116t);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116t);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16T");				break;
@@ -5203,7 +5203,7 @@ CPU_GET_INFO( e116xt )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e116xt);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116xt);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XT");				break;
@@ -5226,7 +5226,7 @@ CPU_GET_INFO( e116xs )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_16k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e116xs);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116xs);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XS");				break;
@@ -5249,7 +5249,7 @@ CPU_GET_INFO( e116xsr )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_16k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e116xsr);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116xsr);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XSR");			break;
@@ -5272,7 +5272,7 @@ CPU_GET_INFO( e132n )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e132n);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132n);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32N");				break;
@@ -5295,7 +5295,7 @@ CPU_GET_INFO( e132t )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e132t);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132t);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32T");				break;
@@ -5318,7 +5318,7 @@ CPU_GET_INFO( e132xn )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e132xn);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xn);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XN");				break;
@@ -5341,7 +5341,7 @@ CPU_GET_INFO( e132xt )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e132xt);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xt);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XT");				break;
@@ -5364,7 +5364,7 @@ CPU_GET_INFO( e132xs )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_16k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e132xs);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xs);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XS");				break;
@@ -5387,7 +5387,7 @@ CPU_GET_INFO( e132xsr )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_16k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(e132xsr);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xsr);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XSR");			break;
@@ -5410,7 +5410,7 @@ CPU_GET_INFO( gms30c2116 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(gms30c2116);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2116);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2116");			break;
@@ -5433,7 +5433,7 @@ CPU_GET_INFO( gms30c2132 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(gms30c2132);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2132);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2132");			break;
@@ -5456,7 +5456,7 @@ CPU_GET_INFO( gms30c2216 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(gms30c2216);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2216);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2216");			break;
@@ -5479,7 +5479,7 @@ CPU_GET_INFO( gms30c2232 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(gms30c2232);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2232);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2232");			break;

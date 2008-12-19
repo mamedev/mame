@@ -1880,13 +1880,13 @@ CPU_GET_INFO( cquestsnd )
 		case CPUINFO_INT_REGISTER + CQUESTSND_ADRCNTR:		info->i = cpustate->adrcntr;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestsnd);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestsnd);			break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestsnd);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestsnd);			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestsnd);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestsnd);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestsnd);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cquestsnd);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cquestsnd);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(cquestsnd);			break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestsnd);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestsnd);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1996,13 +1996,13 @@ CPU_GET_INFO( cquestrot )
 		case CPUINFO_INT_REGISTER + CQUESTROT_PC:		info->i = cpustate->pc;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestrot);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestrot);			break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestrot);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestrot);			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestrot);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestrot);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestrot);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cquestrot);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cquestrot);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(cquestrot);			break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestrot);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestrot);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2114,13 +2114,13 @@ CPU_GET_INFO( cquestlin )
 		case CPUINFO_INT_REGISTER + CQUESTLIN_FGPC:		info->i = cpustate->pc[cpustate->clkcnt & 3 ? BACKGROUND : FOREGROUND];	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestlin);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestlin);			break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestlin);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestlin);			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestlin);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestlin);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestlin);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cquestlin);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cquestlin);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(cquestlin);			break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestlin);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestlin);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

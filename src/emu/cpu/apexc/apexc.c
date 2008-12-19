@@ -910,12 +910,12 @@ CPU_GET_INFO( apexc )
 	case CPUINFO_INT_REGISTER + APEXC_STATE:		info->i = cpustate->running;				break;
 	case CPUINFO_INT_REGISTER + APEXC_ML_FULL:		info->i = effective_address(cpustate, cpustate->ml);	break;
 
-	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(apexc);			break;
-	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(apexc);				break;
-	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(apexc);				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(apexc);			break;
-	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(apexc);			break;
+	case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(apexc);			break;
+	case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(apexc);				break;
+	case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(apexc);				break;
+	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(apexc);			break;
+	case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+	case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(apexc);			break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 	case CPUINFO_STR_NAME:							strcpy(info->s, "APEXC"); break;

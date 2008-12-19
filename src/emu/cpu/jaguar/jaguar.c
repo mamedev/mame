@@ -1567,13 +1567,13 @@ CPU_GET_INFO( jaguargpu )
 		case CPUINFO_INT_SP:							info->i = jaguar->b0[31];							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(jaguargpu);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(jaguargpu);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(jaguar);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(jaguar);					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(jaguargpu);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;									break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(jaguargpu);break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(jaguargpu);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(jaguargpu);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(jaguar);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(jaguar);					break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(jaguargpu);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;									break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(jaguargpu);break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &jaguar->icount;						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1662,10 +1662,10 @@ CPU_GET_INFO( jaguardsp )
 		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ5:		info->i = (jaguar->ctrl[G_CTRL] & 0x10000) ? ASSERT_LINE : CLEAR_LINE; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(jaguardsp);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(jaguardsp);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(jaguardsp);		break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(jaguardsp);break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(jaguardsp);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(jaguardsp);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(jaguardsp);		break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(jaguardsp);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "Jaguar DSP");						break;

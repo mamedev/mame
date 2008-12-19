@@ -1197,15 +1197,15 @@ static CPU_GET_INFO( sharc )
 		case CPUINFO_INT_REGISTER + SHARC_B15:			info->i = cpustate->dag2.b[7];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sharc);		break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sharc);	break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(sharc);		break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sharc);break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sharc);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(sharc);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(sharc);	break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(sharc);		break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sharc);break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sharc);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
-		case CPUINFO_PTR_READ:							info->read = CPU_READ_NAME(sharc);		break;
-		case CPUINFO_PTR_READOP:						info->readop = CPU_READOP_NAME(sharc);	break;
+		case CPUINFO_FCT_READ:							info->read = CPU_READ_NAME(sharc);		break;
+		case CPUINFO_FCT_READOP:						info->readop = CPU_READOP_NAME(sharc);	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(internal_pgm); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1324,7 +1324,7 @@ CPU_GET_INFO( adsp21062 )
 	switch(state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp21062);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp21062);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP21062");			break;

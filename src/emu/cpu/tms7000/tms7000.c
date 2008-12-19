@@ -299,12 +299,12 @@ CPU_GET_INFO( tms7000 )
 		case CPUINFO_INT_REGISTER + TMS7000_T1_DEC: info->i = cpustate->t1_decrementer; break;
 
         /* --- the following bits of info are returned as pointers to data or functions --- */
-        case CPUINFO_PTR_SET_INFO:	info->setinfo = CPU_SET_INFO_NAME(tms7000);	break;
-        case CPUINFO_PTR_INIT:	info->init = CPU_INIT_NAME(tms7000);	break;
-        case CPUINFO_PTR_RESET:	info->reset = CPU_RESET_NAME(tms7000);	break;
-        case CPUINFO_PTR_EXECUTE:	info->execute = CPU_EXECUTE_NAME(tms7000);	break;
-        case CPUINFO_PTR_BURN:	info->burn = NULL;	/* Not supported */break;
-        case CPUINFO_PTR_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms7000);	break;
+        case CPUINFO_FCT_SET_INFO:	info->setinfo = CPU_SET_INFO_NAME(tms7000);	break;
+        case CPUINFO_FCT_INIT:	info->init = CPU_INIT_NAME(tms7000);	break;
+        case CPUINFO_FCT_RESET:	info->reset = CPU_RESET_NAME(tms7000);	break;
+        case CPUINFO_FCT_EXECUTE:	info->execute = CPU_EXECUTE_NAME(tms7000);	break;
+        case CPUINFO_FCT_BURN:	info->burn = NULL;	/* Not supported */break;
+        case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms7000);	break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &cpustate->icount;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:	info->internal_map8 = ADDRESS_MAP_NAME(tms7000_mem); break;
 
@@ -342,7 +342,7 @@ CPU_GET_INFO( tms7000_exl )
 {
     switch( state )
     {
-		case CPUINFO_PTR_EXECUTE:
+		case CPUINFO_FCT_EXECUTE:
 			info->execute = CPU_EXECUTE_NAME(tms7000_exl);
 			break;
 		default:

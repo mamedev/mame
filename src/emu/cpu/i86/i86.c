@@ -537,13 +537,13 @@ CPU_GET_INFO( i8086 )
 		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->prevpc;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i8086);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8086);					break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i8086);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(i8086);					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i8086);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;									break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8086);	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i8086);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8086);					break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(i8086);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(i8086);					break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i8086);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;									break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8086);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;					break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;				break;
 		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(i8086);	break;	
@@ -595,7 +595,7 @@ CPU_GET_INFO( i8088 )
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8088);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8088);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "8088");				break;
@@ -620,7 +620,7 @@ CPU_GET_INFO( i80186 )
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "80186");				break;
@@ -645,8 +645,8 @@ CPU_GET_INFO( i80188 )
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8088);		break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8088);		break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "80188");				break;

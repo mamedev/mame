@@ -525,13 +525,13 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MIPS3_LO:			info->i = mips->r[REG_LO];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						/* provided by core */					break;
-		case CPUINFO_PTR_INIT:							/* provided by core */					break;
-		case CPUINFO_PTR_RESET:							/* provided by core */					break;
-		case CPUINFO_PTR_EXIT:							/* provided by core */					break;
-		case CPUINFO_PTR_EXECUTE:						/* provided by core */					break;
-		case CPUINFO_PTR_TRANSLATE:						/* provided by core */					break;
-		case CPUINFO_PTR_DISASSEMBLE:					/* provided by core */					break;
+		case CPUINFO_FCT_SET_INFO:						/* provided by core */					break;
+		case CPUINFO_FCT_INIT:							/* provided by core */					break;
+		case CPUINFO_FCT_RESET:							/* provided by core */					break;
+		case CPUINFO_FCT_EXIT:							/* provided by core */					break;
+		case CPUINFO_FCT_EXECUTE:						/* provided by core */					break;
+		case CPUINFO_FCT_TRANSLATE:						/* provided by core */					break;
+		case CPUINFO_FCT_DISASSEMBLE:					/* provided by core */					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mips->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

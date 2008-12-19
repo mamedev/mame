@@ -1298,13 +1298,13 @@ CPU_GET_INFO( hd6309 )
 		case CPUINFO_INT_REGISTER + HD6309_DP:			info->i = DP;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd6309);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd6309);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hd6309);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(hd6309);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd6309);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6309);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd6309);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(hd6309);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(hd6309);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(hd6309);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd6309);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6309);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68_state->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

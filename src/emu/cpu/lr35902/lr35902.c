@@ -453,12 +453,12 @@ CPU_GET_INFO( lr35902 )
 	case CPUINFO_INT_REGISTER + LR35902_SPEED:		info->i = 0x7E | ( ( cpustate->w.gb_speed - 1 ) << 7 ) | cpustate->w.gb_speed_change_pending; break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(lr35902);		break;
-	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(lr35902);				break;
-	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(lr35902);			break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(lr35902);		break;
-	case CPUINFO_PTR_BURN:							info->burn = CPU_BURN_NAME(lr35902);				break;
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(lr35902);		break;
+	case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(lr35902);		break;
+	case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(lr35902);				break;
+	case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(lr35902);			break;
+	case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(lr35902);		break;
+	case CPUINFO_FCT_BURN:							info->burn = CPU_BURN_NAME(lr35902);				break;
+	case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(lr35902);		break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->w.icount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

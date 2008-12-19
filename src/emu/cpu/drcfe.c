@@ -147,7 +147,7 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 	drcfe->device = cpu;
 	drcfe->program = memory_find_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
-	drcfe->translate = (cpu_translate_func)device_get_info_fct(cpu, CPUINFO_PTR_TRANSLATE);
+	drcfe->translate = (cpu_translate_func)device_get_info_fct(cpu, CPUINFO_FCT_TRANSLATE);
 #ifdef LSB_FIRST
 	if (cpu_get_endianness(cpu) == ENDIANNESS_BIG)
 #else

@@ -70,7 +70,7 @@ vtlb_state *vtlb_alloc(const device_config *cpu, int space, int fixed_entries, i
 	vtlb->fixed = fixed_entries;
 	vtlb->pageshift = cpu_get_page_shift(cpu, space);
 	vtlb->addrwidth = cpu_get_logaddr_width(cpu, space);
-	vtlb->translate = (cpu_translate_func)device_get_info_fct(cpu, CPUINFO_PTR_TRANSLATE);
+	vtlb->translate = (cpu_translate_func)device_get_info_fct(cpu, CPUINFO_FCT_TRANSLATE);
 
 	/* validate CPU information */
 	assert((1 << vtlb->pageshift) > VTLB_FLAGS_MASK);

@@ -724,8 +724,8 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 		int spacenum;
 
 		/* check the CPU for incompleteness */
-		if (device_get_info_fct(device, CPUINFO_PTR_RESET) == NULL ||
-			device_get_info_fct(device, CPUINFO_PTR_EXECUTE) == NULL)
+		if (device_get_info_fct(device, CPUINFO_FCT_RESET) == NULL ||
+			device_get_info_fct(device, CPUINFO_FCT_EXECUTE) == NULL)
 		{
 			mame_printf_error("%s: %s uses an incomplete CPU\n", driver->source_file, driver->name);
 			error = TRUE;
@@ -733,7 +733,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 		}
 
 		/* check for CPU-specific validity check */
-		cpu_validity_check = (cpu_validity_check_func) device_get_info_fct(device, CPUINFO_PTR_VALIDITY_CHECK);
+		cpu_validity_check = (cpu_validity_check_func) device_get_info_fct(device, CPUINFO_FCT_VALIDITY_CHECK);
 		if (cpu_validity_check != NULL && (*cpu_validity_check)(driver, device->static_config))
 			error = TRUE;
 

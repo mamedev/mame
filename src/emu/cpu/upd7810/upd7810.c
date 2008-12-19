@@ -2087,13 +2087,13 @@ CPU_GET_INFO( upd7810 )
 		case CPUINFO_INT_REGISTER + UPD7810_CO1:		info->i = CO1;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(upd7810);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(upd7810);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7810);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(upd7810);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(upd7810);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7810);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(upd7810);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(upd7810);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd7810);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(upd7810);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(upd7810);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7810);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2178,8 +2178,8 @@ CPU_GET_INFO( upd7807 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7807);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7807);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd7807);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7807);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7807");				break;
@@ -2190,8 +2190,8 @@ CPU_GET_INFO( upd7807 )
 
 CPU_GET_INFO( upd7801 ) {
 	switch( state ) {
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd7801);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7801);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd7801);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd7801);		break;
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7801");				break;
 
@@ -2203,8 +2203,8 @@ CPU_GET_INFO( upd78c05 ) {
 	switch ( state ) {
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd78c05);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd78c05);		break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd78c05);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(upd78c05);		break;
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C05");			break;
 
@@ -2248,7 +2248,7 @@ CPU_GET_INFO( upd78c05 ) {
 
 CPU_GET_INFO( upd78c06 ) {
 	switch ( state ) {
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(upd78c06);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(upd78c06);			break;
 
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C06");			break;
 

@@ -803,13 +803,13 @@ static CPU_GET_INFO( ppcdrc )
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc);		break;
-		case CPUINFO_PTR_INIT:							/* provided per-CPU */							break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppcdrc);			break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppcdrc);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppcdrc);		break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppcdrc);break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(ppcdrc);	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc);		break;
+		case CPUINFO_FCT_INIT:							/* provided per-CPU */							break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(ppcdrc);			break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(ppcdrc);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppcdrc);		break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppcdrc);break;
+		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(ppcdrc);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
@@ -4244,8 +4244,8 @@ CPU_GET_INFO( ppc403ga )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403ga);				break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc403ga);				break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 403GA");		break;
@@ -4283,8 +4283,8 @@ CPU_GET_INFO( ppc403gcx )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403gcx);			break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc403gcx);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 403GCX");		break;
@@ -4327,7 +4327,7 @@ CPU_GET_INFO( ppc601 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc601);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc601);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 601");			break;
@@ -4365,7 +4365,7 @@ CPU_GET_INFO( ppc602 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc602);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc602);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 602");			break;
@@ -4403,7 +4403,7 @@ CPU_GET_INFO( ppc603 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc603);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603");			break;
@@ -4441,7 +4441,7 @@ CPU_GET_INFO( ppc603e )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603e);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc603e);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603e");		break;
@@ -4479,7 +4479,7 @@ CPU_GET_INFO( ppc603r )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603r);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc603r);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603R");		break;
@@ -4517,7 +4517,7 @@ CPU_GET_INFO( ppc604 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc604);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(ppc604);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 604");			break;
@@ -4560,7 +4560,7 @@ CPU_GET_INFO( mpc8240 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mpc8240);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(mpc8240);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC MPC8240");		break;

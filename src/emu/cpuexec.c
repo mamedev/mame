@@ -393,11 +393,11 @@ static DEVICE_START( cpu )
 	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		header->space[spacenum] = memory_find_address_space(device, spacenum);
 	
-	header->set_info = (cpu_set_info_func)device_get_info_fct(device, CPUINFO_PTR_SET_INFO);
-	header->execute = (cpu_execute_func)device_get_info_fct(device, CPUINFO_PTR_EXECUTE);
-	header->burn = (cpu_burn_func)device_get_info_fct(device, CPUINFO_PTR_BURN);
-	header->translate = (cpu_translate_func)device_get_info_fct(device, CPUINFO_PTR_TRANSLATE);
-	header->disassemble = (cpu_disassemble_func)device_get_info_fct(device, CPUINFO_PTR_DISASSEMBLE);
+	header->set_info = (cpu_set_info_func)device_get_info_fct(device, CPUINFO_FCT_SET_INFO);
+	header->execute = (cpu_execute_func)device_get_info_fct(device, CPUINFO_FCT_EXECUTE);
+	header->burn = (cpu_burn_func)device_get_info_fct(device, CPUINFO_FCT_BURN);
+	header->translate = (cpu_translate_func)device_get_info_fct(device, CPUINFO_FCT_TRANSLATE);
+	header->disassemble = (cpu_disassemble_func)device_get_info_fct(device, CPUINFO_FCT_DISASSEMBLE);
 	header->dasm_override = NULL;
 
 	/* fill in the input states and IRQ callback information */
@@ -426,7 +426,7 @@ static DEVICE_START( cpu )
 
 	/* initialize this CPU */
 	num_regs = state_save_get_reg_count(device->machine);
-	init = (cpu_init_func)device_get_info_fct(device, CPUINFO_PTR_INIT);
+	init = (cpu_init_func)device_get_info_fct(device, CPUINFO_FCT_INIT);
 	(*init)(device, standard_irq_callback);
 	num_regs = state_save_get_reg_count(device->machine) - num_regs;
 	
@@ -495,7 +495,7 @@ static DEVICE_RESET( cpu )
 	classdata->totalcycles = 0;
 
 	/* then reset the CPU directly */
-	reset = (cpu_reset_func)device_get_info_fct(device, CPUINFO_PTR_RESET);
+	reset = (cpu_reset_func)device_get_info_fct(device, CPUINFO_FCT_RESET);
 	if (reset != NULL)
 		(*reset)(device);
 
@@ -545,7 +545,7 @@ static DEVICE_STOP( cpu )
 	cpu_exit_func exit;
 	
 	/* call the CPU's exit function if present */
-	exit = (cpu_exit_func)device_get_info_fct(device, CPUINFO_PTR_EXIT);
+	exit = (cpu_exit_func)device_get_info_fct(device, CPUINFO_FCT_EXIT);
 	if (exit != NULL)
 		(*exit)(device);
 }
@@ -565,7 +565,7 @@ static DEVICE_SET_INFO( cpu )
 	if (header != NULL)
 		set_info = header->set_info;
 	else
-		set_info = (cpu_set_info_func)device_get_info_fct(device, CPUINFO_PTR_SET_INFO);
+		set_info = (cpu_set_info_func)device_get_info_fct(device, CPUINFO_FCT_SET_INFO);
 	
 	switch (state)
 	{

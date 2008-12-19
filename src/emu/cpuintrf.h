@@ -130,19 +130,19 @@ enum
 	CPUINFO_FCT_FIRST = DEVINFO_FCT_FIRST,
 
 		/* CPU-specific additions */
-		CPUINFO_PTR_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, INT64 data, void *ptr) */
-		CPUINFO_PTR_INIT,									/* R/O: void (*init)(const device_config *device, int index, int clock, int (*irqcallback)(const device_config *device, int)) */
-		CPUINFO_PTR_RESET,									/* R/O: void (*reset)(const device_config *device) */
-		CPUINFO_PTR_EXIT,									/* R/O: void (*exit)(const device_config *device) */
-		CPUINFO_PTR_EXECUTE,								/* R/O: int (*execute)(const device_config *device, int cycles) */
-		CPUINFO_PTR_BURN,									/* R/O: void (*burn)(const device_config *device, int cycles) */
-		CPUINFO_PTR_DISASSEMBLE,							/* R/O: offs_t (*disassemble)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) */
-		CPUINFO_PTR_TRANSLATE,								/* R/O: int (*translate)(const device_config *device, int space, int intention, offs_t *address) */
-		CPUINFO_PTR_READ,									/* R/O: int (*read)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value) */
-		CPUINFO_PTR_WRITE,									/* R/O: int (*write)(const device_config *device, int space, UINT32 offset, int size, UINT64 value) */
-		CPUINFO_PTR_READOP,									/* R/O: int (*readop)(const device_config *device, UINT32 offset, int size, UINT64 *value) */
-		CPUINFO_PTR_DEBUG_INIT,								/* R/O: void (*debug_init)(const device_config *device) */
-		CPUINFO_PTR_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const game_driver *driver, const void *config) */
+		CPUINFO_FCT_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, INT64 data, void *ptr) */
+		CPUINFO_FCT_INIT,									/* R/O: void (*init)(const device_config *device, int index, int clock, int (*irqcallback)(const device_config *device, int)) */
+		CPUINFO_FCT_RESET,									/* R/O: void (*reset)(const device_config *device) */
+		CPUINFO_FCT_EXIT,									/* R/O: void (*exit)(const device_config *device) */
+		CPUINFO_FCT_EXECUTE,								/* R/O: int (*execute)(const device_config *device, int cycles) */
+		CPUINFO_FCT_BURN,									/* R/O: void (*burn)(const device_config *device, int cycles) */
+		CPUINFO_FCT_DISASSEMBLE,							/* R/O: offs_t (*disassemble)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) */
+		CPUINFO_FCT_TRANSLATE,								/* R/O: int (*translate)(const device_config *device, int space, int intention, offs_t *address) */
+		CPUINFO_FCT_READ,									/* R/O: int (*read)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value) */
+		CPUINFO_FCT_WRITE,									/* R/O: int (*write)(const device_config *device, int space, UINT32 offset, int size, UINT64 value) */
+		CPUINFO_FCT_READOP,									/* R/O: int (*readop)(const device_config *device, UINT32 offset, int size, UINT64 *value) */
+		CPUINFO_FCT_DEBUG_INIT,								/* R/O: void (*debug_init)(const device_config *device) */
+		CPUINFO_FCT_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const game_driver *driver, const void *config) */
 		CPUINFO_FCT_IMPORT_STATE,							/* R/O: void (*import_state)(const device_config *device, void *baseptr, const cpu_state_entry *entry) */
 		CPUINFO_FCT_EXPORT_STATE,							/* R/O: void (*export_state)(const device_config *device, void *baseptr, const cpu_state_entry *entry) */
 		CPUINFO_FCT_IMPORT_STRING,							/* R/O: void (*import_string)(const device_config *device, void *baseptr, const cpu_state_entry *entry, const char *format, char *string) */
@@ -402,19 +402,19 @@ union _cpuinfo
 	genf *  				f;							/* generic function pointers */
 	char *					s;							/* generic strings */
 
-	cpu_set_info_func		setinfo;					/* CPUINFO_PTR_SET_INFO */
-	cpu_init_func			init;						/* CPUINFO_PTR_INIT */
-	cpu_reset_func			reset;						/* CPUINFO_PTR_RESET */
-	cpu_exit_func			exit;						/* CPUINFO_PTR_EXIT */
-	cpu_execute_func		execute;					/* CPUINFO_PTR_EXECUTE */
-	cpu_burn_func			burn;						/* CPUINFO_PTR_BURN */
-	cpu_translate_func		translate;					/* CPUINFO_PTR_TRANSLATE */
-	cpu_read_func			read;						/* CPUINFO_PTR_READ */
-	cpu_write_func			write;						/* CPUINFO_PTR_WRITE */
-	cpu_readop_func			readop;						/* CPUINFO_PTR_READOP */
-	cpu_debug_init_func		debug_init;					/* CPUINFO_PTR_DEBUG_INIT */
-	cpu_disassemble_func	disassemble;				/* CPUINFO_PTR_DISASSEMBLE */
-	cpu_validity_check_func	validity_check;				/* CPUINFO_PTR_VALIDITY_CHECK */
+	cpu_set_info_func		setinfo;					/* CPUINFO_FCT_SET_INFO */
+	cpu_init_func			init;						/* CPUINFO_FCT_INIT */
+	cpu_reset_func			reset;						/* CPUINFO_FCT_RESET */
+	cpu_exit_func			exit;						/* CPUINFO_FCT_EXIT */
+	cpu_execute_func		execute;					/* CPUINFO_FCT_EXECUTE */
+	cpu_burn_func			burn;						/* CPUINFO_FCT_BURN */
+	cpu_translate_func		translate;					/* CPUINFO_FCT_TRANSLATE */
+	cpu_read_func			read;						/* CPUINFO_FCT_READ */
+	cpu_write_func			write;						/* CPUINFO_FCT_WRITE */
+	cpu_readop_func			readop;						/* CPUINFO_FCT_READOP */
+	cpu_debug_init_func		debug_init;					/* CPUINFO_FCT_DEBUG_INIT */
+	cpu_disassemble_func	disassemble;				/* CPUINFO_FCT_DISASSEMBLE */
+	cpu_validity_check_func	validity_check;				/* CPUINFO_FCT_VALIDITY_CHECK */
 	cpu_state_io_func		import_state;				/* CPUINFO_FCT_IMPORT_STATE */
 	cpu_state_io_func		export_state;				/* CPUINFO_FCT_EXPORT_STATE */
 	cpu_string_io_func 		import_string;				/* CPUINFO_FCT_IMPORT_STRING */

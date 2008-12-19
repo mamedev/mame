@@ -1049,13 +1049,13 @@ static CPU_GET_INFO( pic16c5x )
 		case CPUINFO_INT_REGISTER + PIC16C5x_FSR: 		info->i = (cpustate->FSR & cpustate->picRAMmask);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(pic16c5x);	break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(pic16c5x);			break;
-		case CPUINFO_PTR_RESET:							/* set per-CPU */								break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(pic16c5x);			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(pic16c5x);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(pic16c5x);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(pic16c5x);	break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(pic16c5x);			break;
+		case CPUINFO_FCT_RESET:							/* set per-CPU */								break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(pic16c5x);			break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(pic16c5x);		break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(pic16c5x);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1143,7 +1143,7 @@ CPU_GET_INFO( pic16c54 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(pic16c54);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c54);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c54_rom); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c54_ram); break;
 
@@ -1197,7 +1197,7 @@ CPU_GET_INFO( pic16c55 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(pic16c55);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c55);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c55_rom); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c55_ram); break;
 
@@ -1251,7 +1251,7 @@ CPU_GET_INFO( pic16c56 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(pic16c56);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c56);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c56_rom); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c56_ram); break;
 
@@ -1310,7 +1310,7 @@ CPU_GET_INFO( pic16c57 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(pic16c57);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c57);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c57_rom); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c57_ram); break;
 
@@ -1370,7 +1370,7 @@ CPU_GET_INFO( pic16c58 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(pic16c58);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(pic16c58);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map16 = ADDRESS_MAP_NAME(pic16c58_rom); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(pic16c58_ram); break;
 

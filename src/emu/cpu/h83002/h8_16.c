@@ -541,13 +541,13 @@ CPU_GET_INFO( h8_3002 )
 
 	switch(state) {
 	// Interface functions and variables
-	case CPUINFO_PTR_SET_INFO:					info->setinfo     = CPU_SET_INFO_NAME(h8);		break;
-	case CPUINFO_PTR_INIT:						info->init        = CPU_INIT_NAME(h8);			break;
-	case CPUINFO_PTR_RESET:						info->reset       = CPU_RESET_NAME(h8);			break;
-	case CPUINFO_PTR_EXIT:						info->exit        = 0;							break;
-	case CPUINFO_PTR_EXECUTE:					info->execute     = CPU_EXECUTE_NAME(h8);		break;
-	case CPUINFO_PTR_BURN:						info->burn        = 0;							break;
-	case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(h8_32);	break;
+	case CPUINFO_FCT_SET_INFO:					info->setinfo     = CPU_SET_INFO_NAME(h8);		break;
+	case CPUINFO_FCT_INIT:						info->init        = CPU_INIT_NAME(h8);			break;
+	case CPUINFO_FCT_RESET:						info->reset       = CPU_RESET_NAME(h8);			break;
+	case CPUINFO_FCT_EXIT:						info->exit        = 0;							break;
+	case CPUINFO_FCT_EXECUTE:					info->execute     = CPU_EXECUTE_NAME(h8);		break;
+	case CPUINFO_FCT_BURN:						info->burn        = 0;							break;
+	case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(h8_32);	break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount      = &h8->cyccnt;					break;
 	case CPUINFO_INT_CONTEXT_SIZE:				info->i           = sizeof(h83xx_state);		break;
 	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:		info->i           = 2;							break;
@@ -615,7 +615,7 @@ CPU_GET_INFO( h8_3044 )
 	switch (state)
 	{
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8_3044_internal_map);  break;
-		case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(h8_24);					break;
+		case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(h8_24);					break;
 		case CPUINFO_STR_NAME:				strcpy(info->s, "H8/3044");	 break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);
@@ -627,7 +627,7 @@ CPU_GET_INFO( h8_3007 )
 	switch (state)
 	{
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = address_map_h8_3007_internal_map;  break;
-		case CPUINFO_PTR_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
+		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
 		case CPUINFO_STR_NAME:				strcpy(info->s, "H8/3007");		break;
 		default:
 			CPU_GET_INFO_CALL(h8_3002);

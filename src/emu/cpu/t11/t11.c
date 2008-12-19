@@ -448,11 +448,11 @@ CPU_GET_INFO( t11 )
 		case CPUINFO_INT_REGISTER + T11_R5:				info->i = cpustate->REGD(5);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(t11);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(t11);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(t11);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(t11);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(t11);	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(t11);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(t11);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(t11);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(t11);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(t11);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

@@ -1110,13 +1110,13 @@ CPU_GET_INFO( m37710 )
 		case CPUINFO_INT_REGISTER + M37710_IRQ_STATE:	info->i = m37710_get_reg(cpustate, M37710_IRQ_STATE); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m37710);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m37710);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m37710);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m37710);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m37710);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m37710);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m37710);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m37710);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m37710);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(m37710);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m37710);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m37710);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->ICount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(m37710_internal_map); break;

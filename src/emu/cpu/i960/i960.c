@@ -2120,13 +2120,13 @@ CPU_GET_INFO( i960 )
 
 	switch(state) {
 		// Interface functions and variables
-	case CPUINFO_PTR_SET_INFO:					info->setinfo     = CPU_SET_INFO_NAME(i960);	break;
-	case CPUINFO_PTR_INIT:						info->init        = CPU_INIT_NAME(i960);		break;
-	case CPUINFO_PTR_RESET:						info->reset       = CPU_RESET_NAME(i960);		break;
-	case CPUINFO_PTR_EXIT:						info->exit        = 0;							break;
-	case CPUINFO_PTR_EXECUTE:					info->execute     = CPU_EXECUTE_NAME(i960);		break;
-	case CPUINFO_PTR_BURN:						info->burn        = 0;							break;
-	case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(i960);	break;
+	case CPUINFO_FCT_SET_INFO:					info->setinfo     = CPU_SET_INFO_NAME(i960);	break;
+	case CPUINFO_FCT_INIT:						info->init        = CPU_INIT_NAME(i960);		break;
+	case CPUINFO_FCT_RESET:						info->reset       = CPU_RESET_NAME(i960);		break;
+	case CPUINFO_FCT_EXIT:						info->exit        = 0;							break;
+	case CPUINFO_FCT_EXECUTE:					info->execute     = CPU_EXECUTE_NAME(i960);		break;
+	case CPUINFO_FCT_BURN:						info->burn        = 0;							break;
+	case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(i960);	break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount      = &i960->icount;				break;
 	case CPUINFO_INT_CONTEXT_SIZE:				info->i           = sizeof(i960_state_t);		break;
 	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:		info->i           = 4;							break;

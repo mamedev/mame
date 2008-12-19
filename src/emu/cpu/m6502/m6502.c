@@ -738,13 +738,13 @@ CPU_GET_INFO( m6502 )
 		case CPUINFO_INT_REGISTER + M6502_SUBTYPE:		info->i = cpustate->subtype;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6502);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6502);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6502);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6502);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6502);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6502);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6502);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6502);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6502);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(m6502);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6502);			break;
+		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6502);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) cpustate->rdmem_id;		break;
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) cpustate->wrmem_id;		break;
@@ -790,7 +790,7 @@ CPU_GET_INFO( n2a03 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(n2a03);				break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(n2a03);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "N2A03");				break;
@@ -827,10 +827,10 @@ CPU_GET_INFO( m6510 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6510);			break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6510);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6510);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6510);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6510);			break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6510);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6510);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6510);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = ADDRESS_MAP_NAME(m6510_mem); break;
 		case CPUINFO_PTR_M6510_PORTREAD:				info->f = (genf *) cpustate->port_read;		break;
 		case CPUINFO_PTR_M6510_PORTWRITE:				info->f = (genf *) cpustate->port_write;	break;
@@ -924,11 +924,11 @@ CPU_GET_INFO( m65c02 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m65c02);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m65c02);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m65c02);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m65c02);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65c02);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m65c02);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m65c02);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m65c02);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m65c02);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65c02);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M65C02");				break;
@@ -949,8 +949,8 @@ CPU_GET_INFO( m65sc02 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m65sc02);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65sc02);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m65sc02);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65sc02);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M65SC02");				break;
@@ -994,11 +994,11 @@ CPU_GET_INFO( deco16 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(deco16);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(deco16);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(deco16);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(deco16);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(deco16);		break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(deco16);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(deco16);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(deco16);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(deco16);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(deco16);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "DECO CPU16");			break;

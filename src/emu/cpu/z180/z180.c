@@ -2540,14 +2540,14 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_INT_REGISTER + Z180_IOLINES:		info->i = cpustate->iol;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(z180);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(z180);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(z180);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(z180);			break;
-		case CPUINFO_PTR_BURN:							info->burn = CPU_BURN_NAME(z180);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(z180);	break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(z180);		break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(z180);				break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(z180);				break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(z180);			break;
+		case CPUINFO_FCT_BURN:							info->burn = CPU_BURN_NAME(z180);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(z180);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(z180);		break;
+		case CPUINFO_FCT_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(z180);		break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: info->p = (void *)cc[Z180_TABLE_op];			break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: info->p = (void *)cc[Z180_TABLE_cb];			break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: info->p = (void *)cc[Z180_TABLE_ed];			break;
