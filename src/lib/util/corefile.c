@@ -287,7 +287,7 @@ file_error core_fcompress(core_file *file, int level)
 		file->zdata = malloc(sizeof(*file->zdata));
 		if (file->zdata == NULL)
 			return FILERR_OUT_OF_MEMORY;
-		memset(file->zdata, 0, sizeof(file->zdata));
+		memset(file->zdata, 0, sizeof(*file->zdata));
 
 		/* initialize the stream and compressor */
 		if ((file->openflags & OPEN_FLAG_WRITE) != 0)
