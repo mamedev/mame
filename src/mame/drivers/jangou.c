@@ -239,7 +239,7 @@ static READ8_HANDLER( input_mux_r )
 		case 0x10: return input_port_read(space->machine, "PL1_3");
 		case 0x20: return input_port_read(space->machine, "PL2_3");
 	}
-	printf("%04x\n",mux_data);
+//	printf("%04x\n",mux_data);
 
 	return 0xff;
 }
