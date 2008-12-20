@@ -75,12 +75,12 @@ static SND_START( sid8580 )
 
 READ8_HANDLER ( sid6581_0_port_r )
 {
-	return sid6581_port_r(get_sid(0), offset);
+	return sid6581_port_r(space->machine, get_sid(0), offset);
 }
 
 READ8_HANDLER ( sid6581_1_port_r )
 {
-	return sid6581_port_r(get_sid(1), offset);
+	return sid6581_port_r(space->machine, get_sid(1), offset);
 }
 
 WRITE8_HANDLER ( sid6581_0_port_w )

@@ -323,7 +323,7 @@ void sid6581_port_w (SID6581 *This, int offset, int data)
 	}
 }
 
-int sid6581_port_r (SID6581 *This, int offset)
+int sid6581_port_r (running_machine *machine, SID6581 *This, int offset)
 {
     int data;
 /* SIDPLAY reads last written at a sid address value */
@@ -337,13 +337,13 @@ int sid6581_port_r (SID6581 *This, int offset)
 	break;
     case 0x19:						   /* paddle 1 */
 	if (This->ad_read != NULL)
-	    data=This->ad_read (0);
+	    data=This->ad_read (machine, 0);
 	else
 	    data=0;
 	break;
     case 0x1a:						   /* paddle 2 */
 	if (This->ad_read != NULL)
-	    data=This->ad_read (1);
+	    data=This->ad_read (machine, 1);
 	else
 	    data=0;
 	break;

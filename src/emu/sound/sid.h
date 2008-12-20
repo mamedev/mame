@@ -18,7 +18,7 @@ typedef struct _SID6581
     const device_config *device;
     sound_stream *mixer_channel; // mame stream/ mixer channel
 
-    int (*ad_read) (int which);
+    int (*ad_read) (running_machine *machine, int which);
     SIDTYPE type;
     UINT32 clock;
 
@@ -59,7 +59,7 @@ void sid6581_init (SID6581 *This);
 
 int sidEmuReset(SID6581 *This);
 
-int sid6581_port_r (SID6581 *This, int offset);
+int sid6581_port_r (running_machine *machine, SID6581 *This, int offset);
 void sid6581_port_w (SID6581 *This, int offset, int data);
 
 void sid_set_type(SID6581 *This, SIDTYPE type);
