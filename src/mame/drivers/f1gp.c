@@ -485,7 +485,7 @@ static MACHINE_DRIVER_START( f1gp )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
-	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -524,7 +524,7 @@ static MACHINE_DRIVER_START( f1gpb )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* NO sound CPU */
-	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

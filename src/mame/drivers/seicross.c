@@ -412,7 +412,7 @@ static MACHINE_DRIVER_START( nvram )
 	MDRV_CPU_ADD("mcu", NSC8105, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mcu_nvram_map,0)
 
-	MDRV_INTERLEAVE(20)	/* 20 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(1200))	/* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(friskyt)
 	MDRV_NVRAM_HANDLER(seicross)

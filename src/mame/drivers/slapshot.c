@@ -536,7 +536,7 @@ static MACHINE_DRIVER_START( slapshot )
 	MDRV_CPU_ADD("audio", Z80,32000000/8)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_START(slapshot)
 
@@ -578,7 +578,7 @@ static MACHINE_DRIVER_START( opwolf3 )
 	MDRV_CPU_ADD("audio", Z80,32000000/8)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

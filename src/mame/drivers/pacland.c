@@ -423,7 +423,7 @@ static MACHINE_DRIVER_START( pacland )
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_INTERLEAVE(100)	/* we need heavy synching between the MCU and the CPU */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synching between the MCU and the CPU */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

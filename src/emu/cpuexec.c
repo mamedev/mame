@@ -135,16 +135,45 @@ static int get_register_string_max_width(const device_config *device, void *base
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_get_class_data - return a pointer to
-    the class data
+    get_class_data - return a pointer to the
+    class data
 -------------------------------------------------*/
 
-INLINE cpu_class_data *cpu_get_class_data(const device_config *device)
+INLINE cpu_class_data *get_class_data(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->class == DEVICE_CLASS_CPU_CHIP);
 	assert(device->token != NULL);
 	return (cpu_class_data *)cpu_get_class_header(device) - 1;
+}
+
+
+/*-------------------------------------------------
+    get_minimum_quantum - return the minimum
+    quantum required for a given CPU device
+-------------------------------------------------*/
+
+INLINE attoseconds_t get_minimum_quantum(const device_config *device)
+{
+	attoseconds_t basetick = 0;
+	
+	/* fetch the base clock from the classdata if present */
+	if (device->token != NULL)
+	{
+		cpu_class_data *classdata = get_class_data(device);
+		if (classdata->attoseconds_per_cycle != 0)
+			basetick = classdata->attoseconds_per_cycle;
+	}
+
+	/* otherwise compute it from the raw data */
+	if (basetick == 0)
+	{
+		UINT32 baseclock = (UINT64)device->clock * cpu_get_clock_multiplier(device) / cpu_get_clock_divider(device);
+		basetick = HZ_TO_ATTOSECONDS(baseclock);
+	}
+
+	/* apply the minimum cycle count */
+	return basetick * cpu_get_min_cycles(device);
 }
 
 
@@ -155,7 +184,7 @@ INLINE cpu_class_data *cpu_get_class_data(const device_config *device)
 
 INLINE void suspend_until_trigger(const device_config *device, int trigger, int eatcycles)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* suspend the CPU immediately if it's not already */
 	cpu_suspend(device, SUSPEND_REASON_TRIGGER, eatcycles);
@@ -177,20 +206,28 @@ INLINE void suspend_until_trigger(const device_config *device, int trigger, int 
 
 void cpuexec_init(running_machine *machine)
 {
-	int numscreens = video_screen_count(machine->config);
-	attoseconds_t refresh_attosecs;
-	int ipf;
+	attotime min_quantum;
 
 	/* allocate global state */
 	machine->cpuexec_data = auto_malloc(sizeof(*machine->cpuexec_data));
 	memset(machine->cpuexec_data, 0, sizeof(*machine->cpuexec_data));
 
 	/* set the core scheduling quantum */
-	ipf = machine->config->cpu_slices_per_frame;
-	if (ipf <= 0)
-		ipf = 1;
-	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : video_screen_get_frame_period(machine->primary_screen).attoseconds;
-	timer_add_scheduling_quantum(machine, refresh_attosecs / ipf, attotime_never);
+	min_quantum = machine->config->minimum_quantum;
+	if (attotime_compare(min_quantum, attotime_zero) == 0)
+		min_quantum = ATTOTIME_IN_HZ(60);
+	if (machine->config->perfect_cpu_quantum != NULL)
+	{
+		const device_config *cpu = cputag_get_cpu(machine, machine->config->perfect_cpu_quantum);
+		attotime cpu_quantum;
+
+		if (cpu == NULL)
+			fatalerror("CPU '%s' specified for perfect interleave is not present!", machine->config->perfect_cpu_quantum);
+		cpu_quantum = attotime_make(0, get_minimum_quantum(cpu));
+		min_quantum = attotime_min(cpu_quantum, min_quantum); 
+	}
+	assert(min_quantum.seconds == 0);
+	timer_add_scheduling_quantum(machine, min_quantum.attoseconds, attotime_never);
 }
 
 
@@ -214,7 +251,7 @@ void cpuexec_timeslice(running_machine *machine)
 	/* apply pending suspension changes */
 	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 	{
-		cpu_class_data *classdata = cpu_get_class_data(cpu);
+		cpu_class_data *classdata = get_class_data(cpu);
 		classdata->suspend = classdata->nextsuspend;
 		classdata->nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
 		classdata->eatcycles = classdata->nexteatcycles;
@@ -223,7 +260,7 @@ void cpuexec_timeslice(running_machine *machine)
 	/* loop over non-suspended CPUs */
 	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 	{
-		cpu_class_data *classdata = cpu_get_class_data(cpu);
+		cpu_class_data *classdata = get_class_data(cpu);
 		if (classdata->suspend == 0)
 		{
 			attotime delta = attotime_sub(target, classdata->localtime);
@@ -275,7 +312,7 @@ void cpuexec_timeslice(running_machine *machine)
 	/* update the local times of all CPUs */
 	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 	{
-		cpu_class_data *classdata = cpu_get_class_data(cpu);
+		cpu_class_data *classdata = get_class_data(cpu);
 
 		/* if we're suspended and counting, process */
 		if (classdata->suspend != 0 && classdata->eatcycles && attotime_compare(classdata->localtime, target) < 0)
@@ -382,7 +419,7 @@ static DEVICE_START( cpu )
 	/* get pointers to our data */
 	config = device->inline_config;
 	header = cpu_get_class_header(device);
-	classdata = cpu_get_class_data(device);
+	classdata = get_class_data(device);
 	
 	/* add ourself to the global array */
 	if (index < ARRAY_LENGTH(device->machine->cpu))
@@ -480,7 +517,7 @@ static DEVICE_START( cpu )
 
 static DEVICE_RESET( cpu )
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	const cpu_config *config = device->inline_config;
 	cpu_reset_func reset;
 	int line;
@@ -575,7 +612,7 @@ static DEVICE_SET_INFO( cpu )
 			/* if we have a state pointer, we can handle some stuff for free */
 			if (device->token != NULL)
 			{
-				const cpu_class_data *classdata = cpu_get_class_data(device);
+				const cpu_class_data *classdata = get_class_data(device);
 				if (classdata->state != NULL)
 				{
 					if (state >= CPUINFO_INT_REGISTER && state <= CPUINFO_INT_REGISTER_LAST)
@@ -638,7 +675,7 @@ DEVICE_GET_INFO( cpu )
 			/* if we have a state pointer, we can handle some stuff for free */
 			if (device->token != NULL)
 			{
-				const cpu_class_data *classdata = cpu_get_class_data(device);
+				const cpu_class_data *classdata = get_class_data(device);
 				if (classdata->state != NULL)
 				{
 					if (state >= CPUINFO_INT_REGISTER && state <= CPUINFO_INT_REGISTER_LAST)
@@ -690,7 +727,7 @@ DEVICE_GET_INFO( cpu )
 
 void cpu_suspend(const device_config *device, int reason, int eatcycles)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* set the suspend reason and eat cycles flag */
 	classdata->nextsuspend |= reason;
@@ -708,7 +745,7 @@ void cpu_suspend(const device_config *device, int reason, int eatcycles)
 
 void cpu_resume(const device_config *device, int reason)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* clear the suspend reason and eat cycles flag */
 	classdata->nextsuspend &= ~reason;
@@ -737,7 +774,7 @@ int cpu_is_executing(const device_config *device)
 
 int cpu_is_suspended(const device_config *device, int reason)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* return true if the given reason is indicated */
 	return ((classdata->nextsuspend & reason) != 0);
@@ -756,9 +793,14 @@ int cpu_is_suspended(const device_config *device, int reason)
 
 int cpu_get_clock(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata;
 
+	/* if we haven't been started yet, compute it manually */
+	if (device->token == NULL)
+		return (UINT64)device->clock * cpu_get_clock_multiplier(device) / cpu_get_clock_divider(device);
+	
 	/* return the current clock value */
+	classdata = get_class_data(device);
 	return classdata->clock;
 }
 
@@ -770,7 +812,7 @@ int cpu_get_clock(const device_config *device)
 
 void cpu_set_clock(const device_config *device, int clock)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* set the clock and update the information */
 	classdata->clock = clock;
@@ -785,7 +827,7 @@ void cpu_set_clock(const device_config *device, int clock)
 
 double cpu_get_clockscale(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* return the current clock scale factor */
 	return classdata->clockscale;
@@ -799,7 +841,7 @@ double cpu_get_clockscale(const device_config *device)
 
 void cpu_set_clockscale(const device_config *device, double clockscale)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* set the scale factor and update the information */
 	classdata->clockscale = clockscale;
@@ -814,7 +856,7 @@ void cpu_set_clockscale(const device_config *device, double clockscale)
 
 attotime cpu_clocks_to_attotime(const device_config *device, UINT64 clocks)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	if (clocks < classdata->cycles_per_second)
 		return attotime_make(0, clocks * classdata->attoseconds_per_cycle);
 	else
@@ -833,7 +875,7 @@ attotime cpu_clocks_to_attotime(const device_config *device, UINT64 clocks)
 
 UINT64 cpu_attotime_to_clocks(const device_config *device, attotime duration)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	return mulu_32x32(duration.seconds, classdata->cycles_per_second) + (UINT64)duration.attoseconds * (UINT64)classdata->attoseconds_per_cycle;
 }
 
@@ -850,7 +892,7 @@ UINT64 cpu_attotime_to_clocks(const device_config *device, attotime duration)
 
 attotime cpu_get_local_time(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	attotime result;
 
 	/* if we're active, add in the time from the current slice */
@@ -887,7 +929,7 @@ attotime cpuexec_override_local_time(running_machine *machine, attotime default_
 
 UINT64 cpu_get_total_cycles(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	if (device == device->machine->cpuexec_data->executingcpu)
 		return classdata->totalcycles + classdata->cycles_running - *classdata->icount;
@@ -903,7 +945,7 @@ UINT64 cpu_get_total_cycles(const device_config *device)
 
 void cpu_eat_cycles(const device_config *device, int cycles)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* ignore if not the executing CPU */
 	if (device != device->machine->cpuexec_data->executingcpu)
@@ -922,7 +964,7 @@ void cpu_eat_cycles(const device_config *device, int cycles)
 
 void cpu_adjust_icount(const device_config *device, int delta)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* ignore if not the executing CPU */
 	if (device != device->machine->cpuexec_data->executingcpu)
@@ -940,7 +982,7 @@ void cpu_adjust_icount(const device_config *device, int delta)
 
 void cpu_abort_timeslice(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	int delta;
 
 	/* ignore if not the executing CPU */
@@ -1006,7 +1048,7 @@ void cpu_spinuntil_trigger(const device_config *device, int trigger)
 
 void cpu_spinuntil_int(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* suspend until the given trigger fires */
 	suspend_until_trigger(device, classdata->inttrigger, TRUE);
@@ -1047,7 +1089,7 @@ void cpuexec_trigger(running_machine *machine, int trigger)
 	/* look for suspended CPUs waiting for this trigger and unsuspend them */
 	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 	{
-		cpu_class_data *classdata = cpu_get_class_data(cpu);
+		cpu_class_data *classdata = get_class_data(cpu);
 
 		/* if we're executing, for an immediate abort */
 		cpu_abort_timeslice(cpu);
@@ -1080,7 +1122,7 @@ void cpuexec_triggertime(running_machine *machine, int trigger, attotime duratio
 
 void cpu_triggerint(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* signal this CPU's interrupt trigger */
 	cpuexec_trigger(device->machine, classdata->inttrigger);
@@ -1100,7 +1142,7 @@ void cpu_triggerint(const device_config *device)
 
 void cpu_set_input_line(const device_config *device, int line, int state)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	int vector = (line >= 0 && line < MAX_INPUT_LINES) ? classdata->input[line].vector : 0xff;
 	cpu_set_input_line_and_vector(device, line, state, vector);
 }
@@ -1114,7 +1156,7 @@ void cpu_set_input_line(const device_config *device, int line, int state)
 
 void cpu_set_input_line_vector(const device_config *device, int line, int vector)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	if (line >= 0 && line < MAX_INPUT_LINES)
 	{
 		classdata->input[line].vector = vector;
@@ -1132,7 +1174,7 @@ void cpu_set_input_line_vector(const device_config *device, int line, int vector
 
 void cpu_set_input_line_and_vector(const device_config *device, int line, int state, int vector)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	/* catch errors where people use PULSE_LINE for CPUs that don't support it */
 	if (state == PULSE_LINE && line != INPUT_LINE_NMI && line != INPUT_LINE_RESET)
@@ -1175,7 +1217,7 @@ void cpu_set_input_line_and_vector(const device_config *device, int line, int st
 
 void cpu_set_irq_callback(const device_config *device, cpu_irq_callback callback)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	classdata->driver_irq = callback;
 }
 
@@ -1192,7 +1234,7 @@ void cpu_set_irq_callback(const device_config *device, cpu_irq_callback callback
 
 int cpu_getiloops(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	return classdata->iloops;
 }
 
@@ -1209,12 +1251,12 @@ int cpu_getiloops(const device_config *device)
 
 static void update_clock_information(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	INT64 attos;
 
 	/* recompute cps and spc */
 	classdata->cycles_per_second = (double)classdata->clock * classdata->clockscale;
-	classdata->attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / ((double)classdata->clock * classdata->clockscale);
+	classdata->attoseconds_per_cycle = HZ_TO_ATTOSECONDS((double)classdata->clock * classdata->clockscale);
 
 	/* update the CPU's divisor */
 	attos = classdata->attoseconds_per_cycle;
@@ -1238,29 +1280,26 @@ static void update_clock_information(const device_config *device)
 
 static void compute_perfect_interleave(running_machine *machine)
 {
-	if (machine->cpu[0] != NULL && machine->cpu[0]->token != NULL)
+	if (machine->cpu[0] != NULL)
 	{
-		cpu_class_data *classdata = cpu_get_class_data(machine->cpu[0]);
-		attoseconds_t smallest = classdata->attoseconds_per_cycle * cpu_get_min_cycles(machine->cpu[0]);
+		attoseconds_t smallest = get_minimum_quantum(machine->cpu[0]);
 		attoseconds_t perfect = ATTOSECONDS_PER_SECOND - 1;
 		const device_config *cpu;
 
 		/* start with a huge time factor and find the 2nd smallest cycle time */
 		for (cpu = machine->cpu[0]->typenext; cpu != NULL; cpu = cpu->typenext)
-			if (cpu->token != NULL)
-			{
-				cpu_class_data *classdata = cpu_get_class_data(cpu);
-				attoseconds_t curtime = classdata->attoseconds_per_cycle * cpu_get_min_cycles(cpu);
+		{
+			attoseconds_t curquantum = get_minimum_quantum(cpu);
 
-				/* find the 2nd smallest cycle interval */
-				if (curtime < smallest)
-				{
-					perfect = smallest;
-					smallest = curtime;
-				}
-				else if (curtime < perfect)
-					perfect = classdata->attoseconds_per_cycle;
+			/* find the 2nd smallest cycle interval */
+			if (curquantum < smallest)
+			{
+				perfect = smallest;
+				smallest = curquantum;
 			}
+			else if (curquantum < perfect)
+				perfect = curquantum;
+		}
 
 		/* adjust the final value */
 		timer_set_minimum_quantum(machine, perfect);
@@ -1286,7 +1325,7 @@ static void on_vblank(const device_config *device, void *param, int vblank_state
 		for (cpu = device->machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 		{
 			const cpu_config *config = cpu->inline_config;
-			cpu_class_data *classdata = cpu_get_class_data(cpu);
+			cpu_class_data *classdata = get_class_data(cpu);
 			int cpu_interested;
 
 			/* start the interrupt counter */
@@ -1334,7 +1373,7 @@ static TIMER_CALLBACK( trigger_partial_frame_interrupt )
 {
 	const device_config *device = ptr;
 	const cpu_config *config = device->inline_config;
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 
 	if (classdata->iloops == 0)
 		classdata->iloops = config->vblank_interrupts_per_frame;
@@ -1386,7 +1425,7 @@ static TIMER_CALLBACK( triggertime_callback )
 static TIMER_CALLBACK( empty_event_queue )
 {
 	const device_config *device = ptr;
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	cpu_input_data *inputline = &classdata->input[param];
 	int curevent;
 
@@ -1475,7 +1514,7 @@ static TIMER_CALLBACK( empty_event_queue )
 
 static IRQ_CALLBACK( standard_irq_callback )
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	cpu_input_data *inputline = &classdata->input[irqline];
 	int vector = inputline->curvector;
 
@@ -1508,7 +1547,7 @@ static IRQ_CALLBACK( standard_irq_callback )
 
 static void register_save_states(const device_config *device)
 {
-	cpu_class_data *classdata = cpu_get_class_data(device);
+	cpu_class_data *classdata = get_class_data(device);
 	int line;
 
 	state_save_register_device_item(device, 0, classdata->suspend);

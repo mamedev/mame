@@ -859,7 +859,7 @@ static MACHINE_DRIVER_START( polepos )
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
-	MDRV_INTERLEAVE(100)	/* some interleaving */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* some interleaving */
 
 	MDRV_MACHINE_RESET(polepos)
 	MDRV_NVRAM_HANDLER(generic_1fill)

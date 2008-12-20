@@ -671,7 +671,7 @@ static MACHINE_DRIVER_START( tehkanwc )
 	MDRV_CPU_IO_MAP(sound_port,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

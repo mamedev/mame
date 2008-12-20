@@ -464,7 +464,7 @@ static MACHINE_DRIVER_START( pushman )
 	MDRV_CPU_ADD("mcu", M68705, 4000000)	/* No idea */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
-	MDRV_INTERLEAVE(60)
+	MDRV_QUANTUM_TIME(HZ(3600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -502,7 +502,7 @@ static MACHINE_DRIVER_START( bballs )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
-	MDRV_INTERLEAVE(60)
+	MDRV_QUANTUM_TIME(HZ(3600))
 
 	MDRV_MACHINE_RESET(bballs)
 

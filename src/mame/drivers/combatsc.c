@@ -583,7 +583,7 @@ static MACHINE_DRIVER_START( combasc )
 	MDRV_CPU_ADD("audio", Z80,3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(combasc_readmem_sound,combasc_writemem_sound)
 
-	MDRV_INTERLEAVE(20)
+	MDRV_QUANTUM_TIME(HZ(1200))
 
 	MDRV_MACHINE_RESET(combasc)
 
@@ -624,7 +624,7 @@ static MACHINE_DRIVER_START( combascb )
 	MDRV_CPU_ADD("audio", Z80,3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(combasc_readmem_sound,combasc_writemem_sound) /* FAKE */
 
-	MDRV_INTERLEAVE(20)
+	MDRV_QUANTUM_TIME(HZ(1200))
 
 	MDRV_MACHINE_RESET(combasc)
 

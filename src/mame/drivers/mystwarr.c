@@ -942,7 +942,7 @@ static MACHINE_DRIVER_START( mystwarr )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 480)
 
-	MDRV_INTERLEAVE(32)
+	MDRV_QUANTUM_TIME(HZ(1920))
 
 	MDRV_NVRAM_HANDLER(mystwarr)
 	MDRV_MACHINE_START(mystwarr)

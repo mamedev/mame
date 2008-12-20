@@ -1287,7 +1287,7 @@ static MACHINE_DRIVER_START( reikaids )
 	MDRV_CPU_IO_MAP(reikaids_upd7807_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
-	MDRV_INTERLEAVE(500)	// very high interleave required to sync for startup tests
+	MDRV_QUANTUM_TIME(HZ(30000))	// very high interleave required to sync for startup tests
 
 	MDRV_MACHINE_RESET(reikaids_upd7807)
 
@@ -1337,7 +1337,7 @@ static MACHINE_DRIVER_START( pteacher )
 	MDRV_CPU_IO_MAP(pteacher_upd7807_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
-	MDRV_INTERLEAVE(100)	// should be enough
+	MDRV_QUANTUM_TIME(HZ(6000))	// should be enough
 
 	MDRV_MACHINE_RESET(pteacher_upd7807)
 

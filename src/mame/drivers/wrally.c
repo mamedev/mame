@@ -256,7 +256,7 @@ static MACHINE_DRIVER_START( wrally )
 	MDRV_CPU_PROGRAM_MAP(dallas_rom, 0)
 	MDRV_CPU_IO_MAP(dallas_ram, 0)
 
-	MDRV_INTERLEAVE(640)					/* heavy sync */
+	MDRV_QUANTUM_TIME(HZ(38400))					/* heavy sync */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -1091,7 +1091,7 @@ static MACHINE_DRIVER_START( wecleman )
 	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(wecleman_sound_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(wecleman)
 
@@ -1148,7 +1148,7 @@ static MACHINE_DRIVER_START( hotchase )
 
 	/* Amuse: every 2 ms */
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

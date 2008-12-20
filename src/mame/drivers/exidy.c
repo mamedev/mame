@@ -844,7 +844,7 @@ static MACHINE_DRIVER_START( venture )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(exidy_map,venture_map)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(venture_audio)
@@ -865,7 +865,7 @@ static MACHINE_DRIVER_START( mtrap )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(venture)
 
-	MDRV_INTERLEAVE(32)
+	MDRV_QUANTUM_TIME(HZ(1920))
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(mtrap_cvsd_audio)

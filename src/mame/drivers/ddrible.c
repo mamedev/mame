@@ -350,7 +350,7 @@ static MACHINE_DRIVER_START( ddribble )
 	MDRV_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
 
-	MDRV_INTERLEAVE(100)	/* we need heavy synch */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

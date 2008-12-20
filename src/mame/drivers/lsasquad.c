@@ -570,7 +570,7 @@ static MACHINE_DRIVER_START( lsasquad )
 	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
-	MDRV_INTERLEAVE(500)	/* 500 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( daikaiju )
 	MDRV_CPU_PROGRAM_MAP(sound_mem_daikaiju, 0)
 	/* IRQs are triggered by the YM2203 */
 
-	MDRV_INTERLEAVE(500)	/* 500 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 

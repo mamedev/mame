@@ -619,10 +619,10 @@ static MACHINE_DRIVER_START( airbustr )
 	MDRV_CPU_IO_MAP(sound_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
 
-	MDRV_INTERLEAVE(100)	// Palette RAM is filled by sub cpu with data supplied by main cpu
+	MDRV_QUANTUM_TIME(HZ(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
 	MDRV_MACHINE_RESET(airbustr)
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	// video hardware
 
@@ -656,7 +656,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( airbusb )
 	MDRV_IMPORT_FROM(airbustr)
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(0)) // no protection device or watchdog
+	MDRV_WATCHDOG_TIME_INIT(SEC(0)) // no protection device or watchdog
 MACHINE_DRIVER_END
 
 

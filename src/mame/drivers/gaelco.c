@@ -231,7 +231,7 @@ static MACHINE_DRIVER_START( bigkarnk )
 	MDRV_CPU_ADD("audio", M6809, 8867000/4)	/* 68B09, 2.21675 MHz? */
 	MDRV_CPU_PROGRAM_MAP(bigkarnk_readmem_snd,bigkarnk_writemem_snd)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -624,7 +624,7 @@ static MACHINE_DRIVER_START( squash )
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,squash_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -775,7 +775,7 @@ static MACHINE_DRIVER_START( thoop )
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,thoop_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

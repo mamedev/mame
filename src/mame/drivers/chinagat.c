@@ -506,7 +506,7 @@ static MACHINE_DRIVER_START( chinagat )
 	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_INTERLEAVE(100) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_RESET(chinagat)
 
@@ -554,7 +554,7 @@ static MACHINE_DRIVER_START( saiyugb1 )
 	MDRV_CPU_PROGRAM_MAP(i8748_map,0)
 	MDRV_CPU_IO_MAP(i8748_portmap,0)
 
-	MDRV_INTERLEAVE(100)	/* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_RESET(chinagat)
 
@@ -598,7 +598,7 @@ static MACHINE_DRIVER_START( saiyugb2 )
 	MDRV_CPU_ADD("audio", Z80, 3579545)		/* 3.579545 MHz oscillator */
 	MDRV_CPU_PROGRAM_MAP(ym2203c_sound_map,0)
 
-	MDRV_INTERLEAVE(100) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_RESET(chinagat)
 

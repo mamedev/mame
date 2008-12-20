@@ -452,7 +452,7 @@ static MACHINE_DRIVER_START( wardner )
 	/* Data Map is internal to the CPU */
 	MDRV_CPU_IO_MAP(DSP_io_map, 0)
 
-	MDRV_INTERLEAVE(100)					/* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000))					/* 100 CPU slices per frame */
 
 	MDRV_MACHINE_RESET(wardner)
 

@@ -447,7 +447,7 @@ static MACHINE_DRIVER_START( fstarfrc )
 	MDRV_CPU_ADD("audio", Z80,8000000/2)			/* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main CPU */
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -487,7 +487,7 @@ static MACHINE_DRIVER_START( ginkun )
 	MDRV_CPU_ADD("audio", Z80,8000000/2)			/* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main CPU */
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

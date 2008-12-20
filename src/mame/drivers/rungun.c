@@ -336,7 +336,7 @@ static MACHINE_DRIVER_START( rng )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
 
-	MDRV_INTERLEAVE(100) // higher if sound stutters
+	MDRV_QUANTUM_TIME(HZ(6000)) // higher if sound stutters
 
 	MDRV_GFXDECODE(rungun)
 

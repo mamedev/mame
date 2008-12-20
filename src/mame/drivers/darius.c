@@ -846,7 +846,7 @@ static MACHINE_DRIVER_START( darius )
 	MDRV_CPU_PROGRAM_MAP(darius_sound2_readmem,darius_sound2_writemem)
 	MDRV_CPU_IO_MAP(darius_sound2_io_map,0)
 
-	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame ? */
+	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame ? */
 
 	MDRV_MACHINE_START(darius)
 	MDRV_MACHINE_RESET(darius)

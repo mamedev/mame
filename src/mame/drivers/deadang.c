@@ -238,7 +238,7 @@ static MACHINE_DRIVER_START( deadang )
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
 
-	MDRV_INTERLEAVE(1) // the game stops working with higher interleave rates..
+	MDRV_QUANTUM_TIME(HZ(60)) // the game stops working with higher interleave rates..
 
 	MDRV_MACHINE_RESET(seibu_sound)
 

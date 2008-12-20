@@ -376,7 +376,7 @@ static MACHINE_DRIVER_START( crgolf )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_START(crgolf)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(crgolf_video)

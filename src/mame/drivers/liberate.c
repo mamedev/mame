@@ -525,7 +525,7 @@ static MACHINE_DRIVER_START( liberate )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -596,7 +596,7 @@ static MACHINE_DRIVER_START( prosport )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

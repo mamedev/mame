@@ -582,7 +582,7 @@ static MACHINE_DRIVER_START( liblrabl )
 	MDRV_CPU_PROGRAM_MAP(readmem_68k,writemem_68k)
 	MDRV_CPU_VBLANK_INT("main", toypop_m68000_interrupt)
 
-	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(toypop)
 

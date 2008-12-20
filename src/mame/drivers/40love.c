@@ -1034,7 +1034,7 @@ static MACHINE_DRIVER_START( 40love )
 	MDRV_CPU_ADD("mcu",M68705,18432000/6) /* OK */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
-	MDRV_INTERLEAVE(100)	/* high interleave to ensure proper synchronization of CPUs */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* high interleave to ensure proper synchronization of CPUs */
 	MDRV_MACHINE_RESET(ta7630)	/* init machine */
 
 	/* video hardware */

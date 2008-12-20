@@ -2223,7 +2223,7 @@ static MACHINE_DRIVER_START( oscar )
 	MDRV_CPU_ADD("audio", M6502, XTAL_12MHz/8)
 	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,oscar_s_writemem)
 								/* NMIs are caused by the main CPU */
-	MDRV_INTERLEAVE(40) /* 40 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(2400)) /* 40 CPU slices per frame */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -2267,7 +2267,7 @@ static MACHINE_DRIVER_START( lastmiss )
 	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(ym3526_s_readmem,ym3526_s_writemem)
 								/* NMIs are caused by the main CPU */
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -2311,7 +2311,7 @@ static MACHINE_DRIVER_START( shackled )
 	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(ym3526_s_readmem,ym3526_s_writemem)
 								/* NMIs are caused by the main CPU */
-	MDRV_INTERLEAVE(80)
+	MDRV_QUANTUM_TIME(HZ(4800))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -2356,7 +2356,7 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_CPU_ADD("audio", M6502, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(csilver_s_readmem,csilver_s_writemem)
 								/* NMIs are caused by the main CPU */
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

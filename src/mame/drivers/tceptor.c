@@ -400,7 +400,7 @@ static MACHINE_DRIVER_START( tceptor )
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 	MDRV_CPU_VBLANK_INT("2d", mcu_vb_interrupt)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_NVRAM_HANDLER(generic_1fill)
 

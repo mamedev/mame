@@ -390,7 +390,7 @@ static MACHINE_DRIVER_START( decocass )
 	MDRV_CPU_ADD("mcu", I8041,500000*15) /* 500 kHz ( I doubt it is 400kHz Al! )*/
 	MDRV_CPU_IO_MAP(decocass_mcu_portmap,0)
 
-	MDRV_INTERLEAVE(70)				/* interleave CPUs */
+	MDRV_QUANTUM_TIME(HZ(4200))				/* interleave CPUs */
 
 	MDRV_MACHINE_RESET(decocass)
 

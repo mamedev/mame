@@ -262,7 +262,7 @@ static MACHINE_DRIVER_START( battlane )
 	MDRV_CPU_ADD("sub", M6809, 1250000)        /* 1.25 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(battlane_map, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -378,7 +378,7 @@ static MACHINE_DRIVER_START( magmax )
 	MDRV_CPU_PROGRAM_MAP(magmax_soundreadmem,magmax_soundwritemem)
 	MDRV_CPU_IO_MAP(magmax_sound_io_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_START(magmax)
 	MDRV_MACHINE_RESET(magmax)

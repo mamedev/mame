@@ -399,7 +399,7 @@ static MACHINE_DRIVER_START( bwing )
 	MDRV_CPU_IO_MAP(bwp3_io_map,0)
 	MDRV_CPU_PERIODIC_INT(bwp3_interrupt, 1000)
 
-	MDRV_INTERLEAVE(300)		// high enough?
+	MDRV_QUANTUM_TIME(HZ(18000))		// high enough?
 
 	MDRV_MACHINE_RESET(bwing)
 

@@ -339,7 +339,7 @@ static MACHINE_DRIVER_START( spacefb )
 	MDRV_CPU_PROGRAM_MAP(spacefb_audio_map,0)
 	MDRV_CPU_IO_MAP(spacefb_audio_io_map,0)
 
-	MDRV_INTERLEAVE(3)
+	MDRV_QUANTUM_TIME(HZ(180))
 
 	MDRV_MACHINE_START(spacefb)
 	MDRV_MACHINE_RESET(spacefb)

@@ -882,7 +882,7 @@ static MACHINE_DRIVER_START( hangon_base )
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	MDRV_MACHINE_RESET(hangon)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_PPI8255_ADD( "ppi8255_0", hangon_ppi_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", hangon_ppi_intf[1] )

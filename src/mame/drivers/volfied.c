@@ -248,7 +248,7 @@ static MACHINE_DRIVER_START( volfied )
 	MDRV_CPU_ADD("audio", Z80, 4000000)   /* sound CPU, required to run the game */
 	MDRV_CPU_PROGRAM_MAP(z80_map,0)
 
-	MDRV_INTERLEAVE(20)
+	MDRV_QUANTUM_TIME(HZ(1200))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

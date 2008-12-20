@@ -639,7 +639,7 @@ static MACHINE_DRIVER_START( champmcu )
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	/* to MCU timeout champbbj */
-	MDRV_INTERLEAVE(50)
+	MDRV_QUANTUM_TIME(HZ(3000))
 MACHINE_DRIVER_END
 
 

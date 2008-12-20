@@ -409,7 +409,7 @@ static MACHINE_DRIVER_START( ddayjlc )
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 	MDRV_CPU_VBLANK_INT("main", ddayjlc_snd_interrupt)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

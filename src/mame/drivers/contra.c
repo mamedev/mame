@@ -256,7 +256,7 @@ static MACHINE_DRIVER_START( contra )
  	MDRV_CPU_ADD("audio", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 
-	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

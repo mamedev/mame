@@ -597,7 +597,7 @@ static MACHINE_DRIVER_START( meadows )
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, (double)5000000/131072)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -202,7 +202,7 @@ static MACHINE_DRIVER_START( ikki )
 	MDRV_CPU_PROGRAM_MAP(ikki_cpu2,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

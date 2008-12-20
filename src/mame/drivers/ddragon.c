@@ -987,7 +987,7 @@ static MACHINE_DRIVER_START( ddragon )
  	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK/2)	/* 6MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_INTERLEAVE(1000) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_START(ddragon)
 	MDRV_MACHINE_RESET(ddragon)
@@ -1052,7 +1052,7 @@ static MACHINE_DRIVER_START( ddgn6809 )
  	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK/2)	/* 6MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_INTERLEAVE(1000) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_START(ddragon)
 	MDRV_MACHINE_RESET(ddragon)
@@ -1098,7 +1098,7 @@ static MACHINE_DRIVER_START( ddragon2 )
 	MDRV_CPU_ADD("sound", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(dd2_sound_map,0)
 
-	MDRV_INTERLEAVE(1000) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_START(ddragon)
 	MDRV_MACHINE_RESET(ddragon)

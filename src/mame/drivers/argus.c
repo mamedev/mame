@@ -525,7 +525,7 @@ static MACHINE_DRIVER_START( argus )
 	MDRV_CPU_IO_MAP(sound_portmap_2,0)
 #endif
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -579,7 +579,7 @@ static MACHINE_DRIVER_START( valtric )
 	MDRV_CPU_PROGRAM_MAP(sound_map_a,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -624,7 +624,7 @@ static MACHINE_DRIVER_START( butasan )
 	MDRV_CPU_PROGRAM_MAP(sound_map_b,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

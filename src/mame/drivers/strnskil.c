@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START( strnskil )
 	MDRV_CPU_PROGRAM_MAP(strnskil_readmem2,strnskil_writemem2)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

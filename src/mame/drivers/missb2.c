@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( missb2 )
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 	MDRV_CPU_VBLANK_INT("main", missb2_interrupt)
 
-	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware
 

@@ -322,7 +322,7 @@ static MACHINE_DRIVER_START( bladestl )
 	MDRV_CPU_ADD("audio", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

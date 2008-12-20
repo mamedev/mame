@@ -385,7 +385,7 @@ static MACHINE_DRIVER_START( mexico86 )
 	MDRV_CPU_PROGRAM_MAP(sub_cpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	/* video hardware */

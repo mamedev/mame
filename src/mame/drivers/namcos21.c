@@ -1561,7 +1561,7 @@ static MACHINE_DRIVER_START( s21base )
 	MDRV_CPU_DATA_MAP(slave_dsp_data,0)
 	MDRV_CPU_IO_MAP(slave_dsp_io,0)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1635,7 +1635,7 @@ static MACHINE_DRIVER_START( driveyes )
 	MDRV_CPU_DATA_MAP(winrun_dsp_data,0)
 	MDRV_CPU_IO_MAP(winrun_dsp_io,0)
 
-	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1694,7 +1694,7 @@ static MACHINE_DRIVER_START( winrun_c140_typeB )
 	MDRV_CPU_PROGRAM_MAP(am_gpu_winrun,0)
 	MDRV_CPU_VBLANK_INT("main", namcos2_68k_gpu_vblank)
 
-	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)

@@ -606,7 +606,7 @@ static MACHINE_DRIVER_START( system_A )
 	MDRV_CPU_ADD("sound", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_A,sound_writemem_A)
 
-	MDRV_INTERLEAVE(2000)
+	MDRV_QUANTUM_TIME(HZ(120000))
 
 	MDRV_MACHINE_RESET(megasys1)
 

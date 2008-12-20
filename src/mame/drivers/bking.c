@@ -484,7 +484,7 @@ static MACHINE_DRIVER_START( bking3 )
 
 	MDRV_MACHINE_RESET(buggychl)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 MACHINE_DRIVER_END
 
 /***************************************************************************

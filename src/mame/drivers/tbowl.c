@@ -493,7 +493,7 @@ static MACHINE_DRIVER_START( tbowl )
 	MDRV_CPU_ADD("audio", Z80, 4000000) /* Actual Z80 */
 	MDRV_CPU_PROGRAM_MAP(6206A_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_GFXDECODE(tbowl)

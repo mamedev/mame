@@ -320,7 +320,7 @@ static MACHINE_DRIVER_START( megazone )
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
 	MDRV_CPU_IO_MAP(i8039_io_map,0)
 
-	MDRV_INTERLEAVE(15)
+	MDRV_QUANTUM_TIME(HZ(900))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

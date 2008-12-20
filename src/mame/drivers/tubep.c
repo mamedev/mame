@@ -918,7 +918,7 @@ static MACHINE_DRIVER_START( tubep )
 	MDRV_CPU_ADD("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_START(tubep)
 	MDRV_MACHINE_RESET(tubep)

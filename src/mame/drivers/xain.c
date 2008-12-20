@@ -475,7 +475,7 @@ static MACHINE_DRIVER_START( xsleena )
 
 	MDRV_MACHINE_START(xsleena)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

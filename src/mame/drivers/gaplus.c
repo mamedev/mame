@@ -553,7 +553,7 @@ static MACHINE_DRIVER_START( gaplus )
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu3,writemem_cpu3)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_INTERLEAVE(100)	/* a high value to ensure proper synchronization of the CPUs */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* a high value to ensure proper synchronization of the CPUs */
 	MDRV_MACHINE_RESET(gaplus)
 
 	/* video hardware */

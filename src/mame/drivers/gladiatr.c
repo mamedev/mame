@@ -705,7 +705,7 @@ static MACHINE_DRIVER_START( ppking )
 	MDRV_CPU_ADD("audio", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ppking_cpu3_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(ppking)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -754,7 +754,7 @@ static MACHINE_DRIVER_START( gladiatr )
 	MDRV_CPU_ADD("audio", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu3_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(gladiator)
 	MDRV_NVRAM_HANDLER(generic_0fill)

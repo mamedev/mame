@@ -692,7 +692,7 @@ static MACHINE_DRIVER_START( psychic5 )
 	MDRV_CPU_PROGRAM_MAP(psychic5_sound_map,0)
 	MDRV_CPU_IO_MAP(psychic5_soundport_map,0)
 
-	MDRV_INTERLEAVE(10)      /* Allow time for 2nd cpu to interleave */
+	MDRV_QUANTUM_TIME(HZ(600))      /* Allow time for 2nd cpu to interleave */
 	MDRV_MACHINE_RESET(psychic5)
 
 	/* video hardware */
@@ -739,7 +739,7 @@ static MACHINE_DRIVER_START( bombsa )
 	MDRV_CPU_PROGRAM_MAP(bombsa_sound_map,0)
 	MDRV_CPU_IO_MAP(bombsa_soundport_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 	MDRV_MACHINE_RESET(psychic5)
 
 	/* video hardware */

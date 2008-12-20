@@ -336,7 +336,7 @@ static MACHINE_DRIVER_START( ohmygod )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_MACHINE_RESET(ohmygod)
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

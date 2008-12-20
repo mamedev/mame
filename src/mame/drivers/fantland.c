@@ -830,7 +830,7 @@ static MACHINE_DRIVER_START( fantland )
 
 	MDRV_MACHINE_RESET(fantland)
 
-	MDRV_INTERLEAVE(8000/60)	// sound irq must feed the DAC at 8kHz
+	MDRV_QUANTUM_TIME(HZ(8000))	// sound irq must feed the DAC at 8kHz
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -183,7 +183,7 @@ static MACHINE_DRIVER_START( zerozone )
 	MDRV_CPU_ADD("audio", Z80, 1000000)	/* 1 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

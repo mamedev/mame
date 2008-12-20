@@ -225,7 +225,7 @@ static MACHINE_DRIVER_START( drmicro )
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", drmicro_interrupt)
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

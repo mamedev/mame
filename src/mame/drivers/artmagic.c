@@ -700,7 +700,7 @@ static MACHINE_DRIVER_START( artmagic )
 	MDRV_CPU_PROGRAM_MAP(tms_map,0)
 
 	MDRV_MACHINE_RESET(artmagic)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */

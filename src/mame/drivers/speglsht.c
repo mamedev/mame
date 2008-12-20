@@ -331,7 +331,7 @@ static MACHINE_DRIVER_START( speglsht )
 	MDRV_CPU_PROGRAM_MAP(speglsht_mem,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_gen)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_MACHINE_RESET(speglsht)
 
 	/* video hardware */

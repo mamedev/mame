@@ -354,7 +354,7 @@ static MACHINE_DRIVER_START( retofinv )
 	MDRV_CPU_ADD("68705", M68705,18432000/6)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - enough for the sound CPU to read all commands */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

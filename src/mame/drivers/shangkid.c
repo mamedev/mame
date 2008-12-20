@@ -399,7 +399,7 @@ static MACHINE_DRIVER_START( chinhero )
 
 	MDRV_MACHINE_RESET(chinhero)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

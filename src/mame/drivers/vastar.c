@@ -318,7 +318,7 @@ static MACHINE_DRIVER_START( vastar )
 	MDRV_CPU_IO_MAP(cpu2_port_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* ??? */
 
-	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - seems enough to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - seems enough to ensure proper */
 						/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(vastar)
 

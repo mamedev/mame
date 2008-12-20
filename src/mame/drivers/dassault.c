@@ -565,7 +565,7 @@ static MACHINE_DRIVER_START( dassault )
 	MDRV_CPU_ADD("audio", H6280,32220000/8)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_INTERLEAVE(140) /* 140 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(8400)) /* 140 CPU slices per frame */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

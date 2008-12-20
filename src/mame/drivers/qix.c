@@ -560,7 +560,7 @@ static MACHINE_DRIVER_START( qix )
 
 	/* high interleave needed to ensure correct text in service mode */
 	/* Zookeeper settings and high score table seem especially sensitive to this */
-	MDRV_INTERLEAVE(1000)
+	MDRV_QUANTUM_TIME(HZ(60000))
 
 	MDRV_MACHINE_START(qix)
 	MDRV_MACHINE_RESET(qix)

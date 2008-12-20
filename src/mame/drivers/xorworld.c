@@ -205,7 +205,7 @@ static MACHINE_DRIVER_START( xorworld )
 	MDRV_CPU_PROGRAM_MAP(xorworld_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(xorworld_interrupt, 4)	// 1 IRQ2 + 1 IRQ4 + 1 IRQ6
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 
 	MDRV_NVRAM_HANDLER(xorworld)
 

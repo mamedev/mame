@@ -744,7 +744,7 @@ static MACHINE_DRIVER_START( ninjakun )
 	MDRV_CPU_PROGRAM_MAP(ninjakun_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4) /* ? */
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame */
 
 	MDRV_MACHINE_START(ninjakun)
 
@@ -820,7 +820,7 @@ static MACHINE_DRIVER_START( raiders5 )
 	MDRV_CPU_PROGRAM_MAP(raiders5_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* ? */
 
-	MDRV_INTERLEAVE(400)
+	MDRV_QUANTUM_TIME(HZ(24000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

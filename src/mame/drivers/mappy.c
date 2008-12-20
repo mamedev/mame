@@ -1584,7 +1584,7 @@ static MACHINE_DRIVER_START( superpac )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(superpac)
 
@@ -1635,7 +1635,7 @@ static MACHINE_DRIVER_START( phozon )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(phozon)
 
@@ -1672,7 +1672,7 @@ static MACHINE_DRIVER_START( mappy )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(mappy)
 

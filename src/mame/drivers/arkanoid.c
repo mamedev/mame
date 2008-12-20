@@ -768,7 +768,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	MDRV_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 
-	MDRV_INTERLEAVE(100)					// 100 CPU slices per second to synchronize between the MCU and the main CPU
+	MDRV_QUANTUM_TIME(HZ(6000))					// 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	MDRV_MACHINE_START(arkanoid)
 	MDRV_MACHINE_RESET(arkanoid)

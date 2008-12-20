@@ -6375,7 +6375,7 @@ MACHINE_DRIVER_START( genesis_32x )
 	//
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
-	MDRV_INTERLEAVE(30000)
+	MDRV_QUANTUM_TIME(HZ(1800000))
 MACHINE_DRIVER_END
 
 

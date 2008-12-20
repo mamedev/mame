@@ -855,7 +855,7 @@ static MACHINE_DRIVER_START( bssoccer )
 	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_2_readmem,bssoccer_pcm_2_writemem)
 	MDRV_CPU_IO_MAP(bssoccer_pcm_2_io_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -913,7 +913,7 @@ static MACHINE_DRIVER_START( uballoon )
 
 	/* 2nd PCM Z80 missing */
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(uballoon)
 
@@ -964,7 +964,7 @@ static MACHINE_DRIVER_START( sunaq )
 
 	/* 2nd PCM Z80 missing */
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1036,7 +1036,7 @@ static MACHINE_DRIVER_START( bestbest )
 
 	/* 2nd PCM Z80 missing */
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

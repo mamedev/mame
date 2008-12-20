@@ -701,7 +701,7 @@ static MACHINE_DRIVER_START( tokio )
 	MDRV_CPU_ADD("audio", Z80, MAIN_XTAL/8)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(tokio_sound_map, 0) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
-	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware
 
@@ -745,7 +745,7 @@ static MACHINE_DRIVER_START( bublbobl )
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
 
-	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware
 

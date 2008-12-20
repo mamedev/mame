@@ -1604,7 +1604,7 @@ static MACHINE_DRIVER_START( default )
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100) /* CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1678,7 +1678,7 @@ static MACHINE_DRIVER_START( gollygho )
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100) /* CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1728,7 +1728,7 @@ static MACHINE_DRIVER_START( finallap )
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100) /* CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1778,7 +1778,7 @@ static MACHINE_DRIVER_START( sgunner )
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100) /* CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1828,7 +1828,7 @@ static MACHINE_DRIVER_START( luckywld )
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100) /* CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
@@ -1878,7 +1878,7 @@ static MACHINE_DRIVER_START( metlhawk )
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100) /* CPU slices per frame */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* CPU slices per frame */
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)

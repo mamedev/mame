@@ -473,7 +473,7 @@ static MACHINE_DRIVER_START( gyrodine )
 	MDRV_CPU_IO_MAP(gyrodine_sub_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(kyugo)
 

@@ -784,7 +784,7 @@ static MACHINE_DRIVER_START( nycaptor )
 	MDRV_CPU_ADD("mcu", M68705,2000000)
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 
 	/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(ta7630)
@@ -848,7 +848,7 @@ static MACHINE_DRIVER_START( cyclshtg )
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 #endif
 
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 	MDRV_MACHINE_RESET(ta7630)
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -906,7 +906,7 @@ static MACHINE_DRIVER_START( bronx )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_INTERLEAVE(2)
+	MDRV_QUANTUM_TIME(HZ(120))
 	MDRV_MACHINE_RESET(ta7630)
 
 	MDRV_SCREEN_ADD("main", RASTER)

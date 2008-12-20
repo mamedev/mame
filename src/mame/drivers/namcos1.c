@@ -990,7 +990,7 @@ static MACHINE_DRIVER_START( ns1 )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
-	MDRV_INTERLEAVE(640)
+	MDRV_QUANTUM_TIME(HZ(38400))
 
 	MDRV_MACHINE_RESET(namcos1)
 	MDRV_NVRAM_HANDLER(generic_0fill)

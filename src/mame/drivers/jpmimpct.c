@@ -851,7 +851,7 @@ static MACHINE_DRIVER_START( jpmimpct )
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(tms_program_map, 0)
 
-	MDRV_INTERLEAVE(500)
+	MDRV_QUANTUM_TIME(HZ(30000))
 	MDRV_MACHINE_RESET(jpmimpct)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

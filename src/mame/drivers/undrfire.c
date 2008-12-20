@@ -773,7 +773,7 @@ static MACHINE_DRIVER_START( cbombers )
 	MDRV_CPU_PROGRAM_MAP(cbombers_cpub_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_INTERLEAVE(8)	/* CPU slices - Need to interleave Cpu's 1 & 3 */
+	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	MDRV_MACHINE_RESET(undrfire)
 	MDRV_NVRAM_HANDLER(undrfire)

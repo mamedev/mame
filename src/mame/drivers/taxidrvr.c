@@ -374,7 +374,7 @@ static MACHINE_DRIVER_START( taxidrvr )
 	MDRV_CPU_IO_MAP(cpu3_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )

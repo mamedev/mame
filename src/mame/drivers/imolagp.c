@@ -415,7 +415,7 @@ static MACHINE_DRIVER_START( imolagp )
 	MDRV_CPU_IO_MAP(readport_slave,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 

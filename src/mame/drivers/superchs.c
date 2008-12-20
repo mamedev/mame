@@ -422,7 +422,7 @@ static MACHINE_DRIVER_START( superchs )
 	MDRV_CPU_PROGRAM_MAP(superchs_cpub_readmem,superchs_cpub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
 
-	MDRV_INTERLEAVE(8)	/* CPU slices - Need to interleave Cpu's 1 & 3 */
+	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	MDRV_MACHINE_RESET(superchs)
 	MDRV_NVRAM_HANDLER(superchs)

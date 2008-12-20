@@ -1649,7 +1649,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(bosco)
@@ -1708,7 +1708,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(galaga)
@@ -1782,7 +1782,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_INTERLEAVE(1000)	/* 1000 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(60000))	/* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(xevious)
@@ -1855,7 +1855,7 @@ static MACHINE_DRIVER_START( digdug )
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(digdug)

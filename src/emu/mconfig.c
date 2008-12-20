@@ -272,9 +272,13 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, config->driver_data_size, 24);
 				break;
 
-			case MCONFIG_TOKEN_INTERLEAVE:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, config->cpu_slices_per_frame, 24);
+			case MCONFIG_TOKEN_QUANTUM_TIME:
+				TOKEN_EXTRACT_UINT64(tokens, data64);
+				config->minimum_quantum = UINT64_ATTOTIME_TO_ATTOTIME(data64);
+				break;
+
+			case MCONFIG_TOKEN_QUANTUM_PERFECT_CPU:
+				config->perfect_cpu_quantum = TOKEN_GET_STRING(tokens);
 				break;
 
 			case MCONFIG_TOKEN_WATCHDOG_VBLANK:

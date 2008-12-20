@@ -707,13 +707,13 @@ static MACHINE_DRIVER_START( gsword )
 	MDRV_CPU_ADD("audio", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
 
-	MDRV_INTERLEAVE(200) /* Allow time for 2nd cpu to interleave*/
+	MDRV_QUANTUM_TIME(HZ(12000)) /* Allow time for 2nd cpu to interleave*/
 
 	MDRV_MACHINE_RESET(gsword)
 
 #if 1
 	/* to MCU timeout champbbj */
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 #endif
 
 	/* video hardware */

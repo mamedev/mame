@@ -574,7 +574,7 @@ static MACHINE_DRIVER_START( cybertnk )
 	MDRV_CPU_ADD("audio", Z80,3579500)
 	MDRV_CPU_PROGRAM_MAP(sound_mem,0)
 
-	MDRV_INTERLEAVE(100)//arbitrary value,needed to get the communication to work
+	MDRV_QUANTUM_TIME(HZ(6000))//arbitrary value,needed to get the communication to work
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

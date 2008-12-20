@@ -591,7 +591,7 @@ static MACHINE_DRIVER_START( syvalion )
 	MDRV_MACHINE_START(taitoh)
 	MDRV_MACHINE_RESET(taitoh)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -631,7 +631,7 @@ static MACHINE_DRIVER_START( recordbr )
 	MDRV_MACHINE_START(taitoh)
 	MDRV_MACHINE_RESET(taitoh)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -671,7 +671,7 @@ static MACHINE_DRIVER_START( dleague )
 	MDRV_MACHINE_START(taitoh)
 	MDRV_MACHINE_RESET(taitoh)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -453,7 +453,7 @@ static MACHINE_DRIVER_START( mayjinsn )
 	MDRV_CPU_IO_MAP(st0016_m2_io,0)
 	MDRV_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
 	MDRV_CPU_PROGRAM_MAP(v810_mem,0)
-	MDRV_INTERLEAVE(1)
+	MDRV_QUANTUM_TIME(HZ(60))
 MACHINE_DRIVER_END
 
 /*************************************

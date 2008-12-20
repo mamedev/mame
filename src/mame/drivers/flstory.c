@@ -668,7 +668,7 @@ static MACHINE_DRIVER_START( flstory )
 	MDRV_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(flstory_m68705_map,0)
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(ta7630)
 
@@ -725,7 +725,7 @@ static MACHINE_DRIVER_START( onna34ro )
 //  MDRV_CPU_ADD("mcu", M68705,4000000)  /* ??? */
 //  MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(ta7630)
 
@@ -782,7 +782,7 @@ static MACHINE_DRIVER_START( victnine )
 //  MDRV_CPU_ADD("mcu", M68705,4000000)  /* ??? */
 //  MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
-	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(ta7630)
 

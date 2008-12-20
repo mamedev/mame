@@ -249,7 +249,7 @@ static MACHINE_DRIVER_START( dogfgt )
 	MDRV_CPU_ADD("sub", M6502, 1500000)	/* 1.5 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

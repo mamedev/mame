@@ -2115,7 +2115,7 @@ static MACHINE_DRIVER_START( fhawk )
 	MDRV_CPU_PROGRAM_MAP(fhawk_2_readmem,fhawk_2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(fhawk)
 
@@ -2211,7 +2211,7 @@ static MACHINE_DRIVER_START( kurikint )
 	MDRV_CPU_PROGRAM_MAP(kurikint_2_readmem,kurikint_2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(kurikint)
 
@@ -2351,7 +2351,7 @@ static MACHINE_DRIVER_START( evilston )
 	MDRV_CPU_PROGRAM_MAP(evilston_2_readmem,evilston_2_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_MACHINE_RESET(evilston)
 

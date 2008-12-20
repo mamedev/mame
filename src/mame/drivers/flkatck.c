@@ -290,7 +290,7 @@ static MACHINE_DRIVER_START( flkatck )
 	MDRV_CPU_ADD("audio", Z80,3579545)	/* NEC D780C-1, 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(flkatck_readmem_sound,flkatck_writemem_sound)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(flkatck)
 

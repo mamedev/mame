@@ -3254,7 +3254,7 @@ static MACHINE_DRIVER_START( enforce )
 
 	MDRV_MACHINE_START(taitoz)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3308,7 +3308,7 @@ static MACHINE_DRIVER_START( bshark )
 
 	MDRV_MACHINE_START(taitoz)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3363,7 +3363,7 @@ static MACHINE_DRIVER_START( sci )
 
 	MDRV_MACHINE_START(taitoz)
 
-	MDRV_INTERLEAVE(50)
+	MDRV_QUANTUM_TIME(HZ(3000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3418,7 +3418,7 @@ static MACHINE_DRIVER_START( nightstr )
 
 	MDRV_MACHINE_START(taitoz)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3474,7 +3474,7 @@ static MACHINE_DRIVER_START( aquajack )
 
 	MDRV_MACHINE_START(taitoz)
 
-	MDRV_INTERLEAVE(500)
+	MDRV_QUANTUM_TIME(HZ(30000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3581,7 +3581,7 @@ static MACHINE_DRIVER_START( dblaxle )
 
 	MDRV_MACHINE_START(taitoz)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3635,7 +3635,7 @@ static MACHINE_DRIVER_START( racingb )
 	MDRV_CPU_VBLANK_INT("main", dblaxle_cpub_interrupt)
 
 	MDRV_MACHINE_START(taitoz)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -560,7 +560,7 @@ static MACHINE_DRIVER_START( cabalbl )
 	MDRV_CPU_IO_MAP(cabalbl_talk2_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(cabalbl)
 

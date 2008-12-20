@@ -460,7 +460,7 @@ static MACHINE_DRIVER_START( skykid )
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_INTERLEAVE(100)	/* we need heavy synch */
+	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
 
 	MDRV_MACHINE_START(skykid)
 

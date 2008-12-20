@@ -3022,6 +3022,7 @@ static int memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs,
 		int ismapped;
 
 		ismapped = memdata->no_translation ? TRUE : memory_address_physical(space, TRANSLATE_READ_DEBUG, &dummyaddr);
+		*data = ~(UINT64)0;
 		if (ismapped)
 		{
 			switch (size)

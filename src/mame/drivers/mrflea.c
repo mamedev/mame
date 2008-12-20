@@ -278,7 +278,7 @@ static MACHINE_DRIVER_START( mrflea )
 	MDRV_CPU_IO_MAP(inout_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(mrflea_io_interrupt,2)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

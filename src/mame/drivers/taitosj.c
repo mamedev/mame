@@ -1884,7 +1884,7 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_CPU_ADD("mcu", M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(taitosj_mcu_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 MACHINE_DRIVER_END
 
 

@@ -392,7 +392,7 @@ static MACHINE_DRIVER_START( pandoras )
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
 	MDRV_CPU_IO_MAP(i8039_io_map,0)
 
-	MDRV_INTERLEAVE(50)	/* slices per frame */
+	MDRV_QUANTUM_TIME(HZ(3000))	/* slices per frame */
 
 	MDRV_MACHINE_RESET(pandoras)
 

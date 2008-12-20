@@ -1139,7 +1139,7 @@ static MACHINE_DRIVER_START( xboard )
 
 	MDRV_MACHINE_RESET(xboard)
 	MDRV_NVRAM_HANDLER(xboard)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_GFXDECODE(segaxbd)

@@ -849,7 +849,7 @@ static MACHINE_DRIVER_START( apache3 )
 	MDRV_CPU_ADD("sub2", Z80, 8000000) //???
 	MDRV_CPU_PROGRAM_MAP(apache3_z80_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -892,7 +892,7 @@ static MACHINE_DRIVER_START( roundup5 )
 	MDRV_CPU_ADD("audio", Z80, 4000000) //???
 	MDRV_CPU_PROGRAM_MAP(roundup5_z80_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -936,7 +936,7 @@ static MACHINE_DRIVER_START( cyclwarr )
 	MDRV_CPU_ADD("audio", Z80, 16000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -980,7 +980,7 @@ static MACHINE_DRIVER_START( bigfight )
 	MDRV_CPU_ADD("audio", Z80, 16000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
 
-	MDRV_INTERLEAVE(200)
+	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

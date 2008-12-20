@@ -817,7 +817,7 @@ static MACHINE_DRIVER_START( outrundx )
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_MACHINE_RESET(outrun)
-	MDRV_INTERLEAVE(100)
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_PPI8255_ADD( "ppi8255", single_ppi_intf )
 

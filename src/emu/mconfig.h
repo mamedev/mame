@@ -46,7 +46,8 @@ enum
 	MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64,
 
 	MCONFIG_TOKEN_DRIVER_DATA,
-	MCONFIG_TOKEN_INTERLEAVE,
+	MCONFIG_TOKEN_QUANTUM_TIME,
+	MCONFIG_TOKEN_QUANTUM_PERFECT_CPU,
 	MCONFIG_TOKEN_WATCHDOG_VBLANK,
 	MCONFIG_TOKEN_WATCHDOG_TIME,
 
@@ -113,7 +114,8 @@ struct _machine_config
 {
 	UINT32					driver_data_size;		/* amount of memory needed for driver_data */
 
-	UINT32					cpu_slices_per_frame;	/* number of times to interleave execution per frame */
+	attotime				minimum_quantum;		/* minimum scheduling quantum */
+	const char *			perfect_cpu_quantum;	/* tag of CPU to use for "perfect" scheduling */
 	INT32					watchdog_vblank_count;	/* number of VBLANKs until the watchdog kills us */
 	attotime				watchdog_time;			/* length of time until the watchdog kills us */
 
@@ -271,15 +273,20 @@ union _machine_config_token
 #define MDRV_DRIVER_DATA(_struct) \
 	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_DRIVER_DATA, 8, sizeof(_struct), 24),
 
-#define MDRV_INTERLEAVE(_interleave) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_INTERLEAVE, 8, _interleave, 24),
+#define MDRV_QUANTUM_TIME(_time) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_QUANTUM_TIME, 8), \
+	TOKEN_UINT64(UINT64_ATTOTIME_IN_##_time),
+
+#define MDRV_QUANTUM_PERFECT_CPU(_cputag) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_QUANTUM_PERFECT_CPU, 8), \
+	TOKEN_STRING(_cputag),
 
 #define MDRV_WATCHDOG_VBLANK_INIT(_count) \
 	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_WATCHDOG_VBLANK, 8, _count, 24),
 
 #define MDRV_WATCHDOG_TIME_INIT(_time) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_WATCHDOG_TIME, 8), \
-	TOKEN_UINT64(_time),
+	TOKEN_UINT64(UINT64_ATTOTIME_IN_##_time),
 
 
 /* core functions */
