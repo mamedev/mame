@@ -95,6 +95,14 @@ WRITE8_HANDLER( pastelg_blitter_w )
 	}
 }
 
+
+WRITE8_HANDLER( threeds_romsel_w )
+{
+	if (data&0xfc) printf("%02x\n",data);
+	pastelg_gfxrom = (data & 0x3);
+}
+
+
 WRITE8_HANDLER( pastelg_romsel_w )
 {
 	int gfxlen = memory_region_length(space->machine, "gfx1");
@@ -153,10 +161,11 @@ static void pastelg_gfxdraw(running_machine *machine)
 	int dx, dy;
 	int startx, starty;
 	int sizex, sizey;
-	int skipx, skipy;
+	int incx, incy;
 	int ctrx, ctry;
 	int readflag;
 	int gfxaddr, gfxlen;
+	int count;
 	UINT8 color;
 
 	nb1413m3_busyctr = 0;
@@ -164,26 +173,29 @@ static void pastelg_gfxdraw(running_machine *machine)
 	startx = blitter_destx + blitter_sizex;
 	starty = blitter_desty + blitter_sizey;
 
+
 	if (blitter_direction_x)
 	{
-		sizex = blitter_sizex ^ 0xff;
-		skipx = 1;
+		if (blitter_sizex&0x80) sizex = 0xff-blitter_sizex;
+		else sizex=blitter_sizex;
+		incx = 1;
 	}
 	else
 	{
 		sizex = blitter_sizex;
-		skipx = -1;
+		incx = -1;
 	}
 
 	if (blitter_direction_y)
 	{
-		sizey = blitter_sizey ^ 0xff;
-		skipy = 1;
+		if (blitter_sizey&0x80) sizey = 0xff-blitter_sizey;
+		else sizey=blitter_sizey;
+		incy = 1;
 	}
 	else
 	{
 		sizey = blitter_sizey;
-		skipy = -1;
+		incy = -1;
 	}
 
 	gfxlen = memory_region_length(machine, "gfx1");
@@ -191,10 +203,17 @@ static void pastelg_gfxdraw(running_machine *machine)
 
 	readflag = 0;
 
-	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
+	count = 0;
+	y = starty;
+
+	for (ctry = sizey; ctry >= 0; ctry--)
 	{
-		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
+		x = startx;
+
+		for (ctrx = sizex; ctrx >= 0; ctrx--)
 		{
+			gfxaddr = (pastelg_gfxrom << 16) + ((blitter_src_addr + count));
+
 			if ((gfxaddr > (gfxlen - 1)))
 			{
 #ifdef MAME_DEBUG
@@ -223,7 +242,7 @@ static void pastelg_gfxdraw(running_machine *machine)
 			{
 				// 2nd, 4th, 6th, ... read
 				color = (color & 0xf0) >> 4;
-				gfxaddr++;
+				count++;
 			}
 
 			readflag ^= 1;
@@ -243,7 +262,10 @@ static void pastelg_gfxdraw(running_machine *machine)
 			}
 
 			nb1413m3_busyctr++;
+			x += incx;
 		}
+
+		y += incy;
 	}
 
 	nb1413m3_busyflag = 0;

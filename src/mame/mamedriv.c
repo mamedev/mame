@@ -417,6 +417,7 @@ const game_driver * const drivers[] =
 	DRIVER( cntrygrl )  /* (c) 1984 Royal Denshi */
 
 	DRIVER( pastelg )	/* (c) 1985 */
+	DRIVER( 3ds )       /* (c) 1985 */
 
 	DRIVER( crystalg )	/* (c) 1986 */
 	DRIVER( crystal2 )	/* (c) 1986 */
