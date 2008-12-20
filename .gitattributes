@@ -2610,6 +2610,7 @@ src/mame/machine/fd1089.h svneol=native#text/plain
 src/mame/machine/fd1094.c svneol=native#text/plain
 src/mame/machine/fd1094.h svneol=native#text/plain
 src/mame/machine/fddebug.c svneol=native#text/plain
+src/mame/machine/fddebug.h svneol=native#text/plain
 src/mame/machine/flstory.c svneol=native#text/plain
 src/mame/machine/gaelco2.c svneol=native#text/plain
 src/mame/machine/gaelcrpt.c svneol=native#text/plain
