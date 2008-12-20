@@ -5,60 +5,20 @@ Jangou (c) 1983 Nichibutsu
 driver by David Haywood,Angelo Salese and Phil Bennett
 
 TODO:
--convert the video hw to true 4bpp;
--some charset transparency pens are wrong,likely that the buffer trigger isn't correct;
 -unemulated screen flipping;
--jngolady: if you do a soft reset sometimes the z80<->mcu communication fails,causing a
- black screen after the title screen.
+-jngolady: RNG in this isn't working properly...looking at the code,when the mcu isn't on
+ irq routine there's a poll to the [8] ram address,unsurprisingly it's the RNG seed.
+ The problem is that when the rti opcode occurs the program flow doesn't return to feed the
+ RNG but executes another irq,probably there are too many irq pollings and the mcu goes out
+ of cycles...for now I'm kludging it,my guess is that it can be either a cpu bug,a comms bug
+ or 8 is really connected to a RNG seed and the starting code is just for initializing it.
 
 ============================================================================================
 Debug cheats:
 
+*jangou
 $c132 coin counter
 $c088-$c095 player tiles
-
-============================================================================================
-
-JANGOU (C)1982 Nichibutsu
-
-CPU:   Z80 *2
-XTAL:  19.968MHz
-SOUND: AY-3-8910
-
-Location 2-P: HARRIS HCI-55536-5
-Location 3-G: MB7051
-
----
-
-Jangou Lady
-(c)1984 Nihon Bussan
-
-CPU:    Z80 x2 (#1,#2)
-    (40pin unknown:#3)
-SOUND:  AY-3-8910
-    MSM5218RS
-OSC:    19.968MHz
-    400KHz
-
-
-1.5N    chr.
-2.5M
-3.5L
-
-4.9P    Z80#1 prg.
-5.9N
-6.9M
-7.9L
-
-8.9H    Z80#2 prg.
-9.9G
-10.9F
-11.9E
-12.9D
-
-M13.13  CPU#3 prg. (?)
-
-JL.3G   color
 
 *******************************************************************************************/
 
@@ -194,10 +154,9 @@ static WRITE8_HANDLER( blitter_process_w )
 	int src,x,y,h,w, flipx;
 	blit_data[offset] = data;
 
-	/*trigger blitter write to ram,might not be correct...*/
 	if(offset == 5)
 	{
-//      printf("%02x %02x %02x %02x %02x %02x\n",blit_data[0],blit_data[1],blit_data[2],blit_data[3],blit_data[4],blit_data[5]);
+		//printf("%02x %02x %02x %02x %02x %02x\n",blit_data[0],blit_data[1],blit_data[2],blit_data[3],blit_data[4],blit_data[5]);
 		w = (blit_data[4] & 0xff)+1;
 		h = (blit_data[5] & 0xff)+1;
 		src = ((blit_data[1]<<8)|(blit_data[0]<<0));
@@ -223,25 +182,10 @@ static WRITE8_HANDLER( blitter_process_w )
 					UINT8 cur_pen_hi = pen_data[(dat & 0xf0)>>4];
 					UINT8 cur_pen_lo = pen_data[(dat & 0x0f)>>0];
 
-					/*TODO: simplify this when blitter internal ram is converted to 4bpp*/
-					/*don't use hi & lo user-selected bits*/
-					if((cur_pen_hi & 0x20) && (cur_pen_lo & 0x20))
+					dat = cur_pen_lo | cur_pen_hi<<4;
+
+					if((dat & 0xff) != 0)
 						plot_jangou_gfx_pixel(dat, drawx,drawy);
-					else if(cur_pen_lo & 0x20)//use hi pen user-selected bit
-					{
-						dat = (pen_data[cur_pen_hi]<<4) | (dat & 0xf);
-						plot_jangou_gfx_pixel(dat, drawx,drawy);
-					}
-					else if(cur_pen_hi & 0x20)//use lo pen user-selected bit
-					{
-						dat = (pen_data[cur_pen_lo]) | (dat & 0xf0);
-						plot_jangou_gfx_pixel(dat, drawx,drawy);
-					}
-					else //use hi & lo pens user-selected bits
-					{
-						dat = (pen_data[cur_pen_lo]) | (pen_data[cur_pen_hi]<<4);
-						plot_jangou_gfx_pixel(dat, drawx,drawy);
-					}
 
 					if (!flipx)	count--;
 					else count++;
@@ -251,14 +195,12 @@ static WRITE8_HANDLER( blitter_process_w )
 	}
 }
 
-/*Every offset of these registers controls a pen.
-  If the bit 6 (0x20) is high,use the pen from the internal gfx rom.
-  If the bit 6 is low,use an user-selected pen,defined by this register.*/
+/* What is the bit 5 (0x20) for?*/
 static WRITE8_HANDLER( blit_vregs_w )
 {
-	pen_data[offset] = data;
+//	printf("%02x %02x\n",offset,data);
+	pen_data[offset] = data & 0xf;
 }
-
 
 /*************************************
  *
@@ -276,14 +218,14 @@ static WRITE8_HANDLER( mux_w )
 static WRITE8_HANDLER( output_w )
 {
 	/*
-    --x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
-    ---- -x-- flip screen
-    ---- ---x coin counter
-    */
-//  printf("%02x\n",data);
+	--x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
+	---- -x-- flip screen
+	---- ---x coin counter
+	*/
+//	printf("%02x\n",data);
 	coin_counter_w(0,data & 0x01);
-//  flip_screen_set(space->machine, data & 0x04);
-//  coin_lockout_w(0,~data & 0x20);
+//	flip_screen_set(data & 0x04);
+//	coin_lockout_w(0,~data & 0x20);
 }
 
 static READ8_HANDLER( input_mux_r )
@@ -297,7 +239,7 @@ static READ8_HANDLER( input_mux_r )
 		case 0x10: return input_port_read(space->machine, "PL1_3");
 		case 0x20: return input_port_read(space->machine, "PL2_3");
 	}
-//  printf("%04x\n",mux_data);
+	printf("%04x\n",mux_data);
 
 	return 0xff;
 }
@@ -372,11 +314,11 @@ static void jngolady_vclk_cb(const device_config *device)
  *
  *************************************/
 
-static UINT8 nsc_latch;
+static UINT8 nsc_latch,z80_latch;
 
 static READ8_HANDLER( master_com_r )
 {
-	return nsc_latch;
+	return z80_latch;
 }
 
 static WRITE8_HANDLER( master_com_w )
@@ -392,8 +334,7 @@ static READ8_HANDLER( slave_com_r )
 
 static WRITE8_HANDLER( slave_com_w )
 {
-	nsc_latch = data;
-//  cpu_set_input_line(space->machine->cpu[0], 0, HOLD_LINE);
+	z80_latch = data;
 }
 
 /*************************************
@@ -467,6 +408,31 @@ static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+/*************************************
+ *
+ *  Country Girl Memory Map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( cntrygrl_cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+//	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cntrygrl_cpu0_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x01,0x01) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x02,0x02) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x03,0x03) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
+	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
+	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
+	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
+	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w )
+	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continously
+//	AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
+ADDRESS_MAP_END
 
 /*************************************
  *
@@ -547,6 +513,86 @@ static INPUT_PORTS_START( jangou )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cntrygrl )
+	PORT_START("PL1_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Keep 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1P Keep 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1P Keep 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("1P Keep 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("1P Keep 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PL1_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("1P Play") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) //probably a button
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) //probably a button
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("1P Flip Flop")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("1P Bonus") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("1P Take") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PL2_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("2P Keep 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("2P Keep 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("2P Keep 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("2P Keep 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("2P Keep 5")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PL2_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("2P Play")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) //probably a button
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )PORT_PLAYER(2) //probably a button
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2) PORT_NAME("2P Flip Flop")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("1P Bonus")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("1P Take")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PL1_3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PL2_3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_DIPNAME( 0x04, 0x04, "Memory Reset" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Analyzer" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x40, 0x40, "Credit Clear" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Two Pairs" )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x03, "Maximum Rate")  PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "90" )
+	PORT_DIPSETTING(    0x01, "83" )
+	PORT_DIPSETTING(    0x02, "76" )
+	PORT_DIPSETTING(    0x03, "69" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x04, "2")
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x0c, "0" )
+	PORT_DIPNAME( 0x10, 0x10, "Maximum Bet" )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x20, 0x20, "Coin A setting" )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin / 25 Credits" )
+	PORT_DIPNAME( 0x40, 0x40, "Coin B setting"  )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits"  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // blitter busy flag
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jngolady )
@@ -654,6 +700,31 @@ static MACHINE_DRIVER_START( jngolady )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( cntrygrl )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(jangou)
+
+	MDRV_CPU_MODIFY("cpu0")
+	MDRV_CPU_PROGRAM_MAP(0, cntrygrl_cpu0_map )
+	MDRV_CPU_IO_MAP(0,cntrygrl_cpu0_io )
+
+	MDRV_CPU_REMOVE("cpu1")
+
+	/* sound hardware */
+	MDRV_SOUND_START(NULL)
+	MDRV_SOUND_REMOVE("cvsd")
+MACHINE_DRIVER_END
+
+/*
+JANGOU (C)1982 Nichibutsu
+
+CPU:   Z80 *2
+XTAL:  19.968MHz
+SOUND: AY-3-8910
+
+Location 2-P: HARRIS HCI-55536-5
+Location 3-G: MB7051
+*/
 
 ROM_START( jangou )
 	ROM_REGION( 0x10000, "cpu0", 0 )
@@ -673,6 +744,38 @@ ROM_START( jangou )
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "jg3_g.bin", 0x00, 0x20,  CRC(d389549d) SHA1(763486052b34f8a38247820109b114118a9f829f) )
 ROM_END
+
+/*
+Jangou Lady
+(c)1984 Nihon Bussan
+
+CPU:	Z80 x2 (#1,#2)
+	(40pin unknown:#3)
+SOUND:	AY-3-8910
+	MSM5218RS
+OSC:	19.968MHz
+	400KHz
+
+
+1.5N    chr.
+2.5M
+3.5L
+
+4.9P    Z80#1 prg.
+5.9N
+6.9M
+7.9L
+
+8.9H    Z80#2 prg.
+9.9G
+10.9F
+11.9E
+12.9D
+
+M13.13  CPU#3 prg. (?)
+
+JL.3G   color
+*/
 
 ROM_START( jngolady )
 	ROM_REGION( 0xa000, "cpu0", 0 )
@@ -700,5 +803,41 @@ ROM_START( jngolady )
 	ROM_LOAD( "3.5l", 0x04000, 0x04000, CRC(14688574) SHA1(241eaf1838239e38d11dff3556fb0a609a4b46aa) )
 ROM_END
 
-GAME( 1983, jangou,    0,    jangou,   jangou,    0, ROT0, "Nichibutsu", "Jangou",      GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1984, jngolady,  0,    jngolady, jngolady,  0, ROT0, "Nichibutsu", "Jangou Lady", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+ROM_START( cntrygrl )
+	ROM_REGION( 0x10000, "cpu0", 0 )
+	ROM_LOAD( "rom4.bin", 0x00000, 0x02000, CRC(adba8e2f) SHA1(2aae77838e3de6e665b32a7fe4ac3f627c35b871)  )
+	ROM_LOAD( "rom5.bin", 0x02000, 0x02000, CRC(24d210ed) SHA1(6a0eae9d459975fbaad75bf21284baac3ba4f872) )
+
+	/*wtf,these 2 roms are next to the CPU roms, one is a CPU rom from Moon Quasar, the other a GFX rom from Crazy Climber,
+	  I dunno what's going on,game doesn't appear to need these two....*/
+	ROM_REGION( 0x1000, "user1", 0 )
+	ROM_LOAD( "rom6.bin", 0x00000, 0x0800, CRC(33965a89) SHA1(92912cea76a472d9b709c664d9818844a07fcc32)  ) // = mq3    Moon Quasar
+	ROM_LOAD( "rom7.bin", 0x00800, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7)  ) // = cc06   Crazy Climber (US)
+
+	ROM_REGION( 0x6000, "gfx", 0 )
+	ROM_LOAD( "rom1.bin", 0x00000, 0x02000, CRC(92033f37) SHA1(aa407c2feb1cbb7cbc6c59656338453c5a670749)  )
+	ROM_LOAD( "rom2.bin", 0x02000, 0x02000, CRC(0588cc48) SHA1(f769ece2955eb9f055c499b6243a2fead9d07984)  )
+	ROM_LOAD( "rom3.bin", 0x04000, 0x02000, CRC(ce00ff56) SHA1(c5e58707a5dd0f57c34b09de542ef30e96ab95d1)  )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "countrygirl_prom.bin", 0x00, 0x20, CRC(dc54dc52) SHA1(db91a7ae05eb6b6e4b42f91dfe20ac0da6680b46)  )
+ROM_END
+
+/*Temporary kludge for make the RNG work*/
+static READ8_HANDLER( jngolady_rng_r )
+{
+	return mame_rand(space->machine);
+}
+
+static DRIVER_INIT( jngolady )
+{
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x08, 0x08, 0, 0, jngolady_rng_r );
+}
+
+
+
+/* flyer shows a bet version of Jangou Lady too,does it truly exists?*/
+GAME( 1983, jangou,    0,    jangou,   jangou,    0,        ROT0, "Nichibutsu",   "Jangou [BET] (Japan)", GAME_NO_COCKTAIL )
+/* Jangou Night */
+GAME( 1984, jngolady,  0,    jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
+GAME( 1984, cntrygrl,  0,    cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
