@@ -1,0 +1,394 @@
+/*******************************************************************************************
+
+4nin-uchi Mahjong Jantotsu (c) 1983 Sanritsu
+
+driver by David Haywood and Angelo Salese
+
+Notes:
+-The 1-2 Player tiles on hand are actually shown on different screen sides.The Service Mode
+ is for adjusting these screens (to not let the human opponent to read your tiles).
+
+TODO:
+-Video buffering? If you coin up,you can see the "credit 1" msg that gets build into the
+ video bitmaps...
+-According to the flyer,color bitplanes might be wrong on the A-N mahjong charset,might be a
+ BTANB however...
+-I need schematics / pcb photos (component + solder sides) to understand if the background
+ color is hard-wired to the DIP-Switches or there's something else wrong.
+-Missing MSM5205 samples;
+
+============================================================================================
+Debug cheats:
+
+c01b-c028 player-1 tiles
+c02b-c038 right computer tiles
+c03b-c048 up computer tiles / player-2 tiles
+c04b-c058 left computer tiles
+
+============================================================================================
+
+4nin-uchi mahjong Jantotsu
+(c)1983 Sanritsu
+
+C2-00159_A
+
+CPU: Z80
+Sound: SN76489ANx2 MSM5205
+OSC: 18.432MHz
+
+ROMs:
+JAT-00.2B (2764)
+JAT-01.3B
+JAT-02.4B
+JAT-03.2E
+JAT-04.3E
+JAT-05.4E
+
+JAT-40.6B
+JAT-41.7B
+JAT-42.8B
+JAT-43.9B
+
+JAT-60.10P (7051) - color PROM
+
+This game requires special control panel.
+Standard mahjong control panel + these 3 buttons.
+- 9syu nagare
+- Continue Yes
+- Continue No
+
+dumped by sayu
+
+*******************************************************************************************/
+
+#include "driver.h"
+#include "cpu/z80/z80.h"
+#include "sound/sn76496.h"
+
+static UINT8 *jan_bitmap_1,*jan_bitmap_2,*jan_bitmap_3,*jan_bitmap_4;
+static UINT8 vram_bank,col_bank;
+static UINT8 mux_data;
+
+VIDEO_START(jantotsu)
+{
+	jan_bitmap_1 = auto_malloc(0x2000);
+	jan_bitmap_2 = auto_malloc(0x2000);
+	jan_bitmap_3 = auto_malloc(0x2000);
+	jan_bitmap_4 = auto_malloc(0x2000);
+	vram_bank = 0;
+}
+
+VIDEO_UPDATE(jantotsu)
+{
+	int x,y,i;
+	int count;
+
+	count = 0;
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<256;x+=8)
+		{
+			int pen[4],color;
+
+			for (i=0;i<8;i++)
+			{
+				pen[0] = (jan_bitmap_1[count])>>(7-i);
+				pen[1] = (jan_bitmap_2[count])>>(7-i);
+				pen[2] = (jan_bitmap_3[count])>>(7-i);
+				pen[3] = (jan_bitmap_4[count])>>(7-i);
+
+				color = ((pen[0] & 1)<<0);
+				color|= ((pen[1] & 1)<<1);
+				color|= ((pen[2] & 1)<<2);
+				color|= ((pen[3] & 1)<<3);
+				color|= col_bank;
+
+				if((x+i)<=video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, x+i) = screen->machine->pens[color];
+			}
+
+			count++;
+		}
+	}
+
+	return 0;
+}
+
+static READ8_HANDLER( jantotsu_bitmap_r )
+{
+	switch(vram_bank & 3)
+	{
+		case 0: return jan_bitmap_1[offset];
+		case 1: return jan_bitmap_2[offset];
+		case 2: return jan_bitmap_3[offset];
+		case 3: return jan_bitmap_4[offset];
+	}
+	return 0;
+}
+
+static WRITE8_HANDLER( jantotsu_bitmap_w )
+{
+	switch(vram_bank & 3)
+	{
+		case 0: jan_bitmap_1[offset] = data; break;
+		case 1: jan_bitmap_2[offset] = data; break;
+		case 2: jan_bitmap_3[offset] = data; break;
+		case 3: jan_bitmap_4[offset] = data; break;
+	}
+}
+
+static WRITE8_HANDLER( bankaddr_w )
+{
+	vram_bank = ((data & 0xc0)>>6); // top 2 bits?
+
+	// looks like the top 2 bits and bottom 2 bits are used..
+	// multiple buffers? different read / write ?
+
+//	printf("%02x\n",data & 0x03);
+}
+
+static PALETTE_INIT( jantotsu )
+{
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x20; ++i)
+	{
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
+
+/*Multiplexer is mapped as 6-bits reads,bits 6 & 7 are always connected to the coin mechs.*/
+static READ8_HANDLER( jantotsu_mux_r )
+{
+	static UINT8 coin_port;
+
+	coin_port = input_port_read(space->machine, "COINS");
+
+//	printf("%02x\n",mux_data);
+
+	switch(mux_data)
+	{
+		case 1:    return input_port_read(space->machine, "PL1_1") | coin_port;
+		case 2:    return input_port_read(space->machine, "PL1_2") | coin_port;
+		case 4:    return input_port_read(space->machine, "PL1_3") | coin_port;
+		case 8:    return input_port_read(space->machine, "PL1_4") | coin_port;
+		case 0x10: return input_port_read(space->machine, "PL2_1") | coin_port;
+		case 0x20: return input_port_read(space->machine, "PL2_2") | coin_port;
+		case 0x40: return input_port_read(space->machine, "PL2_3") | coin_port;
+		case 0x80: return input_port_read(space->machine, "PL2_4") | coin_port;
+	}
+
+	return coin_port;
+}
+
+static WRITE8_HANDLER( jantotsu_mux_w )
+{
+	mux_data = ~data;
+}
+
+/*If bits 6 & 7 doesn't return 0x80,the game hangs until this bit is set,
+  so I'm guessing that these bits can't be read by the z80 at all but directly
+  hard-wired to the video chip.However I need the schematics / pcb snaps and/or
+  a side-by-side test (to know if the background colors really works) to be sure. */
+static READ8_HANDLER( jantotsu_dsw2_r )
+{
+	return (input_port_read(space->machine, "DSW2") & 0x3f) | 0x80;
+}
+
+static ADDRESS_MAP_START( jantotsu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(jantotsu_bitmap_r,jantotsu_bitmap_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jantotsu_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_WRITE(sn76496_1_w)
+	//02-03 MSM samples
+	AM_RANGE(0x04, 0x04) AM_READWRITE(jantotsu_mux_r,jantotsu_mux_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(bankaddr_w)
+ADDRESS_MAP_END
+
+static INPUT_PORTS_START( jantotsu )
+	PORT_START("COINS")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW1:2" )
+	PORT_DIPNAME( 0x1c, 0x00, "Player vs. CPU timer decrement speed") PORT_DIPLOCATION("SW1:3,4,5") //in msecs I suppose
+	PORT_DIPSETTING(    0x00, "30")
+	PORT_DIPSETTING(    0x08, "50" )
+	PORT_DIPSETTING(    0x04, "70")
+	PORT_DIPSETTING(    0x0c, "90" )
+	PORT_DIPSETTING(    0x10, "110" )
+	PORT_DIPSETTING(    0x18, "130" )
+	PORT_DIPSETTING(    0x14, "150" )
+	PORT_DIPSETTING(    0x1c, "170" )
+	PORT_DIPNAME( 0xe0, 0x00, "Player vs. Player timer decrement speed" ) PORT_DIPLOCATION("SW1:6,7,8") //in msecs I suppose
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPSETTING(    0x40, "120" )
+	PORT_DIPSETTING(    0x20, "140" )
+	PORT_DIPSETTING(    0x60, "160" )
+	PORT_DIPSETTING(    0x80, "180" )
+	PORT_DIPSETTING(    0xc0, "200" )
+	PORT_DIPSETTING(    0xa0, "220" )
+	PORT_DIPSETTING(    0xe0, "240" )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW2:4" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Play BGM") PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x40, "Background Color" ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0xc0, "Purple" )
+	PORT_DIPSETTING(    0x80, "Green" )
+	PORT_DIPSETTING(    0x40, "Blue" )
+	PORT_DIPSETTING(    0x00, "Black" )
+	PORT_START("PL1_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Mahjong Nagare") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Continue Button Yes") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Continue Button No") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_START("PL1_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_START("PL1_3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_START("PL1_4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_START("PL2_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Mahjong Nagare") PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Continue Button Yes") PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Continue Button No") PORT_PLAYER(2)
+	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("PL2_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	PORT_START("PL2_3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
+	PORT_START("PL2_4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+static INTERRUPT_GEN( jantotsu_irq )
+{
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+}
+
+static MACHINE_RESET( jantotsu )
+{
+	mux_data = 0;
+	/*Load hard-wired background color.*/
+	col_bank = (input_port_read(machine, "DSW2") & 0xc0)>>3;
+}
+
+static MACHINE_DRIVER_START( jantotsu )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80,18432000/4)
+	MDRV_CPU_PROGRAM_MAP(0,jantotsu_map)
+	MDRV_CPU_IO_MAP(0,jantotsu_io)
+	MDRV_CPU_VBLANK_INT("main", jantotsu_irq)
+
+	MDRV_MACHINE_RESET(jantotsu)
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+
+	MDRV_PALETTE_INIT(jantotsu)
+	MDRV_PALETTE_LENGTH(0x20)
+
+	MDRV_VIDEO_START(jantotsu)
+	MDRV_VIDEO_UPDATE(jantotsu)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("sn1", SN76489A, 18432000/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("sn2", SN76489A, 18432000/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
+
+
+
+ROM_START( jantotsu )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "jat-00.2b", 0x00000, 0x02000, CRC(bed10f86) SHA1(c5ac845b32fa295b0ff205b1401bcc071d604d6e) )
+	ROM_LOAD( "jat-01.3b", 0x02000, 0x02000, CRC(cc9312e9) SHA1(b08d38cc58d92378305c015c5a001b4da072188b) )
+	ROM_LOAD( "jat-02.4b", 0x04000, 0x02000, CRC(292969f1) SHA1(e7cb93b67296e84ea012fcceb72df712c7e0f135) )
+	ROM_LOAD( "jat-03.2e", 0x06000, 0x02000, CRC(7452ff63) SHA1(b258674e77eee5548a065419a3092877957dec66) )
+	ROM_LOAD( "jat-04.3e", 0x08000, 0x02000, CRC(734e029f) SHA1(75aa13397847b4db32c41aaa6ff2ac82f16bd7a2) )
+	ROM_LOAD( "jat-05.4e", 0x0a000, 0x02000, CRC(1a725e1a) SHA1(1d39d607850f47b9389f41147d4570da8814f639) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "jat-40.6b", 0x00000, 0x02000, CRC(2275253e) SHA1(64e9415faf2775c6b9ab497dce7fda8c4775192e) )
+	ROM_LOAD( "jat-41.7b", 0x02000, 0x02000, CRC(ce08ed71) SHA1(8554e5e7ec178f57bed5fbdd5937e3a35f72c454) )
+	ROM_LOAD( "jat-42.8b", 0x04000, 0x02000, CRC(3ac3efbf) SHA1(846faea7c7c01fb7500aa33a70d4b54e878c0e41) )
+	ROM_LOAD( "jat-43.9b", 0x06000, 0x02000, CRC(3c1d843c) SHA1(7a836e66cad4e94916f0d80a439efde49306a0e1) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "jat-60.10p", 0x00, 0x20,  CRC(65528ae0) SHA1(6e3bf27d10ec14e3c6a494667b03b68726fcff14) )
+ROM_END
+
+GAME( 1983, jantotsu,  0,    jantotsu, jantotsu,  0, ROT270, "Sanritsu", "4nin-uchi Mahjong Jantotsu", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

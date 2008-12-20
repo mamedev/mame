@@ -1591,6 +1591,7 @@ src/mame/drivers/jackpool.c svneol=native#text/plain
 src/mame/drivers/jailbrek.c svneol=native#text/plain
 src/mame/drivers/jalmah.c svneol=native#text/plain
 src/mame/drivers/jangou.c svneol=native#text/plain
+src/mame/drivers/jantotsu.c svneol=native#text/plain
 src/mame/drivers/jchan.c svneol=native#text/plain
 src/mame/drivers/jedi.c svneol=native#text/plain
 src/mame/drivers/jokrwild.c svneol=native#text/plain
