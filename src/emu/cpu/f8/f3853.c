@@ -40,17 +40,17 @@ static struct {
 #define INTERRUPT_VECTOR(external) (external?f3853.low|(f3853.high<<8)|0x80 \
 					:(f3853.low|(f3853.high<<8))&~0x80)
 
-static void f3853_set_interrupt_request_line(void)
+static void f3853_set_interrupt_request_line(running_machine *machine)
 {
     if (!f3853.config.interrupt_request)
 		return;
 
 	if (f3853.external_enable&&!f3853.priority_line)
-		f3853.config.interrupt_request(INTERRUPT_VECTOR(TRUE), TRUE);
+		f3853.config.interrupt_request(machine, INTERRUPT_VECTOR(TRUE), TRUE);
 	else if (f3853.timer_enable&&!f3853.priority_line&&f3853.request_flipflop)
-		f3853.config.interrupt_request(INTERRUPT_VECTOR(FALSE), TRUE);
+		f3853.config.interrupt_request(machine, INTERRUPT_VECTOR(FALSE), TRUE);
 	else
-		f3853.config.interrupt_request(0, FALSE);
+		f3853.config.interrupt_request(machine, 0, FALSE);
 }
 
 static TIMER_CALLBACK( f3853_timer_callback );
@@ -67,7 +67,7 @@ static TIMER_CALLBACK( f3853_timer_callback )
     if (f3853.timer_enable)
 	{
 		f3853.request_flipflop = TRUE;
-		f3853_set_interrupt_request_line();
+		f3853_set_interrupt_request_line(machine);
     }
     f3853_timer_start(0xfe);
 }
@@ -99,18 +99,18 @@ CPU_RESET( f3853 )
     // registers indeterminate
 }
 
-void f3853_set_external_interrupt_in_line(int level)
+void f3853_set_external_interrupt_in_line(running_machine *machine, int level)
 {
     if (f3853.external_interrupt_line&&!level&& f3853.external_enable)
 	f3853.request_flipflop = TRUE;
     f3853.external_interrupt_line = level;
-    f3853_set_interrupt_request_line();
+    f3853_set_interrupt_request_line(machine);
 }
 
-void f3853_set_priority_in_line(int level)
+void f3853_set_priority_in_line(running_machine *machine, int level)
 {
     f3853.priority_line=level;
-    f3853_set_interrupt_request_line();
+    f3853_set_interrupt_request_line(machine);
 }
 
  READ8_HANDLER(f3853_r)
@@ -142,11 +142,11 @@ WRITE8_HANDLER(f3853_w)
 	case 2: //interrupt control
 		f3853.external_enable = ((data&3)==1);
 		f3853.timer_enable = ((data&3)==3);
-		f3853_set_interrupt_request_line();
+		f3853_set_interrupt_request_line(space->machine);
 		break;
 	case 3: //timer
 		f3853.request_flipflop=FALSE;
-		f3853_set_interrupt_request_line();
+		f3853_set_interrupt_request_line(space->machine);
 		f3853_timer_start(data);
 		break;
 	}

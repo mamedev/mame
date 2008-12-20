@@ -17,7 +17,7 @@ typedef struct _f3853_config f3853_config;
 struct _f3853_config
 {
     int frequency;
-    void (*interrupt_request)(UINT16 addr, int level);
+    void (*interrupt_request)(running_machine *machine, UINT16 addr, int level);
 };
 
 void f3853_init(running_machine *machine, const f3853_config *config);
@@ -27,7 +27,7 @@ CPU_RESET( f3853 );
  READ8_HANDLER(f3853_r);
 WRITE8_HANDLER(f3853_w);
 
-void f3853_set_external_interrupt_in_line(int level);
-void f3853_set_priority_in_line(int level);
+void f3853_set_external_interrupt_in_line(running_machine *machine, int level);
+void f3853_set_priority_in_line(running_machine *machine, int level);
 
 #endif /* __F3853_H__ */
