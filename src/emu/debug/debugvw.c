@@ -3018,7 +3018,6 @@ static int memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs,
 	if (memdata->desc->space != NULL)
 	{
 		const address_space *space = memdata->desc->space;
-		UINT64 result = ~(UINT64)0;
 		offs_t dummyaddr = offs;
 		int ismapped;
 
