@@ -175,7 +175,7 @@ static INPUT_CHANGED( coin_changed_callback )
 }
 
 
-static void arcadia_reset_coins(void)
+static void arcadia_reset_coins(running_machine *machine)
 {
 	/* reset coin counters */
 	coin_counter[0] = coin_counter[1] = 0;

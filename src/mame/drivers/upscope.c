@@ -59,7 +59,7 @@ static UINT8 nvram_data_latch;
  *
  *************************************/
 
-static void upscope_reset(void)
+static void upscope_reset(running_machine *machine)
 {
 	prev_cia1_porta = 0xff;
 }

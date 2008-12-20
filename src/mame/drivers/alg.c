@@ -157,7 +157,7 @@ static void serial_w(running_machine *machine, UINT16 data)
  *
  *************************************/
 
-static void alg_potgo_w(UINT16 data)
+static void alg_potgo_w(running_machine *machine, UINT16 data)
 {
 	/* bit 15 controls whether pin 9 is input/output */
 	/* bit 14 controls the value, which selects which player's controls to read */

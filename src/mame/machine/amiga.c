@@ -170,7 +170,7 @@ const char *const amiga_custom_names[0x100] =
  *************************************/
 
 static void custom_reset(running_machine *machine);
-static void autoconfig_reset(void);
+static void autoconfig_reset(running_machine *machine);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
 static TIMER_CALLBACK( scanline_callback );
@@ -284,7 +284,7 @@ static void amiga_m68k_reset(const device_config *device)
 	devtag_reset(device->machine, CIA8520, "cia_0");
 	devtag_reset(device->machine, CIA8520, "cia_1");
 	custom_reset(device->machine);
-	autoconfig_reset();
+	autoconfig_reset(device->machine);
 
 	/* set the overlay bit */
 	if ( IS_AGA(amiga_intf) )
@@ -309,7 +309,7 @@ MACHINE_RESET( amiga )
 
 	/* call the system-specific callback */
 	if (amiga_intf->reset_callback)
-		(*amiga_intf->reset_callback)();
+		(*amiga_intf->reset_callback)(machine);
 
 	/* start the scanline timer */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
@@ -1175,12 +1175,12 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_JOY0DAT:
 			if (amiga_intf->joy0dat_r != NULL)
-				return (*amiga_intf->joy0dat_r)();
+				return (*amiga_intf->joy0dat_r)(space->machine);
 			return input_port_read_safe(space->machine, "JOY0DAT", 0xffff);
 
 		case REG_JOY1DAT:
 			if (amiga_intf->joy1dat_r != NULL)
-				return (*amiga_intf->joy1dat_r)();
+				return (*amiga_intf->joy1dat_r)(space->machine);
 			return input_port_read_safe(space->machine, "JOY1DAT", 0xffff);
 
 		case REG_ADKCONR:
@@ -1197,7 +1197,7 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_DSKBYTR:
 			if (amiga_intf->dskbytr_r != NULL)
-				return (*amiga_intf->dskbytr_r)();
+				return (*amiga_intf->dskbytr_r)(space->machine);
 			return 0x0000;
 
 		case REG_INTENAR:
@@ -1269,12 +1269,12 @@ WRITE16_HANDLER( amiga_custom_w )
 
 		case REG_DSKLEN:
 			if (amiga_intf->dsklen_w != NULL)
-				(*amiga_intf->dsklen_w)(data);
+				(*amiga_intf->dsklen_w)(space->machine, data);
 			break;
 
 		case REG_POTGO:
 			if (amiga_intf->potgo_w != NULL)
-				(*amiga_intf->potgo_w)(data);
+				(*amiga_intf->potgo_w)(space->machine, data);
 			break;
 
 		case REG_SERDAT:
@@ -1532,7 +1532,7 @@ void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_devic
  *
  *************************************/
 
-static void autoconfig_reset(void)
+static void autoconfig_reset(running_machine *machine)
 {
 	autoconfig_device *dev;
 
@@ -1540,7 +1540,7 @@ static void autoconfig_reset(void)
 	for (dev = autoconfig_list; dev; dev = dev->next)
 		if (dev->base && dev->device.uninstall)
 		{
-			(*dev->device.uninstall)(dev->base);
+			(*dev->device.uninstall)(machine, dev->base);
 			dev->base = 0;
 		}
 
@@ -1672,7 +1672,7 @@ READ16_HANDLER( amiga_autoconfig_r )
 		case 0x40/4:
 			byte = 0x00;
 			if (cur_autoconfig->device.int_control_r)
-				byte = (*cur_autoconfig->device.int_control_r)();
+				byte = (*cur_autoconfig->device.int_control_r)(space->machine);
 			break;
 
 		default:
@@ -1731,7 +1731,7 @@ WRITE16_HANDLER( amiga_autoconfig_w )
 	{
 		logerror("Install to %06X\n", cur_autoconfig->base);
 		if (cur_autoconfig->base && cur_autoconfig->device.install)
-			(*cur_autoconfig->device.install)(cur_autoconfig->base);
+			(*cur_autoconfig->device.install)(space->machine, cur_autoconfig->base);
 		cur_autoconfig = cur_autoconfig->next;
 	}
 }
