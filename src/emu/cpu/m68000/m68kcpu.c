@@ -597,15 +597,15 @@ static CPU_GET_INFO( m68k )
 		case CPUINFO_INT_MIN_CYCLES:				info->i = 4;									break;
 		case CPUINFO_INT_MAX_CYCLES:				info->i = 158;									break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 24;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;						break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;						break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;						break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;						break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;						break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;						break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:			info->i = 0;  /* there is no level 0 */			break;
 		case CPUINFO_INT_INPUT_STATE + 1:			info->i = (m68k->virq_state >> 1) & 1;			break;
@@ -987,8 +987,8 @@ CPU_GET_INFO( m68008 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 22;						break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 22;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(m68008);		break;
@@ -1129,8 +1129,8 @@ CPU_GET_INFO( m68020 )
 		case CPUINFO_INT_MIN_CYCLES:				info->i = 2;									break;
 		case CPUINFO_INT_MAX_CYCLES:				info->i = 158;									break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;						break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;						break;
 
 		case CPUINFO_INT_PC:						info->i = REG_PC;								break;
 		case CPUINFO_INT_REGISTER + M68K_MSP:		info->i = (m68k->s_flag && m68k->m_flag) ? REG_SP : REG_MSP; break;
@@ -1225,7 +1225,7 @@ CPU_GET_INFO( m68ec020 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 24;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;						break;
 		case CPUINFO_INT_PC:						info->i = REG_PC & 0x00ffffff; 					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -1300,8 +1300,8 @@ CPU_GET_INFO( m68040 )
 		case CPUINFO_INT_MIN_CYCLES:				info->i = 2;								break;
 		case CPUINFO_INT_MAX_CYCLES:				info->i = 158;								break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
 
 		case CPUINFO_INT_PC:						info->i = REG_PC;								break;
 		case CPUINFO_INT_REGISTER + M68K_MSP:		info->i = (m68k->s_flag && m68k->m_flag) ? REG_SP : REG_MSP; break;

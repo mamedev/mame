@@ -955,15 +955,15 @@ CPU_GET_INFO( tms32010 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 3;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 12;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 5;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 12;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = -1;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 5;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = -1;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (cpustate->INTF & TMS32010_INT_PENDING) ? ASSERT_LINE : CLEAR_LINE;	break;
 
@@ -990,7 +990,7 @@ CPU_GET_INFO( tms32010 )
 		case CPUINFO_FCT_BURN:							info->burn = NULL;									break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32010);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;					break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:	info->internal_map16 = ADDRESS_MAP_NAME(tms32010_ram); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:	info->internal_map16 = ADDRESS_MAP_NAME(tms32010_ram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32010");					break;

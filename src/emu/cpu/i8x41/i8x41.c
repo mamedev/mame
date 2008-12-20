@@ -1193,18 +1193,18 @@ CPU_GET_INFO( i8041 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 2;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:		info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:		info->i = 0;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);		break;
 
 		case CPUINFO_INT_INPUT_STATE + I8X41_INT_IBF:	info->i = (STATE & IBF) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + I8X41_INT_TEST1:	info->i = (STATE & TEST1) ? ASSERT_LINE : CLEAR_LINE; break;
@@ -1319,8 +1319,8 @@ CPU_GET_INFO( i8042 )
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);		break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME(i8042);					break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8042");							break;
 		default:														CPU_GET_INFO_CALL(i8041);							break;

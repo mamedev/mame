@@ -272,15 +272,15 @@ CPU_GET_INFO( tms7000 )
         case CPUINFO_INT_MIN_CYCLES:	info->i = 1;	break;
         case CPUINFO_INT_MAX_CYCLES:	info->i = 48;	break; /* 48 represents the multiply instruction, the next highest is 17 */
 
-        case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;	break;
-        case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;	break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:	info->i = 0;	break;
-        case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;	break;
-        case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;	break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;	break;
-        case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 8;	break;
-        case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 8;	break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:	info->i = 0;	break;
+        case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;	break;
+        case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:	info->i = 16;	break;
+        case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:	info->i = 0;	break;
+        case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;	break;
+        case CPUINFO_INT_ADDRBUS_WIDTH_DATA:	info->i = 0;	break;
+        case CPUINFO_INT_ADDRBUS_SHIFT_DATA:	info->i = 0;	break;
+        case CPUINFO_INT_DATABUS_WIDTH_IO:	info->i = 8;	break;
+        case CPUINFO_INT_ADDRBUS_WIDTH_IO:	info->i = 8;	break;
+        case CPUINFO_INT_ADDRBUS_SHIFT_IO:	info->i = 0;	break;
 
         case CPUINFO_INT_INPUT_STATE + TMS7000_IRQ1_LINE:	info->i = cpustate->irq_state[TMS7000_IRQ1_LINE]; break;
         case CPUINFO_INT_INPUT_STATE + TMS7000_IRQ2_LINE:	info->i = cpustate->irq_state[TMS7000_IRQ2_LINE]; break;

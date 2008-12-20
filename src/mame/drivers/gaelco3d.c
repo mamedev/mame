@@ -194,9 +194,6 @@ static MACHINE_RESET( common )
 		adsp_ram_base[i] = opcode;
 	}
 
-	/* initialize the ADSP Tx callback */
-	adsp21xx_set_tx_handler(machine->cpu[2], adsp_tx_callback);
-
 	/* allocate a timer for feeding the autobuffer */
 	adsp_autobuffer_timer = timer_alloc(machine, adsp_autobuffer_irq, NULL);
 
@@ -908,6 +905,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static const adsp21xx_config adsp_config =
+{
+	NULL,					/* callback for serial receive */
+	adsp_tx_callback,		/* callback for serial transmit */
+	NULL					/* callback for timer fired */
+};
+
 static const tms32031_config tms_config =
 {
 	0x1000,
@@ -925,10 +929,11 @@ static MACHINE_DRIVER_START( gaelco3d )
 	MDRV_CPU_VBLANK_INT("main", vblank_gen)
 
 	MDRV_CPU_ADD("tms", TMS32031, 60000000)
-	MDRV_CPU_PROGRAM_MAP(tms_map,0)
 	MDRV_CPU_CONFIG(tms_config)
+	MDRV_CPU_PROGRAM_MAP(tms_map,0)
 
 	MDRV_CPU_ADD("adsp", ADSP2115, 16000000)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map,0)
 	MDRV_CPU_DATA_MAP(adsp_data_map, 0)
 

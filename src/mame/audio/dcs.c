@@ -372,7 +372,6 @@ static UINT32 *dcs_external_program_ram;
 
 
 
-
 /*************************************
  *
  *  Prototypes
@@ -585,6 +584,21 @@ ADDRESS_MAP_END
 
 /*************************************
  *
+ *  CPU configuration
+ *
+ *************************************/
+
+static const adsp21xx_config adsp_config =
+{
+	NULL,					/* callback for serial receive */
+	sound_tx_callback,		/* callback for serial transmit */
+	timer_enable_callback	/* callback for timer fired */
+};
+
+
+
+/*************************************
+ *
  *  Original DCS Machine Drivers
  *
  *************************************/
@@ -592,6 +606,7 @@ ADDRESS_MAP_END
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 MACHINE_DRIVER_START( dcs_audio_2k )
 	MDRV_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs_2k_program_map,0)
 	MDRV_CPU_DATA_MAP(dcs_2k_data_map,0)
 
@@ -630,6 +645,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dcs2_audio_2115 )
 	MDRV_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs2_2115_program_map,0)
 	MDRV_CPU_DATA_MAP(dcs2_2115_data_map,0)
 
@@ -660,6 +676,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dcs2_audio_dsio )
 	MDRV_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dsio_program_map,0)
 	MDRV_CPU_DATA_MAP(dsio_data_map,0)
 	MDRV_CPU_IO_MAP(dsio_io_map,0)
@@ -683,6 +700,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dcs2_audio_denver )
 	MDRV_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
+	MDRV_CPU_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(denver_program_map,0)
 	MDRV_CPU_DATA_MAP(denver_data_map,0)
 	MDRV_CPU_IO_MAP(denver_io_map,0)
@@ -904,7 +922,6 @@ static void dcs_register_state(running_machine *machine)
 		state_save_register_postload(machine, sdrc_postload, NULL);
 }
 
-
 void dcs_init(running_machine *machine)
 {
 	memset(&dcs, 0, sizeof(dcs));
@@ -916,10 +933,6 @@ void dcs_init(running_machine *machine)
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.rev = 1;
 	dcs.channels = 1;
-
-	/* initialize the ADSP Tx and timer callbacks */
-	adsp21xx_set_tx_handler(dcs.cpu, sound_tx_callback);
-	adsp21xx_set_timer_handler(dcs.cpu, timer_enable_callback);
 
 	/* configure boot and sound ROMs */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -969,10 +982,6 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.channels = 2;
-
-	/* initialize the ADSP Tx and timer callbacks */
-	adsp21xx_set_tx_handler(dcs.cpu, sound_tx_callback);
-	adsp21xx_set_timer_handler(dcs.cpu, timer_enable_callback);
 
 	/* always boot from the base of "dcs" */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");

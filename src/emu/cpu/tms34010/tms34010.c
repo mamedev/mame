@@ -1719,8 +1719,8 @@ static CPU_SET_INFO( tms34010 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(tms, 0, info->i);				break;
-		case CPUINFO_INT_INPUT_STATE + 1:				set_irq_line(tms, 1, info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(tms, 0, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + 1:				set_irq_line(tms, 1, info->i);		break;
 	}
 }
 
@@ -1737,46 +1737,42 @@ CPU_GET_INFO( tms34010 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms34010_state);		break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 8;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 10;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 10000;						break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tms34010_state);	break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 2;						break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;						break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;		break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;						break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 8;						break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;						break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 10;						break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;						break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 10000;					break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 3;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 16;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 32;						break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 3;						break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT1) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (IOREG(tms, REG_INTPEND) & TMS34010_INT2) ? ASSERT_LINE : CLEAR_LINE; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms34010);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(tms34010);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(tms34010);			break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(tms34010);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms34010);		break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms34010);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms->icount;			break;
-		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &tms->state;		break;
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(tms34010);		break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(tms34010);				break;
+		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(tms34010);				break;
+		case CPUINFO_FCT_EXIT:			info->exit = CPU_EXIT_NAME(tms34010);				break;
+		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(tms34010);			break;
+		case CPUINFO_FCT_BURN:			info->burn = NULL;									break;
+		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms34010);	break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms->icount;		break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &tms->state;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS34010");			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS34010");		break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Texas Instruments 340x0"); break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");				break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);			break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Alex Pasadyn/Zsolt Vasvari\nParts based on code by Aaron Giles"); break;
 
 		case CPUINFO_STR_FLAGS:
@@ -1813,14 +1809,14 @@ CPU_GET_INFO( tms34020 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(tms34020);			break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms34020);		break;
+		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(tms34020);				break;
+		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms34020);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS34020");			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS34020");		break;
 
 		default:										CPU_GET_INFO_CALL(tms34010);		break;
 	}

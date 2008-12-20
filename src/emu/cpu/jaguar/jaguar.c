@@ -1516,9 +1516,9 @@ CPU_GET_INFO( jaguargpu )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;										break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 1;										break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;								break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 24;								break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;								break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;								break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;								break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;								break;
 
 		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ0:		info->i = (jaguar->ctrl[G_CTRL] & 0x40) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + JAGUAR_IRQ1:		info->i = (jaguar->ctrl[G_CTRL] & 0x80) ? ASSERT_LINE : CLEAR_LINE; break;

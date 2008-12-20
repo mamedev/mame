@@ -4885,13 +4885,13 @@ static CPU_GET_INFO( hyperstone )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 36;							break;
 
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 15;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 15;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:					/* not implemented */				break;
 
@@ -5022,8 +5022,8 @@ static CPU_GET_INFO( hyperstone )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hyperstone);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map16 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:    info->internal_map16 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_IO:      info->internal_map16 = NULL;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hyperstone CPU");		break;
@@ -5174,10 +5174,10 @@ CPU_GET_INFO( e116t )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_4k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116t);					break;
@@ -5197,10 +5197,10 @@ CPU_GET_INFO( e116xt )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_8k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116xt);					break;
@@ -5220,10 +5220,10 @@ CPU_GET_INFO( e116xs )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_16k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_16k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116xs);					break;
@@ -5243,10 +5243,10 @@ CPU_GET_INFO( e116xsr )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_16k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_16k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e116xsr);					break;
@@ -5266,10 +5266,10 @@ CPU_GET_INFO( e132n )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_4k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132n);					break;
@@ -5289,10 +5289,10 @@ CPU_GET_INFO( e132t )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_4k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132t);					break;
@@ -5312,10 +5312,10 @@ CPU_GET_INFO( e132xn )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_8k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xn);					break;
@@ -5335,10 +5335,10 @@ CPU_GET_INFO( e132xt )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_8k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xt);					break;
@@ -5358,10 +5358,10 @@ CPU_GET_INFO( e132xs )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_16k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_16k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xs);					break;
@@ -5381,10 +5381,10 @@ CPU_GET_INFO( e132xsr )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_16k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_16k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(e132xsr);					break;
@@ -5404,10 +5404,10 @@ CPU_GET_INFO( gms30c2116 )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_4k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2116);					break;
@@ -5427,10 +5427,10 @@ CPU_GET_INFO( gms30c2132 )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_4k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_4k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2132);					break;
@@ -5450,10 +5450,10 @@ CPU_GET_INFO( gms30c2216 )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 16;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_8k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(e116_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2216);					break;
@@ -5473,10 +5473,10 @@ CPU_GET_INFO( gms30c2232 )
 	switch (state)
 	{
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 32;					break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_8k_iram_map); break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(e132_8k_iram_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(gms30c2232);					break;

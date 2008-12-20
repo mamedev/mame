@@ -3645,42 +3645,40 @@ CPU_GET_INFO( z80 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:				info->i = sizeof(z80_state);					break;
-		case CPUINFO_INT_INPUT_LINES:				info->i = 1;									break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:		info->i = 0xff;									break;
-		case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_LITTLE;							break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:			info->i = 1;									break;
-		case CPUINFO_INT_CLOCK_DIVIDER:				info->i = 1;									break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:		info->i = 1;									break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:		info->i = 4;									break;
-		case CPUINFO_INT_MIN_CYCLES:				info->i = 2;									break;
-		case CPUINFO_INT_MAX_CYCLES:				info->i = 16;									break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(z80_state);		break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 1;						break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;						break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;		break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;						break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;						break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;						break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;						break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;						break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;						break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:	info->i = 0;						break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;						break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 16;						break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:				info->i = 16;						break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO:				info->i = 0;						break;
 
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = z80->nmi_state;					break;
-		case CPUINFO_INT_INPUT_STATE + 0:			info->i = z80->irq_state;						break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = z80->nmi_state;			break;
+		case CPUINFO_INT_INPUT_STATE + 0:				info->i = z80->irq_state;			break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(z80);			break;
-		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(z80);				break;
-		case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(z80);				break;
-		case CPUINFO_FCT_EXIT:						info->exit = CPU_EXIT_NAME(z80);				break;
-		case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(z80);			break;
-		case CPUINFO_FCT_BURN:						info->burn = NULL;								break;
-		case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(z80);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount = &z80->icount;					break;
-		case CPUINFO_PTR_STATE_TABLE:				info->state_table = &z80->state;				break;
-		case CPUINFO_FCT_IMPORT_STATE:				info->import_state = CPU_IMPORT_STATE_NAME(z80);break;	
-		case CPUINFO_FCT_EXPORT_STATE:				info->export_state = CPU_EXPORT_STATE_NAME(z80);break;
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(z80);				break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(z80);					break;
+		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(z80);					break;
+		case CPUINFO_FCT_EXIT:			info->exit = CPU_EXIT_NAME(z80);					break;
+		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(z80);				break;
+		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(z80);		break;
+		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(z80);	break;	
+		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(z80);	break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z80->icount;		break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &z80->state;	break;
 
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_op:	info->p = (void *)cc[Z80_TABLE_op];		break;
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_cb:	info->p = (void *)cc[Z80_TABLE_cb];		break;
@@ -3690,11 +3688,11 @@ CPU_GET_INFO( z80 )
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ex:	info->p = (void *)cc[Z80_TABLE_ex];		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "Z80");							break;
-		case CPUINFO_STR_CORE_FAMILY:				strcpy(info->s, "Zilog Z80");					break;
-		case CPUINFO_STR_CORE_VERSION:				strcpy(info->s, "3.8");							break;
-		case CPUINFO_STR_CORE_FILE:					strcpy(info->s, __FILE__);						break;
-		case CPUINFO_STR_CORE_CREDITS:				strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "Z80");				break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Zilog Z80");		break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "3.8");				break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);			break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

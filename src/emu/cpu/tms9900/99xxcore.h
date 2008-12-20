@@ -4674,11 +4674,11 @@ void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 10;/*TODO: compute this value*/break;
 
 #if (USE_16_BIT_ACCESSORS)
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;					break;
 #else
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
 #endif
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:
 #if (TMS99XX_MODEL == TI990_10_ID)
 			/* this CPU has a mapper to expand the address space */
 			info->i = 21;
@@ -4693,12 +4693,12 @@ void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 			info->i = 16;
 #endif
 			break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO:
 #if (TMS99XX_MODEL == TI990_10_ID)
 			/* 3 MSBs do exist, although they are not connected (don't ask...) */
 			info->i = 15;
@@ -4719,7 +4719,7 @@ void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 			info->i = 15;
 #endif
 			break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
 
 /* not implemented */
 /*      case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:  info->i = get_irq_line(INPUT_LINE_NMI); break;

@@ -548,7 +548,6 @@ static void check_irqs(adsp2100_state *adsp)
 {
 	UINT8 check;
 
-#if (HAS_ADSP2181)
 	if (adsp->chip_type >= CHIP_TYPE_ADSP2181)
 	{
 		/* check IRQ2 */
@@ -598,9 +597,7 @@ static void check_irqs(adsp2100_state *adsp)
 		if (check && adsp2181_generate_irq(adsp, ADSP2181_TIMER, 9))
 			return;
 	}
-	else
-#endif
-	if (adsp->chip_type >= CHIP_TYPE_ADSP2101)
+	else if (adsp->chip_type >= CHIP_TYPE_ADSP2101)
 	{
 		/* check IRQ2 */
 		check = (adsp->icntl & 4) ? adsp->irq_latch[ADSP2101_IRQ2] : adsp->irq_state[ADSP2101_IRQ2];
@@ -675,6 +672,7 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
 
 static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callback irqcallback, int chiptype)
 {
+	const adsp21xx_config *config = device->static_config;
 	adsp2100_state *adsp = device->token;
 
 	/* create the tables */
@@ -685,10 +683,19 @@ static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callba
 	adsp->chip_type = chiptype;
 	adsp->irq_callback = irqcallback;
 
+	/* fetch device parameters */
 	adsp->device = device;
 	adsp->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	adsp->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	adsp->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	
+	/* copy function pointers from the config */
+	if (config != NULL)
+	{
+		adsp->sport_rx_callback = config->rx;
+		adsp->sport_tx_callback = config->tx;
+		adsp->timer_fired = config->timer;
+	}
 
 	/* set up the state table */
 	adsp->state = state_table_template;
@@ -1834,8 +1841,18 @@ static CPU_SET_INFO( adsp21xx )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:							adsp->pc = info->i;					break;
-		case CPUINFO_INT_SP:							adsp->pc_sp = info->i; 				break;
+		case CPUINFO_INT_INPUT_STATE + 0:
+		case CPUINFO_INT_INPUT_STATE + 1:
+		case CPUINFO_INT_INPUT_STATE + 2:
+		case CPUINFO_INT_INPUT_STATE + 3:
+		case CPUINFO_INT_INPUT_STATE + 4:
+		case CPUINFO_INT_INPUT_STATE + 5:
+		case CPUINFO_INT_INPUT_STATE + 6:
+		case CPUINFO_INT_INPUT_STATE + 7:
+		case CPUINFO_INT_INPUT_STATE + 8:
+		case CPUINFO_INT_INPUT_STATE + 9:
+			set_irq_line(adsp, state - CPUINFO_INT_INPUT_STATE, info->i);
+			break;
 	}
 }
 
@@ -1854,7 +1871,7 @@ static CPU_GET_INFO( adsp21xx )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(adsp2100_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					/* set per CPU */						break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
@@ -1862,29 +1879,36 @@ static CPU_GET_INFO( adsp21xx )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 1;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 14;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -2;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 14;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = -1;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 14;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = -2;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 14;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = -1;							break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = adsp->ppc;					break;
-		case CPUINFO_INT_PC:							info->i = adsp->pc;						break;
-		case CPUINFO_INT_SP:							info->i = adsp->pc_sp;					break;
+		case CPUINFO_INT_INPUT_STATE + 0:
+		case CPUINFO_INT_INPUT_STATE + 1:
+		case CPUINFO_INT_INPUT_STATE + 2:
+		case CPUINFO_INT_INPUT_STATE + 3:
+		case CPUINFO_INT_INPUT_STATE + 4:
+		case CPUINFO_INT_INPUT_STATE + 5:
+		case CPUINFO_INT_INPUT_STATE + 6:
+		case CPUINFO_INT_INPUT_STATE + 7:
+		case CPUINFO_INT_INPUT_STATE + 8:
+		case CPUINFO_INT_INPUT_STATE + 9:
+			info->i = adsp->irq_state[state - CPUINFO_INT_INPUT_STATE];
+			break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						/* set per CPU */						break;
-		case CPUINFO_FCT_INIT:							/* set per CPU */						break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(adsp21xx);			break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(adsp21xx);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(adsp21xx);		break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(adsp21xx);		break;
-		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(adsp21xx);		break;
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(adsp21xx);			break;
+		case CPUINFO_FCT_INIT:			/* set per CPU */										break;
+		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(adsp21xx);					break;
+		case CPUINFO_FCT_EXIT:			info->exit = CPU_EXIT_NAME(adsp21xx);					break;
+		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(adsp21xx);				break;
+		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(adsp21xx);		break;
+		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(adsp21xx);	break;
+
+		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &adsp->icount;			break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &adsp->state;		break;
 
@@ -1909,7 +1933,6 @@ static CPU_GET_INFO( adsp21xx )
 	}
 }
 
-#if (HAS_ADSP2104||HAS_ADSP2105||HAS_ADSP2115||HAS_ADSP2181)
 static void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 {
 	/* see how many words we need to copy */
@@ -1921,9 +1944,8 @@ static void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 		dstdata[i] = opcode;
 	}
 }
-#endif
 
-#if (HAS_ADSP2100)
+
 /**************************************************************************
  * ADSP2100 section
  **************************************************************************/
@@ -1935,51 +1957,25 @@ static CPU_INIT( adsp2100 )
 	adsp->imask_mask = 0x0f;
 }
 
-static CPU_SET_INFO( adsp2100 )
-{
-	adsp2100_state *adsp = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ0:	set_irq_line(adsp, ADSP2100_IRQ0, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ1:	set_irq_line(adsp, ADSP2100_IRQ1, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ2:	set_irq_line(adsp, ADSP2100_IRQ2, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ3:	set_irq_line(adsp, ADSP2100_IRQ3, info->i);	break;
-
-		default:
-			CPU_SET_INFO_CALL(adsp21xx);
-			break;
-	}
-}
-
 CPU_GET_INFO( adsp2100 )
 {
-	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_LINES:					info->i = 4;								break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ0:	info->i = adsp->irq_state[ADSP2100_IRQ0]; 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ1:	info->i = adsp->irq_state[ADSP2100_IRQ1]; 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ2:	info->i = adsp->irq_state[ADSP2100_IRQ2]; 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ3:	info->i = adsp->irq_state[ADSP2100_IRQ3]; 	break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2100);					break;
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2100);			break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(adsp2100);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2100");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2100");			break;
 
 		default:
 			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
-#endif
 
-
-#if (HAS_ADSP2101)
 /**************************************************************************
  * ADSP2101 section
  **************************************************************************/
@@ -1991,64 +1987,25 @@ static CPU_INIT( adsp2101 )
 	adsp->imask_mask = 0x3f;
 }
 
-static CPU_SET_INFO( adsp2101 )
-{
-	adsp2100_state *adsp = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_IRQ0:	set_irq_line(adsp, ADSP2101_IRQ0, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_IRQ1:	set_irq_line(adsp, ADSP2101_IRQ1, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_IRQ2:	set_irq_line(adsp, ADSP2101_IRQ2, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_SPORT0_RX:set_irq_line(adsp, ADSP2101_SPORT0_RX, info->i); 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_SPORT0_TX:set_irq_line(adsp, ADSP2101_SPORT0_TX, info->i); 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_TIMER:	set_irq_line(adsp, ADSP2101_TIMER, info->i);		break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			adsp->sport_rx_callback = (adsp21xx_rx_func)info->f;		break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			adsp->sport_tx_callback = (adsp21xx_tx_func)info->f;		break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		adsp->timer_fired = (adsp21xx_timer_func)info->f;	break;
-
-		default:
-			CPU_SET_INFO_CALL(adsp21xx);
-			break;
-	}
-}
-
 CPU_GET_INFO( adsp2101 )
 {
-	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_LINES:					info->i = 5;									break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_IRQ0:	info->i = adsp->irq_state[ADSP2101_IRQ0]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_IRQ1:	info->i = adsp->irq_state[ADSP2101_IRQ1]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_IRQ2:	info->i = adsp->irq_state[ADSP2101_IRQ2]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_SPORT0_RX:info->i = adsp->irq_state[ADSP2101_SPORT0_RX];break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_SPORT0_TX:info->i = adsp->irq_state[ADSP2101_SPORT0_TX];break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2101_TIMER:	info->i = adsp->irq_state[ADSP2101_TIMER]; 		break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2101);						break;
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2101);				break;
-
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;		break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		info->f = (genf *)adsp->timer_fired;		break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(adsp2101);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2101");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2101");			break;
 
 		default:
 			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
-#endif
 
-
-#if (HAS_ADSP2104)
 /**************************************************************************
  * ADSP2104 section
  **************************************************************************/
@@ -2065,64 +2022,25 @@ void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
-static CPU_SET_INFO( adsp2104 )
-{
-	adsp2100_state *adsp = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_IRQ0:	set_irq_line(adsp, ADSP2104_IRQ0, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_IRQ1:	set_irq_line(adsp, ADSP2104_IRQ1, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_IRQ2:	set_irq_line(adsp, ADSP2104_IRQ2, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_SPORT0_RX:set_irq_line(adsp, ADSP2104_SPORT0_RX, info->i); 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_SPORT0_TX:set_irq_line(adsp, ADSP2104_SPORT0_TX, info->i); 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_TIMER:	set_irq_line(adsp, ADSP2104_TIMER, info->i);		break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			adsp->sport_rx_callback = (adsp21xx_rx_func)info->f;		break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			adsp->sport_tx_callback = (adsp21xx_tx_func)info->f;		break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		adsp->timer_fired = (adsp21xx_timer_func)info->f;	break;
-
-		default:
-			CPU_SET_INFO_CALL(adsp21xx);
-			break;
-	}
-}
-
 CPU_GET_INFO( adsp2104 )
 {
-	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_LINES:					info->i = 5;									break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_IRQ0:	info->i = adsp->irq_state[ADSP2104_IRQ0]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_IRQ1:	info->i = adsp->irq_state[ADSP2104_IRQ1]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_IRQ2:	info->i = adsp->irq_state[ADSP2104_IRQ2]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_SPORT0_RX:info->i = adsp->irq_state[ADSP2104_SPORT0_RX];break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_SPORT0_TX:info->i = adsp->irq_state[ADSP2104_SPORT0_TX];break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2104_TIMER:	info->i = adsp->irq_state[ADSP2104_TIMER]; 		break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 6;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2104);						break;
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2104);				break;
-
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;		break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		info->f = (genf *)adsp->timer_fired;		break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(adsp2104);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2104");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2104");			break;
 
 		default:
 			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
-#endif
 
-
-#if (HAS_ADSP2105)
 /**************************************************************************
  * ADSP2105 section
  **************************************************************************/
@@ -2139,58 +2057,25 @@ void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
-static CPU_SET_INFO( adsp2105 )
-{
-	adsp2100_state *adsp = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + ADSP2105_IRQ0:	set_irq_line(adsp, ADSP2105_IRQ0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2105_IRQ1:	set_irq_line(adsp, ADSP2105_IRQ1, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2105_IRQ2:	set_irq_line(adsp, ADSP2105_IRQ2, info->i);		break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			adsp->sport_rx_callback = (adsp21xx_rx_func)info->f;	break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			adsp->sport_tx_callback = (adsp21xx_tx_func)info->f;	break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		adsp->timer_fired = (adsp21xx_timer_func)info->f;	break;
-
-		default:
-			CPU_SET_INFO_CALL(adsp21xx);
-			break;
-	}
-}
-
 CPU_GET_INFO( adsp2105 )
 {
-	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_LINES:					info->i = 3;								break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2105_IRQ0:	info->i = adsp->irq_state[ADSP2105_IRQ0]; 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2105_IRQ1:	info->i = adsp->irq_state[ADSP2105_IRQ1]; 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2105_IRQ2:	info->i = adsp->irq_state[ADSP2105_IRQ2]; 	break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2105);					break;
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2105);			break;
-
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;	break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;	break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		info->f = (genf *)adsp->timer_fired;	break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(adsp2105);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2105");				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2105");			break;
 
 		default:
 			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
-#endif
 
-
-#if (HAS_ADSP2115)
 /**************************************************************************
  * ADSP2115 section
  **************************************************************************/
@@ -2207,64 +2092,25 @@ void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
-static CPU_SET_INFO( adsp2115 )
-{
-	adsp2100_state *adsp = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_IRQ0:	set_irq_line(adsp, ADSP2115_IRQ0, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_IRQ1:	set_irq_line(adsp, ADSP2115_IRQ1, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_IRQ2:	set_irq_line(adsp, ADSP2115_IRQ2, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_SPORT0_RX:set_irq_line(adsp, ADSP2115_SPORT0_RX, info->i); 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_SPORT0_TX:set_irq_line(adsp, ADSP2115_SPORT0_TX, info->i); 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_TIMER:	set_irq_line(adsp, ADSP2115_TIMER, info->i);		break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			adsp->sport_rx_callback = (adsp21xx_rx_func)info->f;		break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			adsp->sport_tx_callback = (adsp21xx_tx_func)info->f;		break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		adsp->timer_fired = (adsp21xx_timer_func)info->f;	break;
-
-		default:
-			CPU_SET_INFO_CALL(adsp21xx);
-			break;
-	}
-}
-
 CPU_GET_INFO( adsp2115 )
 {
-	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_LINES:					info->i = 4;									break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_IRQ0:	info->i = adsp->irq_state[ADSP2115_IRQ0]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_IRQ1:	info->i = adsp->irq_state[ADSP2115_IRQ1]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_IRQ2:	info->i = adsp->irq_state[ADSP2115_IRQ2]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_SPORT0_RX:info->i = adsp->irq_state[ADSP2115_SPORT0_RX];break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_SPORT0_TX:info->i = adsp->irq_state[ADSP2115_SPORT0_TX];break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2115_TIMER:	info->i = adsp->irq_state[ADSP2115_TIMER]; 		break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 6;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2115);						break;
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2115);				break;
-
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;		break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		info->f = (genf *)adsp->timer_fired;		break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(adsp2115);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2115");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2115");			break;
 
 		default:
 			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
-#endif
 
-
-#if (HAS_ADSP2181)
 /**************************************************************************
  * ADSP2181 section
  **************************************************************************/
@@ -2281,61 +2127,19 @@ void adsp2181_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
-static CPU_SET_INFO( adsp2181 )
-{
-	adsp2100_state *adsp = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQ0:	set_irq_line(adsp, ADSP2181_IRQ0, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQ1:	set_irq_line(adsp, ADSP2181_IRQ1, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQ2:	set_irq_line(adsp, ADSP2181_IRQ2, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_SPORT0_RX:set_irq_line(adsp, ADSP2181_SPORT0_RX, info->i); 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_SPORT0_TX:set_irq_line(adsp, ADSP2181_SPORT0_TX, info->i); 	break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_TIMER:	set_irq_line(adsp, ADSP2181_TIMER, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQE:	set_irq_line(adsp, ADSP2181_IRQE, info->i);			break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQL1:	set_irq_line(adsp, ADSP2181_IRQL1, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQL2:	set_irq_line(adsp, ADSP2181_IRQL2, info->i);		break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			adsp->sport_rx_callback = (adsp21xx_rx_func)info->f;		break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			adsp->sport_tx_callback = (adsp21xx_tx_func)info->f;		break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		adsp->timer_fired = (adsp21xx_timer_func)info->f;	break;
-
-		default:
-			CPU_SET_INFO_CALL(adsp21xx);
-			break;
-	}
-}
-
 CPU_GET_INFO( adsp2181 )
 {
-	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_LINES:					info->i = 4;									break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQ0:	info->i = adsp->irq_state[ADSP2181_IRQ0]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQ1:	info->i = adsp->irq_state[ADSP2181_IRQ1]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQ2:	info->i = adsp->irq_state[ADSP2181_IRQ2]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_SPORT0_RX:info->i = adsp->irq_state[ADSP2181_SPORT0_RX];break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_SPORT0_TX:info->i = adsp->irq_state[ADSP2181_SPORT0_TX];break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_TIMER:	info->i = adsp->irq_state[ADSP2181_TIMER]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQE:	info->i = adsp->irq_state[ADSP2181_IRQE]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQL1:	info->i = adsp->irq_state[ADSP2181_IRQL1]; 		break;
-		case CPUINFO_INT_INPUT_STATE + ADSP2181_IRQL2:	info->i = adsp->irq_state[ADSP2181_IRQL2]; 		break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 9;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 11;							break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = -1;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 11;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = -1;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(adsp2181);						break;
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2181);				break;
-
-		case CPUINFO_FCT_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback; 		break;
-		case CPUINFO_FCT_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback; 		break;
-		case CPUINFO_FCT_ADSP2100_TIMER_HANDLER:		info->f = (genf *)adsp->timer_fired; 		break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(adsp2181);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2181");					break;
@@ -2415,5 +2219,3 @@ UINT16 adsp2181_idma_data_r(const device_config *device)
 
 	return result;
 }
-
-#endif

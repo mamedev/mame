@@ -142,14 +142,9 @@ $(CPUOBJ)/alph8201/alph8201.o:	$(CPUSRC)/alph8201/alph8201.c \
 # Analog Devices ADSP21xx series
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_ADSP2100=$(if $(filter ADSP2100,$(CPUS)),1,0)
-CPUDEFS += -DHAS_ADSP2101=$(if $(filter ADSP2101,$(CPUS)),1,0)
-CPUDEFS += -DHAS_ADSP2104=$(if $(filter ADSP2104,$(CPUS)),1,0)
-CPUDEFS += -DHAS_ADSP2105=$(if $(filter ADSP2105,$(CPUS)),1,0)
-CPUDEFS += -DHAS_ADSP2115=$(if $(filter ADSP2115,$(CPUS)),1,0)
-CPUDEFS += -DHAS_ADSP2181=$(if $(filter ADSP2181,$(CPUS)),1,0)
+CPUDEFS += -DHAS_ADSP21XX=$(if $(filter ADSP21XX,$(CPUS)),1,0)
 
-ifneq ($(filter ADSP2100 ADSP2101 ADSP2104 ADSP2105 ADSP2115 ADSP2181,$(CPUS)),)
+ifneq ($(filter ADSP21XX,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/adsp2100
 CPUOBJS += $(CPUOBJ)/adsp2100/adsp2100.o
 DBGOBJS += $(CPUOBJ)/adsp2100/2100dasm.o
