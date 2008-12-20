@@ -268,7 +268,7 @@ static void memory_view_recompute(debug_view *view);
 static int memory_view_needs_recompute(debug_view *view);
 static void memory_view_get_cursor_pos(debug_view *view, offs_t *address, UINT8 *shift);
 static void memory_view_set_cursor_pos(debug_view *view, offs_t address, UINT8 shift);
-static UINT64 memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs);
+static int memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs, UINT64 *data);
 static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t offs, UINT64 data);
 
 static const debug_view_callbacks callback_table[] =
@@ -2446,33 +2446,37 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 	/* then add all the memory regions */
 	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
 	{
+		UINT32 length = memory_region_length(machine, rgntag);
 		UINT32 flags = memory_region_flags(machine, rgntag);
-		UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-		UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
-		memory_subview_item *subview;
+		if (length > 0 && (flags & ROMREGION_DATATYPEMASK) == ROMREGION_DATATYPEROM)
+		{
+			UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
+			UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
+			memory_subview_item *subview;
 
-		/* determine the string and allocate a subview large enough */
-		astring_printf(tempstring, "Region '%s'", rgntag);
-		subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
-		memset(subview, 0, sizeof(*subview));
+			/* determine the string and allocate a subview large enough */
+			astring_printf(tempstring, "Region '%s'", rgntag);
+			subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
+			memset(subview, 0, sizeof(*subview));
 
-		/* populate the subview */
-		subview->next = NULL;
-		subview->index = curindex++;
-		subview->base = memory_region(machine, rgntag);
-		subview->length = memory_region_length(machine, rgntag);
+			/* populate the subview */
+			subview->next = NULL;
+			subview->index = curindex++;
+			subview->base = memory_region(machine, rgntag);
+			subview->length = memory_region_length(machine, rgntag);
 #ifdef LSB_FIRST
-		subview->offsetxor = width - 1;
+			subview->offsetxor = width - 1;
 #else
-		subview->offsetxor = 0;
+			subview->offsetxor = 0;
 #endif
-		subview->endianness = little_endian ? ENDIANNESS_LITTLE : ENDIANNESS_BIG;
-		subview->prefsize = MIN(width, 8);
-		strcpy(subview->name, astring_c(tempstring));
+			subview->endianness = little_endian ? ENDIANNESS_LITTLE : ENDIANNESS_BIG;
+			subview->prefsize = MIN(width, 8);
+			strcpy(subview->name, astring_c(tempstring));
 
-		/* add to the list */
-		*tailptr = subview;
-		tailptr = &subview->next;
+			/* add to the list */
+			*tailptr = subview;
+			tailptr = &subview->next;
+		}
 	}
 
 	/* finally add all global array symbols */
@@ -2663,16 +2667,18 @@ static void memory_view_update(debug_view *view)
 			/* generate the data */
 			for (chunknum = 0; chunknum < memdata->chunks_per_row; chunknum++)
 			{
-				UINT64 chunkdata = memory_view_read(memdata, memdata->bytes_per_chunk, addrbyte + chunknum * memdata->bytes_per_chunk);
 				int chunkindex = memdata->reverse_view ? (memdata->chunks_per_row - 1 - chunknum) : chunknum;
+				UINT64 chunkdata;
+				int ismapped;
 
+				ismapped = memory_view_read(memdata, memdata->bytes_per_chunk, addrbyte + chunknum * memdata->bytes_per_chunk, &chunkdata);
 				dest = destrow + memdata->section[1].pos + 1 + chunkindex * posdata->spacing;
 				for (ch = 0; ch < posdata->spacing; ch++, dest++)
 					if (dest >= destmin && dest < destmax)
 					{
 						UINT8 shift = posdata->shift[ch];
 						if (shift < 64)
-							dest->byte = "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f];
+							dest->byte = ismapped ? "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f] : '*';
 					}
 			}
 
@@ -2683,8 +2689,11 @@ static void memory_view_update(debug_view *view)
 				for (ch = 0; ch < memdata->bytes_per_row; ch++, dest++)
 					if (dest >= destmin && dest < destmax)
 					{
-						UINT8 chval = memory_view_read(memdata, 1, addrbyte + ch);
-						dest->byte = isprint(chval) ? chval : '.';
+						int ismapped;
+						UINT64 chval;
+						
+						ismapped = memory_view_read(memdata, 1, addrbyte + ch, &chval);
+						dest->byte = (ismapped && isprint(chval)) ? chval : '.';
 					}
 			}
 		}
@@ -2703,6 +2712,7 @@ static void memory_view_char(debug_view *view, int chval)
 	debug_view_memory *memdata = view->extra_data;
 	offs_t address;
 	char *hexchar;
+	int ismapped;
 	UINT64 data;
 	UINT32 delta;
 	UINT8 shift;
@@ -2775,7 +2785,9 @@ static void memory_view_char(debug_view *view, int chval)
 			hexchar = strchr(hexvals, tolower(chval));
 			if (hexchar == NULL)
 				break;
-			data = memory_view_read(memdata, memdata->bytes_per_chunk, address);
+			ismapped = memory_view_read(memdata, memdata->bytes_per_chunk, address, &data);
+			if (!ismapped)
+				break;
 			data &= ~((UINT64)0x0f << shift);
 			data |= (UINT64)(hexchar - hexvals) << shift;
 			memory_view_write(memdata, memdata->bytes_per_chunk, address, data);
@@ -2882,7 +2894,7 @@ static void memory_view_recompute(debug_view *view)
 	}
 
 	/* derive total sizes from that */
-	view->total.y = (memdata->maxaddr - memdata->byte_offset + memdata->bytes_per_row - 1) / memdata->bytes_per_row;
+	view->total.y = ((UINT64)memdata->maxaddr - (UINT64)memdata->byte_offset + (UINT64)memdata->bytes_per_row - 1) / memdata->bytes_per_row;
 
 	/* reset the current cursor position */
 	memory_view_set_cursor_pos(view, cursoraddr, cursorshift);
@@ -3000,39 +3012,52 @@ static void memory_view_set_cursor_pos(debug_view *view, offs_t address, UINT8 s
     reader
 -------------------------------------------------*/
 
-static UINT64 memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs)
+static int memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs, UINT64 *data)
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->desc->space != NULL)
 	{
 		const address_space *space = memdata->desc->space;
 		UINT64 result = ~(UINT64)0;
+		offs_t dummyaddr = offs;
+		int ismapped;
 
-		switch (size)
+		ismapped = memdata->no_translation ? TRUE : memory_address_physical(space, TRANSLATE_READ_DEBUG, &dummyaddr);
+		if (ismapped)
 		{
-			case 1:	result = debug_read_byte(space, offs, !memdata->no_translation); break;
-			case 2:	result = debug_read_word(space, offs, !memdata->no_translation); break;
-			case 4:	result = debug_read_dword(space, offs, !memdata->no_translation); break;
-			case 8:	result = debug_read_qword(space, offs, !memdata->no_translation); break;
+			switch (size)
+			{
+				case 1:	*data = debug_read_byte(space, offs, !memdata->no_translation); break;
+				case 2:	*data = debug_read_word(space, offs, !memdata->no_translation); break;
+				case 4:	*data = debug_read_dword(space, offs, !memdata->no_translation); break;
+				case 8:	*data = debug_read_qword(space, offs, !memdata->no_translation); break;
+			}
 		}
-		return result;
+		return ismapped;
 	}
 
 	/* if larger than a byte, reduce by half and recurse */
 	if (size > 1)
 	{
+		UINT64 data0, data1;
+		int ismapped;
+		
 		size /= 2;
+		ismapped  = memory_view_read(memdata, size, offs + 0 * size, &data0);
+		ismapped |= memory_view_read(memdata, size, offs + 1 * size, &data1);
 		if (memdata->desc->endianness == ENDIANNESS_LITTLE)
-			return memory_view_read(memdata, size, offs + 0 * size) | ((UINT64)memory_view_read(memdata, size, offs + 1 * size) << (size * 8));
+			*data = data0 | (data1 << (size * 8));
 		else
-			return memory_view_read(memdata, size, offs + 1 * size) | ((UINT64)memory_view_read(memdata, size, offs + 0 * size) << (size * 8));
+			*data = data1 | (data0 << (size * 8));
+		return ismapped;
 	}
 
 	/* all 0xff if out of bounds */
 	offs ^= memdata->desc->offsetxor;
 	if (offs >= memdata->desc->length)
-		return 0xff;
-	return *((UINT8 *)memdata->desc->base + offs);
+		return FALSE;
+	*data = *((UINT8 *)memdata->desc->base + offs);
+	return TRUE;
 }
 
 
