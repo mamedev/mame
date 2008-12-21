@@ -190,7 +190,7 @@ static void dma_interrupt_update( running_machine *machine )
 	m_n_dicr &= 0x00ffffff | ( m_n_dicr << 8 );
 }
 
-static void dma_finished(const address_space *space, int n_channel)
+static void dma_finished(running_machine *machine, int n_channel)
 {
 	if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000401 && n_channel == 2 )
 	{
@@ -224,7 +224,7 @@ static void dma_finished(const address_space *space, int n_channel)
 				n_address &= n_adrmask;
 				n_nextaddress = g_p_n_psxram[ n_address / 4 ];
 				n_size = n_nextaddress >> 24;
-				m_p_fn_dma_write[ n_channel ]( space->machine, n_address + 4, n_size );
+				m_p_fn_dma_write[ n_channel ]( machine, n_address + 4, n_size );
 				//FIXME:
 				// The following conditions will cause an endless loop.
 				// If stopping the transfer is correct I cannot judge
@@ -246,14 +246,13 @@ static void dma_finished(const address_space *space, int n_channel)
 	m_p_n_dmachannelcontrol[ n_channel ] &= ~( ( 1L << 0x18 ) | ( 1L << 0x1c ) );
 
 	m_n_dicr |= 1 << ( 24 + n_channel );
-	dma_interrupt_update(space->machine);
+	dma_interrupt_update(machine);
 	dma_stop_timer( n_channel );
 }
 
 static TIMER_CALLBACK( dma_finished_callback )
 {
-	const address_space *space = NULL;
-	dma_finished(space, param);
+	dma_finished(machine, param);
 }
 
 void psx_dma_install_read_handler( int n_channel, psx_dma_read_handler p_fn_dma_read )
@@ -313,7 +312,7 @@ WRITE32_HANDLER( psx_dma_w )
 				{
 					verboselog( machine, 1, "dma %d read block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_read[ n_channel ]( space->machine, n_address, n_size );
-					dma_finished( space, n_channel );
+					dma_finished( machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000200 &&
 					m_p_fn_dma_read[ n_channel ] != NULL )
@@ -326,7 +325,7 @@ WRITE32_HANDLER( psx_dma_w )
 					}
 					else
 					{
-						dma_finished( space, n_channel );
+						dma_finished( machine, n_channel );
 					}
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000201 &&
@@ -334,7 +333,7 @@ WRITE32_HANDLER( psx_dma_w )
 				{
 					verboselog( machine, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_write[ n_channel ]( space->machine, n_address, n_size );
-					dma_finished( space, n_channel );
+					dma_finished( machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11050100 &&
 					m_p_fn_dma_write[ n_channel ] != NULL )
@@ -342,7 +341,7 @@ WRITE32_HANDLER( psx_dma_w )
 					/* todo: check this is a write not a read... */
 					verboselog( machine, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_write[ n_channel ]( space->machine, n_address, n_size );
-					dma_finished( space, n_channel );
+					dma_finished( machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11150100 &&
 					m_p_fn_dma_write[ n_channel ] != NULL )
@@ -350,7 +349,7 @@ WRITE32_HANDLER( psx_dma_w )
 					/* todo: check this is a write not a read... */
 					verboselog( machine, 1, "dma %d write block %08x %08x\n", n_channel, n_address, n_size );
 					m_p_fn_dma_write[ n_channel ]( space->machine, n_address, n_size );
-					dma_finished( space, n_channel );
+					dma_finished( machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x01000401 &&
 					n_channel == 2 &&
@@ -359,7 +358,7 @@ WRITE32_HANDLER( psx_dma_w )
 					verboselog( machine, 1, "dma %d write linked list %08x\n",
 						n_channel, m_p_n_dmabase[ n_channel ] );
 
-					dma_finished( space, n_channel );
+					dma_finished( machine, n_channel );
 				}
 				else if( m_p_n_dmachannelcontrol[ n_channel ] == 0x11000002 &&
 					n_channel == 6 )
@@ -1566,7 +1565,7 @@ void psx_driver_init( running_machine *machine )
 
 	for( n = 0; n < 7; n++ )
 	{
-		m_p_timer_dma[ n ] = timer_alloc( machine, dma_finished_callback , NULL);
+		m_p_timer_dma[ n ] = timer_alloc( machine, dma_finished_callback, machine );
 		m_p_fn_dma_read[ n ] = NULL;
 		m_p_fn_dma_write[ n ] = NULL;
 	}
