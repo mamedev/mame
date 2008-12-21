@@ -2771,7 +2771,7 @@ V-V                           TP-027
 	DRIVER( spf2xjd )
 	DRIVER( ddsomud )
 	DRIVER( megamn2d )
-	DRIVER( sfz2aad )
+	DRIVER( sfz2ald )
 	DRIVER( xmvsfu1d )
 	DRIVER( batcird )
 	DRIVER( vsavd )

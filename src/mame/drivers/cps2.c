@@ -8117,7 +8117,7 @@ ROM_START( mshud )
 	ROM_LOAD16_WORD_SWAP( "msh.12m",   0x200000, 0x200000, CRC(de092570) SHA1(a03d0df901f6ea79685eaed67db65bee14ec29c6) )
 ROM_END
 
-ROM_START( sfz2aad )
+ROM_START( sfz2ald )
 	ROM_REGION( CODE_SIZE, "main", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "szaad.03", 0x000000, 0x80000, CRC(89f9483b) SHA1(5da4f82ddc79d9b5697ba2fea96dcaf460118248) )
 	ROM_LOAD16_WORD_SWAP( "szaad.04", 0x080000, 0x80000, CRC(aef27ae5) SHA1(5877a05e7355195d686a4d0a97062aacbd3277ee) )
@@ -8509,7 +8509,7 @@ GAME( 1996, sfz2ad,   sfa2,    dead_cps2, cps2_2p6b, cps2,   ROT0,   "bootleg", 
 GAME( 1996, spf2xjd,  spf2t,   dead_cps2, cps2_2p2b, cps2,   ROT0,   "bootleg", "Super Puzzle Fighter II X (Japan 960531 Phoenix Edition) (bootleg)", 0 )
 GAME( 1996, ddsomud,  ddsom,   dead_cps2, cps2_4p4b, cps2,   ROT0,   "bootleg", "Dungeons & Dragons: Shadow over Mystara (USA 960619 Phoenix Edition) (bootleg)", 0 )
 GAME( 1996, megamn2d, megaman2,dead_cps2, cps2_2p3b, cps2,   ROT0,   "bootleg", "Mega Man 2: The Power Fighters (USA 960708 Phoenix Edition) (bootleg)", 0 )
-GAME( 1996, sfz2aad,  sfa2,    dead_cps2, cps2_2p6b, cps2,   ROT0,   "bootleg", "Street Fighter Zero 2 Alpha (Asia 960826 Phoenix Edition) (bootleg)", 0 )
+GAME( 1996, sfz2ald,  sfz2al,  dead_cps2, cps2_2p6b, cps2,   ROT0,   "bootleg", "Street Fighter Zero 2 Alpha (Asia 960826 Phoenix Edition) (bootleg)", 0 )
 GAME( 1996, xmvsfu1d, xmvsf,   dead_cps2, cps2_2p6b, cps2,   ROT0,   "bootleg", "X-Men Vs. Street Fighter (USA 961004 Phoenix Edition) (bootleg)", 0 )
 GAME( 1997, batcird,  batcir,  dead_cps2, cps2_4p2b, cps2,   ROT0,   "bootleg", "Battle Circuit (Euro 970319 Phoenix Edition) (bootleg)", 0 )
 GAME( 1997, vsavd,    vsav,    dead_cps2, cps2_2p6b, cps2,   ROT0,   "bootleg", "Vampire Savior: The Lord of Vampire (Euro 970519 Phoenix Edition) (bootleg)", 0 )
