@@ -41,8 +41,10 @@
 
 struct TTL74153
 {
+	running_machine *machine;
+
 	/* callback */
-	void (*output_cb)(void);
+	void (*output_cb)(running_machine *machine);
 
 	/* inputs */
 	int a;					/* pin 14 */
@@ -87,7 +89,7 @@ void TTL74153_update(int which)
 		chips[which].last_output[0] = chips[which].output[0];
 		chips[which].last_output[1] = chips[which].output[1];
 
-		chips[which].output_cb();
+		chips[which].output_cb(chips[which].machine);
 	}
 }
 
@@ -123,7 +125,7 @@ int TTL74153_output_r(int which, int section)
 
 
 
-void TTL74153_config(int which, const struct TTL74153_interface *intf)
+void TTL74153_config(running_machine *machine, int which, const struct TTL74153_interface *intf)
 {
 	if (which >= MAX_TTL74153)
 	{
@@ -132,6 +134,7 @@ void TTL74153_config(int which, const struct TTL74153_interface *intf)
 	}
 
 
+	chips[which].machine = machine;
 	chips[which].output_cb = (intf ? intf->output_cb : 0);
 	chips[which].a = 1;
 	chips[which].b = 1;

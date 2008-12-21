@@ -27,8 +27,8 @@ static struct
 	int			last_touch_state;
 	int			last_x;
 	int			last_y;
-	void		(*tx_callback)(running_machine *machine, UINT8 data);
-	int			(*touch_callback)(int *touch_x, int *touch_y);
+	microtouch_tx_func	tx_callback;
+	microtouch_touch_func	touch_callback;
 } microtouch;
 
 
@@ -87,7 +87,7 @@ static TIMER_CALLBACK(microtouch_timer_callback)
 		int ty = input_port_read(machine, "TOUCH_Y");
 
 		if ( microtouch.touch_callback == NULL ||
-			 microtouch.touch_callback( &tx, &ty ) != 0 )
+			 microtouch.touch_callback( machine, &tx, &ty ) != 0 )
 		{
 			ty = 0x4000 - ty;
 
@@ -107,8 +107,7 @@ static TIMER_CALLBACK(microtouch_timer_callback)
 	}
 };
 
-void microtouch_init(running_machine *machine, void (*tx_cb)(running_machine *machine, UINT8 data),
-							int (*touch_cb)(int *touch_x, int *touch_y))
+void microtouch_init(running_machine *machine, microtouch_tx_func tx_cb, microtouch_touch_func touch_cb)
 {
 	memset(&microtouch, 0, sizeof(microtouch));
 

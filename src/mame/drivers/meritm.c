@@ -241,7 +241,7 @@ static void meritm_microtouch_tx_callback(running_machine *machine, UINT8 data)
  *  Microtouch touch coordinate transformation
  *
  *************************************/
-static int meritm_touch_coord_transform(int *touch_x, int *touch_y)
+static int meritm_touch_coord_transform(running_machine *machine, int *touch_x, int *touch_y)
 {
 	int xscr = (int)((double)(*touch_x)/0x4000*544);
 	int yscr = (int)((double)(*touch_y)/0x4000*480);

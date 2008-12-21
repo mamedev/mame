@@ -661,7 +661,7 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, taitowlf_get_out2
 };
 
-static void taitowlf_set_keyb_int(int state) {
+static void taitowlf_set_keyb_int(running_machine *machine, int state) {
 	pic8259_set_irq_line(taitowlf_devices.pic8259_1, 1, state);
 }
 

@@ -40,11 +40,11 @@
 /* The interface structure */
 struct TTL74153_interface
 {
-	void (*output_cb)(void);
+	void (*output_cb)(running_machine *machine);
 };
 
 
-void TTL74153_config(int which, const struct TTL74153_interface *intf);
+void TTL74153_config(running_machine *machine, int which, const struct TTL74153_interface *intf);
 
 /* must call TTL74153_update() after setting the inputs */
 void TTL74153_update(int which);

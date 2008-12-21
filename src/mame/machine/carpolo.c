@@ -578,7 +578,7 @@ MACHINE_RESET( carpolo )
 
 
 	/* set up the pedal handling chips */
-	TTL74153_config(TTL74153_1K, 0);
+	TTL74153_config(machine, TTL74153_1K, 0);
 
 	TTL74153_enable_w(TTL74153_1K, 0, 0);
 	TTL74153_enable_w(TTL74153_1K, 1, 0);

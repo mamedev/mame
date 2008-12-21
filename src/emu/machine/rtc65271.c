@@ -32,6 +32,8 @@ cycle */
 
 static struct
 {
+	running_machine *machine;
+
 	/* 64 8-bit registers (10 clock registers, 4 control/status registers, and
     50 bytes of user RAM) */
 	UINT8 regs[64];
@@ -49,7 +51,7 @@ static struct
 	int SQW_internal_state;
 
 	/* callback called when interrupt pin state changes (may be NULL) */
-	void (*interrupt_callback)(int state);
+	void (*interrupt_callback)(running_machine *machine, int state);
 } rtc;
 
 enum
@@ -310,10 +312,11 @@ int rtc65271_file_save(mame_file *file)
     interrupt_callback: callback called when interrupt pin state changes (may
         be NULL)
 */
-void rtc65271_init(running_machine *machine, UINT8 *xram, void (*interrupt_callback)(int state))
+void rtc65271_init(running_machine *machine, UINT8 *xram, void (*interrupt_callback)(running_machine *machine, int state))
 {
 	memset(&rtc, 0, sizeof(rtc));
 
+	rtc.machine = machine;
 	rtc.xram = xram;
 
 	rtc.update_timer = timer_alloc(machine, rtc_begin_update_callback, NULL);
@@ -456,13 +459,13 @@ static void field_interrupts(void)
 	{
 		rtc.regs[reg_C] |= reg_C_IRQF;
 		if (rtc.interrupt_callback)
-			rtc.interrupt_callback(1);
+			rtc.interrupt_callback(rtc.machine, 1);
 	}
 	else
 	{
 		rtc.regs[reg_C] &= ~reg_C_IRQF;
 		if (rtc.interrupt_callback)
-			rtc.interrupt_callback(0);
+			rtc.interrupt_callback(rtc.machine, 0);
 	}
 }
 
