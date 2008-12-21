@@ -11,9 +11,7 @@ NVRAM   :   Battery for main RAM
 
 - The hardware is similar to other IGS002 + IGS003 based boards.
   The interesting part is the background tilemap, that is designed specifically
-  for simulating the nine reels of a slot machine. The way it works is similar,
-  but more complicated than what's emulated in iqblock.c or goldstar.c.
-  It's not emulated properly yet, hence the game is not playable and marked NOT_WORKING.
+  for simulating the nine reels of a slot machine.
 
 ***************************************************************************/
 
@@ -27,31 +25,148 @@ NVRAM   :   Battery for main RAM
                                 Video Hardware
 ***************************************************************************/
 
+
+static tilemap *gp98_reel1_tilemap;
+UINT8 *gp98_reel1_ram;
+
+WRITE8_HANDLER( gp98_reel1_ram_w )
+{
+	gp98_reel1_ram[offset] = data;
+	tilemap_mark_tile_dirty(gp98_reel1_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_jingbell_reel1_tile_info )
+{
+	int code = gp98_reel1_ram[tile_index];
+
+	SET_TILE_INFO(
+			0,
+			(code)+(((tile_index+1)&0x3)*0x100),
+			0,
+			0);
+}
+
+
+static TILE_GET_INFO( get_gp98_reel1_tile_info )
+{
+	int code = gp98_reel1_ram[tile_index];
+
+	SET_TILE_INFO(
+			0,
+			(code*4)+(tile_index&0x3),
+			0,
+			0);
+}
+
+static tilemap *gp98_reel2_tilemap;
+UINT8 *gp98_reel2_ram;
+
+WRITE8_HANDLER( gp98_reel2_ram_w )
+{
+	gp98_reel2_ram[offset] = data;
+	tilemap_mark_tile_dirty(gp98_reel2_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_jingbell_reel2_tile_info )
+{
+	int code = gp98_reel2_ram[tile_index];
+
+	SET_TILE_INFO(
+			0,
+			(code)+(((tile_index+1)&0x3)*0x100),
+			0,
+			0);
+}
+
+static TILE_GET_INFO( get_gp98_reel2_tile_info )
+{
+	int code = gp98_reel2_ram[tile_index];
+
+	SET_TILE_INFO(
+			0,
+			(code*4)+(tile_index&0x3),
+			0,
+			0);
+}
+
+
+static tilemap *gp98_reel3_tilemap;
+UINT8 *gp98_reel3_ram;
+
+WRITE8_HANDLER( gp98_reel3_ram_w )
+{
+	gp98_reel3_ram[offset] = data;
+	tilemap_mark_tile_dirty(gp98_reel3_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_jingbell_reel3_tile_info )
+{
+	int code = gp98_reel3_ram[tile_index];
+
+	SET_TILE_INFO(
+			0,
+			(code)+(((tile_index+1)&0x3)*0x100),
+			0,
+			0);
+}
+
+static TILE_GET_INFO( get_gp98_reel3_tile_info )
+{
+	int code = gp98_reel3_ram[tile_index];
+
+	SET_TILE_INFO(
+			0,
+			(code*4)+(tile_index&0x3),
+			0,
+			0);
+}
+
+
+static tilemap *gp98_reel4_tilemap;
+UINT8 *gp98_reel4_ram;
+
+WRITE8_HANDLER( gp98_reel4_ram_w )
+{
+	gp98_reel4_ram[offset] = data;
+	tilemap_mark_tile_dirty(gp98_reel4_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_jingbell_reel4_tile_info )
+{
+	int code = gp98_reel4_ram[tile_index];
+
+	SET_TILE_INFO(
+			0,
+			(code)+(((tile_index+1)&0x3)*0x100),
+			0,
+			0);
+}
+
+static TILE_GET_INFO( get_gp98_reel4_tile_info )
+{
+	int code = gp98_reel4_ram[tile_index];
+
+	SET_TILE_INFO(
+			0,
+			(code*4)+(tile_index&0x3),
+			0,
+			0);
+}
+
+
+
+
 static UINT8   *fg_tile_ram, *fg_color_ram;
-static UINT8   *bg_tile_ram, *bg_scroll, *bg_scroll2;
+static UINT8   *bg_scroll, *bg_scroll2;
 
 static tilemap *fg_tilemap;
-static tilemap *bg_tilemap;
 
 static int video_enable;
 
 static WRITE8_HANDLER( bg_scroll_w )
 {
 	bg_scroll[offset] = data;
-	tilemap_set_scrolly(bg_tilemap,offset,data);
-}
-
-
-static TILE_GET_INFO( get_bg_tile_info )
-{
-	int code = bg_tile_ram[tile_index];
-	SET_TILE_INFO(0, code + ((tile_index+1) % 4) * 0x100, (code & 0x80) ? 0xc : 0, 0);
-}
-
-static WRITE8_HANDLER( bg_tile_w )
-{
-	bg_tile_ram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+//	tilemap_set_scrolly(bg_tilemap,offset,data);
 }
 
 
@@ -75,14 +190,38 @@ static WRITE8_HANDLER( fg_color_w )
 
 static VIDEO_START(jingbell)
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8, 32,	0x80,0x20);
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
-
-	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
-	tilemap_set_scroll_cols(bg_tilemap, 0x80);
+	gp98_reel1_tilemap = tilemap_create(machine,get_jingbell_reel1_tile_info,tilemap_scan_rows,8,32, 128, 8);
+	gp98_reel2_tilemap = tilemap_create(machine,get_jingbell_reel2_tile_info,tilemap_scan_rows,8,32, 128, 8);
+	gp98_reel3_tilemap = tilemap_create(machine,get_jingbell_reel3_tile_info,tilemap_scan_rows,8,32, 128, 8);
+	gp98_reel4_tilemap = tilemap_create(machine,get_jingbell_reel4_tile_info,tilemap_scan_rows,8,32, 128, 8);
+
+	tilemap_set_scroll_cols(gp98_reel1_tilemap, 128);
+	tilemap_set_scroll_cols(gp98_reel2_tilemap, 128);
+	tilemap_set_scroll_cols(gp98_reel3_tilemap, 128);
+	tilemap_set_scroll_cols(gp98_reel4_tilemap, 128);
 }
+
+
+static VIDEO_START(gp98)
+{
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	0x80,0x20);
+	tilemap_set_transparent_pen(fg_tilemap, 0);
+
+	gp98_reel1_tilemap = tilemap_create(machine,get_gp98_reel1_tile_info,tilemap_scan_rows,8,32, 128, 8);
+	gp98_reel2_tilemap = tilemap_create(machine,get_gp98_reel2_tile_info,tilemap_scan_rows,8,32, 128, 8);
+	gp98_reel3_tilemap = tilemap_create(machine,get_gp98_reel3_tile_info,tilemap_scan_rows,8,32, 128, 8);
+	gp98_reel4_tilemap = tilemap_create(machine,get_gp98_reel4_tile_info,tilemap_scan_rows,8,32, 128, 8);
+
+	tilemap_set_scroll_cols(gp98_reel1_tilemap, 128);
+	tilemap_set_scroll_cols(gp98_reel2_tilemap, 128);
+	tilemap_set_scroll_cols(gp98_reel3_tilemap, 128);
+	tilemap_set_scroll_cols(gp98_reel4_tilemap, 128);
+
+}
+
 
 static VIDEO_UPDATE(jingbell)
 {
@@ -101,41 +240,56 @@ static VIDEO_UPDATE(jingbell)
 
 	if (layers_ctrl & 1)
 	{
-		if (1)
+		int zz,i;
+		int startclipmin = 0;
+		const rectangle *visarea = video_screen_get_visible_area(screen);
+
+
+		for (i= 0;i < 0x80;i++)
 		{
-			// ********* experimental version of the bg rendering
-			int x,y,z, tmap, ystart = 0;
-			rectangle myclip;
-
-			bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-
-			memcpy(&myclip,cliprect,sizeof(myclip));
-
-			for (tmap = 0; tmap < 4; tmap++)
-			{
-				myclip.min_y = ystart;
-				myclip.max_y = ystart+0x0100/4 - 1;
-				for (y = 0; y < 0x8; y++)
-				{
-					for (x = 0; x < 0x80; x++)
-					{
-						int code = bg_tile_ram[x + y * 0x80 + bg_scroll2[tmap*0x20 + 4] * 0x80 * 0x8];
-						for (z = 0; z < 2; z++)
-						{
-							drawgfx(bitmap,screen->machine->gfx[0],
-									code + ((x+1) % 4) * 0x100, (code & 0x80) ? 0xc : 0,
-									0, 0,
-									x * 8, ystart + (y * 32 - ((bg_scroll[x + tmap * 0x80] + tmap*0x100/4) & 0xff)) + z * 0x8 * 0x20,
-	//                              &myclip, TRANSPARENCY_PEN, 0);
-									&myclip, TRANSPARENCY_NONE, 0);
-						}
-					}
-				}
-				ystart += 0x100/4;
-			}
-			// *********
+			tilemap_set_scrolly(gp98_reel1_tilemap, i, bg_scroll[i]*2);
+			tilemap_set_scrolly(gp98_reel2_tilemap, i, bg_scroll[i+0x80]*2);
+			tilemap_set_scrolly(gp98_reel3_tilemap, i, bg_scroll[i+0x100]*2);
+			tilemap_set_scrolly(gp98_reel4_tilemap, i, bg_scroll[i+0x180]*2);
 		}
-		else				tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
+
+
+
+
+		for (zz=0;zz<0x80-8;zz++) // -8 because of visible area (2*8 = 16)
+		{
+			rectangle clip;
+			int rowenable = bg_scroll2[zz];
+
+			/* draw top of screen */
+			clip.min_x = visarea->min_x;
+			clip.max_x = visarea->max_x;
+			clip.min_y = startclipmin;
+			clip.max_y = startclipmin+2;
+
+			bitmap_fill(bitmap,&clip,screen->machine->pens[rowenable]);
+
+			if (rowenable==0)
+			{ // 0 and 1 are the same? or is there a global switchoff?
+				tilemap_draw(bitmap,&clip,gp98_reel1_tilemap,0,0);
+			}
+			else if (rowenable==1)
+			{
+				tilemap_draw(bitmap,&clip,gp98_reel2_tilemap,0,0);
+			}
+			else if (rowenable==2)
+			{
+				tilemap_draw(bitmap,&clip,gp98_reel3_tilemap,0,0);
+			}
+			else if (rowenable==3)
+			{
+				tilemap_draw(bitmap,&clip,gp98_reel4_tilemap,0,0);
+			}
+
+
+			startclipmin+=2;
+		}
+
 	}
 	else					bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
@@ -250,6 +404,9 @@ static READ8_HANDLER( jingbell_magic_r )
 	return 0;
 }
 
+
+
+
 static ADDRESS_MAP_START( jingbell_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
 	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_BASE( &generic_nvram ) AM_SIZE( &generic_nvram_size )
@@ -263,7 +420,10 @@ static ADDRESS_MAP_START( jingbell_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE( &paletteram )
 	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE( &paletteram_2 )
 
-	AM_RANGE( 0x3000, 0x3fff ) AM_RAM_WRITE( bg_tile_w )  AM_BASE( &bg_tile_ram )
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE( gp98_reel1_ram_w )  AM_BASE( &gp98_reel1_ram )
+	AM_RANGE( 0x3400, 0x37ff ) AM_RAM_WRITE( gp98_reel2_ram_w )  AM_BASE( &gp98_reel2_ram )
+	AM_RANGE( 0x3800, 0x3bff ) AM_RAM_WRITE( gp98_reel3_ram_w )  AM_BASE( &gp98_reel3_ram )
+	AM_RANGE( 0x3c00, 0x3fff ) AM_RAM_WRITE( gp98_reel4_ram_w )  AM_BASE( &gp98_reel4_ram )
 
 	AM_RANGE( 0x4000, 0x407f ) AM_RAM AM_BASE( &bg_scroll2 )
 
@@ -426,6 +586,33 @@ static GFXDECODE_START( jingbell )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x6,  0, 16 )
 GFXDECODE_END
 
+static const gfx_layout tiles8x8_layout =
+{
+	8,8,
+	RGN_FRAC(1,3),
+	6,
+	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+1, RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+1, RGN_FRAC(0,3)+0, RGN_FRAC(0,3)+1 },
+	{ 8,10,12,14, 0, 2, 4, 6, },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	16*8
+};
+
+static const gfx_layout tiles8x32_layout =
+{
+	8,32,
+	RGN_FRAC(1,3),
+	6,
+	{ RGN_FRAC(2,3)+0, RGN_FRAC(2,3)+1, RGN_FRAC(1,3)+0, RGN_FRAC(1,3)+1, RGN_FRAC(0,3)+0, RGN_FRAC(0,3)+1 },
+	{ 8,10,12,14, 0, 2, 4, 6, },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16,16*16,17*16,18*16,19*16,20*16,21*16,22*16,23*16,24*16,25*16,26*16,27*16,28*16,29*16,30*16,31*16 },
+	32*16
+};
+
+static GFXDECODE_START( gp98 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x32_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
+GFXDECODE_END
+
 
 /***************************************************************************
                                 Machine Drivers
@@ -478,6 +665,14 @@ static MACHINE_DRIVER_START( jingbell )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gp98 )
+	MDRV_IMPORT_FROM(jingbell)
+	MDRV_GFXDECODE(gp98)
+
+	MDRV_VIDEO_START(gp98)
+MACHINE_DRIVER_END
+
 
 /***************************************************************************
 
@@ -571,4 +766,24 @@ static DRIVER_INIT( jingbell )
 	rom[0x01f19] = 0x18;
 }
 
+ROM_START( gp98 )
+	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "prg", 0x00000, 0x20000, CRC(1c02b8cc) SHA1(b8a29cbd96581f8ae1c1028279b8ee703be29f5f) )
+
+	ROM_REGION( 0x8000, "data", 0 )
+	ROM_COPY( "main", 0x10000, 0x00000, 0x8000 )
+
+	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE ) // 6bpp (2bpp per rom) font at tile # 0x4000
+	ROM_LOAD( "49", 0x000000, 0x80000, BAD_DUMP CRC(a9d9367d) SHA1(91c74740fc8394f1e1cd68feb8c993afd2042d70) )
+	ROM_LOAD( "50", 0x080000, 0x80000, CRC(48f6190d) SHA1(b430131a258b4e2fc178ac0e3e3f0010a82eac65) )
+	ROM_LOAD( "51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
+
+	ROM_REGION( 0x180000, "gfx2", ROMREGION_DISPOSE ) // 6bpp (2bpp per rom) font at tile # 0x4000
+	ROM_COPY( "gfx1", 0x00000, 0x00000, 0x180000 )
+
+	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
+	/* no OKI on this */
+ROM_END
+
 GAME( 1995?, jingbell, 0, jingbell, jingbell, jingbell, ROT0, "IGS", "Jingle Bell (Italy, V133I)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 19??,  gp98,  0,    gp98,  jingbell,        0,        ROT0, "unknown", "Grand Prix '98",GAME_NOT_WORKING| GAME_NO_SOUND )

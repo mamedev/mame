@@ -7415,6 +7415,7 @@ Other Sun games
 	DRIVER( grndtour )	/* (c) 1993 */
 	DRIVER( cabaret )
 	DRIVER( jingbell )	/* (c) 1995? */
+	DRIVER( gp98 )		/* (c) 19?? */
 	DRIVER( lhb )		/* (c) 1995 */
 	DRIVER( lhba )		/* (c) 1995 */
 	DRIVER( dbc )		/* (c) 199? */
