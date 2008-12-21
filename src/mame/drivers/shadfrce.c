@@ -80,9 +80,12 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+
+#define MASTER_CLOCK		XTAL_28MHz
+#define CPU_CLOCK			MASTER_CLOCK / 2
+#define PIXEL_CLOCK		MASTER_CLOCK / 4
 
 UINT16 *shadfrce_fgvideoram, *shadfrce_bg0videoram,  *shadfrce_bg1videoram,   *shadfrce_spvideoram;
 
@@ -100,8 +103,8 @@ WRITE16_HANDLER( shadfrce_bg1videoram_w );
 
 int shadfrce_video_enable = 0;
 static int shadfrce_irqs_enable = 0;
-static int shadfrce_scanline = 0;
-static emu_timer *raster_irq_timer;
+static int raster_scanline = 0;
+static int raster_irq_enable = 0;
 static int vblank = 0;
 
 
@@ -231,19 +234,6 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 	}
 }
 
-static TIMER_CALLBACK( raster_interrupt )
-{
-	// force a screen partial update on the previous scanline
-	if (shadfrce_scanline != 0)
-    	video_screen_update_partial(machine->primary_screen, shadfrce_scanline - 1);
-
-	shadfrce_scanline = (shadfrce_scanline + 1) % 256;
-
-	// fire another raster irq for the next scanline
-	cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
-	timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(machine->primary_screen, shadfrce_scanline, 0), 0);
-}
-
 static WRITE16_HANDLER( shadfrce_irq_ack_w )
 {
 	cpu_set_input_line(space->machine->cpu[0], offset ^ 3, CLEAR_LINE);
@@ -253,26 +243,19 @@ static WRITE16_HANDLER( shadfrce_irq_w )
 {
 	static int prev_value = 0;
 
-	shadfrce_irqs_enable = data & 1; // maybe, it's set/unset inside every trap instruction which is executed
-	shadfrce_video_enable = data & 8; // probably
+	shadfrce_irqs_enable = data & 1;	/* maybe, it's set/unset inside every trap instruction which is executed */
+	shadfrce_video_enable = data & 8;	/* probably */
 
-	// check if there's a high transition to enable the raster timer
+	/* check if there's a high transition to enable the raster IRQ */
 	if((~prev_value & 4) && (data & 4))
 	{
-		if( !timer_enabled(raster_irq_timer) )
-		{
-			timer_enable(raster_irq_timer, 1);
-			timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(space->machine->primary_screen, shadfrce_scanline, 0), 0);
-		}
+		raster_irq_enable = 1;
 	}
 
-	// check if there's a low transition to disable the raster timer
+	/* check if there's a low transition to disable the raster IRQ */
 	if((prev_value & 4) && (~data & 4))
 	{
-		if( timer_enabled(raster_irq_timer) )
-		{
-			timer_enable(raster_irq_timer, 0);
-		}
+		raster_irq_enable = 0;
 	}
 
 	prev_value = data;
@@ -280,7 +263,60 @@ static WRITE16_HANDLER( shadfrce_irq_w )
 
 static WRITE16_HANDLER( shadfrce_scanline_w )
 {
-	shadfrce_scanline = data; // guess, 0 is always written
+	raster_scanline = data; 	/* guess, 0 is always written */
+}
+
+static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
+{
+	int scanline = param;
+
+	/* Vblank is lowered on scanline 0 */
+	if (scanline == 0)
+	{
+		vblank = 0;
+	}
+	/* Hack */
+	else if (scanline == (248-1))		/* -1 is an hack needed to avoid deadlocks */
+	{
+		vblank = 4;
+	}
+
+	/* Raster interrupt - Perform raster effect on given scanline */
+	if (raster_irq_enable)
+	{
+		if (scanline == raster_scanline)
+		{
+			raster_scanline = (raster_scanline + 1) % 240;
+			video_screen_update_partial(timer->machine->primary_screen, raster_scanline - 1);
+			cpu_set_input_line(timer->machine->cpu[0], 1, ASSERT_LINE);
+		}
+	}
+
+	/* An interrupt is generated every 16 scanlines */
+	if (shadfrce_irqs_enable)
+	{
+		if (scanline % 16 == 0)
+		{
+			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+			cpu_set_input_line(timer->machine->cpu[0], 2, ASSERT_LINE);
+		}
+	}
+
+	/* Vblank is raised on scanline 248 */
+	if (shadfrce_irqs_enable)
+	{
+		if (scanline == 248)
+		{
+			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+			cpu_set_input_line(timer->machine->cpu[0], 3, ASSERT_LINE);
+		}
+	}
+
+	/* Adjust for next scanline */
+	if (++scanline >= video_screen_get_height(timer->machine->primary_screen))
+	{
+		scanline = 0;
+	}
 }
 
 
@@ -349,10 +385,10 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( shadfrce )
-	PORT_START("P1")	/* Fake IN0 (player 1 inputs) */
+	PORT_START("P1")		/* Fake IN0 (player 1 inputs) */
 	SHADFRCE_PLAYER_INPUT( 1, IPT_START1 )
 
-	PORT_START("P2")	/* Fake IN1 (player 2 inputs) */
+	PORT_START("P2")		/* Fake IN1 (player 2 inputs) */
 	SHADFRCE_PLAYER_INPUT( 2, IPT_START2 )
 
 	PORT_START("EXTRA")	/* Fake IN2 (players 1 & 2 extra inputs */
@@ -370,13 +406,13 @@ static INPUT_PORTS_START( shadfrce )
 
 	PORT_START("SYSTEM")	/* Fake IN4 (system inputs) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                   /* only in "test mode" ? */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )                /* only in "test mode" ? */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )			/* only in "test mode" ? */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )			/* only in "test mode" ? */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MISC")	/* Fake IN5 (misc) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )				 /* guess */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )			/* guess */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )			/* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
 	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")	/* Fake IN6 (DIP1) */
@@ -480,61 +516,17 @@ static const ym2151_interface ym2151_config =
 	irq_handler
 };
 
-/*
-    Interrupts generation is guessed, but it requires the same hack as in wwfsstar.c
-*/
-static INTERRUPT_GEN( shadfrce_interrupt )
-{
-	int scanline = 255 - cpu_getiloops(device);
-
-	/* Vblank is lowered on scanline 0 (8) */
-	if (scanline == 0)
-	{
-		vblank = 0;
-	}
-	/* Hack */
-	else if (scanline==(248-1))
-	{
-		vblank = 4;
-	}
-	/* Vblank is raised on scanline 248 (256) */
-	else if (scanline==248)
-	{
-		if(shadfrce_irqs_enable)
-			cpu_set_input_line(device, 3, ASSERT_LINE);
-	}
-
-	/* An interrupt is generated every 16 scanlines */
-	if (scanline%16 == 0)
-	{
-		if(shadfrce_irqs_enable)
-			cpu_set_input_line(device, 2, ASSERT_LINE);
-	}
-}
-
-static MACHINE_RESET( shadfrce )
-{
-	raster_irq_timer = timer_alloc(machine, raster_interrupt, NULL);
-	timer_enable(raster_irq_timer, 0);
-	shadfrce_scanline = 0;
-}
-
 static MACHINE_DRIVER_START( shadfrce )
-	MDRV_CPU_ADD("main", M68000, XTAL_28MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("main", M68000, CPU_CLOCK) 			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(shadfrce_interrupt,256)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", shadfrce_scanline, "main", 0, 1)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) 		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_sound_map,0)
 
-	MDRV_MACHINE_RESET(shadfrce)
-
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 432, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
 
 	MDRV_GFXDECODE(shadfrce)
 	MDRV_PALETTE_LENGTH(0x4000)
@@ -546,13 +538,13 @@ static MACHINE_DRIVER_START( shadfrce )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) 		/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_13_4952MHz/8) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb, pin7 is at 2.4v */
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_13_4952MHz/8) 	/* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) 		/* verified on pcb, pin7 is at 2.4v */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END

@@ -38,12 +38,15 @@
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "wwfwfest.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+
+#define MASTER_CLOCK		XTAL_24MHz
+#define CPU_CLOCK			MASTER_CLOCK / 2
+#define PIXEL_CLOCK		MASTER_CLOCK / 4
 
 /*- in this file -*/
 static READ16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r );
@@ -52,11 +55,8 @@ static WRITE16_HANDLER( wwfwfest_1410_write ); /* priority write */
 static WRITE16_HANDLER( wwfwfest_scroll_write ); /* scrolling write */
 static WRITE8_HANDLER( oki_bankswitch_w );
 static WRITE16_HANDLER ( wwfwfest_soundwrite );
-
-static WRITE16_HANDLER( wwfwfest_flipscreen_w )
-{
-	flip_screen_set(space->machine, data&1);
-}
+static WRITE16_HANDLER ( wwfwfest_flipscreen_w );
+static WRITE16_HANDLER ( wwfwfest_irq_ack_w );
 
 /*******************************************************************************
  Memory Maps
@@ -74,8 +74,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(wwfwfest_bg1_videoram_w) AM_BASE(&wwfwfest_bg1_videoram)	/* BG1 Ram - 2 bytes per tile */
 	AM_RANGE(0x100000, 0x100007) AM_WRITE(wwfwfest_scroll_write)
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(wwfwfest_flipscreen_w)
-	AM_RANGE(0x140000, 0x140001) AM_WRITE(SMH_NOP) /* Irq 3 ack */
-	AM_RANGE(0x140002, 0x140003) AM_WRITE(SMH_NOP) /* Irq 2 ack */
+	AM_RANGE(0x140000, 0x140003) AM_WRITE(wwfwfest_irq_ack_w)
 	AM_RANGE(0x14000c, 0x14000d) AM_WRITE(wwfwfest_soundwrite)
 	AM_RANGE(0x140010, 0x140011) AM_WRITE(wwfwfest_1410_write)
 	AM_RANGE(0x140020, 0x140021) AM_READ_PORT("P1")
@@ -101,6 +100,20 @@ ADDRESS_MAP_END
 ********************************************************************************
  as used by the above memory map
 *******************************************************************************/
+
+static WRITE16_HANDLER( wwfwfest_irq_ack_w )
+{
+	if (offset == 0)
+		cpu_set_input_line(space->machine->cpu[0], 3, CLEAR_LINE);
+
+	else
+		cpu_set_input_line(space->machine->cpu[0], 2, CLEAR_LINE);
+}
+
+static WRITE16_HANDLER( wwfwfest_flipscreen_w )
+{
+	flip_screen_set(space->machine, data&1);
+}
 
 /*- Palette Reads/Writes -*/
 
@@ -331,11 +344,29 @@ GFXDECODE_END
  Interrupt Function
 *******************************************************************************/
 
-static INTERRUPT_GEN( wwfwfest_interrupt ) {
-	if( cpu_getiloops(device) == 0 )
-		cpu_set_input_line(device, 3, HOLD_LINE);
-	else
-		cpu_set_input_line(device, 2, HOLD_LINE);
+static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
+{
+	int scanline = param;
+
+	/* An interrupt is generated every 16 scanlines */
+	if (scanline % 16 == 0)
+	{
+		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		cpu_set_input_line(timer->machine->cpu[0], 2, ASSERT_LINE);
+	}
+
+	/* Vblank is raised on scanline 248 */
+	if (scanline == 248)
+	{
+		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		cpu_set_input_line(timer->machine->cpu[0], 3, ASSERT_LINE);
+	}
+
+	/* Adjust for next scanline */
+	if (++scanline >= video_screen_get_height(timer->machine->primary_screen))
+	{
+		scanline = 0;
+	}
 }
 
 /*******************************************************************************
@@ -368,9 +399,9 @@ static VIDEO_EOF( wwfwfest )
 static MACHINE_DRIVER_START( wwfwfest )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_24MHz / 2)	/* 24 crystal, 12 rated chip */
+	MDRV_CPU_ADD("main", M68000, CPU_CLOCK)	/* 24 crystal, 12 rated chip */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(wwfwfest_interrupt,2)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", wwfwfest_scanline, "main", 0, 1)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
@@ -379,11 +410,8 @@ static MACHINE_DRIVER_START( wwfwfest )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1*8, 31*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
 
 	MDRV_GFXDECODE(wwfwfest)
 	MDRV_PALETTE_LENGTH(8192)

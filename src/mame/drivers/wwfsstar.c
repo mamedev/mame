@@ -138,11 +138,14 @@ Notes:
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+
+#define MASTER_CLOCK		XTAL_20MHz
+#define CPU_CLOCK			MASTER_CLOCK / 2
+#define PIXEL_CLOCK		MASTER_CLOCK / 4
 
 /* in (video/wwfsstar.c) */
 VIDEO_START( wwfsstar );
@@ -157,7 +160,7 @@ static WRITE16_HANDLER( wwfsstar_flipscreen_w );
 static WRITE16_HANDLER ( wwfsstar_soundwrite );
 static WRITE16_HANDLER ( wwfsstar_scrollwrite );
 
-static int vblank;
+static int vblank = 0;
 
 /*******************************************************************************
  Memory Maps
@@ -227,7 +230,7 @@ static WRITE16_HANDLER( wwfsstar_flipscreen_w )
 
 static WRITE16_HANDLER( wwfsstar_irqack_w )
 {
-	if(offset == 0)
+	if (offset == 0)
 		cpu_set_input_line(space->machine->cpu[0], 6, CLEAR_LINE);
 
 	else
@@ -247,32 +250,39 @@ static WRITE16_HANDLER( wwfsstar_irqack_w )
     A hack is required: raise the vblank bit a scanline early.
 */
 
-static INTERRUPT_GEN( wwfsstars_interrupt )
+static TIMER_DEVICE_CALLBACK( wwfsstar_scanline )
 {
-	int scanline = 271 - cpu_getiloops(device);
+	int scanline = param;
 
-	/* Vblank is lowered on scanline 0 (8) */
+	/* Vblank is lowered on scanline 0 */
 	if (scanline == 0)
 	{
 		vblank = 0;
 	}
 	/* Hack */
-	else if (scanline==239)
+	else if (scanline == (240-1))		/* -1 is an hack needed to avoid deadlocks */
 	{
 		vblank = 1;
 	}
-	/* Vblank is raised on scanline 240 (248) */
-	else if (scanline==240)
-	{
-		video_screen_update_partial(device->machine->primary_screen, scanline);
-		cpu_set_input_line(device, 6, ASSERT_LINE);
-	}
 
 	/* An interrupt is generated every 16 scanlines */
-	if (scanline%16 == 0)
+	if (scanline % 16 == 0)
 	{
-		video_screen_update_partial(device->machine->primary_screen, scanline);
-		cpu_set_input_line(device, 5, ASSERT_LINE);
+		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		cpu_set_input_line(timer->machine->cpu[0], 5, ASSERT_LINE);
+	}
+
+	/* Vblank is raised on scanline 240 */
+	if (scanline == 240)
+	{
+		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		cpu_set_input_line(timer->machine->cpu[0], 6, ASSERT_LINE);
+	}
+
+	/* Adjust for next scanline */
+	if (++scanline >= video_screen_get_height(timer->machine->primary_screen))
+	{
+		scanline = 0;
 	}
 }
 
@@ -432,20 +442,17 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( wwfsstar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_20MHz / 2)
+	MDRV_CPU_ADD("main", M68000, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
-	MDRV_CPU_VBLANK_INT_HACK(wwfsstars_interrupt, 272)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", wwfsstar_scanline, "main", 0, 1)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.44)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
 
 	MDRV_GFXDECODE(wwfsstar)
 	MDRV_PALETTE_LENGTH(384)

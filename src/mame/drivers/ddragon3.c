@@ -24,12 +24,14 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
+#define MASTER_CLOCK		XTAL_24MHz
+#define CPU_CLOCK			MASTER_CLOCK / 2
+#define PIXEL_CLOCK		MASTER_CLOCK / 4
 
 extern UINT16 *ddragon3_bg_videoram16;
 extern UINT16 *ddragon3_fg_videoram16;
@@ -76,15 +78,18 @@ static WRITE16_HANDLER( ddragon3_io16_w )
 		/*  this gets written to on startup and at the end of IRQ6
         **  possibly trigger IRQ on sound CPU
         */
+		cpu_set_input_line(space->machine->cpu[0], 6, CLEAR_LINE);
 		break;
 
 		case 3:
 		/*  this gets written to on startup,
         **  and at the end of IRQ5 (input port read) */
+		cpu_set_input_line(space->machine->cpu[0], 5, CLEAR_LINE);
 		break;
 
 		case 4:
 		/* this gets written to at the end of IRQ6 only */
+		cpu_set_input_line(space->machine->cpu[0], 6, CLEAR_LINE);
 		break;
 
 		default:
@@ -303,7 +308,7 @@ static INPUT_PORTS_START( ctribe )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_VBLANK )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(	  0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
@@ -467,12 +472,28 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static INTERRUPT_GEN( ddragon3_cpu_interrupt ) { /* 6:0x177e - 5:0x176a */
-	if( cpu_getiloops(device) == 0 ){
-		cpu_set_input_line(device, 6, HOLD_LINE);  /* VBlank */
+static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
+{
+	int scanline = param;
+
+	/* An interrupt is generated every 16 scanlines */
+	if (scanline % 16 == 0)
+	{
+		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		cpu_set_input_line(timer->machine->cpu[0], 5, ASSERT_LINE);
 	}
-	else {
-		cpu_set_input_line(device, 5, HOLD_LINE); /* Input Ports */
+
+	/* Vblank is raised on scanline 248 */
+	if (scanline == 248)
+	{
+		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+		cpu_set_input_line(timer->machine->cpu[0], 6, ASSERT_LINE);
+	}
+
+	/* Adjust for next scanline */
+	if (++scanline >= video_screen_get_height(timer->machine->primary_screen))
+	{
+		scanline = 0;
 	}
 }
 
@@ -484,20 +505,17 @@ static INTERRUPT_GEN( ddragon3_cpu_interrupt ) { /* 6:0x177e - 5:0x176a */
 
 static MACHINE_DRIVER_START( ddragon3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000) // Guess
+	MDRV_CPU_ADD("main", M68000, CPU_CLOCK) // Guess
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_CPU_VBLANK_INT_HACK(ddragon3_cpu_interrupt, 2)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon3_scanline, "main", 0, 1)
 
 	MDRV_CPU_ADD("audio", Z80, 3579545) // Guess (confirmed on bootleg)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound, writemem_sound)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
 
 	MDRV_GFXDECODE(ddragon3)
 	MDRV_PALETTE_LENGTH(768)
@@ -534,9 +552,6 @@ static MACHINE_DRIVER_START( ctribe )
 
 	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(ctribe_readmem_sound,ctribe_writemem_sound)
-
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
 	MDRV_VIDEO_UPDATE(ctribe)
 
@@ -821,7 +836,7 @@ ROM_END
  *************************************/
 
 GAME( 1990, ddragon3, 0,        ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddrago3j, ddragon3,	ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddrago3j, ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ddrago3b, ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribe,   0,        ctribe,   ctribe,   0, ROT0, "Technos", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos", "The Combatribes (US Set 1?)", GAME_SUPPORTS_SAVE )
