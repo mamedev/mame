@@ -6012,6 +6012,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( agress )	/* TA-0029 (c) 1991 Palco */
 	DRIVER( agressb )	/* TA-0029 (c) 1991 Palco */
 	DRIVER( ddragon3 )	/* TA-0030 (c) 1990 */
+	DRIVER( ddrago3p )	/* TA-0030 (c) 1990 */
 	DRIVER( ddrago3j )	/* TA-0030 (c) 1990 (Japan) */
 	DRIVER( ddrago3b )	/* bootleg */
 	DRIVER( wwfwfest )	/* TA-0031 (c) 1991 (US) */
