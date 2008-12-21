@@ -39,11 +39,14 @@
 ***************************************************************************/
 static CPU_RESET( dsp56k );
 
+
 /***************************************************************************
     ONBOARD MEMORY ALLOCATION
 ***************************************************************************/
+// TODO: Put these in the cpustate!!!
 static UINT16 *dsp56k_peripheral_ram;
 static UINT16 *dsp56k_program_ram;
+
 
 /***************************************************************************
     COMPONENT FUNCTIONALITY
@@ -62,6 +65,22 @@ static UINT16 *dsp56k_program_ram;
 
 // 4-8 Memory handlers for on-chip peripheral memory.
 #include "dsp56mem.c"
+
+
+/***************************************************************************
+    Direct Update Handler
+***************************************************************************/
+static DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
+{
+	if (address >= (0x0000<<1) && address <= (0x07ff<<1))
+	{
+		direct->raw = direct->decrypted = (void*)(dsp56k_program_ram - (0x0000<<1));
+		return ~0;
+	}
+
+	return address;
+}
+
 
 /***************************************************************************
     MEMORY ACCESSORS
@@ -172,6 +191,10 @@ static CPU_INIT( dsp56k )
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+
+	/* Setup the direct memory handler for this CPU */
+	/* NOTE: Be sure to grab this guy and call him if you ever install another direct_update_hander in a driver! */
+	memory_set_direct_update_handler(cpustate->program, dsp56k_direct_handler);
 }
 
 static void agu_reset(dsp56k_core* cpustate)
