@@ -7406,6 +7406,7 @@ Other Sun games
 	DRIVER( cb3 )		/* (c) 19?? Dyna/bootleg? */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
 	DRIVER( cmaster )	/* (c) 1991 Dyna */
+	DRIVER( lucky8 )	/* (c) 1989 Wing Co.Ltd */
  	DRIVER( cpoker )	/* (c) 1993? IGS */
  	DRIVER( cpokert )	/* (c) 1993? Tuning */
 	DRIVER( csk227it )	/* (c) 198? IGS */
@@ -8154,7 +8155,6 @@ Other Sun games
 	DRIVER( videomat )	/* 1990 bootleg */
 	DRIVER( sigmapkr )	/* (c) 1995 Sigma */
 	DRIVER( sigma2k )	/* (c) 2000 Sigma */
-	DRIVER( lucky8 )	/* (c) 1989 Falcon */
 	DRIVER( sidewndr )	/* (c) 1981? ACE */
 	DRIVER( spellbnd )	/* (c) 1981? ACE */
 	DRIVER( starspnr )	/* (c) 1982? ACE */
@@ -8310,7 +8310,9 @@ Other Sun games
 	DRIVER( tetriunk )
 	DRIVER( smstrv )	/* (c) 1984 SMS MFG CORP */
 	DRIVER( skylncr )	/* (c) 1995 Bordun International */
+	DRIVER( butrfly )	/* (c) 1995 Bordun International */
 	DRIVER( madzoo )	/* (c) 1995 Bordun International */
+	DRIVER( leader )	/* Bootleg? */
 	DRIVER( livequiz )	/* (c) 1999 Andamiro */
 	DRIVER( cowrace )	/* (c) 19?? unknown */
 	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
