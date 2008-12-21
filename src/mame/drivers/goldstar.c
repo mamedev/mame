@@ -134,6 +134,39 @@ ADDRESS_MAP_END
 
 
 
+static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_WRITE(goldstar_reel1_ram_w) AM_BASE(&goldstar_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_WRITE(goldstar_reel2_ram_w) AM_BASE(&goldstar_reel2_ram)
+	AM_RANGE(0xa800, 0xa9ff) AM_RAM AM_WRITE(goldstar_reel3_ram_w) AM_BASE(&goldstar_reel3_ram)
+	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
+	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(&goldstar_reel2_scroll)
+	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(&goldstar_reel3_scroll)
+
+	/* none of the inputs are verified / tested */
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("IN0")
+	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("IN1")	/* Test Mode */
+	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("DSW1")
+	//AM_RANGE(0xb803, 0xb803)
+	//AM_RANGE(0xb804, 0xb804)
+	AM_RANGE(0xb805, 0xb805) AM_READ_PORT("DSW4")	/* DSW 4 (also appears in 8910 port) */
+	AM_RANGE(0xb806, 0xb806) AM_READ_PORT("DSW7")	/* (don't know to which one of the */
+	AM_RANGE(0xb810, 0xb810) AM_READ_PORT("UNK1")
+	AM_RANGE(0xb811, 0xb811) AM_READ_PORT("UNK2")
+	AM_RANGE(0xb820, 0xb820) AM_READ_PORT("DSW2")
+  AM_RANGE(0xb830, 0xb830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
+  AM_RANGE(0xb840, 0xb840) AM_WRITE(ay8910_control_port_0_w)
+//  AM_RANGE(0xba00, 0xba00) AM_WRITE(goldstar_fa00_w)
+//  AM_RANGE(0xbb00, 0xbb00) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
+//  AM_RANGE(0xbd00, 0xbdff) AM_READWRITE(SMH_RAM,paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
+//  AM_RANGE(0xbe00, 0xbe00) AM_READWRITE(protection_r,protection_w)
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( goldstar_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
@@ -793,6 +826,38 @@ static MACHINE_DRIVER_START( ncb3 )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( lucky8 )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, 12000000/3) // ?? Mhz
+	MDRV_CPU_PROGRAM_MAP(lucky8_map,0)
+	//MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(ncb3)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(goldstar)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
+	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
+	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
+MACHINE_DRIVER_END
+
+
+
 static MACHINE_DRIVER_START( cm )
 
 	/* basic machine hardware */
@@ -1089,6 +1154,55 @@ ROM_START( cmv801 )
 	ROM_LOAD( "prom1.287", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+/*
+
+        Lucky 8 Line
+        Falcon 1989
+
+        G14           6116  9
+        G13   D13           8
+              D12
+        6116                 Z80
+        6116                 8255
+        7                    8255
+        6            SW1     8255
+ 12MHz  5            SW2     8910
+        4  6116      SW4
+        3  6116      SW3
+        2  6116
+        1  6116
+
+    ---
+
+*/
+
+ROM_START( lucky8 )
+	ROM_REGION( 0x8000, "main", 0 )
+	ROM_LOAD( "8",	 0x0000, 0x4000, CRC(a187573e) SHA1(864627502025dbc83a0049fc98505655cec7b181) )
+	ROM_LOAD( "9",   0x4000, 0x4000, CRC(6f62672e) SHA1(05662ef1a70f93b09e48de497b049a282f070735) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "5",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "6",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "7",  0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "3",   0x0000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4",   0x2000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+	ROM_LOAD( "1",   0x4000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2",   0x6000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12", 0x0100, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "g14", 0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+	ROM_LOAD( "g13", 0x0020, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+ROM_END
+
+
 // this is probably different hardware..
 ROM_START( cmaster )
 	ROM_REGION( 0x10000, "main", 0 )
@@ -1202,3 +1316,4 @@ GAME( 19??, cb3,   goldstar,    ncb3, goldstar,  0, ROT0, "Dyna", "Cherry Bonus 
 // cherry master hardware has a rather different mem map, but is basically the same
 GAME( 198?, cmv801, 0,   cm, cmv801, 0, ROT0, "Corsica", "Cherry Master (Corsica, v8.01)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // says ED-96 where the manufacturer is on some games..
 GAME( 1991, cmaster, 0,   cm, cmv801, 0, ROT0, "Dyna", "Cherry Master 91?", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // different HW? closer to cherry master 2?
+GAME( 1989, lucky8, 0, lucky8, goldstar, 0, ROT0, "Falcon", "Lucky 8 Lines", GAME_NOT_WORKING )
