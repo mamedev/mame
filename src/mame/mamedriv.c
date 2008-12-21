@@ -5834,7 +5834,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bangbead )	/* 0259 (c) 2000 Visco */
 	DRIVER( nitd )		/* 0260 (c) 2000 Eleven / Gavaking */
 	DRIVER( nitdbl )	/* bootleg */
-	DRIVER( sengoku3 )	/* 0261 (c) 2001 SNK */
+	DRIVER( sengoku3 )	/* 0261 (c) 2001 Noise Factory / SNK */
 	DRIVER( kof2001 )	/* 0262 (c) 2001 Eolith / SNK */
 	DRIVER( kof2001h )	/* 0262 (c) 2001 Eolith / SNK */
 	DRIVER( cthd2003 )	/* bootleg of kof2001 */

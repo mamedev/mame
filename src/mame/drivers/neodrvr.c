@@ -7707,7 +7707,7 @@ GAME( 2000, mslug3b6, mslug3,   neogeo,   neogeo,   mslug3b6, ROT0, "bootleg", "
 GAME( 2000, kof2000,  neogeo,   neogeo,   neogeo,   kof2000,  ROT0, "SNK", "The King of Fighters 2000" , 0 ) /* Encrypted Code & GFX */
 GAME( 2000, kof2000n, kof2000,  neogeo,   neogeo,   kof2000n, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)" , 0 ) /* Encrypted GFX */
 GAME( 2001, zupapa,   neogeo,   neogeo,   neogeo,   zupapa,   ROT0, "SNK", "Zupapa!" , 0 )	/* Encrypted GFX */
-GAME( 2001, sengoku3, neogeo,   neogeo,   neogeo,   sengoku3, ROT0, "SNK", "Sengoku 3" , 0 )	/* Encrypted GFX */
+GAME( 2001, sengoku3, neogeo,   neogeo,   neogeo,   sengoku3, ROT0, "Noise Factory / SNK", "Sengoku 3" , 0 )	/* Encrypted GFX */
 GAME( 2001, kof2001,  neogeo,   neogeo,   neogeo,   kof2001,  ROT0, "Eolith / SNK", "The King of Fighters 2001 (set 1)" , 0 ) /* Encrypted GFX */
 GAME( 2001, kof2001h, kof2001,  neogeo,   neogeo,   kof2001,  ROT0, "Eolith / SNK", "The King of Fighters 2001 (set 2)" , 0 ) /* Encrypted GFX */
 GAME( 2003, cthd2003, kof2001,  neogeo,   neogeo,   cthd2003, ROT0, "bootleg", "Crouching Tiger Hidden Dragon 2003 (The King of Fighters 2001 bootleg)", 0 ) /* Protected Hack / Bootleg of kof2001 */
