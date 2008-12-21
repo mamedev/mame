@@ -30,10 +30,13 @@ extern WRITE8_HANDLER( goldstar_reel2_ram_w );
 extern UINT8 *goldstar_reel3_ram;
 extern WRITE8_HANDLER( goldstar_reel3_ram_w );
 
+extern WRITE8_HANDLER( goldstar_fg_vidram_w );
+extern WRITE8_HANDLER( goldstar_fg_atrram_w );
+
 WRITE8_HANDLER( goldstar_fa00_w );
 VIDEO_START( goldstar );
+VIDEO_START( cherrym );
 VIDEO_UPDATE( goldstar );
-VIDEO_UPDATE( cherrym );
 
 static UINT8 *nvram;
 static size_t nvram_size;
@@ -71,8 +74,8 @@ static ADDRESS_MAP_START( goldstar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
 	AM_RANGE(0xd800, 0xd9ff) AM_RAM AM_WRITE( goldstar_reel1_ram_w ) AM_BASE(&goldstar_reel1_ram)
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_WRITE( goldstar_reel2_ram_w ) AM_BASE(&goldstar_reel2_ram)
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_WRITE( goldstar_reel3_ram_w ) AM_BASE(&goldstar_reel3_ram)
@@ -102,14 +105,14 @@ static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&colorram)
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM AM_WRITE( goldstar_reel1_ram_w ) AM_BASE(&goldstar_reel1_ram)
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_WRITE( goldstar_reel2_ram_w ) AM_BASE(&goldstar_reel2_ram)
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_WRITE( goldstar_reel3_ram_w ) AM_BASE(&goldstar_reel3_ram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM AM_WRITE(goldstar_reel1_ram_w) AM_BASE(&goldstar_reel1_ram)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_WRITE(goldstar_reel2_ram_w) AM_BASE(&goldstar_reel2_ram)
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_WRITE(goldstar_reel3_ram_w) AM_BASE(&goldstar_reel3_ram)
 	AM_RANGE(0xf040, 0xf07f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
 	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_BASE(&goldstar_reel2_scroll)
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE(&goldstar_reel3_scroll) // moved compared to ncb3
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE(&goldstar_reel3_scroll) // moved compared to goldstar
 
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")	/* Test Mode */
@@ -142,8 +145,8 @@ static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size) // not here..
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM // main?
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
@@ -702,13 +705,32 @@ static MACHINE_DRIVER_START( moonlght )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 MACHINE_DRIVER_END
 
+static PALETTE_INIT(cm)
+{
+	int i;
+	for (i=0;i<0x100;i++)
+	{
+		int r,g,b;
+		UINT8 dat;
 
+		UINT8*proms = memory_region(machine, "proms");
+
+		dat = proms[0x000+i] | (proms[0x100+i]<<4);
+
+		r = (dat & 0x07) << 5;
+		g = (dat & 0x38) << 2;
+		b = (dat & 0xc0) << 0;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+
+	}
+}
 
 static MACHINE_DRIVER_START( chry10 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
-	MDRV_CPU_PROGRAM_MAP(goldstar_map,0)
+	MDRV_CPU_PROGRAM_MAP(ncb3_map,0)
 	MDRV_CPU_IO_MAP(goldstar_readport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -722,6 +744,7 @@ static MACHINE_DRIVER_START( chry10 )
 
 	MDRV_GFXDECODE(chry10)
 	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_INIT(cm)
 	MDRV_NVRAM_HANDLER(goldstar)
 
 	MDRV_VIDEO_START(goldstar)
@@ -732,10 +755,6 @@ static MACHINE_DRIVER_START( chry10 )
 	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
 	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
-
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified //"oki"
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 MACHINE_DRIVER_END
 
 
@@ -759,6 +778,8 @@ static MACHINE_DRIVER_START( ncb3 )
 
 	MDRV_GFXDECODE(ncb3)
 	MDRV_PALETTE_LENGTH(256)
+//	MDRV_PALETTE_INIT(cm)
+
 	MDRV_NVRAM_HANDLER(goldstar)
 
 	MDRV_VIDEO_START(goldstar)
@@ -771,27 +792,7 @@ static MACHINE_DRIVER_START( ncb3 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
-// wrong
-static PALETTE_INIT(cm)
-{
-	int i;
-	for (i=0;i<0x100;i++)
-	{
-		int r,g,b;
-		UINT8 dat;
 
-		UINT8*proms = memory_region(machine, "proms");
-
-		dat = proms[0x000+i] | (proms[0x100+i]<<4);
-
-		r = (dat & 0x07) << 5;
-		g = (dat & 0x38) << 2;
-		b = (dat & 0xc0) << 0;
-
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-
-	}
-}
 static MACHINE_DRIVER_START( cm )
 
 	/* basic machine hardware */
@@ -813,8 +814,8 @@ static MACHINE_DRIVER_START( cm )
 	MDRV_PALETTE_INIT(cm)
 //  MDRV_NVRAM_HANDLER(goldstar)
 
-	MDRV_VIDEO_START(goldstar)
-	MDRV_VIDEO_UPDATE(cherrym)
+	MDRV_VIDEO_START(cherrym)
+	MDRV_VIDEO_UPDATE(goldstar)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
@@ -951,7 +952,7 @@ ROM_START( chry10 )
 	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "1.u3",      0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
 
-	ROM_REGION( 0x0200, "prom", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x02e5, "palgal", ROMREGION_DISPOSE )
@@ -961,9 +962,6 @@ ROM_START( chry10 )
 	ROM_LOAD( "gal22v10b.pl5.bad.dump",     0x00000, 0x02e5, BAD_DUMP CRC(996854bc) SHA1(647d2f49b739f7ca55c0b85290b6a21256834fd8) )
 	ROM_LOAD( "palce16v8h.pl6.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(7e3d99d8) SHA1(983e10eba11e4aeab5103ae644a8e6181d9b27a9) )
 	ROM_LOAD( "palce16v8h.pl7.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-
-	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
-	/* no oki on this pcb .. */
 ROM_END
 
 
@@ -978,7 +976,7 @@ ROM_START( chryigld )
 	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "1.u3",      0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
 
-	ROM_REGION( 0x0200, "prom", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )
 	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x02dd, "palgal", ROMREGION_DISPOSE )
@@ -988,9 +986,6 @@ ROM_START( chryigld )
 	ROM_LOAD( "peel22cv10a.pl5.bad.dump",0x00000, 0x02dd, BAD_DUMP CRC(8e6075d9) SHA1(f2c1b6497a4d9e873d36b89771c135a2cd91d05f) )
 	ROM_LOAD( "palce16v8h.pl6.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(7e3d99d8) SHA1(983e10eba11e4aeab5103ae644a8e6181d9b27a9) )
 	ROM_LOAD( "palce16v8h.pl7.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
-
-	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
-	/* no oki on this pcb .. */
 ROM_END
 
 
@@ -1026,8 +1021,8 @@ ROM_START( ncb3 )
 	ROM_LOAD( "6.764", 0x04000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
 	ROM_LOAD( "7.764", 0x06000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
 
-	ROM_REGION( 0x0200, "prom", ROMREGION_DISPOSE )
-	/* prom missing? */
+	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )
+	ROM_LOAD( "colour_proms", 0x000, 0x200, NO_DUMP )
 
 	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
 	/* no oki on this pcb? */
@@ -1062,8 +1057,8 @@ ROM_START( cb3 )
 	ROM_LOAD( "6.764", 0x04000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
 	ROM_LOAD( "7.764", 0x06000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
 
-	ROM_REGION( 0x0200, "prom", ROMREGION_DISPOSE )
-	/* prom missing? */
+	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )
+	ROM_LOAD( "colour_proms", 0x000, 0x200, NO_DUMP )
 
 	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
 	/* no oki on this pcb? */
@@ -1081,10 +1076,10 @@ ROM_START( cmv801 )
 	ROM_LOAD( "m7.256",   0x10000, 0x8000, CRC(e39fff9c) SHA1(22fdc517fa478441622c6245cecb5728c5595757) )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "m1.64",     0x0000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
-	ROM_LOAD( "m2.64",     0x2000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
-	ROM_LOAD( "m3.64",     0x4000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
-	ROM_LOAD( "m4.64",	   0x6000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "m3.64",     0x0000, 0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "m4.64",	   0x2000, 0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "m1.64",     0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "m2.64",     0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
 
 	ROM_REGION( 0x200, "proms", 0 ) // pal
 	ROM_LOAD( "prom2.287", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
@@ -1153,7 +1148,7 @@ static DRIVER_INIT( chryigld )
 		0x1800, 0x3000, 0x6800, 0x7000,
 		0x0000, 0x4800, 0x2000, 0x5000,
 		0x1000, 0x7800, 0x6000, 0x3800,
-		/* bit below, I'm not sure, no match */
+		/* bit below, I'm not sure, no exact match, but only the first ones matter? */
 		0xc000, 0xc800, 0xd000, 0xd800,
 		0xe000, 0xe800, 0xf000, 0xf800,
 		0x8000, 0x8800, 0x9000, 0x9800,
