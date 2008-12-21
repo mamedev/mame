@@ -308,37 +308,37 @@ CPU_DISASSEMBLE( dsp56k )
 		int parallelType = -1;
 
 		/* Note: it's important that NPDM comes before RtRDM here */
-		/* No Parallel Data Move : 0100 1010 ---- ---- : A-131 */
+		/* No Parallel Data Move : 0100 1010 .... .... : A-131 */
 		if ((op & 0xff00) == 0x4a00)
 		{
 			op_byte = op & 0x00ff;
 			parallelType = kNoParallelDataMove;
 		}
-		/* Register to Register Data Move : 0100 IIII ---- ---- : A-133 */
+		/* Register to Register Data Move : 0100 IIII .... .... : A-133 */
 		else if ((op & 0xf000) == 0x4000)
 		{
 			op_byte = op & 0x00ff;
 			parallelType = kRegisterToRegister;
 		}
-		/* Address Register Update : 0011 0zRR ---- ---- : A-135 */
+		/* Address Register Update : 0011 0zRR .... .... : A-135 */
 		else if ((op & 0xf800) == 0x3000)
 		{
 			op_byte = op & 0x00ff;
 			parallelType = kAddressRegister;
 		}
-		/* X Memory Data Move : 1mRR HHHW ---- ---- : A-137 */
+		/* X Memory Data Move : 1mRR HHHW .... .... : A-137 */
 		else if ((op & 0x8000) == 0x8000)
 		{
 			op_byte = op & 0x00ff;
 			parallelType = kXMemoryDataMove;
 		}
-		/* X Memory Data Move : 0101 HHHW ---- ---- : A-137 */
+		/* X Memory Data Move : 0101 HHHW .... .... : A-137 */
 		else if ((op & 0xf000) == 0x5000)
 		{
 			op_byte = op & 0x00ff;
 			parallelType = kXMemoryDataMove2;
 		}
-		/* X Memory Data Move with short displacement : 0000 0101 BBBB BBBB ---- HHHW ---- ---- : A-139 */
+		/* X Memory Data Move with short displacement : 0000 0101 BBBB BBBB ---- HHHW .... .... : A-139 */
 		else if ((op & 0xff00) == 0x0500)
 		{
 			/* Now check it against all the other potential collisions */

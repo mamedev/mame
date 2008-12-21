@@ -189,14 +189,12 @@ static READ32_HANDLER( psac_rom_r )
 /* irq 3 is network.  don't generate if you don't emulate the network h/w! */
 /* irq 5 is vblank */
 /* irq 7 does nothing (it jsrs to a rts and then rte) */
-
 static INTERRUPT_GEN(polygonet_interrupt)
 {
 	cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 }
 
 /* sound CPU communications */
-
 static READ32_HANDLER( sound_r )
 {
 	int latch = soundlatch3_r(space, 0);
@@ -286,8 +284,7 @@ static WRITE32_HANDLER( dsp_w_lines )
 		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
 	}
 
-	/* 0x04000000 is the ??? line */
-
+	/* 0x04000000 is the COMBNK line - it switches who has access to the shared RAM - the dsp or the 68020 */
 }
 
 static WRITE32_HANDLER( dsp_host_interface_w )
@@ -310,6 +307,21 @@ static READ32_HANDLER( network_r )
 {
 	return 0x08000000;
 }
+
+
+WRITE32_HANDLER( plygonet_palette_w )
+{
+	int r,g,b;
+
+	COMBINE_DATA(&paletteram32[offset]);
+
+ 	r = (paletteram32[offset] >>16) & 0xff;
+	g = (paletteram32[offset] >> 8) & 0xff;
+	b = (paletteram32[offset] >> 0) & 0xff;
+
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+}
+
 
 /**********************************************************************************/
 /*******                            DSP56k maps                             *******/
@@ -503,20 +515,6 @@ static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 	UINT32 driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
 
 	COMBINE_DATA(&dsp56k_bank04_ram[driver_bank_offset + offset]);
-}
-
-
-WRITE32_HANDLER( plygonet_palette_w )
-{
-	int r,g,b;
-
-	COMBINE_DATA(&paletteram32[offset]);
-
- 	r = (paletteram32[offset] >>16) & 0xff;
-	g = (paletteram32[offset] >> 8) & 0xff;
-	b = (paletteram32[offset] >> 0) & 0xff;
-
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 

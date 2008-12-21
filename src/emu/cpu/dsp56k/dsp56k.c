@@ -242,7 +242,7 @@ static CPU_RESET( dsp56k )
 	agu_reset(cpustate);
 	alu_reset(cpustate);
 
-	/* HACK - Put a jump to 0x0000 at 0x0000 - this keeps the CPU put in MAME */
+	/* HACK - Put a jump to 0x0000 at 0x0000 - this keeps the CPU locked to the instruction at address 0x0000 */
 	memory_write_word_16le(cpustate->program, 0x0000, 0x0124);
 }
 

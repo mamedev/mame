@@ -142,7 +142,7 @@ static void pcu_reset(dsp56k_core* cpustate)
 			//        This, in actuality, is handled with the internal boot ROM.
 			for (i = 0; i < 0x800; i++)
 			{
-				UINT32 mem_offset = (0xc0000<<1) + (i<<1);	/* TODO: TEST */
+				UINT32 mem_offset = (0xc000<<1) + (i<<1);	/* TODO: TEST */
 
 				// TODO - DO I HAVE TO FLIP THIS WORD?
 				// P:$c000 -> Internal P:$0000 low byte
