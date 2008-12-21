@@ -159,11 +159,7 @@ INLINE attoseconds_t get_minimum_quantum(const device_config *device)
 	
 	/* fetch the base clock from the classdata if present */
 	if (device->token != NULL)
-	{
-		cpu_class_data *classdata = get_class_data(device);
-		if (classdata->attoseconds_per_cycle != 0)
-			basetick = classdata->attoseconds_per_cycle;
-	}
+		basetick = get_class_data(device)->attoseconds_per_cycle;
 
 	/* otherwise compute it from the raw data */
 	if (basetick == 0)
