@@ -91,11 +91,9 @@ static void update_pixels(const device_config *screen, int x, int y)
 
 WRITE16_HANDLER( blockout_videoram_w )
 {
-	UINT16 oldword = blockout_videoram[offset];
 	COMBINE_DATA(&blockout_videoram[offset]);
 
-	if (oldword != blockout_videoram[offset])
-		update_pixels(space->machine->primary_screen, (offset % 256)*2, (offset / 256) % 256);
+	update_pixels(space->machine->primary_screen, (offset % 256)*2, (offset / 256) % 256);
 }
 
 
