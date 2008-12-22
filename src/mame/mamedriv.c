@@ -7407,6 +7407,7 @@ Other Sun games
 	DRIVER( cb3 )		/* (c) 19?? Dyna/bootleg? */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
 	DRIVER( cmaster )	/* (c) 1991 Dyna */
+	DRIVER( cmasterb )	/* (c) 1991 Dyna */
 	DRIVER( lucky8 )	/* (c) 1989 Wing Co.Ltd */
  	DRIVER( cpoker )	/* (c) 1993? IGS */
  	DRIVER( cpokert )	/* (c) 1993? Tuning */

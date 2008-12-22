@@ -7,13 +7,17 @@ Golden Star and Cherry Master seem to be almost the same thing, running on
 different hardware.  There are also various bootlegs / hacks, it isn't clear
 exactly what hardware each runs on, some appear to have no OKI for example.
 
-driver by Mirko Buffoni
+Driver by Mirko Buffoni.
+Additional Work: David Haywood, Roberto Fresca.
 
 ***************************************************************************/
+
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
+#include "sound/sn76496.h"
+#include "machine/8255ppi.h"
 
 static int dataoffset=0;
 
@@ -101,6 +105,12 @@ static ADDRESS_MAP_START( goldstar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( goldstar_readport, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
@@ -114,68 +124,42 @@ static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf080, 0xf0bf) AM_RAM AM_BASE(&goldstar_reel2_scroll)
 	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE(&goldstar_reel3_scroll) // moved compared to goldstar
 
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")	/* Test Mode */
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("DSW1")
-//  AM_RANGE(0xf803, 0xf803)
-//  AM_RANGE(0xf804, 0xf804)
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW4")	/* DSW 4 (also appears in 8910 port) */
-	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSW7")	/* (don't know to which one of the */
-	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("UNK1")
-	AM_RANGE(0xf811, 0xf811) AM_READ_PORT("UNK2")
-	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
-//  AM_RANGE(0xf830, 0xf830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
-//  AM_RANGE(0xf840, 0xf840) AM_WRITE(ay8910_control_port_0_w)
-//  AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
-//  AM_RANGE(0xfb00, 0xfb00) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
-//  AM_RANGE(0xfd00, 0xfdff) AM_READWRITE(SMH_RAM,paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
-//  AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
+	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xf810, 0xf813) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
+	AM_RANGE(0xf830, 0xf830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
+	AM_RANGE(0xf840, 0xf840) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xf870, 0xf870) AM_WRITE(sn76496_0_w)	/* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
-
-
-static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
-	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_WRITE(goldstar_reel1_ram_w) AM_BASE(&goldstar_reel1_ram)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_WRITE(goldstar_reel2_ram_w) AM_BASE(&goldstar_reel2_ram)
-	AM_RANGE(0xa800, 0xa9ff) AM_RAM AM_WRITE(goldstar_reel3_ram_w) AM_BASE(&goldstar_reel3_ram)
-	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
-	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(&goldstar_reel2_scroll)
-	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(&goldstar_reel3_scroll)
-
-	/* none of the inputs are verified / tested */
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("IN0")
-	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("IN1")	/* Test Mode */
-	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("DSW1")
-	//AM_RANGE(0xb803, 0xb803)
-	//AM_RANGE(0xb804, 0xb804)
-	AM_RANGE(0xb805, 0xb805) AM_READ_PORT("DSW4")	/* DSW 4 (also appears in 8910 port) */
-	AM_RANGE(0xb806, 0xb806) AM_READ_PORT("DSW7")	/* (don't know to which one of the */
-	AM_RANGE(0xb810, 0xb810) AM_READ_PORT("UNK1")
-	AM_RANGE(0xb811, 0xb811) AM_READ_PORT("UNK2")
-	AM_RANGE(0xb820, 0xb820) AM_READ_PORT("DSW2")
-  AM_RANGE(0xb830, 0xb830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
-  AM_RANGE(0xb840, 0xb840) AM_WRITE(ay8910_control_port_0_w)
-//  AM_RANGE(0xba00, 0xba00) AM_WRITE(goldstar_fa00_w)
-//  AM_RANGE(0xbb00, 0xbb00) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
-//  AM_RANGE(0xbd00, 0xbdff) AM_READWRITE(SMH_RAM,paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
-//  AM_RANGE(0xbe00, 0xbe00) AM_READWRITE(protection_r,protection_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( goldstar_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( ncb3_readwriteport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
+//	AM_RANGE(0x00, 0x0f) ---> writes.
 ADDRESS_MAP_END
+
+/* ncb3 findings...
+
+  f800-f803 = 8255_1 (ctrl=9b) ; portA, B & C (input)
+  f810-f813 = 8255_2 (ctrl=9b) ; portA, B & C (input)
+  f820-f823 = 8255_3 (ctrl=90) ; portA (input); ports B & C (output)
+  f830      = AY8910 RW
+  f840      = AY8910 ctrl
+  f850      = Unknown
+  f870      = PSG (init writes)
+
+
+  I/O
+
+  00 = RW
+  06 = RW
+  08 = RW
+  81 =  W
+
+*/
 
 
 static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_WRITENOP
-
 
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size) // not here..
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
@@ -374,6 +358,39 @@ static INPUT_PORTS_START( cmv801 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_WRITE(goldstar_reel1_ram_w) AM_BASE(&goldstar_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_WRITE(goldstar_reel2_ram_w) AM_BASE(&goldstar_reel2_ram)
+	AM_RANGE(0xa800, 0xa9ff) AM_RAM AM_WRITE(goldstar_reel3_ram_w) AM_BASE(&goldstar_reel3_ram)
+	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
+	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(&goldstar_reel2_scroll)
+	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(&goldstar_reel3_scroll)
+
+	/* none of the inputs are verified / tested */
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("IN0")
+	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("IN1")	/* Test Mode */
+	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("DSW1")
+	//AM_RANGE(0xb803, 0xb803)
+	//AM_RANGE(0xb804, 0xb804)
+	AM_RANGE(0xb805, 0xb805) AM_READ_PORT("DSW4")	/* DSW 4 (also appears in 8910 port) */
+	AM_RANGE(0xb806, 0xb806) AM_READ_PORT("DSW7")	/* (don't know to which one of the */
+	AM_RANGE(0xb810, 0xb810) AM_READ_PORT("UNK1")
+	AM_RANGE(0xb811, 0xb811) AM_READ_PORT("UNK2")
+	AM_RANGE(0xb820, 0xb820) AM_READ_PORT("DSW2")
+  AM_RANGE(0xb830, 0xb830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
+  AM_RANGE(0xb840, 0xb840) AM_WRITE(ay8910_control_port_0_w)
+//  AM_RANGE(0xba00, 0xba00) AM_WRITE(goldstar_fa00_w)
+//  AM_RANGE(0xbb00, 0xbb00) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
+//  AM_RANGE(0xbd00, 0xbdff) AM_READWRITE(SMH_RAM,paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
+//  AM_RANGE(0xbe00, 0xbe00) AM_READWRITE(protection_r,protection_w)
+ADDRESS_MAP_END
+
+
 static INPUT_PORTS_START( goldstar )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -500,6 +517,329 @@ static INPUT_PORTS_START( goldstar )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( chryigld )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 2 / Double-Up") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Blue Bet / Card 3")  PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Stop 1")             PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Red Bet / Card 2")   PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 3 / Info / Card 1")    PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Start / Stop All / Card 4") PORT_CODE(KEYCODE_N)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1)    PORT_IMPULSE(2)	// Coin1?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2)    PORT_IMPULSE(2)	// Coin2?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3)    PORT_IMPULSE(2)	// Coin3?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key In") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4)    PORT_IMPULSE(2)	// Coin4?
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key Out / Attendant") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Stats")    PORT_CODE(KEYCODE_0)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x04, "Main Game %" )
+	PORT_DIPSETTING(    0x00, "55%" )
+	PORT_DIPSETTING(    0x01, "60%" )
+	PORT_DIPSETTING(    0x02, "65%" )
+	PORT_DIPSETTING(    0x03, "70%" )
+	PORT_DIPSETTING(    0x04, "75%" )
+	PORT_DIPSETTING(    0x05, "80%" )
+	PORT_DIPSETTING(    0x06, "85%" )
+	PORT_DIPSETTING(    0x07, "90%" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Key-In Type" )
+	PORT_DIPSETTING(    0x40, "B-Type" )
+	PORT_DIPSETTING(    0x00, "A-Type" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ncb3 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 2 / Double-Up") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Blue Bet / Card 3")  PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Stop 1")             PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Red Bet / Card 2")   PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 3 / Info / Card 1")    PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Start / Stop All / Card 4") PORT_CODE(KEYCODE_N)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1)    PORT_IMPULSE(2)	// Coin1?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2)    PORT_IMPULSE(2)	// Coin2?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3)    PORT_IMPULSE(2)	// Coin3?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key In") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4)    PORT_IMPULSE(2)	// Coin4?
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key Out / Attendant") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Stats")    PORT_CODE(KEYCODE_0)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x04, "Main Game %" )
+	PORT_DIPSETTING(    0x00, "55%" )
+	PORT_DIPSETTING(    0x01, "60%" )
+	PORT_DIPSETTING(    0x02, "65%" )
+	PORT_DIPSETTING(    0x03, "70%" )
+	PORT_DIPSETTING(    0x04, "75%" )
+	PORT_DIPSETTING(    0x05, "80%" )
+	PORT_DIPSETTING(    0x06, "85%" )
+	PORT_DIPSETTING(    0x07, "90%" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Key-In Type" )
+	PORT_DIPSETTING(    0x40, "B-Type" )
+	PORT_DIPSETTING(    0x00, "A-Type" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 
 
@@ -597,17 +937,31 @@ static const gfx_layout tiles8x32x4_layout =
 	32*8
 };
 
-
-
+static const gfx_layout tiles8x32x5_layout =
+{
+	8,32,
+	RGN_FRAC(1,5),
+	5,
+	{ RGN_FRAC(0,5), RGN_FRAC(1,5), RGN_FRAC(2,5), RGN_FRAC(3,5), RGN_FRAC(4,5) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
+	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8,
+	 16*8,17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
+     24*8,25*8, 26*8, 27*8, 28*8, 29*8, 30*8, 31*8
+	},
+	32*8
+};
 
 static GFXDECODE_START( goldstar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128,  8 )
 GFXDECODE_END
+
 static GFXDECODE_START( bl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayoutbl, 128,  8 )
 GFXDECODE_END
+
 static GFXDECODE_START( ml )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x18000, tilelayout, 128,  8 )
@@ -622,6 +976,44 @@ static GFXDECODE_START( ncb3 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 )
 GFXDECODE_END
+
+static GFXDECODE_START( cmasterb )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x5_layout, 0, 4 )
+GFXDECODE_END
+
+
+/*************************************
+*      PPI 8255 (x3) Interfaces      *
+*************************************/
+
+static const ppi8255_interface ppi8255_intf[4] =
+{
+	{	/* A, B & C set as input */
+		DEVICE8_PORT("IN0"),	/* Port A read, IN0 */
+		NULL,					/* Port B read, IN1 */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	},
+	{	/* A, B & C set as input */
+		DEVICE8_PORT("IN1"),	/* Port A read, IN2 */
+		DEVICE8_PORT("IN2"),	/* Port B read, IN3 */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	},
+	{	/* A set as input */
+		DEVICE8_PORT("DSW1"),	/* Port A read, DSW4 */
+		NULL,					/* Port B read */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	}
+};
 
 static const ay8910_interface ay8910_config =
 {
@@ -759,13 +1151,18 @@ static PALETTE_INIT(cm)
 	}
 }
 
-static MACHINE_DRIVER_START( chry10 )
+static MACHINE_DRIVER_START( chryigld )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(ncb3_map,0)
-	MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_IO_MAP(ncb3_readwriteport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+	/* 3x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -784,10 +1181,14 @@ static MACHINE_DRIVER_START( chry10 )
 	MDRV_VIDEO_UPDATE(goldstar)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
-	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
-	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("sn1", SN76489, 3000000)	/* 3 MHz. */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("ay", AY8910,1500000)
+	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -798,8 +1199,13 @@ static MACHINE_DRIVER_START( ncb3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(ncb3_map,0)
-	MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_IO_MAP(ncb3_readwriteport,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+	/* 3x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -820,42 +1226,14 @@ static MACHINE_DRIVER_START( ncb3 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("sn1", SN76489, 3000000)	/* 3 MHz. */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
 	MDRV_SOUND_ADD("ay", AY8910,1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( lucky8 )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 12000000/3) // ?? Mhz
-	MDRV_CPU_PROGRAM_MAP(lucky8_map,0)
-	//MDRV_CPU_IO_MAP(goldstar_readport,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
-
-	MDRV_GFXDECODE(ncb3)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
-
-	MDRV_VIDEO_START(goldstar)
-	MDRV_VIDEO_UPDATE(goldstar)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
-	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
-	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
-MACHINE_DRIVER_END
-
 
 
 static MACHINE_DRIVER_START( cm )
@@ -892,6 +1270,73 @@ static MACHINE_DRIVER_START( cm )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified //"oki"
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( cmb )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
+	MDRV_CPU_PROGRAM_MAP(cm_map,0)
+	MDRV_CPU_IO_MAP(cm_portmap,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(cmasterb)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_INIT(cm)
+//  MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(cherrym)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
+	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
+	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
+
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified //"oki"
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( lucky8 )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, 12000000/3) // ?? Mhz
+	MDRV_CPU_PROGRAM_MAP(lucky8_map,0)
+	//MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(ncb3)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(goldstar)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
+	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
+	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
+MACHINE_DRIVER_END
+
 
 
 /***************************************************************************
@@ -958,6 +1403,7 @@ ROMs
 1x ispLSI1024-60LJ (pl3)(read protected)
 3x PALCE16V8H (pl4,pl6,pl7)(read protected)
 1x PEEL22CV10 (pl5)(read protected)
+
 Note
 
 1x 36x2 edge connector
@@ -1054,7 +1500,6 @@ ROM_START( chryigld )
 ROM_END
 
 
-
 ROM_START( moonlght )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "4.bin",  	  0x0000, 0x20000, CRC(ecb06cfb) SHA1(e32613cac5583a0fecf04fca98796b91698e530c) )
@@ -1068,6 +1513,7 @@ ROM_START( moonlght )
 	ROM_REGION( 0x20000, "oki", 0 )	/* Audio ADPCM */
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
+
 
 
 ROM_START( ncb3 )
@@ -1154,6 +1600,55 @@ ROM_START( cmv801 )
 	ROM_LOAD( "prom1.287", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+// this is probably different hardware..
+ROM_START( cmaster )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "8.bin",   0x00000, 0x10000, CRC(31a16d9f) SHA1(f007148449d66954b780f12a9f910968a4052482) )
+
+	ROM_REGION( 0x40000, "user1", 0 )
+	ROM_LOAD( "9.bin",   0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) ) // ?
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "5.bin",   0x00000, 0x8000, CRC(28ff88cc) SHA1(46bc0407be857e8348159735b60cfb660f047a56) )
+	ROM_LOAD( "6.bin",   0x08000, 0x8000, CRC(13582e74) SHA1(27e318542606b8e8d38250749ba996402d314abd) )
+	ROM_LOAD( "7.bin",   0x10000, 0x8000, CRC(1edf1f1d) SHA1(558fa01f1efd7f6541047d3930bdce0974bae5b0))
+
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "1.bin",     0x0000, 0x8000, CRC(71bdab69) SHA1(d2c594ed88d6368df15b623c48eecc1c219b839e) )
+	ROM_LOAD( "2.bin",     0x8000, 0x8000, CRC(fccd48d7) SHA1(af564f5ef9ff5b6363897ce6bdf0b21123911fd4) )
+	ROM_LOAD( "3.bin",     0x10000, 0x8000, CRC(dc77d04a) SHA1(d8656130cde54d4bb96307899f6d607867e49e6c) )
+	ROM_LOAD( "4.bin",	   0x18000, 0x8000, CRC(0dbabaa2) SHA1(44235b19dac1c996e2166672b03f6e3888ecbefa) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "p1.bin", 0x0000, 0x0100, CRC(ac529f04) SHA1(5bc92e50c85bb23e609172cc15c430ddea7fdcb5) )
+	ROM_LOAD( "p2.bin", 0x0100, 0x0100, CRC(3febce95) SHA1(c7c0fec0fb024ebf7d7365a09d28ba3d0037b0b4) )
+	ROM_LOAD( "p3.bin", 0x0200, 0x0100, CRC(99dbdf19) SHA1(3680335406f63289f8d9a81b4cd163e4aa0c14d4) )
+	ROM_LOAD( "p4.bin", 0x0300, 0x0100, CRC(72212427) SHA1(e87a91f28284313c706ebb8175a3586780636e31) )
+ROM_END
+
+ROM_START( cmasterb )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "3.bin",   0x00000, 0x10000, CRC(ccb64229) SHA1(532f4b59952702a3609ff20239acbbacaf71f38f) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "6.bin",   0x00000, 0x10000, CRC(a98d610f) SHA1(d14b3bc8bd6dc9fe2d3fb05ec08224b1a9d52bee) )
+	ROM_LOAD( "7.bin",   0x10000, 0x10000, CRC(a0ffd2d6) SHA1(e78d20d3ab578ccc880bc19678782cb1f8d3671e) )
+	ROM_LOAD( "8.bin",   0x20000, 0x10000, CRC(4f67fca7) SHA1(808e84b9b1f67f137528bb76b0e8aac3dceba20c) )
+
+	ROM_REGION( 0x50000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "9.bin",   0x00000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+	ROM_LOAD( "1.bin",   0x10000, 0x10000, CRC(634fe2ad) SHA1(2284a09446c8928060270861d372a19c0c9d827a) )
+	ROM_LOAD( "2.bin",   0x20000, 0x10000, CRC(a3d59f79) SHA1(588c45550cca673390a35af9617c68c853ff84ba) )
+	ROM_LOAD( "4.bin",   0x30000, 0x10000, CRC(52240e0f) SHA1(7b8375e1f91fdff2b4ccc2e81fbcf843f7ede292) )
+	ROM_LOAD( "5.bin",	 0x40000, 0x10000, CRC(763973c1) SHA1(b364f22041f1d678332554edb3c718cf0ad778b4) )
+
+	ROM_REGION( 0x400, "proms", 0 )	// from cmaster
+	ROM_LOAD( "p1.bin", 0x0000, 0x0100, CRC(ac529f04) SHA1(5bc92e50c85bb23e609172cc15c430ddea7fdcb5) )
+	ROM_LOAD( "p2.bin", 0x0100, 0x0100, CRC(3febce95) SHA1(c7c0fec0fb024ebf7d7365a09d28ba3d0037b0b4) )
+	ROM_LOAD( "p3.bin", 0x0200, 0x0100, CRC(99dbdf19) SHA1(3680335406f63289f8d9a81b4cd163e4aa0c14d4) )
+	ROM_LOAD( "p4.bin", 0x0300, 0x0100, CRC(72212427) SHA1(e87a91f28284313c706ebb8175a3586780636e31) )
+ROM_END
+
 /*
 
         Lucky 8 Line
@@ -1199,36 +1694,7 @@ ROM_START( lucky8 )
 	ROM_REGION( 0x40, "proms2", 0 )
 	ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
 	ROM_LOAD( "g13", 0x0020, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
-
 ROM_END
-
-
-// this is probably different hardware..
-ROM_START( cmaster )
-	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "8.bin",   0x00000, 0x10000, CRC(31a16d9f) SHA1(f007148449d66954b780f12a9f910968a4052482) )
-
-	ROM_REGION( 0x40000, "user1", 0 )
-	ROM_LOAD( "9.bin",   0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) ) // ?
-
-	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "5.bin",   0x00000, 0x8000, CRC(28ff88cc) SHA1(46bc0407be857e8348159735b60cfb660f047a56) )
-	ROM_LOAD( "6.bin",   0x08000, 0x8000, CRC(13582e74) SHA1(27e318542606b8e8d38250749ba996402d314abd) )
-	ROM_LOAD( "7.bin",   0x10000, 0x8000, CRC(1edf1f1d) SHA1(558fa01f1efd7f6541047d3930bdce0974bae5b0))
-
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "1.bin",     0x0000, 0x8000, CRC(71bdab69) SHA1(d2c594ed88d6368df15b623c48eecc1c219b839e) )
-	ROM_LOAD( "2.bin",     0x8000, 0x8000, CRC(fccd48d7) SHA1(af564f5ef9ff5b6363897ce6bdf0b21123911fd4) )
-	ROM_LOAD( "3.bin",     0x10000, 0x8000, CRC(dc77d04a) SHA1(d8656130cde54d4bb96307899f6d607867e49e6c) )
-	ROM_LOAD( "4.bin",	   0x18000, 0x8000, CRC(0dbabaa2) SHA1(44235b19dac1c996e2166672b03f6e3888ecbefa) )
-
-	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "p1.bin", 0x0000, 0x0100, CRC(ac529f04) SHA1(5bc92e50c85bb23e609172cc15c430ddea7fdcb5) )
-	ROM_LOAD( "p2.bin", 0x0100, 0x0100, CRC(3febce95) SHA1(c7c0fec0fb024ebf7d7365a09d28ba3d0037b0b4) )
-	ROM_LOAD( "p3.bin", 0x0200, 0x0100, CRC(99dbdf19) SHA1(3680335406f63289f8d9a81b4cd163e4aa0c14d4) )
-	ROM_LOAD( "p4.bin", 0x0300, 0x0100, CRC(72212427) SHA1(e87a91f28284313c706ebb8175a3586780636e31) )
-ROM_END
-
 
 
 static DRIVER_INIT(goldstar)
@@ -1303,17 +1769,23 @@ static DRIVER_INIT( chryigld )
 }
 
 
-GAME( 199?, goldstar, 0,        goldstar, goldstar, goldstar, ROT0, "IGS", "Golden Star", 0 )
-GAME( 199?, goldstbl, goldstar, goldstbl, goldstar, 0,        ROT0, "IGS", "Golden Star (Blue version)", 0 )
-GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "bootleg", "Moon Light (bootleg of Golden Star)", 0 )
-GAME( 199?, chry10,  goldstar,  chry10,  goldstar, chry10,  ROT0, "bootleg", "Cherry 10 (bootleg of Golden Star)", GAME_NOT_WORKING )
-GAME( 199?, chryigld, goldstar, chry10,  goldstar, chryigld,  ROT0, "bootleg", "Cherry I Gold (bootleg of Golden Star)", GAME_NOT_WORKING )
+/*********************************************
+*                Game Drivers                *
+**********************************************
+
+      YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME                                  FLAGS  */
+GAME( 199?, goldstar, 0,        goldstar, goldstar, goldstar, ROT0, "IGS",         "Golden Star",                            0 )
+GAME( 199?, goldstbl, goldstar, goldstbl, goldstar, 0,        ROT0, "IGS",         "Golden Star (Blue version)",             0 )
+GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "bootleg",     "Moon Light (bootleg of Golden Star)",    0 )
+GAME( 199?, chryigld, goldstar, chryigld, chryigld, chryigld, ROT0, "bootleg",     "Cherry I Gold (bootleg of Golden Star)", 0 )
+GAME( 199?, chry10,   goldstar, chryigld, goldstar, chry10,   ROT0, "bootleg",     "Cherry 10 (bootleg of Golden Star)",     GAME_NOT_WORKING )
 
 // are these really dyna, or bootlegs?
-GAME( 19??, ncb3,  goldstar,    ncb3, goldstar,  0, ROT0, "Dyna", "(New?) Cherry Bonus III", GAME_NOT_WORKING | GAME_NO_SOUND ) // set was labeled 'new cherry bonus 3' but there is no 'new' in the gfx roms
-GAME( 19??, cb3,   goldstar,    ncb3, goldstar,  0, ROT0, "Dyna", "Cherry Bonus III", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 19??, ncb3,     goldstar, ncb3,     ncb3,     0,        ROT0, "Dyna",        "Cherry Bonus III (Version 1.40)",        GAME_NOT_WORKING | GAME_WRONG_COLORS ) // set was labeled 'new cherry bonus 3' but there is no 'new' in the gfx roms
+GAME( 19??, cb3,      goldstar, ncb3,     goldstar, 0,        ROT0, "Dyna",        "Cherry Bonus III",                       GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_NO_SOUND )
 
 // cherry master hardware has a rather different mem map, but is basically the same
-GAME( 198?, cmv801, 0,   cm, cmv801, 0, ROT0, "Corsica", "Cherry Master (Corsica, v8.01)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // says ED-96 where the manufacturer is on some games..
-GAME( 1991, cmaster, 0,   cm, cmv801, 0, ROT0, "Dyna", "Cherry Master 91?", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // different HW? closer to cherry master 2?
-GAME( 1989, lucky8, 0, lucky8, goldstar, 0, ROT0, "Falcon", "Lucky 8 Lines", GAME_NOT_WORKING )
+GAME( 198?, cmv801,   0,        cm,       cmv801,   0,        ROT0, "Corsica",     "Cherry Master (Corsica, v8.01)",         GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // says ED-96 where the manufacturer is on some games..
+GAME( 1991, cmaster,  0,        cm,       cmv801,   0,        ROT0, "Dyna",        "Cherry Master 91?",                      GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // different HW? closer to cherry master 2?
+GAME( 1991, cmasterb, cmaster,  cmb,      cmv801,   0,        ROT0, "Dyna",        "Cherry Master I (v1.01)",                 GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1989, lucky8,   0,        lucky8,   goldstar, 0,        ROT0, "Wing Co.Ltd", "New Lucky 8 Lines",                      GAME_NOT_WORKING )
