@@ -2201,7 +2201,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 						const address_space *space = disasm_view_get_current_subview(info->view[0].view)->space;
 						if (debug_cpu_get_visible_cpu(info->machine) == space->cpu)
 						{
-							offs_t address = memory_byte_to_address(space, disasm_view_get_selected_address(info->view[0].view));
+							offs_t address = disasm_view_get_selected_address(info->view[0].view);
 							sprintf(command, "go %X", address);
 							debug_console_execute_command(info->machine, command, 1);
 						}
@@ -2214,7 +2214,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 						const address_space *space = disasm_view_get_current_subview(info->view[0].view)->space;
 						if (debug_cpu_get_visible_cpu(info->machine) == space->cpu)
 						{
-							offs_t address = memory_byte_to_address(space, disasm_view_get_selected_address(info->view[0].view));
+							offs_t address = disasm_view_get_selected_address(info->view[0].view);
 							cpu_debug_data *cpuinfo = cpu_get_debug_data(space->cpu);
 							debug_cpu_breakpoint *bp;
 							INT32 bpindex = -1;
