@@ -1615,9 +1615,8 @@ static TIMER_CALLBACK( soft_reset )
 	/* now we're running */
 	mame->current_phase = MAME_PHASE_RUNNING;
 
-	/* set the global time to the current time */
-	/* this allows 0-time queued callbacks to run before any CPUs execute */
-	timer_set_global_time(machine, timer_get_time(machine));
+	/* allow 0-time queued callbacks to run before any CPUs execute */
+	timer_execute_timers(machine);
 }
 
 

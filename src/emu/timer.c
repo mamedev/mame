@@ -29,9 +29,10 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_TIMERS		256
-#define MAX_QUANTA		16
+#define MAX_TIMERS				256
+#define MAX_QUANTA				16
 
+#define DEFAULT_MINIMUM_QUANTUM	ATTOSECONDS_IN_MSEC(100)
 
 
 /***************************************************************************
@@ -91,20 +92,22 @@ struct _timer_private
 {
 	/* list of active timers */
 	emu_timer 				timers[MAX_TIMERS]; /* actual timers */
-	emu_timer *				activelist;		/* head of the active list */
-	emu_timer *				freelist; 		/* head of the free list */
-	emu_timer *				freelist_tail;	/* tail of the free list */
+	emu_timer *				activelist;			/* head of the active list */
+	emu_timer *				freelist; 			/* head of the free list */
+	emu_timer *				freelist_tail;		/* tail of the free list */
+	
+	/* execution state */
+	timer_execution_state	exec;				/* current global execution state */
 
 	/* other internal states */
-	attotime 				basetime;		/* the current global base time */
-	emu_timer *				callback_timer;	/* pointer to the current callback timer */
+	emu_timer *				callback_timer;		/* pointer to the current callback timer */
 	UINT8					callback_timer_modified; /* TRUE if the current callback timer was modified */
 	attotime				callback_timer_expire_time; /* the original expiration time */
 
 	/* scheduling quanta */
 	quantum_slot 			quantum_list[MAX_QUANTA]; /* list of scheduling quanta */
-	quantum_slot *			quantum_current;/* current minimum quantum */
-	attoseconds_t 			quantum_minimum;/* duration of minimum quantum */
+	quantum_slot *			quantum_current;	/* current minimum quantum */
+	attoseconds_t 			quantum_minimum;	/* duration of minimum quantum */
 };
 
 
@@ -138,7 +141,7 @@ INLINE attotime get_current_time(running_machine *machine)
 
 	/* if we're executing as a particular CPU, use its local time as a base */
 	/* otherwise, return the global base time */
-	return cpuexec_override_local_time(machine, global->basetime);
+	return cpuexec_override_local_time(machine, global->exec.basetime);
 }
 
 
@@ -198,7 +201,7 @@ INLINE void timer_list_insert(emu_timer *timer)
 	#endif
 
 	/* loop over the timer list */
-	for (t = global->activelist; t; lt = t, t = t->next)
+	for (t = global->activelist; t != NULL; lt = t, t = t->next)
 	{
 		/* if the current list entry expires after us, we should be inserted before it */
 		if (attotime_compare(t->expire, expire) > 0)
@@ -207,20 +210,26 @@ INLINE void timer_list_insert(emu_timer *timer)
 			timer->prev = t->prev;
 			timer->next = t;
 
-			if (t->prev)
+			if (t->prev != NULL)
 				t->prev->next = timer;
 			else
+			{
 				global->activelist = timer;
+				global->exec.nextfire = timer->expire;
+			}
 			t->prev = timer;
 			return;
 		}
 	}
 
 	/* need to insert after the last one */
-	if (lt)
+	if (lt != NULL)
 		lt->next = timer;
 	else
+	{
 		global->activelist = timer;
+		global->exec.nextfire = timer->expire;
+	}
 	timer->prev = lt;
 	timer->next = NULL;
 }
@@ -263,11 +272,15 @@ INLINE void timer_list_remove(emu_timer *timer)
 	#endif
 
 	/* remove it from the list */
-	if (timer->prev)
+	if (timer->prev != NULL)
 		timer->prev->next = timer->next;
 	else
+	{
 		global->activelist = timer->next;
-	if (timer->next)
+		if (global->activelist != NULL)
+			global->exec.nextfire = global->activelist->expire;
+	}
+	if (timer->next != NULL)
 		timer->next->prev = timer->prev;
 }
 
@@ -291,13 +304,15 @@ void timer_init(running_machine *machine)
 	memset(global, 0, sizeof(*global));
 
 	/* we need to wait until the first call to timer_cyclestorun before using real CPU times */
-	global->basetime = attotime_zero;
+	global->exec.basetime = attotime_zero;
+	global->exec.nextfire = attotime_never;
+	global->exec.curquantum = DEFAULT_MINIMUM_QUANTUM;
 	global->callback_timer = NULL;
 	global->callback_timer_modified = FALSE;
 
 	/* register with the save state system */
-	state_save_register_item(machine, "timer", NULL, 0, global->basetime.seconds);
-	state_save_register_item(machine, "timer", NULL, 0, global->basetime.attoseconds);
+	state_save_register_item(machine, "timer", NULL, 0, global->exec.basetime.seconds);
+	state_save_register_item(machine, "timer", NULL, 0, global->exec.basetime.attoseconds);
 	state_save_register_postload(machine, timer_postload, NULL);
 
 	/* initialize the lists */
@@ -309,8 +324,8 @@ void timer_init(running_machine *machine)
 	global->freelist_tail = &global->timers[MAX_TIMERS-1];
 
 	/* reset the quanta */
-	global->quantum_list[0].requested = ATTOSECONDS_IN_MSEC(100);
-	global->quantum_list[0].actual = ATTOSECONDS_IN_MSEC(100);
+	global->quantum_list[0].requested = DEFAULT_MINIMUM_QUANTUM;
+	global->quantum_list[0].actual = DEFAULT_MINIMUM_QUANTUM;
 	global->quantum_list[0].expire = attotime_never;
 	global->quantum_current = &global->quantum_list[0];
 	global->quantum_minimum = ATTOSECONDS_IN_NSEC(1) / 1000;
@@ -334,17 +349,29 @@ void timer_destructor(void *ptr, size_t size)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    timer_next_fire_time - return the
-    time when the next timer will fire
+    timer_get_execution_state - return a pointer
+    to the execution state
 -------------------------------------------------*/
 
-attotime timer_next_fire_time(running_machine *machine)
+timer_execution_state *timer_get_execution_state(running_machine *machine)
 {
 	timer_private *global = machine->timer_data;
-	attotime quantum_time;
+	return &global->exec;
+}
+
+
+/*-------------------------------------------------
+    timer_execute_timers - execute timers and 
+    update scheduling quanta
+-------------------------------------------------*/
+
+void timer_execute_timers(running_machine *machine)
+{
+	timer_private *global = machine->timer_data;
+	emu_timer *timer;
 
 	/* if the current quantum has expired, find a new one */
-	if (attotime_compare(global->basetime, global->quantum_current->expire) >= 0)
+	if (attotime_compare(global->exec.basetime, global->quantum_current->expire) >= 0)
 	{
 		int curr;
 
@@ -353,29 +380,13 @@ attotime timer_next_fire_time(running_machine *machine)
 		for (curr = 1; curr < ARRAY_LENGTH(global->quantum_list); curr++)
 			if (global->quantum_list[curr].requested != 0 && global->quantum_list[curr].requested < global->quantum_current->requested)
 				global->quantum_current = &global->quantum_list[curr];
+		global->exec.curquantum = global->quantum_current->actual;
 	}
-	quantum_time = attotime_add_attoseconds(global->basetime, global->quantum_current->actual);
-	return attotime_min(quantum_time, global->activelist->expire);
-}
 
-
-/*-------------------------------------------------
-    timer_adjust_global_time - adjust the global
-    time; this is also where we fire the timers
--------------------------------------------------*/
-
-void timer_set_global_time(running_machine *machine, attotime newbase)
-{
-	timer_private *global = machine->timer_data;
-	emu_timer *timer;
-
-	/* set the new global offset */
-	global->basetime = newbase;
-
-	LOG(("timer_set_global_time: new=%s head->expire=%s\n", attotime_string(newbase, 9), attotime_string(global->activelist->expire, 9)));
+	LOG(("timer_set_global_time: new=%s head->expire=%s\n", attotime_string(global->exec.basetime, 9), attotime_string(global->activelist->expire, 9)));
 
 	/* now process any timers that are overdue */
-	while (attotime_compare(global->activelist->expire, global->basetime) <= 0)
+	while (attotime_compare(global->activelist->expire, global->exec.basetime) <= 0)
 	{
 		int was_enabled = global->activelist->enabled;
 
@@ -473,7 +484,10 @@ void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantu
 
 	/* update the minimum */
 	if (quantum < global->quantum_current->requested)
+	{
 		global->quantum_current = &global->quantum_list[blank];
+		global->exec.curquantum = global->quantum_current->actual;
+	}
 }
 
 
@@ -496,6 +510,9 @@ void timer_set_minimum_quantum(running_machine *machine, attoseconds_t quantum)
 	for (curr = 0; curr < ARRAY_LENGTH(global->quantum_list); curr++)
 		if (global->quantum_list[curr].requested != 0)
 			global->quantum_list[curr].actual = MAX(global->quantum_list[curr].requested, global->quantum_minimum);
+
+	/* ensure that the live current quantum is up to date */
+	global->exec.curquantum = global->quantum_current->actual;
 }
 
 

@@ -98,6 +98,15 @@ struct _timer_config
 typedef struct _emu_timer emu_timer;
 
 
+typedef struct _timer_execution_state timer_execution_state;
+struct _timer_execution_state
+{
+	attotime				nextfire;		/* time that the head of the timer list will fire */
+	attotime				basetime;		/* global basetime; everything moves forward from here */
+	attoseconds_t			curquantum;		/* current quantum of execution */
+};
+
+
 
 /***************************************************************************
     TIMER DEVICE CONFIGURATION MACROS
@@ -159,11 +168,11 @@ void timer_destructor(void *ptr, size_t size);
 
 /* ----- scheduling helpers ----- */
 
-/* return the time when the next timer will fire */
-attotime timer_next_fire_time(running_machine *machine);
+/* return a pointer to the execution state */
+timer_execution_state *timer_get_execution_state(running_machine *machine);
 
-/* adjust the global time; this is also where we fire the timers */
-void timer_set_global_time(running_machine *machine, attotime newbase);
+/* execute timers and update scheduling quanta */
+void timer_execute_timers(running_machine *machine);
 
 /* add a scheduling quantum; the smallest active one is the one that is in use */
 void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantum, attotime duration);

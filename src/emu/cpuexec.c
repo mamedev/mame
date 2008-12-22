@@ -59,6 +59,10 @@ struct _cpu_input_data
 typedef struct _cpu_class_data cpu_class_data;
 struct _cpu_class_data
 {
+	/* execution lists */
+	const device_config *device;			/* pointer back to our device */
+	cpu_class_data *next;					/* pointer to the next CPU to execute, in order */
+
 	/* cycle counting and executing */
 	int				profiler;				/* profiler tag */
 	int *			icount;					/* pointer to the icount */
@@ -104,6 +108,7 @@ struct _cpu_class_data
 struct _cpuexec_private
 {
 	const device_config *executingcpu;		/* pointer to the currently executing CPU */
+	cpu_class_data *executelist;			/* execution list; suspended CPUs are at the back */
 	char			statebuf[256];			/* string buffer containing state description */
 };
 
@@ -122,12 +127,24 @@ static TIMER_CALLBACK( triggertime_callback );
 static TIMER_CALLBACK( empty_event_queue );
 static IRQ_CALLBACK( standard_irq_callback );
 static void register_save_states(const device_config *device);
+static void rebuild_execute_list(running_machine *machine);
 static UINT64 get_register_value(const device_config *device, void *baseptr, const cpu_state_entry *entry);
 static void set_register_value(const device_config *device, void *baseptr, const cpu_state_entry *entry, UINT64 value);
 static void get_register_string_value(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *dest);
 #ifdef UNUSED_FUNCTION
 static int get_register_string_max_width(const device_config *device, void *baseptr, const cpu_state_entry *entry);
 #endif
+
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+/* these are macros to ensure inlining in cpuexec_timeslice */
+#define ATTOTIME_LT(a,b)		((a).seconds < (b).seconds || ((a).seconds == (b).seconds && (a).attoseconds < (b).attoseconds))
+#define ATTOTIME_NORMALIZE(a)	do { if ((a).attoseconds >= ATTOSECONDS_PER_SECOND) { (a).seconds++; (a).attoseconds -= ATTOSECONDS_PER_SECOND; } } while (0)
+
 
 
 /***************************************************************************
@@ -235,102 +252,127 @@ void cpuexec_init(running_machine *machine)
 void cpuexec_timeslice(running_machine *machine)
 {
 	int call_debugger = ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	timer_execution_state *timerexec = timer_get_execution_state(machine);
 	cpuexec_private *global = machine->cpuexec_data;
-	attotime target = timer_next_fire_time(machine);
-	attotime base = timer_get_time(machine);
-	const device_config *cpu;
 	int ran;
-
-	LOG(("------------------\n"));
-	LOG(("cpu_timeslice: target = %s\n", attotime_string(target, 9)));
-
-	/* apply pending suspension changes */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
+	
+	/* build the execution list if we don't have one yet */
+	if (global->executelist == NULL)
+		rebuild_execute_list(machine);
+	
+	/* loop until we hit the next timer */
+	while (ATTOTIME_LT(timerexec->basetime, timerexec->nextfire))
 	{
-		cpu_class_data *classdata = get_class_data(cpu);
-		classdata->suspend = classdata->nextsuspend;
-		classdata->nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
-		classdata->eatcycles = classdata->nexteatcycles;
-	}
+		cpu_class_data *classdata;
+		UINT32 suspendchanged;
+		attotime target;
+		
+		/* by default, assume our target is the end of the next quantum */
+		target.seconds = timerexec->basetime.seconds;
+		target.attoseconds = timerexec->basetime.attoseconds + timerexec->curquantum;
+		ATTOTIME_NORMALIZE(target);
 
-	/* loop over non-suspended CPUs */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
-	{
-		cpu_class_data *classdata = get_class_data(cpu);
-		if (classdata->suspend == 0)
+		/* however, if the next timer is going to fire before then, override */
+		assert(attotime_sub(timerexec->nextfire, target).seconds <= 0);
+		if (ATTOTIME_LT(timerexec->nextfire, target))
+			target = timerexec->nextfire;
+
+		LOG(("------------------\n"));
+		LOG(("cpu_timeslice: target = %s\n", attotime_string(target, 9)));
+
+		/* apply pending suspension changes */
+		suspendchanged = 0;
+		for (classdata = global->executelist; classdata != NULL; classdata = classdata->next)
 		{
-			attotime delta = attotime_sub(target, classdata->localtime);
-			if (delta.seconds >= 0 && delta.attoseconds >= classdata->attoseconds_per_cycle)
+			suspendchanged |= (classdata->suspend ^ classdata->nextsuspend);
+			classdata->suspend = classdata->nextsuspend;
+			classdata->nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
+			classdata->eatcycles = classdata->nexteatcycles;
+		}
+		
+		/* recompute the execute list if any CPUs changed their suspension state */
+		if (suspendchanged != 0)
+			rebuild_execute_list(machine);
+
+		/* loop over non-suspended CPUs */
+		for (classdata = global->executelist; classdata != NULL; classdata = classdata->next)
+		{
+			/* only process if our target is later than the CPU's current time (coarse check) */
+			if (target.seconds >= classdata->localtime.seconds)
 			{
-				/* compute how long to run */
-				classdata->cycles_running = div_64x32(delta.attoseconds >> classdata->divshift, classdata->divisor);
-				LOG(("  cpu '%s': %d cycles\n", cpu->tag, classdata->cycles_running));
+				attoseconds_t delta, actualdelta;
+				
+				/* compute how many attoseconds to execute this CPU */
+				delta = target.attoseconds - classdata->localtime.attoseconds;
+				if (delta < 0 && target.seconds > classdata->localtime.seconds)
+					delta += ATTOSECONDS_PER_SECOND;
+				assert(delta == attotime_to_attoseconds(attotime_sub(target, classdata->localtime)));
 
-				profiler_mark(classdata->profiler);
-
-				/* note that this global variable cycles_stolen can be modified */
-				/* via the call to cpu_execute */
-				classdata->cycles_stolen = 0;
-				global->executingcpu = cpu;
-				if (!call_debugger)
-					ran = cpu_execute(cpu, classdata->cycles_running);
-				else
+				/* if we have enough for at least 1 cycle, do the math */
+				if (delta >= classdata->attoseconds_per_cycle)
 				{
-					debugger_start_cpu_hook(cpu, target);
-					ran = cpu_execute(cpu, classdata->cycles_running);
-					debugger_stop_cpu_hook(cpu);
-				}
+					/* compute how many cycles we want to execute */
+					ran = classdata->cycles_running = divu_64x32((UINT64)delta >> classdata->divshift, classdata->divisor);
+					LOG(("  cpu '%s': %d cycles\n", classdata->device->tag, classdata->cycles_running));
 
-#ifdef MAME_DEBUG
-				if (ran < classdata->cycles_stolen)
-					fatalerror("Negative CPU cycle count!");
-#endif /* MAME_DEBUG */
+					/* if we're not suspended, actually execute */
+					if (classdata->suspend == 0)
+					{
+						profiler_mark(classdata->profiler);
 
-				ran -= classdata->cycles_stolen;
-				profiler_mark(PROFILER_END);
+						/* note that this global variable cycles_stolen can be modified */
+						/* via the call to cpu_execute */
+						classdata->cycles_stolen = 0;
+						global->executingcpu = classdata->device;
+						if (!call_debugger)
+							ran = cpu_execute(classdata->device, classdata->cycles_running);
+						else
+						{
+							debugger_start_cpu_hook(classdata->device, target);
+							ran = cpu_execute(classdata->device, classdata->cycles_running);
+							debugger_stop_cpu_hook(classdata->device);
+						}
 
-				/* account for these cycles */
-				classdata->totalcycles += ran;
-				classdata->localtime = attotime_add_attoseconds(classdata->localtime, ran * classdata->attoseconds_per_cycle);
-				LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)classdata->totalcycles, attotime_string(classdata->localtime, 9)));
+						/* adjust for any cycles we took back */
+						assert(ran >= classdata->cycles_stolen);
+						ran -= classdata->cycles_stolen;
+						profiler_mark(PROFILER_END);
+					}
+					
+					/* account for these cycles */
+					classdata->totalcycles += ran;
+					
+					/* update the local time for this CPU */
+					actualdelta = classdata->attoseconds_per_cycle * ran;
+					classdata->localtime.attoseconds += actualdelta;
+					ATTOTIME_NORMALIZE(classdata->localtime);
+					LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)classdata->totalcycles, attotime_string(classdata->localtime, 9)));
 
-				/* if the new local CPU time is less than our target, move the target up */
-				if (attotime_compare(classdata->localtime, target) < 0)
-				{
-					target = attotime_max(classdata->localtime, base);
-					LOG(("         (new target)\n"));
+					/* if the new local CPU time is less than our target, move the target up */
+					if (ATTOTIME_LT(classdata->localtime, target))
+					{
+						assert(attotime_compare(classdata->localtime, target) < 0);
+						target = classdata->localtime;
+						
+						/* however, if this puts us before the base, clamp to the base as a minimum */
+						if (ATTOTIME_LT(target, timerexec->basetime))
+						{
+							assert(attotime_compare(target, timerexec->basetime) < 0);
+							target = timerexec->basetime;
+						}
+						LOG(("         (new target)\n"));
+					}
 				}
 			}
 		}
-	}
-	global->executingcpu = NULL;
+		global->executingcpu = NULL;
 
-	/* update the local times of all CPUs */
-	for (cpu = machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
-	{
-		cpu_class_data *classdata = get_class_data(cpu);
-
-		/* if we're suspended and counting, process */
-		if (classdata->suspend != 0 && classdata->eatcycles && attotime_compare(classdata->localtime, target) < 0)
-		{
-			attotime delta = attotime_sub(target, classdata->localtime);
-
-			/* compute how long to run */
-			classdata->cycles_running = div_64x32(delta.attoseconds >> classdata->divshift, classdata->divisor);
-			LOG(("  cpu '%s': %d cycles (suspended)\n", cpu->tag, classdata->cycles_running));
-
-			classdata->totalcycles += classdata->cycles_running;
-			classdata->localtime = attotime_add_attoseconds(classdata->localtime, classdata->cycles_running * classdata->attoseconds_per_cycle);
-			LOG(("         %d skipped, %d total, time = %s\n", classdata->cycles_running, (INT32)classdata->totalcycles, attotime_string(classdata->localtime, 9)));
-		}
-
-		/* update the suspend state (breaks steeltal if we don't) */
-		classdata->suspend = classdata->nextsuspend;
-		classdata->eatcycles = classdata->nexteatcycles;
+		/* update the base time */
+		timerexec->basetime = target;
 	}
 
-	/* update the global time */
-	timer_set_global_time(machine, target);
+	/* execute timers */
+	timer_execute_timers(machine);
 }
 
 
@@ -443,6 +485,7 @@ static DEVICE_START( cpu )
 	}
 
 	/* fill in the suspend states */
+	classdata->device = device;
 	classdata->profiler = index + PROFILER_CPU1;
 	classdata->suspend = SUSPEND_REASON_RESET;
 	classdata->inttrigger = index + TRIGGER_INT;
@@ -1091,7 +1134,7 @@ void cpuexec_trigger(running_machine *machine, int trigger)
 		cpu_abort_timeslice(cpu);
 
 		/* see if this is a matching trigger */
-		if (classdata->suspend != 0 && classdata->trigger == trigger)
+		if ((classdata->nextsuspend & SUSPEND_REASON_TRIGGER) != 0 && classdata->trigger == trigger)
 		{
 			cpu_resume(cpu, SUSPEND_REASON_TRIGGER);
 			classdata->trigger = 0;
@@ -1566,6 +1609,48 @@ static void register_save_states(const device_config *device)
 		state_save_register_device_item(device, line, inputline->vector);
 		state_save_register_device_item(device, line, inputline->curvector);
 		state_save_register_device_item(device, line, inputline->curstate);
+	}
+}
+
+
+/*-------------------------------------------------
+    rebuild_execute_list - rebuild the list of
+    executing CPUs, moving suspended CPUs to the
+    end
+-------------------------------------------------*/
+
+static void rebuild_execute_list(running_machine *machine)
+{
+	cpuexec_private *global = machine->cpuexec_data;
+	const device_config *curcpu;
+	cpu_class_data **tailptr;
+
+	/* start with an empty list */
+	tailptr = &global->executelist;
+	*tailptr = NULL;
+
+	/* first iterate over non-suspended CPUs */
+	for (curcpu = machine->cpu[0]; curcpu != NULL; curcpu = curcpu->typenext)
+	{
+		cpu_class_data *classdata = get_class_data(curcpu);
+		if (classdata->suspend == 0)
+		{
+			*tailptr = classdata;
+			tailptr = &classdata->next;
+			classdata->next = NULL;
+		}
+	}
+
+	/* then add the suspended CPUs */
+	for (curcpu = machine->cpu[0]; curcpu != NULL; curcpu = curcpu->typenext)
+	{
+		cpu_class_data *classdata = get_class_data(curcpu);
+		if (classdata->suspend != 0)
+		{
+			*tailptr = classdata;
+			tailptr = &classdata->next;
+			classdata->next = NULL;
+		}
 	}
 }
 
