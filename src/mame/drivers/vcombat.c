@@ -1,6 +1,8 @@
 /*
 Virtual Combat hardware games.
-
+ 
+Driver by Jason Eckhardt and Andrew Gardner. 
+ 
 ----
 
 There are two known games on this hardware.  Both are developed by
@@ -72,69 +74,138 @@ TODO :  This is a skeleton driver.  Nearly everything.
 #include "cpu/m68000/m68000.h"
 #include "video/generic.h"
 
+static UINT16* framebuffer;
+
+
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM		/* At the very least! */
+	AM_RANGE(0x200000, 0x2fffff) AM_RAM
+	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_BASE(&framebuffer)
+
+//	AM_RANGE(0x400000, 0x43ffff) i860 #1 shared RAM
+//	AM_RANGE(0x440000, 0x440003) i860 #1 com 1
+//	AM_RANGE(0x480000, 0x480003) i860 #1 com 2
+//	AM_RANGE(0x4c0000, 0x4c0003) i860 #1 stop/start/reset
+
+//	AM_RANGE(0x500000, 0x53ffff) i860 #2 shared RAM
+//	AM_RANGE(0x540000, 0x540003) i860 #2 com 1
+//	AM_RANGE(0x580000, 0x580003) i860 #2 com 2
+//	AM_RANGE(0x5c0000, 0x5c0003) i860 #2 stop/start/reset
+
+//	AM_RANGE(0x706000, 0x706003) Bt476 RAMDAC 
+//	AM_RANGE(0x706004, 0x706007) Bt476 RAMDAC (not sure if there are 2?)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-ADDRESS_MAP_END
 
-/*
-static ADDRESS_MAP_START( video_map, ADDRESS_SPACE_PROGRAM, 16 )
-    AM_RANGE(0x000000, 0x1fffff) AM_ROM
-ADDRESS_MAP_END
-*/
+// The first 3d CPU
+//static ADDRESS_MAP_START( 3d_1_map, ADDRESS_SPACE_PROGRAM, ?? )
+//	AM_RANGE(0x00000000, 0x000fffff) Shared framebuffer
+//	AM_RANGE(0xfffc0000, 0xffffffff) Shared RAM (0x400000 in 68k-land)
+//	AM_RANGE(0x20000000, 0x20000003) com 1      (0x440000 in 68k-land)
+//	AM_RANGE(0x40000000, 0x401fffff) AM_ROM
+//	AM_RANGE(0x80000000, 0x80000003) com 2      (0x480000 in 68k-land)
+//ADDRESS_MAP_END
+
+
+// The second 3d CPU
+//static ADDRESS_MAP_START( 3d_2_map, ADDRESS_SPACE_PROGRAM, ?? )
+//	AM_RANGE(0x00000000, 0x000fffff) Shared framebuffer
+//	AM_RANGE(0xfffc0000, 0xffffffff) Shared RAM (0x500000 in 68k-land)
+//	AM_RANGE(0x20000000, 0x20000003) com 1      (0x540000 in 68k-land)
+//	AM_RANGE(0x40000000, 0x401fffff) AM_ROM
+//	AM_RANGE(0x80000000, 0x80000003) com 2      (0x580000 in 68k-land)
+//ADDRESS_MAP_END
+
+
+// Sound CPU - temprarily disabled
+//static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+//	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+//ADDRESS_MAP_END
+
+
+static DRIVER_INIT( vcombat )
+{
+	UINT8 *ROM = memory_region(machine, "main");
+
+	// pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
+	ROM[0x4017] = 0x66;
+	// pc==40fa : jump 40fc ... 600004 should be -16? (interrupts still masked out)
+	ROM[0x40fb] = 0x67;
+	// pc==410e : jump 4110 ... 600004 should be 31 now? (interrupts still masked out)
+	ROM[0x410f] = 0x67;
+	// pc==e220 : jump e222 ... 20119a should not be 0. (no interrupts masked)
+	// TODO: I wonder if this is an input bit or something.  The menu selection continually crawls up.
+}
+
 
 static INPUT_PORTS_START( vcombat )
 INPUT_PORTS_END
 
+
 static VIDEO_UPDATE( vcombat )
 {
+	int x, y;
+	int count = 0;
+
+	for(y = 0; y < 480; y++)
+	{
+		for(x = 0; x < 256; x++)
+		{
+			//UINT32 r,g,b;
+			UINT32 color;
+
+			if (x % 2) color = (framebuffer[count] & 0xff00) >> 8;
+			else	   color =  framebuffer[count] & 0x00ff;
+
+			if(x < video_screen_get_visible_area(screen)->max_x && y < video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y, x) = color | (color<<8) | (color<<16);
+
+			if (x % 2) count++;
+		}
+	}
 	return 0;
 }
 
+
+// This is just here to show that there is text in the main program ROM.  It probably won't really be a useful decode.
 static const gfx_layout vcombat_charlayout =
 {
 	8, 8,
 	0x100000 / 0x80,
 	8,
 	{ 0,1,2,3,4,5,6,7 },
-	{ 0*16,  1*16,  2*16,  3*16,  4*16,  5*16,  6*16,  7*16 },
+	{ 0*16,   1*16,   2*16,   3*16,   4*16,   5*16,   6*16,   7*16 },
 	{ 0*16*8, 1*16*8, 2*16*8, 3*16*8, 4*16*8, 5*16*8, 6*16*8, 7*16*8 },
 	8 * 0x80
 };
+
 
 static GFXDECODE_START( vcombat )
 	GFXDECODE_ENTRY( "main", 0, vcombat_charlayout, 0, 256 )
 GFXDECODE_END
 
+
 static MACHINE_DRIVER_START( vcombat )
 	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq7_line_hold)			/* The only un-masked irq thus far */
+	//MDRV_CPU_VBLANK_INT("main", irq7_line_hold)
 
-	MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	// Disabled for now
+	//MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
+	//MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-/*
-    Virtual combat has an i860 on each of its two upper boards.
-    MDRV_CPU_ADD("video", i860, XTAL_20MHz)
-    MDRV_CPU_PROGRAM_MAP(video_map,0)
-*/
+	// Likely will go away
+	MDRV_GFXDECODE(vcombat)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_GFXDECODE(vcombat)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	/*MDRV_PALETTE_LENGTH(0x100)*/
-
-	MDRV_QUANTUM_TIME(HZ(120000))	/* Temporary */
+	// Seems there is a RAMDAC out there.  Maybe it's for the palette?
+	/*MDRV_PALETTE_LENGTH(0x256)*/
 
 	MDRV_VIDEO_UPDATE(vcombat)
 MACHINE_DRIVER_END
@@ -198,6 +269,6 @@ ROM_START( shadfgtr )
 	/* The second upper-board PAL couldn't be read */
 ROM_END
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT    INIT MONITOR COMPANY     FULLNAME           FLAGS */
-GAME( 1993, vcombat,  0,      vcombat, vcombat, 0,   ROT0,   "VR8 Inc.", "Virtual Combat",  GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1989, shadfgtr, 0,      vcombat, vcombat, 0,   ROT0,   "Sega?",    "Shadow Fighters", GAME_NOT_WORKING | GAME_NO_SOUND )
+/*    YEAR  NAME      PARENT  MACHINE  INPUT    INIT     MONITOR COMPANY     FULLNAME           FLAGS */
+GAME( 1993, vcombat,  0,      vcombat, vcombat, vcombat, ROT0,   "VR8 Inc.", "Virtual Combat",  GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1989, shadfgtr, 0,      vcombat, vcombat, 0,       ROT0,   "Sega?",    "Shadow Fighters", GAME_NOT_WORKING | GAME_NO_SOUND )
