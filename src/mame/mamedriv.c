@@ -8439,4 +8439,7 @@ Other Sun games
 	/* Aristocrat */
 	DRIVER ( caswin )
 
+	/* Eagle */
+	DRIVER ( janshi )
+
 #endif	/* DRIVER_RECURSIVE */
