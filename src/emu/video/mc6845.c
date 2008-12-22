@@ -871,7 +871,7 @@ static DEVICE_VALIDITY_CHECK( mc6845 )
 	int error = FALSE;
 	const mc6845_interface *intf = (const mc6845_interface *) device->static_config;
 
-	if (intf != NULL)
+	if (intf != NULL && intf->screen_tag != NULL)
 	{
 		if (device->clock <= 0)
 		{
