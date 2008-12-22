@@ -8435,4 +8435,7 @@ Other Sun games
 	/* STG? */
 	DRIVER ( queen )
 
+	/* Aristocrat */
+	DRIVER ( caswin )
+
 #endif	/* DRIVER_RECURSIVE */
