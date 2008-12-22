@@ -5,9 +5,10 @@
 Janshi
 (c)1992 Eagle
 
-CPU: 68000? -- no, it isn't, might be Z180 internal rom?
+CPU: HD647180X0P6 (might have internal rom)
 Sound: AY-3-8910, M6295
 Others: Battery
+OSC: 32MHz, 21MHz & 12.2880MHz
 
 ROMs:
 1.1A         [92b140a5]
@@ -70,7 +71,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( janshi )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,8000000)/*Z80? Z180?*/		 /* ? MHz */
+	MDRV_CPU_ADD("main", Z80,6000000) /* Z180 */		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(0,mainmap)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
