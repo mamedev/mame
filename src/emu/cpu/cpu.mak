@@ -622,10 +622,9 @@ $(CPUOBJ)/e132xs/e132xs.o:	$(CPUSRC)/e132xs/e132xs.c \
 # Intel 8080/8085A
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_8080=$(if $(filter 8080,$(CPUS)),1,0)
-CPUDEFS += -DHAS_8085A=$(if $(filter 8085A,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8085=$(if $(filter I8085,$(CPUS)),1,0)
 
-ifneq ($(filter 8080 8085A,$(CPUS)),)
+ifneq ($(filter I8085,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i8085
 CPUOBJS += $(CPUOBJ)/i8085/i8085.o
 DBGOBJS += $(CPUOBJ)/i8085/8085dasm.o

@@ -504,10 +504,19 @@ MACHINE_DRIVER_END
 
 /* Same as Phoenix, but uses an AY8910 and an extra visible line (column) */
 
+static const i8085_config survival_i8085_config =
+{
+	NULL,					/* INTE changed callback */
+	NULL,					/* STATUS changed callback */
+	NULL,					/* SOD changed callback (8085A only) */
+	survival_sid_callback	/* SID changed callback (8085A only) */
+};
+
 static MACHINE_DRIVER_START( survival )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", 8085A, CPU_CLOCK)	/* 5.50 MHz */
+	MDRV_CPU_CONFIG(survival_i8085_config)
 	MDRV_CPU_PROGRAM_MAP(survival_memory_map, 0)
 
 	MDRV_MACHINE_RESET(phoenix)
@@ -1019,11 +1028,6 @@ static DRIVER_INIT( condor )
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x5000, 0, 0, input_port_read_handler8(machine->portconfig, "DSW1") );
 }
 
-static DRIVER_INIT( survival )
-{
-	i8085_set_sid_callback(machine->cpu[0], survival_sid_callback);
-}
-
 
 
 GAME( 1980, phoenix,  0,        phoenix,  phoenix,  0,        ROT90, "Amstar", "Phoenix (Amstar)", GAME_SUPPORTS_SAVE )
@@ -1049,4 +1053,4 @@ GAME( 1981, pleiadbl, pleiads,  pleiads,  pleiads,  0,        ROT90, "bootleg", 
 GAME( 1981, pleiadce, pleiads,  pleiads,  pleiadce, 0,        ROT90, "Tehkan (Centuri license)", "Pleiads (Centuri)", GAME_IMPERFECT_COLORS )
 GAME( 1981, capitol,  pleiads,  phoenix,  capitol,  0,        ROT90, "Universal Video Spiel", "Capitol", GAME_IMPERFECT_COLORS )
 
-GAME( 1982, survival, 0,        survival, survival, survival, ROT90, "Rock-ola", "Survival", GAME_IMPERFECT_COLORS )
+GAME( 1982, survival, 0,        survival, survival, 0,        ROT90, "Rock-ola", "Survival", GAME_IMPERFECT_COLORS )

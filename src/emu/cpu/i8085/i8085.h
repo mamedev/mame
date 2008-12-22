@@ -1,30 +1,24 @@
-#ifndef I8085_H
-#define I8085_H
+#ifndef __I8085_H__
+#define __I8085_H__
 
 #include "cpuintrf.h"
 
-enum
-{
-	I8085_PC=1, I8085_SP, I8085_AF ,I8085_BC, I8085_DE, I8085_HL,
-	I8085_HALT, I8085_IM, I8085_IREQ, I8085_ISRV, I8085_VECTOR,
-	I8085_TRAP_STATE, I8085_INTR_STATE,
-	I8085_RST55_STATE, I8085_RST65_STATE, I8085_RST75_STATE, I8085_STATUS
-};
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
 enum
 {
-	CPUINFO_FCT_I8085_SOD_CALLBACK = CPUINFO_FCT_CPU_SPECIFIC,
-	CPUINFO_FCT_I8085_SID_CALLBACK,
-	CPUINFO_FCT_I8085_INTE_CALLBACK,
-	CPUINFO_FCT_I8085_STATUS_CALLBACK,
-
-	CPUINFO_INT_I8085_SID = CPUINFO_INT_CPU_SPECIFIC
+	I8085_PC, I8085_SP, I8085_AF, I8085_BC, I8085_DE, I8085_HL,
+	I8085_A, I8085_B, I8085_C, I8085_D, I8085_E, I8085_H, I8085_L,
+	I8085_STATUS, I8085_SOD, I8085_SID, I8085_INTE,
+	I8085_HALT, I8085_IM,
+	
+	I8085_GENPC = REG_GENPC,
+	I8085_GENSP = REG_GENSP,
+	I8085_GENPCBASE = REG_GENPCBASE
 };
-
-typedef void (*i8085_sod_func)(const device_config *device, int state);
-typedef int (*i8085_sid_func)(const device_config *device);
-typedef void (*i8085_inte_func)(const device_config *device, int state);
-typedef void (*i8085_status_func)(const device_config *device, UINT8 status);
 
 
 #define I8085_INTR_LINE     0
@@ -32,63 +26,40 @@ typedef void (*i8085_status_func)(const device_config *device, UINT8 status);
 #define I8085_RST65_LINE	2
 #define I8085_RST75_LINE	3
 
-CPU_GET_INFO( i8085 );
-#define CPU_8085A CPU_GET_INFO_NAME( i8085 )
 
-/**************************************************************************
- * I8080 section
- **************************************************************************/
-#if (HAS_8080)
-#define I8080_PC                I8085_PC
-#define I8080_SP				I8085_SP
-#define I8080_BC				I8085_BC
-#define I8080_DE				I8085_DE
-#define I8080_HL				I8085_HL
-#define I8080_AF				I8085_AF
-#define I8080_HALT				I8085_HALT
-#define I8080_IREQ				I8085_IREQ
-#define I8080_ISRV				I8085_ISRV
-#define I8080_VECTOR			I8085_VECTOR
-#define I8080_TRAP_STATE		I8085_TRAP_STATE
-#define I8080_INTR_STATE		I8085_INTR_STATE
-#define I8080_STATUS			I8085_STATUS
-#define I8080_REG_LAYOUT \
-{	CPU_8080, \
-	I8080_AF,I8080_BC,I8080_DE,I8080_HL,I8080_SP,I8080_PC, DBG_ROW, \
-	I8080_HALT,I8080_IREQ,I8080_ISRV,I8080_VECTOR, I8080_STATUS, \
-    DBG_END }
 
-#define I8080_INTR_LINE         I8085_INTR_LINE
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef void (*i8085_sod_func)(const device_config *device, int state);
+typedef int (*i8085_sid_func)(const device_config *device);
+typedef void (*i8085_inte_func)(const device_config *device, int state);
+typedef void (*i8085_status_func)(const device_config *device, UINT8 status);
+
+typedef struct _i8085_config i8085_config;
+struct _i8085_config
+{
+	i8085_inte_func		inte;				/* INTE changed callback */
+	i8085_status_func	status;				/* STATUS changed callback */
+	i8085_sod_func		sod;				/* SOD changed callback (8085A only) */
+	i8085_sid_func		sid;				/* SID changed callback (8085A only) */
+};
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
 CPU_GET_INFO( i8080 );
 #define CPU_8080 CPU_GET_INFO_NAME( i8080 )
-#endif
+
+CPU_GET_INFO( i8085 );
+#define CPU_8085A CPU_GET_INFO_NAME( i8085 )
 
 CPU_DISASSEMBLE( i8085 );
 
-INLINE void i8085_set_sod_callback(const device_config *device, i8085_sod_func callback)
-{
-	device_set_info_fct(device, CPUINFO_FCT_I8085_SOD_CALLBACK, (genf *)callback);
-}
-
-INLINE void i8085_set_sid_callback(const device_config *device, i8085_sid_func callback)
-{
-	device_set_info_fct(device, CPUINFO_FCT_I8085_SID_CALLBACK, (genf *)callback);
-}
-
-INLINE void i8085_set_inte_callback(const device_config *device, i8085_inte_func callback)
-{
-	device_set_info_fct(device, CPUINFO_FCT_I8085_INTE_CALLBACK, (genf *)callback);
-}
-
-INLINE void i8085_set_status_callback(const device_config *device, i8085_status_func callback)
-{
-	device_set_info_fct(device, CPUINFO_FCT_I8085_STATUS_CALLBACK, (genf *)callback);
-}
-
-INLINE void i8085_set_sid(const device_config *device, int sid)
-{
-	device_set_info_int(device, CPUINFO_INT_I8085_SID, sid);
-}
+#define i8085_set_sid(cpu, sid)		cpu_set_reg(cpu, I8085_SID, sid)
 
 #endif

@@ -122,8 +122,6 @@
  *
  *****************************************************************************/
 
-/*int survival_prot = 0; */
-
 #include "debugger.h"
 #include "i8085.h"
 #include "i8085cpu.h"
@@ -133,50 +131,205 @@
 
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-#define I8085_INTR      0xff
+#define CPUTYPE_8080	0
+#define CPUTYPE_8085	1
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef struct _i8085_state i8085_state;
 struct _i8085_state
 {
-	int 	cputype;	/* 0 8080, 1 8085A */
-	PAIR	PC,SP,AF,BC,DE,HL,XX;
-	UINT8	HALT;
-	UINT8	IM; 		/* interrupt mask */
-	UINT8	IREQ;		/* requested interrupts */
-	UINT8	ISRV;		/* serviced interrupt */
-	UINT32	INTR;		/* vector for INTR */
-	UINT32	IRQ2;		/* scheduled interrupt address */
-	UINT32	IRQ1;		/* executed interrupt address */
-	UINT8   STATUS;		/* status word */
-	UINT8	after_ei;	/* are we in the EI shadow? */
-	INT8	irq_state[4];
-	cpu_irq_callback irq_callback;
+	i8085_config 		config;
+	int 				cputype;		/* 0 8080, 1 8085A */
+	PAIR				PC,SP,AF,BC,DE,HL,XX;
+	UINT8				HALT;
+	UINT8				IM; 			/* interrupt mask (8085A only) */
+	UINT8   			STATUS;			/* status word */
+
+	UINT8				after_ei;		/* post-EI processing; starts at 2, check for ints at 0 */
+	UINT8				nmi_state;		/* raw NMI line state */
+	UINT8				irq_state[4];	/* raw IRQ line states */
+	UINT8				trap_pending;	/* TRAP interrupt latched? */
+	UINT8				trap_im_copy;	/* copy of IM register when TRAP was taken */
+	UINT8				sod_state;		/* state of the SOD line */
+	
+	UINT8				ietemp;			/* import/export temp space */
+
+	cpu_irq_callback 	irq_callback;
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
-	i8085_sod_func sod_callback;
-	i8085_sid_func sid_callback;
-	i8085_inte_func inte_callback;
-	i8085_status_func status_callback;
-	int		icount;
-	UINT8 	rim_ien;
+	cpu_state_table 	state;
+	int					icount;
 };
+
+
+
+/***************************************************************************
+    CPU STATE DESCRIPTION
+***************************************************************************/
+
+#define I8085_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	CPU_STATE_ENTRY(I8085_##_name, #_name, _format, i8085_state, _member, _datamask, ~0, _flags)
+
+static const cpu_state_entry state_array[] =
+{
+	I8085_STATE_ENTRY(PC,  "%04X", PC.w.l, 0xffff, 0)
+	I8085_STATE_ENTRY(GENPC, "%04X", PC.w.l, 0xffff, CPUSTATE_NOSHOW)
+//	I8085_STATE_ENTRY(GENPCBASE, "%04X", prvpc.w.l, 0xffff, CPUSTATE_NOSHOW)
+	
+	I8085_STATE_ENTRY(SP,  "%04X", PC.w.l, 0xffff, 0)
+	I8085_STATE_ENTRY(GENSP, "%04X", PC.w.l, 0xffff, CPUSTATE_NOSHOW)
+	
+	I8085_STATE_ENTRY(A, "%02X", AF.b.l, 0xff, CPUSTATE_NOSHOW)
+	I8085_STATE_ENTRY(B, "%02X", BC.b.h, 0xff, CPUSTATE_NOSHOW)
+	I8085_STATE_ENTRY(C, "%02X", BC.b.l, 0xff, CPUSTATE_NOSHOW)
+	I8085_STATE_ENTRY(D, "%02X", DE.b.h, 0xff, CPUSTATE_NOSHOW)
+	I8085_STATE_ENTRY(E, "%02X", DE.b.l, 0xff, CPUSTATE_NOSHOW)
+	I8085_STATE_ENTRY(H, "%02X", HL.b.h, 0xff, CPUSTATE_NOSHOW)
+	I8085_STATE_ENTRY(L, "%02X", HL.b.l, 0xff, CPUSTATE_NOSHOW)
+
+	I8085_STATE_ENTRY(AF, "%04X", AF.w.l, 0xffff, 0)
+	I8085_STATE_ENTRY(BC, "%04X", BC.w.l, 0xffff, 0)
+	I8085_STATE_ENTRY(DE, "%04X", DE.w.l, 0xffff, 0)
+	I8085_STATE_ENTRY(HL, "%04X", HL.w.l, 0xffff, 0)
+
+	I8085_STATE_ENTRY(STATUS, "%02X", STATUS, 0xff, 0)
+	I8085_STATE_ENTRY(SOD, "%1u", sod_state, 0x1, 0)
+	I8085_STATE_ENTRY(SID, "%1u", ietemp, 0x1, CPUSTATE_EXPORT | CPUSTATE_IMPORT)
+	I8085_STATE_ENTRY(INTE, "%1u", ietemp, 0x1, CPUSTATE_EXPORT | CPUSTATE_IMPORT)
+};
+
+static const cpu_state_table state_table_template =
+{
+	NULL,						/* pointer to the base of state (offsets are relative to this) */
+	0,							/* subtype this table refers to */
+	ARRAY_LENGTH(state_array),	/* number of entries */
+	state_array					/* array of entries */
+};
+
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define IS_8080(c)			((c)->cputype == CPUTYPE_8080)
+#define IS_8085(c)			((c)->cputype == CPUTYPE_8085)
+
+
+
+/***************************************************************************
+    STATIC TABLES
+***************************************************************************/
 
 static UINT8 ZS[256];
 static UINT8 ZSP[256];
 
-static UINT8 ROP(i8085_state *cpustate)
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+static void execute_one(i8085_state *cpustate, int opcode);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE void set_sod(i8085_state *cpustate, int state)
 {
-	cpustate->STATUS = 0xa2; // instruction fetch
+	if (state != 0 && cpustate->sod_state == 0)
+	{
+		cpustate->sod_state = 1;
+		if (cpustate->config.sod != NULL)
+			(*cpustate->config.sod)(cpustate->device, 1);
+	}
+	else if (state == 0 && cpustate->sod_state != 0)
+	{
+		cpustate->sod_state = 0;
+		if (cpustate->config.sod != NULL)
+			(*cpustate->config.sod)(cpustate->device, 0);
+	}
+}
+
+
+INLINE void set_inte(i8085_state *cpustate, int state)
+{
+	if (state != 0 && (cpustate->IM & IM_IE) == 0)
+	{
+		cpustate->IM |= IM_IE;
+		if (cpustate->config.inte != NULL)
+			(*cpustate->config.inte)(cpustate->device, 1);
+	}
+	else if (state == 0 && (cpustate->IM & IM_IE) != 0)
+	{
+		cpustate->IM &= ~IM_IE;
+		if (cpustate->config.inte != NULL)
+			(*cpustate->config.inte)(cpustate->device, 0);
+	}
+}
+
+
+INLINE void set_status(i8085_state *cpustate, UINT8 status)
+{
+	if (status != cpustate->STATUS && cpustate->config.status != NULL)
+		(*cpustate->config.status)(cpustate->device, status);
+	cpustate->STATUS = status;
+}
+
+
+INLINE UINT8 get_rim_value(i8085_state *cpustate)
+{
+	UINT8 result = cpustate->IM;
+	
+	/* copy live RST5.5 and RST6.5 states */
+	result &= ~(IM_I65 | IM_I55);
+	if (cpustate->irq_state[I8085_RST65_LINE] && !(cpustate->IM & IM_M65))
+		result |= IM_I65;
+	if (cpustate->irq_state[I8085_RST55_LINE] && !(cpustate->IM & IM_M55))
+		result |= IM_I55;
+	
+	/* fetch the SID bit if we have a callback */
+	if (cpustate->config.sid != NULL)
+		result = (result & 0x7f) | ((*cpustate->config.sid)(cpustate->device) ? 0x80 : 0);
+	return result;
+}
+
+
+INLINE void break_halt_for_interrupt(i8085_state *cpustate)
+{
+	/* de-halt if necessary */
+	if (cpustate->HALT)
+	{
+		cpustate->PC.w.l++;
+		cpustate->HALT = 0;
+		set_status(cpustate, 0x26);	/* int ack while halt */
+	}
+	else
+		set_status(cpustate, 0x23);	/* int ack */	
+}
+
+
+INLINE UINT8 ROP(i8085_state *cpustate)
+{
+	set_status(cpustate, 0xa2); // instruction fetch
 	return memory_decrypted_read_byte(cpustate->program, cpustate->PC.w.l++);
 }
 
-static UINT8 ARG(i8085_state *cpustate)
+INLINE UINT8 ARG(i8085_state *cpustate)
 {
 	return memory_raw_read_byte(cpustate->program, cpustate->PC.w.l++);
 }
 
-static UINT16 ARG16(i8085_state *cpustate)
+INLINE UINT16 ARG16(i8085_state *cpustate)
 {
 	UINT16 w;
 	w  = memory_raw_read_byte(cpustate->program, cpustate->PC.d);
@@ -186,23 +339,125 @@ static UINT16 ARG16(i8085_state *cpustate)
 	return w;
 }
 
-static UINT8 RM(i8085_state *cpustate, UINT32 a)
+INLINE UINT8 RM(i8085_state *cpustate, UINT32 a)
 {
-	cpustate->STATUS = 0x82; // memory read
+	set_status(cpustate, 0x82); // memory read
 	return memory_read_byte_8le(cpustate->program, a);
 }
 
-static void WM(i8085_state *cpustate, UINT32 a, UINT8 v)
+INLINE void WM(i8085_state *cpustate, UINT32 a, UINT8 v)
 {
-	cpustate->STATUS = 0x00; // memory write
+	set_status(cpustate, 0x00); // memory write
 	memory_write_byte_8le(cpustate->program, a, v);
 }
 
-INLINE void execute_one(i8085_state *cpustate, int opcode)
-{
-	/* output state word */
-	if (cpustate->status_callback) (*cpustate->status_callback)(cpustate->device, cpustate->STATUS);
 
+static void check_for_interrupts(i8085_state *cpustate)
+{
+	/* TRAP is the highest priority */
+	if (cpustate->trap_pending)
+	{
+		/* the first RIM after a TRAP reflects the original IE state; remember it here,
+		   setting the high bit to indicate it is valid */
+		cpustate->trap_im_copy = cpustate->IM | 0x80;
+		
+		/* reset the pending state */
+		cpustate->trap_pending = FALSE;
+
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt(cpustate);
+		if (cpustate->irq_callback != NULL)
+			(*cpustate->irq_callback)(cpustate->device, INPUT_LINE_NMI);
+
+		/* push the PC and jump to $0024 */
+		M_PUSH(PC);
+		cpustate->IM &= ~IM_IE;
+		cpustate->PC.w.l = ADDR_TRAP;
+		cpustate->icount -= 11;
+	}
+	
+	/* followed by RST7.5 */
+	else if ((cpustate->IM & IM_I75) && !(cpustate->IM & IM_M75) && (cpustate->IM & IM_IE))
+	{
+		/* reset the pending state (which is CPU-visible via the RIM instruction) */
+		cpustate->IM &= ~IM_I75;
+
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt(cpustate);
+		if (cpustate->irq_callback != NULL)
+			(*cpustate->irq_callback)(cpustate->device, I8085_RST75_LINE);
+
+		/* push the PC and jump to $003C */ 
+		M_PUSH(PC);
+		cpustate->IM &= ~IM_IE;
+		cpustate->PC.w.l = ADDR_RST75;
+		cpustate->icount -= 11;
+	}
+	
+	/* followed by RST6.5 */
+	else if (cpustate->irq_state[I8085_RST65_LINE] && !(cpustate->IM & IM_M65) && (cpustate->IM & IM_IE))
+	{
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt(cpustate);
+		if (cpustate->irq_callback != NULL)
+			(*cpustate->irq_callback)(cpustate->device, I8085_RST65_LINE);
+
+		/* push the PC and jump to $0034 */ 
+		M_PUSH(PC);
+		cpustate->IM &= ~IM_IE;
+		cpustate->PC.w.l = ADDR_RST65;
+		cpustate->icount -= 11;
+	}
+	
+	/* followed by RST5.5 */
+	else if (cpustate->irq_state[I8085_RST55_LINE] && !(cpustate->IM & IM_M55) && (cpustate->IM & IM_IE))
+	{
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt(cpustate);
+		if (cpustate->irq_callback != NULL)
+			(*cpustate->irq_callback)(cpustate->device, I8085_RST55_LINE);
+
+		/* push the PC and jump to $002C */ 
+		M_PUSH(PC);
+		cpustate->IM &= ~IM_IE;
+		cpustate->PC.w.l = ADDR_RST55;
+		cpustate->icount -= 11;
+	}
+
+	/* followed by classic INTR */
+	else if (cpustate->irq_state[I8085_INTR_LINE] && (cpustate->IM & IM_IE))
+	{
+		UINT32 vector = 0;
+		
+		/* break out of HALT state and call the IRQ ack callback */
+		break_halt_for_interrupt(cpustate);
+		if (cpustate->irq_callback != NULL)
+			vector = (*cpustate->irq_callback)(cpustate->device, I8085_INTR_LINE);
+
+		/* use the resulting vector as an opcode to execute */
+		cpustate->IM &= ~IM_IE;
+		switch (vector & 0xff0000)
+		{
+			case 0xcd0000:	/* CALL nnnn */
+				cpustate->icount -= 7;
+				M_PUSH(PC);
+
+			case 0xc30000:	/* JMP  nnnn */
+				cpustate->icount -= 10;
+				cpustate->PC.d = vector & 0xffff;
+				break;
+
+			default:
+				LOG(("i8085 take int $%02x\n", vector));
+				execute_one(cpustate, vector & 0xff);
+				break;
+		}
+	}
+}
+
+
+static void execute_one(i8085_state *cpustate, int opcode)
+{
 	switch (opcode)
 	{
 		case 0x00: cpustate->icount -= 4;	/* NOP  */
@@ -214,17 +469,17 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0x02: cpustate->icount -= 7;	/* STAX B */
 			WM(cpustate, cpustate->BC.d, cpustate->AF.b.h);
 			break;
-		case 0x03: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* INX  B */
+		case 0x03: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* INX  B */
 			cpustate->BC.w.l++;
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				if (cpustate->BC.b.l == 0x00) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
-		case 0x04: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* INR  B */
+		case 0x04: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  B */
 			M_INR(cpustate->BC.b.h);
 			break;
-		case 0x05: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* DCR  B */
+		case 0x05: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  B */
 			M_DCR(cpustate->BC.b.h);
 			break;
 		case 0x06: cpustate->icount -= 7;	/* MVI  B,nn */
@@ -235,7 +490,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			break;
 
 		case 0x08:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 10;		/* DSUB */
 				M_DSUB(cpustate);
 			} else {
@@ -248,17 +503,17 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0x0a: cpustate->icount -= 7;	/* LDAX B */
 			cpustate->AF.b.h = RM(cpustate, cpustate->BC.d);
 			break;
-		case 0x0b: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* DCX  B */
+		case 0x0b: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* DCX  B */
 			cpustate->BC.w.l--;
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				if (cpustate->BC.b.l == 0xff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
-		case 0x0c: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* INR  C */
+		case 0x0c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  C */
 			M_INR(cpustate->BC.b.l);
 			break;
-		case 0x0d: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* DCR  C */
+		case 0x0d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  C */
 			M_DCR(cpustate->BC.b.l);
 			break;
 		case 0x0e: cpustate->icount -= 7;	/* MVI  C,nn */
@@ -269,7 +524,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			break;
 
 		case 0x10:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 7;		/* ASRH */
 				cpustate->AF.b.l = (cpustate->AF.b.l & ~CF) | (cpustate->HL.b.l & CF);
 				cpustate->HL.w.l = (cpustate->HL.w.l >> 1);
@@ -283,17 +538,17 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0x12: cpustate->icount -= 7;	/* STAX D */
 			WM(cpustate, cpustate->DE.d, cpustate->AF.b.h);
 			break;
-		case 0x13: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* INX  D */
+		case 0x13: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* INX  D */
 			cpustate->DE.w.l++;
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				if (cpustate->DE.b.l == 0x00) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
-		case 0x14: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* INR  D */
+		case 0x14: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  D */
 			M_INR(cpustate->DE.b.h);
 			break;
-		case 0x15: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* DCR  D */
+		case 0x15: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  D */
 			M_DCR(cpustate->DE.b.h);
 			break;
 		case 0x16: cpustate->icount -= 7;	/* MVI  D,nn */
@@ -304,7 +559,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			break;
 
 		case 0x18:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 10;		/* RLDE */
 				cpustate->AF.b.l = (cpustate->AF.b.l & ~(CF | VF)) | (cpustate->DE.b.h >> 7);
 				cpustate->DE.w.l = (cpustate->DE.w.l << 1) | (cpustate->DE.w.l >> 15);
@@ -320,17 +575,17 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0x1a: cpustate->icount -= 7;	/* LDAX D */
 			cpustate->AF.b.h = RM(cpustate, cpustate->DE.d);
 			break;
-		case 0x1b: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* DCX  D */
+		case 0x1b: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* DCX  D */
 			cpustate->DE.w.l--;
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				if (cpustate->DE.b.l == 0xff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
-		case 0x1c: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* INR  E */
+		case 0x1c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  E */
 			M_INR(cpustate->DE.b.l);
 			break;
-		case 0x1d: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* DCR  E */
+		case 0x1d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  E */
 			M_DCR(cpustate->DE.b.l);
 			break;
 		case 0x1e: cpustate->icount -= 7;	/* MVI  E,nn */
@@ -341,12 +596,14 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			break;
 
 		case 0x20:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 7;		/* RIM  */
-				cpustate->AF.b.h = cpustate->IM;
-				if (cpustate->sid_callback)
-					cpustate->AF.b.h = (cpustate->AF.b.h & 0x7f) | ((*cpustate->sid_callback)(cpustate->device) ? 0x80 : 0);
-				cpustate->AF.b.h |= cpustate->rim_ien; cpustate->rim_ien = 0; //AT: read and clear IEN status latch
+				cpustate->AF.b.h = get_rim_value(cpustate);
+				
+				/* if we have remembered state from taking a TRAP, fix up the IE flag here */
+				if (cpustate->trap_im_copy & 0x80)
+					cpustate->AF.b.h = (cpustate->AF.b.h & ~IM_IE) | (cpustate->trap_im_copy & IM_IE);
+				cpustate->trap_im_copy = 0;
 			} else {
 				cpustate->icount -= 4;		/* NOP undocumented */
 			}
@@ -360,17 +617,17 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->XX.w.l++;
 			WM(cpustate, cpustate->XX.d, cpustate->HL.b.h);
 			break;
-		case 0x23: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* INX  H */
+		case 0x23: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* INX  H */
 			cpustate->HL.w.l++;
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				if (cpustate->HL.b.l == 0x00) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
-		case 0x24: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* INR  H */
+		case 0x24: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  H */
 			M_INR(cpustate->HL.b.h);
 			break;
-		case 0x25: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* DCR  H */
+		case 0x25: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  H */
 			M_DCR(cpustate->HL.b.h);
 			break;
 		case 0x26: cpustate->icount -= 7;	/* MVI  H,nn */
@@ -382,14 +639,14 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			if (cpustate->AF.b.l & HF) cpustate->XX.d |= 0x200;
 			if (cpustate->AF.b.l & NF) cpustate->XX.d |= 0x400;
 			cpustate->AF.w.l = DAA[cpustate->XX.d];
-			if( cpustate->cputype==0 )
+			if (IS_8080(cpustate))
 			{
 				cpustate->AF.b.l &= 0xd5; // Ignore not used flags
 			}
 			break;
 
 		case 0x28:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 10;		/* LDEH nn */
 				cpustate->XX.d = ARG(cpustate);
 				cpustate->DE.d = (cpustate->HL.d + cpustate->XX.d) & 0xffff;
@@ -406,24 +663,24 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->XX.w.l++;
 			cpustate->HL.b.h = RM(cpustate, cpustate->XX.d);
 			break;
-		case 0x2b: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* DCX  H */
+		case 0x2b: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* DCX  H */
 			cpustate->HL.w.l--;
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				if (cpustate->HL.b.l == 0xff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
-		case 0x2c: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* INR  L */
+		case 0x2c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  L */
 			M_INR(cpustate->HL.b.l);
 			break;
-		case 0x2d: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* DCR  L */
+		case 0x2d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  L */
 			M_DCR(cpustate->HL.b.l);
 			break;
 		case 0x2e: cpustate->icount -= 7;	/* MVI  L,nn */
 			M_MVI(cpustate->HL.b.l);
 			break;
 		case 0x2f: cpustate->icount -= 4;	/* CMA  */
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				cpustate->AF.b.h ^= 0xff;
 				cpustate->AF.b.l |= HF + NF;
@@ -435,24 +692,33 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			break;
 
 		case 0x30:
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				cpustate->icount -= 7;		/* SIM  */
-
-				if (cpustate->AF.b.h & 0x40) //SOE - only when bit 0x40 is set!
-				{
-					cpustate->IM &=~IM_SOD;
-					if (cpustate->AF.b.h & 0x80) cpustate->IM |= IM_SOD; //is it needed ?
-					if (cpustate->sod_callback) (*cpustate->sod_callback)(cpustate->device, cpustate->AF.b.h >> 7); //SOD - data = bit 0x80
-				}
-//AT
-				//cpustate->IM &= (IM_SID + IM_IEN + IM_TRAP);
-				//cpustate->IM |= (cpustate->AF.b.h & ~(IM_SID + IM_SOD + IM_IEN + IM_TRAP));
-
-				// overwrite RST5.5-7.5 interrupt masks only when bit 0x08 of the accumulator is set
+				
+				/* if bit 3 is set, bits 0-2 become the new masks */
 				if (cpustate->AF.b.h & 0x08)
-					cpustate->IM = (cpustate->IM & ~(IM_RST55+IM_RST65+IM_RST75)) | (cpustate->AF.b.h & (IM_RST55+IM_RST65+IM_RST75));
+				{
+					cpustate->IM &= ~(IM_M55 | IM_M65 | IM_M75 | IM_I55 | IM_I65);
+					cpustate->IM |= cpustate->AF.b.h & (IM_M55 | IM_M65 | IM_M75);
+					
+					/* update live state based on the new masks */
+					if ((cpustate->IM & IM_M55) == 0 && cpustate->irq_state[I8085_RST55_LINE])
+						cpustate->IM |= IM_I55;
+					if ((cpustate->IM & IM_M65) == 0 && cpustate->irq_state[I8085_RST65_LINE])
+						cpustate->IM |= IM_I65;
+				}
+				
+				/* bit if 4 is set, the 7.5 flip-flop is cleared */
+				if (cpustate->AF.b.h & 0x10)
+					cpustate->IM &= ~IM_I75;
+				
+				/* if bit 6 is set, then bit 7 is the new SOD state */
+				if (cpustate->AF.b.h & 0x40)
+					set_sod(cpustate, cpustate->AF.b.h >> 7);
 
+				/* check for revealed interrupts */
+				check_for_interrupts(cpustate);
 			} else {
 				cpustate->icount -= 4;		/* NOP undocumented */
 			}
@@ -465,9 +731,9 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->XX.d = ARG16(cpustate);
 			WM(cpustate, cpustate->XX.d, cpustate->AF.b.h);
 			break;
-		case 0x33: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* INX  SP */
+		case 0x33: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* INX  SP */
 			cpustate->SP.w.l++;
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				if (cpustate->SP.b.l == 0x00) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
@@ -491,7 +757,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			break;
 
 		case 0x38:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 10;		/* LDES nn */
 				cpustate->XX.d = ARG(cpustate);
 				cpustate->DE.d = (cpustate->SP.d + cpustate->XX.d) & 0xffff;
@@ -506,17 +772,17 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->XX.d = ARG16(cpustate);
 			cpustate->AF.b.h = RM(cpustate, cpustate->XX.d);
 			break;
-		case 0x3b: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* DCX  SP */
+		case 0x3b: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* DCX  SP */
 			cpustate->SP.w.l--;
-			if( cpustate->cputype )
+			if (IS_8085(cpustate))
 			{
 				if (cpustate->SP.b.l == 0xff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
-		case 0x3c: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* INR  A */
+		case 0x3c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  A */
 			M_INR(cpustate->AF.b.h);
 			break;
-		case 0x3d: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* DCR  A */
+		case 0x3d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* DCR  A */
 			M_DCR(cpustate->AF.b.h);
 			break;
 		case 0x3e: cpustate->icount -= 7;	/* MVI  A,nn */
@@ -526,153 +792,153 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->AF.b.l = (cpustate->AF.b.l & 0xfe) | ((cpustate->AF.b.l & CF)==1 ? 0 : 1);
 			break;
 
-		case 0x40: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  B,B */
+		case 0x40: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,B */
 			/* no op */
 			break;
-		case 0x41: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  B,C */
+		case 0x41: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,C */
 			cpustate->BC.b.h = cpustate->BC.b.l;
 			break;
-		case 0x42: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  B,D */
+		case 0x42: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,D */
 			cpustate->BC.b.h = cpustate->DE.b.h;
 			break;
-		case 0x43: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  B,E */
+		case 0x43: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,E */
 			cpustate->BC.b.h = cpustate->DE.b.l;
 			break;
-		case 0x44: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  B,H */
+		case 0x44: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,H */
 			cpustate->BC.b.h = cpustate->HL.b.h;
 			break;
-		case 0x45: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  B,L */
+		case 0x45: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,L */
 			cpustate->BC.b.h = cpustate->HL.b.l;
 			break;
 		case 0x46: cpustate->icount -= 7;	/* MOV  B,M */
 			cpustate->BC.b.h = RM(cpustate, cpustate->HL.d);
 			break;
-		case 0x47: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  B,A */
+		case 0x47: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  B,A */
 			cpustate->BC.b.h = cpustate->AF.b.h;
 			break;
 
-		case 0x48: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  C,B */
+		case 0x48: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,B */
 			cpustate->BC.b.l = cpustate->BC.b.h;
 			break;
-		case 0x49: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  C,C */
+		case 0x49: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,C */
 			/* no op */
 			break;
-		case 0x4a: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  C,D */
+		case 0x4a: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,D */
 			cpustate->BC.b.l = cpustate->DE.b.h;
 			break;
-		case 0x4b: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  C,E */
+		case 0x4b: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,E */
 			cpustate->BC.b.l = cpustate->DE.b.l;
 			break;
-		case 0x4c: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  C,H */
+		case 0x4c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,H */
 			cpustate->BC.b.l = cpustate->HL.b.h;
 			break;
-		case 0x4d: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  C,L */
+		case 0x4d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,L */
 			cpustate->BC.b.l = cpustate->HL.b.l;
 			break;
 		case 0x4e: cpustate->icount -= 7;	/* MOV  C,M */
 			cpustate->BC.b.l = RM(cpustate, cpustate->HL.d);
 			break;
-		case 0x4f: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  C,A */
+		case 0x4f: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  C,A */
 			cpustate->BC.b.l = cpustate->AF.b.h;
 			break;
 
-		case 0x50: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  D,B */
+		case 0x50: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,B */
 			cpustate->DE.b.h = cpustate->BC.b.h;
 			break;
-		case 0x51: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  D,C */
+		case 0x51: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,C */
 			cpustate->DE.b.h = cpustate->BC.b.l;
 			break;
-		case 0x52: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  D,D */
+		case 0x52: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,D */
 			/* no op */
 			break;
-		case 0x53: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  D,E */
+		case 0x53: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,E */
 			cpustate->DE.b.h = cpustate->DE.b.l;
 			break;
-		case 0x54: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  D,H */
+		case 0x54: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,H */
 			cpustate->DE.b.h = cpustate->HL.b.h;
 			break;
-		case 0x55: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  D,L */
+		case 0x55: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,L */
 			cpustate->DE.b.h = cpustate->HL.b.l;
 			break;
 		case 0x56: cpustate->icount -= 7;	/* MOV  D,M */
 			cpustate->DE.b.h = RM(cpustate, cpustate->HL.d);
 			break;
-		case 0x57: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  D,A */
+		case 0x57: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  D,A */
 			cpustate->DE.b.h = cpustate->AF.b.h;
 			break;
 
-		case 0x58: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  E,B */
+		case 0x58: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,B */
 			cpustate->DE.b.l = cpustate->BC.b.h;
 			break;
-		case 0x59: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  E,C */
+		case 0x59: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,C */
 			cpustate->DE.b.l = cpustate->BC.b.l;
 			break;
-		case 0x5a: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  E,D */
+		case 0x5a: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,D */
 			cpustate->DE.b.l = cpustate->DE.b.h;
 			break;
-		case 0x5b: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  E,E */
+		case 0x5b: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,E */
 			/* no op */
 			break;
-		case 0x5c: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  E,H */
+		case 0x5c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,H */
 			cpustate->DE.b.l = cpustate->HL.b.h;
 			break;
-		case 0x5d: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  E,L */
+		case 0x5d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,L */
 			cpustate->DE.b.l = cpustate->HL.b.l;
 			break;
 		case 0x5e: cpustate->icount -= 7;	/* MOV  E,M */
 			cpustate->DE.b.l = RM(cpustate, cpustate->HL.d);
 			break;
-		case 0x5f: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  E,A */
+		case 0x5f: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  E,A */
 			cpustate->DE.b.l = cpustate->AF.b.h;
 			break;
 
-		case 0x60: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  H,B */
+		case 0x60: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,B */
 			cpustate->HL.b.h = cpustate->BC.b.h;
 			break;
-		case 0x61: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  H,C */
+		case 0x61: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,C */
 			cpustate->HL.b.h = cpustate->BC.b.l;
 			break;
-		case 0x62: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  H,D */
+		case 0x62: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,D */
 			cpustate->HL.b.h = cpustate->DE.b.h;
 			break;
-		case 0x63: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  H,E */
+		case 0x63: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,E */
 			cpustate->HL.b.h = cpustate->DE.b.l;
 			break;
-		case 0x64: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  H,H */
+		case 0x64: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,H */
 			/* no op */
 			break;
-		case 0x65: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  H,L */
+		case 0x65: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,L */
 			cpustate->HL.b.h = cpustate->HL.b.l;
 			break;
 		case 0x66: cpustate->icount -= 7;	/* MOV  H,M */
 			cpustate->HL.b.h = RM(cpustate, cpustate->HL.d);
 			break;
-		case 0x67: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  H,A */
+		case 0x67: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  H,A */
 			cpustate->HL.b.h = cpustate->AF.b.h;
 			break;
 
-		case 0x68: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  L,B */
+		case 0x68: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,B */
 			cpustate->HL.b.l = cpustate->BC.b.h;
 			break;
-		case 0x69: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  L,C */
+		case 0x69: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,C */
 			cpustate->HL.b.l = cpustate->BC.b.l;
 			break;
-		case 0x6a: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  L,D */
+		case 0x6a: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,D */
 			cpustate->HL.b.l = cpustate->DE.b.h;
 			break;
-		case 0x6b: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  L,E */
+		case 0x6b: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,E */
 			cpustate->HL.b.l = cpustate->DE.b.l;
 			break;
-		case 0x6c: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  L,H */
+		case 0x6c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,H */
 			cpustate->HL.b.l = cpustate->HL.b.h;
 			break;
-		case 0x6d: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  L,L */
+		case 0x6d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,L */
 			/* no op */
 			break;
 		case 0x6e: cpustate->icount -= 7;	/* MOV  L,M */
 			cpustate->HL.b.l = RM(cpustate, cpustate->HL.d);
 			break;
-		case 0x6f: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  L,A */
+		case 0x6f: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  L,A */
 			cpustate->HL.b.l = cpustate->AF.b.h;
 			break;
 
@@ -694,38 +960,38 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0x75: cpustate->icount -= 7;	/* MOV  M,L */
 			WM(cpustate, cpustate->HL.d, cpustate->HL.b.l);
 			break;
-		case 0x76: cpustate->icount -= (cpustate->cputype) ? 5 : 7;	/* HLT */
+		case 0x76: cpustate->icount -= IS_8085(cpustate) ? 5 : 7;	/* HLT */
 			cpustate->PC.w.l--;
 			cpustate->HALT = 1;
-			cpustate->STATUS = 0x8a; // halt acknowledge
+			set_status(cpustate, 0x8a); // halt acknowledge
 			if (cpustate->icount > 0) cpustate->icount = 0;
 			break;
 		case 0x77: cpustate->icount -= 7;	/* MOV  M,A */
 			WM(cpustate, cpustate->HL.d, cpustate->AF.b.h);
 			break;
 
-		case 0x78: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  A,B */
+		case 0x78: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,B */
 			cpustate->AF.b.h = cpustate->BC.b.h;
 			break;
-		case 0x79: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  A,C */
+		case 0x79: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,C */
 			cpustate->AF.b.h = cpustate->BC.b.l;
 			break;
-		case 0x7a: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  A,D */
+		case 0x7a: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,D */
 			cpustate->AF.b.h = cpustate->DE.b.h;
 			break;
-		case 0x7b: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  A,E */
+		case 0x7b: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,E */
 			cpustate->AF.b.h = cpustate->DE.b.l;
 			break;
-		case 0x7c: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  A,H */
+		case 0x7c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,H */
 			cpustate->AF.b.h = cpustate->HL.b.h;
 			break;
-		case 0x7d: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  A,L */
+		case 0x7d: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,L */
 			cpustate->AF.b.h = cpustate->HL.b.l;
 			break;
 		case 0x7e: cpustate->icount -= 7;	/* MOV  A,M */
 			cpustate->AF.b.h = RM(cpustate, cpustate->HL.d);
 			break;
-		case 0x7f: cpustate->icount -= (cpustate->cputype) ? 4 : 5;	/* MOV  A,A */
+		case 0x7f: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* MOV  A,A */
 			/* no op */
 			break;
 
@@ -929,7 +1195,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			M_CMP(cpustate->AF.b.h);
 			break;
 
-		case 0xc0: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* RNZ  */
+		case 0xc0: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RNZ  */
 			M_RET( !(cpustate->AF.b.l & ZF) );
 			break;
 		case 0xc1: cpustate->icount -= 10;	/* POP  B */
@@ -944,18 +1210,18 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0xc4: cpustate->icount -= 11;	/* CNZ  nnnn */
 			M_CALL( !(cpustate->AF.b.l & ZF) );
 			break;
-		case 0xc5: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* PUSH B */
+		case 0xc5: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* PUSH B */
 			M_PUSH(BC);
 			break;
 		case 0xc6: cpustate->icount -= 7;	/* ADI  nn */
 			cpustate->XX.b.l = ARG(cpustate);
 			M_ADD(cpustate->XX.b.l);
 				break;
-		case 0xc7: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* RST  0 */
+		case 0xc7: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  0 */
 			M_RST(0);
 			break;
 
-		case 0xc8: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* RZ   */
+		case 0xc8: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RZ   */
 			M_RET( cpustate->AF.b.l & ZF );
 			break;
 		case 0xc9: cpustate->icount -= 10;	/* RET  */
@@ -965,7 +1231,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			M_JMP( cpustate->AF.b.l & ZF );
 			break;
 		case 0xcb:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				if (cpustate->AF.b.l & VF) {
 					cpustate->icount -= 12;
 					M_RST(8);			/* call 0x40 */
@@ -987,11 +1253,11 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->XX.b.l = ARG(cpustate);
 			M_ADC(cpustate->XX.b.l);
 			break;
-		case 0xcf: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* RST  1 */
+		case 0xcf: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  1 */
 			M_RST(1);
 			break;
 
-		case 0xd0: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* RNC  */
+		case 0xd0: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RNC  */
 			M_RET( !(cpustate->AF.b.l & CF) );
 			break;
 		case 0xd1: cpustate->icount -= 10;	/* POP  D */
@@ -1006,22 +1272,22 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0xd4: cpustate->icount -= 11;	/* CNC  nnnn */
 			M_CALL( !(cpustate->AF.b.l & CF) );
 			break;
-		case 0xd5: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* PUSH D */
+		case 0xd5: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* PUSH D */
 			M_PUSH(DE);
 			break;
 		case 0xd6: cpustate->icount -= 7;	/* SUI  nn */
 			cpustate->XX.b.l = ARG(cpustate);
 			M_SUB(cpustate->XX.b.l);
 			break;
-		case 0xd7: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* RST  2 */
+		case 0xd7: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  2 */
 			M_RST(2);
 			break;
 
-		case 0xd8: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* RC   */
+		case 0xd8: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RC   */
 			M_RET( cpustate->AF.b.l & CF );
 			break;
 		case 0xd9:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 10;		/* SHLX */
 				cpustate->XX.w.l = cpustate->DE.w.l;
 				WM(cpustate, cpustate->XX.d, cpustate->HL.b.l);
@@ -1042,7 +1308,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			M_CALL( cpustate->AF.b.l & CF );
 			break;
 		case 0xdd:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 7;		/* JNX  nnnn */
 				M_JMP( !(cpustate->AF.b.l & XF) );
 			} else {
@@ -1054,11 +1320,11 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->XX.b.l = ARG(cpustate);
 			M_SBB(cpustate->XX.b.l);
 			break;
-		case 0xdf: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* RST  3 */
+		case 0xdf: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  3 */
 			M_RST(3);
 			break;
 
-		case 0xe0: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* RPO    */
+		case 0xe0: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RPO    */
 			M_RET( !(cpustate->AF.b.l & VF) );
 			break;
 		case 0xe1: cpustate->icount -= 10;	/* POP  H */
@@ -1067,7 +1333,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0xe2: cpustate->icount -= 10;	/* JPO  nnnn */
 			M_JMP( !(cpustate->AF.b.l & VF) );
 			break;
-		case 0xe3: cpustate->icount -= (cpustate->cputype) ? 16 : 18;	/* XTHL */
+		case 0xe3: cpustate->icount -= IS_8085(cpustate) ? 16 : 18;	/* XTHL */
 			M_POP(XX);
 			M_PUSH(HL);
 			cpustate->HL.d = cpustate->XX.d;
@@ -1075,21 +1341,21 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 		case 0xe4: cpustate->icount -= 11;	/* CPO  nnnn */
 			M_CALL( !(cpustate->AF.b.l & VF) );
 			break;
-		case 0xe5: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* PUSH H */
+		case 0xe5: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* PUSH H */
 			M_PUSH(HL);
 			break;
 		case 0xe6: cpustate->icount -= 7;	/* ANI  nn */
 			cpustate->XX.b.l = ARG(cpustate);
 			M_ANA(cpustate->XX.b.l);
 			break;
-		case 0xe7: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* RST  4 */
+		case 0xe7: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  4 */
 			M_RST(4);
 			break;
 
-		case 0xe8: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* RPE  */
+		case 0xe8: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RPE  */
 			M_RET( cpustate->AF.b.l & VF );
 			break;
-		case 0xe9: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* PCHL */
+		case 0xe9: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* PCHL */
 			cpustate->PC.d = cpustate->HL.w.l;
 			break;
 		case 0xea: cpustate->icount -= 10;	/* JPE  nnnn */
@@ -1104,7 +1370,7 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			M_CALL( cpustate->AF.b.l & VF );
 			break;
 		case 0xed:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 10;		/* LHLX */
 				cpustate->XX.w.l = cpustate->DE.w.l;
 				cpustate->HL.b.l = RM(cpustate, cpustate->XX.d);
@@ -1119,11 +1385,11 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->XX.b.l = ARG(cpustate);
 			M_XRA(cpustate->XX.b.l);
 			break;
-		case 0xef: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* RST  5 */
+		case 0xef: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  5 */
 			M_RST(5);
 			break;
 
-		case 0xf0: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* RP   */
+		case 0xf0: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RP   */
 			M_RET( !(cpustate->AF.b.l&SF) );
 			break;
 		case 0xf1: cpustate->icount -= 10;	/* POP  A */
@@ -1134,27 +1400,26 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			break;
 		case 0xf3: cpustate->icount -= 4;	/* DI   */
 			/* remove interrupt enable */
-			cpustate->IM &= ~IM_IEN;
-			if (cpustate->inte_callback) (*cpustate->inte_callback)(cpustate->device, (cpustate->IM & IM_IEN) ? 1 : 0);
+			set_inte(cpustate, 0);
 			break;
 		case 0xf4: cpustate->icount -= 11;	/* CP   nnnn */
 			M_CALL( !(cpustate->AF.b.l & SF) );
 			break;
-		case 0xf5: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* PUSH A */
+		case 0xf5: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* PUSH A */
 			M_PUSH(AF);
 			break;
 		case 0xf6: cpustate->icount -= 7;	/* ORI  nn */
 			cpustate->XX.b.l = ARG(cpustate);
 			M_ORA(cpustate->XX.b.l);
 			break;
-		case 0xf7: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* RST  6 */
+		case 0xf7: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  6 */
 			M_RST(6);
 			break;
 
-		case 0xf8: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* RM   */
+		case 0xf8: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* RM   */
 			M_RET( cpustate->AF.b.l & SF );
 			break;
-		case 0xf9: cpustate->icount -= (cpustate->cputype) ? 6 : 5;	/* SPHL */
+		case 0xf9: cpustate->icount -= IS_8085(cpustate) ? 6 : 5;	/* SPHL */
 			cpustate->SP.d = cpustate->HL.d;
 			break;
 		case 0xfa: cpustate->icount -= 10;	/* JM   nnnn */
@@ -1162,15 +1427,14 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			break;
 		case 0xfb: cpustate->icount -= 4;	/* EI */
 			/* set interrupt enable */
-			cpustate->IM |= IM_IEN;
-			if (cpustate->inte_callback) (*cpustate->inte_callback)(cpustate->device, (cpustate->IM & IM_IEN) ? 1 : 0);
-			cpustate->after_ei = TRUE;
+			set_inte(cpustate, 1);
+			cpustate->after_ei = 2;
 			break;
 		case 0xfc: cpustate->icount -= 11;	/* CM   nnnn */
 			M_CALL( cpustate->AF.b.l & SF );
 			break;
 		case 0xfd:
-			if( cpustate->cputype ) {
+			if (IS_8085(cpustate)) {
 				cpustate->icount -= 7;		/* JX   nnnn */
 				M_JMP( cpustate->AF.b.l & XF );
 			} else {
@@ -1182,110 +1446,36 @@ INLINE void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->XX.b.l = ARG(cpustate);
 			M_CMP(cpustate->XX.b.l);
 			break;
-		case 0xff: cpustate->icount -= (cpustate->cputype) ? 12 : 11;	/* RST  7 */
+		case 0xff: cpustate->icount -= IS_8085(cpustate) ? 12 : 11;	/* RST  7 */
 			M_RST(7);
 			break;
 	}
 }
 
-static void Interrupt(i8085_state *cpustate)
-{
 
-	if( cpustate->HALT )		/* if the CPU was halted */
-	{
-		cpustate->PC.w.l++; 	/* skip HALT instr */
-		cpustate->HALT = 0;
-		cpustate->STATUS = 0x26; // int ack while halt
-	} else {
-		cpustate->STATUS = 0x23; // int ack
-	}
-//AT
-	cpustate->IREQ &= ~cpustate->ISRV; // remove serviced IRQ flag
-	cpustate->rim_ien = (cpustate->ISRV==IM_TRAP) ? cpustate->IM & IM_IEN : 0; // latch general interrupt enable bit on TRAP or NMI
-//ZT
-	cpustate->IM &= ~IM_IEN;      /* remove general interrupt enable bit */
+/***************************************************************************
+    COMMON EXECUTION
+***************************************************************************/
 
-	if( cpustate->ISRV == IM_INTR )
-	{
-		LOG(("Interrupt get INTR vector\n"));
-		cpustate->IRQ1 = (cpustate->irq_callback)(cpustate->device, 0);
-	}
-
-	if( cpustate->cputype )
-	{
-		if( cpustate->ISRV == IM_RST55 )
-		{
-			LOG(("Interrupt get RST5.5 vector\n"));
-			//cpustate->IRQ1 = (cpustate->irq_callback)(cpustate->device, 1);
-			cpustate->irq_state[I8085_RST55_LINE] = CLEAR_LINE; //AT: processing RST5.5, reset interrupt line
-		}
-
-		if( cpustate->ISRV == IM_RST65	)
-		{
-			LOG(("Interrupt get RST6.5 vector\n"));
-			//cpustate->IRQ1 = (cpustate->irq_callback)(cpustate->device, 2);
-			cpustate->irq_state[I8085_RST65_LINE] = CLEAR_LINE; //AT: processing RST6.5, reset interrupt line
-		}
-
-		if( cpustate->ISRV == IM_RST75 )
-		{
-			LOG(("Interrupt get RST7.5 vector\n"));
-			//cpustate->IRQ1 = (cpustate->irq_callback)(cpustate->device, 3);
-			cpustate->irq_state[I8085_RST75_LINE] = CLEAR_LINE; //AT: processing RST7.5, reset interrupt line
-		}
-	}
-
-	switch( cpustate->IRQ1 & 0xff0000 )
-	{
-		case 0xcd0000:	/* CALL nnnn */
-			cpustate->icount -= 7;
-			M_PUSH(PC);
-		case 0xc30000:	/* JMP  nnnn */
-			cpustate->icount -= 10;
-			cpustate->PC.d = cpustate->IRQ1 & 0xffff;
-			break;
-		default:
-			switch( cpustate->ISRV )
-			{
-				case IM_TRAP:
-				case IM_RST75:
-				case IM_RST65:
-				case IM_RST55:
-					M_PUSH(PC);
-					if (cpustate->IRQ1 != (1 << I8085_RST75_LINE))
-						cpustate->PC.d = cpustate->IRQ1;
-					else
-						cpustate->PC.d = 0x3c;
-					break;
-				default:
-					LOG(("i8085 take int $%02x\n", cpustate->IRQ1));
-					execute_one(cpustate, cpustate->IRQ1 & 0xff);
-			}
-	}
-	cpustate->ISRV = 0;
-}
-
-static CPU_EXECUTE( i8085 )
+static CPU_EXECUTE( i808x )
 {
 	i8085_state *cpustate = device->token;
-
+	
 	cpustate->icount = cycles;
+
+	/* check for TRAPs before diving in (can't do others because of after_ei) */
+	if (cpustate->trap_pending || cpustate->after_ei == 0)
+		check_for_interrupts(cpustate);
+
 	do
 	{
 		debugger_instruction_hook(device, cpustate->PC.d);
 
-		/* interrupts enabled or TRAP pending ? */
-		if ( ((cpustate->IM & IM_IEN) && (!cpustate->after_ei)) || (cpustate->IREQ & IM_TRAP) )
-		{
-			/* copy scheduled to executed interrupt request */
-			cpustate->IRQ1 = cpustate->IRQ2;
-			/* reset scheduled interrupt request */
-			cpustate->IRQ2 = 0;
-			/* interrupt now ? */
-			if (cpustate->IRQ1) Interrupt(cpustate);
-		}
+		/* the instruction after an EI does not take an interrupt, so
+		   we cannot check immediately; handle post-EI behavior here */
+		if (cpustate->after_ei != 0 && --cpustate->after_ei == 0)
+			check_for_interrupts(cpustate);
 
-		cpustate->after_ei = FALSE;
 		/* here we go... */
 		execute_one(cpustate, ROP(cpustate));
 
@@ -1294,9 +1484,12 @@ static CPU_EXECUTE( i8085 )
 	return cycles - cpustate->icount;
 }
 
-/****************************************************************************
- * Initialise the various lookup tables used by the emulation code
- ****************************************************************************/
+
+
+/***************************************************************************
+    CORE INITIALIZATION
+***************************************************************************/
+
 static void init_tables (void)
 {
 	UINT8 zs;
@@ -1320,338 +1513,183 @@ static void init_tables (void)
 	}
 }
 
-/****************************************************************************
- * Init the 8085 emulation
- ****************************************************************************/
-static CPU_INIT( i8085 )
+
+static void init_808x_common(const device_config *device, cpu_irq_callback irqcallback, int type)
 {
 	i8085_state *cpustate = device->token;
 
 	init_tables();
-	cpustate->cputype = 1;
+
+	/* set up the state table */
+	cpustate->state = state_table_template;
+	cpustate->state.baseptr = cpustate;
+	cpustate->state.subtypemask = 1 << type;
+
+	if (device->static_config != NULL)
+		cpustate->config = *(i8085_config *)device->static_config;
+	cpustate->cputype = type;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
+
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
-
+	
+	state_save_register_device_item(device, 0, cpustate->PC.w.l);
+	state_save_register_device_item(device, 0, cpustate->SP.w.l);
 	state_save_register_device_item(device, 0, cpustate->AF.w.l);
 	state_save_register_device_item(device, 0, cpustate->BC.w.l);
 	state_save_register_device_item(device, 0, cpustate->DE.w.l);
 	state_save_register_device_item(device, 0, cpustate->HL.w.l);
-	state_save_register_device_item(device, 0, cpustate->SP.w.l);
-	state_save_register_device_item(device, 0, cpustate->PC.w.l);
 	state_save_register_device_item(device, 0, cpustate->HALT);
 	state_save_register_device_item(device, 0, cpustate->IM);
-	state_save_register_device_item(device, 0, cpustate->IREQ);
-	state_save_register_device_item(device, 0, cpustate->ISRV);
-	state_save_register_device_item(device, 0, cpustate->INTR);
-	state_save_register_device_item(device, 0, cpustate->IRQ2);
-	state_save_register_device_item(device, 0, cpustate->IRQ1);
 	state_save_register_device_item(device, 0, cpustate->STATUS);
 	state_save_register_device_item(device, 0, cpustate->after_ei);
+	state_save_register_device_item(device, 0, cpustate->nmi_state);
 	state_save_register_device_item_array(device, 0, cpustate->irq_state);
+	state_save_register_device_item(device, 0, cpustate->trap_pending);
+	state_save_register_device_item(device, 0, cpustate->trap_im_copy);
+	state_save_register_device_item(device, 0, cpustate->sod_state);
 }
-
-/****************************************************************************
- * Reset the 8085 emulation
- ****************************************************************************/
-static CPU_RESET( i8085 )
-{
-	i8085_state *cpustate = device->token;
-	cpu_irq_callback save_irqcallback;
-	i8085_sod_func save_sodcallback;
-	i8085_sid_func save_sidcallback;
-	i8085_inte_func save_intecallback;
-	i8085_status_func save_statuscallback;
-	int cputype_bak = cpustate->cputype;
-
-	init_tables();
-	save_irqcallback = cpustate->irq_callback;
-	save_sodcallback = cpustate->sod_callback;
-	save_sidcallback = cpustate->sid_callback;
-	save_intecallback = cpustate->inte_callback;
-	save_statuscallback = cpustate->status_callback;
-	memset(cpustate, 0, sizeof(*cpustate));
-	cpustate->irq_callback = save_irqcallback;
-	cpustate->sod_callback = save_sodcallback;
-	cpustate->sid_callback = save_sidcallback;
-	cpustate->inte_callback = save_intecallback;
-	cpustate->status_callback = save_statuscallback;
-	cpustate->device = device;
-	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
-
-	cpustate->cputype = cputype_bak;
-	cpustate->after_ei = FALSE;
-
-	if (cpustate->inte_callback) (*cpustate->inte_callback)(cpustate->device, (cpustate->IM & IM_IEN) ? 1 : 0);
-}
-
-/****************************************************************************
- * Shut down the CPU emulation
- ****************************************************************************/
-static CPU_EXIT( i8085 )
-{
-	/* nothing to do */
-}
-
-/****************************************************************************/
-/* Set TRAP signal state                                                    */
-/****************************************************************************/
-static void i8085_set_TRAP(i8085_state *cpustate, int state)
-{
-	LOG(("i8085: TRAP %d\n", state));
-	if (state)
-	{
-		cpustate->IREQ |= IM_TRAP;
-		if( cpustate->ISRV & IM_TRAP ) return;	/* already servicing TRAP ? */
-		cpustate->ISRV = IM_TRAP;				/* service TRAP */
-		cpustate->IRQ2 = ADDR_TRAP;
-	}
-	else
-	{
-		cpustate->IREQ &= ~IM_TRAP; 			/* remove request for TRAP */
-	}
-}
-
-/****************************************************************************/
-/* Set RST7.5 signal state                                                  */
-/****************************************************************************/
-static void i8085_set_RST75(i8085_state *cpustate, int state)
-{
-	LOG(("i8085: RST7.5 %d\n", state));
-	if( state )
-	{
-
-		cpustate->IREQ |= IM_RST75; 			/* request RST7.5 */
-		cpustate->irq_state[I8085_RST75_LINE] = CLEAR_LINE;	/* clear latch */
-		if( cpustate->IM & IM_RST75 ) return;	/* if masked, ignore it for now */
-		if( !cpustate->ISRV )					/* if no higher priority IREQ is serviced */
-		{
-			cpustate->ISRV = IM_RST75;			/* service RST7.5 */
-			cpustate->IRQ2 = ADDR_RST75;
-		}
-	}
-	/* RST7.5 is reset only by SIM or end of service routine ! */
-}
-
-/****************************************************************************/
-/* Set RST6.5 signal state                                                  */
-/****************************************************************************/
-static void i8085_set_RST65(i8085_state *cpustate, int state)
-{
-	LOG(("i8085: RST6.5 %d\n", state));
-	if( state )
-	{
-		cpustate->IREQ |= IM_RST65; 			/* request RST6.5 */
-		if( cpustate->IM & IM_RST65 ) return;	/* if masked, ignore it for now */
-		if( !cpustate->ISRV )					/* if no higher priority IREQ is serviced */
-		{
-			cpustate->ISRV = IM_RST65;			/* service RST6.5 */
-			cpustate->IRQ2 = ADDR_RST65;
-		}
-	}
-	else
-	{
-		cpustate->IREQ &= ~IM_RST65;			/* remove request for RST6.5 */
-	}
-}
-
-/****************************************************************************/
-/* Set RST5.5 signal state                                                  */
-/****************************************************************************/
-static void i8085_set_RST55(i8085_state *cpustate, int state)
-{
-	LOG(("i8085: RST5.5 %d\n", state));
-	if( state )
-	{
-		cpustate->IREQ |= IM_RST55; 			/* request RST5.5 */
-		if( cpustate->IM & IM_RST55 ) return;	/* if masked, ignore it for now */
-		if( !cpustate->ISRV )					/* if no higher priority IREQ is serviced */
-		{
-			cpustate->ISRV = IM_RST55;			/* service RST5.5 */
-			cpustate->IRQ2 = ADDR_RST55;
-		}
-	}
-	else
-	{
-		cpustate->IREQ &= ~IM_RST55;			/* remove request for RST5.5 */
-	}
-}
-
-/****************************************************************************/
-/* Set INTR signal                                                          */
-/****************************************************************************/
-static void i8085_set_INTR(i8085_state *cpustate, int state)
-{
-	LOG(("i8085: INTR %d\n", state));
-	if( state )
-	{
-		cpustate->IREQ |= IM_INTR;				/* request INTR */
-		//cpustate->INTR = state;
-		cpustate->INTR = I8085_INTR; //AT: cpustate->INTR is supposed to hold IRQ0 vector(0x38) (0xff in this implementation)
-		if( cpustate->IM & IM_INTR ) return;	/* if masked, ignore it for now */
-		if( !cpustate->ISRV )					/* if no higher priority IREQ is serviced */
-		{
-			cpustate->ISRV = IM_INTR;			/* service INTR */
-			cpustate->IRQ2 = cpustate->INTR;
-		}
-	}
-	else
-	{
-		cpustate->IREQ &= ~IM_INTR; 			/* remove request for INTR */
-	}
-}
-
-static void i8085_set_irq_line(i8085_state *cpustate, int irqline, int state)
-{
-	if (irqline == INPUT_LINE_NMI)
-	{
-		if( state != CLEAR_LINE )
-			i8085_set_TRAP(cpustate, 1);
-	}
-	else if (irqline < 4)
-	{
-		if (irqline == I8085_RST75_LINE)	/* RST7.5 is latched on rising edge, the others are sampled */
-		{
-			if( state != CLEAR_LINE )
-				cpustate->irq_state[irqline] = state;
-		}
-		else
-			cpustate->irq_state[irqline] = state;
-
-		if (state == CLEAR_LINE)
-		{
-			if( !(cpustate->IM & IM_IEN) )
-			{
-				switch (irqline)
-				{
-					case I8085_INTR_LINE: i8085_set_INTR(cpustate, 0); break;
-					case I8085_RST55_LINE: i8085_set_RST55(cpustate, 0); break;
-					case I8085_RST65_LINE: i8085_set_RST65(cpustate, 0); break;
-					case I8085_RST75_LINE: i8085_set_RST75(cpustate, 0); break;
-				}
-			}
-		}
-		else
-		{
-			if( cpustate->IM & IM_IEN )
-			{
-				switch( irqline )
-				{
-					case I8085_INTR_LINE: i8085_set_INTR(cpustate, 1); break;
-					case I8085_RST55_LINE: i8085_set_RST55(cpustate, 1); break;
-					case I8085_RST65_LINE: i8085_set_RST65(cpustate, 1); break;
-					case I8085_RST75_LINE: i8085_set_RST75(cpustate, 1); break;
-				}
-			}
-		}
-	}
-}
-
-
-/**************************************************************************
- * 8080 section
- **************************************************************************/
-#if (HAS_8080)
 
 static CPU_INIT( i8080 )
 {
+	init_808x_common(device, irqcallback, CPUTYPE_8080);
+}
+
+static CPU_INIT( i8085 )
+{
+	init_808x_common(device, irqcallback, CPUTYPE_8085);
+}
+
+
+
+/***************************************************************************
+    COMMON RESET
+***************************************************************************/
+
+static CPU_RESET( i808x )
+{
+	i8085_state *cpustate = device->token;
+	
+	cpustate->PC.d = 0;
+	cpustate->HALT = 0;
+	cpustate->IM &= ~IM_I75;
+	cpustate->IM |= IM_M55 | IM_M65 | IM_M75;
+	cpustate->after_ei = FALSE;
+	cpustate->trap_pending = FALSE;
+	cpustate->trap_im_copy = 0;
+	set_inte(cpustate, 0);
+	set_sod(cpustate, 0);
+}
+
+
+
+/***************************************************************************
+    COMMON STATE IMPORT/EXPORT
+***************************************************************************/
+
+static CPU_IMPORT_STATE( i808x )
+{
 	i8085_state *cpustate = device->token;
 
-	init_tables();
-	cpustate->cputype = 0;
-	cpustate->irq_callback = irqcallback;
-	cpustate->device = device;
-
-	state_save_register_device_item(device, 0, cpustate->AF.w.l);
-	state_save_register_device_item(device, 0, cpustate->BC.w.l);
-	state_save_register_device_item(device, 0, cpustate->DE.w.l);
-	state_save_register_device_item(device, 0, cpustate->HL.w.l);
-	state_save_register_device_item(device, 0, cpustate->SP.w.l);
-	state_save_register_device_item(device, 0, cpustate->PC.w.l);
-	state_save_register_device_item(device, 0, cpustate->HALT);
-	state_save_register_device_item(device, 0, cpustate->IM);
-	state_save_register_device_item(device, 0, cpustate->IREQ);
-	state_save_register_device_item(device, 0, cpustate->ISRV);
-	state_save_register_device_item(device, 0, cpustate->INTR);
-	state_save_register_device_item(device, 0, cpustate->IRQ2);
-	state_save_register_device_item(device, 0, cpustate->IRQ1);
-	state_save_register_device_item(device, 0, cpustate->STATUS);
-	state_save_register_device_item_array(device, 0, cpustate->irq_state);
+	switch (entry->index)
+	{
+		case I8085_SID:
+			if (cpustate->ietemp)
+				cpustate->IM |= IM_SID;
+			else
+				cpustate->IM &= ~IM_SID;
+			break;
+		
+		case I8085_INTE:
+			if (cpustate->ietemp)
+				cpustate->IM |= IM_IE;
+			else
+				cpustate->IM &= ~IM_IE;
+			break;
+		
+		default:
+			fatalerror("CPU_IMPORT_STATE(i808x) called for unexpected value\n");
+			break;
+	}
 }
 
-static void i8080_set_irq_line(i8085_state *cpustate, int irqline, int state)
+
+static CPU_EXPORT_STATE( i808x )
 {
+	i8085_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case I8085_SID:
+			cpustate->ietemp = ((cpustate->IM & IM_SID) != 0);
+			if (cpustate->config.sid != NULL)
+				cpustate->ietemp = ((*cpustate->config.sid)(cpustate->device) != 0);
+			break;
+		
+		case I8085_INTE:
+			cpustate->ietemp = ((cpustate->IM & IM_IE) != 0);
+			break;
+		
+		default:
+			fatalerror("CPU_EXPORT_STATE(i808x) called for unexpected value\n");
+			break;
+	}
+}
+
+
+
+/***************************************************************************
+    COMMON SET INFO
+***************************************************************************/
+
+static void i808x_set_irq_line(i8085_state *cpustate, int irqline, int state)
+{
+	int newstate = (state != CLEAR_LINE);
+	
+	/* NMI is edge-triggered */
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if( state != CLEAR_LINE )
-			i8085_set_TRAP(cpustate, 1);
+		if (!cpustate->nmi_state && newstate)
+			cpustate->trap_pending = TRUE;
+		cpustate->nmi_state = newstate;
 	}
-	else
+
+	/* RST7.5 is edge-triggered */
+	else if (irqline == I8085_RST75_LINE)
 	{
-		cpustate->irq_state[irqline] = state;
-		if (state == CLEAR_LINE)
-		{
-			if (!(cpustate->IM & IM_IEN))
-				i8085_set_INTR(cpustate, 0);
-		}
-		else
-		{
-			if (cpustate->IM & IM_IEN)
-				i8085_set_INTR(cpustate, 1);
-		}
+		if (!cpustate->irq_state[I8085_RST75_LINE] && newstate)
+			cpustate->IM |= IM_I75;
+		cpustate->irq_state[I8085_RST75_LINE] = newstate;
 	}
+	
+	/* remaining sources are level triggered */
+	else if (irqline < ARRAY_LENGTH(cpustate->irq_state))
+		cpustate->irq_state[irqline] = state;
 }
-#endif
 
 
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( i8085 )
+static CPU_SET_INFO( i808x )
 {
 	i8085_state *cpustate = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + I8085_INTR_LINE:	i8085_set_irq_line(cpustate, I8085_INTR_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + I8085_RST55_LINE:i8085_set_irq_line(cpustate, I8085_RST55_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + I8085_RST65_LINE:i8085_set_irq_line(cpustate, I8085_RST65_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + I8085_RST75_LINE:i8085_set_irq_line(cpustate, I8085_RST75_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	i8085_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
-
-		case CPUINFO_INT_PC:							cpustate->PC.w.l = info->i; 					break;
-		case CPUINFO_INT_REGISTER + I8085_PC:			cpustate->PC.w.l = info->i;						break;
-		case CPUINFO_INT_SP:							cpustate->SP.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_SP:			cpustate->SP.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_AF:			cpustate->AF.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_BC:			cpustate->BC.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_DE:			cpustate->DE.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_HL:			cpustate->HL.w.l = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_IM:			cpustate->IM = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8085_HALT:			cpustate->HALT = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_IREQ:			cpustate->IREQ = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_ISRV:			cpustate->ISRV = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_VECTOR:		cpustate->INTR = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8085_STATUS:		cpustate->STATUS = info->i;						break;
-
-		case CPUINFO_INT_I8085_SID:						if (info->i) cpustate->IM |= IM_SID; else cpustate->IM &= ~IM_SID; break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_I8085_SOD_CALLBACK:			cpustate->sod_callback = (i8085_sod_func)info->f; break;
-		case CPUINFO_FCT_I8085_SID_CALLBACK:			cpustate->sid_callback = (i8085_sid_func)info->f; break;
-		case CPUINFO_FCT_I8085_INTE_CALLBACK:			cpustate->inte_callback = (i8085_inte_func)info->f; break;
-		case CPUINFO_FCT_I8085_STATUS_CALLBACK:			cpustate->status_callback = (i8085_status_func)info->f; break;
+		case CPUINFO_INT_INPUT_STATE + I8085_INTR_LINE:
+		case CPUINFO_INT_INPUT_STATE + I8085_RST55_LINE:
+		case CPUINFO_INT_INPUT_STATE + I8085_RST65_LINE:
+		case CPUINFO_INT_INPUT_STATE + I8085_RST75_LINE:
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:
+			i808x_set_irq_line(cpustate, state - CPUINFO_INT_INPUT_STATE, info->i); 
+			break;
 	}
 }
 
 
 
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
+/***************************************************************************
+    8085/COMMON GET INFO
+***************************************************************************/
 
 CPU_GET_INFO( i8085 )
 {
@@ -1670,48 +1708,25 @@ CPU_GET_INFO( i8085 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 4;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;							break;
 
-		case CPUINFO_INT_INPUT_STATE + I8085_INTR_LINE:	info->i = (cpustate->IREQ & IM_INTR) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + I8085_RST55_LINE:info->i = (cpustate->IREQ & IM_RST55) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + I8085_RST65_LINE:info->i = (cpustate->IREQ & IM_RST65) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + I8085_RST75_LINE:info->i = (cpustate->IREQ & IM_RST75) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = (cpustate->IREQ & IM_TRAP) ? ASSERT_LINE : CLEAR_LINE; break;
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(i808x);				break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(i8085);						break;
+		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(i808x);					break;
+		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(i808x);				break;
+		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(i8085);		break;
+		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(i808x);		break;	
+		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(i808x);		break;
 
-		case CPUINFO_INT_PREVIOUSPC:					/* not supported */						break;
-
-		case CPUINFO_INT_PC:							info->i = cpustate->PC.d;						break;
-		case CPUINFO_INT_REGISTER + I8085_PC:			info->i = cpustate->PC.w.l;						break;
-		case CPUINFO_INT_SP:							info->i = cpustate->SP.d;						break;
-		case CPUINFO_INT_REGISTER + I8085_SP:			info->i = cpustate->SP.w.l;						break;
-		case CPUINFO_INT_REGISTER + I8085_AF:			info->i = cpustate->AF.w.l;						break;
-		case CPUINFO_INT_REGISTER + I8085_BC:			info->i = cpustate->BC.w.l;						break;
-		case CPUINFO_INT_REGISTER + I8085_DE:			info->i = cpustate->DE.w.l;						break;
-		case CPUINFO_INT_REGISTER + I8085_HL:			info->i = cpustate->HL.w.l;						break;
-		case CPUINFO_INT_REGISTER + I8085_IM:			info->i = cpustate->IM;							break;
-		case CPUINFO_INT_REGISTER + I8085_HALT:			info->i = cpustate->HALT;						break;
-		case CPUINFO_INT_REGISTER + I8085_IREQ:			info->i = cpustate->IREQ;						break;
-		case CPUINFO_INT_REGISTER + I8085_ISRV:			info->i = cpustate->ISRV;						break;
-		case CPUINFO_INT_REGISTER + I8085_VECTOR:		info->i = cpustate->INTR;						break;
-		case CPUINFO_INT_REGISTER + I8085_STATUS:		info->i = cpustate->STATUS;						break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i8085);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8085);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(i8085);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(i8085);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i8085);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8085);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "8085A");				break;
@@ -1731,55 +1746,24 @@ CPU_GET_INFO( i8085 )
 				cpustate->AF.b.l & 0x02 ? 'N':'.',
 				cpustate->AF.b.l & 0x01 ? 'C':'.');
 			break;
-
-		case CPUINFO_STR_REGISTER + I8085_AF:			sprintf(info->s, "AF:%04X", cpustate->AF.w.l);	break;
-		case CPUINFO_STR_REGISTER + I8085_BC:			sprintf(info->s, "BC:%04X", cpustate->BC.w.l);	break;
-		case CPUINFO_STR_REGISTER + I8085_DE:			sprintf(info->s, "DE:%04X", cpustate->DE.w.l);	break;
-		case CPUINFO_STR_REGISTER + I8085_HL:			sprintf(info->s, "HL:%04X", cpustate->HL.w.l);	break;
-		case CPUINFO_STR_REGISTER + I8085_SP:			sprintf(info->s, "SP:%04X", cpustate->SP.w.l);	break;
-		case CPUINFO_STR_REGISTER + I8085_PC:			sprintf(info->s, "PC:%04X", cpustate->PC.w.l);	break;
-		case CPUINFO_STR_REGISTER + I8085_IM:			sprintf(info->s, "IM:%02X", cpustate->IM);		break;
-		case CPUINFO_STR_REGISTER + I8085_HALT:			sprintf(info->s, "HALT:%d", cpustate->HALT);	break;
-		case CPUINFO_STR_REGISTER + I8085_IREQ:			sprintf(info->s, "IREQ:%02X", cpustate->IREQ);	break;
-		case CPUINFO_STR_REGISTER + I8085_ISRV:			sprintf(info->s, "ISRV:%02X", cpustate->ISRV);	break;
-		case CPUINFO_STR_REGISTER + I8085_VECTOR:		sprintf(info->s, "VEC:%02X", cpustate->INTR);	break;
-		case CPUINFO_STR_REGISTER + I8085_STATUS:		sprintf(info->s, "SW:%02X", cpustate->STATUS);	break;
 	}
 }
 
 
-#if (HAS_8080)
-/**************************************************************************
- * CPU-specific get_info/set_info
- **************************************************************************/
-
-static CPU_SET_INFO( i8080 )
-{
-	i8085_state *cpustate = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + I8080_INTR_LINE:	i8080_set_irq_line(cpustate, I8080_INTR_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	i8080_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
-
-		default:										CPU_SET_INFO_CALL(i8085); break;
-	}
-}
+/***************************************************************************
+    8080-SPECIFIC GET INFO
+***************************************************************************/
 
 CPU_GET_INFO( i8080 )
 {
-	i8085_state *cpustate = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
-		case CPUINFO_INT_INPUT_STATE + I8085_INTR_LINE:	info->i = (cpustate->IREQ & IM_INTR) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = (cpustate->IREQ & IM_TRAP) ? ASSERT_LINE : CLEAR_LINE; break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i8080);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8080);				break;
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(i8080);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "8080");				break;
@@ -1787,4 +1771,3 @@ CPU_GET_INFO( i8080 )
 		default:										CPU_GET_INFO_CALL(i8085); break;
 	}
 }
-#endif

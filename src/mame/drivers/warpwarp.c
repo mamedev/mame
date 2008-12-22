@@ -133,6 +133,8 @@ TODO:
 #include "geebee.lh"
 #include "sos.lh"
 
+#define MASTER_CLOCK		XTAL_18_432MHz
+
 
 /*******************************************************
  *
@@ -734,18 +736,15 @@ static const custom_sound_interface warpwarp_custom_interface =
 static MACHINE_DRIVER_START( geebee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080,XTAL_18_432MHz/9) /* verified on pcb */
+	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/9) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(geebee_map,0)
 	MDRV_CPU_IO_MAP(geebee_port_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(34*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 28*8-1)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 
 	MDRV_GFXDECODE(1k)
 	MDRV_PALETTE_LENGTH(4*2)
@@ -778,17 +777,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bombbee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080,18432000/9) 		/* 18.432 MHz / 9 */
+	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/9) 		/* 18.432 MHz / 9 */
 	MDRV_CPU_PROGRAM_MAP(bombbee_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(34*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 28*8-1)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 
 	MDRV_GFXDECODE(color)
 	MDRV_PALETTE_LENGTH(2*256+1)

@@ -93,22 +93,21 @@ static void n8080_status_callback(const device_config *device, UINT8 status)
 	}
 }
 
-static MACHINE_START( spacefev )
+static const i8085_config n8080_cpu_config =
 {
-	const device_config *cpu = cputag_get_cpu(machine, "main");
-
-	i8085_set_status_callback(cpu, n8080_status_callback);
-	i8085_set_inte_callback(cpu, n8080_inte_callback);
-}
+	n8080_inte_callback,	/* INTE changed callback */
+	n8080_status_callback,	/* STATUS changed callback */
+	NULL,					/* SOD changed callback (8085A only) */
+	NULL,					/* SID changed callback (8085A only) */
+};
 
 static MACHINE_DRIVER_START( spacefev )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
+	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-
-	MDRV_MACHINE_START(spacefev)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -134,10 +133,9 @@ static MACHINE_DRIVER_START( sheriff )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
+	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-
-	MDRV_MACHINE_START(spacefev)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -163,10 +161,9 @@ static MACHINE_DRIVER_START( helifire )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
+	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-
-	MDRV_MACHINE_START(spacefev)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

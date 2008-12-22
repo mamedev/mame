@@ -183,11 +183,13 @@ static int sid_callback(const device_config *device)
 }
 
 
-static SOUND_START( redalert_voice )
+static const i8085_config redalert_voice_i8085_config =
 {
-	i8085_set_sod_callback(machine->cpu[2], sod_callback);
-	i8085_set_sid_callback(machine->cpu[2], sid_callback);
-}
+	NULL,				/* INTE changed callback */
+	NULL,				/* STATUS changed callback */
+	sod_callback,		/* SOD changed callback (8085A only) */
+	sid_callback		/* SID changed callback (8085A only) */
+};
 
 
 static ADDRESS_MAP_START( redalert_voice_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -208,7 +210,6 @@ ADDRESS_MAP_END
 static SOUND_START( redalert )
 {
 	SOUND_START_CALL(redalert_audio);
-	SOUND_START_CALL(redalert_voice);
 }
 
 
@@ -242,6 +243,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( redalert_audio_voice )
 
 	MDRV_CPU_ADD("voice", 8085A, REDALERT_VOICE_CPU_CLOCK)
+	MDRV_CPU_CONFIG(redalert_voice_i8085_config)
 	MDRV_CPU_PROGRAM_MAP(redalert_voice_map,0)
 
 	MDRV_SOUND_ADD("cvsd", HC55516, REDALERT_HC55516_CLOCK)

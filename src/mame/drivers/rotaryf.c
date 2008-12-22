@@ -31,8 +31,10 @@ static INTERRUPT_GEN( rotaryf_interrupt )
 	if (video_screen_get_vblank(device->machine->primary_screen))
 		cpu_set_input_line(device, I8085_RST55_LINE, HOLD_LINE);
 	else
-		cpu_set_input_line(device, I8085_RST75_LINE, HOLD_LINE);
-
+	{
+		cpu_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
+		cpu_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+	}
 }
 
 

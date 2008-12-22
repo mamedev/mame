@@ -539,12 +539,21 @@ static void dwarfd_sod_callback(const device_config *device, int nSO)
 	crt_access=nSO;
 }
 
+
+static const i8085_config dwarfd_i8085_config =
+{
+	NULL,					/* INTE changed callback */
+	NULL,					/* STATUS changed callback */
+	dwarfd_sod_callback,	/* SOD changed callback (8085A only) */
+	NULL					/* SID changed callback (8085A only) */
+};
+
+
 #define NUM_LINES 25
 static INTERRUPT_GEN( dwarfd_interrupt )
 {
 	if(cpu_getiloops(device) < NUM_LINES)
 	{
-		i8085_set_sod_callback(device, dwarfd_sod_callback);
 		cpu_set_input_line(device,I8085_RST65_LINE,HOLD_LINE); // 34 - every 8th line
 		line=cpu_getiloops(device);
 		idx=0;
@@ -689,7 +698,7 @@ static MACHINE_DRIVER_START( dwarfd )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
 	MDRV_CPU_ADD("main", 8085A, 10595000/3*2)        /* ? MHz */
-
+	MDRV_CPU_CONFIG(dwarfd_i8085_config)
 	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
 	MDRV_CPU_IO_MAP(io_map, 0)
 
@@ -775,8 +784,6 @@ static DRIVER_INIT(dwarfd)
 		}
 	//      src[i] = src[i]&0xe0;
 	}
-
-	i8085_set_sod_callback(machine->cpu[0], dwarfd_sod_callback);
 
 	videobuf=auto_malloc(0x8000);
 	dwarfd_ram=auto_malloc(0x1000);
