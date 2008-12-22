@@ -1804,6 +1804,7 @@ src/mame/drivers/pangofun.c svneol=native#text/plain
 src/mame/drivers/panicr.c svneol=native#text/plain
 src/mame/drivers/paradise.c svneol=native#text/plain
 src/mame/drivers/paranoia.c svneol=native#text/plain
+src/mame/drivers/parentj.c svneol=native#text/plain
 src/mame/drivers/parodius.c svneol=native#text/plain
 src/mame/drivers/pasha2.c svneol=native#text/plain
 src/mame/drivers/pass.c svneol=native#text/plain
