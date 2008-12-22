@@ -25,7 +25,6 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_CPU 				8
 #define MAX_INPUT_EVENTS		32
 
 
@@ -229,8 +228,18 @@ enum
     MACROS
 ***************************************************************************/
 
-#define IRQ_CALLBACK(func)			int func(const device_config *device, int irqline)
+/* device iteration helpers */
+#define cpu_count(config)				device_list_items((config)->devicelist, CPU)
+#define cpu_first(config)				device_list_first((config)->devicelist, CPU)
+#define cpu_next(previous)				((previous)->typenext)
+#define cpu_get_index(cpu)				device_list_index((cpu)->machine->config->devicelist, CPU, (cpu)->tag)
 
+
+/* IRQ callback to be called by CPU cores when an IRQ is actually taken */
+#define IRQ_CALLBACK(func)				int func(const device_config *device, int irqline)
+
+
+/* CPU interface functions */
 #define CPU_GET_INFO_NAME(name)			cpu_get_info_##name
 #define CPU_GET_INFO(name)				void CPU_GET_INFO_NAME(name)(const device_config *device, UINT32 state, cpuinfo *info)
 #define CPU_GET_INFO_CALL(name)			CPU_GET_INFO_NAME(name)(device, state, info)
@@ -304,8 +313,9 @@ enum
 #define CPU_EXPORT_STRING_CALL(name)	CPU_EXPORT_STRING_NAME(name)(device, baseptr, entry, string)
 
 
-
-#define cpu_get_index(cpu)					device_list_index((cpu)->machine->config->devicelist, CPU, (cpu)->tag)
+/* base macro for defining CPU state entries */
+#define CPU_STATE_ENTRY(_index, _symbol, _format, _struct, _member, _datamask, _validmask, _flags) \
+	{ _index, _validmask, offsetof(_struct, _member), _datamask, sizeof(((_struct *)0)->_member), _flags, _symbol, _format },
 
 
 /* helpers for accessing common CPU state */
@@ -342,33 +352,21 @@ enum
 #define cpu_set_reg(cpu, reg, val)			device_set_info_int(cpu, CPUINFO_INT_REGISTER + (reg), (val))
 
 
-/* helpers for using machine/cputag instead of cpu objects */
-#define cputag_reset(mach, tag)						device_reset(cputag_get_cpu(mach, tag))
-#define cputag_get_index(mach, tag)					cpu_get_index(cputag_get_cpu(mach, tag))
-#define cputag_get_address_space(mach, tag, space)	cpu_get_address_space(cputag_get_cpu(mach, tag), space)
-
-
-#define CPU_STATE_ENTRY(_index, _symbol, _format, _struct, _member, _datamask, _validmask, _flags) \
-	{ _index, _validmask, offsetof(_struct, _member), _datamask, sizeof(((_struct *)0)->_member), _flags, _symbol, _format },
-
-
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-/* opaque definition of CPU internal and debugging info */
-typedef struct _cpu_debug_data cpu_debug_data;
-
 
 /* forward declaration of types */
 typedef union _cpuinfo cpuinfo;
 typedef struct _cpu_state_entry cpu_state_entry;
 
 
-/* define the various callback functions */
+/* IRQ callback to be called by CPU cores when an IRQ is actually taken */
 typedef int (*cpu_irq_callback)(const device_config *device, int irqnum);
 
+
+/* CPU interface functions */
 typedef void (*cpu_get_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
 typedef void (*cpu_set_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
 typedef void (*cpu_init_func)(const device_config *device, cpu_irq_callback irqcallback);
@@ -385,6 +383,10 @@ typedef offs_t (*cpu_disassemble_func)(const device_config *device, char *buffer
 typedef int (*cpu_validity_check_func)(const game_driver *driver, const void *config);
 typedef void (*cpu_state_io_func)(const device_config *device, void *baseptr, const cpu_state_entry *entry);
 typedef void (*cpu_string_io_func)(const device_config *device, void *baseptr, const cpu_state_entry *entry, char *string);
+
+
+/* a cpu_type is just a pointer to the CPU's get_info function */
+typedef cpu_get_info_func cpu_type;
 
 
 /* structure describing a single item of exposed CPU state */
@@ -410,10 +412,6 @@ struct _cpu_state_table
 	UINT32					entrycount;					/* number of entries */
 	const cpu_state_entry *	entrylist;					/* array of entries */
 };
-
-
-/* a cpu_type is just a pointer to the CPU's get_info function */
-typedef cpu_get_info_func cpu_type;
 
 
 /* cpuinfo union used to pass data to/from the get_info/set_info functions */
@@ -449,113 +447,6 @@ union _cpuinfo
 	const addrmap64_token *	internal_map64;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
 };
 
-
-/* partial data hanging off of the classtoken */
-typedef struct _cpu_class_header cpu_class_header;
-struct _cpu_class_header
-{
-	cpu_debug_data *		debug;						/* debugging data */
-	const address_space *	space[ADDRESS_SPACES];		/* address spaces */
-
-	/* table of core functions */
-	cpu_set_info_func		set_info;
-	cpu_execute_func		execute;
-	cpu_burn_func			burn;
-	cpu_translate_func		translate;
-	cpu_disassemble_func	disassemble;
-	cpu_disassemble_func 	dasm_override;
-};
-
-
-
-/***************************************************************************
-    CPU DEFINITIONS
-***************************************************************************/
-
-#define cpu_count(config)		device_list_items((config)->devicelist, CPU)
-#define cpu_first(config)		device_list_first((config)->devicelist, CPU)
-#define cpu_next(previous)		device_list_next((previous), CPU)
-
-
-CPU_GET_INFO( dummy );
-#define CPU_DUMMY CPU_GET_INFO_NAME( dummy )
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
-/* ----- live CPU accessors ----- */
-
-/* return the PC, corrected to a byte offset and translated to physical space, on a given CPU */
-offs_t cpu_get_physical_pc_byte(const device_config *cpu);
-
-/* disassemble a line at a given PC on a given CPU */
-offs_t cpu_dasm(const device_config *cpu, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-
-/* set a dasm override handler */
-void cpu_set_dasm_override(const device_config *cpu, cpu_disassemble_func dasm_override);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    cpu_get_class_header - return a pointer to
-    the class header
--------------------------------------------------*/
-
-INLINE cpu_class_header *cpu_get_class_header(const device_config *device)
-{
-	if (device->token != NULL)
-		return (cpu_class_header *)((UINT8 *)device->token + device->tokenbytes) - 1;
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    cpu_get_debug_data - return a pointer to
-    the given CPU's debugger data
--------------------------------------------------*/
-
-INLINE cpu_debug_data *cpu_get_debug_data(const device_config *device)
-{
-	cpu_class_header *classheader = cpu_get_class_header(device);
-	return classheader->debug;
-}
-
-
-/*-------------------------------------------------
-    cpu_get_address_space - return a pointer to
-    the given CPU's address space
--------------------------------------------------*/
-
-INLINE const address_space *cpu_get_address_space(const device_config *device, int spacenum)
-{
-	/* it is faster to pull this from the class header, but only after we've started */
-	if (device->token != NULL)
-	{
-		cpu_class_header *classheader = cpu_get_class_header(device);
-		return classheader->space[spacenum];
-	}
-	return memory_find_address_space(device, spacenum);
-}
-
-
-/*-------------------------------------------------
-    cpu_execute - execute the requested cycles on
-    a given CPU
--------------------------------------------------*/
-
-INLINE int cpu_execute(const device_config *device, int cycles)
-{
-	cpu_class_header *classheader = cpu_get_class_header(device);
-	return (*classheader->execute)(device, cycles);
-}
 
 
 #endif	/* __CPUINTRF_H__ */

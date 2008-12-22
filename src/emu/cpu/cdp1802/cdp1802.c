@@ -893,8 +893,8 @@ static CPU_INIT( cdp1802 )
 
 	/* get address spaces */
 
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	/* set initial values */
 

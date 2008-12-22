@@ -328,7 +328,7 @@ UINT32 debug_comment_get_opcode_crc32(const device_config *device, offs_t addres
 		argbuf[i] = debug_read_opcode(space, address + i, 1, TRUE);
 	}
 
-	numbytes = cpu_dasm(device, buff, address & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+	numbytes = debug_cpu_disassemble(device, buff, address & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 	numbytes = memory_address_to_byte(space, numbytes);
 
 	crc = crc32(0, argbuf, numbytes);

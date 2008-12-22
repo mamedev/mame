@@ -709,9 +709,9 @@ static void mcs48_init(const device_config *device, cpu_irq_callback irqcallback
 	cpustate->device = device;
 	cpustate->int_rom_size = romsize;
 
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	/* ensure that regptr is valid before get_info gets called */
 	update_regptr(cpustate);

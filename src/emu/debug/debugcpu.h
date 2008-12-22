@@ -100,29 +100,32 @@ struct _debug_hotspot_entry
 /* In cpuintrf.h: typedef struct _cpu_debug_data cpu_debug_data; */
 struct _cpu_debug_data
 {
-	const device_config *device;				/* CPU device object */
-	symbol_table *	symtable;					/* symbol table for expression evaluation */
-	UINT32			flags;						/* debugging flags for this CPU */
-	UINT8			opwidth;					/* width of an opcode */
-	offs_t			stepaddr;					/* step target address for DEBUG_FLAG_STEPPING_OVER */
-	int				stepsleft;					/* number of steps left until done */
-	offs_t			stopaddr;					/* stop address for DEBUG_FLAG_STOP_PC */
-	attotime		stoptime;					/* stop time for DEBUG_FLAG_STOP_TIME */
-	int				stopirq;					/* stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT */
-	int				stopexception;				/* stop exception number for DEBUG_FLAG_STOP_EXCEPTION */
-	attotime		endexectime;				/* ending time of the current execution */
-	debug_trace_info trace;						/* trace info */
-	debug_cpu_breakpoint *bplist;				/* list of breakpoints */
-	debug_hotspot_entry *hotspots;				/* hotspot list */
-	offs_t			pc_history[DEBUG_HISTORY_SIZE]; /* history of recent PCs */
-	UINT32			pc_history_index;			/* current history index */
-	int				hotspot_count;				/* number of hotspots */
-	int				hotspot_threshhold;			/* threshhold for the number of hits to print */
-	cpu_read_func	read; 						/* memory read routine */
-	cpu_write_func	write;						/* memory write routine */
-	cpu_readop_func	readop;						/* opcode read routine */
-	debug_instruction_hook_func instrhook;		/* per-instruction callback hook */
-	debug_cpu_watchpoint *wplist[ADDRESS_SPACES]; /* watchpoint lists for each address space */
+	const device_config *	device;						/* CPU device object */
+	symbol_table *			symtable;					/* symbol table for expression evaluation */
+	UINT32					flags;						/* debugging flags for this CPU */
+	UINT8					opwidth;					/* width of an opcode */
+	offs_t					stepaddr;					/* step target address for DEBUG_FLAG_STEPPING_OVER */
+	int						stepsleft;					/* number of steps left until done */
+	offs_t					stopaddr;					/* stop address for DEBUG_FLAG_STOP_PC */
+	attotime				stoptime;					/* stop time for DEBUG_FLAG_STOP_TIME */
+	int						stopirq;					/* stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT */
+	int						stopexception;				/* stop exception number for DEBUG_FLAG_STOP_EXCEPTION */
+	attotime				endexectime;				/* ending time of the current execution */
+	debug_trace_info	 	trace;						/* trace info */
+	debug_cpu_breakpoint *	bplist;						/* list of breakpoints */
+	debug_hotspot_entry *	hotspots;					/* hotspot list */
+	offs_t					pc_history[DEBUG_HISTORY_SIZE]; /* history of recent PCs */
+	UINT32					pc_history_index;			/* current history index */
+	int						hotspot_count;				/* number of hotspots */
+	int						hotspot_threshhold;			/* threshhold for the number of hits to print */
+	cpu_read_func			read; 						/* memory read routine */
+	cpu_write_func			write;						/* memory write routine */
+	cpu_readop_func			readop;						/* opcode read routine */
+	cpu_translate_func 		translate;					/* pointer to CPU's translate function */
+	cpu_disassemble_func	disassemble;				/* pointer to CPU's dissasemble function */
+	cpu_disassemble_func 	dasm_override;				/* pointer to provided override function */
+	debug_instruction_hook_func instrhook;				/* per-instruction callback hook */
+	debug_cpu_watchpoint *	wplist[ADDRESS_SPACES];		/* watchpoint lists for each address space */
 };
 
 
@@ -196,6 +199,19 @@ symbol_table *debug_cpu_get_visible_symtable(running_machine *machine);
 
 /* return a specific CPU's symbol table */
 symbol_table *debug_cpu_get_symtable(const device_config *device);
+
+
+
+/* ----- memory and disassembly helpers ----- */
+
+/* return the physical address corresponding to the given logical address */
+int debug_cpu_translate(const address_space *space, int intention, offs_t *address);
+
+/* disassemble a line at a given PC on a given CPU */
+offs_t debug_cpu_disassemble(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+
+/* set an override handler for disassembly */
+void debug_cpu_set_dasm_override(const device_config *device, cpu_disassemble_func dasm_override);
 
 
 

@@ -886,9 +886,9 @@ static CPU_INIT( m6800 )
 {
 	m6800_state *cpustate = device->token;
 
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	//  cpustate->subtype   = SUBTYPE_M6800;
 	cpustate->insn = m6800_insn;
@@ -1283,9 +1283,9 @@ static CPU_INIT( m6801 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	cpustate->clock = device->clock / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
@@ -1308,9 +1308,9 @@ static CPU_INIT( m6802 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_register(cpustate, "m6802");
 }
@@ -1329,9 +1329,9 @@ static CPU_INIT( m6803 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	cpustate->clock = device->clock / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
@@ -1669,9 +1669,9 @@ static CPU_INIT( m6808 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_register(cpustate, "m6808");
 }
@@ -1691,9 +1691,9 @@ static CPU_INIT( hd63701 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	cpustate->clock = device->clock / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
@@ -2041,9 +2041,9 @@ static CPU_INIT( nsc8105 )
 	//  cpustate->subtype = SUBTYPE_NSC8105;
 	cpustate->device = device;
 
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	cpustate->insn = nsc8105_insn;
 	cpustate->cycles = cycles_nsc8105;

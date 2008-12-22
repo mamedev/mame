@@ -34,8 +34,8 @@ UINT32 *generic_nvram32;
 /* memory card status */
 static int memcard_inserted;
 
-/* interrupt status */
-static UINT8 interrupt_enable[MAX_CPU];
+/* interrupt status for up to 8 CPUs */
+static UINT8 interrupt_enable[8];
 
 
 

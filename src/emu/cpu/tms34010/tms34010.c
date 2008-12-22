@@ -740,7 +740,7 @@ static CPU_RESET( tms34010 )
 	/* the first time we are run */
 	tms->reset_deferred = tms->config->halt_on_reset;
 	if (tms->config->halt_on_reset)
-		tms34010_io_register_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
+		tms34010_io_register_w(memory_find_address_space(device, ADDRESS_SPACE_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
 }
 
 
@@ -1636,7 +1636,7 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 		/* control register */
 		case TMS34010_HOST_CONTROL:
 			tms->external_host_access = TRUE;
-			space = cpu_get_address_space(tms->device, ADDRESS_SPACE_PROGRAM);
+			space = memory_find_address_space(tms->device, ADDRESS_SPACE_PROGRAM);
 			tms34010_io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xffff);
 			tms34010_io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0xffff);
 			tms->external_host_access = FALSE;

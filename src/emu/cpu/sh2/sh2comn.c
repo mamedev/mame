@@ -724,8 +724,8 @@ void sh2_common_init(SH2 *sh2, const device_config *device, cpu_irq_callback irq
 	}
 	sh2->irq_callback = irqcallback;
 	sh2->device = device;
-	sh2->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	sh2->internal = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh2->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh2->internal = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	state_save_register_device_item(device, 0, sh2->pc);
 	state_save_register_device_item(device, 0, sh2->r[15]);

@@ -387,7 +387,7 @@ INLINE UINT16 mix_3D(ay8910_context *psg)
 static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(psg->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(psg->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
 	psg->regs[r] = v;
@@ -783,7 +783,7 @@ int ay8910_read_ym(void *chip)
 {
 	ay8910_context *psg = chip;
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(psg->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(psg->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int r = psg->register_latch;
 
 	if (r > 15) return 0;

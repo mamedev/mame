@@ -940,13 +940,6 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 
 
-/* ----- miscellaneous utilities ----- */
-
-/* return the physical address corresponding to the given logical address */
-int memory_address_physical(const address_space *space, int intention, offs_t *address);
-
-
-
 /* ----- debugger helpers ----- */
 
 /* return a string describing the handler at a particular offset */

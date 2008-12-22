@@ -1730,8 +1730,8 @@ static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t t
 
 			/* get the disassembly, but only if mapped */
 			instlen = 1;
-			if (memory_address_physical(space, TRANSLATE_FETCH, &physpcbyte))
-				instlen = cpu_dasm(space->cpu, dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
+			if (debug_cpu_translate(space, TRANSLATE_FETCH, &physpcbyte))
+				instlen = debug_cpu_disassemble(space->cpu, dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
 
 			/* count this one */
 			instcount++;
@@ -1891,7 +1891,7 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 
 		/* make sure we can translate the address, and then disassemble the result */
 		physpcbyte = pcbyte;
-		if (memory_address_physical(space, TRANSLATE_FETCH_DEBUG, &physpcbyte))
+		if (debug_cpu_translate(space, TRANSLATE_FETCH_DEBUG, &physpcbyte))
 		{
 			UINT8 opbuf[64], argbuf[64];
 
@@ -1903,7 +1903,7 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 			}
 
 			/* disassemble the result */
-			pc += numbytes = cpu_dasm(space->cpu, buffer, pc & space->logaddrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			pc += numbytes = debug_cpu_disassemble(space->cpu, buffer, pc & space->logaddrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 		else
 			strcpy(buffer, "<unmapped>");
@@ -3021,7 +3021,7 @@ static int memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs,
 		offs_t dummyaddr = offs;
 		int ismapped;
 
-		ismapped = memdata->no_translation ? TRUE : memory_address_physical(space, TRANSLATE_READ_DEBUG, &dummyaddr);
+		ismapped = memdata->no_translation ? TRUE : debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &dummyaddr);
 		*data = ~(UINT64)0;
 		if (ismapped)
 		{

@@ -171,7 +171,7 @@ static WRITE8_HANDLER( port40_w )
 //  Bits 1-3 are all set high upon death, until the game continues
 //  Bit 6 is used only in Malzak II, and is set high after checking
 //        the selected version
-//  logerror("S2650 [0x%04x]: port 0x40 write: 0x%02x\n",cpu_get_physical_pc_byte(space->machine->cpu[0]),data);
+//  logerror("S2650 [0x%04x]: port 0x40 write: 0x%02x\n",cpu_get_pc(space->machine->cpu[0]),data);
 	if(data & 0x40)
 		malzak_bank1 = 1;
 	else

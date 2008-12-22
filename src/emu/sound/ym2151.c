@@ -1046,7 +1046,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 {
 	YM2151 *chip = _chip;
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	YM2151Operator *op = &chip->oper[ (r&0x07)*4+((r&0x18)>>3) ];
 
 	/* adjust bus to 8 bits */

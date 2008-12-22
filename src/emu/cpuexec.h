@@ -49,6 +49,11 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/* opaque definition of CPU internal and debugging info */
+typedef struct _cpu_debug_data cpu_debug_data;
+
+
+/* interrupt callback for VBLANK and timed interrupts */
 typedef void (*cpu_interrupt_func)(const device_config *device);
 
 
@@ -65,6 +70,16 @@ struct _cpu_config
 	const char *		vblank_interrupt_screen;	/* the screen that causes the VBLANK interrupt */
 	cpu_interrupt_func 	timed_interrupt;			/* for interrupts not tied to VBLANK */
 	UINT64		 		timed_interrupt_period;		/* period for periodic interrupts */
+};
+
+
+/* public data at the end of the device->token */
+typedef struct _cpu_class_header cpu_class_header;
+struct _cpu_class_header
+{
+	cpu_debug_data *		debug;					/* debugging data */
+	const address_space *	space[ADDRESS_SPACES];	/* address spaces */
+	cpu_set_info_func		set_info;				/* this CPU's set_info function */
 };
 
 
@@ -133,6 +148,9 @@ struct _cpu_config
 #define cputag_get_cpu(mach, tag)										devtag_get_device(mach, CPU, tag)
 
 /* helpers for using machine/cputag instead of cpu objects */
+#define cputag_reset(mach, tag)											devtag_reset(mach, CPU, tag)
+#define cputag_get_index(mach, tag)										cpu_get_index(cputag_get_cpu(mach, tag))
+#define cputag_get_address_space(mach, tag, space)						cpu_get_address_space(cputag_get_cpu(mach, tag), space)
 #define cputag_suspend(mach, tag, reason, eat)							cpu_suspend(cputag_get_cpu(mach, tag), reason, eat)
 #define cputag_resume(mach, tag, reason)								cpu_resume(cputag_get_cpu(mach, tag), reason)
 #define cputag_is_suspended(mach, tag, reason)							cpu_is_suspended(cputag_get_cpu(mach, tag), reason)
@@ -292,7 +310,6 @@ void cpu_set_irq_callback(const device_config *cpu, cpu_irq_callback callback);
     INLINE FUNCTIONS
 ***************************************************************************/
 
-
 /*-------------------------------------------------
     cpu_get_type - return the type of the
     specified CPU
@@ -305,5 +322,45 @@ INLINE cpu_type cpu_get_type(const device_config *device)
 }
 
 
+/*-------------------------------------------------
+    cpu_get_class_header - return a pointer to
+    the class header
+-------------------------------------------------*/
+
+INLINE cpu_class_header *cpu_get_class_header(const device_config *device)
+{
+	if (device->token != NULL)
+		return (cpu_class_header *)((UINT8 *)device->token + device->tokenbytes) - 1;
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    cpu_get_debug_data - return a pointer to
+    the given CPU's debugger data
+-------------------------------------------------*/
+
+INLINE cpu_debug_data *cpu_get_debug_data(const device_config *device)
+{
+	cpu_class_header *classheader = cpu_get_class_header(device);
+	return classheader->debug;
+}
+
+
+/*-------------------------------------------------
+    cpu_get_address_space - return a pointer to
+    the given CPU's address space
+-------------------------------------------------*/
+
+INLINE const address_space *cpu_get_address_space(const device_config *device, int spacenum)
+{
+	/* it is faster to pull this from the class header, but only after we've started */
+	if (device->token != NULL)
+	{
+		cpu_class_header *classheader = cpu_get_class_header(device);
+		return classheader->space[spacenum];
+	}
+	return memory_find_address_space(device, spacenum);
+}
 
 #endif	/* __CPUEXEC_H__ */

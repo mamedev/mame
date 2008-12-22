@@ -62,6 +62,7 @@ struct _cpu_class_data
 	/* execution lists */
 	const device_config *device;			/* pointer back to our device */
 	cpu_class_data *next;					/* pointer to the next CPU to execute, in order */
+	cpu_execute_func execute;				/* execute function pointer */
 
 	/* cycle counting and executing */
 	int				profiler;				/* profiler tag */
@@ -325,11 +326,11 @@ void cpuexec_timeslice(running_machine *machine)
 						classdata->cycles_stolen = 0;
 						global->executingcpu = classdata->device;
 						if (!call_debugger)
-							ran = cpu_execute(classdata->device, classdata->cycles_running);
+							ran = (*classdata->execute)(classdata->device, classdata->cycles_running);
 						else
 						{
 							debugger_start_cpu_hook(classdata->device, target);
-							ran = cpu_execute(classdata->device, classdata->cycles_running);
+							ran = (*classdata->execute)(classdata->device, classdata->cycles_running);
 							debugger_stop_cpu_hook(classdata->device);
 						}
 
@@ -469,11 +470,6 @@ static DEVICE_START( cpu )
 		header->space[spacenum] = memory_find_address_space(device, spacenum);
 
 	header->set_info = (cpu_set_info_func)device_get_info_fct(device, CPUINFO_FCT_SET_INFO);
-	header->execute = (cpu_execute_func)device_get_info_fct(device, CPUINFO_FCT_EXECUTE);
-	header->burn = (cpu_burn_func)device_get_info_fct(device, CPUINFO_FCT_BURN);
-	header->translate = (cpu_translate_func)device_get_info_fct(device, CPUINFO_FCT_TRANSLATE);
-	header->disassemble = (cpu_disassemble_func)device_get_info_fct(device, CPUINFO_FCT_DISASSEMBLE);
-	header->dasm_override = NULL;
 
 	/* fill in the input states and IRQ callback information */
 	for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
@@ -486,6 +482,7 @@ static DEVICE_START( cpu )
 
 	/* fill in the suspend states */
 	classdata->device = device;
+	classdata->execute = (cpu_execute_func)device_get_info_fct(device, CPUINFO_FCT_EXECUTE);
 	classdata->profiler = index + PROFILER_CPU1;
 	classdata->suspend = SUSPEND_REASON_RESET;
 	classdata->inttrigger = index + TRIGGER_INT;

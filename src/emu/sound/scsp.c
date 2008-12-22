@@ -698,7 +698,7 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(SCSP->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(SCSP->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:

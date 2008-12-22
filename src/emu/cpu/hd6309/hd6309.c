@@ -513,7 +513,7 @@ static CPU_INIT( hd6309 )
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
 
-	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* setup regtable */
 

@@ -1557,7 +1557,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (memory_address_physical(space, TRANSLATE_READ, &curaddr))
+						if (debug_cpu_translate(space, TRANSLATE_READ, &curaddr))
 						{
 							UINT8 byte = debug_read_byte(space, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %02X", byte);
@@ -1576,7 +1576,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (memory_address_physical(space, TRANSLATE_READ_DEBUG, &curaddr))
+						if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
 						{
 							UINT16 word = debug_read_word(space, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %04X", word);
@@ -1595,7 +1595,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (memory_address_physical(space, TRANSLATE_READ_DEBUG, &curaddr))
+						if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
 						{
 							UINT32 dword = debug_read_dword(space, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %08X", dword);
@@ -1614,7 +1614,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (memory_address_physical(space, TRANSLATE_READ_DEBUG, &curaddr))
+						if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
 						{
 							UINT64 qword = debug_read_qword(space, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %08X%08X", (UINT32)(qword >> 32), (UINT32)qword);
@@ -1635,7 +1635,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 			for (j = 0; j < 16 && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
-				if (memory_address_physical(space, TRANSLATE_READ_DEBUG, &curaddr))
+				if (debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &curaddr))
 				{
 					UINT8 byte = debug_read_byte(space, i + j, TRUE);
 					outdex += sprintf(&output[outdex], "%c", (byte >= 32 && byte < 128) ? byte : '.');
@@ -1809,7 +1809,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
-		if (memory_address_physical(space, TRANSLATE_FETCH_DEBUG, &tempaddr))
+		if (debug_cpu_translate(space, TRANSLATE_FETCH_DEBUG, &tempaddr))
 		{
 			UINT8 opbuf[64], argbuf[64];
 
@@ -1821,7 +1821,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 			}
 
 			/* disassemble the result */
-			i += numbytes = cpu_dasm(space->cpu, disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			i += numbytes = debug_cpu_disassemble(space->cpu, disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* print the bytes */
@@ -2012,7 +2012,7 @@ static void execute_history(running_machine *machine, int ref, int params, const
 			argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, TRUE);
 		}
 
-		cpu_dasm(space->cpu, buffer, pc, opbuf, argbuf);
+		debug_cpu_disassemble(space->cpu, buffer, pc, opbuf, argbuf);
 
 		debug_console_printf(machine, "%0*X: %s\n", space->logaddrchars, pc, buffer);
 	}
@@ -2102,7 +2102,7 @@ static void execute_map(running_machine *machine, int ref, int params, const cha
 	{
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
 		taddress = memory_address_to_byte(space, address) & space->bytemask;
-		if (memory_address_physical(space, intention, &taddress))
+		if (debug_cpu_translate(space, intention, &taddress))
 		{
 			const char *mapname = memory_get_handler_string(space, intention == TRANSLATE_WRITE_DEBUG, taddress);
 			debug_console_printf(machine, "%7s: %08X logical == %08X physical -> %s\n", intnames[intention & 3], (UINT32)address, memory_byte_to_address(space, taddress), mapname);

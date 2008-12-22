@@ -2050,9 +2050,9 @@ static CPU_INIT( mcs51 )
 	mcs51_state->irq_callback = irqcallback;
 	mcs51_state->device = device;
 
-	mcs51_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	mcs51_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	mcs51_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	mcs51_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	mcs51_state->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	mcs51_state->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	mcs51_state->features = FEATURE_NONE;
 	mcs51_state->ram_mask = 0x7F;  			/* 128 bytes of ram */

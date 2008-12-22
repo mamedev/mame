@@ -1317,27 +1317,6 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 
 /***************************************************************************
-    MISCELLANEOUS UTILITIES
-***************************************************************************/
-
-/*-------------------------------------------------
-    memory_address_physical - return the physical
-    address corresponding to the given logical
-    address
--------------------------------------------------*/
-
-int memory_address_physical(const address_space *space, int intention, offs_t *address)
-{
-	cpu_class_header *classheader = cpu_get_class_header(space->cpu);
-	if (classheader->translate != NULL)
-		return (*classheader->translate)(space->cpu, space->spacenum, intention, address);
-	else
-		return TRUE;
-}
-
-
-
-/***************************************************************************
     DEBUGGER HELPERS
 ***************************************************************************/
 

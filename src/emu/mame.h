@@ -149,7 +149,7 @@ struct _running_machine
 	const input_port_config *portconfig;		/* points to a list of input port configurations */
 
 	/* CPU information */
-	const device_config *	cpu[MAX_CPU];		/* array of CPU devices */
+	const device_config *	cpu[8];				/* array of first 8 CPU devices */
 
 	/* game-related information */
 	const game_driver *		gamedrv;			/* points to the definition of the game machine */

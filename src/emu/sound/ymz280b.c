@@ -869,7 +869,7 @@ static void write_to_register(struct YMZ280BChip *chip, int data)
 				if (chip->ext_ram_write)
 				{
 					/* temporary hack until this is converted to a device */
-					const address_space *space = cpu_get_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+					const address_space *space = memory_find_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 					chip->ext_ram_write(space, chip->rom_readback_addr, data);
 				}
 				else

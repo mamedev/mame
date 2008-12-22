@@ -409,7 +409,7 @@ static void init_common(int isdsp, const device_config *device, cpu_irq_callback
 
 	jaguar->irq_callback = irqcallback;
 	jaguar->device = device;
-	jaguar->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	jaguar->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	if (configdata != NULL)
 		jaguar->cpu_interrupt = configdata->cpu_int_callback;
 

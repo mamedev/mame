@@ -833,7 +833,7 @@ static int pokey_register_r(int chip, int offs)
 	}
 #endif
 
-	space = cpu_get_address_space(p->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	space = memory_find_address_space(p->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch (offs & 15)
 	{
 	case POT0_C: case POT1_C: case POT2_C: case POT3_C:
@@ -985,7 +985,7 @@ static void pokey_register_w(int chip, int offs, int data)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(p->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(p->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int ch_mask = 0, new_val;
 
 #ifdef MAME_DEBUG

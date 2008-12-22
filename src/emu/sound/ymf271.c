@@ -1375,7 +1375,7 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_read ) {
 		return chip->ext_mem_read(space,address);
 	} else {
@@ -1388,7 +1388,7 @@ static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 static void ymf271_write_ext_memory(YMF271Chip *chip, UINT32 address, UINT8 data)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_write ) {
 		chip->ext_mem_write(space, address, data);
 	}

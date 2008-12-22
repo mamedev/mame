@@ -408,7 +408,7 @@ static unsigned char Y8950PortHandler_r(void *param)
 {
 	struct y8950_info *info = param;
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->portread)
 		return info->intf->portread(space,info->index);
 	return 0;
@@ -418,7 +418,7 @@ static void Y8950PortHandler_w(void *param,unsigned char data)
 {
 	struct y8950_info *info = param;
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->portwrite)
 		info->intf->portwrite(space,info->index,data);
 }
@@ -427,7 +427,7 @@ static unsigned char Y8950KeyboardHandler_r(void *param)
 {
 	struct y8950_info *info = param;
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->keyboardread)
 		return info->intf->keyboardread(space,info->index);
 	return 0;
@@ -437,7 +437,7 @@ static void Y8950KeyboardHandler_w(void *param,unsigned char data)
 {
 	struct y8950_info *info = param;
 	/* temporary hack until this is converted to a device */
-	const address_space *space = cpu_get_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = memory_find_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->keyboardwrite)
 		info->intf->keyboardwrite(space,info->index,data);
 }

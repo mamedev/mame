@@ -203,6 +203,8 @@ void debug_cpu_init(running_machine *machine)
 		info->read = (cpu_read_func)device_get_info_fct(info->device, CPUINFO_FCT_READ);
 		info->write = (cpu_write_func)device_get_info_fct(info->device, CPUINFO_FCT_WRITE);
 		info->readop = (cpu_readop_func)device_get_info_fct(info->device, CPUINFO_FCT_READOP);
+		info->translate = (cpu_translate_func)device_get_info_fct(info->device, CPUINFO_FCT_TRANSLATE);
+		info->disassemble = (cpu_disassemble_func)device_get_info_fct(info->device, CPUINFO_FCT_DISASSEMBLE);
 
 		/* allocate a symbol table */
 		info->symtable = symtable_alloc(global->symtable, (void *)cpu);
@@ -355,6 +357,98 @@ symbol_table *debug_cpu_get_visible_symtable(running_machine *machine)
 symbol_table *debug_cpu_get_symtable(const device_config *device)
 {
 	return cpu_get_debug_data(device)->symtable;
+}
+
+
+
+/***************************************************************************
+    MEMORY AND DISASSEMBLY HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    debug_cpu_translate - return the physical
+    address corresponding to the given logical
+    address
+-------------------------------------------------*/
+
+int debug_cpu_translate(const address_space *space, int intention, offs_t *address)
+{
+	cpu_debug_data *info = cpu_get_debug_data(space->cpu);
+	if (info->translate != NULL)
+		return (*info->translate)(space->cpu, space->spacenum, intention, address);
+	else
+		return TRUE;
+}
+
+
+/*-------------------------------------------------
+    debug_cpu_disassemble - disassemble a line at 
+    a given PC on a given CPU
+-------------------------------------------------*/
+
+offs_t debug_cpu_disassemble(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+{
+	cpu_debug_data *info = cpu_get_debug_data(device);
+	offs_t result = 0;
+
+	/* check for disassembler override */
+	if (info->dasm_override != NULL)
+		result = (*info->dasm_override)(device, buffer, pc, oprom, opram);
+
+	/* if we have a disassembler, run it */
+	if (result == 0 && info->disassemble != NULL)
+		result = (*info->disassemble)(device, buffer, pc, oprom, opram);
+
+	/* if we still have nothing, output vanilla bytes */
+	if (result == 0)
+	{
+		result = cpu_get_min_opcode_bytes(device);
+		switch (result)
+		{
+			case 1:
+			default:
+				sprintf(buffer, "$%02X", *(UINT8 *)oprom);
+				break;
+
+			case 2:
+				sprintf(buffer, "$%04X", *(UINT16 *)oprom);
+				break;
+
+			case 4:
+				sprintf(buffer, "$%08X", *(UINT32 *)oprom);
+				break;
+
+			case 8:
+				sprintf(buffer, "$%08X%08X", (UINT32)(*(UINT64 *)oprom >> 32), (UINT32)(*(UINT64 *)oprom >> 0));
+				break;
+		}
+	}
+
+	/* make sure we get good results */
+	assert((result & DASMFLAG_LENGTHMASK) != 0);
+#ifdef MAME_DEBUG
+{
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	int bytes = memory_address_to_byte(space, result & DASMFLAG_LENGTHMASK);
+	assert(bytes >= cpu_get_min_opcode_bytes(device));
+	assert(bytes <= cpu_get_max_opcode_bytes(device));
+	(void) bytes; /* appease compiler */
+}
+#endif
+
+	return result;
+}
+
+
+/*-------------------------------------------------
+    debug_cpu_set_dasm_override - set an override 
+    handler for disassembly
+-------------------------------------------------*/
+
+void debug_cpu_set_dasm_override(const device_config *device, cpu_disassemble_func dasm_override)
+{
+	cpu_debug_data *info = cpu_get_debug_data(device);
+	info->dasm_override = dasm_override;
 }
 
 
@@ -1255,7 +1349,7 @@ UINT8 debug_read_byte(const address_space *space, offs_t address, int apply_tran
 	memory_set_debugger_access(space, global->debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, return 0xff */
-	if (apply_translation && !memory_address_physical(space, TRANSLATE_READ_DEBUG, &address))
+	if (apply_translation && !debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
 		result = 0xff;
 
 	/* if there is a custom read handler, and it returns TRUE, use that value */
@@ -1308,7 +1402,7 @@ UINT16 debug_read_word(const address_space *space, offs_t address, int apply_tra
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffff */
-		if (apply_translation && !memory_address_physical(space, TRANSLATE_READ_DEBUG, &address))
+		if (apply_translation && !debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
 			result = 0xffff;
 
 		/* if there is a custom read handler, and it returns TRUE, use that value */
@@ -1363,7 +1457,7 @@ UINT32 debug_read_dword(const address_space *space, offs_t address, int apply_tr
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffff */
-		if (apply_translation && !memory_address_physical(space, TRANSLATE_READ_DEBUG, &address))
+		if (apply_translation && !debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
 			result = 0xffffffff;
 
 		/* if there is a custom read handler, and it returns TRUE, use that value */
@@ -1418,7 +1512,7 @@ UINT64 debug_read_qword(const address_space *space, offs_t address, int apply_tr
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
-		if (apply_translation && !memory_address_physical(space, TRANSLATE_READ_DEBUG, &address))
+		if (apply_translation && !debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &address))
 			result = ~(UINT64)0;
 
 		/* if there is a custom read handler, and it returns TRUE, use that value */
@@ -1454,7 +1548,7 @@ void debug_write_byte(const address_space *space, offs_t address, UINT8 data, in
 	memory_set_debugger_access(space, global->debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, we're done */
-	if (apply_translation && !memory_address_physical(space, TRANSLATE_WRITE_DEBUG, &address))
+	if (apply_translation && !debug_cpu_translate(space, TRANSLATE_WRITE_DEBUG, &address))
 		;
 
 	/* if there is a custom write handler, and it returns TRUE, use that */
@@ -1507,7 +1601,7 @@ void debug_write_word(const address_space *space, offs_t address, UINT16 data, i
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && !memory_address_physical(space, TRANSLATE_WRITE_DEBUG, &address))
+		if (apply_translation && !debug_cpu_translate(space, TRANSLATE_WRITE_DEBUG, &address))
 			;
 
 		/* if there is a custom write handler, and it returns TRUE, use that */
@@ -1561,7 +1655,7 @@ void debug_write_dword(const address_space *space, offs_t address, UINT32 data, 
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && !memory_address_physical(space, TRANSLATE_WRITE_DEBUG, &address))
+		if (apply_translation && !debug_cpu_translate(space, TRANSLATE_WRITE_DEBUG, &address))
 			;
 
 		/* if there is a custom write handler, and it returns TRUE, use that */
@@ -1615,7 +1709,7 @@ void debug_write_qword(const address_space *space, offs_t address, UINT64 data, 
 		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && !memory_address_physical(space, TRANSLATE_WRITE_DEBUG, &address))
+		if (apply_translation && !debug_cpu_translate(space, TRANSLATE_WRITE_DEBUG, &address))
 			;
 
 		/* if there is a custom write handler, and it returns TRUE, use that */
@@ -1669,7 +1763,7 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 	}
 
 	/* translate to physical first */
-	if (!memory_address_physical(space, TRANSLATE_FETCH_DEBUG, &address))
+	if (!debug_cpu_translate(space, TRANSLATE_FETCH_DEBUG, &address))
 		return ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size));
 
 	/* keep in physical range */
@@ -2262,7 +2356,7 @@ static UINT32 dasm_wrapped(const device_config *device, char *buffer, offs_t pc)
 		argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, TRUE);
 	}
 
-	return cpu_dasm(device, buffer, pc, opbuf, argbuf);
+	return debug_cpu_disassemble(device, buffer, pc, opbuf, argbuf);
 }
 
 

@@ -81,7 +81,7 @@ static CPU_INIT( arm7 )
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 #if TEST_COPROC_FUNCS
 	// setup co-proc callbacks example
