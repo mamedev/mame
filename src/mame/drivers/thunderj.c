@@ -25,9 +25,6 @@
 
 
 
-static UINT16 *shared_ram;
-
-
 /*************************************
  *
  *  Initialization & interrupts
@@ -48,7 +45,6 @@ static MACHINE_RESET( thunderj )
 	atarigen_interrupt_reset(update_interrupts);
 	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 	atarijsa_reset();
-	memory_set_bankptr(machine, 1, shared_ram);
 }
 
 
@@ -90,48 +86,6 @@ static WRITE16_HANDLER( latch_w )
 			thunderj_alpha_tile_bank = (data >> 2) & 7;
 		}
 	}
-}
-
-
-
-/*************************************
- *
- *  Synchronization helper
- *
- *************************************/
-
-static TIMER_CALLBACK( shared_sync_callback )
-{
-	if (--param)
-		timer_set(machine, ATTOTIME_IN_USEC(50), NULL, param, shared_sync_callback);
-}
-
-
-static READ16_HANDLER( shared_ram_r )
-{
-	UINT16 result = shared_ram[offset];
-
-	/* look for a byte access, and then check for the high bit and a TAS opcode */
-	if (mem_mask != 0xffff && (result & mem_mask & 0x8080))
-	{
-		offs_t ppc = cpu_get_previouspc(space->cpu);
-		if (ppc < 0xa0000)
-		{
-			UINT16 *rom_base = (UINT16 *)space->cpu->region;
-			UINT16 opcode = rom_base[ppc / 2];
-
-			/* look for TAS or BTST #$7; both CPUs spin waiting for these in order to */
-			/* coordinate communications. Some spins have timeouts that reset the machine */
-			/* if they fail, so we must make sure they are released in time */
-			if ((opcode & 0xffc0) == 0x4ac0 ||
-				((opcode & 0xffc0) == 0x0080 && rom_base[ppc / 2 + 1] == 7))
-			{
-				timer_call_after_resynch(space->machine, NULL, 4, shared_sync_callback);
-			}
-		}
-	}
-
-	return result;
 }
 
 
@@ -184,7 +138,7 @@ static WRITE16_HANDLER( thunderj_atarivc_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0x160000, 0x16ffff) AM_READWRITE(shared_ram_r, SMH_BANK1) AM_BASE(&shared_ram)
+	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
@@ -217,7 +171,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( extra_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x07ffff) AM_ROM
-	AM_RANGE(0x160000, 0x16ffff) AM_READWRITE(shared_ram_r, SMH_BANK1)
+	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE(1) 
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x260011) AM_READ_PORT("260010")
 	AM_RANGE(0x260012, 0x260013) AM_READ(special_port2_r)
@@ -325,7 +279,9 @@ static MACHINE_DRIVER_START( thunderj )
 
 	MDRV_MACHINE_RESET(thunderj)
 	MDRV_NVRAM_HANDLER(atarigen)
-	MDRV_QUANTUM_TIME(HZ(6000))
+	
+	/* perfect synchronization due to shared RAM */
+	MDRV_QUANTUM_PERFECT_CPU("main")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
