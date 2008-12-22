@@ -143,6 +143,7 @@ CPUS += ARM
 CPUS += ARM7
 CPUS += JAGUAR
 CPUS += CUBEQCPU
+CPUS += ESRIP
 CPUS += R3000
 CPUS += R3041
 CPUS += R4600
@@ -1575,6 +1576,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/ertictac.o \
 	$(DRIVERS)/esd16.o $(VIDEO)/esd16.o \
 	$(DRIVERS)/esh.o \
+	$(DRIVERS)/esripsys.o $(VIDEO)/esripsys.o \
 	$(DRIVERS)/ettrivia.o \
 	$(DRIVERS)/filetto.o \
 	$(DRIVERS)/flower.o $(AUDIO)/flower.o $(VIDEO)/flower.o \
@@ -1677,7 +1679,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/trvquest.o \
 	$(DRIVERS)/ttchamp.o \
 	$(DRIVERS)/tugboat.o \
-	$(DRIVERS)/turbosub.o \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \

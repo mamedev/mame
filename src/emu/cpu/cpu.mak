@@ -266,6 +266,23 @@ $(CPUOBJ)/cubeqcpu/cubeqcpu.o:	$(CPUSRC)/cubeqcpu/cubeqcpu.c \
 
 
 #-------------------------------------------------
+# Entertainment Sciences AM29116-based RIP
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_ESRIP=$(if $(filter ESRIP,$(CPUS)),1,0)
+
+ifneq ($(filter ESRIP,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/esrip
+CPUOBJS += $(CPUOBJ)/esrip/esrip.o
+#DBGOBJS += $(CPUOBJ)/esrip/esrip.o
+endif
+
+$(CPUOBJ)/esrip/esrip.o:	$(CPUSRC)/esrip/esrip.c \
+							$(CPUSRC)/esrip/esrip.h
+
+
+
+#-------------------------------------------------
 # RCA CDP1802
 #-------------------------------------------------
 

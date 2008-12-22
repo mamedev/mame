@@ -1,0 +1,990 @@
+/***************************************************************************
+
+    Entertainment Sciences Real-Time Image Processor (RIP) hardware
+
+    driver by Phil Bennett
+
+    Games supported:
+        * Turbo Sub [2 sets]
+
+    ROMs wanted:
+        * Bouncer
+        * Turbo Sub [later version] (uses 512kbit graphics ROMs)
+
+    Notes:
+        * 'turbosub' executes a series of hardware tests on startup.
+        To skip, hold down keypad '*' on reset.
+
+    Todo:
+        * TMS5220 speech? The game sends speech play commands to the sound
+        CPU but they're ignored. The speech data seems to be stored in
+        the upper half of the (banked) sound data ROMs but this is never
+        accessed. Maybe the speech data was unfinished and only the later
+        version of Turbo Sub has speech?
+
+        * Determine if line drop outs occur on real hardware. Overclocking
+        the RIP CPU eliminates them.
+
+        * Implement collision detection hardware (not used by Turbo Sub).
+
+****************************************************************************/
+
+#include "driver.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/esrip/esrip.h"
+#include "machine/6840ptm.h"
+#include "sound/dac.h"
+#include "sound/5220intf.h"
+#include "esripsys.h"
+
+
+/*************************************
+ *
+ *  Statics
+ *
+ *************************************/
+
+/* I/O */
+static UINT8 g_iodata;
+static UINT8 g_ioaddr;
+static UINT8 coin_latch;
+static UINT8 keypad_status;
+static UINT8 g_status;
+static UINT8 f_status;
+static int io_firq_status;
+static UINT8 cmos_ram_a2_0;
+static UINT8 cmos_ram_a10_3;
+static UINT8 *cmos_ram;
+
+/* Sound */
+static UINT8 u56a;
+static UINT8 u56b;
+static UINT8 g_to_s_latch1;
+static UINT8 g_to_s_latch2;
+static UINT8 s_to_g_latch1;
+static UINT8 s_to_g_latch2;
+static UINT8 dac_msb;
+static UINT8 dac_vol;
+static UINT8 tms_data;
+
+/* Video */
+static UINT8 *fdt_a;
+static UINT8 *fdt_b;
+static int _fasel = 0;
+static int _fbsel = 1;
+//static int fig = 0;
+
+/*************************************
+ *
+ *  6840 PTM
+ *
+ *************************************/
+
+static void ptm_irq(running_machine *machine, int state)
+{
+	cpu_set_input_line(machine->cpu[ESRIPSYS_SOUND_CPU], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static const ptm6840_interface ptm_intf =
+{
+	2000000,
+	{ 0, 0, 0 },
+	{ NULL, NULL, NULL },
+	ptm_irq
+};
+
+
+/*************************************
+ *
+ *  i8251A UART
+ *
+ *************************************/
+
+/* Note: Game CPU /FIRQ is connected to RXRDY */
+static WRITE8_HANDLER( uart_w )
+{
+	if ((offset & 1) == 0)
+		mame_printf_debug("%c",data);
+}
+
+static READ8_HANDLER( uart_r )
+{
+	return 0;
+}
+
+
+/*************************************
+ *
+ *  Game CPU Status Ports
+ *
+ *************************************/
+
+/*
+    Write                   Read
+    =====                   ====
+    0: ROM bank bit 0       0: Frame CPU status D0
+    1: ROM bank bit 1       1: Frame CPU status D1
+    2: -                    2: Frame CPU status D2
+    3: Bank sel enable?     3: Frame CPU status D3
+    4: Frame CPU /FIRQ      4: -
+    5: /INTACK              5: Frame CPU status D5
+    6: -                    6: RIP BANK 4
+    7: Frame CPU /NMI       7: /VBLANK
+*/
+
+static READ8_HANDLER( g_status_r )
+{
+	int bank4 = BIT(get_rip_status(space->machine->cpu[ESRIPSYS_VIDEO_CPU]), 2);
+	int vblank = video_screen_get_vblank(space->machine->primary_screen);
+
+	return (!vblank << 7) | (bank4 << 6) | (f_status & 0x2f);
+}
+
+static WRITE8_HANDLER( g_status_w )
+{
+	int bankaddress;
+	UINT8* const ROM = memory_region(space->machine, "game_cpu");
+
+	g_status = data;
+
+	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
+	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+
+	cpu_set_input_line(space->machine->cpu[ESRIPSYS_FRAME_CPU], M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[ESRIPSYS_FRAME_CPU], INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
+
+	cpu_set_input_line(space->machine->cpu[ESRIPSYS_VIDEO_CPU], INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+
+	/* /VBLANK IRQ acknowledge */
+	if (!(data & 0x20))
+		cpu_set_input_line(space->machine->cpu[ESRIPSYS_GAME_CPU], M6809_IRQ_LINE, CLEAR_LINE);
+}
+
+
+/*************************************
+ *
+ *  Frame CPU Status Ports
+ *
+ *************************************/
+
+/*
+    Write                       Read
+    =====                       ====
+    0: Game CPU status in D0    0: /ERROR (AM29116)
+    1: Game CPU status in D1    1: /IPT UPLOAD (AM29116)
+    2: Game CPU status in D2    2: -
+    3: Game CPU status in D3    3: RER0 (AM29116)
+    4: -                        4: RER1 (AM29116)
+    5: Game CPU status in D5    5: VBLANK flag (cleared on FRAME write)
+    6: -                        6: /FBSEL
+    7: /FRDONE                  7: /VBLANK
+*/
+
+static READ8_HANDLER( f_status_r )
+{
+	int vblank = video_screen_get_vblank(space->machine->primary_screen);
+	UINT8 rip_status = get_rip_status(space->machine->cpu[ESRIPSYS_VIDEO_CPU]);
+
+	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
+
+	return (!vblank << 7) | (_fbsel << 6) | (esripsys_frame_vbl << 5) | rip_status;
+}
+
+static WRITE8_HANDLER( f_status_w )
+{
+	f_status = data;
+}
+
+
+/*************************************
+ *
+ *  Frame CPU Functions
+ *
+ *************************************/
+
+static TIMER_CALLBACK( delayed_bank_swap )
+{
+	_fasel ^= 1;
+	_fbsel ^= 1;
+}
+
+static WRITE8_HANDLER( frame_w )
+{
+	timer_call_after_resynch(space->machine, NULL, 0, delayed_bank_swap);
+	esripsys_frame_vbl = 1;
+}
+
+static READ8_HANDLER( fdt_r )
+{
+ 	if (!_fasel)
+ 		return fdt_b[offset];
+ 	else
+ 		return fdt_a[offset];
+}
+
+static WRITE8_HANDLER( fdt_w )
+{
+ 	if (!_fasel)
+ 		fdt_b[offset] = data;
+ 	else
+ 		fdt_a[offset] = data;
+}
+
+
+/*************************************
+ *
+ *  Video CPU Functions
+ *
+ *************************************/
+
+READ16_DEVICE_HANDLER( fdt_rip_r )
+{
+	offset = (offset & 0x7ff) << 1;
+
+	if (!_fasel)
+		return (fdt_a[offset] << 8) | fdt_a[offset + 1];
+	else
+		return (fdt_b[offset] << 8) | fdt_b[offset + 1];
+}
+
+WRITE16_DEVICE_HANDLER( fdt_rip_w )
+{
+	offset = (offset & 0x7ff) << 1;
+
+	if (!_fasel)
+	{
+		fdt_a[offset + 0] = data >> 8;
+		fdt_a[offset + 1] = data & 0xff;
+	}
+	else
+	{
+		fdt_b[offset + 0] = data >> 8;
+		fdt_b[offset + 1] = data & 0xff;
+	}
+}
+
+/*
+   D0 = /VBLANK
+   D1 = /HBLANK
+   D2 = 1/2SEL
+   D3 = /FIG
+   D4 = /FBSEL
+   D5 = VO
+   D6 =
+   D7 = /FDONE
+*/
+
+UINT8 rip_status_in(running_machine *machine)
+{
+	UINT8 _vblank = !video_screen_get_vblank(machine->primary_screen);
+	UINT8 _hblank = !video_screen_get_hblank(machine->primary_screen);
+	UINT8 v0 =  video_screen_get_vpos(machine->primary_screen) & 1;
+
+	return	_vblank
+			| (_hblank << 1)
+			| (esripsys__12sel << 2)
+			| (_fbsel << 4)
+			| (v0 << 5)
+			| (f_status & 0x80);
+}
+
+/*************************************
+ *
+ *  I/O
+ *
+ *************************************/
+
+static WRITE8_HANDLER( g_iobus_w )
+{
+	g_iodata = data;
+}
+
+static READ8_HANDLER( g_iobus_r )
+{
+	switch (g_ioaddr & 0x7f)
+	{
+		case 0:
+			return s_to_g_latch2;
+		case 3:
+			return s_to_g_latch1;
+		case 5:
+			return cmos_ram[(cmos_ram_a10_3 << 3) | (cmos_ram_a2_0 & 3)];
+		case 8:
+		{
+			int keypad = input_port_read(space->machine, "KEYPAD_B") | keypad_status;
+			keypad_status = 0;
+			io_firq_status = 0;
+			return keypad;
+		}
+		case 9:
+		{
+			return input_port_read(space->machine, "KEYPAD_A");
+		}
+		case 0xa:
+		{
+			int coins =  coin_latch | (input_port_read(space->machine, "COINS") & 0x30);
+			coin_latch = 0;
+			io_firq_status = 0;
+			return coins;
+		}
+		case 0x10:
+			return input_port_read(space->machine, "IO_1");
+		case 0x11:
+			return input_port_read(space->machine, "JOYSTICK_X");
+		case 0x12:
+			return input_port_read(space->machine, "JOYSTICK_Y");
+		case 0x16:
+			return io_firq_status;
+		case 0x18:
+			return input_port_read(space->machine, "IO_2");
+			/* Unused I/O */
+		case 0x19:
+		case 0x1a:
+			return 0xff;
+		case 0x50:
+		case 0x51:
+		case 0x52:
+		case 0x53:
+		case 0x54:
+		case 0x55:
+		case 0x56:
+		case 0x57:
+		case 0x58:
+		case 0x59:
+		case 0x5a:
+		case 0x5b:
+		case 0x5c:
+		case 0x5d:
+		case 0x5e:
+			/* MSM5832 real-time clock/calendar */
+			return 0xff;
+		default:
+		{
+			logerror("Unknown I/O read (%x)\n", g_ioaddr & 0x7f);
+			return 0xff;
+		}
+	}
+}
+
+static WRITE8_HANDLER( g_ioadd_w )
+{
+	g_ioaddr = data;
+
+	/* Bit 7 is connected to /OE of LS374 containing I/O data */
+	if ((data & 0x80) == 0)
+	{
+		switch (g_ioaddr & 0x7f)
+		{
+			case 0x00:
+			{
+				g_to_s_latch1 = g_iodata;
+				break;
+			}
+			case 0x02:
+			{
+				cpu_set_input_line(space->machine->cpu[ESRIPSYS_SOUND_CPU], INPUT_LINE_NMI, g_iodata & 4 ? CLEAR_LINE : ASSERT_LINE);
+
+				if (!(g_to_s_latch2 & 1) && (g_iodata & 1))
+				{
+					/* Rising D0 will clock in 1 to FF1... */
+					u56a = 1;
+
+					/*...causing a sound CPU /IRQ */
+					cpu_set_input_line(space->machine->cpu[ESRIPSYS_SOUND_CPU], M6809_IRQ_LINE, ASSERT_LINE);
+				}
+
+				if (g_iodata & 2)
+					u56b = 0;
+
+				g_to_s_latch2 = g_iodata;
+
+				break;
+			}
+			case 0x04:
+			{
+				cmos_ram[(cmos_ram_a10_3 << 3) | (cmos_ram_a2_0 & 3)] = g_iodata;
+				break;
+			}
+			case 0x06:
+			{
+				cmos_ram_a10_3 = g_iodata;
+				break;
+			}
+			case 0x07:
+			{
+				cmos_ram_a2_0 = g_iodata;
+				break;
+			}
+			case 0x0b:
+			{
+				/* Possibly I/O acknowledge; see FIRQ */
+				break;
+			}
+			case 0x14:
+			{
+				break;
+			}
+			case 0x15:
+			{
+				esripsys_video_firq_en = g_iodata & 1;
+				break;
+			}
+			default:
+			{
+				logerror("Unknown I/O write to %x with %x\n", g_ioaddr, g_iodata);
+			}
+		}
+	}
+}
+
+static INPUT_CHANGED( keypad_interrupt )
+{
+	if (newval == 0)
+	{
+		io_firq_status |= 2;
+		keypad_status |= 0x20;
+		cpu_set_input_line(field->port->machine->cpu[ESRIPSYS_GAME_CPU], M6809_FIRQ_LINE, HOLD_LINE);
+	}
+}
+
+static INPUT_CHANGED( coin_interrupt )
+{
+	if (newval == 1)
+	{
+		io_firq_status |= 2;
+		coin_latch = input_port_read(field->port->machine, "COINS") << 2;
+		cpu_set_input_line(field->port->machine->cpu[ESRIPSYS_GAME_CPU], M6809_FIRQ_LINE, HOLD_LINE);
+	}
+}
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
+
+INPUT_PORTS_START( turbosub )
+	PORT_START("KEYPAD_A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0") PORT_CHANGED(keypad_interrupt, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1") PORT_CHANGED(keypad_interrupt, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2") PORT_CHANGED(keypad_interrupt, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3") PORT_CHANGED(keypad_interrupt, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4") PORT_CHANGED(keypad_interrupt, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5") PORT_CHANGED(keypad_interrupt, 0)
+
+	PORT_START("KEYPAD_B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6") PORT_CHANGED(keypad_interrupt, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7") PORT_CHANGED(keypad_interrupt, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8") PORT_CHANGED(keypad_interrupt, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_PLAYER(3) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9") PORT_CHANGED(keypad_interrupt, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_PLAYER(3) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("*") PORT_CHANGED(keypad_interrupt, 0)
+
+	PORT_START("COINS")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_interrupt, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_interrupt, 0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IO_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Neutralizer")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Fire")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	/* Mirror of IO_1 (unused) */
+	PORT_START("IO_2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("JOYSTICK_X")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+
+	PORT_START("JOYSTICK_Y")
+	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_MINMAX(0xff, 0x00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+INPUT_PORTS_END
+
+
+/*************************************
+ *
+ *  Sound
+ *
+ *************************************/
+
+/* Game/Sound CPU communications */
+static READ8_HANDLER( s_200e_r )
+{
+	return g_to_s_latch1;
+}
+
+static WRITE8_HANDLER( s_200e_w )
+{
+	s_to_g_latch1 = data;
+}
+
+static WRITE8_HANDLER( s_200f_w )
+{
+	/* Bit 6 -> Reset latch U56A */
+	/* Bit 7 -> Clock latch U56B */
+
+	if (s_to_g_latch2 & 0x40)
+	{
+		u56a = 0;
+		cpu_set_input_line(space->machine->cpu[ESRIPSYS_SOUND_CPU], M6809_IRQ_LINE, CLEAR_LINE);
+	}
+
+	if (!(s_to_g_latch2 & 0x40) && (data & 0x40))
+		u56b = 1;
+
+	s_to_g_latch2 = data;
+}
+
+static READ8_HANDLER( s_200f_r )
+{
+	return (g_to_s_latch2 & 0xfc) | (u56b << 1) | u56a;
+}
+
+static READ8_HANDLER( tms5220_r )
+{
+	if (offset == 0)
+	{
+		/* TMS5220 core returns status bits in D7-D6 */
+		UINT8 status = tms5220_status_r(space, 0);
+
+		status = (status & 0x80 >> 5) | (status & 0x40 >> 5) | (status & 0x20 >> 5);
+		return (!tms5220_ready_r() << 7) | (!tms5220_int_r() << 6) | status;
+	}
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( tms5220_w )
+{
+	if (offset == 0)
+	{
+		if (tms5220_ready_r())
+			tms5220_status_r(space, 0);
+
+		tms_data = data;
+	}
+	if (offset == 1)
+	{
+		if (tms5220_ready_r())
+			tms5220_data_w(0, 0, tms_data);
+	}
+}
+
+/* Not used in later revisions */
+static WRITE8_HANDLER( control_w )
+{
+	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, cpu_get_previouspc(space->cpu));
+}
+
+
+/* 10-bit MC3410CL DAC */
+static WRITE8_HANDLER( dac_w )
+{
+	if (offset == 0)
+	{
+		dac_msb = data & 3;
+	}
+	else
+	{
+		UINT16 dac_data = (dac_msb << 8) | data;
+
+		/*
+			The 8-bit DAC modulates the 10-bit DAC.
+			Shift down to prevent clipping.
+		*/
+		dac_signed_data_16_w(0, (dac_vol * dac_data) >> 1);
+	}
+}
+
+/* 8-bit MC3408 DAC */
+static WRITE8_HANDLER( volume_dac_w )
+{
+	dac_vol = data;
+}
+
+
+/*************************************
+ *
+ *  Memory Maps
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( game_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_BASE(&esripsys_pal_ram)
+	AM_RANGE(0x4300, 0x4300) AM_WRITE(esripsys_bg_intensity_w)
+	AM_RANGE(0x4400, 0x47ff) AM_NOP /* Collision detection RAM */
+	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(g_status_r, g_status_w)
+	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(g_iobus_r, g_iobus_w)
+	AM_RANGE(0x5000, 0x53ff) AM_WRITE(g_ioadd_w)
+	AM_RANGE(0x5400, 0x57ff) AM_NOP
+	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(uart_r, uart_w)
+	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( frame_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(fdt_r, fdt_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(f_status_r, f_status_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(frame_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0800, 0x0fff) AM_RAM /* Not installed on later PCBs */
+	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
+	AM_RANGE(0x200a, 0x200b) AM_WRITE(dac_w)
+	AM_RANGE(0x200c, 0x200c) AM_WRITE(volume_dac_w)
+	AM_RANGE(0x200d, 0x200d) AM_WRITE(control_w)
+	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)
+	AM_RANGE(0x200f, 0x200f) AM_READWRITE(s_200f_r, s_200f_w)
+	AM_RANGE(0x2020, 0x2027) AM_READWRITE(ptm6840_0_r, ptm6840_0_w)
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(2)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(3)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(4)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( video_cpu_map, ADDRESS_SPACE_PROGRAM, 64 )
+	AM_RANGE(0x000, 0x1ff) AM_ROM
+ADDRESS_MAP_END
+
+
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
+static DRIVER_INIT( esripsys )
+{
+	UINT8* const ROM = memory_region(machine, "sound_data");
+
+	fdt_a = auto_malloc(FDT_RAM_SIZE);
+	fdt_b = auto_malloc(FDT_RAM_SIZE);
+	cmos_ram = auto_malloc(CMOS_RAM_SIZE);
+
+	ptm6840_config(machine, 0, &ptm_intf);
+
+	memory_set_bankptr(machine, 2, &ROM[0x0000+0x0000]);
+	memory_set_bankptr(machine, 3, &ROM[0x0000+0x4000]);
+	memory_set_bankptr(machine, 4, &ROM[0x0000+0x8000]);
+
+	/* TODO: Finish me! */
+//	state_save_register_global_pointer(fdt_a, FDT_RAM_SIZE);
+//	state_save_register_global_pointer(fdt_b, FDT_RAM_SIZE);
+}
+
+static NVRAM_HANDLER( esripsys )
+{
+	if (read_or_write)
+		mame_fwrite(file, cmos_ram, CMOS_RAM_SIZE);
+	else if (file)
+		mame_fread(file, cmos_ram, CMOS_RAM_SIZE);
+	else
+		memset(cmos_ram, 0x00, CMOS_RAM_SIZE);
+}
+
+static esrip_config rip_config =
+{
+	fdt_rip_r,
+	fdt_rip_w,
+	rip_status_in,
+	esripsys_draw,
+	"proms"
+};
+
+static MACHINE_DRIVER_START( esripsys )
+	MDRV_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
+	MDRV_CPU_PROGRAM_MAP(game_cpu_map, 0)
+	MDRV_CPU_VBLANK_INT("main", esripsys_vblank_irq)
+
+	MDRV_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
+	MDRV_CPU_PROGRAM_MAP(frame_cpu_map, 0)
+
+	MDRV_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz/4)
+	MDRV_CPU_PROGRAM_MAP(video_cpu_map, 0)
+	MDRV_CPU_CONFIG(rip_config)
+
+	MDRV_CPU_ADD("sound_cpu", M6809E, XTAL_8MHz)
+	MDRV_CPU_PROGRAM_MAP(sound_cpu_map, 0)
+
+	MDRV_NVRAM_HANDLER(esripsys)
+
+	/* Video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(ESRIPSYS_PIXEL_CLOCK, ESRIPSYS_HTOTAL, ESRIPSYS_HBLANK_END, ESRIPSYS_HBLANK_START, ESRIPSYS_VTOTAL, ESRIPSYS_VBLANK_END, ESRIPSYS_VBLANK_START)
+
+	MDRV_VIDEO_START(esripsys)
+	MDRV_VIDEO_UPDATE(esripsys)
+
+	/* Sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("tms5220nl", TMS5220, 640000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_DRIVER_END
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
+
+ROM_START( turbosub )
+	ROM_REGION( 0xc0000, "main_code", 0) /* Non-bankswitched, 6809 #0 code */
+	ROM_LOAD( "turbosub.u85",    0x18000, 0x4000, CRC(eabb9509) SHA1(cbfb6c5becb3fe1b4ed729e92a0f4029a5df7d67) )
+
+	ROM_REGION( 0x48000, "game_cpu", 0 ) /* Bankswitched 6809 code */
+	ROM_LOAD( "turbosub.u82",    0x10000, 0x2000, CRC(de32eb6f) SHA1(90bf31a5adf261d47b4f52e93b5e97f343b7ebf0) )
+	ROM_CONTINUE(                0x20000, 0x2000 )
+	ROM_LOAD( "turbosub.u81",    0x12000, 0x2000, CRC(9ae09613) SHA1(9b5ada4a21473b30be98bcc461129b6ed4e0bb11) )
+	ROM_CONTINUE(                0x22000, 0x2000 )
+	ROM_LOAD( "turbosub.u87",    0x14000, 0x2000, CRC(ad2284f7) SHA1(8e11b8ad0a98dd1fe6ec8f7ea9e6e4f4a45d8a1b) )
+	ROM_CONTINUE(                0x24000, 0x2000 )
+	ROM_LOAD( "turbosub.u86",    0x16000, 0x2000, CRC(4f51e6fd) SHA1(8f51ac6412aace29279ce7b02cad45ed681c2065) )
+	ROM_CONTINUE(                0x26000, 0x2000 )
+
+	ROM_LOAD( "turbosub.u80",    0x30000, 0x2000, CRC(ff2e2870) SHA1(45f91d63ad91585482c9dd05290b204b007e3f44) )
+	ROM_CONTINUE(                0x40000, 0x2000 )
+	ROM_LOAD( "turbosub.u79",    0x32000, 0x2000, CRC(13680923) SHA1(14e3daa2178853cef1fd96a68305420c11fceb96) )
+	ROM_CONTINUE(                0x42000, 0x2000 )
+	ROM_LOAD( "turbosub.u84",    0x34000, 0x2000, CRC(7059842d) SHA1(c20a8accd3fc23bc4476e1d08798d7a80915d37c) )
+	ROM_CONTINUE(                0x44000, 0x2000 )
+	ROM_LOAD( "turbosub.u83",    0x36000, 0x2000, CRC(31b86fc6) SHA1(8e56e8a75f653c3c4da2c9f31f739894beb194db) )
+	ROM_CONTINUE(                0x46000, 0x2000 )
+
+	/* e000 - ffff = Upper half of U85 (lower half is blank) */
+	ROM_COPY( "main_code", 0x18000 + 0x2000, 0xe000, 0x2000 )
+
+	ROM_REGION( 0x10000, "frame_cpu", 0 )
+	ROM_LOAD( "turbosub.u63", 0xc000, 0x4000, CRC(35701532) SHA1(77d957682aab10ee902c1e47c468b9ab8fe6a512) )
+
+	ROM_REGION( 0x1000, "video_cpu", 0 )
+	ROMX_LOAD( "27s29.u29", 0x0, 0x200, CRC(d580672b) SHA1(b56295a5b780ab5e8ff6817ebb084a8dfad8c281), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u28", 0x1, 0x200, CRC(f7976b87) SHA1(c19a1d375c497f1671170c7833952979819c3812), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u27", 0x2, 0x200, CRC(03ebd3ea) SHA1(109f5369bd36bcf0da5928b96566655c6895c737), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u21", 0x3, 0x200, CRC(e232384b) SHA1(cfc3acc86add06b4cb6addb3455d71123fb359ce), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u20", 0x4, 0x200, CRC(0a8e44d8) SHA1(2df46316510b2dbfd4c9913a1460c00d5572d586), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u19", 0x5, 0x200, CRC(de17e5f0) SHA1(3e14768374e1bda25183aee86a82d220b7f58ff9), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u18", 0x6, 0x200, CRC(e33ed0a4) SHA1(41edbdc7c022971ce14bd2f419c92714b796fad7), ROM_SKIP(7))
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 )
+	ROM_LOAD( "turbosub.u66a",   0xe000, 0x2000, CRC(8db3bcdb) SHA1(e6ae324ba9dad4884e1cb3d67ce099a6f4739456) )
+
+	ROM_REGION( 0xc000, "sound_data", 0)
+	ROM_LOAD( "turbosub.u69", 0x0000, 0x4000, CRC(ad04193b) SHA1(2f660302e60a7e68e079a8dd13266a77c077f939) )
+	ROM_LOAD( "turbosub.u68", 0x4000, 0x4000, CRC(72e3d09b) SHA1(eefdfcd0c4c32e465f18d40f46cb5bc022c22bfd) )
+	ROM_LOAD( "turbosub.u67", 0x8000, 0x4000, CRC(f8ae82e9) SHA1(fd27b9fe7872c3c680a1f71a4a5d5eeaa12e4a19) )
+
+	ROM_REGION( 0x40000, "4bpp", 0)
+	ROM_LOAD( "turbosub.u44", 0x00000, 0x4000, CRC(eaa05860) SHA1(f649891dae9354b7f2e46e6a380b52a569229d64) )
+	ROM_LOAD( "turbosub.u49", 0x10000, 0x4000, CRC(b4170ac2) SHA1(bdbfc43c891c8d525dcc46fb9d05602263ab69cd) )
+	ROM_LOAD( "turbosub.u54", 0x20000, 0x4000, CRC(bebf98d8) SHA1(170502bb44fc6d6bf14d8dac4778b37888c14a7b) )
+	ROM_LOAD( "turbosub.u59", 0x30000, 0x4000, CRC(9c1f4397) SHA1(94335f2db2650f8b7e24fc3f92a04b73325ab164) )
+
+	ROM_LOAD( "turbosub.u43", 0x04000, 0x4000, CRC(5d76237c) SHA1(3d50347856039e43290497348447b1c4581f3a33) )
+	ROM_LOAD( "turbosub.u48", 0x14000, 0x4000, CRC(cea4e036) SHA1(4afce4f2a09adf9c83ab7188c05cd7236dea16a3) )
+	ROM_LOAD( "turbosub.u53", 0x24000, 0x4000, CRC(1352d58a) SHA1(76ae86c365dd4c9e1a6c5af91c01d31e7ee35f0f) )
+	ROM_LOAD( "turbosub.u58", 0x34000, 0x4000, CRC(5024d83f) SHA1(a293d92a0ae01901b5618b0250d48e3ba631dfcb) )
+
+	ROM_LOAD( "turbosub.u42", 0x08000, 0x4000, CRC(057a1c72) SHA1(5af89b128b7818550572d02e5ff724c415fa8b8b) )
+	ROM_LOAD( "turbosub.u47", 0x18000, 0x4000, CRC(10def494) SHA1(a3ba691eb2b0d782162ffc6c081761965844a3a9) )
+	ROM_LOAD( "turbosub.u52", 0x28000, 0x4000, CRC(070d07d6) SHA1(4c81310cd646641a380817fedffab66e76529c97) )
+	ROM_LOAD( "turbosub.u57", 0x38000, 0x4000, CRC(5ddb0458) SHA1(d1169882397f364ca38fbd563250b33d13b1a7c6) )
+
+	ROM_LOAD( "turbosub.u41", 0x0c000, 0x4000, CRC(014bb06b) SHA1(97276ba26b60c2907e59b92cc9de5251298579cf) )
+	ROM_LOAD( "turbosub.u46", 0x1c000, 0x4000, CRC(3b866e2c) SHA1(c0dd4827a18eb9f4b1055d92544beed10f01fd86) )
+	ROM_LOAD( "turbosub.u51", 0x2c000, 0x4000, CRC(43cdcb5c) SHA1(3dd966daa904d3be7be63c584ba033c0e7904d5c) )
+	ROM_LOAD( "turbosub.u56", 0x3c000, 0x4000, CRC(6d116adf) SHA1(f808e28cef41dc86e43d8c12966037213da87c87) )
+
+	ROM_REGION( 0x40000, "8bpp_l", 0)
+	ROM_LOAD( "turbosub.u4",  0x00000, 0x4000, CRC(08303604) SHA1(f075b645d89a2d91bd9b621748906a9f9890ee60) )
+	ROM_LOAD( "turbosub.u14", 0x10000, 0x4000, CRC(83b26c8d) SHA1(2dfa3b45c44652d255c402511bb3810fffb0731d) )
+	ROM_LOAD( "turbosub.u24", 0x20000, 0x4000, CRC(6bbb6cb3) SHA1(d513e547a05b34076bb8261abd51301ac5f3f5d4) )
+	ROM_LOAD( "turbosub.u34", 0x30000, 0x4000, CRC(7b844f4a) SHA1(82467eb7e116f9f225711a1698c151945e1de6e4) )
+
+	ROM_LOAD( "turbosub.u3",  0x04000, 0x4000, CRC(825ef29c) SHA1(affadd0976f793b8bdbcbc4768b7de27121e7b11) )
+	ROM_LOAD( "turbosub.u13", 0x14000, 0x4000, CRC(350cc17a) SHA1(b98d16be997fc0576d3206f51f29ce3e257492d3) )
+	ROM_LOAD( "turbosub.u23", 0x24000, 0x4000, CRC(b1531916) SHA1(805a23f40aa875f431e835fdaceba87261c14155) )
+	ROM_LOAD( "turbosub.u33", 0x34000, 0x4000, CRC(0d5130cb) SHA1(7e4e4e5ea50c581a60d15964571464029515c720) )
+
+	ROM_LOAD( "turbosub.u2",  0x08000, 0x4000, CRC(a8b8c032) SHA1(20512a3a1f8b9c0361e6f5a7e9a50605be3ae650) )
+	ROM_LOAD( "turbosub.u12", 0x18000, 0x4000, CRC(a2c4badf) SHA1(267af1be6261833211270af25045e306efffee80) )
+	ROM_LOAD( "turbosub.u22", 0x28000, 0x4000, CRC(97b7cf0e) SHA1(888fb2f384a5cba8a6f7569886eb6dc27e2b024f) )
+	ROM_LOAD( "turbosub.u32", 0x38000, 0x4000, CRC(b286710e) SHA1(5082db13630ba0967006619027c39ee3607b838d) )
+
+	ROM_LOAD( "turbosub.u1",  0x0c000, 0x4000, CRC(88b0a7a9) SHA1(9012c8059cf60131efa6a0432accd87813187206) )
+	ROM_LOAD( "turbosub.u11", 0x1c000, 0x4000, CRC(9f0ff723) SHA1(54b52b4ebc32f10aa32c799ac819928290e70455) )
+	ROM_LOAD( "turbosub.u21", 0x2c000, 0x4000, CRC(b4122fe2) SHA1(50e8b488a7b7f739336b60a3fd8a5b14f5010b75) )
+	ROM_LOAD( "turbosub.u31", 0x3c000, 0x4000, CRC(3fa15c78) SHA1(bf5cb85fc26b5045ad5acc944c917b068ace2c49) )
+
+	ROM_REGION( 0x40000, "8bpp_r", 0)
+	ROM_LOAD( "turbosub.u9",  0x00000, 0x4000, CRC(9a03eadf) SHA1(25ee1ebe52f030b2fa09d76161e46540c91cbc4c) )
+	ROM_LOAD( "turbosub.u19", 0x10000, 0x4000, CRC(498253b8) SHA1(dd74d4f9f19d8a746415baea604116faedb4fb31) )
+	ROM_LOAD( "turbosub.u29", 0x20000, 0x4000, CRC(809c374f) SHA1(d3849eed8441e4641ffcbca7c83ee3bb16681a0b) )
+	ROM_LOAD( "turbosub.u39", 0x30000, 0x4000, CRC(3e4e0681) SHA1(ac834f6823ffe835d6f149e79c1d31ae2b89e85d) )
+
+	ROM_LOAD( "turbosub.u8",  0x04000, 0x4000, CRC(01118737) SHA1(3a8e998b80dffe82296170273dcbbe9870c5b695) )
+	ROM_LOAD( "turbosub.u18", 0x14000, 0x4000, CRC(39fd8e57) SHA1(392f8a8cf58fc4813de840775d9c53561488152d) )
+	ROM_LOAD( "turbosub.u28", 0x24000, 0x4000, CRC(0628586d) SHA1(e37508c2812e1c98659aaba9c495e7396842614e) )
+	ROM_LOAD( "turbosub.u38", 0x34000, 0x4000, CRC(7d597a7e) SHA1(2f48faf75406ab3ff0b954040b74e68b7ca6f7a5) )
+
+	ROM_LOAD( "turbosub.u7",  0x08000, 0x4000, CRC(50eea315) SHA1(567dbb3cb3a75a7507f4cb4748c7dd878e69d6b7) )
+	ROM_LOAD( "turbosub.u17", 0x18000, 0x4000, CRC(8a9e19e6) SHA1(19067e153c0002edfd4a756f92ad75d9a0cbc3dd) )
+	ROM_LOAD( "turbosub.u27", 0x28000, 0x4000, CRC(1c81a8d9) SHA1(3d13d1ccd7ec3dddf2a27600eb64b5be386e868c) )
+	ROM_LOAD( "turbosub.u37", 0x38000, 0x4000, CRC(59f978cb) SHA1(e99d6378de941cad92e9702fcb18aea87acd371f) )
+
+	ROM_LOAD( "turbosub.u6",  0x0c000, 0x4000, CRC(841e00bd) SHA1(f777cc8dd8dd7c8baa2007355a76db782a218efc) )
+	ROM_LOAD( "turbosub.u16", 0x1c000, 0x4000, CRC(d3b63d81) SHA1(e86dd64825f6d9e7bebc26413f524a8962f68f2d) )
+	ROM_LOAD( "turbosub.u26", 0x2c000, 0x4000, CRC(867cfe32) SHA1(549e4e557d63dfab8e8c463916512a1b422ce425) )
+	ROM_LOAD( "turbosub.u36", 0x3c000, 0x4000, CRC(0d8ebc21) SHA1(7ae65edae05869376caa975ff2c778a08e8ad8a2) )
+
+	ROM_REGION( 0x260, "proms", 0)
+	ROM_LOAD( "27s29.u123",    0x0000, 0x0200, CRC(b2e8770e) SHA1(849292a6b30bb0e6547ce3232438136897a651b0) )
+	ROM_LOAD( "6331_snd.u2",   0x0200, 0x0020, CRC(f1328a5e) SHA1(44d4e802988415d24a0b9eaa38300f5add3a2727) )
+	ROM_LOAD( "6331_rom.u74",  0x0220, 0x0020, CRC(7b72b34e) SHA1(bc4d67a6993beb36a161368428e648d0492ac436) )
+	ROM_LOAD( "6331_vid.u155", 0x0240, 0x0020, CRC(63371737) SHA1(f08c03c81322c0de9ee64b4a9f11a1422c5bd463) )
+ROM_END
+
+ROM_START( turbosba )
+	ROM_REGION( 0xc0000, "main_code", 0) /* Non-bankswitched, 6809 #0 code */
+	ROM_LOAD( "u85",    0x18000, 0x4000, CRC(d37ccb06) SHA1(445df1caa4dd4901e474bb0903bf28e536edf493) )
+
+	ROM_REGION( 0x48000, "game_cpu", 0 ) /* Bankswitched 6809 code */
+	ROM_LOAD( "u82",    0x10000, 0x2000, CRC(1596a100) SHA1(0a53d4b79245f2a51de87ec4de6db525aa342f2c) )
+	ROM_CONTINUE(                0x20000, 0x2000 )
+	ROM_LOAD( "u81",    0x12000, 0x2000, CRC(1c8e053d) SHA1(397f04fdf7c5dfaa33a396b1b41c015a86537ef6) )
+	ROM_CONTINUE(                0x22000, 0x2000 )
+	ROM_LOAD( "u87",    0x14000, 0x2000, CRC(c80d0512) SHA1(aedd829edd2cb214fa30ae2fe25ad7590c86971b) )
+	ROM_CONTINUE(                0x24000, 0x2000 )
+	ROM_LOAD( "u86",    0x16000, 0x2000, CRC(8af137d3) SHA1(12768d14b18401d07a793de3412da059b5a33699) )
+	ROM_CONTINUE(                0x26000, 0x2000 )
+
+	ROM_LOAD( "u80",    0x30000, 0x2000, CRC(6f53b658) SHA1(39841e4b0a6809ad061a07adcdb8d92fd7652959) )
+	ROM_CONTINUE(                0x40000, 0x2000 )
+	ROM_LOAD( "u79",    0x32000, 0x2000, CRC(aa6f1db6) SHA1(70cacedb57f3c5646181e26c355f87f1cea1d651) )
+	ROM_CONTINUE(                0x42000, 0x2000 )
+	ROM_LOAD( "u84",    0x34000, 0x2000, CRC(e856323f) SHA1(d973f8efa3a1f5907b8c09b58043d7b41ff3f0c1) )
+	ROM_CONTINUE(                0x44000, 0x2000 )
+	ROM_LOAD( "u83",    0x36000, 0x2000, CRC(056fc173) SHA1(426bcea3c2420b8df036122ebb6fc80af89e63d2) )
+	ROM_CONTINUE(                0x46000, 0x2000 )
+
+	/* e000 - ffff = Upper half of U85 (lower half is blank) */
+	ROM_COPY( "main_code", 0x18000 + 0x2000, 0xe000, 0x2000 )
+
+	ROM_REGION( 0x10000, "frame_cpu", 0 )
+	ROM_LOAD( "u63",    0xe000, 0x2000, CRC(e85216d4) SHA1(7f61a93c52a31782116e9825d0aefa58ca3720b9) )
+
+	ROM_REGION( 0x1000, "video_cpu", 0 )
+	ROMX_LOAD( "27s29.u29", 0x0, 0x200, CRC(d580672b) SHA1(b56295a5b780ab5e8ff6817ebb084a8dfad8c281), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u28", 0x1, 0x200, CRC(f7976b87) SHA1(c19a1d375c497f1671170c7833952979819c3812), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u27", 0x2, 0x200, CRC(03ebd3ea) SHA1(109f5369bd36bcf0da5928b96566655c6895c737), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u21", 0x3, 0x200, CRC(e232384b) SHA1(cfc3acc86add06b4cb6addb3455d71123fb359ce), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u20", 0x4, 0x200, CRC(0a8e44d8) SHA1(2df46316510b2dbfd4c9913a1460c00d5572d586), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u19", 0x5, 0x200, CRC(de17e5f0) SHA1(3e14768374e1bda25183aee86a82d220b7f58ff9), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u18", 0x6, 0x200, CRC(e33ed0a4) SHA1(41edbdc7c022971ce14bd2f419c92714b796fad7), ROM_SKIP(7))
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 )
+	ROM_LOAD( "turbosub.u66", 0xe000, 0x2000, CRC(8db3bcdb) SHA1(e6ae324ba9dad4884e1cb3d67ce099a6f4739456) )
+
+	ROM_REGION( 0xc000, "sound_data", 0)
+	ROM_LOAD( "turbosub.u69", 0x0000, 0x4000, CRC(ad04193b) SHA1(2f660302e60a7e68e079a8dd13266a77c077f939) )
+	ROM_LOAD( "turbosub.u68", 0x4000, 0x4000, CRC(72e3d09b) SHA1(eefdfcd0c4c32e465f18d40f46cb5bc022c22bfd) )
+	ROM_LOAD( "turbosub.u67", 0x8000, 0x4000, CRC(f8ae82e9) SHA1(fd27b9fe7872c3c680a1f71a4a5d5eeaa12e4a19) )
+
+	ROM_REGION( 0x40000, "4bpp", 0)
+	ROM_LOAD( "turbosub.u44", 0x00000, 0x4000, CRC(eaa05860) SHA1(f649891dae9354b7f2e46e6a380b52a569229d64) )
+	ROM_LOAD( "turbosub.u49", 0x10000, 0x4000, CRC(b4170ac2) SHA1(bdbfc43c891c8d525dcc46fb9d05602263ab69cd) )
+	ROM_LOAD( "turbosub.u54", 0x20000, 0x4000, CRC(bebf98d8) SHA1(170502bb44fc6d6bf14d8dac4778b37888c14a7b) )
+	ROM_LOAD( "turbosub.u59", 0x30000, 0x4000, CRC(9c1f4397) SHA1(94335f2db2650f8b7e24fc3f92a04b73325ab164) )
+
+	ROM_LOAD( "turbosub.u43", 0x04000, 0x4000, CRC(5d76237c) SHA1(3d50347856039e43290497348447b1c4581f3a33) )
+	ROM_LOAD( "turbosub.u48", 0x14000, 0x4000, CRC(cea4e036) SHA1(4afce4f2a09adf9c83ab7188c05cd7236dea16a3) )
+	ROM_LOAD( "turbosub.u53", 0x24000, 0x4000, CRC(1352d58a) SHA1(76ae86c365dd4c9e1a6c5af91c01d31e7ee35f0f) )
+	ROM_LOAD( "turbosub.u58", 0x34000, 0x4000, CRC(5024d83f) SHA1(a293d92a0ae01901b5618b0250d48e3ba631dfcb) )
+
+	ROM_LOAD( "turbosub.u42", 0x08000, 0x4000, CRC(057a1c72) SHA1(5af89b128b7818550572d02e5ff724c415fa8b8b) )
+	ROM_LOAD( "turbosub.u47", 0x18000, 0x4000, CRC(10def494) SHA1(a3ba691eb2b0d782162ffc6c081761965844a3a9) )
+	ROM_LOAD( "turbosub.u52", 0x28000, 0x4000, CRC(070d07d6) SHA1(4c81310cd646641a380817fedffab66e76529c97) )
+	ROM_LOAD( "turbosub.u57", 0x38000, 0x4000, CRC(5ddb0458) SHA1(d1169882397f364ca38fbd563250b33d13b1a7c6) )
+
+	ROM_LOAD( "turbosub.u41", 0x0c000, 0x4000, CRC(014bb06b) SHA1(97276ba26b60c2907e59b92cc9de5251298579cf) )
+	ROM_LOAD( "turbosub.u46", 0x1c000, 0x4000, CRC(3b866e2c) SHA1(c0dd4827a18eb9f4b1055d92544beed10f01fd86) )
+	ROM_LOAD( "turbosub.u51", 0x2c000, 0x4000, CRC(43cdcb5c) SHA1(3dd966daa904d3be7be63c584ba033c0e7904d5c) )
+	ROM_LOAD( "turbosub.u56", 0x3c000, 0x4000, CRC(6d116adf) SHA1(f808e28cef41dc86e43d8c12966037213da87c87) )
+
+	ROM_REGION( 0x40000, "8bpp_l", 0)
+	ROM_LOAD( "turbosub.u4",  0x00000, 0x4000, CRC(08303604) SHA1(f075b645d89a2d91bd9b621748906a9f9890ee60) )
+	ROM_LOAD( "turbosub.u14", 0x10000, 0x4000, CRC(83b26c8d) SHA1(2dfa3b45c44652d255c402511bb3810fffb0731d) )
+	ROM_LOAD( "turbosub.u24", 0x20000, 0x4000, CRC(6bbb6cb3) SHA1(d513e547a05b34076bb8261abd51301ac5f3f5d4) )
+	ROM_LOAD( "turbosub.u34", 0x30000, 0x4000, CRC(7b844f4a) SHA1(82467eb7e116f9f225711a1698c151945e1de6e4) )
+
+	ROM_LOAD( "turbosub.u3",  0x04000, 0x4000, CRC(825ef29c) SHA1(affadd0976f793b8bdbcbc4768b7de27121e7b11) )
+	ROM_LOAD( "turbosub.u13", 0x14000, 0x4000, CRC(350cc17a) SHA1(b98d16be997fc0576d3206f51f29ce3e257492d3) )
+	ROM_LOAD( "turbosub.u23", 0x24000, 0x4000, CRC(b1531916) SHA1(805a23f40aa875f431e835fdaceba87261c14155) )
+	ROM_LOAD( "turbosub.u33", 0x34000, 0x4000, CRC(0d5130cb) SHA1(7e4e4e5ea50c581a60d15964571464029515c720) )
+
+	ROM_LOAD( "turbosub.u2",  0x08000, 0x4000, CRC(a8b8c032) SHA1(20512a3a1f8b9c0361e6f5a7e9a50605be3ae650) )
+	ROM_LOAD( "turbosub.u12", 0x18000, 0x4000, CRC(a2c4badf) SHA1(267af1be6261833211270af25045e306efffee80) )
+	ROM_LOAD( "turbosub.u22", 0x28000, 0x4000, CRC(97b7cf0e) SHA1(888fb2f384a5cba8a6f7569886eb6dc27e2b024f) )
+	ROM_LOAD( "turbosub.u32", 0x38000, 0x4000, CRC(b286710e) SHA1(5082db13630ba0967006619027c39ee3607b838d) )
+
+	ROM_LOAD( "turbosub.u1",  0x0c000, 0x4000, CRC(88b0a7a9) SHA1(9012c8059cf60131efa6a0432accd87813187206) )
+	ROM_LOAD( "turbosub.u11", 0x1c000, 0x4000, CRC(9f0ff723) SHA1(54b52b4ebc32f10aa32c799ac819928290e70455) )
+	ROM_LOAD( "turbosub.u21", 0x2c000, 0x4000, CRC(b4122fe2) SHA1(50e8b488a7b7f739336b60a3fd8a5b14f5010b75) )
+	ROM_LOAD( "turbosub.u31", 0x3c000, 0x4000, CRC(3fa15c78) SHA1(bf5cb85fc26b5045ad5acc944c917b068ace2c49) )
+
+	ROM_REGION( 0x40000, "8bpp_r", 0)
+	ROM_LOAD( "turbosub.u9",  0x00000, 0x4000, CRC(9a03eadf) SHA1(25ee1ebe52f030b2fa09d76161e46540c91cbc4c) )
+	ROM_LOAD( "turbosub.u19", 0x10000, 0x4000, CRC(498253b8) SHA1(dd74d4f9f19d8a746415baea604116faedb4fb31) )
+	ROM_LOAD( "turbosub.u29", 0x20000, 0x4000, CRC(809c374f) SHA1(d3849eed8441e4641ffcbca7c83ee3bb16681a0b) )
+	ROM_LOAD( "turbosub.u39", 0x30000, 0x4000, CRC(3e4e0681) SHA1(ac834f6823ffe835d6f149e79c1d31ae2b89e85d) )
+
+	ROM_LOAD( "turbosub.u8",  0x04000, 0x4000, CRC(01118737) SHA1(3a8e998b80dffe82296170273dcbbe9870c5b695) )
+	ROM_LOAD( "turbosub.u18", 0x14000, 0x4000, CRC(39fd8e57) SHA1(392f8a8cf58fc4813de840775d9c53561488152d) )
+	ROM_LOAD( "turbosub.u28", 0x24000, 0x4000, CRC(0628586d) SHA1(e37508c2812e1c98659aaba9c495e7396842614e) )
+	ROM_LOAD( "turbosub.u38", 0x34000, 0x4000, CRC(7d597a7e) SHA1(2f48faf75406ab3ff0b954040b74e68b7ca6f7a5) )
+
+	ROM_LOAD( "turbosub.u7",  0x08000, 0x4000, CRC(50eea315) SHA1(567dbb3cb3a75a7507f4cb4748c7dd878e69d6b7) )
+	ROM_LOAD( "turbosub.u17", 0x18000, 0x4000, CRC(8a9e19e6) SHA1(19067e153c0002edfd4a756f92ad75d9a0cbc3dd) )
+	ROM_LOAD( "turbosub.u27", 0x28000, 0x4000, CRC(1c81a8d9) SHA1(3d13d1ccd7ec3dddf2a27600eb64b5be386e868c) )
+	ROM_LOAD( "turbosub.u37", 0x38000, 0x4000, CRC(59f978cb) SHA1(e99d6378de941cad92e9702fcb18aea87acd371f) )
+
+	ROM_LOAD( "turbosub.u6",  0x0c000, 0x4000, CRC(841e00bd) SHA1(f777cc8dd8dd7c8baa2007355a76db782a218efc) )
+	ROM_LOAD( "turbosub.u16", 0x1c000, 0x4000, CRC(d3b63d81) SHA1(e86dd64825f6d9e7bebc26413f524a8962f68f2d) )
+	ROM_LOAD( "turbosub.u26", 0x2c000, 0x4000, CRC(867cfe32) SHA1(549e4e557d63dfab8e8c463916512a1b422ce425) )
+	ROM_LOAD( "turbosub.u36", 0x3c000, 0x4000, CRC(0d8ebc21) SHA1(7ae65edae05869376caa975ff2c778a08e8ad8a2) )
+
+	ROM_REGION( 0x260, "proms", 0)
+	ROM_LOAD( "27s29.u123",    0x0000, 0x0200, CRC(b2e8770e) SHA1(849292a6b30bb0e6547ce3232438136897a651b0) )
+	ROM_LOAD( "6331_snd.u2",   0x0200, 0x0020, CRC(f1328a5e) SHA1(44d4e802988415d24a0b9eaa38300f5add3a2727) )
+	ROM_LOAD( "6331_rom.u74",  0x0220, 0x0020, CRC(7b72b34e) SHA1(bc4d67a6993beb36a161368428e648d0492ac436) )
+	ROM_LOAD( "6331_vid.u155", 0x0240, 0x0020, CRC(63371737) SHA1(f08c03c81322c0de9ee64b4a9f11a1422c5bd463) )
+ROM_END
+
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+ 
+GAME( 1985, turbosub, 0,        esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", 0 )
+GAME( 1985, turbosba, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", 0 )
