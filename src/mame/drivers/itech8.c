@@ -593,7 +593,7 @@ static const via6522_interface via_interface =
 void itech8_update_interrupts(running_machine *machine, int periodic, int tms34061, int blitter)
 {
 	cpu_type main_cpu_type = cpu_get_type(machine->cpu[0]);
-	
+
 	/* update the states */
 	if (periodic != -1) periodic_int = periodic;
 	if (tms34061 != -1) tms34061_int = tms34061;

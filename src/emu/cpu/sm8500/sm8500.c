@@ -84,7 +84,7 @@ INLINE void sm85cpu_mem_writeword( sm8500_state *cpustate, UINT32 address, UINT1
 	sm85cpu_mem_writebyte( cpustate, ( address + 1 ) & 0xffff, value & 0xff );
 }
 
-static CPU_INIT( sm8500 ) 
+static CPU_INIT( sm8500 )
 {
 	sm8500_state *cpustate = device->token;
 

@@ -50,7 +50,7 @@ struct _i8086_state
 	INT8 irq_state;
 	INT8 test_state;	/* PJB 03/05 */
 	INT32 extra_cycles;       /* extra cycles for interrupts */
-	
+
 	UINT16 ip;
 	UINT32 sp;
 
@@ -81,7 +81,7 @@ static const cpu_state_entry state_array[] =
 	I86_STATE_ENTRY(GENPC, "%9s", pc, 0xfffff, CPUSTATE_IMPORT)
 	I86_STATE_ENTRY(GENPCBASE, "%08X", pc, 0xfffff, CPUSTATE_NOSHOW)	/* not implemented */
 	I86_STATE_ENTRY(IP,    "%04X", ip, 0xffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
-	
+
 	I86_STATE_ENTRY(FLAGS, "%04X", flags, 0xffff, CPUSTATE_NOSHOW | CPUSTATE_IMPORT | CPUSTATE_EXPORT)
 
 	I86_STATE_ENTRY(AX,    "%04X", regs.w[AX], 0xffff, 0)
@@ -408,7 +408,7 @@ static CPU_IMPORT_STATE( i8086 )
 		case I8086_FLAGS:
 			ExpandFlags(cpustate->flags);
 			break;
-		
+
 		case I8086_ES:
 			cpustate->base[ES] = SegBase(ES);
 			break;
@@ -424,7 +424,7 @@ static CPU_IMPORT_STATE( i8086 )
 		case I8086_DS:
 			cpustate->base[DS] = SegBase(DS);
 			break;
-		
+
 		default:
 			fatalerror("CPU_IMPORT_STATE(i8086) called for unexpected value\n");
 			break;
@@ -449,7 +449,7 @@ static CPU_EXPORT_STATE( i8086 )
 		case I8086_GENSP:
 			cpustate->sp = cpustate->base[SS] + cpustate->regs.w[SP];
 			break;
-		
+
 		default:
 			fatalerror("CPU_EXPORT_STATE(i8086) called for unexpected value\n");
 			break;
@@ -466,11 +466,11 @@ static CPU_EXPORT_STRING( i8086 )
 		case I8086_GENPC:
 			sprintf(string, "%04X:%04X", cpustate->sregs[CS] & 0xffff, (cpustate->pc - cpustate->base[CS]) & 0xffff);
 			break;
-		
+
 		case I8086_GENSP:
 			sprintf(string, "%04X:%04X", cpustate->sregs[SS] & 0xffff, cpustate->regs.w[SP] & 0xffff);
 			break;
-		
+
 		default:
 			fatalerror("CPU_EXPORT_STRING(i8086) called for unexpected value\n");
 			break;
@@ -546,7 +546,7 @@ CPU_GET_INFO( i8086 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8086);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;					break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;				break;
-		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(i8086);	break;	
+		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(i8086);	break;
 		case CPUINFO_FCT_EXPORT_STATE:					info->export_state = CPU_EXPORT_STATE_NAME(i8086);	break;
 		case CPUINFO_FCT_EXPORT_STRING:					info->export_string = CPU_EXPORT_STRING_NAME(i8086);break;
 

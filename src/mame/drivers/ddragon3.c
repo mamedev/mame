@@ -84,7 +84,7 @@ TA-0028-P2-10
 Notes:
 
 ROMs (All ROMs are 27C010 EPROM. - means not populated)
-      Label   Location 
+      Label   Location
       ----------------
       25      IC3
       26      IC4

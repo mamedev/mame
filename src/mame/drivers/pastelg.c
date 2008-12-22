@@ -438,8 +438,8 @@ MACHINE_DRIVER_END
 
 /*
 
-Produttore	Nichibutsu
-N.revisione	TD-1412a
+Produttore  Nichibutsu
+N.revisione TD-1412a
 CPU
 1x custom Nichibutsu PG14111 (DIL40)(main?)
 1x custom Nichibutsu PG14112 (DIL40)(sound?)

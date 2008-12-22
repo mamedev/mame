@@ -320,6 +320,9 @@ static const struct
 #if (HAS_OKIM6295)
 	{ SOUND_OKIM6295, SND_GET_INFO_NAME( okim6295 ) },
 #endif
+#if (HAS_OKIM6258)
+	{ SOUND_OKIM6258, SND_GET_INFO_NAME( okim6258 ) },
+#endif
 #if (HAS_MSM5205)
 	{ SOUND_MSM5205, SND_GET_INFO_NAME( msm5205 ) },
 #endif

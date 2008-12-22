@@ -65,7 +65,7 @@ void debugger_init(running_machine *machine)
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		machine_entry *entry;
-		
+
 		/* initialize the submodules */
 		debug_cpu_init(machine);
 		debug_command_init(machine);
@@ -85,7 +85,7 @@ void debugger_init(running_machine *machine)
 			atexit(debugger_flush_all_traces_on_abnormal_exit);
 		atexit_registered = TRUE;
 
-		/* listen in on the errorlog */		
+		/* listen in on the errorlog */
 		add_logerror_callback(machine, debug_errorlog_write_line);
 	}
 }
@@ -110,7 +110,7 @@ void debugger_refresh_display(running_machine *machine)
 static void debugger_exit(running_machine *machine)
 {
 	machine_entry **entryptr;
-	
+
 	/* remove this machine from the list; it came down cleanly */
 	for (entryptr = &machine_list; *entryptr != NULL; entryptr = &(*entryptr)->next)
 		if ((*entryptr)->machine == machine)
@@ -124,8 +124,8 @@ static void debugger_exit(running_machine *machine)
 
 
 /*-------------------------------------------------
-    debugger_flush_all_traces_on_abnormal_exit - 
-    flush any traces in the event of an aborted 
+    debugger_flush_all_traces_on_abnormal_exit -
+    flush any traces in the event of an aborted
     execution
 -------------------------------------------------*/
 

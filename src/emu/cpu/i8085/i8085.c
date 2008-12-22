@@ -156,7 +156,7 @@ struct _i8085_state
 	UINT8				trap_pending;	/* TRAP interrupt latched? */
 	UINT8				trap_im_copy;	/* copy of IM register when TRAP was taken */
 	UINT8				sod_state;		/* state of the SOD line */
-	
+
 	UINT8				ietemp;			/* import/export temp space */
 
 	cpu_irq_callback 	irq_callback;
@@ -180,11 +180,11 @@ static const cpu_state_entry state_array[] =
 {
 	I8085_STATE_ENTRY(PC,  "%04X", PC.w.l, 0xffff, 0)
 	I8085_STATE_ENTRY(GENPC, "%04X", PC.w.l, 0xffff, CPUSTATE_NOSHOW)
-//	I8085_STATE_ENTRY(GENPCBASE, "%04X", prvpc.w.l, 0xffff, CPUSTATE_NOSHOW)
-	
+//  I8085_STATE_ENTRY(GENPCBASE, "%04X", prvpc.w.l, 0xffff, CPUSTATE_NOSHOW)
+
 	I8085_STATE_ENTRY(SP,  "%04X", PC.w.l, 0xffff, 0)
 	I8085_STATE_ENTRY(GENSP, "%04X", PC.w.l, 0xffff, CPUSTATE_NOSHOW)
-	
+
 	I8085_STATE_ENTRY(A, "%02X", AF.b.l, 0xff, CPUSTATE_NOSHOW)
 	I8085_STATE_ENTRY(B, "%02X", BC.b.h, 0xff, CPUSTATE_NOSHOW)
 	I8085_STATE_ENTRY(C, "%02X", BC.b.l, 0xff, CPUSTATE_NOSHOW)
@@ -289,14 +289,14 @@ INLINE void set_status(i8085_state *cpustate, UINT8 status)
 INLINE UINT8 get_rim_value(i8085_state *cpustate)
 {
 	UINT8 result = cpustate->IM;
-	
+
 	/* copy live RST5.5 and RST6.5 states */
 	result &= ~(IM_I65 | IM_I55);
 	if (cpustate->irq_state[I8085_RST65_LINE] && !(cpustate->IM & IM_M65))
 		result |= IM_I65;
 	if (cpustate->irq_state[I8085_RST55_LINE] && !(cpustate->IM & IM_M55))
 		result |= IM_I55;
-	
+
 	/* fetch the SID bit if we have a callback */
 	if (cpustate->config.sid != NULL)
 		result = (result & 0x7f) | ((*cpustate->config.sid)(cpustate->device) ? 0x80 : 0);
@@ -314,7 +314,7 @@ INLINE void break_halt_for_interrupt(i8085_state *cpustate)
 		set_status(cpustate, 0x26);	/* int ack while halt */
 	}
 	else
-		set_status(cpustate, 0x23);	/* int ack */	
+		set_status(cpustate, 0x23);	/* int ack */
 }
 
 
@@ -358,9 +358,9 @@ static void check_for_interrupts(i8085_state *cpustate)
 	if (cpustate->trap_pending)
 	{
 		/* the first RIM after a TRAP reflects the original IE state; remember it here,
-		   setting the high bit to indicate it is valid */
+           setting the high bit to indicate it is valid */
 		cpustate->trap_im_copy = cpustate->IM | 0x80;
-		
+
 		/* reset the pending state */
 		cpustate->trap_pending = FALSE;
 
@@ -375,7 +375,7 @@ static void check_for_interrupts(i8085_state *cpustate)
 		cpustate->PC.w.l = ADDR_TRAP;
 		cpustate->icount -= 11;
 	}
-	
+
 	/* followed by RST7.5 */
 	else if ((cpustate->IM & IM_I75) && !(cpustate->IM & IM_M75) && (cpustate->IM & IM_IE))
 	{
@@ -387,13 +387,13 @@ static void check_for_interrupts(i8085_state *cpustate)
 		if (cpustate->irq_callback != NULL)
 			(*cpustate->irq_callback)(cpustate->device, I8085_RST75_LINE);
 
-		/* push the PC and jump to $003C */ 
+		/* push the PC and jump to $003C */
 		M_PUSH(PC);
 		cpustate->IM &= ~IM_IE;
 		cpustate->PC.w.l = ADDR_RST75;
 		cpustate->icount -= 11;
 	}
-	
+
 	/* followed by RST6.5 */
 	else if (cpustate->irq_state[I8085_RST65_LINE] && !(cpustate->IM & IM_M65) && (cpustate->IM & IM_IE))
 	{
@@ -402,13 +402,13 @@ static void check_for_interrupts(i8085_state *cpustate)
 		if (cpustate->irq_callback != NULL)
 			(*cpustate->irq_callback)(cpustate->device, I8085_RST65_LINE);
 
-		/* push the PC and jump to $0034 */ 
+		/* push the PC and jump to $0034 */
 		M_PUSH(PC);
 		cpustate->IM &= ~IM_IE;
 		cpustate->PC.w.l = ADDR_RST65;
 		cpustate->icount -= 11;
 	}
-	
+
 	/* followed by RST5.5 */
 	else if (cpustate->irq_state[I8085_RST55_LINE] && !(cpustate->IM & IM_M55) && (cpustate->IM & IM_IE))
 	{
@@ -417,7 +417,7 @@ static void check_for_interrupts(i8085_state *cpustate)
 		if (cpustate->irq_callback != NULL)
 			(*cpustate->irq_callback)(cpustate->device, I8085_RST55_LINE);
 
-		/* push the PC and jump to $002C */ 
+		/* push the PC and jump to $002C */
 		M_PUSH(PC);
 		cpustate->IM &= ~IM_IE;
 		cpustate->PC.w.l = ADDR_RST55;
@@ -428,7 +428,7 @@ static void check_for_interrupts(i8085_state *cpustate)
 	else if (cpustate->irq_state[I8085_INTR_LINE] && (cpustate->IM & IM_IE))
 	{
 		UINT32 vector = 0;
-		
+
 		/* break out of HALT state and call the IRQ ack callback */
 		break_halt_for_interrupt(cpustate);
 		if (cpustate->irq_callback != NULL)
@@ -599,7 +599,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			if (IS_8085(cpustate)) {
 				cpustate->icount -= 7;		/* RIM  */
 				cpustate->AF.b.h = get_rim_value(cpustate);
-				
+
 				/* if we have remembered state from taking a TRAP, fix up the IE flag here */
 				if (cpustate->trap_im_copy & 0x80)
 					cpustate->AF.b.h = (cpustate->AF.b.h & ~IM_IE) | (cpustate->trap_im_copy & IM_IE);
@@ -695,24 +695,24 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			if (IS_8085(cpustate))
 			{
 				cpustate->icount -= 7;		/* SIM  */
-				
+
 				/* if bit 3 is set, bits 0-2 become the new masks */
 				if (cpustate->AF.b.h & 0x08)
 				{
 					cpustate->IM &= ~(IM_M55 | IM_M65 | IM_M75 | IM_I55 | IM_I65);
 					cpustate->IM |= cpustate->AF.b.h & (IM_M55 | IM_M65 | IM_M75);
-					
+
 					/* update live state based on the new masks */
 					if ((cpustate->IM & IM_M55) == 0 && cpustate->irq_state[I8085_RST55_LINE])
 						cpustate->IM |= IM_I55;
 					if ((cpustate->IM & IM_M65) == 0 && cpustate->irq_state[I8085_RST65_LINE])
 						cpustate->IM |= IM_I65;
 				}
-				
+
 				/* bit if 4 is set, the 7.5 flip-flop is cleared */
 				if (cpustate->AF.b.h & 0x10)
 					cpustate->IM &= ~IM_I75;
-				
+
 				/* if bit 6 is set, then bit 7 is the new SOD state */
 				if (cpustate->AF.b.h & 0x40)
 					set_sod(cpustate, cpustate->AF.b.h >> 7);
@@ -1460,7 +1460,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 static CPU_EXECUTE( i808x )
 {
 	i8085_state *cpustate = device->token;
-	
+
 	cpustate->icount = cycles;
 
 	/* check for TRAPs before diving in (can't do others because of after_ei) */
@@ -1472,7 +1472,7 @@ static CPU_EXECUTE( i808x )
 		debugger_instruction_hook(device, cpustate->PC.d);
 
 		/* the instruction after an EI does not take an interrupt, so
-		   we cannot check immediately; handle post-EI behavior here */
+           we cannot check immediately; handle post-EI behavior here */
 		if (cpustate->after_ei != 0 && --cpustate->after_ei == 0)
 			check_for_interrupts(cpustate);
 
@@ -1533,7 +1533,7 @@ static void init_808x_common(const device_config *device, cpu_irq_callback irqca
 
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
-	
+
 	state_save_register_device_item(device, 0, cpustate->PC.w.l);
 	state_save_register_device_item(device, 0, cpustate->SP.w.l);
 	state_save_register_device_item(device, 0, cpustate->AF.w.l);
@@ -1570,7 +1570,7 @@ static CPU_INIT( i8085 )
 static CPU_RESET( i808x )
 {
 	i8085_state *cpustate = device->token;
-	
+
 	cpustate->PC.d = 0;
 	cpustate->HALT = 0;
 	cpustate->IM &= ~IM_I75;
@@ -1600,14 +1600,14 @@ static CPU_IMPORT_STATE( i808x )
 			else
 				cpustate->IM &= ~IM_SID;
 			break;
-		
+
 		case I8085_INTE:
 			if (cpustate->ietemp)
 				cpustate->IM |= IM_IE;
 			else
 				cpustate->IM &= ~IM_IE;
 			break;
-		
+
 		default:
 			fatalerror("CPU_IMPORT_STATE(i808x) called for unexpected value\n");
 			break;
@@ -1626,11 +1626,11 @@ static CPU_EXPORT_STATE( i808x )
 			if (cpustate->config.sid != NULL)
 				cpustate->ietemp = ((*cpustate->config.sid)(cpustate->device) != 0);
 			break;
-		
+
 		case I8085_INTE:
 			cpustate->ietemp = ((cpustate->IM & IM_IE) != 0);
 			break;
-		
+
 		default:
 			fatalerror("CPU_EXPORT_STATE(i808x) called for unexpected value\n");
 			break;
@@ -1646,7 +1646,7 @@ static CPU_EXPORT_STATE( i808x )
 static void i808x_set_irq_line(i8085_state *cpustate, int irqline, int state)
 {
 	int newstate = (state != CLEAR_LINE);
-	
+
 	/* NMI is edge-triggered */
 	if (irqline == INPUT_LINE_NMI)
 	{
@@ -1662,7 +1662,7 @@ static void i808x_set_irq_line(i8085_state *cpustate, int irqline, int state)
 			cpustate->IM |= IM_I75;
 		cpustate->irq_state[I8085_RST75_LINE] = newstate;
 	}
-	
+
 	/* remaining sources are level triggered */
 	else if (irqline < ARRAY_LENGTH(cpustate->irq_state))
 		cpustate->irq_state[irqline] = state;
@@ -1680,7 +1680,7 @@ static CPU_SET_INFO( i808x )
 		case CPUINFO_INT_INPUT_STATE + I8085_RST65_LINE:
 		case CPUINFO_INT_INPUT_STATE + I8085_RST75_LINE:
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:
-			i808x_set_irq_line(cpustate, state - CPUINFO_INT_INPUT_STATE, info->i); 
+			i808x_set_irq_line(cpustate, state - CPUINFO_INT_INPUT_STATE, info->i);
 			break;
 	}
 }
@@ -1721,7 +1721,7 @@ CPU_GET_INFO( i8085 )
 		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(i808x);					break;
 		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(i808x);				break;
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(i8085);		break;
-		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(i808x);		break;	
+		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(i808x);		break;
 		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(i808x);		break;
 
 		/* --- the following bits of info are returned as pointers --- */

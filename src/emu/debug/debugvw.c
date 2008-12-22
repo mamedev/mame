@@ -2691,7 +2691,7 @@ static void memory_view_update(debug_view *view)
 					{
 						int ismapped;
 						UINT64 chval;
-						
+
 						ismapped = memory_view_read(memdata, 1, addrbyte + ch, &chval);
 						dest->byte = (ismapped && isprint(chval)) ? chval : '.';
 					}
@@ -3041,7 +3041,7 @@ static int memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t offs,
 	{
 		UINT64 data0, data1;
 		int ismapped;
-		
+
 		size /= 2;
 		ismapped  = memory_view_read(memdata, size, offs + 0 * size, &data0);
 		ismapped |= memory_view_read(memdata, size, offs + 1 * size, &data1);

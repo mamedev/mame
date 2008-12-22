@@ -156,7 +156,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	astring *tempstring = astring_alloc();
 	device_config *device = NULL;
 	sound_config *sound = NULL;
-	
+
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
 	{

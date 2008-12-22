@@ -17,11 +17,11 @@
 
 /*
 TODO:
-	- 0x01ee: should this move sign extend?  otherwise the test-against-minus means nothing.
-	- Restore only the proper bits upon loop termination!
-	- BFCLR has some errata in the docs that may need to be applied.
-	- *_bit_set(0) is difficult to read.  maybe make it *_bit_chg(0).
-	- Potentially "better" reporting for unimplemented opcodes.
+    - 0x01ee: should this move sign extend?  otherwise the test-against-minus means nothing.
+    - Restore only the proper bits upon loop termination!
+    - BFCLR has some errata in the docs that may need to be applied.
+    - *_bit_set(0) is difficult to read.  maybe make it *_bit_chg(0).
+    - Potentially "better" reporting for unimplemented opcodes.
 */
 
 /************************/

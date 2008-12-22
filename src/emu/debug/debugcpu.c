@@ -242,7 +242,7 @@ void debug_cpu_init(running_machine *machine)
 			/* add the symbol to the table */
 			symtable_add_register(info->symtable, symname, (void *)(FPTR)regnum, get_cpu_reg, set_cpu_reg);
 		}
-		
+
 		/* if no curpc, add one */
 		if (symtable_find(info->symtable, "curpc") == NULL)
 			symtable_add_register(info->symtable, "curpc", NULL, get_current_pc, 0);

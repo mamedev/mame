@@ -78,7 +78,7 @@ struct _tms34010_state
 	} regs[31];
 
 	UINT16 IOregs[64];
-	
+
 	cpu_state_table		state;
 };
 
@@ -203,12 +203,12 @@ static const cpu_state_entry state_array[] =
 	TMS340X0_STATE_ENTRY(PC,  "%08X", pc, 0xffffffff, 0)
 	TMS340X0_STATE_ENTRY(GENPC, "%08X", pc, 0xffffffff, CPUSTATE_NOSHOW)
 	TMS340X0_STATE_ENTRY(GENPCBASE, "%08X", ppc, 0xffffffff, CPUSTATE_NOSHOW)
-	
+
 	TMS340X0_STATE_ENTRY(SP,  "%08X", regs[15].reg, 0xffffffff, 0)
 	TMS340X0_STATE_ENTRY(GENSP, "%08X", regs[15].reg, 0xffffffff, CPUSTATE_NOSHOW)
-	
+
 	TMS340X0_STATE_ENTRY(ST,  "%08X", st, 0xffffffff, 0)
-	
+
 	TMS340X0_STATE_ENTRY(A0,  "%08X", regs[0].reg,     0xffffffff, 0)
 	TMS340X0_STATE_ENTRY(A1,  "%08X", regs[1].reg,     0xffffffff, 0)
 	TMS340X0_STATE_ENTRY(A2,  "%08X", regs[2].reg,     0xffffffff, 0)

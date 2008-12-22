@@ -198,7 +198,7 @@ static WRITE8_HANDLER( blitter_process_w )
 /* What is the bit 5 (0x20) for?*/
 static WRITE8_HANDLER( blit_vregs_w )
 {
-//	printf("%02x %02x\n",offset,data);
+//  printf("%02x %02x\n",offset,data);
 	pen_data[offset] = data & 0xf;
 }
 
@@ -218,14 +218,14 @@ static WRITE8_HANDLER( mux_w )
 static WRITE8_HANDLER( output_w )
 {
 	/*
-	--x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
-	---- -x-- flip screen
-	---- ---x coin counter
-	*/
-//	printf("%02x\n",data);
+    --x- ---- ? (polls between high and low in irq routine,probably signals the vblank routine)
+    ---- -x-- flip screen
+    ---- ---x coin counter
+    */
+//  printf("%02x\n",data);
 	coin_counter_w(0,data & 0x01);
-//	flip_screen_set(data & 0x04);
-//	coin_lockout_w(0,~data & 0x20);
+//  flip_screen_set(data & 0x04);
+//  coin_lockout_w(0,~data & 0x20);
 }
 
 static READ8_HANDLER( input_mux_r )
@@ -239,7 +239,7 @@ static READ8_HANDLER( input_mux_r )
 		case 0x10: return input_port_read(space->machine, "PL1_3");
 		case 0x20: return input_port_read(space->machine, "PL2_3");
 	}
-//	printf("%04x\n",mux_data);
+//  printf("%04x\n",mux_data);
 
 	return 0xff;
 }
@@ -416,7 +416,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntrygrl_cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-//	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+//  AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( cntrygrl_cpu0_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
 	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w )
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continously
-//	AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
+//  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -749,12 +749,12 @@ ROM_END
 Jangou Lady
 (c)1984 Nihon Bussan
 
-CPU:	Z80 x2 (#1,#2)
-	(40pin unknown:#3)
-SOUND:	AY-3-8910
-	MSM5218RS
-OSC:	19.968MHz
-	400KHz
+CPU:    Z80 x2 (#1,#2)
+    (40pin unknown:#3)
+SOUND:  AY-3-8910
+    MSM5218RS
+OSC:    19.968MHz
+    400KHz
 
 
 1.5N    chr.
@@ -809,7 +809,7 @@ ROM_START( cntrygrl )
 	ROM_LOAD( "rom5.bin", 0x02000, 0x02000, CRC(24d210ed) SHA1(6a0eae9d459975fbaad75bf21284baac3ba4f872) )
 
 	/*wtf,these 2 roms are next to the CPU roms, one is a CPU rom from Moon Quasar, the other a GFX rom from Crazy Climber,
-	  I dunno what's going on,game doesn't appear to need these two....*/
+      I dunno what's going on,game doesn't appear to need these two....*/
 	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "rom6.bin", 0x00000, 0x0800, CRC(33965a89) SHA1(92912cea76a472d9b709c664d9818844a07fcc32)  ) // = mq3    Moon Quasar
 	ROM_LOAD( "rom7.bin", 0x00800, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7)  ) // = cc06   Crazy Climber (US)

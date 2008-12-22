@@ -301,7 +301,7 @@ static const cpu_state_entry state_array[] =
 	ADSP21XX_STATE_ENTRY(PC,  "%04X", pc, 0xffff, 0)
 	ADSP21XX_STATE_ENTRY(GENPC, "%04X", pc, 0xffff, CPUSTATE_NOSHOW)
 	ADSP21XX_STATE_ENTRY(GENPCBASE, "%04X", ppc, 0xffff, CPUSTATE_NOSHOW)
-	
+
 	ADSP21XX_STATE_ENTRY(AX0, "%04X", core.ax0.u, 0xffff, 0)
 	ADSP21XX_STATE_ENTRY(AX1, "%04X", core.ax1.u, 0xffff, 0)
 	ADSP21XX_STATE_ENTRY(AY0, "%04X", core.ay0.u, 0xffff, 0)
@@ -688,7 +688,7 @@ static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callba
 	adsp->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	adsp->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	adsp->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
-	
+
 	/* copy function pointers from the config */
 	if (config != NULL)
 	{
@@ -1791,7 +1791,7 @@ static CPU_IMPORT_STATE( adsp21xx )
 		case ADSP2100_MSTAT:
 			update_mstat(adsp);
 			break;
-		
+
 		case ADSP2100_IMASK:
 		case ADSP2100_ICNTL:
 		case ADSP2100_IRQSTATE0:
@@ -1800,7 +1800,7 @@ static CPU_IMPORT_STATE( adsp21xx )
 		case ADSP2100_IRQSTATE3:
 			check_irqs(adsp);
 			break;
-		
+
 		case ADSP2100_I0:
 		case ADSP2100_I1:
 		case ADSP2100_I2:
@@ -1811,7 +1811,7 @@ static CPU_IMPORT_STATE( adsp21xx )
 		case ADSP2100_I7:
 			update_i(adsp, entry->index - ADSP2100_I0);
 			break;
-		
+
 		case ADSP2100_L0:
 		case ADSP2100_L1:
 		case ADSP2100_L2:
@@ -1822,7 +1822,7 @@ static CPU_IMPORT_STATE( adsp21xx )
 		case ADSP2100_L7:
 			update_l(adsp, entry->index - ADSP2100_L0);
 			break;
-		
+
 		default:
 			fatalerror("CPU_IMPORT_STATE(adsp21xx) called for unexpected value\n");
 			break;

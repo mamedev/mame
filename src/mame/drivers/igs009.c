@@ -166,7 +166,7 @@ static int video_enable;
 static WRITE8_HANDLER( bg_scroll_w )
 {
 	bg_scroll[offset] = data;
-//	tilemap_set_scrolly(bg_tilemap,offset,data);
+//  tilemap_set_scrolly(bg_tilemap,offset,data);
 }
 
 

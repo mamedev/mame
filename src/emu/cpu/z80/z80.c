@@ -206,10 +206,10 @@ static const cpu_state_entry state_array[] =
 	Z80_STATE_ENTRY(PC,  "%04X", PCD, 0xffff, 0)
 	Z80_STATE_ENTRY(GENPC, "%04X", PCD, 0xffff, CPUSTATE_NOSHOW)
 	Z80_STATE_ENTRY(GENPCBASE, "%04X", prvpc.w.l, 0xffff, CPUSTATE_NOSHOW)
-	
+
 	Z80_STATE_ENTRY(SP,  "%04X", SP, 0xffff, 0)
 	Z80_STATE_ENTRY(GENSP, "%04X", SPD, 0xffff, CPUSTATE_NOSHOW)
-	
+
 	Z80_STATE_ENTRY(A, "%02X", A, 0xff, CPUSTATE_NOSHOW)
 	Z80_STATE_ENTRY(B, "%02X", B, 0xff, CPUSTATE_NOSHOW)
 	Z80_STATE_ENTRY(C, "%02X", C, 0xff, CPUSTATE_NOSHOW)
@@ -3585,7 +3585,7 @@ static CPU_IMPORT_STATE( z80 )
 			cpustate->r = cpustate->rtemp & 0x7f;
 			cpustate->r2 = cpustate->rtemp & 0x80;
 			break;
-		
+
 		default:
 			fatalerror("CPU_IMPORT_STATE(z80) called for unexpected value\n");
 			break;
@@ -3673,7 +3673,7 @@ CPU_GET_INFO( z80 )
 		case CPUINFO_FCT_EXIT:			info->exit = CPU_EXIT_NAME(z80);						break;
 		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(z80);					break;
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(z80);			break;
-		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(z80);		break;	
+		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(z80);		break;
 		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(z80);		break;
 
 		/* --- the following bits of info are returned as pointers --- */

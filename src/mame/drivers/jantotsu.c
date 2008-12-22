@@ -144,7 +144,7 @@ static WRITE8_HANDLER( bankaddr_w )
 	// looks like the top 2 bits and bottom 2 bits are used..
 	// multiple buffers? different read / write ?
 
-//	printf("%02x\n",data & 0x03);
+//  printf("%02x\n",data & 0x03);
 }
 
 static PALETTE_INIT( jantotsu )
@@ -179,7 +179,7 @@ static READ8_HANDLER( jantotsu_mux_r )
 
 	coin_port = input_port_read(space->machine, "COINS");
 
-//	printf("%02x\n",mux_data);
+//  printf("%02x\n",mux_data);
 
 	switch(mux_data)
 	{

@@ -778,10 +778,10 @@ static const cpu_state_entry state_array[] =
 	Z180_STATE_ENTRY(PC,  "%04X", PC.w.l, 0xffff, 0)
 	Z180_STATE_ENTRY(GENPC, "%04X", _PCD, 0xffff, CPUSTATE_NOSHOW)
 	Z180_STATE_ENTRY(GENPCBASE, "%04X", PREPC.w.l, 0xffff, CPUSTATE_NOSHOW)
-	
+
 	Z180_STATE_ENTRY(SP,  "%04X", _SPD, 0xffff, 0)
 	Z180_STATE_ENTRY(GENSP, "%04X", SP.w.l, 0xffff, CPUSTATE_NOSHOW)
-	
+
 	Z180_STATE_ENTRY(A, "%02X", _A, 0xff, CPUSTATE_NOSHOW)
 	Z180_STATE_ENTRY(B, "%02X", _B, 0xff, CPUSTATE_NOSHOW)
 	Z180_STATE_ENTRY(C, "%02X", _C, 0xff, CPUSTATE_NOSHOW)
@@ -2053,7 +2053,7 @@ static CPU_RESET( z180 )
 	z180_state *cpustate = device->token;
 	z80_daisy_state *save_daisy;
 	cpu_irq_callback save_irqcallback;
-	cpu_state_table save_table; 
+	cpu_state_table save_table;
 	int i, p;
 	int oldval, newval, val;
 	UINT8 *padd, *padc, *psub, *psbc;
@@ -2455,17 +2455,17 @@ static CPU_IMPORT_STATE( z180 )
 			cpustate->R = cpustate->rtemp & 0x7f;
 			cpustate->R2 = cpustate->rtemp & 0x80;
 			break;
-		
+
 		case Z180_CBR:
 		case Z180_BBR:
 		case Z180_CBAR:
 			z180_mmu(cpustate);
 			break;
-		
+
 		case Z180_IOLINES:
 			z180_write_iolines(cpustate, cpustate->ioltemp);
 			break;
-		
+
 		default:
 			fatalerror("CPU_IMPORT_STATE(z80) called for unexpected value\n");
 			break;
@@ -2482,7 +2482,7 @@ static CPU_EXPORT_STATE( z180 )
 		case Z180_R:
 			cpustate->rtemp = (cpustate->R & 0x7f) | (cpustate->R2 & 0x80);
 			break;
-		
+
 		case Z180_IOLINES:
 			cpustate->ioltemp = cpustate->iol;
 			break;
@@ -2559,13 +2559,13 @@ CPU_GET_INFO( z180 )
 		case CPUINFO_FCT_BURN:			info->burn = CPU_BURN_NAME(z180);						break;
 		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(z180);			break;
 		case CPUINFO_FCT_TRANSLATE:		info->translate = CPU_TRANSLATE_NAME(z180);				break;
-		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(z180);		break;	
+		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(z180);		break;
 		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(z180);		break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state;	break;
-		
+
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		info->p = (void *)cc[Z180_TABLE_op];	break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		info->p = (void *)cc[Z180_TABLE_cb];	break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		info->p = (void *)cc[Z180_TABLE_ed];	break;

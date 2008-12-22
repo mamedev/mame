@@ -124,7 +124,7 @@ static DEVICE_START(at28c16)
 	/* validate some basic stuff */
 	assert(device != NULL);
 //  assert(device->static_config != NULL);
-//	assert(device->inline_config == NULL);
+//  assert(device->inline_config == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 

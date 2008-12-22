@@ -96,12 +96,12 @@ static WRITE8_HANDLER( output_w )
 static WRITE8_HANDLER( lamps_w )
 {
 	/*
-	---x ---- lamp button 5
-	---- x--- lamp button 4
-	---- -x-- lamp button 3
-	---- --x- lamp button 2
-	---- ---x lamp button 1
-	*/
+    ---x ---- lamp button 5
+    ---- x--- lamp button 4
+    ---- -x-- lamp button 3
+    ---- --x- lamp button 2
+    ---- ---x lamp button 1
+    */
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )

@@ -75,13 +75,13 @@ static WRITE8_HANDLER( dderby_sound_w )
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_BASE(&main_rom)
-//	AM_RANGE(0x6000,0x67ff) AM_RAM AM_SHARE(1)
-//	AM_RANGE(0x8810, 0x8810) AM_WRITE(SMH_NOP) // sound hook?
-//	AM_RANGE(0x8810, 0x8810) AM_READ(dderby_ff)
+//  AM_RANGE(0x6000,0x67ff) AM_RAM AM_SHARE(1)
+//  AM_RANGE(0x8810, 0x8810) AM_WRITE(SMH_NOP) // sound hook?
+//  AM_RANGE(0x8810, 0x8810) AM_READ(dderby_ff)
 	AM_RANGE(0x8811, 0x8811) AM_READ_PORT("IN2") // ??? doubt if this is dip 2.
-//	AM_RANGE(0x8bab, 0x8bab) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
-//	AM_RANGE(0x8baa, 0x8baa) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
-//	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&main_ram)
+//  AM_RANGE(0x8bab, 0x8bab) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
+//  AM_RANGE(0x8baa, 0x8baa) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
+//  AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&main_ram)
 	AM_RANGE(0x8880, 0x8880) AM_MIRROR(0x8) AM_READ_PORT("KEY0") // ??? doubt if this is dip 2.
 	AM_RANGE(0x8881, 0x8881) AM_MIRROR(0x8) AM_READ_PORT("KEYA") // ??? doubt if this is dip 2.
 	AM_RANGE(0x8882, 0x8882) AM_READ_PORT("KEY1") //AM_MIRROR(0x8)// ??? doubt if this is dip 2.
@@ -93,29 +93,29 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8888, 0x8888) AM_READ_PORT("KEY7") // ??? doubt if this is dip 2.
 	AM_RANGE(0x8889, 0x8889) AM_READ_PORT("KEY8") // ??? doubt if this is dip 2.
 	AM_RANGE(0x888a, 0x888a) AM_READ_PORT("KEY9") // ??? doubt if this is dip 2.
-//	AM_RANGE(0x888e, 0x888e) AM_READ_PORT("KEY0") // ??? doubt if this is dip 2.
-/*	AM_RANGE(0x888f, 0x888f) AM_READ_PORT("KEYA") // ??? doubt if this is dip 2.
-	AM_RANGE(0x888a, 0x888a) AM_READ_PORT("KEY1") // ??? doubt if this is dip 2.
-	AM_RANGE(0x888b, 0x888b) AM_READ_PORT("KEY2") // ??? doubt if this is dip 2.
-	AM_RANGE(0x888c, 0x888c) AM_READ_PORT("KEY3") // ??? doubt if this is dip 2.
-	AM_RANGE(0x888d, 0x888d) AM_READ_PORT("KEY4") // ??? COLLECT??
-	AM_RANGE(0x888e, 0x888e) AM_READ_PORT("KEY5") // ??? doubt if this is dip 2.
+//  AM_RANGE(0x888e, 0x888e) AM_READ_PORT("KEY0") // ??? doubt if this is dip 2.
+/*  AM_RANGE(0x888f, 0x888f) AM_READ_PORT("KEYA") // ??? doubt if this is dip 2.
+    AM_RANGE(0x888a, 0x888a) AM_READ_PORT("KEY1") // ??? doubt if this is dip 2.
+    AM_RANGE(0x888b, 0x888b) AM_READ_PORT("KEY2") // ??? doubt if this is dip 2.
+    AM_RANGE(0x888c, 0x888c) AM_READ_PORT("KEY3") // ??? doubt if this is dip 2.
+    AM_RANGE(0x888d, 0x888d) AM_READ_PORT("KEY4") // ??? COLLECT??
+    AM_RANGE(0x888e, 0x888e) AM_READ_PORT("KEY5") // ??? doubt if this is dip 2.
 */
-//	AM_RANGE(0x8887, 0x8887) AM_READ_PORT("KEY6") // ??? doubt if this is dip 2.
+//  AM_RANGE(0x8887, 0x8887) AM_READ_PORT("KEY6") // ??? doubt if this is dip 2.
 
-//	AM_RANGE(0x8887, 0x8887) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
-//	AM_RANGE(0x8889, 0x8889) AM_READ_PORT("IN2")
+//  AM_RANGE(0x8887, 0x8887) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
+//  AM_RANGE(0x8889, 0x8889) AM_READ_PORT("IN2")
 
 	AM_RANGE(0x8887, 0x8887) AM_MIRROR(0x8) AM_READ_PORT("SERVICE")
-//	AM_RANGE(0x888f, 0x888f) AM_READ_PORT("SERVICE")
+//  AM_RANGE(0x888f, 0x888f) AM_READ_PORT("SERVICE")
 
 	AM_RANGE(0x8888, 0x8888) AM_MIRROR(0x8) AM_READ_PORT("DOOR")
-//	AM_RANGE(0x8890, 0x8890) AM_READ_PORT("DOOR")
+//  AM_RANGE(0x8890, 0x8890) AM_READ_PORT("DOOR")
 
 	AM_RANGE(0x8892, 0x8892) AM_MIRROR(0x8) AM_READ_PORT("DOOR2")
-//	AM_RANGE(0x889a, 0x889a) AM_READ_PORT("DOOR2")
+//  AM_RANGE(0x889a, 0x889a) AM_READ_PORT("DOOR2")
 	AM_RANGE(0x8893, 0x8893) AM_MIRROR(0x8)AM_READ_PORT("DOOR3")
-//	AM_RANGE(0x889b, 0x889b) AM_READ_PORT("DOOR3")
+//  AM_RANGE(0x889b, 0x889b) AM_READ_PORT("DOOR3")
 
 	AM_RANGE(0x8e00, 0x8fff) AM_RAM // nvram maybe!
 
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xC000, 0xC007) AM_RAM // shared ram to 2nd cpu?? battery backed ram?
 
 	AM_RANGE(0xC802, 0xC802) AM_READ_PORT("DSW") // first dip
-//	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
+//  AM_RANGE(0xc803, 0xc803) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
 
 	AM_RANGE(0xCA02, 0xCA03) AM_RAM AM_WRITE(dderby_sound_w) // BEST GUESS SO FAR!
 	AM_RANGE(0xCA00, 0xCA00) AM_RAM AM_WRITE(dderby_sound_w) // BEST GUESS SO FAR!
@@ -423,7 +423,7 @@ racetrack seems to be stored in 4th and 5th prom.
 can we draw it with the tilemap? maybe not, the layout is a litle strange
 
 */
-//	base = scroll_ram[0];
+//  base = scroll_ram[0];
 
 	off=0x1900-(bg*0x100)+(scroll_ram[1])*0x100;
 	scrolly = 0xff-(scroll_ram[0]);
@@ -581,7 +581,7 @@ static MACHINE_DRIVER_START( dderby )
 	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
 	MDRV_CPU_PERIODIC_INT(dderby_interrupt, 244)	// seems about right judging by countdown timer on screen (15 > 1)
-//	MDRV_CPU_VBLANK_INT("main", dderby_interrupt)
+//  MDRV_CPU_VBLANK_INT("main", dderby_interrupt)
 
 // SOUND CPU (PROBABLY WRONG)
 //

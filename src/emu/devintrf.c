@@ -125,7 +125,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	device->tokenbytes = 0;
 	device->region = NULL;
 	device->regionbytes = 0;
-	
+
 	/* append the tag */
 	strcpy(device->tag, tag);
 
@@ -253,7 +253,7 @@ int device_list_items(const device_config *listhead, device_type type)
 		for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 			count++;
 	}
-	
+
 	/* locate all devices of a given type */
 	else
 	{
@@ -310,7 +310,7 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 	const device_config *curdev;
 
 	assert(tag != NULL);
-	
+
 	/* locate among all devices */
 	if (type == DEVICE_TYPE_WILDCARD)
 	{
@@ -318,7 +318,7 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 			if (strcmp(tag, curdev->tag) == 0)
 				return curdev;
 	}
-	
+
 	/* locate among all devices of a given type */
 	else
 	{
@@ -356,7 +356,7 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 			index++;
 		}
 	}
-	
+
 	/* locate among all devices of a given type */
 	else
 	{
@@ -389,7 +389,7 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 			if (index-- == 0)
 				return curdev;
 	}
-	
+
 	/* locate among all devices of a given type */
 	else
 	{
@@ -465,7 +465,7 @@ const device_config *device_list_class_find_by_tag(const device_config *listhead
 	const device_config *curdev;
 
 	assert(tag != NULL);
-	
+
 	/* locate among all devices of a given class */
 	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
 	for ( ; curdev != NULL; curdev = curdev->classnext)
@@ -529,7 +529,7 @@ const device_config *device_list_class_find_by_index(const device_config *listhe
 ***************************************************************************/
 
 /*-------------------------------------------------
-    device_list_attach_machine - "attach" a 
+    device_list_attach_machine - "attach" a
     running_machine to its list of devices
 -------------------------------------------------*/
 
@@ -687,14 +687,14 @@ void device_reset(const device_config *device)
 
 
 /*-------------------------------------------------
-    device_set_clock - change the clock on a 
+    device_set_clock - change the clock on a
     device
 -------------------------------------------------*/
 
 void device_set_clock(const device_config *device, UINT32 clock)
 {
 	device_config *devicerw = (device_config *)device;
-	
+
 	/* not much for now */
 	devicerw->clock = clock;
 }
@@ -811,8 +811,8 @@ INT64 devtype_get_info_int(device_type type, UINT32 state)
 
 
 /*-------------------------------------------------
-    devtype_get_info_int - return a function 
-    pointer from a device type (does not need to 
+    devtype_get_info_int - return a function
+    pointer from a device type (does not need to
     be allocated)
 -------------------------------------------------*/
 
