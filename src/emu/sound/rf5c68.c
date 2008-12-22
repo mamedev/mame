@@ -126,7 +126,6 @@ static SND_START( rf5c68 )
 	/* allocate memory for the chip */
 	struct rf5c68pcm *chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
-	memset(chip->data, 0xff, sizeof(chip->data));
 
 	/* allocate the stream */
 	chip->stream = stream_create(device, 0, 2, clock / 384, chip, rf5c68_update);

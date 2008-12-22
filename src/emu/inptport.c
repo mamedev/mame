@@ -628,7 +628,7 @@ INLINE const char *get_port_tag(const input_port_config *port, char *tempbuffer)
     buffer
 -------------------------------------------------*/
 
-INLINE void *error_buf_append(char *errorbuf, int errorbuflen, const char *format, ...)
+INLINE void* ATTR_PRINTF(3,4) error_buf_append(char *errorbuf, int errorbuflen, const char *format, ...)
 {
 	int curlen = (errorbuf != NULL) ? strlen(errorbuf) : 0;
 	int bytesleft = errorbuflen - curlen;
