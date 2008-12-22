@@ -870,6 +870,49 @@ ROM_START( spacecho )
 	ROM_LOAD( "im5623.f12", 0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
 
+/*
+rom.b0                  cb7.5b                  IDENTICAL
+rom.a5                  cb6.2.3t                IDENTICAL
+rom.a2                  c3.4.5t                 IDENTICAL
+rom.a1                  c2.5t                   IDENTICAL
+rom.a4                  cb5.3t                  IDENTICAL
+rom.b3                  cb10.3b                 IDENTICAL
+rom.b2                  cb9.4b                  IDENTICAL
+rom.a3                  c4.4t                   IDENTICAL
+rom.a0                  c11.5.6t                99.853516%
+                        mb7052.6k               NO MATCH
+                        mb7052.6m               NO MATCH
+
+Only 3 bytes different between rom.a0 (spacecho) and c11.5.6t (spacech2), at offset 0x8b.
+
+Spacecho:    0x008b:  call $2929    cd 29 29
+
+Spacech2:    0x008b:  im 1          ed 56
+             0x008d:  nop           00
+
+So... spacech2 is avoiding to enter the sub at $2929.
+  
+*/
+ROM_START( spacech2 )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "c11.5.6t",    0x0000, 0x0800, CRC(90637f25) SHA1(820d2f326a5d8d0a04a0fca46b035624dfd7222c) )	// 3 bytes different at 0x8e
+	ROM_LOAD( "c2.5t",       0x0800, 0x0800, CRC(a5f0a34f) SHA1(359e7a9954dedb464f7456cd071db77b2219ab2c) )
+	ROM_LOAD( "c3.4.5t",     0x1000, 0x0800, CRC(cbbb3acb) SHA1(3dc71683f31da39a544382b463ece39cca8124b3) )
+	ROM_LOAD( "c4.4t",       0x1800, 0x0800, CRC(311050ca) SHA1(ed4a5cb7ec0306654178dae8f30b39b9c8db0ce3) )
+	ROM_LOAD( "cb5.3t",      0x2000, 0x0800, CRC(28943803) SHA1(4904e6d092494bfca064d25d094ab9e9049fa9ca) )
+	ROM_LOAD( "cb6.2.3t",    0x2800, 0x0800, CRC(851c9f28) SHA1(c7bb4e25b74eb71e8b394214f9cbd95f59a1fa58) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )     /* 64k for the second CPU */
+	ROM_LOAD( "cb7.5b",      0x0000, 0x0800, CRC(db45689d) SHA1(057a8dc2629f57fdeebb6262de2bdd78b4e66dca) )
+	ROM_LOAD( "cb9.4b",      0x1000, 0x0800, CRC(1e074157) SHA1(cb2073415aff7804ac85e2137bef2005bf6cf239) )
+	ROM_LOAD( "cb10.3b",     0x1800, 0x0800, CRC(d50a8b20) SHA1(d733fa327d2e7dfe08c84015c6c326ed8ab39e3d) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* Intersil IM5623CPE proms compatible with 82s129 */
+	/* The upper 128 bytes are 0's, used by the hardware to blank the display */
+	ROM_LOAD( "mb7052.6k", 0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* top bitmap */
+	ROM_LOAD( "mb7052.6m", 0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
+ROM_END
+
 ROM_START( ttmahjng )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "ju04", 0x0000, 0x1000, CRC(fe7c693a) SHA1(be0630557e0bcd9ec2e9542cc4a4d947889ec57a) )
@@ -963,5 +1006,6 @@ GAME( 1981, routex,   route16,  routex,   route16,  0,        ROT270, "bootleg",
 GAME( 1980, speakres, 0,        speakres, speakres, 0,        ROT270, "Sun Electronics", "Speak & Rescue", 0 )
 GAME( 1980, stratvox, speakres, stratvox, stratvox, 0,        ROT270, "[Sun Electronics] (Taito license)", "Stratovox", 0 )
 GAME( 1980, stratvob, speakres, stratvox, stratvox, 0,        ROT270, "bootleg", "Stratovox (bootleg)", 0 )
-GAME( 1980, spacecho, speakres, spacecho, spacecho, 0,        ROT270, "bootleg", "Space Echo", 0 )
+GAME( 1980, spacecho, speakres, spacecho, spacecho, 0,        ROT270, "bootleg", "Space Echo (set 1)", 0 )
+GAME( 1980, spacech2, speakres, spacecho, spacecho, 0,        ROT270, "bootleg", "Space Echo (set 2)", 0 )
 GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, 0,        ROT0,   "Taito", "T.T Mahjong", 0 )

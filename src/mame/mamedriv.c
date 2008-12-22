@@ -7019,6 +7019,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( stratvox )	/* [1980 Sun Electronics] Taito */
 	DRIVER( stratvob )	/* bootleg */
 	DRIVER( spacecho )	/* bootleg */
+	DRIVER( spacech2 )	/* bootleg */
 	DRIVER( route16 )	/* (c) 1981 Tehkan/Sun + Centuri license */
 	DRIVER( route16a )	/* (c) 1981 Tehkan/Sun + Centuri license */
 	DRIVER( route16b )	/* bootleg */
