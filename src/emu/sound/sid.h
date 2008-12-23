@@ -18,7 +18,7 @@ typedef struct _SID6581
     const device_config *device;
     sound_stream *mixer_channel; // mame stream/ mixer channel
 
-    int (*ad_read) (running_machine *machine, int which);
+    int (*ad_read) (const device_config *device, int which);
     SIDTYPE type;
     UINT32 clock;
 
