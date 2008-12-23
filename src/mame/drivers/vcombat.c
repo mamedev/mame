@@ -28,6 +28,7 @@ UPPER:
     8-way DIP switch
     574200D x4
     PAL palce24v10 x2 (next to the i860)
+	Bt476 RAMDAC
 
 LOWER:
     Motorola MC68000P12 x2
@@ -73,9 +74,9 @@ TODO :  This is a skeleton driver.  Nearly everything.
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "video/generic.h"
+#include "video/tlc34076.h"
 
 static UINT16* framebuffer;
-
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
@@ -92,8 +93,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0x580000, 0x580003) i860 #2 com 2
 //	AM_RANGE(0x5c0000, 0x5c0003) i860 #2 stop/start/reset
 
-//	AM_RANGE(0x706000, 0x706003) Bt476 RAMDAC 
-//	AM_RANGE(0x706004, 0x706007) Bt476 RAMDAC (not sure if there are 2?)
+	AM_RANGE(0x706000, 0x70601f) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
 ADDRESS_MAP_END
 
 
@@ -123,6 +123,12 @@ ADDRESS_MAP_END
 //ADDRESS_MAP_END
 
 
+static MACHINE_RESET( vcombat )
+{
+	// Setup the Bt476 palette chip
+	tlc34076_reset(6);
+}
+
 static DRIVER_INIT( vcombat )
 {
 	UINT8 *ROM = memory_region(machine, "main");
@@ -146,19 +152,19 @@ static VIDEO_UPDATE( vcombat )
 {
 	int x, y;
 	int count = 0;
+	const rgb_t *pens = tlc34076_get_pens();
 
 	for(y = 0; y < 480; y++)
 	{
 		for(x = 0; x < 256; x++)
 		{
-			//UINT32 r,g,b;
 			UINT32 color;
 
 			if (x % 2) color = (framebuffer[count] & 0xff00) >> 8;
 			else	   color =  framebuffer[count] & 0x00ff;
 
 			if(x < video_screen_get_visible_area(screen)->max_x && y < video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, x) = color | (color<<8) | (color<<16);
+				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
 
 			if (x % 2) count++;
 		}
@@ -194,6 +200,8 @@ static MACHINE_DRIVER_START( vcombat )
 	//MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
 	//MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
+	MDRV_MACHINE_RESET(vcombat)
+
 	// Likely will go away
 	MDRV_GFXDECODE(vcombat)
 
@@ -203,9 +211,6 @@ static MACHINE_DRIVER_START( vcombat )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-
-	// Seems there is a RAMDAC out there.  Maybe it's for the palette?
-	/*MDRV_PALETTE_LENGTH(0x256)*/
 
 	MDRV_VIDEO_UPDATE(vcombat)
 MACHINE_DRIVER_END
