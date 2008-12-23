@@ -120,7 +120,7 @@ w [$17]
 
 static UINT8 jangou_gfx_nibble(running_machine *machine,UINT16 niboffset)
 {
-	UINT8 *blit_rom = memory_region(machine,"gfx");
+	const UINT8 *const blit_rom = memory_region(machine,"gfx");
 
 	if (niboffset&1)
 	{
@@ -814,7 +814,7 @@ ROM_START( cntrygrl )
 	ROM_LOAD( "rom6.bin", 0x00000, 0x0800, CRC(33965a89) SHA1(92912cea76a472d9b709c664d9818844a07fcc32)  ) // = mq3    Moon Quasar
 	ROM_LOAD( "rom7.bin", 0x00800, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7)  ) // = cc06   Crazy Climber (US)
 
-	ROM_REGION( 0x6000, "gfx", 0 )
+	ROM_REGION( 0x10000, "gfx", 0 )
 	ROM_LOAD( "rom1.bin", 0x00000, 0x02000, CRC(92033f37) SHA1(aa407c2feb1cbb7cbc6c59656338453c5a670749)  )
 	ROM_LOAD( "rom2.bin", 0x02000, 0x02000, CRC(0588cc48) SHA1(f769ece2955eb9f055c499b6243a2fead9d07984)  )
 	ROM_LOAD( "rom3.bin", 0x04000, 0x02000, CRC(ce00ff56) SHA1(c5e58707a5dd0f57c34b09de542ef30e96ab95d1)  )
