@@ -415,6 +415,12 @@ const game_driver * const drivers[] =
 	/* Jangou Night   *//* (c) 1983 */
 	DRIVER( jngolady )  /* (c) 1984 */
 	DRIVER( cntrygrl )  /* (c) 1984 Royal Denshi */
+	DRIVER( nightgal )  /* (c) 1984 */
+	DRIVER( ngtbunny )  /* (c) 1984 */
+	DRIVER( royalngt )  /* (c) 1984 Royal Denshi */
+	DRIVER( sexygal  )  /* (c) 1985 */
+	DRIVER( sweetgal )  /* (c) 1985 */
+	DRIVER( ngalsumr )  /* (c) 1985 */
 
 	DRIVER( pastelg )	/* (c) 1985 */
 	DRIVER( 3ds )       /* (c) 1985 */

@@ -1064,6 +1064,7 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/nbmj8891.o $(VIDEO)/nbmj8891.o \
 	$(DRIVERS)/nbmj8991.o $(VIDEO)/nbmj8991.o \
 	$(DRIVERS)/nbmj9195.o $(VIDEO)/nbmj9195.o \
+	$(DRIVERS)/nightgal.o \
 	$(DRIVERS)/niyanpai.o $(MACHINE)/m68kfmly.o $(VIDEO)/niyanpai.o \
 	$(DRIVERS)/pastelg.o $(VIDEO)/pastelg.o \
 	$(DRIVERS)/seicross.o $(VIDEO)/seicross.o \
