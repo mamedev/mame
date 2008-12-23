@@ -69,7 +69,7 @@ static READ8_HANDLER( nbmj8991_sound_r )
 
 static MACHINE_RESET( nbmj8991 )
 {
-	if (cpu_get_type(machine->cpu[1]) == CPU_Z80)
+	if (machine->cpu[1] != NULL && cpu_get_type(machine->cpu[1]) == CPU_Z80)
 	{
 		memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "audio") + 0x8000, 0x8000);
 		memory_set_bank(machine, 1, 0);
