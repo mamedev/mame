@@ -327,6 +327,8 @@ static UINT8	*mpDualPortRAM;
 static UINT16 pointram_control;
 
 
+#define ENABLE_LOGGING		0
+
 
 #define DSP_BUF_MAX (4096*12)
 static struct
@@ -418,7 +420,7 @@ TransmitWordToSlave( UINT16 data )
 {
 	unsigned offs = mpDspState->slaveInputStart+mpDspState->slaveBytesAvailable++;
 	mpDspState->slaveInputBuffer[offs%DSP_BUF_MAX] = data;
-	logerror( "+%04x(#%04x)\n", data, mpDspState->slaveBytesAvailable );
+	if (ENABLE_LOGGING) logerror( "+%04x(#%04x)\n", data, mpDspState->slaveBytesAvailable );
 	mpDspState->slaveActive = 1;
 	if( mpDspState->slaveBytesAvailable >= DSP_BUF_MAX )
 	{
@@ -446,7 +448,7 @@ TransferDspData( running_machine *machine )
 				{
 					addr = namcos21_dspram16[addr];
 					mpDspState->masterSourceAddr = addr;
-					logerror( "LOOP:0x%04x\n", addr );
+					if (ENABLE_LOGGING) logerror( "LOOP:0x%04x\n", addr );
 					addr&=0x7fff;
 					if( old==addr )
 					{
@@ -461,7 +463,7 @@ TransferDspData( running_machine *machine )
 			}
 			else if( mode==0 )
 			{ /* direct data transfer */
-				logerror( "DATA TFR(0x%x)\n", code );
+				if (ENABLE_LOGGING) logerror( "DATA TFR(0x%x)\n", code );
 				TransmitWordToSlave( code );
 				for( i=0; i<code; i++ )
 				{
@@ -471,7 +473,7 @@ TransferDspData( running_machine *machine )
 			}
 			else if( code==0x18 || code==0x1a )
 			{
-				logerror( "HEADER TFR(0x%x)\n", code );
+				if (ENABLE_LOGGING) logerror( "HEADER TFR(0x%x)\n", code );
 				TransmitWordToSlave( code+1 );
 				for( i=0; i<code; i++ )
 				{
@@ -482,7 +484,7 @@ TransferDspData( running_machine *machine )
 			else
 			{
 				INT32 masterAddr = ReadPointROMData(machine, code);
-				logerror( "OBJ TFR(0x%x)\n", code );
+				if (ENABLE_LOGGING) logerror( "OBJ TFR(0x%x)\n", code );
 				{
 					UINT16 len = namcos21_dspram16[addr++];
 					for(;;)
@@ -512,7 +514,7 @@ TransferDspData( running_machine *machine )
 							}
 							else
 							{
-								logerror( "TFR NOP?\n" );
+								if (ENABLE_LOGGING) logerror( "TFR NOP?\n" );
 							}
 						}
 					} /* for(;;) */
@@ -571,7 +573,7 @@ ReadWordFromSlaveInput( const address_space *space )
 		{
 			mpDspState->slaveBytesAdvertised--;
 		}
-		logerror( "%s:-%04x(0x%04x)\n", cpuexec_describe_context(space->machine), data, mpDspState->slaveBytesAvailable );
+		if (ENABLE_LOGGING) logerror( "%s:-%04x(0x%04x)\n", cpuexec_describe_context(space->machine), data, mpDspState->slaveBytesAvailable );
 	}
 	return data;
 } /* ReadWordFromSlaveInput */
@@ -604,7 +606,7 @@ static WRITE16_HANDLER( dspram16_w )
 		if( mpDspState->masterSourceAddr &&
 			offset == 1+(mpDspState->masterSourceAddr&0x7fff) )
 		{
-			logerror( "IDC-CONTINUE\n" );
+			if (ENABLE_LOGGING) logerror( "IDC-CONTINUE\n" );
 			TransferDspData(space->machine);
 		}
 		else if( namcos2_gametype == NAMCOS21_SOLVALOU &&
@@ -653,7 +655,7 @@ static READ16_HANDLER( dsp_port0_r )
 
 static WRITE16_HANDLER( dsp_port0_w )
 { /* unused? */
-	logerror( "PTRAM_LO(0x%04x)\n", data );
+	if (ENABLE_LOGGING) logerror( "PTRAM_LO(0x%04x)\n", data );
 } /* dsp_port0_w */
 
 static READ16_HANDLER( dsp_port1_r )
@@ -668,7 +670,7 @@ static READ16_HANDLER( dsp_port1_r )
 
 static WRITE16_HANDLER( dsp_port1_w )
 { /* unused? */
-	logerror( "PTRAM_HI(0x%04x)\n", data );
+	if (ENABLE_LOGGING) logerror( "PTRAM_HI(0x%04x)\n", data );
 } /* dsp_port1_w */
 
 static READ16_HANDLER( dsp_port2_r )
@@ -678,7 +680,7 @@ static READ16_HANDLER( dsp_port2_r )
 
 static WRITE16_HANDLER( dsp_port2_w )
 {
-	logerror( "IDC ADDR INIT(0x%04x)\n", data );
+	if (ENABLE_LOGGING) logerror( "IDC ADDR INIT(0x%04x)\n", data );
 	mpDspState->masterSourceAddr = data;
 	TransferDspData(space->machine);
 } /* dsp_port2_w */
@@ -707,7 +709,7 @@ static int namcos21_irq_enable;
 
 static WRITE16_HANDLER( dsp_port8_w )
 { /* IRQ-enable? */
-	logerror( "port8_w(%d)\n", data );
+	if (ENABLE_LOGGING) logerror( "port8_w(%d)\n", data );
 	if( data )
 	{
 		mpDspState->masterFinished = 1;
@@ -732,7 +734,7 @@ static WRITE16_HANDLER(dsp_porta_w)
 	/* INT2 begin: 1 */
 	/* direct-draw begin: 0 */
 	/* INT1 begin: 1 */
-//  logerror( "dsp_porta_w(0x%04x)\n", data );
+//  if (ENABLE_LOGGING) logerror( "dsp_porta_w(0x%04x)\n", data );
 } /* dsp_porta_w */
 
 static READ16_HANDLER(dsp_portb_r)
@@ -792,7 +794,7 @@ static READ16_HANDLER( dsp_portf_r )
 
 static WRITE16_HANDLER( dsp_xf_w )
 {
-	logerror("xf(%d)\n",data);
+	if (ENABLE_LOGGING) logerror("xf(%d)\n",data);
 }
 
 static ADDRESS_MAP_START( master_dsp_program, ADDRESS_SPACE_PROGRAM, 16 )
@@ -881,7 +883,7 @@ RenderSlaveOutput( UINT16 data )
 		}
 		else if( count==0 )
 		{
-			logerror( "RenderSlaveOutput\n" );
+			if (ENABLE_LOGGING) logerror( "RenderSlaveOutput\n" );
 			exit(1);
 		}
 	}
@@ -916,7 +918,7 @@ static WRITE16_HANDLER(slave_port3_w)
 
 static WRITE16_HANDLER( slave_XF_output_w )
 {
-	logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(space->cpu), data );
+	if (ENABLE_LOGGING) logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(space->cpu), data );
 } /* slave_XF_output_w */
 
 static READ16_HANDLER( slave_portf_r )
