@@ -794,7 +794,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 	config = machine_config_alloc(game->machine_config);
 #ifdef MESS
 	/* temporary hook until MESS device transition is complete */
-	mess_devices_setup(config, game);
+	mess_devices_setup(NULL, config, game);
 #endif /* MESS */
 	portconfig = input_port_config_alloc(game->ipt, NULL, 0);
 
