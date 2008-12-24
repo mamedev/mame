@@ -272,6 +272,8 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "rockola.h"
 
 
+#define MASTER_CLOCK	XTAL_11_289MHz
+
 /* Change to 1 to allow fake debug buttons */
 #define NIBBLER_HACK	0
 
@@ -295,7 +297,7 @@ static void sasuke_start_counter(running_machine *machine)
 	sasuke_counter = 0;
 
 	sasuke_timer = timer_alloc(machine, sasuke_update_counter, NULL);
-	timer_adjust_periodic(sasuke_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11289000/8));	// 1.4 MHz
+	timer_adjust_periodic(sasuke_timer, attotime_zero, 0, ATTOTIME_IN_HZ(MASTER_CLOCK / 8));	// 1.4 MHz
 }
 
 
@@ -756,6 +758,25 @@ static INTERRUPT_GEN( rockola_interrupt )
 
 /*************************************
  *
+ *  6845 CRTC interface
+ *
+ *************************************/
+
+static const mc6845_interface mc6845_intf =
+{
+	"main",		/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	NULL,		/* callback for display state changes */
+	NULL,		/* HSYNC callback */
+	NULL		/* VSYNC callback */
+};
+
+
+/*************************************
+ *
  *  Machine initialisation
  *
  *************************************/
@@ -801,7 +822,7 @@ static MACHINE_RESET( pballoon )
 
 static MACHINE_DRIVER_START( sasuke )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M6502, 11289000/16) // 700 kHz
+	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 16) // 700 kHz
 	MDRV_CPU_PROGRAM_MAP(sasuke_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(satansat_interrupt, 2)
 
@@ -810,7 +831,7 @@ static MACHINE_DRIVER_START( sasuke )
 	// video hardware
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE((11289000.0 / 16) / (45 * 32 * 8))
+	MDRV_SCREEN_REFRESH_RATE((MASTER_CLOCK / 16) / (45 * 32 * 8))
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -823,7 +844,7 @@ static MACHINE_DRIVER_START( sasuke )
 	MDRV_VIDEO_START(satansat)
 	MDRV_VIDEO_UPDATE(rockola)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -875,7 +896,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vanguard )
 	// basic machine hardware
-	//MDRV_CPU_ADD("main", M6502, 11289000/8)   // 1.4 MHz
+	//MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
 	MDRV_CPU_ADD("main", M6502, 930000)		// adjusted
 	MDRV_CPU_PROGRAM_MAP(vanguard_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(rockola_interrupt, 2)
@@ -885,7 +906,7 @@ static MACHINE_DRIVER_START( vanguard )
 	// video hardware
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE((11289000.0 / 16) / (45 * 32 * 8))
+	MDRV_SCREEN_REFRESH_RATE((MASTER_CLOCK / 16) / (45 * 32 * 8))
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -898,7 +919,7 @@ static MACHINE_DRIVER_START( vanguard )
 	MDRV_VIDEO_START(rockola)
 	MDRV_VIDEO_UPDATE(rockola)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
