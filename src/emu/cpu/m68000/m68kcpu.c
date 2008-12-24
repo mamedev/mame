@@ -403,6 +403,77 @@ const UINT8 m68ki_ea_idx_cycle_table[64] =
 
 
 
+/***************************************************************************
+    CPU STATE DESCRIPTION
+***************************************************************************/
+
+#define MASK_ALL 					(CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_040)
+#define MASK_24BIT_SPACE			(CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)
+#define MASK_32BIT_SPACE			(CPU_TYPE_020 | CPU_TYPE_040)
+#define MASK_010_OR_LATER			(CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_040)
+#define MASK_020_OR_LATER			(CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_040)
+#define MASK_040_OR_LATER			(CPU_TYPE_040)
+
+#define M68K_STATE_ENTRY(_name, _format, _member, _datamask, _flags, _mask) \
+	CPU_STATE_ENTRY(M68K_##_name, #_name, _format, m68ki_cpu_core, _member, _datamask, _mask, _flags)
+
+static const cpu_state_entry state_array[] =
+{
+	M68K_STATE_ENTRY(PC,  "%06X", pc, 0xffffff, 0, MASK_24BIT_SPACE)
+	M68K_STATE_ENTRY(PC,  "%08X", pc, 0xffffffff, 0, MASK_32BIT_SPACE)
+	M68K_STATE_ENTRY(GENPC, "%06X", pc, 0xffffff, CPUSTATE_NOSHOW, MASK_24BIT_SPACE)
+	M68K_STATE_ENTRY(GENPC, "%08X", pc, 0xffffffff, CPUSTATE_NOSHOW, MASK_32BIT_SPACE)
+	M68K_STATE_ENTRY(GENPCBASE, "%06X", ppc, 0xffffff, CPUSTATE_NOSHOW, MASK_24BIT_SPACE)
+	M68K_STATE_ENTRY(GENPCBASE, "%08X", ppc, 0xffffffff, CPUSTATE_NOSHOW, MASK_32BIT_SPACE)
+
+	M68K_STATE_ENTRY(SP,  "%08X", dar[15], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(GENSP, "%08X", dar[15], 0xffffffff, CPUSTATE_NOSHOW, MASK_ALL)
+
+	M68K_STATE_ENTRY(ISP, "%08X", iotemp, 0xffffffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT, MASK_ALL)
+	M68K_STATE_ENTRY(USP, "%08X", iotemp, 0xffffffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT, MASK_ALL)
+	M68K_STATE_ENTRY(MSP, "%08X", iotemp, 0xffffffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT, MASK_020_OR_LATER)
+	M68K_STATE_ENTRY(SR, "%04X", iotemp, 0xffff, CPUSTATE_IMPORT | CPUSTATE_EXPORT, MASK_ALL)
+
+	M68K_STATE_ENTRY(D0, "%08X", dar[0], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(D1, "%08X", dar[1], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(D2, "%08X", dar[2], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(D3, "%08X", dar[3], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(D4, "%08X", dar[4], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(D5, "%08X", dar[5], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(D6, "%08X", dar[6], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(D7, "%08X", dar[7], 0xffffffff, 0, MASK_ALL)
+
+	M68K_STATE_ENTRY(A0, "%08X", dar[8], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(A1, "%08X", dar[9], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(A2, "%08X", dar[10], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(A3, "%08X", dar[11], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(A4, "%08X", dar[12], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(A5, "%08X", dar[13], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(A6, "%08X", dar[14], 0xffffffff, 0, MASK_ALL)
+	M68K_STATE_ENTRY(A7, "%08X", dar[15], 0xffffffff, 0, MASK_ALL)
+
+	M68K_STATE_ENTRY(PREF_ADDR, "%06X", pref_addr, 0xffffff, 0, MASK_24BIT_SPACE)
+	M68K_STATE_ENTRY(PREF_ADDR, "%08X", pref_addr, 0xffffffff, 0, MASK_32BIT_SPACE)
+	M68K_STATE_ENTRY(PREF_DATA, "%08X", pref_data, 0xffffffff, 0, MASK_ALL)
+
+	M68K_STATE_ENTRY(SFC, "%01X", sfc, 0x7, 0, MASK_010_OR_LATER)
+	M68K_STATE_ENTRY(DFC, "%01X", dfc, 0x7, 0, MASK_010_OR_LATER)
+	M68K_STATE_ENTRY(VBR, "%08X", vbr, 0xffffffff, 0, MASK_010_OR_LATER)
+
+	M68K_STATE_ENTRY(CACR, "%08X", cacr, 0xffffffff, 0, MASK_020_OR_LATER)
+	M68K_STATE_ENTRY(CAAR, "%08X", caar, 0xffffffff, 0, MASK_020_OR_LATER)
+};
+
+static const cpu_state_table state_table_template =
+{
+	NULL,						/* pointer to the base of state (offsets are relative to this) */
+	0,							/* subtype this table refers to */
+	ARRAY_LENGTH(state_array),	/* number of entries */
+	state_array					/* array of entries */
+};
+
+
+
 /* ======================================================================== */
 /* ================================= API ================================== */
 /* ======================================================================== */
@@ -514,6 +585,10 @@ static CPU_INIT( m68k )
 		emulation_initialized = 1;
 	}
 
+	/* set up the state table */
+	m68k->state = state_table_template;
+	m68k->state.baseptr = m68k;
+
 	/* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
 	state_save_register_device_item_array(device, 0, REG_D);
 	state_save_register_device_item(device, 0, REG_PPC);
@@ -578,6 +653,104 @@ static CPU_DISASSEMBLE( m68k )
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, m68k->dasm_type);
 }
 
+
+
+/**************************************************************************
+ * STATE IMPORT/EXPORT
+ **************************************************************************/
+
+static CPU_IMPORT_STATE( m68k )
+{
+	m68ki_cpu_core *m68k = device->token;
+
+	switch (entry->index)
+	{
+		case M68K_SR:
+			m68ki_set_sr(m68k, m68k->iotemp);
+			break;
+			
+		case M68K_ISP:
+			if (m68k->s_flag && !m68k->m_flag)
+				REG_SP = m68k->iotemp;
+			else
+				REG_ISP = m68k->iotemp;
+			break;
+
+		case M68K_USP:
+			if (!m68k->s_flag)
+				REG_SP = m68k->iotemp;
+			else
+				REG_USP = m68k->iotemp;
+			break;
+
+		case M68K_MSP:
+			if (m68k->s_flag && m68k->m_flag)
+				REG_SP = m68k->iotemp;
+			else
+				REG_MSP = m68k->iotemp;
+			break;
+
+		default:
+			fatalerror("CPU_IMPORT_STATE(m68k) called for unexpected value\n");
+			break;
+	}
+}
+
+
+static CPU_EXPORT_STATE( m68k )
+{
+	m68ki_cpu_core *m68k = device->token;
+
+	switch (entry->index)
+	{
+		case M68K_SR:
+			m68k->iotemp = m68ki_get_sr(m68k);
+			break;
+			
+		case M68K_ISP:
+			m68k->iotemp = (m68k->s_flag && !m68k->m_flag) ? REG_SP : REG_ISP;
+			break;
+
+		case M68K_USP:
+			m68k->iotemp = (!m68k->s_flag) ? REG_SP : REG_USP;
+			break;
+
+		case M68K_MSP:
+			m68k->iotemp = (m68k->s_flag && m68k->m_flag) ? REG_SP : REG_MSP;
+			break;
+
+		default:
+			fatalerror("CPU_EXPORT_STATE(m68k) called for unexpected value\n");
+			break;
+	}
+}
+
+static CPU_SET_INFO( m68k )
+{
+	m68ki_cpu_core *m68k = device->token;
+	switch (state)
+	{
+		/* --- the following bits of info are set as 64-bit signed integers --- */
+		case CPUINFO_INT_INPUT_STATE + 0:
+		case CPUINFO_INT_INPUT_STATE + 1:
+		case CPUINFO_INT_INPUT_STATE + 2:
+		case CPUINFO_INT_INPUT_STATE + 3:
+		case CPUINFO_INT_INPUT_STATE + 4:
+		case CPUINFO_INT_INPUT_STATE + 5:
+		case CPUINFO_INT_INPUT_STATE + 6:
+		case CPUINFO_INT_INPUT_STATE + 7:
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:
+			set_irq_line(m68k, state - CPUINFO_INT_INPUT_STATE, info->i);
+			break;
+
+		/* --- the following bits of info are set as pointers to data or functions --- */
+		case CPUINFO_FCT_M68K_RESET_CALLBACK:		m68k->reset_instr_callback = (m68k_reset_func)info->f; break;
+		case CPUINFO_FCT_M68K_CMPILD_CALLBACK:		m68k->cmpild_instr_callback = (m68k_cmpild_func)info->f; break;
+		case CPUINFO_FCT_M68K_RTE_CALLBACK:			m68k->rte_instr_callback = (m68k_rte_func)info->f; break;
+		case CPUINFO_FCT_M68K_TAS_CALLBACK:			m68k->tas_instr_callback = (m68k_tas_func)info->f; break;
+	}
+}
+
 static CPU_GET_INFO( m68k )
 {
 	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
@@ -586,78 +759,49 @@ static CPU_GET_INFO( m68k )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:				info->i = sizeof(m68ki_cpu_core);				break;
-		case CPUINFO_INT_INPUT_LINES:				info->i = 8;									break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:		info->i = -1;									break;
-		case CPUINFO_INT_ENDIANNESS:				info->i = ENDIANNESS_BIG;							break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:			info->i = 1;									break;
-		case CPUINFO_INT_CLOCK_DIVIDER:				info->i = 1;									break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:		info->i = 2;									break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:		info->i = 10;									break;
-		case CPUINFO_INT_MIN_CYCLES:				info->i = 4;									break;
-		case CPUINFO_INT_MAX_CYCLES:				info->i = 158;									break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m68ki_cpu_core);		break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 10;							break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 4;							break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 16;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;						break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;						break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 0;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 16;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 24;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: 		info->i = 0;							break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:			info->i = 0;  /* there is no level 0 */			break;
-		case CPUINFO_INT_INPUT_STATE + 1:			info->i = (m68k->virq_state >> 1) & 1;			break;
-		case CPUINFO_INT_INPUT_STATE + 2:			info->i = (m68k->virq_state >> 2) & 1;			break;
-		case CPUINFO_INT_INPUT_STATE + 3:			info->i = (m68k->virq_state >> 3) & 1;			break;
-		case CPUINFO_INT_INPUT_STATE + 4:			info->i = (m68k->virq_state >> 4) & 1;			break;
-		case CPUINFO_INT_INPUT_STATE + 5:			info->i = (m68k->virq_state >> 5) & 1;			break;
-		case CPUINFO_INT_INPUT_STATE + 6:			info->i = (m68k->virq_state >> 6) & 1;			break;
-		case CPUINFO_INT_INPUT_STATE + 7:			info->i = (m68k->virq_state >> 7) & 1;			break;
+		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;  /* there is no level 0 */	break;
+		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (m68k->virq_state >> 1) & 1;	break;
+		case CPUINFO_INT_INPUT_STATE + 2:				info->i = (m68k->virq_state >> 2) & 1;	break;
+		case CPUINFO_INT_INPUT_STATE + 3:				info->i = (m68k->virq_state >> 3) & 1;	break;
+		case CPUINFO_INT_INPUT_STATE + 4:				info->i = (m68k->virq_state >> 4) & 1;	break;
+		case CPUINFO_INT_INPUT_STATE + 5:				info->i = (m68k->virq_state >> 5) & 1;	break;
+		case CPUINFO_INT_INPUT_STATE + 6:				info->i = (m68k->virq_state >> 6) & 1;	break;
+		case CPUINFO_INT_INPUT_STATE + 7:				info->i = (m68k->virq_state >> 7) & 1;	break;
 
-		case CPUINFO_INT_PREVIOUSPC:				info->i = REG_PPC;								break;
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(m68k);				break;
+		case CPUINFO_FCT_INIT:			/* set per-core */										break;
+		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(m68k);						break;
+		case CPUINFO_FCT_EXECUTE:		info->execute = CPU_EXECUTE_NAME(m68k);					break;
+		case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(m68k);			break;
+		case CPUINFO_FCT_IMPORT_STATE:	info->import_state = CPU_IMPORT_STATE_NAME(m68k);		break;
+		case CPUINFO_FCT_EXPORT_STATE:	info->export_state = CPU_EXPORT_STATE_NAME(m68k);		break;
 
-		case CPUINFO_INT_PC:						info->i = REG_PC & 0x00ffffff; 					break;
-		case CPUINFO_INT_REGISTER + M68K_PC:		info->i = REG_PC;								break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + M68K_SP:		info->i = REG_SP;								break;
-		case CPUINFO_INT_REGISTER + M68K_ISP:		info->i = (m68k->s_flag && !m68k->m_flag) ? REG_SP : REG_ISP; break;
-		case CPUINFO_INT_REGISTER + M68K_USP:		info->i = m68k->s_flag ? REG_USP : REG_SP; 		break;
-		case CPUINFO_INT_REGISTER + M68K_SR:		info->i = m68ki_get_sr(m68k);					break;
-		case CPUINFO_INT_REGISTER + M68K_D0:		info->i = REG_D[0];								break;
-		case CPUINFO_INT_REGISTER + M68K_D1:		info->i = REG_D[1]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_D2:		info->i = REG_D[2]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_D3:		info->i = REG_D[3]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_D4:		info->i = REG_D[4]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_D5:		info->i = REG_D[5]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_D6:		info->i = REG_D[6]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_D7:		info->i = REG_D[7]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_A0:		info->i = REG_A[0]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_A1:		info->i = REG_A[1]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_A2:		info->i = REG_A[2]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_A3:		info->i = REG_A[3]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_A4:		info->i = REG_A[4]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_A5:		info->i = REG_A[5]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_A6:		info->i = REG_A[6]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_A7:		info->i = REG_A[7]; 							break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:	info->i = m68k->pref_addr; 						break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_DATA:	info->i = m68k->pref_data; 						break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:					/* set per-core */								break;
-		case CPUINFO_FCT_INIT:						/* set per-core */								break;
-		case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(m68k);				break;
-		case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(m68k);			break;
-		case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(m68k);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount = &m68k->remaining_cycles;			break;
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k->remaining_cycles;	break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &m68k->state;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						/* set per-core */								break;
-		case CPUINFO_STR_CORE_FAMILY:				strcpy(info->s, "Motorola 68K");				break;
-		case CPUINFO_STR_CORE_VERSION:				strcpy(info->s, "4.00");						break;
-		case CPUINFO_STR_CORE_FILE:					strcpy(info->s, __FILE__);						break;
-		case CPUINFO_STR_CORE_CREDITS:				strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
+		case CPUINFO_STR_NAME:							/* set per-core */						break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "4.00");				break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68ki_get_sr(m68k);
@@ -679,87 +823,6 @@ static CPU_GET_INFO( m68k )
 				sr & 0x0002 ? 'V':'.',
 				sr & 0x0001 ? 'C':'.');
 			break;
-
-		case CPUINFO_STR_REGISTER + M68K_PC:		sprintf(info->s, "PC :%08X", REG_PC); 			break;
-		case CPUINFO_STR_REGISTER + M68K_SR:  		sprintf(info->s, "SR :%04X", m68ki_get_sr(m68k)); break;
-		case CPUINFO_STR_REGISTER + M68K_SP:  		sprintf(info->s, "SP :%08X", REG_SP); 			break;
-		case CPUINFO_STR_REGISTER + M68K_ISP: 		sprintf(info->s, "ISP:%08X", (m68k->s_flag && !m68k->m_flag) ? REG_SP : REG_ISP); break;
-		case CPUINFO_STR_REGISTER + M68K_USP: 		sprintf(info->s, "USP:%08X", m68k->s_flag ? REG_USP : REG_SP); break;
-		case CPUINFO_STR_REGISTER + M68K_D0:		sprintf(info->s, "D0 :%08X", REG_D[0]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_D1:		sprintf(info->s, "D1 :%08X", REG_D[1]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_D2:		sprintf(info->s, "D2 :%08X", REG_D[2]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_D3:		sprintf(info->s, "D3 :%08X", REG_D[3]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_D4:		sprintf(info->s, "D4 :%08X", REG_D[4]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_D5:		sprintf(info->s, "D5 :%08X", REG_D[5]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_D6:		sprintf(info->s, "D6 :%08X", REG_D[6]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_D7:		sprintf(info->s, "D7 :%08X", REG_D[7]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_A0:		sprintf(info->s, "A0 :%08X", REG_A[0]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_A1:		sprintf(info->s, "A1 :%08X", REG_A[1]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_A2:		sprintf(info->s, "A2 :%08X", REG_A[2]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_A3:		sprintf(info->s, "A3 :%08X", REG_A[3]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_A4:		sprintf(info->s, "A4 :%08X", REG_A[4]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_A5:		sprintf(info->s, "A5 :%08X", REG_A[5]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_A6:		sprintf(info->s, "A6 :%08X", REG_A[6]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_A7:		sprintf(info->s, "A7 :%08X", REG_A[7]); 		break;
-		case CPUINFO_STR_REGISTER + M68K_PREF_ADDR:	sprintf(info->s, "PAR:%08X", m68k->pref_addr); 	break;
-		case CPUINFO_STR_REGISTER + M68K_PREF_DATA:	sprintf(info->s, "PDA:%08X", m68k->pref_data); 	break;
-	}
-}
-
-static CPU_SET_INFO( m68k )
-{
-	m68ki_cpu_core *m68k = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:			set_irq_line(m68k, 0, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 1:			set_irq_line(m68k, 1, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 2:			set_irq_line(m68k, 2, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 3:			set_irq_line(m68k, 3, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 4:			set_irq_line(m68k, 4, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 5:			set_irq_line(m68k, 5, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 6:			set_irq_line(m68k, 6, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:
-		case CPUINFO_INT_INPUT_STATE + 7:			set_irq_line(m68k, 7, info->i);					break;
-
-		case CPUINFO_INT_PC:  						m68ki_jump(m68k, info->i & 0x00ffffff); 		break;
-		case CPUINFO_INT_REGISTER + M68K_PC:  		m68ki_jump(m68k, info->i);						break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + M68K_SP:  		REG_SP = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_ISP: 		if(m68k->s_flag && !m68k->m_flag)
-														REG_SP = info->i;
-													else
-														REG_ISP = info->i;
-													break;
-		case CPUINFO_INT_REGISTER + M68K_USP: 		if(m68k->s_flag)
-														REG_USP = info->i;
-													else
-														REG_SP = info->i;
-													break;
-		case CPUINFO_INT_REGISTER + M68K_SR:  		m68ki_set_sr(m68k, info->i);					break;
-		case CPUINFO_INT_REGISTER + M68K_D0:  		REG_D[0] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_D1:  		REG_D[1] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_D2:  		REG_D[2] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_D3:  		REG_D[3] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_D4:  		REG_D[4] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_D5:  		REG_D[5] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_D6:  		REG_D[6] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_D7:  		REG_D[7] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_A0:  		REG_A[0] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_A1:  		REG_A[1] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_A2:  		REG_A[2] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_A3:  		REG_A[3] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_A4:  		REG_A[4] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_A5:  		REG_A[5] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_A6:  		REG_A[6] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_A7:  		REG_A[7] = info->i;								break;
-		case CPUINFO_INT_REGISTER + M68K_PREF_ADDR:	m68k->pref_addr = info->i;						break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_M68K_RESET_CALLBACK:		m68k->reset_instr_callback = (m68k_reset_func)info->f; break;
-		case CPUINFO_FCT_M68K_CMPILD_CALLBACK:		m68k->cmpild_instr_callback = (m68k_cmpild_func)info->f; break;
-		case CPUINFO_FCT_M68K_RTE_CALLBACK:			m68k->rte_instr_callback = (m68k_rte_func)info->f; break;
-		case CPUINFO_FCT_M68K_TAS_CALLBACK:			m68k->tas_instr_callback = (m68k_tas_func)info->f; break;
 	}
 }
 
@@ -913,6 +976,7 @@ static CPU_INIT( m68000 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_000;
+	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68000;
 	m68k->memory           = interface_d16;
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -929,17 +993,11 @@ static CPU_INIT( m68000 )
 	m68k->cyc_reset        = 132;
 }
 
-static CPU_SET_INFO( m68000 )
-{
-	CPU_SET_INFO_CALL(m68k);
-}
-
 CPU_GET_INFO( m68000 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(m68000);		break;
 		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68000);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -961,6 +1019,7 @@ static CPU_INIT( m68008 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_008;
+	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68008;
 	m68k->memory           = interface_d8;
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -977,27 +1036,21 @@ static CPU_INIT( m68008 )
 	m68k->cyc_reset        = 132;
 }
 
-static CPU_SET_INFO( m68008 )
-{
-	CPU_SET_INFO_CALL(m68k);
-}
-
 CPU_GET_INFO( m68008 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 22;						break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 22;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(m68008);		break;
-		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68008);				break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68008);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "68008");						break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68008");				break;
 
-		default: 									CPU_GET_INFO_CALL(m68k);						break;
+		default: 										CPU_GET_INFO_CALL(m68k);				break;
 	}
 }
 
@@ -1013,6 +1066,7 @@ static CPU_INIT( m68010 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_010;
+	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68010;
 	m68k->memory           = interface_d16;
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1029,41 +1083,17 @@ static CPU_INIT( m68010 )
 	m68k->cyc_reset        = 130;
 }
 
-static CPU_SET_INFO( m68010 )
-{
-	m68ki_cpu_core *m68k = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_REGISTER + M68K_VBR:  		m68k->vbr = info->i;							break;
-		case CPUINFO_INT_REGISTER + M68K_SFC:  		m68k->sfc = info->i & 7;						break;
-		case CPUINFO_INT_REGISTER + M68K_DFC:  		m68k->dfc = info->i & 7;						break;
-
-		default:									CPU_SET_INFO_CALL(m68k);						break;
-	}
-}
-
 CPU_GET_INFO( m68010 )
 {
-	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_REGISTER + M68K_VBR:  		info->i = m68k->vbr;							break;
-		case CPUINFO_INT_REGISTER + M68K_SFC:  		info->i = m68k->sfc;							break;
-		case CPUINFO_INT_REGISTER + M68K_DFC:  		info->i = m68k->dfc;							break;
-
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(m68010);		break;
-		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68010);				break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68010);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "68010");						break;
-		case CPUINFO_STR_REGISTER + M68K_SFC:		sprintf(info->s, "SFC:%X",   m68k->sfc); 		break;
-		case CPUINFO_STR_REGISTER + M68K_DFC:		sprintf(info->s, "DFC:%X",   m68k->dfc); 		break;
-		case CPUINFO_STR_REGISTER + M68K_VBR:		sprintf(info->s, "VBR:%08X", m68k->vbr); 		break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68010");				break;
 
-		default:									CPU_GET_INFO_CALL(m68k);						break;
+		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
 }
 
@@ -1079,6 +1109,7 @@ static CPU_INIT( m68020 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_020;
+	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68020;
 	m68k->memory           = interface_d32;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1095,28 +1126,6 @@ static CPU_INIT( m68020 )
 	m68k->cyc_reset        = 518;
 }
 
-static CPU_SET_INFO( m68020 )
-{
-	m68ki_cpu_core *m68k = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:  						m68ki_jump(m68k, info->i);					 	break;
-		case CPUINFO_INT_REGISTER + M68K_MSP:		if(m68k->s_flag && m68k->m_flag)
-														REG_SP = info->i;
-													else
-														REG_MSP = info->i;
-													break;
-		case CPUINFO_INT_REGISTER + M68K_CACR:		m68k->cacr = info->i;							break;
-		case CPUINFO_INT_REGISTER + M68K_CAAR:		m68k->caar = info->i;							break;
-		case CPUINFO_INT_REGISTER + M68K_VBR:  		m68k->vbr = info->i;							break;
-		case CPUINFO_INT_REGISTER + M68K_SFC:  		m68k->sfc = info->i & 7;						break;
-		case CPUINFO_INT_REGISTER + M68K_DFC:  		m68k->dfc = info->i & 7;						break;
-
-		default:									CPU_SET_INFO_CALL(m68k);						break;
-	}
-}
-
 CPU_GET_INFO( m68020 )
 {
 	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
@@ -1125,27 +1134,18 @@ CPU_GET_INFO( m68020 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:		info->i = 20;									break;
-		case CPUINFO_INT_MIN_CYCLES:				info->i = 2;									break;
-		case CPUINFO_INT_MAX_CYCLES:				info->i = 158;									break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20;							break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;						break;
-
-		case CPUINFO_INT_PC:						info->i = REG_PC;								break;
-		case CPUINFO_INT_REGISTER + M68K_MSP:		info->i = (m68k->s_flag && m68k->m_flag) ? REG_SP : REG_MSP; break;
-		case CPUINFO_INT_REGISTER + M68K_CACR: 		info->i = m68k->cacr;							break;
-		case CPUINFO_INT_REGISTER + M68K_CAAR: 		info->i = m68k->caar;							break;
-		case CPUINFO_INT_REGISTER + M68K_VBR:  		info->i = m68k->vbr;							break;
-		case CPUINFO_INT_REGISTER + M68K_SFC:  		info->i = m68k->sfc;							break;
-		case CPUINFO_INT_REGISTER + M68K_DFC:  		info->i = m68k->dfc;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(m68020);		break;
-		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68020);				break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68020);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "68020");						break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68020");				break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68ki_get_sr(m68k);
@@ -1168,14 +1168,7 @@ CPU_GET_INFO( m68020 )
 				sr & 0x0001 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + M68K_MSP:		sprintf(info->s, "MSP:%08X", (m68k->s_flag && m68k->m_flag) ? REG_SP : REG_MSP); break;
-		case CPUINFO_STR_REGISTER + M68K_CACR:		sprintf(info->s, "CCR:%08X", m68k->cacr); 		break;
-		case CPUINFO_STR_REGISTER + M68K_CAAR:		sprintf(info->s, "CAR:%08X", m68k->caar); 		break;
-		case CPUINFO_STR_REGISTER + M68K_SFC:		sprintf(info->s, "SFC:%X",   m68k->sfc); 		break;
-		case CPUINFO_STR_REGISTER + M68K_DFC:		sprintf(info->s, "DFC:%X",   m68k->dfc); 		break;
-		case CPUINFO_STR_REGISTER + M68K_VBR:		sprintf(info->s, "VBR:%08X", m68k->vbr); 		break;
-
-		default:									CPU_GET_INFO_CALL(m68k);						break;
+		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
 }
 
@@ -1191,6 +1184,7 @@ static CPU_INIT( m68ec020 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_EC020;
+	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68EC020;
 	m68k->memory           = interface_d32;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1207,35 +1201,20 @@ static CPU_INIT( m68ec020 )
 	m68k->cyc_reset        = 518;
 }
 
-static CPU_SET_INFO( m68ec020 )
-{
-	m68ki_cpu_core *m68k = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:  						m68ki_jump(m68k, info->i & 0x00ffffff); 		break;
-
-		default:									CPU_SET_INFO_CALL(m68020);						break;
-	}
-}
-
 CPU_GET_INFO( m68ec020 )
 {
-	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 24;						break;
-		case CPUINFO_INT_PC:						info->i = REG_PC & 0x00ffffff; 					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 24;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(m68ec020);	break;
-		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68ec020);			break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68ec020);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:						strcpy(info->s, "68EC020");						break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "68EC020");				break;
 
-		default:									CPU_GET_INFO_CALL(m68020);						break;
+		default:										CPU_GET_INFO_CALL(m68020);				break;
 	}
 }
 
@@ -1250,6 +1229,7 @@ static CPU_INIT( m68040 )
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_040;
+	m68k->state.subtypemask = m68k->cpu_type;
 	m68k->dasm_type        = M68K_CPU_TYPE_68040;
 	m68k->memory           = interface_d32;
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
@@ -1266,28 +1246,6 @@ static CPU_INIT( m68040 )
 	m68k->cyc_reset        = 518;
 }
 
-static CPU_SET_INFO( m68040 )
-{
-	m68ki_cpu_core *m68k = device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:  						m68ki_jump(m68k, info->i);					 	break;
-		case CPUINFO_INT_REGISTER + M68K_MSP:		if(m68k->s_flag && m68k->m_flag)
-														REG_SP = info->i;
-													else
-														REG_MSP = info->i;
-													break;
-		case CPUINFO_INT_REGISTER + M68K_CACR:		m68k->cacr = info->i;							break;
-		case CPUINFO_INT_REGISTER + M68K_CAAR:		m68k->caar = info->i;							break;
-		case CPUINFO_INT_REGISTER + M68K_VBR:  		m68k->vbr = info->i;							break;
-		case CPUINFO_INT_REGISTER + M68K_SFC:  		m68k->sfc = info->i & 7;						break;
-		case CPUINFO_INT_REGISTER + M68K_DFC:  		m68k->dfc = info->i & 7;						break;
-
-		default:									CPU_SET_INFO_CALL(m68k);						break;
-	}
-}
-
 CPU_GET_INFO( m68040 )
 {
 	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
@@ -1296,24 +1254,15 @@ CPU_GET_INFO( m68040 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:		info->i = 20;								break;
-		case CPUINFO_INT_MIN_CYCLES:				info->i = 2;								break;
-		case CPUINFO_INT_MAX_CYCLES:				info->i = 158;								break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 20;							break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 158;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 32;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 32;					break;
-
-		case CPUINFO_INT_PC:						info->i = REG_PC;								break;
-		case CPUINFO_INT_REGISTER + M68K_MSP:		info->i = (m68k->s_flag && m68k->m_flag) ? REG_SP : REG_MSP; break;
-		case CPUINFO_INT_REGISTER + M68K_CACR: 		info->i = m68k->cacr;							break;
-		case CPUINFO_INT_REGISTER + M68K_CAAR: 		info->i = m68k->caar;							break;
-		case CPUINFO_INT_REGISTER + M68K_VBR:  		info->i = m68k->vbr;							break;
-		case CPUINFO_INT_REGISTER + M68K_SFC:  		info->i = m68k->sfc;							break;
-		case CPUINFO_INT_REGISTER + M68K_DFC:  		info->i = m68k->dfc;							break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 32;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: 		info->i = 32;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m68040);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m68040);				break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68040);						break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "68040");				break;
@@ -1339,13 +1288,6 @@ CPU_GET_INFO( m68040 )
 				sr & 0x0001 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + M68K_MSP:		sprintf(info->s, "MSP:%08X", (m68k->s_flag && m68k->m_flag) ? REG_SP : REG_MSP); break;
-		case CPUINFO_STR_REGISTER + M68K_CACR:		sprintf(info->s, "CCR:%08X", m68k->cacr); 		break;
-		case CPUINFO_STR_REGISTER + M68K_CAAR:		sprintf(info->s, "CAR:%08X", m68k->caar); 		break;
-		case CPUINFO_STR_REGISTER + M68K_SFC:		sprintf(info->s, "SFC:%X",   m68k->sfc); 		break;
-		case CPUINFO_STR_REGISTER + M68K_DFC:		sprintf(info->s, "DFC:%X",   m68k->dfc); 		break;
-		case CPUINFO_STR_REGISTER + M68K_VBR:		sprintf(info->s, "VBR:%08X", m68k->vbr); 		break;
-
-		default:									CPU_GET_INFO_CALL(m68k);						break;
+		default:										CPU_GET_INFO_CALL(m68k);				break;
 	}
 }

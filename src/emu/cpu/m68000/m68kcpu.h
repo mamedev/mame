@@ -600,6 +600,9 @@ struct _m68ki_cpu_core
 	m68k_memory_interface memory;
 	offs_t encrypted_start;
 	offs_t encrypted_end;
+	
+	cpu_state_table state;
+	UINT32		iotemp;
 
 	/* save state data */
 	UINT16 save_sr;
