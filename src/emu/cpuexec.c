@@ -912,7 +912,7 @@ attotime cpu_clocks_to_attotime(const device_config *device, UINT64 clocks)
 UINT64 cpu_attotime_to_clocks(const device_config *device, attotime duration)
 {
 	cpu_class_data *classdata = get_class_data(device);
-	return mulu_32x32(duration.seconds, classdata->cycles_per_second) + (UINT64)duration.attoseconds * (UINT64)classdata->attoseconds_per_cycle;
+	return mulu_32x32(duration.seconds, classdata->cycles_per_second) + (UINT64)duration.attoseconds / (UINT64)classdata->attoseconds_per_cycle;
 }
 
 
