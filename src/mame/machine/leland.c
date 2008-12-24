@@ -410,7 +410,7 @@ MACHINE_RESET( leland )
 		memory_set_bankptr(machine, 3, &slave_base[0x10000]);
 
 	/* if we have an I80186 CPU, reset it */
-	if (cpu_get_type(machine->cpu[2]) == CPU_I80186)
+	if (machine->cpu[2] != NULL && cpu_get_type(machine->cpu[2]) == CPU_I80186)
 		leland_80186_sound_init();
 }
 
