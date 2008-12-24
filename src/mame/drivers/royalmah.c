@@ -33,6 +33,7 @@ Year + Game               Board(s)             CPU      Company            Notes
 93  Mahjong Cafe Doll     D76052208L-2         TLCS-90  Dynax              Larger palette, RTC, Undumped internal rom
 95  Mahjong Tensinhai     D10010318L1          TLCS-90  Dynax              Larger palette, RTC
 96  Janputer '96                               Z80      Dynax              Larger palette, RTC
+99  Mahjong Cafe Break    NS528-9812           TLCS-90  Nakanihon / Dynax  Undumped internal rom
 ---------------------------------------------------------------------------------------------------------------------
 
 TODO:
@@ -3148,6 +3149,53 @@ ROM_START( janoh )
 	ROM_LOAD( "janho.color", 0x00, 0x20, NO_DUMP )
 ROM_END
 
+/***************************************************************************
+
+Mahjong Cafe Break
+Dynax/Nakanihon, 199?
+
+This game runs on Royal Mahjong hardware with a Nakanihon top board
+
+Top PCB Layout
+--------------
+
+NS528-9812
+|-------------------------|
+|X  NS528A2               |
+|   NS528B2  PLCC84 528011|
+|RGB                 DIP32|
+|          8MHz      DIP32|
+|DSW4(10)                 |
+|DSW3(10)   SDIP64  6264  |
+|DSW2(10)                 |
+|DSW1(10)           52802 |
+|                 A3      |
+|BATTERY     A1   A2  Y A4|
+|-------------------------|
+Notes:
+      RGB 3  - wire cable tied to mainboard
+      X      - DIP16 socket with flat cable plugged in coming from main board PROM socket
+      PLCC84 - unknown PLCC84 in a socket
+      DIP32  - unpopulated DIP32 socket
+      SDIP64 - unknown CPU, probably TLCS-90 (TMP91640)
+      A1     - unknown DIP8 IC, possibly MB3771 reset/watchdog chip
+      A2/A3  - unknown DIP14 ICs, probably logic
+      A4     - unknown DIP18 IC, RTC IC
+      Y      - 32.768kHz OSC for RTC
+
+***************************************************************************/
+ROM_START( cafebrk )
+	ROM_REGION( 0x280000, "main", 0 )
+	ROM_LOAD( "528.tmp91640", 0x000000, 0x004000, NO_DUMP )
+	ROM_LOAD( "528011.1f",    0x000000, 0x080000, CRC(440ae60b) SHA1(c24efd76ba73adcb614b1974e8f92592800ba53c) )
+	/* bank switched ROMs follow */
+	ROM_LOAD( "52802.1d",     0x080000, 0x200000, CRC(bf4760fc) SHA1(d54ab9e298800a31d95a5f8b98ab9ba5b2866acf) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "ns528b2.4h", 0x000, 0x200, CRC(5699e69a) SHA1(fe13b93dd2c4a16865b4edcb0fee1390fdade725) )
+	ROM_LOAD( "ns528a2.4j", 0x200, 0x200, CRC(b5a3a569) SHA1(8e31c600ae24b672b614908ee920a333ed600941) )
+ROM_END
+
 
 static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x8000 );	}
 
@@ -3180,3 +3228,4 @@ GAME( 1992,  cafetime, 0,        cafetime, cafetime, 0,        ROT0, "Dynax",   
 GAME( 1993,  cafedoll, 0,        mjifb,    mjifb,    0,        ROT0, "Dynax",                      "Mahjong Cafe Doll (Japan)",             GAME_NOT_WORKING )
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, 0,        ROT0, "Dynax",                      "Mahjong Tensinhai (Japan)",             GAME_NOT_WORKING )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, janptr96, ROT0, "Dynax",                      "Janputer '96 (Japan)",                  0 )
+GAME( 1999,  cafebrk,  0,        mjifb,    mjifb,    0,        ROT0, "Nakanihon / Dynax",          "Mahjong Cafe Break",                    GAME_NOT_WORKING )

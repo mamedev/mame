@@ -7370,7 +7370,8 @@ Other Sun games
 	DRIVER( mjtensin )	/* "100" 1995 Dynax */
 	DRIVER( nettoqc )	/* "103" (c) 1995 Nakanihon */
 	DRIVER( majrjhdx )	/* "105" 1996 Dynax */
-	DRIVER( ddenlvrj )	/* "113" (c) 1996 Dynax */
+	DRIVER( ddenlvrj )	/* "113" (c) 1995 Dynax */
+	DRIVER( ddenlvrk )	/* "113" (c) 1995 Dynax */
 	DRIVER( ddenlovr )	/* "113" (c) 1996 Dynax */
 	DRIVER( ddenlovb )	/* bootleg */
 	DRIVER( hanakanz )	/* "507" 1996 Dynax */
@@ -7383,6 +7384,7 @@ Other Sun games
 	DRIVER( dai2kaku )	/* "522" DaiDaiKakumei (Japan)*/
 	DRIVER( mjchuuka )	/* "???" (c) 1998 Dynax */
 	DRIVER( mjreach1 )	/* "526" Mahjong Reach Ippatsu 1998 Nihon System/Dynax */
+	DRIVER( cafebrk )	/* "528" Mahjong Cafe Break (C) 1999 Nakanihon / Dynax */
 
 	DRIVER( pkgnsh )	/* "505" Pachinko Gindama Shoubu 1998 (Japan) */
 	DRIVER( pkgnshdx )	/* "522" Pachinko Gindama Shoubu DX 1998 (Japan) */
@@ -8438,6 +8440,7 @@ Other Sun games
 
 	/* Astro Corp. */
 	DRIVER( showhand )	/* (c) 1999? Astro Corp. */
+	DRIVER( showhanc )	/* (c) 1999? Astro Corp. */
 
 	/* Dyna */
 	DRIVER ( cb2001 )

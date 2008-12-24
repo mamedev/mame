@@ -23,6 +23,7 @@ Year + Game                                 Board
 98  Billiard Academy Real Break (Japan)     NM523-1-9805
 98  Billiard Academy Real Break (Europe)    MM600-1-9807
 98  Billiard Academy Real Break (Korea)     MM600-1-9807
+04  Dai-Dai-Kakumei (Japan)                 NM522-1-9803
 ---------------------------------------------------------------------------
 
 Notes:
@@ -676,7 +677,7 @@ static INTERRUPT_GEN( realbrk_interrupt )
 static MACHINE_DRIVER_START( realbrk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000,32000000 / 2)			/* !! TMP68301 !! */
+	MDRV_CPU_ADD("main",M68000, XTAL_32MHz / 2)			/* !! TMP68301 !! */
 	MDRV_CPU_PROGRAM_MAP(realbrk_mem,base_mem)
 	MDRV_CPU_VBLANK_INT("main", realbrk_interrupt)
 
@@ -699,11 +700,11 @@ static MACHINE_DRIVER_START( realbrk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 33868800 / 2)
+	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_33_8688MHz / 2)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579000)
+	MDRV_SOUND_ADD("ym", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
@@ -1052,10 +1053,12 @@ ROM_START( realbrkk )
 	ROM_LOAD( "mm60003.2e", 0x000000, 0x400000, CRC(39512459) SHA1(b5859a7d8f2f87d923e7f86f095cbffd31f9cbfa) )
 ROM_END
 
+// Team Japump board:
+
 ROM_START( dai2kaku )
 	ROM_REGION( 0x100000, "main", 0 )		/* TMP68301 Code */
-	ROM_LOAD16_BYTE( "52202b.1r", 0x000001, 0x080000, CRC(e45d6368) SHA1(5fb39b7c2e0fd474e7c366279f616b9244e6cf2e) )
 	ROM_LOAD16_BYTE( "52201b.2r", 0x000000, 0x080000, CRC(5672cbe6) SHA1(4379edd0725e1b8cd5b3f9201e484487eccd1714) )
+	ROM_LOAD16_BYTE( "52202b.1r", 0x000001, 0x080000, CRC(e45d6368) SHA1(5fb39b7c2e0fd474e7c366279f616b9244e6cf2e) )
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )	/* Backgrounds */
 	ROM_LOAD32_WORD( "52210.9b", 0x0000000, 0x400000, CRC(29f0cd88) SHA1(e8eab4f3e4cb12663874d4f4a2fefc77d15fa078) )
@@ -1073,11 +1076,98 @@ ROM_START( dai2kaku )
 	ROM_LOAD( "52203.2e", 0x000000, 0x100000, CRC(a612ba97) SHA1(b7bb903f8e00ce5febf3b68a3d892da9162b45be) )
 ROM_END
 
+// Guru board:
 
-GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, realbrk,  0,       realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Europe)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon", "Billiard Academy Real Break (Korea)", GAME_IMPERFECT_GRAPHICS )
-GAME( 2004, dai2kaku, 0,       dai2kaku, realbrk,  0, ROT0, "SystemBit", "DaiDaiKakumei (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+/***************************************************************************
 
+Dai Dai Kakumei
+SystemBit Corp. 2004
+
+Same PCB as Pachinko Gindama Shoubu DX (Japan)
+
+PCB Layout
+----------
+
+NM522-1-9803
+|-------------------------------------------------------|
+|  TMP68301   1R    TPC1010  M548262     2E    MN52204  |
+|             2R             M548262           MN52205  |
+|                 TC55257         32.768kHz             |
+|                 TC55257  33.8688MHz   PST532          |
+|M                             M6242 BATTERY   4L10F2467|
+|A     VR1                          PAL                 |
+|H     VR2                4L10F2468     32MHz           |
+|J  TA7252                                              |
+|O        JRC3404                                       |
+|N  YAC516  JRC3404                                     |
+|G   YM2413                LC3664                       |
+|                          LC3664    9F    9D    9B 9A  |
+|DSW2 DSW1   3.579545MHz           LC3664               |
+|DSW3 DSW4             TC55257     LC3664               |
+|                      TC55257                          |
+|CN3                   TC55257                          |
+|CN4                   TC55257                          |
+|-------------------------------------------------------|
+Notes:
+      TMP68301 - clock 16.000MHz
+      YM2413   - clock 3.579545MHz
+      YMZ280B  - clock 16.9344MHz [33.8688/2]
+      VSync    - 59.8986Hz
+      HSync    - 15.332kHz
+      TPC1010  - Actel CPLD
+      TC55257  - 256kx8 SRAM
+      LC3664   - 64kx8 SRAM
+      M548262  - 256k x8 fastpage VRAM
+      PST532   - IC for system reset and battery backup switching
+      DIPSW's  - Each have 10 switches
+      VOL1/VOL2- Separate volume levels for sound and voice
+      CN3/CN4  - Connectors for player 3 & 4 controls
+
+27C160 EPROMs. They don't have numbers like the other dump.
+There is no 52203 number on the ROMs (or any other),
+just 9A 9B 9D 9F 2E 2R 1R.
+The only ones with numbers are the EPROMs at 1A and 1B.
+
+***************************************************************************/
+/*
+This dump matches the already supported set, except for rom sizes:
+
+	1r                      52201B.2R               IDENTICAL
+	2r                      52202B.1R               IDENTICAL
+	nm52204.1b              52204.1B                IDENTICAL
+	nm52205.1a              52205.1A                IDENTICAL
+	2e           [1/2]      52203.2E                IDENTICAL
+	9a                      52211.9A     [1/2]      IDENTICAL
+	9b                      52210.9B     [1/2]      IDENTICAL
+	9d                      52208.9D     [1/2]      IDENTICAL
+	9f                      52206.9F     [1/2]      IDENTICAL
+*/
+#if 0
+ROM_START( dai2kaku_alt_rom_size )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD16_BYTE( "1r", 0x000000, 0x080000, CRC(5672cbe6) SHA1(4379edd0725e1b8cd5b3f9201e484487eccd1714) )
+	ROM_LOAD16_BYTE( "2r", 0x000001, 0x080000, CRC(e45d6368) SHA1(5fb39b7c2e0fd474e7c366279f616b9244e6cf2e) )
+
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD32_WORD( "9b", 0x000000, 0x200000, CRC(eab21697) SHA1(28540e04c0d4040328f3d3373e623138a8730c07) )
+	ROM_LOAD32_WORD( "9a", 0x000002, 0x200000, CRC(1b12dd4e) SHA1(8be13b72b2427eb66f1c4f736aa8bde0a8e1bc9b) )
+
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "nm52204.1b", 0x000000, 0x020000, CRC(47a39496) SHA1(3ac9499b70c63185fb65378c18d4ff30ba1d2f2b) )
+	ROM_LOAD16_BYTE( "nm52205.1a", 0x000001, 0x020000, CRC(4b7d16c0) SHA1(5f6410121ec13bea2869d61db169dbe2536453ea) )
+
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD32_WORD( "9f", 0x000000, 0x200000, CRC(63a1a280) SHA1(a6a4b7ebe2b8d57f5c1fce43c9b28c5dc2d6057a) )
+	ROM_LOAD32_WORD( "9d", 0x000002, 0x200000, CRC(1743a929) SHA1(4756e9c567c406f635c6380e263f38a6a2a82038) )
+
+	ROM_REGION( 0x200000, "ymz", 0 )
+	ROM_LOAD( "2e", 0x000000, 0x200000, CRC(833856b5) SHA1(10663abd2a051f95c07b301573124ae53f902044) )
+ROM_END
+#endif
+
+GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, realbrk,  0,       realbrk,  realbrk,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  GAME_IMPERFECT_GRAPHICS )
+GAME( 2004, dai2kaku, 0,       dai2kaku, realbrk,  0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

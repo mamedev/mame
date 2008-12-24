@@ -363,8 +363,8 @@ INLINE void log_draw_error(int src, int cmd)
 
 static int blit_draw(running_machine *machine, int src,int sx)
 {
-	UINT8 *src_data = memory_region(machine, "gfx1");
-	int src_len = memory_region_length(machine, "gfx1");
+	UINT8 *src_data = memory_region(machine, "blitter");
+	int src_len = memory_region_length(machine, "blitter");
 	int bit_addr = (src & 0xffffff) * ddenlovr_blit_rom_bits;	/* convert to bit address */
 	int pen_size, arg_size, cmd;
 	int x;
@@ -1150,8 +1150,8 @@ static WRITE16_HANDLER( ddenlovr_blitter_irq_ack_w )
 
 static READ8_HANDLER( rongrong_gfxrom_r )
 {
-	UINT8 *rom	=	memory_region( space->machine, "gfx1" );
-	size_t size	=	memory_region_length( space->machine, "gfx1" );
+	UINT8 *rom	=	memory_region( space->machine, "blitter" );
+	size_t size	=	memory_region_length( space->machine, "blitter" );
 	int address	=	ddenlovr_blit_address;
 
 	if (address >= size)
@@ -1222,7 +1222,7 @@ VIDEO_UPDATE(ddenlovr)
 
 #if 0
 	static int base = 0x0;
-	const UINT8 *gfx = memory_region(screen->machine, "gfx1");
+	const UINT8 *gfx = memory_region(screen->machine, "blitter");
 	int next;
 	memset(ddenlovr_pixmap[0],0,512*512);
 	memset(ddenlovr_pixmap[1],0,512*512);
@@ -1678,6 +1678,76 @@ static ADDRESS_MAP_START( ddenlvrj_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300240, 0x300241) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)									// RAM
 ADDRESS_MAP_END
+
+
+static UINT16 *ddenlvrk_protection1, *ddenlvrk_protection2;
+static READ16_HANDLER( ddenlvrk_protection1_r )
+{
+	switch(*ddenlvrk_protection1)
+	{
+		case 0x007e:	return 0x00aa;
+	}
+	return *ddenlvrk_protection1;
+}
+
+static READ16_HANDLER( ddenlvrk_protection2_r )
+{
+	switch(*ddenlvrk_protection1)
+	{
+		case 0x0000:	return *ddenlvrk_protection2;
+	}
+	return 0x80;
+}
+static WRITE16_HANDLER( ddenlvrk_protection2_w )
+{
+	COMBINE_DATA( ddenlvrk_protection2 );
+	okim6295_set_bank_base(0, ((*ddenlvrk_protection2)&0x7) * 0x40000);
+}
+
+static ADDRESS_MAP_START( ddenlvrk_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)					// ROM
+	AM_RANGE(0xe00086, 0xe00087) AM_READ(ddenlovr_gfxrom_r)			// Video Chip
+	AM_RANGE(0xe00070, 0xe00071) AM_READNOP
+	AM_RANGE(0xe00100, 0xe00101) AM_READ_PORT("P1")
+	AM_RANGE(0xe00102, 0xe00103) AM_READ_PORT("P2")
+	AM_RANGE(0xe00104, 0xe00105) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xe00200, 0xe00201) AM_READ_PORT("DSW")
+	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREAD8(MSM6242, "rtc", msm6242_r,	0x00ff)	// 6242RTC
+	AM_RANGE(0xe00604, 0xe00605) AM_READ(ay8910_read_port_0_lsb_r)
+	AM_RANGE(0xe00700, 0xe00701) AM_READ(okim6295_status_0_lsb_r)	// Sound
+	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)					// RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ddenlvrk_writemem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)						// ROM
+
+	AM_RANGE(0x100000, 0x100001) AM_READWRITE(ddenlvrk_protection1_r, SMH_RAM)					AM_BASE(&ddenlvrk_protection1)
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ddenlvrk_protection2_r, ddenlvrk_protection2_w)	AM_BASE(&ddenlvrk_protection2)
+
+	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)			// Palette
+//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                               // ? B0 on startup, then 00
+	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
+	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
+	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr16_transparency_pen_w)
+	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0xe00068, 0xe00069) AM_WRITE(ddenlovr16_bgcolor_w)
+	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE(ddenlovr16_priority_w)
+	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE(ddenlovr16_layer_enable_w)
+	AM_RANGE(0xe00080, 0xe00083) AM_WRITE(ddenlovr_blitter_w)
+	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(ddenlovr_blitter_irq_ack_w)	// Blitter irq acknowledge
+	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)		// Coin Counters
+	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)		//
+	AM_RANGE(0xe00400, 0xe00401) AM_WRITE(ym2413_register_port_0_lsb_w)
+	AM_RANGE(0xe00402, 0xe00403) AM_WRITE(ym2413_data_port_0_lsb_w)
+	AM_RANGE(0xe00500, 0xe0051f) AM_DEVWRITE8(MSM6242, "rtc", msm6242_w, 0x00ff)	// 6242RTC
+//  AM_RANGE(0xe00302, 0xe00303) AM_WRITE(SMH_NOP)                      // ?
+	AM_RANGE(0xe00600, 0xe00601) AM_WRITE(ay8910_control_port_0_lsb_w)
+	AM_RANGE(0xe00602, 0xe00603) AM_WRITE(ay8910_write_port_0_lsb_w)
+	AM_RANGE(0xe00700, 0xe00701) AM_WRITE(okim6295_data_0_lsb_w)
+	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)						// RAM
+ADDRESS_MAP_END
+
+
 
 
 static ADDRESS_MAP_START( ddenlovr_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2299,8 +2369,8 @@ static READ8_HANDLER( hanakanz_busy_r )
 
 static READ8_HANDLER( hanakanz_gfxrom_r )
 {
-	UINT8 *rom	=	memory_region( space->machine, "gfx1" );
-	size_t size		=	memory_region_length( space->machine, "gfx1" );
+	UINT8 *rom	=	memory_region( space->machine, "blitter" );
+	size_t size		=	memory_region_length( space->machine, "blitter" );
 	int address		=	(ddenlovr_blit_address & 0xffffff) * 2;
 
 	static UINT8 romdata[2];
@@ -2498,8 +2568,8 @@ static UINT8 mjchuuka_romdata[2];
 
 static void mjchuuka_get_romdata(running_machine *machine)
 {
-	UINT8 *rom	=	memory_region( machine, "gfx1" );
-	size_t size		=	memory_region_length( machine, "gfx1" );
+	UINT8 *rom	=	memory_region( machine, "blitter" );
+	size_t size		=	memory_region_length( machine, "blitter" );
 	int address		=	(ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
@@ -6495,7 +6565,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000,24000000 / 2)
+	MDRV_CPU_ADD("main",M68000, XTAL_24MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(ddenlovr_readmem,ddenlovr_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -6516,14 +6586,14 @@ static MACHINE_DRIVER_START( ddenlovr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
+	MDRV_SOUND_ADD("ym", YM2413, XTAL_28_63636MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ay8910", AY8910, 1789772)
+	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_28_63636MHz / 16)	// or /8 ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1022720)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_28_63636MHz / 28)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
@@ -6536,6 +6606,12 @@ static MACHINE_DRIVER_START( ddenlvrj )
 	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(ddenlvrj_readmem,ddenlvrj_writemem)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( ddenlvrk )
+	MDRV_IMPORT_FROM(ddenlovr)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(ddenlvrk_readmem,ddenlvrk_writemem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( akamaru )
@@ -7105,7 +7181,7 @@ ROM_START( mmpanic )
 	ROM_REGION( 0x20000, "sound", 0 )	/* Z80 Code */
 	ROM_LOAD( "nwc7003",      0x00000, 0x20000, CRC(4f02ce44) SHA1(9a3abd9c555d5863a2110d84d1a3f582ba9d56b9) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x280000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x280000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "nwc7004",      0x000000, 0x100000, CRC(5b4ad8c5) SHA1(a92a0bef01c71e745597ec96e7b8aa0ec26dc59d) )
 	ROM_LOAD( "nwc7005",      0x100000, 0x100000, CRC(9ec41956) SHA1(5a92d725cee7052e1c3cd671b58795125c6a4ea9) )
 	ROM_LOAD( "nwc7006a",     0x200000, 0x080000, CRC(9099c571) SHA1(9762612f41384602d545d2ec6dabd5f077d5fe21) )
@@ -7180,7 +7256,7 @@ ROM_START( animaljr )
 	ROM_REGION( 0x20000, "sound", 0 )	/* Z80 Code */
 	ROM_LOAD( "7503s.8e",     0x00000, 0x20000, CRC(d1fac899) SHA1(dde2824d73b13c18b83e4c4b63fe7835bce87ea4) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x200000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x200000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "7504.17b",     0x000000, 0x100000, CRC(b62de6a3) SHA1(62abf09b52844d3b3325e8931cb572c15581964f) )
 	ROM_LOAD( "7505.17d",     0x100000, 0x080000, CRC(729b073f) SHA1(8e41fafc47adbe76452e92ab1459536a5a46784d) )
 	ROM_LOAD( "7506s.17f",    0x180000, 0x080000, CRC(1be1ae17) SHA1(57bf9bcd9df49cdbb1311ec9e850cb1a141e5069) )
@@ -7221,7 +7297,7 @@ ROM_START( quizchq )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	ROM_LOAD( "nwc7303.4e",   0x90000, 0x80000, CRC(ffc77601) SHA1(b25c4a027e1fa4397dd86299dfe9251022b0d174) )
 
-	ROM_REGION( 0x320000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x320000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "nwc7307.s4b",  0x000000, 0x80000, CRC(a09d1dbe) SHA1(f17af24293eea803ebb5c758bffb4519dcad3a71) )
 	ROM_LOAD( "nwc7306.s3b",  0x080000, 0x80000, CRC(52d27aac) SHA1(3c38278a5ce757ca0c4a22e4de6052132edd7cbc) )
 	ROM_LOAD( "nwc7305.s2b",  0x100000, 0x80000, CRC(5f50914e) SHA1(1fe5df146e028995c53a5aca896546898d7b5914) )
@@ -7240,7 +7316,7 @@ ROM_START( quizchql )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	ROM_LOAD( "3.rom",        0x90000, 0x80000, CRC(6028198f) SHA1(f78c3cfc0663b44655cb75928941a5ec4a57c8ba) )
 
-	ROM_REGION( 0x420000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x420000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "4.rom",        0x000000, 0x80000, CRC(e6bdea31) SHA1(cb39d1d5e367ad2623c2bd0b2966541aa41bbb9b) )
 	ROM_LOAD( "5.rom",        0x080000, 0x80000, CRC(c243f10a) SHA1(22366a9441b8317780e85065accfa59fe1cd8258) )
 	ROM_LOAD( "11.rom",       0x100000, 0x80000, CRC(c9ae5880) SHA1(1bbda7293178132797dd017d71b24aba5ce57022) )
@@ -7264,7 +7340,7 @@ ROM_START( quiz365 )
 	ROM_LOAD16_BYTE( "7803.3b",  0x100000, 0x040000, CRC(10d315b1) SHA1(9f1bb57ba32152cca3b88fc3f841451b2b506a74) )
 	ROM_LOAD16_BYTE( "7802.3d",  0x100001, 0x040000, CRC(6616caa3) SHA1(3b3fda61fa62c10b4d9e07e898018ffc9fab0f91) )
 
-	ROM_REGION( 0x380000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x380000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "7810.14b", 0x000000, 0x100000, CRC(4b1a4984) SHA1(581ee032b396d65cd604f39846153a4dcb296aad) )
 	ROM_LOAD( "7809.13b", 0x100000, 0x100000, CRC(139d52ab) SHA1(08d705301379fcb952cbb1add0e16a148e611bbb) )
 	ROM_LOAD( "7808.12b", 0x200000, 0x080000, CRC(a09fd4a4) SHA1(016ecbf1d27a4890dee01e1966ec5efff6eb3afe) )
@@ -7284,7 +7360,7 @@ ROM_START( quiz365t )
 	ROM_LOAD16_BYTE( "7803.rom", 0x100000, 0x040000, CRC(5b7a78d3) SHA1(6ade16df301b57e4a7309834a47ca72300f50ffa) )
 	ROM_LOAD16_BYTE( "7802.rom", 0x100001, 0x040000, CRC(c3238a9d) SHA1(6b4b2ab1315fc9e2667b4f8f394e00a27923f926) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x400000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "7810.rom", 0x000000, 0x100000, CRC(4b1a4984) SHA1(581ee032b396d65cd604f39846153a4dcb296aad) )
 	ROM_LOAD( "7809.rom", 0x100000, 0x100000, CRC(139d52ab) SHA1(08d705301379fcb952cbb1add0e16a148e611bbb) )
 	ROM_LOAD( "7808.rom", 0x200000, 0x080000, CRC(a09fd4a4) SHA1(016ecbf1d27a4890dee01e1966ec5efff6eb3afe) )
@@ -7318,7 +7394,7 @@ ROM_START( rongrong )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	/* 90000-10ffff empty */
 
-	ROM_REGION( 0x280000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x280000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "8003.8c",      0x000000, 0x80000, CRC(f57192e5) SHA1(e33f5243028520492cd876be3e4b6a76a9b20d46) )
 	ROM_LOAD( "8004.9c",      0x080000, 0x80000, CRC(c8c0b5cb) SHA1(d0c99908022b7d5d484e6d1990c00f15f7d8665a) )
 	ROM_LOAD( "8005e.10c",    0x100000, 0x80000, CRC(11c7a23c) SHA1(96d6b82db2555f7d0df661367a7a09bd4eaecba9) )
@@ -7366,7 +7442,7 @@ ROM_START( rongrngg )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	/* 90000-10ffff empty */
 
-	ROM_REGION( 0x280000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x280000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "rr_8003.rom",  0x000000, 0x80000, CRC(f57192e5) SHA1(e33f5243028520492cd876be3e4b6a76a9b20d46) )
 	ROM_LOAD( "rr_8004.rom",  0x080000, 0x80000, CRC(c8c0b5cb) SHA1(d0c99908022b7d5d484e6d1990c00f15f7d8665a) )
 	ROM_LOAD( "rr_8005g.rom", 0x100000, 0x80000, CRC(11c7a23c) SHA1(96d6b82db2555f7d0df661367a7a09bd4eaecba9) )
@@ -7411,7 +7487,7 @@ ROM_START( rongrngj )
 	ROM_RELOAD(          0x10000, 0x80000 )
 	/* 90000-10ffff empty */
 
-	ROM_REGION( 0x240000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x240000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "8003.8c",  0x000000, 0x80000, CRC(f57192e5) SHA1(e33f5243028520492cd876be3e4b6a76a9b20d46) )
 	ROM_LOAD( "8004.9c",  0x080000, 0x80000, CRC(c8c0b5cb) SHA1(d0c99908022b7d5d484e6d1990c00f15f7d8665a) )
 	ROM_LOAD( "8005.10c", 0x100000, 0x80000, CRC(d1e5f74c) SHA1(808b37a4992f27768b85eea24fd868d5c9b1e1c0) )
@@ -7444,7 +7520,7 @@ ROM_START( nettoqc )
 	ROM_LOAD16_BYTE( "10304.rom", 0x100001, 0x040000, CRC(da1f56e5) SHA1(76c865927ee8392dd77476a248816e04e60c784a) )
 	ROM_CONTINUE(                 0x100001, 0x040000 )	// 1ST AND 2ND HALF IDENTICAL
 
-	ROM_REGION( 0x400000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x400000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "10307.rom", 0x000000, 0x100000, CRC(c7a3b05f) SHA1(c931670c5d14f8446404ad00d785fa73d97dedfc) )
 	ROM_LOAD( "10308.rom", 0x100000, 0x100000, CRC(416807a1) SHA1(bccf746ddc9750e3956299fec5b3737a53b24c36) )
 	ROM_LOAD( "10309.rom", 0x200000, 0x100000, CRC(81841272) SHA1(659c009c41ae54d330da41922c8afd1fb293d854) )
@@ -7492,7 +7568,7 @@ ROM_START( ddenlvrj )
 	ROM_LOAD16_BYTE( "1124.2d", 0x000000, 0x040000, CRC(6a9ec557) SHA1(e1512601910a9d06e16a20e10ab7acc96a0819bd) )
 	ROM_LOAD16_BYTE( "1123.2h", 0x000001, 0x040000, CRC(d41cbed0) SHA1(5c80f6a6cf15518120f664a0446355e80eeb2a0f) )
 
-	ROM_REGION( 0xe80000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0xe80000, "blitter", 0 )	/* blitter data */
 	/* 000000-bfffff empty */
 	ROM_LOAD( "1125.2b", 0xc00000, 0x080000, CRC(0181f53c) SHA1(64a6a2f00f81f7181700b83912033a6ee8bbf73a) )
 	ROM_LOAD( "1126.2a", 0xc80000, 0x080000, CRC(17ff2df4) SHA1(7b6723e0a0f471698735a31aa19dc4ebabe35e8c) )
@@ -7503,6 +7579,78 @@ ROM_START( ddenlvrj )
 	ROM_REGION( 0x200000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "1122.2m", 0x080000, 0x080000, CRC(e8619d66) SHA1(b40db5db1bd0a12cd66eb5192e53ddc5b85bd1cf) )	// bank 4, 5
 	ROM_LOAD( "1121.2n", 0x100000, 0x080000, CRC(e2b8359e) SHA1(d882635370405610a1707d9e39a0d8e025ad6e22) )	// bank 2, 3
+ROM_END
+
+
+/***************************************************************************
+
+Don Den Lover (Korea)
+Dynax, 1995
+
+PCB Layout
+----------
+
+Top Board
+
+N113SUB
+|-----------------|
+|     PLCC44      |
+|1F 1E       1B 1A|
+|                 |
+|                 |
+|                 |
+|   2E 2D 2C 2B 2A|
+|                 |
+|-----------------|
+Notes:
+      PLCC44 - Actel A1010B CPLD
+
+Bottom Board
+
+|-------------------------------------|
+|UPC1241  BATTERY                     |
+|LM358 LM358   M28    6264     68000  |
+|YM2413    72421      6264            |
+|ULN2003  95105           PAL         |
+|J                              24MHz |
+|A                           M514262  |
+|M                           M514262  |
+|M          28.63636MHz      M514262  |
+|A          62256            M514262  |
+|                                     |
+|                      NL-005         |
+|DSW1(8)                              |
+|-------------------------------------|
+Notes:
+      68000 - clock 12.000MHz [24/2]
+      M28   - M6295 clock 1.022727143MHz [28.63636/28]. Pin7 HIGH
+      95105 - unknown DIP40 chip
+      72421 - RTC IC
+      YM2413- clock 3.579545MHz [28.63636/8]
+      VSync - 60.8516Hz
+      HSync - 15.2782kHz
+      
+Hardware info by Guru
+
+***************************************************************************/
+
+ROM_START( ddenlvrk )
+	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "rom.1a", 0x000000, 0x40000, CRC(868c45f8) SHA1(023ceaa30cfa03470ef005c8b739a85ae9764e15) )
+	ROM_LOAD16_BYTE( "rom.1b", 0x000001, 0x40000, CRC(4fab3c90) SHA1(61a756a3ccae39f3a649371116b9d940d3b1b852) )
+
+	ROM_REGION( 0x280000, "blitter", 0 )	/* blitter data */
+	ROM_LOAD( "rom.2a", 0x000000, 0x80000, CRC(ee143d8e) SHA1(61a36c64d450209071e996b418adf416dfa68fd9) )
+	ROM_LOAD( "rom.2b", 0x080000, 0x80000, CRC(58a662be) SHA1(3e2fc167bdee74ebfa63c3b1b0d822e3d898c30c) )
+	ROM_LOAD( "rom.2c", 0x100000, 0x80000, CRC(f96e0708) SHA1(e910970a4203b9b1943c853e3d869dd43cdfbc2d) )
+	ROM_LOAD( "rom.2d", 0x180000, 0x80000, CRC(b47e27ec) SHA1(5a36e68eb7c868ce8ca9d11bd9bcaa7f101ee64f) )
+	ROM_LOAD( "rom.2e", 0x200000, 0x80000, CRC(7c7beef6) SHA1(f8631aaec7cc01cc6478f3fc95fdac51c5b5d226) )
+
+	ROM_REGION( 0x200000, "oki", ROMREGION_ERASE )	/* Samples */
+	ROM_LOAD( "rom.1e", 0x080000, 0x40000, CRC(a49318df) SHA1(d952cab857a21e7710fad5b4977b11ff3794ac4d) )	// bank 2
+	ROM_CONTINUE(       0x180000, 0x40000 )																	// bank 6
+	ROM_LOAD( "rom.1f", 0x040000, 0x40000, CRC(9df4f029) SHA1(a8da9905f60910437756dede66a21c8653d98ca6) )	// bank 1
+	ROM_CONTINUE(       0x140000, 0x40000 )																	// bank 5
 ROM_END
 
 
@@ -7531,7 +7679,7 @@ ROM_START( ddenlovr )
 	ROM_LOAD16_BYTE( "1134h.1a", 0x000000, 0x040000, CRC(43accdff) SHA1(3023d4a071fc877f8e4325e95e586739077ccb02) )
 	ROM_LOAD16_BYTE( "1133h.1c", 0x000001, 0x040000, CRC(361bf7b6) SHA1(1727112284cd1dcc1ed17ccba214cb0f8993650a) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x480000, "blitter", 0 )	/* blitter data */
 	/* 000000-1fffff empty */
 	ROM_LOAD( "1135h.3h", 0x200000, 0x080000, CRC(ee143d8e) SHA1(61a36c64d450209071e996b418adf416dfa68fd9) )
 	ROM_LOAD( "1136h.3f", 0x280000, 0x080000, CRC(58a662be) SHA1(3e2fc167bdee74ebfa63c3b1b0d822e3d898c30c) )
@@ -7579,7 +7727,7 @@ ROM_START( ddenlovb )
 	ROM_LOAD16_BYTE( "rom2", 0x000000, 0x040000, CRC(cabdf78f) SHA1(789d4754c7b84964ee317b8a618f26a417f50bcc) )
 	ROM_LOAD16_BYTE( "rom3", 0x000001, 0x040000, CRC(36f8d05e) SHA1(78f75175541ebf377f5375ea30d80ea91f380971) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x280000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "rom4", 0x000000, 0x080000, CRC(ee143d8e) SHA1(61a36c64d450209071e996b418adf416dfa68fd9) )
 	ROM_LOAD( "rom5", 0x080000, 0x080000, CRC(58a662be) SHA1(3e2fc167bdee74ebfa63c3b1b0d822e3d898c30c) )
 	ROM_LOAD( "rom6", 0x100000, 0x080000, CRC(f96e0708) SHA1(e910970a4203b9b1943c853e3d869dd43cdfbc2d) )
@@ -7587,7 +7735,7 @@ ROM_START( ddenlovb )
 	ROM_LOAD( "rom8", 0x200000, 0x080000, CRC(7c7beef6) SHA1(f8631aaec7cc01cc6478f3fc95fdac51c5b5d226) )
 
 	ROM_REGION( 0x200000, "oki", 0 )	/* Samples */
-	ROM_LOAD( "rom1", 0x100000, 0x080000, CRC(ba4723e8) SHA1(fd32b33bd43773fed083990b59a3994f4a631b04) )
+	ROM_LOAD( "rom1", 0x000000, 0x080000, CRC(ba4723e8) SHA1(fd32b33bd43773fed083990b59a3994f4a631b04) )
 ROM_END
 
 static DRIVER_INIT( rongrong )
@@ -7623,7 +7771,7 @@ ROM_START( hanakanz )
 	ROM_LOAD( "50720.5b",     0x00000, 0x80000, CRC(dc40fcfc) SHA1(32c8b3d23039ac47504c881552572f2c22afa585) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 
-	ROM_REGION( 0x300000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x300000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD16_BYTE( "50740.8b",     0x000000, 0x80000, CRC(999e70ce) SHA1(421c137b43522fbf9f3f5aa86692dc563af86880) )
 	ROM_LOAD16_BYTE( "50730.8c",     0x000001, 0x80000, CRC(54e1731d) SHA1(c3f60c4412665b379b4b630ead576691d7b2a598) )
 	ROM_LOAD16_BYTE( "50760.10b",    0x100000, 0x80000, CRC(8fcb5da3) SHA1(86bd4f89e860cd476a026c21a87f34b7a208c539) )
@@ -7670,7 +7818,7 @@ ROM_START( hkagerou )
 	ROM_LOAD( "nm5102.5b",    0x00000, 0x80000, CRC(c56c0856) SHA1(9b3c17c80498c9fa0ea91aa876aa4853c95ebb8c) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 
-	ROM_REGION( 0xe80000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0xe80000, "blitter", 0 )	/* blitter data */
 
 	ROM_LOAD16_BYTE( "nm5104.8b",    0xc00000, 0x080000, CRC(e91dd92b) SHA1(a4eb8a6237e63639da5fc1bc504c8dc2aee99ff5) )
 	ROM_LOAD16_BYTE( "nm5103.8c",    0xc00001, 0x080000, CRC(4d4e248b) SHA1(f981ba8a05bac59c665fb0fd201ea8ff3bd87a3c) )
@@ -7720,7 +7868,7 @@ ROM_START( mjreach1 )
 	ROM_LOAD( "52602-n.5b",   0x00000, 0x80000, CRC(6bef7978) SHA1(56e38448fb03e868094d75e5b7de4e4f4a4e850a) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 
-	ROM_REGION( 0x500000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x500000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD16_BYTE( "52604.8b",     0x000000, 0x100000, CRC(6ce01bb4) SHA1(800043d8203ab5560ed0b24e0a4e01c14b6a3ac0) )
 	ROM_LOAD16_BYTE( "52603.8c",     0x000001, 0x100000, CRC(16d2c169) SHA1(3e50b1109c86d0e8f931ce5a3abf20d807ebabba) )
 	ROM_LOAD16_BYTE( "52606.10b",    0x200000, 0x100000, CRC(07fe5dae) SHA1(221ec21c2d84497af5b769d7409f8775be933783) )
@@ -7777,7 +7925,7 @@ ROM_START( mjchuuka )
 	ROM_LOAD( "d12102.5b", 0x00000, 0x80000, CRC(585a0a8e) SHA1(94b3eede36117fe0a34b61454484c72cd7f0ce6a) )
 	ROM_RELOAD(            0x10000, 0x80000 )
 
-	ROM_REGION( 0x300000, "gfx1", ROMREGION_ERASEFF )	/* blitter data */
+	ROM_REGION( 0x300000, "blitter", ROMREGION_ERASEFF )	/* blitter data */
 	ROM_LOAD16_BYTE( "d12103.11c", 0x000000, 0x080000, CRC(83bfc841) SHA1(36547e737244f95004c598adeb46cebce9ab3231) )
 	ROM_LOAD16_BYTE( "d12104.11a", 0x000001, 0x080000, CRC(1bf6220a) SHA1(ea18fdf6e1298a3b4c91fbf6219b1edcfecaeca3) )
 	ROM_LOAD16_BYTE( "d12105.12c", 0x100000, 0x080000, CRC(3424c8ac) SHA1(ee48622b478d39c6bdb5a18cab204e14f7d54f7a) )
@@ -7858,7 +8006,7 @@ ROM_START( mjdchuka )
 	ROM_LOAD( "2.5b", 0x00000, 0x80000, CRC(7957b4e7) SHA1(8b76c15694e42ff0b2ec5aeae059bf342f6bf476) )
 	ROM_RELOAD(       0x10000, 0x80000 )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )	/* blitter data */
+	ROM_REGION( 0x100000, "blitter", ROMREGION_ERASEFF )	/* blitter data */
 	ROM_LOAD16_BYTE( "3.11c", 0x000000, 0x080000, CRC(c66553c3) SHA1(6e5380fdb97cc8b52986f3a3a8cac43c0f38cf54) )
 	ROM_LOAD16_BYTE( "4.11a", 0x000001, 0x080000, CRC(972852fb) SHA1(157f0a772bf060efc39033b10e63a6cb1022edf6) )
 
@@ -7917,7 +8065,7 @@ ROM_START( funkyfig )
 	ROM_REGION( 0x20000, "sound", 0 )	/* Z80 Code */
 	ROM_LOAD( "7401.1h",      0x00000, 0x20000, CRC(0f47d785) SHA1(d57733db6dcfb4c2cdaad04b5d3f0f569a0e7461) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 
-ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )	/* blitter data */
+ROM_REGION( 0x500000, "blitter", ROMREGION_ERASE00 )	/* blitter data */
 	ROM_LOAD( "7404.8b",      0x000000, 0x080000, CRC(aa4ddf32) SHA1(864890795a238ab34a85ca55a387d7e5efafccee) )			// \ 7e6f +
 	ROM_LOAD( "7405.9b",      0x080000, 0x080000, CRC(fc125bd8) SHA1(150578f67d89be59eeeb811c159a789e5e9c993e) )			// / 35bb = b42a OK
 	ROM_LOAD( "7406.10b",     0x100000, 0x080000, BAD_DUMP CRC(04a214b1) SHA1(af3e652377f5652377c7dedfad7c2677695eaf46) )	// \ af08 +
@@ -7964,7 +8112,7 @@ ROM_START( mjmyster )
 	ROM_LOAD( "77t2.c3", 0x00000, 0x40000, CRC(b1427cce) SHA1(1640f5bb6275cce92e38cf3e0c788b4e65606459) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0x1a0000, "gfx1", ROMREGION_ERASE00 )	/* blitter data */
+	ROM_REGION( 0x1a0000, "blitter", ROMREGION_ERASE00 )	/* blitter data */
 	ROM_LOAD( "77t6.b12", 0x000000, 0x080000, CRC(a287589a) SHA1(58659dd7e019d1d32efeaec548c84a7ded637c50) )
 	ROM_LOAD( "77t5.b11", 0x080000, 0x080000, CRC(a3475059) SHA1(ec86dcea3314b65d391a970680c021899c16449e) )
 	ROM_LOAD( "77t4.b10", 0x100000, 0x080000, CRC(f45c24d6) SHA1(0eca68f2ca5722717f27ac0839359966daa2715b) )
@@ -8028,7 +8176,7 @@ ROM_START( mjmywrld )
 	ROM_LOAD( "2.3d", 0x00000, 0x40000, CRC(a1ff31fa) SHA1(f132aaf59570cbbd2c4eff3ee7bd4cec26ce2fbb) )
 	ROM_RELOAD(       0x10000, 0x40000 )
 
-	ROM_REGION( 0x1a0000, "gfx1", ROMREGION_ERASE00 )	/* blitter data */
+	ROM_REGION( 0x1a0000, "blitter", ROMREGION_ERASE00 )	/* blitter data */
 	ROM_LOAD( "5.12b", 0x000000, 0x100000, CRC(a1f26722) SHA1(604780c1df622a1fb05ea8175acfa774cbe9f6e1) )
 	ROM_LOAD( "4.11b", 0x100000, 0x080000, CRC(f45c24d6) SHA1(0eca68f2ca5722717f27ac0839359966daa2715b) )
 	ROM_LOAD( "3.10b", 0x180000, 0x020000, CRC(8671165b) SHA1(23fad112909e82ac9d25dbb69bf6334f30fa6540) )
@@ -8093,7 +8241,7 @@ ROM_START( hginga )
 	ROM_LOAD( "8101.2b", 0x00000, 0x40000, CRC(77a64b71) SHA1(3426998746c834435ff10a8d1c6502ea64a5f2e2) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_ERASEFF )	/* blitter data */
+	ROM_REGION( 0x180000, "blitter", ROMREGION_ERASEFF )	/* blitter data */
 	ROM_LOAD( "8102.9a",  0x000000, 0x80000, CRC(0074af23) SHA1(39cd978bcc34b27fc896094cf2dd3b7d4596ab00) )
 	ROM_LOAD( "8103.10a", 0x080000, 0x80000, CRC(a3a4ecb5) SHA1(08264cf131fd4c02d8b5925564cf8daa56e0bbc2) )
 	ROM_LOAD( "8104.11a", 0x100000, 0x20000, CRC(24513af9) SHA1(ee1f440b64c1f8c1efc6f0c60e25cab257407865) )
@@ -8155,7 +8303,7 @@ ROM_START( mjmyornt )
 	ROM_LOAD( "7102.3d", 0x00000, 0x40000, CRC(058f779b) SHA1(97253a86b2600c295f67e566ee3c0aa693ed117e) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0x1a0000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x1a0000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "7105.12b", 0x000000, 0x100000, CRC(35ca0079) SHA1(41b950b6fb9b216671d55dc399acb058ec80391f) )
 	ROM_LOAD( "7104.11b", 0x100000, 0x080000, CRC(6d0fd29a) SHA1(9b31668acf1790d9aecd1f8e8c0cb52a7a625d2d) )
 	ROM_LOAD( "7103.10b", 0x180000, 0x020000, CRC(88511487) SHA1(eae3008ecfcfa9aed667e69742b91d8e9f7302ec) )
@@ -8217,7 +8365,7 @@ ROM_START( mjmyuniv )
 	ROM_LOAD( "2.3d", 0x00000, 0x40000, CRC(3284d714) SHA1(be2d5c5129ba9d689e030cb53bc30ed01c941703) )
 	ROM_RELOAD(       0x10000, 0x40000 )
 
-	ROM_REGION( 0x600000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x600000, "blitter", 0 )	/* blitter data */
 	// gap
 	ROM_LOAD( "5.11b", 0x400000, 0x80000, CRC(a287589a) SHA1(58659dd7e019d1d32efeaec548c84a7ded637c50) )
 	ROM_LOAD( "6.12b", 0x480000, 0x80000, CRC(a3475059) SHA1(ec86dcea3314b65d391a970680c021899c16449e) )
@@ -8265,7 +8413,7 @@ ROM_START( akamaru )
 	ROM_LOAD16_BYTE( "50108.1a", 0x100000, 0x080000, CRC(1520ecad) SHA1(eaf44511148252eac0c7a7aab9bd689f87e5a40f) )
 	ROM_LOAD16_BYTE( "50106.1c", 0x100001, 0x080000, CRC(8e081747) SHA1(ef7fb469455671ca7982c2455e8cb113c2750e30) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x480000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "50109.2h", 0x000000, 0x100000, CRC(cdff154d) SHA1(d9cdf159cd55fef0dd1abe07c2f19f05f63b2d1e) )
 	ROM_LOAD( "50112.2d", 0x100000, 0x100000, CRC(7fdd9853) SHA1(d4ada01fa49b2932d02df5eb3d3e7eaad535df0b) )
 	ROM_LOAD( "50110.3h", 0x200000, 0x100000, CRC(06ca4d87) SHA1(c80708df3613d36950ba5cc98d36336533ee7699) )
@@ -8358,7 +8506,7 @@ ROM_START( mjflove )
 	ROM_LOAD( "50004.2e", 0x00000, 0x80000, CRC(20afcdec) SHA1(b3e7d6083dab812a497b69a501e9d993a8ca86e7) )
 	ROM_RELOAD(           0x10000, 0x80000 )
 
-	ROM_REGION( 0x3c0000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x3c0000, "blitter", 0 )	/* blitter data */
 	ROM_LOAD( "50005.2d", 0x000000, 0x80000, CRC(6494d5ad) SHA1(2313ee2f897320715c3de9a0de5c66e06b763a5f) )
 	ROM_LOAD( "50006.2c", 0x080000, 0x80000, CRC(a1d61eb7) SHA1(4755c3843890f4682d5e5804153baba3d98ac2cc) )
 	ROM_LOAD( "50007.2b", 0x100000, 0x80000, CRC(d79ea2f5) SHA1(9c783ee8fe1f646ad2402676c3b924678955a964) )
@@ -8460,7 +8608,7 @@ ROM_START( hparadis )
 	ROM_LOAD( "1012.3e", 0x00000, 0x40000, CRC(bd3a3a8f) SHA1(35d70c2869a93192de7041b5c90b8a8a5e910946) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0x600000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x600000, "blitter", 0 )	/* blitter data */
 	// unused
 	ROM_LOAD( "1015.3a", 0x400000, 0x80000, CRC(ea7b282e) SHA1(4fb33f3a8fe0dd792bcdd90894b90f1ac09ef6a5) )
 	ROM_LOAD( "1014.2a", 0x480000, 0x80000, CRC(5f057c13) SHA1(d17211c3b697b48012018b738cff22fc4743d607) )
@@ -8528,7 +8676,7 @@ ROM_START( hgokou )
 	ROM_LOAD( "1082b.2b", 0x00000, 0x40000, CRC(e33bc5a5) SHA1(cb723cc81b914b45f89236812492c105c93c4e0b) )
 	ROM_RELOAD(           0x10000, 0x40000 )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )	/* blitter data */
+	ROM_REGION( 0x200000, "blitter", 0 )	/* blitter data */
 	// unused
 	ROM_LOAD( "1083.9a",  0x100000, 0x80000, CRC(054200c3) SHA1(7db457fa1f8639d15a6faa3e1e05d4302e7dd281) )
 	ROM_LOAD( "1084.10a", 0x180000, 0x80000, CRC(49f657e8) SHA1(077c553f88a76f826495ad516350a53ce361c6da) )
@@ -8558,8 +8706,9 @@ GAME( 1995, hgokou,   0,        hgokou,   hgokou,   0,        ROT0, "Dynax (Alba
 GAME( 1995, mjdchuka, 0,        mjchuuka, mjchuuka, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, v. D111)",        GAME_NO_COCKTAIL )
 GAME( 1995, nettoqc,  0,        nettoqc,  nettoqc,  0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                       GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
 GAME( 1995, ddenlvrj, 0,        ddenlvrj, ddenlvrj, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)", GAME_NO_COCKTAIL )
+GAME( 1995, ddenlvrk, ddenlvrj, ddenlvrk, ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Korea)",                       GAME_NO_COCKTAIL )
+GAME( 1995, ddenlovb, ddenlvrj, ddenlovr, ddenlovr, 0,        ROT0, "[Dynax] (bootleg)",                           "Don Den Lover Vol. 1 (Korea, bootleg)",              GAME_NO_COCKTAIL )
 GAME( 1996, ddenlovr, ddenlvrj, ddenlovr, ddenlovr, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                   GAME_NO_COCKTAIL )
-GAME( 1996, ddenlovb, ddenlvrj, ddenlovr, ddenlovr, 0,        ROT0, "[Dynax] (bootleg)",                           "Don Den Lover Vol. 1 (Korea, bootleg)",              GAME_NO_COCKTAIL )
 GAME( 1996, hanakanz, 0,        hanakanz, hanakanz, 0,        ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                              GAME_NO_COCKTAIL )
 GAME( 1996, akamaru,  0,        akamaru,  akamaru,  0,        ROT0, "Dynax (Nakanihon licence)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",           GAME_NO_COCKTAIL )
 GAME( 1996, mjflove,  0,        mjflove,  mjflove,  0,        ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                      GAME_NO_COCKTAIL )
