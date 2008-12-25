@@ -4713,7 +4713,7 @@ dumped by sayu
 ***************************************************************************/
 
 ROM_START( hanayara )
-	ROM_REGION( 0x50000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x1d*0x8000, "main", 0 )	// Z80 Code
 	ROM_LOAD( "5501h.2d", 0x00000, 0x20000, CRC(124860b7) SHA1(205459d95f876433a9ca329fe31cfe9b08023baf) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 	ROM_LOAD( "5502h.4d", 0x30000, 0x20000, CRC(93407801) SHA1(63dc3419f97d86221dbdd67b5be41d713364496b) )
