@@ -39,7 +39,7 @@ Emulation Notes:
 
 */
 
-#define MASTER_CLOCK 22118400
+#define MASTER_CLOCK	XTAL_22_1184MHz
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -284,11 +284,25 @@ static PALETTE_INIT(carrera)
 		palette_set_color_rgb(machine, x, pal3bit(src[x] >> 0), pal3bit(src[x] >> 3), pal2bit(src[x] >> 6));
 }
 
+
+static const mc6845_interface mc6845_intf =
+{
+	"main",		/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	NULL,		/* callback for display state changes */
+	NULL,		/* HSYNC callback */
+	NULL		/* VSYNC callback */
+};
+
+
 static MACHINE_DRIVER_START( carrera )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK / 6)
+	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
+	MDRV_CPU_IO_MAP(io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
@@ -299,13 +313,13 @@ static MACHINE_DRIVER_START( carrera )
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 
+	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK / 16, mc6845_intf)
+
 	MDRV_GFXDECODE(carrera)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT(carrera)
 
 	MDRV_VIDEO_UPDATE(carrera)
-
-	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -314,9 +328,6 @@ static MACHINE_DRIVER_START( carrera )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
-
-
-
 
 
 ROM_START( carrera )

@@ -111,6 +111,7 @@ enum
 	XTAL_21_3MHz  		= 21300000,
 	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling, some Data East 90's games */
 	XTAL_22MHz   		= 22000000,
+	XTAL_22_1184MHz		= 22118400,
 	XTAL_24MHz   		= 24000000,		/* Mario, 80's Data East games, 80's Konami games */
 	XTAL_24_576MHz  	= 24576000,		/* Pole Position h/w, Model 3 CPU board */
 	XTAL_25MHz   		= 25000000,		/* Namco System 22, Taito GNET, Dogyuun h/w */
