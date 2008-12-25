@@ -1658,7 +1658,7 @@ static int joystick_map_parse(const char *mapstring, joystick_map *map)
 			for (colnum = 0; colnum < 9; colnum++)
 			{
 				/* if we're at the end of row, copy previous to the middle, then apply left/right symmetry */
-				if (*mapstring == 0 || *mapstring == '.')
+				if (colnum > 0 && (*mapstring == 0 || *mapstring == '.'))
 				{
 					int symmetric = (colnum >= 5);
 					UINT8 val = map->map[rownum][symmetric ? (8 - colnum) : (colnum - 1)];
