@@ -225,6 +225,18 @@ static GFXDECODE_START( usgames )
 GFXDECODE_END
 
 
+static const mc6845_interface mc6845_intf =
+{
+	"main",		/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	NULL,		/* callback for display state changes */
+	NULL,		/* HSYNC callback */
+	NULL		/* VSYNC callback */
+};
+
 
 static MACHINE_DRIVER_START( usg32 )
 
@@ -250,7 +262,7 @@ static MACHINE_DRIVER_START( usg32 )
 	MDRV_VIDEO_START(usgames)
 	MDRV_VIDEO_UPDATE(usgames)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_18MHz / 16, mc6845_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
