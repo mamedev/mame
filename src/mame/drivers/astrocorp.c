@@ -446,4 +446,4 @@ static DRIVER_INIT( showhanc )
 }
 
 GAME( 1999?, showhand, 0,        showhand, showhand, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)", 0 )
-GAME( 1999?, showhanc, showhand, showhanc, showhanc, showhanc, ROT0, "Astro Corp.", "Show Hand (China)", 0 )
+GAME( 1999?, showhanc, showhand, showhanc, showhanc, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue",  0 )

@@ -7385,6 +7385,7 @@ Other Sun games
 	DRIVER( mjchuuka )	/* "???" (c) 1998 Dynax */
 	DRIVER( mjreach1 )	/* "526" Mahjong Reach Ippatsu 1998 Nihon System/Dynax */
 	DRIVER( cafebrk )	/* "528" Mahjong Cafe Break (C) 1999 Nakanihon / Dynax */
+	DRIVER( jongtei )	/* "532" Mahjong Jong-Tei (C) 1999 Dynax */
 
 	DRIVER( pkgnsh )	/* "505" Pachinko Gindama Shoubu 1998 (Japan) */
 	DRIVER( pkgnshdx )	/* "522" Pachinko Gindama Shoubu DX 1998 (Japan) */
