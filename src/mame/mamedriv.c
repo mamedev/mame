@@ -5888,7 +5888,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( samsh5sh )	/* 0272 (c) 2003 Playmore */
 	DRIVER( samsh5sn )	/* 0272 (c) 2003 Playmore */
 
-	/* The BreezaSoft games don't have proper ID codes */
+	/* The BrezzaSoft games don't have proper ID codes */
 	DRIVER( jockeygp )
 	DRIVER( vliner )
 	DRIVER( vlinero )

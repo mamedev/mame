@@ -7888,10 +7888,10 @@ GAME( 2002, rotd,     neogeo,   neogeo,   neogeo,   rotd,     ROT0, "Evoga / Pla
 GAME( 2002, matrim,   neogeo,   neogeo,   neogeo,   matrim,   ROT0, "Noise Factory / Atlus", "Matrimelee / Shin Gouketsuji Ichizoku Toukon", 0 )
 GAME( 2002, matrimbl, matrim,   neogeo,   neogeo,   matrimbl, ROT0, "bootleg", "Matrimelee / Shin Gouketsuji Ichizoku Toukon (bootleg)", 0 )
 
-/* Breezasoft */
+/* BrezzaSoft */
 GAME( 2001, jockeygp, neogeo,   neogeo,   jockeygp, jockeygp, ROT0, "Sun Amusement / BrezzaSoft", "Jockey Grand Prix", 0 )
-GAME( 2001, vliner,   neogeo,   neogeo,   vliner,   vliner,   ROT0, "Dyna / BreezaSoft", "V-Liner (set 1)", 0 )
-GAME( 2001, vlinero,  vliner,   neogeo,   vliner,   vliner,   ROT0, "Dyna / BreezaSoft", "V-Liner (set 2)", 0 )
+GAME( 2001, vliner,   neogeo,   neogeo,   vliner,   vliner,   ROT0, "Dyna / BrezzaSoft", "V-Liner (set 1)", 0 )
+GAME( 2001, vlinero,  vliner,   neogeo,   vliner,   vliner,   ROT0, "Dyna / BrezzaSoft", "V-Liner (set 2)", 0 )
 
 /* Kyle Hodgetts */
 GAME( 2000, diggerma, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Kyle Hodgetts", "Digger Man (prototype)", 0 )
