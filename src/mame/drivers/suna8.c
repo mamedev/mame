@@ -45,6 +45,8 @@ Notes:
 #include "sound/samples.h"
 #include "includes/suna8.h"
 
+#define SUNA8_MASTER_CLOCK		XTAL_24MHz
+
 /***************************************************************************
 
 
@@ -1483,12 +1485,12 @@ static const samples_interface suna8_samples_interface =
 static MACHINE_DRIVER_START( hardhead )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 24000000 / 4)			/* ? */
+	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)			/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_readmem,hardhead_writemem)
 	MDRV_CPU_IO_MAP(hardhead_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* No NMI */
 
-	MDRV_CPU_ADD("audio", Z80, 24000000 / 4)					/* ? */
+	MDRV_CPU_ADD("audio", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
 	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
@@ -1510,11 +1512,11 @@ static MACHINE_DRIVER_START( hardhead )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM3812, 4000000)
+	MDRV_SOUND_ADD("ym", YM3812, SUNA8_MASTER_CLOCK / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD("ay", AY8910, 24000000 / 16)
+	MDRV_SOUND_ADD("ay", AY8910, SUNA8_MASTER_CLOCK / 16)
 	MDRV_SOUND_CONFIG(hardhead_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
@@ -1537,12 +1539,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rranger )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 24000000 / 4)					/* ? */
+	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(rranger_readmem,rranger_writemem)
 	MDRV_CPU_IO_MAP(rranger_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ & NMI ! */
 
-	MDRV_CPU_ADD("audio", Z80, 24000000 / 4)					/* ? */
+	MDRV_CPU_ADD("audio", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(rranger_sound_readmem,rranger_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* NMI = retn */
 
@@ -1563,11 +1565,11 @@ static MACHINE_DRIVER_START( rranger )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
+	MDRV_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 4000000)
+	MDRV_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
@@ -1593,15 +1595,15 @@ static INTERRUPT_GEN( brickzn_interrupt )
 static MACHINE_DRIVER_START( brickzn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 24000000 / 4)		/* SUNA PROTECTION BLOCK */
+	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA PROTECTION BLOCK */
 	MDRV_CPU_PROGRAM_MAP(brickzn_readmem,brickzn_writemem)
 //  MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt, 2)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// nmi breaks ramtest but is needed!
 
-	MDRV_CPU_ADD("sound", Z80, 24000000 / 4)	/* Z0840006PSC */
+	MDRV_CPU_ADD("sound", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
 	MDRV_CPU_PROGRAM_MAP(brickzn_sound_readmem,brickzn_sound_writemem)
 
-	MDRV_CPU_ADD("pcm", Z80, 24000000 / 4)	/* Z0840006PSC */
+	MDRV_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
 	MDRV_CPU_PROGRAM_MAP(brickzn_pcm_readmem,brickzn_pcm_writemem)
 	MDRV_CPU_IO_MAP(brickzn_pcm_io_map,0)
 
@@ -1622,12 +1624,12 @@ static MACHINE_DRIVER_START( brickzn )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM3812, 4000000)
+	MDRV_SOUND_ADD("ym", YM3812, SUNA8_MASTER_CLOCK / 6)
 	MDRV_SOUND_CONFIG(brickzn_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD("ay", AY8910, 24000000 / 16)
+	MDRV_SOUND_ADD("ay", AY8910, SUNA8_MASTER_CLOCK / 16)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.33)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.33)
 
@@ -1695,12 +1697,12 @@ static const ay8910_interface starfigh_ay8910_interface =
 static MACHINE_DRIVER_START( starfigh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 24000000 / 4)					/* ? */
+	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(starfigh_readmem,starfigh_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt,2)	/* IRQ & NMI */
 
 	/* The sound section is identical to that of hardhead */
-	MDRV_CPU_ADD("audio", Z80, 24000000 / 4)					/* ? */
+	MDRV_CPU_ADD("audio", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
 	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
@@ -1722,11 +1724,11 @@ static MACHINE_DRIVER_START( starfigh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM3812, 4000000)
+	MDRV_SOUND_ADD("ym", YM3812, SUNA8_MASTER_CLOCK / 6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD("ay", AY8910, 24000000 / 16)
+	MDRV_SOUND_ADD("ay", AY8910, SUNA8_MASTER_CLOCK / 16)
 	MDRV_SOUND_CONFIG(starfigh_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
@@ -1754,11 +1756,11 @@ static INTERRUPT_GEN( sparkman_interrupt )
 static MACHINE_DRIVER_START( sparkman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 24000000 / 4)					/* ? */
+	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(sparkman_readmem,sparkman_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(sparkman_interrupt,2)	/* IRQ & NMI */
 
-	MDRV_CPU_ADD("audio", Z80, 24000000 / 4)				/* ? */
+	MDRV_CPU_ADD("audio", Z80, SUNA8_MASTER_CLOCK / 4)				/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
 	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
@@ -1780,11 +1782,11 @@ static MACHINE_DRIVER_START( sparkman )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM3812, 4000000)
+	MDRV_SOUND_ADD("ym", YM3812, SUNA8_MASTER_CLOCK / 6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD("ay", AY8910, 24000000 / 16)
+	MDRV_SOUND_ADD("ay", AY8910, SUNA8_MASTER_CLOCK / 16)
 	MDRV_SOUND_CONFIG(hardhead_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
