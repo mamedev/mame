@@ -8045,6 +8045,7 @@ Other Sun games
 	DRIVER( bmcbowl )	/* (c) 1994 BMC */
 	DRIVER( koftball )  /* (c) 1995 BMC */
 	DRIVER( pitboss )	/* (c) 1983 Merit */
+	DRIVER( pitbossa )	/* (c) 1983 Merit */
 	DRIVER( casino5 )	/* (c) 1983 Merit */
 	DRIVER( trvwzh )	/* (c) 1985 Merit */
 	DRIVER( trvwzha )	/* (c) 1985 Merit */
