@@ -2033,7 +2033,7 @@ profiler_mark(PROFILER_INPUT);
 
 	/* perform the mouse hit test */
 	mouse_target = ui_input_find_mouse(machine, &mouse_target_x, &mouse_target_y, &mouse_button);
-	if (mouse_button)
+	if (mouse_button && mouse_target)
 	{
 		const char *tag = NULL;
 		input_port_value mask;
