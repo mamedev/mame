@@ -1000,6 +1000,11 @@
     - Created inputs from the scratch for jolycdib.
     - Updated technical notes.
 
+    [2008-12-26]
+    - Correctly setup the MC6845 device for all systems.
+    - Added common MC6845 device interface.
+    - Eliminated the screen size & visible area parameters to Magic Card 2.
+
 
     *** TO DO ***
 

@@ -578,6 +578,15 @@
     - Added new games: Maverik, Brasil 89 & Poker'91.
     - Reworked the sets parent-clone relationship (still in progress).
 
+    [2008-12-26]
+
+    - Correctly setup the MC6845 device for all systems.
+    - Added common MC6845 device interface.
+    - Merged witchcrd and sloco93 machine drivers.
+    - Added/corrected the 50/60 Hz. DIP switches to all games.
+	  The 50hz mode needs to be corrected. Some games as most bsuerte sets have
+	  the 50/60 Hz. DIP switch connection patched.
+
 
     TODO:
 
