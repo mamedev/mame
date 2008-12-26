@@ -973,7 +973,7 @@ static INPUT_PORTS_START( goldnpkr )
 	PORT_DIPNAME( 0x10, 0x00, "Jacks or Better" )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "50hz/60hz" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )			PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, "50hz" )
 	PORT_DIPSETTING(    0x00, "60hz" )
 	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )		PORT_DIPLOCATION("SW1:3")	/* listed in the manual as "Play Mode" */
@@ -1112,9 +1112,9 @@ static INPUT_PORTS_START( pottnpkr )
 	PORT_DIPNAME( 0x10, 0x00, "Jacks or Better" )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
 	/* listed in the manual as "Play Mode" */
 	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x40, "Manual" )			/*  listed in the manual as "Out Play" */
@@ -1313,9 +1313,9 @@ static INPUT_PORTS_START( goodluck )
 	PORT_DIPNAME( 0x10, 0x00, "Jacks or Better" )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
 	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x40, "Manual" )
 	PORT_DIPSETTING(    0x00, "Auto" )
@@ -1690,6 +1690,32 @@ static INPUT_PORTS_START( sloco93 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, "1 Coin - 10 Credit / 1 Note - 120 Credits" )
 	PORT_DIPSETTING(    0x00, "1 Coin - 100 Credits / 1 Note - 100 Credits" )
+
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( royale )
@@ -1811,9 +1837,9 @@ static INPUT_PORTS_START( bsuerte )
 	PORT_DIPNAME( 0x10, 0x00, "Par Simple" )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
 	PORT_DIPNAME( 0x40, 0x00, "Modo de Pago" )		PORT_DIPLOCATION("SW1:3")	/* left as 'auto' */
 	PORT_DIPSETTING(    0x40, "Manual" )
 	PORT_DIPSETTING(    0x00, "Auto" )
@@ -2110,6 +2136,23 @@ static const pia6821_interface pottnpkr_pia1_intf =
 };
 
 
+/************************
+*    CRTC Interface    *
+************************/
+
+static const mc6845_interface mc6845_intf =
+{
+	"main",	/* screen we are acting on */
+	8,		/* number of pixels per video memory address */
+	NULL,	/* before pixel update callback */
+	NULL,	/* row update callback */
+	NULL,	/* after pixel update callback */
+	NULL,	/* callback for display state changes */
+	NULL,	/* HSYNC callback */
+	NULL	/* VSYNC callback */
+};
+
+
 /**************************************
 *       Discrete Sound Routines       *
 ***************************************
@@ -2267,7 +2310,7 @@ static MACHINE_DRIVER_START( goldnpkr_base )
 	MDRV_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
 
-	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 68B45 or 6845s @ CPU clock */
 
 	MDRV_GFXDECODE(goldnpkr)
 	MDRV_PALETTE_INIT(goldnpkr)
@@ -2313,24 +2356,6 @@ static MACHINE_DRIVER_START( witchcrd )
 	MDRV_CPU_PROGRAM_MAP(witchcrd_map, 0)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(witchcrd)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( sloco93 )
-
-	MDRV_IMPORT_FROM(goldnpkr_base)
-
-	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_SIZE((39+1)*8, (31+1)*8)
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 1*8, 29*8-1)
-
 	MDRV_PALETTE_INIT(witchcrd)
 
 	/* sound hardware */
@@ -3240,8 +3265,8 @@ GAME(  1991, witchcrd, 0,        witchcrd, witchcrd, pottnpkr, ROT0,   "Video Kl
 GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, pottnpkr, ROT0,   "Unknown",                   "Witch Card (spanish, witch game, set 1)", 0 )
 GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, pottnpkr, ROT0,   "Unknown",                   "Witch Card (spanish, witch game, set 2)", 0 )
 GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, pottnpkr, ROT0,   "Unknown",                   "Witch Card (english, no witch game)",     0 )
-GAME(  1993, sloco93,  0,        sloco93,  sloco93,  pottnpkr, ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 1)",          0 )
-GAME(  1993, sloco93a, sloco93,  sloco93,  sloco93,  pottnpkr, ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 2)",          0 )
+GAME(  1993, sloco93,  0,        witchcrd, sloco93,  pottnpkr, ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 1)",          0 )
+GAME(  1993, sloco93a, sloco93,  witchcrd, sloco93,  pottnpkr, ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 2)",          0 )
 GAME(  198?, maverik,  0,        witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Maverik",                                 0 )
 GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Brasil 89",                               0,                layout_goldnpkr )
 GAME(  1991, poker91,  0,        witchcrd, poker91,  pottnpkr, ROT0,   "Unknown",                   "Poker 91",                                0 )
