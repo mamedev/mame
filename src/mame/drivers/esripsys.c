@@ -17,11 +17,11 @@
         * Hold '*' during the game to access the operator menu.
 
     Todo:
-        * TMS5220 speech? The game sends speech play commands to the sound
-        CPU but they're ignored. The speech data seems to be stored in
-        the upper half of the (banked) sound data ROMs but this is never
-        accessed. Maybe the speech data was unfinished and only the later
-        version of Turbo Sub has speech?
+        * TMS5220 speech. The game is sending speech play commands to
+        the sound CPU but any speech code greater than 2 is ignored (see $EC26).
+        I think most of the speech data is stored in the upper half of the
+        banked sound data ROMs but I don't know how or when the ROM
+        bank is switched :/
 
         * Determine if line drop outs occur on real hardware. Overclocking
         the RIP CPU eliminates them.
@@ -68,12 +68,12 @@ static UINT8 dac_msb;
 static UINT8 dac_vol;
 static UINT8 tms_data;
 
-/* Video */
+/* Frame/Video CPU shared RAM */
 static UINT8 *fdt_a;
 static UINT8 *fdt_b;
 static int _fasel = 0;
 static int _fbsel = 1;
-//static int fig = 0;
+
 
 /*************************************
  *
@@ -88,7 +88,7 @@ static void ptm_irq(running_machine *machine, int state)
 
 static const ptm6840_interface ptm_intf =
 {
-	2000000,
+	XTAL_8MHz / 4,
 	{ 0, 0, 0 },
 	{ NULL, NULL, NULL },
 	ptm_irq
@@ -217,18 +217,18 @@ static WRITE8_HANDLER( frame_w )
 
 static READ8_HANDLER( fdt_r )
 {
- 	if (!_fasel)
- 		return fdt_b[offset];
- 	else
- 		return fdt_a[offset];
+	if (!_fasel)
+		return fdt_b[offset];
+	else
+		return fdt_a[offset];
 }
 
 static WRITE8_HANDLER( fdt_w )
 {
- 	if (!_fasel)
- 		fdt_b[offset] = data;
- 	else
- 		fdt_a[offset] = data;
+	if (!_fasel)
+		fdt_b[offset] = data;
+	else
+		fdt_a[offset] = data;
 }
 
 
@@ -305,7 +305,7 @@ static READ8_HANDLER( g_iobus_r )
 	switch (g_ioaddr & 0x7f)
 	{
 		case 0:
-			return s_to_g_latch2;
+			return s_to_g_latch2 & 0x3f;
 		case 3:
 			return s_to_g_latch1;
 		case 5:
@@ -536,7 +536,7 @@ static WRITE8_HANDLER( s_200f_w )
 		cpu_set_input_line(space->machine->cpu[ESRIPSYS_SOUND_CPU], M6809_IRQ_LINE, CLEAR_LINE);
 	}
 
-	if (!(s_to_g_latch2 & 0x40) && (data & 0x40))
+	if (!(s_to_g_latch2 & 0x80) && (data & 0x80))
 		u56b = 1;
 
 	s_to_g_latch2 = data;
@@ -561,6 +561,7 @@ static READ8_HANDLER( tms5220_r )
 	return 0xff;
 }
 
+/* TODO: Implement correctly using the state PROM */
 static WRITE8_HANDLER( tms5220_w )
 {
 	if (offset == 0)
@@ -714,7 +715,7 @@ static MACHINE_DRIVER_START( esripsys )
 	MDRV_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
 	MDRV_CPU_PROGRAM_MAP(frame_cpu_map, 0)
 
-	MDRV_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz/4)
+	MDRV_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(video_cpu_map, 0)
 	MDRV_CPU_CONFIG(rip_config)
 
@@ -987,5 +988,5 @@ ROM_END
  *
  *************************************/
  
-GAME( 1985, turbosub, 0,        esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", 0 )
-GAME( 1985, turbosba, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", 0 )
+GAME( 1985, turbosub, 0,        esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", GAME_IMPERFECT_SOUND )
+GAME( 1985, turbosba, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", GAME_IMPERFECT_SOUND )
