@@ -1133,7 +1133,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( ncb3 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( cmasterb )
@@ -1404,7 +1404,7 @@ static MACHINE_DRIVER_START( ncb3 )
 
 	MDRV_GFXDECODE(ncb3)
 	MDRV_PALETTE_LENGTH(256)
-//  MDRV_PALETTE_INIT(cm)
+	MDRV_PALETTE_INIT(cm)
 
 	MDRV_NVRAM_HANDLER(goldstar)
 
@@ -1724,13 +1724,13 @@ ROM_START( ncb3 )
 	ROM_LOAD( "main_7.256", 0x10000, 0x08000, CRC(dcf97517) SHA1(0a29696e0464c8878c499b1786a17080fd088a72) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "1.764", 0x00000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
-	ROM_LOAD( "5.764", 0x02000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
-	ROM_LOAD( "6.764", 0x04000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
-	ROM_LOAD( "7.764", 0x06000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "7.764", 0x00000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "6.764", 0x02000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "5.764", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "1.764", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
 
-	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )
-	ROM_LOAD( "colour_proms", 0x000, 0x200, NO_DUMP )
+	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )	/* PROM from chryigld. need verification */
+	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
 	/* no oki on this pcb? */
@@ -1759,14 +1759,14 @@ ROM_START( cb3 )
 	ROM_LOAD( "main_7.256", 0x10000, 0x08000, CRC(dcf97517) SHA1(0a29696e0464c8878c499b1786a17080fd088a72) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "main_4.764", 0x00000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
-	ROM_LOAD( "main_3.764", 0x02000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
-	/* 2 roms missing - roms below taken from above set */
-	ROM_LOAD( "6.764", 0x04000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
-	ROM_LOAD( "7.764", 0x06000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	/* 2 roms missing - the first 2 roms below taken from above set */
+	ROM_LOAD( "7.764",      0x00000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "6.764",      0x02000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "main_3.764", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "main_4.764", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
 
-	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )
-	ROM_LOAD( "colour_proms", 0x000, 0x200, NO_DUMP )
+	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )	/* PROM from chryigld. need verification */
+	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
 	/* no oki on this pcb? */
@@ -2058,8 +2058,8 @@ GAME( 199?, chryigld, goldstar, chryigld, chryigld, chryigld, ROT0, "bootleg",  
 GAME( 199?, chry10,   goldstar, chryigld, goldstar, chry10,   ROT0, "bootleg",     "Cherry 10 (bootleg of Golden Star)",     GAME_NOT_WORKING )
 
 // are these really dyna, or bootlegs?
-GAME( 19??, ncb3,     goldstar, ncb3,     ncb3,     0,        ROT0, "Dyna",        "Cherry Bonus III (Version 1.40)",        GAME_NOT_WORKING | GAME_WRONG_COLORS ) // set was labeled 'new cherry bonus 3' but there is no 'new' in the gfx roms
-GAME( 19??, cb3,      goldstar, ncb3,     goldstar, 0,        ROT0, "Dyna",        "Cherry Bonus III",                       GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_NO_SOUND )
+GAME( 19??, ncb3,     goldstar, ncb3,     ncb3,     0,        ROT0, "Dyna",        "Cherry Bonus III (Version 1.40)",        GAME_NOT_WORKING ) // set was labeled 'new cherry bonus 3' but there is no 'new' in the gfx roms
+GAME( 19??, cb3,      goldstar, ncb3,     goldstar, 0,        ROT0, "Dyna",        "Cherry Bonus III",                       GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // cherry master hardware has a rather different mem map, but is basically the same
 GAME( 198?, cmv801,   0,        cm,       cmv801,   0,        ROT0, "Corsica",     "Cherry Master (Corsica, v8.01)",         GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // says ED-96 where the manufacturer is on some games..
