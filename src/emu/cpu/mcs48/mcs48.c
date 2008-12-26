@@ -744,12 +744,10 @@ static void mcs48_init(const device_config *device, cpu_irq_callback irqcallback
     RAM
 -------------------------------------------------*/
 
-#if (HAS_I8035 || HAS_MB8884)
 static CPU_INIT( i8035 )
 {
 	mcs48_init(device, irqcallback, 0x0);
 }
-#endif
 
 
 /*-------------------------------------------------
@@ -758,12 +756,10 @@ static CPU_INIT( i8035 )
     RAM
 -------------------------------------------------*/
 
-#if (HAS_I8048 || HAS_I8648 || HAS_I8748 || HAS_N7751)
 static CPU_INIT( i8048 )
 {
 	mcs48_init(device, irqcallback, 0x400);
 }
-#endif
 
 
 /*-------------------------------------------------
@@ -772,12 +768,10 @@ static CPU_INIT( i8048 )
     RAM
 -------------------------------------------------*/
 
-#if (HAS_I8039)
 static CPU_INIT( i8039 )
 {
 	mcs48_init(device, irqcallback, 0x0);
 }
-#endif
 
 
 /*-------------------------------------------------
@@ -786,12 +780,10 @@ static CPU_INIT( i8039 )
     RAM
 -------------------------------------------------*/
 
-#if (HAS_I8049 || HAS_I8749 || HAS_M58715)
 static CPU_INIT( i8049 )
 {
 	mcs48_init(device, irqcallback, 0x800);
 }
-#endif
 
 
 /*-------------------------------------------------
@@ -1132,7 +1124,6 @@ static CPU_GET_INFO( mcs48 )
     CPU-SPECIFIC CONTEXT ACCESS
 ***************************************************************************/
 
-#if (HAS_I8035)
 CPU_GET_INFO( i8035 )
 {
 	switch (state)
@@ -1144,9 +1135,7 @@ CPU_GET_INFO( i8035 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif
 
-#if (HAS_I8048)
 CPU_GET_INFO( i8048 )
 {
 	switch (state)
@@ -1159,9 +1148,7 @@ CPU_GET_INFO( i8048 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif
 
-#if (HAS_I8648)
 CPU_GET_INFO( i8648 )
 {
 	switch (state)
@@ -1174,9 +1161,7 @@ CPU_GET_INFO( i8648 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif
 
-#if (HAS_I8748)
 CPU_GET_INFO( i8748 )
 {
 	switch (state)
@@ -1189,9 +1174,7 @@ CPU_GET_INFO( i8748 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif
 
-#if (HAS_MB8884)
 CPU_GET_INFO( mb8884 )
 {
 	switch (state)
@@ -1203,9 +1186,7 @@ CPU_GET_INFO( mb8884 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif
 
-#if (HAS_N7751)
 CPU_GET_INFO( n7751 )
 {
 	switch (state)
@@ -1218,11 +1199,9 @@ CPU_GET_INFO( n7751 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif
 
 
 
-#if (HAS_I8039)
 CPU_GET_INFO( i8039 )
 {
 	switch (state)
@@ -1234,9 +1213,7 @@ CPU_GET_INFO( i8039 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif
 
-#if (HAS_I8049)
 CPU_GET_INFO( i8049 )
 {
 	switch (state)
@@ -1249,9 +1226,7 @@ CPU_GET_INFO( i8049 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif
 
-#if (HAS_I8749)
 CPU_GET_INFO( i8749 )
 {
 	switch (state)
@@ -1264,9 +1239,7 @@ CPU_GET_INFO( i8749 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif
 
-#if (HAS_M58715)
 CPU_GET_INFO( m58715 )
 {
 	switch (state)
@@ -1279,4 +1252,3 @@ CPU_GET_INFO( m58715 )
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
-#endif

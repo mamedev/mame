@@ -25,7 +25,7 @@ OBJDIRS += \
 # specify required CPU cores (none)
 #-------------------------------------------------
 
-CPUS += I8049
+CPUS += MCS48
 CPUS += Z80
 
 

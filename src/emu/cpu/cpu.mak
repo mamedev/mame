@@ -658,19 +658,9 @@ $(CPUOBJ)/i8085/i8085.o:	$(CPUSRC)/i8085/i8085.c \
 # Intel MCS-48 (8039 and derivatives)
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_I8035=$(if $(filter I8035,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8048=$(if $(filter I8048,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8648=$(if $(filter I8648,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8748=$(if $(filter I8748,$(CPUS)),1,0)
-CPUDEFS += -DHAS_MB8884=$(if $(filter MB8884,$(CPUS)),1,0)
+CPUDEFS += -DHAS_MCS48=$(if $(filter MCS48,$(CPUS)),1,0)
 
-CPUDEFS += -DHAS_I8039=$(if $(filter I8039,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8049=$(if $(filter I8049,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8749=$(if $(filter I8749,$(CPUS)),1,0)
-CPUDEFS += -DHAS_N7751=$(if $(filter N7751,$(CPUS)),1,0)
-CPUDEFS += -DHAS_M58715=$(if $(filter M58715,$(CPUS)),1,0)
-
-ifneq ($(filter I8035 I8048 I8648 I8748 MB8884 I8039 I8049 I8749 N7751 M58715,$(CPUS)),)
+ifneq ($(filter MCS48,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mcs48
 CPUOBJS += $(CPUOBJ)/mcs48/mcs48.o
 DBGOBJS += $(CPUOBJ)/mcs48/mcs48dsm.o
