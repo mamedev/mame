@@ -157,6 +157,33 @@ static WRITE8_HANDLER( videoram2_w )
 	videoram2[offset] = data;
 }
 
+static WRITE8_HANDLER( unknown_w )
+{
+	switch (offset)
+	{
+		case 0: // different values
+			break;
+		case 1: // set to 0 at the boot and set to 1 continuesly
+			break;
+		case 2: // only set to 0 at the boot
+			break;
+		case 3: // not used
+			break;
+		case 4: // only set to 1 after the tests
+			break;
+		case 5: // only set to 0 at the boot
+			break;
+		case 6: // different values
+			break;
+		case 7: // 07 and 08 are like a counter: every write in 08 is a incremented value (from 00 to ff)
+			break;
+		case 8: // when this value is 0xff the next value is 00 and port 07 is incremented (from 00 to ff)
+			break;
+		case 9: // different values
+			break;
+	}
+}
+
 static ADDRESS_MAP_START( jongkyo_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM) AM_WRITE(videoram2_w) // wrong, this doesn't seem to be video ram on write..
 	AM_RANGE(0x4000, 0x6bff) AM_READ(SMH_ROM) // fixed rom
@@ -177,6 +204,7 @@ static ADDRESS_MAP_START( jongkyo_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0") AM_WRITE(mux_w)
 	// W 11 select keyboard row (fe fd fb f7)
 	AM_RANGE(0x40, 0x45) AM_WRITE(bank_select_w)
+	AM_RANGE(0x46, 0x4f) AM_WRITE(unknown_w)
 ADDRESS_MAP_END
 
 /*
