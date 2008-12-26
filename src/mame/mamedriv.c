@@ -7420,6 +7420,7 @@ Other Sun games
 	DRIVER( cmaster )	/* (c) 1991 Dyna */
 	DRIVER( cmasterb )	/* (c) 1991 Dyna */
 	DRIVER( lucky8 )	/* (c) 1989 Wing Co.Ltd */
+	DRIVER( lucky8a )	/* (c) 1989 Wing Co.Ltd */
  	DRIVER( cpoker )	/* (c) 1993? IGS */
  	DRIVER( cpokert )	/* (c) 1993? Tuning */
 	DRIVER( csk227it )	/* (c) 198? IGS */
