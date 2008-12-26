@@ -482,6 +482,29 @@ static ADDRESS_MAP_START( mjapinky_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( janho_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE(1) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
+ADDRESS_MAP_END
+
+
+/* this CPU makes little sense - what is it for? why so many addresses accessed?
+  -- it puts a value in shared ram to allow the main CPU to boot, then.. ?
+*/
+static ADDRESS_MAP_START( janoh_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
+	AM_RANGE( 0x4100, 0x413f ) AM_RAM
+	AM_RANGE( 0x6000, 0x607f ) AM_RAM
+	AM_RANGE( 0x7000, 0x7000 ) AM_READ(SMH_NOP)
+	AM_RANGE( 0x7200, 0x7200 ) AM_WRITE(SMH_NOP)
+	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_SHARE(1)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( janoh_sub_iomap, ADDRESS_SPACE_IO, 8 )
+ADDRESS_MAP_END
+
 /****************************************************************************
                                 Janputer '96
 ****************************************************************************/
@@ -2245,6 +2268,20 @@ static MACHINE_DRIVER_START( royalmah )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( janoh )
+
+	MDRV_IMPORT_FROM(royalmah)
+	MDRV_CPU_REPLACE("main", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(janho_map,0)
+
+	MDRV_CPU_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(janoh_sub_map,0)
+	MDRV_CPU_IO_MAP(janoh_sub_iomap,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( dondenmj )
 	MDRV_IMPORT_FROM(royalmah)
 	MDRV_CPU_REPLACE("main", Z80, 8000000/2)	/* 4 MHz ? */
@@ -3196,6 +3233,61 @@ ROM_START( cafebrk )
 	ROM_LOAD( "ns528a2.4j", 0x200, 0x200, CRC(b5a3a569) SHA1(8e31c600ae24b672b614908ee920a333ed600941) )
 ROM_END
 
+/*
+
+Janou
+(c)1985 Toaplan (distributed by SNK)
+
+RM-1C (modified Royal Mahjong hardware)
+
+CPU: Z80x2 (on subboard)
+Sound: AY-3-8910
+OSC: 18.432MHz
+
+ROMs:
+JO1
+JO2
+JO3
+JO4
+JO5
+JO6
+JO7
+
+
+Subboard GX002A
+C8 (2764)
+18S030.44
+18S030.45
+
+HM6116
+MSM2128x4
+
+
+dumped by sayu
+
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+
+ROM_START( janoha )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "jo1",       0x0000, 0x1000, CRC(1a7dd28d) SHA1(347085c2b305861e4a4a602c3b3b0c57889f7f45) )
+	ROM_LOAD( "jo2",       0x1000, 0x1000, CRC(e92ca79f) SHA1(9714ebee954dd98cf98b340e1dc424a4b2a78c36) )
+	ROM_LOAD( "jo3",       0x2000, 0x1000, CRC(8e349cac) SHA1(27442fc97750ceb6e928682ee545a9ebff4511ac) )
+	ROM_LOAD( "jo4",       0x3000, 0x1000, CRC(f2bcac9a) SHA1(46eea014edf9f260b35b5f9bd0fd0a0236da16ef) )
+	ROM_LOAD( "jo5",       0x4000, 0x1000, CRC(16c09c73) SHA1(ea712f9ca3200ca27434e4200187b488e24f4c65) )
+	ROM_LOAD( "jo6",       0x5000, 0x1000, CRC(92687327) SHA1(4fafba5881dca2a147616d94dd055eba6aa3c653) )
+	ROM_LOAD( "jo7",       0x6000, 0x1000, CRC(f9a3fea6) SHA1(898c030b34f7432568e080e2814619d836d98a2f) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "c8",       0x0000, 0x2000, CRC(a37ed493) SHA1(a3246c635ee77f96afd96285ef7091f6fc0d7636) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "18s030.45",  0x0000, 0x0020, CRC(c6a24ae9) SHA1(ec7a4dee2fec2f7151ddc39e40a3eee6a1c4992d) )
+	ROM_LOAD( "18s030.44",  0x0020, 0x0020, CRC(d4eabf78) SHA1(f14778b552ff483e36e7c30ee67e8e2075790ea2) )
+ROM_END
+
 
 static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x8000 );	}
 
@@ -3212,7 +3304,8 @@ GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0, "Nichibutsu
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, 0,        ROT0, "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, 0,        ROT0, "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, 0,        ROT0, "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
-GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh",                                GAME_NOT_WORKING )
+GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 1)",                                GAME_NOT_WORKING )
+GAME( 1982,  janoha,   janoh,    janoh,    royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 2)", GAME_NOT_WORKING ) // this one is complete?
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, 0,        ROT0, "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  ippatsu,  ROT0, "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   0,        ROT0, "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
