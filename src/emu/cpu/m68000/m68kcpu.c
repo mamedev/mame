@@ -526,7 +526,7 @@ static CPU_EXECUTE( m68k )
 	m68ki_cpu_core *m68k = device->token;
 
 	/* Set our pool of clock cycles available */
-	SET_CYCLES(m68k, cycles);
+	m68k->remaining_cycles = cycles;
 	m68k->initial_cycles = cycles;
 
 	/* See if interrupts came in */
@@ -553,20 +553,20 @@ static CPU_EXECUTE( m68k )
 			/* Read an instruction and call its handler */
 			m68k->ir = m68ki_read_imm_16(m68k);
 			m68ki_instruction_jump_table[m68k->ir](m68k);
-			USE_CYCLES(m68k, m68k->cyc_instruction[m68k->ir]);
+			m68k->remaining_cycles -= m68k->cyc_instruction[m68k->ir];
 
 			/* Trace m68k_exception, if necessary */
 			m68ki_exception_if_trace(); /* auto-disable (see m68kcpu.h) */
-		} while(GET_CYCLES(m68k) > 0);
+		} while (m68k->remaining_cycles > 0);
 
 		/* set previous PC to current PC for the next entry into the loop */
 		REG_PPC = REG_PC;
 	}
-	else
-		SET_CYCLES(m68k, 0);
+	else if (m68k->remaining_cycles > 0)
+		m68k->remaining_cycles = 0;
 
 	/* return how many clocks we used */
-	return m68k->initial_cycles - GET_CYCLES(m68k);
+	return m68k->initial_cycles - m68k->remaining_cycles;
 }
 
 static CPU_INIT( m68k )
@@ -618,7 +618,8 @@ static CPU_RESET( m68k )
 
 	/* Clear all stop levels and eat up all remaining cycles */
 	m68k->stopped = 0;
-	SET_CYCLES(m68k, 0);
+	if (m68k->remaining_cycles > 0)
+		m68k->remaining_cycles = 0;
 
 	m68k->run_mode = RUN_MODE_BERR_AERR_RESET;
 

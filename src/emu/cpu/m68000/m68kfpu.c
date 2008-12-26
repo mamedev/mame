@@ -499,55 +499,55 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 		case 0x00:		// FMOVE
 		{
 			REG_FP[dst].f = source;
-			USE_CYCLES(m68k, 4);
+			m68k->remaining_cycles -= 4;
 			break;
 		}
 		case 0x04:		// FSQRT
 		{
 			REG_FP[dst].f = sqrt(source);
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
-			USE_CYCLES(m68k, 109);
+			m68k->remaining_cycles -= 109;
 			break;
 		}
 		case 0x18:		// FABS
 		{
 			REG_FP[dst].f = fabs(source);
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
-			USE_CYCLES(m68k, 3);
+			m68k->remaining_cycles -= 3;
 			break;
 		}
 		case 0x1a:		// FNEG
 		{
 			REG_FP[dst].f = -source;
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
-			USE_CYCLES(m68k, 3);
+			m68k->remaining_cycles -= 3;
 			break;
 		}
 		case 0x20:		// FDIV
 		{
 			REG_FP[dst].f /= source;
-			USE_CYCLES(m68k, 43);
+			m68k->remaining_cycles -= 43;
 			break;
 		}
 		case 0x22:		// FADD
 		{
 			REG_FP[dst].f += source;
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
-			USE_CYCLES(m68k, 9);
+			m68k->remaining_cycles -= 9;
 			break;
 		}
 		case 0x23:		// FMUL
 		{
 			REG_FP[dst].f *= source;
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
-			USE_CYCLES(m68k, 11);
+			m68k->remaining_cycles -= 11;
 			break;
 		}
 		case 0x28:		// FSUB
 		{
 			REG_FP[dst].f -= source;
 			SET_CONDITION_CODES(m68k, REG_FP[dst]);
-			USE_CYCLES(m68k, 9);
+			m68k->remaining_cycles -= 9;
 			break;
 		}
 		case 0x38:		// FCMP
@@ -555,7 +555,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			fp_reg res;
 			res.f = REG_FP[dst].f - source;
 			SET_CONDITION_CODES(m68k, res);
-			USE_CYCLES(m68k, 7);
+			m68k->remaining_cycles -= 7;
 			break;
 		}
 		case 0x3a:		// FTST
@@ -563,7 +563,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			fp_reg res;
 			res.f = source;
 			SET_CONDITION_CODES(m68k, res);
-			USE_CYCLES(m68k, 7);
+			m68k->remaining_cycles -= 7;
 			break;
 		}
 
@@ -626,7 +626,7 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 	}
 
-	USE_CYCLES(m68k, 12);
+	m68k->remaining_cycles -= 12;
 }
 
 static void fmove_fpcr(m68ki_cpu_core *m68k, UINT16 w2)
@@ -656,7 +656,7 @@ static void fmove_fpcr(m68ki_cpu_core *m68k, UINT16 w2)
 		}
 	}
 
-	USE_CYCLES(m68k, 10);
+	m68k->remaining_cycles -= 10;
 }
 
 static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
@@ -678,7 +678,7 @@ static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
 					if (reglist & (1 << i))
 					{
 						WRITE_EA_FPE(m68k, ea, REG_FP[i]);
-						USE_CYCLES(m68k, 2);
+						m68k->remaining_cycles -= 2;
 					}
 				}
 				break;
@@ -698,7 +698,7 @@ static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
 					if (reglist & (1 << i))
 					{
 						REG_FP[7-i] = READ_EA_FPE(m68k, ea);
-						USE_CYCLES(m68k, 2);
+						m68k->remaining_cycles -= 2;
 					}
 				}
 				break;
@@ -723,7 +723,7 @@ static void fbcc16(m68ki_cpu_core *m68k)
 		m68ki_branch_16(m68k, offset-2);
 	}
 
-	USE_CYCLES(m68k, 7);
+	m68k->remaining_cycles -= 7;
 }
 
 static void fbcc32(m68ki_cpu_core *m68k)
@@ -740,7 +740,7 @@ static void fbcc32(m68ki_cpu_core *m68k)
 		m68ki_branch_32(m68k, offset-4);
 	}
 
-	USE_CYCLES(m68k, 7);
+	m68k->remaining_cycles -= 7;
 }
 
 
