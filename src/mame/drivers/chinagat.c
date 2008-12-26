@@ -79,6 +79,9 @@ Dip locations and factory settings verified with China Gate US manual.
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
 
+#define MAIN_CLOCK		XTAL_12MHz
+#define PIXEL_CLOCK		MAIN_CLOCK / 2
+
 /**************** Video stuff ******************/
 
 WRITE8_HANDLER( ddragon_bgvideoram_w );
@@ -107,11 +110,87 @@ static int saiyugb1_m5205_clk;
 
 
 
-static MACHINE_RESET( chinagat )
+/*
+    Based on the Solar Warrior schematics, vertical timing counts as follows:
+
+        08,09,0A,0B,...,FC,FD,FE,FF,E8,E9,EA,EB,...,FC,FD,FE,FF,
+        08,09,....
+
+    Thus, it counts from 08 to FF, then resets to E8 and counts to FF again.
+    This gives (256 - 8) + (256 - 232) = 248 + 24 = 272 total scanlines.
+
+    VBLK is signalled starting when the counter hits F8, and continues through
+    the reset to E8 and through until the next reset to 08 again.
+
+    Since MAME's video timing is 0-based, we need to convert this.
+*/
+/* based on ddragon.c driver */
+INLINE int scanline_to_vcount(int scanline)
 {
-	technos_video_hw = 1;
-	sprite_irq = M6809_IRQ_LINE;
-	sound_irq = INPUT_LINE_NMI;
+	int vcount = scanline + 8;
+	if (vcount < 0x100)
+		return vcount;
+	else
+		return (vcount - 0x18) | 0x100;
+}
+
+static TIMER_DEVICE_CALLBACK( chinagat_scanline )
+{
+	int scanline = param;
+	int screen_height = video_screen_get_height(timer->machine->primary_screen);
+	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
+	int vcount = scanline_to_vcount(scanline);
+
+	/* update to the current point */
+	if (scanline > 0)
+	{
+		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+	}
+
+	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
+	if (vcount == 0xf8)
+	{
+		cpu_set_input_line(timer->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+	}
+
+	/* set 1ms signal on rising edge of vcount & 8 */
+	if (!(vcount_old & 8) && (vcount & 8))
+	{
+		cpu_set_input_line(timer->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+	}
+
+	/* adjust for next scanline */
+	if (++scanline >= screen_height)
+	{
+		scanline = 0;
+	}
+}
+
+static WRITE8_HANDLER( chinagat_interrupt_w )
+{
+	switch (offset)
+	{
+		case 0: /* 3e00 - SND irq */
+			soundlatch_w( space, 0, data );
+			cpu_set_input_line(space->machine->cpu[2], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			break;
+
+		case 1: /* 3e01 - NMI ack */
+			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+			break;
+
+		case 2: /* 3e02 - FIRQ ack */
+			cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
+			break;
+
+		case 3: /* 3e03 - IRQ ack */
+			cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
+			break;
+
+		case 4: /* 3e04 - sub CPU IRQ ack */
+			cpu_set_input_line(space->machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			break;
+	}
 }
 
 static WRITE8_HANDLER( chinagat_video_ctrl_w )
@@ -139,17 +218,6 @@ static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
 	UINT8 *RAM = memory_region( space->machine, "sub" );
 	memory_set_bankptr(space->machine,  4,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
-}
-
-static WRITE8_HANDLER( chinagat_sub_IRQ_w )
-{
-	cpu_set_input_line(space->machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
-}
-
-static WRITE8_HANDLER( chinagat_cpu_sound_cmd_w )
-{
-	soundlatch_w( space, offset, data );
-	cpu_set_input_line(space->machine->cpu[2], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static READ8_HANDLER( saiyugb1_mcu_command_r )
@@ -270,11 +338,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x317f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3400, 0x357f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0x3800, 0x397f) AM_WRITE(SMH_BANK3) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(chinagat_cpu_sound_cmd_w)
-//  AM_RANGE(0x3e01, 0x3e01) AM_WRITE(SMH_NOP)
-//  AM_RANGE(0x3e02, 0x3e02) AM_WRITE(SMH_NOP)
-//  AM_RANGE(0x3e03, 0x3e03) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x3e04, 0x3e04) AM_WRITE(chinagat_sub_IRQ_w)
+	AM_RANGE(0x3e00, 0x3e04) AM_WRITE(chinagat_interrupt_w)
 	AM_RANGE(0x3e06, 0x3e06) AM_WRITE(SMH_RAM) AM_BASE(&ddragon_scrolly_lo)
 	AM_RANGE(0x3e07, 0x3e07) AM_WRITE(SMH_RAM) AM_BASE(&ddragon_scrollx_lo)
 	AM_RANGE(0x3f00, 0x3f00) AM_WRITE(chinagat_video_ctrl_w)
@@ -458,6 +522,7 @@ static GFXDECODE_START( chinagat )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 256, 8 )	/* 16x16 background tiles */
 GFXDECODE_END
 
+
 static void chinagat_irq_handler(running_machine *machine, int irq)
 {
 	cpu_set_input_line(machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE );
@@ -468,19 +533,12 @@ static const ym2151_interface ym2151_config =
 	chinagat_irq_handler
 };
 
-
 /* This on the bootleg board, instead of the m6295 */
 static const msm5205_interface msm5205_config =
 {
 	saiyugb1_m5205_irq_w,	/* Interrupt function */
 	MSM5205_S64_4B			/* vclk input mode (6030Hz, 4-bit) */
 };
-
-static INTERRUPT_GEN( chinagat_interrupt )
-{
-	cpu_set_input_line(device, 1, HOLD_LINE);	/* hold the FIRQ line */
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* pulse the NMI line */
-}
 
 /* This is only on the second bootleg board */
 static const ym2203_interface ym2203_config =
@@ -496,27 +554,22 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( chinagat )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", HD6309,12000000/2)		/* 1.5 MHz (12MHz oscillator ???) */
+	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", chinagat_interrupt)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "main", 0, 1)
 
-	MDRV_CPU_ADD("sub", HD6309,12000000/2)		/* 1.5 MHz (12MHz oscillator ???) */
+	MDRV_CPU_ADD("sub", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_RESET(chinagat)
-
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 29*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
 
 	MDRV_GFXDECODE(chinagat)
 	MDRV_PALETTE_LENGTH(384)
@@ -540,14 +593,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( saiyugb1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,12000000/8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", chinagat_interrupt)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "main", 0, 1)
 
-	MDRV_CPU_ADD("sub", M6809,12000000/8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)		/* 3.579545 MHz oscillator */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
 	MDRV_CPU_PROGRAM_MAP(saiyugb1_sound_map,0)
 
 	MDRV_CPU_ADD("mcu", I8748, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
@@ -556,15 +609,10 @@ static MACHINE_DRIVER_START( saiyugb1 )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_RESET(chinagat)
-
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 29*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
 
 	MDRV_GFXDECODE(chinagat)
 	MDRV_PALETTE_LENGTH(384)
@@ -588,27 +636,22 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( saiyugb2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,12000000/8)		/* 1.5 MHz (12MHz oscillator) */
+	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", chinagat_interrupt)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "main", 0, 1)
 
-	MDRV_CPU_ADD("sub", M6809,12000000/8)		/* 1.5 MHz (12MHz oscillator) */
+	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)		/* 3.579545 MHz oscillator */
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
 	MDRV_CPU_PROGRAM_MAP(ym2203c_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_RESET(chinagat)
-
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 29*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
 
 	MDRV_GFXDECODE(chinagat)
 	MDRV_PALETTE_LENGTH(384)
@@ -844,9 +887,16 @@ ROM_START( saiyugb2 )
 ROM_END
 
 
+static DRIVER_INIT( chinagat )
+{
+	technos_video_hw = 1;
+	sprite_irq = M6809_IRQ_LINE;
+	sound_irq = INPUT_LINE_NMI;
+}
+
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT    MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1988, chinagat, 0,        chinagat, chinagat, 0     , ROT0, "[Technos] (Taito Romstar license)", "China Gate (US)", 0 )
-GAME( 1988, saiyugou, chinagat, chinagat, chinagat, 0     , ROT0, "Technos", "Sai Yu Gou Ma Roku (Japan)", 0 )
-GAME( 1988, saiyugb1, chinagat, saiyugb1, chinagat, 0     , ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", GAME_IMPERFECT_SOUND )
-GAME( 1988, saiyugb2, chinagat, saiyugb2, chinagat, 0     , ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", 0 )
+GAME( 1988, chinagat, 0,        chinagat, chinagat, chinagat, ROT0, "[Technos] (Taito Romstar license)", "China Gate (US)", 0 )
+GAME( 1988, saiyugou, chinagat, chinagat, chinagat, chinagat, ROT0, "Technos", "Sai Yu Gou Ma Roku (Japan)", 0 )
+GAME( 1988, saiyugb1, chinagat, saiyugb1, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", GAME_IMPERFECT_SOUND )
+GAME( 1988, saiyugb2, chinagat, saiyugb2, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", 0 )
