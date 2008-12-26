@@ -27,6 +27,7 @@ WRITE16_HANDLER( es5505_data_1_w );
 void es5505_voice_bank_0_w(int voice, int bank);
 void es5505_voice_bank_1_w(int voice, int bank);
 
+SND_GET_INFO( es5505 );
 
 
 typedef struct _es5506_interface es5506_interface;
@@ -52,5 +53,7 @@ WRITE16_HANDLER( es5506_data_1_word_w );
 
 void es5506_voice_bank_0_w(int voice, int bank);
 void es5506_voice_bank_1_w(int voice, int bank);
+
+SND_GET_INFO( es5506 );
 
 #endif /* __ES5506_H__ */

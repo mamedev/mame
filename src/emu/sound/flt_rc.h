@@ -58,4 +58,6 @@ extern const flt_rc_config flt_rc_ac_default;
 
 void filter_rc_set_RC(int num, int type, double R1, double R2, double R3, double C);
 
+SND_GET_INFO( filter_rc );
+
 #endif /* __FLT_RC_H__ */

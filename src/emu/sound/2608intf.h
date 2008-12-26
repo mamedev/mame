@@ -6,6 +6,8 @@
 #include "fm.h"
 #include "ay8910.h"
 
+void ym2608_update_request(void *param);
+
 typedef struct _ym2608_interface ym2608_interface;
 struct _ym2608_interface
 {
@@ -34,5 +36,7 @@ WRITE8_HANDLER( ym2608_control_port_1_a_w );
 WRITE8_HANDLER( ym2608_control_port_1_b_w );
 WRITE8_HANDLER( ym2608_data_port_1_a_w );
 WRITE8_HANDLER( ym2608_data_port_1_b_w );
+
+SND_GET_INFO( ym2608 );
 
 #endif /* __2608INTF_H__ */

@@ -15,4 +15,6 @@ void dmadac_enable(UINT8 first_channel, UINT8 num_channels, UINT8 enable);
 void dmadac_set_frequency(UINT8 first_channel, UINT8 num_channels, double frequency);
 void dmadac_set_volume(UINT8 first_channel, UINT8 num_channels, UINT16 volume);
 
+SND_GET_INFO( dmadac );
+
 #endif /* __DMADAC_H__ */

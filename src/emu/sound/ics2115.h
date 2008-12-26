@@ -11,4 +11,6 @@ struct _ics2115_interface {
 READ8_HANDLER( ics2115_r );
 WRITE8_HANDLER( ics2115_w );
 
+SND_GET_INFO( ics2115 );
+
 #endif /* __ICS2115_H__ */

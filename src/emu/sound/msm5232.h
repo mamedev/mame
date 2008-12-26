@@ -15,4 +15,6 @@ WRITE8_HANDLER( msm5232_1_w );
 
 void msm5232_set_clock(void *chip, int clock);
 
+SND_GET_INFO( msm5232 );
+
 #endif /* __MSM5232_H__ */

@@ -19,4 +19,6 @@ WRITE16_HANDLER( es8712_data_0_msb_w );
 WRITE16_HANDLER( es8712_data_1_msb_w );
 WRITE16_HANDLER( es8712_data_2_msb_w );
 
+SND_GET_INFO( es8712 );
+
 #endif /* __ES8712_H__ */

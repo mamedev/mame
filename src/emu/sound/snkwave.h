@@ -5,5 +5,7 @@
 
 WRITE8_HANDLER( snkwave_w );
 
+SND_GET_INFO( snkwave );
+
 #endif /* __SNKWAVE_H__ */
 

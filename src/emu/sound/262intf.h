@@ -26,5 +26,6 @@ WRITE8_HANDLER( ymf262_register_b_1_w );
 WRITE8_HANDLER( ymf262_data_a_1_w );
 WRITE8_HANDLER( ymf262_data_b_1_w );
 
+SND_GET_INFO( ymf262 );
 
 #endif /* __262INTF_H__ */

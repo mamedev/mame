@@ -32,4 +32,7 @@ READ8_HANDLER  ( sid6581_1_port_r );
 WRITE8_HANDLER ( sid6581_0_port_w );
 WRITE8_HANDLER ( sid6581_1_port_w );
 
+SND_GET_INFO( sid6581 );
+SND_GET_INFO( sid8580 );
+
 #endif /* __SID6581_H__ */

@@ -106,4 +106,6 @@ void pokey2_kbcode_w (int kbcode, int make);
 void pokey3_kbcode_w (int kbcode, int make);
 void pokey4_kbcode_w (int kbcode, int make);
 
+SND_GET_INFO( pokey );
+
 #endif	/* __POKEY_H__ */

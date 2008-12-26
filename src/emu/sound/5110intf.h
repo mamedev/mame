@@ -22,4 +22,12 @@ int tms5110_ready_r(void);
 
 void tms5110_set_frequency(int frequency);
 
+SND_GET_INFO( tms5110 );
+SND_GET_INFO( tms5100 );
+SND_GET_INFO( tms5110a );
+SND_GET_INFO( cd2801 );
+SND_GET_INFO( tmc0281 );
+SND_GET_INFO( cd2802 );
+SND_GET_INFO( m58817 );
+
 #endif /* __5110INTF_H__ */

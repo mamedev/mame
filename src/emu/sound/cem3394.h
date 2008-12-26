@@ -43,5 +43,6 @@ void cem3394_set_voltage(int chip, int input, double voltage);
     CEM3394_FINAL_GAIN:         gain, in dB */
 double cem3394_get_parameter(int chip, int input);
 
+SND_GET_INFO( cem3394 );
 
 #endif /* __CEM3394_H__ */

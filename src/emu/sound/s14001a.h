@@ -9,5 +9,7 @@ void s14001a_rst_0_w(int data);		/* write to RESET pin */
 void s14001a_set_clock(int clock);     /* set VSU-1000 clock */
 void s14001a_set_volume(int volume);    /* set VSU-1000 volume control */
 
+SND_GET_INFO( s14001a );
+
 #endif /* __S14001A_H__ */
 

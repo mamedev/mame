@@ -11,4 +11,6 @@
 WRITE16_HANDLER( irem_ga20_w );
 READ16_HANDLER( irem_ga20_r );
 
+SND_GET_INFO( iremga20 );
+
 #endif /* __IREMGA20_H__ */

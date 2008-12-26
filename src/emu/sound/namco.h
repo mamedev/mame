@@ -30,5 +30,9 @@ extern UINT8 *namco_wavedata;
 #define pacman_soundregs namco_soundregs
 #define polepos_soundregs namco_soundregs
 
+SND_GET_INFO( namco );
+SND_GET_INFO( namco_15xx );
+SND_GET_INFO( namco_cus30 );
+
 #endif /* __NAMCO_H__ */
 

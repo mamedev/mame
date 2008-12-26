@@ -32,4 +32,6 @@ void k007232_set_bank( int chip, int chABank, int chBBank );
 */
 void k007232_set_volume(int chip,int channel,int volumeA,int volumeB);
 
+SND_GET_INFO( k007232 );
+
 #endif /* __K007232_H__ */

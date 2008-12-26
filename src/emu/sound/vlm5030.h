@@ -23,4 +23,6 @@ void vlm5030_vcu(int pin );
 /* set ST pin level  : set table address A0-A7 / start speech */
 void vlm5030_st(int pin );
 
+SND_GET_INFO( vlm5030 );
+
 #endif /* __VLM5030_H__ */

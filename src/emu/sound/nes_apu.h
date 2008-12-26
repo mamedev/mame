@@ -47,4 +47,6 @@ READ8_HANDLER( nes_psg_1_r );
 WRITE8_HANDLER( nes_psg_0_w );
 WRITE8_HANDLER( nes_psg_1_w );
 
+SND_GET_INFO( nesapu );
+
 #endif /* __NES_APU_H__ */

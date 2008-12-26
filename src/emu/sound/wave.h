@@ -11,6 +11,7 @@
 #include "messdrv.h"
 #endif
 
+SND_GET_INFO( wave );
 
 
 #endif /* __WAVE_H__ */

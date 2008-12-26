@@ -5,6 +5,8 @@
 
 #include "ay8910.h"
 
+void ym2203_update_request(void *param);
+
 typedef struct _ym2203_interface ym2203_interface;
 struct _ym2203_interface
 {
@@ -63,5 +65,7 @@ WRITE16_HANDLER( ym2203_write_port_4_lsb_w );
 
 WRITE8_HANDLER( ym2203_word_0_w );
 WRITE8_HANDLER( ym2203_word_1_w );
+
+SND_GET_INFO( ym2203 );
 
 #endif /* __2203INTF_H__ */

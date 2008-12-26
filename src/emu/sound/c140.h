@@ -23,4 +23,6 @@ struct _c140_interface {
     int banking_type;
 };
 
+SND_GET_INFO( c140 );
+
 #endif /* __C140_H__ */

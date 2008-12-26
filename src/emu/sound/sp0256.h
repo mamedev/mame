@@ -36,4 +36,6 @@ WRITE8_HANDLER( sp0256_ALD_w );
 READ16_HANDLER( spb640_r );
 WRITE16_HANDLER( spb640_w );
 
+SND_GET_INFO( sp0256 );
+
 #endif /* __SP0256_H__ */

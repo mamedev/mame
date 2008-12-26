@@ -37,6 +37,8 @@ WRITE16_HANDLER( ym2151_data_port_0_lsb_w );
 WRITE16_HANDLER( ym2151_data_port_1_lsb_w );
 WRITE16_HANDLER( ym2151_data_port_2_lsb_w );
 
+SND_GET_INFO( ym2151 );
+
 #endif /* __2151INTF_H__ */
 
 

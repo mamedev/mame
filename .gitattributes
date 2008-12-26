@@ -902,6 +902,7 @@ src/emu/sound/upd7759.h svneol=native#text/plain
 src/emu/sound/vlm5030.c svneol=native#text/plain
 src/emu/sound/vlm5030.h svneol=native#text/plain
 src/emu/sound/votrax.c svneol=native#text/plain
+src/emu/sound/votrax.h svneol=native#text/plain
 src/emu/sound/vrender0.c svneol=native#text/plain
 src/emu/sound/vrender0.h svneol=native#text/plain
 src/emu/sound/wave.c svneol=native#text/plain

@@ -6,6 +6,8 @@
 #include "fm.h"
 
 
+void ym2610_update_request(void *param);
+
 typedef struct _ym2610_interface ym2610_interface;
 struct _ym2610_interface
 {
@@ -47,5 +49,9 @@ WRITE8_HANDLER( ym2610_data_port_1_a_w );
 WRITE16_HANDLER( ym2610_data_port_1_a_lsb_w );
 WRITE8_HANDLER( ym2610_data_port_1_b_w );
 WRITE16_HANDLER( ym2610_data_port_1_b_lsb_w );
+
+SND_GET_INFO( ym2610 );
+SND_GET_INFO( ym2610b );
+
 
 #endif /* __2610INTF_H__ */

@@ -134,4 +134,13 @@ void ay8910_set_clock_ym(void *chip, int clock);
 void ay8910_write_ym(void *chip, int addr, int data);
 int ay8910_read_ym(void *chip);
 
+SND_GET_INFO( ay8910 );
+SND_GET_INFO( ay8912 );
+SND_GET_INFO( ay8913 );
+SND_GET_INFO( ay8930 );
+SND_GET_INFO( ym2149 );
+SND_GET_INFO( ym3439 );
+SND_GET_INFO( ymz284 );
+SND_GET_INFO( ymz294 );
+
 #endif /* __AY8910_H__ */

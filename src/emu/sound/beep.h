@@ -11,6 +11,8 @@ void beep_set_state(int,int);
 void beep_set_frequency(int,int);
 void beep_set_volume(int,int);
 
+SND_GET_INFO( beep );
+
 #ifdef __cplusplus
 }
 #endif

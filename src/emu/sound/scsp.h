@@ -28,4 +28,6 @@ READ16_HANDLER( scsp_midi_out_r );
 
 extern UINT32* stv_scu;
 
+SND_GET_INFO( scsp );
+
 #endif /* __SCSP_H__ */

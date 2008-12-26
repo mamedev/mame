@@ -216,7 +216,7 @@ static void astrocade_reset(struct astrocade_info *chip)
 	chip->c_state = 0;
 }
 
-SND_RESET( astrocade )
+static SND_RESET( astrocade )
 {
 	astrocade_reset(device->token);
 }

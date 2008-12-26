@@ -52,4 +52,6 @@ int sample_loaded(int samplenum);
 /* drivers as well (e.g. a sound chip emulator needing drum samples) */
 struct loaded_samples *readsamples(const char *const *samplenames, const char *name);
 
+SND_GET_INFO( samples );
+
 #endif /* __SAMPLES_H__ */

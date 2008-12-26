@@ -40,4 +40,6 @@ void cdp1869_set_wnamp(int which, int value);
 void cdp1869_set_wnfreq(int which, int value);
 void cdp1869_set_wnoff(int which, int value);
 
+SND_GET_INFO( cdp1869 );
+
 #endif /* __CDP1869_H__ */

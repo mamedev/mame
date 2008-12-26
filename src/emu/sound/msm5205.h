@@ -36,4 +36,6 @@ void msm5205_playmode_w(int num,int _select);
 
 void msm5205_set_volume(int num,int volume);
 
+SND_GET_INFO( msm5205 );
+
 #endif /* __MSM5205_H__ */

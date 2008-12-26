@@ -34,5 +34,8 @@ WRITE8_HANDLER( hc55516_1_clock_set_w );
 WRITE8_HANDLER( hc55516_1_digit_clock_clear_w );
 READ8_HANDLER ( hc55516_1_clock_state_r );
 
+SND_GET_INFO( hc55516 );
+SND_GET_INFO( mc3417 );
+SND_GET_INFO( mc3418 );
 
 #endif /* __HC55516_H__ */

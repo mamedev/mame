@@ -26,4 +26,6 @@ extern void tms36xx_note_w(int chip, int octave, int note);
 /* TMS3617 interface functions */
 extern void tms3617_enable_w(int chip, int enable);
 
+SND_GET_INFO( tms36xx );
+
 #endif /* __TMS36XX_H__ */

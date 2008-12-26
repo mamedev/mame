@@ -15,4 +15,7 @@ extern UINT16 *gaelco_sndregs;
 WRITE16_HANDLER( gaelcosnd_w );
 READ16_HANDLER( gaelcosnd_r );
 
+SND_GET_INFO( gaelco_gae1 );
+SND_GET_INFO( gaelco_cg1v );
+
 #endif /* __GALELCO_H__ */

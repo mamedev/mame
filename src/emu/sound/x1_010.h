@@ -19,4 +19,6 @@ WRITE16_HANDLER( seta_sound_word_w );
 
 void seta_sound_enable_w(int);
 
+SND_GET_INFO( x1_010 );
+
 #endif /* __X1_010_H__ */

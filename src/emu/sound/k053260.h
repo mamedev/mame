@@ -25,4 +25,6 @@ READ16_HANDLER( k053260_0_lsb_r );
 WRITE16_HANDLER( k053260_1_lsb_w );
 READ16_HANDLER( k053260_1_lsb_r );
 
+SND_GET_INFO( k053260 );
+
 #endif /* __K053260_H__ */

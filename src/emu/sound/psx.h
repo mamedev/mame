@@ -27,4 +27,6 @@ struct _psx_spu_interface
 	void (*spu_install_write_handler)(int,spu_handler);
 };
 
+SND_GET_INFO( psxspu );
+
 #endif /* __SOUND_PSX_H__ */

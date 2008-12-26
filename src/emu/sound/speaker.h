@@ -25,6 +25,8 @@ struct _speaker_interface
 
 void speaker_level_w (int which, int new_level);
 
+SND_GET_INFO( speaker );
+
 #ifdef __cplusplus
 }
 #endif

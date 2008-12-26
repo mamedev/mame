@@ -18,4 +18,6 @@ void *custom_get_token(int index);
 #define CUSTOM_STOP(name) void name(const device_config *device, void *token)
 #define CUSTOM_RESET(name) void name(const device_config *device, void *token)
 
+SND_GET_INFO( custom );
+
 #endif /* __CUSTOM_H__ */

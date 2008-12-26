@@ -30,4 +30,6 @@ WRITE8_HANDLER( ymf278b_data_port_1_b_w );
 WRITE8_HANDLER( ymf278b_control_port_1_c_w );
 WRITE8_HANDLER( ymf278b_data_port_1_c_w );
 
+SND_GET_INFO( ymf278b );
+
 #endif /* __YMF278B_H__ */

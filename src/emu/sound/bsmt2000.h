@@ -12,4 +12,6 @@
 
 WRITE16_HANDLER( bsmt2000_data_0_w );
 
+SND_GET_INFO( bsmt2000 );
+
 #endif /* __BSMT2000_H__ */

@@ -23,4 +23,6 @@ struct _sega_pcm_interface
 WRITE8_HANDLER( sega_pcm_w );
 READ8_HANDLER( sega_pcm_r );
 
+SND_GET_INFO( segapcm );
+
 #endif /* __SEGAPCM_H__ */
