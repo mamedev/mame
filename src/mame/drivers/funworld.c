@@ -1963,6 +1963,23 @@ static const ay8910_interface ay8910_intf =
 };
 
 
+/************************
+*    CRTC Interface    *
+************************/
+
+static const mc6845_interface mc6845_intf =
+{
+	"main",	/* screen we are acting on */
+	4,		/* number of pixels per video memory address */
+	NULL,	/* before pixel update callback */
+	NULL,	/* row update callback */
+	NULL,	/* after pixel update callback */
+	NULL,	/* callback for display state changes */
+	NULL,	/* HSYNC callback */
+	NULL	/* VSYNC callback */
+};
+
+
 /**************************
 *     Machine Drivers     *
 **************************/
@@ -1993,7 +2010,7 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_VIDEO_START(funworld)
 	MDRV_VIDEO_UPDATE(funworld)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)	/* 2MHz, veryfied on jollycrd & royalcrd */
 
     /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2008,11 +2025,6 @@ static MACHINE_DRIVER_START( magicrd2 )
 
 	MDRV_CPU_REPLACE("main", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map, 0)
-
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_SIZE((123+1)*4, (36+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-//  MDRV_SCREEN_VISIBLE_AREA(0*4, 112*4-1, 0*8, 34*8-1) /* Taken from MC6845 init, registers 01 & 06 */
-	MDRV_SCREEN_VISIBLE_AREA(0*4, 98*4-1, 0*8, 32*8-1)	/* adjusted to screen for testing purposes */
 
 	MDRV_GFXDECODE(funworld)
 	MDRV_VIDEO_START(magicrd2)
