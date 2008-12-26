@@ -35,6 +35,7 @@ COLOR.BPR  color
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
+static UINT8 *mjsiyoub_sub_rom;
 
 static VIDEO_START(mjsiyoub)
 {
@@ -45,21 +46,33 @@ static VIDEO_UPDATE(mjsiyoub)
 	return 0;
 }
 
-static ADDRESS_MAP_START( readmem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+
+
+static READ8_HANDLER( test_r )
+{
+	return 0;
+}
+
+static ADDRESS_MAP_START( main_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(&mjsiyoub_sub_rom)
+	AM_RANGE(0x8000, 0xffff) AM_RAM //probably shared ram (all of it?)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+/*this doesn't appear to be just sound cpu,there are clearly inputs too and probably something else too.*/
+static ADDRESS_MAP_START( sub_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x01, 0x01) AM_READ(ay8910_read_port_0_r) //read mux
+	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_READ(test_r)
+	AM_RANGE(0x11, 0x11) AM_READ(test_r)
+	AM_RANGE(0x11, 0x11) AM_WRITENOP //xor-ed mux
+	AM_RANGE(0x13, 0x13) AM_READ(test_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mjsiyoub )
@@ -70,8 +83,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,				/* Input A: DSW 2 */
-	NULL,				/* Input B: DSW 1 */
+	test_r,
+	test_r,
 	NULL,
 	NULL
 };
@@ -82,17 +95,49 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B				/* 8 KHz, 4 Bits  ?? */
 };
 
+static MACHINE_RESET( mjsiyoub )
+{
+//	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+}
+
+
+static PALETTE_INIT( mjsiyoub )
+{
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x20; ++i)
+	{
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
 
 static MACHINE_DRIVER_START( mjsiyoub )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,18432000/4)
-	MDRV_CPU_PROGRAM_MAP(readmem1,writemem1)
+	MDRV_CPU_PROGRAM_MAP(main_mem,0)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,18432000/4)
-	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
-//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_PROGRAM_MAP(sub_mem,0)
+	MDRV_CPU_IO_MAP(sub_io,0)
+  	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
+	MDRV_MACHINE_RESET( mjsiyoub )
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -100,8 +145,9 @@ static MACHINE_DRIVER_START( mjsiyoub )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
+	MDRV_PALETTE_INIT(mjsiyoub)
 
-	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(0x20)
 
 	MDRV_VIDEO_START(mjsiyoub)
 	MDRV_VIDEO_UPDATE(mjsiyoub)
@@ -132,4 +178,11 @@ ROM_START( mjsiyoub )
 	ROM_LOAD( "color.bpr", 0x00, 0x20,  CRC(d21367e5) SHA1(b28321ac8f99abfebe2ef4da0c751cefe9f3f3b6) )
 ROM_END
 
-GAME( 1986, mjsiyoub,  0,    mjsiyoub, mjsiyoub, 0, ROT0, "Visco", "Mahjong Shiyou", GAME_NOT_WORKING )
+static DRIVER_INIT( mjsiyoub )
+{
+	UINT8 *ROM = memory_region(machine, "sub");
+
+	memcpy(mjsiyoub_sub_rom, ROM, 0x8000);
+}
+
+GAME( 1986, mjsiyoub,  0,    mjsiyoub, mjsiyoub, mjsiyoub, ROT0, "Visco", "Mahjong Shiyou", GAME_NOT_WORKING )
