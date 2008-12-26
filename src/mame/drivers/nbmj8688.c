@@ -25,6 +25,9 @@ TODO:
 
 - Screen flip is not perfect.
 
+- Barline has wrong NMI enable trigger,causing wrong sample pitch (& crashes
+  when you reset)
+
 ******************************************************************************/
 
 #include "driver.h"
@@ -271,6 +274,10 @@ static DRIVER_INIT( nightlov )
 	nb1413m3_type = NB1413M3_NIGHTLOV;
 }
 
+static DRIVER_INIT( barline )
+{
+	nb1413m3_type = NB1413M3_BARLINE;
+}
 
 static ADDRESS_MAP_START( readmem_mjsikaku, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xf7ff) AM_READ(SMH_ROM)
@@ -335,6 +342,39 @@ static ADDRESS_MAP_START( writeport_secolove, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
+ADDRESS_MAP_END
+
+static WRITE8_HANDLER( barline_output_w )
+{
+	coin_lockout_w(0,~data & 0x80);
+	coin_counter_w(0,data & 0x02);
+}
+
+static ADDRESS_MAP_START( readport_barline, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
+	AM_RANGE(0x80, 0x80) AM_READ(ym3812_status_port_0_r)
+	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
+	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
+	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
+	AM_RANGE(0xd0, 0xd0) AM_READ(ff_r)	// irq ack? watchdog?
+ 	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r)
+	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( writeport_barline, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_sndrombank1_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(nb1413m3_nmi_clock_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x90, 0x97) AM_WRITE(nbmj8688_blitter_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(barline_output_w)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
+//	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE) //not used
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -1222,6 +1262,115 @@ static INPUT_PORTS_START( secolove )
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( barline )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIPSW 1-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DIPSW 1-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DIPSW 2-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(nb1413m3_busyflag_r, NULL)	// DRAW BUSY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )			//
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE3 )		// MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )		// ANALYZER
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )					// TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 )			// CREDIT CLEAR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
+
+	PORT_START("KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Stop 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1P Stop 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1P Stop 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("1P Stop 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("1P Start") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_NAME("1P Bet") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("1P Flip Flop") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_NAME("Double Up") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_NAME("Big") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_NAME("Small") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_NAME("Take Score") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/Stop")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Push Bet")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY8")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY9")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( citylove )
 	PORT_START("DSWA")
@@ -2893,6 +3042,20 @@ static MACHINE_DRIVER_START( mbmj_h12bit )
 	MDRV_VIDEO_START(mbmj8688_hybrid_12bit)
 MACHINE_DRIVER_END
 
+/*Same as h12bit HW with different sound HW + NMI enable bit*/
+static MACHINE_DRIVER_START( barline )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(mbmj_h12bit)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(readport_barline, writeport_barline)
+//	MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
+
+	MDRV_SOUND_REPLACE("8910", YM3812, 20000000/8)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+
+	MDRV_SOUND_REMOVE("dac")
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mbmj_p16bit )
 
@@ -3831,8 +3994,30 @@ ROM_START( idhimitu )
 	ROM_LOAD( "ic3m.bin", 0x00000, 0x40000, CRC(ba005a3a) SHA1(305041f764b5ba9ffa882c1a69555a38a53b1556) )	// same as iemoto/iemoto31.1a gfx data
 ROM_END
 
+ROM_START( barline )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "16061_1h1r.c2", 0x00000, 0x10000, CRC(0a1d3e61) SHA1(652005181779e69c03f2b29e6aac2481321b8d06) )
 
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "16061_2a.e9", 0x00000, 0x10000, CRC(53c1a339) SHA1(439bb1dc072be47233567ec9215384cb1959e2d4) )
+	ROM_LOAD( "16061_2b.e10",0x10000, 0x10000, CRC(8126dac6) SHA1(45b7f2f0dd373847bdfe13c7f51b198ea409d70e) )
+	ROM_LOAD( "16061_3a.f9", 0x20000, 0x10000, CRC(ceb17b22) SHA1(a7b72ec3e93bab6dcb5c480d812c0223b7e0acc1) )
+	ROM_LOAD( "16061_3b.f10",0x30000, 0x10000, CRC(b269b85b) SHA1(a8f21f37b7dde7425fa1fd0264b3c67620ffcdaa) )
+	ROM_LOAD( "16061_4a.g9", 0x40000, 0x10000, CRC(729dbf45) SHA1(8b5fbeacf45365d16546654525fe1e65ec781ece) )
+	ROM_LOAD( "16061_4b.g10",0x50000, 0x10000, CRC(7c6946be) SHA1(5f236658073b3b3a54c82f0a973fb7a8c91a1e13) )
+	ROM_LOAD( "16061_5a.h9", 0x60000, 0x10000, CRC(707ca3b9) SHA1(6a5d931bfbfeb7b6be038d3bdb982055c201335e) )
+	ROM_LOAD( "16061_5b.h10",0x70000, 0x10000, CRC(6d83713e) SHA1(5548b75d07793a609e1b92bd385c77efff41e46d) )
+	ROM_LOAD( "16061_6a.i9", 0x80000, 0x10000, CRC(79d93064) SHA1(ad07e22519064f6e952787e1ff072f769536cb2b) )
+	ROM_LOAD( "16061_6b.i10",0x90000, 0x10000, CRC(e724d22f) SHA1(6810a4b0e4665d6773c55355607e85b4e3efe380) )
+	ROM_LOAD( "16061_7a.j9", 0xa0000, 0x10000, CRC(49a5322c) SHA1(0037107833ece237b22a00793ac8a8562d57a3c5) )
+	ROM_LOAD( "16061_7b.j10",0xb0000, 0x10000, CRC(cfbbe06b) SHA1(f251df0f102d2812a23ff99dbdbd832ba122d787) )
 
+	ROM_REGION( 0x104, "pals", 0 )
+	ROM_LOAD( "16061.c10",0x000, 0x104, CRC(f8a85391) SHA1(ac47909fd4ab8fa198b14b82c2619e82a79ae3ef) )
+	ROM_LOAD( "16061.db", 0x000, 0x104, CRC(9c28c9c9) SHA1(7622f985fece66951a5d9d2e3a2b2c26d0980d26) )
+	ROM_LOAD( "16061.g3", 0x000, 0x104, CRC(22579310) SHA1(33fe9ea70895e0233fa1c5a999d3c9e50031209c) )
+	ROM_LOAD( "16061.k7", 0x000, 0x104, CRC(d25ccac8) SHA1(cfad5a4cd9609ac2461314d77a5e0cecd326c63b) )
+ROM_END
 
 /* 8-bit palette */
 GAME( 1986, crystalg, 0,        crystalg,        crystalg, crystalg, ROT0, "Nichibutsu", "Crystal Gal (Japan 860512)", 0 )
@@ -3844,6 +4029,7 @@ GAME( 1986, apparel,  0,        apparel,         apparel,  apparel,  ROT0, "Cent
 GAME( 1986, citylove, 0,        mbmj_h12bit,     citylove, citylove, ROT0, "Nichibutsu", "City Love (Japan 860908)", 0 )
 GAME( 1986, mcitylov, citylove, mbmj_h12bit,     mcitylov, mcitylov, ROT0, "Nichibutsu", "City Love [BET] (Japan 860904)", 0 )
 GAME( 1986, secolove, 0,        mbmj_h12bit,     secolove, secolove, ROT0, "Nichibutsu", "Second Love (Japan 861201)", 0 )
+GAME( 1986?,barline,  0,    	barline, 	 	 barline,  barline,  ROT180, "Nichibutsu", "Barline (Japan?)",  GAME_IMPERFECT_SOUND )
 
 /* hybrid 16-bit palette */
 GAME( 1987, seiha,    0,        seiha,           seiha,    seiha,    ROT0, "Nichibutsu", "Seiha (Japan 870725)", 0 )
@@ -3882,7 +4068,6 @@ GAME( 1988, mjsikakd, mjsikaku, mjsikaku,        mjsikaku, mjsikaku, ROT0, "Nich
 GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, mmsikaku, ROT0, "Nichibutsu", "Mahjong Shikaku [BET] (Japan 880929)", 0 )
 GAME( 1988, otonano,  0,        otonano,         otonano,  otonano,  ROT0, "Apple", "Otona no Mahjong (Japan 880628)", 0 )
 GAME( 1988, mjcamera, 0,        otonano,         mjcamera, mjcamera, ROT0, "MIKI SYOUJI", "Mahjong Camera Kozou (set 1) (Japan 881109)", 0 )
-
 
 
 /*
