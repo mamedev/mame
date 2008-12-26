@@ -6887,6 +6887,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( twineagl )	/* UA-2 (c) 1988 + Taito license */
 	DRIVER( downtown )	/* UD-2 (c) 1989 + Romstar or Taito license (DSW) */
 	DRIVER( downtow2 )	/* UD-2 (c) 1989 + Romstar or Taito license (DSW) */
+	DRIVER( downtowj )	/* UD-2 (c) 1989 + Romstar or Taito license (DSW) */
 	DRIVER( downtowp )	/* UD-2 (c) 1989 + Romstar or Taito license (DSW) */
 	DRIVER( usclssic )	/* UE   (c) 1989 + Romstar or Taito license (DSW) */
 	DRIVER( calibr50 )	/* UH   (c) 1989 + Romstar or Taito license (DSW) */

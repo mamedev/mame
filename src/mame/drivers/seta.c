@@ -8363,6 +8363,31 @@ ROM_START( downtow2 )
 	ROM_LOAD( "ud2011.t07", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) )
 ROM_END
 
+ROM_START( downtowj )
+	ROM_REGION( 0x0a0000, "main", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "ud2001.000", 0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) )
+	ROM_LOAD16_BYTE( "ud2001.003", 0x000001, 0x040000, CRC(e7d5fa5f) SHA1(48612514598711aa73bf75243c842f0aca72f3d0) )
+	ROM_LOAD16_BYTE( "u37.9a",     0x080000, 0x010000, CRC(73047657) SHA1(731663101d809170aad3cd39e901ef494494c5a1) )
+	ROM_LOAD16_BYTE( "u31.8a",     0x080001, 0x010000, CRC(6a050240) SHA1(6a1a305b7d32bb2ad17842b4eeabc891fce02160) )
+
+	ROM_REGION( 0x04c000, "sub", 0 )		/* 65c02 Code */
+	ROM_LOAD( "ud2002.004", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) )
+	ROM_RELOAD(             0x00c000, 0x040000  )
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD16_BYTE( "ud2005.t01", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) )
+	ROM_LOAD16_BYTE( "ud2006.t02", 0x000001, 0x080000, CRC(6e381bf2) SHA1(ba46e019d2991dec539444ef7376fe0e9a6a8b75) )
+	ROM_LOAD16_BYTE( "ud2007.t03", 0x100000, 0x080000, CRC(737b4971) SHA1(2a034011b0ac03d532a89b544f4eec497ac7ee80) )
+	ROM_LOAD16_BYTE( "ud2008.t04", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_LOAD( "ud2009.t05", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) )
+	ROM_LOAD( "ud2010.t06", 0x080000, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) )
+
+	ROM_REGION( 0x080000, "x1", 0 )	/* Samples */
+	ROM_LOAD( "ud2011.t07", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) )
+ROM_END
+
 ROM_START( downtowp )
 	ROM_REGION( 0x0a0000, "main", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "ud2001.000",   0x000000, 0x040000, CRC(f1965260) SHA1(c0560342238d75f9b81ae9f3408cacfbcd331529) )
@@ -9634,6 +9659,7 @@ GAME( 1987, tndrcadj, tndrcade, tndrcade, tndrcadj, 0,        ROT270, "[Seta] (T
 GAME( 1988, twineagl, 0,        twineagl, twineagl, twineagl, ROT270, "Seta (Taito license)",   "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
 GAME( 1989, downtown, 0,        downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Set 1)" , 0) // Country/License: DSW
 GAME( 1989, downtow2, downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Set 2)" , 0) // Country/License: DSW
+GAME( 1989, downtowj, downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Joystick Hack)" , 0) // Country/License: DSW
 GAME( 1989, downtowp, downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
 GAME( 1989, usclssic, 0,        usclssic, usclssic, 0,        ROT270, "Seta",                   "U.S. Classic" , 0) // Country/License: DSW
 GAME( 1989, calibr50, 0,        calibr50, calibr50, 0,        ROT270, "Athena / Seta",          "Caliber 50" , 0) // Country/License: DSW
