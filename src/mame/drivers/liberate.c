@@ -559,6 +559,7 @@ static MACHINE_DRIVER_START( liberatb )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_TYPE(M6502)
 	MDRV_CPU_PROGRAM_MAP(liberatb_readmem,liberatb_writemem)
+	MDRV_CPU_IO_MAP(0,0)
 	MDRV_CPU_VBLANK_INT("main", deco16_interrupt)
 MACHINE_DRIVER_END
 
