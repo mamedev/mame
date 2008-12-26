@@ -25,8 +25,8 @@ TODO:
 
 - Screen flip is not perfect.
 
-- Barline has wrong NMI enable trigger,causing wrong sample pitch (& crashes
-  when you reset)
+- Barline has wrong NMI enable trigger,causing wrong sample pitch (& sometimes
+  crashes when you soft reset)
 
 ******************************************************************************/
 
