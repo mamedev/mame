@@ -81,7 +81,8 @@ Dip locations verified with manual for ddragon & ddragon2
 
 #define MAIN_CLOCK		XTAL_12MHz
 #define SOUND_CLOCK		XTAL_3_579545MHz
-#define MCU_CLOCK		XTAL_4MHz
+#define MCU_CLOCK			MAIN_CLOCK / 3
+#define PIXEL_CLOCK		MAIN_CLOCK / 2
 
 
 /* from video */
@@ -96,8 +97,6 @@ WRITE8_HANDLER( ddragon_fgvideoram_w );
 extern UINT8 *ddragon_spriteram;
 extern UINT8 technos_video_hw;
 /* end of extern code & data */
-
-static emu_timer *scanline_timer;
 
 /* private globals */
 static UINT8 dd_sub_cpu_busy;
@@ -141,30 +140,24 @@ INLINE int scanline_to_vcount(int scanline)
 		return (vcount - 0x18) | 0x100;
 }
 
-
-static TIMER_CALLBACK( ddragon_scanline_callback )
+static TIMER_DEVICE_CALLBACK( ddragon_scanline )
 {
 	int scanline = param;
-	int screen_height = video_screen_get_height(machine->primary_screen);
+	int screen_height = video_screen_get_height(timer->machine->primary_screen);
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
 	if (scanline > 0)
-		video_screen_update_partial(machine->primary_screen, scanline - 1);
+		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(timer->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
-
-	/* adjust for next scanline */
-	if (++scanline >= screen_height)
-		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+		cpu_set_input_line(timer->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -179,9 +172,6 @@ static MACHINE_START( ddragon )
 {
 	/* configure banks */
 	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
-
-	/* allocate timer for scanlines */
-	scanline_timer = timer_alloc(machine, ddragon_scanline_callback, NULL);
 
 	/* determine the sound CPU index */
 	snd_cpu = cputag_get_cpu(machine, "sound");
@@ -201,7 +191,6 @@ static MACHINE_RESET( ddragon )
 	adpcm_end[0] = adpcm_end[1] = 0;
 	adpcm_idle[0] = adpcm_idle[1] = 1;
 	adpcm_data[0] = adpcm_data[1] = -1;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 
@@ -978,16 +967,17 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( ddragon )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK)	/* 12MHz / 4 internally */
+ 	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(ddragon_map,0)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "main", 0, 1)
 
-	MDRV_CPU_ADD("sub", HD63701, MAIN_CLOCK/2)	/* 6Mhz / 4 internally */
+	MDRV_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)	/* 6 MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
- 	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK/2)	/* 6MHz / 4 internally */
+ 	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MDRV_QUANTUM_TIME(HZ(60000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
 	MDRV_MACHINE_START(ddragon)
 	MDRV_MACHINE_RESET(ddragon)
@@ -998,7 +988,7 @@ static MACHINE_DRIVER_START( ddragon )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 272, 0, 240)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
 	MDRV_VIDEO_START(ddragon)
 	MDRV_VIDEO_UPDATE(ddragon)
@@ -1025,7 +1015,7 @@ static MACHINE_DRIVER_START( ddragonb )
 	MDRV_IMPORT_FROM(ddragon)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("sub", M6809, MAIN_CLOCK/2)	/* 6Mhz / 4 internally */
+	MDRV_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)	/* 1.5Mhz */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 MACHINE_DRIVER_END
 
@@ -1034,7 +1024,7 @@ static MACHINE_DRIVER_START( ddragnba )
 	MDRV_IMPORT_FROM(ddragon)
 
 	/* basic machine hardware */
- 	MDRV_CPU_REPLACE("sub", M6803, MAIN_CLOCK/2)	/* 6Mhz / 4 internally */
+ 	MDRV_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)	/* 6Mhz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(ddragnba_sub_map,0)
 	MDRV_CPU_IO_MAP(ddragnba_sub_portmap,0)
 MACHINE_DRIVER_END
@@ -1043,13 +1033,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ddgn6809 )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK)	/* 12MHz / 4 internally */
+ 	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(ddragon_map,0)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "main", 0, 1)
 
-	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK/2)	/* 6Mhz / 4 internally */
+	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)	/* 1.5 Mhz */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
- 	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK/2)	/* 6MHz / 4 internally */
+ 	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
@@ -1063,7 +1054,7 @@ static MACHINE_DRIVER_START( ddgn6809 )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 272, 0, 240)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
 	MDRV_VIDEO_START(ddragon)
 	MDRV_VIDEO_UPDATE(ddragon)
@@ -1089,10 +1080,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ddragon2 )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK)	/* 12MHz / 4 internally */
+ 	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(dd2_map,0)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "main", 0, 1)
 
-	MDRV_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)	/* 4 MHz */
+	MDRV_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)		/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(dd2_sub_map,0)
 
 	MDRV_CPU_ADD("sound", Z80, 3579545)
@@ -1109,7 +1101,7 @@ static MACHINE_DRIVER_START( ddragon2 )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 272, 0, 240)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
 	MDRV_VIDEO_START(ddragon)
 	MDRV_VIDEO_UPDATE(ddragon)
@@ -2005,9 +1997,6 @@ GAME( 1987, ddragonb, ddragon,  ddragonb, ddragon,  ddragon,  ROT0, "bootleg", "
 GAME( 1987, ddragnba, ddragon,  ddragnba, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddgn6809, ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 1)", GAME_NOT_WORKING )
 GAME( 1987, dd6809a,  ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 2)", GAME_NOT_WORKING )
-
-
-
 GAME( 1988, ddragon2, 0,        ddragon2, ddragon2, ddragon2, ROT0, "Technos", "Double Dragon II - The Revenge (World)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ddragn2u, ddragon2, ddragon2, ddragon2, ddragon2, ROT0, "Technos", "Double Dragon II - The Revenge (US)", GAME_SUPPORTS_SAVE )
 

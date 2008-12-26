@@ -361,12 +361,6 @@ static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
 		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
 		cpu_set_input_line(timer->machine->cpu[0], 3, ASSERT_LINE);
 	}
-
-	/* Adjust for next scanline */
-	if (++scanline >= video_screen_get_height(timer->machine->primary_screen))
-	{
-		scanline = 0;
-	}
 }
 
 /*******************************************************************************

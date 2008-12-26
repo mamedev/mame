@@ -14,6 +14,7 @@
 int vb_scrollx_hi=0;
 int vb_scrollx_lo=0;
 int vb_scrolly_hi=0;
+int scrollx[256];
 
 UINT8 *vb_scrolly_lo;
 UINT8 *vb_videoram;
@@ -23,7 +24,6 @@ static int vb_bgprombank=0xff;
 static int vb_spprombank=0xff;
 
 static tilemap *bg_tilemap;
-static int scrollx[32];
 
 /***************************************************************************
 
@@ -168,26 +168,11 @@ VIDEO_UPDATE( vb )
 	tilemap_set_scrolly(bg_tilemap,0,vb_scrolly_hi + *vb_scrolly_lo);
 
 	/*To get linescrolling to work properly, we must ignore the 1st two scroll values, no idea why! -SJE */
-	for (i = 2;i < 32;i++) {
+	for (i = 2; i < 256; i++) {
 		tilemap_set_scrollx(bg_tilemap,i,scrollx[i-2]);
 		//logerror("scrollx[%d] = %d\n",i,scrollx[i]);
 	}
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
-}
-
-
-/*I don't really understand what the proper timing of this should be,
-  but after TONS of testing, the tilemap individual line scrolling works as long as flip screen is not set -SJE
-*/
-INTERRUPT_GEN( vball_interrupt )
-{
-	int line = 31 - cpu_getiloops(device);
-	if (line < 13)
-		cpu_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);
-	else if (line == 13)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	//save the scroll x register value
-	if(line<32) scrollx[31-line] = (vb_scrollx_hi + vb_scrollx_lo+4);
 }

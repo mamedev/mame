@@ -147,6 +147,11 @@ TODO:
 #include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
 
+#define MASTER_CLOCK		XTAL_12MHz
+#define CPU_CLOCK			MASTER_CLOCK / 8
+#define MCU_CLOCK			MASTER_CLOCK / 4
+#define PIXEL_CLOCK		MASTER_CLOCK / 2
+
 static UINT8 *xain_sharedram;
 static int vblank;
 
@@ -163,6 +168,66 @@ WRITE8_HANDLER( xain_flipscreen_w );
 
 extern UINT8 *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
 
+
+/*
+    Based on the Solar Warrior schematics, vertical timing counts as follows:
+
+        08,09,0A,0B,...,FC,FD,FE,FF,E8,E9,EA,EB,...,FC,FD,FE,FF,
+        08,09,....
+
+    Thus, it counts from 08 to FF, then resets to E8 and counts to FF again.
+    This gives (256 - 8) + (256 - 232) = 248 + 24 = 272 total scanlines.
+
+    VBLK is signalled starting when the counter hits F8, and continues through
+    the reset to E8 and through until the next reset to 08 again.
+
+    Since MAME's video timing is 0-based, we need to convert this.
+*/
+
+INLINE int scanline_to_vcount(int scanline)
+{
+	int vcount = scanline + 8;
+	if (vcount < 0x100)
+		return vcount;
+	else
+		return (vcount - 0x18) | 0x100;
+}
+
+static TIMER_DEVICE_CALLBACK( xain_scanline )
+{
+	int scanline = param;
+	int screen_height = video_screen_get_height(timer->machine->primary_screen);
+	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
+	int vcount = scanline_to_vcount(scanline);
+
+	/* update to the current point */
+	if (scanline > 0)
+	{
+		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+	}
+
+	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
+	if (!(vcount_old & 8) && (vcount & 8))
+	{
+		cpu_set_input_line(timer->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+	}
+
+	/* NMI fires on scanline 248 (VBL) and is latched */
+	if (vcount == 0xf8)
+	{
+		cpu_set_input_line(timer->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+	}
+
+	/* VBLANK input bit is held high from scanlines 248-255 */
+	if (vcount >= 248-1)	// -1 is a hack - see notes above
+	{
+		vblank = 1;
+	}
+	else
+	{
+		vblank = 0;
+	}
+}
 
 static READ8_HANDLER( xain_sharedram_r )
 {
@@ -248,24 +313,6 @@ static CUSTOM_INPUT( xain_vblank_r )
 	return vblank;
 }
 
-static INTERRUPT_GEN( xain_interrupt )
-{
-	int scanline = 255 - cpu_getiloops(device);
-
-	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
-	if (scanline & 0x08)
-		cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
-
-	/* NMI fires on scanline 248 (VBL) and is latched */
-	if (scanline == 248)
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-
-	/* VBLANK input bit is held high from scanlines 248-255 */
-	if (scanline >= 248-1) // -1 is a hack - see notes above
-		vblank = 1;
-	else
-		vblank = 0;
-}
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(xain_sharedram_r, xain_sharedram_w) AM_BASE(&xain_sharedram)
@@ -293,7 +340,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3c00, 0x3dff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu_map_B, ADDRESS_SPACE_PROGRAM, 8 )
@@ -302,7 +349,7 @@ static ADDRESS_MAP_START( cpu_map_B, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(xain_irqB_clear_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(xainCPUB_bankswitch_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK2)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 #if 0
@@ -321,6 +368,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( xsleena )
 	PORT_START("P1")
@@ -399,7 +447,6 @@ static INPUT_PORTS_START( xsleena )
 INPUT_PORTS_END
 
 
-
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -430,7 +477,6 @@ static GFXDECODE_START( xain )
 GFXDECODE_END
 
 
-
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
@@ -447,30 +493,29 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-
 static MACHINE_START( xsleena )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space_main = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space_sub = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
 	/* initialize the bank pointers */
-	xainCPUA_bankswitch_w(space,0,0);
-	xainCPUB_bankswitch_w(space,0,0);
+	xainCPUA_bankswitch_w(space_main,0,0);
+	xainCPUB_bankswitch_w(space_sub,0,0);
 }
-
 
 static MACHINE_DRIVER_START( xsleena )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 1500000)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("main", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(xain_interrupt,256)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", xain_scanline, "main", 0, 1)
 
-	MDRV_CPU_ADD("sub", M6809, 1500000)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("sub", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
 	MDRV_CPU_PROGRAM_MAP(cpu_map_B,0)
 
-	MDRV_CPU_ADD("audio", M6809, 1500000)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("audio", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-//  MDRV_CPU_ADD("mcu", M68705, 3000000)    /* Confirmed 3MHz */
+//  MDRV_CPU_ADD("mcu", M68705, MCU_CLOCK)    /* Confirmed 3MHz */
 //  MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_MACHINE_START(xsleena)
@@ -479,11 +524,8 @@ static MACHINE_DRIVER_START( xsleena )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)	/* based on ddragon driver */
 
 	MDRV_GFXDECODE(xain)
 	MDRV_PALETTE_LENGTH(512)
@@ -507,7 +549,6 @@ static MACHINE_DRIVER_START( xsleena )
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 MACHINE_DRIVER_END
-
 
 
 /***************************************************************************
@@ -676,7 +717,6 @@ ROM_START( solarwar )
 ROM_END
 
 
-
 static DRIVER_INIT( xsleena )
 {
 	UINT8 *RAM = memory_region(machine, "main");
@@ -702,7 +742,6 @@ static DRIVER_INIT( solarwar )
 	RAM[0xd482] = 0x12;
 	RAM[0xd483] = 0x12;
 }
-
 
 
 GAME( 1986, xsleena,  0,       xsleena, xsleena, xsleena,  ROT0, "Technos", "Xain'd Sleena", 0 )
