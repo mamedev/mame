@@ -1728,7 +1728,6 @@ src/mame/drivers/missile.c svneol=native#text/plain
 src/mame/drivers/mitchell.c svneol=native#text/plain
 src/mame/drivers/mjkjidai.c svneol=native#text/plain
 src/mame/drivers/mjsister.c svneol=native#text/plain
-src/mame/drivers/mjsiyoub.c svneol=native#text/plain
 src/mame/drivers/mlanding.c svneol=native#text/plain
 src/mame/drivers/model1.c svneol=native#text/plain
 src/mame/drivers/model2.c svneol=native#text/plain

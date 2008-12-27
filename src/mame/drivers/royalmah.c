@@ -3288,6 +3288,43 @@ ROM_START( janoha )
 	ROM_LOAD( "18s030.44",  0x0020, 0x0020, CRC(d4eabf78) SHA1(f14778b552ff483e36e7c30ee67e8e2075790ea2) )
 ROM_END
 
+/*
+
+Mahjong Shiyou (BET type)
+(c)1986 Visco
+
+Board:  S-0086-001-00
+CPU:    Z80-A x2
+Sound:  AY-3-8910
+        M5205
+OSC:    18.432MHz
+        400KHz
+
+
+1.1K       Z80#2 prg.
+2.1G
+
+3.3G       Z80#1 prg.
+4.3F
+
+COLOR.BPR  color
+
+*/
+
+ROM_START( mjsiyoub )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "3.3g", 0x00000, 0x8000, CRC(47d0f16e) SHA1(a125be052668ba93756bf940af31a10e91a3d307) )
+	ROM_LOAD( "4.3f", 0x08000, 0x8000, CRC(6cd6a200) SHA1(1c53e5caacdb9c660bd98f5331bf5354581f74c9) )
+
+	/*encrypted z80?*/
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "1.1k", 0x00000, 0x8000, CRC(a1083321) SHA1(b36772e90be60270234df16cf92d87f8d950190d) )
+	ROM_LOAD( "2.1g", 0x08000, 0x4000, CRC(cfe5de1d) SHA1(4acf9a752aa3c02b0889b0b49d3744359fa24460) )
+
+	ROM_REGION( 0x40000, "proms", 0 )
+	ROM_LOAD( "color.bpr", 0x00, 0x20,  CRC(d21367e5) SHA1(b28321ac8f99abfebe2ef4da0c751cefe9f3f3b6) )
+ROM_END
+
 
 static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x8000 );	}
 
@@ -3301,6 +3338,7 @@ static DRIVER_INIT( janptr96 )
 
 
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0, "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
+GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, 0, 	   ROT0, "Visco",                      "Mahjong Shiyou", GAME_NOT_WORKING )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, 0,        ROT0, "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, 0,        ROT0, "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, 0,        ROT0, "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
