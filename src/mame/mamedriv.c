@@ -1426,6 +1426,7 @@ const game_driver * const drivers[] =
 	DRIVER( rtypej )	/* (c) 1987 (Japan) */
 	DRIVER( rtypejp )	/* (c) 1987 (Japan) */
 	DRIVER( rtypeu )	/* (c) 1987 + Nintendo USA license (US) */
+	DRIVER( rtypeb )		/* bootleg  */
 	DRIVER( bchopper )	/* (c) 1987 */
 	DRIVER( mrheli )	/* (c) 1987 (Japan) */
 	DRIVER( nspirit )	/* (c) 1988 */

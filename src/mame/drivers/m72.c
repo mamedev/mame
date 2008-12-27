@@ -2448,6 +2448,42 @@ ROM_START( rtypeu )
 	ROM_LOAD( "m72_a-4d-.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 at IC19 */
 ROM_END
 
+ROM_START( rtypeb )
+	ROM_REGION( 0x100000, "main", 0 ) /* Roms located on the M72-ROM-C rom board */
+	ROM_LOAD16_BYTE( "7.512", 0x00001, 0x10000, CRC(eacc8024) SHA1(6bcf1d4ea182b7341eac736d2a5d5f70deec0758) )
+	ROM_LOAD16_BYTE( "1.512", 0x00000, 0x10000, CRC(2e5fe27b) SHA1(a3364be5ab9c67aaa2152baf39ea12c571eca3cc) )
+	ROM_LOAD16_BYTE( "8.512", 0x20001, 0x10000, CRC(22cc4950) SHA1(ada5cffc13c38391a334411632237166a6be4938) )
+	ROM_RELOAD(                      0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "2.512", 0x20000, 0x10000, CRC(ada7b90e) SHA1(c9d2caed95b95d1c1718a10766bc88b2f8f51619) )
+	ROM_RELOAD(                      0xe0000, 0x10000 )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE ) /* Roms located on the M72-ROM-C rom board */
+	ROM_LOAD( "rt_r-00.1h", 0x00000, 0x10000, CRC(dad53bc0) SHA1(1e3bc498861946278a0b1fe24259f5d224e265d7) )	/* sprites */
+	ROM_LOAD( "rt_r-01.1j", 0x10000, 0x08000, CRC(5e441e7f) SHA1(6741eb7f2d9d985b5a89eefc73ea44c3e38de6f7) )
+	ROM_RELOAD(             0x18000, 0x08000 )
+	ROM_LOAD( "rt_r-10.1k", 0x20000, 0x10000, CRC(d6a66298) SHA1(d2873d05aa3b257e7699c188880ac3daad672fa5) )
+	ROM_LOAD( "rt_r-11.1l", 0x30000, 0x08000, CRC(791df4f8) SHA1(5239a97222212ac9c019177771cb2b5096b7bc17) )
+	ROM_RELOAD(             0x38000, 0x08000 )
+	ROM_LOAD( "rt_r-20.3h", 0x40000, 0x10000, CRC(fc247c8a) SHA1(01cf0a60f47fa5e2ed430a3f075e69e6cb762a48) )
+	ROM_LOAD( "rt_r-21.3j", 0x50000, 0x08000, CRC(ed793841) SHA1(7e55a9a11fcd989db39bce6be48821b747c7d97f) )
+	ROM_RELOAD(             0x58000, 0x08000 )
+	ROM_LOAD( "rt_r-30.3k", 0x60000, 0x10000, CRC(eb02a1cb) SHA1(60a394ab53afdcbbf9e88083b8dbe8c897170d77) )
+	ROM_LOAD( "rt_r-31.3l", 0x70000, 0x08000, CRC(8558355d) SHA1(b5467d1f22f6e5f90c5d8a8ac2d55974f287d589) )
+	ROM_RELOAD(             0x78000, 0x08000 )
+
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE ) /* Roms located on the M72-B-D rom board */
+	ROM_LOAD( "rt_b-a0.3c", 0x00000, 0x08000, CRC(4e212fb0) SHA1(687061ecade2ebd0bd1343c9c4a831791853f79c) )	/* tiles #1 */
+	ROM_LOAD( "rt_b-a1.3d", 0x08000, 0x08000, CRC(8a65bdff) SHA1(130bf6af521f13247a739a95eab4bdaa24b2ac10) )
+	ROM_LOAD( "rt_b-a2.3a", 0x10000, 0x08000, CRC(5a4ae5b9) SHA1(95c3b64f50e6f673b2bf9b40642c152da5009d25) )
+	ROM_LOAD( "rt_b-a3.3e", 0x18000, 0x08000, CRC(73327606) SHA1(9529ecdedd30e2a0400fb1083117992cc18b5158) )
+
+	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE ) /* Roms located on the M72-B-D rom board */
+	ROM_LOAD( "rt_b-b0.3j", 0x00000, 0x08000, CRC(a7b17491) SHA1(5b390770e56ba2d35e108534d7eda8dca996fdf7) )	/* tiles #2 */
+	ROM_LOAD( "rt_b-b1.3k", 0x08000, 0x08000, CRC(b9709686) SHA1(700905a3e9661e0874939f54da2909e1396ce596) )
+	ROM_LOAD( "rt_b-b2.3h", 0x10000, 0x08000, CRC(433b229a) SHA1(14222eaa3e67e5a7f80eafcf22bac4eb2d485a9a) )
+	ROM_LOAD( "rt_b-b3.3f", 0x18000, 0x08000, CRC(ad89b072) SHA1(e2683d0e7415f3abd147e518bf6c87e44744cd4f) )
+ROM_END
+
 ROM_START( bchopper )
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "c-h0-b.rom",   0x00001, 0x10000, CRC(f2feab16) SHA1(03ee874658e0f59957f8425e1ebf9c938737cc19) )
@@ -3414,6 +3450,7 @@ GAME( 1987, rtype,    0,        rtype,    rtype,    0,        ROT0,   "Irem", "R
 GAME( 1987, rtypej,   rtype,    rtype,    rtype,    0,        ROT0,   "Irem", "R-Type (Japan)", GAME_NO_COCKTAIL )
 GAME( 1987, rtypejp,  rtype,    rtype,    rtypep,   0,        ROT0,   "Irem", "R-Type (Japan prototype)", GAME_NO_COCKTAIL )
 GAME( 1987, rtypeu,   rtype,    rtype,    rtype,    0,        ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", GAME_NO_COCKTAIL )
+GAME( 1987, rtypeb,   rtype,    rtype,    rtype,    0,        ROT0,   "bootleg", "R-Type (World bootleg)", GAME_NO_COCKTAIL )
 GAME( 1987, bchopper, 0,        m72,      bchopper, bchopper, ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL )
 GAME( 1987, mrheli,   bchopper, m72,      bchopper, mrheli,   ROT0,   "Irem", "Mr. HELI no Dai-Bouken", GAME_NO_COCKTAIL )
 GAME( 1988, nspirit,  0,        m72,      nspirit,  nspirit,  ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )
