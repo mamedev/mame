@@ -3477,6 +3477,17 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( calorie )	/* (c) 1986 Sega */
 	DRIVER( calorieb )	/* (c) 1986 Sega (but bootleg) */
 
+	/* Bingo-based games */
+	DRIVER( bingoc )    /* (c) 1989 Sega */
+	/* Bingo Fantasy  *//* (c) 19?? Sega */
+	/* Bingo Star     *//* (c) 19?? Sega */
+	/* Bingo Party    *//* (c) 1993 Sega */
+	/* BP Phoenix     *//* (c) 1998 Sega */
+	/* BP Special     *//* (c) 2000 Sega */
+	/* BP Multicards  *//* (c) 2002 Sega */
+	/* BP Splash      *//* (c) 2002 Sega */
+	/* Bingo Planet   *//* (c) 1997 Sega */
+
 	/* Enduro Racer / Space Harrier / Hang On */
 	DRIVER( enduror )	/* (c) 1985 (FD1089B, decrypted) */
 	DRIVER( enduror1 )	/* (c) 1985 (FD1089B, decrypted) */

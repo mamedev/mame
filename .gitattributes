@@ -1276,6 +1276,7 @@ src/mame/drivers/bfm_sc2.c svneol=native#text/plain
 src/mame/drivers/bigevglf.c svneol=native#text/plain
 src/mame/drivers/bigfghtr.c svneol=native#text/plain
 src/mame/drivers/bigstrkb.c svneol=native#text/plain
+src/mame/drivers/bingoc.c svneol=native#text/plain
 src/mame/drivers/bionicc.c svneol=native#text/plain
 src/mame/drivers/bishi.c svneol=native#text/plain
 src/mame/drivers/bishjan.c svneol=native#text/plain

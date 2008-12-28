@@ -1168,6 +1168,7 @@ $(MAMEOBJ)/sanritsu.a: \
 $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/aladbl.o \
 	$(DRIVERS)/angelkds.o $(VIDEO)/angelkds.o \
+	$(DRIVERS)/bingoc.o \
 	$(DRIVERS)/blockade.o $(AUDIO)/blockade.o $(VIDEO)/blockade.o \
 	$(DRIVERS)/calorie.o \
 	$(DRIVERS)/coolridr.o \
