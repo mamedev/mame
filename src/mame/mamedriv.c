@@ -7938,6 +7938,7 @@ Other Sun games
 	DRIVER( msbingo )	/* (C) 1994 Min Corp. */
 	DRIVER( dblpoint )	/* (c) 1995 Min Corp. */
 	DRIVER( dblpoind )	/* (c) 1995 Dong Bang Electron */
+	DRIVER( statusbj )  /* (c) 1981 Status Games */
 	DRIVER( hangman )	/* (c) 1984 Status Games */
 	DRIVER( trivquiz )	/* (c) 1984 Status Games */
 	DRIVER( statriv2 )	/* (c) 1984 Status Games */
