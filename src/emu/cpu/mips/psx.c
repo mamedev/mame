@@ -3119,7 +3119,7 @@ static void setcp3cr( psxcpu_state *psxcpu, int reg, UINT32 value )
 #define BFC ( psxcpu->cp2cr[ 23 ].sd )
 #define OFX ( psxcpu->cp2cr[ 24 ].sd )
 #define OFY ( psxcpu->cp2cr[ 25 ].sd )
-#define H   ( psxcpu->cp2cr[ 26 ].w.l )
+#define H   ( psxcpu->cp2cr[ 26 ].sw.l )
 #define DQA ( psxcpu->cp2cr[ 27 ].sw.l )
 #define DQB ( psxcpu->cp2cr[ 28 ].sd )
 #define ZSF3 ( psxcpu->cp2cr[ 29 ].sw.l )
@@ -5323,7 +5323,7 @@ static const UINT16 reciprocals[ 32768 ]=
 
 INLINE UINT32 gte_divide( INT16 numerator, UINT16 denominator )
 {
-	if( numerator < ( denominator * 2 ) )
+	if( numerator >= 0 && numerator < ( denominator * 2 ) )
 	{
 		UINT32 offset = denominator;
 		int shift = 0;
