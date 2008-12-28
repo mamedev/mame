@@ -49,7 +49,6 @@ extern size_t goldstar_video_size;
 extern UINT8 *goldstar_reel1_scroll, *goldstar_reel2_scroll, *goldstar_reel3_scroll;
 
 
-
 extern UINT8 *goldstar_reel1_ram;
 extern WRITE8_HANDLER( goldstar_reel1_ram_w );
 extern UINT8 *goldstar_reel2_ram;
@@ -183,7 +182,7 @@ ADDRESS_MAP_END
 
   I/O
 
-  00 = RW  (chryigld)
+  00 = RW  (chrygld)
   02 = RW  (ncb3)
   06 = RW
   08 = RW
@@ -549,7 +548,7 @@ static INPUT_PORTS_START( goldstar )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( chryigld )
+static INPUT_PORTS_START( chrygld )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1596,7 +1595,7 @@ static PALETTE_INIT(lucky8)
 }
 
 
-static MACHINE_DRIVER_START( chryigld )
+static MACHINE_DRIVER_START( chrygld )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
@@ -1932,7 +1931,7 @@ ROM_END
 
 
 
-ROM_START( chryigld )
+ROM_START( chrygld )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ol-v9.u20",  0x00000, 0x10000, CRC(b61c0695) SHA1(63c44b20fd7f76bdb33331273d2610e8cfd31add) )
 
@@ -1987,7 +1986,7 @@ ROM_START( ncb3 )
 	ROM_LOAD( "5.764", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
 	ROM_LOAD( "1.764", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
 
-	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )	/* PROM from chryigld. need verification */
+	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )	/* PROM from chrygld. need verification */
 	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
@@ -2023,7 +2022,7 @@ ROM_START( cb3 )
 	ROM_LOAD( "main_3.764", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
 	ROM_LOAD( "main_4.764", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
 
-	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )	/* PROM from chryigld. need verification */
+	ROM_REGION( 0x0200, "proms", ROMREGION_DISPOSE )	/* PROM from chrygld. need verification */
 	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, BAD_DUMP CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
 
 	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
@@ -2250,9 +2249,9 @@ static DRIVER_INIT(goldstar)
 	}
 }
 
-// this block swapping is the same for chry10, chryigld and cb3
+// this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
-void do_blockswaps(UINT8* ROM)
+static void do_blockswaps(UINT8* ROM)
 {
 	int A;
 	UINT8 *buffer;
@@ -2272,6 +2271,7 @@ void do_blockswaps(UINT8* ROM)
 	};
 
 	buffer = malloc(0x10000);
+	memcpy(buffer,ROM,0x10000);
 
 	// swap some 0x800 blocks around..
 	for (A =0;A<32; A++)
@@ -2282,7 +2282,7 @@ void do_blockswaps(UINT8* ROM)
 	free(buffer);
 }
 
-static void dump_to_file(UINT8* ROM)
+static void dump_to_file(running_machine* machine, UINT8* ROM)
 {
 	#if 0
 	{
@@ -2305,7 +2305,7 @@ static DRIVER_INIT( chry10 )
 	do_blockswaps(ROM);
 
 	/* and something else... */
-	dump_to_file(ROM);
+	dump_to_file(machine, ROM);
 }
 
 
@@ -2315,11 +2315,11 @@ static DRIVER_INIT( cb3 )
 	do_blockswaps(ROM);
 
 	/* and something else... */
-	dump_to_file(ROM);
+	dump_to_file(machine, ROM);
 }
 
 
-static DRIVER_INIT( chryigld )
+static DRIVER_INIT( chrygld )
 {
 	int A;
 	UINT8 *ROM = memory_region(machine, "main");
@@ -2333,7 +2333,7 @@ static DRIVER_INIT( chryigld )
 		ROM[A] = dat;
 	}
 
-	dump_to_file(ROM);
+	dump_to_file(machine, ROM);
 }
 
 static DRIVER_INIT(lucky8a)
@@ -2352,8 +2352,8 @@ static DRIVER_INIT(lucky8a)
 GAME( 199?, goldstar, 0,        goldstar, goldstar, goldstar, ROT0, "IGS",         "Golden Star",                            0 )
 GAME( 199?, goldstbl, goldstar, goldstbl, goldstar, 0,        ROT0, "IGS",         "Golden Star (Blue version)",             0 )
 GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "bootleg",     "Moon Light (bootleg of Golden Star)",    0 )
-GAME( 199?, chryigld, goldstar, chryigld, chryigld, chryigld, ROT0, "bootleg",     "Cherry I Gold (bootleg of Golden Star)", 0 )
-GAME( 199?, chry10,   goldstar, chryigld, ncb3,     chry10,   ROT0, "bootleg",     "Cherry 10 (bootleg of Golden Star)",     GAME_NOT_WORKING )
+GAME( 199?, chrygld,  goldstar, chrygld,  chrygld,  chrygld,  ROT0, "bootleg",     "Cherry Gold I",                          0 )
+GAME( 199?, chry10,   goldstar, chrygld,  ncb3,     chry10,   ROT0, "bootleg",     "Cherry 10 (bootleg of Golden Star)",     GAME_NOT_WORKING )
 
 // are these really dyna, or bootlegs?
 GAME( 19??, ncb3,     goldstar, ncb3,     ncb3,     0,        ROT0, "Dyna",        "Cherry Bonus III (Version 1.40)",        GAME_NOT_WORKING ) // set was labeled 'new cherry bonus 3' but there is no 'new' in the gfx roms
