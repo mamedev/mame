@@ -63,7 +63,7 @@ static VIDEO_UPDATE(jongkyo)
 	// good mahjong tiles
 	      data3 = 0x0f; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
 	// good girl tiles
-	//		data3 = 0x00; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
+	//	data3 = 0x00; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
 
 
 
@@ -108,6 +108,14 @@ static WRITE8_HANDLER( mux_w )
 {
 	mux_data = ~data;
 //	printf("%02x\n",mux_data);
+}
+
+static WRITE8_HANDLER( jongkyo_coin_counter_w )
+{
+	/* bit 1 = coin counter */
+	coin_counter_w(0,data & 2);
+
+	/* bit 2 always set? */
 }
 
 static READ8_HANDLER( input_1p_r )
@@ -169,7 +177,7 @@ static WRITE8_HANDLER( unknown_w )
 			break;
 		case 3: // not used
 			break;
-		case 4: // only set to 1 after the tests
+		case 4: // set to 1 before the girl drawing (probably is the palette selector, not sure how to restore the old palette)
 			break;
 		case 5: // only set to 0 at the boot
 			break;
@@ -200,7 +208,7 @@ static ADDRESS_MAP_START( jongkyo_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_0_w)
 
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW")
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW") AM_WRITE(jongkyo_coin_counter_w)
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0") AM_WRITE(mux_w)
 	// W 11 select keyboard row (fe fd fb f7)
 	AM_RANGE(0x40, 0x45) AM_WRITE(bank_select_w)
