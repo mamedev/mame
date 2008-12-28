@@ -45,7 +45,7 @@ VIDEO_UPDATE(bingoc)
 	return 0;
 }
 
-static READ16_HANDLER( rand_r )
+static READ16_HANDLER( bingoc_rand_r )
 {
 	return 0xffff;
 }
@@ -95,8 +95,8 @@ static WRITE8_HANDLER( bingoc_play_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10007f) AM_READ(rand_r) //comms? lamps?
-	AM_RANGE(0x180000, 0x18007f) AM_READ(rand_r) //comms? lamps?
+	AM_RANGE(0x100000, 0x10007f) AM_READ(bingoc_rand_r) //comms? lamps?
+	AM_RANGE(0x180000, 0x18007f) AM_READ(bingoc_rand_r) //comms? lamps?
 #if !SOUND_TEST
 	AM_RANGE(0x180010, 0x180011) AM_WRITE(main_sound_latch_w) //WRONG there...
 #endif
