@@ -92,6 +92,7 @@ enum
 	XTAL_13_4MHz		= 13400000,		/* TNK3, Ikari Warriors h/w */
 	XTAL_13_4952MHz		= 13495200,		/* Used on Shadow Force pcb and maybe other Technos pcbs? */
 	XTAL_14MHz   		= 14000000,
+	XTAL_14_112Mhz    	= 14112000, 	/* Timex/Sinclair TS2068 */
 	XTAL_14_31818MHz  	= 14318180,		/* Extremely common, used on 100's of PCBs */
 	XTAL_14_705882MHz  	= 14705882,		/* Aleck64 */
 	XTAL_14_7456MHz 	= 14745600,		/* Namco System 12 & System Super 22/23 for H8/3002 CPU */
