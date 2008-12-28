@@ -7938,7 +7938,7 @@ Other Sun games
 	DRIVER( msbingo )	/* (C) 1994 Min Corp. */
 	DRIVER( dblpoint )	/* (c) 1995 Min Corp. */
 	DRIVER( dblpoind )	/* (c) 1995 Dong Bang Electron */
-	DRIVER( statusbj )  /* (c) 1981 Status Games */
+	DRIVER( statusbj )	/* (c) 1981 Status Games */
 	DRIVER( hangman )	/* (c) 1984 Status Games */
 	DRIVER( trivquiz )	/* (c) 1984 Status Games */
 	DRIVER( statriv2 )	/* (c) 1984 Status Games */
@@ -8058,6 +8058,7 @@ Other Sun games
 	DRIVER( cardline )	/* (c) 199? Veltmeijer */
 	DRIVER( bmcbowl )	/* (c) 1994 BMC */
 	DRIVER( koftball )  /* (c) 1995 BMC */
+	DRIVER( mpoker )	/* (c) 1983 Merit */
 	DRIVER( pitboss )	/* (c) 1983 Merit */
 	DRIVER( pitbossa )	/* (c) 1983 Merit */
 	DRIVER( casino5 )	/* (c) 1983 Merit */

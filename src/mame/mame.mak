@@ -940,6 +940,7 @@ $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/meadows.o $(AUDIO)/meadows.o $(VIDEO)/meadows.o \
 
 $(MAMEOBJ)/merit.a: \
+	$(DRIVERS)/mpoker.o \
 	$(DRIVERS)/merit.o \
 	$(DRIVERS)/meritm.o \
 
