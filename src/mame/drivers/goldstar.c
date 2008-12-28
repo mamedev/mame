@@ -697,7 +697,7 @@ static INPUT_PORTS_START( chryigld )
 	PORT_DIPSETTING(    0x00, "Exchange" )
 
 	/* DSW5 is not connected yet. Where the hell is connected? */
-	PORT_START("DSW5") 
+	PORT_START("DSW5")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )		PORT_DIPLOCATION("DSW5:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -869,7 +869,7 @@ static INPUT_PORTS_START( ncb3 )
 	PORT_DIPSETTING(    0x80, "Unexchange" )
 	PORT_DIPSETTING(    0x00, "Exchange" )
 
-	PORT_START("DSW5") 
+	PORT_START("DSW5")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )		PORT_DIPLOCATION("DSW5:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1341,6 +1341,12 @@ static GFXDECODE_START( ncb3 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128, 4 )
 GFXDECODE_END
 
+static GFXDECODE_START( cmv801 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
+GFXDECODE_END
+
+
 static GFXDECODE_START( cmasterb )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x5_layout, 0, 4 )
@@ -1532,6 +1538,7 @@ static MACHINE_DRIVER_START( moonlght )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
 MACHINE_DRIVER_END
 
+
 static PALETTE_INIT(cm)
 {
 	int i;
@@ -1552,6 +1559,42 @@ static PALETTE_INIT(cm)
 
 	}
 }
+
+static PALETTE_INIT(lucky8)
+{
+	int i;
+	int r,g,b;
+	UINT8 dat;
+	UINT8 *proms;
+
+	proms = memory_region(machine, "proms");
+	for (i=0;i<0x100;i++)
+	{
+
+		dat = proms[0x000+i] | (proms[0x100+i]<<4);
+
+		r = (dat & 0x07) << 5;
+		g = (dat & 0x38) << 2;
+		b = (dat & 0xc0) << 0;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+
+	}
+
+	proms = memory_region(machine, "proms2");
+	for (i=0;i<0x20;i++)
+	{
+		dat = proms[i];
+
+		r = (dat & 0x07) << 5;
+		g = (dat & 0x38) << 2;
+		b = (dat & 0xc0) << 0;
+
+		palette_set_color(machine, i+0x80, MAKE_RGB(r, g, b));
+	}
+
+}
+
 
 static MACHINE_DRIVER_START( chryigld )
 
@@ -1592,7 +1635,6 @@ static MACHINE_DRIVER_START( chryigld )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
-
 
 
 
@@ -1654,7 +1696,7 @@ static MACHINE_DRIVER_START( cm )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(ncb3)
+	MDRV_GFXDECODE(cmv801)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
 //  MDRV_NVRAM_HANDLER(goldstar)
@@ -1729,6 +1771,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MDRV_PALETTE_INIT(lucky8)
 
 	MDRV_GFXDECODE(ncb3)
 	MDRV_PALETTE_LENGTH(256)
@@ -2094,18 +2137,24 @@ ROM_START( lucky8 )
 	ROM_LOAD( "7",  0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "3",   0x0000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
-	ROM_LOAD( "4",   0x2000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
-	ROM_LOAD( "1",   0x4000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
-	ROM_LOAD( "2",   0x6000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "1",   0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
 
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "d12", 0x0100, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "d12", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	/* missing prom? - using one from other dump */
+	ROM_LOAD( "prom4", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
 	ROM_LOAD( "g14", 0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
 
-	ROM_REGION( 0x40, "proms2", 0 )
-	ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-	ROM_LOAD( "g13", 0x0020, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -2158,7 +2207,8 @@ Seems to be related to timing since once patched the game is very fast.
 */
 ROM_START( lucky8a )
 	ROM_REGION( 0x8000, "main", 0 )
-	ROM_LOAD( "1",	 0x0000, 0x8000, CRC(554cddff) SHA1(8a0678993c7010f70adc9e9443b51cf5929bf110) )
+	// we have to patch this, it might be bad
+	ROM_LOAD( "1",	 0x0000, 0x8000, BAD_DUMP CRC(554cddff) SHA1(8a0678993c7010f70adc9e9443b51cf5929bf110) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "6",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
@@ -2166,19 +2216,23 @@ ROM_START( lucky8a )
 	ROM_LOAD( "8",  0x10000, 0x8000, CRC(80b35f06) SHA1(561d257d7bc8976cfa08f36d84961f1263509b5b) )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "4",   0x0000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
-	ROM_LOAD( "5",   0x2000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
-	ROM_LOAD( "2",   0x4000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
-	ROM_LOAD( "3",   0x6000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "2",   0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "3",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "4",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "5",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
 
-	ROM_REGION( 0x300, "proms", 0 )
+	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "prom3", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
 	ROM_LOAD( "prom4", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
-	ROM_LOAD( "prom5", 0x0200, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
 
 	ROM_REGION( 0x40, "proms2", 0 )
 	ROM_LOAD( "prom1", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-	ROM_LOAD( "prom2", 0x0020, 0x0020, CRC(7b1a769f) SHA1(788b3573df17d398c74662fec4fd7693fc27e2ef) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "prom5", 0x000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "prom2", 0x0000, 0x0020, CRC(7b1a769f) SHA1(788b3573df17d398c74662fec4fd7693fc27e2ef) )
 ROM_END
 
 
@@ -2196,15 +2250,11 @@ static DRIVER_INIT(goldstar)
 	}
 }
 
-static DRIVER_INIT( chry10 )
-{
-	// probably has the same block swapping as chryigld below, but data swap is different
-}
-
-static DRIVER_INIT( chryigld )
+// this block swapping is the same for chry10, chryigld and cb3
+//  the underlying bitswaps / xors are different however
+void do_blockswaps(UINT8* ROM)
 {
 	int A;
-	UINT8 *ROM = memory_region(machine, "main");
 	UINT8 *buffer;
 
 	static UINT16 cherry_swaptables[32] = {
@@ -2213,7 +2263,8 @@ static DRIVER_INIT( chryigld )
 		0x1800, 0x3000, 0x6800, 0x7000,
 		0x0000, 0x4800, 0x2000, 0x5000,
 		0x1000, 0x7800, 0x6000, 0x3800,
-		/* bit below, I'm not sure, no exact match, but only the first ones matter? */
+		/* bit below, I'm not sure, no exact match, but only the first ones matter,
+		   as the is just garbage */
 		0xc000, 0xc800, 0xd000, 0xd800,
 		0xe000, 0xe800, 0xf000, 0xf800,
 		0x8000, 0x8800, 0x9000, 0x9800,
@@ -2222,14 +2273,6 @@ static DRIVER_INIT( chryigld )
 
 	buffer = malloc(0x10000);
 
-	// a data bitswap (this is correct for chryigld, not chry10)
-	for (A = 0;A < 0x10000;A++)
-	{
-		UINT8 dat = ROM[A];
-		dat =  BITSWAP8(dat,5,6,3,4,7,2,1,0);
-		buffer[A] = dat;
-	}
-
 	// swap some 0x800 blocks around..
 	for (A =0;A<32; A++)
 	{
@@ -2237,7 +2280,10 @@ static DRIVER_INIT( chryigld )
 	}
 
 	free(buffer);
+}
 
+static void dump_to_file(UINT8* ROM)
+{
 	#if 0
 	{
 		FILE *fp;
@@ -2251,6 +2297,43 @@ static DRIVER_INIT( chryigld )
 		}
 	}
 	#endif
+}
+
+static DRIVER_INIT( chry10 )
+{
+	UINT8 *ROM = memory_region(machine, "main");
+	do_blockswaps(ROM);
+
+	/* and something else... */
+	dump_to_file(ROM);
+}
+
+
+static DRIVER_INIT( cb3 )
+{
+	UINT8 *ROM = memory_region(machine, "main");
+	do_blockswaps(ROM);
+
+	/* and something else... */
+	dump_to_file(ROM);
+}
+
+
+static DRIVER_INIT( chryigld )
+{
+	int A;
+	UINT8 *ROM = memory_region(machine, "main");
+	do_blockswaps(ROM);
+
+	// a data bitswap
+	for (A = 0;A < 0x10000;A++)
+	{
+		UINT8 dat = ROM[A];
+		dat =  BITSWAP8(dat,5,6,3,4,7,2,1,0);
+		ROM[A] = dat;
+	}
+
+	dump_to_file(ROM);
 }
 
 static DRIVER_INIT(lucky8a)
@@ -2274,11 +2357,11 @@ GAME( 199?, chry10,   goldstar, chryigld, ncb3,     chry10,   ROT0, "bootleg",  
 
 // are these really dyna, or bootlegs?
 GAME( 19??, ncb3,     goldstar, ncb3,     ncb3,     0,        ROT0, "Dyna",        "Cherry Bonus III (Version 1.40)",        GAME_NOT_WORKING ) // set was labeled 'new cherry bonus 3' but there is no 'new' in the gfx roms
-GAME( 19??, cb3,      goldstar, ncb3,     ncb3,     0,        ROT0, "Dyna",        "Cherry Bonus III",                       GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 19??, cb3,      goldstar, ncb3,     ncb3,     cb3,      ROT0, "Dyna",        "Cherry Bonus III",                       GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // cherry master hardware has a rather different mem map, but is basically the same
 GAME( 198?, cmv801,   0,        cm,       cmv801,   0,        ROT0, "Corsica",     "Cherry Master (Corsica, v8.01)",         GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // says ED-96 where the manufacturer is on some games..
 GAME( 1991, cmaster,  0,        cm,       cmv801,   0,        ROT0, "Dyna",        "Cherry Master 91?",                      GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // different HW? closer to cherry master 2?
 GAME( 1991, cmasterb, cmaster,  cmb,      cmv801,   0,        ROT0, "Dyna",        "Cherry Master I (v1.01)",                GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd", "New Lucky 8 Lines (set 1)",              GAME_WRONG_COLORS )
-GAME( 1989, lucky8a,  0,        lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd", "New Lucky 8 Lines (set 2)",              GAME_WRONG_COLORS )
+GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd", "New Lucky 8 Lines (set 1)",              GAME_IMPERFECT_COLORS )
+GAME( 1989, lucky8a,  0,        lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd", "New Lucky 8 Lines (set 2)",              GAME_IMPERFECT_COLORS )
