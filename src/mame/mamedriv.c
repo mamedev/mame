@@ -4866,8 +4866,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gijoe )		/* GX069 (c) 1991 (World) */
 	DRIVER( gijoeu )	/* GX069 (c) 1991 (US) */
 	DRIVER( gijoej )	/* GX069 (c) 1991 (Japan) */
-	DRIVER( thndrx2 )	/* GX073 (c) 1991 (Japan) */
+	DRIVER( thndrx2 )	/* GX073 (c) 1991 (World) */
 	DRIVER( thndrx2a )	/* GX073 (c) 1991 (Asia) */
+	DRIVER( thndrx2j )	/* GX073 (c) 1991 (Japan) */
 	DRIVER( prmrsocr )	/* GX101 (c) 1993 (Europe) */
 	DRIVER( prmrsocj )	/* GX101 (c) 1993 (Japan) */
 	DRIVER( qgakumon )	/* GX248 (c) 1993 (Japan) */

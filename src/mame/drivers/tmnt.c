@@ -3787,8 +3787,8 @@ ROM_END
 
 ROM_START( thndrx2 )
 	ROM_REGION( 0x40000, "main", 0 ) /* 2*32k for 68000 code */
-	ROM_LOAD16_BYTE( "073-k02.11c", 0x000000, 0x20000, CRC(0c8b2d3f) SHA1(44ca5d96d8f85ae2760df4e1c339916e0a76143f) )
-	ROM_LOAD16_BYTE( "073-k03.12c", 0x000001, 0x20000, CRC(3803b427) SHA1(95b755c70ac55af604c6b44bc41b761efce19f48) )
+	ROM_LOAD16_BYTE( "073-ea-l02.11c", 0x000000, 0x20000, CRC(eae02b51) SHA1(ac513919b183d5353792418e6190c484c5cf1bcd) )
+	ROM_LOAD16_BYTE( "073-ea-l03.12c", 0x000001, 0x20000, CRC(738ed007) SHA1(4539fd37ca9d7b25ee3b79c428c8f6c3be484bdf) )
 
 	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "073-c01.4f",   0x0000, 0x10000, CRC(44ebe83c) SHA1(9274df6affa4f0456d273ff3aa1bda7d2a20416e) )
@@ -3825,6 +3825,25 @@ ROM_START( thndrx2a )
 	ROM_LOAD( "073-b04.2d",   0x0000, 0x80000, CRC(05287a0b) SHA1(10784b8be6a93a5ebf22a884f99c116e51ae8743) )
 ROM_END
 
+ROM_START( thndrx2j )
+	ROM_REGION( 0x40000, "main", 0 ) /* 2*32k for 68000 code */
+	ROM_LOAD16_BYTE( "073-k02.11c", 0x000000, 0x20000, CRC(0c8b2d3f) SHA1(44ca5d96d8f85ae2760df4e1c339916e0a76143f) )
+	ROM_LOAD16_BYTE( "073-k03.12c", 0x000001, 0x20000, CRC(3803b427) SHA1(95b755c70ac55af604c6b44bc41b761efce19f48) )
+
+	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_LOAD( "073-c01.4f",   0x0000, 0x10000, CRC(44ebe83c) SHA1(9274df6affa4f0456d273ff3aa1bda7d2a20416e) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_LOAD( "073-c06.16k",  0x000000, 0x080000, CRC(24e22b42) SHA1(7e5e14495bd4adbe5d1cbec75262c9c4c83f5793) )	/* tiles */
+	ROM_LOAD( "073-c05.12k",  0x080000, 0x080000, CRC(952a935f) SHA1(87ed81616a243d679f7501db7acdd8b6617f85a3) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_LOAD( "073-c07.7k",   0x000000, 0x080000, CRC(14e93f38) SHA1(bf111b68be722c9c2f0f9c7700b3af6cd8fd28be) )	/* sprites */
+	ROM_LOAD( "073-c08.3k",   0x080000, 0x080000, CRC(09fab3ab) SHA1(af54c7bfe8edc5b5ea2c4fba4d5c637cfcbbeff5) )
+
+	ROM_REGION( 0x80000, "konami", 0 )	/* samples for the 053260 */
+	ROM_LOAD( "073-b04.2d",   0x0000, 0x80000, CRC(05287a0b) SHA1(10784b8be6a93a5ebf22a884f99c116e51ae8743) )
+ROM_END
 
 ROM_START( prmrsocr )
 	ROM_REGION( 0x80000, "main", 0 ) /* 2*256k for 68000 code */
@@ -4180,8 +4199,9 @@ GAME( 1991, ssrdradd, ssriders, ssriders, ssrid4ps, gfx,      ROT0,  "Konami", "
 GAME( 1991, ssrdrjbd, ssriders, ssriders, ssriders, gfx,      ROT0,  "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, sunsetbl, ssriders, sunsetbl, sunsetbl, gfx,      ROT0,  "Konami", "Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1991, thndrx2,  0,        thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (Japan)", 0 )
+GAME( 1991, thndrx2,  0,        thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (World)", 0 )
 GAME( 1991, thndrx2a, thndrx2,  thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (Asia)", 0 )
+GAME( 1991, thndrx2j, thndrx2,  thndrx2,  thndrx2,  gfx,      ROT0,  "Konami", "Thunder Cross II (Japan)", 0 )
 
 GAME( 1993, prmrsocr, 0,        prmrsocr, prmrsocr, glfgreat, ROT0,  "Konami", "Premier Soccer (ver EAB)", 0 )
 GAME( 1993, prmrsocj, prmrsocr, prmrsocr, prmrsocr, glfgreat, ROT0,  "Konami", "Premier Soccer (ver JAB)", 0 )
