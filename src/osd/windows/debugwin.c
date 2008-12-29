@@ -2660,6 +2660,8 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 				return 1;
 
 			case ID_EXIT:
+				if (info->focuswnd != NULL)
+					SetFocus(info->focuswnd);
 				mame_schedule_exit(info->machine);
 				return 1;
 		}
