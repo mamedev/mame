@@ -1324,6 +1324,7 @@ src/mame/drivers/cball.c svneol=native#text/plain
 src/mame/drivers/cbasebal.c svneol=native#text/plain
 src/mame/drivers/cbuster.c svneol=native#text/plain
 src/mame/drivers/ccastles.c svneol=native#text/plain
+src/mame/drivers/cchance.c svneol=native#text/plain
 src/mame/drivers/cchasm.c svneol=native#text/plain
 src/mame/drivers/cclimber.c svneol=native#text/plain
 src/mame/drivers/centiped.c svneol=native#text/plain

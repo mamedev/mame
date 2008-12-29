@@ -1322,6 +1322,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/bking.o $(VIDEO)/bking.o \
 	$(DRIVERS)/bublbobl.o $(MACHINE)/bublbobl.o $(VIDEO)/bublbobl.o \
 	$(DRIVERS)/buggychl.o $(MACHINE)/buggychl.o $(VIDEO)/buggychl.o \
+	$(DRIVERS)/cchance.o \
 	$(DRIVERS)/chaknpop.o $(MACHINE)/chaknpop.o $(VIDEO)/chaknpop.o \
 	$(DRIVERS)/champbwl.o \
 	$(DRIVERS)/changela.o $(VIDEO)/changela.o \

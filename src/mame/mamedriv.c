@@ -1796,6 +1796,7 @@ const game_driver * const drivers[] =
 	DRIVER( tnzsjo )	/* B53 (c) 1988 Taito Corporation (Japan) (new logo) */
 	DRIVER( tnzso )		/* B53?(c) 1988 Taito Corporation Japan (World) (old logo) */
 	DRIVER( insectx )	/* B97 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( cchance )   /* (c)1987 Taito? */
 	DRIVER( champbwl )	/* (c)1989 Romstar.  not Taito, but the same Seta video chips */
 
 	/* Taito L-System games */
