@@ -3052,6 +3052,7 @@ V-V                           TP-027
 	DRIVER( drmn2mpu )	/* 1999 - DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB) */
 	DRIVER( dncfrks )	/* 2000 - Dance Freaks (G*874 VER. KAA) */
 	DRIVER( dmx )		/* 2000 - Dance Maniax (G*874 VER. JAA) */
+	DRIVER( dsem )		/* 2000 - Dancing Stage Euro Mix (G*936 VER. EAA) */
 	DRIVER( gtrfrk3m )	/* 2000 - Guitar Freaks 3rd Mix (GE949 VER. JAC) */
 	DRIVER( gtfrk3ma )	/* 2000 - Guitar Freaks 3rd Mix (GE949 VER. JAB) */
 	DRIVER( gtfrk3mb )	/* 2000 - Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02) */

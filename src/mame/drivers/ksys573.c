@@ -3855,6 +3855,23 @@ ROM_START( dncfrks )
 	DISK_IMAGE_READONLY( "874kaa", 0, BAD_DUMP MD5(5e02c8dba12f949ce99834e597d8d08d) SHA1(659281e1b63c5ff0616b27d7f87a4e7f1c493372) )
 ROM_END
 
+ROM_START( dsem )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
+	ROM_LOAD( "ge936ea.u1",   0x000000, 0x000224, BAD_DUMP CRC(0f5b7ae3) SHA1(646dd49da1216cc2d3d6920bc9b3447d55ebfbf0) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
+	ROM_LOAD( "ge936ea.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "936eaa", 0, BAD_DUMP MD5(1b3fea5748aec4b8efdc0aa42a84a56a) SHA1(eb824ea9593ea4a84440ff1032055d85e6c9e025) )
+ROM_END
+
 ROM_START( dsem2 )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
@@ -4477,6 +4494,7 @@ GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami"
 GAME( 1999, drmn2mpu, drmn2m,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 2000, dncfrks,  sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,      dncfrks,  konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
+GAME( 2000, dsem,     sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix (G*936 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.7 */
 GAME( 2000, gtrfrk3m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3ma, gtrfrk3m, konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, gtfrk3mb, gtrfrk3m, konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
