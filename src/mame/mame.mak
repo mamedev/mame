@@ -345,6 +345,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/atlus.a \
 	$(MAMEOBJ)/barcrest.a \
 	$(MAMEOBJ)/bfm.a \
+	$(MAMEOBJ)/bmc.a \
 	$(MAMEOBJ)/capcom.a \
 	$(MAMEOBJ)/cinemat.a \
 	$(MAMEOBJ)/comad.a \
@@ -575,6 +576,10 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfcobra.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
 	$(MACHINE)/bfm_bd1.o \
+
+$(MAMEOBJ)/bmc.a: \
+	$(DRIVERS)/bmcbowl.o \
+	$(DRIVERS)/koftball.o \
 
 $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/1942.o $(VIDEO)/1942.o \
@@ -1542,9 +1547,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/blackt96.o \
-	$(DRIVERS)/bmcbowl.o \
 	$(DRIVERS)/brasil.o \
-	$(DRIVERS)/koftball.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/caswin.o \
