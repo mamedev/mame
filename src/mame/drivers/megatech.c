@@ -1278,7 +1278,7 @@ ROM_END
 /* 37 */ // unknown
 /* 38 */ GAME( 1990, mt_eswat, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Cyber Police ESWAT: Enhanced Special Weapons and Tactics (Mega-Tech)", GAME_NOT_WORKING )
 /* 39 */ GAME( 1990, mt_smgp,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Super Monaco GP (Mega-Tech)", GAME_NOT_WORKING )
-/* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Moonwalker (Mega-Tech)", GAME_NOT_WORKING )
+/* 40 */ GAME( 1990, mt_mwalk, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Michael Jackson's Moonwalker (Mega-Tech)", GAME_NOT_WORKING )
 /* 41 */ GAME( 1990, mt_crack, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Crack Down (Mega-Tech)", GAME_NOT_WORKING )
 /* 42 */ // unknown
 /* 43 */ // unknown
