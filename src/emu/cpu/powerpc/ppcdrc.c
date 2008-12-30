@@ -1337,7 +1337,10 @@ static void static_generate_exception(powerpc_state *ppc, UINT8 exception, int r
 		generate_update_mode(ppc, block);													// <update mode>
 
 		/* determine our target PC */
-		UML_MOV(block, IREG(0), IMM(0x00000000));											// mov     i0,0x00000000
+		if (ppc->flavor == PPC_MODEL_602)
+			UML_MOV(block, IREG(0), SPR32(SPR602_IBR));										// mov     i0,[ibr]
+		else
+			UML_MOV(block, IREG(0), IMM(0x00000000));										// mov     i0,0x00000000
 		UML_TEST(block, MSR32, IMM(MSROEA_IP));												// test    [msr],IP
 		UML_MOVc(block, IF_NZ, IREG(0), IMM(0xfff00000));									// mov     i0,0xfff00000,nz
 		UML_OR(block, IREG(0), IREG(0), IREG(3));											// or      i0,i0,i3
