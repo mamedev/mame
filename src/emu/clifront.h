@@ -28,6 +28,7 @@
 #define CLIOPTION_LISTFULL				"listfull"
 #define CLIOPTION_LISTSOURCE			"listsource"
 #define CLIOPTION_LISTCLONES			"listclones"
+#define CLIOPTION_LISTBROTHERS			"listbrothers"
 #define CLIOPTION_LISTCRC				"listcrc"
 #define CLIOPTION_LISTDEVICES			"listdevices"
 #define CLIOPTION_LISTROMS				"listroms"
@@ -49,6 +50,7 @@ int cli_info_listxml(core_options *options, const char *gamename);
 int cli_info_listfull(core_options *options, const char *gamename);
 int cli_info_listsource(core_options *options, const char *gamename);
 int cli_info_listclones(core_options *options, const char *gamename);
+int cli_info_listbrothers(core_options *options, const char *gamename);
 int cli_info_listcrc(core_options *options, const char *gamename);
 int cli_info_listroms(core_options *options, const char *gamename);
 int cli_info_listsamples(core_options *options, const char *gamename);
