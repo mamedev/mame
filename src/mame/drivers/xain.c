@@ -152,7 +152,6 @@ TODO:
 #define MCU_CLOCK			MASTER_CLOCK / 4
 #define PIXEL_CLOCK		MASTER_CLOCK / 2
 
-static UINT8 *xain_sharedram;
 static int vblank;
 
 VIDEO_UPDATE( xain );
@@ -229,37 +228,15 @@ static TIMER_DEVICE_CALLBACK( xain_scanline )
 	}
 }
 
-static READ8_HANDLER( xain_sharedram_r )
-{
-	return xain_sharedram[offset];
-}
-
-static WRITE8_HANDLER( xain_sharedram_w )
-{
-	/* locations 003d and 003e are used as a semaphores between CPU A and B, */
-	/* so let's resync every time they are changed to avoid deadlocks */
-	if ((offset == 0x003d || offset == 0x003e)
-			&& xain_sharedram[offset] != data)
-		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
-	xain_sharedram[offset] = data;
-}
-
 static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
-
-	xain_pri=data&0x7;
-
-	if (data & 0x08) {memory_set_bankptr(space->machine, 1,&RAM[0x10000]);}
-	else {memory_set_bankptr(space->machine, 1,&RAM[0x4000]);}
+	xain_pri = data & 0x7;
+	memory_set_bank(space->machine, 1, (data >> 3) & 1);
 }
 
 static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "sub");
-
-	if (data & 0x01) {memory_set_bankptr(space->machine, 2,&RAM[0x10000]);}
-	else {memory_set_bankptr(space->machine, 2,&RAM[0x4000]);}
+	memory_set_bank(space->machine, 2, data & 1);
 }
 
 static WRITE8_HANDLER( xain_sound_command_w )
@@ -315,11 +292,10 @@ static CUSTOM_INPUT( xain_vblank_r )
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(xain_sharedram_r, xain_sharedram_w) AM_BASE(&xain_sharedram)
-	AM_RANGE(0x2000, 0x37ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(xain_charram_w) AM_BASE(&xain_charram)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(xain_bgram1_w) AM_BASE(&xain_bgram1)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(xain_bgram0_w) AM_BASE(&xain_bgram0)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(xain_charram_w) AM_BASE(&xain_charram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(xain_bgram1_w) AM_BASE(&xain_bgram1)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(xain_bgram0_w) AM_BASE(&xain_bgram0)
 	AM_RANGE(0x3800, 0x397f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("P1")
 	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(xain_scrollxP1_w)
@@ -339,16 +315,16 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu_map_B, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(xain_sharedram_r, xain_sharedram_w)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(xain_irqA_assert_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(xain_irqB_clear_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(xainCPUB_bankswitch_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK2)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -495,11 +471,10 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( xsleena )
 {
-	const address_space *space_main = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	const address_space *space_sub = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
-	/* initialize the bank pointers */
-	xainCPUA_bankswitch_w(space_main,0,0);
-	xainCPUB_bankswitch_w(space_sub,0,0);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x4000, 0xc000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "sub")  + 0x4000, 0xc000);
+	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, 2, 0);
 }
 
 static MACHINE_DRIVER_START( xsleena )
@@ -520,7 +495,7 @@ static MACHINE_DRIVER_START( xsleena )
 
 	MDRV_MACHINE_START(xsleena)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MDRV_QUANTUM_PERFECT_CPU("main")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
