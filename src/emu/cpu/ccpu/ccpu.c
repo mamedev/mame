@@ -191,7 +191,7 @@ static CPU_EXECUTE( ccpu )
 
 	cpustate->icount = cycles;
 
-	while (cpustate->icount >= 0)
+	do
 	{
 		UINT16 tempval;
    		UINT8 opcode;
@@ -673,7 +673,7 @@ static CPU_EXECUTE( ccpu )
 				NEXT_ACC_A(cpustate); CYCLES(cpustate, 1);
 				break;
 		}
-	}
+	} while (cpustate->icount > 0);
 
 	return cycles - cpustate->icount;
 }

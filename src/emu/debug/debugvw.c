@@ -1690,7 +1690,7 @@ static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t t
 {
 	int minlen = memory_byte_to_address(space, cpu_get_min_opcode_bytes(space->cpu));
 	int maxlen = memory_byte_to_address(space, cpu_get_max_opcode_bytes(space->cpu));
-	offs_t targetpcbyte = memory_address_to_byte(space, targetpc);
+	offs_t targetpcbyte = memory_address_to_byte(space, targetpc) & space->logbytemask;
 	offs_t lastgoodpc = targetpc;
 	offs_t fillpcbyte, curpc;
 	UINT8 opbuf[1024], argbuf[1024];
@@ -1709,7 +1709,7 @@ static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t t
 	fillpcbyte = targetpcbyte;
 	while (1)
 	{
-		offs_t curpcbyte = memory_address_to_byte(space, curpc);
+		offs_t curpcbyte = memory_address_to_byte(space, curpc) & space->logbytemask;
 		offs_t scanpc;
 		int instcount = 0;
 		int instlen;
@@ -1725,7 +1725,7 @@ static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t t
 		/* loop until we get past the target instruction */
 		for (scanpc = curpc; scanpc < targetpc; scanpc += instlen)
 		{
-			offs_t scanpcbyte = memory_address_to_byte(space, scanpc);
+			offs_t scanpcbyte = memory_address_to_byte(space, scanpc) & space->logbytemask;
 			offs_t physpcbyte = scanpcbyte;
 
 			/* get the disassembly, but only if mapped */
@@ -1840,6 +1840,9 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 	minbytes = cpu_get_min_opcode_bytes(space->cpu);
 	maxbytes = cpu_get_max_opcode_bytes(space->cpu);
 
+	/* ensure that the PC is aligned to the minimum opcode size */
+	pc &= ~memory_byte_to_address_end(space, minbytes - 1);
+
 	/* set the width of the third column according to display mode */
 	if (dasmdata->right_column == DASM_RIGHTCOL_RAW || dasmdata->right_column == DASM_RIGHTCOL_ENCRYPTED)
 	{
@@ -1879,7 +1882,7 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 		int numbytes = 0;
 
 		/* convert PC to a byte offset */
-		pcbyte = memory_address_to_byte(space, pc);
+		pcbyte = memory_address_to_byte(space, pc) & space->logbytemask;
 
 		/* save a copy of the previous line as a backup if we're only doing one line */
 		if (lines == 1)
@@ -1915,7 +1918,7 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 		if (dasmdata->right_column == DASM_RIGHTCOL_RAW || dasmdata->right_column == DASM_RIGHTCOL_ENCRYPTED)
 		{
 			/* get the bytes */
-			numbytes = memory_address_to_byte(space, numbytes);
+			numbytes = memory_address_to_byte(space, numbytes) & space->logbytemask;
 			disasm_view_generate_bytes(space, pcbyte, numbytes, minbytes, &destbuf[dasmdata->divider2], dasmdata->allocated.x - dasmdata->divider2, dasmdata->right_column == DASM_RIGHTCOL_ENCRYPTED);
 		}
 		else if (dasmdata->right_column == DASM_RIGHTCOL_COMMENTS)
@@ -1995,7 +1998,7 @@ static void disasm_view_update(debug_view *view)
 		exprerr = expression_execute(dasmdata->expression.parsed, &result);
 		if (exprerr == EXPRERR_NONE && result != dasmdata->expression.result)
 		{
-			offs_t resultbyte = memory_address_to_byte(space, result);
+			offs_t resultbyte = memory_address_to_byte(space, result) & space->logbytemask;
 
 			/* update the result */
 			dasmdata->expression.result = result;
@@ -2103,7 +2106,7 @@ recompute:
 			{
 				const cpu_debug_data *cpuinfo = cpu_get_debug_data(space->cpu);
 				for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
-					if (dasmdata->byteaddress[effrow] == memory_address_to_byte(space, bp->address))
+					if (dasmdata->byteaddress[effrow] == (memory_address_to_byte(space, bp->address) & space->logbytemask))
 						attrib = DCA_CHANGED;
 			}
 

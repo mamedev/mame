@@ -989,7 +989,7 @@ void cpu_eat_cycles(const device_config *device, int cycles)
 		return;
 
 	if (cycles > *classdata->icount)
-		cycles = *classdata->icount + 1;
+		cycles = *classdata->icount;
 	*classdata->icount -= cycles;
 }
 
@@ -1029,7 +1029,7 @@ void cpu_abort_timeslice(const device_config *device)
 	/* swallow the remaining cycles */
 	if (classdata->icount != NULL)
 	{
-		delta = *classdata->icount + 1;
+		delta = *classdata->icount;
 		classdata->cycles_stolen += delta;
 		classdata->cycles_running -= delta;
 		*classdata->icount -= delta;

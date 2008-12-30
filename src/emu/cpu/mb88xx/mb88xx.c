@@ -220,7 +220,7 @@ static CPU_EXECUTE( mb88 )
 
 	cpustate->icount = cycles;
 
-	while (cpustate->icount >= 0)
+	while (cpustate->icount > 0)
 	{
 		UINT8 opcode, arg, oc;
 

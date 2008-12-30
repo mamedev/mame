@@ -1951,7 +1951,7 @@ static CPU_EXECUTE( i960 )
 
 	i960->icount = cycles;
 	check_irqs(i960);
-	while(i960->icount >= 0) {
+	while(i960->icount > 0) {
 		i960->PIP = i960->IP;
 		debugger_instruction_hook(device, i960->IP);
 

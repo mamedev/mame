@@ -1018,7 +1018,7 @@ static CPU_EXECUTE( v810 )
 	v810_state *cpustate = device->token;
 
 	cpustate->icount = cycles;
-	while(cpustate->icount>=0)
+	while(cpustate->icount>0)
 	{
 		UINT32 op;
 

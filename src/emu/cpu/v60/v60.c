@@ -456,7 +456,7 @@ static CPU_EXECUTE( v60 )
 	if (cpustate->irq_line != CLEAR_LINE)
 		v60_try_irq(cpustate);
 
-	while (cpustate->icount >= 0)
+	while (cpustate->icount > 0)
 	{
 		UINT32 inc;
 		cpustate->PPC = cpustate->PC;
