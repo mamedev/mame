@@ -49,6 +49,7 @@ struct _i8086_state
 	INT8 nmi_state;
 	INT8 irq_state;
 	INT8 test_state;	/* PJB 03/05 */
+	UINT8 rep_in_progress;
 	INT32 extra_cycles;       /* extra cycles for interrupts */
 
 	UINT16 ip;
@@ -172,6 +173,7 @@ static void i8086_state_register(const device_config *device)
 	state_save_register_device_item(device, 0, cpustate->irq_state);
 	state_save_register_device_item(device, 0, cpustate->extra_cycles);
 	state_save_register_device_item(device, 0, cpustate->test_state);	/* PJB 03/05 */
+	state_save_register_device_item(device, 0, cpustate->rep_in_progress);	/* PJB 03/05 */
 }
 
 static CPU_INIT( i8086 )

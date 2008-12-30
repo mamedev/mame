@@ -67,6 +67,7 @@ struct _i80286_state
 	INT8	nmi_state;
 	INT8	irq_state;
 	INT8	test_state;		/* PJB 03/05 */
+	UINT8 rep_in_progress;
 	INT32 	extra_cycles;       /* extra cycles for interrupts */
 
 	memory_interface	mem;
@@ -159,6 +160,7 @@ static CPU_RESET( i80286 )
 	cpustate->flags=2;
 	ExpandFlags(cpustate->flags);
 	cpustate->idtr.base=0;cpustate->idtr.limit=0x3ff;
+	cpustate->rep_in_progress = FALSE;
 
 	CHANGE_PC(cpustate->pc);
 
@@ -267,6 +269,7 @@ static CPU_INIT( i80286 )
 	state_save_register_device_item(device, 0, cpustate->nmi_state);
 	state_save_register_device_item(device, 0, cpustate->irq_state);
 	state_save_register_device_item(device, 0, cpustate->extra_cycles);
+	state_save_register_device_item(device, 0, cpustate->rep_in_progress);
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;

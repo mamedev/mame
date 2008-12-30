@@ -748,6 +748,8 @@ $(CPUOBJ)/i86/i86.o:	$(CPUSRC)/i86/i86.c \
 
 $(CPUOBJ)/i86/i286.o:	$(CPUSRC)/i86/i286.c \
 						$(CPUSRC)/i86/i286.h \
+						$(CPUSRC)/i86/instr86.c \
+						$(CPUSRC)/i86/instr186.c \
 						$(CPUSRC)/i86/instr286.c \
 						$(I86DEPS)
 

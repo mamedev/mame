@@ -393,33 +393,39 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 	case 0x26:  /* ES: */
 		cpustate->seg_prefix=TRUE;
 		cpustate->prefix_base=cpustate->base[ES];
-		ICOUNT -= timing.override;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.override;
 		PREFIX(rep)(cpustate, flagval);
 		break;
 	case 0x2e:  /* CS: */
 		cpustate->seg_prefix=TRUE;
 		cpustate->prefix_base=cpustate->base[CS];
-		ICOUNT -= timing.override;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.override;
 		PREFIX(rep)(cpustate, flagval);
 		break;
 	case 0x36:  /* SS: */
 		cpustate->seg_prefix=TRUE;
 		cpustate->prefix_base=cpustate->base[SS];
-		ICOUNT -= timing.override;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.override;
 		PREFIX(rep)(cpustate, flagval);
 		break;
 	case 0x3e:  /* DS: */
 		cpustate->seg_prefix=TRUE;
 		cpustate->prefix_base=cpustate->base[DS];
-		ICOUNT -= timing.override;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.override;
 		PREFIX(rep)(cpustate, flagval);
 		break;
 #ifndef I8086
 	case 0x6c:	/* REP INSB */
-		ICOUNT -= timing.rep_ins8_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_ins8_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			PutMemB(ES,cpustate->regs.w[DI],read_port_byte(cpustate->regs.w[DX]));
 			cpustate->regs.w[DI] += cpustate->DirVal;
 			ICOUNT -= timing.rep_ins8_count;
@@ -427,10 +433,12 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0x6d:  /* REP INSW */
-		ICOUNT -= timing.rep_ins16_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_ins16_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			PutMemW(ES,cpustate->regs.w[DI],read_port_word(cpustate->regs.w[DX]));
 			cpustate->regs.w[DI] += 2 * cpustate->DirVal;
 			ICOUNT -= timing.rep_ins16_count;
@@ -438,10 +446,12 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0x6e:  /* REP OUTSB */
-		ICOUNT -= timing.rep_outs8_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_outs8_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			write_port_byte(cpustate->regs.w[DX],GetMemB(DS,cpustate->regs.w[SI]));
 			cpustate->regs.w[SI] += cpustate->DirVal; /* GOL 11/27/01 */
 			ICOUNT -= timing.rep_outs8_count;
@@ -449,10 +459,12 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0x6f:  /* REP OUTSW */
-		ICOUNT -= timing.rep_outs16_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_outs16_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			write_port_word(cpustate->regs.w[DX],GetMemW(DS,cpustate->regs.w[SI]));
 			cpustate->regs.w[SI] += 2 * cpustate->DirVal; /* GOL 11/27/01 */
 			ICOUNT -= timing.rep_outs16_count;
@@ -461,12 +473,14 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		break;
 #endif
 	case 0xa4:  /* REP MOVSB */
-		ICOUNT -= timing.rep_movs8_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_movs8_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
 			BYTE tmp;
 
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			tmp = GetMemB(DS,cpustate->regs.w[SI]);
 			PutMemB(ES,cpustate->regs.w[DI], tmp);
 			cpustate->regs.w[DI] += cpustate->DirVal;
@@ -476,12 +490,14 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0xa5:  /* REP MOVSW */
-		ICOUNT -= timing.rep_movs16_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_movs16_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
 			WORD tmp;
 
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			tmp = GetMemW(DS,cpustate->regs.w[SI]);
 			PutMemW(ES,cpustate->regs.w[DI], tmp);
 			cpustate->regs.w[DI] += 2 * cpustate->DirVal;
@@ -491,12 +507,14 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0xa6:  /* REP(N)E CMPSB */
-		ICOUNT -= timing.rep_cmps8_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_cmps8_base;
+		cpustate->rep_in_progress = FALSE;
 		for (cpustate->ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
 		{
 			unsigned dst, src;
 
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			dst = GetMemB(ES, cpustate->regs.w[DI]);
 			src = GetMemB(DS, cpustate->regs.w[SI]);
 		    SUBB(src,dst); /* opposite of the usual convention */
@@ -507,12 +525,14 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0xa7:  /* REP(N)E CMPSW */
-		ICOUNT -= timing.rep_cmps16_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_cmps16_base;
+		cpustate->rep_in_progress = FALSE;
 		for (cpustate->ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
 		{
 			unsigned dst, src;
 
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			dst = GetMemW(ES, cpustate->regs.w[DI]);
 			src = GetMemW(DS, cpustate->regs.w[SI]);
 		    SUBW(src,dst); /* opposite of the usual convention */
@@ -523,10 +543,12 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0xaa:  /* REP STOSB */
-		ICOUNT -= timing.rep_stos8_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_stos8_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			PutMemB(ES,cpustate->regs.w[DI],cpustate->regs.b[AL]);
 			cpustate->regs.w[DI] += cpustate->DirVal;
 			ICOUNT -= timing.rep_stos8_count;
@@ -534,10 +556,12 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0xab:  /* REP STOSW */
-		ICOUNT -= timing.rep_stos16_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_stos16_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			PutMemW(ES,cpustate->regs.w[DI],cpustate->regs.w[AX]);
 			cpustate->regs.w[DI] += 2 * cpustate->DirVal;
 			ICOUNT -= timing.rep_stos16_count;
@@ -545,10 +569,12 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0xac:  /* REP LODSB */
-		ICOUNT -= timing.rep_lods8_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_lods8_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			cpustate->regs.b[AL] = GetMemB(DS,cpustate->regs.w[SI]);
 			cpustate->regs.w[SI] += cpustate->DirVal;
 			ICOUNT -= timing.rep_lods8_count;
@@ -556,10 +582,12 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0xad:  /* REP LODSW */
-		ICOUNT -= timing.rep_lods16_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_lods16_base;
+		cpustate->rep_in_progress = FALSE;
 		for (; count > 0; count--)
 		{
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			cpustate->regs.w[AX] = GetMemW(DS,cpustate->regs.w[SI]);
 			cpustate->regs.w[SI] += 2 * cpustate->DirVal;
 			ICOUNT -= timing.rep_lods16_count;
@@ -567,12 +595,14 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0xae:  /* REP(N)E SCASB */
-		ICOUNT -= timing.rep_scas8_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_scas8_base;
+		cpustate->rep_in_progress = FALSE;
 		for (cpustate->ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
 		{
 			unsigned src, dst;
 
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			src = GetMemB(ES, cpustate->regs.w[DI]);
 			dst = cpustate->regs.b[AL];
 		    SUBB(dst,src);
@@ -582,12 +612,14 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
 		cpustate->regs.w[CX]=count;
 		break;
 	case 0xaf:  /* REP(N)E SCASW */
-		ICOUNT -= timing.rep_scas16_base;
+		if (!cpustate->rep_in_progress)
+			ICOUNT -= timing.rep_scas16_base;
+		cpustate->rep_in_progress = FALSE;
 		for (cpustate->ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
 		{
 			unsigned src, dst;
 
-			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; break; }
+			if (ICOUNT <= 0) { cpustate->pc = cpustate->prevpc; cpustate->rep_in_progress = TRUE; break; }
 			src = GetMemW(ES, cpustate->regs.w[DI]);
 			dst = cpustate->regs.w[AX];
 		    SUBW(dst,src);
