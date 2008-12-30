@@ -20,6 +20,7 @@
 #include "sndintrf.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "sp0250.h"
 
 /*
@@ -106,7 +107,8 @@ static void sp0250_load_values(struct sp0250 *sp)
 	sp->filter[5].B = sp0250_gc(sp->fifo[13]);
 	sp->filter[5].F = sp0250_gc(sp->fifo[14]);
 	sp->fifo_pos = 0;
-	sp->drq(ASSERT_LINE);
+	if (sp->drq != NULL)
+		sp->drq(ASSERT_LINE);
 
 	sp->pcount = 0;
 	sp->rcount = 0;
@@ -198,9 +200,12 @@ static SND_START( sp0250 )
 	sp = auto_malloc(sizeof(*sp));
 	memset(sp, 0, sizeof(*sp));
 	sp->RNG = 1;
-	sp->drq = intf->drq_callback;
-	sp->drq(ASSERT_LINE);
-	timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(clock), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
+	sp->drq = (intf != NULL) ? intf->drq_callback : NULL;
+	if (sp->drq != NULL)
+	{
+		sp->drq(ASSERT_LINE);
+		timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(clock), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
+	}
 
 	sp->stream = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, sp, sp0250_update);
 
@@ -211,12 +216,23 @@ static SND_START( sp0250 )
 WRITE8_HANDLER( sp0250_w )
 {
 	struct sp0250 *sp = sndti_token(SOUND_SP0250, 0);
+	stream_update(sp->stream);
 	if (sp->fifo_pos != 15)
 	{
 		sp->fifo[sp->fifo_pos++] = data;
-		if (sp->fifo_pos == 15)
+		if (sp->fifo_pos == 15 && sp->drq != NULL)
 			sp->drq(CLEAR_LINE);
 	}
+	else
+		logerror("%s: overflow SP0250 FIFO\n", cpuexec_describe_context(space->machine));
+}
+
+
+UINT8 sp0250_drq_r(void)
+{
+	struct sp0250 *sp = sndti_token(SOUND_SP0250, 0);
+	stream_update(sp->stream);
+	return (sp->fifo_pos == 15) ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
