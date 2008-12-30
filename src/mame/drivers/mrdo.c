@@ -16,6 +16,9 @@ VBlank duration: 1/VSYNC * (70/262) = 4368 us
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 
+#define MAIN_CLOCK		XTAL_8MHz
+#define VIDEO_CLOCK		XTAL_20MHz
+
 
 extern UINT8 *mrdo_bgvideoram,*mrdo_fgvideoram;
 WRITE8_HANDLER( mrdo_bgvideoram_w );
@@ -39,26 +42,20 @@ static READ8_HANDLER( mrdo_SECRE_r )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)	/* video and color RAM */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(mrdo_bgvideoram_w) AM_BASE(&mrdo_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(mrdo_fgvideoram_w) AM_BASE(&mrdo_fgvideoram)
+	AM_RANGE(0x9000, 0x90ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(mrdo_flipscreen_w)	/* screen flip + playfield priority */
+	AM_RANGE(0x9801, 0x9801) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x9802, 0x9802) AM_WRITE(sn76496_1_w)
 	AM_RANGE(0x9803, 0x9803) AM_READ(mrdo_SECRE_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(mrdo_bgvideoram_w) AM_BASE(&mrdo_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(mrdo_fgvideoram_w) AM_BASE(&mrdo_fgvideoram)
-	AM_RANGE(0x9000, 0x90ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(mrdo_flipscreen_w)	/* screen flip + playfield priority */
-	AM_RANGE(0x9801, 0x9801) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0x9802, 0x9802) AM_WRITE(sn76496_1_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(mrdo_scrollx_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(mrdo_scrolly_w)
 ADDRESS_MAP_END
@@ -142,28 +139,25 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	512,	/* 512 characters */
-	2,	/* 2 bits per pixel */
-	{ 0, 512*8*8 },	/* the two bitplanes are separated */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8,8,
+	RGN_FRAC(1,2),
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
+	{ STEP8(7,-1) },
+	{ STEP8(0,8) },
+	8*8
 };
+
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	128,	/* 128 sprites */
-	2,	/* 2 bits per pixel */
-	{ 4, 0 },	/* the two bitplanes for 4 pixels are packed into one byte */
-	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0,
-			16+3, 16+2, 16+1, 16+0, 24+3, 24+2, 24+1, 24+0 },
-	{ 0*16, 2*16, 4*16, 6*16, 8*16, 10*16, 12*16, 14*16,
-			16*16, 18*16, 20*16, 22*16, 24*16, 26*16, 28*16, 30*16 },
-	64*8	/* every sprite takes 64 consecutive bytes */
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 4, 0 },
+	{ STEP4(0*8+3,-1), STEP4(1*8+3,-1), STEP4(2*8+3,-1), STEP4(3*8+3,-1) },
+	{ STEP16(0,32) },
+	64*8
 };
-
-
 
 static GFXDECODE_START( mrdo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )	/* colors 0-255 directly mapped */
@@ -176,17 +170,14 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mrdo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,8000000/2)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_ADD("main", Z80, MAIN_CLOCK/2)	/* 4 MHz */
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(5000000.0/312/262)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4368))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/4, 312, 8, 248, 262, 32, 224)
 
 	MDRV_GFXDECODE(mrdo)
 	MDRV_PALETTE_LENGTH(64*4+16*4)
@@ -198,10 +189,10 @@ static MACHINE_DRIVER_START( mrdo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn1", SN76489, MAIN_CLOCK/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("sn2", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn2", SN76489, MAIN_CLOCK/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
