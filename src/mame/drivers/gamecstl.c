@@ -578,17 +578,20 @@ static IRQ_CALLBACK(irq_callback)
 	return r;
 }
 
-static MACHINE_RESET(gamecstl)
+static MACHINE_START(gamecstl)
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
-
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
-
 	gamecstl_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
 	gamecstl_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
 	gamecstl_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
 	gamecstl_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
 	gamecstl_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+}
+
+static MACHINE_RESET(gamecstl)
+{
+	memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
+
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 }
 
 
@@ -652,6 +655,7 @@ static MACHINE_DRIVER_START(gamecstl)
 	MDRV_CPU_PROGRAM_MAP(gamecstl_map, 0)
 	MDRV_CPU_IO_MAP(gamecstl_io, 0)
 
+	MDRV_MACHINE_START(gamecstl)
 	MDRV_MACHINE_RESET(gamecstl)
 
 	MDRV_PCI_BUS_ADD("pcibus", 0)
