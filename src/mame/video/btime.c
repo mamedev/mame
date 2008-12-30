@@ -21,14 +21,12 @@ UINT8 *zoar_scrollram;
 UINT8 *deco_charram;
 size_t bnj_backgroundram_size;
 
-static int sprite_dirty[256];
-static int char_dirty[1024];
-
 static UINT8 btime_palette = 0;
 static UINT8 bnj_scroll1 = 0;
 static UINT8 bnj_scroll2 = 0;
 static bitmap_t *background_bitmap;
-static UINT8 lnc_sound_interrupt_enabled = 0;
+
+static UINT8 *sprite_dirty, *char_dirty;
 
 /***************************************************************************
 
@@ -142,14 +140,20 @@ VIDEO_START( btime )
     bnj_scroll1 = 0;
     bnj_scroll2 = 0;
     btime_palette = 0;
+
+	sprite_dirty = auto_malloc(256 * sizeof(*sprite_dirty));
+	memset(sprite_dirty, 1, 256 * sizeof(*sprite_dirty));
+
+	char_dirty = auto_malloc(1024 * sizeof(*char_dirty));
+	memset(char_dirty, 1, 1024 * sizeof(*char_dirty));
 }
 
 
 VIDEO_START( bnj )
 {
     /* the background area is twice as wide as the screen */
-    int width = video_screen_get_width(machine->primary_screen);
-    int height = video_screen_get_height(machine->primary_screen);
+    int width = 256;
+    int height = 256;
     bitmap_format format = video_screen_get_format(machine->primary_screen);
     background_bitmap = auto_bitmap_alloc(2*width, height, format);
 
@@ -297,15 +301,6 @@ WRITE8_HANDLER( bnj_video_control_w )
         btime_video_control_w(space, offset, data);
 }
 
-WRITE8_HANDLER( lnc_video_control_w )
-{
-    // I have a feeling that this only works by coincidence. I couldn't
-    // figure out how NMI's are disabled by the sound processor
-    lnc_sound_interrupt_enabled = data & 0x08;
-
-    bnj_video_control_w(space, offset, data & 0x01);
-}
-
 WRITE8_HANDLER( disco_video_control_w )
 {
 	btime_palette = (data >> 2) & 0x03;
@@ -314,13 +309,6 @@ WRITE8_HANDLER( disco_video_control_w )
 	{
 		flip_screen_set(space->machine, data & 0x01);
 	}
-}
-
-
-INTERRUPT_GEN( lnc_sound_interrupt )
-{
-    if (lnc_sound_interrupt_enabled)
-    	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -341,7 +329,7 @@ static void draw_chars(running_machine *machine, bitmap_t *bitmap, const rectang
         if (flip_screen_get(machine))
         {
             x = 31 - x;
-            y = 31 - y;
+            y = 33 - y;
         }
 
         drawgfx(bitmap,machine->gfx[0],
@@ -377,7 +365,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
         if (flip_screen_get(machine))
         {
             x = 240 - x;
-            y = 240 - y + sprite_y_adjust_flip_screen;
+            y = 256 - y + sprite_y_adjust_flip_screen;
 
             flipx = !flipx;
             flipy = !flipy;
@@ -429,7 +417,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
             if (flip_screen_get(machine))
             {
                 x = 240 - x;
-                y = 240 - y;
+                y = 256 - y;
             }
 
             drawgfx(bitmap, machine->gfx[2],
@@ -565,7 +553,7 @@ VIDEO_UPDATE( bnj )
             if (flip_screen_get(screen->machine))
             {
                 sx = 496 - sx;
-                sy = 240 - sy;
+                sy = 256 - sy;
             }
 
             drawgfx(background_bitmap, screen->machine->gfx[2],
@@ -612,7 +600,7 @@ VIDEO_UPDATE( cookrace )
         if (flip_screen_get(screen->machine))
         {
             sx = 31 - sx;
-            sy = 31 - sy;
+            sy = 33 - sy;
         }
 
         drawgfx(bitmap, screen->machine->gfx[2],

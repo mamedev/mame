@@ -1,12 +1,17 @@
-/* Set this to 1 to display current tape position */
-#define TAPE_UI_DISPLAY 0
-
 #ifdef MAME_DEBUG
-#define LOGLEVEL  3
+#define LOGLEVEL  5
 #else
 #define LOGLEVEL  0
 #endif
 #define LOG(n,x)  do { if (LOGLEVEL >= n) logerror x; } while (0)
+
+
+#define DECOCASS_TAPE DEVICE_GET_INFO_NAME(decocass_tape)
+DEVICE_GET_INFO( decocass_tape );
+
+#define MDRV_DECOCASS_TAPE_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, DECOCASS_TAPE, 0)
+
 
 extern WRITE8_HANDLER( decocass_coin_counter_w );
 extern WRITE8_HANDLER( decocass_sound_command_w );
@@ -14,6 +19,7 @@ extern READ8_HANDLER( decocass_sound_data_r );
 extern READ8_HANDLER( decocass_sound_ack_r );
 extern WRITE8_HANDLER( decocass_sound_data_w );
 extern READ8_HANDLER( decocass_sound_command_r );
+extern TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen );
 extern WRITE8_HANDLER( decocass_sound_nmi_enable_w );
 extern READ8_HANDLER( decocass_sound_nmi_enable_r );
 extern READ8_HANDLER( decocass_sound_data_ack_reset_r );
@@ -22,11 +28,6 @@ extern WRITE8_HANDLER( decocass_nmi_reset_w );
 extern WRITE8_HANDLER( decocass_quadrature_decoder_reset_w );
 extern WRITE8_HANDLER( decocass_adc_w );
 extern READ8_HANDLER( decocass_input_r );
-extern int tape_dir;
-extern int tape_speed;
-extern attotime tape_time0;
-extern emu_timer *tape_timer;
-attotime decocass_adjust_tape_time(attotime tape_time);
 
 extern WRITE8_HANDLER( decocass_reset_w );
 
@@ -35,6 +36,7 @@ extern WRITE8_HANDLER( decocass_e5xx_w );
 extern WRITE8_HANDLER( decocass_de0091_w );
 extern WRITE8_HANDLER( decocass_e900_w );
 
+extern MACHINE_START( decocass );
 extern MACHINE_RESET( decocass );
 extern MACHINE_RESET( ctsttape );
 extern MACHINE_RESET( chwy );

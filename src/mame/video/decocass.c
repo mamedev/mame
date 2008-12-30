@@ -213,8 +213,6 @@ WRITE8_HANDLER( decocass_paletteram_w )
 
 WRITE8_HANDLER( decocass_charram_w )
 {
-	if (data == decocass_charram[offset])
-		return;
 	decocass_charram[offset] = data;
 	/* dirty sprite */
 	sprite_dirty[(offset >> 5) & 255] = 1;
@@ -245,8 +243,6 @@ static void mark_bg_tile_dirty(offs_t offset)
 
 WRITE8_HANDLER( decocass_tileram_w )
 {
-	if (data == decocass_tileram[offset])
-		return;
 	decocass_tileram[offset] = data;
 	/* dirty tile (64 bytes per tile) */
 	tile_dirty[(offset / 64) & 15] = 1;
@@ -257,8 +253,6 @@ WRITE8_HANDLER( decocass_tileram_w )
 
 WRITE8_HANDLER( decocass_objectram_w )
 {
-	if (data == decocass_objectram[offset])
-		return;
 	decocass_objectram[offset] = data;
 	/* dirty the object */
 	object_dirty = 1;
@@ -266,8 +260,6 @@ WRITE8_HANDLER( decocass_objectram_w )
 
 WRITE8_HANDLER( decocass_bgvideoram_w )
 {
-	if (data == decocass_bgvideoram[offset])
-		return;
 	decocass_bgvideoram[offset] = data;
 	mark_bg_tile_dirty( offset );
 }
@@ -592,10 +584,10 @@ VIDEO_START( decocass )
 	tilemap_set_transparent_pen( fg_tilemap, 0 );
 
 	bg_tilemap_l_clip = *video_screen_get_visible_area(machine->primary_screen);
-	bg_tilemap_l_clip.max_y = video_screen_get_height(machine->primary_screen) / 2;
+	bg_tilemap_l_clip.max_y = 256 / 2;
 
 	bg_tilemap_r_clip = *video_screen_get_visible_area(machine->primary_screen);
-	bg_tilemap_r_clip.min_y = video_screen_get_height(machine->primary_screen) / 2;
+	bg_tilemap_r_clip.min_y = 256 / 2;
 
 	/* background videroam bits D0-D3 are shared with the tileram */
 	decocass_bgvideoram = decocass_tileram;
@@ -615,18 +607,6 @@ VIDEO_UPDATE( decocass )
 	else if (watchdog_count-- > 0)
 		watchdog_reset(screen->machine);
 
-#if TAPE_UI_DISPLAY
-	if (tape_timer)
-	{
-		attotime tape_time = decocass_adjust_tape_time(tape_time0);
-		popmessage("%c%c [%05.1fs] %c%c",
-			(tape_dir < 0 && tape_speed) ? '<' : ' ',
-			(tape_dir < 0) ? '<' : ' ',
-			attotime_to_double(tape_time),
-			(tape_dir > 0) ? '>' : ' ',
-			(tape_dir > 0 && tape_speed) ? '>' : ' ');
-	}
-#endif
 #ifdef MAME_DEBUG
 	{
 		static int showmsg;

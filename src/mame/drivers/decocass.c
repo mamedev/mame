@@ -54,9 +54,16 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/i8x41/i8x41.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/decocass.h"
 #include "sound/ay8910.h"
+
+#define MASTER_CLOCK 	XTAL_12MHz
+#define HCLK			(MASTER_CLOCK/2)
+#define HCLK1			(HCLK/2)
+#define HCLK2			(HCLK1/2)
+#define HCLK4			(HCLK2/2)
+
 
 static UINT8 *decocass_rambase;
 
@@ -142,8 +149,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( decocass_mcu_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READWRITE(i8041_p1_r, i8041_p1_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(i8041_p2_r, i8041_p2_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(i8041_p1_r, i8041_p1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(i8041_p2_r, i8041_p2_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( decocass )
@@ -268,65 +275,47 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
-	3,		/* 3 bits per pixel */
-	{ 2*1024*8*8, 1024*8*8, 0 },	/* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 	/* every char takes 8 consecutive bytes */
+	8,8,
+	1024,
+	3,
+	{ 2*1024*8*8, 1*1024*8*8, 0*1024*8*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,	/* 16*16 sprites */
-	256,	/* 256 sprites */
-	3,		/* 3 bits per pixel */
-	{ 2*256*16*16, 256*16*16, 0 },	/* the bitplanes are separated */
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-	  0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	16,16,
+	256,
+	3,
+	{ 2*256*16*16, 1*256*16*16, 0*256*16*16 },
+	{ STEP8(16*8,1), STEP8(0*8,1) },
+	{ STEP16(0,8) },
+	32*8
 };
 
 static const gfx_layout tilelayout =
 {
-	16,16,	/* 16*16 characters */
-	16+1,	/* 16 tiles (+1 empty tile used in the half-width bg tilemaps) */
-	3,	/* 3 bits per pixel */
+	16,16,
+	16+1,		/* 16 tiles (+1 empty tile used in the half-width bg tilemaps) */
+	3,
 	{ 2*16*16*16+4, 2*16*16*16+0, 4 },
-	{ 3*16*8+0, 3*16*8+1, 3*16*8+2, 3*16*8+3,
-	  2*16*8+0, 2*16*8+1, 2*16*8+2, 2*16*8+3,
-	  16*8+0, 16*8+1, 16*8+2, 16*8+3,
-	  0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
-	2*16*16 /* every tile takes 64 consecutive bytes */
+	{ STEP4(3*16*8,1), STEP4(2*16*8,1), STEP4(1*16*8,1), STEP4(0*16*8,1) },
+	{ STEP16(0,8) },
+	2*16*16
 };
 
 static const UINT32 objlayout_xoffset[64] =
 {
-	7*8+0,7*8+1,7*8+2,7*8+3,7*8+4,7*8+5,7*8+6,7*8+7,
-	6*8+0,6*8+1,6*8+2,6*8+3,6*8+4,6*8+5,6*8+6,6*8+7,
-	5*8+0,5*8+1,5*8+2,5*8+3,5*8+4,5*8+5,5*8+6,5*8+7,
-	4*8+0,4*8+1,4*8+2,4*8+3,4*8+4,4*8+5,4*8+6,4*8+7,
-	3*8+0,3*8+1,3*8+2,3*8+3,3*8+4,3*8+5,3*8+6,3*8+7,
-	2*8+0,2*8+1,2*8+2,2*8+3,2*8+4,2*8+5,2*8+6,2*8+7,
-	1*8+0,1*8+1,1*8+2,1*8+3,1*8+4,1*8+5,1*8+6,1*8+7,
-	0*8+0,0*8+1,0*8+2,0*8+3,0*8+4,0*8+5,0*8+6,0*8+7
+	STEP8(7*8,1), STEP8(6*8,1), STEP8(5*8,1), STEP8(4*8,1), 
+	STEP8(3*8,1), STEP8(2*8,1), STEP8(1*8,1), STEP8(0*8,1)
 };
 
 static const UINT32 objlayout_yoffset[64] =
 {
-	63*2*64,62*2*64,61*2*64,60*2*64,59*2*64,58*2*64,57*2*64,56*2*64,
-	55*2*64,54*2*64,53*2*64,52*2*64,51*2*64,50*2*64,49*2*64,48*2*64,
-	47*2*64,46*2*64,45*2*64,44*2*64,43*2*64,42*2*64,41*2*64,40*2*64,
-	39*2*64,38*2*64,37*2*64,36*2*64,35*2*64,34*2*64,33*2*64,32*2*64,
-	31*2*64,30*2*64,29*2*64,28*2*64,27*2*64,26*2*64,25*2*64,24*2*64,
-	23*2*64,22*2*64,21*2*64,20*2*64,19*2*64,18*2*64,17*2*64,16*2*64,
-	15*2*64,14*2*64,13*2*64,12*2*64,11*2*64,10*2*64, 9*2*64, 8*2*64,
-	 7*2*64, 6*2*64, 5*2*64, 4*2*64, 3*2*64, 2*2*64, 1*2*64, 0*2*64
+	STEP32(63*2*64, -1*2*64),
+	STEP32(31*2*64, -1*2*64)
 };
 
 static const gfx_layout objlayout =
@@ -381,26 +370,27 @@ static PALETTE_INIT( decocass )
 static MACHINE_DRIVER_START( decocass )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,750000)
+	MDRV_CPU_ADD("main", M6502, HCLK4)
 	MDRV_CPU_PROGRAM_MAP(decocass_map,0)
 
-	MDRV_CPU_ADD("audio", M6502,500000) /* 500 kHz */
+	MDRV_CPU_ADD("audio", M6502, HCLK1/3/2)
 	MDRV_CPU_PROGRAM_MAP(decocass_sound_map,0)
+	MDRV_TIMER_ADD_SCANLINE("audionmi", decocass_audio_nmi_gen, "main", 0, 8)
 
-	MDRV_CPU_ADD("mcu", I8041,500000*15) /* 500 kHz ( I doubt it is 400kHz Al! )*/
+	MDRV_CPU_ADD("mcu", I8041, HCLK)
 	MDRV_CPU_IO_MAP(decocass_mcu_portmap,0)
 
 	MDRV_QUANTUM_TIME(HZ(4200))				/* interleave CPUs */
 
+	MDRV_MACHINE_START(decocass)
 	MDRV_MACHINE_RESET(decocass)
+	
+	MDRV_DECOCASS_TAPE_ADD("cassette")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)		/* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
+	MDRV_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 
 	MDRV_GFXDECODE(decocass)
 	MDRV_PALETTE_LENGTH(32+2*8+2*4)
@@ -412,10 +402,10 @@ static MACHINE_DRIVER_START( decocass )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, HCLK2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, HCLK2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
@@ -692,41 +682,41 @@ ROM_END
 ROM_START( ctsttape )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "testtape.cas", 0x0000, 0x2000, CRC(4f9d8efb) SHA1(5b77747dad1033e5703f06c0870441b54b4256c5) )
 ROM_END
 
 ROM_START( chwy )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	/* The dongle data is reverse engineered from manual decryption */
 	ROM_LOAD( "chwy.pro",   0x0000, 0x0020, BAD_DUMP CRC(2fae678e) SHA1(4a7de851442d4c1d690de03262f0e136a52fca35) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "chwy.cas",   0x0000, 0x8000, CRC(68a48064) SHA1(7e389737972fd0c54f398d296159c561f5ec3a93) )
 ROM_END
 
 ROM_START( clocknch )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "clocknch.cas", 0x0000, 0x8000, CRC(c9d163a4) SHA1(3ef55a8d8f603059e263776c08eb81f2cf18b75c) )
 ROM_END
 
 ROM_START( ctisland )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "ctisland.cas", 0x0000, 0x8000, CRC(3f63b8f8) SHA1(2fd0679ef9750a228ebb098672ab6091fda75804) )
 
 	ROM_REGION( 0x4000, "user3", 0 )	  /* roms from the overlay pcb */
@@ -739,10 +729,10 @@ ROM_END
 ROM_START( ctislnd2 )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "ctislnd2.cas", 0x0000, 0x8000, CRC(2854b4c0) SHA1(d3b4e0031dbb2340fbbe396a1ff9b8fbfd63663e) )
 
 	ROM_REGION( 0x4000, "user3", 0 )	  /* roms from the overlay pcb */
@@ -755,10 +745,10 @@ ROM_END
 ROM_START( ctislnd3 )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "ctislnd3.cas", 0x0000, 0x8000, CRC(45464e1e) SHA1(03275694d963c7ab0e0f5525e248e69da5f9b591) )
 
 	ROM_REGION( 0x4000, "user3", 0 )	  /* roms from the overlay pcb */
@@ -771,51 +761,51 @@ ROM_END
 ROM_START( csuperas )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "csuperas.cas", 0x0000, 0x8000, CRC(fabcd07f) SHA1(4070c668ad6725f0710cf7fe6df0d5f80272a449) )
 ROM_END
 
 ROM_START( castfant )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "castfant.cas", 0x0000, 0x8000, CRC(6d77d1b5) SHA1(821bd65fbe887cbeac9281a2ad3f88595918f886) )
 ROM_END
 
 ROM_START( cluckypo )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cluckypo.cas", 0x0000, 0x8000, CRC(2070c243) SHA1(cd3af309af8eb27937756c1fe6fd0504be5aaaf5) )
 ROM_END
 
 ROM_START( cterrani )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cterrani.cas", 0x0000, 0x8000, CRC(eb71adbc) SHA1(67becfde39c034d4b8edc2eb100050de102773da) )
 ROM_END
 
 ROM_START( cexplore )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	/* The dongle data is reverse engineered by table analysis */
 	ROM_LOAD( "cexplore.pro", 0x0000, 0x0020, BAD_DUMP CRC(c7a9ac8f) SHA1(b0a566d948f71a4eddcde0dd5e9e69ca96f71c36) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cexplore.cas", 0x0000, 0x8000, CRC(fae49c66) SHA1(4ae69e2f706fdf30204f0aa1277619395cacc21b) )
 
 	ROM_REGION( 0x4000, "user3", 0 )	  /* roms from the overlay pcb */
@@ -825,10 +815,10 @@ ROM_END
 ROM_START( cprogolf )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00020, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "de-0061.pro", 0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cprogolf.cas", 0x0000, 0x8000, CRC(02123cd1) SHA1(e4c630ed293725f23d539cb43beb97953558dabd) )
 ROM_END
 
@@ -838,50 +828,50 @@ ROM_END
 ROM_START( cmissnx )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00800, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cmissnx.pro",  0x0000, 0x0800, CRC(8a41c071) SHA1(7b16d933707bf21d25dcd11db6a6c28834b11c5b) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cmissnx.cas",  0x0000, 0x8000, CRC(3a094e11) SHA1(c355fe14838187cbde19a799e5c60083c82615ac) )
 ROM_END
 
 ROM_START( cdiscon1 )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00800, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cdiscon1.pro", 0x0000, 0x0800, CRC(0f793fab) SHA1(331f1b1b482fcd10f42c388a503f9af62d705401) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cdiscon1.cas", 0x0000, 0x8000, CRC(1429a397) SHA1(12f9e03fcda31dc6161a39bf5c3315a1e9e94565) )
 ROM_END
 
 ROM_START( csweetht )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00800, "user1", 0 )   /* dongle data */
+	ROM_REGION( 0x00800, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "cdiscon1.pro", 0x0000, 0x0800, CRC(0f793fab) SHA1(331f1b1b482fcd10f42c388a503f9af62d705401) )
 
-	ROM_REGION( 0x10000, "user2", 0 )   /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )   /* (max) 64k for cassette image */
 	ROM_LOAD( "csweetht.cas", 0x0000, 0x8000, CRC(175ef706) SHA1(49b86233f69d0daf54a6e59b86e69b8159e8f6cc) )
 ROM_END
 
 ROM_START( cptennis )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00800, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cptennis.pro", 0x0000, 0x0800, CRC(59b8cede) SHA1(514861a652b5256a11477fc357bc01dfd87f712b) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cptennis.cas", 0x0000, 0x8000, CRC(6bb257fe) SHA1(7554bf1996bc9e9c04a276aab050708d70103f54) )
 ROM_END
 
 ROM_START( ctornado )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x00800, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x00800, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "ctornado.pro", 0x0000, 0x0800, CRC(c9a91697) SHA1(3f7163291edbdf1a596e3cd2b7a16bbb140ffb36) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "ctornado.cas", 0x0000, 0x8000, CRC(e4e36ce0) SHA1(48a11823121fb2e3de31ae08e453c0124fc4f7f3) )
 ROM_END
 
@@ -891,150 +881,150 @@ ROM_END
 ROM_START( cburnrub )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cburnrub.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cburnrub.cas",   0x0000, 0x8000, CRC(4528ac22) SHA1(dc0fcc5e5fd21c1c858a90f43c175e36a24b3c3d) )
 ROM_END
 
 ROM_START( cburnrb2 )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cburnrub.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cburnrb2.cas",   0x0000, 0x8000, CRC(84a9ed66) SHA1(a9c536e46b89fc6b9c6271776292fed1241d2f3f) )
 ROM_END
 
 ROM_START( cbnj )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cburnrub.pro",   0x0000, 0x1000, CRC(9f396832) SHA1(0e302fd094474ac792882948a018c73ce76e0759) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cbnj.cas",       0x0000, 0x8000, CRC(eed41560) SHA1(85d5df76efac33cd10427f659c4259afabb3daaf) )
 ROM_END
 
 ROM_START( cbtime )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cbtime.pro",   0x0000, 0x1000, CRC(25bec0f0) SHA1(9fb1f9699f37937421e26d4fb8fdbcd21a5ddc5c) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cbtime.cas",   0x0000, 0x8000, CRC(56d7dc58) SHA1(34b2513c9ca7ab40f532b6d6d911aa3012113632) )
 ROM_END
 
 ROM_START( cgraplop )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cgraplop.pro", 0x0000, 0x1000, CRC(ee93787d) SHA1(0c753d62fdce2fdbd5b329a5aa259a967d07a651) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cgraplop.cas", 0x0000, 0x8000, CRC(d2c1c1bb) SHA1(db67304caa11540363735e7d4bf03507ccbe9980) )
 ROM_END
 
 ROM_START( cgraplp2 )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cgraplop.pro", 0x0000, 0x1000, CRC(ee93787d) SHA1(0c753d62fdce2fdbd5b329a5aa259a967d07a651) ) /* is this right for this set? */
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cgraplp2.cas", 0x0000, 0x8000, CRC(2e728981) SHA1(83ba90d95858d647315a1c311b8643672afea5f7) )
 ROM_END
 
 ROM_START( clapapa )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "clapapa.pro",  0x0000, 0x1000, CRC(e172819a) SHA1(3492775f4f0a0b31ce5a1a998076829b3f264e98) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "clapapa.cas",  0x0000, 0x8000, CRC(4ffbac24) SHA1(1ec0d7ac1886d4b430dc12be27f387e9d952d235) )
 ROM_END
 
 ROM_START( clapapa2 )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )   /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "clapapa.pro",  0x0000, 0x1000, CRC(e172819a) SHA1(3492775f4f0a0b31ce5a1a998076829b3f264e98) )
 
-	ROM_REGION( 0x10000, "user2", 0 )   /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )   /* (max) 64k for cassette image */
 	ROM_LOAD( "clapapa2.cas",  0x0000, 0x8000, CRC(069dd3c4) SHA1(5a19392c7ac5aea979187c96267e73bf5126307e) )
 ROM_END
 
 ROM_START( cfghtice )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cfghtice.pro", 0x0000, 0x1000, CRC(5abd27b5) SHA1(2ab1c171adffd491759036d6ce2433706654aad2) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cfghtice.cas", 0x0000, 0x10000, CRC(906dd7fb) SHA1(894a7970d5476ed035edd15656e5cf10d6ddcf57) )
 ROM_END
 
 ROM_START( cprobowl )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cprobowl.pro", 0x0000, 0x1000, CRC(e3a88e60) SHA1(e6e9a2e5ab26e0463c63201a15f7d5a429ec836e) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cprobowl.cas", 0x0000, 0x8000, CRC(cb86c5e1) SHA1(66c467418cff2ed6d7c121a8b1650ee97ae48fe9) )
 ROM_END
 
 ROM_START( cnightst )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cnightst.pro", 0x0000, 0x1000, CRC(553b0fbc) SHA1(2cdf4560992b62e59b6de760d7996be4ed25f505) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cnightst.cas", 0x0000, 0x8000, CRC(c6f844cb) SHA1(5fc6154c20ee4e2f4049a78df6f3cacbb96b0dc0) )
 ROM_END
 
 ROM_START( cnights2 )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )   /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "cnightst.pro", 0x0000, 0x1000, CRC(553b0fbc) SHA1(2cdf4560992b62e59b6de760d7996be4ed25f505) )
 
-	ROM_REGION( 0x10000, "user2", 0 )   /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )   /* (max) 64k for cassette image */
 	ROM_LOAD( "cnights2.cas", 0x0000, 0x8000, CRC(1a28128c) SHA1(4b620a1919d02814f734aba995115c09dc2db930) )
 ROM_END
 
 ROM_START( cprosocc )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cprosocc.pro", 0x0000, 0x1000,  CRC(919fabb2) SHA1(3d6a0676cea7b0be0fe69d06e04ca08c36b2851a) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cprosocc.cas", 0x0000, 0x10000, CRC(76b1ad2c) SHA1(6188667e5bc001dfdf83deaf7251eae794de4702) )
 ROM_END
 
 ROM_START( cppicf )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cppicf.pro",   0x0000, 0x1000, CRC(0b1a1ecb) SHA1(2106da6837c78812c102b0eaaa1127fcc21ea780) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cppicf.cas",   0x0000, 0x8000, CRC(8c02f160) SHA1(03430dd8d4b2e6ca931986dac4d39be6965ffa6f) )
 ROM_END
 
 ROM_START( cppicf2 )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )   /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "cppicf.pro",   0x0000, 0x1000, CRC(0b1a1ecb) SHA1(2106da6837c78812c102b0eaaa1127fcc21ea780) )
 
-	ROM_REGION( 0x10000, "user2", 0 )   /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )   /* (max) 64k for cassette image */
 	ROM_LOAD( "cppicf2.cas",   0x0000, 0x8000, CRC(78ffa1bc) SHA1(d15f2a240ae7b45885d32b5f507243f82e820d4b) )
 ROM_END
 
@@ -1044,20 +1034,20 @@ ROM_END
 ROM_START( cscrtry )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x08000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x08000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "cscrtry.pro",  0x0000, 0x8000, CRC(7bc3460b) SHA1(7c5668ff9a5073e27f4a83b02d79892eb4df6b92) )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cscrtry.cas",  0x0000, 0x8000, CRC(5625f0ca) SHA1(f4b0a6f2ca908880386838f06b626479b4b74134) )
 ROM_END
 
 ROM_START( cscrtry2 )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x08000, "user1", 0 )   /* dongle data */
+	ROM_REGION( 0x08000, "dongle", 0 )   /* dongle data */
 	ROM_LOAD( "cscrtry.pro",  0x0000, 0x8000, CRC(7bc3460b) SHA1(7c5668ff9a5073e27f4a83b02d79892eb4df6b92) )
 
-	ROM_REGION( 0x10000, "user2", 0 )   /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )   /* (max) 64k for cassette image */
 	ROM_LOAD( "cscrtry2.cas",  0x0000, 0x8000, CRC(04597842) SHA1(7f1fc3e06b61df880debe9056bdfbbb8600af739) )
 ROM_END
 
@@ -1067,10 +1057,10 @@ ROM_END
 ROM_START( cbdash )
 	DECOCASS_COMMON_ROMS
 
-/*  ROM_REGION( 0x01000, "user1", 0 ) */ /* (max) 4k for dongle data */
+/*  ROM_REGION( 0x01000, "dongle", 0 ) */ /* (max) 4k for dongle data */
 	/* no proms */
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cbdash.cas",   0x0000, 0x8000, CRC(cba4c1af) SHA1(5d163d8e31c58b20679c6be06b1aa02df621822b) )
 ROM_END
 
@@ -1081,7 +1071,7 @@ ROM_START( cflyball )
 
 	/* no dongle data */
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "cflyball.cas",   0x0000, 0x10000, CRC(cb40d043) SHA1(57698bac7e0d552167efa99d08116bf19a3b29c9) )
 ROM_END
 
@@ -1091,10 +1081,10 @@ ROM_END
 ROM_START( czeroize )
 	DECOCASS_COMMON_ROMS
 
-	ROM_REGION( 0x01000, "user1", 0 )	  /* dongle data */
+	ROM_REGION( 0x01000, "dongle", 0 )	  /* dongle data */
 	ROM_LOAD( "czeroize.pro",  0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "user2", 0 )	  /* (max) 64k for cassette image */
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "czeroize.cas",   0x0000, 0x10000, CRC(3ef0a406) SHA1(645b34cd477e0bb5539c8fe937a7a2dbd8369003) )
 ROM_END
 
@@ -1185,4 +1175,4 @@ static DRIVER_INIT( decocrom )
 /* 39 */ GAME( 1984, cppicf2,  cppicf, cppicf,   decocass, decocass, ROT270, "Data East Corporation", "Peter Pepper's Ice Cream Factory (Cassette, set 2)", 0 )
 /* 40 */ GAME( 1984, cfghtice, decocass, cfghtice, decocass, decocass, ROT270, "Data East Corporation", "Fighting Ice Hockey (Cassette)", 0 )
 /* 44 */ GAME( 1985, cbdash,   decocass, cbdash,   decocass, decocass, ROT270, "Data East Corporation", "Boulder Dash (Cassette)", 0 )
-         GAME( 1985, cflyball, decocass, cflyball, decocass, decocass, ROT270, "Data East Corporation", "Flying Ball (Cassette)", GAME_NO_SOUND )
+         GAME( 1985, cflyball, decocass, cflyball, decocass, decocass, ROT270, "Data East Corporation", "Flying Ball (Cassette)", 0 )

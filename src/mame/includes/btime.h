@@ -48,7 +48,4 @@ WRITE8_HANDLER( deco_charram_w );
 WRITE8_HANDLER( zoar_video_control_w );
 WRITE8_HANDLER( btime_video_control_w );
 WRITE8_HANDLER( bnj_video_control_w );
-WRITE8_HANDLER( lnc_video_control_w );
 WRITE8_HANDLER( disco_video_control_w );
-
-INTERRUPT_GEN( lnc_sound_interrupt );

@@ -672,27 +672,6 @@ $(CPUOBJ)/mcs48/mcs48.o:	$(CPUSRC)/mcs48/mcs48.c \
 
 
 #-------------------------------------------------
-# Intel 8x41
-#-------------------------------------------------
-
-CPUDEFS += -DHAS_I8041=$(if $(filter I8041,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8741=$(if $(filter I8741,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8042=$(if $(filter I8042,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8242=$(if $(filter I8242,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8742=$(if $(filter I8742,$(CPUS)),1,0)
-
-ifneq ($(filter I8041 I8741 I8042 I8242 I8742 ,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/i8x41
-CPUOBJS += $(CPUOBJ)/i8x41/i8x41.o
-DBGOBJS += $(CPUOBJ)/i8x41/8x41dasm.o
-endif
-
-$(CPUOBJ)/i8x41/i8x41.o:	$(CPUSRC)/i8x41/i8x41.c \
-							$(CPUSRC)/i8x41/i8x41.h
-
-
-
-#-------------------------------------------------
 # Intel 8051 and derivatives
 #-------------------------------------------------
 

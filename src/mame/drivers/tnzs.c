@@ -622,7 +622,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "taitoipt.h"
-#include "cpu/i8x41/i8x41.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
@@ -894,11 +894,10 @@ static ADDRESS_MAP_START( tnzsb_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8742_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x02, 0x02) AM_WRITE(tnzs_port2_w)
-	AM_RANGE(I8X41_p1, I8X41_p1) AM_READ(tnzs_port1_r)
-	AM_RANGE(I8X41_p2, I8X41_p2) AM_READ(tnzs_port2_r)
-	AM_RANGE(I8X41_t0, I8X41_t0) AM_READ_PORT("COIN1")
-	AM_RANGE(I8X41_t1, I8X41_t1) AM_READ_PORT("COIN2")
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(tnzs_port1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(tnzs_port2_r, tnzs_port2_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_PORT("COIN1")
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_PORT("COIN2")
 ADDRESS_MAP_END
 
 

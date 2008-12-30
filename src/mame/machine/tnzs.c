@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "cpu/i8x41/i8x41.h"
+#include "cpu/mcs48/mcs48.h"
 #include "includes/tnzs.h"
 
 static int mcu_type;
@@ -44,16 +44,8 @@ static READ8_HANDLER( mcu_tnzs_r )
 {
 	UINT8 data;
 
-	if (offset == 0)
-	{
-		data = cpu_get_reg(space->machine->cpu[2], I8X41_DATA);
-		cpu_yield(space->cpu);
-	}
-	else
-	{
-		data = cpu_get_reg(space->machine->cpu[2], I8X41_STAT);
-		cpu_yield(space->cpu);
-	}
+	data = upi41_master_r(space->machine->cpu[2], offset & 1);
+	cpu_yield(space->cpu);
 
 //  logerror("PC %04x: read %02x from mcu $c00%01x\n", cpu_get_previouspc(space->cpu), data, offset);
 
@@ -64,10 +56,7 @@ static WRITE8_HANDLER( mcu_tnzs_w )
 {
 //  logerror("PC %04x: write %02x to mcu $c00%01x\n", cpu_get_previouspc(space->cpu), data, offset);
 
-	if (offset == 0)
-		cpu_set_reg(space->machine->cpu[2], I8X41_DATA, data);
-	else
-		cpu_set_reg(space->machine->cpu[2], I8X41_CMND, data);
+	upi41_master_w(space->machine->cpu[2], offset & 1, data);
 }
 
 
