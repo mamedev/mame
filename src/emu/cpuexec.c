@@ -325,6 +325,7 @@ void cpuexec_timeslice(running_machine *machine)
 						/* via the call to cpu_execute */
 						classdata->cycles_stolen = 0;
 						global->executingcpu = classdata->device;
+						*classdata->icount = classdata->cycles_running;
 						if (!call_debugger)
 							ran = (*classdata->execute)(classdata->device, classdata->cycles_running);
 						else

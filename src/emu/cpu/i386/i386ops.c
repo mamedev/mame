@@ -2169,8 +2169,9 @@ static void I386OP(hlt)(i386_state *cpustate)				// Opcode 0xf4
 	// TODO: We need to raise an exception in protected mode and when
 	// the current privilege level is not zero
 	cpustate->halted = 1;
-	cpustate->cycles = 0;
 	CYCLES(cpustate,CYCLES_HLT);
+	if (cpustate->cycles > 0)
+		cpustate->cycles = 0;
 }
 
 static void I386OP(decimal_adjust)(i386_state *cpustate, int direction)
