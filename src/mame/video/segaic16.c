@@ -1978,7 +1978,12 @@ static void segaic16_sprites_16a_draw(running_machine *machine, struct sprite_in
 		{																	\
 			/* shadow/hilight mode? */										\
 			if (color == info->colorbase + (0x3f << 4))						\
-				dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries;	\
+			{																\
+				/* we have to check this for System 18 so that we don't */  \
+				/* attempt to shadow VDP pixels */							\
+				if (dest[x] < palette.entries)								\
+					dest[x] += (paletteram16[dest[x]] & 0x8000) ? palette.entries*2 : palette.entries; \
+			}																\
 																			\
 			/* regular draw */												\
 			else															\

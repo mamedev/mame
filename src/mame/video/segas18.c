@@ -218,26 +218,104 @@ VIDEO_UPDATE( system18 )
 
 	/* draw background opaquely first, not setting any priorities */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("0: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("1: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 	if (vdp_enable && vdplayer == 0) draw_vdp(bitmap, cliprect, vdppri);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("2: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 
 	/* draw background again to draw non-transparent pixels over the VDP and set the priority */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 0, 0x01);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("3: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_BACKGROUND, 1, 0x02);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("4: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 	if (vdp_enable && vdplayer == 1) draw_vdp(bitmap, cliprect, vdppri);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("5: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 
 	/* draw foreground */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 0, 0x02);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("6: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_FOREGROUND, 1, 0x04);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("7: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 	if (vdp_enable && vdplayer == 2) draw_vdp(bitmap, cliprect, vdppri);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("8: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 
 	/* text layer */
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 0, 0x04);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("9: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 	segaic16_tilemap_draw(screen, bitmap, cliprect, 0, SEGAIC16_TILEMAP_TEXT, 1, 0x08);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("A: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 	if (vdp_enable && vdplayer == 3) draw_vdp(bitmap, cliprect, vdppri);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("B: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 
 	/* draw the sprites */
 	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
+{
+	int x,y;
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			if (*BITMAP_ADDR16(bitmap, y, x) >= 0x2000) printf("C: pix=%04X\n", *BITMAP_ADDR16(bitmap, y, x));
+}
 
 #if DEBUG_VDP
 	if (vdp_enable && input_code_pressed(KEYCODE_V))

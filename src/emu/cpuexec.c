@@ -1453,7 +1453,6 @@ static TIMER_CALLBACK( triggertime_callback )
 }
 
 
-
 /*-------------------------------------------------
     empty_event_queue - empty a CPU's event queue
     for a specific input line
