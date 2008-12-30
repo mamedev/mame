@@ -77,17 +77,11 @@ static const int mpc603r_pll_config[12][9] =
 };
 
 
-#if (HAS_PPC603 || HAS_PPC601 || HAS_PPC604)
 static void ppc603_exception(int exception);
-#endif
-#if (HAS_PPC602)
 static void ppc602_exception(int exception);
-#endif
-#if (HAS_PPC403)
 static void ppc403_exception(int exception);
 static UINT8 ppc403_spu_r(UINT32 a);
 static void ppc403_spu_w(UINT32 a, UINT8 d);
-#endif
 
 #define RD				((op >> 21) & 0x1F)
 #define RT				((op >> 21) & 0x1f)
@@ -144,9 +138,7 @@ static void ppc403_spu_w(UINT32 a, UINT8 d);
 	if((ppc.msr & 0x2000) == 0){	\
 	}
 
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
 static UINT32		ppc_field_xlat[256];
-#endif
 
 
 
@@ -323,12 +315,8 @@ typedef struct {
 	FPR	fpr[32];
 	UINT32 sr[16];
 
-#if HAS_PPC603 || HAS_PPC601 || HAS_MPC8240 || HAS_PPC604
 	int is603;
-#endif
-#if HAS_PPC602
 	int is602;
-#endif
 
 	/* PowerPC 602 specific registers */
 	UINT32 lt;
@@ -388,29 +376,17 @@ static UINT32 ppc_rotate_mask[32][32];
 
 INLINE int IS_PPC602(void)
 {
-#if HAS_PPC602
 	return ppc.is602;
-#else
-	return 0;
-#endif
 }
 
 INLINE int IS_PPC603(void)
 {
-#if HAS_PPC603 || HAS_PPC601 || HAS_PPC604
 	return ppc.is603;
-#else
-	return 0;
-#endif
 }
 
 INLINE int IS_PPC403(void)
 {
-#if HAS_PPC403
 	return !IS_PPC602() && !IS_PPC603();
-#else
-	return 0;
-#endif
 }
 
 /*********************************************************************/
@@ -560,7 +536,6 @@ INLINE void ppc_set_spr(int spr, UINT32 value)
 		case SPR_PVR:		return;
 	}
 
-#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601 || HAS_PPC604)
 	if(IS_PPC602() || IS_PPC603()) {
 		switch(spr)
 		{
@@ -568,14 +543,10 @@ INLINE void ppc_set_spr(int spr, UINT32 value)
 				if((value & 0x80000000) && !(DEC & 0x80000000))
 				{
 					/* trigger interrupt */
-#if HAS_PPC602
 					if (IS_PPC602())
 						ppc602_exception(EXCEPTION_DECREMENTER);
-#endif
-#if HAS_PPC603 || HAS_PPC601 || HAS_PPC604
 					if (IS_PPC603())
 						ppc603_exception(EXCEPTION_DECREMENTER);
-#endif
 				}
 				write_decrementer(value);
 				return;
@@ -629,9 +600,7 @@ INLINE void ppc_set_spr(int spr, UINT32 value)
 			case SPR603E_IABR:			ppc.iabr = value; return;
 		}
 	}
-#endif
 
-#if (HAS_PPC602)
 	if (ppc.is602) {
 		switch(spr)
 		{
@@ -643,9 +612,7 @@ INLINE void ppc_set_spr(int spr, UINT32 value)
 			case SPR602_TCR:		ppc.tcr = value; return;
 		}
 	}
-#endif
 
-#if (HAS_PPC403)
 	if (IS_PPC403()) {
 		switch(spr)
 		{
@@ -702,7 +669,6 @@ INLINE void ppc_set_spr(int spr, UINT32 value)
 			case SPR403_IAC2:		ppc.iac2 = value; return;
 		}
 	}
-#endif
 
 	fatalerror("ppc: set_spr: unknown spr %d (%03X) !", spr, spr);
 }
@@ -723,7 +689,6 @@ INLINE UINT32 ppc_get_spr(int spr)
 		case SPR_PVR:		return ppc.pvr;
 	}
 
-#if (HAS_PPC403)
 	if (IS_PPC403())
 	{
 		switch (spr)
@@ -754,9 +719,7 @@ INLINE UINT32 ppc_get_spr(int spr)
 			case SPR403_IAC2:		return ppc.iac2;
 		}
 	}
-#endif
 
-#if (HAS_PPC602)
 	if (ppc.is602) {
 		switch(spr)
 		{
@@ -769,9 +732,7 @@ INLINE UINT32 ppc_get_spr(int spr)
 			case SPR602_TCR:		return ppc.tcr;
 		}
 	}
-#endif
 
-#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601 || HAS_PPC604)
 	if (IS_PPC603() || IS_PPC602())
 	{
 		switch (spr)
@@ -819,7 +780,6 @@ INLINE UINT32 ppc_get_spr(int spr)
 			case SPR603E_DBAT3U:	return ppc.dbat[3].u;
 		}
 	}
-#endif
 
 	fatalerror("ppc: get_spr: unknown spr %d (%03X) !", spr, spr);
 	return 0;
@@ -899,17 +859,9 @@ INLINE void ppc_exception(int exception_type)
 
 #include "ppc_mem.c"
 
-#if (HAS_PPC403)
 #include "ppc403.c"
-#endif
-
-#if (HAS_PPC602)
 #include "ppc602.c"
-#endif
-
-#if (HAS_PPC603 || HAS_PPC601 || HAS_MPC8240 || HAS_PPC604)
 #include "ppc603.c"
-#endif
 
 /********************************************************************/
 
@@ -974,7 +926,6 @@ static void ppc_init(void)
 
 
 // !!! probably should move this stuff elsewhere !!!
-#if HAS_PPC403
 static CPU_INIT( ppc403 )
 {
 	const ppc_config *configdata = device->static_config;
@@ -1020,10 +971,7 @@ static CPU_EXIT( ppc403 )
 {
 
 }
-#endif /* HAS_PPC403 */
 
-
-#if (HAS_PPC603)
 static CPU_INIT( ppc603 )
 {
 	const ppc_config *configdata = device->static_config;
@@ -1167,9 +1115,7 @@ static CPU_EXIT( ppc603 )
 {
 
 }
-#endif
 
-#if (HAS_PPC602)
 static CPU_INIT( ppc602 )
 {
 	float multiplier;
@@ -1302,9 +1248,6 @@ static CPU_EXIT( ppc602 )
 {
 
 }
-#endif
-
-#if (HAS_MPC8240)
 
 static void mpc8240_tlbli(UINT32 op)
 {
@@ -1446,10 +1389,7 @@ static CPU_EXIT( mpc8240 )
 {
 
 }
-#endif
 
-
-#if (HAS_PPC601)
 static CPU_INIT( ppc601 )
 {
 	const ppc_config *configdata = device->static_config;
@@ -1577,9 +1517,7 @@ static CPU_EXIT( ppc601 )
 {
 
 }
-#endif
 
-#if (HAS_PPC604)
 static CPU_INIT( ppc604 )
 {
 	const ppc_config *configdata = device->static_config;
@@ -1709,7 +1647,6 @@ static CPU_EXIT( ppc604 )
 {
 
 }
-#endif
 
 
 
@@ -1766,7 +1703,6 @@ static CPU_SET_INFO( ppc )
 	}
 }
 
-#if (HAS_PPC403)
 static CPU_SET_INFO( ppc403 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 8)
@@ -1781,9 +1717,7 @@ static CPU_SET_INFO( ppc403 )
 		default:									ppc_set_info(state, info);				break;
 	}
 }
-#endif
 
-#if (HAS_PPC603)
 static CPU_SET_INFO( ppc603 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
@@ -1798,7 +1732,6 @@ static CPU_SET_INFO( ppc603 )
 		default:											ppc_set_info(state, info);		break;
 	}
 }
-#endif
 
 static CPU_GET_INFO( ppc )
 {
@@ -1933,7 +1866,6 @@ static CPU_GET_INFO( ppc )
 	}
 }
 
-#if (HAS_PPC403)
 CPU_GET_INFO( ppc403 )
 {
 	switch(state)
@@ -1959,9 +1891,7 @@ CPU_GET_INFO( ppc403 )
 		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
-#endif
 
-#if (HAS_PPC603)
 CPU_GET_INFO( ppc603 )
 {
 	switch(state)
@@ -1994,11 +1924,7 @@ CPU_GET_INFO( ppc603 )
 		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
-#endif
 
-/* PowerPC 602 */
-
-#if (HAS_PPC602)
 static CPU_SET_INFO( ppc602 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
@@ -2043,11 +1969,8 @@ CPU_GET_INFO( ppc602 )
 		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
-#endif
 
-/* Motorola MPC8240 */
 
-#if (HAS_MPC8240)
 static CPU_SET_INFO( mpc8240 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
@@ -2088,11 +2011,7 @@ CPU_GET_INFO( mpc8240 )
 		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
-#endif
 
-/* PPC601 */
-
-#if (HAS_PPC601)
 static CPU_SET_INFO( ppc601 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
@@ -2133,11 +2052,7 @@ CPU_GET_INFO( ppc601 )
 		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
-#endif
 
-/* PPC604 */
-
-#if (HAS_PPC604)
 static CPU_SET_INFO( ppc604 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
@@ -2178,4 +2093,3 @@ CPU_GET_INFO( ppc604 )
 		default:										CPU_GET_INFO_CALL(ppc);				break;
 	}
 }
-#endif

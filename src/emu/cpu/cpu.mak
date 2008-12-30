@@ -1213,17 +1213,9 @@ $(CPUOBJ)/pdp1/pdp1.o:	$(CPUSRC)/pdp1/pdp1.c \
 # Motorola PowerPC series
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_PPC403GA=$(if $(filter PPC403GA,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC403GCX=$(if $(filter PPC403GCX,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC601=$(if $(filter PPC601,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC602=$(if $(filter PPC602,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC603=$(if $(filter PPC603,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC603E=$(if $(filter PPC603E,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC603R=$(if $(filter PPC603R,$(CPUS)),1,0)
-CPUDEFS += -DHAS_PPC604=$(if $(filter PPC604,$(CPUS)),1,0)
-CPUDEFS += -DHAS_MPC8240=$(if $(filter MPC8240,$(CPUS)),1,0)
+CPUDEFS += -DHAS_POWERPC=$(if $(filter POWERPC,$(CPUS)),1,0)
 
-ifneq ($(filter PPC403GA PPC403GCX PPC601 PPC602 PPC603 PPC603E PPC603R PPC604 MPC8240,$(CPUS)),)
+ifneq ($(filter POWERPC,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/powerpc
 CPUOBJS += $(CPUOBJ)/powerpc/ppccom.o $(CPUOBJ)/powerpc/ppcfe.o $(CPUOBJ)/powerpc/ppcdrc.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o

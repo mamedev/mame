@@ -221,7 +221,7 @@ static VIDEO_UPDATE( m2 )
 			UINT16 *d = BITMAP_ADDR16(bitmap, j, 0);
 			for (i=0; i < 512; i++)
 			{
-				d[i^3] = *fb++;
+				d[i^3] = *fb++ & 0x7fff;
 			}
 		}
 	}

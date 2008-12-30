@@ -148,50 +148,32 @@ struct _powerpc_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-#if (HAS_PPC403GA)
 CPU_GET_INFO( ppc403ga );
 #define CPU_PPC403GA CPU_GET_INFO_NAME( ppc403ga )
-#endif
 
-#if (HAS_PPC403GCX)
 CPU_GET_INFO( ppc403gcx );
 #define CPU_PPC403GCX CPU_GET_INFO_NAME( ppc403gcx )
-#endif
 
-#if (HAS_PPC601)
 CPU_GET_INFO( ppc601 );
 #define CPU_PPC601 CPU_GET_INFO_NAME( ppc601 )
-#endif
 
-#if (HAS_PPC602)
 CPU_GET_INFO( ppc602 );
 #define CPU_PPC602 CPU_GET_INFO_NAME( ppc602 )
-#endif
 
-#if (HAS_PPC603)
 CPU_GET_INFO( ppc603 );
 #define CPU_PPC603 CPU_GET_INFO_NAME( ppc603 )
-#endif
 
-#if (HAS_PPC603E)
 CPU_GET_INFO( ppc603e );
 #define CPU_PPC603E CPU_GET_INFO_NAME( ppc603e )
-#endif
 
-#if (HAS_PPC603R)
 CPU_GET_INFO( ppc603r );
 #define CPU_PPC603R CPU_GET_INFO_NAME( ppc603r )
-#endif
 
-#if (HAS_PPC604)
 CPU_GET_INFO( ppc604 );
 #define CPU_PPC604 CPU_GET_INFO_NAME( ppc604 )
-#endif
 
-#if (HAS_MPC8240)
 CPU_GET_INFO( mpc8240 );
 #define CPU_MPC8240 CPU_GET_INFO_NAME( mpc8240 )
-#endif
 
 
 

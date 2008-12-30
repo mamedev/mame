@@ -66,7 +66,6 @@ INLINE void WRITE64(UINT32 a, UINT64 d)
 
 /***********************************************************************/
 
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
 static UINT16 ppc_read16_unaligned(const address_space *space, UINT32 a)
 {
 	return ((UINT16)ppc.read8(space, a+0) << 8) | ((UINT16)ppc.read8(space, a+1) << 0);
@@ -102,7 +101,6 @@ static void ppc_write64_unaligned(const address_space *space, UINT32 a, UINT64 d
 	ppc.write32(space, a+0, (UINT32)(d >> 32));
 	ppc.write32(space, a+4, (UINT32)(d));
 }
-#endif
 
 /***********************************************************************/
 
@@ -296,7 +294,6 @@ exception:
 	}
 }
 
-#if (HAS_PPC602||HAS_PPC603)
 static int ppc_translate_address_cb(int space, offs_t *addr)
 {
 	int success = 1;
@@ -308,7 +305,6 @@ static int ppc_translate_address_cb(int space, offs_t *addr)
 	}
 	return success;
 }
-#endif
 
 static UINT8 ppc_read8_translated(const address_space *space, offs_t address)
 {
@@ -359,13 +355,11 @@ static void ppc_write64_translated(const address_space *space, offs_t address, U
 }
 
 #ifndef PPC_DRC
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
 static UINT32 ppc_readop_translated(const address_space *space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_CODE | PPC_TRANSLATE_READ);
 	return memory_read_dword_64be(space, address);
 }
-#endif
 #endif
 
 /***********************************************************************/
@@ -380,7 +374,6 @@ static CPU_DISASSEMBLE( ppc )
 
 /***********************************************************************/
 
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
 static CPU_READOP( ppc )
 {
 	if (!(ppc.msr & MSR_IR))
@@ -441,4 +434,3 @@ static CPU_WRITE( ppc )
 
 	return 1;
 }
-#endif

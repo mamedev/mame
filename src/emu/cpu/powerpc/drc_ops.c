@@ -2624,7 +2624,6 @@ static UINT32 recompile_xoris(drc_core *drc, UINT32 op)
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
 
-#if HAS_PPC403
 static UINT32 recompile_dccci(drc_core *drc, UINT32 op)
 {
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
@@ -2713,7 +2712,6 @@ static UINT32 recompile_invalid(drc_core *drc, UINT32 op)
 
 /* PowerPC 60x Recompilers */
 
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
 static UINT32 recompile_lfs(drc_core *drc,UINT32 op)
 {
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
@@ -3768,7 +3766,6 @@ static UINT32 recompile_fnmsubsx(drc_core *drc, UINT32 op)
 
 // PPC602
 
-#if (HAS_PPC602)
 static UINT32 recompile_esa(drc_core *drc, UINT32 op)
 {
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
@@ -3790,19 +3787,14 @@ static UINT32 recompile_dsa(drc_core *drc, UINT32 op)
 
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
-#endif /* HAS_PPC602 */
 
-#if (HAS_PPC602 || HAS_MPC8240)
 static UINT32 recompile_tlbli(drc_core *drc, UINT32 op)
 {
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
-#endif
 
-#if (HAS_PPC602||HAS_PPC604||HAS_MPC8240)
 static UINT32 recompile_tlbld(drc_core *drc, UINT32 op)
 {
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
-#endif
 

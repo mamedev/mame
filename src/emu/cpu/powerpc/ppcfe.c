@@ -98,6 +98,16 @@ INLINE int is_601_class(const powerpc_state *ppc)
 
 
 /*-------------------------------------------------
+    is_602_class - are we one of the 602 variants?
+-------------------------------------------------*/
+
+INLINE int is_602_class(const powerpc_state *ppc)
+{
+	return (ppc->flavor == PPC_MODEL_602);
+}
+
+
+/*-------------------------------------------------
     is_603_class - are we one of the 603 variants?
 -------------------------------------------------*/
 
@@ -1005,7 +1015,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 
 		case 0x3d2:	/* TLBLD */
 		case 0x3f2:	/* TLBLI */
-			if (!(ppc->cap & PPCCAP_603_MMU))
+			if (!(ppc->cap & PPCCAP_603_MMU) && !is_602_class(ppc))
 				return FALSE;
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION;
 			return TRUE;
@@ -1180,6 +1190,13 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 				return FALSE;
 			if (op & MSR_EE)
 				desc->flags |= OPFLAG_CAN_EXPOSE_EXTERNAL_INT;
+			return TRUE;
+		
+		case 0x254: /* ESA */
+		case 0x274: /* DSA */
+			if (!is_602_class(ppc))
+				return FALSE;
+			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION;
 			return TRUE;
 	}
 
