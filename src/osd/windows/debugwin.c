@@ -26,6 +26,7 @@
 
 // MAMEOS headers
 #include "debugwin.h"
+#include "winmain.h"
 #include "window.h"
 #include "video.h"
 #include "input.h"
@@ -390,17 +391,29 @@ void debugwin_init_windows(void)
 
 		if (temp_dc != NULL)
 		{
-			// create a standard Lucida Console 8 font
-			debug_font = CreateFont(-MulDiv(8, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
-						ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, TEXT("Lucida Console"));
+			int size = options_get_int(mame_options(), WINOPTION_DEBUGGER_FONT_SIZE);
+			TCHAR *t_face;
+		
+			// create a standard font
+			t_face = tstring_from_utf8(options_get_string(mame_options(), WINOPTION_DEBUGGER_FONT));
+			debug_font = CreateFont(-MulDiv(size, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
+						ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, t_face);
+			free(t_face);
+			
+			// fall back to Lucida Console 8
 			if (debug_font == NULL)
-				fatalerror("Unable to create debug font");
+			{
+				debug_font = CreateFont(-MulDiv(8, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
+							ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, TEXT("Lucida Console"));
+				if (debug_font == NULL)
+					fatalerror("Unable to create debug font");
+			}
 
 			// get the metrics
 			old_font = SelectObject(temp_dc, debug_font);
 			if (GetTextMetrics(temp_dc, &metrics))
 			{
-				debug_font_width = metrics.tmMaxCharWidth;
+				debug_font_width = metrics.tmAveCharWidth;
 				debug_font_height = metrics.tmHeight;
 				debug_font_ascent = metrics.tmAscent + metrics.tmExternalLeading;
 			}
