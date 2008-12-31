@@ -42,7 +42,7 @@ static TILE_GET_INFO( get_jingbell_reel1_tile_info )
 	SET_TILE_INFO(
 			0,
 			(code)+(((tile_index+1)&0x3)*0x100),
-			0,
+			(code & 0x80) ? 0xc : 0,
 			0);
 }
 
@@ -74,7 +74,7 @@ static TILE_GET_INFO( get_jingbell_reel2_tile_info )
 	SET_TILE_INFO(
 			0,
 			(code)+(((tile_index+1)&0x3)*0x100),
-			0,
+			(code & 0x80) ? 0xc : 0,
 			0);
 }
 
@@ -106,7 +106,7 @@ static TILE_GET_INFO( get_jingbell_reel3_tile_info )
 	SET_TILE_INFO(
 			0,
 			(code)+(((tile_index+1)&0x3)*0x100),
-			0,
+			(code & 0x80) ? 0xc : 0,
 			0);
 }
 
@@ -138,7 +138,7 @@ static TILE_GET_INFO( get_jingbell_reel4_tile_info )
 	SET_TILE_INFO(
 			0,
 			(code)+(((tile_index+1)&0x3)*0x100),
-			0,
+			(code & 0x80) ? 0xc : 0,
 			0);
 }
 
@@ -771,15 +771,23 @@ ROM_START( gp98 )
 	ROM_LOAD( "prg", 0x00000, 0x20000, CRC(1c02b8cc) SHA1(b8a29cbd96581f8ae1c1028279b8ee703be29f5f) )
 
 	ROM_REGION( 0x8000, "data", 0 )
-	ROM_COPY( "main", 0x10000, 0x00000, 0x8000 )
+	ROM_COPY( "main", 0x18000, 0x00000, 0x8000 )
 
-	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE ) // 6bpp (2bpp per rom) font at tile # 0x4000
+	ROM_REGION( 0x180000, "tempgfx", ROMREGION_DISPOSE ) // 6bpp (2bpp per rom) font at tile # 0x4000
 	ROM_LOAD( "49", 0x000000, 0x80000, BAD_DUMP CRC(a9d9367d) SHA1(91c74740fc8394f1e1cd68feb8c993afd2042d70) )
 	ROM_LOAD( "50", 0x080000, 0x80000, CRC(48f6190d) SHA1(b430131a258b4e2fc178ac0e3e3f0010a82eac65) )
 	ROM_LOAD( "51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
 
-	ROM_REGION( 0x180000, "gfx2", ROMREGION_DISPOSE ) // 6bpp (2bpp per rom) font at tile # 0x4000
-	ROM_COPY( "gfx1", 0x00000, 0x00000, 0x180000 )
+	ROM_REGION( 0xc0000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "tempgfx", 0x000000, 0x00000, 0x40000 )
+	ROM_COPY( "tempgfx", 0x080000, 0x40000, 0x40000 )
+	ROM_COPY( "tempgfx", 0x100000, 0x80000, 0x40000 )
+
+	ROM_REGION( 0xc0000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "tempgfx", 0x040000, 0x00000, 0x40000 )
+	ROM_COPY( "tempgfx", 0x0c0000, 0x40000, 0x40000 )
+	ROM_COPY( "tempgfx", 0x140000, 0x80000, 0x40000 )
+
 
 	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
 	/* no OKI on this */
