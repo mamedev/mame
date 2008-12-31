@@ -249,8 +249,8 @@ static CPU_SET_INFO( m65ce02 )
 		case CPUINFO_INT_REGISTER + M65CE02_ZP: cpustate->zp.b.l = info->i; break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	cpustate->rdmem_id = (m6502_read_indexed_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	cpustate->wrmem_id = (m6502_write_indexed_func) info->f; break;
+		case CPUINFO_FCT_M6502_READINDEXED_CALLBACK:	cpustate->rdmem_id = (m6502_read_indexed_func) info->f; break;
+		case CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK:	cpustate->wrmem_id = (m6502_write_indexed_func) info->f; break;
 	}
 }
 
@@ -315,8 +315,8 @@ CPU_GET_INFO( m65ce02 )
 		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65ce02);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) cpustate->rdmem_id;		break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) cpustate->wrmem_id;		break;
+		case CPUINFO_FCT_M6502_READINDEXED_CALLBACK:	info->f = (genf *) cpustate->rdmem_id;		break;
+		case CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) cpustate->wrmem_id;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME: strcpy(info->s, "M65CE02");  break;

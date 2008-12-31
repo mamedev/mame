@@ -680,8 +680,8 @@ static CPU_SET_INFO( m6502 )
 		case CPUINFO_INT_REGISTER + M6502_ZP:			cpustate->zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	cpustate->rdmem_id = (m6502_read_indexed_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	cpustate->wrmem_id = (m6502_write_indexed_func) info->f; break;
+		case CPUINFO_FCT_M6502_READINDEXED_CALLBACK:	cpustate->rdmem_id = (m6502_read_indexed_func) info->f; break;
+		case CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK:	cpustate->wrmem_id = (m6502_write_indexed_func) info->f; break;
 	}
 }
 
@@ -746,8 +746,8 @@ CPU_GET_INFO( m6502 )
 		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6502);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) cpustate->rdmem_id;		break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) cpustate->wrmem_id;		break;
+		case CPUINFO_FCT_M6502_READINDEXED_CALLBACK:	info->f = (genf *) cpustate->rdmem_id;		break;
+		case CPUINFO_FCT_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) cpustate->wrmem_id;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6502");				break;
@@ -813,8 +813,8 @@ static CPU_SET_INFO( m6510 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6510_PORTREAD:	cpustate->port_read = (m6510_port_read_func) info->f;	break;
-		case CPUINFO_PTR_M6510_PORTWRITE:	cpustate->port_write = (m6510_port_write_func) info->f;	break;
+		case CPUINFO_FCT_M6510_PORTREAD:	cpustate->port_read = (m6510_port_read_func) info->f;	break;
+		case CPUINFO_FCT_M6510_PORTWRITE:	cpustate->port_write = (m6510_port_write_func) info->f;	break;
 
 		default:							CPU_SET_INFO_CALL(m6502);			break;
 	}
@@ -832,8 +832,8 @@ CPU_GET_INFO( m6510 )
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6510);				break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6510);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = ADDRESS_MAP_NAME(m6510_mem); break;
-		case CPUINFO_PTR_M6510_PORTREAD:				info->f = (genf *) cpustate->port_read;		break;
-		case CPUINFO_PTR_M6510_PORTWRITE:				info->f = (genf *) cpustate->port_write;	break;
+		case CPUINFO_FCT_M6510_PORTREAD:				info->f = (genf *) cpustate->port_read;		break;
+		case CPUINFO_FCT_M6510_PORTWRITE:				info->f = (genf *) cpustate->port_write;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6510");				break;

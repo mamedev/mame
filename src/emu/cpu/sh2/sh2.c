@@ -2312,7 +2312,7 @@ static CPU_SET_INFO( sh2 )
 		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(device, info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK:		sh2->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;
+		case CPUINFO_FCT_SH2_FTCSR_READ_CALLBACK:		sh2->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;
 	}
 }
 
@@ -2446,7 +2446,7 @@ CPU_GET_INFO( sh2 )
 		case CPUINFO_STR_REGISTER + SH2_R15:			sprintf(info->s, "R15 :%08X", sh2->r[15]); break;
 		case CPUINFO_STR_REGISTER + SH2_EA:				sprintf(info->s, "EA  :%08X", sh2->ea);    break;
 
-		case CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK:		info->f = (genf*)sh2->ftcsr_read_callback; break;
+		case CPUINFO_FCT_SH2_FTCSR_READ_CALLBACK:		info->f = (genf*)sh2->ftcsr_read_callback; break;
 
 	}
 }
