@@ -71,6 +71,7 @@
  *  RDOP    read an opcode
  ***************************************************************/
 #define RDOP() memory_decrypted_read_byte(cpustate->space, PCW++); cpustate->icount -= 1
+#define PEEKOP() memory_decrypted_read_byte(cpustate->space, PCW)
 
 /***************************************************************
  *  RDOPARG read an opcode argument
@@ -435,7 +436,9 @@
  ***************************************************************/
 #define CLI 													\
 	if ((cpustate->irq_state != CLEAR_LINE) && (P & F_I)) { 		\
-		cpustate->after_cli = 1;									\
+		/* kludge for now until IRQ rewrite: ignore if RTI follows */ \
+		if (PEEKOP() != 0x40) \
+			cpustate->after_cli = 1;									\
 	}															\
 	P &= ~F_I
 
