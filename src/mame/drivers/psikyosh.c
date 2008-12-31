@@ -1008,19 +1008,22 @@ ROM_START( dragnblz )
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7fd1b225) SHA1(6aa61021ada51393bbb34fd1aea00b8feccc8197) )
 ROM_END
 
-/* Most of the roms on this board are from Dragon Blaze and not used by the game, they're needed for the board to
-   work, but the content doesn't matter. */
+/*
+
+Starting with Gunbarich and including Mahjong G-Taste, Psikyo started to "recycle" left over Dragon Blaze PCBs.
+  Psikyo would replace some of the Dragon Blaze roms with the new game roms leaving many of the surface mounted
+  roms intact.  The new games don't use or access the left over roms, but the PCB needs the roms filled to function.
+
+  The hidden rom tests in Gunbarich and Mahjong G-Teste shows the games only uses the new game roms.
+
+*/
+
 ROM_START( gnbarich )
 	ROM_REGION( 0x100000, "main", 0)
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u21",   0x000000, 0x080000, CRC(c136cd9c) SHA1(ab66c4f5196a66a97dbb5832336a203421cf40fa) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u22",   0x000002, 0x080000, CRC(6588fc96) SHA1(3db29fcf17e8b2aee465319b557bd3e45bc966b2) )
 
 	ROM_REGION( 0x2c00000, "gfx1", ROMTEST_GFX )	/* Sprites */
-	/* Gunbarich doesn't actually use 1-5 and 10, they're on the board, but all the gfx are in 6-9
-       The game was an upgrade to Dragon Blaze, only some of the roms were replaced however it
-       appears the board needs to be fully populated to work correctly so the Dragon Blaze roms
-       were left on it.  After hooking up hidden rom test we can see only the 8 roms we load are
-       tested */
 //  ROM_LOAD32_WORD( "1l.u4",  0x0400000, 0x200000, CRC(c2eb565c) SHA1(07e41b36cc03a87f28d091754fdb0d1a7316a532) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "1h.u12", 0x0400002, 0x200000, CRC(23cb46b7) SHA1(005b7cc40eea103688a64a72c219c7535970dbfb) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "2l.u5",  0x0800000, 0x200000, CRC(bc256aea) SHA1(1f1d678e8a63513a95f296b8a07d2ea485d1e53f) ) /* From Dragon Blaze */
@@ -1046,14 +1049,11 @@ ROM_START( gnbarich )
 	ROM_LOAD( "snd0.u52", 0x000000, 0x200000, CRC(7b10436b) SHA1(c731fcce024e286a677ca10a91761c1ee06094a5) )
 ROM_END
 
-/* Most of the roms on this board are from Dragon Blaze and not used by the game, they're needed for the board to
-   work, but the content doesn't matter. */
 ROM_START( mjgtaste )
 	ROM_REGION( 0x100000, "main", 0)
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(5f2041dc) SHA1(f3862ffdb8df0cf921ce1cb0236935731e7729a7) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(f5ff7876) SHA1(4c909db9c97f29fd79df6dacd29762688701b973) )
 
-	/* exact number of gfx / sound roms may be incorrect */
 	ROM_REGION( 0x2c00000, "gfx1", ROMTEST_GFX | ROMREGION_ERASE00 )	/* Sprites */
 	ROM_LOAD32_WORD( "1l.u4",  0x0400000, 0x200000, CRC(30da42b1) SHA1(8485f2c0e7769b50b95d962afe14fa7ae74cd887) )
 	ROM_LOAD32_WORD( "1h.u12", 0x0400002, 0x200000, CRC(629c1d44) SHA1(61909091328bb7b6d3e6e0bff91e14c9b4b86c2c) )
@@ -1076,7 +1076,7 @@ ROM_START( mjgtaste )
 //  ROM_LOAD32_WORD( "10l.u58",0x2800000, 0x200000, CRC(a3f5c7f8) SHA1(d17478ca3e7ef46270f350ffa35d43acb05b1185) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "10h.u59",0x2800002, 0x200000, CRC(30e304c4) SHA1(1d866276bfe7f7524306a880d225aaf11ac2e5dd) ) /* From Dragon Blaze */
 
-	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples - Not Dumped */
+	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "snd0.u52", 0x000000, 0x400000, CRC(0179f018) SHA1(16ae63e021230356777342ed902e02407a1a1b82) )
 ROM_END
 
@@ -1085,7 +1085,7 @@ ROM_START( tgm2 )
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(b19f6c31) SHA1(c58346c575db71262aebc3993743cb031c41e4af) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(c521bf24) SHA1(0ee5b9f74b6b8bcc01b2270c53f30d99e877ed64) )
 
-	ROM_REGION( 0x3000000, "gfx1", ROMTEST_GFX )
+	ROM_REGION( 0x3000000, "gfx1", ROMTEST_GFX )	/* Sprites */
 	// Lower positions not populated
 	ROM_LOAD32_WORD( "81ts_3l.u6",   0x0c00000, 0x200000, CRC(d77cff9c) SHA1(93ee48c350110ebf9a80cca95c599c90a523147d) )
 	ROM_LOAD32_WORD( "82ts_3h.u14",  0x0c00002, 0x200000, CRC(f012b583) SHA1(907e1c93cbfa6a0285f96c53f5ccb63e313053d7) )
@@ -1104,10 +1104,10 @@ ROM_START( tgm2 )
 	ROM_LOAD32_WORD( "95ts_10l.u58", 0x2800000, 0x200000, CRC(303a5240) SHA1(5816d1922e85bc27a2a13cdd183d9e67c7ddb2e1) )
 	ROM_LOAD32_WORD( "96ts_10h.u59", 0x2800002, 0x200000, CRC(2240ebf6) SHA1(b61f93a18dd9d94fb57d95745d4df2e41a0371ff) )
 
-	ROM_REGION( 0x800000, "ymf", 0 ) // Samples
+	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "97ts_snd.u52", 0x000000, 0x400000, CRC(9155eca6) SHA1(f0b4f68462d8a465c39815d3b7fd9818788132ae) )
 
-	ROM_REGION( 0x100, "user1", 0 ) // Default Eeprom (contains scores etc.)
+	ROM_REGION( 0x100, "user1", 0 ) /* Default Eeprom (contains scores etc.) */
 	// might need byteswapping to reprogram actual chip
 	ROM_LOAD( "tgm2.default.nv", 0x000, 0x100, CRC(50e2348c) SHA1(d17d2739c97a1d93a95dcc9f11feb1f6f228729e) )
 ROM_END
@@ -1117,7 +1117,7 @@ ROM_START( tgm2p )
 	ROM_LOAD32_WORD_SWAP( "2b.u21",   0x000000, 0x080000, CRC(38bc626c) SHA1(783e8413b11f1fa08d331b09ef4ed63f62b87ead) )
 	ROM_LOAD32_WORD_SWAP( "1b.u22",   0x000002, 0x080000, CRC(7599fb19) SHA1(3f7e81756470c173cc17a7e7dee91437571fd0c3) )
 
-	ROM_REGION( 0x3000000, "gfx1", ROMTEST_GFX )
+	ROM_REGION( 0x3000000, "gfx1", ROMTEST_GFX )	/* Sprites */
 	// Lower positions not populated
 	ROM_LOAD32_WORD( "81ts_3l.u6",   0x0c00000, 0x200000, CRC(d77cff9c) SHA1(93ee48c350110ebf9a80cca95c599c90a523147d) )
 	ROM_LOAD32_WORD( "82ts_3h.u14",  0x0c00002, 0x200000, CRC(f012b583) SHA1(907e1c93cbfa6a0285f96c53f5ccb63e313053d7) )
@@ -1136,10 +1136,10 @@ ROM_START( tgm2p )
 	ROM_LOAD32_WORD( "95ts_10l.u58", 0x2800000, 0x200000, CRC(303a5240) SHA1(5816d1922e85bc27a2a13cdd183d9e67c7ddb2e1) )
 	ROM_LOAD32_WORD( "96ts_10h.u59", 0x2800002, 0x200000, CRC(2240ebf6) SHA1(b61f93a18dd9d94fb57d95745d4df2e41a0371ff) )
 
-	ROM_REGION( 0x800000, "ymf", 0 ) // Samples
+	ROM_REGION( 0x800000, "ymf", 0 ) /* Samples */
 	ROM_LOAD( "97ts_snd.u52", 0x000000, 0x400000, CRC(9155eca6) SHA1(f0b4f68462d8a465c39815d3b7fd9818788132ae) )
 
-	ROM_REGION( 0x100, "user1", 0 ) // Default Eeprom (contains scores etc.)
+	ROM_REGION( 0x100, "user1", 0 ) /* Default Eeprom (contains scores etc.) */
 	// might need byteswapping to reprogram actual chip
 	ROM_LOAD( "tgm2p.default.nv", 0x000, 0x100, CRC(b2328b40) SHA1(e6cda4d6f4e91b9f78d2ca84a5eee6c3bd03fe02) )
 ROM_END
