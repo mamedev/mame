@@ -6716,8 +6716,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gunbird2 )	/* (c) 1998 */
 	DRIVER( s1945iii )	/* (c) 1999 */
 	DRIVER( dragnblz )	/* (c) 2000 */
-	/* tgm2  (c) 2000 -- removed at Arika's request */
-	/* tgm2p (c) 2000 -- removed at Arika's request */
+	DRIVER( tgm2 )		/* (c) 2000 */
+	DRIVER( tgm2p )		/* (c) 2000 */
 	DRIVER( gnbarich )	/* (c) 2001 */
 	DRIVER( mjgtaste )	/* (c) 2002 */
 	DRIVER( hotgmck )	/* (c) 1997 */
