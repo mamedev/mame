@@ -1603,6 +1603,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/limenko.o \
 	$(DRIVERS)/ltcasino.o \
 	$(DRIVERS)/lucky74.o $(VIDEO)/lucky74.o \
+	$(DRIVERS)/luckgrln.o \
 	$(DRIVERS)/magic10.o \
 	$(DRIVERS)/magicfly.o \
 	$(DRIVERS)/magictg.o \

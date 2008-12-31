@@ -8422,6 +8422,7 @@ Other Sun games
 	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
 	DRIVER( lucky74 )	/* (c) 1988 Wing Co., Ltd */
 	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
+	DRIVER( luckgrln )	/* (c) 1991 Wing Co., Ltd */
 	DRIVER( magictg )	/* (c) 199? Acclaim */
 	DRIVER( magictga )	/* (c) 199? Acclaim */
 	DRIVER( re900 )		/* (c) 1993 Entretenimientos GEMINIS */
