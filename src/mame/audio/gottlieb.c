@@ -6,6 +6,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "debugger.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
 #include "sound/samples.h"
@@ -30,7 +31,6 @@ static UINT8 nmi_rate;
 static UINT8 nmi_state;
 
 static UINT8 speech_control;
-static UINT8 sp0250_drq;
 static UINT8 last_command;
 
 static UINT8 *dac_data;
@@ -470,16 +470,9 @@ static WRITE8_HANDLER( nmi_rate_w )
  *
  *************************************/
 
-static void sp0250_drq_callback(int level)
-{
-	sp0250_drq = (level == ASSERT_LINE) ? 1 : 0;
-}
-
-
 static CUSTOM_INPUT( speech_drq_custom_r )
 {
-	/* this is reflected by a bit in the input port */
-	return sp0250_drq;
+	return sp0250_drq_r();
 }
 
 
@@ -554,7 +547,6 @@ static SOUND_START( gottlieb2 )
 	state_save_register_global(machine, nmi_rate);
 	state_save_register_global(machine, nmi_state);
 	state_save_register_global(machine, speech_control);
-	state_save_register_global(machine, sp0250_drq);
 	state_save_register_global(machine, last_command);
 }
 
@@ -590,19 +582,6 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Rev. 2 sound interfaces
- *
- *************************************/
-
-static const struct sp0250_interface sp0250_interface =
-{
-	sp0250_drq_callback
-};
-
-
-
-/*************************************
- *
  *  Rev. 2 machine driver
  *
  *************************************/
@@ -614,7 +593,7 @@ MACHINE_DRIVER_START( gottlieb_soundrev2 )
 
 	MDRV_CPU_ADD("speech", M6502, SOUND2_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(gottlieb_speech2_map,0)
-
+	
 	/* sound hardware */
 	MDRV_SOUND_START( gottlieb2 )
 
@@ -631,7 +610,6 @@ MACHINE_DRIVER_START( gottlieb_soundrev2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("sp", SP0250, SOUND2_SPEECH_CLOCK)
-	MDRV_SOUND_CONFIG(sp0250_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
