@@ -2506,22 +2506,71 @@ static void dump_to_file(running_machine* machine, UINT8* ROM)
 	#endif
 }
 
+UINT8 decrypt(UINT8 cipherText, UINT16 address)
+{
+	int idx;
+	UINT8 output;
+	int rotation[8] = {1, 0, 0, 1, 0, 1, 1, 1};
+	int sbox[8] = {0x08, 0x08, 0x28, 0x00, 0x20, 0x20, 0x88, 0x88};
+
+	idx = BIT(cipherText, 1) | (BIT(address,0) << 1) | (BIT(address, 4) << 2);
+
+	if (rotation[idx] == 0)
+		output = BITSWAP8(cipherText, 5, 6, 3, 4, 7, 2, 1, 0);   // rotates bit #3, #5 and #7 in one direction...
+	else
+		output = BITSWAP8(cipherText, 3, 6, 7, 4, 5, 2, 1, 0);   // ... or in the other
+
+	return output ^ sbox[idx];
+}
+
+UINT8 chry10_decrypt(UINT8 cipherText)
+{
+	return cipherText ^ (BIT(cipherText, 4) << 3) ^ (BIT(cipherText, 1) << 5) ^ (BIT(cipherText, 6) << 7);
+}
+
 static DRIVER_INIT( chry10 )
 {
 	UINT8 *ROM = memory_region(machine, "main");
-	do_blockswaps(ROM);
+	int size = memory_region_length(machine, "main");
+	int start = 0;
 
-	/* and something else... */
+	UINT8 *buffer;
+	int i;
+
+	for (i = start; i < size; i++)
+	{
+		ROM[i] = chry10_decrypt(ROM[i]);
+	}
+
+	buffer = malloc_or_die(size);
+	memcpy(buffer, ROM, size);
+
+	free(buffer);
+
+	do_blockswaps(ROM);
 	dump_to_file(machine, ROM);
 }
-
 
 static DRIVER_INIT( cb3 )
 {
 	UINT8 *ROM = memory_region(machine, "main");
-	do_blockswaps(ROM);
+	int size = memory_region_length(machine, "main");
+	int start = 0;
 
-	/* and something else... */
+	UINT8 *buffer;
+	int i;
+
+	for (i = start; i < size; i++)
+	{
+		ROM[i] = decrypt(ROM[i], i);
+	}
+
+	buffer = malloc_or_die(size);
+	memcpy(buffer, ROM, size);
+
+	free(buffer);
+
+	do_blockswaps(ROM);
 	dump_to_file(machine, ROM);
 }
 
@@ -2555,21 +2604,21 @@ static DRIVER_INIT(lucky8a)
 *                Game Drivers                *
 **********************************************
 
-      YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME                                  FLAGS  */
-GAME( 199?, goldstar, 0,        goldstar, goldstar, goldstar, ROT0, "IGS",         "Golden Star",                            0 )
-GAME( 199?, goldstbl, goldstar, goldstbl, goldstar, 0,        ROT0, "IGS",         "Golden Star (Blue version)",             0 )
-GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "bootleg",     "Moon Light (bootleg of Golden Star)",    0 )
-GAME( 199?, chrygld,  0,        chrygld,  chrygld,  chrygld,  ROT0, "bootleg",     "Cherry Gold I",                          0 )
-GAME( 199?, chry10,   0,        chrygld,  ncb3,     chry10,   ROT0, "bootleg",     "Cherry 10 (bootleg of Golden Star)",     GAME_NOT_WORKING )
+      YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY              FULLNAME                                  FLAGS  */
+GAME( 199?, goldstar, 0,        goldstar, goldstar, goldstar, ROT0, "IGS",               "Golden Star",                            0 )
+GAME( 199?, goldstbl, goldstar, goldstbl, goldstar, 0,        ROT0, "IGS",               "Golden Star (Blue version)",             0 )
+GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",    0 )
+GAME( 199?, chrygld,  0,        chrygld,  chrygld,  chrygld,  ROT0, "bootleg",           "Cherry Gold I",                          0 )
+GAME( 199?, chry10,   0,        chrygld,  ncb3,     chry10,   ROT0, "bootleg",           "Cherry 10 (bootleg of Golden Star)",     GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
 // are these really dyna, or bootlegs?
-GAME( 199?, ncb3,     0,        ncb3,     ncb3,     0,        ROT0, "Dyna",        "Cherry Bonus III (Version 1.40, set 1)", 0 ) // set was labeled 'new cherry bonus 3' but there is no 'new' in the gfx roms
-GAME( 199?, cb3a,     ncb3,     ncb3,     cb3a,     0,        ROT0, "Dyna",        "Cherry Bonus III (Version 1.40, set 2)", 0 )
-GAME( 199?, cb3,      ncb3,     ncb3,     ncb3,     cb3,      ROT0, "Dyna",        "Cherry Bonus III",                       GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 199?, ncb3,     0,        ncb3,     ncb3,     0,        ROT0, "Dyna",              "Cherry Bonus III (Version 1.40, set 1)",     0 )
+GAME( 199?, cb3a,     ncb3,     ncb3,     cb3a,     0,        ROT0, "Dyna",              "Cherry Bonus III (Version 1.40, set 2)",     0 )
+GAME( 199?, cb3,      ncb3,     ncb3,     ncb3,     cb3,      ROT0, "Dyna",              "Cherry Bonus III (Version 1.40, encrypted)", 0 )
 
 // cherry master hardware has a rather different mem map, but is basically the same
-GAME( 198?, cmv801,   0,        cm,       cmv801,   0,        ROT0, "Corsica",     "Cherry Master (Corsica, v8.01)",         GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // says ED-96 where the manufacturer is on some games..
-GAME( 1991, cmaster,  0,        cm,       cmv801,   0,        ROT0, "Dyna",        "Cherry Master 91?",                      GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // different HW? closer to cherry master 2?
-GAME( 1991, cmasterb, 0,        cmb,      cmv801,   0,        ROT0, "Dyna",        "Cherry Master I (v1.01)",                GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd", "New Lucky 8 Lines (set 1)",              GAME_IMPERFECT_COLORS )
-GAME( 1989, lucky8a,  lucky8,   lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd", "New Lucky 8 Lines (set 2)",              GAME_IMPERFECT_COLORS )
+GAME( 198?, cmv801,   0,        cm,       cmv801,   0,        ROT0, "Corsica",           "Cherry Master (Corsica, v8.01)",         GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // says ED-96 where the manufacturer is on some games..
+GAME( 1991, cmaster,  0,        cm,       cmv801,   0,        ROT0, "Dyna",              "Cherry Master 91?",                      GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING ) // different HW? closer to cherry master 2?
+GAME( 1991, cmasterb, 0,        cmb,      cmv801,   0,        ROT0, "Dyna",              "Cherry Master I (v1.01)",                GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",              GAME_IMPERFECT_COLORS )
+GAME( 1989, lucky8a,  lucky8,   lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",              GAME_IMPERFECT_COLORS )
