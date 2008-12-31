@@ -48,7 +48,7 @@ static INTERRUPT_GEN( popeye_interrupt )
 
 /* the protection device simply returns the last two values written shifted left */
 /* by a variable amount. */
-static int prot0,prot1,prot_shift;
+static UINT8 prot0,prot1,prot_shift;
 
 static READ8_HANDLER( protection_r )
 {
@@ -271,22 +271,15 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("DSW0")	/* DSW0 */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x03, "A 3/1 B 1/2" )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x01, "A 2/1 B 2/5" )
-	PORT_DIPSETTING(    0x04, "A 2/1 B 1/3" )
-	PORT_DIPSETTING(    0x07, "A 1/1 B 2/1" )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )    PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x08, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x0c, "A 1/1 B 1/2" )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x06, "A 1/2 B 1/4" )
-	PORT_DIPSETTING(    0x0b, "A 1/2 B 1/5" )
-	PORT_DIPSETTING(    0x02, "A 2/5 B 1/1" )
-	PORT_DIPSETTING(    0x0a, "A 1/3 B 1/1" )
-	PORT_DIPSETTING(    0x09, "A 1/4 B 1/1" )
-	PORT_DIPSETTING(    0x05, "A 1/5 B 1/1" )
-	PORT_DIPSETTING(    0x08, "A 1/6 B 1/1" )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -299,25 +292,25 @@ static INPUT_PORTS_START( popeye )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* scans DSW1 one bit at a time */
 
 	PORT_START("DSW1")	/* DSW1 (FAKE - appears as bit 7 of DSW0, see code below) */
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "40000" )
 	PORT_DIPSETTING(    0x20, "60000" )
 	PORT_DIPSETTING(    0x10, "80000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
@@ -475,7 +468,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( skyskipr )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 8000000/2)	/* 4 MHz */
+	MDRV_CPU_ADD("main", Z80, XTAL_8MHz/2)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(skyskipr_readmem,skyskipr_writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", popeye_interrupt)
@@ -498,7 +491,7 @@ static MACHINE_DRIVER_START( skyskipr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, 8000000/4)
+	MDRV_SOUND_ADD("ay", AY8910, XTAL_8MHz/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
@@ -558,79 +551,86 @@ ROM_START( skyskipr )
 	ROM_LOAD( "tnx1-t.3j",    0x0240, 0x0100, CRC(1c5c8dea) SHA1(5738303b2a9c79b7d06bcf20fdb4d9b29f6e2d96) ) /* timing for the protection ALU */
 ROM_END
 
+/*
+    Popeye
+
+    CPU/Sound Board: TPP2-01-CPU
+    Video Board:     TPP2-01-VIDEO
+*/
+
 ROM_START( popeye )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "c-7a",         0x0000, 0x2000, CRC(9af7c821) SHA1(592acfe221b5c3bd9b920f639b141f37a56d6997) )
-	ROM_LOAD( "c-7b",         0x2000, 0x2000, CRC(c3704958) SHA1(af96d10fa9bdb86b00c89d10f67cb5ca5586f446) )
-	ROM_LOAD( "c-7c",         0x4000, 0x2000, CRC(5882ebf9) SHA1(5531229b37f9ba0ede7fdc24909e3c3efbc8ade4) )
-	ROM_LOAD( "c-7e",         0x6000, 0x2000, CRC(ef8649ca) SHA1(a0157f91600e56e2a953dadbd76da4330652e5c8) )
+	ROM_LOAD( "tpp2-c.7a", 0x0000, 0x2000, CRC(9af7c821) SHA1(592acfe221b5c3bd9b920f639b141f37a56d6997) )
+	ROM_LOAD( "tpp2-c.7b", 0x2000, 0x2000, CRC(c3704958) SHA1(af96d10fa9bdb86b00c89d10f67cb5ca5586f446) )
+	ROM_LOAD( "tpp2-c.7c", 0x4000, 0x2000, CRC(5882ebf9) SHA1(5531229b37f9ba0ede7fdc24909e3c3efbc8ade4) )
+	ROM_LOAD( "tpp2-c.7e", 0x6000, 0x2000, CRC(ef8649ca) SHA1(a0157f91600e56e2a953dadbd76da4330652e5c8) )
 
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "v-5n",         0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
-	ROM_CONTINUE(             0x0000, 0x0800 )
+	ROM_LOAD( "tpp2-v.5n", 0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
+	ROM_CONTINUE(          0x0000, 0x0800 )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "v-1e",         0x0000, 0x2000, CRC(0f2cd853) SHA1(426c9b4f6579bfcebe72b976bfe4f05147d53f96) )
-	ROM_LOAD( "v-1f",         0x2000, 0x2000, CRC(888f3474) SHA1(ddee56b2b49bd50aaf9c98d8ef6e905e3f6ab859) )
-	ROM_LOAD( "v-1j",         0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
-	ROM_LOAD( "v-1k",         0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
+	ROM_LOAD( "tpp2-v.1e", 0x0000, 0x2000, CRC(0f2cd853) SHA1(426c9b4f6579bfcebe72b976bfe4f05147d53f96) )
+	ROM_LOAD( "tpp2-v.1f", 0x2000, 0x2000, CRC(888f3474) SHA1(ddee56b2b49bd50aaf9c98d8ef6e905e3f6ab859) )
+	ROM_LOAD( "tpp2-v.1j", 0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
+	ROM_LOAD( "tpp2-v.1k", 0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
 
 	ROM_REGION( 0x0340, "proms", 0 )
-	ROM_LOAD( "prom-cpu.4a",  0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
-	ROM_LOAD( "prom-cpu.3a",  0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
-	ROM_LOAD( "prom-cpu.5b",  0x0040, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "prom-cpu.5a",  0x0140, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
-	ROM_LOAD( "prom-vid.7j",  0x0240, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* timing for the protection ALU */
+	ROM_LOAD( "tpp2-c.4a", 0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
+	ROM_LOAD( "tpp2-c.3a", 0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
+	ROM_LOAD( "tpp2-c.5b", 0x0040, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD( "tpp2-c.5a", 0x0140, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+	ROM_LOAD( "tpp2-v.7j", 0x0240, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* timing for the protection ALU */
 ROM_END
 
 ROM_START( popeyeu )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "7a",           0x0000, 0x2000, CRC(0bd04389) SHA1(3b08186c9b20dd4dfb92df98941b18999f23aece) )
-	ROM_LOAD( "7b",           0x2000, 0x2000, CRC(efdf02c3) SHA1(4fa616bdb4e21f752e46890d007c911fff9ceadc) )
-	ROM_LOAD( "7c",           0x4000, 0x2000, CRC(8eee859e) SHA1(a597d5655d06d565653c64b18ed8842625e15088) )
-	ROM_LOAD( "7e",           0x6000, 0x2000, CRC(b64aa314) SHA1(b5367f518350223e191d94434dc535873efb4c74) )
+	ROM_LOAD( "7a",        0x0000, 0x2000, CRC(0bd04389) SHA1(3b08186c9b20dd4dfb92df98941b18999f23aece) )
+	ROM_LOAD( "7b",        0x2000, 0x2000, CRC(efdf02c3) SHA1(4fa616bdb4e21f752e46890d007c911fff9ceadc) )
+	ROM_LOAD( "7c",        0x4000, 0x2000, CRC(8eee859e) SHA1(a597d5655d06d565653c64b18ed8842625e15088) )
+	ROM_LOAD( "7e",        0x6000, 0x2000, CRC(b64aa314) SHA1(b5367f518350223e191d94434dc535873efb4c74) )
 
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "v-5n",         0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
-	ROM_CONTINUE(             0x0000, 0x0800 )
+	ROM_LOAD( "tpp2-v.5n", 0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
+	ROM_CONTINUE(          0x0000, 0x0800 )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "v-1e",         0x0000, 0x2000, CRC(0f2cd853) SHA1(426c9b4f6579bfcebe72b976bfe4f05147d53f96) )
-	ROM_LOAD( "v-1f",         0x2000, 0x2000, CRC(888f3474) SHA1(ddee56b2b49bd50aaf9c98d8ef6e905e3f6ab859) )
-	ROM_LOAD( "v-1j",         0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
-	ROM_LOAD( "v-1k",         0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
+	ROM_LOAD( "tpp2-v.1e", 0x0000, 0x2000, CRC(0f2cd853) SHA1(426c9b4f6579bfcebe72b976bfe4f05147d53f96) )
+	ROM_LOAD( "tpp2-v.1f", 0x2000, 0x2000, CRC(888f3474) SHA1(ddee56b2b49bd50aaf9c98d8ef6e905e3f6ab859) )
+	ROM_LOAD( "tpp2-v.1j", 0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
+	ROM_LOAD( "tpp2-v.1k", 0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
 
 	ROM_REGION( 0x0340, "proms", 0 )
-	ROM_LOAD( "prom-cpu.4a",  0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
-	ROM_LOAD( "prom-cpu.3a",  0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
-	ROM_LOAD( "prom-cpu.5b",  0x0040, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "prom-cpu.5a",  0x0140, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
-	ROM_LOAD( "prom-vid.7j",  0x0240, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* timing for the protection ALU */
+	ROM_LOAD( "tpp2-c.4a", 0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
+	ROM_LOAD( "tpp2-c.3a", 0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
+	ROM_LOAD( "tpp2-c.5b", 0x0040, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD( "tpp2-c.5a", 0x0140, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+	ROM_LOAD( "tpp2-v.7j", 0x0240, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* timing for the protection ALU */
 ROM_END
 
 ROM_START( popeyef )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "tpp2-c_f.7a",  0x0000, 0x2000, CRC(5fc5264d) SHA1(6c3d4df748c55293b6de58bd874a08f8164b878d) )
-	ROM_LOAD( "tpp2-c_f.7b",  0x2000, 0x2000, CRC(51de48e8) SHA1(7573931c6fcb53ee5ab9408906cd8eb2ba271c64) )
-	ROM_LOAD( "tpp2-c_f.7c",  0x4000, 0x2000, CRC(62df9647) SHA1(65d043b4142aa3ad2db7a1d4e1a2c22656ca7ade) )
-	ROM_LOAD( "tpp2-c_f.7e",  0x6000, 0x2000, CRC(f31e7916) SHA1(0f54ea7b1691b7789067fe880ffc56fac1d9523a) )
+	ROM_LOAD( "tpp2-c_f.7a", 0x0000, 0x2000, CRC(5fc5264d) SHA1(6c3d4df748c55293b6de58bd874a08f8164b878d) )
+	ROM_LOAD( "tpp2-c_f.7b", 0x2000, 0x2000, CRC(51de48e8) SHA1(7573931c6fcb53ee5ab9408906cd8eb2ba271c64) )
+	ROM_LOAD( "tpp2-c_f.7c", 0x4000, 0x2000, CRC(62df9647) SHA1(65d043b4142aa3ad2db7a1d4e1a2c22656ca7ade) )
+	ROM_LOAD( "tpp2-c_f.7e", 0x6000, 0x2000, CRC(f31e7916) SHA1(0f54ea7b1691b7789067fe880ffc56fac1d9523a) )
 
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "v-5n",         0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
-	ROM_CONTINUE(             0x0000, 0x0800 )
+	ROM_LOAD( "tpp2-v.5n",   0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )	/* first half is empty */
+	ROM_CONTINUE(            0x0000, 0x0800 )
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "v-1e",         0x0000, 0x2000, CRC(0f2cd853) SHA1(426c9b4f6579bfcebe72b976bfe4f05147d53f96) )
-	ROM_LOAD( "v-1f",         0x2000, 0x2000, CRC(888f3474) SHA1(ddee56b2b49bd50aaf9c98d8ef6e905e3f6ab859) )
-	ROM_LOAD( "v-1j",         0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
-	ROM_LOAD( "v-1k",         0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
+	ROM_LOAD( "tpp2-v.1e",   0x0000, 0x2000, CRC(0f2cd853) SHA1(426c9b4f6579bfcebe72b976bfe4f05147d53f96) )
+	ROM_LOAD( "tpp2-v.1f",   0x2000, 0x2000, CRC(888f3474) SHA1(ddee56b2b49bd50aaf9c98d8ef6e905e3f6ab859) )
+	ROM_LOAD( "tpp2-v.1j",   0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
+	ROM_LOAD( "tpp2-v.1k",   0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
 
 	ROM_REGION( 0x0340, "proms", 0 )
-	ROM_LOAD( "prom-cpu.4a",  0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
-	ROM_LOAD( "prom-cpu.3a",  0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
-	ROM_LOAD( "prom-cpu.5b",  0x0040, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "prom-cpu.5a",  0x0140, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
-	ROM_LOAD( "prom-vid.7j",  0x0240, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* timing for the protection ALU */
+	ROM_LOAD( "tpp2-c.4a",   0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
+	ROM_LOAD( "tpp2-c.3a",   0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
+	ROM_LOAD( "tpp2-c.5b",   0x0040, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD( "tpp2-c.5a",   0x0140, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+	ROM_LOAD( "tpp2-v.7j",   0x0240, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* timing for the protection ALU */
 ROM_END
 
 ROM_START( popeyebl )
@@ -675,6 +675,10 @@ static DRIVER_INIT( skyskipr )
 		memcpy(rom,buffer,len);
 		free(buffer);
 	}
+
+    state_save_register_global(machine, prot0);
+    state_save_register_global(machine, prot1);
+    state_save_register_global(machine, prot_shift);
 }
 
 static DRIVER_INIT( popeye )
@@ -692,12 +696,15 @@ static DRIVER_INIT( popeye )
 		memcpy(rom,buffer,len);
 		free(buffer);
 	}
+
+    state_save_register_global(machine, prot0);
+    state_save_register_global(machine, prot1);
+    state_save_register_global(machine, prot_shift);
 }
 
 
-GAME( 1981, skyskipr, 0,      skyskipr, skyskipr, skyskipr, ROT0, "Nintendo", "Sky Skipper", 0 )
-GAME( 1982, popeye,   0,      popeye,   popeye,   popeye,   ROT0, "Nintendo", "Popeye (revision D)", 0 )
-GAME( 1982, popeyeu,  popeye, popeye,   popeye,   popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)", 0 )
-GAME( 1982, popeyef,  popeye, popeye,   popeyef,  popeye,   ROT0, "Nintendo", "Popeye (revision F)", 0 )
-GAME( 1982, popeyebl, popeye, popeyebl, popeye,   0,        ROT0, "bootleg",  "Popeye (bootleg)", 0 )
-
+GAME( 1981, skyskipr, 0,      skyskipr, skyskipr, skyskipr, ROT0, "Nintendo", "Sky Skipper", GAME_SUPPORTS_SAVE )
+GAME( 1982, popeye,   0,      popeye,   popeye,   popeye,   ROT0, "Nintendo", "Popeye (revision D)", GAME_SUPPORTS_SAVE )
+GAME( 1982, popeyeu,  popeye, popeye,   popeye,   popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)", GAME_SUPPORTS_SAVE )
+GAME( 1982, popeyef,  popeye, popeye,   popeyef,  popeye,   ROT0, "Nintendo", "Popeye (revision F)", GAME_SUPPORTS_SAVE )
+GAME( 1982, popeyebl, popeye, popeyebl, popeye,   0,        ROT0, "bootleg",  "Popeye (bootleg)", GAME_SUPPORTS_SAVE )

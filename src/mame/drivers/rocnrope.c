@@ -248,6 +248,13 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
+/*
+    Roc'n Rope
+
+    CPU/Video Board: KT-A207-1C
+    Sound Board:     KT-2207-2A
+*/
+
 ROM_START( rocnrope )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "rr1.1h",       0x6000, 0x2000, CRC(83093134) SHA1(c9509cfb9f9043cd6c226cc84dbc2e2b744488f6) )
@@ -274,6 +281,9 @@ ROM_START( rocnrope )
 	ROM_LOAD( "a17_prom.bin", 0x0000, 0x0020, CRC(22ad2c3e) SHA1(1c2198b286c75aa9e78d000432795b1ce86ad6b9) )
 	ROM_LOAD( "b16_prom.bin", 0x0020, 0x0100, CRC(750a9677) SHA1(7a5b4aed5f87180850657b8852bb3f3138d58b5b) )
 	ROM_LOAD( "rocnrope.pr3", 0x0120, 0x0100, CRC(b5c75a27) SHA1(923d6ccf015fd7458494416cc05426cc922a9238) )
+
+    ROM_REGION( 0x0001, "pal_cpuvidbd", 0 ) /* PAL located on the cpu/video board */
+    ROM_LOAD( "h100.6g",      0x0000, 0x0001, NO_DUMP ) /* 20 Pin chip.  Appears to be a PAL.  Schematics obsfucated. */
 ROM_END
 
 ROM_START( rocnropk )
@@ -302,6 +312,9 @@ ROM_START( rocnropk )
 	ROM_LOAD( "a17_prom.bin", 0x0000, 0x0020, CRC(22ad2c3e) SHA1(1c2198b286c75aa9e78d000432795b1ce86ad6b9) )
 	ROM_LOAD( "b16_prom.bin", 0x0020, 0x0100, CRC(750a9677) SHA1(7a5b4aed5f87180850657b8852bb3f3138d58b5b) )
 	ROM_LOAD( "rocnrope.pr3", 0x0120, 0x0100, CRC(b5c75a27) SHA1(923d6ccf015fd7458494416cc05426cc922a9238) )
+
+    ROM_REGION( 0x0001, "pal_cpuvidbd", 0 ) /* PAL located on the cpu/video board */
+    ROM_LOAD( "h100.6g",      0x0000, 0x0001, NO_DUMP ) /* 20 Pin chip.  Appears to be a PAL.  Schematics obsfucated. */
 ROM_END
 
 

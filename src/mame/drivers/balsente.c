@@ -39,6 +39,11 @@
         * CEM3394 emulation is not perfect
         * Shrike Avenger doesn't work properly
 
+    Other:
+        * Some of the cartridge types are unknown
+        * Do any of the remaining unknown cartridge types contain a PAL
+          that needs to be dumped?
+
 ****************************************************************************
 
     Memory map
@@ -1258,6 +1263,11 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+#define MOTHERBOARD_PALS \
+    ROM_REGION( 0x00001, "motherbrd_pals", 0) /* Motherboard PAL's */ \
+    ROM_LOAD( "u01508001100b.u20f", 0x00000, 0x00001, NO_DUMP ) /* PAL16L8 */
+
+
 ROM_START( sentetst )
 	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "sdiagef.bin",  0x2e000, 0x2000, CRC(2a39fc53) SHA1(04ea68bfad455cc928e57390eba5597c38bbab69) )
@@ -1267,6 +1277,8 @@ ROM_START( sentetst )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "sdiaggr0.bin", 0x00000, 0x2000, CRC(5e0ff62a) SHA1(3f0ebebb2f58530af7fac57a4780dfb37ef1ee1d) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1290,6 +1302,8 @@ ROM_START( cshift )
 	ROM_LOAD( "cs-gr2.bin", 0x04000, 0x2000, CRC(1784f939) SHA1(ff7f43451580e3b314c24b00a66765c0b395ddf6) )
 	ROM_LOAD( "cs-gr3.bin", 0x06000, 0x2000, CRC(b43916a2) SHA1(8d42fb6ae7cf8b2d94eb0c14e00bb115f8ef01b4) )
 	ROM_LOAD( "cs-gr4.bin", 0x08000, 0x2000, CRC(a94cd35b) SHA1(0ca0497a1b055ff1ae6b7bc36ae45749dff50caa) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1314,8 +1328,14 @@ ROM_START( gghost )
 	ROM_LOAD( "ggh-gr3.bin", 0x06000, 0x2000, CRC(dd7e25d0) SHA1(cc6402835d1b46d160869ba1d1cad54f24d3fe86) )
 	ROM_LOAD( "ggh-gr4.bin", 0x08000, 0x2000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
 	ROM_LOAD( "ggh-gr5.bin", 0x0a000, 0x2000, CRC(d3da0093) SHA1(7474901b089ea62abad0a2f657fd8c4a1be09bf0) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
+
+/*
+    The Hat Trick cartridge does not have any PAL's.
+*/
 
 ROM_START( hattrick )
 	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -1331,6 +1351,8 @@ ROM_START( hattrick )
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "rom-gr0.u9b", 0x00000, 0x2000, CRC(9f41baba) SHA1(fa817a8e4d2f7b86a2294132e3991f7b6d8cb11a) )
 	ROM_LOAD( "rom-gr1.u8b", 0x02000, 0x2000, CRC(951f08c9) SHA1(059a575dd35cd8e822e12ac2606b47b6272bbb41) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1355,6 +1377,8 @@ ROM_START( otwalls )
 	ROM_LOAD( "otw-gr3.bin", 0x06000, 0x2000, CRC(6b17e4a9) SHA1(f9c57da863d613a456ee056569a87a9552ad3874) )
 	ROM_LOAD( "otw-gr4.bin", 0x08000, 0x2000, CRC(15985c8c) SHA1(94f21c348bfbe4db6d0cfa5b5e35d2df4b8f936d) )
 	ROM_LOAD( "otw-gr5.bin", 0x0a000, 0x2000, CRC(448f7e3c) SHA1(505724e90f17b05ccf0137dbed0d33e39db1d5ab) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1379,6 +1403,8 @@ ROM_START( snakepit )
 	ROM_LOAD( "spit-gr3.bin", 0x06000, 0x2000, CRC(c6703ec2) SHA1(0f5d7c17ee508f8fea316b7f92cdd7cc174b155f) )
 	ROM_LOAD( "spit-gr4.bin", 0x08000, 0x2000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
 	ROM_LOAD( "spit-gr5.bin", 0x0a000, 0x2000, CRC(dc27c970) SHA1(291ef10a8c330ef8e47622246b6301d2e5171df7) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1403,6 +1429,8 @@ ROM_START( snakjack )
 	ROM_LOAD( "rom-gr3.u6b", 0x06000, 0x2000, CRC(b6602be8) SHA1(c5bc95e0116fb2cf86a694561dc2c21612ba4434) )
 	ROM_LOAD( "rom-gr4.u5b", 0x08000, 0x2000, CRC(3fbfa686) SHA1(6c137d177c7aa2701497ac3ac922fdb8cd9f52b3) )
 	ROM_LOAD( "rom-gr5.u4b", 0x0a000, 0x2000, CRC(345f94fb) SHA1(0af24f4e1a797efe5272f64b8a34483fe6002436) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1423,6 +1451,11 @@ ROM_START( stocker )
 	ROM_LOAD( "stkr-gr1.bin", 0x02000, 0x2000, CRC(4a5cc00b) SHA1(9ce46ed94e715a5997998aee6377baf2869ab3a6) )
 	ROM_LOAD( "stkr-gr2.bin", 0x04000, 0x2000, CRC(70002382) SHA1(c151ad3df2714a2f9f8b047894e7585ca16bd29e) )
 	ROM_LOAD( "stkr-gr3.bin", 0x06000, 0x2000, CRC(68c862d8) SHA1(302ce10e23d17af9aa7fa13d18c602656a262eaa) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1447,6 +1480,8 @@ ROM_START( triviag1 )
 	ROM_LOAD( "tpg1-gr3.bin", 0x06000, 0x2000, CRC(323a8640) SHA1(7ec6f8f9bcfa5de442dce4f6e81e697da34dbab8) )
 	ROM_LOAD( "tpg1-gr4.bin", 0x08000, 0x2000, CRC(673acf42) SHA1(7b36a86441732ba14576f9c1dd14fe0da575d4bf) )
 	ROM_LOAD( "tpg1-gr5.bin", 0x0a000, 0x2000, CRC(067bfd66) SHA1(32f5973f2f0aed67c8f9b5886f52b9dc516a611e) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 ROM_START( trivia12 )
@@ -1470,6 +1505,8 @@ ROM_START( trivia12 )
 	ROM_LOAD( "gr3.u6b", 0x06000, 0x2000, CRC(323a8640) SHA1(7ec6f8f9bcfa5de442dce4f6e81e697da34dbab8) )
 	ROM_LOAD( "gr4.u5b", 0x08000, 0x2000, CRC(673acf42) SHA1(7b36a86441732ba14576f9c1dd14fe0da575d4bf) )
 	ROM_LOAD( "gr5.u4b", 0x0a000, 0x2000, CRC(d17d5431) SHA1(b92741f6eda01f2e360e73a9f4df728fc44d7e1b) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1489,6 +1526,8 @@ ROM_START( triviag2 )
 	ROM_LOAD( "gr01.bin",  0x00000, 0x4000, CRC(6829de8e) SHA1(4ec494883ba358f2ac7ce8d5a623a2f34b5bc843) )
 	ROM_LOAD( "gr23.bin",  0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "gr45.bin",  0x08000, 0x4000, CRC(1e870293) SHA1(32149c9c8047854f2b2ad8844c4bd00a8ded588e) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1508,6 +1547,8 @@ ROM_START( triviasp )
 	ROM_LOAD( "gr01.bin",    0x00000, 0x4000, CRC(6829de8e) SHA1(4ec494883ba358f2ac7ce8d5a623a2f34b5bc843) )
 	ROM_LOAD( "gr23.bin",    0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "allsport.3b", 0x08000, 0x4000, CRC(7415a7fc) SHA1(93d832434f359ce7b02aef276c89456b16438979) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1527,6 +1568,8 @@ ROM_START( triviayp )
 	ROM_LOAD( "gr01.bin", 0x00000, 0x4000, CRC(6829de8e) SHA1(4ec494883ba358f2ac7ce8d5a623a2f34b5bc843) )
 	ROM_LOAD( "gr23.bin", 0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "gr45.bin", 0x08000, 0x4000, CRC(1242033e) SHA1(1a3fe186bb261e2c7d9fbbb2a3103b39bf029b35) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1546,6 +1589,11 @@ ROM_START( triviabb )
 	ROM_LOAD( "gr01.bin", 0x00000, 0x4000, CRC(6829de8e) SHA1(4ec494883ba358f2ac7ce8d5a623a2f34b5bc843) )
 	ROM_LOAD( "gr23.bin", 0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "gr45.bin", 0x08000, 0x4000, CRC(92fb6fb1) SHA1(1a322bd3cfacdf82d4fcc4b4d47f78a701411919) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+
+    MOTHERBOARD_PALS
 ROM_END
 
 ROM_START( triviaes )
@@ -1566,6 +1614,8 @@ ROM_START( triviaes )
 	ROM_LOAD( "tp_gr3.bin", 0x00000, 0x4000, CRC(6829de8e) SHA1(4ec494883ba358f2ac7ce8d5a623a2f34b5bc843) )
 	ROM_LOAD( "tp_gr2.bin", 0x04000, 0x4000, CRC(89398700) SHA1(771ee04baa9a31d435a6234490105878713e7845) )
 	ROM_LOAD( "tp_gr1.bin", 0x08000, 0x4000, CRC(1242033e) SHA1(1a3fe186bb261e2c7d9fbbb2a3103b39bf029b35) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1582,6 +1632,11 @@ ROM_START( gimeabrk )
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "gr01.u6b", 0x00000, 0x4000, CRC(e3cdc476) SHA1(2f17c3f84767850d45192dfb507dd2716ecadc20) )
 	ROM_LOAD( "gr23.u5b", 0x04000, 0x4000, CRC(0555d9c0) SHA1(da0d1f207ad056b2d82a5ad6382372066883d161) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1600,6 +1655,11 @@ ROM_START( minigolf )
 	ROM_LOAD( "gr01.u6b", 0x00000, 0x4000, CRC(8e24d594) SHA1(d35329fb78f90ec478418917aa1ef06d0967e6f8) )
 	ROM_LOAD( "gr23.u5b", 0x04000, 0x4000, CRC(3bf355ef) SHA1(691df25b35b00e21ad09d17a21fe98a353aa3dda) )
 	ROM_LOAD( "gr45.u4b", 0x08000, 0x4000, CRC(8eb14921) SHA1(fda8b8f8e801360310f7cb1aa4c6aea1fa0a4b25) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1619,6 +1679,11 @@ ROM_START( minigol2 )
 	ROM_LOAD( "gr01.u6b", 0x00000, 0x4000, CRC(8e24d594) SHA1(d35329fb78f90ec478418917aa1ef06d0967e6f8) )
 	ROM_LOAD( "gr23.u5b", 0x04000, 0x4000, CRC(3bf355ef) SHA1(691df25b35b00e21ad09d17a21fe98a353aa3dda) )
 	ROM_LOAD( "gr45.u4b", 0x08000, 0x4000, CRC(8eb14921) SHA1(fda8b8f8e801360310f7cb1aa4c6aea1fa0a4b25) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal10l8.u1c", 0x0000, 0x0001, NO_DUMP ) /* PAL10L8CN */
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1639,6 +1704,8 @@ ROM_START( toggle )
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "tgle-gr0.bin", 0x00000, 0x2000, CRC(0e0e5d0e) SHA1(363858ce08767f8a9b8eaec56405377cdd74b178) )
 	ROM_LOAD( "tgle-gr1.bin", 0x02000, 0x2000, CRC(3b141ad2) SHA1(72430fd616adbc72d86a5f10672572a31bed0b5d) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1666,8 +1733,17 @@ ROM_START( nametune )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "nttgr0.bin",  0x00000, 0x8000, CRC(6b75bb4b) SHA1(e7131d112fb0b36985c5b6383700f55728a1c4fd) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
+
+/*
+    Night Stocker
+
+    This game utilizes the standard motherboard and sound board, but in addition it
+    also uses a Gun Interface Board (Board: 006-8032-01-0B) and video interface? board.
+*/
 
 ROM_START( nstocker )
 	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -1688,6 +1764,17 @@ ROM_START( nstocker )
 	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(35d4433e) SHA1(399d04c2a29d993f77d0d5c2d62915081d4a85dd) )
 	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(734b858a) SHA1(71763789807021938b840a88af34aad7f4751298) )
 	ROM_LOAD( "gr67.u1c", 0x0c000, 0x4000, CRC(3311f9c0) SHA1(63b185c761b258113c31cc269ce0b1462bf37f40) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+
+    ROM_REGION( 0x00004, "gun_io_bd_pals", 0) /* Gun I/O Board PALs */
+    ROM_LOAD( "pal16r8acn.u6", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+    ROM_LOAD( "pal16r8acn.u7", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+    ROM_LOAD( "pal16r8acn.u8", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+    ROM_LOAD( "pal16r8acn.u9", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+
+    MOTHERBOARD_PALS
 ROM_END
 
 ROM_START( nstockr2 )
@@ -1709,6 +1796,17 @@ ROM_START( nstockr2 )
 	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(35d4433e) SHA1(399d04c2a29d993f77d0d5c2d62915081d4a85dd) )
 	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(734b858a) SHA1(71763789807021938b840a88af34aad7f4751298) )
 	ROM_LOAD( "gr67.u1c", 0x0c000, 0x4000, CRC(3311f9c0) SHA1(63b185c761b258113c31cc269ce0b1462bf37f40) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8 */
+
+    ROM_REGION( 0x00004, "gun_io_bd_pals", 0) /* Gun I/O Board PALs */
+    ROM_LOAD( "pal16r8acn.u6", 0x0000, 0x0001, NO_DUMP )
+    ROM_LOAD( "pal16r8acn.u7", 0x0000, 0x0001, NO_DUMP )
+    ROM_LOAD( "pal16r8acn.u8", 0x0000, 0x0001, NO_DUMP )
+    ROM_LOAD( "pal16r8acn.u9", 0x0000, 0x0001, NO_DUMP )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1727,6 +1825,11 @@ ROM_START( sfootbal )
 	ROM_LOAD( "sfbgr23.bin", 0x04000, 0x4000, CRC(5c5af726) SHA1(04cdd476e6689d17273659fb1fe0ca642edbe5a8) )
 	ROM_LOAD( "sfbgr45.bin", 0x08000, 0x4000, CRC(e767251e) SHA1(3c05295317a673fb1de5924f27de276d2846d805) )
 	ROM_LOAD( "sfbgr67.bin", 0x0c000, 0x4000, CRC(42452a7a) SHA1(37479d6e9071ac775215a6815dbaf280b3c6a57f) )
+
+    ROM_REGION( 0x00001, "cart_pals", 0) /* PAL's located on the cartridge */
+    ROM_LOAD( "pal16r8.u7c", 0x0000, 0x0001, NO_DUMP ) /* PAL16R8ANC */
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1743,6 +1846,8 @@ ROM_START( spiker )
 	ROM_LOAD( "gr01.u4c", 0x00000, 0x4000, CRC(0caa6e3e) SHA1(ce6765d44e444d24129ec99f04a41a866a32eee2) )
 	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(970c81f6) SHA1(f22189e172a795d115597feb48ccbc04be3859b9) )
 	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(90ddd737) SHA1(8e1dde2f42e9bf755dedeef218745d1fc54faac7) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1763,6 +1868,8 @@ ROM_START( stompin )
 	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(761abb80) SHA1(a1278e93a4fa66cc4d347954dd45121120da568d) )
 	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(0d2cf2e6) SHA1(beccb1342127e79a845c4b6b20f20052097ebb98) )
 	ROM_LOAD( "gr67.u2c", 0x0c000, 0x4000, CRC(2bab2784) SHA1(a4020fd8f5ca2fdb37efd37cbccf86cae0468eb0) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1779,6 +1886,8 @@ ROM_START( rescraid )
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "gr0.a5",    0x00000, 0x8000, CRC(e0dfc133) SHA1(0b120b4410098d8db26b5819043d4fe7c426b948) )
 	ROM_LOAD( "gr4.a7",    0x08000, 0x8000, CRC(952ade30) SHA1(f065368f645616d6d84be469ba45a9afa8788eda) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -1810,6 +1919,8 @@ ROM_START( grudge )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )		/* up to 64k of sprites */
 	ROM_LOAD( "grudge.gr0", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) )
+
+    MOTHERBOARD_PALS
 ROM_END
 
 
@@ -2009,14 +2120,26 @@ static DRIVER_INIT( shrike )
  *
  *************************************/
 
+/* Board: Unknown */
 GAME( 1984, sentetst, 0,        balsente, sentetst, sentetst, ROT0, "Bally/Sente",  "Sente Diagnostic Cartridge", GAME_SUPPORTS_SAVE )
 GAME( 1984, cshift,   0,        balsente, cshift,   cshift,   ROT0, "Bally/Sente",  "Chicken Shift", GAME_SUPPORTS_SAVE )
 GAME( 1984, gghost,   0,        balsente, gghost,   gghost,   ROT0, "Bally/Sente",  "Goalie Ghost", GAME_SUPPORTS_SAVE )
+
+/* Board: 006-8003-01-0D Rev D */
 GAME( 1984, hattrick, 0,        balsente, hattrick, hattrick, ROT0, "Bally/Sente",  "Hat Trick", GAME_SUPPORTS_SAVE )
+
+/* Board: Unknown */
 GAME( 1984, otwalls,  0,        balsente, otwalls,  otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", GAME_SUPPORTS_SAVE )
 GAME( 1984, snakepit, 0,        balsente, sentetst, snakepit, ROT0, "Bally/Sente",  "Snake Pit", GAME_SUPPORTS_SAVE )
 GAME( 1984, snakjack, 0,        balsente, snakjack, snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", GAME_SUPPORTS_SAVE )
+
+/* Board: 006-8025-01-0B Rev B */
 GAME( 1984, stocker,  0,        balsente, stocker,  stocker,  ROT0, "Bally/Sente",  "Stocker", GAME_SUPPORTS_SAVE )
+GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break", GAME_SUPPORTS_SAVE )
+GAME( 1985, minigolf, 0,        balsente, minigolf, minigolf, ROT0, "Bally/Sente",  "Mini Golf (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1985, minigol2, minigolf, balsente, minigol2, minigol2, ROT0, "Bally/Sente",  "Mini Golf (set 2)", GAME_SUPPORTS_SAVE )
+
+/* Board: Unknown (Baby Boomer Edition uses 006-8025-01-0B Rev B board.  Do the rest use it too? */
 GAME( 1984, triviag1, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus I) (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1984, trivia12, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus I) (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1984, triviag2, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Genus II)", GAME_SUPPORTS_SAVE )
@@ -2024,14 +2147,15 @@ GAME( 1984, triviasp, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente
 GAME( 1984, triviayp, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", GAME_SUPPORTS_SAVE )
 GAME( 1984, triviabb, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition)", GAME_SUPPORTS_SAVE )
 GAME( 1987, triviaes, 0,        balsente, triviaes, triviaes, ROT0, "Bally/Sente",  "Trivial Pursuit (Spanish Edition)", GAME_SUPPORTS_SAVE )
-GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break", GAME_SUPPORTS_SAVE )
-GAME( 1985, minigolf, 0,        balsente, minigolf, minigolf, ROT0, "Bally/Sente",  "Mini Golf (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1985, minigol2, minigolf, balsente, minigol2, minigol2, ROT0, "Bally/Sente",  "Mini Golf (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1985, toggle,   0,        balsente, toggle,   toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1986, nametune, 0,        balsente, nametune, nametune, ROT0, "Bally/Sente",  "Name That Tune", GAME_SUPPORTS_SAVE )
+
+/* Board: 006-8027-01-0B Rev B */
 GAME( 1986, nstocker, 0,        balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1986, nstockr2, nstocker, balsente, nstocker, nstocker, ROT0, "Bally/Sente",  "Night Stocker (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, sfootbal, 0,        balsente, sfootbal, sfootbal, ROT0, "Bally/Sente",  "Street Football", GAME_SUPPORTS_SAVE )
+
+/* Board: Unknown */
 GAME( 1986, spiker,   0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker", GAME_SUPPORTS_SAVE )
 GAME( 1986, stompin,  0,        balsente, stompin,  stompin,  ROT0, "Bally/Sente",  "Stompin'", GAME_SUPPORTS_SAVE )
 GAME( 1987, rescraid, 0,        balsente, rescraid, rescraid, ROT0, "Bally/Midway", "Rescue Raider", GAME_SUPPORTS_SAVE )

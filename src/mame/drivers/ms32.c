@@ -1280,6 +1280,9 @@ ROM_START( bbbxing )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "bbbx22.bin",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "bbbx23.bin",  0x200000, 0x200000, CRC(b7875a23) SHA1(62bb4c1318f98ea68894658d92ce08e84d386d0c) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( 47pie2 )
@@ -1315,6 +1318,9 @@ ROM_START( 47pie2 )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "94019-10.22", 0x000000, 0x200000, CRC(745d41ec) SHA1(9118d0f27b65c9d37970326ccf86fdccb81d32f5) )
 	ROM_LOAD( "94019-11.23", 0x200000, 0x200000, CRC(021dc350) SHA1(c71936091f86440201fdbdc94b0d1d22c4018188) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( 47pie2o )
@@ -1350,6 +1356,9 @@ ROM_START( 47pie2o )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "94019-10.22", 0x000000, 0x200000, CRC(745d41ec) SHA1(9118d0f27b65c9d37970326ccf86fdccb81d32f5) )
 	ROM_LOAD( "94019-11.23", 0x200000, 0x200000, CRC(021dc350) SHA1(c71936091f86440201fdbdc94b0d1d22c4018188) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( desertwr )
@@ -1387,6 +1396,9 @@ ROM_START( desertwr )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "92042-01.33", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "94038-13.34", 0x200000, 0x200000, CRC(b0cac8f2) SHA1(f7d2e32d9c2f301341f7c02678c2c1e09ce655ba) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( f1superb )
@@ -1439,6 +1451,9 @@ ROM_START( f1superb )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "f1sb24.bin", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "f1sb23.bin", 0x200000, 0x200000, CRC(bfefa3ab) SHA1(7770cc9b091e258ede7f2780df61a592cc008dd7) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( gratia )
@@ -1473,6 +1488,9 @@ ROM_START( gratia )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "92042.01", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common rom?
 	ROM_LOAD( "94019.10", 0x200000, 0x200000, CRC(a751e316) SHA1(3d658370c71b83582fd132b3da441089df9bfd05) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( gratiaa )
@@ -1507,6 +1525,9 @@ ROM_START( gratiaa )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "92042.01", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common rom?
 	ROM_LOAD( "94019.10", 0x200000, 0x200000, CRC(a751e316) SHA1(3d658370c71b83582fd132b3da441089df9bfd05) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( gametngk )
@@ -1544,6 +1565,9 @@ ROM_START( gametngk )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "mr94041.13", 0x000000, 0x200000, CRC(fba84caf) SHA1(318270dbf825a8e0f315992c49a2dc34dd1df7c1) )
 	ROM_LOAD( "mr94041.14", 0x200000, 0x200000, CRC(2d6308bd) SHA1(600b6ccdbb976301075e0b287124a9fd5fe7fc1b) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( hayaosi2 )
@@ -1577,6 +1601,9 @@ ROM_START( hayaosi2 )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr93038.01",  0x200000, 0x200000, CRC(b8a38bfc) SHA1(1aa7b69beebceb6f09a1ee006de054cb84002e94) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 /*
@@ -1679,6 +1706,9 @@ ROM_START( hayaosi3 )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr92042.01",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr94027.10",  0x200000, 0x200000, CRC(e7cabe41) SHA1(5d903baed690a98856f7581319cf4dbfe1db47bb) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( kirarast )
@@ -1715,6 +1745,9 @@ ROM_START( kirarast )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr95025.12",  0x000000, 0x200000, CRC(1dd4f766) SHA1(455befd3a216f2197cd2e7e4899d4f1af7d20bf7) )
 	ROM_LOAD( "mr95025.13",  0x200000, 0x200000, CRC(0adfe5b8) SHA1(02309e5789b58896e5f68603502c76d4a917bd91) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( akiss )
@@ -1750,6 +1783,9 @@ ROM_START( akiss )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "95008-11.22",  0x000000, 0x200000, CRC(23b9af76) SHA1(98b4087c142500dc759bda94d71c77634452a7ad))
 	ROM_LOAD( "95008-12.23",  0x200000, 0x200000, CRC(780a2f45) SHA1(770cbf04e34ae7d72e6eb2304bcdfaff483cd8c1))
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( p47aces )
@@ -1787,6 +1823,9 @@ ROM_START( p47aces )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "p47-22.bin",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) )
 	ROM_LOAD( "p47-23.bin",  0x200000, 0x200000, CRC(547fa4d4) SHA1(8a5ecb3300646762f63d37a27e643e1f6ce5e775) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( tetrisp )
@@ -1816,6 +1855,9 @@ ROM_START( tetrisp )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "mr95024.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
 	ROM_LOAD( "mr95024.23", 0x200000, 0x200000, CRC(57502a17) SHA1(ce880188854dc17d9ebbfa3c373469cf5e6858c2) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 ROM_START( tp2m32 )
@@ -1844,6 +1886,9 @@ ROM_START( tp2m32 )
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "tp2m3205.22", 0x000000, 0x200000, CRC(74aa5c31) SHA1(7e3f86198fb678244fab76bee9c72bbdfc818118) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 
@@ -1880,6 +1925,9 @@ ROM_START( bnstars ) /* ver 1.1 */
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples - 8-bit signed PCM */
 	ROM_LOAD( "mr96004-10.22",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 /*
@@ -1951,6 +1999,9 @@ ROM_START( wpksocv2 )
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
 	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) )
 	ROM_LOAD( "mr95033-08.23", 0x200000, 0x200000, CRC(89a291fa) SHA1(7746a0490134fc902ce2dc7b0d33b455d792c105) )
+
+    ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
+    ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
 

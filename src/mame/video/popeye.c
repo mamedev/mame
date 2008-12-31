@@ -14,12 +14,13 @@ static UINT8 *popeye_bitmapram;
 static const size_t popeye_bitmapram_size = 0x2000;
 
 static bitmap_t *tmpbitmap2;
-static int invertmask;
-static int bitmap_type;
+static UINT8 invertmask;
+static UINT8 bitmap_type;
 enum { TYPE_SKYSKIPR, TYPE_POPEYE };
 
 static tilemap *fg_tilemap;
 
+static UINT8 lastflip;
 
 /***************************************************************************
 
@@ -250,6 +251,12 @@ VIDEO_START( skyskipr )
 
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
+
+    lastflip = 0;
+
+    state_save_register_global(machine, lastflip);
+    state_save_register_global_bitmap(machine, tmpbitmap2);
+    state_save_register_global_pointer(machine, popeye_bitmapram, popeye_bitmapram_size);
 }
 
 VIDEO_START( popeye )
@@ -261,12 +268,17 @@ VIDEO_START( popeye )
 
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
+
+    lastflip = 0;
+
+    state_save_register_global(machine, lastflip);
+    state_save_register_global_bitmap(machine, tmpbitmap2);
+    state_save_register_global_pointer(machine, popeye_bitmapram, popeye_bitmapram_size);
 }
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
-	static int lastflip = 0;
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	if (lastflip != flip_screen_get(machine))

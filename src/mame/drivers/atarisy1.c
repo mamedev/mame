@@ -16,6 +16,58 @@
 
 ****************************************************************************
 
+    Atari System 1 TTL motherboard factory modifications.  (From TTL Rev 1 dump.)
+
+    Location A2
+      74S02 with no pins pulled up
+      (On the solder side the traces for Pin 1 and 3 are severed and swapped by
+      jumper wire on the parts side.)
+
+        Pin 1 - Jumpered to C15
+        Pin 3 - Jumpered to C16
+
+
+    Location J16
+      74LS164 piggybacked on top of existing chip with all pins pulled up
+      except for VCC and GND
+
+        Pin 1  - Jumpered to VCC
+        Pin 2  - Jumpered to VCC
+        Pin 3  - No connection
+        Pin 4  - No connection
+        Pin 5  - No connection
+        Pin 6  - No connection
+        Pin 7  - Ground
+        Pin 8  - Jumpered to Pin 4 of 74LS244 at C17
+        Pin 9  - Jumpered to Pin 11 of piggybacked 74LS00 at J17
+        Pin 10 - No Connection
+        Pin 11 - No Connection
+        Pin 12 - No Connection
+        Pin 13 - Jumpered to Pin 9 of piggybacked 74LS00 at J17
+        Pin 14 - VCC
+
+
+    Location J17
+      74LS00 piggybacked on top of existing chip with all pins pulled up except
+      for VCC and GND
+
+        Pin 1  - Jumpered to Pin 2 of YM2151 at H16
+        Pin 2  - Jumpered to Pin 6 of 74LS273 at E10
+        Pin 3  - Jumpered to Pin 12 of piggybacked 74LS00
+        Pin 4  - No connection
+        Pin 5  - No connection
+        Pin 6  - No connection
+        Pin 7  - Ground
+        Pin 8  - Jumpered to Pin 2 of 6502 at L19 (Pin 2 of 6502 pulled up)
+        Pin 9  - Jumpered to Pin 13 of piggybacked 74LS164 at J16
+        Pin 10 - Jumpered to Pin 4 of 74LS367 at D17
+        Pin 11 - Jumpered to Pin 13 of piggybacked 74LS164 at J16
+        Pin 12 - Jumpered to Pin 3 of piggybacked 74LS00
+        Pin 13 - Jumpered to VCC
+        Pin 14 - VCC
+
+****************************************************************************
+
     Memory map
 
 ****************************************************************************
@@ -754,24 +806,46 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+/*
+    Atari System 1 Motherboard BIOS
+
+    Initially Atari released the Atari System 1 motherboard in the TTL version and
+    then later consolidated some of the chips into the LSI version.
+
+    Motherboard Manuals:
+        * The TTL Motherboard is referenced in the TM-277 and SP-277 manuals.
+        * The LSI Motherboard is referenced in the TM-286 and SP-286 manuals.
+*/
+
 #define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
 	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1) | ROM_SKIP(1)) /* Note '+1' */
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
-#define MOTHERBOARD_BIOS											                                                \
-	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (TM277 and SP277 manuals)" )                                        \
- 	ROM_LOAD16_BYTE_BIOS(0, "136032.205", 0x00000, 0x04000, CRC(88d0be26) SHA1(d124045eccc562ff0423b23a240e27ad740fa0c9) ) \
-	ROM_LOAD16_BYTE_BIOS(0, "136032.206", 0x00001, 0x04000, CRC(3c79ef05) SHA1(20fdca7131478e1ee12691bdafd2d5bb74cbd16f) ) \
-	ROM_SYSTEM_BIOS( 1, "lsi", "LSI Motherboard (TM286 and SP286 manuals)" )                                        \
- 	ROM_LOAD16_BYTE_BIOS(1, "136032.114", 0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) ) /* Located at J11 */ \
-	ROM_LOAD16_BYTE_BIOS(1, "136032.115", 0x00001, 0x04000, CRC(7275b4dc) SHA1(0896ab37ea832a1335046353612c1b4c86d8d040) ) /* Located at J10 */
+#define MOTHERBOARD_BIOS											                                                           \
+	ROM_SYSTEM_BIOS( 0, "ttl", "TTL Motherboard (Rev 2)" )                                                                     \
+ 	ROM_LOAD16_BYTE_BIOS(0, "136032.205.l13", 0x00000, 0x04000, CRC(88d0be26) SHA1(d124045eccc562ff0423b23a240e27ad740fa0c9) ) \
+	ROM_LOAD16_BYTE_BIOS(0, "136032.206.l12", 0x00001, 0x04000, CRC(3c79ef05) SHA1(20fdca7131478e1ee12691bdafd2d5bb74cbd16f) ) \
+	ROM_SYSTEM_BIOS( 1, "ttl1", "TTL Motherboard (Rev 1)" )                                                                    \
+ 	ROM_LOAD16_BYTE_BIOS(1, "136032.105.l13", 0x00000, 0x04000, CRC(690b37d3) SHA1(547372f1044a3442aa52fcd2b3546540aba59344) ) \
+	ROM_LOAD16_BYTE_BIOS(1, "136032.106.l12", 0x00001, 0x04000, CRC(76ee86c4) SHA1(cbcd424510435a04e9041967a13781fd19b0f2c4) ) \
+	ROM_SYSTEM_BIOS( 2, "lsi", "LSI Motherboard" )                                                                             \
+ 	ROM_LOAD16_BYTE_BIOS(2, "136032.114.j11", 0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) ) \
+	ROM_LOAD16_BYTE_BIOS(2, "136032.115.j10", 0x00001, 0x04000, CRC(7275b4dc) SHA1(0896ab37ea832a1335046353612c1b4c86d8d040) )
 
-#define MOTHERBOARD_ALPHA                                                                           				\
- 	ROM_LOAD_BIOS(0, "136032.107", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
- 	ROM_LOAD_BIOS(1, "136028.107", 0x00000, 0x02000, CRC(315e4bea) SHA1(a00ea23fbdbf075f8f3f184275be83387e8ac82b) ) \
+#define MOTHERBOARD_ALPHA                                                                           				   \
+ 	ROM_LOAD_BIOS(0, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
+ 	ROM_LOAD_BIOS(1, "136032.104.f5", 0x00000, 0x02000, CRC(7a29dc07) SHA1(72ba464da01bd6d3a91b8d9997d5ac14b6f47aad) ) \
+ 	ROM_LOAD_BIOS(2, "136032.107.b2", 0x00000, 0x02000, CRC(315e4bea) SHA1(a00ea23fbdbf075f8f3f184275be83387e8ac82b) )
 
+#define MOTHERBOARD_PROMS                                                                                              \
+ 	ROM_LOAD_BIOS(0, "136032.101.e3", 0x00000, 0x00100, CRC(7e84972a) SHA1(84d422b53547271e3a07342704a05ef481db3f99) ) \
+ 	ROM_LOAD_BIOS(0, "136032.102.e5", 0x00000, 0x00100, CRC(ebf1e0ae) SHA1(2d327e78832edd67ca3909c25b8c8c839637a1ed) ) \
+ 	ROM_LOAD_BIOS(0, "136032.103.f7", 0x00000, 0x00001, NO_DUMP ) /* N82S153 */                                        \
+ 	ROM_LOAD_BIOS(1, "136032.101.e3", 0x00000, 0x00100, CRC(7e84972a) SHA1(84d422b53547271e3a07342704a05ef481db3f99) ) \
+ 	ROM_LOAD_BIOS(1, "136032.102.e5", 0x00000, 0x00100, CRC(ebf1e0ae) SHA1(2d327e78832edd67ca3909c25b8c8c839637a1ed) ) \
+ 	ROM_LOAD_BIOS(1, "136032.103.f7", 0x00000, 0x00001, NO_DUMP ) /* N82S153 */
 
 ROM_START( atarisy1 )
 	ROM_REGION( 0x88000, "main", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
@@ -784,9 +858,22 @@ ROM_START( atarisy1 )
 
 	ROM_REGION( 0x100000, "tiles", ROMREGION_DISPOSE | ROMREGION_INVERT | ROMREGION_ERASEFF )
 
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by the TTL version.) */
+    MOTHERBOARD_PROMS
+
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )	/* graphics mapping PROMs */
 ROM_END
 
+
+/*
+    Marble Madness
+
+    Initially Atari released the TTL version and then later consolidated some
+    of the chips into the LSI version.
+
+    There are two different versions of the schematics and they are not compatible.
+    The SP-276 manual is for the TTL version and the SP-276-A manual is for the LSI version.
+*/
 
 ROM_START( marble )
 	ROM_REGION( 0x88000, "main", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
@@ -828,6 +915,9 @@ ROM_START( marble )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136033.118",   0x000, 0x200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap */
 	ROM_LOAD( "136033.119",   0x200, 0x200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -867,6 +957,9 @@ ROM_START( marble2 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136033.118",   0x000, 0x200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap */
 	ROM_LOAD( "136033.119",   0x200, 0x200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -906,6 +999,9 @@ ROM_START( marble3 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136033.118",   0x000, 0x200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap */
 	ROM_LOAD( "136033.119",   0x200, 0x200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -949,6 +1045,9 @@ ROM_START( marble4 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136033.118",   0x000, 0x200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap */
 	ROM_LOAD( "136033.119",   0x200, 0x200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -982,8 +1081,15 @@ ROM_START( marble5 ) /* LSI Cartridge */
  	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD(        "136033.118", 0x00000, 0x00200, CRC(2101b0ed) SHA1(e4fb8dfa80ed78847c697f9de2bd8540b0c04889) )  /* remap, located at A7 */
 	ROM_LOAD(        "136033.159", 0x00200, 0x00200, CRC(19f6e767) SHA1(041f24cc03c9043c31c3294c9565dfda9bdada74) )  /* color, located at A5 */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
+
+/*
+    Peter Pack-Rat
+*/
 
 ROM_START( peterpak )
 	ROM_REGION( 0x88000, "main", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
@@ -1023,8 +1129,15 @@ ROM_START( peterpak )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136028.136",   0x000, 0x200, CRC(861cfa36) SHA1(d18ca5e28bf48df6506be6bc0283c996c6520ef4) )  /* remap */
 	ROM_LOAD( "136028.137",   0x200, 0x200, CRC(8507e5ea) SHA1(a009a98fe02625a20f4a9d9ab1c70891bf4e45ec) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
+
+/*
+    Indiana Jones and the Temple of Doom
+*/
 
 ROM_START( indytemp )
 	ROM_REGION( 0x88000, "main", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
@@ -1070,6 +1183,9 @@ ROM_START( indytemp )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1117,6 +1233,9 @@ ROM_START( indytem2 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1164,6 +1283,9 @@ ROM_START( indytem3 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1211,6 +1333,9 @@ ROM_START( indytem4 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1305,8 +1430,15 @@ ROM_START( indytemd )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
 	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
+
+/*
+    Road Runner
+*/
 
 ROM_START( roadrunn )
 	ROM_REGION( 0x88000, "main", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
@@ -1365,6 +1497,9 @@ ROM_START( roadrunn )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136040-126.7a",   0x000000, 0x000200, CRC(1713c0cd) SHA1(237ce1c53d8a17823df3341360f03b2b94cd91bb) )
 	ROM_LOAD( "136040-125.5a",   0x000200, 0x000200, CRC(a9ca8795) SHA1(77583510e7a7179493f313e0c0b25d029dd6e583) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1425,6 +1560,9 @@ ROM_START( roadrun2 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136040-126.7a",   0x000000, 0x000200, CRC(1713c0cd) SHA1(237ce1c53d8a17823df3341360f03b2b94cd91bb) )
 	ROM_LOAD( "136040-125.5a",   0x000200, 0x000200, CRC(a9ca8795) SHA1(77583510e7a7179493f313e0c0b25d029dd6e583) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1485,8 +1623,22 @@ ROM_START( roadrun1 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136040-126.7a",   0x000000, 0x000200, CRC(1713c0cd) SHA1(237ce1c53d8a17823df3341360f03b2b94cd91bb) )
 	ROM_LOAD( "136040-125.5a",   0x000200, 0x000200, CRC(a9ca8795) SHA1(77583510e7a7179493f313e0c0b25d029dd6e583) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
+
+/*
+    Road Blasters
+
+    Road Blasters was released in a cartridge version for the generic upright
+    cabinet and a dedicated three board stack for the cockpit version.
+
+    The cartridge version is referenced in the TM-298 and SP-298 manuals.
+
+    The cockpit version is referenced in the TM-299 and SP-299 manuals.
+*/
 
 ROM_START( roadblst )
 	ROM_REGION( 0x88000, "main", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
@@ -1550,6 +1702,9 @@ ROM_START( roadblst )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1615,6 +1770,9 @@ ROM_START( roadblsg )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1680,6 +1838,9 @@ ROM_START( roadbls3 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1745,6 +1906,9 @@ ROM_START( roadblg2 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1810,6 +1974,9 @@ ROM_START( roadbls2 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1875,6 +2042,9 @@ ROM_START( roadblg1 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -1940,6 +2110,9 @@ ROM_START( roadbls1 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -2005,6 +2178,9 @@ ROM_START( roadblsc )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -2070,6 +2246,9 @@ ROM_START( roadblcg )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 
@@ -2135,6 +2314,9 @@ ROM_START( roadblc1 )
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136048-1174.12d", 0x000000, 0x000200, CRC(db4a4d53) SHA1(c5468f3585ec9bc23c9ee990b3ae3738b0309823) )
 	ROM_LOAD( "136048-1173.2d",  0x000200, 0x000200, CRC(c80574af) SHA1(9a3dc83f70e79915ce0db3e6e69b5dcfee3acb6f) )
+
+    ROM_REGION( 0x201, "motherbrd_proms", ROMREGION_DISPOSE) /* Motherboard PROM's (Only used by TTL version.) */
+    MOTHERBOARD_PROMS
 ROM_END
 
 

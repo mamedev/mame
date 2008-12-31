@@ -1030,7 +1030,17 @@ ROM_START( tx1a )
 	ROM_LOAD( "xb12.ic50",  0x1700, 0x200, CRC(6b424cea) SHA1(83127326c20116b0a4be1126e163f9c6755e19dc) )
 ROM_END
 
-/* The single monitor is the parent set at the moment, as the 3-monitor  is incomplete */
+/*
+    Buggy Boy Junior/Speed Buggy (Upright)
+
+    The single monitor is the parent set at the moment, as the 3-monitor is incomplete
+
+    The game is comprised of three boards.
+        - Sound Board (labeled TC043-1, top small board)
+        - CPU Board (labeled TC041, middle board, uses 15.000 MHz xtal)
+        - Video Board (labeled TC042, bottom board, uses 18.000 MHz xtal)
+*/
+
 ROM_START( buggybjr )
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "bug1a.214", 0x20000, 0x8000, CRC(92797c25) SHA1(8f7434abbd7f557d3202abb01b1e4899c82c67a5) )
@@ -1050,6 +1060,7 @@ ROM_START( buggybjr )
 	ROM_RELOAD(                  0xc001,  0x2000 )
 	ROM_RELOAD(                  0xfc001, 0x2000 )
 
+    /* ROM's Located on the sound board */
 	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "bug35s.21", 0x00000, 0x4000, CRC(65d9af57) SHA1(17b09404942d17e7254550c43b56ae96a8c55680) )
 
@@ -1092,6 +1103,7 @@ ROM_START( buggybjr )
 	ROM_LOAD( "bug13.32",   0x0000, 0x2000, CRC(53604d7a) SHA1(bfa304cd885162ece7a5f54988d9880fc541eb3a) )
 	ROM_LOAD( "bug18s.141", 0x2000, 0x4000, CRC(67786327) SHA1(32cc1f5bc654497c968ddcd4af29720c6d659482) )
 
+    /* PROM's located on the video board */
 	ROM_REGION( 0x10000, "proms", 0 )
 	/* RGBI */
 	ROM_LOAD( "bb10.41", 0x000, 0x100, CRC(f2368398) SHA1(53f28dba11bb494d033bb279abf138975c84b20d) )
@@ -1111,6 +1123,27 @@ ROM_START( buggybjr )
 
 	/* Road */
 	ROM_LOAD( "bb7.188", 0x1500, 0x100, CRC(b57b609f) SHA1(2dea375437c62cb4c64b21d5e6ddc09397b6ab35) )
+
+    /* PAL's located on the sound board */
+    ROM_REGION( 0x00001, "pals_soundbd", 0 )
+    ROM_LOAD( "pal10l8cn.ic16", 0x00000, 0x00001, NO_DUMP )
+
+    /* PAL's located on the video board */
+    ROM_REGION( 0x00002, "pals_vidbd", 0 )
+    ROM_LOAD( "pal10h8cn.ic82", 0x00000, 0x00001, NO_DUMP )
+    ROM_LOAD( "pal14h4cn.ic83", 0x00000, 0x00001, NO_DUMP )
+
+    /* PAL's located on the cpu board */
+    ROM_REGION( 0x00009, "pals_cpubd", 0 )
+    ROM_LOAD( "pal16r4a-2cn.ic83", 0x00000, 0x00001, NO_DUMP )
+    ROM_LOAD( "pal12l6cn.ic87",    0x00000, 0x00001, NO_DUMP )
+    ROM_LOAD( "pal10l8cn.ic88",    0x00000, 0x00001, NO_DUMP )
+    ROM_LOAD( "pal14h4cn.ic149",   0x00000, 0x00001, NO_DUMP )
+    ROM_LOAD( "pal16l8cj.ic150",   0x00000, 0x00001, NO_DUMP )
+    ROM_LOAD( "pal14l4cn.ic151",   0x00000, 0x00001, NO_DUMP )
+    ROM_LOAD( "pal14l4cn.ic167",   0x00000, 0x00001, NO_DUMP )
+    ROM_LOAD( "pal14h4cn.ic229",   0x00000, 0x00001, NO_DUMP )
+    ROM_LOAD( "pal14h4cn.ic230",   0x00000, 0x00001, NO_DUMP )
 ROM_END
 
 

@@ -448,6 +448,13 @@ ROM_START( speedrcr )
 
 	ROM_REGION( 0x400000, "c352", 0 ) // Samples
 	ROM_LOAD("se1_voi.23s",   0x000000, 0x400000, CRC(b95e2ffb) SHA1(7669232d772caa9afa4c7593d018e8b6e534114a) )
+
+    ROM_REGION( 0x000005, "pals", 0) /* PAL's */
+    ROM_LOAD( "sysfl-1.bin",  0x000000, 0x000001, NO_DUMP ) /* PAL16L8BCN at 2S */
+    ROM_LOAD( "sysfl-2.bin",  0x000000, 0x000001, NO_DUMP ) /* PAL16L8BCN at 3L */
+    ROM_LOAD( "sysfl-3.bin",  0x000000, 0x000001, NO_DUMP ) /* PALCE16V8H-15PC/4 at 12S */
+    ROM_LOAD( "sysfl-4.bin",  0x000000, 0x000001, NO_DUMP ) /* PAL20L8BCNS at 20N */
+    ROM_LOAD( "sysfl-5.bin",  0x000000, 0x000001, NO_DUMP ) /* PALCE16V8H-15PC/4 at 19D */
 ROM_END
 
 ROM_START( finalapb )

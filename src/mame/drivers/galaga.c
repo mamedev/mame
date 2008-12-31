@@ -1904,6 +1904,12 @@ MACHINE_DRIVER_END
 /**********************************************************************************************
   Bosconian & clones
 **********************************************************************************************/
+/*
+
+Bosconian
+Namco/Midway, 1981
+
+*/
 
 #define BOSCO_CUSTOMS \
 	ROM_REGION_NAMCO_50XX( CPUTAG_50XX ) \
@@ -2036,6 +2042,13 @@ ROM_START( boscoo2 )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
 ROM_END
 
+/*
+    Bosconian - Midway Version
+
+    CPU/Sound Board: A084-91412-B550
+    Video Board:     A084-91413-B550
+*/
+
 ROM_START( boscomd )
 	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "3n",       0x0000, 0x1000, CRC(441b501a) SHA1(7b4921ff40b3c56950fd32aa0ec5563b02a00929) )
@@ -2075,6 +2088,9 @@ ROM_START( boscomd )
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
+
+    ROM_REGION( 0x0001, "pal_vidbd", 0 ) /* PAL located on the video board */
+    ROM_LOAD( "0066-005xx-xxqx.5a", 0x00000, 0x00001, NO_DUMP ) /* According to the manual it's a PAL. What type is unknown. */
 ROM_END
 
 ROM_START( boscomdo )
@@ -2116,6 +2132,9 @@ ROM_START( boscomdo )
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
+
+    ROM_REGION( 0x0001, "pal_vidbd", 0 ) /* PAL located on the video board */
+    ROM_LOAD( "0066-005xx-xxqx.5a", 0x00000, 0x00001, NO_DUMP ) /* According to the manual it's a PAL. What type is unknown. */
 ROM_END
 
 /**********************************************************************************************
@@ -2525,6 +2544,12 @@ ROM_END
 	ROM_REGION_NAMCO_54XX( CPUTAG_54XX ) \
 	ROM_REGION_NAMCO_51XX( "51xx" ) \
 
+/*
+    Xevious - Namco Version
+
+    Single/Dual Board?
+*/
+
 ROM_START( xevious )
 	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "xvi_1.3p",     0x0000, 0x1000, CRC(09964dda) SHA1(4882b25b0938a903f3a367455ba788a30759b5b0) )
@@ -2575,6 +2600,13 @@ ROM_START( xevious )
 	ROM_LOAD( "xvi_1bpr.5n",  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
 
+/*
+    Xevious - Atari Version
+
+    CPU/Sound Board: A039785
+    Video Board:     A039787
+*/
+
 ROM_START( xeviousa )
 	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "xea-1m-a.bin", 0x0000, 0x2000, CRC(8c2b50ec) SHA1(f770873b711d838556dde67a8aac8a7f572fcc5b) )
@@ -2616,6 +2648,9 @@ ROM_START( xeviousa )
 	ROM_LOAD( "xvi_6bpr.4f",  0x0500, 0x0200, CRC(3a7599f0) SHA1(a4bdf58c190ca16fc7b976c97f41087a61fdb8b8) ) /* bg tiles lookup table high bits */
 	ROM_LOAD( "xvi_4bpr.3l",  0x0700, 0x0200, CRC(fd8b9d91) SHA1(87ddf0b9d723aabb422d6d416aa9ec6bc246bf34) ) /* sprite lookup table low bits */
 	ROM_LOAD( "xvi_5bpr.3m",  0x0900, 0x0200, CRC(bf906d82) SHA1(776168a73d3b9f0ce05610acc8a623deae0a572b) ) /* sprite lookup table high bits */
+
+    ROM_REGION( 0x0001, "pals_vidbd", 0) /* PAL's located on the video board */
+    ROM_LOAD( "137294-001.1f", 0x0000, 0x0001, NO_DUMP ) /* N82S153N */
 
 	ROM_REGION( 0x0200, "namco", 0 )	/* sound PROMs */
 	ROM_LOAD( "xvi_2bpr.7n",  0x0000, 0x0100, CRC(550f06bc) SHA1(816a0fafa0b084ac11ae1af70a5186539376fc2a) )
@@ -2663,6 +2698,9 @@ ROM_START( xeviousb )
 	ROM_LOAD( "xvi_6bpr.4f",  0x0500, 0x0200, CRC(3a7599f0) SHA1(a4bdf58c190ca16fc7b976c97f41087a61fdb8b8) ) /* bg tiles lookup table high bits */
 	ROM_LOAD( "xvi_4bpr.3l",  0x0700, 0x0200, CRC(fd8b9d91) SHA1(87ddf0b9d723aabb422d6d416aa9ec6bc246bf34) ) /* sprite lookup table low bits */
 	ROM_LOAD( "xvi_5bpr.3m",  0x0900, 0x0200, CRC(bf906d82) SHA1(776168a73d3b9f0ce05610acc8a623deae0a572b) ) /* sprite lookup table high bits */
+
+    ROM_REGION( 0x0001, "pals_vidbd", 0) /* PAL's located on the video board */
+    ROM_LOAD( "137294-001.1f", 0x0000, 0x0001, NO_DUMP ) /* N82S153N */
 
 	ROM_REGION( 0x0200, "namco", 0 )	/* sound PROMs */
 	ROM_LOAD( "xvi_2bpr.7n",  0x0000, 0x0100, CRC(550f06bc) SHA1(816a0fafa0b084ac11ae1af70a5186539376fc2a) )
@@ -2714,10 +2752,19 @@ ROM_START( xeviousc )
 	ROM_LOAD( "xvi_4bpr.3l",  0x0700, 0x0200, CRC(fd8b9d91) SHA1(87ddf0b9d723aabb422d6d416aa9ec6bc246bf34) ) /* sprite lookup table low bits */
 	ROM_LOAD( "xvi_5bpr.3m",  0x0900, 0x0200, CRC(bf906d82) SHA1(776168a73d3b9f0ce05610acc8a623deae0a572b) ) /* sprite lookup table high bits */
 
+    ROM_REGION( 0x0001, "pals_vidbd", 0) /* PAL's located on the video board */
+    ROM_LOAD( "137294-001.1f", 0x0000, 0x0001, NO_DUMP ) /* N82S153N */
+
 	ROM_REGION( 0x0200, "namco", 0 )	/* sound PROMs */
 	ROM_LOAD( "xvi_2bpr.7n",  0x0000, 0x0100, CRC(550f06bc) SHA1(816a0fafa0b084ac11ae1af70a5186539376fc2a) )
 	ROM_LOAD( "xvi_1bpr.5n",  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
+
+/*
+    Xevious Bootleg
+
+    Single/Dual Board?
+*/
 
 ROM_START( xevios )
 	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
@@ -2964,6 +3011,25 @@ ROM_START( digdugb )
 	ROM_LOAD( "136007.109",   0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
 
+/*
+    Dig Dug - Atari Version
+
+    There are two revisions of the board and the placement of the components
+    are different between the two versions.
+
+    Revision A:
+        * The letter "A" is silkscreened in the A10 corner of the board.
+        * The 1st, 2nd and 3rd edition TM-203 and SP-203 manuals cover this board.
+
+    Revision B:
+        * The letter "B" is silkscreened in the P12 corner (on right side of
+          the edge connector).
+        * Also, the three Z80's are located on the opposite side of the edge connector and
+          they are stacked in a column.  (The Z80's are oriented vertically instead of 
+          horizontal as the other chips are.)
+        * The 4th edition TM-203 and SP-203 manuals cover this board.
+*/
+
 ROM_START( digdugat )
 	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "136007.201",   0x0000, 0x1000, CRC(23d0b1a4) SHA1(a118d55e03a9ccf069f37c7bac2c9044dccd1f5e) )
@@ -3045,6 +3111,10 @@ ROM_START( digduga1 )
 	ROM_LOAD( "136007.110",   0x0000, 0x0100, CRC(7a2815b4) SHA1(085ada18c498fdb18ecedef0ea8fe9217edb7b46) )
 	ROM_LOAD( "136007.109",   0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
+
+/*
+    Zig Zag (Dig Dug bootleg)
+*/
 
 ROM_START( dzigzag )
 	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
@@ -3279,7 +3349,7 @@ GAME( 1982, digdug,   0,       digdug,  digdug,   0,       ROT90, "Namco", "Dig 
 GAME( 1982, digdugb,  digdug,  digdug,  digdug,   0,       ROT90, "Namco", "Dig Dug (rev 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, digdugat, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, digduga1, digdug,  digdug,  digdug,   0,       ROT90, "[Namco] (Atari license)", "Dig Dug (Atari, rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, digsid,   digdug,  digdug, digdug,    0,       ROT90, "Namco [Sidam license]", "Dig Dug (manufactured by Sidam)", GAME_SUPPORTS_SAVE )
+GAME( 1982, digsid,   digdug,  digdug,  digdug,   0,       ROT90, "Namco [Sidam license]", "Dig Dug (manufactured by Sidam)", GAME_SUPPORTS_SAVE )
 
 /* Bootlegs with replacement I/O chips */
 

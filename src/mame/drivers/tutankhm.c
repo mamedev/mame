@@ -10,6 +10,10 @@
 
     Sound board: uses the same board as Pooyan.
 
+    Note:
+    * The sound board uses a 14.318 MHz xtal.
+    * The cpu/video board uses a 18.432 MHz xtal.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -127,26 +131,26 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tutankhm )
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "256 (Cheat)")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, "30000" )
 	PORT_DIPSETTING(    0x00, "40000" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x40, 0x40, "Flash Bomb" )
+	PORT_DIPNAME( 0x40, 0x40, "Flash Bomb" )           PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, "1 per Life" )
 	PORT_DIPSETTING(    0x00, "1 per Game" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -181,7 +185,7 @@ static INPUT_PORTS_START( tutankhm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -198,7 +202,7 @@ static INPUT_PORTS_START( tutankhm )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )      PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -257,6 +261,13 @@ MACHINE_DRIVER_END
  *  ROM definitions
  *
  *************************************/
+
+/*
+    Tutankham
+
+    CPU/Video Board: KT-3203-1B
+    Sound Board:     KT-5112-2B
+*/
 
 ROM_START( tutankhm )
 	ROM_REGION( 0x20000, "main", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */

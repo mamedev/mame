@@ -4655,6 +4655,12 @@ ROM_START( scobrab )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
 ROM_END
 
+/*
+    Lost Tomb
+
+    CPU/Sound Board: A969
+    Video Board:     A2048
+*/
 
 ROM_START( losttomb )
 	ROM_REGION( 0x10000, "main", 0 )
@@ -5039,7 +5045,12 @@ GAME( 1981, frogf,    frogger,  frogf,    frogger,  froggers, ROT90,  "Falcon", 
 GAME( 1981, frogg,    frogger,  galaxian, frogg,    frogg,    ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 
 
-/* Turtles based hardware */
+/* 
+    Turtles based hardware
+
+    CPU/Video Board: KT-4108-2
+    Sound Board:     KT-4108-1
+*/
 GAME( 1981, turtles,  0,        turtles,  turtles,  turtles,  ROT90,  "[Konami] (Stern license)", "Turtles", GAME_SUPPORTS_SAVE )
 GAME( 1981, turpin,   turtles,  turtles,  turpin,   turtles,  ROT90,  "[Konami] (Sega license)", "Turpin", GAME_SUPPORTS_SAVE )
 GAME( 1981, 600,      turtles,  turtles,  turtles,  turtles,  ROT90,  "Konami", "600", GAME_SUPPORTS_SAVE )
