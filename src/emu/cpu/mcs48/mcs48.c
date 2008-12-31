@@ -959,6 +959,17 @@ static CPU_INIT( mcs48_2k_rom )
 
 
 /*-------------------------------------------------
+    mcs48_4k_rom - initialization for systems 
+    with 2k of internal ROM
+-------------------------------------------------*/
+
+static CPU_INIT( mcs48_4k_rom )
+{
+	mcs48_init(device, irqcallback, MCS48_FEATURE, 0x1000);
+}
+
+
+/*-------------------------------------------------
     upi41_1k_rom_init - initialization for systems 
     with 1k of internal ROM
 -------------------------------------------------*/
@@ -1217,11 +1228,15 @@ void upi41_master_w(const device_config *device, UINT8 a0, UINT8 data)
 
 /* FIXME: the memory maps should probably support rom banking for EA */
 static ADDRESS_MAP_START(program_10bit, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00, 0x3ff) AM_ROM
+	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_11bit, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00, 0x7ff) AM_ROM
+	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(program_12bit, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_6bit, ADDRESS_SPACE_DATA, 8)
@@ -1422,6 +1437,8 @@ static void mcs48_generic_get_info(const device_config *device, UINT32 state, cp
 				info->init = (features == UPI41_FEATURE) ? CPU_INIT_NAME(upi41_1k_rom) : CPU_INIT_NAME(mcs48_1k_rom);
 			else if (romsize == 2048)
 				info->init = (features == UPI41_FEATURE) ? CPU_INIT_NAME(upi41_2k_rom) : CPU_INIT_NAME(mcs48_2k_rom);
+			else if (romsize == 4096)
+				info->init = CPU_INIT_NAME(mcs48_4k_rom);
 			else
 				fatalerror("mcs48_generic_get_info: Invalid ROM size");
 			break;
@@ -1441,6 +1458,8 @@ static void mcs48_generic_get_info(const device_config *device, UINT32 state, cp
 				info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);
 			else if (romsize == 2048)
 				info->internal_map8 = ADDRESS_MAP_NAME(program_11bit);
+			else if (romsize == 4096)
+				info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);
 			else
 				fatalerror("mcs48_generic_get_info: Invalid RAM size");
 			break;
@@ -1469,21 +1488,27 @@ static void mcs48_generic_get_info(const device_config *device, UINT32 state, cp
 }
 
 
+/* Official Intel MCS-48 parts */
 CPU_GET_INFO( i8035 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0,  64, "I8035"); }
 CPU_GET_INFO( i8048 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, "I8048"); }
 CPU_GET_INFO( i8648 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, "I8648"); }
 CPU_GET_INFO( i8748 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, "I8748"); }
-CPU_GET_INFO( mb8884 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0,  64, "MB8884"); }
-CPU_GET_INFO( n7751 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, "N7751"); }
-
 CPU_GET_INFO( i8039 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0, 128, "I8039"); }
 CPU_GET_INFO( i8049 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128, "I8049"); }
 CPU_GET_INFO( i8749 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128, "I8749"); }
-CPU_GET_INFO( m58715 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128, "M58715"); }
+CPU_GET_INFO( i8040 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0, 256, "I8040"); }
+CPU_GET_INFO( i8050 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 4096, 256, "I8050"); }
 
+
+/* Official Intel UPI-41 parts */
 CPU_GET_INFO( i8041 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 1024, 128, "I8041"); }
 CPU_GET_INFO( i8741 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 1024, 128, "I8741"); }
-
 CPU_GET_INFO( i8042 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256, "I8042"); }
 CPU_GET_INFO( i8242 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256, "I8242"); }
 CPU_GET_INFO( i8742 )  { mcs48_generic_get_info(device, state, info, UPI41_FEATURE, 2048, 256, "I8742"); }
+
+
+/* Clones */
+CPU_GET_INFO( mb8884 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE,    0,  64, "MB8884"); }
+CPU_GET_INFO( n7751 )  { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 1024,  64, "N7751"); }
+CPU_GET_INFO( m58715 ) { mcs48_generic_get_info(device, state, info, MCS48_FEATURE, 2048, 128, "M58715"); }

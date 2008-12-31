@@ -89,51 +89,57 @@ enum
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
+    MACROS
 ***************************************************************************/
-
-/* MCS-48 variants with 64 bytes of internal RAM and up to 1k of internal ROM */
-CPU_GET_INFO( i8035 );
-CPU_GET_INFO( i8048 );
-CPU_GET_INFO( i8648 );
-CPU_GET_INFO( i8748 );
-CPU_GET_INFO( mb8884 );
-CPU_GET_INFO( n7751 );
 
 #define CPU_I8035 CPU_GET_INFO_NAME( i8035 )
 #define CPU_I8048 CPU_GET_INFO_NAME( i8048 )
 #define CPU_I8648 CPU_GET_INFO_NAME( i8648 )
 #define CPU_I8748 CPU_GET_INFO_NAME( i8748 )
-#define CPU_MB8884 CPU_GET_INFO_NAME( mb8884 )
-#define CPU_N7751 CPU_GET_INFO_NAME( n7751 )
-
-/* MCS-48 variants with 128 bytes of internal RAM and up to 2k of internal ROM */
-CPU_GET_INFO( i8039 );
-CPU_GET_INFO( i8049 );
-CPU_GET_INFO( i8749 );
-CPU_GET_INFO( m58715 );
-
 #define CPU_I8039 CPU_GET_INFO_NAME( i8039 )
 #define CPU_I8049 CPU_GET_INFO_NAME( i8049 )
 #define CPU_I8749 CPU_GET_INFO_NAME( i8749 )
-#define CPU_M58715 CPU_GET_INFO_NAME( m58715 )
-
-
-/* UPI-41 variants with 128 bytes of internal RAM and up to 1k of internal ROM */
-CPU_GET_INFO( i8041 );
-CPU_GET_INFO( i8741 );
+#define CPU_I8040 CPU_GET_INFO_NAME( i8040 )
+#define CPU_I8050 CPU_GET_INFO_NAME( i8050 )
 
 #define CPU_I8041 CPU_GET_INFO_NAME( i8041 )
 #define CPU_I8741 CPU_GET_INFO_NAME( i8741 )
-
-/* UPI-41 variants with 256 bytes of internal RAM and up to 2k of internal ROM */
-CPU_GET_INFO( i8042 );
-CPU_GET_INFO( i8242 );
-CPU_GET_INFO( i8742 );
-
 #define CPU_I8042 CPU_GET_INFO_NAME( i8042 )
 #define CPU_I8242 CPU_GET_INFO_NAME( i8242 )
 #define CPU_I8742 CPU_GET_INFO_NAME( i8742 )
+
+#define CPU_MB8884 CPU_GET_INFO_NAME( mb8884 )
+#define CPU_N7751 CPU_GET_INFO_NAME( n7751 )
+#define CPU_M58715 CPU_GET_INFO_NAME( m58715 )
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+/* Official Intel MCS-48 parts */
+CPU_GET_INFO( i8035 );			/* external ROM,         64 bytes internal RAM */
+CPU_GET_INFO( i8048 );			/* 1k internal ROM,      64 bytes internal RAM */
+CPU_GET_INFO( i8648 );			/* 1k internal OTP ROM,  64 bytes internal RAM */
+CPU_GET_INFO( i8748 );			/* 1k internal EEPROM,   64 bytes internal RAM */
+CPU_GET_INFO( i8039 );			/* external ROM,        128 bytes internal RAM */
+CPU_GET_INFO( i8049 );			/* 2k internal ROM,     128 bytes internal RAM */
+CPU_GET_INFO( i8749 );			/* 2k internal EEPROM,  128 bytes internal RAM */
+CPU_GET_INFO( i8040 );			/* external ROM,        256 bytes internal RAM */
+CPU_GET_INFO( i8050 );			/* 4k internal ROM,     256 bytes internal RAM */
+
+/* Official Intel UPI-41 parts */
+CPU_GET_INFO( i8041 );			/* 1k internal ROM,     128 bytes internal RAM */
+CPU_GET_INFO( i8741 );			/* 1k internal EEPROM,  128 bytes internal RAM */
+CPU_GET_INFO( i8042 );			/* 2k internal ROM,     256 bytes internal RAM */
+CPU_GET_INFO( i8242 );			/* 2k internal ROM,     256 bytes internal RAM */
+CPU_GET_INFO( i8742 );			/* 2k internal EEPROM,  256 bytes internal RAM */
+
+/* Clones */
+CPU_GET_INFO( mb8884 );			/* 8035 clone */
+CPU_GET_INFO( n7751 );			/* 8048 clone */
+CPU_GET_INFO( m58715 );			/* 8049 clone */
 
 
 /* functions for talking to the input/output buffers on the UPI41-class chips */
