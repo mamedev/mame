@@ -956,7 +956,7 @@ static const char *const ir_names[] =	{
 static const char *internal_registers_names(UINT16 x)
 {
 	int ir = x - T90_IOBASE;
-	if ( ir >= 0 && ir <= sizeof(ir_names)/sizeof(ir_names[0]) )
+	if ( ir >= 0 && ir < sizeof(ir_names)/sizeof(ir_names[0]) )
 		return ir_names[ir];
 	return NULL;
 }
