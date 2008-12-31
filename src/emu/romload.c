@@ -291,9 +291,16 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
 static int determine_bios_rom(rom_load_data *romdata, const rom_entry *romp)
 {
 	const char *specbios = options_get_string(mame_options(), OPTION_BIOS);
+	const char *defaultname = NULL;
 	const rom_entry *rom;
+	int default_no = 1;
 	int bios_count = 0;
 	int bios_no = 0;
+	
+	/* first determine the default BIOS name */
+	for (rom = romp; !ROMENTRY_ISEND(rom); rom++)
+		if (ROMENTRY_ISDEFAULT_BIOS(rom))
+			defaultname = ROM_GETNAME(rom);
 
 	/* look for a BIOS with a matching name */
 	for (rom = romp; !ROMENTRY_ISEND(rom); rom++)
@@ -307,6 +314,8 @@ static int determine_bios_rom(rom_load_data *romdata, const rom_entry *romp)
 			sprintf(bios_number, "%d", bios_flags - 1);
 			if (strcmp(bios_number, specbios) == 0 || strcmp(biosname, specbios) == 0)
 				bios_no = bios_flags;
+			if (defaultname != NULL && strcmp(biosname, defaultname) == 0)
+				default_no = bios_flags;
 			bios_count++;
 		}
 
@@ -321,7 +330,7 @@ static int determine_bios_rom(rom_load_data *romdata, const rom_entry *romp)
 		}
 
 		/* set to default */
-		bios_no = 1;
+		bios_no = default_no;
 	}
 
 	LOG(("Using System BIOS: %d\n", bios_no));

@@ -38,6 +38,7 @@ enum
 	ROMENTRYTYPE_CARTRIDGE,		/* this entry specifies a cartridge (MESS) */
 	ROMENTRYTYPE_IGNORE,		/* this entry continues loading the previous ROM but throws the data away */
 	ROMENTRYTYPE_SYSTEM_BIOS,	/* this entry specifies a bios */
+	ROMENTRYTYPE_DEFAULT_BIOS,	/* this entry specifies a default bios */
 	ROMENTRYTYPE_COUNT
 };
 
@@ -176,6 +177,7 @@ struct _rom_load_data
 #define ROMENTRY_ISCOPY(r)			(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_COPY)
 #define ROMENTRY_ISIGNORE(r)		(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_IGNORE)
 #define ROMENTRY_ISSYSTEM_BIOS(r)	(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_SYSTEM_BIOS)
+#define ROMENTRY_ISDEFAULT_BIOS(r)	(ROMENTRY_GETTYPE(r) == ROMENTRYTYPE_DEFAULT_BIOS)
 #define ROMENTRY_ISREGIONEND(r)		(ROMENTRY_ISREGION(r) || ROMENTRY_ISEND(r))
 
 /* ----- per-region macros ----- */
@@ -265,6 +267,7 @@ struct _rom_load_data
 
 /* ----- system BIOS macros ----- */
 #define ROM_SYSTEM_BIOS(value,name,description)		{ name, description, 0, 0, ROMENTRYTYPE_SYSTEM_BIOS | ROM_BIOS(value+1) },
+#define ROM_DEFAULT_BIOS(name)						{ name, NULL, 0, 0, ROMENTRYTYPE_DEFAULT_BIOS },
 
 
 /* ----- disk loading macros ----- */
