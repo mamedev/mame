@@ -2060,6 +2060,9 @@ const game_driver * const drivers[] =
 	/* Taito "Wolf" System */
 	DRIVER( pf2012 )	/* E59 (c) 1997 Taito */
 
+	/* Taito Type-Zero System */
+	DRIVER( landhigh )	/* E68 (c) 1999 Taito */
+
 	/* Toaplan games */
 	DRIVER( perfrman )	/* (c) 1985 Data East Corporation (Japan) */
 	DRIVER( perfrmau )	/* (c) 1985 Data East USA (US) */

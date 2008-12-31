@@ -2043,6 +2043,7 @@ src/mame/drivers/taito_z.c svneol=native#text/plain
 src/mame/drivers/taitoair.c svneol=native#text/plain
 src/mame/drivers/taitojc.c svneol=native#text/plain
 src/mame/drivers/taitosj.c svneol=native#text/plain
+src/mame/drivers/taitotz.c svneol=native#text/plain
 src/mame/drivers/taitowlf.c svneol=native#text/plain
 src/mame/drivers/tank8.c svneol=native#text/plain
 src/mame/drivers/tankbatt.c svneol=native#text/plain
