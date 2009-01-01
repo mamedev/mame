@@ -312,7 +312,7 @@ ROM_START( aliens )
 	ROM_LOAD( "821a08.h14",  0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
-	ROM_LOAD( "875_b04.bin",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
+	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
 ROM_START( aliens2 )
@@ -344,7 +344,7 @@ ROM_START( aliens2 )
 	ROM_LOAD( "821a08.h14",  0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
-	ROM_LOAD( "875_b04.bin",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
+	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
 ROM_START( aliens3 )
@@ -376,7 +376,7 @@ ROM_START( aliens3 )
 	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
-	ROM_LOAD( "875_b04.bin", 0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
+	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
 ROM_START( aliensu )
@@ -408,7 +408,7 @@ ROM_START( aliensu )
 	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
-	ROM_LOAD( "875_b04.bin", 0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
+	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
 ROM_START( aliensj )
@@ -440,7 +440,7 @@ ROM_START( aliensj )
 	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
-	ROM_LOAD( "875_b04.bin", 0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
+	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
 ROM_START( aliensj2 )
@@ -472,7 +472,7 @@ ROM_START( aliensj2 )
 	ROM_LOAD( "821a08.h14", 0x0000, 0x0100, CRC(7da55800) SHA1(3826f73569c8ae0431510a355bdfa082152b74a5) )	/* priority encoder (not used) */
 
 	ROM_REGION( 0x40000, "konami", 0 ) /* samples for 007232 */
-	ROM_LOAD( "875_b04.bin", 0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
+	ROM_LOAD( "875b04.e05",  0x00000, 0x40000, CRC(4e209ac8) SHA1(09d9eaae61bfd04bf318555ccd44d7371571d86d) )
 ROM_END
 
 /***************************************************************************
