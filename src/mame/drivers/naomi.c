@@ -1228,7 +1228,7 @@ static DRIVER_INIT(fotns)
 		src[i] = atomiswave_decrypt(src[i], i*2, &fotns_key);
 	}
 
-
+#if 0
 	{
 		FILE *fp;
 		const char *gamename = machine->gamedrv->name;
@@ -1242,6 +1242,7 @@ static DRIVER_INIT(fotns)
 			fclose(fp);
 		}
 	}
+#endif
 }
 
 
@@ -1258,7 +1259,7 @@ static DRIVER_INIT(demofist)
 		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);
 	}
 
-
+#if 0
 	{
 		FILE *fp;
 		const char *gamename = machine->gamedrv->name;
@@ -1272,6 +1273,7 @@ static DRIVER_INIT(demofist)
 			fclose(fp);
 		}
 	}
+#endif
 }
 
 
