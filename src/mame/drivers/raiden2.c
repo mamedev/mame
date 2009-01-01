@@ -1827,6 +1827,36 @@ ROM_START( r2dx_v33 )
 	ROM_LOAD( "copx_d3.357",   0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
 ROM_END
 
+ROM_START( xsedae )
+	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_LOAD32_BYTE("1.u024",   0x000000, 0x40000, CRC(185437f9) SHA1(e46950b6a549d11dc57105dd7d9cb512a8ecbe70) )
+	ROM_LOAD32_BYTE("3.u023",   0x000002, 0x40000, CRC(293fd6c1) SHA1(8b1a231f4bedbf9c0f347330e13fdf092b9888b4) )
+	ROM_LOAD32_BYTE("2.u025",   0x000001, 0x40000, CRC(a2b052df) SHA1(e8bf9ab3d5d4e601ea9386e1f2d4e017b025407e) )
+	ROM_LOAD32_BYTE("4.u026",   0x000003, 0x40000, CRC(5adf20bf) SHA1(42a0bb5a460c656675b2c432c043fc61a9049276) )
+
+	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
+	/* Not populated */
+
+	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "8.u1110",  0x000000, 0x20000, CRC(2dc2f81a) SHA1(0f6605042e0e295b4256b43dbdf5d53daebe1a9a) )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
+	ROM_LOAD16_BYTE( "5.u077",	0x000000,	0x010000, CRC(478deced) SHA1(88cd72cb76bbc1c4255c3dfae4b9a10af9b050b2) )
+ 	ROM_LOAD16_BYTE( "6.u072",	0x000001,	0x010000, CRC(a788402d) SHA1(8a1ac4760cf75cd2e32c1d15f36ad15cce3d411b) )
+
+ 	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE ) /* background gfx */
+ 	ROM_LOAD( "bg-1.u075",   0x000000, 0x100000, CRC(ac087560) SHA1(b6473b20c55ec090961cfc46a024b3c5b707ec25) )
+ 	ROM_LOAD( "7.u0714",     0x100000, 0x080000, CRC(296105dc) SHA1(c2b80d681646f504b03c2dde13e37b1d820f82d2) )
+
+ 	ROM_REGION( 0x800000, "gfx3", ROMREGION_DISPOSE ) /* sprite gfx (not encrypted) */
+ 	ROM_LOAD32_WORD( "obj-1.u0811",  0x000000, 0x100000, CRC(e65f1b4e) SHA1(b04be9af41ce868e64071715252c4ff228891cf0) )
+ 	ROM_LOAD32_WORD( "obj-2.u082",   0x000002, 0x100000, CRC(e753e7ad) SHA1(643ab39ac1b7df686a16b1ed6fdcb686720ca8e8) )
+
+ 	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
+ 	ROM_LOAD( "9.u105", 0x00000, 0x40000, CRC(a7a0c5f9) SHA1(7882681ac152642aa4f859071f195842068b214b) )
+
+ 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
+ROM_END
 
 static DRIVER_INIT (raiden2)
 {
@@ -1839,7 +1869,13 @@ static DRIVER_INIT (raiden2)
 	raiden2_decrypt_sprites(machine);
 }
 
-
+static DRIVER_INIT (xsedae)
+{
+	/* wrong , there must be some banking this just stops it crashing */
+	UINT8 *RAM = memory_region(machine, "user1");
+	memory_set_bankptr(machine, 1,&RAM[0x100000]);
+	memory_set_bankptr(machine, 2,&RAM[0x040000]);
+}
 
 
 static const UINT8 r2_v33_default_eeprom_type1[32] =
@@ -2132,6 +2168,7 @@ GAME( 1993, zeroteam, 0,       raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaih
 GAME( 1993, zeroteaa, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, zeroteab, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, zerotsel, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1995, xsedae,   0,       raiden2,  raiden2,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
 GAME( 1993, nzerotea, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
