@@ -566,7 +566,7 @@ WRITE##bits##_DEVICE_HANDLER( name##_w )							\
 WRITE##bits##_DEVICE_HANDLER( name##_w )							\
 {																	\
 	if (cond)														\
-		return func(handler, device, offset, data, mem_mask);		\
+		func(handler, device, offset, data, mem_mask);				\
 }
 
 
