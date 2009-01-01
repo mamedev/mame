@@ -438,6 +438,7 @@ const game_driver * const drivers[] =
 	DRIVER( livegal )	/* (c) 1987 */
 	DRIVER( seiha )		/* (c) 1987 */
 	DRIVER( seiham )	/* (c) 1987 */
+	DRIVER( mjgaiden )	/* (c) 1987 Central Denshi */
 	DRIVER( bijokkoy )	/* (c) 1987 */
 	DRIVER( iemoto )	/* (c) 1987 */
 	DRIVER( iemotom )	/* (c) 1987 */

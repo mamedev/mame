@@ -483,6 +483,20 @@ static ADDRESS_MAP_START( writeport_seiha, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( writeport_mjgaiden, ADDRESS_SPACE_IO, 8 )
+    ADDRESS_MAP_GLOBAL_MASK(0xff)
+    AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_nmi_clock_w)
+    AM_RANGE(0x20, 0x3f) AM_WRITE(nbmj8688_clut_w)
+    AM_RANGE(0x50, 0x50) AM_WRITE(mjsikaku_romsel_w)
+    AM_RANGE(0x90, 0x97) AM_WRITE(nbmj8688_blitter_w)
+    AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
+    AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+    AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
+    AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
+    AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+    AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
+    AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_p16bit_LCD, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -3133,6 +3147,14 @@ static MACHINE_DRIVER_START( seiha )
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( mjgaiden )
+    /* basic machine hardware */
+    MDRV_IMPORT_FROM(NBMJDRV_4096)
+
+    MDRV_CPU_MODIFY("main")
+    MDRV_CPU_PROGRAM_MAP(readmem_ojousan, writemem_ojousan)
+    MDRV_CPU_IO_MAP(readport_secolove, writeport_mjgaiden)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( iemoto )
 
@@ -3154,7 +3176,6 @@ static MACHINE_DRIVER_START( ojousan )
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_iemoto)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( mbmj_p12bit )
 
@@ -3449,6 +3470,69 @@ ROM_START( seiham )
 	ROM_LOAD( "seiha07.9a",   0x190000, 0x10000, CRC(a7d438ec) SHA1(5d145bab0ffc76fd77582ea5495ca4496210d41a) )	// seiha/seiha07.9a
 	ROM_LOAD( "seih_08m.bin", 0x1a0000, 0x10000, CRC(e8e61e48) SHA1(e1d0e64b39bad3e294b061fb6f02ece2f2ee4bca) )
 	ROM_LOAD( "se1507.6a",    0x200000, 0x80000, CRC(f1e9555e) SHA1(a34ffcff2b2d6ba40a8a453b89970d636515a8ad) )	// seiha/se1507.6a
+ROM_END
+
+/*
+Mahjong Gaiden
+(c)1987 Central Denshi
+
+CPU: Z80B
+Sound: AY-3-8910
+OSC: 5.000MHz
+Custom: 1413M3
+
+ROMs:
+1.4G
+2.3G
+3.3I
+4.2I
+5.1I
+W19.1A
+W20.2A
+W21.3A
+W22.4A
+W23.5A
+
+Subboard
+6.2A
+7.3A
+8.4A
+9.2B
+10.3B
+
+
+dumped by sayu
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+
+/*
+Is this a hack of Seiha or an officially licensed game? There are Seiha references in various places plus
+it shares some gfx roms...
+*/
+ROM_START( mjgaiden )
+    ROM_REGION( 0x30000, "main", 0 ) /* program */
+    ROM_LOAD( "1.4g",      0x00000, 0x08000, CRC(6f54ab3d) SHA1(08fe565616de2e06141407c56b6de23014cfc56c) )
+    ROM_LOAD( "2.3g",      0x08000, 0x08000, CRC(b4fed864) SHA1(a48300e586cb160fff903fb4203ee66418a81b3d) )
+
+    ROM_REGION( 0x40000, "voice", 0 ) /* voice */
+    ROM_LOAD( "3.3i",   0x00000, 0x10000, CRC(2bcf3d87) SHA1(e768d112d7c314d1252c41793352bdca7a86f92e) )
+    ROM_LOAD( "4.2i",   0x10000, 0x10000, CRC(2fc905d0) SHA1(add824681979c2eba42b199280a99f7ea063b18e) )
+
+	/*TODO: check if the w labeled roms are correctly mapped.*/
+    ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
+    ROM_LOAD( "se1507.6a",0x000000, 0x80000, CRC(f1e9555e) SHA1(a34ffcff2b2d6ba40a8a453b89970d636515a8ad) ) // seiha/se1507.6a
+    ROM_LOAD( "w19.1a",   0x080000, 0x40000, CRC(788cd3ca) SHA1(955a520e122aaee30e080d0a784556b69ba3de36) )
+    ROM_LOAD( "w20.2a",   0x0c0000, 0x40000, CRC(a3175a8f) SHA1(8214fdefa1186dd96bc55a30b64a24a486750f05) )
+    ROM_LOAD( "w21.3a",   0x100000, 0x40000, CRC(da46163e) SHA1(c6e5f59fe813915f94d81ff28526614c943b7082) )
+    ROM_LOAD( "6.2a",     0x180000, 0x10000, CRC(9fefe2ca) SHA1(7b638a739640e9d311ee15c0e7b4f3f2dfdd3589) ) // seiha/seiha06.8a
+    ROM_LOAD( "7.3a",     0x190000, 0x10000, CRC(a7d438ec) SHA1(5d145bab0ffc76fd77582ea5495ca4496210d41a) )            // seiha/seiha07.9a
+    ROM_LOAD( "8.4a",     0x1a0000, 0x10000, CRC(e8e61e48) SHA1(e1d0e64b39bad3e294b061fb6f02ece2f2ee4bca) )
+    ROM_LOAD( "9.2b",     0x1b0000, 0x10000, CRC(541f6e9f) SHA1(946a9c9cc8e6985098af4dd035f80ecc50e800ec) )            // seiha/seiha05.1i
+    ROM_LOAD( "10.3b",    0x1c0000, 0x10000, CRC(a4144f78) SHA1(316ebe91aa604f1d4a0f1942df9d87de487c977a) )
+    ROM_LOAD( "w22.4a",   0x200000, 0x40000, CRC(ea2b78b3) SHA1(38ec10a29f32cbb6b270fa10ade815cf3e0a54c2) )
+    ROM_LOAD( "w23.5a",   0x240000, 0x40000, CRC(0263ff75) SHA1(16a18dfaf732ab94dec70fd8e955d6179525115c) )
 ROM_END
 
 ROM_START( bijokkoy )
@@ -4032,15 +4116,16 @@ GAME( 1986, secolove, 0,        mbmj_h12bit,     secolove, secolove, ROT0, "Nich
 GAME( 1986?,barline,  0,    	barline, 	 	 barline,  barline,  ROT180, "Nichibutsu", "Barline (Japan?)",  GAME_IMPERFECT_SOUND )
 
 /* hybrid 16-bit palette */
-GAME( 1987, seiha,    0,        seiha,           seiha,    seiha,    ROT0, "Nichibutsu", "Seiha (Japan 870725)", 0 )
-GAME( 1987, seiham,   seiha,    seiha,           seiham,   seiham,   ROT0, "Nichibutsu", "Seiha [BET] (Japan 870723)", 0 )
-GAME( 1987, iemoto,   0,        iemoto,          iemoto,   iemoto,   ROT0, "Nichibutsu", "Iemoto (Japan 871020)", 0 )
-GAME( 1987, iemotom,  iemoto,   ojousan,         iemotom,  iemotom,  ROT0, "Nichibutsu", "Iemoto [BET] (Japan 871118)", 0 )
+GAME( 1987, seiha,    0,        seiha,           seiha,    seiha,    ROT0, "Nichibutsu", 	 "Seiha (Japan 870725)", 0 )
+GAME( 1987, seiham,   seiha,    seiha,           seiham,   seiham,   ROT0, "Nichibutsu", 	 "Seiha [BET] (Japan 870723)", 0 )
+GAME( 1987, mjgaiden, 0,        mjgaiden,        ojousan,  ojousan,  ROT0, "Central Denshi", "Mahjong Gaiden [BET] (Japan 870803)", 0 )
+GAME( 1987, iemoto,   0,        iemoto,          iemoto,   iemoto,   ROT0, "Nichibutsu", 	 "Iemoto (Japan 871020)", 0 )
+GAME( 1987, iemotom,  iemoto,   ojousan,         iemotom,  iemotom,  ROT0, "Nichibutsu", 	 "Iemoto [BET] (Japan 871118)", 0 )
 GAME( 1987, ryuuha,   iemoto,   ojousan,         ryuuha,   ryuuha,   ROT0, "Central Denshi", "Ryuuha [BET] (Japan 871027)", 0 )
-GAME( 1987, ojousan,  0,        ojousan,         ojousan,  ojousan,  ROT0, "Nichibutsu", "Ojousan (Japan 871204)", 0 )
-GAME( 1987, ojousanm, ojousan,  ojousan,         ojousanm, ojousanm, ROT0, "Nichibutsu", "Ojousan [BET] (Japan 870108)", 0 )
-GAME( 1988, korinai,  0,        ojousan,         korinai,  korinai,  ROT0, "Nichibutsu", "Mahjong-zukino Korinai Menmen (Japan 880425)", 0 )
-GAME( 1988, korinaim, korinai,  ojousan,         korinaim, korinaim, ROT0, "Nichibutsu", "Mahjong-zukino Korinai Menmen [BET] (Japan 880920)", 0 )
+GAME( 1987, ojousan,  0,        ojousan,         ojousan,  ojousan,  ROT0, "Nichibutsu", 	 "Ojousan (Japan 871204)", 0 )
+GAME( 1987, ojousanm, ojousan,  ojousan,         ojousanm, ojousanm, ROT0, "Nichibutsu", 	 "Ojousan [BET] (Japan 870108)", 0 )
+GAME( 1988, korinai,  0,        ojousan,         korinai,  korinai,  ROT0, "Nichibutsu", 	 "Mahjong-zukino Korinai Menmen (Japan 880425)", 0 )
+GAME( 1988, korinaim, korinai,  ojousan,         korinaim, korinaim, ROT0, "Nichibutsu", 	 "Mahjong-zukino Korinai Menmen [BET] (Japan 880920)", 0 )
 
 /* pure 16-bit palette (+ LCD in some) */
 GAME( 1987, housemnq, 0,        mbmj_p16bit_LCD, housemnq, housemnq, ROT0, "Nichibutsu", "House Mannequin (Japan 870217)", 0 )
