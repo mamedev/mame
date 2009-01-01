@@ -3316,7 +3316,7 @@ ROM_START( mjsiyoub )
 	ROM_LOAD( "3.3g", 0x00000, 0x8000, CRC(47d0f16e) SHA1(a125be052668ba93756bf940af31a10e91a3d307) )
 	ROM_LOAD( "4.3f", 0x08000, 0x8000, CRC(6cd6a200) SHA1(1c53e5caacdb9c660bd98f5331bf5354581f74c9) )
 
-	/*encrypted z80?*/
+	/*encrypted z80*/
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "1.1k", 0x00000, 0x8000, CRC(a1083321) SHA1(b36772e90be60270234df16cf92d87f8d950190d) )
 	ROM_LOAD( "2.1g", 0x08000, 0x4000, CRC(cfe5de1d) SHA1(4acf9a752aa3c02b0889b0b49d3744359fa24460) )
@@ -3325,6 +3325,157 @@ ROM_START( mjsiyoub )
 	ROM_LOAD( "color.bpr", 0x00, 0x20,  CRC(d21367e5) SHA1(b28321ac8f99abfebe2ef4da0c751cefe9f3f3b6) )
 ROM_END
 
+/*
+
+Mahjong Senka
+(c)1986 Visco
+
+Modified Royal Mahjong Hardware
+
+CPU: Z80 <- wrong,they are 2 z80 CPUs -AS
+Sound: AY-3-8910
+OSC: 18.432MHz
+Others: Battery
+
+ROMs:
+1
+2
+3
+4
+1.2L (N82S129N)
+2.2K (N82S123N)
+3.1D (N82S129N)
+4.8K (N82S123N) - color PROM
+
+
+dumped by sayu
+
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+
+ROM_START( mjsenka )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "3",       0x0000, 0x4000, CRC(b2d8be1f) SHA1(da75e1072d271de2dbd897a551f6c32593f6421b) )
+	ROM_LOAD( "4",       0x4000, 0x2000, CRC(e9e84999) SHA1(7b5f0edd92cf3a45e85055460e6cb00b154fd152) )
+	ROM_LOAD( "2",       0x6000, 0x2000, CRC(cdb02fc5) SHA1(5de6b15b79ea7c4246a294b17f166e53be6a4abc) )
+
+	/*encrypted z80*/
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "1",       0x0000, 0x2000, CRC(83e943d1) SHA1(c4f9b5036627ccb369e7db03a743e496b149af85) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "4.8k",  0x0000, 0x0020, CRC(41bd4d69) SHA1(4d2da761b338b62b2ea151c201063a24d6e4cc97) )
+	ROM_LOAD( "2.2k",  0x0020, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) )
+
+	ROM_REGION( 0x0200, "user1", 0 ) //?
+	ROM_LOAD( "1.2l",  0x0000, 0x0100, CRC(24599429) SHA1(6c93bb2e7bc9902cace0c9d482fc1584c4c1a114) )
+	ROM_LOAD( "3.1d",  0x0100, 0x0100, CRC(86aeafd1) SHA1(c4e5c56ce5baf2be3962675ae333e28bd8108a00) )
+ROM_END
+
+/*
+
+Mahjong Yarou
+(c)1986 Visco/Video System
+
+FRM-00 (modified royal mahjong hardware)
+
+CPU: Z80 (on subboard) <- wrong,they are 2 z80 CPUs -AS
+Sound: AY-3-8910
+OSC: 18.432MHz
+
+ROMs:
+1(2732)
+2(2732)
+3(2732)
+4(2732)
+5(2732)
+6(2732)
+4.6K (18S030) - pin14 is connected to subboard's WS
+                pin9 is not inserted to the socket
+
+Subboard:
+7(2732)
+8(2764)
+N82S129N.IC4
+N82S123N.IC7
+N82S129N.IC15
+
+Connetor between mainboard and subboard
+sub - main
+ CK - LS368 (1K) pin12
+ HD - LS08  (2E) pin1
+ VD - LS08  (2E) pin2
+ WS - 18S030(6K) pin14
+ () - LS138 (3K) pin13
+
+
+Mainboard
+----------------------------------------------------------
+    1         2       3       4       5        6       7
+A 74LS04    74LS86  74LS153  MB8116  MB8116  74LS157
+B 74LS161   74LS86  74LS153  MB8116  MB8116  74LS95
+C 74LS161   74LS86  74LS153  MB8116  MB8116  74LS157
+D 74LS74    74LS86  74LS153  MB8116  MB8116  74LS95    8
+E 74LS161   74LS08  74LS153  MB8116  MB8116  74LS157   9
+F 74LS161   74LS74  74LS00   MB8116  MB8116  74LS95    1
+H 74LS74    74LS00  74LS175  MB8116  MB8116  74LS157   0
+J 74LS107   74LS32  74LS10   MB8116  MB8116  74LS95
+K 74LS368   74LS241 74LS138  74LS08  74LS174 4.6K
+L 18.432MHz 74LS241 74LS138  74LS04  74LS244 74LS174
+M (socket to subbd) 74LS367  74LS08  DIPSW   74LS368
+N                   (74LS245)74LS138 74LS04  TC40H000P
+
+  1     2     3     4     5     6                      6 B
+                                                       1 A
+                                                       1 T
+                                                       6 T
+----------------------------------------------------------
+
+Subboard
+-----------------------------------------------------------
+74LS42(IC21)   ?(IC22)        ?(IC23)        74LS85(IC24)
+74LS125(IC16)  74LS08(IC17)   74LS393(IC9)   82S129N(IC15)
+74LS161(IC6)   82S123N(IC7)   74LS161(IC8)   74LS157(IC14)
+82S129N(IC4)   74LS259(IC5)   74LS32(IC12)   74LS74(IC13)
+7(IC2)                        PAL20X10(IC19) 74LS00(IC20)
+8(IC3)                        74LS245(IC18)  DIPSW
+                                             74LS32(IC11)
+Z80A                                         74LS04(IC10)
+                                             5pin connector
+-----------------------------------------------------------
+
+
+dumped by sayu
+
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+
+ROM_START( mjyarou )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "1",       0x0000, 0x1000, CRC(312c3b29) SHA1(ec2e14b392cf761f0a7079376994418fd463a06c) )
+	ROM_LOAD( "2",       0x1000, 0x1000, CRC(98f14097) SHA1(cd1f72d6effa50f95386dfc5fa9b5056d83e554f) )
+	ROM_LOAD( "3",       0x2000, 0x1000, CRC(295dbf40) SHA1(d6ac7bd88da849e418e750e2c91a594f65bdff39) )
+	ROM_LOAD( "4",       0x3000, 0x1000, CRC(a6a078c8) SHA1(936be36c7c938c705e7054a42c1908bb5a5ee1bb) )
+	ROM_LOAD( "5",       0x4000, 0x1000, CRC(3179657e) SHA1(703fc57ae71554345754267c31809cf7af7f1639) )
+	ROM_LOAD( "6",       0x5000, 0x1000, CRC(6ccc05b4) SHA1(6eefba6023673edd86e82a0ad861a4d8f7f6652b) )
+	ROM_LOAD( "8",       0x6000, 0x2000, CRC(1adef246) SHA1(b5f5598daf71694effffbfb486b03fcda5a593ee) ) //might be a rom for the sub cpu.
+
+	/*encrypted z80*/
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "7",       0x0000, 0x1000, CRC(dd144b90) SHA1(56b2c4472aaec49d9fddc99d8aa718b17655812c) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "4.6k",  		  0x0000, 0x0020, CRC(41bd4d69) SHA1(4d2da761b338b62b2ea151c201063a24d6e4cc97) )
+	ROM_LOAD( "82s123n.ic7",  0x0020, 0x0020, CRC(46014727) SHA1(eec451f292ee319fa6bfbbf223aaa12b231692c1) )
+
+	ROM_REGION( 0x0200, "user1", 0 ) //?
+	ROM_LOAD( "82s129n.ic15",  0x0000, 0x0100, CRC(86aeafd1) SHA1(c4e5c56ce5baf2be3962675ae333e28bd8108a00) )
+	ROM_LOAD( "82s129n.ic4",   0x0100, 0x0100, CRC(f09d3c4c) SHA1(a9e752d75e7f3ebd05add4ccf2f9f15d8f9a8d15) )
+ROM_END
 
 static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x8000 );	}
 
@@ -3338,15 +3489,17 @@ static DRIVER_INIT( janptr96 )
 
 
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0, "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
-GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, 0, 	   ROT0, "Visco",                      "Mahjong Shiyou", GAME_NOT_WORKING )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, 0,        ROT0, "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, 0,        ROT0, "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, 0,        ROT0, "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
-GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 1)",                                GAME_NOT_WORKING )
-GAME( 1984,  janoha,   janoh,    janoh,    royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 2)", GAME_NOT_WORKING ) // this one is complete?
+GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 1)",                        GAME_NOT_WORKING )
+GAME( 1984,  janoha,   janoh,    janoh,    royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 2)", 						GAME_NOT_WORKING ) // this one is complete?
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, 0,        ROT0, "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  ippatsu,  ROT0, "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   0,        ROT0, "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
+GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, 0, 	   ROT0, "Visco",                      "Mahjong Shiyou (Japan)", 				GAME_NOT_WORKING )
+GAME( 1986,  mjsenka,  0,        royalmah, royalmah, 0,        ROT0, "Visco",                 	   "Mahjong Senka (Japan)",     			GAME_NOT_WORKING )
+GAME( 1986,  mjyarou,  0,        royalmah, royalmah, 0,        ROT0, "Visco / Video System",   	   "Mahjong Yarou [BET] (Japan",			GAME_NOT_WORKING )
 GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, 0,        ROT0, "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
 GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  0,        ROT0, "Dynax",                      "Tonton [BET] (Japan)",                  0 )
 GAME( 1988,  majs101b, 0,        majs101b, majs101b, 0,        ROT0, "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )

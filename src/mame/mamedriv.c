@@ -7327,6 +7327,9 @@ Other Sun games
 	DRIVER( janyoup2 )	/* Falcon bootleg */
 	DRIVER( janoh )		/* (c) 1984 Toaplan */
 	DRIVER( janoha )	/* (c) 1984 Toaplan */
+	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
+	DRIVER( mjsenka )   /* (c) 1986 Visco */
+	DRIVER( mjyarou )	/* (c) 1986 Visco / Video System */
 	DRIVER( suzume )	/*  ??  (c) 1986 Dyna Electronics */
 	DRIVER( hnayayoi )	/* "02" (c) 1987 Dyna Electronics */
 	DRIVER( dondenmj )	/* "03" (c) 1986 Dyna Electronics */
@@ -8366,7 +8369,6 @@ Other Sun games
 	DRIVER( leader )	/* Bootleg? */
 	DRIVER( livequiz )	/* (c) 1999 Andamiro */
 	DRIVER( cowrace )	/* (c) 19?? unknown */
-	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
 	DRIVER( discoboy )	/* (c) 1993 Soft Art Co. */
 	DRIVER( steaser )
 	DRIVER( pangofun )	/* (c) 1995 InfoCube */

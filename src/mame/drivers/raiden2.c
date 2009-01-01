@@ -1827,6 +1827,43 @@ ROM_START( r2dx_v33 )
 	ROM_LOAD( "copx_d3.357",   0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
 ROM_END
 
+/*
+
+X Se Dae Quiz
+Seibu/Dream Island, 1995
+
+This game runs on a Zero Team PCB
+
+PCB Layout
+ZERO TEAM-V2 SEIBU KAIHATSU INC.
+|----------------------------------------|
+|LA4460 YM2151 M6295 9  Z80    Y         |
+|HB-46A1 YM3014 SEI150 8                 |
+|VOL      6116     6116  28.6362MHz 6116 |
+|                  6116   SEI251    6116 |
+|J HB-2                            62256 |
+|A                  OBJ-2  OBJ-1   62256 |
+|M                                 62256 |
+|M      SW1(8) PAL    1      3     62256 |
+|A             PAL    4      2  SEI1000  |
+|   SW2(8)     6264                      |
+|          PAL 6264          X           |
+|   SW3(8)       SEI0200  5    D71011    |
+|         7     BG-1      6         V30  |
+|----------------------------------------|
+Notes:
+      PCB is identical to standard Zero Team PCB
+      with the following differences....
+      1. X - location for COPX ROM, not populated
+      2. Y - location for battery, not populated
+      3. NEC V30 and NEC D71011 are located on a sub board and
+         the surface-mounted V30 (UPD70116) is not populated
+      4. ROM7 is located in a 8M-DIP42 to 4M-DIP40 adapter and is a 27C4002 EPROM
+      5. ROM8 has the top 4 pins hanging out of the DIP28 socket and is a 27C1001
+         EPROM. Pins 30,31 & 32 are tied together and pin 2 is tied to the SEI150
+         with a wire.
+*/
+
 ROM_START( xsedae )
 	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1.u024",   0x000000, 0x40000, CRC(185437f9) SHA1(e46950b6a549d11dc57105dd7d9cb512a8ecbe70) )
