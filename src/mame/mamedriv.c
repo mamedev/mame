@@ -5211,11 +5211,13 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( centipd2 )	/* 136001           (c) 1980 */
 	DRIVER( centtime )	/* 136001           (c) 1980 */
 	DRIVER( centipdb )	/* (bootleg) */
+	DRIVER( centipdd )	/* hack by Two Bit Score */
 	DRIVER( caterplr )	/* (bootleg) */
 	DRIVER( millpac )	/* Valadon */
 	DRIVER( magworm )	/* (bootleg) */
 	DRIVER( mazeinv ) 	/* (proto)          (c) 1982 */
 	DRIVER( milliped )	/* 136013           (c) 1982 */
+	DRIVER( millipdd )	/* hack by Two Bit Score */
 	DRIVER( qwak )	 	/* (proto)          (c) 1982 */
 	DRIVER( runaway )	/* (proto)          (c) 1982 */
 	DRIVER( bullsdrt )	/* (c) 1985 Shinkai */

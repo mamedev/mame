@@ -26,6 +26,8 @@
       136013-109.5p
       136013-110.5r
 
+The Two Bit Score "Dux" hack was circulated and common enough for inclusion
+
 ****************************************************************************
 
     Main clock: XTAL = 12.096 MHz
@@ -1761,6 +1763,22 @@ ROM_START( centiped )
 ROM_END
 
 
+ROM_START( centipdd ) /* Centipede "Dux" graphics hack by Two Bit Score */
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "136001-307.d1",  0x2000, 0x0800, CRC(5ab0d9de) SHA1(8ea6e3304202831aabaf31dbd0f970a7b3bfe421) )
+	ROM_LOAD( "136001-308.e1",  0x2800, 0x0800, CRC(4c07fd3e) SHA1(af4fdbf32c23b1864819d620a874e7f205da3cdb) )
+	ROM_LOAD( "136001-309.fh1", 0x3000, 0x0800, CRC(ff69b424) SHA1(689fa560d40a384dcbcad7c8095bc12e91875580) )
+	ROM_LOAD( "136001-310.j1",  0x3800, 0x0800, CRC(44e40fa4) SHA1(c557db83876afc8ab52047ab1a3c3bfef34d6351) )
+
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "dux-211.f7",  0x0000, 0x0800, CRC(fee15594) SHA1(1193c295b57904d1c19c7f0400ef4c1893a80f55) )
+	ROM_LOAD( "dux-212.hj7", 0x0800, 0x0800, CRC(f980c777) SHA1(3997a45ed38d7ae68dddf70b37da6e2e0c6a7710) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "136001-213.p4",   0x0000, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) )
+ROM_END
+
+
 ROM_START( centipd2 )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "136001-207.d1",  0x2000, 0x0800, CRC(b2909e2f) SHA1(90ec90bd1e262861730afd5b113ec8dddd958ed8) )
@@ -1872,6 +1890,22 @@ ROM_START( milliped )
 ROM_END
 
 
+ROM_START( millipdd ) /* Millipede "Dux" graphics hack by Two Bit Score */
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "136013-104.1mn", 0x4000, 0x1000, CRC(40711675) SHA1(b595d6a0f5d3c611ade1b83a94c3b909d2124dc4) )
+	ROM_LOAD( "136013-103.1l",  0x5000, 0x1000, CRC(fb01baf2) SHA1(9c1d0bbc20bf25dd21761a311fd1ed80aa029241) )
+	ROM_LOAD( "136013-102.1jk", 0x6000, 0x1000, CRC(62e137e0) SHA1(9fe40db55ba1d20d4f11704f7f5df9ff75b87f30) )
+	ROM_LOAD( "136013-101.1h",  0x7000, 0x1000, CRC(46752c7d) SHA1(ab06b1fd80271849946f90757b3837b617394929) )
+
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "mil-dux.5r", 0x0000, 0x0800, CRC(b6c617b6) SHA1(a672a9b35b773677aea6b9a5c4305939180f6854) )
+	ROM_LOAD( "mil-dux.5p", 0x0800, 0x0800, CRC(2a6ef4b0) SHA1(832dae8c1b1f959bb8582f9503d84bea9d50c08c) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "136001-213.7e", 0x0000, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) ) /* not used */
+ROM_END
+
+
 ROM_START( mazeinv )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "005.011",      0x3000, 0x1000, CRC(37129536) SHA1(356cb986a40b332100e00fb72194fd4dade2cba7) )
@@ -1965,10 +1999,12 @@ GAME( 1980, centiped, 0,        centiped, centiped, 0,        ROT270, "Atari",  
 GAME( 1980, centipd2, centiped, centiped, centiped, 0,        ROT270, "Atari",   "Centipede (revision 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centtime, centiped, centiped, centtime, 0,        ROT270, "Atari",   "Centipede (1 player, timed)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centipdb, centiped, centipdb, centiped, 0,        ROT270, "bootleg", "Centipede (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, centipdd, centiped, centiped, centiped, 0,        ROT270, "hack",    "Centipede Dux (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1980, caterplr, centiped, caterplr, caterplr, caterplr, ROT270, "bootleg", "Caterpillar", GAME_SUPPORTS_SAVE )
 GAME( 1980, millpac,  centiped, centipdb, centiped, 0,        ROT270, "Valadon Automation", "Millpac", GAME_SUPPORTS_SAVE )
 GAME( 1980, magworm,  centiped, magworm,  magworm,  magworm,  ROT270, "bootleg", "Magic Worm (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, milliped, 0,        milliped, milliped, 0,        ROT270, "Atari",   "Millipede", GAME_SUPPORTS_SAVE )
+GAME( 1982, millipdd, milliped, milliped, milliped, 0,        ROT270, "Atari",   "Millipede Dux (hack)", GAME_SUPPORTS_SAVE )
 
 GAME( 1980, warlords, 0,        warlords, warlords, 0,        ROT0,   "Atari",   "Warlords", GAME_SUPPORTS_SAVE )
 GAME( 1981, mazeinv,  0,        mazeinv,  mazeinv,  0,        ROT270, "Atari",   "Maze Invaders (prototype)", 0 )
