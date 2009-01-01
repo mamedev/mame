@@ -748,7 +748,7 @@ READ16_HANDLER( deco16_146_funkyjet_prot_r )
 	}
 
 	if (cpu_get_pc(space->cpu)!=0xc0ea)
-		logerror("CPU #0 PC %06x: warning - read unmapped control address %06x (ctrl %04x)\n", cpu_get_pc(space->cpu), offset<<1, input_port_read(space->machine, "P1"));
+		logerror("CPU #0 PC %06x: warning - read unmapped control address %06x (ctrl %04x)\n", cpu_get_pc(space->cpu), offset<<1, input_port_read(space->machine, "INPUTS"));
 
 	return 0;
 }
