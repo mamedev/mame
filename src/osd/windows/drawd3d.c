@@ -89,7 +89,8 @@ struct _texture_info
 	float					vstart, vstop;				// beginning/ending V coordinates
 	int						rawwidth, rawheight;		// raw width/height of the texture
 	int						type;						// what type of texture are we?
-	int						borderpix;					// do we have a 1 pixel border?
+	int						xborderpix;					// number of border pixels in X
+	int						yborderpix;					// number of border pixels in Y
 	int						xprescale;					// what is our X prescale factor?
 	int						yprescale;					// what is our Y prescale factor?
 	d3d_texture *			d3dtex;						// Direct3D texture pointer
@@ -1797,17 +1798,19 @@ static void texture_compute_size(d3d_info *d3d, int texwidth, int texheight, tex
 	int finalheight = texheight;
 	int finalwidth = texwidth;
 
-	// if we're not wrapping, add a 1 pixel border on all sides
-#if ENABLE_BORDER_PIX
-	texture->borderpix = !(texture->flags & PRIMFLAG_TEXWRAP_MASK);
-#else
-	texture->borderpix = FALSE;
-#endif
-	if (texture->borderpix)
+	// if we're not wrapping, add a 1-2 pixel border on all sides
+	texture->xborderpix = 0;
+	texture->yborderpix = 0;
+	if (ENABLE_BORDER_PIX && !(texture->flags & PRIMFLAG_TEXWRAP_MASK))
 	{
-		finalwidth += 2;
-		finalheight += 2;
+		// note we need 2 pixels in X for YUY textures
+		texture->xborderpix = (PRIMFLAG_GET_TEXFORMAT(texture->flags) == TEXFORMAT_YUY16) ? 2 : 1;
+		texture->yborderpix = 1;
 	}
+
+	// compute final texture size
+	finalwidth += 2 * texture->xborderpix;
+	finalheight += 2 * texture->yborderpix;
 
 	// round width/height up to nearest power of 2 if we need to
 	if (!(d3d->texture_caps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL))
@@ -1849,13 +1852,13 @@ static void texture_compute_size(d3d_info *d3d, int texwidth, int texheight, tex
 		finalheight *= 2;
 
 	// if we added pixels for the border, and that just barely pushed us over, take it back
-	if (texture->borderpix &&
-		((finalwidth > d3d->texture_max_width && finalwidth - 2 <= d3d->texture_max_width) ||
-		 (finalheight > d3d->texture_max_height && finalheight - 2 <= d3d->texture_max_height)))
+	if ((finalwidth > d3d->texture_max_width && finalwidth - 2 * texture->xborderpix <= d3d->texture_max_width) ||
+		(finalheight > d3d->texture_max_height && finalheight - 2 * texture->yborderpix <= d3d->texture_max_height))
 	{
-		texture->borderpix = FALSE;
-		finalwidth -= 2;
-		finalheight -= 2;
+		finalwidth -= 2 * texture->xborderpix;
+		finalheight -= 2 * texture->yborderpix;
+		texture->xborderpix = 0;
+		texture->yborderpix = 0;
 	}
 
 	// if we're above the max width/height, do what?
@@ -1867,20 +1870,10 @@ static void texture_compute_size(d3d_info *d3d, int texwidth, int texheight, tex
 	}
 
 	// compute the U/V scale factors
-	if (texture->borderpix)
-	{
-		texture->ustart = 1.0f / (float)finalwidth;
-		texture->ustop = (float)(texwidth + 1) / (float)finalwidth;
-		texture->vstart = 1.0f / (float)finalheight;
-		texture->vstop = (float)(texheight + 1) / (float)finalheight;
-	}
-	else
-	{
-		texture->ustart = 0.0f;
-		texture->ustop = (float)texwidth / (float)finalwidth;
-		texture->vstart = 0.0f;
-		texture->vstop = (float)texheight / (float)finalheight;
-	}
+	texture->ustart = (float)texture->xborderpix / (float)finalwidth;
+	texture->ustop = (float)(texwidth + texture->xborderpix) / (float)finalwidth;
+	texture->vstart = (float)texture->yborderpix / (float)finalheight;
+	texture->vstop = (float)(texheight + texture->yborderpix) / (float)finalheight;
 
 	// set the final values
 	texture->rawwidth = finalwidth;
@@ -1893,15 +1886,16 @@ static void texture_compute_size(d3d_info *d3d, int texwidth, int texheight, tex
 //  copyline_palette16
 //============================================================
 
-INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
 
-	if (borderpix)
+	assert(xborderpix == 0 || xborderpix == 1);
+	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*src];
 	for (x = 0; x < width; x++)
 		*dst++ = 0xff000000 | palette[*src++];
-	if (borderpix)
+	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*--src];
 }
 
@@ -1911,15 +1905,16 @@ INLINE void copyline_palette16(UINT32 *dst, const UINT16 *src, int width, const 
 //  copyline_palettea16
 //============================================================
 
-INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
 
-	if (borderpix)
+	assert(xborderpix == 0 || xborderpix == 1);
+	if (xborderpix)
 		*dst++ = palette[*src];
 	for (x = 0; x < width; x++)
 		*dst++ = palette[*src++];
-	if (borderpix)
+	if (xborderpix)
 		*dst++ = palette[*--src];
 }
 
@@ -1929,14 +1924,16 @@ INLINE void copyline_palettea16(UINT32 *dst, const UINT16 *src, int width, const
 //  copyline_rgb15
 //============================================================
 
-INLINE void copyline_rgb15(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+INLINE void copyline_rgb15(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
+
+	assert(xborderpix == 0 || xborderpix == 1);
 
 	// palette (really RGB map) case
 	if (palette != NULL)
 	{
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT16 pix = *src;
 			*dst++ = 0xff000000 | palette[0x40 + ((pix >> 10) & 0x1f)] | palette[0x20 + ((pix >> 5) & 0x1f)] | palette[0x00 + ((pix >> 0) & 0x1f)];
@@ -1946,7 +1943,7 @@ INLINE void copyline_rgb15(UINT32 *dst, const UINT16 *src, int width, const rgb_
 			UINT16 pix = *src++;
 			*dst++ = 0xff000000 | palette[0x40 + ((pix >> 10) & 0x1f)] | palette[0x20 + ((pix >> 5) & 0x1f)] | palette[0x00 + ((pix >> 0) & 0x1f)];
 		}
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT16 pix = *--src;
 			*dst++ = 0xff000000 | palette[0x40 + ((pix >> 10) & 0x1f)] | palette[0x20 + ((pix >> 5) & 0x1f)] | palette[0x00 + ((pix >> 0) & 0x1f)];
@@ -1956,7 +1953,7 @@ INLINE void copyline_rgb15(UINT32 *dst, const UINT16 *src, int width, const rgb_
 	// direct case
 	else
 	{
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT16 pix = *src;
 			UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
@@ -1968,7 +1965,7 @@ INLINE void copyline_rgb15(UINT32 *dst, const UINT16 *src, int width, const rgb_
 			UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
 			*dst++ = 0xff000000 | color | ((color >> 5) & 0x070707);
 		}
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT16 pix = *--src;
 			UINT32 color = ((pix & 0x7c00) << 9) | ((pix & 0x03e0) << 6) | ((pix & 0x001f) << 3);
@@ -1983,14 +1980,16 @@ INLINE void copyline_rgb15(UINT32 *dst, const UINT16 *src, int width, const rgb_
 //  copyline_rgb32
 //============================================================
 
-INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int borderpix)
+INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
+
+	assert(xborderpix == 0 || xborderpix == 1);
 
 	// palette (really RGB map) case
 	if (palette != NULL)
 	{
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT32 srcpix = *src;
 			*dst++ = 0xff000000 | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
@@ -2000,7 +1999,7 @@ INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_
 			UINT32 srcpix = *src++;
 			*dst++ = 0xff000000 | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
 		}
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT32 srcpix = *--src;
 			*dst++ = 0xff000000 | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
@@ -2010,11 +2009,11 @@ INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_
 	// direct case
 	else
 	{
-		if (borderpix)
+		if (xborderpix)
 			*dst++ = 0xff000000 | *src;
 		for (x = 0; x < width; x++)
 			*dst++ = 0xff000000 | *src++;
-		if (borderpix)
+		if (xborderpix)
 			*dst++ = 0xff000000 | *--src;
 	}
 }
@@ -2025,14 +2024,16 @@ INLINE void copyline_rgb32(UINT32 *dst, const UINT32 *src, int width, const rgb_
 //  copyline_argb32
 //============================================================
 
-INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int borderpix)
+INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
+
+	assert(xborderpix == 0 || xborderpix == 1);
 
 	// palette (really RGB map) case
 	if (palette != NULL)
 	{
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT32 srcpix = *src;
 			*dst++ = (srcpix & 0xff000000) | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
@@ -2042,7 +2043,7 @@ INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb
 			UINT32 srcpix = *src++;
 			*dst++ = (srcpix & 0xff000000) | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
 		}
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT32 srcpix = *--src;
 			*dst++ = (srcpix & 0xff000000) | palette[0x200 + RGB_RED(srcpix)] | palette[0x100 + RGB_GREEN(srcpix)] | palette[RGB_BLUE(srcpix)];
@@ -2052,11 +2053,11 @@ INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb
 	// direct case
 	else
 	{
-		if (borderpix)
+		if (xborderpix)
 			*dst++ = *src;
 		for (x = 0; x < width; x++)
 			*dst++ = *src++;
-		if (borderpix)
+		if (xborderpix)
 			*dst++ = *--src;
 	}
 }
@@ -2067,47 +2068,62 @@ INLINE void copyline_argb32(UINT32 *dst, const UINT32 *src, int width, const rgb
 //  copyline_yuy16_to_yuy2
 //============================================================
 
-INLINE void copyline_yuy16_to_yuy2(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+INLINE void copyline_yuy16_to_yuy2(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
+
+	assert(xborderpix == 0 || xborderpix == 2);
+	assert(width % 2 == 0);
 
 	// palette (really RGB map) case
 	if (palette != NULL)
 	{
-		if (borderpix)
+		if (xborderpix)
 		{
-			UINT16 srcpix = *src;
-			*dst++ = palette[0x000 + (srcpix >> 8)] | (srcpix << 8);
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src--;
+			*dst++ = palette[0x000 + (srcpix0 >> 8)] | (srcpix0 << 8);
+			*dst++ = palette[0x000 + (srcpix0 >> 8)] | (srcpix1 << 8);
 		}
-		for (x = 0; x < width; x++)
+		for (x = 0; x < width; x += 2)
 		{
-			UINT16 srcpix = *src++;
-			*dst++ = palette[0x000 + (srcpix >> 8)] | (srcpix << 8);
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src++;
+			*dst++ = palette[0x000 + (srcpix0 >> 8)] | (srcpix0 << 8);
+			*dst++ = palette[0x000 + (srcpix1 >> 8)] | (srcpix1 << 8);
 		}
-		if (borderpix)
+		if (xborderpix)
 		{
-			UINT16 srcpix = *--src;
-			*dst++ = palette[0x000 + (srcpix >> 8)] | (srcpix << 8);
+			UINT16 srcpix1 = *--src;
+			UINT16 srcpix0 = *--src;
+			*dst++ = palette[0x000 + (srcpix1 >> 8)] | (srcpix0 << 8);
+			*dst++ = palette[0x000 + (srcpix1 >> 8)] | (srcpix1 << 8);
 		}
 	}
 
 	// direct case
 	else
 	{
-		if (borderpix)
+		if (xborderpix)
 		{
-			UINT16 srcpix = *src;
-			*dst++ = (srcpix >> 8) | (srcpix << 8);
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src--;
+			*dst++ = (srcpix0 >> 8) | (srcpix0 << 8);
+			*dst++ = (srcpix0 >> 8) | (srcpix1 << 8);
 		}
-		for (x = 0; x < width; x++)
+		for (x = 0; x < width; x += 2)
 		{
-			UINT16 srcpix = *src++;
-			*dst++ = (srcpix >> 8) | (srcpix << 8);
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src++;
+			*dst++ = (srcpix0 >> 8) | (srcpix0 << 8);
+			*dst++ = (srcpix1 >> 8) | (srcpix1 << 8);
 		}
-		if (borderpix)
+		if (xborderpix)
 		{
-			UINT16 srcpix = *--src;
-			*dst++ = (srcpix >> 8) | (srcpix << 8);
+			UINT16 srcpix1 = *--src;
+			UINT16 srcpix0 = *--src;
+			*dst++ = (srcpix1 >> 8) | (srcpix0 << 8);
+			*dst++ = (srcpix1 >> 8) | (srcpix1 << 8);
 		}
 	}
 }
@@ -2118,39 +2134,61 @@ INLINE void copyline_yuy16_to_yuy2(UINT16 *dst, const UINT16 *src, int width, co
 //  copyline_yuy16_to_uyvy
 //============================================================
 
-INLINE void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+INLINE void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
+
+	assert(xborderpix == 0 || xborderpix == 2);
+	assert(width % 2 == 0);
 
 	// palette (really RGB map) case
 	if (palette != NULL)
 	{
-		if (borderpix)
+		if (xborderpix)
 		{
-			UINT16 srcpix = *src;
-			*dst++ = palette[0x100 + (srcpix >> 8)] | (srcpix & 0xff);
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src--;
+			*dst++ = palette[0x100 + (srcpix0 >> 8)] | (srcpix0 & 0xff);
+			*dst++ = palette[0x100 + (srcpix0 >> 8)] | (srcpix1 & 0xff);
 		}
-		for (x = 0; x < width; x++)
+		for (x = 0; x < width; x += 2)
 		{
-			UINT16 srcpix = *src++;
-			*dst++ = palette[0x100 + (srcpix >> 8)] | (srcpix & 0xff);
+			UINT16 srcpix0 = *src++;
+			UINT16 srcpix1 = *src++;
+			*dst++ = palette[0x100 + (srcpix0 >> 8)] | (srcpix0 & 0xff);
+			*dst++ = palette[0x100 + (srcpix1 >> 8)] | (srcpix1 & 0xff);
 		}
-		if (borderpix)
+		if (xborderpix)
 		{
-			UINT16 srcpix = *--src;
-			*dst++ = palette[0x100 + (srcpix >> 8)] | (srcpix & 0xff);
+			UINT16 srcpix1 = *--src;
+			UINT16 srcpix0 = *--src;
+			*dst++ = palette[0x100 + (srcpix1 >> 8)] | (srcpix0 & 0xff);
+			*dst++ = palette[0x100 + (srcpix1 >> 8)] | (srcpix1 & 0xff);
 		}
 	}
 
 	// direct case
 	else
 	{
-		if (borderpix)
-			*dst++ = *src;
-		for (x = 0; x < width; x++)
+		if (xborderpix)
+		{
+			UINT16 srcpix0 = src[0];
+			UINT16 srcpix1 = src[1];
+			*dst++ = srcpix0;
+			*dst++ = (srcpix0 & 0xff00) | (srcpix1 & 0x00ff);
+		}
+		for (x = 0; x < width; x += 2)
+		{
 			*dst++ = *src++;
-		if (borderpix)
-			*dst++ = *--src;
+			*dst++ = *src++;
+		}
+		if (xborderpix)
+		{
+			UINT16 srcpix1 = *--src;
+			UINT16 srcpix0 = *--src;
+			*dst++ = (srcpix1 & 0xff00) | (srcpix0 & 0x00ff);
+			*dst++ = srcpix1;
+		}
 	}
 }
 
@@ -2160,19 +2198,23 @@ INLINE void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, co
 //  copyline_yuy16_to_argb
 //============================================================
 
-INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int borderpix)
+INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, const rgb_t *palette, int xborderpix)
 {
 	int x;
+
+	assert(xborderpix == 0 || xborderpix == 2);
+	assert(width % 2 == 0);
 
 	// palette (really RGB map) case
 	if (palette != NULL)
 	{
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT16 srcpix0 = src[0];
 			UINT16 srcpix1 = src[1];
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
 			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
 		}
 		for (x = 0; x < width / 2; x++)
@@ -2184,12 +2226,13 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
 			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
 		}
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT16 srcpix1 = *--src;
 			UINT16 srcpix0 = *--src;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
 			*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
 		}
 	}
@@ -2197,15 +2240,16 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 	// direct case
 	else
 	{
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT16 srcpix0 = src[0];
 			UINT16 srcpix1 = src[1];
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
 			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
 		}
-		for (x = 0; x < width / 2; x++)
+		for (x = 0; x < width; x += 2)
 		{
 			UINT16 srcpix0 = *src++;
 			UINT16 srcpix1 = *src++;
@@ -2214,12 +2258,13 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 			*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
 			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
 		}
-		if (borderpix)
+		if (xborderpix)
 		{
 			UINT16 srcpix1 = *--src;
 			UINT16 srcpix0 = *--src;
 			UINT8 cb = srcpix0 & 0xff;
 			UINT8 cr = srcpix1 & 0xff;
+			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
 			*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
 		}
 	}
@@ -2250,43 +2295,43 @@ static void texture_set_data(d3d_info *d3d, texture_info *texture, const render_
 		return;
 
 	// loop over Y
-	miny = 0 - texture->borderpix;
-	maxy = texsource->height + texture->borderpix;
+	miny = 0 - texture->yborderpix;
+	maxy = texsource->height + texture->yborderpix;
 	for (dsty = miny; dsty < maxy; dsty++)
 	{
 		int srcy = (dsty < 0) ? 0 : (dsty >= texsource->height) ? texsource->height - 1 : dsty;
-		void *dst = (BYTE *)rect.pBits + (dsty + texture->borderpix) * rect.Pitch;
+		void *dst = (BYTE *)rect.pBits + (dsty + texture->yborderpix) * rect.Pitch;
 
 		// switch off of the format and
 		switch (PRIMFLAG_GET_TEXFORMAT(flags))
 		{
 			case TEXFORMAT_PALETTE16:
-				copyline_palette16(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+				copyline_palette16(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_PALETTEA16:
-				copyline_palettea16(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+				copyline_palettea16(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_RGB15:
-				copyline_rgb15(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+				copyline_rgb15(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_RGB32:
-				copyline_rgb32(dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+				copyline_rgb32(dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_ARGB32:
-				copyline_argb32(dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+				copyline_argb32(dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_YUY16:
 				if (d3d->yuv_format == D3DFMT_YUY2)
-					copyline_yuy16_to_yuy2(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+					copyline_yuy16_to_yuy2(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				else if (d3d->yuv_format == D3DFMT_UYVY)
-					copyline_yuy16_to_uyvy(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+					copyline_yuy16_to_uyvy(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				else
-					copyline_yuy16_to_argb(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix);
+					copyline_yuy16_to_argb(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			default:
@@ -2338,8 +2383,8 @@ static void texture_prescale(d3d_info *d3d, texture_info *texture)
 
 		// set the source bounds
 		source.left = source.top = 0;
-		source.right = texture->texinfo.width + 2 * texture->borderpix;
-		source.bottom = texture->texinfo.height + 2 * texture->borderpix;
+		source.right = texture->texinfo.width + 2 * texture->xborderpix;
+		source.bottom = texture->texinfo.height + 2 * texture->yborderpix;
 
 		// set the target bounds
 		dest = source;
@@ -2382,22 +2427,22 @@ static void texture_prescale(d3d_info *d3d, texture_info *texture)
 		// configure the X/Y coordinates on the target surface
 		d3d->lockedbuf[0].x = -0.5f;
 		d3d->lockedbuf[0].y = -0.5f;
-		d3d->lockedbuf[1].x = (float)((texture->texinfo.width + 2 * texture->borderpix) * texture->xprescale) - 0.5f;
+		d3d->lockedbuf[1].x = (float)((texture->texinfo.width + 2 * texture->xborderpix) * texture->xprescale) - 0.5f;
 		d3d->lockedbuf[1].y = -0.5f;
 		d3d->lockedbuf[2].x = -0.5f;
-		d3d->lockedbuf[2].y = (float)((texture->texinfo.height + 2 * texture->borderpix) * texture->yprescale) - 0.5f;
-		d3d->lockedbuf[3].x = (float)((texture->texinfo.width + 2 * texture->borderpix) * texture->xprescale) - 0.5f;
-		d3d->lockedbuf[3].y = (float)((texture->texinfo.height + 2 * texture->borderpix) * texture->yprescale) - 0.5f;
+		d3d->lockedbuf[2].y = (float)((texture->texinfo.height + 2 * texture->yborderpix) * texture->yprescale) - 0.5f;
+		d3d->lockedbuf[3].x = (float)((texture->texinfo.width + 2 * texture->xborderpix) * texture->xprescale) - 0.5f;
+		d3d->lockedbuf[3].y = (float)((texture->texinfo.height + 2 * texture->yborderpix) * texture->yprescale) - 0.5f;
 
 		// configure the U/V coordintes on the source texture
 		d3d->lockedbuf[0].u0 = 0.0f;
 		d3d->lockedbuf[0].v0 = 0.0f;
-		d3d->lockedbuf[1].u0 = (float)(texture->texinfo.width + 2 * texture->borderpix) / (float)texture->rawwidth;
+		d3d->lockedbuf[1].u0 = (float)(texture->texinfo.width + 2 * texture->xborderpix) / (float)texture->rawwidth;
 		d3d->lockedbuf[1].v0 = 0.0f;
 		d3d->lockedbuf[2].u0 = 0.0f;
-		d3d->lockedbuf[2].v0 = (float)(texture->texinfo.height + 2 * texture->borderpix) / (float)texture->rawheight;
-		d3d->lockedbuf[3].u0 = (float)(texture->texinfo.width + 2 * texture->borderpix) / (float)texture->rawwidth;
-		d3d->lockedbuf[3].v0 = (float)(texture->texinfo.height + 2 * texture->borderpix) / (float)texture->rawheight;
+		d3d->lockedbuf[2].v0 = (float)(texture->texinfo.height + 2 * texture->yborderpix) / (float)texture->rawheight;
+		d3d->lockedbuf[3].u0 = (float)(texture->texinfo.width + 2 * texture->xborderpix) / (float)texture->rawwidth;
+		d3d->lockedbuf[3].v0 = (float)(texture->texinfo.height + 2 * texture->yborderpix) / (float)texture->rawheight;
 
 		// reset the remaining vertex parameters
 		for (i = 0; i < 4; i++)
