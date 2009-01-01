@@ -77,6 +77,77 @@ static void (*execute_command)(const device_config *laserdisc, int command);
 
 /*************************************
  *
+ *  Disc location
+ *
+ *************************************/
+
+static void free_string(running_machine *machine)
+{
+	astring_free(filename);
+}
+
+
+static chd_file *get_disc(const device_config *device)
+{
+	mame_file *image_file = NULL;
+	chd_file *image_chd = NULL;
+	mame_path *path;
+
+	/* open a path to the ROMs and find the first CHD file */
+	path = mame_openpath(mame_options(), OPTION_ROMPATH);
+	if (path != NULL)
+	{
+		const osd_directory_entry *dir;
+
+		/* iterate while we get new objects */
+		while ((dir = mame_readpath(path)) != NULL)
+		{
+			int length = strlen(dir->name);
+
+			/* look for files ending in .chd */
+			if (length > 4 &&
+				tolower(dir->name[length - 4] == '.') &&
+				tolower(dir->name[length - 3] == 'c') &&
+				tolower(dir->name[length - 2] == 'h') &&
+				tolower(dir->name[length - 1] == 'd'))
+			{
+				file_error filerr;
+				chd_error chderr;
+
+				/* open the file itself via our search path */
+				filerr = mame_fopen(SEARCHPATH_IMAGE, dir->name, OPEN_FLAG_READ, &image_file);
+				if (filerr == FILERR_NONE)
+				{
+					/* try to open the CHD */
+					chderr = chd_open_file(mame_core_file(image_file), CHD_OPEN_READ, NULL, &image_chd);
+					if (chderr == CHDERR_NONE)
+					{
+						set_disk_handle("laserdisc", image_file, image_chd);
+						filename = astring_dupc(dir->name);
+						add_exit_callback(device->machine, free_string);
+						break;
+					}
+
+					/* close the file on failure */
+					mame_fclose(image_file);
+					image_file = NULL;
+				}
+			}
+		}
+		mame_closepath(path);
+	}
+
+	/* if we failed, pop a message and exit */
+	if (image_file == NULL)
+		fatalerror("No valid image file found!\n");
+	
+	return get_disk_handle("laserdisc");
+}
+
+
+
+/*************************************
+ *
  *  Timers and sync
  *
  *************************************/
@@ -508,6 +579,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ldv1000 )
 	MDRV_IMPORT_FROM(ldplayer_ntsc)
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
+	MDRV_LASERDISC_GET_DISC(get_disc)
 MACHINE_DRIVER_END
 
 
@@ -516,6 +588,7 @@ static MACHINE_DRIVER_START( pr8210 )
 	MDRV_MACHINE_START(pr8210)
 	MDRV_MACHINE_RESET(pr8210)
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "main", "ldsound")
+	MDRV_LASERDISC_GET_DISC(get_disc)
 MACHINE_DRIVER_END
 
 
@@ -543,71 +616,8 @@ ROM_END
  *
  *************************************/
 
-static void free_string(running_machine *machine)
-{
-	astring_free(filename);
-}
-
-
-static DRIVER_INIT( ldplayer )
-{
-	mame_file *image_file = NULL;
-	chd_file *image_chd = NULL;
-	mame_path *path;
-
-	/* open a path to the ROMs and find the first CHD file */
-	path = mame_openpath(mame_options(), OPTION_ROMPATH);
-	if (path != NULL)
-	{
-		const osd_directory_entry *dir;
-
-		/* iterate while we get new objects */
-		while ((dir = mame_readpath(path)) != NULL)
-		{
-			int length = strlen(dir->name);
-
-			/* look for files ending in .chd */
-			if (length > 4 &&
-				tolower(dir->name[length - 4] == '.') &&
-				tolower(dir->name[length - 3] == 'c') &&
-				tolower(dir->name[length - 2] == 'h') &&
-				tolower(dir->name[length - 1] == 'd'))
-			{
-				file_error filerr;
-				chd_error chderr;
-
-				/* open the file itself via our search path */
-				filerr = mame_fopen(SEARCHPATH_IMAGE, dir->name, OPEN_FLAG_READ, &image_file);
-				if (filerr == FILERR_NONE)
-				{
-					/* try to open the CHD */
-					chderr = chd_open_file(mame_core_file(image_file), CHD_OPEN_READ, NULL, &image_chd);
-					if (chderr == CHDERR_NONE)
-					{
-						set_disk_handle("laserdisc", image_file, image_chd);
-						filename = astring_dupc(dir->name);
-						add_exit_callback(machine, free_string);
-						break;
-					}
-
-					/* close the file on failure */
-					mame_fclose(image_file);
-					image_file = NULL;
-				}
-			}
-		}
-		mame_closepath(path);
-	}
-
-	/* if we failed, pop a message and exit */
-	if (image_file == NULL)
-		fatalerror("No valid image file found!\n");
-}
-
-
-
-static DRIVER_INIT( ldv1000 ) { execute_command = ldv1000_execute; DRIVER_INIT_CALL(ldplayer); }
-static DRIVER_INIT( pr8210 )  { execute_command = pr8210_execute; DRIVER_INIT_CALL(ldplayer); }
+static DRIVER_INIT( ldv1000 ) { execute_command = ldv1000_execute; }
+static DRIVER_INIT( pr8210 )  { execute_command = pr8210_execute; }
 
 
 
@@ -618,4 +628,4 @@ static DRIVER_INIT( pr8210 )  { execute_command = pr8210_execute; DRIVER_INIT_CA
  *************************************/
 
 GAME( 2008, ldv1000, 0, ldv1000, ldplayer, ldv1000, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
-GAMEL( 2008, pr8210,  0, pr8210,  ldplayer, pr8210,  ROT0, "MAME", "Pioneer PR-8210 Simulator", 0, layout_pr8210 )
+GAMEL(2008, pr8210,  0, pr8210,  ldplayer, pr8210,  ROT0, "MAME", "Pioneer PR-8210 Simulator", 0, layout_pr8210 )

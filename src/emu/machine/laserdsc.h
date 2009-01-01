@@ -14,6 +14,7 @@
 #ifndef __LASERDSC_H__
 #define __LASERDSC_H__
 
+#include "chd.h"
 #include "sound/custom.h"
 
 
@@ -66,6 +67,8 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef chd_file *(*laserdisc_get_disc_func)(const device_config *device);
+
 typedef void (*laserdisc_audio_func)(const device_config *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1);
 
 typedef void (*vp931_data_ready_func)(const device_config *device, int state);
@@ -74,6 +77,7 @@ typedef struct _laserdisc_config laserdisc_config;
 struct _laserdisc_config
 {
 	UINT32					type;
+	laserdisc_get_disc_func	getdisc;
 	laserdisc_audio_func	audio;
 	const char *			sound;
 	const char *			screen;
@@ -97,6 +101,9 @@ struct _laserdisc_config
 	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type) \
 	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, screen, _screen) \
 	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, sound, _sound) \
+
+#define MDRV_LASERDISC_GET_DISC(_func) \
+	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, getdisc, _func)
 
 #define MDRV_LASERDISC_AUDIO(_func) \
 	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, audio, _func)
