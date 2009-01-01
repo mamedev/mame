@@ -303,7 +303,7 @@ ROM_START( ajax )
 	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "770_h03.f16",	0x00000, 0x08000, CRC(2ffd2afc) SHA1(ca2ef684f87bcf9b70b3ec66ec80685edaf04b9b) )
 
-    ROM_REGION( 0x080000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x080000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "770c13-a.f3",		0x000000, 0x010000, CRC(4ef6fff2) SHA1(0a2953f6907738b795d96184329431539386a463) )
 	ROM_LOAD16_BYTE( "770c13-c.f4",		0x000001, 0x010000, CRC(97ffbab6) SHA1(97d9a39600eed918e12908a9abed0d4161c20ef6) )
 	ROM_LOAD16_BYTE( "770c13-b.e3",		0x020000, 0x010000, CRC(86fdd706) SHA1(334c2720fc35aa556c6c5850d32f9bc9a6800fba) )
@@ -313,7 +313,7 @@ ROM_START( ajax )
 	ROM_LOAD16_BYTE( "770c12-b.e5",		0x060000, 0x010000, CRC(5f221cc6) SHA1(9a7a9c7853a3b582c4034b773cef08aee5391d6e) )
 	ROM_LOAD16_BYTE( "770c12-d.e6",		0x060001, 0x010000, CRC(f1edb2f4) SHA1(3e66cc711e25cbf6e6a747d43a9efec0710d5b7a) )
 
-    ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD16_BYTE( "770c09-a.f8",		0x000000, 0x010000, CRC(76690fb8) SHA1(afe267a37b65d63d3765dc3b88d8a8262446f786) )
 	ROM_LOAD16_BYTE( "770c09-e.f9",		0x000001, 0x010000, CRC(17b482c9) SHA1(3535197956f5bf5b564fec1ddbb3e3ea3bf1f7bd) )
 	ROM_LOAD16_BYTE( "770c09-b.e8",		0x020000, 0x010000, CRC(cd1709d1) SHA1(5a835639eb2d75adcfd0103b0800dd74b2bf9503) )
@@ -369,11 +369,11 @@ ROM_START( typhoon )
 	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "770_h03.f16",	0x00000, 0x08000, CRC(2ffd2afc) SHA1(ca2ef684f87bcf9b70b3ec66ec80685edaf04b9b) )
 
-    ROM_REGION( 0x080000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x080000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "770c13",		0x000000, 0x040000, CRC(b859ca4e) SHA1(f58678d503683f78cca0d5ed2d79f6f68ab3495a) )	/* characters (N22) */
 	ROM_LOAD( "770c12",		0x040000, 0x040000, CRC(50d14b72) SHA1(e3ff4a5aeefa6c10b5f7fec18297948b7c5acfdf) )	/* characters (K22) */
 
-    ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "770c09",		0x000000, 0x080000, CRC(1ab4a7ff) SHA1(fa007b41027f95d29d2a9f931a2fe235844db637) )	/* sprites (N4) */
 	ROM_LOAD( "770c08",		0x080000, 0x080000, CRC(a8e80586) SHA1(0401f59baa691905287cef94427f39e0c3f0adc6) )	/* sprites (K4) */
 
@@ -405,11 +405,11 @@ ROM_START( ajaxj )
 	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "770_f03.f16",	0x00000, 0x08000, CRC(3fe914fd) SHA1(c691920402bd859e2bf765084704a8bfad302cfa) )
 
-    ROM_REGION( 0x080000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x080000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "770c13",		0x000000, 0x040000, CRC(b859ca4e) SHA1(f58678d503683f78cca0d5ed2d79f6f68ab3495a) )	/* characters (N22) */
 	ROM_LOAD( "770c12",		0x040000, 0x040000, CRC(50d14b72) SHA1(e3ff4a5aeefa6c10b5f7fec18297948b7c5acfdf) )	/* characters (K22) */
 
-    ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
 	ROM_LOAD( "770c09",		0x000000, 0x080000, CRC(1ab4a7ff) SHA1(fa007b41027f95d29d2a9f931a2fe235844db637) )	/* sprites (N4) */
 	ROM_LOAD( "770c08",		0x080000, 0x080000, CRC(a8e80586) SHA1(0401f59baa691905287cef94427f39e0c3f0adc6) )	/* sprites (K4) */
 
