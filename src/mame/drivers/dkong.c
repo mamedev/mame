@@ -1981,7 +1981,35 @@ ROM_START( dkongjo1 )
 	ROM_LOAD( "c-2k.bpr",     0x0000, 0x0100, CRC(e273ede5) SHA1(b50ec9e1837c00c20fb2a4369ec7dd0358321127) ) /* palette low 4 bits (inverted) */
 	ROM_LOAD( "c-2j.bpr",     0x0100, 0x0100, CRC(d6412358) SHA1(f9c872da2fe8e800574ae3bf483fb3ccacc92eb3) ) /* palette high 4 bits (inverted) */
 	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
+ROM_END
 
+ROM_START( dkongf ) /* Donkey Kong Foundry (hack) from Jeff's Romhack */
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "dk_f.5et",  0x0000, 0x1000, CRC(00b7efaf) SHA1(97ed5930eb5d0cb98a9008b1d329ba7f3b8b8dbf) )
+	ROM_LOAD( "dk_f.5ct",  0x1000, 0x1000, CRC(88af9b69) SHA1(c5621dd8198c333b3fa32fdece60ee5a3d8b2276) )
+	ROM_LOAD( "dk_f.5bt",  0x2000, 0x1000, CRC(de74ad91) SHA1(c80227361bdbc565e9f5764e6364b52d40ca778a) )
+	ROM_LOAD( "dk_f.5at",  0x3000, 0x1000, CRC(6a6bd420) SHA1(f012e2d21d906a2993af9cf8b2912ea6c928e94b) )
+	/* space for diagnostic ROM */
+
+	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
+	ROM_RELOAD(               0x0800, 0x0800 )
+	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
+
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "v_5h_b.bin",   0x0000, 0x0800, CRC(12c8c95d) SHA1(a57ff5a231c45252a63b354137c920a1379b70a3) )
+	ROM_LOAD( "v_3pt.bin",    0x0800, 0x0800, CRC(15e9c5e9) SHA1(976eb1e18c74018193a35aa86cff482ebfc5cc4e) )
+
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "l_4m_b.bin",   0x0000, 0x0800, CRC(59f8054d) SHA1(793dba9bf5a5fe76328acdfb90815c243d2a65f1) )
+	ROM_LOAD( "l_4n_b.bin",   0x0800, 0x0800, CRC(672e4714) SHA1(92e5d379f4838ac1fa44d448ce7d142dae42102f) )
+	ROM_LOAD( "l_4r_b.bin",   0x1000, 0x0800, CRC(feaa59ee) SHA1(ecf95db5a20098804fc8bd59232c66e2e0ed3db4) )
+	ROM_LOAD( "l_4s_b.bin",   0x1800, 0x0800, CRC(20f2ef7e) SHA1(3bc482a38bf579033f50082748ee95205b0f673d) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "c-2k.bpr",     0x0000, 0x0100, CRC(e273ede5) SHA1(b50ec9e1837c00c20fb2a4369ec7dd0358321127) ) /* palette low 4 bits (inverted) */
+	ROM_LOAD( "c-2j.bpr",     0x0100, 0x0100, CRC(d6412358) SHA1(f9c872da2fe8e800574ae3bf483fb3ccacc92eb3) ) /* palette high 4 bits (inverted) */
+	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
 ROM_END
 
 ROM_START( dkongjr )
@@ -2914,6 +2942,7 @@ GAME( 1981, dkongo,   dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo",
 GAME( 1981, dkongjp,  dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjo,  dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjo1, dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 3) (bad dump?)", GAME_SUPPORTS_SAVE )
+GAME( 1981, dkongf,   dkong,    dkong2b,  dkong,          0,  ROT90, "hack", "Donkey Kong Foundry", GAME_SUPPORTS_SAVE ) /* hack from Jeff's Romhack */
 
 GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (US)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
@@ -2931,7 +2960,7 @@ GAME( 1983, pestplce, mario,	pestplce, pestplce,       0,  ROT180, "bootleg", "P
 /* 2650 based */
 GAME( 1984, herbiedk, huncholy, s2650,    herbiedk,       0,  ROT90, "CVS", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1983, hunchbkd, hunchbak, s2650,    hunchbkd,       0,  ROT90, "Century Electronics", "Hunchback (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, sbdk,	  superbik,	s2650,    sbdk,		      0,  ROT90, "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbdk,     superbik, s2650,    sbdk,           0,  ROT90, "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1984, herodk,   hero,     s2650,    herodk,    herodk,  ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1984, herodku,  hero,     s2650,    herodk,         0,  ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1984, 8ballact, 0,    	s2650,    8ballact,       0,  ROT90, "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (DK conversion)", GAME_SUPPORTS_SAVE )
