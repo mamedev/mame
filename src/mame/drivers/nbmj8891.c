@@ -24,7 +24,7 @@ TODO:
 
 - Controls in gionbana: 1~8 is assigned to A~H, "Yes" is LShift, "No" is Z.
 
-- Controls in maiko and hanaoji: 1~8 is assigned to A~H, "Yes" is M, "No" is N.
+- Controls in maiko,hanaoji,hnxmasev and hnageman: 1~8 is assigned to A~H, "Yes" is M, "No" is N.
 
 - Real machine has ROMs for protection, but I don't know how to access the ROM,
   so I'm doing something that works but is probably wrong.
@@ -40,6 +40,8 @@ TODO:
 - Screen flipping is not perfect.
 
 - taiwanmb needs MCU emulation (color lookup table data output etc.)
+
+- Missing VCR tape / emulation for hnxmasev,hnageman
 
 ******************************************************************************/
 
@@ -429,6 +431,20 @@ static ADDRESS_MAP_START( writemem_maiko, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(nbmj8891_palette_type2_w)
 	AM_RANGE(0xf400, 0xf40f) AM_WRITE(nbmj8891_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hnxmasev_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
+	AM_RANGE(0xf700, 0xf70f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hnageman_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8891_palette_type2_r,nbmj8891_palette_type2_w)
+	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8891_clut_r,nbmj8891_clut_w)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_mmaiko, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2912,6 +2928,23 @@ static MACHINE_DRIVER_START( hanaoji )
 	MDRV_NVRAM_HANDLER(nb1413m3)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( hnxmasev )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(maiko)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(hnxmasev_mem, 0)
+	MDRV_CPU_IO_MAP(readport_maiko, writeport_maiko)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( hnageman )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(maiko)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(hnageman_mem, 0)
+	MDRV_CPU_IO_MAP(readport_maiko, writeport_maiko)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( scandal )
 
@@ -3848,6 +3881,108 @@ ROM_START( taiwanmb )
 	ROM_LOAD( "clut_ram.8f", 0x000000, 0x00800, CRC(bd80fa09) SHA1(896421e1e01beef0de6acebbbc255224e4e0438b) )
 ROM_END
 
+/*
+AV Hanafuda Hana no Christmas Eve
+(c)1990 Nichibutsu
+
+The PCB accepts composite video and monaural audio input from VCR.
+Then converts the signal to RGB (uses NEC uPC1352C).
+
+CPU: Z80B
+Sound: YM3812 Y3014B
+OSC: 3.579545MHz, 20.00000MHz
+Custom: 1413M3
+
+ROMs:
+A.4C
+B.4F
+C.10A
+D.10C
+E.10D
+F.10E
+G.10F
+H.10J
+I.10K
+J.10L
+K.10M
+
+
+dumped by sayu
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+
+ROM_START( hnxmasev )
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_LOAD( "b.3f",   0x00000, 0x10000, CRC(45e34624) SHA1(db7f880a8b2f36d5bed939bd0b2694f27e29141b) )
+
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
+	ROM_LOAD( "a.3c", 	 0x00000, 0x20000, CRC(713b3f8f) SHA1(460e9dcfc4a31f8e6d3f40ba77d6639257d9762f) ) //same as maiko
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* gfx */
+	ROM_LOAD( "c.10a", 0x000000, 0x10000, CRC(e46a1baa) SHA1(95ccf45a3c542391b67bd7993b5f7828ab525ebc) )
+	ROM_LOAD( "d.10c", 0x010000, 0x10000, CRC(0777dad4) SHA1(7c502d78f778402614a5850bc9066322dda3f73d) )
+	ROM_LOAD( "e.10d", 0x020000, 0x10000, CRC(eedd6244) SHA1(b636dacc4b2064c50ecaffef082735159031d333) )
+	ROM_LOAD( "f.10e", 0x030000, 0x10000, CRC(9a8f2cf0) SHA1(31b504785c8e0747bc61a06d1684d96dbd84c261) )
+	ROM_LOAD( "g.10h", 0x040000, 0x10000, CRC(a78fe88a) SHA1(d5e8a02d2266bd0e61ee662c5d3fe9ea4f3ebfb3) )
+	ROM_LOAD( "h.10j", 0x050000, 0x10000, CRC(4810eb2e) SHA1(89b91b444f41127559e21f794eda4922b56b50bd) )
+	ROM_LOAD( "i.10k", 0x060000, 0x10000, CRC(cf0c26cf) SHA1(5f64779abc578388e712abb381e2bbdbf4f78e0c) )
+	ROM_LOAD( "j.10l", 0x070000, 0x10000, CRC(b0fb3334) SHA1(99032e00ccfbc903dc068d174f8d51211269b99c) )
+
+	ROM_REGION( 0x10000, "vcr", 0 ) /* vcr prg?data?*/
+	ROM_LOAD( "k.10m",   0x00000, 0x10000, CRC(e29e9ef2) SHA1(5a3ea8f771f3191fad88d237b70301634353b7bb) )
+ROM_END
+
+/*
+AV Hanafuda Hana no Ageman
+(c)1990 Nichibutsu / AV Japan
+
+The PCB accepts composite video and monaural audio input from VCR.
+Then converts the signal to RGB (uses NEC uPC1352C).
+
+CPU: Z80B
+Sound: YM3812 Y3014B
+OSC: 3.579545MHz, 20.00000MHz
+Custom: 1413M3
+
+ROMs:
+1.4C
+2.4F
+3.10A
+4.10C
+5.10D
+6.10E
+7.10F
+8.10J
+9.10K
+
+
+dumped by sayu
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+
+ROM_START( hnageman )
+	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_LOAD( "2.3f",   0x00000, 0x10000, CRC(155ed09a) SHA1(254f199063fe525c574032ae69d4d21b0debb4c5) )
+
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
+	ROM_LOAD( "1.3c", 	 0x00000, 0x20000, CRC(713b3f8f) SHA1(460e9dcfc4a31f8e6d3f40ba77d6639257d9762f) ) //same as maiko
+
+	ROM_REGION( 0xd0000, "gfx1", 0 ) /* gfx */
+	ROM_LOAD( "3.10a", 0x000000, 0x20000, CRC(080e0daa) SHA1(331137392c46fededdc55bd731c3a0bee88e59e3) )
+	ROM_LOAD( "4.10c", 0x020000, 0x20000, CRC(d297ee95) SHA1(a89d438175b6f0b3af83a4706744a19c0d742904) )
+	ROM_LOAD( "5.10d", 0x040000, 0x20000, CRC(c2eb8ced) SHA1(d58ef5f7d47da4624595058c23e949e193ced40a) )
+	ROM_LOAD( "6.10e", 0x060000, 0x20000, CRC(36106de2) SHA1(15f2957c3e83d05b5706a0b98068a3d0d8d57ae9) )
+	ROM_LOAD( "7.10h", 0x080000, 0x20000, CRC(0bb99a3a) SHA1(1c896f50f74a52fcf96a40ca536502908bab85c9) )
+	ROM_LOAD( "8.10j", 0x0a0000, 0x20000, CRC(23fad43a) SHA1(7276b92623dc4559e62d2f4742c8a68233c1dfe5) )
+	ROM_LOAD( "9.10k", 0x0c0000, 0x10000, CRC(c995c1da) SHA1(c8a1f4919296221c375763b0d9838f31ed53135d) )
+ROM_END
+
+
+
 
 //     YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT, MONITOR,COMPANY,FULLNAME,FLAGS)
 GAME( 1988, msjiken,   0,        msjiken,  msjiken,  msjiken,  ROT270, "Nichibutsu", "Mahjong Satsujin Jiken (Japan 881017)", 0 )
@@ -3874,6 +4009,8 @@ GAME( 1990, mladyhtr,  0,        mjnanpas, mladyhtr, mladyhtr, ROT0,   "Nichibut
 GAME( 1990, chinmoku,  0,        mjnanpas, chinmoku, chinmoku, ROT0,   "Nichibutsu", "Mahjong Chinmoku no Hentai (Japan 900511)", 0 )
 GAME( 1990, maiko,     0,        maiko,    maiko,    maiko,    ROT0,   "Nichibutsu", "Maikobana (Japan 900802)", 0 )
 GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   mmaiko,   ROT0,   "Nichibutsu", "Maikobana [BET] (Japan 900911)", 0 )
+GAME( 1990, hnxmasev,  0,   	 hnxmasev, maiko,    maiko,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Christmas Eve (Japan 901204)", GAME_NOT_WORKING )
+GAME( 1990, hnageman,  0,   	 hnageman, maiko,    maiko,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Ageman (Japan 900716)", GAME_NOT_WORKING )
 GAME( 1990, club90s,   0,        mjnanpas, club90s,  club90s,  ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", 0 )
 GAME( 1990, club90sa,  club90s,  mjnanpas, club90s,  club90s,  ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 2) (Japan 900919)", 0 )
 GAME( 1990, lovehous,  club90s,  lovehous, lovehous, lovehous, ROT0,   "Nichibutsu", "Mahjong Love House [BET] (Japan 901024)", 0 )

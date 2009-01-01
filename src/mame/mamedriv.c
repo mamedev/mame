@@ -491,6 +491,8 @@ const game_driver * const drivers[] =
 	DRIVER( chinmoku )	/* (c) 1990 */
 	DRIVER( maiko )		/* (c) 1990 */
 	DRIVER( mmaiko )	/* (c) 1990 */
+	DRIVER( hnageman )	/* (c) 1990 Nichibutsu/AV Japan */
+	DRIVER( hnxmasev )	/* (c) 1990 Nichibutsu/AV Japan */
 	DRIVER( club90s )	/* (c) 1990 */
 	DRIVER( club90sa )	/* (c) 1990 */
 	DRIVER( lovehous )	/* (c) 1990 */
