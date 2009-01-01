@@ -16,7 +16,7 @@
         * TX-1 tyre screech noises are not implemented yet.
         * 'buggyboy' set is using ROMs from 'buggybjr' for testing purposes
         until the original set can be dumped.
-
+							
 ****************************************************************************
 
     Buggy Boy Error Codes          TX-1 Error Codes
@@ -177,6 +177,7 @@ static INPUT_PORTS_START( tx1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
 
 	PORT_START("PPI_PORTD")
 	/* Wire jumper setting on sound PCB */
@@ -282,7 +283,7 @@ static INPUT_PORTS_START( buggyboy )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
 	PORT_START("PPI_PORTC")
-	PORT_DIPNAME( 0xff, 0x80, "Sound PCB Jumper:" )
+	PORT_DIPNAME( 0xff, 0x80, "Sound PCB Jumper" )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -367,7 +368,7 @@ static INPUT_PORTS_START( buggybjr )
 
 	/* Wire jumper setting on sound PCB */
 	PORT_START("YM2149_IC19_B")
-	PORT_DIPNAME( 0xff, 0x80, "Sound PCB Jumper:" )
+	PORT_DIPNAME( 0xff, 0x80, "Sound PCB Jumper" )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -409,10 +410,19 @@ static READ8_HANDLER( ts_r )
 	return z80_ram[offset];
 }
 
-static WRITE8_DEVICE_HANDLER( tx1_coin_cnt )
+
+static WRITE8_DEVICE_HANDLER( tx1_coin_cnt_w )
 {
 	coin_counter_w(0, data & 0x80);
 	coin_counter_w(1, data & 0x40);
+//	coin_counter_w(2, data & 0x40);
+}
+
+static WRITE8_DEVICE_HANDLER( bb_coin_cnt_w )
+{
+	coin_counter_w(0, data & 0x01);
+	coin_counter_w(1, data & 0x02);
+//	coin_counter_w(2, data & 0x04);
 }
 
 static WRITE8_HANDLER( tx1_ppi_latch_w )
@@ -431,18 +441,27 @@ static READ8_DEVICE_HANDLER( tx1_ppi_portb_r )
 	return input_port_read(device->machine, "PPI_PORTD") | tx1_ppi_latch_b;
 }
 
-/* TODO */
+
+static UINT8 bit_reverse8(UINT8 val)
+{
+	val = ((val & 0xF0) >>  4) | ((val & 0x0F) <<  4);
+	val = ((val & 0xCC) >>  2) | ((val & 0x33) <<  2);
+	val = ((val & 0xAA) >>  1) | ((val & 0x55) <<  1);
+
+	return val;
+}
+
 static READ8_HANDLER( bb_analog_r )
 {
-	if ( offset == 1 )
-		return ((input_port_read(space->machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(space->machine, "AN_STEERING");
+	if (offset == 0)
+		return bit_reverse8(((input_port_read(space->machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(space->machine, "AN_STEERING"));
 	else
-		return (input_port_read(space->machine, "AN_BRAKE") & 0xf) << 4;
+		return bit_reverse8((input_port_read(space->machine, "AN_BRAKE") & 0xf) << 4);
 }
 
 static READ8_HANDLER( bbjr_analog_r )
 {
-	if ( offset == 0 )
+	if (offset == 0)
 		return ((input_port_read(space->machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(space->machine, "AN_STEERING");
 	else
 		return (input_port_read(space->machine, "AN_BRAKE") & 0xf) << 4;
@@ -462,8 +481,8 @@ static const ppi8255_interface buggyboy_ppi8255_intf =
 	NULL,
 	DEVICE8_PORT("PPI_PORTC"),
 	NULL,
+	bb_coin_cnt_w,
 	NULL,
-	NULL
 };
 
 
@@ -474,7 +493,7 @@ static const ppi8255_interface tx1_ppi8255_intf =
 	DEVICE8_PORT("PPI_PORTC"),
 	NULL,
 	NULL,
-	tx1_coin_cnt
+	tx1_coin_cnt_w
 };
 
 
@@ -588,7 +607,7 @@ static ADDRESS_MAP_START( buggyboy_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&z80_ram)
 	AM_RANGE(0x6000, 0x6001) AM_READ(bb_analog_r)
 	AM_RANGE(0x6800, 0x6803) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x7000, 0x7003) AM_RAM
+	AM_RANGE(0x7000, 0x7003) AM_READWRITE(tx1_pit8253_r, tx1_pit8253_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(z80_intreq_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(ts_r, ts_w)
 ADDRESS_MAP_END
@@ -630,8 +649,29 @@ static const ay8910_interface tx1_ay8910_interface =
 };
 
 
-/* YM2149 IC19 */
 static const ay8910_interface buggyboy_ym2149_interface_1 =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
+	bb_ym1_a_w,
+	NULL,
+};
+
+static const ay8910_interface buggyboy_ym2149_interface_2 =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
+	bb_ym2_a_w,
+	bb_ym2_b_w,
+};
+
+
+/* YM2149 IC19 */
+static const ay8910_interface buggybjr_ym2149_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -642,14 +682,14 @@ static const ay8910_interface buggyboy_ym2149_interface_1 =
 };
 
 /* YM2149 IC24 */
-static const ay8910_interface buggyboy_ym2149_interface_2 =
+static const ay8910_interface buggybjr_ym2149_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	NULL,
 	NULL,
-	bb_ym1_a_w,
-	bb_ym1_b_w,
+	bb_ym2_a_w,
+	bb_ym2_b_w,
 };
 
 static const custom_sound_interface tx1_custom_interface =
@@ -674,11 +714,11 @@ static const custom_sound_interface bb_custom_interface =
  *************************************/
 
 static MACHINE_DRIVER_START( tx1 )
-	MDRV_CPU_ADD("main", I8086, 5000000)
+	MDRV_CPU_ADD("main", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(tx1_main, 0)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
-	MDRV_CPU_ADD("math", I8086,5000000)
+	MDRV_CPU_ADD("math", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(tx1_math, 0)
 
 	MDRV_CPU_ADD("audio", Z80, TX1_PIXEL_CLOCK / 2)
@@ -729,11 +769,11 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( buggyboy )
-	MDRV_CPU_ADD("main", I8086/*BUGGYBOY_CPU_TYPE*/, 5000000)
+	MDRV_CPU_ADD("main", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_main, 0)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
-	MDRV_CPU_ADD("math", I8086/*BUGGYBOY_CPU_TYPE*/, 5000000)
+	MDRV_CPU_ADD("math", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_math, 0)
 
 	MDRV_CPU_ADD("audio", Z80, BUGGYBOY_ZCLK / 2)
@@ -785,11 +825,11 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( buggybjr )
-	MDRV_CPU_ADD("main", I8086/*BUGGYBOY_CPU_TYPE*/, 5000000)
+	MDRV_CPU_ADD("main", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggybjr_main, 0)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
-	MDRV_CPU_ADD("math", I8086/*BUGGYBOY_CPU_TYPE*/, 5000000)
+	MDRV_CPU_ADD("math", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_math, 0)
 
 	MDRV_CPU_ADD("audio", Z80, BUGGYBOY_ZCLK / 2)
@@ -822,11 +862,11 @@ static MACHINE_DRIVER_START( buggybjr )
 //  MDRV_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MDRV_SOUND_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
-	MDRV_SOUND_CONFIG(buggyboy_ym2149_interface_1)
+	MDRV_SOUND_CONFIG(buggybjr_ym2149_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
 
 	MDRV_SOUND_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4)
-	MDRV_SOUND_CONFIG(buggyboy_ym2149_interface_2)
+	MDRV_SOUND_CONFIG(buggybjr_ym2149_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
 	MDRV_SOUND_ADD("buggyboy", CUSTOM, 0)
@@ -1103,7 +1143,7 @@ ROM_START( buggybjr )
 	ROM_LOAD( "bug13.32",   0x0000, 0x2000, CRC(53604d7a) SHA1(bfa304cd885162ece7a5f54988d9880fc541eb3a) )
 	ROM_LOAD( "bug18s.141", 0x2000, 0x4000, CRC(67786327) SHA1(32cc1f5bc654497c968ddcd4af29720c6d659482) )
 
-    /* PROM's located on the video board */
+	/* PROMs located on the video board */
 	ROM_REGION( 0x10000, "proms", 0 )
 	/* RGBI */
 	ROM_LOAD( "bb10.41", 0x000, 0x100, CRC(f2368398) SHA1(53f28dba11bb494d033bb279abf138975c84b20d) )
@@ -1124,26 +1164,26 @@ ROM_START( buggybjr )
 	/* Road */
 	ROM_LOAD( "bb7.188", 0x1500, 0x100, CRC(b57b609f) SHA1(2dea375437c62cb4c64b21d5e6ddc09397b6ab35) )
 
-    /* PAL's located on the sound board */
-    ROM_REGION( 0x00001, "pals_soundbd", 0 )
-    ROM_LOAD( "pal10l8cn.ic16", 0x00000, 0x00001, NO_DUMP )
+	/* PALs located on the sound board */
+	ROM_REGION( 0x00001, "pals_soundbd", 0 )
+	ROM_LOAD( "pal10l8cn.ic16", 0x00000, 0x00001, NO_DUMP )
 
-    /* PAL's located on the video board */
-    ROM_REGION( 0x00002, "pals_vidbd", 0 )
-    ROM_LOAD( "pal10h8cn.ic82", 0x00000, 0x00001, NO_DUMP )
-    ROM_LOAD( "pal14h4cn.ic83", 0x00000, 0x00001, NO_DUMP )
+	/* PALs located on the video board */
+	ROM_REGION( 0x00002, "pals_vidbd", 0 )
+	ROM_LOAD( "pal10h8cn.ic82", 0x00000, 0x00001, NO_DUMP )
+	ROM_LOAD( "pal14h4cn.ic83", 0x00000, 0x00001, NO_DUMP )
 
-    /* PAL's located on the cpu board */
-    ROM_REGION( 0x00009, "pals_cpubd", 0 )
-    ROM_LOAD( "pal16r4a-2cn.ic83", 0x00000, 0x00001, NO_DUMP )
-    ROM_LOAD( "pal12l6cn.ic87",    0x00000, 0x00001, NO_DUMP )
-    ROM_LOAD( "pal10l8cn.ic88",    0x00000, 0x00001, NO_DUMP )
-    ROM_LOAD( "pal14h4cn.ic149",   0x00000, 0x00001, NO_DUMP )
-    ROM_LOAD( "pal16l8cj.ic150",   0x00000, 0x00001, NO_DUMP )
-    ROM_LOAD( "pal14l4cn.ic151",   0x00000, 0x00001, NO_DUMP )
-    ROM_LOAD( "pal14l4cn.ic167",   0x00000, 0x00001, NO_DUMP )
-    ROM_LOAD( "pal14h4cn.ic229",   0x00000, 0x00001, NO_DUMP )
-    ROM_LOAD( "pal14h4cn.ic230",   0x00000, 0x00001, NO_DUMP )
+	/* PALs located on the cpu board */
+	ROM_REGION( 0x00009, "pals_cpubd", 0 )
+	ROM_LOAD( "pal16r4a-2cn.ic83", 0x00000, 0x00001, NO_DUMP )
+	ROM_LOAD( "pal12l6cn.ic87",    0x00000, 0x00001, NO_DUMP )
+	ROM_LOAD( "pal10l8cn.ic88",    0x00000, 0x00001, NO_DUMP )
+	ROM_LOAD( "pal14h4cn.ic149",   0x00000, 0x00001, NO_DUMP )
+	ROM_LOAD( "pal16l8cj.ic150",   0x00000, 0x00001, NO_DUMP )
+	ROM_LOAD( "pal14l4cn.ic151",   0x00000, 0x00001, NO_DUMP )
+	ROM_LOAD( "pal14l4cn.ic167",   0x00000, 0x00001, NO_DUMP )
+	ROM_LOAD( "pal14h4cn.ic229",   0x00000, 0x00001, NO_DUMP )
+	ROM_LOAD( "pal14h4cn.ic230",   0x00000, 0x00001, NO_DUMP )
 ROM_END
 
 

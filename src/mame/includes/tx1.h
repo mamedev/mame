@@ -6,7 +6,7 @@
 #include "machine/8255ppi.h"
 #include "sound/custom.h"
 
-#define TX1_PIXEL_CLOCK		6000000
+#define TX1_PIXEL_CLOCK		(XTAL_18MHz / 3)
 #define TX1_HBSTART			256
 #define TX1_HBEND			0
 #define TX1_HTOTAL			384
@@ -14,7 +14,7 @@
 #define TX1_VBEND			0
 #define TX1_VTOTAL			264
 
-#define BB_PIXEL_CLOCK		6000000
+#define BB_PIXEL_CLOCK		(XTAL_18MHz / 3)
 #define BB_HBSTART			256
 #define BB_HBEND			0
 #define BB_HTOTAL			384
@@ -22,9 +22,8 @@
 #define BB_VBEND			0
 #define BB_VTOTAL			288
 
-/* Buggy Boy PCBs could use 8086s or V30s */
-#define BUGGYBOY_CPU_TYPE	I8086
-#define BUGGYBOY_ZCLK		7500000
+#define CPU_MASTER_CLOCK	(XTAL_15MHz)
+#define BUGGYBOY_ZCLK		(CPU_MASTER_CLOCK / 2)
 
 
 /*----------- defined in drivers/tx1.c -----------*/
@@ -55,7 +54,8 @@ READ8_HANDLER( tx1_pit8253_r );
 WRITE8_HANDLER( tx1_pit8253_w );
 
 WRITE8_HANDLER( bb_ym1_a_w );
-WRITE8_HANDLER( bb_ym1_b_w );
+WRITE8_HANDLER( bb_ym2_a_w );
+WRITE8_HANDLER( bb_ym2_b_w );
 CUSTOM_START( buggyboy_sh_start );
 CUSTOM_RESET( buggyboy_sh_reset );
 
