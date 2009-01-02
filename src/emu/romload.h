@@ -271,25 +271,61 @@ struct _rom_entry
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* disk handling */
+
+/* ----- ROM processing ----- */
+
+/* load the ROMs and open the disk  images associated with the given machine */
+void rom_init(running_machine *machine);
+
+/* return the number of warnings we generated */
+int rom_load_warnings(void);
+
+
+
+/* ----- ROM iteration ----- */
+
+/* return pointer to first ROM source */
+const rom_source *rom_first_source(const game_driver *drv, const machine_config *config);
+
+/* return pointer to next ROM source */
+const rom_source *rom_next_source(const game_driver *drv, const machine_config *config, const rom_source *previous);
+
+/* return pointer to the first ROM region within a source */
+const rom_entry *rom_first_region(const game_driver *drv, const rom_source *romp);
+
+/* return pointer to the next ROM region within a source */
+const rom_entry *rom_next_region(const rom_entry *romp);
+
+/* return pointer to the first ROM file within a region */
+const rom_entry *rom_first_file(const rom_entry *romp);
+
+/* return pointer to the next ROM file within a region */
+const rom_entry *rom_next_file(const rom_entry *romp);
+
+/* return TRUE if the given rom_source refers to the game driver itself */
+int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source);
+
+/* return the expected size of a file given the ROM description */
+UINT32 rom_file_size(const rom_entry *romp);
+
+/* return the appropriate name for a rom region */
+astring *rom_region_name(astring *result, const game_driver *drv, const rom_source *source, const rom_entry *romp);
+
+
+
+/* ----- disk handling ----- */
+
+/* open a disk image, searching up the parent and loading by checksum */
 chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd);
+
+/* open a disk image, searching up the parent and loading by checksum */
 chd_error open_disk_image_options(core_options *options, const game_driver *gamedrv, const rom_entry *romp, mame_file **image_file, chd_file **image_chd);
+
+/* return a pointer to the CHD file associated with the given region */
 chd_file *get_disk_handle(const char *region);
+
+/* set a pointer to the CHD file associated with the given region */
 void set_disk_handle(const char *region, mame_file *file, chd_file *chd);
 
-/* ROM processing */
-void rom_init(running_machine *machine);
-int rom_load_warnings(void);
-const rom_source *rom_first_source(const game_driver *drv, const machine_config *config);
-const rom_source *rom_next_source(const game_driver *drv, const machine_config *config, const rom_source *previous);
-const rom_entry *rom_first_region(const game_driver *drv, const rom_source *romp);
-const rom_entry *rom_next_region(const rom_entry *romp);
-const rom_entry *rom_first_file(const rom_entry *romp);
-const rom_entry *rom_next_file(const rom_entry *romp);
-const rom_entry *rom_first_chunk(const rom_entry *romp);
-const rom_entry *rom_next_chunk(const rom_entry *romp);
-
-int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source);
-astring *rom_region_name(astring *result, const game_driver *drv, const rom_source *source, const rom_entry *romp);
 
 #endif	/* __ROMLOAD_H__ */

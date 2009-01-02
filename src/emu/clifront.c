@@ -534,7 +534,7 @@ int cli_info_listroms(core_options *options, const char *gamename)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
-			const rom_entry *region, *rom, *chunk;
+			const rom_entry *region, *rom;
 			const rom_source *source;
 
 			/* print the header */
@@ -555,11 +555,7 @@ int cli_info_listroms(core_options *options, const char *gamename)
 
 						/* accumulate the total length of all chunks */
 						if (ROMREGION_ISROMDATA(region))
-						{
-							length = 0;
-							for (chunk = rom_first_chunk(rom); chunk; chunk = rom_next_chunk(chunk))
-								length += ROM_GETLENGTH(chunk);
-						}
+							length = rom_file_size(rom);
 
 						/* start with the name */
 						mame_printf_info("%-12s ", name);

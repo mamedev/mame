@@ -386,18 +386,11 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 					const char *name = ROM_GETNAME(rom);
 					int offset = ROM_GETOFFSET(rom);
 					const rom_entry *parent_rom = NULL;
-					const rom_entry *chunk;
 					char bios_name[100];
-					int length;
 
 					/* BIOS ROMs only apply to bioses */
 					if ((is_bios && rom_type != 0) || (!is_bios && rom_type == 0))
 						continue;
-
-					/* compute the total length of all chunks */
-					length = 0;
-					for (chunk = rom_first_chunk(rom); chunk; chunk = rom_next_chunk(chunk))
-						length += ROM_GETLENGTH(chunk);
 
 					/* if we have a valid ROM and we are a clone, see if we can find the parent ROM */
 					if (!ROM_NOGOODDUMP(rom) && clone_of != NULL)
@@ -443,7 +436,7 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 					if (bios_name[0] != 0)
 						fprintf(out, " bios=\"%s\"", xml_normalize_string(bios_name));
 					if (!is_disk)
-						fprintf(out, " size=\"%d\"", length);
+						fprintf(out, " size=\"%d\"", rom_file_size(rom));
 
 					/* dump checksum information only if there is a known dump */
 					if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))

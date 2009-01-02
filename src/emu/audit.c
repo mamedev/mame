@@ -329,7 +329,6 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 static int audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record)
 {
 	const game_driver *drv;
-	const rom_entry *chunk;
 	UINT32 crc = 0;
 	UINT8 crcs[4];
 	int has_crc;
@@ -339,10 +338,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 	record->name = ROM_GETNAME(rom);
 	record->exphash = ROM_GETHASHDATA(rom);
 	record->length = 0;
-
-	/* compute the expected length by summing the chunks */
-	for (chunk = rom_first_chunk(rom); chunk; chunk = rom_next_chunk(chunk))
-		record->explength += ROM_GETLENGTH(chunk);
+	record->explength = rom_file_size(rom);
 
 	/* see if we have a CRC and extract it if so */
 	has_crc = hash_data_extract_binary_checksum(record->exphash, HASH_CRC, crcs);
