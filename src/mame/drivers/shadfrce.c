@@ -287,7 +287,8 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 		if (scanline == raster_scanline)
 		{
 			raster_scanline = (raster_scanline + 1) % 240;
-			video_screen_update_partial(timer->machine->primary_screen, raster_scanline - 1);
+			if (raster_scanline > 0)
+				video_screen_update_partial(timer->machine->primary_screen, raster_scanline - 1);
 			cpu_set_input_line(timer->machine->cpu[0], 1, ASSERT_LINE);
 		}
 	}
@@ -297,7 +298,8 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 	{
 		if (scanline % 16 == 0)
 		{
-			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
+			if (scanline > 0)
+				video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
 			cpu_set_input_line(timer->machine->cpu[0], 2, ASSERT_LINE);
 		}
 	}
