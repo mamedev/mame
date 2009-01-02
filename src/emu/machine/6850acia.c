@@ -215,8 +215,8 @@ static DEVICE_START( acia6850 )
 	acia6850_t *acia_p = get_token(device);
 	acia6850_interface *intf = get_interface(device);
 
-	acia_p->tx_clock = device->clock;
-	acia_p->rx_clock = (intf->rx_clock == 0) ? device->clock : intf->rx_clock;
+	acia_p->rx_clock = intf->rx_clock;
+	acia_p->tx_clock = intf->tx_clock;
 	acia_p->tx_counter = 0;
 	acia_p->rx_counter = 0;
 	acia_p->rx_pin = intf->rx_pin;
