@@ -1051,7 +1051,10 @@ astring *game_info_astring(running_machine *machine, astring *string)
 			const screen_config *scrconfig = screen->inline_config;
 
 			if (scrcount > 1)
+			{
 				astring_catc(string, slider_get_screen_desc(screen));
+				astring_catc(string, ": ");
+			}
 
 			if (scrconfig->type == SCREEN_TYPE_VECTOR)
 				astring_catc(string, "Vector\n");
