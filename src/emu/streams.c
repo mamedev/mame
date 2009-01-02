@@ -45,6 +45,7 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "profiler.h"
 
 
 
@@ -473,9 +474,11 @@ void stream_update(sound_stream *stream)
 	INT32 update_sampindex = time_to_sampindex(strdata, stream, timer_get_time(machine));
 
 	/* generate samples to get us up to the appropriate time */
+	profiler_mark(PROFILER_SOUND);
 	assert(stream->output_sampindex - stream->output_base_sampindex >= 0);
 	assert(update_sampindex - stream->output_base_sampindex <= stream->output_bufalloc);
 	generate_samples(stream, update_sampindex - stream->output_sampindex);
+	profiler_mark(PROFILER_END);
 
 	/* remember this info for next time */
 	stream->output_sampindex = update_sampindex;

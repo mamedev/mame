@@ -14,192 +14,195 @@
 #include "profiler.h"
 
 
-/* in usrintf.c */
-static int use_profiler;
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-#define MEMORY 6
-
-typedef struct _profile_data profile_data;
-struct _profile_data
+typedef struct _profile_string profile_string;
+struct _profile_string
 {
-	UINT64 count[MEMORY][PROFILER_TOTAL];
-	unsigned int cpu_context_switches[MEMORY];
+	int 		type;
+	const char *string;
 };
 
-static profile_data profile;
-static int memory;
 
 
-static int FILO_type[10];
-static osd_ticks_t FILO_start[10];
-static int FILO_length;
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
 
-void profiler_start(void)
+profiler_state global_profiler;
+
+
+
+/***************************************************************************
+    CORE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    _profiler_mark - mark the beginning/end of a 
+    profiler entry
+-------------------------------------------------*/
+
+void _profiler_mark(int type)
 {
-	use_profiler = 1;
-	FILO_length = 0;
-}
+	profiler_data *data = &global_profiler.data[global_profiler.dataindex];
+	osd_ticks_t curticks = osd_profiling_ticks();
 
-void profiler_stop(void)
-{
-	use_profiler = 0;
-}
+	/* track context switches */
+	if (type >= PROFILER_CPU_FIRST && type <= PROFILER_CPU_MAX)
+		data->context_switches++;
 
-void profiler_mark(int type)
-{
-	osd_ticks_t curr_ticks;
-
-
-	if (!use_profiler)
-	{
-		FILO_length = 0;
-		return;
-	}
-
-	if (type >= PROFILER_CPU1 && type <= PROFILER_CPU8)
-		profile.cpu_context_switches[memory]++;
-
-	curr_ticks = osd_profiling_ticks();
-
+	/* if we're starting a new bucket, begin now */
 	if (type != PROFILER_END)
 	{
-		if (FILO_length > 0)
-		{
-			if (FILO_length >= 10)
-			{
-logerror("Profiler error: FILO buffer overflow\n");
-				return;
-			}
+		int index = global_profiler.filoindex++;
+		profiler_filo_entry *entry = &global_profiler.filo[index];
 
-			/* handle nested calls */
-			profile.count[memory][FILO_type[FILO_length-1]] += curr_ticks - FILO_start[FILO_length-1];
+		/* fail if we overflow */
+		if (index > ARRAY_LENGTH(global_profiler.filo))
+			fatalerror("Profiler FILO overflow\n");
+
+		/* if we're nested, stop the previous entry */
+		if (index > 0)
+		{
+			profiler_filo_entry *preventry = entry - 1;
+			data->duration[preventry->type] += curticks - preventry->start;
 		}
-		FILO_type[FILO_length] = type;
-		FILO_start[FILO_length] = curr_ticks;
-		FILO_length++;
+		
+		/* fill in this entry */
+		entry->type = type;
+		entry->start = curticks;
 	}
-	else
+	
+	/* if we're ending an existing bucket, update the time */
+	else if (global_profiler.filoindex > 0)
 	{
-		if (FILO_length <= 0)
+		int index = --global_profiler.filoindex;
+		profiler_filo_entry *entry = &global_profiler.filo[index];
+		
+		/* account for the time taken */
+		data->duration[entry->type] += curticks - entry->start;
+		
+		/* if we have a previous entry, restart his time now */
+		if (index != 0)
 		{
-logerror("Profiler error: FILO buffer underflow\n");
-			return;
-		}
-
-		FILO_length--;
-		profile.count[memory][FILO_type[FILO_length]] += curr_ticks - FILO_start[FILO_length];
-		if (FILO_length > 0)
-		{
-			/* handle nested calls */
-			FILO_start[FILO_length-1] = curr_ticks;
+			profiler_filo_entry *preventry = entry - 1;
+			preventry->start = curticks;
 		}
 	}
 }
 
-const char *profiler_get_text(running_machine *machine)
+
+/*-------------------------------------------------
+    _profiler_get_text - return the current text 
+    in an astring
+-------------------------------------------------*/
+
+astring *_profiler_get_text(running_machine *machine, astring *string)
 {
-	int i,j;
-	UINT64 total,normalize;
-	UINT64 computed;
-	static const char *const names[PROFILER_TOTAL] =
+	static const profile_string names[] =
 	{
-		"CPU 1  ",
-		"CPU 2  ",
-		"CPU 3  ",
-		"CPU 4  ",
-		"CPU 5  ",
-		"CPU 6  ",
-		"CPU 7  ",
-		"CPU 8  ",
-		"Mem rd ",
-		"Mem wr ",
-		"Video  ",
-		"drawgfx",
-		"copybmp",
-		"tmdraw ",
-		"tmdrroz",
-		"tmupdat",
-		"Artwork",
-		"Blit   ",
-		"Sound  ",
-		"Mixer  ",
-		"Callbck",
-		"Input  ",
-		"Movie  ",
-		"Logerr ",
-		"Extra  ",
-		"User1  ",
-		"User2  ",
-		"User3  ",
-		"User4  ",
-		"Profilr",
-		"Idle   ",
+		{ PROFILER_MEMREAD,          "Memory Read" },
+		{ PROFILER_MEMWRITE,         "Memory Write" },
+		{ PROFILER_VIDEO,            "Video Update" },
+		{ PROFILER_DRAWGFX,          "drawgfx" },
+		{ PROFILER_COPYBITMAP,       "copybitmap" },
+		{ PROFILER_TILEMAP_DRAW,     "Tilemap Draw" },
+		{ PROFILER_TILEMAP_DRAW_ROZ, "Tilemap ROZ Draw" },
+		{ PROFILER_TILEMAP_UPDATE,   "Tilemap Update" },
+		{ PROFILER_BLIT,             "OSD Blitting" },
+		{ PROFILER_SOUND,            "Sound Generation" },
+		{ PROFILER_TIMER_CALLBACK,   "Timer Callbacks" },
+		{ PROFILER_INPUT,            "Input Processing" },
+		{ PROFILER_MOVIE_REC,        "Movie Recording" },
+		{ PROFILER_LOGERROR,         "Error Logging" },
+		{ PROFILER_EXTRA,            "Unaccounted/Overhead" },
+		{ PROFILER_USER1,            "User 1" },
+		{ PROFILER_USER2,            "User 2" },
+		{ PROFILER_USER3,            "User 3" },
+		{ PROFILER_USER4,            "User 4" },
+		{ PROFILER_PROFILER,         "Profiler" },
+		{ PROFILER_IDLE,             "Idle" }
 	};
-	static int showdelay[PROFILER_TOTAL];
-	static char buf[50*40];
-	char *bufptr = buf;
-
-
-	if (!use_profiler) return "";
+	UINT64 computed, normalize, total;
+	int curtype, curmem, switches;
 
 	profiler_mark(PROFILER_PROFILER);
-
+	
+	/* compute the total time for all bits, not including profiler or idle */
 	computed = 0;
-	i = 0;
-	while (i < PROFILER_PROFILER)
-	{
-		for (j = 0;j < MEMORY;j++)
-			computed += profile.count[j][i];
-		i++;
-	}
+	for (curtype = 0; curtype < PROFILER_PROFILER; curtype++)
+		for (curmem = 0; curmem < ARRAY_LENGTH(global_profiler.data); curmem++)
+			computed += global_profiler.data[curmem].duration[curtype];
+	
+	/* save that result in normalize, and continue adding the rest */
 	normalize = computed;
-	while (i < PROFILER_TOTAL)
-	{
-		for (j = 0;j < MEMORY;j++)
-			computed += profile.count[j][i];
-		i++;
-	}
+	for ( ; curtype < PROFILER_TOTAL; curtype++)
+		for (curmem = 0; curmem < ARRAY_LENGTH(global_profiler.data); curmem++)
+			computed += global_profiler.data[curmem].duration[curtype];
+
+	/* this becomes the total; if we end up with 0 for anything, we were just started, so return empty */
 	total = computed;
+	astring_reset(string);
+	if (total == 0 || normalize == 0)
+		return string;
 
-	if (total == 0 || normalize == 0) return "";	/* we have been just reset */
-
-	for (i = 0;i < PROFILER_TOTAL;i++)
+	/* loop over all types and generate the string */
+	for (curtype = 0; curtype < PROFILER_TOTAL; curtype++)
 	{
+		/* determine the accumulated time for this type */
 		computed = 0;
-		{
-			for (j = 0;j < MEMORY;j++)
-				computed += profile.count[j][i];
-		}
-		if (computed || showdelay[i])
-		{
-			if (computed) showdelay[i] = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds);
-			showdelay[i]--;
+		for (curmem = 0; curmem < ARRAY_LENGTH(global_profiler.data); curmem++)
+			computed += global_profiler.data[curmem].duration[curtype];
 
-			if (i < PROFILER_PROFILER)
-				bufptr += sprintf(bufptr,"%02d%% %02d%% %s\n",
-						(int)((computed * 100 + total/2) / total),
-						(int)((computed * 100 + normalize/2) / normalize),
-						names[i]);
+		/* if we have non-zero data and we're ready to display, do it */
+		if (global_profiler.dataready && computed != 0)
+		{
+			int nameindex;
+			
+			/* start with the un-normalized percentage */
+			astring_catprintf(string, "%02d%% ", (int)((computed * 100 + total/2) / total));
+			
+			/* followed by the normalized percentage for everything but profiler and idle */
+			if (curtype < PROFILER_PROFILER)
+				astring_catprintf(string, "%02d%% ", (int)((computed * 100 + normalize/2) / normalize));
+			
+			/* and then the text */
+			if (curtype >= PROFILER_CPU_FIRST && curtype <= PROFILER_CPU_MAX)
+				astring_catprintf(string, "CPU '%s'", device_list_find_by_index(machine->config->devicelist, CPU, curtype - PROFILER_CPU_FIRST)->tag);
 			else
-				bufptr += sprintf(bufptr,"%02d%% %s\n",
-						(int)((computed * 100 + total/2) / total),
-						names[i]);
+				for (nameindex = 0; nameindex < ARRAY_LENGTH(names); nameindex++)
+					if (names[nameindex].type == curtype)
+					{
+						astring_catc(string, names[nameindex].string);
+						break;
+					}
+			
+			/* followed by a carriage return */
+			astring_catc(string, "\n");
 		}
 	}
 
-	i = 0;
-	for (j = 0;j < MEMORY;j++)
-		i += profile.cpu_context_switches[j];
-	bufptr += sprintf(bufptr,"%4d CPU switches\n",i / MEMORY);
-
-	/* reset the counters */
-	memory = (memory + 1) % MEMORY;
-	profile.cpu_context_switches[memory] = 0;
-	for (i = 0;i < PROFILER_TOTAL;i++)
-		profile.count[memory][i] = 0;
+	/* followed by context switches */
+	if (global_profiler.dataready)
+	{
+		switches = 0;
+		for (curmem = 0; curmem < ARRAY_LENGTH(global_profiler.data); curmem++)
+			switches += global_profiler.data[curmem].context_switches;
+		astring_catprintf(string, "%d CPU switches\n", switches / ARRAY_LENGTH(global_profiler.data));
+	}
 
 	profiler_mark(PROFILER_END);
 
-	return buf;
+	/* advance to the next dataset and reset it to 0 */
+	global_profiler.dataindex = (global_profiler.dataindex + 1) % ARRAY_LENGTH(global_profiler.data);
+	memset(&global_profiler.data[global_profiler.dataindex], 0, sizeof(global_profiler.data[global_profiler.dataindex]));
+
+	/* we are ready once we have wrapped around */
+	if (global_profiler.dataindex == 0)
+		global_profiler.dataready = TRUE;
+
+	return string;
 }

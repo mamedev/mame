@@ -484,7 +484,7 @@ static DEVICE_START( cpu )
 	/* fill in the suspend states */
 	classdata->device = device;
 	classdata->execute = (cpu_execute_func)device_get_info_fct(device, CPUINFO_FCT_EXECUTE);
-	classdata->profiler = index + PROFILER_CPU1;
+	classdata->profiler = index + PROFILER_CPU_FIRST;
 	classdata->suspend = SUSPEND_REASON_RESET;
 	classdata->inttrigger = index + TRIGGER_INT;
 

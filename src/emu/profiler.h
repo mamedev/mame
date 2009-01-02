@@ -7,6 +7,16 @@
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
+****************************************************************************
+
+	To start profiling a certain section, e.g. video:
+	profiler_mark(PROFILER_VIDEO);
+
+	to end profiling the current section:
+	profiler_mark(PROFILER_END);
+
+	the profiler handles a FILO list so calls may be nested.
+	
 ***************************************************************************/
 
 #pragma once
@@ -14,18 +24,19 @@
 #ifndef __PROFILER_H__
 #define __PROFILER_H__
 
+#include "astring.h"
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
 /* profiling */
 enum
 {
 	PROFILER_END = -1,
-	PROFILER_CPU1 = 0,
-	PROFILER_CPU2,
-	PROFILER_CPU3,
-	PROFILER_CPU4,
-	PROFILER_CPU5,
-	PROFILER_CPU6,
-	PROFILER_CPU7,
-	PROFILER_CPU8,
+	PROFILER_CPU_FIRST = 0,
+	PROFILER_CPU_MAX = PROFILER_CPU_FIRST + 32,
 	PROFILER_MEMREAD,
 	PROFILER_MEMWRITE,
 	PROFILER_VIDEO,
@@ -34,10 +45,8 @@ enum
 	PROFILER_TILEMAP_DRAW,
 	PROFILER_TILEMAP_DRAW_ROZ,
 	PROFILER_TILEMAP_UPDATE,
-	PROFILER_ARTWORK,
 	PROFILER_BLIT,
 	PROFILER_SOUND,
-	PROFILER_MIXER,
 	PROFILER_TIMER_CALLBACK,
 	PROFILER_INPUT,		/* input.c and inptport.c */
 	PROFILER_MOVIE_REC,	/* movie recording */
@@ -57,30 +66,82 @@ enum
 };
 
 
-/*
-To start profiling a certain section, e.g. video:
-profiler_mark(PROFILER_VIDEO);
 
-to end profiling the current section:
-profiler_mark(PROFILER_END);
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-the profiler handles a FILO list so calls may be nested.
-*/
+typedef struct _profiler_filo_entry profiler_filo_entry;
+struct _profiler_filo_entry
+{
+	int				type;				/* type of entry */
+	osd_ticks_t		start;				/* start time */
+};
+
+
+typedef struct _profiler_data profiler_data;
+struct _profiler_data
+{
+	UINT32			context_switches;	/* number of context switches seen */
+	osd_ticks_t		duration[PROFILER_TOTAL]; /* duration spent in each entry */
+};
+
+
+typedef struct _profiler_state profiler_state;
+struct _profiler_state
+{
+	UINT8			enabled;			/* are we enabled? */
+	UINT8			filoindex;			/* current FILO index */
+	UINT8			dataindex;			/* current data index */
+	UINT8			dataready;			/* are we to display the data yet? */
+	profiler_filo_entry filo[16];		/* array of FILO entries */
+	profiler_data	data[16];			/* array of data */
+};
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+extern profiler_state global_profiler;
+
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
 #ifdef MAME_PROFILER
-void profiler_mark(int type);
 
-/* functions called by usrintf.c */
-void profiler_start(void);
-void profiler_stop(void);
-const char *profiler_get_text(running_machine *machine);
+#define profiler_mark(x)		do { if (global_profiler.enabled) _profiler_mark(x); } while (0)
+#define profiler_start()		do { global_profiler.enabled = TRUE; global_profiler.filoindex = global_profiler.dataindex = global_profiler.dataready = 0; } while (0)
+#define profiler_stop()			do { global_profiler.enabled = FALSE; } while (0)
+#define profiler_get_text(x,s)	_profiler_get_text(x, s)
+
 #else
-#define profiler_mark(type)
 
-#define profiler_start()
-#define profiler_stop()
-#define profiler_get_text(machine) ""
+#define profiler_mark(x)		do { } while (0)
+#define profiler_start()		do { } while (0)
+#define profiler_stop()			do { } while (0)
+#define profiler_get_text(x,s) 	astring_reset(s)
+
 #endif
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+
+/* ----- core functions (do not call directly; use macros) ----- */
+
+/* mark the beginning/end of a profiler entry */
+void _profiler_mark(int type);
+
+/* return the current text in an astring */
+astring *_profiler_get_text(running_machine *machine, astring *string);
 
 
 #endif	/* __PROFILER_H__ */
