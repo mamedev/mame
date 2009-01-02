@@ -1010,7 +1010,7 @@ static WRITE32_HANDLER( dmaoffset_w )
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		m_n_dmaoffset = ( ( offset + 2 ) * 4 ) | ( data & 0xffff0000 );
+		m_n_dmaoffset = ( ( offset * 4 ) + 2 ) | ( data & 0xffff0000 );
 	}
 	verboselog( space->machine, 1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_dmaoffset );
 }
@@ -1023,8 +1023,8 @@ static void namcos12_rom_read( running_machine *machine, UINT32 n_address, INT32
 	INT32 n_ramleft;
 	INT32 n_romleft;
 
-	UINT32 *p_n_src;
-	UINT32 *p_n_dst;
+	UINT16 *source;
+	UINT16 *destination;
 
 	if( ( m_n_dmaoffset >= 0x80000000 ) || ( m_n_dmabias == 0x1f300000 ) )
 	{
@@ -1051,7 +1051,7 @@ static void namcos12_rom_read( running_machine *machine, UINT32 n_address, INT32
 		verboselog( machine, 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
 	}
 
-	p_n_src = (UINT32 *)( memory_region( machine, n_region ) + n_offset );
+	source = (UINT16 *) memory_region( machine, n_region );
 	n_romleft = ( memory_region_length( machine, n_region ) - n_offset ) / 4;
 	if( n_size > n_romleft )
 	{
@@ -1059,7 +1059,7 @@ static void namcos12_rom_read( running_machine *machine, UINT32 n_address, INT32
 		n_size = n_romleft;
 	}
 
-	p_n_dst = &g_p_n_psxram[ n_address / 4 ];
+	destination = (UINT16 *) g_p_n_psxram;
 	n_ramleft = ( g_n_psxramsize - n_address ) / 4;
 	if( n_size > n_ramleft )
 	{
@@ -1067,9 +1067,15 @@ static void namcos12_rom_read( running_machine *machine, UINT32 n_address, INT32
 		n_size = n_ramleft;
 	}
 
+	n_size *= 2;
+	n_address /= 2;
+	n_offset /= 2;
+
 	while( n_size > 0 )
 	{
-		*( p_n_dst++ ) = *( p_n_src++ );
+		destination[ WORD_XOR_LE( n_address ) ] = source[ WORD_XOR_LE( n_offset ) ];
+		n_address++;
+		n_offset++;
 		n_size--;
 	}
 }
@@ -2355,11 +2361,11 @@ GAME( 1996, tekken3b,  tekken3,  coh700,   namcos12, namcos12, ROT0, "Namco",   
 GAME( 1996, tekken3c,  tekken3,  coh700,   namcos12, namcos12, ROT0, "Namco",         "Tekken 3 (TET2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
 GAME( 1997, lbgrande,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Libero Grande (LG2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
 GAME( 1997, toukon3,   0,        coh700,   namcos12, namcos12, ROT0, "Tomy/Namco",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (TR1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC019 */
-GAME( 1998, soulclbr,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC14/VER.C)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
-GAME( 1998, soulclba,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC11/VER.C)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) /* KC020 */
-GAME( 1998, soulclbb,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC13/VER.B)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) /* KC020 */
-GAME( 1998, soulclbc,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC11/VER.B)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) /* KC020 */
-GAME( 1998, soulclbd,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC11/VER.A2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) /* KC020 */
+GAME( 1998, soulclbr,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC14/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, soulclba,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC11/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC020 */
+GAME( 1998, soulclbb,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC13/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC020 */
+GAME( 1998, soulclbc,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC11/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC020 */
+GAME( 1998, soulclbd,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC11/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC020 */
 GAME( 1998, ehrgeiz,   0,        coh700,   namcos12, namcos12, ROT0, "Square/Namco",  "Ehrgeiz (EG3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC021 */
 GAME( 1998, ehrgeiza,  ehrgeiz,  coh700,   namcos12, namcos12, ROT0, "Square/Namco",  "Ehrgeiz (EG2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC021 */
 GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Derby Quiz My Dream Horse (MDH1/VER.A2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC035 */
