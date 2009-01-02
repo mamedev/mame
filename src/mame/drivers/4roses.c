@@ -353,19 +353,36 @@ static const ay8910_interface ay8910_intf =
 };
 
 
+/************************
+*    CRTC Interface    *
+************************/
+
+static const mc6845_interface mc6845_intf =
+{
+	"main",		/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	NULL,		/* callback for display state changes */
+	NULL,		/* HSYNC callback */
+	NULL		/* VSYNC callback */
+};
+
+
 /**************************
 *     Machine Drivers     *
 **************************/
 
 static MACHINE_DRIVER_START( 4roses )
-    /* basic machine hardware */
+	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
 	MDRV_CPU_PROGRAM_MAP(4roses_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 //  MDRV_NVRAM_HANDLER(generic_0fill)
 
-    /* video hardware */
+	/* video hardware */
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -381,9 +398,9 @@ static MACHINE_DRIVER_START( 4roses )
 	MDRV_VIDEO_START(funworld)
 	MDRV_VIDEO_UPDATE(funworld)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf) /* 2MHz, guess */
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz, guess */

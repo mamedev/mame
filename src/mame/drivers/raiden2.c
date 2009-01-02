@@ -1871,7 +1871,7 @@ ROM_START( xsedae )
 	ROM_LOAD32_BYTE("2.u025",   0x000001, 0x40000, CRC(a2b052df) SHA1(e8bf9ab3d5d4e601ea9386e1f2d4e017b025407e) )
 	ROM_LOAD32_BYTE("4.u026",   0x000003, 0x40000, CRC(5adf20bf) SHA1(42a0bb5a460c656675b2c432c043fc61a9049276) )
 
-	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
+	ROM_REGION( 0x40000, "user2", ROMREGION_ERASEFF )	/* COPDX */
 	/* Not populated */
 
 	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */

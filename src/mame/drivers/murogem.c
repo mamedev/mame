@@ -192,6 +192,18 @@ static VIDEO_UPDATE(murogem)
 	return 0;
 }
 
+static const mc6845_interface mc6845_intf =
+{
+	"main",		/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	NULL,		/* callback for display state changes */
+	NULL,		/* HSYNC callback */
+	NULL		/* VSYNC callback */
+};
+
 
 static MACHINE_DRIVER_START( murogem )
 	/* basic machine hardware */
@@ -213,7 +225,7 @@ static MACHINE_DRIVER_START( murogem )
 	MDRV_PALETTE_INIT(murogem)
 	MDRV_VIDEO_UPDATE(murogem)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 0, mc6845_null_interface)
+	MDRV_MC6845_ADD("crtc", MC6845, 750000, mc6845_intf) /* ? MHz */
 MACHINE_DRIVER_END
 
 
