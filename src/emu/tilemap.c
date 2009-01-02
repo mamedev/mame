@@ -297,8 +297,8 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 	int group;
 
 	/* allocate the tilemap itself */
-	tmap = malloc_or_die(sizeof(tilemap));
-	memset(tmap, 0, sizeof(tilemap));
+	tmap = malloc_or_die(sizeof(*tmap));
+	memset(tmap, 0, sizeof(*tmap));
 
 	/* fill in the basic metrics */
 	tmap->machine = machine;
@@ -338,6 +338,7 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 	tmap->tileflags = malloc_or_die(tmap->max_logical_index);
 	tmap->flagsmap = bitmap_alloc(tmap->width, tmap->height, BITMAP_FORMAT_INDEXED8);
 	tmap->pen_to_flags = malloc_or_die(sizeof(tmap->pen_to_flags[0]) * MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
+	memset(tmap->pen_to_flags, 0, sizeof(tmap->pen_to_flags[0]) * MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
 	for (group = 0; group < TILEMAP_NUM_GROUPS; group++)
 		tilemap_map_pens_to_layer(tmap, group, 0, 0, TILEMAP_PIXEL_LAYER0);
 
