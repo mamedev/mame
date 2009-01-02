@@ -141,25 +141,6 @@ struct _rom_entry
 };
 
 
-/* In mamecore.h: typedef struct _rom_load_data rom_load_data; */
-struct _rom_load_data
-{
-	int				warnings;			/* warning count during processing */
-	int				errors;				/* error count during processing */
-
-	int				romsloaded;			/* current ROMs loaded count */
-	int				romstotal;			/* total number of ROMs to read */
-
-	mame_file *		file;				/* current file */
-
-	UINT8 *			regionbase;			/* base of current region */
-	UINT32			regionlength;		/* length of current region */
-
-	char			errorbuf[4096];		/* accumulated errors */
-	UINT8			tempbuf[65536];		/* temporary buffer */
-};
-
-
 
 /***************************************************************************
     MACROS

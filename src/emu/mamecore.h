@@ -60,11 +60,8 @@ typedef UINT32 FPTR;
 /* These are forward struct declarations that are used to break
    circular dependencies in the code */
 typedef struct _running_machine running_machine;
-typedef struct _mame_display mame_display;
 typedef struct _game_driver game_driver;
 typedef struct _machine_config machine_config;
-typedef struct _rom_load_data rom_load_data;
-typedef struct _osd_create_params osd_create_params;
 typedef struct _gfx_element gfx_element;
 typedef struct _mame_file mame_file;
 

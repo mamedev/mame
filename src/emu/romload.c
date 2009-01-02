@@ -27,6 +27,25 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _rom_load_data rom_load_data;
+struct _rom_load_data
+{
+	int				warnings;			/* warning count during processing */
+	int				errors;				/* error count during processing */
+
+	int				romsloaded;			/* current ROMs loaded count */
+	int				romstotal;			/* total number of ROMs to read */
+
+	mame_file *		file;				/* current file */
+
+	UINT8 *			regionbase;			/* base of current region */
+	UINT32			regionlength;		/* length of current region */
+
+	astring *		errorstring;		/* error string */
+	UINT8			tempbuf[65536];		/* temporary buffer */
+};
+
+
 typedef struct _open_chd open_chd;
 struct _open_chd
 {
@@ -92,6 +111,7 @@ void set_disk_handle(const char *region, mame_file *file, chd_file *chdfile)
 	**chd_list_tailptr = chd;
 	chd_list_tailptr = &(*chd_list_tailptr)->next;
 }
+
 
 
 /***************************************************************************
@@ -325,7 +345,7 @@ static int determine_bios_rom(rom_load_data *romdata, const rom_entry *romp)
 		/* if we got neither an empty string nor 'default' then warn the user */
 		if (specbios[0] != 0 && strcmp(specbios, "default") != 0)
 		{
-			sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s: invalid bios\n", specbios);
+			astring_catprintf(romdata->errorstring, "%s: invalid bios\n", specbios);
 			romdata->warnings++;
 		}
 
@@ -386,21 +406,21 @@ static void handle_missing_file(rom_load_data *romdata, const rom_entry *romp)
 	/* optional files are okay */
 	if (ROM_ISOPTIONAL(romp))
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "OPTIONAL %s NOT FOUND\n", ROM_GETNAME(romp));
+		astring_catprintf(romdata->errorstring, "OPTIONAL %s NOT FOUND\n", ROM_GETNAME(romp));
 		romdata->warnings++;
 	}
 
 	/* no good dumps are okay */
 	else if (ROM_NOGOODDUMP(romp))
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s NOT FOUND (NO GOOD DUMP KNOWN)\n", ROM_GETNAME(romp));
+		astring_catprintf(romdata->errorstring, "%s NOT FOUND (NO GOOD DUMP KNOWN)\n", ROM_GETNAME(romp));
 		romdata->warnings++;
 	}
 
 	/* anything else is bad */
 	else
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s NOT FOUND\n", ROM_GETNAME(romp));
+		astring_catprintf(romdata->errorstring, "%s NOT FOUND\n", ROM_GETNAME(romp));
 		romdata->errors++;
 	}
 }
@@ -422,13 +442,13 @@ static void dump_wrong_and_correct_checksums(rom_load_data* romdata, const char*
 	found_functions = hash_data_used_functions(hash) & hash_data_used_functions(acthash);
 
 	hash_data_print(hash, found_functions, chksum);
-	sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "    EXPECTED: %s\n", chksum);
+	astring_catprintf(romdata->errorstring, "    EXPECTED: %s\n", chksum);
 
 	/* We dump informations only of the functions for which MAME provided
         a correct checksum. Other functions we might have calculated are
         useless here */
 	hash_data_print(acthash, found_functions, chksum);
-	sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "       FOUND: %s\n", chksum);
+	astring_catprintf(romdata->errorstring, "       FOUND: %s\n", chksum);
 
 	/* For debugging purposes, we check if the checksums available in the
        driver are correctly specified or not. This can be done by checking
@@ -445,7 +465,7 @@ static void dump_wrong_and_correct_checksums(rom_load_data* romdata, const char*
 		for (i = 0; i < HASH_NUM_FUNCTIONS; i++)
 			if (wrong_functions & (1 << i))
 			{
-				sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)],
+				astring_catprintf(romdata->errorstring,
 					"\tInvalid %s checksum treated as 0 (check leading zeros)\n",
 					hash_function_name(1 << i));
 
@@ -476,21 +496,21 @@ static void verify_length_and_hash(rom_load_data *romdata, const char *name, UIN
 	/* verify length */
 	if (explength != actlength)
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
+		astring_catprintf(romdata->errorstring, "%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength);
 		romdata->warnings++;
 	}
 
 	/* If there is no good dump known, write it */
 	if (hash_data_has_info(hash, HASH_INFO_NO_DUMP))
 	{
-			sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s NO GOOD DUMP KNOWN\n", name);
+			astring_catprintf(romdata->errorstring, "%s NO GOOD DUMP KNOWN\n", name);
 		romdata->warnings++;
 	}
 	/* verify checksums */
 	else if (!hash_data_is_equal(hash, acthash, 0))
 	{
 		/* otherwise, it's just bad */
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s WRONG CHECKSUMS:\n", name);
+		astring_catprintf(romdata->errorstring, "%s WRONG CHECKSUMS:\n", name);
 
 		dump_wrong_and_correct_checksums(romdata, hash, acthash);
 
@@ -499,7 +519,7 @@ static void verify_length_and_hash(rom_load_data *romdata, const char *name, UIN
 	/* If it matches, but it is actually a bad dump, write it */
 	else if (hash_data_has_info(hash, HASH_INFO_BAD_DUMP))
 	{
-		sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s ROM NEEDS REDUMP\n",name);
+		astring_catprintf(romdata->errorstring, "%s ROM NEEDS REDUMP\n",name);
 		romdata->warnings++;
 	}
 }
@@ -546,15 +566,16 @@ static void display_rom_load_results(running_machine *machine, rom_load_data *ro
 		}
 
 		/* create the error message and exit fatally */
-		strcat(romdata->errorbuf, "ERROR: required files are missing, the "GAMENOUN" cannot be run.");
-		fatalerror_exitcode(machine, MAMERR_MISSING_FILES, "%s", romdata->errorbuf);
+		mame_printf_error("%s", astring_c(romdata->errorstring));
+		astring_free(romdata->errorstring);
+		fatalerror_exitcode(machine, MAMERR_MISSING_FILES, "ERROR: required files are missing, the "GAMENOUN" cannot be run.");
 	}
 
 	/* if we had warnings, output them, but continue */
 	if (romdata->warnings)
 	{
-		strcat(romdata->errorbuf, "WARNING: the "GAMENOUN" might not run correctly.");
-		mame_printf_warning("%s\n", romdata->errorbuf);
+		astring_catc(romdata->errorstring, "WARNING: the "GAMENOUN" might not run correctly.");
+		mame_printf_warning("%s\n", astring_c(romdata->errorstring));
 	}
 }
 
@@ -1117,9 +1138,9 @@ static void process_disk_entries(running_machine *machine, rom_load_data *romdat
 			if (err != CHDERR_NONE)
 			{
 				if (err == CHDERR_FILE_NOT_FOUND)
-					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s NOT FOUND\n", astring_c(filename));
+					astring_catprintf(romdata->errorstring, "%s NOT FOUND\n", astring_c(filename));
 				else
-					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s CHD ERROR: %s\n", astring_c(filename), chd_error_string(err));
+					astring_catprintf(romdata->errorstring, "%s CHD ERROR: %s\n", astring_c(filename), chd_error_string(err));
 
 				/* if this is NO_DUMP, keep going, though the system may not be able to handle it */
 				if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_NO_DUMP) || DISK_ISOPTIONAL(romp))
@@ -1138,13 +1159,13 @@ static void process_disk_entries(running_machine *machine, rom_load_data *romdat
 			/* verify the MD5 */
 			if (!hash_data_is_equal(ROM_GETHASHDATA(romp), acthash, 0))
 			{
-				sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s WRONG CHECKSUMS:\n", astring_c(filename));
+				astring_catprintf(romdata->errorstring, "%s WRONG CHECKSUMS:\n", astring_c(filename));
 				dump_wrong_and_correct_checksums(romdata, ROM_GETHASHDATA(romp), acthash);
 				romdata->warnings++;
 			}
 			else if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_BAD_DUMP))
 			{
-				sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s CHD NEEDS REDUMP\n", astring_c(filename));
+				astring_catprintf(romdata->errorstring, "%s CHD NEEDS REDUMP\n", astring_c(filename));
 				romdata->warnings++;
 			}
 
@@ -1155,7 +1176,7 @@ static void process_disk_entries(running_machine *machine, rom_load_data *romdat
 				err = open_disk_diff(machine->gamedrv, romp, chd.origchd, &chd.difffile, &chd.diffchd);
 				if (err != CHDERR_NONE)
 				{
-					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s DIFF CHD ERROR: %s\n", astring_c(filename), chd_error_string(err));
+					astring_catprintf(romdata->errorstring, "%s DIFF CHD ERROR: %s\n", astring_c(filename), chd_error_string(err));
 					romdata->errors++;
 					continue;
 				}
@@ -1276,13 +1297,14 @@ static void process_region_list(running_machine *machine, rom_load_data *romdata
 
 void rom_init(running_machine *machine)
 {
-	static rom_load_data romdata;
+	rom_load_data romdata;
 
 	/* make sure we get called back on the way out */
 	add_exit_callback(machine, rom_exit);
 
 	/* reset the romdata struct */
 	memset(&romdata, 0, sizeof(romdata));
+	romdata.errorstring = astring_alloc();
 
 	/* determine the correct biosset to load based on OPTION_BIOS string */
 	system_bios = determine_bios_rom(&romdata, machine->gamedrv->rom);
@@ -1299,8 +1321,8 @@ void rom_init(running_machine *machine)
 
 	/* display the results and exit */
 	total_rom_load_warnings = romdata.warnings;
-
 	display_rom_load_results(machine, &romdata);
+	astring_free(romdata.errorstring);
 }
 
 
@@ -1334,6 +1356,11 @@ static void rom_exit(running_machine *machine)
 	}
 }
 
+
+/*-------------------------------------------------
+    rom_load_warnings - return the number of
+    warnings we generated
+-------------------------------------------------*/
 
 int rom_load_warnings(void)
 {
