@@ -3930,8 +3930,11 @@ ROM_START( hnxmasev )
 	ROM_LOAD( "i.10k", 0x060000, 0x10000, CRC(cf0c26cf) SHA1(5f64779abc578388e712abb381e2bbdbf4f78e0c) )
 	ROM_LOAD( "j.10l", 0x070000, 0x10000, CRC(b0fb3334) SHA1(99032e00ccfbc903dc068d174f8d51211269b99c) )
 
-	ROM_REGION( 0x10000, "vcr", 0 ) /* vcr prg?data?*/
+	ROM_REGION( 0x10000, "vcr", 0 ) /* vcr prg?data? */
 	ROM_LOAD( "k.10m",   0x00000, 0x10000, CRC(e29e9ef2) SHA1(5a3ea8f771f3191fad88d237b70301634353b7bb) )
+
+	DISK_REGION( "vhs" ) /* Video Home System tape */
+	DISK_IMAGE_READONLY( "hnxmasev", 0, NO_DUMP )
 ROM_END
 
 /*
@@ -3979,6 +3982,9 @@ ROM_START( hnageman )
 	ROM_LOAD( "7.10h", 0x080000, 0x20000, CRC(0bb99a3a) SHA1(1c896f50f74a52fcf96a40ca536502908bab85c9) )
 	ROM_LOAD( "8.10j", 0x0a0000, 0x20000, CRC(23fad43a) SHA1(7276b92623dc4559e62d2f4742c8a68233c1dfe5) )
 	ROM_LOAD( "9.10k", 0x0c0000, 0x10000, CRC(c995c1da) SHA1(c8a1f4919296221c375763b0d9838f31ed53135d) )
+
+	DISK_REGION( "vhs" ) /* Video Home System tape */
+	DISK_IMAGE_READONLY( "hnageman", 0, NO_DUMP )
 ROM_END
 
 
