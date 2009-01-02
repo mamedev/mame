@@ -2779,7 +2779,7 @@ static void menu_sliders_populate(running_machine *machine, ui_menu *menu, int m
 			break;
 	}
 
-	ui_menu_set_custom_render(menu, menu_sliders_custom_render, 0.0f, 2.0f * ui_get_line_height());
+	ui_menu_set_custom_render(menu, menu_sliders_custom_render, 0.0f, 2.0f * ui_get_line_height() + 2.0f * UI_BOX_TB_BORDER);
 	astring_free(tempstring);
 }
 
@@ -2794,39 +2794,43 @@ static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, 
 	const slider_state *curslider = selectedref;
 	if (curslider != NULL)
 	{
-		astring *tempstring = astring_alloc();
-		INT32 curval = (*curslider->update)(machine, curslider->arg, tempstring, SLIDER_NOCHANGE);
-		float percentage = (float)(curval - curslider->minval) / (float)(curslider->maxval - curslider->minval);
-		float default_percentage = (float)(curslider->defval - curslider->minval) / (float)(curslider->maxval - curslider->minval);
 		float bar_left, bar_area_top, bar_width, bar_area_height, bar_top, bar_bottom, default_x, current_x;
-		float space_width = ui_get_char_width(' ');
 		float line_height = ui_get_line_height();
-		float ui_width, ui_height;
+		astring *tempstring = astring_alloc();
+		float percentage, default_percentage;
 		float text_height;
+		INT32 curval;
 
-		/* finish assembling the text */
+		/* determine the current value and text */
+		curval = (*curslider->update)(machine, curslider->arg, tempstring, SLIDER_NOCHANGE);
+
+		/* compute the current and default percentages */
+		percentage = (float)(curval - curslider->minval) / (float)(curslider->maxval - curslider->minval);
+		default_percentage = (float)(curslider->defval - curslider->minval) / (float)(curslider->maxval - curslider->minval);
+
+		/* assemble the the text */
 		astring_insc(tempstring, 0, " ");
 		astring_insc(tempstring, 0, curslider->description);
 
-		/* leave a spaces' worth of room along the left/right sides, and a lines' worth on the top/bottom */
-		ui_width = 1.0f - 2.0f * space_width;
-		ui_height = 1.0f - 2.0f * line_height;
+		/* move us to the bottom of the screen, and expand to full width */
+		y2 = 1.0f - UI_BOX_TB_BORDER;
+		y1 = y2 - bottom;
+		x1 = UI_BOX_LR_BORDER;
+		x2 = 1.0f - UI_BOX_LR_BORDER;
+
+		/* draw extra menu area */
+		ui_draw_outlined_box(x1, y1, x2, y2, UI_FILLCOLOR);
+		y1 += UI_BOX_TB_BORDER;
 
 		/* determine the text height */
-		ui_draw_text_full(astring_c(tempstring), 0, 0, ui_width - 2 * UI_BOX_LR_BORDER,
-					JUSTIFY_CENTER, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
-
-		/* add a box around the whole area */
-		ui_draw_outlined_box(space_width,
-						 line_height + ui_height - text_height - line_height - 2 * UI_BOX_TB_BORDER,
-						 space_width + ui_width,
-						 line_height + ui_height, UI_FILLCOLOR);
+		ui_draw_text_full(astring_c(tempstring), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+					JUSTIFY_CENTER, WRAP_TRUNCATE, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
 
 		/* draw the thermometer */
-		bar_left = 2.0f * space_width;
-		bar_area_top = line_height + ui_height - UI_BOX_TB_BORDER - text_height - line_height * 0.75f;
-		bar_width = ui_width - 2.0f * space_width;
-		bar_area_height = line_height * 0.75f;
+		bar_left = x1 + UI_BOX_LR_BORDER;
+		bar_area_top = y1;
+		bar_width = x2 - x1 - 2.0f * UI_BOX_LR_BORDER;
+		bar_area_height = line_height;
 
 		/* compute positions */
 		bar_top = bar_area_top + 0.125f * bar_area_height;
@@ -2846,7 +2850,7 @@ static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, 
 		render_ui_add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* draw the actual text */
-		ui_draw_text_full(astring_c(tempstring), space_width + UI_BOX_LR_BORDER, line_height + ui_height - UI_BOX_TB_BORDER - text_height, ui_width - 2.0f * UI_BOX_LR_BORDER,
+		ui_draw_text_full(astring_c(tempstring), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
 					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
 
 		astring_free(tempstring);
