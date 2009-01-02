@@ -197,11 +197,6 @@ extern READ32_HANDLER(lanc_ram_r);
 extern WRITE32_HANDLER(lanc_ram_w);
 
 
-// defined in video/gticlub.c
-VIDEO_START( gticlub );
-VIDEO_UPDATE( gticlub );
-
-
 // defined in drivers/nwk-tr.c
 int K001604_vh_start(running_machine *machine, int chip);
 void K001604_tile_update(running_machine *machine, int chip);

@@ -193,6 +193,8 @@ static poly_manager *poly;
 static poly_vertex prev_v[4];
 static int prev_poly_type;
 
+static UINT8 *gfxrom;
+
 
 void K001005_swap_buffers(running_machine *machine);
 
@@ -208,6 +210,8 @@ void K001005_init(running_machine *machine)
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 	K001005_zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
+
+	gfxrom = memory_region(machine, "gfx1");
 
 	K001005_bitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	K001005_bitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
@@ -480,8 +484,6 @@ static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent,
 		z += dz;
 	}
 }
-
-static UINT8 *gfxrom;
 
 static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
@@ -979,7 +981,6 @@ VIDEO_START( gticlub )
 	tick = 0;
 	debug_tex_page = 0;
 	debug_tex_palette = 0;
-	gfxrom = memory_region(machine, "gfx1");
 
 	K001006_init(machine);
 	K001005_init(machine);
