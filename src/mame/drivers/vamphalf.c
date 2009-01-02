@@ -1170,6 +1170,19 @@ static READ16_HANDLER( vamphalf_speedup_r )
 			cpu_eat_cycles(space->cpu, 50);
 	}
 
+	return wram[(0x4a840/2)+offset];
+}
+
+static READ16_HANDLER( vamphafk_speedup_r )
+{
+	if(cpu_get_pc(space->cpu) == 0x82de)
+	{
+		if(irq_active(space))
+			cpu_spinuntil_int(space->cpu);
+		else
+			cpu_eat_cycles(space->cpu, 50);
+	}
+
 	return wram[(0x4a6d0/2)+offset];
 }
 
@@ -1290,10 +1303,17 @@ static READ16_HANDLER( dquizgo2_speedup_r )
 	return wram[(0xcde70/2)+offset];
 }
 
-
 static DRIVER_INIT( vamphalf )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0004a6d0, 0x0004a6d3, 0, 0, vamphalf_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0004a840, 0x0004a843, 0, 0, vamphalf_speedup_r );
+
+	palshift = 0;
+	flip_bit = 0x80;
+}
+
+static DRIVER_INIT( vamphafk )
+{
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0004a6d0, 0x0004a6d3, 0, 0, vamphafk_speedup_r );
 
 	palshift = 0;
 	flip_bit = 0x80;
@@ -1384,7 +1404,7 @@ GAME( 1999, luplup,   suplup,   suplup,   common,   luplup,   ROT0,   "Omega Sys
 GAME( 1999, luplup29, suplup,   suplup,   common,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
 GAME( 1999, puzlbang, suplup,   suplup,   common,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (version 2.8 / 990106)", 0 )
 GAME( 1999, vamphalf, 0,        vamphalf, common,   vamphalf, ROT0,   "Danbi & F2 System", "Vamf x1/2 (Europe)", 0 )
-GAME( 1999, vamphafk, vamphalf, vamphalf, common,   vamphalf, ROT0,   "Danbi & F2 System", "Vamp x1/2 (Korea)", 0 )
+GAME( 1999, vamphafk, vamphalf, vamphalf, common,   vamphafk, ROT0,   "Danbi & F2 System", "Vamp x1/2 (Korea)", 0 )
 GAME( 2000, dquizgo2, 0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",           "Date Quiz Go Go Episode 2" , 0)
 GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
