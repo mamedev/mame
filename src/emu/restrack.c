@@ -199,7 +199,11 @@ void *restrack_register_object(object_type type, void *ptr, size_t size, const c
 
 void *auto_malloc_file_line(size_t size, const char *file, int line)
 {
-	return pool_malloc_file_line(current_pool(), size, file, line);
+	void *result = pool_malloc_file_line(current_pool(), size, file, line);
+#ifdef MAME_DEBUG
+	rand_memory(result, size);
+#endif
+	return result;
 }
 
 
@@ -273,7 +277,8 @@ bitmap_t *auto_bitmap_alloc_file_line(int width, int height, bitmap_format forma
 
 /*-------------------------------------------------
     validate_auto_malloc_memory - validate that a
-    block of memory has been allocated by auto_malloc()
+    block of memory has been allocated by 
+    auto_malloc()
 -------------------------------------------------*/
 
 void validate_auto_malloc_memory(void *memory, size_t memory_size)

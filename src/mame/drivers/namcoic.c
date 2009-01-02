@@ -1082,6 +1082,7 @@ roz_get_info( running_machine *machine, tile_data *tileinfo, int tile_index, int
 		if( tile&0x0200 ) mangle |= 0x0400;
 		if( tile&0x0400 ) mangle |= 0x0800;
 		if( tile&0x0800 ) mangle |= 0x1000;
+		tile &= 0x3fff; /* cap mask offset */
 		break;
 
 	default:
