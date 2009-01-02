@@ -410,7 +410,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( uballoon_pcm_1_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "pcm");
+	UINT8 *RAM = memory_region(space->machine, "pcm1");
 	int bank = data & 1;
 	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
 	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x10000 + 0x400]);
@@ -907,7 +907,7 @@ static MACHINE_DRIVER_START( uballoon )
 	MDRV_CPU_ADD("audio", Z80, 3579545)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(uballoon_sound_readmem,uballoon_sound_writemem)
 
-	MDRV_CPU_ADD("pcm", Z80, 5000000)	/* ? */
+	MDRV_CPU_ADD("pcm1", Z80, 5000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(uballoon_pcm_1_readmem,uballoon_pcm_1_writemem)
 	MDRV_CPU_IO_MAP(uballoon_pcm_1_io_map,0)
 
@@ -958,7 +958,7 @@ static MACHINE_DRIVER_START( sunaq )
 	MDRV_CPU_ADD("audio", Z80, 14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sunaq_sound_readmem,sunaq_sound_writemem)
 
-	MDRV_CPU_ADD("pcm", Z80, 24000000/4)		/* Z80B */
+	MDRV_CPU_ADD("pcm1", Z80, 24000000/4)		/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_readmem,bssoccer_pcm_1_writemem)
 	MDRV_CPU_IO_MAP(bssoccer_pcm_1_io_map,0)
 
@@ -1030,7 +1030,7 @@ static MACHINE_DRIVER_START( bestbest )
 	MDRV_CPU_ADD("audio", Z80, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(bestbest_sound_map,0)
 
-	MDRV_CPU_ADD("pcm", Z80, 24000000/4)
+	MDRV_CPU_ADD("pcm1", Z80, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(bestbest_pcm_1_map,0)
 	MDRV_CPU_IO_MAP(bestbest_pcm_1_iomap,0)
 
@@ -1165,7 +1165,7 @@ ROM_START( uballoon )
 	ROM_REGION( 0x010000, "audio", 0 ) 	/* Z80 #1 - Music */
 	ROM_LOAD( "audio1.rom", 0x000000, 0x010000, CRC(c771f2b4) SHA1(6da4c526c0ea3be5d5bb055a31bf1171a6ddb51d) )
 
-	ROM_REGION( 0x020000, "pcm", 0 ) 	/* Z80 #2 - PCM */
+	ROM_REGION( 0x020000, "pcm1", 0 ) 	/* Z80 #2 - PCM */
 	ROM_LOAD( "audio2.rom", 0x000000, 0x020000, CRC(c7f75347) SHA1(5bbbd39285c593441c6da6a12f3632d60b103216) )
 
 	/* There's no Z80 #3 - PCM */
@@ -1218,7 +1218,7 @@ ROM_START( sunaq )
 	ROM_REGION( 0x010000, "audio", 0 ) 	/* Z80 #1 - Music */
 	ROM_LOAD( "audio1.bin", 0x000000, 0x010000, CRC(3df42f82) SHA1(91c1037c9d5d1ec82ed4cdfb35de5a6d626ecb3b) )
 
-	ROM_REGION( 0x080000, "pcm", 0 ) 	/* Z80 #2 - PCM */
+	ROM_REGION( 0x080000, "pcm1", 0 ) 	/* Z80 #2 - PCM */
 	ROM_LOAD( "audio2.bin", 0x000000, 0x080000, CRC(cac85ba9) SHA1(e5fbe813022c17d9eaf2a57184341666e2af365a) )
 
 	/* There's no Z80 #3 - PCM */
@@ -1295,7 +1295,7 @@ ROM_START( bestbest )
 	ROM_REGION( 0x10000, "audio", 0 ) 	/* Z80 #1 - Music */
 	ROM_LOAD( "5.bin", 0x00000, 0x10000, CRC(bb9265e6) SHA1(424eceac4fd48c9a99653ece2f3fcbc8b37569cf) ) // BEST OF BEST V10 XILINX PROGRAM 3020 1994,1,17
 
-	ROM_REGION( 0x10000, "pcm", 0 ) 	/* Z80 #2 - PCM */
+	ROM_REGION( 0x10000, "pcm1", 0 ) 	/* Z80 #2 - PCM */
 	ROM_LOAD( "6.bin", 0x00000, 0x10000, CRC(dd445f6b) SHA1(658417d72c003f25db273e3c731838317ed1876c) )
 
 	/* There's no Z80 #3 - PCM */
