@@ -524,8 +524,6 @@ static void AICA_Init(const device_config *device, struct _AICA *AICA, const aic
 
 	// get AICA RAM
 	{
-		memset(AICA,0,sizeof(*AICA));
-
 		if (sndindex == 0)
 		{
 			AICA->Master=1;
