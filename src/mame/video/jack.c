@@ -43,6 +43,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x18) << 5);
 	int color = colorram[tile_index] & 0x07;
+	
+	// striv: colorram[tile_index] & 0x80 ???
 
 	SET_TILE_INFO(0, code, color, 0);
 }

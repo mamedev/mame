@@ -815,9 +815,9 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
+	RGN_FRAC(1,2),	/* 1024 characters */
 	2,	/* 2 bits per pixel */
-	{ 0, 1024*8*8 },	/* the two bitplanes are seperated */
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },	/* the two bitplanes are seperated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8	/* every char takes 16 bytes */
@@ -1307,12 +1307,12 @@ ROM_START( striv )
 	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "snd.5a",       0x0000, 0x1000, CRC(b7ddf84f) SHA1(fa4cc0b2e5a88c82c62492c03e97ac6aa8a905b1) )
 
-	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "chr0.1a",      0x0000, 0x1000, CRC(8f60229b) SHA1(96a888ae02797a205e1c6202395d3b42a820ad4d) )
+	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )	
+	ROM_LOAD( "chr3.5a",      0x0000, 0x1000, CRC(8f982a9c) SHA1(dd6f454dfd3e03d008080890881cfafd79758a40) )
 	ROM_LOAD( "chr2.4a",      0x1000, 0x1000, CRC(8f982a9c) SHA1(dd6f454dfd3e03d008080890881cfafd79758a40) )
-	ROM_LOAD( "chr3.5a",      0x2000, 0x1000, CRC(8f982a9c) SHA1(dd6f454dfd3e03d008080890881cfafd79758a40) )
-	ROM_LOAD( "chr1.2a",      0x3000, 0x1000, CRC(7ad4358e) SHA1(dd3a03c78fa8bf435e9905b901dc5a9987cd52e4) )
-
+	ROM_LOAD( "chr1.2a",      0x2000, 0x1000, CRC(7ad4358e) SHA1(dd3a03c78fa8bf435e9905b901dc5a9987cd52e4) )
+	ROM_LOAD( "chr0.1a",      0x3000, 0x1000, CRC(8f60229b) SHA1(96a888ae02797a205e1c6202395d3b42a820ad4d) )
+	
 	ROM_REGION( 0x80000, "user1", ROMREGION_ERASEFF ) /* Question roms */
 	ROM_LOAD( "rom.u6",       0x00000, 0x8000, CRC(a32d7a28) SHA1(fbad0b5c9f1dbeb4f245a2198248c18ceae556fa) )
 	ROM_LOAD( "rom.u7",       0x08000, 0x8000, CRC(bc44ae18) SHA1(815cc3c87b89fc702a9ca88d5117ab46464b53c0) )
@@ -1457,5 +1457,5 @@ GAME( 1981, tripool,  0,        tripool, tripool,  jack,     ROT90, "Noma (Casin
 GAME( 1981, tripoola, tripool,  tripool, tripool,  jack,     ROT90, "Noma (Costal Games license)", "Tri-Pool (Costal Games)", 0 )
 GAME( 1986, joinem,   0,        joinem,  joinem,   zzyzzyxx, ROT90, "Global Corporation", "Joinem", 0 )
 GAME( 1983, loverboy, 0,        loverboy,loverboy, loverboy, ROT90, "G.T Enterprise Inc", "Lover Boy", 0 )
-GAME( 1985, striv,    0,        jack,    striv,    striv,    ROT270,"Hara Industries", "Super Triv", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1985, striv,    0,        jack,    striv,    striv,    ROT270,"Hara Industries", "Super Triv", GAME_IMPERFECT_SOUND )
 
