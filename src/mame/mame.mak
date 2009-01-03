@@ -1366,6 +1366,7 @@ $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/taito_z.o $(VIDEO)/taito_z.o \
 	$(DRIVERS)/taitoair.o $(VIDEO)/taitoair.o \
 	$(DRIVERS)/taitojc.o $(VIDEO)/taitojc.o \
+	$(DRIVERS)/taitopjc.o $\
 	$(DRIVERS)/taitosj.o $(MACHINE)/taitosj.o $(VIDEO)/taitosj.o \
 	$(DRIVERS)/taitotz.o \
 	$(DRIVERS)/taitowlf.o \

@@ -2064,6 +2064,9 @@ const game_driver * const drivers[] =
 	/* Taito "Wolf" System */
 	DRIVER( pf2012 )	/* E59 (c) 1997 Taito */
 
+	/* Taito PPC JC System */
+	DRIVER( optiger )	/* E63 (c) 1998 Taito */
+
 	/* Taito Type-Zero System */
 	DRIVER( landhigh )	/* E68 (c) 1999 Taito */
 
