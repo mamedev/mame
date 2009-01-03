@@ -1,5 +1,5 @@
 /*
-   Taito PPC JC system
+   Taito Power-JC System
 
    Skeleton driver. Requires TLCS-900 CPU core to make progress.
 
