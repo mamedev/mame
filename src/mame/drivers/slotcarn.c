@@ -24,6 +24,7 @@
 #define CPU_CLOCK				(MASTER_CLOCK / 4)
 #define PIXEL_CLOCK				(MASTER_CLOCK / 1)
 #define CRTC_CLOCK				(MASTER_CLOCK / 8)
+#define SND_CLOCK				(MASTER_CLOCK / 8)
 
 #define NUM_PENS				(16)
 #define RAM_PALETTE_SIZE		(1024)
@@ -447,7 +448,7 @@ static const ay8910_interface scarn_ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	NULL,
-	input_port_6_r,	/* DSW 2 */
+	input_port_6_r,	/* DSW2 */
 	NULL,
 	NULL
 };
@@ -471,20 +472,22 @@ static MACHINE_DRIVER_START( slotcarn )
 	MDRV_PPI8255_ADD( "ppi8255_2", scarn_ppi8255_intf[2] )
 
 	MDRV_MACHINE_START(merit)
-	/* video hardware */
 
+	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
 	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
+	MDRV_GFXDECODE(slotcarn)
+	MDRV_PALETTE_LENGTH(0x400)
 	MDRV_VIDEO_UPDATE(slotcarn)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910,1500000)
+	MDRV_SOUND_ADD("ay",AY8910, SND_CLOCK)
 	MDRV_SOUND_CONFIG(scarn_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -556,8 +559,6 @@ ROM_START( slotcarn )
 
 	ROM_REGION( 0x04000, "gfx2", 0 ) // 1bpp (both halves identical)
 	ROM_LOAD( "rom4.a5", 0x0000, 0x4000, CRC(1428c46c) SHA1(ea30eeebcc2cc825f33e1ffeb590b047e3072b9c) )
-
-	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
 ROM_END
 
 
