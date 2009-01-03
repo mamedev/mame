@@ -176,6 +176,8 @@ VIDEO_START( mrdo )
 	tilemap_set_scrolldx(fg_tilemap, 0, 56);
 	tilemap_set_scrolldy(bg_tilemap, 0, 6);
 	tilemap_set_scrolldy(fg_tilemap, 0, 6);
+
+    state_save_register_global(machine, flipscreen);
 }
 
 

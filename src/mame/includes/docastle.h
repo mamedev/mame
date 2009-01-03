@@ -6,6 +6,7 @@ WRITE8_HANDLER( docastle_shared0_w );
 WRITE8_HANDLER( docastle_shared1_w );
 WRITE8_HANDLER( docastle_nmitrigger_w );
 
+void docastle_shared_state_register(running_machine *machine);
 
 /*----------- defined in video/docastle.c -----------*/
 

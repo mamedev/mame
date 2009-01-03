@@ -10,12 +10,15 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "includes/docastle.h"
-
-
+#include "state.h"
 
 static UINT8 buffer0[9],buffer1[9];
 
-
+void docastle_shared_state_register(running_machine *machine)
+{
+    state_save_register_global_array(machine, buffer0);
+    state_save_register_global_array(machine, buffer1);
+}
 
 /*
 Communication between the two CPUs happens through a single bidirectional latch.
