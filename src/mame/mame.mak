@@ -677,7 +677,6 @@ $(MAMEOBJ)/dooyong.a: \
 	$(DRIVERS)/gundealr.o $(VIDEO)/gundealr.o \
 
 $(MAMEOBJ)/dynax.a: \
-	$(DRIVERS)/cherrym2.o \
 	$(DRIVERS)/ddenlovr.o \
 	$(DRIVERS)/dynax.o $(VIDEO)/dynax.o \
 	$(DRIVERS)/hnayayoi.o $(VIDEO)/hnayayoi.o \

@@ -7448,8 +7448,11 @@ Other Sun games
 	DRIVER( cb3a )		/* (c) 199? Dyna/bootleg? */
 	DRIVER( cb3 )		/* (c) 199? Dyna/bootleg? */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
+	DRIVER( cmv4 )		/* (c) 1992 Dyna */
 	DRIVER( cmaster )	/* (c) 1991 Dyna */
-	DRIVER( cmasterb )	/* (c) 1991 Dyna */
+	DRIVER( cm2v841 )	/* (c) 198? Dyna Electronics */
+	DRIVER( cm2841a )	/* (c) 198? Dyna Electronics */
+	DRIVER( cmast91 )	/* (c) 1991 Dyna */
 	DRIVER( lucky8 )	/* (c) 1989 Wing Co.Ltd */
 	DRIVER( lucky8a )	/* (c) 1989 Wing Co.Ltd */
  	DRIVER( cpoker )	/* (c) 1993? IGS */
@@ -8200,8 +8203,6 @@ Other Sun games
 
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */
-	DRIVER( cm2v841 )	/* (c) 198? Dyna Electronics */
-	DRIVER( cm2841a )	/* (c) 198? Dyna Electronics */
 	DRIVER( ampoker2 )	/* (c) 1990 Novomatic */
 	DRIVER( ampkr2b1 )	/* 1990 bootleg */
 	DRIVER( ampkr2b2 )	/* 1990 bootleg */
