@@ -81,9 +81,7 @@ const UINT8 cb2001_decryption_table[256] = {
 
 /* robiza notes:
 
-
 56 -> ????
-
 
 5c -> conditional jmp for sure
 
@@ -93,13 +91,10 @@ aa -> ????
 d8 ????
 dd -> fa (di)
 
-
 guessed:
 45 -> b0 (mov al,#value)
 6e -> ba (mov dw,#value)
 c2 -> ee (out dw,al)
-
-
 
 probably:
 
