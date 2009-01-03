@@ -155,6 +155,10 @@ static GFXDECODE_START( 4enraya )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
+static MACHINE_START( 4enraya )
+{
+    state_save_register_global(machine, soundlatch);
+}
 
 static MACHINE_DRIVER_START( 4enraya )
 
@@ -176,6 +180,8 @@ static MACHINE_DRIVER_START( 4enraya )
 
 	MDRV_VIDEO_START(4enraya)
 	MDRV_VIDEO_UPDATE(4enraya)
+
+    MDRV_MACHINE_START(4enraya)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -203,4 +209,4 @@ ROM_START( 4enraya )
 	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* not used */
 ROM_END
 
-GAME( 1990, 4enraya,  0,       4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", 0 )
+GAME( 1990, 4enraya,  0,       4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", GAME_SUPPORTS_SAVE )
