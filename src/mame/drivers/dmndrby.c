@@ -44,13 +44,10 @@ DD10 DD14  DD18     H5            DD21
 #include "video/resnet.h"
 
 static UINT8* dderby_vidchars;
-static UINT8* dderby_soundmem;
 static UINT8* scroll_ram;
 static UINT8* dderby_vidattribs;
 static UINT8* sprite_ram;
 static UINT8 *nvram;
-static UINT8 *main_rom;
-static UINT8 *main_ram;
 static size_t nvram_size;
 static UINT8 *racetrack_tilemap_rom;
 static tilemap *racetrack_tilemap;
@@ -65,166 +62,242 @@ static NVRAM_HANDLER( dderby )
 
 static WRITE8_HANDLER( dderby_sound_w )
 {
-	static UINT8 last=0;
-	if(data!=last)
-		soundlatch_w(space,0,data);
-
-	last=data;
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(cputag_get_cpu(space->machine, "audio"), 0, HOLD_LINE);
 }
 
-
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_BASE(&main_rom)
-//  AM_RANGE(0x6000,0x67ff) AM_RAM AM_SHARE(1)
-//  AM_RANGE(0x8810, 0x8810) AM_WRITE(SMH_NOP) // sound hook?
-//  AM_RANGE(0x8810, 0x8810) AM_READ(dderby_ff)
-	AM_RANGE(0x8811, 0x8811) AM_READ_PORT("IN2") // ??? doubt if this is dip 2.
-//  AM_RANGE(0x8bab, 0x8bab) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
-//  AM_RANGE(0x8baa, 0x8baa) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
-//  AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&main_ram)
-	AM_RANGE(0x8880, 0x8880) AM_MIRROR(0x8) AM_READ_PORT("KEY0") // ??? doubt if this is dip 2.
-	AM_RANGE(0x8881, 0x8881) AM_MIRROR(0x8) AM_READ_PORT("KEYA") // ??? doubt if this is dip 2.
-	AM_RANGE(0x8882, 0x8882) AM_READ_PORT("KEY1") //AM_MIRROR(0x8)// ??? doubt if this is dip 2.
-	AM_RANGE(0x8883, 0x8883) AM_MIRROR(0x8) AM_READ_PORT("KEY2") // ??? doubt if this is dip 2.
-	AM_RANGE(0x8884, 0x8884) AM_MIRROR(0x8) AM_READ_PORT("KEY3") // ??? doubt if this is dip 2.
-	AM_RANGE(0x8885, 0x8885) AM_MIRROR(0x8) AM_READ_PORT("KEY4") // ??? COLLECT??
-	AM_RANGE(0x8886, 0x8886) AM_MIRROR(0x8) AM_READ_PORT("KEY5") // ??? doubt if this is dip 2.
-	AM_RANGE(0x8887, 0x8887) AM_MIRROR(0x8) AM_READ_PORT("KEY6") // ??? doubt if this is dip 2.
-	AM_RANGE(0x8888, 0x8888) AM_READ_PORT("KEY7") // ??? doubt if this is dip 2.
-	AM_RANGE(0x8889, 0x8889) AM_READ_PORT("KEY8") // ??? doubt if this is dip 2.
-	AM_RANGE(0x888a, 0x888a) AM_READ_PORT("KEY9") // ??? doubt if this is dip 2.
-//  AM_RANGE(0x888e, 0x888e) AM_READ_PORT("KEY0") // ??? doubt if this is dip 2.
-/*  AM_RANGE(0x888f, 0x888f) AM_READ_PORT("KEYA") // ??? doubt if this is dip 2.
-    AM_RANGE(0x888a, 0x888a) AM_READ_PORT("KEY1") // ??? doubt if this is dip 2.
-    AM_RANGE(0x888b, 0x888b) AM_READ_PORT("KEY2") // ??? doubt if this is dip 2.
-    AM_RANGE(0x888c, 0x888c) AM_READ_PORT("KEY3") // ??? doubt if this is dip 2.
-    AM_RANGE(0x888d, 0x888d) AM_READ_PORT("KEY4") // ??? COLLECT??
-    AM_RANGE(0x888e, 0x888e) AM_READ_PORT("KEY5") // ??? doubt if this is dip 2.
-*/
-//  AM_RANGE(0x8887, 0x8887) AM_READ_PORT("KEY6") // ??? doubt if this is dip 2.
-
-//  AM_RANGE(0x8887, 0x8887) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
-//  AM_RANGE(0x8889, 0x8889) AM_READ_PORT("IN2")
-
-	AM_RANGE(0x8887, 0x8887) AM_MIRROR(0x8) AM_READ_PORT("SERVICE")
-//  AM_RANGE(0x888f, 0x888f) AM_READ_PORT("SERVICE")
-
-	AM_RANGE(0x8888, 0x8888) AM_MIRROR(0x8) AM_READ_PORT("DOOR")
-//  AM_RANGE(0x8890, 0x8890) AM_READ_PORT("DOOR")
-
-	AM_RANGE(0x8892, 0x8892) AM_MIRROR(0x8) AM_READ_PORT("DOOR2")
-//  AM_RANGE(0x889a, 0x889a) AM_READ_PORT("DOOR2")
-	AM_RANGE(0x8893, 0x8893) AM_MIRROR(0x8)AM_READ_PORT("DOOR3")
-//  AM_RANGE(0x889b, 0x889b) AM_READ_PORT("DOOR3")
-
-	AM_RANGE(0x8e00, 0x8fff) AM_RAM // nvram maybe!
-
-	AM_RANGE(0x8000, 0x8dff) AM_RAM AM_BASE(&main_ram)
-
-	AM_RANGE(0xC000, 0xC007) AM_RAM // shared ram to 2nd cpu?? battery backed ram?
-
-	AM_RANGE(0xC802, 0xC802) AM_READ_PORT("DSW") // first dip
-//  AM_RANGE(0xc803, 0xc803) AM_READ_PORT("IN1") // ??? doubt if this is dip 2.
-
-	AM_RANGE(0xCA02, 0xCA03) AM_RAM AM_WRITE(dderby_sound_w) // BEST GUESS SO FAR!
-	AM_RANGE(0xCA00, 0xCA00) AM_RAM AM_WRITE(dderby_sound_w) // BEST GUESS SO FAR!
-	AM_RANGE(0xCA00, 0xCA03) AM_RAM //AM_WRITE(SMH_NOP) // sound hook?
-
-	AM_RANGE(0xCC00, 0xCC05) AM_RAM AM_BASE(&scroll_ram)
-
-// CORRECT HERE (I THINK!)
-	AM_RANGE(0xCE08, 0XCE1F) AM_RAM AM_BASE(&sprite_ram) // horse sprites
-	AM_RANGE(0xD000, 0xD3ff) AM_RAM AM_BASE(&dderby_vidchars) // char ram
-	AM_RANGE(0xD400, 0xD7ff) AM_RAM AM_BASE(&dderby_vidattribs) // colours/ attrib ram
-
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
+	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
+	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("IN3")
+	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("IN4")
+	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("IN5")
+	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN6")
+	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("IN7")
+	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW2")
+	AM_RANGE(0xca01, 0xca01) AM_WRITENOP //watchdog
+	AM_RANGE(0xca02, 0xca02) AM_RAM AM_WRITE(dderby_sound_w)
+	AM_RANGE(0xca03, 0xca03) AM_RAM //???
+	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_BASE(&scroll_ram)
+	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_BASE(&sprite_ram) // horse sprites
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(&dderby_vidchars) // char ram
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE(&dderby_vidattribs) // colours/ attrib ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dderby_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&dderby_soundmem) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x1000) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_RAM //???
+	AM_RANGE(0x4000, 0x4000) AM_READWRITE(soundlatch_r,ay8910_control_port_0_w)
 	AM_RANGE(0x4001, 0x4001) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
-
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
-
+	AM_RANGE(0x6000, 0x67ff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dderby )
-
-	PORT_START("SERVICE")
-	PORT_DIPNAME(0xff,0xff,"Refill Key")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-	PORT_START("KEY0")
-	PORT_DIPNAME(0xff,0xff,"KEY0")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-	PORT_START("KEYA")
-	PORT_DIPNAME(0xff,0xff,"KEYA")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-
-	PORT_START("KEY1")
-	PORT_DIPNAME(0xff,0xff,"KEY1")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-	PORT_START("KEY2")
-	PORT_DIPNAME(0xff,0xff,"KEY2")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-	PORT_START("KEY3")
-	PORT_DIPNAME(0xff,0xff,"KEY3")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-	PORT_START("KEY4")
-	PORT_DIPNAME(0xff,0xff,"KEY4")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-	PORT_START("KEY5")
-	PORT_DIPNAME(0xff,0xff,"KEY5")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-	PORT_START("KEY6")
-	PORT_DIPNAME(0xff,0xff,"KEY6")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-	PORT_START("KEY7")
-	PORT_DIPNAME(0xff,0xff,"KEY7")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-	PORT_START("KEY8")
-	PORT_DIPNAME(0xff,0xff,"KEY8")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-	PORT_START("KEY9")
-	PORT_DIPNAME(0xff,0xff,"KEY9")
-	PORT_DIPSETTING(0xff, DEF_STR( Off ))
-	PORT_DIPSETTING(0x00,DEF_STR( On ))
-
-	PORT_START("DOOR")
-	PORT_DIPNAME(0x02,0x02,"Door")
-	PORT_DIPSETTING(0x02, "Open")
-	PORT_DIPSETTING(0x00," CLOSED")
-	PORT_START("DOOR2")
-	PORT_DIPNAME(0x02,0x02,"Door")
-	PORT_DIPSETTING(0x02, "Open")
-	PORT_DIPSETTING(0x00," CLOSED")
-	PORT_START("DOOR3")
-	PORT_DIPNAME(0x02,0x02,"Door")
-	PORT_DIPSETTING(0x02, "Open")
-	PORT_DIPSETTING(0x00," CLOSED")
-
-	PORT_START("DSW")	/* 8bit */
+    PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_START("IN1")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_START("IN3")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN3" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_START("IN4")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN4" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_START("IN5")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN5" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_START("IN6")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN6" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_START("IN7")
+	PORT_DIPNAME( 0x0001, 0x0001, "IN7" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_START("DSW1")	/* 8bit */
 	PORT_DIPNAME( 0x01, 0x01, " Unknown 1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -237,23 +310,21 @@ static INPUT_PORTS_START( dderby )
 	PORT_DIPSETTING(    0x04, "480p (cash + tokens)" )
 	PORT_DIPSETTING(    0x00, "600p (cash + tokens)" )
 	PORT_DIPNAME( 0x30, 0x00, "Percentage Payout" )
-	PORT_DIPSETTING(    0x00, "76%" )	PORT_CONDITION("DSW", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x10, "80%" )	PORT_CONDITION("DSW", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x30, "88%" )	PORT_CONDITION("DSW", 0xc0, PORTCOND_LESSTHAN, 0x80)
-
-	PORT_DIPSETTING(    0x00, "78%" )	PORT_CONDITION("DSW", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x10, "82%" )	PORT_CONDITION("DSW", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x30, "90%" )	PORT_CONDITION("DSW", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-
+	PORT_DIPSETTING(    0x00, "76%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x10, "80%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x30, "88%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x00, "78%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x10, "82%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x30, "90%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
 	PORT_DIPNAME( 0xc0, 0x80, "Price Per Game" )
 	PORT_DIPSETTING(    0x00, "2p" )
 	PORT_DIPSETTING(    0x40, "5p" )
 	PORT_DIPSETTING(    0x80, "10p" )
 	PORT_DIPSETTING(    0xc0, "20p" )
 
-	PORT_START("IN1")	/* 8bit */
+	PORT_START("DSW2")	/* 8bit */
 	PORT_DIPNAME( 0x01, 0x01, "Show Results")
 	PORT_DIPSETTING(    0x01, "Last Race" )
 	PORT_DIPSETTING(    0x00, "Last 6 Races" )
@@ -278,38 +349,11 @@ static INPUT_PORTS_START( dderby )
 	PORT_DIPNAME( 0x80, 0x80, " Unknown 8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN2")	/* 8bit */
-	PORT_DIPNAME( 0x01, 0x00, " Unknown 1") // token error ???
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, " Unknown 2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, " Unknown 3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, " Unknown 4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, " Unknown 1")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, " Unknown 2" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, " Unknown 3" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, " Unknown 4" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dderbya )
 	PORT_INCLUDE( dderby )
-	PORT_MODIFY("DSW")	/* 8bit */
+	PORT_MODIFY("DSW1")	/* 8bit */
 	PORT_DIPNAME( 0x01, 0x01, "Price Per Play")
 	PORT_DIPSETTING(    0x01, "5p" )
 	PORT_DIPSETTING(    0x00, "10p" )
@@ -512,15 +556,16 @@ wouldnt like to say its the most effective way though...
 
 static INTERRUPT_GEN( dderby_interrupt )
 {
-	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "main"), 0, HOLD_LINE, 0x8a); // game
+	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "main"), 0, HOLD_LINE, 0xcf);/* RST 08h */
 }
 
 
+#if 0
 static INTERRUPT_GEN( dderby_sound_interrupt )
 {
 	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "audio"), 0, HOLD_LINE, 0x50);
 }
-
+#endif
 
 // copied from elsewhere. maybe incorrect
 static PALETTE_INIT( dmnderby )
@@ -581,13 +626,12 @@ static MACHINE_DRIVER_START( dderby )
 	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
 	MDRV_CPU_PERIODIC_INT(dderby_interrupt, 244)	// seems about right judging by countdown timer on screen (15 > 1)
-//  MDRV_CPU_VBLANK_INT("main", dderby_interrupt)
+//	MDRV_CPU_VBLANK_INT("main", dderby_interrupt)
 
-// SOUND CPU (PROBABLY WRONG)
-//
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* verified on schematics */
 	MDRV_CPU_PROGRAM_MAP(dderby_sound_map,0)
-	MDRV_CPU_PERIODIC_INT(dderby_sound_interrupt, 100)	// total guess
+//	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+//	MDRV_CPU_PERIODIC_INT(dderby_sound_interrupt, 100)	// total guess
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_NVRAM_HANDLER(dderby)
