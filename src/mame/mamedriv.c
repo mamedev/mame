@@ -7447,17 +7447,6 @@ Other Sun games
 	DRIVER( moonlght )	/* bootleg */
 	DRIVER( chry10 )	/* bootleg */
 	DRIVER( chrygld )	/* bootleg */
-	DRIVER( ncb3 )		/* (c) 199? Dyna/bootleg? */
-	DRIVER( cb3a )		/* (c) 199? Dyna/bootleg? */
-	DRIVER( cb3 )		/* (c) 199? Dyna/bootleg? */
-	DRIVER( cmv801 )	/* (c) 198? Corsica */
-	DRIVER( cmv4 )		/* (c) 1992 Dyna */
-	DRIVER( cmaster )	/* (c) 1991 Dyna */
-	DRIVER( cm2v841 )	/* (c) 198? Dyna Electronics */
-	DRIVER( cm2841a )	/* (c) 198? Dyna Electronics */
-	DRIVER( cmast91 )	/* (c) 1991 Dyna */
-	DRIVER( lucky8 )	/* (c) 1989 Wing Co.Ltd */
-	DRIVER( lucky8a )	/* (c) 1989 Wing Co.Ltd */
  	DRIVER( cpoker )	/* (c) 1993? IGS */
  	DRIVER( cpokert )	/* (c) 1993? Tuning */
 	DRIVER( csk227it )	/* (c) 198? IGS */
@@ -8437,9 +8426,6 @@ Other Sun games
 	DRIVER( vcombat )	/* (c) 1993 VR8 Inc. */
 	DRIVER( shadfgtr )	/* (c) 1989 Sega? */
 	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
-	DRIVER( lucky74 )	/* (c) 1988 Wing Co., Ltd */
-	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
-	DRIVER( luckgrln )	/* (c) 1991 Wing Co., Ltd */
 	DRIVER( magictg )	/* (c) 199? Acclaim */
 	DRIVER( magictga )	/* (c) 199? Acclaim */
 	DRIVER( re900 )		/* (c) 1993 Entretenimientos GEMINIS */
@@ -8499,7 +8485,16 @@ Other Sun games
 	DRIVER( showhanc )	/* (c) 1999? Astro Corp. */
 
 	/* Dyna */
-	DRIVER ( cb2001 )
+	DRIVER( cb2001 )	/* (c) Dyna */
+	DRIVER( ncb3 )		/* (c) 199? Dyna/bootleg? */
+	DRIVER( cb3a )		/* (c) 199? Dyna/bootleg? */
+	DRIVER( cb3 )		/* (c) 199? Dyna/bootleg? */
+	DRIVER( cmv801 )	/* (c) 198? Corsica */
+	DRIVER( cmv4 )		/* (c) 1992 Dyna */
+	DRIVER( cmaster )	/* (c) 1991 Dyna */
+	DRIVER( cm2v841 )	/* (c) 198? Dyna Electronics */
+	DRIVER( cm2841a )	/* (c) 198? Dyna Electronics */
+	DRIVER( cmast91 )	/* (c) 1991 Dyna */
 
 	/* STG? */
 	DRIVER ( queen )
@@ -8509,5 +8504,13 @@ Other Sun games
 
 	/* Eagle */
 	DRIVER ( janshi )
+
+	/* Wing */
+	DRIVER( slotcarn )	/* (c) 1985 Wing Co. Ltd */
+	DRIVER( lucky74 )	/* (c) 1988 Wing Co. Ltd */
+	DRIVER( lucky74a )	/* (c) 1988 Wing Co. Ltd */
+	DRIVER( lucky8 )	/* (c) 1989 Wing Co. Ltd */
+	DRIVER( lucky8a )	/* (c) 1989 Wing Co. Ltd */
+	DRIVER( luckgrln )	/* (c) 1991 Wing Co. Ltd */
 
 #endif	/* DRIVER_RECURSIVE */
