@@ -672,9 +672,10 @@ static READ8_HANDLER( videopkr_t0_latch )
 	return t0_latch;
 }
 
-static WRITE8_HANDLER(p4_w)
+static WRITE8_HANDLER( prog_w )
 {
-	cputag_set_input_line(space->machine, "main", 0, CLEAR_LINE);	/* clear interrupt FF */
+	if (!data)
+		cputag_set_input_line(space->machine, "main", 0, CLEAR_LINE);	/* clear interrupt FF */
 }
 
 /*************************
@@ -877,11 +878,11 @@ static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_io_port, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(videopkr_io_r, videopkr_io_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(videopkr_p1_data_r, videopkr_p1_data_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(videopkr_p2_data_r, videopkr_p2_data_w)
-	AM_RANGE(MCS48_PORT_P4, MCS48_PORT_P4) AM_WRITE(p4_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(videopkr_t0_latch)
+	AM_RANGE(0x00,            0xff           ) AM_READWRITE(videopkr_io_r, videopkr_io_w)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1  ) AM_READWRITE(videopkr_p1_data_r, videopkr_p1_data_w)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2  ) AM_READWRITE(videopkr_p2_data_r, videopkr_p2_data_w)
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_WRITE(prog_w)
+	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0  ) AM_READ(videopkr_t0_latch)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
