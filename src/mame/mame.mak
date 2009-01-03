@@ -1771,6 +1771,8 @@ $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
 						$(LAYOUT)/pe_keno.lh \
 						$(LAYOUT)/pe_slots.lh
 
+$(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh
+
 $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 
 $(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh

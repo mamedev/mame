@@ -223,6 +223,8 @@ Notes:
 #include "polepos.h"
 #include "nam_cust.h"
 
+#include "polepos.lh"
+
 #define POLEPOS_TOGGLE	PORT_TOGGLE
 
 
@@ -874,6 +876,7 @@ static MACHINE_DRIVER_START( polepos )
 
 	MDRV_GFXDECODE(polepos)
 	MDRV_PALETTE_LENGTH(0x0f00)
+	MDRV_DEFAULT_LAYOUT(layout_polepos)
 
 	MDRV_PALETTE_INIT(polepos)
 	MDRV_VIDEO_START(polepos)
@@ -1772,4 +1775,3 @@ GAME( 1983, topracrb, polepos,	polepos, polepos,  polepos,	 ROT0, "bootleg", "To
 GAME( 1983, polepos2, 0,		polepos, polepos2, polepos2, ROT0, "Namco", "Pole Position II", 0 )
 GAME( 1983, poleps2a, polepos2, polepos, polepos2, polepos2, ROT0, "Namco (Atari license)", "Pole Position II (Atari)", 0 )
 GAME( 1983, poleps2b, polepos2, polepos, polepos2, polepos,	 ROT0, "bootleg", "Pole Position II (bootleg)", 0 )
-

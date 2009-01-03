@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="shifter" defstate="0">
+		<rect>
+			<bounds left="5" top="0" right="35" bottom="40" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+
+		<disk>
+			<bounds left="18" right="22" top="9" bottom="11" />
+			<color red="0.25" green="0.25" blue="0.25" />
+		</disk>
+		<rect>
+			<bounds left="18" right="22" top="10" bottom="30" />
+			<color red="0.25" green="0.25" blue="0.25" />
+		</rect>
+		<disk>
+			<bounds left="18" right="22" top="29" bottom="31" />
+			<color red="0.25" green="0.25" blue="0.25" />
+		</disk>
+
+		<text string="L">
+			<bounds left="15" right="25" top="2" bottom="8" />
+			<color red="1" green="1" blue="1" />
+		</text>
+		<text string="H">
+			<bounds left="15" right="25" top="32" bottom="38" />
+			<color red="1" green="1" blue="1" />
+		</text>
+
+		<rect state="0">
+			<bounds left="10" right="30" top="10" bottom="15" />
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<disk state="0">
+			<bounds left="7.5" right="12.5" top="10" bottom="15" />
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<bounds left="27.5" right="32.5" top="10" bottom="15" />
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+
+		<rect state="1">
+			<bounds left="10" right="30" top="25" bottom="30" />
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<disk state="1">
+			<bounds left="7.5" right="12.5" top="25" bottom="30" />
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<bounds left="27.5" right="32.5" top="25" bottom="30" />
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	
+	<view name="Shifter">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+		
+		<bezel element="shifter" inputtag="IN0" inputmask="0x02">
+			<bounds x="3.7" y="2.45" width="0.25" height="0.5" />
+			<color alpha="0.9" />
+		</bezel>
+	</view>	
+</mamelayout>

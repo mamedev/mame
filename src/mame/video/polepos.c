@@ -515,18 +515,5 @@ VIDEO_UPDATE( polepos )
 	draw_road(screen->machine, bitmap);
 	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
-/* following code should be enabled only in a debug build */
-/* original arcade doesn't work in this way */
-#ifdef MAME_DEBUG
-	{
-		int in = input_port_read(screen->machine, "IN0");
-		static int lastin;
-
-		if ((in ^ lastin) & polepos_gear_bit)
-			popmessage((in & polepos_gear_bit) ? "LO" : "HI");
-
-		lastin = in;
-	}
-#endif
 	return 0;
 }
