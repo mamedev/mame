@@ -693,6 +693,12 @@ static GFXDECODE_START( statriv2v )
 	GFXDECODE_ENTRY( "gfx1", 0, statriv2_tiles16x8_layout, 0, 64 )
 GFXDECODE_END
 
+static MACHINE_START( statriv2 )
+{
+    state_save_register_global(machine, question_offset_low);
+    state_save_register_global(machine, question_offset_med);
+    state_save_register_global(machine, question_offset_high);
+}
 
 static INTERRUPT_GEN( statriv2_interrupt )
 {
@@ -724,6 +730,8 @@ static MACHINE_DRIVER_START( statriv2 )
 	MDRV_PALETTE_INIT(statriv2)
 	MDRV_VIDEO_START(statriv2)
 	MDRV_VIDEO_UPDATE(statriv2)
+
+    MDRV_MACHINE_START(statriv2)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1096,13 +1104,13 @@ ROM_START( sextriv )
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
-GAME( 1981, statusbj, 0,        statusbj,  statusbj, 0, ROT0, "Status Games", "Status Black Jack (V1.0c)", GAME_IMPERFECT_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1984, hangman,  0,        hangman,   hangman,  0, ROT0, "Status Games", "Hangman", 0 )
-GAME( 1984, trivquiz, 0,        trivquiz,  statriv2, 0, ROT0, "Status Games", "Triv Quiz", 0 )
-GAME( 1984, statriv2, 0,        statriv2,  statriv2, 0, ROT0, "Status Games", "Triv Two", 0 )
-GAME( 1985, statrv2v, statriv2, statriv2v, statriv2, 0, ROT90,"Status Games", "Triv Two (Vertical)", 0 )
-GAME( 1985, statriv4, 0,        statriv4,  statriv4, 0, ROT0, "Status Games", "Triv Four", 0 )
-GAME( 1985, sextriv,  0,        sextriv,   sextriv,  0, ROT0, "Status Games", "Sex Triv", 0 )
-GAME( 1985, quaquiz2, 0,        quaquiz2,  quaquiz2, 0, ROT0, "Status Games", "Quadro Quiz II", GAME_NOT_WORKING )
-GAME( 1986, supertr2, 0,        supertr2,  supertr2, 0, ROT0, "Status Games", "Super Triv II", 0 )
-GAME( 1988, supertr3, 0,        supertr3,  supertr2, 0, ROT0, "Status Games", "Super Triv III", GAME_IMPERFECT_GRAPHICS)
+GAME( 1981, statusbj, 0,        statusbj,  statusbj, 0, ROT0, "Status Games", "Status Black Jack (V1.0c)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1984, hangman,  0,        hangman,   hangman,  0, ROT0, "Status Games", "Hangman", GAME_SUPPORTS_SAVE )
+GAME( 1984, trivquiz, 0,        trivquiz,  statriv2, 0, ROT0, "Status Games", "Triv Quiz", GAME_SUPPORTS_SAVE )
+GAME( 1984, statriv2, 0,        statriv2,  statriv2, 0, ROT0, "Status Games", "Triv Two", GAME_SUPPORTS_SAVE )
+GAME( 1985, statrv2v, statriv2, statriv2v, statriv2, 0, ROT90,"Status Games", "Triv Two (Vertical)", GAME_SUPPORTS_SAVE )
+GAME( 1985, statriv4, 0,        statriv4,  statriv4, 0, ROT0, "Status Games", "Triv Four", GAME_SUPPORTS_SAVE )
+GAME( 1985, sextriv,  0,        sextriv,   sextriv,  0, ROT0, "Status Games", "Sex Triv", GAME_SUPPORTS_SAVE )
+GAME( 1985, quaquiz2, 0,        quaquiz2,  quaquiz2, 0, ROT0, "Status Games", "Quadro Quiz II", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1986, supertr2, 0,        supertr2,  supertr2, 0, ROT0, "Status Games", "Super Triv II", GAME_SUPPORTS_SAVE )
+GAME( 1988, supertr3, 0,        supertr3,  supertr2, 0, ROT0, "Status Games", "Super Triv III", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
