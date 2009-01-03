@@ -139,62 +139,6 @@ ROM_START( lhzb2a )
 	ROM_LOAD( "m1103",    0x000000, 0x080000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
 ROM_END
 
-/*
-
-Mahjong Man Guan Cai Shen
-IGS, 1998
-
-
-PCB Layout
-----------
-
-IGS PCB NO-0192-1
-|---------------------------------------|
-|              JAMMA            UPC1242 |
-|                                       |
-|               S1502.U10               |
-|                          K668    VOL  |
-|                                       |
-|                                       |
-|                       22MHz           |
-|1     61256                            |
-|8              |-------|      TEXT.U25 |
-|W     PAL      |       |               |
-|A              |IGS017 |               |
-|Y              |       |      M1501.U23|
-|               |-------|               |
-|   |-------|                           |
-|   |       |                           |
-|   |IGS025 |   P1500.U8                |
-|   |       |              PAL    6264  |
-|1  |-------|                           |
-|0  |----|                 PAL    6264  |
-|W  |IGS |                 PAL          |
-|A  |029 |  8MHz                 SPDT_SW|
-|Y  |----|                 68000        |
-|T DSW1  DSW2                   BATTERY |
-|---------------------------------------|
-Notes:
-      Uses JAMMA & common 10-way/18-way Mahjong pinout
-      68000 clock 11.000MHz [22/2]
-      K668  == Oki M6295 (QFP44). Clock 1MHz [8/8]. pin7 = High
-      VSync - 60Hz
-      HSync - 15.3kHz
-
-*/
-
-
-ROM_START( mgcs )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
-	ROM_LOAD16_WORD_SWAP( "p1500.u8", 0x00000, 0x80000, CRC(a8cb5905) SHA1(37be7d926a1352869632d43943763accd4dec4b7) )
-
-	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "s1502.u10", 0x00000, 0x80000, CRC(a8a6ba58) SHA1(59276a8ab4a31812600816c2a43b74bd71394419) )
-
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "m1501.u23", 0x000000, 0x200000, CRC(7a876bcc) SHA1(581740f39cfac56324f483a24aece6957645378a) )
-	ROM_LOAD( "text.u25",    0x000000, 0x080000, CRC(a37f9613) SHA1(812f060ca98a34540c48a180c359c3d0f1c0b5bb) )
-ROM_END
 
 /*
 
@@ -460,56 +404,6 @@ static DRIVER_INIT( lhzb2a )
 
 }
 
-static DRIVER_INIT( mgcs )
-{
-	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
-
-	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
-	{
-		UINT16 x = src[i];
-
-		/* bit 0 xor layer */
-
-		if( i & 0x20/2 )
-		{
-			if( i & 0x02/2 )
-			{
-				x ^= 0x0001;
-			}
-		}
-
-		if( !(i & 0x4000/2) )
-		{
-			if( !(i & 0x300/2) )
-			{
-				x ^= 0x0001;
-			}
-		}
-
-		/* bit 8 xor layer */
-
-		if( (i & 0x2000/2) || !(i & 0x80/2) )
-		{
-			if( i & 0x100/2 )
-			{
-				if( !(i & 0x20/2) || (i & 0x400/2) )
-				{
-					x ^= 0x0100;
-				}
-			}
-		}
-		else
-		{
-			x ^= 0x0100;
-		}
-
-		src[i] = x;
-	}
-}
-
 static DRIVER_INIT( slqz2 )
 {
 	int i;
@@ -643,7 +537,6 @@ static DRIVER_INIT( sdmg2 )
 
 GAME( 1998, lhzb2,    0,        igs_m68,    igs_m68,    lhzb2,  ROT0,  "IGS", "Mahjong Long Hu Zheng Ba 2 (set 1)", GAME_NOT_WORKING )
 GAME( 1998, lhzb2a,   lhzb2,    igs_m68,    igs_m68,    lhzb2a, ROT0,  "IGS", "Mahjong Long Hu Zheng Ba 2 (set 2)", GAME_NOT_WORKING )
-GAME( 1998, mgcs,     0,        igs_m68,    igs_m68,    mgcs,   ROT0,  "IGS", "Mahjong Man Guan Cai Shen", GAME_NOT_WORKING )
 GAME( 1998, slqz2,    0,        igs_m68,    igs_m68,    slqz2,  ROT0,  "IGS", "Mahjong Shuang Long Qiang Zhu 2", GAME_NOT_WORKING )
 GAME( 1997, sdmg2,    0,        igs_m68,    igs_m68,    sdmg2,  ROT0,  "IGS", "Mahjong Super Da Man Guan 2", GAME_NOT_WORKING )
 

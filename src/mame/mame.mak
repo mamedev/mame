@@ -761,7 +761,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/goldstar.o $(VIDEO)/goldstar.o \
 	$(DRIVERS)/igs009.o \
 	$(DRIVERS)/igs_blit.o \
-	$(DRIVERS)/igs_180.o \
+	$(DRIVERS)/igs017.o \
 	$(DRIVERS)/igs_m027.o \
 	$(DRIVERS)/igs_m68.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
