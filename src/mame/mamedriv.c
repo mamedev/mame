@@ -8151,6 +8151,10 @@ Other Sun games
 	DRIVER( cubeqst )	/* (c) 1983 Simutrek Inc. */
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
 
+	/* Impera */
+	DRIVER( magicard )	/* (c) 199? */
+	DRIVER( magicrda )	/* (c) 199? */
+
 	/* Funworld */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolyc3x3 )	/* (c) 1985 TAB-Austria */

@@ -1671,6 +1671,7 @@ src/mame/drivers/macs.c svneol=native#text/plain
 src/mame/drivers/madalien.c svneol=native#text/plain
 src/mame/drivers/madmotor.c svneol=native#text/plain
 src/mame/drivers/magic10.c svneol=native#text/plain
+src/mame/drivers/magicard.c svneol=native#text/plain
 src/mame/drivers/magicfly.c svneol=native#text/plain
 src/mame/drivers/magictg.c svneol=native#text/plain
 src/mame/drivers/magmax.c svneol=native#text/plain
