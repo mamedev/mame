@@ -1,4 +1,19 @@
-/*
+/*******************************************************************************************
+
+Diamond Derby - G4001 board (c) 1986 Electrocoin
+
+driver by David Haywood,Mike Green & Angelo Salese
+
+Notes:
+-Press Collect Button to "get the money";
+
+TODO:
+-Enters into Service Mode (?) if you let it go in attract mode after some time;
+-Fix remaining graphic issues;
+-Fix colors (check bar test on the first Service Mode menu);
+
+============================================================================================
+
 G4001
 Diamond Derby - Electrocoin on an SNK board
 
@@ -33,10 +48,7 @@ DD10 DD14  DD18     H5            DD21
  2114                  2148 2148
  2114              H10
 
-
- Driver Improvements by Mike Green
-
-*/
+*******************************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -66,22 +78,53 @@ static WRITE8_HANDLER( dderby_sound_w )
 	cpu_set_input_line(cputag_get_cpu(space->machine, "audio"), 0, HOLD_LINE);
 }
 
+static UINT8 io_port[8];
+
+static READ8_HANDLER( input_r )
+{
+	switch(offset & 7)
+	{
+		case 0: return input_port_read(space->machine, "IN0");
+		case 1: return input_port_read(space->machine, "IN1");
+		case 2: return input_port_read(space->machine, "IN2");
+		case 3: return input_port_read(space->machine, "IN3");
+		case 4: return input_port_read(space->machine, "IN4");
+		case 5: return input_port_read(space->machine, "IN5");
+		case 6: return input_port_read(space->machine, "IN6");
+		case 7: return input_port_read(space->machine, "IN7");
+	}
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( output_w )
+{
+	/*
+	---- x--- refill meter [4]
+	---- x--- token out meter [5]
+	---- x--- token in meter [6]
+	---- x--- cash out meter [7]
+	---- -x-- coin out (meter) [0-3]
+	---- -x-- coin lockout token [4]
+	---- -x-- coin counter (meter) [5]
+	---- --x- coin lockout [0-3]
+	---- ---x lamp [0-6]
+	*/
+	io_port[offset] = data;
+//	popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",io_port[0],io_port[1],io_port[2],io_port[3],io_port[4],io_port[5],io_port[6],io_port[7]);
+}
+
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("IN3")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("IN4")
-	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("IN5")
-	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN6")
-	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("IN7")
+	AM_RANGE(0xc000, 0xc007) AM_READ(input_r)
+	AM_RANGE(0xc000, 0xc007) AM_WRITE(output_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW2")
+	AM_RANGE(0xca00, 0xca00) AM_WRITENOP//(vblank_irq_w) //???
 	AM_RANGE(0xca01, 0xca01) AM_WRITENOP //watchdog
 	AM_RANGE(0xca02, 0xca02) AM_RAM AM_WRITE(dderby_sound_w)
-	AM_RANGE(0xca03, 0xca03) AM_RAM //???
+	AM_RANGE(0xca03, 0xca03) AM_WRITENOP//(timer_irq_w) //???
 	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_BASE(&scroll_ram)
 	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_BASE(&sprite_ram) // horse sprites
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(&dderby_vidchars) // char ram
@@ -98,206 +141,54 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dderby )
     PORT_START("IN0")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_DIPNAME( 0x0002, 0x0002, "Out Coin 1" )//out coin 1
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("BET Horse 5")  PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )
+
     PORT_START("IN1")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_DIPNAME( 0x0002, 0x0002, "Out Coin 2" )//out coin 2
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("BET Horse 6")  PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )
+
     PORT_START("IN2")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_DIPNAME( 0x0002, 0x0002, "Out Coin 3" )//out coin 3
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Collect")  PORT_CODE(KEYCODE_2_PAD) //to get coins
+	PORT_BIT( 0xf4, IP_ACTIVE_LOW, IPT_UNUSED )
+
     PORT_START("IN3")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN3" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
     PORT_START("IN4")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN4" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Refill Key")  PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("BET Horse 4")  PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0xf5, IP_ACTIVE_LOW, IPT_UNUSED )
+
     PORT_START("IN5")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN5" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("BET Horse 3")  PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0xf5, IP_ACTIVE_LOW, IPT_UNUSED )
+
     PORT_START("IN6")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN6" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Back Door")  PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("BET Horse 2")  PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0xf5, IP_ACTIVE_LOW, IPT_UNUSED )
+
     PORT_START("IN7")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN7" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_START("DSW1")	/* 8bit */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Token Coin")  PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("BET Horse 1")  PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0xf5, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, " Unknown 1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -376,7 +267,6 @@ static INPUT_PORTS_START( dderbya )
 	PORT_DIPNAME( 0x80, 0x80, " Unknown 4" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
@@ -417,12 +307,7 @@ static GFXDECODE_START( dmndrby )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 32*16, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0, 8)
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 16*16, 32 )
-
 GFXDECODE_END
-
-
-
-
 
 static TILE_GET_INFO( get_dmndrby_tile_info )
 {
@@ -553,21 +438,7 @@ wouldnt like to say its the most effective way though...
 	return 0;
 }
 
-
-static INTERRUPT_GEN( dderby_interrupt )
-{
-	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "main"), 0, HOLD_LINE, 0xcf);/* RST 08h */
-}
-
-
-#if 0
-static INTERRUPT_GEN( dderby_sound_interrupt )
-{
-	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "audio"), 0, HOLD_LINE, 0x50);
-}
-#endif
-
-// copied from elsewhere. maybe incorrect
+// copied from elsewhere. surely incorrect
 static PALETTE_INIT( dmnderby )
 {
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -621,17 +492,26 @@ static PALETTE_INIT( dmnderby )
 	}
 }
 
+/*Main Z80 is IM 0,HW-latched irqs. */
+static INTERRUPT_GEN( dderby_irq )
+{
+	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "main"), 0, HOLD_LINE, 0xd7); /* RST 10h */
+}
+
+static INTERRUPT_GEN( dderby_timer_irq )
+{
+	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "main"), 0, HOLD_LINE, 0xcf); /* RST 08h */
+}
+
 static MACHINE_DRIVER_START( dderby )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
-	MDRV_CPU_PERIODIC_INT(dderby_interrupt, 244)	// seems about right judging by countdown timer on screen (15 > 1)
-//	MDRV_CPU_VBLANK_INT("main", dderby_interrupt)
+	MDRV_CPU_VBLANK_INT("main", dderby_irq)
+	MDRV_CPU_PERIODIC_INT(dderby_timer_irq, 244)
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* verified on schematics */
 	MDRV_CPU_PROGRAM_MAP(dderby_sound_map,0)
-//	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-//	MDRV_CPU_PERIODIC_INT(dderby_sound_interrupt, 100)	// total guess
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_NVRAM_HANDLER(dderby)
@@ -758,5 +638,5 @@ ROM_END
 
 
 /*    YEAR, NAME,    PARENT,   MACHINE, INPUT,   INIT,    MONITOR, COMPANY,   FULLNAME */
-GAME( 1994, dmndrby,  0,       dderby, dderby,  0, ROT0, "Electrocoin", "Diamond Derby (Newer)",GAME_NOT_WORKING|GAME_NO_SOUND ) // hack?
-GAME( 1986, dmndrbya, dmndrby, dderby, dderbya, 0, ROT0, "Electrocoin", "Diamond Derby (Original)",GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1994, dmndrby,  0,       dderby, dderby,  0, ROT0, "Electrocoin", "Diamond Derby (Newer)",GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_COLORS|GAME_NOT_WORKING ) // hack?
+GAME( 1986, dmndrbya, dmndrby, dderby, dderbya, 0, ROT0, "Electrocoin", "Diamond Derby (Original)",GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_COLORS|GAME_NOT_WORKING )
