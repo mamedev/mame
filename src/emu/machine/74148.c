@@ -167,7 +167,7 @@ int TTL74148_enable_output_r(int which)
 
 
 
-void TTL74148_config(int which, const struct TTL74148_interface *intf)
+void TTL74148_config(running_machine *machine, int which, const struct TTL74148_interface *intf)
 {
 	if (which >= MAX_TTL74148)
 	{
@@ -176,18 +176,27 @@ void TTL74148_config(int which, const struct TTL74148_interface *intf)
 	}
 
 
-	chips[which].output_cb = (intf ? intf->output_cb : 0);
-	chips[which].enable_input = 1;
-	chips[which].input_lines[0] = 1;
-	chips[which].input_lines[1] = 1;
-	chips[which].input_lines[2] = 1;
-	chips[which].input_lines[3] = 1;
-	chips[which].input_lines[4] = 1;
-	chips[which].input_lines[5] = 1;
-	chips[which].input_lines[6] = 1;
-	chips[which].input_lines[7] = 1;
+    chips[which].output_cb = (intf ? intf->output_cb : 0);
+    chips[which].enable_input = 1;
+    chips[which].input_lines[0] = 1;
+    chips[which].input_lines[1] = 1;
+    chips[which].input_lines[2] = 1;
+    chips[which].input_lines[3] = 1;
+    chips[which].input_lines[4] = 1;
+    chips[which].input_lines[5] = 1;
+    chips[which].input_lines[6] = 1;
+    chips[which].input_lines[7] = 1;
 
-	chips[which].last_output = -1;
-	chips[which].last_output_valid = -1;
-	chips[which].last_enable_output = -1;
+    chips[which].last_output = -1;
+    chips[which].last_output_valid = -1;
+    chips[which].last_enable_output = -1;
+
+    state_save_register_item_array(machine, "ttl74148", NULL, which, chips[which].input_lines);
+    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].enable_input);
+    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].output);
+    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].output_valid);
+    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].enable_output);
+    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].last_output);
+    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].last_output_valid);
+    state_save_register_item(machine, "ttl74148", NULL, which, chips[which].last_enable_output);
 }

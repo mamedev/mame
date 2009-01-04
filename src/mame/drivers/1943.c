@@ -458,6 +458,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1987, 1943,     0,        1943,     1943,     0, ROT270, "Capcom", "1943: The Battle of Midway (US)", 0 )
-GAME( 1987, 1943j,    1943,     1943,     1943,     0, ROT270, "Capcom", "1943: Midway Kaisen (Japan)", 0 )
-GAME( 1987, 1943kai,  0,        1943,     1943,     0, ROT270, "Capcom", "1943 Kai: Midway Kaisen (Japan)", 0 )
+GAME( 1987, 1943,     0,        1943,     1943,     0, ROT270, "Capcom", "1943: The Battle of Midway (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, 1943j,    1943,     1943,     1943,     0, ROT270, "Capcom", "1943: Midway Kaisen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, 1943kai,  0,        1943,     1943,     0, ROT270, "Capcom", "1943 Kai: Midway Kaisen (Japan)", GAME_SUPPORTS_SAVE )

@@ -169,6 +169,12 @@ VIDEO_START( carpolo )
 	sprite_goal_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT, format);
 
 	sprite_border_collision_bitmap = auto_bitmap_alloc(SPRITE_WIDTH, SPRITE_HEIGHT, format);
+
+    state_save_register_global_bitmap(machine, sprite_sprite_collision_bitmap1);
+    state_save_register_global_bitmap(machine, sprite_sprite_collision_bitmap2);
+    state_save_register_global_bitmap(machine, sprite_goal_collision_bitmap1);
+    state_save_register_global_bitmap(machine, sprite_goal_collision_bitmap2);
+    state_save_register_global_bitmap(machine, sprite_border_collision_bitmap);
 }
 
 

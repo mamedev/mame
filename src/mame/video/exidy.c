@@ -60,6 +60,15 @@ VIDEO_START( exidy )
 	motion_object_1_vid = auto_bitmap_alloc(16, 16, format);
 	motion_object_2_vid = auto_bitmap_alloc(16, 16, format);
 	motion_object_2_clip = auto_bitmap_alloc(16, 16, format);
+
+    state_save_register_global(machine, collision_mask);
+    state_save_register_global(machine, collision_invert);
+    state_save_register_global(machine, is_2bpp);
+    state_save_register_global(machine, int_condition);
+    state_save_register_global_bitmap(machine, background_bitmap);
+    state_save_register_global_bitmap(machine, motion_object_1_vid);
+    state_save_register_global_bitmap(machine, motion_object_2_vid);
+    state_save_register_global_bitmap(machine, motion_object_2_clip);
 }
 
 

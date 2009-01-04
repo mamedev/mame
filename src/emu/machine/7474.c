@@ -140,8 +140,6 @@ int TTL7474_output_comp_r(int which)
 
 void TTL7474_config(running_machine *machine, int which, const struct TTL7474_interface *intf)
 {
-	struct TTL7474 *chip = &chips[which];
-
 	if (which >= MAX_TTL7474)
 	{
 		logerror("Only %d 7474's are supported at this time.\n", MAX_TTL7474);
@@ -149,25 +147,25 @@ void TTL7474_config(running_machine *machine, int which, const struct TTL7474_in
 	}
 
 
-	chip->output_cb = (intf ? intf->output_cb : 0);
+    chips[which].output_cb = (intf ? intf->output_cb : 0);
 
 	/* all inputs are open first */
-    chip->clear = 1;
-    chip->preset = 1;
-    chip->clock = 1;
-    chip->d = 1;
+    chips[which].clear = 1;
+    chips[which].preset = 1;
+    chips[which].clock = 1;
+    chips[which].d = 1;
 
-    chip->last_clock = 1;
-    chip->last_output = -1;
-    chip->last_output_comp = -1;
+    chips[which].last_clock = 1;
+    chips[which].last_output = -1;
+    chips[which].last_output_comp = -1;
 
-    state_save_register_item(machine, "ttl7474", NULL, which, chip->clear);
-    state_save_register_item(machine, "ttl7474", NULL, which, chip->preset);
-    state_save_register_item(machine, "ttl7474", NULL, which, chip->clock);
-    state_save_register_item(machine, "ttl7474", NULL, which, chip->d);
-    state_save_register_item(machine, "ttl7474", NULL, which, chip->output);
-    state_save_register_item(machine, "ttl7474", NULL, which, chip->output_comp);
-    state_save_register_item(machine, "ttl7474", NULL, which, chip->last_clock);
-    state_save_register_item(machine, "ttl7474", NULL, which, chip->last_output);
-    state_save_register_item(machine, "ttl7474", NULL, which, chip->last_output_comp);
+    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].clear);
+    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].preset);
+    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].clock);
+    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].d);
+    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].output);
+    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].output_comp);
+    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].last_clock);
+    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].last_output);
+    state_save_register_item(machine, "ttl7474", NULL, which, chips[which].last_output_comp);
 }

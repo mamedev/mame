@@ -97,11 +97,14 @@ static UINT8 last_analog_output[2];
 static UINT8 *poly17 = NULL;
 static UINT8 *rand17 = NULL;
 
-
-
 /* local prototypes */
 static void poly17_init(void);
 
+/* local timers */
+static emu_timer *irq_off;
+static emu_timer *irq_timer;
+static emu_timer *firq_off;
+static emu_timer *firq_timer;
 
 /*************************************
  *
@@ -109,55 +112,66 @@ static void poly17_init(void);
  *
  *************************************/
 
-static TIMER_CALLBACK( irq_off )
+static TIMER_CALLBACK( irq_off_tick )
 {
 	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
-static TIMER_CALLBACK( irq_timer )
+static TIMER_CALLBACK( irq_timer_tick )
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), NULL, 64, irq_timer);
+        timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 	else
-		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), NULL, param + 64, irq_timer);
+        timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
+    timer_adjust_oneshot(irq_off, video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), 0);
 }
 
 
-static TIMER_CALLBACK( firq_off )
+static TIMER_CALLBACK( firq_off_tick )
 {
 	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-static TIMER_CALLBACK( firq_timer )
+static TIMER_CALLBACK( firq_timer_tick )
 {
 	/* same time next frame */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
+    timer_adjust_oneshot(firq_timer, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), 0);
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
 	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, BALSENTE_HBSTART), NULL, 0, firq_off);
+    timer_adjust_oneshot(firq_off, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, BALSENTE_HBSTART), 0);
+}
+
+static MACHINE_START( gridlee )
+{
+    /* create the polynomial tables */
+    poly17_init();
+
+    state_save_register_global_array(machine, last_analog_input);
+    state_save_register_global_array(machine, last_analog_output);
+
+    irq_off = timer_alloc(machine, irq_off_tick, 0);
+    irq_timer = timer_alloc(machine, irq_timer_tick, 0);
+    firq_off = timer_alloc(machine, firq_off_tick, 0);
+    firq_timer = timer_alloc(machine, firq_timer_tick, 0);
 }
 
 
 static MACHINE_RESET( gridlee )
 {
 	/* start timers to generate interrupts */
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, irq_timer);
-	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
-
-	/* create the polynomial tables */
-	poly17_init();
+    timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+    timer_adjust_oneshot(firq_timer, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), 0);
 }
 
 
@@ -437,6 +451,7 @@ static MACHINE_DRIVER_START( gridlee )
 	MDRV_CPU_ADD("main", M6809, BALSENTE_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
 
+    MDRV_MACHINE_START(gridlee)
 	MDRV_MACHINE_RESET(gridlee)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -500,4 +515,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, gridlee, 0,        gridlee, gridlee, 0,     ROT0, "Videa", "Gridlee", GAME_IMPERFECT_SOUND )
+GAME( 1983, gridlee, 0,        gridlee, gridlee, 0,     ROT0, "Videa", "Gridlee", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )

@@ -211,7 +211,7 @@ MACHINE_RESET( vertigo )
 {
 	int i;
 
-	TTL74148_config(0, &irq_encoder);
+	TTL74148_config(machine, 0, &irq_encoder);
 	TTL74148_enable_input_w(0, 0);
 
 	for (i = 0; i < 8; i++)

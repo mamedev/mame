@@ -23,6 +23,8 @@ static tilemap *background;
 
 int fortyl_pix_color[4];
 
+static int pixram_sel;
+
 /*
 *   color prom decoding
 */
@@ -98,6 +100,19 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 /***************************************************************************
 
+  State-related callbacks
+
+***************************************************************************/
+
+static STATE_POSTLOAD( redraw_pixels )
+{
+    fortyl_pix_redraw = 1;
+    tilemap_mark_all_tiles_dirty(background);
+}
+
+
+/***************************************************************************
+
   Start the video hardware emulation.
 
 ***************************************************************************/
@@ -116,6 +131,15 @@ VIDEO_START( fortyl )
 
 	tilemap_set_scroll_rows(background,32);
 	tilemap_set_transparent_pen(background,0);
+
+    state_save_register_global(machine, fortyl_flipscreen);
+    state_save_register_global_array(machine, fortyl_pix_color);
+    state_save_register_global_pointer(machine, fortyl_pixram1, 0x4000);
+    state_save_register_global_pointer(machine, fortyl_pixram2, 0x4000);
+    state_save_register_global_bitmap(machine, pixel_bitmap1);
+    state_save_register_global_bitmap(machine, pixel_bitmap2);
+    state_save_register_global(machine, pixram_sel);
+    state_save_register_postload(machine, redraw_pixels, NULL);
 }
 
 
@@ -124,8 +148,6 @@ VIDEO_START( fortyl )
   Memory handlers
 
 ***************************************************************************/
-
-static int pixram_sel;
 
 static void fortyl_set_scroll_x(int offset)
 {

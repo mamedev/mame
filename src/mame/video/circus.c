@@ -49,6 +49,10 @@ VIDEO_START( circus )
 {
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
+
+    state_save_register_global(machine, clown_x);
+    state_save_register_global(machine, clown_y);
+    state_save_register_global(machine, clown_z);
 }
 
 static void draw_line(bitmap_t *bitmap, const rectangle *cliprect, int x1, int y1, int x2, int y2, int dotted)

@@ -218,6 +218,45 @@ INLINE int sh6840_update_noise(int clocks)
 
 /*************************************
  *
+ *  6840 state saving
+ *
+ *************************************/
+
+static void sh6840_register_state_globals(running_machine *machine)
+{
+    state_save_register_global_array(machine, sh6840_volume);
+    state_save_register_global(machine, sh6840_MSB);
+    state_save_register_global(machine, sh6840_LFSR_oldxor);
+    state_save_register_global(machine, sh6840_LFSR_0);
+    state_save_register_global(machine, sh6840_LFSR_1);
+    state_save_register_global(machine, sh6840_LFSR_2);
+    state_save_register_global(machine, sh6840_LFSR_3);
+    state_save_register_global(machine, sh6840_clock_count);
+    state_save_register_global(machine, exidy_sfxctrl);
+    state_save_register_global(machine, sh6840_timer[0].cr);
+    state_save_register_global(machine, sh6840_timer[0].state);
+    state_save_register_global(machine, sh6840_timer[0].leftovers);
+    state_save_register_global(machine, sh6840_timer[0].timer);
+    state_save_register_global(machine, sh6840_timer[0].clocks);
+    state_save_register_global(machine, sh6840_timer[0].counter.w);
+    state_save_register_global(machine, sh6840_timer[1].cr);
+    state_save_register_global(machine, sh6840_timer[1].state);
+    state_save_register_global(machine, sh6840_timer[1].leftovers);
+    state_save_register_global(machine, sh6840_timer[1].timer);
+    state_save_register_global(machine, sh6840_timer[1].clocks);
+    state_save_register_global(machine, sh6840_timer[1].counter.w);
+    state_save_register_global(machine, sh6840_timer[2].cr);
+    state_save_register_global(machine, sh6840_timer[2].state);
+    state_save_register_global(machine, sh6840_timer[2].leftovers);
+    state_save_register_global(machine, sh6840_timer[2].timer);
+    state_save_register_global(machine, sh6840_timer[2].clocks);
+    state_save_register_global(machine, sh6840_timer[2].counter.w);
+}
+
+
+
+/*************************************
+ *
  *  Core sound generation
  *
  *************************************/
@@ -347,6 +386,8 @@ static void *common_sh_start(const device_config *device, int clock, const custo
 	/* allocate the stream */
 	exidy_stream = stream_create(device, 0, 1, sample_rate, NULL, exidy_stream_update);
 
+    sh6840_register_state_globals(device->machine);
+
 	return auto_malloc(1);
 }
 
@@ -376,6 +417,7 @@ static void common_sh_reset(void *token)
 	sh6840_volume[0] = 0;
 	sh6840_volume[1] = 0;
 	sh6840_volume[2] = 0;
+    sh6840_clock_count = 0;
 	exidy_sfxctrl = 0;
 
 	/* LFSR */
@@ -456,6 +498,31 @@ static const riot6532_interface r6532_interface =
 
 
 
+/*************************************
+ *
+ *  8253 state saving
+ *
+ *************************************/
+
+
+static void sh8253_register_state_globals(running_machine *machine)
+{
+    state_save_register_global(machine, sh8253_timer[0].clstate);
+    state_save_register_global(machine, sh8253_timer[0].enable);
+    state_save_register_global(machine, sh8253_timer[0].count);
+    state_save_register_global(machine, sh8253_timer[0].step);
+    state_save_register_global(machine, sh8253_timer[0].fraction);
+    state_save_register_global(machine, sh8253_timer[1].clstate);
+    state_save_register_global(machine, sh8253_timer[1].enable);
+    state_save_register_global(machine, sh8253_timer[1].count);
+    state_save_register_global(machine, sh8253_timer[1].step);
+    state_save_register_global(machine, sh8253_timer[1].fraction);
+    state_save_register_global(machine, sh8253_timer[2].clstate);
+    state_save_register_global(machine, sh8253_timer[2].enable);
+    state_save_register_global(machine, sh8253_timer[2].count);
+    state_save_register_global(machine, sh8253_timer[2].step);
+    state_save_register_global(machine, sh8253_timer[2].fraction);
+}
 
 /*************************************
  *
@@ -658,6 +725,9 @@ static void *venture_common_sh_start(const device_config *device, int clock, con
 
 	/* 8253 */
 	freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
+
+    state_save_register_global(machine, riot_irq_state);
+    sh8253_register_state_globals(device->machine);
 
 	return ret;
 }

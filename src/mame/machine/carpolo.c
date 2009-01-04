@@ -514,12 +514,22 @@ MACHINE_START( carpolo )
 	/* set up the PIA's */
 	pia_config(machine, 0, &pia_0_intf);
 	pia_config(machine, 1, &pia_1_intf);
+
+    state_save_register_global(machine, ball_screen_collision_cause);
+    state_save_register_global(machine, car_ball_collision_x);
+    state_save_register_global(machine, car_ball_collision_y);
+    state_save_register_global(machine, car_car_collision_cause);
+    state_save_register_global(machine, car_goal_collision_cause);
+    state_save_register_global(machine, car_ball_collision_cause);
+    state_save_register_global(machine, car_border_collision_cause);
+    state_save_register_global(machine, priority_0_extension);
+    state_save_register_global_array(machine, last_wheel_value);
 }
 
 MACHINE_RESET( carpolo )
 {
 	/* set up the priority encoder */
-	TTL74148_config(TTL74148_3S, &TTL74148_3S_intf);
+	TTL74148_config(machine, TTL74148_3S, &TTL74148_3S_intf);
 	TTL74148_enable_input_w(TTL74148_3S, 0);	/* always enabled */
 
 

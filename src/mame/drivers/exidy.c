@@ -768,6 +768,17 @@ GFXDECODE_END
 
 /*************************************
  *
+ *  Machine init
+ *
+ *************************************/
+
+static MACHINE_START( teetert )
+{
+    state_save_register_global(machine, last_dial);
+}
+
+/*************************************
+ *
  *  Machine drivers
  *
  *************************************/
@@ -857,6 +868,9 @@ static MACHINE_DRIVER_START( teetert )
 	MDRV_IMPORT_FROM(venture)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_VBLANK_INT_HACK(teetert_vblank_interrupt,10)
+
+    MDRV_MACHINE_START( teetert )
+
 MACHINE_DRIVER_END
 
 
@@ -1419,22 +1433,22 @@ static DRIVER_INIT( fax )
  *
  *************************************/
 
-GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, sidetrac, ROT0, "Exidy", "Side Track", 0 )
-GAME( 1980, targ,     0,       targ,     targ,     targ,     ROT0, "Exidy", "Targ", 0 )
-GAME( 1980, targc,    targ,    targ,     targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", 0 )
-GAME( 1980, spectar,  0,       spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", 0 )
-GAME( 1980, spectar1, spectar, spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 1?)", 0 )
-GAME( 1980, rallys,   spectar, rallys,   rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg?)", 0 )
-GAME( 1980, phantoma, spectar, rallys,   phantoma, phantoma, ROT0, "Jeutel","Phantomas", 0 )
+GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, sidetrac, ROT0, "Exidy", "Side Track", GAME_SUPPORTS_SAVE )
+GAME( 1980, targ,     0,       targ,     targ,     targ,     ROT0, "Exidy", "Targ", GAME_SUPPORTS_SAVE )
+GAME( 1980, targc,    targ,    targ,     targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spectar,  0,       spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", GAME_SUPPORTS_SAVE )
+GAME( 1980, spectar1, spectar, spectar,  spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 1?)", GAME_SUPPORTS_SAVE )
+GAME( 1980, rallys,   spectar, rallys,   rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1980, phantoma, spectar, rallys,   phantoma, phantoma, ROT0, "Jeutel","Phantomas", GAME_SUPPORTS_SAVE )
 
-GAME( 1981, mtrap,    0,       mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 5)", 0 )
-GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 3)", 0 )
-GAME( 1981, mtrap4,   mtrap,   mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 4)", 0 )
-GAME( 1981, venture,  0,       venture,  venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 1)", 0 )
-GAME( 1981, venture2, venture, venture,  venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 2)", 0 )
-GAME( 1981, venture4, venture, venture,  venture,  venture,  ROT0, "Exidy", "Venture (version 4)", 0 )
-GAME( 1982, teetert,  0,       teetert,  teetert,  teetert,  ROT0, "Exidy", "Teeter Torture (prototype)", 0 )
-GAME( 1982, pepper2,  0,       pepper2,  pepper2,  pepper2,  ROT0, "Exidy", "Pepper II", 0 )
-GAME( 1982, hardhat,  0,       pepper2,  pepper2,  pepper2,  ROT0, "Exidy", "Hard Hat", 0 )
-GAME( 1983, fax,      0,       fax,      fax,      fax,      ROT0, "Exidy", "FAX", 0 )
-GAME( 1983, fax2,     fax,     fax,      fax,      fax,      ROT0, "Exidy", "FAX 2", 0 )
+GAME( 1981, mtrap,    0,       mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 5)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 3)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mtrap4,   mtrap,   mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 4)", GAME_SUPPORTS_SAVE )
+GAME( 1981, venture,  0,       venture,  venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1981, venture2, venture, venture,  venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1981, venture4, venture, venture,  venture,  venture,  ROT0, "Exidy", "Venture (version 4)", GAME_SUPPORTS_SAVE )
+GAME( 1982, teetert,  0,       teetert,  teetert,  teetert,  ROT0, "Exidy", "Teeter Torture (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1982, pepper2,  0,       pepper2,  pepper2,  pepper2,  ROT0, "Exidy", "Pepper II", GAME_SUPPORTS_SAVE )
+GAME( 1982, hardhat,  0,       pepper2,  pepper2,  pepper2,  ROT0, "Exidy", "Hard Hat", GAME_SUPPORTS_SAVE )
+GAME( 1983, fax,      0,       fax,      fax,      fax,      ROT0, "Exidy", "FAX", GAME_SUPPORTS_SAVE )
+GAME( 1983, fax2,     fax,     fax,      fax,      fax,      ROT0, "Exidy", "FAX 2", GAME_SUPPORTS_SAVE )

@@ -220,6 +220,11 @@ VIDEO_START( 1943 )
 
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[1], 0x0f);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
+
+    state_save_register_global(machine, chon);
+    state_save_register_global(machine, objon);
+    state_save_register_global(machine, sc1on);
+    state_save_register_global(machine, sc2on);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)

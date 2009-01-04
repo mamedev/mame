@@ -49,7 +49,7 @@ struct TTL74148_interface
 };
 
 
-void TTL74148_config(int which, const struct TTL74148_interface *intf);
+void TTL74148_config(running_machine *machine, int which, const struct TTL74148_interface *intf);
 
 /* must call TTL74148_update() after setting the inputs */
 void TTL74148_update(running_machine *machine, int which);

@@ -13,6 +13,7 @@
 
 
 static MACHINE_RESET( 88games );
+static MACHINE_START( 88games );
 static KONAMI_SETLINES_CALLBACK( k88games_banking );
 
 static UINT8 *ram;
@@ -282,6 +283,8 @@ static MACHINE_DRIVER_START( 88games )
 	MDRV_VIDEO_START(88games)
 	MDRV_VIDEO_UPDATE(88games)
 
+    MDRV_MACHINE_START(88games)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -514,7 +517,12 @@ static MACHINE_RESET( 88games )
 	paletteram = &memory_region(machine, "main")[0x20000];
 }
 
-
+static MACHINE_START( 88games )
+{
+    state_save_register_global(machine, videobank);
+    state_save_register_global(machine, zoomreadroms);
+    state_save_register_global(machine, speech_chip);
+}
 
 static DRIVER_INIT( 88games )
 {
@@ -524,6 +532,6 @@ static DRIVER_INIT( 88games )
 
 
 
-GAME( 1988, 88games,  0,       88games, 88games, 88games, ROT0, "Konami", "'88 Games", 0 )
-GAME( 1988, konami88, 88games, 88games, 88games, 88games, ROT0, "Konami", "Konami '88", 0 )
-GAME( 1988, hypsptsp, 88games, 88games, 88games, 88games, ROT0, "Konami", "Hyper Sports Special (Japan)", 0 )
+GAME( 1988, 88games,  0,       88games, 88games, 88games, ROT0, "Konami", "'88 Games", GAME_SUPPORTS_SAVE )
+GAME( 1988, konami88, 88games, 88games, 88games, 88games, ROT0, "Konami", "Konami '88", GAME_SUPPORTS_SAVE )
+GAME( 1988, hypsptsp, 88games, 88games, 88games, 88games, ROT0, "Konami", "Hyper Sports Special (Japan)", GAME_SUPPORTS_SAVE )

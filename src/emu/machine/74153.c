@@ -134,21 +134,34 @@ void TTL74153_config(running_machine *machine, int which, const struct TTL74153_
 	}
 
 
-	chips[which].machine = machine;
-	chips[which].output_cb = (intf ? intf->output_cb : 0);
-	chips[which].a = 1;
-	chips[which].b = 1;
-	chips[which].enable[0] = 1;
-	chips[which].enable[1] = 1;
-	chips[which].input_lines[0][0] = 1;
-	chips[which].input_lines[0][1] = 1;
-	chips[which].input_lines[0][2] = 1;
-	chips[which].input_lines[0][3] = 1;
-	chips[which].input_lines[1][0] = 1;
-	chips[which].input_lines[1][1] = 1;
-	chips[which].input_lines[1][2] = 1;
-	chips[which].input_lines[1][3] = 1;
+    chips[which].machine = machine;
+    chips[which].output_cb = (intf ? intf->output_cb : 0);
+    chips[which].a = 1;
+    chips[which].b = 1;
+    chips[which].enable[0] = 1;
+    chips[which].enable[1] = 1;
+    chips[which].input_lines[0][0] = 1;
+    chips[which].input_lines[0][1] = 1;
+    chips[which].input_lines[0][2] = 1;
+    chips[which].input_lines[0][3] = 1;
+    chips[which].input_lines[1][0] = 1;
+    chips[which].input_lines[1][1] = 1;
+    chips[which].input_lines[1][2] = 1;
+    chips[which].input_lines[1][3] = 1;
 
-	chips[which].last_output[0] = -1;
-	chips[which].last_output[1] = -1;
+    chips[which].last_output[0] = -1;
+    chips[which].last_output[1] = -1;
+
+    state_save_register_item_array(machine, "ttl74153", NULL, which, chips[which].enable);
+    state_save_register_item_array(machine, "ttl74153", NULL, which, chips[which].last_output);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].input_lines[0][0]);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].input_lines[0][1]);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].input_lines[0][2]);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].input_lines[0][3]);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].input_lines[1][0]);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].input_lines[1][1]);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].input_lines[1][2]);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].input_lines[1][3]);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].a);
+    state_save_register_item(machine, "ttl74153", NULL, which, chips[which].b);
 }
