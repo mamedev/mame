@@ -2155,6 +2155,7 @@ const game_driver * const drivers[] =
 	DRIVER( ghox )		/* TP-021 (c) 1991 Toaplan */
 	DRIVER( ghoxj )		/* TP-021 (c) 1991 Toaplan */
 	DRIVER( dogyuun )	/* TP-022 (c) 1992 Toaplan */
+	DRIVER( dogyuunk )	/* TP-022 (c) 1992 Toaplan */
 	DRIVER( kbash )		/* TP-023 (c) 1993 Toaplan */
 	DRIVER( kbash2 )	/* bootleg */
 	DRIVER( truxton2 )	/* TP-024 (c) 1992 Toaplan */

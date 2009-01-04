@@ -18,6 +18,7 @@ Supported games:
     ghox        TP-021        Toaplan       Ghox (Spinner with single up/down axis control)
     ghoxj       TP-021        Toaplan       Ghox (8-Way Joystick controls)
     dogyuun     TP-022        Toaplan       Dogyuun
+    dogyuunk    TP-022        Toaplan       Dogyuun (Licensed to Unite Trading For Korea)
     kbash       TP-023        Toaplan       Knuckle Bash
     kbash2      bootleg       Toaplan       Knuckle Bash 2
     truxton2    TP-024        Toaplan       Truxton 2 / Tatsujin Oh
@@ -50,28 +51,34 @@ Supported games:
 
     SET NOTES:
 
-    sstriker - The region jumper is read with this set but even when set to Japan you get all english
-               text etc which seems a little odd. However this has been verified correct on two boards.
-    kingdmgp - might be a bootleg / hack, some of the tiles needed for the credits screen have been
-               stripped out, doesn't seem very professional, since its rare and should probably only
-               have a different graphics rom its nearly impossible for us to verify, a lot of boards
-               being sold as 'Kingdom Grand Prix' are infact conversions using Neill Corlett's hack
+    sstriker - The region jumper is read with this set but even when set to Japan you get all English
+               text etc. which seems a little odd. However, this has been verified correct on two boards.
+
+    kingdmgp - Might be a bootleg / hack, some of the tiles needed for the credits screen have been
+               stripped out, doesn't seem very professional, since it's rare and should probably only
+               have a different graphics rom, it's nearly impossible for us to verify. A lot of boards
+               being sold as 'Kingdom Grand Prix' are infact conversions using Neill Corlett's hack.
 
             ** The above two look like genuine Korean release boards, Raizing probably just missed a few things
 
-    bgaregga - the clones have fewer types of enemy bullets (not fewer bullets, just fewer types!)
+    bgaregga - The clones have fewer types of enemy bullets (not fewer bullets, just fewer types!)
                and Stage Edit is disabled - the dipswitch is still listed in service mode but it
-               doesn't do anything.  In addition to these changes, bgaregt2 has no third button!
+               doesn't do anything. In addition to these changes, bgaregt2 has no third button!
                Instead of being able to change the formation of your options with a button press,
                each of the selectable ships has a different, fixed option formation.
 
-    batrider - original release was marketed as a two button game, but actually needed a third button
-               to fully use some of the ships' weaponry!  This error was rectified in the B Version
-               (which is fully playable with either two or three buttons)
+    batrider - The original release was marketed as a two button game, but actually needed a third button
+               to fully use some of the ships' weaponry! This error was rectified in the B Version
+               (which is fully playable with either two or three buttons).
 
-    bbakraid - the Unlimited Version can display more score digits (as players managed to counter stop
+    bbakraid - The Unlimited Version can display more score digits (as players managed to counter stop
                the original within days of its release!) and adds a "team" mode ala Batrider where you
-               select a different ship for each of your three lives
+               select a different ship for each of your three lives.
+
+    dogyuunk - PCB says "TOAPLAN CO.,LTD. TP-022-1 MADE IN KOREA". It contains 3 custom Toaplan chips 
+               (2 gfx chips and TS-002-MACH sound MCU). Uses original Toaplan-badged MASKROMs for GFX 
+               and sound and original 'TP-022 01 TOAPLAN' sticker on program EPROM.
+
 
  ****************************************************************************
  * Battle Garegga and Armed Police Batrider have secret characters.         *
@@ -2247,6 +2254,30 @@ static INPUT_PORTS_START( dogyuun )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( dogyuunk )
+	PORT_INCLUDE( dogyuun )
+
+	PORT_MODIFY("JMPR")
+	PORT_DIPNAME( 0x000f,	0x0005, "Territory" )
+	PORT_DIPSETTING(		0x0003, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
+//  PORT_DIPSETTING(        0x0007, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x0002, "USA (Atari Games Corp license)" )
+//  PORT_DIPSETTING(        0x000c, "USA (Atari Games Corp license)" )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp license)" )
+	PORT_DIPSETTING(		0x0008, "South East Asia (Charterfield license)" )
+//  PORT_DIPSETTING(        0x000d, "South East Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x0005, "Korea (Unite Trading license)" )
+//  PORT_DIPSETTING(        0x000a, "Korea (Unite Trading license)" )
+	PORT_DIPSETTING(		0x0004, "Hong Kong (Charterfield license)" )
+//  PORT_DIPSETTING(        0x0009, "Hong Kong (Charterfield license)" )
+	PORT_DIPSETTING(		0x0006, "Taiwan" )
+//  PORT_DIPSETTING(        0x000b, "Taiwan" )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( kbash )
 	PORT_INCLUDE( toaplan2 )
 
@@ -4202,6 +4233,30 @@ ROM_START( dogyuun )
 ROM_END
 
 
+ROM_START( dogyuunk )
+	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "01.u64", 0x000000, 0x080000, CRC(fe5bd7f4) SHA1(9c725466112a514c9ed0fb074422d291c175c3f4) )
+
+	/* Secondary CPU is a Toaplan marked chip, (TS-002-MACH  TOA PLAN) */
+	/* Its likely to be a NEC V25+ (PLCC94). */
+#if USE_V25
+	ROM_REGION( 0x10000, "cpu1", 0 )			/* Sound CPU code */
+//  ROM_LOAD( "tp022.mcu", 0x00000, 0x08000, NO_DUMP )
+#endif
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD16_WORD_SWAP( "tp022_3.w92", 0x000000, 0x100000, CRC(191b595f) SHA1(89344946daa18087cc83f92027cf5da659b1c7a5) )
+	ROM_LOAD16_WORD_SWAP( "tp022_4.w93", 0x100000, 0x100000, CRC(d58d29ca) SHA1(90d142fef37764ef817347a2bed77892a288a077) )
+
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD16_WORD_SWAP( "tp022_5.w16", 0x000000, 0x200000, CRC(d4c1db45) SHA1(f5655467149ba737128c2f54c9c6cdaca6e4c35c) )
+	ROM_LOAD16_WORD_SWAP( "tp022_6.w17", 0x200000, 0x200000, CRC(d48dc74f) SHA1(081b5a00a2ff2bd82b98b30aab3cb5b6ae1014d5) )
+
+	ROM_REGION( 0x40000, "oki", 0 )		/* ADPCM Samples */
+	ROM_LOAD( "tp022_2.w30", 0x00000, 0x40000, CRC(043271b3) SHA1(c7eaa929e55dd956579b824ea9d20a1d0129a925) )
+ROM_END
+
+
 ROM_START( kbash )
 	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "kbash01.bin", 0x000000, 0x080000, CRC(2965f81d) SHA1(46f2df30fa92c80ba5a37f75e756424e15534784) )
@@ -4996,6 +5051,7 @@ GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan",
 GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Licensed to Unite Trading For Korea)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1999, kbash2,   0,        kbash2,   kbash2,   T2_noZ80, ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan", "Truxton II / Tatsujin Oh", GAME_SUPPORTS_SAVE )
