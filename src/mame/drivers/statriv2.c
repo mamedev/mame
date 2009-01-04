@@ -709,9 +709,9 @@ static INTERRUPT_GEN( statriv2_interrupt )
 static MACHINE_DRIVER_START( statriv2 )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MDRV_CPU_ADD("main",8085A,12400000*2)              /* 12.4MHz / 4? */
-	MDRV_CPU_PROGRAM_MAP(statriv2_readmem,statriv2_writemem)
-	MDRV_CPU_IO_MAP(statriv2_readport,statriv2_writeport)
+    MDRV_CPU_ADD("main", 8085A, 13684000) /* 12.44MHz * 1.1, ugh, glargh, hack, but it makes one in-game second roughly one real-life second */
+	MDRV_CPU_PROGRAM_MAP(statriv2_readmem, statriv2_writemem)
+	MDRV_CPU_IO_MAP(statriv2_readport, statriv2_writeport)
 	MDRV_CPU_VBLANK_INT("main", statriv2_interrupt)
 
 	MDRV_NVRAM_HANDLER(statriv2)
@@ -719,7 +719,7 @@ static MACHINE_DRIVER_START( statriv2 )
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 38*8-1, 0, 32*8-1)
