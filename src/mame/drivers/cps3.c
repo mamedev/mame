@@ -2721,7 +2721,7 @@ ROM_START( sfiii3 )
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "33s000", 0, MD5(f159ad85cc94ced3ddb9ef5e92173a9f) SHA1(47c7ae0f2dc47c7d28bdf66d378a3aaba4c99c75) )
+	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(24e78b8c66fb1573ffd642ee51607f3b53ed40b7) MD5(cf63f3dbcc2653b95709133fe79c7225) )
 ROM_END
 
 ROM_START( sfiii3a )
@@ -2732,7 +2732,7 @@ ROM_START( sfiii3a )
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(24e78b8c66fb1573ffd642ee51607f3b53ed40b7) MD5(cf63f3dbcc2653b95709133fe79c7225) )
+	DISK_IMAGE_READONLY( "33s000", 0, MD5(f159ad85cc94ced3ddb9ef5e92173a9f) SHA1(47c7ae0f2dc47c7d28bdf66d378a3aaba4c99c75) )
 ROM_END
 
 ROM_START( redearth )
@@ -2757,7 +2757,6 @@ ROM_START( warzard )
 	DISK_IMAGE_READONLY( "wzd000", 0, MD5(028ff12a4ce34118dd0091e87c8cdd08) SHA1(6d4e6b7fff4ff3f04e349479fa5a1cbe63e673b8) )
 ROM_END
 
-
 ROM_START( jojo )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
@@ -2766,10 +2765,10 @@ ROM_START( jojo )
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "jjk000", 0, MD5(05440ecf90e836207a27a99c817a3328) SHA1(d5a11315ac21e573ffe78e63602ec2cb420f361f) )
+	DISK_IMAGE_READONLY( "cap-jjk-160", 0, SHA1(74fb14d838d98c3e10baa08e6f7b2464d840dcf0) MD5(93cc16f11a88c8f5268cb96baebc0a13) )
 ROM_END
 
-ROM_START( jojoalt )
+ROM_START( jojoa )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
@@ -2777,7 +2776,7 @@ ROM_START( jojoalt )
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* GFX Region */
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "cap-jjk-160", 0, SHA1(74fb14d838d98c3e10baa08e6f7b2464d840dcf0) MD5(93cc16f11a88c8f5268cb96baebc0a13) )
+	DISK_IMAGE_READONLY( "jjk000", 0, MD5(05440ecf90e836207a27a99c817a3328) SHA1(d5a11315ac21e573ffe78e63602ec2cb420f361f) )
 ROM_END
 
 ROM_START( jojoba )
@@ -2808,7 +2807,6 @@ ROM_START( sfiiin )
 	ROM_LOAD( "50",  0x2000000, 0x400000, CRC(58933dc2) SHA1(1f1723be676a817237e96b6e20263b935c59daae) )
 ROM_END
 
-
 ROM_START( sfiii2n )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii2_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(fd297c0d) SHA1(4323deda2789f104b53f32a663196ec16de73215) )
@@ -2825,13 +2823,12 @@ ROM_START( sfiii2n )
 	ROM_LOAD( "51",  0x2800000, 0x800000, CRC(1102b8eb) SHA1(c7dd2ee3a3214c6ec47a03fe3e8c941775d57f76) )
 ROM_END
 
-
 ROM_START( sfiii3n )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
 	ROM_LOAD( "sfiii3_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(1edc6366) SHA1(60b4b9adeb030a33059d74fdf03873029e465b52) )
 
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* cd content region */
-	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(77233d39) SHA1(59c3f890fdc33a7d8dc91e5f9c4e7b7019acfb00) )
+	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(ba7f76b2) SHA1(6b396596dea009b34af17484919ae37eda53ec65) )
 	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(5ca8faba) SHA1(71c12638ae7fa38b362d68c3ccb4bb3ccd67f0e9) )
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(b37cf960) SHA1(60310f95e4ecedee85846c08ccba71e286cda73b) )
@@ -2849,7 +2846,7 @@ ROM_START( sfiii3an )
 	ROM_LOAD( "sfiii3_japan_nocd.29f400.u2", 0x000000, 0x080000, CRC(1edc6366) SHA1(60b4b9adeb030a33059d74fdf03873029e465b52) )
 
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* cd content region */
-	ROM_LOAD( "10",  0x0000000, 0x800000,  CRC(ba7f76b2) SHA1(6b396596dea009b34af17484919ae37eda53ec65) )
+	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(77233d39) SHA1(59c3f890fdc33a7d8dc91e5f9c4e7b7019acfb00) )
 	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(5ca8faba) SHA1(71c12638ae7fa38b362d68c3ccb4bb3ccd67f0e9) )
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(b37cf960) SHA1(60310f95e4ecedee85846c08ccba71e286cda73b) )
@@ -2867,8 +2864,8 @@ ROM_START( jojon )
 	ROM_LOAD( "jojo_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(05b4f953) SHA1(c746c7bb5359acc9adced817cb4870b1912eaefd) )
 
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* cd content region */
-	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(e40dc123) SHA1(517e7006349b5a8fd6c30910362583f48d009355) )
-	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(0571e37c) SHA1(1aa28ef6ea1b606a55d0766480b3ee156f0bca5a) )
+	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(bc612872) SHA1(18930f2906176b54a9b8bec56f06dda3362eb418) )
+	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(0e1daddf) SHA1(34bb4e0fb86258095a7b20f60174453195f3735a) )
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(1d99181b) SHA1(25c216de16cefac2d5892039ad23d07848a457e6) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(6889fbda) SHA1(53a51b993d319d81a604cdf70b224955eacb617e) )
@@ -2877,13 +2874,13 @@ ROM_START( jojon )
 	ROM_LOAD( "50",  0x2000000, 0x400000, CRC(1c749cc7) SHA1(23df741360476d8035c68247e645278fbab53b59) )
 ROM_END
 
-ROM_START( jojoaltn )
+ROM_START( jojoan )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojo_asia_nocd.29f400.u2", 0x000000, 0x080000, CRC(05b4f953) SHA1(c746c7bb5359acc9adced817cb4870b1912eaefd) )
 
 	ROM_REGION32_BE( 0x800000*2, "user4", ROMREGION_ERASEFF ) /* cd content region */
-	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(bc612872) SHA1(18930f2906176b54a9b8bec56f06dda3362eb418) )
-	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(0e1daddf) SHA1(34bb4e0fb86258095a7b20f60174453195f3735a) )
+	ROM_LOAD( "10",  0x0000000, 0x800000, CRC(e40dc123) SHA1(517e7006349b5a8fd6c30910362583f48d009355) )
+	ROM_LOAD( "20",  0x0800000, 0x800000, CRC(0571e37c) SHA1(1aa28ef6ea1b606a55d0766480b3ee156f0bca5a) )
 	ROM_REGION16_BE( 0x800000*10, "user5", ROMREGION_ERASEFF ) /* cd content region */
 	ROM_LOAD( "30",  0x0000000, 0x800000, CRC(1d99181b) SHA1(25c216de16cefac2d5892039ad23d07848a457e6) )
 	ROM_LOAD( "31",  0x0800000, 0x800000, CRC(6889fbda) SHA1(53a51b993d319d81a604cdf70b224955eacb617e) )
@@ -3091,11 +3088,11 @@ GAME( 1997, sfiiij,  sfiii,    cps3, cps3, cps3,  ROT0,   "Capcom", "Street Figh
 GAME( 1997, sfiii2,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA, 970930)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sfiii2j, sfiii2,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan, 970930)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1999, sfiii3,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990512)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3a, sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990608)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990608)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3a, sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990512)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1998, jojo,    0,        cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 981202)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoalt, jojo,     cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 990108)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojo,    0,        cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 990108)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoa,   jojo,     cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 981202)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1999, jojoba,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Japan, 990913)", GAME_IMPERFECT_GRAPHICS )
 
@@ -3108,11 +3105,11 @@ GAME( 1997, sfiiin,  sfiii,    cps3, cps3, cps3, ROT0,   "Capcom", "Street Fight
 
 GAME( 1997, sfiii2n, sfiii2,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia, 970930, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1999, sfiii3n, sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990512, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3an,sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990608, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3n, sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990608, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3an,sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990512, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1998, jojon,   jojo,     cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 981202, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoaltn,jojo,     cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 990108, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojon,   jojo,     cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 990108, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoan,  jojo,     cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 981202, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1999, jojoban, jojoba,   cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Japan, 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, jojobane,jojoba,   cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Euro, 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )

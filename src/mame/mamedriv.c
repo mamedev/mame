@@ -2810,20 +2810,20 @@ V-V                           TP-027
 	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 Capcom */
 	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 Capcom */
 	DRIVER( sfiii2j )	/* 30/09/1997 (c) 1997 Capcom */
-	DRIVER( sfiii3 )	/* 12/05/1999 (c) 1999 Capcom */
-	DRIVER( sfiii3a )	/* 08/06/1999 (c) 1999 Capcom */
-	DRIVER( jojo )		/* 02/12/1998 (c) 1998 Capcom */
-	DRIVER( jojoalt )	/* 08/01/1998 (c) 1998 Capcom */
+	DRIVER( sfiii3 )	/* 08/06/1999 (c) 1999 Capcom */
+	DRIVER( sfiii3a )	/* 12/05/1999 (c) 1999 Capcom */
+	DRIVER( jojo )		/* 08/01/1999 (c) 1998 Capcom */
+	DRIVER( jojoa )		/* 02/12/1998 (c) 1998 Capcom */
 	DRIVER( jojoba )	/* 13/09/1999 (c) 1999 Capcom */
 	DRIVER( redearth )	/* 21/11/1996 (c) 1996 Capcom */
 	DRIVER( warzard )	/* 21/11/1996 (c) 1996 Capcom */
 
 	DRIVER( sfiiin )	/* 04/02/1997 (c) 1997 Capcom */
 	DRIVER( sfiii2n )	/* 30/09/1997 (c) 1997 Capcom */
-	DRIVER( sfiii3n )	/* 12/05/1999 (c) 1999 Capcom */
-	DRIVER( sfiii3an )	/* 08/06/1999 (c) 1999 Capcom */
-	DRIVER( jojon )		/* 02/12/1998 (c) 1998 Capcom */
-	DRIVER( jojoaltn )	/* 08/01/1998 (c) 1998 Capcom */
+	DRIVER( sfiii3n )	/* 08/06/1999 (c) 1999 Capcom */
+	DRIVER( sfiii3an )	/* 12/05/1999 (c) 1999 Capcom */
+	DRIVER( jojon )		/* 08/01/1999 (c) 1998 Capcom */
+	DRIVER( jojoan )	/* 02/12/1998 (c) 1998 Capcom */
 	DRIVER( jojoban )	/* 13/09/1999 (c) 1999 Capcom */
 	DRIVER( jojobane )	/* 13/09/1999 (c) 1999 Capcom */
 	DRIVER( redeartn )	/* 21/11/1996 (c) 1996 Capcom */
