@@ -128,45 +128,48 @@ static VIDEO_UPDATE( cubeqst )
 		memset(depth_buffer, 0xff, 512);
 
 		/* Process all the spans on this scanline */
-		for (i = 0; i < num_entries; i += 2)
+		if (y < 256)
 		{
-			int color = 0, depth = 0;
-			int h1 = 0, h2 = 0;
-			int x;
-
-			int entry1 = stk_ram[(y << 7) | ((i + 0) & 0x7f)];
-			int entry2 = stk_ram[(y << 7) | ((i + 1) & 0x7f)];
-
-			/* Determine which entry is the start point and which is the stop */
-			if ( entry1 & (1 << 19) )
+			for (i = 0; i < num_entries; i += 2)
 			{
-				h1 = (entry2 >> 8) & 0x1ff;
-				depth = entry2 & 0xff;
+				int color = 0, depth = 0;
+				int h1 = 0, h2 = 0;
+				int x;
 
-				h2 = (entry1 >> 8) & 0x1ff;
-				color = entry1 & 0xff;
-			}
-			else if ( entry2 & (1 << 19) )
-			{
-				h1 = (entry1 >> 8) & 0x1ff;
-				depth = entry1 & 0xff;
+				int entry1 = stk_ram[(y << 7) | ((i + 0) & 0x7f)];
+				int entry2 = stk_ram[(y << 7) | ((i + 1) & 0x7f)];
 
-				h2 = (entry2 >> 8) & 0x1ff;
-				color = entry2 & 0xff;
-			}
-			else
-			{
-				// Shouldn't happen...
-			}
-
-			/* Draw the span, testing for depth */
-			pen = colormap[paletteram16[color]];
-			for (x = h1; x <= h2; ++x)
-			{
-				if (!(depth_buffer[x] < depth))
+				/* Determine which entry is the start point and which is the stop */
+				if ( entry1 & (1 << 19) )
 				{
-					dest[x] = pen;
-					depth_buffer[x] = depth;
+					h1 = (entry2 >> 8) & 0x1ff;
+					depth = entry2 & 0xff;
+
+					h2 = (entry1 >> 8) & 0x1ff;
+					color = entry1 & 0xff;
+				}
+				else if ( entry2 & (1 << 19) )
+				{
+					h1 = (entry1 >> 8) & 0x1ff;
+					depth = entry1 & 0xff;
+
+					h2 = (entry2 >> 8) & 0x1ff;
+					color = entry2 & 0xff;
+				}
+				else
+				{
+					// Shouldn't happen...
+				}
+
+				/* Draw the span, testing for depth */
+				pen = colormap[paletteram16[color]];
+				for (x = h1; x <= h2; ++x)
+				{
+					if (!(depth_buffer[x] < depth))
+					{
+						dest[x] = pen;
+						depth_buffer[x] = depth;
+					}
 				}
 			}
 		}
