@@ -46,23 +46,10 @@ TODO:
   Therefore, it might be another protection device, which sits in the middle
   between CPU and NMK004.
 - Protection is patched in several games.
-- In hachamf it seems that the protection device shares some RAM (fe000-fefff)
-  with the main CPU, and the main CPU fetches pointers from that shared RAM to
-  do important operations like reading the input ports. Some of them are easily
-  deduced checking for similarities in macross and bjtwin; however another
-  protection check involves (see the routine at 01429a) writing data to the
-  fe100-fe1ff range, and then jumping to subroutines in that range (most likely
-  function pointers since each one is only 0x10 bytes long), and heaven knows
-  what those should do.
-  On startup, hachamf does a RAM test, then copies some stuff and jumps to
-  RAM at 0xfef00, where it sits in a loop. We patch around that by replacing the
-  reset vector with the "real" one.
-  update: simulated this,see hachamf_mcu_shared_w() & tdragon_mcu_shared_w() for
-  more info about it.
-- Hacha Mecha Fighter bg graphics are completely wrong except at the title screen &
+- Hacha Mecha Fighter: mcu simulation *might* be wrong/incorrect (see notes).
+- Hacha Mecha Fighter: bg graphics are completely wrong except at the title screen &
   the level 7.Likely to be a rom issue,the game activates the bgbank
-  when it is on the above two cases.Also the bomb graphics are wrong when the game
-  is in japanese mode...
+  when it is on the above two cases.
 - Cocktail mode is supported, but tilemap.c has problems with asymmetrical
   visible areas.
 - Music timing in nouryoku is a little off.
@@ -72,6 +59,9 @@ TODO:
 - Input ports in Bio-ship Paladin, Strahl
 - Sound communication in Mustang might be incorrectly implemented
 - Incorrect OKI samples banking in Rapid Hero
+- Hacha Mecha Fighter: (BTANB) the bomb graphics are pretty weird when the game is in
+  japanese mode,but it's like this on the original game,it's just a japanese write for
+  "bomb" word (I presume)
 
 ----
 
@@ -547,14 +537,15 @@ ADDRESS_MAP_END
 Thunder Dragon & Hacha Mecha Fighter shares some ram with the MCU,the job of the latter
 is to provide some jsr vectors used by the game for gameplay calculations.Also it has
 the job to give the vectors of where the inputs are to be read & to calculate the coin
-settings,the latter is in the video file to avoid sync problems.
+settings,the latter is in a TIMER_DEVICE_CALLBACK to avoid sync problems.
 To make a long story short,this MCU is an alternative version of the same protection
 used by the MJ-8956 games (there are even the same kind of error codes!(i.e the number
 printed on the up-left corner of the screen)...
 
 Note: I'm 100% sure of the Thunder Dragon vectors because I've compared it with the
 bootleg sets,I'm *not* 100% sure of the Hacha Mecha Fighter vectors because I don't have
-anything to compare,infact
+anything to compare and I don't know if for example an option should be there if you lose a
+life,but the game looks pretty much hard without it.
 
 ******************************************************************************************/
 
@@ -701,7 +692,6 @@ static WRITE16_HANDLER( hachamf_mainram_w )
 	}
 }
 
-
 static ADDRESS_MAP_START( hachamf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	/* I/O Region */
@@ -779,6 +769,157 @@ static WRITE16_HANDLER( tdragon_mainram_w )
 	}
 }
 
+/*coin setting MCU simulation*/
+static void mcu_run(running_machine *machine, UINT8 dsw_setting)
+{
+	static UINT8 input_pressed;
+	static UINT16 coin_input;
+	UINT8 dsw[2];
+	static UINT8 start_helper = 0;
+	static UINT8 coin_count[2],coin_count_frac[2];
+	static UINT8 i;
+
+	/*Accept the start button but needs some m68k processing first,otherwise you can't start a play with 1 credit inserted*/
+	if(start_helper & 1 && nmk16_mainram[0x9000/2] & 0x0200) /*start 1 */
+	{
+		nmk16_mainram[0xef00/2]--;
+		start_helper = start_helper & 2;
+	}
+	if(start_helper & 2 && nmk16_mainram[0x9000/2] & 0x0100) /*start 2*/
+	{
+		nmk16_mainram[0xef00/2]--;
+		start_helper = start_helper & 1;
+	}
+
+	/*needed because of the uncompatibility of the dsw settings.*/
+	if(dsw_setting) // Thunder Dragon
+	{
+		dsw[0] = (input_port_read(machine, "DSW2") & 0x7);
+		dsw[1] = (input_port_read(machine, "DSW2") & 0x38) >> 3;
+		for(i=0;i<2;i++)
+		{
+			switch(dsw[i] & 7)
+			{
+				case 0: nmk16_mainram[0x9000/2]|=0x4000; break; //free play
+				case 1: coin_count_frac[i] = 1; coin_count[i] = 4; break;
+				case 2: coin_count_frac[i] = 1; coin_count[i] = 3; break;
+				case 3: coin_count_frac[i] = 1; coin_count[i] = 2; break;
+				case 4: coin_count_frac[i] = 4; coin_count[i] = 1; break;
+				case 5: coin_count_frac[i] = 3; coin_count[i] = 1; break;
+				case 6: coin_count_frac[i] = 2; coin_count[i] = 1; break;
+				case 7: coin_count_frac[i] = 1; coin_count[i] = 1; break;
+			}
+		}
+	}
+	else // Hacha Mecha Fighter
+	{
+		dsw[0] = (input_port_read(machine, "DSW1") & 0x0700) >> 8;
+		dsw[1] = (input_port_read(machine, "DSW1") & 0x3800) >> 11;
+		for(i=0;i<2;i++)
+		{
+			switch(dsw[i] & 7)
+			{
+				case 0: nmk16_mainram[0x9000/2]|=0x4000; break; //free play
+				case 1: coin_count_frac[i] = 4; coin_count[i] = 1; break;
+				case 2: coin_count_frac[i] = 3; coin_count[i] = 1; break;
+				case 3: coin_count_frac[i] = 2; coin_count[i] = 1; break;
+				case 4: coin_count_frac[i] = 1; coin_count[i] = 4; break;
+				case 5: coin_count_frac[i] = 1; coin_count[i] = 3; break;
+				case 6: coin_count_frac[i] = 1; coin_count[i] = 2; break;
+				case 7: coin_count_frac[i] = 1; coin_count[i] = 1; break;
+			}
+		}
+	}
+
+	/*read the coin port*/
+	coin_input = (~(input_port_read(machine, "IN0")));
+
+	if(coin_input & 0x01)//coin 1
+	{
+		if((input_pressed & 0x01) == 0)
+		{
+			if(coin_count_frac[0] != 1)
+			{
+				nmk16_mainram[0xef02/2]+=coin_count[0];
+				if(coin_count_frac[0] == nmk16_mainram[0xef02/2])
+				{
+					nmk16_mainram[0xef00/2]+=coin_count[0];
+					nmk16_mainram[0xef02/2] = 0;
+				}
+			}
+			else
+				nmk16_mainram[0xef00/2]+=coin_count[0];
+		}
+		input_pressed = (input_pressed & 0xfe) | 1;
+	}
+	else
+		input_pressed = (input_pressed & 0xfe);
+
+	if(coin_input & 0x02)//coin 2
+	{
+		if((input_pressed & 0x02) == 0)
+		{
+			if(coin_count_frac[1] != 1)
+			{
+				nmk16_mainram[0xef02/2]+=coin_count[1];
+				if(coin_count_frac[1] == nmk16_mainram[0xef02/2])
+				{
+					nmk16_mainram[0xef00/2]+=coin_count[1];
+					nmk16_mainram[0xef02/2] = 0;
+				}
+			}
+			else
+				nmk16_mainram[0xef00/2]+=coin_count[1];
+		}
+		input_pressed = (input_pressed & 0xfd) | 2;
+	}
+	else
+		input_pressed = (input_pressed & 0xfd);
+
+	if(coin_input & 0x04)//service 1
+	{
+		if((input_pressed & 0x04) == 0)
+			nmk16_mainram[0xef00/2]++;
+		input_pressed = (input_pressed & 0xfb) | 4;
+	}
+	else
+		input_pressed = (input_pressed & 0xfb);
+
+	/*The 0x9000 ram address is the status */
+	if(nmk16_mainram[0xef00/2] > 0 && nmk16_mainram[0x9000/2] & 0x8000) //enable start button
+	{
+		if(coin_input & 0x08)//start 1
+		{
+			if((input_pressed & 0x08) == 0 && (!(nmk16_mainram[0x9000/2] & 0x0200))) //start 1
+				start_helper = 1;
+
+			input_pressed = (input_pressed & 0xf7) | 8;
+		}
+		else
+			input_pressed = (input_pressed & 0xf7);
+
+		if(coin_input & 0x10)//start 2
+		{
+			/*Decrease two coins to let two players play with one start 2 button and two credits inserted at the insert coin screen.*/
+			if((input_pressed & 0x10) == 0 && (!(nmk16_mainram[0x9000/2] & 0x0100))) // start 2
+				start_helper = (nmk16_mainram[0x9000/2] == 0x8000) ? (3) : (2);
+
+			input_pressed = (input_pressed & 0xef) | 0x10;
+		}
+		else
+			input_pressed = (input_pressed & 0xef);
+	}
+}
+
+static TIMER_DEVICE_CALLBACK( tdragon_mcu_sim )
+{
+	mcu_run(timer->machine,1);
+}
+
+static TIMER_DEVICE_CALLBACK( hachamf_mcu_sim )
+{
+	mcu_run(timer->machine,0);
+}
 
 static ADDRESS_MAP_START( tdragon_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
@@ -3903,6 +4044,7 @@ static MACHINE_DRIVER_START( tdragon )
 	MDRV_VIDEO_START(macross)
 	MDRV_VIDEO_EOF(nmk)
 	MDRV_VIDEO_UPDATE(tdragon)
+	MDRV_TIMER_ADD_PERIODIC("coinsim", tdragon_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -4029,6 +4171,7 @@ static MACHINE_DRIVER_START( hachamf )
 	MDRV_VIDEO_START(macross)
 	MDRV_VIDEO_EOF(nmk)
 	MDRV_VIDEO_UPDATE(hachamf)
+	MDRV_TIMER_ADD_PERIODIC("coinsim", hachamf_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
