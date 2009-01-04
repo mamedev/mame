@@ -717,6 +717,7 @@ int main(int argc, char *argv[])
 	bitmap = bitmap_alloc(info.width, info.height, BITMAP_FORMAT_YUY16);
 	if (bitmap == NULL)
 	{
+		isavi ? close_avi(file) : close_chd(file);
 		fprintf(stderr, "Out of memory creating %dx%d bitmap\n", info.width, info.height);
 		return 1;
 	}
@@ -726,6 +727,12 @@ int main(int argc, char *argv[])
 	rsound = malloc(info.samplerate * sizeof(*rsound));
 	if (lsound == NULL || rsound == NULL)
 	{
+		isavi ? close_avi(file) : close_chd(file);
+		bitmap_free(bitmap);
+		if (rsound != NULL)
+			free(rsound);
+		if (lsound != NULL)
+			free(lsound);
 		fprintf(stderr, "Out of memory allocating sound buffers of %d bytes\n", (INT32)(info.samplerate * sizeof(*rsound)));
 		return 1;
 	}
