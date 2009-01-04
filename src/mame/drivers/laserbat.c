@@ -498,7 +498,7 @@ GFXDECODE_END
 static TILE_GET_INFO( get_tile_info )
 {
 	// wrong color index!
-	SET_TILE_INFO(0, videoram[tile_index], colorram[tile_index], 0);
+	SET_TILE_INFO(0, videoram[tile_index], colorram[tile_index] & 0x7f, 0);
 }
 
 static VIDEO_START( laserbat )

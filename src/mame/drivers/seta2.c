@@ -1826,7 +1826,7 @@ static MACHINE_DRIVER_START( mj4simai )
 	MDRV_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 
 	MDRV_GFXDECODE(seta2)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MDRV_PALETTE_LENGTH(0x8000+0xf0)	/* extra 0xf0 because we might draw 256-color object with 16-color granularity */
 
 	MDRV_VIDEO_START(seta2)
 	MDRV_VIDEO_UPDATE(seta2)
