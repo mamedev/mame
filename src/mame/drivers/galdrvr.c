@@ -5045,7 +5045,7 @@ GAME( 1981, frogf,    frogger,  frogf,    frogger,  froggers, ROT90,  "Falcon", 
 GAME( 1981, frogg,    frogger,  galaxian, frogg,    frogg,    ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 
 
-/* 
+/*
     Turtles based hardware
 
     CPU/Video Board: KT-4108-2

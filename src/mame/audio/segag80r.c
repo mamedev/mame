@@ -836,7 +836,7 @@ MACHINE_DRIVER_START( monsterb_sound_board )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audio", N7751, 6000000)
 	MDRV_CPU_IO_MAP(monsterb_7751_portmap,0)
-	
+
 	MDRV_I8243_ADD("audio_8243", NULL, n7751_rom_control_w)
 
 	/* sound hardware */
@@ -959,7 +959,7 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 		case 2:
 			sound_addr = (sound_addr & ~0xf00) | ((data & 0x0f) << 8);
 			break;
-		
+
 		case 3:
 			sound_addr &= 0xfff;
 			{
@@ -993,7 +993,7 @@ static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 {
 	/* write to P2; low 4 bits go to 8243 */
 	i8243_p2_w(device, offset, data & 0x0f);
-	
+
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
 	n7751_busy = data >> 7;

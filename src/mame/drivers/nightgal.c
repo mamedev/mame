@@ -253,7 +253,7 @@ static UINT8 mux_data;
 static WRITE8_HANDLER( mux_w )
 {
 	mux_data = ~data;
-//	printf("%02x\n",mux_data);
+//  printf("%02x\n",mux_data);
 }
 
 static READ8_HANDLER( input_1p_r )
@@ -271,7 +271,7 @@ static READ8_HANDLER( input_1p_r )
 		case 0x10: return input_port_read(space->machine, "PL1_5") | cr_clear;
 		case 0x20: return input_port_read(space->machine, "PL1_6") | cr_clear;
 	}
-//	printf("%04x\n",mux_data);
+//  printf("%04x\n",mux_data);
 
 	return (input_port_read(space->machine, "PL1_1") & input_port_read(space->machine, "PL1_2") & input_port_read(space->machine, "PL1_3") &
 	       input_port_read(space->machine, "PL1_4") & input_port_read(space->machine, "PL1_5") & input_port_read(space->machine, "PL1_6")) | cr_clear;//input_port_read(space->machine, "PL1_0") && ;
@@ -292,7 +292,7 @@ static READ8_HANDLER( input_2p_r )
 		case 0x10: return input_port_read(space->machine, "PL2_5") | coin_port;
 		case 0x20: return input_port_read(space->machine, "PL2_6") | coin_port;
 	}
-//	printf("%04x\n",mux_data);
+//  printf("%04x\n",mux_data);
 
 	return (input_port_read(space->machine, "PL2_1") & input_port_read(space->machine, "PL2_2") & input_port_read(space->machine, "PL2_3") &
 	       input_port_read(space->machine, "PL2_4") & input_port_read(space->machine, "PL2_5") & input_port_read(space->machine, "PL2_6")) | coin_port;//input_port_read(space->machine, "PL1_0") && ;
@@ -318,7 +318,7 @@ static ADDRESS_MAP_START( nightgal_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01,0x01) AM_READ(ay8910_read_port_0_r) //ay read port
 	AM_RANGE(0x02,0x02) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x03,0x03) AM_WRITE(ay8910_control_port_0_w)
-//	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
+//  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
 	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA")
 	AM_RANGE(0x12,0x12) AM_READ_PORT("DSWA")
@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1100, 0x1100) AM_READWRITE(z80_latch_r,z80_latch_w) //irq control?
 	AM_RANGE(0x1200, 0x1200) AM_READNOP //flip screen set bit
 	AM_RANGE(0x1300, 0x130f) AM_READ(blit_vregs_r)
-//	AM_RANGE(0x1000, 0xdfff) AM_ROM AM_REGION("gfx1", 0 )
+//  AM_RANGE(0x1000, 0xdfff) AM_ROM AM_REGION("gfx1", 0 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -618,8 +618,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sexygal )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( nightgal )
-//	MDRV_CPU_MODIFY("main")
-//	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+//  MDRV_CPU_MODIFY("main")
+//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 MACHINE_DRIVER_END
 
 
@@ -632,23 +632,23 @@ CPU:Z80
 SND:AY-3-8910
 ETC:CUSTOM(The surface of the chip is scrached, so the name of the chip is unknown), MemoryBackup
 
-NGAL_01.BIN	graphic
-NGAL_02.BIN	graphic
-NGAL_03.BIN	graphic
-NGAL_04.BIN	graphic
-NGAL_05.BIN	graphic
-NGAL_06.BIN	graphic
-NGAL_07.BIN	graphic
-NGAL_08.BIN	graphic
-NGAL_09.BIN	program
-NGAL_10.BIN	program
-NGAL_11.BIN	program
-NGAL_12.BIN	program
-NGAL_BP.BIN	color
+NGAL_01.BIN graphic
+NGAL_02.BIN graphic
+NGAL_03.BIN graphic
+NGAL_04.BIN graphic
+NGAL_05.BIN graphic
+NGAL_06.BIN graphic
+NGAL_07.BIN graphic
+NGAL_08.BIN graphic
+NGAL_09.BIN program
+NGAL_10.BIN program
+NGAL_11.BIN program
+NGAL_12.BIN program
+NGAL_BP.BIN color
 
 Dumped by Gastroptosis. 2000/06/04
 Dumped by Uki. 2000/06/11
-
+?
 */
 
 ROM_START( nightgal )
@@ -748,14 +748,14 @@ Sexy Gal
 XG-1B (main board)
 SGP-A (sub board)
 
-CPU:	Z80-A
-SOUND:	YM2203C
-	DAC
-OSC:	20.000MHz
-	10.000MHz
-	6.000MHz (sub board)
-Chips:	CPU? 40pin
-	CPU? 40pin (sub board)
+CPU:    Z80-A
+SOUND:  YM2203C
+    DAC
+OSC:    20.000MHz
+    10.000MHz
+    6.000MHz (sub board)
+Chips:  CPU? 40pin
+    CPU? 40pin (sub board)
 
 
 1.3A    prg?
@@ -841,15 +841,15 @@ ROM_END
 Night Gal Summer (JPN Ver.)
 (c)1985 Nihon Bussan
 
-CPU:	Z80
-SOUND:	AY-3-8910
-	DAC
-OSC:	20.000MHz
-	6.000MHz (sub board)
+CPU:    Z80
+SOUND:  AY-3-8910
+    DAC
+OSC:    20.000MHz
+    6.000MHz (sub board)
 
-Chips:	NG138507 (CPU?)
-	Unknown 40pin
-	Unknown 40pin
+Chips:  NG138507 (CPU?)
+    Unknown 40pin
+    Unknown 40pin
 
 
 1S.IC7  prg./samples?

@@ -63,7 +63,7 @@ static VIDEO_UPDATE(jongkyo)
 	// good mahjong tiles
 	      data3 = 0x0f; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
 	// good girl tiles
-	//	data3 = 0x00; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
+	//  data3 = 0x00; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
 
 
 
@@ -107,7 +107,7 @@ static UINT8 mux_data;
 static WRITE8_HANDLER( mux_w )
 {
 	mux_data = ~data;
-//	printf("%02x\n",mux_data);
+//  printf("%02x\n",mux_data);
 }
 
 static WRITE8_HANDLER( jongkyo_coin_counter_w )
@@ -133,7 +133,7 @@ static READ8_HANDLER( input_1p_r )
 		case 0x10: return input_port_read(space->machine, "PL1_5") | cr_clear;
 		case 0x20: return input_port_read(space->machine, "PL1_6") | cr_clear;
 	}
-//	printf("%04x\n",mux_data);
+//  printf("%04x\n",mux_data);
 
 	return (input_port_read(space->machine, "PL1_1") & input_port_read(space->machine, "PL1_2") & input_port_read(space->machine, "PL1_3") &
 	       input_port_read(space->machine, "PL1_4") & input_port_read(space->machine, "PL1_5") & input_port_read(space->machine, "PL1_6")) | cr_clear;//input_port_read(space->machine, "PL1_0") && ;
@@ -154,7 +154,7 @@ static READ8_HANDLER( input_2p_r )
 		case 0x10: return input_port_read(space->machine, "PL2_5") | coin_port;
 		case 0x20: return input_port_read(space->machine, "PL2_6") | coin_port;
 	}
-//	printf("%04x\n",mux_data);
+//  printf("%04x\n",mux_data);
 
 	return (input_port_read(space->machine, "PL2_1") & input_port_read(space->machine, "PL2_2") & input_port_read(space->machine, "PL2_3") &
 	       input_port_read(space->machine, "PL2_4") & input_port_read(space->machine, "PL2_5") & input_port_read(space->machine, "PL2_6")) | coin_port;//input_port_read(space->machine, "PL1_0") && ;

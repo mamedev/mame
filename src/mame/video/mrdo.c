@@ -171,7 +171,7 @@ VIDEO_START( mrdo )
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);
-	
+
 	tilemap_set_scrolldx(bg_tilemap, 0, 56);
 	tilemap_set_scrolldx(fg_tilemap, 0, 56);
 	tilemap_set_scrolldy(bg_tilemap, 0, 6);

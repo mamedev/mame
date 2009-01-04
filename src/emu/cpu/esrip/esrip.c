@@ -62,7 +62,7 @@
 ***************************************************************************/
 
 typedef struct
-{	
+{
 	UINT16	ram[32];
 	UINT16	acc;
 	UINT16	d_latch;
@@ -74,7 +74,7 @@ typedef struct
 	UINT8	immflag;
 	UINT8	ct;
 	UINT8	t;
-	
+
 	/* Instruction latches - current and previous values */
 	UINT8	l1, pl1;
 	UINT8	l2, pl2;
@@ -139,7 +139,7 @@ static STATE_POSTLOAD( esrip_postload )
 
 //static void esrip_state_register(int index, const char *type)
 //{
-//	state_save_register_item_pointer(type, index, cpustate->ipt_ram, IPT_RAM_SIZE / 2);
+//  state_save_register_item_pointer(type, index, cpustate->ipt_ram, IPT_RAM_SIZE / 2);
 //}
 
 
@@ -261,9 +261,9 @@ static CPU_INIT( esrip )
 	cpustate->draw = _config->draw;
 
 	cpustate->ipt_ram = auto_malloc(IPT_RAM_SIZE);
-//state_save_register_global_pointer(cpustate->ipt_ram, IPT_RAM_SIZE / 2);			// TODO
+//state_save_register_global_pointer(cpustate->ipt_ram, IPT_RAM_SIZE / 2);          // TODO
 
-//	esrip_state_register(index, "esrip");
+//  esrip_state_register(index, "esrip");
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
@@ -1667,7 +1667,7 @@ static CPU_EXECUTE( esrip )
 			am29116_execute(cpustate, (cpustate->l7 << 8) | cpustate->l6, BIT(cpustate->l5, 2));
 
 			y_bus = cpustate->result;
-			
+
 			if (BIT(cpustate->l5, 0))
 				cpustate->d_latch = y_bus;
 		}
@@ -1741,7 +1741,7 @@ static CPU_EXECUTE( esrip )
 		cpustate->l6 = (in_h >> 16);
 		cpustate->l7 = (in_h >> 24);
 
-//		if (RISING_EDGE(cpustate->pl7, cpustate->l2, 7))
+//      if (RISING_EDGE(cpustate->pl7, cpustate->l2, 7))
 
 		/* Colour latch */
 		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 0))
@@ -1773,7 +1773,7 @@ static CPU_EXECUTE( esrip )
 			cpustate->y_scale = x_bus & 0xff;
 
 		/* Unknown */
-//		if (RISING_EDGE(cpustate->pl4, cpustate->l4, 7))
+//      if (RISING_EDGE(cpustate->pl4, cpustate->l4, 7))
 
 		/* Image ROM address */
 		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 5))
@@ -1821,7 +1821,7 @@ static CPU_EXECUTE( esrip )
 static CPU_DISASSEMBLE( esrip )
 {
 #if 0
-	static const char* const jmp_types[] = 
+	static const char* const jmp_types[] =
 	{
 		"JCT",
 		"JT1",
@@ -1833,7 +1833,7 @@ static CPU_DISASSEMBLE( esrip )
 		"JMP",
 	};
 
-	static const char* const njmp_types[] = 
+	static const char* const njmp_types[] =
 	{
 		"JNCT",
 		"JNT1",
@@ -1967,7 +1967,7 @@ CPU_GET_INFO( esrip )
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
 
-		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c%c%c%c%c%c%c", 
+		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c%c%c%c%c%c%c",
 																		cpustate->status & 0x80 ? '3' : '.',
 																		cpustate->status & 0x40 ? '2' : '.',
 																		cpustate->status & 0x20 ? '1' : '.',

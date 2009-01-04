@@ -1218,7 +1218,7 @@ READ8_HANDLER( decocass_e5xx_r )
 	if (2 == (offset & E5XX_MASK))
 	{
 		UINT8 bot_eot = (tape_get_status_bits(cassette_device) >> 5) & 1;
-		
+
 		data =
 			(BIT7(i8041_p1) 	  << 0) |	/* D0 = P17 - REQ/ */
 			(BIT0(i8041_p2) 	  << 1) |	/* D1 = P20 - FNO/ */
@@ -1369,7 +1369,7 @@ static void decocass_reset_common(running_machine *machine)
 
 	memset(decocass_quadrature_decoder, 0, sizeof(decocass_quadrature_decoder));
 	decocass_sound_ack = 0;
-	
+
 	audio_nmi_enabled = 0;
 	audio_nmi_state = 0;
 }
@@ -1666,7 +1666,7 @@ WRITE8_HANDLER( i8041_p1_w )
 	if ((data ^ i8041_p1) & 0x34)
 	{
 		int newspeed = 0;
-		
+
 		if ((data & 0x30) == 0x20)
 			newspeed = (data & 0x04) ? -1 : -7;
 		else if ((data & 0x30) == 0x10)
@@ -1871,7 +1871,7 @@ INLINE tape_state *get_safe_token(const device_config *device)
 static UINT16 tape_crc16_byte(UINT16 crc, UINT8 data)
 {
 	int bit;
-	
+
 	for (bit = 0; bit < 8; bit++)
 	{
 		crc = (crc >> 1) | (crc << 15);
@@ -1894,7 +1894,7 @@ static const char *tape_describe_state(tape_state *tape)
 	static char buffer[40];
 	char temprname[40];
 	const char *rname = temprname;
-	
+
 	if (tape->region == REGION_LEADER)
 		rname = "LEAD";
 	else if (tape->region == REGION_LEADER_GAP)
@@ -1916,7 +1916,7 @@ static const char *tape_describe_state(tape_state *tape)
 		char tempbname[40];
 		const char *bname = tempbname;
 		int clk;
-		
+
 		if (tape->bytenum <= BYTE_PRE_GAP_33)
 			sprintf(tempbname, "PR%02d", tape->bytenum - BYTE_PRE_GAP_0);
 		else if (tape->bytenum == BYTE_LEADIN)
@@ -1948,7 +1948,7 @@ static const char *tape_describe_state(tape_state *tape)
 
 		sprintf(temprname, "BL%02X.%4s.%d.%d", tape->region - REGION_DATA_BLOCK_0, bname, tape->bitnum, clk);
 	}
-	
+
 	sprintf(buffer, "{%9d=%s}", tape->clockpos, rname);
 	return buffer;
 }
@@ -1963,7 +1963,7 @@ static TIMER_CALLBACK( tape_clock_callback )
 {
 	const device_config *device = ptr;
 	tape_state *tape = get_safe_token(device);
-	
+
 	/* advance by one clock in the desired direction */
 	if (tape->speed < 0 && tape->clockpos > 0)
 		tape->clockpos--;
@@ -1979,7 +1979,7 @@ static TIMER_CALLBACK( tape_clock_callback )
 		tape->region = REGION_BOT;
 	else if (tape->clockpos < REGION_BOT_GAP_END_CLOCK)
 		tape->region = REGION_BOT_GAP;
-	
+
 	/* look for states after the end of data */
 	else if (tape->clockpos >= tape->numclocks - REGION_LEADER_END_CLOCK)
 		tape->region = REGION_TRAILER;
@@ -1989,24 +1989,24 @@ static TIMER_CALLBACK( tape_clock_callback )
 		tape->region = REGION_EOT;
 	else if (tape->clockpos >= tape->numclocks - REGION_BOT_GAP_END_CLOCK)
 		tape->region = REGION_EOT_GAP;
-	
+
 	/* everything else is data */
 	else
 	{
 		UINT32 dataclock = tape->clockpos - REGION_BOT_GAP_END_CLOCK;
-		
+
 		/* compute the block number */
 		tape->region = REGION_DATA_BLOCK_0 + dataclock / (TAPE_CLOCKS_PER_BYTE * BYTE_BLOCK_TOTAL);
 		dataclock -= (tape->region - REGION_DATA_BLOCK_0) * TAPE_CLOCKS_PER_BYTE * BYTE_BLOCK_TOTAL;
-		
+
 		/* compute the byte within the block */
 		tape->bytenum = dataclock / TAPE_CLOCKS_PER_BYTE;
 		dataclock -= tape->bytenum * TAPE_CLOCKS_PER_BYTE;
-		
+
 		/* compute the bit within the byte */
 		tape->bitnum = dataclock / TAPE_CLOCKS_PER_BIT;
 	}
-	
+
 	/* log */
 	if (LOG_CASSETTE_STATE)
 		tape_describe_state(tape);
@@ -2022,26 +2022,26 @@ static UINT8 tape_get_status_bits(const device_config *device)
 {
 	tape_state *tape = get_safe_token(device);
 	UINT8 tape_bits = 0;
-	
+
 	/* bit 0x20 is the BOT/EOT signal, which is also set in the leader/trailer area */
 	if (tape->region == REGION_LEADER || tape->region == REGION_BOT || tape->region == REGION_EOT || tape->region == REGION_TRAILER)
 		tape_bits |= 0x20;
-	
+
 	/* bit 0x40 is the clock, which is only valid in some areas of the data block */
 	/* bit 0x80 is the data, which is only valid in some areas of the data block */
 	if (tape->region >= REGION_DATA_BLOCK_0 && tape->region <= REGION_DATA_BLOCK_255)
 	{
 		int blocknum = tape->region - REGION_DATA_BLOCK_0;
 		UINT8 byteval = 0x00;
-		
+
 		/* in the main data area, the clock alternates at the clock rate */
 		if (tape->bytenum >= BYTE_LEADIN && tape->bytenum <= BYTE_LEADOUT)
 			tape_bits |= ((UINT32)(tape->clockpos - REGION_BOT_GAP_END_CLOCK) & 1) ? 0x00 : 0x40;
-		
+
 		/* in the longclock area, the clock holds high */
 		else if (tape->bytenum == BYTE_LONGCLOCK)
 			tape_bits |= 0x40;
-		
+
 		/* everywhere else, the clock holds to 0 */
 		else
 			;
@@ -2049,19 +2049,19 @@ static UINT8 tape_get_status_bits(const device_config *device)
 		/* lead-in and lead-out bytes are 0xAA */
 		if (tape->bytenum == BYTE_HEADER || tape->bytenum == BYTE_TRAILER)
 			byteval = 0xaa;
-		
+
 		/* data block bytes are data */
 		else if (tape->bytenum >= BYTE_DATA_0 && tape->bytenum <= BYTE_DATA_255)
 			byteval = device->region[blocknum * 256 + (tape->bytenum - BYTE_DATA_0)];
-		
+
 		/* CRC MSB */
 		else if (tape->bytenum == BYTE_CRC16_MSB)
 			byteval = tape->crc16[blocknum] >> 8;
-		
+
 		/* CRC LSB */
 		else if (tape->bytenum == BYTE_CRC16_LSB)
 			byteval = tape->crc16[blocknum];
-		
+
 		/* select the appropriate bit from the byte and move to the upper bit */
 		if ((byteval >> tape->bitnum) & 1)
 			tape_bits |= 0x80;
@@ -2091,11 +2091,11 @@ static void tape_change_speed(const device_config *device, INT8 newspeed)
 	tape_state *tape = get_safe_token(device);
 	attotime newperiod;
 	INT8 absnewspeed;
-	
+
 	/* do nothing if speed has not changed */
 	if (tape->speed == newspeed)
 		return;
-	
+
 	/* compute how fast to run the tape timer */
 	absnewspeed = (newspeed < 0) ? -newspeed : newspeed;
 	if (newspeed == 0)
@@ -2103,7 +2103,7 @@ static void tape_change_speed(const device_config *device, INT8 newspeed)
 	else
 		newperiod = ATTOTIME_IN_HZ(TAPE_CLOCKRATE * absnewspeed);
 
-	/* set the new speed */	
+	/* set the new speed */
 	timer_adjust_periodic(tape->timer, newperiod, 0, newperiod);
 	tape->speed = newspeed;
 }
@@ -2117,7 +2117,7 @@ static DEVICE_START( decocass_tape )
 {
 	tape_state *tape = get_safe_token(device);
 	int curblock, offs, numblocks;
-	
+
 	/* validate some basic stuff */
 	assert(device != NULL);
 	assert(device->static_config == NULL);
@@ -2129,14 +2129,14 @@ static DEVICE_START( decocass_tape )
 	tape->timer = timer_alloc(device->machine, tape_clock_callback, (void *)device);
 	if (device->region == NULL)
 		return DEVICE_START_OK;
-	
+
 	/* scan for the first non-empty block in the image */
 	for (offs = device->regionbytes - 1; offs >= 0; offs--)
 		if (device->region[offs] != 0)
 			break;
 	numblocks = ((offs | 0xff) + 1) / 256;
 	assert(numblocks < ARRAY_LENGTH(tape->crc16));
-	
+
 	/* compute the total length */
 	tape->numclocks = REGION_BOT_GAP_END_CLOCK + numblocks * BYTE_BLOCK_TOTAL * 16 + REGION_BOT_GAP_END_CLOCK;
 
@@ -2145,7 +2145,7 @@ static DEVICE_START( decocass_tape )
 	{
 		UINT16 crc = 0;
 		int testval;
-		
+
 		/* first CRC the 256 bytes of data */
 		for (offs = 256 * curblock; offs < 256 * curblock + 256; offs++)
 			crc = tape_crc16_byte(crc, device->region[offs]);

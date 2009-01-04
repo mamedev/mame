@@ -308,7 +308,7 @@ static const gfx_layout tilelayout =
 
 static const UINT32 objlayout_xoffset[64] =
 {
-	STEP8(7*8,1), STEP8(6*8,1), STEP8(5*8,1), STEP8(4*8,1), 
+	STEP8(7*8,1), STEP8(6*8,1), STEP8(5*8,1), STEP8(4*8,1),
 	STEP8(3*8,1), STEP8(2*8,1), STEP8(1*8,1), STEP8(0*8,1)
 };
 
@@ -384,7 +384,7 @@ static MACHINE_DRIVER_START( decocass )
 
 	MDRV_MACHINE_START(decocass)
 	MDRV_MACHINE_RESET(decocass)
-	
+
 	MDRV_DECOCASS_TAPE_ADD("cassette")
 
 	/* video hardware */

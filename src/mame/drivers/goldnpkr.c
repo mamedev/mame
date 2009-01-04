@@ -584,8 +584,8 @@
     - Added common MC6845 device interface.
     - Merged witchcrd and sloco93 machine drivers.
     - Added/corrected the 50/60 Hz. DIP switches to all games.
-	  The 50hz mode needs to be corrected. Some games as most bsuerte sets have
-	  the 50/60 Hz. DIP switch connection patched.
+      The 50hz mode needs to be corrected. Some games as most bsuerte sets have
+      the 50/60 Hz. DIP switch connection patched.
 
 
     TODO:

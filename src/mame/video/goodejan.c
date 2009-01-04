@@ -30,7 +30,7 @@ static TILE_GET_INFO( goodejan_bg_tile_info )
 
 	// WRONG!
 	tile|= (goodejan_bgvram[tile_index]&0x8000)>>3;
-//	if ((goodejan_bgvram[tile_index]&0x8000)==0x0000) tile+=0x1000;
+//  if ((goodejan_bgvram[tile_index]&0x8000)==0x0000) tile+=0x1000;
 
 	SET_TILE_INFO(1, tile, color, 0);
 }

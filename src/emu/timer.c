@@ -95,7 +95,7 @@ struct _timer_private
 	emu_timer *				activelist;			/* head of the active list */
 	emu_timer *				freelist; 			/* head of the free list */
 	emu_timer *				freelist_tail;		/* tail of the free list */
-	
+
 	/* execution state */
 	timer_execution_state	exec;				/* current global execution state */
 
@@ -361,7 +361,7 @@ timer_execution_state *timer_get_execution_state(running_machine *machine)
 
 
 /*-------------------------------------------------
-    timer_execute_timers - execute timers and 
+    timer_execute_timers - execute timers and
     update scheduling quanta
 -------------------------------------------------*/
 

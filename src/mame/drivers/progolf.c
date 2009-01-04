@@ -47,7 +47,7 @@ Twenty four 8116 rams.
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM //AM_WRITE(deco_charram_w) AM_BASE(&deco_charram)
-	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_BASE(&deco_charram) //AM_WRITE(deco_charram_w) 
+	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_BASE(&deco_charram) //AM_WRITE(deco_charram_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITENOP
 	AM_RANGE(0x9000, 0x9000) AM_READNOP
 	AM_RANGE(0x9200, 0x9200) AM_WRITENOP

@@ -9,14 +9,14 @@
 
 ****************************************************************************
 
-	To start profiling a certain section, e.g. video:
-	profiler_mark(PROFILER_VIDEO);
+    To start profiling a certain section, e.g. video:
+    profiler_mark(PROFILER_VIDEO);
 
-	to end profiling the current section:
-	profiler_mark(PROFILER_END);
+    to end profiling the current section:
+    profiler_mark(PROFILER_END);
 
-	the profiler handles a FILO list so calls may be nested.
-	
+    the profiler handles a FILO list so calls may be nested.
+
 ***************************************************************************/
 
 #pragma once

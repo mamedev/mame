@@ -40,27 +40,27 @@ T0 output clock
 
 ****************************************************************************
 
-	UPI-41/42 chips are MCS-48 derived, with some opcode changes:
-	
-			MCS-48 opcode		UPI-41/42 opcode
-			-------------		----------------
-		02: OUTL BUS,A			OUT  DBB,A
-		08: INS  BUS,A			<illegal>
-		22: <illegal>			IN   DBB,A
-		75: ENT0 CLK			<illegal>
-		80: MOVX A,@R0			<illegal>
-		81: MOVX A,@R1			<illegal>
-		86: JNI  <dest>			JOBF <dest>
-		88: ORL  BUS,#n			<illegal>
-		90: MOVX @R0,A			MOV  STS,A
-		91: MOVX @R1,A			<illegal>
-		98: ANL  BUS,#n			<illegal>
-		D6: <illegal>			JNIBF <dest>
-		E5: SEL  MB0			EN   DMA
-		F5: SEL  MB1			EN   FLAGS
+    UPI-41/42 chips are MCS-48 derived, with some opcode changes:
 
-	Chip numbers are similar to the MCS-48 series:
-    
+            MCS-48 opcode       UPI-41/42 opcode
+            -------------       ----------------
+        02: OUTL BUS,A          OUT  DBB,A
+        08: INS  BUS,A          <illegal>
+        22: <illegal>           IN   DBB,A
+        75: ENT0 CLK            <illegal>
+        80: MOVX A,@R0          <illegal>
+        81: MOVX A,@R1          <illegal>
+        86: JNI  <dest>         JOBF <dest>
+        88: ORL  BUS,#n         <illegal>
+        90: MOVX @R0,A          MOV  STS,A
+        91: MOVX @R1,A          <illegal>
+        98: ANL  BUS,#n         <illegal>
+        D6: <illegal>           JNIBF <dest>
+        E5: SEL  MB0            EN   DMA
+        F5: SEL  MB1            EN   FLAGS
+
+    Chip numbers are similar to the MCS-48 series:
+
     Chip   RAM  ROM  I/O
     ----   ---  ---  ---
     8041   128   1k
@@ -160,7 +160,7 @@ struct _mcs48_state
 
 	UINT8		feature_mask;		/* processor feature flags */
 	UINT16		int_rom_size;		/* internal rom size */
-	
+
 	cpu_state_table state;			/* state table */
 	UINT8		rtemp;				/* temporary for import/export */
 };
@@ -195,7 +195,7 @@ static const cpu_state_entry state_array[] =
 
 	MCS48_STATE_ENTRY(P1, "%02X", p1, 0xff, 0)
 	MCS48_STATE_ENTRY(P2, "%02X", p2, 0xff, 0)
-	
+
 	MCS48_STATE_ENTRY(R0, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
 	MCS48_STATE_ENTRY(R1, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
 	MCS48_STATE_ENTRY(R2, "%02X", rtemp, 0xff, CPUSTATE_IMPORT | CPUSTATE_EXPORT)
@@ -332,7 +332,7 @@ INLINE void pull_pc_psw(mcs48_state *cpustate)
 
 
 /*-------------------------------------------------
-    pull_pc - pull the PC value from the stack, 
+    pull_pc - pull the PC value from the stack,
     leaving the upper part of PSW intact
 -------------------------------------------------*/
 
@@ -437,7 +437,7 @@ INLINE UINT8 p2_mask(mcs48_state *cpustate)
 
 
 /*-------------------------------------------------
-    expander_operation - perform an operation via 
+    expander_operation - perform an operation via
     the 8243 expander chip
 -------------------------------------------------*/
 
@@ -445,10 +445,10 @@ INLINE void expander_operation(mcs48_state *cpustate, UINT8 operation, UINT8 por
 {
 	/* put opcode/data on low 4 bits of P2 */
 	port_w(2, cpustate->p2 = (cpustate->p2 & 0xf0) | (operation << 2) | (port & 3));
-	
+
 	/* generate high-to-low transition on PROG line */
 	prog_w(0);
-	
+
 	/* put data on low 4 bits of P2 */
 	if (operation != 0)
 		port_w(2, cpustate->p2 = (cpustate->p2 & 0xf0) | (cpustate->a & 0x0f));
@@ -737,7 +737,7 @@ OPHANDLER( out_dbb_a )
 	/* copy to the DBBO and update the bit in STS */
 	cpustate->dbbo = cpustate->a;
 	cpustate->sts |= STS_OBF;
-	
+
 	/* if P2 flags are enabled, update the state of P2 */
 	if (cpustate->flags_enabled && (cpustate->p2 & P2_OBF) == 0)
 		port_w(2, cpustate->p2 |= P2_OBF);
@@ -824,37 +824,37 @@ SPLIT_OPHANDLER( split_f5, sel_mb1,    en_flags )
 static const mcs48_ophandler opcode_table[256]=
 {
 	nop,        illegal,    split_02,  add_a_n,   jmp_0,     en_i,       illegal,   dec_a,         /* 00 */
-	split_08,   in_a_p1,    in_a_p2,   illegal,   movd_a_p4, movd_a_p5,  movd_a_p6, movd_a_p7, 
+	split_08,   in_a_p1,    in_a_p2,   illegal,   movd_a_p4, movd_a_p5,  movd_a_p6, movd_a_p7,
 	inc_xr0,    inc_xr1,    jb_0,      adc_a_n,   call_0,    dis_i,      jtf,       inc_a,         /* 10 */
-	inc_r0,     inc_r1,     inc_r2,    inc_r3,    inc_r4,    inc_r5,     inc_r6,    inc_r7,    
+	inc_r0,     inc_r1,     inc_r2,    inc_r3,    inc_r4,    inc_r5,     inc_r6,    inc_r7,
 	xch_a_xr0,  xch_a_xr1,  split_22,  mov_a_n,   jmp_1,     en_tcnti,   jnt_0,     clr_a,         /* 20 */
-	xch_a_r0,   xch_a_r1,   xch_a_r2,  xch_a_r3,  xch_a_r4,  xch_a_r5,   xch_a_r6,  xch_a_r7,  
+	xch_a_r0,   xch_a_r1,   xch_a_r2,  xch_a_r3,  xch_a_r4,  xch_a_r5,   xch_a_r6,  xch_a_r7,
 	xchd_a_xr0, xchd_a_xr1, jb_1,      illegal,   call_1,    dis_tcnti,  jt_0,      cpl_a,         /* 30 */
-	illegal,    outl_p1_a,  outl_p2_a, illegal,   movd_p4_a, movd_p5_a,  movd_p6_a, movd_p7_a, 
+	illegal,    outl_p1_a,  outl_p2_a, illegal,   movd_p4_a, movd_p5_a,  movd_p6_a, movd_p7_a,
 	orl_a_xr0,  orl_a_xr1,  mov_a_t,   orl_a_n,   jmp_2,     strt_cnt,   jnt_1,     swap_a,        /* 40 */
-	orl_a_r0,   orl_a_r1,   orl_a_r2,  orl_a_r3,  orl_a_r4,  orl_a_r5,   orl_a_r6,  orl_a_r7,  
+	orl_a_r0,   orl_a_r1,   orl_a_r2,  orl_a_r3,  orl_a_r4,  orl_a_r5,   orl_a_r6,  orl_a_r7,
 	anl_a_xr0,  anl_a_xr1,  jb_2,      anl_a_n,   call_2,    strt_t,     jt_1,      da_a,          /* 50 */
-	anl_a_r0,   anl_a_r1,   anl_a_r2,  anl_a_r3,  anl_a_r4,  anl_a_r5,   anl_a_r6,  anl_a_r7,  
+	anl_a_r0,   anl_a_r1,   anl_a_r2,  anl_a_r3,  anl_a_r4,  anl_a_r5,   anl_a_r6,  anl_a_r7,
 	add_a_xr0,  add_a_xr1,  mov_t_a,   illegal,   jmp_3,     stop_tcnt,  illegal,   rrc_a,         /* 60 */
-	add_a_r0,   add_a_r1,   add_a_r2,  add_a_r3,  add_a_r4,  add_a_r5,   add_a_r6,  add_a_r7,  
+	add_a_r0,   add_a_r1,   add_a_r2,  add_a_r3,  add_a_r4,  add_a_r5,   add_a_r6,  add_a_r7,
 	adc_a_xr0,  adc_a_xr1,  jb_3,      illegal,   call_3,    split_75,   jf1,       rr_a,          /* 70 */
-	adc_a_r0,   adc_a_r1,   adc_a_r2,  adc_a_r3,  adc_a_r4,  adc_a_r5,   adc_a_r6,  adc_a_r7,  
+	adc_a_r0,   adc_a_r1,   adc_a_r2,  adc_a_r3,  adc_a_r4,  adc_a_r5,   adc_a_r6,  adc_a_r7,
 	split_80,   split_81,   illegal,   ret,       jmp_4,     clr_f0,     split_86,  illegal,       /* 80 */
-	split_88,   orl_p1_n,   orl_p2_n,  illegal,   orld_p4_a, orld_p5_a,  orld_p6_a, orld_p7_a, 
+	split_88,   orl_p1_n,   orl_p2_n,  illegal,   orld_p4_a, orld_p5_a,  orld_p6_a, orld_p7_a,
 	split_90,   split_91,   jb_4,      retr,      call_4,    cpl_f0,     jnz,       clr_c,         /* 90 */
-	split_98,   anl_p1_n,   anl_p2_n,  illegal,   anld_p4_a, anld_p5_a,  anld_p6_a, anld_p7_a, 
+	split_98,   anl_p1_n,   anl_p2_n,  illegal,   anld_p4_a, anld_p5_a,  anld_p6_a, anld_p7_a,
 	mov_xr0_a,  mov_xr1_a,  illegal,   movp_a_xa, jmp_5,     clr_f1,     illegal,   cpl_c,         /* A0 */
-	mov_r0_a,   mov_r1_a,   mov_r2_a,  mov_r3_a,  mov_r4_a,  mov_r5_a,   mov_r6_a,  mov_r7_a,  
+	mov_r0_a,   mov_r1_a,   mov_r2_a,  mov_r3_a,  mov_r4_a,  mov_r5_a,   mov_r6_a,  mov_r7_a,
 	mov_xr0_n,  mov_xr1_n,  jb_5,      jmpp_xa,   call_5,    cpl_f1,     jf0,       illegal,       /* B0 */
-	mov_r0_n,   mov_r1_n,   mov_r2_n,  mov_r3_n,  mov_r4_n,  mov_r5_n,   mov_r6_n,  mov_r7_n,  
+	mov_r0_n,   mov_r1_n,   mov_r2_n,  mov_r3_n,  mov_r4_n,  mov_r5_n,   mov_r6_n,  mov_r7_n,
 	illegal,    illegal,    illegal,   illegal,   jmp_6,     sel_rb0,    jz,        mov_a_psw,     /* C0 */
-	dec_r0,     dec_r1,     dec_r2,    dec_r3,    dec_r4,    dec_r5,     dec_r6,    dec_r7,    
+	dec_r0,     dec_r1,     dec_r2,    dec_r3,    dec_r4,    dec_r5,     dec_r6,    dec_r7,
 	xrl_a_xr0,  xrl_a_xr1,  jb_6,      xrl_a_n,   call_6,    sel_rb1,    split_d6,  mov_psw_a,     /* D0 */
-	xrl_a_r0,   xrl_a_r1,   xrl_a_r2,  xrl_a_r3,  xrl_a_r4,  xrl_a_r5,   xrl_a_r6,  xrl_a_r7,  
+	xrl_a_r0,   xrl_a_r1,   xrl_a_r2,  xrl_a_r3,  xrl_a_r4,  xrl_a_r5,   xrl_a_r6,  xrl_a_r7,
 	illegal,    illegal,    illegal,   movp3_a_xa,jmp_7,     split_e5,   jnc,       rl_a,          /* E0 */
-	djnz_r0,    djnz_r1,    djnz_r2,   djnz_r3,   djnz_r4,   djnz_r5,    djnz_r6,   djnz_r7,    
+	djnz_r0,    djnz_r1,    djnz_r2,   djnz_r3,   djnz_r4,   djnz_r5,    djnz_r6,   djnz_r7,
 	mov_a_xr0,  mov_a_xr1,  jb_7,      illegal,   call_7,    split_f5,   jc,        rlc_a,         /* F0 */
-	mov_a_r0,   mov_a_r1,   mov_a_r2,  mov_a_r3,  mov_a_r4,  mov_a_r5,   mov_a_r6,  mov_a_r7  
+	mov_a_r0,   mov_a_r1,   mov_a_r2,  mov_a_r3,  mov_a_r4,  mov_a_r5,   mov_a_r6,  mov_a_r7
 };
 
 
@@ -926,7 +926,7 @@ static void mcs48_init(const device_config *device, cpu_irq_callback irqcallback
 
 
 /*-------------------------------------------------
-    mcs48_norom_init - initialization for systems 
+    mcs48_norom_init - initialization for systems
     with no internal ROM
 -------------------------------------------------*/
 
@@ -937,7 +937,7 @@ static CPU_INIT( mcs48_norom )
 
 
 /*-------------------------------------------------
-    mcs48_1k_rom_init - initialization for systems 
+    mcs48_1k_rom_init - initialization for systems
     with 1k of internal ROM
 -------------------------------------------------*/
 
@@ -948,7 +948,7 @@ static CPU_INIT( mcs48_1k_rom )
 
 
 /*-------------------------------------------------
-    mcs48_2k_rom - initialization for systems 
+    mcs48_2k_rom - initialization for systems
     with 2k of internal ROM
 -------------------------------------------------*/
 
@@ -959,7 +959,7 @@ static CPU_INIT( mcs48_2k_rom )
 
 
 /*-------------------------------------------------
-    mcs48_4k_rom - initialization for systems 
+    mcs48_4k_rom - initialization for systems
     with 2k of internal ROM
 -------------------------------------------------*/
 
@@ -970,7 +970,7 @@ static CPU_INIT( mcs48_4k_rom )
 
 
 /*-------------------------------------------------
-    upi41_1k_rom_init - initialization for systems 
+    upi41_1k_rom_init - initialization for systems
     with 1k of internal ROM
 -------------------------------------------------*/
 
@@ -981,7 +981,7 @@ static CPU_INIT( upi41_1k_rom )
 
 
 /*-------------------------------------------------
-    upi41_2k_rom_init - initialization for systems 
+    upi41_2k_rom_init - initialization for systems
     with 2k of internal ROM
 -------------------------------------------------*/
 
@@ -1136,7 +1136,7 @@ static CPU_EXECUTE( mcs48 )
 	do
 	{
 		unsigned opcode;
-		
+
 		/* fetch next opcode */
 		cpustate->prevpc = cpustate->pc;
 		debugger_instruction_hook(device, cpustate->pc);
@@ -1169,7 +1169,7 @@ static CPU_EXECUTE( mcs48 )
 UINT8 upi41_master_r(const device_config *device, UINT8 a0)
 {
 	mcs48_state *cpustate = device->token;
-	
+
 	/* if just reading the status, return it */
 	if ((a0 & 1) != 0)
 		return cpustate->sts;
@@ -1196,10 +1196,10 @@ static TIMER_CALLBACK( master_callback )
 	mcs48_state *cpustate = device->token;
 	UINT8 a0 = (param >> 8) & 1;
 	UINT8 data = param;
-	
+
 	/* data always goes to the input buffer */
 	cpustate->dbbi = data;
-	
+
 	/* set the appropriate flags */
 	if ((cpustate->sts & STS_IBF) == 0)
 	{
@@ -1207,7 +1207,7 @@ static TIMER_CALLBACK( master_callback )
 		if (cpustate->flags_enabled)
 			port_w(2, cpustate->p2 &= ~P2_NIBF);
 	}
-	
+
 	/* set F1 accordingly */
 	if (a0 == 0)
 		cpustate->sts &= ~STS_F1;

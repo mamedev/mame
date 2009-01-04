@@ -382,7 +382,7 @@ int debug_cpu_translate(const address_space *space, int intention, offs_t *addre
 
 
 /*-------------------------------------------------
-    debug_cpu_disassemble - disassemble a line at 
+    debug_cpu_disassemble - disassemble a line at
     a given PC on a given CPU
 -------------------------------------------------*/
 
@@ -441,7 +441,7 @@ offs_t debug_cpu_disassemble(const device_config *device, char *buffer, offs_t p
 
 
 /*-------------------------------------------------
-    debug_cpu_set_dasm_override - set an override 
+    debug_cpu_set_dasm_override - set an override
     handler for disassembly
 -------------------------------------------------*/
 

@@ -669,7 +669,7 @@ static CPU_IMPORT_STATE( m68k )
 		case M68K_SR:
 			m68ki_set_sr(m68k, m68k->iotemp);
 			break;
-			
+
 		case M68K_ISP:
 			if (m68k->s_flag && !m68k->m_flag)
 				REG_SP = m68k->iotemp;
@@ -707,7 +707,7 @@ static CPU_EXPORT_STATE( m68k )
 		case M68K_SR:
 			m68k->iotemp = m68ki_get_sr(m68k);
 			break;
-			
+
 		case M68K_ISP:
 			m68k->iotemp = (m68k->s_flag && !m68k->m_flag) ? REG_SP : REG_ISP;
 			break;

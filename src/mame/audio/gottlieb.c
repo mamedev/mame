@@ -593,7 +593,7 @@ MACHINE_DRIVER_START( gottlieb_soundrev2 )
 
 	MDRV_CPU_ADD("speech", M6502, SOUND2_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(gottlieb_speech2_map,0)
-	
+
 	/* sound hardware */
 	MDRV_SOUND_START( gottlieb2 )
 

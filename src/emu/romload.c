@@ -278,7 +278,7 @@ astring *rom_region_name(astring *result, const game_driver *drv, const rom_sour
 
 
 /*-------------------------------------------------
-    rom_file_size - return the expected size of a 
+    rom_file_size - return the expected size of a
     file given the ROM description
 -------------------------------------------------*/
 
@@ -300,7 +300,7 @@ UINT32 rom_file_size(const rom_entry *romp)
 		maxlength = MAX(maxlength, curlength);
 	}
 	while (ROMENTRY_ISRELOAD(romp));
-	
+
 	return maxlength;
 }
 
@@ -338,9 +338,9 @@ static void determine_bios_rom(rom_load_data *romdata)
 	const rom_entry *rom;
 	int default_no = 1;
 	int bios_count = 0;
-	
+
 	romdata->system_bios = 0;
-	
+
 	/* first determine the default BIOS name */
 	for (rom = romdata->machine->gamedrv->rom; !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
@@ -837,7 +837,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 		}
 	}
 	free(tempbuf);
-	
+
 	LOG(("  All done\n"));
 	return ROM_GETLENGTH(romp);
 }
@@ -1010,8 +1010,8 @@ chd_error open_disk_image(const game_driver *gamedrv, const rom_entry *romp, mam
 
 
 /*-------------------------------------------------
-    open_disk_image_options - open a disk image, 
-    searching up the parent and loading by 
+    open_disk_image_options - open a disk image,
+    searching up the parent and loading by
     checksum
 -------------------------------------------------*/
 
@@ -1338,7 +1338,7 @@ void rom_init(running_machine *machine)
 	memset(&romdata, 0, sizeof(romdata));
 	romdata.machine = machine;
 	romdata.errorstring = astring_alloc();
-	
+
 	/* figure out which BIOS we are using */
 	determine_bios_rom(&romdata);
 

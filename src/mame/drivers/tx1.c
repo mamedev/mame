@@ -16,7 +16,7 @@
         * TX-1 tyre screech noises are not implemented yet.
         * 'buggyboy' set is using ROMs from 'buggybjr' for testing purposes
         until the original set can be dumped.
-							
+
 ****************************************************************************
 
     Buggy Boy Error Codes          TX-1 Error Codes
@@ -415,14 +415,14 @@ static WRITE8_DEVICE_HANDLER( tx1_coin_cnt_w )
 {
 	coin_counter_w(0, data & 0x80);
 	coin_counter_w(1, data & 0x40);
-//	coin_counter_w(2, data & 0x40);
+//  coin_counter_w(2, data & 0x40);
 }
 
 static WRITE8_DEVICE_HANDLER( bb_coin_cnt_w )
 {
 	coin_counter_w(0, data & 0x01);
 	coin_counter_w(1, data & 0x02);
-//	coin_counter_w(2, data & 0x04);
+//  coin_counter_w(2, data & 0x04);
 }
 
 static WRITE8_HANDLER( tx1_ppi_latch_w )

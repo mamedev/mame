@@ -106,7 +106,7 @@ CPU_GET_INFO( i860 )
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.1");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);			break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Jason Eckhardt and Andrew Gardner");	break;
-	
+
 		case CPUINFO_INT_PC:							info->i = i860->pc;					break;
 		case CPUINFO_INT_PREVIOUSPC:					info->i = i860->ppc;				break;
 	}

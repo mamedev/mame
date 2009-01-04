@@ -204,43 +204,43 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 {
 	/* OKI BANKING  (still far from perfect, based on game behaviour)
 
-	The two okis can indifferently play music or samples and are switched on the fly during game
-	This is a preliminary table of the banks:
+    The two okis can indifferently play music or samples and are switched on the fly during game
+    This is a preliminary table of the banks:
 
-	BANK	MUSIC	SAMPLES
-	 0		   X
-	 1	  X
-	 2	  X 
-	 3	  X
-	 4		   X      
-	 5	  X
-	 6	  X
-	 7	  X
+    BANK    MUSIC   SAMPLES
+     0         X
+     1    X
+     2    X
+     3    X
+     4         X
+     5    X
+     6    X
+     7    X
 
-	Two nibbles are used in this handler: (data & 0xf) and ((data >> 4) & 0xf)
-	The values for the first nibble are the followings and should map the 8 oki banks:
-	- 0x6, 0x7, 0x9, 0xa, 0xb, 0xd, 0xe, 0xf
-	The values for the second nibble are the followings and should probably be used too:
-	- 0x6, 0x9, 0xa
+    Two nibbles are used in this handler: (data & 0xf) and ((data >> 4) & 0xf)
+    The values for the first nibble are the followings and should map the 8 oki banks:
+    - 0x6, 0x7, 0x9, 0xa, 0xb, 0xd, 0xe, 0xf
+    The values for the second nibble are the followings and should probably be used too:
+    - 0x6, 0x9, 0xa
 
-	Same values are redudant, for example:
-	level 2: data = 0x99
-	level 6: data = 0x99 
-	(this means same background music for the two levels - it could be correct, though)
+    Same values are redudant, for example:
+    level 2: data = 0x99
+    level 6: data = 0x99
+    (this means same background music for the two levels - it could be correct, though)
 
-	Also with current implementation, using only (data & 0xf), we have to force some values
-	manually, because the correspondent places in the table are already used
+    Also with current implementation, using only (data & 0xf), we have to force some values
+    manually, because the correspondent places in the table are already used
 
-	Musics order is completely guessed but close to what the original PCB game should be */
+    Musics order is completely guessed but close to what the original PCB game should be */
 
 	static const int bank_table_0[16] = { -1, -1, -1, -1, -1, -1, 0, 0, -1, 6, 0, 5, -1, 0, 0, 0 };
 	static const int bank_table_1[16] = { -1, -1, -1, -1, -1, -1, 2, 2, -1, 0, 0, 4, -1, 1, 1, 1 };
 
 	static int bank_0 = 0;
 	static int bank_1 = 0;
-    	
+
 	//popmessage("oki_0 banking value = %X\noki_1 banking value = %X\n",data & 0xf,(data >> 4) & 0xf);
-        
+
 	bank_0 = bank_table_0[data & 0xf];
 	bank_1 = bank_table_1[data & 0xf];		// (data >> 4) & 0xf ??
 
@@ -253,14 +253,14 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 
 	if (data == 0x9b)
 	{
-		bank_0 = 7;		// level 7 music			
-		bank_1 = 0;		// level 7 samples			
+		bank_0 = 7;		// level 7 music
+		bank_1 = 0;		// level 7 samples
 	}
 
 	if (data == 0x9f)
 	{
-		bank_0 = 0;		// end sequence samples			
-		bank_1 = 3;		// end sequence music			
+		bank_0 = 0;		// end sequence samples
+		bank_1 = 3;		// end sequence music
 	}
 
 	okim6295_set_bank_base(0, bank_0 * 0x40000);
@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( gstream_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
 	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
 	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2") 	// extra coin switches etc
-	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w) 	// oki banking 
+	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w) 	// oki banking
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w) 	// ??
 	AM_RANGE(0x4050, 0x4053) AM_READWRITE(gstream_oki_1_r, gstream_oki_1_w) 	// music and samples
 	AM_RANGE(0x4060, 0x4063) AM_READWRITE(gstream_oki_0_r, gstream_oki_0_w) 	// music and samples

@@ -2,13 +2,13 @@
 
  Lucky Girl (newer 1991 version on different hardware?)
   -- there is an early 'Lucky Girl' which appears to be running on Nichibutsu like hardware.
-  
+
  The program rom extracted from the Z180 also refers to this as Lucky 74..
 
- 
- 
- 
- 
+
+
+
+
  Lucky Girl
  Wing 1991
 
@@ -41,7 +41,7 @@
  1x 06B30P          40-pin PDIP     Unknown
  1x 101810P         64-pin SDIP     Unknown
  1x HG62E11B10P     64-pin SDIP     Hitachi gate array (custom)
- 1x CPU module      90-pin SDIP    
+ 1x CPU module      90-pin SDIP
 
  Others
 
@@ -69,19 +69,19 @@
 
  Reset switch cuts power supply going to Video/Work RAM.
 
- 
+
 */
 
 
 #include "driver.h"
 #include "cpu/z180/z180.h"
 
-	
+
 static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x10000, 0x1ffff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM	
+	AM_RANGE(0x0f000, 0x0ffff) AM_RAM
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -107,7 +107,7 @@ static const gfx_layout tiles8x8_layout =
 };
 static GFXDECODE_START( luckgrln )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )	
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 static VIDEO_START(luckgrln)
@@ -121,11 +121,11 @@ static VIDEO_UPDATE(luckgrln)
 }
 
 static MACHINE_DRIVER_START( luckgrln )
-	MDRV_CPU_ADD("main", Z180,8000000)		
+	MDRV_CPU_ADD("main", Z180,8000000)
 	MDRV_CPU_PROGRAM_MAP(mainmap,0)
-	MDRV_CPU_IO_MAP(portmap,0)	
+	MDRV_CPU_IO_MAP(portmap,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-	
+
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -145,7 +145,7 @@ DRIVER_INIT( luckgrln )
 	int i;
 	UINT8 x,v;
 	UINT8* rom = memory_region(machine,"user1");
-	
+
 	for (i=0;i<0x20000;i++)
 	{
 		x = rom[i];
@@ -155,7 +155,7 @@ DRIVER_INIT( luckgrln )
 		x = (x << (i & 7)) | (x >> (8-(i & 7)));
 		rom[i] = x;
 	}
-	
+
 	#if 0
 	{
 		FILE *fp;
@@ -168,24 +168,24 @@ DRIVER_INIT( luckgrln )
 			fclose(fp);
 		}
 	}
-	#endif	
-	
+	#endif
+
 	// ??
-	memory_set_bankptr(machine, 1,&rom[0x010000]);	
+	memory_set_bankptr(machine, 1,&rom[0x010000]);
 }
 
 ROM_START( luckgrln )
 	ROM_REGION( 0x4000, "main", 0 ) // internal Z180 rom
 	ROM_LOAD( "lucky74.bin",  0x00000, 0x4000, CRC(fa128e05) SHA1(97a9534b8414f984159271db48b153b0724d22f9) )
-	
+
 	ROM_REGION( 0x20000, "user1", 0 ) // external data / cpu rom
 	ROM_LOAD( "falcon.13",  0x00000, 0x20000, CRC(f7a717fd) SHA1(49a39b84620876ee2faf73aaa405a1e17cab2da2) )
-	
+
 	ROM_REGION( 0x60000, "gfx1", 0 )
 	ROM_LOAD( "eagle.1", 0x00000, 0x20000, CRC(37209082) SHA1(ffb30da5920886f37c6b97e03f5a8ec3b6265e68) )
 	ROM_LOAD( "eagle.2", 0x20000, 0x20000, CRC(bdb2d694) SHA1(3e58fe3f6b447181e3a85f0fc2a0c996231bc8e8) )
 	ROM_LOAD( "eagle.3", 0x40000, 0x20000, CRC(2c765389) SHA1(d5697c73cc939aa46f36c2dd87e90bba2536e347))
-	
+
 	ROM_REGION( 0x60000, "gfx2", 0 ) // luckgrlns - 3bpp
 	ROM_LOAD( "falcon.4", 0x00000, 0x20000, CRC(369eaddf) SHA1(52387ea63e5c8fb0c27b796026152a06b68467af) )
 	ROM_LOAD( "falcon.5", 0x20000, 0x20000, CRC(c9ac1fe7) SHA1(fc027002754b90cc49ca74fac5240a99a194c0b3))

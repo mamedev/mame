@@ -1132,15 +1132,15 @@ The only ones with numbers are the EPROMs at 1A and 1B.
 /*
 This dump matches the already supported set, except for rom sizes:
 
-	1r                      52201B.2R               IDENTICAL
-	2r                      52202B.1R               IDENTICAL
-	nm52204.1b              52204.1B                IDENTICAL
-	nm52205.1a              52205.1A                IDENTICAL
-	2e           [1/2]      52203.2E                IDENTICAL
-	9a                      52211.9A     [1/2]      IDENTICAL
-	9b                      52210.9B     [1/2]      IDENTICAL
-	9d                      52208.9D     [1/2]      IDENTICAL
-	9f                      52206.9F     [1/2]      IDENTICAL
+    1r                      52201B.2R               IDENTICAL
+    2r                      52202B.1R               IDENTICAL
+    nm52204.1b              52204.1B                IDENTICAL
+    nm52205.1a              52205.1A                IDENTICAL
+    2e           [1/2]      52203.2E                IDENTICAL
+    9a                      52211.9A     [1/2]      IDENTICAL
+    9b                      52210.9B     [1/2]      IDENTICAL
+    9d                      52208.9D     [1/2]      IDENTICAL
+    9f                      52206.9F     [1/2]      IDENTICAL
 */
 #if 0
 ROM_START( dai2kaku_alt_rom_size )

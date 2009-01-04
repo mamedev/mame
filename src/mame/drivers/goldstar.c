@@ -161,19 +161,19 @@ static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
 	AM_RANGE(0xf830, 0xf830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
 	AM_RANGE(0xf840, 0xf840) AM_WRITE(ay8910_control_port_0_w)
-//	AM_RANGE(0xf850, 0xf850) AM_WRITE(ncb3_p1_flip_w)	// need flip?
-//	AM_RANGE(0xf860, 0xf860) AM_WRITE(ncb3_p2_flip_w)	// need flip?
+//  AM_RANGE(0xf850, 0xf850) AM_WRITE(ncb3_p1_flip_w)   // need flip?
+//  AM_RANGE(0xf860, 0xf860) AM_WRITE(ncb3_p2_flip_w)   // need flip?
 	AM_RANGE(0xf870, 0xf870) AM_WRITE(sn76496_0_w)	/* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ncb3_readwriteport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)	// read from 0x00 when controls set1 is used...
-//	AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)	// read from 0x02 when controls set2 is used...
-//	AM_RANGE(0x06, 0x06) AM_READ(ncb3_unkread_r)	// unknown...
-//	AM_RANGE(0x08, 0x08) AM_READ(ncb3_unkread_r)	// unknown...
+//  AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)    // read from 0x00 when controls set1 is used...
+//  AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)    // read from 0x02 when controls set2 is used...
+//  AM_RANGE(0x06, 0x06) AM_READ(ncb3_unkread_r)    // unknown...
+//  AM_RANGE(0x08, 0x08) AM_READ(ncb3_unkread_r)    // unknown...
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW5")	/* confirmed for ncb3 */
-//	AM_RANGE(0x81, 0x81) ---> large writes.
+//  AM_RANGE(0x81, 0x81) ---> large writes.
 
 ADDRESS_MAP_END
 
@@ -3110,7 +3110,7 @@ static void do_blockswaps(UINT8* ROM)
 		0x0000, 0x4800, 0x2000, 0x5000,
 		0x1000, 0x7800, 0x6000, 0x3800,
 		/* bit below, I'm not sure, no exact match, but only the first ones matter,
-		   as the is just garbage */
+           as the is just garbage */
 		0xc000, 0xc800, 0xd000, 0xd800,
 		0xe000, 0xe800, 0xf000, 0xf800,
 		0x8000, 0x8800, 0x9000, 0x9800,
@@ -3237,7 +3237,7 @@ static DRIVER_INIT(cm)
 	UINT8 *ROM = memory_region(machine, "main");
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.	
+    the mixed modes 2-0 are not working properly.
 */
 	ROM[0x0021] = 0x9b;
 	ROM[0x0025] = 0x9b;
@@ -3248,7 +3248,7 @@ static DRIVER_INIT(cmv4)
 	UINT8 *ROM = memory_region(machine, "main");
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.	
+    the mixed modes 2-0 are not working properly.
 */
 	ROM[0x0209] = 0x9b;
 	ROM[0x020d] = 0x9b;
@@ -3259,7 +3259,7 @@ static DRIVER_INIT(cmast91)
 	UINT8 *ROM = memory_region(machine, "main");
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.	
+    the mixed modes 2-0 are not working properly.
 */
 	ROM[0x0070] = 0x9b;
 	ROM[0x0a92] = 0x9b;

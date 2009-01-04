@@ -448,7 +448,7 @@ static STREAM_UPDATE( buggyboy_stream_update )
 		gain0 = BIT(ym2_outputb, 3) ? 1.0 : 2.0;
 	else
 		gain0 = BIT(ym1_outputa, 3) ? 1.0 : 2.0;
-	
+
 	n1_en = BIT(ym2_outputb, 4);
 	n2_en = BIT(ym2_outputb, 5);
 

@@ -1191,7 +1191,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			if (op & MSR_EE)
 				desc->flags |= OPFLAG_CAN_EXPOSE_EXTERNAL_INT;
 			return TRUE;
-		
+
 		case 0x254: /* ESA */
 		case 0x274: /* DSA */
 			if (!is_602_class(ppc))

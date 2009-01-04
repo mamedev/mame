@@ -41,7 +41,7 @@ profiler_state global_profiler;
 ***************************************************************************/
 
 /*-------------------------------------------------
-    _profiler_mark - mark the beginning/end of a 
+    _profiler_mark - mark the beginning/end of a
     profiler entry
 -------------------------------------------------*/
 
@@ -70,21 +70,21 @@ void _profiler_mark(int type)
 			profiler_filo_entry *preventry = entry - 1;
 			data->duration[preventry->type] += curticks - preventry->start;
 		}
-		
+
 		/* fill in this entry */
 		entry->type = type;
 		entry->start = curticks;
 	}
-	
+
 	/* if we're ending an existing bucket, update the time */
 	else if (global_profiler.filoindex > 0)
 	{
 		int index = --global_profiler.filoindex;
 		profiler_filo_entry *entry = &global_profiler.filo[index];
-		
+
 		/* account for the time taken */
 		data->duration[entry->type] += curticks - entry->start;
-		
+
 		/* if we have a previous entry, restart his time now */
 		if (index != 0)
 		{
@@ -96,7 +96,7 @@ void _profiler_mark(int type)
 
 
 /*-------------------------------------------------
-    _profiler_get_text - return the current text 
+    _profiler_get_text - return the current text
     in an astring
 -------------------------------------------------*/
 
@@ -130,13 +130,13 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 	int curtype, curmem, switches;
 
 	profiler_mark(PROFILER_PROFILER);
-	
+
 	/* compute the total time for all bits, not including profiler or idle */
 	computed = 0;
 	for (curtype = 0; curtype < PROFILER_PROFILER; curtype++)
 		for (curmem = 0; curmem < ARRAY_LENGTH(global_profiler.data); curmem++)
 			computed += global_profiler.data[curmem].duration[curtype];
-	
+
 	/* save that result in normalize, and continue adding the rest */
 	normalize = computed;
 	for ( ; curtype < PROFILER_TOTAL; curtype++)
@@ -161,14 +161,14 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 		if (global_profiler.dataready && computed != 0)
 		{
 			int nameindex;
-			
+
 			/* start with the un-normalized percentage */
 			astring_catprintf(string, "%02d%% ", (int)((computed * 100 + total/2) / total));
-			
+
 			/* followed by the normalized percentage for everything but profiler and idle */
 			if (curtype < PROFILER_PROFILER)
 				astring_catprintf(string, "%02d%% ", (int)((computed * 100 + normalize/2) / normalize));
-			
+
 			/* and then the text */
 			if (curtype >= PROFILER_CPU_FIRST && curtype <= PROFILER_CPU_MAX)
 				astring_catprintf(string, "CPU '%s'", device_list_find_by_index(machine->config->devicelist, CPU, curtype - PROFILER_CPU_FIRST)->tag);
@@ -179,7 +179,7 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 						astring_catc(string, names[nameindex].string);
 						break;
 					}
-			
+
 			/* followed by a carriage return */
 			astring_catc(string, "\n");
 		}

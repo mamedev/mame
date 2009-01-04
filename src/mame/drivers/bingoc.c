@@ -84,13 +84,13 @@ static WRITE16_HANDLER( main_sound_latch_w )
 static WRITE8_HANDLER( bingoc_play_w )
 {
 	/*
-	---- --x- sound rom banking
-	---- ---x start-stop sample
-	*/
+    ---- --x- sound rom banking
+    ---- ---x start-stop sample
+    */
 	UINT8 *upd = memory_region(space->machine, "upd");
 	memcpy(&upd[0x00000], &upd[0x20000 + (((data & 2)>>1) * 0x20000)], 0x20000);
 	upd7759_start_w(0, data & 1);
-//	printf("%02x\n",data);
+//  printf("%02x\n",data);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )

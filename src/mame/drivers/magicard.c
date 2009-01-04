@@ -30,7 +30,7 @@
                   1x 19.6608 MHz.
 
     - PLDs:       1x PAL16L8ACN
-	              1x PALCE18V8H-25
+                  1x PALCE18V8H-25
 
 
 *******************************************************************************
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( magicard_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x020002, 0x020003) AM_READ(test_r)
 	AM_RANGE(0x040000, 0x05ffff) AM_RAM
 	AM_RANGE(0x060000, 0x07ffff) AM_RAM AM_BASE(&blit_ram)
-//	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_REGION("main", 0)
+//  AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_REGION("main", 0)
 	AM_RANGE(0x180000, 0x1ffbff) AM_ROM AM_REGION("main", 0)
 	AM_RANGE(0x1ffc00, 0x1fffff) AM_RAM
 	AM_RANGE(0x260000, 0x27ffff) AM_RAM /*???*/
@@ -160,27 +160,27 @@ MACHINE_RESET( magicard )
 
 static PALETTE_INIT( magicard )
 {
-/*	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+/*  int bit0, bit1, bit2 , r, g, b;
+    int i;
 
-	for (i = 0; i < 0x100; ++i)
-	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+    for (i = 0; i < 0x100; ++i)
+    {
+        bit0 = (color_prom[0] >> 0) & 0x01;
+        bit1 = (color_prom[0] >> 1) & 0x01;
+        bit2 = (color_prom[0] >> 2) & 0x01;
+        r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+        bit0 = (color_prom[0] >> 3) & 0x01;
+        bit1 = (color_prom[0] >> 4) & 0x01;
+        bit2 = (color_prom[0] >> 5) & 0x01;
+        g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+        bit0 = 0;
+        bit1 = (color_prom[0] >> 6) & 0x01;
+        bit2 = (color_prom[0] >> 7) & 0x01;
+        b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-		color_prom++;
-	}*/
+        palette_set_color(machine, i, MAKE_RGB(r, g, b));
+        color_prom++;
+    }*/
 }
 
 /*************************
@@ -224,13 +224,13 @@ static const gfx_layout mca_tilelayout =
 static GFXDECODE_START( magicard )
 	GFXDECODE_ENTRY( "main", 0x21562, mca_charlayout,  0, 32 )
 	GFXDECODE_ENTRY( "main", 0x16470, mca_tilelayout,  0, 32 )
-//	GFXDECODE_ENTRY( "main", 0x22efa, mca_tilelayout,  0, 32 )
+//  GFXDECODE_ENTRY( "main", 0x22efa, mca_tilelayout,  0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( magicrda )
 	GFXDECODE_ENTRY( "main", 0x21562 + 0x792, mca_charlayout,  0, 32 )
 	GFXDECODE_ENTRY( "main", 0x16470, mca_tilelayout,  0, 32 )
-//	GFXDECODE_ENTRY( "main", 0x22efa, mca_tilelayout,  0, 32 )
+//  GFXDECODE_ENTRY( "main", 0x22efa, mca_tilelayout,  0, 32 )
 GFXDECODE_END
 
 
@@ -250,7 +250,7 @@ static INTERRUPT_GEN( magicard_irq )
 static MACHINE_DRIVER_START( magicard )
 	MDRV_CPU_ADD("main", M68000, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
 	MDRV_CPU_PROGRAM_MAP(magicard_mem,0)
-//	MDRV_CPU_VBLANK_INT("main", magicard_irq) /* no interrupts? (it erases the vectors..) */
+//  MDRV_CPU_VBLANK_INT("main", magicard_irq) /* no interrupts? (it erases the vectors..) */
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -287,8 +287,8 @@ ROM_START( magicard )
 	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "magicorg.bin", 0x000000, 0x80000, CRC(810edf9f) SHA1(0f1638a789a4be7413aa019b4e198353ba9c12d9) )
 
-//	ROM_REGION( 0x400, "boot_prg", 0 )
-//	ROM_COPY( "main", 0x00000, 0x00000, 0x400)
+//  ROM_REGION( 0x400, "boot_prg", 0 )
+//  ROM_COPY( "main", 0x00000, 0x00000, 0x400)
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* Color PROM?? */
 	ROM_LOAD16_WORD_SWAP("mgorigee.bin",	0x0000,	0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
@@ -299,8 +299,8 @@ ROM_START( magicrda )
 	ROM_LOAD16_WORD_SWAP( "mcorigg2.bin", 0x00000, 0x20000, CRC(48546aa9) SHA1(23099a5e4c9f2c3386496f6d7f5bb7d435a6fb16) )
 	ROM_LOAD16_WORD_SWAP( "mcorigg1.bin", 0x20000, 0x20000, CRC(c9e4a38d) SHA1(812e5826b27c7ad98142a0f52fbdb6b61a2e31d7) )
 
-//	ROM_REGION( 0x400, "boot_prg", 0 )
-//	ROM_COPY( "main", 0x00000, 0x00000, 0x400)
+//  ROM_REGION( 0x400, "boot_prg", 0 )
+//  ROM_COPY( "main", 0x00000, 0x00000, 0x400)
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* Color PROM?? */
 	ROM_LOAD("mgorigee.bin",	0x0000,	0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )

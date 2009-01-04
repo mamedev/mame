@@ -256,18 +256,18 @@ void cpuexec_timeslice(running_machine *machine)
 	timer_execution_state *timerexec = timer_get_execution_state(machine);
 	cpuexec_private *global = machine->cpuexec_data;
 	int ran;
-	
+
 	/* build the execution list if we don't have one yet */
 	if (global->executelist == NULL)
 		rebuild_execute_list(machine);
-	
+
 	/* loop until we hit the next timer */
 	while (ATTOTIME_LT(timerexec->basetime, timerexec->nextfire))
 	{
 		cpu_class_data *classdata;
 		UINT32 suspendchanged;
 		attotime target;
-		
+
 		/* by default, assume our target is the end of the next quantum */
 		target.seconds = timerexec->basetime.seconds;
 		target.attoseconds = timerexec->basetime.attoseconds + timerexec->curquantum;
@@ -290,7 +290,7 @@ void cpuexec_timeslice(running_machine *machine)
 			classdata->nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
 			classdata->eatcycles = classdata->nexteatcycles;
 		}
-		
+
 		/* recompute the execute list if any CPUs changed their suspension state */
 		if (suspendchanged != 0)
 			rebuild_execute_list(machine);
@@ -302,7 +302,7 @@ void cpuexec_timeslice(running_machine *machine)
 			if (target.seconds >= classdata->localtime.seconds)
 			{
 				attoseconds_t delta, actualdelta;
-				
+
 				/* compute how many attoseconds to execute this CPU */
 				delta = target.attoseconds - classdata->localtime.attoseconds;
 				if (delta < 0 && target.seconds > classdata->localtime.seconds)
@@ -340,10 +340,10 @@ void cpuexec_timeslice(running_machine *machine)
 						ran -= classdata->cycles_stolen;
 						profiler_mark(PROFILER_END);
 					}
-					
+
 					/* account for these cycles */
 					classdata->totalcycles += ran;
-					
+
 					/* update the local time for this CPU */
 					actualdelta = classdata->attoseconds_per_cycle * ran;
 					classdata->localtime.attoseconds += actualdelta;
@@ -355,7 +355,7 @@ void cpuexec_timeslice(running_machine *machine)
 					{
 						assert(attotime_compare(classdata->localtime, target) < 0);
 						target = classdata->localtime;
-						
+
 						/* however, if this puts us before the base, clamp to the base as a minimum */
 						if (ATTOTIME_LT(target, timerexec->basetime))
 						{

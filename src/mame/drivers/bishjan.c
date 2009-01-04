@@ -257,7 +257,7 @@ static VIDEO_UPDATE( bishjan )
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap_1, 0, 0);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tmap_2, 0, 0);
 
-//	popmessage("SCROLL: %03x,%03x - %03x,%03x DISABLE: %02x", bishjan_scroll_1_x,bishjan_scroll_1_y, bishjan_scroll_2_x,bishjan_scroll_2_y, bishjan_disable);
+//  popmessage("SCROLL: %03x,%03x - %03x,%03x DISABLE: %02x", bishjan_scroll_1_x,bishjan_scroll_1_y, bishjan_scroll_2_x,bishjan_scroll_2_y, bishjan_disable);
 
 	return 0;
 }
@@ -447,7 +447,7 @@ static WRITE8_HANDLER( saklove_outputs_w )
 			break;
 	}
 
-//	popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", saklove_outputs[0], saklove_outputs[1], saklove_outputs[2], saklove_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", saklove_outputs[0], saklove_outputs[1], saklove_outputs[2], saklove_outputs[3]);
 }
 
 static WRITE8_HANDLER( saklove_oki_bank_w )
@@ -992,7 +992,7 @@ Notes:
       HSync    - 15.3234kHz
 
 ***************************************************************************/
-      
+
 ROM_START( saklove )
 	ROM_REGION( 0x20000, "main", 0 )	// AM188-EM
 	ROM_LOAD( "1.u23", 0x00000, 0x20000, CRC(02319bfb) SHA1(1a425dcdeecae92d8b7457d1897c700ac7856a9d) )

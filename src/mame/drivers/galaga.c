@@ -3025,7 +3025,7 @@ ROM_END
         * The letter "B" is silkscreened in the P12 corner (on right side of
           the edge connector).
         * Also, the three Z80's are located on the opposite side of the edge connector and
-          they are stacked in a column.  (The Z80's are oriented vertically instead of 
+          they are stacked in a column.  (The Z80's are oriented vertically instead of
           horizontal as the other chips are.)
         * The 4th edition TM-203 and SP-203 manuals cover this board.
 */

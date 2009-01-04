@@ -435,7 +435,7 @@ int cli_info_listclones(core_options *options, const char *gamename)
 
 
 /*-------------------------------------------------
-    cli_info_listbrothers - output the name and 
+    cli_info_listbrothers - output the name and
     source filename of one or more games
 -------------------------------------------------*/
 
@@ -444,7 +444,7 @@ int cli_info_listbrothers(core_options *options, const char *gamename)
 	UINT8 *didit = malloc_or_die(driver_list_get_count(drivers));
 	astring *filename = astring_alloc();
 	int drvindex, count = 0;
-	
+
 	memset(didit, 0, driver_list_get_count(drivers));
 
 	/* iterate over drivers */
@@ -452,7 +452,7 @@ int cli_info_listbrothers(core_options *options, const char *gamename)
 		if (!didit[drvindex] && mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			int matchindex;
-		
+
 			didit[drvindex] = TRUE;
 			if (count > 0)
 				mame_printf_info("\n");
@@ -464,7 +464,7 @@ int cli_info_listbrothers(core_options *options, const char *gamename)
 				{
 					const char *matchstring = (mame_strwildcmp(gamename, drivers[matchindex]->name) == 0) ? "-> " : "   ";
 					const game_driver *clone_of = driver_get_clone(drivers[matchindex]);
-					
+
 					if (clone_of != NULL && (clone_of->flags & GAME_IS_BIOS_ROOT) == 0)
 						mame_printf_info("%s%-8s [%s]\n", matchstring, drivers[matchindex]->name, clone_of->name);
 					else

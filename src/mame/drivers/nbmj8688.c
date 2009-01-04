@@ -354,7 +354,7 @@ static WRITE8_HANDLER( barline_output_w )
 
 static ADDRESS_MAP_START( readport_barline, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
+//  AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
 	AM_RANGE(0x80, 0x80) AM_READ(ym3812_status_port_0_r)
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( writeport_barline, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(barline_output_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
-//	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE) //not used
+//  AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE) //not used
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -3063,7 +3063,7 @@ static MACHINE_DRIVER_START( barline )
 	MDRV_IMPORT_FROM(mbmj_h12bit)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(readport_barline, writeport_barline)
-//	MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 
 	MDRV_SOUND_REPLACE("8910", YM3812, 20000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)

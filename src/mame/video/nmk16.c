@@ -545,7 +545,7 @@ VIDEO_UPDATE( macross )
 
 VIDEO_UPDATE( tdragon )
 {
-//	mcu_run(screen->machine, 1);
+//  mcu_run(screen->machine, 1);
 
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
@@ -562,7 +562,7 @@ VIDEO_UPDATE( tdragon )
 
 VIDEO_UPDATE( hachamf )
 {
-//	mcu_run(screen->machine, 0);
+//  mcu_run(screen->machine, 0);
 
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 

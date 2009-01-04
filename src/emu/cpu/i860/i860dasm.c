@@ -48,9 +48,9 @@ CPU_DISASSEMBLE( i860 )
 
 	/* Little Endian */
 	const UINT32 op = (oprom[3] << 24) | (oprom[2] << 16) | (oprom[1] << 8) | (oprom[0] << 0);
-	//const UINT32 op = (oprom[2] << 24) | (oprom[3] << 16) | (oprom[0] << 8) | (oprom[1] << 0);	/* Mixed Endian */
-	//const UINT32 op = (oprom[0] << 24) | (oprom[1] << 16) | (oprom[2] << 8) | (oprom[3] << 0);	/* Big Endian */
-	//const UINT32 op = (oprom[1] << 24) | (oprom[0] << 16) | (oprom[3] << 8) | (oprom[2] << 0);	/* Mixed Endian */
+	//const UINT32 op = (oprom[2] << 24) | (oprom[3] << 16) | (oprom[0] << 8) | (oprom[1] << 0);    /* Mixed Endian */
+	//const UINT32 op = (oprom[0] << 24) | (oprom[1] << 16) | (oprom[2] << 8) | (oprom[3] << 0);    /* Big Endian */
+	//const UINT32 op = (oprom[1] << 24) | (oprom[0] << 16) | (oprom[3] << 8) | (oprom[2] << 0);    /* Mixed Endian */
 
 	/* The opcode is the top 6 bits */
 	UINT8 opcode = (op >> 26) & 0x3f;
@@ -61,53 +61,53 @@ CPU_DISASSEMBLE( i860 )
 	/* Main decode */
 	switch (opcode)
 	{
-		case 0x00: 
+		case 0x00:
 		case 0x01:
 		case 0x04:
 		case 0x05: i860_dasm_ldx(op, tempB); 		break;
-	
+
 		case 0x03:
 		case 0x07: i860_dasm_stx(op, tempB); 		break;
-	
+
 		case 0x02: i860_dasm_ixfr(op, tempB); 		break;
-	
+
 		case 0x06: sprintf(tempB, "(reserved)"); 	break;
-	
+
 		case 0x08:
 		case 0x09:
 		case 0x0a:
 		case 0x0b: i860_dasm_fid_fst(op, tempB); 	break;
-	
+
 		case 0x0d: i860_dasm_flush(op, tempB); 		break;
-	
+
 		case 0x0f: i860_dasm_pstd(op, tempB); 		break;
-	
+
 		case 0x0c:
 		case 0x0e: i860_dasm_ldc_sdc(op, tempB); 	break;
-	
+
 		case 0x10: i860_dasm_bri(op, tempB); 		break;
-	
+
 		case 0x11: i860_dasm_trap(op, tempB); 		break;
-	
+
 		case 0x12: i860_dasm_floating_point_dasm(op, tempB); break;	/* Floating point operation sub-group */
-	
+
 		case 0x13: i860_dasm_core_dasm(op, tempB);	 break;			/* Core operation sub-group */
-	
+
 		case 0x14:
 		case 0x15:
 		case 0x16:
 		case 0x17: i860_dasm_bte_btne(op, tempB); 	break;
-	
+
 		case 0x18:
 		case 0x19: i860_dasm_pfidy(op, tempB); 		break;
-	
+
 		case 0x1a:
 		case 0x1b:
 		case 0x1c:
 		case 0x1d:
 		case 0x1e:
 		case 0x1f: i860_dasm_CTRL_dasm(op, tempB);  break;			/* CTRL operation sub-group */
-	
+
 		case 0x20:
 		case 0x21:
 		case 0x22:
@@ -116,39 +116,39 @@ CPU_DISASSEMBLE( i860 )
 		case 0x25:
 		case 0x26:
 		case 0x27: i860_dasm_addu_subu(op, tempB); 	break;
-	
+
 		case 0x28:
 		case 0x29:
 		case 0x2a:
 		case 0x2b: i860_dasm_shl_shr(op, tempB); 	break;
-	
+
 		case 0x2c: i860_dasm_shrd(op, tempB); 		break;
-	
+
 		case 0x2d: i860_dasm_bla(op, tempB); 		break;
-	
+
 		case 0x2e:
 		case 0x2f: i860_dasm_shra(op, tempB); 		break;
-	
+
 		case 0x30:
 		case 0x31:
 		case 0x32:
 		case 0x33: i860_dasm_and_andh(op, tempB); 	break;
-	
+
 		case 0x34:
 		case 0x35:
 		case 0x36:
 		case 0x37: i860_dasm_andnot_andnoth(op, tempB); break;
-	
+
 		case 0x38:
 		case 0x39:
 		case 0x3a:
 		case 0x3b: i860_dasm_or_orh(op, tempB); 	break;
-	
+
 		case 0x3c:
 		case 0x3d:
 		case 0x3e:
 		case 0x3f: i860_dasm_xor_xorh(op, tempB); 	break;
-	
+
 		default: sprintf(tempB, "(reserved)"); 		break;
 	}
 
@@ -228,11 +228,11 @@ static void i860_dasm_stx(const UINT32 op, char* buffer)
 
 static void i860_dasm_ixfr(const UINT32 op, char* buffer)
 {
-//	UINT16 val = op & 0x7ff;
-//	UINT8  opc = (op >> 26) & 0x3f;
-//	UINT8 src2 = (op >> 21) & 0x1f;
-//	UINT8 dest = (op >> 16) & 0x1f;
-//	UINT8 src1 = (op >> 11) & 0x1f;
+//  UINT16 val = op & 0x7ff;
+//  UINT8  opc = (op >> 26) & 0x3f;
+//  UINT8 src2 = (op >> 21) & 0x1f;
+//  UINT8 dest = (op >> 16) & 0x1f;
+//  UINT8 src1 = (op >> 11) & 0x1f;
 
 	sprintf(buffer, "ixfr");
 }

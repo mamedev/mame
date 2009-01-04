@@ -102,8 +102,8 @@ static MACHINE_START( btime )
 static WRITE8_HANDLER( audio_nmi_enable_w )
 {
 	/* for most games, this serves as the NMI enable for the audio CPU; however,
-	   lnc and disco use bit 0 of the first AY-8910's port A instead; many other
-	   games also write there in addition to this address */
+       lnc and disco use bit 0 of the first AY-8910's port A instead; many other
+       games also write there in addition to this address */
 	if (audio_nmi_enable_type == AUDIO_ENABLE_DIRECT)
 	{
 		audio_nmi_enabled = data & 1;
@@ -1238,7 +1238,7 @@ static MACHINE_DRIVER_START( btime )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
-	
+
 	MDRV_MACHINE_START(btime)
 
 	MDRV_GFXDECODE(btime)

@@ -100,18 +100,18 @@ static READ8_HANDLER( input_r )
 static WRITE8_HANDLER( output_w )
 {
 	/*
-	---- x--- refill meter [4]
-	---- x--- token out meter [5]
-	---- x--- token in meter [6]
-	---- x--- cash out meter [7]
-	---- -x-- coin out (meter) [0-3]
-	---- -x-- coin lockout token [4]
-	---- -x-- coin counter (meter) [5]
-	---- --x- coin lockout [0-3]
-	---- ---x lamp [0-6]
-	*/
+    ---- x--- refill meter [4]
+    ---- x--- token out meter [5]
+    ---- x--- token in meter [6]
+    ---- x--- cash out meter [7]
+    ---- -x-- coin out (meter) [0-3]
+    ---- -x-- coin lockout token [4]
+    ---- -x-- coin counter (meter) [5]
+    ---- --x- coin lockout [0-3]
+    ---- ---x lamp [0-6]
+    */
 	io_port[offset] = data;
-//	popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",io_port[0],io_port[1],io_port[2],io_port[3],io_port[4],io_port[5],io_port[6],io_port[7]);
+//  popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",io_port[0],io_port[1],io_port[2],io_port[3],io_port[4],io_port[5],io_port[6],io_port[7]);
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )

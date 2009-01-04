@@ -891,7 +891,7 @@ Spacech2:    0x008b:  im 1          ed 56
              0x008d:  nop           00
 
 So... spacech2 is avoiding to enter the sub at $2929.
-  
+
 */
 ROM_START( spacech2 )
 	ROM_REGION( 0x10000, "cpu1", 0 )

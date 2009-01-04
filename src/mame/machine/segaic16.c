@@ -217,7 +217,7 @@ static void memory_mapper_w(const address_space *space, struct memory_mapper_chi
 			{
 				if ((chip->regs[offset] & 3) == 3)
 					fd1094_machine_init(space->machine->cpu[0]);
-				
+
 				/* fd1094_machine_init calls device_reset on the CPU, so we must do this afterwards */
 				cpu_set_input_line(chip->cpu, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
 			}

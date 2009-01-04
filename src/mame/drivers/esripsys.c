@@ -597,9 +597,9 @@ static WRITE8_HANDLER( dac_w )
 		UINT16 dac_data = (dac_msb << 8) | data;
 
 		/*
-			The 8-bit DAC modulates the 10-bit DAC.
-			Shift down to prevent clipping.
-		*/
+            The 8-bit DAC modulates the 10-bit DAC.
+            Shift down to prevent clipping.
+        */
 		dac_signed_data_16_w(0, (dac_vol * dac_data) >> 1);
 	}
 }
@@ -684,8 +684,8 @@ static DRIVER_INIT( esripsys )
 	memory_set_bankptr(machine, 4, &ROM[0x0000+0x8000]);
 
 	/* TODO: Finish me! */
-//	state_save_register_global_pointer(fdt_a, FDT_RAM_SIZE);
-//	state_save_register_global_pointer(fdt_b, FDT_RAM_SIZE);
+//  state_save_register_global_pointer(fdt_a, FDT_RAM_SIZE);
+//  state_save_register_global_pointer(fdt_b, FDT_RAM_SIZE);
 }
 
 static NVRAM_HANDLER( esripsys )
@@ -987,6 +987,6 @@ ROM_END
  *  Game drivers
  *
  *************************************/
- 
+
 GAME( 1985, turbosub, 0,        esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", GAME_IMPERFECT_SOUND )
 GAME( 1985, turbosba, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", GAME_IMPERFECT_SOUND )

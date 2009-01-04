@@ -277,7 +277,7 @@ bitmap_t *auto_bitmap_alloc_file_line(int width, int height, bitmap_format forma
 
 /*-------------------------------------------------
     validate_auto_malloc_memory - validate that a
-    block of memory has been allocated by 
+    block of memory has been allocated by
     auto_malloc()
 -------------------------------------------------*/
 

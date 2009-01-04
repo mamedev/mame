@@ -429,7 +429,7 @@ static ADDRESS_MAP_START( statusbj_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xb1, 0xb1) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
 	AM_RANGE(0xc0, 0xcf) AM_READWRITE(SMH_NOP, SMH_NOP)		/* 9927 CRT controller? */
-//	AM_RANGE(0xce,0xce) AM_READ(test_r)
+//  AM_RANGE(0xce,0xce) AM_READ(test_r)
 ADDRESS_MAP_END
 
 /*some sort of "simple" protection? This is just a kludge for it,coin chuts doesn't work consistantly,
@@ -446,7 +446,7 @@ static READ8_DEVICE_HANDLER( prot_r )
 
 //static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w );
 //{
-//	popmessage("PPI port C out: %02X", data);
+//  popmessage("PPI port C out: %02X", data);
 //}
 
 
@@ -462,7 +462,7 @@ static const ppi8255_interface ppi8255_intf[1] =
 		DEVICE8_PORT("IN2"),	/* Port C read (Lower Nibble as Input) */
 		NULL,   				/* Port A write */
 		NULL,  		 			/* Port B write */
-		NULL	//ppi_portc_hi_w				/* Port C write (High nibble as Output) */
+		NULL	//ppi_portc_hi_w                /* Port C write (High nibble as Output) */
 	}
 };
 

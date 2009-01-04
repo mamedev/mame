@@ -75,8 +75,8 @@ Supported games:
                the original within days of its release!) and adds a "team" mode ala Batrider where you
                select a different ship for each of your three lives.
 
-    dogyuunk - PCB says "TOAPLAN CO.,LTD. TP-022-1 MADE IN KOREA". It contains 3 custom Toaplan chips 
-               (2 gfx chips and TS-002-MACH sound MCU). Uses original Toaplan-badged MASKROMs for GFX 
+    dogyuunk - PCB says "TOAPLAN CO.,LTD. TP-022-1 MADE IN KOREA". It contains 3 custom Toaplan chips
+               (2 gfx chips and TS-002-MACH sound MCU). Uses original Toaplan-badged MASKROMs for GFX
                and sound and original 'TP-022 01 TOAPLAN' sticker on program EPROM.
 
 

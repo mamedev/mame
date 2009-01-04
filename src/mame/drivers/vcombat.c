@@ -1,8 +1,8 @@
 /*
 Virtual Combat hardware games.
- 
-Driver by Jason Eckhardt and Andrew Gardner. 
- 
+
+Driver by Jason Eckhardt and Andrew Gardner.
+
 ----
 
 There are two known games on this hardware.  Both are developed by
@@ -28,7 +28,7 @@ UPPER:
     8-way DIP switch
     574200D x4
     PAL palce24v10 x2 (next to the i860)
-	Bt476 RAMDAC
+    Bt476 RAMDAC
 
 LOWER:
     Motorola MC68000P12 x2
@@ -85,16 +85,16 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x2fffff) AM_RAM
 	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_BASE(&framebuffer) AM_SHARE(1)
-	
+
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&vid_0_shared_RAM) AM_SHARE(2)	/* First i860 shared RAM */
-//	AM_RANGE(0x440000, 0x440003) i860 #1 com 1
-//	AM_RANGE(0x480000, 0x480003) i860 #1 com 2
-//	AM_RANGE(0x4c0000, 0x4c0003) i860 #1 stop/start/reset
+//  AM_RANGE(0x440000, 0x440003) i860 #1 com 1
+//  AM_RANGE(0x480000, 0x480003) i860 #1 com 2
+//  AM_RANGE(0x4c0000, 0x4c0003) i860 #1 stop/start/reset
 
 	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE(&vid_1_shared_RAM) AM_SHARE(3)	/* Second i860 shared RAM */
-//	AM_RANGE(0x540000, 0x540003) i860 #2 com 1
-//	AM_RANGE(0x580000, 0x580003) i860 #2 com 2
-//	AM_RANGE(0x5c0000, 0x5c0003) i860 #2 stop/start/reset
+//  AM_RANGE(0x540000, 0x540003) i860 #2 com 1
+//  AM_RANGE(0x580000, 0x580003) i860 #2 com 2
+//  AM_RANGE(0x5c0000, 0x5c0003) i860 #2 stop/start/reset
 
 	AM_RANGE(0x706000, 0x70601f) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
 ADDRESS_MAP_END
@@ -103,9 +103,9 @@ ADDRESS_MAP_END
 /* The first i860 - middle board */
 static ADDRESS_MAP_START( vid_0_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE(1)					/* Shared framebuffer */
-//	AM_RANGE(0x20000000, 0x20000003) com 1      (0x440000 in 68k-land)
-//	AM_RANGE(0x40000000, 0x401fffff) AM_ROM								/* 3d data ROMs */
-//	AM_RANGE(0x80000000, 0x80000003) com 2      (0x480000 in 68k-land)
+//  AM_RANGE(0x20000000, 0x20000003) com 1      (0x440000 in 68k-land)
+//  AM_RANGE(0x40000000, 0x401fffff) AM_ROM                             /* 3d data ROMs */
+//  AM_RANGE(0x80000000, 0x80000003) com 2      (0x480000 in 68k-land)
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE(2)					/* Shared RAM with main */
 ADDRESS_MAP_END
 
@@ -113,16 +113,16 @@ ADDRESS_MAP_END
 /* The second i860 - top board */
 static ADDRESS_MAP_START( vid_1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE(1)					/* Shared framebuffer */
-//	AM_RANGE(0x20000000, 0x20000003) com 1      (0x540000 in 68k-land)
-//	AM_RANGE(0x40000000, 0x401fffff) AM_ROM								/* 3d data ROMs */
-//	AM_RANGE(0x80000000, 0x80000003) com 2      (0x580000 in 68k-land)
+//  AM_RANGE(0x20000000, 0x20000003) com 1      (0x540000 in 68k-land)
+//  AM_RANGE(0x40000000, 0x401fffff) AM_ROM                             /* 3d data ROMs */
+//  AM_RANGE(0x80000000, 0x80000003) com 2      (0x580000 in 68k-land)
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_SHARE(3)					/* Shared RAM with main */
 ADDRESS_MAP_END
 
 
 /* Sound CPU - temprarily disabled */
 //static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-//	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+//  AM_RANGE(0x000000, 0x03ffff) AM_ROM
 //ADDRESS_MAP_END
 
 

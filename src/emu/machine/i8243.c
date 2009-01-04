@@ -83,7 +83,7 @@ WRITE8_DEVICE_HANDLER( i8243_prog_w )
 {
 	i8243_state *i8243 = get_safe_token(device);
 	i8243_config *config = get_safe_config(device);
-	
+
 	/* only care about low bit */
 	data &= 1;
 
@@ -91,7 +91,7 @@ WRITE8_DEVICE_HANDLER( i8243_prog_w )
 	if (i8243->prog && !data)
 	{
 		i8243->opcode = i8243->p2;
-		
+
 		/* if this is a read opcode, copy result to p2out */
 		if ((i8243->opcode >> 2) == MCS48_EXPANDER_OP_READ)
 		{
@@ -100,7 +100,7 @@ WRITE8_DEVICE_HANDLER( i8243_prog_w )
 			i8243->p2out = i8243->p[i8243->opcode & 3] & 0x0f;
 		}
 	}
-	
+
 	/* on low->high transition state, act on opcode */
 	else if (!i8243->prog && data)
 	{
@@ -111,13 +111,13 @@ WRITE8_DEVICE_HANDLER( i8243_prog_w )
 				if (config->writehandler != NULL)
 					(*config->writehandler)(device, i8243->opcode & 3, i8243->p[i8243->opcode & 3]);
 				break;
-			
+
 			case MCS48_EXPANDER_OP_OR:
 				i8243->p[i8243->opcode & 3] |= i8243->p2 & 0x0f;
 				if (config->writehandler != NULL)
 					(*config->writehandler)(device, i8243->opcode & 3, i8243->p[i8243->opcode & 3]);
 				break;
-			
+
 			case MCS48_EXPANDER_OP_AND:
 				i8243->p[i8243->opcode & 3] &= i8243->p2 & 0x0f;
 				if (config->writehandler != NULL)
@@ -125,7 +125,7 @@ WRITE8_DEVICE_HANDLER( i8243_prog_w )
 				break;
 		}
 	}
-	
+
 	/* remember the state */
 	i8243->prog = data;
 }
@@ -153,7 +153,7 @@ static DEVICE_START( i8243 )
 static DEVICE_RESET( i8243 )
 {
 	i8243_state *i8243 = get_safe_token(device);
-	
+
 	i8243->p2 = 0x0f;
 	i8243->p2out = 0x0f;
 	i8243->prog = 1;

@@ -393,13 +393,13 @@ void debugwin_init_windows(void)
 		{
 			int size = options_get_int(mame_options(), WINOPTION_DEBUGGER_FONT_SIZE);
 			TCHAR *t_face;
-		
+
 			// create a standard font
 			t_face = tstring_from_utf8(options_get_string(mame_options(), WINOPTION_DEBUGGER_FONT));
 			debug_font = CreateFont(-MulDiv(size, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
 						ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, t_face);
 			free(t_face);
-			
+
 			// fall back to Lucida Console 8
 			if (debug_font == NULL)
 			{

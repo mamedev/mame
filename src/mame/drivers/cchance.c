@@ -19,12 +19,12 @@ This one should be a simple project, it uses a Z80 and a Seta graphics chipset a
 
 There are 3 banks of dipswitches, 4,8,8. Battery backup of a 4364 cpu ram. 2 6264 video rams. All 5 eproms are 27512
 
-Chip	checksum
-cpu	$ba0d
-cha0	$2ed7
-cha1	$dc81
-cha2	$cca8
-cha3	$10d8
+Chip    checksum
+cpu $ba0d
+cha0    $2ed7
+cha1    $dc81
+cha2    $cca8
+cha3    $10d8
 
 2 color proms for the output. will get those dumped as well.
 
@@ -43,7 +43,7 @@ static WRITE8_HANDLER( output_0_w )
 	//---- --x- divider?
 	coin_lockout_w(0,~data & 1);
 
-//	coin_counter_w(0,~data & 1);
+//  coin_counter_w(0,~data & 1);
 }
 
 static UINT8 hop_io,bell_io;
@@ -92,8 +92,8 @@ static INPUT_PORTS_START( cchance )
 	PORT_START("SP")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opt 1") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Opt 2") PORT_CODE(KEYCODE_S)
-//	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout") PORT_CODE(KEYCODE_D)
-//	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hop Over") PORT_CODE(KEYCODE_F)
+//  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Payout") PORT_CODE(KEYCODE_D)
+//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hop Over") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Slottle") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Drop SW") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Key") PORT_CODE(KEYCODE_J)

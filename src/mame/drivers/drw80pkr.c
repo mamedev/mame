@@ -54,8 +54,8 @@ static WRITE8_HANDLER( p2_w )
 static WRITE8_HANDLER( prog_w )
 {
 	/* this is written via an out to port 4, but unless there is an 8243 port expander,
-	   it is more likely that the port 4 output is used to toggle the PROG line; see
-	   videopkr */
+       it is more likely that the port 4 output is used to toggle the PROG line; see
+       videopkr */
 	prog = data;
 }
 

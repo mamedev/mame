@@ -14,7 +14,7 @@ static UINT32 common_dasm(const device_config *device, char *buffer, offs_t pc, 
 {
 	const UINT8 *startram = opram;
 	UINT32 flags = 0;
-	
+
 	opram++;
 	switch (*oprom++)
 	{
@@ -293,7 +293,7 @@ static UINT32 common_dasm(const device_config *device, char *buffer, offs_t pc, 
 		case 0xfe:		sprintf(buffer, "mov  a,r6");											break;
 		case 0xff:		sprintf(buffer, "mov  a,r7");											break;
 	}
-	
+
 	return (opram - startram) | flags | DASMFLAG_SUPPORTED;
 }
 

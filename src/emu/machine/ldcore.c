@@ -1287,7 +1287,7 @@ static void init_disc(const device_config *device)
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	chd_error err;
-	
+
 	/* get a handle to the disc to play */
 	if (config->getdisc != NULL)
 		ldcore->disc = (*config->getdisc)(device);
@@ -1456,7 +1456,7 @@ static DEVICE_START( laserdisc )
 	assert(ld->screen != NULL);
 	if (!ld->screen->started)
 		return DEVICE_START_MISSING_DEPENDENCY;
-	
+
 	/* save a copy of the device pointer */
 	ld->device = device;
 
