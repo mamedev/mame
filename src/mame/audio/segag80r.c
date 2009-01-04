@@ -12,6 +12,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "segag80r.h"
 #include "machine/8255ppi.h"
+#include "machine/i8243.h"
 #include "sound/samples.h"
 #include "sound/tms36xx.h"
 #include "sound/dac.h"
@@ -753,11 +754,10 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w );
 static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w );
 static READ8_DEVICE_HANDLER( n7751_status_r );
 static WRITE8_DEVICE_HANDLER( n7751_command_w );
-static WRITE8_HANDLER( n7751_rom_offset_w );
-static WRITE8_HANDLER( n7751_rom_select_w );
+static WRITE8_DEVICE_HANDLER( n7751_rom_control_w );
 static READ8_HANDLER( n7751_rom_r );
 static READ8_HANDLER( n7751_command_r );
-static WRITE8_HANDLER( n7751_busy_w );
+static WRITE8_DEVICE_HANDLER( n7751_p2_w );
 static READ8_HANDLER( n7751_t1_r );
 
 /*
@@ -802,13 +802,12 @@ static const tms36xx_interface monsterb_tms3617_interface =
  *************************************/
 
 static ADDRESS_MAP_START( monsterb_7751_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(n7751_command_r)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(n7751_busy_w)
-	AM_RANGE(MCS48_PORT_P4, MCS48_PORT_P6) AM_WRITE(n7751_rom_offset_w)
-	AM_RANGE(MCS48_PORT_P7, MCS48_PORT_P7) AM_WRITE(n7751_rom_select_w)
+	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
+	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_DEVWRITE(I8243, "audio_8243", n7751_p2_w)
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE(I8243, "audio_8243", i8243_prog_w)
 ADDRESS_MAP_END
 
 
@@ -837,6 +836,8 @@ MACHINE_DRIVER_START( monsterb_sound_board )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audio", N7751, 6000000)
 	MDRV_CPU_IO_MAP(monsterb_7751_portmap,0)
+	
+	MDRV_I8243_ADD("audio_8243", NULL, n7751_rom_control_w)
 
 	/* sound hardware */
 	MDRV_SOUND_START(monsterb)
@@ -939,26 +940,37 @@ static WRITE8_DEVICE_HANDLER( n7751_command_w )
 }
 
 
-static WRITE8_HANDLER( n7751_rom_offset_w )
+static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 {
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */
 	/* P6 - address lines 8-11 */
-	int mask = (0xf << (4 * offset)) & 0x3fff;
-	int newdata = (data << (4 * offset)) & mask;
-	sound_addr = (sound_addr & ~mask) | newdata;
-}
-
-
-static WRITE8_HANDLER( n7751_rom_select_w )
-{
 	/* P7 - ROM selects */
-	int numroms = memory_region_length(space->machine, "n7751") / 0x1000;
-	sound_addr &= 0xfff;
-	if (!(data & 0x01) && numroms >= 1) sound_addr |= 0x0000;
-	if (!(data & 0x02) && numroms >= 2) sound_addr |= 0x1000;
-	if (!(data & 0x04) && numroms >= 3) sound_addr |= 0x2000;
-	if (!(data & 0x08) && numroms >= 4) sound_addr |= 0x3000;
+	switch (offset)
+	{
+		case 0:
+			sound_addr = (sound_addr & ~0x00f) | ((data & 0x0f) << 0);
+			break;
+
+		case 1:
+			sound_addr = (sound_addr & ~0x0f0) | ((data & 0x0f) << 4);
+			break;
+
+		case 2:
+			sound_addr = (sound_addr & ~0xf00) | ((data & 0x0f) << 8);
+			break;
+		
+		case 3:
+			sound_addr &= 0xfff;
+			{
+				int numroms = memory_region_length(device->machine, "n7751") / 0x1000;
+				if (!(data & 0x01) && numroms >= 1) sound_addr |= 0x0000;
+				if (!(data & 0x02) && numroms >= 2) sound_addr |= 0x1000;
+				if (!(data & 0x04) && numroms >= 3) sound_addr |= 0x2000;
+				if (!(data & 0x08) && numroms >= 4) sound_addr |= 0x3000;
+			}
+			break;
+	}
 }
 
 
@@ -977,9 +989,11 @@ static READ8_HANDLER( n7751_command_r )
 }
 
 
-static WRITE8_HANDLER( n7751_busy_w )
+static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 {
-	/* write to P2 */
+	/* write to P2; low 4 bits go to 8243 */
+	i8243_p2_w(device, offset, data & 0x0f);
+	
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
 	n7751_busy = data >> 7;

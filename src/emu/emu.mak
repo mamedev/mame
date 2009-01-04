@@ -134,6 +134,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/eeprom.o \
 	$(EMUMACHINE)/f3853.o \
 	$(EMUMACHINE)/generic.o \
+	$(EMUMACHINE)/i8243.o \
 	$(EMUMACHINE)/i2cmem.o \
  	$(EMUMACHINE)/idectrl.o \
  	$(EMUMACHINE)/intelfsh.o \

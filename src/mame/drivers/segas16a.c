@@ -150,6 +150,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "system16.h"
 #include "machine/8255ppi.h"
 #include "machine/fd1089.h"
+#include "machine/i8243.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
@@ -445,7 +446,7 @@ static WRITE8_HANDLER( n7751_control_w )
 }
 
 
-static WRITE8_HANDLER( n7751_rom_offset_w )
+static WRITE8_DEVICE_HANDLER( n7751_rom_offset_w )
 {
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */
@@ -464,17 +465,19 @@ static READ8_HANDLER( n7751_rom_r )
 }
 
 
-static READ8_HANDLER( n7751_command_r )
+static READ8_DEVICE_HANDLER( n7751_p2_r )
 {
 	/* read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048) */
 	/* bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used */
-	return 0x80 | ((n7751_command & 0x07) << 4);
+	return 0x80 | ((n7751_command & 0x07) << 4) | (i8243_p2_r(device, offset) & 0x0f);
 }
 
 
-static WRITE8_HANDLER( n7751_busy_w )
+static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 {
-	/* write to P2 */
+	/* write to P2; low 4 bits go to 8243 */
+	i8243_p2_w(device, offset, data & 0x0f);
+
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
 }
@@ -861,11 +864,11 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( n7751_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS48_PORT_BUS,MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)  AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)  AM_WRITE(dac_0_data_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)  AM_READWRITE(n7751_command_r, n7751_busy_w)
-	AM_RANGE(MCS48_PORT_P4, MCS48_PORT_P7)  AM_WRITE(n7751_rom_offset_w)
+	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READ(n7751_rom_r)
+	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(n7751_t1_r)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_DEVREADWRITE(I8243, "n7751_8243", n7751_p2_r, n7751_p2_w)
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE(I8243, "n7751_8243", i8243_prog_w)
 ADDRESS_MAP_END
 
 
@@ -1783,6 +1786,8 @@ static MACHINE_DRIVER_START( system16a )
 
 	MDRV_CPU_ADD("n7751", N7751, 6000000)
 	MDRV_CPU_IO_MAP(n7751_portmap,0)
+	
+	MDRV_I8243_ADD("n7751_8243", NULL, n7751_rom_offset_w)
 
 	MDRV_MACHINE_RESET(system16a)
 	MDRV_NVRAM_HANDLER(system16a)

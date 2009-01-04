@@ -32,7 +32,7 @@
 
 static tilemap *bg_tilemap;
 
-static UINT8 p1, p2, p4, bus;
+static UINT8 p1, p2, prog, bus;
 
 static UINT8 *pkr_cmos_ram;
 
@@ -51,9 +51,12 @@ static WRITE8_HANDLER( p2_w )
 	p2 = data;
 }
 
-static WRITE8_HANDLER( p4_w )
+static WRITE8_HANDLER( prog_w )
 {
-	p4 = data;
+	/* this is written via an out to port 4, but unless there is an 8243 port expander,
+	   it is more likely that the port 4 output is used to toggle the PROG line; see
+	   videopkr */
+	prog = data;
 }
 
 static WRITE8_HANDLER( bus_w )
@@ -199,11 +202,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drw80pkr_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_cmos_r, drw80pkr_cmos_w) AM_BASE(&pkr_cmos_ram)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_RAM
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
-    AM_RANGE(MCS48_PORT_P4, MCS48_PORT_P4) AM_RAM_WRITE(p4_w)
-    AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
+	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_RAM
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
+    AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_RAM_WRITE(prog_w)
+    AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READWRITE(bus_r, bus_w)
 ADDRESS_MAP_END
 
 /*************************
