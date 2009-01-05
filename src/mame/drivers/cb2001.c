@@ -36,7 +36,6 @@ In test mode (c) is 2000
 
 ------------------------------
 
-
 *************************************************************************************************/
 
 #include "driver.h"
@@ -153,6 +152,33 @@ static INTERRUPT_GEN( vblank_irq )
 //  cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
 }
 
+static const gfx_layout cb2001_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 8,12,0,4,24,28, 16,20 },
+	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32 },
+	8*32
+};
+
+static const gfx_layout cb2001_layout32 =
+	{
+	8,32,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 8,12,0,4,24,28, 16,20 },
+	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32,14*32,15*32,16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32,24*32,25*32,26*32,27*32,28*32,29*32,30*32,31*32 },
+	32*32
+};
+
+static GFXDECODE_START( cb2001 )
+	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout,   0x0, 2  )
+	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 2  )
+GFXDECODE_END
+
 static const nec_config cb2001_config = { cb2001_decryption_table, };
 static MACHINE_DRIVER_START( cb2001 )
 	MDRV_CPU_ADD("main", V30, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
@@ -160,6 +186,8 @@ static MACHINE_DRIVER_START( cb2001 )
 	MDRV_CPU_PROGRAM_MAP(cb2001_map,0)
 	MDRV_CPU_IO_MAP(cb2001_io,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_irq)
+
+	MDRV_GFXDECODE(cb2001)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
