@@ -2004,7 +2004,7 @@ GAME( 1980, caterplr, centiped, caterplr, caterplr, caterplr, ROT270, "bootleg",
 GAME( 1980, millpac,  centiped, centipdb, centiped, 0,        ROT270, "Valadon Automation", "Millpac", GAME_SUPPORTS_SAVE )
 GAME( 1980, magworm,  centiped, magworm,  magworm,  magworm,  ROT270, "bootleg", "Magic Worm (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, milliped, 0,        milliped, milliped, 0,        ROT270, "Atari",   "Millipede", GAME_SUPPORTS_SAVE )
-GAME( 1982, millipdd, milliped, milliped, milliped, 0,        ROT270, "Atari",   "Millipede Dux (hack)", GAME_SUPPORTS_SAVE )
+GAME( 1982, millipdd, milliped, milliped, milliped, 0,        ROT270, "hack",    "Millipede Dux (hack)", GAME_SUPPORTS_SAVE )
 
 GAME( 1980, warlords, 0,        warlords, warlords, 0,        ROT0,   "Atari",   "Warlords", GAME_SUPPORTS_SAVE )
 GAME( 1981, mazeinv,  0,        mazeinv,  mazeinv,  0,        ROT270, "Atari",   "Maze Invaders (prototype)", 0 )
