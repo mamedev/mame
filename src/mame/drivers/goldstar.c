@@ -3082,6 +3082,73 @@ ROM_START( lucky8a )
 ROM_END
 
 
+/* these 'Amcoe' games look like bootlegs of cherry master
+  the z80 roms are encrypted */
+ROM_START( schery98 )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "sk98133.bin",	 0x0000, 0x10000, CRC(77a5dd54) SHA1(e693f477b42b83f1f5e45fb7c56486119bf91856) )
+
+	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
+	ROM_LOAD( "sk98h.bin",  0x00000, 0x10000, CRC(0574357b) SHA1(96a846f6d49dd67ad078ad9240e632f79ae1b437) )
+	ROM_LOAD( "sk98l.bin",  0x10000, 0x10000, CRC(ebe802a4) SHA1(178542c204fd1027874e6d2c099edaa7878c993f) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
+	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "sk98u19.bin", 0x0000, 0x0100, CRC(796c7960) SHA1(0f64a8119fd4809a5ac79585b415b34b2a83e9dc) )
+	ROM_LOAD( "sk98u20.bin", 0x0100, 0x0100, CRC(a0862663) SHA1(e27c3bba5f87b51a19ea8068f2ce7b82a6f0eedb) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "sku1920.bin", 0x0000, 0x0100, CRC(a8c86d5e) SHA1(d19cd5e57ac8fdd685540c1bb2e1474d1326362b) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // samples
+	ROM_LOAD( "sk98t.bin", 0x00000, 0x20000, CRC(8598b059) SHA1(9e031e30e58a9c1b3d029004ee0f1616711fa2ae) )
+ROM_END
+
+
+
+ROM_START( schery97 )
+	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "sc352.bin",	 0x00000, 0x10000, CRC(d3857d85) SHA1(e97b2634f0993631023c08f6baf800461abfad12) )
+	ROM_LOAD( "sc352c4.bin", 0x10000, 0x10000, CRC(44f55f6e) SHA1(8b6e8618281de480979de37c7b36a0e68a524f47) ) // ?? alt program?
+
+	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
+	ROM_LOAD( "sc97h.bin",  0x00000, 0x10000, CRC(def39ee2) SHA1(5e6817bd947ebf16d0313285a00876b796b71cab) )
+	ROM_LOAD( "sc97l.bin",  0x10000, 0x10000, CRC(6f4d6aea) SHA1(6809c26e6975cac97b0f8c01a508d4e022859b1a) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
+	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "sc97u19.bin", 0x0000, 0x0100, CRC(6a01caca) SHA1(9b3e9eebb9fcc8770f7e92f0f1c0434516ee613d) )
+	ROM_LOAD( "sc97u20.bin", 0x0100, 0x0100, CRC(5899c1d5) SHA1(c335b99bb58da3a11005a8952a15d9f43bdff157) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "scu1920.bin", 0x0000, 0x0100, CRC(3aa291dd) SHA1(f35c916b5463ff9ec6e57048af29a746148a13af) )
+	ROM_REGION( 0x80000, "oki", 0 ) // samples
+	ROM_LOAD( "sc97t.bin", 0x00000, 0x20000, CRC(8598b059) SHA1(9e031e30e58a9c1b3d029004ee0f1616711fa2ae) )
+ROM_END
+
+
 static DRIVER_INIT(goldstar)
 {
 	int A;
@@ -3301,3 +3368,8 @@ GAME( 1991, cmast91,  0,        cmast91,  cmv801,   cmast91,  ROT0, "Dyna",     
 
 GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",              GAME_IMPERFECT_COLORS )
 GAME( 1989, lucky8a,  lucky8,   lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",              GAME_IMPERFECT_COLORS )
+
+// bootlegs of cherry master?
+GAME( 1998, schery98, 0,        cm,       cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
+GAME( 1998, schery97, 0,        cm,       cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '97",                       GAME_NOT_WORKING )
+
