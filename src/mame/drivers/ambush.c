@@ -294,6 +294,6 @@ ROM_START( ambushv )
 	ROM_LOAD( "14.bpr",		  0x0300, 0x0100, CRC(622a8ce7) SHA1(6834f67874251f2ef3a33aec893311f5d10e496f) )  /* They don't look like color PROMs */
 ROM_END
 
-GAME( 1983, ambush,   0,        ambush,   ambush,   0, ROT0, "Nippon Amuse Co-Ltd", "Ambush", 0 )
-GAME( 1983, ambushv,  ambush,   ambush,   ambush,   0, ROT0, "Volt Elec co-ltd", "Ambush (Volt Elec co-ltd)", 0 )
-GAME( 1983, ambusht,  ambush,   ambush,   ambusht,  0, ROT0, "Tecfri", "Ambush (Tecfri)", 0 )
+GAME( 1983, ambush,   0,        ambush,   ambush,   0, ROT0, "Nippon Amuse Co-Ltd", "Ambush", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambushv,  ambush,   ambush,   ambush,   0, ROT0, "Volt Elec co-ltd", "Ambush (Volt Elec co-ltd)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ambusht,  ambush,   ambush,   ambusht,  0, ROT0, "Tecfri", "Ambush (Tecfri)", GAME_SUPPORTS_SAVE )
