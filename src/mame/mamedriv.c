@@ -8517,5 +8517,6 @@ Other Sun games
 
 	DRIVER( schery98 )	/* (c) 1998 Amcoe */
 	DRIVER( schery97 )	/* (c) 1998 Amcoe */
+	DRIVER( sfbonus )	/* (c) 199? Amcoe */
 
 #endif	/* DRIVER_RECURSIVE */

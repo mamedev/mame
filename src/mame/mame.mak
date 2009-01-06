@@ -1677,6 +1677,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/cb2001.o \
+	$(DRIVERS)/sfbonus.o \
 
 #-------------------------------------------------
 # layout dependencies

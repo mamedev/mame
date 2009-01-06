@@ -1935,6 +1935,7 @@ src/mame/drivers/senjyo.c svneol=native#text/plain
 src/mame/drivers/seta.c svneol=native#text/plain
 src/mame/drivers/seta2.c svneol=native#text/plain
 src/mame/drivers/sf.c svneol=native#text/plain
+src/mame/drivers/sfbonus.c svneol=native#text/plain
 src/mame/drivers/sfkick.c svneol=native#text/plain
 src/mame/drivers/sg1000a.c svneol=native#text/plain
 src/mame/drivers/shadfrce.c svneol=native#text/plain
