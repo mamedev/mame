@@ -292,6 +292,44 @@ static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+//static WRITE8_HANDLER( ladylinr_outport_w )
+//{
+/* LAMPS (b840)...
+
+   .... ...x
+   .... ..x.
+   .... .x..
+   .... x...  BET
+   ...x ....  SMALL/INFO
+   ..x. ....  START
+   .x.. ....
+   x... ....
+*/
+//	popmessage("Output: %02X", data);
+//}
+
+static ADDRESS_MAP_START( ladylinr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_WRITE(goldstar_reel1_ram_w) AM_BASE(&goldstar_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_WRITE(goldstar_reel2_ram_w) AM_BASE(&goldstar_reel2_ram)
+	AM_RANGE(0xa800, 0xa9ff) AM_RAM AM_WRITE(goldstar_reel3_ram_w) AM_BASE(&goldstar_reel3_ram)
+	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
+	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(&goldstar_reel2_scroll)
+	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(&goldstar_reel3_scroll)
+
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* DSW bank */
+	AM_RANGE(0xb830, 0xb830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
+	AM_RANGE(0xb840, 0xb840) AM_WRITE(ay8910_control_port_0_w)	/* no sound... only use ports */
+	AM_RANGE(0xb850, 0xb850) AM_WRITENOP	/* just turn off the lamps, if exist */
+	AM_RANGE(0xb870, 0xb870) AM_WRITE(sn76496_0_w)	/* sound */
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
 static INPUT_PORTS_START( cmv801 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1733,6 +1771,69 @@ static INPUT_PORTS_START( lucky8a )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ladylinr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key In") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Hopper Muenze")      PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Hopper Voll")        PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Abschreib (Payout)")      PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Aufsteller (Supervisor)") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Buchhaltung (Attendant)") PORT_CODE(KEYCODE_9)
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hoch (Big) / Stop 3")          PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Gamble (D-UP)")                PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Nehmen (Take)")                PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Setzen (Bet)")                 PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Tief (Small) / Stop 1 / Info") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Start / Stop 2")               PORT_CODE(KEYCODE_C)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Remote Credits" )	PORT_DIPLOCATION("DSW1:1,2")	/* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x03, "100" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("DSW1:5")	/* OK */
+	PORT_DIPSETTING(    0x00, "20 credits" )
+	PORT_DIPSETTING(    0x10, "50 Credits" )
+	PORT_DIPNAME( 0x20, 0x20, "Coin B & C" )		PORT_DIPLOCATION("DSW1:6")	/* OK */
+	PORT_DIPSETTING(    0x00, "10 credits" )
+	PORT_DIPSETTING(    0x20, "20 credits" )
+	PORT_DIPNAME( 0x40, 0x40, "Reels Speed" )		PORT_DIPLOCATION("DSW1:7")	/* OK */
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
+	PORT_DIPNAME( 0x80, 0x00, "Input Test Mode" )	PORT_DIPLOCATION("DSW1:8")	/* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+/*  there are 2 extra DSW banks...
+    both are tied to a daughterboard, maybe hooked to a device.
+	they are not related to the original hardware, and are not
+	listed in the Input Test Mode.
+*/
+INPUT_PORTS_END
+
 
 
 static const gfx_layout charlayout =
@@ -1964,6 +2065,26 @@ static const ppi8255_interface lucky8_ppi8255_intf[3] =
 	}
 };
 
+static const ppi8255_interface ladylinr_ppi8255_intf[2] =
+{
+	{	/* A, B & C set as input */
+		DEVICE8_PORT("IN0"),	/* Port A read */
+		DEVICE8_PORT("IN1"),	/* Port B read */
+		DEVICE8_PORT("IN2"),	/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	},
+	{	/* A set as input */
+		DEVICE8_PORT("DSW1"),	/* Port A read */
+		NULL,					/* Port B read */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	}
+};
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -1990,6 +2111,16 @@ static const ay8910_interface lucky8_ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	input_port_7_r,	/* DSW 3 */
 	input_port_8_r,	/* DSW 4 */
+	NULL,
+	NULL
+};
+
+static const ay8910_interface ladylinr_ay8910_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	NULL,
 	NULL
 };
@@ -2404,6 +2535,47 @@ static MACHINE_DRIVER_START( lucky8 )
 
 	MDRV_SOUND_ADD("ay", AY8910,1500000)
 	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( ladylinr )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, 12000000/4) // ?? Mhz
+	MDRV_CPU_PROGRAM_MAP(ladylinr_map,0)
+	//MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+
+	/* 2x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", ladylinr_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ladylinr_ppi8255_intf[1] )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MDRV_PALETTE_INIT(lucky8)
+
+	MDRV_GFXDECODE(ncb3)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(goldstar)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
+
+	MDRV_SOUND_ADD("sn1", SN76489, 3000000)	/* 3 MHz. */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("ay", AY8910,1500000)
+	MDRV_SOUND_CONFIG(ladylinr_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_DRIVER_END
@@ -3081,6 +3253,73 @@ ROM_START( lucky8a )
 	ROM_LOAD( "prom2", 0x0000, 0x0020, CRC(7b1a769f) SHA1(788b3573df17d398c74662fec4fd7693fc27e2ef) )
 ROM_END
 
+/*
+    LADY LINER - TAB Austria
+
+    Hardware Notes:
+    ---------------
+
+    CPU:   1x Z80.
+    Sound: 1x AY8930.
+    I/O:   2x P8255A.
+
+    Clock: 1x Xtal @ 12.0000MHz.
+
+    ROMs:  1x NM27C256Q (ladybrd)
+           7x M27C64A (1,2,3,4,71,72,73)
+           2x PROM AM27S19PC (39,73)
+           3x PROM AM27S21PC (37,38,96)
+
+    RAM:   4x HY6116ALP-10 (near graphics ROMs)
+           1x HY6116ALP-10 (near program ROM)
+
+    1x 8 DIP Switches.
+    1x trimmer (volume).
+
+    Connectors:  1x 18x2 edge connector.
+                 1x 22x2 edge connector.
+
+    Both connectors are wired to a strange small PCB with:
+	1x 6x2 edge connector + 1x 60x2 edge connector (with smaller spacing) + 2x 8 DIP Switches.
+
+    Silkscreened on PCB:
+    "TAB AUSTRIA"
+
+    Sticker on PCB:
+	"TAB Austria" & "LL 2690"
+
+*/
+
+ROM_START( ladylinr )
+	ROM_REGION( 0x8000, "main", 0 )
+	ROM_LOAD( "ladybrd.bin",	0x0000, 0x8000, CRC(44d2aed0) SHA1(1afe6178d1bf4ad0b623f33be879ed5180ad2db1) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "ll73.bin",	0x00000, 0x8000, CRC(afa4a705) SHA1(779340713df7029553cfc1c57997dfdd96a0f0cc) )
+	ROM_LOAD( "ll72.bin",	0x08000, 0x8000, CRC(bd1d8a39) SHA1(01e37704c753352024e79b0b83b040f8288b9aed) )
+	ROM_LOAD( "ll71.bin",	0x10000, 0x8000, CRC(1c417efa) SHA1(491579a76d80c4f488ef94393d12a190571ae285) )
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "1.bin",	0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "2.bin",	0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "3.bin",	0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "4.bin",	0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s21pc.38",	0x0000, 0x0100, CRC(06a0ee6f) SHA1(e793fbb9e14e4e6c6d6783a36edee74f28e7e214) )
+	ROM_LOAD( "am27s21pc.37",	0x0100, 0x0100, CRC(8589d23c) SHA1(9629c0d8af3cce47ef376898a4be84c0752a265b) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "am27s19pc.39",	0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "am27s21pc.96",	0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "am27s19pc.73",	0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
+ROM_END
+
+
 
 /* these 'Amcoe' games look like bootlegs of cherry master
   the z80 roms are encrypted */
@@ -3368,6 +3607,8 @@ GAME( 1991, cmast91,  0,        cmast91,  cmv801,   cmast91,  ROT0, "Dyna",     
 
 GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",              GAME_IMPERFECT_COLORS )
 GAME( 1989, lucky8a,  lucky8,   lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",              GAME_IMPERFECT_COLORS )
+
+GAME( 198?, ladylinr, 0,        ladylinr, ladylinr, 0,        ROT0, "TAB Austria",       "Lady Liner",                             0 )
 
 // bootlegs of cherry master?
 GAME( 1998, schery98, 0,        cm,       cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
