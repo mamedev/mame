@@ -119,6 +119,7 @@ VIDEO_START( airbustr )
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
 	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+    state_save_register_global_bitmap(machine, sprites_bitmap);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	pandora_start(machine,1,0,0);
 

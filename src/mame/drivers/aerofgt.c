@@ -115,6 +115,11 @@ static WRITE8_HANDLER( aerofgt_sh_bankswitch_w )
 	memory_set_bankptr(space->machine, 1,rom + (data & 0x03) * 0x8000);
 }
 
+static MACHINE_START( aerofgt )
+{
+    state_save_register_global(machine, pending_command);
+}
+
 static MACHINE_RESET( aerofgt )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
@@ -1296,6 +1301,7 @@ static MACHINE_DRIVER_START( pspikes )
 	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
+    MDRV_MACHINE_START(aerofgt)
 	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
@@ -1422,6 +1428,7 @@ static MACHINE_DRIVER_START( karatblz )
 	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
+    MDRV_MACHINE_START(aerofgt)
 	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
@@ -1460,6 +1467,7 @@ static MACHINE_DRIVER_START( spinlbrk )
 	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
+    MDRV_MACHINE_START(aerofgt)
 	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
@@ -1498,6 +1506,7 @@ static MACHINE_DRIVER_START( turbofrc )
 	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
+    MDRV_MACHINE_START(aerofgt)
 	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
@@ -1536,6 +1545,7 @@ static MACHINE_DRIVER_START( aerofgtb )
 	MDRV_CPU_IO_MAP(aerofgt_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
+    MDRV_MACHINE_START(aerofgt)
 	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
@@ -1575,6 +1585,7 @@ static MACHINE_DRIVER_START( aerofgt )
 	MDRV_CPU_IO_MAP(aerofgt_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
+    MDRV_MACHINE_START(aerofgt)
 	MDRV_MACHINE_RESET(aerofgt)
 
 	/* video hardware */
@@ -1673,6 +1684,8 @@ static MACHINE_DRIVER_START( wbbc97 )
 	MDRV_CPU_ADD("audio",Z80,8000000/2) /* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wbbc97_sound_map,0)
 								/* IRQs are triggered by the YM3812 */
+
+    MDRV_MACHINE_START(aerofgt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2407,23 +2420,23 @@ ROM_START( wbbc97 )
 ROM_END
 
 
-GAME( 1990, spinlbrk, 0,        spinlbrk, spinlbrk, 0, ROT0,   "V-System Co.",     "Spinal Breakers (World)", GAME_NO_COCKTAIL )
-GAME( 1990, spinlbru, spinlbrk, spinlbrk, spinlbru, 0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", GAME_NO_COCKTAIL )
-GAME( 1990, spinlbrj, spinlbrk, spinlbrk, spinlbrk, 0, ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", GAME_NO_COCKTAIL )
-GAME( 1991, pspikes,  0,        pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Power Spikes (World)", GAME_NO_COCKTAIL )
-GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Power Spikes (Korea)", GAME_NO_COCKTAIL )
-GAME( 1991, svolly91, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Super Volley '91 (Japan)", GAME_NO_COCKTAIL )
-GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, 0, ROT0,   "bootleg",          "Power Spikes (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1991, spikes91, pspikes,  spikes91, pspikes,  0, ROT0,   "bootleg",          "1991 Spikes (Italian bootleg)", GAME_NO_SOUND | GAME_NO_COCKTAIL )
-GAME( 1991, pspikesc, pspikes,  pspikesc, pspikesc, 0, ROT0,   "bootleg",          "Power Spikes (China)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
-GAME( 1991, karatblz, 0,        karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (World)", GAME_NO_COCKTAIL )
-GAME( 1991, karatblu, karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", GAME_NO_COCKTAIL )
-GAME( 1991, karatblj, karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (Japan)", GAME_NO_COCKTAIL )
-GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, 0, ROT270, "Video System Co.", "Turbo Force", GAME_NO_COCKTAIL )
-GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt,  0, ROT270, "Video System Co.", "Aero Fighters", GAME_NO_COCKTAIL )
-GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 1)", GAME_NO_COCKTAIL )
-GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 2)", GAME_NO_COCKTAIL )
-GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Sonic Wings (Japan)", GAME_NO_COCKTAIL )
-GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
-GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 2)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
-GAME( 1997, wbbc97,   0,        wbbc97,   wbbc97,   0, ROT0,   "Comad",            "Beach Festival World Championship 1997", GAME_NO_COCKTAIL )
+GAME( 1990, spinlbrk, 0,        spinlbrk, spinlbrk, 0, ROT0,   "V-System Co.",     "Spinal Breakers (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1990, spinlbru, spinlbrk, spinlbrk, spinlbru, 0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1990, spinlbrj, spinlbrk, spinlbrk, spinlbrk, 0, ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, pspikes,  0,        pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Power Spikes (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Power Spikes (Korea)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, svolly91, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Super Volley '91 (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, 0, ROT0,   "bootleg",          "Power Spikes (bootleg)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, spikes91, pspikes,  spikes91, pspikes,  0, ROT0,   "bootleg",          "1991 Spikes (Italian bootleg)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_NO_COCKTAIL )
+GAME( 1991, pspikesc, pspikes,  pspikesc, pspikesc, 0, ROT0,   "bootleg",          "Power Spikes (China)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1991, karatblz, 0,        karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, karatblu, karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, karatblj, karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, 0, ROT270, "Video System Co.", "Turbo Force", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt,  0, ROT270, "Video System Co.", "Aero Fighters", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Sonic Wings (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_NO_SOUND )
+GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_NO_SOUND )
+GAME( 1997, wbbc97,   0,        wbbc97,   wbbc97,   0, ROT0,   "Comad",            "Beach Festival World Championship 1997", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

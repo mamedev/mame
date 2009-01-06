@@ -197,6 +197,10 @@ WRITE8_HANDLER( ajax_bankswitch_2_w )
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 }
 
+MACHINE_START( ajax )
+{
+    state_save_register_global(machine, firq_enable);
+}
 
 MACHINE_RESET( ajax )
 {

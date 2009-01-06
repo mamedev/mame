@@ -229,6 +229,11 @@ static const ay8910_interface ay8910_config =
 	NULL
 };
 
+static MACHINE_START( formatz )
+{
+    state_save_register_global(machine, disable_irq);
+}
+
 static MACHINE_DRIVER_START( formatz )
 
 	/* basic machine hardware */
@@ -239,6 +244,8 @@ static MACHINE_DRIVER_START( formatz )
 	MDRV_CPU_ADD("audio", M6809, XTAL_10MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+    MDRV_MACHINE_START(formatz)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -329,5 +336,5 @@ ROM_END
 
 
 
-GAME( 1984, formatz,  0,       formatz, formatz, 0, ROT0, "Jaleco", "Formation Z", GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, aeroboto, formatz, formatz, formatz, 0, ROT0, "[Jaleco] (Williams license)", "Aeroboto", GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, formatz,  0,       formatz, formatz, 0, ROT0, "Jaleco", "Formation Z", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, aeroboto, formatz, formatz, formatz, 0, ROT0, "[Jaleco] (Williams license)", "Aeroboto", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

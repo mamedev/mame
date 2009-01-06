@@ -48,6 +48,9 @@ VIDEO_START( aeroboto )
 
 	tilemap_set_scroll_rows(bg_tilemap,64);
 
+    state_save_register_global(machine, aeroboto_charbank);
+    state_save_register_global(machine, aeroboto_starsoff);
+
 	#if STARS_LAYOUT
 	{
 		UINT8 *rom, *temp;

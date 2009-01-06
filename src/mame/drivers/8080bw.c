@@ -99,6 +99,19 @@
 
 /*******************************************************/
 /*                                                     */
+/* Games with additional sound / video hardware        */
+/*                                                     */
+/*******************************************************/
+
+static MACHINE_START( extra_8080bw )
+{
+    MACHINE_START_CALL(extra_8080bw_sh);
+    MACHINE_START_CALL(extra_8080bw_vh);
+    MACHINE_START_CALL(mw8080bw);
+}
+
+/*******************************************************/
+/*                                                     */
 /* Space Invaders CV Version (Taito)                   */
 /*                                                     */
 /*******************************************************/
@@ -230,6 +243,7 @@ static MACHINE_DRIVER_START( invadpt2 )
     MDRV_IMPORT_FROM(mw8080bw_root)
     MDRV_CPU_MODIFY("main")
     MDRV_CPU_IO_MAP(invadpt2_io_map,0)
+    MDRV_MACHINE_START(extra_8080bw)
 
     /* 60 Hz signal clocks two LS161. Ripple carry will */
     /* reset circuit, if LS161 not cleared before.      */
@@ -285,6 +299,7 @@ static MACHINE_DRIVER_START( spcewars )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(spcewars_io_map,0)
+    MDRV_MACHINE_START(extra_8080bw)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -407,6 +422,7 @@ static MACHINE_DRIVER_START( cosmo )
     MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(cosmo_map, 0)
 	MDRV_CPU_IO_MAP(cosmo_io_map, 0)
+    MDRV_MACHINE_START(extra_8080bw)
 
     /* video hardware */
 	MDRV_VIDEO_UPDATE(cosmo)
@@ -631,6 +647,7 @@ static MACHINE_DRIVER_START( lrescue )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(lrescue_io_map,0)
+    MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(invadpt2)
@@ -943,6 +960,7 @@ static MACHINE_DRIVER_START( schasrcv )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
 	MDRV_CPU_IO_MAP(schasrcv_io_map,0)
+    MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(schasrcv)
@@ -971,6 +989,13 @@ static CUSTOM_INPUT( sflush_80_r )
 	return sfl_int;
 }
 
+static MACHINE_START( sflush )
+{
+    state_save_register_global(machine, sfl_int);
+
+    MACHINE_START_CALL(mw8080bw);
+}
+
 static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
@@ -994,6 +1019,7 @@ static MACHINE_DRIVER_START( sflush )
 	MDRV_CPU_REPLACE("main",M6800,2000000)        /* ?? */
 	MDRV_CPU_PROGRAM_MAP(sflush_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
+    MDRV_MACHINE_START(sflush)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(sflush)
@@ -1095,6 +1121,7 @@ static MACHINE_DRIVER_START( lupin3 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
 	MDRV_CPU_IO_MAP(lupin3_io_map,0)
+    MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(lupin3)
@@ -1133,6 +1160,13 @@ UINT8 polaris_get_cloud_pos(void)
 	return polaris_cloud_pos;
 }
 
+static MACHINE_START( polaris )
+{
+    state_save_register_global(machine, polaris_cloud_speed);
+    state_save_register_global(machine, polaris_cloud_pos);
+
+    MACHINE_START_CALL(mw8080bw);
+}
 
 // Port 5 is used to reset the watchdog timer.
 // This port is also written to when the boss plane is going up and down.
@@ -1214,6 +1248,7 @@ static MACHINE_DRIVER_START( polaris )
 	MDRV_CPU_IO_MAP(polaris_io_map,0)
 	MDRV_WATCHDOG_VBLANK_INIT(255)
 	MDRV_CPU_VBLANK_INT("main", polaris_interrupt)
+    MDRV_MACHINE_START(polaris)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(polaris)
@@ -1336,6 +1371,7 @@ static MACHINE_DRIVER_START( ballbomb )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(ballbomb_io_map,0)
+    MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(ballbomb)
@@ -1410,6 +1446,7 @@ static MACHINE_DRIVER_START( yosakdon )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(yosakdon_map,0)
 	MDRV_CPU_IO_MAP(yosakdon_io_map,0)
+    MDRV_MACHINE_START(extra_8080bw)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(invaders_samples_audio)
@@ -1506,6 +1543,7 @@ static MACHINE_DRIVER_START( indianbt )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(indianbt_io_map,0)
+    MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(indianbt)
@@ -1603,6 +1641,7 @@ static MACHINE_DRIVER_START( shuttlei )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(shuttlei_map,0)
 	MDRV_CPU_IO_MAP(shuttlei_io_map,0)
+    MDRV_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("main")
@@ -2492,66 +2531,66 @@ ROM_END
 /* board #  rom       parent    machine   inp */
 
 /* Taito games */
-GAMEL(1978, sitv,     invaders, invaders, sitv,     0, ROT270, "Taito", "Space Invaders (TV Version)", 0, layout_invaders )
-GAME( 1979, sicv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (CV Version)", 0 )
-GAME( 1978, sisv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version)", 0 )
-GAME( 1978, sisv2,    invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version 2)", 0 )
-GAMEL(1979, galxwars, 0,        invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 1)", 0, layout_invaders )
-GAMEL(1979, galxwar2, galxwars, invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 2)", 0, layout_invaders )
-GAMEL(1979, galxwart, galxwars, invaders, galxwars, 0, ROT270, "Taito?", "Galaxy Wars (Taito?)" , 0, layout_invaders) /* Copyright Not Displayed */
-GAMEL(1979, starw,    galxwars, invaders, galxwars, 0, ROT270, "bootleg", "Star Wars", 0, layout_invaders )
-GAME( 1979, lrescue,  0,        lrescue,  lrescue,  0, ROT270, "Taito", "Lunar Rescue", 0 )
-GAME( 1980, mlander,  lrescue,  invaders, lrescue,  0, ROT270, "[Taito] (Leisure Time Electronics bootleg)", "Moon Lander (bootleg of Lunar Rescue)", 0 )
-GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Model Racing bootleg)", "Lunar Rescue (Model Racing bootleg)", 0 )
-GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal license?)", "Galaxy Rescue", 0 )
-GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", 0 )
-GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", 0 )
-GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Midway", "Space Invaders Deluxe", 0 )
-GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_IMPERFECT_SOUND )
-GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_IMPERFECT_COLORS )
-GAME( 1979, schasrcv, schaser,  schasrcv, schasrcv, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_IMPERFECT_COLORS )
-GAME( 1979, sflush,   0,        sflush,   sflush,   0, ROT270, "Taito", "Straight Flush",GAME_NO_SOUND| GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
-GAME( 1980, lupin3,   0,        lupin3,   lupin3,   0, ROT270, "Taito", "Lupin III", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 1)", 0 )
-GAME( 1980, polarisa, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 2)", 0 )
-GAME( 1980, ballbomb, 0,        ballbomb, ballbomb, 0, ROT270, "Taito", "Balloon Bomber", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )	/* missing clouds */
-GAME( 1980, indianbt, 0,        indianbt, indianbt, 0, ROT270, "Taito", "Indian Battle", 0 )
+GAMEL(1978, sitv,     invaders, invaders, sitv,     0, ROT270, "Taito", "Space Invaders (TV Version)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAME( 1979, sicv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (CV Version)", GAME_SUPPORTS_SAVE )
+GAME( 1978, sisv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version)", GAME_SUPPORTS_SAVE )
+GAME( 1978, sisv2,    invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version 2)", GAME_SUPPORTS_SAVE )
+GAMEL(1979, galxwars, 0,        invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 1)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, galxwar2, galxwars, invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 2)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, galxwart, galxwars, invaders, galxwars, 0, ROT270, "Taito?", "Galaxy Wars (Taito?)" , GAME_SUPPORTS_SAVE, layout_invaders) /* Copyright Not Displayed */
+GAMEL(1979, starw,    galxwars, invaders, galxwars, 0, ROT270, "bootleg", "Star Wars", GAME_SUPPORTS_SAVE, layout_invaders )
+GAME( 1979, lrescue,  0,        lrescue,  lrescue,  0, ROT270, "Taito", "Lunar Rescue", GAME_SUPPORTS_SAVE )
+GAME( 1980, mlander,  lrescue,  invaders, lrescue,  0, ROT270, "[Taito] (Leisure Time Electronics bootleg)", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
+GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Model Racing bootleg)", "Lunar Rescue (Model Racing bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal license?)", "Galaxy Rescue", GAME_SUPPORTS_SAVE )
+GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE )
+GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE )
+GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Midway", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
+GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
+GAME( 1979, schasrcv, schaser,  schasrcv, schasrcv, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
+GAME( 1979, sflush,   0,        sflush,   sflush,   0, ROT270, "Taito", "Straight Flush",GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
+GAME( 1980, lupin3,   0,        lupin3,   lupin3,   0, ROT270, "Taito", "Lupin III", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, polarisa, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, ballbomb, 0,        ballbomb, ballbomb, 0, ROT270, "Taito", "Balloon Bomber", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )    /* missing clouds */
+GAME( 1980, indianbt, 0,        indianbt, indianbt, 0, ROT270, "Taito", "Indian Battle", GAME_SUPPORTS_SAVE )
 
 /* Misc. manufacturers */
 
-GAMEL(1980, searthin, invaders, invaders, searthin, 0, ROT270, "bootleg", "Super Earth Invasion (set 1)", 0, layout_invaders )
-GAMEL(1980, searthia, invaders, invaders, searthin, 0, ROT270, "bootleg", "Super Earth Invasion (set 2)", 0, layout_invaders )
-GAMEL(1978, invadrmr, invaders, invaders, invadrmr, 0, ROT270, "Model Racing", "Space Invaders (Model Racing)", 0, layout_invaders )
-GAMEL(1978, spaceatt, invaders, invaders, sicv,     0, ROT270, "Video Games GMBH", "Space Attack", 0, layout_invaders )
-GAMEL(1980, spaceat2, invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Space Attack II", 0, layout_invaders )
-GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Super Invaders (Zenitone-Microsec)", 0, layout_invaders )
-GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg", "Super Invaders (EMAG)", 0, layout_invaders )
-GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "Test ROM", "Space Invaders Test ROM", 0, layout_invaders )
-GAMEL(19??, alieninv, invaders, invaders, searthin, 0, ROT270, "bootleg", "Alien Invasion Part II", 0, layout_invaders )
-GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation (Konami)","Space King", 0, layout_invaders )
-GAMEL(1978, spcewars, invaders, spcewars, spcewars, 0, ROT270, "Sanritsu", "Space War (Sanritsu)", 0, layout_invaders )
-GAME (19??, astropal, 0,        astropal, astropal, 0, ROT0,   "Sidam?", "Astropal", GAME_IMPERFECT_SOUND )
-GAMEL(1978, spacewr3, invaders, spcewars, sicv,     0, ROT270, "bootleg", "Space War Part 3", 0, layout_invaders )
-GAMEL(1978, invaderl, invaders, invaders, sicv,     0, ROT270, "Logitec", "Space Invaders (Logitec)", 0, layout_invaders )
-GAMEL(1978, invader4, invaders, invaders, sicv,     0, ROT270, "bootleg", "Space Invaders Part Four", 0, layout_invaders )
-GAMEL(1979, jspecter, invaders, invaders, jspecter, 0, ROT270, "Jatre", "Jatre Specter (set 1)", 0, layout_invaders )
-GAMEL(1979, jspectr2, invaders, invaders, jspecter, 0, ROT270, "Jatre", "Jatre Specter (set 2)", 0, layout_invaders )
-GAMEL(1979, cosmicmo, invaders, invaders, cosmicmo, 0, ROT270, "Universal", "Cosmic Monsters", 0, layout_invaders )
-GAMEL(1979, cosmicm2, invaders, invaders, cosmicmo, 0, ROT270, "Universal", "Cosmic Monsters 2", 0, layout_invaders )
-GAMEL(19??, superinv, invaders, invaders, superinv, 0, ROT270, "bootleg", "Super Invaders", 0, layout_invaders )
-GAMEL(19??, invasion, invaders, invaders, invasion, 0, ROT270, "Sidam", "Invasion", 0, layout_invaders )
-GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, 0, ROT270, "bootleg", "Darth Vader", GAME_NO_SOUND )
-GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Moon Base", 0 )
-GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_IMPERFECT_SOUND, layout_invrvnge )
-GAMEL(19??, invrvnga, invrvnge, invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_IMPERFECT_SOUND, layout_invrvnge )
-GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "GamePlan (Taito)", "Space Laser", 0 )
-GAME( 1980, laser,    spclaser, invaders, spclaser, 0, ROT270, "Leisure Time Electronics Inc.", "Astro Laser", 0 )
-GAME( 1979, spcewarl, spclaser, invaders, spclaser, 0, ROT270, "Leijac Corporation (Konami)","Space War (Leijac Corporation)", 0 )
-GAME( 1979, rollingc, 0,        rollingc, rollingc, 0, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", 0 )
-GAME( 1979, ozmawars, 0,        invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 1)", 0 )
-GAME( 1979, ozmawar2, ozmawars, invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 2)" , 0) /* Uses Taito's three board color version of Space Invaders PCB */
-GAME( 1979, solfight, ozmawars, invaders, ozmawars, 0, ROT270, "bootleg", "Solar Fight", 0 )
-GAME( 1979, spaceph,  ozmawars, invaders, spaceph,  0, ROT270, "Zilec Games", "Space Phantoms", 0 )
-GAME( 1979, yosakdon, 0,        yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 1)", GAME_IMPERFECT_SOUND ) /* bootleg? */
-GAME( 1979, yosakdoa, yosakdon, yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 2)", GAME_IMPERFECT_SOUND ) /* bootleg? */
-GAMEL(197?, shuttlei, 0,        shuttlei, shuttlei, 0, ROT270, "Omori", "Shuttle Invader", GAME_NO_COCKTAIL, layout_shuttlei )
+GAMEL(1980, searthin, invaders, invaders, searthin, 0, ROT270, "bootleg", "Super Earth Invasion (set 1)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1980, searthia, invaders, invaders, searthin, 0, ROT270, "bootleg", "Super Earth Invasion (set 2)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, invadrmr, invaders, invaders, invadrmr, 0, ROT270, "Model Racing", "Space Invaders (Model Racing)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spaceatt, invaders, invaders, sicv,     0, ROT270, "Video Games GMBH", "Space Attack", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1980, spaceat2, invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Space Attack II", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg", "Super Invaders (EMAG)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "Test ROM", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, alieninv, invaders, invaders, searthin, 0, ROT270, "bootleg", "Alien Invasion Part II", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation (Konami)","Space King", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spcewars, invaders, spcewars, spcewars, 0, ROT270, "Sanritsu", "Space War (Sanritsu)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAME (19??, astropal, 0,        astropal, astropal, 0, ROT0,   "Sidam?", "Astropal", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAMEL(1978, spacewr3, invaders, spcewars, sicv,     0, ROT270, "bootleg", "Space War Part 3", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, invaderl, invaders, invaders, sicv,     0, ROT270, "Logitec", "Space Invaders (Logitec)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, invader4, invaders, invaders, sicv,     0, ROT270, "bootleg", "Space Invaders Part Four", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, jspecter, invaders, invaders, jspecter, 0, ROT270, "Jatre", "Jatre Specter (set 1)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, jspectr2, invaders, invaders, jspecter, 0, ROT270, "Jatre", "Jatre Specter (set 2)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, cosmicmo, invaders, invaders, cosmicmo, 0, ROT270, "Universal", "Cosmic Monsters", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1979, cosmicm2, invaders, invaders, cosmicmo, 0, ROT270, "Universal", "Cosmic Monsters 2", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, superinv, invaders, invaders, superinv, 0, ROT270, "bootleg", "Super Invaders", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, invasion, invaders, invaders, invasion, 0, ROT270, "Sidam", "Invasion", GAME_SUPPORTS_SAVE, layout_invaders )
+GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, 0, ROT270, "bootleg", "Darth Vader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Moon Base", GAME_SUPPORTS_SAVE )
+GAMEL(19??, invrvnge, 0,        invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
+GAMEL(19??, invrvnga, invrvnge, invrvnge, invrvnge, 0, ROT270, "Zenitone-Microsec Ltd. (Dutchford license)", "Invader's Revenge (Dutchford)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_invrvnge )
+GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "GamePlan (Taito)", "Space Laser", GAME_SUPPORTS_SAVE )
+GAME( 1980, laser,    spclaser, invaders, spclaser, 0, ROT270, "Leisure Time Electronics Inc.", "Astro Laser", GAME_SUPPORTS_SAVE )
+GAME( 1979, spcewarl, spclaser, invaders, spclaser, 0, ROT270, "Leijac Corporation (Konami)","Space War (Leijac Corporation)", GAME_SUPPORTS_SAVE )
+GAME( 1979, rollingc, 0,        rollingc, rollingc, 0, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", GAME_SUPPORTS_SAVE )
+GAME( 1979, ozmawars, 0,        invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, ozmawar2, ozmawars, invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 2)", GAME_SUPPORTS_SAVE ) /* Uses Taito's three board color version of Space Invaders PCB */
+GAME( 1979, solfight, ozmawars, invaders, ozmawars, 0, ROT270, "bootleg", "Solar Fight", GAME_SUPPORTS_SAVE )
+GAME( 1979, spaceph,  ozmawars, invaders, spaceph,  0, ROT270, "Zilec Games", "Space Phantoms", GAME_SUPPORTS_SAVE )
+GAME( 1979, yosakdon, 0,        yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* bootleg? */
+GAME( 1979, yosakdoa, yosakdon, yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* bootleg? */
+GAMEL(197?, shuttlei, 0,        shuttlei, shuttlei, 0, ROT270, "Omori", "Shuttle Invader", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL, layout_shuttlei )

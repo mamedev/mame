@@ -589,6 +589,14 @@ static INTERRUPT_GEN( slave_interrupt )
 
 /* Machine Initialization */
 
+static MACHINE_START( airbustr )
+{
+    state_save_register_global(machine, soundlatch_status);
+    state_save_register_global(machine, soundlatch2_status);
+    state_save_register_global(machine, master_addr);
+    state_save_register_global(machine, slave_addr);
+}
+
 static MACHINE_RESET( airbustr )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
@@ -621,6 +629,7 @@ static MACHINE_DRIVER_START( airbustr )
 
 	MDRV_QUANTUM_TIME(HZ(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
+    MDRV_MACHINE_START(airbustr)
 	MDRV_MACHINE_RESET(airbustr)
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
@@ -768,6 +777,6 @@ static DRIVER_INIT( airbustr )
 
 /* Game Drivers */
 
-GAME( 1990, airbustr, 0,        airbustr, airbustr, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)" , 0)	// 891220
-GAME( 1990, airbustj, airbustr, airbustr, airbustj, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)" , 0)	// 891229
-GAME( 1990, airbusb,  airbustr, airbusb,  airbustj, 0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)" , 0)	// based on Japan set (891229)
+GAME( 1990, airbustr, 0,        airbustr, airbustr, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (World)", GAME_SUPPORTS_SAVE )	// 891220
+GAME( 1990, airbustj, airbustr, airbustr, airbustj, airbustr, ROT0, "Kaneko (Namco license)", "Air Buster: Trouble Specialty Raid Unit (Japan)", GAME_SUPPORTS_SAVE)    // 891229
+GAME( 1990, airbusb,  airbustr, airbusb,  airbustj, 0,        ROT0, "bootleg", "Air Buster: Trouble Specialty Raid Unit (bootleg)", GAME_SUPPORTS_SAVE)	// based on Japan set (891229)

@@ -21,6 +21,8 @@ UINT8 polaris_get_cloud_pos(void);
 
 /*----------- defined in audio/8080bw.c -----------*/
 
+MACHINE_START( extra_8080bw_sh );
+
 WRITE8_HANDLER( invadpt2_sh_port_1_w );
 WRITE8_HANDLER( invadpt2_sh_port_2_w );
 
@@ -68,10 +70,11 @@ WRITE8_HANDLER( yosakdon_sh_port_2_w );
 WRITE8_HANDLER( shuttlei_sh_port_1_w );
 WRITE8_HANDLER( shuttlei_sh_port_2_w );
 
-
 /*----------- defined in video/8080bw.c -----------*/
 
 extern UINT8 *c8080bw_colorram;
+
+MACHINE_START( extra_8080bw_vh );
 
 void c8080bw_flip_screen_w(const address_space *space, int data);
 void c8080bw_screen_red_w(int data);

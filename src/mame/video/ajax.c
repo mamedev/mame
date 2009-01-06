@@ -79,6 +79,7 @@ VIDEO_START( ajax )
 	K052109_vh_start(machine,"gfx1",NORMAL_PLANE_ORDER,tile_callback);
 	K051960_vh_start(machine,"gfx2",NORMAL_PLANE_ORDER,sprite_callback);
 	K051316_vh_start_0(machine,"gfx3",7,FALSE,0,zoom_callback);
+    state_save_register_global(machine, ajax_priority);
 }
 
 

@@ -15,6 +15,11 @@ extern int alpha68k_microcontroller_id;
 
 /******************************************************************************/
 
+VIDEO_START( alpha68k_common_vh )
+{
+    state_save_register_global(machine, flipscreen);
+}
+
 void alpha68k_flipscreen_w(int flip)
 {
 	flipscreen = flip;
@@ -71,9 +76,14 @@ VIDEO_START( alpha68k )
 	fix_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
+
+    state_save_register_global(machine, bank_base);
+
+    VIDEO_START_CALL(alpha68k_common_vh);
 }
 
 /******************************************************************************/
+
 //AT
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int j, int s, int e)
 {

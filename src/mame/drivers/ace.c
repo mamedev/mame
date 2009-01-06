@@ -303,13 +303,17 @@ static GFXDECODE_START( ace )
 	GFXDECODE_ENTRY( NULL          , 0x8000, scorelayout, 0, 2 )    /* the game dynamically modifies this */
 GFXDECODE_END
 
-
+static MACHINE_START( ace )
+{
+    state_save_register_global_array(machine, objpos);
+}
 
 static MACHINE_DRIVER_START( ace )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/9)	/* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
+    MDRV_MACHINE_START(ace)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -349,4 +353,4 @@ ROM_START( ace )
 
 ROM_END
 
-GAME( 1976, ace, 0, ace, ace, 0, ROT0, "Allied Leisure", "Ace", GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1976, ace, 0, ace, ace, 0, ROT0, "Allied Leisure", "Ace", GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )

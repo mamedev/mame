@@ -288,6 +288,13 @@ static const ym3812_interface ym3812_config =
 
 /******************************************************************************/
 
+static MACHINE_START( triothep )
+{
+    state_save_register_global(machine, trio_control_select);
+}
+
+/******************************************************************************/
+
 static MACHINE_DRIVER_START( actfancr )
 
 	/* basic machine hardware */
@@ -340,6 +347,8 @@ static MACHINE_DRIVER_START( triothep )
 
 	MDRV_CPU_ADD("audio",M6502, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
+
+    MDRV_MACHINE_START(triothep)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -586,8 +595,8 @@ static DRIVER_INIT( actfancj )
 
 
 
-GAME( 1989, actfancr, 0,        actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", 0 )
-GAME( 1989, actfanc1, actfancr, actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", 0 )
-GAME( 1989, actfancj, actfancr, actfancr, actfancr, actfancj, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", 0 )
-GAME( 1989, triothep, 0,        triothep, triothep, 0,        ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", 0 )
-GAME( 1989, triothej, triothep, triothep, triothep, 0,        ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", 0 )
+GAME( 1989, actfancr, 0,        actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, actfanc1, actfancr, actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, actfancj, actfancr, actfancr, actfancr, actfancj, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, triothep, 0,        triothep, triothep, 0,        ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, triothej, triothep, triothep, triothep, 0,        ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", GAME_SUPPORTS_SAVE )

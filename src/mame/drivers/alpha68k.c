@@ -196,6 +196,7 @@ DIP locations verified from manuals for:
 
 PALETTE_INIT( kyros );
 PALETTE_INIT( paddlem );
+VIDEO_START( alpha68k_common_vh );
 VIDEO_START( alpha68k );
 VIDEO_UPDATE( kyros );
 VIDEO_UPDATE( sstingry );
@@ -236,6 +237,14 @@ static MACHINE_RESET( common )
 static MACHINE_RESET( tnexspce )
 {
 	alpha68k_flipscreen_w(0);
+}
+
+static MACHINE_START( common )
+{
+    state_save_register_global(machine, trigstate);
+    state_save_register_global(machine, deposits1);
+    state_save_register_global(machine, deposits2);
+    state_save_register_global(machine, credits);
 }
 
 /******************************************************************************/
@@ -362,18 +371,29 @@ static WRITE16_HANDLER( tnexspce_soundlatch_w )
 //ZT
 /******************************************************************************/
 
+static unsigned coinvalue = 0;
+static unsigned microcontroller_data = 0;
+static int latch;
+
 /* Kyros, Super Stingray, Mahjong Block Jongbou */
+static MACHINE_START( kyros )
+{
+    state_save_register_global(machine, coinvalue);
+    state_save_register_global(machine, microcontroller_data);
+    state_save_register_global(machine, latch);
+
+    MACHINE_START_CALL( common );
+}
+
 static READ16_HANDLER( kyros_alpha_trigger_r )
 {
 	/* possible jump codes:
          - Kyros          : 0x22
          - Super Stingray : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
     */
-	static unsigned coinvalue = 0, microcontroller_data = 0;
 	static const UINT8 coinage1[8][2]={{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
 	static const UINT8 coinage2[8][2]={{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
 
-	static int latch;
 	int source = shared_ram[offset];
 
 	switch (offset) {
@@ -451,11 +471,9 @@ static READ16_HANDLER( alpha_II_trigger_r )
          - Sky Soldiers  : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
          - Gold Medalist : 0x21,0x23,0x24,0x5b
     */
-	static unsigned coinvalue = 0, microcontroller_data = 0;
 	static const UINT8 coinage1[8][2] = {{1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {2,3}, {3,2}};
 	static const UINT8 coinage2[8][2] = {{1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1}, {8,1}};
 
-	static int latch;
 	int source = shared_ram[offset];
 
 	switch (offset)
@@ -547,11 +565,9 @@ static READ16_HANDLER( alpha_V_trigger_r )
          - Gang Wars               : 0x21,0x23,0x24,0x54
          - Super Champion Baseball : 0x21,0x23,0x24
     */
-	static unsigned coinvalue = 0, microcontroller_data = 0;
 	static const UINT8 coinage1[8][2] = {{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
 	static const UINT8 coinage2[8][2] = {{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
 
-	static int latch;
 	int source = shared_ram[offset];
 
 	switch (offset)
@@ -1912,6 +1928,7 @@ static MACHINE_DRIVER_START( sstingry )
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 //ZT
 
+    MDRV_MACHINE_START(kyros)
 	MDRV_MACHINE_RESET(common)
 
 	/* video hardware */
@@ -1926,6 +1943,7 @@ static MACHINE_DRIVER_START( sstingry )
 //AT
 	MDRV_PALETTE_INIT(kyros)
 //ZT
+    MDRV_VIDEO_START(alpha68k_common_vh)
 	MDRV_VIDEO_UPDATE(sstingry)
 
 	/* sound hardware */
@@ -1961,6 +1979,7 @@ static MACHINE_DRIVER_START( kyros )
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 //ZT
 
+    MDRV_MACHINE_START(kyros)
 	MDRV_MACHINE_RESET(common)
 
 	/* video hardware */
@@ -1974,6 +1993,7 @@ static MACHINE_DRIVER_START( kyros )
 	MDRV_PALETTE_LENGTH(256 + 1)
 
 	MDRV_PALETTE_INIT(kyros)
+    MDRV_VIDEO_START(alpha68k_common_vh)
 	MDRV_VIDEO_UPDATE(kyros)
 
 	/* sound hardware */
@@ -2006,6 +2026,7 @@ static MACHINE_DRIVER_START( jongbou )
 	MDRV_CPU_IO_MAP(jongbou_sound_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 160) // guess, controls sound speed
 
+    MDRV_MACHINE_START(kyros)
 	MDRV_MACHINE_RESET(common)
 
 	/* video hardware */
@@ -2019,6 +2040,7 @@ static MACHINE_DRIVER_START( jongbou )
 	MDRV_PALETTE_LENGTH(256 + 1)
 
 	MDRV_PALETTE_INIT(kyros)
+    MDRV_VIDEO_START(alpha68k_common_vh)
 	MDRV_VIDEO_UPDATE(kyros)
 
 	/* sound hardware */
@@ -2051,6 +2073,7 @@ static MACHINE_DRIVER_START( alpha68k_I )
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_PALETTE_INIT(paddlem)
 //ZT
+    MDRV_VIDEO_START(alpha68k_common_vh)
 	MDRV_VIDEO_UPDATE(alpha68k_I)
 
 	/* sound hardware */
@@ -2257,6 +2280,7 @@ static MACHINE_DRIVER_START( tnexspce )
 
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_PALETTE_INIT(paddlem)
+    MDRV_VIDEO_START(alpha68k_common_vh)
 	MDRV_VIDEO_UPDATE(alpha68k_I)
 
 	/* sound hardware */
@@ -3266,27 +3290,27 @@ static DRIVER_INIT( tnexspce )
 
 /******************************************************************************/
 
-GAME( 1986, sstingry, 0,        sstingry,      sstingry, sstingry, ROT90, "Alpha Denshi Co.",   "Super Stingray", 0 )
-GAME( 1987, kyros,    0,        kyros,         kyros,    kyros,    ROT90, "World Games Inc",    "Kyros", 0 )
-GAME( 1986, kyrosj,   kyros,    kyros,         kyros,    kyros,    ROT90, "Alpha Denshi Co.",   "Kyros No Yakata (Japan)", 0 )
-GAME( 1987, jongbou,  0,        jongbou,       jongbou,  jongbou,  ROT90, "SNK",                "Mahjong Block Jongbou (Japan)", 0 )
-GAME( 1988, paddlema, 0,        alpha68k_I,    paddlema, paddlema, ROT90, "SNK",                "Paddle Mania", 0 )
-GAME( 1987, timesold, 0,        alpha68k_II,   timesold, timesold, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 3)", 0 )
-GAME( 1987, timesol1, timesold, alpha68k_II,   timesold, timesol1, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 1)", 0 )
-GAME( 1987, btlfield, timesold, alpha68k_II,   btlfield, btlfield, ROT90, "[Alpha Denshi Co.] (SNK license)", "Battle Field (Japan)", 0 )
-GAME( 1987, btlfildb, timesold, btlfildb,      btlfildb, btlfildb, ROT90, "bootleg",            "Battle Field (bootleg)", 0 )
-GAME( 1988, skysoldr, 0,        alpha68k_II,   skysoldr, skysoldr, ROT90, "[Alpha Denshi Co.] (SNK of America/Romstar license)", "Sky Soldiers (US)", 0 )
-GAME( 1988, goldmedl, 0,        alpha68k_II_gm,goldmedl, goldmedl, ROT0,  "SNK",                "Gold Medalist", 0 )
-GAME( 1988, goldmeda, goldmedl, alpha68k_II_gm,goldmedl, goldmeda, ROT0,  "SNK",                "Gold Medalist (alt)", 0 )
+GAME( 1986, sstingry, 0,        sstingry,      sstingry, sstingry, ROT90, "Alpha Denshi Co.",   "Super Stingray", GAME_SUPPORTS_SAVE )
+GAME( 1987, kyros,    0,        kyros,         kyros,    kyros,    ROT90, "World Games Inc",    "Kyros", GAME_SUPPORTS_SAVE )
+GAME( 1986, kyrosj,   kyros,    kyros,         kyros,    kyros,    ROT90, "Alpha Denshi Co.",   "Kyros No Yakata (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, jongbou,  0,        jongbou,       jongbou,  jongbou,  ROT90, "SNK",                "Mahjong Block Jongbou (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, paddlema, 0,        alpha68k_I,    paddlema, paddlema, ROT90, "SNK",                "Paddle Mania", GAME_SUPPORTS_SAVE )
+GAME( 1987, timesold, 0,        alpha68k_II,   timesold, timesold, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1987, timesol1, timesold, alpha68k_II,   timesold, timesol1, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, btlfield, timesold, alpha68k_II,   btlfield, btlfield, ROT90, "[Alpha Denshi Co.] (SNK license)", "Battle Field (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, btlfildb, timesold, btlfildb,      btlfildb, btlfildb, ROT90, "bootleg",            "Battle Field (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1988, skysoldr, 0,        alpha68k_II,   skysoldr, skysoldr, ROT90, "[Alpha Denshi Co.] (SNK of America/Romstar license)", "Sky Soldiers (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, goldmedl, 0,        alpha68k_II_gm,goldmedl, goldmedl, ROT0,  "SNK",                "Gold Medalist", GAME_SUPPORTS_SAVE )
+GAME( 1988, goldmeda, goldmedl, alpha68k_II_gm,goldmedl, goldmeda, ROT0,  "SNK",                "Gold Medalist (alt)", GAME_SUPPORTS_SAVE )
 GAME( 1988, goldmedb, goldmedl, alpha68k_II_gm,goldmedl, goldmeda, ROT0,  "bootleg",            "Gold Medalist (bootleg)", GAME_NOT_WORKING )
-GAME( 1989, skyadvnt, 0,        alpha68k_V,    skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",   "Sky Adventure (World)", 0 )
-GAME( 1989, skyadvnu, skyadvnt, alpha68k_V,    skyadvnu, skyadvnu, ROT90, "Alpha Denshi Co. (SNK of America license)", "Sky Adventure (US)", 0 )
-GAME( 1989, skyadvnj, skyadvnt, alpha68k_V,    skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",   "Sky Adventure (Japan)", 0 )
-GAME( 1989, gangwars, 0,        alpha68k_V,    gangwars, gangwars, ROT0,  "Alpha Denshi Co.",   "Gang Wars (US)", 0 )
-GAME( 1989, gangwarb, gangwars, alpha68k_V,    gangwarb, gangwarb, ROT0,  "bootleg",            "Gang Wars (bootleg)", 0 )
+GAME( 1989, skyadvnt, 0,        alpha68k_V,    skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",   "Sky Adventure (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, skyadvnu, skyadvnt, alpha68k_V,    skyadvnu, skyadvnu, ROT90, "Alpha Denshi Co. (SNK of America license)", "Sky Adventure (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, skyadvnj, skyadvnt, alpha68k_V,    skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",   "Sky Adventure (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, gangwars, 0,        alpha68k_V,    gangwars, gangwars, ROT0,  "Alpha Denshi Co.",   "Gang Wars (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, gangwarb, gangwars, alpha68k_V,    gangwarb, gangwarb, ROT0,  "bootleg",            "Gang Wars (bootleg)", GAME_SUPPORTS_SAVE )
 #if SBASEBAL_HACK
-GAME( 1989, sbasebal, 0,        alpha68k_V_sb, sbasebal, sbasebal, ROT0,  "Alpha Denshi Co.",   "Super Champion Baseball (Japan)", 0 )
+GAME( 1989, sbasebal, 0,        alpha68k_V_sb, sbasebal, sbasebal, ROT0,  "Alpha Denshi Co.",   "Super Champion Baseball (Japan)", GAME_SUPPORTS_SAVE )
 #else
-GAME( 1989, sbasebal, 0,        alpha68k_V_sb, sbasebal, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)", "Super Champion Baseball (US)", 0 )
+GAME( 1989, sbasebal, 0,        alpha68k_V_sb, sbasebal, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)", "Super Champion Baseball (US)", GAME_SUPPORTS_SAVE )
 #endif
-GAME( 1989, tnexspce, 0,        tnexspce,      tnexspce, tnexspce, ROT90, "SNK",                "The Next Space", GAME_NO_COCKTAIL )
+GAME( 1989, tnexspce, 0,        tnexspce,      tnexspce, tnexspce, ROT90, "SNK",                "The Next Space", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

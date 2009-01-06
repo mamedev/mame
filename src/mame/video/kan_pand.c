@@ -171,6 +171,10 @@ void pandora_start(running_machine *machine, UINT8 region, int x, int y)
 
 	pandora_sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	pandora_clear_bitmap = 1;
+
+    state_save_register_global(machine, pandora_clear_bitmap);
+    state_save_register_global_pointer(machine, pandora_spriteram, 0x1000);
+    state_save_register_global_bitmap(machine, pandora_sprites_bitmap);
 }
 
 

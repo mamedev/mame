@@ -242,6 +242,7 @@ static MACHINE_DRIVER_START( ajax )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	MDRV_MACHINE_RESET(ajax)
+    MDRV_MACHINE_START(ajax)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -436,6 +437,6 @@ static DRIVER_INIT( ajax )
 
 
 
-GAME( 1987, ajax,    0,    ajax, ajax, ajax, ROT90, "Konami", "Ajax", 0 )
-GAME( 1987, typhoon, ajax, ajax, ajax, ajax, ROT90, "Konami", "Typhoon", 0 )
-GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax, ROT90, "Konami", "Ajax (Japan)", 0 )
+GAME( 1987, ajax,    0,    ajax, ajax, ajax, ROT90, "Konami", "Ajax", GAME_SUPPORTS_SAVE )
+GAME( 1987, typhoon, ajax, ajax, ajax, ajax, ROT90, "Konami", "Typhoon", GAME_SUPPORTS_SAVE )
+GAME( 1987, ajaxj,   ajax, ajax, ajax, ajax, ROT90, "Konami", "Ajax (Japan)", GAME_SUPPORTS_SAVE )

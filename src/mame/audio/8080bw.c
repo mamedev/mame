@@ -11,12 +11,25 @@
 
 static emu_timer *schaser_effect_555_timer;
 static attotime schaser_effect_555_time_remain;
+static INT32 schaser_effect_555_time_remain_savable;
 static int schaser_effect_555_is_low;
 static int schaser_explosion;
 static UINT8 port_1_last = 0;
 static UINT8 port_2_last = 0;
 static UINT8 port_3_last = 0;
 
+/*******************************************************/
+/*                                                     */
+/* Global state registration                           */
+/*                                                     */
+/*******************************************************/
+
+MACHINE_START( extra_8080bw_sh )
+{
+    state_save_register_global(machine, port_1_last);
+    state_save_register_global(machine, port_2_last);
+    state_save_register_global(machine, port_3_last);
+}
 
 /*******************************************************/
 /*                                                     */
@@ -783,6 +796,7 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
        bit 4 - Effect Sound C (SX4)
        bit 5 - Explosion (SX5) */
 
+    //printf( "schaser_sh_port_1_w: %02x\n", data );
 	discrete_sound_w(space, SCHASER_DOT_EN, data & 0x01);
 	discrete_sound_w(space, SCHASER_DOT_SEL, data & 0x02);
 
@@ -815,6 +829,7 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			if (!schaser_effect_555_is_low)
 			{
 				schaser_effect_555_time_remain = timer_timeleft(schaser_effect_555_timer);
+                schaser_effect_555_time_remain_savable = attotime_to_double(schaser_effect_555_time_remain);
 				timer_adjust_oneshot(schaser_effect_555_timer, attotime_never, 0);
 			}
 		}
@@ -844,6 +859,8 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
        bit 4 - Field Control B (SX10)
        bit 5 - Flip Screen */
 
+    printf( "schaser_sh_port_2_w: %02x\n", data );
+
 	discrete_sound_w(space, SCHASER_MUSIC_BIT, data & 0x01);
 
 	discrete_sound_w(space, SCHASER_SND_EN, data & 0x02);
@@ -854,6 +871,8 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 	schaser_background_control_w(data & 0x18);
 
 	c8080bw_flip_screen_w(space, data & 0x20);
+
+    port_2_last = data;
 }
 
 
@@ -864,6 +883,7 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 	/* Toggle 555 output */
 	schaser_effect_555_is_low = !schaser_effect_555_is_low;
 	schaser_effect_555_time_remain = attotime_zero;
+    schaser_effect_555_time_remain_savable = attotime_to_double(schaser_effect_555_time_remain);
 
 	if (schaser_effect_555_is_low)
 		new_time = attotime_div(PERIOD_OF_555_ASTABLE(0, RES_K(20), CAP_U(1)), 2);
@@ -880,10 +900,25 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 }
 
 
+static STATE_POSTLOAD( schaser_reinit_555_time_remain )
+{
+    const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+    schaser_effect_555_time_remain = double_to_attotime(schaser_effect_555_time_remain_savable);
+    schaser_sh_port_2_w(space, 0, port_2_last);
+}
+
+
 MACHINE_START( schaser )
 {
 	schaser_effect_555_timer = timer_alloc(machine, schaser_effect_555_cb, NULL);
 
+    state_save_register_global(machine, schaser_explosion);
+    state_save_register_global(machine, schaser_effect_555_is_low);
+    state_save_register_global(machine, schaser_effect_555_time_remain_savable);
+    state_save_register_global(machine, port_2_last);
+    state_save_register_postload(machine, schaser_reinit_555_time_remain, NULL);
+
+    MACHINE_START_CALL(extra_8080bw_vh);
 	MACHINE_START_CALL(mw8080bw);
 }
 
@@ -896,6 +931,7 @@ MACHINE_RESET( schaser )
 	schaser_sh_port_1_w(space, 0, 0);
 	schaser_sh_port_2_w(space, 0, 0);
 	schaser_effect_555_time_remain = attotime_zero;
+    schaser_effect_555_time_remain_savable = attotime_to_double(schaser_effect_555_time_remain);
 
 	MACHINE_RESET_CALL(mw8080bw);
 }

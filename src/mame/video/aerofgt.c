@@ -95,12 +95,26 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 ***************************************************************************/
 
+static void aerofgt_register_state_globals(running_machine *machine)
+{
+    state_save_register_global_array(machine, gfxbank);
+    state_save_register_global(machine, bg1scrollx);
+    state_save_register_global(machine, bg1scrolly);
+    state_save_register_global(machine, bg2scrollx);
+    state_save_register_global(machine, bg2scrolly);
+    state_save_register_global(machine, charpalettebank);
+    state_save_register_global(machine, spritepalettebank);
+}
+
 VIDEO_START( pspikes )
 {
 	bg1_tilemap = tilemap_create(machine, get_pspikes_tile_info,tilemap_scan_rows,8,8,64,32);
 	/* no bg2 in this game */
 
 	sprite_gfx = 1;
+
+    aerofgt_register_state_globals(machine);
+    state_save_register_global(machine, spikes91_lookup);
 }
 
 
@@ -114,6 +128,8 @@ VIDEO_START( karatblz )
 	spritepalettebank = 0;
 
 	sprite_gfx = 2;
+
+    aerofgt_register_state_globals(machine);
 }
 
 VIDEO_START( spinlbrk )
@@ -140,7 +156,11 @@ VIDEO_START( spinlbrk )
 	aerofgt_spriteram1 = aerofgt_spriteram2 + aerofgt_spriteram2_size/2;
 	aerofgt_spriteram1_size = 0x4000;
 	for (i = 0;i < aerofgt_spriteram1_size/2;i++)
+    {
 		aerofgt_spriteram1[i] = i;
+    }
+
+    aerofgt_register_state_globals(machine);
 }
 
 VIDEO_START( turbofrc )
@@ -153,6 +173,8 @@ VIDEO_START( turbofrc )
 	spritepalettebank = 0;
 
 	sprite_gfx = 2;
+
+    aerofgt_register_state_globals(machine);
 }
 
 VIDEO_START( wbbc97 )
@@ -163,6 +185,10 @@ VIDEO_START( wbbc97 )
 	tilemap_set_transparent_pen(bg1_tilemap,15);
 
 	sprite_gfx = 1;
+
+    aerofgt_register_state_globals(machine);
+
+    state_save_register_global(machine, wbbc97_bitmap_enable);
 }
 
 /***************************************************************************

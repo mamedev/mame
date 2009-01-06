@@ -22,7 +22,17 @@ static UINT8 screen_red;
 static UINT8 schaser_background_disable;
 static UINT8 schaser_background_select;
 
+MACHINE_START( extra_8080bw_vh )
+{
+    state_save_register_global(machine, c8080bw_flip_screen);
+    state_save_register_global(machine, color_map);
+    state_save_register_global(machine, screen_red);
 
+    // These two only belong to schaser, but for simplicity's sake let's waste
+    // two bytes in other drivers' .sta files.
+    state_save_register_global(machine, schaser_background_disable);
+    state_save_register_global(machine, schaser_background_select);
+}
 
 void c8080bw_flip_screen_w(const address_space *space, int data)
 {
