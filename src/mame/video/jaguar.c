@@ -808,6 +808,10 @@ static STATE_POSTLOAD( cojag_postload )
 
 VIDEO_START( cojag )
 {
+	memset(&blitter_regs, 0, sizeof(blitter_regs));
+	memset(&gpu_regs, 0, sizeof(gpu_regs));
+	cpu_irq_state = 0;
+
 	object_timer = timer_alloc(machine, cojag_scanline_update, NULL);
 	adjust_object_timer(machine, 0);
 
