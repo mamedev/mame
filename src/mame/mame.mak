@@ -328,6 +328,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/alliedl.a \
 	$(MAMEOBJ)/alpha.a \
 	$(MAMEOBJ)/amiga.a \
+	$(MAMEOBJ)/aristocr.a \
 	$(MAMEOBJ)/atari.a \
 	$(MAMEOBJ)/atlus.a \
 	$(MAMEOBJ)/barcrest.a \
@@ -460,6 +461,10 @@ $(MAMEOBJ)/amiga.a: \
 	$(DRIVERS)/cubocd32.o $(MACHINE)/cubocd32.o \
 	$(DRIVERS)/mquake.o \
 	$(DRIVERS)/upscope.o \
+
+$(MAMEOBJ)/aristocr.a: \
+	$(DRIVERS)/86lions.o \
+	$(DRIVERS)/caswin.o \
 
 $(MAMEOBJ)/atari.a: \
  	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
@@ -1538,7 +1543,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/brasil.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
-	$(DRIVERS)/caswin.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \

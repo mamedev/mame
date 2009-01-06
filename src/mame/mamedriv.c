@@ -8502,7 +8502,8 @@ Other Sun games
 	DRIVER ( queen )
 
 	/* Aristocrat */
-	DRIVER ( caswin )
+	DRIVER ( 86lions )	/* (c) 1985? */
+	DRIVER ( caswin )	/* (c) 1985 */
 
 	/* Eagle */
 	DRIVER ( janshi )

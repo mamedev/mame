@@ -1204,6 +1204,7 @@ src/mame/drivers/40love.c svneol=native#text/plain
 src/mame/drivers/4enraya.c svneol=native#text/plain
 src/mame/drivers/4roses.c svneol=native#text/plain
 src/mame/drivers/8080bw.c svneol=native#text/plain
+src/mame/drivers/86lions.c svneol=native#text/plain
 src/mame/drivers/88games.c svneol=native#text/plain
 src/mame/drivers/ace.c svneol=native#text/plain
 src/mame/drivers/acefruit.c svneol=native#text/plain
