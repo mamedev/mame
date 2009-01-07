@@ -191,7 +191,7 @@ astring *_profiler_get_text(running_machine *machine, astring *string)
 		switches = 0;
 		for (curmem = 0; curmem < ARRAY_LENGTH(global_profiler.data); curmem++)
 			switches += global_profiler.data[curmem].context_switches;
-		astring_catprintf(string, "%d CPU switches\n", switches / ARRAY_LENGTH(global_profiler.data));
+		astring_catprintf(string, "%d CPU switches\n", switches / (int) ARRAY_LENGTH(global_profiler.data));
 	}
 
 	profiler_mark(PROFILER_END);
