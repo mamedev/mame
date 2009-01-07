@@ -908,7 +908,7 @@ DEVICE_GET_INFO( mc6845 )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
+		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mc6845); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
