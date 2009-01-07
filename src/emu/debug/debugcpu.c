@@ -448,7 +448,10 @@ offs_t debug_cpu_disassemble(const device_config *device, char *buffer, offs_t p
 void debug_cpu_set_dasm_override(const device_config *device, cpu_disassemble_func dasm_override)
 {
 	cpu_debug_data *info = cpu_get_debug_data(device);
-	info->dasm_override = dasm_override;
+
+	/* since our callers don't know if we are in debug mode or not, we have to do this check */
+	if (info != NULL)
+		info->dasm_override = dasm_override;
 }
 
 
