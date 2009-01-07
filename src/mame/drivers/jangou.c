@@ -56,7 +56,7 @@ static PALETTE_INIT( jangou )
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
-	for (i = 0; i < 0x10; ++i)
+	for (i = 0; i < 0x20; ++i)
 	{
 		bit0 = (color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 1) & 0x01;
@@ -659,7 +659,7 @@ static MACHINE_DRIVER_START( jangou )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_VIDEO_START(jangou)
 	MDRV_VIDEO_UPDATE(jangou)
@@ -809,7 +809,7 @@ ROM_START( cntrygrl )
 	ROM_LOAD( "rom5.bin", 0x02000, 0x02000, CRC(24d210ed) SHA1(6a0eae9d459975fbaad75bf21284baac3ba4f872) )
 
 	/*wtf,these 2 roms are next to the CPU roms, one is a CPU rom from Moon Quasar, the other a GFX rom from Crazy Climber,
-      I dunno what's going on,game doesn't appear to need these two....*/
+      I dunno what's going on,the game doesn't appear to need these two....*/
 	ROM_REGION( 0x1000, "user1", 0 )
 	ROM_LOAD( "rom6.bin", 0x00000, 0x0800, CRC(33965a89) SHA1(92912cea76a472d9b709c664d9818844a07fcc32)  ) // = mq3    Moon Quasar
 	ROM_LOAD( "rom7.bin", 0x00800, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7)  ) // = cc06   Crazy Climber (US)
@@ -823,6 +823,23 @@ ROM_START( cntrygrl )
 	ROM_LOAD( "countrygirl_prom.bin", 0x00, 0x20, CRC(dc54dc52) SHA1(db91a7ae05eb6b6e4b42f91dfe20ac0da6680b46)  )
 ROM_END
 
+ROM_START( luckygrl )
+	ROM_REGION( 0x10000, "cpu0", 0 ) //encrypted z80 cpu
+	ROM_LOAD( "5.9c", 0x00000, 0x01000, CRC(79b34eb2) SHA1(4b4916e09bfd6573fd2c7a7254fa4419164e0c4d) )
+	ROM_LOAD( "7.9f", 0x01000, 0x01000, CRC(14a44d23) SHA1(4f84a8f986a8fd9d5ac0636be1bb036c3b2746c2) )
+	ROM_LOAD( "6.9e", 0x02000, 0x01000, CRC(06850aa8) SHA1(c23cb6b7b26d5586b1a095dee88228d1613ae7d0) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD( "1.5r",      0x00000, 0x2000, CRC(fb429678) SHA1(00e37e90550d9190d06977a5f5ed75b691750cc1) )
+	ROM_LOAD( "piggy2.5r", 0x02000, 0x2000, CRC(a3919845) SHA1(45fffe34b7a29ecf8c8feb4152b5c7330ea3ad83) )
+	ROM_LOAD( "3.5n",      0x04000, 0x2000, CRC(130cfb89) SHA1(86b2a2142675cbd69d7cccab9b00f4c8863cdcbc) )
+	ROM_LOAD( "piggy4.5r", 0x06000, 0x2000, CRC(f5641c95) SHA1(e824b95c80d00789f07391aa5dcc02505bb8e141) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "prom_mb7051.3h", 0x00, 0x20, CRC(dff9f7a1) SHA1(593c99434df5dfd900ec57e3efa459903b589d96) )
+ROM_END
+
+
 /*Temporary kludge for make the RNG work*/
 static READ8_HANDLER( jngolady_rng_r )
 {
@@ -834,6 +851,48 @@ static DRIVER_INIT( jngolady )
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x08, 0x08, 0, 0, jngolady_rng_r );
 }
 
+static DRIVER_INIT (luckygrl)
+{
+	// this is WRONG
+	int A;
+	UINT8 *ROM = memory_region(machine, "cpu0");
+
+
+	unsigned char patn1[32] = {
+		0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0,
+		0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28,
+	};
+
+	unsigned char patn2[32] = {
+		0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20, 0x28, 0x20,
+		0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88,	0x28, 0x88, 0x28, 0x88, 0x28, 0x88, 0x28, 0x88
+	};
+
+	for (A = 0;A < 0x3000;A++)
+	{
+		UINT8 dat = ROM[A];
+		if (A&0x100) dat = dat ^ patn2[A&0x1f];
+		else dat = dat ^ patn1[A&0x1f];
+
+		ROM[A] = dat;
+	}
+
+
+	#if 0
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted_%s", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(ROM, 0x3000, 1, fp);
+			fclose(fp);
+		}
+	}
+	#endif
+
+}
 
 
 /* flyer shows a bet version of Jangou Lady too,does it truly exists?*/
@@ -841,3 +900,4 @@ GAME( 1983, jangou,    0,    jangou,   jangou,    0,        ROT0, "Nichibutsu", 
 /* Jangou Night */
 GAME( 1984, jngolady,  0,    jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
 GAME( 1984, cntrygrl,  0,    cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
+GAME( 1984?,luckygrl,  0,    cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing", 		  "Lucky Girl? (Wing)", GAME_NOT_WORKING )
