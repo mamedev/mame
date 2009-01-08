@@ -2385,21 +2385,18 @@ MACHINE_DRIVER_END
 
 static PALETTE_INIT(cm)
 {
+	/* BBGGGRRR */
+
 	int i;
+
 	for (i=0;i<0x100;i++)
 	{
-		int r,g,b;
-		UINT8 dat;
-
+		UINT8 data;
 		UINT8*proms = memory_region(machine, "proms");
 
-		dat = proms[0x000+i] | (proms[0x100+i]<<4);
+		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
-		r = (dat & 0x07) << 5;
-		g = (dat & 0x38) << 2;
-		b = (dat & 0xc0) << 0;
-
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color_rgb(machine, i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 
 	}
 }
@@ -2424,37 +2421,28 @@ static PALETTE_INIT(cmast91)
 
 static PALETTE_INIT(lucky8)
 {
+	/* BBGGGRRR */
+
 	int i;
-	int r,g,b;
-	UINT8 dat;
+	UINT8 data;
 	UINT8 *proms;
 
 	proms = memory_region(machine, "proms");
-	for (i=0;i<0x100;i++)
+	for (i=0; i < 0x100; i++)
 	{
 
-		dat = proms[0x000+i] | (proms[0x100+i]<<4);
+		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
-		r = (dat & 0x07) << 5;
-		g = (dat & 0x38) << 2;
-		b = (dat & 0xc0) << 0;
-
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-
+		palette_set_color_rgb(machine, i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 
 	proms = memory_region(machine, "proms2");
-	for (i=0;i<0x20;i++)
+	for (i=0; i < 0x20; i++)
 	{
-		dat = proms[i];
+		data = proms[i];
 
-		r = (dat & 0x07) << 5;
-		g = (dat & 0x38) << 2;
-		b = (dat & 0xc0) << 0;
-
-		palette_set_color(machine, i+0x80, MAKE_RGB(r, g, b));
+		palette_set_color_rgb(machine, i + 0x80, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
-
 }
 
 
