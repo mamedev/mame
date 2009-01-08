@@ -43,6 +43,28 @@
   Controls Set2 is using reels stop buttons from Controls Set1.
 
 
+  * Kkoj Noli
+
+  kkuj nol-i / kkoj noli (better romanization).
+
+  kkuj = stab/kill
+  nol-i = bees
+
+  The little red box at bottom of the title translates as "South Korea"
+
+  Seems to be a hack of Lucky 8 Lines.
+
+  - Child'ish graphics.
+  - For Amusement only... There is no payout/keyout line accessed.
+  - No stats or service mode.
+  - No NVRAM.
+  - Two sets of player's controls, as lucky8.
+  - No ay8910, so no extra ports.
+  - Only 1 DIP switches bank.
+
+  Nominated for the *WORST* hacked gambling game EVER!
+
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -286,6 +308,29 @@ static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
 	AM_RANGE(0xb840, 0xb840) AM_WRITE(ay8910_control_port_0_w)	/* no sound... only use both ports for DSWs */
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
+	AM_RANGE(0xb870, 0xb870) AM_WRITE(sn76496_0_w)	/* sound */
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( kkojnoli_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM	/* definitelly no NVRAM */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_WRITE(goldstar_fg_vidram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_WRITE(goldstar_fg_atrram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_WRITE(goldstar_reel1_ram_w) AM_BASE(&goldstar_reel1_ram)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_WRITE(goldstar_reel2_ram_w) AM_BASE(&goldstar_reel2_ram)
+	AM_RANGE(0xa800, 0xa9ff) AM_RAM AM_WRITE(goldstar_reel3_ram_w) AM_BASE(&goldstar_reel3_ram)
+	AM_RANGE(0xb040, 0xb07f) AM_RAM AM_BASE(&goldstar_reel1_scroll)
+	AM_RANGE(0xb080, 0xb0bf) AM_RAM AM_BASE(&goldstar_reel2_scroll)
+	AM_RANGE(0xb100, 0xb17f) AM_RAM AM_BASE(&goldstar_reel3_scroll)
+
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* Input Port */
+	AM_RANGE(0xb830, 0xb830) AM_WRITENOP		/* no ay8910 */
+	AM_RANGE(0xb840, 0xb840) AM_WRITENOP		/* no ay8910 */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
 	AM_RANGE(0xb870, 0xb870) AM_WRITE(sn76496_0_w)	/* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -1834,6 +1879,85 @@ static INPUT_PORTS_START( ladylinr )
 */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kkojnoli )
+	PORT_START("IN0")	/* d800 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 - Big / Switch Controls") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 - Double-Up")             PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 - Take Score")            PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 - Bet")                   PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 - Small / Info")          PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 - Start")                 PORT_CODE(KEYCODE_N)
+
+	PORT_START("IN1")	/* d801 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("P2 - Big / Switch Controls") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("P2 - Double-Up")             PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("P2 - Take Score")            PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("P2 - Bet")                   PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("P2 - Small / Info")          PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("P2 - Start")                 PORT_CODE(KEYCODE_H)
+
+	PORT_START("IN2")	/* d802 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")	/* d810 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1)    PORT_IMPULSE(2)	// Coin1?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2)    PORT_IMPULSE(2)	// Coin2?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3)    PORT_IMPULSE(2)	// Coin3?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key In") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4)    PORT_IMPULSE(2)	// Coin4?
+
+	PORT_START("IN4")	/* d811 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "W-UP Type" )			PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, "Reels (automatic)" )
+	PORT_DIPSETTING(    0x00, "Flowers (Big/Small)" )
+
+INPUT_PORTS_END
+
 
 
 static const gfx_layout charlayout =
@@ -2057,6 +2181,34 @@ static const ppi8255_interface lucky8_ppi8255_intf[3] =
 	},
 	{	/* A set as input */
 		DEVICE8_PORT("DSW2"),	/* Port A read */
+		NULL,					/* Port B read */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	}
+};
+
+static const ppi8255_interface kkojnoli_ppi8255_intf[3] =
+{
+	{	/* A, B & C set as input */
+		DEVICE8_PORT("IN0"),	/* Port A read */
+		DEVICE8_PORT("IN1"),	/* Port B read */
+		DEVICE8_PORT("IN2"),	/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	},
+	{	/* A, B & C set as input */
+		DEVICE8_PORT("IN3"),	/* Port A read */
+		DEVICE8_PORT("IN4"),	/* Port B read */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	},
+	{	/* A set as input */
+		DEVICE8_PORT("DSW1"),	/* Port A read */
 		NULL,					/* Port B read */
 		NULL,					/* Port C read */
 		NULL,					/* Port A write */
@@ -2536,6 +2688,43 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_SOUND_ADD("ay", AY8910,1500000)
 	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( kkojnoli )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, 12000000/3) // ?? Mhz
+	MDRV_CPU_PROGRAM_MAP(kkojnoli_map,0)
+	//MDRV_CPU_IO_MAP(goldstar_readport,0)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+
+	/* 3x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", kkojnoli_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", kkojnoli_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", kkojnoli_ppi8255_intf[2] )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MDRV_PALETTE_INIT(lucky8)
+
+	MDRV_GFXDECODE(ncb3)
+	MDRV_PALETTE_LENGTH(256)
+
+	MDRV_VIDEO_START(goldstar)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
+
+	MDRV_SOUND_ADD("sn1", SN76489, 3000000)	/* 3 MHz. */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 MACHINE_DRIVER_END
 
@@ -3099,7 +3288,7 @@ ROM_START( cmast91 )
 	ROM_CONTINUE(0xe000,0x1000)
 	ROM_CONTINUE(0xf000,0x1000)
 
-	ROM_REGION( 0x40000, "user1", 0 ) // unknown, bitmaps, or sound?
+	ROM_REGION( 0x40000, "user1", 0 ) /* unknown, bitmaps, or sound? */
 	ROM_LOAD( "9.bin",   0x00000, 0x40000, CRC(92342276) SHA1(f9436752f2ec67cf873fd01c729c7c113dc18be0) ) // ?
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3118,8 +3307,14 @@ ROM_START( cmast91 )
 	ROM_LOAD( "p2.bin", 0x0100, 0x0100, CRC(3febce95) SHA1(c7c0fec0fb024ebf7d7365a09d28ba3d0037b0b4) )
 	ROM_LOAD( "p3.bin", 0x0200, 0x0100, CRC(99dbdf19) SHA1(3680335406f63289f8d9a81b4cd163e4aa0c14d4) )
 
-	ROM_REGION( 0x100, "proms2", 0 ) // screen layout?
+	ROM_REGION( 0x100, "proms2", 0 ) /* screen layout? */
 	ROM_LOAD( "p4.bin", 0x0000, 0x0100, CRC(72212427) SHA1(e87a91f28284313c706ebb8175a3586780636e31) )
+
+	ROM_REGION( 0x800, "plds", 0 ) /* all 16L8-12/-15/-25 type, protected */
+	ROM_LOAD( "pld1.bin", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pld2.bin", 0x0200, 0x0104, NO_DUMP )
+	ROM_LOAD( "pld3.bin", 0x0400, 0x0104, NO_DUMP )
+	ROM_LOAD( "pld4.bin", 0x0600, 0x0104, NO_DUMP )
 ROM_END
 
 /*
@@ -3319,6 +3514,58 @@ ROM_START( ladylinr )
 	ROM_LOAD( "am27s19pc.73",	0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
 ROM_END
 
+/*
+
+  Board had a sticker that said MODEL 9006
+
+  .u22  2764
+  .u21  2764
+  .u20  2764
+  .u19  2764
+  .u18  27256
+  .u17  27256
+  .u16  27256
+  .u66  27256
+
+  HM6116P
+  D4016C-2 x3
+  D4016C-5
+  12Mhz Crystal
+  D780C
+  UM82C55A-PC
+  M5L8255AP-5
+  D8255AC-2
+
+*/
+ROM_START( kkojnoli )
+	ROM_REGION( 0x8000, "main", 0 )
+	ROM_LOAD( "9006.u66",	0x0000, 0x8000, CRC(5807a005) SHA1(9c7156656cd651c7785c42ce25e96aadd8e3d9ff) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "9006.u18",	0x00000, 0x8000, CRC(b83e304f) SHA1(1022518928d8cb094340927a65b8fb72b0f3c640) )
+	ROM_LOAD( "9006.u17",	0x08000, 0x8000, CRC(13a3258b) SHA1(605555ae48012ca4b1829d1c835b33ddeec17da6) )
+	ROM_LOAD( "9006.u16",	0x10000, 0x8000, CRC(84d09be4) SHA1(09a9e491a9a5fc7882c88d46ae2a6e7e99d082f4) )
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "9006.u22",	0x0000, 0x2000, BAD_DUMP CRC(4e93130d) SHA1(faaaf51844da8d3bdb908fb8ce0f2442e26b5f62) )
+	ROM_LOAD( "9006.u20",	0x2000, 0x2000, BAD_DUMP CRC(717fe736) SHA1(04e578c1992bbdb312bb6bc12137bd96522a50e6) )
+	ROM_LOAD( "9006.u21",	0x4000, 0x2000, BAD_DUMP CRC(f5314f3f) SHA1(0423dc545fce0322377f1934894a999427709b33) )
+	ROM_LOAD( "9006.u19",	0x6000, 0x2000, BAD_DUMP CRC(c321d50b) SHA1(8c132d8fcc812bcec5966c8a3960dfbe5d9f8c36) )
+
+	/* proms are from lucky8a */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom3", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "prom1", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "prom5", 0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "prom2", 0x0000, 0x0020, BAD_DUMP CRC(7b1a769f) SHA1(788b3573df17d398c74662fec4fd7693fc27e2ef) )
+ROM_END
 
 
 /* these 'Amcoe' games look like bootlegs of cherry master
@@ -3605,10 +3852,10 @@ GAME( 198?, cm2841a,  cmv4,     cm,       cmv801,   0,        ROT0, "Dyna",     
 
 GAME( 1991, cmast91,  0,        cmast91,  cmv801,   cmast91,  ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",           GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING )
 
-GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",              GAME_IMPERFECT_COLORS )
-GAME( 1989, lucky8a,  lucky8,   lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",              GAME_IMPERFECT_COLORS )
-
+GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",              0 )
+GAME( 1989, lucky8a,  lucky8,   lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",              0 )
 GAME( 198?, ladylinr, 0,        ladylinr, ladylinr, 0,        ROT0, "TAB Austria",       "Lady Liner",                             0 )
+GAME( 198?, kkojnoli, 0,        kkojnoli, kkojnoli, 0,        ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",              GAME_IMPERFECT_COLORS )
 
 // bootlegs of cherry master?
 GAME( 1998, schery98, 0,        cm,       cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
