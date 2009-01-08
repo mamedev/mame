@@ -315,7 +315,7 @@ static void cdp1869_draw_char(const device_config *device, bitmap_t *bitmap, int
 
 		int ccb0 = BIT(data, CCB0);
 		int ccb1 = BIT(data, CCB1);
-		int pcb = cdp1869->intf->pcb_r(device, pma, cma);
+		int pcb = BIT(cdp1869->intf->pcb_r(device, pma, cma), 0);
 
 		int color = cdp1869_get_pen(device, ccb0, ccb1, pcb);
 
