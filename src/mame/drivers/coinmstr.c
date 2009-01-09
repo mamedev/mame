@@ -1,12 +1,12 @@
 /*
-
+x
   Coinmaster trivia games
 
   preliminary driver by Pierpaolo Prazzoli
 
   TODO:
-  - finish video emulation (colors, missing banking bits)
-  - where is palette ?
+  - is there extra colour info in attr3 for suprnudge 2 and copoker?
+  - is there colour intensity control?
   - finish inputs
   - finish question roms reading
   - hook up all the PIAs
@@ -29,7 +29,7 @@
 #include "sound/ay8910.h"
 
 
-static UINT8 *attr_ram1, *attr_ram2;
+static UINT8 *attr_ram1, *attr_ram2, *attr_ram3;
 static tilemap *bg_tilemap;
 
 static UINT8 question_adr[4];
@@ -42,12 +42,75 @@ static WRITE8_HANDLER( quizmstr_bg_w )
 		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
 }
 
+
+static void coinmstr_set_pal(running_machine *machine, UINT32 paldat, int col)
+{
+	col = col *4;
+
+	{
+		int r0, r1, r2, r3;
+		int g0, g1, g2, g3;
+		int b0, b1, b2, b3;
+		int i0, i1, intensity;
+
+
+
+		i0 = (paldat & 0x2000) >> 13 ;
+		i1 = (paldat & 0x1000) >> 12 ;
+
+		intensity = ((i0<<1) | (i1))+1;
+		intensity = 4;
+
+
+		r0 = (paldat & 0x1000) >> 12 ;
+		g0 = (paldat & 0x0800) >> 11 ;
+		b0 = (paldat & 0x0400) >> 10 ;
+		r1 = (paldat & 0x0200) >> 9 ;
+		g1 = (paldat & 0x0100) >> 8 ;
+		b1 = (paldat & 0x0080) >> 7 ;
+
+		r2 = (paldat & 0x0020) >> 5 ;
+		g2 = (paldat & 0x0010) >> 4 ;
+		b2 = (paldat & 0x0008) >> 3 ;
+		r3 = (paldat & 0x0004) >> 2 ;
+		g3 = (paldat & 0x0002) >> 1 ;
+		b3 = (paldat & 0x0001) >> 0 ;
+
+
+
+		palette_set_color_rgb(machine, col+0, (b0*intensity)<<5, (g0*intensity)<<5, (r0*intensity)<<5);
+		palette_set_color_rgb(machine, col+2, (b1*intensity)<<5, (g1*intensity)<<5, (r1*intensity)<<5);
+		palette_set_color_rgb(machine, col+1, (b2*intensity)<<5, (g2*intensity)<<5, (r2*intensity)<<5);
+		palette_set_color_rgb(machine, col+3, (b3*intensity)<<5, (g3*intensity)<<5, (r3*intensity)<<5);
+
+
+
+	}
+
+
+
+
+
+}
+
+
+
 static WRITE8_HANDLER( quizmstr_attr1_w )
 {
 	attr_ram1[offset] = data;
 
 	if(offset >= 0x0240)
+	{
+		// the later games also use attr3 for something..
+		UINT32 	paldata = (attr_ram1[offset]&0x7f) | ((attr_ram2[offset]&0x7f)<<7);
 		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
+
+
+		coinmstr_set_pal(space->machine, paldata, offset-0x240);
+
+
+
+	}
 }
 
 static WRITE8_HANDLER( quizmstr_attr2_w )
@@ -55,8 +118,26 @@ static WRITE8_HANDLER( quizmstr_attr2_w )
 	attr_ram2[offset] = data;
 
 	if(offset >= 0x0240)
+	{
+		// the later games also use attr3 for something..
+		UINT32 	paldata = (attr_ram1[offset]&0x7f) | ((attr_ram2[offset]&0x7f)<<7);
+		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
+
+		coinmstr_set_pal(space->machine, paldata, offset-0x240);
+
+
+
+	}
+}
+
+static WRITE8_HANDLER( quizmstr_attr3_w )
+{
+	attr_ram3[offset] = data;
+
+	if(offset >= 0x0240)
 		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
 }
+
 
 static READ8_HANDLER( question_r )
 {
@@ -116,6 +197,11 @@ static WRITE8_HANDLER( question_w )
 	question_adr[offset] = data;
 }
 
+static READ8_HANDLER( ff_r )
+{
+	return 0xff;
+}
+
 // Common memory map
 
 static ADDRESS_MAP_START( coinmstr_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -124,7 +210,7 @@ static ADDRESS_MAP_START( coinmstr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_BASE(&attr_ram1)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_BASE(&attr_ram2)
-	AM_RANGE(0xf800, 0xffff) AM_RAM // supnudg2 writes here...
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_BASE(&attr_ram3)
 ADDRESS_MAP_END
 
 // Different I/O mappping for every game
@@ -180,6 +266,27 @@ static ADDRESS_MAP_START( supnudg2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x79, 0x79) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0xc0, 0xc1) AM_READNOP
 	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( copoker_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_BASE(&attr_ram1)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_BASE(&attr_ram2)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_BASE(&attr_ram3)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( copoker_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE(H46505, "crtc", mc6845_address_w)
+	AM_RANGE(0x41, 0x41) AM_DEVWRITE(H46505, "crtc", mc6845_register_w)
+	AM_RANGE(0x48, 0x48) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x49, 0x49) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x58, 0x5b) AM_READWRITE(pia_0_r, pia_0_w) /* confirmed */
+	AM_RANGE(0x68, 0x6b) AM_READWRITE(pia_1_r, pia_1_w) /* confirmed */
+	AM_RANGE(0x78, 0x7b) AM_READWRITE(pia_2_r, pia_2_w) /* confirmed */
+	AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)	/* needed to boot */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( quizmstr )
@@ -508,6 +615,74 @@ static INPUT_PORTS_START( supnudg2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( copoker )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Cancel / Collect")                           PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 1 & 5 (auto?)")                         PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 2 / Bet / Half Gamble / Previous Hand") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Deal / Draw / Gamble")                       PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Auto Hold")                                  PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Short Term Meters")              PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill Mode")                    PORT_TOGGLE PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("0-8")                                        PORT_CODE(KEYCODE_S)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE (2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE (2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Factory Install Switch" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -526,17 +701,19 @@ GFXDECODE_END
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile = videoram[tile_index + 0x0240];
-	int color = 0;
+	int color = tile_index;
 
 	tile |= (attr_ram1[tile_index + 0x0240] & 0x80) << 1;
 	tile |= (attr_ram2[tile_index + 0x0240] & 0x80) << 2;
+
+	tile |= (attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
 
 	SET_TILE_INFO(0,tile,color,0);
 }
 
 static VIDEO_START( coinmstr )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows, 8, 8, 46, 64);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows, 8, 8, 46, 32);
 }
 
 static VIDEO_UPDATE( coinmstr )
@@ -596,6 +773,32 @@ static const pia6821_interface trailblz_pia_2_intf =
 	/*irqs   : A/B             */ 0, 0
 };
 
+
+/* PIA 0 */
+static const pia6821_interface copoker_pia_0_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, 0, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
+	/*irqs   : A/B             */ 0, 0
+};
+
+/* PIA 1 */
+static const pia6821_interface copoker_pia_1_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ input_port_1_r, input_port_2_r, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
+	/*irqs   : A/B             */ 0, 0
+};
+
+/* PIA 2 */
+static const pia6821_interface copoker_pia_2_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ input_port_3_r, 0, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
+	/*irqs   : A/B             */ 0, 0
+};
+
+
 static MACHINE_START( quizmstr )
 {
 	pia_config(machine, 0, &quizmstr_pia_0_intf);
@@ -616,6 +819,18 @@ static MACHINE_START( trailblz )
 }
 
 static MACHINE_RESET( trailblz )
+{
+	pia_reset();
+}
+
+static MACHINE_START( copoker )
+{
+	pia_config(machine, 0, &copoker_pia_0_intf);
+	pia_config(machine, 1, &copoker_pia_1_intf);
+	pia_config(machine, 2, &copoker_pia_2_intf);
+}
+
+static MACHINE_RESET( copoker )
 {
 	pia_reset();
 }
@@ -657,7 +872,7 @@ static MACHINE_DRIVER_START( coinmstr )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
 
 	MDRV_GFXDECODE(coinmstr)
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_LENGTH(46*32*4)
 
 	MDRV_VIDEO_START(coinmstr)
 	MDRV_VIDEO_UPDATE(coinmstr)
@@ -697,6 +912,16 @@ static MACHINE_DRIVER_START( supnudg2 )
 
 	MDRV_MACHINE_START(quizmstr)
 	MDRV_MACHINE_RESET(quizmstr)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( copoker )
+	MDRV_IMPORT_FROM(coinmstr)
+	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_PROGRAM_MAP(copoker_map,0)
+	MDRV_CPU_IO_MAP(copoker_io_map,0)
+
+	MDRV_MACHINE_START(copoker)
+	MDRV_MACHINE_RESET(copoker)
 MACHINE_DRIVER_END
 
 /*
@@ -796,8 +1021,8 @@ ROM_START( supnudg2 )
 	ROM_LOAD( "u4.bin",       0x8000, 0x8000, CRC(0551e859) SHA1(b71640097cc75b78f3013f0e77de328bf1a205b1) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "u23.bin",      0x0000, 0x8000, CRC(726a48ac) SHA1(cd17840067294812edf5bfa88d71fc967388df8e) )
-	ROM_LOAD( "u25.bin",      0x8000, 0x8000, CRC(1f7cef5e) SHA1(3abc31d400a0f5dc29c70d8aac42fd6302290cc9) )
+	ROM_LOAD( "u25.bin",      0x0000, 0x8000, CRC(1f7cef5e) SHA1(3abc31d400a0f5dc29c70d8aac42fd6302290cc9) )
+	ROM_LOAD( "u23.bin",      0x8000, 0x8000, CRC(726a48ac) SHA1(cd17840067294812edf5bfa88d71fc967388df8e) )
 
 	ROM_REGION( 0xa0000, "user1", 0 ) /* Question roms */
 	ROM_LOAD( "q1.bin",       0x00000, 0x8000, CRC(245d679a) SHA1(2d3fbed8c1b3d0bffe7f3bd9088e0a5d207654c7) )
@@ -822,6 +1047,38 @@ ROM_START( supnudg2 )
 	ROM_LOAD( "q20.bin",      0x98000, 0x8000, CRC(0845b450) SHA1(c373839ee1ad983e2df41cb22f625c14972372b0) )
 ROM_END
 
+/*
+
+  Poker Roulette (c) 1990 Coinmaster
+
+
+  Hardware notes:
+
+  CPU:  1x z80
+  RAM:  2x 6264
+  I/O:  3x 6821 PIAs
+  CRTC: 1x 6845
+  SND:  1x ay-3-8912
+  Xtal: 1x 14MHz.
+
+
+  Dev notes:
+
+  2x gfx banks, switched by bit4 of attr RAM.
+
+*/
+
+ROM_START( pokeroul )
+	ROM_REGION( 0x10000, "cpu", 0 )
+	ROM_LOAD( "poker1.ic3",   0x0000, 0x8000, CRC(bfe78d09) SHA1(7cc0f57714ff808a41ce20027a283e5dff60f752) )
+	ROM_LOAD( "poker2.ic4",   0x8000, 0x8000, CRC(34c1b55c) SHA1(fa562d230a57dce3fff176c21c86b461a02749f6) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "027c1.00_e14.7.88.ic25",   0x0000, 0x8000, CRC(719f9879) SHA1(122e2689a21a22713f938e3bf6cfb72c60fb9a16) )
+	ROM_LOAD( "027c1.01_e14.7.88.ic23",   0x8000, 0x8000, CRC(71e5a2fc) SHA1(c28efcea1cf6c9872e70ff191932e3cdb5618917) )
+ROM_END
+
+
 static DRIVER_INIT( coinmstr )
 {
 	UINT8 *rom = memory_region(machine, "user1");
@@ -844,3 +1101,4 @@ static DRIVER_INIT( coinmstr )
 GAME( 1985, quizmstr, 0, quizmstr, quizmstr, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",            GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, trailblz, 0, trailblz, trailblz, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                   GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // or Trail Blazer 2 ?
 GAME( 1989, supnudg2, 0, supnudg2, supnudg2, coinmstr, ROT0, "Coinmaster",            "Super Nudger II (Version 5.21)", GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1987, pokeroul, 0, copoker,  copoker,  0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",  GAME_WRONG_COLORS | GAME_NOT_WORKING )
