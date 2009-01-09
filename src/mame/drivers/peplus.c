@@ -103,6 +103,7 @@ Additional notes
           pexp0112     2
           pexs0006     2
           pexmp006     2
+          pexmp017     2
 
 
 2) Configuration
@@ -173,10 +174,13 @@ Stephh's log (2007.11.28) :
 #define MASTER_CLOCK 		XTAL_20MHz
 #define CPU_CLOCK			((MASTER_CLOCK)/2)		/* divided by 2 - 7474 */
 #define MC6845_CLOCK		((MASTER_CLOCK)/8/3)
+#define SOUND_CLOCK			((MASTER_CLOCK)/12)
 
 static UINT16 autohold_addr; /* address to patch in program RAM to enable autohold feature */
 
 static tilemap *bg_tilemap;
+static UINT8 wingboard;
+static UINT8 jumper_e16_e17; /* Set this to TRUE when CG chips are 27c512 instead of 27c256 */
 
 /* Pointers to External RAM */
 static UINT8 *program_ram;
@@ -191,8 +195,9 @@ static UINT8 *sf000_ram;
 /* Variables used instead of CRTC6845 system */
 static UINT16 vid_address = 0;
 
-/* Holds upper video address and palette number */
+/* Holds upper video address, palette number and jumper_e16_e17 flag */
 static UINT8 *palette_ram;
+static UINT8 *palette_ram2;
 
 /* IO Ports */
 static UINT8 *io_port;
@@ -227,6 +232,25 @@ static const mc6845_interface mc6845_intf =
 	crtc_addr				/* update address callback */
 };
 
+
+/**************
+* Memory Copy *
+***************/
+
+static void peplus_load_superdata(running_machine *machine, const char *bank_name)
+{
+    UINT8 *super_data = memory_region(machine, bank_name);
+
+    /* Distribute Superboard Data */
+    memcpy(s3000_ram, &super_data[0x3000], 0x1000);
+    memcpy(s5000_ram, &super_data[0x5000], 0x1000);
+    memcpy(s7000_ram, &super_data[0x7000], 0x1000);
+    memcpy(sb000_ram, &super_data[0xb000], 0x1000);
+    memcpy(sd000_ram, &super_data[0xd000], 0x1000);
+    memcpy(sf000_ram, &super_data[0xf000], 0x1000);
+}
+
+
 /*****************
 * NVRAM Handlers *
 ******************/
@@ -252,6 +276,7 @@ static NVRAM_HANDLER( peplus )
 	NVRAM_HANDLER_CALL(i2cmem_0);
 }
 
+
 /*****************
 * Write Handlers *
 ******************/
@@ -260,7 +285,7 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
 {
 	int i;
 
-	for (i = 0; i < 16; i++)
+	for (i = 0; i < space->machine->config->total_colors; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -286,17 +311,13 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
 	}
 }
 
-/*
-    ROCKWELL 6545 - Transparent Memory Addressing
-    The current CRTC6845 driver does not support these
-    additional registers (R18, R19, R31)
-*/
+
+/* ROCKWELL 6545 - Transparent Memory Addressing */
 
 static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
 {
 	vid_address = address;
 }
-
 
 static WRITE8_DEVICE_HANDLER( peplus_crtc_mode_w )
 {
@@ -327,11 +348,12 @@ static MC6845_ON_VSYNC_CHANGED(crtc_vsync)
 	handle_lightpen(device);
 }
 
-
 static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 {
 	videoram[vid_address] = data;
 	palette_ram[vid_address] = io_port[1];
+	palette_ram2[vid_address] = io_port[3];
+
 	tilemap_mark_tile_dirty(bg_tilemap, vid_address);
 
 	/* An access here triggers a device read !*/
@@ -350,6 +372,15 @@ static WRITE8_HANDLER( peplus_duart_w )
 
 static WRITE8_HANDLER( peplus_cmos_w )
 {
+	char bank_name[5];
+
+	/* Test for Wingboard PAL Trigger Condition */
+	if (offset == 0x1fff && wingboard && data < 5)
+	{
+		sprintf(bank_name, "user%d", data + 1);
+		peplus_load_superdata(space->machine, bank_name);
+	}
+
 	cmos_ram[offset] = data;
 }
 
@@ -513,6 +544,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 	UINT8 coin_optics = 0x00;
     UINT8 coin_out = 0x00;
 	UINT64 curr_cycles = cpu_get_total_cycles(space->cpu);
+	UINT16 door_wait = 500;
 
 	UINT8 sda = 0;
 	if(!sda_dir)
@@ -555,7 +587,10 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 			break;
 	}
 
-	if (curr_cycles - last_door > 6000/12) { // Guessing with 6000
+	if (wingboard)
+		door_wait = 12345;
+
+	if (curr_cycles - last_door > door_wait) {
 		if ((input_port_read_safe(space->machine, "DOOR",0xff) & 0x01) == 0x01) {
 			door_open = (!door_open & 0x01);
 		} else {
@@ -603,10 +638,18 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int pr = palette_ram[tile_index];
+	int pr2 = palette_ram2[tile_index];
 	int vr = videoram[tile_index];
 
 	int code = ((pr & 0x0f)*256) | vr;
 	int color = (pr>>4) & 0x0f;
+
+	// Access 2nd Half of CGs and CAP
+	if (jumper_e16_e17 && (pr2 & 0x10) == 0x10)
+	{
+		code += 0x1000;
+		color += 0x10;
+	}
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -616,6 +659,8 @@ static VIDEO_START( peplus )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
 	palette_ram = auto_malloc(0x3000);
 	memset(palette_ram, 0, 0x3000);
+	palette_ram2 = auto_malloc(0x3000);
+	memset(palette_ram2, 0, 0x3000);
 }
 
 static VIDEO_UPDATE( peplus )
@@ -662,28 +707,12 @@ static PALETTE_INIT( peplus )
 }
 
 
-/*************************
-*    Graphics Layouts    *
-*************************/
-
-static const gfx_layout charlayout =
-{
-	8,8,    /* 8x8 characters */
-	0x1000, /* 4096 characters */
-	4,  /* 4 bitplanes */
-	{ 0x1000*8*8*3, 0x1000*8*8*2, 0x1000*8*8*1, 0x1000*8*8*0 }, /* bitplane offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 /******************************
 * Graphics Decode Information *
 ******************************/
 
 static GFXDECODE_START( peplus )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 16 )
+			GFXDECODE_ENTRY( "gfx1", 0x00000, gfx_8x8x4_planar, 0, 16 )
 GFXDECODE_END
 
 
@@ -751,6 +780,7 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	/* Ports start here */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_BASE(&io_port)
 ADDRESS_MAP_END
+
 
 /*************************
 *      Input ports       *
@@ -995,7 +1025,6 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_NVRAM_HANDLER(peplus)
 
 	// video hardware
-
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1003,7 +1032,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 
 	MDRV_GFXDECODE(peplus)
-	MDRV_PALETTE_LENGTH(16*16)
+	MDRV_PALETTE_LENGTH(16*16*2)
 
 	MDRV_MC6845_ADD("crtc", R6545_1, MC6845_CLOCK, mc6845_intf)
 
@@ -1012,7 +1041,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_VIDEO_UPDATE(peplus)
 
 	// sound hardware
-	MDRV_SOUND_ADD("ay", AY8912, 20000000/12)
+	MDRV_SOUND_ADD("ay", AY8912, SOUND_CLOCK)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
@@ -1040,24 +1069,31 @@ static void peplus_init(running_machine *machine)
 /* Normal board */
 static DRIVER_INIT( peplus )
 {
+	wingboard = FALSE;
+	jumper_e16_e17 = FALSE;
 	peplus_init(machine);
 }
 
 /* Superboard */
 static DRIVER_INIT( peplussb )
 {
-    UINT8 *super_data = memory_region(machine, "user1");
-
-    /* Distribute Superboard Data */
-    memcpy(s3000_ram, &super_data[0x3000], 0x1000);
-    memcpy(s5000_ram, &super_data[0x5000], 0x1000);
-    memcpy(s7000_ram, &super_data[0x7000], 0x1000);
-    memcpy(sb000_ram, &super_data[0xb000], 0x1000);
-    memcpy(sd000_ram, &super_data[0xd000], 0x1000);
-    memcpy(sf000_ram, &super_data[0xf000], 0x1000);
+	wingboard = FALSE;
+	jumper_e16_e17 = FALSE;
+	peplus_load_superdata(machine, "user1");
 
 	peplus_init(machine);
 }
+
+/* Superboard with Attached Wingboard */
+static DRIVER_INIT( peplussbw )
+{
+	wingboard = TRUE;
+	jumper_e16_e17 = TRUE;
+	peplus_load_superdata(machine, "user1");
+
+	peplus_init(machine);
+}
+
 
 /*************************
 *        Rom Load        *
@@ -1067,224 +1103,224 @@ ROM_START( peset038 ) /* Normal board : Set Chip (Set038) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "set038.u68",   0x00000, 0x10000, CRC(9c4b1d1a) SHA1(8a65cd1d8e2d74c7b66f4dfc73e7afca8458e979) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
 	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
 	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
 	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
 ROM_END
 
 ROM_START( pepp0065 ) /* Normal board : Jokers Wild Poker (PP0065) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "pp0065.u68",   0x00000, 0x10000, CRC(76c1a367) SHA1(ea8be9241e9925b5a4206db6875e1572f85fa5fe) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
 	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
 	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
 	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
 ROM_END
 
 ROM_START( pepp0158 ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "pp0158.u68",   0x00000, 0x10000, CRC(5976cd19) SHA1(6a461ea9ddf78dffa3cf8b65903ebf3127f23d45) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
 	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
 	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
 	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
 ROM_END
 
 ROM_START( pepp0188 ) /* Normal board : Standard Draw Poker (PP0188) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "pp0188.u68",   0x00000, 0x10000, CRC(cf36a53c) SHA1(99b578538ab24d9ff91971b1f77599272d1dbfc6) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
 	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
 	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
 	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
 ROM_END
 
 ROM_START( pepp0250 ) /* Normal board : Double Down Stud Poker (PP0250) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "pp0250.u68",   0x00000, 0x10000, CRC(4c919598) SHA1(fe73503c6ccb3c5746fb96be58cd5b740c819713) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
 	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
 	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
 	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
 ROM_END
 
 ROM_START( pepp0447 ) /* Normal board : Standard Draw Poker (PP0447) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "pp0447.u68",   0x00000, 0x10000, CRC(0ef0bb6c) SHA1(d0ef7a83417054f05d32d0a93ed0d5d618f4dfb9) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
 	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
 	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
 	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
 ROM_END
 
 ROM_START( pepp0516 ) /* Normal board : Double Bonus Poker (PP0516) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "pp0516.u68",   0x00000, 0x10000, CRC(d9da6e13) SHA1(421678d9cb42daaf5b21074cc3900db914dd26cf) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
 	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
 	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
 	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0200, CRC(8020b65f) SHA1(e280b11315acba88799d8875fb2980bee9d5e687) )
 ROM_END
 
 ROM_START( pebe0014 ) /* Normal board : Blackjack (BE0014) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "be0014.u68",   0x00000, 0x10000, CRC(232b32b7) SHA1(a3af9414577642fedc23b4c1911901cd31e9d6e0) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg2036.u72",	 0x00000, 0x8000, CRC(0a168d06) SHA1(7ed4fb5c7bcacab077bcec030f0465c6eaf3ce1c) )
 	ROM_LOAD( "mgo-cg2036.u73",	 0x08000, 0x8000, CRC(826b4090) SHA1(34390484c0faffe9340fd93d273b9292d09f97fd) )
 	ROM_LOAD( "mbo-cg2036.u74",	 0x10000, 0x8000, CRC(46aac851) SHA1(28d84b49c6cebcf2894b5a15d935618f84093caa) )
 	ROM_LOAD( "mxo-cg2036.u75",	 0x18000, 0x8000, CRC(60204a56) SHA1(2e3420da9e79ba304ca866d124788f84861380a7) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap707.u50", 0x0000, 0x0100, CRC(9851ba36) SHA1(5a0a43c1e212ae8c173102ede9c57a3d95752f99) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap707.u50", 0x0000, 0x0200, CRC(5bfeed62) SHA1(df47a2723a70a7c16fbf03b9f614e9b98751a59e) )
 ROM_END
 
 ROM_START( peke1012 ) /* Normal board : Keno (KE1012) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ke1012.u68",   0x00000, 0x10000, CRC(470e8c10) SHA1(f8a65a3a73477e9e9d2f582eeefa93b470497dfa) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE ) // BAD DUMPS
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) // BAD DUMPS
 	ROM_LOAD( "mro-cg1267.u72",	 0x00000, 0x8000, CRC(16498b57) SHA1(9c22726299af7204c4be1c6d8afc4c1b512ad918) )
 	ROM_LOAD( "mgo-cg1267.u73",	 0x08000, 0x8000, CRC(80847c5a) SHA1(8422cd13a91c3c462af5efcfca8615e7eeaa2e52) )
 	ROM_LOAD( "mbo-cg1267.u74",	 0x10000, 0x8000, CRC(ce7af8a7) SHA1(38675122c764b8fa9260246ea99ac0f0750da277) )
 	ROM_LOAD( "mxo-cg1267.u75",	 0x18000, 0x8000, CRC(3aac0d4a) SHA1(764da54bdb2f2c49551cf1d10286de9450abad2f) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap1267.u50", 0x0000, 0x0200, CRC(3dac264f) SHA1(e9c9de42ffd64d4463bee6fa10886a53bc062ff8) )
 ROM_END
 
 ROM_START( peps0014 ) /* Normal board : Super Joker Slots (PS0014) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ps0014.u68",   0x00000, 0x10000, CRC(368c3f58) SHA1(ebefcefbb5386659680719936bff72ad61087343) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg0916.u72",	 0x00000, 0x8000, CRC(d97049d9) SHA1(78f7bb33866ca92922a8b83d5f9ac459edd39176) )
 	ROM_LOAD( "mgo-cg0916.u73",	 0x08000, 0x8000, CRC(6e075788) SHA1(e8e9d8b7943d62e31d1d58f870bc765cba65c203) )
 	ROM_LOAD( "mbo-cg0916.u74",	 0x10000, 0x8000, CRC(a5cdf0f3) SHA1(23b2749fd2cb5b8462ce7c912005779b611f32f9) )
 	ROM_LOAD( "mxo-cg0916.u75",	 0x18000, 0x8000, CRC(1f3a2d72) SHA1(8e07324d436980b628e007d30a835757c1f70f6d) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap0916.u50", 0x0000, 0x0100, CRC(b9a5ee21) SHA1(d3c952f594baca9dc234602d90c506dd537c4dcc) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap0916.u50", 0x0000, 0x0200, CRC(c9a4f87c) SHA1(3c7c53fbf7573f07b334e0529bfd7ccf8d5339b5) )
 ROM_END
 
 ROM_START( peps0022 ) /* Normal board : Red White & Blue Slots (PS0022) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ps0022.u68",   0x00000, 0x10000, CRC(d65c0939) SHA1(d91f472a43f77f9df8845e97561540f988e522e3) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg0960.u72",	 0x00000, 0x8000, CRC(8c38c6fd) SHA1(5d6e9ac18b9b3f1253bba080bef1c067b2fdd7a8) )
 	ROM_LOAD( "mgo-cg0960.u73",	 0x08000, 0x8000, CRC(b4f44163) SHA1(1bc635a5160fdff2882c8362644aebf983a1a427) )
 	ROM_LOAD( "mbo-cg0960.u74",	 0x10000, 0x8000, CRC(8057e3a8) SHA1(5510872b1607daaf890603e76a8a47680e639e8e) )
 	ROM_LOAD( "mxo-cg0960.u75",	 0x18000, 0x8000, CRC(d57b4c25) SHA1(6ddfbaae87f9958642ddb95e581ac31e1dd55608) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap0960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap0960.u50", 0x0000, 0x0200, CRC(83d67070) SHA1(4c50abbe750dbd4a461084b0bfc51e38df97e421) )
 ROM_END
 
 ROM_START( peps0043 ) /* Normal board : Double Diamond Slots (PS0043) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ps0043.u68",   0x00000, 0x10000, CRC(d612429c) SHA1(95eb4774482a930066456d517fb2e4f67d4df4cb) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg1003.u72",	 0x00000, 0x8000, CRC(41ce0395) SHA1(ae90dbae30e4efed33f83ee7038fb2e5171c1945) )
 	ROM_LOAD( "mgo-cg1003.u73",	 0x08000, 0x8000, CRC(5a383fa1) SHA1(27b1febbdda7332e8d474fc0cca683f451a07090) )
 	ROM_LOAD( "mbo-cg1003.u74",	 0x10000, 0x8000, CRC(5ec00224) SHA1(bb70a4326cd1810b200e193a449061df62085f37) )
 	ROM_LOAD( "mxo-cg1003.u75",	 0x18000, 0x8000, CRC(2ffacd52) SHA1(38126ac4998806a1ddd55e6aa1942044240d41d0) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap1003.u50", 0x0000, 0x0100, CRC(cc400805) SHA1(f5ac48ad2a5df64da150f09f2ea5d910230bde56) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap1003.u50", 0x0000, 0x0200, CRC(1fb7b69f) SHA1(cdb609f39ef1ca0ddf389a599f799c269c7163f9) )
 ROM_END
 
 ROM_START( peps0045 ) /* Normal board : Red White & Blue Slots (PS0045) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ps0045.u68",   0x00000, 0x10000, CRC(de180b84) SHA1(0d592d7d535b0aacbd62c18ac222da770fab7b85) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg0960.u72",	 0x00000, 0x8000, CRC(8c38c6fd) SHA1(5d6e9ac18b9b3f1253bba080bef1c067b2fdd7a8) )
 	ROM_LOAD( "mgo-cg0960.u73",	 0x08000, 0x8000, CRC(b4f44163) SHA1(1bc635a5160fdff2882c8362644aebf983a1a427) )
 	ROM_LOAD( "mbo-cg0960.u74",	 0x10000, 0x8000, CRC(8057e3a8) SHA1(5510872b1607daaf890603e76a8a47680e639e8e) )
 	ROM_LOAD( "mxo-cg0960.u75",	 0x18000, 0x8000, CRC(d57b4c25) SHA1(6ddfbaae87f9958642ddb95e581ac31e1dd55608) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap0960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap0960.u50", 0x0000, 0x0200, CRC(83d67070) SHA1(4c50abbe750dbd4a461084b0bfc51e38df97e421) )
 ROM_END
 
 ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ps0308.u68",   0x00000, 0x10000, CRC(fe30e081) SHA1(d216cbc6336727caf359e6b178c856ab2659cabd) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg0911.u72",	 0x00000, 0x8000, CRC(48491b50) SHA1(9ec6d3ff34a08d40082a1347a46635838fd31afc) )
 	ROM_LOAD( "mgo-cg0911.u73",	 0x08000, 0x8000, CRC(c1ff7d97) SHA1(78ab138ae9c7f9b3352f9b1ef5fbc473993bb8c8) )
 	ROM_LOAD( "mbo-cg0911.u74",	 0x10000, 0x8000, CRC(202e0f9e) SHA1(51421dfd1b00a9e3b1e938d5bffaa3b7cd4c2b5e) )
 	ROM_LOAD( "mxo-cg0911.u75",	 0x18000, 0x8000, CRC(d97740a2) SHA1(d76926d7fbbc24d2384a1079cb97e654600b134b) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap0911.u50", 0x0000, 0x0100, CRC(f117e781) SHA1(ba9d850c93e5f3abc26b0ba51f67fa7c07e05f59) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap0911.u50", 0x0000, 0x0200, CRC(79dc19c0) SHA1(9ebf998b73c3390cbb957b3dd3fec57b3c70a06d) )
 ROM_END
 
 ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ps0615.u68",   0x00000, 0x10000, CRC(d27dd6ab) SHA1(b3f065f507191682edbd93b07b72ed87bf6ae9b1) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg2246.u72",	 0x00000, 0x8000, CRC(7c08c355) SHA1(2a154b81c6d9671cea55a924bffb7f5461747142) )
 	ROM_LOAD( "mgo-cg2246.u73",	 0x08000, 0x8000, CRC(b3c16487) SHA1(c97232fadd086f604eaeb3cd3c2d1c8fe0dcfa70) )
 	ROM_LOAD( "mbo-cg2246.u74",	 0x10000, 0x8000, CRC(e61331f5) SHA1(4364edc625d64151cbae40780b54cb1981086647) )
 	ROM_LOAD( "mxo-cg2246.u75",	 0x18000, 0x8000, CRC(f0f4a27d) SHA1(3a10ab196aeaa5b50d47b9d3c5b378cfadd6fe96) )
 
-	ROM_REGION( 0x100, "proms", 0 ) // WRONG CAP
-    ROM_LOAD( "cap0960.u50", 0x0000, 0x0100, CRC(00dd8d0a) SHA1(542763b12aeb0aec2b410f7c075c52907f45d171) )
+	ROM_REGION( 0x200, "proms", 0 ) // WRONG CAP
+    ROM_LOAD( "cap0960.u50", 0x0000, 0x0200, CRC(83d67070) SHA1(4c50abbe750dbd4a461084b0bfc51e38df97e421) )
 ROM_END
 
 ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) */
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "ps0716.u68",   0x00000, 0x10000, CRC(7615d7b6) SHA1(91fe62eec720a0dc2ebf48835065148f19499d16) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg2266.u72",	 0x00000, 0x8000, CRC(590accd8) SHA1(4e1c963c50799eaa49970e25ecf9cb01eb6b09e1) )
 	ROM_LOAD( "mgo-cg2266.u73",	 0x08000, 0x8000, CRC(b87ffa05) SHA1(92126b670b9cabeb5e2cc35b6e9c458088b18eea) )
 	ROM_LOAD( "mbo-cg2266.u74",	 0x10000, 0x8000, CRC(e3df30e1) SHA1(c7d2ae9a7c7e53bfb6197b635efcb5dc231e4fe0) )
 	ROM_LOAD( "mxo-cg2266.u75",	 0x18000, 0x8000, CRC(56271442) SHA1(61ad0756b9f6412516e46ef6625a4c3899104d4e) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap2266.u50", 0x0000, 0x0100, CRC(5aaff103) SHA1(9cfda9c095cb77a8bb761c131a0f358e79b97abc) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "cap2266.u50", 0x0000, 0x0200, CRC(ae8b52ac) SHA1(f58d40ee77d7f432dfe5f37954e43cab654c9a4c) )
 ROM_END
 
 ROM_START( pex2069p ) /* Superboard : Double Double Bonus Poker (X002069P) */
@@ -1294,14 +1330,14 @@ ROM_START( pex2069p ) /* Superboard : Double Double Bonus Poker (X002069P) */
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002069p.u66",   0x00000, 0x10000, CRC(875ecfcf) SHA1(80472cb43b36e518216e60a9b4883a81163718a2) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg2185.u77",	 0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
 	ROM_LOAD( "mgo-cg2185.u78",	 0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",	 0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",	 0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap1321.u43", 0x0000, 0x0100, CRC(1e19c0ff) SHA1(e48ebc4a3c88e8b8c9740841dac919e9bb2c4b7f) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
 ROM_START( pexp0019 ) /* Superboard : Deuces Wild Poker (XP000019) */
@@ -1311,14 +1347,14 @@ ROM_START( pexp0019 ) /* Superboard : Deuces Wild Poker (XP000019) */
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002025p.u66",   0x00000, 0x10000, CRC(f3dac423) SHA1(e9394d330deb3b8a1001e57e72a506cd9098f161) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg2185.u77",	 0x00000, 0x8000, CRC(7e64bd1a) SHA1(e988a380ee58078bf5bdc7747e83aed1393cfad8) )
 	ROM_LOAD( "mgo-cg2185.u78",	 0x08000, 0x8000, CRC(d4127893) SHA1(75039c45ba6fd171a66876c91abc3191c7feddfc) )
 	ROM_LOAD( "mbo-cg2185.u79",	 0x10000, 0x8000, CRC(17dba955) SHA1(5f77379c88839b3a04e235e4fb0120c77e17b60e) )
 	ROM_LOAD( "mxo-cg2185.u80",	 0x18000, 0x8000, CRC(583eb3b1) SHA1(4a2952424969917fb1594698a779fe5a1e99bff5) )
 
-	ROM_REGION( 0x100, "proms", 0 ) // WRONG CAP
-	ROM_LOAD( "cap2234.u43", 0x0000, 0x0100, CRC(a930e283) SHA1(61bce50fa13b3e980ece3e72d068835e19bd5049) )
+	ROM_REGION( 0x200, "proms", 0 ) // WRONG CAP
+	ROM_LOAD( "capx2234.u43", 0x0000, 0x0200, CRC(519000fa) SHA1(31cd72643ca74a778418f944045e9e03937143d6) )
 ROM_END
 
 ROM_START( pexp0112 ) /* Superboard : White Hot Aces Poker (XP000112) */
@@ -1328,14 +1364,14 @@ ROM_START( pexp0112 ) /* Superboard : White Hot Aces Poker (XP000112) */
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x002035p.u66",   0x00000, 0x10000, CRC(dc3f0742) SHA1(d57cf3353b81f41895458019e47203f98645f17a) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg2324.u77",	 0x00000, 0x8000, CRC(6eceef42) SHA1(a2ddd2a3290c41e510f483c6b633fe0002694d0b) )
 	ROM_LOAD( "mgo-cg2324.u78",	 0x08000, 0x8000, CRC(26d0acbe) SHA1(09a9127deb88185cd5b748bac657461eadb2f48f) )
 	ROM_LOAD( "mbo-cg2324.u79",	 0x10000, 0x8000, CRC(47baee32) SHA1(d8af09022ccb5fc06aa3aa4c200a734b66cbee00) )
 	ROM_LOAD( "mxo-cg2324.u80",	 0x18000, 0x8000, CRC(60449fc0) SHA1(251d1e04786b70c1d2bc7b02f3b69cd58ac76398) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap2174.u43", 0x0000, 0x0100, CRC(cbff3f26) SHA1(9e145676f2871c2369042a13cbeabb7efe2728e1) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
 ROM_END
 
 ROM_START( pexs0006 ) /* Superboard : Triple Triple Diamond Slots (XS000006) */
@@ -1345,14 +1381,14 @@ ROM_START( pexs0006 ) /* Superboard : Triple Triple Diamond Slots (XS000006) */
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000998s.u66",   0x00000, 0x10000, CRC(e29d4346) SHA1(93901ff65c8973e34ac1f0dd68bb4c4973da5621) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg2361.u77",	 0x00000, 0x8000, CRC(c0eba866) SHA1(8f217aeb3e8028a5633d95e5612f1b55e601650f) )
 	ROM_LOAD( "mgo-cg2361.u78",	 0x08000, 0x8000, CRC(345eaea2) SHA1(18ebb94a323e1cf671201db8b9f85d4f30d8b5ec) )
 	ROM_LOAD( "mbo-cg2361.u79",	 0x10000, 0x8000, CRC(fa130af6) SHA1(aca5e52e00bc75a4801fd3f6c564e62ed4251d8e) )
 	ROM_LOAD( "mxo-cg2361.u80",	 0x18000, 0x8000, CRC(7de1812c) SHA1(c7e23a10f20fc8b618df21dd33ac456e1d2cfe33) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap2361.u43", 0x0000, 0x0100, CRC(051aea66) SHA1(2abf32caaeb821ca50a6398581de69bbfe5930e9) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2361.u43", 0x0000, 0x0200, CRC(93057296) SHA1(534bbf8ee80a22822d577f6685501f4c929987ef) )
 ROM_END
 
 ROM_START( pexmp006 ) /* Superboard : Multi-Poker (XMP00006) */
@@ -1362,15 +1398,41 @@ ROM_START( pexmp006 ) /* Superboard : Multi-Poker (XMP00006) */
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "xm00002p.u66",   0x00000, 0x10000, CRC(96cf471c) SHA1(9597bf6a80c392ee22dc4606db610fdaf032377f) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg2174.u77",	 0x00000, 0x8000, CRC(bb666733) SHA1(dcaa1980b051a554cb0f443b1183a680edc9ad3f) )
 	ROM_LOAD( "mgo-cg2174.u78",	 0x08000, 0x8000, CRC(cc46adb0) SHA1(6065aa5dcb9091ad80e499c7ee6dc629e79c865a) )
 	ROM_LOAD( "mbo-cg2174.u79",	 0x10000, 0x8000, CRC(7291a0c8) SHA1(1068f35e6ef5fd88c584922860231840a90fb623) )
 	ROM_LOAD( "mxo-cg2174.u80",	 0x18000, 0x8000, CRC(14f9480c) SHA1(59323f9fc5995277aea86d088893b6eb95b4e89b) )
 
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap2174.u43", 0x0000, 0x0100, CRC(cbff3f26) SHA1(9e145676f2871c2369042a13cbeabb7efe2728e1) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
 ROM_END
+
+ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "xmp00017.u67",   0x00000, 0x10000, CRC(129e6eaa) SHA1(1dd2b83a672a618f338b553a6cbd598b6d4ce672) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x000055p.u66",   0x00000, 0x10000, CRC(e06819df) SHA1(36590c4588b8036908e63714fbb3e77d23e60eae) )
+	ROM_REGION( 0x10000, "user2", 0 )
+	ROM_LOAD( "x000188p.u66",   0x00000, 0x10000, CRC(3eb7580e) SHA1(86f2280542fb8a55767efd391d0fb04a12ed9408) )
+	ROM_REGION( 0x10000, "user3", 0 )
+	ROM_LOAD( "x000581p.u66",   0x00000, 0x10000, CRC(a4cfecc3) SHA1(b2c805781ba43bda9e208d8c16578dc96b6f58f7) )
+	ROM_REGION( 0x10000, "user4", 0 )
+	ROM_LOAD( "x000727p.u66",   0x00000, 0x10000, CRC(4828474c) SHA1(9836b76113a71802df30ca15f7c9a5790e6f1c5b) )
+	ROM_REGION( 0x10000, "user5", 0 )
+	ROM_LOAD( "x002036p.u66",   0x00000, 0x10000, CRC(69207baf) SHA1(fe038b969106ae5cdc8dde1c06497be9c7b5b8bf) )
+
+	ROM_REGION( 0x040000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg2298.u77",	 0x00000, 0x10000, CRC(8c35dc7f) SHA1(90e9566e816287e6248d7cab318dee3ad6fac871) )
+	ROM_LOAD( "mgo-cg2298.u78",	 0x10000, 0x10000, CRC(3663174a) SHA1(c203a4a59f6bc1625d47f35426ffc5b4d279251a) )
+	ROM_LOAD( "mbo-cg2298.u79",	 0x20000, 0x10000, CRC(9088cdbe) SHA1(dc62951c584463a1e795a774f5752f890d8e3f65) )
+	ROM_LOAD( "mxo-cg2298.u80",	 0x30000, 0x10000, CRC(8d3aafc8) SHA1(931bc82398b94c63ed9f6f1bd95723aa801894cc) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
@@ -1411,6 +1473,9 @@ GAMEL(1995, pexp0112, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - Int
 
 /* Superboard : multi-poker */
 GAMEL(1995, pexmp006, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XMP00006) Multi-Poker",                 0,   layout_pe_poker )
+
+/* Superboard : multi-poker (wingboard) */
+GAMEL(1995, pexmp017, 0,      peplus,  peplus_poker, peplussbw,ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard",            0,   layout_pe_poker )
 
 /* Superboard : slots machine */
 GAMEL(1997, pexs0006, 0,      peplus,  peplus_slots, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XS000006) Triple Triple Diamond Slots", 0,   layout_pe_slots )

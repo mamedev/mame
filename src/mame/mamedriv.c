@@ -8417,6 +8417,7 @@ Other Sun games
 	DRIVER( pexp0112 )	/* (c) 1995 IGT - International Gaming Technology */
 	DRIVER( pexs0006 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( pexmp006 )	/* (c) 1997 IGT - International Gaming Technology */
+	DRIVER( pexmp017 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
 	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
