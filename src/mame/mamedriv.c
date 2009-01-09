@@ -8367,7 +8367,7 @@ Other Sun games
 	DRIVER( destryea )	/* (c) 1981 Cidelsa */
 	DRIVER( draco )		/* (c) 1981 Cidelsa */
 	DRIVER( rockduck )	/* (c) 1983 Datel SAS */
-	DRIVER( tetriunk )
+	DRIVER( tetriskr )	/* (c) 1988? bootleg */
 	DRIVER( smstrv )	/* (c) 1984 SMS MFG CORP */
 	DRIVER( skylncr )	/* (c) 1995 Bordun International */
 	DRIVER( butrfly )	/* (c) 1995 Bordun International */

@@ -1,19 +1,29 @@
 /******************************************************************************************
 
-Filetto (c) 1990 Novarmatic
+PC-XT (c) 1987 IBM
+
+(Actually Arcade games running on more or less modified PC-XT HW)
 
 driver by Angelo Salese & Chris Hardy
+original tetriunk.c by David Haywood & Tomasz Slanina
+
+Notes:
+- The Korean Tetris is a blantant rip-off of the Mirrorsoft/Andromeda Software Tetris PC
+  version;
 
 TODO:
-- Use the MESS implementation of the CGA video emulation;
-- Add a proper FDC device,if you enable it will give a boot error,probably because it
+- EGA/CGA/VGA emulation uses the bare minimum for these games,there are still a lot of
+  features that needs to be added;
+- Filetto: Add a proper FDC device,if you enable it will give a boot error,probably because it
   expects that in the floppy drive shouldn't be anything,there's currently a kludge that
   does the trick;
-- Add sound,"buzzer" PC sound plus the UM5100 sound chip,might be connected to the
+- Filetto: Add sound,"buzzer" PC sound plus the UM5100 sound chip ,might be connected to the
   prototyping card;
+- Korean Tetris: Add the aforementioned "buzzer" plus identify if there's any kind of sound
+  chip on it;
 
 ********************************************************************************************
-HW notes:
+Filetto HW notes:
 The PCB is a un-modified IBM-PC with a CGA adapter & a prototyping card that controls the
 interface between the pc and the Jamma connectors.Additionally there's also a UM5100 sound
 chip for the sound.
@@ -29,7 +39,7 @@ PCB Contents:
 1x UMC 8936CS-UM8250B Programmable asynchronous communications element (lower board)
 There isn't any keyboard found connected to the pcb.
 ********************************************************************************************
-SW notes:
+Filetto SW notes:
 The software of this game can be extracted with a normal Windows program extractor.
 The files names are:
 -command.com  (1)
@@ -46,21 +56,6 @@ main program (x.exe).
 (4)The main program,done in plain Basic with several Italian comments in it.The date of
 the main program is 9th October 1990.
 
-********************************************************************************************
-Vector & irq notes (Mainly a memo for me):
-
-7c69 -> int $13 (FDC check),done
-7c6c
-16ef9 -> read dsw
-159cd []
-[2361c]
-12eae
-int $10 (vector number 0x0040) cmds
-AH
-0x00 - Set Video mode ($449)
-0x01 -
-0x02 - Set Cursor position (BH=$00 IP=$ff71b DX=$0600)
-0x0e - Teletype output (IP=$7d3c) (Note: This types "Errore di Boot")
 ******************************************************************************************/
 
 #include "driver.h"
@@ -72,6 +67,7 @@ AH
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
 #include "sound/hc55516.h"
+#include "sound/beep.h"
 
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
@@ -88,6 +84,7 @@ static UINT8 *vga_vram,*work_ram;
 static UINT8 video_regs[0x19];
 static UINT8 *vga_mode;
 static UINT8 hv_blank;
+static UINT8 *vga_bg_bank;
 
 static int bank;
 static int lastvalue;
@@ -98,9 +95,13 @@ static int lastvalue;
 #define RES_320x200 0
 #define RES_640x200 1
 
-static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs);
+static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs,UINT8 gfx_num);
 
 static VIDEO_START( filetto )
+{
+}
+
+static VIDEO_START( tetriskr )
 {
 }
 
@@ -128,11 +129,11 @@ static READ8_HANDLER( vga_hvretrace_r )
 	return res;
 }
 
-//Note: this should be converted to red/green/brown instead of magenta/cyan/white
 /*Basic Graphic mode */
+/*TODO: non-black colours should use the bright versions*/
 static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
 {
-	static UINT16 x,y,pen = 0;
+	static UINT16 x,y;
 	static UINT32 offs;
 
 	SET_VISIBLE_AREA(320,200);
@@ -140,38 +141,10 @@ static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const r
 	for(y=0;y<200;y+=2)
 		for(x=0;x<320;x+=4)
 		{
-			switch((vga_vram[offs] & 0xc0) >> 6)
-			{
-				case 0: pen = 0xf0; break;
-				case 1: pen = 0xfb; break;
-				case 2: pen = 0xfd; break;
-				case 3: pen = 0xff; break;
-			}
-			*BITMAP_ADDR16(bitmap, y, x) = pen;
-			switch((vga_vram[offs] & 0x30) >> 4)
-			{
-				case 0: pen = 0xf0; break;
-				case 1: pen = 0xfb; break;
-				case 2: pen = 0xfd; break;
-				case 3: pen = 0xff; break;
-			}
-			*BITMAP_ADDR16(bitmap, y, x+1) = pen;
-			switch((vga_vram[offs] & 0x0c) >> 2)
-			{
-				case 0: pen = 0xf0; break;
-				case 1: pen = 0xfb; break;
-				case 2: pen = 0xfd; break;
-				case 3: pen = 0xff; break;
-			}
-			*BITMAP_ADDR16(bitmap, y, x+2) = pen;
-			switch((vga_vram[offs] & 0x03) >> 0)
-			{
-				case 0: pen = 0xf0; break;
-				case 1: pen = 0xfb; break;
-				case 2: pen = 0xfd; break;
-				case 3: pen = 0xff; break;
-			}
-			*BITMAP_ADDR16(bitmap, y, x+3) = pen;
+			*BITMAP_ADDR16(bitmap, y, x+0) = machine->pens[0x200+(((vga_vram[offs] & 0xc0)>>6)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+1) = machine->pens[0x200+(((vga_vram[offs] & 0x30)>>4)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+2) = machine->pens[0x200+(((vga_vram[offs] & 0x0c)>>2)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+3) = machine->pens[0x200+(((vga_vram[offs] & 0x03)>>0)<<1)];
 			offs++;
 		}
 
@@ -179,38 +152,10 @@ static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const r
 	for(y=1;y<200;y+=2)
 		for(x=0;x<320;x+=4)
 		{
-			switch((vga_vram[offs] & 0xc0) >> 6)
-			{
-				case 0: pen = 0xf0; break;
-				case 1: pen = 0xfb; break;
-				case 2: pen = 0xfd; break;
-				case 3: pen = 0xff; break;
-			}
-			*BITMAP_ADDR16(bitmap, y, x) = pen;
-			switch((vga_vram[offs] & 0x30) >> 4)
-			{
-				case 0: pen = 0xf0; break;
-				case 1: pen = 0xfb; break;
-				case 2: pen = 0xfd; break;
-				case 3: pen = 0xff; break;
-			}
-			*BITMAP_ADDR16(bitmap, y, x+1) = pen;
-			switch((vga_vram[offs] & 0x0c) >> 2)
-			{
-				case 0: pen = 0xf0; break;
-				case 1: pen = 0xfb; break;
-				case 2: pen = 0xfd; break;
-				case 3: pen = 0xff; break;
-			}
-			*BITMAP_ADDR16(bitmap, y, x+2) = pen;
-			switch((vga_vram[offs] & 0x03) >> 0)
-			{
-				case 0: pen = 0xf0; break;
-				case 1: pen = 0xfb; break;
-				case 2: pen = 0xfd; break;
-				case 3: pen = 0xff; break;
-			}
-			*BITMAP_ADDR16(bitmap, y, x+3) = pen;
+			*BITMAP_ADDR16(bitmap, y, x+0) = machine->pens[0x200+(((vga_vram[offs] & 0xc0)>>6)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+1) = machine->pens[0x200+(((vga_vram[offs] & 0x30)>>4)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+2) = machine->pens[0x200+(((vga_vram[offs] & 0x0c)>>2)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+3) = machine->pens[0x200+(((vga_vram[offs] & 0x03)>>0)<<1)];
 			offs++;
 		}
 
@@ -218,7 +163,7 @@ static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const r
 
 
 
-static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
+static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs,UINT8 gfx_num)
 {
 	static UINT32 offs,x,y,max_x,max_y;
 
@@ -243,14 +188,14 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 		for(x=0;x<max_x;x++)
 		{
 			int tile =  vga_vram[offs] & 0xff;
-			int color = vga_vram[offs+1] & 0x0f;
+			int color = vga_vram[offs+1] & 0xff;
 
-			drawgfx(bitmap,machine->gfx[2],
+			drawgfx(bitmap,machine->gfx[gfx_num],
 					tile,
 					color,
 					0,0,
 					x*8,y*8,
-					cliprect,TRANSPARENCY_NONE,0);
+					cliprect,((color & 0xf0) != 0) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
 
 			offs+=2;
 		}
@@ -277,10 +222,57 @@ static VIDEO_UPDATE( filetto )
 			switch(vga_mode[0] & 1)
 			{
 				case 0x00:
-					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_320x200,0x18000);
+					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_320x200,0x18000,2);
 					break;
 				case 0x01:
-					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_640x200,0x18000);
+					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_640x200,0x18000,2);
+					break;
+			}
+		}
+	}
+
+	return 0;
+}
+
+static void vga_bitmap_layer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+{
+	int x,y,z;
+	UINT8 *region = memory_region(machine, "user1");
+	static UINT32 cur_bank;
+
+	/*TODO: might be a different descramble algorythm plus plain bg bank*/
+	cur_bank = (((8-vga_bg_bank[0]) & 0x1f)*0x10000);
+
+	for(y=0;y<200;y+=8)
+	{
+		for(z=0;z<8;z++)
+		for(x=0;x<320;x++)
+		{
+			*BITMAP_ADDR16(bitmap, y+z, x) = 0x200+(region[(y*320/8)+x+z*0x2000+cur_bank+8] & 0xf);
+		}
+	}
+}
+
+/*S3 Video card,VGA*/
+static VIDEO_UPDATE( tetriskr )
+{
+	bitmap_fill(bitmap, cliprect, 0);
+
+	if(vga_mode[0] & 8)
+	{
+		if(vga_mode[0] & 2)
+			cga_graphic_bitmap(screen->machine,bitmap,cliprect,0,0x18000);
+		else
+		{
+			vga_bitmap_layer(screen->machine,bitmap,cliprect);
+
+			switch(vga_mode[0] & 1)
+			{
+				case 0x00:
+					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_320x200,0x18000,0);
+					break;
+				case 0x01:
+					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_640x200,0x18000,0);
 					break;
 			}
 		}
@@ -458,11 +450,16 @@ static READ8_DEVICE_HANDLER( port_c_r )
 }
 
 /*'buzzer' sound routes here*/
+/* Filetto uses this for either beep and um5100 sound routing,probably there's a mux somewhere.*/
+/* The Korean Tetris uses it as a regular buzzer,probably the sound is all in there...*/
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	port_b_data = data;
 //  hc55516_digit_w(0, data);
-//  popmessage("%02x",data);
+//	popmessage("%02x\n",data);
+//	beep_set_state(0, 0);
+//	beep_set_state(0, 1);
+//	beep_set_frequency(0, port_b_data);
 }
 
 static WRITE8_DEVICE_HANDLER( wss_1_w )
@@ -660,12 +657,13 @@ static ADDRESS_MAP_START( filetto_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //irq vectors
 	AM_RANGE(0x00400, 0x007ff) AM_RAM AM_BASE(&work_ram)
 	AM_RANGE(0x00800, 0x9ffff) AM_RAM //work RAM 640KB
-	AM_RANGE(0xa0000, 0xbffff) AM_READWRITE(SMH_RAM,vga_vram_w) AM_BASE(&vga_vram)//VGA RAM
+	AM_RANGE(0xa0000, 0xbffff) AM_RAM_WRITE(vga_vram_w) AM_BASE(&vga_vram)//VGA RAM
 	AM_RANGE(0xc0000, 0xcffff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237_1", dma8237_r, dma8237_w ) //8237 DMA Controller
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE(PIC8259, "pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)    //8253 PIT
@@ -681,6 +679,39 @@ static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
+	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
+	AM_RANGE(0x03b4, 0x03b5) AM_READWRITE(vga_regs_r,vga_regs_w) //various VGA/CGA/EGA regs
+	AM_RANGE(0x03d4, 0x03d5) AM_READWRITE(vga_regs_r,vga_regs_w) //mirror of above
+	AM_RANGE(0x03d8, 0x03d9) AM_RAM AM_BASE(&vga_mode)
+	AM_RANGE(0x03ba, 0x03bb) AM_READ(vga_hvretrace_r)//Controls H-Blank/V-Blank
+	AM_RANGE(0x03da, 0x03db) AM_READ(vga_hvretrace_r)//mirror of above
+	AM_RANGE(0x03f2, 0x03f2) AM_WRITE(drive_selection_w)
+	AM_RANGE(0x03f4, 0x03f4) AM_READ(fdc765_status_r) //765 Floppy Disk Controller (FDC) Status
+	AM_RANGE(0x03f5, 0x03f5) AM_READWRITE(fdc765_data_r,fdc765_data_w)//FDC Data
+	AM_RANGE(0x03f8, 0x03ff) AM_RAM //rs232c (serial) port
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tetriskr_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237_1", dma8237_r, dma8237_w ) //8237 DMA Controller
+	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE(PIC8259, "pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)    //8253 PIT
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,mc146818_port_w)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE(PIC8259, "pic8259_2", pic8259_r, pic8259_w )
+  	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
+//	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("IN1") //game port
+	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
+	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
+//	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
+//	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
+	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
+	AM_RANGE(0x03c0, 0x03c0) AM_RAM AM_BASE(&vga_bg_bank)
+	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
+	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
+//	AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1")
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
 	AM_RANGE(0x03b4, 0x03b5) AM_READWRITE(vga_regs_r,vga_regs_w) //various VGA/CGA/EGA regs
 	AM_RANGE(0x03d4, 0x03d5) AM_READWRITE(vga_regs_r,vga_regs_w) //mirror of above
@@ -727,6 +758,46 @@ static INPUT_PORTS_START( filetto )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tetriskr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) //probably unused
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START("IN1") //dip-switches?
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static const gfx_layout dos_chars =
 {
 	8,16,
@@ -751,9 +822,13 @@ static const gfx_layout dos_chars2 =
 };
 
 static GFXDECODE_START( filetto )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, dos_chars,    0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x1000, dos_chars2,   0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0x1800, dos_chars2,   0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, dos_chars,    0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, dos_chars2,   0, 0x100 )
+	GFXDECODE_ENTRY( "gfx1", 0x1800, dos_chars2,   0, 0x100 )
+GFXDECODE_END
+
+static GFXDECODE_START( tetriskr )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, dos_chars2,   0, 0x100 )
 GFXDECODE_END
 
 
@@ -768,49 +843,50 @@ BROWN = 6
 LIGHT GRAY = 7
 */
 
+static const rgb_t defcolors[]=
+{
+	MAKE_RGB(0x00,0x00,0x00),
+	MAKE_RGB(0x00,0x00,0xaa),
+	MAKE_RGB(0x00,0xaa,0x00),
+	MAKE_RGB(0x00,0xaa,0xaa),
+	MAKE_RGB(0xaa,0x00,0x00),
+	MAKE_RGB(0xaa,0x00,0xaa),
+	MAKE_RGB(0xaa,0xaa,0x00),
+	MAKE_RGB(0xaa,0xaa,0xaa),
+	MAKE_RGB(0x55,0x55,0x55),
+	MAKE_RGB(0x55,0x55,0xff),
+	MAKE_RGB(0x55,0xff,0x55),
+	MAKE_RGB(0x55,0xff,0xff),
+	MAKE_RGB(0xff,0x55,0x55),
+	MAKE_RGB(0xff,0x55,0xff),
+	MAKE_RGB(0xff,0xff,0x55),
+	MAKE_RGB(0xff,0xff,0xff)
+};
+
 static PALETTE_INIT(filetto)
 {
 	/*Note:palette colors are 6bpp...
     xxxx xx--
     */
-	int i;
+	int ix,iy;
 
-	for(i=0;i<0x100;i++)
-		palette_set_color(machine, i,MAKE_RGB(0x00,0x00,0x00));
+	for(ix=0;ix<0x300;ix++)
+		palette_set_color(machine, ix,MAKE_RGB(0x00,0x00,0x00));
 
-	palette_set_color(machine, 0+2,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine, 1+2,MAKE_RGB(0x00,0x00,0x9f));
-	palette_set_color(machine, 3+2,MAKE_RGB(0x00,0x9f,0x00));
-	palette_set_color(machine, 5+2,MAKE_RGB(0x00,0x9f,0x9f));
-	palette_set_color(machine, 7+2,MAKE_RGB(0x9f,0x00,0x00));
-	palette_set_color(machine, 9+2,MAKE_RGB(0x9f,0x00,0x9f));
-	palette_set_color(machine, 11+2,MAKE_RGB(0x9f,0x9f,0x00));
-	palette_set_color(machine, 13+2,MAKE_RGB(0x9f,0x9f,0x9f));
-	palette_set_color(machine, 15+2,MAKE_RGB(0x3f,0x3f,0x3f));
-	palette_set_color(machine, 17+2,MAKE_RGB(0x3f,0x3f,0xff));
-	palette_set_color(machine, 19+2,MAKE_RGB(0x3f,0xff,0x3f));
-	palette_set_color(machine, 21+2,MAKE_RGB(0x3f,0xff,0xff));
-	palette_set_color(machine, 23+2,MAKE_RGB(0xff,0x3f,0x10));
-	palette_set_color(machine, 25+2,MAKE_RGB(0xff,0x3f,0xff));
-	palette_set_color(machine, 27+2,MAKE_RGB(0xff,0xff,0x3f));
-	palette_set_color(machine, 29+2,MAKE_RGB(0xff,0xff,0xff));
+	//regular colors
+	for(iy=0;iy<0x10;iy++)
+	{
+		for(ix=0;ix<0x10;ix++)
+		{
+			palette_set_color(machine,(ix*2)+1+(iy*0x20),defcolors[ix]);
+			palette_set_color(machine,(ix*2)+0+(iy*0x20),defcolors[iy]);
+		}
+	}
 
-	palette_set_color(machine, 0xf0,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine, 0xf1,MAKE_RGB(0x00,0x00,0xaa));
-	palette_set_color(machine, 0xf2,MAKE_RGB(0x00,0xaa,0x00));
-	palette_set_color(machine, 0xf3,MAKE_RGB(0x00,0xaa,0xaa));
-	palette_set_color(machine, 0xf4,MAKE_RGB(0xaa,0x00,0x00));
-	palette_set_color(machine, 0xf5,MAKE_RGB(0xaa,0x00,0xaa));
-	palette_set_color(machine, 0xf6,MAKE_RGB(0xaa,0xaa,0x00));
-	palette_set_color(machine, 0xf7,MAKE_RGB(0xaa,0xaa,0xaa));
-	palette_set_color(machine, 0xf8,MAKE_RGB(0x55,0x55,0x55));
-	palette_set_color(machine, 0xf9,MAKE_RGB(0x55,0x55,0xff));
-	palette_set_color(machine, 0xfa,MAKE_RGB(0x55,0xff,0x55));
-	palette_set_color(machine, 0xfb,MAKE_RGB(0x55,0xff,0xff));
-	palette_set_color(machine, 0xfc,MAKE_RGB(0xff,0x55,0x55));
-	palette_set_color(machine, 0xfd,MAKE_RGB(0xff,0x55,0xff));
-	palette_set_color(machine, 0xfe,MAKE_RGB(0xff,0xff,0x55));
-	palette_set_color(machine, 0xff,MAKE_RGB(0xff,0xff,0xff));
+	//bitmap mode
+	for(ix=0;ix<0x10;ix++)
+		palette_set_color(machine, 0x200+ix,defcolors[ix]);
+	//todo: 256 colors
 }
 
 static MACHINE_RESET( filetto )
@@ -827,7 +903,7 @@ static MACHINE_RESET( filetto )
 }
 
 static MACHINE_DRIVER_START( filetto )
-	MDRV_CPU_ADD("main", I8088, 8000000)
+	MDRV_CPU_ADD("main", I8088, 8000000) //or regular PC-XT 14318180/3 clock?
 	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
 	MDRV_CPU_IO_MAP(filetto_io,0)
 
@@ -853,7 +929,7 @@ static MACHINE_DRIVER_START( filetto )
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 480-1)
 
-	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(0x300)
 
 	MDRV_PALETTE_INIT(filetto)
 
@@ -867,8 +943,51 @@ static MACHINE_DRIVER_START( filetto )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 //  PC "buzzer" sound
+	MDRV_SOUND_ADD("beep", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( tetriskr )
+	MDRV_CPU_ADD("main", I8088, 14318180/3)
+	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
+	MDRV_CPU_IO_MAP(tetriskr_io,0)
+
+	MDRV_MACHINE_RESET( filetto )
+
+	MDRV_PIT8253_ADD( "pit8253", pc_pit8253_config )
+
+	MDRV_PPI8255_ADD( "ppi8255_0", filetto_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", filetto_ppi8255_intf[1] )
+
+	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
+
+	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
+
+	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
+
+	MDRV_GFXDECODE(tetriskr)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 480-1)
+
+	MDRV_PALETTE_LENGTH(0x300)
+
+	MDRV_PALETTE_INIT(filetto)
+
+	MDRV_VIDEO_START(tetriskr)
+	MDRV_VIDEO_UPDATE(tetriskr)
+
+	/*Sound Hardware*/
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+//  PC "buzzer" sound
+	MDRV_SOUND_ADD("beep", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+MACHINE_DRIVER_END
 
 ROM_START( filetto )
 	ROM_REGION( 0x100000, "main", 0 )
@@ -895,10 +1014,58 @@ ROM_START( filetto )
 	ROM_LOAD16_BYTE("v2.u14",  0x00001, 0x20000, CRC(427e012e) SHA1(50514a6307e63078fe7444a96e39d834684db7df) )
 ROM_END
 
+ROM_START( tetriskr )
+	ROM_REGION( 0x100000, "main", 0 ) /* code */
+	ROM_LOAD( "b-10.u10", 0xf0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
+
+	ROM_REGION( 0x10000, "gfx1",0 ) /* gfx - 1bpp font*/
+	ROM_LOAD( "b-3.u36", 0x00000, 0x2000, CRC(1a636f9a) SHA1(a356cc57914d0c9b9127670b55d1f340e64b1ac9) )
+
+	ROM_REGION( 0x80000, "gfx2",ROMREGION_INVERT )
+	ROM_LOAD( "b-1.u59", 0x00000, 0x10000, CRC(4719d986) SHA1(6e0499944b968d96fbbfa3ead6237d69c769d634))
+	ROM_LOAD( "b-2.u58", 0x10000, 0x10000, CRC(599e1154) SHA1(14d99f90b4fedeab0ac24ffa9b1fd9ad0f0ba699))
+	ROM_LOAD( "b-4.u54", 0x20000, 0x10000, CRC(e112c450) SHA1(dfdecfc6bd617ec520b7563b7caf44b79d498bd3))
+	ROM_LOAD( "b-5.u53", 0x30000, 0x10000, CRC(050b7650) SHA1(5981dda4ed43b6e81fbe48bfba90a8775d5ecddf))
+	ROM_LOAD( "b-6.u49", 0x40000, 0x10000, CRC(d596ceb0) SHA1(8c82fb638688971ef11159a6b240253e63f0949d))
+	ROM_LOAD( "b-7.u48", 0x50000, 0x10000, CRC(79336b6c) SHA1(7a95875f3071bdc3ee25c0e6a5a3c00ef02dc977))
+	ROM_LOAD( "b-8.u44", 0x60000, 0x10000, CRC(1f82121a) SHA1(106da0f39f1260d0761217ed0a24c1611bfd7f05))
+	ROM_LOAD( "b-9.u43", 0x70000, 0x10000, CRC(4ea22349) SHA1(14dfd3dbd51f8bd6f3290293b8ea1c165e8cf7fd))
+
+	ROM_REGION( 0x180000, "user1", ROMREGION_ERASEFF )
+	// copy for the gfx2,to be made with the DRIVER_INIT
+ROM_END
+
 static DRIVER_INIT( filetto )
 {
 	//...
 }
 
-GAME( 1990, filetto,    0, filetto,    filetto,   filetto, ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_NO_SOUND | GAME_IMPERFECT_COLORS)
+/*Descramble the background gfx data.*/
+static DRIVER_INIT( tetriskr )
+{
+	int i,j,k;
+	int index=0;
+	UINT8 *region = memory_region(machine, "user1");
+	UINT8 *gfx = memory_region(machine, "gfx2");
 
+	for(i=0;i<0x20000;i++)
+	{
+		//8 pixels/byte
+		for(j=0;j<8;j++)
+		{
+			int mask=(1<<(7-j));
+			int pixel=0;
+			for(k=0;k<4;k++)
+			{
+				if(gfx[k*0x20000+i]&mask)
+				{
+					pixel|=(1<<k);
+				}
+			}
+			region[index++]=pixel;
+		}
+	}
+}
+
+GAME( 1990, filetto,  0, filetto,  filetto,  filetto,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS)
+GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, tetriskr, ROT0,  "bootleg",    "Tetris  (bootleg of Mirrorsoft PC-XT Tetris version)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS)
