@@ -1461,7 +1461,7 @@ ROM_START( sidebs2j )
 	ROM_LOAD( "e17-23.65",  0x000000, 0x010000, CRC(80ac1428) SHA1(5a2a1e60a11ecdb8743c20ddacfb61f9fd00f01c) )
 
 	ROM_REGION( 0x00080, "user2", 0 )		/* eeprom */
-	ROM_LOAD( "93c46.87",  0x000000, 0x000080, CRC(50fdcce0) SHA1(6e901856755ccdcf478a457c510c0de58683216a) )
+	ROM_LOAD( "japan-93c46.87",  0x000000, 0x000080, CRC(50fdcce0) SHA1(6e901856755ccdcf478a457c510c0de58683216a) ) /* No specific label but different defaults */
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )
 	ROM_LOAD32_WORD( "e38-05.9",  0x0800002, 0x200000, CRC(bda366bf) SHA1(a7558e6d5e4583a2d8e3d2bfa8cabcc459d3ee83) )
