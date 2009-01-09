@@ -173,6 +173,10 @@ static const rectangle visible1 = { 0*8, (14+48)*8-1,  4*8,  (4+7)*8-1 };
 static const rectangle visible2 = { 0*8, (14+48)*8-1, 12*8, (12+7)*8-1 };
 static const rectangle visible3 = { 0*8, (14+48)*8-1, 20*8, (20+7)*8-1 };
 
+static const rectangle cm91_visible1 = { 0*8, (14+48)*8-1, 4*8,  (4+7)*8-1 };	/* same start for reel1 */ 
+static const rectangle cm91_visible2 = { 0*8, (14+48)*8-1, 11*8, (12+7)*8-1 };	/* 4 pixels less for reel2 */
+static const rectangle cm91_visible3 = { 0*8, (14+48)*8-1, 19*8, (19+7)*8-1 };	/* 8 pixels less for reel3 */
+
 
 VIDEO_UPDATE( goldstar )
 {
@@ -192,6 +196,28 @@ VIDEO_UPDATE( goldstar )
 	tilemap_draw(bitmap,&visible3,goldstar_reel3_tilemap,0,0);
 
 	tilemap_draw(bitmap,cliprect,goldstar_fg_tilemap,0,0);
+
+	return 0;
+}
+
+VIDEO_UPDATE( cmast91 )
+{
+	int i;
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+
+	for (i= 0;i < 64;i++)
+	{
+		tilemap_set_scrolly(goldstar_reel1_tilemap, i, goldstar_reel1_scroll[i]);
+		tilemap_set_scrolly(goldstar_reel2_tilemap, i, goldstar_reel2_scroll[i]);
+		tilemap_set_scrolly(goldstar_reel3_tilemap, i, goldstar_reel3_scroll[i]);
+	}
+
+	tilemap_draw(bitmap, &cm91_visible1, goldstar_reel1_tilemap, 0, 0);
+	tilemap_draw(bitmap, &cm91_visible2, goldstar_reel2_tilemap, 0, 0);
+	tilemap_draw(bitmap, &cm91_visible3, goldstar_reel3_tilemap, 0, 0);
+
+	tilemap_draw(bitmap, cliprect, goldstar_fg_tilemap, 0, 0);
 
 	return 0;
 }
