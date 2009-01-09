@@ -31,7 +31,7 @@ struct _cdp1802_state
 
 	/* registers */
 	UINT8 d;				/* data register (accumulator) */
-	UINT8 df;				/* data flag (ALU carry) */
+	int df;					/* data flag (ALU carry) */
 	UINT8 b;				/* auxiliary holding register */
 	UINT16 r[16];			/* scratchpad registers */
 	UINT8 p;				/* designates which register is Program Counter */
@@ -54,14 +54,67 @@ struct _cdp1802_state
 	int ef;					/* external flags */
 
 	/* execution logic */
+	UINT16 fake_pc;			/* fake program counter */
 	int icount;				/* instruction counter */
+
+	cpu_state_table state_table;
+};
+
+/***************************************************************************
+    CPU STATE DESCRIPTION
+***************************************************************************/
+
+#define CDP1802_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	CPU_STATE_ENTRY(CDP1802_##_name, #_name, _format, cdp1802_state, _member, _datamask, ~0, _flags)
+
+static const cpu_state_entry state_array[] =
+{
+	CDP1802_STATE_ENTRY(GENPC, "%04X", fake_pc, 0xffff, CPUSTATE_NOSHOW | CPUSTATE_IMPORT | CPUSTATE_EXPORT)
+
+	CDP1802_STATE_ENTRY(P, "%02X", p, 0xff, 0)
+	CDP1802_STATE_ENTRY(X, "%02X", x, 0xff, 0)
+	CDP1802_STATE_ENTRY(D, "%02X", d, 0xff, 0)
+	CDP1802_STATE_ENTRY(B, "%02X", b, 0xff, 0)
+	CDP1802_STATE_ENTRY(T, "%02X", t, 0xff, 0)
+
+	CDP1802_STATE_ENTRY(N, "%01X", n, 0xf, 0)
+	CDP1802_STATE_ENTRY(I, "%01X", i, 0xf, 0)
+
+	CDP1802_STATE_ENTRY(R0, "%04X", r[0], 0xffff, 0)
+	CDP1802_STATE_ENTRY(R1, "%04X", r[1], 0xffff, 0)
+	CDP1802_STATE_ENTRY(R2, "%04X", r[2], 0xffff, 0)
+	CDP1802_STATE_ENTRY(R3, "%04X", r[3], 0xffff, 0)
+	CDP1802_STATE_ENTRY(R4, "%04X", r[4], 0xffff, 0)
+	CDP1802_STATE_ENTRY(R5, "%04X", r[5], 0xffff, 0)
+	CDP1802_STATE_ENTRY(R6, "%04X", r[6], 0xffff, 0)
+	CDP1802_STATE_ENTRY(R7, "%04X", r[7], 0xffff, 0)
+	CDP1802_STATE_ENTRY(R8, "%04X", r[8], 0xffff, 0)
+	CDP1802_STATE_ENTRY(R9, "%04X", r[9], 0xffff, 0)
+	CDP1802_STATE_ENTRY(Ra, "%04X", r[10], 0xffff, 0)
+	CDP1802_STATE_ENTRY(Rb, "%04X", r[11], 0xffff, 0)
+	CDP1802_STATE_ENTRY(Rc, "%04X", r[12], 0xffff, 0)
+	CDP1802_STATE_ENTRY(Rd, "%04X", r[13], 0xffff, 0)
+	CDP1802_STATE_ENTRY(Re, "%04X", r[14], 0xffff, 0)
+	CDP1802_STATE_ENTRY(Rf, "%04X", r[15], 0xffff, 0)
+
+	CDP1802_STATE_ENTRY(DF, "%1u", df, 0x1, CPUSTATE_NOSHOW)
+	CDP1802_STATE_ENTRY(IE, "%1u", ie, 0x1, CPUSTATE_NOSHOW)
+	CDP1802_STATE_ENTRY(Q, "%1u", q, 0x1, CPUSTATE_NOSHOW)
+};
+
+static const cpu_state_table state_table_template =
+{
+	NULL,						/* pointer to the base of state (offsets are relative to this) */
+	0,							/* subtype this table refers to */
+	ARRAY_LENGTH(state_array),	/* number of entries */
+	state_array					/* array of entries */
 };
 
 #define OPCODE_R(addr)		memory_decrypted_read_byte(cpustate->program, addr)
-#define RAM_R(addr)			memory_read_byte_8le(cpustate->program, addr)
-#define RAM_W(addr, data)	memory_write_byte_8le(cpustate->program, addr, data)
-#define IO_R(addr)			memory_read_byte_8le(cpustate->io, addr)
-#define IO_W(addr, data)	memory_write_byte_8le(cpustate->io, addr, data)
+#define RAM_R(addr)			memory_read_byte_8be(cpustate->program, addr)
+#define RAM_W(addr, data)	memory_write_byte_8be(cpustate->program, addr, data)
+#define IO_R(addr)			memory_read_byte_8be(cpustate->io, addr)
+#define IO_W(addr, data)	memory_write_byte_8be(cpustate->io, addr, data)
 
 #define P	cpustate->p
 #define X	cpustate->x
@@ -221,7 +274,7 @@ static void cdp1802_run(const device_config *device)
 
 		cpustate->icount -= CDP1802_CYCLES_RESET;
 
-		debugger_instruction_hook(device, cpustate->r[cpustate->p]);
+		debugger_instruction_hook(device, R[P]);
 
 		break;
 
@@ -246,7 +299,7 @@ static void cdp1802_run(const device_config *device)
 			cpustate->state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(device, cpustate->r[cpustate->p]);
+		debugger_instruction_hook(device, R[P]);
 
 		break;
 
@@ -723,7 +776,7 @@ static void cdp1802_run(const device_config *device)
 			cpustate->state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(device, cpustate->r[cpustate->p]);
+		debugger_instruction_hook(device, R[P]);
 
 		break;
 
@@ -811,7 +864,7 @@ static void cdp1802_run(const device_config *device)
 			cpustate->state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(device, cpustate->r[cpustate->p]);
+		debugger_instruction_hook(device, R[P]);
 
 		break;
 	}
@@ -891,7 +944,13 @@ static CPU_INIT( cdp1802 )
 
 	cpustate->intf = (cdp1802_interface *) device->static_config;
 
-	/* get address spaces */
+	/* set up the state table */
+
+	cpustate->state_table = state_table_template;
+	cpustate->state_table.baseptr = cpustate;
+	cpustate->state_table.subtypemask = 1;
+
+	/* find address spaces */
 
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
@@ -926,6 +985,41 @@ static CPU_INIT( cdp1802 )
 	state_save_register_device_item(device, 0, cpustate->ef);
 }
 
+/**************************************************************************
+ * STATE IMPORT/EXPORT
+ **************************************************************************/
+
+static CPU_IMPORT_STATE( cdp1802 )
+{
+	cdp1802_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case CDP1802_GENPC:
+			R[P] = cpustate->fake_pc;
+			break;
+
+		default:
+			fatalerror("CPU_IMPORT_STATE(cdp1802) called for unexpected value\n");
+			break;
+	}
+}
+
+static CPU_EXPORT_STATE( cdp1802 )
+{
+	cdp1802_state *cpustate = device->token;
+
+	switch (entry->index)
+	{
+		case CDP1802_GENPC:
+			cpustate->fake_pc = R[P];
+			break;
+
+		default:
+			fatalerror("CPU_EXPORT_STATE(cdp1802) called for unexpected value\n");
+			break;
+	}
+}
 
 /**************************************************************************
  * Generic set_info
@@ -937,55 +1031,27 @@ static CPU_SET_INFO( cdp1802 )
 
 	switch (state)
 	{
-		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		cpustate->irq = info->i;		break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		cpustate->irq = info->i;	break;
 		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAIN:	cpustate->dmain = info->i;	break;
 		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAOUT:	cpustate->dmaout = info->i;	break;
-
-		case CPUINFO_INT_REGISTER + CDP1802_P:			cpustate->p = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_X:			cpustate->x = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_T:			cpustate->t = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_D:			cpustate->d = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_B:			cpustate->b = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R0:			cpustate->r[0] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_R1:			cpustate->r[1] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_R2:			cpustate->r[2] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_R3:			cpustate->r[3] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_R4:			cpustate->r[4] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_R5:			cpustate->r[5] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_R6:			cpustate->r[6] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_R7:			cpustate->r[7] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_R8:			cpustate->r[8] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_R9:			cpustate->r[9] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Ra:			cpustate->r[0xa] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rb:			cpustate->r[0xb] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rc:			cpustate->r[0xc] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rd:			cpustate->r[0xd] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Re:			cpustate->r[0xe] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rf:			cpustate->r[0xf] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_DF:			cpustate->df = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_IE:			cpustate->ie = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_Q:			cpustate->q = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_N:			cpustate->n = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_I:			cpustate->i = info->i;		break;
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CDP1802_PC: 		cpustate->r[cpustate->p] = info->i;	break;
 	}
 }
 
-/****************************************************************************
- * Return a formatted string for a register
- ****************************************************************************/
+/**************************************************************************
+ * Generic get_info
+ **************************************************************************/
+
 CPU_GET_INFO( cdp1802 )
 {
 	cdp1802_state *cpustate = (device != NULL) ? device->token : NULL;
 
-	switch(state)
+	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cdp1802_state);		break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -993,60 +1059,32 @@ CPU_GET_INFO( cdp1802 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = CDP1802_CYCLES_EXECUTE * 2;	break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = CDP1802_CYCLES_EXECUTE * 3;	break;
 
-		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 3;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:	info->i = 8;									break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM: info->i = 16;									break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM: info->i = 0;									break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:	info->i = 0;									break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 	info->i = 0;									break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 	info->i = 0;									break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:		info->i = 8;									break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 		info->i = 3;									break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 		info->i = 0;									break;
 
-		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		info->i = cpustate->irq;		break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		info->i = cpustate->irq;	break;
 		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAIN:	info->i = cpustate->dmain;	break;
 		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAOUT:	info->i = cpustate->dmaout;	break;
 
-		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
-
-		case CPUINFO_INT_SP:							info->i = 0;							break;
-		case CPUINFO_INT_REGISTER + CDP1802_P:			info->i = cpustate->p;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_X:			info->i = cpustate->x;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_T:			info->i = cpustate->t;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_D:			info->i = cpustate->d;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_B:			info->i = cpustate->b;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R0:			info->i = cpustate->r[0];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_R1:			info->i = cpustate->r[1];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_R2:			info->i = cpustate->r[2];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_R3:			info->i = cpustate->r[3];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_R4:			info->i = cpustate->r[4];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_R5:			info->i = cpustate->r[5];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_R6:			info->i = cpustate->r[6];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_R7:			info->i = cpustate->r[7];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_R8:			info->i = cpustate->r[8];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_R9:			info->i = cpustate->r[9];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Ra:			info->i = cpustate->r[0xa];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rb:			info->i = cpustate->r[0xb];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rc:			info->i = cpustate->r[0xc];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rd:			info->i = cpustate->r[0xd];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Re:			info->i = cpustate->r[0xe];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rf:			info->i = cpustate->r[0xf];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_DF:			info->i = cpustate->df;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_IE:			info->i = cpustate->ie;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_Q:			info->i = cpustate->q;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_N:			info->i = cpustate->n;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_I:			info->i = cpustate->i;					break;
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CDP1802_PC:			info->i = cpustate->r[cpustate->p];		break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
+		/* --- the following bits of info are returned as pointers to functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cdp1802);			break;
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cdp1802);				break;
 		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cdp1802);				break;
 		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cdp1802);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;									break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cdp1802);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;					break;
+		case CPUINFO_FCT_IMPORT_STATE:					info->import_state = CPU_IMPORT_STATE_NAME(cdp1802);break;
+		case CPUINFO_FCT_EXPORT_STATE:					info->export_state = CPU_EXPORT_STATE_NAME(cdp1802);break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state_table;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "CDP1802");				break;
@@ -1055,37 +1093,10 @@ CPU_GET_INFO( cdp1802 )
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 
-		case CPUINFO_STR_REGISTER + CDP1802_PC:	sprintf(info->s, "PC:%.4x", cpustate->r[cpustate->p]);break;
-		case CPUINFO_STR_REGISTER + CDP1802_R0:	sprintf(info->s, "R0:%.4x", cpustate->r[0]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R1:	sprintf(info->s, "R1:%.4x", cpustate->r[1]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R2:	sprintf(info->s, "R2:%.4x", cpustate->r[2]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R3:	sprintf(info->s, "R3:%.4x", cpustate->r[3]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R4:	sprintf(info->s, "R4:%.4x", cpustate->r[4]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R5:	sprintf(info->s, "R5:%.4x", cpustate->r[5]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R6:	sprintf(info->s, "R6:%.4x", cpustate->r[6]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R7:	sprintf(info->s, "R7:%.4x", cpustate->r[7]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R8:	sprintf(info->s, "R8:%.4x", cpustate->r[8]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R9:	sprintf(info->s, "R9:%.4x", cpustate->r[9]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_Ra:	sprintf(info->s, "Ra:%.4x", cpustate->r[0xa]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_Rb:	sprintf(info->s, "Rb:%.4x", cpustate->r[0xb]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_Rc:	sprintf(info->s, "Rc:%.4x", cpustate->r[0xc]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_Rd:	sprintf(info->s, "Rd:%.4x", cpustate->r[0xd]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_Re:	sprintf(info->s, "Re:%.4x", cpustate->r[0xe]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_Rf:	sprintf(info->s, "Rf:%.4x", cpustate->r[0xf]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_P:	sprintf(info->s, "P:%x",    cpustate->p);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_X:	sprintf(info->s, "X:%x",    cpustate->x);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_D:	sprintf(info->s, "D:%.2x",  cpustate->d);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_B:	sprintf(info->s, "B:%.2x",  cpustate->b);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_T:	sprintf(info->s, "T:%.2x",  cpustate->t);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_DF:	sprintf(info->s, "DF:%x",   cpustate->df);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_IE:	sprintf(info->s, "IE:%x",   cpustate->ie);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_Q:	sprintf(info->s, "Q:%x",    cpustate->q);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_N:	sprintf(info->s, "N:%x",    cpustate->n);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_I:	sprintf(info->s, "I:%x",    cpustate->i);			break;
 		case CPUINFO_STR_FLAGS: sprintf(info->s,
-									"%s%s%s",
-									 cpustate->df ? "DF" : "..",
-									 cpustate->ie ? "IE" : "..",
-									 cpustate->q ? "Q" : "."); break;
+									"%c%c%c",
+									 cpustate->df ? 'D' : '.',
+									 cpustate->ie ? 'I' : '.',
+									 cpustate->q ? 'Q' : '.'); break;
 	}
 }

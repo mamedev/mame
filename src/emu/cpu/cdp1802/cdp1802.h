@@ -52,43 +52,14 @@ enum _cdp1802_state_code
 	CDP1802_STATE_CODE_S3_INTERRUPT
 };
 
-// CDP1802 Registers
-
 enum
 {
-	CDP1802_PC = 1,
-	CDP1802_P,		// Designates which register is Program Counter
-	CDP1802_X,		// Designates which register is Data Pointer
-	CDP1802_D,		// Data Register (Accumulator)
-	CDP1802_B,		// Auxiliary Holding Register
-	CDP1802_T,		// Holds old X, P after Interrupt (X is high nibble)
-
-	CDP1802_R0,		// Scratchpad Register 0
-	CDP1802_R1,
-	CDP1802_R2,
-	CDP1802_R3,
-	CDP1802_R4,
-	CDP1802_R5,
-	CDP1802_R6,
-	CDP1802_R7,
-	CDP1802_R8,
-	CDP1802_R9,
-	CDP1802_Ra,
-	CDP1802_Rb,
-	CDP1802_Rc,
-	CDP1802_Rd,
-	CDP1802_Re,
-	CDP1802_Rf,
-
-	CDP1802_DF,		// Data Flag (ALU Carry)
-	CDP1802_IE,		// Interrupt Enable
-	CDP1802_Q,		// Output Flip-Flop
-	CDP1802_N,		// Holds Low-Order Instruction Digit
-	CDP1802_I,		// Holds High-Order Instruction Digit
+	CDP1802_P, CDP1802_X, CDP1802_D, CDP1802_B, CDP1802_T,
+	CDP1802_R0, CDP1802_R1, CDP1802_R2, CDP1802_R3, CDP1802_R4, CDP1802_R5, CDP1802_R6, CDP1802_R7,
+	CDP1802_R8, CDP1802_R9, CDP1802_Ra, CDP1802_Rb, CDP1802_Rc, CDP1802_Rd, CDP1802_Re, CDP1802_Rf,
+	CDP1802_DF, CDP1802_IE, CDP1802_Q, CDP1802_N, CDP1802_I,
+	CDP1802_GENPC = REG_GENPC
 };
-
-CPU_GET_INFO( cdp1802 );
-#define CPU_CDP1802 CPU_GET_INFO_NAME( cdp1802 )
 
 typedef cdp1802_control_mode (*cdp1802_mode_read_func)(const device_config *device);
 #define CDP1802_MODE_READ(name) cdp1802_control_mode name(const device_config *device)
@@ -132,6 +103,9 @@ struct _cdp1802_interface
 };
 #define CDP1802_INTERFACE(name) const cdp1802_interface (name) =
 
-CPU_DISASSEMBLE( cdp1802 );
+extern CPU_GET_INFO( cdp1802 );
+#define CPU_CDP1802 CPU_GET_INFO_NAME( cdp1802 )
+
+extern CPU_DISASSEMBLE( cdp1802 );
 
 #endif /* __CDP1802_H__ */
