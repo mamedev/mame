@@ -17,14 +17,14 @@
 #define BASE_SHIFT	16
 
 struct k053260_channel_def {
-	unsigned long		rate;
-	unsigned long		size;
-	unsigned long		start;
-	unsigned long		bank;
-	unsigned long		volume;
+	UINT32		rate;
+	UINT32		size;
+	UINT32		start;
+	UINT32		bank;
+	UINT32		volume;
 	int					play;
-	unsigned long		pan;
-	unsigned long		pos;
+	UINT32		pan;
+	UINT32		pos;
 	int					loop;
 	int					ppcm; /* packed PCM ( 4 bit signed ) */
 	int					ppcm_data;
@@ -33,9 +33,9 @@ struct k053260_chip_def {
 	sound_stream *					channel;
 	int								mode;
 	int								regs[0x30];
-	unsigned char					*rom;
+	UINT8					*rom;
 	int								rom_size;
-	unsigned long					*delta_table;
+	UINT32					*delta_table;
 	struct k053260_channel_def		channels[4];
 	const k053260_interface			*intf;
 	const device_config *device;
@@ -46,7 +46,7 @@ static void InitDeltaTable( struct k053260_chip_def *ic, int rate, int clock ) {
 	int		i;
 	double	base = ( double )rate;
 	double	max = (double)(clock); /* Hz */
-	unsigned long val;
+	UINT32 val;
 
 	for( i = 0; i < 0x1000; i++ ) {
 		double v = ( double )( 0x1000 - i );
@@ -55,7 +55,7 @@ static void InitDeltaTable( struct k053260_chip_def *ic, int rate, int clock ) {
 
 		if ( target && base ) {
 			target = fixed / ( base / target );
-			val = ( unsigned long )target;
+			val = ( UINT32 )target;
 			if ( val == 0 )
 				val = 1;
 		} else
@@ -105,7 +105,7 @@ static STREAM_UPDATE( k053260_update ) {
 
 	int i, j, lvol[4], rvol[4], play[4], loop[4], ppcm_data[4], ppcm[4];
 	unsigned char *rom[4];
-	unsigned long delta[4], end[4], pos[4];
+	UINT32 delta[4], end[4], pos[4];
 	int dataL, dataR;
 	signed char d;
 	struct k053260_chip_def *ic = param;
@@ -227,7 +227,7 @@ static SND_START( k053260 )
 	for ( i = 0; i < 0x30; i++ )
 		ic->regs[i] = 0;
 
-	ic->delta_table = ( unsigned long * )auto_malloc( 0x1000 * sizeof( unsigned long ) );
+	ic->delta_table = ( UINT32 * )auto_malloc( 0x1000 * sizeof( UINT32 ) );
 
 	ic->channel = stream_create( device, 0, 2, rate, ic, k053260_update );
 
@@ -258,7 +258,7 @@ INLINE void check_bounds( struct k053260_chip_def *ic, int channel ) {
 
 		ic->channels[channel].size = ic->rom_size - channel_start;
 	}
-	if (LOG) logerror("K053260: Sample Start = %06x, Sample End = %06x, Sample rate = %04lx, PPCM = %s\n", channel_start, channel_end, ic->channels[channel].rate, ic->channels[channel].ppcm ? "yes" : "no" );
+	if (LOG) logerror("K053260: Sample Start = %06x, Sample End = %06x, Sample rate = %04x, PPCM = %s\n", channel_start, channel_end, ic->channels[channel].rate, ic->channels[channel].ppcm ? "yes" : "no" );
 }
 
 static void k053260_write( const address_space *space, offs_t offset, UINT8 data, int chip )
@@ -395,8 +395,9 @@ static UINT8 k053260_read( const address_space *space,  offs_t offset, int chip 
 		break;
 
 		case 0x2e: /* read rom */
-			if ( ic->mode & 1 ) {
-				unsigned int offs = ic->channels[0].start + ( ic->channels[0].pos >> BASE_SHIFT ) + ( ic->channels[0].bank << 16 );
+			if ( ic->mode & 1 ) 
+			{
+				UINT32 offs = ic->channels[0].start + ( ic->channels[0].pos >> BASE_SHIFT ) + ( ic->channels[0].bank << 16 );
 
 				ic->channels[0].pos += ( 1 << 16 );
 
