@@ -5,7 +5,7 @@ x
   preliminary driver by Pierpaolo Prazzoli
 
   TODO:
-  - is there extra colour info in attr3 for suprnudge 2 and copoker?
+  - is there extra colour info in attr3 for suprnudge 2 and pokeroul?
   - is there colour intensity control?
   - finish inputs
   - finish question roms reading
@@ -51,16 +51,6 @@ static void coinmstr_set_pal(running_machine *machine, UINT32 paldat, int col)
 		int r0, r1, r2, r3;
 		int g0, g1, g2, g3;
 		int b0, b1, b2, b3;
-		int i0, i1, intensity;
-
-
-
-		i0 = (paldat & 0x2000) >> 13 ;
-		i1 = (paldat & 0x1000) >> 12 ;
-
-		intensity = ((i0<<1) | (i1))+1;
-		intensity = 4;
-
 
 		r0 = (paldat & 0x1000) >> 12 ;
 		g0 = (paldat & 0x0800) >> 11 ;
@@ -77,22 +67,13 @@ static void coinmstr_set_pal(running_machine *machine, UINT32 paldat, int col)
 		b3 = (paldat & 0x0001) >> 0 ;
 
 
-
-		palette_set_color_rgb(machine, col+0, (b0*intensity)<<5, (g0*intensity)<<5, (r0*intensity)<<5);
-		palette_set_color_rgb(machine, col+2, (b1*intensity)<<5, (g1*intensity)<<5, (r1*intensity)<<5);
-		palette_set_color_rgb(machine, col+1, (b2*intensity)<<5, (g2*intensity)<<5, (r2*intensity)<<5);
-		palette_set_color_rgb(machine, col+3, (b3*intensity)<<5, (g3*intensity)<<5, (r3*intensity)<<5);
-
-
+		palette_set_color_rgb(machine, col+0, (b0 * 255) << 5, (g0 * 255) << 5, (r0 * 255) << 5);
+		palette_set_color_rgb(machine, col+2, (b1 * 255) << 5, (g1 * 255) << 5, (r1 * 255) << 5);
+		palette_set_color_rgb(machine, col+1, (b2 * 255) << 5, (g2 * 255) << 5, (r2 * 255) << 5);
+		palette_set_color_rgb(machine, col+3, (b3 * 255) << 5, (g3 * 255) << 5, (r3 * 255) << 5);
 
 	}
-
-
-
-
-
 }
-
 
 
 static WRITE8_HANDLER( quizmstr_attr1_w )
@@ -102,13 +83,10 @@ static WRITE8_HANDLER( quizmstr_attr1_w )
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32 	paldata = (attr_ram1[offset]&0x7f) | ((attr_ram2[offset]&0x7f)<<7);
-		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
+		UINT32 	paldata = (attr_ram1[offset] & 0x7f) | ((attr_ram2[offset] & 0x7f) << 7);
+		tilemap_mark_tile_dirty(bg_tilemap, offset - 0x0240);
 
-
-		coinmstr_set_pal(space->machine, paldata, offset-0x240);
-
-
+		coinmstr_set_pal(space->machine, paldata, offset - 0x240);
 
 	}
 }
@@ -120,12 +98,10 @@ static WRITE8_HANDLER( quizmstr_attr2_w )
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32 	paldata = (attr_ram1[offset]&0x7f) | ((attr_ram2[offset]&0x7f)<<7);
-		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
+		UINT32 	paldata = (attr_ram1[offset] & 0x7f) | ((attr_ram2[offset] & 0x7f) << 7);
+		tilemap_mark_tile_dirty(bg_tilemap, offset - 0x0240);
 
-		coinmstr_set_pal(space->machine, paldata, offset-0x240);
-
-
+		coinmstr_set_pal(space->machine, paldata, offset - 0x240);
 
 	}
 }
@@ -135,7 +111,8 @@ static WRITE8_HANDLER( quizmstr_attr3_w )
 	attr_ram3[offset] = data;
 
 	if(offset >= 0x0240)
-		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
+		tilemap_mark_tile_dirty(bg_tilemap, offset - 0x0240);
+
 }
 
 
@@ -206,7 +183,7 @@ static READ8_HANDLER( ff_r )
 
 static ADDRESS_MAP_START( coinmstr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM // supnudg2 writes here...
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_BASE(&attr_ram1)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_BASE(&attr_ram2)
@@ -268,16 +245,7 @@ static ADDRESS_MAP_START( supnudg2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( copoker_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_BASE(&videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_BASE(&attr_ram1)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_BASE(&attr_ram2)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_BASE(&attr_ram3)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( copoker_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pokeroul_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE(H46505, "crtc", mc6845_address_w)
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE(H46505, "crtc", mc6845_register_w)
@@ -288,6 +256,7 @@ static ADDRESS_MAP_START( copoker_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x78, 0x7b) AM_READWRITE(pia_2_r, pia_2_w) /* confirmed */
 	AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)	/* needed to boot */
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( quizmstr )
 	PORT_START("IN0")
@@ -615,7 +584,7 @@ static INPUT_PORTS_START( supnudg2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( copoker )
+static INPUT_PORTS_START( pokeroul )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Cancel / Collect")                           PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 1 & 5 (auto?)")                         PORT_CODE(KEYCODE_Z)
@@ -698,6 +667,7 @@ static GFXDECODE_START( coinmstr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
+
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int tile = videoram[tile_index + 0x0240];
@@ -708,17 +678,17 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	tile |= (attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
 
-	SET_TILE_INFO(0,tile,color,0);
+	SET_TILE_INFO(0, tile, color, 0);
 }
 
 static VIDEO_START( coinmstr )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows, 8, 8, 46, 32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 46, 32);
 }
 
 static VIDEO_UPDATE( coinmstr )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -775,7 +745,7 @@ static const pia6821_interface trailblz_pia_2_intf =
 
 
 /* PIA 0 */
-static const pia6821_interface copoker_pia_0_intf =
+static const pia6821_interface pokeroul_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
@@ -783,7 +753,7 @@ static const pia6821_interface copoker_pia_0_intf =
 };
 
 /* PIA 1 */
-static const pia6821_interface copoker_pia_1_intf =
+static const pia6821_interface pokeroul_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ input_port_1_r, input_port_2_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
@@ -791,7 +761,7 @@ static const pia6821_interface copoker_pia_1_intf =
 };
 
 /* PIA 2 */
-static const pia6821_interface copoker_pia_2_intf =
+static const pia6821_interface pokeroul_pia_2_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ input_port_3_r, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
@@ -823,14 +793,14 @@ static MACHINE_RESET( trailblz )
 	pia_reset();
 }
 
-static MACHINE_START( copoker )
+static MACHINE_START( pokeroul )
 {
-	pia_config(machine, 0, &copoker_pia_0_intf);
-	pia_config(machine, 1, &copoker_pia_1_intf);
-	pia_config(machine, 2, &copoker_pia_2_intf);
+	pia_config(machine, 0, &pokeroul_pia_0_intf);
+	pia_config(machine, 1, &pokeroul_pia_1_intf);
+	pia_config(machine, 2, &pokeroul_pia_2_intf);
 }
 
-static MACHINE_RESET( copoker )
+static MACHINE_RESET( pokeroul )
 {
 	pia_reset();
 }
@@ -914,14 +884,13 @@ static MACHINE_DRIVER_START( supnudg2 )
 	MDRV_MACHINE_RESET(quizmstr)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( copoker )
+static MACHINE_DRIVER_START( pokeroul )
 	MDRV_IMPORT_FROM(coinmstr)
 	MDRV_CPU_MODIFY("cpu")
-	MDRV_CPU_PROGRAM_MAP(copoker_map,0)
-	MDRV_CPU_IO_MAP(copoker_io_map,0)
+	MDRV_CPU_IO_MAP(pokeroul_io_map,0)
 
-	MDRV_MACHINE_START(copoker)
-	MDRV_MACHINE_RESET(copoker)
+	MDRV_MACHINE_START(pokeroul)
+	MDRV_MACHINE_RESET(pokeroul)
 MACHINE_DRIVER_END
 
 /*
@@ -1098,7 +1067,7 @@ static DRIVER_INIT( coinmstr )
 }
 
 
-GAME( 1985, quizmstr, 0, quizmstr, quizmstr, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",            GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, trailblz, 0, trailblz, trailblz, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                   GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // or Trail Blazer 2 ?
-GAME( 1989, supnudg2, 0, supnudg2, supnudg2, coinmstr, ROT0, "Coinmaster",            "Super Nudger II (Version 5.21)", GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1987, pokeroul, 0, copoker,  copoker,  0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",  GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1985, quizmstr, 0, quizmstr, quizmstr, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",            GAME_UNEMULATED_PROTECTION )
+GAME( 1987, trailblz, 0, trailblz, trailblz, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                   GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // or Trail Blazer 2 ?
+GAME( 1989, supnudg2, 0, supnudg2, supnudg2, coinmstr, ROT0, "Coinmaster",            "Super Nudger II (Version 5.21)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1990, pokeroul, 0, pokeroul, pokeroul, 0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",  GAME_NOT_WORKING )
