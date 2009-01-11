@@ -665,6 +665,10 @@ static WRITE8_HANDLER( yarunara_flipscreen_w )
 {
 	dynax_flipscreen_w(space,0,(data&2)?1:0);
 }
+static WRITE8_HANDLER( yarunara_flipscreen_inv_w )
+{
+	dynax_flipscreen_w(space,0,(data&2)?0:1);
+}
 
 static WRITE8_HANDLER( yarunara_blit_romregion_w )
 {
@@ -1414,7 +1418,7 @@ static ADDRESS_MAP_START( tenkai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x10050, 0x10050 ) AM_WRITE( tenkai_priority_w		)	// layer priority and enable
 	AM_RANGE( 0x10054, 0x10054 ) AM_WRITE( dynax_blit_backpen_w		)	// Background Color
 	AM_RANGE( 0x10058, 0x10058 ) AM_WRITE( tenkai_blit_romregion_w	)	// Blitter ROM bank
-	AM_RANGE( 0x10060, 0x10060 ) AM_WRITE( yarunara_flipscreen_w	)	// Flip Screen
+	AM_RANGE( 0x10060, 0x10060 ) AM_WRITE( yarunara_flipscreen_inv_w)	// Flip Screen
 	AM_RANGE( 0x10064, 0x10064 ) AM_WRITE( yarunara_layer_half_w	)	// half of the interleaved layer to write to
 	AM_RANGE( 0x10068, 0x10068 ) AM_WRITE( yarunara_layer_half2_w	)	//
 	AM_RANGE( 0x1006c, 0x1006c ) AM_WRITE( tenkai_6c_w				)	// ?
@@ -4166,7 +4170,7 @@ static MACHINE_DRIVER_START( tenkai )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 4, 255-8-4)
+	MDRV_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)	// hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
 
 	MDRV_PALETTE_LENGTH(16*256)
 
@@ -5685,8 +5689,9 @@ ROM_START( tenkai )
 	// Note by Whistler:
 	// It appears that the first half of lzc-01.u6 in tenkaibb (as well as the same data in other bootleg versions)
 	// does not exist _anywhere_ in this rom dump, and in this way some girls won't show correctly (such as the 3rd one)
-	ROM_REGION( 0x80000, "gfx1", 0 )	// blitter data
-	ROM_LOAD( "taicom01.15b", 0x000000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
+	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
+	ROM_LOAD( "tydg002.u8",   0x000000, 0x80000, NO_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )
+	ROM_LOAD( "taicom01.15b", 0x080000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )	// either this was dumped half size, or the above rom was missing from the pcb
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "taicom02.11b", 0x000000, 0x80000, CRC(aae8cfb7) SHA1(736c6148aa6e7b22ca19615a27e9a10d41778aa7) )
@@ -5741,8 +5746,10 @@ mc3.u15      [2/2]      taicom00.2c  [4/4]      IDENTICAL
 
 ROM_START( tenkai2b )
 	ROM_REGION( 0x50000, "main", 0 )
+	ROM_LOAD( "mc0.u11",          0x00000, 0x40000, CRC(8488a3ab) SHA1(f367a2dcc65410929db595b3c442d310d50a4940) )
+	ROM_RELOAD(                   0x10000, 0x40000 )
+	// tenkai internal rom is incompatible with the code of this set
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
-	ROM_LOAD( "mc0.u11",          0x10000, 0x40000, CRC(8488a3ab) SHA1(f367a2dcc65410929db595b3c442d310d50a4940) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "mc1.u8",  0x000000, 0x100000, CRC(786698e3) SHA1(9ddf4e31f454fb3c7969b1433771e95a976de741) )
@@ -5873,14 +5880,15 @@ ROM_START( tenkaicb )
 	ROM_REGION( 0x50000, "main", 0 )
 	ROM_LOAD( "rom.u15", 0x00000, 0x40000, CRC(7b877721) SHA1(41bba10ffb3d72af84d6577d4785225fe1ecc640) )
 	ROM_RELOAD(          0x10000, 0x40000 )
+	// it doesn't need the internal rom from tenkai
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
-	ROM_LOAD( "rom.u13", 0x00000, 0x80000, CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) )
-	ROM_LOAD( "rom.u12", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
+	ROM_LOAD( "tydg002.u8", 0x00000, 0x80000, NO_DUMP CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )
+	ROM_LOAD( "rom.u12",    0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASEFF )	// blitter data
-
-	ROM_LOAD( "rom.u13", 0x80000, 0x80000, CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) )//ok
+	ROM_REGION( 0x100000, "gfx2", 0 )	// blitter data
+	ROM_LOAD( "taicom02.11b", 0x00000, 0x80000, NO_DUMP CRC(aae8cfb7) SHA1(736c6148aa6e7b22ca19615a27e9a10d41778aa7) )
+	ROM_LOAD( "rom.u13",      0x80000, 0x80000, CRC(68cb730a) SHA1(7ce90e34fa51d50a7668ac1c5ccbc18bebe8ad84) )
 ROM_END
 
 /***************************************************************************
@@ -5951,15 +5959,20 @@ tydg004.u21  [4/4]      taicom03.13b [4/4]      24.230194%
 ***************************************************************************/
 
 ROM_START( tenkaid )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x90000, "main", 0 )
+	ROM_LOAD( "tydg001.u11",      0x00000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
+	ROM_RELOAD(                   0x10000, 0x40000 )
+	ROM_RELOAD(                   0x50000, 0x40000 )
+	// tenkai internal rom is incompatible with the code of this set
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
-	ROM_LOAD( "tydg001.u11",      0x10000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )	// blitter data
-	ROM_LOAD( "tydg002.u8",  0x000000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )
-	ROM_LOAD( "tydg005.u19", 0x080000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
-	ROM_LOAD( "tydg003.u6",  0x100000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )
-	ROM_LOAD( "tydg004.u21", 0x180000, 0x80000, CRC(b7d49d04) SHA1(756c35bbe207b5bfc6e05d6da99a7ad5a3453506) )
+	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
+	ROM_LOAD( "tydg002.u8",  0x00000, 0x80000, CRC(b0f08a20) SHA1(5f7083d5caadd77594eaf46efa11a8756cefcf7d) )
+	ROM_LOAD( "tydg003.u6",  0x80000, 0x80000, CRC(60717d91) SHA1(85dbb510d33b36d2255b740ccc4917216dd21497) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )	// blitter data
+	ROM_LOAD( "tydg004.u21", 0x00000, 0x80000, CRC(b7d49d04) SHA1(756c35bbe207b5bfc6e05d6da99a7ad5a3453506) )
+	ROM_LOAD( "tydg005.u19", 0x80000, 0x80000, CRC(39e4e6f3) SHA1(5b543a5933446091d7cfd519d5a6f23047d8a9f2) )
 ROM_END
 
 /***************************************************************************
@@ -5979,8 +5992,9 @@ lzc-02.rom   [2/2]      taicom03.13b            IDENTICAL
 
 ROM_START( tenkaie )
 	ROM_REGION( 0x50000, "main", 0 )
-	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
-	ROM_LOAD( "epr-a01.rom",      0x10000, 0x40000, CRC(a35e54db) SHA1(247c856e19989fb834e8ed135393927bbd9c0277) )
+	ROM_LOAD( "epr-a01.rom",      0x00000, 0x40000, CRC(a35e54db) SHA1(247c856e19989fb834e8ed135393927bbd9c0277) )
+	ROM_RELOAD(                   0x10000, 0x40000 )
+	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "lzc-01.rom", 0x000000, 0x100000, CRC(786698e3) SHA1(9ddf4e31f454fb3c7969b1433771e95a976de741) )
@@ -5988,6 +6002,7 @@ ROM_START( tenkaie )
 	ROM_REGION( 0x100000, "gfx2", 0 )	// blitter data
 	ROM_LOAD( "lzc-02.rom", 0x000000, 0x100000, CRC(90a19443) SHA1(8f593c00e39dd5acc76b058591019d117967a17b) )
 ROM_END
+
 
 /***************************************************************************
 
@@ -6242,12 +6257,12 @@ GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, mjelct3,  ROT180, "Dynax",  
 GAME( 1990, neruton,  0,        neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan)",                         GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, hanayara, 0,        yarunara, hanayara, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                    0 )
 GAME( 1991, mjcomv1,  0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                          0 )
-GAME( 1991, tenkai,   0,        tenkai,   tenkai,   0,        ROT180, "Dynax",                    "Mahjong Tenkaigen",                                            GAME_NOT_WORKING )
-GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   0,        ROT180, "Dynax",                    "Mahjong Tenkaigen Part 2 (bootleg)",                           GAME_NOT_WORKING )
-GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   0,        ROT180, "Dynax",                    "Mahjong Tenkaigen (bootleg b)",                                0 )
-GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   0,        ROT180, "Dynax",                    "Mahjong Tenkaigen (bootleg c)",                                GAME_NOT_WORKING )
-GAME( 1991, tenkaid,  tenkai,   tenkai,   tenkai,   0,        ROT180, "Dynax",                    "Mahjong Tenkaigen (set 1)",                                    GAME_NOT_WORKING )
-GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   0,        ROT180, "Dynax",                    "Mahjong Tenkaigen (set 2)",                                    GAME_NOT_WORKING )
+GAME( 1991, tenkai,   0,        tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                            0 )
+GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen Part 2 (bootleg)",                           GAME_NOT_WORKING )
+GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (bootleg b)",                                0 )
+GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (bootleg c)",                                0 )
+GAME( 1991, tenkaid,  tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 1)",                                    GAME_NOT_WORKING )
+GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                    0 )
 GAME( 1992, htengoku, 0,        htengoku, htengoku, 0,        ROT180, "Dynax",                    "Hanafuda Hana Tengoku (Japan)",                                0 )
 GAME( 1994, mjreach,  0,        tenkai,   mjreach,  mjreach,  ROT0,   "Dynax",                    "Mahjong Reach (bootleg)",                                      0 )
 GAME( 1995, shpeng,   0,        sprtmtch, sprtmtch, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                           GAME_WRONG_COLORS ) // not a dynax board. proms?
