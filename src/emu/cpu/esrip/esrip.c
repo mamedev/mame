@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    escpustate->c
+    esrip.c
 
     Implementation of the Entertainment Sciences
     AM29116-based Real Time Image Processor
@@ -23,14 +23,12 @@
     MACROS
 ***************************************************************************/
 
-#define ASSERT(x)
-//(assert(x))
 #define RIP_PC		(cpustate->pc | ((cpustate->status_out & 1) << 8))
 #define _BIT(x, n)	((x) & (1 << (n)))
 #define RISING_EDGE(old_val, new_val, bit)	(!(old_val & (1 << bit)) && (new_val & (1 << bit)))
 
-#define UNHANDLED	do {printf("%s:UNHANDLED (%x)\n", __FUNCTION__, inst); ASSERT(0);}while(0)
-#define INVALID		do {printf("%s:INVALID (%x)\n", __FUNCTION__, inst); ASSERT(0);}while(0)
+#define UNHANDLED	do {printf("%s:UNHANDLED (%x)\n", __FUNCTION__, inst); assert(0);} while (0)
+#define INVALID		do {printf("%s:INVALID (%x)\n", __FUNCTION__, inst); assert(0);} while (0)
 
 #define RAM_ADDR	(inst & 0x1f)
 #define MODE		(inst & 0x8000)
@@ -94,19 +92,19 @@ typedef struct
 	UINT16	attr_latch;
 	UINT16	adl_latch;
 	UINT16	adr_latch;
+	UINT16	iaddr_latch;
 	UINT8	c_latch;
-	UINT16	iaddr;
 
 	UINT16	fdt_cnt;
 	UINT16	ipt_cnt;
 
-	UINT16	*ipt_ram;
-	UINT8	*lbrm;
+	UINT8	fig;
+	UINT16	fig_cycles;
 
 	UINT8	*optable;
 
-	UINT8	fig;
-	UINT16	fig_cycles;
+	UINT16	*ipt_ram;
+	UINT8	*lbrm;
 
 	const	device_config *device;
 	const	address_space *program;
@@ -120,28 +118,19 @@ typedef struct
 
 
 /***************************************************************************
-    INITIALIZATION AND SHUTDOWN
+    PUBLIC FUNCTIONS
 ***************************************************************************/
 
 UINT8 get_rip_status(const device_config *cpu)
 {
 	esrip_state *cpustate = cpu->token;
-
 	return cpustate->status_out;
 }
 
-/*
-static STATE_POSTLOAD( esrip_postload )
-{
 
-}
-*/
-
-//static void esrip_state_register(int index, const char *type)
-//{
-//  state_save_register_item_pointer(type, index, cpustate->ipt_ram, IPT_RAM_SIZE / 2);
-//}
-
+/***************************************************************************
+    INITIALIZATION AND SHUTDOWN
+***************************************************************************/
 
 enum
 {
@@ -149,7 +138,6 @@ enum
 	SVSTR, PRT, SOR, TOR2, SHFTR, TEST, NOP, SETST, RSTST,
 	ROTNR, BONR, BOR1, SONR, SHFTNR, PRTNR, TONR
 } ops;
-
 
 void make_ops(esrip_state *cpustate)
 {
@@ -260,16 +248,58 @@ static CPU_INIT( esrip )
 	cpustate->status_in = _config->status_in;
 	cpustate->draw = _config->draw;
 
+	/* Allocate image pointer table RAM */
 	cpustate->ipt_ram = auto_malloc(IPT_RAM_SIZE);
-//state_save_register_global_pointer(cpustate->ipt_ram, IPT_RAM_SIZE / 2);          // TODO
 
-//  esrip_state_register(index, "esrip");
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* Create the instruction decode lookup table */
 	cpustate->optable = auto_malloc(65536);
 	make_ops(cpustate);
+
+	/* Register stuff for state saving */
+	state_save_register_device_item(device, 0, cpustate->acc);
+	state_save_register_device_item_array(device, 0, cpustate->ram);
+	state_save_register_device_item(device, 0, cpustate->d_latch);
+	state_save_register_device_item(device, 0, cpustate->i_latch);
+	state_save_register_device_item(device, 0, cpustate->result);
+	state_save_register_device_item(device, 0, cpustate->new_status);
+	state_save_register_device_item(device, 0, cpustate->status);
+	state_save_register_device_item(device, 0, cpustate->inst);
+	state_save_register_device_item(device, 0, cpustate->immflag);
+	state_save_register_device_item(device, 0, cpustate->ct);
+	state_save_register_device_item(device, 0, cpustate->t);
+	state_save_register_device_item(device, 0, cpustate->l1);
+	state_save_register_device_item(device, 0, cpustate->l2);
+	state_save_register_device_item(device, 0, cpustate->l3);
+	state_save_register_device_item(device, 0, cpustate->l4);
+	state_save_register_device_item(device, 0, cpustate->l5);
+	state_save_register_device_item(device, 0, cpustate->l6);
+	state_save_register_device_item(device, 0, cpustate->l7);
+	state_save_register_device_item(device, 0, cpustate->pl1);
+	state_save_register_device_item(device, 0, cpustate->pl2);
+	state_save_register_device_item(device, 0, cpustate->pl3);
+	state_save_register_device_item(device, 0, cpustate->pl4);
+	state_save_register_device_item(device, 0, cpustate->pl5);
+	state_save_register_device_item(device, 0, cpustate->pl6);
+	state_save_register_device_item(device, 0, cpustate->pl7);
+	state_save_register_device_item(device, 0, cpustate->pc);
+	state_save_register_device_item(device, 0, cpustate->status_out);
+	state_save_register_device_item(device, 0, cpustate->x_scale);
+	state_save_register_device_item(device, 0, cpustate->y_scale);
+	state_save_register_device_item(device, 0, cpustate->line_latch);
+	state_save_register_device_item(device, 0, cpustate->fig_latch);
+	state_save_register_device_item(device, 0, cpustate->attr_latch);
+	state_save_register_device_item(device, 0, cpustate->adl_latch);
+	state_save_register_device_item(device, 0, cpustate->adr_latch);
+	state_save_register_device_item(device, 0, cpustate->iaddr_latch);
+	state_save_register_device_item(device, 0, cpustate->c_latch);
+	state_save_register_device_item(device, 0, cpustate->fdt_cnt);
+	state_save_register_device_item(device, 0, cpustate->ipt_cnt);
+	state_save_register_device_item(device, 0, cpustate->fig);
+	state_save_register_device_item(device, 0, cpustate->fig_cycles);
+	state_save_register_device_item_pointer(device, 0, cpustate->ipt_ram, IPT_RAM_SIZE / sizeof(UINT16));
 }
 
 
@@ -306,6 +336,9 @@ static CPU_EXIT( esrip )
 }
 
 
+/***************************************************************************
+    PRIVATE FUNCTIONS
+***************************************************************************/
 
 static int get_hblank(running_machine *machine)
 {
@@ -358,7 +391,7 @@ INLINE int check_jmp(esrip_state *cpustate, running_machine *machine, UINT8 jmp_
 		}
 	}
 	else
-		ASSERT(!"RIP: Invalid jump control");
+		assert(!"RIP: Invalid jump control");
 
 	return ret;
 }
@@ -400,6 +433,10 @@ INLINE void calc_v_flag_sub(esrip_state *cpustate, UINT16 a, UINT16 b, UINT32 r)
 	cpustate->new_status |= ((a ^ b) & (r ^ b) & 0x8000) ? 8 : 0;
 }
 
+
+/***************************************************************************
+    INSTRUCTIONS
+***************************************************************************/
 
 enum
 {
@@ -1614,9 +1651,12 @@ static CPU_EXECUTE( esrip )
 {
 	esrip_state *cpustate = device->token;
 	int calldebugger = (device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0;
-	UINT16 status = cpustate->status_in(device->machine);
-
+	UINT8 status;
+	
 	cpustate->icount = cycles;
+
+	/* I think we can get away with placing this outside of the loop */
+	status = cpustate->status_in(device->machine);
 
 	/* Core execution loop */
 	do
@@ -1636,7 +1676,7 @@ static CPU_EXECUTE( esrip )
 
 		if (cpustate->fig_cycles)
 		{
-			if(--cpustate->fig_cycles == 0)
+			if (--cpustate->fig_cycles == 0)
 				cpustate->fig = 0;
 		}
 
@@ -1761,7 +1801,7 @@ static CPU_EXECUTE( esrip )
 			cpustate->attr_latch = x_bus;
 
 			cpustate->fig = 1;
-			cpustate->fig_cycles = cpustate->draw(device->machine, cpustate->adl_latch, cpustate->adr_latch, cpustate->fig_latch, cpustate->attr_latch, cpustate->iaddr, cpustate->c_latch, cpustate->x_scale, cpustate->line_latch);
+			cpustate->fig_cycles = cpustate->draw(device->machine, cpustate->adl_latch, cpustate->adr_latch, cpustate->fig_latch, cpustate->attr_latch, cpustate->iaddr_latch, cpustate->c_latch, cpustate->x_scale, cpustate->line_latch);
 		}
 
 		/* X-scale */
@@ -1777,7 +1817,7 @@ static CPU_EXECUTE( esrip )
 
 		/* Image ROM address */
 		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 5))
-			cpustate->iaddr = y_bus;
+			cpustate->iaddr_latch = y_bus;
 
 		/* IXLLD */
 		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 6))
@@ -1815,7 +1855,7 @@ static CPU_EXECUTE( esrip )
 
 
 /***************************************************************************
-    DISASSEMBLY HOOK
+    DISASSEMBLY HOOK (TODO: FINISH)
 ***************************************************************************/
 
 static CPU_DISASSEMBLE( esrip )
@@ -1862,35 +1902,35 @@ static CPU_DISASSEMBLE( esrip )
 	UINT8 ctrl3 = (inst_hi) & 0xff;
 
 	sprintf(buffer, "%.4x %c%c%c%c %.2x %s%s%s%s%s%s%s%s %c%s%s%s %c%c%c%c%c%c%c%c\n",
-		ins,
-		ctrl & 1 ? 'D' : ' ',
-		ctrl & 2 ? ' ' : 'Y',
-		ctrl & 4 ? 'S' : ' ',
-		(~jmp_ctrl & 0x18) ? 'J' : ' ',
-		jmp_dest,
-		ctrl1 & 0x01 ? "  " : "I ",
-		ctrl1 & 0x02 ? "  " : "FL",
-		ctrl1 & 0x04 ? "FE" : "  ",
-		ctrl1 & 0x08 ? "  " : "FR",
-		ctrl1 & 0x10 ? "  " : "IL",
-		ctrl1 & 0x20 ? "IE" : "  ",
-		ctrl1 & 0x40 ? "  " : "IR",
-		ctrl1 & 0x80 ? "  " : "IW",
+			ins,
+			ctrl & 1 ? 'D' : ' ',
+			ctrl & 2 ? ' ' : 'Y',
+			ctrl & 4 ? 'S' : ' ',
+			(~jmp_ctrl & 0x18) ? 'J' : ' ',
+			jmp_dest,
+			ctrl1 & 0x01 ? "  " : "I ",
+			ctrl1 & 0x02 ? "  " : "FL",
+			ctrl1 & 0x04 ? "FE" : "  ",
+			ctrl1 & 0x08 ? "  " : "FR",
+			ctrl1 & 0x10 ? "  " : "IL",
+			ctrl1 & 0x20 ? "IE" : "  ",
+			ctrl1 & 0x40 ? "  " : "IR",
+			ctrl1 & 0x80 ? "  " : "IW",
 
-		ctrl2 & 0x80 ? ' ' : 'O',
-		ctrl2 & 0x40 ? "     " : "IXLLD",
-		ctrl2 & 0x20 ? "     " : "IADLD",
-		ctrl2 & 0x10 ? "     " : "SCALD",
+			ctrl2 & 0x80 ? ' ' : 'O',
+			ctrl2 & 0x40 ? "     " : "IXLLD",
+			ctrl2 & 0x20 ? "     " : "IADLD",
+			ctrl2 & 0x10 ? "     " : "SCALD",
 
-		ctrl3 & 0x01 ? ' ' : '0',
-		ctrl3 & 0x02 ? ' ' : '1',
-		ctrl3 & 0x04 ? ' ' : '2',
-		ctrl3 & 0x08 ? ' ' : '3',
-		ctrl3 & 0x10 ? ' ' : '4',
-		ctrl3 & 0x20 ? ' ' : '5',
-		ctrl3 & 0x40 ? ' ' : '6',
-		ctrl3 & 0x80 ? ' ' : '7'
-		);
+			ctrl3 & 0x01 ? ' ' : '0',
+			ctrl3 & 0x02 ? ' ' : '1',
+			ctrl3 & 0x04 ? ' ' : '2',
+			ctrl3 & 0x08 ? ' ' : '3',
+			ctrl3 & 0x10 ? ' ' : '4',
+			ctrl3 & 0x20 ? ' ' : '5',
+			ctrl3 & 0x40 ? ' ' : '6',
+			ctrl3 & 0x80 ? ' ' : '7'
+			);
 
 	return 1 | DASMFLAG_SUPPORTED;
 }
@@ -2025,6 +2065,6 @@ CPU_GET_INFO( esrip )
 		case CPUINFO_STR_REGISTER + ESRIP_ADRL:			sprintf(info->s, "ADRL: %04X", cpustate->adl_latch); break;
 		case CPUINFO_STR_REGISTER + ESRIP_ADRR:			sprintf(info->s, "ADRR: %04X", cpustate->adr_latch); break;
 		case CPUINFO_STR_REGISTER + ESRIP_COLR:			sprintf(info->s, "COLR: %04X", cpustate->c_latch); break;
-		case CPUINFO_STR_REGISTER + ESRIP_IADDR:		sprintf(info->s, "IADR: %04X", cpustate->iaddr); break;
+		case CPUINFO_STR_REGISTER + ESRIP_IADDR:		sprintf(info->s, "IADR: %04X", cpustate->iaddr_latch); break;
 	}
 }
