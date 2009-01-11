@@ -8490,17 +8490,17 @@ Other Sun games
 	DRIVER( showhanc )	/* (c) 1999? Astro Corp. */
 
 	/* Dyna */
-	DRIVER( cb2001 )	/* (c) Dyna */
-	DRIVER( ncb3 )		/* (c) 199? Dyna/bootleg? */
-	DRIVER( cb3a )		/* (c) 199? Dyna/bootleg? */
-	DRIVER( cb3 )		/* (c) 199? Dyna/bootleg? */
+	DRIVER( cb2001 )	/* (c) 2001 Dyna Electronics */
+	DRIVER( ncb3 )		/* (c) 199? Dyna Electronics */
+	DRIVER( cb3a )		/* (c) 199? Dyna Electronics */
+	DRIVER( cb3 )		/* (c) 199? Dyna Electronics */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
-	DRIVER( cmv4 )		/* (c) 1992 Dyna */
-	DRIVER( cmv4a )		/* (c) 1992 Dyna */
-	DRIVER( cmaster )	/* (c) 1991 Dyna */
-	DRIVER( cm2v841 )	/* (c) 198? Dyna Electronics */
-	DRIVER( cm2841a )	/* (c) 198? Dyna Electronics */
-	DRIVER( cmast91 )	/* (c) 1991 Dyna */
+	DRIVER( cmv4 )		/* (c) 1992 Dyna Electronics */
+	DRIVER( cmv4a )		/* (c) 1992 Dyna Electronics */
+	DRIVER( cmaster )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmasterb )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
 
 	/* STG? */
 	DRIVER ( queen )
@@ -8525,5 +8525,6 @@ Other Sun games
 	DRIVER( sfbonus )	/* (c) 199? Amcoe */
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
+	DRIVER( mtonic )	/* 198? (c) Tonic */
 
 #endif	/* DRIVER_RECURSIVE */

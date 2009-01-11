@@ -43,6 +43,19 @@
   Controls Set2 is using reels stop buttons from Controls Set1.
 
 
+  * Cherry Master V4 (set 2)
+
+  This set is supposed to be a kind of "stealth".
+  The game is hidden into a Tetris game and could be triggered/switched
+  in some way. Seems that it was designed for locations/countries where
+  gambling games are/were not allowed.
+
+  The game is booting as Cherry Master V4 instead of Tetris ATM...
+
+  Even when the gambling game is working properly, the game is flagged
+  as NOT_WORKING till can figure out how can switch between games.
+
+
   * Kkoj Noli
 
   kkuj nol-i / kkoj noli (better romanization).
@@ -591,7 +604,7 @@ static INPUT_PORTS_START( cmv4 )
 	PORT_DIPSETTING(    0xc0, "64" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x04, "Main Game Pay Rate" )	PORT_DIPLOCATION("DSW2:1,2,3")	/* OK */
+	PORT_DIPNAME( 0x07, 0x03, "Main Game Pay Rate" )	PORT_DIPLOCATION("DSW2:1,2,3")	/* OK */
 	PORT_DIPSETTING(    0x07, "30%" )
 	PORT_DIPSETTING(    0x06, "38%" )
 	PORT_DIPSETTING(    0x05, "46%" )
@@ -753,7 +766,7 @@ static INPUT_PORTS_START( cmaster )
 	PORT_DIPSETTING(    0xc0, "64" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x04, "Main Game Pay Rate" )	PORT_DIPLOCATION("DSW2:1,2,3")	/* OK */
+	PORT_DIPNAME( 0x07, 0x03, "Main Game Pay Rate" )	PORT_DIPLOCATION("DSW2:1,2,3")	/* OK */
 	PORT_DIPSETTING(    0x07, "45%" )
 	PORT_DIPSETTING(    0x06, "50%" )
 	PORT_DIPSETTING(    0x05, "55%" )
@@ -858,7 +871,7 @@ static INPUT_PORTS_START( cmaster )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cm2v841 )
+static INPUT_PORTS_START( cmasterb )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1020,7 +1033,7 @@ static INPUT_PORTS_START( cm2v841 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cm2841a )
+static INPUT_PORTS_START( cmasterc )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2708,6 +2721,29 @@ static const gfx_layout tiles8x32x4_layout =
 	32*8
 };
 
+static const UINT32 layout_xoffset[128] =
+{
+	STEP32(0*128,4),STEP32(1*128,4),STEP32(2*128,4),STEP32(3*128,4)
+};
+
+static const UINT32 layout_yoffset[128] =
+{
+	STEP32(0*16384, 512),STEP32(1*16384,512),STEP32(2*16384,512),STEP32(3*16384,512)
+};
+
+static const gfx_layout tiles128x128x4_layout =
+{
+	128,128,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	4 * 16384, /* object takes 8 consecutive bytes */
+	layout_xoffset,
+	layout_yoffset
+};
+
 #if 0 // decodes an extra plane for cmv4 / cmasterb, not sure if we need to
 static const gfx_layout tiles8x32x5_layout =
 {
@@ -2750,9 +2786,21 @@ static GFXDECODE_START( ncb3 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128, 4 )
 GFXDECODE_END
 
-static GFXDECODE_START( cmv801 )
+static GFXDECODE_START( cm )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
+GFXDECODE_END
+
+static GFXDECODE_START( cmbitmap )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
+	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 )
+GFXDECODE_END
+
+static GFXDECODE_START( cmast91 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
+	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 ) // wrong... FIXME.
 GFXDECODE_END
 
 #if 0 // decodes an extra plane for cmv4 / cmasterb, not sure if we need to
@@ -3203,7 +3251,42 @@ static MACHINE_DRIVER_START( cm )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(cmv801)
+	MDRV_GFXDECODE(cmbitmap)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_INIT(cm)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(cherrym)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ay", AY8910,1500000)
+	MDRV_SOUND_CONFIG(cm_ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( cmnobmp )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
+	MDRV_CPU_PROGRAM_MAP(cm_map,0)
+	MDRV_CPU_IO_MAP(cm_portmap,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+	/* 2x 8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(cm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
 	MDRV_NVRAM_HANDLER(goldstar)
@@ -3238,7 +3321,7 @@ static MACHINE_DRIVER_START( cmast91 )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(cmv801)
+	MDRV_GFXDECODE(cmast91)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cmast91)
 	MDRV_NVRAM_HANDLER(goldstar)
@@ -3686,6 +3769,9 @@ ROM_START( cmv801 )
 	ROM_LOAD( "m1.64",     0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
 	ROM_LOAD( "m2.64",     0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
 
+	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE )
+	ROM_LOAD( "27512.u53",  0x0000, 0x10000, NO_DUMP )
+
 	ROM_REGION( 0x200, "proms", 0 ) // pal
 	ROM_LOAD( "prom2.287", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "prom3.287", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -3883,8 +3969,7 @@ ROM_START( cmaster )
 ROM_END
 
 
-/* doesn't seem to have 'cherry master 2' anywhere on the screen.. */
-/*
+/*  cmasterb & cmasterc
 
     Cherry Master II ver 8.41
 
@@ -3905,7 +3990,7 @@ ROM_END
     4x8 dip + 1 Switch (main test ???)
 */
 
-ROM_START( cm2v841 )
+ROM_START( cmasterb )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "u81.9",  0x0000,  0x1000, CRC(09e44314) SHA1(dbb7e9afc9a1dc0d4ce7b150324077f3f3579c02) )
 	ROM_CONTINUE(0x4000,0x1000)
@@ -3939,7 +4024,7 @@ ROM_START( cm2v841 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
-ROM_START( cm2841a )
+ROM_START( cmasterc )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "msii841.u81",  0x3000,  0x1000, CRC(977db602) SHA1(0fd3d6781b654ac6befdc9278f84ca708d5d448c) )
 	ROM_CONTINUE(0x2000,0x1000)
@@ -3973,6 +4058,7 @@ ROM_START( cm2841a )
 ROM_END
 
 /*
+
 Cherry Master '91
 -----------------
 
@@ -4089,6 +4175,7 @@ ROM_START( lucky8 )
 ROM_END
 
 /*
+
 unknown koren or chinese bootleg of something?
 
 XTAL 12MHz
@@ -4283,6 +4370,43 @@ ROM_START( kkojnoli )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "prom2", 0x0000, 0x0020, BAD_DUMP CRC(7b1a769f) SHA1(788b3573df17d398c74662fec4fd7693fc27e2ef) )
+ROM_END
+
+/*
+
+Magical Tonic
+
+unknown, 40 pin cpu (plastic box, with "Tonic" sticker on it)
+8255 x3
+YM2203
+12 MHz 
+
+4x DSW
+
+*/
+
+ROM_START( mtonic )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "8.e6",	0x0000, 0x8000, CRC(01daf2af) SHA1(cb9b12c79dce3c9123510a49dffc9f3cee056cf6) )
+	ROM_LOAD( "9.e6",	0x8000, 0x8000, CRC(1770ac79) SHA1(cadfd00ae75b90b1d202d741828e0afbd5ba0bec) )
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "5.j10",	0x00000, 0x10000, CRC(b8032ea3) SHA1(15e5335a583d8e7a5422cd4d1d7342874a4962ab) )
+	ROM_LOAD( "6.j11",	0x10000, 0x10000, CRC(ff38ff30) SHA1(8fef6e1fe7c307c69c9dcafa69ecf66467b9cb41) )
+	ROM_LOAD( "7.j12",	0x20000, 0x10000, CRC(8f1d2db9) SHA1(200de01334905079dca542541e442d4194ecd913) )
+
+	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "1.l10",	0x0000, 0x4000, CRC(746588db) SHA1(2a0af552011246d4cc0cd0b670907cf8685ce8ef) )
+	ROM_LOAD( "2.l11",	0x4000, 0x4000, CRC(8b7dd248) SHA1(a3ebde9fd0b6b1e42aa9b6d8e30c225abf2f80ce) )
+	ROM_LOAD( "3.l12",	0x8000, 0x4000, CRC(de05e678) SHA1(8b9fcb9f912075a20a9ae38100006b57d508e0e7) )
+	ROM_LOAD( "4.l13",	0xc000, 0x4000, CRC(8c542eee) SHA1(cb424e2a67c6d39302beca7cd5244bcad4a91189) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom1",	0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "prom2",	0x0100, 0x0100, NO_DUMP )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "prom3",	0x0000, 0x0020, NO_DUMP )
 ROM_END
 
 
@@ -4544,17 +4668,6 @@ static DRIVER_INIT(cmast91)
 	ROM[0x0a92] = 0x9b;
 }
 
-static DRIVER_INIT(cm2v841)
-{
-	UINT8 *ROM = memory_region(machine, "main");
-
-/*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.
-*/
-	ROM[0x0209] = 0x9b;
-	ROM[0x020d] = 0x9b;
-}
-
 static DRIVER_INIT(lucky8a)
 {
 	UINT8 *ROM = memory_region(machine, "main");
@@ -4583,22 +4696,23 @@ GAME( 199?, cb3,      ncb3,     ncb3,     ncb3,     cb3,      ROT0, "Dyna",     
 GAME( 198?, cmv801,   0,        cm,       cmv801,   cm,       ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",      0 ) /* says ED-96 where the manufacturer is on some games.. */
 
 GAME( 1992, cmv4,     0,        cm,       cmv4,     cmv4,     ROT0, "Dyna",              "Cherry Master (ver.4, set 1)",           0 )
-GAME( 1992, cmv4a,    0,        cm,       cmv4,     cmv4,     ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",           GAME_NOT_WORKING )	/* stealth game? */
-GAME( 1991, cmaster,  cmv4,     cm,       cmaster,  0,        ROT0, "Dyna",              "Cherry Master I (ver.1.01)",             0 )
+GAME( 1992, cmv4a,    cmv4,     cm,       cmv4,     cmv4,     ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",           GAME_NOT_WORKING )	/* stealth game? */
+GAME( 1991, cmaster,  0,        cm,       cmaster,  0,        ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",      0 )
+GAME( 1991, cmasterb, cmaster,  cm,       cmasterb, cmv4,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",      0 )
+GAME( 1991, cmasterc, cmaster,  cm,       cmasterc, cmv4,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",      GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, cmast91,  0,        cmast91,  cmast91,  cmast91,  ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",           0 )
 
-GAME( 198?, cm2v841,  cmv4,     cm,       cm2v841,  cm2v841,  ROT0, "Dyna",              "Cherry Master (II?) (ver.8.41, set 1)",  GAME_NOT_WORKING )
-GAME( 198?, cm2841a,  cmv4,     cm,       cm2841a,  cm2v841,  ROT0, "Dyna",              "Cherry Master (II?) (ver.8.41, set 2)",  GAME_NOT_WORKING )
 
 GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",              0 )
 GAME( 1989, lucky8a,  lucky8,   lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",              0 )
 GAME( 198?, ladylinr, 0,        ladylinr, ladylinr, 0,        ROT0, "TAB Austria",       "Lady Liner",                             0 )
 GAME( 198?, kkojnoli, 0,        kkojnoli, kkojnoli, 0,        ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",              GAME_IMPERFECT_COLORS )
 
-// bootlegs of cherry master?
-GAME( 1998, schery98, 0,        cm,       cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
-GAME( 1998, schery97, 0,        cm,       cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '97",                       GAME_NOT_WORKING )
+GAME( 198?, mtonic,   0,        ncb3,     cmv801,   0,        ROT0, "Tonic",             "Magical Tonic?",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
 
+// bootlegs of cherry master?
+GAME( 1998, schery98, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
+GAME( 1998, schery97, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '97",                       GAME_NOT_WORKING )
 
 /* possible stealth sets:
 
