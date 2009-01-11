@@ -8496,6 +8496,7 @@ Other Sun games
 	DRIVER( cb3 )		/* (c) 199? Dyna/bootleg? */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */
 	DRIVER( cmv4 )		/* (c) 1992 Dyna */
+	DRIVER( cmv4a )		/* (c) 1992 Dyna */
 	DRIVER( cmaster )	/* (c) 1991 Dyna */
 	DRIVER( cm2v841 )	/* (c) 198? Dyna Electronics */
 	DRIVER( cm2841a )	/* (c) 198? Dyna Electronics */
