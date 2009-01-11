@@ -10,7 +10,6 @@
     not all games work due to either banking, dma or protection issues.
     graphics are glitchy in some games.
 
-    - day, date, and year from the RTC appear to be ignored (hour/min/sec are fine). H8 core bug or BIOS doesn't care?
     - golgo13 assumes the test switch is a switch, not a button - must hold down F2 to stay in test mode
 
 
@@ -1311,16 +1310,19 @@ static READ8_HANDLER( s12_mcu_rtc_r )
 			ret = make_bcd(systime.local_time.hour);	// hour (BCD, 0-23)
 			break;
 		case 3:
-			ret = make_bcd(weekday[systime.local_time.weekday]); // day of the week (1 = Monday, 7 = Sunday)
+			ret = make_bcd(weekday[systime.local_time.weekday]);	// low nibble = day of the week
+			ret |= (make_bcd(systime.local_time.mday) & 0x0f)<<4;	// high nibble = low digit of day
 			break;
 		case 4:
-			ret = make_bcd(systime.local_time.mday);	// day (BCD, 1-31)
+			ret = (make_bcd(systime.local_time.mday) >> 4);			// low nibble = high digit of day
+			ret |= (make_bcd(systime.local_time.month + 1) & 0x0f)<<4;	// high nibble = low digit of month
 			break;
 		case 5:
-			ret = make_bcd(systime.local_time.month + 1);	// month (BCD, 1-12)
+			ret = make_bcd(systime.local_time.month + 1) >> 4;	// low nibble = high digit of month
+			ret |= (make_bcd(systime.local_time.year % 10) << 4);	// high nibble = low digit of year
 			break;
 		case 6:
-			ret = make_bcd(systime.local_time.year % 100);	// year (BCD, 0-99)
+			ret = make_bcd(systime.local_time.year % 100) >> 4;	// low nibble = tens digit of year (BCD, 0-9)
 			break;
 	}
 
