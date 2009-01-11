@@ -208,7 +208,7 @@ part of the screen, in the attract mode this works fine, but in the
 game it doesn't, so maybe it wasn't really hooked up and instead
 only one of the register (f001) is used for both part?
 
-* update, it is correct, the screen is meant to split in two when
+ update, it is correct, the screen is meant to split in two when
  the kid goes what would be offscreen, just looked kinda odd
 
 Interesting note, each Bank in the 0x8000 - 0xbfff appears to
@@ -598,6 +598,12 @@ GFXDECODE_END
 
 */
 
+static MACHINE_START( angelkds )
+{
+    state_save_register_global_array(machine, angelkds_sound);
+    state_save_register_global_array(machine, angelkds_sound2);
+}
+
 static MACHINE_DRIVER_START( angelkds )
 	MDRV_CPU_ADD("main", Z80, 8000000) /* 8MHz? 6 seems too slow? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
@@ -607,6 +613,8 @@ static MACHINE_DRIVER_START( angelkds )
 	MDRV_CPU_ADD("sub", Z80, 4000000) /* 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_IO_MAP(sub_portmap,0)
+
+    MDRV_MACHINE_START(angelkds)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -740,5 +748,5 @@ ROM_END
 static DRIVER_INIT( spcpostn )	{ spcpostn_decode(machine, "main"); }
 
 
-GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" , 0) /* Nasco not displayed but 'Exa Planning' is */
-GAME( 1986, spcpostn, 0, angelkds, spcpostn, spcpostn,  ROT90,  "Sega / Nasco", "Space Position (Japan)" , 0) /* encrypted */
+GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" , GAME_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */
+GAME( 1986, spcpostn, 0, angelkds, spcpostn, spcpostn,  ROT90,  "Sega / Nasco", "Space Position (Japan)" , GAME_SUPPORTS_SAVE) /* encrypted */

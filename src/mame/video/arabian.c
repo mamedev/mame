@@ -217,6 +217,11 @@ VIDEO_START( arabian )
 		converted_gfx[offs * 4 + 1] = p3;
 		converted_gfx[offs * 4 + 0] = p4;
 	}
+
+    state_save_register_global_pointer(machine, main_bitmap, BITMAP_WIDTH * BITMAP_HEIGHT);
+    state_save_register_global_pointer(machine, converted_gfx, 0x8000 * 2);
+    state_save_register_global(machine, arabian_video_control);
+    state_save_register_global(machine, arabian_flip_screen);
 }
 
 

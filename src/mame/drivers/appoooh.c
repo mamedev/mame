@@ -54,35 +54,37 @@ Credits:
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
 
-static UINT8 *adpcmptr = 0;
-static int appoooh_adpcm_data;
+static UINT32 appoooh_adpcm_data;
+static UINT32 appoooh_adpcm_address = 0xffffffff;
 
 static void appoooh_adpcm_int(const device_config *device)
 {
-	if( adpcmptr )
+	if(appoooh_adpcm_address != 0xffffffff)
 	{
-		if( appoooh_adpcm_data==-1)
+		if(appoooh_adpcm_data == 0xffffffff)
 		{
-			appoooh_adpcm_data = *adpcmptr++;
-			msm5205_data_w(0,appoooh_adpcm_data >> 4);
-			if(appoooh_adpcm_data==0x70)
+            UINT8 *RAM = memory_region(device->machine, "adpcm");
+            appoooh_adpcm_data = RAM[appoooh_adpcm_address++];
+			msm5205_data_w(0, appoooh_adpcm_data >> 4);
+			if(appoooh_adpcm_data == 0x70)
 			{
-				adpcmptr = 0;
+                appoooh_adpcm_address = 0xffffffff;
 				msm5205_reset_w(0,1);
 			}
-		}else{
+		}
+        else
+        {
 			msm5205_data_w(0,appoooh_adpcm_data & 0x0f );
-			appoooh_adpcm_data =-1;
+			appoooh_adpcm_data = -1;
 		}
 	}
 }
 /* adpcm address write */
 static WRITE8_HANDLER( appoooh_adpcm_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "adpcm");
-	adpcmptr  = &RAM[data*256];
+    appoooh_adpcm_address = data << 8;
 	msm5205_reset_w(0,0);
-	appoooh_adpcm_data=-1;
+	appoooh_adpcm_data = 0xffffffff;
 }
 
 
@@ -211,6 +213,14 @@ static const msm5205_interface msm5205_config =
 
 
 
+static MACHINE_START( appoooh )
+{
+    state_save_register_global(machine, appoooh_adpcm_data);
+    state_save_register_global(machine, appoooh_adpcm_address);
+}
+
+
+
 static MACHINE_DRIVER_START( appoooh )
 
 	/* basic machine hardware */
@@ -218,6 +228,8 @@ static MACHINE_DRIVER_START( appoooh )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+
+    MDRV_MACHINE_START(appoooh)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -421,6 +433,8 @@ static MACHINE_DRIVER_START( robowres )
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
+    MDRV_MACHINE_START(appoooh)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -560,6 +574,6 @@ static DRIVER_INIT(robowrb){
 }
 
 
-GAME( 1984, appoooh,  0,        appoooh,  appoooh,  0,        ROT0, "[Sanritsu] Sega", "Appoooh", 0 )
-GAME( 1986, robowres, 0, 		robowres, robowres, robowres, ROT0, "Sega", "Robo Wres 2001", 0 )
-GAME( 1986, robowrb,  robowres, robowres, robowres, robowrb,  ROT0, "bootleg", "Robo Wres 2001 (bootleg)", 0 )
+GAME( 1984, appoooh,  0,        appoooh,  appoooh,  0,        ROT0, "[Sanritsu] Sega", "Appoooh", GAME_SUPPORTS_SAVE )
+GAME( 1986, robowres, 0,        robowres, robowres, robowres, ROT0, "Sega", "Robo Wres 2001", GAME_SUPPORTS_SAVE )
+GAME( 1986, robowrb,  robowres, robowres, robowres, robowrb,  ROT0, "bootleg", "Robo Wres 2001 (bootleg)", GAME_SUPPORTS_SAVE )

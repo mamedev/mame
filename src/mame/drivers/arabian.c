@@ -361,6 +361,12 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
+static MACHINE_START( arabian )
+{
+    state_save_register_global(machine, custom_cpu_reset);
+    state_save_register_global(machine, custom_cpu_busy);
+}
+
 static MACHINE_DRIVER_START( arabian )
 
 	/* basic machine hardware */
@@ -368,6 +374,8 @@ static MACHINE_DRIVER_START( arabian )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+    MDRV_MACHINE_START(arabian)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -449,5 +457,5 @@ static DRIVER_INIT( arabian )
  *
  *************************************/
 
-GAME( 1983, arabian,  0,        arabian,  arabian,  arabian,  ROT270, "Sun Electronics",                   "Arabian",         0 )
-GAME( 1983, arabiana, arabian,  arabian,  arabiana, arabian,  ROT270, "[Sun Electronics] (Atari license)", "Arabian (Atari)", 0 )
+GAME( 1983, arabian,  0,        arabian,  arabian,  arabian,  ROT270, "Sun Electronics",                   "Arabian",         GAME_SUPPORTS_SAVE )
+GAME( 1983, arabiana, arabian,  arabian,  arabiana, arabian,  ROT270, "[Sun Electronics] (Atari license)", "Arabian (Atari)", GAME_SUPPORTS_SAVE )

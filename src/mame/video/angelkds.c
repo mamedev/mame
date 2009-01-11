@@ -13,12 +13,13 @@ static tilemap *tx_tilemap,*bgbot_tilemap ,*bgtop_tilemap;
 
 UINT8 *angelkds_txvideoram, *angelkds_bgbotvideoram, *angelkds_bgtopvideoram;
 
+static int angelkds_txbank;
+static int angelkds_bgbotbank;
+static int angelkds_bgtopbank;
+
 /*** Text Layer Tilemap
 
 */
-
-static int angelkds_txbank;
-
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
@@ -49,9 +50,6 @@ if (angelkds_txbank != data)
 /*** Top Half Background Tilemap
 
 */
-
-static int angelkds_bgtopbank;
-
 
 static TILE_GET_INFO( get_bgtop_tile_info )
 {
@@ -88,8 +86,6 @@ WRITE8_HANDLER( angelkds_bgtopscroll_write )
 /*** Bottom Half Background Tilemap
 
 */
-
-static int angelkds_bgbotbank;
 
 static TILE_GET_INFO( get_bgbot_tile_info )
 {
@@ -271,6 +267,10 @@ VIDEO_START( angelkds )
 
 	bgtop_tilemap = tilemap_create(machine, get_bgtop_tile_info,tilemap_scan_rows, 8, 8,32,32);
 	tilemap_set_transparent_pen(bgtop_tilemap,15);
+
+    state_save_register_global(machine, angelkds_txbank);
+    state_save_register_global(machine, angelkds_bgbotbank);
+    state_save_register_global(machine, angelkds_bgtopbank);
 }
 
 /* enable bits are uncertain */

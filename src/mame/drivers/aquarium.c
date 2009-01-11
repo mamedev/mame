@@ -341,6 +341,11 @@ static const ym2151_interface ym2151_config =
 };
 
 
+static MACHINE_START( aquarium )
+{
+    state_save_register_global(machine, aquarium_snd_ack);
+}
+
 static MACHINE_DRIVER_START( aquarium )
 
 	/* basic machine hardware */
@@ -352,6 +357,7 @@ static MACHINE_DRIVER_START( aquarium )
 	MDRV_CPU_PROGRAM_MAP(snd_map,0)
 	MDRV_CPU_IO_MAP(snd_portmap,0)
 
+    MDRV_MACHINE_START(aquarium)
 #if AQUARIUS_HACK
 	MDRV_MACHINE_RESET(aquarium)
 #endif
@@ -414,7 +420,7 @@ ROM_START( aquarium )
 ROM_END
 
 #if !AQUARIUS_HACK
-GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", GAME_NO_COCKTAIL )
+GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 #else
-GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium", GAME_NO_COCKTAIL )
+GAME( 1996, aquarium, 0, aquarium, aquarium, aquarium, ROT0, "Excellent System", "Aquarium", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 #endif

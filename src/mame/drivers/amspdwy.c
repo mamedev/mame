@@ -43,25 +43,34 @@ VIDEO_UPDATE( amspdwy );
 
     Or last value when wheel delta = 0
 */
-#define AMSPDWY_WHEEL_R( _n_ ) \
-static READ8_HANDLER( amspdwy_wheel_##_n_##_r ) \
-{ \
-	static UINT8 wheel_old, ret; \
-	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };\
-	UINT8 wheel; \
-	wheel = input_port_read(space->machine, portnames[2 + _n_]); \
-	if (wheel != wheel_old) \
-	{ \
-		wheel = (wheel & 0x7fff) - (wheel & 0x8000); \
-		if (wheel > wheel_old)	ret = ((+wheel) & 0xf) | 0x00; \
-		else					ret = ((-wheel) & 0xf) | 0x10; \
-		wheel_old = wheel; \
-	} \
-	return ret | input_port_read(space->machine, portnames[_n_]); \
-}
-AMSPDWY_WHEEL_R( 0 )
-AMSPDWY_WHEEL_R( 1 )
 
+static UINT8 wheel_old[2];
+static UINT8 wheel_return[2];
+
+static UINT8 amspdwy_wheel_r(running_machine *machine, int index)
+{
+    static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };
+    UINT8 wheel;
+    wheel = input_port_read(machine, portnames[2 + index]);
+    if (wheel != wheel_old[index])
+    {
+        wheel = (wheel & 0x7fff) - (wheel & 0x8000);
+        if (wheel > wheel_old[index])  wheel_return[index] = ((+wheel) & 0xf) | 0x00;
+        else                           wheel_return[index] = ((-wheel) & 0xf) | 0x10;
+        wheel_old[index] = wheel;
+    }
+    return wheel_return[index] | input_port_read(machine, portnames[index]);
+}
+
+static READ8_HANDLER( amspdwy_wheel_0_r )
+{
+    return amspdwy_wheel_r(space->machine, 0);
+}
+
+static READ8_HANDLER( amspdwy_wheel_1_r )
+{
+    return amspdwy_wheel_r(space->machine, 0);
+}
 
 static READ8_HANDLER( amspdwy_sound_r )
 {
@@ -250,6 +259,13 @@ static const ym2151_interface amspdwy_ym2151_interface =
 	irq_handler
 };
 
+static MACHINE_START( amspdwy )
+{
+    wheel_old[0]    = wheel_old[1]    = 0;
+    wheel_return[0] = wheel_return[1] = 0;
+    state_save_register_global_array(machine, wheel_old);
+    state_save_register_global_array(machine, wheel_return);
+}
 
 static MACHINE_DRIVER_START( amspdwy )
 
@@ -261,6 +277,8 @@ static MACHINE_DRIVER_START( amspdwy )
 
 	MDRV_CPU_ADD("audio", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
 	MDRV_CPU_PROGRAM_MAP(amspdwy_sound_map,0)
+
+    MDRV_MACHINE_START(amspdwy)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -376,5 +394,5 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 1)", 0 )
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 2)", 0 )
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, 0, ROT0, "Enerdyne Technologies, Inc.", "American Speedway (set 2)", GAME_SUPPORTS_SAVE )

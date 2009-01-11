@@ -145,6 +145,9 @@ VIDEO_START( appoooh )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_scrolldy(fg_tilemap,8,8);
 	tilemap_set_scrolldy(bg_tilemap,8,8);
+
+    state_save_register_global(machine, scroll_x);
+    state_save_register_global(machine, priority);
 }
 
 WRITE8_HANDLER( appoooh_scroll_w )
