@@ -13,7 +13,6 @@ UINT8 segag80r_background_pcb;
 
 static double rweights[3], gweights[3], bweights[2];
 
-static UINT8 *dirtychar;
 static UINT8 video_control;
 static UINT8 video_flip;
 static UINT8 vblank_latch;
@@ -209,9 +208,7 @@ VIDEO_START( segag80r )
 			3,	rg_resistances, gweights, 220, 0,
 			2,	b_resistances,  bweights, 220, 0);
 
-	/* allocate paletteram */
-	dirtychar = auto_malloc(256);
-	memset(dirtychar, 1, 256);
+	gfx_element_set_source(machine->gfx[0], &videoram[0x800]);
 
 	/* allocate paletteram */
 	paletteram = auto_malloc(0x80);
@@ -288,7 +285,7 @@ WRITE8_HANDLER( segag80r_videoram_w )
 
 	/* track which characters are dirty */
 	if (offset & 0x800)
-		dirtychar[(offset & 0x7ff) / 8] = TRUE;
+		gfx_element_mark_dirty(space->machine->gfx[0], (offset & 0x7ff) / 8);
 }
 
 
@@ -657,13 +654,6 @@ static void draw_videoram(running_machine *machine, bitmap_t *bitmap, const rect
 		{
 			int offs = effy * 32 + (x ^ flipmask);
 			UINT8 tile = videoram[offs];
-
-			/* if the tile is dirty, decode it */
-			if (dirtychar[tile])
-			{
-				decodechar(machine->gfx[0], tile, &videoram[0x800]);
-				dirtychar[tile] = 0;
-			}
 
 			/* draw the tile */
 			drawgfx(bitmap, machine->gfx[0], tile, tile >> 4, video_flip, video_flip, x*8, y*8, cliprect, TRANSPARENCY_PENS, transparent_pens[tile >> 4]);

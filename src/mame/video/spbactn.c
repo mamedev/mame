@@ -90,12 +90,12 @@ static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
 					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
 
-					drawgfx(bitmap, machine->gfx[2],
+					drawgfx_transpen_raw(bitmap, cliprect, machine->gfx[2],
 						code + layout[row][col],
 						machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 						flipx, flipy,
 						x, y,
-						cliprect, TRANSPARENCY_PEN_RAW, 0);
+						0);
 				}
 			}
 
@@ -133,12 +133,12 @@ VIDEO_UPDATE( spbactn )
 
 		color = ((attr & 0x00f0) >> 4) | 0x80;
 
-		drawgfx(tile_bitmap_bg, screen->machine->gfx[1],
+		drawgfx_transpen_raw(tile_bitmap_bg, cliprect, screen->machine->gfx[1],
 					code,
 					screen->machine->gfx[1]->color_base + color * screen->machine->gfx[1]->color_granularity,
 					0, 0,
 					16 * sx, 8 * sy,
-					cliprect, TRANSPARENCY_PEN_RAW, -1);
+					-1);
 
 		sx++;
 		if (sx > 63)
@@ -160,12 +160,12 @@ VIDEO_UPDATE( spbactn )
 
 			color = ((attr & 0x00f0) >> 4) | 0x80;
 
-			drawgfx(tile_bitmap_bg, screen->machine->gfx[1],
+			drawgfx_transpen_raw(tile_bitmap_bg, cliprect, screen->machine->gfx[1],
 					code,
 					screen->machine->gfx[1]->color_base + color * screen->machine->gfx[1]->color_granularity,
 					0, 0,
 					16 * sx, 8 * sy,
-					cliprect, TRANSPARENCY_PEN_RAW, 0);
+					0);
 
 			sx++;
 			if (sx > 63)
@@ -194,12 +194,12 @@ VIDEO_UPDATE( spbactn )
 		else
 			color |= 0x0080;
 
-		drawgfx(tile_bitmap_fg, screen->machine->gfx[0],
+		drawgfx_transpen_raw(tile_bitmap_fg, cliprect, screen->machine->gfx[0],
 					code,
 					screen->machine->gfx[0]->color_base + color * screen->machine->gfx[0]->color_granularity,
 					0, 0,
 					16 * sx, 8 * sy,
-					cliprect, TRANSPARENCY_PEN_RAW, 0);
+					0);
 
 		sx++;
 		if (sx > 63)

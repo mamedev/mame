@@ -195,10 +195,6 @@ UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;
 UINT32 *skns_palette_ram;
 UINT32 *skns_pal_regs, *skns_v3_regs, *skns_spc_regs;
 
-UINT32 skns_v3t_dirty[0x4000]; // allocate this elsewhere?
-UINT32 skns_v3t_4bppdirty[0x8000]; // allocate this elsewhere?
-int skns_v3t_somedirty,skns_v3t_4bpp_somedirty;
-
 static UINT32 *skns_v3t_ram, *skns_main_ram, *skns_cache_ram;
 
 /* hit.c */
@@ -755,10 +751,8 @@ static WRITE32_HANDLER( skns_v3t_w )
 
 	COMBINE_DATA(&skns_v3t_ram[offset]);
 
-	skns_v3t_dirty[offset/0x40] = 1;
-	skns_v3t_somedirty = 1;
-	skns_v3t_4bppdirty[offset/0x20] = 1;
-	skns_v3t_4bpp_somedirty = 1;
+	gfx_element_mark_dirty(space->machine->gfx[1], offset/0x40);
+	gfx_element_mark_dirty(space->machine->gfx[3], offset/0x20);
 
 	data = skns_v3t_ram[offset];
 // i think we need to swap around to decode .. endian issues?

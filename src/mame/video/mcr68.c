@@ -73,6 +73,8 @@ VIDEO_START( zwackery )
 	const UINT8 *colordatabase = (const UINT8 *)memory_region(machine, "gfx3");
 	gfx_element *gfx0 = machine->gfx[0];
 	gfx_element *gfx2 = machine->gfx[2];
+	UINT8 *srcdata0, *dest0;
+	UINT8 *srcdata2, *dest2;
 	int code, y, x;
 
 	/* initialize the background tilemap */
@@ -82,18 +84,24 @@ VIDEO_START( zwackery )
 	fg_tilemap = tilemap_create(machine, zwackery_get_fg_tile_info, tilemap_scan_rows,  16,16, 32,32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
+	/* allocate memory for the assembled gfx data */
+	srcdata0 = auto_malloc(gfx0->total_elements * gfx0->width * gfx0->height);
+	srcdata2 = auto_malloc(gfx2->total_elements * gfx2->width * gfx2->height);
+	
 	/* "colorize" each code */
+	dest0 = srcdata0;
+	dest2 = srcdata2;
 	for (code = 0; code < gfx0->total_elements; code++)
 	{
 		const UINT8 *coldata = colordatabase + code * 32;
-		UINT8 *gfxdata0 = gfx0->gfxdata + code * gfx0->char_modulo;
-		UINT8 *gfxdata2 = gfx2->gfxdata + code * gfx2->char_modulo;
+		const UINT8 *gfxdata0 = gfx_element_get_data(gfx0, code);
+		const UINT8 *gfxdata2 = gfx_element_get_data(gfx2, code);
 
 		/* assume 16 rows */
 		for (y = 0; y < 16; y++)
 		{
-			UINT8 *gd0 = gfxdata0;
-			UINT8 *gd2 = gfxdata2;
+			const UINT8 *gd0 = gfxdata0;
+			const UINT8 *gd2 = gfxdata2;
 
 			/* 16 columns */
 			for (x = 0; x < 16; x++, gd0++, gd2++)
@@ -104,12 +112,12 @@ VIDEO_START( zwackery )
 				int tp0, tp1;
 
 				/* every 4 pixels gets its own foreground/background colors */
-				*gd0 = *gd0 ? pen1 : pen0;
+				*dest0++ = *gd0 ? pen1 : pen0;
 
 				/* for gfx 2, we convert all low-priority pens to 0 */
 				tp0 = (pen0 & 0x80) ? pen0 : 0;
 				tp1 = (pen1 & 0x80) ? pen1 : 0;
-				*gd2 = *gd2 ? tp1 : tp0;
+				*dest2++ = *gd2 ? tp1 : tp0;
 			}
 
 			/* advance */
@@ -117,6 +125,20 @@ VIDEO_START( zwackery )
 			gfxdata2 += gfx2->line_modulo;
 		}
 	}
+
+	/* create a simple target layout */
+	gfx0->layout.planes = gfx2->layout.planes = 8;
+	for (x = 0; x < 8; x++)
+		gfx0->layout.planeoffset[x] = gfx2->layout.planeoffset[x] = x;
+	for (x = 0; x < gfx0->width; x++)
+		gfx0->layout.xoffset[x] = gfx2->layout.xoffset[x] = 8 * x;
+	for (y = 0; y < gfx0->height; y++)
+		gfx0->layout.yoffset[y] = gfx2->layout.yoffset[y] = 8 * y * gfx0->width;
+	gfx0->layout.charincrement = gfx2->layout.charincrement = 8 * gfx0->width * gfx0->height;
+
+	/* make the assembled data our new source data */
+	gfx_element_set_source(gfx0, srcdata0);
+	gfx_element_set_source(gfx2, srcdata2);
 }
 
 

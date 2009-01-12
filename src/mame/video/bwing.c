@@ -81,6 +81,13 @@ WRITE8_HANDLER( bwing_scrollram_w )
 
 		tilemap_mark_tile_dirty(scrollmap[offset>>12], offset & 0xfff);
 	}
+	else
+	{
+		if (offset < 0x1000)
+			gfx_element_mark_dirty(fgfx, offset/32);
+		else
+			gfx_element_mark_dirty(bgfx, offset/32);
+	}
 
 	(srbase[srbank])[offset] = data;
 }
@@ -88,10 +95,6 @@ WRITE8_HANDLER( bwing_scrollram_w )
 
 WRITE8_HANDLER( bwing_scrollreg_w )
 {
-	static unsigned bp_ready=0;
-	unsigned i;
-	UINT8 *src;
-
 	sreg[offset] = data;
 
 	switch (offset)
@@ -102,19 +105,6 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 			// tile graphics are decoded in RAM on the fly and tile codes are banked + interleaved(ouch)
 			mapmask = data;
 			srbank = data >> 6;
-
-			if (srbank) bp_ready |= 1<<(srbank-1) & 7;
-
-			if (bp_ready == 7 && !srbank)
-			{
-				src = srbase[1];
-				for (i=0; i<BW_NTILES; i++) decodechar(fgfx, i, src);
-
-				src += 0x1000;
-				for (i=0; i<BW_NTILES; i++) decodechar(bgfx, i, src);
-
-				bp_ready = 0;
-			}
 
 			#if BW_DEBUG
 				logerror("(%s)%04x: w=%02x a=%04x f=%d\n", space->cpu->tag, cpu_get_pc(space->cpu),data,0x1b00+offset,video_screen_get_frame_number(space->machine->primary_screen));
@@ -164,7 +154,7 @@ WRITE8_HANDLER( bwing_paletteram_w )
 // Initializations
 
 #define BW_SET_TILE_INFO(GFX, CODE, COLOR) { \
-	tileinfo->pen_data = GFX->gfxdata + (CODE) * GFX->char_modulo; \
+	tileinfo->pen_data = gfx_element_get_data(GFX, CODE); \
 	tileinfo->palette_base = GFX->color_base + ((COLOR) << 3); \
 	}
 
@@ -215,7 +205,9 @@ VIDEO_START( bwing )
 	for (i=0; i<8; i++) sreg[i] = 0;
 
 	fgfx = machine->gfx[2];
+	gfx_element_set_source(fgfx, srbase[1]);
 	bgfx = machine->gfx[3];
+	gfx_element_set_source(bgfx, srbase[1] + 0x1000);
 
 	dwptr = fgfx->pen_usage;
 	if (dwptr)

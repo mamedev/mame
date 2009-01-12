@@ -14,18 +14,24 @@ static int oinprion, cbparam;
 static int sprite_colorbase, sub1_colorbase, last_psac_colorbase, gametype;
 static int roz_enable, roz_rombank;
 static tilemap *ult_936_tilemap;
-static char *orig_roms;
 
-// do some trickery since we know the graphics decode doesn't touch the source data again
-// and we want the original data
-static void mystwarr_save_orig_tiles(running_machine *machine)
+// create a decoding buffer to hold decodable tiles so that the ROM test will pass by
+// reading the original raw data
+static void mystwarr_decode_tiles(running_machine *machine)
 {
 	UINT8 *s = memory_region(machine, "gfx1");
 	int len = memory_region_length(machine, "gfx1");
 	UINT8 *pFinish = s+len-3;
+	UINT8 *d, *decoded;
+	int gfxnum;
+	
+	for (gfxnum = 0; gfxnum < ARRAY_LENGTH(machine->gfx); gfxnum++)
+		if (machine->gfx[gfxnum] != NULL && machine->gfx[gfxnum]->srcdata == s)
+			break;
+	assert(gfxnum != ARRAY_LENGTH(machine->gfx));
 
-	orig_roms = malloc_or_die(len);
-	memcpy(orig_roms, s, len);
+	decoded = auto_malloc(len);
+	d = decoded;
 
 	// now convert the data into a drawable format so we can decode it
 	while (s < pFinish)
@@ -43,23 +49,17 @@ static void mystwarr_save_orig_tiles(running_machine *machine)
 		int d3 = ((s[0]&0x10)<<3)|((s[0]&0x01)<<6)|((s[1]&0x10)<<1)|((s[1]&0x01)<<4)|
 		         ((s[2]&0x10)>>1)|((s[2]&0x01)<<2)|((s[3]&0x10)>>3)|((s[3]&0x01)   );
 
-		s[0] = d3;
-		s[1] = d1;
-		s[2] = d2;
-		s[3] = d0;
+		d[0] = d3;
+		d[1] = d1;
+		d[2] = d2;
+		d[3] = d0;
+		d[4] = s[4];
 
 		s += 5;
+		d += 5;
 	}
-}
-
-static void mystwarr_rest_orig_tiles(running_machine *machine)
-{
-	UINT8 *s = memory_region(machine, "gfx1");
-	int len = memory_region_length(machine, "gfx1");
-
-	// restore the original data so the ROM test can pass
-	memcpy(s, orig_roms, len);
-	free(orig_roms);
+	
+	gfx_element_set_source(machine->gfx[gfxnum], decoded);
 }
 
 
@@ -164,11 +164,9 @@ VIDEO_START(gaiapols)
 
 	gametype = 0;
 
-	mystwarr_save_orig_tiles(machine);
-
 	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
-	mystwarr_rest_orig_tiles(machine);
+	mystwarr_decode_tiles(machine);
 
 	K055673_vh_start(machine, "gfx2", 1, -61, -22, gaiapols_sprite_callback); // stage2 brick walls
 
@@ -206,11 +204,9 @@ VIDEO_START(dadandrn)
 
 	gametype = 1;
 
-	mystwarr_save_orig_tiles(machine);
-
 	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
-	mystwarr_rest_orig_tiles(machine);
+	mystwarr_decode_tiles(machine);
 
 	K055673_vh_start(machine, "gfx2", 0, -42, -22, gaiapols_sprite_callback);
 
@@ -237,11 +233,9 @@ VIDEO_START(mystwarr)
 
 	gametype = 0;
 
-	mystwarr_save_orig_tiles(machine);
-
 	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, mystwarr_tile_callback, 0);
 
-	mystwarr_rest_orig_tiles(machine);
+	mystwarr_decode_tiles(machine);
 
 	K055673_vh_start(machine, "gfx2", 0, -48, -24, mystwarr_sprite_callback);
 
@@ -265,11 +259,9 @@ VIDEO_START(metamrph)
 	K054338_vh_start(machine);
 	K053250_vh_start(machine, 1, &rgn_250);
 
-	mystwarr_save_orig_tiles(machine);
-
 	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
-	mystwarr_rest_orig_tiles(machine);
+	mystwarr_decode_tiles(machine);
 
 	K055673_vh_start(machine, "gfx2", 1, -51, -22, metamrph_sprite_callback);
 
@@ -291,11 +283,9 @@ VIDEO_START(viostorm)
 	K055555_vh_start(machine);
 	K054338_vh_start(machine);
 
-	mystwarr_save_orig_tiles(machine);
-
 	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game4bpp_tile_callback, 0);
 
-	mystwarr_rest_orig_tiles(machine);
+	mystwarr_decode_tiles(machine);
 
 	K055673_vh_start(machine, "gfx2", 1, -62, -23, metamrph_sprite_callback);
 
@@ -314,11 +304,9 @@ VIDEO_START(martchmp)
 	K055555_vh_start(machine);
 	K054338_vh_start(machine);
 
-	mystwarr_save_orig_tiles(machine);
-
 	K056832_vh_start(machine, "gfx1", K056832_BPP_5, 0, NULL, game5bpp_tile_callback, 0);
 
-	mystwarr_rest_orig_tiles(machine);
+	mystwarr_decode_tiles(machine);
 
 	K055673_vh_start(machine, "gfx2", 0, -58, -23, martchmp_sprite_callback);
 

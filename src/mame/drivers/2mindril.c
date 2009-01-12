@@ -81,13 +81,7 @@ static UINT16 *textram;
 
 static VIDEO_UPDATE( drill )
 {
-	int i;
 	bitmap_fill(bitmap,NULL,0);
-
-	for (i=0; i<256; i++)
-	{
-		decodechar(screen->machine->gfx[1],i,(UINT8*)&charram[0]);
-	}
 
 	DRAW_MAP(map1ram,0)
 	DRAW_MAP(map2ram,1)
@@ -117,6 +111,7 @@ static VIDEO_UPDATE( drill )
 static VIDEO_START( drill )
 {
 	machine->gfx[0]->color_granularity=16;
+	gfx_element_set_source(machine->gfx[1], (UINT8 *)charram);
 }
 
 static UINT16 *iodata;
@@ -220,6 +215,12 @@ static WRITE16_HANDLER( sensors_w )
 	}
 }
 
+static WRITE16_HANDLER( charram_w )
+{
+	COMBINE_DATA(&charram[offset]);
+	gfx_element_mark_dirty(space->machine->gfx[1], offset/16);
+}
+
 static ADDRESS_MAP_START( drill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
@@ -229,7 +230,7 @@ static ADDRESS_MAP_START( drill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x414000, 0x415fff) AM_RAM AM_BASE(&map3ram)
 	AM_RANGE(0x416000, 0x417fff) AM_RAM AM_BASE(&map4ram)
 	AM_RANGE(0x41c000, 0x41dfff) AM_RAM AM_BASE(&textram)
-	AM_RANGE(0x41e000, 0x41ffff) AM_RAM AM_BASE(&charram)
+	AM_RANGE(0x41e000, 0x41ffff) AM_RAM_WRITE(charram_w) AM_BASE(&charram)
 	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE(&unkram)// video stuff, 460000 - video regs ?
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x502000, 0x503fff) AM_RAM

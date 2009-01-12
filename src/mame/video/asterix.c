@@ -123,8 +123,9 @@ VIDEO_UPDATE( asterix )
 	K056832_tilemap_draw(screen->machine, bitmap, cliprect, layer[1], 0, 2);
 	K056832_tilemap_draw(screen->machine, bitmap, cliprect, layer[2], 0, 4);
 
-	pdrawgfx_shadow_lowpri = 1;	/* fix shadows in front of feet */
-	K053245_sprites_draw(0, bitmap, cliprect);
+/* this isn't supported anymore and it is unsure if still needed; keeping here for reference 
+	pdrawgfx_shadow_lowpri = 1; fix shadows in front of feet */
+	K053245_sprites_draw(screen->machine, 0, bitmap, cliprect);
 
 	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 2, 0, 0);
 	return 0;

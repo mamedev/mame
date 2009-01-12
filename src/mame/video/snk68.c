@@ -19,6 +19,7 @@ UINT16* pow_fg_videoram;
 static int sprite_flip_axis;
 static tilemap *fg_tilemap;
 static int flipscreen;
+static UINT32 fg_tile_offset;
 
 /***************************************************************************
 
@@ -28,7 +29,7 @@ static int flipscreen;
 
 static TILE_GET_INFO( get_pow_tile_info )
 {
-	int tile = (pow_fg_videoram[2*tile_index] & 0xff);
+	int tile = fg_tile_offset + (pow_fg_videoram[2*tile_index] & 0xff);
 	int color = pow_fg_videoram[2*tile_index+1] & 0x07;
 
 	SET_TILE_INFO(0, tile, color, 0);
@@ -63,6 +64,7 @@ static void common_video_start(running_machine *machine)
 VIDEO_START( pow )
 {
 	fg_tilemap = tilemap_create(machine, get_pow_tile_info,tilemap_scan_cols,8,8,32,32);
+	fg_tile_offset = 0;
 
 	common_video_start(machine);
 }
@@ -139,7 +141,11 @@ WRITE16_HANDLER( pow_flipscreen16_w )
 
 		sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
 
-		tilemap_set_pen_data_offset(fg_tilemap, ((data & 0x70) << 4) * space->machine->gfx[0]->char_modulo);
+		if (fg_tile_offset != ((data & 0x70) << 4))
+		{
+			fg_tile_offset = (data & 0x70) << 4;
+			tilemap_mark_all_tiles_dirty(fg_tilemap);
+		}
 	}
 }
 

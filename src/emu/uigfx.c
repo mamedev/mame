@@ -787,14 +787,14 @@ static void gfxset_draw_item(running_machine *machine, const gfx_element *gfx, i
 	for (y = 0; y < height; y++)
 	{
 		UINT32 *dest = (UINT32 *)bitmap->base + (dsty + y) * rowpixels + dstx;
-		UINT8 *src = gfx->gfxdata + index * gfx->char_modulo;
+		const UINT8 *src = gfx_element_get_data(gfx, index);
 
 		/* loop over columns in the cell */
 		for (x = 0; x < width; x++)
 		{
 			int effx = x, effy = y;
 			rgb_t pixel;
-			UINT8 *s;
+			const UINT8 *s;
 
 			/* compute effective x,y values after rotation */
 			if (!(rotate & ORIENTATION_SWAP_XY))

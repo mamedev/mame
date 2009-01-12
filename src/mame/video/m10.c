@@ -69,8 +69,7 @@ WRITE8_HANDLER( m15_chargen_w )
 	if (state->chargen[offset] != data)
 	{
 		state->chargen[offset] = data;
-		/* not very effective ... dirty would be better */
-		decodechar(space->machine->gfx[0],offset >> 3,state->chargen);
+		gfx_element_mark_dirty(space->machine->gfx[0],offset >> 3);
 	}
 }
 
@@ -88,7 +87,7 @@ INLINE void plot_pixel_m10(running_machine *machine, bitmap_t *bm, int x, int y,
 
 VIDEO_START( m10 )
 {
-	//m10_state *state = machine->driver_data;
+	m10_state *state = machine->driver_data;
 	int i;
 
 	for (i=0;i<32*8;i++)
@@ -99,8 +98,7 @@ VIDEO_START( m10 )
 	tilemap_set_scrolldx(tx_tilemap, 0, 62);
 	tilemap_set_scrolldy(tx_tilemap, 0, 0);
 
-	back_gfx = allocgfx(machine, &backlayout);
-	back_gfx->total_colors = 8;
+	back_gfx = gfx_element_alloc(machine, &backlayout, state->chargen, 8, 0);
 
 	machine->gfx[1] = back_gfx;
 	return ;
@@ -110,10 +108,7 @@ VIDEO_START( m15 )
 {
 	m10_state *state = machine->driver_data;
 
-	machine->gfx[0] = allocgfx(machine, &charlayout);
-	machine->gfx[0]->total_colors = 8;
-
-	decodegfx(machine->gfx[0], state->chargen,0,256);
+	machine->gfx[0] = gfx_element_alloc(machine, &charlayout, state->chargen, 8, 0);
 
 	tx_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,32,32);
 	tilemap_set_scrolldx(tx_tilemap, 0, 116);
@@ -137,7 +132,6 @@ VIDEO_UPDATE( m10 )
 
 	bitmap_fill(bitmap,cliprect,0);
 
-	decodegfx(back_gfx, state->chargen,0,4);
 	for (i=0;i<4;i++)
 		if (state->flip)
 			drawgfx(bitmap, back_gfx, i, color[i], 1, 1, 31*8 - xpos[i], 6, cliprect, 0, 0);

@@ -293,6 +293,7 @@ static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectan
 
 		clip.min_y += visarea->min_y + yoffs;
 		clip.max_y += visarea->max_y + yoffs;
+		sect_rect(&clip, cliprect);
 
 		copybitmap(bitmap, scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
 				   sx, visarea->min_y + yoffs, &clip);

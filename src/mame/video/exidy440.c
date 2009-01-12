@@ -420,7 +420,7 @@ static void update_screen(const device_config *screen, bitmap_t *bitmap, const r
 			sy -= (VBSTART - VBEND);
 
 		/* draw line */
-		draw_scanline8(bitmap, 0, y, (HBSTART - HBEND), &local_videoram[sy * 512], NULL, -1);
+		draw_scanline8(bitmap, 0, y, (HBSTART - HBEND), &local_videoram[sy * 512], NULL);
 	}
 
 	/* draw the sprites */

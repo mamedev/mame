@@ -24,8 +24,8 @@ static UINT8 buff_spriteram[SPRITERAM_SIZE];
 
 static TILE_GET_INFO( get_bg18_tile_info )
 {
-	int attr = taitol_rambanks[2*tile_index+0x4000+1];
-	int code = taitol_rambanks[2*tile_index+0x4000]
+	int attr = taitol_rambanks[2*tile_index+0x8000+1];
+	int code = taitol_rambanks[2*tile_index+0x8000]
 			| ((attr & 0x03) << 8)
 			| ((bankc[(attr & 0xc) >> 2]) << 10)
 			| (horshoes_gfxbank << 12);
@@ -39,8 +39,8 @@ static TILE_GET_INFO( get_bg18_tile_info )
 
 static TILE_GET_INFO( get_bg19_tile_info )
 {
-	int attr = taitol_rambanks[2*tile_index+0x5000+1];
-	int code = taitol_rambanks[2*tile_index+0x5000]
+	int attr = taitol_rambanks[2*tile_index+0x9000+1];
+	int code = taitol_rambanks[2*tile_index+0x9000]
 			| ((attr & 0x03) << 8)
 			| ((bankc[(attr & 0xc) >> 2]) << 10)
 			| (horshoes_gfxbank << 12);
@@ -54,8 +54,8 @@ static TILE_GET_INFO( get_bg19_tile_info )
 
 static TILE_GET_INFO( get_ch1a_tile_info )
 {
-	int attr = taitol_rambanks[2*tile_index+0x6000+1];
-	int code = taitol_rambanks[2*tile_index+0x6000]|((attr&0x01)<<8)|((attr&0x04)<<7);
+	int attr = taitol_rambanks[2*tile_index+0xa000+1];
+	int code = taitol_rambanks[2*tile_index+0xa000]|((attr&0x01)<<8)|((attr&0x04)<<7);
 
 	SET_TILE_INFO(
 			2,
@@ -158,50 +158,44 @@ READ8_HANDLER( taitol_control_r )
 	return cur_ctrl;
 }
 
-INLINE void taitol_chardef(running_machine *machine, int num, int offset)
-{
-	decodechar(machine->gfx[2], num, taitol_rambanks + offset);
-	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
-}
-
 void taitol_chardef14_m(running_machine *machine, int offset)
 {
-	taitol_chardef(machine, offset/32, 0);
+	gfx_element_mark_dirty(machine->gfx[2], offset/32 + 0);
 }
 
 void taitol_chardef15_m(running_machine *machine, int offset)
 {
-	taitol_chardef(machine, offset/32 + 128, 0);
+	gfx_element_mark_dirty(machine->gfx[2], offset/32 + 128);
 }
 
 void taitol_chardef16_m(running_machine *machine, int offset)
 {
-	taitol_chardef(machine, offset/32+256, 0);
+	gfx_element_mark_dirty(machine->gfx[2], offset/32 + 256);
 }
 
 void taitol_chardef17_m(running_machine *machine, int offset)
 {
-	taitol_chardef(machine, offset/32+384, 0);
+	gfx_element_mark_dirty(machine->gfx[2], offset/32 + 384);
 }
 
 void taitol_chardef1c_m(running_machine *machine, int offset)
 {
-	taitol_chardef(machine, offset/32+512, 0x4000);
+	gfx_element_mark_dirty(machine->gfx[2], offset/32 + 512);
 }
 
 void taitol_chardef1d_m(running_machine *machine, int offset)
 {
-	taitol_chardef(machine, offset/32+640, 0x4000);
+	gfx_element_mark_dirty(machine->gfx[2], offset/32 + 640);
 }
 
 void taitol_chardef1e_m(running_machine *machine, int offset)
 {
-	taitol_chardef(machine, offset/32+768, 0x4000);
+	gfx_element_mark_dirty(machine->gfx[2], offset/32 + 768);
 }
 
 void taitol_chardef1f_m(running_machine *machine, int offset)
 {
-	taitol_chardef(machine, offset/32+896, 0x4000);
+	gfx_element_mark_dirty(machine->gfx[2], offset/32 + 896);
 }
 
 void taitol_bg18_m(running_machine *machine, int offset)
@@ -299,17 +293,17 @@ VIDEO_UPDATE( taitol )
 	int dx,dy;
 
 
-	dx = taitol_rambanks[0x73f4]|(taitol_rambanks[0x73f5]<<8);
+	dx = taitol_rambanks[0xb3f4]|(taitol_rambanks[0xb3f5]<<8);
 	if (flipscreen)
 		dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
-	dy = taitol_rambanks[0x73f6];
+	dy = taitol_rambanks[0xb3f6];
 	tilemap_set_scrollx(bg18_tilemap,0,-dx);
 	tilemap_set_scrolly(bg18_tilemap,0,-dy);
 
-	dx = taitol_rambanks[0x73fc]|(taitol_rambanks[0x73fd]<<8);
+	dx = taitol_rambanks[0xb3fc]|(taitol_rambanks[0xb3fd]<<8);
 	if (flipscreen)
 		dx = ((dx & 0xfffc) | ((dx - 3) & 0x0003)) ^ 0xf;
-	dy = taitol_rambanks[0x73fe];
+	dy = taitol_rambanks[0xb3fe];
 	tilemap_set_scrollx(bg19_tilemap,0,-dx);
 	tilemap_set_scrolly(bg19_tilemap,0,-dy);
 
@@ -337,7 +331,7 @@ VIDEO_UPDATE( taitol )
 
 VIDEO_EOF( taitol )
 {
-	UINT8 *spriteram = taitol_rambanks + 0x7000;
+	UINT8 *spriteram = taitol_rambanks + 0xb000;
 
 	memcpy(buff_spriteram,spriteram,SPRITERAM_SIZE);
 }

@@ -10,8 +10,7 @@ UINT16 *f1gpb_rozregs, *f1gpb_fgregs;
 size_t f1gp_spr1cgram_size,f1gp_spr2cgram_size;
 
 static UINT16 *zoomdata;
-static int dirtygfx,flipscreen,gfxctrl;
-static UINT8 *dirtychar;
+static int flipscreen,gfxctrl;
 
 #define TOTAL_CHARS 0x800
 
@@ -63,10 +62,8 @@ VIDEO_START( f1gp )
 
 	tilemap_set_transparent_pen(fg_tilemap,0xff);
 
-	dirtychar = auto_malloc(TOTAL_CHARS);
-	memset(dirtychar,1,TOTAL_CHARS);
-
 	zoomdata = (UINT16 *)memory_region(machine, "gfx4");
+	gfx_element_set_source(machine->gfx[3], (UINT8 *)zoomdata);
 }
 
 VIDEO_START( f1gpb )
@@ -76,10 +73,8 @@ VIDEO_START( f1gpb )
 
 	tilemap_set_transparent_pen(fg_tilemap,0xff);
 
-	dirtychar = auto_malloc(TOTAL_CHARS);
-	memset(dirtychar,1,TOTAL_CHARS);
-
 	zoomdata = (UINT16 *)memory_region(machine, "gfx4");
+	gfx_element_set_source(machine->gfx[3], (UINT8 *)zoomdata);
 }
 
 VIDEO_START( f1gp2 )
@@ -95,11 +90,6 @@ VIDEO_START( f1gp2 )
 
 	tilemap_set_scrolldx(fg_tilemap,-80,0);
 	tilemap_set_scrolldy(fg_tilemap,-26,0);
-
-	dirtychar = auto_malloc(TOTAL_CHARS);
-	memset(dirtychar,1,TOTAL_CHARS);
-
-	zoomdata = (UINT16 *)memory_region(machine, "gfx4");
 }
 
 
@@ -116,13 +106,8 @@ READ16_HANDLER( f1gp_zoomdata_r )
 
 WRITE16_HANDLER( f1gp_zoomdata_w )
 {
-	int oldword = zoomdata[offset];
 	COMBINE_DATA(&zoomdata[offset]);
-	if (oldword != zoomdata[offset])
-	{
-		dirtygfx = 1;
-		dirtychar[offset / 64] = 1;
-	}
+	gfx_element_mark_dirty(space->machine->gfx[3], offset / 64);
 }
 
 READ16_HANDLER( f1gp_rozvideoram_r )
@@ -330,26 +315,6 @@ static void f1gpb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 
 VIDEO_UPDATE( f1gp )
 {
-	if (dirtygfx)
-	{
-		int i;
-
-		dirtygfx = 0;
-
-		for (i = 0;i < TOTAL_CHARS;i++)
-		{
-			if (dirtychar[i])
-			{
-				dirtychar[i] = 0;
-				decodechar(screen->machine->gfx[3],i,(UINT8 *)zoomdata);
-			}
-		}
-
-		tilemap_mark_all_tiles_dirty(roz_tilemap);
-	}
-
-
-
 	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,0);
@@ -374,24 +339,6 @@ VIDEO_UPDATE( f1gpb )
 {
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
-
-	if (dirtygfx)
-	{
-		int i;
-
-		dirtygfx = 0;
-
-		for (i = 0;i < TOTAL_CHARS;i++)
-		{
-			if (dirtychar[i])
-			{
-				dirtychar[i] = 0;
-				decodechar(screen->machine->gfx[3],i,(UINT8 *)zoomdata);
-			}
-		}
-
-		tilemap_mark_all_tiles_dirty(roz_tilemap);
-	}
 
 	incxy = (INT16)f1gpb_rozregs[1];
 	incyx = -incxy;

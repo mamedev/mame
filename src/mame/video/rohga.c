@@ -46,8 +46,6 @@ VIDEO_START( wizdfire )
 	deco16_set_tilemap_bank_callback(3,wizdfire_bank_callback);
 
 	deco16_pf1_rowscroll=deco16_pf2_rowscroll=0;
-
-	alpha_set_level(0x80);
 }
 
 VIDEO_START( nitrobal )
@@ -63,8 +61,6 @@ VIDEO_START( nitrobal )
 	deco16_set_tilemap_colour_mask(2,0);
 	deco16_set_tilemap_colour_base(3,0);
 	deco16_set_tilemap_colour_mask(3,0);
-
-	alpha_set_level(0x80);
 }
 
 /******************************************************************************/
@@ -153,7 +149,7 @@ static void wizdfire_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	for (offs = 0;offs < 0x400;offs += 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
-		int trans=TRANSPARENCY_PEN;
+		int alpha=0xff;
 
 		sprite = spriteptr[offs+1];
 		if (!sprite) continue;
@@ -194,7 +190,7 @@ static void wizdfire_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		colour = (x >> 9) &0x1f;
 
 		if (bank==4 && colour&0x10) {
-			trans=TRANSPARENCY_ALPHA;
+			alpha=0x80;
 			colour&=0xf;
 		}
 
@@ -231,12 +227,12 @@ static void wizdfire_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		while (multi >= 0)
 		{
-			drawgfx(bitmap,machine->gfx[bank],
+			drawgfx_alpha(bitmap,cliprect,machine->gfx[bank],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					cliprect,trans,0);
+					0,alpha);
 
 			multi--;
 		}
@@ -283,7 +279,7 @@ Sprites 2:
 	while (offs!=end)
 	{
 		int x,y,sprite,colour,fx,fy,w,h,sx,sy,x_mult,y_mult,tilemap_pri,sprite_pri;
-		int trans=TRANSPARENCY_PEN;
+		int alpha=0xff;
 
 		sprite = spriteptr[offs+3];
 		if (!sprite) {
@@ -387,7 +383,7 @@ sprite 2:
 		}
 
 		if (gfxbank==4 && colour&0x10) {
-			trans=TRANSPARENCY_ALPHA;
+			alpha=0x80;
 			colour&=0xf;
 		}
 
@@ -426,7 +422,7 @@ sprite 2:
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						cliprect,trans,0,tilemap_pri,sprite_pri,1);
+						cliprect,0,tilemap_pri,sprite_pri,1,alpha);
 			}
 		}
 
@@ -509,7 +505,7 @@ VIDEO_UPDATE( wizdfire )
 	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3,3);
 
 	if ((deco16_priority&0x1f)==0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
-		deco16_tilemap_3_draw(screen,bitmap,cliprect,TILEMAP_DRAW_ALPHA,0);
+		deco16_tilemap_3_draw(screen,bitmap,cliprect,TILEMAP_DRAW_ALPHA(0x80),0);
 	else
 		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,0);
 

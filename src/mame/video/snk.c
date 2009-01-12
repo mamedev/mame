@@ -33,8 +33,11 @@ static int fg_scrollx, fg_scrolly, bg_scrollx, bg_scrolly;
 static int sp16_scrollx, sp16_scrolly, sp32_scrollx, sp32_scrolly;
 static UINT8 sprite_split_point;
 static int num_sprites, yscroll_mask;
+static UINT32 bg_tile_offset;
+static UINT32 tx_tile_offset;
 
 static UINT8 empty_tile[16*16];
+static UINT8 drawmode_table[16];
 
 /**************************************************************************************/
 
@@ -87,7 +90,7 @@ static TILE_GET_INFO( marvins_get_tx_tile_info )
 	int code = snk_tx_videoram[tile_index];
 	int color = code >> 5;
 	SET_TILE_INFO(0,
-			code,
+			tx_tile_offset + code,
 			color,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
 }
@@ -96,7 +99,7 @@ static TILE_GET_INFO( ikari_get_tx_tile_info )
 {
 	int code = snk_tx_videoram[tile_index];
 	SET_TILE_INFO(0,
-			code,
+			tx_tile_offset + code,
 			0,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
 }
@@ -105,7 +108,7 @@ static TILE_GET_INFO( gwar_get_tx_tile_info )
 {
 	int code = snk_tx_videoram[tile_index];
 	SET_TILE_INFO(0,
-			code,
+			tx_tile_offset + code,
 			0,
 			0);
 }
@@ -134,7 +137,7 @@ static TILE_GET_INFO( aso_get_bg_tile_info )
 {
 	int code = snk_bg_videoram[tile_index];
 	SET_TILE_INFO(1,
-			code,
+			bg_tile_offset + code,
 			0,
 			0);
 }
@@ -189,9 +192,9 @@ static VIDEO_START( snk_3bpp_shadow )
 		fatalerror("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
-	for(i = 0; i <= 5; i++) gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-	gfx_drawmode_table[6] = DRAWMODE_SHADOW;
-	gfx_drawmode_table[7] = DRAWMODE_NONE;
+	for(i = 0; i <= 5; i++) drawmode_table[i] = DRAWMODE_SOURCE;
+	drawmode_table[6] = (machine->config->video_attributes & VIDEO_HAS_SHADOWS) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+	drawmode_table[7] = DRAWMODE_NONE;
 
 	for (i = 0x000;i < 0x400;i++)
 		machine->shadow_table[i] = i | 0x200;
@@ -205,9 +208,9 @@ static VIDEO_START( snk_4bpp_shadow )
 		fatalerror("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
-	for(i = 0; i <= 13; i++) gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-	gfx_drawmode_table[14] = DRAWMODE_SHADOW;
-	gfx_drawmode_table[15] = DRAWMODE_NONE;
+	for(i = 0; i <= 13; i++) drawmode_table[i] = DRAWMODE_SOURCE;
+	drawmode_table[14] = (machine->config->video_attributes & VIDEO_HAS_SHADOWS) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+	drawmode_table[15] = DRAWMODE_NONE;
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0x000;i < 0x400;i++)
@@ -235,6 +238,8 @@ VIDEO_START( marvins )
 
 	tilemap_set_scrolldx(bg_tilemap, 15,  31);
 	tilemap_set_scrolldy(bg_tilemap,  8, -32);
+	
+	tx_tile_offset = 0;
 }
 
 VIDEO_START( jcross )
@@ -252,6 +257,8 @@ VIDEO_START( jcross )
 
 	num_sprites = 25;
 	yscroll_mask = 0x1ff;
+	bg_tile_offset = 0;
+	tx_tile_offset = 0;
 }
 
 VIDEO_START( sgladiat )
@@ -269,6 +276,8 @@ VIDEO_START( sgladiat )
 
 	num_sprites = 25;
 	yscroll_mask = 0x0ff;
+	bg_tile_offset = 0;
+	tx_tile_offset = 0;
 }
 
 VIDEO_START( hal21 )
@@ -307,6 +316,7 @@ VIDEO_START( tnk3 )
 
 	num_sprites = 50;
 	yscroll_mask = 0x1ff;
+	tx_tile_offset = 0;
 }
 
 VIDEO_START( ikari )
@@ -321,10 +331,18 @@ VIDEO_START( ikari )
 
 	tilemap_set_scrolldx(bg_tilemap, 15, 24);
 	tilemap_set_scrolldy(bg_tilemap,  8, -32);
+	
+	tx_tile_offset = 0;
 }
 
 VIDEO_START( gwar )
 {
+	int i;
+	
+	/* prepare drawmode table */
+	for(i = 0; i <= 14; i++) drawmode_table[i] = DRAWMODE_SOURCE;
+	drawmode_table[15] = DRAWMODE_NONE;
+
 	memset(empty_tile,0xf,sizeof(empty_tile));
 
 	tx_tilemap = tilemap_create(machine, gwar_get_tx_tile_info, tilemap_scan_cols,  8,  8, 50, 32);
@@ -334,6 +352,8 @@ VIDEO_START( gwar )
 
 	tilemap_set_scrolldx(bg_tilemap, 16, 143);
 	tilemap_set_scrolldy(bg_tilemap,  0, -32);
+	
+	tx_tile_offset = 0;
 }
 
 VIDEO_START( tdfever )
@@ -443,7 +463,11 @@ WRITE8_HANDLER( hal21_flipscreen_w )
 	flip_screen_set(space->machine, data & 0x80);
 
 	tilemap_set_palette_offset(bg_tilemap, ((data & 0xf) ^ 8) << 4);
-	tilemap_set_pen_data_offset(bg_tilemap, ((data & 0x20) << 3) * space->machine->gfx[1]->char_modulo);
+	if (bg_tile_offset != ((data & 0x20) << 3))
+	{
+		bg_tile_offset = (data & 0x20) << 3;
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
+	}
 
 	// other bits unknown
 }
@@ -507,7 +531,11 @@ WRITE8_HANDLER( tnk3_videoattrs_w )
 
 	flip_screen_set(space->machine, data & 0x80);
 
-	tilemap_set_pen_data_offset(tx_tilemap, ((data & 0x40) << 2) * space->machine->gfx[0]->char_modulo);
+	if (tx_tile_offset != ((data & 0x40) << 2))
+	{
+		tx_tile_offset = (data & 0x40) << 2;
+		tilemap_mark_all_tiles_dirty(tx_tilemap);
+	}
 
 	bg_scrolly =   (bg_scrolly   & 0xff) | ((data & 0x10) << 4);
 	sp16_scrolly = (sp16_scrolly & 0xff) | ((data & 0x08) << 5);
@@ -518,7 +546,11 @@ WRITE8_HANDLER( tnk3_videoattrs_w )
 WRITE8_HANDLER( aso_bg_bank_w )
 {
 	tilemap_set_palette_offset(bg_tilemap, ((data & 0xf) ^ 8) << 4);
-	tilemap_set_pen_data_offset(bg_tilemap, ((data & 0x30) << 4) * space->machine->gfx[1]->char_modulo);
+	if (bg_tile_offset != ((data & 0x30) << 4))
+	{
+		bg_tile_offset = (data & 0x30) << 4;
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
+	}
 }
 
 WRITE8_HANDLER( ikari_bg_scroll_msb_w )
@@ -549,13 +581,21 @@ if (data != 0x20 &&	// normal
 	popmessage("attrs %02x contact MAMEDEV", data);
 
 	tilemap_set_palette_offset(tx_tilemap, (data & 0x01) << 4);
-	tilemap_set_pen_data_offset(tx_tilemap, ((data & 0x10) << 4) * space->machine->gfx[0]->char_modulo);
+	if (tx_tile_offset != ((data & 0x10) << 4))
+	{
+		tx_tile_offset = (data & 0x10) << 4;
+		tilemap_mark_all_tiles_dirty(tx_tilemap);
+	}
 }
 
 WRITE8_HANDLER( gwar_tx_bank_w )
 {
 	tilemap_set_palette_offset(tx_tilemap, (data & 0xf) << 4);
-	tilemap_set_pen_data_offset(tx_tilemap, ((data & 0x30) << 4) * space->machine->gfx[0]->char_modulo);
+	if (tx_tile_offset != ((data & 0x30) << 4))
+	{
+		tx_tile_offset = (data & 0x30) << 4;
+		tilemap_mark_all_tiles_dirty(tx_tilemap);
+	}
 }
 
 WRITE8_HANDLER( gwar_videoattrs_w )
@@ -640,12 +680,12 @@ static void marvins_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		if (sx > 512-16) sx -= 512;
 		if (sy > 256-16) sy -= 256;
 
-		drawgfx( bitmap,gfx,
+		drawgfx_transtable(bitmap,cliprect,gfx,
 			tile_number,
 			color,
 			flipx, flipy,
 			sx, sy,
-			cliprect,TRANSPARENCY_PEN_TABLE,7);
+			drawmode_table, machine->shadow_table);
 
 		source+=4;
 	}
@@ -705,12 +745,12 @@ static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 		if (sx > 512-size) sx -= 512;
 		if (sy > (yscroll_mask+1)-size) sy -= (yscroll_mask+1);
 
-		drawgfx(bitmap,gfx,
+		drawgfx_transtable(bitmap,cliprect,gfx,
 				tile_number,
 				color,
 				xflip,yflip,
 				sx,sy,
-				cliprect,TRANSPARENCY_PEN_TABLE,7);
+				drawmode_table, machine->shadow_table);
 	}
 }
 
@@ -751,12 +791,12 @@ static void ikari_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 		if (sx > 512-size) sx -= 512;
 		if (sy > 512-size) sy -= 512;
 
-		drawgfx(bitmap,gfx,
+		drawgfx_transtable(bitmap,cliprect,gfx,
 				tile_number,
 				color,
 				0,0,
 				sx,sy,
-				cliprect,TRANSPARENCY_PEN_TABLE,7);
+				drawmode_table, machine->shadow_table);
 	}
 }
 
@@ -791,11 +831,9 @@ static void tdfever_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 {
 	const gfx_element *gfx = machine->gfx[gfxnum];
 	const int size = gfx->width;
-	int tile_number, attributes, sx, sy, color, pen_mode;
+	int tile_number, attributes, sx, sy, color;
 	int which;
 	int flipx, flipy;
-
-	pen_mode = (machine->config->video_attributes & VIDEO_HAS_SHADOWS) ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN;
 
 	for(which = from*4; which < to*4; which+=4)
 	{
@@ -838,12 +876,12 @@ static void tdfever_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		if (sx > 512-size) sx -= 512;
 		if (sy > 512-size) sy -= 512;
 
-		drawgfx(bitmap,gfx,
+		drawgfx_transtable(bitmap,cliprect,gfx,
 				tile_number,
 				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,pen_mode,15);
+				drawmode_table, machine->shadow_table);
 	}
 }
 

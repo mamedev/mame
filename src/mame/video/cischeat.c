@@ -60,6 +60,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 
 static int cischeat_ip_select;
 static int shift_ret = 1;
+static UINT8 drawmode_table[16];
 
 #ifdef MAME_DEBUG
 static int debugsprites;	// For debug purposes
@@ -129,10 +130,10 @@ static void prepare_shadows(void)
 {
 	int i;
 	for (i = 0;i < 16;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SOURCE;
+		drawmode_table[i] = DRAWMODE_SOURCE;
 
-	gfx_drawmode_table[ 0] = DRAWMODE_SHADOW;
-	gfx_drawmode_table[15] = DRAWMODE_NONE;
+	drawmode_table[ 0] = DRAWMODE_SHADOW;
+	drawmode_table[15] = DRAWMODE_NONE;
 }
 
 /**************************************************************************
@@ -923,18 +924,18 @@ if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continu
 		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
 		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
 
+		drawmode_table[ 0] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+
 		for (y = ystart; y != yend; y += yinc)
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				drawgfxzoom(bitmap,machine->gfx[3],
+				drawgfxzoom_transtable(bitmap,cliprect,machine->gfx[3],
 							code++,
 							color,
 							flipx,flipy,
 							(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-							cliprect,
-							shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,15,
-							xscale, yscale );
+							xscale, yscale, drawmode_table, machine->shadow_table);
 			}
 		}
 #ifdef MAME_DEBUG
@@ -1077,18 +1078,18 @@ if ( (debugsprites) && ( ((attr & 0x0300)>>8) != (debugsprites-1) ) ) 	{ continu
 		if (flipy)	{ ystart = ynum-1;  yend = -1;    yinc = -1; }
 		else		{ ystart = 0;       yend = ynum;  yinc = +1; }
 
+		drawmode_table[ 0] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+
 		for (y = ystart; y != yend; y += yinc)
 		{
 			for (x = xstart; x != xend; x += xinc)
 			{
-				drawgfxzoom(bitmap,machine->gfx[3],
+				drawgfxzoom_transtable(bitmap,cliprect,machine->gfx[3],
 							code++,
 							color,
 							flipx,flipy,
 							(sx + x * xdim) / 0x10000, (sy + y * ydim) / 0x10000,
-							cliprect,
-							shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,15,
-							xscale, yscale );
+							xscale, yscale, drawmode_table, machine->shadow_table);
 			}
 		}
 #ifdef MAME_DEBUG

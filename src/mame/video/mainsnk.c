@@ -6,6 +6,8 @@ UINT8 *mainsnk_fgram;
 UINT8 *mainsnk_bgram;
 
 
+static UINT32 bg_tile_offset;
+
 
 static TILEMAP_MAPPER( marvins_tx_scan_cols )
 {
@@ -33,7 +35,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	SET_TILE_INFO(
 			0,
-			code,
+			bg_tile_offset + code,
 			0,
 			0);
 }
@@ -67,7 +69,11 @@ WRITE8_HANDLER(mainsnk_c600_w)
 	else if (space->machine->gfx[0]->total_elements == 0x800)	// canvas
 		bank = ((data & 0x40) >> 6) | ((data & 0x30) >> 3);
 
-	tilemap_set_pen_data_offset(bg_tilemap, (bank << 8) * space->machine->gfx[0]->char_modulo);
+	if (bg_tile_offset != (bank << 8))
+	{
+		bg_tile_offset = bank << 8;
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
+	}
 }
 
 WRITE8_HANDLER( mainsnk_fgram_w )

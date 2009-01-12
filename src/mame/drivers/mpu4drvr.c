@@ -212,7 +212,6 @@ static UINT8 m6809_acia_dcd;
 /* SCN2674 AVDC stuff */
 static int mpu4_gfx_index;
 static UINT16 * mpu4_vid_vidram;
-static UINT8  * mpu4_vid_vidram_is_dirty;
 static UINT16 * mpu4_vid_mainram;
 
 static UINT8 scn2674_IR[16];
@@ -452,18 +451,6 @@ static VIDEO_UPDATE( mpu4_vid )
 
 	bitmap_fill(bitmap,cliprect,0);
 
-	for (i = 0; i < 0x1000; i++)
-	{
-		if (mpu4_vid_vidram_is_dirty[i]==1)
-		{
-			decodechar(screen->machine->gfx[mpu4_gfx_index+0], i, (UINT8 *)mpu4_vid_vidram);
-			decodechar(screen->machine->gfx[mpu4_gfx_index+1], i, (UINT8 *)mpu4_vid_vidram);
-			decodechar(screen->machine->gfx[mpu4_gfx_index+2], i, (UINT8 *)mpu4_vid_vidram);
-			decodechar(screen->machine->gfx[mpu4_gfx_index+3], i, (UINT8 *)mpu4_vid_vidram);
-			mpu4_vid_vidram_is_dirty[i]=0;
-		}
-	}
-
 	/* this is in main ram.. i think it must transfer it out of here??? */
 	/* count = 0x0018b6/2; - crmaze count = 0x004950/2; - turnover */
 
@@ -517,7 +504,10 @@ static WRITE16_HANDLER( mpu4_vid_vidram_w )
 {
 	COMBINE_DATA(&mpu4_vid_vidram[offset]);
 	offset <<= 1;
-	mpu4_vid_vidram_is_dirty[offset/0x20]=1;
+	gfx_element_mark_dirty(space->machine->gfx[mpu4_gfx_index+0], offset/0x20);
+	gfx_element_mark_dirty(space->machine->gfx[mpu4_gfx_index+1], offset/0x20);
+	gfx_element_mark_dirty(space->machine->gfx[mpu4_gfx_index+2], offset/0x20);
+	gfx_element_mark_dirty(space->machine->gfx[mpu4_gfx_index+3], offset/0x20);
 }
 
 
@@ -983,9 +973,7 @@ static VIDEO_START( mpu4_vid )
       maybe we will anyway, but for now we don't need to */
 
 	mpu4_vid_vidram = auto_malloc (0x20000);
-	mpu4_vid_vidram_is_dirty = auto_malloc(0x1000);
 
-	memset(mpu4_vid_vidram_is_dirty,1,0x1000);
 	memset(mpu4_vid_vidram,0,0x20000);
 
  	/* find first empty slot to decode gfx */
@@ -996,16 +984,10 @@ static VIDEO_START( mpu4_vid )
 	assert(mpu4_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[mpu4_gfx_index+0] = allocgfx(machine, &mpu4_vid_char_8x8_layout);
-	machine->gfx[mpu4_gfx_index+1] = allocgfx(machine, &mpu4_vid_char_8x16_layout);
-	machine->gfx[mpu4_gfx_index+2] = allocgfx(machine, &mpu4_vid_char_16x8_layout);
-	machine->gfx[mpu4_gfx_index+3] = allocgfx(machine, &mpu4_vid_char_16x16_layout);
-
-	/* set the color information */
-	machine->gfx[mpu4_gfx_index+0]->total_colors = machine->config->total_colors / 16;
-	machine->gfx[mpu4_gfx_index+1]->total_colors = machine->config->total_colors / 16;
-	machine->gfx[mpu4_gfx_index+2]->total_colors = machine->config->total_colors / 16;
-	machine->gfx[mpu4_gfx_index+3]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[mpu4_gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, (UINT8 *)mpu4_vid_vidram, machine->config->total_colors / 16, 0);
+	machine->gfx[mpu4_gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, (UINT8 *)mpu4_vid_vidram, machine->config->total_colors / 16, 0);
+	machine->gfx[mpu4_gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, (UINT8 *)mpu4_vid_vidram, machine->config->total_colors / 16, 0);
+	machine->gfx[mpu4_gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, (UINT8 *)mpu4_vid_vidram, machine->config->total_colors / 16, 0);
 
 	scn2675_IR_pointer = 0;
 }

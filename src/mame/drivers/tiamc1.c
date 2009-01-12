@@ -118,30 +118,10 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/tiamc1.h"
 
-static UINT8 *video_ram;
-
-static DRIVER_INIT( tiamc1 )
-{
-	video_ram = auto_malloc(0x3040);
-}
-
 static MACHINE_RESET( tiamc1 )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	memset(video_ram, 0, 0x3040);
-
-        tiamc1_charram = video_ram + 0x0800;     /* Ram is banked */
-        tiamc1_tileram = video_ram + 0x0000;
-
-	tiamc1_spriteram_y = video_ram + 0x3000;
-	tiamc1_spriteram_x = video_ram + 0x3010;
-	tiamc1_spriteram_n = video_ram + 0x3020;
-	tiamc1_spriteram_a = video_ram + 0x3030;
-
 	tiamc1_bankswitch_w(space, 0, 0);
-
-	state_save_register_global_pointer(machine, video_ram, 0x3040);
 }
 
 static WRITE8_HANDLER( tiamc1_control_w )
@@ -342,7 +322,7 @@ ROM_START( koroleva )
 
 ROM_END
 
-GAME( 1988, konek, 0, tiamc1, tiamc1, tiamc1, ROT0, "Terminal", "Konek-Gorbunok", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1988, sosterm, 0, tiamc1, tiamc1, tiamc1, ROT0, "Terminal", "S.O.S.", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1988, koroleva, 0, tiamc1, tiamc1, tiamc1, ROT0, "Terminal", "Snezhnaja Koroleva", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, konek, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "Konek-Gorbunok", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, sosterm, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "S.O.S.", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, koroleva, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "Snezhnaja Koroleva", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 

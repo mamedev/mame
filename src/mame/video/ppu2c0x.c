@@ -72,8 +72,6 @@ typedef struct {
 	UINT8					*spriteram;				/* sprite ram */
 	pen_t					*colortable;			/* color table modified at run time */
 	pen_t					*colortable_mono;		/* monochromatic color table modified at run time */
-	UINT8					*dirtychar;				/* an array flagging dirty characters */
-	int						chars_are_dirty;		/* master flag to check if theres any dirty character */
 	emu_timer				*scanline_timer;		/* scanline timer */
 	emu_timer				*hblank_timer;			/* hblank period at end of each scanline */
 	emu_timer				*nmi_timer;				/* NMI timer */
@@ -310,7 +308,6 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		chips[i].videomem = auto_malloc( VIDEOMEM_SIZE );
 		chips[i].videoram = auto_malloc( VIDEOMEM_SIZE );
 		chips[i].spriteram = auto_malloc( SPRITERAM_SIZE );
-		chips[i].dirtychar = auto_malloc( CHARGEN_NUM_CHARS );
 		chips[i].colortable = auto_malloc( sizeof( default_colortable ) );
 		chips[i].colortable_mono = auto_malloc( sizeof( default_colortable_mono ) );
 
@@ -319,9 +316,6 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		memset( chips[i].videoram, 0, VIDEOMEM_SIZE );
 		memset( chips[i].spriteram, 0, SPRITERAM_SIZE );
 		memset( chips[i].videoram_banks_indices, 0xff, sizeof(chips[i].videoram_banks_indices) );
-
-		/* set all characters dirty */
-		memset( chips[i].dirtychar, 1, CHARGEN_NUM_CHARS );
 
 		if ( intf->vram_enabled[i] )
 		{
@@ -362,9 +356,7 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 
 			memcpy(&gl, &ppu_charlayout, sizeof(gl));
 			gl.total = total;
-			machine->gfx[intf->gfx_layout_number[i]] = allocgfx( machine, &gl );
-			decodegfx( machine->gfx[intf->gfx_layout_number[i]], src, 0, machine->gfx[intf->gfx_layout_number[i]]->total_elements );
-			machine->gfx[intf->gfx_layout_number[i]]->total_colors = 8;
+			machine->gfx[intf->gfx_layout_number[i]] = gfx_element_alloc( machine, &gl, src, 8, 0 );
 		}
 
 		/* setup our videomem handlers based on mirroring */
@@ -412,9 +404,7 @@ static void draw_background(running_machine *machine, int num, UINT8 *line_prior
 	const int total_elements = chips[num].machine->gfx[gfx_bank]->total_elements;
 	const int *nes_vram = &chips[num].nes_vram[0];
 	const int tile_page = chips[num].tile_page;
-	const int char_modulo = chips[num].machine->gfx[gfx_bank]->char_modulo;
 	const int line_modulo = chips[num].machine->gfx[gfx_bank]->line_modulo;
-	UINT8 *gfx_data = chips[num].machine->gfx[gfx_bank]->gfxdata;
 	UINT8 **ppu_page = chips[num].ppu_page;
 	int	start_x = ( chips[num].x_fine ^ 0x07 ) - 7;
 	UINT16 back_pen;
@@ -493,8 +483,8 @@ static void draw_background(running_machine *machine, int num, UINT8 *line_prior
 		if(start_x < VISIBLE_SCREEN_WIDTH )
 		{
 			paldata = &color_table[ 4 * ( ( ( color_byte >> color_bits ) & 0x03 ) ) ];
-			start = ( index2 % total_elements ) * char_modulo + scroll_y_fine * line_modulo;
-			sd = &gfx_data[start];
+			start = scroll_y_fine * line_modulo;
+			sd = gfx_element_get_data(chips[num].machine->gfx[gfx_bank], index2 % total_elements) + start;
 
 			/* render the pixel */
 			for( i = 0; i < 8; i++ )
@@ -548,11 +538,9 @@ static void draw_sprites(running_machine *machine, int num, UINT8 *line_priority
 	const int gfx_bank = intf->gfx_layout_number[num];
 	const int total_elements = chips[num].machine->gfx[gfx_bank]->total_elements;
 	const int sprite_page = chips[num].sprite_page;
-	const int char_modulo = chips[num].machine->gfx[gfx_bank]->char_modulo;
 	const int line_modulo = chips[num].machine->gfx[gfx_bank]->line_modulo;
 	const UINT8 *sprite_ram = chips[num].spriteram;
 	pen_t *color_table = chips[num].colortable;
-	UINT8 *gfx_data = chips[num].machine->gfx[gfx_bank]->gfxdata;
 	int *ppu_regs = &chips[num].regs[0];
 
 	int spriteXPos, spriteYPos, spriteIndex;
@@ -637,8 +625,10 @@ static void draw_sprites(running_machine *machine, int num, UINT8 *line_priority
 			sprite_line = ( size - 1 ) - sprite_line;
 
 		paldata = &color_table[4 * color];
-		start = ( index1 % total_elements ) * char_modulo + sprite_line * line_modulo;
-		sd = &gfx_data[start];
+		start = sprite_line * line_modulo;
+		sd = gfx_element_get_data(chips[num].machine->gfx[gfx_bank], index1 % total_elements) + start;
+		if (size > 8)
+			gfx_element_get_data(chips[num].machine->gfx[gfx_bank], (index1 + 1) % total_elements);
 
 		if ( pri )
 		{
@@ -859,7 +849,6 @@ static TIMER_CALLBACK( scanline_callback )
 	int num = param;
 	ppu2c0x_chip* this_ppu = &chips[num];
 	int *ppu_regs = &chips[num].regs[0];
-	int i;
 	int blanked = ( ppu_regs[PPU_CONTROL1] & ( PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES ) ) == 0;
 	int vblank = ((this_ppu->scanline >= PPU_VBLANK_FIRST_SCANLINE-1) && (this_ppu->scanline < this_ppu->scanlines_per_frame-1)) ? 1 : 0;
 	int next_scanline;
@@ -892,29 +881,6 @@ logerror("vlbank starting\n");
 			// B-Wings is an example game that needs this.
 			timer_adjust_oneshot(this_ppu->nmi_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), num);
 		}
-	}
-
-	/* decode any dirty chars if we're using vram */
-
-	/* first, check the master dirty char flag */
-	if ( (!this_ppu->has_videorom || this_ppu->has_videoram) && this_ppu->chars_are_dirty )
-	{
-		/* cache some values */
-		UINT8 *dirtyarray = this_ppu->dirtychar;
-		UINT8 *vram = this_ppu->videomem;
-		gfx_element *gfx = chips[num].machine->gfx[intf->gfx_layout_number[num]];
-
-		/* then iterate and decode */
-		for( i = 0; i < CHARGEN_NUM_CHARS; i++ )
-		{
-			if ( dirtyarray[i] )
-			{
-				decodechar( gfx, i, vram );
-				dirtyarray[i] = 0;
-			}
-		}
-
-		this_ppu->chars_are_dirty = 0;
 	}
 
 	if ( this_ppu->scanline == this_ppu->scanlines_per_frame - 1 )
@@ -996,7 +962,6 @@ void ppu2c0x_reset(running_machine *machine, int num, int scan_scale)
 	chips[num].tile_page = 0;
 	chips[num].sprite_page = 0;
 	chips[num].back_color = 0;
-	chips[num].chars_are_dirty = 1;
 
 	/* initialize the color tables */
 	{
@@ -1244,11 +1209,8 @@ void ppu2c0x_w( const address_space *space, offs_t offset, UINT8 data, int num )
 						/* store the data */
 						this_ppu->videomem[tempAddr] = data;
 
-						/* setup the master dirty switch */
-						this_ppu->chars_are_dirty = 1;
-
 						/* mark the char dirty */
-						this_ppu->dirtychar[tempAddr >> 4] = 1;
+						gfx_element_mark_dirty(this_ppu->machine->gfx[intf->gfx_layout_number[num]], tempAddr >> 4);
 					}
 				}
 
@@ -1397,14 +1359,16 @@ void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank
 	{
 		for ( i = start_page; i < start_page + num_pages; i++ )
 		{
+			int elemnum;
+			
 			if ( chips[num].videoram_banks_indices[i] != -1 )
 			{
 				memcpy( &chips[num].videoram[chips[num].videoram_banks_indices[i]*0x400], &chips[num].videomem[i*0x400], 0x400);
 			}
 			chips[num].videoram_banks_indices[i] = -1;
-			memset( &chips[num].dirtychar[start_page*0x400 >> 4], 1, (num_pages*0x400 >> 4));
+			for (elemnum = 0; elemnum < (num_pages*0x400 >> 4); elemnum++)
+				gfx_element_mark_dirty(chips[num].machine->gfx[intf->gfx_layout_number[num]], (start_page*0x400 >> 4) + elemnum);
 		}
-		chips[num].chars_are_dirty = 1;
 	}
 	else
 	{
@@ -1447,14 +1411,15 @@ void ppu2c0x_set_videoram_bank( int num, int start_page, int num_pages, int bank
 
 	for ( i = start_page; i < start_page + num_pages; i++ )
 	{
+		int elemnum;
 		if ( chips[num].videoram_banks_indices[i] != -1 )
 		{
 			memcpy( &chips[num].videoram[chips[num].videoram_banks_indices[i]*0x400], &chips[num].videomem[i*0x400], 0x400);
 		}
 		chips[num].videoram_banks_indices[i] = (bank * bank_size * 16)/0x400 + (i - start_page);
-		memset( &chips[num].dirtychar[start_page*0x400 >> 4], 1, (num_pages*0x400 >> 4));
+		for (elemnum = 0; elemnum < (num_pages*0x400 >> 4); elemnum++)
+			gfx_element_mark_dirty(chips[num].machine->gfx[intf->gfx_layout_number[num]], (start_page*0x400 >> 4) + elemnum);
 	}
-	chips[num].chars_are_dirty = 1;
 
 	{
 		int vram_start = start_page * 0x400;

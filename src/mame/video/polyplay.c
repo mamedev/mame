@@ -14,7 +14,6 @@
 
 
 UINT8 *polyplay_characterram;
-static UINT8 dirtycharacter[256];
 
 
 
@@ -38,10 +37,15 @@ WRITE8_HANDLER( polyplay_characterram_w )
 {
 	if (polyplay_characterram[offset] != data)
 	{
-		dirtycharacter[((offset >> 3) & 0x7f) | 0x80] = 1;
+		gfx_element_mark_dirty(space->machine->gfx[1], ((offset >> 3) & 0x7f) | 0x80);
 
 		polyplay_characterram[offset] = data;
 	}
+}
+
+VIDEO_START( polyplay )
+{
+	gfx_element_set_source(machine->gfx[1], polyplay_characterram);
 }
 
 
@@ -55,13 +59,6 @@ VIDEO_UPDATE( polyplay )
 		int sx = (offs & 0x3f) << 3;
 		int sy = offs >> 6 << 3;
 		UINT8 code = videoram[offs];
-
-		if (dirtycharacter[code])
-		{
-			decodechar(screen->machine->gfx[1], code & 0x7f, polyplay_characterram);
-
-			dirtycharacter[code] = 0;
-		}
 
 		drawgfx(bitmap,screen->machine->gfx[(code >> 7) & 0x01],
 				code, 0, 0, 0, sx, sy,

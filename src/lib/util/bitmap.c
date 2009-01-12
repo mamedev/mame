@@ -72,6 +72,10 @@ bitmap_t *bitmap_alloc_slop(int width, int height, int xslop, int yslop, bitmap_
 	bitmap->bpp = bpp;
 	bitmap->rowpixels = rowpixels;
 	bitmap->base = (UINT8 *)bitmap->alloc + (rowpixels * yslop + xslop) * (bpp / 8);
+	bitmap->cliprect.min_x = 0;
+	bitmap->cliprect.max_x = width - 1;
+	bitmap->cliprect.min_y = 0;
+	bitmap->cliprect.max_y = height - 1;
 
 	return bitmap;
 }
@@ -104,6 +108,10 @@ bitmap_t *bitmap_wrap(void *base, int width, int height, int rowpixels, bitmap_f
 	bitmap->bpp = bpp;
 	bitmap->rowpixels = rowpixels;
 	bitmap->base = base;
+	bitmap->cliprect.min_x = 0;
+	bitmap->cliprect.max_x = width - 1;
+	bitmap->cliprect.min_y = 0;
+	bitmap->cliprect.max_y = height - 1;
 
 	return bitmap;
 }
@@ -164,13 +172,8 @@ void bitmap_free(bitmap_t *bitmap)
 
 void bitmap_fill(bitmap_t *dest, const rectangle *cliprect, UINT32 color)
 {
-	rectangle fill;
+	rectangle fill = dest->cliprect;
 	int x, y;
-
-	/* default to the whole bitmap */
-	fill.min_x = fill.min_y = 0;
-	fill.max_x = dest->width - 1;
-	fill.max_y = dest->height - 1;
 
 	/* if we have a cliprect, intersect with that */
 	if (cliprect != NULL)

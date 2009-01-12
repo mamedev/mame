@@ -143,9 +143,9 @@ VIDEO_UPDATE( skyraid )
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_terrain(screen->machine, helper, cliprect);
-	draw_sprites(screen->machine, helper, cliprect);
-	draw_missiles(screen->machine, helper, cliprect);
+	draw_terrain(screen->machine, helper, NULL);
+	draw_sprites(screen->machine, helper, NULL);
+	draw_missiles(screen->machine, helper, NULL);
 	draw_trapezoid(screen->machine, bitmap, helper);
 	draw_text(screen->machine, bitmap, cliprect);
 	return 0;

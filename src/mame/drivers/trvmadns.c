@@ -143,9 +143,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 static WRITE8_HANDLER( trvmadns_gfxram_w )
 {
 	trvmadns_gfxram[offset] = data;
-	decodechar(space->machine->gfx[0], offset/16, trvmadns_gfxram);
-
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
+	gfx_element_mark_dirty(space->machine->gfx[0], offset/16);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -268,6 +266,8 @@ static VIDEO_START( trvmadns )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap,1);
+
+	gfx_element_set_source(machine->gfx[0], trvmadns_gfxram);
 }
 
 static VIDEO_UPDATE( trvmadns )

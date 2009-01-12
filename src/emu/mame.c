@@ -32,7 +32,6 @@
                 - calls output_init() [output.c] to initialize the output system
                 - calls state_init() [state.c] to initialize save state system
                 - calls state_save_allow_registration() [state.c] to allow registrations
-                - calls drawgfx_init() [drawgfx.c] to initialize rendering globals
                 - calls palette_init() [palette.c] to initialize palette system
                 - calls render_init() [render.c] to initialize the rendering system
                 - calls ui_init() [ui.c] to initialize the user interface
@@ -1478,7 +1477,6 @@ static void init_machine(running_machine *machine)
 	output_init(machine);
 	state_init(machine);
 	state_save_allow_registration(machine, TRUE);
-	drawgfx_init(machine);
 	palette_init(machine);
 	render_init(machine);
 	ui_init(machine);
@@ -1559,7 +1557,7 @@ static void init_machine(running_machine *machine)
 
 	/* free memory regions allocated with REGIONFLAG_DISPOSE (typically gfx roms) */
 	/* but not if the debugger is enabled (so we can look at the data) */
-	if (!options_get_bool(mame_options(), OPTION_DEBUG))
+	if (PREDECODE_GFX && !options_get_bool(mame_options(), OPTION_DEBUG))
 		for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = nextrgntag)
 		{
 			nextrgntag = memory_region_next(machine, rgntag);

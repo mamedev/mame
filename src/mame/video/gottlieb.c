@@ -122,8 +122,7 @@ WRITE8_HANDLER( gottlieb_charram_w )
 	if (gottlieb_charram[offset] != data)
 	{
 		gottlieb_charram[offset] = data;
-		decodechar(space->machine->gfx[0], offset / 32, gottlieb_charram);
-		tilemap_mark_all_tiles_dirty(bg_tilemap);
+		gfx_element_mark_dirty(space->machine->gfx[0], offset / 32);
 	}
 }
 
@@ -162,6 +161,8 @@ VIDEO_START( gottlieb )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 0, 318 - 256);
+
+	gfx_element_set_source(machine->gfx[0], gottlieb_charram);
 
 	/* save some state */
 	state_save_register_global(machine, background_priority);

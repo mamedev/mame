@@ -512,6 +512,7 @@ src/emu/devintrf.c svneol=native#text/plain
 src/emu/devintrf.h svneol=native#text/plain
 src/emu/drawgfx.c svneol=native#text/plain
 src/emu/drawgfx.h svneol=native#text/plain
+src/emu/drawgfxm.h svneol=native#text/plain
 src/emu/driver.c svneol=native#text/plain
 src/emu/driver.h svneol=native#text/plain
 src/emu/drivers/empty.c svneol=native#text/plain

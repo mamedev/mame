@@ -72,7 +72,6 @@ Dumped 06/15/2000
 #include "sound/nile.h"
 
 static UINT16* tileram;
-static UINT8* dirty_tileram;
 static UINT16* dmaram;
 
 static UINT16 *sprram, *sprram_old;
@@ -127,40 +126,20 @@ static void update_palette(running_machine *machine)
 
 static VIDEO_START(srmp6)
 {
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = allocgfx(machine, &tiles8x8_layout);
-	machine->gfx[0]->total_colors = machine->config->total_colors / 256;
-	machine->gfx[0]->color_granularity=256;
-
 	tileram = auto_malloc(0x100000*16);
-	dirty_tileram = auto_malloc((0x100000*16)/0x40); // every 8x8x8 tile is 0x40 bytes
-
 	memset(tileram,0x00,(0x100000*16));
-	memset(dirty_tileram,1,(0x100000*16)/0x40);
 
 	dmaram = auto_malloc(0x100);
 
 	sprram_old = auto_malloc(0x80000);
 	memset(sprram_old, 0, 0x80000);
 
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	machine->gfx[0] = gfx_element_alloc(machine, &tiles8x8_layout, (UINT8*)tileram, machine->config->total_colors / 256, 0);
+	machine->gfx[0]->color_granularity=256;
+
 	brightness = 0x60;
 }
-
-/* Debug code */
-#ifdef UNUSED_FUNCTION
-static void srmp6_decode_charram(running_machine *machine)
-{
-	if(input_code_pressed_once(KEYCODE_Z))
-	{
-		int i;
-		for (i=0;i<(0x100000*16)/0x40;i++)
-		{
-			decodechar(machine->gfx[0], i, (UINT8*)tileram);
-			dirty_tileram[i] = 0;
-		}
-	}
-}
-#endif
 
 #if 0
 static int xixi=0;
@@ -168,7 +147,7 @@ static int xixi=0;
 
 static VIDEO_UPDATE(srmp6)
 {
-	int trans = TRANSPARENCY_PEN;
+	int alpha;
 	int x,y,tileno,height,width,xw,yw,sprite,xb,yb;
 	UINT16 *sprite_list=sprram_old;
 	UINT16 mainlist_offset = 0;
@@ -182,11 +161,6 @@ static VIDEO_UPDATE(srmp6)
 	bitmap_fill(bitmap,cliprect,0);
 
 #if 0
-	/* debug */
-	srmp6_decode_charram(screen->machine);
-
-
-
 	/* debug */
 	if(input_code_pressed_once(KEYCODE_Q))
 	{
@@ -226,13 +200,11 @@ static VIDEO_UPDATE(srmp6)
 
 			if((sprite_list[mainlist_offset+5] & 0x700) == 0x700)
 			{
-				trans = TRANSPARENCY_ALPHA;
-				alpha_set_level((sprite_list[mainlist_offset+5] & 0x1F) << 3);
+				alpha = (sprite_list[mainlist_offset+5] & 0x1F) << 3;
 			}
 			else
 			{
-				trans = TRANSPARENCY_PEN;
-				alpha_set_level(255);
+				alpha = 255;
 			}
 	//  printf("%x %x \n",sprite_list[mainlist_offset+1],sublist_length);
 
@@ -273,13 +245,7 @@ static VIDEO_UPDATE(srmp6)
 						else
 							yb=y+(height-yw-1)*8+global_y;
 
-						if (dirty_tileram[tileno])
-						{
-							decodechar(screen->machine->gfx[0], tileno, (UINT8*)tileram);
-							dirty_tileram[tileno] = 0;
-						}
-
-						drawgfx(bitmap,screen->machine->gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,cliprect,trans,0);
+						drawgfx_alpha(bitmap,cliprect,screen->machine->gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,0,alpha);
 						tileno++;
 		 			}
 				}
@@ -384,7 +350,7 @@ static unsigned short lastb;
 static unsigned short lastb2;
 static int destl;
 
-static UINT32 process(UINT8 b,UINT32 dst_offset)
+static UINT32 process(running_machine *machine,UINT8 b,UINT32 dst_offset)
 {
 
  	int l=0;
@@ -399,7 +365,7 @@ static UINT32 process(UINT8 b,UINT32 dst_offset)
  		for(i=0;i<rle;++i)
  		{
 			tram[dst_offset+destl] = lastb;
-			dirty_tileram[(dst_offset+destl)/0x40] = 1;
+			gfx_element_mark_dirty(machine->gfx[0], (dst_offset+destl)/0x40);
 
 			dst_offset++;
  			++l;
@@ -413,7 +379,7 @@ static UINT32 process(UINT8 b,UINT32 dst_offset)
  		lastb2=lastb;
  		lastb=b;
 		tram[dst_offset+destl] = b;
-		dirty_tileram[(dst_offset+destl)/0x40] = 1;
+		gfx_element_mark_dirty(machine->gfx[0], (dst_offset+destl)/0x40);
 
  		return 1;
  	}
@@ -467,13 +433,13 @@ static WRITE16_HANDLER(srmp6_dma_w)
 				{
 					UINT8 real_byte;
 					real_byte = rom[srctab+p*2];
-					tempidx+=process(real_byte,tempidx);
+					tempidx+=process(space->machine,real_byte,tempidx);
 					real_byte = rom[srctab+p*2+1];//px[DMA_XOR((current_table_address+p*2+1))];
-					tempidx+=process(real_byte,tempidx);
+					tempidx+=process(space->machine,real_byte,tempidx);
  				}
  				else
  				{
- 					tempidx+=process(p,tempidx);
+ 					tempidx+=process(space->machine,p,tempidx);
  				}
 
  				ctrl<<=1;

@@ -208,7 +208,6 @@ void cvs_scroll_stars(void)
 VIDEO_UPDATE( cvs )
 {
 	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };
-	int code;
 	offs_t offs;
 	int scroll[8];
 	UINT8 character_banking_mode;
@@ -223,14 +222,6 @@ VIDEO_UPDATE( cvs )
 
 	character_banking_mode = cvs_get_character_banking_mode();
 
-	/* ROM based tiles first */
-	for (code = 0; code < ram_based_char_start_indices[character_banking_mode]; code++)
-		decodechar(screen->machine->gfx[0], code, memory_region(screen->machine, "gfx1"));
-
-	/* now the RAM based ones */
-	for (; code < 0x100; code++)
-		decodechar(screen->machine->gfx[0], code, cvs_character_ram);
-
 	/* draw the background */
 	for (offs = 0; offs < 0x0400; offs++)
 	{
@@ -242,7 +233,9 @@ VIDEO_UPDATE( cvs )
 		UINT8 x = offs << 3;
 		UINT8 y = offs >> 5 << 3;
 
-		drawgfx(background_bitmap, screen->machine->gfx[0],
+		int gfxnum = (code < ram_based_char_start_indices[character_banking_mode]) ? 0 : 1;
+
+		drawgfx(background_bitmap, screen->machine->gfx[gfxnum],
 				code, color,
 				0, 0,
 				x, y,
@@ -259,7 +252,7 @@ VIDEO_UPDATE( cvs )
 				collision_color = 0x102;
 		}
 
-		drawgfx(cvs_collision_background, screen->machine->gfx[0],
+		drawgfx(cvs_collision_background, screen->machine->gfx[gfxnum],
 				code, collision_color,
 				0, 0,
 				x, y,

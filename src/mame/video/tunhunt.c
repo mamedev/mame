@@ -251,17 +251,15 @@ static void draw_motion_object(bitmap_t *bitmap, const rectangle *cliprect)
 	}
 	scalex = (1<<16);
 
-	copyrozbitmap(
-		bitmap,tmpbitmap,
+	copyrozbitmap_trans(
+		bitmap,cliprect,tmpbitmap,
 		-x0*scalex,/* startx */
 		-y0*scaley,/* starty */
 		scalex,/* incxx */
 		0,0,/* incxy,incyx */
 		scaley,/* incyy */
 		0, /* no wraparound */
-		cliprect,
-		TRANSPARENCY_PEN,0,
-		0 /* priority */
+		0
 	);
 }
 

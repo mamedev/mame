@@ -275,7 +275,7 @@ static void render_sprites_91399(running_machine *machine, bitmap_t *bitmap, con
 		for (y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= cliprect->min_y && sy <= cliprect->max_y)
 			{
-				UINT8 *src = gfx->gfxdata + gfx->char_modulo * code + gfx->line_modulo * (y ^ vflip);
+				const UINT8 *src = gfx_element_get_data(gfx, code) + gfx->line_modulo * (y ^ vflip);
 				UINT16 *dst = BITMAP_ADDR16(bitmap, sy, 0);
 				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
 
@@ -345,7 +345,7 @@ static void render_sprites_91464(running_machine *machine, bitmap_t *bitmap, con
 		for (y = 0; y < 32; y++, sy = (sy + 1) & 0x1ff)
 			if (sy >= 2 && sy >= cliprect->min_y && sy <= cliprect->max_y)
 			{
-				UINT8 *src = gfx->gfxdata + gfx->char_modulo * code + gfx->line_modulo * (y ^ vflip);
+				const UINT8 *src = gfx_element_get_data(gfx, code) + gfx->line_modulo * (y ^ vflip);
 				UINT16 *dst = BITMAP_ADDR16(bitmap, sy, 0);
 				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
 

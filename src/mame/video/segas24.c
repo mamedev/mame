@@ -31,8 +31,6 @@ VIDEO_UPDATE(system24)
 		return 0;
 	}
 
-	sys24_tile_update(screen->machine);
-
 	bitmap_fill(priority_bitmap, 0, 0);
 	bitmap_fill(bitmap, cliprect, 0);
 

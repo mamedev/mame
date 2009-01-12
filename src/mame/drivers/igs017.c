@@ -173,6 +173,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 {
 	// prepare GfxElement on the fly
 	gfx_element gfx;
+	UINT8 dirty = 0;
 
 	gfx.machine = machine;
 	gfx.width = dimx;
@@ -184,6 +185,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 	gfx.total_colors = 8;
 	gfx.pen_usage = NULL;
 	gfx.gfxdata = sprites_gfx + addr;
+	gfx.dirty = &dirty;
 	gfx.line_modulo = dimx;
 	gfx.char_modulo = 0;	// doesn't matter
 	gfx.flags = 0;

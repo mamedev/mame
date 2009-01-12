@@ -327,8 +327,8 @@ static MC6845_BEGIN_UPDATE( begin_update )
 static MC6845_UPDATE_ROW( update_row )
 {
 	qix_state *state = device->machine->driver_data;
+	UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 	UINT16 x;
-	UINT8 scanline[256];
 
 	pen_t *pens = (pen_t *)param;
 
@@ -337,9 +337,7 @@ static MC6845_UPDATE_ROW( update_row )
 	offs_t offs_xor = state->flip ? 0xffff : 0;
 
 	for (x = 0; x < x_count * 8; x++)
-		scanline[x] = state->videoram[(offs + x) ^ offs_xor];
-
-	draw_scanline8(bitmap, 0, y, x_count * 8, scanline, pens, -1);
+		dest[x] = pens[state->videoram[(offs + x) ^ offs_xor]];
 }
 
 

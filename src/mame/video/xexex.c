@@ -134,7 +134,7 @@ VIDEO_UPDATE( xexex )
 
 		if (alpha > 0)
 		{
-			K056832_tilemap_draw(screen->machine, bitmap, cliprect, 1, (alpha >= 255) ? 0 : TILEMAP_DRAW_ALPHA, 0);
+			K056832_tilemap_draw(screen->machine, bitmap, cliprect, 1, TILEMAP_DRAW_ALPHA(alpha), 0);
 		}
 	}
 

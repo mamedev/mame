@@ -137,7 +137,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					cliprect,TRANSPARENCY_PEN,0);
 		} else {
 			/* get a pointer to the current sprite's gfx data */
-			UINT8 *gfx_src = gfx->gfxdata + (number % gfx->total_elements)*gfx->char_modulo;
+			const UINT8 *gfx_src = gfx_element_get_data(gfx, number % gfx->total_elements);
 
 			for (py = 0; py < gfx->height; py++){
 				/* get a pointer to the current line in the screen bitmap */

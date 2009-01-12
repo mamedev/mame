@@ -423,7 +423,7 @@ static void draw_road(running_machine *machine, bitmap_t *bitmap)
 		}
 
 		/* draw the scanline */
-		draw_scanline16(bitmap, 0, y, 256, &scanline[xscroll], NULL, -1);
+		draw_scanline16(bitmap, 0, y, 256, &scanline[xscroll], NULL);
 	}
 }
 
@@ -432,7 +432,7 @@ static void zoom_sprite(running_machine *machine, bitmap_t *bitmap,int big,
 		int sizex,int sizey)
 {
 	const gfx_element *gfx = machine->gfx[big ? 3 : 2];
-	UINT8 *gfxdata = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+	const UINT8 *gfxdata = gfx_element_get_data(gfx, code % gfx->total_elements);
 	UINT8 *scaling_rom = memory_region(machine, "gfx6");
 	UINT32 transmask = colortable_get_transpen_mask(machine->colortable, gfx, color, 0x1f);
 	int coloroffs = gfx->color_base + color * gfx->color_granularity;
@@ -451,7 +451,7 @@ static void zoom_sprite(running_machine *machine, bitmap_t *bitmap,int big,
 			int xx = sx & 0x3ff;
 			int siz = 0;
 			int offs = 0;
-			UINT8 *src;
+			const UINT8 *src;
 
 			if (!big) dy >>= 1;
 			src = gfxdata + dy * gfx->line_modulo;

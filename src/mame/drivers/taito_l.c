@@ -60,22 +60,26 @@ puzznici note
 #include "includes/taito_l.h"
 
 
-static void (*const rambank_modify_notifiers[12])(running_machine *, int) =
+static const struct
 {
-	taitol_chardef14_m,	// 14
-	taitol_chardef15_m,	// 15
-	taitol_chardef16_m,	// 16
-	taitol_chardef17_m,	// 17
+	void (*notifier)(running_machine *, int);
+	UINT32 offset;
+} rambank_modify_notifiers[12] =
+{
+	{ taitol_chardef14_m, 0x0000 },	// 14
+	{ taitol_chardef15_m, 0x1000 },	// 15
+	{ taitol_chardef16_m, 0x2000 },	// 16
+	{ taitol_chardef17_m, 0x3000 },	// 17
 
-	taitol_bg18_m,		// 18
-	taitol_bg19_m,		// 19
-	taitol_char1a_m,	// 1a
-	taitol_obj1b_m,		// 1b
+	{ taitol_bg18_m, 0x8000 },		// 18
+	{ taitol_bg19_m, 0x9000 },		// 19
+	{ taitol_char1a_m, 0xa000 },	// 1a
+	{ taitol_obj1b_m, 0xb000 },		// 1b
 
-	taitol_chardef1c_m,	// 1c
-	taitol_chardef1d_m,	// 1d
-	taitol_chardef1e_m,	// 1e
-	taitol_chardef1f_m,	// 1f
+	{ taitol_chardef1c_m, 0x4000 },	// 1c
+	{ taitol_chardef1d_m, 0x5000 },	// 1d
+	{ taitol_chardef1e_m, 0x6000 },	// 1e
+	{ taitol_chardef1f_m, 0x7000 },	// 1f
 };
 
 static void (*current_notifier[4])(running_machine *, int);
@@ -152,11 +156,7 @@ static void machine_init(running_machine *machine)
 	cur_rombank = cur_rombank2 = 0;
 	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
 
-	for(i=0;i<512;i++)
-	{
-		decodechar(machine->gfx[2], i, taitol_rambanks);
-		decodechar(machine->gfx[2], i+512, taitol_rambanks + 0x4000);
-	}
+	gfx_element_set_source(machine->gfx[2], taitol_rambanks);
 
 	adpcm_pos = 0;
 	adpcm_data = -1;
@@ -377,8 +377,8 @@ static WRITE8_HANDLER( rambankswitch_w )
 		if(data>=0x14 && data<=0x1f)
 		{
 			data -= 0x14;
-			current_notifier[offset] = rambank_modify_notifiers[data];
-			current_base[offset] = taitol_rambanks+0x1000*data;
+			current_notifier[offset] = rambank_modify_notifiers[data].notifier;
+			current_base[offset] = taitol_rambanks+rambank_modify_notifiers[data].offset;
 		}
 		else if (data == 0x80)
 		{

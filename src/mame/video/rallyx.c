@@ -16,8 +16,8 @@ When there is a sprite under the bullet, the palette bank is changed, but the
 palette entry number is NOT changed; therefore, the sprite pixels that are
 covered by the bullet just change bank. This is emulated by first drawing the
 bullets normally, then drawing the sprites (with pdrawgfx so they are not
-drawn over high priority tiles), then drawing the pullets again in
-TRANSPARENCY_PEN_TABLE mode, so that bullets not covered by sprites remain
+drawn over high priority tiles), then drawing the pullets again with
+drawgfx_transtable mode, so that bullets not covered by sprites remain
 the same while the others alter the sprite color.
 
 
@@ -50,6 +50,7 @@ struct star
 };
 static struct star stars[MAX_STARS];
 static int total_stars;
+static UINT8 drawmode_table[4];
 
 
 /***************************************************************************
@@ -356,9 +357,9 @@ VIDEO_START( rallyx )
 		machine->shadow_table[i] = i;
 
 	for (i = 0;i < 3;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
+		drawmode_table[i] = DRAWMODE_SHADOW;
 
-	gfx_drawmode_table[3] = DRAWMODE_NONE;
+	drawmode_table[3] = DRAWMODE_NONE;
 }
 
 
@@ -383,9 +384,9 @@ VIDEO_START( jungler )
 		machine->shadow_table[i] = i;
 
 	for (i = 0;i < 3;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
+		drawmode_table[i] = DRAWMODE_SHADOW;
 
-	gfx_drawmode_table[3] = DRAWMODE_NONE;
+	drawmode_table[3] = DRAWMODE_NONE;
 
 	calculate_star_field();
 }
@@ -419,9 +420,9 @@ VIDEO_START( locomotn )
 		machine->shadow_table[i] = i;
 
 	for (i = 0;i < 3;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
+		drawmode_table[i] = DRAWMODE_SHADOW;
 
-	gfx_drawmode_table[3] = DRAWMODE_NONE;
+	drawmode_table[3] = DRAWMODE_NONE;
 
 	calculate_star_field();
 }
@@ -456,9 +457,9 @@ VIDEO_START( commsega )
 		machine->shadow_table[i] = i;
 
 	for (i = 0;i < 3;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
+		drawmode_table[i] = DRAWMODE_SHADOW;
 
-	gfx_drawmode_table[3] = DRAWMODE_NONE;
+	drawmode_table[3] = DRAWMODE_NONE;
 
 	calculate_star_field();
 }
@@ -575,7 +576,7 @@ static void locomotn_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 	}
 }
 
-static void rallyx_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transparency )
+static void rallyx_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transpen )
 {
 	int offs;
 
@@ -587,16 +588,24 @@ static void rallyx_draw_bullets(running_machine *machine, bitmap_t *bitmap, cons
 		y = 253 - rallyx_radary[offs];
 		if (flip_screen_get(machine)) x -= 3;
 
-		drawgfx(bitmap,machine->gfx[2],
-				((rallyx_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
-				0,
-				0,0,
-				x,y,
-				cliprect,transparency,3);
+		if (transpen)
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+					((rallyx_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
+					0,
+					0,0,
+					x,y,
+					3);
+		else
+			drawgfx_transtable(bitmap,cliprect,machine->gfx[2],
+					((rallyx_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
+					0,
+					0,0,
+					x,y,
+					drawmode_table,machine->shadow_table);
 	}
 }
 
-static void jungler_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transparency )
+static void jungler_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transpen )
 {
 	int offs;
 
@@ -607,16 +616,24 @@ static void jungler_draw_bullets(running_machine *machine, bitmap_t *bitmap, con
 		x = rallyx_radarx[offs] + ((~rallyx_radarattr[offs & 0x0f] & 0x08) << 5);
 		y = 253 - rallyx_radary[offs];
 
-		drawgfx(bitmap,machine->gfx[2],
-				(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
-				0,
-				0,0,
-				x,y,
-				cliprect,transparency,3);
+		if (transpen)
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+					(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
+					0,
+					0,0,
+					x,y,
+					3);
+		else
+			drawgfx_transtable(bitmap,cliprect,machine->gfx[2],
+					(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
+					0,
+					0,0,
+					x,y,
+					drawmode_table,machine->shadow_table);
 	}
 }
 
-static void locomotn_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transparency )
+static void locomotn_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transpen )
 {
 	int offs;
 
@@ -635,12 +652,20 @@ static void locomotn_draw_bullets(running_machine *machine, bitmap_t *bitmap, co
 		x = rallyx_radarx[offs] + ((~rallyx_radarattr[offs & 0x0f] & 0x08) << 5);
 		y = 252 - rallyx_radary[offs];
 
-		drawgfx(bitmap,machine->gfx[2],
-				(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
-				0,
-				0,0,
-				x,y,
-				cliprect,transparency,3);
+		if (transpen)
+			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
+					(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
+					0,
+					0,0,
+					x,y,
+					3);
+		else
+			drawgfx_transtable(bitmap,cliprect,machine->gfx[2],
+					(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
+					0,
+					0,0,
+					x,y,
+					drawmode_table,machine->shadow_table);
 	}
 }
 
@@ -669,9 +694,9 @@ VIDEO_UPDATE( rallyx )
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,1);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,1);
 
-	rallyx_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN);
-	rallyx_draw_sprites(screen->machine, bitmap,cliprect,1);
-	rallyx_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+	rallyx_draw_bullets(screen->machine,bitmap,cliprect,TRUE);
+	rallyx_draw_sprites(screen->machine,bitmap,cliprect,1);
+	rallyx_draw_bullets(screen->machine,bitmap,cliprect,FALSE);
 
 	return 0;
 }
@@ -702,9 +727,9 @@ VIDEO_UPDATE( jungler )
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,0);
 
-	jungler_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN);
-	rallyx_draw_sprites(screen->machine, bitmap,cliprect,0);
-	jungler_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+	jungler_draw_bullets(screen->machine,bitmap,cliprect,TRUE);
+	rallyx_draw_sprites(screen->machine,bitmap,cliprect,0);
+	jungler_draw_bullets(screen->machine,bitmap,cliprect,FALSE);
 
 	if (stars_enable)
 		draw_stars(screen->machine, bitmap, cliprect);
@@ -746,9 +771,9 @@ VIDEO_UPDATE( locomotn )
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,1);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,1);
 
-	locomotn_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN);
-	locomotn_draw_sprites(screen->machine, bitmap,cliprect,0);
-	locomotn_draw_bullets(screen->machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+	locomotn_draw_bullets(screen->machine,bitmap,cliprect,TRUE);
+	locomotn_draw_sprites(screen->machine,bitmap,cliprect,0);
+	locomotn_draw_bullets(screen->machine,bitmap,cliprect,FALSE);
 
 	if (stars_enable)
 		draw_stars(screen->machine, bitmap, cliprect);

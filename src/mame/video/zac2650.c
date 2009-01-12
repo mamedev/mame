@@ -35,6 +35,13 @@ READ8_HANDLER( zac_s2636_r )
     else return CollisionSprite;
 }
 
+WRITE8_HANDLER( zac_s2636_w )
+{
+	zac2650_s2636_0_ram[offset] = data;
+	gfx_element_mark_dirty(space->machine->gfx[1], offset/8);
+	gfx_element_mark_dirty(space->machine->gfx[2], offset/8);
+}
+
 READ8_HANDLER( tinvader_port_0_r )
 {
 	return input_port_read(space->machine, "1E80") - CollisionBackground;
@@ -137,6 +144,9 @@ VIDEO_START( tinvader )
 
 	spritebitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+
+	gfx_element_set_source(machine->gfx[1], zac2650_s2636_0_ram);
+	gfx_element_set_source(machine->gfx[2], zac2650_s2636_0_ram);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
@@ -169,12 +179,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
             int bx       = (zac2650_s2636_0_ram[offs+10] * 4) - 22;
             int by       = (zac2650_s2636_0_ram[offs+12] * 3) + 3;
             int x,y;
-
-			/* 16x8 version */
-			decodechar(machine->gfx[1],spriteno,zac2650_s2636_0_ram);
-
-			/* 16x16 version */
-			decodechar(machine->gfx[2],spriteno,zac2650_s2636_0_ram);
 
             /* Sprite->Background collision detection */
 			drawgfx(bitmap,machine->gfx[expand],

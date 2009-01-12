@@ -81,9 +81,9 @@ VIDEO_START( relief )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-
-	/* blend the MO graphics */
-	atarigen_blend_gfx(machine, 1, 2, 0x0f, 0x10);
+	
+	/* MOs are 5bpp but with a 4-bit color granularity */
+	machine->gfx[1]->color_granularity = 16;
 
 	/* initialize the playfield */
 	atarigen_playfield_tilemap = tilemap_create(machine, get_playfield_tile_info, tilemap_scan_cols,  8,8, 64,64);

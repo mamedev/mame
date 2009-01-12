@@ -90,11 +90,13 @@ static VIDEO_UPDATE( acefruit )
 
 				for( x = 0; x < 16; x++ )
 				{
+					int sprite = ( spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
+					const UINT8 *gfxdata = gfx_element_get_data(gfx, sprite);
+
 					for( y = 0; y < 8; y++ )
 					{
 						UINT16 *dst = BITMAP_ADDR16( bitmap, y + ( row * 8 ), x + ( col * 16 ) );
-						int sprite = ( spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
-						*( dst ) = *( gfx->gfxdata + ( sprite * gfx->char_modulo ) + ( ( spriterow + y ) * gfx->line_modulo ) + ( ( spriteindex % 64 ) >> 1 ) );
+						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->line_modulo ) + ( ( spriteindex % 64 ) >> 1 ) );
 					}
 
 					spriteindex += spritesize;

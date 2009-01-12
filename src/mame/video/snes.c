@@ -1941,6 +1941,8 @@ static void snes_dbg_draw_all_tiles(bitmap_t *bitmap, UINT32 tileaddr, UINT8 bpl
 		addr = tileaddr + (jj * bpl * 16 * 32);
 		for( kk = 0; kk < 8; kk++ )
 		{
+			UINT32 *destline = BITMAP_ADDR32(bitmap, jj * 8 + kk, 0);
+			
 			/* Clear buffers */
 			memset( scanlines[MAINSCREEN].buffer, 0, SNES_SCR_WIDTH * 2 );
 			memset( scanlines[MAINSCREEN].zbuf, 0, SNES_SCR_WIDTH * 2 );
@@ -1960,7 +1962,12 @@ static void snes_dbg_draw_all_tiles(bitmap_t *bitmap, UINT32 tileaddr, UINT8 bpl
 				}
 				addr += (bpl * 16);
 			}
-			draw_scanline16( bitmap, 0, jj * 8 + kk, SNES_SCR_WIDTH * 2, scanlines[MAINSCREEN].buffer, machine->pens, 200 );
+			for (ii = 0; ii < SNES_SCR_WIDTH * 2; ii++)
+			{
+				int pixdata = scanlines[MAINSCREEN].buffer[ii];
+				if (pixdata != 200)
+					destline[ii] = machine->pens[pixdata];
+			}
 			addr -= (32 * (bpl * 16)) - 2;
 		}
 	}
@@ -2142,6 +2149,7 @@ static UINT8 snes_dbg_video(bitmap_t *bitmap, UINT16 curline )
 		{
 			static UINT32 tmaddr = 0;
 			static INT8 tmbg = 0;
+			UINT32 *destline = BITMAP_ADDR32(bitmap, curline, 0);
 			if( curline == 0 )
 			{
 				if( adjust & 0x1 ) tmaddr += 2;
@@ -2159,21 +2167,26 @@ static UINT8 snes_dbg_video(bitmap_t *bitmap, UINT16 curline )
 			for( ii = 0; ii < SNES_SCR_WIDTH; ii++ )
 				scanlines[MAINSCREEN].buffer[ii] = machine->pens[0];
 			snes_dbg_draw_maps(bitmap, tmaddr, dm, curline, tmbg );
-			draw_scanline16( bitmap, 0, curline, SNES_SCR_WIDTH, scanlines[MAINSCREEN].buffer, machine->pens, 200 );
+			for (ii = 0; ii < SNES_SCR_WIDTH; ii++)
+			{
+				int pixdata = scanlines[MAINSCREEN].buffer[ii];
+				if (pixdata != 200)
+					destline[ii] = machine->pens[pixdata];
+			}
 			return 1;
 				}
 		}
 
 			/* Draw some useful information about the back/fixed colours and current bg mode etc. */
-			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 26) = machine->pens[dbg_mode_colours[(snes_ram[CGWSEL] & 0xc0) >> 6]];
-			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 24) = machine->pens[dbg_mode_colours[(snes_ram[CGWSEL] & 0x30) >> 4]];
-			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 22) = machine->pens[dbg_mode_colours[snes_ram[BGMODE] & 0x7]];
-			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 12) = machine->pens[32767];
-			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 2 ) = machine->pens[32767];
+			*BITMAP_ADDR32(bitmap, curline, SNES_DBG_HORZ_POS - 26) = machine->pens[dbg_mode_colours[(snes_ram[CGWSEL] & 0xc0) >> 6]];
+			*BITMAP_ADDR32(bitmap, curline, SNES_DBG_HORZ_POS - 24) = machine->pens[dbg_mode_colours[(snes_ram[CGWSEL] & 0x30) >> 4]];
+			*BITMAP_ADDR32(bitmap, curline, SNES_DBG_HORZ_POS - 22) = machine->pens[dbg_mode_colours[snes_ram[BGMODE] & 0x7]];
+			*BITMAP_ADDR32(bitmap, curline, SNES_DBG_HORZ_POS - 12) = machine->pens[32767];
+			*BITMAP_ADDR32(bitmap, curline, SNES_DBG_HORZ_POS - 2 ) = machine->pens[32767];
 			for( ii = 0; ii < 5; ii++ )
 			{
-			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 19 + ii) = snes_cgram[0];
-			*BITMAP_ADDR16(bitmap, curline, SNES_DBG_HORZ_POS - 9  + ii) = snes_cgram[FIXED_COLOUR];
+			*BITMAP_ADDR32(bitmap, curline, SNES_DBG_HORZ_POS - 19 + ii) = snes_cgram[0];
+			*BITMAP_ADDR32(bitmap, curline, SNES_DBG_HORZ_POS - 9  + ii) = snes_cgram[FIXED_COLOUR];
 			}
 			/* Draw window positions */
 			scanlines[MAINSCREEN].buffer[snes_ram[WH0]] = machine->pens[dbg_mode_colours[0]];

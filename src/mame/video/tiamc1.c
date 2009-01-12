@@ -11,12 +11,12 @@
 #include "includes/tiamc1.h"
 
 
-UINT8 *tiamc1_tileram;
-UINT8 *tiamc1_charram;
-UINT8 *tiamc1_spriteram_x;
-UINT8 *tiamc1_spriteram_y;
-UINT8 *tiamc1_spriteram_a;
-UINT8 *tiamc1_spriteram_n;
+static UINT8 *tiamc1_tileram;
+static UINT8 *tiamc1_charram;
+static UINT8 *tiamc1_spriteram_x;
+static UINT8 *tiamc1_spriteram_y;
+static UINT8 *tiamc1_spriteram_a;
+static UINT8 *tiamc1_spriteram_n;
 static UINT8 tiamc1_layers_ctrl;
 static UINT8 tiamc1_bg_vshift;
 static UINT8 tiamc1_bg_hshift;
@@ -35,15 +35,15 @@ WRITE8_HANDLER( tiamc1_videoram_w )
 	if(!(tiamc1_layers_ctrl & 16))
 		tiamc1_charram[offset + 0x1800] = data;
 
-	if((tiamc1_layers_ctrl & 30) ^ 0xff)
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	if ((tiamc1_layers_ctrl & (16|8|4|2)) != (16|8|4|2))
+		gfx_element_mark_dirty(space->machine->gfx[0], (offset / 8) & 0xff);
 
 	if(!(tiamc1_layers_ctrl & 1)) {
 		tiamc1_tileram[offset] = data;
-		if (offset >= 1024)
-			tilemap_mark_tile_dirty(bg_tilemap1, offset);
+		if (offset < 1024)
+			tilemap_mark_tile_dirty(bg_tilemap1, offset & 0x3ff);
 		else
-			tilemap_mark_tile_dirty(bg_tilemap2, offset);
+			tilemap_mark_tile_dirty(bg_tilemap2, offset & 0x3ff);
 	}
 }
 
@@ -122,24 +122,31 @@ PALETTE_INIT( tiamc1 )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	int code = tiamc1_tileram[tile_index];
-
-	decodechar(machine->gfx[0], code, tiamc1_charram);
-
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO(0, tiamc1_tileram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	int code = tiamc1_tileram[tile_index + 1024];
-
-	decodechar(machine->gfx[0], code, tiamc1_charram);
-
-	SET_TILE_INFO(0, code, 0, 0);
+	SET_TILE_INFO(0, tiamc1_tileram[tile_index + 1024], 0, 0);
 }
 
 VIDEO_START( tiamc1 )
 {
+	UINT8 *video_ram;
+
+	video_ram = auto_malloc(0x3040);
+	memset(video_ram, 0, 0x3040);
+
+        tiamc1_charram = video_ram + 0x0800;     /* Ram is banked */
+        tiamc1_tileram = video_ram + 0x0000;
+
+	tiamc1_spriteram_y = video_ram + 0x3000;
+	tiamc1_spriteram_x = video_ram + 0x3010;
+	tiamc1_spriteram_n = video_ram + 0x3020;
+	tiamc1_spriteram_a = video_ram + 0x3030;
+
+	state_save_register_global_pointer(machine, video_ram, 0x3040);
+
 	bg_tilemap1 = tilemap_create(machine, get_bg1_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
@@ -152,6 +159,8 @@ VIDEO_START( tiamc1 )
 	state_save_register_global(machine, tiamc1_layers_ctrl);
 	state_save_register_global(machine, tiamc1_bg_vshift);
 	state_save_register_global(machine, tiamc1_bg_hshift);
+
+	gfx_element_set_source(machine->gfx[0], tiamc1_charram);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

@@ -882,16 +882,14 @@ VIDEO_UPDATE( ygv608 )
   cos_theta = (double)ygv608.dx / (double)0x10000;
 
   if( ygv608.regs.s.zron )
-    copyrozbitmap( bitmap, work_bitmap,
+    copyrozbitmap( bitmap, cliprect, work_bitmap,
                    ( visarea->min_x << 16 ) +
                     ygv608.ax + 0x10000 * r *
                     ( -sin( alpha ) * cos_theta + cos( alpha ) * sin_theta ),
                    ( visarea->min_y << 16 ) +
                     ygv608.ay + 0x10000 * r *
                     ( cos( alpha ) * cos_theta + sin( alpha ) * sin_theta ),
-                   ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0,
-                   cliprect,
-                   TRANSPARENCY_NONE, 0, 0 );
+                   ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0);
   else
 #endif
     copybitmap( bitmap, work_bitmap, 0, 0, 0, 0, cliprect);
@@ -909,12 +907,11 @@ VIDEO_UPDATE( ygv608 )
 
 #ifdef _ENABLE_ROTATE_ZOOM
   if( ygv608.regs.s.zron )
-    copyrozbitmap( bitmap, work_bitmap,
+    copyrozbitmap_trans( bitmap, cliprect, work_bitmap,
                    ygv608.ax, // + ( visarea->min_x << 16 ),
                    ygv608.ay, // + ( visarea->min_y << 16 ),
                    ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0,
-                   cliprect,
-                   TRANSPARENCY_PEN, 0, 0 );
+                   0 );
   else
 #endif
     copybitmap_trans( bitmap, work_bitmap, 0, 0, 0, 0, cliprect, 0 );

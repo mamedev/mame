@@ -70,20 +70,23 @@ int shangha3_do_shadows;
 static UINT16 gfxlist_addr;
 static bitmap_t *rawbitmap;
 
+static UINT8 drawmode_table[16];
 
 
 VIDEO_START( shangha3 )
 {
+	int i;
+
 	rawbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+
+	for (i = 0;i < 14;i++)
+		drawmode_table[i] = DRAWMODE_SOURCE;
+	drawmode_table[14] = shangha3_do_shadows ? DRAWMODE_SHADOW : DRAWMODE_NONE;
+	drawmode_table[15] = DRAWMODE_NONE;
 
 	if (shangha3_do_shadows)
 	{
-		int i;
-
 		/* Prepare the shadow table */
-		for (i = 0;i < 14;i++)
-			gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-		gfx_drawmode_table[14] = DRAWMODE_SHADOW;
 		for (i = 0;i < 128;i++)
 			machine->shadow_table[i] = i+128;
 	}
@@ -154,6 +157,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 			myclip.max_x = sx + sizex;
 			myclip.min_y = sy;
 			myclip.max_y = sy + sizey;
+			sect_rect(&myclip, &rawbitmap->cliprect);
 
 			if (shangha3_ram[offs+4] & 0x08)	/* tilemap */
 			{
@@ -225,26 +229,26 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 				int w;
 
 if (zoomx <= 1 && zoomy <= 1)
-	drawgfxzoom(rawbitmap,space->machine->gfx[0],
+	drawgfxzoom_transtable(rawbitmap,&myclip,space->machine->gfx[0],
 			code,
 			color,
 			flipx,flipy,
 			sx,sy,
-			&myclip,shangha3_do_shadows ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,15,
-			0x1000000,0x1000000);
+			0x1000000,0x1000000,
+			drawmode_table,space->machine->shadow_table);
 else
 {
 				w = (sizex+15)/16;
 
 				for (x = 0;x < w;x++)
 				{
-					drawgfxzoom(rawbitmap,space->machine->gfx[0],
+					drawgfxzoom_transtable(rawbitmap,&myclip,space->machine->gfx[0],
 							code,
 							color,
 							flipx,flipy,
 							sx + 16*x,sy,
-							&myclip,shangha3_do_shadows ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,15,
-							(0x200-zoomx)*0x100,(0x200-zoomy)*0x100);
+							(0x200-zoomx)*0x100,(0x200-zoomy)*0x100,
+							drawmode_table,space->machine->shadow_table);
 
 					if ((code & 0x000f) == 0x0f)
 						code = (code + 0x100) & 0xfff0;

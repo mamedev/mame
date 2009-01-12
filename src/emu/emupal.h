@@ -74,7 +74,7 @@
 
     1) declare MDRV_VIDEO_ATTRIBUTES( ... VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS ... )
 
-    2) set gfx_drawmode_table[0-n] to DRAWMODE_NONE, DRAWMODE_SOURCE or DRAWMODE_SHADOW
+    2) make a pen table fill with DRAWMODE_NONE, DRAWMODE_SOURCE or DRAWMODE_SHADOW
 
     3) (optional) set shadow darkness or highlight brightness by
         palette_set_shadow_factor(0.0-1.0) or
@@ -84,8 +84,8 @@
         palette_set_shadow_mode(0) to arm shadows or
         palette_set_shadow_mode(1) to arm highlights
 
-    5) call drawgfx with the TRANSPARENCY_PEN_TABLE flag
-        drawgfx( ..., cliprect, TRANSPARENCY_PEN_TABLE, transparent_color )
+    5) call drawgfx_transtable
+        drawgfx_transtable( ..., pentable )
 
 ******************************************************************************/
 

@@ -267,7 +267,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	const UINT8 *source = &spriteram[0x0800-0x20];	/* the last is NOT a sprite */
 	const UINT8 *finish = &spriteram[0];
 	gfx_element *gfx = machine->gfx[2];
-	gfx_element mygfx = *gfx;
 
 	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = spriteram[0x07f7];
@@ -310,12 +309,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		sy++;	/* sprites are buffered and delayed by one scanline */
 
-		/* change GfxElement parameters to draw only the needed part of the 32x32 tile */
-		mygfx.width = sizex;
-		mygfx.height = sizey;
-		mygfx.gfxdata = gfx->gfxdata + tx + ty * gfx->line_modulo;
-
-		pdrawgfx( bitmap, &mygfx,
+		gfx_element_set_source_clip(gfx, tx, sizex, ty, sizey);
+		pdrawgfx( bitmap, gfx,
 				sprite,
 				color,
 				flipx,flipy,

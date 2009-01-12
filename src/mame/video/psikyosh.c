@@ -92,19 +92,64 @@ sol divide doesn't seem to make much use of tilemaps at all, it uses them to fad
 #include "driver.h"
 #include "profiler.h"
 #include "psikyosh.h"
+#include "drawgfxm.h"
 
 /* Needed for psikyosh_drawgfxzoom */
 static bitmap_t *zoom_bitmap, *z_bitmap;
+static UINT8 alphatable[256];
 
 /* Psikyo PS6406B */
 /* --- BACKGROUNDS --- */
+
+#define PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(DEST, PRIORITY, SOURCE)					\
+do																					\
+{																					\
+	UINT32 srcdata = (SOURCE);														\
+	if (srcdata != 0)																\
+		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alphatable[srcdata]);	\
+}																					\
+while (0)																			\
+
+void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, 
+		int fixedalpha)
+{
+	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
+	
+	const pen_t *paldata;
+	
+	/* if we have a fixed alpha, call the standard drawgfx_alpha */
+	if (fixedalpha >= 0)
+	{
+		drawgfx_alpha(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty, 0, fixedalpha);
+		return;
+	}
+
+	assert(dest != NULL);
+	assert(dest->bpp == 32);
+	assert(gfx != NULL);
+	assert(alphatable != NULL);
+
+	/* get final code and color, and grab lookup tables */
+	code %= gfx->total_elements;
+	color %= gfx->total_colors;
+	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
+	
+	/* early out if completely transparent */
+	if (gfx->pen_usage != NULL && (gfx->pen_usage[code] & ~(1 << 0)) == 0)
+		return;
+
+	/* render based on dest bitmap depth */
+	DRAWGFX_CORE(UINT32, PIXEL_OP_REMAP_TRANS0_ALPHATABLE32, NO_PRIORITY);
+}
+
 
 /* 'Normal' layers, no line/columnscroll. No per-line effects */
 static void draw_bglayer(running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	gfx_element *gfx;
 	int offs=0, sx, sy;
-	int scrollx, scrolly, bank, alpha, alphamap, trans, size, width;
+	int scrollx, scrolly, bank, alpha, alphamap, size, width;
 
 	if ( BG_TYPE(layer) == BG_NORMAL_ALT )
 	{
@@ -130,13 +175,9 @@ static void draw_bglayer(running_machine *machine, int layer, bitmap_t *bitmap, 
 	width = BG_LARGE(layer) ? 0x200 : 0x100;
 
 	if(alphamap) { /* alpha values are per-pen */
-		trans = TRANSPARENCY_ALPHARANGE;
-	} else if(alpha) {
-		trans = TRANSPARENCY_ALPHA;
-		alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
-		alpha_set_level(alpha);
+		alpha = -1;
 	} else {
-		trans = TRANSPARENCY_PEN;
+		alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
 	}
 
 	if((bank>=0x0c) && (bank<=0x1f)) /* shouldn't happen, 20 banks of 0x800 bytes */
@@ -150,13 +191,13 @@ static void draw_bglayer(running_machine *machine, int layer, bitmap_t *bitmap, 
 				tileno = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 				colour = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0xff000000) >> 24;
 
-				drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* normal */
+				drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),alpha); /* normal */
 				if(scrollx)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* wrap x */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),alpha); /* wrap x */
 				if(scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap y */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,alpha); /* wrap y */
 				if(scrollx && scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap xy */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,alpha); /* wrap xy */
 
 				offs++;
 			}
@@ -170,7 +211,7 @@ static void draw_bglayertext(running_machine *machine, int layer, bitmap_t *bitm
 {
 	gfx_element *gfx;
 	int offs, sx, sy;
-	int scrollx, scrolly, bank, size, width, scrollbank,trans,alpha,alphamap;
+	int scrollx, scrolly, bank, size, width, scrollbank,alpha,alphamap;
 
 	scrollbank = BG_TYPE(layer); /* Scroll bank appears to be same as layer type */
 
@@ -186,13 +227,9 @@ static void draw_bglayertext(running_machine *machine, int layer, bitmap_t *bitm
 	scrolly = (psikyosh_bgram[(scrollbank*0x800)/4 - 0x4000/4] & 0x03ff0000) >> 16;
 
 	if(alphamap) { /* alpha values are per-pen */
-		trans = TRANSPARENCY_ALPHARANGE;
-	} else if(alpha) {
-		trans = TRANSPARENCY_ALPHA;
-		alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
-		alpha_set_level(alpha);
+		alpha = -1;
 	} else {
-		trans = TRANSPARENCY_PEN;
+		alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
 	}
 
 
@@ -205,13 +242,13 @@ static void draw_bglayertext(running_machine *machine, int layer, bitmap_t *bitm
 				tileno = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 				colour = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0xff000000) >> 24;
 
-				drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* normal */
+				drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),alpha); /* normal */
 				if(scrollx)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* wrap x */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),alpha); /* wrap x */
 				if(scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap y */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,alpha); /* wrap y */
 				if(scrollx && scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap xy */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,alpha); /* wrap xy */
 
 				offs++;
 	}}}
@@ -224,13 +261,9 @@ static void draw_bglayertext(running_machine *machine, int layer, bitmap_t *bitm
 	scrolly = (psikyosh_bgram[(scrollbank*0x800)/4 - 0x4000/4 + 0x20/4] & 0x03ff0000) >> 16;
 
 	if(alphamap) { /* alpha values are per-pen */
-		trans = TRANSPARENCY_ALPHARANGE;
-	} else if(alpha) {
-		trans = TRANSPARENCY_ALPHA;
-		alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
-		alpha_set_level(alpha);
+		alpha = -1;
 	} else {
-		trans = TRANSPARENCY_PEN;
+		alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
 	}
 
 	if((bank>=0x0c) && (bank<=0x1f)) { /* shouldn't happen, 20 banks of 0x800 bytes */
@@ -242,13 +275,13 @@ static void draw_bglayertext(running_machine *machine, int layer, bitmap_t *bitm
 				tileno = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0x0007ffff); /* seems to take into account spriteram, hence -0x4000 */
 				colour = (psikyosh_bgram[(bank*0x800)/4 + offs - 0x4000/4] & 0xff000000) >> 24;
 
-				drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* normal */
+				drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),alpha); /* normal */
 				if(scrollx)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* wrap x */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),alpha); /* wrap x */
 				if(scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap y */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,alpha); /* wrap y */
 				if(scrollx && scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap xy */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,alpha); /* wrap xy */
 
 				offs++;
 	}}}
@@ -260,7 +293,7 @@ static void draw_bglayerscroll(running_machine *machine, int layer, bitmap_t *bi
 {
 	gfx_element *gfx;
 	int offs, sx, sy;
-	int scrollx, scrolly, bank, alpha, alphamap, trans, size, width, scrollbank;
+	int scrollx, scrolly, bank, alpha, alphamap, size, width, scrollbank;
 
 	scrollbank = BG_TYPE(layer); /* Scroll bank appears to be same as layer type */
 
@@ -280,13 +313,9 @@ static void draw_bglayerscroll(running_machine *machine, int layer, bitmap_t *bi
 	width = BG_LARGE(layer) ? 0x200 : 0x100;
 
 	if(alphamap) { /* alpha values are per-pen */
-		trans = TRANSPARENCY_ALPHARANGE;
-	} else if(alpha) {
-		trans = TRANSPARENCY_ALPHA;
-		alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
-		alpha_set_level(alpha);
+		alpha = -1;
 	} else {
-		trans = TRANSPARENCY_PEN;
+		alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
 	}
 
 	if((bank>=0x0c) && (bank<=0x1f)) /* shouldn't happen, 20 banks of 0x800 bytes */
@@ -315,13 +344,13 @@ static void draw_bglayerscroll(running_machine *machine, int layer, bitmap_t *bi
 
 //              drawgfx(zoom_bitmap,gfx,tileno,colour,0,0,(16*sx)&0x1ff,((16*sy)&(width-1)),NULL,TRANSPARENCY_PEN,0);
 
-				drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* normal */
+				drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1)),alpha); /* normal */
 				if(scrollx)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),cliprect,trans,0); /* wrap x */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1)),alpha); /* wrap x */
 				if(scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap y */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,(16*sx+scrollx)&0x1ff,((16*sy+scrolly)&(width-1))-width,alpha); /* wrap y */
 				if(scrollx && scrolly)
-					drawgfx(bitmap,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,cliprect,trans,0); /* wrap xy */
+					drawgfx_alphatable(bitmap,cliprect,gfx,tileno,colour,0,0,((16*sx+scrollx)&0x1ff)-0x200,((16*sy+scrolly)&(width-1))-width,alpha); /* wrap xy */
 
 				offs++;
 			}
@@ -395,7 +424,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 static void psikyosh_drawgfxzoom( running_machine *machine,
 		bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
-		const rectangle *clip,int transparency,int transparent_color,
+		const rectangle *clip,int alpha,
 		int zoomx, int zoomy, int wide, int high, UINT32 z)
 {
 	rectangle myclip; /* Clip to screen boundaries */
@@ -406,7 +435,6 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 
 	profiler_mark(PROFILER_DRAWGFX);
 
-	assert(transparency == TRANSPARENCY_PEN || transparency == TRANSPARENCY_ALPHA || transparency == TRANSPARENCY_ALPHARANGE);
 	assert(dest_bmp->bpp == 32);
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
@@ -444,7 +472,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 				for (xtile = xstart; xtile != xend; xtile += xinc )
 				{
 					const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-					int source_base = ((code + code_offset++) % gfx->total_elements) * gfx->height;
+					const UINT8 *code_base = gfx_element_get_data(gfx, (code + code_offset++) % gfx->total_elements);
 
 					int x_index_base, y_index, sx, sy, ex, ey;
 
@@ -494,11 +522,11 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 						int y;
 
 						/* case 1: TRANSPARENCY_PEN */
-						if (transparency == TRANSPARENCY_PEN)
+						if (alpha == 0xff)
 						{
 							if( z > 0 )
 							{
-								UINT8 *source = gfx->gfxdata + (source_base + y_index)*gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + (y_index)*gfx->line_modulo + x_index_base;
 								UINT32 *dest = (UINT32 *)dest_bmp->base + sy*dest_bmp->rowpixels + sx;
 								UINT16 *pri = (UINT16 *)z_bitmap->base + sy*z_bitmap->rowpixels + sx;
 								int src_modulo = yinc*gfx->line_modulo - xinc*(ex-sx);
@@ -512,7 +540,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 										if(z >= *pri)
 										{
 											int c = *source;
-											if( c != transparent_color )
+											if( c != 0 )
 											{
 												*dest = pal[c];
 												*pri = z;
@@ -529,7 +557,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 							}
 							else
 							{
-								UINT8 *source = gfx->gfxdata + (source_base + y_index)*gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index*gfx->line_modulo + x_index_base;
 								UINT32 *dest = (UINT32 *)dest_bmp->base + sy*dest_bmp->rowpixels + sx;
 								int src_modulo = yinc*gfx->line_modulo - xinc*(ex-sx);
 								int dst_modulo = dest_bmp->rowpixels - (ex-sx);
@@ -540,7 +568,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 									for( x=sx; x<ex; x++ )
 									{
 										int c = *source;
-										if( c != transparent_color ) *dest = pal[c];
+										if( c != 0 ) *dest = pal[c];
 
 										dest++;
 										source += xinc;
@@ -551,12 +579,12 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 							}
 						}
 
-						/* case 6: TRANSPARENCY_ALPHA */
-						if (transparency == TRANSPARENCY_ALPHA)
+						/* case 6: alpha-blended */
+						else if (alpha >= 0)
 						{
 							if ( z > 0 )
 							{
-								UINT8 *source = gfx->gfxdata + (source_base + y_index)*gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index*gfx->line_modulo + x_index_base;
 								UINT32 *dest = (UINT32 *)dest_bmp->base + sy*dest_bmp->rowpixels + sx;
 								UINT16 *pri = (UINT16 *)z_bitmap->base + sy*z_bitmap->rowpixels + sx;
 								int src_modulo = yinc*gfx->line_modulo - xinc*(ex-sx);
@@ -570,9 +598,9 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 										if(z >= *pri)
 										{
 											int c = *source;
-											if( c != transparent_color )
+											if( c != 0 )
 											{
-												*dest = alpha_blend32(*dest, pal[c]);
+												*dest = alpha_blend_r32(*dest, pal[c], alpha);
 												*pri = z;
 											}
 										}
@@ -587,7 +615,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 							}
 							else
 							{
-								UINT8 *source = gfx->gfxdata + (source_base + y_index)*gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index*gfx->line_modulo + x_index_base;
 								UINT32 *dest = (UINT32 *)dest_bmp->base + sy*dest_bmp->rowpixels + sx;
 								int src_modulo = yinc*gfx->line_modulo - xinc*(ex-sx);
 								int dst_modulo = dest_bmp->rowpixels - (ex-sx);
@@ -598,7 +626,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 									for( x=sx; x<ex; x++ )
 									{
 										int c = *source;
-										if( c != transparent_color ) *dest = alpha_blend32(*dest, pal[c]);
+										if( c != 0 ) *dest = alpha_blend_r32(*dest, pal[c], alpha);
 
 										dest++;
 										source += xinc;
@@ -611,11 +639,11 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 
 						/* pjp 31/5/02 */
 						/* case 7: TRANSPARENCY_ALPHARANGE */
-						if (transparency == TRANSPARENCY_ALPHARANGE)
+						else
 						{
 							if ( z > 0 )
 							{
-								UINT8 *source = gfx->gfxdata + (source_base + y_index)*gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index*gfx->line_modulo + x_index_base;
 								UINT32 *dest = (UINT32 *)dest_bmp->base + sy*dest_bmp->rowpixels + sx;
 								UINT16 *pri = (UINT16 *)z_bitmap->base + sy*z_bitmap->rowpixels + sx;
 								int src_modulo = yinc*gfx->line_modulo - xinc*(ex-sx);
@@ -629,12 +657,12 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 										if(z >= *pri)
 										{
 											int c = *source;
-											if( c != transparent_color )
+											if( c != 0 )
 											{
-												if( gfx_alpharange_table[c] == 0xff )
+												if( alphatable[c] == 0xff )
 													*dest = pal[c];
 												else
-													*dest = alpha_blend_r32(*dest, pal[c], gfx_alpharange_table[c]);
+													*dest = alpha_blend_r32(*dest, pal[c], alphatable[c]);
 
 												*pri = z;
 											}
@@ -650,7 +678,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 							}
 							else
 							{
-								UINT8 *source = gfx->gfxdata + (source_base + y_index)*gfx->line_modulo + x_index_base;
+								const UINT8 *source = code_base + y_index*gfx->line_modulo + x_index_base;
 								UINT32 *dest = (UINT32 *)dest_bmp->base + sy*dest_bmp->rowpixels + sx;
 								int src_modulo = yinc*gfx->line_modulo - xinc*(ex-sx);
 								int dst_modulo = dest_bmp->rowpixels - (ex-sx);
@@ -661,12 +689,12 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 									for( x=sx; x<ex; x++ )
 									{
 										int c = *source;
-										if( c != transparent_color )
+										if( c != 0 )
 										{
-											if( gfx_alpharange_table[c] == 0xff )
+											if( alphatable[c] == 0xff )
 												*dest = pal[c];
 											else
-												*dest = alpha_blend_r32(*dest, pal[c], gfx_alpharange_table[c]);
+												*dest = alpha_blend_r32(*dest, pal[c], alphatable[c]);
 										}
 										dest++;
 										source += xinc;
@@ -690,10 +718,10 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 		{
 			for(xtile=0; xtile<wide; xtile++)
 			{
-				int source_base = ((code + code_offset++) % gfx->total_elements) * gfx->height;
+				const UINT8 *code_base = gfx_element_get_data(gfx, (code + code_offset++) % gfx->total_elements);
 				for( ypixel=0; ypixel<gfx->height; ypixel++ )
 				{
-					UINT8 *source = gfx->gfxdata + (source_base+ypixel) * gfx->line_modulo;
+					const UINT8 *source = code_base + ypixel * gfx->line_modulo;
 					UINT8 *dest = BITMAP_ADDR8(zoom_bitmap, ypixel + ytile*gfx->height, 0);
 
 					for( xpixel=0; xpixel<gfx->width; xpixel++ )
@@ -766,7 +794,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 
 					/* case 1: TRANSPARENCY_PEN */
 					/* Note: adjusted to >>10 and draws from zoom_bitmap not gfx */
-					if (transparency == TRANSPARENCY_PEN)
+					if (alpha == 0xff)
 					{
 						if( z > 0 )
 						{
@@ -782,7 +810,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 									if(z >= pri[x])
 									{
 										int c = source[x_index>>10];
-										if( c != transparent_color )
+										if( c != 0 )
 										{
 											dest[x] = pal[c];
 											pri[x] = z;
@@ -805,7 +833,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 								for( x=sx; x<ex; x++ )
 								{
 									int c = source[x_index>>10];
-									if( c != transparent_color ) dest[x] = pal[c];
+									if( c != 0 ) dest[x] = pal[c];
 									x_index += dx;
 								}
 
@@ -814,8 +842,8 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 						}
 					}
 
-					/* case 6: TRANSPARENCY_ALPHA */
-					if (transparency == TRANSPARENCY_ALPHA)
+					/* case 6: alpha-blended */
+					else if (alpha >= 0)
 					{
 						if( z > 0 )
 						{
@@ -831,9 +859,9 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 									if(z >= pri[x])
 									{
 										int c = source[x_index>>10];
-										if( c != transparent_color )
+										if( c != 0 )
 										{
-											dest[x] = alpha_blend32(dest[x], pal[c]);
+											dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
 											pri[x] = z;
 										}
 									}
@@ -854,7 +882,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 								for( x=sx; x<ex; x++ )
 								{
 									int c = source[x_index>>10];
-									if( c != transparent_color ) dest[x] = alpha_blend32(dest[x], pal[c]);
+									if( c != 0 ) dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
 									x_index += dx;
 								}
 
@@ -864,7 +892,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 					}
 
 					/* case 7: TRANSPARENCY_ALPHARANGE */
-					if (transparency == TRANSPARENCY_ALPHARANGE)
+					else
 					{
 						if( z > 0 )
 						{
@@ -880,12 +908,12 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 									if(z >= pri[x])
 									{
 										int c = source[x_index>>10];
-										if( c != transparent_color )
+										if( c != 0 )
 										{
-											if( gfx_alpharange_table[c] == 0xff )
+											if( alphatable[c] == 0xff )
 												dest[x] = pal[c];
 											else
-												dest[x] = alpha_blend_r32(dest[x], pal[c], gfx_alpharange_table[c]);
+												dest[x] = alpha_blend_r32(dest[x], pal[c], alphatable[c]);
 
 											pri[x] = z;
 										}
@@ -907,12 +935,12 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 								for( x=sx; x<ex; x++ )
 								{
 									int c = source[x_index>>10];
-									if( c != transparent_color )
+									if( c != 0 )
 									{
-										if( gfx_alpharange_table[c] == 0xff )
+										if( alphatable[c] == 0xff )
 											dest[x] = pal[c];
 										else
-											dest[x] = alpha_blend_r32(dest[x], pal[c], gfx_alpharange_table[c]);
+											dest[x] = alpha_blend_r32(dest[x], pal[c], alphatable[c]);
 									}
 									x_index += dx;
 								}
@@ -972,7 +1000,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	while( listcntr < listlen )
 	{
 		UINT32 listdat, sprnum, xpos, ypos, high, wide, flpx, flpy, zoomx, zoomy, tnum, colr, dpth;
-		UINT32 pri, alpha, alphamap, trans;
+		UINT32 pri, alphamap;
+		int alpha;
 
 		listdat = list[BYTE_XOR_BE(listcntr)];
 		sprnum = (listdat & 0x03ff) * 4;
@@ -1009,19 +1038,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			gfx = dpth ? machine->gfx[1] : machine->gfx[0];
 
 			if(alphamap) { /* alpha values are per-pen */
-				trans = TRANSPARENCY_ALPHARANGE;
-			} else if(alpha) {
-				alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
-				trans = TRANSPARENCY_ALPHA;
-				alpha_set_level(alpha);
+				alpha = -1;
 			} else {
-				trans = TRANSPARENCY_PEN;
+				alpha = ((0x3f-alpha)*0xff)/0x3f; /* 0x3f-0x00 maps to 0x00-0xff */
 			}
 
 			/* start drawing */
 			if( zoom_table[BYTE_XOR_BE(zoomy)] && zoom_table[BYTE_XOR_BE(zoomx)] ) /* Avoid division-by-zero when table contains 0 (Uninitialised/Bug) */
 			{
-				psikyosh_drawgfxzoom(machine, bitmap,gfx,tnum,colr,flpx,flpy,xpos,ypos,cliprect,trans,0,
+				psikyosh_drawgfxzoom(machine, bitmap,gfx,tnum,colr,flpx,flpy,xpos,ypos,cliprect,alpha,
 									(UINT32)zoom_table[BYTE_XOR_BE(zoomx)], (UINT32)zoom_table[BYTE_XOR_BE(zoomy)], wide, high, listcntr);
 
 #if 0
@@ -1066,10 +1091,10 @@ VIDEO_START( psikyosh )
 	{ /* Pens 0xc0-0xff have a gradient of alpha values associated with them */
 		int i;
 		for (i=0; i<0xc0; i++)
-			gfx_alpharange_table[i] = 0xff;
+			alphatable[i] = 0xff;
 		for (i=0; i<0x40; i++) {
 			int alpha = ((0x3f-i)*0xff)/0x3f;
-			gfx_alpharange_table[i+0xc0] = alpha;
+			alphatable[i+0xc0] = alpha;
 		}
 	}
 

@@ -16,6 +16,7 @@
 #include "rendutil.h"
 #include "ui.h"
 #include "aviio.h"
+#include "deprecat.h"
 
 #include "snap.lh"
 
@@ -340,11 +341,8 @@ void video_init(running_machine *machine)
 		(*machine->config->init_palette)(machine, memory_region(machine, "proms"));
 
 	/* actually decode the graphics */
-	if (machine->config->gfxdecodeinfo != NULL)
+	if (PREDECODE_GFX && machine->config->gfxdecodeinfo != NULL)
 		decode_graphics(machine, machine->config->gfxdecodeinfo);
-
-	/* reset video statics and get out of here */
-	pdrawgfx_shadow_lowpri = 0;
 
 	/* create a render target for snapshots */
 	viewname = options_get_string(mame_options(), OPTION_SNAPVIEW);
@@ -407,7 +405,7 @@ static void video_exit(running_machine *machine)
 
 	/* free all the graphics elements */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
-		freegfx(machine->gfx[i]);
+		gfx_element_free(machine->gfx[i]);
 
 	/* free the snapshot target */
 	if (global.snap_target != NULL)
@@ -471,27 +469,29 @@ static void init_buffered_spriteram(running_machine *machine)
 
 static void allocate_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo)
 {
-	int i;
+	int curgfx;
 
 	/* loop over all elements */
-	for (i = 0; i < MAX_GFX_ELEMENTS && gfxdecodeinfo[i].gfxlayout != NULL; i++)
+	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
 	{
-		int region_length = 8 * memory_region_length(machine, gfxdecodeinfo[i].memory_region);
-		int xscale = (gfxdecodeinfo[i].xscale == 0) ? 1 : gfxdecodeinfo[i].xscale;
-		int yscale = (gfxdecodeinfo[i].yscale == 0) ? 1 : gfxdecodeinfo[i].yscale;
+		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
+		UINT32 region_length = 8 * memory_region_length(machine, gfxdecode->memory_region);
+		const UINT8 *region_base = memory_region(machine, gfxdecode->memory_region);
+		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
+		UINT32 yscale = (gfxdecode->yscale == 0) ? 1 : gfxdecode->yscale;
 		UINT32 *extpoffs, extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
-		gfx_layout glcopy;
-		const gfx_layout *gl = gfxdecodeinfo[i].gfxlayout;
+		const gfx_layout *gl = gfxdecode->gfxlayout;
 		int israw = (gl->planeoffset[0] == GFX_RAW);
 		int planes = gl->planes;
-		UINT16 width = gl->width;
-		UINT16 height = gl->height;
+		UINT32 width = gl->width;
+		UINT32 height = gl->height;
 		UINT32 total = gl->total;
 		UINT32 charincrement = gl->charincrement;
+		gfx_layout glcopy;
 		int j;
 
 		/* make a copy of the layout */
-		glcopy = *gfxdecodeinfo[i].gfxlayout;
+		glcopy = *gfxdecode->gfxlayout;
 
 		/* copy the X and Y offsets into temporary arrays */
 		memcpy(extxoffs, glcopy.xoffset, sizeof(glcopy.xoffset));
@@ -526,8 +526,7 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 		/* if the character count is a region fraction, compute the effective total */
 		if (IS_FRAC(total))
 		{
-			if (region_length == 0)
-				continue;
+			assert(region_length != 0);
 			total = region_length / charincrement * FRAC_NUM(total) / FRAC_DEN(total);
 		}
 
@@ -539,7 +538,10 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 			{
 				UINT32 value = extpoffs[j];
 				if (IS_FRAC(value))
+				{
+					assert(region_length != 0);
 					extpoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+				}
 			}
 
 			/* loop over all the X/Y offsets, converting fractions */
@@ -547,21 +549,27 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 			{
 				UINT32 value = extxoffs[j];
 				if (IS_FRAC(value))
+				{
+					assert(region_length != 0);
 					extxoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+				}
 			}
 
 			for (j = 0; j < height; j++)
 			{
 				UINT32 value = extyoffs[j];
 				if (IS_FRAC(value))
+				{
+					assert(region_length != 0);
 					extyoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+				}
 			}
 		}
 
 		/* otherwise, just use the line modulo */
 		else
 		{
-			int base = gfxdecodeinfo[i].start;
+			int base = gfxdecode->start;
 			int end = region_length/8;
 			int linemod = gl->yoffset[0];
 			while (total > 0)
@@ -580,11 +588,7 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 		glcopy.total = total;
 
 		/* allocate the graphics */
-		machine->gfx[i] = allocgfx(machine, &glcopy);
-
-		/* if we have a remapped colortable, point our local colortable to it */
-		machine->gfx[i]->total_colors = gfxdecodeinfo[i].total_color_codes;
-		machine->gfx[i]->color_base = machine->config->gfxdecodeinfo[i].color_codes_start;
+		machine->gfx[curgfx] = gfx_element_alloc(machine, &glcopy, (region_base != NULL) ? region_base + gfxdecode->start : NULL, gfxdecode->total_color_codes, gfxdecode->color_codes_start);
 	}
 }
 
@@ -610,7 +614,6 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 			/* if we have a valid region, decode it now */
 			if (gfxdecodeinfo[i].memory_region != NULL)
 			{
-				UINT8 *region_base = memory_region(machine, gfxdecodeinfo[i].memory_region);
 				gfx_element *gfx = machine->gfx[i];
 				int j;
 
@@ -619,7 +622,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 				{
 					char buffer[200];
 					int num_to_decode = (j + 1024 < gfx->total_elements) ? 1024 : (gfx->total_elements - j);
-					decodegfx(gfx, region_base + gfxdecodeinfo[i].start, j, num_to_decode);
+					decodegfx(gfx, j, num_to_decode);
 					curgfx += num_to_decode;
 
 					/* display some startup text */
@@ -2722,6 +2725,38 @@ int video_get_view_for_target(running_machine *machine, render_target *target, c
 		viewindex = 0;
 
 	return viewindex;
+}
+
+
+
+/***************************************************************************
+    DEBUGGING HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    video_assert_out_of_range_pixels - assert if 
+    any pixels in the given bitmap contain an 
+    invalid palette index
+-------------------------------------------------*/
+
+void video_assert_out_of_range_pixels(running_machine *machine, bitmap_t *bitmap)
+{
+#ifdef MAME_DEBUG
+	int maxindex = palette_get_max_index(machine->palette);
+	int x, y;
+	
+	/* this only applies to indexed16 bitmaps */
+	if (bitmap->format != BITMAP_FORMAT_INDEXED16)
+		return;
+	
+	/* iterate over rows */
+	for (y = 0; y < bitmap->height; y++)
+	{
+		UINT16 *rowbase = BITMAP_ADDR16(bitmap, y, 0);
+		for (x = 0; x < bitmap->width; x++)
+			assert(rowbase[x] < maxindex);
+	}
+#endif
 }
 
 

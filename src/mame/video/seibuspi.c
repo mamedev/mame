@@ -235,7 +235,7 @@ WRITE32_HANDLER( video_dma_address_w )
 static void draw_blend_gfx(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
 	const pen_t *pens = &machine->pens[gfx->color_base];
-	UINT8 *dp;
+	const UINT8 *dp;
 	int i, j;
 	int x1, x2;
 	int y1, y2;
@@ -314,7 +314,7 @@ static void draw_blend_gfx(running_machine *machine, bitmap_t *bitmap, const rec
 		code &= 0xffff;
 	}
 
-	dp = gfx->gfxdata + code * gfx->char_modulo;
+	dp = gfx_element_get_data(gfx, code);
 
 	// draw
 	for (j=y1; j <= y2; j++)

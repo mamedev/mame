@@ -215,15 +215,11 @@ Playfield tile info:
 static tilemap *pf1_tilemap,*pf2_tilemap,*pf3_tilemap,*pf4_tilemap;
 static tilemap *pixel_layer,*vram_layer;
 static UINT32 *spriteram32_buffered;
-static int vram_dirty[256];
-static int pivot_changed,vram_changed;
 static UINT32 f3_control_0[8];
 static UINT32 f3_control_1[8];
 static int flipscreen;
 static UINT8 sprite_extra_planes;
 static UINT8 sprite_pen_mask;
-
-static UINT8 *pivot_dirty;
 
 static UINT32 *f3_pf_data_1,*f3_pf_data_2,*f3_pf_data_3,*f3_pf_data_4;
 
@@ -599,7 +595,7 @@ VIDEO_EOF( f3 )
 VIDEO_START( f3 )
 {
 	const struct F3config *pCFG=&f3_config_table[0];
-	int tile, width, height, i;
+	int width, height, i;
 
 	f3_alpha_level_2as=127;
 	f3_alpha_level_2ad=127;
@@ -622,7 +618,6 @@ VIDEO_START( f3 )
 
 	spritelist=0;
 	spriteram32_buffered=0;
-	pivot_dirty=0;
 	pf_line_inf=0;
 	pri_alp_bitmap=0;
 	tile_opaque_sp=0;
@@ -674,7 +669,6 @@ VIDEO_START( f3 )
 	sprite_end = spritelist;
 	vram_layer = tilemap_create(machine, get_tile_info_vram,tilemap_scan_rows,8,8,64,64);
 	pixel_layer = tilemap_create(machine, get_tile_info_pixel,tilemap_scan_cols,8,8,64,32);
-	pivot_dirty = (UINT8 *)auto_malloc(2048);
 	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
 	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));
 	width = video_screen_get_width(machine->primary_screen);
@@ -703,10 +697,8 @@ VIDEO_START( f3 )
 	state_save_register_global_array(machine, f3_control_0);
 	state_save_register_global_array(machine, f3_control_1);
 
-	for (tile = 0;tile < 256;tile++)
-		vram_dirty[tile]=1;
-	for (tile = 0;tile < 2048;tile++)
-		pivot_dirty[tile]=1;
+	gfx_element_set_source(machine->gfx[0], (UINT8 *)f3_vram);
+	gfx_element_set_source(machine->gfx[3], (UINT8 *)f3_pivot_ram);
 
 	f3_skip_this_frame=0;
 
@@ -722,7 +714,7 @@ VIDEO_START( f3 )
 		{
 			int x,y;
 			int chk_trans_or_opa=0;
-			UINT8 *dp = sprite_gfx->gfxdata + c * sprite_gfx->char_modulo;
+			const UINT8 *dp = gfx_element_get_data(sprite_gfx, c);
 			for (y = 0;y < sprite_gfx->height;y++)
 			{
 				for (x = 0;x < sprite_gfx->width;x++)
@@ -751,7 +743,7 @@ VIDEO_START( f3 )
 			{
 				int chk_trans_or_opa=0;
 				UINT8 extra_mask = ((extra_planes << 4) | 0x0f);
-				UINT8 *dp = pf_gfx->gfxdata + c * pf_gfx->char_modulo;
+				const UINT8 *dp = gfx_element_get_data(pf_gfx, c);
 
 				for (y = 0;y < pf_gfx->height;y++)
 				{
@@ -819,15 +811,13 @@ WRITE32_HANDLER( f3_videoram_w )
 WRITE32_HANDLER( f3_vram_w )
 {
 	COMBINE_DATA(&f3_vram[offset]);
-	vram_dirty[offset/8]=1;
-	vram_changed=1;
+	gfx_element_mark_dirty(space->machine->gfx[0], offset/8);
 }
 
 WRITE32_HANDLER( f3_pivot_w )
 {
 	COMBINE_DATA(&f3_pivot_ram[offset]);
-	pivot_dirty[offset/8]=1;
-	pivot_changed=1;
+	gfx_element_mark_dirty(space->machine->gfx[3], offset/8);
 }
 
 WRITE32_HANDLER( f3_lineram_w )
@@ -2668,7 +2658,7 @@ INLINE void f3_drawgfx( running_machine *machine,
 	if( gfx )
 	{
 		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-		int source_base = (code % gfx->total_elements) * 16;
+		const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		{
 			/* compute sprite increment per screen pixel */
@@ -2734,14 +2724,14 @@ INLINE void f3_drawgfx( running_machine *machine,
 				{
 					int y=ey-sy;
 					int x=(ex-sx-1)|(tile_opaque_sp[code % gfx->total_elements]<<4);
-					UINT8 *source0 = gfx->gfxdata + (source_base+y_index) * 16 + x_index_base;
+					const UINT8 *source0 = code_base + y_index * 16 + x_index_base;
 					UINT32 *dest0 = BITMAP_ADDR32(dest_bmp, sy, sx);
 					UINT8 *pri0 = BITMAP_ADDR8(pri_alp_bitmap, sy, sx);
 					int yadv = dest_bmp->rowpixels;
 					dy=dy*16;
 					while(1)
 					{
-						UINT8 *source = source0;
+						const UINT8 *source = source0;
 						UINT32 *dest = dest0;
 						UINT8 *pri = pri0;
 
@@ -2833,7 +2823,7 @@ INLINE void f3_drawgfxzoom(running_machine *machine,
 	if( gfx )
 	{
 		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-		int source_base = (code % gfx->total_elements) * 16;
+		const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 		{
 			/* compute sprite increment per screen pixel */
@@ -2900,7 +2890,7 @@ INLINE void f3_drawgfxzoom(running_machine *machine,
 					int y;
 					for( y=sy; y<ey; y++ )
 					{
-						UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * 16;
+						const UINT8 *source = code_base + (y_index>>16) * 16;
 						UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 						UINT8 *pri = BITMAP_ADDR8(pri_alp_bitmap, y, 0);
 
@@ -3248,30 +3238,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( f3 )
 {
 	UINT32 sy_fix[5],sx_fix[5];
-	int tile;
 
 	f3_skip_this_frame=0;
 	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
-	/* Dynamically decode VRAM chars if dirty */
-	if (vram_changed)
-		for (tile = 0;tile < 256;tile++)
-			if (vram_dirty[tile]) {
-				decodechar(screen->machine->gfx[0],tile,(UINT8 *)f3_vram);
-				tilemap_mark_all_tiles_dirty(vram_layer); // TODO
-				//tilemap_mark_tile_dirty(vram_layer,tile);
-				vram_dirty[tile]=0;
-			}
-
-	/* Decode chars & mark tilemap dirty */
-	if (pivot_changed)
-		for (tile = 0;tile < 2048;tile++)
-			if (pivot_dirty[tile]) {
-				decodechar(screen->machine->gfx[3],tile,(UINT8 *)f3_pivot_ram);
-				tilemap_mark_tile_dirty(pixel_layer,tile);
-				pivot_dirty[tile]=0;
-			}
-	pivot_changed=vram_changed=0;
 
 	/* Setup scroll */
 	sy_fix[0]=((f3_control_0[2]&0xffff0000)>> 7) + (1<<16);

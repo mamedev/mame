@@ -167,10 +167,10 @@ VIDEO_UPDATE( magmax )
 				UINT16 line_data_flip_x[256];
 				for (i=0; i<256; i++)
 					line_data_flip_x[i] = line_data[255-i];
-				draw_scanline16(bitmap, 0, 255-v, 256, line_data_flip_x, NULL , -1);
+				draw_scanline16(bitmap, 0, 255-v, 256, line_data_flip_x, NULL);
 			}
 			else
-				draw_scanline16(bitmap, 0, v, 256, line_data, NULL, -1);
+				draw_scanline16(bitmap, 0, v, 256, line_data, NULL);
 		}
 	}
 

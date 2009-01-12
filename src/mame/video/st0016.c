@@ -14,7 +14,6 @@ UINT32 st0016_game;
 
 static INT32 st0016_spr_bank,st0016_spr2_bank,st0016_pal_bank,st0016_char_bank;
 static int spr_dx,spr_dy;
-static UINT8 *chardirty;
 
 static UINT8 st0016_vregs[0xc0];
 static int st0016_ramgfx;
@@ -115,7 +114,7 @@ READ8_HANDLER(st0016_character_ram_r)
 WRITE8_HANDLER(st0016_character_ram_w)
 {
 	st0016_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
-	chardirty[st0016_char_bank] = 1;
+	gfx_element_mark_dirty(space->machine->gfx[st0016_ramgfx], st0016_char_bank);
 }
 
 READ8_HANDLER(st0016_vregs_r)
@@ -353,20 +352,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 							int yloop,xloop;
 							int ypos, xpos;
 							int tileno;
-							UINT8 *srcgfx;
+							const UINT8 *srcgfx;
 							int gfxoffs;
 							ypos = sy+y0*8+spr_dy;
 							xpos = sx+x0*8+spr_dx;
 							tileno = (code+i0++)&ST0016_CHAR_BANK_MASK ;
 
-							if (chardirty[tileno])
-							{
-								chardirty[tileno] = 0;
-								decodechar(gfx, tileno, (UINT8 *) st0016_charram);
-							}
-
 							gfxoffs = 0;
-							srcgfx= gfx->gfxdata+(64*tileno);
+							srcgfx= gfx_element_get_data(gfx, tileno);
 
 							for (yloop=0; yloop<8; yloop++)
 							{
@@ -424,14 +417,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static STATE_POSTLOAD( st0016_postload )
-{
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	st0016_rom_bank_w(space,0,st0016_rom_bank);
-	memset(chardirty, 1, ST0016_MAX_CHAR_BANK);
-}
-
 
 void st0016_save_init(running_machine *machine)
 {
@@ -444,7 +429,6 @@ void st0016_save_init(running_machine *machine)
 	state_save_register_global_pointer(machine, st0016_charram, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
 	state_save_register_global_pointer(machine, st0016_paletteram, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
 	state_save_register_global_pointer(machine, st0016_spriteram, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
-	state_save_register_postload(machine, st0016_postload, NULL);
 }
 
 
@@ -463,13 +447,7 @@ VIDEO_START( st0016 )
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[gfx_index] = allocgfx(machine, &charlayout);
-	chardirty = auto_malloc(ST0016_MAX_CHAR_BANK);
-	memset(chardirty, 1, ST0016_MAX_CHAR_BANK);
-
-	/* set the color information */
-	machine->gfx[gfx_index]->color_base = 0;
-	machine->gfx[gfx_index]->total_colors = 0x40;
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, (UINT8 *) st0016_charram, 0x40, 0);
 	st0016_ramgfx = gfx_index;
 
 	spr_dx=0;
@@ -531,12 +509,6 @@ static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangl
 	 				flipx=st0016_spriteram[i+3]&0x80;
 					flipy=st0016_spriteram[i+3]&0x40;
 
-					if (chardirty[code])
-					{
-						chardirty[code] = 0;
-						decodechar(gfx, code, (UINT8 *) st0016_charram);
-					}
-
 				 	if(priority)
 				 	{
 				 		drawgfx(bitmap,gfx,
@@ -551,12 +523,12 @@ static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangl
 							UINT16 *destline;
 							int yloop,xloop;
 							int ypos, xpos;
-							UINT8 *srcgfx;
+							const UINT8 *srcgfx;
 							int gfxoffs;
 							ypos = y*8+spr_dy;//+((st0016_vregs[j+2]==0xaf)?0x50:0);//hack for mayjinsen title screen
 							xpos = x*8+spr_dx;
 							gfxoffs = 0;
-							srcgfx= gfx->gfxdata+(gfx->char_modulo*code);
+							srcgfx= gfx_element_get_data(gfx, code);
 
 							for (yloop=0; yloop<8; yloop++)
 							{

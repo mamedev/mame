@@ -862,7 +862,7 @@ if ((temp & 0xff00) == 0xc800)
 					continue;
 
 				/* draw the sprite */
-				drawgfx(bitmap, gfx, code, color, hflip, vflip, sx, sy, cliprect, TRANSPARENCY_PEN_RAW, mo->transpen);
+				drawgfx_transpen_raw(bitmap, cliprect, gfx, code, color, hflip, vflip, sx, sy, mo->transpen);
 				rendered = 1;
 
 				/* mark the grid dirty */
@@ -899,7 +899,7 @@ if ((temp & 0xff00) == 0xc800)
 					continue;
 
 				/* draw the sprite */
-				drawgfx(bitmap, gfx, code, color, hflip, vflip, sx, sy, cliprect, TRANSPARENCY_PEN_RAW, mo->transpen);
+				drawgfx_transpen_raw(bitmap, cliprect, gfx, code, color, hflip, vflip, sx, sy, mo->transpen);
 				rendered = 1;
 
 				/* mark the grid dirty */

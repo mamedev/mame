@@ -428,7 +428,7 @@ INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const 
 //          const pen_t *pal = &gfx->colortable[gfx->color_granularity * (color % gfx->total_colors)];
 			UINT32 palbase = (gfx->color_granularity * color) & 0x1ffff;
 			const pen_t *pal = &cps3_mame_colours[palbase];
-			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+			const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
@@ -501,7 +501,7 @@ INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const 
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
@@ -520,7 +520,7 @@ INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const 
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
@@ -540,7 +540,7 @@ INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const 
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
@@ -560,7 +560,7 @@ INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const 
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
@@ -797,11 +797,6 @@ static const gfx_layout cps3_tiles8x8_layout =
 };
 
 static UINT32* cps3_ss_ram;
-static UINT8* cps3_ss_ram_dirty;
-static int cps3_ss_ram_is_dirty;
-
-static UINT8* cps3_char_ram_dirty;
-static int cps3_char_ram_is_dirty;
 
 static void cps3_set_mame_colours(running_machine *machine, int colournum, UINT16 data, UINT32 fadeval )
 {
@@ -845,29 +840,21 @@ static void cps3_set_mame_colours(running_machine *machine, int colournum, UINT1
 static VIDEO_START(cps3)
 {
 	cps3_ss_ram       = auto_malloc(0x10000);
-	cps3_ss_ram_dirty = auto_malloc(0x400);
-	cps3_ss_ram_is_dirty = 1;
 	memset(cps3_ss_ram, 0x00, 0x10000);
-	memset(cps3_ss_ram_dirty, 1, 0x400);
 	state_save_register_global_pointer(machine, cps3_ss_ram, 0x10000/4);
 
 	cps3_char_ram = auto_malloc(0x800000);
-	cps3_char_ram_dirty = auto_malloc(0x800000/256);
-	cps3_char_ram_is_dirty = 1;
 	memset(cps3_char_ram, 0x00, 0x800000);
-	memset(cps3_char_ram_dirty, 1, 0x8000);
 	state_save_register_global_pointer(machine, cps3_char_ram, 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = allocgfx(machine, &cps3_tiles8x8_layout);
-	machine->gfx[0]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[0] = gfx_element_alloc(machine, &cps3_tiles8x8_layout, (UINT8 *)cps3_ss_ram, machine->config->total_colors / 16, 0);
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[1] = allocgfx(machine, &cps3_tiles16x16_layout);
-	machine->gfx[1]->total_colors = machine->config->total_colors / 64;
-	machine->gfx[1]->color_granularity=64;
+	machine->gfx[1] = gfx_element_alloc(machine, &cps3_tiles16x16_layout, (UINT8 *)cps3_char_ram, machine->config->total_colors / 64, 0);
+	machine->gfx[1]->color_granularity = 64;
 
 	//decode_charram();
 
@@ -968,13 +955,7 @@ static void cps3_draw_tilemapsprite_line(running_machine *machine, int tmnum, in
 			if (!bpp) machine->gfx[1]->color_granularity=256;
 			else machine->gfx[1]->color_granularity=64;
 
-			if (cps3_char_ram_dirty[tileno])
-			{
-				decodechar(machine->gfx[1], tileno, (UINT8*)cps3_char_ram);
-				cps3_char_ram_dirty[tileno] = 0;
-			}
 			cps3_drawgfxzoom(machine, bitmap, machine->gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,&clip,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
-
 		}
 	}
 }
@@ -1215,12 +1196,6 @@ static VIDEO_UPDATE(cps3)
 								{
 									int realtileno = tileno+count;
 
-									if (cps3_char_ram_dirty[realtileno])
-									{
-										decodechar(screen->machine->gfx[1], realtileno, (UINT8*)cps3_char_ram);
-										cps3_char_ram_dirty[realtileno] = 0;
-									}
-
 									if (global_alpha || alpha)
 									{
 										cps3_drawgfxzoom(screen->machine, renderbuffer_bitmap, screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
@@ -1293,13 +1268,6 @@ static VIDEO_UPDATE(cps3)
 				pal += cps3_ss_pal_base << 5;
 				tile+=0x200;
 
-
-				if (cps3_ss_ram_dirty[tile])
-				{
-					decodechar(screen->machine->gfx[0], tile, (UINT8*)cps3_ss_ram);
-					cps3_ss_ram_dirty[tile] = 0;
-				}
-
 				cps3_drawgfxzoom(screen->machine, bitmap, screen->machine->gfx[0],tile,pal,flipx,flipy,x*8,y*8,cliprect,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
 				count++;
 			}
@@ -1323,9 +1291,7 @@ static WRITE32_HANDLER( cps3_ssram_w )
 		// we only want to endian-flip the character data, the tilemap info is fine
 		data = LITTLE_ENDIANIZE_INT32(data);
 		mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
-
-		cps3_ss_ram_dirty[offset/16] = 1;
-		cps3_ss_ram_is_dirty = 1;
+		gfx_element_mark_dirty(space->machine->gfx[0], offset/16);
 	}
 
 	COMBINE_DATA(&cps3_ss_ram[offset]);
@@ -1419,8 +1385,7 @@ static WRITE32_HANDLER( cram_data_w )
 	mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
 	data = LITTLE_ENDIANIZE_INT32(data);
 	COMBINE_DATA(&cps3_char_ram[fulloffset]);
-	cps3_char_ram_dirty[fulloffset/0x40] = 1;
-	cps3_char_ram_is_dirty = 1;
+	gfx_element_mark_dirty(space->machine->gfx[1], fulloffset/0x40);
 }
 
 /* FLASH ROM ACCESS */
@@ -1904,7 +1869,7 @@ static int cps3_rle_length = 0;
 static int last_normal_byte = 0;
 
 
-static UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length )
+static UINT32 process_byte( running_machine *machine, UINT8 real_byte, UINT32 destination, int max_length )
 {
 	UINT8* dest       = (UINT8*)cps3_char_ram;
 
@@ -1924,8 +1889,7 @@ static UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length 
 		while (cps3_rle_length)
 		{
 			dest[((destination+tranfercount)&0x7fffff)^3] = (last_normal_byte&0x3f);
-			cps3_char_ram_dirty[((destination+tranfercount)&0x7fffff)/0x100] = 1;
-			cps3_char_ram_is_dirty = 1;
+			gfx_element_mark_dirty(machine->gfx[1], ((destination+tranfercount)&0x7fffff)/0x100);
 			//printf("RLE WRite Byte %08x, %02x\n", destination+tranfercount, real_byte);
 
 			tranfercount++;
@@ -1944,8 +1908,7 @@ static UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length 
 		//printf("Write Normal Data\n");
 		dest[(destination&0x7fffff)^3] = real_byte;
 		last_normal_byte = real_byte;
-		cps3_char_ram_dirty[(destination&0x7fffff)/0x100] = 1;
-		cps3_char_ram_is_dirty = 1;
+		gfx_element_mark_dirty(machine->gfx[1], (destination&0x7fffff)/0x100);
 		return 1;
 	}
 }
@@ -1973,7 +1936,7 @@ static void cps3_do_char_dma( running_machine *machine, UINT32 real_source, UINT
 
 			real_byte = sourcedata[DMA_XOR((current_table_address+current_byte*2+0))];
 			//if (real_byte&0x80) return;
-			length_processed = process_byte( real_byte, real_destination, length_remaining );
+			length_processed = process_byte( machine, real_byte, real_destination, length_remaining );
 			length_remaining-=length_processed; // subtract the number of bytes the operation has taken
 			real_destination+=length_processed; // add it onto the destination
 			if (real_destination>0x7fffff) return;
@@ -1981,7 +1944,7 @@ static void cps3_do_char_dma( running_machine *machine, UINT32 real_source, UINT
 
 			real_byte = sourcedata[DMA_XOR((current_table_address+current_byte*2+1))];
 			//if (real_byte&0x80) return;
-			length_processed = process_byte( real_byte, real_destination, length_remaining );
+			length_processed = process_byte( machine, real_byte, real_destination, length_remaining );
 			length_remaining-=length_processed; // subtract the number of bytes the operation has taken
 			real_destination+=length_processed; // add it onto the destination
 			if (real_destination>0x7fffff) return;
@@ -1990,7 +1953,7 @@ static void cps3_do_char_dma( running_machine *machine, UINT32 real_source, UINT
 		else
 		{
 			UINT32 length_processed;
-			length_processed = process_byte( current_byte, real_destination, length_remaining );
+			length_processed = process_byte( machine, current_byte, real_destination, length_remaining );
 			length_remaining-=length_processed; // subtract the number of bytes the operation has taken
 			real_destination+=length_processed; // add it onto the destination
 			if (real_destination>0x7fffff) return;
@@ -2003,7 +1966,7 @@ static void cps3_do_char_dma( running_machine *machine, UINT32 real_source, UINT
 
 static unsigned short lastb;
 static unsigned short lastb2;
-static UINT32 ProcessByte8(UINT8 b,UINT32 dst_offset)
+static UINT32 ProcessByte8(running_machine *machine,UINT8 b,UINT32 dst_offset)
 {
 	UINT8* destRAM = (UINT8*)cps3_char_ram;
  	int l=0;
@@ -2016,8 +1979,7 @@ static UINT32 ProcessByte8(UINT8 b,UINT32 dst_offset)
  		for(i=0;i<rle;++i)
  		{
 			destRAM[(dst_offset&0x7fffff)^3] = lastb;
-			cps3_char_ram_dirty[(dst_offset&0x7fffff)/0x100] = 1;
-			cps3_char_ram_is_dirty = 1;
+			gfx_element_mark_dirty(machine->gfx[1], (dst_offset&0x7fffff)/0x100);
 
 			dst_offset++;
  			++l;
@@ -2031,8 +1993,7 @@ static UINT32 ProcessByte8(UINT8 b,UINT32 dst_offset)
  		lastb2=lastb;
  		lastb=b;
 		destRAM[(dst_offset&0x7fffff)^3] = b;
-		cps3_char_ram_dirty[(dst_offset&0x7fffff)/0x100] = 1;
-		cps3_char_ram_is_dirty = 1;
+		gfx_element_mark_dirty(machine->gfx[1], (dst_offset&0x7fffff)/0x100);
  		return 1;
  	}
  }
@@ -2061,13 +2022,13 @@ static void cps3_do_alt_char_dma( running_machine *machine, UINT32 src, UINT32 r
 				UINT8 real_byte;
 				p&=0x7f;
 				real_byte = px[DMA_XOR((current_table_address+p*2+0))];
-				ds+=ProcessByte8(real_byte,ds);
+				ds+=ProcessByte8(machine,real_byte,ds);
 				real_byte = px[DMA_XOR((current_table_address+p*2+1))];
-				ds+=ProcessByte8(real_byte,ds);
+				ds+=ProcessByte8(machine,real_byte,ds);
  			}
  			else
  			{
- 				ds+=ProcessByte8(p,ds);
+ 				ds+=ProcessByte8(machine,p,ds);
  			}
  			++src;
  			ctrl<<=1;

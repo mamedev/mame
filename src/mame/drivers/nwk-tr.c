@@ -243,8 +243,7 @@ static WRITE32_HANDLER( paletteram32_w )
 
 static UINT32 *K001604_tile_ram[MAX_K001604_CHIPS];
 static UINT32 *K001604_char_ram[MAX_K001604_CHIPS];
-static UINT8 *K001604_dirty_map[MAX_K001604_CHIPS][2];
-static int K001604_gfx_index[MAX_K001604_CHIPS][2], K001604_char_dirty[MAX_K001604_CHIPS][2];
+static int K001604_gfx_index[MAX_K001604_CHIPS][2];
 static tilemap *K001604_layer_8x8[MAX_K001604_CHIPS][2];
 static int K001604_tilemap_offset;
 static tilemap *K001604_layer_roz[MAX_K001604_CHIPS][2];
@@ -422,9 +421,6 @@ int K001604_vh_start(running_machine *machine, int chip)
 
 	K001604_tile_ram[chip] = auto_malloc(0x20000);
 
-	K001604_dirty_map[chip][0] = auto_malloc(K001604_NUM_TILES_LAYER0);
-	K001604_dirty_map[chip][1] = auto_malloc(K001604_NUM_TILES_LAYER1);
-
 	K001604_reg[chip] = auto_malloc(0x400);
 
 	if (chip == 0)
@@ -453,64 +449,13 @@ int K001604_vh_start(running_machine *machine, int chip)
 
 	memset(K001604_char_ram[chip], 0, 0x200000);
 	memset(K001604_tile_ram[chip], 0, 0x10000);
-	memset(K001604_dirty_map[chip][0], 0, K001604_NUM_TILES_LAYER0);
-	memset(K001604_dirty_map[chip][1], 0, K001604_NUM_TILES_LAYER1);
 	memset(K001604_reg[chip], 0, 0x400);
 
 
-	machine->gfx[K001604_gfx_index[chip][0]] = allocgfx(machine, &K001604_char_layout_layer_8x8);
-	decodegfx(machine->gfx[K001604_gfx_index[chip][0]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][0]]->total_elements);
-	machine->gfx[K001604_gfx_index[chip][1]] = allocgfx(machine, &K001604_char_layout_layer_16x16);
-	decodegfx(machine->gfx[K001604_gfx_index[chip][1]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][1]]->total_elements);
-
-	machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->config->total_colors / 16;
-	machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[K001604_gfx_index[chip][0]] = gfx_element_alloc(machine, &K001604_char_layout_layer_8x8, (UINT8*)&K001604_char_ram[chip][0], machine->config->total_colors / 16, 0);
+	machine->gfx[K001604_gfx_index[chip][1]] = gfx_element_alloc(machine, &K001604_char_layout_layer_16x16, (UINT8*)&K001604_char_ram[chip][0], machine->config->total_colors / 16, 0);
 
 	return 0;
-}
-
-void K001604_tile_update(running_machine *machine, int chip)
-{
-	if(K001604_char_dirty[chip][0])
-	{
-		int i;
-		for (i=0; i < K001604_NUM_TILES_LAYER0; i++)
-		{
-			if(K001604_dirty_map[chip][0][i])
-			{
-				K001604_dirty_map[chip][0][i] = 0;
-				decodechar(machine->gfx[K001604_gfx_index[chip][0]], i, (UINT8*)&K001604_char_ram[chip][0]);
-			}
-		}
-		tilemap_mark_all_tiles_dirty(K001604_layer_8x8[chip][0]);
-		tilemap_mark_all_tiles_dirty(K001604_layer_8x8[chip][1]);
-
-		if (K001604_roz_size[chip] == 0)
-		{
-			tilemap_mark_all_tiles_dirty(K001604_layer_roz[chip][0]);
-			tilemap_mark_all_tiles_dirty(K001604_layer_roz[chip][1]);
-		}
-		K001604_char_dirty[chip][0] = 0;
-	}
-	if(K001604_char_dirty[chip][1])
-	{
-		int i;
-		for (i=0; i < K001604_NUM_TILES_LAYER1; i++)
-		{
-			if(K001604_dirty_map[chip][1][i])
-			{
-				K001604_dirty_map[chip][1][i] = 0;
-				decodechar(machine->gfx[K001604_gfx_index[chip][1]], i, (UINT8*)&K001604_char_ram[chip][0]);
-			}
-		}
-
-		if (K001604_roz_size[chip] == 1)
-		{
-			tilemap_mark_all_tiles_dirty(K001604_layer_roz[chip][0]);
-			tilemap_mark_all_tiles_dirty(K001604_layer_roz[chip][1]);
-		}
-		K001604_char_dirty[chip][1] = 0;
-	}
 }
 
 void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect)
@@ -659,11 +604,8 @@ WRITE32_HANDLER(K001604_char_w)
 
 	COMBINE_DATA(K001604_char_ram[chip] + addr);
 
-	K001604_dirty_map[chip][0][addr / 32] = 1;
-	K001604_char_dirty[chip][0] = 1;
-
-	K001604_dirty_map[chip][1][addr / 128] = 1;
-	K001604_char_dirty[chip][1] = 1;
+	gfx_element_mark_dirty(space->machine->gfx[K001604_gfx_index[chip][0]], addr / 32);
+	gfx_element_mark_dirty(space->machine->gfx[K001604_gfx_index[chip][1]], addr / 128);
 }
 
 
@@ -724,7 +666,6 @@ static VIDEO_UPDATE( nwktr )
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
-	K001604_tile_update(screen->machine, 0);
 	K001604_draw_front_layer(0, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);

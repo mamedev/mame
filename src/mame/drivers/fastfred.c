@@ -118,6 +118,11 @@ static UINT8 imago_sprites[0x800*3];
 static UINT16 imago_sprites_address;
 static UINT8 imago_sprites_bank = 0;
 
+static MACHINE_START( imago )
+{
+	gfx_element_set_source(machine->gfx[1], imago_sprites);
+}
+
 static WRITE8_HANDLER( imago_dma_irq_w )
 {
 	cpu_set_input_line(space->machine->cpu[0], 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
@@ -142,7 +147,7 @@ static WRITE8_HANDLER( imago_sprites_dma_w )
 	sprites_data = rom[imago_sprites_address + 0x2000*2 + imago_sprites_bank * 0x1000];
 	imago_sprites[offset + 0x800*2] = sprites_data;
 
-	decodechar(space->machine->gfx[1], offset/32, imago_sprites);
+	gfx_element_mark_dirty(space->machine->gfx[1], offset/32);
 }
 
 static READ8_HANDLER( imago_sprites_offset_r )
@@ -665,6 +670,8 @@ static MACHINE_DRIVER_START( imago )
 	MDRV_IMPORT_FROM(fastfred)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(imago_map,0)
+	
+	MDRV_MACHINE_START(imago)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */

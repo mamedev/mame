@@ -17,7 +17,6 @@ static UINT16 * ml_spriteram;
 static UINT16 * ml_unk;
 static bitmap_t *ml_bitmap[8];
 #define ML_CHARS 0x2000
-static UINT8 dirtychar[ML_CHARS];
 static int status_bit;
 static int adpcm_pos;
 static int adpcm_data;
@@ -35,23 +34,10 @@ static const gfx_layout tiles8x8_layout =
 	32*8
 };
 
-static void updateChars(running_machine *machine)
-{
-	int i;
-	for(i=0;i<ML_CHARS;i++)
-	{
-		if(dirtychar[i])
-		{
-			dirtychar[i]=0;
-			decodechar(machine->gfx[0], i,(UINT8 *) ml_tileram);
-		}
-	}
-}
-
 static WRITE16_HANDLER(ml_tileram_w)
 {
 	COMBINE_DATA(&ml_tileram[offset]);
-	dirtychar[offset>>4]=1;
+	gfx_element_mark_dirty(space->machine->gfx[0], offset>>4);
 }
 
 static READ16_HANDLER(ml_tileram_r)
@@ -200,10 +186,8 @@ ADDRESS_MAP_END
 static VIDEO_START(mlanding)
 {
 	int i;
-	for(i=0;i<ML_CHARS;i++)
-	{
-		dirtychar[i]=0;
-	}
+
+	gfx_element_set_source(machine->gfx[0], (UINT8 *) ml_tileram);
 
 	for	(i=0;i<8;i++)
 		ml_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
@@ -212,8 +196,6 @@ static VIDEO_START(mlanding)
 static VIDEO_UPDATE(mlanding)
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-
-	updateChars(screen->machine);
 
 	{
 		int i,dx,dy,j,k,num;

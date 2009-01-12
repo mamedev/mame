@@ -370,7 +370,7 @@ static const gfx_layout pflayout =
 	5,
 	{ 0, 0, 1, 2, 3 },
 	{ RGN_FRAC(2,5)+0, RGN_FRAC(2,5)+4, 0, 4, RGN_FRAC(2,5)+8, RGN_FRAC(2,5)+12, 8, 12 },
-	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
+	{ STEP8(0,16) },
 	16*8
 };
 
@@ -381,7 +381,7 @@ static const gfx_layout pftoplayout =
 	5,
 	{ RGN_FRAC(4,5), RGN_FRAC(4,5), RGN_FRAC(4,5), RGN_FRAC(4,5), RGN_FRAC(4,5) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -390,9 +390,9 @@ static const gfx_layout anlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,32) },
 	32*8
 };
 

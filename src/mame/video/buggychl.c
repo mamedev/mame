@@ -8,8 +8,6 @@ UINT8 *buggychl_scrollv,*buggychl_scrollh;
 static UINT8 buggychl_sprite_lookup[0x2000];
 UINT8 *buggychl_character_ram;
 
-static int *dirtychar;
-
 static bitmap_t *tmpbitmap1,*tmpbitmap2;
 static int sl_bank,bg_on,sky_on,sprite_color_base,bg_scrollx;
 
@@ -29,11 +27,10 @@ PALETTE_INIT( buggychl )
 
 VIDEO_START( buggychl )
 {
-	dirtychar = auto_malloc(256 * sizeof(*dirtychar));
 	tmpbitmap1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	tmpbitmap2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	memset(dirtychar,0xff,256 * sizeof(*dirtychar));
+	gfx_element_set_source(machine->gfx[0], buggychl_character_ram);
 }
 
 
@@ -43,8 +40,7 @@ WRITE8_HANDLER( buggychl_chargen_w )
 	if (buggychl_character_ram[offset] != data)
 	{
 		buggychl_character_ram[offset] = data;
-
-		dirtychar[(offset / 8) & 0xff] = 1;
+		gfx_element_mark_dirty(space->machine->gfx[0], (offset / 8) & 0xff);
 	}
 }
 
@@ -210,7 +206,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					code = 8 * (lookup[pos] | ((lookup[pos+1] & 0x07) << 8));
 					realflipy = (lookup[pos+1] & 0x80) ? !flipy : flipy;
 					code += (realflipy ? (charline ^ 7) : charline);
-					pendata = machine->gfx[1]->gfxdata + code*16;
+					pendata = gfx_element_get_data(machine->gfx[1], code);
 
 					for (x = 0;x < 16;x++)
 					{
@@ -239,18 +235,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( buggychl )
 {
-	int code;
-
-
 	if (sky_on)
 		draw_sky(bitmap, cliprect);
 	else
 		bitmap_fill(bitmap,cliprect,0);
-
-	/* decode modified characters */
-	for (code = 0;code < 256;code++)
-		if (dirtychar[code])
-			decodechar(screen->machine->gfx[0],code,buggychl_character_ram);
 
 	if (bg_on)
 		draw_bg(screen->machine, bitmap, cliprect);
@@ -259,7 +247,5 @@ VIDEO_UPDATE( buggychl )
 
 	draw_fg(screen->machine, bitmap, cliprect);
 
-	for (code = 0;code < 256;code++)
-		dirtychar[code] = 0;
 	return 0;
 }

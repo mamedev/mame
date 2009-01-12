@@ -61,6 +61,7 @@ struct _bitmap_t
 	bitmap_format	format;			/* format of the bitmap */
 	int				bpp;			/* bits per pixel */
 	palette_t *		palette;		/* optional palette */
+	rectangle		cliprect;		/* a clipping rectangle covering the full bitmap */
 };
 
 

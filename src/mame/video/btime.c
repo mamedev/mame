@@ -26,8 +26,6 @@ static UINT8 bnj_scroll1 = 0;
 static UINT8 bnj_scroll2 = 0;
 static bitmap_t *background_bitmap;
 
-static UINT8 *sprite_dirty, *char_dirty;
-
 /***************************************************************************
 
     Burger Time doesn't have a color PROM. It uses RAM to dynamically
@@ -141,11 +139,10 @@ VIDEO_START( btime )
     bnj_scroll2 = 0;
     btime_palette = 0;
 
-	sprite_dirty = auto_malloc(256 * sizeof(*sprite_dirty));
-	memset(sprite_dirty, 1, 256 * sizeof(*sprite_dirty));
-
-	char_dirty = auto_malloc(1024 * sizeof(*char_dirty));
-	memset(char_dirty, 1, 1024 * sizeof(*char_dirty));
+	if (machine->gfx[0]->srcdata == NULL)
+		gfx_element_set_source(machine->gfx[0], deco_charram);
+	if (machine->gfx[1]->srcdata == NULL)
+		gfx_element_set_source(machine->gfx[1], deco_charram);
 }
 
 
@@ -242,10 +239,10 @@ WRITE8_HANDLER( deco_charram_w )
     offset &= 0x1fff;
 
     /* dirty sprite */
-    sprite_dirty[offset >> 5] = 1;
+    gfx_element_mark_dirty(space->machine->gfx[1], offset >> 5);
 
     /* diry char */
-    char_dirty  [offset >> 3] = 1;
+    gfx_element_mark_dirty(space->machine->gfx[0], offset >> 3);
 }
 
 WRITE8_HANDLER( bnj_background_w )
@@ -431,43 +428,6 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 }
 
 
-static void decode_modified(running_machine *machine, UINT8 *sprite_ram, int interleave)
-{
-    int i,offs;
-
-
-    /* decode dirty characters */
-    for (offs = btime_videoram_size - 1;offs >= 0;offs--)
-    {
-        int code;
-
-        code = btime_videoram[offs] + 256 * (btime_colorram[offs] & 3);
-
-        if (char_dirty[code])
-        {
-            decodechar(machine->gfx[0],code,deco_charram);
-
-            char_dirty[code] = 0;
-        }
-    }
-
-    /* decode dirty sprites */
-    for (i = 0, offs = 0;i < 8; i++, offs += 4*interleave)
-    {
-        int code;
-
-        code  = sprite_ram[offs + interleave];
-
-        if (sprite_dirty[code])
-        {
-            decodechar(machine->gfx[1],code,deco_charram);
-
-            sprite_dirty[code] = 0;
-        }
-    }
-}
-
-
 VIDEO_UPDATE( btime )
 {
     if (bnj_scroll1 & 0x10)
@@ -620,7 +580,6 @@ VIDEO_UPDATE( cookrace )
 
 VIDEO_UPDATE( disco )
 {
-    decode_modified(screen->machine, spriteram, 1);
     draw_chars(screen->machine, bitmap, cliprect, TRANSPARENCY_NONE, btime_palette, -1);
     draw_sprites(screen->machine, bitmap, cliprect, btime_palette, 0, 0, spriteram, 1);
 
@@ -630,7 +589,6 @@ VIDEO_UPDATE( disco )
 
 VIDEO_UPDATE( progolf )
 {
-	decode_modified(screen->machine, spriteram, 1);
 	draw_chars(screen->machine, bitmap, cliprect, TRANSPARENCY_NONE, /*btime_palette*/0, -1);
 //  draw_sprites(screen->machine, bitmap, cliprect, 0/*btime_palette*/, 0, 0, spriteram, 1);
 

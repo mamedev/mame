@@ -22,10 +22,8 @@ struct _poly_extra_data
 
 static int taitojc_gfx_index;
 
-static UINT8 *taitojc_dirty_map;
 static UINT32 *taitojc_char_ram;
 static UINT32 *taitojc_tile_ram;
-static int taitojc_char_dirty;
 static tilemap *taitojc_tilemap;
 
 static poly_manager *poly;
@@ -51,24 +49,6 @@ static TILE_GET_INFO( taitojc_tile_info )
 	SET_TILE_INFO(taitojc_gfx_index, tile, color, 0);
 }
 
-static void taitojc_tile_update(running_machine *machine)
-{
-	int i;
-	if (taitojc_char_dirty)
-	{
-		for (i=0; i < TAITOJC_NUM_TILES; i++)
-		{
-			if (taitojc_dirty_map[i])
-			{
-				taitojc_dirty_map[i] = 0;
-				decodechar(machine->gfx[taitojc_gfx_index], i, (UINT8 *)taitojc_char_ram);
-			}
-		}
-		tilemap_mark_all_tiles_dirty(taitojc_tilemap);
-		taitojc_char_dirty = 0;
-	}
-}
-
 READ32_HANDLER(taitojc_tile_r)
 {
 	return taitojc_tile_ram[offset];
@@ -88,8 +68,7 @@ WRITE32_HANDLER(taitojc_tile_w)
 WRITE32_HANDLER(taitojc_char_w)
 {
 	COMBINE_DATA(taitojc_char_ram + offset);
-	taitojc_dirty_map[offset/32] = 1;
-	taitojc_char_dirty = 1;
+	gfx_element_mark_dirty(space->machine->gfx[taitojc_gfx_index], offset/32);
 }
 
 // Object data format:
@@ -196,8 +175,6 @@ VIDEO_START( taitojc )
 {
 	int width, height;
 
-	taitojc_char_dirty = 1;
-
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, taitojc_exit);
 
@@ -209,7 +186,6 @@ VIDEO_START( taitojc )
 	assert(taitojc_gfx_index != MAX_GFX_ELEMENTS);
 
 	taitojc_tilemap = tilemap_create(machine, taitojc_tile_info, tilemap_scan_rows,  16, 16, 64, 64);
-	taitojc_dirty_map = auto_malloc(TAITOJC_NUM_TILES);
 
 	tilemap_set_transparent_pen(taitojc_tilemap, 0);
 
@@ -220,10 +196,7 @@ VIDEO_START( taitojc )
 	memset(taitojc_tile_ram, 0, 0x4000);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[taitojc_gfx_index] = allocgfx(machine, &taitojc_char_layout);
-
-	/* set the color information */
-	machine->gfx[taitojc_gfx_index]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[taitojc_gfx_index] = gfx_element_alloc(machine, &taitojc_char_layout, (UINT8 *)taitojc_char_ram, machine->config->total_colors / 16, 0);
 
 	taitojc_texture = auto_malloc(0x400000);
 
@@ -280,7 +253,6 @@ VIDEO_UPDATE( taitojc )
 		}
 	}
 
-	taitojc_tile_update(screen->machine);
 	tilemap_draw(bitmap, cliprect, taitojc_tilemap, 0,0);
 
 #if 0

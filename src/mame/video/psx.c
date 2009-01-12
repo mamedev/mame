@@ -537,7 +537,7 @@ static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 				}
 				p_n_interleave[ n_x ] = m_p_p_vram[ n_yi ][ n_xi ];
 			}
-			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, machine->pens, -1 );
+			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, machine->pens );
 		}
 	}
 	return m_debug.b_texture;
@@ -922,7 +922,7 @@ VIDEO_UPDATE( psx )
 			n_line = n_lines;
 			while( n_line > 0 )
 			{
-				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, m_p_p_vram[ n_y + m_n_displaystarty ] + n_x + n_displaystartx, NULL, -1 );
+				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, m_p_p_vram[ n_y + m_n_displaystarty ] + n_x + n_displaystartx, NULL );
 				n_y++;
 				n_line--;
 			}

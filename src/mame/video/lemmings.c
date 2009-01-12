@@ -17,7 +17,7 @@
 
 UINT16 *lemmings_pixel_0_data,*lemmings_pixel_1_data,*lemmings_vram_data,*lemmings_control_data;
 static UINT16 *sprite_triple_buffer_0,*sprite_triple_buffer_1;
-static UINT8 *vram_buffer, *vram_dirty;
+static UINT8 *vram_buffer;
 static bitmap_t *bitmap0;
 static tilemap *vram_tilemap;
 
@@ -97,12 +97,13 @@ VIDEO_START( lemmings )
 	vram_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_cols,8,8,64,32);
 
 	vram_buffer = (UINT8*)auto_malloc(2048*64); /* 64 bytes per VRAM character */
-	vram_dirty = (UINT8*)auto_malloc(2048);
 	sprite_triple_buffer_0 = (UINT16*)auto_malloc(0x800);
 	sprite_triple_buffer_1 = (UINT16*)auto_malloc(0x800);
 
 	tilemap_set_transparent_pen(vram_tilemap,0);
 	bitmap_fill(bitmap0,0,0x100);
+
+	gfx_element_set_source(machine->gfx[2], vram_buffer);
 }
 
 VIDEO_EOF( lemmings )
@@ -148,7 +149,7 @@ WRITE16_HANDLER( lemmings_pixel_1_w )
 
 	/* Copy pixel to buffer for easier decoding later */
 	tile=((sx/8)*32)+(sy/8);
-	vram_dirty[tile]=1;
+	gfx_element_mark_dirty(space->machine->gfx[2], tile);
 	vram_buffer[(tile*64) + ((sx&7)) + ((sy&7)*8)]=(src>>8)&0xf;
 
 	sx+=1; /* Update both pixels in the word */
@@ -163,19 +164,10 @@ WRITE16_HANDLER( lemmings_vram_w )
 
 VIDEO_UPDATE( lemmings )
 {
-	int x1=-lemmings_control_data[0],x0=-lemmings_control_data[2],i,y=0;
+	int x1=-lemmings_control_data[0],x0=-lemmings_control_data[2],y=0;
 	rectangle rect;
 	rect.max_y=cliprect->max_y;
 	rect.min_y=cliprect->min_y;
-
-	/* Decode any characters that have changed in vram */
-	for (i=0; i<2048; i++) {
-		if (vram_dirty[i]) {
-			decodechar(screen->machine->gfx[2],i,vram_buffer);
-			tilemap_mark_tile_dirty(vram_tilemap,i);
-			vram_dirty[i]=0;
-		}
-	}
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_sprites(screen->machine,bitmap,cliprect,sprite_triple_buffer_1,1,0x0000);

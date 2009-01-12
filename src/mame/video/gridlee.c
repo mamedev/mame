@@ -160,7 +160,7 @@ VIDEO_UPDATE( gridlee )
 	{
 		/* non-flipped: draw directly from the bitmap */
 		if (!gridlee_cocktail_flip)
-			draw_scanline8(bitmap, 0, y, 256, &local_videoram[(y - BALSENTE_VBEND) * 256], pens + 16, -1);
+			draw_scanline8(bitmap, 0, y, 256, &local_videoram[(y - BALSENTE_VBEND) * 256], pens + 16);
 
 		/* flipped: x-flip the scanline into a temp buffer and draw that */
 		else
@@ -171,7 +171,7 @@ VIDEO_UPDATE( gridlee )
 
 			for (xx = 0; xx < 256; xx++)
 				temp[xx] = local_videoram[srcy * 256 + 255 - xx];
-			draw_scanline8(bitmap, 0, y, 256, temp, pens + 16, -1);
+			draw_scanline8(bitmap, 0, y, 256, temp, pens + 16);
 		}
 	}
 

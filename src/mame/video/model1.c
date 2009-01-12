@@ -1460,7 +1460,6 @@ VIDEO_START(model1)
 
 VIDEO_UPDATE(model1)
 {
-	sys24_tile_update(screen->machine);
 #if 0
 	{
 		int mod = 0;

@@ -24,14 +24,6 @@ static int flipscreen;
 
 static tilemap *background, *foreground;
 
-static UINT8 *blank_characterdata; /* pseudo character */
-
-/* gfxram dirty flags */
-
-/* we should be able to draw sprite gfx directly without caching to GfxElements */
-
-static UINT8 *sprite_dirty[8];
-
 static const struct
 {
 	UINT8 width;
@@ -43,6 +35,8 @@ sprite_data[8] =
 	{ 32, 32, 4 }, { 16, 32, 5 }, { 32, 16, 2 }, { 64, 64, 7 },
 	{  8,  8, 0 }, { 16,  8, 6 }, {  8, 16, 3 }, { 16, 16, 1 }
 };
+
+static UINT8 blank_tile[8*8];
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
@@ -57,7 +51,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 	if (code & 0xf800) {
 		SET_TILE_INFO( 0, code&0x7ff, color&0x7f, flags );
 	} else {
-		SET_TILE_INFO( 0, 0x800, 0x00, 0 );
+		SET_TILE_INFO( 0, 0, 0x00, 0 );
+		tileinfo->pen_data = blank_tile;
 	}
 	tileinfo->category = (code & 0x1000)>>12;
 }
@@ -75,7 +70,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 	if (code & 0xf800) {
 		SET_TILE_INFO( 0, code&0x7ff, color&0x7f, flags );
 	} else {
-		SET_TILE_INFO( 0, 0x800, 0x00, 0 );
+		SET_TILE_INFO( 0, 0, 0x00, 0 );
+		tileinfo->pen_data = blank_tile;
 	}
 	tileinfo->category = (code & 0x1000)>>12;
 }
@@ -199,7 +195,7 @@ WRITE16_HANDLER( nemesis_characterram_word_w )
 		{
 			int w = sprite_data[i].width;
 			int h = sprite_data[i].height;
-			sprite_dirty[i][offset * 4 / (w * h)] = 1;
+			gfx_element_mark_dirty(space->machine->gfx[sprite_data[i].char_type], offset * 4 / (w * h));
 		}
 	}
 }
@@ -208,7 +204,6 @@ WRITE16_HANDLER( nemesis_characterram_word_w )
 /* claim a palette dirty array */
 VIDEO_START( nemesis )
 {
-	int i;
 	spriteram_words = spriteram_size / 2;
 
 	background = tilemap_create(machine,
@@ -222,21 +217,16 @@ VIDEO_START( nemesis )
 	tilemap_set_scroll_rows( background, 256 );
 	tilemap_set_scroll_rows( foreground, 256 );
 
-	for (i=0; i<8; i++)
-	{
-		int w = sprite_data[i].width;
-		int h = sprite_data[i].height;
-		int size = 0x20000 / (w * h);
-		sprite_dirty[i] = auto_malloc(size);
-		memset(sprite_dirty[i], 1, size);
-	}
-
 	memset(nemesis_characterram,0,nemesis_characterram_size);
 
-
-	blank_characterdata = auto_malloc(32*8/8*(2048+1));
-	memset(blank_characterdata,0x00,32*8/8*(2048+1));
-	decodechar(machine->gfx[0],0x800,(UINT8 *)blank_characterdata);
+	gfx_element_set_source(machine->gfx[0], (UINT8 *)nemesis_characterram);
+	gfx_element_set_source(machine->gfx[1], (UINT8 *)nemesis_characterram);
+	gfx_element_set_source(machine->gfx[2], (UINT8 *)nemesis_characterram);
+	gfx_element_set_source(machine->gfx[3], (UINT8 *)nemesis_characterram);
+	gfx_element_set_source(machine->gfx[4], (UINT8 *)nemesis_characterram);
+	gfx_element_set_source(machine->gfx[5], (UINT8 *)nemesis_characterram);
+	gfx_element_set_source(machine->gfx[6], (UINT8 *)nemesis_characterram);
+	gfx_element_set_source(machine->gfx[7], (UINT8 *)nemesis_characterram);
 
 	flipscreen = 0;
 	tilemap_flip = 0;
@@ -329,64 +319,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 /******************************************************************************/
 
-static void update_gfx(running_machine *machine)
-{
-	int offs,code;
-	int bAnyDirty;
-
-	bAnyDirty = 0;
-	for (offs = spriteram_words - 1;offs >= 0;offs --)
-	{
-		if (sprite_dirty[4][offs])
-		{
-			decodechar(machine->gfx[0],offs,(UINT8 *)nemesis_characterram);
-			bAnyDirty = 1;
-			sprite_dirty[4][offs] = 0;
-		}
-	}
-	if( bAnyDirty )
-	{
-		tilemap_mark_all_tiles_dirty( background );
-		tilemap_mark_all_tiles_dirty( foreground );
-	}
-
-	for (offs = 0;offs < spriteram_words;offs += 8)
-	{
-		int char_type;
-		int zoom;
-
-		zoom = spriteram16[offs+2] & 0xff;
-		if (!(spriteram16[offs+2] & 0xff00) && ((spriteram16[offs+3] & 0xff00) != 0xff00))
-			code = spriteram16[offs+3] + ((spriteram16[offs+4] & 0xc0) << 2);
-		else
-			code = (spriteram16[offs+3] & 0xff) + ((spriteram16[offs+4] & 0xc0) << 2);
-
-		if (zoom != 0xFF || code!=0)
-		{
-			int size = spriteram16[offs+1];
-			int idx = (size >> 3) & 7;
-			int w, h;
-
-			w = sprite_data[idx].width;
-			h = sprite_data[idx].height;
-			code = code * 8 * 16 / (w * h);
-			char_type = sprite_data[idx].char_type;
-			if (sprite_dirty[idx][code] == 1)
-			{
-				decodechar(machine->gfx[char_type],code,(UINT8 *)nemesis_characterram);
-				sprite_dirty[idx][code] = 0;
-			}
-		}
-	}
-}
-
-/******************************************************************************/
-
 VIDEO_UPDATE( nemesis )
 {
 	int offs;
-
-	update_gfx(screen->machine);
 
 	bitmap_fill(priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
@@ -414,8 +349,6 @@ VIDEO_UPDATE( salamand )
 {
 	int offs;
 	rectangle clip;
-
-	update_gfx(screen->machine);
 
 	bitmap_fill(priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);

@@ -536,9 +536,7 @@ static WRITE16_HANDLER( gdfs_gfxram_w )
 {
 	offset += gdfs_gfxram_bank * 0x100000/2;
 	COMBINE_DATA(&eaglshot_gfxram[offset]);
-
-	eaglshot_dirty = 1;
-	eaglshot_dirty_tile[offset / (16*8/2)] = 1;
+	gfx_element_mark_dirty(space->machine->gfx[2], offset / (16*8/2));
 }
 
 static READ16_HANDLER( gdfs_blitram_r )
@@ -588,14 +586,17 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
-				eaglshot_dirty = 1;
-
 				memcpy( &eaglshot_gfxram[dst/2], &rom[src], len );
 
 				if (len % (16*8))	len = len / (16*8) + 1;
 				else				len = len / (16*8);
 
-				memset( &eaglshot_dirty_tile[dst / (16*8)], 1, len );
+				dst /= 16*8;
+				while (len--)
+				{
+					gfx_element_mark_dirty(space->machine->gfx[2], dst);
+					dst++;
+				}
 			}
 			else
 			{
@@ -1101,9 +1102,8 @@ static WRITE16_HANDLER( eaglshot_gfxram_w )
 {
 	offset += (ssv_scroll[0x76/2] & 0xf) * 0x40000/2;
 	COMBINE_DATA(&eaglshot_gfxram[offset]);
-
-	eaglshot_dirty = 1;
-	eaglshot_dirty_tile[offset / (16*8/2)] = 1;
+	gfx_element_mark_dirty(space->machine->gfx[0], offset / (16*8/2));
+	gfx_element_mark_dirty(space->machine->gfx[1], offset / (16*8/2));
 }
 
 
@@ -2716,7 +2716,6 @@ static void init_ssv(void)
 	ssv_enable_video(1);
 	ssv_special = 0;
 	interrupt_ultrax = 0;
-	eaglshot_dirty = 0;
 }
 
 static void init_ssv_hypreac2(void)

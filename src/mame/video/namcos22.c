@@ -558,7 +558,7 @@ static void
 mydrawgfxzoom(
 	bitmap_t *dest_bmp,const gfx_element *gfx,
 	UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-	const rectangle *clip,int transparency,int transparent_color,
+	const rectangle *clip,
 	int scalex, int scaley, int z, int prioverchar, int alpha )
 {
 	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -597,7 +597,7 @@ mydrawgfxzoom(
 		extra->prioverchar = prioverchar;
 		extra->line_modulo = gfx->line_modulo;
 		extra->pens = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-		extra->source = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+		extra->source = gfx_element_get_data(gfx, code % gfx->total_elements);
 #ifdef RENDER_AS_QUADS
 		poly_render_quad_fan(poly, dest_bmp, clip, renderscanline_sprite, 2, 4, &vert[0]);
 #else
@@ -671,7 +671,6 @@ poly3d_Draw3dSprite( bitmap_t *bitmap, gfx_element *gfx, int tileNumber, int col
       flipx, flipy,
       sx, sy,
       &clip,
-      TRANSPARENCY_ALPHA, 0xff,
       (width<<16)/32,
       (height<<16)/32,
       zc, pri, 0xff - translucency );
@@ -1063,8 +1062,6 @@ UINT32 *namcos22_czattr;
 
 UINT32 *namcos22_tilemapattr;
 
-static int cgsomethingisdirty;
-static UINT8 *cgdirty;
 static UINT8 *dirtypal;
 
 READ32_HANDLER( namcos22_czram_r )
@@ -1538,13 +1535,12 @@ WRITE32_HANDLER( namcos22_textram_w )
 static void
 DrawTranslucentCharacters( bitmap_t *bitmap, const rectangle *cliprect )
 {
-	alpha_set_level( 0xff-mixer.text_translucency ); /* ? */
-	tilemap_draw( bitmap, cliprect, bgtilemap, TILEMAP_DRAW_ALPHA|1, 0 );
+	UINT8 alpha = 0xff-mixer.text_translucency; /* ? */
+	tilemap_draw( bitmap, cliprect, bgtilemap, TILEMAP_DRAW_ALPHA(alpha)|1, 0 );
 }
 
 static void DrawCharacterLayer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	unsigned i;
 	INT32 dx = namcos22_tilemapattr[0]>>16;
 	INT32 dy = namcos22_tilemapattr[0]&0xffff;
 	/**
@@ -1552,32 +1548,6 @@ static void DrawCharacterLayer(running_machine *machine, bitmap_t *bitmap, const
     * namcos22_tilemapattr[0x8/4] == 0x01ff0000
     * namcos22_tilemapattr[0xe/4] == ?
     */
-	if( cgsomethingisdirty )
-	{
-		for( i=0; i<64*64; i+=2 )
-		{
-			UINT32 data = namcos22_textram[i/2];
-			if( cgdirty[(data>>16)&0x3ff] )
-			{
-				tilemap_mark_tile_dirty( bgtilemap,i );
-			}
-			if( cgdirty[data&0x3ff] )
-			{
-				tilemap_mark_tile_dirty( bgtilemap,i+1 );
-			}
-		}
-
-		for( i=0; i<NUM_CG_CHARS; i++ )
-		{
-			if( cgdirty[i] )
-			{
-				decodechar( machine->gfx[GFX_CHAR],i,(UINT8 *)namcos22_cgram );
-				cgdirty[i] = 0;
-			}
-		}
-		cgsomethingisdirty = 0;
-	}
-
 	bitmap_fill(priority_bitmap,cliprect,0);
 	tilemap_set_scrollx( bgtilemap,0, (dx-0x35c)&0x3ff );
 	tilemap_set_scrolly( bgtilemap,0, dy&0x3ff );
@@ -2192,8 +2162,7 @@ READ32_HANDLER( namcos22_cgram_r )
 WRITE32_HANDLER( namcos22_cgram_w )
 {
 	COMBINE_DATA( &namcos22_cgram[offset] );
-	cgdirty[offset/32] = 1;
-	cgsomethingisdirty = 1;
+	gfx_element_mark_dirty(space->machine->gfx[GFX_CHAR],offset/32);
 }
 
 READ32_HANDLER( namcos22_gamma_r )
@@ -2230,15 +2199,18 @@ static void namcos22_exit(running_machine *machine)
 
 static VIDEO_START( common )
 {
+	int code;
+	
 	bgtilemap = tilemap_create( machine, TextTilemapGetInfo,tilemap_scan_rows,16,16,64,64 );
 		tilemap_set_transparent_pen( bgtilemap, 0xf );
 
 	mbDSPisActive = 0;
 	memset( namcos22_polygonram, 0xcc, 0x20000 );
 
+	for (code = 0; code < machine->gfx[GFX_TEXTURE_TILE]->total_elements; code++)
+		gfx_element_decode(machine->gfx[GFX_TEXTURE_TILE], code);
 	Prepare3dTexture(memory_region(machine, "textilemap"), machine->gfx[GFX_TEXTURE_TILE]->gfxdata );
 	dirtypal = auto_malloc(NAMCOS22_PALETTE_SIZE/4);
-	cgdirty = auto_malloc( 0x400 );
 	mPtRomSize = memory_region_length(machine, "pointrom")/3;
 	mpPolyL = memory_region(machine, "pointrom");
 	mpPolyM = mpPolyL + mPtRomSize;
@@ -2251,6 +2223,8 @@ static VIDEO_START( common )
 #endif
 	add_reset_callback(machine, namcos22_reset);
 	add_exit_callback(machine, namcos22_exit);
+
+	gfx_element_set_source(machine->gfx[GFX_CHAR], (UINT8 *)namcos22_cgram);
 }
 
 VIDEO_START( namcos22 )

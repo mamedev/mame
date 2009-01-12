@@ -2426,18 +2426,18 @@ static const gfx_layout tiles16x16x4_layout =
 static const gfx_layout tiles8x8x8_layout =
 {
 	8,8,
-	0x100000/(64*8/8),
+	0x100000/(32*8/8),
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 8, 16, 24, 32, 40, 48, 56 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8
+	32*8	/* really 64*8, but granularity is 32 bytes */
 };
 
 static const gfx_layout tiles16x16x8_layout =
 {
 	16,16,
-	0x100000/(128*16/8),
+	0x100000/(64*16/8),
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 8, 16, 24, 32, 40, 48, 56,
@@ -2447,7 +2447,7 @@ static const gfx_layout tiles16x16x8_layout =
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
 	64*16, 64*17, 64*18, 64*19, 64*20, 64*21, 64*22, 64*23
 	},
-	128*16
+	64*16	/* really 128*16, but granularity is 32 bytes */
 };
 
 

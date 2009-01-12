@@ -838,13 +838,13 @@ void deco16_clear_sprite_priority_bitmap(void)
 void deco16_pdrawgfx(running_machine *machine,
 		bitmap_t *dest,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri)
+		const rectangle *clip,int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha)
 {
 	int ox,oy,cx,cy;
 	int x_index,y_index,x,y;
 
 	const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	int source_base = (code % gfx->total_elements) * gfx->height;
+	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 	/* check bounds */
 	ox = sx;
@@ -864,7 +864,7 @@ void deco16_pdrawgfx(running_machine *machine,
 
 	for( y=0; y<16-cy; y++ )
 	{
-		UINT8 *source = gfx->gfxdata + ((source_base+y_index) * gfx->line_modulo);
+		const UINT8 *source = code_base + (y_index * gfx->line_modulo);
 		UINT32 *destb = BITMAP_ADDR32(dest, sy, 0);
 		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
 		UINT8 *spri = BITMAP_ADDR8(sprite_priority_bitmap, sy, 0);
@@ -879,8 +879,8 @@ void deco16_pdrawgfx(running_machine *machine,
 				if( c != transparent_color && x >= 0 && x < 320 )
 				{
 					if (pri_mask>pri[x] && sprite_mask>spri[x]) {
-						if (transparency == TRANSPARENCY_ALPHA)
-							destb[x] = alpha_blend32(destb[x], pal[c]);
+						if (alpha != 0xff)
+							destb[x] = alpha_blend_r32(destb[x], pal[c], alpha);
 						else
 							destb[x] = pal[c];
 						if (write_pri)

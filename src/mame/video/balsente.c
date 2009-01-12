@@ -227,7 +227,7 @@ VIDEO_UPDATE( balsente )
 
 	/* draw scanlines from the VRAM directly */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		draw_scanline8(bitmap, 0, y, 256, &local_videoram[(y - BALSENTE_VBEND) * 256], pens, -1);
+		draw_scanline8(bitmap, 0, y, 256, &local_videoram[(y - BALSENTE_VBEND) * 256], pens);
 
 	/* draw the sprite images */
 	for (i = 0; i < 40; i++)

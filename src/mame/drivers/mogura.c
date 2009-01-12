@@ -55,6 +55,7 @@ static TILE_GET_INFO( get_mogura_tile_info )
 
 static VIDEO_START( mogura )
 {
+	gfx_element_set_source(machine->gfx[0], mogura_gfxram);
 	mogura_tilemap = tilemap_create(machine, get_mogura_tile_info,tilemap_scan_rows,8,8,64, 32);
 }
 
@@ -110,9 +111,7 @@ static WRITE8_HANDLER ( mogura_gfxram_w )
 {
 	mogura_gfxram[offset] = data ;
 
-	decodechar(space->machine->gfx[0], offset/16, mogura_gfxram);
-
-	tilemap_mark_all_tiles_dirty(mogura_tilemap);
+	gfx_element_mark_dirty(space->machine->gfx[0], offset/16);
 }
 
 

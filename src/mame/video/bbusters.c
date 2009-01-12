@@ -108,7 +108,7 @@ VIDEO_START( mechatt )
 
 INLINE const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int dy, int block)
 {
-	int source_base,code=0;
+	int code=0;
 
 	/* Get a tile index from the x,y position in the block */
 	switch (block)
@@ -141,8 +141,7 @@ INLINE const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int 
 		break;
 	}
 
-	source_base=((sprite+code) % gfx->total_elements) * 16;
-	return gfx->gfxdata + ((source_base+(dy%16)) * gfx->line_modulo);
+	return gfx_element_get_data(gfx, (sprite+code) % gfx->total_elements) + ((dy%16) * gfx->line_modulo);
 }
 
 static void bbusters_draw_block(running_machine *machine, bitmap_t *dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)

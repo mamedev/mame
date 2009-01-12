@@ -50,11 +50,7 @@ enum
 {
 	TRANSPARENCY_NONE,			/* opaque with remapping */
 	TRANSPARENCY_PEN,			/* single pen transparency with remapping */
-	TRANSPARENCY_PEN_RAW,		/* single pen transparency with no remapping */
 	TRANSPARENCY_PENS,			/* multiple pen transparency with remapping */
-	TRANSPARENCY_PEN_TABLE,		/* special pen remapping modes (see DRAWMODE_xxx below) with remapping */
-	TRANSPARENCY_ALPHA,			/* single pen transparency, other pens alpha */
-	TRANSPARENCY_ALPHARANGE,	/* single pen transparency, multiple pens alpha depending on array, see psikyosh.c */
 
 	TRANSPARENCY_MODES			/* total number of modes; must be last */
 };
@@ -99,6 +95,7 @@ enum
 const gfx_layout name = { width, height, RGN_FRAC(1,1), planes, { GFX_RAW }, { 0 }, { linemod }, charmod };
 
 
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -122,8 +119,13 @@ struct _gfx_layout
 /* In mamecore.h: typedef struct _gfx_element gfx_element; */
 struct _gfx_element
 {
-	UINT16			width;				/* pixel width of each element */
-	UINT16			height;				/* pixel height of each element */
+	UINT16			width;				/* current pixel width of each element (changeble with source clipping) */
+	UINT16			height;				/* current pixel height of each element (changeble with source clipping) */
+	UINT16			startx;				/* current source clip X offset */
+	UINT16			starty;				/* current source clip Y offset */
+
+	UINT16			origwidth;			/* starting pixel width of each element */
+	UINT16			origheight;			/* staring pixel height of each element */
 	UINT8			flags;				/* one of the GFX_ELEMENT_* flags above */
 	UINT32 			total_elements;		/* total number of decoded elements */
 
@@ -131,13 +133,17 @@ struct _gfx_element
 	UINT16			color_depth;		/* number of colors each pixel can represent */
 	UINT16			color_granularity;	/* number of colors for each color code */
 	UINT32			total_colors;		/* number of color codes */
-
+	
 	UINT32 *		pen_usage;			/* bitmask of pens that are used (pens 0-31 only) */
 
 	UINT8 *			gfxdata;			/* pixel data, 8bpp or 4bpp (if GFX_ELEMENT_PACKED) */
 	UINT32			line_modulo;		/* bytes between each row of data */
 	UINT32			char_modulo;		/* bytes between each element */
-	running_machine *	machine;		/* pointer to the owning machine */
+	const UINT8 *	srcdata;			/* pointer to the source data for decoding */
+	UINT8 *			dirty;				/* dirty array for detecting tiles that need decoding */
+	UINT32			dirtyseq;			/* sequence number; incremented each time a tile is dirtied */
+
+	running_machine *machine;			/* pointer to the owning machine */
 	gfx_layout		layout;				/* copy of the original layout */
 };
 
@@ -155,127 +161,171 @@ struct _gfx_decode_entry
 };
 
 
-typedef struct _alpha_cache alpha_cache;
-struct _alpha_cache
-{
-	int		alphas;
-	int		alphad;
-};
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-/* drawing mode case TRANSPARENCY_ALPHARANGE */
-extern UINT8 gfx_alpharange_table[256];
-
-/* drawing mode case TRANSPARENCY_PEN_TABLE */
-extern UINT8 gfx_drawmode_table[256];
-
-/* By default, when drawing sprites with pdrawgfx, shadows affect the sprites below them. */
-/* Set this flag to 1 to make shadows only affect the background, leaving sprites at full brightness. */
-extern int pdrawgfx_shadow_lowpri;
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void drawgfx_init(running_machine *machine);
+
+/* ----- graphics elements ----- */
+
+/* allocate a gfx_element structure based on a given layout */
+gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, const UINT8 *srcdata, UINT32 total_colors, UINT32 color_base);
+
+/* update a single code in a gfx_element */
+void gfx_element_decode(const gfx_element *gfx, UINT32 code);
+
+/* free a gfx_element */
+void gfx_element_free(gfx_element *gfx);
 
 
-void decodechar(gfx_element *gfx,int num,const unsigned char *src);
-gfx_element *allocgfx(running_machine *machine, const gfx_layout *gl);
-void decodegfx(gfx_element *gfx, const UINT8 *src, UINT32 first, UINT32 count);
-void freegfx(gfx_element *gfx);
+
+/* ----- core graphics drawing ----- */
+
+/* generic drawgfx with legacy interface */
+void drawgfx(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle *cliprect, int transparency, UINT32 transparent_color);
+
+/* specific drawgfx implementations for each transparency type */
+void drawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty);
+void drawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 transpen);
+void drawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 transpen);
+void drawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 transmask);
+void drawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, const UINT8 *pentable, const pen_t *shadowtable);
+void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 transpen, UINT8 alpha);
 
 
-void drawgfx(bitmap_t *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color);
-void pdrawgfx(bitmap_t *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		UINT32 priority_mask);
-void mdrawgfx(bitmap_t *dest,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		UINT32 priority_mask);
+
+/* ----- zoomed graphics drawing ----- */
+
+/* generic drawgfxzoom with legacy interface */
+void drawgfxzoom(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle *cliprect, int transparency, UINT32 transparent_color, UINT32 scalex, UINT32 scaley);
+
+/* specific drawgfxzoom implementations for each transparency type */
+void drawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley);
+void drawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, UINT32 transpen);
+void drawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, UINT32 transpen);
+void drawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, UINT32 transmask);
+void drawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, const UINT8 *pentable, const pen_t *shadowtable);
+void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, UINT32 transpen, UINT8 alpha);
 
 
-void drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley);
-void pdrawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
-		UINT32 priority_mask);
-void mdrawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
-		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
-		UINT32 priority_mask);
+
+/* ----- priority masked graphics drawing ----- */
+
+/* generic pdrawgfx with legacy interface */
+void pdrawgfx(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle *cliprect, int transparency, UINT32 transparent_color, UINT32 pmask);
+
+/* specific pdrawgfx implementations for each transparency type */
+void pdrawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_t *priority, UINT32 pmask);
+void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_t *priority, UINT32 pmask, UINT32 transpen);
+void pdrawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_t *priority, UINT32 pmask, UINT32 transpen);
+void pdrawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_t *priority, UINT32 pmask, UINT32 transmask);
+void pdrawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_t *priority, UINT32 pmask, const UINT8 *pentable, const pen_t *shadowtable);
+void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, bitmap_t *priority, UINT32 pmask, UINT32 transpen, UINT8 alpha);
 
 
-void draw_scanline8(bitmap_t *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen);
-void draw_scanline16(bitmap_t *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen);
-void draw_scanline32(bitmap_t *bitmap,int x,int y,int length,const UINT32 *src,const pen_t *pens,int transparent_pen);
-void pdraw_scanline8(bitmap_t *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen,int pri);
-void pdraw_scanline16(bitmap_t *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen,int pri);
-void pdraw_scanline32(bitmap_t *bitmap,int x,int y,int length,const UINT32 *src,const pen_t *pens,int transparent_pen,int pri);
-void extract_scanline8(bitmap_t *bitmap,int x,int y,int length,UINT8 *dst);
-void extract_scanline16(bitmap_t *bitmap,int x,int y,int length,UINT16 *dst);
-void extract_scanline32(bitmap_t *bitmap,int x,int y,int length,UINT32 *dst);
+
+/* ----- priority masked zoomed graphics drawing ----- */
+
+/* generic pdrawgfxzoom with legacy interface */
+void pdrawgfxzoom(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle *cliprect, int transparency, UINT32 transparent_color, UINT32 scalex, UINT32 scaley, UINT32 pmask);
+
+/* specific pdrawgfxzoom implementations for each transparency type */
+void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask);
+void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, UINT32 transpen);
+void pdrawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, UINT32 transpen);
+void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, UINT32 transmask);
+void pdrawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, const UINT8 *pentable, const pen_t *shadowtable);
+void pdrawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, UINT32 transpen, UINT8 alpha);
 
 
-void copybitmap(bitmap_t *dest,bitmap_t *src,int flipx,int flipy,
-				int sx,int sy,const rectangle *clip);
 
-void copybitmap_trans(bitmap_t *dest,bitmap_t *src,int flipx,int flipy,
-					  int sx,int sy,const rectangle *clip,pen_t transparent_pen);
+/* ----- scanline copying ----- */
 
-void copyscrollbitmap(bitmap_t *dest,bitmap_t *src,
-					  int rows,const int *rowscroll,int cols,const int *colscroll,
-					  const rectangle *clip);
+/* copy pixels from an 8bpp buffer to a single scanline of a bitmap */
+void draw_scanline8(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT8 *srcptr, const pen_t *paldata);
 
-void copyscrollbitmap_trans(bitmap_t *dest,bitmap_t *src,
-					 		int rows,const int *rowscroll,int cols,const int *colscroll,
-					 		const rectangle *clip,pen_t transparent_pen);
+/* copy pixels from a 16bpp buffer to a single scanline of a bitmap */
+void draw_scanline16(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT16 *srcptr, const pen_t *paldata);
 
+/* copy pixels from a 32bpp buffer to a single scanline of a bitmap */
+void draw_scanline32(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr, const pen_t *paldata);
+
+
+
+/* ----- scanline extraction ----- */
+
+/* copy pixels from a single scanline of a bitmap to an 8bpp buffer */
+void extract_scanline8(bitmap_t *bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT8 *destptr);
+
+/* copy pixels from a single scanline of a bitmap to a 16bpp buffer */
+void extract_scanline16(bitmap_t *bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT16 *destptr);
+
+/* copy pixels from a single scanline of a bitmap to a 32bpp buffer */
+void extract_scanline32(bitmap_t *bitmap, INT32 srcx, INT32 srcy, INT32 length, UINT32 *destptr);
+
+
+
+/* ----- bitmap copying ----- */
+
+/* copy from one bitmap to another, copying all unclipped pixels */
+void copybitmap(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle *cliprect);
+
+/* copy from one bitmap to another, copying all unclipped pixels except those that match transpen */
+void copybitmap_trans(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle *cliprect, UINT32 transpen);
+
+/* 
+  Copy a bitmap onto another with scroll and wraparound.
+  These functions support multiple independently scrolling rows/columns.
+  "rows" is the number of indepentently scrolling rows. "rowscroll" is an
+  array of integers telling how much to scroll each row. Same thing for
+  "numcols" and "colscroll".
+  If the bitmap cannot scroll in one direction, set numrows or columns to 0.
+  If the bitmap scrolls as a whole, set numrows and/or numcols to 1.
+  Bidirectional scrolling is, of course, supported only if the bitmap
+  scrolls as a whole in at least one direction.
+*/
+
+/* copy from one bitmap to another, copying all unclipped pixels, and applying scrolling to one or more rows/colums */
+void copyscrollbitmap(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle *cliprect);
+
+/* copy from one bitmap to another, copying all unclipped pixels except those that match transpen, and applying scrolling to one or more rows/colums */
+void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle *cliprect, UINT32 transpen);
 
 /*
-  Copy a bitmap applying rotation, zooming, and arbitrary distortion.
-  This function works in a way that mimics some real hardware like the Konami
-  051316, so it requires little or no further processing on the caller side.
+	Copy a bitmap applying rotation, zooming, and arbitrary distortion.
+	This function works in a way that mimics some real hardware like the Konami
+	051316, so it requires little or no further processing on the caller side.
 
-  Two 16.16 fixed point counters are used to keep track of the position on
-  the source bitmap. startx and starty are the initial values of those counters,
-  indicating the source pixel that will be drawn at coordinates (0,0) in the
-  destination bitmap. The destination bitmap is scanned left to right, top to
-  bottom; every time the cursor moves one pixel to the right, incxx is added
-  to startx and incxy is added to starty. Every time the cursor moves to the
-  next line, incyx is added to startx and incyy is added to startyy.
+	Two 16.16 fixed point counters are used to keep track of the position on
+	the source bitmap. startx and starty are the initial values of those counters,
+	indicating the source pixel that will be drawn at coordinates (0,0) in the
+	destination bitmap. The destination bitmap is scanned left to right, top to
+	bottom; every time the cursor moves one pixel to the right, incxx is added
+	to startx and incxy is added to starty. Every time the cursor moves to the
+	next line, incyx is added to startx and incyy is added to startyy.
 
-  What this means is that if incxy and incyx are both 0, the bitmap will be
-  copied with only zoom and no rotation. If e.g. incxx and incyy are both 0x8000,
-  the source bitmap will be doubled.
+	What this means is that if incxy and incyx are both 0, the bitmap will be
+	copied with only zoom and no rotation. If e.g. incxx and incyy are both 0x8000,
+	the source bitmap will be doubled.
 
-  Rotation is performed this way:
-  incxx = 0x10000 * cos(theta)
-  incxy = 0x10000 * -sin(theta)
-  incyx = 0x10000 * sin(theta)
-  incyy = 0x10000 * cos(theta)
-  this will perform a rotation around (0,0), you'll have to adjust startx and
-  starty to move the center of rotation elsewhere.
+	Rotation is performed this way:
+	incxx = 0x10000 * cos(theta)
+	incxy = 0x10000 * -sin(theta)
+	incyx = 0x10000 * sin(theta)
+	incyy = 0x10000 * cos(theta)
+	this will perform a rotation around (0,0), you'll have to adjust startx and
+	starty to move the center of rotation elsewhere.
 
-  Optionally the bitmap can be tiled across the screen instead of doing a single
-  copy. This is obtained by setting the wraparound parameter to true.
- */
-void copyrozbitmap(bitmap_t *dest,bitmap_t *src,
-		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
-		const rectangle *clip,int transparency,int transparent_color,UINT32 priority);
+	Optionally the bitmap can be tiled across the screen instead of doing a single
+	copy. This is obtained by setting the wraparound parameter to true.
+*/
+
+/* copy from one bitmap to another, with zoom and rotation, copying all unclipped pixels */
+void copyrozbitmap(bitmap_t *dest, const rectangle *cliprect, bitmap_t *src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound);
+
+/* copy from one bitmap to another, with zoom and rotation, copying all unclipped pixels whose values do not match transpen */
+void copyrozbitmap_trans(bitmap_t *dest, const rectangle *cliprect, bitmap_t *src, INT32 startx, INT32 starty, INT32 incxx, INT32 incxy, INT32 incyx, INT32 incyy, int wraparound, UINT32 transparent_color);
 
 
 
@@ -283,33 +333,71 @@ void copyrozbitmap(bitmap_t *dest,bitmap_t *src,
     INLINE FUNCTIONS
 ***************************************************************************/
 
-/* Alpha blending functions */
-INLINE void alpha_set_level(int level)
+/*-------------------------------------------------
+    gfx_element_set_source - set a pointer to
+    the source of a gfx_element
+-------------------------------------------------*/
+
+INLINE void gfx_element_set_source(gfx_element *gfx, const UINT8 *source)
 {
-	extern struct _alpha_cache drawgfx_alpha_cache;
-	assert(level >= 0 && level <= 256);
-	drawgfx_alpha_cache.alphas = level;
-	drawgfx_alpha_cache.alphad = 256 - level;
+	gfx->srcdata = source;
+	memset(gfx->dirty, 1, gfx->total_elements);
 }
 
 
-INLINE UINT32 alpha_blend16(UINT32 d, UINT32 s)
+/*-------------------------------------------------
+    gfx_element_get_data - return a pointer to 
+    the base of the given code within a 
+    gfx_element, decoding it if it is dirty
+-------------------------------------------------*/
+
+INLINE const UINT8 *gfx_element_get_data(const gfx_element *gfx, UINT32 code)
 {
-	extern struct _alpha_cache drawgfx_alpha_cache;
-	return ((((s & 0x001f) * drawgfx_alpha_cache.alphas + (d & 0x001f) * drawgfx_alpha_cache.alphad) >> 8)) |
-		   ((((s & 0x03e0) * drawgfx_alpha_cache.alphas + (d & 0x03e0) * drawgfx_alpha_cache.alphad) >> 8) & 0x03e0) |
-		   ((((s & 0x7c00) * drawgfx_alpha_cache.alphas + (d & 0x7c00) * drawgfx_alpha_cache.alphad) >> 8) & 0x7c00);
+	assert(code < gfx->total_elements);
+	if (gfx->dirty[code])
+		gfx_element_decode(gfx, code);
+	return gfx->gfxdata + code * gfx->char_modulo + gfx->starty * gfx->line_modulo + gfx->startx;
 }
 
 
-INLINE UINT32 alpha_blend32(UINT32 d, UINT32 s)
+/*-------------------------------------------------
+    gfx_element_mark_dirty - mark a code of a
+    gfx_element dirty
+-------------------------------------------------*/
+
+INLINE void gfx_element_mark_dirty(gfx_element *gfx, UINT32 code)
 {
-	extern struct _alpha_cache drawgfx_alpha_cache;
-	return ((((s & 0x0000ff) * drawgfx_alpha_cache.alphas + (d & 0x0000ff) * drawgfx_alpha_cache.alphad) >> 8)) |
-		   ((((s & 0x00ff00) * drawgfx_alpha_cache.alphas + (d & 0x00ff00) * drawgfx_alpha_cache.alphad) >> 8) & 0x00ff00) |
-		   ((((s & 0xff0000) * drawgfx_alpha_cache.alphas + (d & 0xff0000) * drawgfx_alpha_cache.alphad) >> 8) & 0xff0000);
+	if (code < gfx->total_elements)
+	{
+		gfx->dirty[code] = 1;
+		gfx->dirtyseq++;
+	}
 }
 
+
+/*-------------------------------------------------
+    gfx_element_set_source_clip - set a source
+    clipping area to apply to subsequent renders
+-------------------------------------------------*/
+
+INLINE void gfx_element_set_source_clip(gfx_element *gfx, UINT32 xoffs, UINT32 width, UINT32 yoffs, UINT32 height)
+{
+	assert(xoffs < gfx->origwidth);
+	assert(yoffs < gfx->origheight);
+	assert(xoffs + width <= gfx->origwidth);
+	assert(yoffs + height <= gfx->origheight);
+
+	gfx->width = width;
+	gfx->height = height;
+	gfx->startx = xoffs;
+	gfx->starty = yoffs;
+}
+
+
+/*-------------------------------------------------
+    alpha_blend_r16 - alpha blend two 16-bit
+    5-5-5 RGB pixels
+-------------------------------------------------*/
 
 INLINE UINT32 alpha_blend_r16(UINT32 d, UINT32 s, UINT8 level)
 {
@@ -320,7 +408,12 @@ INLINE UINT32 alpha_blend_r16(UINT32 d, UINT32 s, UINT8 level)
 }
 
 
-INLINE UINT32 alpha_blend_r32( UINT32 d, UINT32 s, UINT8 level )
+/*-------------------------------------------------
+    alpha_blend_r32 - alpha blend two 32-bit
+    8-8-8 RGB pixels
+-------------------------------------------------*/
+
+INLINE UINT32 alpha_blend_r32(UINT32 d, UINT32 s, UINT8 level)
 {
 	int alphad = 256 - level;
 	return ((((s & 0x0000ff) * level + (d & 0x0000ff) * alphad) >> 8)) |

@@ -991,66 +991,7 @@ static void supernova_draw_b( bitmap_t *bitmap, bitmap_t* bitmap_flags, const re
 
 VIDEO_UPDATE(skns)
 {
-	int i, offset;
-
-	UINT8 *btiles;
-
-
 	palette_update(screen->machine);
-
-	btiles = memory_region (screen->machine, "gfx3");
-
-//  if (!(skns_v3_regs[0x0c/4] & 0x0100)); // if tilemap b is in 8bpp mode
-	{
-		if (skns_v3t_somedirty)
-		{
-			skns_v3t_somedirty = 0;
-
-			/* check if & where that tile is used in the tilemap */
-			for (offset=0;offset<0x4000/4;offset++)
-			{
-				int code = ((skns_tilemapB_ram[offset] & 0x001fffff) >> 0 );
-				if (skns_v3t_dirty[code&0x3ff])
-					tilemap_mark_tile_dirty(skns_tilemap_B,offset);
-			}
-
-			for (i = 0; i < 0x0400; i++)
-			{
-				if (skns_v3t_dirty[i] == 1)
-				{
-					decodechar(screen->machine->gfx[1], i, (UINT8*)btiles);
-
-					skns_v3t_dirty[i] = 0;
-				}
-			}
-		}
-	}
-
-//  if (skns_v3_regs[0x0c/4] & 0x0100); // if tilemap b is in 4bpp mode
-	{
-		if (skns_v3t_4bpp_somedirty)
-		{
-			skns_v3t_4bpp_somedirty = 0;
-
-			/* check if & where that tile is used in the tilemap */
-			for (offset=0;offset<0x4000/4;offset++)
-			{
-				int code = ((skns_tilemapB_ram[offset] & 0x001fffff) >> 0 );
-				if (skns_v3t_4bppdirty[code&0x7ff])
-					tilemap_mark_tile_dirty(skns_tilemap_B,offset);
-			}
-
-			for (i = 0; i < 0x0800; i++)
-			{
-				if (skns_v3t_4bppdirty[i] == 1)
-				{
-					decodechar(screen->machine->gfx[3], i, (UINT8*)btiles);
-
-					skns_v3t_4bppdirty[i] = 0;
-				}
-			}
-		}
-	}
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(tilemap_bitmap_lower, NULL, 0);

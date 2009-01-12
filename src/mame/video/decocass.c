@@ -35,11 +35,6 @@ size_t decocass_objectram_size;
 
 static tilemap *fg_tilemap, *bg_tilemap_l, *bg_tilemap_r;
 
-static char *sprite_dirty;
-static char *char_dirty;
-static char *tile_dirty;
-static char object_dirty;
-
 static rectangle bg_tilemap_l_clip;
 static rectangle bg_tilemap_r_clip;
 
@@ -215,9 +210,9 @@ WRITE8_HANDLER( decocass_charram_w )
 {
 	decocass_charram[offset] = data;
 	/* dirty sprite */
-	sprite_dirty[(offset >> 5) & 255] = 1;
+	gfx_element_mark_dirty(space->machine->gfx[1], (offset >> 5) & 255);
 	/* dirty char */
-	char_dirty[(offset >> 3) & 1023] = 1;
+	gfx_element_mark_dirty(space->machine->gfx[0], (offset >> 3) & 1023);
 }
 
 
@@ -245,7 +240,7 @@ WRITE8_HANDLER( decocass_tileram_w )
 {
 	decocass_tileram[offset] = data;
 	/* dirty tile (64 bytes per tile) */
-	tile_dirty[(offset / 64) & 15] = 1;
+	gfx_element_mark_dirty(space->machine->gfx[2], (offset / 64) & 15);
 	/* first 1KB of tile RAM is shared with tilemap RAM */
 	if (offset < decocass_bgvideoram_size)
 		mark_bg_tile_dirty( offset );
@@ -255,7 +250,8 @@ WRITE8_HANDLER( decocass_objectram_w )
 {
 	decocass_objectram[offset] = data;
 	/* dirty the object */
-	object_dirty = 1;
+	gfx_element_mark_dirty(space->machine->gfx[3], 0);
+	gfx_element_mark_dirty(space->machine->gfx[3], 1);
 }
 
 WRITE8_HANDLER( decocass_bgvideoram_w )
@@ -497,84 +493,8 @@ static void draw_missiles(running_machine *machine,bitmap_t *bitmap, const recta
 }
 
 
-static void decode_modified(running_machine* machine, UINT8 *sprite_ram, int interleave)
-{
-	int i,offs;
-
-	/* decode dirty characters */
-	for (offs = decocass_fgvideoram_size - 1;offs >= 0;offs--)
-	{
-		int code;
-
-		code = decocass_fgvideoram[offs] + 256 * (decocass_colorram[offs] & 3);
-
-		switch (char_dirty[code])
-		{
-		case 1:
-			decodechar(machine->gfx[0],code,decocass_charram);
-			char_dirty[code] = 2;
-			/* fall through */
-		case 2:
-			tilemap_mark_tile_dirty(fg_tilemap, offs);
-			break;
-		default:
-			break;
-		}
-	}
-
-	for (i = 0; i < 1024; i++)
-	{
-		if (char_dirty[i] == 2)
-			char_dirty[i] = 0;
-	}
-
-	/* decode dirty sprites */
-	for (i = 0, offs = 0;i < 8; i++, offs += 4*interleave)
-	{
-		int code;
-
-		code  = sprite_ram[offs + interleave];
-		if (sprite_dirty[code])
-		{
-			sprite_dirty[code] = 0;
-
-			decodechar(machine->gfx[1],code,decocass_charram);
-		}
-	}
-
-	/* decode dirty tiles */
-	for (offs = 0; offs < decocass_bgvideoram_size; offs++)
-	{
-		int code = (decocass_tileram[offs] >> 4) & 15;
-
-		if (tile_dirty[code])
-		{
-			tile_dirty[code] = 0;
-
-			decodechar(machine->gfx[2],code,decocass_tileram);
-
-			/* mark all visible tiles dirty */
-			for (i = offs; i < decocass_bgvideoram_size; i++)
-				if (code == ((decocass_tileram[i] >> 4) & 15))
-					mark_bg_tile_dirty(i);
-		}
-	}
-
-	/* decode object if it is dirty */
-	if (object_dirty)
-	{
-		decodechar(machine->gfx[3], 0, decocass_objectram);
-		decodechar(machine->gfx[3], 1, decocass_objectram);
-		object_dirty = 0;
-	}
-}
-
 VIDEO_START( decocass )
 {
-	sprite_dirty = auto_malloc(256);
-	char_dirty = auto_malloc(1024);
-	tile_dirty = auto_malloc(16);
-
 	bg_tilemap_l = tilemap_create( machine, get_bg_l_tile_info, bgvideoram_scan_cols,  16, 16, 32, 32 );
 	bg_tilemap_r = tilemap_create( machine, get_bg_r_tile_info, bgvideoram_scan_cols,  16, 16, 32, 32 );
 	fg_tilemap = tilemap_create( machine, get_fg_tile_info, fgvideoram_scan_cols,   8,  8, 32, 32 );
@@ -584,7 +504,7 @@ VIDEO_START( decocass )
 	tilemap_set_transparent_pen( fg_tilemap, 0 );
 
 	bg_tilemap_l_clip = *video_screen_get_visible_area(machine->primary_screen);
-	bg_tilemap_l_clip.max_y = 256 / 2;
+	bg_tilemap_l_clip.max_y = 256 / 2 - 1;
 
 	bg_tilemap_r_clip = *video_screen_get_visible_area(machine->primary_screen);
 	bg_tilemap_r_clip.min_y = 256 / 2;
@@ -592,6 +512,11 @@ VIDEO_START( decocass )
 	/* background videroam bits D0-D3 are shared with the tileram */
 	decocass_bgvideoram = decocass_tileram;
 	decocass_bgvideoram_size = 0x0400;	/* d000-d3ff */
+
+	gfx_element_set_source(machine->gfx[0], decocass_charram);
+	gfx_element_set_source(machine->gfx[1], decocass_charram);
+	gfx_element_set_source(machine->gfx[2], decocass_tileram);
+	gfx_element_set_source(machine->gfx[3], decocass_objectram);
 }
 
 VIDEO_UPDATE( decocass )
@@ -628,8 +553,6 @@ VIDEO_UPDATE( decocass )
 #endif
 
 	bitmap_fill( bitmap, cliprect , 0);
-
-	decode_modified(screen->machine, decocass_fgvideoram, 0x20 );
 
 	scrolly_l = back_vl_shift;
 	scrolly_r = 256 - back_vr_shift;

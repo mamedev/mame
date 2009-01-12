@@ -351,7 +351,7 @@ static void splndrbt_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 //      const UINT8 * const xromline = xrom + (scalex << 4);
 		const UINT8 * const yromline = yrom + (scaley << 4) + (15 - scaley);
-		const UINT8* const srcgfx = gfx->gfxdata + tile * gfx->char_modulo;
+		const UINT8* const srcgfx = gfx_element_get_data(gfx, tile);
 		const pen_t *paldata = &machine->pens[gfx->color_base + gfx->color_granularity * color];
 		int x,yy;
 

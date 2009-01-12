@@ -199,7 +199,6 @@ extern WRITE32_HANDLER(lanc_ram_w);
 
 // defined in drivers/nwk-tr.c
 int K001604_vh_start(running_machine *machine, int chip);
-void K001604_tile_update(running_machine *machine, int chip);
 void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
 void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
 READ32_HANDLER(K001604_tile_r);
@@ -224,7 +223,6 @@ static VIDEO_UPDATE( jetwave )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
-	K001604_tile_update(screen->machine, 0);
 	K001005_draw(bitmap, cliprect);
 
 	K001604_draw_front_layer(0, bitmap, cliprect);
@@ -505,7 +503,7 @@ static ADDRESS_MAP_START( jetwave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
-	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)		/* LANC Buffer RAM (27E) */
+	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)	 AM_BASE(&lanc_ram)	/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)
 	AM_RANGE(0x7f000000, 0x7f3fffff) AM_MIRROR(0x80000000) AM_ROM AM_REGION("user2", 0)

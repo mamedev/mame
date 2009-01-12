@@ -71,6 +71,6 @@ VIDEO_UPDATE( rollerg )
 	bitmap_fill(priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,16 * bg_colorbase);
 	K051316_zoom_draw_0(bitmap,cliprect,0,1);
-	K053245_sprites_draw(0,bitmap,cliprect);
+	K053245_sprites_draw(screen->machine,0,bitmap,cliprect);
 	return 0;
 }

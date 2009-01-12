@@ -140,8 +140,7 @@ WRITE8_HANDLER( tryout_vram_w )
 		break;
 	}
 
-	decodechar(space->machine->gfx[2],(offset-0x400/64)&0x7f,tryout_vram_gfx);
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
+	gfx_element_mark_dirty(space->machine->gfx[2], (offset-0x400/64)&0x7f);
 }
 
 WRITE8_HANDLER( tryout_vram_bankswitch_w )
@@ -178,6 +177,8 @@ VIDEO_START( tryout )
 
 	tryout_vram=auto_malloc(8 * 0x800);
 	tryout_vram_gfx=auto_malloc(0x6000);
+
+	gfx_element_set_source(machine->gfx[2], tryout_vram_gfx);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }

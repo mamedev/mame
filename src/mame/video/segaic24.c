@@ -81,8 +81,7 @@ enum {SYS24_TILES = 0x4000};
 
 static UINT16 *sys24_char_ram, *sys24_tile_ram;
 static UINT16 sys24_tile_mask;
-static UINT8 *sys24_char_dirtymap;
-static int sys24_char_dirty, sys24_char_gfx_index;
+static int sys24_char_gfx_index;
 static tilemap *sys24_tile_layer[4];
 
 #ifdef LSB_FIRST
@@ -135,12 +134,6 @@ static TILE_GET_INFO( sys24_tile_info_1w )
 	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
 }
 
-static STATE_POSTLOAD( sys24_tile_dirtyall )
-{
-	memset(sys24_char_dirtymap, 1, SYS24_TILES);
-	sys24_char_dirty = 1;
-}
-
 void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 {
 	sys24_tile_mask = tile_mask;
@@ -154,8 +147,6 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 
 	sys24_tile_ram = auto_malloc(0x10000);
 
-	sys24_char_dirtymap = auto_malloc(SYS24_TILES);
-
 	sys24_tile_layer[0] = tilemap_create(machine, sys24_tile_info_0s, tilemap_scan_rows,  8, 8, 64, 64);
 	sys24_tile_layer[1] = tilemap_create(machine, sys24_tile_info_0w, tilemap_scan_rows,  8, 8, 64, 64);
 	sys24_tile_layer[2] = tilemap_create(machine, sys24_tile_info_1s, tilemap_scan_rows,  8, 8, 64, 64);
@@ -168,34 +159,11 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 
 	memset(sys24_char_ram, 0, 0x80000);
 	memset(sys24_tile_ram, 0, 0x10000);
-	memset(sys24_char_dirtymap, 1, SYS24_TILES);
-	sys24_char_dirty = 1;
 
-	machine->gfx[sys24_char_gfx_index] = allocgfx(machine, &sys24_char_layout);
-
-	machine->gfx[sys24_char_gfx_index]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[sys24_char_gfx_index] = gfx_element_alloc(machine, &sys24_char_layout, (UINT8 *)sys24_char_ram, machine->config->total_colors / 16, 0);
 
 	state_save_register_global_pointer(machine, sys24_tile_ram, 0x10000/2);
 	state_save_register_global_pointer(machine, sys24_char_ram, 0x80000/2);
-	state_save_register_postload(machine, sys24_tile_dirtyall, NULL);
-}
-
-void sys24_tile_update(running_machine *machine)
-{
-	if(sys24_char_dirty) {
-		int i;
-		for(i=0; i<SYS24_TILES; i++) {
-			if(sys24_char_dirtymap[i]) {
-				sys24_char_dirtymap[i] = 0;
-				decodechar(machine->gfx[sys24_char_gfx_index], i, (UINT8 *)sys24_char_ram);
-			}
-		}
-		tilemap_mark_all_tiles_dirty(sys24_tile_layer[0]);
-		tilemap_mark_all_tiles_dirty(sys24_tile_layer[1]);
-		tilemap_mark_all_tiles_dirty(sys24_tile_layer[2]);
-		tilemap_mark_all_tiles_dirty(sys24_tile_layer[3]);
-		sys24_char_dirty = 0;
-	}
 }
 
 static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
@@ -604,8 +572,7 @@ WRITE16_HANDLER(sys24_char_w)
 	UINT16 old = sys24_char_ram[offset];
 	COMBINE_DATA(sys24_char_ram + offset);
 	if(old != sys24_char_ram[offset]) {
-		sys24_char_dirtymap[offset / 16] = 1;
-		sys24_char_dirty = 1;
+		gfx_element_mark_dirty(space->machine->gfx[sys24_char_gfx_index], offset / 16);
 	}
 }
 

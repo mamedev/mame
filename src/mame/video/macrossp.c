@@ -166,8 +166,6 @@ VIDEO_START(macrossp)
 	machine->gfx[1]->color_granularity=64;
 	machine->gfx[2]->color_granularity=64;
 	machine->gfx[3]->color_granularity=64;
-
-	alpha_set_level(0x80); /* guess */
 }
 
 
@@ -209,7 +207,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int flipx = (source[2] & 0x40000000) >> 30;
 		int flipy = (source[2] & 0x80000000) >> 31;
 
-		int trans = (source[2] & 0x20000000)?TRANSPARENCY_ALPHA:TRANSPARENCY_PEN; /* alpha blending enable? */
+		int alpha = (source[2] & 0x20000000)?0x80:0xff; /* alpha blending enable? */
 
 		int loopno = 0;
 
@@ -245,7 +243,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					for (ycnt = 0; ycnt <= high; ycnt++) {
 						xoffset = 0;
 						for (xcnt = 0; xcnt <= wide; xcnt++) {
-							drawgfxzoom(bitmap,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,cliprect,trans,0,xzoom*0x100,yzoom*0x100);
+							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset += ((xzoom*16 + (1<<7)) >> 8);
 							loopno++;
@@ -257,7 +255,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					for (ycnt = high; ycnt >= 0; ycnt--) {
 						xoffset = 0;
 						for (xcnt = 0; xcnt <= wide; xcnt++) {
-							drawgfxzoom(bitmap,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,cliprect,trans,0,xzoom*0x100,yzoom*0x100);
+							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset += ((xzoom*16 + (1<<7)) >> 8);
 							loopno++;
@@ -271,7 +269,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					for (ycnt = 0; ycnt <= high; ycnt++) {
 						xoffset = ((wide*xzoom*16) >> 8);
 						for (xcnt = wide; xcnt >= 0; xcnt--) {
-							drawgfxzoom(bitmap,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,cliprect,trans,0,xzoom*0x100,yzoom*0x100);
+							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset -= ((xzoom*16 + (1<<7)) >> 8);
 							loopno++;
@@ -283,7 +281,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					for (ycnt = high; ycnt >= 0; ycnt--) {
 						xoffset = ((wide*xzoom*16) >> 8);
 						for (xcnt = wide; xcnt >=0 ; xcnt--) {
-							drawgfxzoom(bitmap,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,cliprect,trans,0,xzoom*0x100,yzoom*0x100);
+							drawgfxzoom_alpha(bitmap,cliprect,gfx,tileno+loopno,col,flipx,flipy,xpos+xoffset,ypos+yoffset,xzoom*0x100,yzoom*0x100,0,alpha);
 
 							xoffset -= ((xzoom*16 + (1<<7)) >> 8);
 							loopno++;

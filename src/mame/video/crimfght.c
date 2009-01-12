@@ -77,10 +77,10 @@ VIDEO_UPDATE( crimfght )
 	K052109_tilemap_update();
 
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,0);
-	K051960_sprites_draw(bitmap,cliprect,2,2);
+	K051960_sprites_draw(screen->machine,bitmap,cliprect,2,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,0);
-	K051960_sprites_draw(bitmap,cliprect,1,1);
+	K051960_sprites_draw(screen->machine,bitmap,cliprect,1,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,0);
-	K051960_sprites_draw(bitmap,cliprect,0,0);
+	K051960_sprites_draw(screen->machine,bitmap,cliprect,0,0);
 	return 0;
 }

@@ -276,23 +276,13 @@ static void decode_bg(running_machine *machine, const char * region)
 	free(buffer);
 
 	/* decode the graphics */
-	machine->gfx[gfx_index] = allocgfx(machine, &bg_layout);
-	decodegfx(machine->gfx[gfx_index], memory_region(machine, region), 0, machine->gfx[gfx_index]->total_elements);
-
-	/* set the color information */
-	machine->gfx[gfx_index]->color_base = 2048;
-	machine->gfx[gfx_index]->total_colors = 64;
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, &bg_layout, memory_region(machine, region), 64, 2048);
 }
 
 static void decode_sprite(running_machine *machine, int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	machine->gfx[gfx_index] = allocgfx(machine, layout);
-	decodegfx(machine->gfx[gfx_index], data, 0, machine->gfx[gfx_index]->total_elements);
-
-	/* set the color information */
-	machine->gfx[gfx_index]->color_base = 1024;
-	machine->gfx[gfx_index]->total_colors = 64;
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, layout, data, 64, 1024);
 }
 
 // fix sprite order
@@ -320,7 +310,7 @@ static void decode_sprite16(running_machine *machine, const char * region)
 	UINT8 *dst;
 	int i, y;
 
-	dst = malloc_or_die(len);
+	dst = auto_malloc(len);
 
 	for (i = 0; i < len / (4*4*16); i++)
 		for (y = 0; y < 16; y++)
@@ -340,8 +330,6 @@ static void decode_sprite16(running_machine *machine, const char * region)
 		}
 
 	decode_sprite(machine, sprite16, &spr16_layout, dst);
-
-	free(dst);
 }
 
 // fix sprite order
@@ -375,7 +363,7 @@ static void decode_sprite32(running_machine *machine, const char * region)
 	UINT8 *dst;
 	int i;
 
-	dst = malloc_or_die(len);
+	dst = auto_malloc(len);
 
 	memset(dst, 0, len);
 
@@ -391,8 +379,6 @@ static void decode_sprite32(running_machine *machine, const char * region)
 	}
 
 	decode_sprite(machine, sprite32, &spr32_layout, dst);
-
-	free(dst);
 }
 
 VIDEO_START( tceptor )

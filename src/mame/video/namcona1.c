@@ -19,13 +19,10 @@ UINT16 *namcona1_workram;
 //UINT16 *namcona1_pixmap;
 
 /* private variables */
-static char *dirtychar;
-static char dirtygfx;
 static UINT16 *shaperam;
 static UINT16 *cgram;
 static tilemap *roz_tilemap;
 static int roz_palette;
-static int roz_dirty;
 static tilemap *bg_tilemap[NAMCONA1_NUM_TILEMAPS];
 static int tilemap_palette_bank[NAMCONA1_NUM_TILEMAPS];
 static int palette_is_dirty;
@@ -139,7 +136,7 @@ WRITE16_HANDLER( namcona1_videoram_w )
 	}
 	else if( offset<0xa000/2 )
 	{
-		roz_dirty = 1;
+		tilemap_mark_all_tiles_dirty( roz_tilemap );
 	}
 } /* namcona1_videoram_w */
 
@@ -262,10 +259,7 @@ WRITE16_HANDLER( namcona1_gfxram_w )
 			old_word = shaperam[offset];
 			COMBINE_DATA( &shaperam[offset] );
 			if( shaperam[offset]!=old_word )
-			{
-				dirtygfx = 1;
-				dirtychar[offset/4] = 1;
-			}
+				gfx_element_mark_dirty(space->machine->gfx[2], offset/4);
 		}
 	}
 	else if( type == 0x02 )
@@ -274,59 +268,20 @@ WRITE16_HANDLER( namcona1_gfxram_w )
 		COMBINE_DATA( &cgram[offset] );
 		if( cgram[offset]!=old_word )
 		{
-			dirtygfx = 1;
-			dirtychar[offset/0x20] = 1;
+			gfx_element_mark_dirty(space->machine->gfx[0], offset/0x20);
+			gfx_element_mark_dirty(space->machine->gfx[1], offset/0x20);
 		}
 	}
 } /* namcona1_gfxram_w */
 
 static void UpdateGfx(running_machine *machine)
 {
-	const UINT16 *pSource = videoram16;
-	int page;
-	int i;
-
-	if( dirtygfx )
-	{
-		for( page = 0; page<NAMCONA1_NUM_TILEMAPS; page++ )
-		{
-			for( i=0; i<0x1000; i++ )
-			{
-				if( dirtychar[*pSource++ & 0xfff] )
-				{
-					tilemap_mark_tile_dirty( bg_tilemap[page], i );
-				}
-			}
-		}
-
-		for( i=0; i<0x1000; i++ )
-		{
-			if( dirtychar[*pSource++ & 0xfff] )
-			{
-				roz_dirty = 1;
-				break;
-			}
-		}
-
-		for( i = 0;i <0x1000; i++ )
-		{
-			if( dirtychar[i] )
-			{
-				dirtychar[i] = 0;
-				decodechar(machine->gfx[0],i,(UINT8 *)cgram);
-				decodechar(machine->gfx[1],i,(UINT8 *)cgram);
-				decodechar(machine->gfx[2],i,(UINT8 *)shaperam);
-			}
-		}
-		dirtygfx = 0;
-	}
 } /* UpdateGfx */
 
 VIDEO_START( namcona1 )
 {
 	static const tile_get_info_func get_info[4] = { tilemap_get_info0, tilemap_get_info1, tilemap_get_info2, tilemap_get_info3 };
 	int i;
-	gfx_element *gfx0,*gfx1,*gfx2;
 
 	roz_tilemap = tilemap_create( machine, roz_get_info, tilemap_scan_rows, 8,8,64,64 );
 	roz_palette = -1;
@@ -339,19 +294,11 @@ VIDEO_START( namcona1 )
 
 	shaperam		     = auto_malloc( 0x2000*4 );
 	cgram			     = auto_malloc( 0x1000*0x40 );
-	dirtychar		     = auto_malloc( 0x1000 );
 
-	gfx0 = allocgfx( machine, &cg_layout_8bpp );
-	gfx0->total_colors = machine->config->total_colors/256;
-	machine->gfx[0] = gfx0;
+	machine->gfx[0] = gfx_element_alloc( machine, &cg_layout_8bpp, (UINT8 *)cgram, machine->config->total_colors/256, 0 );
+	machine->gfx[1] = gfx_element_alloc( machine, &cg_layout_4bpp, (UINT8 *)cgram, machine->config->total_colors/16, 0 );
+	machine->gfx[2] = gfx_element_alloc( machine, &shape_layout, (UINT8 *)shaperam, machine->config->total_colors/2, 0 );
 
-	gfx1 = allocgfx( machine, &cg_layout_4bpp );
-	gfx1->total_colors = machine->config->total_colors/16;
-	machine->gfx[1] = gfx1;
-
-	gfx2 = allocgfx( machine, &shape_layout );
-	gfx2->total_colors = machine->config->total_colors/2;
-	machine->gfx[2] = gfx2;
 } /* namcona1_vh_start */
 
 /*************************************************************************/
@@ -372,8 +319,8 @@ static void pdraw_tile(running_machine *machine,
 	const gfx_element *mask = machine->gfx[2];
 
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
-	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
-	UINT8 *mask_base = mask->gfxdata + (code % mask->total_elements) * mask->char_modulo;
+	const UINT8 *source_base = gfx_element_get_data(gfx, (code % gfx->total_elements));
+	const UINT8 *mask_base = gfx_element_get_data(mask, (code % mask->total_elements));
 
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
 	int sprite_screen_width  = ((1<<16)*gfx->width+0x8000)>>16;
@@ -443,8 +390,8 @@ static void pdraw_tile(running_machine *machine,
 
 			for( y=sy; y<ey; y++ )
 			{
-				UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-				UINT8 *mask_addr = mask_base + (y_index>>16) * mask->line_modulo;
+				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+				const UINT8 *mask_addr = mask_base + (y_index>>16) * mask->line_modulo;
 				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
 
@@ -714,15 +661,9 @@ VIDEO_UPDATE( namcona1 )
 			int color = namcona1_vreg[0xba/2]&0xf;
 			if( color != roz_palette )
 			{
-				roz_dirty = 1;
+				tilemap_mark_all_tiles_dirty( roz_tilemap );
 				roz_palette = color;
 			}
-		}
-
-		if( roz_dirty )
-		{
-			tilemap_mark_all_tiles_dirty( roz_tilemap );
-			roz_dirty = 0;
 		}
 
 		bitmap_fill( priority_bitmap,cliprect ,0);

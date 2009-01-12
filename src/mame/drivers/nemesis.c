@@ -1918,7 +1918,7 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 characters */
-	2048+1,	/* 2048 characters (+ blank one) */
+	2048,	/* 2048 characters (+ blank one) */
 	4,	/* 4 bits per pixel */
 	{ 0, 1, 2, 3 }, /* the two bitplanes are merged in the same nibble */
 	{ XOR(0*4), XOR(1*4), XOR(2*4), XOR(3*4), XOR(4*4), XOR(5*4), XOR(6*4), XOR(7*4) },

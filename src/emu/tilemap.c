@@ -46,8 +46,8 @@ typedef enum
 
 
 /* internal blitting callbacks */
-typedef void (*blitmask_func)(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-typedef void (*blitopaque_func)(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
+typedef void (*blitmask_func)(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+typedef void (*blitopaque_func)(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
 
 
 /* blitting parameters for rendering */
@@ -61,6 +61,7 @@ struct _blit_parameters
 	UINT32 				tilemap_priority_code;
 	UINT8				mask;
 	UINT8				value;
+	UINT8				alpha;
 };
 
 
@@ -97,6 +98,8 @@ struct _tilemap
 	UINT8						all_tiles_clean;	/* true if all tiles are clean */
 	UINT32						palette_offset;		/* palette offset */
 	UINT32						pen_data_offset;	/* pen data offset */
+	UINT32						gfx_used;			/* bitmask of gfx items used */
+	UINT32						gfx_dirtyseq[MAX_GFX_ELEMENTS]; /* dirtyseq values from last check */
 
 	/* scroll information */
 	UINT32						scrollrows;			/* number of independently scrolled rows */
@@ -157,18 +160,18 @@ static void tilemap_draw_roz_core(tilemap *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
 
 /* scanline rasterizers for drawing to the pixmap */
-static void scanline_draw_opaque_null(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_masked_null(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_opaque_ind16(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_masked_ind16(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_opaque_rgb16(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_masked_rgb16(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_opaque_rgb16_alpha(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_masked_rgb16_alpha(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_opaque_rgb32(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_masked_rgb32(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_opaque_rgb32_alpha(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
-static void scanline_draw_masked_rgb32_alpha(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode);
+static void scanline_draw_opaque_null(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_masked_null(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_opaque_ind16(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_masked_ind16(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_opaque_rgb16(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_masked_rgb16(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_opaque_rgb16_alpha(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_masked_rgb16_alpha(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_opaque_rgb32(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_masked_rgb32(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_opaque_rgb32_alpha(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
+static void scanline_draw_masked_rgb32_alpha(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha);
 
 
 
@@ -251,6 +254,30 @@ INLINE tilemap *indexed_tilemap(int index)
 }
 
 
+/*-------------------------------------------------
+    gfx_tiles_changed - return TRUE if any 
+    gfx_elements used by this tilemap have
+    changed
+-------------------------------------------------*/
+
+INLINE int gfx_elements_changed(tilemap *tmap)
+{
+	UINT32 usedmask = tmap->gfx_used;
+	int isdirty = FALSE;
+	int gfxnum;
+
+	/* iterate over all used gfx types and set the dirty flag if any of them have changed */
+	for (gfxnum = 0; usedmask != 0; usedmask >>= 1, gfxnum++)
+		if ((usedmask & 1) != 0)
+			if (tmap->gfx_dirtyseq[gfxnum] != tmap->machine->gfx[gfxnum]->dirtyseq)
+			{
+				tmap->gfx_dirtyseq[gfxnum] = tmap->machine->gfx[gfxnum]->dirtyseq;
+				isdirty = TRUE;
+			}
+
+	return isdirty;
+}
+
 
 /***************************************************************************
     SYSTEM-WIDE MANAGEMENT
@@ -318,6 +345,7 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 
 	/* set up the default pen mask */
 	tmap->tileinfo.pen_mask = 0xff;
+	tmap->tileinfo.gfxnum = 0xff;
 
 	/* initialize global states */
 	tmap->enable = TRUE;
@@ -387,21 +415,6 @@ void tilemap_set_user_data(tilemap *tmap, void *user_data)
 void tilemap_set_palette_offset(tilemap *tmap, UINT32 offset)
 {
 	tmap->palette_offset = offset;
-}
-
-
-/*-------------------------------------------------
-    tilemap_set_pen_data_offset - specify an offset
-    to be added to pen_data while rendering tiles
--------------------------------------------------*/
-
-void tilemap_set_pen_data_offset(tilemap *tmap, UINT32 offset)
-{
-	if (tmap->pen_data_offset != offset)
-	{
-		tmap->pen_data_offset = offset;
-		tilemap_mark_all_tiles_dirty(tmap);
-	}
 }
 
 
@@ -776,10 +789,11 @@ profiler_mark(PROFILER_TILEMAP_DRAW);
 	original_cliprect = blit.cliprect;
 
 	/* if the whole map is dirty, mark it as such */
-	if (tmap->all_tiles_dirty)
+	if (tmap->all_tiles_dirty || gfx_elements_changed(tmap))
 	{
 		memset(tmap->tileflags, TILE_FLAG_DIRTY, tmap->max_logical_index);
 		tmap->all_tiles_dirty = FALSE;
+		tmap->gfx_used = 0;
 	}
 
 	width  = video_screen_get_width(tmap->machine->primary_screen);
@@ -975,10 +989,11 @@ void tilemap_draw_by_index(bitmap_t *dest, int number, UINT32 scrollx, UINT32 sc
 	scrolly = tmap->height - scrolly % tmap->height;
 
 	/* if the whole map is dirty, mark it as such */
-	if (tmap->all_tiles_dirty)
+	if (tmap->all_tiles_dirty || gfx_elements_changed(tmap))
 	{
 		memset(tmap->tileflags, TILE_FLAG_DIRTY, tmap->max_logical_index);
 		tmap->all_tiles_dirty = FALSE;
+		tmap->gfx_used = 0;
 	}
 
 	/* iterate to handle wraparound */
@@ -1205,7 +1220,11 @@ static void pixmap_update(tilemap *tmap, const rectangle *cliprect)
 {
 	int mincol, maxcol, minrow, maxrow;
 	int row, col;
-
+	
+	/* if the graphics changed, we need to mark everything dirty */
+ 	if (gfx_elements_changed(tmap))
+		tilemap_mark_all_tiles_dirty(tmap);
+ 
 	/* if everything is clean, do nothing */
 	if (tmap->all_tiles_clean)
 		return;
@@ -1232,6 +1251,7 @@ profiler_mark(PROFILER_TILEMAP_DRAW);
 	{
 		memset(tmap->tileflags, TILE_FLAG_DIRTY, tmap->max_logical_index);
 		tmap->all_tiles_dirty = FALSE;
+		tmap->gfx_used = 0;
 	}
 
 	/* iterate over rows */
@@ -1280,6 +1300,13 @@ profiler_mark(PROFILER_TILEMAP_UPDATE);
 	/* if mask data is specified, apply it */
 	if ((flags & (TILE_FORCE_LAYER0 | TILE_FORCE_LAYER1 | TILE_FORCE_LAYER2)) == 0 && tmap->tileinfo.mask_data != NULL)
 		tmap->tileflags[logindex] = tile_apply_bitmask(tmap, tmap->tileinfo.mask_data, x0, y0, tmap->tileinfo.category, flags);
+
+	/* track which gfx have been used for this tilemap */
+	if (tmap->tileinfo.gfxnum != 0xff && (tmap->gfx_used & (1 << tmap->tileinfo.gfxnum)) == 0)
+	{
+		tmap->gfx_used |= 1 << tmap->tileinfo.gfxnum;
+		tmap->gfx_dirtyseq[tmap->tileinfo.gfxnum] = tmap->machine->gfx[tmap->tileinfo.gfxnum]->dirtyseq;
+	}
 
 profiler_mark(PROFILER_END);
 }
@@ -1470,8 +1497,9 @@ static void configure_blit_parameters(blit_parameters *blit, tilemap *tmap, bitm
 		blit->cliprect.max_y = dest->height - 1;
 	}
 
-	/* set the priority code */
+	/* set the priority code and alpha */
 	blit->tilemap_priority_code = priority | (priority_mask << 8) | (tmap->palette_offset << 16);
+	blit->alpha = (flags & TILEMAP_DRAW_ALPHA_FLAG) ? (flags >> 24) : 0xff;
 
 	/* if no destination, just render priority */
 	if (dest == NULL)
@@ -1486,13 +1514,13 @@ static void configure_blit_parameters(blit_parameters *blit, tilemap *tmap, bitm
 		switch (dest->format)
 		{
 			case BITMAP_FORMAT_RGB32:
-				blit->draw_masked = (flags & TILEMAP_DRAW_ALPHA) ? scanline_draw_masked_rgb32_alpha : scanline_draw_masked_rgb32;
-				blit->draw_opaque = (flags & TILEMAP_DRAW_ALPHA) ? scanline_draw_opaque_rgb32_alpha : scanline_draw_opaque_rgb32;
+				blit->draw_masked = (blit->alpha < 0xff) ? scanline_draw_masked_rgb32_alpha : scanline_draw_masked_rgb32;
+				blit->draw_opaque = (blit->alpha < 0xff) ? scanline_draw_opaque_rgb32_alpha : scanline_draw_opaque_rgb32;
 				break;
 
 			case BITMAP_FORMAT_RGB15:
-				blit->draw_masked = (flags & TILEMAP_DRAW_ALPHA) ? scanline_draw_masked_rgb16_alpha : scanline_draw_masked_rgb16;
-				blit->draw_opaque = (flags & TILEMAP_DRAW_ALPHA) ? scanline_draw_opaque_rgb16_alpha : scanline_draw_opaque_rgb16;
+				blit->draw_masked = (blit->alpha < 0xff) ? scanline_draw_masked_rgb16_alpha : scanline_draw_masked_rgb16;
+				blit->draw_opaque = (blit->alpha < 0xff) ? scanline_draw_opaque_rgb16_alpha : scanline_draw_opaque_rgb16;
 				break;
 
 			case BITMAP_FORMAT_INDEXED16:
@@ -1650,7 +1678,7 @@ static void tilemap_draw_instance(tilemap *tmap, const blit_parameters *blit, in
 				{
 					for (cury = y; cury < nexty; cury++)
 					{
-						(*blit->draw_opaque)(dest0, source0, x_end - x_start, tmap->machine->pens, pmap0, blit->tilemap_priority_code);
+						(*blit->draw_opaque)(dest0, source0, x_end - x_start, tmap->machine->pens, pmap0, blit->tilemap_priority_code, blit->alpha);
 
 						dest0 = (UINT8 *)dest0 + dest_line_pitch_bytes;
 						source0 += tmap->pixmap->rowpixels;
@@ -1664,7 +1692,7 @@ static void tilemap_draw_instance(tilemap *tmap, const blit_parameters *blit, in
 					const UINT8 *mask0 = mask_baseaddr + x_start;
 					for (cury = y; cury < nexty; cury++)
 					{
-						(*blit->draw_masked)(dest0, source0, mask0, blit->mask, blit->value, x_end - x_start, tmap->machine->pens, pmap0, blit->tilemap_priority_code);
+						(*blit->draw_masked)(dest0, source0, mask0, blit->mask, blit->value, x_end - x_start, tmap->machine->pens, pmap0, blit->tilemap_priority_code, blit->alpha);
 
 						dest0 = (UINT8 *)dest0 + dest_line_pitch_bytes;
 						source0 += tmap->pixmap->rowpixels;
@@ -1712,9 +1740,9 @@ do {																		\
 	else if (blit->draw_masked == scanline_draw_masked_rgb16)				\
 		*(UINT16 *)dest = clut[INPUT_VAL];									\
 	else if (blit->draw_masked == scanline_draw_masked_rgb32_alpha)			\
-		*(UINT32 *)dest = alpha_blend32(*(UINT32 *)dest, clut[INPUT_VAL]);	\
+		*(UINT32 *)dest = alpha_blend_r32(*(UINT32 *)dest, clut[INPUT_VAL], alpha);	\
 	else if (blit->draw_masked == scanline_draw_masked_rgb16_alpha)			\
-		*(UINT16 *)dest = alpha_blend16(*(UINT16 *)dest, clut[INPUT_VAL]);	\
+		*(UINT16 *)dest = alpha_blend_r16(*(UINT16 *)dest, clut[INPUT_VAL], alpha);	\
 } while (0)
 
 static void tilemap_draw_roz_core(tilemap *tmap, const blit_parameters *blit,
@@ -1731,6 +1759,7 @@ static void tilemap_draw_roz_core(tilemap *tmap, const blit_parameters *blit,
 	UINT32 priority = blit->tilemap_priority_code;
 	UINT8 mask = blit->mask;
 	UINT8 value = blit->value;
+	UINT8 alpha = blit->alpha;
 	UINT32 cx;
 	UINT32 cy;
 	int x;
@@ -1902,7 +1931,7 @@ static void tilemap_draw_roz_core(tilemap *tmap, const blit_parameters *blit,
     bitmap, setting priority only
 -------------------------------------------------*/
 
-static void scanline_draw_opaque_null(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_opaque_null(void *dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	int i;
 
@@ -1920,7 +1949,7 @@ static void scanline_draw_opaque_null(void *dest, const UINT16 *source, int coun
     bitmap using a mask, setting priority only
 -------------------------------------------------*/
 
-static void scanline_draw_masked_null(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_masked_null(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	int i;
 
@@ -1940,7 +1969,7 @@ static void scanline_draw_masked_null(void *dest, const UINT16 *source, const UI
     indexed bitmap
 -------------------------------------------------*/
 
-static void scanline_draw_opaque_ind16(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_opaque_ind16(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	UINT16 *dest = _dest;
 	int pal = pcode >> 16;
@@ -1983,7 +2012,7 @@ static void scanline_draw_opaque_ind16(void *_dest, const UINT16 *source, int co
     indexed bitmap using a mask
 -------------------------------------------------*/
 
-static void scanline_draw_masked_ind16(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_masked_ind16(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	UINT16 *dest = _dest;
 	int pal = pcode >> 16;
@@ -2016,7 +2045,7 @@ static void scanline_draw_masked_ind16(void *_dest, const UINT16 *source, const 
     RGB bitmap
 -------------------------------------------------*/
 
-static void scanline_draw_opaque_rgb16(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_opaque_rgb16(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
 	UINT16 *dest = _dest;
@@ -2046,7 +2075,7 @@ static void scanline_draw_opaque_rgb16(void *_dest, const UINT16 *source, int co
     RGB bitmap using a mask
 -------------------------------------------------*/
 
-static void scanline_draw_masked_rgb16(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_masked_rgb16(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
 	UINT16 *dest = _dest;
@@ -2078,7 +2107,7 @@ static void scanline_draw_masked_rgb16(void *_dest, const UINT16 *source, const 
     16bpp RGB bitmap with alpha blending
 -------------------------------------------------*/
 
-static void scanline_draw_opaque_rgb16_alpha(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_opaque_rgb16_alpha(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
 	UINT16 *dest = _dest;
@@ -2089,7 +2118,7 @@ static void scanline_draw_opaque_rgb16_alpha(void *_dest, const UINT16 *source, 
 	{
 		for (i = 0; i < count; i++)
 		{
-			dest[i] = alpha_blend16(dest[i], clut[source[i]]);
+			dest[i] = alpha_blend_r16(dest[i], clut[source[i]], alpha);
 			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
 		}
 	}
@@ -2098,7 +2127,7 @@ static void scanline_draw_opaque_rgb16_alpha(void *_dest, const UINT16 *source, 
 	else
 	{
 		for (i = 0; i < count; i++)
-			dest[i] = alpha_blend16(dest[i], clut[source[i]]);
+			dest[i] = alpha_blend_r16(dest[i], clut[source[i]], alpha);
 	}
 }
 
@@ -2109,7 +2138,7 @@ static void scanline_draw_opaque_rgb16_alpha(void *_dest, const UINT16 *source, 
     blending
 -------------------------------------------------*/
 
-static void scanline_draw_masked_rgb16_alpha(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_masked_rgb16_alpha(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
 	UINT16 *dest = _dest;
@@ -2121,7 +2150,7 @@ static void scanline_draw_masked_rgb16_alpha(void *_dest, const UINT16 *source, 
 		for (i = 0; i < count; i++)
 			if ((maskptr[i] & mask) == value)
 			{
-				dest[i] = alpha_blend16(dest[i], clut[source[i]]);
+				dest[i] = alpha_blend_r16(dest[i], clut[source[i]], alpha);
 				pri[i] = (pri[i] & (pcode >> 8)) | pcode;
 			}
 	}
@@ -2131,7 +2160,7 @@ static void scanline_draw_masked_rgb16_alpha(void *_dest, const UINT16 *source, 
 	{
 		for (i = 0; i < count; i++)
 			if ((maskptr[i] & mask) == value)
-				dest[i] = alpha_blend16(dest[i], clut[source[i]]);
+				dest[i] = alpha_blend_r16(dest[i], clut[source[i]], alpha);
 	}
 }
 
@@ -2141,7 +2170,7 @@ static void scanline_draw_masked_rgb16_alpha(void *_dest, const UINT16 *source, 
     RGB bitmap
 -------------------------------------------------*/
 
-static void scanline_draw_opaque_rgb32(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_opaque_rgb32(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
 	UINT32 *dest = _dest;
@@ -2171,7 +2200,7 @@ static void scanline_draw_opaque_rgb32(void *_dest, const UINT16 *source, int co
     RGB bitmap using a mask
 -------------------------------------------------*/
 
-static void scanline_draw_masked_rgb32(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_masked_rgb32(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
 	UINT32 *dest = _dest;
@@ -2203,7 +2232,7 @@ static void scanline_draw_masked_rgb32(void *_dest, const UINT16 *source, const 
     32bpp RGB bitmap with alpha blending
 -------------------------------------------------*/
 
-static void scanline_draw_opaque_rgb32_alpha(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_opaque_rgb32_alpha(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
 	UINT32 *dest = _dest;
@@ -2214,7 +2243,7 @@ static void scanline_draw_opaque_rgb32_alpha(void *_dest, const UINT16 *source, 
 	{
 		for (i = 0; i < count; i++)
 		{
-			dest[i] = alpha_blend32(dest[i], clut[source[i]]);
+			dest[i] = alpha_blend_r32(dest[i], clut[source[i]], alpha);
 			pri[i] = (pri[i] & (pcode >> 8)) | pcode;
 		}
 	}
@@ -2223,7 +2252,7 @@ static void scanline_draw_opaque_rgb32_alpha(void *_dest, const UINT16 *source, 
 	else
 	{
 		for (i = 0; i < count; i++)
-			dest[i] = alpha_blend32(dest[i], clut[source[i]]);
+			dest[i] = alpha_blend_r32(dest[i], clut[source[i]], alpha);
 	}
 }
 
@@ -2234,7 +2263,7 @@ static void scanline_draw_opaque_rgb32_alpha(void *_dest, const UINT16 *source, 
     blending
 -------------------------------------------------*/
 
-static void scanline_draw_masked_rgb32_alpha(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode)
+static void scanline_draw_masked_rgb32_alpha(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
 	UINT32 *dest = _dest;
@@ -2246,7 +2275,7 @@ static void scanline_draw_masked_rgb32_alpha(void *_dest, const UINT16 *source, 
 		for (i = 0; i < count; i++)
 			if ((maskptr[i] & mask) == value)
 			{
-				dest[i] = alpha_blend32(dest[i], clut[source[i]]);
+				dest[i] = alpha_blend_r32(dest[i], clut[source[i]], alpha);
 				pri[i] = (pri[i] & (pcode >> 8)) | pcode;
 			}
 	}
@@ -2256,6 +2285,6 @@ static void scanline_draw_masked_rgb32_alpha(void *_dest, const UINT16 *source, 
 	{
 		for (i = 0; i < count; i++)
 			if ((maskptr[i] & mask) == value)
-				dest[i] = alpha_blend32(dest[i], clut[source[i]]);
+				dest[i] = alpha_blend_r32(dest[i], clut[source[i]], alpha);
 	}
 }

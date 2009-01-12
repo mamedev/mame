@@ -630,6 +630,7 @@ static void decode_gfx(running_machine *machine, UINT16 *pflookup, UINT16 *moloo
 
 static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 {
+	const UINT8 *srcdata;
 	int bank_index, gfx_index;
 
 	/* determine the bank index */
@@ -668,29 +669,27 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the graphics */
+	srcdata = &memory_region(machine, "tiles")[0x80000 * (bank_index - 1)];
 	switch (bpp)
 	{
 	case 4:
-		machine->gfx[gfx_index] = allocgfx(machine, &objlayout_4bpp);
+		machine->gfx[gfx_index] = gfx_element_alloc(machine, &objlayout_4bpp, srcdata, 0x40, 256);
 		break;
 
 	case 5:
-		machine->gfx[gfx_index] = allocgfx(machine, &objlayout_5bpp);
+		machine->gfx[gfx_index] = gfx_element_alloc(machine, &objlayout_5bpp, srcdata, 0x40, 256);
 		break;
 
 	case 6:
-		machine->gfx[gfx_index] = allocgfx(machine, &objlayout_6bpp);
+		machine->gfx[gfx_index] = gfx_element_alloc(machine, &objlayout_6bpp, srcdata, 0x40, 256);
 		break;
 
 	default:
 		fatalerror("Unsupported bpp");
 	}
-	decodegfx(machine->gfx[gfx_index], &memory_region(machine, "tiles")[0x80000 * (bank_index - 1)], 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	machine->gfx[gfx_index]->color_base = 256;
 	machine->gfx[gfx_index]->color_granularity = 8;
-	machine->gfx[gfx_index]->total_colors = 0x40;
 	bank_color_shift[gfx_index] = bpp - 3;
 
 	/* set the entry and return it */

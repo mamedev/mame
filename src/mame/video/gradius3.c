@@ -8,8 +8,6 @@
 UINT16 *gradius3_gfxram;
 int gradius3_priority;
 static int layer_colorbase[3],sprite_colorbase;
-static int dirtygfx;
-static UINT8 *dirtychar;
 
 
 
@@ -77,10 +75,9 @@ VIDEO_START( gradius3 )
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
        from how they are connected to the CPU. */
 	for (i = 0;i < TOTAL_SPRITES;i++)
-		decodechar(machine->gfx[1],i,memory_region(machine, "gfx2"));
+		gfx_element_mark_dirty(machine->gfx[1],i);
 
-	dirtychar = auto_malloc(TOTAL_CHARS);
-	memset(dirtychar,1,TOTAL_CHARS);
+	gfx_element_set_source(machine->gfx[0], (UINT8 *)gradius3_gfxram);
 }
 
 
@@ -103,10 +100,7 @@ WRITE16_HANDLER( gradius3_gfxram_w )
 	int oldword = gradius3_gfxram[offset];
 	COMBINE_DATA(&gradius3_gfxram[offset]);
 	if (oldword != gradius3_gfxram[offset])
-	{
-		dirtygfx = 1;
-		dirtychar[offset / 16] = 1;
-	}
+		gfx_element_mark_dirty(space->machine->gfx[0], offset / 16);
 }
 
 
@@ -125,24 +119,6 @@ VIDEO_UPDATE( gradius3 )
 	K052109_w(space,0x1d80,0x10);
 	K052109_w(space,0x1f00,0x32);
 
-	if (dirtygfx)
-	{
-		int i;
-
-		dirtygfx = 0;
-
-		for (i = 0;i < TOTAL_CHARS;i++)
-		{
-			if (dirtychar[i])
-			{
-				dirtychar[i] = 0;
-				decodechar(screen->machine->gfx[0],i,(UINT8 *)gradius3_gfxram);
-			}
-		}
-
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
-	}
-
 	K052109_tilemap_update();
 
 	bitmap_fill(priority_bitmap,cliprect,0);
@@ -159,6 +135,6 @@ VIDEO_UPDATE( gradius3 )
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,4);
 	}
 
-	K051960_sprites_draw(bitmap,cliprect,-1,-1);
+	K051960_sprites_draw(screen->machine,bitmap,cliprect,-1,-1);
 	return 0;
 }

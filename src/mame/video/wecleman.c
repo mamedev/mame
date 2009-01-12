@@ -585,7 +585,7 @@ static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const
 	};
 
 
-	UINT8 *src_ptr;
+	const UINT8 *src_ptr;
 	const pen_t *pal_ptr, *rgb_ptr;
 
 	int scrollx, sy, sx;
@@ -614,7 +614,6 @@ static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const
 	else if (priority == 0x04)
 	{
 		// draw road
-		UINT8 *src_base = machine->gfx[1]->gfxdata;
 		pen_t road_rgb[48];
 
 		for (i=0; i<48; i++)
@@ -633,7 +632,14 @@ static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const
 			if ((road>>8) != 0x04) continue;
 			road &= YMASK;
 
-			src_ptr = src_base + (road << 9);
+			src_ptr = gfx_element_get_data(machine->gfx[1], (road << 3));
+			gfx_element_get_data(machine->gfx[1], (road << 3) + 1);
+			gfx_element_get_data(machine->gfx[1], (road << 3) + 2);
+			gfx_element_get_data(machine->gfx[1], (road << 3) + 3);
+			gfx_element_get_data(machine->gfx[1], (road << 3) + 4);
+			gfx_element_get_data(machine->gfx[1], (road << 3) + 5);
+			gfx_element_get_data(machine->gfx[1], (road << 3) + 6);
+			gfx_element_get_data(machine->gfx[1], (road << 3) + 7);
 			mdy = ((road * MIDCURB_DY) >> 8) * bitmap->rowpixels;
 			tdy = ((road * TOPCURB_DY) >> 8) * bitmap->rowpixels;
 
@@ -680,7 +686,7 @@ static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
 				 int tmw_l2, int tmh_l2,		// tilemap width and height in log(2)
 				 int alpha, int pal_offset )	// alpha(0-3f), # of color codes to shift
 {
-	UINT8 *src_base, *src_ptr;
+	const UINT8 *src_ptr;
 	UINT16 *tmap_ptr;
 	UINT32 *dst_base, *dst_ptr;
 	const pen_t *pal_base, *pal_ptr;
@@ -706,8 +712,6 @@ static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
 	tmskipy = scrolly / tileh;
 	dy = -(scrolly & (tileh-1));
 
-	src_base = gfx->gfxdata;
-
 	dst_base = BITMAP_ADDR32(bitmap, y0+dy, x0+dx);
 
 	pal_base = machine->pens + pal_offset * gfx->color_granularity;
@@ -730,7 +734,7 @@ static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
 			// Wec Le Mans specific: decodes tile color in EAX
 			UINT16 tile_color = ((tiledata >> 5) & 0x78) + (tiledata >> 12);
 
-			src_ptr = src_base + tile_index * gfx->char_modulo;
+			src_ptr = gfx_element_get_data(gfx, tile_index);
 			pal_ptr = pal_base + tile_color * gfx->color_granularity;
 			dst_ptr = dst_base + j * tilew;
 

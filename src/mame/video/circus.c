@@ -198,7 +198,7 @@ VIDEO_UPDATE( crash )
 static void ripcord_draw_skydiver(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx;
-	UINT8  *src_lineptr, *src_pixptr;
+	const UINT8  *src_lineptr, *src_pixptr;
 	UINT16 *dst_lineptr, *dst_lineend;
 	UINT32 code;
 	int sx, sy;
@@ -216,7 +216,7 @@ static void ripcord_draw_skydiver(running_machine *machine, bitmap_t *bitmap, co
 	edx = 1;
 
 	gfx = machine->gfx[1];
-	src_lineptr = gfx->gfxdata + code * gfx->char_modulo;
+	src_lineptr = gfx_element_get_data(gfx, code);
 	src_pitch = gfx->line_modulo;
 	dst_pitch = bitmap->rowpixels;
 

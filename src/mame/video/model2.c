@@ -2734,7 +2734,6 @@ VIDEO_UPDATE(model2)
 {
 	logerror("--- frame ---\n");
 
-	sys24_tile_update(screen->machine);
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 	bitmap_fill(sys24_bitmap, cliprect, 0);
 

@@ -81,6 +81,9 @@ int palette_get_num_colors(palette_t *palette);
 /* return the number of groups managed by the palette */
 int palette_get_num_groups(palette_t *palette);
 
+/* return the maximum allowed index (i.e., length of arrays returned by palette_entry_list*) */
+int palette_get_max_index(palette_t *palette);
+
 /* return the index of the black entry */
 UINT32 palette_get_black_entry(palette_t *palette);
 

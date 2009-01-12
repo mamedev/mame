@@ -9,8 +9,6 @@ static tilemap *bg_tilemap;
 
 static int charbank,charpalette,video_enable;
 static UINT16 *zoomdata;
-static int dirtygfx;
-static UINT8 *dirtychar;
 
 #define TOTAL_CHARS 0x400
 
@@ -56,9 +54,6 @@ VIDEO_START( tail2nos )
 
 	K051316_vh_start_0(machine,"gfx3",-4,TRUE,0,zoom_callback);
 
-	dirtychar = auto_malloc(TOTAL_CHARS);
-	memset(dirtychar,1,TOTAL_CHARS);
-
 	tilemap_set_transparent_pen(bg_tilemap,15);
 
 	K051316_wraparound_enable(0,1);
@@ -90,10 +85,7 @@ WRITE16_HANDLER( tail2nos_zoomdata_w )
 	int oldword = zoomdata[offset];
 	COMBINE_DATA(&zoomdata[offset]);
 	if (oldword != zoomdata[offset])
-	{
-		dirtygfx = 1;
-		dirtychar[offset / 64] = 1;
-	}
+		gfx_element_mark_dirty(space->machine->gfx[2], offset / 64);
 }
 
 WRITE16_HANDLER( tail2nos_gfxbank_w )
@@ -164,25 +156,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( tail2nos )
 {
-	if (dirtygfx)
-	{
-		int i;
-
-		dirtygfx = 0;
-
-		for (i = 0;i < TOTAL_CHARS;i++)
-		{
-			if (dirtychar[i])
-			{
-				dirtychar[i] = 0;
-				decodechar(screen->machine->gfx[2],i,(UINT8 *)zoomdata);
-			}
-		}
-
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
-	}
-
-
 	if (video_enable)
 	{
 		K051316_zoom_draw_0(bitmap,cliprect,0,0);

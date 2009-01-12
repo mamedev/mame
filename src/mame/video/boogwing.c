@@ -9,7 +9,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	for (offs = 0x400-4;offs >= 0;offs -= 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult,pri=0,spri=0;
-		int trans=TRANSPARENCY_PEN;
+		int alpha = 0xff;
 
 		sprite = spriteram_base[offs+1];
 		if (!sprite) continue;
@@ -38,13 +38,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 			// Transparency
 			if (spriteram_base[offs+2]&0x2000)
-				trans=TRANSPARENCY_ALPHA;
+				alpha = 0x80;
 
 			if (deco16_priority==0x2)
 			{
 				// Additional sprite alpha in this mode
 				if (spriteram_base[offs+2]&0x8000)
-					trans=TRANSPARENCY_ALPHA;
+					alpha = 0x80;
 
 				// Sprite vs playfield
 				if ((spriteram_base[offs+2]&0xc000)==0xc000)
@@ -123,7 +123,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					cliprect,trans, 0, pri, spri, 0);
+					cliprect, 0, pri, spri, 0, alpha);
 
 			multi--;
 		}
@@ -152,8 +152,6 @@ VIDEO_START(boogwing)
 	deco16_set_tilemap_bank_callback(3,boogwing_bank_callback2);
 	deco16_set_tilemap_colour_base(1,0);
 	deco16_set_tilemap_transparency_mask(1, 0x1f); // 5bpp graphics
-
-	alpha_set_level(0x80);
 }
 
 VIDEO_UPDATE(boogwing)
@@ -187,7 +185,7 @@ VIDEO_UPDATE(boogwing)
 
 		// This mode uses playfield 3 to shadow sprites & playfield 2 (instead of
 		// regular alpha-blending, the destination is inverted).  Not yet implemented.
-//      deco16_tilemap_3_draw(screen,bitmap,cliprect,TILEMAP_DRAW_ALPHA,32);
+//      deco16_tilemap_3_draw(screen,bitmap,cliprect,TILEMAP_DRAW_ALPHA(0x80),32);
 	}
 	else
 	{

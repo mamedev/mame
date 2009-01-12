@@ -284,7 +284,7 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 	for (offs = 0x400 - 4; offs >= 0; offs -=4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult,pri=0;
-		int trans;
+		int alpha = 0xff;
 
 		sprite = spritedata[offs+1] & 0xffff;
 
@@ -292,7 +292,6 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 		flash=y&0x1000;
 		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
-		trans=TRANSPARENCY_PEN;
 		x = spritedata[offs+2];
 		colour = (x >>9) & colourmask;
 
@@ -332,7 +331,7 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					cliprect,trans,0,pri,1<<gfxbank, 1);
+					cliprect,0,pri,1<<gfxbank, 1, alpha);
 
 			multi--;
 		}
@@ -348,10 +347,9 @@ static void deco32_draw_sprite(bitmap_t *dest,const gfx_element *gfx,
 		UINT32 code,UINT32 priority,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip)
 {
+	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 	int ox,oy,cx,cy;
 	int x_index,y_index,x,y;
-
-	int source_base = (code % gfx->total_elements) * gfx->height;
 
 	/* check bounds */
 	ox = sx;
@@ -371,7 +369,7 @@ static void deco32_draw_sprite(bitmap_t *dest,const gfx_element *gfx,
 
 	for( y=0; y<16-cy; y++ )
 	{
-		UINT8 *source = gfx->gfxdata + ((source_base+y_index) * gfx->line_modulo);
+		const UINT8 *source = code_base + y_index * gfx->line_modulo;
 		UINT16 *destb = BITMAP_ADDR16(dest, sy, 0);
 
 		if (flipx) { source+=15-(sx-ox); x_index=-1; } else { x_index=1; source+=(sx-ox); }
@@ -458,8 +456,8 @@ static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 INLINE void dragngun_drawgfxzoom( running_machine *machine,
 		bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color,
-		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height )
+		const rectangle *clip,int transparent_color,
+		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height, UINT8 alpha )
 {
 	rectangle myclip;
 
@@ -492,7 +490,7 @@ INLINE void dragngun_drawgfxzoom( running_machine *machine,
 		if( gfx )
 		{
 			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-			int source_base = (code % gfx->total_elements) * gfx->height;
+			const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
@@ -558,13 +556,13 @@ INLINE void dragngun_drawgfxzoom( running_machine *machine,
 					int y;
 
 					/* case 1: TRANSPARENCY_PEN */
-					if (transparency == TRANSPARENCY_PEN)
+					if (alpha == 0xff)
 					{
 						if (pri_buffer)
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
@@ -588,7 +586,7 @@ INLINE void dragngun_drawgfxzoom( running_machine *machine,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
@@ -604,14 +602,14 @@ INLINE void dragngun_drawgfxzoom( running_machine *machine,
 						}
 					}
 
-					/* case 6: TRANSPARENCY_ALPHA */
-					if (transparency == TRANSPARENCY_ALPHA)
+					/* alpha-blended */
+					else
 					{
 						if (pri_buffer)
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
@@ -622,7 +620,7 @@ INLINE void dragngun_drawgfxzoom( running_machine *machine,
 									if( c != transparent_color )
 									{
 										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = alpha_blend32(dest[x], pal[c]);
+											dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
 										pri[x] = 31;
 									}
 									x_index += dx;
@@ -635,14 +633,14 @@ INLINE void dragngun_drawgfxzoom( running_machine *machine,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
 								{
 									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = alpha_blend32(dest[x], pal[c]);
+									if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
 									x_index += dx;
 								}
 
@@ -713,7 +711,7 @@ static void dragngun_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 	for (offs = 0;offs < 0x800;offs += 8)
 	{
-		int sx,sy,colour,fx,fy,w,h,x,y,bx,by,trans,scalex,scaley;
+		int sx,sy,colour,fx,fy,w,h,x,y,bx,by,alpha,scalex,scaley;
 		int zoomx,zoomy;
 		int xpos,ypos;
 
@@ -743,9 +741,9 @@ static void dragngun_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 		colour = spritedata[offs+6]&0x1f;
 
 		if (spritedata[offs+6]&0x80)
-			trans=TRANSPARENCY_ALPHA;
+			alpha=0x80;
 		else
-			trans=TRANSPARENCY_PEN;
+			alpha=0xff;
 
 		fx = spritedata[offs+4]&0x8000;
 		fy = spritedata[offs+5]&0x8000;
@@ -808,15 +806,15 @@ static void dragngun_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 						colour,
 						fx,fy,
 						xpos>>16,ypos>>16,
-						cliprect,trans,15,zoomx,zoomy,NULL,0,
-						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16) );
+						cliprect,15,zoomx,zoomy,NULL,0,
+						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), alpha );
 				else
-					drawgfx(bitmap,machine->gfx[bank],
+					drawgfx_alpha(bitmap,cliprect,machine->gfx[bank],
 						sprite,
 						colour,
 						fx,fy,
 						xpos>>16,ypos>>16,
-						cliprect,trans,15);
+						15,alpha);
 
 				if (fx)
 					xpos-=zoomx<<4;
@@ -1006,7 +1004,6 @@ VIDEO_START( dragngun )
 
 	deco32_pf2_colourbank=deco32_pf4_colourbank=0;
 
-	alpha_set_level(0x80);
 	state_save_register_global(machine, dragngun_sprite_ctrl);
 	has_ace_ram=0;
 }
@@ -1030,7 +1027,6 @@ VIDEO_START( lockload )
 
 	deco32_pf2_colourbank=deco32_pf4_colourbank=0;
 
-	alpha_set_level(0x80);
 	state_save_register_global(machine, dragngun_sprite_ctrl);
 	has_ace_ram=0;
 }
@@ -1061,7 +1057,6 @@ VIDEO_START( nslasher )
 	deco32_pf2_colourbank=16;
 	deco32_pf4_colourbank=16;
 	state_save_register_global(machine, deco32_pri);
-	alpha_set_level(0x80);
 	has_ace_ram=1;
 }
 
@@ -1483,13 +1478,11 @@ static void mixDualAlphaSprites(running_machine* machine, bitmap_t *bitmap, cons
                         Pri 2 -
                         Pri 3 -
                     */
-					alpha_set_level(0x80);
 
 					/* Alpha values are tied to ACE ram... */
 					//int alpha=((deco32_ace_ram[0x0 + (((priColAlphaPal1&0xf0)>>4)/2)]) * 8)-1;
 					//if (alpha<0)
 					//  alpha=0;
-					//alpha_set_level(255-alpha);
 
 					/* I don't really understand how object ACE ram is really hooked up,
                         the only obvious place in Night Slashers is the stagecoach in level 2 */
@@ -1497,14 +1490,14 @@ static void mixDualAlphaSprites(running_machine* machine, bitmap_t *bitmap, cons
 					if (pri1==0 && (((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0 && (pri0&0x3)!=1 && (pri0&0x3)!=2))))
 					{
 						if ((deco32_pri&1)==0 || ((deco32_pri&1)==1 && tilemapPri[x]<4) || ((deco32_pri&1)==1 && mixAlphaTilemap))
-							destLine[x]=alpha_blend32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)]);
+							destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)], 0x80);
 					}
 					else if (pri1==1 && ((priColAlphaPal0&0xff)==0 || ((pri0&0x3)!=0 && (pri0&0x3)!=1 && (pri0&0x3)!=2)))
-						destLine[x]=alpha_blend32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)]);
+						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)], 0x80);
 					else if (pri1==2)// TOdo
-						destLine[x]=alpha_blend32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)]);
+						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)], 0x80);
 					else if (pri1==3)// TOdo
-						destLine[x]=alpha_blend32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)]);
+						destLine[x]=alpha_blend_r32(destLine[x], pal1[(priColAlphaPal1&0xff) + (gfx1->color_granularity * col1)], 0x80);
 				}
 				else
 				{
@@ -1538,9 +1531,8 @@ static void mixDualAlphaSprites(running_machine* machine, bitmap_t *bitmap, cons
 						int alpha=((deco32_ace_ram[0x17 + (((p&0xf0)>>4)/2)]) * 8)-1;
 						if (alpha<0)
 							alpha=0;
-						alpha_set_level(255-alpha);
 
-						destLine[x]=alpha_blend32(destLine[x], pal2[p]);
+						destLine[x]=alpha_blend_r32(destLine[x], pal2[p], 255-alpha);
 					}
 				}
 			}

@@ -107,7 +107,7 @@ WRITE8_HANDLER( rockola_charram_w )
 	if (rockola_charram[offset] != data)
 	{
 		rockola_charram[offset] = data;
-		tilemap_mark_all_tiles_dirty(fg_tilemap);
+		gfx_element_mark_dirty(space->machine->gfx[0], (offset/8) % 256);
 	}
 }
 
@@ -171,8 +171,6 @@ static TILE_GET_INFO( get_fg_tile_info )
 	int code = rockola_videoram2[tile_index];
 	int color = colorram[tile_index] & 0x07;
 
-	decodechar(machine->gfx[0], code, rockola_charram);
-
 	SET_TILE_INFO(0, code, color, 0);
 }
 
@@ -182,6 +180,8 @@ VIDEO_START( rockola )
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
+	
+	gfx_element_set_source(machine->gfx[0], rockola_charram);
 }
 
 VIDEO_UPDATE( rockola )
@@ -291,8 +291,6 @@ static TILE_GET_INFO( satansat_get_fg_tile_info )
 	int code = rockola_videoram2[tile_index];
 	int color = colorram[tile_index] & 0x03;
 
-	decodechar(machine->gfx[0], code, rockola_charram);
-
 	SET_TILE_INFO(0, code, color, 0);
 }
 
@@ -302,4 +300,6 @@ VIDEO_START( satansat )
 	fg_tilemap = tilemap_create(machine, satansat_get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
+	
+	gfx_element_set_source(machine->gfx[0], rockola_charram);
 }

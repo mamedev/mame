@@ -230,6 +230,18 @@ int palette_get_num_groups(palette_t *palette)
 
 
 /*-------------------------------------------------
+    palette_get_max_index - return the maximum 
+    allowed index (i.e., length of arrays returned 
+    by palette_entry_list*)
+-------------------------------------------------*/
+
+int palette_get_max_index(palette_t *palette)
+{
+	return palette->numcolors * palette->numgroups + 2;
+}
+
+
+/*-------------------------------------------------
     palette_get_black_entry - return the index of
     the black entry
 -------------------------------------------------*/

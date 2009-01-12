@@ -392,7 +392,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 					} else { /* last palette entry is reserved for shadows and highlights */
 
 						/* get a pointer to the current sprite's gfx data */
-						UINT8 *gfx_src = gfx->gfxdata + (number % gfx->total_elements)*gfx->char_modulo;
+						const UINT8 *gfx_src = gfx_element_get_data(gfx, number % gfx->total_elements);
 
 						for (py = 0; py < gfx->height; py++){
 							/* get a pointer to the current line in the screen bitmap */

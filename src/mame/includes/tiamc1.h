@@ -10,13 +10,6 @@ WRITE8_HANDLER( tiamc1_timer1_gate_w );
 
 /*----------- defined in video/tiamc1.c -----------*/
 
-extern UINT8 *tiamc1_charram;
-extern UINT8 *tiamc1_tileram;
-extern UINT8 *tiamc1_spriteram_x;
-extern UINT8 *tiamc1_spriteram_y;
-extern UINT8 *tiamc1_spriteram_n;
-extern UINT8 *tiamc1_spriteram_a;
-
 PALETTE_INIT( tiamc1 );
 VIDEO_START( tiamc1 );
 VIDEO_UPDATE( tiamc1 );

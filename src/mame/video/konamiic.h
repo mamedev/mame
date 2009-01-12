@@ -104,7 +104,7 @@ READ8_HANDLER( K051937_r );
 WRITE8_HANDLER( K051937_w );
 READ16_HANDLER( K051937_word_r );
 WRITE16_HANDLER( K051937_word_w );
-void K051960_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority);
+void K051960_sprites_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority);
 int K051960_is_IRQ_enabled(void);
 int K051960_is_NMI_enabled(void);
 void K051960_set_sprite_offsets(int dx, int dy);
@@ -129,7 +129,7 @@ WRITE16_HANDLER( K053244_lsb_w );
 READ16_HANDLER( K053244_word_r );
 WRITE16_HANDLER( K053244_word_w );
 void K053244_bankselect(int chip, int bank);	/* used by TMNT2, Asterix and Premier Soccer for ROM testing */
-void K053245_sprites_draw(int chip, bitmap_t *bitmap,const rectangle *cliprect);
+void K053245_sprites_draw(running_machine *machine, int chip, bitmap_t *bitmap,const rectangle *cliprect);
 void K053245_sprites_draw_lethal(running_machine *machine, int chip, bitmap_t *bitmap,const rectangle *cliprect); /* for lethal enforcers */
 void K053245_clear_buffer(int chip);
 void K053245_set_SpriteOffset(int chip,int offsx, int offsy);
@@ -254,6 +254,8 @@ READ8_HANDLER( K051733_r );
 
 void K056832_SetExtLinescroll(void);	/* Lethal Enforcers */
 
+#define K056382_DRAW_FLAG_FORCE_XYSCROLL		0x00800000
+
 void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, int bpp, int big,
 			int (*scrolld)[4][2],
 			void (*callback)(int layer, int *code, int *color, int *flags),
@@ -284,8 +286,8 @@ WRITE8_HANDLER( K056832_w );
 WRITE8_HANDLER( K056832_b_w );
 void K056832_mark_plane_dirty(int num);
 void K056832_MarkAllTilemapsDirty(void);
-void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int num, int flags, UINT32 priority);
-void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority);
+void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int num, UINT32 flags, UINT32 priority);
+void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority);
 void K056832_set_LayerAssociation(int status);
 int  K056832_get_LayerAssociation(void);
 void K056832_set_LayerOffset(int layer, int offsx, int offsy);

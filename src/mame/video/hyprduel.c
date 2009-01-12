@@ -408,6 +408,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	int i, pri;
 	static const int primask[4] = { 0x0000, 0xff00, 0xff00|0xf0f0, 0xff00|0xf0f0|0xcccc };
+	UINT8 dirty = 0;
 
 	for (i=0; i<0x20; i++)
 	{
@@ -483,6 +484,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				gfx.line_modulo = width;
 				gfx.char_modulo = 0;	/* doesn't matter */
 				gfx.flags = 0;
+				gfx.dirty = &dirty;
 				gfx.machine = machine;
 
 				/* Bounds checking */
@@ -515,6 +517,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				gfx.line_modulo = width/2;
 				gfx.char_modulo = 0;	/* doesn't matter */
 				gfx.flags = GFX_ELEMENT_PACKED;
+				gfx.dirty = &dirty;
 				gfx.machine = machine;
 
 				/* Bounds checking */

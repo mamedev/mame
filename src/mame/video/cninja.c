@@ -93,8 +93,6 @@ VIDEO_START( mutantf )
 	deco16_set_tilemap_colour_base(1,0x30);
 	deco16_set_tilemap_colour_base(2,0x20);
 	deco16_set_tilemap_colour_base(3,0x40);
-
-	alpha_set_level(0x80);
 }
 
 /******************************************************************************/
@@ -325,7 +323,7 @@ static void mutantf_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	while (offs!=end)
 	{
 		int x,y,sprite,colour,fx,fy,w,h,sx,sy,x_mult,y_mult;
-		int trans=TRANSPARENCY_PEN;
+		int alpha=0xff;
 
 		sprite = spriteptr[offs+3];
 		if (!sprite) {
@@ -347,7 +345,7 @@ static void mutantf_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		colour = (spriteptr[offs+2] >>0) & 0x1f;
 
 		if (gfxbank==4) { /* Seems to be always alpha'd */
-			trans=TRANSPARENCY_ALPHA;
+			alpha=0x80;
 			colour&=0xf;
 		}
 
@@ -380,12 +378,13 @@ static void mutantf_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 		for (x=0; x<w; x++) {
 			for (y=0; y<h; y++) {
-				pdrawgfx(bitmap,machine->gfx[gfxbank],
+				pdrawgfx_alpha(bitmap,cliprect,machine->gfx[gfxbank],
 						sprite + y + h * x,
 						colour,
 						fx,fy,
 						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						cliprect,trans,0,0);
+						priority_bitmap,0,
+						0,alpha);
 			}
 		}
 

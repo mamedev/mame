@@ -131,9 +131,6 @@
             * setting a global palette offset via
                 tilemap_set_palette_offset()
 
-            * setting a global pen data offset via
-                tilemap_set_pen_data_offset()
-
     3. In your memory write handlers for the tile memory, anytime tile
         data is modified, you need to mark the tile dirty so that it is
         re-rendered with the new data the next time the tilemap is drawn.
@@ -282,8 +279,7 @@
         TILEMAP_DRAW_LAYER0 is assumed.
 
     * If you want to render with alpha blending, you can call
-        tilemap_draw() with the TILEMAP_DRAW_ALPHA flag. To configure the
-        amount of alpha blending, call alpha_set_level() ahead of time.
+        tilemap_draw() with the TILEMAP_DRAW_ALPHA flag.
 
     * To configure more complex pen-to-layer mapping, use the
         tilemap_map_pens_to_layer() call. This call takes a group number
@@ -302,6 +298,7 @@
 #define __TILEMAP_H__
 
 #include "mamecore.h"
+#include "drawgfx.h"
 
 
 /***************************************************************************
@@ -323,7 +320,8 @@
 #define TILEMAP_DRAW_LAYER1				0x20		/* draw layer 1 */
 #define TILEMAP_DRAW_LAYER2				0x40		/* draw layer 2 */
 #define TILEMAP_DRAW_OPAQUE				0x80		/* draw everything, even transparent stuff */
-#define TILEMAP_DRAW_ALPHA				0x100		/* draw with alpha blending */
+#define TILEMAP_DRAW_ALPHA_FLAG			0x100		/* draw with alpha blending (in the upper 8 bits) */
+#define TILEMAP_DRAW_ALPHA(x)			(TILEMAP_DRAW_ALPHA_FLAG | (rgb_clamp(x) << 24))
 #define TILEMAP_DRAW_ALL_CATEGORIES		0x200		/* draw all categories */
 
 
@@ -390,13 +388,14 @@ typedef struct _tilemap tilemap;
 typedef struct _tile_data tile_data;
 struct _tile_data
 {
-	const UINT8*	pen_data;		/* required */
-	const UINT8*	mask_data;		/* required */
+	const UINT8 *	pen_data;		/* required */
+	const UINT8 *	mask_data;		/* required */
 	pen_t			palette_base;	/* defaults to 0 */
 	UINT8			category;		/* defaults to 0; range from 0..15 */
 	UINT8			group;			/* defaults to 0; range from 0..TILEMAP_NUM_GROUPS */
 	UINT8			flags;			/* defaults to 0; one or more of TILE_* flags above */
 	UINT8			pen_mask;		/* defaults to 0xff; mask to apply to pen_data while rendering the tile */
+	UINT8			gfxnum;			/* defaults to 0xff; specify index of machine->gfx for auto-invalidation on dirty */
 };
 
 
@@ -441,11 +440,6 @@ void tilemap_set_user_data(tilemap *tmap, void *user_data);
  * It does not apply to the cached pixmap, which is provided by tilemap_get_pixmap().
  */
 void tilemap_set_palette_offset(tilemap *tmap, UINT32 offset);
-
-/* specify an offset to be added to pen_data while rendering tiles.
- * This will automatically mark all tiles dirty if the offset changes.
- */
-void tilemap_set_pen_data_offset(tilemap *tmap, UINT32 offset);
 
 /* set an enable flag for the tilemap; if 0, requests to draw the tilemap are ignored */
 void tilemap_set_enable(tilemap *tmap, int enable);
@@ -570,13 +564,14 @@ TILEMAP_MAPPER( tilemap_scan_cols_flip_xy );
 
 INLINE void tileinfo_set(running_machine *machine, tile_data *tileinfo, int gfxnum, int rawcode, int rawcolor, int flags)
 {
-	const gfx_element *	gfx = machine->gfx[gfxnum];
+	const gfx_element *gfx = machine->gfx[gfxnum];
 	int code = rawcode % gfx->total_elements;
-	tileinfo->pen_data = gfx->gfxdata + code * gfx->char_modulo;
+	tileinfo->pen_data = gfx_element_get_data(gfx, code);
 	tileinfo->palette_base = gfx->color_base + gfx->color_granularity * rawcolor;
 	tileinfo->flags = flags;
 	if (gfx->flags & GFX_ELEMENT_PACKED)
 		tileinfo->flags |= TILE_4BPP;
+	tileinfo->gfxnum = gfxnum;
 }
 
 

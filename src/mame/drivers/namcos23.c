@@ -775,6 +775,7 @@ static WRITE32_HANDLER( namcos23_textram_w )
 
 static VIDEO_START( ss23 )
 {
+	gfx_element_set_source(machine->gfx[0], (UINT8 *)namcos23_charram);
 	bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
 	tilemap_set_transparent_pen(bgtilemap, 0xf);
 }
@@ -936,11 +937,8 @@ static VIDEO_UPDATE( gorgon )
 
 static WRITE32_HANDLER( s23_txtchar_w )
 {
-	COMBINE_DATA(&namcos23_charram[offset]	);
-
-	decodechar( space->machine->gfx[0],offset/32,(UINT8 *)namcos23_charram );
-
-	tilemap_mark_all_tiles_dirty(bgtilemap);
+	COMBINE_DATA(&namcos23_charram[offset]);
+	gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
 }
 
 static READ32_HANDLER( ss23_vstat_r )

@@ -430,23 +430,21 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
     if ( zoomx || zoomy )
     {
-      drawgfxzoom (bitmap,machine->gfx[1],
+      drawgfxzoom_transpen_raw (bitmap,cliprect,machine->gfx[1],
         code,
         color,
         flipx,flipy,
         x,y,
-        cliprect,
-        TRANSPARENCY_PEN_RAW,0,(zx << 16) / 16,(zy << 16) / 16);
+        (zx << 16) / 16,(zy << 16) / 16,0);
     }
     else
     {
-      drawgfx (bitmap,machine->gfx[1],
+      drawgfx_transpen_raw (bitmap,cliprect,machine->gfx[1],
         code,
         color,
         flipx,flipy,
         x,y,
-        cliprect,
-        TRANSPARENCY_PEN_RAW,0);
+        0);
     }
   }
 }

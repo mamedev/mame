@@ -622,7 +622,6 @@ static WRITE32_HANDLER( hng64_pal_w )
 	a = ((paletteram32[offset] & 0xff000000) >>24);
 
 	// a sure ain't alpha.
-	// alpha_set_level(mame_rand(space->machine)) ;
 	// mame_printf_debug("Alpha : %d %d %d %d\n", a, b, g, r) ;
 
 	//if (a != 0)

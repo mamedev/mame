@@ -48,7 +48,7 @@ WRITE16_HANDLER(roundup5_vram_w)
 
 	offset=offset%0xc000;
 
-	decodechar(space->machine->gfx[1],offset/0x10,(UINT8 *)roundup5_vram);
+	gfx_element_mark_dirty(space->machine->gfx[1],offset/0x10);
 }
 
 
@@ -207,6 +207,8 @@ VIDEO_START( roundup5 )
 
 	memset(shadow_pen_array, 0, 8192);
 	tilemap_set_transparent_pen(tx_layer,0);
+
+	gfx_element_set_source(machine->gfx[1], (UINT8 *)roundup5_vram);
 }
 
 VIDEO_START( cyclwarr )
@@ -271,7 +273,7 @@ INLINE void roundupt_drawgfxzoomrotate( running_machine *machine,
 		{
 			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			const UINT8 *shadow_pens = shadow_pen_array + (gfx->color_granularity * (color % gfx->total_colors));
-			int source_base = (code % gfx->total_elements) * gfx->height;
+			const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 			int block_size = 8 * scalex;
 			int sprite_screen_height = ((ssy&0xffff)+block_size)>>16;
@@ -397,7 +399,7 @@ INLINE void roundupt_drawgfxzoomrotate( running_machine *machine,
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
 								{
-									UINT8 *source = gfx->gfxdata + (source_base+((cy>>16))) * gfx->line_modulo;
+									const UINT8 *source = code_base + (cy>>16) * gfx->line_modulo;
 									int c = source[(cx >> 16)];
 									if( c != transparent_color )
 									{
@@ -421,7 +423,7 @@ INLINE void roundupt_drawgfxzoomrotate( running_machine *machine,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * gfx->line_modulo;
+								const UINT8 *source = code_base + (y_index>>16) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 								UINT8 *priority_dest = BITMAP_ADDR8(dest_bmp, y, 0);
 

@@ -52,6 +52,8 @@ static tilemap *bg_tilemap[6];
 static UINT8 *tilemap_maskdata;
 static int copy_sprites;
 
+static UINT8 drawmode_table[16];
+
 
 
 
@@ -126,8 +128,9 @@ VIDEO_START( namcos1 )
 	state_save_register_global_array(machine, namcos1_playfield_control);
 
 	/* set table for sprite color == 0x7f */
-	for (i = 0;i <= 15;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
+	for (i = 0;i < 15;i++)
+		drawmode_table[i] = DRAWMODE_SHADOW;
+	drawmode_table[15] = DRAWMODE_NONE;
 
 	/* clear paletteram */
 	memset(namcos1_paletteram, 0, 0x8000);
@@ -278,7 +281,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	const UINT8 *source = &spriteram[0x0800-0x20];	/* the last is NOT a sprite */
 	const UINT8 *finish = &spriteram[0];
 	gfx_element *gfx = machine->gfx[1];
-	gfx_element mygfx = *gfx;
 
 	int sprite_xoffs = spriteram[0x07f5] + ((spriteram[0x07f4] & 1) << 8);
 	int sprite_yoffs = spriteram[0x07f7];
@@ -318,18 +320,25 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		sy++;	/* sprites are buffered and delayed by one scanline */
 
-		/* change GfxElement parameters to draw only the needed part of the 32x32 tile */
-		mygfx.width = sizex;
-		mygfx.height = sizey;
-		mygfx.gfxdata = gfx->gfxdata + tx + ty * gfx->line_modulo;
-
-		pdrawgfx( bitmap, &mygfx,
-				sprite,
-				color,
-				flipx,flipy,
-				sx & 0x1ff,
-				((sy + 16) & 0xff) - 16,
-				cliprect,(color != 0x7f) ? TRANSPARENCY_PEN : TRANSPARENCY_PEN_TABLE,0xf, pri_mask);
+		gfx_element_set_source_clip(gfx, tx, sizex, ty, sizey);
+		if (color != 0x7f)
+			pdrawgfx_transpen( bitmap, cliprect, gfx,
+					sprite,
+					color,
+					flipx,flipy,
+					sx & 0x1ff,
+					((sy + 16) & 0xff) - 16,
+					priority_bitmap, pri_mask, 
+					0xf);
+		else
+			pdrawgfx_transtable( bitmap, cliprect, gfx,
+					sprite,
+					color,
+					flipx,flipy,
+					sx & 0x1ff,
+					((sy + 16) & 0xff) - 16,
+					priority_bitmap, pri_mask,
+					drawmode_table, machine->shadow_table);
 
 		source -= 0x10;
 	}

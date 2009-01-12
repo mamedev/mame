@@ -1155,6 +1155,16 @@ static const gfx_layout tile8layout =
 	8*8
 };
 
+static const gfx_layout disco_tile8layout =
+{
+	8,8,
+	0x6000/3/8,
+	3,
+	{ 0x4000*8, 0x2000*8, 0x0000*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
+};
 
 
 static const gfx_layout tile16layout =
@@ -1168,7 +1178,16 @@ static const gfx_layout tile16layout =
 	32*8
 };
 
-
+static const gfx_layout disco_tile16layout =
+{
+	16,16,
+	0x6000/3/32,
+	3,
+	{ 0x4000*8, 0x2000*8, 0x0000*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
+	32*8
+};
 
 static const gfx_layout bnj_tile16layout =
 {
@@ -1211,8 +1230,8 @@ static GFXDECODE_START( zoar )
 GFXDECODE_END
 
 static GFXDECODE_START( disco )
-	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,  0, 4 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx1", 0, tile16layout, 0, 4 ) /* sprites */
+	GFXDECODE_ENTRY( NULL, 0, disco_tile8layout,  0, 4 ) /* char set #1 */
+	GFXDECODE_ENTRY( NULL, 0, disco_tile16layout, 0, 4 ) /* sprites */
 GFXDECODE_END
 
 
@@ -1736,9 +1755,6 @@ ROM_START( disco )
 	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "disco.w6",     0xf000, 0x1000, CRC(d81e781e) SHA1(bde510bfed06a13bd56bf7ddbf220e7cf82f79b6) )
 
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 )
-	/* dynamically allocated */
-
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "disco.clr",    0x0000, 0x0020, CRC(a393f913) SHA1(42dce159283427064b3f5ce3a6e2189744ecd943) )
 ROM_END
@@ -1754,9 +1770,6 @@ ROM_START( discof )
 
 	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "disco.w6",     0xf000, 0x1000, CRC(d81e781e) SHA1(bde510bfed06a13bd56bf7ddbf220e7cf82f79b6) )
-
-	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 )
-	/* dynamically allocated */
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "disco.clr",    0x0000, 0x0020, CRC(a393f913) SHA1(42dce159283427064b3f5ce3a6e2189744ecd943) )

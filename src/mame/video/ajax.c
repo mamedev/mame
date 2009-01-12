@@ -112,6 +112,6 @@ VIDEO_UPDATE( ajax )
 	}
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[0],0,8);
 
-	K051960_sprites_draw(bitmap,cliprect,-1,-1);
+	K051960_sprites_draw(screen->machine,bitmap,cliprect,-1,-1);
 	return 0;
 }

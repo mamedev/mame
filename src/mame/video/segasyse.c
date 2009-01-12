@@ -74,7 +74,12 @@ VIDEO_UPDATE( megaplay_normal )
 		segae_drawscanline(screen->machine, i-16,0,0);
 
 	for (i = miny;i <= maxy;i++)
-		draw_scanline8(bitmap,32,i,256,&cache_bitmap[(i-16) * (16+256+16) +24],&screen->machine->pens[palette_base],0);
+	{
+		UINT16 *dest = BITMAP_ADDR16(bitmap, i, 32);
+		int x;
+		for (x = 0; x < 256; x++)
+			dest[x] = screen->machine->pens[palette_base + cache_bitmap[(i-16) * (16+256+16) + 24 + x]];
+	}
 
 	return 0;
 }

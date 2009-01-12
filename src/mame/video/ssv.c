@@ -147,12 +147,13 @@ static void ssv_drawgfx(	bitmap_t *bitmap, const gfx_element *gfx,
 					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 					const rectangle *cliprect, int shadow	)
 {
-	UINT8 *source, *addr, pen;
+	const UINT8 *addr, *source;
+	UINT8 pen;
 	UINT16 *dest;
 	int sx, x1, dx;
 	int sy, y1, dy;
 
-	addr	=	(code  % gfx->total_elements) * gfx->char_modulo + gfx->gfxdata;
+	addr	=	gfx_element_get_data(gfx, code  % gfx->total_elements);
 	color	=	gfx->color_granularity * (color % gfx->total_colors);
 
 	if ( flipx )	{	x1 = x0-1;				x0 += gfx->width-1;		dx = -1;	}
@@ -202,7 +203,9 @@ VIDEO_START( eaglshot )
 	VIDEO_START_CALL(ssv);
 
 	eaglshot_gfxram		=	(UINT16*)auto_malloc(16 * 0x40000);
-	eaglshot_dirty_tile	=	(char*)auto_malloc(16 * 0x40000 / (16*8));
+
+	gfx_element_set_source(machine->gfx[0], (UINT8 *)eaglshot_gfxram);
+	gfx_element_set_source(machine->gfx[1], (UINT8 *)eaglshot_gfxram);
 }
 
 static tilemap *gdfs_tmap;
@@ -223,10 +226,10 @@ VIDEO_START( gdfs )
 {
 	VIDEO_START_CALL(ssv);
 
-	machine->gfx[2]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
-
 	eaglshot_gfxram		=	(UINT16*)auto_malloc(4 * 0x100000);
-	eaglshot_dirty_tile	=	(char*)auto_malloc(4 * 0x100000 / (16*8));
+
+	machine->gfx[2]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
+	gfx_element_set_source(machine->gfx[2], (UINT8 *)eaglshot_gfxram);
 
 	gdfs_tmap			=	tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 											 16,16, 0x100,0x100	);
@@ -245,7 +248,6 @@ int ssv_sprites_offsx, ssv_sprites_offsy;
 int ssv_tilemap_offsx, ssv_tilemap_offsy;
 
 UINT16 *eaglshot_gfxram, *gdfs_tmapram, *gdfs_tmapscroll;
-char eaglshot_dirty, *eaglshot_dirty_tile;
 
 /***************************************************************************
 
@@ -917,27 +919,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( eaglshot )
 {
-	int tile;
-
-	// Decode tiles from ram
-	if (eaglshot_dirty)
-	{
-		eaglshot_dirty = 0;
-
-		for (tile = 0; tile < (16 * 0x40000 / (16*8)); tile++)
-		{
-			if (eaglshot_dirty_tile[tile])
-			{
-				eaglshot_dirty_tile[tile] = 0;
-
-				decodechar(screen->machine->gfx[0], tile, (UINT8 *)eaglshot_gfxram);
-				decodechar(screen->machine->gfx[1], tile, (UINT8 *)eaglshot_gfxram);
-			}
-		}
-	}
-
-	VIDEO_UPDATE_CALL(ssv);
-	return 0;
+	return VIDEO_UPDATE_CALL(ssv);
 }
 
 /*
@@ -1105,25 +1087,9 @@ static void gdfs_draw_zooming_sprites(running_machine *machine, bitmap_t *bitmap
 
 VIDEO_UPDATE( gdfs )
 {
-	int tile, pri;
+	int pri;
 
 	VIDEO_UPDATE_CALL(ssv);
-
-	// Decode zooming sprites tiles from ram
-	if (eaglshot_dirty)
-	{
-		eaglshot_dirty = 0;
-
-		for (tile = 0; tile < (4 * 0x100000 / (16*8)); tile++)
-		{
-			if (eaglshot_dirty_tile[tile])
-			{
-				eaglshot_dirty_tile[tile] = 0;
-
-				decodechar(screen->machine->gfx[2], tile, (UINT8 *)eaglshot_gfxram);
-			}
-		}
-	}
 
 	for (pri = 0; pri <= 0xf; pri++)
 		gdfs_draw_zooming_sprites(screen->machine, bitmap, cliprect, pri);

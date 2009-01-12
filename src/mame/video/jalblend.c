@@ -75,7 +75,7 @@ void jal_blend_drawgfx(running_machine *machine,bitmap_t *dest_bmp,const gfx_ele
 	{
 		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		const UINT8 *alpha = &jal_blend_table[gfx->color_granularity * (color % gfx->total_colors)];
-		UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+		const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 		int x_index_base, y_index, sx, sy, ex, ey;
 		int xinc, yinc;
 
@@ -128,7 +128,7 @@ void jal_blend_drawgfx(running_machine *machine,bitmap_t *dest_bmp,const gfx_ele
 				/* taken from case 7: TRANSPARENCY_ALPHARANGE */
 				for (y = sy; y < ey; y++)
 				{
-					UINT8 *source = source_base + y_index*gfx->line_modulo;
+					const UINT8 *source = source_base + y_index*gfx->line_modulo;
 					UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 					int x_index = x_index_base;
 					for (x = sx; x < ex; x++)
@@ -159,7 +159,7 @@ void jal_blend_drawgfx(running_machine *machine,bitmap_t *dest_bmp,const gfx_ele
 				/* taken from case 7: TRANSPARENCY_ALPHARANGE */
 				for (y = sy; y < ey; y++)
 				{
-					UINT8 *source = source_base + y_index*gfx->line_modulo;
+					const UINT8 *source = source_base + y_index*gfx->line_modulo;
 					UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 					int x_index = x_index_base;
 					for (x = sx; x < ex; x++)

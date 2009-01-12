@@ -36,8 +36,6 @@ static bitmap_t *taitosj_layer_bitmap[3];
 static bitmap_t *sprite_sprite_collbitmap1,*sprite_sprite_collbitmap2;
 static bitmap_t *sprite_layer_collbitmap1;
 static bitmap_t *sprite_layer_collbitmap2[3];
-static UINT8 dirtycharacter1[256],dirtycharacter2[256];
-static UINT8 dirtysprite1[64],dirtysprite2[64];
 
 static const int layer_enable_mask[3] = { 0x10, 0x20, 0x40 };
 
@@ -154,15 +152,6 @@ static void set_pens(running_machine *machine)
 	}
 }
 
-
-static STATE_POSTLOAD( taitosj_postload )
-{
-	memset(dirtycharacter1, 1, sizeof(dirtycharacter1));
-	memset(dirtycharacter2, 1, sizeof(dirtycharacter2));
-	memset(dirtysprite1, 1, sizeof(dirtysprite1));
-	memset(dirtysprite2, 1, sizeof(dirtysprite2));
-}
-
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -214,14 +203,12 @@ VIDEO_START( taitosj )
 	sprite_sprite_collbitmap1 = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
 	sprite_sprite_collbitmap2 = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
 
-	memset(dirtycharacter1, 1, sizeof(dirtycharacter1));
-	memset(dirtycharacter2, 1, sizeof(dirtycharacter2));
-	memset(dirtysprite1, 1, sizeof(dirtysprite1));
-	memset(dirtysprite2, 1, sizeof(dirtysprite2));
+	gfx_element_set_source(machine->gfx[0], taitosj_characterram);
+	gfx_element_set_source(machine->gfx[1], taitosj_characterram);
+	gfx_element_set_source(machine->gfx[2], taitosj_characterram + 0x1800);
+	gfx_element_set_source(machine->gfx[3], taitosj_characterram + 0x1800);
 
 	compute_draw_order(machine);
-
-	state_save_register_postload(machine, taitosj_postload, NULL);
 }
 
 
@@ -253,13 +240,13 @@ WRITE8_HANDLER( taitosj_characterram_w )
 	{
 		if (offset < 0x1800)
 		{
-			dirtycharacter1[(offset / 8) & 0xff] = 1;
-			dirtysprite1[(offset / 32) & 0x3f] = 1;
+			gfx_element_mark_dirty(space->machine->gfx[0], (offset / 8) & 0xff);
+			gfx_element_mark_dirty(space->machine->gfx[1], (offset / 32) & 0x3f);
 		}
 		else
 		{
-			dirtycharacter2[(offset / 8) & 0xff] = 1;
-			dirtysprite2[(offset / 32) & 0x3f] = 1;
+			gfx_element_mark_dirty(space->machine->gfx[2], (offset / 8) & 0xff);
+			gfx_element_mark_dirty(space->machine->gfx[3], (offset / 32) & 0x3f);
 		}
 
 		taitosj_characterram[offset] = data;
@@ -537,44 +524,6 @@ static void check_sprite_layer_collision(running_machine *machine, int *sprites_
 }
 
 
-static void decode_modified(running_machine *machine)
-{
-	offs_t offs;
-
-	/* decode modified characters */
-	for (offs = 0;offs < 256;offs++)
-	{
-		if (dirtycharacter1[offs] == 1)
-		{
-			decodechar(machine->gfx[0], offs, taitosj_characterram);
-			dirtycharacter1[offs] = 0;
-		}
-
-		if (dirtycharacter2[offs] == 1)
-		{
-			decodechar(machine->gfx[2], offs, taitosj_characterram + 0x1800);
-			dirtycharacter2[offs] = 0;
-		}
-	}
-
-	/* decode modified sprites */
-	for (offs = 0;offs < 64;offs++)
-	{
-		if (dirtysprite1[offs] == 1)
-		{
-			decodechar(machine->gfx[1], offs, taitosj_characterram);
-			dirtysprite1[offs] = 0;
-		}
-
-		if (dirtysprite2[offs] == 1)
-		{
-			decodechar(machine->gfx[3], offs, taitosj_characterram + 0x1800);
-			dirtysprite2[offs] = 0;
-		}
-	}
-}
-
-
 static void draw_layers(running_machine *machine)
 {
 	offs_t offs;
@@ -801,8 +750,6 @@ static int video_update_common(running_machine *machine, bitmap_t *bitmap,
 	rectangle sprite_areas[0x20]; 	/* areas on bitmap (sprite locations) */
 
 	set_pens(machine);
-
-	decode_modified(machine);
 
 	draw_layers(machine);
 

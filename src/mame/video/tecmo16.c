@@ -411,31 +411,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx(bitmap,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
 								code + layout[y][x],
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx,sy,
-								cliprect,TRANSPARENCY_PEN_RAW,0,
-								priority_mask);
+								priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
 								code + layout[y][x],
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx-512,sy,
-								cliprect,TRANSPARENCY_PEN_RAW,0,
-								priority_mask);
+								priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
 								code + layout[y][x],
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx+512,sy,
-								cliprect,TRANSPARENCY_PEN_RAW,0,
-								priority_mask);
+								priority_bitmap, priority_mask,0);
 					}
 				}
 			}
@@ -457,31 +454,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 							sx = 256 - (xpos + 8*(!flipx?(sizex-1-x):x) + 8);
 							sy = 256 - (ypos + 8*(!flipy?(sizey-1-y):y) + 8);
 						}
-						pdrawgfx(bitmap,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
 								code + layout[y][x],
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx,sy,
-								cliprect,TRANSPARENCY_PEN_RAW,0,
-								priority_mask);
+								priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
 								code + layout[y][x],
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx-512,sy,
-								cliprect,TRANSPARENCY_PEN_RAW,0,
-								priority_mask);
+								priority_bitmap, priority_mask,0);
 
 						/* wrap around x */
-						pdrawgfx(bitmap,machine->gfx[2],
+						pdrawgfx_transpen_raw(bitmap,cliprect,machine->gfx[2],
 								code + layout[y][x],
 								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx+512,sy,
-								cliprect,TRANSPARENCY_PEN_RAW,0,
-								priority_mask);
+								priority_bitmap, priority_mask,0);
 					}
 				}
 			}

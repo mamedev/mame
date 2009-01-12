@@ -195,7 +195,11 @@ READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 {
 	if (cpu_get_reg(space->cpu, S2650_FO))
-		cvs_character_ram[(0 * 0x800) | 0x400 | character_ram_page_start | offset] = data;
+	{
+		offset |= (0 * 0x800) | 0x400 | character_ram_page_start;
+		cvs_character_ram[offset] = data;
+		gfx_element_mark_dirty(space->machine->gfx[1], offset/8);
+	}
 	else
 		cvs_s2636_0_ram[offset] = data;
 }
@@ -212,7 +216,11 @@ READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 {
 	if (cpu_get_reg(space->cpu, S2650_FO))
-		cvs_character_ram[(1 * 0x800) | 0x400 | character_ram_page_start | offset] = data;
+	{
+		offset |= (1 * 0x800) | 0x400 | character_ram_page_start;
+		cvs_character_ram[offset] = data;
+		gfx_element_mark_dirty(space->machine->gfx[1], offset/8);
+	}
 	else
 		cvs_s2636_1_ram[offset] = data;
 }
@@ -229,7 +237,11 @@ READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 {
 	if (cpu_get_reg(space->cpu, S2650_FO))
-		cvs_character_ram[(2 * 0x800) | 0x400 | character_ram_page_start | offset] = data;
+	{
+		offset |= (2 * 0x800) | 0x400 | character_ram_page_start;
+		cvs_character_ram[offset] = data;
+		gfx_element_mark_dirty(space->machine->gfx[1], offset/8);
+	}
 	else
 		cvs_s2636_2_ram[offset] = data;
 }
@@ -497,6 +509,10 @@ MACHINE_START( cvs )
 	cvs_character_ram = auto_malloc(3 * 0x800);  /* only half is used, but
                                                     by allocating twice the amount,
                                                     we can use the same gfx_layout */
+
+	if (machine->gfx[1] != NULL)
+		gfx_element_set_source(machine->gfx[1], cvs_character_ram);
+	
 	start_393hz_timer(machine);
 
 	/* register state save */
@@ -996,6 +1012,7 @@ static const gfx_layout charlayout =
 
 static GFXDECODE_START( cvs )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 256+4 )
+	GFXDECODE_ENTRY( NULL,   0x0000, charlayout, 0, 256+4 )
 GFXDECODE_END
 
 

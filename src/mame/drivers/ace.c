@@ -61,18 +61,17 @@ static READ8_HANDLER( ace_objpos_r )
 }
 #endif
 
+static VIDEO_START( ace )
+{
+	gfx_element_set_source(machine->gfx[1], ace_characterram);
+	gfx_element_set_source(machine->gfx[2], ace_characterram);
+	gfx_element_set_source(machine->gfx[3], ace_characterram);
+	gfx_element_set_source(machine->gfx[4], ace_scoreram);
+}
+
 static VIDEO_UPDATE( ace )
 {
 	int offs;
-
-	decodechar(screen->machine->gfx[1], 0, ace_characterram);
-	decodechar(screen->machine->gfx[2], 0, ace_characterram);
-	decodechar(screen->machine->gfx[3], 0, ace_characterram);
-
-	for (offs = 0; offs < 8; offs++)
-	{
-		decodechar(screen->machine->gfx[4], offs, ace_scoreram);
-	}
 
 	/* first of all, fill the screen with the background color */
 	bitmap_fill(bitmap, cliprect, 0);
@@ -119,11 +118,6 @@ static PALETTE_INIT( ace )
 }
 
 
-static READ8_HANDLER( ace_characterram_r )
-{
-	return ace_characterram[offset];
-}
-
 static WRITE8_HANDLER( ace_characterram_w )
 {
 	if (ace_characterram[offset] != data)
@@ -134,9 +128,17 @@ static WRITE8_HANDLER( ace_characterram_w )
 			popmessage("write to %04x data=%02x\n", 0x8000+offset, data);
 		}
 		ace_characterram[offset] = data;
+		gfx_element_mark_dirty(space->machine->gfx[1], 0);
+		gfx_element_mark_dirty(space->machine->gfx[2], 0);
+		gfx_element_mark_dirty(space->machine->gfx[3], 0);
 	}
 }
 
+static WRITE8_HANDLER( ace_scoreram_w )
+{
+	ace_scoreram[offset] = data;
+	gfx_element_mark_dirty(space->machine->gfx[4], offset / 32);
+}
 
 static READ8_HANDLER( unk_r )
 {
@@ -152,9 +154,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(&ace_scoreram)	/* 2x2101 */
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_BASE(&ace_scoreram)	/* 2x2101 */
 	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE(&ace_ram2)		/* 2x2101 */
-	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(ace_characterram_r, ace_characterram_w) AM_BASE(&ace_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
+	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_BASE(&ace_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
 
 	AM_RANGE(0xc000, 0xc005) AM_WRITE(ace_objpos_w)
 
@@ -326,6 +328,7 @@ static MACHINE_DRIVER_START( ace )
 	MDRV_PALETTE_LENGTH(2)
 
 	MDRV_PALETTE_INIT(ace)
+	MDRV_VIDEO_START(ace)
 	MDRV_VIDEO_UPDATE(ace)
 
 	/* sound hardware */

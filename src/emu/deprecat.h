@@ -54,4 +54,23 @@
 int cpu_getiloops(const device_config *device);
 
 
+
+/*************************************
+ *
+ *  Graphics decoding. Drivers should
+ *  use the new gfx_element_mark_dirty()
+ *  to explicitly mark tiles dirty, and
+ *  gfx_element_get_data() to fetch a
+ *  pointer to the data (and undirty
+ *  the tile)
+ *
+ *************************************/
+
+/* decode a series of tiles from a particular gfx_element */
+void decodegfx(gfx_element *gfx, UINT32 first, UINT32 count);
+
+void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src);
+
+
+
 #endif	/* __DEPRECAT_H__ */

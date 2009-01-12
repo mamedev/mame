@@ -294,12 +294,6 @@ DrawSpriteInit( running_machine *machine )
 {
 	int i;
 	/* set table for sprite color == 0x0f */
-	for(i = 0;i <= 253;i++)
-	{
-		gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-	}
-	gfx_drawmode_table[254] = DRAWMODE_SHADOW;
-	gfx_drawmode_table[255] = DRAWMODE_NONE;
 	for( i = 0; i<16*256; i++ )
 	{
 		machine->shadow_table[i] = i+0x2000;
@@ -334,10 +328,7 @@ ApplyClip( rectangle *clip, const rectangle *cliprect )
 	clip->min_y = GetPaletteRegister(2) - 0x21;
 	clip->max_y = GetPaletteRegister(3) - 0x21 - 1;
 	/* intersect with master clip rectangle */
-	if( clip->min_x < cliprect->min_x ){ clip->min_x = cliprect->min_x; }
-	if( clip->min_y < cliprect->min_y ){ clip->min_y = cliprect->min_y; }
-	if( clip->max_x > cliprect->max_x ){ clip->max_x = cliprect->max_x; }
-	if( clip->max_y > cliprect->max_y ){ clip->max_y = cliprect->max_y; }
+	sect_rect(clip, cliprect);
 } /* ApplyClip */
 
 VIDEO_UPDATE( namcos2_default )

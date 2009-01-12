@@ -460,6 +460,7 @@ static int mastboy_m5205_sambit0, mastboy_m5205_sambit1;
 
 static VIDEO_START(mastboy)
 {
+	gfx_element_set_source(machine->gfx[0], mastboy_vram);
 }
 
 static VIDEO_UPDATE(mastboy)
@@ -563,7 +564,7 @@ static WRITE8_HANDLER( banked_ram_w )
 			mastboy_vram[offs] = data^0xff;
 
 			/* Decode the new tile */
-			decodechar(space->machine->gfx[0], offs/32, mastboy_vram);
+			gfx_element_mark_dirty(space->machine->gfx[0], offs/32);
 		}
 	}
 	else

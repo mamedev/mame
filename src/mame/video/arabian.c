@@ -386,7 +386,7 @@ VIDEO_UPDATE( arabian )
 	{
 		/* non-flipped case */
 		if (!arabian_flip_screen)
-			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &main_bitmap[y * BITMAP_WIDTH], pens, -1);
+			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &main_bitmap[y * BITMAP_WIDTH], pens);
 
 		/* flipped case */
 		else
@@ -395,7 +395,7 @@ VIDEO_UPDATE( arabian )
 			int x;
 			for (x = 0; x < BITMAP_WIDTH; x++)
 				scanline[BITMAP_WIDTH - 1 - x] = main_bitmap[y * BITMAP_WIDTH + x];
-			draw_scanline8(bitmap, 0, BITMAP_HEIGHT - 1 - y, BITMAP_WIDTH, scanline, pens, -1);
+			draw_scanline8(bitmap, 0, BITMAP_HEIGHT - 1 - y, BITMAP_WIDTH, scanline, pens);
 		}
 	}
 	return 0;

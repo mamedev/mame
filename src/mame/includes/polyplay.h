@@ -14,5 +14,6 @@ SAMPLES_START( polyplay_sh_start );
 extern UINT8 *polyplay_characterram;
 
 PALETTE_INIT( polyplay );
+VIDEO_START( polyplay );
 VIDEO_UPDATE( polyplay );
 WRITE8_HANDLER( polyplay_characterram_w );

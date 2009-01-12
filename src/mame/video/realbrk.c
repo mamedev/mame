@@ -222,8 +222,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	rectangle spritetile_clip;
 	spritetile_clip.min_x = 0;
 	spritetile_clip.min_y = 0;
-	spritetile_clip.max_x = 32;
-	spritetile_clip.max_y = 32;
+	spritetile_clip.max_x = 31;
+	spritetile_clip.max_y = 31;
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{
@@ -314,14 +314,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				switch( rot )
 				{
 					case 0x10: // rot 90
-						copyrozbitmap( tmpbitmap1, tmpbitmap0,
+						copyrozbitmap_trans( tmpbitmap1, NULL, tmpbitmap0,
 							(UINT32)0<<16,
 							(UINT32)16<<16,
 							0 << 16,
 							-1 << 16,
 							1 << 16,
 							0 << 16,
-							0, cliprect, TRANSPARENCY_PEN, 0, 0 );
+							0, 0 );
 
 							currx = (sx - (y+1) * ydim) / 0x10000;
 							curry = (sy + x * xdim) / 0x10000;
@@ -330,14 +330,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 						break;
 
 					case 0x20: // rot 180
-						copyrozbitmap( tmpbitmap1, tmpbitmap0,
+						copyrozbitmap_trans( tmpbitmap1, NULL, tmpbitmap0,
 							(UINT32)16<<16,
 							(UINT32)16<<16,
 							-1 << 16,
 							0 << 16,
 							0 << 16,
 							-1 << 16,
-							0, cliprect, TRANSPARENCY_PEN, 0, 0 );
+							0, 0 );
 
 							currx = (sx - (x+1) * xdim) / 0x10000;
 							curry = (sy - (y+1) * ydim) / 0x10000;
@@ -346,14 +346,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 						break;
 
 					case 0x30: // rot 270
-						copyrozbitmap( tmpbitmap1, tmpbitmap0,
+						copyrozbitmap_trans( tmpbitmap1, NULL, tmpbitmap0,
 							(UINT32)16<<16,
 							(UINT32)0<<16,
 							0 << 16,
 							1 << 16,
 							-1 << 16,
 							0 << 16,
-							0, cliprect, TRANSPARENCY_PEN, 0, 0 );
+							0, 0 );
 
 							currx = (sx + y * ydim) / 0x10000;
 							curry = (sy - (x+1) * xdim) / 0x10000;

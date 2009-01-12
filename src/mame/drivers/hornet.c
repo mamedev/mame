@@ -332,8 +332,7 @@ static UINT32 jvs_sdata_ptr = 0;
 
 static UINT32 *K037122_tile_ram[MAX_K037122_CHIPS];
 static UINT32 *K037122_char_ram[MAX_K037122_CHIPS];
-static UINT8 *K037122_dirty_map[MAX_K037122_CHIPS];
-static int K037122_gfx_index[MAX_K037122_CHIPS], K037122_char_dirty[MAX_K037122_CHIPS];
+static int K037122_gfx_index[MAX_K037122_CHIPS];
 static tilemap *K037122_layer[MAX_K037122_CHIPS][2];
 static UINT32 *K037122_reg[MAX_K037122_CHIPS];
 
@@ -410,13 +409,6 @@ static TILE_GET_INFO( K037122_1_tile_info_layer1 )
 	SET_TILE_INFO(K037122_gfx_index[1], tile, color, flags);
 }
 
-static STATE_POSTLOAD( K037122_postload )
-{
-	int chip = (FPTR)param;
-	K037122_char_dirty[chip] = 1;
-	memset(K037122_dirty_map[chip], 1, K037122_NUM_TILES);
-}
-
 static int K037122_vh_start(running_machine *machine, int chip)
 {
 	for(K037122_gfx_index[chip] = 0; K037122_gfx_index[chip] < MAX_GFX_ELEMENTS; K037122_gfx_index[chip]++)
@@ -428,8 +420,6 @@ static int K037122_vh_start(running_machine *machine, int chip)
 	K037122_char_ram[chip] = auto_malloc(0x200000);
 
 	K037122_tile_ram[chip] = auto_malloc(0x20000);
-
-	K037122_dirty_map[chip] = auto_malloc(K037122_NUM_TILES);
 
 	K037122_reg[chip] = auto_malloc(0x400);
 
@@ -449,39 +439,15 @@ static int K037122_vh_start(running_machine *machine, int chip)
 
 	memset(K037122_char_ram[chip], 0, 0x200000);
 	memset(K037122_tile_ram[chip], 0, 0x20000);
-	memset(K037122_dirty_map[chip], 0, K037122_NUM_TILES);
 	memset(K037122_reg[chip], 0, 0x400);
 
-	machine->gfx[K037122_gfx_index[chip]] = allocgfx(machine, &K037122_char_layout);
-	decodegfx(machine->gfx[K037122_gfx_index[chip]], (UINT8*)K037122_char_ram[chip], 0, machine->gfx[K037122_gfx_index[chip]]->total_elements);
-
-	machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[K037122_gfx_index[chip]] = gfx_element_alloc(machine, &K037122_char_layout, (UINT8*)K037122_char_ram[chip], machine->config->total_colors / 16, 0);
 
 	state_save_register_item_pointer(machine, "K037122", NULL, chip, K037122_reg[chip], 0x400/sizeof(K037122_reg[chip][0]));
 	state_save_register_item_pointer(machine, "K037122", NULL, chip, K037122_char_ram[chip], 0x200000/sizeof(K037122_char_ram[chip][0]));
 	state_save_register_item_pointer(machine, "K037122", NULL, chip, K037122_tile_ram[chip], 0x20000/sizeof(K037122_tile_ram[chip][0]));
-	state_save_register_postload(machine, K037122_postload, (void *)(FPTR)chip);
 
 	return 0;
-}
-
-static void K037122_tile_update(running_machine *machine, int chip)
-{
-	if (K037122_char_dirty[chip])
-	{
-		int i;
-		for (i=0; i < K037122_NUM_TILES; i++)
-		{
-			if (K037122_dirty_map[chip][i])
-			{
-				K037122_dirty_map[chip][i] = 0;
-				decodechar(machine->gfx[K037122_gfx_index[chip]], i, (UINT8 *)K037122_char_ram[chip]);
-			}
-		}
-		tilemap_mark_all_tiles_dirty(K037122_layer[chip][0]);
-		tilemap_mark_all_tiles_dirty(K037122_layer[chip][1]);
-		K037122_char_dirty[chip] = 0;
-	}
 }
 
 static void K037122_tile_draw(running_machine *machine, int chip, bitmap_t *bitmap, const rectangle *cliprect)
@@ -576,8 +542,7 @@ static WRITE32_HANDLER(K037122_char_w)
 	addr = offset + (bank * (0x40000/4));
 
 	COMBINE_DATA(K037122_char_ram[chip] + addr);
-	K037122_dirty_map[chip][addr / 32] = 1;
-	K037122_char_dirty[chip] = 1;
+	gfx_element_mark_dirty(space->machine->gfx[K037122_gfx_index[chip]], addr / 32);
 }
 
 static READ32_HANDLER(K037122_reg_r)
@@ -629,7 +594,6 @@ static VIDEO_UPDATE( hornet )
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
-	K037122_tile_update(screen->machine, 0);
 	K037122_tile_draw(screen->machine, 0, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
@@ -645,7 +609,6 @@ static VIDEO_UPDATE( hornet_2board )
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
-		K037122_tile_update(screen->machine, 0);
 		K037122_tile_draw(screen->machine, 0, bitmap, cliprect);
 	}
 	else if (strcmp(screen->tag, "right") == 0)
@@ -654,7 +617,6 @@ static VIDEO_UPDATE( hornet_2board )
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
-		K037122_tile_update(screen->machine, 1);
 		K037122_tile_draw(screen->machine, 1, bitmap, cliprect);
 	}
 

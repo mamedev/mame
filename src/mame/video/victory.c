@@ -1113,10 +1113,10 @@ VIDEO_UPDATE( victory )
 	/* blend the bitmaps and do collision detection */
 	for (y = 0; y < 256; y++)
 	{
+		UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 		UINT8 sy = scrolly + y;
 		UINT8 *fg = &fgbitmap[y * 256];
 		UINT8 *bg = &bgbitmap[sy * 256];
-		UINT8 scanline[256];
 
 		/* do the blending */
 		for (x = 0; x < 256; x++)
@@ -1127,9 +1127,6 @@ VIDEO_UPDATE( victory )
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
 				timer_set(screen->machine, video_screen_get_time_until_pos(screen, y, x), NULL, x | (y << 8), bgcoll_irq_callback);
 		}
-
-		/* draw the scanline */
-		draw_scanline8(bitmap, 0, y, 256, scanline, NULL, -1);
 	}
 
 	return 0;

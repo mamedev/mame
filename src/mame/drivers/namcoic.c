@@ -278,7 +278,7 @@ static void zdrawgfxzoom(running_machine *machine,
 		{
 			int shadow_offset = (machine->config->video_attributes&VIDEO_HAS_SHADOWS)?machine->config->total_colors:0;
 			const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+			const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
 			int sprite_screen_width = (scalex*gfx->width+0x8000)>>16;
 			if (sprite_screen_width && sprite_screen_height)
@@ -348,7 +348,7 @@ static void zdrawgfxzoom(running_machine *machine,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+								const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 								UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
 								int x, x_index = x_index_base;
@@ -470,25 +470,23 @@ namcos2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle
 				int scaley = (sizey<<16)/((word0&0x0200)?0x20:0x10);
 				if(scalex && scaley)
 				{
-					gfx_element gfx = *machine->gfx[rgn];
+					gfx_element *gfx = machine->gfx[rgn];
+
 					if( (word0&0x0200)==0 )
-					{
-						gfx.width = 16;
-						gfx.height = 16;
-						if( word1&0x0001 ) gfx.gfxdata += 16;
-						if( word1&0x0002 ) gfx.gfxdata += 16*gfx.line_modulo;
-					}
+						gfx_element_set_source_clip(gfx, (word1&0x0001) ? 16 : 0, 16, (word1&0x0002) ? 16 : 0, 16);
+					else
+						gfx_element_set_source_clip(gfx, 0, 32, 0, 32);
+
 					zdrawgfxzoom(
 						machine,
 						bitmap,
-						&gfx,
+						gfx,
 						sprn,
 						color,
 						flipx,flipy,
 						xpos,ypos,
 						cliprect,
 						TRANSPARENCY_PEN,0xff,
-						//(color==0x0f ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN),0xff,
 						scalex,scaley,
 						loop );
 				}
@@ -1508,8 +1506,6 @@ WRITE32_HANDLER( namco_rozvideoram32_le_w )
  *      0x1fffd             always 0xffff 0xffff?
  */
 static UINT16 *mpRoadRAM; /* at 0x880000 in Final Lap; at 0xa00000 in Lucky&Wild */
-static UINT8 *mpRoadDirty;
-static int mbRoadSomethingIsDirty;
 static int mRoadGfxBank;
 static tilemap *mpRoadTilemap;
 static pen_t mRoadTransparentColor;
@@ -1572,70 +1568,29 @@ WRITE16_HANDLER( namco_road16_w )
 	else
 	{
 		offset -= 0x10000/2;
-		if( offset<ROAD_TILE_COUNT_MAX*WORDS_PER_ROAD_TILE )
-		{
-			mpRoadDirty[offset/WORDS_PER_ROAD_TILE] = 1;
-			mbRoadSomethingIsDirty = 1;
-		}
+		gfx_element_mark_dirty(space->machine->gfx[mRoadGfxBank], offset/WORDS_PER_ROAD_TILE);
 	}
-}
-
-static void
-UpdateRoad(running_machine *machine)
-{
-	int i;
-	if( mbRoadSomethingIsDirty )
-	{
-		for( i=0; i<ROAD_TILE_COUNT_MAX; i++ )
-		{
-			if( mpRoadDirty[i] )
-			{
-				decodechar(
-					machine->gfx[mRoadGfxBank],
-					i,
-					0x10000+(UINT8 *)mpRoadRAM);
-				mpRoadDirty[i] = 0;
-			}
-		}
-		tilemap_mark_all_tiles_dirty( mpRoadTilemap );
-		mbRoadSomethingIsDirty = 0;
-	}
-}
-
-static STATE_POSTLOAD( RoadMarkAllDirty )
-{
-	memset( mpRoadDirty,0x01,ROAD_TILE_COUNT_MAX );
-	mbRoadSomethingIsDirty = 1;
 }
 
 void
 namco_road_init(running_machine *machine, int gfxbank )
 {
+	gfx_element *pGfx;
+	
 	mbRoadNeedTransparent = 0;
 	mRoadGfxBank = gfxbank;
-	mpRoadDirty = auto_malloc(ROAD_TILE_COUNT_MAX);
-	{
-		memset( mpRoadDirty,0x00,ROAD_TILE_COUNT_MAX );
-		mbRoadSomethingIsDirty = 0;
-		mpRoadRAM = auto_malloc(0x20000);
-		{
-			gfx_element *pGfx = allocgfx( machine, &RoadTileLayout );
-				decodegfx(pGfx, 0x10000+(UINT8 *)mpRoadRAM, 0, pGfx->total_elements);
-				pGfx->color_base = 0xf00;
-				pGfx->total_colors = 0x3f;
 
-				machine->gfx[gfxbank] = pGfx;
-				mpRoadTilemap = tilemap_create(machine,
-					get_road_info,tilemap_scan_rows,
-					ROAD_TILE_SIZE,ROAD_TILE_SIZE,
-					ROAD_COLS,ROAD_ROWS);
+	mpRoadRAM = auto_malloc(0x20000);
 
-					state_save_register_global_pointer(machine, mpRoadDirty, ROAD_TILE_COUNT_MAX);
-					state_save_register_global_pointer(machine, mpRoadRAM,   0x20000 / 2);
-					state_save_register_postload(machine, RoadMarkAllDirty, NULL);
+	pGfx = gfx_element_alloc( machine, &RoadTileLayout, 0x10000+(UINT8 *)mpRoadRAM, 0x3f, 0xf00);
 
-		}
-	}
+	machine->gfx[gfxbank] = pGfx;
+	mpRoadTilemap = tilemap_create(machine,
+		get_road_info,tilemap_scan_rows,
+		ROAD_TILE_SIZE,ROAD_TILE_SIZE,
+		ROAD_COLS,ROAD_ROWS);
+
+	state_save_register_global_pointer(machine, mpRoadRAM,   0x20000 / 2);
 } /* namco_road_init */
 
 void
@@ -1652,8 +1607,6 @@ namco_road_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cli
 	bitmap_t *pSourceBitmap;
 	unsigned yscroll;
 	int i;
-
-	UpdateRoad(machine);
 
 	pSourceBitmap = tilemap_get_pixmap(mpRoadTilemap);
 	yscroll = mpRoadRAM[0x1fdfe/2];

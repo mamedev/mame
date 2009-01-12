@@ -27,6 +27,10 @@
 #endif /* MESS */
 
 
+// temporary: set this to 1 to pre-decode graphics like we used to
+#define PREDECODE_GFX		(0)
+
+
 
 /***************************************************************************
     CONSTANTS

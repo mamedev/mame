@@ -127,6 +127,12 @@ static TILE_GET_INFO( get_tile_info_FG )
 	SET_TILE_INFO(0, madalien_videoram[tile_index], 0, 0);
 }
 
+WRITE8_HANDLER( madalien_videoram_w )
+{
+	madalien_videoram[offset] = data;
+	tilemap_mark_tile_dirty(tilemap_fg, offset);
+}
+
 
 static VIDEO_START( madalien )
 {
@@ -159,6 +165,8 @@ static VIDEO_START( madalien )
 	}
 
 	headlight_bitmap = auto_bitmap_alloc(128, 128, BITMAP_FORMAT_INDEXED16);
+
+	gfx_element_set_source(machine->gfx[0], madalien_charram);
 
 	drawgfx(headlight_bitmap, machine->gfx[2], 0, 0, 0, 0, 0x00, 0x00, NULL, TRANSPARENCY_NONE, 0);
 	drawgfx(headlight_bitmap, machine->gfx[2], 0, 0, 0, 1, 0x00, 0x40, NULL, TRANSPARENCY_NONE, 0);
@@ -240,14 +248,15 @@ static void draw_headlight(bitmap_t *bitmap, const rectangle *cliprect, int flip
 
 static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int flip)
 {
-	int i;
-
-	for (i = 0; i < 256; i++)
-		decodechar(machine->gfx[0], i, madalien_charram);
-
-	tilemap_mark_all_tiles_dirty(tilemap_fg);
 	tilemap_set_flip(tilemap_fg, flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	tilemap_draw(bitmap, cliprect, tilemap_fg, 0, 0);
+}
+
+
+WRITE8_HANDLER( madalien_charram_w )
+{
+	madalien_charram[offset] = data;
+	gfx_element_mark_dirty(space->machine->gfx[0], (offset/8) & 0xff);
 }
 
 

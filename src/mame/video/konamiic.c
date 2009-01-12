@@ -1212,11 +1212,7 @@ static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UIN
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	machine->gfx[gfx_index] = allocgfx(machine, &gl);
-	decodegfx(machine->gfx[gfx_index], data, 0, machine->gfx[gfx_index]->total_elements);
-
-	/* set the color information */
-	machine->gfx[gfx_index]->total_colors = machine->config->total_colors / (1 << bpp);
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, &gl, data, machine->config->total_colors >> bpp, 0);
 }
 
 
@@ -2477,7 +2473,7 @@ static int K051960_irq_enabled, K051960_nmi_enabled;
 void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority,int *shadow))
 {
-	int gfx_index,i;
+	int gfx_index;
 	UINT32 total;
 	static const gfx_layout spritelayout =
 	{
@@ -2547,12 +2543,6 @@ void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int
 
 	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
-
-	/* prepare shadow draw table */
-	gfx_drawmode_table[0] = DRAWMODE_NONE;
-	for (i = 1;i < 15;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-	gfx_drawmode_table[15] = DRAWMODE_SHADOW;
 
 	K051960_dx = K051960_dy = 0;
 
@@ -2730,11 +2720,15 @@ WRITE16_HANDLER( K051937_word_w )
  * Note that Aliens also uses the shadow bit to select the second sprite bank.
  */
 
-void K051960_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority)
+void K051960_sprites_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority)
 {
 #define NUM_SPRITES 128
 	int offs,pri_code;
 	int sortedlist[NUM_SPRITES];
+	UINT8 drawmode_table[256];
+	
+	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
+	drawmode_table[0] = DRAWMODE_NONE;
 
 	for (offs = 0;offs < NUM_SPRITES;offs++)
 		sortedlist[offs] = -1;
@@ -2812,6 +2806,8 @@ void K051960_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect,int min_pri
 			flipy = !flipy;
 		}
 
+		drawmode_table[K051960_gfx->color_granularity-1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{
 			int sx,sy;
@@ -2831,19 +2827,20 @@ void K051960_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect,int min_pri
 					else c += yoffset[y];
 
 					if (max_priority == -1)
-						pdrawgfx(bitmap,K051960_gfx,
+						pdrawgfx_transtable(bitmap,cliprect,K051960_gfx,
 								c,
 								color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,pri);
+								priority_bitmap,pri,
+								drawmode_table,machine->shadow_table);
 					else
-						drawgfx(bitmap,K051960_gfx,
+						drawgfx_transtable(bitmap,cliprect,K051960_gfx,
 								c,
 								color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0);
+								drawmode_table,machine->shadow_table);
 				}
 			}
 		}
@@ -2868,21 +2865,22 @@ void K051960_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect,int min_pri
 					else c += yoffset[y];
 
 					if (max_priority == -1)
-						pdrawgfxzoom(bitmap,K051960_gfx,
+						pdrawgfxzoom_transtable(bitmap,cliprect,K051960_gfx,
 								c,
 								color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-								(zw << 16) / 16,(zh << 16) / 16,pri);
+								(zw << 16) / 16,(zh << 16) / 16,
+								priority_bitmap,pri,
+								drawmode_table,machine->shadow_table);
 					else
-						drawgfxzoom(bitmap,K051960_gfx,
+						drawgfxzoom_transtable(bitmap,cliprect,K051960_gfx,
 								c,
 								color,
 								flipx,flipy,
 								sx & 0x1ff,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-								(zw << 16) / 16,(zh << 16) / 16);
+								(zw << 16) / 16,(zh << 16) / 16,
+								drawmode_table,machine->shadow_table);
 				}
 			}
 		}
@@ -2999,7 +2997,7 @@ static int K053245_dx[MAX_K053245_CHIPS], K053245_dy[MAX_K053245_CHIPS];
 void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority))
 {
-	int gfx_index,i;
+	int gfx_index;
 	UINT32 total;
 	static const gfx_layout spritelayout =
 	{
@@ -3042,11 +3040,6 @@ void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 
-	/* prepare shadow draw table */
-	gfx_drawmode_table[0] = DRAWMODE_NONE;
-	for (i = 1;i < 15;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-	gfx_drawmode_table[15] = DRAWMODE_SHADOW;
 	K05324x_z_rejection = -1;
 	K053245_memory_region[chip] = gfx_memory_region;
 	K053245_gfx[chip] = machine->gfx[gfx_index];
@@ -3244,12 +3237,16 @@ void K053244_bankselect(int chip, int bank)
  * The rest of the sprite remains normal.
  */
 
-void K053245_sprites_draw(int chip, bitmap_t *bitmap,const rectangle *cliprect) //*
+void K053245_sprites_draw(running_machine *machine, int chip, bitmap_t *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 128
 	int offs,pri_code,i;
 	int sortedlist[NUM_SPRITES];
 	int flipscreenX, flipscreenY, spriteoffsX, spriteoffsY;
+	UINT8 drawmode_table[256];
+	
+	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
+	drawmode_table[0] = DRAWMODE_NONE;
 
 	flipscreenX = K053244_regs[chip][5] & 0x01;
 	flipscreenY = K053244_regs[chip][5] & 0x02;
@@ -3372,6 +3369,8 @@ void K053245_sprites_draw(int chip, bitmap_t *bitmap,const rectangle *cliprect) 
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
+		drawmode_table[K053245_gfx[chip]->color_granularity-1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+
 		for (y = 0;y < h;y++)
 		{
 			int sx,sy,zw,zh;
@@ -3434,22 +3433,24 @@ void K053245_sprites_draw(int chip, bitmap_t *bitmap,const rectangle *cliprect) 
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					pdrawgfx(bitmap,K053245_gfx[chip],
+					pdrawgfx_transtable(bitmap,cliprect,K053245_gfx[chip],
 							c,
 							color,
 							fx,fy,
 							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,pri);
+							priority_bitmap,pri,
+							drawmode_table,machine->shadow_table);
 				}
 				else
 				{
-					pdrawgfxzoom(bitmap,K053245_gfx[chip],
+					pdrawgfxzoom_transtable(bitmap,cliprect,K053245_gfx[chip],
 							c,
 							color,
 							fx,fy,
 							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-							(zw << 16) / 16,(zh << 16) / 16,pri);
+							(zw << 16) / 16,(zh << 16) / 16,
+							priority_bitmap,pri,
+							drawmode_table,machine->shadow_table);
 
 				}
 			}
@@ -3479,6 +3480,10 @@ void K053245_sprites_draw_lethal(running_machine *machine,int chip, bitmap_t *bi
 	int offs,pri_code,i;
 	int sortedlist[NUM_SPRITES];
 	int flipscreenX, flipscreenY, spriteoffsX, spriteoffsY;
+	UINT8 drawmode_table[256];
+	
+	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
+	drawmode_table[0] = DRAWMODE_NONE;
 
 	flipscreenX = K053244_regs[chip][5] & 0x01;
 	flipscreenY = K053244_regs[chip][5] & 0x02;
@@ -3601,6 +3606,8 @@ void K053245_sprites_draw_lethal(running_machine *machine,int chip, bitmap_t *bi
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
 
+		drawmode_table[machine->gfx[0]->color_granularity-1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+
 		for (y = 0;y < h;y++)
 		{
 			int sx,sy,zw,zh;
@@ -3663,22 +3670,24 @@ void K053245_sprites_draw_lethal(running_machine *machine,int chip, bitmap_t *bi
 
 				if (zoomx == 0x10000 && zoomy == 0x10000)
 				{
-					pdrawgfx(bitmap,machine->gfx[0], /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					pdrawgfx_transtable(bitmap,cliprect,machine->gfx[0], /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,
 							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,pri);
+							priority_bitmap,pri,
+							drawmode_table,machine->shadow_table);
 				}
 				else
 				{
-					pdrawgfxzoom(bitmap,machine->gfx[0],  /* hardcoded to 0 (decoded 6bpp gfx) for le */
+					pdrawgfxzoom_transtable(bitmap,cliprect,machine->gfx[0],  /* hardcoded to 0 (decoded 6bpp gfx) for le */
 							c,
 							color,
 							fx,fy,
 							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-							(zw << 16) / 16,(zh << 16) / 16,pri);
+							(zw << 16) / 16,(zh << 16) / 16,
+							priority_bitmap,pri,
+							drawmode_table,machine->shadow_table);
 
 				}
 			}
@@ -3747,7 +3756,7 @@ void K053247_wraparound_enable(int status)
 void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, int dx, int dy, int plane_order,
 					 void (*callback)(int *code,int *color,int *priority))
 {
-	int gfx_index,i;
+	int gfx_index;
 	UINT32 total;
 	static const gfx_layout spritelayout =
 	{
@@ -3794,12 +3803,6 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 			popmessage("driver should use VIDEO_HAS_SHADOWS");
 	}
 	}
-
-	/* prepare shadow draw table */
-	gfx_drawmode_table[0] = DRAWMODE_NONE;
-	for (i = 1;i < 15;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-	gfx_drawmode_table[15] = DRAWMODE_SHADOW;
 
 	K053247_dx = dx;
 	K053247_dy = dy;
@@ -3871,7 +3874,7 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 		16*16*6
 	};
 	UINT8 *s1, *s2, *d;
-	long i, c;
+	long i;
 	UINT16 *K055673_rom;
 	int size4;
 
@@ -3929,13 +3932,6 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 
 	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
-
-	/* prepare shadow draw table */
-	c = machine->gfx[gfx_index]->color_granularity-1;
-	gfx_drawmode_table[0] = DRAWMODE_NONE;
-	for (i = 1;i < c;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-	gfx_drawmode_table[c] = DRAWMODE_SHADOW;
 
 	K053247_dx = dx;
 	K053247_dy = dy;
@@ -4221,8 +4217,15 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 	int offx = (short)((K053246_regs[0] << 8) | K053246_regs[1]);
 	int offy = (short)((K053246_regs[2] << 8) | K053246_regs[3]);
 
-	int solidpens = K053247_gfx->color_granularity - 1;
 	int screen_width = video_screen_get_width(machine->primary_screen);
+	UINT8 drawmode_table[256];
+	UINT8 shadowmode_table[256];
+	UINT8 *whichtable;
+	
+	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
+	drawmode_table[0] = DRAWMODE_NONE;
+	memset(shadowmode_table, DRAWMODE_SHADOW, sizeof(shadowmode_table));
+	shadowmode_table[0] = DRAWMODE_NONE;
 
 	/*
         safeguard older drivers missing any of the following video attributes:
@@ -4393,13 +4396,14 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 		if (mirrorx) flipx = 0; // documented and confirmed
 		mirrory = shadow & 0x8000;
 
+		whichtable = drawmode_table;
 		if (color == -1)
 		{
 			// drop the entire sprite to shadow unconditionally
 			if (shdmask < 0) continue;
 			color = 0;
 			shadow = -1;
-			for (temp=1; temp<solidpens; temp++) gfx_drawmode_table[temp] = DRAWMODE_SHADOW;
+			whichtable = shadowmode_table;
 			palette_set_shadow_mode(machine, 0);
 		}
 		else
@@ -4447,6 +4451,8 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 		/* the coordinates given are for the *center* of the sprite */
 		ox -= (zoomx * w) >> 13;
 		oy -= (zoomy * h) >> 13;
+
+		drawmode_table[K053247_gfx->color_granularity-1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 
 		for (y = 0;y < h;y++)
 		{
@@ -4505,51 +4511,52 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 
 				if (nozoom)
 				{
-					pdrawgfx(bitmap,K053247_gfx,
+					pdrawgfx_transtable(bitmap,cliprect,K053247_gfx,
 							c,
 							color,
 							fx,fy,
 							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,primask);
+							priority_bitmap,primask,
+							whichtable,machine->shadow_table);
 				}
 				else
 				{
-					pdrawgfxzoom(bitmap,K053247_gfx,
+					pdrawgfxzoom_transtable(bitmap,cliprect,K053247_gfx,
 							c,
 							color,
 							fx,fy,
 							sx,sy,
-							cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-							(zw << 16) >> 4,(zh << 16) >> 4,primask);
+							(zw << 16) >> 4,(zh << 16) >> 4,
+							priority_bitmap,primask,
+							whichtable,machine->shadow_table);
 				}
 
 				if (mirrory && h == 1)  /* Simpsons shadows */
 				{
 					if (nozoom)
 					{
-						pdrawgfx(bitmap,K053247_gfx,
+						pdrawgfx_transtable(bitmap,cliprect,K053247_gfx,
 								c,
 								color,
 								fx,!fy,
 								sx,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,primask);
+								priority_bitmap,primask,
+								whichtable,machine->shadow_table);
 					}
 					else
 					{
-						pdrawgfxzoom(bitmap,K053247_gfx,
+						pdrawgfxzoom_transtable(bitmap,cliprect,K053247_gfx,
 								c,
 								color,
 								fx,!fy,
 								sx,sy,
-								cliprect,shadow ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN,0,
-								(zw << 16) >> 4,(zh << 16) >> 4,primask);
+								(zw << 16) >> 4,(zh << 16) >> 4,
+								priority_bitmap,primask,
+								whichtable,machine->shadow_table);
 					}
 				}
 			} // end of X loop
 		} // end of Y loop
-
-		// reset drawmode_table
-		if (shadow == -1) for (temp=1; temp<solidpens; temp++) gfx_drawmode_table[temp] = DRAWMODE_SOURCE;
 
 	} // end of sprite-list loop
 #undef NUM_SPRITES
@@ -6488,7 +6495,7 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 
 			UINT8 code_transparent, code_opaque;
 			const pen_t *pal_ptr;
-			const UINT8  *src_base, *src_ptr;
+			const UINT8  *src_ptr;
 			UINT8  *xpr_ptr;
 			UINT16 *dst_ptr;
 			UINT16 pen, basepen;
@@ -6509,7 +6516,6 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 			pixmap  = K056832_pixmap[page];
 			pal_ptr    = machine->pens;
 			src_gfx    = machine->gfx[K056832_gfxnum];
-			src_base   = src_gfx->gfxdata;
 			src_pitch  = src_gfx->line_modulo;
 			src_modulo = src_gfx->char_modulo;
 			dst_pitch  = pixmap->rowpixels;
@@ -6561,7 +6567,7 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 	return(0);
 }
 
-void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority)
+void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority)
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -6620,10 +6626,10 @@ void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rect
 	} else corr = 0;
 	corr -= K056832_LayerOffset[layer][0];
 
-	if (scrollmode == 0 && (flags & TILE_LINE_DISABLED))
+	if (scrollmode == 0 && (flags & K056382_DRAW_FLAG_FORCE_XYSCROLL))
 	{
 		scrollmode = 3;
-		flags &= ~TILE_LINE_DISABLED;
+		flags &= ~K056382_DRAW_FLAG_FORCE_XYSCROLL;
 	}
 
 	switch( scrollmode )
@@ -6844,7 +6850,7 @@ void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rect
 
 } // end of function
 
-void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority) //*
+void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, UINT32 flags, UINT32 priority) //*
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -6899,10 +6905,10 @@ void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const r
 	} else corr = 0;
 	corr -= K056832_LayerOffset[layer][0];
 
-	if (scrollmode == 0 && (flags & TILE_LINE_DISABLED))
+	if (scrollmode == 0 && (flags & K056382_DRAW_FLAG_FORCE_XYSCROLL))
 	{
 		scrollmode = 3;
-		flags &= ~TILE_LINE_DISABLED;
+		flags &= ~K056382_DRAW_FLAG_FORCE_XYSCROLL;
 	}
 
 	switch( scrollmode )
@@ -7409,7 +7415,6 @@ int K054338_set_alpha_level(int pblend)
 
 	if (pblend <= 0 || pblend > 3)
 	{
-		alpha_set_level(255);
 		return(255);
 	}
 
@@ -7424,7 +7429,6 @@ int K054338_set_alpha_level(int pblend)
 	if (!(mixset & 0x20))
 	{
 		mixlv = mixlv<<3 | mixlv>>2;
-		alpha_set_level(mixlv); // source x alpha/255  +  target x (255-alpha)/255
     }
 	else
 	{
@@ -7440,7 +7444,6 @@ int K054338_set_alpha_level(int pblend)
 		// DUMMY
 		if (mixlv && mixlv<0x1f) mixlv = 0x10;
 		mixlv = mixlv<<3 | mixlv>>2;
-		alpha_set_level(mixlv);
 
 		if (VERBOSE)
 			popmessage("MIXSET%1d %s addition mode: %02x",pblend,(mixpri)?"dst":"src",mixset&0x1f);

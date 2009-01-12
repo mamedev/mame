@@ -18,6 +18,7 @@ extern UINT8 *zac2650_s2636_0_ram;
 WRITE8_HANDLER( tinvader_videoram_w );
 static WRITE8_HANDLER( tinvader_sound_w );
 READ8_HANDLER( zac_s2636_r );
+WRITE8_HANDLER( zac_s2636_w );
 READ8_HANDLER( tinvader_port_0_r );
 
 VIDEO_START( tinvader );
@@ -33,7 +34,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1e82, 0x1e82) AM_READ_PORT("1E82")
 	AM_RANGE(0x1e85, 0x1e85) AM_READ_PORT("1E85")					/* Dodgem Only */
 	AM_RANGE(0x1e86, 0x1e86) AM_READ_PORT("1E86") AM_WRITENOP		/* Dodgem Only */
-	AM_RANGE(0x1f00, 0x1fff) AM_READWRITE(zac_s2636_r, SMH_RAM) AM_BASE(&zac2650_s2636_0_ram)
+	AM_RANGE(0x1f00, 0x1fff) AM_READWRITE(zac_s2636_r, zac_s2636_w) AM_BASE(&zac2650_s2636_0_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
@@ -210,62 +211,31 @@ static PALETTE_INIT( zac2650 )
 
 static const gfx_layout tinvader_character =
 {
-	24,24,
+	8,8,
 	128,
 	1,
 	{ 0 },
-	{ 0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,7 },
-   	{ 0*8, 0*8, 0*8, 1*8, 1*8, 1*8, 2*8, 2*8, 2*8, 3*8, 3*8, 3*8, 4*8, 4*8, 4*8,
-	  5*8, 5*8, 5*8, 6*8, 6*8, 6*8, 7*8, 7*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
 
-static const gfx_layout s2636_character8 =
+static const gfx_layout s2636_character =
 {
-	32,30,
+	8,10,
 	16,
 	1,
 	{ 0 },
-	{ 0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,6,6,6,6,7,7,7,7 },
-   	{ 0*8, 0*8, 0*8, 1*8, 1*8, 1*8, 2*8, 2*8, 2*8, 3*8, 3*8, 3*8,
-	  4*8, 4*8, 4*8, 5*8, 5*8, 5*8, 6*8, 6*8, 6*8, 7*8, 7*8, 7*8,
-	  8*8, 8*8, 8*8, 9*8, 9*8, 9*8 	} ,
+	{ STEP8(0,1) },
+   	{ STEP8(0,8), STEP2(8*8,8) },
 	8*8
-};
-
-static const UINT32 s2636_character16_xoffset[64] =
-{
-	0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,
-	4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7
-};
-
-static const UINT32 s2636_character16_yoffset[60] =
-{
-	0*8, 0*8, 0*8, 0*8, 0*8, 0*8, 1*8, 1*8, 1*8, 1*8, 1*8, 1*8,
-	2*8, 2*8, 2*8, 2*8, 2*8, 2*8, 3*8, 3*8, 3*8, 3*8, 3*8, 3*8,
-	4*8, 4*8, 4*8, 4*8, 4*8, 4*8, 5*8, 5*8, 5*8, 5*8, 5*8, 5*8,
-	6*8, 6*8, 6*8, 6*8, 6*8, 6*8, 7*8, 7*8, 7*8, 7*8, 7*8, 7*8,
-	8*8, 8*8, 8*8, 8*8, 8*8, 8*8, 9*8, 9*8, 9*8, 9*8, 9*8, 9*8
-};
-
-static const gfx_layout s2636_character16 =
-{
-	64,60,
-	16,
-	1,
-	{ 0 },
-	EXTENDED_XOFFS,
-	EXTENDED_YOFFS,
-	8*8,
-	s2636_character16_xoffset,
-	s2636_character16_yoffset
 };
 
 static GFXDECODE_START( tinvader )
-	GFXDECODE_ENTRY( "gfx1", 0, tinvader_character,  0, 2 )
-  	GFXDECODE_ENTRY( NULL,   0x1F00, s2636_character8, 0, 2 )	/* dynamic */
-  	GFXDECODE_ENTRY( NULL,   0x1F00, s2636_character16, 0, 2 )	/* dynamic */
+	GFXDECODE_SCALE( "gfx1", 0, tinvader_character,   0, 2, 3, 3 )
+  	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 4, 3 )	/* dynamic */
+  	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 8, 6 )	/* dynamic */
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( tinvader )

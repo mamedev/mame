@@ -181,9 +181,9 @@ static VIDEO_START(mediagx)
 static void draw_char(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
-	UINT8 *dp;
+	const UINT8 *dp;
 	int index = 0;
-	dp = gfx->gfxdata + ch * gfx->char_modulo;
+	dp = gfx_element_get_data(gfx, ch);
 
 	for (j=y; j < y+8; j++)
 	{

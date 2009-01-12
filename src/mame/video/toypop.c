@@ -175,7 +175,6 @@ WRITE16_HANDLER( toypop_merged_background_w )
 static void draw_background(bitmap_t *bitmap)
 {
 	int offs, x, y;
-	UINT16 scanline[288];
 	pen_t pen_base = 0x300 + 0x10*palettebank;
 
 	// copy the background image from RAM (0x190200-0x19FDFF) to bitmap
@@ -184,6 +183,7 @@ static void draw_background(bitmap_t *bitmap)
 		offs = 0xFDFE/2;
 		for (y = 0; y < 224; y++)
 		{
+			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 			for (x = 0; x < 288; x+=2)
 			{
 				UINT16 data = toypop_bg_image[offs];
@@ -191,7 +191,6 @@ static void draw_background(bitmap_t *bitmap)
 				scanline[x+1] = pen_base | (data >> 8);
 				offs--;
 			}
-			draw_scanline16(bitmap, 0, y, 288, scanline, NULL, -1);
 		}
 	}
 	else
@@ -199,6 +198,7 @@ static void draw_background(bitmap_t *bitmap)
 		offs = 0x200/2;
 		for (y = 0; y < 224; y++)
 		{
+			UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 			for (x = 0; x < 288; x+=2)
 			{
 				UINT16 data = toypop_bg_image[offs];
@@ -206,7 +206,6 @@ static void draw_background(bitmap_t *bitmap)
 				scanline[x+1] = pen_base | (data & 0x0f);
 				offs++;
 			}
-			draw_scanline16(bitmap, 0, y, 288, scanline, NULL, -1);
 		}
 	}
 }

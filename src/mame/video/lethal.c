@@ -45,20 +45,11 @@ static void lethalen_tile_callback(int layer, int *code, int *color, int *flags)
 
 VIDEO_START(lethalen)
 {
-	int i;
-
 	K053251_vh_start(machine);
 
 	K056832_vh_start(machine, "gfx1", K056832_BPP_8LE, 1, NULL, lethalen_tile_callback, 0);
 
 	K053245_vh_start(machine, 0, "gfx3",NORMAL_PLANE_ORDER, lethalen_sprite_callback);
-
-	/* the default drawmode table is no good for 6bpp, create a new one */
-	gfx_drawmode_table[0] = DRAWMODE_NONE;
-	for (i = 1;i < 64;i++)
-		gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-
-	gfx_drawmode_table[63] = DRAWMODE_SHADOW;
 
 	// this game uses external linescroll RAM
 	K056832_SetExtLinescroll();

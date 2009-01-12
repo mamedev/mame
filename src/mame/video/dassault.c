@@ -20,7 +20,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 	{
 		for (offs = 0x800-4;offs >= 0; offs -= 4)
 		{
-			int trans=TRANSPARENCY_PEN, pmask=0;
+			int alpha=0xff, pmask=0;
 
 			/* Draw the main spritebank after the other one */
 			if (bank==0)
@@ -41,7 +41,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 			/* Alpha on chip 2 only */
 			if (bank==1 && x&0xc000)
-				trans=TRANSPARENCY_ALPHA;
+				alpha=0x80;
 
 			y = spritebase[offs];
 			flash=y&0x1000;
@@ -134,7 +134,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 						colour,
 						fx,fy,
 						x,y + mult * multi,
-						cliprect,trans,0,pmask,1<<bank, 1);
+						cliprect,0,pmask,1<<bank, 1, alpha);
 
 				multi--;
 			}
@@ -157,8 +157,6 @@ VIDEO_START( dassault )
 	deco16_set_tilemap_bank_callback(1,dassault_bank_callback);
 	deco16_set_tilemap_bank_callback(2,dassault_bank_callback);
 	deco16_set_tilemap_bank_callback(3,dassault_bank_callback);
-
-	alpha_set_level(0x80);
 }
 
 /******************************************************************************/

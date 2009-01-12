@@ -236,7 +236,6 @@ UINT8 gticlub_led_reg0;
 UINT8 gticlub_led_reg1;
 
 int K001604_vh_start(running_machine *machine, int chip);
-void K001604_tile_update(running_machine *machine, int chip);
 void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
 void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
 READ32_HANDLER(K001604_tile_r);
@@ -280,7 +279,6 @@ static VIDEO_UPDATE( hangplt )
 	{
 		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo0");
 
-		K001604_tile_update(screen->machine, 0);
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
 		voodoo_update(voodoo, bitmap, cliprect);
@@ -291,7 +289,6 @@ static VIDEO_UPDATE( hangplt )
 	{
 		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo1");
 
-		K001604_tile_update(screen->machine, 1);
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
 		voodoo_update(voodoo, bitmap, cliprect);

@@ -298,6 +298,7 @@ static MACHINE_DRIVER_START( polyplay )
 	MDRV_PALETTE_LENGTH(10)
 
 	MDRV_PALETTE_INIT(polyplay)
+	MDRV_VIDEO_START(polyplay)
 	MDRV_VIDEO_UPDATE(polyplay)
 
 	/* sound hardware */

@@ -370,7 +370,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int xsize, ysize, xzoom, yzoom;
 	int code, attr, color, size, pri, pri_mask, trans;
 	gfx_element *gfx = machine->gfx[region];
-	gfx_element mygfx = *gfx;
 
 	UINT32		*source	= sprram_top;
 	const UINT32	*finish	= sprram_top + (sprram_size - 0x10) / 4;
@@ -433,11 +432,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		/* change GfxElement parameters to draw only the needed part of the 256x256 tile */
-		mygfx.width = xsize;
-		mygfx.height = ysize;
-		mygfx.gfxdata = gfx->gfxdata + tx + ty * gfx->line_modulo;
-
 		/* TODO: priority handling is completely wrong, but better than nothing */
 		if (pri == 0x0)
 			pri_mask = 0x00;
@@ -448,7 +442,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		else
 			pri_mask = 0xfe;
 
-		pdrawgfxzoom(bitmap, &mygfx,
+		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
+		pdrawgfxzoom(bitmap, gfx,
 				code,
 				color,
 				flipx, flipy,

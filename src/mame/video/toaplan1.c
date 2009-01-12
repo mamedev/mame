@@ -948,7 +948,7 @@ static void toaplan1_draw_sprite_custom(bitmap_t *dest_bmp,const gfx_element *gf
 		const rectangle *clip,int priority)
 {
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
-	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
 	int sprite_screen_width = ((1<<16)*gfx->width+0x8000)>>16;
@@ -1018,7 +1018,7 @@ static void toaplan1_draw_sprite_custom(bitmap_t *dest_bmp,const gfx_element *gf
 
 			for( y=sy; y<ey; y++ )
 			{
-				UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
 
