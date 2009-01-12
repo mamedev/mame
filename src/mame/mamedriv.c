@@ -8476,6 +8476,16 @@ Other Sun games
 	DRIVER( brasil )    /* (c) 2000 unknown */
 	DRIVER( fashion )   /* (c) 2000 unknown */
 
+	/* V30-based italian gambling games */
+ 	DRIVER( tour4000 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever40 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever50 )	/* (c) 2000 High Video */
+ 	DRIVER( tour4010 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever51 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever61 )	/* (c) 2000 High Video */
+ 	DRIVER( cfever1k )	/* (c) 2000 High Video */
+ 	DRIVER( girotutt )	/* (c) 2000 High Video */
+
 	/* M68k based italian gambling games */
 	DRIVER( ilpag )     /* (c) 19?? unknown */
 	DRIVER( mil4000 )   /* (c) 2000 Sure Milano */
