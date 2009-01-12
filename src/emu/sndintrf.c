@@ -108,6 +108,7 @@ SND_GET_INFO( tms5200 );
 SND_GET_INFO( tms5220 );
 SND_GET_INFO( vlm5030 );
 SND_GET_INFO( adpcm );
+SND_GET_INFO( okim6376 );
 SND_GET_INFO( okim6295 );
 SND_GET_INFO( okim6258 );
 SND_GET_INFO( msm5205 );
@@ -316,6 +317,9 @@ static const struct
 #endif
 #if (HAS_VLM5030)
 	{ SOUND_VLM5030, SND_GET_INFO_NAME( vlm5030 ) },
+#endif
+#if (HAS_OKIM6376)
+	{ SOUND_OKIM6376, SND_GET_INFO_NAME( okim6376 ) },
 #endif
 #if (HAS_OKIM6295)
 	{ SOUND_OKIM6295, SND_GET_INFO_NAME( okim6295 ) },
