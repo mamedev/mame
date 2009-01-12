@@ -71,14 +71,14 @@ static const cpu_state_entry state_array[] =
 {
 	CDP1802_STATE_ENTRY(GENPC, "%04X", fake_pc, 0xffff, CPUSTATE_NOSHOW | CPUSTATE_IMPORT | CPUSTATE_EXPORT)
 
-	CDP1802_STATE_ENTRY(P, "%02X", p, 0xff, 0)
-	CDP1802_STATE_ENTRY(X, "%02X", x, 0xff, 0)
+	CDP1802_STATE_ENTRY(P, "%01X", p, 0xf, 0)
+	CDP1802_STATE_ENTRY(X, "%01X", x, 0xf, 0)
 	CDP1802_STATE_ENTRY(D, "%02X", d, 0xff, 0)
 	CDP1802_STATE_ENTRY(B, "%02X", b, 0xff, 0)
 	CDP1802_STATE_ENTRY(T, "%02X", t, 0xff, 0)
 
-	CDP1802_STATE_ENTRY(N, "%01X", n, 0xf, 0)
 	CDP1802_STATE_ENTRY(I, "%01X", i, 0xf, 0)
+	CDP1802_STATE_ENTRY(N, "%01X", n, 0xf, 0)
 
 	CDP1802_STATE_ENTRY(R0, "%04X", r[0], 0xffff, 0)
 	CDP1802_STATE_ENTRY(R1, "%04X", r[1], 0xffff, 0)
@@ -941,6 +941,7 @@ static CPU_RESET( cdp1802 )
 static CPU_INIT( cdp1802 )
 {
 	cdp1802_state *cpustate = device->token;
+	int i;
 
 	cpustate->intf = (cdp1802_interface *) device->static_config;
 
@@ -956,6 +957,19 @@ static CPU_INIT( cdp1802 )
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	/* set initial values */
+
+	cpustate->p = mame_rand(device->machine) & 0x0f;
+	cpustate->x = mame_rand(device->machine) & 0x0f;
+	cpustate->d = mame_rand(device->machine);
+	cpustate->b = mame_rand(device->machine);
+	cpustate->t = mame_rand(device->machine);
+	cpustate->n = mame_rand(device->machine) & 0x0f;
+	cpustate->i = mame_rand(device->machine) & 0x0f;
+
+	for (i = 0; i < 16; i++)
+	{
+		cpustate->r[i] = mame_rand(device->machine);
+	}
 
 	cpustate->mode = CDP1802_MODE_RESET;
 	cpustate->prevmode = cpustate->mode;
