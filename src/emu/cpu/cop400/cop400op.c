@@ -1,227 +1,17 @@
 /***************************************************************************
 
-    410ops.c
+    cop400op.c
 
-    National Semiconductor COP410 Emulator.
+    National Semiconductor COP400 Emulator.
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
-#define UINT1	UINT8
-#define UINT4	UINT8
-#define UINT6	UINT8
-#define UINT10	UINT16
-
-typedef struct _cop400_state cop400_state;
-struct _cop400_state
-{
-	const cop400_interface *intf;
-
-    const address_space *program;
-    const address_space *data;
-    const address_space *io;
-
-	/* registers */
-	UINT10 	pc;	   			/* 11-bit ROM address program counter */
-	UINT10	prevpc;			/* previous value of program counter */
-	UINT4	a;				/* 4-bit accumulator */
-	UINT8	b;				/* 5/6/7-bit RAM address register */
-	UINT1	c;				/* 1-bit carry register */
-	UINT4	en;				/* 4-bit enable register */
-	UINT4	g;				/* 4-bit general purpose I/O port */
-	UINT8	q;				/* 8-bit latch for L port */
-	UINT10	sa, sb, sc;		/* subroutine save registers */
-	UINT4	sio;			/* 4-bit shift register and counter */
-	UINT1	skl;			/* 1-bit latch for SK output */
-	UINT8	si;				/* serial input */
-	UINT4	h;				/* 4-bit general purpose I/O port (COP440 only) */
-	UINT8	r;				/* 8-bit general purpose I/O port (COP440 only) */
-
-	/* counter */
-	UINT8	t;				/* 8-bit timer */
-	int		skt_latch;		/* timer overflow latch */
-
-	/* input/output ports */
-	UINT8	g_mask;			/* G port mask */
-	UINT8	d_mask;			/* D port mask */
-	UINT8	in_mask;		/* IN port mask */
-	UINT4	il;				/* IN latch */
-	UINT4	in[4];			/* IN port shift register */
-
-	/* skipping logic */
-	int skip;				/* skip next instruction */
-	int skip_lbi;			/* skip until next non-LBI instruction */
-	int last_skip;			/* last value of skip */
-	int halt;				/* halt mode */
-	int idle;				/* idle mode */
-
-	/* microbus */
-	int microbus_int;		/* microbus interrupt */
-
-	/* execution logic */
-	int InstLen[256];		/* instruction length in bytes */
-	int LBIops[256];
-	int LBIops33[256];
-	int icount;				/* instruction counter */
-
-	const device_config *device;
-
-	/* timers */
-	emu_timer *serial_timer;
-	emu_timer *counter_timer;
-	emu_timer *inil_timer;
-	emu_timer *microbus_timer;
-};
-
-/* The opcode table now is a combination of cycle counts and function pointers */
-typedef struct {
-	unsigned cycles;
-	void (*function) (cop400_state *cop400, UINT8 opcode);
-}	s_opcode;
-
-#define INSTRUCTION(mnemonic) INLINE void (mnemonic)(cop400_state *cop400, UINT8 opcode)
-
-#define ROM(a)			memory_decrypted_read_byte(cop400->program, a)
-#define RAM_R(a)		memory_read_byte_8le(cop400->data, a)
-#define RAM_W(a, v)		memory_write_byte_8le(cop400->data, a, v)
-#define IN(a)			memory_read_byte_8le(cop400->io, a)
-#define OUT(a, v)		memory_write_byte_8le(cop400->io, a, v)
-
-#define A				cop400->a
-#define B				cop400->b
-#define C				cop400->c
-#define G				cop400->g
-#define Q				cop400->q
-#define EN				cop400->en
-#define SA				cop400->sa
-#define SB				cop400->sb
-#define SIO				cop400->sio
-#define SKL				cop400->skl
-#define PC				cop400->pc
-#define prevPC			cop400->prevpc
-
-#define IN_G()			IN(COP400_PORT_G)
-#define IN_L()			IN(COP400_PORT_L)
-#define IN_SI()			BIT(IN(COP400_PORT_SIO), 0)
-#define IN_CKO()		BIT(IN(COP400_PORT_CKO), 0)
-#define OUT_G(A)		OUT(COP400_PORT_G, (A) & cop400->g_mask)
-#define OUT_L(A)		OUT(COP400_PORT_L, (A))
-#define OUT_D(A)		OUT(COP400_PORT_D, (A) & cop400->d_mask)
-#define OUT_SK(A)		OUT(COP400_PORT_SK, (A))
-#define OUT_SO(A)		OUT(COP400_PORT_SIO, (A))
-
-#ifndef PUSH
-#define PUSH(addr) 		{ SB = SA; SA = addr; }
-#define POP() 			{ PC = SA; SA = SB; }
-#endif
-
-/* Serial I/O */
-
-static TIMER_CALLBACK( cop400_serial_tick )
-{
-	cop400_state *cop400 = ptr;
-
-	if (BIT(EN, 0))
-	{
-		/*
-
-            SIO is an asynchronous binary counter decrementing its value by one upon each low-going pulse ("1" to "0") occurring on the SI input.
-            Each pulse must remain at each logic level at least two instruction cycles. SK outputs the value of the C upon the execution of an XAS
-            and remains latched until the execution of another XAS instruction. The SO output is equal to the value of EN3.
-
-        */
-
-		// serial output
-
-		OUT_SO(BIT(EN, 3));
-
-		// serial clock
-
-		OUT_SK(SKL);
-
-		// serial input
-
-		cop400->si <<= 1;
-		cop400->si = (cop400->si & 0x0e) | IN_SI();
-
-		if ((cop400->si & 0x0f) == 0x0c) // 1100
-		{
-			SIO--;
-			SIO &= 0x0f;
-		}
-	}
-	else
-	{
-		/*
-
-            SIO is a serial shift register, shifting continuously left each instruction cycle time. The data present at SI goes into the least
-            significant bit of SIO: SO can be enabled to output the most significant bit of SIO each cycle time. SK output becomes a logic-
-            controlled clock, providing a SYNC signal each instruction time. It will start outputting a SYNC pulse upon the execution of an XAS
-            instruction with C = "1," stopping upon the execution of a subsequent XAS with C = "0".
-
-            If EN0 is changed from "1" to "0" ("0" to "1") the SK output will change from "1" to SYNC (SYNC to "1") without the execution of
-            an XAS instruction.
-
-        */
-
-		// serial output
-
-		if (BIT(EN, 3))
-		{
-			OUT_SO(BIT(SIO, 3));
-		}
-		else
-		{
-			OUT_SO(0);
-		}
-
-		// serial clock
-
-		if (SKL)
-		{
-			OUT_SK(1); // SYNC
-		}
-		else
-		{
-			OUT_SK(0);
-		}
-
-		// serial input
-
-		SIO = ((SIO << 1) | IN_SI()) & 0x0f;
-	}
-}
-
-INLINE void WRITE_Q(cop400_state *cop400, UINT8 data)
-{
-	Q = data;
-
-	if (BIT(EN, 2))
-	{
-		OUT_L(Q);
-	}
-}
-
-INLINE void WRITE_G(cop400_state *cop400, UINT8 data)
-{
-	if (cop400->intf->microbus == COP400_MICROBUS_ENABLED)
-	{
-		data = (data & 0x0e) | cop400->microbus_int;
-	}
-
-	G = data;
-
-	OUT_G(G);
-}
-
-INSTRUCTION(illegal)
-{
-	logerror("COP400: PC = %04x, Illegal opcode = %02x\n", PC-1, ROM(PC-1));
-}
-
-/* Arithmetic Instructions */
+/***************************************************************************
+	ARITHMETIC INSTRUCTIONS
+***************************************************************************/
 
 /*
 
@@ -239,14 +29,14 @@ INSTRUCTION(illegal)
 
 */
 
-INSTRUCTION(asc)
+INSTRUCTION( asc )
 {
 	A = A + C + RAM_R(B);
 
 	if (A > 0xF)
 	{
 		C = 1;
-		cop400->skip = 1;
+		cpustate->skip = 1;
 		A &= 0xF;
 	}
 	else
@@ -291,13 +81,13 @@ INSTRUCTION( add )
 
 INSTRUCTION( aisc )
 {
-	UINT4 y = opcode & 0x0f;
+	UINT8 y = opcode & 0x0f;
 
 	A = A + y;
 
 	if (A > 0x0f)
 	{
-		cop400->skip = 1;
+		cpustate->skip = 1;
 		A &= 0xF;
 	}
 }
@@ -408,7 +198,59 @@ INSTRUCTION( xor )
 	A = A ^ RAM_R(B);
 }
 
-/* Transfer-of-Control Instructions */
+/*
+
+    Mnemonic:           ADT
+
+    Hex Code:           4A
+    Binary:             0 1 0 0 1 0 1 0
+
+    Data Flow:          A + 10 -> A
+
+    Description:        Add Ten to A
+
+*/
+
+INSTRUCTION( adt )
+{
+	A = (A + 10) & 0x0F;
+}
+
+/*
+
+    Mnemonic:           CASC
+
+    Hex Code:           10
+    Binary:             0 0 0 1 0 0 0 0
+
+    Data Flow:          ~A + RAM(B) + C -> A
+                        Carry -> C
+
+    Skip Conditions:    Carry
+
+    Description:        Complement and Add with Carry, Skip on Carry
+
+*/
+
+INSTRUCTION( casc )
+{
+	A = (A ^ 0xF) + RAM_R(B) + C;
+
+	if (A > 0xF)
+	{
+		C = 1;
+		cpustate->skip = 1;
+		A &= 0xF;
+	}
+	else
+	{
+		C = 0;
+	}
+}
+
+/***************************************************************************
+	TRANSFER-OF-CONTROL INSTRUCTIONS
+***************************************************************************/
 
 /*
 
@@ -417,7 +259,7 @@ INSTRUCTION( xor )
     Hex Code:           FF
     Binary:             1 1 1 1 1 1 1 1
 
-    Data Flow:          ROM(PC9:8,A,M) -> PC7:0
+    Data Flow:          ROM(PC10:8,A,M) -> PC7:0
 
     Description:        Jump Indirect
 
@@ -425,8 +267,8 @@ INSTRUCTION( xor )
 
 INSTRUCTION( jid )
 {
-	UINT16 addr = (PC & 0x300) | (A << 4) | RAM_R(B);
-	PC = (PC & 0x300) | ROM(addr);
+	UINT16 addr = (PC & 0x700) | (A << 4) | RAM_R(B);
+	PC = (PC & 0x700) | ROM(addr);
 }
 
 /*
@@ -435,7 +277,7 @@ INSTRUCTION( jid )
 
     Operand:            a
     Hex Code:           6- --
-    Binary:             0 1 1 0 0 0 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
+    Binary:             0 1 1 0 0 a10 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
 
     Data Flow:          a -> PC
 
@@ -445,7 +287,7 @@ INSTRUCTION( jid )
 
 INSTRUCTION( jmp )
 {
-	UINT16 a = ((opcode & 0x03) << 8) | ROM(PC);
+	UINT16 a = ((opcode & 0x07) << 8) | ROM(PC);
 
 	PC = a;
 }
@@ -472,23 +314,23 @@ INSTRUCTION( jmp )
 
 INSTRUCTION( jp )
 {
-	UINT4 page = PC >> 6;
+	UINT8 page = PC >> 6;
 
 	if (page == 2 || page == 3)
 	{
 		UINT8 a = opcode & 0x7f;
-		PC = (PC & 0x380) | a;
+		PC = (PC & 0x780) | a;
 	}
 	else if ((opcode & 0xc0) == 0xc0)
 	{
 		UINT8 a = opcode & 0x3f;
-		PC = (PC & 0x3c0) | a;
+		PC = (PC & 0x7c0) | a;
 	}
 	else
 	{
 		// JSRP
 		UINT8 a = opcode & 0x3f;
-		PUSH(PC);
+		PUSH(cpustate, PC);
 		PC = 0x80 | a;
 	}
 }
@@ -499,7 +341,7 @@ INSTRUCTION( jp )
 
     Operand:            a
     Hex Code:           6- --
-    Binary:             0 1 1 0 1 0 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
+    Binary:             0 1 1 0 1 a10 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
 
     Data Flow:          PC + 1 -> SA -> SB -> SC
                         a -> PC
@@ -510,9 +352,9 @@ INSTRUCTION( jp )
 
 INSTRUCTION( jsr )
 {
-	UINT16 a = ((opcode & 0x03) << 8) | ROM(PC);
+	UINT16 a = ((opcode & 0x07) << 8) | ROM(PC);
 
-	PUSH(PC + 1);
+	PUSH(cpustate, PC + 1);
 	PC = a;
 }
 
@@ -531,7 +373,28 @@ INSTRUCTION( jsr )
 
 INSTRUCTION( ret )
 {
-	POP();
+	POP(cpustate);
+}
+
+/*
+
+    Processor:          COP420
+
+    Mnemonic:           RET
+
+    Hex Code:           48
+    Binary:             0 1 0 0 1 0 0 0
+
+    Data Flow:          SC -> SB -> SA -> PC
+
+    Description:        Return from Subroutine, restore Skip logic
+
+*/
+
+INSTRUCTION( cop420_ret )
+{
+	POP(cpustate);
+	cpustate->skip = cpustate->last_skip;
 }
 
 /*
@@ -551,8 +414,8 @@ INSTRUCTION( ret )
 
 INSTRUCTION( retsk )
 {
-	POP();
-	cop400->skip = 1;
+	POP(cpustate);
+	cpustate->skip = 1;
 }
 
 /*
@@ -570,10 +433,29 @@ INSTRUCTION( retsk )
 
 INSTRUCTION( halt )
 {
-	cop400->halt = 1;
+	cpustate->halt = 1;
 }
 
-/* Memory Reference Instructions */
+/*
+
+    Mnemonic:           IT
+
+    Hex Code:           33 39
+    Binary:             0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1
+
+    Description:        IDLE till Timer Overflows then Continues
+
+*/
+
+INSTRUCTION( it )
+{
+	cpustate->halt = 1;
+	cpustate->idle = 1;
+}
+
+/***************************************************************************
+	MEMORY REFERENCE INSTRUCTIONS
+***************************************************************************/
 
 /*
 
@@ -624,11 +506,11 @@ INSTRUCTION( camq )
 
 	UINT8 data = (A << 4) | RAM_R(B);
 
-	WRITE_Q(cop400, data);
+	WRITE_Q(cpustate, data);
 
 #ifdef CAMQ_BUG
-	WRITE_Q(cop400, 0x3c);
-	WRITE_Q(cop400, data);
+	WRITE_Q(cpustate, 0x3c);
+	WRITE_Q(cpustate, data);
 #endif
 }
 
@@ -662,7 +544,7 @@ INSTRUCTION( ld )
     Hex Code:           BF
     Binary:             1 0 1 1 1 1 1 1
 
-    Data Flow:          ROM(PC9:8,A,M) -> Q
+    Data Flow:          ROM(PC10:8,A,M) -> Q
                         SB -> SC
 
     Description:        Load Q Indirect
@@ -671,10 +553,10 @@ INSTRUCTION( ld )
 
 INSTRUCTION( lqid )
 {
-	PUSH(PC);
-	PC = (PC & 0x300) | (A << 4) | RAM_R(B);
-	WRITE_Q(cop400, ROM(PC));
-	POP();
+	PUSH(cpustate, PC);
+	PC = (PC & 0x700) | (A << 4) | RAM_R(B);
+	WRITE_Q(cpustate, ROM(PC));
+	POP(cpustate);
 }
 
 /*
@@ -760,13 +642,13 @@ INSTRUCTION( smb3 ) { RAM_W(B, RAM_R(B) | 0x8); }
 
 INSTRUCTION( stii )
 {
-	UINT4 y = opcode & 0x0f;
+	UINT8 y = opcode & 0x0f;
 	UINT16 Bd;
 
 	RAM_W(B, y);
 
 	Bd = ((B & 0x0f) + 1) & 0x0f;
-	B = (B & 0x30) + Bd;
+	B = (B & 0x70) + Bd;
 }
 
 /*
@@ -786,7 +668,7 @@ INSTRUCTION( stii )
 
 INSTRUCTION( x )
 {
-	UINT4 r = opcode & 0x30;
+	UINT8 r = opcode & 0x30;
 	UINT8 t = RAM_R(B);
 
 	RAM_W(B, A);
@@ -801,7 +683,7 @@ INSTRUCTION( x )
 
     Operand:            r,d
     Hex Code:           23 --
-    Binary:             0 0 1 0 0 0 1 1 1 0 r1 r0 d3 d2 d1 d0
+    Binary:             0 0 1 0 0 0 1 1 1 r2 r1 r0 d3 d2 d1 d0
 
     Data Flow:          RAM(r,d) <-> A
 
@@ -811,7 +693,7 @@ INSTRUCTION( x )
 
 INSTRUCTION( xad )
 {
-	UINT8 rd = opcode & 0x3f;
+	UINT8 rd = opcode & 0x7f;
 	UINT8 t = A;
 
 	A = RAM_R(rd);
@@ -840,7 +722,7 @@ INSTRUCTION( xad )
 INSTRUCTION( xds )
 {
 	UINT8 t, Bd;
-	UINT4 r = opcode & 0x30;
+	UINT8 r = opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
@@ -851,7 +733,7 @@ INSTRUCTION( xds )
 
 	B = B ^ r;
 
-	if (Bd == 0x0f) cop400->skip = 1;
+	if (Bd == 0x0f) cpustate->skip = 1;
 }
 
 /*
@@ -875,7 +757,7 @@ INSTRUCTION( xds )
 INSTRUCTION( xis )
 {
 	UINT8 t, Bd;
-	UINT4 r = opcode & 0x30;
+	UINT8 r = opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
@@ -886,10 +768,91 @@ INSTRUCTION( xis )
 
 	B = B ^ r;
 
-	if (Bd == 0x00) cop400->skip = 1;
+	if (Bd == 0x00) cpustate->skip = 1;
 }
 
-/* Register Reference Instructions */
+/*
+
+    Mnemonic:           CQMA
+
+    Hex Code:           33 2C
+    Binary:             0 0 1 1 0 0 1 1 0 0 1 0 1 1 0 0
+
+    Data Flow:          Q7:4 -> RAM(B)
+                        Q3:0 -> A
+
+    Description:        Copy Q to RAM, A
+
+*/
+
+INSTRUCTION( cqma )
+{
+	RAM_W(B, Q >> 4);
+	A = Q & 0xF;
+}
+
+/*
+
+    Mnemonic:           LDD
+
+    Operand:            r, d
+    Hex Code:           23 --
+    Binary:             0 0 1 0 0 0 1 1 0 r2 r1 r0 d3 d2 d1 d0
+
+    Data Flow:          RAM(r,d) -> A
+
+    Description:        Load A with RAM pointed to directly by r,d
+
+*/
+
+INSTRUCTION( ldd )
+{
+	UINT8 rd = opcode & 0x7f;
+
+	A = RAM_R(rd);
+}
+
+/*
+
+    Mnemonic:           CAMT
+
+    Hex Code:           33 3F
+    Binary:
+
+    Data Flow:          A -> T7:4
+                        RAM(B) -> T3:0
+
+    Description:        Copy A, RAM to T
+
+*/
+
+INSTRUCTION( camt )
+{
+	T = (A << 4) | RAM_R(B);
+}
+/*
+
+    Mnemonic:           CTMA
+
+    Hex Code:           33 2F
+    Binary:
+
+    Data Flow:          T7:4 -> RAM(B)
+                        T3:0 -> A
+
+    Description:        Copy T to RAM, A
+
+*/
+
+INSTRUCTION( ctma )
+{
+	RAM_W(B, T >> 4);
+	A = T & 0x0f;
+}
+
+/***************************************************************************
+	REGISTER REFERENCE INSTRUCTIONS
+***************************************************************************/
 
 /*
 
@@ -906,7 +869,7 @@ INSTRUCTION( xis )
 
 INSTRUCTION( cab )
 {
-	B = (B & 0x30) | A;
+	B = (B & 0x70) | A;
 }
 
 /*
@@ -936,7 +899,7 @@ INSTRUCTION( cba )
                         33 --
 
     Binary:             0 0 r1 r0 d3 d2 d1 d0 (d-1)
-                        0 0 1 1 0 0 1 1 1 0 r1 r0 d3 d2 d1 d0
+                        0 0 1 1 0 0 1 1 1 r2 r1 r0 d3 d2 d1 d0
 
     Data Flow:          r,d -> B
 
@@ -954,10 +917,10 @@ INSTRUCTION( lbi )
 	}
 	else
 	{
-		B = (opcode & 0x30) | (((opcode & 0x0f) + 1) & 0x0f);
+		B = (opcode & 0x70) | (((opcode & 0x0f) + 1) & 0x0f);
 	}
 
-	cop400->skip_lbi = 1;
+	cpustate->skip_lbi = 1;
 }
 
 /*
@@ -976,7 +939,7 @@ INSTRUCTION( lbi )
 
 INSTRUCTION( lei )
 {
-	UINT4 y = opcode & 0x0f;
+	UINT8 y = opcode & 0x0f;
 
 	EN = y;
 
@@ -986,7 +949,55 @@ INSTRUCTION( lei )
 	}
 }
 
-/* Test Instructions */
+/*
+
+    Mnemonic:           XABR
+
+    Hex Code:           12
+    Binary:             0 0 0 1 0 0 1 0
+
+    Data Flow:          A <-> Br(0,0 -> A3,A2)
+
+    Description:        Exchange A with Br
+
+*/
+
+INSTRUCTION( xabr )
+{
+	UINT8 Br = A & 0x03;
+	UINT8 Bd = B & 0x0f;
+
+	A = B >> 4;
+	B = (Br << 4) + Bd;
+}
+
+/*
+
+	Processor:			COP444
+
+    Mnemonic:           XABR
+
+    Hex Code:           12
+    Binary:             0 0 0 1 0 0 1 0
+
+    Data Flow:          A <-> Br(0 -> A3)
+
+    Description:        Exchange A with Br
+
+*/
+
+INSTRUCTION( cop444_xabr )
+{
+	UINT8 Br = A & 0x07;
+	UINT8 Bd = B & 0x0f;
+
+	A = B >> 4;
+	B = (Br << 4) + Bd;
+}
+
+/***************************************************************************
+	TEST INSTRUCTIONS
+***************************************************************************/
 
 /*
 
@@ -1003,7 +1014,7 @@ INSTRUCTION( lei )
 
 INSTRUCTION( skc )
 {
-	if (C == 1) cop400->skip = 1;
+	if (C == 1) cpustate->skip = 1;
 }
 
 /*
@@ -1021,7 +1032,7 @@ INSTRUCTION( skc )
 
 INSTRUCTION( ske )
 {
-	if (A == RAM_R(B)) cop400->skip = 1;
+	if (A == RAM_R(B)) cpustate->skip = 1;
 }
 
 /*
@@ -1039,7 +1050,7 @@ INSTRUCTION( ske )
 
 INSTRUCTION( skgz )
 {
-	if (IN_G() == 0) cop400->skip = 1;
+	if (IN_G() == 0) cpustate->skip = 1;
 }
 
 /*
@@ -1062,15 +1073,15 @@ INSTRUCTION( skgz )
 
 */
 
-INLINE void skgbz(cop400_state *cop400, int bit)
+INLINE void skgbz(cop400_state *cpustate, int bit)
 {
-	if (!BIT(IN_G(), bit)) cop400->skip = 1;
+	if (!BIT(IN_G(), bit)) cpustate->skip = 1;
 }
 
-INSTRUCTION( skgbz0 ) { skgbz(cop400, 0); }
-INSTRUCTION( skgbz1 ) { skgbz(cop400, 1); }
-INSTRUCTION( skgbz2 ) { skgbz(cop400, 2); }
-INSTRUCTION( skgbz3 ) { skgbz(cop400, 3); }
+INSTRUCTION( skgbz0 ) { skgbz(cpustate, 0); }
+INSTRUCTION( skgbz1 ) { skgbz(cpustate, 1); }
+INSTRUCTION( skgbz2 ) { skgbz(cpustate, 2); }
+INSTRUCTION( skgbz3 ) { skgbz(cpustate, 3); }
 
 /*
 
@@ -1092,17 +1103,41 @@ INSTRUCTION( skgbz3 ) { skgbz(cop400, 3); }
 
 */
 
-INLINE void skmbz(cop400_state *cop400, int bit)
+INLINE void skmbz(cop400_state *cpustate, int bit)
 {
-	if (!BIT(RAM_R(B), bit)) cop400->skip = 1;
+	if (!BIT(RAM_R(B), bit)) cpustate->skip = 1;
 }
 
-INSTRUCTION( skmbz0 ) { skmbz(cop400, 0); }
-INSTRUCTION( skmbz1 ) { skmbz(cop400, 1); }
-INSTRUCTION( skmbz2 ) { skmbz(cop400, 2); }
-INSTRUCTION( skmbz3 ) { skmbz(cop400, 3); }
+INSTRUCTION( skmbz0 ) { skmbz(cpustate, 0); }
+INSTRUCTION( skmbz1 ) { skmbz(cpustate, 1); }
+INSTRUCTION( skmbz2 ) { skmbz(cpustate, 2); }
+INSTRUCTION( skmbz3 ) { skmbz(cpustate, 3); }
 
-/* Input/Output Instructions */
+/*
+
+    Mnemonic:           SKT
+
+    Hex Code:           41
+    Binary:             0 1 0 0 0 0 0 1
+
+    Skip Conditions:    A time-base counter carry has occurred since last test
+
+    Description:        Skip on Timer
+
+*/
+
+INSTRUCTION( skt )
+{
+	if (cpustate->skt_latch)
+	{
+		cpustate->skt_latch = 0;
+		cpustate->skip = 1;
+	}
+}
+
+/***************************************************************************
+	INPUT/OUTPUT INSTRUCTIONS
+***************************************************************************/
 
 /*
 
@@ -1177,7 +1212,7 @@ INSTRUCTION( obd )
 
 INSTRUCTION( omg )
 {
-	WRITE_G(cop400, RAM_R(B));
+	WRITE_G(cpustate, RAM_R(B));
 }
 
 /*
@@ -1201,4 +1236,83 @@ INSTRUCTION( xas )
 	A = t;
 
 	SKL = C;
+}
+
+/*
+
+    Mnemonic:           ININ
+
+    Hex Code:           33 28
+    Binary:
+
+    Data Flow:          IN -> A
+
+    Description:        Input IN Inputs to A
+
+*/
+
+INSTRUCTION( inin )
+{
+	A = IN_IN();
+}
+
+/*
+
+    Processor:          COP402M
+
+    Mnemonic:           ININ
+
+    Hex Code:           33 28
+    Binary:
+
+    Data Flow:          IN -> A, A1 = "1"
+
+    Description:        Input IN Inputs to A
+
+*/
+
+INSTRUCTION( cop402m_inin )
+{
+	A = IN_IN() | 0x02;
+}
+
+/*
+
+    Mnemonic:           INIL
+
+    Hex Code:           33 29
+    Binary:
+
+    Data Flow:          IL3,CKO,"0",IL0 -> A
+
+    Description:        Input IL Latches to A
+
+*/
+
+INSTRUCTION( inil )
+{
+	A = (IL & 0x09) | IN_CKO() << 2;
+
+	IL = 0;
+}
+
+/*
+
+    Mnemonic:           OGI
+
+    Operand:            y
+    Hex Code:           33 5-
+    Binary:             0 0 1 1 0 0 1 1 0 1 0 1 y3 y2 y1 y0
+
+    Data Flow:          y -> G
+
+    Description:        Output to G Ports Immediate
+
+*/
+
+INSTRUCTION( ogi )
+{
+	UINT8 y = opcode & 0x0f;
+
+	WRITE_G(cpustate, y);
 }

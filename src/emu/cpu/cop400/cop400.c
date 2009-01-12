@@ -1,0 +1,1651 @@
+/***************************************************************************
+
+    cop400.c
+
+    National Semiconductor COP400 Emulator.
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+****************************************************************************
+
+	Type		ROM		RAM		G		D		IN
+
+	COP410		512x8	32x4					none
+	COP411		512x8	32x4	0-2		0-1		none
+	COP401		none	32x4					none
+	COP413?
+	COP414?		
+	COP415?		
+	COP405?		
+
+	COP420		1024x8	64x4					
+	COP421		1024x8	64x4					none
+	COP422		1024x8	64x4	2-3		2-3		none
+	COP402		none	64x4
+
+	COP444		2048x8	128x4
+	COP445		2048x8	128x4					none
+	COP424		1024x8	64x4
+	COP425		1024x8	64x4					none
+	COP426		1024x8	64x4	2-3		2-3
+	COP404		none	none
+
+	COP440		2048x8	160x4	
+	COP441		2048x8	160x4	
+	COP442		2048x8	160x4	
+
+****************************************************************************
+
+	Prefix      Temperature Range
+
+    COP4xx      0C ... 70C
+    COP3xx      -40C ... +85C
+    COP2xx      -55C ... +125C
+
+***************************************************************************/
+
+/*
+
+	TODO:
+
+	- remove LBIOps
+	- remove InstLen
+    - run interrupt test suite
+    - run production test suite
+    - run microbus test suite
+    - when is the microbus int cleared?
+	- opcode support for 2048x8 and 128x4/160x4 memory sizes
+    - CKO sync input
+    - save internal RAM when CKO is RAM power supply pin
+    - COP413/COP414/COP415/COP405
+	- COP404 opcode map switching, dual timer, microbus enable
+    - COP440/COP441/COP442 (new registers: 2-bit N, 4-bit H, 8-bit R; some new opcodes, 2Kx8 ROM, 160x4 RAM)
+	
+*/
+
+#include "driver.h"
+#include "cpuintrf.h"
+#include "debugger.h"
+#include "cop400.h"
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+/* feature masks */
+#define COP410_FEATURE	0x01
+#define COP420_FEATURE	0x02
+#define COP444_FEATURE	0x04
+#define COP440_FEATURE	0x08
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _cop400_opcode_map cop400_opcode_map;
+
+typedef struct _cop400_state cop400_state;
+struct _cop400_state
+{
+	const cop400_interface *intf;
+
+    const address_space *program;
+    const address_space *data;
+    const address_space *io;
+
+	/* registers */
+	UINT16 	pc;	   			/* 9/10/11-bit ROM address program counter */
+	UINT16	prevpc;			/* previous value of program counter */
+	UINT8	a;				/* 4-bit accumulator */
+	UINT8	b;				/* 5/6/7-bit RAM address register */
+	int		c;				/* 1-bit carry register */
+	UINT8	n;				/* 2-bit stack pointer (COP440 only) */
+	UINT8	en;				/* 4-bit enable register */
+	UINT8	g;				/* 4-bit general purpose I/O port */
+	UINT8	q;				/* 8-bit latch for L port */
+	UINT16	sa, sb, sc;		/* subroutine save registers (not present in COP440) */
+	UINT8	sio;			/* 4-bit shift register and counter */
+	int		skl;			/* 1-bit latch for SK output */
+	UINT8	h;				/* 4-bit general purpose I/O port (COP440 only) */
+	UINT8	r;				/* 8-bit general purpose I/O port (COP440 only) */
+
+	/* counter */
+	UINT8	t;				/* 8-bit timer */
+	int		skt_latch;		/* timer overflow latch */
+
+	/* input/output ports */
+	UINT8	g_mask;			/* G port mask */
+	UINT8	d_mask;			/* D port mask */
+	UINT8	in_mask;		/* IN port mask */
+	UINT8	il;				/* IN latch */
+	UINT8	in[4];			/* IN port shift register */
+	UINT8	si;				/* serial input */
+
+	/* skipping logic */
+	int skip;				/* skip next instruction */
+	int skip_lbi;			/* skip until next non-LBI instruction */
+	int last_skip;			/* last value of skip */
+	int halt;				/* halt mode */
+	int idle;				/* idle mode */
+
+	/* microbus */
+	int microbus_int;		/* microbus interrupt */
+
+	/* execution logic */
+	int InstLen[256];		/* instruction length in bytes */
+	int LBIops[256];
+	int LBIops33[256];
+	int icount;				/* instruction counter */
+	cpu_state_table state_table;	/* state table */
+
+	const cop400_opcode_map *opcode_map;
+
+	/* timers */
+	emu_timer *serial_timer;
+	emu_timer *counter_timer;
+	emu_timer *inil_timer;
+	emu_timer *microbus_timer;
+};
+
+struct _cop400_opcode_map {
+	unsigned cycles;
+	void (*function) (cop400_state *cpustate, UINT8 opcode);
+};
+
+/***************************************************************************
+    CPU STATE DESCRIPTION
+***************************************************************************/
+
+#define COP400_STATE_ENTRY(_name, _format, _member, _datamask, _featuremask, _flags) \
+	CPU_STATE_ENTRY(COP400_##_name, #_name, _format, cop400_state, _member, _datamask, _featuremask, _flags)
+
+#define COP410_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	COP400_STATE_ENTRY(_name, _format, _member, _datamask, COP410_FEATURE | COP420_FEATURE | COP444_FEATURE | COP440_FEATURE, _flags)
+
+#define COP420_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	COP400_STATE_ENTRY(_name, _format, _member, _datamask, COP420_FEATURE | COP444_FEATURE | COP440_FEATURE, _flags)
+
+#define COP444_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	COP400_STATE_ENTRY(_name, _format, _member, _datamask, COP444_FEATURE | COP440_FEATURE, _flags)
+
+#define COP440_STATE_ENTRY(_name, _format, _member, _datamask, _flags) \
+	COP400_STATE_ENTRY(_name, _format, _member, _datamask, COP440_FEATURE, _flags)
+
+static const cpu_state_entry state_array[] =
+{
+	COP410_STATE_ENTRY(GENPC, "%03X", pc, 0xfff, CPUSTATE_NOSHOW)
+	COP410_STATE_ENTRY(GENPCBASE, "%03X", prevpc, 0xfff, CPUSTATE_NOSHOW)
+	COP440_STATE_ENTRY(GENSP, "%01X", n, 0x3, CPUSTATE_NOSHOW)
+
+	COP410_STATE_ENTRY(PC, "%03X", pc, 0xfff, 0)
+
+	COP400_STATE_ENTRY(SA, "%03X", sa, 0xfff, COP410_FEATURE | COP420_FEATURE | COP444_FEATURE, 0)
+	COP400_STATE_ENTRY(SB, "%03X", sb, 0xfff, COP410_FEATURE | COP420_FEATURE | COP444_FEATURE, 0)
+	COP400_STATE_ENTRY(SC, "%03X", sc, 0xfff, COP420_FEATURE | COP444_FEATURE, 0)
+	COP440_STATE_ENTRY(N, "%01X", n, 0x3, 0)
+
+	COP410_STATE_ENTRY(A, "%01X", a, 0xf, 0)
+	COP410_STATE_ENTRY(B, "%02X", b, 0xff, 0)
+	COP410_STATE_ENTRY(C, "%1u", c, 0x1, 0)
+
+	COP410_STATE_ENTRY(EN, "%01X", en, 0xf, 0)
+	COP410_STATE_ENTRY(G, "%01X", g, 0xf, 0)
+	COP440_STATE_ENTRY(H, "%01X", h, 0xf, 0)
+	COP410_STATE_ENTRY(Q, "%02X", q, 0xff, 0)
+	COP440_STATE_ENTRY(R, "%02X", r, 0xff, 0)
+
+	COP410_STATE_ENTRY(SIO, "%01X", sio, 0xf, 0)
+	COP410_STATE_ENTRY(SKL, "%1u", skl, 0x1, 0)
+
+	COP420_STATE_ENTRY(T, "%02X", t, 0xff, 0)
+};
+
+static const cpu_state_table state_table_template =
+{
+	NULL,						/* pointer to the base of state (offsets are relative to this) */
+	0,							/* subtype this table refers to */
+	ARRAY_LENGTH(state_array),	/* number of entries */
+	state_array					/* array of entries */
+};
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define ROM(a)			memory_decrypted_read_byte(cpustate->program, a)
+#define RAM_R(a)		memory_read_byte_8le(cpustate->data, a)
+#define RAM_W(a, v)		memory_write_byte_8le(cpustate->data, a, v)
+#define IN(a)			memory_read_byte_8le(cpustate->io, a)
+#define OUT(a, v)		memory_write_byte_8le(cpustate->io, a, v)
+
+#define IN_G()			(IN(COP400_PORT_G) & cpustate->g_mask)
+#define IN_L()			IN(COP400_PORT_L)
+#define IN_SI()			BIT(IN(COP400_PORT_SIO), 0)
+#define IN_CKO()		BIT(IN(COP400_PORT_CKO), 0)
+#define IN_IN()			(cpustate->in_mask ? IN(COP400_PORT_IN) : 0)
+
+#define OUT_G(v)		OUT(COP400_PORT_G, (v) & cpustate->g_mask)
+#define OUT_L(v)		OUT(COP400_PORT_L, (v))
+#define OUT_D(v)		OUT(COP400_PORT_D, (v) & cpustate->d_mask)
+#define OUT_SK(v)		OUT(COP400_PORT_SK, (v))
+#define OUT_SO(v)		OUT(COP400_PORT_SIO, (v))
+
+#define PC				cpustate->pc
+#define A				cpustate->a
+#define B				cpustate->b
+#define C				cpustate->c
+#define G				cpustate->g
+#define Q				cpustate->q
+#define H				cpustate->h
+#define R				cpustate->r
+#define EN				cpustate->en
+#define SA				cpustate->sa
+#define SB				cpustate->sb
+#define SC				cpustate->sc
+#define SIO				cpustate->sio
+#define SKL				cpustate->skl
+#define T				cpustate->t
+#define IL				cpustate->il
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE void PUSH(cop400_state *cpustate, UINT16 data)
+{
+	if (cpustate->state_table.subtypemask != COP410_FEATURE)
+	{
+		SC = SB;
+	}
+
+	SB = SA;
+	SA = data;
+}
+
+INLINE void POP(cop400_state *cpustate)
+{
+	PC = SA;
+	SA = SB;
+
+	if (cpustate->state_table.subtypemask != COP410_FEATURE)
+	{
+		SB = SC;
+	}
+}
+
+INLINE void WRITE_Q(cop400_state *cpustate, UINT8 data)
+{
+	Q = data;
+
+	if (BIT(EN, 2))
+	{
+		OUT_L(Q);
+	}
+}
+
+INLINE void WRITE_G(cop400_state *cpustate, UINT8 data)
+{
+	if (cpustate->intf->microbus == COP400_MICROBUS_ENABLED)
+	{
+		data = (data & 0x0e) | cpustate->microbus_int;
+	}
+
+	G = data;
+
+	OUT_G(G);
+}
+
+/***************************************************************************
+    OPCODE HANDLERS
+***************************************************************************/
+
+#define INSTRUCTION(mnemonic) INLINE void (mnemonic)(cop400_state *cpustate, UINT8 opcode)
+
+INSTRUCTION(illegal)
+{
+	logerror("COP400: PC = %04x, Illegal opcode = %02x\n", PC-1, ROM(PC-1));
+}
+
+#include "cop400op.c"
+
+/***************************************************************************
+    OPCODE TABLES
+***************************************************************************/
+
+static const cop400_opcode_map COP410_OPCODE_23_MAP[] =
+{
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, xad	 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
+};
+
+static void cop410_op23(cop400_state *cpustate, UINT8 opcode)
+{
+	UINT8 opcode23 = ROM(PC++);
+
+	(*(COP410_OPCODE_23_MAP[opcode23].function))(cpustate, opcode23);
+}
+
+static const cop400_opcode_map COP410_OPCODE_33_MAP[] =
+{
+	{1, illegal 	},{1, skgbz0	},{1, illegal   },{1, skgbz2	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, skgbz1 	},{1, illegal 	},{1, skgbz3 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, skgz 		},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, ing	 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, inl	 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, halt	 	},{1, illegal 	},{1, omg	 	},{1, illegal 	},{1, camq	 	},{1, illegal 	},{1, obd	 	},{1, illegal 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},
+	{1, lei 		},{1, lei 		},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
+};
+
+static void cop410_op33(cop400_state *cpustate, UINT8 opcode)
+{
+	UINT8 opcode33 = ROM(PC++);
+
+	(*(COP410_OPCODE_33_MAP[opcode33].function))(cpustate, opcode33);
+}
+
+static const cop400_opcode_map COP410_OPCODE_MAP[] =
+{
+	{1, clra		},{1, skmbz0	},{1, xor		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{0, illegal		},{1, skmbz1	},{0, illegal	},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, skc			},{1, ske		},{1, sc		},{1, cop410_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds 		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, asc			},{1, add		},{1, rc		},{1, cop410_op33	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+
+	{1, comp		},{0, illegal	},{1, rmb2		},{1, rmb3			},{1, nop		},{1, rmb1		},{1, smb2		},{1, smb1		},
+	{1,	ret			},{1, retsk		},{0, illegal	},{1, smb3			},{1, rmb0		},{1, smb0		},{1, cba		},{1, xas		},
+	{1, cab			},{1, aisc		},{1, aisc		},{1, aisc			},{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc		},
+	{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc			},{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc		},
+	{2, jmp			},{2, jmp		},{0, illegal	},{0, illegal		},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal   },
+	{2, jsr			},{2, jsr		},{0, illegal	},{0, illegal		},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},
+	{1, stii		},{1, stii		},{1, stii		},{1, stii			},{1, stii		},{1, stii		},{1, stii		},{1, stii		},
+	{1, stii		},{1, stii		},{1, stii		},{1, stii			},{1, stii		},{1, stii		},{1, stii		},{1, stii		},
+
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{2, lqid		},
+
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{2, jid		}
+};
+
+static const cop400_opcode_map COP420_OPCODE_23_MAP[] =
+{
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
+};
+
+static void cop420_op23(cop400_state *cpustate, UINT8 opcode)
+{
+	UINT8 opcode23 = ROM(PC++);
+
+	(*(COP420_OPCODE_23_MAP[opcode23].function))(cpustate, opcode23);
+}
+
+static const cop400_opcode_map COP420_OPCODE_33_MAP[] =
+{
+	{1, illegal		},{1, skgbz0 	},{1, illegal 	},{1, skgbz2 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, skgbz1 	},{1, illegal 	},{1, skgbz3 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, skgz	 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, inin 		},{1, inil 		},{1, ing	 	},{1, illegal 	},{1, cqma	 	},{1, illegal 	},{1, inl	 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, omg	 	},{1, illegal 	},{1, camq	 	},{1, illegal 	},{1, obd	 	},{1, illegal 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, ogi	 		},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},
+	{1, ogi	 		},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},
+	{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},
+	{1, lei 		},{1, lei 		},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
+};
+
+static void cop420_op33(cop400_state *cpustate, UINT8 opcode)
+{
+	UINT8 opcode33 = ROM(PC++);
+
+	(*(COP420_OPCODE_33_MAP[opcode33].function))(cpustate, opcode33);
+}
+
+static const cop400_opcode_map COP420_OPCODE_MAP[] =
+{
+	{1, clra		},{1, skmbz0	},{1, xor		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, casc		},{1, skmbz1	},{1, xabr		},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, skc			},{1, ske		},{1, sc		},{1, cop420_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds 		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, asc			},{1, add		},{1, rc		},{1, cop420_op33  	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+
+	{1, comp		},{1, skt		},{1, rmb2		},{1, rmb3			},{1, nop		},{1, rmb1		},{1, smb2		},{1, smb1		},
+	{1,	cop420_ret	},{1, retsk		},{1, adt		},{1, smb3			},{1, rmb0		},{1, smb0		},{1, cba		},{1, xas		},
+	{1, cab			},{1, aisc		},{1, aisc		},{1, aisc			},{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc		},
+	{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc			},{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc		},
+	{2, jmp			},{2, jmp		},{2, jmp		},{2, jmp			},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal   },
+	{2, jsr			},{2, jsr		},{2, jsr		},{2, jsr			},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},
+	{1, stii		},{1, stii		},{1, stii		},{1, stii			},{1, stii		},{1, stii		},{1, stii		},{1, stii		},
+	{1, stii		},{1, stii		},{1, stii		},{1, stii			},{1, stii		},{1, stii		},{1, stii		},{1, stii		},
+
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{2, lqid		},
+
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{2, jid		}
+};
+
+static const cop400_opcode_map COP444_OPCODE_23_MAP[256] =
+{
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+	{1, ldd		 	},{1, ldd		},{1, ldd	 	},{1, ldd	 	},{1, ldd	 	},{1, ldd 		},{1, ldd	 	},{1, ldd	 	},
+
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+	{1, xad		 	},{1, xad		},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},{1, xad	 	},
+};
+
+static void cop444_op23(cop400_state *cpustate, UINT8 opcode)
+{
+	UINT8 opcode23 = ROM(PC++);
+
+	(*(COP444_OPCODE_23_MAP[opcode23].function))(cpustate, opcode23);
+}
+
+static const cop400_opcode_map COP444_OPCODE_33_MAP[256] =
+{
+	{1, illegal		},{1, skgbz0 	},{1, illegal 	},{1, skgbz2 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, skgbz1 	},{1, illegal 	},{1, skgbz3 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, skgz	 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, inin 		},{1, inil 		},{1, ing	 	},{1, illegal 	},{1, cqma	 	},{1, illegal 	},{1, inl	 	},{1, ctma	 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, it		 	},{1, illegal 	},{1, omg	 	},{1, illegal 	},{1, camq	 	},{1, illegal 	},{1, obd	 	},{1, camt	 	},
+
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, ogi	 		},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},
+	{1, ogi	 		},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},{1, ogi	 	},
+	{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},{1, lei 		},
+	{1, lei 		},{1, lei 		},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},{1, lei	 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
+
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+	{1, lbi		 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},{1, lbi	 	},
+};
+
+static void cop444_op33(cop400_state *cpustate, UINT8 opcode)
+{
+	UINT8 opcode33 = ROM(PC++);
+
+	(*(COP444_OPCODE_33_MAP[opcode33].function))(cpustate, opcode33);
+}
+
+static const cop400_opcode_map COP444_OPCODE_MAP[256] =
+{
+	{1, clra		},{1, skmbz0	},{1, xor		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, casc		},{1, skmbz1	},{1, cop444_xabr},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, skc			},{1, ske		},{1, sc		},{1, cop444_op23	},{1, xis		},{1, ld		},{1, x			},{1, xds 		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+	{1, asc			},{1, add		},{1, rc		},{1, cop444_op33  	},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
+
+	{1, comp		},{1, skt		},{1, rmb2		},{1, rmb3			},{1, nop		},{1, rmb1		},{1, smb2		},{1, smb1		},
+	{1,	cop420_ret	},{1, retsk		},{1, adt		},{1, smb3			},{1, rmb0		},{1, smb0		},{1, cba		},{1, xas		},
+	{1, cab			},{1, aisc		},{1, aisc		},{1, aisc			},{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc		},
+	{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc			},{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc		},
+	{2, jmp			},{2, jmp		},{2, jmp		},{2, jmp			},{2, jmp		},{2, jmp		},{2, jmp		},{2, jmp		},
+	{2, jsr			},{2, jsr		},{2, jsr		},{2, jsr			},{2, jsr		},{2, jsr		},{2, jsr		},{2, jsr		},
+	{1, stii		},{1, stii		},{1, stii		},{1, stii			},{1, stii		},{1, stii		},{1, stii		},{1, stii		},
+	{1, stii		},{1, stii		},{1, stii		},{1, stii			},{1, stii		},{1, stii		},{1, stii		},{1, stii		},
+
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{2, lqid		},
+
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
+	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{2, jid		}
+};
+
+/***************************************************************************
+    TIMER CALLBACKS
+***************************************************************************/
+
+static TIMER_CALLBACK( serial_tick )
+{
+	cop400_state *cpustate = ptr;
+
+	if (BIT(EN, 0))
+	{
+		/*
+
+            SIO is an asynchronous binary counter decrementing its value by one upon each low-going pulse ("1" to "0") occurring on the SI input.
+            Each pulse must remain at each logic level at least two instruction cycles. SK outputs the value of the C upon the execution of an XAS
+            and remains latched until the execution of another XAS instruction. The SO output is equal to the value of EN3.
+
+        */
+
+		// serial output
+
+		OUT_SO(BIT(EN, 3));
+
+		// serial clock
+
+		OUT_SK(SKL);
+
+		// serial input
+
+		cpustate->si <<= 1;
+		cpustate->si = (cpustate->si & 0x0e) | IN_SI();
+
+		if ((cpustate->si & 0x0f) == 0x0c) // 1100
+		{
+			SIO--;
+			SIO &= 0x0f;
+		}
+	}
+	else
+	{
+		/*
+
+            SIO is a serial shift register, shifting continuously left each instruction cycle time. The data present at SI goes into the least
+            significant bit of SIO: SO can be enabled to output the most significant bit of SIO each cycle time. SK output becomes a logic-
+            controlled clock, providing a SYNC signal each instruction time. It will start outputting a SYNC pulse upon the execution of an XAS
+            instruction with C = "1," stopping upon the execution of a subsequent XAS with C = "0".
+
+            If EN0 is changed from "1" to "0" ("0" to "1") the SK output will change from "1" to SYNC (SYNC to "1") without the execution of
+            an XAS instruction.
+
+        */
+
+		// serial output
+
+		if (BIT(EN, 3))
+		{
+			OUT_SO(BIT(SIO, 3));
+		}
+		else
+		{
+			OUT_SO(0);
+		}
+
+		// serial clock
+
+		if (SKL)
+		{
+			OUT_SK(1); // SYNC
+		}
+		else
+		{
+			OUT_SK(0);
+		}
+
+		// serial input
+
+		SIO = ((SIO << 1) | IN_SI()) & 0x0f;
+	}
+}
+
+static TIMER_CALLBACK( counter_tick )
+{
+	cop400_state *cpustate = ptr;
+
+	T++;
+
+	if (T == 0)
+	{
+		cpustate->skt_latch = 1;
+
+		if (cpustate->idle)
+		{
+			cpustate->idle = 0;
+			cpustate->halt = 0;
+		}
+	}
+}
+
+static TIMER_CALLBACK( inil_tick )
+{
+	cop400_state *cpustate = ptr;
+	UINT8 in;
+	int i;
+
+	in = IN_IN();
+
+	for (i = 0; i < 4; i++)
+	{
+		cpustate->in[i] = (cpustate->in[i] << 1) | BIT(in, i);
+
+		if ((cpustate->in[i] & 0x07) == 0x04) // 100
+		{
+			IL |= (1 << i);
+		}
+	}
+}
+
+static TIMER_CALLBACK( microbus_tick )
+{
+	cop400_state *cpustate = ptr;
+	UINT8 in;
+
+	in = IN_IN();
+
+	if (!BIT(in, 2))
+	{
+		// chip select
+
+		if (!BIT(in, 1))
+		{
+			// read strobe
+
+			OUT_L(Q);
+
+			cpustate->microbus_int = 1;
+		}
+		else if (!BIT(in, 3))
+		{
+			// write strobe
+
+			Q = IN_L();
+
+			cpustate->microbus_int = 0;
+		}
+	}
+}
+
+/***************************************************************************
+    INITIALIZATION
+***************************************************************************/
+
+static void cop400_init(const device_config *device, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, int has_counter, int has_inil)
+{
+	cop400_state *cpustate = device->token;
+
+	cpustate->intf = (cop400_interface *) device->static_config;
+
+	/* find address spaces */
+
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+
+	/* set output pin masks */
+
+	cpustate->g_mask = g_mask;
+	cpustate->d_mask = d_mask;
+	cpustate->in_mask = in_mask;
+
+	/* set clock divider */
+
+	device_set_info_int(device, CPUINFO_INT_CLOCK_DIVIDER, cpustate->intf->cki);
+
+	/* allocate serial timer */
+
+	cpustate->serial_timer = timer_alloc(device->machine, serial_tick, cpustate);
+	timer_adjust_periodic(cpustate->serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
+
+	/* allocate counter timer */
+
+	if (has_counter)
+	{
+		cpustate->counter_timer = timer_alloc(device->machine, counter_tick, cpustate);
+		timer_adjust_periodic(cpustate->counter_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16 / 4));
+	}
+
+	/* allocate IN latch timer */
+
+	if (has_inil)
+	{
+		cpustate->inil_timer = timer_alloc(device->machine, inil_tick, cpustate);
+		timer_adjust_periodic(cpustate->inil_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
+	}
+
+	/* allocate Microbus timer */
+
+	if (cpustate->intf->microbus == COP400_MICROBUS_ENABLED)
+	{
+		cpustate->microbus_timer = timer_alloc(device->machine, microbus_tick, cpustate);
+		timer_adjust_periodic(cpustate->microbus_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 16));
+	}
+
+	/* register for state saving */
+
+	state_save_register_device_item(device, 0, cpustate->pc);
+	state_save_register_device_item(device, 0, cpustate->prevpc);
+	state_save_register_device_item(device, 0, cpustate->n);
+	state_save_register_device_item(device, 0, cpustate->sa);
+	state_save_register_device_item(device, 0, cpustate->sb);
+	state_save_register_device_item(device, 0, cpustate->sc);
+	state_save_register_device_item(device, 0, cpustate->a);
+	state_save_register_device_item(device, 0, cpustate->b);
+	state_save_register_device_item(device, 0, cpustate->c);
+	state_save_register_device_item(device, 0, cpustate->g);
+	state_save_register_device_item(device, 0, cpustate->h);
+	state_save_register_device_item(device, 0, cpustate->q);
+	state_save_register_device_item(device, 0, cpustate->r);
+	state_save_register_device_item(device, 0, cpustate->en);
+	state_save_register_device_item(device, 0, cpustate->sio);
+	state_save_register_device_item(device, 0, cpustate->skl);
+	state_save_register_device_item(device, 0, cpustate->t);
+	state_save_register_device_item(device, 0, cpustate->skip);
+	state_save_register_device_item(device, 0, cpustate->skip_lbi);
+	state_save_register_device_item(device, 0, cpustate->skt_latch);
+	state_save_register_device_item(device, 0, cpustate->si);
+	state_save_register_device_item(device, 0, cpustate->last_skip);
+	state_save_register_device_item_array(device, 0, cpustate->in);
+	state_save_register_device_item(device, 0, cpustate->microbus_int);
+	state_save_register_device_item(device, 0, cpustate->halt);
+	state_save_register_device_item(device, 0, cpustate->idle);
+}
+
+static void cop410_init_opcodes(const device_config *device)
+{
+	cop400_state *cpustate = device->token;
+	int i;
+
+	/* set up the state table */
+
+	cpustate->state_table = state_table_template;
+	cpustate->state_table.baseptr = cpustate;
+	cpustate->state_table.subtypemask = COP410_FEATURE;
+
+	/* initialize instruction length array */
+
+	for (i=0; i<256; i++) cpustate->InstLen[i]=1;
+
+	cpustate->InstLen[0x60] = cpustate->InstLen[0x61] = cpustate->InstLen[0x68] = 
+	cpustate->InstLen[0x69] = cpustate->InstLen[0x33] = cpustate->InstLen[0x23] = 2;
+
+	/* initialize LBI opcode array */
+
+	for (i=0; i<256; i++) cpustate->LBIops[i] = 0;
+	for (i=0x08; i<0x10; i++) cpustate->LBIops[i] = 1;
+	for (i=0x18; i<0x20; i++) cpustate->LBIops[i] = 1;
+	for (i=0x28; i<0x30; i++) cpustate->LBIops[i] = 1;
+	for (i=0x38; i<0x40; i++) cpustate->LBIops[i] = 1;
+
+	/* select opcode map */
+
+	cpustate->opcode_map = COP410_OPCODE_MAP;
+}
+
+static void cop420_init_opcodes(const device_config *device)
+{
+	cop400_state *cpustate = device->token;
+	int i;
+
+	/* set up the state table */
+
+	cpustate->state_table = state_table_template;
+	cpustate->state_table.baseptr = cpustate;
+	cpustate->state_table.subtypemask = COP420_FEATURE;
+
+	/* initialize instruction length array */
+
+	for (i=0; i<256; i++) cpustate->InstLen[i]=1;
+
+	cpustate->InstLen[0x60] = cpustate->InstLen[0x61] = cpustate->InstLen[0x62] = cpustate->InstLen[0x63] =
+	cpustate->InstLen[0x68] = cpustate->InstLen[0x69] = cpustate->InstLen[0x6a] = cpustate->InstLen[0x6b] =
+	cpustate->InstLen[0x33] = cpustate->InstLen[0x23] = 2;
+
+	/* initialize LBI opcode array */
+
+	for (i=0; i<256; i++) cpustate->LBIops[i] = 0;
+	for (i=0x08; i<0x10; i++) cpustate->LBIops[i] = 1;
+	for (i=0x18; i<0x20; i++) cpustate->LBIops[i] = 1;
+	for (i=0x28; i<0x30; i++) cpustate->LBIops[i] = 1;
+	for (i=0x38; i<0x40; i++) cpustate->LBIops[i] = 1;
+
+	for (i=0; i<256; i++) cpustate->LBIops33[i] = 0;
+	for (i=0x80; i<0xc0; i++) cpustate->LBIops33[i] = 1;
+
+	/* select opcode map */
+
+	cpustate->opcode_map = COP420_OPCODE_MAP;
+}
+
+static void cop444_init_opcodes(const device_config *device)
+{
+	cop400_state *cpustate = device->token;
+	int i;
+
+	/* set up the state table */
+
+	cpustate->state_table = state_table_template;
+	cpustate->state_table.baseptr = cpustate;
+	cpustate->state_table.subtypemask = COP444_FEATURE;
+
+	/* initialize instruction length array */
+
+	for (i=0; i<256; i++) cpustate->InstLen[i]=1;
+
+	cpustate->InstLen[0x60] = cpustate->InstLen[0x61] = cpustate->InstLen[0x62] = cpustate->InstLen[0x63] =
+	cpustate->InstLen[0x68] = cpustate->InstLen[0x69] = cpustate->InstLen[0x6a] = cpustate->InstLen[0x6b] =
+	cpustate->InstLen[0x33] = cpustate->InstLen[0x23] = 2;
+
+	/* initialize LBI opcode array */
+
+	for (i=0; i<256; i++) cpustate->LBIops[i] = 0;
+	for (i=0x08; i<0x10; i++) cpustate->LBIops[i] = 1;
+	for (i=0x18; i<0x20; i++) cpustate->LBIops[i] = 1;
+	for (i=0x28; i<0x30; i++) cpustate->LBIops[i] = 1;
+	for (i=0x38; i<0x40; i++) cpustate->LBIops[i] = 1;
+
+	for (i=0; i<256; i++) cpustate->LBIops33[i] = 0;
+	for (i=0x80; i<0xc0; i++) cpustate->LBIops33[i] = 1;
+
+	/* select opcode map */
+
+	cpustate->opcode_map = COP444_OPCODE_MAP;
+}
+
+static CPU_INIT( cop410 )
+{
+	cop410_init_opcodes(device);
+	cop400_init(device, 0xf, 0xf, 0, 0, 0);
+}
+
+static CPU_INIT( cop411 )
+{
+	cop410_init_opcodes(device);
+	cop400_init(device, 0x7, 0x3, 0, 0, 0);
+}
+
+static CPU_INIT( cop420 )
+{
+	cop420_init_opcodes(device);
+	cop400_init(device, 0xf, 0xf, 0xf, 1, 1);
+}
+
+static CPU_INIT( cop421 )
+{
+	cop420_init_opcodes(device);
+	cop400_init(device, 0xf, 0xf, 0, 1, 0);
+}
+
+static CPU_INIT( cop422 )
+{
+	cop420_init_opcodes(device);
+	cop400_init(device, 0xe, 0xe, 0, 1, 0);
+}
+
+static CPU_INIT( cop444 )
+{
+	cop444_init_opcodes(device);
+	cop400_init(device, 0xf, 0xf, 0xf, 1, 1);
+}
+
+static CPU_INIT( cop425 )
+{
+	cop444_init_opcodes(device);
+	cop400_init(device, 0xf, 0xf, 0, 1, 0);
+}
+
+static CPU_INIT( cop426 )
+{
+	cop444_init_opcodes(device);
+	cop400_init(device, 0xe, 0xe, 0xf, 1, 1);
+}
+
+static CPU_INIT( cop445 )
+{
+	cop444_init_opcodes(device);
+	cop400_init(device, 0x7, 0x3, 0, 1, 0);
+}
+
+/***************************************************************************
+    RESET
+***************************************************************************/
+
+static CPU_RESET( cop400 )
+{
+	cop400_state *cpustate = device->token;
+
+	PC = 0;
+	A = 0;
+	B = 0;
+	C = 0;
+	OUT_D(0);
+	EN = 0;
+	WRITE_G(cpustate, 0);
+	SKL = 1;
+
+	T = 0;
+	cpustate->skt_latch = 1;
+
+	cpustate->halt = 0;
+	cpustate->idle = 0;
+}
+
+/***************************************************************************
+    EXECUTION
+***************************************************************************/
+
+static CPU_EXECUTE( cop400 )
+{
+	cop400_state *cpustate = device->token;
+
+	UINT8 opcode;
+
+	cpustate->icount = cycles;
+
+	do
+	{
+		cpustate->prevpc = PC;
+
+		debugger_instruction_hook(device, PC);
+
+		if (cpustate->intf->cko == COP400_CKO_HALT_IO_PORT)
+		{
+			cpustate->halt = IN_CKO();
+		}
+
+		if (cpustate->halt)
+		{
+			cpustate->icount -= 1;
+			continue;
+		}
+
+		opcode = ROM(PC);
+
+		if (cpustate->skip_lbi)
+		{
+			int is_lbi = 0;
+
+			if (opcode == 0x33)
+			{
+				is_lbi = cpustate->LBIops33[ROM(PC+1)];
+			}
+			else
+			{
+				is_lbi = cpustate->LBIops[opcode];
+			}
+
+			if (is_lbi)
+			{
+				cpustate->icount -= cpustate->opcode_map[opcode].cycles;
+
+				PC += cpustate->InstLen[opcode];
+			}
+			else
+			{
+				cpustate->skip_lbi = 0;
+			}
+		}
+
+		if (!cpustate->skip_lbi)
+		{
+			int inst_cycles = cpustate->opcode_map[opcode].cycles;
+
+			PC++;
+
+			(*(cpustate->opcode_map[opcode].function))(cpustate, opcode);
+			cpustate->icount -= inst_cycles;
+
+			// check for interrupt
+
+			if (BIT(EN, 1) && BIT(IL, 1))
+			{
+				void *function = cpustate->opcode_map[ROM(PC)].function;
+
+				if ((function != jp) &&	(function != jmp) && (function != jsr))
+				{
+					// store skip logic
+					cpustate->last_skip = cpustate->skip;
+					cpustate->skip = 0;
+
+					// push next PC
+					PUSH(cpustate, PC);
+
+					// jump to interrupt service routine
+					PC = 0x0ff;
+
+					// disable interrupt
+					EN &= ~0x02;
+				}
+
+				IL &= ~2;
+			}
+
+			// skip next instruction?
+
+			if (cpustate->skip)
+			{
+				void *function = cpustate->opcode_map[ROM(PC)].function;
+
+				opcode = ROM(PC);
+
+				if ((function == lqid) || (function == jid))
+				{
+					cpustate->icount -= 1;
+				}
+				else
+				{
+					cpustate->icount -= cpustate->opcode_map[opcode].cycles;
+				}
+
+				PC += cpustate->InstLen[opcode];
+
+				cpustate->skip = 0;
+			}
+		}
+	} while (cpustate->icount > 0);
+
+	return cycles - cpustate->icount;
+}
+
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
+
+static ADDRESS_MAP_START( program_512b, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000, 0x1ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( program_1kb, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( program_2kb, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( data_32b, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x00, 0x1f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( data_64b, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x00, 0x3f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( data_128b, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x00, 0x7f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( data_160b, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x00, 0x9f) AM_RAM
+ADDRESS_MAP_END
+
+/***************************************************************************
+    VALIDITY CHECKS
+***************************************************************************/
+
+static CPU_VALIDITY_CHECK( cop410 )
+{
+	int error = FALSE;
+	const cop400_interface *intf = (const cop400_interface *) config;
+
+	if ((intf == NULL) || (intf->cki <= 0))
+	{
+		mame_printf_error("%s: %s has an invalid CPU configuration\n", driver->source_file, driver->name);
+		error = TRUE;
+	}
+
+	return error;
+}
+
+static CPU_VALIDITY_CHECK( cop420 )
+{
+	int error = FALSE;
+	const cop400_interface *intf = (const cop400_interface *) config;
+
+	if ((intf == NULL) || (intf->cki <= 0))
+	{
+		mame_printf_error("%s: %s has an invalid CPU configuration\n", driver->source_file, driver->name);
+		error = TRUE;
+	}
+
+	return error;
+}
+
+static CPU_VALIDITY_CHECK( cop421 )
+{
+	int error = FALSE;
+	const cop400_interface *intf = (const cop400_interface *) config;
+
+	if ((intf == NULL) || (intf->cki <= 0) || (intf->microbus == COP400_MICROBUS_ENABLED))
+	{
+		mame_printf_error("%s: %s has an invalid CPU configuration\n", driver->source_file, driver->name);
+		error = TRUE;
+	}
+
+	return error;
+}
+
+static CPU_VALIDITY_CHECK( cop444 )
+{
+	int error = FALSE;
+	const cop400_interface *intf = (const cop400_interface *) config;
+
+	if ((intf == NULL) || (intf->cki <= 0))
+	{
+		mame_printf_error("%s: %s has an invalid CPU configuration\n", driver->source_file, driver->name);
+		error = TRUE;
+	}
+
+	return error;
+}
+
+/***************************************************************************
+    GENERAL CONTEXT ACCESS
+***************************************************************************/
+
+static CPU_SET_INFO( cop400 )
+{
+	/* nothing to set */
+}
+
+static CPU_GET_INFO( cop400 )
+{
+	cop400_state *cpustate = (device != NULL) ? device->token : NULL;
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cop400_state);							break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 0;											break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;											break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;											break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 16;											break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;											break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;											break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;											break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 2;											break;
+
+		case CPUINFO_INT_DATABUS_WIDTH_PROGRAM:			info->i = 8;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			/* set per-core */										break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_PROGRAM:			info->i = 0;											break;
+		case CPUINFO_INT_DATABUS_WIDTH_DATA:			info->i = 8; /* really 4 */								break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			/* set per-core */										break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_DATA: 			info->i = 0;											break;
+		case CPUINFO_INT_DATABUS_WIDTH_IO:				info->i = 8;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_IO: 				info->i = 9;											break;
+		case CPUINFO_INT_ADDRBUS_SHIFT_IO: 				info->i = 0;											break;
+
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cop400);				break;
+		case CPUINFO_FCT_INIT:							/* set per-core */										break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(cop400);					break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cop400);				break;
+		case CPUINFO_FCT_DISASSEMBLE:					/* set per-core */										break;
+		case CPUINFO_FCT_VALIDITY_CHECK:				/* set per-core */										break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;						break;
+		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &cpustate->state_table;				break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	/* set per-core */										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA: 		/* set per-core */ 										break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP400");								break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "National Semiconductor COPS");			break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");									break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);								break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright MAME Team");					break;
+	}
+}
+
+/***************************************************************************
+    CPU-SPECIFIC CONTEXT ACCESS
+***************************************************************************/
+
+CPU_GET_INFO( cop410 )
+{
+	cop400_state *cpustate = (device != NULL) ? device->token : NULL;
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 9;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 5;											break;
+
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop410);						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop410);		break;
+		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410);	break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_512b);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_32b);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP410");								break;
+
+		case CPUINFO_STR_FLAGS: sprintf(info->s,
+									"%c%c",
+									 cpustate->c ? 'C' : '.',
+									 cpustate->skl ? 'S' : '.'); break;
+
+		default:										CPU_GET_INFO_CALL(cop400);								break;
+	}
+}
+
+CPU_GET_INFO( cop411 )
+{
+	// COP411 is a 20-pin package version of the COP410, missing D2/D3/G3/CKO
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop411);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP411");								break;
+
+		default:										CPU_GET_INFO_CALL(cop410);								break;
+	}
+}
+
+CPU_GET_INFO( cop401 )
+{
+	// COP401 is a ROMless version of the COP410
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = NULL;								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP401");								break;
+
+		default:										CPU_GET_INFO_CALL(cop410);								break;
+	}
+}
+
+CPU_GET_INFO( cop420 )
+{
+	cop400_state *cpustate = (device != NULL) ? device->token : NULL;
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 10;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 6;											break;
+
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop420);						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop420);		break;
+		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop420);	break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_64b);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP420");								break;
+
+		case CPUINFO_STR_FLAGS: sprintf(info->s,
+									"%c%c%c",
+									 cpustate->c ? 'C' : '.',
+									 cpustate->skl ? 'S' : '.',
+									 cpustate->skt_latch ? 'T' : '.'); break;
+
+		default:										CPU_GET_INFO_CALL(cop400);								break;
+	}
+}
+
+CPU_GET_INFO( cop421 )
+{
+	// COP421 is a 24-pin package version of the COP420, lacking the IN ports
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop421);						break;
+		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop421);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP421");								break;
+
+		default:										CPU_GET_INFO_CALL(cop420);								break;
+	}
+}
+
+CPU_GET_INFO( cop422 )
+{
+	// COP422 is a 20-pin package version of the COP420, lacking G0/G1, D0/D1, and the IN ports
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop422);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP422");								break;
+
+		default:										CPU_GET_INFO_CALL(cop421);								break;
+	}
+}
+
+CPU_GET_INFO( cop402 )
+{
+	// COP402 is a ROMless version of the COP420
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = NULL;								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP402");								break;
+
+		default:										CPU_GET_INFO_CALL(cop420);								break;
+	}
+}
+
+CPU_GET_INFO( cop444 )
+{
+	cop400_state *cpustate = (device != NULL) ? device->token : NULL;
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 11;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 7;											break;
+
+		/* --- the following bits of info are returned as pointers to functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop444);						break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop444);		break;
+		case CPUINFO_FCT_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop444);	break;
+
+		/* --- the following bits of info are returned as pointers --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_2kb);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_128b);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP444");								break;
+
+		case CPUINFO_STR_FLAGS: sprintf(info->s,
+									"%c%c%c",
+									 cpustate->c ? 'C' : '.',
+									 cpustate->skl ? 'S' : '.',
+									 cpustate->skt_latch ? 'T' : '.'); break;
+
+		default:										CPU_GET_INFO_CALL(cop400);								break;
+	}
+}
+
+CPU_GET_INFO( cop445 )
+{
+	// COP445 is a 24-pin package version of the COP444, lacking the IN ports
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop445);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP445");								break;
+
+		default:										CPU_GET_INFO_CALL(cop444);								break;
+	}
+}
+
+CPU_GET_INFO( cop424 )
+{
+	// COP424 is functionally equivalent to COP444, with only 1K ROM and 64x4 bytes RAM
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ADDRBUS_WIDTH_PROGRAM:			info->i = 10;											break;
+		case CPUINFO_INT_ADDRBUS_WIDTH_DATA: 			info->i = 6;											break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_1kb);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_DATA:		info->internal_map8 = ADDRESS_MAP_NAME(data_64b);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP424");								break;
+
+		default:										CPU_GET_INFO_CALL(cop444);								break;
+	}
+}
+
+CPU_GET_INFO( cop425 )
+{
+	// COP425 is a 24-pin package version of the COP424, lacking the IN ports
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop425);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP425");								break;
+
+		default:										CPU_GET_INFO_CALL(cop424);								break;
+	}
+}
+
+CPU_GET_INFO( cop426 )
+{
+	// COP426 is a 20-pin package version of the COP424, with only L0-L7, G2-G3, D2-D3 ports
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(cop426);						break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP426");								break;
+
+		default:										CPU_GET_INFO_CALL(cop424);								break;
+	}
+}
+
+CPU_GET_INFO( cop404 )
+{
+	// COP404 is a ROMless version of the COP444, which can emulate a COP410C/COP411C, COP424C/COP425C, or a COP444C/COP445C
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP_PROGRAM:	info->internal_map8 = NULL;								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP404");								break;
+
+		default:										CPU_GET_INFO_CALL(cop444);								break;
+	}
+}
