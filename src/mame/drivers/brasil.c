@@ -667,7 +667,7 @@ ROM_START( newmcard )
 	ROM_COPY( "user1", 0x0c0000, 0x000000, 0x40000 )
 
 	ROM_REGION( 0x080000, "samples", 0 ) /* M6376 Samples */
-	ROM_LOAD( "mc33.ic5", 0x00000, 0x80000, CRC(83a855ab) SHA1(7f9384c875b951d17caa91f8a7365edaf7f9afe1) )
+	ROM_LOAD( "mc31.ic15", 0x00000, 0x40000, CRC(8b72ffec) SHA1(fca5cf2594325e0c9fe446ddf2330c669f7f37a9) )
 ROM_END
 
 /*

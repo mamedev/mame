@@ -172,24 +172,41 @@ static void generate_adpcm(struct okim6376 *chip, struct ADPCMVoice *voice, INT1
 		/* loop while we still have samples to generate */
 		while (samples)
 		{
+			int nibble;
+
+			if (count == 0)
+			{
+				/* get the number of samples to play */
+				count = (base[sample / 2] & 0x7f) << 1;
+
+				/* end of voice marker */
+				if (count == 0)
+				{
+					voice->playing = 0;
+					break;
+				}
+				else
+				{
+					/* step past the count byte */
+					sample += 2;
+				}
+			}
+
 			/* compute the new amplitude and update the current step */
-			int nibble = base[sample / 2] >> (((sample & 1) << 2) ^ 4);
+			nibble = base[sample / 2] >> (((sample & 1) << 2) ^ 4);
 
 			/* output to the buffer, scaling by the volume */
 			/* signal in range -4096..4095, volume in range 2..16 => signal * volume / 2 in range -32768..32767 */
 			*buffer++ = clock_adpcm(voice, nibble) * voice->volume / 2;
-			samples--;
 
-			/* next! */
-			if (++sample >= count)
-			{
-				voice->playing = 0;
-				break;
-			}
+			++sample;
+			--count;
+			--samples;
 		}
 
 		/* update the parameters */
 		voice->sample = sample;
+		voice->count = count;
 	}
 
 	/* fill the rest with silence */
@@ -365,7 +382,7 @@ static void okim6376_data_w(int num, int data)
 	/* if a command is pending, process the second half */
 	if (info->command != -1)
 	{
-		int temp = data >> 4, i, start, stop;
+		int temp = data >> 4, i, start;
 		unsigned char *base, *base_end;
 
 
@@ -383,44 +400,33 @@ static void okim6376_data_w(int num, int data)
 			{
 				struct ADPCMVoice *voice = &info->voice[i];
 
-				/* determine the start/stop positions, max address space is 16Mbit */
+				/* determine the start position, max address space is 16Mbit */
 				base = &info->region_base[info->command * 4];
 				base_end = &info->region_base[(MAX_WORDS+1) * 4];
 				start = ((base[0] << 16) + (base[1] << 8) + base[2]) & 0x1fffff;
-				if (start == 0) {
+
+				if (start == 0)
+				{
 					voice->playing = 0;
-				} else {
-					/* FIX: for now handle stop reading the next sample start */
-					do {
-						stop  = ((base[4] << 16) + (base[5] << 8) + base[6]) & 0x1fffff;
-						if (stop == 0) base += 4;
-					} while (stop == 0 && base < base_end);
-
+				}
+				else
+				{
 					/* set up the voice to play this sample */
-					if (start < stop)
+					if (!voice->playing)
 					{
-						if (!voice->playing)
-						{
-							voice->playing = 1;
-							voice->base_offset = start;
-							voice->sample = 0;
-							voice->count = 2 * (stop - start + 1);
+						voice->playing = 1;
+						voice->base_offset = start;
+						voice->sample = 0;
+						voice->count = 0;
 
-							/* also reset the ADPCM parameters */
-							reset_adpcm(voice);
-							/* FIX: no attenuation for now */
-							voice->volume = volume_table[0];
-						}
-						else
-						{
-							logerror("OKIM6376:%d requested to play sample %02x on non-stopped voice\n",num,info->command);
-						}
+						/* also reset the ADPCM parameters */
+						reset_adpcm(voice);
+						/* FIX: no attenuation for now */
+						voice->volume = volume_table[0];
 					}
-					/* invalid samples go here */
 					else
 					{
-						logerror("OKIM6376:%d requested to play invalid sample %02x\n",num,info->command);
-						voice->playing = 0;
+						logerror("OKIM6376:%d requested to play sample %02x on non-stopped voice\n",num,info->command);
 					}
 				}
 			}
