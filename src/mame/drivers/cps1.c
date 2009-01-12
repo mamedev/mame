@@ -8285,6 +8285,8 @@ static DRIVER_INIT( sf2ue )
 	/* The mapping is handled by a PAL on the B-board */
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800140, 0x80017f, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8001c0, 0x8001ff, 0, 0, cps1_cps_b_r, cps1_cps_b_w);
+
+	DRIVER_INIT_CALL(cps1);
 }
 
 static DRIVER_INIT( sf2hack )
