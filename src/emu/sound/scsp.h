@@ -29,5 +29,6 @@ READ16_HANDLER( scsp_midi_out_r );
 extern UINT32* stv_scu;
 
 SND_GET_INFO( scsp );
+#define SOUND_SCSP SND_GET_INFO_NAME( scsp )
 
 #endif /* __SCSP_H__ */

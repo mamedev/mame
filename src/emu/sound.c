@@ -291,7 +291,7 @@ static void start_sound_chips(running_machine *machine)
 		info->sound = msound;
 
 		/* start the chip, tagging all its streams */
-		VPRINTF(("sndnum = %d -- sound_type = %d\n", sndnum, msound->type));
+		VPRINTF(("sndnum = %d -- sound_type = %s\n", sndnum, sndtype_get_name(msound->type)));
 		num_regs = state_save_get_reg_count(machine);
 		streams_set_tag(machine, info);
 		if (sndintrf_init_sound(machine, sndnum, msound->tag, msound->type, msound->clock, msound->config) != 0)
@@ -903,12 +903,12 @@ void sndti_set_output_gain(sound_type type, int index, int output, float gain)
 
 	if (sndnum < 0)
 	{
-		logerror("sndti_set_output_gain called for invalid sound type %d, index %d\n", type, index);
+		logerror("sndti_set_output_gain called for invalid sound type %s, index %d\n", sndtype_get_name(type), index);
 		return;
 	}
 	if (output >= sound[sndnum].outputs)
 	{
-		logerror("sndti_set_output_gain called for invalid sound output %d (type %d, index %d)\n", output, type, index);
+		logerror("sndti_set_output_gain called for invalid sound output %d (type %s, index %d)\n", output, sndtype_get_name(type), index);
 		return;
 	}
 	stream_set_output_gain(sound[sndnum].output[output].stream, sound[sndnum].output[output].output, gain);

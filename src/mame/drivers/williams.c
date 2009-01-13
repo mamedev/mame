@@ -494,10 +494,11 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
+#include "sound/dac.h"
+#include "sound/hc55516.h"
 #include "machine/6821new.h"
 #include "audio/williams.h"
 #include "williams.h"
-#include "sound/dac.h"
 
 
 #define MASTER_CLOCK		(12000000)

@@ -26,5 +26,6 @@ WRITE16_HANDLER( aica_midi_in );
 READ16_HANDLER( aica_midi_out_r );
 
 SND_GET_INFO( aica );
+#define SOUND_AICA SND_GET_INFO_NAME( aica )
 
 #endif /* __AICA_H__ */

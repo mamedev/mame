@@ -56,5 +56,6 @@ void reset_adpcm(struct adpcm_state *state);
 INT16 clock_adpcm(struct adpcm_state *state, UINT8 nibble);
 
 SND_GET_INFO( okim6295 );
+#define SOUND_OKIM6295 SND_GET_INFO_NAME( okim6295 )
 
 #endif /* __OKIM6295_H__ */

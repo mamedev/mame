@@ -28,6 +28,7 @@ void es5505_voice_bank_0_w(int voice, int bank);
 void es5505_voice_bank_1_w(int voice, int bank);
 
 SND_GET_INFO( es5505 );
+#define SOUND_ES5505 SND_GET_INFO_NAME( es5505 )
 
 
 typedef struct _es5506_interface es5506_interface;
@@ -55,5 +56,6 @@ void es5506_voice_bank_0_w(int voice, int bank);
 void es5506_voice_bank_1_w(int voice, int bank);
 
 SND_GET_INFO( es5506 );
+#define SOUND_ES5506 SND_GET_INFO_NAME( es5506 )
 
 #endif /* __ES5506_H__ */

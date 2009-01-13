@@ -9,5 +9,6 @@ extern void tms3615_enable_w(int chip, int enable);
 #define TMS3615_FOOTAGE_16	1
 
 SND_GET_INFO( tms3615 );
+#define SOUND_TMS3615 SND_GET_INFO_NAME( tms3615 )
 
 #endif /* __TMS3615_H__ */

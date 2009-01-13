@@ -44,5 +44,6 @@ WRITE16_HANDLER( ymz280b_data_1_lsb_w );
 WRITE16_HANDLER( ymz280b_data_1_msb_w );
 
 SND_GET_INFO( ymz280b );
+#define SOUND_YMZ280B SND_GET_INFO_NAME( ymz280b )
 
 #endif /* __YMZ280B_H__ */

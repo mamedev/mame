@@ -25,137 +25,12 @@
 
 #define MAX_SOUND 32
 
-/* Enum listing all the sound chips */
-enum _sound_type
-{
-	SOUND_DUMMY,
-	SOUND_CUSTOM,
-	SOUND_SAMPLES,
-	SOUND_DAC,
-	SOUND_DMADAC,
-	SOUND_DISCRETE,
-	SOUND_AY8910,
-	SOUND_AY8912,
-	SOUND_AY8913,
-	SOUND_AY8930,
-	SOUND_YM2149,
-	SOUND_YM3439,
-	SOUND_YMZ284,
-	SOUND_YMZ294,
-	SOUND_YM2203,
-	SOUND_YM2151,
-	SOUND_YM2608,
-	SOUND_YM2610,
-	SOUND_YM2610B,
-	SOUND_YM2612,
-	SOUND_YM3438,
-	SOUND_YM2413,
-	SOUND_YM3812,
-	SOUND_YM3526,
-	SOUND_YMZ280B,
-	SOUND_Y8950,
-	SOUND_SN76477,
-	SOUND_SN76489,
-	SOUND_SN76489A,
-	SOUND_SN76494,
-	SOUND_SN76496,
-	SOUND_GAMEGEAR,
-	SOUND_SMSIII,
-	SOUND_POKEY,
-	SOUND_NES,
-	SOUND_ASTROCADE,
-	SOUND_NAMCO,
-	SOUND_NAMCO_15XX,
-	SOUND_NAMCO_CUS30,
-	SOUND_NAMCO_52XX,
-	SOUND_NAMCO_63701X,
-	SOUND_SNKWAVE,
-	SOUND_TMS36XX,
-	SOUND_TMS3615,
-	SOUND_TMS5100,
-	SOUND_TMS5110,
-	SOUND_TMS5110A,
-	SOUND_CD2801,
-	SOUND_TMC0281,
-	SOUND_CD2802,
-	SOUND_M58817,
-	SOUND_TMC0285,
-	SOUND_TMS5200,
-	SOUND_TMS5220,
-	SOUND_VLM5030,
-	SOUND_OKIM6376,
-	SOUND_OKIM6295,
-	SOUND_OKIM6258,
-	SOUND_MSM5205,
-	SOUND_MSM5232,
-	SOUND_UPD7759,
-	SOUND_HC55516,
-	SOUND_MC3417,
-	SOUND_MC3418,
-	SOUND_K005289,
-	SOUND_K007232,
-	SOUND_K051649,
-	SOUND_K053260,
-	SOUND_K054539,
-	SOUND_SEGAPCM,
-	SOUND_RF5C68,
-	SOUND_CEM3394,
-	SOUND_C140,
-	SOUND_QSOUND,
-	SOUND_SAA1099,
-	SOUND_IREMGA20,
-	SOUND_ES5503,
-	SOUND_ES5505,
-	SOUND_ES5506,
-	SOUND_BSMT2000,
-	SOUND_YMF262,
-	SOUND_YMF278B,
-	SOUND_GAELCO_CG1V,
-	SOUND_GAELCO_GAE1,
-	SOUND_X1_010,
-	SOUND_MULTIPCM,
-	SOUND_C6280,
-	SOUND_TIA,
-	SOUND_SP0250,
-	SOUND_SCSP,
-	SOUND_PSXSPU,
-	SOUND_YMF271,
-	SOUND_CDDA,
-	SOUND_ICS2115,
-	SOUND_ST0016,
-	SOUND_NILE,
-	SOUND_C352,
-	SOUND_VRENDER0,
-	SOUND_VOTRAX,
-	SOUND_ES8712,
-	SOUND_RF5C400,
-	SOUND_SPEAKER,
-	SOUND_CDP1869,
-	SOUND_BEEP,
-	SOUND_WAVE,
-	SOUND_SID6581,
-	SOUND_SID8580,
-	SOUND_SP0256,
-	SOUND_S14001A,
-	SOUND_AICA,
-
-	/* filters start here */
-	SOUND_FILTER_VOLUME,
-	SOUND_FILTER_RC,
-	SOUND_FILTER_LOWPASS,
-
-	SOUND_COUNT
-};
-typedef enum _sound_type sound_type;
-
 
 /* Sound information constants */
 enum
 {
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
 	SNDINFO_INT_FIRST = DEVINFO_INT_FIRST,
-
-		SNDINFO_INT_ALIAS = DEVINFO_INT_CLASS_SPECIFIC,		/* R/O: alias to sound type for (type,index) identification */
 
 	SNDINFO_INT_CORE_SPECIFIC = DEVINFO_INT_DEVICE_SPECIFIC, /* R/W: core-specific values start here */
 
@@ -172,6 +47,7 @@ enum
 
 		SNDINFO_PTR_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, sndinfo *info) */
 		SNDINFO_PTR_START,									/* R/O: void *(*start)(const device_config *device, int clock, const void *config, int sndindex) */
+		SNDINFO_FCT_ALIAS,									/* R/O: alias to sound type for (type,index) identification */
 
 	SNDINFO_FCT_CORE_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC, /* R/W: core-specific values start here */
 
@@ -229,6 +105,8 @@ typedef void *(*snd_start_func)(const device_config *device, int clock, const vo
 typedef void (*snd_stop_func)(const device_config *device);
 typedef void (*snd_reset_func)(const device_config *device);
 
+typedef snd_get_info_func sound_type;
+
 
 /* sndinfo union used to pass data to/from the get_info/set_info functions */
 union _sndinfo
@@ -237,6 +115,7 @@ union _sndinfo
 	void *	p;											/* generic pointers */
 	genf *  f;											/* generic function pointers */
 	char *	s;											/* generic strings */
+	sound_type type;									/* generic type */
 
 	snd_set_info_func	set_info;						/* SNDINFO_PTR_SET_INFO */
 	snd_start_func		start;							/* SNDINFO_PTR_START */
@@ -247,15 +126,9 @@ union _sndinfo
 typedef struct _snd_class_header snd_class_header;
 struct _snd_class_header
 {
-	int						index;					/* index of this SND */
-	sound_type				sndtype; 				/* type index of this SND */
-
 	/* table of core functions */
 	snd_get_info_func	get_info;
 	snd_set_info_func	set_info;
-	snd_start_func		start;
-	snd_stop_func		stop;
-	snd_reset_func		reset;
 };
 
 
@@ -351,6 +224,8 @@ int sndti_exists(sound_type sndtype, int sndindex);
 int sndti_to_sndnum(sound_type type, int index);
 sound_type sndnum_to_sndti(int sndnum, int *index);
 int sndtype_count(sound_type sndtype);
+
+#define SOUND_DUMMY NULL
 
 
 #endif	/* __SNDINTRF_H__ */

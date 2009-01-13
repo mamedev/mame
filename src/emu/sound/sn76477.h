@@ -125,5 +125,6 @@ void sn76477_vco_voltage_w(int chip, double data);
 void sn76477_pitch_voltage_w(int chip, double data);
 
 SND_GET_INFO( sn76477 );
+#define SOUND_SN76477 SND_GET_INFO_NAME( sn76477 )
 
 #endif/* __SN76477_H__ */

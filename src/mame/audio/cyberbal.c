@@ -5,8 +5,9 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/atarigen.h"
 #include "sound/dac.h"
+#include "sound/2151intf.h"
+#include "machine/atarigen.h"
 #include "includes/cyberbal.h"
 
 

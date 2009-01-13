@@ -254,7 +254,7 @@ SND_GET_INFO( tms5220 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_ALIAS:							info->i = SOUND_TMS5220;						break;
+		case SNDINFO_FCT_ALIAS:							info->type = SOUND_TMS5220;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( tms5220 );	break;

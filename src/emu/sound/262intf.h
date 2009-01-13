@@ -27,5 +27,6 @@ WRITE8_HANDLER( ymf262_data_a_1_w );
 WRITE8_HANDLER( ymf262_data_b_1_w );
 
 SND_GET_INFO( ymf262 );
+#define SOUND_YMF262 SND_GET_INFO_NAME( ymf262 )
 
 #endif /* __262INTF_H__ */

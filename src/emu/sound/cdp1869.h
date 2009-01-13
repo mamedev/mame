@@ -41,5 +41,6 @@ void cdp1869_set_wnfreq(int which, int value);
 void cdp1869_set_wnoff(int which, int value);
 
 SND_GET_INFO( cdp1869 );
+#define SOUND_CDP1869 SND_GET_INFO_NAME( cdp1869 )
 
 #endif /* __CDP1869_H__ */

@@ -46,5 +46,6 @@ WRITE16_HANDLER( okim6258_data_2_msb_w );
 WRITE16_HANDLER( okim6258_ctrl_0_lsb_w );
 
 SND_GET_INFO( okim6258 );
+#define SOUND_OKIM6258 SND_GET_INFO_NAME( okim6258 )
 
 #endif /* __OKIM6258_H__ */

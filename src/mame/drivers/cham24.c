@@ -55,9 +55,10 @@ Notes:
 */
 
 #include "driver.h"
-#include "video/ppu2c0x.h"
-#include "sound/nes_apu.h"
 #include "cpu/m6502/m6502.h"
+#include "sound/dac.h"
+#include "sound/nes_apu.h"
+#include "video/ppu2c0x.h"
 
 static WRITE8_HANDLER( sprite_dma_w )
 {

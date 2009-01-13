@@ -16,5 +16,6 @@ int cdda_audio_paused(int num);
 int cdda_audio_ended(int num);
 
 SND_GET_INFO( cdda );
+#define SOUND_CDDA SND_GET_INFO_NAME( cdda )
 
 #endif /* __CDDA_H__ */

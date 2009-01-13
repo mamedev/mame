@@ -24,5 +24,6 @@ struct _c140_interface {
 };
 
 SND_GET_INFO( c140 );
+#define SOUND_C140 SND_GET_INFO_NAME( c140 )
 
 #endif /* __C140_H__ */

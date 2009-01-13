@@ -31,6 +31,7 @@ struct _namco_52xx_interface
 void namcoio_52xx_write(int data);
 
 SND_GET_INFO( namco_52xx );
+#define SOUND_NAMCO_52XX SND_GET_INFO_NAME( namco_52xx )
 
 #endif /* __NAMCO52_H__ */
 

@@ -53,5 +53,7 @@ WRITE16_HANDLER( ym2610_data_port_1_b_lsb_w );
 SND_GET_INFO( ym2610 );
 SND_GET_INFO( ym2610b );
 
+#define SOUND_YM2610 SND_GET_INFO_NAME( ym2610 )
+#define SOUND_YM2610B SND_GET_INFO_NAME( ym2610b )
 
 #endif /* __2610INTF_H__ */

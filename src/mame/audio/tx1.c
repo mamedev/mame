@@ -6,9 +6,10 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "includes/tx1.h"
-#include "video/resnet.h"
+#include "sound/ay8910.h"
 #include "sound/custom.h"
+#include "video/resnet.h"
+#include "includes/tx1.h"
 
 
 /*************************************

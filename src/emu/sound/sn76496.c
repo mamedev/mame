@@ -392,7 +392,7 @@ SND_GET_INFO( sn76496 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_ALIAS:							info->i = SOUND_SN76496;						break;
+		case SNDINFO_FCT_ALIAS:							info->type = SOUND_SN76496;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sn76496 );	break;

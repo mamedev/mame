@@ -47,6 +47,7 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/custom.h"
+#include "sound/cdda.h"
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
 #include "machine/6526cia.h"

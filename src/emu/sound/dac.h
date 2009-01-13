@@ -16,5 +16,6 @@ WRITE8_HANDLER( dac_1_signed_data_w );
 WRITE8_HANDLER( dac_2_signed_data_w );
 
 SND_GET_INFO( dac );
+#define SOUND_DAC SND_GET_INFO_NAME( dac )
 
 #endif /* __DAC_H__ */

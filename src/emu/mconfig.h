@@ -16,6 +16,7 @@
 
 #include "devintrf.h"
 #include "cpuexec.h"
+#include "sndintrf.h"
 #include <stddef.h>
 
 
@@ -132,7 +133,7 @@ struct _machine_config
 
 	palette_init_func		init_palette;			/* one-time palette init callback  */
 	video_start_func		video_start;			/* one-time video start callback */
-	sound_reset_func		video_reset;			/* video reset callback */
+	video_reset_func		video_reset;			/* video reset callback */
 	video_eof_func			video_eof;				/* end-of-frame video callback */
 	video_update_func 		video_update; 			/* video update callback */
 
@@ -172,6 +173,7 @@ union _machine_config_token
 	palette_init_func palette_init;
 	video_eof_func video_eof;
 	video_update_func video_update;
+	sound_type sndtype;
 };
 
 
@@ -375,7 +377,8 @@ union _machine_config_token
 
 /* add/remove/replace sounds */
 #define MDRV_SOUND_ADD(_tag, _type, _clock) \
-	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_SOUND_ADD, 8, SOUND_##_type, 24, _clock, 32), \
+	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_SOUND_ADD, 8, _clock, 32), \
+	TOKEN_PTR(sndtype, SOUND_##_type), \
 	TOKEN_STRING(_tag),
 
 #define MDRV_SOUND_REMOVE(_tag) \
@@ -391,7 +394,8 @@ union _machine_config_token
 	TOKEN_PTR(voidptr, &(_config)),
 
 #define MDRV_SOUND_REPLACE(_tag, _type, _clock) \
-	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_SOUND_REPLACE, 8, SOUND_##_type, 24, _clock, 32), \
+	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_SOUND_REPLACE, 8, _clock, 32), \
+	TOKEN_PTR(sndtype, SOUND_##_type), \
 	TOKEN_STRING(_tag),
 
 #define MDRV_SOUND_ROUTE_EX(_output, _target, _gain, _input)			\

@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "sound/ay8910.h"
 
 
 UINT8 *dday_bgvideoram;

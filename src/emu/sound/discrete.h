@@ -4306,5 +4306,6 @@ READ8_HANDLER(discrete_sound_2_r);
 READ8_HANDLER(discrete_sound_3_r);
 
 SND_GET_INFO( discrete );
+#define SOUND_DISCRETE SND_GET_INFO_NAME( discrete )
 
 #endif /* __DISCRETE_H__ */

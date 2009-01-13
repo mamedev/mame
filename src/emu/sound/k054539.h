@@ -46,5 +46,6 @@ void k054539_init_flags(int chip, int flags);
 void k054539_set_gain(int chip, int channel, double gain);
 
 SND_GET_INFO( k054539 );
+#define SOUND_K054539 SND_GET_INFO_NAME( k054539 )
 
 #endif /* __K054539_H__ */

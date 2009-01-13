@@ -6,10 +6,11 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/vlm5030.h"
 #include "sound/dac.h"
+#include "sound/sn76496.h"
+#include "sound/vlm5030.h"
+#include "machine/konami1.h"
 
 
 extern UINT8 *hyperspt_scroll;

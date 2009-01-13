@@ -44,5 +44,6 @@ void cem3394_set_voltage(int chip, int input, double voltage);
 double cem3394_get_parameter(int chip, int input);
 
 SND_GET_INFO( cem3394 );
+#define SOUND_CEM3394 SND_GET_INFO_NAME( cem3394 )
 
 #endif /* __CEM3394_H__ */

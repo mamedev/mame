@@ -24,5 +24,6 @@ WRITE8_HANDLER( sega_pcm_w );
 READ8_HANDLER( sega_pcm_r );
 
 SND_GET_INFO( segapcm );
+#define SOUND_SEGAPCM SND_GET_INFO_NAME( segapcm )
 
 #endif /* __SEGAPCM_H__ */

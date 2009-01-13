@@ -89,6 +89,7 @@
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/i8085/i8085.h"
+#include "sound/speaker.h"
 #include "deprecat.h"
 #include "8080bw.h"
 #include "mw8080bw.h"

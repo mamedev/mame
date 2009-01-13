@@ -38,6 +38,7 @@ WRITE16_HANDLER( ym2151_data_port_1_lsb_w );
 WRITE16_HANDLER( ym2151_data_port_2_lsb_w );
 
 SND_GET_INFO( ym2151 );
+#define SOUND_YM2151 SND_GET_INFO_NAME( ym2151 )
 
 #endif /* __2151INTF_H__ */
 

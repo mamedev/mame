@@ -12,6 +12,6 @@
 #endif
 
 SND_GET_INFO( wave );
-
+#define SOUND_WAVE SND_GET_INFO_NAME( wave )
 
 #endif /* __WAVE_H__ */

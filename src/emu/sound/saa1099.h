@@ -18,5 +18,6 @@ WRITE16_HANDLER( saa1099_control_port_1_lsb_w );
 WRITE16_HANDLER( saa1099_write_port_1_lsb_w );
 
 SND_GET_INFO( saa1099 );
+#define SOUND_SAA1099 SND_GET_INFO_NAME( saa1099 )
 
 #endif /* __SAA1099_H__ */

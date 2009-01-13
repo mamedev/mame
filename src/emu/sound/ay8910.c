@@ -675,31 +675,21 @@ void *ay8910_start_ym(sound_type chip_type, const device_config *device, int clo
 	else
 		info->streams = 3;
 
-	switch (chip_type)
+	if (chip_type == SOUND_AY8910 || chip_type == SOUND_AY8930)
 	{
-		case SOUND_AY8910:
-		case SOUND_AY8930:
-			info->step = 2;
-			info->par = &ay8910_param;
-			info->par_env = &ay8910_param;
-			info->zero_is_off = 1;
-			info->env_step_mask = 0x0F;
-			break;
-		case SOUND_YM2149:
-		case SOUND_YM2203:
-		case SOUND_YM2610:
-		case SOUND_YM2610B:
-		case SOUND_YM2608:
-		case SOUND_YMZ284:
-		case SOUND_YMZ294:
-		case SOUND_YM3439:
-		default:
-			info->step = 1;
-			info->par = &ym2149_param;
-			info->par_env = &ym2149_param_env;
-			info->zero_is_off = 0;
-			info->env_step_mask = 0x1F;
-			break;
+		info->step = 2;
+		info->par = &ay8910_param;
+		info->par_env = &ay8910_param;
+		info->zero_is_off = 1;
+		info->env_step_mask = 0x0F;
+	}
+	else
+	{
+		info->step = 1;
+		info->par = &ym2149_param;
+		info->par_env = &ym2149_param_env;
+		info->zero_is_off = 0;
+		info->env_step_mask = 0x1F;
 	}
 
 	build_mixer_table(info);
@@ -867,7 +857,7 @@ SND_GET_INFO( ay8910 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_ALIAS:							info->i = SOUND_AY8910;							break;
+		case SNDINFO_FCT_ALIAS:							info->type = SOUND_AY8910;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ay8910 );	break;

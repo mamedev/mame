@@ -11,5 +11,6 @@ WRITE16_HANDLER(nile_sndctrl_w);
 READ16_HANDLER(nile_sndctrl_r);
 
 SND_GET_INFO( nile );
+#define SOUND_NILE SND_GET_INFO_NAME( nile )
 
 #endif /* __NILE_H__ */

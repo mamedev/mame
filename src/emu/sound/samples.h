@@ -53,5 +53,6 @@ int sample_loaded(int samplenum);
 struct loaded_samples *readsamples(const char *const *samplenames, const char *name);
 
 SND_GET_INFO( samples );
+#define SOUND_SAMPLES SND_GET_INFO_NAME( samples )
 
 #endif /* __SAMPLES_H__ */

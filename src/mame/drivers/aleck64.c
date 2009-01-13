@@ -166,10 +166,11 @@ Notes:
 */
 
 #include "driver.h"
+#include "streams.h"
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
-#include "streams.h"
 #include "sound/custom.h"
+#include "sound/dmadac.h"
 #include "includes/n64.h"
 
 static READ32_HANDLER( aleck_dips_r )

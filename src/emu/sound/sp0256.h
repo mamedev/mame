@@ -37,5 +37,6 @@ READ16_HANDLER( spb640_r );
 WRITE16_HANDLER( spb640_w );
 
 SND_GET_INFO( sp0256 );
+#define SOUND_SP0256 SND_GET_INFO_NAME( sp0256 )
 
 #endif /* __SP0256_H__ */

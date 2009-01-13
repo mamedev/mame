@@ -30,5 +30,6 @@ WRITE8_HANDLER( upd7759_0_start_w );
 READ8_HANDLER( upd7759_0_busy_r );
 
 SND_GET_INFO( upd7759 );
+#define SOUND_UPD7759 SND_GET_INFO_NAME( upd7759 )
 
 #endif /* __UPD7759_H__ */

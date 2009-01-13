@@ -12,5 +12,6 @@ READ8_HANDLER( ics2115_r );
 WRITE8_HANDLER( ics2115_w );
 
 SND_GET_INFO( ics2115 );
+#define SOUND_ICS2115 SND_GET_INFO_NAME( ics2115 )
 
 #endif /* __ICS2115_H__ */

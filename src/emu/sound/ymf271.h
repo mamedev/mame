@@ -17,5 +17,6 @@ READ8_HANDLER( ymf271_1_r );
 WRITE8_HANDLER( ymf271_1_w );
 
 SND_GET_INFO( ymf271 );
+#define SOUND_YMF271 SND_GET_INFO_NAME( ymf271 )
 
 #endif /* __YMF271_H__ */

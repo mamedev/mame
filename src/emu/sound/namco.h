@@ -34,5 +34,10 @@ SND_GET_INFO( namco );
 SND_GET_INFO( namco_15xx );
 SND_GET_INFO( namco_cus30 );
 
+#define SOUND_NAMCO SND_GET_INFO_NAME( namco )
+#define SOUND_NAMCO_15XX SND_GET_INFO_NAME( namco_15xx )
+#define SOUND_NAMCO_CUS30 SND_GET_INFO_NAME( namco_cus30 )
+
+
 #endif /* __NAMCO_H__ */
 

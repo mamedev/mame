@@ -16,5 +16,6 @@ READ32_HANDLER(vr0_snd_read);
 WRITE32_HANDLER(vr0_snd_write);
 
 SND_GET_INFO( vrender0 );
+#define SOUND_VRENDER0 SND_GET_INFO_NAME( vrender0 )
 
 #endif /* __VRENDER0_H__ */

@@ -35,6 +35,7 @@ WRITE8_HANDLER( ym2612_data_port_1_a_w );
 WRITE8_HANDLER( ym2612_data_port_1_b_w );
 
 SND_GET_INFO( ym2612 );
+#define SOUND_YM2612 SND_GET_INFO_NAME( ym2612 )
 
 
 typedef struct _ym3438_interface ym3438_interface;
@@ -67,5 +68,6 @@ WRITE8_HANDLER( ym3438_data_port_1_a_w );
 WRITE8_HANDLER( ym3438_data_port_1_b_w );
 
 SND_GET_INFO( ym3438 );
+#define SOUND_YM3438 SND_GET_INFO_NAME( ym3438 )
 
 #endif /* __2612INTF_H__ */

@@ -160,9 +160,10 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
 	{
-		int size, offset, type, bits, in, out;
+		int size, offset, bits, in, out;
 		UINT32 data32, clock, gain;
 		device_type devtype;
+		sound_type type;
 		const char *tag;
 		UINT64 data64;
 
@@ -360,7 +361,8 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			/* add/remove/replace sounds */
 			case MCONFIG_TOKEN_SOUND_ADD:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
+				type = TOKEN_GET_PTR(tokens, sndtype);
 				tag = TOKEN_GET_STRING(tokens);
 				sound = sound_add(config, device_build_tag(tempstring, owner, tag), type, clock);
 				break;
@@ -384,7 +386,8 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			case MCONFIG_TOKEN_SOUND_REPLACE:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
+				type = TOKEN_GET_PTR(tokens, sndtype);
 				tag = TOKEN_GET_STRING(tokens);
 				sound = sound_find(config, device_build_tag(tempstring, owner, tag));
 				if (sound == NULL)

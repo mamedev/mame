@@ -124,23 +124,15 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	has_tms5220 = has_oki6295 = has_pokey = has_ym2151 = 0;
 	for (i = 0; i < MAX_SOUND; i++)
 	{
-		switch (machine->config->sound[i].type)
-		{
-			case SOUND_TMS5220:
-				has_tms5220 = 1;
-				break;
-			case SOUND_OKIM6295:
-				has_oki6295 = 1;
-				break;
-			case SOUND_POKEY:
-				has_pokey = 1;
-				break;
-			case SOUND_YM2151:
-				has_ym2151 = 1;
-				break;
-			default:
-				break;
-		}
+		sound_type type = machine->config->sound[i].type;
+		if (type == SOUND_TMS5220)
+			has_tms5220 = 1;
+		if (type == SOUND_OKIM6295)
+			has_oki6295 = 1;
+		if (type == SOUND_POKEY)
+			has_pokey = 1;
+		if (type == SOUND_YM2151)
+			has_ym2151 = 1;
 	}
 
 	/* install POKEY memory handlers */

@@ -146,6 +146,7 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/3812intf.h"
 #include "includes/toaplan2.h"
 
 

@@ -16,5 +16,6 @@ WRITE8_HANDLER(es5503_reg_0_w);
 void es5503_set_base_0(UINT8 *wavemem);
 
 SND_GET_INFO( es5503 );
+#define SOUND_ES5503 SND_GET_INFO_NAME( es5503 )
 
 #endif /* __ES5503_H__ */

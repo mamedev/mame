@@ -67,5 +67,6 @@ WRITE8_HANDLER( ym2203_word_0_w );
 WRITE8_HANDLER( ym2203_word_1_w );
 
 SND_GET_INFO( ym2203 );
+#define SOUND_YM2203 SND_GET_INFO_NAME( ym2203 )
 
 #endif /* __2203INTF_H__ */

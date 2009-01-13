@@ -27,5 +27,6 @@ extern void tms36xx_note_w(int chip, int octave, int note);
 extern void tms3617_enable_w(int chip, int enable);
 
 SND_GET_INFO( tms36xx );
+#define SOUND_TMS36XX SND_GET_INFO_NAME( tms36xx )
 
 #endif /* __TMS36XX_H__ */

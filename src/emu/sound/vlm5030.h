@@ -24,5 +24,6 @@ void vlm5030_vcu(int pin );
 void vlm5030_st(int pin );
 
 SND_GET_INFO( vlm5030 );
+#define SOUND_VLM5030 SND_GET_INFO_NAME( vlm5030 )
 
 #endif /* __VLM5030_H__ */

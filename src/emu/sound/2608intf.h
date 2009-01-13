@@ -38,5 +38,6 @@ WRITE8_HANDLER( ym2608_data_port_1_a_w );
 WRITE8_HANDLER( ym2608_data_port_1_b_w );
 
 SND_GET_INFO( ym2608 );
+#define SOUND_YM2608 SND_GET_INFO_NAME( ym2608 )
 
 #endif /* __2608INTF_H__ */

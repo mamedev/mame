@@ -107,5 +107,6 @@ void pokey3_kbcode_w (int kbcode, int make);
 void pokey4_kbcode_w (int kbcode, int make);
 
 SND_GET_INFO( pokey );
+#define SOUND_POKEY SND_GET_INFO_NAME( pokey )
 
 #endif	/* __POKEY_H__ */

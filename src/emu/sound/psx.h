@@ -28,5 +28,6 @@ struct _psx_spu_interface
 };
 
 SND_GET_INFO( psxspu );
+#define SOUND_PSXSPU SND_GET_INFO_NAME( psxspu )
 
 #endif /* __SOUND_PSX_H__ */

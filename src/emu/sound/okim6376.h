@@ -25,5 +25,6 @@ WRITE16_HANDLER( okim6376_data_1_msb_w );
 WRITE16_HANDLER( okim6376_data_2_msb_w );
 
 SND_GET_INFO( okim6376 );
+#define SOUND_OKIM6376 SND_GET_INFO_NAME( okim6376 )
 
 #endif /* __OKIM6376_H__ */

@@ -22,12 +22,12 @@
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
+#include "sound/2151intf.h"
+#include "sound/dac.h"
 #include "rendlay.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "cyberbal.h"
-#include "sound/2151intf.h"
-
 
 
 /*************************************
