@@ -226,6 +226,14 @@ struct _bank_data
 	void *					entryd[MAX_BANK_ENTRIES];/* array of decrypted entries for this bank */
 };
 
+/* In memory.h: typedef struct _direct_range direct_range; */
+struct _direct_range
+{
+    direct_range *			next;					/* pointer to the next range in the list */
+    offs_t 					bytestart;				/* starting byte offset of the range */
+    offs_t					byteend;				/* ending byte offset of the range */
+};
+
 /* In memory.h: typedef struct _handler_data handler_data */
 struct _handler_data
 {
@@ -331,7 +339,8 @@ static STATE_POSTLOAD( bank_reattach );
 static UINT8 table_assign_handler(const address_space *space, handler_data **table, void *object, genf *handler, const char *handler_name, offs_t bytestart, offs_t byteend, offs_t bytemask);
 static void table_compute_subhandler(handler_data **table, UINT8 entry, read_or_write readorwrite, int spacebits, int spaceendian, int handlerbits, int handlerunitmask);
 static void table_populate_range(address_table *tabledata, offs_t bytestart, offs_t byteend, UINT8 handler);
-static void table_populate_range_mirrored(address_table *tabledata, offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handler);
+static void table_populate_range_mirrored(address_space *space, address_table *tabledata, offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handler);
+UINT8 table_derive_range(const address_table *table, offs_t byteaddress, offs_t *bytestart, offs_t *byteend);
 
 /* subtable management */
 static UINT8 subtable_alloc(address_table *tabledata);
@@ -340,6 +349,10 @@ static int subtable_merge(address_table *tabledata);
 static void subtable_release(address_table *tabledata, UINT8 subentry);
 static UINT8 *subtable_open(address_table *tabledata, offs_t l1index);
 static void subtable_close(address_table *tabledata, offs_t l1index);
+
+/* direct memory ranges */
+static direct_range *direct_range_find(address_space *space, offs_t byteaddress, UINT8 *entry);
+static void direct_range_remove_intersecting(address_space *space, offs_t bytestart, offs_t byteend);
 
 /* memory block allocation */
 static void *block_allocate(const address_space *space, offs_t bytestart, offs_t byteend, void *memory);
@@ -368,8 +381,8 @@ static void mem_dump(running_machine *machine);
 INLINE void force_opbase_update(const address_space *space)
 {
 	address_space *spacerw = (address_space *)space;
-	spacerw->direct.max = 0;
-	spacerw->direct.min = 1;
+	spacerw->direct.byteend = 0;
+	spacerw->direct.bytestart = 1;
 }
 
 
@@ -794,7 +807,7 @@ void address_map_free(address_map *map)
 			astring_free(entry->region_string);
 		free(entry);
 	}
-
+	
 	/* free the map */
 	free(map);
 }
@@ -875,6 +888,8 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 	address_space *spacerw = (address_space *)space;
 	UINT8 *base = NULL, *based = NULL;
 	const handler_data *handlers;
+	direct_range *range;
+	offs_t maskedbits;
 	UINT8 entry;
 
 	/* allow overrides */
@@ -884,33 +899,24 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 		if (byteaddress == ~0)
 			return TRUE;
 	}
-
-	/* perform the lookup */
-	byteaddress &= spacerw->bytemask;
-	entry = spacerw->readlookup[LEVEL1_INDEX(byteaddress)];
-	if (entry >= SUBTABLE_BASE)
-		entry = spacerw->readlookup[LEVEL2_INDEX(entry,byteaddress)];
+	
+	/* remove the masked bits (we'll put them back later) */
+	maskedbits = byteaddress & ~spacerw->bytemask;
+	
+	/* find or allocate a matching range */
+	range = direct_range_find(spacerw, byteaddress, &entry);
 
 	/* keep track of current entry */
 	spacerw->direct.entry = entry;
 
-	/* if we don't map to a bank, see if there are any banks we can map to */
+	/* if we don't map to a bank, return FALSE */
 	if (entry < STATIC_BANK1 || entry >= STATIC_RAM)
 	{
-		/* loop over banks and find a match */
-		for (entry = 1; entry < STATIC_COUNT; entry++)
-		{
-			bank_info *bank = &memdata->bankdata[entry];
-			if (bank->used && bank_references_space(bank, space) && bank->bytestart < byteaddress && bank->byteend > byteaddress)
-				break;
-		}
-
-		/* if nothing was found, leave everything alone */
-		if (entry == STATIC_COUNT)
-		{
-			logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, byteaddress, space->name);
-			return FALSE;
-		}
+		/* ensure future updates to land here as well until we get back into a bank */
+		spacerw->direct.byteend = 0;
+		spacerw->direct.bytestart = 1;
+		logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, byteaddress, space->name);
+		return FALSE;
 	}
 
 	/* if no decrypted opcodes, point to the same base */
@@ -921,11 +927,11 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 
 	/* compute the adjusted base */
 	handlers = spacerw->read.handlers[entry];
-	spacerw->direct.mask = handlers->bytemask;
-	spacerw->direct.raw = base - (handlers->bytestart & spacerw->direct.mask);
-	spacerw->direct.decrypted = based - (handlers->bytestart & spacerw->direct.mask);
-	spacerw->direct.min = handlers->bytestart;
-	spacerw->direct.max = handlers->byteend;
+	spacerw->direct.bytemask = handlers->bytemask;
+	spacerw->direct.raw = base - (handlers->bytestart & spacerw->direct.bytemask);
+	spacerw->direct.decrypted = based - (handlers->bytestart & spacerw->direct.bytemask);
+	spacerw->direct.bytestart = maskedbits | range->bytestart;
+	spacerw->direct.byteend = maskedbits | range->byteend;
 	return TRUE;
 }
 
@@ -1546,9 +1552,9 @@ static void memory_init_spaces(running_machine *machine)
 
 				/* set the direct access information base */
 				space->direct.raw = space->direct.decrypted = NULL;
-				space->direct.mask = space->bytemask;
-				space->direct.min = 1;
-				space->direct.max = 0;
+				space->direct.bytemask = space->bytemask;
+				space->direct.bytestart = 1;
+				space->direct.byteend = 0;
 				space->direct.entry = STATIC_UNMAP;
 				space->directupdate = NULL;
 
@@ -1898,13 +1904,35 @@ static void memory_exit(running_machine *machine)
 	/* free all the address spaces and tables */
 	for (space = (address_space *)memdata->spacelist; space != NULL; space = nextspace)
 	{
+		int entry;
+
 		nextspace = (address_space *)space->next;
+
+		/* free all direct ranges */
+		for (entry = 0; entry < ARRAY_LENGTH(space->direct.rangelist); entry++)
+			while (space->direct.rangelist[entry] != NULL)
+			{
+				direct_range *range = space->direct.rangelist[entry];
+				space->direct.rangelist[entry] = range->next;
+				free(range);
+			}
+
+		/* free the free list of direct ranges */
+		while (space->direct.freerangelist != NULL)
+		{
+			direct_range *range = space->direct.freerangelist;
+			space->direct.freerangelist = range->next;
+			free(range);
+		}
+
+		/* free the address map and tables */
 		if (space->map != NULL)
 			address_map_free(space->map);
 		if (space->read.table != NULL)
 			free(space->read.table);
 		if (space->write.table != NULL)
 			free(space->write.table);
+
 		free(space);
 	}
 }
@@ -2193,7 +2221,7 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 		table_compute_subhandler(tabledata->handlers, entry, readorwrite, space->dbits, space->endianness, handlerbits, handlerunitmask);
 
 	/* populate it */
-	table_populate_range_mirrored(tabledata, bytestart, byteend, bytemirror, entry);
+	table_populate_range_mirrored(space, tabledata, bytestart, byteend, bytemirror, entry);
 
 	/* reset read/write pointers if necessary (could have moved due to realloc) */
 	if (reset_write)
@@ -2205,8 +2233,8 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 	if (readorwrite == ROW_READ && entry == space->direct.entry)
 	{
 		space->direct.entry = STATIC_UNMAP;
-		space->direct.min = 1;
-		space->direct.max = 0;
+		space->direct.bytestart = 1;
+		space->direct.byteend = 0;
 	}
 }
 
@@ -2551,7 +2579,7 @@ static void table_populate_range(address_table *tabledata, offs_t bytestart, off
     including mirrors
 -------------------------------------------------*/
 
-static void table_populate_range_mirrored(address_table *tabledata, offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handler)
+static void table_populate_range_mirrored(address_space *space, address_table *tabledata, offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handler)
 {
 	offs_t lmirrorbit[LEVEL2_BITS], lmirrorbits, hmirrorbit[32 - LEVEL2_BITS], hmirrorbits, lmirrorcount, hmirrorcount;
 	UINT8 prev_entry = STATIC_INVALID;
@@ -2575,6 +2603,17 @@ static void table_populate_range_mirrored(address_table *tabledata, offs_t bytes
 		for (i = 0; i < hmirrorbits; i++)
 			if (hmirrorcount & (1 << i))
 				hmirrorbase |= hmirrorbit[i];
+
+		/* invalidate any intersecting cached ranges */
+		for (lmirrorcount = 0; lmirrorcount < (1 << lmirrorbits); lmirrorcount++)
+		{
+			/* compute the base of this mirror */
+			offs_t lmirrorbase = hmirrorbase;
+			for (i = 0; i < lmirrorbits; i++)
+				if (lmirrorcount & (1 << i))
+					lmirrorbase |= lmirrorbit[i];
+			direct_range_remove_intersecting(space, bytestart + lmirrorbase, byteend + lmirrorbase);
+		}
 
 		/* if this is not our first time through, and the level 2 entry matches the previous
            level 2 entry, just do a quick map and get out; note that this only works for entries
@@ -2615,6 +2654,108 @@ static void table_populate_range_mirrored(address_table *tabledata, offs_t bytes
 			table_populate_range(tabledata, bytestart + lmirrorbase, byteend + lmirrorbase, handler);
 		}
 	}
+}
+
+
+/*-------------------------------------------------
+    table_derive_range - look up the entry for
+    a memory range, and then compute the extent
+    of that range based on the lookup tables
+-------------------------------------------------*/
+
+UINT8 table_derive_range(const address_table *table, offs_t byteaddress, offs_t *bytestart, offs_t *byteend)
+{
+	UINT32 curentry, entry, curl1entry, l1entry;
+	const handler_data *handler;
+	offs_t minscan, maxscan;
+
+	/* look up the initial address to get the entry we care about */
+	entry = l1entry = table->table[LEVEL1_INDEX(byteaddress)];
+	if (l1entry >= SUBTABLE_BASE)
+		entry = table->table[LEVEL2_INDEX(l1entry, byteaddress)];
+	handler = table->handlers[entry];
+
+	/* use the bytemask of the entry to set minimum and maximum bounds */
+	minscan = handler->bytestart | ((byteaddress - handler->bytestart) & ~handler->bytemask);
+	maxscan = handler->byteend | ((byteaddress - handler->bytestart) & ~handler->bytemask);
+
+	/* first scan backwards to find the start address */
+	curl1entry = l1entry;
+	curentry = entry;
+	*bytestart = byteaddress;
+	while (1)
+	{
+		/* if we need to scan the subtable, do it */
+		if (curentry != curl1entry)
+		{
+			UINT32 minindex = LEVEL2_INDEX(curl1entry, 0);
+			UINT32 index;
+
+			/* scan backwards from the current address, until the previous entry doesn't match */
+			for (index = LEVEL2_INDEX(curl1entry, *bytestart); index > minindex; index--, *bytestart -= 1)
+				if (table->table[index - 1] != entry)
+					break;
+
+			/* if we didn't hit the beginning, then we're finished scanning */
+			if (index != minindex)
+				break;
+		}
+
+		/* move to the beginning of this L1 entry; stop at the minimum address */
+		*bytestart &= ~((1 << LEVEL2_BITS) - 1);
+		if (*bytestart <= minscan)
+			break;
+
+		/* look up the entry of the byte at the end of the previous L1 entry; if it doesn't match, stop */
+		curentry = curl1entry = table->table[LEVEL1_INDEX(*bytestart - 1)];
+		if (curl1entry >= SUBTABLE_BASE)
+			curentry = table->table[LEVEL2_INDEX(curl1entry, *bytestart - 1)];
+		if (curentry != entry)
+			break;
+
+		/* move into the previous entry and resume searching */
+		*bytestart -= 1;
+	}
+
+	/* then scan forwards to find the end address */
+	curl1entry = l1entry;
+	curentry = entry;
+	*byteend = byteaddress;
+	while (1)
+	{
+		/* if we need to scan the subtable, do it */
+		if (curentry != curl1entry)
+		{
+			UINT32 maxindex = LEVEL2_INDEX(curl1entry, ~0);
+			UINT32 index;
+
+			/* scan forwards from the current address, until the next entry doesn't match */
+			for (index = LEVEL2_INDEX(curl1entry, *byteend); index < maxindex; index++, *byteend += 1)
+				if (table->table[index + 1] != entry)
+					break;
+
+			/* if we didn't hit the end, then we're finished scanning */
+			if (index != maxindex)
+				break;
+		}
+
+		/* move to the end of this L1 entry; stop at the maximum address */
+		*byteend |= (1 << LEVEL2_BITS) - 1;
+		if (*byteend >= maxscan)
+			break;
+
+		/* look up the entry of the byte at the start of the next L1 entry; if it doesn't match, stop */
+		curentry = curl1entry = table->table[LEVEL1_INDEX(*byteend + 1)];
+		if (curl1entry >= SUBTABLE_BASE)
+			curentry = table->table[LEVEL2_INDEX(curl1entry, *byteend + 1)];
+		if (curentry != entry)
+			break;
+
+		/* move into the next entry and resume searching */
+		*byteend += 1;
+	}
+
+	return entry;
 }
 
 
@@ -2811,6 +2952,95 @@ static UINT8 *subtable_open(address_table *tabledata, offs_t l1index)
 static void subtable_close(address_table *tabledata, offs_t l1index)
 {
 	/* defer any merging until we run out of tables */
+}
+
+
+
+/***************************************************************************
+    DIRECT MEMORY RANGES
+***************************************************************************/
+
+/*-------------------------------------------------
+    direct_range_find - find a byte address in
+    a range
+-------------------------------------------------*/
+
+static direct_range *direct_range_find(address_space *space, offs_t byteaddress, UINT8 *entry)
+{
+	direct_range **rangelistptr;
+	direct_range **rangeptr;
+	direct_range *range;
+
+	/* determine which entry */
+	byteaddress &= space->bytemask;
+	*entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
+	if (*entry >= SUBTABLE_BASE)
+		*entry = space->readlookup[LEVEL2_INDEX(*entry, byteaddress)];
+	rangelistptr = &space->direct.rangelist[*entry];
+	
+	/* scan our table */
+	for (rangeptr = rangelistptr; *rangeptr != NULL; rangeptr = &(*rangeptr)->next)
+		if (byteaddress >= (*rangeptr)->bytestart && byteaddress <= (*rangeptr)->byteend)
+		{
+			/* found a match; move us to the head of the list if we're not already there */
+			range = *rangeptr;
+			if (range != *rangelistptr)
+			{
+				*rangeptr = range->next;
+				range->next = *rangelistptr;
+				*rangelistptr = range;
+			}
+			return range;
+		}
+	
+	/* didn't find out; allocate a new one */
+	range = space->direct.freerangelist;
+	if (range != NULL)
+		space->direct.freerangelist = range->next;
+	else
+		range = malloc_or_die(sizeof(*range));
+	
+	/* fill in the range */
+	table_derive_range(&space->read, byteaddress, &range->bytestart, &range->byteend);
+	range->next = *rangelistptr;
+	*rangelistptr = range;
+	
+	return range;
+}
+
+    
+/*-------------------------------------------------
+    direct_range_remove_intersecting - remove
+    all cached ranges that intersect the given
+    address range
+-------------------------------------------------*/
+
+static void direct_range_remove_intersecting(address_space *space, offs_t bytestart, offs_t byteend)
+{
+    int entry;
+    
+    /* loop over all entries */
+    for (entry = 0; entry < ARRAY_LENGTH(space->read.handlers); entry++)
+    {
+        direct_range **rangeptr, **nextrangeptr;
+        
+        /* loop over all ranges in this entry's list */
+        for (nextrangeptr = rangeptr = &space->direct.rangelist[entry]; *rangeptr != NULL; rangeptr = nextrangeptr)
+        {
+        	/* if we intersect, remove and add to the free range list */
+            if (bytestart <= (*rangeptr)->byteend && byteend >= (*rangeptr)->bytestart)
+            {
+                direct_range *range = *rangeptr;
+                *rangeptr = range->next;
+                range->next = space->direct.freerangelist;
+                space->direct.freerangelist = range;
+            }
+            
+            /* otherwise advance to the next in the list */
+            else
+                nextrangeptr = &(*rangeptr)->next;
+        }
+    }
 }
 
 
@@ -3180,11 +3410,7 @@ static const char *handler_to_string(const address_table *table, UINT8 entry)
 
 static void dump_map(FILE *file, const address_space *space, const address_table *table)
 {
-	int l1count = 1 << LEVEL1_BITS;
-	int l2count = 1 << LEVEL2_BITS;
-	UINT8 lastentry = STATIC_UNMAP;
-	int entrymatches = 0;
-	int i, j;
+	offs_t byteaddress, bytestart, byteend;
 
 	/* dump generic information */
 	fprintf(file, "  Address bits = %d\n", space->abits);
@@ -3193,84 +3419,14 @@ static void dump_map(FILE *file, const address_space *space, const address_table
 	fprintf(file, "       L2 bits = %d\n", LEVEL2_BITS);
 	fprintf(file, "  Address mask = %X\n", space->bytemask);
 	fprintf(file, "\n");
-
-	/* loop over level 1 entries */
-	for (i = 0; i < l1count; i++)
+	
+	/* iterate over addresses */
+	for (byteaddress = 0; byteaddress <= space->bytemask; byteaddress = byteend + 1)
 	{
-		UINT8 entry = table->table[i];
-
-		/* if this entry matches the previous one, just count it */
-		if (entry < SUBTABLE_BASE && entry == lastentry)
-		{
-			entrymatches++;
-			continue;
-		}
-
-		/* otherwise, print accumulated info */
-		if (lastentry < SUBTABLE_BASE && lastentry != STATIC_UNMAP)
-			fprintf(file, "%08X-%08X    = %02X: %s [offset=%08X]\n",
-							(i - entrymatches) << LEVEL2_BITS,
-							(i << LEVEL2_BITS) - 1,
-							lastentry,
-							handler_to_string(table, lastentry),
-							table->handlers[lastentry]->bytestart);
-
-		/* start counting with this entry */
-		lastentry = entry;
-		entrymatches = 1;
-
-		/* if we're a subtable, we need to drill down */
-		if (entry >= SUBTABLE_BASE)
-		{
-			UINT8 lastentry2 = STATIC_UNMAP;
-			int entry2matches = 0;
-
-			/* loop over level 2 entries */
-			entry -= SUBTABLE_BASE;
-			for (j = 0; j < l2count; j++)
-			{
-				UINT8 entry2 = table->table[(1 << LEVEL1_BITS) + (entry << LEVEL2_BITS) + j];
-
-				/* if this entry matches the previous one, just count it */
-				if (entry2 < SUBTABLE_BASE && entry2 == lastentry2)
-				{
-					entry2matches++;
-					continue;
-				}
-
-				/* otherwise, print accumulated info */
-				if (lastentry2 < SUBTABLE_BASE && lastentry2 != STATIC_UNMAP)
-					fprintf(file, "%08X-%08X    = %02X: %s [offset=%08X]\n",
-									((i << LEVEL2_BITS) | (j - entry2matches)),
-									((i << LEVEL2_BITS) | (j - 1)),
-									lastentry2,
-									handler_to_string(table, lastentry2),
-									table->handlers[lastentry2]->bytestart);
-
-				/* start counting with this entry */
-				lastentry2 = entry2;
-				entry2matches = 1;
-			}
-
-			/* flush the last entry */
-			if (lastentry2 < SUBTABLE_BASE && lastentry2 != STATIC_UNMAP)
-				fprintf(file, "%08X-%08X    = %02X: %s [offset=%08X]\n",
-								((i << LEVEL2_BITS) | (j - entry2matches)),
-								((i << LEVEL2_BITS) | (j - 1)),
-								lastentry2,
-								handler_to_string(table, lastentry2),
-								table->handlers[lastentry2]->bytestart);
-		}
-	}
-
-	/* flush the last entry */
-	if (lastentry < SUBTABLE_BASE && lastentry != STATIC_UNMAP)
+		UINT8 entry = table_derive_range(table, byteaddress, &bytestart, &byteend);
 		fprintf(file, "%08X-%08X    = %02X: %s [offset=%08X]\n",
-						(i - entrymatches) << LEVEL2_BITS,
-						(i << LEVEL2_BITS) - 1,
-						lastentry,
-						handler_to_string(table, lastentry),
-						table->handlers[lastentry]->bytestart);
+						bytestart, byteend, entry, handler_to_string(table, entry), table->handlers[entry]->bytestart);
+	}
 }
 
 

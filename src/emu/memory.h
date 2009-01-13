@@ -88,6 +88,8 @@ enum
 typedef struct _handler_data handler_data;
 typedef struct _subtable_data subtable_data;
 
+/* direct_range is an opaque type used to track ranges for direct access */
+typedef struct _direct_range direct_range;
 
 /* forward-declare the address_space structure */
 typedef struct _address_space address_space;
@@ -103,10 +105,12 @@ struct _direct_read_data
 {
 	UINT8 *					raw;				/* direct access data pointer (raw) */
 	UINT8 *					decrypted;			/* direct access data pointer (decrypted) */
-	offs_t					mask;				/* address mask */
-	offs_t					min;				/* minimum valid address */
-	offs_t					max;				/* maximum valid address */
+	offs_t					bytemask;			/* byte address mask */
+	offs_t					bytestart;			/* minimum valid byte address */
+	offs_t					byteend;			/* maximum valid byte address */
 	UINT8		 			entry;				/* live entry */
+	direct_range *			rangelist[256];		/* list of ranges for each entry */
+	direct_range *			freerangelist;		/* list of recycled range entries */
 };
 
 
@@ -502,7 +506,7 @@ union _addrmap64_token
 
 
 /* opcode range safety check */
-#define address_is_unsafe(S,A)			((UNEXPECTED((A) < (S)->direct.min) || UNEXPECTED((A) > (S)->direct.max)))
+#define memory_address_in_direct_region(S,A)			((UNEXPECTED((A) < (S)->direct.bytestart) || UNEXPECTED((A) > (S)->direct.byteend)))
 
 
 /* wrappers for dynamic read handler installation */
@@ -1108,36 +1112,36 @@ INLINE void memory_write_qword_masked(const address_space *space, offs_t byteadd
 
 INLINE void *memory_decrypted_read_ptr(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return &space->direct.decrypted[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return &space->direct.decrypted[byteaddress & space->direct.bytemask];
 	return NULL;
 }
 
 INLINE UINT8 memory_decrypted_read_byte(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return space->direct.decrypted[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return space->direct.decrypted[byteaddress & space->direct.bytemask];
 	return memory_read_byte(space, byteaddress);
 }
 
 INLINE UINT16 memory_decrypted_read_word(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return *(UINT16 *)&space->direct.decrypted[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return *(UINT16 *)&space->direct.decrypted[byteaddress & space->direct.bytemask];
 	return memory_read_word(space, byteaddress);
 }
 
 INLINE UINT32 memory_decrypted_read_dword(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return *(UINT32 *)&space->direct.decrypted[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return *(UINT32 *)&space->direct.decrypted[byteaddress & space->direct.bytemask];
 	return memory_read_dword(space, byteaddress);
 }
 
 INLINE UINT64 memory_decrypted_read_qword(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return *(UINT64 *)&space->direct.decrypted[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return *(UINT64 *)&space->direct.decrypted[byteaddress & space->direct.bytemask];
 	return memory_read_qword(space, byteaddress);
 }
 
@@ -1151,36 +1155,36 @@ INLINE UINT64 memory_decrypted_read_qword(const address_space *space, offs_t byt
 
 INLINE void *memory_raw_read_ptr(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return &space->direct.raw[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return &space->direct.raw[byteaddress & space->direct.bytemask];
 	return NULL;
 }
 
 INLINE UINT8 memory_raw_read_byte(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return space->direct.raw[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return space->direct.raw[byteaddress & space->direct.bytemask];
 	return memory_read_byte(space, byteaddress);
 }
 
 INLINE UINT16 memory_raw_read_word(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return *(UINT16 *)&space->direct.raw[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return *(UINT16 *)&space->direct.raw[byteaddress & space->direct.bytemask];
 	return memory_read_word(space, byteaddress);
 }
 
 INLINE UINT32 memory_raw_read_dword(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return *(UINT32 *)&space->direct.raw[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return *(UINT32 *)&space->direct.raw[byteaddress & space->direct.bytemask];
 	return memory_read_dword(space, byteaddress);
 }
 
 INLINE UINT64 memory_raw_read_qword(const address_space *space, offs_t byteaddress)
 {
-	if (!address_is_unsafe(space, byteaddress) || memory_set_direct_region(space, byteaddress))
-		return *(UINT64 *)&space->direct.raw[byteaddress & space->direct.mask];
+	if (!memory_address_in_direct_region(space, byteaddress) || memory_set_direct_region(space, byteaddress))
+		return *(UINT64 *)&space->direct.raw[byteaddress & space->direct.bytemask];
 	return memory_read_qword(space, byteaddress);
 }
 

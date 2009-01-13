@@ -448,8 +448,6 @@ offs_t debug_cpu_disassemble(const device_config *device, char *buffer, offs_t p
 void debug_cpu_set_dasm_override(const device_config *device, cpu_disassemble_func dasm_override)
 {
 	cpu_debug_data *info = cpu_get_debug_data(device);
-
-	/* since our callers don't know if we are in debug mode or not, we have to do this check */
 	if (info != NULL)
 		info->dasm_override = dasm_override;
 }
@@ -1737,9 +1735,8 @@ void debug_write_qword(const address_space *space, offs_t address, UINT64 data, 
 
 UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, int arg)
 {
+	UINT64 result = ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size)), result2;
 	cpu_debug_data *info = cpu_get_debug_data(space->cpu);
-	offs_t lowbits_mask;
-	const void *ptr;
 
 	/* keep in logical range */
 	address &= space->logbytemask;
@@ -1767,7 +1764,7 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 
 	/* translate to physical first */
 	if (!debug_cpu_translate(space, TRANSLATE_FETCH_DEBUG, &address))
-		return ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size));
+		return result;
 
 	/* keep in physical range */
 	address &= space->bytemask;
@@ -1824,27 +1821,52 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 			break;
 	}
 
-	/* get pointer to data */
-	/* note that we query aligned to the bus width, and then add back the low bits */
-	lowbits_mask = space->dbits / 8 - 1;
-	if (!arg)
-		ptr = memory_decrypted_read_ptr(space, address & ~lowbits_mask);
-	else
-		ptr = memory_raw_read_ptr(space, address & ~lowbits_mask);
-	if (ptr == NULL)
-		return ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size));
-	ptr = (UINT8 *)ptr + (address & lowbits_mask);
-
-	/* return based on the size */
+	/* switch off the size and handle unaligned accesses */
 	switch (size)
 	{
-		case 1: return *(UINT8 *) ptr;
-		case 2:	return *(UINT16 *)ptr;
-		case 4:	return *(UINT32 *)ptr;
-		case 8:	return *(UINT64 *)ptr;
-	}
+		case 1:
+			result = (arg) ? memory_raw_read_byte(space, address) : memory_decrypted_read_byte(space, address);
+			break;
 
-	return 0;	/* appease compiler */
+		case 2:
+			result = (arg) ? memory_raw_read_word(space, address & ~1) : memory_decrypted_read_word(space, address & ~1);
+			if ((address & 1) != 0)
+			{
+				result2 = (arg) ? memory_raw_read_word(space, (address & ~1) + 2) : memory_decrypted_read_word(space, (address & ~1) + 2);
+				if (space->endianness == ENDIANNESS_LITTLE)
+					result = (result >> (8 * (address & 1))) | (result2 << (16 - 8 * (address & 1)));
+				else
+					result = (result << (8 * (address & 1))) | (result2 >> (16 - 8 * (address & 1)));
+				result &= 0xffff;
+			}
+			break;
+
+		case 4:
+			result = (arg) ? memory_raw_read_dword(space, address & ~3) : memory_decrypted_read_dword(space, address & ~3);
+			if ((address & 3) != 0)
+			{
+				result2 = (arg) ? memory_raw_read_dword(space, (address & ~3) + 4) : memory_decrypted_read_dword(space, (address & ~3) + 4);
+				if (space->endianness == ENDIANNESS_LITTLE)
+					result = (result >> (8 * (address & 3))) | (result2 << (32 - 8 * (address & 3)));
+				else
+					result = (result << (8 * (address & 3))) | (result2 >> (32 - 8 * (address & 3)));
+				result &= 0xffffffff;
+			}
+			break;
+
+		case 8:
+			result = (arg) ? memory_raw_read_qword(space, address & ~7) : memory_decrypted_read_qword(space, address & ~7);
+			if ((address & 7) != 0)
+			{
+				result2 = (arg) ? memory_raw_read_qword(space, (address & ~7) + 8) : memory_decrypted_read_qword(space, (address & ~7) + 8);
+				if (space->endianness == ENDIANNESS_LITTLE)
+					result = (result >> (8 * (address & 7))) | (result2 << (64 - 8 * (address & 7)));
+				else
+					result = (result << (8 * (address & 7))) | (result2 >> (64 - 8 * (address & 7)));
+			}
+			break;
+	}
+	return result;
 }
 
 
