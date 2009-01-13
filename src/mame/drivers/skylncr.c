@@ -24,8 +24,7 @@
 
     TODO:
 
-    - Hook the PPI 8255 devices and rework the I/O based on them.
-    - Proper M5M82C255 emulation.
+    - Proper M5M82C255 device emulation.
 
 
 *************************************************************************************************************/
@@ -36,6 +35,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/8255ppi.h"
 
 static tilemap *tmap;
 
@@ -58,6 +58,12 @@ static UINT8* reelscroll2;
 static UINT8* reelscroll3;
 static UINT8* reelscroll4;
 
+static UINT8 skylncr_nmi_enable;
+
+
+/**************************************
+*           Video Hardware            *
+**************************************/
 
 static WRITE8_HANDLER( skylncr_videoram_w )
 {
@@ -106,13 +112,12 @@ static TILE_GET_INFO( get_reel_4_tile_info )
 static VIDEO_START( skylncr )
 {
 
-	tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows,
-							8,8, 0x40,0x20	);
+	tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows, 8, 8, 0x40, 0x20	);
 
-	reel_1_tilemap = tilemap_create(machine, get_reel_1_tile_info, tilemap_scan_rows, 8,32, 64,8 );
-	reel_2_tilemap = tilemap_create(machine, get_reel_2_tile_info, tilemap_scan_rows, 8,32, 64,8 );
-	reel_3_tilemap = tilemap_create(machine, get_reel_3_tile_info, tilemap_scan_rows, 8,32, 64,8 );
-	reel_4_tilemap = tilemap_create(machine, get_reel_4_tile_info, tilemap_scan_rows, 8,32, 64,8 );
+	reel_1_tilemap = tilemap_create(machine, get_reel_1_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
+	reel_2_tilemap = tilemap_create(machine, get_reel_2_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
+	reel_3_tilemap = tilemap_create(machine, get_reel_3_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
+	reel_4_tilemap = tilemap_create(machine, get_reel_4_tile_info, tilemap_scan_rows, 8, 32, 64, 8 );
 
 	tilemap_set_scroll_cols(reel_2_tilemap, 0x40);
 	tilemap_set_scroll_cols(reel_3_tilemap, 0x40);
@@ -127,9 +132,9 @@ static VIDEO_START( skylncr )
 }
 
 // are these hardcoded, or registers?
-static const rectangle visible1 = { 0*8, (14+48)*8-1,  4*8,  (4+7)*8-1 };
-static const rectangle visible2 = { 0*8, (14+48)*8-1, 12*8, (12+7)*8-1 };
-static const rectangle visible3 = { 0*8, (14+48)*8-1, 20*8, (20+7)*8-1 };
+static const rectangle visible1 = { 0*8, (20+48)*8-1,  4*8,  (4+7)*8-1 };
+static const rectangle visible2 = { 0*8, (20+48)*8-1, 12*8, (12+7)*8-1 };
+static const rectangle visible3 = { 0*8, (20+48)*8-1, 20*8, (20+7)*8-1 };
 
 
 static VIDEO_UPDATE( skylncr )
@@ -146,14 +151,15 @@ static VIDEO_UPDATE( skylncr )
 		tilemap_set_scrolly(reel_4_tilemap, i, reelscroll4[i]);
 	}
 
-	tilemap_draw(bitmap,&visible1,reel_2_tilemap,0,0);
-	tilemap_draw(bitmap,&visible2,reel_3_tilemap,0,0);
-	tilemap_draw(bitmap,&visible3,reel_4_tilemap,0,0);
+	tilemap_draw(bitmap,&visible1,reel_2_tilemap, 0, 0);
+	tilemap_draw(bitmap,&visible2,reel_3_tilemap, 0, 0);
+	tilemap_draw(bitmap,&visible3,reel_4_tilemap, 0, 0);
 
 
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 	return 0;
 }
+
 
 WRITE8_HANDLER( reeltiles_1_w )
 {
@@ -204,25 +210,6 @@ WRITE8_HANDLER( reeltileshigh_4_w )
 }
 
 
-static READ8_HANDLER( ret_ff )
-{
-	return 0xff;
-}
-
-#ifdef UNUSED_FUNCTION
-static READ8_HANDLER( ret_00 )
-{
-	return 0x00;
-}
-#endif
-
-static UINT8 skylncr_nmi_enable;
-
-static WRITE8_HANDLER( skylncr_nmi_enable_w )
-{
-	skylncr_nmi_enable = data & 0x10;
-}
-
 static WRITE8_HANDLER( skylncr_paletteram_w )
 {
 	static int color;
@@ -235,10 +222,16 @@ static WRITE8_HANDLER( skylncr_paletteram_w )
 	{
 		int r,g,b;
 		paletteram[color] = data;
-		r = paletteram[(color/3*3)+0];	g = paletteram[(color/3*3)+1];	b = paletteram[(color/3*3)+2];
-		r = (r << 2) | (r >> 4);		g = (g << 2) | (g >> 4);		b = (b << 2) | (b >> 4);
-		palette_set_color(space->machine,color/3,MAKE_RGB(r,g,b));
-		color = (color + 1) % (0x100*3);
+
+		r = paletteram[(color/3 * 3) + 0];
+		g = paletteram[(color/3 * 3) + 1];
+		b = paletteram[(color/3 * 3) + 2];
+		r = (r << 2) | (r >> 4);
+		g = (g << 2) | (g >> 4);
+		b = (b << 2) | (b >> 4);
+
+		palette_set_color(space->machine, color / 3, MAKE_RGB(r, g, b));
+		color = (color + 1) % (0x100 * 3);
 	}
 }
 
@@ -254,10 +247,16 @@ static WRITE8_HANDLER( skylncr_paletteram2_w )
 	{
 		int r,g,b;
 		paletteram_2[color] = data;
-		r = paletteram_2[(color/3*3)+0];	g = paletteram_2[(color/3*3)+1];	b = paletteram_2[(color/3*3)+2];
-		r = (r << 2) | (r >> 4);			g = (g << 2) | (g >> 4);			b = (b << 2) | (b >> 4);
-		palette_set_color(space->machine,0x100 + color/3,MAKE_RGB(r,g,b));
-		color = (color + 1) % (0x100*3);
+
+		r = paletteram_2[(color/3 * 3) + 0];
+		g = paletteram_2[(color/3 * 3) + 1];
+		b = paletteram_2[(color/3 * 3) + 2];
+		r = (r << 2) | (r >> 4);
+		g = (g << 2) | (g >> 4);
+		b = (b << 2) | (b >> 4);
+
+		palette_set_color(space->machine, 0x100 + color / 3, MAKE_RGB(r, g, b));
+		color = (color + 1) % (0x100 * 3);
 	}
 }
 
@@ -281,6 +280,37 @@ static WRITE8_HANDLER( reelscroll4_w )
 	reelscroll4[offset] = data;
 }
 
+
+/************************************
+*         Other Handlers            *
+************************************/
+
+static WRITE8_HANDLER( skylncr_coin_w )
+{
+	coin_counter_w( 0, data & 0x04 );
+}
+
+static READ8_HANDLER( ret_ff )
+{
+	return 0xff;
+}
+
+#ifdef UNUSED_FUNCTION
+static READ8_HANDLER( ret_00 )
+{
+	return 0x00;
+}
+#endif
+
+static WRITE8_HANDLER( skylncr_nmi_enable_w )
+{
+	skylncr_nmi_enable = data & 0x10;
+}
+
+
+/**************************************
+*             Memory Map              *
+**************************************/
 
 static ADDRESS_MAP_START( mem_map_skylncr, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -340,21 +370,11 @@ static ADDRESS_MAP_START( mem_map_skylncr, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( skylncr_coin_w )
-{
-	coin_counter_w( 0, data & 0x04 );
-//  popmessage("%02x",data);
-}
-
 static ADDRESS_MAP_START( io_map_skylncr, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW2")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN3")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN4")
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
 
 	AM_RANGE(0x20, 0x20) AM_WRITE( skylncr_coin_w )
 
@@ -367,6 +387,10 @@ static ADDRESS_MAP_START( io_map_skylncr, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x70, 0x70) AM_WRITE( skylncr_nmi_enable_w )
 ADDRESS_MAP_END
 
+
+/***************************************
+*           Graphics Layouts           *
+***************************************/
 
 static const gfx_layout layout8x8x8 =
 {
@@ -424,6 +448,11 @@ static const gfx_layout layout8x32x8_rot =
 	8*32*8/2
 };
 
+
+/**************************************
+*           Graphics Decode           *
+**************************************/
+
 static GFXDECODE_START( skylncr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x8,		0, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout8x32x8,		0, 2 )
@@ -431,48 +460,52 @@ static GFXDECODE_START( skylncr )
 GFXDECODE_END
 
 
+/***********************************
+*           Input Ports            *
+***********************************/
+
 static INPUT_PORTS_START( skylncr )
-	PORT_START("IN1")	/* $0 "PORT0 A" */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Stop 2") PORT_CODE(KEYCODE_X)
+	PORT_START("IN1")	/* $00 (PPI0 port A) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_CODE(KEYCODE_X) PORT_NAME("Stop 2")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Stop 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_CODE(KEYCODE_Z) PORT_NAME("Stop 1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_CODE(KEYCODE_C) PORT_NAME("Stop 3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("IN2")	/* $1 "PORT0 B" */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Bet")             PORT_CODE(KEYCODE_2)
+	PORT_START("IN2")	/* $01 (PPI0 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(KEYCODE_2) PORT_NAME("Bet")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9) PORT_NAME("Option 2 (D-UP)") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9) PORT_CODE(KEYCODE_S) PORT_NAME("Option 2 (D-UP)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Start")           PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(KEYCODE_1) PORT_NAME("Start")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
-	PORT_START("IN3")	/* $11 "PORT1 B" */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key In")          PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Option 1 (D-UP)") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("D-UP")            PORT_CODE(KEYCODE_3)
+	PORT_START("IN3")	/* $11 (PPI1 port B) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_Q) PORT_NAME("Key In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_A) PORT_NAME("Option 1 (D-UP)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_3) PORT_NAME("D-UP")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Take Score")      PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_4) PORT_NAME("Take Score")
 
-	PORT_START("IN4")	/* $12 "PORT1 C" */
+	PORT_START("IN4")	/* $12 (PPI1 port C) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Reset")    PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Stats")    PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Stats")
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )	/* Settings */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key Out")  PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W) PORT_NAME("Key Out")
 
-	PORT_START("DSW1")	/* $2 "DSW1" */
+	PORT_START("DSW1")	/* $02 (PPI0 port C) */
 	PORT_DIPNAME( 0x11, 0x01, "D-UP Percentage" )
 	PORT_DIPSETTING(    0x11, "60%" )
 	PORT_DIPSETTING(    0x01, "70%" )
@@ -497,8 +530,8 @@ static INPUT_PORTS_START( skylncr )
 	PORT_DIPSETTING(    0x80, "x100" )
 	PORT_DIPSETTING(    0x00, "x1" )
 
-	PORT_START("DSW2")	/* $10 "DSW2" */
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_START("DSW2")	/* $10 (PPI1 port A) */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -573,6 +606,35 @@ static INPUT_PORTS_START( skylncr )
 INPUT_PORTS_END
 
 
+/**************************************
+*       PPI 8255 (x2) Interface       *
+**************************************/
+
+static const ppi8255_interface ppi8255_intf[2] =
+{
+	{	/* A, B & C set as input */
+		DEVICE8_PORT("IN1"),	/* Port A read */
+		DEVICE8_PORT("IN2"),	/* Port B read */
+		DEVICE8_PORT("DSW1"),	/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	},
+	{	/* A, B & C set as input */
+		DEVICE8_PORT("DSW2"),	/* Port A read */
+		DEVICE8_PORT("IN3"),	/* Port B read */
+		DEVICE8_PORT("IN4"),	/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	}
+};
+
+
+/**********************************
+*       AY-3-8910 Interface       *
+**********************************/
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -590,6 +652,11 @@ static INTERRUPT_GEN( skylncr_vblank_interrupt )
 	if (skylncr_nmi_enable) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
+
+/*************************************
+*           Machine Driver           *
+*************************************/
+
 static MACHINE_DRIVER_START( skylncr )
 
 	/* basic machine hardware */
@@ -599,6 +666,10 @@ static MACHINE_DRIVER_START( skylncr )
 	MDRV_CPU_VBLANK_INT("main", skylncr_vblank_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	/* 1x M5M82C255, or 2x PPI8255 */
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -621,6 +692,10 @@ static MACHINE_DRIVER_START( skylncr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
+/**********************************
+*            ROM Load             *
+**********************************/
 /*
 
 Sky Lancer PCB Layout
@@ -744,16 +819,20 @@ ROM_START( leader )
 ROM_END
 
 
+/**********************************
+*           Driver Init           *
+**********************************/
+
 static DRIVER_INIT( skylncr )
 {
-	paletteram   = auto_malloc(0x100*3);
-	paletteram_2 = auto_malloc(0x100*3);
+	paletteram   = auto_malloc(0x100 * 3);
+	paletteram_2 = auto_malloc(0x100 * 3);
 }
 
 
-/*****************************************************
-                   Game Drivers
-*****************************************************/
+/****************************************************
+*                  Game Drivers                     *
+****************************************************/
 
 /*    YEAR  NAME      PARENT   MACHINE   INPUT     INIT     ROT    COMPANY                 FULLNAME                            FLAGS  */
 GAME( 1995, skylncr,  0,       skylncr,  skylncr,  skylncr, ROT0, "Bordun International", "Sky Lancer (Bordun, ver.U450C)",    0 )
