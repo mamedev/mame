@@ -129,11 +129,11 @@ int sndintrf_init_sound(running_machine *machine, int sndnum, const char *tag, s
 	info->device->clock = clock;
 
 	/* compute the index */
-	totalsnd++;
 	for (index = 0, sndidx = 0; sndidx < totalsnd; sndidx++)
-		if (sound[sndidx].sndtype == sndtype)
+		if (sound[sndidx].aliastype == info->aliastype)
 			index++;
 	info->index = index;
+	totalsnd++;
 
 	/* start the chip, tagging all its streams */
 	current_sound_start = &sound[sndnum];
