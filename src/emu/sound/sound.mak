@@ -336,6 +336,18 @@ endif
 
 
 #-------------------------------------------------
+# National Semiconductor Digitalker
+#-------------------------------------------------
+
+SOUNDDEFS += -DHAS_DIGITALKER=$(if $(filter DIGITALKER,$(SOUNDS)),1,0)
+
+ifneq ($(filter DIGITALKER,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/digitalk.o
+endif
+
+
+
+#-------------------------------------------------
 # Nintendo custom sound chips
 #-------------------------------------------------
 

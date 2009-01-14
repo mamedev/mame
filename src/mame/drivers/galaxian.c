@@ -232,6 +232,7 @@ TO DO :
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
+#include "sound/digitalk.h"
 #include "includes/cclimber.h"
 #include "sound/discrete.h"
 
@@ -251,7 +252,6 @@ static UINT8 zigzag_ay8910_latch;
 static UINT8 kingball_speech_dip;
 static UINT8 kingball_sound;
 static UINT8 mshuttle_ay8910_cs;
-static UINT8 scorpion_sound_data;
 
 static UINT16 protection_state;
 static UINT8 protection_result;
@@ -799,28 +799,17 @@ static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
 	}
 }
 
-
-static READ8_HANDLER( scorpion_sound_status_r )
+static READ8_HANDLER( scorpion_digitalker_intr_r )
 {
-	logerror("%04X:scorpion_sound_status_r()\n", cpu_get_pc(space->cpu));
-	return 1;
+	return digitalker_0_intr_r();
 }
 
-
-static WRITE8_HANDLER( scorpion_sound_data_w )
+static WRITE8_HANDLER( scorpion_digitalker_control_w )
 {
-	scorpion_sound_data = data;
-//  logerror("%04X:scorpion_sound_data_w(%02X)\n", cpu_get_pc(space->cpu), data);
+	digitalker_0_cs_w(data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	digitalker_0_cms_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
+	digitalker_0_wr_w(data & 4 ? ASSERT_LINE : CLEAR_LINE);
 }
-
-
-static WRITE8_HANDLER( scorpion_sound_control_w )
-{
-	if (!(data & 0x04))
-		mame_printf_debug("Secondary sound = %02X\n", scorpion_sound_data);
-//  logerror("%04X:scorpion_sound_control_w(%02X)\n", cpu_get_pc(space->cpu), data);
-}
-
 
 static const ppi8255_interface scorpion_ppi8255_1_intf =
 {
@@ -1652,8 +1641,8 @@ static const ay8910_interface scorpion_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	NULL,
 	NULL,
-	scorpion_sound_data_w,
-	scorpion_sound_control_w,
+	digitalker_0_data_w,
+	scorpion_digitalker_control_w,
 };
 
 static const ay8910_interface checkmaj_ay8910_interface =
@@ -1665,7 +1654,6 @@ static const ay8910_interface checkmaj_ay8910_interface =
 	NULL,
 	NULL
 };
-
 
 static const discrete_mixer_desc konami_sound_mixer_desc =
 	{DISC_MIXER_IS_OP_AMP,
@@ -2052,6 +2040,9 @@ static MACHINE_DRIVER_START( scorpion )
 	MDRV_SOUND_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(scorpion_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD("digitalker", DIGITALKER, 4000000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_DRIVER_END
 
 
@@ -2882,7 +2873,7 @@ static DRIVER_INIT( scorpion )
 	/* no background related */
 //  memory_install_write8_handler(space, 0x6803, 0x6803, 0, 0, SMH_NOP);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, scorpion_sound_status_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, scorpion_digitalker_intr_r);
 /*
 {
     const UINT8 *rom = memory_region(machine, "speech");

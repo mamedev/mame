@@ -4375,7 +4375,7 @@ ROM_START( scorpion )
 	ROM_LOAD( "32_f5.5f",     0x0000, 0x1000, CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
 	ROM_LOAD( "32_h5.5h",     0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
 
-	ROM_REGION( 0x3000, "speech", 0 ) /* Samples? / Speech? */
+	ROM_REGION( 0x3000, "digitalker", 0 ) /* Digitalker speech samples */
 	ROM_LOAD( "32_a3.6e",     0x0000, 0x1000, CRC(279ae6f9) SHA1(a93b1d68c9f4b6ad62fdb8816285e61bd3b4b884) )
 	ROM_LOAD( "32_a2.6d",     0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
 	ROM_LOAD( "32_a1.6c",     0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
@@ -4402,7 +4402,7 @@ ROM_START( scrpiona )
 	ROM_LOAD( "scor_f5.bin",  0x0000, 0x1000, CRC(60180a38) SHA1(518c1267523139aa4e27860012a722b67fe25b6d) )
 	ROM_LOAD( "32_h5.5h",     0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
 
-	ROM_REGION( 0x3000, "speech", 0 ) /* Samples? / Speech? */
+	ROM_REGION( 0x3000, "digitalker", 0 ) /* Digitalker speech samples */
 	ROM_LOAD( "scor_a3.bin",  0x0000, 0x1000, CRC(04abf178) SHA1(2e7f231413d9ec461ca21840f31d1d6b8b17c4d5) )
 	ROM_LOAD( "scor_a2.bin",  0x1000, 0x1000, CRC(452d6354) SHA1(3d5397fddcc17b4d03b9cdc53a6439f159d1bfcc) )
 	ROM_LOAD( "32_a1.6c",     0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
@@ -4428,7 +4428,7 @@ ROM_START( scrpionb )
 	ROM_LOAD( "ic72.5f",     0x0000, 0x1000, CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
 	ROM_LOAD( "ic73.5h",     0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
 
-	ROM_REGION( 0x3000, "speech", 0 ) /* Samples? / Speech? */
+	ROM_REGION( 0x3000, "digitalker", 0 ) /* Digitalker speech samples */
 	ROM_LOAD( "ic25.6e",     0x0000, 0x1000, CRC(04abf178) SHA1(2e7f231413d9ec461ca21840f31d1d6b8b17c4d5) )
 	ROM_LOAD( "ic24.6d",     0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
 	ROM_LOAD( "ic23.6c",     0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
