@@ -14,9 +14,9 @@ static attotime schaser_effect_555_time_remain;
 static INT32 schaser_effect_555_time_remain_savable;
 static int schaser_effect_555_is_low;
 static int schaser_explosion;
-static UINT8 port_1_last = 0;
-static UINT8 port_2_last = 0;
-static UINT8 port_3_last = 0;
+static UINT8 port_1_last_extra = 0;
+static UINT8 port_2_last_extra = 0;
+static UINT8 port_3_last_extra = 0;
 
 /*******************************************************/
 /*                                                     */
@@ -26,9 +26,9 @@ static UINT8 port_3_last = 0;
 
 MACHINE_START( extra_8080bw_sh )
 {
-    state_save_register_global(machine, port_1_last);
-    state_save_register_global(machine, port_2_last);
-    state_save_register_global(machine, port_3_last);
+    state_save_register_global(machine, port_1_last_extra);
+    state_save_register_global(machine, port_2_last_extra);
+    state_save_register_global(machine, port_3_last_extra);
 }
 
 /*******************************************************/
@@ -39,7 +39,7 @@ MACHINE_START( extra_8080bw_sh )
 
 WRITE8_HANDLER( invadpt2_sh_port_1_w )
 {
-	UINT8 rising_bits = data & ~port_1_last;
+	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	sn76477_enable_w(0, !(data & 0x01));			/* SAUCER SOUND */
 
@@ -52,7 +52,7 @@ WRITE8_HANDLER( invadpt2_sh_port_1_w )
 
 	sound_global_enable(data & 0x20);
 
-	port_1_last = data;
+	port_1_last_extra = data;
 
 }
 
@@ -65,7 +65,7 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
        D2 = 82K
        D3 = 100K */
 
-	UINT8 rising_bits = data & ~port_2_last;
+	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start_n(0, 4, 3, 0);		/* FLEET */
 	if (rising_bits & 0x02) sample_start_n(0, 4, 4, 0);		/* FLEET */
@@ -75,7 +75,7 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
 
     c8080bw_flip_screen_w(space, data & 0x20);
 
-	port_2_last = data;
+	port_2_last_extra = data;
 }
 
 
@@ -87,7 +87,7 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
 
 WRITE8_HANDLER( spcewars_sh_port_w )
 {
-	UINT8 rising_bits = data & ~port_1_last;
+	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	sn76477_enable_w(0, !(data & 0x01));			/* Saucer Sound */
 
@@ -97,7 +97,7 @@ WRITE8_HANDLER( spcewars_sh_port_w )
 
 	speaker_level_w(0, (data & 0x10) ? 1 : 0);		/* Various bitstream tunes */
 
-	port_1_last = data;
+	port_1_last_extra = data;
 }
 
 
@@ -130,7 +130,7 @@ const samples_interface lrescue_samples_interface =
 
 WRITE8_HANDLER( lrescue_sh_port_1_w )
 {
-	UINT8 rising_bits = data & ~port_1_last;
+	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(0, 3, 0);		/* Thrust */
 	if (rising_bits & 0x02) sample_start(1, 2, 0);		/* Shot Sound */
@@ -142,12 +142,12 @@ WRITE8_HANDLER( lrescue_sh_port_1_w )
 
 	c8080bw_screen_red_w(data & 0x04);
 
-	port_1_last = data;
+	port_1_last_extra = data;
 }
 
 WRITE8_HANDLER( lrescue_sh_port_2_w )
 {
-	UINT8 rising_bits = data & ~port_2_last;
+	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(1, 8, 0);		/* Footstep high tone */
 	if (rising_bits & 0x02) sample_start(1, 7, 0);		/* Footstep low tone */
@@ -156,11 +156,11 @@ WRITE8_HANDLER( lrescue_sh_port_2_w )
 	speaker_level_w(0, (data & 0x08) ? 1 : 0);		/* Bitstream tunes - endlevel and bonus1 */
 
 	if (rising_bits & 0x10) sample_start(3, 6, 0);		/* Shooting Star and Rescue Ship sounds */
-	if (~data & 0x10 && port_2_last & 0x10) sample_stop (3);	/* This makes the rescue ship sound beep on and off */
+	if (~data & 0x10 && port_2_last_extra & 0x10) sample_stop (3);	/* This makes the rescue ship sound beep on and off */
 
 	c8080bw_flip_screen_w(space, data & 0x20);
 
-	port_2_last = data;
+	port_2_last_extra = data;
 }
 
 
@@ -186,7 +186,7 @@ WRITE8_HANDLER( cosmo_sh_port_2_w )
 
 WRITE8_HANDLER( ballbomb_sh_port_1_w )
 {
-	UINT8 rising_bits = data & ~port_1_last;
+	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(1, 2, 0);		/* Hit a balloon */
 	if (rising_bits & 0x02) sample_start(2, 0, 0);		/* Shot Sound */
@@ -198,12 +198,12 @@ WRITE8_HANDLER( ballbomb_sh_port_1_w )
 
 	c8080bw_screen_red_w(data & 0x04);
 
-	port_1_last = data;
+	port_1_last_extra = data;
 }
 
 WRITE8_HANDLER( ballbomb_sh_port_2_w )
 {
-	UINT8 rising_bits = data & ~port_2_last;
+	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (data & 0x01) sample_start(0, 7, 0);		/* Indicates plane will drop bombs */
 	if (data & 0x04) sample_start(0, 4, 0);		/* Plane is dropping new balloons at start of level */
@@ -211,7 +211,7 @@ WRITE8_HANDLER( ballbomb_sh_port_2_w )
 
 	c8080bw_flip_screen_w(space, data & 0x20);
 
-	port_2_last = data;
+	port_2_last_extra = data;
 }
 
 
@@ -262,7 +262,7 @@ WRITE8_HANDLER( indianbt_sh_port_1_w )
 {
 	/* bit 4 occurs every 5.25 seconds during gameplay */
 
-	UINT8 rising_bits = data & ~port_1_last;
+	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(1, 7, 0);	/* Death */
 	if (rising_bits & 0x02) sample_start(0, 1, 0);		/* Shot Sound */
@@ -273,19 +273,19 @@ WRITE8_HANDLER( indianbt_sh_port_1_w )
 
 	c8080bw_screen_red_w(data & 0x01);
 
-	port_1_last = data;
+	port_1_last_extra = data;
 }
 
 WRITE8_HANDLER( indianbt_sh_port_2_w )
 {
-	UINT8 rising_bits = data & ~port_2_last;
+	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(4, 0, 0);		/* Bird dropped an egg, Lasso used */
 	if (rising_bits & 0x02) sample_start(4, 2, 0);	/* Egg hatches, egg shot */
 	if (rising_bits & 0x08) sample_start(5, 0, 0);		/* Grabber, Lasso caught something */
 	if (rising_bits & 0x10) sample_start(3, 7, 0);		/* Lasso sound */
 
-	port_2_last = data;
+	port_2_last_extra = data;
 }
 
 WRITE8_HANDLER( indianbt_sh_port_3_w )
@@ -872,7 +872,7 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 
 	c8080bw_flip_screen_w(space, data & 0x20);
 
-    port_2_last = data;
+    port_2_last_extra = data;
 }
 
 
@@ -904,7 +904,7 @@ static STATE_POSTLOAD( schaser_reinit_555_time_remain )
 {
     const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
     schaser_effect_555_time_remain = double_to_attotime(schaser_effect_555_time_remain_savable);
-    schaser_sh_port_2_w(space, 0, port_2_last);
+    schaser_sh_port_2_w(space, 0, port_2_last_extra);
 }
 
 
@@ -915,7 +915,7 @@ MACHINE_START( schaser )
     state_save_register_global(machine, schaser_explosion);
     state_save_register_global(machine, schaser_effect_555_is_low);
     state_save_register_global(machine, schaser_effect_555_time_remain_savable);
-    state_save_register_global(machine, port_2_last);
+    state_save_register_global(machine, port_2_last_extra);
     state_save_register_postload(machine, schaser_reinit_555_time_remain, NULL);
 
     MACHINE_START_CALL(extra_8080bw_vh);
@@ -945,13 +945,13 @@ MACHINE_RESET( schaser )
 
 WRITE8_HANDLER( rollingc_sh_port_w )
 {
-	UINT8 rising_bits = data & ~port_3_last;
+	UINT8 rising_bits = data & ~port_3_last_extra;
 
 	if (rising_bits & 0x02) sample_start(4, 0, 0);	/* Steering */
 	if (rising_bits & 0x04) sample_start(0, 1, 0);	/* Collision */
 	if (rising_bits & 0x10) sample_start(1, 8, 0);	/* Computer car is starting to move */
 
-	port_3_last = data;
+	port_3_last_extra = data;
 }
 
 
@@ -1011,7 +1011,7 @@ WRITE8_HANDLER( invrvnge_sh_port_w )
 
 WRITE8_HANDLER( lupin3_sh_port_1_w )
 {
-	UINT8 rising_bits = data & ~port_1_last;
+	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(0, 6, 0);		/* Walking, get money */
 
@@ -1021,12 +1021,12 @@ WRITE8_HANDLER( lupin3_sh_port_1_w )
 	if (rising_bits & 0x08) sample_start(0, 1, 0);		/* Jail */
 	if (rising_bits & 0x10) sample_start(3, 8, 0);		/* Bonus Man */
 
-	port_1_last = data;
+	port_1_last_extra = data;
 }
 
 WRITE8_HANDLER( lupin3_sh_port_2_w )
 {
-	UINT8 rising_bits = data & ~port_2_last;
+	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(0, 3, 0);		/* Lands on top of building, wife kicks man */
 	if (rising_bits & 0x02) sample_start(1, 2, 0);		/* deposit money, start intermission, end game */
@@ -1036,7 +1036,7 @@ WRITE8_HANDLER( lupin3_sh_port_2_w )
 
 	c8080bw_flip_screen_w(space, data & 0x20);
 
-	port_2_last = data;
+	port_2_last_extra = data;
 }
 
 
@@ -1052,12 +1052,12 @@ WRITE8_HANDLER( schasrcv_sh_port_1_w )
        bit 3 = 1st speedup
        Death is a stream of ff's with some fe's thrown in */
 
-	UINT8 rising_bits = data & ~port_1_last;
+	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x02) sample_start(1, 6, 0);		/* Ran over a dot */
 	if (rising_bits & 0x10) sample_start(0, 1, 0);		/* Death */
 
-	port_1_last = data;
+	port_1_last_extra = data;
 }
 
 WRITE8_HANDLER( schasrcv_sh_port_2_w )
@@ -1077,7 +1077,7 @@ WRITE8_HANDLER( schasrcv_sh_port_2_w )
 
 WRITE8_HANDLER( yosakdon_sh_port_1_w )
 {
-	UINT8 rising_bits = data & ~port_1_last;
+	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(0, 3, 0);			/* Game Over */
 	if (rising_bits & 0x02) sample_start(2, 0, 0);			/* Bird dead */
@@ -1087,12 +1087,12 @@ WRITE8_HANDLER( yosakdon_sh_port_1_w )
 
 	sound_global_enable(data & 0x20);
 
-	port_1_last = data;
+	port_1_last_extra = data;
 }
 
 WRITE8_HANDLER( yosakdon_sh_port_2_w )
 {
-	UINT8 rising_bits = data & ~port_2_last;
+	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(1, 6, 0);			/* Ready? , Game Over */
 	if (rising_bits & 0x04) sample_start(3, 7, 0);			/* Big bird dead */
@@ -1103,7 +1103,7 @@ WRITE8_HANDLER( yosakdon_sh_port_2_w )
 
 	c8080bw_flip_screen_w(space, data & 0x20);
 
-	port_2_last = data;
+	port_2_last_extra = data;
 }
 
 
@@ -1116,14 +1116,14 @@ WRITE8_HANDLER( shuttlei_sh_port_1_w )
 {
 	/* bit 3 is high while you are alive and playing */
 
-	UINT8 rising_bits = data & ~port_1_last;
+	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(4, 4, 0);			/* Fleet move */
 	if (rising_bits & 0x02) sample_start(5, 8, 0);			/* Extra Tank */
 
 	sn76477_enable_w(0, data & 0x04 ? 0:1);				/* UFO */
 
-	port_1_last = data;
+	port_1_last_extra = data;
 }
 
 WRITE8_HANDLER( shuttlei_sh_port_2_w )
