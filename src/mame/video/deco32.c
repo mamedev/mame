@@ -1586,7 +1586,6 @@ VIDEO_UPDATE( nslasher )
 	bitmap_fill(sprite0_mix_bitmap,cliprect,0);
 	bitmap_fill(sprite1_mix_bitmap,cliprect,0);
 	bitmap_fill(priority_bitmap,cliprect,0);
-	bitmap_fill(tilemap_alpha_bitmap,cliprect,0);
 	if ((deco32_pf34_control[5]&0x8000)==0)
 		bitmap_fill(bitmap,cliprect,screen->machine->pens[0x200]);
 
