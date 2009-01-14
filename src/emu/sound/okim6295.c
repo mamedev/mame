@@ -61,8 +61,8 @@ static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 static int diff_lookup[49*16];
 
 /* volume lookup table. The manual lists only 9 steps, ~3dB per step. Given the dB values,
-   that seems to map to a 5-bit volume control. What happens for steps after the 9th is not
-    known, we arbitrarily assign a "1" to all those steps. */
+   that seems to map to a 5-bit volume control. Any volume parameter beyond the 9th index
+   results in silent playback. */
 static const int volume_table[16] =
 {
 	0x20,	//   0 dB
@@ -74,13 +74,13 @@ static const int volume_table[16] =
 	0x04,	// -18.0 dB
 	0x03,	// -20.5 dB
 	0x02,	// -24.0 dB
-	0x01,	// unknown
-	0x01,	// unknown
-	0x01,	// unknown
-	0x01,	// unknown
-	0x01,	// unknown
-	0x01,	// unknown
-	0x01,	// unknown
+	0x00,
+	0x00,
+	0x00,
+	0x00,
+	0x00,
+	0x00,
+	0x00,
 };
 
 /* tables computed? */
@@ -482,10 +482,6 @@ static void okim6295_data_w(int num, int data)
 						/* also reset the ADPCM parameters */
 						reset_adpcm(&voice->adpcm);
 						voice->volume = volume_table[data & 0x0f];
-
-						/* the manual only lists 9 volume steps */
-						if ((data & 0x0f) >= 9)
-							popmessage("OKI6295 volume %x contact MAMEDEV", data & 0x0f);
 					}
 					else
 					{
