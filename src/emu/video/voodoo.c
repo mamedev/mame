@@ -3121,7 +3121,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 					{
 						stats->pixels_in++;
 						stats->clip_fail++;
-						continue;
+						goto nextpixel;
 					}
 				}
 
@@ -3142,7 +3142,7 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 				/* pixel pipeline part 2 handles color combine, fog, alpha, and final output */
 				PIXEL_PIPELINE_END(v, stats, dither, dither4, dither_lookup, x, dest, depth, v->reg[fbzMode].u, v->reg[fbzColorPath].u, v->reg[alphaMode].u, v->reg[fogMode].u, iterz, iterw, v->reg[zaColor]);
 			}
-
+nextpixel:
 			/* advance our pointers */
 			x++;
 			mask >>= 4;
