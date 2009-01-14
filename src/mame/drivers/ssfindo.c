@@ -316,7 +316,6 @@ static READ32_HANDLER(PS7500_IO_r)
 	{
 		case MSECR:
 			return mame_rand(space->machine);
-		break;
 
 		case IOLINES: //TODO: eeprom  24c01
 #if 0

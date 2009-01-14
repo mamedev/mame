@@ -1000,15 +1000,12 @@ static READ8_HANDLER( rbi_hack_r)
 		{
    			case 9:
     			return 0x6F;
-			break;
 
 			case 14:
 				return 0x94;
-			break;
 
    			default:
     			return 0xB4;
-			break;
 		}
 	}
 }

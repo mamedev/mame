@@ -721,27 +721,22 @@ UINT8 dsp56k_host_interface_read(device_config* device, UINT8 offset)
 		// Interrupt Control Register (ICR)
 		case 0x00:
 			return ICR;
-			break;
 
 		// Command Vector Register (CVR)
 		case 0x01:
 			return CVR;
-			break;
 
 		// Interrupt status register (ISR)
 		case 0x02:
 			return ISR;
-			break;
 
 		// Interrupt vector register (IVR)
 		case 0x03:
 			return IVR;
-			break;
 
 		// Read zeroes
 		case 0x04:
 			return 0x00;
-			break;
 
 		// Reserved
 		case 0x05:

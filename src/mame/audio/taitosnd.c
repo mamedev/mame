@@ -119,29 +119,24 @@ READ8_HANDLER( taitosound_comm_r )
 		case 0x00:		// mode #0
 			//logerror("taitosnd: Master cpu read portdata %01x\n", tc0140syt.masterdata[0]);
 			return tc0140syt.masterdata[tc0140syt.mainmode ++];
-			break;
 
 		case 0x01:		// mode #1
 			//logerror("taitosnd: Master cpu receives 0/1 : %01x%01x\n", tc0140syt.masterdata[1],tc0140syt.masterdata[0]);
 			tc0140syt.status &= ~TC0140SYT_PORT01_FULL_MASTER;
 			return tc0140syt.masterdata[tc0140syt.mainmode ++];
-			break;
 
 		case 0x02:		// mode #2
 			//logerror("taitosnd: Master cpu read masterdata %01x\n", tc0140syt.masterdata[2]);
 			return tc0140syt.masterdata[tc0140syt.mainmode ++];
-			break;
 
 		case 0x03:		// mode #3
 			//logerror("taitosnd: Master cpu receives 2/3 : %01x%01x\n", tc0140syt.masterdata[3],tc0140syt.masterdata[2]);
 			tc0140syt.status &= ~TC0140SYT_PORT23_FULL_MASTER;
 			return tc0140syt.masterdata[tc0140syt.mainmode ++];
-			break;
 
 		case 0x04:		// port status
 			//logerror("tc0140syt : Master cpu read status : %02x\n", tc0140syt.status);
 			return tc0140syt.status;
-			break;
 
 		default:
 			logerror("tc0140syt : Master cpu read in mode [%02x]\n", tc0140syt.mainmode);

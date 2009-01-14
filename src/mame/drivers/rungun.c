@@ -100,7 +100,6 @@ static READ16_HANDLER( rng_sysregs_r )
 				data = input_port_read(space->machine, "P1") & input_port_read(space->machine, "P3");
 				return(data<<8 | data);
 			}
-		break;
 
 		case 0x02/2:
 			if (input_port_read(space->machine, "DSW") & 0x20)
@@ -110,7 +109,6 @@ static READ16_HANDLER( rng_sysregs_r )
 				data = input_port_read(space->machine, "P2") & input_port_read(space->machine, "P4");
 				return(data<<8 | data);
 			}
-		break;
 
 		case 0x04/2:
 			/*
@@ -119,7 +117,6 @@ static READ16_HANDLER( rng_sysregs_r )
                 bit9 : joysticks layout(auto detect???)
             */
 			return input_port_read(space->machine, "SYSTEM");
-		break;
 
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
@@ -133,7 +130,6 @@ static READ16_HANDLER( rng_sysregs_r )
 				}
 			}
 			return((rng_sysreg[0x06/2] & 0xff00) | data);
-		break;
 	}
 
 	return(rng_sysreg[offset]);

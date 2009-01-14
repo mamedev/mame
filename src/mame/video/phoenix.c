@@ -327,12 +327,10 @@ CUSTOM_INPUT( pleiads_protection_r )
 	case 0x20:
 		/* Bit 3 is 0 */
 		return 0;
-		break;
 	case 0x0c:
 	case 0x30:
 		/* Bit 3 is 1 */
 		return 1;
-		break;
 	default:
 		logerror("%s:Unknown protection question %02X\n", cpuexec_describe_context(field->port->machine), pleiads_protection_question);
 		return 0;

@@ -432,7 +432,6 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
 			return input_port_read(space->machine, "P1");
-			break;
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
@@ -482,7 +481,6 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
 			return input_port_read(space->machine, "P2");
-			break;
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
@@ -516,10 +514,8 @@ READ8_HANDLER( nb1413m3_inputport3_r )
 		case NB1413M3_FINALBNY:
 		case NB1413M3_MMSIKAKU:
 			return ((nb1413m3_outcoin_flag & 0x01) << 1);
-			break;
 		default:
 			return 0xff;
-			break;
 	}
 }
 
@@ -530,16 +526,13 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 		case NB1413M3_KANATUEN:
 		case NB1413M3_KYUHITO:
 			return input_port_read(space->machine, "DSWB");
-			break;
 		case NB1413M3_TAIWANMB:
 			return ((input_port_read(space->machine, "DSWA") & 0xf0) | ((input_port_read(space->machine, "DSWB") & 0xf0) >> 4));
-			break;
 		case NB1413M3_OTONANO:
 		case NB1413M3_MJCAMERA:
 		case NB1413M3_IDHIMITU:
 		case NB1413M3_KAGUYA2:
 			return (((input_port_read(space->machine, "DSWA") & 0x0f) << 4) | (input_port_read(space->machine, "DSWB") & 0x0f));
-			break;
 		case NB1413M3_SCANDAL:
 		case NB1413M3_SCANDALM:
 		case NB1413M3_MJFOCUSM:
@@ -551,7 +544,6 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 		case NB1413M3_TOKIMBSJ:
 		case NB1413M3_TOKYOGAL:
 			return ((input_port_read(space->machine, "DSWA") & 0x0f) | ((input_port_read(space->machine, "DSWB") & 0x0f) << 4));
-			break;
 		case NB1413M3_TRIPLEW1:
 		case NB1413M3_NTOPSTAR:
 		case NB1413M3_PSTADIUM:
@@ -565,10 +557,8 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 			        ((input_port_read(space->machine, "DSWB") & 0x10) >> 2) | ((input_port_read(space->machine, "DSWB") & 0x40) >> 3) |
 			        ((input_port_read(space->machine, "DSWA") & 0x01) << 4) | ((input_port_read(space->machine, "DSWA") & 0x04) << 3) |
 			        ((input_port_read(space->machine, "DSWA") & 0x10) << 2) | ((input_port_read(space->machine, "DSWA") & 0x40) << 1));
-			break;
 		default:
 			return input_port_read(space->machine, "DSWA");
-			break;
 	}
 }
 
@@ -579,16 +569,13 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 		case NB1413M3_KANATUEN:
 		case NB1413M3_KYUHITO:
 			return input_port_read(space->machine, "DSWA");
-			break;
 		case NB1413M3_TAIWANMB:
 			return (((input_port_read(space->machine, "DSWA") & 0x0f) << 4) | (input_port_read(space->machine, "DSWB") & 0x0f));
-			break;
 		case NB1413M3_OTONANO:
 		case NB1413M3_MJCAMERA:
 		case NB1413M3_IDHIMITU:
 		case NB1413M3_KAGUYA2:
 			return ((input_port_read(space->machine, "DSWA") & 0xf0) | ((input_port_read(space->machine, "DSWB") & 0xf0) >> 4));
-			break;
 		case NB1413M3_SCANDAL:
 		case NB1413M3_SCANDALM:
 		case NB1413M3_MJFOCUSM:
@@ -600,7 +587,6 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 		case NB1413M3_TOKIMBSJ:
 		case NB1413M3_TOKYOGAL:
 			return (((input_port_read(space->machine, "DSWA") & 0xf0) >> 4) | (input_port_read(space->machine, "DSWB") & 0xf0));
-			break;
 		case NB1413M3_TRIPLEW1:
 		case NB1413M3_NTOPSTAR:
 		case NB1413M3_PSTADIUM:
@@ -614,10 +600,8 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 			        ((input_port_read(space->machine, "DSWB") & 0x20) >> 3) | ((input_port_read(space->machine, "DSWB") & 0x80) >> 4) |
 			        ((input_port_read(space->machine, "DSWA") & 0x02) << 3) | ((input_port_read(space->machine, "DSWA") & 0x08) << 2) |
 			        ((input_port_read(space->machine, "DSWA") & 0x20) << 1) | ((input_port_read(space->machine, "DSWA") & 0x80) << 0));
-			break;
 		default:
 			return input_port_read(space->machine, "DSWB");
-			break;
 	}
 }
 

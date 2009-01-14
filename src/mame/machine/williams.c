@@ -951,6 +951,7 @@ static READ8_DEVICE_HANDLER( tshoot_input_port_0_3_r )
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
 
+	// FIXME: this code is never reached
 	return 0;
 }
 

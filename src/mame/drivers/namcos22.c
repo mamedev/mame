@@ -2606,19 +2606,14 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 			}
 
 			return (ddx & 0xff);
-			break;
 		case 1:
 			return (ddx>>8);
-			break;
 		case 2:
 			return (ddy & 0xff);
-			break;
 		case 3:
 			return (ddy>>8);
-			break;
 		default:
 			return 0;
-			break;
 	}
 }
 
@@ -2636,23 +2631,18 @@ static READ8_HANDLER( alpineracer_mcu_adc_r )
 	{
 		case 0:
 			return swing & 0xff;
-			break;
 
 		case 1:
 			return (swing>>8);
-			break;
 
 		case 2:
 			return edge & 0xff;
-			break;
 
 		case 3:
 			return (edge>>8);
-			break;
 
 		default:
 			return 0;
-			break;
 	}
 }
 
@@ -2669,31 +2659,24 @@ static READ8_HANDLER( cybrcycc_mcu_adc_r )
 	{
 		case 0:
 			return steer & 0xff;
-			break;
 
 		case 1:
 			return (steer>>8);
-			break;
 
 		case 2:
 			return gas & 0xff;
-			break;
 
 		case 3:
 			return (gas>>8);
-			break;
 
 		case 4:
 			return brake & 0xff;
-			break;
 
 		case 5:
 			return (brake>>8);
-			break;
 
 		default:
 			return 0;
-			break;
 	}
 }
 
@@ -2710,31 +2693,24 @@ static READ8_HANDLER( airco22_mcu_adc_r )
 	{
 		case 0:
 			return x & 0xff;
-			break;
 
 		case 1:
 			return (x>>8);
-			break;
 
 		case 2:
 			return y & 0xff;
-			break;
 
 		case 3:
 			return (y>>8);
-			break;
 
 		case 4:
 			return pedal & 0xff;
-			break;
 
 		case 5:
 			return (pedal>>8);
-			break;
 
 		default:
 			return 0;
-			break;
 	}
 }
 

@@ -242,7 +242,6 @@ static READ8_HANDLER( mcu_arknoid2_r )
 				logerror("error, unknown mcu command\n");
 				/* should not happen */
 				return 0xff;
-				break;
 		}
 	}
 	else
@@ -370,7 +369,6 @@ static READ8_HANDLER( mcu_extrmatn_r )
 				logerror("error, unknown mcu command\n");
 				/* should not happen */
 				return 0xff;
-				break;
 		}
 	}
 	else
@@ -573,18 +571,14 @@ READ8_HANDLER( tnzs_mcu_r )
 		case MCU_TNZS:
 		case MCU_CHUKATAI:
 			return mcu_tnzs_r(space,offset);
-			break;
 		case MCU_ARKANOID:
 			return mcu_arknoid2_r(space,offset);
-			break;
 		case MCU_EXTRMATN:
 		case MCU_DRTOPPEL:
 		case MCU_PLUMPOP:
 			return mcu_extrmatn_r(space,offset);
-			break;
 		default:
 			return 0xff;
-			break;
 	}
 }
 

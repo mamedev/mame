@@ -228,7 +228,6 @@ static WRITE8_HANDLER( zvideoram_w )
 		logerror("mode =%02x pc=%04x\n",*io9401,cpu_get_pc(space->cpu) );
 		popmessage("mode =%02x pc=%04x\n",*io9401,cpu_get_pc(space->cpu) );
 		return;
-		break;
 	}
 
 

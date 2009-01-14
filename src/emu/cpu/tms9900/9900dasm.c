@@ -325,10 +325,8 @@ static int print_arg (char *dest, int mode, int arg, const UINT8 *opram, unsigne
 	{
 		case 0x0:	/* workspace register */
 			return sprintf (dest, "R%d", arg);
-			break;
 		case 0x1:	/* workspace register indirect */
 			return sprintf (dest, "*R%d", arg);
-			break;
 		case 0x2:	/* symbolic|indexed */
 			base = readop_arg(opram, pc);
 			if (arg) 	/* indexed */
@@ -338,7 +336,6 @@ static int print_arg (char *dest, int mode, int arg, const UINT8 *opram, unsigne
 			break;
 		case 0x3:	/* workspace register indirect auto increment */
 			return sprintf (dest, "*R%d+", arg);
-			break;
 	}
 
 	return 0;

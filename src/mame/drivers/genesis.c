@@ -180,14 +180,11 @@ READ16_HANDLER(genesis_ctrl_r)
 	{
 	case 0:							/* DRAM mode is write only */
 		return 0xffff;
-		break;
 	case 0x80:						/* return Z80 CPU Function Stop Accessible or not */
 		/* logerror("Returning z80 state\n"); */
 		return (z80running ? 0x0100 : 0x0);
-		break;
 	case 0x100:						/* Z80 CPU Reset - write only */
 		return 0xffff;
-		break;
 	}
 	return 0x00;
 
@@ -204,7 +201,6 @@ WRITE16_HANDLER(genesis_ctrl_w)
 	{
 	case 0:							/* set DRAM mode... we have to ignore this for production cartridges */
 		return;
-		break;
 	case 0x80:						/* Z80 BusReq */
 		if (data == 0x100)
 		{
@@ -221,7 +217,6 @@ WRITE16_HANDLER(genesis_ctrl_w)
 			/* logerror("z80 started, BusReq ends\n"); */
 		}
 		return;
-		break;
 	case 0x100:						/* Z80 CPU Reset */
 		if (data == 0x00)
 		{
@@ -238,8 +233,6 @@ WRITE16_HANDLER(genesis_ctrl_w)
 			/* logerror("z80 out of reset\n"); */
 		}
 		return;
-
-		break;
 	}
 }
 

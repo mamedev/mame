@@ -48,52 +48,42 @@ int sh2_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 	{
 		case  0:
 			return describe_group_0(context, desc, prev, opcode);
-			break;
 
 		case  1: 	// MOVLS4
 			desc->regin[0] |= REGFLAG_R(Rn) | REGFLAG_R(Rm);
 			desc->flags |= OPFLAG_WRITES_MEMORY;
 			return TRUE;
-			break;
 
 		case  2:
 			return describe_group_2(context, desc, prev, opcode);
-			break;
 
 		case  3:
 			return describe_group_3(context, desc, prev, opcode);
-			break;
 
 		case  4:
 			return describe_group_4(context, desc, prev, opcode);
-			break;
 
 		case  5: 	// MOVLL4
 			desc->regin[0] |= REGFLAG_R(Rm);
 			desc->regout[0] |= REGFLAG_R(Rn);
 			desc->flags |= OPFLAG_READS_MEMORY;
 			return TRUE;
-			break;
 
 		case  6:
 			return describe_group_6(context, desc, prev, opcode);
-			break;
 
 		case  7: 	// ADDI
 			desc->regin[0] |= REGFLAG_R(Rn);
 			desc->regout[0] |= REGFLAG_R(Rn);
 			return TRUE;
-			break;
 
 		case  8:
 			return describe_group_8(context, desc, prev, opcode);
-			break;
 
 		case  9: 	// MOVWI
 			desc->regout[0] |= REGFLAG_R(Rn);
 			desc->flags |= OPFLAG_READS_MEMORY;
 			return TRUE;
-			break;
 
 		case 11: 	// BSR
 			desc->regout[1] |= REGFLAG_PR;
@@ -108,26 +98,21 @@ int sh2_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 				desc->cycles = 2;
 				return TRUE;
 			}
-			break;
 
 		case 12:
 			return describe_group_12(context, desc, prev, opcode);
-			break;
 
 		case 13: 	// MOVLI
 			desc->regout[0] |= REGFLAG_R(Rn);
 			desc->flags |= OPFLAG_READS_MEMORY;
 			return TRUE;
-			break;
 
 		case 14: 	// MOVI
 			desc->regout[0] |= REGFLAG_R(Rn);
 			return TRUE;
-			break;
 
 		case 15: 	// NOP
 			return TRUE;
-			break;
 	}
 
 	return FALSE;
@@ -154,12 +139,10 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 	case 0x3a: // NOP();
 	case 0x3b: // NOP();
 		return TRUE;
-		break;
 
 	case 0x02: // STCSR(Rn);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		return TRUE;
-		break;
 
 	case 0x03: // BSRF(Rn);
 		desc->regout[1] |= REGFLAG_PR;
@@ -169,7 +152,6 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->delayslots = 1;
 
 		return TRUE;
-		break;
 
 	case 0x04: // MOVBS0(Rm, Rn);
 	case 0x05: // MOVWS0(Rm, Rn);
@@ -186,7 +168,6 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(Rn) | REGFLAG_R(0);
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x07: // MULL(Rm, Rn);
 	case 0x17: // MULL(Rm, Rn);
@@ -196,18 +177,15 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_MACL;
 		desc->cycles = 2;
 		return TRUE;
-		break;
 
 	case 0x08: // CLRT();
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case 0x0a: // STSMACH(Rn);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_MACH;
 		return TRUE;
-		break;
 
 	case 0x0b: // RTS();
 		desc->regin[1] |= REGFLAG_PR;
@@ -218,7 +196,6 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->cycles = 2;
 
 		return TRUE;
-		break;
 
 	case 0x0c: // MOVBL0(Rm, Rn);
 	case 0x0d: // MOVWL0(Rm, Rn);
@@ -236,7 +213,6 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x0f: // MAC_L(Rm, Rn);
 	case 0x1f: // MAC_L(Rm, Rn);
@@ -246,40 +222,33 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
 		desc->cycles = 3;
 		return TRUE;
-		break;
 
 	case 0x12: // STCGBR(Rn);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->regin[1] |= REGFLAG_GBR;
 		return TRUE;
-		break;
 
 	case 0x18: // SETT();
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case 0x19: // DIV0U();
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case 0x1a: // STSMACL(Rn);
 		desc->regin[1] |= REGFLAG_MACL;
 		desc->regout[0] |= REGFLAG_R(Rn);
 		return TRUE;
-		break;
 
 	case 0x1b: // SLEEP();
 		desc->cycles = 3;
 		return TRUE;
-		break;
 
 	case 0x22: // STCVBR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_VBR;
 		return TRUE;
-		break;
 
 	case 0x23: // BRAF(Rn);
 		desc->regin[0] |= REGFLAG_R(Rm);
@@ -288,24 +257,20 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->delayslots = 1;
 		desc->cycles = 2;
 		return TRUE;
-		break;
 
 	case 0x28: // CLRMAC();
 		desc->regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
 		return TRUE;
-		break;
 
 	case 0x29: // MOVT(Rn);
 		desc->regin[1] |= REGFLAG_SR;
 		desc->regout[0] |= REGFLAG_R(Rn);
 		return TRUE;
-		break;
 
 	case 0x2a: // STSPR(Rn);
 		desc->regin[1] |= REGFLAG_PR;
 		desc->regout[0] |= REGFLAG_R(Rn);
 		return TRUE;
-		break;
 
 	case 0x2b: // RTE();
 		desc->regin[0] |= REGFLAG_R(15);
@@ -317,7 +282,6 @@ static int describe_group_0(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->cycles = 4;
 
 		return TRUE;
-		break;
 	}
 
 	return FALSE;
@@ -333,11 +297,9 @@ static int describe_group_2(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(Rn);
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case  3: // NOP();
 		return TRUE;
-		break;
 
 	case  4: // MOVBM(Rm, Rn);
 	case  5: // MOVWM(Rm, Rn);
@@ -347,7 +309,6 @@ static int describe_group_2(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case  7: // DIV0S(Rm, Rn);
 	case  8: // TST(Rm, Rn);
@@ -355,7 +316,6 @@ static int describe_group_2(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case  9: // AND(Rm, Rn);
 	case 10: // XOR(Rm, Rn);
@@ -363,7 +323,6 @@ static int describe_group_2(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(Rn);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		return TRUE;
-		break;
 
 	case 14: // MULU(Rm, Rn);
 	case 15: // MULS(Rm, Rn);
@@ -371,7 +330,6 @@ static int describe_group_2(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
 		desc->cycles = 2;
 		return TRUE;
-		break;
 	}
 
 	return FALSE;
@@ -389,19 +347,16 @@ static int describe_group_3(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case  1: // NOP();
 	case  9: // NOP();
 		return TRUE;
-		break;
 
 	case  4: // DIV1(Rm, Rn);
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(Rn);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case  5: // DMULU(Rm, Rn);
 	case 13: // DMULS(Rm, Rn);
@@ -409,14 +364,12 @@ static int describe_group_3(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
 		desc->cycles = 2;
 		return TRUE;
-		break;
 
 	case  8: // SUB(Rm, Rn);
 	case 12: // ADD(Rm, Rn);
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(Rn);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		return TRUE;
-		break;
 
 	case 10: // SUBC(Rm, Rn);
 	case 11: // SUBV(Rm, Rn);
@@ -427,7 +380,6 @@ static int describe_group_3(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 	}
 	return FALSE;
 }
@@ -444,7 +396,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case 0x02: // STSMMACH(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -452,7 +403,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x03: // STCMSR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -460,7 +410,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->cycles = 2;
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x06: // LDSMMACH(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -468,7 +417,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_MACH;
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x07: // LDCMSR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -477,7 +425,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->cycles = 3;
 		desc->flags |= OPFLAG_READS_MEMORY | OPFLAG_CAN_EXPOSE_EXTERNAL_INT | OPFLAG_END_SEQUENCE;
 		return TRUE;
-		break;
 
 	case 0x08: // SHLL2(Rn);
 	case 0x09: // SHLR2(Rn);
@@ -488,13 +435,11 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regin[0] |= REGFLAG_R(Rn);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		return TRUE;
-		break;
 
 	case 0x0a: // LDSMACH(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_MACH;
 		return TRUE;
-		break;
 
 	case 0x0b: // JSR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -503,14 +448,12 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->targetpc = BRANCH_TARGET_DYNAMIC;
 		desc->delayslots = 1;
 		return TRUE;
-		break;
 
 	case 0x0e: // LDCSR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		desc->flags |= OPFLAG_CAN_EXPOSE_EXTERNAL_INT | OPFLAG_END_SEQUENCE;
 		return TRUE;
-		break;
 
 	case 0x0f: // MAC_W(Rm, Rn);
 	case 0x1f: // MAC_W(Rm, Rn);
@@ -522,7 +465,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_MACL | REGFLAG_MACH;
 		desc->cycles = 3;
 		return TRUE;
-		break;
 
 	case 0x10: // DT(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -530,7 +472,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case 0x11: // CMPPZ(Rn);
 	case 0x15: // CMPPL(Rn);
@@ -538,7 +479,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regin[1] |= REGFLAG_SR;
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case 0x12: // STSMMACL(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -546,7 +486,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x13: // STCMGBR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -554,7 +493,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x16: // LDSMMACL(Rn);
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(Rn);
@@ -562,7 +500,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_MACL;
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x17: // LDCMGBR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -570,13 +507,11 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_GBR;
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x1a: // LDSMACL(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_MACL;
 		return TRUE;
-		break;
 
 	case 0x1b: // TAS(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -585,13 +520,11 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->cycles = 4;
 		desc->flags |= OPFLAG_READS_MEMORY | OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x1e: // LDCGBR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_GBR;
 		return TRUE;
-		break;
 
 	case 0x20: // SHAL(Rn);
 	case 0x21: // SHAR(Rn);
@@ -599,7 +532,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case 0x22: // STSMPR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -607,7 +539,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x23: // STCMVBR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -615,7 +546,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x24: // ROTCL(Rn);
 	case 0x25: // ROTCR(Rn);
@@ -624,7 +554,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case 0x26: // LDSMPR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -632,7 +561,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_PR;
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x27: // LDCMVBR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
@@ -640,13 +568,11 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[1] |= REGFLAG_VBR;
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case 0x2a: // LDSPR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_PR;
 		return TRUE;
-		break;
 
 	case 0x2b: // JMP(Rm);
 		desc->regin[0] |= REGFLAG_R(Rm);
@@ -654,13 +580,11 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->targetpc = BRANCH_TARGET_DYNAMIC;
 		desc->delayslots = 1;
 		return TRUE;
-		break;
 
 	case 0x2e: // LDCVBR(Rn);
 		desc->regin[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_VBR;
 		return TRUE;
-		break;
 
 	case 0x0c: // NOP();
 	case 0x0d: // NOP();
@@ -685,8 +609,6 @@ static int describe_group_4(SH2 *context, opcode_desc *desc, const opcode_desc *
 	case 0x3d: // NOP();
 	case 0x3e: // NOP();
 		return TRUE;
-		break;
-
 	}
 
 	return FALSE;
@@ -710,7 +632,6 @@ static int describe_group_6(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regin[0] |= REGFLAG_R(Rm);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		return TRUE;
-		break;
 
 	case  4: // MOVBP(Rm, Rn);
 	case  5: // MOVWP(Rm, Rn);
@@ -719,20 +640,17 @@ static int describe_group_6(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case  8: // SWAPB(Rm, Rn);
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(Rn);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		return TRUE;
-		break;
 
 	case 10: // NEGC(Rm, Rn);
 		desc->regin[0] |= REGFLAG_R(Rm);
 		desc->regout[0] |= REGFLAG_R(Rn);
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 	}
 	return FALSE;
 }
@@ -748,7 +666,6 @@ static int describe_group_8(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regin[0] |= REGFLAG_R(Rm) | REGFLAG_R(0);
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case  2<< 8: // NOP();
 	case  3<< 8: // NOP();
@@ -758,7 +675,6 @@ static int describe_group_8(SH2 *context, opcode_desc *desc, const opcode_desc *
 	case 12<< 8: // NOP();
 	case 14<< 8: // NOP();
 		return TRUE;
-		break;
 
 	case  4<< 8: // MOVBL4(Rm, opcode & 0x0f);
 	case  5<< 8: // MOVWL4(Rm, opcode & 0x0f);
@@ -766,14 +682,12 @@ static int describe_group_8(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->regout[0] |= REGFLAG_R(0);
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case  8<< 8: // CMPIM(opcode & 0xff);
 		desc->regin[0] |= REGFLAG_R(Rm);
 		desc->regin[1] |= REGFLAG_SR;
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case  9<< 8: // BT(opcode & 0xff);
 	case 11<< 8: // BF(opcode & 0xff);
@@ -782,7 +696,6 @@ static int describe_group_8(SH2 *context, opcode_desc *desc, const opcode_desc *
 		disp = ((INT32)opcode << 24) >> 24;
 		desc->targetpc = (desc->pc + 2) + disp * 2 + 2;
 		return TRUE;
-		break;
 
 	case 13<< 8: // BTS(opcode & 0xff);
 	case 15<< 8: // BFS(opcode & 0xff);
@@ -792,7 +705,6 @@ static int describe_group_8(SH2 *context, opcode_desc *desc, const opcode_desc *
 		desc->targetpc = (desc->pc + 2) + disp * 2 + 2;
 		desc->delayslots = 1;
 		return TRUE;
-		break;
 	}
 
 	return FALSE;
@@ -808,7 +720,6 @@ static int describe_group_12(SH2 *context, opcode_desc *desc, const opcode_desc 
 		desc->regin[0] |= REGFLAG_R(0);
 		desc->flags |= OPFLAG_WRITES_MEMORY;
 		return TRUE;
-		break;
 
 	case  3<<8: // TRAPA(opcode & 0xff);
 		desc->regin[0] |= REGFLAG_R(15);
@@ -818,7 +729,6 @@ static int describe_group_12(SH2 *context, opcode_desc *desc, const opcode_desc 
 		desc->targetpc = BRANCH_TARGET_DYNAMIC;
 		desc->flags |= OPFLAG_READS_MEMORY | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 		return TRUE;
-		break;
 
 	case  4<<8: // MOVBLG(opcode & 0xff);
 	case  5<<8: // MOVWLG(opcode & 0xff);
@@ -827,14 +737,12 @@ static int describe_group_12(SH2 *context, opcode_desc *desc, const opcode_desc 
 		desc->regout[0] |= REGFLAG_R(0);
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 
 	case  8<<8: // TSTI(opcode & 0xff);
 		desc->regin[0] |= REGFLAG_R(0);
 		desc->regin[1] |= REGFLAG_SR;
 		desc->regout[1] |= REGFLAG_SR;
 		return TRUE;
-		break;
 
 	case  9<<8: // ANDI(opcode & 0xff);
 	case 10<<8: // XORI(opcode & 0xff);
@@ -842,7 +750,6 @@ static int describe_group_12(SH2 *context, opcode_desc *desc, const opcode_desc 
 		desc->regin[0] |= REGFLAG_R(0);
 		desc->regout[0] |= REGFLAG_R(0);
 		return TRUE;
-		break;
 
 	case 12<<8: // TSTM(opcode & 0xff);
 	case 13<<8: // ANDM(opcode & 0xff);
@@ -853,7 +760,6 @@ static int describe_group_12(SH2 *context, opcode_desc *desc, const opcode_desc 
 		desc->regout[1] |= REGFLAG_SR;
 		desc->flags |= OPFLAG_READS_MEMORY;
 		return TRUE;
-		break;
 	}
 
 	return FALSE;

@@ -2862,7 +2862,6 @@ TABLE_FUNCTION(void, set_line, (m37710i_cpu_struct *cpustate, int line, int stat
 						cpustate->m37710_regs[m37710_irq_levels[line]] |= 8;
 					}
 					return;
-					break;
 				case ASSERT_LINE:
 				case PULSE_LINE:
 				case HOLD_LINE:

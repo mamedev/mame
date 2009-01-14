@@ -1955,11 +1955,9 @@ static READ32_HANDLER( bam2_mcu_r )
 				case 0x7f:		// first drive check
 				case 0x1c:		// second drive check (causes HDD detected)
 					return 1;	// return error
-					break;
 			}
 
 			return 4;			// return OK
-			break;
 	}
 
 	return 0;

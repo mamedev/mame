@@ -165,7 +165,6 @@ READ16_HANDLER(brival_protection_r)
 			case 2:
 			case 3:
 				return 0;
-				break;
 		}
 	}
 
@@ -212,7 +211,6 @@ WRITE16_HANDLER(brival_protection_w)
 				return;
 			logerror("brival_protection_w: UNKNOWN WRITE: offset %x value %x\n", offset, data);
 			return;
-			break;
 	}
 
 	memcpy(ret, &ROM[protAddress[curProtType][0]], 16);

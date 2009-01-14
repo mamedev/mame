@@ -4031,26 +4031,20 @@ READ16_HANDLER( K055673_rom_word_r )	// 5bpp
 	{
 		case 0:	// 20k / 36u
 			return ROM[romofs+2];
-			break;
 		case 1:	// 17k / 36y
 			return ROM[romofs+3];
-			break;
 		case 2: // 10k / 32y
 		case 3:
 			romofs /= 2;
-		       	return ROM8[romofs+1];
-			break;
+			return ROM8[romofs+1];
 		case 4:	// 22k / 34u
 			return ROM[romofs];
-			break;
 		case 5:	// 19k / 34y
 			return ROM[romofs+1];
-			break;
 		case 6:	// 12k / 29y
 		case 7:
 			romofs /= 2;
-		       	return ROM8[romofs];
-			break;
+			return ROM8[romofs];
 		default:
 			LOG(("55673_rom_word_r: Unknown read offset %x\n", offset));
 			break;
@@ -4073,24 +4067,18 @@ READ16_HANDLER( K055673_GX6bpp_rom_word_r )
 	{
 		case 0:
 			return ROM[romofs+3];
-			break;
 		case 1:
 			return ROM[romofs+4];
-			break;
 		case 2:
 		case 3:
-		       	return ROM[romofs+5];
-			break;
+			return ROM[romofs+5];
 		case 4:
 			return ROM[romofs];
-			break;
 		case 5:
 			return ROM[romofs+1];
-			break;
 		case 6:
 		case 7:
-		       	return ROM[romofs+2];
-			break;
+			return ROM[romofs+2];
 		default:
 			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, cpu_get_pc(space->cpu)));
 			break;

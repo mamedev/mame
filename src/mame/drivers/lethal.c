@@ -299,7 +299,6 @@ static READ8_HANDLER( le_4800_r )
 				case 0x45:
 				case 0x46:
 					return K053244_r(space,offset-0x40);
-					break;
 
 				case 0x80:
 				case 0x81:
@@ -334,11 +333,9 @@ static READ8_HANDLER( le_4800_r )
 				case 0x9e:
 				case 0x9f:
 					return K054000_r(space,offset-0x80);
-					break;
 
 				case 0xca:
 					return sound_status_r(space,0);
-					break;
 			}
 		}
 		else if (offset < 0x1800)
@@ -454,7 +451,6 @@ static READ8_HANDLER(guns_r)
 	{
 		case 0:
 			return GUNX(1)>>1;
-			break;
 		case 1:
 			if ((240-GUNY(1)) == 7)
 				return 0;
@@ -463,7 +459,6 @@ static READ8_HANDLER(guns_r)
 			break;
 		case 2:
 			return GUNX(2)>>1;
-			break;
 		case 3:
 			if ((240-GUNY(2)) == 7)
 				return 0;

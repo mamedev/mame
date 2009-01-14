@@ -180,7 +180,6 @@ static READ8_HANDLER( spunchout_prot_r ) {
 				return memory_read_byte(space, 0xd7c1);
 
 			return prot_mem[offset];
-		break;
 
 		case 0x01:
 			if ( prot_mode_sel == 0x08 ) /* PC = 0x0b6a */
@@ -236,7 +235,6 @@ static READ8_HANDLER( spunchout_prot_r ) {
 			return 0x00;
 		case 0x0d:
 			return prot_mode_sel;
-		break;
 	}
 
 	logerror("Read from unknown protection? port %02x ( selector = %02x )\n", offset, prot_mode_sel );
@@ -260,7 +258,6 @@ static WRITE8_HANDLER( spunchout_prot_w ) {
 
 			prot_mem[offset] = data;
 			return;
-		break;
 
 		case 0x02:
 			if ( prot_mode_sel == 0x09 ) { /* PC = 0x20f7, 0x22d7 */
@@ -294,6 +291,7 @@ static WRITE8_HANDLER( spunchout_prot_w ) {
 		case 0x0d: /* PC = all over the code */
 			prot_mode_sel = data;
 			return;
+
 		case 0x0f:
 			prot_mem[offset] = data;
 			return;

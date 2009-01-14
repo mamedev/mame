@@ -34,10 +34,10 @@ static WRITE16_HANDLER( lemmings_control_w )
 static READ16_HANDLER( lemmings_trackball_r )
 {
 	switch (offset) {
-	case 0: return input_port_read(space->machine, "AN0"); break;
-	case 1: return input_port_read(space->machine, "AN1"); break;
-	case 4: return input_port_read(space->machine, "AN2"); break;
-	case 5: return input_port_read(space->machine, "AN3"); break;
+	case 0: return input_port_read(space->machine, "AN0");
+	case 1: return input_port_read(space->machine, "AN1");
+	case 4: return input_port_read(space->machine, "AN2");
+	case 5: return input_port_read(space->machine, "AN3");
 	}
 	return 0;
 }

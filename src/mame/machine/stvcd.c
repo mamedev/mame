@@ -383,37 +383,31 @@ static UINT16 cd_readWord(UINT32 addr)
 //          CDROM_LOG(("%s:RW HIRQ: %04x\n", cpuexec_describe_context(Machine), rv))
 
 			return rv;
-			break;
 
 		case 0x000c:
 		case 0x000e:
 			CDROM_LOG(("RW HIRM: %04x\n", hirqmask))
 			return hirqmask;
-			break;
 
 		case 0x0018:
 		case 0x001a:
 //          CDROM_LOG(("RW CR1: %04x\n", cr1))
 			return cr1;
-			break;
 
 		case 0x001c:
 		case 0x001e:
 //          CDROM_LOG(("RW CR2: %04x\n", cr2))
 			return cr2;
-			break;
 
 		case 0x0020:
 		case 0x0022:
 //          CDROM_LOG(("RW CR3: %04x\n", cr3))
 			return cr3;
-			break;
 
 		case 0x0024:
 		case 0x0026:
 //          CDROM_LOG(("RW CR4: %04x\n", cr4))
 			return cr4;
-			break;
 
 		case 0x8000:
 			rv = 0xffff;
@@ -450,12 +444,10 @@ static UINT16 cd_readWord(UINT32 addr)
 			}
 
 			return rv;
-			break;
 
 		default:
 			CDROM_LOG(("%s:CD: RW %08x\n", cpuexec_describe_context(machine), addr))
 			return 0xffff;
-			break;
 	}
 
 }
@@ -526,12 +518,10 @@ static UINT32 cd_readLong(UINT32 addr)
 			}
 
 			return rv;
-			break;
 
 		default:
 			CDROM_LOG(("%s:CD: RL %08x\n", cpuexec_describe_context(machine), addr))
 			return 0xffff;
-			break;
 	}
 }
 
@@ -566,7 +556,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 	case 0x0022:
 //              CDROM_LOG(("WW CR3: %04x\n", data))
 		cr3 = data;
-			break;
+		break;
 	case 0x0024:
 	case 0x0026:
 //              CDROM_LOG(("WW CR4: %04x\n", data))
@@ -1348,7 +1338,6 @@ READ32_HANDLER( stvcd_r )
 		case 0x90026:
 			rv = cd_readWord(offset);
 			return rv<<16;
-			break;
 
 		case 0x98000:
 		case 0x18000:

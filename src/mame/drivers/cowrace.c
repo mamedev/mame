@@ -75,8 +75,8 @@ static READ8_HANDLER( cowrace_30c3_r )
 {
 	switch( cowrace_38c2 )
 	{
-		case 0x02:	return 0x03;	break;
-		case 0x04:	return 0x00;	break;
+		case 0x02:	return 0x03;
+		case 0x04:	return 0x00;
 	}
 
 	return 0xff;

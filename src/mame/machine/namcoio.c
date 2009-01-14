@@ -967,10 +967,10 @@ static UINT8 namco_06xx_data_r(running_machine *machine,int chip,int offset)
 
 	switch (customio_command[chip] & 0xf)
 	{
-		case 0x1: return namco_06xx_data_read(machine, 4*chip + 0); break;
-		case 0x2: return namco_06xx_data_read(machine, 4*chip + 1); break;
-		case 0x4: return namco_06xx_data_read(machine, 4*chip + 2); break;
-		case 0x8: return namco_06xx_data_read(machine, 4*chip + 3); break;
+		case 0x1: return namco_06xx_data_read(machine, 4*chip + 0);
+		case 0x2: return namco_06xx_data_read(machine, 4*chip + 1);
+		case 0x4: return namco_06xx_data_read(machine, 4*chip + 2);
+		case 0x8: return namco_06xx_data_read(machine, 4*chip + 3);
 		default:
 			logerror("%s: 06XX #%d read in unsupported mode %02x\n",cpuexec_describe_context(machine),chip,customio_command[chip]);
 			return 0xff;

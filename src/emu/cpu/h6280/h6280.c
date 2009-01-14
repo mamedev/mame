@@ -289,7 +289,7 @@ READ8_HANDLER( h6280_irq_status_r )
 
 	switch (offset&3)
 	{
-	default: return cpustate->io_buffer; break;
+	default: return cpustate->io_buffer;
 	case 3:
 		{
 			status=0;
@@ -298,7 +298,7 @@ READ8_HANDLER( h6280_irq_status_r )
 			if(cpustate->irq_state[2]!=CLEAR_LINE) status|=4; /* TIMER */
 			return status|(cpustate->io_buffer&(~H6280_IRQ_MASK));
 		}
-	case 2: return cpustate->irq_mask|(cpustate->io_buffer&(~H6280_IRQ_MASK));break;
+	case 2: return cpustate->irq_mask|(cpustate->io_buffer&(~H6280_IRQ_MASK));
 	}
 }
 

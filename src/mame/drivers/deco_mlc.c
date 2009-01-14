@@ -214,12 +214,10 @@ static WRITE32_HANDLER( mlc_irq_w )
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
 		cpu_set_input_line(space->machine->cpu[0], mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
-		break;
 	case 0x14: /* Prepare scanline interrupt */
 		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, irq_ram[0x14/4], 0),0);
 		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(space->machine->primary_screen));
 		return;
-		break;
 	case 0x18:
 	case 0x1c:
 	case 0x20:

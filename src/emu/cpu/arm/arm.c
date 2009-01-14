@@ -1200,7 +1200,6 @@ static UINT32 decodeShift( ARM_REGS* cpustate, UINT32 insn, UINT32 *pCarry)
 			*pCarry = k ? (rm & (1 << (32 - k))) : (R15 & C_MASK);
 		}
 		return k ? LSL(rm, k) : rm;
-		break;
 
 	case 1:			       			/* LSR */
 		if (k == 0 || k == 32)

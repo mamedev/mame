@@ -195,7 +195,6 @@ READ16_HANDLER( irem_ga20_r )
 	{
 		case 7:	// voice status.  bit 0 is 1 if active. (routine around 0xccc in rtypeleo)
 			return chip->channel[channel].play ? 1 : 0;
-			break;
 
 		default:
 			logerror("GA20: read unk. register %d, channel %d\n", offset & 0xf, channel);

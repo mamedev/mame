@@ -867,7 +867,6 @@ static WRITE64_HANDLER( real3d_dma_w )
 				return;
 			}
 			return;
-			break;
 	}
 	fatalerror("real3d_dma_w: %08X, %08X%08X, %08X%08X", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 }

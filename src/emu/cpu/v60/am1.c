@@ -1058,17 +1058,14 @@ static UINT32 am1Immediate(v60_state *cpustate)
 	case 0:
 		cpustate->amout = OpRead8(cpustate->program, cpustate->modadd + 1);
 		return 2;
-		break;
 
 	case 1:
 		cpustate->amout = OpRead16(cpustate->program, cpustate->modadd + 1);
 		return 3;
-		break;
 
 	case 2:
 		cpustate->amout = OpRead32(cpustate->program, cpustate->modadd + 1);
 		return 5;
-		break;
 	}
 
 	// It should not be here!  Written to avoid warning

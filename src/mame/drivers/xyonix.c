@@ -99,10 +99,8 @@ static READ8_HANDLER ( xyonix_io_r )
 		{
 			case 0x81 :
 				return input_port_read(space->machine, "P1") & 0x7f;
-				break;
 			case 0x82 :
 				return input_port_read(space->machine, "P2") & 0x7f;
-				break;
 			case 0x91:
 				/* check coin inputs */
 				coin = ((input_port_read(space->machine, "P1") & 0x80) >> 7) | ((input_port_read(space->machine, "P2") & 0x80) >> 6);
@@ -112,25 +110,19 @@ static READ8_HANDLER ( xyonix_io_r )
 				}
 				prev_coin = coin;
 				return credits;
-				break;
 			case 0x92:
 				return ((input_port_read(space->machine, "P1") & 0x80) >> 7) | ((input_port_read(space->machine, "P2") & 0x80) >> 6);
-				break;
 			case 0xe0:	/* reset? */
 				coins = 0;
 				credits = 0;
 				return 0xff;
-				break;
 			case 0xe1:
 				credits--;
 				return 0xff;
-				break;
 			case 0xfe:	/* Dip Switches 1 to 4 */
 				return input_port_read(space->machine, "DSW") & 0x0f;
-				break;
 			case 0xff:	/* Dip Switches 5 to 8 */
 				return input_port_read(space->machine, "DSW") >> 4;
-				break;
 		}
 	}
 

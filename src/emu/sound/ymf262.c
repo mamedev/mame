@@ -1635,7 +1635,7 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 		{
 		case 0x101:	/* test register */
 			return;
-		break;
+
 		case 0x104:	/* 6 channels enable */
 			{
 				UINT8 prev;
@@ -1675,7 +1675,7 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
 
 			}
 			return;
-		break;
+
 		case 0x105:	/* OPL3 extensions enable register */
 
 			chip->OPL3_mode = v&0x01;	/* OPL3 mode when bit0=1 otherwise it is OPL2 mode */
@@ -1689,7 +1689,6 @@ static void OPL3WriteReg(OPL3 *chip, int r, int v)
             */
 
 			return;
-		break;
 
 		default:
 			if (r < 0x120)

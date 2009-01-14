@@ -1221,7 +1221,6 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_DENISEID:
 			return CUSTOM_REG(REG_DENISEID);
-			break;
 	}
 
 	if (LOG_CUSTOM)

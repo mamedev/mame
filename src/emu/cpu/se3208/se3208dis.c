@@ -1171,7 +1171,6 @@ static _OP DecodeOp(UINT16 Opcode)
 			break;
 		case 0x1:
 			return LERI;
-			break;
 		case 0x2:
 			{
 				switch(EXTRACT(Opcode,11,13))

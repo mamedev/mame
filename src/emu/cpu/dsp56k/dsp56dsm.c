@@ -2659,9 +2659,9 @@ static int decode_BBB_table(UINT16 BBB)
 {
 	switch(BBB)
 	{
-		case 0x4: return BBB_UPPER ; break;
-		case 0x2: return BBB_MIDDLE; break;
-		case 0x1: return BBB_LOWER ; break;
+		case 0x4: return BBB_UPPER;
+		case 0x2: return BBB_MIDDLE;
+		case 0x1: return BBB_LOWER;
 	}
 
 	return BBB_LOWER;                          /* Not really safe... */

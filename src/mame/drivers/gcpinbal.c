@@ -92,7 +92,6 @@ static READ16_HANDLER( ioc_r )
 		case 0x50:
 		case 0x51:
 			return okim6295_status_0_r(space,0)<<8;
-			break;
 
 	}
 

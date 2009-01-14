@@ -204,7 +204,6 @@ static int COND( mb86233_state *cpustate, UINT32 cond )
 
 		case 0x16:	/* always */
 			return 1;
-		break;
 
 		default:
 			logerror( "TGP: Unknown condition code (cc=%d) at PC:%x\n", cond, GETPC());
@@ -594,60 +593,46 @@ static UINT32 GETREGS( mb86233_state *cpustate, UINT32 reg, int source )
 		{
 			case 0x10:	/* A */
 				return GETA().u;
-			break;
 
 			case 0x11:	/* A.e */
 				return (GETA().u >> 23) & 0xff;
-			break;
 
 			case 0x12:	/* A.m */
 				return (GETA().u & 0x7fffff) | ((GETA().u&0x80000000) >> 8);
-			break;
 
 			case 0x13:	/* B */
 				return GETB().u;
-			break;
 
 			case 0x14:	/* B.e */
 				return (GETB().u >> 23) & 0xff;
-			break;
 
 			case 0x15:	/* B.m */
 				return (GETB().u & 0x7fffff) | ((GETB().u&0x80000000) >> 8);
-			break;
 
 			case 0x19:	/* D */
 				return GETD().u;
-			break;
 
 			case 0x1A:	/* D.e */
 				return (GETD().u >> 23) & 0xff;
-			break;
 
 			case 0x1B:	/* D.m */
 				return (GETD().u & 0x7fffff) | ((GETD().u&0x80000000) >> 8);
-			break;
 
 			case 0x1C:	/* P */
 				return GETP().u;
-			break;
 
 			case 0x1D:	/* P.e */
 				return (GETP().u >> 23) & 0xff;
-			break;
 
 			case 0x1E:	/* P.m */
 				return (GETP().u & 0x7fffff) | ((GETP().u&0x80000000) >> 8);
-			break;
 
 			case 0x1F:	/* Shift */
 				return GETSHIFT();
-			break;
 
 			case 0x20:	/* Parallel Port */
 				logerror( "TGP: Parallel port read at PC:%04x\n", GETPC() );
 				return 0;
-			break;
 
 			case 0x21:	/* FIn */
 			{
@@ -664,19 +649,15 @@ static UINT32 GETREGS( mb86233_state *cpustate, UINT32 reg, int source )
 				GETFIFOWAIT() = 1;
 				return 0;
 			}
-			break;
 
 			case 0x22:	/* FOut */
 				return 0;
-			break;
 
 			case 0x23:	/* EB */
 				return GETEB();
-			break;
 
 			case 0x34:
 				return GETREPCNT();
-			break;
 
 			default:
 				logerror( "TGP: Unknown GETREG (%d) at PC=%04x\n", reg, GETPC() );

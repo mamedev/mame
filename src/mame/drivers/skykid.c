@@ -53,19 +53,19 @@ static READ8_HANDLER( inputport_r )
 	switch (inputport_selected)
 	{
 		case 0x00:	/* DSW B (bits 0-4) */
-			return (input_port_read(space->machine, "DSWB") & 0xf8) >> 3; break;
+			return (input_port_read(space->machine, "DSWB") & 0xf8) >> 3;
 		case 0x01:	/* DSW B (bits 5-7), DSW A (bits 0-1) */
-			return ((input_port_read(space->machine, "DSWB") & 0x07) << 2) | ((input_port_read(space->machine, "DSWA") & 0xc0) >> 6); break;
+			return ((input_port_read(space->machine, "DSWB") & 0x07) << 2) | ((input_port_read(space->machine, "DSWA") & 0xc0) >> 6);
 		case 0x02:	/* DSW A (bits 2-6) */
-			return (input_port_read(space->machine, "DSWA") & 0x3e) >> 1; break;
+			return (input_port_read(space->machine, "DSWA") & 0x3e) >> 1;
 		case 0x03:	/* DSW A (bit 7), DSW C (bits 0-3) */
-			return ((input_port_read(space->machine, "DSWA") & 0x01) << 4) | (input_port_read(space->machine, "BUTTON2") & 0x0f); break;
+			return ((input_port_read(space->machine, "DSWA") & 0x01) << 4) | (input_port_read(space->machine, "BUTTON2") & 0x0f);
 		case 0x04:	/* coins, start */
-			return input_port_read(space->machine, "SYSTEM"); break;
+			return input_port_read(space->machine, "SYSTEM");
 		case 0x05:	/* 2P controls */
-			return input_port_read(space->machine, "P2"); break;
+			return input_port_read(space->machine, "P2");
 		case 0x06:	/* 1P controls */
-			return input_port_read(space->machine, "P1"); break;
+			return input_port_read(space->machine, "P1");
 		default:
 			return 0xff;
 	}

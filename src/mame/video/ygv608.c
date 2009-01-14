@@ -1043,7 +1043,6 @@ READ16_HANDLER( ygv608_r )
 			if (ygv608.regs.s.r2 & r2_saar)
 				ygv608.regs.s.saa++;
 			return (data << 8);
-			break;
 
 		case 0x02: /* P#2 - scroll data port */
 			data = ygv608.scroll_data_table[(ygv608.regs.s.r2 & r2_b_a) >> 4][ygv608.regs.s.sca];
@@ -1055,7 +1054,6 @@ READ16_HANDLER( ygv608_r )
 					ygv608.regs.s.r2 ^= r2_b_a;
 			}
 			return( data << 8 );
-			break;
 
 		case 0x03: /* P#3 - color palette data port */
 			data = ygv608.colour_palette[ygv608.regs.s.cc][p3_state];
@@ -1066,7 +1064,6 @@ READ16_HANDLER( ygv608_r )
 					ygv608.regs.s.cc++;
 			}
 			return( data << 8 );
-			break;
 
 		case 0x04: /* P#4 - register data port */
 		{

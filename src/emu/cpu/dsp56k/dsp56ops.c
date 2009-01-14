@@ -4345,8 +4345,8 @@ static UINT16 execute_q_table(dsp56k_core* cpustate, int RR, UINT16 q)
 
 	switch(q)
 	{
-		case 0x0: /* No permanent changes */ ; return (*rX)+(*nX); break;
-		case 0x1: (*rX)--;					   return (*rX);	   break;	// This one is special - it's a *PRE-decrement*!
+		case 0x0: /* No permanent changes */ ; return (*rX)+(*nX);
+		case 0x1: (*rX)--;					   return (*rX);	// This one is special - it's a *PRE-decrement*!
 	}
 
 	/* Should not get here */

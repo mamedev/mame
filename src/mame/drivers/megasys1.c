@@ -248,11 +248,11 @@ static READ16_HANDLER( ip_select_r )
 
 	switch (i)
 	{
-			case 0 :	return input_port_read(space->machine, "SYSTEM");	break;
-			case 1 :	return input_port_read(space->machine, "P1");		break;
-			case 2 :	return input_port_read(space->machine, "P2");		break;
-			case 3 :	return input_port_read(space->machine, "DSW1");	break;
-			case 4 :	return input_port_read(space->machine, "DSW2");	break;
+			case 0 :	return input_port_read(space->machine, "SYSTEM");
+			case 1 :	return input_port_read(space->machine, "P1");
+			case 2 :	return input_port_read(space->machine, "P2");
+			case 3 :	return input_port_read(space->machine, "DSW1");
+			case 4 :	return input_port_read(space->machine, "DSW2");
 			default	 :	return 0x0006;
 	}
 }

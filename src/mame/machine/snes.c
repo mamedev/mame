@@ -514,7 +514,6 @@ READ8_HANDLER( snes_r_io )
 			return snes_ram[offset];
 		case RDIO:			/* Programmable I/O port - echos back what's written to WRIO */
 			return snes_ram[WRIO];
-			break;
 		case RDDIVL:		/* Quotient of divide result (low) */
 		case RDDIVH:		/* Quotient of divide result (high) */
 		case RDMPYL:		/* Product/Remainder of mult/div result (low) */

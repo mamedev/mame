@@ -605,15 +605,11 @@ static READ16_HANDLER( gtmr_wheel_r )
 	{
 		case 0x0000:	// 'Both Sides' = 270deg Wheel
 			return	(input_port_read(space->machine, "WHEEL0"));
-			break;
-
 		case 0x1000:	// '1P Side' = 360' Wheel
 			return	(input_port_read(space->machine, "WHEEL1"));
-			break;
 		default:
 			return	(0);
-			break;
-		}
+	}
 }
 
 static WRITE16_HANDLER( gtmr_oki_0_bank_w )
@@ -719,17 +715,13 @@ static READ16_HANDLER( gtmr2_wheel_r )
 	{
 		case 0x0000:	// 270' A. Wheel
 			return	(input_port_read(space->machine, "WHEEL0"));
-			break;
 		case 0x1000:	// 270' D. Wheel
 			return	(input_port_read(space->machine, "WHEEL1") << 8);
-			break;
 		case 0x0800:	// 360' Wheel
 			return	(input_port_read(space->machine, "WHEEL2") << 8);
-			break;
 		default:
 			logerror("gtmr2_wheel_r : read at %06x with joystick\n", cpu_get_pc(space->cpu));
 			return	(~0);
-			break;
 	}
 }
 

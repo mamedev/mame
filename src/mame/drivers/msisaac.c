@@ -129,7 +129,6 @@ MCU simulation TODO:
 		case 0x41:
  		case 0x42:
  			return 0;
- 		break;
 
  		/*With this command the MCU controls body direction  */
  		case 0x02:
@@ -167,17 +166,14 @@ MCU simulation TODO:
 
  			return direction;
  		}
- 		break;
 
 		/*This controls the arms when they return to the player.            */
  		case 0x07:
  			return 0x45;
- 		break;
 
  		default:
  			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(space->cpu), mcu_val );
  		   	return mcu_val;
- 		break;
 	}
 #endif
 }

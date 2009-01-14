@@ -518,11 +518,11 @@ static READ8_HANDLER( mux_port_r )
 {
 	switch( input_selector )
 	{
-		case 0x01: return input_port_read(space->machine, "IN0-0"); break;
-		case 0x02: return input_port_read(space->machine, "IN0-1"); break;
-		case 0x04: return input_port_read(space->machine, "IN0-2"); break;
-		case 0x08: return input_port_read(space->machine, "IN0-3"); break;
-		case 0x00: return input_port_read(space->machine, "DSW0"); break;
+		case 0x01: return input_port_read(space->machine, "IN0-0");
+		case 0x02: return input_port_read(space->machine, "IN0-1");
+		case 0x04: return input_port_read(space->machine, "IN0-2");
+		case 0x08: return input_port_read(space->machine, "IN0-3");
+		case 0x00: return input_port_read(space->machine, "DSW0");
 	}
 	return 0xff;
 }

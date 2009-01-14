@@ -923,19 +923,15 @@ static READ8_HANDLER( port7_r )
 	{
 		case 0x00:
 			return input_port_read_safe(space->machine, "P4", 0xff);
-			break;
 
 		case 0x20:
 			return input_port_read(space->machine, "MISC");
-			break;
 
 		case 0x40:
 			return input_port_read(space->machine, "P1");
-			break;
 
 		case 0x60:
 			return input_port_read(space->machine, "P2");
-			break;
 
 		default:
 			break;

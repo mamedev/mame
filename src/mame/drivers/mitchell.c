@@ -303,7 +303,6 @@ static READ8_HANDLER( input_r )
 		case 0:
 		default:
 			return input_port_read(space->machine, portnames[offset]);
-			break;
 		case 1:		/* Mahjong games */
 			if (offset) return mahjong_input_r(space, offset-1);
 			else return input_port_read(space->machine, "IN0");

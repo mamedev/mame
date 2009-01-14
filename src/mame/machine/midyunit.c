@@ -164,10 +164,10 @@ static READ16_HANDLER( term2_input_r )
 	switch (term2_analog_select)
 	{
 		default:
-		case 0:  return input_port_read(space->machine, "STICK0_X");  break;
-		case 1:  return input_port_read(space->machine, "STICK0_Y");  break;
-		case 2:  return input_port_read(space->machine, "STICK1_X");  break;
-		case 3:  return input_port_read(space->machine, "STICK1_Y");  break;
+		case 0:  return input_port_read(space->machine, "STICK0_X");
+		case 1:  return input_port_read(space->machine, "STICK0_Y");
+		case 2:  return input_port_read(space->machine, "STICK1_X");
+		case 3:  return input_port_read(space->machine, "STICK1_Y");
 	}
 }
 

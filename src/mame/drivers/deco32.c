@@ -410,10 +410,10 @@ static READ32_HANDLER( dragngun_lightgun_r )
 {
 	/* Ports 0-3 are read, but seem unused */
 	switch (dragngun_lightgun_port) {
-	case 4: return input_port_read(space->machine, "LIGHT0_X"); break;
-	case 5: return input_port_read(space->machine, "LIGHT1_X"); break;
-	case 6: return input_port_read(space->machine, "LIGHT0_Y"); break;
-	case 7: return input_port_read(space->machine, "LIGHT1_Y"); break;
+	case 4: return input_port_read(space->machine, "LIGHT0_X");
+	case 5: return input_port_read(space->machine, "LIGHT1_X");
+	case 6: return input_port_read(space->machine, "LIGHT0_Y");
+	case 7: return input_port_read(space->machine, "LIGHT1_Y");
 	}
 
 //  logerror("Illegal lightgun port %d read \n",dragngun_lightgun_port);
