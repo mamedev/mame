@@ -9,6 +9,7 @@ Sengoku Mahjong Video Hardware section
 static tilemap *bg_tilemap,*md_tilemap,*fg_tilemap,*tx_tilemap;
 UINT16 *sengokmj_bgvram,*sengokmj_mdvram,*sengokmj_fgvram,*sengokmj_txvram;
 static UINT16 sengokmj_layer_en;
+static UINT16 sengokmj_scrolly;
 
 WRITE16_HANDLER( sengokmj_bgvram_w )
 {
@@ -39,6 +40,11 @@ WRITE16_HANDLER( sengokmj_layer_enable_w )
 	/*---- ---- ---x ---- enable sprites?*/
 	/*---- ---- ---- xxxx enable layers*/
 	sengokmj_layer_en = data;
+}
+
+WRITE16_HANDLER( sengokmj_bg_scrolly_w )
+{
+	sengokmj_scrolly = data;
 }
 
 static TILE_GET_INFO( sengoku_bg_tile_info )
@@ -113,9 +119,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_START( sengokmj )
 {
-	bg_tilemap = tilemap_create(machine, sengoku_bg_tile_info,tilemap_scan_rows,16,16,32,16);
-	md_tilemap = tilemap_create(machine, sengoku_md_tile_info,tilemap_scan_rows,16,16,32,16);
-	fg_tilemap = tilemap_create(machine, sengoku_fg_tile_info,tilemap_scan_rows,16,16,32,16);
+	bg_tilemap = tilemap_create(machine, sengoku_bg_tile_info,tilemap_scan_rows,16,16,32,32);
+	md_tilemap = tilemap_create(machine, sengoku_md_tile_info,tilemap_scan_rows,16,16,32,32);
+	fg_tilemap = tilemap_create(machine, sengoku_fg_tile_info,tilemap_scan_rows,16,16,32,32);
 	tx_tilemap = tilemap_create(machine, sengoku_tx_tile_info,tilemap_scan_rows, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(md_tilemap,15);
@@ -126,19 +132,16 @@ VIDEO_START( sengokmj )
 VIDEO_UPDATE( sengokmj )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x7ff]); //black pen
+	tilemap_set_scrolly( bg_tilemap,0, sengokmj_scrolly );
 
-	if(!(sengokmj_layer_en & 1))
-		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect, 2);
-	draw_sprites(screen->machine, bitmap,cliprect, 1);
-	if(!(sengokmj_layer_en & 2))
-		tilemap_draw(bitmap,cliprect,md_tilemap,0,0);
-	if(!(sengokmj_layer_en & 4))
-		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect, 0);
-	draw_sprites(screen->machine, bitmap,cliprect, 3);
-	if(!(sengokmj_layer_en & 8))
-		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	if(!(sengokmj_layer_en & 1)) 	{ tilemap_draw(bitmap,cliprect,bg_tilemap,0,0); }
+	if(!(sengokmj_layer_en & 0x10)) { draw_sprites(screen->machine, bitmap,cliprect, 2); }
+	if(!(sengokmj_layer_en & 0x10)) { draw_sprites(screen->machine, bitmap,cliprect, 1); }
+	if(!(sengokmj_layer_en & 2)) 	{ tilemap_draw(bitmap,cliprect,md_tilemap,0,0); }
+	if(!(sengokmj_layer_en & 4)) 	{ tilemap_draw(bitmap,cliprect,fg_tilemap,0,0); }
+	if(!(sengokmj_layer_en & 0x10)) { draw_sprites(screen->machine, bitmap,cliprect, 0); }
+	if(!(sengokmj_layer_en & 0x10)) { draw_sprites(screen->machine, bitmap,cliprect, 3); }
+	if(!(sengokmj_layer_en & 8))	{ tilemap_draw(bitmap,cliprect,tx_tilemap,0,0); }
 
 //  popmessage("%04x",sengokmj_layer_en);
 	return 0;

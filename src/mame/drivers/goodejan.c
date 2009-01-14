@@ -8,10 +8,9 @@ OSC: 12.000MHz 16.000MHz 7.15909MHz
 
 
 ToDo:
- BG Banking is wrong.
  Inputs are imperfect (missing dips)
- Sprite glitches in intro
-
+ Some sprite flickers on attract mode
+ totmejan: Are the "dots" behind the girls in attract mode correct?
 
 PCB Layout
 
@@ -69,6 +68,7 @@ WRITE16_HANDLER( goodejan_txvram_w );
 WRITE16_HANDLER( goodejan_bg_scrollx_w );
 WRITE16_HANDLER( goodejan_bg_scrolly_w );
 WRITE16_HANDLER( goodejan_layer_en_w );
+WRITE16_HANDLER( goodejan_gfxbank_w );
 
 VIDEO_START( goodejan );
 VIDEO_UPDATE( goodejan );
@@ -106,21 +106,26 @@ static ADDRESS_MAP_START( goodejan_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /*totmejan CRT is at 8000-804f,goodejan is at 8040-807f(808f but not tested)*/
-static ADDRESS_MAP_START( goodejan_io_map, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x801c, 0x801d) AM_WRITE(goodejan_layer_en_w )
-
-	AM_RANGE(0x805c, 0x805d) AM_WRITE(goodejan_layer_en_w )
-	AM_RANGE(0x8060, 0x8061) AM_WRITE(goodejan_bg_scrollx_w )
-	AM_RANGE(0x8062, 0x8063) AM_WRITE(goodejan_bg_scrolly_w )
-
+static ADDRESS_MAP_START( common_io_map, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(goodejan_gfxbank_w)
+	AM_RANGE(0x8020, 0x8023) AM_WRITENOP
+	AM_RANGE(0xb000, 0xb003) AM_WRITENOP
 	AM_RANGE(0xb004, 0xb005) AM_WRITE(mahjong_panel_w)
 
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
 	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2") // maybe it's a seibu_main_word mirror?
-//  AM_RANGE(0xc004, 0xc005) AM_READ(random_reading)
-
 	AM_RANGE(0xd000, 0xd00f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( totmejan_io_map, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x801c, 0x801d) AM_WRITE(goodejan_layer_en_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( goodejan_io_map, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x805c, 0x805d) AM_WRITE(goodejan_layer_en_w )
+	AM_RANGE(0x8060, 0x8061) AM_WRITE(goodejan_bg_scrollx_w )
+	AM_RANGE(0x8062, 0x8063) AM_WRITE(goodejan_bg_scrolly_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goodejan )
@@ -326,7 +331,7 @@ static MACHINE_DRIVER_START( goodejan )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", V30, GOODEJAN_MHZ2/2)
 	MDRV_CPU_PROGRAM_MAP(goodejan_map,0)
-	MDRV_CPU_IO_MAP(goodejan_io_map,0)
+	MDRV_CPU_IO_MAP(common_io_map,goodejan_io_map)
 	MDRV_CPU_VBLANK_INT_HACK(goodejan_interrupt,2)
 
 	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
@@ -349,6 +354,12 @@ static MACHINE_DRIVER_START( goodejan )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(GOODEJAN_MHZ1/2,GOODEJAN_MHZ2/16)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( totmejan )
+	MDRV_IMPORT_FROM( goodejan )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(common_io_map,totmejan_io_map)
 MACHINE_DRIVER_END
 
 ROM_START( totmejan )
@@ -393,8 +404,7 @@ ROM_START( goodejan )
 	ROM_LOAD16_BYTE( "4.061",  0x00001, 0x10000, CRC(5bdf7225) SHA1(a8eded9dc5be1db20cddbed1ae8c22de1674de2a) )
 
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "e_jan2scr.064", 0x080000, 0x080000, CRC(71654822) SHA1(fe2a128413999085e321e455aeebda0360d38cb8) )
-	ROM_CONTINUE( 			   0x000000, 0x080000 )
+	ROM_LOAD( "e_jan2scr.064", 0x000000, 0x100000, CRC(71654822) SHA1(fe2a128413999085e321e455aeebda0360d38cb8) )
 
 	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "e_jan2obj.078", 0x000000, 0x080000, CRC(0f892ef2) SHA1(188ae43db1c48fb6870aa45c64718e901831499b) )
@@ -421,8 +431,7 @@ ROM_START( goodejaa )
 	ROM_LOAD16_BYTE( "4.061",  0x00001, 0x10000, CRC(5bdf7225) SHA1(a8eded9dc5be1db20cddbed1ae8c22de1674de2a) )
 
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "e_jan2scr.064", 0x080000, 0x080000, CRC(71654822) SHA1(fe2a128413999085e321e455aeebda0360d38cb8) )
-	ROM_CONTINUE( 			   0x000000, 0x080000 )
+	ROM_LOAD( "e_jan2scr.064", 0x000000, 0x100000, CRC(71654822) SHA1(fe2a128413999085e321e455aeebda0360d38cb8) )
 
 	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "e_jan2obj.078", 0x000000, 0x080000, CRC(0f892ef2) SHA1(188ae43db1c48fb6870aa45c64718e901831499b) )
@@ -434,6 +443,6 @@ ROM_START( goodejaa )
 	ROM_LOAD( "fmj08.083", 0x000, 0x100, CRC(9657b7ad) SHA1(e9b469c2b3534593f7fe0ea19cbbf93b55957e42) )
 ROM_END
 
-GAME( 1991, totmejan, 0,        goodejan, goodejan, 0, ROT0, "Seibu (distributed by Tecmo)", "Tottemo E Jong", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, totmejan, 0,        totmejan, goodejan, 0, ROT0, "Seibu (distributed by Tecmo)", "Tottemo E Jong", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, goodejan, 0,        goodejan, goodejan, 0, ROT0, "Seibu (distributed by Tecmo)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 1)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, goodejaa, goodejan, goodejan, goodejan, 0, ROT0, "Seibu (distributed by Tecmo)", "Good E Jong -Kachinuki Mahjong Syoukin Oh!!- (set 2)", GAME_IMPERFECT_GRAPHICS )

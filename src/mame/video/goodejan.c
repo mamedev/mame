@@ -3,6 +3,7 @@
 static tilemap *bg_tilemap, *tx_tilemap;
 UINT16 *goodejan_bgvram,*goodejan_txvram;
 static UINT16 goodejan_layer_en;
+static UINT16 goodejan_gfx_bank;
 
 WRITE16_HANDLER( goodejan_bgvram_w )
 {
@@ -23,13 +24,19 @@ WRITE16_HANDLER( goodejan_layer_en_w )
 	goodejan_layer_en = data;
 }
 
+/*Not from the Seibu CRTC,it's an external ROM banking.*/
+WRITE16_HANDLER( goodejan_gfxbank_w )
+{
+	goodejan_gfx_bank = (data & 0x100)>>8;
+	tilemap_mark_all_tiles_dirty(bg_tilemap);
+}
+
 static TILE_GET_INFO( goodejan_bg_tile_info )
 {
 	int tile = goodejan_bgvram[tile_index]&0x0fff;
 	int color = (goodejan_bgvram[tile_index]&0xf000)>>12;
 
-	// WRONG!
-	tile|= (goodejan_bgvram[tile_index]&0x8000)>>3;
+	tile|= goodejan_gfx_bank<<12;
 //  if ((goodejan_bgvram[tile_index]&0x8000)==0x0000) tile+=0x1000;
 
 	SET_TILE_INFO(1, tile, color, 0);
