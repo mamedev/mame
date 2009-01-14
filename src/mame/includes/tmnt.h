@@ -7,6 +7,7 @@ WRITE16_HANDLER( lgtnfght_0a0018_w );
 WRITE16_HANDLER( blswhstl_700300_w );
 READ16_HANDLER( glfgreat_rom_r );
 WRITE16_HANDLER( glfgreat_122000_w );
+WRITE16_HANDLER( ssriders_eeprom_w );
 WRITE16_HANDLER( ssriders_1c0300_w );
 WRITE16_HANDLER( prmrsocr_122000_w );
 WRITE16_HANDLER( tmnt_priority_w );

@@ -84,7 +84,7 @@ static READ8_DEVICE_HANDLER( ppi_port_b_r )
 	return 0xff;
 }
 
-void sfkick_remap_banks(running_machine *machine)
+static void sfkick_remap_banks(running_machine *machine)
 {
 	/* 0000-3ffff */
 	switch(sfkick_bank_cfg&3)
@@ -417,7 +417,7 @@ static void sfkick_vdp_interrupt(running_machine *machine, int i)
 	cpu_set_input_line (machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
-VIDEO_START( sfkick )
+static VIDEO_START( sfkick )
 {
 	VIDEO_START_CALL(generic_bitmapped);
 	v9938_init (machine, 0, machine->primary_screen, tmpbitmap, MODEL_V9938, 0x80000, sfkick_vdp_interrupt);

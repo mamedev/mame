@@ -160,50 +160,49 @@ static VIDEO_UPDATE( skylncr )
 	return 0;
 }
 
-
-WRITE8_HANDLER( reeltiles_1_w )
+static WRITE8_HANDLER( reeltiles_1_w )
 {
 	reeltiles_1_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel_1_tilemap, offset);
 }
 
-WRITE8_HANDLER( reeltiles_2_w )
+static WRITE8_HANDLER( reeltiles_2_w )
 {
 	reeltiles_2_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel_2_tilemap, offset);
 }
 
-WRITE8_HANDLER( reeltiles_3_w )
+static WRITE8_HANDLER( reeltiles_3_w )
 {
 	reeltiles_3_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel_3_tilemap, offset);
 }
 
-WRITE8_HANDLER( reeltiles_4_w )
+static WRITE8_HANDLER( reeltiles_4_w )
 {
 	reeltiles_4_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel_4_tilemap, offset);
 }
 
-WRITE8_HANDLER( reeltileshigh_1_w )
+static WRITE8_HANDLER( reeltileshigh_1_w )
 {
 	reeltileshigh_1_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel_1_tilemap, offset);
 }
 
-WRITE8_HANDLER( reeltileshigh_2_w )
+static WRITE8_HANDLER( reeltileshigh_2_w )
 {
 	reeltileshigh_2_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel_2_tilemap, offset);
 }
 
-WRITE8_HANDLER( reeltileshigh_3_w )
+static WRITE8_HANDLER( reeltileshigh_3_w )
 {
 	reeltileshigh_3_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel_3_tilemap, offset);
 }
 
-WRITE8_HANDLER( reeltileshigh_4_w )
+static WRITE8_HANDLER( reeltileshigh_4_w )
 {
 	reeltileshigh_4_ram[offset] = data;
 	tilemap_mark_tile_dirty(reel_4_tilemap, offset);

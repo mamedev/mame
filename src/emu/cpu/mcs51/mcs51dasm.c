@@ -55,7 +55,7 @@ enum
 
 //SFR Names
 
-static struct {
+static const struct {
 	int feature;
 	int addr;
 	const char *name;

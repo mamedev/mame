@@ -59,11 +59,11 @@ static const UINT8 sm8500_b2w[8] = {
         0, 8, 2, 10, 4, 12, 6, 14
 };
 
-UINT8 sm85cpu_mem_readbyte( sm8500_state *cpustate, UINT32 offset ) {
+static UINT8 sm85cpu_mem_readbyte( sm8500_state *cpustate, UINT32 offset ) {
 	return ( offset < 0x10 ) ? cpustate->register_base[offset] : memory_read_byte_8be( cpustate->program, offset );
 }
 
-void sm85cpu_mem_writebyte( sm8500_state *cpustate, UINT32 offset, UINT8 data ) {
+static void sm85cpu_mem_writebyte( sm8500_state *cpustate, UINT32 offset, UINT8 data ) {
 	if ( offset < 0x10 ) {
 		cpustate->register_base[offset] = data;
 	} else {
@@ -267,7 +267,7 @@ static CPU_BURN( sm8500 )
 	}
 }
 
-unsigned sm8500_get_reg( sm8500_state *cpustate, int regnum )
+static unsigned sm8500_get_reg( sm8500_state *cpustate, int regnum )
 {
 	switch( regnum )
 	{

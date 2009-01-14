@@ -309,7 +309,7 @@ static READ32_HANDLER( network_r )
 }
 
 
-WRITE32_HANDLER( plygonet_palette_w )
+static WRITE32_HANDLER( plygonet_palette_w )
 {
 	int r,g,b;
 

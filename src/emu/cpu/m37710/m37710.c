@@ -841,7 +841,7 @@ static CPU_RESET( m37710 )
 }
 
 /* Exit and clean up */
-CPU_EXIT( m37710 )
+static CPU_EXIT( m37710 )
 {
 	/* nothing to do yet */
 }
@@ -886,16 +886,6 @@ static unsigned m37710_get_reg(m37710i_cpu_struct *cpustate, int regnum)
 static void m37710_set_reg(m37710i_cpu_struct *cpustate, int regnum, unsigned value)
 {
 	FTABLE_SET_REG(cpustate, regnum, value);
-}
-
-/* Load a CPU state */
-void m37710_state_load(void *file)
-{
-}
-
-/* Save the current CPU state */
-void m37710_state_save(void *file)
-{
 }
 
 /* Set an interrupt line */

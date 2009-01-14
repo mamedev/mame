@@ -553,16 +553,6 @@ typedef struct                      /* Source directory entry       */
 /* All other writes should store the value in the addressed register as
    expected. */
 
-/*========== PROCEDURES ==========*/
-
-void DSP_Reset                      /* Reset emulated DSP           */
-    ( void );
-
-void DSP_Update                     /* Mix one sample of audio      */
-    (
-    short *             sound_ptr   /* Pointer to mix audio into    */
-    );
-
 /*----------- defined in video/snes.c -----------*/
 
 extern struct SNES_PPU_STRUCT snes_ppu;

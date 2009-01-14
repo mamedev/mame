@@ -239,7 +239,7 @@ static WRITE8_HANDLER( fdt_w )
  *
  *************************************/
 
-READ16_DEVICE_HANDLER( fdt_rip_r )
+static READ16_DEVICE_HANDLER( fdt_rip_r )
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -249,7 +249,7 @@ READ16_DEVICE_HANDLER( fdt_rip_r )
 		return (fdt_b[offset] << 8) | fdt_b[offset + 1];
 }
 
-WRITE16_DEVICE_HANDLER( fdt_rip_w )
+static WRITE16_DEVICE_HANDLER( fdt_rip_w )
 {
 	offset = (offset & 0x7ff) << 1;
 
@@ -276,7 +276,7 @@ WRITE16_DEVICE_HANDLER( fdt_rip_w )
    D7 = /FDONE
 */
 
-UINT8 rip_status_in(running_machine *machine)
+static UINT8 rip_status_in(running_machine *machine)
 {
 	int vpos =  video_screen_get_vpos(machine->primary_screen);
 	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
@@ -465,7 +465,7 @@ static INPUT_CHANGED( coin_interrupt )
  *
  *************************************/
 
-INPUT_PORTS_START( turbosub )
+static INPUT_PORTS_START( turbosub )
 	PORT_START("KEYPAD_A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Keypad 0") PORT_CHANGED(keypad_interrupt, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_PLAYER(3) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Keypad 1") PORT_CHANGED(keypad_interrupt, 0)
@@ -722,7 +722,7 @@ static NVRAM_HANDLER( esripsys )
 		memset(cmos_ram, 0x00, CMOS_RAM_SIZE);
 }
 
-static esrip_config rip_config =
+static const esrip_config rip_config =
 {
 	fdt_rip_r,
 	fdt_rip_w,

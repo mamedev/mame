@@ -1,8 +1,5 @@
 /*----------- defined in machine/wrally.c -----------*/
 
-DRIVER_INIT( wrally );
-MACHINE_RESET( wrally );
-
 WRITE16_HANDLER( wrally_vram_w );
 WRITE16_HANDLER( wrally_flipscreen_w );
 WRITE16_HANDLER( OKIM6295_bankswitch_w );

@@ -10,12 +10,12 @@ Merit Poker?
 static UINT8* mpoker_video;
 
 
-VIDEO_START(mpoker)
+static VIDEO_START(mpoker)
 {
 
 }
 
-VIDEO_UPDATE(mpoker)
+static VIDEO_UPDATE(mpoker)
 {
 	int y,x;
 	int count;

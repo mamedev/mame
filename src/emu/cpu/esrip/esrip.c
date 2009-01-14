@@ -1939,7 +1939,7 @@ static CPU_DISASSEMBLE( esrip )
  * set_info
  **************************************************************************/
 
-CPU_SET_INFO( esrip )
+static CPU_SET_INFO( esrip )
 {
 	esrip_state *cpustate = device->token;
 

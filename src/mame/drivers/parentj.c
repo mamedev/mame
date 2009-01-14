@@ -10,13 +10,13 @@
 
 static UINT16* parentj_video;
 
-VIDEO_START(parentj)
+static VIDEO_START(parentj)
 {
 
 
 }
 
-VIDEO_UPDATE(parentj)
+static VIDEO_UPDATE(parentj)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x0c000/2;

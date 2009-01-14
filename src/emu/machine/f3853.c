@@ -210,7 +210,7 @@ static DEVICE_RESET( f3853 )
 }
 
 
-DEVICE_SET_INFO( f3853 )
+static DEVICE_SET_INFO( f3853 )
 {
 	switch ( state )
 	{

@@ -126,12 +126,12 @@ e328e 18 c0 xor al,al
 */
 
 
-VIDEO_START(cb2001)
+static VIDEO_START(cb2001)
 {
 
 }
 
-VIDEO_UPDATE(cb2001)
+static VIDEO_UPDATE(cb2001)
 {
 	return 0;
 }

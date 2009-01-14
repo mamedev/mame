@@ -19,12 +19,12 @@ ROMs    epia BIOS + solid state HD
 #include "driver.h"
 #include "cpu/i386/i386.h"
 
-VIDEO_START(queen)
+static VIDEO_START(queen)
 {
 
 }
 
-VIDEO_UPDATE(queen)
+static VIDEO_UPDATE(queen)
 {
 	return 0;
 }

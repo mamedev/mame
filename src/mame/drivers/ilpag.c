@@ -49,12 +49,12 @@ Note
 static UINT16 *blit_romaddr,*blit_attr1_ram,*blit_dst_ram_loword,*blit_attr2_ram,*blit_dst_ram_hiword;
 static UINT8 *blit_buffer;
 
-VIDEO_START(ilpag)
+static VIDEO_START(ilpag)
 {
 	blit_buffer = auto_malloc(512*512*4); //just to be sure,number is wrong
 }
 
-VIDEO_UPDATE(ilpag)
+static VIDEO_UPDATE(ilpag)
 {
 	int x,y;
 //  static int counter = 0;

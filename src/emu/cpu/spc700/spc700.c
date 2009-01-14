@@ -259,63 +259,6 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 
 
 /* ======================================================================== */
-/* ============================= INTERFACE API ============================ */
-/* ======================================================================== */
-
-/* This is the interface, not the implementation.  Please call the  */
-/* implementation APIs below.                                       */
-
-
-CPU_INIT( spc700 );
-
-/* Pulse the RESET pin on the CPU */
-CPU_RESET( spc700 );
-
-/* Set the RESET line on the CPU */
-void spc700_set_reset_line(spc700i_cpu *cpustate, int state, void* param);
-
-/* Clean up after the emulation core - Not used in this core - */
-CPU_EXIT( spc700 );
-
-/* Get the current Program Counter */
-unsigned spc700_get_pc(spc700i_cpu *cpustate);
-
-/* Set the current Program Counter */
-void spc700_set_pc(spc700i_cpu *cpustate,unsigned val);
-
-/* Get the current Stack Pointer */
-unsigned spc700_get_sp(spc700i_cpu *cpustate);
-
-/* Set the current Stack Pointer */
-void spc700_set_sp(spc700i_cpu *cpustate,unsigned val);
-
-/* Get a register from the core */
-unsigned spc700_get_reg(spc700i_cpu *cpustate,int regnum);
-
-/* Set a register in the core */
-void spc700_set_reg(spc700i_cpu *cpustate,int regnum, unsigned val);
-
-/* Note about NMI:
- *   NMI is a one-shot trigger.  In order to trigger NMI again, you must
- *   clear NMI and then assert it again.
- */
-void spc700_set_nmi_line(spc700i_cpu *cpustate,int state);
-
-/* Assert or clear the IRQ pin */
-void spc700_set_irq_line(spc700i_cpu *cpustate,int line, int state);
-
-/* Set the callback that will be called when an interrupt is serviced */
-void spc700_set_irq_callback(spc700i_cpu *cpustate,cpu_irq_callback callback);
-
-/* Get a formatted string representing a register and its contents */
-const char *spc700_info(spc700i_cpu *cpustate,void *context, int regnum);
-
-
-/* Pulse the SO (Set Overflow) pin on the CPU */
-void spc700_pulse_so(spc700i_cpu *cpustate);
-
-
-/* ======================================================================== */
 /* ============================ UTILITY MACROS ============================ */
 /* ======================================================================== */
 
@@ -1299,7 +1242,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 /* ================================= API ================================== */
 /* ======================================================================== */
 
-CPU_INIT( spc700 )
+static CPU_INIT( spc700 )
 {
 	spc700i_cpu *cpustate = device->token;
 
@@ -1309,7 +1252,7 @@ CPU_INIT( spc700 )
 }
 
 
-CPU_RESET( spc700 )
+static CPU_RESET( spc700 )
 {
 	spc700i_cpu *cpustate = device->token;
 
@@ -1330,38 +1273,14 @@ CPU_RESET( spc700 )
 }
 
 /* Exit and clean up */
-CPU_EXIT( spc700 )
+static CPU_EXIT( spc700 )
 {
 	/* nothing to do yet */
 }
 
 
-/* Get the current Program Counter */
-unsigned spc700_get_pc(spc700i_cpu *cpustate)
-{
-	return REG_PC;
-}
-
-/* Set the Program Counter */
-void spc700_set_pc(spc700i_cpu *cpustate,unsigned val)
-{
-	JUMP(cpustate, val);
-}
-
-/* Get the current Stack Pointer */
-unsigned spc700_get_sp(spc700i_cpu *cpustate)
-{
-	return REG_S + STACK_PAGE;
-}
-
-/* Set the Stack Pointer */
-void spc700_set_sp(spc700i_cpu *cpustate,unsigned val)
-{
-	REG_S = MAKE_UINT_8(val);
-}
-
 /* Assert or clear the NMI line of the CPU */
-void spc700_set_nmi_line(spc700i_cpu *cpustate,int state)
+static void spc700_set_nmi_line(spc700i_cpu *cpustate,int state)
 {
 #if !SPC700_OPTIMIZE_SNES
 	if(state == CLEAR_LINE)
@@ -1378,7 +1297,7 @@ void spc700_set_nmi_line(spc700i_cpu *cpustate,int state)
 }
 
 /* Assert or clear the IRQ line of the CPU */
-void spc700_set_irq_line(spc700i_cpu *cpustate,int line, int state)
+static void spc700_set_irq_line(spc700i_cpu *cpustate,int line, int state)
 {
 #if !SPC700_OPTIMIZE_SNES
 	LINE_IRQ = (state != CLEAR_LINE) ? IRQ_SET : IRQ_CLEAR;
@@ -1386,18 +1305,12 @@ void spc700_set_irq_line(spc700i_cpu *cpustate,int line, int state)
 #endif /* SPC700_OPTIMIZE_SNES */
 }
 
-/* Set the callback that is called when servicing an interrupt */
-void spc700_set_irq_callback(spc700i_cpu *cpustate,cpu_irq_callback callback)
-{
-	INT_ACK = callback;
-}
-
 #include "spc700ds.h"
 
 //int dump_flag = 0;
 
 /* Execute instructions for <clocks> cycles */
-CPU_EXECUTE( spc700 )
+static CPU_EXECUTE( spc700 )
 {
 	spc700i_cpu *cpustate = device->token;
 

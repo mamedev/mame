@@ -4499,7 +4499,7 @@ static void do_blockswaps(UINT8* ROM)
 	int A;
 	UINT8 *buffer;
 
-	static UINT16 cherry_swaptables[32] = {
+	static const UINT16 cherry_swaptables[32] = {
 		/* to align with goldstar */
 		0x0800, 0x4000, 0x2800, 0x5800,
 		0x1800, 0x3000, 0x6800, 0x7000,
@@ -4542,7 +4542,7 @@ static void dump_to_file(running_machine* machine, UINT8* ROM)
 	#endif
 }
 
-UINT8 decrypt(UINT8 cipherText, UINT16 address)
+static UINT8 decrypt(UINT8 cipherText, UINT16 address)
 {
 	int idx;
 	UINT8 output;
@@ -4559,7 +4559,7 @@ UINT8 decrypt(UINT8 cipherText, UINT16 address)
 	return output ^ sbox[idx];
 }
 
-UINT8 chry10_decrypt(UINT8 cipherText)
+static UINT8 chry10_decrypt(UINT8 cipherText)
 {
 	return cipherText ^ (BIT(cipherText, 4) << 3) ^ (BIT(cipherText, 1) << 5) ^ (BIT(cipherText, 6) << 7);
 }

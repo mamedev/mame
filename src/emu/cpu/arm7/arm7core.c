@@ -117,9 +117,9 @@ INLINE UINT8 arm7_cpu_read8(arm_state *cpustate, offs_t addr);
 
 /* Static Vars */
 // Note: for multi-cpu implementation, this approach won't work w/o modification
-WRITE32_HANDLER((*arm7_coproc_do_callback));    // holder for the co processor Data Operations Callback func.
-READ32_HANDLER((*arm7_coproc_rt_r_callback));   // holder for the co processor Register Transfer Read Callback func.
-WRITE32_HANDLER((*arm7_coproc_rt_w_callback));  // holder for the co processor Register Transfer Write Callback Callback func.
+write32_space_func arm7_coproc_do_callback;    // holder for the co processor Data Operations Callback func.
+read32_space_func arm7_coproc_rt_r_callback;   // holder for the co processor Register Transfer Read Callback func.
+write32_space_func arm7_coproc_rt_w_callback;  // holder for the co processor Register Transfer Write Callback Callback func.
 // holder for the co processor Data Transfer Read & Write Callback funcs
 void (*arm7_coproc_dt_r_callback)(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
 void (*arm7_coproc_dt_w_callback)(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));

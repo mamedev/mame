@@ -200,7 +200,7 @@ static int AdvanceEnvelope          /* Run envelope step & retn ENVX*/
 
 /***** DSP_Reset *****/
 
-void DSP_Reset                      /* Reset emulated DSP           */
+static void DSP_Reset                      /* Reset emulated DSP           */
     ( void )
 {
 int                     i;
@@ -235,7 +235,7 @@ DSPregs[ 0x5C ]  = 0;
 
 /***** DSP_Update *****/
 
-void DSP_Update                     /* Mix one sample of audio      */
+static void DSP_Update                     /* Mix one sample of audio      */
     (
     short *             sound_ptr   /* Pointer to mix audio into    */
     )

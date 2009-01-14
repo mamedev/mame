@@ -121,8 +121,6 @@ static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
 }
 
 
-extern int suprnova_alt_enable_sprites;
-
 static VIDEO_START(galpani3)
 {
 	/* so we can use suprnova.c */
@@ -535,7 +533,7 @@ static READ16_HANDLER( galpani3_mcu_status_r )
 
 // might be blitter regs? - there are 3, probably GRAP2 chips
 
-READ16_HANDLER( galpani3_regs1_r )
+static READ16_HANDLER( galpani3_regs1_r )
 {
 	switch (offset)
 	{
@@ -560,7 +558,7 @@ READ16_HANDLER( galpani3_regs1_r )
 }
 
 
-READ16_HANDLER( galpani3_regs2_r )
+static READ16_HANDLER( galpani3_regs2_r )
 {
 	switch (offset)
 	{
@@ -585,7 +583,7 @@ READ16_HANDLER( galpani3_regs2_r )
 }
 
 
-READ16_HANDLER( galpani3_regs3_r )
+static READ16_HANDLER( galpani3_regs3_r )
 {
 	switch (offset)
 	{
@@ -610,11 +608,11 @@ READ16_HANDLER( galpani3_regs3_r )
 }
 
 
-UINT16 galpani3_regs1_address_regs[0x20];
-UINT16 galpani3_regs2_address_regs[0x20];
-UINT16 galpani3_regs3_address_regs[0x20];
+static UINT16 galpani3_regs1_address_regs[0x20];
+static UINT16 galpani3_regs2_address_regs[0x20];
+static UINT16 galpani3_regs3_address_regs[0x20];
 
-void gp3_do_rle(UINT32 address, UINT16*framebuffer, UINT8* rledata)
+static void gp3_do_rle(UINT32 address, UINT16*framebuffer, UINT8* rledata)
 {
 	int rle_count = 0;
 	int normal_count = 0;
@@ -664,13 +662,13 @@ void gp3_do_rle(UINT32 address, UINT16*framebuffer, UINT8* rledata)
 
 }
 
-WRITE16_HANDLER( galpani3_regs1_address_w )
+static WRITE16_HANDLER( galpani3_regs1_address_w )
 {
 	logerror("galpani3_regs1_address_w %04x\n",data);
 	COMBINE_DATA(&galpani3_regs1_address_regs[offset]);
 }
 
-WRITE16_HANDLER( galpani3_regs1_go_w )
+static WRITE16_HANDLER( galpani3_regs1_go_w )
 {
 	UINT32 address = galpani3_regs1_address_regs[1]| (galpani3_regs1_address_regs[0]<<16);
 	UINT8* rledata = memory_region(space->machine,"gfx2");
@@ -680,13 +678,13 @@ WRITE16_HANDLER( galpani3_regs1_go_w )
 }
 
 
-WRITE16_HANDLER( galpani3_regs2_address_w )
+static WRITE16_HANDLER( galpani3_regs2_address_w )
 {
 	logerror("galpani3_regs2_address_w %04x\n",data);
 	COMBINE_DATA(&galpani3_regs2_address_regs[offset]);
 }
 
-WRITE16_HANDLER( galpani3_regs2_go_w )
+static WRITE16_HANDLER( galpani3_regs2_go_w )
 {
 	UINT32 address = galpani3_regs2_address_regs[1]| (galpani3_regs2_address_regs[0]<<16);
 	UINT8* rledata = memory_region(space->machine,"gfx2");
@@ -700,13 +698,13 @@ WRITE16_HANDLER( galpani3_regs2_go_w )
 
 
 
-WRITE16_HANDLER( galpani3_regs3_address_w )
+static WRITE16_HANDLER( galpani3_regs3_address_w )
 {
 	logerror("galpani3_regs3_address_w %04x\n",data);
 	COMBINE_DATA(&galpani3_regs3_address_regs[offset]);
 }
 
-WRITE16_HANDLER( galpani3_regs3_go_w )
+static WRITE16_HANDLER( galpani3_regs3_go_w )
 {
 	UINT32 address =  galpani3_regs3_address_regs[1]| (galpani3_regs3_address_regs[0]<<16);
 	UINT8* rledata = memory_region(space->machine,"gfx2");

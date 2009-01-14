@@ -27,9 +27,9 @@ NVRAM   :   Battery for main RAM
 
 
 static tilemap *gp98_reel1_tilemap;
-UINT8 *gp98_reel1_ram;
+static UINT8 *gp98_reel1_ram;
 
-WRITE8_HANDLER( gp98_reel1_ram_w )
+static WRITE8_HANDLER( gp98_reel1_ram_w )
 {
 	gp98_reel1_ram[offset] = data;
 	tilemap_mark_tile_dirty(gp98_reel1_tilemap,offset);
@@ -59,9 +59,9 @@ static TILE_GET_INFO( get_gp98_reel1_tile_info )
 }
 
 static tilemap *gp98_reel2_tilemap;
-UINT8 *gp98_reel2_ram;
+static UINT8 *gp98_reel2_ram;
 
-WRITE8_HANDLER( gp98_reel2_ram_w )
+static WRITE8_HANDLER( gp98_reel2_ram_w )
 {
 	gp98_reel2_ram[offset] = data;
 	tilemap_mark_tile_dirty(gp98_reel2_tilemap,offset);
@@ -91,9 +91,9 @@ static TILE_GET_INFO( get_gp98_reel2_tile_info )
 
 
 static tilemap *gp98_reel3_tilemap;
-UINT8 *gp98_reel3_ram;
+static UINT8 *gp98_reel3_ram;
 
-WRITE8_HANDLER( gp98_reel3_ram_w )
+static WRITE8_HANDLER( gp98_reel3_ram_w )
 {
 	gp98_reel3_ram[offset] = data;
 	tilemap_mark_tile_dirty(gp98_reel3_tilemap,offset);
@@ -123,9 +123,9 @@ static TILE_GET_INFO( get_gp98_reel3_tile_info )
 
 
 static tilemap *gp98_reel4_tilemap;
-UINT8 *gp98_reel4_ram;
+static UINT8 *gp98_reel4_ram;
 
-WRITE8_HANDLER( gp98_reel4_ram_w )
+static WRITE8_HANDLER( gp98_reel4_ram_w )
 {
 	gp98_reel4_ram[offset] = data;
 	tilemap_mark_tile_dirty(gp98_reel4_tilemap,offset);

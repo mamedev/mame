@@ -649,7 +649,7 @@ static const ym2610_interface ym2610_config =
 /******************************************************************************/
 
 // default eeprom with reasonable calibration for MAME
-unsigned char bbusters_default_eeprom[128] = {
+static const unsigned char bbusters_default_eeprom[128] = {
 	                                    /*y*/                   /*y*/
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00, 0x00, 0x00, 0xEE, 0x00,
 	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,

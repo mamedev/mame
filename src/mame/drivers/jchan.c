@@ -189,7 +189,6 @@ static UINT16* jchan_sprregs_1;
 static UINT16 *jchan_spriteram_2;
 static UINT16* jchan_sprregs_2;
 
-extern int suprnova_alt_enable_sprites;
 static UINT16 *mainsub_shared_ram;
 
 /***************************************************************************

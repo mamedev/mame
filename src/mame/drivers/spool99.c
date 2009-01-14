@@ -107,12 +107,12 @@ static TILE_GET_INFO( get_spool99_tile_info )
 			0);
 }
 
-VIDEO_START(spool99)
+static VIDEO_START(spool99)
 {
 	sc0_tilemap = tilemap_create(machine, get_spool99_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
-VIDEO_UPDATE(spool99)
+static VIDEO_UPDATE(spool99)
 {
 	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
 	return 0;

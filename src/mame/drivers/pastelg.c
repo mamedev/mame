@@ -218,7 +218,7 @@ static INPUT_PORTS_START( pastelg )
 INPUT_PORTS_END
 
 // stops the game hanging..
-CUSTOM_INPUT( nb1413m3_hackbusyflag_r )
+static CUSTOM_INPUT( nb1413m3_hackbusyflag_r )
 {
 	static int i = 0;
 	i ^= 1;

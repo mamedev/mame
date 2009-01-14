@@ -25,7 +25,6 @@ static int vdp1_sprite_log = 0;
 UINT32 *stv_vdp1_vram;
 static UINT32 *stv_vdp1_regs;
 UINT8* stv_vdp1_gfx_decode;
-extern UINT8 get_vblank(running_machine *machine);
 
 static UINT16	 *stv_framebuffer[2];
 static UINT16	 **stv_framebuffer_draw_lines;
@@ -294,7 +293,7 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 		else
 		{
 			if ( vdp1_sprite_log ) logerror( "VDP1: Access to register TVMR = %1X\n", STV_VDP1_TVMR );
-			if ( STV_VDP1_VBE && get_vblank(space->machine) )
+			if ( STV_VDP1_VBE && stv_get_vblank(space->machine) )
 			{
 				stv_vdp1_clear_framebuffer_on_next_frame = 1;
 			}

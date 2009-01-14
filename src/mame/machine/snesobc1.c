@@ -12,11 +12,11 @@
 
 #include "includes/snes.h"
 
-int obc1_address;
-int obc1_offset;
-int obc1_shift;
+static int obc1_address;
+static int obc1_offset;
+static int obc1_shift;
 
-READ8_HANDLER( obc1_read )
+static READ8_HANDLER( obc1_read )
 {
 	UINT16 address = offset & 0x1fff;
 	UINT8 value;
@@ -52,7 +52,7 @@ READ8_HANDLER( obc1_read )
 }
 
 
-WRITE8_HANDLER( obc1_write )
+static WRITE8_HANDLER( obc1_write )
 {
 	UINT16 address = offset & 0x1fff;
 	UINT8 temp;
@@ -98,7 +98,7 @@ WRITE8_HANDLER( obc1_write )
 	}
 }
 
-void obc1_init( void )
+static void obc1_init( void )
 {
 	obc1_offset  = (snes_ram[0x1ff5] & 0x01) ? 0x1800 : 0x1c00;
 	obc1_address = (snes_ram[0x1ff6] & 0x7f);

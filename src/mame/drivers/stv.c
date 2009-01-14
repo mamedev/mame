@@ -222,7 +222,7 @@ static INT32  scu_size_0,		/* Transfer DMA size lv 0*/
 			  scu_size_1,		/* lv 1*/
 			  scu_size_2;		/* lv 2*/
 
-struct
+static struct
 {
 	UINT8 vblank_out;
 	UINT8 vblank_in;

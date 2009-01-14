@@ -247,7 +247,7 @@ static void vdp_interrupt (running_machine *machine, int state)
 *      Input ports      *
 ************************/
 
-INPUT_PORTS_START( re900 )
+static INPUT_PORTS_START( re900 )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
@@ -334,7 +334,7 @@ INPUT_PORTS_START( re900 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( bs94 )
+static INPUT_PORTS_START( bs94 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet")       PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Double")    PORT_CODE(KEYCODE_3)

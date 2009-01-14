@@ -19,7 +19,7 @@ static UINT8 *io_ram;
 /*Temporary,to show something on screen...*/
 static char led_array[21];
 
-VIDEO_START( deshoros )
+static VIDEO_START( deshoros )
 {
 	static UINT8 i;
 	for(i=0;i<20;i++)
@@ -27,7 +27,7 @@ VIDEO_START( deshoros )
 	led_array[20] = 0;
 }
 
-VIDEO_UPDATE( deshoros )
+static VIDEO_UPDATE( deshoros )
 {
 	popmessage("%s",led_array);
 	return 0;

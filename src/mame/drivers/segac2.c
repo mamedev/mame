@@ -247,12 +247,6 @@ static READ16_HANDLER( palette_r )
 	return paletteram16[offset + palbank * 0x200];
 }
 
-UINT16* megadrive_vdp_palette_lookup_segac2;
-UINT16* megadrive_vdp_palette_lookup_sprite_segac2;
-UINT16* megadrive_vdp_palette_lookup_shadow_segac2;
-UINT16* megadrive_vdp_palette_lookup_highlight_segac2;
-
-
 /* handle writes to the paletteram */
 static WRITE16_HANDLER( palette_w )
 {
@@ -277,15 +271,15 @@ static WRITE16_HANDLER( palette_w )
 	/* set the color */
 	palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 
-	megadrive_vdp_palette_lookup_segac2[offset] = (b) | (g<<5) | (r<<10);
-	megadrive_vdp_palette_lookup_sprite_segac2[offset] = (b) | (g<<5) | (r<<10);
+	megadrive_vdp_palette_lookup[offset] = (b) | (g<<5) | (r<<10);
+	megadrive_vdp_palette_lookup_sprite[offset] = (b) | (g<<5) | (r<<10);
 
 	tmpr = r>>1;tmpg=g>>1;tmpb=b>>1;
-	megadrive_vdp_palette_lookup_shadow_segac2[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
+	megadrive_vdp_palette_lookup_shadow[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
 
 	// how is it calculated on c2?
 	tmpr = tmpr|0x10; 	tmpg = tmpg|0x10; 	tmpb = tmpb|0x10;
-	megadrive_vdp_palette_lookup_highlight_segac2[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
+	megadrive_vdp_palette_lookup_highlight[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
 }
 
 
@@ -1347,7 +1341,7 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
-void  segac2_irq2_interrupt(running_machine *machine, int state)
+static void  segac2_irq2_interrupt(running_machine *machine, int state)
 {
 	//printf("sound irq %d\n", state);
 	cpu_set_input_line(machine->cpu[0], 2, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1371,24 +1365,18 @@ static const ym3438_interface ym3438_intf =
 
 ******************************************************************************/
 
-VIDEO_START(segac2_new)
+static VIDEO_START(segac2_new)
 {
 	VIDEO_START_CALL(megadriv);
 
 
-	megadrive_vdp_palette_lookup_segac2 = auto_malloc(0x1000);
-	megadrive_vdp_palette_lookup_sprite_segac2 = auto_malloc(0x1000);
-	megadrive_vdp_palette_lookup_shadow_segac2 = auto_malloc(0x1000);
-	megadrive_vdp_palette_lookup_highlight_segac2 = auto_malloc(0x1000);
-
-	megadrive_vdp_palette_lookup = megadrive_vdp_palette_lookup_segac2;
-	megadrive_vdp_palette_lookup_sprite = megadrive_vdp_palette_lookup_sprite_segac2;
-	megadrive_vdp_palette_lookup_shadow = megadrive_vdp_palette_lookup_shadow_segac2;
-	megadrive_vdp_palette_lookup_highlight = megadrive_vdp_palette_lookup_highlight_segac2;
-
+	megadrive_vdp_palette_lookup = auto_malloc(0x1000);
+	megadrive_vdp_palette_lookup_sprite = auto_malloc(0x1000);
+	megadrive_vdp_palette_lookup_shadow = auto_malloc(0x1000);
+	megadrive_vdp_palette_lookup_highlight = auto_malloc(0x1000);
 }
 
-VIDEO_UPDATE(segac2_new)
+static VIDEO_UPDATE(segac2_new)
 {
 	if (!segac2_enable_display)
 	{

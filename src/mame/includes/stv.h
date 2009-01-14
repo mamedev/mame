@@ -81,6 +81,8 @@ extern UINT32* stv_vdp2_regs;
 extern UINT32* stv_vdp2_vram;
 extern UINT32* stv_vdp2_cram;
 
+UINT8 stv_get_vblank(running_machine *machine);
+
 WRITE32_HANDLER ( stv_vdp2_vram_w );
 READ32_HANDLER ( stv_vdp2_vram_r );
 

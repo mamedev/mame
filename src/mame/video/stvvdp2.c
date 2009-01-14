@@ -112,17 +112,17 @@ UINT32* stv_vdp2_vram;
 static UINT8* stv_vdp2_gfx_decode;
 
 static int stv_vdp2_render_rbg0;
-int stv_hblank,stv_vblank,stv_odd;
-int horz_res,vert_res;
+int stv_hblank,stv_vblank;
+static int stv_odd;
+static int horz_res,vert_res;
 
 UINT32* stv_vdp2_cram;
 
 static void stv_vdp2_dynamic_res_change(running_machine *machine);
-UINT8 get_vblank(running_machine *machine);
-UINT8 get_hblank(running_machine *machine);
-int   get_vblank_duration(running_machine *machine);
+static UINT8 get_hblank(running_machine *machine);
+static int   get_vblank_duration(running_machine *machine);
 //int get_hblank_duration(running_machine *machine); //<- when we know that...
-UINT8 get_odd_bit(running_machine *machine);
+static UINT8 get_odd_bit(running_machine *machine);
 
 static void refresh_palette_data(running_machine *machine);
 static int stv_vdp2_window_process(int x,int y);
@@ -5265,7 +5265,7 @@ WRITE32_HANDLER ( stv_vdp2_regs_w )
 	}
 }
 
-UINT8 get_hblank(running_machine *machine)
+static UINT8 get_hblank(running_machine *machine)
 {
 	static int cur_h;
 
@@ -5281,7 +5281,7 @@ UINT8 get_hblank(running_machine *machine)
 //int get_hblank_duration(running_machine *machine)
 //...
 
-UINT8 get_vblank(running_machine *machine)
+UINT8 stv_get_vblank(running_machine *machine)
 {
 	static int cur_v;
 	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
@@ -5294,7 +5294,7 @@ UINT8 get_vblank(running_machine *machine)
 }
 
 /*some vblank lines measurements (according to Charles MacDonald)*/
-int get_vblank_duration(running_machine *machine)
+static int get_vblank_duration(running_machine *machine)
 {
 	if(STV_VDP2_HRES & 4)
 	{
@@ -5316,7 +5316,7 @@ int get_vblank_duration(running_machine *machine)
 	return 0;
 }
 
-UINT8 get_odd_bit(running_machine *machine)
+static UINT8 get_odd_bit(running_machine *machine)
 {
 	static int cur_v;
 	cur_v = video_screen_get_vpos(machine->primary_screen);
@@ -5339,7 +5339,7 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 		case 0x4/4:
 		{
 			/*Screen Status Register*/
-			stv_vblank = get_vblank(space->machine);
+			stv_vblank = stv_get_vblank(space->machine);
 			stv_hblank = get_hblank(space->machine);
 			stv_odd = get_odd_bit(space->machine);
 

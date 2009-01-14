@@ -63,7 +63,7 @@ static int diff_lookup[49*16];
 /* volume lookup table. The manual lists only 9 steps, ~3dB per step. Given the dB values,
    that seems to map to a 5-bit volume control. What happens for steps after the 9th is not
     known, we arbitrarily assign a "1" to all those steps. */
-static int volume_table[16] =
+static const int volume_table[16] =
 {
 	0x20,	//   0 dB
 	0x16,	//  -3.2 dB

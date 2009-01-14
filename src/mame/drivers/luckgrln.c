@@ -140,7 +140,7 @@ static MACHINE_DRIVER_START( luckgrln )
 	MDRV_VIDEO_UPDATE(luckgrln)
 MACHINE_DRIVER_END
 
-DRIVER_INIT( luckgrln )
+static DRIVER_INIT( luckgrln )
 {
 	int i;
 	UINT8 x,v;

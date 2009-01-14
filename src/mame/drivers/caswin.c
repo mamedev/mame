@@ -31,12 +31,12 @@ static TILE_GET_INFO( get_sc0_tile_info )
 			0);
 }
 
-VIDEO_START(vvillage)
+static VIDEO_START(vvillage)
 {
 	sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
-VIDEO_UPDATE(vvillage)
+static VIDEO_UPDATE(vvillage)
 {
 	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
 	return 0;

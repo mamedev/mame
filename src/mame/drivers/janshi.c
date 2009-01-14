@@ -37,12 +37,12 @@ static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-VIDEO_START(janshi)
+static VIDEO_START(janshi)
 {
 
 }
 
-VIDEO_UPDATE(janshi)
+static VIDEO_UPDATE(janshi)
 {
 	return 0;
 }

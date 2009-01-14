@@ -133,7 +133,7 @@ static TILE_GET_INFO( get_sc3_tile_info )
 			0);
 }
 
-VIDEO_START(mil4000)
+static VIDEO_START(mil4000)
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
@@ -152,7 +152,7 @@ VIDEO_START(mil4000)
 	tilemap_set_transparent_pen(sc3_tilemap,0);
 }
 
-VIDEO_UPDATE(mil4000)
+static VIDEO_UPDATE(mil4000)
 {
 	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,sc1_tilemap,0,0);

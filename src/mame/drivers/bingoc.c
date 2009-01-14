@@ -35,12 +35,12 @@ SOUND : YM2151 uPD7759C
 
 #define SOUND_TEST 0
 
-VIDEO_START(bingoc)
+static VIDEO_START(bingoc)
 {
 
 }
 
-VIDEO_UPDATE(bingoc)
+static VIDEO_UPDATE(bingoc)
 {
 	return 0;
 }

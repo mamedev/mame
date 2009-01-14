@@ -29,12 +29,12 @@ TODO:
 
 static UINT16 *blit_ram;
 
-VIDEO_START(brasil)
+static VIDEO_START(brasil)
 {
 
 }
 
-VIDEO_UPDATE(brasil)
+static VIDEO_UPDATE(brasil)
 {
 	int x,y,count;
 
@@ -64,7 +64,7 @@ VIDEO_UPDATE(brasil)
 	return 0;
 }
 
-VIDEO_UPDATE(vidpokr2)
+static VIDEO_UPDATE(vidpokr2)
 {
 	int x,y,count;
 

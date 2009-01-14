@@ -9,12 +9,14 @@ extern int skns_v3t_somedirty,skns_v3t_4bpp_somedirty;
 
 /*----------- defined in video/suprnova.c -----------*/
 
+extern int suprnova_alt_enable_sprites;
+
 void skns_sprite_kludge(int x, int y);
 void skns_draw_sprites(
-running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
-UINT32* spriteram_source, size_t spriteram_size,
-UINT8* gfx_source, size_t gfx_length,
-UINT32* sprite_regs );
+	running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
+	UINT32* spriteram_source, size_t spriteram_size,
+	UINT8* gfx_source, size_t gfx_length,
+	UINT32* sprite_regs );
 
 WRITE32_HANDLER ( skns_tilemapA_w );
 WRITE32_HANDLER ( skns_tilemapB_w );

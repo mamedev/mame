@@ -615,7 +615,6 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 	UINT16 *src;
 	int inc;
-	UINT8 dirty = 0;
 
 	if (sprites == 0)
 		return;

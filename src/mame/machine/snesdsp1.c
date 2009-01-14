@@ -121,7 +121,7 @@ static INT16 shiftR(INT16 C, INT16 E);
 
 //////////////////////////////////////////////////////////////////
 
-UINT8 DSP1_getSr(void)
+static UINT8 DSP1_getSr(void)
 {
    mSrLowByteAccess = ~mSrLowByteAccess;
    if (mSrLowByteAccess)
@@ -136,7 +136,7 @@ UINT8 DSP1_getSr(void)
 
 //////////////////////////////////////////////////////////////////
 
-UINT8 DSP1_getDr(void)
+static UINT8 DSP1_getDr(void)
 {
    UINT8 oDr;
 
@@ -146,14 +146,14 @@ UINT8 DSP1_getDr(void)
 
 //////////////////////////////////////////////////////////////////
 
-void DSP1_setDr(UINT8 iDr)
+static void DSP1_setDr(UINT8 iDr)
 {
     DSP1_fsmStep(0, &iDr);
 }
 
 //////////////////////////////////////////////////////////////////
 
-void DSP1_reset(running_machine *machine)
+static void DSP1_reset(running_machine *machine)
 {
 	UINT32 i;
 	UINT8 *dspin = memory_region(machine, "user6");

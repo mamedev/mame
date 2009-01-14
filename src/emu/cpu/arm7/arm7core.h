@@ -403,9 +403,9 @@ enum
 #define SET_REGISTER(state, reg, val)  SetRegister(state, reg, val)
 #define ARM7_CHECKIRQ           arm7_check_irq_state(cpustate)
 
-extern WRITE32_HANDLER((*arm7_coproc_do_callback));
-extern READ32_HANDLER((*arm7_coproc_rt_r_callback));
-extern WRITE32_HANDLER((*arm7_coproc_rt_w_callback));
+extern write32_space_func arm7_coproc_do_callback;
+extern read32_space_func arm7_coproc_rt_r_callback;
+extern write32_space_func arm7_coproc_rt_w_callback;
 extern void (*arm7_coproc_dt_r_callback)(arm_state *cpustate, UINT32 insn, UINT32* prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
 extern void (*arm7_coproc_dt_w_callback)(arm_state *cpustate, UINT32 insn, UINT32* prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
 

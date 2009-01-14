@@ -73,7 +73,7 @@ static CPU_DISASSEMBLE(h8)
 	return h8_disasm(buffer, pc, oprom, opram, 0xffff);
 }
 
-void h8_300_InterruptRequest(h83xx_state *h8, UINT8 source)
+static void h8_300_InterruptRequest(h83xx_state *h8, UINT8 source)
 {
 	if(source>31)
 	{

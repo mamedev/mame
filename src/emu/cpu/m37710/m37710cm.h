@@ -21,15 +21,6 @@
 /* ================================= MAME ================================= */
 /* ======================================================================== */
 
-/* Clean up after the emulation core - Not used in this core - */
-CPU_EXIT( m37710 );
-
-/* Save the current CPU state to disk */
-void m37710_state_save(void *file);
-
-/* Load a CPU state from disk */
-void m37710_state_load(void *file);
-
 #undef M37710_CALL_DEBUGGER
 
 #define M37710_CALL_DEBUGGER(x) 		debugger_instruction_hook(cpustate->device, x)

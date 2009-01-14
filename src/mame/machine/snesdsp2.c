@@ -10,28 +10,28 @@
 
 ***************************************************************************/
 
-int DSP2_waiting_for_command = 0;
-int DSP2_command = 0;
-int DSP2_in_count = 0,  DSP2_in_index = 0;
-int DSP2_out_count = 0, DSP2_out_index = 0;
+static int DSP2_waiting_for_command = 0;
+static int DSP2_command = 0;
+static int DSP2_in_count = 0,  DSP2_in_index = 0;
+static int DSP2_out_count = 0, DSP2_out_index = 0;
 
-UINT8 DSP2_parameters[512] = {0};
-UINT8 DSP2_output[512] = {0};
+static UINT8 DSP2_parameters[512] = {0};
+static UINT8 DSP2_output[512] = {0};
 
-UINT8 DSP2_op05transparent = 0;
-int DSP2_op05haslen = 0;
-int DSP2_op05len = 0;
-int DSP2_op06haslen = 0;
-int DSP2_op06len = 0;
-UINT16 DSP2_op09word1 = 0;
-UINT16 DSP2_op09word2 = 0;
-int DSP2_op0dhaslen = 0;
-int DSP2_op0doutlen = 0;
-int DSP2_op0dinlen = 0;
+static UINT8 DSP2_op05transparent = 0;
+static int DSP2_op05haslen = 0;
+static int DSP2_op05len = 0;
+static int DSP2_op06haslen = 0;
+static int DSP2_op06len = 0;
+static UINT16 DSP2_op09word1 = 0;
+static UINT16 DSP2_op09word2 = 0;
+static int DSP2_op0dhaslen = 0;
+static int DSP2_op0doutlen = 0;
+static int DSP2_op0dinlen = 0;
 
 
 //convert bitmap to bitplane tile
-void DSP2_op01( void )
+static void DSP2_op01( void )
 {
 //op01 size is always 32 bytes input and output
 //the hardware does strange things if you vary the size
@@ -89,13 +89,13 @@ void DSP2_op01( void )
 }
 
 //set transparent color
-void DSP2_op03( void )
+static void DSP2_op03( void )
 {
 	DSP2_op05transparent = DSP2_parameters[0];
 }
 
 //replace bitmap using transparent color
-void DSP2_op05( void )
+static void DSP2_op05( void )
 {
 	UINT8 color;
 // Overlay bitmap with transparency.
@@ -170,7 +170,7 @@ void DSP2_op09( void )
 }
 
 //scale bitmap
-void DSP2_op0d( void )
+static void DSP2_op0d( void )
 {
 // Bit accurate hardware algorithm - uses fixed point math
 // This should match the DSP2 Op0D output exactly
@@ -239,7 +239,7 @@ void DSP2_reset( void )
 	DSP2_op0dinlen       = 0;
 }
 
-UINT8 DSP2_read( void )
+static UINT8 DSP2_read( void )
 {
 	UINT8 r = 0xff;
 	if (DSP2_out_count)
@@ -252,7 +252,7 @@ UINT8 DSP2_read( void )
 	return r;
 }
 
-void DSP2_write(UINT8 data)
+static void DSP2_write(UINT8 data)
 {
 	if(DSP2_waiting_for_command)
 	{

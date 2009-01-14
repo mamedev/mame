@@ -1105,7 +1105,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ym2610_interface ym2610_config =
+static const ym2610_interface ym2610_config =
 {
 	audio_cpu_irq
 };

@@ -69,7 +69,7 @@ static UINT8 *jan_bitmap_1,*jan_bitmap_2,*jan_bitmap_3,*jan_bitmap_4;
 static UINT8 vram_bank,col_bank;
 static UINT8 mux_data;
 
-VIDEO_START(jantotsu)
+static VIDEO_START(jantotsu)
 {
 	jan_bitmap_1 = auto_malloc(0x2000);
 	jan_bitmap_2 = auto_malloc(0x2000);
@@ -78,7 +78,7 @@ VIDEO_START(jantotsu)
 	vram_bank = 0;
 }
 
-VIDEO_UPDATE(jantotsu)
+static VIDEO_UPDATE(jantotsu)
 {
 	int x,y,i;
 	int count;

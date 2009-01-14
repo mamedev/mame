@@ -127,7 +127,8 @@ static UINT8 bright_v3_b_trans = 0x00, bright_v3_g_trans = 0x00, bright_v3_r_tra
 
 // This ignores the alpha values atm.
 static int spc_changed=0, v3_changed=0, palette_updated=0;
-int suprnova_alt_enable_background, suprnova_alt_enable_sprites;
+static int suprnova_alt_enable_background;
+int suprnova_alt_enable_sprites;
 
 WRITE32_HANDLER ( skns_pal_regs_w )
 {
