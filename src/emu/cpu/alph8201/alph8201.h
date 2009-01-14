@@ -12,10 +12,6 @@
 #ifndef __ALPH8201_H__
 #define __ALPH8201_H__
 
-#ifndef INLINE
-#define INLINE static inline
-#endif
-
 #include "cpuintrf.h"
 
 enum

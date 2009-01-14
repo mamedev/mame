@@ -12,10 +12,6 @@ extern CPU_GET_INFO( spc700 );
 /* ============================= Configuration ============================ */
 /* ======================================================================== */
 
-#ifndef INLINE
-#define INLINE static
-#endif
-
 #undef uint
 #define uint unsigned int
 

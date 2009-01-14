@@ -16,10 +16,6 @@ Based on G65C816 CPU Emulator by Karl Stenerud
 
 #define ADDRESS_24BIT(A) ((A)&0xffffff)
 
-#ifndef INLINE
-#define INLINE static
-#endif
-
 typedef struct
 {
 	unsigned char name;

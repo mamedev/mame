@@ -55,10 +55,6 @@
 #include "pic16c5x.h"
 
 
-#ifndef INLINE
-#define INLINE static inline
-#endif
-
 
 #define M_RDRAM(A)		(((A) < 8) ? cpustate->internalram[A] : PIC16C5x_RAM_RDMEM(A))
 #define M_WRTRAM(A,V)	do { if ((A) < 8) cpustate->internalram[A] = (V); else PIC16C5x_RAM_WRMEM(A,V); } while (0)

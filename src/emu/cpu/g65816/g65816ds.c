@@ -24,9 +24,6 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 #endif
 
 #define ADDRESS_65816(A) ((A)&0xffffff)
-#ifndef INLINE
-#define INLINE static
-#endif
 
 
 typedef struct

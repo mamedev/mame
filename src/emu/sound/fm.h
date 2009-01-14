@@ -85,11 +85,6 @@ typedef signed int		INT32;   /* signed 32bit   */
 #endif /* OSD_CPU_H */
 #endif
 
-#ifndef INLINE
-#define INLINE static __inline__
-#endif
-
-
 
 
 typedef stream_sample_t FMSAMPLE;

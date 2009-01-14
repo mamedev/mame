@@ -12,10 +12,6 @@
 #ifndef __MB88XX_H__
 #define	__MB88XX_H__
 
-#ifndef INLINE
-#define INLINE static inline
-#endif
-
 #include "cpuintrf.h"
 
 /***************************************************************************

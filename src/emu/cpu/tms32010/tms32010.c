@@ -56,10 +56,6 @@
 #include "tms32010.h"
 
 
-#ifndef INLINE
-#define INLINE static inline
-#endif
-
 
 #define M_RDROM(A)		TMS32010_ROM_RDMEM(A)
 #define M_WRTROM(A,V)	TMS32010_ROM_WRMEM(A,V)

@@ -123,10 +123,6 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #define CLK 4	/* 1 cycle equals 4 clock ticks */		/* PE/DI */
 
 
-#ifndef INLINE
-#define INLINE static inline
-#endif
-
 
 #define SET_PC(x)	do { cpustate->PC = (x); } while (0)
 
