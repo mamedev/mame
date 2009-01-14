@@ -8542,5 +8542,6 @@ Other Sun games
 	
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
+	DRIVER( spielbud )	/* (c) 1985 ADP */
 
 #endif	/* DRIVER_RECURSIVE */
