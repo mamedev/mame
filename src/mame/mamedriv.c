@@ -7491,6 +7491,8 @@ Other Sun games
 	DRIVER( slqz2 )		/* (c) 1998 */
 	DRIVER( sdmg2 )		/* (c) 1997 */
 
+	DRIVER( igs_ncs )	/* (c) 2000 */
+
 	DRIVER( bigd2 )		/* (c) 2000 */
 	DRIVER( sdwx )		/* (c) 2002 */
 	DRIVER( sddz )		/* (c) 200? */
@@ -8536,5 +8538,8 @@ Other Sun games
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( mtonic )	/* 198? (c) Tonic */
+	
+	DRIVER( 3super8 )	/* unknown */
+	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 
 #endif	/* DRIVER_RECURSIVE */
