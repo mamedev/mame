@@ -418,6 +418,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		for ( ; src >= end; src -= 8/2 )
 		{
 			int x,y, attr,code,color,flipx,flipy, zoom, curr_pri,width,height;
+			gfx_element gfx;
 			UINT8 *gfxdata;
 
 			/* Exponential zoom table extracted from daitoride */
@@ -469,27 +470,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			if (color == 0xf)	/* 8bpp */
 			{
-				/* prepare GfxElement on the fly */
-				gfx_element gfx;
-				gfx.machine = machine;
-				gfx.width = width;
-				gfx.height = height;
-				gfx.total_elements = 1;
-				gfx.color_depth = 256;
-				gfx.color_granularity = 256;
-				gfx.color_base = 0;
-				gfx.total_colors = 0x20;
-				gfx.pen_usage = NULL;
-				gfx.gfxdata = gfxdata;
-				gfx.line_modulo = width;
-				gfx.char_modulo = 0;	/* doesn't matter */
-				gfx.flags = 0;
-				gfx.dirty = &dirty;
-				gfx.machine = machine;
-
 				/* Bounds checking */
 				if ( (gfxdata + width * height - 1) >= gfx_max )
 					continue;
+
+				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
 
 				pdrawgfxzoom(	bitmap,&gfx,
 								0,
@@ -502,27 +487,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			}
 			else
 			{
-				/* prepare GfxElement on the fly */
-				gfx_element gfx;
-				gfx.machine = machine;
-				gfx.width = width;
-				gfx.height = height;
-				gfx.total_elements = 1;
-				gfx.color_depth = 16;
-				gfx.color_granularity = 16;
-				gfx.color_base = 0;
-				gfx.total_colors = 0x200;
-				gfx.pen_usage = NULL;
-				gfx.gfxdata = gfxdata;
-				gfx.line_modulo = width/2;
-				gfx.char_modulo = 0;	/* doesn't matter */
-				gfx.flags = GFX_ELEMENT_PACKED;
-				gfx.dirty = &dirty;
-				gfx.machine = machine;
-
 				/* Bounds checking */
 				if ( (gfxdata + width/2 * height - 1) >= gfx_max )
 					continue;
+
+				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width/2, 0, 16, GFX_ELEMENT_PACKED);
 
 				pdrawgfxzoom(	bitmap,&gfx,
 								0,

@@ -209,7 +209,7 @@ static VIDEO_START( snk_4bpp_shadow )
 
 	/* prepare shadow draw table */
 	for(i = 0; i <= 13; i++) drawmode_table[i] = DRAWMODE_SOURCE;
-	drawmode_table[14] = (machine->config->video_attributes & VIDEO_HAS_SHADOWS) ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+	drawmode_table[14] = DRAWMODE_SHADOW;
 	drawmode_table[15] = DRAWMODE_NONE;
 
 	/* all palette entries are not affected by shadow sprites... */
@@ -358,9 +358,8 @@ VIDEO_START( gwar )
 
 VIDEO_START( tdfever )
 {
-	VIDEO_START_CALL(snk_4bpp_shadow);
-
 	VIDEO_START_CALL(gwar);
+	VIDEO_START_CALL(snk_4bpp_shadow);
 }
 
 /**************************************************************************************/

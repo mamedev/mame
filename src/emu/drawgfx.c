@@ -215,6 +215,42 @@ void gfx_element_free(gfx_element *gfx)
 }
 
 
+/*-------------------------------------------------
+    gfx_element_build_temporary - create a 
+    temporary one-off gfx_element
+-------------------------------------------------*/
+
+void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity, UINT32 flags)
+{
+	static UINT8 not_dirty = 0;
+
+	gfx->width = width;
+	gfx->height = height;
+	gfx->startx = 0;
+	gfx->starty = 0;
+
+	gfx->origwidth = width;
+	gfx->origheight = height;
+	gfx->flags = flags;
+	gfx->total_elements = 1;
+	
+	gfx->color_base = color_base;
+	gfx->color_depth = color_granularity;
+	gfx->color_granularity = color_granularity;
+	gfx->total_colors = (machine->config->total_colors - color_base) / color_granularity;
+	
+	gfx->pen_usage = NULL;
+	
+	gfx->gfxdata = base;
+	gfx->line_modulo = rowbytes;
+	gfx->char_modulo = 0;
+	gfx->srcdata = base;
+	gfx->dirty = &not_dirty;
+	gfx->dirtyseq = 0;
+	
+	gfx->machine = machine;
+}
+
 
 /*-------------------------------------------------
     calc_penusage - calculate the pen usage for
@@ -1893,8 +1929,8 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 				 	break;
 
 			/* compute the cliprect for this group */
-			subclip.min_x = col * colwidth;
-			subclip.max_x = (col + groupcols) * colwidth - 1;
+			subclip.min_x = col * colwidth + xscroll;
+			subclip.max_x = (col + groupcols) * colwidth - 1 + xscroll;
 			sect_rect(&subclip, cliprect);
 
 			/* iterate over all portions of the scroll that overlap the destination */
@@ -1927,8 +1963,8 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 				 	break;
 
 			/* compute the cliprect for this group */
-			subclip.min_y = row * rowheight;
-			subclip.max_y = (row + grouprows) * rowheight - 1;
+			subclip.min_y = row * rowheight + yscroll;
+			subclip.max_y = (row + grouprows) * rowheight - 1 + yscroll;
 			sect_rect(&subclip, cliprect);
 
 			/* iterate over all portions of the scroll that overlap the destination */

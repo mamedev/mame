@@ -173,26 +173,12 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 {
 	// prepare GfxElement on the fly
 	gfx_element gfx;
-	UINT8 dirty = 0;
-
-	gfx.machine = machine;
-	gfx.width = dimx;
-	gfx.height = dimy;
-	gfx.total_elements = 1;
-	gfx.color_depth = 32;
-	gfx.color_granularity = 32;
-	gfx.color_base = 0x100;
-	gfx.total_colors = 8;
-	gfx.pen_usage = NULL;
-	gfx.gfxdata = sprites_gfx + addr;
-	gfx.dirty = &dirty;
-	gfx.line_modulo = dimx;
-	gfx.char_modulo = 0;	// doesn't matter
-	gfx.flags = 0;
-
+	
 	// Bounds checking
 	if ( addr + dimx * dimy >= sprites_gfx_size )
 		return;
+
+	gfx_element_build_temporary(&gfx, machine, sprites_gfx + addr, dimx, dimy, dimx, 0x100, 32, 0);
 
 	drawgfx(	bitmap,&gfx,
 				0, color,

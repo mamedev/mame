@@ -622,6 +622,8 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 	for (i=0; i<0x20; i++)
 	{
+		gfx_element gfx;
+	
 		if (!(metro_videoregs[0x02/2] & 0x8000))
 		{
 			src = spriteram16 + (sprites - 1) * (8/2);
@@ -690,27 +692,11 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 			if (support_8bpp && color == 0xf)	/* 8bpp */
 			{
-				/* prepare GfxElement on the fly */
-				gfx_element gfx;
-				gfx.machine = machine;
-				gfx.width = width;
-				gfx.height = height;
-				gfx.total_elements = 1;
-				gfx.color_depth = 256;
-				gfx.color_granularity = 256;
-				gfx.color_base = 0;
-				gfx.total_colors = 0x20;
-				gfx.pen_usage = NULL;
-				gfx.gfxdata = gfxdata;
-				gfx.line_modulo = width;
-				gfx.char_modulo = 0;	/* doesn't matter */
-				gfx.flags = 0;
-				gfx.dirty = &dirty;
-				gfx.machine = machine;
-
 				/* Bounds checking */
 				if ( (gfxdata + width * height - 1) >= gfx_max )
 					continue;
+
+				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
 
 				pdrawgfxzoom(	bitmap,&gfx,
 								0,
@@ -723,27 +709,11 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 			}
 			else
 			{
-				/* prepare GfxElement on the fly */
-				gfx_element gfx;
-				gfx.machine = machine;
-				gfx.width = width;
-				gfx.height = height;
-				gfx.total_elements = 1;
-				gfx.color_depth = 16;
-				gfx.color_granularity = 16;
-				gfx.color_base = 0;
-				gfx.total_colors = 0x200;
-				gfx.pen_usage = NULL;
-				gfx.gfxdata = gfxdata;
-				gfx.line_modulo = width/2;
-				gfx.char_modulo = 0;	/* doesn't matter */
-				gfx.flags = GFX_ELEMENT_PACKED;
-				gfx.dirty = &dirty;
-				gfx.machine = machine;
-
 				/* Bounds checking */
 				if ( (gfxdata + width/2 * height - 1) >= gfx_max )
 					continue;
+
+				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width/2, 0, 16, GFX_ELEMENT_PACKED);
 
 				pdrawgfxzoom(	bitmap,&gfx,
 								0,

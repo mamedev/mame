@@ -178,6 +178,9 @@ void gfx_element_decode(const gfx_element *gfx, UINT32 code);
 /* free a gfx_element */
 void gfx_element_free(gfx_element *gfx);
 
+/* create a temporary one-off gfx_element */
+void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UINT8 *base, UINT32 width, UINT32 height, UINT32 rowbytes, UINT32 color_base, UINT32 color_granularity, UINT32 flags);
+
 
 
 /* ----- core graphics drawing ----- */

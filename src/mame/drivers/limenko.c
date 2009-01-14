@@ -355,7 +355,6 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 	for(i = 0; i <= count*2; i += 2)
 	{
 		int x, width, flipx, y, height, flipy, code, color, pri;
-		UINT8 dirty = 0;
 
 		if(~sprites[i] & 0x80000000) continue;
 
@@ -381,25 +380,12 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 
 		gfxdata	= base_gfx + 64 * code;
 
-		/* prepare GfxElement on the fly */
-		gfx.machine = machine;
-		gfx.width = width;
-		gfx.height = height;
-		gfx.total_elements = 1;
-		gfx.color_depth = 256;
-		gfx.color_granularity = 256;
-		gfx.color_base = 0;
-		gfx.total_colors = 0x10;
-		gfx.pen_usage = NULL;
-		gfx.gfxdata = gfxdata;
-		gfx.line_modulo = width;
-		gfx.char_modulo = 0;	/* doesn't matter */
-		gfx.flags = 0;
-		gfx.dirty = &dirty;
-
 		/* Bounds checking */
 		if ( (gfxdata + width * height - 1) >= gfx_max )
 			continue;
+
+		/* prepare GfxElement on the fly */
+		gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
 
 		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x,y,cliprect,pri);
 
