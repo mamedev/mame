@@ -236,7 +236,6 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 
 typedef struct
 {
-	int index;
 	sound_stream * stream;
 
 	UINT8 WordInput; // value on word input bus
@@ -565,7 +564,6 @@ static SND_START( s14001a )
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
-	chip->index = sndindex;
 
 	chip->GlobalSilenceState = 1;
 	chip->OldDelta = 0x02;

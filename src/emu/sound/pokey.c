@@ -204,7 +204,6 @@ struct POKEYregisters
 	attotime clock_period;
 	attotime ad_time_fast;
 	attotime ad_time_slow;
-	int index;
 
 	UINT8 poly4[0x0f];
 	UINT8 poly5[0x1f];
@@ -620,7 +619,6 @@ static SND_START( pokey )
 		memcpy(&chip->intf, config, sizeof(pokey_interface));
 	chip->device = device;
 	chip->clock_period = ATTOTIME_IN_HZ(clock);
-	chip->index = sndindex;
 
 	/* calculate the A/D times
      * In normal, slow mode (SKCTL bit SK_PADDLE is clear) the conversion
@@ -803,7 +801,7 @@ static void pokey_potgo(const address_space *space, struct POKEYregisters *p)
 		{
 			int r = (*p->pot_r[pot])(space, pot);
 
-			LOG(("POKEY #%d pot_r(%d) returned $%02x\n", p->index, pot, r));
+			LOG(("POKEY %s pot_r(%d) returned $%02x\n", p->device->tag, pot, r));
 			if( r != -1 )
 			{
 				if (r > 228)

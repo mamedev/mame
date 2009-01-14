@@ -45,7 +45,6 @@ struct ics2115
 {
 	const ics2115_interface *intf;
 	const device_config *device;
-	int index;
 	UINT8 *rom;
 	INT16 *ulaw;
 
@@ -450,7 +449,6 @@ static SND_START( ics2115 )
 
 	chip->device = device;
 	chip->intf = config;
-	chip->index = sndindex;
 	chip->rom = device->region;
 	chip->timer[0].timer = timer_alloc(device->machine, timer_cb_0, chip);
 	chip->timer[1].timer = timer_alloc(device->machine, timer_cb_1, chip);

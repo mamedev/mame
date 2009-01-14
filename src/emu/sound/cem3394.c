@@ -108,7 +108,7 @@
 typedef struct
 {
 	sound_stream * stream;			/* our stream */
-	void (*external)(int, int, short *);/* callback to generate external samples */
+	void (*external)(const device_config *, int, short *);/* callback to generate external samples */
 	double vco_zero_freq;			/* frequency of VCO at 0.0V */
 	double filter_zero_freq;		/* frequency of filter at 0.0V */
 
@@ -131,7 +131,7 @@ typedef struct
 
 	double inv_sample_rate;
 	int sample_rate;
-	int index;
+	const device_config *device;
 
 	INT16 *mixer_buffer;
 	INT16 *external_buffer;
@@ -171,7 +171,7 @@ static STREAM_UPDATE( cem3394_update )
 		INT16 last_ext = chip->last_ext;
 
 		/* fetch the external data */
-		(*chip->external)(chip->index, samples, chip->external_buffer);
+		(*chip->external)(chip->device, samples, chip->external_buffer);
 
 		/* compute the modulation depth, and adjust fstep to the maximum frequency */
 		/* we lop off 13 bits of depth so that we can multiply by stepadjust, below, */
@@ -322,7 +322,7 @@ static SND_START( cem3394 )
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
-	chip->index = sndindex;
+	chip->device = device;
 
 	/* copy global parameters */
 	chip->sample_rate = CEM3394_SAMPLE_RATE;

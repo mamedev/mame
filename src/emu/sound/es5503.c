@@ -64,7 +64,6 @@ typedef struct
 
 	UINT8 *docram;
 
-	int index;
 	sound_stream * stream;
 
 	void (*irq_callback)(running_machine *machine, int);	// IRQ callback
@@ -232,7 +231,6 @@ static SND_START( es5503 )
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
-	chip->index = sndindex;
 
 	intf = config;
 

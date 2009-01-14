@@ -128,7 +128,6 @@ typedef struct
 	INT32 mix_level[8];
 
 	sound_stream * stream;
-	int index;
 } YMF278BChip;
 
 static INT32 *mix;
@@ -675,7 +674,6 @@ static SND_START( ymf278b )
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
-	chip->index = sndindex;
 
 	intf = (config != NULL) ? config : &defintrf;
 

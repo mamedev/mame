@@ -513,7 +513,7 @@ static void AICA_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((float) n)/log((float) 2))
 
-static void AICA_Init(const device_config *device, struct _AICA *AICA, const aica_interface *intf, int sndindex)
+static void AICA_Init(const device_config *device, struct _AICA *AICA, const aica_interface *intf)
 {
 	int i;
 
@@ -524,14 +524,7 @@ static void AICA_Init(const device_config *device, struct _AICA *AICA, const aic
 
 	// get AICA RAM
 	{
-		if (sndindex == 0)
-		{
-			AICA->Master=1;
-		}
-		else
-		{
-			AICA->Master=0;
-		}
+		AICA->Master = intf->master;
 
 		AICA->AICARAM = device->region;
 		if (AICA->AICARAM)
@@ -1295,7 +1288,7 @@ static SND_START( aica )
 	intf = config;
 
 	// init the emulation
-	AICA_Init(device, AICA, intf, sndindex);
+	AICA_Init(device, AICA, intf);
 
 	// set up the IRQ callbacks
 	{

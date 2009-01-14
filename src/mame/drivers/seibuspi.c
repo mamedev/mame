@@ -1050,7 +1050,7 @@ static ADDRESS_MAP_START( spisound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( flashrom_read )
+static READ8_DEVICE_HANDLER( flashrom_read )
 {
 	logerror("Flash Read: %08X\n", offset);
 	if( offset < 0x100000 )
@@ -1064,7 +1064,7 @@ static READ8_HANDLER( flashrom_read )
 	return 0;
 }
 
-static WRITE8_HANDLER( flashrom_write )
+static WRITE8_DEVICE_HANDLER( flashrom_write )
 {
 	logerror("Flash Write: %08X, %02X\n", offset, data);
 	if( offset < 0x100000 )

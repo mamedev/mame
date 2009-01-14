@@ -33,7 +33,6 @@ struct MSM5205Voice
 	const msm5205_interface *intf;
 	const device_config *device;
 	sound_stream * stream;  /* number of stream system      */
-	INT32 index;
 	INT32 clock;				/* clock rate */
 	emu_timer *timer;        /* VCLK callback timer          */
 	INT32 data;               /* next adpcm data              */
@@ -46,6 +45,8 @@ struct MSM5205Voice
 	int diff_lookup[49*16];
 };
 
+
+static void msm5205_playmode(struct MSM5205Voice *voice,int select);
 
 /*
  * ADPCM lockup tabe
@@ -156,7 +157,7 @@ static void msm5205_reset(struct MSM5205Voice *voice)
 	voice->signal  = 0;
 	voice->step    = 0;
 	/* timer and bitwidth set */
-	msm5205_playmode_w(voice->index,voice->intf->select);
+	msm5205_playmode(voice,voice->intf->select);
 }
 
 
@@ -180,7 +181,6 @@ static SND_START( msm5205 )
 	/* save a global pointer to our interface */
 	voice->intf = config;
 	voice->device = device;
-	voice->index = sndindex;
 	voice->clock = clock;
 
 	/* compute the difference tables */
@@ -259,6 +259,11 @@ void msm5205_data_w (int num, int data)
 void msm5205_playmode_w(int num,int select)
 {
 	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
+	msm5205_playmode(voice,select);
+}
+
+static void msm5205_playmode(struct MSM5205Voice *voice,int select)
+{
 	static const int prescaler_table[4] = {96,48,64,0};
 	int prescaler = prescaler_table[select & 3];
 	int bitwidth = (select & 4) ? 4 : 3;

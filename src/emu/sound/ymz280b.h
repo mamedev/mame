@@ -15,8 +15,8 @@ typedef struct _ymz280b_interface ymz280b_interface;
 struct _ymz280b_interface
 {
 	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
-	read8_space_func ext_read;			/* external RAM read */
-	write8_space_func ext_write;		/* external RAM write */
+	read8_device_func ext_read;			/* external RAM read */
+	write8_device_func ext_write;		/* external RAM write */
 };
 
 READ8_HANDLER ( ymz280b_status_0_r );

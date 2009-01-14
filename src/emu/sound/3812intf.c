@@ -372,7 +372,6 @@ struct y8950_info
 	void *			chip;
 	const y8950_interface *intf;
 	const device_config *device;
-	int				index;
 };
 
 static void IRQHandler_8950(void *param,int irq)
@@ -407,39 +406,31 @@ static void TimerHandler_8950(void *param,int c,attotime period)
 static unsigned char Y8950PortHandler_r(void *param)
 {
 	struct y8950_info *info = param;
-	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->portread)
-		return info->intf->portread(space,info->index);
+		return info->intf->portread(info->device,0);
 	return 0;
 }
 
 static void Y8950PortHandler_w(void *param,unsigned char data)
 {
 	struct y8950_info *info = param;
-	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->portwrite)
-		info->intf->portwrite(space,info->index,data);
+		info->intf->portwrite(info->device,0,data);
 }
 
 static unsigned char Y8950KeyboardHandler_r(void *param)
 {
 	struct y8950_info *info = param;
-	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->keyboardread)
-		return info->intf->keyboardread(space,info->index);
+		return info->intf->keyboardread(info->device,0);
 	return 0;
 }
 
 static void Y8950KeyboardHandler_w(void *param,unsigned char data)
 {
 	struct y8950_info *info = param;
-	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(info->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (info->intf->keyboardwrite)
-		info->intf->keyboardwrite(space,info->index,data);
+		info->intf->keyboardwrite(info->device,0,data);
 }
 
 static STREAM_UPDATE( y8950_stream_update )
@@ -466,7 +457,6 @@ static SND_START( y8950 )
 
 	info->intf = config ? config : &dummy;
 	info->device = device;
-	info->index = sndindex;
 
 	/* stream system initialize */
 	info->chip = y8950_init(device,clock,rate);

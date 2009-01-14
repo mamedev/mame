@@ -13,7 +13,7 @@ struct _cem3394_interface
 {
 	double vco_zero_freq;				/* frequency at 0V for VCO */
 	double filter_zero_freq;			/* frequency at 0V for filter */
-	void (*external)(int, int, short *);/* external input source */
+	void (*external)(const device_config *, int, short *);/* external input source */
 };
 
 /* inputs */

@@ -255,7 +255,6 @@ static SND_START( discrete )
 	memset(info, 0, sizeof(*info));
 
 	info->device = device;
-	info->sndindex = sndindex;
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
 	if (clock)
@@ -266,7 +265,7 @@ static SND_START( discrete )
 	info->neg_sample_time = - info->sample_time;
 
 	/* create the logfile */
-	sprintf(name, "discrete%d.log", info->sndindex);
+	sprintf(name, "discrete%s.log", device->tag);
 	if (DISCRETE_DEBUGLOG && !info->disclogfile)
 		info->disclogfile = fopen(name, "w");
 
@@ -714,7 +713,7 @@ static void setup_disc_logs(discrete_info *info)
 
 	for (log_num = 0; log_num < info->num_csvlogs; log_num++)
 	{
-		sprintf(name, "discrete%d_%d.csv", info->sndindex, log_num);
+		sprintf(name, "discrete%s_%d.csv", info->device->tag, log_num);
 		info->disc_csv_file[log_num] = fopen(name, "w");
 		/* Output some header info */
 		fprintf(info->disc_csv_file[log_num], "\"MAME Discrete System Node Log\"\n");
@@ -731,7 +730,7 @@ static void setup_disc_logs(discrete_info *info)
 
 	for (log_num = 0; log_num < info->num_wavelogs; log_num++)
 	{
-		sprintf(name, "discrete%d_%d.wav", info->sndindex, log_num);
+		sprintf(name, "discrete%s_%d.wav", info->device->tag, log_num);
 		info->disc_wav_file[log_num] = wav_open(name, info->sample_rate, info->wavelog_node[log_num]->active_inputs/2);
 	}
 }

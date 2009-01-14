@@ -138,7 +138,7 @@ int sndintrf_init_sound(running_machine *machine, int sndnum, const char *tag, s
 	/* start the chip, tagging all its streams */
 	current_sound_start = &sound[sndnum];
 	start = (snd_start_func)sndtype_get_info_fct(sndtype, SNDINFO_PTR_START);
-	info->device->token = (*start)(info->device, clock, config, info->index);
+	info->device->token = (*start)(info->device, clock, config);
 	current_sound_start = NULL;
 	VPRINTF(("  token = %p\n", info->device->token));
 

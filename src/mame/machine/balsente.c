@@ -83,6 +83,7 @@ static UINT8 m6850_sound_output;
 
 /* noise generator states */
 static UINT32 noise_position[6];
+static const device_config *cem_device[6];
 
 /* game-specific states */
 static UINT8 nstocker_bits;
@@ -182,6 +183,7 @@ MACHINE_RESET( balsente )
 
 	/* reset the noise generator */
 	memset(noise_position, 0, sizeof(noise_position));
+	memset(cem_device, 0, sizeof(cem_device));
 
 	/* point the banks to bank 0 */
 	numbanks = (memory_region_length(machine, "main") > 0x40000) ? 16 : 8;
@@ -279,11 +281,27 @@ static void poly17_init(void)
 }
 
 
-void balsente_noise_gen(int chip, int count, short *buffer)
+void balsente_noise_gen(const device_config *device, int count, short *buffer)
 {
+	int chip;
+	UINT32 step, noise_counter;
+	
+	/* find the chip we are referring to */
+	for (chip = 0; chip < ARRAY_LENGTH(cem_device); chip++)
+	{
+		if (device == cem_device[chip])
+			break;
+		else if (cem_device[chip] == NULL)
+		{
+			cem_device[chip] = device;
+			break;
+		}
+	}
+	assert(chip < ARRAY_LENGTH(cem_device));
+
 	/* noise generator runs at 100kHz */
-	UINT32 step = (100000 << 14) / CEM3394_SAMPLE_RATE;
-	UINT32 noise_counter = noise_position[chip];
+	step = (100000 << 14) / CEM3394_SAMPLE_RATE;
+	noise_counter = noise_position[chip];
 
 	while (count--)
 	{

@@ -107,8 +107,8 @@ typedef struct
 	UINT8 ext_read;
 
 	const UINT8 *rom;
-	read8_space_func ext_mem_read;
-	write8_space_func ext_mem_write;
+	read8_device_func ext_mem_read;
+	write8_device_func ext_mem_write;
 	void (*irq_callback)(running_machine *, int);
 
 	UINT32 clock;
@@ -1374,10 +1374,8 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 
 static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_read ) {
-		return chip->ext_mem_read(space,address);
+		return chip->ext_mem_read(chip->device,address);
 	} else {
 		if( address < 0x800000)
 			return chip->rom[address];
@@ -1387,10 +1385,8 @@ static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 
 static void ymf271_write_ext_memory(YMF271Chip *chip, UINT32 address, UINT8 data)
 {
-	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_write ) {
-		chip->ext_mem_write(space, address, data);
+		chip->ext_mem_write(chip->device, address, data);
 	}
 }
 
@@ -1727,7 +1723,7 @@ static void init_state(YMF271Chip *chip, const device_config *device)
 	state_save_register_device_item(device, 0, chip->ext_read);
 }
 
-static void ymf271_init(const device_config *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_space_func ext_read, write8_space_func ext_write)
+static void ymf271_init(const device_config *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_device_func ext_read, write8_device_func ext_write)
 {
 	chip->timA = timer_alloc(device->machine, ymf271_timer_a_tick, chip);
 	chip->timB = timer_alloc(device->machine, ymf271_timer_b_tick, chip);

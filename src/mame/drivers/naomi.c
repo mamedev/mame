@@ -806,6 +806,7 @@ static void aica_irq(running_machine *machine, int irq)
 
 static const aica_interface aica_config =
 {
+	TRUE,
 	0,
 	aica_irq
 };

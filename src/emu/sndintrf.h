@@ -46,7 +46,7 @@ enum
 		SNDINFO_PTR_RESET = DEVINFO_FCT_RESET,				/* R/O: void (*reset)(const device_config *device) */
 
 		SNDINFO_PTR_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, sndinfo *info) */
-		SNDINFO_PTR_START,									/* R/O: void *(*start)(const device_config *device, int clock, const void *config, int sndindex) */
+		SNDINFO_PTR_START,									/* R/O: void *(*start)(const device_config *device, int clock, const void *config) */
 		SNDINFO_FCT_ALIAS,									/* R/O: alias to sound type for (type,index) identification */
 
 	SNDINFO_FCT_CORE_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC, /* R/W: core-specific values start here */
@@ -78,8 +78,8 @@ enum
 #define SND_SET_INFO_CALL(name)		SND_SET_INFO_NAME(name)(device, state, info)
 
 #define SND_START_NAME(name)		snd_start_##name
-#define SND_START(name)				void *SND_START_NAME(name)(const device_config *device, int clock, const void *config, int sndindex)
-#define SND_START_CALL(name)		SND_START_NAME(name)(device, clock, config, sndindex)
+#define SND_START(name)				void *SND_START_NAME(name)(const device_config *device, int clock, const void *config)
+#define SND_START_CALL(name)		SND_START_NAME(name)(device, clock, config)
 
 #define SND_STOP_NAME(name)			snd_stop_##name
 #define SND_STOP(name)				void SND_STOP_NAME(name)(const device_config *device)
@@ -101,7 +101,7 @@ typedef union _sndinfo sndinfo;
 /* define the various callback functions */
 typedef void (*snd_get_info_func)(const device_config *device, UINT32 state, sndinfo *info);
 typedef void (*snd_set_info_func)(const device_config *device, UINT32 state, sndinfo *info);
-typedef void *(*snd_start_func)(const device_config *device, int clock, const void *config, int sndindex);
+typedef void *(*snd_start_func)(const device_config *device, int clock, const void *config);
 typedef void (*snd_stop_func)(const device_config *device);
 typedef void (*snd_reset_func)(const device_config *device);
 

@@ -3186,7 +3186,7 @@
  *  Use this to monitor nodes while debugging the driver.  You should
  *  remove these nodes from the final driver.  You can use up to a maximum
  *  DISCRETE_MAX_CSVLOGS.  Each file will be called discreteX_Y.csv,
- *  where X is the sndindex.  Y is 0-9, in the order the file is
+ *  where X is the sound tag.  Y is 0-9, in the order the file is
  *  created in the driver.
  *
  *  This can be used to monitor how multiple nodes relate to each other.
@@ -3209,7 +3209,7 @@
  *  Use this to monitor nodes while debugging the driver.  You should
  *  remove these nodes from the final driver.  You can use up to a maximum
  *  of DISCRETE_MAX_WAVELOGS.  Each file will be called discreteX_Y.wav,
- *  where X is the sndindex.  Y is 0-9, in the order the file is
+ *  where X is the sound tag.  Y is 0-9, in the order the file is
  *  created in the driver.
  *
  *  This can be used to monitor how a node's input affects it's output.
@@ -3586,7 +3586,6 @@ struct _discrete_info
 	const device_config *device;
 
 	/* emulation info */
-	int		sndindex;
 	int		sample_rate;
 	double	sample_time;
 	double	neg_sample_time;

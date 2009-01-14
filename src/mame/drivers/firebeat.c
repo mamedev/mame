@@ -1804,7 +1804,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static READ8_HANDLER( soundram_r )
+static READ8_DEVICE_HANDLER( soundram_r )
 {
 	if (offset >= 0 && offset < 0x200000)
 	{
@@ -1817,7 +1817,7 @@ static READ8_HANDLER( soundram_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( soundram_w )
+static WRITE8_DEVICE_HANDLER( soundram_w )
 {
 }
 

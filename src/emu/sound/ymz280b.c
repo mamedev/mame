@@ -91,8 +91,8 @@ struct YMZ280BChip
 	void (*irq_callback)(running_machine *, int);		/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
-	read8_space_func ext_ram_read;		/* external RAM read handler */
-	write8_space_func ext_ram_write;	/* external RAM write handler */
+	read8_device_func ext_ram_read;		/* external RAM read handler */
+	write8_device_func ext_ram_write;	/* external RAM write handler */
 
 #if MAKE_WAVS
 	void *		wavresample;			/* resampled waveform */
@@ -868,9 +868,7 @@ static void write_to_register(struct YMZ280BChip *chip, int data)
 			case 0x87:		/* RAM write */
 				if (chip->ext_ram_write)
 				{
-					/* temporary hack until this is converted to a device */
-					const address_space *space = memory_find_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-					chip->ext_ram_write(space, chip->rom_readback_addr, data);
+					chip->ext_ram_write(chip->device, chip->rom_readback_addr, data);
 				}
 				else
 					logerror("YMZ280B attempted RAM write to %X\n", chip->rom_readback_addr);
@@ -1081,7 +1079,7 @@ READ8_HANDLER( ymz280b_data_0_r )
 {
 	UINT8 data;
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	data = chip->ext_ram_read(space, chip->rom_readback_addr - 1);
+	data = chip->ext_ram_read(chip->device, chip->rom_readback_addr - 1);
 	chip->rom_readback_addr++;
 	return data;
 }
@@ -1090,7 +1088,7 @@ READ8_HANDLER( ymz280b_data_1_r )
 {
 	UINT8 data;
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	data = chip->ext_ram_read(space, chip->rom_readback_addr - 1);
+	data = chip->ext_ram_read(chip->device, chip->rom_readback_addr - 1);
 	chip->rom_readback_addr++;
 	return data;
 }

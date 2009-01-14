@@ -29,7 +29,7 @@ extern UINT16 *shrike_io;
 
 MACHINE_RESET( balsente );
 
-void balsente_noise_gen(int chip, int count, short *buffer);
+void balsente_noise_gen(const device_config *device, int count, short *buffer);
 
 WRITE8_HANDLER( balsente_random_reset_w );
 READ8_HANDLER( balsente_random_num_r );

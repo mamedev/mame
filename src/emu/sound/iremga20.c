@@ -248,7 +248,7 @@ static SND_START( iremga20 )
 
 	chip->stream = stream_create( device, 0, 2, clock/4, chip, IremGA20_update );
 
-	state_save_register_device_item_array(device, sndindex, chip->regs);
+	state_save_register_device_item_array(device, 0, chip->regs);
 	for (i = 0; i < 4; i++)
 	{
 		state_save_register_device_item(device, i, chip->channel[i].rate);
