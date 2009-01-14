@@ -3401,6 +3401,7 @@ ROM_END
 
 ROM_START( smleague ) /* only runs with the USA bios */
 	STV_BIOS
+	ROM_DEFAULT_BIOS( "us" )
 
 	ROM_REGION32_BE( 0x3000000, "user1", 0 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr18777.13",               0x0000001, 0x0080000, CRC(8d180866) SHA1(d47ebabab6e06400312d39f68cd818852e496b96) )
