@@ -2744,6 +2744,31 @@ static const gfx_layout tiles128x128x4_layout =
 	layout_yoffset
 };
 
+
+static const UINT32 layout_xoffset256[256] =
+{
+	STEP32(0*128,4),STEP32(1*128,4),STEP32(2*128,4),STEP32(3*128,4), STEP32(4*128,4), STEP32(5*128,4), STEP32(6*128,4), STEP32(7*128,4)
+};
+
+static const UINT32 layout_yoffset256[256] =
+{
+	STEP32(0*32768, 1024),STEP32(1*32768,1024),STEP32(2*32768,1024),STEP32(3*32768,1024),STEP32(4*32768,1024), STEP32(5*32768,1024),STEP32(6*32768,1024),STEP32(7*32768,1024)
+};
+
+
+static const gfx_layout tiles256x128x4_layout =
+{
+	256,256,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	8 * 32768, /* object takes 8 consecutive bytes */
+	layout_xoffset256,
+	layout_yoffset256
+};
+
 #if 0 // decodes an extra plane for cmv4 / cmasterb, not sure if we need to
 static const gfx_layout tiles8x32x5_layout =
 {
@@ -2800,7 +2825,7 @@ GFXDECODE_END
 static GFXDECODE_START( cmast91 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128+64, 4 ) // or is there a register for the +64?
-	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout, 128, 4 ) // wrong... FIXME.
+	GFXDECODE_ENTRY( "user1", 0, tiles256x128x4_layout, 128, 4 ) // wrong... FIXME.
 GFXDECODE_END
 
 #if 0 // decodes an extra plane for cmv4 / cmasterb, not sure if we need to
@@ -4351,25 +4376,28 @@ ROM_START( kkojnoli )
 	ROM_LOAD( "9006.u17",	0x08000, 0x8000, CRC(13a3258b) SHA1(605555ae48012ca4b1829d1c835b33ddeec17da6) )
 	ROM_LOAD( "9006.u16",	0x10000, 0x8000, CRC(84d09be4) SHA1(09a9e491a9a5fc7882c88d46ae2a6e7e99d082f4) )
 
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "9006.u22",	0x0000, 0x2000, BAD_DUMP CRC(4e93130d) SHA1(faaaf51844da8d3bdb908fb8ce0f2442e26b5f62) )
-	ROM_LOAD( "9006.u20",	0x2000, 0x2000, BAD_DUMP CRC(717fe736) SHA1(04e578c1992bbdb312bb6bc12137bd96522a50e6) )
-	ROM_LOAD( "9006.u21",	0x4000, 0x2000, BAD_DUMP CRC(f5314f3f) SHA1(0423dc545fce0322377f1934894a999427709b33) )
-	ROM_LOAD( "9006.u19",	0x6000, 0x2000, BAD_DUMP CRC(c321d50b) SHA1(8c132d8fcc812bcec5966c8a3960dfbe5d9f8c36) )
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE ) /* redumped */
+	ROM_LOAD( "9006.u22",	0x0000, 0x2000, CRC(4e93130d) SHA1(faaaf51844da8d3bdb908fb8ce0f2442e26b5f62) )
+	ROM_LOAD( "9006.u20",	0x2000, 0x2000, CRC(717fe736) SHA1(04e578c1992bbdb312bb6bc12137bd96522a50e6) )
+	ROM_LOAD( "9006.u21",	0x4000, 0x2000, CRC(f5314f3f) SHA1(0423dc545fce0322377f1934894a999427709b33) )
+	ROM_LOAD( "9006.u19",	0x6000, 0x2000, CRC(c321d50b) SHA1(8c132d8fcc812bcec5966c8a3960dfbe5d9f8c36) )
 
-	/* proms are from lucky8a */
+	/* proper proms recent dumped */
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "prom3", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
-	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+	ROM_LOAD( "9006.u24", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "9006.u23", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
 
+	/* this one seems bitrotten (bits 3 and 7), except for this issue,
+	   the prom have concordance with prom1 from lucky8 */
 	ROM_REGION( 0x40, "proms2", 0 )
-	ROM_LOAD( "prom1", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+	ROM_LOAD( "prom1", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+//	ROM_LOAD( "9006.u57", 0x0000, 0x0020, CRC(8a37416a) SHA1(696b46db2ff2bb9ef471ff925977e8a186b17de8) )
 
 	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "prom5", 0x0000, 0x0100, BAD_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+	ROM_LOAD( "9006.u41", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "prom2", 0x0000, 0x0020, BAD_DUMP CRC(7b1a769f) SHA1(788b3573df17d398c74662fec4fd7693fc27e2ef) )
+	ROM_LOAD( "9006.u58", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -4379,7 +4407,7 @@ Magical Tonic
 unknown, 40 pin cpu (plastic box, with "Tonic" sticker on it)
 8255 x3
 YM2203
-12 MHz 
+12 MHz
 
 4x DSW
 
