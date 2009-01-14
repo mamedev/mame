@@ -1278,6 +1278,7 @@ static STATE_POSTLOAD( video_screen_postload )
 {
 	const device_config *screen = param;
 	realloc_screen_bitmaps(screen);
+	global.movie_next_frame_time = timer_get_time(machine);
 }
 
 
