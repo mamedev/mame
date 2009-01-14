@@ -685,6 +685,32 @@ ROM_START( starspnr )
 	ROM_LOAD( "16-1-101.b11", 0x0200, 0x0100, NO_DUMP )
 ROM_END
 
+/* no information about this one */
+ROM_START( acefruit  )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "vp-h9.bin",    0x00e000, 0x0800, CRC(f595daf7) SHA1(be5abd34fd06f73cd80f5b15902d158e33705c8f) )
+	ROM_CONTINUE(             0x000000, 0x0800 )
+	ROM_LOAD( "vp-h10.bin",   0x00e800, 0x0800, CRC(b0539100) SHA1(763f31f72f55c3322b24e127b37130d37daa5216) )
+	ROM_CONTINUE(             0x000800, 0x0800 )
+	ROM_LOAD( "vp-h11.bin",   0x00f000, 0x0800, CRC(fa176072) SHA1(18203278bb9c505f07390f7b95ecf9ab6d7b7122) )
+	ROM_CONTINUE(             0x001000, 0x0800 )
+
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* 8k for graphics */
+	ROM_LOAD( "vp-h5.bin",         0x000000, 0x000800, CRC(dfffe063) SHA1(1b860323fe93b7d010fa35167769555a6bd4a49c) )
+	ROM_LOAD( "vp-h6.bin",         0x000800, 0x000800, CRC(355203b8) SHA1(959f3599a24293f392e8b10061c39d3244f34c05) )
+	ROM_LOAD( "vp-h7.bin",         0x001000, 0x000800, CRC(7784de8a) SHA1(40851724c9b7ef26964462b5e97ad943df4d56e2) )
+	ROM_LOAD( "vp-h8.bin",         0x001800, 0x000800, CRC(d587e541) SHA1(902b6c4673b8b989d034d60d3c47f2499f100ba2) )
+
+	/* there were no proms in the set */
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "16-1-101.b9",  0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "16-1-101.b10", 0x0100, 0x0100, NO_DUMP )
+	ROM_LOAD( "16-1-101.b11", 0x0200, 0x0100, NO_DUMP )
+ROM_END
+
+
 GAMEL( 1981?, sidewndr, 0,        acefruit, sidewndr, sidewndr, ROT270, "ACE", "Sidewinder", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
 GAMEL( 1981?, spellbnd, sidewndr, acefruit, spellbnd, 0,        ROT270, "ACE", "Spellbound", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND, layout_sidewndr )
 GAME ( 1982?, starspnr, 0,        acefruit, starspnr, 0,        ROT270, "ACE", "Starspinner (Dutch/Nederlands)", GAME_NOT_WORKING | GAME_NO_SOUND )
+// inputs need fixing on this one, no idea what it's called either
+GAME ( 1982?, acefruit, 0,        acefruit, spellbnd, 0,        ROT270, "ACE", "Unknown ACE Fruits Game", GAME_NOT_WORKING | GAME_NO_SOUND )
