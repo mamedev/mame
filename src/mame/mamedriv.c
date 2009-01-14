@@ -1858,6 +1858,7 @@ const game_driver * const drivers[] =
 	DRIVER( ashura )	/* C43 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( ashurau )	/* C43 (c) 1990 Taito America Corporation (US) */
 	DRIVER( hitice )	/* C59 (c) 1990 Williams (US) */
+	DRIVER( hiticej )	/* C59 (c) 1990 Midway/Taito Corporation (Japan) */
 	DRIVER( sbm )		/* C69 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( selfeena )	/* ??? (c) 1991 East Technology */
 	DRIVER( silentd )	/* ??? (c) 1992 Taito Corporation Japan (World) */
