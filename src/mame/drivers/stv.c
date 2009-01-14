@@ -2947,6 +2947,7 @@ ROM_END
 
 ROM_START( diehard ) /* must use USA, Europe or Taiwan BIOS */
 	STV_BIOS
+	ROM_DEFAULT_BIOS( "us" )
 
 	ROM_REGION32_BE( 0x3000000, "user1", 0 ) /* SH2 code */
 
@@ -3622,6 +3623,7 @@ On the other side of the PCB are 2 more maskROMs, MPR-18788 @ IC9 and MPR-18789 
 
 ROM_START( critcrsh ) /* Must use Europe or Asia BIOS */
 	STV_BIOS
+	ROM_DEFAULT_BIOS( "euro" )
 
 	ROM_REGION32_BE( 0x3000000, "user1", 0 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "epr-18821.ic13",  0x0000001, 0x0080000, CRC(9a6658e2) SHA1(16dbae3d9ab584713afcb403f89fe71049609245) )
