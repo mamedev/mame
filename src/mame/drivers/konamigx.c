@@ -1866,13 +1866,44 @@ ROM_START( fantjour )
 	ROM_LOAD( "321b18.7g", 0x200000, 2*1024*1024, CRC(2c561ad0) SHA1(6265054072ba1c2837dd96e0259b20bc50457160) )
 ROM_END
 
-/* Salamander 2 */
+/* Salamander 2 (ver JAA) */
 ROM_START( salmndr2 )
 	/* main program */
 	ROM_REGION( 0x800000, "main", 0 )
 	GX_BIOS
 	ROM_LOAD32_WORD_SWAP( "521jaa02.31b", 0x200002, 512*1024, CRC(f6c3a95b) SHA1(c4ef3631eca898e5787fb2d356355da7e5d475eb) )
 	ROM_LOAD32_WORD_SWAP( "521jaa03.27b", 0x200000, 512*1024, CRC(c3be5e0a) SHA1(13bbce62c4d04a657de4594cc4d258e2468a59a4) )
+
+	/* sound program */
+	ROM_REGION( 0x40000, "sound", 0 )
+	ROM_LOAD16_BYTE("521-a04.9c", 0x000000, 64*1024, CRC(efddca7a) SHA1(ac6b45044b6abeb2455ec21a61322185bf1c7219) )
+	ROM_LOAD16_BYTE("521-a05.7c", 0x000001, 64*1024, CRC(51a3af2c) SHA1(94d220ae619d53747bd3e762000ed59cf1b4d305) )
+
+	/* tiles */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
+	TILE_WORDS2_ROM_LOAD("521-a09.17h", 0x000000, 2*1024*1024, CRC(fb9e2f5e) SHA1(acb41616625d6976ad50e184787ab74e29f86039) )
+	TILE_WORDS2_ROM_LOAD("521-a11.15h", 0x300000, 1*1024*1024, CRC(25e0a6e5) SHA1(592e9f183f077e9272a4f0ead441b5bfd8029816) )
+	TILE_BYTES2_ROM_LOAD("521-a13.13c", 0x000004, 2*1024*1024, CRC(3ed7441b) SHA1(57e3e8035c056cf46a383d228c76a7da7def134f) )
+
+	/* sprites */
+	ROM_REGION( 0x600000, "gfx2", ROMREGION_ERASE00 )
+	_48_WORD_ROM_LOAD( "521-a08.25g", 0x000000, 2*1024*1024, CRC(f24f76bd) SHA1(823f614d436901241743c923206cb61d8bbb5c58) )
+	_48_WORD_ROM_LOAD( "521-a07.28g", 0x000002, 2*1024*1024, CRC(50ef9b7a) SHA1(104eac2bce43e99d4adc208145afe7be9156628e) )
+	_48_WORD_ROM_LOAD( "521-a06.30g", 0x000004, 2*1024*1024, CRC(cba5db2c) SHA1(505efdf8571ae28d8788dcafbfffcfb67e3189ce) )
+
+	/* sound data */
+	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_LOAD( "521-a12.9g", 0x000000, 2*1024*1024, CRC(66614d3b) SHA1(e1e5ebe546bced6ab74b0af500acf0f3308902a4) )
+	ROM_LOAD( "521-a13.7g", 0x200000, 1*1024*1024, CRC(c3322475) SHA1(1774524ff031e0c4a7f3432810e968d37f9c6331) )
+ROM_END
+
+/* Salamander 2 (ver AAB) */
+ROM_START( salmnd2a )
+	/* main program */
+	ROM_REGION( 0x800000, "main", 0 )
+	GX_BIOS
+	ROM_LOAD32_WORD_SWAP( "521aab02.bin", 0x200002, 512*1024, CRC(ac9d151f) SHA1(aabd17a41a42cbbe9b62a9751cdb264e714cac6a) )
+	ROM_LOAD32_WORD_SWAP( "521aab03.bin", 0x200000, 512*1024, CRC(feecf34d) SHA1(c37959199afedd3deee9d4c248ec83ccccf9a401) )
 
 	/* sound program */
 	ROM_REGION( 0x40000, "sound", 0 )
@@ -3310,6 +3341,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "daiskiss",  7, 0, 5, BPP5 },
 	{ "tokkae",    7, 0, 0, BPP5 },
 	{ "salmndr2",  7, 0, 6, BPP66 },
+	{ "salmnd2a",  7, 0, 6, BPP66 },
 	{ "winspike",  8, 2, 7, BPP4 },
 	{ "winspikj",  8, 2, 7, BPP4 },
 	{ "soccerss",  7, 0, 0, BPP4 },
@@ -3458,6 +3490,7 @@ GAME( 1996, daiskiss, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "D
 GAME( 1996, tokkae,   konamigx, konamigx_6bpp, puzldama, konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 /* protection controls player ship direction in attract mode - doesn't impact playability */
 GAME( 1996, salmndr2, konamigx, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
+GAME( 1996, salmnd2a, salmndr2, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", GAME_IMPERFECT_GRAPHICS|GAME_UNEMULATED_PROTECTION )
 /* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
 GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, winspikj, winspike, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )

@@ -296,7 +296,7 @@ VIDEO_START(konamigx_6bpp_2)
 {
 	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
 
-	if (!strcmp(machine->gamedrv->name,"salmndr2"))
+	if (!strcmp(machine->gamedrv->name,"salmndr2") || !strcmp(machine->gamedrv->name,"salmnd2a"))
 	{
 		K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
 
