@@ -1594,8 +1594,7 @@ VIDEO_UPDATE( nslasher )
 	nslasher_draw_sprites(screen->machine,sprite1_mix_bitmap,cliprect,buffered_spriteram32_2,4);
 
 	/* Render alpha-blended tilemap to seperate buffer for proper mixing */
-	if (alphaTilemap)
-		bitmap_fill(tilemap_alpha_bitmap,cliprect,0);
+	bitmap_fill(tilemap_alpha_bitmap,cliprect,0);
 
 	/* Draw playfields & sprites */
 	if (deco32_pri&2)
