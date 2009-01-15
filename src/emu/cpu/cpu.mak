@@ -744,12 +744,12 @@ CPUDEFS += -DHAS_I860=$(if $(filter I860,$(CPUS)),1,0)
 ifneq ($(filter I860,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i860
 CPUOBJS += $(CPUOBJ)/i860/i860.o
-DBGOBJS += $(CPUOBJ)/i860/i860dasm.o
+DBGOBJS += $(CPUOBJ)/i860/i860dis.o
 endif
 
-$(CPUOBJ)/i860/i860.o:	$(CPUSRC)/i860/i860.c \
-						$(CPUSRC)/i860/i860.h
-
+$(CPUOBJ)/i860/i860.o:  $(CPUSRC)/i860/i860.c \
+                                               $(CPUSRC)/i860/i860.h \
+                                               $(CPUSRC)/i860/i860dec.c
 
 #-------------------------------------------------
 # Intel i960
