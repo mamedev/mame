@@ -1942,7 +1942,7 @@ static void snes_dbg_draw_all_tiles(bitmap_t *bitmap, UINT32 tileaddr, UINT8 bpl
 		for( kk = 0; kk < 8; kk++ )
 		{
 			UINT32 *destline = BITMAP_ADDR32(bitmap, jj * 8 + kk, 0);
-			
+
 			/* Clear buffers */
 			memset( scanlines[MAINSCREEN].buffer, 0, SNES_SCR_WIDTH * 2 );
 			memset( scanlines[MAINSCREEN].zbuf, 0, SNES_SCR_WIDTH * 2 );

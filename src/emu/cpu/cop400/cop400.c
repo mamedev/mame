@@ -9,35 +9,35 @@
 
 ****************************************************************************
 
-	Type		ROM		RAM		G		D		IN
+    Type        ROM     RAM     G       D       IN
 
-	COP410		512x8	32x4					none
-	COP411		512x8	32x4	0-2		0-1		none
-	COP401		none	32x4					none
-	COP413?
-	COP414?		
-	COP415?		
-	COP405?		
+    COP410      512x8   32x4                    none
+    COP411      512x8   32x4    0-2     0-1     none
+    COP401      none    32x4                    none
+    COP413?
+    COP414?
+    COP415?
+    COP405?
 
-	COP420		1024x8	64x4					
-	COP421		1024x8	64x4					none
-	COP422		1024x8	64x4	2-3		2-3		none
-	COP402		none	64x4
+    COP420      1024x8  64x4
+    COP421      1024x8  64x4                    none
+    COP422      1024x8  64x4    2-3     2-3     none
+    COP402      none    64x4
 
-	COP444		2048x8	128x4
-	COP445		2048x8	128x4					none
-	COP424		1024x8	64x4
-	COP425		1024x8	64x4					none
-	COP426		1024x8	64x4	2-3		2-3
-	COP404		none	none
+    COP444      2048x8  128x4
+    COP445      2048x8  128x4                   none
+    COP424      1024x8  64x4
+    COP425      1024x8  64x4                    none
+    COP426      1024x8  64x4    2-3     2-3
+    COP404      none    none
 
-	COP440		2048x8	160x4	
-	COP441		2048x8	160x4	
-	COP442		2048x8	160x4	
+    COP440      2048x8  160x4
+    COP441      2048x8  160x4
+    COP442      2048x8  160x4
 
 ****************************************************************************
 
-	Prefix      Temperature Range
+    Prefix      Temperature Range
 
     COP4xx      0C ... 70C
     COP3xx      -40C ... +85C
@@ -47,21 +47,21 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- remove LBIOps
-	- remove InstLen
+    - remove LBIOps
+    - remove InstLen
     - run interrupt test suite
     - run production test suite
     - run microbus test suite
     - when is the microbus int cleared?
-	- opcode support for 2048x8 and 128x4/160x4 memory sizes
+    - opcode support for 2048x8 and 128x4/160x4 memory sizes
     - CKO sync input
     - save internal RAM when CKO is RAM power supply pin
     - COP413/COP414/COP415/COP405
-	- COP404 opcode map switching, dual timer, microbus enable
+    - COP404 opcode map switching, dual timer, microbus enable
     - COP440/COP441/COP442 (new registers: 2-bit N, 4-bit H, 8-bit R; some new opcodes, 2Kx8 ROM, 160x4 RAM)
-	
+
 */
 
 #include "driver.h"
@@ -952,7 +952,7 @@ static void cop410_init_opcodes(const device_config *device)
 
 	for (i=0; i<256; i++) cpustate->InstLen[i]=1;
 
-	cpustate->InstLen[0x60] = cpustate->InstLen[0x61] = cpustate->InstLen[0x68] = 
+	cpustate->InstLen[0x60] = cpustate->InstLen[0x61] = cpustate->InstLen[0x68] =
 	cpustate->InstLen[0x69] = cpustate->InstLen[0x33] = cpustate->InstLen[0x23] = 2;
 
 	/* initialize LBI opcode array */

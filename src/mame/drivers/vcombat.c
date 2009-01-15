@@ -1,8 +1,8 @@
 /*
 Virtual Combat hardware games.
- 
-Driver by Jason Eckhardt and Andrew Gardner. 
- 
+
+Driver by Jason Eckhardt and Andrew Gardner.
+
 ----
 
 There are two known games on this hardware.  Both are developed by
@@ -28,7 +28,7 @@ UPPER: (Virtual Combat has an identical MIDDLE board also).
     8-way DIP switch
     574200D x4
     PAL palce24v10 x2 (next to the i860)
-	Bt476 RAMDAC
+    Bt476 RAMDAC
 
 LOWER:
     Motorola MC68000P12 x2
@@ -59,45 +59,45 @@ NOTES : Shadow Fighters appears to have been dumped from an earlier
         The PAL that's dumped for Shadow Fighters looks pretty bad.
 
 TODO :  This is a partially working driver.  Most of the memory maps for
-			all four CPUs are complete.  An Intel i860XR CPU core has now
-			been incorporated into MAME. 
+            all four CPUs are complete.  An Intel i860XR CPU core has now
+            been incorporated into MAME.
 
-	--------                Notes/questions                  ----------
-	 - Most of the memory maps and input ports are complete now.
-	   For "main", the only I/O locations that seem to be left
-	   mysterious are:
-	     0x600010,
-	     0x60000C: Only written; maybe mc6845? Often accessed
-		       together, and 16 consecutive words of data are
-		       written to 0x60000C, making me think it might be 
-		       6845-related.  May or may not be important for
-		       reasonable emulation.
-	     0x60001C: Only read; might be a latch of some sort.  It is
-		       read each time M0's interrupt service routine syncs
-		       with the i860's to have them update the frame buffer.
-		       Might this be a HW blank bit so things look clean when
-		       the i860's do their updates?
-		       The two other times I see it read are just before
-		       and after one of the pallette setups is done.
-	     0x600018: ? No info yet.
-	     0x704000: (VC only) Likely analog axis for VR headset
-	     0x703000: (VC only) Likely analog axis for VR headset
-	     0x702000: (Shadow only). I think this is another IN port. It
-		       is always read at the same time as the other two
-		       ports.
+    --------                Notes/questions                  ----------
+     - Most of the memory maps and input ports are complete now.
+       For "main", the only I/O locations that seem to be left
+       mysterious are:
+         0x600010,
+         0x60000C: Only written; maybe mc6845? Often accessed
+               together, and 16 consecutive words of data are
+               written to 0x60000C, making me think it might be
+               6845-related.  May or may not be important for
+               reasonable emulation.
+         0x60001C: Only read; might be a latch of some sort.  It is
+               read each time M0's interrupt service routine syncs
+               with the i860's to have them update the frame buffer.
+               Might this be a HW blank bit so things look clean when
+               the i860's do their updates?
+               The two other times I see it read are just before
+               and after one of the pallette setups is done.
+         0x600018: ? No info yet.
+         0x704000: (VC only) Likely analog axis for VR headset
+         0x703000: (VC only) Likely analog axis for VR headset
+         0x702000: (Shadow only). I think this is another IN port. It
+               is always read at the same time as the other two
+               ports.
 
-	  - Assuming a single framebuffer, as I think we are at the moment,
-	    how are all the CPUs writes to the framebuffer prioritized,
-	    if at all?  The zero values written by the 68k side erase
-	    the i860-generated FB data (i.e., zero maps to black in the
-	    pallette).  On the other hand, treating the zero values as 
+      - Assuming a single framebuffer, as I think we are at the moment,
+        how are all the CPUs writes to the framebuffer prioritized,
+        if at all?  The zero values written by the 68k side erase
+        the i860-generated FB data (i.e., zero maps to black in the
+        pallette).  On the other hand, treating the zero values as
         transparent doesn't quite look right either.  Could just the
         i860s each have their own framebuffers?  After
-	    all, since each eye of the binocular sees a slightly different
-	    picture, the i860's might just maintain their own.  Then maybe
-	    the 68k shares with each of the two, since I think it just
-	    generates a single picture (not sure about that either).
-	----------------------------------------------
+        all, since each eye of the binocular sees a slightly different
+        picture, the i860's might just maintain their own.  Then maybe
+        the 68k shares with each of the two, since I think it just
+        generates a single picture (not sure about that either).
+    ----------------------------------------------
 */
 
 #include <stdio.h>
@@ -134,7 +134,7 @@ static VIDEO_UPDATE( vcombat )
 			else	   color =  framebuffer_main[count] & 0x00ff;
 
 			/* Vcombat's screen renders 'flopped' - very likely because VR headset displays may reflect off mirrors.
-			   Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
+               Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
 			if(x < video_screen_get_visible_area(screen)->max_x && y < video_screen_get_visible_area(screen)->max_y)
 				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
 
@@ -157,7 +157,7 @@ static VIDEO_UPDATE( vcombat )
 			else	   color =  framebuffer_secondary[count] & 0x00ff;
 
 			/* Vcombat's screen renders 'flopped' - very likely because VR headset displays may reflect off mirrors.
-			   Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
+               Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
 			if(x < video_screen_get_visible_area(screen)->max_x && y < video_screen_get_visible_area(screen)->max_y)
 				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
 
@@ -244,21 +244,21 @@ static READ16_HANDLER( sound_resetmain_r )
 static WRITE64_HANDLER( v0_fb_w )
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
-	   i860 uses a 64-bit data bus.  Adjust accordingly.  */
+       i860 uses a 64-bit data bus.  Adjust accordingly.  */
 	char *p = (char *)framebuffer_main;
 	int m = mem_mask;
 	int o = (offset << 2);
 	if (m & 0xff000000) {
-		p[o+3] = (data >> 24) & 0xff; 
+		p[o+3] = (data >> 24) & 0xff;
 	}
 	if (m & 0x00ff0000) {
-		p[o+2] = (data >> 16) & 0xff; 
+		p[o+2] = (data >> 16) & 0xff;
 	}
 	if (m & 0x0000ff00) {
-		p[o+1] = (data >> 8) & 0xff; 
+		p[o+1] = (data >> 8) & 0xff;
 	}
 	if (m & 0x000000ff) {
-		p[o+0] = (data >> 0) & 0xff; 
+		p[o+0] = (data >> 0) & 0xff;
 	}
 }
 
@@ -267,21 +267,21 @@ static WRITE64_HANDLER( v0_fb_w )
 static WRITE64_HANDLER( v1_fb_w )
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
-	   i860 uses a 64-bit data bus.  Adjust accordingly.  */
+       i860 uses a 64-bit data bus.  Adjust accordingly.  */
 	char *p = (char *)framebuffer_secondary;
 	int m = mem_mask;
 	int o = (offset << 2);
 	if (m & 0xff000000) {
-		p[o+3] = (data >> 24) & 0xff; 
+		p[o+3] = (data >> 24) & 0xff;
 	}
 	if (m & 0x00ff0000) {
-		p[o+2] = (data >> 16) & 0xff; 
+		p[o+2] = (data >> 16) & 0xff;
 	}
 	if (m & 0x0000ff00) {
-		p[o+1] = (data >> 8) & 0xff; 
+		p[o+1] = (data >> 8) & 0xff;
 	}
 	if (m & 0x000000ff) {
-		p[o+0] = (data >> 0) & 0xff; 
+		p[o+0] = (data >> 0) & 0xff;
 	}
 }
 
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x2fffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(main_video_write)
-	
+
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&vid_0_shared_RAM) AM_SHARE(2)	/* First i860 shared RAM */
 	AM_RANGE(0x440000, 0x440003) AM_RAM AM_SHARE(6)		/* M0->P0 i860 #1 com 1 */
 	AM_RANGE(0x480000, 0x480003) AM_RAM AM_SHARE(7)		/* M0<-P0 i860 #1 com 2 */
@@ -304,8 +304,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600001) AM_READ(control_1_r)	/* IN0 port */
 	AM_RANGE(0x600004, 0x600005) AM_RAM AM_SHARE(5)		/* M0<-M1 */
 	AM_RANGE(0x600008, 0x600009) AM_READ(control_2_r)	/* IN1 port */
-	/* AM_RANGE(0x60000c, 0x60000d) 					   See notes at top of driver.  */
-	/* AM_RANGE(0x600010, 0x600011) 					   See notes at top of driver.  */
+	/* AM_RANGE(0x60000c, 0x60000d)                        See notes at top of driver.  */
+	/* AM_RANGE(0x600010, 0x600011)                        See notes at top of driver.  */
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM					/* TODO: Non-volatile RAM */
 	AM_RANGE(0x701000, 0x701001) AM_READ(main_irqiack_r)
 	AM_RANGE(0x705000, 0x705001) AM_RAM AM_SHARE(4)		/* M1->M0 */
@@ -319,7 +319,7 @@ ADDRESS_MAP_END
 
 /* The first i860 - middle board */
 static ADDRESS_MAP_START( vid_0_map, ADDRESS_SPACE_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v0_fb_w)		/* Shared framebuffer - half of the bits lost to 32-bit bus */ 
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM_WRITE(v0_fb_w)		/* Shared framebuffer - half of the bits lost to 32-bit bus */
 	AM_RANGE(0x20000000, 0x20000007) AM_RAM AM_SHARE(6) 		/* M0<-P0 com 1 (0x440000 in 68k-land) */
 	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("gfx", 0)
 	AM_RANGE(0x80000000, 0x80000007) AM_RAM AM_SHARE(7) 		/* M0->P0 com 2 (0x480000 in 68k-land) */
@@ -401,18 +401,18 @@ static DRIVER_INIT( vcombat )
 	framebuffer_secondary = auto_malloc(0x10000 * sizeof(UINT16));
 
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
-	   I think what is happening here is that M0 snags the first time
-	   it hits this point based on a counter test just above this
-	   instruction.  That counter gets updated just past this instruction.
-	   However, the only way this can be passed is if the M0 CPU is
-	   reset (the IPL=7, but irq 7 is a nop).  I am almost sure that M1
-	   reads a latch, which resets M0 (probably to ensure M0 and M1 are
-	   both alive) and gets passed this snag.  I tried to hook up a reset
-	   which should work, but asserting the reset line on the m68k doesn't
-	   seem to do anything.  Maybe the 68k emulator doesn't respond to
-	   that, or I didn't do it correctly.  But I think that is what needs
-	   to be done.  But it isn't crucial for emulation.  Shadow does not
-	   have this snag. */
+       I think what is happening here is that M0 snags the first time
+       it hits this point based on a counter test just above this
+       instruction.  That counter gets updated just past this instruction.
+       However, the only way this can be passed is if the M0 CPU is
+       reset (the IPL=7, but irq 7 is a nop).  I am almost sure that M1
+       reads a latch, which resets M0 (probably to ensure M0 and M1 are
+       both alive) and gets passed this snag.  I tried to hook up a reset
+       which should work, but asserting the reset line on the m68k doesn't
+       seem to do anything.  Maybe the 68k emulator doesn't respond to
+       that, or I didn't do it correctly.  But I think that is what needs
+       to be done.  But it isn't crucial for emulation.  Shadow does not
+       have this snag. */
 	ROM[0x4017] = 0x66;
 }
 

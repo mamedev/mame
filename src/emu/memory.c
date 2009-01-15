@@ -807,7 +807,7 @@ void address_map_free(address_map *map)
 			astring_free(entry->region_string);
 		free(entry);
 	}
-	
+
 	/* free the map */
 	free(map);
 }
@@ -899,10 +899,10 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 		if (byteaddress == ~0)
 			return TRUE;
 	}
-	
+
 	/* remove the masked bits (we'll put them back later) */
 	maskedbits = byteaddress & ~spacerw->bytemask;
-	
+
 	/* find or allocate a matching range */
 	range = direct_range_find(spacerw, byteaddress, &entry);
 
@@ -2977,7 +2977,7 @@ static direct_range *direct_range_find(address_space *space, offs_t byteaddress,
 	if (*entry >= SUBTABLE_BASE)
 		*entry = space->readlookup[LEVEL2_INDEX(*entry, byteaddress)];
 	rangelistptr = &space->direct.rangelist[*entry];
-	
+
 	/* scan our table */
 	for (rangeptr = rangelistptr; *rangeptr != NULL; rangeptr = &(*rangeptr)->next)
 		if (byteaddress >= (*rangeptr)->bytestart && byteaddress <= (*rangeptr)->byteend)
@@ -2992,23 +2992,23 @@ static direct_range *direct_range_find(address_space *space, offs_t byteaddress,
 			}
 			return range;
 		}
-	
+
 	/* didn't find out; allocate a new one */
 	range = space->direct.freerangelist;
 	if (range != NULL)
 		space->direct.freerangelist = range->next;
 	else
 		range = malloc_or_die(sizeof(*range));
-	
+
 	/* fill in the range */
 	table_derive_range(&space->read, byteaddress, &range->bytestart, &range->byteend);
 	range->next = *rangelistptr;
 	*rangelistptr = range;
-	
+
 	return range;
 }
 
-    
+
 /*-------------------------------------------------
     direct_range_remove_intersecting - remove
     all cached ranges that intersect the given
@@ -3018,12 +3018,12 @@ static direct_range *direct_range_find(address_space *space, offs_t byteaddress,
 static void direct_range_remove_intersecting(address_space *space, offs_t bytestart, offs_t byteend)
 {
     int entry;
-    
+
     /* loop over all entries */
     for (entry = 0; entry < ARRAY_LENGTH(space->read.handlers); entry++)
     {
         direct_range **rangeptr, **nextrangeptr;
-        
+
         /* loop over all ranges in this entry's list */
         for (nextrangeptr = rangeptr = &space->direct.rangelist[entry]; *rangeptr != NULL; rangeptr = nextrangeptr)
         {
@@ -3035,7 +3035,7 @@ static void direct_range_remove_intersecting(address_space *space, offs_t bytest
                 range->next = space->direct.freerangelist;
                 space->direct.freerangelist = range;
             }
-            
+
             /* otherwise advance to the next in the list */
             else
                 nextrangeptr = &(*rangeptr)->next;
@@ -3419,7 +3419,7 @@ static void dump_map(FILE *file, const address_space *space, const address_table
 	fprintf(file, "       L2 bits = %d\n", LEVEL2_BITS);
 	fprintf(file, "  Address mask = %X\n", space->bytemask);
 	fprintf(file, "\n");
-	
+
 	/* iterate over addresses */
 	for (byteaddress = 0; byteaddress <= space->bytemask; byteaddress = byteend + 1)
 	{

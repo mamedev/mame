@@ -81,7 +81,7 @@ VIDEO_START( relief )
 		0,					/* resulting value to indicate "special" */
 		0					/* callback routine for special entries */
 	};
-	
+
 	/* MOs are 5bpp but with a 4-bit color granularity */
 	machine->gfx[1]->color_granularity = 16;
 

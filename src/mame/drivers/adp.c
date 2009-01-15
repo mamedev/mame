@@ -350,7 +350,7 @@ return 0x4;
 	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
 
 	return 0x0004 ^ 0xffff; // 0x0004
-	
+
 	// FIXME: this code is never executed
 	switch (mame_rand(space->machine) & 3)
 	{

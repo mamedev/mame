@@ -1,21 +1,21 @@
 /***************************************************************************
 
-	i860.c
+    i860.c
 
-	Interface file for the Intel i860 emulator.
+    Interface file for the Intel i860 emulator.
 
-	Copyright (C) 1995-present Jason Eckhardt (jle@rice.edu)
-	Released for general non-commercial use under the MAME license
-	with the additional requirement that you are free to use and
-	redistribute this code in modified or unmodified form, provided
-	you list me in the credits.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright (C) 1995-present Jason Eckhardt (jle@rice.edu)
+    Released for general non-commercial use under the MAME license
+    with the additional requirement that you are free to use and
+    redistribute this code in modified or unmodified form, provided
+    you list me in the credits.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
 /*
-TODO: Separate out i860XR and i860XP (make different types, etc). 
-	  Hook IRQ lines into MAME core (they're custom functions atm).
+TODO: Separate out i860XR and i860XP (make different types, etc).
+      Hook IRQ lines into MAME core (they're custom functions atm).
 */
 
 #include "debugger.h"
@@ -49,7 +49,7 @@ static CPU_RESET( i860 )
 
 
 /***************************************************************************
- *  Disassembler hook 
+ *  Disassembler hook
  ***************************************************************************/
 
 static CPU_DISASSEMBLE( i860 )
@@ -65,7 +65,7 @@ static CPU_DISASSEMBLE( i860 )
 
 
 /**************************************************************************
- * The actual decode and execute code. 
+ * The actual decode and execute code.
  **************************************************************************/
 #include "i860dec.c"
 
@@ -311,7 +311,7 @@ CPU_GET_INFO( i860 )
 		case CPUINFO_STR_REGISTER + I860_DB:			sprintf(info->s, "DB : %08x", cpustate->cregs[CR_DB]);			break;
 		case CPUINFO_STR_REGISTER + I860_FSR:			sprintf(info->s, "FSR : %08x", cpustate->cregs[CR_FSR]);		break;
 		case CPUINFO_STR_REGISTER + I860_EPSR:			sprintf(info->s, "EPSR : %08x", cpustate->cregs[CR_EPSR]);		break;
-	
+
 		case CPUINFO_STR_REGISTER + I860_R0:			sprintf(info->s, "R0 : %08x",  cpustate->iregs[0]);		break;
 		case CPUINFO_STR_REGISTER + I860_R1:			sprintf(info->s, "R1 : %08x",  cpustate->iregs[1]);		break;
 		case CPUINFO_STR_REGISTER + I860_R2:			sprintf(info->s, "R2 : %08x",  cpustate->iregs[2]);		break;

@@ -670,7 +670,7 @@ static MACHINE_DRIVER_START( imago )
 	MDRV_IMPORT_FROM(fastfred)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(imago_map,0)
-	
+
 	MDRV_MACHINE_START(imago)
 
 	/* video hardware */

@@ -124,8 +124,8 @@ VIDEO_UPDATE( xmen )
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);
 
-/* this isn't supported anymore and it is unsure if still needed; keeping here for reference 
-	pdrawgfx_shadow_lowpri = 1;	fix shadows of boulders in front of feet */
+/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
+    pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 	K053247_sprites_draw(screen->machine, bitmap,cliprect);
 	return 0;
 }
@@ -251,8 +251,8 @@ VIDEO_EOF( xmen6p )
 	tilemap_draw(renderbitmap,&cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(renderbitmap,&cliprect,K052109_tilemap[layer[2]],0,4);
 
-/* this isn't supported anymore and it is unsure if still needed; keeping here for reference 
-	pdrawgfx_shadow_lowpri = 1;	fix shadows of boulders in front of feet */
+/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
+    pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 	K053247_sprites_draw(machine, renderbitmap,&cliprect);
 
 }

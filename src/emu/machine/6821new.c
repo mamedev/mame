@@ -1067,8 +1067,8 @@ int pianew_get_output_ca2(const device_config *device)
 
 /*-------------------------------------------------
     pianew_get_output_ca2_z - version of
-	pianew_get_output_ca2, which takes account of internal
-	pullup resistor
+    pianew_get_output_ca2, which takes account of internal
+    pullup resistor
 -------------------------------------------------*/
 
 int pianew_get_output_ca2_z(const device_config *device)

@@ -622,7 +622,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 	for (i=0; i<0x20; i++)
 	{
 		gfx_element gfx;
-	
+
 		if (!(metro_videoregs[0x02/2] & 0x8000))
 		{
 			src = spriteram16 + (sprites - 1) * (8/2);

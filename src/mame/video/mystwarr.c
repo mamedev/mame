@@ -24,7 +24,7 @@ static void mystwarr_decode_tiles(running_machine *machine)
 	UINT8 *pFinish = s+len-3;
 	UINT8 *d, *decoded;
 	int gfxnum;
-	
+
 	for (gfxnum = 0; gfxnum < ARRAY_LENGTH(machine->gfx); gfxnum++)
 		if (machine->gfx[gfxnum] != NULL && machine->gfx[gfxnum]->srcdata == s)
 			break;
@@ -58,7 +58,7 @@ static void mystwarr_decode_tiles(running_machine *machine)
 		s += 5;
 		d += 5;
 	}
-	
+
 	gfx_element_set_source(machine->gfx[gfxnum], decoded);
 }
 

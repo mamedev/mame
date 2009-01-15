@@ -367,7 +367,7 @@ ADDRESS_MAP_END
    .x.. ....
    x... ....
 */
-//	popmessage("Output: %02X", data);
+//  popmessage("Output: %02X", data);
 //}
 
 static ADDRESS_MAP_START( ladylinr_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2548,8 +2548,8 @@ static INPUT_PORTS_START( ladylinr )
 
 /*  there are 2 extra DSW banks...
     both are tied to a daughterboard, maybe hooked to a device.
-	they are not related to the original hardware, and are not
-	listed in the Input Test Mode.
+    they are not related to the original hardware, and are not
+    listed in the Input Test Mode.
 */
 INPUT_PORTS_END
 
@@ -4274,13 +4274,13 @@ ROM_END
                  1x 22x2 edge connector.
 
     Both connectors are wired to a strange small PCB with:
-	1x 6x2 edge connector + 1x 60x2 edge connector (with smaller spacing) + 2x 8 DIP Switches.
+    1x 6x2 edge connector + 1x 60x2 edge connector (with smaller spacing) + 2x 8 DIP Switches.
 
     Silkscreened on PCB:
     "TAB AUSTRIA"
 
     Sticker on PCB:
-	"TAB Austria" & "LL 2690"
+    "TAB Austria" & "LL 2690"
 
 */
 
@@ -4357,10 +4357,10 @@ ROM_START( kkojnoli )
 	ROM_LOAD( "9006.u23", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
 
 	/* this one seems bitrotten (bits 3 and 7), except for this issue,
-	   the prom have concordance with prom1 from lucky8 */
+       the prom have concordance with prom1 from lucky8 */
 	ROM_REGION( 0x40, "proms2", 0 )
 	ROM_LOAD( "prom1", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-//	ROM_LOAD( "9006.u57", 0x0000, 0x0020, CRC(8a37416a) SHA1(696b46db2ff2bb9ef471ff925977e8a186b17de8) )
+//  ROM_LOAD( "9006.u57", 0x0000, 0x0020, CRC(8a37416a) SHA1(696b46db2ff2bb9ef471ff925977e8a186b17de8) )
 
 	ROM_REGION( 0x100, "unkprom", 0 )
 	ROM_LOAD( "9006.u41", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
@@ -4583,9 +4583,9 @@ static DRIVER_INIT( chry10 )
 	do_blockswaps(ROM);
 
 	/* The game has a PIC for protection.
-	   If the code enter to this sub, just
-	   keeps looping eternally...
-	*/
+       If the code enter to this sub, just
+       keeps looping eternally...
+    */
 	ROM[0xA5DC] = 0xc9;
 
 	dump_to_file(machine, ROM);

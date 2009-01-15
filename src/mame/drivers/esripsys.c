@@ -280,7 +280,7 @@ static UINT8 rip_status_in(running_machine *machine)
 {
 	int vpos =  video_screen_get_vpos(machine->primary_screen);
 	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
-//	UINT8 _hblank = !video_screen_get_hblank(machine->primary_screen);
+//  UINT8 _hblank = !video_screen_get_hblank(machine->primary_screen);
 
 	return	_vblank
 			| (esripsys_hblank << 1)
@@ -597,9 +597,9 @@ static WRITE8_HANDLER( dac_w )
 		UINT16 dac_data = (dac_msb << 8) | data;
 
 		/*
-			The 8-bit DAC modulates the 10-bit DAC.
-			Shift down to prevent clipping.
-		*/
+            The 8-bit DAC modulates the 10-bit DAC.
+            Shift down to prevent clipping.
+        */
 		dac_signed_data_16_w(0, (dac_vol * dac_data) >> 1);
 	}
 }

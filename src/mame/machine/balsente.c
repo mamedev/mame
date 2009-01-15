@@ -285,7 +285,7 @@ void balsente_noise_gen(const device_config *device, int count, short *buffer)
 {
 	int chip;
 	UINT32 step, noise_counter;
-	
+
 	/* find the chip we are referring to */
 	for (chip = 0; chip < ARRAY_LENGTH(cem_device); chip++)
 	{

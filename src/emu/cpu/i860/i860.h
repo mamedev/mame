@@ -1,15 +1,15 @@
 /***************************************************************************
- 
-	i860.h
 
-	Interface file for the Intel i860 emulator.
+    i860.h
 
-	Copyright (C) 1995-present Jason Eckhardt (jle@rice.edu)
-	Released for general non-commercial use under the MAME license
-	with the additional requirement that you are free to use and
-	redistribute this code in modified or unmodified form, provided
-	you list me in the credits.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Interface file for the Intel i860 emulator.
+
+    Copyright (C) 1995-present Jason Eckhardt (jle@rice.edu)
+    Released for general non-commercial use under the MAME license
+    with the additional requirement that you are free to use and
+    redistribute this code in modified or unmodified form, provided
+    you list me in the credits.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -61,9 +61,9 @@ typedef struct {
 	/* Integer registers (32 x 32-bits).  */
 	UINT32 iregs[32];
 
-	/* Floating point registers (32 x 32-bits, 16 x 64 bits, or 8 x 128 bits). 
-	   When referenced as pairs or quads, the higher numbered registers
-	   are the upper bits. E.g., double precision f0 is f1:f0.  */
+	/* Floating point registers (32 x 32-bits, 16 x 64 bits, or 8 x 128 bits).
+       When referenced as pairs or quads, the higher numbered registers
+       are the upper bits. E.g., double precision f0 is f1:f0.  */
 	UINT8 frg[32 * 4];
 
 	/* Control registers (6 x 32-bits).  */
@@ -88,7 +88,7 @@ typedef struct {
 			float s;
 			double d;
 		} val;
-	
+
 		/* The stage status bits.  */
 		struct {
 			/* Adder result precision (1 = dbl, 0 = sgl).  */
@@ -97,14 +97,14 @@ typedef struct {
 	} A[3];
 
 	/* The multiplier pipeline. 3 stages for single precision, 2 stages
-	   for double precision, and confusing for mixed precision.  */
+       for double precision, and confusing for mixed precision.  */
 	struct {
 		/* The stage contents.  */
 		union {
 			float s;
 			double d;
 		} val;
-	
+
 		/* The stage status bits.  */
 		struct {
 			/* Multiplier result precision (1 = dbl, 0 = sgl).  */
@@ -119,7 +119,7 @@ typedef struct {
 			float s;
 			double d;
 		} val;
-		
+
 		/* The stage status bits.  */
 		struct {
 			/* Load result precision (1 = dbl, 0 = sgl).  */
@@ -134,7 +134,7 @@ typedef struct {
 			float s;
 			double d;
 		} val;
-		
+
 		/* The stage status bits.  */
 		struct {
 			/* Integer/graphics result precision (1 = dbl, 0 = sgl).  */
@@ -147,29 +147,29 @@ typedef struct {
 	int pin_reset;
 
 	/*
-	 * Other emulator state.
-	 */
+     * Other emulator state.
+     */
 	int exiting_readmem;
 	int exiting_ifetch;
 
 	/* Indicate a control-flow instruction, so we know the PC is updated.  */
 	int pc_updated;
-	
+
 	/* Indicate an instruction just generated a trap, so we know the PC
-	   needs to go to the trap address.  */
+       needs to go to the trap address.  */
 	int pending_trap;
-	
+
 	/* This is 1 if the next fir load gets the trap address, otherwise
-	   it is 0 to get the ld.c address.  This is set to 1 only when a
-	   non-reset trap occurs.  */
+       it is 0 to get the ld.c address.  This is set to 1 only when a
+       non-reset trap occurs.  */
 	int fir_gets_trap_addr;
-	
+
 	/* Single stepping flag for internal use.  */
-	int single_stepping; 
-	
+	int single_stepping;
+
 	/*
-	 * MAME-specific stuff.
-	 */
+     * MAME-specific stuff.
+     */
 	const device_config *device;
 	const address_space *program;
 	UINT32 ppc;
@@ -200,7 +200,7 @@ enum {
 };
 
 
-/*  TODO: THESE WILL BE REPLACED BY MAME FUNCTIONS 
+/*  TODO: THESE WILL BE REPLACED BY MAME FUNCTIONS
 #define BYTE_REV32(t)   \
   do { \
     (t) = ((UINT32)(t) >> 16) | ((UINT32)(t) << 16); \

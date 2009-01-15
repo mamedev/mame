@@ -46,7 +46,7 @@ INLINE int readbit(const UINT8 *src, unsigned int bitnum)
 
 
 /*-------------------------------------------------
-    normalize_xscroll - normalize an X scroll 
+    normalize_xscroll - normalize an X scroll
     value for a bitmap to be positive and less
     than the width
 -------------------------------------------------*/
@@ -58,7 +58,7 @@ INLINE INT32 normalize_xscroll(bitmap_t *bitmap, INT32 xscroll)
 
 
 /*-------------------------------------------------
-    normalize_yscroll - normalize a Y scroll 
+    normalize_yscroll - normalize a Y scroll
     value for a bitmap to be positive and less
     than the height
 -------------------------------------------------*/
@@ -104,7 +104,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 	gfx->color_depth = 1 << planes;
 	gfx->color_granularity = 1 << planes;
 	gfx->total_colors = total_colors;
-	
+
 	gfx->srcdata = srcdata;
 	gfx->machine = machine;
 
@@ -143,7 +143,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 	/* allocate a pen usage array for entries with 32 pens or less */
 	if (gfx->color_depth <= 32)
 		gfx->pen_usage = malloc_or_die(gfx->total_elements * sizeof(*gfx->pen_usage));
-	
+
 	/* allocate a dirty array */
 	gfx->dirty = malloc_or_die(gfx->total_elements * sizeof(*gfx->dirty));
 	memset(gfx->dirty, 1, gfx->total_elements * sizeof(*gfx->dirty));
@@ -159,7 +159,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 		gfx->flags |= GFX_ELEMENT_DONT_FREE;
 		if (planes <= 4)
 			gfx->flags |= GFX_ELEMENT_PACKED;
-		
+
 		/* RAW graphics must have a pointer up front */
 		gfx->gfxdata = (UINT8 *)gfx->srcdata;
 	}
@@ -180,7 +180,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 
 
 /*-------------------------------------------------
-    gfx_element_decode - update a single code in 
+    gfx_element_decode - update a single code in
     a gfx_element
 -------------------------------------------------*/
 
@@ -216,7 +216,7 @@ void gfx_element_free(gfx_element *gfx)
 
 
 /*-------------------------------------------------
-    gfx_element_build_temporary - create a 
+    gfx_element_build_temporary - create a
     temporary one-off gfx_element
 -------------------------------------------------*/
 
@@ -233,21 +233,21 @@ void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UIN
 	gfx->origheight = height;
 	gfx->flags = flags;
 	gfx->total_elements = 1;
-	
+
 	gfx->color_base = color_base;
 	gfx->color_depth = color_granularity;
 	gfx->color_granularity = color_granularity;
 	gfx->total_colors = (machine->config->total_colors - color_base) / color_granularity;
-	
+
 	gfx->pen_usage = NULL;
-	
+
 	gfx->gfxdata = base;
 	gfx->line_modulo = rowbytes;
 	gfx->char_modulo = 0;
 	gfx->srcdata = base;
 	gfx->dirty = &not_dirty;
 	gfx->dirtyseq = 0;
-	
+
 	gfx->machine = machine;
 }
 
@@ -308,7 +308,7 @@ void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
 	const UINT32 *yoffset = gl->extyoffs ? gl->extyoffs : gl->yoffset;
 	UINT8 *dp = gfx->gfxdata + code * gfx->char_modulo;
 	int plane, x, y;
-	
+
 	if (!israw)
 	{
 		/* zap the data to 0 */
@@ -357,7 +357,7 @@ void decodechar(const gfx_element *gfx, UINT32 code, const UINT8 *src)
 
 	/* compute pen usage */
 	calc_penusage(gfx, code);
-	
+
 	/* no longer dirty */
 	gfx->dirty[code] = 0;
 }
@@ -402,7 +402,7 @@ void decodegfx(gfx_element *gfx, UINT32 first, UINT32 count)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    drawgfx - generic drawgfx with legacy 
+    drawgfx - generic drawgfx with legacy
     interface
 -------------------------------------------------*/
 
@@ -414,15 +414,15 @@ void drawgfx(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, 
 		case TRANSPARENCY_NONE:
 			drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy);
 			break;
-		
+
 		case TRANSPARENCY_PEN:
 			drawgfx_transpen(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, transparent_color);
 			break;
-		
+
 		case TRANSPARENCY_PENS:
 			drawgfx_transmask(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, transparent_color);
 			break;
-		
+
 		default:
 			fatalerror("Invalid transparency specified for drawgfx (%d)", transparency);
 			break;
@@ -435,7 +435,7 @@ void drawgfx(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color, 
     no transparency
 -------------------------------------------------*/
 
-void drawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void drawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
@@ -449,7 +449,7 @@ void drawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
@@ -463,8 +463,8 @@ void drawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element
     a single transparent pen
 -------------------------------------------------*/
 
-void drawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, 
+void drawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
@@ -485,16 +485,16 @@ void drawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_eleme
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
 	{
 		UINT32 usage = gfx->pen_usage[code];
-		
+
 		/* fully transparent; do nothing */
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
-		
+
 		/* fully opaque; draw as such */
 		if ((usage & (1 << transpen)) == 0)
 		{
@@ -512,13 +512,13 @@ void drawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_eleme
 
 
 /*-------------------------------------------------
-    drawgfx_transpen_raw - render a gfx element 
+    drawgfx_transpen_raw - render a gfx element
     with a single transparent pen and no color
     lookups
 -------------------------------------------------*/
 
-void drawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, 
+void drawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
@@ -529,7 +529,7 @@ void drawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_e
 
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
-	
+
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
 		return;
@@ -543,13 +543,13 @@ void drawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_e
 
 
 /*-------------------------------------------------
-    drawgfx_transmask - render a gfx element 
+    drawgfx_transmask - render a gfx element
     with a multiple transparent pens provided as
     a mask
 -------------------------------------------------*/
 
-void drawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, 
+void drawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transmask)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
@@ -570,16 +570,16 @@ void drawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
 	{
 		UINT32 usage = gfx->pen_usage[code];
-		
+
 		/* fully transparent; do nothing */
 		if ((usage & ~transmask) == 0)
 			return;
-		
+
 		/* fully opaque; draw as such */
 		if ((usage & transmask) == 0)
 		{
@@ -597,13 +597,13 @@ void drawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 
 
 /*-------------------------------------------------
-    drawgfx_transtable - render a gfx element 
+    drawgfx_transtable - render a gfx element
     using a table to look up which pens are
     transparent, opaque, or shadowing
 -------------------------------------------------*/
 
-void drawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, 
+void drawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		const UINT8 *pentable, const pen_t *shadowtable)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
@@ -618,7 +618,7 @@ void drawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16, NO_PRIORITY);
@@ -633,13 +633,13 @@ void drawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
     remaining pixels with a fixed alpha value
 -------------------------------------------------*/
 
-void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, 
+void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 transpen, UINT8 alpha)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 	const pen_t *paldata;
-	
+
 	/* special case alpha = 0xff */
 	if (alpha == 0xff)
 	{
@@ -655,7 +655,7 @@ void drawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element 
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
 		return;
@@ -687,15 +687,15 @@ void drawgfxzoom(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 col
 		case TRANSPARENCY_NONE:
 			drawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley);
 			break;
-		
+
 		case TRANSPARENCY_PEN:
 			drawgfxzoom_transpen(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, transparent_color);
 			break;
-		
+
 		case TRANSPARENCY_PENS:
 			drawgfxzoom_transmask(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, transparent_color);
 			break;
-		
+
 		default:
 			fatalerror("Invalid transparency specified for drawgfxzoom (%d)", transparency);
 			break;
@@ -704,17 +704,17 @@ void drawgfxzoom(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 col
 
 
 /*-------------------------------------------------
-    drawgfxzoom_opaque - render a scaled gfx 
+    drawgfxzoom_opaque - render a scaled gfx
     element with no transparency
 -------------------------------------------------*/
 
-void drawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void drawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 	const pen_t *paldata;
-	
+
 	/* non-zoom case */
 	if (scalex == 0x10000 && scaley == 0x10000)
 	{
@@ -730,7 +730,7 @@ void drawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
@@ -740,11 +740,11 @@ void drawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 
 
 /*-------------------------------------------------
-    drawgfxzoom_transpen - render a scaled gfx 
+    drawgfxzoom_transpen - render a scaled gfx
     element with a single transparent pen
 -------------------------------------------------*/
 
-void drawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void drawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen)
 {
@@ -773,16 +773,16 @@ void drawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_e
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
 	{
 		UINT32 usage = gfx->pen_usage[code];
-		
+
 		/* fully transparent; do nothing */
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
-		
+
 		/* fully opaque; draw as such */
 		if ((usage & (1 << transpen)) == 0)
 		{
@@ -800,12 +800,12 @@ void drawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_e
 
 
 /*-------------------------------------------------
-    drawgfxzoom_transpen_raw - render a scaled gfx 
-    element with a single transparent pen and no 
+    drawgfxzoom_transpen_raw - render a scaled gfx
+    element with a single transparent pen and no
     color lookups
 -------------------------------------------------*/
 
-void drawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void drawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen)
 {
@@ -824,7 +824,7 @@ void drawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const g
 
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
-	
+
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
 		return;
@@ -838,12 +838,12 @@ void drawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const g
 
 
 /*-------------------------------------------------
-    drawgfxzoom_transmask - render a scaled gfx 
-    element with a multiple transparent pens 
+    drawgfxzoom_transmask - render a scaled gfx
+    element with a multiple transparent pens
     provided as a mask
 -------------------------------------------------*/
 
-void drawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void drawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transmask)
 {
@@ -872,16 +872,16 @@ void drawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
 	{
 		UINT32 usage = gfx->pen_usage[code];
-		
+
 		/* fully transparent; do nothing */
 		if ((usage & ~transmask) == 0)
 			return;
-		
+
 		/* fully opaque; draw as such */
 		if ((usage & transmask) == 0)
 		{
@@ -899,12 +899,12 @@ void drawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_
 
 
 /*-------------------------------------------------
-    drawgfxzoom_transtable - render a scaled gfx 
-    element using a table to look up which pens 
+    drawgfxzoom_transtable - render a scaled gfx
+    element using a table to look up which pens
     are transparent, opaque, or shadowing
 -------------------------------------------------*/
 
-void drawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void drawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, const UINT8 *pentable, const pen_t *shadowtable)
 {
@@ -927,7 +927,7 @@ void drawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16, NO_PRIORITY);
@@ -937,18 +937,18 @@ void drawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx
 
 
 /*-------------------------------------------------
-    drawgfxzoom_alpha - render a scaled gfx element 
-    with a single transparent pen, alpha blending 
+    drawgfxzoom_alpha - render a scaled gfx element
+    with a single transparent pen, alpha blending
     the remaining pixels with a fixed alpha value
 -------------------------------------------------*/
 
-void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, UINT32 transpen, UINT8 alpha)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
 	const pen_t *paldata;
-	
+
 	/* non-zoom case */
 	if (scalex == 0x10000 && scaley == 0x10000)
 	{
@@ -971,7 +971,7 @@ void drawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
 		return;
@@ -1003,15 +1003,15 @@ void pdrawgfx(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color,
 		case TRANSPARENCY_NONE:
 			pdrawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, priority_bitmap, priority_mask);
 			break;
-		
+
 		case TRANSPARENCY_PEN:
 			pdrawgfx_transpen(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, priority_bitmap, priority_mask, transparent_color);
 			break;
-		
+
 		case TRANSPARENCY_PENS:
 			pdrawgfx_transmask(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, priority_bitmap, priority_mask, transparent_color);
 			break;
-		
+
 		default:
 			fatalerror("Invalid transparency specified for pdrawgfx (%d)", transparency);
 			break;
@@ -1025,7 +1025,7 @@ void pdrawgfx(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 color,
     bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask)
 {
@@ -1039,10 +1039,10 @@ void pdrawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_elemen
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, UINT8);
@@ -1053,11 +1053,11 @@ void pdrawgfx_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_elemen
 
 /*-------------------------------------------------
     pdrawgfx_transpen - render a gfx element with
-    a single transparent pen, checking against the 
+    a single transparent pen, checking against the
     priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transpen)
 {
@@ -1078,16 +1078,16 @@ void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
 	{
 		UINT32 usage = gfx->pen_usage[code];
-		
+
 		/* fully transparent; do nothing */
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
-		
+
 		/* fully opaque; draw as such */
 		if ((usage & (1 << transpen)) == 0)
 		{
@@ -1098,7 +1098,7 @@ void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, UINT8);
@@ -1108,12 +1108,12 @@ void pdrawgfx_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_elem
 
 
 /*-------------------------------------------------
-    pdrawgfx_transpen_raw - render a gfx element 
+    pdrawgfx_transpen_raw - render a gfx element
     with a single transparent pen and no color
     lookups, checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transpen)
 {
@@ -1123,14 +1123,14 @@ void pdrawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_
 
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
-	
+
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
 		return;
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFX_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, UINT8);
@@ -1140,12 +1140,12 @@ void pdrawgfx_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_
 
 
 /*-------------------------------------------------
-    pdrawgfx_transmask - render a gfx element 
+    pdrawgfx_transmask - render a gfx element
     with a multiple transparent pens provided as
     a mask, checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transmask)
 {
@@ -1166,16 +1166,16 @@ void pdrawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
 	{
 		UINT32 usage = gfx->pen_usage[code];
-		
+
 		/* fully transparent; do nothing */
 		if ((usage & ~transmask) == 0)
 			return;
-		
+
 		/* fully opaque; draw as such */
 		if ((usage & transmask) == 0)
 		{
@@ -1186,7 +1186,7 @@ void pdrawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, UINT8);
@@ -1196,13 +1196,13 @@ void pdrawgfx_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 
 
 /*-------------------------------------------------
-    pdrawgfx_transtable - render a gfx element 
+    pdrawgfx_transtable - render a gfx element
     using a table to look up which pens are
-    transparent, opaque, or shadowing, checking 
+    transparent, opaque, or shadowing, checking
     against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, const UINT8 *pentable, const pen_t *shadowtable)
 {
@@ -1217,10 +1217,10 @@ void pdrawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_el
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY, UINT8);
@@ -1232,11 +1232,11 @@ void pdrawgfx_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_el
 /*-------------------------------------------------
     pdrawgfx_alpha - render a gfx element with
     a single transparent pen, alpha blending the
-    remaining pixels with a fixed alpha value, 
+    remaining pixels with a fixed alpha value,
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		bitmap_t *priority, UINT32 pmask, UINT32 transpen, UINT8 alpha)
 {
@@ -1257,14 +1257,14 @@ void pdrawgfx_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
 		return;
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFX_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN_ALPHA16_PRIORITY, UINT8);
@@ -1292,15 +1292,15 @@ void pdrawgfxzoom(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 co
 		case TRANSPARENCY_NONE:
 			pdrawgfxzoom_opaque(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, priority_bitmap, priority_mask);
 			break;
-		
+
 		case TRANSPARENCY_PEN:
 			pdrawgfxzoom_transpen(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, priority_bitmap, priority_mask, transparent_color);
 			break;
-		
+
 		case TRANSPARENCY_PENS:
 			pdrawgfxzoom_transmask(dest, cliprect, gfx, code, color, flipx, flipy, sx, sy, scalex, scaley, priority_bitmap, priority_mask, transparent_color);
 			break;
-		
+
 		default:
 			fatalerror("Invalid transparency specified for pdrawgfxzoom (%d)", transparency);
 			break;
@@ -1309,12 +1309,12 @@ void pdrawgfxzoom(bitmap_t *dest, const gfx_element *gfx, UINT32 code, UINT32 co
 
 
 /*-------------------------------------------------
-    pdrawgfxzoom_opaque - render a scaled gfx 
-    element with no transparency, checking against 
+    pdrawgfxzoom_opaque - render a scaled gfx
+    element with no transparency, checking against
     the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask)
 {
@@ -1335,10 +1335,10 @@ void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_el
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_OPAQUE_PRIORITY, UINT8);
@@ -1348,14 +1348,14 @@ void pdrawgfxzoom_opaque(bitmap_t *dest, const rectangle *cliprect, const gfx_el
 
 
 /*-------------------------------------------------
-    pdrawgfxzoom_transpen - render a scaled gfx 
-    element with a single transparent pen, 
+    pdrawgfxzoom_transpen - render a scaled gfx
+    element with a single transparent pen,
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, 
+		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transpen)
 {
 	const pen_t *paldata;
@@ -1382,16 +1382,16 @@ void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
 	{
 		UINT32 usage = gfx->pen_usage[code];
-		
+
 		/* fully transparent; do nothing */
 		if ((usage & ~(1 << transpen)) == 0)
 			return;
-		
+
 		/* fully opaque; draw as such */
 		if ((usage & (1 << transpen)) == 0)
 		{
@@ -1402,7 +1402,7 @@ void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN_PRIORITY, UINT8);
@@ -1412,15 +1412,15 @@ void pdrawgfxzoom_transpen(bitmap_t *dest, const rectangle *cliprect, const gfx_
 
 
 /*-------------------------------------------------
-    pdrawgfxzoom_transpen_raw - render a scaled gfx 
-    element with a single transparent pen and no 
-    color lookups, checking against the priority 
+    pdrawgfxzoom_transpen_raw - render a scaled gfx
+    element with a single transparent pen and no
+    color lookups, checking against the priority
     bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, 
+		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transpen)
 {
 	/* non-zoom case */
@@ -1436,14 +1436,14 @@ void pdrawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const 
 
 	/* get final code and color, and grab lookup tables */
 	code %= gfx->total_elements;
-	
+
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
 		return;
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REBASE_TRANSPEN_PRIORITY, UINT8);
@@ -1453,15 +1453,15 @@ void pdrawgfxzoom_transpen_raw(bitmap_t *dest, const rectangle *cliprect, const 
 
 
 /*-------------------------------------------------
-    pdrawgfxzoom_transmask - render a scaled gfx 
-    element with a multiple transparent pens 
+    pdrawgfxzoom_transmask - render a scaled gfx
+    element with a multiple transparent pens
     provided as a mask, checking against the
     priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, 
+		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transmask)
 {
 	const pen_t *paldata;
@@ -1488,16 +1488,16 @@ void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* use pen usage to optimize */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code])
 	{
 		UINT32 usage = gfx->pen_usage[code];
-		
+
 		/* fully transparent; do nothing */
 		if ((usage & ~transmask) == 0)
 			return;
-		
+
 		/* fully opaque; draw as such */
 		if ((usage & transmask) == 0)
 		{
@@ -1508,7 +1508,7 @@ void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSMASK_PRIORITY, UINT8);
@@ -1518,15 +1518,15 @@ void pdrawgfxzoom_transmask(bitmap_t *dest, const rectangle *cliprect, const gfx
 
 
 /*-------------------------------------------------
-    pdrawgfxzoom_transtable - render a scaled gfx 
-    element using a table to look up which pens 
-    are transparent, opaque, or shadowing, 
+    pdrawgfxzoom_transtable - render a scaled gfx
+    element using a table to look up which pens
+    are transparent, opaque, or shadowing,
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, 
+		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		const UINT8 *pentable, const pen_t *shadowtable)
 {
 	const pen_t *paldata;
@@ -1547,10 +1547,10 @@ void pdrawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gf
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY, UINT8);
@@ -1560,16 +1560,16 @@ void pdrawgfxzoom_transtable(bitmap_t *dest, const rectangle *cliprect, const gf
 
 
 /*-------------------------------------------------
-    pdrawgfxzoom_alpha - render a scaled gfx 
-    element with a single transparent pen, alpha 
-    blending the remaining pixels with a fixed 
-    alpha value, checking against the priority 
+    pdrawgfxzoom_alpha - render a scaled gfx
+    element with a single transparent pen, alpha
+    blending the remaining pixels with a fixed
+    alpha value, checking against the priority
     bitmap
 -------------------------------------------------*/
 
-void pdrawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
+void pdrawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
-		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask, 
+		UINT32 scalex, UINT32 scaley, bitmap_t *priority, UINT32 pmask,
 		UINT32 transpen, UINT8 alpha)
 {
 	const pen_t *paldata;
@@ -1596,14 +1596,14 @@ void pdrawgfxzoom_alpha(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && !gfx->dirty[code] && (gfx->pen_usage[code] & ~(1 << transpen)) == 0)
 		return;
 
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
-	
+
 	/* render based on dest bitmap depth */
 	if (dest->bpp == 16)
 		DRAWGFXZOOM_CORE(UINT16, PIXEL_OP_REMAP_TRANSPEN_ALPHA16_PRIORITY, UINT8);
@@ -1638,7 +1638,7 @@ void draw_scanline8(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, co
 		else
 			DRAWSCANLINE_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 	}
-	
+
 	/* raw copy case */
 	else
 	{
@@ -1672,7 +1672,7 @@ void draw_scanline16(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, c
 		else
 			DRAWSCANLINE_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 	}
-	
+
 	/* raw copy case */
 	else
 	{
@@ -1706,7 +1706,7 @@ void draw_scanline32(bitmap_t *bitmap, INT32 destx, INT32 desty, INT32 length, c
 		else
 			DRAWSCANLINE_CORE(UINT32, PIXEL_OP_REMAP_OPAQUE, NO_PRIORITY);
 	}
-	
+
 	/* raw copy case */
 	else
 	{
@@ -1807,7 +1807,7 @@ void copybitmap(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx
 
 
 /*-------------------------------------------------
-    copybitmap_trans - copy from one bitmap to 
+    copybitmap_trans - copy from one bitmap to
     another, copying all unclipped pixels except
     those that match transpen
 -------------------------------------------------*/
@@ -1851,23 +1851,23 @@ void copybitmap_trans(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32
 ***************************************************************************/
 
 /*-------------------------------------------------
-    copyscrollbitmap - copy from one bitmap to 
-    another, copying all unclipped pixels, and 
+    copyscrollbitmap - copy from one bitmap to
+    another, copying all unclipped pixels, and
     applying scrolling to one or more rows/colums
 -------------------------------------------------*/
 
 void copyscrollbitmap(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle *cliprect)
 {
 	/* just call through to the transparent case as the underlying copybitmap will
-	   optimize for pen == 0xffffffff */
+       optimize for pen == 0xffffffff */
 	copyscrollbitmap_trans(dest, src, numrows, rowscroll, numcols, colscroll, cliprect, 0xffffffff);
 }
 
 
 /*-------------------------------------------------
-    copyscrollbitmap_trans - copy from one bitmap 
-    to another, copying all unclipped pixels 
-    except those that match transpen, and applying 
+    copyscrollbitmap_trans - copy from one bitmap
+    to another, copying all unclipped pixels
+    except those that match transpen, and applying
     scrolling to one or more rows/colums
 -------------------------------------------------*/
 
@@ -1913,7 +1913,7 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 		rectangle subclip = *cliprect;
 		int col, colwidth, groupcols;
 
-		/* determine width of each column */		
+		/* determine width of each column */
 		colwidth = src->width / numcols;
 		assert(src->width % colwidth == 0);
 
@@ -1947,7 +1947,7 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 		rectangle subclip = *cliprect;
 		int row, rowheight, grouprows;
 
-		/* determine width of each rows */		
+		/* determine width of each rows */
 		rowheight = src->height / numrows;
 		assert(src->height % rowheight == 0);
 
@@ -1983,7 +1983,7 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 
 /*-------------------------------------------------
     copyrozbitmap - copy from one bitmap to another,
-    with zoom and rotation, copying all unclipped 
+    with zoom and rotation, copying all unclipped
     pixels
 -------------------------------------------------*/
 
@@ -2006,9 +2006,9 @@ void copyrozbitmap(bitmap_t *dest, const rectangle *cliprect, bitmap_t *src, INT
 
 
 /*-------------------------------------------------
-    copyrozbitmap_trans - copy from one bitmap to 
-    another, with zoom and rotation, copying all 
-    unclipped pixels whose values do not match 
+    copyrozbitmap_trans - copy from one bitmap to
+    another, with zoom and rotation, copying all
+    unclipped pixels whose values do not match
     transpen
 -------------------------------------------------*/
 

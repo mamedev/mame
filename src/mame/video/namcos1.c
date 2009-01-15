@@ -328,7 +328,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					flipx,flipy,
 					sx & 0x1ff,
 					((sy + 16) & 0xff) - 16,
-					priority_bitmap, pri_mask, 
+					priority_bitmap, pri_mask,
 					0xf);
 		else
 			pdrawgfx_transtable( bitmap, cliprect, gfx,

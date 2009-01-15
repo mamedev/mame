@@ -110,14 +110,14 @@ do																					\
 }																					\
 while (0)																			\
 
-void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx, 
-		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty, 
+void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
 		int fixedalpha)
 {
 	bitmap_t *priority = NULL;	/* dummy, no priority in this case */
-	
+
 	const pen_t *paldata;
-	
+
 	/* if we have a fixed alpha, call the standard drawgfx_alpha */
 	if (fixedalpha >= 0)
 	{
@@ -134,7 +134,7 @@ void drawgfx_alphatable(bitmap_t *dest, const rectangle *cliprect, const gfx_ele
 	code %= gfx->total_elements;
 	color %= gfx->total_colors;
 	paldata = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * color];
-	
+
 	/* early out if completely transparent */
 	if (gfx->pen_usage != NULL && (gfx->pen_usage[code] & ~(1 << 0)) == 0)
 		return;

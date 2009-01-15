@@ -1576,7 +1576,7 @@ void
 namco_road_init(running_machine *machine, int gfxbank )
 {
 	gfx_element *pGfx;
-	
+
 	mbRoadNeedTransparent = 0;
 	mRoadGfxBank = gfxbank;
 

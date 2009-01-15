@@ -395,7 +395,7 @@ static UINT8 k053260_read( const address_space *space,  offs_t offset, int chip 
 		break;
 
 		case 0x2e: /* read rom */
-			if ( ic->mode & 1 ) 
+			if ( ic->mode & 1 )
 			{
 				UINT32 offs = ic->channels[0].start + ( ic->channels[0].pos >> BASE_SHIFT ) + ( ic->channels[0].bank << 16 );
 

@@ -121,18 +121,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
-//	AM_RANGE(0x8000, 0x800f) AM_WRITE(seibu_main_word_w)
-//	AM_RANGE(0x8010, 0x801b) AM_WRITENOP
+//  AM_RANGE(0x8000, 0x800f) AM_WRITE(seibu_main_word_w)
+//  AM_RANGE(0x8010, 0x801b) AM_WRITENOP
 	AM_RANGE(0x801c, 0x801d) AM_WRITE(sengokmj_layer_enable_w)
-//	AM_RANGE(0x801e, 0x801f) AM_WRITENOP
-//	AM_RANGE(0x8020, 0x802f) AM_WRITENOP
+//  AM_RANGE(0x801e, 0x801f) AM_WRITENOP
+//  AM_RANGE(0x8020, 0x802f) AM_WRITENOP
 	AM_RANGE(0x8022, 0x8023) AM_WRITE(sengokmj_bg_scrolly_w)
-//	AM_RANGE(0x8030, 0x803f) AM_WRITENOP
-//	AM_RANGE(0x8040, 0x804f) AM_WRITENOP
+//  AM_RANGE(0x8030, 0x803f) AM_WRITENOP
+//  AM_RANGE(0x8040, 0x804f) AM_WRITENOP
 
 	AM_RANGE(0x8080, 0x8081) AM_WRITE(seibu_z80_com_6_mirror_w)
-//	AM_RANGE(0x80c0, 0x80c1) AM_WRITE(seibu_z80_com_unk_mirror_w)
-//	AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
+//  AM_RANGE(0x80c0, 0x80c1) AM_WRITE(seibu_z80_com_unk_mirror_w)
+//  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
 	AM_RANGE(0x8180, 0x8181) AM_WRITE(sengokmj_out_w)
 	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")

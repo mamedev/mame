@@ -255,7 +255,7 @@ INLINE tilemap *indexed_tilemap(int index)
 
 
 /*-------------------------------------------------
-    gfx_tiles_changed - return TRUE if any 
+    gfx_tiles_changed - return TRUE if any
     gfx_elements used by this tilemap have
     changed
 -------------------------------------------------*/
@@ -1220,11 +1220,11 @@ static void pixmap_update(tilemap *tmap, const rectangle *cliprect)
 {
 	int mincol, maxcol, minrow, maxrow;
 	int row, col;
-	
+
 	/* if the graphics changed, we need to mark everything dirty */
  	if (gfx_elements_changed(tmap))
 		tilemap_mark_all_tiles_dirty(tmap);
- 
+
 	/* if everything is clean, do nothing */
 	if (tmap->all_tiles_clean)
 		return;

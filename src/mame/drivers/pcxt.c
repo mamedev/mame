@@ -456,10 +456,10 @@ static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	port_b_data = data;
 //  hc55516_digit_w(0, data);
-//	popmessage("%02x\n",data);
-//	beep_set_state(0, 0);
-//	beep_set_state(0, 1);
-//	beep_set_frequency(0, port_b_data);
+//  popmessage("%02x\n",data);
+//  beep_set_state(0, 0);
+//  beep_set_state(0, 1);
+//  beep_set_frequency(0, port_b_data);
 }
 
 static WRITE8_DEVICE_HANDLER( wss_1_w )
@@ -702,16 +702,16 @@ static ADDRESS_MAP_START( tetriskr_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE(PIC8259, "pic8259_2", pic8259_r, pic8259_w )
   	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
-//	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("IN1") //game port
+//  AM_RANGE(0x0201, 0x0201) AM_READ_PORT("IN1") //game port
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
-//	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
-//	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
+//  AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
+//  AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
 	AM_RANGE(0x03c0, 0x03c0) AM_RAM AM_BASE(&vga_bg_bank)
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
 	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
-//	AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1")
+//  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1")
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
 	AM_RANGE(0x03b4, 0x03b5) AM_READWRITE(vga_regs_r,vga_regs_w) //various VGA/CGA/EGA regs
 	AM_RANGE(0x03d4, 0x03d5) AM_READWRITE(vga_regs_r,vga_regs_w) //mirror of above

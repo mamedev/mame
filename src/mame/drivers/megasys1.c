@@ -1191,7 +1191,7 @@ static INPUT_PORTS_START( plusalph )
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Cocktail ) )
- 
+
 	PORT_DIPNAME( 0x8000, 0x8000, "Freeze Screen (Cheat)")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1214,7 +1214,7 @@ static INPUT_PORTS_START( rodland )
 	PORT_DIPSETTING(      0x0060, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Hardest ) )
- 
+
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 

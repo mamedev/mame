@@ -238,7 +238,7 @@ VIDEO_START( marvins )
 
 	tilemap_set_scrolldx(bg_tilemap, 15,  31);
 	tilemap_set_scrolldy(bg_tilemap,  8, -32);
-	
+
 	tx_tile_offset = 0;
 }
 
@@ -331,14 +331,14 @@ VIDEO_START( ikari )
 
 	tilemap_set_scrolldx(bg_tilemap, 15, 24);
 	tilemap_set_scrolldy(bg_tilemap,  8, -32);
-	
+
 	tx_tile_offset = 0;
 }
 
 VIDEO_START( gwar )
 {
 	int i;
-	
+
 	/* prepare drawmode table */
 	for(i = 0; i <= 14; i++) drawmode_table[i] = DRAWMODE_SOURCE;
 	drawmode_table[15] = DRAWMODE_NONE;
@@ -352,7 +352,7 @@ VIDEO_START( gwar )
 
 	tilemap_set_scrolldx(bg_tilemap, 16, 143);
 	tilemap_set_scrolldy(bg_tilemap,  0, -32);
-	
+
 	tx_tile_offset = 0;
 }
 

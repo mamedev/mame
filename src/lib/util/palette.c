@@ -230,8 +230,8 @@ int palette_get_num_groups(palette_t *palette)
 
 
 /*-------------------------------------------------
-    palette_get_max_index - return the maximum 
-    allowed index (i.e., length of arrays returned 
+    palette_get_max_index - return the maximum
+    allowed index (i.e., length of arrays returned
     by palette_entry_list*)
 -------------------------------------------------*/
 

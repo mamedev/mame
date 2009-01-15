@@ -173,7 +173,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 {
 	// prepare GfxElement on the fly
 	gfx_element gfx;
-	
+
 	// Bounds checking
 	if ( addr + dimx * dimy >= sprites_gfx_size )
 		return;

@@ -11,39 +11,39 @@
 
 **********************************************************************
 
-	How to use these macros:
-	
-	There are two sets of macros. The PIXEL_OP* macros are simple
-	per-pixel operations, designed to take a SOURCE pixel and
-	copy it to the DEST, perhaps updating the PRIORITY pixel as
-	well. On their own, they are not particularly useful.
-	
-	The second set of macros represents the core gfx/bitmap walking
-	and rendering code. These macros generally take the target pixel
-	type (UINT8, UINT16, UINT32), one of the PIXEL_OP* macros,
-	and a priority bitmap pixel type (UINT8, UINT16, UINT32, or the
-	special type NO_PRIORITY).
-	
-	Although the code may look inefficient at first, the compiler is
-	able to easily optimize out unused cases due to the way the
-	macros are written, leaving behind just the cases we are
-	interested in.
-	
-	The general approach for using these macros is:
-	
-	my_drawing_function(params)
-	{
-		// ensure that all the required parameters for the mega
-		// macro are defined (if they are not needed, just declare
-		// the variables and set them equal to a known constant
-		// value to help the compiler)
-		
-		// set up any additional variables needed by the PIXEL_OP*
-		// macro you want to use (each macro has its own 
-		// requirements)
-		
-		MEGA_MACRO(BITMAP_TYPE, PIXEL_OP, PRIORITY_TYPE);
-	}
+    How to use these macros:
+
+    There are two sets of macros. The PIXEL_OP* macros are simple
+    per-pixel operations, designed to take a SOURCE pixel and
+    copy it to the DEST, perhaps updating the PRIORITY pixel as
+    well. On their own, they are not particularly useful.
+
+    The second set of macros represents the core gfx/bitmap walking
+    and rendering code. These macros generally take the target pixel
+    type (UINT8, UINT16, UINT32), one of the PIXEL_OP* macros,
+    and a priority bitmap pixel type (UINT8, UINT16, UINT32, or the
+    special type NO_PRIORITY).
+
+    Although the code may look inefficient at first, the compiler is
+    able to easily optimize out unused cases due to the way the
+    macros are written, leaving behind just the cases we are
+    interested in.
+
+    The general approach for using these macros is:
+
+    my_drawing_function(params)
+    {
+        // ensure that all the required parameters for the mega
+        // macro are defined (if they are not needed, just declare
+        // the variables and set them equal to a known constant
+        // value to help the compiler)
+
+        // set up any additional variables needed by the PIXEL_OP*
+        // macro you want to use (each macro has its own
+        // requirements)
+
+        MEGA_MACRO(BITMAP_TYPE, PIXEL_OP, PRIORITY_TYPE);
+    }
 
 *********************************************************************/
 
@@ -70,7 +70,7 @@ typedef struct { char dummy[3]; } NO_PRIORITY;
 ***************************************************************************/
 
 /*-------------------------------------------------
-    PIXEL_OP_COPY_OPAQUE - render all pixels 
+    PIXEL_OP_COPY_OPAQUE - render all pixels
     regardless of pen, copying directly
 -------------------------------------------------*/
 
@@ -83,7 +83,7 @@ while (0)																			\
 
 
 /*-------------------------------------------------
-    PIXEL_OP_COPY_TRANSPEN - render all pixels 
+    PIXEL_OP_COPY_TRANSPEN - render all pixels
     except those matching 'transpen', copying
     directly
 -------------------------------------------------*/
@@ -99,7 +99,7 @@ while (0)																			\
 
 
 /*-------------------------------------------------
-    PIXEL_OP_REMAP_OPAQUE - render all pixels 
+    PIXEL_OP_REMAP_OPAQUE - render all pixels
     regardless of pen, mapping the pen via the
     'paldata' array
 -------------------------------------------------*/
@@ -122,8 +122,8 @@ while (0)																			\
 
 
 /*-------------------------------------------------
-    PIXEL_OP_REMAP_TRANSPEN - render all pixels 
-    except those matching 'transpen', mapping the 
+    PIXEL_OP_REMAP_TRANSPEN - render all pixels
+    except those matching 'transpen', mapping the
     pen via the 'paldata' array
 -------------------------------------------------*/
 
@@ -151,7 +151,7 @@ while (0)																			\
 
 
 /*-------------------------------------------------
-    PIXEL_OP_REBASE_TRANSPEN - render all pixels 
+    PIXEL_OP_REBASE_TRANSPEN - render all pixels
     except those matching 'transpen', adding
     'color' to the pen value
 -------------------------------------------------*/
@@ -180,8 +180,8 @@ while (0)																			\
 
 
 /*-------------------------------------------------
-    PIXEL_OP_REMAP_TRANSMASK - render all pixels 
-    except those matching 'transmask', mapping the 
+    PIXEL_OP_REMAP_TRANSMASK - render all pixels
+    except those matching 'transmask', mapping the
     pen via the 'paldata' array
 -------------------------------------------------*/
 
@@ -212,8 +212,8 @@ while (0)																			\
     PIXEL_OP_REMAP_TRANSTABLE - look up each pen in
     'pentable'; if the entry is DRAWMODE_NONE,
     don't draw it; if the entry is DRAWMODE_SOURCE,
-    look up the pen via the 'paldata' array; if the 
-    entry is DRAWMODE_SHADOW, generate a shadow of 
+    look up the pen via the 'paldata' array; if the
+    entry is DRAWMODE_SHADOW, generate a shadow of
     the destination pixel using 'shadowtable'
 -------------------------------------------------*/
 
@@ -299,10 +299,10 @@ while (0)																			\
 
 
 /*-------------------------------------------------
-    PIXEL_OP_REMAP_TRANSPEN_ALPHA - render all 
-    pixels except those matching 'transpen', 
-    mapping the pen to via the 'paldata' array; 
-    the resulting color is RGB alpha blended 
+    PIXEL_OP_REMAP_TRANSPEN_ALPHA - render all
+    pixels except those matching 'transpen',
+    mapping the pen to via the 'paldata' array;
+    the resulting color is RGB alpha blended
     against the destination using 'alpha'
 -------------------------------------------------*/
 
@@ -357,18 +357,18 @@ while (0)																			\
 ***************************************************************************/
 
 /*
-	Assumed input parameters or local variables:
-	
-		bitmap_t *dest - the bitmap to render to
-		const rectangle *cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
-		const gfx_element *gfx - pointer to the gfx_element to render
-		UINT32 code - index of the entry within gfx_element
-		UINT32 color - index of the color within gfx_element
-		int flipx - non-zero means render right-to-left instead of left-to-right
-		int flipy - non-zero means render bottom-to-top instead of top-to-bottom
-		INT32 destx - the top-left X coordinate to render to
-		INT32 desty - the top-left Y coordinate to render to
-		bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
+    Assumed input parameters or local variables:
+
+        bitmap_t *dest - the bitmap to render to
+        const rectangle *cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
+        const gfx_element *gfx - pointer to the gfx_element to render
+        UINT32 code - index of the entry within gfx_element
+        UINT32 color - index of the color within gfx_element
+        int flipx - non-zero means render right-to-left instead of left-to-right
+        int flipy - non-zero means render bottom-to-top instead of top-to-bottom
+        INT32 destx - the top-left X coordinate to render to
+        INT32 desty - the top-left Y coordinate to render to
+        bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 
@@ -627,20 +627,20 @@ do { 																					\
 ***************************************************************************/
 
 /*
-	Assumed input parameters or local variables:
-	
-		bitmap_t *dest - the bitmap to render to
-		const rectangle *cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
-		const gfx_element *gfx - pointer to the gfx_element to render
-		UINT32 code - index of the entry within gfx_element
-		UINT32 color - index of the color within gfx_element
-		int flipx - non-zero means render right-to-left instead of left-to-right
-		int flipy - non-zero means render bottom-to-top instead of top-to-bottom
-		INT32 destx - the top-left X coordinate to render to
-		INT32 desty - the top-left Y coordinate to render to
-		UINT32 scalex - the 16.16 scale factor in the X dimension
-		UINT32 scaley - the 16.16 scale factor in the Y dimension
-		bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
+    Assumed input parameters or local variables:
+
+        bitmap_t *dest - the bitmap to render to
+        const rectangle *cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
+        const gfx_element *gfx - pointer to the gfx_element to render
+        UINT32 code - index of the entry within gfx_element
+        UINT32 color - index of the color within gfx_element
+        int flipx - non-zero means render right-to-left instead of left-to-right
+        int flipy - non-zero means render bottom-to-top instead of top-to-bottom
+        INT32 destx - the top-left X coordinate to render to
+        INT32 desty - the top-left Y coordinate to render to
+        UINT32 scalex - the 16.16 scale factor in the X dimension
+        UINT32 scaley - the 16.16 scale factor in the Y dimension
+        bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 
@@ -808,16 +808,16 @@ do { 																					\
 ***************************************************************************/
 
 /*
-	Assumed input parameters or local variables:
-	
-		bitmap_t *dest - the bitmap to copy to
-		bitmap_t *src - the bitmap to copy from (must be same bpp as dest)
-		const rectangle *cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
-		int flipx - non-zero means render right-to-left instead of left-to-right
-		int flipy - non-zero means render bottom-to-top instead of top-to-bottom
-		INT32 destx - the top-left X coordinate to copy to
-		INT32 desty - the top-left Y coordinate to copy to
-		bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
+    Assumed input parameters or local variables:
+
+        bitmap_t *dest - the bitmap to copy to
+        bitmap_t *src - the bitmap to copy from (must be same bpp as dest)
+        const rectangle *cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
+        int flipx - non-zero means render right-to-left instead of left-to-right
+        int flipy - non-zero means render bottom-to-top instead of top-to-bottom
+        INT32 destx - the top-left X coordinate to copy to
+        INT32 desty - the top-left Y coordinate to copy to
+        bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 #define COPYBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)							\
@@ -986,19 +986,19 @@ do { 																					\
 ***************************************************************************/
 
 /*
-	Assumed input parameters or local variables:
-	
-		bitmap_t *dest - the bitmap to copy to
-		bitmap_t *src - the bitmap to copy from (must be same bpp as dest)
-		const rectangle *cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
-		INT32 destx - the 16.16 source X position at destination pixel (0,0)
-		INT32 desty - the 16.16 source Y position at destination pixel (0,0)
-		INT32 incxx - the 16.16 amount to increment in source X for each destination X pixel
-		INT32 incyx - the 16.16 amount to increment in source Y for each destination X pixel
-		INT32 incxy - the 16.16 amount to increment in source X for each destination Y pixel
-		INT32 incyy - the 16.16 amount to increment in source Y for each destination Y pixel
-		int wraparound - non-zero means wrap when hitting the edges of the source
-		bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
+    Assumed input parameters or local variables:
+
+        bitmap_t *dest - the bitmap to copy to
+        bitmap_t *src - the bitmap to copy from (must be same bpp as dest)
+        const rectangle *cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
+        INT32 destx - the 16.16 source X position at destination pixel (0,0)
+        INT32 desty - the 16.16 source Y position at destination pixel (0,0)
+        INT32 incxx - the 16.16 amount to increment in source X for each destination X pixel
+        INT32 incyx - the 16.16 amount to increment in source Y for each destination X pixel
+        INT32 incxy - the 16.16 amount to increment in source X for each destination Y pixel
+        INT32 incyy - the 16.16 amount to increment in source Y for each destination Y pixel
+        int wraparound - non-zero means wrap when hitting the edges of the source
+        bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 #define COPYROZBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)						\
@@ -1291,14 +1291,14 @@ do { 																				\
 ***************************************************************************/
 
 /*
-	Assumed input parameters or local variables:
-	
-		bitmap_t *bitmap - the bitmap to copy to
-		INT32 destx - the X coordinate to copy to
-		INT32 desty - the Y coordinate to copy to
-		INT32 length - the total number of pixels to copy
-		const UINTx *srcptr - pointer to memory containing the source pixels
-		bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
+    Assumed input parameters or local variables:
+
+        bitmap_t *bitmap - the bitmap to copy to
+        INT32 destx - the X coordinate to copy to
+        INT32 desty - the Y coordinate to copy to
+        INT32 length - the total number of pixels to copy
+        const UINTx *srcptr - pointer to memory containing the source pixels
+        bitmap_t *priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 #define DRAWSCANLINE_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)						\
@@ -1347,13 +1347,13 @@ do { 																				\
 ***************************************************************************/
 
 /*
-	Assumed input parameters:
-	
-		bitmap_t *bitmap - the bitmap to extract from
-		INT32 srcx - the X coordinate to begin extraction
-		INT32 srcy - the Y coordinate to begin extraction
-		INT32 length - the total number of pixels to extract
-		UINTx *destptr - pointer to memory to receive the extracted pixels
+    Assumed input parameters:
+
+        bitmap_t *bitmap - the bitmap to extract from
+        INT32 srcx - the X coordinate to begin extraction
+        INT32 srcy - the Y coordinate to begin extraction
+        INT32 length - the total number of pixels to extract
+        UINTx *destptr - pointer to memory to receive the extracted pixels
 */
 
 #define EXTRACTSCANLINE_CORE(PIXEL_TYPE)											\

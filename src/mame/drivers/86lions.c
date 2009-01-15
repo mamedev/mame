@@ -14,9 +14,9 @@ NOTES:
   - Seems to be 1 DSW bank tied to VIA, and another to ay8910.
 
 TODO:
-	- Understand inputs / via mapping properly;
-	- Finish the mc6845 conversion;
-	- Colors? This shoudn't use a color prom.
+    - Understand inputs / via mapping properly;
+    - Finish the mc6845 conversion;
+    - Colors? This shoudn't use a color prom.
 
 *******************************************************************************************/
 
@@ -136,57 +136,57 @@ static INPUT_PORTS_START( lions )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-7") PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-8") PORT_CODE(KEYCODE_L)
 
-//	PORT_START("DSW1")
-//	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_START("DSW1")
+//  PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-//	PORT_START("DSW2")
-//	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-//	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_START("DSW2")
+//  PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+//  PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -223,39 +223,39 @@ static const ay8910_interface ay8910_config =
 //static READ8_DEVICE_HANDLER( input_a )
 //{
 //return input_port_read(machine, "IN0");
-//	return mame_rand(device->machine);
+//  return mame_rand(device->machine);
 //return 0xff;
 //}
 
 //static READ8_DEVICE_HANDLER( input_b )
 //{
 //return input_port_read(machine, "IN1");
-//		return mame_rand(device->machine);
+//      return mame_rand(device->machine);
 //return 0xff;
 //}
 
 static READ8_DEVICE_HANDLER( input_ca1 )
 {
-//		return mame_rand(device->machine);
+//      return mame_rand(device->machine);
 	return 0x00;
 }
 
 static READ8_DEVICE_HANDLER( input_cb1 )
 {
-//		return mame_rand(device->machine);
+//      return mame_rand(device->machine);
 	return 0x00;
 }
 
 static READ8_DEVICE_HANDLER( input_ca2 )
 {
-//		return mame_rand(device->machine);
+//      return mame_rand(device->machine);
 
 	return 0x00;
 }
 
 static READ8_DEVICE_HANDLER( input_cb2 )
 {
-//		return mame_rand(device->machine);
+//      return mame_rand(device->machine);
 
 	return 0x00;
 }
@@ -314,7 +314,7 @@ static INTERRUPT_GEN( lions_irq )
 static const mc6845_interface mc6845_intf =
 {
 	/* in fact is a mc6845 driving 4 pixels by memory address.
-	   that's why the big horizontal parameters */
+       that's why the big horizontal parameters */
 
 	"main",	/* screen we are acting on */
 	4,		/* number of pixels per video memory address */
@@ -372,8 +372,8 @@ ROM_START( 86lions )
 	ROM_LOAD( "gn1.u11", 0x01000, 0x1000, CRC(80dce6f4) SHA1(bf953eba9cb270297b0d0efffe15b926e94dfbe7) )
 	ROM_LOAD( "bl1.u9",  0x02000, 0x1000, CRC(675e164a) SHA1(99346ca70bfe673b31d71dc6b3bbc3b8f961e87f) )
 
-//	ROM_REGION( 0x20, "proms", 0 )
-//	ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
+//  ROM_REGION( 0x20, "proms", 0 )
+//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
 

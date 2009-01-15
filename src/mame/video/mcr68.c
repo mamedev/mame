@@ -87,7 +87,7 @@ VIDEO_START( zwackery )
 	/* allocate memory for the assembled gfx data */
 	srcdata0 = auto_malloc(gfx0->total_elements * gfx0->width * gfx0->height);
 	srcdata2 = auto_malloc(gfx2->total_elements * gfx2->width * gfx2->height);
-	
+
 	/* "colorize" each code */
 	dest0 = srcdata0;
 	dest2 = srcdata2;

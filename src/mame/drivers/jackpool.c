@@ -134,17 +134,17 @@ static READ16_HANDLER( jackpool_io_r )
 		case 0x18: return input_port_read(space->machine,"HOLD5");
 		case 0x1a: return input_port_read(space->machine,"START1");
 		case 0x1c: return input_port_read(space->machine,"BET");
-//		case 0x2c: eeprom 1 r?
-//		case 0x2e: eeprom 2 r?
+//      case 0x2c: eeprom 1 r?
+//      case 0x2e: eeprom 2 r?
 	}
 
-//	printf("R %02x\n",offset*2);
+//  printf("R %02x\n",offset*2);
 	return jackpool_io[offset];
 }
 
 static WRITE16_HANDLER( jackpool_io_w )
 {
-//	printf("W %02x %02x\n",offset*2,data);
+//  printf("W %02x %02x\n",offset*2,data);
 	COMBINE_DATA(&jackpool_io[offset]);
 
 	#if 0

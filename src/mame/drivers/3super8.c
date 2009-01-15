@@ -5,7 +5,7 @@
 this dump is bad
 
 
-Produttore	?Italy?
+Produttore  ?Italy?
 N.revisione
 CPU
 

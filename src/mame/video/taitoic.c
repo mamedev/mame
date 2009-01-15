@@ -1854,7 +1854,7 @@ do																					\
 	}																				\
 }																					\
 while (0)																			\
-			
+
 static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	UINT8 layer=1;

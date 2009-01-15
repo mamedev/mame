@@ -259,7 +259,7 @@ typedef struct {
 	// Waveform and current index in it
 	UINT8 dac_index; // 128 for done
 	INT16 dac[128];
-	
+
 } digitalker;
 
 // Quantized intensity values, first index is the volume, second the
@@ -344,7 +344,7 @@ static void digitalker_step_mode_0(digitalker *dg)
 
 	for(i=0; i<32; i++)
 		dg->dac[wpos++] = 0;
-	    
+
 	for(k=1; k != 9; k++) {
 		bits |= dg->rom[dg->apos+k] << 8;
 		for(l=0; l<4; l++) {
@@ -355,7 +355,7 @@ static void digitalker_step_mode_0(digitalker *dg)
 	}
 
 	digitalker_write(dg, &wpos, vol, dac);
-	
+
 	for(k=7; k >= 0; k--) {
 		bits = (bits << 8) | (k ? dg->rom[dg->apos+k] : 0x80);
 		for(l=3; l>=0; l--) {
@@ -405,7 +405,7 @@ static void digitalker_step_mode_2(digitalker *dg)
 	}
 
 	digitalker_write(dg, &wpos, vol, dac);
-	
+
 	for(k=7; k >= 0; k--) {
 		bits = (bits << 8) | (k ? dg->rom[dg->apos+k] : 0x80);
 		for(l=3; l>=0; l--) {
@@ -426,7 +426,7 @@ static void digitalker_step_mode_2(digitalker *dg)
 	}
 
 	digitalker_write(dg, &wpos, vol, dac);
-	
+
 	for(k=7; k >= 0; k--) {
 		bits = (bits << 8) | (k ? dg->rom[dg->apos+k] : 0x80);
 		for(l=3; l>=0; l--) {
@@ -524,7 +524,7 @@ static void digitalker_step(digitalker *dg)
 	case 1: digitalker_step_mode_1(dg); break;
 	case 2: digitalker_step_mode_2(dg); break;
 	case 3: digitalker_step_mode_3(dg); break;
-	}	
+	}
 	if(!dg->zero_count)
 		dg->dac_index = 0;
 }

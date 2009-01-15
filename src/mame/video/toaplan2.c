@@ -598,7 +598,7 @@ VIDEO_START( batrider_0 )
 	raizing_tx_gfxram16 = auto_malloc(RAIZING_TX_GFXRAM_SIZE);
 	memset(raizing_tx_gfxram16,0,RAIZING_TX_GFXRAM_SIZE);
 	state_save_register_global_pointer(machine, raizing_tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
-	
+
 	gfx_element_set_source(machine->gfx[2], (UINT8 *)raizing_tx_gfxram16);
 
 	toaplan2_vram_alloc(0);

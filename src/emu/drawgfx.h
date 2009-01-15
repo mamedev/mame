@@ -133,7 +133,7 @@ struct _gfx_element
 	UINT16			color_depth;		/* number of colors each pixel can represent */
 	UINT16			color_granularity;	/* number of colors for each color code */
 	UINT32			total_colors;		/* number of color codes */
-	
+
 	UINT32 *		pen_usage;			/* bitmask of pens that are used (pens 0-31 only) */
 
 	UINT8 *			gfxdata;			/* pixel data, 8bpp or 4bpp (if GFX_ELEMENT_PACKED) */
@@ -277,7 +277,7 @@ void copybitmap(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx
 /* copy from one bitmap to another, copying all unclipped pixels except those that match transpen */
 void copybitmap_trans(bitmap_t *dest, bitmap_t *src, int flipx, int flipy, INT32 destx, INT32 desty, const rectangle *cliprect, UINT32 transpen);
 
-/* 
+/*
   Copy a bitmap onto another with scroll and wraparound.
   These functions support multiple independently scrolling rows/columns.
   "rows" is the number of indepentently scrolling rows. "rowscroll" is an
@@ -296,32 +296,32 @@ void copyscrollbitmap(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32
 void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const INT32 *rowscroll, UINT32 numcols, const INT32 *colscroll, const rectangle *cliprect, UINT32 transpen);
 
 /*
-	Copy a bitmap applying rotation, zooming, and arbitrary distortion.
-	This function works in a way that mimics some real hardware like the Konami
-	051316, so it requires little or no further processing on the caller side.
+    Copy a bitmap applying rotation, zooming, and arbitrary distortion.
+    This function works in a way that mimics some real hardware like the Konami
+    051316, so it requires little or no further processing on the caller side.
 
-	Two 16.16 fixed point counters are used to keep track of the position on
-	the source bitmap. startx and starty are the initial values of those counters,
-	indicating the source pixel that will be drawn at coordinates (0,0) in the
-	destination bitmap. The destination bitmap is scanned left to right, top to
-	bottom; every time the cursor moves one pixel to the right, incxx is added
-	to startx and incxy is added to starty. Every time the cursor moves to the
-	next line, incyx is added to startx and incyy is added to startyy.
+    Two 16.16 fixed point counters are used to keep track of the position on
+    the source bitmap. startx and starty are the initial values of those counters,
+    indicating the source pixel that will be drawn at coordinates (0,0) in the
+    destination bitmap. The destination bitmap is scanned left to right, top to
+    bottom; every time the cursor moves one pixel to the right, incxx is added
+    to startx and incxy is added to starty. Every time the cursor moves to the
+    next line, incyx is added to startx and incyy is added to startyy.
 
-	What this means is that if incxy and incyx are both 0, the bitmap will be
-	copied with only zoom and no rotation. If e.g. incxx and incyy are both 0x8000,
-	the source bitmap will be doubled.
+    What this means is that if incxy and incyx are both 0, the bitmap will be
+    copied with only zoom and no rotation. If e.g. incxx and incyy are both 0x8000,
+    the source bitmap will be doubled.
 
-	Rotation is performed this way:
-	incxx = 0x10000 * cos(theta)
-	incxy = 0x10000 * -sin(theta)
-	incyx = 0x10000 * sin(theta)
-	incyy = 0x10000 * cos(theta)
-	this will perform a rotation around (0,0), you'll have to adjust startx and
-	starty to move the center of rotation elsewhere.
+    Rotation is performed this way:
+    incxx = 0x10000 * cos(theta)
+    incxy = 0x10000 * -sin(theta)
+    incyx = 0x10000 * sin(theta)
+    incyy = 0x10000 * cos(theta)
+    this will perform a rotation around (0,0), you'll have to adjust startx and
+    starty to move the center of rotation elsewhere.
 
-	Optionally the bitmap can be tiled across the screen instead of doing a single
-	copy. This is obtained by setting the wraparound parameter to true.
+    Optionally the bitmap can be tiled across the screen instead of doing a single
+    copy. This is obtained by setting the wraparound parameter to true.
 */
 
 /* copy from one bitmap to another, with zoom and rotation, copying all unclipped pixels */
@@ -349,8 +349,8 @@ INLINE void gfx_element_set_source(gfx_element *gfx, const UINT8 *source)
 
 
 /*-------------------------------------------------
-    gfx_element_get_data - return a pointer to 
-    the base of the given code within a 
+    gfx_element_get_data - return a pointer to
+    the base of the given code within a
     gfx_element, decoding it if it is dirty
 -------------------------------------------------*/
 

@@ -512,7 +512,7 @@ MACHINE_START( cvs )
 
 	if (machine->gfx[1] != NULL)
 		gfx_element_set_source(machine->gfx[1], cvs_character_ram);
-	
+
 	start_393hz_timer(machine);
 
 	/* register state save */

@@ -141,7 +141,7 @@ static MACHINE_DRIVER_START( igs_ncs )
 	MDRV_CPU_PROGRAM_MAP(igs_ncs_map,0)
 	MDRV_CPU_IO_MAP(igs_ncs_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(igs_ncs_interrupt,2)
-//	MDRV_CPU_VBLANK_INT("main",igs_ncs_interrupt)
+//  MDRV_CPU_VBLANK_INT("main",igs_ncs_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

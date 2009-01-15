@@ -1360,7 +1360,7 @@ void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank
 		for ( i = start_page; i < start_page + num_pages; i++ )
 		{
 			int elemnum;
-			
+
 			if ( chips[num].videoram_banks_indices[i] != -1 )
 			{
 				memcpy( &chips[num].videoram[chips[num].videoram_banks_indices[i]*0x400], &chips[num].videomem[i*0x400], 0x400);

@@ -1612,10 +1612,10 @@ void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0,
 	gfx_element *gx1 = machine->gfx[gfx1];
 	UINT8 *srcdata, *dest;
 	int c, x, y;
-	
+
 	/* allocate memory for the assembled data */
 	srcdata = auto_malloc(gx0->total_elements * gx0->width * gx0->height);
-	
+
 	/* loop over elements */
 	dest = srcdata;
 	for (c = 0; c < gx0->total_elements; c++)

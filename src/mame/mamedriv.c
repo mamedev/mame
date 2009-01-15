@@ -4966,7 +4966,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tbyahhoo )	/* GX424 (c) 1995 (Japan) */
 	DRIVER( tkmmpzdm )	/* GX515 (c) 1995 (Japan) */
 	DRIVER( salmndr2 )	/* GX521 (c) 1996 (Japan) */
-	DRIVER( salmnd2a )	/* GX521 (c) 1996 (Asia) */	
+	DRIVER( salmnd2a )	/* GX521 (c) 1996 (Asia) */
 	DRIVER( sexyparo )	/* GX533 (c) 1996 (Japan) */
 	DRIVER( daiskiss )	/* GX535 (c) 1996 (Japan) */
 	DRIVER( tokkae )	/* GX615 (c) 1996 (Japan) */
@@ -8543,7 +8543,7 @@ Other Sun games
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( mtonic )	/* 198? (c) Tonic */
-	
+
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 	DRIVER( spielbud )	/* (c) 1985 ADP */

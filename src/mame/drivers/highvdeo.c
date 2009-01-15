@@ -7,29 +7,29 @@ driver by Mirko Buffoni
 
 Memory layout:
 
-000000-0003FF	Interrupt table
-000400-003FFF	NVRAM and main ram
-040000-04FFFF	VGA 320x200 address space
-080000-0BFFFF	Banked ROM
-0C0000-0FFFFF	Program ROM
+000000-0003FF   Interrupt table
+000400-003FFF   NVRAM and main ram
+040000-04FFFF   VGA 320x200 address space
+080000-0BFFFF   Banked ROM
+0C0000-0FFFFF   Program ROM
 
 
 Port layout:
 
-0x0008 R	Input port -> Keyboard
-0x000A R	Input port -> Coin and Service
-0x000C R	Input port -> Reset
+0x0008 R    Input port -> Keyboard
+0x000A R    Input port -> Coin and Service
+0x000C R    Input port -> Reset
 
-0x0030 R	Read continuously... maybe watchdog?
+0x0030 R    Read continuously... maybe watchdog?
 
-0x0000 W	Keyboard Lights control port
-0x0002 W	\ Hopper or ticket related
-0x0004 W	/
-0x0006 W	OKI6395 ADPCM command:  need to be latched
-0x0010 W	Like 0x3c8 in VGA
-0x0014 W	Like 0x3c9 in VGA
+0x0000 W    Keyboard Lights control port
+0x0002 W    \ Hopper or ticket related
+0x0004 W    /
+0x0006 W    OKI6395 ADPCM command:  need to be latched
+0x0010 W    Like 0x3c8 in VGA
+0x0014 W    Like 0x3c9 in VGA
 
-0x0030 W	Bankswitch select
+0x0030 W    Bankswitch select
 
 ----
 
@@ -39,30 +39,30 @@ INT 2 (NMI) called every Vblank
 
 Interesting locations.  255 = YES
 
-3E23-24		Valore Moneta	(5)  (1,5,10)
-3E25-26		Valore Gettone	(5)  (1-20)
-3E27-28		Valore Servizio	(10) (5-500)
-3E29-2A		Banconote 1		(5)  (5-500)
+3E23-24     Valore Moneta   (5)  (1,5,10)
+3E25-26     Valore Gettone  (5)  (1-20)
+3E27-28     Valore Servizio (10) (5-500)
+3E29-2A     Banconote 1     (5)  (5-500)
 
-3E33		Replay			(255) (0,255)
-3E34		Double			(0)   (0,255)
-3E35		BloccaBanconote	(255) (0,255)
-3E36		Accumulo		(0)   (0,255)
-3E37		Vincita 10		(255) (0,255)
-3E38		Numeroni		(255) (0,255)
-3E39		Palline			(255) (0,255)
-3E3B		Lattine			(255) (0,255)
-3E3D		Premio			(10)  (X,10)
-3E3E		Bet Max Credit	(20)  (1-50)
-3E3F		Bet Max Points	(20)  (1-50)
+3E33        Replay          (255) (0,255)
+3E34        Double          (0)   (0,255)
+3E35        BloccaBanconote (255) (0,255)
+3E36        Accumulo        (0)   (0,255)
+3E37        Vincita 10      (255) (0,255)
+3E38        Numeroni        (255) (0,255)
+3E39        Palline         (255) (0,255)
+3E3B        Lattine         (255) (0,255)
+3E3D        Premio          (10)  (X,10)
+3E3E        Bet Max Credit  (20)  (1-50)
+3E3F        Bet Max Points  (20)  (1-50)
 
-3E40-41		Blocco Getton.  (100) (10-1000)
-3E42		Cambio Carte	(0)   (Veloce=0, Normale=1, Lento=2)
-3E45-46		Valore ticket	(100) (1-500)
-3E4B		Bet Min Gioco	(1)   (1-10)
-3E4C		Bet Min Fever	(1)   (1-10)
+3E40-41     Blocco Getton.  (100) (10-1000)
+3E42        Cambio Carte    (0)   (Veloce=0, Normale=1, Lento=2)
+3E45-46     Valore ticket   (100) (1-500)
+3E4B        Bet Min Gioco   (1)   (1-10)
+3E4C        Bet Min Fever   (1)   (1-10)
 
-3E59		Tickets			(10)  (Tutti=0, 10=F, 1=FF)
+3E59        Tickets         (10)  (Tutti=0, 10=F, 1=FF)
 
 ----
 

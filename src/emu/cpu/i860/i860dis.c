@@ -1,15 +1,15 @@
 /***************************************************************************
 
-	i860dis.c
+    i860dis.c
 
-	Disassembler for the Intel i860 emulator.
+    Disassembler for the Intel i860 emulator.
 
-	Copyright (C) 1995-present Jason Eckhardt (jle@rice.edu)
-	Released for general non-commercial use under the MAME license
-	with the additional requirement that you are free to use and
-	redistribute this code in modified or unmodified form, provided
-	you list me in the credits.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright (C) 1995-present Jason Eckhardt (jle@rice.edu)
+    Released for general non-commercial use under the MAME license
+    with the additional requirement that you are free to use and
+    redistribute this code in modified or unmodified form, provided
+    you list me in the credits.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
 
@@ -31,7 +31,7 @@
 
 
 /* Control register names.  */
-static const char *const cr2str[] = 
+static const char *const cr2str[] =
 	{"fir", "psr", "dirbase", "db", "fsr", "epsr", "!", "!"};
 
 
@@ -51,10 +51,10 @@ static void int_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
 	/* Possibly prefix shrd with 'd.' */
 	if (((insn & 0xfc000000) == 0xb0000000) && (insn & 0x200))
-		sprintf(buf, "d.%s\t%%r%d,%%r%d,%%r%d", mnemonic, 
+		sprintf(buf, "d.%s\t%%r%d,%%r%d,%%r%d", mnemonic,
 			get_isrc1 (insn), get_isrc2 (insn), get_idest (insn));
 	else
-		sprintf(buf, "%s\t%%r%d,%%r%d,%%r%d", mnemonic, 
+		sprintf(buf, "%s\t%%r%d,%%r%d,%%r%d", mnemonic,
 			get_isrc1 (insn), get_isrc2 (insn), get_idest (insn));
 }
 
@@ -64,13 +64,13 @@ static void int_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 static void int_i2d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 {
 	/* Sign extend the 16-bit immediate.
-	   Print as hex for the bitwise operations.  */
+       Print as hex for the bitwise operations.  */
 	int upper_6bits = (insn >> 26) & 0x3f;
 	if (upper_6bits >= 0x30 && upper_6bits <= 0x3f)
 		sprintf(buf, "%s\t0x%04x,%%r%d,%%r%d", mnemonic,
 			(UINT32)(get_imm16 (insn)), get_isrc2 (insn), get_idest (insn));
 	else
-		sprintf(buf, "%s\t%d,%%r%d,%%r%d", mnemonic, 
+		sprintf(buf, "%s\t%d,%%r%d,%%r%d", mnemonic,
 			sign_ext(get_imm16 (insn), 16), get_isrc2 (insn), get_idest (insn));
 }
 
@@ -121,10 +121,10 @@ static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	int s = (insn & 0x180) >> 7;
 	prefix_p = (insn & 0x400) ? "p" : "";
 	prefix_d = (insn & 0x200) ? "d." : "";
- 
+
 	/* Special case: pf[m]am and pf[m]sm families are always pipelined, so they
-	   do not have a prefix.  Also, for the pfmam and pfmsm families, replace
-	   any 'a' in the mnemonic with 'm' and prepend an 'm'.  */ 
+       do not have a prefix.  Also, for the pfmam and pfmsm families, replace
+       any 'a' in the mnemonic with 'm' and prepend an 'm'.  */
 	if ((insn & 0x7f) < 0x20)
 	{
 		int is_pfam = insn & 0x400;
@@ -153,7 +153,7 @@ static void flop_12d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	if ((insn & 0x7f) == 0x34)
 	{
 		const char *mn[2] = { "fgt.", "fle." };
-		int r = (insn & 0x080) >> 7;   
+		int r = (insn & 0x080) >> 7;
 		int s = (insn & 0x100) ? 3 : 0;
 		sprintf(buf, "%s%s%s%s\t%%f%d,%%f%d,%%f%d", prefix_d, prefix_p, mn[r],
 			suffix[s], get_fsrc1 (insn), get_fsrc2 (insn), get_fdest (insn));
@@ -186,7 +186,7 @@ static void flop_2d(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	const char *prefix_d;
 	int s = (insn & 0x180) >> 7;
 	prefix_d = (insn & 0x200) ? "d." : "";
-	sprintf(buf, "%s%s%s\t%%f%d,%%f%d", prefix_d, mnemonic, suffix[s], 
+	sprintf(buf, "%s%s%s\t%%f%d,%%f%d", prefix_d, mnemonic, suffix[s],
 		get_fsrc2 (insn), get_fdest (insn));
 }
 
@@ -247,14 +247,14 @@ static void int_ldx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	UINT32 idx = 0;
 
 	/* Bits 28 and 0 determine the operand size.  */
-	idx = ((insn >> 27) & 2) | (insn & 1); 
+	idx = ((insn >> 27) & 2) | (insn & 1);
 
 	/* Bit 26 determines the addressing mode (reg+reg or disp+reg).  */
 	if (insn & 0x04000000)
 	{
 		/* Chop off lower bits of displacement.  */
 		INT32 immsrc1 = sign_ext (get_imm16 (insn), 16);
-		int size = sizes[idx]; 
+		int size = sizes[idx];
 		immsrc1 &= ~(size - 1);
 		sprintf(buf, "%s%s\t%d(%%r%d),%%r%d", mnemonic, suffix[idx],
 			immsrc1, get_isrc2 (insn), get_idest (insn));
@@ -276,10 +276,10 @@ static void int_stx(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 	INT32 immsrc = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
 
 	/* Bits 28 and 0 determine the operand size.  */
-	idx = ((insn >> 27) & 2) | (insn & 1); 
+	idx = ((insn >> 27) & 2) | (insn & 1);
 
 	/* Chop off lower bits of displacement.  */
-	size = sizes[idx]; 
+	size = sizes[idx];
 	immsrc &= ~(size - 1);
 	sprintf(buf, "%s%s\t%%r%d,%d(%%r%d)", mnemonic, suffix[idx],
 		get_isrc1 (insn), immsrc, get_isrc2 (insn));
@@ -309,8 +309,8 @@ static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 				   || upper_6bits == 25);
 
 	/* Bits 2 and 1 determine the operand size.  */
-	idx = ((insn >> 1) & 3); 
-	size = sizes[idx]; 
+	idx = ((insn >> 1) & 3);
+	size = sizes[idx];
 
 	/* There is no pipelined load quad on XR.  */
 	if (piped && size == 16)
@@ -333,7 +333,7 @@ static void int_fldst(char *buf, char *mnemonic, UINT32 pc, UINT32 insn)
 		immsrc1 &= ~(size - 1);
 		if (is_load)
 			sprintf(buf, "%s%s%s\t%d(%%r%d)%s,%%f%d", piped_suff[piped], mnemonic,
-				suffix[idx], immsrc1, get_isrc2 (insn), auto_suff[auto_inc], 
+				suffix[idx], immsrc1, get_isrc2 (insn), auto_suff[auto_inc],
 				get_fdest (insn));
 		else
 			sprintf(buf, "%s%s\t%%f%d,%d(%%r%d)%s", mnemonic, suffix[idx],
@@ -375,14 +375,14 @@ enum
 typedef struct
 {
 	/* Disassembly function for this opcode.
-	   Call with buffer, mnemonic, pc, insn.  */
+       Call with buffer, mnemonic, pc, insn.  */
 	void (*insn_dis)(char *, char *, UINT32, UINT32);
-	
+
     /* Flags for this opcode.  */
 	char flags;
-	
+
     /* Mnemonic of this opcode (sometimes partial when more decode is
-	   done in disassembly routines-- e.g., loads and stores).  */
+       done in disassembly routines-- e.g., loads and stores).  */
 	const char *mnemonic;
 } decode_tbl_t;
 
@@ -391,8 +391,8 @@ typedef struct
 static decode_tbl_t decode_tbl[64] =
 {
 	/* A slight bit of decoding for loads and stores is done in the
-	   execution routines (operand size and addressing mode), which
-	   is why their respective entries are identical.  */
+       execution routines (operand size and addressing mode), which
+       is why their respective entries are identical.  */
 	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.b isrc1(isrc2),idest.  */
 	{ int_ldx,   DEC_DECODED, "ld."        }, /* ld.b #const(isrc2),idest.  */
 	{ int_1d,    DEC_DECODED, "ixfr"       }, /* ixfr isrc1ni,fdest.        */
@@ -413,7 +413,7 @@ static decode_tbl_t decode_tbl[64] =
 	{ int_12d,   DEC_DECODED, "trap"       }, /* trap isrc1ni,isrc2,idest.            */
 	{ 0,         DEC_MORE,    0            }, /* FP ESCAPE FORMAT, more decode.       */
 	{ 0,         DEC_MORE,    0            }, /* CORE ESCAPE FORMAT, more decode.     */
-	{ int_12S,   DEC_DECODED, "btne"       }, /* btne isrc1,isrc2,sbroff.             */ 
+	{ int_12S,   DEC_DECODED, "btne"       }, /* btne isrc1,isrc2,sbroff.             */
 	{ int_i2S,   DEC_DECODED, "btne"       }, /* btne #const,isrc2,sbroff.            */
 	{ int_12S,   DEC_DECODED, "bte"        }, /* bte isrc1,isrc2,sbroff.              */
 	{ int_i2S,   DEC_DECODED, "bte"        }, /* bte #const5,isrc2,idest.             */
@@ -442,7 +442,7 @@ static decode_tbl_t decode_tbl[64] =
 	{ int_12d,   DEC_DECODED, "shra"       }, /* shra isrc1,isrc2,idest.    */
 	{ int_i2d,   DEC_DECODED, "shra"       }, /* shra #const,isrc2,idest.   */
 	{ int_12d,   DEC_DECODED, "and"        }, /* and isrc1,isrc2,idest.     */
-	{ int_i2d,   DEC_DECODED, "and"        }, /* and #const,isrc2,idest.    */ 
+	{ int_i2d,   DEC_DECODED, "and"        }, /* and #const,isrc2,idest.    */
 	{ 0,         0           , 0           },
 	{ int_i2d,   DEC_DECODED, "andh"       }, /* andh #const,isrc2,idest.   */
 	{ int_12d,   DEC_DECODED, "andnot"     }, /* andnot isrc1,isrc2,idest.  */
@@ -478,10 +478,10 @@ static decode_tbl_t core_esc_decode_tbl[8] =
 static decode_tbl_t fp_decode_tbl[128] =
 {
 	/* Floating point instructions.  The least significant 7 bits are
-	   the (extended) opcode and bits 10:7 are P,D,S,R respectively
-	   ([p]ipelined, [d]ual, [s]ource prec., [r]esult prec.).  
-	   For some operations, I defer decoding the P,S,R bits to the
-	   emulation routine for them.  */
+       the (extended) opcode and bits 10:7 are P,D,S,R respectively
+       ([p]ipelined, [d]ual, [s]ource prec., [r]esult prec.).
+       For some operations, I defer decoding the P,S,R bits to the
+       emulation routine for them.  */
 	{ flop_12d,  DEC_DECODED, "r2p1."     }, /* 0x00 pf[m]am */
 	{ flop_12d,  DEC_DECODED, "r2pt."     }, /* 0x01 pf[m]am */
 	{ flop_12d,  DEC_DECODED, "r2ap1."    }, /* 0x02 pf[m]am */
@@ -681,10 +681,10 @@ unsigned disasm_i860(char *buf, unsigned pc, UINT32 insn)
 			}
 		}
 	}
-	
+
 	if (unrecognized_op)
 		sprintf (buf, ".long\t%#08x", insn);
-	
+
 	/* Replace tabs with spaces */
 	i860_dasm_tab_replacer(buf, 10);
 

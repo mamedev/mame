@@ -2726,7 +2726,7 @@ void K051960_sprites_draw(running_machine *machine,bitmap_t *bitmap,const rectan
 	int offs,pri_code;
 	int sortedlist[NUM_SPRITES];
 	UINT8 drawmode_table[256];
-	
+
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
@@ -3244,7 +3244,7 @@ void K053245_sprites_draw(running_machine *machine, int chip, bitmap_t *bitmap,c
 	int sortedlist[NUM_SPRITES];
 	int flipscreenX, flipscreenY, spriteoffsX, spriteoffsY;
 	UINT8 drawmode_table[256];
-	
+
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
@@ -3481,7 +3481,7 @@ void K053245_sprites_draw_lethal(running_machine *machine,int chip, bitmap_t *bi
 	int sortedlist[NUM_SPRITES];
 	int flipscreenX, flipscreenY, spriteoffsX, spriteoffsY;
 	UINT8 drawmode_table[256];
-	
+
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
@@ -4209,7 +4209,7 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 	UINT8 drawmode_table[256];
 	UINT8 shadowmode_table[256];
 	UINT8 *whichtable;
-	
+
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 	memset(shadowmode_table, DRAWMODE_SHADOW, sizeof(shadowmode_table));

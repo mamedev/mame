@@ -1,23 +1,23 @@
 /*
-	SMS Manufacturing Corp hardware
+    SMS Manufacturing Corp hardware
 
-	Driver by Mariusz Wojcieszek
+    Driver by Mariusz Wojcieszek
 
-	Preliminary driver by Reip
-	Schematics provided by Exodus
-	Sure Shot board provided by ranger_lennier
-	Notes by Lord Nightmare
+    Preliminary driver by Reip
+    Schematics provided by Exodus
+    Sure Shot board provided by ranger_lennier
+    Notes by Lord Nightmare
 
-	Notes/ToDo:
-	- pit8254 is not accessed by z80 (and there is no interrupt service routine), so
-	  it is not fitted in the driver
-	- video registers can be read (to read framebuffer contents), this is not emulated
-	  as software does not use this feature
-	- I8088 clock may be incorrect
-	- Video Blanking Zone input - probably hblank or vblank
-	- game speed may be not 100% correct - software does not use interrupts and
-	  Video Blanking Zone is not emulated (which is required to get proper timings)
-	- implement video raw parameters
+    Notes/ToDo:
+    - pit8254 is not accessed by z80 (and there is no interrupt service routine), so
+      it is not fitted in the driver
+    - video registers can be read (to read framebuffer contents), this is not emulated
+      as software does not use this feature
+    - I8088 clock may be incorrect
+    - Video Blanking Zone input - probably hblank or vblank
+    - game speed may be not 100% correct - software does not use interrupts and
+      Video Blanking Zone is not emulated (which is required to get proper timings)
+    - implement video raw parameters
 
 */
 
@@ -361,7 +361,7 @@ static READ8_DEVICE_HANDLER(ppi0_c_r)
       probably a beam to check the hopper coin out
   PC0 - "Video BZ" (Video Blanking Zone, is an input)
       it's probably vblank or hblank, 0 is always returned, games wait for this bit
-	  to become 0 before accesing video
+      to become 0 before accesing video
 */
 	return 0;
 }
@@ -728,10 +728,10 @@ ROM_START( trvhang )
 ROM_END
 
 /*
-Etched in copper on back	COPYRIGHT SMS 1983
-					mfg corp. S/N	A-2043
-							A-2043 was hand etched
-			
+Etched in copper on back    COPYRIGHT SMS 1983
+                    mfg corp. S/N   A-2043
+                            A-2043 was hand etched
+
 16MHz Crystal
 24MHz Crystal
 D780C
@@ -739,7 +739,7 @@ D8255AC-5
 P8255A-5
 P8088
 AY-3-8910
-6116	x2
+6116    x2
 P8254
 
 Empty 40 pin socket at U2 and U50
@@ -748,43 +748,43 @@ Empty 28 pin socket at U18
 
 
 
-.u16	28128	stickered	U-16
-				TRIVIA -2
-				011586
+.u16    28128   stickered   U-16
+                TRIVIA -2
+                011586
 
-.u17	28128	stickered	U-16
-				TRIVIA -2
-				011586
+.u17    28128   stickered   U-16
+                TRIVIA -2
+                011586
 
-.u19	28128	stickered	U-16
-				TRIVIA DLXE
-				021281
+.u19    28128   stickered   U-16
+                TRIVIA DLXE
+                021281
 
-.u26	2732	stickered	#26
-				073184
+.u26    2732    stickered   #26
+                073184
 
 
 the pal's had colored dots on them
 saved in JEDEC format
-.32	dmpal10l8nc	red	red	blue
-.52	dmpal10l8nc	red	red	white
-.38	dmpal10l8nc	blue	blue	blue
-.39	dmpal10l8nc	green	green	green
-.40	dmpal10l8nc	pink
-.110	dmpal10l8nc	pink	pink
-.58	dmpal10h8nc	brown 	brown	brown
-.80	dmpal10h8nc	blue	blue
-.128	dmpal10h8nc	blue 	brown	blue
-.129	dmpal10h8nc	pink 	green	pink
-.130	dmpal10h8nc	pink	scratched off
-.94	dmpal14h4nc	green	green
-.109	dmpal14h4nc	brown	brown
-.140	dmpal14h4nc	brown
-.141	dmpal14h4nc	brown
-.142	dmpal14h4nc	brown
-.143	dmpal14h4nc	brown
-.144	dmpal14h4nc	brown
-.145	dmpal14h4nc	brown
+.32 dmpal10l8nc red red blue
+.52 dmpal10l8nc red red white
+.38 dmpal10l8nc blue    blue    blue
+.39 dmpal10l8nc green   green   green
+.40 dmpal10l8nc pink
+.110    dmpal10l8nc pink    pink
+.58 dmpal10h8nc brown   brown   brown
+.80 dmpal10h8nc blue    blue
+.128    dmpal10h8nc blue    brown   blue
+.129    dmpal10h8nc pink    green   pink
+.130    dmpal10h8nc pink    scratched off
+.94 dmpal14h4nc green   green
+.109    dmpal14h4nc brown   brown
+.140    dmpal14h4nc brown
+.141    dmpal14h4nc brown
+.142    dmpal14h4nc brown
+.143    dmpal14h4nc brown
+.144    dmpal14h4nc brown
+.145    dmpal14h4nc brown
 */
 
 ROM_START( trvhanga )
