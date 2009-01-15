@@ -136,13 +136,13 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 
 int audit_samples(core_options *options, const game_driver *gamedrv, audit_record **audit)
 {
+	int records = 0;
+#if HAS_SAMPLES
 	machine_config *config = machine_config_alloc(gamedrv->machine_config);
 	audit_record *record;
 	int sndnum, sampnum;
-	int records = 0;
 
 	/* count the number of sample records attached to this driver */
-#if HAS_SAMPLES
 	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound); sndnum++)
 		if (config->sound[sndnum].type == SOUND_SAMPLES)
 		{
@@ -156,7 +156,6 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 						records++;
 			}
 		}
-#endif
 
 	/* if no records, just quit now */
 	if (records == 0)
@@ -214,6 +213,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 
 skip:
 	machine_config_free(config);
+#endif /* HAS_SAMPLES */
 	return records;
 }
 
