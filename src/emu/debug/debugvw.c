@@ -3336,7 +3336,9 @@ void memory_view_set_chunks_per_row(debug_view *view, UINT32 rowchunks)
 	debug_view_memory *memdata = view->extra_data;
 
 	assert(view->type == DVT_MEMORY);
-	assert(rowchunks > 0);
+
+	if (rowchunks < 1)
+		return;
 
 	if (rowchunks != memdata->chunks_per_row)
 	{
