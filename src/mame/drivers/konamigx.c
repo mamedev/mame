@@ -1866,7 +1866,7 @@ ROM_START( fantjour )
 	ROM_LOAD( "321b18.7g", 0x200000, 2*1024*1024, CRC(2c561ad0) SHA1(6265054072ba1c2837dd96e0259b20bc50457160) )
 ROM_END
 
-/* Salamander 2 (ver JAA) */
+/* Salamander 2 version JAA (Japan) */
 ROM_START( salmndr2 )
 	/* main program */
 	ROM_REGION( 0x800000, "main", 0 )
@@ -1897,13 +1897,13 @@ ROM_START( salmndr2 )
 	ROM_LOAD( "521-a13.7g", 0x200000, 1*1024*1024, CRC(c3322475) SHA1(1774524ff031e0c4a7f3432810e968d37f9c6331) )
 ROM_END
 
-/* Salamander 2 (ver AAB) */
+/* Salamander 2 version AAB (Asia) */
 ROM_START( salmnd2a )
 	/* main program */
 	ROM_REGION( 0x800000, "main", 0 )
 	GX_BIOS
-	ROM_LOAD32_WORD_SWAP( "521aab02.bin", 0x200002, 512*1024, CRC(ac9d151f) SHA1(aabd17a41a42cbbe9b62a9751cdb264e714cac6a) )
-	ROM_LOAD32_WORD_SWAP( "521aab03.bin", 0x200000, 512*1024, CRC(feecf34d) SHA1(c37959199afedd3deee9d4c248ec83ccccf9a401) )
+	ROM_LOAD32_WORD_SWAP( "521aab02.31b", 0x200002, 512*1024, CRC(ac9d151f) SHA1(aabd17a41a42cbbe9b62a9751cdb264e714cac6a) )
+	ROM_LOAD32_WORD_SWAP( "521aab03.27b", 0x200000, 512*1024, CRC(feecf34d) SHA1(c37959199afedd3deee9d4c248ec83ccccf9a401) )
 
 	/* sound program */
 	ROM_REGION( 0x40000, "sound", 0 )
