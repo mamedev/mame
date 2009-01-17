@@ -1785,7 +1785,7 @@ static CPU_RESET( upd78c05 )
 static CPU_RESET( upd78c06 )
 {
 	upd7810_state *cpustate = device->token;
-	CPU_RESET_CALL(upd7810);
+	CPU_RESET_CALL(upd78c05);
 	cpustate->op48 = op48_78c06;
 	cpustate->op4C = op4C_78c06;
 	cpustate->op4D = op4D_78c06;
