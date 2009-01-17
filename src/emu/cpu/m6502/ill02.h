@@ -280,4 +280,58 @@
 			P|=F_V;										\
 	}
 
+/* N2A03 *******************************************************
+ *  ISB increment and subtract with carry
+ ***************************************************************/
+#define ISB_NES													\
+	tmp = (UINT8)(tmp+1);										\
+	SBC_NES
+
+/* N2A03 *******************************************************
+ * RRA  rotate right and add with carry
+ *  C -> [7][6][5][4][3][2][1][0] -> C
+ ***************************************************************/
+#define RRA_NES													\
+	tmp |= (P & F_C) << 8;										\
+	P = (P & ~F_C) | (tmp & F_C);								\
+	tmp = (UINT8)(tmp >> 1);									\
+	ADC_NES
+
+/* N2A03 *******************************************************
+ *  OAL load accumulator and index X
+ ***************************************************************/
+#define OAL_NES													\
+	A = X = (UINT8)((A|0xff)&tmp);								\
+	SET_NZ(A)
+
+/* N2A03 *******************************************************
+ * SXH  store index X high
+ * logical and index X with memory[PC+1] and store the result
+ *
+ * This instruction writes to an odd address when crossing
+ * a page boundary. The one known test case can be explained
+ * with a shift of Y. More testing will be needed to determine
+ * if this is correct.
+ *
+ ***************************************************************/
+#define SXH_NES													\
+	if ( Y && Y > EAL )											\
+		EAH |= ( Y << 1 );										\
+	tmp = X & (EAH+1)
+
+/* N2A03 *******************************************************
+ * SYH  store index Y and (high + 1)
+ * logical and index Y with memory[PC+1] + 1 and store the result
+ *
+ * This instruction writs to an odd address when crossing a
+ * a page boundary. The one known test case can be explained
+ * with a shoft of X. More testing will be needed to determine
+ * if this is correct.
+ *
+ ***************************************************************/
+#define SYH_NES													\
+	if ( X && X > EAL )											\
+		EAH |= ( X << 1 );										\
+	tmp = Y & (EAH+1)
+
 #endif /* __ILL02_H__ */
