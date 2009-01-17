@@ -623,7 +623,7 @@ void mc6845_set_clock(const device_config *device, int clock)
 	if (clock != mc6845->clock)
 	{
 		mc6845->clock = clock;
-		recompute_parameters(mc6845, FALSE);
+		recompute_parameters(mc6845, TRUE);
 	}
 }
 
