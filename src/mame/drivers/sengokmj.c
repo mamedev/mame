@@ -56,18 +56,13 @@ RSSENGO2.72   chr.
 #include "cpu/nec/nec.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
+#include "includes/sei_crtc.h"
 
-extern UINT16 *sengokmj_bgvram,*sengokmj_mdvram,*sengokmj_fgvram,*sengokmj_txvram;
+extern UINT16 *seibucrtc_sc0vram,*seibucrtc_sc1vram,*seibucrtc_sc2vram,*seibucrtc_sc3vram;
+extern UINT16 *seibucrtc_vregs;
+
 static UINT16 sengokumj_mux_data;
-
-WRITE16_HANDLER( sengokmj_bgvram_w );
-WRITE16_HANDLER( sengokmj_fgvram_w );
-WRITE16_HANDLER( sengokmj_mdvram_w );
-WRITE16_HANDLER( sengokmj_txvram_w );
-WRITE16_HANDLER( sengokmj_layer_enable_w );
-WRITE16_HANDLER( sengokmj_bg_scrolly_w );
-VIDEO_START( sengokmj );
-VIDEO_UPDATE( sengokmj );
+static UINT8 hopper_io;
 
 /* Multiplexer device for the mahjong panel */
 static READ16_HANDLER( mahjong_panel_r )
@@ -99,6 +94,8 @@ static WRITE16_HANDLER( sengokmj_out_w )
 	coin_lockout_w(0,~data & 2);
 	coin_lockout_w(1,~data & 2);
 	coin_counter_w(0,data & 4);
+	hopper_io = ((data & 1)<<6);
+//	popmessage("%02x",hopper_io);
 }
 
 static WRITE16_HANDLER( seibu_z80_com_6_mirror_w )
@@ -106,13 +103,18 @@ static WRITE16_HANDLER( seibu_z80_com_6_mirror_w )
 	seibu_main_word_w(space,6,data,0xffff);
 }
 
+static READ16_HANDLER( sengokmj_system_r )
+{
+	return (input_port_read(space->machine, "SYSTEM") & 0xffbf) | hopper_io;
+}
+
 static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(sengokmj_bgvram_w) AM_BASE(&sengokmj_bgvram)
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(sengokmj_fgvram_w) AM_BASE(&sengokmj_fgvram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(sengokmj_mdvram_w) AM_BASE(&sengokmj_mdvram)
-	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM_WRITE(sengokmj_txvram_w) AM_BASE(&sengokmj_txvram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc1vram_w) AM_BASE(&seibucrtc_sc1vram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(seibucrtc_sc2vram_w) AM_BASE(&seibucrtc_sc2vram)
+	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM_WRITE(seibucrtc_sc3vram_w) AM_BASE(&seibucrtc_sc3vram)
 	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
@@ -121,14 +123,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
-//  AM_RANGE(0x8000, 0x800f) AM_WRITE(seibu_main_word_w)
-//  AM_RANGE(0x8010, 0x801b) AM_WRITENOP
-	AM_RANGE(0x801c, 0x801d) AM_WRITE(sengokmj_layer_enable_w)
-//  AM_RANGE(0x801e, 0x801f) AM_WRITENOP
-//  AM_RANGE(0x8020, 0x802f) AM_WRITENOP
-	AM_RANGE(0x8022, 0x8023) AM_WRITE(sengokmj_bg_scrolly_w)
-//  AM_RANGE(0x8030, 0x803f) AM_WRITENOP
-//  AM_RANGE(0x8040, 0x804f) AM_WRITENOP
+	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
 
 	AM_RANGE(0x8080, 0x8081) AM_WRITE(seibu_z80_com_6_mirror_w)
 //  AM_RANGE(0x80c0, 0x80c1) AM_WRITE(seibu_z80_com_unk_mirror_w)
@@ -137,7 +132,7 @@ static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
-	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2") //switches
+	AM_RANGE(0xc004, 0xc005) AM_READ(sengokmj_system_r) //switches
 ADDRESS_MAP_END
 
 
@@ -145,28 +140,26 @@ static INPUT_PORTS_START( sengokmj )
 	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Re-start" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Re-start" )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(	  0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, "Double G" )
+	PORT_DIPNAME( 0x0004, 0x0004, "Double G" )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "Double L" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Double L" )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(	  0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Kamon" )
+	PORT_DIPNAME( 0x0010, 0x0010, "Kamon" )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(	  0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(   	  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )
-	PORT_DIPSETTING(	  0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Out Sw" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW1:6" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Out Sw" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(	  0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Hopper" )
+	PORT_DIPNAME( 0x0080, 0x0000, "Hopper" ) PORT_DIPLOCATION("SW1:8") //game gives hopper error with this off.
 	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -181,7 +174,6 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
 
 	PORT_START("KEY1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B )
@@ -230,7 +222,7 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_START("UNUSED")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW2")
+	PORT_START("SYSTEM")
 	PORT_DIPNAME( 0x0001, 0x0001, "Door" )
 	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
@@ -247,10 +239,7 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_DIPNAME( 0x0020, 0x0020, "Cash" )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	/* Used, causes "Hopper RunAway" message if you toggle it */
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
+//	0x40 Hopper
 	PORT_DIPNAME( 0x0080, 0x0080, "Meter" )
 	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
@@ -314,13 +303,13 @@ static MACHINE_DRIVER_START( sengokmj )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(16*8, 56*8-1, 2*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1) //TODO: dynamic resolution
 
 	MDRV_GFXDECODE(sengokmj)
 	MDRV_PALETTE_LENGTH(0x800)
 
-	MDRV_VIDEO_START(sengokmj)
-	MDRV_VIDEO_UPDATE(sengokmj)
+	MDRV_VIDEO_START(seibu_crtc)
+	MDRV_VIDEO_UPDATE(seibu_crtc)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)

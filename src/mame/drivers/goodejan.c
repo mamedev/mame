@@ -52,26 +52,23 @@ Notes:
 
 #include "driver.h"
 #include "cpu/nec/nec.h"
-#include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
+#include "includes/sei_crtc.h"
 
 #define GOODEJAN_MHZ1 7159090
 #define GOODEJAN_MHZ2 16000000
 #define GOODEJAN_MHZ3 12000000
 
-extern UINT16 *goodejan_bgvram, *goodejan_txvram;
+extern UINT16 *seibucrtc_sc0vram,*seibucrtc_sc1vram,*seibucrtc_sc2vram,*seibucrtc_sc3vram;
+extern UINT16 *seibucrtc_vregs;
+extern UINT16 seibucrtc_sc0bank;
 static UINT16 goodejan_mux_data;
 
-WRITE16_HANDLER( goodejan_bgvram_w );
-WRITE16_HANDLER( goodejan_txvram_w );
-WRITE16_HANDLER( goodejan_bg_scrollx_w );
-WRITE16_HANDLER( goodejan_bg_scrolly_w );
-WRITE16_HANDLER( goodejan_layer_en_w );
-WRITE16_HANDLER( goodejan_gfxbank_w );
-
-VIDEO_START( goodejan );
-VIDEO_UPDATE( goodejan );
+WRITE16_HANDLER( goodejan_gfxbank_w )
+{
+	seibucrtc_sc0bank_w((data & 0x100)>>8);// = (data & 0x100)>>8;
+}
 
 /* Multiplexer device for the mahjong panel */
 static READ16_HANDLER( mahjong_panel_r )
@@ -98,9 +95,12 @@ static WRITE16_HANDLER( mahjong_panel_w )
 
 static ADDRESS_MAP_START( goodejan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x0afff) AM_RAM
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(goodejan_bgvram_w) AM_BASE(&goodejan_bgvram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc3vram_w) AM_BASE(&seibucrtc_sc3vram)
 	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(goodejan_txvram_w) AM_BASE(&goodejan_txvram)
+	/*Guess: these two aren't used/initialized at all.*/
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(seibucrtc_sc1vram_w) AM_BASE(&seibucrtc_sc1vram)
+	AM_RANGE(0x0e800, 0x0efff) AM_RAM_WRITE(seibucrtc_sc2vram_w) AM_BASE(&seibucrtc_sc2vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -108,24 +108,21 @@ ADDRESS_MAP_END
 /*totmejan CRT is at 8000-804f,goodejan is at 8040-807f(808f but not tested)*/
 static ADDRESS_MAP_START( common_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(goodejan_gfxbank_w)
-	AM_RANGE(0x8020, 0x8023) AM_WRITENOP
 	AM_RANGE(0xb000, 0xb003) AM_WRITENOP
 	AM_RANGE(0xb004, 0xb005) AM_WRITE(mahjong_panel_w)
 
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
-	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2") // maybe it's a seibu_main_word mirror?
+	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2") // switches
 	AM_RANGE(0xd000, 0xd00f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( totmejan_io_map, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x801c, 0x801d) AM_WRITE(goodejan_layer_en_w )
+	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( goodejan_io_map, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x805c, 0x805d) AM_WRITE(goodejan_layer_en_w )
-	AM_RANGE(0x8060, 0x8061) AM_WRITE(goodejan_bg_scrollx_w )
-	AM_RANGE(0x8062, 0x8063) AM_WRITE(goodejan_bg_scrolly_w )
+	AM_RANGE(0x8040, 0x807f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goodejan )
@@ -313,17 +310,17 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( goodejan )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x200, 0x40 ) /* Sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x000, 0x30 ) /* Tiles */
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0x100, 0x10 ) /* Text */
+	GFXDECODE_ENTRY( "spr_gfx", 0,tilelayout, 0x200, 0x40 ) /* Sprites */
+	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x000, 0x30 ) /* Tiles */
+	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x300, 0x10 ) /* Text */
+	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout, 0x600, 0x10 ) /* Tiles */
+	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x100, 0x10 ) /* Text */
 GFXDECODE_END
 
-static INTERRUPT_GEN( goodejan_interrupt )
+static INTERRUPT_GEN( goodejan_irq )
 {
-	if (cpu_getiloops(device))
-		cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x208/4);
-	else
-		cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x00c/4);
+	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x208/4);
+/* vector 0x00c is just a reti */
 }
 
 static MACHINE_DRIVER_START( goodejan )
@@ -332,7 +329,7 @@ static MACHINE_DRIVER_START( goodejan )
 	MDRV_CPU_ADD("main", V30, GOODEJAN_MHZ2/2)
 	MDRV_CPU_PROGRAM_MAP(goodejan_map,0)
 	MDRV_CPU_IO_MAP(common_io_map,goodejan_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(goodejan_interrupt,2)
+	MDRV_CPU_VBLANK_INT("main",goodejan_irq)
 
 	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
 
@@ -344,13 +341,13 @@ static MACHINE_DRIVER_START( goodejan )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) //TODO: dynamic resolution
 
 	MDRV_GFXDECODE(goodejan)
 	MDRV_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(goodejan)
-	MDRV_VIDEO_UPDATE(goodejan)
+	MDRV_VIDEO_START(seibu_crtc)
+	MDRV_VIDEO_UPDATE(seibu_crtc)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(GOODEJAN_MHZ1/2,GOODEJAN_MHZ2/16)
@@ -372,15 +369,20 @@ ROM_START( totmejan )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASEFF | ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "3.063",  0x00000, 0x10000, CRC(61b5ae88) SHA1(16105a4e97765454079deda8eaa456d60d44e906) )
-	ROM_LOAD16_BYTE( "4.061",  0x00001, 0x10000, CRC(29fb6ad2) SHA1(8a9c4625472daefca7fb73a9ef3717e86c3d632f) )
+	ROM_REGION( 0x080000, "spr_gfx", ROMREGION_DISPOSE )
+	ROM_LOAD( "e-jan.078", 0x000000, 0x080000, CRC(ff9ee9d8) SHA1(5e49e9a666630ca9867ee96b9d2b8d6f503b25df) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "bg_gfx", ROMREGION_DISPOSE )
 	ROM_LOAD( "e-jan.064", 0x000000, 0x100000, CRC(5f6185ee) SHA1(599e4a574672cd1571032e879b3032d06b70e4e2) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "e-jan.078", 0x000000, 0x080000, CRC(ff9ee9d8) SHA1(5e49e9a666630ca9867ee96b9d2b8d6f503b25df) )
+	ROM_REGION( 0x20000, "md_gfx", ROMREGION_DISPOSE )
+	/*Empty*/
+	ROM_REGION( 0x20000, "fg_gfx", ROMREGION_DISPOSE )
+	/*Empty*/
+
+	ROM_REGION( 0x20000, "tx_gfx", ROMREGION_ERASEFF | ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "3.063",  0x00000, 0x10000, CRC(61b5ae88) SHA1(16105a4e97765454079deda8eaa456d60d44e906) )
+	ROM_LOAD16_BYTE( "4.061",  0x00001, 0x10000, CRC(29fb6ad2) SHA1(8a9c4625472daefca7fb73a9ef3717e86c3d632f) )
 
 	ROM_REGION( 0x80000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "e-jan.0911", 0x00000, 0x80000, CRC(a7fb93c2) SHA1(c2e1300f142032c087c96e1a785af28a6d678947) )
@@ -399,15 +401,20 @@ ROM_START( goodejan )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASEFF | ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "3.063",  0x00000, 0x10000, CRC(f355564a) SHA1(35140cc86504d6fdaba00b520d226724bac9f546) )
-	ROM_LOAD16_BYTE( "4.061",  0x00001, 0x10000, CRC(5bdf7225) SHA1(a8eded9dc5be1db20cddbed1ae8c22de1674de2a) )
+	ROM_REGION( 0x080000, "spr_gfx", ROMREGION_DISPOSE )
+	ROM_LOAD( "e_jan2obj.078", 0x000000, 0x080000, CRC(0f892ef2) SHA1(188ae43db1c48fb6870aa45c64718e901831499b) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "bg_gfx", ROMREGION_DISPOSE )
 	ROM_LOAD( "e_jan2scr.064", 0x000000, 0x100000, CRC(71654822) SHA1(fe2a128413999085e321e455aeebda0360d38cb8) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "e_jan2obj.078", 0x000000, 0x080000, CRC(0f892ef2) SHA1(188ae43db1c48fb6870aa45c64718e901831499b) )
+	ROM_REGION( 0x20000, "md_gfx", ROMREGION_DISPOSE )
+	/*Empty*/
+	ROM_REGION( 0x20000, "fg_gfx", ROMREGION_DISPOSE )
+	/*Empty*/
+
+	ROM_REGION( 0x20000, "tx_gfx", ROMREGION_ERASEFF | ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "3.063",  0x00000, 0x10000, CRC(f355564a) SHA1(35140cc86504d6fdaba00b520d226724bac9f546) )
+	ROM_LOAD16_BYTE( "4.061",  0x00001, 0x10000, CRC(5bdf7225) SHA1(a8eded9dc5be1db20cddbed1ae8c22de1674de2a) )
 
 	ROM_REGION( 0x80000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "e-jan.911", 0x00000, 0x80000, CRC(6d2cbc35) SHA1(61f47e2a94b8877906224f46d8301a26a0b9e55f) )
@@ -426,15 +433,20 @@ ROM_START( goodejaa )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASEFF | ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "3.063",  0x00000, 0x10000, CRC(f355564a) SHA1(35140cc86504d6fdaba00b520d226724bac9f546) )
-	ROM_LOAD16_BYTE( "4.061",  0x00001, 0x10000, CRC(5bdf7225) SHA1(a8eded9dc5be1db20cddbed1ae8c22de1674de2a) )
+	ROM_REGION( 0x080000, "spr_gfx", ROMREGION_DISPOSE )
+	ROM_LOAD( "e_jan2obj.078", 0x000000, 0x080000, CRC(0f892ef2) SHA1(188ae43db1c48fb6870aa45c64718e901831499b) )
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "bg_gfx", ROMREGION_DISPOSE )
 	ROM_LOAD( "e_jan2scr.064", 0x000000, 0x100000, CRC(71654822) SHA1(fe2a128413999085e321e455aeebda0360d38cb8) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "e_jan2obj.078", 0x000000, 0x080000, CRC(0f892ef2) SHA1(188ae43db1c48fb6870aa45c64718e901831499b) )
+	ROM_REGION( 0x20000, "md_gfx", ROMREGION_DISPOSE )
+	/*Empty*/
+	ROM_REGION( 0x20000, "fg_gfx", ROMREGION_DISPOSE )
+	/*Empty*/
+
+	ROM_REGION( 0x20000, "tx_gfx", ROMREGION_ERASEFF | ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "3.063",  0x00000, 0x10000, CRC(f355564a) SHA1(35140cc86504d6fdaba00b520d226724bac9f546) )
+	ROM_LOAD16_BYTE( "4.061",  0x00001, 0x10000, CRC(5bdf7225) SHA1(a8eded9dc5be1db20cddbed1ae8c22de1674de2a) )
 
 	ROM_REGION( 0x80000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "e-jan.911", 0x00000, 0x80000, CRC(6d2cbc35) SHA1(61f47e2a94b8877906224f46d8301a26a0b9e55f) )
