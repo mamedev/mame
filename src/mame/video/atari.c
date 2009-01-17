@@ -10,12 +10,6 @@
 #include "includes/atari.h"
 #include "video/gtia.h"
 
-#ifdef	LSB_FIRST
-#define BYTE_XOR(n) (n)
-#else
-#define BYTE_XOR(n) ((n)^1)
-#endif
-
 #define VERBOSE 0
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
@@ -990,16 +984,16 @@ static void antic_linerefresh(running_machine *machine)
 	if ( (antic.cmd & ANTIC_HSCR) == 0  || (antic.pfwidth == 48) || (antic.pfwidth == 32))
 	{
 		/* no hscroll */
-		dst[3] = antic.color_lookup[src[BYTE_XOR(0)]] | antic.color_lookup[src[BYTE_XOR(1)]] << 16;
+		dst[3] = antic.color_lookup[src[BYTE_XOR_LE(0)]] | antic.color_lookup[src[BYTE_XOR_LE(1)]] << 16;
 		src += 2;
 		dst += 4;
 		for( x = 1; x < HCHARS-1; x++ )
 		{
-			*dst++ = antic.color_lookup[src[BYTE_XOR(0)]] | antic.color_lookup[src[BYTE_XOR(1)]] << 16;
-			*dst++ = antic.color_lookup[src[BYTE_XOR(2)]] | antic.color_lookup[src[BYTE_XOR(3)]] << 16;
+			*dst++ = antic.color_lookup[src[BYTE_XOR_LE(0)]] | antic.color_lookup[src[BYTE_XOR_LE(1)]] << 16;
+			*dst++ = antic.color_lookup[src[BYTE_XOR_LE(2)]] | antic.color_lookup[src[BYTE_XOR_LE(3)]] << 16;
 			src += 4;
 		}
-		dst[0] = antic.color_lookup[src[BYTE_XOR(0)]] | antic.color_lookup[src[BYTE_XOR(1)]] << 16;
+		dst[0] = antic.color_lookup[src[BYTE_XOR_LE(0)]] | antic.color_lookup[src[BYTE_XOR_LE(1)]] << 16;
 	}
 	else
 	{
@@ -1032,9 +1026,9 @@ static void antic_linerefresh(running_machine *machine)
 						}
 						else
 						{
-							*dst++ = antic.color_lookup[src[BYTE_XOR(0)]] | antic.color_lookup[src[BYTE_XOR(1)]] << 16;
+							*dst++ = antic.color_lookup[src[BYTE_XOR_LE(0)]] | antic.color_lookup[src[BYTE_XOR_LE(1)]] << 16;
 						}
-						*dst++ = antic.color_lookup[src[BYTE_XOR(2)]] | antic.color_lookup[src[BYTE_XOR(3)]] << 16;
+						*dst++ = antic.color_lookup[src[BYTE_XOR_LE(2)]] | antic.color_lookup[src[BYTE_XOR_LE(3)]] << 16;
 						src += 4;
 					}
 					for ( ; x < HCHARS-1; x++ )

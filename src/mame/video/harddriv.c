@@ -18,11 +18,8 @@
 
 #define DISPLAY_SPEEDUPS			0
 
-#ifdef LSB_FIRST
-#define MASK(n)			(0x000000ffUL << ((n) * 8))
-#else
-#define MASK(n)			(0xff000000UL >> (((n) ^ 1) * 8))
-#endif
+#define MASK(n)			NATIVE_ENDIAN_VALUE_LE_BE(0x000000ffUL << ((n) * 8), 0xff000000UL >> (((n) ^ 1) * 8))
+
 
 
 /*************************************

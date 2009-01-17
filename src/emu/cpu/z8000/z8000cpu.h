@@ -49,17 +49,10 @@
  * higher bit positions.
  * That's the reason for the ordering in the following pointer table.
  **************************************************************************/
-#ifdef LSB_FIRST
-#define RB(n)   regs.B[((((n) & 7) << 1) | (((n) & 8) >> 3)) ^ 7]
-#define RW(n)   regs.W[(n) ^ 3]
-#define RL(n)   regs.L[((n) >> 1) ^ 1]
-#define RQ(n)   regs.Q[((n) >> 2)]
-#else
-#define RB(n)   regs.B[(((n) & 7) << 1) | (((n) & 8) >> 3)]
-#define RW(n)   regs.W[(n)]
-#define RL(n)   regs.L[((n) >> 1)]
-#define RQ(n)   regs.Q[((n) >> 2)]
-#endif
+#define RB(n)   regs.B[BYTE8_XOR_BE((((n) & 7) << 1) | (((n) & 8) >> 3))]
+#define RW(n)   regs.W[BYTE4_XOR_BE(n)]
+#define RL(n)   regs.L[BYTE_XOR_BE((n) >> 1)]
+#define RQ(n)   regs.Q[(n) >> 2]
 
 /* the register used as stack pointer */
 #define SP      15

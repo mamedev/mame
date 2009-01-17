@@ -937,15 +937,9 @@ INLINE void f3_alpha_set_level(void)
 
 /*============================================================================*/
 
-#ifdef LSB_FIRST
-#define COLOR1 0
-#define COLOR2 1
-#define COLOR3 2
-#else
-#define COLOR1 3
-#define COLOR2 2
-#define COLOR3 1
-#endif
+#define COLOR1 BYTE4_XOR_LE(0)
+#define COLOR2 BYTE4_XOR_LE(1)
+#define COLOR3 BYTE4_XOR_LE(2)
 
 
 

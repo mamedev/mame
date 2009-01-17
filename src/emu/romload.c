@@ -613,12 +613,12 @@ static void region_post_process(rom_load_data *romdata, const char *rgntag)
 	UINT32 regionlength = memory_region_length(romdata->machine, rgntag);
 	UINT32 regionflags = memory_region_flags(romdata->machine, rgntag);
 	UINT8 *regionbase = memory_region(romdata->machine, rgntag);
-	int littleendian = ((regionflags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
+	int endianness = ((regionflags & ROMREGION_ENDIANMASK) == ROMREGION_LE) ? ENDIANNESS_LITTLE : ENDIANNESS_BIG;
 	int datawidth = 1 << ((regionflags & ROMREGION_WIDTHMASK) >> 8);
 	UINT8 *base;
 	int i, j;
 
-	LOG(("+ datawidth=%d little=%d\n", datawidth, littleendian));
+	LOG(("+ datawidth=%d little=%d\n", datawidth, endianness == ENDIANNESS_LITTLE));
 
 	/* if the region is inverted, do that now */
 	if (regionflags & ROMREGION_INVERTMASK)
@@ -629,11 +629,7 @@ static void region_post_process(rom_load_data *romdata, const char *rgntag)
 	}
 
 	/* swap the endianness if we need to */
-#ifdef LSB_FIRST
-	if (datawidth > 1 && !littleendian)
-#else
-	if (datawidth > 1 && littleendian)
-#endif
+	if (datawidth > 1 && endianness != ENDIANNESS_NATIVE)
 	{
 		LOG(("+ Byte swapping region\n"));
 		for (i = 0, base = regionbase; i < regionlength; i += datawidth)

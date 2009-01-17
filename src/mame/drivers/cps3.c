@@ -330,11 +330,7 @@ Notes:
 #define LOAD_CD_CONTENT 1
 #define DEBUG_PRINTF 0
 
-#ifdef LSB_FIRST
-	#define DMA_XOR(a)	((a) ^ 1)
-#else
-	#define DMA_XOR(a)	((a) ^ 2)
-#endif
+#define DMA_XOR(a)		((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,2))
 
 
 static UINT32* decrypted_bios;

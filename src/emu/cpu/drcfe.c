@@ -148,11 +148,7 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 	drcfe->program = memory_find_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->translate = (cpu_translate_func)device_get_info_fct(cpu, CPUINFO_FCT_TRANSLATE);
-#ifdef LSB_FIRST
-	if (cpu_get_endianness(cpu) == ENDIANNESS_BIG)
-#else
-	if (cpu_get_endianness(cpu) == ENDIANNESS_LITTLE)
-#endif
+	if (cpu_get_endianness(cpu) != ENDIANNESS_NATIVE)
 		drcfe->codexor = (cpu_get_databus_width(cpu, ADDRESS_SPACE_PROGRAM) / 8 / cpu_get_min_opcode_bytes(cpu) - 1) * cpu_get_min_opcode_bytes(cpu);
 
 	return drcfe;

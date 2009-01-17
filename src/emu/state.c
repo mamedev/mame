@@ -569,11 +569,7 @@ state_save_error state_save_write_file(running_machine *machine, mame_file *file
 	/* generate the header */
 	memcpy(&header[0], ss_magic_num, 8);
 	header[8] = SAVE_VERSION;
-#ifdef LSB_FIRST
-	header[9] = 0;
-#else
-	header[9] = SS_MSB_FIRST;
-#endif
+	header[9] = NATIVE_ENDIAN_VALUE_LE_BE(0, SS_MSB_FIRST);
 	strncpy((char *)&header[0x0a], machine->gamedrv->name, 0x1c - 0x0a);
 	*(UINT32 *)&header[0x1c] = LITTLE_ENDIANIZE_INT32(signature);
 
@@ -629,11 +625,7 @@ state_save_error state_save_read_file(running_machine *machine, mame_file *file)
 		return STATERR_INVALID_HEADER;
 
 	/* determine whether or not to flip the data when done */
-#ifdef LSB_FIRST
-	flip = ((header[9] & SS_MSB_FIRST) != 0);
-#else
-	flip = ((header[9] & SS_MSB_FIRST) == 0);
-#endif
+	flip = NATIVE_ENDIAN_VALUE_LE_BE((header[9] & SS_MSB_FIRST) != 0, (header[9] & SS_MSB_FIRST) == 0);
 
 	/* read all the data, flipping if necessary */
 	for (entry = global->entrylist; entry != NULL; entry = entry->next)

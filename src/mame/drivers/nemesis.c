@@ -1909,11 +1909,7 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-#ifdef LSB_FIRST
-#define XOR(x) ((x)^8)
-#else
-#define XOR(x) (x)
-#endif
+#define XOR(x) ((x)^NATIVE_ENDIAN_VALUE_LE_BE(8,0))
 
 static const gfx_layout charlayout =
 {

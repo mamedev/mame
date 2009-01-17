@@ -8,13 +8,6 @@ struct _wav_file
 	UINT32 data_offs;
 };
 
-#ifdef LSB_FIRST
-#define intel_long(x) (x)
-#define intel_short(x) (x)
-#else
-#define intel_long(x) (((x << 24) | (((unsigned long) x) >> 24) | (( x & 0x0000ff00) << 8) | (( x & 0x00ff0000) >> 8)))
-#define intel_short(x) (((x) << 8) | ((x) >> 8))
-#endif
 
 wav_file *wav_open(const char *filename, int sample_rate, int channels)
 {
@@ -50,33 +43,33 @@ wav_file *wav_open(const char *filename, int sample_rate, int channels)
 	fwrite("fmt ", 1, 4, wav->file);
 
 	/* write the format length */
-	temp32 = intel_long(16);
+	temp32 = LITTLE_ENDIANIZE_INT32(16);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* write the format (PCM) */
-	temp16 = intel_short(1);
+	temp16 = LITTLE_ENDIANIZE_INT16(1);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the channels */
-	temp16 = intel_short(channels);
+	temp16 = LITTLE_ENDIANIZE_INT16(channels);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the sample rate */
-	temp32 = intel_long(sample_rate);
+	temp32 = LITTLE_ENDIANIZE_INT32(sample_rate);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* write the bytes/second */
 	bps = sample_rate * 2 * channels;
-	temp32 = intel_long(bps);
+	temp32 = LITTLE_ENDIANIZE_INT32(bps);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* write the block align */
 	align = 2 * channels;
-	temp16 = intel_short(align);
+	temp16 = LITTLE_ENDIANIZE_INT16(align);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the bits/sample */
-	temp16 = intel_short(16);
+	temp16 = LITTLE_ENDIANIZE_INT16(16);
 	fwrite(&temp16, 1, 2, wav->file);
 
 	/* write the 'data' tag */
@@ -101,13 +94,13 @@ void wav_close(wav_file *wav)
 	/* update the total file size */
 	fseek(wav->file, wav->total_offs, SEEK_SET);
 	temp32 = total - (wav->total_offs + 4);
-	temp32 = intel_long(temp32);
+	temp32 = LITTLE_ENDIANIZE_INT32(temp32);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	/* update the data size */
 	fseek(wav->file, wav->data_offs, SEEK_SET);
 	temp32 = total - (wav->data_offs + 4);
-	temp32 = intel_long(temp32);
+	temp32 = LITTLE_ENDIANIZE_INT32(temp32);
 	fwrite(&temp32, 1, 4, wav->file);
 
 	fclose(wav->file);

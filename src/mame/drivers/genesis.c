@@ -501,13 +501,6 @@ ADDRESS_MAP_END
 
 /* Z80 Sound Hardware - based on MESS code, to be improved, it can do some strange things */
 
-#ifdef LSB_FIRST
-	#define BYTE_XOR(a) ((a) ^ 1)
-#else
-	#define BYTE_XOR(a) (a)
-#endif
-
-
 
 static WRITE8_HANDLER ( genesis_bank_select_w ) /* note value will be meaningless unless all bits are correctly set in */
 {
@@ -613,9 +606,9 @@ READ8_HANDLER ( genesis_z80_bank_r )
 	logerror("z80 read from address %x\n", address);
 
 	/* Read the data out of the 68k ROM */
-	if (base != NULL && address < 0x400000) return base[BYTE_XOR(address)];
+	if (base != NULL && address < 0x400000) return base[BYTE_XOR_BE(address)];
 	/* else read the data out of the 68k RAM */
-//  else if (address > 0xff0000) return genesis_68k_ram[BYTE_XOR(offset)];
+//  else if (address > 0xff0000) return genesis_68k_ram[BYTE_XOR_BE(offset)];
 
 	return -1;
 }

@@ -280,12 +280,13 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
 	info->audio_length -= sectoread;
 
 	/* CD-DA data on the disc is big-endian, flip if we're not */
-	#ifdef LSB_FIRST
-	for( i = 0; i < info->audio_samples * 2; i++ )
+	if (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE)
 	{
-		audio_cache[ i ] = BIG_ENDIANIZE_INT16( audio_cache[ i ] );
+		for( i = 0; i < info->audio_samples * 2; i++ )
+		{
+			audio_cache[ i ] = BIG_ENDIANIZE_INT16( audio_cache[ i ] );
+		}
 	}
-	#endif
 
 	/* reset feedout ptr */
 	info->audio_bptr = 0;

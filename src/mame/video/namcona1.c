@@ -35,10 +35,8 @@ static void tilemap_get_info(
 	int tilemap_color,
 	int use_4bpp_gfx )
 {
-#ifdef LSB_FIRST
 	UINT16 *source;
 	static UINT8 mask_data[8];
-#endif
 
 	int data = tilemap_videoram[tile_index];
 	int tile = data&0xfff;
@@ -62,20 +60,21 @@ static void tilemap_get_info(
 	else
 	{
 		SET_TILE_INFO( gfx,tile,tilemap_color,0 );
-#ifdef LSB_FIRST
-		source = shaperam+4*tile;
-		mask_data[0] = source[0]>>8;
-		mask_data[1] = source[0]&0xff;
-		mask_data[2] = source[1]>>8;
-		mask_data[3] = source[1]&0xff;
-		mask_data[4] = source[2]>>8;
-		mask_data[5] = source[2]&0xff;
-		mask_data[6] = source[3]>>8;
-		mask_data[7] = source[3]&0xff;
-		tileinfo->mask_data = mask_data;
-#else
-		tileinfo->mask_data = (UINT8 *)(shaperam+4*tile);
-#endif
+		if (ENDIANNESS_NATIVE == ENDIANNESS_BIG)
+			tileinfo->mask_data = (UINT8 *)(shaperam+4*tile);
+		else
+		{
+			source = shaperam+4*tile;
+			mask_data[0] = source[0]>>8;
+			mask_data[1] = source[0]&0xff;
+			mask_data[2] = source[1]>>8;
+			mask_data[3] = source[1]&0xff;
+			mask_data[4] = source[2]>>8;
+			mask_data[5] = source[2]&0xff;
+			mask_data[6] = source[3]>>8;
+			mask_data[7] = source[3]&0xff;
+			tileinfo->mask_data = mask_data;
+		}
 	}
 } /* tilemap_get_info */
 
@@ -105,21 +104,22 @@ static TILE_GET_INFO( roz_get_info )
 	}
 	else
 	{
-#ifdef LSB_FIRST
-		UINT16 *source;
-		static UINT8 mask_data[8];
-		source = shaperam+4*tile;
-		mask_data[0] = source[0]>>8;
-		mask_data[1] = source[0]&0xff;
-		mask_data[2] = source[1]>>8;
-		mask_data[3] = source[1]&0xff;
-		mask_data[4] = source[2]>>8;
-		mask_data[5] = source[2]&0xff;
-		mask_data[6] = source[3]>>8;
-		mask_data[7] = source[3]&0xff;
-#else
 		UINT8 *mask_data = (UINT8 *)(shaperam+4*tile);
-#endif
+		
+		if (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE)
+		{
+			UINT16 *source = (UINT16 *)mask_data;
+			static UINT8 conv_data[9];
+			conv_data[0] = source[0]>>8;
+			conv_data[1] = source[0]&0xff;
+			conv_data[2] = source[1]>>8;
+			conv_data[3] = source[1]&0xff;
+			conv_data[4] = source[2]>>8;
+			conv_data[5] = source[2]&0xff;
+			conv_data[6] = source[3]>>8;
+			conv_data[7] = source[3]&0xff;
+			mask_data = conv_data;
+		}
 		SET_TILE_INFO( gfx,tile,tilemap_color,0 );
 		tileinfo->mask_data = mask_data;
 	}

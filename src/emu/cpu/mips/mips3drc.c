@@ -91,11 +91,7 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
     MACROS
 ***************************************************************************/
 
-#ifdef LSB_FIRST
-#define LOPTR(x)				((UINT32 *)(x))
-#else
-#define LOPTR(x)				((UINT32 *)(x) + 1)
-#endif
+#define LOPTR(x)				((UINT32 *)(x) + NATIVE_ENDIAN_VALUE_LE_BE(0,1))
 
 #define R32(reg)				mips3->impstate->regmaplo[reg].type, mips3->impstate->regmaplo[reg].value
 #define LO32					R32(REG_LO)

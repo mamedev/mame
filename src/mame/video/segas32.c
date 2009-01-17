@@ -189,11 +189,7 @@
  *
  *************************************/
 
-#ifdef LSB_FIRST
-#define SWAP_HALVES(x)			(x)
-#else
-#define SWAP_HALVES(x)			(((x) >> 16) | ((x) << 16))
-#endif
+#define SWAP_HALVES(x)			NATIVE_ENDIAN_VALUE_LE_BE(x, ((x) >> 16) | ((x) << 16))
 
 
 

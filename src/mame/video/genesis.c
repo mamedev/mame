@@ -36,11 +36,7 @@ static const device_config *genesis_screen;
 #define VDP_VRAM_WORD(x)	((VDP_VRAM_BYTE(x) << 8) | VDP_VRAM_BYTE((x) + 1))
 #define VDP_VSRAM_WORD(x)	((VDP_VSRAM_BYTE(x) << 8) | VDP_VSRAM_BYTE((x) + 1))
 
-#ifdef LSB_FIRST
-#define EXTRACT_PIXEL(x,i)	(((x) >> (((i) ^ 1) * 4)) & 0x0f)
-#else
-#define EXTRACT_PIXEL(x,i)	(((x) >> (((i) ^ 7) * 4)) & 0x0f)
-#endif
+#define EXTRACT_PIXEL(x,i)	(((x) >> (((i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,7)) * 4)) & 0x0f)
 
 
 

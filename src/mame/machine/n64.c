@@ -7,14 +7,6 @@
 #include "includes/n64.h"
 #include "sound/dmadac.h"
 
-#ifdef LSB_FIRST
-	#define BYTE_ADDR_XOR		3
-	#define WORD_ADDR_XOR		1
-#else
-	#define BYTE_ADDR_XOR		0
-	#define WORD_ADDR_XOR		0
-#endif
-
 UINT32 *rdram;
 UINT32 *rsp_imem;
 UINT32 *rsp_dmem;

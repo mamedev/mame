@@ -138,13 +138,20 @@ typedef union
 #endif
 
 
-
 /* Endianness constants */
 enum
 {
-	ENDIANNESS_LITTLE = 0,				/* emulated CPU is little endian */
-	ENDIANNESS_BIG					/* emulated CPU is big endian */
+	ENDIANNESS_LITTLE = 0,
+	ENDIANNESS_BIG
 };
+
+
+/* Native endianness */
+#ifdef LSB_FIRST
+#define ENDIANNESS_NATIVE				ENDIANNESS_LITTLE
+#else
+#define ENDIANNESS_NATIVE				ENDIANNESS_BIG
+#endif
 
 
 /* orientation of bitmaps */
@@ -195,6 +202,15 @@ enum
 #define RADIAN_TO_DEGREE(x)   ((180.0 / M_PI) * (x))
 #define DEGREE_TO_RADIAN(x)   ((M_PI / 180.0) * (x))
 
+
+/* endian-based value: first value is if 'endian' is little-endian, second is if 'endian' is big-endian */
+#define ENDIAN_VALUE_LE_BE(endian,leval,beval)	(((endian) == ENDIANNESS_LITTLE) ? (leval) : (beval))
+
+/* endian-based value: first value is if native endianness is little-endian, second is if native is big-endian */
+#define NATIVE_ENDIAN_VALUE_LE_BE(leval,beval)	((ENDIANNESS_NATIVE == ENDIANNESS_LITTLE) ? (leval) : (beval))
+
+/* endian-based value: first value is if 'endian' matches native, second is if 'endian' doesn't match native */
+#define ENDIAN_VALUE_NE_NNE(endian,leval,beval)	(((endian) == ENDIANNESS_NATIVE) ? (neval) : (nneval))
 
 
 /* Useful macros to deal with bit shuffling encryptions */

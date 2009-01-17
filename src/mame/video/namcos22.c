@@ -612,11 +612,7 @@ ApplyGamma( running_machine *machine, bitmap_t *bitmap )
 	int x,y;
 	if( mbSuperSystem22 )
 	{ /* super system 22 */
-#ifdef LSB_FIRST
-#define XORPAT 0x3
-#else
-#define XORPAT 0x0
-#endif
+#define XORPAT NATIVE_ENDIAN_VALUE_LE_BE(3,0)
 		const UINT8 *rlut = (const UINT8 *)&namcos22_gamma[0x100/4];
 		const UINT8 *glut = (const UINT8 *)&namcos22_gamma[0x200/4];
 		const UINT8 *blut = (const UINT8 *)&namcos22_gamma[0x300/4];

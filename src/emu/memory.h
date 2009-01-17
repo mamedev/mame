@@ -582,37 +582,30 @@ union _addrmap64_token
 
 
 /* macros for accessing bytes and words within larger chunks */
-#ifdef LSB_FIRST
 
-#define BYTE_XOR_BE(a)  				((a) ^ 1)		/* read/write a byte to a 16-bit space */
-#define BYTE_XOR_LE(a)  				(a)
-#define BYTE4_XOR_BE(a) 				((a) ^ 3)		/* read/write a byte to a 32-bit space */
-#define BYTE4_XOR_LE(a) 				(a)
-#define WORD_XOR_BE(a)  				((a) ^ 2)		/* read/write a word to a 32-bit space */
-#define WORD_XOR_LE(a)  				(a)
-#define BYTE8_XOR_BE(a) 				((a) ^ 7)		/* read/write a byte to a 64-bit space */
-#define BYTE8_XOR_LE(a) 				(a)
-#define WORD2_XOR_BE(a)  				((a) ^ 6)		/* read/write a word to a 64-bit space */
-#define WORD2_XOR_LE(a)  				(a)
-#define DWORD_XOR_BE(a)  				((a) ^ 4)		/* read/write a dword to a 64-bit space */
-#define DWORD_XOR_LE(a)  				(a)
+/* read/write a byte to a 16-bit space */
+#define BYTE_XOR_BE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0))
+#define BYTE_XOR_LE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,1))
 
-#else
+/* read/write a byte to a 32-bit space */
+#define BYTE4_XOR_BE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(3,0))
+#define BYTE4_XOR_LE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,3))
 
-#define BYTE_XOR_BE(a)  				(a)
-#define BYTE_XOR_LE(a)  				((a) ^ 1)		/* read/write a byte to a 16-bit space */
-#define BYTE4_XOR_BE(a) 				(a)
-#define BYTE4_XOR_LE(a) 				((a) ^ 3)		/* read/write a byte to a 32-bit space */
-#define WORD_XOR_BE(a)  				(a)
-#define WORD_XOR_LE(a)  				((a) ^ 2)		/* read/write a word to a 32-bit space */
-#define BYTE8_XOR_BE(a) 				(a)
-#define BYTE8_XOR_LE(a) 				((a) ^ 7)		/* read/write a byte to a 64-bit space */
-#define WORD2_XOR_BE(a)  				(a)
-#define WORD2_XOR_LE(a)  				((a) ^ 6)		/* read/write a word to a 64-bit space */
-#define DWORD_XOR_BE(a)  				(a)
-#define DWORD_XOR_LE(a)  				((a) ^ 4)		/* read/write a dword to a 64-bit space */
+/* read/write a word to a 32-bit space */
+#define WORD_XOR_BE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
+#define WORD_XOR_LE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,2))
 
-#endif
+/* read/write a byte to a 64-bit space */
+#define BYTE8_XOR_BE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(7,0))
+#define BYTE8_XOR_LE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,7))
+
+/* read/write a word to a 64-bit space */
+#define WORD2_XOR_BE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0))
+#define WORD2_XOR_LE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6))
+
+/* read/write a dword to a 64-bit space */
+#define DWORD_XOR_BE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0))
+#define DWORD_XOR_LE(a)  				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4))
 
 
 

@@ -605,13 +605,10 @@ static void deco_decrypt(running_machine *machine,const char *rgntag,const UINT8
 	UINT16 *buffer = malloc_or_die(len*2);
 	int i;
 
-#ifdef LSB_FIRST
 	/* we work on 16-bit words but data is loaded as 8-bit, so swap bytes on LSB machines */
-	for (i = 0;i < len;i++)
-	{
-		rom[i] = (rom[i] >> 8) | (rom[i] << 8);
-	}
-#endif
+	if (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE)
+		for (i = 0;i < len;i++)
+			rom[i] = BIG_ENDIANIZE_INT16(rom[i]);
 
 		memcpy(buffer,rom,len*2);
 
@@ -644,13 +641,10 @@ static void deco_decrypt(running_machine *machine,const char *rgntag,const UINT8
 
 		free(buffer);
 
-#ifdef LSB_FIRST
 	/* we work on 16-bit words but data is loaded as 8-bit, so swap bytes on LSB machines */
-	for (i = 0;i < len;i++)
-	{
-		rom[i] = (rom[i] >> 8) | (rom[i] << 8);
-	}
-#endif
+	if (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE)
+		for (i = 0;i < len;i++)
+			rom[i] = BIG_ENDIANIZE_INT16(rom[i]);
 }
 
 void deco56_decrypt_gfx(running_machine *machine, const char *tag)

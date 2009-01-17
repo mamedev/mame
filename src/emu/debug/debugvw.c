@@ -2467,11 +2467,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 			subview->index = curindex++;
 			subview->base = memory_region(machine, rgntag);
 			subview->length = memory_region_length(machine, rgntag);
-#ifdef LSB_FIRST
-			subview->offsetxor = width - 1;
-#else
-			subview->offsetxor = 0;
-#endif
+			subview->offsetxor = NATIVE_ENDIAN_VALUE_LE_BE(width - 1, 0);
 			subview->endianness = little_endian ? ENDIANNESS_LITTLE : ENDIANNESS_BIG;
 			subview->prefsize = MIN(width, 8);
 			strcpy(subview->name, astring_c(tempstring));
@@ -2510,11 +2506,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 			subview->base = base;
 			subview->length = valcount * valsize;
 			subview->offsetxor = 0;
-#ifdef LSB_FIRST
-			subview->endianness = ENDIANNESS_LITTLE;
-#else
-			subview->endianness = ENDIANNESS_BIG;
-#endif
+			subview->endianness = ENDIANNESS_NATIVE;
 			subview->prefsize = MIN(valsize, 8);
 			strcpy(subview->name, astring_c(tempstring));
 
