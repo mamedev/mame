@@ -178,12 +178,6 @@ typedef enum _read_or_write read_or_write;
 #define HANDLER_TO_BANK(h)		((UINT32)(FPTR)(h))
 #define BANK_TO_HANDLER(b)		((genf *)(FPTR)(b))
 
-#undef ADDR2BYTE
-#undef BYTE2ADDR
-#define ADDR2BYTE(s,a)			(((s)->ashift < 0) ? ((a) << -(s)->ashift) : ((a) >> (s)->ashift))
-#define ADDR2BYTE_END(s,a)		(((s)->ashift < 0) ? (((a) << -(s)->ashift) | ((1 << -(s)->ashift) - 1)) : ((a) >> (s)->ashift))
-#define BYTE2ADDR(s,a)			(((s)->ashift < 0) ? ((a) >> -(s)->ashift) : ((a) << (s)->ashift))
-
 #define SUBTABLE_PTR(tabledata, entry) (&(tabledata)->table[(1 << LEVEL1_BITS) + (((entry) - SUBTABLE_BASE) << LEVEL2_BITS)])
 
 
@@ -402,10 +396,10 @@ INLINE void adjust_addresses(address_space *space, offs_t *start, offs_t *end, o
 	*end &= ~*mirror & space->addrmask;
 
 	/* adjust to byte values */
-	*start = ADDR2BYTE(space, *start);
-	*end = ADDR2BYTE_END(space, *end);
-	*mask = ADDR2BYTE(space, *mask);
-	*mirror = ADDR2BYTE(space, *mirror);
+	*start = memory_address_to_byte(space, *start);
+	*end = memory_address_to_byte_end(space, *end);
+	*mask = memory_address_to_byte(space, *mask);
+	*mirror = memory_address_to_byte(space, *mirror);
 }
 
 
@@ -826,8 +820,8 @@ void address_map_free(address_map *map)
 
 void memory_set_decrypted_region(const address_space *space, offs_t addrstart, offs_t addrend, void *base)
 {
-	offs_t bytestart = ADDR2BYTE(space, addrstart);
-	offs_t byteend = ADDR2BYTE_END(space, addrend);
+	offs_t bytestart = memory_address_to_byte(space, addrstart);
+	offs_t byteend = memory_address_to_byte_end(space, addrend);
 	int banknum, found = FALSE;
 
 	/* loop over banks looking for a match */
@@ -1160,7 +1154,7 @@ void *_memory_install_handler(const address_space *space, offs_t addrstart, offs
 	if (whandler != 0)
 		space_map_range(spacerw, ROW_WRITE, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, spacerw, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1177,7 +1171,7 @@ UINT8 *_memory_install_handler8(const address_space *space, offs_t addrstart, of
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1194,7 +1188,7 @@ UINT16 *_memory_install_handler16(const address_space *space, offs_t addrstart, 
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1211,7 +1205,7 @@ UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, 
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1228,7 +1222,7 @@ UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, 
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1249,7 +1243,7 @@ void *_memory_install_device_handler(const address_space *space, const device_co
 	if (whandler != 0)
 		space_map_range(spacerw, ROW_WRITE, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, (void *)device, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1266,7 +1260,7 @@ UINT8 *_memory_install_device_handler8(const address_space *space, const device_
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1283,7 +1277,7 @@ UINT16 *_memory_install_device_handler16(const address_space *space, const devic
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1300,7 +1294,7 @@ UINT32 *_memory_install_device_handler32(const address_space *space, const devic
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1317,7 +1311,7 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump(space->machine);
-	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+	return space_find_backing_memory(spacerw, memory_address_to_byte(spacerw, addrstart));
 }
 
 
@@ -1593,7 +1587,7 @@ static void memory_init_preflight(running_machine *machine)
 		if (space->map->globalmask != 0)
 		{
 			space->addrmask = space->map->globalmask;
-			space->bytemask = ADDR2BYTE_END(space, space->addrmask);
+			space->bytemask = memory_address_to_byte_end(space, space->addrmask);
 		}
 
 		/* make a pass over the address map, adjusting for the CPU and getting memory pointers */
