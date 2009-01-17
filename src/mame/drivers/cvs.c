@@ -121,7 +121,7 @@ UINT8 *cvs_color_ram;
 UINT8 *cvs_video_ram;
 UINT8 *cvs_bullet_ram;
 UINT8 *cvs_palette_ram;
-UINT8 *cvs_character_ram;
+static UINT8 *cvs_character_ram;
 UINT8 *cvs_s2636_0_ram;
 UINT8 *cvs_s2636_1_ram;
 UINT8 *cvs_s2636_2_ram;
@@ -198,7 +198,7 @@ WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 	{
 		offset |= (0 * 0x800) | 0x400 | character_ram_page_start;
 		cvs_character_ram[offset] = data;
-		gfx_element_mark_dirty(space->machine->gfx[1], offset/8);
+		gfx_element_mark_dirty(space->machine->gfx[1], (offset/8) % 256);
 	}
 	else
 		cvs_s2636_0_ram[offset] = data;
@@ -219,7 +219,7 @@ WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 	{
 		offset |= (1 * 0x800) | 0x400 | character_ram_page_start;
 		cvs_character_ram[offset] = data;
-		gfx_element_mark_dirty(space->machine->gfx[1], offset/8);
+		gfx_element_mark_dirty(space->machine->gfx[1], (offset/8) % 256);
 	}
 	else
 		cvs_s2636_1_ram[offset] = data;
@@ -240,7 +240,7 @@ WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 	{
 		offset |= (2 * 0x800) | 0x400 | character_ram_page_start;
 		cvs_character_ram[offset] = data;
-		gfx_element_mark_dirty(space->machine->gfx[1], offset/8);
+		gfx_element_mark_dirty(space->machine->gfx[1], (offset/8) % 256);
 	}
 	else
 		cvs_s2636_2_ram[offset] = data;
