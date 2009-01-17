@@ -1222,14 +1222,15 @@ $(MAMEOBJ)/seibu.a: \
 	$(DRIVERS)/dcon.o $(VIDEO)/dcon.o \
 	$(DRIVERS)/deadang.o $(VIDEO)/deadang.o \
 	$(DRIVERS)/dynduke.o $(VIDEO)/dynduke.o \
-	$(DRIVERS)/goodejan.o $(VIDEO)/goodejan.o \
 	$(DRIVERS)/kncljoe.o $(VIDEO)/kncljoe.o \
 	$(DRIVERS)/mustache.o $(VIDEO)/mustache.o \
 	$(DRIVERS)/panicr.o \
 	$(DRIVERS)/raiden.o $(VIDEO)/raiden.o \
 	$(DRIVERS)/raiden2.o $(MACHINE)/r2crypt.o \
 	$(DRIVERS)/seibuspi.o $(MACHINE)/seibuspi.o $(VIDEO)/seibuspi.o \
-	$(DRIVERS)/sengokmj.o $(VIDEO)/sengokmj.o \
+	$(VIDEO)/sei_crtc.o \
+	$(DRIVERS)/sengokmj.o \
+	$(DRIVERS)/goodejan.o \
 	$(DRIVERS)/stfight.o $(MACHINE)/stfight.o $(VIDEO)/stfight.o \
 	$(DRIVERS)/wiz.o $(VIDEO)/wiz.o \
 	$(MACHINE)/spisprit.o \
