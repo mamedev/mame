@@ -30,11 +30,17 @@
 #include "sound/ay8910.h"
 #include "cpu/mcs48/mcs48.h"
 
+#define CPU_CLOCK XTAL_7_8643MHz
+
 static tilemap *bg_tilemap;
 
 static UINT8 p1, p2, prog, bus;
 
-static UINT8 *pkr_cmos_ram;
+static UINT8 *pkr_io_ram;
+static UINT8 active_bank = 0;
+
+static UINT16 video_ram[0x0400];
+static UINT8 color_ram[0x0400];
 
 
 /*****************
@@ -53,10 +59,17 @@ static WRITE8_HANDLER( p2_w )
 
 static WRITE8_HANDLER( prog_w )
 {
-	/* this is written via an out to port 4, but unless there is an 8243 port expander,
-       it is more likely that the port 4 output is used to toggle the PROG line; see
-       videopkr */
 	prog = data;
+
+	// Bankswitch Program Memory
+	if (prog == 0x01)
+	{
+		active_bank++;
+		if (active_bank == 2)
+			active_bank = 0;
+
+		memory_set_bank(space->machine, 1, active_bank);		
+	}
 }
 
 static WRITE8_HANDLER( bus_w )
@@ -64,11 +77,82 @@ static WRITE8_HANDLER( bus_w )
 	bus = data;
 }
 
-static WRITE8_HANDLER( drw80pkr_cmos_w )
+static WRITE8_HANDLER( drw80pkr_io_w )
 {
-    //if (p2 == 0xc7) CRTC Register
-    //if (p2 == 0xd7) CRTC Address
-    pkr_cmos_ram[offset] = data;
+	static UINT16 n_offs;
+	static UINT16 n_data;
+	static UINT16 add;
+	
+	
+	if (p2 == 0x3f) // write cg address
+	{
+		if (p1 == 0xbf || p1 == 0x3f)
+		{
+			n_data = data;
+		}
+		if (p1 == 0x7f && data != 0x0f)
+		{
+			n_data = data + 0x100;
+		}
+
+		add = ((p1 & 0xc0) << 2);
+		if (p1 == 0x3f && offset >= 0xf0)
+		{
+			add = 0x200;
+		}
+		n_offs = (add) + (0xff-offset);
+
+		video_ram[n_offs] = n_data;
+
+		tilemap_mark_tile_dirty(bg_tilemap, n_offs);
+	}
+
+	if (p2 == 0x7f) // write palette
+	{
+		n_offs = ((p1 & 0xc0) << 2 ) + (0xff-offset);
+
+		color_ram[n_offs] = 0;//data & 0x0f;		
+
+		if (data < 0x10)
+			video_ram[n_offs] = video_ram[n_offs] + 0x100;
+
+		tilemap_mark_tile_dirty(bg_tilemap, n_offs);
+	}
+
+	// ay8910_control_port_0_w
+	if (p1 == 0xfc && p2 == 0xff && offset == 0x00)
+		ay8910_control_port_0_w(space, 0, data);
+
+	// ay8910_write_port_0_w
+	if (p1 == 0xfe && p2 == 0xff && offset == 0x00)
+		ay8910_write_port_0_w(space, 1, data);
+
+	// CRTC Register
+	// R0 = 0x1f(31)	Horizontal Total
+	// R1 = 0x18(24)	Horizontal Displayed
+	// R2 = 0x1a(26)	Horizontal Sync Position
+	// R3 = 0x34(52)	HSYNC/VSYNC Widths
+	// R4 = 0x1f(31)	Vertical Total
+	// R5 = 0x01(01)	Vertical Total Adjust
+	// R6 = 0x1b(27)	Vertical Displayed
+	// R7 = 0x1c(28)	Vertical Sync Position
+	// R8 = 0x10		Mode Control
+	//					Non-interlace
+	//					Straight Binary - Ram Addressing
+	//					Shared Memory - Ram Access
+	//					Delay Display Enable one character time
+	//					No Delay Cursor Skew
+	// R9 = 0x07(07)	Scan Line
+	// R10 = 0x00		Cursor Start
+	// R11 = 0x00		Cursor End
+	// R12 = 0x00		Display Start Address (High)
+	// R13 = 0x00		Display Start Address (Low)
+    //if (p1 == 0xff && p2 == 0xc7)
+
+	// CRTC Address
+    //if (p1 == 0xff && p2 == 0xd7)
+
+	pkr_io_ram[offset] = data;
 }
 
 /****************
@@ -90,10 +174,11 @@ static READ8_HANDLER( bus_r )
     return bus;
 }
 
-static READ8_HANDLER( drw80pkr_cmos_r )
+static READ8_HANDLER( drw80pkr_io_r )
 {
-    return pkr_cmos_ram[offset];
+    return pkr_io_ram[offset];
 }
+
 
 /****************************
 * Video/Character functions *
@@ -101,16 +186,15 @@ static READ8_HANDLER( drw80pkr_cmos_r )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-    int vr = 0;
-	int code = vr;
-	int color = 0;
+	int color = color_ram[tile_index];
+	int code = video_ram[tile_index];
 
 	SET_TILE_INFO(0, code, color, 0);
 }
 
 static VIDEO_START( drw80pkr )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 27);
 }
 
 static VIDEO_UPDATE( drw80pkr )
@@ -164,11 +248,11 @@ static PALETTE_INIT( drw80pkr )
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8x8 characters */
-	0x200, /* 512 characters */
+	RGN_FRAC(1,2), /* 512 characters */
 	2,  /* 2 bitplanes */
-	{ 0x200*8*8*1, 0x200*8*8*0 }, /* bitplane offsets */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ RGN_FRAC(1,2), 0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -188,7 +272,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( drw80pkr )
 {
-
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main"), 0x1000);
 }
 
 
@@ -197,11 +281,11 @@ static DRIVER_INIT( drw80pkr )
 *************************/
 
 static ADDRESS_MAP_START( drw80pkr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(SMH_ROM, SMH_ROM)
+	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drw80pkr_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_cmos_r, drw80pkr_cmos_w) AM_BASE(&pkr_cmos_ram)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_io_r, drw80pkr_io_w) AM_BASE(&pkr_io_ram)
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_RAM
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_READWRITE(p1_r, p1_w)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READWRITE(p2_r, p2_w)
@@ -223,7 +307,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( drw80pkr )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", I8039, 7864300)
+	MDRV_CPU_ADD("main", I8039, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drw80pkr_map, 0)
     MDRV_CPU_IO_MAP(drw80pkr_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
@@ -257,9 +341,10 @@ MACHINE_DRIVER_END
 ROM_START( drw80pkr )
 	ROM_REGION( 0x2000, "main", 0 )
 	ROM_LOAD( "pm0.u81",   0x0000, 0x1000, CRC(0f3e97d2) SHA1(aa9e4015246284f32435d7320de667e075412e5b) )
-    ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(5a6ad467) SHA1(0128bd70b65244a0f68031d5f451bf115eeb7609) )
+	ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(5a6ad467) SHA1(0128bd70b65244a0f68031d5f451bf115eeb7609) )	
+    
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x002000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg0-a.u74",	 0x0000, 0x1000, CRC(97f5eb92) SHA1(f6c7bb42ccef8a78e8d56104ad942ae5b8e5b0df) )
 	ROM_LOAD( "cg1-a.u76",	 0x1000, 0x1000, CRC(2a3a750d) SHA1(db6183d11b2865b011c3748dc472cf5858dde78f) )
 
