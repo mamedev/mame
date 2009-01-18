@@ -232,7 +232,7 @@ static SND_START( es5503 )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	intf = config;
+	intf = device->static_config;
 
 	chip->irq_callback = intf->irq_callback;
 	chip->adc_read = intf->adc_read;

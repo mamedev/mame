@@ -116,7 +116,7 @@ static SND_START( ym2203 )
 		},
 		NULL
 	};
-	const ym2203_interface *intf = config ? config : &generic_2203;
+	const ym2203_interface *intf = device->static_config ? device->static_config : &generic_2203;
 	struct ym2203_info *info;
 	int rate = clock/72; /* ??? */
 

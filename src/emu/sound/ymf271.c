@@ -1750,7 +1750,7 @@ static SND_START( ymf271 )
 	chip->device = device;
 	chip->clock = clock;
 
-	intf = (config != NULL) ? config : &defintrf;
+	intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
 	ymf271_init(device, chip, device->region, intf->irq_callback, intf->ext_read, intf->ext_write);
 	chip->stream = stream_create(device, 0, 2, clock/384, chip, ymf271_update);

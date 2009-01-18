@@ -45,7 +45,7 @@ static SND_START( ym2151 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->intf = config ? config : &dummy;
+	info->intf = device->static_config ? device->static_config : &dummy;
 
 	rate = clock/64;
 

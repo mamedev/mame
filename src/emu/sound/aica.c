@@ -1285,7 +1285,7 @@ static SND_START( aica )
 	AICA = auto_malloc(sizeof(*AICA));
 	memset(AICA, 0, sizeof(*AICA));
 
-	intf = config;
+	intf = device->static_config;
 
 	// init the emulation
 	AICA_Init(device, AICA, intf);

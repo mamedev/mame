@@ -103,7 +103,7 @@ static SND_START( snkwave )
 {
 	struct snkwave_sound *chip;
 
-	assert(config == 0);
+	assert(device->static_config == 0);
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));

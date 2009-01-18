@@ -494,7 +494,7 @@ static SND_START( tms36xx )
 	tms = auto_malloc(sizeof(*tms));
 	memset(tms, 0, sizeof(*tms));
 
-	tms->intf = config;
+	tms->intf = device->static_config;
 
    tms->channel = stream_create(device, 0, 1, clock * 64, tms, tms36xx_sound_update);
 	tms->samplerate = clock * 64;

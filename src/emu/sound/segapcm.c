@@ -78,7 +78,7 @@ static STREAM_UPDATE( SEGAPCM_update )
 
 static SND_START( segapcm )
 {
-	const sega_pcm_interface *intf = config;
+	const sega_pcm_interface *intf = device->static_config;
 	int mask, rom_mask, len;
 	struct segapcm *spcm;
 

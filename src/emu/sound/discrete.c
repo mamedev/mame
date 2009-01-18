@@ -247,7 +247,7 @@ node_description *discrete_find_node(void *chip, int node)
 
 static SND_START( discrete )
 {
-	discrete_sound_block *intf = (discrete_sound_block *)config;
+	discrete_sound_block *intf = (discrete_sound_block *)device->static_config;
 	discrete_info *info;
 	char name[32];
 

@@ -179,7 +179,7 @@ static SND_START( msm5205 )
 	sndintrf_register_token(voice);
 
 	/* save a global pointer to our interface */
-	voice->intf = config;
+	voice->intf = device->static_config;
 	voice->device = device;
 	voice->clock = clock;
 

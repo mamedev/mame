@@ -129,7 +129,7 @@ static SND_START( ym2608 )
 		},
 		NULL
 	};
-	const ym2608_interface *intf = config ? config : &generic_2608;
+	const ym2608_interface *intf = device->static_config ? device->static_config : &generic_2608;
 	int rate = clock/72;
 	void *pcmbufa;
 	int  pcmsizea;

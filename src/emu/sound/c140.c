@@ -456,7 +456,7 @@ static STREAM_UPDATE( update_stereo )
 
 static SND_START( c140 )
 {
-	const c140_interface *intf = config;
+	const c140_interface *intf = device->static_config;
 	struct c140_info *info;
 
 	info = auto_malloc(sizeof(*info));

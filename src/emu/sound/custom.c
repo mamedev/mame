@@ -18,10 +18,10 @@ static SND_START( custom )
 	memset(info, 0, sizeof(*info));
 
 	/* stash a pointer and call the start routine */
-	info->intf = config;
+	info->intf = device->static_config;
 	if (info->intf->start)
 	{
-		info->token = (*info->intf->start)(device, clock, config);
+		info->token = (*info->intf->start)(device, clock, device->static_config);
 		if (!info->token)
 			return NULL;
 	}

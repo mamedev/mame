@@ -448,7 +448,7 @@ static SND_START( ics2115 )
 	memset(chip, 0, sizeof(*chip));
 
 	chip->device = device;
-	chip->intf = config;
+	chip->intf = device->static_config;
 	chip->rom = device->region;
 	chip->timer[0].timer = timer_alloc(device->machine, timer_cb_0, chip);
 	chip->timer[1].timer = timer_alloc(device->machine, timer_cb_1, chip);

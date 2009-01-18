@@ -317,7 +317,7 @@ static STREAM_UPDATE( cem3394_update )
 
 static SND_START( cem3394 )
 {
-	const cem3394_interface *intf = config;
+	const cem3394_interface *intf = device->static_config;
 	sound_chip *chip;
 
 	chip = auto_malloc(sizeof(*chip));

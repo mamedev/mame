@@ -259,7 +259,7 @@ static SND_START( psxspu )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	chip->intf = config;
+	chip->intf = device->static_config;
 	chip->device = device;
 	chip->g_p_n_psxram = *(chip->intf->p_psxram);
 

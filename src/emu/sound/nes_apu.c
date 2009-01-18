@@ -670,7 +670,7 @@ static STREAM_UPDATE( nes_psg_update_sound )
 /* INITIALIZE APU SYSTEM */
 static SND_START( nesapu )
 {
-	const nes_interface *intf = config;
+	const nes_interface *intf = device->static_config;
 	struct nesapu_info *info;
 	int rate = clock / 4;
 	int i;

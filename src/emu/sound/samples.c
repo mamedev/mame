@@ -523,7 +523,7 @@ static STATE_POSTLOAD( samples_postload )
 static SND_START( samples )
 {
 	int i;
-	const samples_interface *intf = config;
+	const samples_interface *intf = device->static_config;
 	struct samples_info *info;
 
 	info = auto_malloc(sizeof(*info));

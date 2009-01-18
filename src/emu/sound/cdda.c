@@ -54,7 +54,7 @@ static SND_START( cdda )
 	/* allocate an audio cache */
 	info->audio_cache = auto_malloc( CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
-	intf = config;
+	intf = device->static_config;
 
 	info->stream = stream_create(device, 0, 2, 44100, info, cdda_update);
 

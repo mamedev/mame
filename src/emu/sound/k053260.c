@@ -211,7 +211,7 @@ static SND_START( k053260 )
 
 	/* Initialize our chip structure */
 	ic->device = device;
-	ic->intf = (config != NULL) ? config : &defintrf;
+	ic->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
 	ic->mode = 0;
 	ic->rom = device->region;

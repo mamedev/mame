@@ -1230,7 +1230,7 @@ static SND_START( scsp )
 	SCSP = auto_malloc(sizeof(*SCSP));
 	memset(SCSP, 0, sizeof(*SCSP));
 
-	intf = config;
+	intf = device->static_config;
 
 	// init the emulation
 	SCSP_Init(device, SCSP, intf);

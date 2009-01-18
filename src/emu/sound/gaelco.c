@@ -242,10 +242,10 @@ WRITE16_HANDLER( gaelcosnd_w )
                         CG-1V/GAE1 Init
   ============================================================================*/
 
-static void *gaelcosnd_start(sound_type sndtype, const device_config *device, int clock, const void *config)
+static void *gaelcosnd_start(sound_type sndtype, const device_config *device, int clock)
 {
 	int j, vol;
-	const gaelcosnd_interface *intf = config;
+	const gaelcosnd_interface *intf = device->static_config;
 
 	struct GAELCOSND *info;
 	info = auto_malloc(sizeof(*info));
@@ -277,12 +277,12 @@ static void *gaelcosnd_start(sound_type sndtype, const device_config *device, in
 
 static SND_START( gaelco_gae1 )
 {
-	return gaelcosnd_start(SOUND_GAELCO_GAE1, device, clock, config);
+	return gaelcosnd_start(SOUND_GAELCO_GAE1, device, clock);
 }
 
 static SND_START( gaelco_cg1v )
 {
-	return gaelcosnd_start(SOUND_GAELCO_CG1V, device, clock, config);
+	return gaelcosnd_start(SOUND_GAELCO_CG1V, device, clock);
 }
 
 

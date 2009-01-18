@@ -71,7 +71,7 @@ static SND_START( tms5110 )
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
-	info->intf = config ? config : &dummy;
+	info->intf = device->static_config ? device->static_config : &dummy;
 	info->table = device->region;
 
 	info->chip = tms5110_create(device, TMS5110_IS_5110A);

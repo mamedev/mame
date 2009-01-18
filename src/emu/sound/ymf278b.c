@@ -675,7 +675,7 @@ static SND_START( ymf278b )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	intf = (config != NULL) ? config : &defintrf;
+	intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
 	ymf278b_init(device->machine, chip, device->region, intf->irq_callback, clock);
 	chip->stream = stream_create(device, 0, 2, clock/768, chip, ymf278b_pcm_update);

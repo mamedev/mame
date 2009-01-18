@@ -647,7 +647,7 @@ static SND_START( vlm5030 )
 	memset(chip, 0, sizeof(*chip));
 
 	chip->device = device;
-	chip->intf = (config != NULL) ? config : &defintrf;
+	chip->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
 	emulation_rate = clock / 440;
 

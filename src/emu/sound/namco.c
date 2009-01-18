@@ -356,7 +356,7 @@ static STREAM_UPDATE( namco_update_stereo )
 static SND_START( namco )
 {
 	sound_channel *voice;
-	const namco_interface *intf = config;
+	const namco_interface *intf = device->static_config;
 	int clock_multiple;
 	struct namco_sound *chip;
 

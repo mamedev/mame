@@ -129,7 +129,7 @@ static SND_START( ym2610 )
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	};
-	const ym2610_interface *intf = config ? config : &generic_2610;
+	const ym2610_interface *intf = device->static_config ? device->static_config : &generic_2610;
 	int rate = clock/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
@@ -196,7 +196,7 @@ static SND_START( ym2610b )
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	};
-	const ym2610_interface *intf = config ? config : &generic_2610;
+	const ym2610_interface *intf = device->static_config ? device->static_config : &generic_2610;
 	int rate = clock/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;

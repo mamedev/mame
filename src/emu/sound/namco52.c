@@ -140,7 +140,7 @@ static SND_START( namco_52xx )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	chip->intf = config;
+	chip->intf = device->static_config;
 	chip->rom     = device->region;
 	chip->rom_len = device->regionbytes;
 

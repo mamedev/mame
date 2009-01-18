@@ -876,7 +876,7 @@ static void *es5506_start_common(const device_config *device, int clock, const v
 
 static SND_START( es5506 )
 {
-	return es5506_start_common(device, clock, config, SOUND_ES5506);
+	return es5506_start_common(device, clock, device->static_config, SOUND_ES5506);
 }
 
 
@@ -1503,7 +1503,7 @@ void es5506_voice_bank_1_w(int voice, int bank)
 
 static SND_START( es5505 )
 {
-	const es5505_interface *intf = config;
+	const es5505_interface *intf = device->static_config;
 	es5506_interface es5506intf;
 
 	memset(&es5506intf, 0, sizeof(es5506intf));

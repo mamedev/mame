@@ -818,7 +818,7 @@ static SND_START( ay8910 )
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	};
-	const ay8910_interface *intf = (config ? config : &generic_ay8910);
+	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
 	return ay8910_start_ym(SOUND_AY8910, device, clock, intf);
 }
 
@@ -830,7 +830,7 @@ static SND_START( ym2149 )
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	};
-	const ay8910_interface *intf = (config ? config : &generic_ay8910);
+	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
 	return ay8910_start_ym(SOUND_YM2149, device, clock, intf);
 }
 

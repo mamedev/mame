@@ -194,7 +194,7 @@ static STREAM_UPDATE( seta_update )
 static SND_START( x1_010 )
 {
 	int i;
-	const x1_010_interface *intf = config;
+	const x1_010_interface *intf = device->static_config;
 	struct x1_010_info *info;
 
 	info = auto_malloc(sizeof(*info));

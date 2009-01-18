@@ -615,8 +615,8 @@ static SND_START( pokey )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	if (config)
-		memcpy(&chip->intf, config, sizeof(pokey_interface));
+	if (device->static_config)
+		memcpy(&chip->intf, device->static_config, sizeof(pokey_interface));
 	chip->device = device;
 	chip->clock_period = ATTOTIME_IN_HZ(clock);
 

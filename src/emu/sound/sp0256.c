@@ -1171,7 +1171,7 @@ static STREAM_UPDATE( sp0256_update )
 
 static SND_START( sp0256 )
 {
-	const sp0256_interface *intf = config;
+	const sp0256_interface *intf = device->static_config;
 	struct sp0256 *sp;
 
 	sp = auto_malloc(sizeof(*sp));

@@ -83,7 +83,7 @@ static void set_RC_info(struct filter_rc_info *info, int type, double R1, double
 static SND_START( filter_rc )
 {
 	struct filter_rc_info *info;
-	const flt_rc_config *conf = config;
+	const flt_rc_config *conf = device->static_config;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));

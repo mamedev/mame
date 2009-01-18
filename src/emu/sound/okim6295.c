@@ -319,7 +319,7 @@ static void okim6295_state_save_register(struct okim6295 *info, const device_con
 
 static SND_START( okim6295 )
 {
-	const okim6295_interface *intf = config;
+	const okim6295_interface *intf = device->static_config;
 	struct okim6295 *info;
 	int voice;
 	int divisor = intf->pin7 ? 132 : 165;

@@ -302,7 +302,7 @@ static SND_START( k007232 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->intf = (config != NULL) ? config : &defintrf;
+	info->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
 	/* Set up the chips */
 

@@ -88,7 +88,7 @@ static SND_START( ym3812 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->intf = config ? config : &dummy;
+	info->intf = device->static_config ? device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
@@ -259,7 +259,7 @@ static SND_START( ym3526 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->intf = config ? config : &dummy;
+	info->intf = device->static_config ? device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
@@ -455,7 +455,7 @@ static SND_START( y8950 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->intf = config ? config : &dummy;
+	info->intf = device->static_config ? device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */

@@ -780,7 +780,7 @@ static STREAM_UPDATE( MSM5232_update_one )
 
 static SND_START( msm5232 )
 {
-	const msm5232_interface *intf = config;
+	const msm5232_interface *intf = device->static_config;
 	int rate = clock/CLOCK_RATE_DIVIDER;
 	MSM5232 *chip;
 

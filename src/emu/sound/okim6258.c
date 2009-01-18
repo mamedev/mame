@@ -184,7 +184,7 @@ static void okim6258_state_save_register(struct okim6258 *info, const device_con
 
 static SND_START( okim6258 )
 {
-	const okim6258_interface *intf = config;
+	const okim6258_interface *intf = device->static_config;
 	struct okim6258 *info;
 
 	info = auto_malloc(sizeof(*info));

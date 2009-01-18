@@ -102,7 +102,7 @@ static SND_START( vrender0 )
 	VR0 = auto_malloc(sizeof(*VR0));
 	memset(VR0, 0, sizeof(*VR0));
 
-	intf=config;
+	intf=device->static_config;
 
 	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
 	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));
