@@ -37,13 +37,14 @@ static STREAM_UPDATE( speaker_sound_update )
 
 static SND_START( speaker )
 {
-	struct speaker *sp = auto_malloc(sizeof(*sp));
+	struct speaker *sp = device->token;
 
 	sp->channel = stream_create(device, 0, 1, device->machine->sample_rate, sp, speaker_sound_update);
 	sp->num_levels = 2;
 	sp->levels = default_levels;
 	sp->level = 0;
-	return sp;
+
+	return DEVICE_START_OK;
 }
 
 
@@ -87,6 +88,7 @@ SND_GET_INFO( speaker )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct speaker); 				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( speaker );	break;

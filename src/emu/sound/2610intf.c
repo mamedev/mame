@@ -133,18 +133,15 @@ static SND_START( ym2610 )
 	int rate = clock/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
-	struct ym2610_info *info;
+	struct ym2610_info *info = device->token;
 	astring *name = astring_alloc();
 
 	chip_type = SOUND_YM2610;
 
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
-
 	info->intf = intf;
 	info->device = device;
-	info->psg = ay8910_start_ym(SOUND_YM2610, device, clock, &generic_ay8910);
-	if (!info->psg) return NULL;
+	info->psg = ay8910_start_ym(NULL, SOUND_YM2610, device, clock, &generic_ay8910);
+	assert_always(info->psg != NULL, "Error creating YM2610/AY8910 chip");
 
 	/* Timer Handler set */
 	info->timer[0] = timer_alloc(device->machine, timer_callback_0, info);
@@ -169,14 +166,11 @@ static SND_START( ym2610 )
 	info->chip = ym2610_init(info,device,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
+	assert_always(info->chip != NULL, "Error creating YM2610 chip");
 
 	state_save_register_postload(device->machine, ym2610_intf_postload, info);
 
-	if (info->chip)
-		return info;
-
-	/* error */
-	return NULL;
+	return DEVICE_START_OK;
 }
 #endif
 
@@ -200,18 +194,15 @@ static SND_START( ym2610b )
 	int rate = clock/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
-	struct ym2610_info *info;
+	struct ym2610_info *info = device->token;
 	astring *name = astring_alloc();
 
 	chip_type = SOUND_YM2610B;
 
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
-
 	info->intf = intf;
 	info->device = device;
-	info->psg = ay8910_start_ym(SOUND_YM2610B, device, clock, &generic_ay8910);
-	if (!info->psg) return NULL;
+	info->psg = ay8910_start_ym(NULL, SOUND_YM2610B, device, clock, &generic_ay8910);
+	assert_always(info->psg != NULL, "Error creating YM2610B/AY8910 chip");
 
 	/* Timer Handler set */
 	info->timer[0] =timer_alloc(device->machine, timer_callback_0, info);
@@ -236,11 +227,9 @@ static SND_START( ym2610b )
 	info->chip = ym2610_init(info,device,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
-	if (info->chip)
-		return info;
-
-	/* error */
-	return NULL;
+	assert_always(info->chip != NULL, "Error creating YM2610B chip");
+	
+	return DEVICE_START_OK;
 }
 #endif
 
@@ -495,6 +484,7 @@ SND_GET_INFO( ym2610 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym2610_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2610 );		break;
@@ -532,6 +522,7 @@ SND_GET_INFO( ym2610b )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym2610_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2610b );		break;

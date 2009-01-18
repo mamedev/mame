@@ -633,10 +633,7 @@ static SND_START( k054539 )
 {
 	static const k054539_interface defintrf = { 0 };
 	int i;
-	struct k054539_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct k054539_info *info = device->token;
 
 	for (i = 0; i < 8; i++)
 		info->k054539_gain[i] = 1.0;
@@ -669,7 +666,7 @@ static SND_START( k054539 )
 	k054539_init_chip(device, info, clock);
 
 	state_save_register_postload(device->machine, reset_zones, info);
-	return info;
+	return DEVICE_START_OK;
 }
 
 WRITE8_HANDLER( k054539_0_w )
@@ -713,6 +710,7 @@ SND_GET_INFO( k054539 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct k054539_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k054539 );	break;

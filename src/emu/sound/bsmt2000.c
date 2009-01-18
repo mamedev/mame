@@ -107,12 +107,8 @@ static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8
 
 static SND_START( bsmt2000 )
 {
-	bsmt2000_chip *chip;
+	bsmt2000_chip *chip = device->token;
 	int voicenum;
-
-	/* allocate the chip */
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	/* create a stream at a nominal sample rate (real one specified later) */
 	chip->stream = stream_create(device, 0, 2, clock / 1000, chip, bsmt2000_update);
@@ -147,7 +143,7 @@ static SND_START( bsmt2000 )
 
 	/* reset the chip -- this also configures the default mode */
 	bsmt2000_reset(chip);
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -500,6 +496,7 @@ SND_GET_INFO( bsmt2000 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(bsmt2000_chip);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( bsmt2000 );		break;

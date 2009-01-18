@@ -103,10 +103,7 @@ static STREAM_UPDATE( votrax_update_sound )
 
 static SND_START( votrax )
 {
-	struct votrax_info *votrax;
-
-	votrax = auto_malloc(sizeof(*votrax));
-	memset(votrax, 0, sizeof(*votrax));
+	struct votrax_info *votrax = device->token;
 
 	votrax->device = device;
 	votrax->samples = readsamples(VotraxTable,"votrax");
@@ -118,7 +115,7 @@ static SND_START( votrax )
 	votrax->sample = NULL;
 	votrax->step = 0;
 
-	return votrax;
+	return DEVICE_START_OK;
 }
 
 
@@ -174,6 +171,7 @@ SND_GET_INFO( votrax )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct votrax_info); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( votrax );	break;

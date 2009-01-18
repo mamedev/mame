@@ -105,10 +105,7 @@ static STREAM_UPDATE( cdp1869_update )
 
 static SND_START( cdp1869 )
 {
-	struct CDP1869 *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct CDP1869 *info = device->token;
 
 	info->device = device;
 	info->stream = stream_create(device, 0, 1, device->machine->sample_rate, info, cdp1869_update );
@@ -124,7 +121,7 @@ static SND_START( cdp1869 )
 	info->wnfreq = 0;
 	info->wnamp = 0;
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 void cdp1869_set_toneamp(int which, int value)
@@ -186,6 +183,7 @@ SND_GET_INFO( cdp1869 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct CDP1869);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( cdp1869 );	break;

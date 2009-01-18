@@ -67,28 +67,20 @@ static void speech_rom_set_addr(int addr)
 static SND_START( tms5110 )
 {
 	static const tms5110_interface dummy = { 0 };
-	struct tms5110_info *info;
+	struct tms5110_info *info = device->token;
 
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 	info->intf = device->static_config ? device->static_config : &dummy;
 	info->table = device->region;
 
 	info->chip = tms5110_create(device, TMS5110_IS_5110A);
-	if (!info->chip)
-		return NULL;
-	sndintrf_register_token(info);
+	assert_always(info->chip != NULL, "Error creating TMS5110 chip");
 
 	/* initialize a stream */
 	info->stream = stream_create(device, 0, 1, clock / 80, info, tms5110_update);
 
 	if (info->table == NULL)
 	{
-	    if (info->intf->M0_callback==NULL)
-	    {
-			logerror("\n file: 5110intf.c, SND_START( tms5110 ):\n  Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
-			return NULL;
-	    }
+		assert_always(info->intf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
 	    tms5110_set_M0_callback(info->chip, info->intf->M0_callback );
 	    tms5110_set_load_address(info->chip, info->intf->load_address );
 	}
@@ -102,49 +94,55 @@ static SND_START( tms5110 )
     tms5110_reset_chip(info->chip);
 
     /* request a sound channel */
-    return info;
+    return DEVICE_START_OK;
 }
 
 static SND_START( tms5100 )
 {
-	struct tms5110_info *info = SND_START_CALL( tms5110 );
+	struct tms5110_info *info = device->token;
+	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_5100);
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_START( tms5110a )
 {
-	struct tms5110_info *info = SND_START_CALL( tms5110 );
+	struct tms5110_info *info = device->token;
+	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_5110A);
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_START( cd2801 )
 {
-	struct tms5110_info *info = SND_START_CALL( tms5110 );
+	struct tms5110_info *info = device->token;
+	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2801);
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_START( tmc0281 )
 {
-	struct tms5110_info *info = SND_START_CALL( tms5110 );
+	struct tms5110_info *info = device->token;
+	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_TMC0281);
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_START( cd2802 )
 {
-	struct tms5110_info *info = SND_START_CALL( tms5110 );
+	struct tms5110_info *info = device->token;
+	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2802);
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_START( m58817 )
 {
-	struct tms5110_info *info = SND_START_CALL( tms5110 );
+	struct tms5110_info *info = device->token;
+	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_M58817);
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -298,6 +296,7 @@ SND_GET_INFO( tms5110 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct tms5110_info);			break;
 		case SNDINFO_FCT_ALIAS:							info->type = SOUND_TMS5110;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

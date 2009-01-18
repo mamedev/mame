@@ -314,15 +314,12 @@ static int SN76496_init(const device_config *device, int clock, struct SN76496 *
 }
 
 
-static void *generic_start(const device_config *device, int clock, int feedbackmask, int noisetaps, int noiseinvert)
+static device_start_err generic_start(const device_config *device, int clock, int feedbackmask, int noisetaps, int noiseinvert)
 {
-	struct SN76496 *chip;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	struct SN76496 *chip = device->token;
 
 	if (SN76496_init(device,clock,chip) != 0)
-		return NULL;
+		fatalerror("Error creating SN76496 chip");
 	SN76496_set_gain(chip, 0);
 
 	chip->FeedbackMask = feedbackmask;
@@ -338,8 +335,7 @@ static void *generic_start(const device_config *device, int clock, int feedbackm
 	state_save_register_device_item_array(device, 0, chip->Count);
 	state_save_register_device_item_array(device, 0, chip->Output);
 
-	return chip;
-
+	return DEVICE_START_OK;
 }
 
 
@@ -392,6 +388,7 @@ SND_GET_INFO( sn76496 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct SN76496); 				break;
 		case SNDINFO_FCT_ALIAS:							info->type = SOUND_SN76496;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

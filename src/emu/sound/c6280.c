@@ -310,10 +310,7 @@ static STREAM_UPDATE( c6280_update )
 static SND_START( c6280 )
 {
     int rate = clock/16;
-    c6280_t *info;
-
-    info = auto_malloc(sizeof(*info));
-    memset(info, 0, sizeof(*info));
+    c6280_t *info = device->token;
 
     /* Initialize PSG emulator */
     c6280_init(device, info, clock, rate);
@@ -321,7 +318,7 @@ static SND_START( c6280 )
     /* Create stereo stream */
     info->stream = stream_create(device, 0, 2, rate, info, c6280_update);
 
-    return info;
+    return DEVICE_START_OK;
 }
 
 READ8_HANDLER( c6280_r ) { return h6280io_get_buffer((device_config*)space->cpu); }
@@ -348,6 +345,7 @@ SND_GET_INFO( c6280 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(c6280_t);						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c6280 );	break;

@@ -80,10 +80,7 @@ static SND_START( segapcm )
 {
 	const sega_pcm_interface *intf = device->static_config;
 	int mask, rom_mask, len;
-	struct segapcm *spcm;
-
-	spcm = auto_malloc(sizeof(*spcm));
-	memset(spcm, 0, sizeof(*spcm));
+	struct segapcm *spcm = device->token;
 
 	spcm->rom = (const UINT8 *)device->region;
 	spcm->ram = auto_malloc(0x800);
@@ -106,7 +103,7 @@ static SND_START( segapcm )
 	state_save_register_device_item_array(device, 0, spcm->low);
 	state_save_register_device_item_pointer(device, 0, spcm->ram, 0x800);
 
-	return spcm;
+	return DEVICE_START_OK;
 }
 
 
@@ -144,6 +141,7 @@ SND_GET_INFO( segapcm )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct segapcm);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( segapcm );	break;

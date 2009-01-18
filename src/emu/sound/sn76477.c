@@ -2388,7 +2388,7 @@ static void state_save_register(const device_config *device, struct SN76477 *sn)
 
 static SND_START( sn76477 )
 {
-	struct SN76477 *sn;
+	struct SN76477 *sn = device->token;
 	sn76477_interface *intf;
 
 
@@ -2398,9 +2398,6 @@ static SND_START( sn76477 )
 	intf = &test_interface;
 #endif
 
-
-	sn = auto_malloc(sizeof(*sn));
-	memset(sn, 0, sizeof(*sn));
 
 	sn->device = device;
 
@@ -2416,8 +2413,6 @@ static SND_START( sn76477 )
 	}
 
 	intialize_noise(sn);
-
-	sndintrf_register_token(sn);
 
 	/* set up interface values */
 	_SN76477_enable_w(sn, intf->enable);
@@ -2457,7 +2452,7 @@ static SND_START( sn76477 )
 	if (LOG_WAV)
 		open_wav_file(sn);
 
-	return sn;
+	return DEVICE_START_OK;
 }
 
 
@@ -2474,6 +2469,7 @@ SND_GET_INFO( sn76477 )
 {
 	switch (state)
 	{
+	case SNDINFO_INT_TOKEN_BYTES:	info->i = sizeof(struct SN76477); break;
 	case SNDINFO_PTR_START:			info->start = SND_START_NAME( sn76477 ); break;
 	case SNDINFO_PTR_STOP:			info->stop = SND_STOP_NAME( sn76477 ); break;
 	case SNDINFO_STR_NAME:			strcpy(info->s, "SN76477"); break;

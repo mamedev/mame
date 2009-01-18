@@ -101,16 +101,13 @@ static STREAM_UPDATE( namco_63701x_update )
 
 static SND_START( namco_63701x )
 {
-	struct namco_63701x *chip;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	struct namco_63701x *chip = device->token;
 
 	chip->rom = device->region;
 
 	chip->stream = stream_create(device, 0, 2, clock/1000, chip, namco_63701x_update);
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -173,6 +170,7 @@ SND_GET_INFO( namco_63701x )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct namco_63701x);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_63701x );	break;

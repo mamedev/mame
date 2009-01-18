@@ -39,11 +39,8 @@ static STATE_POSTLOAD( ym2151intf_postload )
 static SND_START( ym2151 )
 {
 	static const ym2151_interface dummy = { 0 };
-	struct ym2151_info *info;
+	struct ym2151_info *info = device->token;
 	int rate;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	info->intf = device->static_config ? device->static_config : &dummy;
 
@@ -53,16 +50,13 @@ static SND_START( ym2151 )
 	info->stream = stream_create(device,0,2,rate,info,ym2151_update);
 
 	info->chip = ym2151_init(device,clock,rate);
+	assert_always(info->chip != NULL, "Error creating YM2151 chip");
 
 	state_save_register_postload(device->machine, ym2151intf_postload, info);
 
-	if (info->chip != 0)
-	{
-		ym2151_set_irq_handler(info->chip,info->intf->irqhandler);
-		ym2151_set_port_write_handler(info->chip,info->intf->portwritehandler);
-		return info;
-	}
-	return NULL;
+	ym2151_set_irq_handler(info->chip,info->intf->irqhandler);
+	ym2151_set_port_write_handler(info->chip,info->intf->portwritehandler);
+	return DEVICE_START_OK;
 }
 
 
@@ -222,6 +216,7 @@ SND_GET_INFO( ym2151 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym2151_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2151 );		break;

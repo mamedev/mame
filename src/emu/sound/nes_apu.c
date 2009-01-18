@@ -671,12 +671,9 @@ static STREAM_UPDATE( nes_psg_update_sound )
 static SND_START( nesapu )
 {
 	const nes_interface *intf = device->static_config;
-	struct nesapu_info *info;
+	struct nesapu_info *info = device->token;
 	int rate = clock / 4;
 	int i;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	/* Initialize global variables */
 	info->samps_per_sync = rate / ATTOSECONDS_TO_HZ(video_screen_get_frame_period(device->machine->primary_screen).attoseconds);
@@ -752,7 +749,7 @@ static SND_START( nesapu )
 	state_save_register_device_item(device, 0, info->APU.buf_pos);
 #endif
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -774,6 +771,7 @@ SND_GET_INFO( nesapu )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct nesapu_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( nesapu );	break;

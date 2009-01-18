@@ -248,11 +248,8 @@ node_description *discrete_find_node(void *chip, int node)
 static SND_START( discrete )
 {
 	discrete_sound_block *intf = (discrete_sound_block *)device->static_config;
-	discrete_info *info;
+	discrete_info *info = device->token;
 	char name[32];
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	info->device = device;
 
@@ -318,7 +315,7 @@ static SND_START( discrete )
 	setup_disc_logs(info);
 
 	discrete_current_context = NULL;
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -755,6 +752,7 @@ SND_GET_INFO( discrete )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(discrete_info);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( discrete );		break;

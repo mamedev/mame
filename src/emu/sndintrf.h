@@ -32,6 +32,8 @@ enum
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
 	SNDINFO_INT_FIRST = DEVINFO_INT_FIRST,
 
+		SNDINFO_INT_TOKEN_BYTES = DEVINFO_INT_TOKEN_BYTES,	/* R/O: bytes to allocate for the token */
+
 	SNDINFO_INT_CORE_SPECIFIC = DEVINFO_INT_DEVICE_SPECIFIC, /* R/W: core-specific values start here */
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -42,11 +44,11 @@ enum
 	/* --- the following bits of info are returned as pointers to functions --- */
 	SNDINFO_FCT_FIRST = DEVINFO_FCT_FIRST,
 
+		SNDINFO_PTR_START = DEVINFO_FCT_START,				/* R/O: void *(*start)(const device_config *device, int clock) */
 		SNDINFO_PTR_STOP = DEVINFO_FCT_STOP,				/* R/O: void (*stop)(const device_config *device) */
 		SNDINFO_PTR_RESET = DEVINFO_FCT_RESET,				/* R/O: void (*reset)(const device_config *device) */
 
 		SNDINFO_PTR_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, sndinfo *info) */
-		SNDINFO_PTR_START,									/* R/O: void *(*start)(const device_config *device, int clock, const void *config) */
 		SNDINFO_FCT_ALIAS,									/* R/O: alias to sound type for (type,index) identification */
 
 	SNDINFO_FCT_CORE_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC, /* R/W: core-specific values start here */
@@ -78,7 +80,7 @@ enum
 #define SND_SET_INFO_CALL(name)		SND_SET_INFO_NAME(name)(device, state, info)
 
 #define SND_START_NAME(name)		snd_start_##name
-#define SND_START(name)				void *SND_START_NAME(name)(const device_config *device, int clock)
+#define SND_START(name)				device_start_err SND_START_NAME(name)(const device_config *device, int clock)
 #define SND_START_CALL(name)		SND_START_NAME(name)(device, clock)
 
 #define SND_STOP_NAME(name)			snd_stop_##name
@@ -101,7 +103,7 @@ typedef union _sndinfo sndinfo;
 /* define the various callback functions */
 typedef void (*snd_get_info_func)(const device_config *device, UINT32 state, sndinfo *info);
 typedef void (*snd_set_info_func)(const device_config *device, UINT32 state, sndinfo *info);
-typedef void *(*snd_start_func)(const device_config *device, int clock);
+typedef device_start_err (*snd_start_func)(const device_config *device, int clock);
 typedef void (*snd_stop_func)(const device_config *device);
 typedef void (*snd_reset_func)(const device_config *device);
 
@@ -123,13 +125,6 @@ union _sndinfo
 	snd_reset_func		reset;							/* SNDINFO_PTR_RESET */
 };
 
-typedef struct _snd_class_header snd_class_header;
-struct _snd_class_header
-{
-	/* table of core functions */
-	snd_get_info_func	get_info;
-	snd_set_info_func	set_info;
-};
 
 
 /***************************************************************************
@@ -169,11 +164,6 @@ INT64 sndti_get_info_int(sound_type sndtype, int sndindex, UINT32 state);
 void *sndti_get_info_ptr(sound_type sndtype, int sndindex, UINT32 state);
 genf *sndti_get_info_fct(sound_type sndtype, int sndindex, UINT32 state);
 const char *sndti_get_info_string(sound_type sndtype, int sndindex, UINT32 state);
-
-/* set info accessors */
-void sndti_set_info_int(sound_type sndtype, int sndindex, UINT32 state, INT64 data);
-void sndti_set_info_ptr(sound_type sndtype, int sndindex, UINT32 state, void *data);
-void sndti_set_info_fct(sound_type sndtype, int sndindex, UINT32 state, genf *data);
 
 #define sndti_get_name(sndtype, sndindex)			sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_NAME)
 #define sndti_get_core_family(sndtype, sndindex)	sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_FAMILY)
@@ -217,7 +207,6 @@ const char *sndtype_get_info_string(sound_type sndtype, UINT32 state);
 void sndintrf_init(running_machine *machine);
 int sndintrf_init_sound(running_machine *machine, int sndnum, const char *tag, sound_type sndtype, int clock, const void *config);
 void sndintrf_exit_sound(int sndnum);
-void sndintrf_register_token(void *token);
 
 /* Misc helpers */
 int sndti_exists(sound_type sndtype, int sndindex);

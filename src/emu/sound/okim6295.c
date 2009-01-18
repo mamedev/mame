@@ -320,12 +320,9 @@ static void okim6295_state_save_register(struct okim6295 *info, const device_con
 static SND_START( okim6295 )
 {
 	const okim6295_interface *intf = device->static_config;
-	struct okim6295 *info;
+	struct okim6295 *info = device->token;
 	int voice;
 	int divisor = intf->pin7 ? 132 : 165;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	compute_tables();
 
@@ -351,7 +348,7 @@ static SND_START( okim6295 )
 	okim6295_state_save_register(info, device);
 
 	/* success */
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -662,6 +659,7 @@ SND_GET_INFO( okim6295 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct okim6295);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( okim6295 );		break;

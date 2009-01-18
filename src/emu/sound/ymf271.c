@@ -1743,10 +1743,8 @@ static SND_START( ymf271 )
 	static const ymf271_interface defintrf = { 0 };
 	const ymf271_interface *intf;
 	int i;
-	YMF271Chip *chip;
+	YMF271Chip *chip = device->token;
 
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 	chip->device = device;
 	chip->clock = clock;
 
@@ -1770,7 +1768,7 @@ static SND_START( ymf271 )
 		total_level[i] = (int)(65536.0 / pow(10.0, db / 20.0));
 	}
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 READ8_HANDLER( ymf271_0_r )
@@ -1823,6 +1821,7 @@ SND_GET_INFO( ymf271 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(YMF271Chip); 					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf271 );	break;

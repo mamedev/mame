@@ -79,16 +79,13 @@ void tms3615_enable_w(int chip, int enable)
 
 static SND_START( tms3615 )
 {
-	struct TMS3615 *tms;
-
-	tms = auto_malloc(sizeof(*tms));
-	memset(tms, 0, sizeof(*tms));
+	struct TMS3615 *tms = device->token;
 
 	tms->channel = stream_create(device, 0, 2, clock/8, tms, tms3615_sound_update);
 	tms->samplerate = clock/8;
 	tms->basefreq = clock;
 
-    return tms;
+    return DEVICE_START_OK;
 }
 
 /**************************************************************************
@@ -108,6 +105,7 @@ SND_GET_INFO( tms3615 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct TMS3615); 				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( tms3615 );	break;

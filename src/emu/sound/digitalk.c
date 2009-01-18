@@ -641,8 +641,7 @@ static void digitalker_register_for_save(digitalker *dg)
 
 static SND_START(digitalker)
 {
-	digitalker *dg = auto_malloc(sizeof(*dg));
-	memset(dg, 0, sizeof(*dg));
+	digitalker *dg = device->token;
 	dg->device = device;
 	dg->rom = memory_region(device->machine, device->tag);
 	dg->stream = stream_create(device, 0, 1, clock/4, dg, digitalker_update);
@@ -654,7 +653,7 @@ static SND_START(digitalker)
 
 	digitalker_register_for_save(dg);
 
-	return dg;
+	return DEVICE_START_OK;
 }
 
 static SND_SET_INFO(digitalker)
@@ -665,6 +664,7 @@ static SND_SET_INFO(digitalker)
 SND_GET_INFO(digitalker)
 {
 	switch(state) {
+	case SNDINFO_INT_TOKEN_BYTES:	info->i = sizeof(digitalker); break;
 	case SNDINFO_PTR_SET_INFO:		info->set_info = SND_SET_INFO_NAME(digitalker); break;
 	case SNDINFO_PTR_START:			info->start = SND_START_NAME(digitalker); break;
 	case SNDINFO_PTR_STOP:      	break;

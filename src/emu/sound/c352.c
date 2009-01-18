@@ -532,10 +532,7 @@ static void c352_init(struct c352_info *info, const device_config *device)
 
 static SND_START( c352 )
 {
-	struct c352_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct c352_info *info = device->token;
 
 	info->c352_rom_samples = device->region;
 	info->c352_rom_length = device->regionbytes;
@@ -546,7 +543,7 @@ static SND_START( c352 )
 
 	c352_init(info, device);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -591,6 +588,7 @@ SND_GET_INFO( c352 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct c352_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c352 );	break;

@@ -117,16 +117,13 @@ static SND_START( ym2203 )
 		NULL
 	};
 	const ym2203_interface *intf = device->static_config ? device->static_config : &generic_2203;
-	struct ym2203_info *info;
+	struct ym2203_info *info = device->token;
 	int rate = clock/72; /* ??? */
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
 	info->device = device;
-	info->psg = ay8910_start_ym(SOUND_YM2203, device, clock, &intf->ay8910_intf);
-	if (!info->psg) return NULL;
+	info->psg = ay8910_start_ym(NULL, SOUND_YM2203, device, clock, &intf->ay8910_intf);
+	assert_always(info->psg != NULL, "Error creating YM2203/AY8910 chip");
 
 	/* Timer Handler set */
 	info->timer[0] = timer_alloc(device->machine, timer_callback_2203_0, info);
@@ -137,15 +134,11 @@ static SND_START( ym2203 )
 
 	/* Initialize FM emurator */
 	info->chip = ym2203_init(info,device,clock,rate,timer_handler,IRQHandler,&psgintf);
+	assert_always(info->chip != NULL, "Error creating YM2203 chip");
 
 	state_save_register_postload(device->machine, ym2203_intf_postload, info);
 
-	if (info->chip)
-		return info;
-
-	/* error */
-	/* stream close */
-	return NULL;
+	return DEVICE_START_OK;
 }
 
 static SND_STOP( ym2203 )
@@ -341,6 +334,7 @@ SND_GET_INFO( ym2203 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym2203_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2203 );		break;

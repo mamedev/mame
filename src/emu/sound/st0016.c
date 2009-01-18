@@ -127,16 +127,13 @@ static STREAM_UPDATE( st0016_update )
 static SND_START( st0016 )
 {
 	const st0016_interface *intf = device->static_config;
-	struct st0016_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct st0016_info *info = device->token;
 
 	info->sound_ram = intf->p_soundram;
 
 	info->stream = stream_create(device, 0, 2, 44100, info, st0016_update);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -159,6 +156,7 @@ SND_GET_INFO( st0016 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct st0016_info); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( st0016 );	break;

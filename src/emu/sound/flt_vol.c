@@ -24,15 +24,12 @@ static STREAM_UPDATE( filter_volume_update )
 
 static SND_START( filter_volume )
 {
-	struct filter_volume_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct filter_volume_info *info = device->token;
 
 	info->gain = 0x100;
 	info->stream = stream_create(device, 1, 1, device->machine->sample_rate, info, filter_volume_update);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -62,6 +59,7 @@ SND_GET_INFO( filter_volume )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct filter_volume_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( filter_volume );	break;

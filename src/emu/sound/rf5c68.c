@@ -124,12 +124,11 @@ static STREAM_UPDATE( rf5c68_update )
 static SND_START( rf5c68 )
 {
 	/* allocate memory for the chip */
-	struct rf5c68pcm *chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	struct rf5c68pcm *chip = device->token;
 
 	/* allocate the stream */
 	chip->stream = stream_create(device, 0, 2, clock / 384, chip, rf5c68_update);
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -240,6 +239,7 @@ SND_GET_INFO( rf5c68 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct rf5c68pcm);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( rf5c68 );	break;

@@ -29,13 +29,10 @@ static STREAM_UPDATE( sid_update )
 
 
 
-static void *sid_start(const device_config *device, int clock, SIDTYPE sidtype)
+static device_start_err sid_start(const device_config *device, int clock, SIDTYPE sidtype)
 {
-	SID6581 *sid;
+	SID6581 *sid = device->token;
 	const sid6581_interface *iface = (const sid6581_interface*) device->static_config;
-
-	sid = (SID6581 *) auto_malloc(sizeof(*sid));
-	memset(sid, 0, sizeof(*sid));
 
 	sid->device = device;
 	sid->mixer_channel = stream_create (device, 0, 1,  device->machine->sample_rate, (void *) sid, sid_update);
@@ -46,7 +43,7 @@ static void *sid_start(const device_config *device, int clock, SIDTYPE sidtype)
 
 	sid6581_init(sid);
 	sidInitWaveformTables(sidtype);
-	return sid;
+	return DEVICE_START_OK;
 }
 
 
@@ -113,6 +110,7 @@ SND_GET_INFO( sid6581 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(SID6581);						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sid6581 );	break;

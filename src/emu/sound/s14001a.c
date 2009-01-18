@@ -559,11 +559,8 @@ static STREAM_UPDATE( s14001a_pcm_update )
 
 static SND_START( s14001a )
 {
-	S14001AChip *chip;
+	S14001AChip *chip = device->token;
 	int i;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	chip->GlobalSilenceState = 1;
 	chip->OldDelta = 0x02;
@@ -578,7 +575,7 @@ static SND_START( s14001a )
 
 	chip->stream = stream_create(device, 0, 1, clock ? clock : device->machine->sample_rate, chip, s14001a_pcm_update);
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 static SND_SET_INFO( s14001a )
@@ -632,6 +629,9 @@ SND_GET_INFO( s14001a )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:				info->i = sizeof(S14001AChip);					break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:					info->set_info = SND_SET_INFO_NAME( s14001a );	break;
 		case SNDINFO_PTR_START:						info->start = SND_START_NAME( s14001a );		break;

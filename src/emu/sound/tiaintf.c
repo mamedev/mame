@@ -19,18 +19,14 @@ static STREAM_UPDATE( tia_update )
 
 static SND_START( tia )
 {
-	struct tia_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct tia_info *info = device->token;
 
 	info->channel = stream_create(device, 0, 1, clock, info, tia_update);
 
 	info->chip = tia_sound_init(clock, clock, 16);
-	if (!info->chip)
-		return NULL;
+	assert_always(info->chip != NULL, "Error creating TIA chip");
 
-    return info;
+    return DEVICE_START_OK;
 }
 
 static SND_STOP( tia )
@@ -67,6 +63,7 @@ SND_GET_INFO( tia )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct tia_info); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( tia );	break;

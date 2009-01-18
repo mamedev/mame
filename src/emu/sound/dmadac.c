@@ -93,10 +93,7 @@ static STREAM_UPDATE( dmadac_update )
 
 static SND_START( dmadac )
 {
-	struct dmadac_channel_data *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct dmadac_channel_data *info = device->token;
 
 	/* allocate a clear a buffer */
 	info->buffer = auto_malloc(sizeof(info->buffer[0]) * BUFFER_SIZE);
@@ -116,7 +113,7 @@ static SND_START( dmadac )
 	state_save_register_device_item(device, 0, info->frequency);
 	state_save_register_device_item_pointer(device, 0, info->buffer, BUFFER_SIZE);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -249,6 +246,7 @@ SND_GET_INFO( dmadac )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct dmadac_channel_data);	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( dmadac );	break;

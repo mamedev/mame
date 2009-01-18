@@ -252,12 +252,9 @@ static void spu_write( running_machine *machine, UINT32 n_address, INT32 n_size 
 
 static SND_START( psxspu )
 {
-	struct psxinfo *chip;
+	struct psxinfo *chip = device->token;
 	int n_effect;
 	int n_channel;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	chip->intf = device->static_config;
 	chip->device = device;
@@ -352,7 +349,7 @@ static SND_START( psxspu )
 	chip->intf->spu_install_write_handler( 4, spu_write );
 
 	chip->stream = stream_create( device, 0, 2, 44100, chip, PSXSPU_update );
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -682,6 +679,7 @@ SND_GET_INFO( psxspu )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct psxinfo);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( psxspu );	break;

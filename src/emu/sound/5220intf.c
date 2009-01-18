@@ -44,16 +44,12 @@ static STREAM_UPDATE( tms5220_update );
 static SND_START( tms5220 )
 {
 	static const tms5220_interface dummy = { 0 };
-	struct tms5220_info *info;
+	struct tms5220_info *info = device->token;
 
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 	info->intf = device->static_config ? device->static_config : &dummy;
 
 	info->chip = tms5220_create(device);
-	if (!info->chip)
-		return NULL;
-	sndintrf_register_token(info);
+	assert_always(info->chip != NULL, "Error creating TMS5220 chip");
 
 	/* initialize a info->stream */
 	info->stream = stream_create(device, 0, 1, clock / 80, info, tms5220_update);
@@ -69,16 +65,17 @@ static SND_START( tms5220 )
 	tms5220_set_read_and_branch(info->chip, info->intf->read_and_branch);
 
     /* request a sound channel */
-    return info;
+    return DEVICE_START_OK;
 }
 
 
 #if (HAS_TMC0285 || HAS_TMS5200)
 static SND_START( tms5200 )
 {
-	struct tms5220_info *info = SND_START_CALL( tms5220 );
+	struct tms5220_info *info = device->token;
+	SND_START_CALL( tms5220 );
 	tms5220_set_variant(info->chip, variant_tmc0285);
-	return info;
+	return DEVICE_START_OK;
 }
 #endif /* (HAS_TMC0285) && (HAS_TMS5200) */
 
@@ -254,6 +251,7 @@ SND_GET_INFO( tms5220 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct tms5220_info);			break;
 		case SNDINFO_FCT_ALIAS:							info->type = SOUND_TMS5220;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

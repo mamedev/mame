@@ -101,10 +101,7 @@ static void DAC_build_voltable(struct dac_info *info)
 
 static SND_START( dac )
 {
-	struct dac_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct dac_info *info = device->token;
 
 	DAC_build_voltable(info);
 
@@ -113,7 +110,7 @@ static SND_START( dac )
 
 	state_save_register_device_item(device, 0, info->output);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -169,6 +166,7 @@ SND_GET_INFO( dac )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct dac_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( dac );	break;

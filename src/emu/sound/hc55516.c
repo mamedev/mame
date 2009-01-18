@@ -52,14 +52,10 @@ static STREAM_UPDATE( hc55516_update );
 
 
 
-static void *start_common(const device_config *device, int clock,
+static device_start_err start_common(const device_config *device, int clock,
 						  UINT8 _shiftreg_mask, int _active_clock_hi)
 {
-	struct hc55516_data *chip;
-
-	/* allocate the chip */
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	struct hc55516_data *chip = device->token;
 
 	/* compute the fixed charge, decay, and leak time constants */
 	charge = pow(exp(-1), 1.0 / (FILTER_CHARGE_TC * 16000.0));
@@ -85,7 +81,7 @@ static void *start_common(const device_config *device, int clock,
 	state_save_register_device_item(device, 0, chip->integrator);
 
 	/* success */
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -339,6 +335,7 @@ SND_GET_INFO( hc55516 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct hc55516_data);		break;
 		case SNDINFO_FCT_ALIAS:							info->type = SOUND_HC55516;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

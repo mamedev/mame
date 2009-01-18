@@ -441,11 +441,8 @@ static UINT16 ics2115_reg_r(struct ics2115 *chip, UINT8 reg)
 
 static SND_START( ics2115 )
 {
-	struct ics2115 *chip;
+	struct ics2115 *chip = device->token;
 	int i;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	chip->device = device;
 	chip->intf = device->static_config;
@@ -467,7 +464,7 @@ static SND_START( ics2115 )
 		chip->ulaw[i] = v;
 	}
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 READ8_HANDLER( ics2115_r )
@@ -552,6 +549,7 @@ SND_GET_INFO( ics2115 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ics2115);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ics2115 );	break;

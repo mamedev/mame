@@ -202,12 +202,9 @@ static STREAM_UPDATE( k053260_update ) {
 static SND_START( k053260 )
 {
 	static const k053260_interface defintrf = { 0 };
-	struct k053260_chip_def *ic;
+	struct k053260_chip_def *ic = device->token;
 	int rate = clock / 32;
 	int i;
-
-	ic = auto_malloc(sizeof(*ic));
-	memset(ic, 0, sizeof(*ic));
 
 	/* Initialize our chip structure */
 	ic->device = device;
@@ -237,7 +234,7 @@ static SND_START( k053260 )
 	if ( ic->intf->irq )
 		timer_pulse( device->machine, attotime_mul(ATTOTIME_IN_HZ(clock), 32), NULL, 0, ic->intf->irq );
 
-    return ic;
+    return DEVICE_START_OK;
 }
 
 INLINE void check_bounds( struct k053260_chip_def *ic, int channel ) {
@@ -481,6 +478,7 @@ SND_GET_INFO( k053260 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct k053260_chip_def);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k053260 );	break;

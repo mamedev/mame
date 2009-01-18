@@ -105,7 +105,7 @@ static void update_namco_waveform(struct namco_sound *chip, int offset, UINT8 da
 
 
 /* build the decoded waveform table */
-static int build_decoded_waveform(struct namco_sound *chip, UINT8 *rgnbase)
+static void build_decoded_waveform(struct namco_sound *chip, UINT8 *rgnbase)
 {
 	INT16 *p;
 	int size;
@@ -141,8 +141,6 @@ static int build_decoded_waveform(struct namco_sound *chip, UINT8 *rgnbase)
 		for (offset = 0; offset < 256; offset++)
 			update_namco_waveform(chip, offset, namco_wavedata[offset]);
 	}
-
-	return 0;
 }
 
 
@@ -358,10 +356,7 @@ static SND_START( namco )
 	sound_channel *voice;
 	const namco_interface *intf = device->static_config;
 	int clock_multiple;
-	struct namco_sound *chip;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	struct namco_sound *chip = device->token;
 
 	/* extract globals from the interface */
 	chip->num_voices = intf->voices;
@@ -381,8 +376,7 @@ static SND_START( namco )
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", chip->f_fracbits, chip->namco_clock, chip->sample_rate);
 
 	/* build the waveform table */
-	if (build_decoded_waveform(chip, device->region))
-		return NULL;
+	build_decoded_waveform(chip, device->region);
 
 	/* get stream channels */
 	if (intf->stereo)
@@ -426,7 +420,7 @@ static SND_START( namco )
 		state_save_register_device_item(device, voicenum, voice->waveform_select);
 	}
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -818,6 +812,7 @@ SND_GET_INFO( namco )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct namco_sound);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco );	break;
@@ -852,6 +847,7 @@ SND_GET_INFO( namco_15xx )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct namco_sound);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_15xx );	break;
@@ -886,6 +882,7 @@ SND_GET_INFO( namco_cus30 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct namco_sound);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_cus30 );	break;

@@ -18,7 +18,6 @@
 #include "wave.h"
 
 #define ALWAYS_PLAY_SOUND	0
-#define WAVE_TOKEN_MASK		0xFFFF0000
 
 
 
@@ -64,7 +63,7 @@ static SND_START( wave )
 	image = device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, device->tag );
 #endif
 	stream_create(device, 0, 1, device->machine->sample_rate, (void *)image, wave_sound_update);
-	return (void *) (FPTR)(WAVE_TOKEN_MASK);
+	return DEVICE_START_OK;
 }
 
 
@@ -87,6 +86,7 @@ SND_GET_INFO( wave )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = 1;	 							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( wave );	break;

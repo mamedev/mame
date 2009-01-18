@@ -488,10 +488,8 @@ static unsigned char multi_pcm_reg_r(int chip, int offset)
 
 static SND_START( multipcm )
 {
-	struct _MultiPCM *ptChip;
+	struct _MultiPCM *ptChip = device->token;
 	int i;
-
-	ptChip=(struct _MultiPCM *)auto_malloc(sizeof(struct _MultiPCM));
 
 	ptChip->ROM=(INT8 *)device->region;
 	ptChip->Rate=(float) clock / MULTIPCM_CLOCKDIV;
@@ -636,7 +634,7 @@ static SND_START( multipcm )
 
 	LFO_Init();
 
-	return ptChip;
+	return DEVICE_START_OK;
 }
 
 
@@ -707,6 +705,7 @@ SND_GET_INFO( multipcm )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct _MultiPCM);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( multipcm );	break;

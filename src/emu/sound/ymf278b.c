@@ -670,10 +670,7 @@ static SND_START( ymf278b )
 	static const ymf278b_interface defintrf = { 0 };
 	const ymf278b_interface *intf;
 	int i;
-	YMF278BChip *chip;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	YMF278BChip *chip = device->token;
 
 	intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
@@ -698,7 +695,7 @@ static SND_START( ymf278b )
 		chip->mix_level[i] = chip->volume[8*i+8];
 	chip->mix_level[7] = 0;
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -804,6 +801,7 @@ SND_GET_INFO( ymf278b )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(YMF278BChip); 					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf278b );	break;

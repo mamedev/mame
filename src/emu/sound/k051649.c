@@ -55,7 +55,7 @@ struct k051649_info
 };
 
 /* build a table to divide by the number of voices */
-static int make_mixer_table(struct k051649_info *info, int voices)
+static void make_mixer_table(struct k051649_info *info, int voices)
 {
 	int count = voices * 256;
 	int i;
@@ -75,8 +75,6 @@ static int make_mixer_table(struct k051649_info *info, int voices)
 		info->mixer_lookup[ i] = val;
 		info->mixer_lookup[-i] = -val;
 	}
-
-	return 0;
 }
 
 
@@ -129,10 +127,7 @@ static STREAM_UPDATE( k051649_update )
 
 static SND_START( k051649 )
 {
-	struct k051649_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct k051649_info *info = device->token;
 
 	/* get stream channels */
 	info->rate = clock/16;
@@ -143,10 +138,9 @@ static SND_START( k051649 )
 	info->mixer_buffer = auto_malloc(2 * sizeof(short) * info->rate);
 
 	/* build the mixer table */
-	if (make_mixer_table(info, 5))
-		return NULL;
+	make_mixer_table(info, 5);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_RESET( k051649 )
@@ -237,6 +231,7 @@ SND_GET_INFO( k051649 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct k051649_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k051649 );	break;

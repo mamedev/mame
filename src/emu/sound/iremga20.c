@@ -230,11 +230,8 @@ static SND_RESET( iremga20 )
 
 static SND_START( iremga20 )
 {
-	struct IremGA20_chip_def *chip;
+	struct IremGA20_chip_def *chip = device->token;
 	int i;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	/* Initialize our chip structure */
 	chip->rom = device->region;
@@ -261,7 +258,7 @@ static SND_START( iremga20 )
 		state_save_register_device_item(device, i, chip->channel[i].play);
 	}
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -285,6 +282,7 @@ SND_GET_INFO( iremga20 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct IremGA20_chip_def);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( iremga20 );	break;

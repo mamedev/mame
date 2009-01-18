@@ -258,12 +258,8 @@ static void astrocade_state_save_register(struct astrocade_info *chip, const dev
 
 static SND_START( astrocade )
 {
-	struct astrocade_info *chip;
+	struct astrocade_info *chip = device->token;
 	int i;
-
-	/* allocate the chip memory */
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	/* generate a bitswap table for the noise */
 	for (i = 0; i < 256; i++)
@@ -276,7 +272,7 @@ static SND_START( astrocade )
 	astrocade_reset(chip);
 	astrocade_state_save_register(chip, device);
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -338,6 +334,7 @@ SND_GET_INFO( astrocade )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct astrocade_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( astrocade );	break;

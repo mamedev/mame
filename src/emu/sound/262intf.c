@@ -70,19 +70,15 @@ static void _stream_update(void *param, int interval)
 static SND_START( ymf262 )
 {
 	static const ymf262_interface dummy = { 0 };
-	struct ymf262_info *info;
+	struct ymf262_info *info = device->token;
 	int rate = clock/288;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	info->intf = device->static_config ? device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
 	info->chip = ymf262_init(device,clock,rate);
-	if (info->chip == NULL)
-		return NULL;
+	assert_always(info->chip != NULL, "Error creating YMF262 chip");
 
 	info->stream = stream_create(device,0,4,rate,info,ymf262_stream_update);
 
@@ -94,7 +90,7 @@ static SND_START( ymf262 )
 	info->timer[0] = timer_alloc(device->machine, timer_callback_262_0, info);
 	info->timer[1] = timer_alloc(device->machine, timer_callback_262_1, info);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_STOP( ymf262 )
@@ -173,6 +169,7 @@ SND_GET_INFO( ymf262 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ymf262_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf262 );		break;

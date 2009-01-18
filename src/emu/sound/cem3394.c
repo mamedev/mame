@@ -318,10 +318,8 @@ static STREAM_UPDATE( cem3394_update )
 static SND_START( cem3394 )
 {
 	const cem3394_interface *intf = device->static_config;
-	sound_chip *chip;
+	sound_chip *chip = device->token;
 
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 	chip->device = device;
 
 	/* copy global parameters */
@@ -351,7 +349,7 @@ static SND_START( cem3394 )
 	state_save_register_device_item(device, 0, chip->last_ext);
 	state_save_register_device_item(device, 0, chip->pulse_width);
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -575,6 +573,7 @@ SND_GET_INFO( cem3394 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(sound_chip);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( cem3394 );	break;

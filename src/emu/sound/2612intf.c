@@ -90,11 +90,8 @@ static STATE_POSTLOAD( ym2612_intf_postload )
 static SND_START( ym2612 )
 {
 	static const ym2612_interface dummy = { 0 };
-	struct ym2612_info *info;
+	struct ym2612_info *info = device->token;
 	int rate = clock/72;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	info->intf = device->static_config ? device->static_config : &dummy;
 	info->device = device;
@@ -109,13 +106,11 @@ static SND_START( ym2612 )
 
 	/**** initialize YM2612 ****/
 	info->chip = ym2612_init(info,device,clock,rate,timer_handler,IRQHandler);
+	assert_always(info->chip != NULL, "Error creating YM2612 chip");
 
 	state_save_register_postload(device->machine, ym2612_intf_postload, info);
-
-	if (info->chip)
-		return info;
-	/* error */
-	return NULL;
+	
+	return DEVICE_START_OK;
 }
 
 
@@ -362,6 +357,7 @@ SND_GET_INFO( ym2612 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym2612_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2612 );		break;
@@ -398,6 +394,7 @@ SND_GET_INFO( ym3438 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym2612_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym3438 );		break;

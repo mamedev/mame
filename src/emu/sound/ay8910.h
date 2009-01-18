@@ -126,7 +126,7 @@ WRITE16_HANDLER( ay8910_write_port_4_msb_w );
 
 /*********** An interface for SSG of YM2203 ***********/
 
-void *ay8910_start_ym(sound_type chip_type, const device_config *device, int clock, const ay8910_interface *intf);
+void *ay8910_start_ym(void *infoptr, sound_type chip_type, const device_config *device, int clock, const ay8910_interface *intf);
 
 void ay8910_stop_ym(void *chip);
 void ay8910_reset_ym(void *chip);

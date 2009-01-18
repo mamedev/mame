@@ -608,12 +608,9 @@ static void register_for_save(struct POKEYregisters *chip, const device_config *
 
 static SND_START( pokey )
 {
-	struct POKEYregisters *chip;
+	struct POKEYregisters *chip = device->token;
 	int sample_rate = clock;
 	int i;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	if (device->static_config)
 		memcpy(&chip->intf, device->static_config, sizeof(pokey_interface));
@@ -668,7 +665,7 @@ static SND_START( pokey )
 
 	register_for_save(chip, device);
 
-    return chip;
+    return DEVICE_START_OK;
 }
 
 static TIMER_CALLBACK( pokey_timer_expire )
@@ -1525,6 +1522,7 @@ SND_GET_INFO( pokey )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct POKEYregisters);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( pokey );	break;

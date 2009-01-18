@@ -51,22 +51,18 @@ static void _stream_update(void *param, int interval)
 static SND_START( ym2413 )
 {
 	int rate = clock/72;
-	struct ym2413_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct ym2413_info *info = device->token;
 
 	/* emulator create */
 	info->chip = ym2413_init(device, clock, rate);
-	if (!info->chip)
-		return NULL;
+	assert_always(info->chip != NULL, "Error creating YM2413 chip");
 
 	/* stream system initialize */
 	info->stream = stream_create(device,0,2,rate,info,ym2413_stream_update);
 
 	ym2413_set_update_handler(info->chip, _stream_update, info);
 
-	return info;
+	return DEVICE_START_OK;
 
 
 
@@ -169,6 +165,7 @@ SND_GET_INFO( ym2413 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym2413_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2413 );		break;

@@ -457,10 +457,7 @@ static STREAM_UPDATE( update_stereo )
 static SND_START( c140 )
 {
 	const c140_interface *intf = device->static_config;
-	struct c140_info *info;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct c140_info *info = device->token;
 
 	info->sample_rate=info->baserate=clock;
 
@@ -490,7 +487,7 @@ static SND_START( c140 )
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	info->mixer_buffer_left = auto_malloc(2 * sizeof(INT16)*info->sample_rate );
 	info->mixer_buffer_right = info->mixer_buffer_left + info->sample_rate;
-	return info;
+	return DEVICE_START_OK;
 }
 
 
@@ -514,6 +511,7 @@ SND_GET_INFO( c140 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct c140_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c140 );	break;

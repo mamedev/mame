@@ -195,10 +195,8 @@ static STREAM_UPDATE( sp0250_update )
 static SND_START( sp0250 )
 {
 	const struct sp0250_interface *intf = device->static_config;
-	struct sp0250 *sp;
+	struct sp0250 *sp = device->token;
 
-	sp = auto_malloc(sizeof(*sp));
-	memset(sp, 0, sizeof(*sp));
 	sp->RNG = 1;
 	sp->drq = (intf != NULL) ? intf->drq_callback : NULL;
 	if (sp->drq != NULL)
@@ -209,7 +207,7 @@ static SND_START( sp0250 )
 
 	sp->stream = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, sp, sp0250_update);
 
-	return sp;
+	return DEVICE_START_OK;
 }
 
 
@@ -255,6 +253,7 @@ SND_GET_INFO( sp0250 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct sp0250); 				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sp0250 );	break;

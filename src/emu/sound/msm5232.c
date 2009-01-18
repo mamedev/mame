@@ -782,15 +782,12 @@ static SND_START( msm5232 )
 {
 	const msm5232_interface *intf = device->static_config;
 	int rate = clock/CLOCK_RATE_DIVIDER;
-	MSM5232 *chip;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	MSM5232 *chip = device->token;
 
 	msm5232_init(chip, intf, clock, rate);
 
 	chip->stream = stream_create(device,0,11,rate,chip,MSM5232_update_one);
-	return chip;
+	return DEVICE_START_OK;
 }
 
 static SND_STOP( msm5232 )
@@ -846,6 +843,7 @@ SND_GET_INFO( msm5232 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(MSM5232);						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( msm5232 );	break;

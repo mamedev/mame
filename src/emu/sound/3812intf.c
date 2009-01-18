@@ -82,19 +82,15 @@ static void _stream_update_3812(void * param, int interval)
 static SND_START( ym3812 )
 {
 	static const ym3812_interface dummy = { 0 };
-	struct ym3812_info *info;
+	struct ym3812_info *info = device->token;
 	int rate = clock/72;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	info->intf = device->static_config ? device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
 	info->chip = ym3812_init(device,clock,rate);
-	if (!info->chip)
-		return NULL;
+	assert_always(info->chip != NULL, "Error creating YM3812 chip");
 
 	info->stream = stream_create(device,0,1,rate,info,ym3812_stream_update);
 
@@ -106,7 +102,7 @@ static SND_START( ym3812 )
 	info->timer[0] = timer_alloc(device->machine, timer_callback_3812_0, info);
 	info->timer[1] = timer_alloc(device->machine, timer_callback_3812_1, info);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_STOP( ym3812 )
@@ -174,6 +170,7 @@ SND_GET_INFO( ym3812 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym3812_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym3812 );		break;
@@ -253,19 +250,15 @@ static void _stream_update_3526(void *param, int interval)
 static SND_START( ym3526 )
 {
 	static const ym3526_interface dummy = { 0 };
-	struct ym3526_info *info;
+	struct ym3526_info *info = device->token;
 	int rate = clock/72;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	info->intf = device->static_config ? device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
 	info->chip = ym3526_init(device,clock,rate);
-	if (!info->chip)
-		return NULL;
+	assert_always(info->chip != NULL, "Error creating YM3526 chip");
 
 	info->stream = stream_create(device,0,1,rate,info,ym3526_stream_update);
 	/* YM3526 setup */
@@ -276,7 +269,7 @@ static SND_START( ym3526 )
 	info->timer[0] = timer_alloc(device->machine, timer_callback_3526_0, info);
 	info->timer[1] = timer_alloc(device->machine, timer_callback_3526_1, info);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_STOP( ym3526 )
@@ -344,6 +337,7 @@ SND_GET_INFO( ym3526 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym3526_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym3526 );		break;
@@ -449,19 +443,15 @@ static void _stream_update_8950(void *param, int interval)
 static SND_START( y8950 )
 {
 	static const y8950_interface dummy = { 0 };
-	struct y8950_info *info;
+	struct y8950_info *info = device->token;
 	int rate = clock/72;
-
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
 
 	info->intf = device->static_config ? device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
 	info->chip = y8950_init(device,clock,rate);
-	if (!info->chip)
-		return NULL;
+	assert_always(info->chip != NULL, "Error creating Y8950 chip");
 
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(info->chip, device->region, device->regionbytes);
@@ -480,7 +470,7 @@ static SND_START( y8950 )
 	info->timer[0] = timer_alloc(device->machine, timer_callback_8950_0, info);
 	info->timer[1] = timer_alloc(device->machine, timer_callback_8950_1, info);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_STOP( y8950 )
@@ -548,6 +538,7 @@ SND_GET_INFO( y8950 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct y8950_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( y8950 );		break;

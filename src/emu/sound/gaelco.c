@@ -242,14 +242,12 @@ WRITE16_HANDLER( gaelcosnd_w )
                         CG-1V/GAE1 Init
   ============================================================================*/
 
-static void *gaelcosnd_start(sound_type sndtype, const device_config *device, int clock)
+static device_start_err gaelcosnd_start(sound_type sndtype, const device_config *device, int clock)
 {
 	int j, vol;
 	const gaelcosnd_interface *intf = device->static_config;
 
-	struct GAELCOSND *info;
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	struct GAELCOSND *info = device->token;
 
 	chip_type = sndtype;
 
@@ -272,7 +270,7 @@ static void *gaelcosnd_start(sound_type sndtype, const device_config *device, in
 	if (LOG_WAVE)
 		wavraw = wav_open("gae1_snd.wav", 8000, 2);
 
-	return info;
+	return DEVICE_START_OK;
 }
 
 static SND_START( gaelco_gae1 )
@@ -314,6 +312,7 @@ SND_GET_INFO( gaelco_gae1 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct GAELCOSND);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( gaelco_gae1 );	break;
@@ -350,6 +349,7 @@ SND_GET_INFO( gaelco_cg1v )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct GAELCOSND);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( gaelco_cg1v );	break;

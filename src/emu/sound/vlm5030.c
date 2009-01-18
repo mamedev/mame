@@ -641,10 +641,7 @@ static SND_START( vlm5030 )
 {
 	const vlm5030_interface defintrf = { 0 };
 	int emulation_rate;
-	struct vlm5030_info *chip;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	struct vlm5030_info *chip = device->token;
 
 	chip->device = device;
 	chip->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
@@ -690,7 +687,7 @@ static SND_START( vlm5030 )
 	state_save_register_device_item_array(device,0,chip->x);
 	state_save_register_postload(device->machine, vlm5030_restore_state, chip);
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -712,6 +709,7 @@ SND_GET_INFO( vlm5030 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct vlm5030_info); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( vlm5030 );	break;

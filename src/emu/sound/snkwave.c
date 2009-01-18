@@ -101,12 +101,9 @@ static STREAM_UPDATE( snkwave_update )
 
 static SND_START( snkwave )
 {
-	struct snkwave_sound *chip;
+	struct snkwave_sound *chip = device->token;
 
 	assert(device->static_config == 0);
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	/* adjust internal clock */
 	chip->external_clock = clock;
@@ -128,7 +125,7 @@ static SND_START( snkwave )
 	state_save_register_device_item(device, 0, chip->waveform_position);
 	state_save_register_device_item_pointer(device, 0, chip->waveform, WAVEFORM_LENGTH);
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 
@@ -177,6 +174,7 @@ SND_GET_INFO( snkwave )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct snkwave_sound); 		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( snkwave );	break;

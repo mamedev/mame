@@ -488,11 +488,8 @@ void tms3617_enable_w(int chip, int enable)
 static SND_START( tms36xx )
 {
 	int j;
-	struct TMS36XX *tms;
+	struct TMS36XX *tms = device->token;
 	int enable;
-
-	tms = auto_malloc(sizeof(*tms));
-	memset(tms, 0, sizeof(*tms));
 
 	tms->intf = device->static_config;
 
@@ -518,7 +515,7 @@ static SND_START( tms36xx )
 		tms->decay[3], tms->decay[4], tms->decay[5]));
    LOG(("TMS36xx speed         %d\n", tms->speed));
 
-    return tms;
+    return DEVICE_START_OK;
 }
 
 
@@ -542,6 +539,7 @@ SND_GET_INFO( tms36xx )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct TMS36XX); 				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( tms36xx );	break;

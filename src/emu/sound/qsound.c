@@ -94,11 +94,8 @@ static void qsound_set_command(struct qsound_info *chip, int data, int value);
 
 static SND_START( qsound )
 {
-	struct qsound_info *chip;
+	struct qsound_info *chip = device->token;
 	int i;
-
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
 
 	chip->sample_rom = (QSOUND_SRC_SAMPLE *)device->region;
 	chip->sample_rom_length = device->regionbytes;
@@ -149,7 +146,7 @@ static SND_START( qsound )
 		state_save_register_device_item(device, i, chip->channel[i].offset);
 	}
 
-	return chip;
+	return DEVICE_START_OK;
 }
 
 static SND_STOP( qsound )
@@ -383,6 +380,7 @@ SND_GET_INFO( qsound )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct qsound_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( qsound );	break;
