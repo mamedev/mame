@@ -14,8 +14,11 @@
         * Suit Pursuit
         * Treasure Trail?
 
-    Known bugs:
-        * Neither game registers coins. Protection maybe?
+    Known issues:
+        * Neither game registers coins and I can't find where the credit
+        count gets updated in the code. Each game requires a unique
+        security PAL - maybe this is related? I'm poking the coin values
+        directly into RAM for now.
 
 ***************************************************************************/
 
@@ -558,11 +561,24 @@ static READ16_HANDLER( io_r )
 		}
 		default:
 		{
+			mame_printf_debug("Unknown IO R:0x%x\n", 0xc0000 + (offset * 2));
 			return 0;
 		}
 	}
 }
 
+static INPUT_CHANGED( coin_inserted )
+{
+	if (newval == 0)
+	{
+		UINT32 credit;
+		const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		
+		/* Get the current credit value and add the new coin value */
+		credit = memory_read_dword(space, 0x8002c) + (UINT32)param;
+		memory_write_dword(space, 0x8002c, credit);
+	}
+}
 
 /****************************************
  *
@@ -664,10 +680,10 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( guab )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door")  PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door")  PORT_CODE(KEYCODE_T) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED(coin_inserted, (void *)50)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED(coin_inserted, (void *)100)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key switch") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_UNUSED )  PORT_NAME("50p level")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_UNUSED )  PORT_NAME("100p level")
@@ -690,16 +706,16 @@ static INPUT_PORTS_START( guab )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("D")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p") PORT_CHANGED(coin_inserted, (void *)10)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p") PORT_CHANGED(coin_inserted, (void *)20)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tenup )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door")  PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door")  PORT_CODE(KEYCODE_T) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED(coin_inserted, (void *)50)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED(coin_inserted, (void *)100)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key switch") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_UNUSED )  PORT_NAME("10p level")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_UNUSED )  PORT_NAME("100p level")
@@ -722,8 +738,8 @@ static INPUT_PORTS_START( tenup )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")  PORT_CHANGED(coin_inserted, (void *)10)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")  PORT_CHANGED(coin_inserted, (void *)20)
 INPUT_PORTS_END
 
 
@@ -830,8 +846,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, guab,   0,     guab, guab,  0, ROT0, "JPM", "Give us a Break (6th edition)", GAME_NOT_WORKING )
-GAME( 1986, guab3,  guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (3rd edition)", GAME_NOT_WORKING )
-
-GAME( 1988, tenup,  0,     guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 17)",        GAME_NOT_WORKING )
-GAME( 1988, tenup3, tenup, guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 3)",         GAME_NOT_WORKING )
+GAME( 1986, guab,   0,     guab, guab,  0, ROT0, "JPM", "Give us a Break (6th edition)", 0 )
+GAME( 1986, guab3,  guab,  guab, guab,  0, ROT0, "JPM", "Give us a Break (3rd edition)", 0 )
+GAME( 1988, tenup,  0,     guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 17)",        0 )
+GAME( 1988, tenup3, tenup, guab, tenup, 0, ROT0, "JPM", "Ten Up (compendium 3)",         0 )
