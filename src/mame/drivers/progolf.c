@@ -48,41 +48,34 @@ static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM //AM_WRITE(deco_charram_w) AM_BASE(&deco_charram)
 	AM_RANGE(0x2000, 0x7fff) AM_RAM AM_BASE(&deco_charram) //AM_WRITE(deco_charram_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITENOP
+	AM_RANGE(0x9000, 0x9000) AM_WRITENOP //video control?
 	AM_RANGE(0x9000, 0x9000) AM_READNOP
 	AM_RANGE(0x9200, 0x9200) AM_WRITENOP
 	AM_RANGE(0x9400, 0x9400) AM_WRITENOP
 	AM_RANGE(0x9600, 0x9600) AM_WRITENOP
 	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("IN0")     /* VBLANK */
 	AM_RANGE(0x9800, 0x9800) AM_READNOP
-	AM_RANGE(0x9800, 0x9801) AM_WRITENOP
+	AM_RANGE(0x9800, 0x9801) AM_WRITENOP // mc6845 regs
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
 	AM_RANGE(0x9a00, 0x9a00) AM_READNOP
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&btime_colorram)
 	AM_RANGE(0x8800, 0x881f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x8820, 0x8fff) AM_RAM
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-#if 0
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xafff) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
+	AM_RANGE(0x5000, 0x5fff) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(ay8910_read_port_1_r,ay8910_write_port_1_w)
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(ay8910_control_port_1_w)
+//	AM_RANGE(0x8000, 0x8fff) AM_WRITE(interrupt_enable_w) //???
+	AM_RANGE(0x9000, 0xafff) AM_READ(soundlatch_r)
+	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-#endif
 
 static INPUT_PORTS_START( progolf )
 	PORT_START("IN0")
@@ -193,9 +186,9 @@ static MACHINE_DRIVER_START( progolf )
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 //  MDRV_CPU_VBLANK_INT("main", progolf_interrupt)
 
-//  MDRV_CPU_ADD("audio", M6502, 500000)
-//  MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-//  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
+  	MDRV_CPU_ADD("audio", M6502, 500000)
+	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
+//	MDRV_CPU_VBLANK_INT("main",nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -232,7 +225,7 @@ ROM_START( progolf )
 	ROM_LOAD( "g1-m.8a",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.9a",      0xf000, 0x1000, CRC(8f8b1e8e) SHA1(fc877a8f2b26ea48c5ba2324678d6077f3432a79) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "g6-m.1b",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
@@ -254,7 +247,7 @@ ROM_START( progolfa )
 	ROM_LOAD( "g1-m.a8",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.a9",      0xf000, 0x1000, CRC(a03c533f) SHA1(2e0006be40e32b64b1490bd339d9fc9302eee7c4) )
 
-	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "g5-m.b1",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
@@ -283,5 +276,6 @@ static DRIVER_INIT( progolf )
 		decrypted[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0);
 }
 
-GAME( 1981, progolf,  0,       progolf, progolf, progolf, ROT270, "Data East Corporation", "Pro Golf (set 1)", GAME_NOT_WORKING )
-GAME( 1981, progolfa, progolf, progolf, progolf, progolf, ROT270, "Data East Corporation", "Pro Golf (set 2)", GAME_NOT_WORKING ) // doesn't display anything
+/*Maybe progolf is a bootleg and progolfa is the original (with Deco C10707 as CPU)?*/
+GAME( 1981, progolf,  0,       progolf, progolf, progolf, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_NOT_WORKING )
+GAME( 1981, progolfa, progolf, progolf, progolf, progolf, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING ) // doesn't display anything
