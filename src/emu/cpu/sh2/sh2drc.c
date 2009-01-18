@@ -1376,7 +1376,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
 			strcpy(buffer, "<virtual nop>");
 		else
-			DasmSH2(buffer, desclist->pc, *desclist->opptr.w);
+			DasmSH2(buffer, desclist->pc, desclist->opptr.w[0]);
 #else
 		strcpy(buffer, "???");
 #endif
@@ -1505,8 +1505,9 @@ static void generate_checksum_block(SH2 *sh2, drcuml_block *block, compiler_stat
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			UML_LOAD(block, IREG(0), seqhead->opptr.l, IMM(0), DWORD);				// load    i0,*opptr,0,dword
-			UML_CMP(block, IREG(0), IMM(*seqhead->opptr.l));						// cmp     i0,*opptr
+			void *base = memory_decrypted_read_ptr(sh2->program, SH2_CODE_XOR(seqhead->physpc));
+			UML_LOAD(block, IREG(0), base, IMM(0), WORD);							// load    i0,base,word
+			UML_CMP(block, IREG(0), IMM(seqhead->opptr.w[0]));						// cmp     i0,*opptr
 			UML_EXHc(block, IF_NE, sh2->nocode, IMM(epc(seqhead)));		// exne    nocode,seqhead->pc
 		}
 	}
@@ -1518,20 +1519,23 @@ static void generate_checksum_block(SH2 *sh2, drcuml_block *block, compiler_stat
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
+				base = memory_decrypted_read_ptr(sh2->program, SH2_CODE_XOR(curdesc->physpc));
 				UML_LOAD(block, IREG(0), curdesc->opptr.w, IMM(0), WORD);			// load    i0,*opptr,0,word
-				UML_CMP(block, IREG(0), IMM(*curdesc->opptr.w));					// cmp     i0,*opptr
+				UML_CMP(block, IREG(0), IMM(curdesc->opptr.w[0]));					// cmp     i0,*opptr
 				UML_EXHc(block, IF_NE, sh2->nocode, IMM(epc(seqhead)));	// exne    nocode,seqhead->pc
 			}
 #else
 		UINT32 sum = 0;
-		UML_LOAD(block, IREG(0), seqhead->opptr.l, IMM(0), DWORD);					// load    i0,*opptr,0,dword
-		sum += *seqhead->opptr.l;
+		void *base = memory_decrypted_read_ptr(sh2->program, SH2_CODE_XOR(seqhead->physpc));
+		UML_LOAD(block, IREG(0), base, IMM(0), WORD);								// load    i0,base,word
+		sum += seqhead->opptr.w[0];
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				UML_LOAD(block, IREG(1), curdesc->opptr.l, IMM(0), DWORD);			// load    i1,*opptr,dword
+				base = memory_decrypted_read_ptr(sh2->program, SH2_CODE_XOR(curdesc->physpc));
+				UML_LOAD(block, IREG(1), base, IMM(0), WORD);						// load    i1,*opptr,word
 				UML_ADD(block, IREG(0), IREG(0), IREG(1));							// add     i0,i0,i1
-				sum += *curdesc->opptr.l;
+				sum += curdesc->opptr.w[0];
 			}
 		UML_CMP(block, IREG(0), IMM(sum));											// cmp     i0,sum
 		UML_EXHc(block, IF_NE, sh2->nocode, IMM(epc(seqhead)));			// exne    nocode,seqhead->pc
@@ -1551,7 +1555,7 @@ static void generate_sequence_instruction(SH2 *sh2, drcuml_block *block, compile
 
 	/* add an entry for the log */
 	if (LOG_UML && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
-		log_add_disasm_comment(block, desc->pc, *desc->opptr.l);
+		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
 
 	/* set the PC map variable */
 	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 1 : desc->pc;
@@ -1622,7 +1626,7 @@ static void generate_sequence_instruction(SH2 *sh2, drcuml_block *block, compile
 		if (!generate_opcode(sh2, block, compiler, desc))
 		{
 			UML_MOV(block, MEM(&sh2->pc), IMM(desc->pc));							// mov     [pc],desc->pc
-			UML_MOV(block, MEM(&sh2->arg0), IMM(*desc->opptr.w));					// mov     [arg0],opcode
+			UML_MOV(block, MEM(&sh2->arg0), IMM(desc->opptr.w[0]));					// mov     [arg0],opcode
 			UML_CALLC(block, cfunc_unimplemented, sh2);								// callc   cfunc_unimplemented
 		}
 	}
@@ -1653,7 +1657,7 @@ static int generate_opcode(SH2 *sh2, drcuml_block *block, compiler_state *compil
 {
 	UINT32 scratch, scratch2;
 	INT32 disp;
-	UINT16 opcode = *desc->opptr.w;
+	UINT16 opcode = desc->opptr.w[0];
 	UINT8 opswitch = opcode >> 12;
 	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
 
@@ -1830,8 +1834,7 @@ static int generate_group_0(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	case 0x24: // MOVBS0(Rm, Rn);
 	case 0x34: // MOVBS0(Rm, Rn);
 		UML_ADD(block, IREG(0), R32(0), R32(Rn));		// add r0, R0, Rn
-		UML_MOV(block, IREG(1), R32(Rm));			// mov r1, Rm
-		UML_AND(block, IREG(1), IREG(1), IMM(0x000000ff));   	// and r1, r1, 0xff
+		UML_AND(block, IREG(1), R32(Rm), IMM(0x000000ff));   	// and r1, Rm, 0xff
 		UML_CALLH(block, sh2->write8);				// call write8
 
 		if (!in_delay_slot)
@@ -1843,8 +1846,7 @@ static int generate_group_0(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	case 0x25: // MOVWS0(Rm, Rn);
 	case 0x35: // MOVWS0(Rm, Rn);
 		UML_ADD(block, IREG(0), R32(0), R32(Rn));		// add r0, R0, Rn
-		UML_MOV(block, IREG(1), R32(Rm));			// mov r1, Rm
-		UML_AND(block, IREG(1), IREG(1), IMM(0x0000ffff));  	// and r1, r1, 0xffff
+		UML_AND(block, IREG(1), R32(Rm), IMM(0x0000ffff));  	// and r1, Rm, 0xffff
 		UML_CALLH(block, sh2->write16);				// call write16
 
 		if (!in_delay_slot)
@@ -1934,7 +1936,7 @@ static int generate_group_0(SH2 *sh2, drcuml_block *block, compiler_state *compi
 		if (sh2->cpu_type > CPU_TYPE_SH1)
 		{
 			save_fast_iregs(sh2, block);
-			UML_MOV(block, MEM(&sh2->arg0), IMM(*desc->opptr.w));
+			UML_MOV(block, MEM(&sh2->arg0), IMM(desc->opptr.w[0]));
 			UML_CALLC(block, cfunc_MAC_L, sh2);
 			load_fast_iregs(sh2, block);
 			return TRUE;
@@ -2054,8 +2056,7 @@ static int generate_group_2(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	{
 	case  0: // MOVBS(Rm, Rn);
 		UML_MOV(block, IREG(0), R32(Rn));		// mov r0, Rn
-		UML_MOV(block, IREG(1), R32(Rm));		// mov r1, Rm
-		UML_AND(block, IREG(1), IREG(1), IMM(0xff));	// and r1, r1, 0xff
+		UML_AND(block, IREG(1), R32(Rm), IMM(0xff));	// and r1, Rm, 0xff
 		UML_CALLH(block, sh2->write8);
 
 		if (!in_delay_slot)
@@ -2064,8 +2065,7 @@ static int generate_group_2(SH2 *sh2, drcuml_block *block, compiler_state *compi
 
 	case  1: // MOVWS(Rm, Rn);
 		UML_MOV(block, IREG(0), R32(Rn));		// mov r0, Rn
-		UML_MOV(block, IREG(1), R32(Rm));		// mov r1, Rm
-		UML_AND(block, IREG(1), IREG(1), IMM(0xffff));	// and r1, r1, 0xffff
+		UML_AND(block, IREG(1), R32(Rm), IMM(0xffff));	// and r1, Rm, 0xffff
 		UML_CALLH(block, sh2->write16);
 
 		if (!in_delay_slot)
@@ -2259,7 +2259,7 @@ static int generate_group_3(SH2 *sh2, drcuml_block *block, compiler_state *compi
 
 	case  4: // DIV1(Rm, Rn);
 		save_fast_iregs(sh2, block);
-		UML_MOV(block, MEM(&sh2->arg0), IMM(*desc->opptr.w));
+		UML_MOV(block, MEM(&sh2->arg0), IMM(desc->opptr.w[0]));
 		UML_CALLC(block, cfunc_DIV1, sh2);
 		load_fast_iregs(sh2, block);
 		return TRUE;
@@ -2302,7 +2302,7 @@ static int generate_group_3(SH2 *sh2, drcuml_block *block, compiler_state *compi
 		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 #else
 		save_fast_iregs(sh2, block);
-		UML_MOV(block, MEM(&sh2->arg0), IMM(*desc->opptr.w));
+		UML_MOV(block, MEM(&sh2->arg0), IMM(desc->opptr.w[0]));
 		UML_CALLC(block, cfunc_SUBV, sh2);
 		load_fast_iregs(sh2, block);
 #endif
@@ -2322,7 +2322,7 @@ static int generate_group_3(SH2 *sh2, drcuml_block *block, compiler_state *compi
 		UML_ROLINS(block, MEM(&sh2->sr), IREG(0), IMM(0), IMM(T)); // rolins [sr],i0,0,T
 #else
 		save_fast_iregs(sh2, block);
-		UML_MOV(block, MEM(&sh2->arg0), IMM(*desc->opptr.w));
+		UML_MOV(block, MEM(&sh2->arg0), IMM(desc->opptr.w[0]));
 		UML_CALLC(block, cfunc_ADDV, sh2);
 		load_fast_iregs(sh2, block);
 #endif
@@ -2457,7 +2457,7 @@ static int generate_group_4(SH2 *sh2, drcuml_block *block, compiler_state *compi
 	case 0x2f: // MAC_W(Rm, Rn);
 	case 0x3f: // MAC_W(Rm, Rn);
 		save_fast_iregs(sh2, block);
-		UML_MOV(block, MEM(&sh2->arg0), IMM(*desc->opptr.w));
+		UML_MOV(block, MEM(&sh2->arg0), IMM(desc->opptr.w[0]));
 		UML_CALLC(block, cfunc_MAC_W, sh2);
 		load_fast_iregs(sh2, block);
 		return TRUE;
@@ -2767,12 +2767,8 @@ static int generate_group_6(SH2 *sh2, drcuml_block *block, compiler_state *compi
 		UML_CALLH(block, sh2->read8);			// call read8
 		UML_SEXT(block, R32(Rn), IREG(0), BYTE);     	// sext Rn, r0, BYTE
 
-		UML_CMP(block, IMM(Rn), IMM(Rm));		// cmp N, M
-		UML_JMPc(block, IF_Z, compiler->labelnum);    	// jz compiler->labelnum
-
-		UML_ADD(block, R32(Rm), R32(Rm), IMM(1));	// add Rm, Rm, #1
-
-		UML_LABEL(block, compiler->labelnum++);	      	// labelnum:
+		if (Rm != Rn)
+			UML_ADD(block, R32(Rm), R32(Rm), IMM(1));	// add Rm, Rm, #1
 
 		if (!in_delay_slot)
 			generate_update_cycles(sh2, block, compiler, IMM(desc->pc + 2), TRUE);
@@ -2783,12 +2779,8 @@ static int generate_group_6(SH2 *sh2, drcuml_block *block, compiler_state *compi
 		UML_CALLH(block, sh2->read16);			// call read16
 		UML_SEXT(block, R32(Rn), IREG(0), WORD);     	// sext Rn, r0, WORD
 
-		UML_CMP(block, IMM(Rn), IMM(Rm));		// cmp N, M
-		UML_JMPc(block, IF_Z, compiler->labelnum);    	// jz compiler->labelnum
-
-		UML_ADD(block, R32(Rm), R32(Rm), IMM(2));	// add Rm, Rm, #2
-
-		UML_LABEL(block, compiler->labelnum++);	      	// labelnum:
+		if (Rm != Rn)
+			UML_ADD(block, R32(Rm), R32(Rm), IMM(2));	// add Rm, Rm, #2
 
 		if (!in_delay_slot)
 			generate_update_cycles(sh2, block, compiler, IMM(desc->pc + 2), TRUE);
@@ -2799,12 +2791,8 @@ static int generate_group_6(SH2 *sh2, drcuml_block *block, compiler_state *compi
 		UML_CALLH(block, sh2->read32);			// call read32
 		UML_MOV(block, R32(Rn), IREG(0));		// mov Rn, r0
 
-		UML_CMP(block, IMM(Rn), IMM(Rm));		// cmp N, M
-		UML_JMPc(block, IF_Z, compiler->labelnum); 	// jz compiler->labelnum
-
-		UML_ADD(block, R32(Rm), R32(Rm), IMM(4));	// add Rm, Rm, #4
-
-		UML_LABEL(block, compiler->labelnum++);		// labelnum:
+		if (Rm != Rn)
+			UML_ADD(block, R32(Rm), R32(Rm), IMM(4));	// add Rm, Rm, #4
 
 		if (!in_delay_slot)
 			generate_update_cycles(sh2, block, compiler, IMM(desc->pc + 2), TRUE);

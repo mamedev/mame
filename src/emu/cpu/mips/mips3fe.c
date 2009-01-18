@@ -42,14 +42,26 @@ static int describe_instruction_cop2(mips3_state *mips, UINT32 op, opcode_desc *
 int mips3fe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 {
 	mips3_state *mips = param;
-	UINT32 op = *desc->opptr.l;
-	UINT8 opswitch = op >> 26;
+	UINT32 op, opswitch;
+
+	/* compute the physical PC */
+	if (!mips3com_translate_address(mips, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &desc->physpc))
+	{
+		/* uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and */
+		/* mark as needing to validate; otherwise, just end the sequence here */
+		desc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_COMPILER_PAGE_FAULT | OPFLAG_VIRTUAL_NOOP | OPFLAG_END_SEQUENCE;
+		return TRUE;
+	}
+
+	/* fetch the opcode */
+	op = desc->opptr.l[0] = memory_decrypted_read_dword(mips->program, desc->physpc);
 
 	/* all instructions are 4 bytes and default to a single cycle each */
 	desc->length = 4;
 	desc->cycles = 1;
 
 	/* parse the instruction */
+	opswitch = op >> 26;
 	switch (opswitch)
 	{
 		case 0x00:	/* SPECIAL */

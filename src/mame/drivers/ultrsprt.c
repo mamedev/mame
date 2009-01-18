@@ -86,14 +86,14 @@ static MACHINE_START( ultrsprt )
 
 	/* configure fast RAM regions for DRC */
 	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x0007ffff);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x80000000);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x8007ffff);
 	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, vram);
 	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 
 	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x7f000000);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x7f01ffff);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0xff000000);
+	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0xff01ffff);
 	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
 	device_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
@@ -110,9 +110,7 @@ static ADDRESS_MAP_START( ultrsprt_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
 	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_BASE(&workram)
 	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x7fa00000, 0x7fbfffff) AM_ROM AM_SHARE(1)
-	AM_RANGE(0x7fc00000, 0x7fdfffff) AM_ROM AM_SHARE(1)
-	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(1)
+	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
@@ -167,7 +165,7 @@ static WRITE16_HANDLER( K056800_68k_w )
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 	AM_RANGE(0x00100000, 0x00101fff) AM_RAM
 	AM_RANGE(0x00200000, 0x00200007) AM_WRITE(K056800_68k_w)
 	AM_RANGE(0x00200008, 0x0020000f) AM_READ(K056800_68k_r)

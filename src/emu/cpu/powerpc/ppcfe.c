@@ -130,15 +130,27 @@ INLINE int is_603_class(const powerpc_state *ppc)
 int ppcfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 {
 	powerpc_state *ppc = param;
-	UINT32 op = *desc->opptr.l;
-	UINT32 opswitch = op >> 26;
+	UINT32 op, opswitch;
 	int regnum;
+
+	/* compute the physical PC */
+	if (!ppccom_translate_address(ppc, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &desc->physpc))
+	{
+		/* uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and */
+		/* mark as needing to validate; otherwise, just end the sequence here */
+		desc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_COMPILER_PAGE_FAULT | OPFLAG_VIRTUAL_NOOP | OPFLAG_END_SEQUENCE;
+		return TRUE;
+	}
+
+	/* fetch the opcode */
+	op = desc->opptr.l[0] = memory_decrypted_read_dword(ppc->program, desc->physpc);
 
 	/* all instructions are 4 bytes and default to a single cycle each */
 	desc->length = 4;
 	desc->cycles = 1;
 
 	/* parse the instruction */
+	opswitch = op >> 26;
 	switch (opswitch)
 	{
 		case 0x02:	/* TDI - 64-bit only */

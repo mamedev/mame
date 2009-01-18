@@ -105,14 +105,13 @@ struct _opcode_desc
 	offs_t			physpc;					/* physical PC of this opcode */
 	offs_t			targetpc;				/* target PC if we are a branch, or BRANCH_TARGET_DYNAMIC */
 
-	/* pointer to the current opcode */
+	/* copy of up to 16 bytes of opcode */
 	union
 	{
-		void *		v;
-		UINT8 *		b;
-		UINT16 *	w;
-		UINT32 *	l;
-		UINT64 *	q;
+		UINT8		b[16];
+		UINT16		w[8];
+		UINT32		l[4];
+		UINT64		q[2];
 	} opptr;								/* pointer to opcode memory */
 
 	/* information about this instruction's execution */
