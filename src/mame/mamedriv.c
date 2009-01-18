@@ -3937,6 +3937,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( waverunr )	/* 1996 */
 	DRIVER( hotd )		/* 1997 */
 	DRIVER( overrev )	/* 1997 */
+	DRIVER( segawski )	/* 1997 */
 	DRIVER( topskatr )	/* 1997 */
 	DRIVER( topskatu )	/* 1997 */
 	DRIVER( bel )		/* 1998 */
