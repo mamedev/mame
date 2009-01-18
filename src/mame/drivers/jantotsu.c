@@ -5,25 +5,26 @@
 driver by David Haywood and Angelo Salese
 
 Notes:
--The 1-2 Player tiles on hand are actually shown on different screen sides.The Service Mode
- is for adjusting these screens (to not let the human opponent to read your tiles).
+-The 1st/2nd Player tiles on hand are actually shown on different screen sides.The Service
+ Mode is for adjusting these screens (to not let the human opponent to read your tiles).
 
 TODO:
+-MSM5205 samples are wrongly played i.e. plays chi when it's clearly a pon.ADPCM index issue;
+-MSM5205 sample stop is wrong;
 -Video buffering? If you coin up,you can see the "credit 1" msg that gets build into the
  video bitmaps...
 -According to the flyer,color bitplanes might be wrong on the A-N mahjong charset,might be a
  BTANB however...
 -I need schematics / pcb photos (component + solder sides) to understand if the background
  color is hard-wired to the DIP-Switches or there's something else wrong.
--Missing MSM5205 samples;
 
 ============================================================================================
 Debug cheats:
 
 c01b-c028 player-1 tiles
-c02b-c038 right computer tiles
-c03b-c048 up computer tiles / player-2 tiles
-c04b-c058 left computer tiles
+c02b-c038 "right" computer tiles
+c03b-c048 "up" computer tiles / player-2 tiles
+c04b-c058 "left" computer tiles
 
 ============================================================================================
 
@@ -64,6 +65,7 @@ dumped by sayu
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "sound/msm5205.h"
 
 static UINT8 *jan_bitmap_1,*jan_bitmap_2,*jan_bitmap_3,*jan_bitmap_4;
 static UINT8 vram_bank,col_bank;
@@ -210,6 +212,56 @@ static READ8_HANDLER( jantotsu_dsw2_r )
 	return (input_port_read(space->machine, "DSW2") & 0x3f) | 0x80;
 }
 
+static UINT32 adpcm_pos;
+static UINT8 adpcm_idle;
+static int adpcm_data;
+
+static WRITE8_HANDLER( jan_adpcm_w )
+{
+	switch (offset)
+	{
+		case 0:
+			adpcm_pos = (data & 0xff) * 0x80;
+			adpcm_idle = 0;
+			msm5205_reset_w(0,0);
+//			printf("%02x 0\n",data);
+			break;
+		/*same write as port 2?*/
+		case 1:
+//			adpcm_idle = 1;
+//			msm5205_reset_w(0,1);
+//			printf("%02x 1\n",data);
+			break;
+	}
+}
+
+static void jan_adpcm_int(const device_config *device)
+{
+	static UINT8 trigger;
+
+	if (adpcm_pos >= 0x8000 || adpcm_idle)
+	{
+		//adpcm_idle = 1;
+		msm5205_reset_w(0,1);
+		trigger = 0;
+	}
+	else
+	{
+		UINT8 *ROM = memory_region(device->machine, "adpcm");
+
+		adpcm_data = ((trigger ? (ROM[adpcm_pos] & 0x0f) : (ROM[adpcm_pos] & 0xf0)>>4) );
+		msm5205_data_w(0,adpcm_data & 0xf);
+		trigger^=1;
+		if(trigger == 0)
+		{
+			adpcm_pos++;
+			if((ROM[adpcm_pos] & 0xff) == 0xff)
+				adpcm_idle = 1;
+		}
+	}
+}
+
+
 static ADDRESS_MAP_START( jantotsu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -220,7 +272,7 @@ static ADDRESS_MAP_START( jantotsu_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(sn76496_0_w)
 	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_WRITE(sn76496_1_w)
-	//02-03 MSM samples
+	AM_RANGE(0x02, 0x03) AM_WRITE(jan_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(jantotsu_mux_r,jantotsu_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(bankaddr_w)
 ADDRESS_MAP_END
@@ -336,7 +388,15 @@ static MACHINE_RESET( jantotsu )
 	mux_data = 0;
 	/*Load hard-wired background color.*/
 	col_bank = (input_port_read(machine, "DSW2") & 0xc0)>>3;
+	adpcm_pos = 0;
+	adpcm_idle = 1;
 }
+
+static const msm5205_interface msm5205_config =
+{
+	jan_adpcm_int,	/* interrupt function */
+	MSM5205_S48_4B	/* 8kHz */
+};
 
 static MACHINE_DRIVER_START( jantotsu )
 	/* basic machine hardware */
@@ -368,6 +428,10 @@ static MACHINE_DRIVER_START( jantotsu )
 
 	MDRV_SOUND_ADD("sn2", SN76489A, 18432000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("adpcm", MSM5205, 288000)
+	MDRV_SOUND_CONFIG(msm5205_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 
@@ -381,7 +445,7 @@ ROM_START( jantotsu )
 	ROM_LOAD( "jat-04.3e", 0x08000, 0x02000, CRC(734e029f) SHA1(75aa13397847b4db32c41aaa6ff2ac82f16bd7a2) )
 	ROM_LOAD( "jat-05.4e", 0x0a000, 0x02000, CRC(1a725e1a) SHA1(1d39d607850f47b9389f41147d4570da8814f639) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_REGION( 0x8000, "adpcm", 0 )
 	ROM_LOAD( "jat-40.6b", 0x00000, 0x02000, CRC(2275253e) SHA1(64e9415faf2775c6b9ab497dce7fda8c4775192e) )
 	ROM_LOAD( "jat-41.7b", 0x02000, 0x02000, CRC(ce08ed71) SHA1(8554e5e7ec178f57bed5fbdd5937e3a35f72c454) )
 	ROM_LOAD( "jat-42.8b", 0x04000, 0x02000, CRC(3ac3efbf) SHA1(846faea7c7c01fb7500aa33a70d4b54e878c0e41) )
