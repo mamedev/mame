@@ -140,7 +140,7 @@ WRITE8_HANDLER( graph_processor_w )
 		case 0x03: bitmap_videoram_address_x = data; break;
 		case 0x07: bitmap_videoram_address_y = data; break;
 		default:
-			current_bitmap_videoram_accessed[(bitmap_videoram_address_y << 8) | bitmap_videoram_address_x] = data & 0x07;
+			current_bitmap_videoram_accessed[(bitmap_videoram_address_y << 8) | bitmap_videoram_address_x] = data & 0x0f;
 
 			adjust_xy(offset);
 			break;
@@ -196,7 +196,7 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			pen_t pen = current_bitmap_videoram_displayed[(y << 8) | x];
+			pen_t pen = current_bitmap_videoram_displayed[(y << 8) | x] & 0x07;
 
 			if (pen)
 				*BITMAP_ADDR16(bitmap, y, (x - 6) & 0xff) = 0x10 | ((x & 0x80) >> 4) | pen;

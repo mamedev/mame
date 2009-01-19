@@ -322,7 +322,7 @@ VIDEO_UPDATE( midzeus )
 		{
 			UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-				dest[x] = WAVERAM_READPIX(base, y, x - xoffs);
+				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
 		}
 	}
 
