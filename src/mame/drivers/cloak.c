@@ -98,13 +98,16 @@
     2008-07
     Dip locations and suggested settings verified with manual.
 
+    Note: The master CPU prints a 'SLAVE COM BAD' message on startup
+    before it actually tests the slave CPU. The message only remains
+    visible if the slave CPU fails to respond.
+
 ****************************************************************************/
 
 /*
 
     TODO:
 
-    - slave com bad at startup
     - is bitmap drawing in service mode correct?
     - real cpu speeds
     - custom write
@@ -330,15 +333,15 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_DRIVER_START( cloak )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,1000000)		/* 1 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(master_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MDRV_CPU_ADD("main", M6502, 1000000)		/* 1 MHz ???? */
+	MDRV_CPU_PROGRAM_MAP(master_map, 0)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
-	MDRV_CPU_ADD("slave", M6502,1250000)		/* 1.25 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(slave_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MDRV_CPU_ADD("slave", M6502, 1250000)		/* 1.25 MHz ???? */
+	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 
-	MDRV_QUANTUM_TIME(HZ(300))
+	MDRV_QUANTUM_TIME(HZ(1000))
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
