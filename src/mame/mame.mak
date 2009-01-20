@@ -750,16 +750,16 @@ $(MAMEOBJ)/greyhnd.a: \
 	$(DRIVERS)/getrivia.o \
 
 $(MAMEOBJ)/igs.a: \
-	$(DRIVERS)/csk.o $(VIDEO)/csk.o \
 	$(DRIVERS)/ddz.o \
 	$(DRIVERS)/dunhuang.o \
 	$(DRIVERS)/goldstar.o $(VIDEO)/goldstar.o \
+	$(DRIVERS)/jackie.o \
+	$(DRIVERS)/igspoker.o \
 	$(DRIVERS)/igs009.o \
 	$(DRIVERS)/igs_blit.o \
 	$(DRIVERS)/igs017.o \
 	$(DRIVERS)/igs_m027.o \
 	$(DRIVERS)/igs_m68.o \
-	$(DRIVERS)/igs_ncs.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \
@@ -1739,6 +1739,8 @@ $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
 						$(LAYOUT)/pmpoker.lh \
+
+$(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
 
 $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
 

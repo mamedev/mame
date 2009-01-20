@@ -7457,6 +7457,8 @@ Other Sun games
  	DRIVER( cpokert )	/* (c) 1993? Tuning */
 	DRIVER( csk227it )	/* (c) 198? IGS */
 	DRIVER( csk234it )	/* (c) 198? IGS */
+	DRIVER( igs_ncs )	/* (c) 198? IGS */
+	DRIVER( igs_ncs2 )	/* (c) 2000 IGS */
 	DRIVER( jackie )	/* (c) 199? IGS */
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
@@ -7494,8 +7496,6 @@ Other Sun games
 	DRIVER( mgcs )		/* (c) 1998 */
 	DRIVER( slqz2 )		/* (c) 1998 */
 	DRIVER( sdmg2 )		/* (c) 1997 */
-
-	DRIVER( igs_ncs )	/* (c) 2000 */
 
 	DRIVER( bigd2 )		/* (c) 2000 */
 	DRIVER( sdwx )		/* (c) 2002 */
