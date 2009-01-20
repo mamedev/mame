@@ -8054,10 +8054,10 @@ Other Sun games
 	DRIVER( fredmemc )	/* (c) 1994 Coastal Amusements */
 	DRIVER( fredmesp )	/* (c) 1994 Coastal Amusements */
 	DRIVER( cecmatch )	/* (c) 1993 Coastal Amusements */
-	DRIVER( f15se )		/* (c) 1991 Microprose */
-	DRIVER( f15se21 )	/* (c) 1991 Microprose */
-	DRIVER( botss )		/* (c) 1992 Microprose */
-	DRIVER( stankatk )	/* (c) 1992 Microprose */
+	DRIVER( f15se )		/* (c) 1991 Microprose Games Inc. */
+	DRIVER( f15se21 )	/* (c) 1991 Microprose Games Inc. */
+	DRIVER( botss )		/* (c) 1992 Microprose Games Inc. */
+	DRIVER( stankatk )	/* (c) 1992 Microprose Games Inc. */
 	DRIVER( dynadice )	/* ? */
 	DRIVER( ssingles )	/* Yachiyo? */
 	DRIVER( tcl )		/* (c) 1995 Uniwang */
@@ -8549,5 +8549,8 @@ Other Sun games
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 	DRIVER( spielbud )	/* (c) 1985 ADP */
+
+	/* Hi-Soft */
+	DRIVER( himesiki )	/* (c) 1989 Hi-Soft */
 
 #endif	/* DRIVER_RECURSIVE */

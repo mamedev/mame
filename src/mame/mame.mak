@@ -1579,6 +1579,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/gunpey.o \
 	$(DRIVERS)/hexa.o $(VIDEO)/hexa.o \
 	$(DRIVERS)/highvdeo.o \
+	$(DRIVERS)/himesiki.o $(VIDEO)/himesiki.o \
 	$(DRIVERS)/homedata.o $(VIDEO)/homedata.o \
 	$(DRIVERS)/hotblock.o \
 	$(DRIVERS)/ilpag.o \
