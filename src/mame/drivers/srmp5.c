@@ -115,9 +115,9 @@ static VIDEO_UPDATE( srmp5 )
 		}
 	}
 	else
-#else
-		bitmap_fill(bitmap,cliprect,0);
 #endif
+		bitmap_fill(bitmap,cliprect,0);
+
 	while((sprite_list[SUBLIST_OFFSET]&SPRITE_LIST_END_MARKER)==0 && sprite_list<sprite_list_end)
 	{
 		UINT16 *sprite_sublist=&sprram[sprite_list[SUBLIST_OFFSET]<<SUBLIST_OFFSET_SHIFT];
