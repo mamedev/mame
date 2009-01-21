@@ -8438,7 +8438,7 @@ Other Sun games
 	DRIVER( blazlaz )	/* (c) 1989 Hudson Soft */
 	DRIVER( paranoia )	/* (c) 1990 Naxat Soft */
 	DRIVER( vcombat )	/* (c) 1993 VR8 Inc. */
-	DRIVER( shadfgtr )	/* (c) 1989 DUTECH Inc. */
+	DRIVER( shadfgtr )	/* (c) 1993 DUTECH Inc. */
 	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
 	DRIVER( magictg )	/* (c) 199? Acclaim */
 	DRIVER( magictga )	/* (c) 199? Acclaim */

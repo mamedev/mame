@@ -1,7 +1,7 @@
 /*
 Virtual Combat hardware games.
 
-Driver by Jason Eckhardt and Andrew Gardner.
+Driver by Jason Eckhardt, Andrew Gardner and Phil Bennett.
 
 ----
 
@@ -11,7 +11,7 @@ Kyle Hodgetts.
 Virtual Combat (c) VR8 Inc. 1993
 http://arcade.sonzogni.com/VRCombat/
 
-Shadow Fighters (German) (c) Sega? 1989?
+Shadow Fighters (German) (c) Dutech 1993
 
 ----
 
@@ -66,12 +66,6 @@ TODO :  This is a partially working driver.  Most of the memory maps for
      - Most of the memory maps and input ports are complete now.
        For "main", the only I/O locations that seem to be left
        mysterious are:
-         0x600010,
-         0x60000C: Only written; maybe mc6845? Often accessed
-               together, and 16 consecutive words of data are
-               written to 0x60000C, making me think it might be
-               6845-related.  May or may not be important for
-               reasonable emulation.
          0x60001C: Only read; might be a latch of some sort.  It is
                read each time M0's interrupt service routine syncs
                with the i860's to have them update the frame buffer.
@@ -82,86 +76,73 @@ TODO :  This is a partially working driver.  Most of the memory maps for
          0x600018: ? No info yet.
          0x704000: (VC only) Likely analog axis for VR headset
          0x703000: (VC only) Likely analog axis for VR headset
-         0x702000: (Shadow only). I think this is another IN port. It
-               is always read at the same time as the other two
-               ports.
 
-      - Assuming a single framebuffer, as I think we are at the moment,
-        how are all the CPUs writes to the framebuffer prioritized,
-        if at all?  The zero values written by the 68k side erase
-        the i860-generated FB data (i.e., zero maps to black in the
-        pallette).  On the other hand, treating the zero values as
-        transparent doesn't quite look right either.  Could just the
-        i860s each have their own framebuffers?  After
-        all, since each eye of the binocular sees a slightly different
-        picture, the i860's might just maintain their own.  Then maybe
-        the 68k shares with each of the two, since I think it just
-        generates a single picture (not sure about that either).
     ----------------------------------------------
 */
 
-#include <stdio.h>
 #include "driver.h"
+#include "rendlay.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/i860/i860.h"
 #include "video/generic.h"
 #include "video/tlc34076.h"
+#include "video/mc6845.h"
+#include "sound/dac.h"
 
-static UINT16* framebuffer_main;
-static UINT16* framebuffer_secondary;
+
+static UINT16* m68k_framebuffer[2];
+static UINT16* i860_framebuffer[2][2];
+static UINT16* framebuffer_ctrl;
+
 static UINT16* vid_0_shared_RAM;
 static UINT16* vid_1_shared_RAM;
+
+static int crtc_select;
 
 
 static VIDEO_UPDATE( vcombat )
 {
-	int x, y;
-	int count = 0;
-	const rgb_t *pens = tlc34076_get_pens();
+	int y;
+	const rgb_t *const pens = tlc34076_get_pens();
+	const device_config *aux = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "aux");
+
+	UINT16 *m68k_buf = m68k_framebuffer[(*framebuffer_ctrl & 0x20) ? 1 : 0];
+	UINT16 *i860_buf = i860_framebuffer[(screen == aux) ? 1 : 0][0];
 
 	/* TODO: It looks like the leftmost chunk of the ground should really be on the right side? */
 	/*       But the i860 draws the background correctly, so it may be an original game issue. */
 	/*       There's also some garbage in the upper-left corner. Might be related to this 'wraparound'. */
 	/*       Or maybe it's related to the 68k's alpha?  It might come from the 68k side of the house.  */
 
-	/* Main eye */
-	for(y = 0; y < 256; y++)
+	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
-		for(x = 384; x < 640; x++)
+		int x;
+		int src_addr = 256/2 * y;
+		const UINT16 *m68k_src = &m68k_buf[src_addr];
+		const UINT16 *i860_src = &i860_buf[src_addr];
+		UINT32 *dst = BITMAP_ADDR32(bitmap, y, cliprect->min_x);
+
+		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
 		{
-			UINT32 color;
-			if (x % 2) color = (framebuffer_main[count] & 0xff00) >> 8;
-			else	   color =  framebuffer_main[count] & 0x00ff;
+			int i;
+			UINT16 m68k_pix = *m68k_src++;
+			UINT16 i860_pix = *i860_src++;
 
-			/* Vcombat's screen renders 'flopped' - very likely because VR headset displays may reflect off mirrors.
-               Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
-			if(x < video_screen_get_visible_area(screen)->max_x && y < video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
+			/* Draw two pixels */
+			for (i = 0; i < 2; ++i)
+			{
+				/* Vcombat's screen renders 'flopped' - very likely because VR headset displays may reflect off mirrors.
+				Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
 
-			if (x % 2) count++;
-		}
-	}
+				/* Combine the two layers */
+				if ((m68k_pix & 0xff) == 0)
+					*dst++ = pens[i860_pix & 0xff];
+				else
+					*dst++ = pens[m68k_pix & 0xff];
 
-	/* Early out for shadow fighters */
-	if (!framebuffer_secondary)
-		return 0;
-
-	/* Secondary eye */
-	count = 0;
-	for(y = 0; y < 256; y++)
-	{
-		for(x = 0; x < 256; x++)
-		{
-			UINT32 color;
-			if (x % 2) color = (framebuffer_secondary[count] & 0xff00) >> 8;
-			else	   color =  framebuffer_secondary[count] & 0x00ff;
-
-			/* Vcombat's screen renders 'flopped' - very likely because VR headset displays may reflect off mirrors.
-               Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
-			if(x < video_screen_get_visible_area(screen)->max_x && y < video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
-
-			if (x % 2) count++;
+				m68k_pix >>= 8;
+				i860_pix >>= 8;
+			}
 		}
 	}
 
@@ -169,13 +150,27 @@ static VIDEO_UPDATE( vcombat )
 }
 
 
-/* Maybe there's a blend chip between the 68k and the framebuffer? */
 static WRITE16_HANDLER( main_video_write )
 {
-	/* Doesn't seem to make sense for shadow fighters. Maybe some of that factory rework disables this?  */
-	/* Doesn't always seem to work for vcombat either.  More testing needed.  */
-	if (data != 0x00000000) {
-		framebuffer_main[offset] = data;
+	int fb = (*framebuffer_ctrl & 0x20) ? 0 : 1;
+	UINT16 old_data = m68k_framebuffer[fb][offset];
+
+	/* Transparency mode? */
+	if (*framebuffer_ctrl & 0x40)
+	{
+		if (data == 0x0000)
+			return;
+
+		if ((data & 0x00ff) == 0)
+			data = (data & 0xff00) | (old_data & 0x00ff);
+		if ((data & 0xff00) == 0)
+			data = (data & 0x00ff) | (old_data & 0xff00);
+
+		COMBINE_DATA(&m68k_framebuffer[fb][offset]);
+	}
+	else
+	{
+		COMBINE_DATA(&m68k_framebuffer[fb][offset]);
 	}
 }
 
@@ -187,6 +182,11 @@ static READ16_HANDLER( control_1_r )
 static READ16_HANDLER( control_2_r )
 {
 	return (input_port_read(space->machine, "IN1") << 8);
+}
+
+static READ16_HANDLER( control_3_r )
+{
+	return (input_port_read(space->machine, "IN2") << 8);
 }
 
 static void wiggle_i860_common(int n, UINT16 data, const device_config *device)
@@ -245,7 +245,7 @@ static WRITE64_HANDLER( v0_fb_w )
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
        i860 uses a 64-bit data bus.  Adjust accordingly.  */
-	char *p = (char *)framebuffer_main;
+	char *p = (char *)(i860_framebuffer[0][0]);
 	int m = mem_mask;
 	int o = (offset << 2);
 	if (m & 0xff000000) {
@@ -268,7 +268,7 @@ static WRITE64_HANDLER( v1_fb_w )
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
        i860 uses a 64-bit data bus.  Adjust accordingly.  */
-	char *p = (char *)framebuffer_secondary;
+	char *p = (char *)(i860_framebuffer[1][0]);
 	int m = mem_mask;
 	int o = (offset << 2);
 	if (m & 0xff000000) {
@@ -285,11 +285,31 @@ static WRITE64_HANDLER( v1_fb_w )
 	}
 }
 
+static WRITE16_HANDLER( crtc_w )
+{
+	const device_config *crtc = device_list_find_by_tag(space->machine->config->devicelist, MC6845, "crtc");
+
+	if (crtc == NULL)
+		return;
+
+	if (crtc_select == 0)
+		mc6845_address_w(crtc, 0, data >> 8);
+	else
+		mc6845_register_w(crtc, 0, data >> 8);
+
+	crtc_select ^= 1;
+}
+
+static WRITE16_HANDLER( dac_w )
+{
+	INT16 newval = ((INT16)data - 0x6000) << 2;
+	dac_signed_data_16_w(0, newval + 0x8000);
+}
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x2fffff) AM_RAM
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM_WRITE(main_video_write)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(main_video_write)
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&vid_0_shared_RAM) AM_SHARE(2)	/* First i860 shared RAM */
 	AM_RANGE(0x440000, 0x440003) AM_RAM AM_SHARE(6)		/* M0->P0 i860 #1 com 1 */
@@ -304,10 +324,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600001) AM_READ(control_1_r)	/* IN0 port */
 	AM_RANGE(0x600004, 0x600005) AM_RAM AM_SHARE(5)		/* M0<-M1 */
 	AM_RANGE(0x600008, 0x600009) AM_READ(control_2_r)	/* IN1 port */
-	/* AM_RANGE(0x60000c, 0x60000d)                        See notes at top of driver.  */
-	/* AM_RANGE(0x600010, 0x600011)                        See notes at top of driver.  */
-	AM_RANGE(0x700000, 0x7007ff) AM_RAM					/* TODO: Non-volatile RAM */
+	AM_RANGE(0x60001c, 0x60001d) AM_NOP
+
+	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(crtc_w)
+	AM_RANGE(0x600010, 0x600011) AM_RAM AM_BASE(&framebuffer_ctrl)
+	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x701000, 0x701001) AM_READ(main_irqiack_r)
+	AM_RANGE(0x702000, 0x702001) AM_READ(control_3_r)
 	AM_RANGE(0x705000, 0x705001) AM_RAM AM_SHARE(4)		/* M1->M0 */
 
 	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
@@ -342,10 +365,12 @@ ADDRESS_MAP_END
 /* Sound CPU */
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x081000, 0x081fff) AM_RAM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(dac_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(sound_resetmain_r)   /* Ping M0's reset line */
 	AM_RANGE(0x180000, 0x180001) AM_RAM AM_SHARE(4)   /* M1<-M0 */
-	AM_RANGE(0x1C0000, 0x1C0001) AM_RAM AM_SHARE(5)   /* M1->M0 */
+	AM_RANGE(0x1c0000, 0x1c0001) AM_RAM AM_SHARE(5)   /* M1->M0 */
+	AM_RANGE(0x200000, 0x37ffff) AM_ROM AM_REGION("samples", 0)
 ADDRESS_MAP_END
 
 
@@ -356,6 +381,8 @@ static MACHINE_RESET( vcombat )
 
 	i860_set_pin(cputag_get_cpu(machine, "vid_0")->token, DEC_PIN_BUS_HOLD, 1);
 	i860_set_pin(cputag_get_cpu(machine, "vid_1")->token, DEC_PIN_BUS_HOLD, 1);
+
+	crtc_select = 0;
 }
 
 static MACHINE_RESET( shadfgtr )
@@ -364,6 +391,8 @@ static MACHINE_RESET( shadfgtr )
 	tlc34076_reset(6);
 
 	i860_set_pin(cputag_get_cpu(machine, "vid_0")->token, DEC_PIN_BUS_HOLD, 1);
+
+	crtc_select = 0;
 }
 
 
@@ -396,9 +425,17 @@ static DRIVER_INIT( vcombat )
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "vid_0", ADDRESS_SPACE_PROGRAM), vid_0_direct_handler);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "vid_1", ADDRESS_SPACE_PROGRAM), vid_1_direct_handler);
 
-	/* Allocate the two framebuffers */
-	framebuffer_main = auto_malloc(0x10000 * sizeof(UINT16));
-	framebuffer_secondary = auto_malloc(0x10000 * sizeof(UINT16));
+	/* Allocate the 68000 framebuffers */
+	m68k_framebuffer[0] = auto_malloc(0x8000 * sizeof(UINT16));
+	m68k_framebuffer[1] = auto_malloc(0x8000 * sizeof(UINT16));
+
+	/* First i860 */
+	i860_framebuffer[0][0] = auto_malloc(0x8000 * sizeof(UINT16));
+	i860_framebuffer[0][1] = auto_malloc(0x8000 * sizeof(UINT16));
+
+	/* Second i860 */
+	i860_framebuffer[1][0] = auto_malloc(0x8000 * sizeof(UINT16));
+	i860_framebuffer[1][1] = auto_malloc(0x8000 * sizeof(UINT16));
 
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
        I think what is happening here is that M0 snags the first time
@@ -418,9 +455,15 @@ static DRIVER_INIT( vcombat )
 
 static DRIVER_INIT( shadfgtr )
 {
-	/* Allocate just one framebuffer */
-	framebuffer_main = auto_malloc(0x10000 * sizeof(UINT16));
-	framebuffer_secondary = NULL;
+	/* Allocate th 68000 frame buffers */
+	m68k_framebuffer[0] = auto_malloc(0x8000 * sizeof(UINT16));
+	m68k_framebuffer[1] = auto_malloc(0x8000 * sizeof(UINT16));
+
+	/* Only one i860 */
+	i860_framebuffer[0][0] = auto_malloc(0x8000 * sizeof(UINT16));
+	i860_framebuffer[0][1] = auto_malloc(0x8000 * sizeof(UINT16));
+	i860_framebuffer[1][0] = NULL;
+	i860_framebuffer[1][1] = NULL;
 
 	/* The i860 executes out of RAM */
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "vid_0", ADDRESS_SPACE_PROGRAM), vid_0_direct_handler);
@@ -451,15 +494,16 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( shadfgtr )
+	/* Check me */
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY /* ? */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY /* ? */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -470,7 +514,37 @@ static INPUT_PORTS_START( shadfgtr )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	/* Check me */
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 INPUT_PORTS_END
+
+
+static MC6845_ON_HSYNC_CHANGED(sound_update)
+{
+	/* Seems reasonable */
+	cpu_set_input_line(cputag_get_cpu(device->machine, "sound"), M68K_IRQ_1, hsync ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static const mc6845_interface mc6845_intf =
+{
+	"main",		/* screen we are acting on */
+	16,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	NULL,		/* callback for display state changes */
+	sound_update,		/* HSYNC callback */
+	NULL		/* VSYNC callback */
+};
 
 
 static MACHINE_DRIVER_START( vcombat )
@@ -489,7 +563,9 @@ static MACHINE_DRIVER_START( vcombat )
 	/* Sound CPU */
 	MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 15000)	/* Remove this if MC6845 is enabled */
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_RESET(vcombat)
 
 /* Temporary hack for experimenting with timing. */
@@ -498,14 +574,24 @@ static MACHINE_DRIVER_START( vcombat )
 	MDRV_QUANTUM_PERFECT_CPU("main")
 #endif
 
+	/* Disabled for now as it can't handle multiple screens */
+//	MDRV_MC6845_ADD("crtc", MC6845, 6000000 / 16, mc6845_intf)
+	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
+
+	MDRV_SCREEN_ADD("aux", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
 
 	MDRV_VIDEO_UPDATE(vcombat)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 
@@ -522,16 +608,21 @@ static MACHINE_DRIVER_START( shadfgtr )
 	MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_RESET(shadfgtr)
 
+	MDRV_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 4 / 16, mc6845_intf)
+
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)
 
 	MDRV_VIDEO_UPDATE(vcombat)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 
@@ -577,7 +668,7 @@ ROM_START( shadfgtr )
 	ROM_LOAD16_BYTE( "shadfgtr.b42", 0x00000, 0x20000, CRC(f8605dcd) SHA1(1b29f47856ccc757bc96674682ae48f87e6b0e54) )
 	ROM_LOAD16_BYTE( "shadfgtr.b33", 0x00001, 0x20000, CRC(291d59ac) SHA1(cc4904c2ac8ef6a12033c10893246a438ac44014) )
 
-	ROM_REGION( 0x100000, "samples", 0 )
+	ROM_REGION( 0x180000, "samples", 0 )
 	ROM_LOAD16_BYTE( "shadfgtr.b41", 0x00000, 0x80000, CRC(9e4b4df3) SHA1(8101197275e9f728acdeef85737eecbdec132b27) )
 	ROM_LOAD16_BYTE( "shadfgtr.b37", 0x00001, 0x80000, CRC(98446ba2) SHA1(1c8cc0d9c5de54d9e53699a5ab281579d15edc96) )
 
@@ -596,5 +687,5 @@ ROM_START( shadfgtr )
 ROM_END
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      MONITOR COMPANY      FULLNAME           FLAGS */
-GAME( 1993, vcombat,  0,      vcombat,  vcombat,  vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1989, shadfgtr, 0,      shadfgtr, shadfgtr, shadfgtr, ROT0,                "DUTECH Inc.",  "Shadow Fighters", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1993, vcombat,  0,      vcombat,  vcombat,  vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  GAME_NOT_WORKING )
+GAME( 1993, shadfgtr, 0,      shadfgtr, shadfgtr, shadfgtr, ROT0,                "DUTECH Inc.",  "Shadow Fighters", GAME_NOT_WORKING )
