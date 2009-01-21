@@ -139,12 +139,12 @@ static READ8_HANDLER( g_status_r )
 static WRITE8_HANDLER( g_status_w )
 {
 	int bankaddress;
-	UINT8* const ROM = memory_region(space->machine, "game_cpu");
+	UINT8 *rom = memory_region(space->machine, "game_cpu");
 
 	g_status = data;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
-	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &rom[bankaddress]);
 
 	cpu_set_input_line(space->machine->cpu[ESRIPSYS_FRAME_CPU], M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 	cpu_set_input_line(space->machine->cpu[ESRIPSYS_FRAME_CPU], INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
@@ -522,7 +522,7 @@ static WRITE8_HANDLER( s_200e_w )
 
 static WRITE8_HANDLER( s_200f_w )
 {
-	UINT8* const ROM = memory_region(space->machine, "sound_data");
+	UINT8 *rom = memory_region(space->machine, "sound_data");
 	int rombank = data & 0x20 ? 0x2000 : 0;
 
 	/* Bit 6 -> Reset latch U56A */
@@ -537,9 +537,9 @@ static WRITE8_HANDLER( s_200f_w )
 		u56b = 1;
 
 	/* Speech data resides in the upper 8kB of the ROMs */
-	memory_set_bankptr(space->machine, 2, &ROM[0x0000 + rombank]);
-	memory_set_bankptr(space->machine, 3, &ROM[0x4000 + rombank]);
-	memory_set_bankptr(space->machine, 4, &ROM[0x8000 + rombank]);
+	memory_set_bankptr(space->machine, 2, &rom[0x0000 + rombank]);
+	memory_set_bankptr(space->machine, 3, &rom[0x4000 + rombank]);
+	memory_set_bankptr(space->machine, 4, &rom[0x8000 + rombank]);
 
 	s_to_g_latch2 = data;
 }
@@ -672,7 +672,7 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT( esripsys )
 {
-	UINT8* const ROM = memory_region(machine, "sound_data");
+	UINT8 *rom = memory_region(machine, "sound_data");
 
 	fdt_a = auto_malloc(FDT_RAM_SIZE);
 	fdt_b = auto_malloc(FDT_RAM_SIZE);
@@ -680,9 +680,9 @@ static DRIVER_INIT( esripsys )
 
 	ptm6840_config(machine, 0, &ptm_intf);
 
-	memory_set_bankptr(machine, 2, &ROM[0x0000]);
-	memory_set_bankptr(machine, 3, &ROM[0x4000]);
-	memory_set_bankptr(machine, 4, &ROM[0x8000]);
+	memory_set_bankptr(machine, 2, &rom[0x0000]);
+	memory_set_bankptr(machine, 3, &rom[0x4000]);
+	memory_set_bankptr(machine, 4, &rom[0x8000]);
 
 	/* Register stuff for state saving */
 	state_save_register_global_pointer(machine, fdt_a, FDT_RAM_SIZE);

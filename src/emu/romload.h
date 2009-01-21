@@ -234,6 +234,9 @@ struct _rom_entry
 #define ROM_LOAD32_WORD(name,offset,length,hash)	ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(2))
 #define ROM_LOAD32_WORD_SWAP(name,offset,length,hash) ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
 #define ROM_LOAD32_DWORD(name,offset,length,hash)	ROMX_LOAD(name, offset, length, hash, ROM_GROUPDWORD)
+#define ROM_LOAD64_WORD(name,offset,length,hash)	ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6))
+#define ROM_LOAD64_WORD_SWAP(name,offset,length,hash) ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6))
+
 
 /* ----- ROM_RELOAD related macros ----- */
 #define ROM_RELOAD(offset,length)					{ NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS },

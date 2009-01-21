@@ -1014,8 +1014,6 @@ MACHINE_DRIVER_END
 
 /*************************************************************************/
 
-#define ROM_LOAD64_WORD(name,offset,length,hash)      ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6))
-
 ROM_START(gticlub)
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 		ROM_LOAD32_BYTE("688aaa01.21u", 0x000003, 0x80000, CRC(06a56474) SHA1(3a457b885a35e3ee030fd51d847bcf75fce46208))

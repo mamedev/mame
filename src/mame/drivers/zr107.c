@@ -858,8 +858,6 @@ static DRIVER_INIT(jetwave)
 
 /*****************************************************************************/
 
-#define ROM_LOAD64_WORD(name,offset,length,hash)      ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6))
-
 ROM_START(midnrun)
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
 	ROM_LOAD32_BYTE("midnight.20u", 0x000003, 0x80000, CRC(ea70edf2) SHA1(51c882383a150ba118ccd39eb869525fcf5eee3c) )

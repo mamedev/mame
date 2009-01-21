@@ -446,7 +446,6 @@ static INPUT_PORTS_START( rng )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 )
 INPUT_PORTS_END
 
-#define ROM_LOAD64_WORD(name,offset,length,crc)		ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(6))
 
 ROM_START( rungun )
 	/* main program Europe Version AA  1993, 10.8 */

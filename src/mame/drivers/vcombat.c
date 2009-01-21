@@ -626,9 +626,6 @@ static MACHINE_DRIVER_START( shadfgtr )
 MACHINE_DRIVER_END
 
 
-/* Perhaps add this to the core romload.h file?  */
-#define ROM_LOAD64_WORD(name,offset,length,hash) ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6))
-
 ROM_START( vcombat )
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "ep8v2.b49", 0x00000, 0x80000, CRC(98d5a45d) SHA1(099e314f11c93ad6e642ceaa311e2a5b6fd7193c) )
