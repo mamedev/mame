@@ -1646,6 +1646,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/slotcarn.o \
 	$(DRIVERS)/sms.o \
 	$(DRIVERS)/snookr10.o $(VIDEO)/snookr10.o \
+	$(DRIVERS)/sothello.o \
 	$(DRIVERS)/spool99.o \
 	$(DRIVERS)/sprcros2.o $(VIDEO)/sprcros2.o \
 	$(DRIVERS)/ssfindo.o \

@@ -8061,6 +8061,7 @@ Other Sun games
 	DRIVER( dynadice )	/* ? */
 	DRIVER( ssingles )	/* Yachiyo? */
 	DRIVER( tcl )		/* (c) 1995 Uniwang */
+	DRIVER( sothello )	/* (c) 1986 Success / Fujiwara */
 
 	/* Multi Amenity Cassette System */
 	DRIVER( macsbios )

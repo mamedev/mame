@@ -1982,6 +1982,7 @@ src/mame/drivers/snookr10.c svneol=native#text/plain
 src/mame/drivers/snowbros.c svneol=native#text/plain
 src/mame/drivers/solomon.c svneol=native#text/plain
 src/mame/drivers/sonson.c svneol=native#text/plain
+src/mame/drivers/sothello.c svneol=native#text/plain
 src/mame/drivers/spacefb.c svneol=native#text/plain
 src/mame/drivers/spaceg.c svneol=native#text/plain
 src/mame/drivers/spbactn.c svneol=native#text/plain

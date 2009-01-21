@@ -111,6 +111,7 @@ enum
 	XTAL_20_079MHz		= 20790000,		/* Blockade-hardware Gremlin games */
 	XTAL_21MHz  		= 21000000,		/* Lock-On pixel clock */
 	XTAL_21_3MHz  		= 21300000,
+	XTAL_21_477MHz 		= 21477000,		/* Super Othello */
 	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling, some Data East 90's games */
 	XTAL_22MHz   		= 22000000,
 	XTAL_22_1184MHz		= 22118400,
