@@ -46,14 +46,14 @@ In test mode (c) is 2000
 const UINT8 cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,xxxx,0x61,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
 //  pppp                     ????
-	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,xxxx,xxxx,0x3a,xxxx,xxxx,0x1f, /* 10 */
-//                                           pppp                pppp           ????
+	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,xxxx,0x3a,xxxx,xxxx,0x1f, /* 10 */
+//                                           pppp     ????       pppp           ????
 	xxxx,0x8e,xxxx,0x0f,xxxx,0x49,0xbc,xxxx, xxxx,xxxx,xxxx,0x75,xxxx,xxxx,xxxx,xxxx, /* 20 */
 //       !!!!      ????      ???? ????                      pppp
 	0x9d,xxxx,xxxx,xxxx,xxxx,xxxx,0xbe,xxxx, xxxx,xxxx,0x74,xxxx,xxxx,0xa6,0xbf,xxxx, /* 30 */
 //  ????                          pppp                 ????           ???? ????
-	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
-//       !!!!                gggg
+	xxxx,0xea,xxxx,xxxx,xxxx,0xb0,xxxx,xxxx, xxxx,0xa2,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 40 */
+//       !!!!                gggg                 ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,0x42,xxxx, xxxx,xxxx,xxxx,xxxx,0xeb,xxxx,xxxx,xxxx, /* 50 */
 //                                ????                           ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,0xa5,xxxx,xxxx,xxxx,xxxx,0xba,xxxx, /* 60 */
