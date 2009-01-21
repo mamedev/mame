@@ -151,6 +151,8 @@ Video board has additional chips:
 #include "machine/68681.h"
 
 static UINT8 register_active;
+static UINT8 mux_data;
+
 static struct
 {
 	const device_config *duart68681;
@@ -193,6 +195,7 @@ static MACHINE_START( skattv )
 static MACHINE_RESET( skattv )
 {
 	skattv_devices.duart68681 = device_list_find_by_tag( machine->config->devicelist, DUART68681, "duart68681" );
+	mux_data = 0;
 }
 
 static const duart68681_config skattv_duart68681_config =
@@ -320,32 +323,34 @@ if (!input_code_pressed(KEYCODE_O))
 
 static READ16_HANDLER(test_r)
 {
-	static int counter = 0;
 	int value = 0xffff;
 
-	if (counter==0x0) if (input_code_pressed(KEYCODE_1)) value = 0x0004 ^ 0xffff;
-	if (counter==0x1) if (input_code_pressed(KEYCODE_2)) value = 0x0004 ^ 0xffff;
-	if (counter==0x2) if (input_code_pressed(KEYCODE_3)) value = 0x0004 ^ 0xffff;
-	if (counter==0x3) if (input_code_pressed(KEYCODE_4)) value = 0x0004 ^ 0xffff;
-	if (counter==0x4) if (input_code_pressed(KEYCODE_5)) value = 0x0004 ^ 0xffff;
-	if (counter==0x5) if (input_code_pressed(KEYCODE_6)) value = 0x0004 ^ 0xffff;
-	if (counter==0x6) if (input_code_pressed(KEYCODE_7)) value = 0x0004 ^ 0xffff;
-	if (counter==0x7) if (input_code_pressed(KEYCODE_8)) value = 0x0004 ^ 0xffff;
-	if (counter==0x8) if (input_code_pressed(KEYCODE_Q)) value = 0x0004 ^ 0xffff;
-	if (counter==0x9) if (input_code_pressed(KEYCODE_W)) value = 0x0004 ^ 0xffff;
-	if (counter==0xa) if (input_code_pressed(KEYCODE_E)) value = 0x0004 ^ 0xffff;
-	if (counter==0xb) if (input_code_pressed(KEYCODE_R)) value = 0x0004 ^ 0xffff;
-	if (counter==0xc) if (input_code_pressed(KEYCODE_T)) value = 0x0004 ^ 0xffff;
-	if (counter==0xd) if (input_code_pressed(KEYCODE_Y)) value = 0x0004 ^ 0xffff;
-	if (counter==0xe) if (input_code_pressed(KEYCODE_U)) value = 0x0004 ^ 0xffff;
-	if (counter==0xf) if (input_code_pressed(KEYCODE_I)) value = 0x0004 ^ 0xffff;
-
-	counter += 1;
-	if (counter == 16) counter = 0;
+	switch(mux_data)
+	{
+		case 0x00: value = input_port_read(space->machine, "x0"); break;
+		case 0x01: value = input_port_read(space->machine, "x1"); break;
+		case 0x02: value = input_port_read(space->machine, "x2"); break;
+		case 0x03: value = input_port_read(space->machine, "1P_UP"); break;
+		case 0x04: value = input_port_read(space->machine, "1P_B1"); break;
+		case 0x05: value = input_port_read(space->machine, "x5"); break;
+		case 0x06: value = input_port_read(space->machine, "1P_RIGHT"); break;
+		case 0x07: value = input_port_read(space->machine, "1P_DOWN"); break;
+		case 0x08: value = input_port_read(space->machine, "1P_LEFT"); break;
+		case 0x09: value = input_port_read(space->machine, "x9"); break;
+		case 0x0a: value = input_port_read(space->machine, "x10"); break;
+		case 0x0b: value = input_port_read(space->machine, "x11"); break;
+		case 0x0c: value = input_port_read(space->machine, "x12"); break;
+		case 0x0d: value = input_port_read(space->machine, "x13"); break;
+		case 0x0e: value = input_port_read(space->machine, "x14"); break;
+		case 0x0f: value = input_port_read(space->machine, "x15"); break;
+	}
+	mux_data++;
+	mux_data&=0xf;
 
 	return value;
 }
 
+/*???*/
 static WRITE16_HANDLER(wh2_w)
 {
 	register_active = data;
@@ -358,9 +363,9 @@ static READ16_HANDLER(t2_r)
  vblank ^=0x40;
  hblank ^=0x20;
 
-// return mame_rand(space->machine) & 0x00f0;
+return mame_rand(space->machine) & 0x00f0;
 
- popmessage("%08x",cpu_get_pc(space->cpu));
+// popmessage("%08x",cpu_get_pc(space->cpu));
 // return 0x0000;
  return 0xff9f | vblank | hblank;
 }
@@ -396,6 +401,19 @@ static ADDRESS_MAP_START( backgamn_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800084, 0xffbfff) AM_RAM // used?
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	//400000-40001f?
+	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
+	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+//	AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
+	AM_RANGE(0x800140, 0x800141) AM_READWRITE(t2_r,ay8910_control_port_0_lsb_w) //18b too
+	AM_RANGE(0x800142, 0x800143) AM_READWRITE(ay8910_read_port_0_lsb_r,ay8910_write_port_0_lsb_w) //18b too
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+
 static INPUT_PORTS_START( adp )
 
 INPUT_PORTS_END
@@ -412,6 +430,79 @@ static INPUT_PORTS_START( skattv )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+
+	PORT_START("x0") //vblank status?
+	PORT_DIPNAME( 0x0004,0x0004, "SW0" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+
+	PORT_START("x1")
+	PORT_DIPNAME( 0x0004,0x0004, "SW1" ) //another up button
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+
+	PORT_START("x2")
+	PORT_DIPNAME( 0x0004,0x0004, "SW2" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("1P_UP")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("1P_B1")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("x5")
+	PORT_DIPNAME( 0x0004,0x0004, "SW5" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("1P_RIGHT")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("1P_DOWN")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW, IPT_UNUSED  )
+	PORT_START("1P_LEFT")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("x9")
+	PORT_DIPNAME( 0x0004,0x0004, "SW9" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("x10") //button 2
+	PORT_DIPNAME( 0x0004,0x0004, "SW10" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("x11")
+	PORT_DIPNAME( 0x0004,0x0004, "SW11" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("x12") //button 3
+	PORT_DIPNAME( 0x0004,0x0004, "SW12" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("x13")
+	PORT_DIPNAME( 0x0004,0x0004, "SW13" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("x14") //button 4
+	PORT_DIPNAME( 0x0004,0x0004, "SW14" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
+	PORT_START("x15")
+	PORT_DIPNAME( 0x0004,0x0004, "SW15" )
+	PORT_DIPSETTING(     0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(     0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xfffb, IP_ACTIVE_LOW,  IPT_UNUSED  )
 INPUT_PORTS_END
 
 /*
@@ -499,6 +590,12 @@ static MACHINE_DRIVER_START( backgamn )
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( funland )
+	MDRV_IMPORT_FROM( skattv )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(funland_mem, 0)
+MACHINE_DRIVER_END
+
 ROM_START( quickjac )
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "quick_jack_index_a.1.u2.bin", 0x00000, 0x10000, CRC(c2fba6fe) SHA1(f79e5913f9ded1e370cc54dd55860263b9c51d61) )
@@ -569,4 +666,5 @@ GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP", "Quick 
 GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
 GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,        0, skattv,      skattv,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
-GAME( 1999, funlddlx,        0, skattv,      skattv,    0, ROT0,  "Stella", "Funny Land de Luxe", GAME_NOT_WORKING )
+GAME( 1999, funlddlx,        0, funland,     skattv,    0, ROT0,  "Stella", "Funny Land de Luxe", GAME_NOT_WORKING )
+
