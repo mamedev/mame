@@ -17,12 +17,6 @@
         * Hold '*' during the game to access the operator menu.
 
     To do:
-        * TMS5220 speech. The game is sending speech play commands to
-        the sound CPU but any speech code greater than 2 is ignored (see $EC26).
-        I think most of the speech data is stored in the upper half of the
-        banked sound data ROMs but I don't know how or when the ROM
-        bank is switched :/
-
         * Confirm that occasional line drop outs do occur on real hardware.
         14 sprites seems to be the maximum number that the RIP CPU can safely
         process per line.
@@ -528,6 +522,9 @@ static WRITE8_HANDLER( s_200e_w )
 
 static WRITE8_HANDLER( s_200f_w )
 {
+	UINT8* const ROM = memory_region(space->machine, "sound_data");
+	int rombank = data & 0x20 ? 0x2000 : 0;
+
 	/* Bit 6 -> Reset latch U56A */
 	/* Bit 7 -> Clock latch U56B */
 	if (s_to_g_latch2 & 0x40)
@@ -538,6 +535,11 @@ static WRITE8_HANDLER( s_200f_w )
 
 	if (!(s_to_g_latch2 & 0x80) && (data & 0x80))
 		u56b = 1;
+
+	/* Speech data resides in the upper 8kB of the ROMs */
+	memory_set_bankptr(space->machine, 2, &ROM[0x0000 + rombank]);
+	memory_set_bankptr(space->machine, 3, &ROM[0x4000 + rombank]);
+	memory_set_bankptr(space->machine, 4, &ROM[0x8000 + rombank]);
 
 	s_to_g_latch2 = data;
 }
@@ -554,7 +556,7 @@ static READ8_HANDLER( tms5220_r )
 		/* TMS5220 core returns status bits in D7-D6 */
 		UINT8 status = tms5220_status_r(space, 0);
 
-		status = (status & 0x80 >> 5) | (status & 0x40 >> 5) | (status & 0x20 >> 5);
+		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
 		return (!tms5220_ready_r() << 7) | (!tms5220_int_r() << 6) | status;
 	}
 
@@ -566,16 +568,15 @@ static WRITE8_HANDLER( tms5220_w )
 {
 	if (offset == 0)
 	{
-		if (tms5220_ready_r())
-			tms5220_status_r(space, 0);
-
 		tms_data = data;
+		tms5220_data_w(0, 0, tms_data);
 	}
+#if 0
 	if (offset == 1)
 	{
-		if (tms5220_ready_r())
-			tms5220_data_w(0, 0, tms_data);
+		tms5220_data_w(0, 0, tms_data);
 	}
+#endif
 }
 
 /* Not used in later revisions */
@@ -760,11 +761,11 @@ static MACHINE_DRIVER_START( esripsys )
 	/* Sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("tms5220nl", TMS5220, 640000)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MDRV_SOUND_ADD("tms5220nl", TMS5220, 640000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 
@@ -1013,5 +1014,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, turbosub, 0,        esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1985, turbosba, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1985, turbosub, 0,        esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", GAME_SUPPORTS_SAVE )
+GAME( 1985, turbosba, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", GAME_SUPPORTS_SAVE )
