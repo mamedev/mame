@@ -250,7 +250,7 @@ static VIDEO_UPDATE(adp)
 	int x,y,b;
 
 	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
-
+/*
 	if (input_code_pressed(KEYCODE_M)) b = 0;
 	if (input_code_pressed(KEYCODE_Q)) b += 0x060 * 280 * 1;
 	if (input_code_pressed(KEYCODE_W)) b += 0x060 * 280 * 2;
@@ -274,7 +274,7 @@ static VIDEO_UPDATE(adp)
 	if (input_code_pressed(KEYCODE_V)) b += 0x060 * 280 * 20;
 	if (input_code_pressed(KEYCODE_B)) b += 0x060 * 280 * 21;
 	if (input_code_pressed(KEYCODE_N)) b += 0x060 * 280 * 22;
-
+*/
 	for (y = 0;y < 280;y++)
 	{
 		for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 4 ; x += 4)
@@ -320,123 +320,31 @@ if (!input_code_pressed(KEYCODE_O))
 
 static READ16_HANDLER(test_r)
 {
-// printf("ra=%04x ",register_active);
-if (register_active == 0x0000) {
-	if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_A)) return 0x0100 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_S)) return 0x0200 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_D)) return 0x0400 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_F)) return 0x0800 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_G)) return 0x1000 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_H)) return 0x2000 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_J)) return 0x4000 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_K)) return 0x8000 ^ 0xffff;
-return 0x4;
+	static int counter = 0;
+	int value = 0xffff;
+
+	if (counter==0x0) if (input_code_pressed(KEYCODE_1)) value = 0x0004 ^ 0xffff;
+	if (counter==0x1) if (input_code_pressed(KEYCODE_2)) value = 0x0004 ^ 0xffff;
+	if (counter==0x2) if (input_code_pressed(KEYCODE_3)) value = 0x0004 ^ 0xffff;
+	if (counter==0x3) if (input_code_pressed(KEYCODE_4)) value = 0x0004 ^ 0xffff;
+	if (counter==0x4) if (input_code_pressed(KEYCODE_5)) value = 0x0004 ^ 0xffff;
+	if (counter==0x5) if (input_code_pressed(KEYCODE_6)) value = 0x0004 ^ 0xffff;
+	if (counter==0x6) if (input_code_pressed(KEYCODE_7)) value = 0x0004 ^ 0xffff;
+	if (counter==0x7) if (input_code_pressed(KEYCODE_8)) value = 0x0004 ^ 0xffff;
+	if (counter==0x8) if (input_code_pressed(KEYCODE_Q)) value = 0x0004 ^ 0xffff;
+	if (counter==0x9) if (input_code_pressed(KEYCODE_W)) value = 0x0004 ^ 0xffff;
+	if (counter==0xa) if (input_code_pressed(KEYCODE_E)) value = 0x0004 ^ 0xffff;
+	if (counter==0xb) if (input_code_pressed(KEYCODE_R)) value = 0x0004 ^ 0xffff;
+	if (counter==0xc) if (input_code_pressed(KEYCODE_T)) value = 0x0004 ^ 0xffff;
+	if (counter==0xd) if (input_code_pressed(KEYCODE_Y)) value = 0x0004 ^ 0xffff;
+	if (counter==0xe) if (input_code_pressed(KEYCODE_U)) value = 0x0004 ^ 0xffff;
+	if (counter==0xf) if (input_code_pressed(KEYCODE_I)) value = 0x0004 ^ 0xffff;
+
+	counter += 1;
+	if (counter == 16) counter = 0;
+
+	return value;
 }
-	if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
-
-	return 0x0004 ^ 0xffff; // 0x0004
-
-	// FIXME: this code is never executed
-	switch (mame_rand(space->machine) & 3)
-	{
-		case 0:
-			return 0;
-		case 1:
-			return 0xffff;
-		default:
-			return mame_rand(space->machine) & 0xffff;
-	}
-}
-
-/*
-static READ16_HANDLER(test1_r)
-{
-    if (input_code_pressed(KEYCODE_Q)) return 0x0001;
-    if (input_code_pressed(KEYCODE_W)) return 0x0002;
-    if (input_code_pressed(KEYCODE_E)) return 0x0004;
-    if (input_code_pressed(KEYCODE_R)) return 0x0008;
-    if (input_code_pressed(KEYCODE_T)) return 0x0010;
-    if (input_code_pressed(KEYCODE_Y)) return 0x0020;
-    if (input_code_pressed(KEYCODE_U)) return 0x0040;
-    if (input_code_pressed(KEYCODE_I)) return 0x0080;
-    if (input_code_pressed(KEYCODE_A)) return 0x0100;
-    if (input_code_pressed(KEYCODE_S)) return 0x0200;
-    if (input_code_pressed(KEYCODE_D)) return 0x0400;
-    if (input_code_pressed(KEYCODE_F)) return 0x0800;
-    if (input_code_pressed(KEYCODE_G)) return 0x1000;
-    if (input_code_pressed(KEYCODE_H)) return 0x2000;
-    if (input_code_pressed(KEYCODE_J)) return 0x4000;
-    if (input_code_pressed(KEYCODE_K)) return 0x8000;
-
-    switch (mame_rand(space->machine) & 3)
-    {
-        case 0:
-            return 0;
-        case 1:
-            return 0xffff;
-        default:
-            return mame_rand(space->machine) % 0xffff;
-    }
-}
-*/
-/*
-static READ16_HANDLER(rh1_r)
-{
-// printf("ra=%04x ",register_active);
-
-    if ((register_active == 0x0e) || (register_active == 0x0e) || (register_active == 0x0e))
-        {
-    if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_A)) return 0x0100 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_S)) return 0x0200 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_D)) return 0x0400 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_F)) return 0x0800 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_G)) return 0x1000 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_H)) return 0x2000 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_J)) return 0x4000 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_K)) return 0x8000 ^ 0xffff;
-
-        }
-
-    switch (mame_rand(space->machine) & 3)
-    {
-        case 0:
-            return 0;
-        case 1:
-            return 0xffff;
-        default:
-            return mame_rand(space->machine) % 0xffff;
-    }
-}
-*/
-/*
-static WRITE16_HANDLER(wh1_w)
-{
-    // register_active = data;
-}
-*/
 
 static WRITE16_HANDLER(wh2_w)
 {
@@ -450,22 +358,6 @@ static READ16_HANDLER(t2_r)
  vblank ^=0x40;
  hblank ^=0x20;
 
-    if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_A)) return 0x0100 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_S)) return 0x0200 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_D)) return 0x0400 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_F)) return 0x0800 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_G)) return 0x1000 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_H)) return 0x2000 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_J)) return 0x4000 ^ 0xffff;
-    if (input_code_pressed(KEYCODE_K)) return 0x8000 ^ 0xffff;
 // return mame_rand(space->machine) & 0x00f0;
 
  popmessage("%08x",cpu_get_pc(space->cpu));
@@ -516,7 +408,7 @@ static INPUT_PORTS_START( skattv )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BILL1    )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
