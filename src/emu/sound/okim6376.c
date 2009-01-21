@@ -54,10 +54,10 @@ static int diff_lookup[49*16];
    attenuation to apply to the sound signal. */
 static int volume_table[4] =
 {
-	0x10,	//   0 dB
-	0x08,	//  -6.0 dB
-	0x04,	// -12.0 dB
-	0x02,	// -24.0 dB
+	0x20,	//   0 dB
+	0x10,	//  -6.0 dB
+	0x08,	// -12.0 dB
+	0x04,	// -24.0 dB
 };
 
 /* tables computed? */
@@ -136,10 +136,10 @@ static INT16 clock_adpcm(struct ADPCMVoice *voice, UINT8 nibble)
 	voice->signal += diff_lookup[voice->step * 16 + (nibble & 15)];
 
 	/* clamp to the maximum 12bit */
-	if (voice->signal > 4095)
-		voice->signal = 4095;
-	else if (voice->signal < -4096)
-		voice->signal = -4096;
+	if (voice->signal > 2047)
+		voice->signal = 2047;
+	else if (voice->signal < -2048)
+		voice->signal = -2048;
 
 	/* adjust the step size and clamp */
 	voice->step += index_shift[nibble & 7];
