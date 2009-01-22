@@ -1077,6 +1077,8 @@ static EXPRERR infix_to_postfix(parsed_expression *expr)
 	int tokindex = 0;
 	EXPRERR exprerr;
 
+	memset(&dummy, 0, sizeof(dummy));
+
 	/* start with an empty stack */
 	init_token_stack(expr);
 
@@ -1198,6 +1200,8 @@ static EXPRERR execute_function(parsed_expression *expr, parse_token *token)
 	int paramcount = 0;
 	parse_token t1;
 	EXPRERR exprerr;
+
+	memset(&t1, 0, sizeof(t1));
 
 	/* pop off all pushed parameters */
 	while (paramcount < MAX_FUNCTION_PARAMS)
