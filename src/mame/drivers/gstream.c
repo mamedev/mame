@@ -516,7 +516,7 @@ static READ32_HANDLER( gstream_speedup_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0001592)
 	{
-		cpu_spinuntil_int(space->cpu);
+		cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return gstream_workram[0xd1ee0/4];
