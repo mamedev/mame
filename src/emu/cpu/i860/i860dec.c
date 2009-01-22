@@ -42,12 +42,7 @@
 #include <math.h>
 
 
-#ifdef LSB_FIRST
 #undef HOST_MSB
-#else
-#define HOST_MSB
-#endif
-
 
 #undef  TRACE_RDWR_MEM
 #undef  TRACE_ADDR_TRANSLATION
