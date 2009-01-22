@@ -322,8 +322,6 @@ static SND_START( saa1099 )
 
 	/* for each chip allocate one stream */
 	saa->stream = stream_create(device, 0, 2, saa->sample_rate, saa, saa1099_update);
-
-	return DEVICE_START_OK;
 }
 
 static void saa1099_control_port_w( int chip, int reg, int data )

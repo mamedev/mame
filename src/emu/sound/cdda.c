@@ -63,8 +63,6 @@ static SND_START( cdda )
 	state_save_register_device_item_pointer( device, 0, info->audio_cache, CD_MAX_SECTOR_DATA * MAX_SECTORS );
 	state_save_register_device_item( device, 0, info->audio_samples );
 	state_save_register_device_item( device, 0, info->audio_bptr );
-
-	return DEVICE_START_OK;
 }
 
 

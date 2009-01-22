@@ -124,8 +124,6 @@ static SND_START( snkwave )
 	state_save_register_device_item(device, 0, chip->counter);
 	state_save_register_device_item(device, 0, chip->waveform_position);
 	state_save_register_device_item_pointer(device, 0, chip->waveform, WAVEFORM_LENGTH);
-
-	return DEVICE_START_OK;
 }
 
 

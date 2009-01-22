@@ -560,8 +560,6 @@ static SND_START( samples )
 	/* initialize any custom handlers */
 	if (intf->start)
 		(*intf->start)(device);
-
-	return DEVICE_START_OK;
 }
 
 

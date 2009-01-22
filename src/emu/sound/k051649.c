@@ -139,8 +139,6 @@ static SND_START( k051649 )
 
 	/* build the mixer table */
 	make_mixer_table(info, 5);
-
-	return DEVICE_START_OK;
 }
 
 static SND_RESET( k051649 )

@@ -84,8 +84,6 @@ static SND_START( tms3615 )
 	tms->channel = stream_create(device, 0, 2, clock/8, tms, tms3615_sound_update);
 	tms->samplerate = clock/8;
 	tms->basefreq = clock;
-
-    return DEVICE_START_OK;
 }
 
 /**************************************************************************

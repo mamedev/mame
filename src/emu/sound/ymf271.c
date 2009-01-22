@@ -1767,8 +1767,6 @@ static SND_START( ymf271 )
 		double db = 0.75 * (double)i;
 		total_level[i] = (int)(65536.0 / pow(10.0, db / 20.0));
 	}
-
-	return DEVICE_START_OK;
 }
 
 READ8_HANDLER( ymf271_0_r )

@@ -28,8 +28,6 @@ static SND_START( filter_volume )
 
 	info->gain = 0x100;
 	info->stream = stream_create(device, 1, 1, device->machine->sample_rate, info, filter_volume_update);
-
-	return DEVICE_START_OK;
 }
 
 

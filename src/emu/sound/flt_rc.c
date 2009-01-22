@@ -91,8 +91,6 @@ static SND_START( filter_rc )
 		set_RC_info(info, conf->type, conf->R1, conf->R2, conf->R3, conf->C);
 	else
 		set_RC_info(info, FLT_RC_LOWPASS, 1, 1, 1, 0);
-
-	return DEVICE_START_OK;
 }
 
 

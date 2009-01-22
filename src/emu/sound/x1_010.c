@@ -211,8 +211,6 @@ static SND_START( x1_010 )
 
 	/* get stream channels */
 	info->stream = stream_create(device,0,2,info->rate,info,seta_update);
-
-	return DEVICE_START_OK;
 }
 
 

@@ -311,9 +311,6 @@ static SND_START( okim6376 )
 	}
 
 	okim6376_state_save_register(info, device);
-
-	/* success */
-	return DEVICE_START_OK;
 }
 
 

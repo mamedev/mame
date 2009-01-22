@@ -543,8 +543,6 @@ static DEVICE_START( cpu )
 
 	/* register some internal states as well */
 	register_save_states(device);
-
-	return DEVICE_START_OK;
 }
 
 

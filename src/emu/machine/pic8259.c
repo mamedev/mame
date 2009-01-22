@@ -397,8 +397,6 @@ static DEVICE_START( pic8259 ) {
 	pic8259->intf = device->static_config;
 
 	pic8259->timer = timer_alloc( device->machine, pic8259_timerproc, (void *)device );
-
-	return DEVICE_START_OK;
 }
 
 

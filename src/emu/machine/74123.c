@@ -208,8 +208,6 @@ static DEVICE_START( ttl74123 )
 	state_save_register_device_item(device, 0, chip->a);
 	state_save_register_device_item(device, 0, chip->b);
 	state_save_register_device_item(device, 0, chip->clear);
-
-	return DEVICE_START_OK;
 }
 
 

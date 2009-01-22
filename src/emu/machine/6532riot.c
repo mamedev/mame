@@ -462,8 +462,6 @@ static DEVICE_START( riot6532 )
 
 	state_save_register_device_item(device, 0, riot->timershift);
 	state_save_register_device_item(device, 0, riot->timerstate);
-
-	return DEVICE_START_OK;
 }
 
 

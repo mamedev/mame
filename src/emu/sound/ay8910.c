@@ -823,7 +823,6 @@ static SND_START( ay8910 )
 	};
 	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
 	ay8910_start_ym(device->token, SOUND_AY8910, device, clock, intf);
-	return DEVICE_START_OK;
 }
 
 static SND_START( ym2149 )
@@ -836,7 +835,6 @@ static SND_START( ym2149 )
 	};
 	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
 	ay8910_start_ym(device->token, SOUND_YM2149, device, clock, intf);
-	return DEVICE_START_OK;
 }
 
 static SND_STOP( ay8910 )

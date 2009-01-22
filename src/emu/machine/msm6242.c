@@ -153,8 +153,6 @@ static DEVICE_START( msm6242 )
 	msm6242->reg[1] = 0;
 	msm6242->reg[2] = 0;
 	memset(&msm6242->hold_time, 0, sizeof(mame_system_time));
-
-	return DEVICE_START_OK;
 }
 
 

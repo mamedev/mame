@@ -196,7 +196,6 @@ static DEVICE_START( cia )
 	state_save_register_device_item(device, 0, cia->cnt);
 	state_save_register_device_item(device, 0, cia->shift);
 	state_save_register_device_item(device, 0, cia->serial);
-	return DEVICE_START_OK;
 }
 
 

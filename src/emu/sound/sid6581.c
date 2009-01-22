@@ -43,7 +43,6 @@ static device_start_err sid_start(const device_config *device, int clock, SIDTYP
 
 	sid6581_init(sid);
 	sidInitWaveformTables(sidtype);
-	return DEVICE_START_OK;
 }
 
 

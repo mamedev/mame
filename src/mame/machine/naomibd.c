@@ -538,8 +538,6 @@ static DEVICE_START( naomibd )
 
 	/* register for save states */
 	init_save_state(device);
-
-	return DEVICE_START_OK;
 }
 
 

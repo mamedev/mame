@@ -106,8 +106,6 @@ static SND_START( namco_63701x )
 	chip->rom = device->region;
 
 	chip->stream = stream_create(device, 0, 2, clock/1000, chip, namco_63701x_update);
-
-	return DEVICE_START_OK;
 }
 
 

@@ -1752,8 +1752,6 @@ static DEVICE_START( ide_controller )
 
 	state_save_register_device_item(device, 0, ide->master_password_enable);
 	state_save_register_device_item(device, 0, ide->user_password_enable);
-
-	return DEVICE_START_OK;
 }
 
 

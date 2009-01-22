@@ -21,8 +21,6 @@ static SND_START( custom )
 		info->token = (*info->intf->start)(device, clock, device->static_config);
 		assert_always(info->token != NULL, "Error starting custom sound");
 	}
-
-	return DEVICE_START_OK;
 }
 
 

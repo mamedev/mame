@@ -154,8 +154,6 @@ static DEVICE_START( pia )
 	state_save_register_device_item(device, 0, p->in_cb1_pushed);
 	state_save_register_device_item(device, 0, p->in_cb2_pushed);
 	state_save_register_device_item(device, 0, p->out_cb2_needs_pulled);
-
-	return DEVICE_START_OK;
 }
 
 

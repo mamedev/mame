@@ -343,8 +343,6 @@ static SND_START( rf5c400 )
 	struct rf5c400_info *info = device->token;
 
 	rf5c400_init_chip(device, info, clock);
-
-	return DEVICE_START_OK;
 }
 
 /*****************************************************************************/

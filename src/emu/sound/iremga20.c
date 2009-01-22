@@ -257,8 +257,6 @@ static SND_START( iremga20 )
 		state_save_register_device_item(device, i, chip->channel[i].effect);
 		state_save_register_device_item(device, i, chip->channel[i].play);
 	}
-
-	return DEVICE_START_OK;
 }
 
 

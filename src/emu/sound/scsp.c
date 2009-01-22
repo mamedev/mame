@@ -1238,8 +1238,6 @@ static SND_START( scsp )
 
 		SCSP->stream = stream_create(device, 0, 2, 44100, SCSP, SCSP_Update);
 	}
-
-	return DEVICE_START_OK;
 }
 
 

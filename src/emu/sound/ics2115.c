@@ -463,8 +463,6 @@ static SND_START( ics2115 )
 			v = v-33;
 		chip->ulaw[i] = v;
 	}
-
-	return DEVICE_START_OK;
 }
 
 READ8_HANDLER( ics2115_r )

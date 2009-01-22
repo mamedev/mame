@@ -143,7 +143,6 @@ static SND_START( bsmt2000 )
 
 	/* reset the chip -- this also configures the default mode */
 	bsmt2000_reset(chip);
-	return DEVICE_START_OK;
 }
 
 

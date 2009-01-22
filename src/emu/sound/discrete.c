@@ -315,7 +315,6 @@ static SND_START( discrete )
 	setup_disc_logs(info);
 
 	discrete_current_context = NULL;
-	return DEVICE_START_OK;
 }
 
 

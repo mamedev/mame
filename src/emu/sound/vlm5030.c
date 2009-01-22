@@ -686,8 +686,6 @@ static SND_START( vlm5030 )
 	state_save_register_device_item_array(device,0,chip->target_k);
 	state_save_register_device_item_array(device,0,chip->x);
 	state_save_register_postload(device->machine, vlm5030_restore_state, chip);
-
-	return DEVICE_START_OK;
 }
 
 

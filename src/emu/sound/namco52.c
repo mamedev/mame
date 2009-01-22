@@ -164,8 +164,6 @@ static SND_START( namco_52xx )
 	state_save_register_device_item(device, 0, chip->n52_end);
 	state_save_register_device_item(device, 0, chip->n52_length);
 	state_save_register_device_item(device, 0, chip->n52_pos);
-
-	return DEVICE_START_OK;
 }
 
 

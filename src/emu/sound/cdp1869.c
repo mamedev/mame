@@ -120,8 +120,6 @@ static SND_START( cdp1869 )
 	info->toneamp = 0;
 	info->wnfreq = 0;
 	info->wnamp = 0;
-
-	return DEVICE_START_OK;
 }
 
 void cdp1869_set_toneamp(int which, int value)

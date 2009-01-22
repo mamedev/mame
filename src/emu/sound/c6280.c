@@ -317,8 +317,6 @@ static SND_START( c6280 )
 
     /* Create stereo stream */
     info->stream = stream_create(device, 0, 2, rate, info, c6280_update);
-
-    return DEVICE_START_OK;
 }
 
 READ8_HANDLER( c6280_r ) { return h6280io_get_buffer((device_config*)space->cpu); }

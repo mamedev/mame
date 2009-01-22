@@ -103,8 +103,6 @@ static DEVICE_START(x2212)
 	state_save_register_device_item_pointer( device, 0, c->e2prom, SIZE_DATA );
 	state_save_register_device_item( device, 0, c->store );
 	state_save_register_device_item( device, 0, c->array_recall );
-
-	return DEVICE_START_OK;
 }
 
 /*-------------------------------------------------

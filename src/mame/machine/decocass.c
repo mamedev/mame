@@ -2128,7 +2128,7 @@ static DEVICE_START( decocass_tape )
 	/* fetch the data pointer */
 	tape->timer = timer_alloc(device->machine, tape_clock_callback, (void *)device);
 	if (device->region == NULL)
-		return DEVICE_START_OK;
+		return;
 
 	/* scan for the first non-empty block in the image */
 	for (offs = device->regionbytes - 1; offs >= 0; offs--)
@@ -2161,8 +2161,6 @@ static DEVICE_START( decocass_tape )
 	state_save_register_device_item(device, 0, tape->speed);
 	state_save_register_device_item(device, 0, tape->bitnum);
 	state_save_register_device_item(device, 0, tape->clockpos);
-
-	return DEVICE_START_OK;
 }
 
 

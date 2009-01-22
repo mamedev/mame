@@ -819,7 +819,7 @@ static STREAM_UPDATE( es5506_update )
 
 ***********************************************************************************************/
 
-static device_start_err es5506_start_common(const device_config *device, int clock, const void *config, sound_type sndtype)
+static void es5506_start_common(const device_config *device, int clock, const void *config, sound_type sndtype)
 {
 	const es5506_interface *intf = config;
 	struct ES5506Chip *chip = device->token;
@@ -864,13 +864,12 @@ static device_start_err es5506_start_common(const device_config *device, int clo
 	chip->scratch = auto_malloc(sizeof(chip->scratch[0]) * 2 * MAX_SAMPLE_CHUNK);
 
 	/* success */
-	return DEVICE_START_OK;
 }
 
 
 static SND_START( es5506 )
 {
-	return es5506_start_common(device, clock, device->static_config, SOUND_ES5506);
+	es5506_start_common(device, clock, device->static_config, SOUND_ES5506);
 }
 
 
@@ -1507,7 +1506,7 @@ static SND_START( es5505 )
 	es5506intf.irq_callback = intf->irq_callback;
 	es5506intf.read_port = intf->read_port;
 
-	return es5506_start_common(device, clock, &es5506intf, SOUND_ES5505);
+	es5506_start_common(device, clock, &es5506intf, SOUND_ES5505);
 }
 
 

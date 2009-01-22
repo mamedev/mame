@@ -227,9 +227,6 @@ static SND_START( es8712 )
 	chip->signal = -2;
 
 	es8712_state_save_register(chip, device);
-
-	/* success */
-	return DEVICE_START_OK;
 }
 
 

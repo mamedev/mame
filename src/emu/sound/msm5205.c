@@ -198,9 +198,6 @@ static SND_START( msm5205 )
 	state_save_register_device_item(device, 0, voice->bitwidth);
 	state_save_register_device_item(device, 0, voice->signal);
 	state_save_register_device_item(device, 0, voice->step);
-
-	/* success */
-	return DEVICE_START_OK;
 }
 
 /*

@@ -25,8 +25,6 @@ static SND_START( tia )
 
 	info->chip = tia_sound_init(clock, clock, 16);
 	assert_always(info->chip != NULL, "Error creating TIA chip");
-
-    return DEVICE_START_OK;
 }
 
 static SND_STOP( tia )

@@ -514,8 +514,6 @@ static SND_START( tms36xx )
 		tms->decay[0], tms->decay[1], tms->decay[2],
 		tms->decay[3], tms->decay[4], tms->decay[5]));
    LOG(("TMS36xx speed         %d\n", tms->speed));
-
-    return DEVICE_START_OK;
 }
 
 

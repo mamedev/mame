@@ -62,8 +62,6 @@ static SND_START( ym2413 )
 
 	ym2413_set_update_handler(info->chip, _stream_update, info);
 
-	return DEVICE_START_OK;
-
 
 
 

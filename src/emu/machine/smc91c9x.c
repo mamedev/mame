@@ -534,8 +534,6 @@ static DEVICE_START( smc91c9x )
 	state_save_register_device_item_array(device, 0, smc->tx);
 	state_save_register_device_item(device, 0, smc->sent);
 	state_save_register_device_item(device, 0, smc->recd);
-
-	return DEVICE_START_OK;
 }
 
 

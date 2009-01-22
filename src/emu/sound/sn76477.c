@@ -2451,8 +2451,6 @@ static SND_START( sn76477 )
 
 	if (LOG_WAV)
 		open_wav_file(sn);
-
-	return DEVICE_START_OK;
 }
 
 

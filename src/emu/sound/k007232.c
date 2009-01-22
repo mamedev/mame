@@ -326,8 +326,6 @@ static SND_START( k007232 )
 	info->stream = stream_create(device,0,2,clock/128,info,KDAC_A_update);
 
 	KDAC_A_make_fncode(info);
-
-	return DEVICE_START_OK;
 }
 
 /************************************************/

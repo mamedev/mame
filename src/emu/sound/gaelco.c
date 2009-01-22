@@ -242,7 +242,7 @@ WRITE16_HANDLER( gaelcosnd_w )
                         CG-1V/GAE1 Init
   ============================================================================*/
 
-static device_start_err gaelcosnd_start(sound_type sndtype, const device_config *device, int clock)
+static void gaelcosnd_start(sound_type sndtype, const device_config *device, int clock)
 {
 	int j, vol;
 	const gaelcosnd_interface *intf = device->static_config;
@@ -269,18 +269,16 @@ static device_start_err gaelcosnd_start(sound_type sndtype, const device_config 
 
 	if (LOG_WAVE)
 		wavraw = wav_open("gae1_snd.wav", 8000, 2);
-
-	return DEVICE_START_OK;
 }
 
 static SND_START( gaelco_gae1 )
 {
-	return gaelcosnd_start(SOUND_GAELCO_GAE1, device, clock);
+	gaelcosnd_start(SOUND_GAELCO_GAE1, device, clock);
 }
 
 static SND_START( gaelco_cg1v )
 {
-	return gaelcosnd_start(SOUND_GAELCO_CG1V, device, clock);
+	gaelcosnd_start(SOUND_GAELCO_CG1V, device, clock);
 }
 
 

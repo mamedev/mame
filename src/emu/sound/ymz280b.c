@@ -694,9 +694,6 @@ static SND_START( ymz280b )
 #if MAKE_WAVS
 	chip->wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);
 #endif
-
-	/* success */
-	return DEVICE_START_OK;
 }
 
 

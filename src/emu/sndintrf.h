@@ -80,7 +80,7 @@ enum
 #define SND_SET_INFO_CALL(name)		SND_SET_INFO_NAME(name)(device, state, info)
 
 #define SND_START_NAME(name)		snd_start_##name
-#define SND_START(name)				device_start_err SND_START_NAME(name)(const device_config *device, int clock)
+#define SND_START(name)				void SND_START_NAME(name)(const device_config *device, int clock)
 #define SND_START_CALL(name)		SND_START_NAME(name)(device, clock)
 
 #define SND_STOP_NAME(name)			snd_stop_##name
@@ -103,7 +103,7 @@ typedef union _sndinfo sndinfo;
 /* define the various callback functions */
 typedef void (*snd_get_info_func)(const device_config *device, UINT32 state, sndinfo *info);
 typedef void (*snd_set_info_func)(const device_config *device, UINT32 state, sndinfo *info);
-typedef device_start_err (*snd_start_func)(const device_config *device, int clock);
+typedef void (*snd_start_func)(const device_config *device, int clock);
 typedef void (*snd_stop_func)(const device_config *device);
 typedef void (*snd_reset_func)(const device_config *device);
 

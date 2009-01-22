@@ -1293,8 +1293,6 @@ static SND_START( aica )
 
 		AICA->stream = stream_create(device, 0, 2, 44100, AICA, AICA_Update);
 	}
-
-	return DEVICE_START_OK;
 }
 
 #ifdef UNUSED_FUNCTION

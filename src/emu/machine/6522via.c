@@ -233,8 +233,6 @@ static DEVICE_START( via6522 )
 	/* Default clock is from CPU1 */
 	if (device->clock == 0)
 		device_set_clock(device, device->machine->cpu[0]->clock);
-
-	return DEVICE_START_OK;
 }
 
 

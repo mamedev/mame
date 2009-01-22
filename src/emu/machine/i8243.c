@@ -142,7 +142,6 @@ WRITE8_DEVICE_HANDLER( i8243_prog_w )
 
 static DEVICE_START( i8243 )
 {
-	return DEVICE_START_OK;
 }
 
 

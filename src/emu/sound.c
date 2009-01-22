@@ -821,8 +821,6 @@ static DEVICE_START( speaker_output )
 	/* copy in all the relevant info */
 	info->speaker = device->inline_config;
 	info->tag = device->tag;
-
-	return DEVICE_START_OK;
 }
 
 

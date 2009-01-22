@@ -542,8 +542,6 @@ static SND_START( c352 )
 	info->stream = stream_create(device, 0, 4, info->sample_rate_base, info, c352_update);
 
 	c352_init(info, device);
-
-	return DEVICE_START_OK;
 }
 
 

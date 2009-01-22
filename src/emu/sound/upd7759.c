@@ -662,8 +662,6 @@ static SND_START( upd7759 )
 	upd7759_reset(chip);
 
 	register_for_save(chip, device);
-
-	return DEVICE_START_OK;
 }
 
 

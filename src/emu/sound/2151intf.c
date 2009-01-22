@@ -56,7 +56,6 @@ static SND_START( ym2151 )
 
 	ym2151_set_irq_handler(info->chip,info->intf->irqhandler);
 	ym2151_set_port_write_handler(info->chip,info->intf->portwritehandler);
-	return DEVICE_START_OK;
 }
 
 

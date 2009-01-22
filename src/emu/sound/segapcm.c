@@ -102,8 +102,6 @@ static SND_START( segapcm )
 
 	state_save_register_device_item_array(device, 0, spcm->low);
 	state_save_register_device_item_pointer(device, 0, spcm->ram, 0x800);
-
-	return DEVICE_START_OK;
 }
 
 

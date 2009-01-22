@@ -314,7 +314,7 @@ static int SN76496_init(const device_config *device, int clock, struct SN76496 *
 }
 
 
-static device_start_err generic_start(const device_config *device, int clock, int feedbackmask, int noisetaps, int noiseinvert)
+static void generic_start(const device_config *device, int clock, int feedbackmask, int noisetaps, int noiseinvert)
 {
 	struct SN76496 *chip = device->token;
 
@@ -334,39 +334,37 @@ static device_start_err generic_start(const device_config *device, int clock, in
 	state_save_register_device_item_array(device, 0, chip->Period);
 	state_save_register_device_item_array(device, 0, chip->Count);
 	state_save_register_device_item_array(device, 0, chip->Output);
-
-	return DEVICE_START_OK;
 }
 
 
 static SND_START( sn76489 )
 {
-	return generic_start(device, clock, 0x4000, 0x03, TRUE);
+	generic_start(device, clock, 0x4000, 0x03, TRUE);
 }
 
 static SND_START( sn76489a )
 {
-	return generic_start(device, clock, 0x8000, 0x06, FALSE);
+	generic_start(device, clock, 0x8000, 0x06, FALSE);
 }
 
 static SND_START( sn76494 )
 {
-	return generic_start(device, clock, 0x8000, 0x06, FALSE);
+	generic_start(device, clock, 0x8000, 0x06, FALSE);
 }
 
 static SND_START( sn76496 )
 {
-	return generic_start(device, clock, 0x8000, 0x06, FALSE);
+	generic_start(device, clock, 0x8000, 0x06, FALSE);
 }
 
 static SND_START( gamegear )
 {
-	return generic_start(device, clock, 0x8000, 0x09, FALSE);
+	generic_start(device, clock, 0x8000, 0x09, FALSE);
 }
 
 static SND_START( smsiii )
 {
-	return generic_start(device, clock, 0x8000, 0x09, FALSE);
+	generic_start(device, clock, 0x8000, 0x09, FALSE);
 }
 
 

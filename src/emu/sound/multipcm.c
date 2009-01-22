@@ -633,8 +633,6 @@ static SND_START( multipcm )
 	}
 
 	LFO_Init();
-
-	return DEVICE_START_OK;
 }
 
 

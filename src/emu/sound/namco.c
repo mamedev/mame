@@ -419,8 +419,6 @@ static SND_START( namco )
 		state_save_register_device_item(device, voicenum, voice->noise_counter);
 		state_save_register_device_item(device, voicenum, voice->waveform_select);
 	}
-
-	return DEVICE_START_OK;
 }
 
 

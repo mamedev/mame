@@ -664,8 +664,6 @@ static SND_START( pokey )
 	chip->channel = stream_create(device, 0, 1, sample_rate, chip, pokey_update);
 
 	register_for_save(chip, device);
-
-    return DEVICE_START_OK;
 }
 
 static TIMER_CALLBACK( pokey_timer_expire )

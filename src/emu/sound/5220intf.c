@@ -63,9 +63,6 @@ static SND_START( tms5220 )
 	tms5220_set_read(info->chip, info->intf->read);
 	tms5220_set_load_address(info->chip, info->intf->load_address);
 	tms5220_set_read_and_branch(info->chip, info->intf->read_and_branch);
-
-    /* request a sound channel */
-    return DEVICE_START_OK;
 }
 
 
@@ -75,7 +72,6 @@ static SND_START( tms5200 )
 	struct tms5220_info *info = device->token;
 	SND_START_CALL( tms5220 );
 	tms5220_set_variant(info->chip, variant_tmc0285);
-	return DEVICE_START_OK;
 }
 #endif /* (HAS_TMC0285) && (HAS_TMS5200) */
 

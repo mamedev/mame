@@ -271,8 +271,6 @@ static SND_START( astrocade )
 	/* reset state */
 	astrocade_reset(chip);
 	astrocade_state_save_register(chip, device);
-
-	return DEVICE_START_OK;
 }
 
 

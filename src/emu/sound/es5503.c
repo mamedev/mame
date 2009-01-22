@@ -264,8 +264,6 @@ static SND_START( es5503 )
 
 	chip->output_rate = (clock/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
 	chip->stream = stream_create(device, 0, 2, chip->output_rate, chip, es5503_pcm_update);
-
-	return DEVICE_START_OK;
 }
 
 READ8_HANDLER(es5503_reg_0_r)

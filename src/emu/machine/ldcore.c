@@ -1455,7 +1455,10 @@ static DEVICE_START( laserdisc )
 	ld->screen = devtag_get_device(device->machine, VIDEO_SCREEN, config->screen);
 	assert(ld->screen != NULL);
 	if (!ld->screen->started)
-		return DEVICE_START_MISSING_DEPENDENCY;
+	{
+		device_delay_init(device);
+		return;
+	}
 
 	/* save a copy of the device pointer */
 	ld->device = device;
@@ -1492,8 +1495,6 @@ static DEVICE_START( laserdisc )
 
 	/* register callbacks */
 	config_register(device->machine, "laserdisc", configuration_load, configuration_save);
-
-	return DEVICE_START_OK;
 }
 
 

@@ -652,8 +652,6 @@ static SND_START(digitalker)
 	digitalker_set_intr(dg, 1);
 
 	digitalker_register_for_save(dg);
-
-	return DEVICE_START_OK;
 }
 
 static SND_SET_INFO(digitalker)

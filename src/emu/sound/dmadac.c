@@ -112,8 +112,6 @@ static SND_START( dmadac )
 	state_save_register_device_item(device, 0, info->enabled);
 	state_save_register_device_item(device, 0, info->frequency);
 	state_save_register_device_item_pointer(device, 0, info->buffer, BUFFER_SIZE);
-
-	return DEVICE_START_OK;
 }
 
 

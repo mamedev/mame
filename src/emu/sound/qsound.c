@@ -145,8 +145,6 @@ static SND_START( qsound )
 		state_save_register_device_item(device, i, chip->channel[i].lastdt);
 		state_save_register_device_item(device, i, chip->channel[i].offset);
 	}
-
-	return DEVICE_START_OK;
 }
 
 static SND_STOP( qsound )

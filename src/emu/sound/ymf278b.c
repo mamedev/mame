@@ -694,8 +694,6 @@ static SND_START( ymf278b )
 	for(i=0; i<7; i++)
 		chip->mix_level[i] = chip->volume[8*i+8];
 	chip->mix_level[7] = 0;
-
-	return DEVICE_START_OK;
 }
 
 

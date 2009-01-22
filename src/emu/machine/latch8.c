@@ -222,8 +222,6 @@ static DEVICE_START( latch8 )
 		}
 
 	state_save_register_device_item(device, 0, latch8->value);
-
-	return DEVICE_START_OK;
 }
 
 

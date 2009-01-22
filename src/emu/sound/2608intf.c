@@ -160,7 +160,6 @@ static SND_START( ym2608 )
 	assert_always(info->chip != NULL, "Error creating YM2608 chip");
 
 	state_save_register_postload(device->machine, ym2608_intf_postload, info);
-	return DEVICE_START_OK;
 }
 
 static SND_STOP( ym2608 )

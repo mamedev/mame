@@ -189,8 +189,6 @@ static DEVICE_START( f3853 )
 	state_save_register_device_item( device, 0, f3853->request_flipflop );
 	state_save_register_device_item( device, 0, f3853->priority_line );
 	state_save_register_device_item( device, 0, f3853->external_interrupt_line );
-
-	return DEVICE_START_OK;
 }
 
 

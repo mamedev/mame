@@ -557,8 +557,6 @@ static DEVICE_START( z80pio )
 	state_save_register_device_item_array(device, 0, z80pio->out);
 	state_save_register_device_item_array(device, 0, z80pio->strobe);
 	state_save_register_device_item_array(device, 0, z80pio->int_state);
-
-	return DEVICE_START_OK;
 }
 
 

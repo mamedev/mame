@@ -21,6 +21,17 @@
 #define TEMP_STRING_POOL_ENTRIES		16
 #define MAX_STRING_LENGTH				256
 
+// ->started states 
+//
+// Only 0 and 1 are externally visible in practice, making it a
+// boolean //for external users
+
+enum {
+	DEVICE_STOPPED = 0,
+	DEVICE_STARTED = 1,
+	DEVICE_STARTING = 2,
+	DEVICE_DELAYED = 3
+};
 
 
 /***************************************************************************
@@ -120,7 +131,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 
 	/* ensure live fields are all cleared */
 	device->machine = NULL;
-	device->started = FALSE;
+	device->started = DEVICE_STOPPED;
 	device->token = NULL;
 	device->tokenbytes = 0;
 	device->region = NULL;
@@ -600,9 +611,18 @@ void device_list_start(running_machine *machine)
 			device_start_func start = (device_start_func)device_get_info_fct(device, DEVINFO_FCT_START);
 
 			assert(start != NULL);
-			if (!device->started && (*start)(device) == DEVICE_START_OK)
-				device->started = TRUE;
-			numstarted += device->started;
+			if (!device->started)
+			{
+				device->started = DEVICE_STARTING;
+				(*start)(device);
+				if (device->started == DEVICE_DELAYED)
+					device->started = DEVICE_STOPPED;
+				else
+				{
+					device->started = DEVICE_STARTED;
+					numstarted ++;
+				}
+			}
 		}
 
 		/* if we didn't start anything new, we're in trouble */
@@ -611,6 +631,17 @@ void device_list_start(running_machine *machine)
 	}
 }
 
+
+/*-------------------------------------------------
+    device_delay_init - delay the startup of a given
+    device for dependency reasons
+-------------------------------------------------*/
+void device_delay_init(const device_config *device)
+{
+	if (device->started != DEVICE_STARTING && device->started != DEVICE_DELAYED)
+		fatalerror("Error: Calling device_delay_init on a device not in the process of starting.");
+	((device_config *)device)->started = DEVICE_DELAYED;
+}
 
 /*-------------------------------------------------
     device_list_stop - stop the configured list

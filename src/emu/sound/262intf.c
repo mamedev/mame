@@ -89,8 +89,6 @@ static SND_START( ymf262 )
 
 	info->timer[0] = timer_alloc(device->machine, timer_callback_262_0, info);
 	info->timer[1] = timer_alloc(device->machine, timer_callback_262_1, info);
-
-	return DEVICE_START_OK;
 }
 
 static SND_STOP( ymf262 )

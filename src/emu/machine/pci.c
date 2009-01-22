@@ -223,8 +223,6 @@ static DEVICE_START( pci_bus )
 	/* register pci states */
 	state_save_register_device_item(device, 0, pcibus->address);
 	state_save_register_device_item(device, 0, pcibus->devicenum);
-
-	return DEVICE_START_OK;
 }
 
 

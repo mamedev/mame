@@ -105,8 +105,6 @@ static SND_START( vrender0 )
 	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));
 
 	VR0->stream = stream_create(device, 0, 2, 44100, VR0, VR0_Update);
-
-	return DEVICE_START_OK;
 }
 
 WRITE32_HANDLER(vr0_snd_write)

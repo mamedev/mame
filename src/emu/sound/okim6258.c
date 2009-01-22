@@ -202,8 +202,6 @@ static SND_START( okim6258 )
 	info->step = 0;
 
 	okim6258_state_save_register(info, device);
-
-	return DEVICE_START_OK;
 }
 
 

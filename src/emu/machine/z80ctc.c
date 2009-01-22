@@ -494,7 +494,6 @@ static DEVICE_START( z80ctc )
 	}
 
 	astring_free(tempstring);
-	return DEVICE_START_OK;
 }
 
 

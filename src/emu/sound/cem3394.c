@@ -348,8 +348,6 @@ static SND_START( cem3394 )
 	state_save_register_device_item(device, 0, chip->modulation_depth);
 	state_save_register_device_item(device, 0, chip->last_ext);
 	state_save_register_device_item(device, 0, chip->pulse_width);
-
-	return DEVICE_START_OK;
 }
 
 

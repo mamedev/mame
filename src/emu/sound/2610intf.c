@@ -169,8 +169,6 @@ static SND_START( ym2610 )
 	assert_always(info->chip != NULL, "Error creating YM2610 chip");
 
 	state_save_register_postload(device->machine, ym2610_intf_postload, info);
-
-	return DEVICE_START_OK;
 }
 #endif
 
@@ -228,8 +226,6 @@ static SND_START( ym2610b )
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 	assert_always(info->chip != NULL, "Error creating YM2610B chip");
-	
-	return DEVICE_START_OK;
 }
 #endif
 

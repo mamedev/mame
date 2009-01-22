@@ -101,8 +101,6 @@ static SND_START( ym3812 )
 
 	info->timer[0] = timer_alloc(device->machine, timer_callback_3812_0, info);
 	info->timer[1] = timer_alloc(device->machine, timer_callback_3812_1, info);
-
-	return DEVICE_START_OK;
 }
 
 static SND_STOP( ym3812 )
@@ -268,8 +266,6 @@ static SND_START( ym3526 )
 
 	info->timer[0] = timer_alloc(device->machine, timer_callback_3526_0, info);
 	info->timer[1] = timer_alloc(device->machine, timer_callback_3526_1, info);
-
-	return DEVICE_START_OK;
 }
 
 static SND_STOP( ym3526 )
@@ -469,8 +465,6 @@ static SND_START( y8950 )
 
 	info->timer[0] = timer_alloc(device->machine, timer_callback_8950_0, info);
 	info->timer[1] = timer_alloc(device->machine, timer_callback_8950_1, info);
-
-	return DEVICE_START_OK;
 }
 
 static SND_STOP( y8950 )

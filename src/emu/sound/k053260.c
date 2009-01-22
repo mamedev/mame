@@ -233,8 +233,6 @@ static SND_START( k053260 )
 	/* setup SH1 timer if necessary */
 	if ( ic->intf->irq )
 		timer_pulse( device->machine, attotime_mul(ATTOTIME_IN_HZ(clock), 32), NULL, 0, ic->intf->irq );
-
-    return DEVICE_START_OK;
 }
 
 INLINE void check_bounds( struct k053260_chip_def *ic, int channel ) {

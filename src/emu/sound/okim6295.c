@@ -346,9 +346,6 @@ static SND_START( okim6295 )
 	}
 
 	okim6295_state_save_register(info, device);
-
-	/* success */
-	return DEVICE_START_OK;
 }
 
 

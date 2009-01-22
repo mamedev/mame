@@ -43,8 +43,6 @@ static SND_START( speaker )
 	sp->num_levels = 2;
 	sp->levels = default_levels;
 	sp->level = 0;
-
-	return DEVICE_START_OK;
 }
 
 

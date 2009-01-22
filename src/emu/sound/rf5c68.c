@@ -128,7 +128,6 @@ static SND_START( rf5c68 )
 
 	/* allocate the stream */
 	chip->stream = stream_create(device, 0, 2, clock / 384, chip, rf5c68_update);
-	return DEVICE_START_OK;
 }
 
 

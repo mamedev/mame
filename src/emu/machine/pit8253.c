@@ -1038,7 +1038,7 @@ void pit8253_set_clock_signal(const device_config *device, int timerno, int stat
 }
 
 
-static device_start_err common_start( const device_config *device, int device_type ) {
+static void common_start( const device_config *device, int device_type ) {
 	pit8253_t	*pit8253 = get_safe_token(device);
 	int			timerno;
 
@@ -1077,18 +1077,16 @@ static device_start_err common_start( const device_config *device, int device_ty
 		state_save_register_device_item(device, timerno, timer->last_updated.attoseconds);
 		state_save_register_device_item(device, timerno, timer->clock);
 	}
-
-	return DEVICE_START_OK;
 }
 
 
 static DEVICE_START( pit8253 ) {
-	return common_start( device, TYPE_PIT8253 );
+	common_start( device, TYPE_PIT8253 );
 }
 
 
 static DEVICE_START( pit8254 ) {
-	return common_start( device, TYPE_PIT8254 );
+	common_start( device, TYPE_PIT8254 );
 }
 
 

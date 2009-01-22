@@ -206,8 +206,6 @@ static SND_START( sp0250 )
 	}
 
 	sp->stream = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, sp, sp0250_update);
-
-	return DEVICE_START_OK;
 }
 
 

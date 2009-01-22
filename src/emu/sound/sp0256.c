@@ -1207,8 +1207,6 @@ static SND_START( sp0256 )
     /* -------------------------------------------------------------------- */
 	sp->rom = device->region;
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
-
-	return DEVICE_START_OK;
 }
 
 static SND_STOP( sp0256 )

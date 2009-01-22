@@ -92,9 +92,6 @@ static SND_START( tms5110 )
 
     /* reset the 5110 */
     tms5110_reset_chip(info->chip);
-
-    /* request a sound channel */
-    return DEVICE_START_OK;
 }
 
 static SND_START( tms5100 )
@@ -102,7 +99,6 @@ static SND_START( tms5100 )
 	struct tms5110_info *info = device->token;
 	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_5100);
-	return DEVICE_START_OK;
 }
 
 static SND_START( tms5110a )
@@ -110,7 +106,6 @@ static SND_START( tms5110a )
 	struct tms5110_info *info = device->token;
 	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_5110A);
-	return DEVICE_START_OK;
 }
 
 static SND_START( cd2801 )
@@ -118,7 +113,6 @@ static SND_START( cd2801 )
 	struct tms5110_info *info = device->token;
 	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2801);
-	return DEVICE_START_OK;
 }
 
 static SND_START( tmc0281 )
@@ -126,7 +120,6 @@ static SND_START( tmc0281 )
 	struct tms5110_info *info = device->token;
 	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_TMC0281);
-	return DEVICE_START_OK;
 }
 
 static SND_START( cd2802 )
@@ -134,7 +127,6 @@ static SND_START( cd2802 )
 	struct tms5110_info *info = device->token;
 	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2802);
-	return DEVICE_START_OK;
 }
 
 static SND_START( m58817 )
@@ -142,7 +134,6 @@ static SND_START( m58817 )
 	struct tms5110_info *info = device->token;
 	SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_M58817);
-	return DEVICE_START_OK;
 }
 
 

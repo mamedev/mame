@@ -4614,8 +4614,6 @@ static DEVICE_START( voodoo )
 
 	/* register for save states */
 	init_save_state(device);
-
-	return DEVICE_START_OK;
 }
 
 

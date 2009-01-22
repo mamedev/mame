@@ -52,7 +52,7 @@ static STREAM_UPDATE( hc55516_update );
 
 
 
-static device_start_err start_common(const device_config *device, int clock,
+static void start_common(const device_config *device, int clock,
 						  UINT8 _shiftreg_mask, int _active_clock_hi)
 {
 	struct hc55516_data *chip = device->token;
@@ -79,27 +79,24 @@ static device_start_err start_common(const device_config *device, int clock,
 	state_save_register_device_item(device, 0, chip->update_count);
 	state_save_register_device_item(device, 0, chip->filter);
 	state_save_register_device_item(device, 0, chip->integrator);
-
-	/* success */
-	return DEVICE_START_OK;
 }
 
 
 static SND_START( hc55516 )
 {
-	return start_common(device, clock, 0x07, TRUE);
+	start_common(device, clock, 0x07, TRUE);
 }
 
 
 static SND_START( mc3417 )
 {
-	return start_common(device, clock, 0x07, FALSE);
+	start_common(device, clock, 0x07, FALSE);
 }
 
 
 static SND_START( mc3418 )
 {
-	return start_common(device, clock, 0x0f, FALSE);
+	start_common(device, clock, 0x0f, FALSE);
 }
 
 

@@ -109,8 +109,6 @@ static SND_START( dac )
 	info->output = 0;
 
 	state_save_register_device_item(device, 0, info->output);
-
-	return DEVICE_START_OK;
 }
 
 

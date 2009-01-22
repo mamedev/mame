@@ -257,7 +257,6 @@ static DEVICE_START( acia6850 )
 	state_save_register_device_item(device, 0, acia_p->rts);
 	state_save_register_device_item(device, 0, acia_p->brk);
 	state_save_register_device_item(device, 0, acia_p->status_read);
-	return DEVICE_START_OK;
 }
 
 

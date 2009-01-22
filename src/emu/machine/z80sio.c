@@ -798,7 +798,6 @@ static DEVICE_START( z80sio )
 	sio->receive_poll_cb = intf->receive_poll_cb;
 
 	astring_free(tempstring);
-	return DEVICE_START_OK;
 }
 
 

@@ -666,7 +666,6 @@ static SND_START( k054539 )
 	k054539_init_chip(device, info, clock);
 
 	state_save_register_postload(device->machine, reset_zones, info);
-	return DEVICE_START_OK;
 }
 
 WRITE8_HANDLER( k054539_0_w )

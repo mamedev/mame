@@ -114,8 +114,6 @@ static SND_START( votrax )
 
 	votrax->sample = NULL;
 	votrax->step = 0;
-
-	return DEVICE_START_OK;
 }
 
 

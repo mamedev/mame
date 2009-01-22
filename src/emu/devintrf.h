@@ -37,15 +37,6 @@ enum _device_class
 typedef enum _device_class device_class;
 
 
-/* device start results */
-enum _device_start_err
-{
-	DEVICE_START_OK = 0,				/* everything is fine */
-	DEVICE_START_MISSING_DEPENDENCY		/* at least one device we depend on is not yet started */
-};
-typedef enum _device_start_err device_start_err;
-
-
 /* useful in device_list functions for scanning through all devices */
 #define DEVICE_TYPE_WILDCARD			NULL
 
@@ -118,7 +109,7 @@ enum
 #define DEVICE_SET_INFO_CALL(name)	DEVICE_SET_INFO_NAME(name)(device, state, info)
 
 #define DEVICE_START_NAME(name)		device_start_##name
-#define DEVICE_START(name)			device_start_err DEVICE_START_NAME(name)(const device_config *device)
+#define DEVICE_START(name)			void DEVICE_START_NAME(name)(const device_config *device)
 #define DEVICE_START_CALL(name)		DEVICE_START_NAME(name)(device)
 
 #define DEVICE_STOP_NAME(name)		device_stop_##name
@@ -194,7 +185,7 @@ typedef struct _device_config device_config;
 /* device interface function types */
 typedef void (*device_get_info_func)(const device_config *device, UINT32 state, deviceinfo *info);
 typedef void (*device_set_info_func)(const device_config *device, UINT32 state, const deviceinfo *info);
-typedef device_start_err (*device_start_func)(const device_config *device);
+typedef void (*device_start_func)(const device_config *device);
 typedef void (*device_stop_func)(const device_config *device);
 typedef INT32 (*device_execute_func)(const device_config *device, INT32 clocks);
 typedef void (*device_reset_func)(const device_config *device);
@@ -341,6 +332,8 @@ void device_reset(const device_config *device);
 /* change the clock on a device */
 void device_set_clock(const device_config *device, UINT32 clock);
 
+/* allow a device to ask for its initialization to be delayed */
+void device_delay_init(const device_config *device);
 
 
 /* ----- device information getters ----- */

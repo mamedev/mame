@@ -844,8 +844,6 @@ static DEVICE_START( cdp1869 )
 	state_save_register_device_item(device, 0, cdp1869->toneamp);
 	state_save_register_device_item(device, 0, cdp1869->wnfreq);
 	state_save_register_device_item(device, 0, cdp1869->wnamp);
-
-	return DEVICE_START_OK;
 }
 
 static DEVICE_SET_INFO( cdp1869 )

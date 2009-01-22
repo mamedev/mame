@@ -90,7 +90,6 @@ static SND_START( beep )
 	pBeep->frequency = 3250;
 	pBeep->incr = 0;
 	pBeep->signal = 0x07fff;
-	return DEVICE_START_OK;
 }
 
 

@@ -177,8 +177,6 @@ static SND_START( k005289 )
 	voice[1].volume = 0;
 	voice[1].wave = &info->sound_prom[0x100];
 	voice[1].counter = 0;
-
-	return DEVICE_START_OK;
 }
 
 

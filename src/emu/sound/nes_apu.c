@@ -748,8 +748,6 @@ static SND_START( nesapu )
 #else
 	state_save_register_device_item(device, 0, info->APU.buf_pos);
 #endif
-
-	return DEVICE_START_OK;
 }
 
 
