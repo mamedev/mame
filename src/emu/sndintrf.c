@@ -131,7 +131,7 @@ int sndintrf_init_sound(running_machine *machine, int sndnum, const char *tag, s
 			index++;
 	info->index = index;
 	totalsnd++;
-	
+
 	/* allocate the token */
 	tokenbytes = sndtype_get_info_int(sndtype, DEVINFO_INT_TOKEN_BYTES);
 	assert(tokenbytes != 0);

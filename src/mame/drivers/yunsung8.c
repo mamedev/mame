@@ -57,7 +57,7 @@ static MACHINE_RESET( yunsung8 )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8* yunsung8_videoram = auto_malloc(0x4000);
-	
+
 	yunsung8_videoram_0 = yunsung8_videoram + 0x0000;	// Ram is banked
 	yunsung8_videoram_1 = yunsung8_videoram + 0x2000;
 	yunsung8_videobank_w(space,0,0);
@@ -535,11 +535,11 @@ static MACHINE_DRIVER_START( yunsung8 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM3812, 4000000) 
+	MDRV_SOUND_ADD("ym", YM3812, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */ 
+	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(yunsung8_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)

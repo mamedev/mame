@@ -254,29 +254,29 @@ static VIDEO_UPDATE(adp)
 
 	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
 /*
-	if (input_code_pressed(KEYCODE_M)) b = 0;
-	if (input_code_pressed(KEYCODE_Q)) b += 0x060 * 280 * 1;
-	if (input_code_pressed(KEYCODE_W)) b += 0x060 * 280 * 2;
-	if (input_code_pressed(KEYCODE_E)) b += 0x060 * 280 * 3;
-	if (input_code_pressed(KEYCODE_R)) b += 0x060 * 280 * 4;
-	if (input_code_pressed(KEYCODE_T)) b += 0x060 * 280 * 5;
-	if (input_code_pressed(KEYCODE_Y)) b += 0x060 * 280 * 6;
-	if (input_code_pressed(KEYCODE_U)) b += 0x060 * 280 * 7;
-	if (input_code_pressed(KEYCODE_I)) b += 0x060 * 280 * 8;
-	if (input_code_pressed(KEYCODE_A)) b += 0x060 * 280 * 9;
-	if (input_code_pressed(KEYCODE_S)) b += 0x060 * 280 * 10;
-	if (input_code_pressed(KEYCODE_D)) b += 0x060 * 280 * 11;
-	if (input_code_pressed(KEYCODE_F)) b += 0x060 * 280 * 12;
-	if (input_code_pressed(KEYCODE_G)) b += 0x060 * 280 * 13;
-	if (input_code_pressed(KEYCODE_H)) b += 0x060 * 280 * 14;
-	if (input_code_pressed(KEYCODE_J)) b += 0x060 * 280 * 15;
-	if (input_code_pressed(KEYCODE_K)) b += 0x060 * 280 * 16;
-	if (input_code_pressed(KEYCODE_Z)) b += 0x060 * 280 * 17;
-	if (input_code_pressed(KEYCODE_X)) b += 0x060 * 280 * 18;
-	if (input_code_pressed(KEYCODE_C)) b += 0x060 * 280 * 19;
-	if (input_code_pressed(KEYCODE_V)) b += 0x060 * 280 * 20;
-	if (input_code_pressed(KEYCODE_B)) b += 0x060 * 280 * 21;
-	if (input_code_pressed(KEYCODE_N)) b += 0x060 * 280 * 22;
+    if (input_code_pressed(KEYCODE_M)) b = 0;
+    if (input_code_pressed(KEYCODE_Q)) b += 0x060 * 280 * 1;
+    if (input_code_pressed(KEYCODE_W)) b += 0x060 * 280 * 2;
+    if (input_code_pressed(KEYCODE_E)) b += 0x060 * 280 * 3;
+    if (input_code_pressed(KEYCODE_R)) b += 0x060 * 280 * 4;
+    if (input_code_pressed(KEYCODE_T)) b += 0x060 * 280 * 5;
+    if (input_code_pressed(KEYCODE_Y)) b += 0x060 * 280 * 6;
+    if (input_code_pressed(KEYCODE_U)) b += 0x060 * 280 * 7;
+    if (input_code_pressed(KEYCODE_I)) b += 0x060 * 280 * 8;
+    if (input_code_pressed(KEYCODE_A)) b += 0x060 * 280 * 9;
+    if (input_code_pressed(KEYCODE_S)) b += 0x060 * 280 * 10;
+    if (input_code_pressed(KEYCODE_D)) b += 0x060 * 280 * 11;
+    if (input_code_pressed(KEYCODE_F)) b += 0x060 * 280 * 12;
+    if (input_code_pressed(KEYCODE_G)) b += 0x060 * 280 * 13;
+    if (input_code_pressed(KEYCODE_H)) b += 0x060 * 280 * 14;
+    if (input_code_pressed(KEYCODE_J)) b += 0x060 * 280 * 15;
+    if (input_code_pressed(KEYCODE_K)) b += 0x060 * 280 * 16;
+    if (input_code_pressed(KEYCODE_Z)) b += 0x060 * 280 * 17;
+    if (input_code_pressed(KEYCODE_X)) b += 0x060 * 280 * 18;
+    if (input_code_pressed(KEYCODE_C)) b += 0x060 * 280 * 19;
+    if (input_code_pressed(KEYCODE_V)) b += 0x060 * 280 * 20;
+    if (input_code_pressed(KEYCODE_B)) b += 0x060 * 280 * 21;
+    if (input_code_pressed(KEYCODE_N)) b += 0x060 * 280 * 22;
 */
 	for (y = 0;y < 280;y++)
 	{
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( funland_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	//400000-40001f?
 	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
-//	AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
+//  AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
 	AM_RANGE(0x800140, 0x800141) AM_READWRITE(t2_r,ay8910_control_port_0_lsb_w) //18b too
 	AM_RANGE(0x800142, 0x800143) AM_READWRITE(ay8910_read_port_0_lsb_r,ay8910_write_port_0_lsb_w) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )

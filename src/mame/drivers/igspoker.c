@@ -50,12 +50,12 @@ xBBBBBGGGGGRRRRR    (Bit 15 is never used)
 ---
 
 FIX:  csk227it has video issues, as after Ability game, bg_tilemap is not reset
-	so there must be some bg_enable command which I couldn't find, or rom is
-	from a beta version which has transparency issues.  This doesn't happen with
-	csk234it or New Champion Skill.
-	Insert credits with Key-In and press Pay-out to play ability game, and wait
-	for attract-mode to show cubes (not cards), which are transparent and reveal
-	background tilemap.
+    so there must be some bg_enable command which I couldn't find, or rom is
+    from a beta version which has transparency issues.  This doesn't happen with
+    csk234it or New Champion Skill.
+    Insert credits with Key-In and press Pay-out to play ability game, and wait
+    for attract-mode to show cubes (not cards), which are transparent and reveal
+    background tilemap.
 
 *****************************************************************************/
 
@@ -96,7 +96,7 @@ static READ8_HANDLER( igs_irqack_r )
 
 static WRITE8_HANDLER( igs_irqack_w )
 {
-//	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+//  cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

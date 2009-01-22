@@ -317,7 +317,7 @@ static ADDRESS_MAP_START( srmp5_mem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE(spr_r, spr_w)
 	AM_RANGE(0x0a100000, 0x0a17ffff) AM_READWRITE(srmp5_palette_r, srmp5_palette_w)
-	//0クリアしないと進まないので
+	//0?N???A?????????i??????????
 	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
 	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE(srmp5_vidregs_r, srmp5_vidregs_w)
 	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE(tileram_r, tileram_w)
@@ -482,7 +482,7 @@ static const r3000_cpu_core config =
 	4096	/* data cache size */
 };
 
-static const gfx_layout tile_16x8x8_layout = 
+static const gfx_layout tile_16x8x8_layout =
 {
 	16,8,
 	RGN_FRAC(1,1),
@@ -494,7 +494,7 @@ static const gfx_layout tile_16x8x8_layout =
 };
 
 #if 0
-static const gfx_layout tile_16x16x8_layout = 
+static const gfx_layout tile_16x16x8_layout =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -508,7 +508,7 @@ static const gfx_layout tile_16x16x8_layout =
 
 static GFXDECODE_START( srmp5 )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x8x8_layout,  0x0, 0x800  )
-//	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
+//  GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( srmp5 )
@@ -521,7 +521,7 @@ static MACHINE_DRIVER_START( srmp5 )
 	MDRV_CPU_ADD("sub", R3000LE, 25000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(srmp5_mem,0)
-	//256は適当
+	//256???K??
 	MDRV_CPU_VBLANK_INT_HACK(irq4_gen, 256)
 
 	MDRV_QUANTUM_TIME(HZ(6000))

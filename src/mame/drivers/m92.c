@@ -767,7 +767,7 @@ static INPUT_PORTS_START( psoldier )
 
 	PORT_MODIFY("P1_P2")
 	IREM_GENERIC_JOYSTICKS_3_BUTTONS(1, 2)
-		
+
 	PORT_MODIFY("DSW")
 	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0x0020, 0x0000, "Any Button to Start" ) PORT_DIPLOCATION("SW1:6")

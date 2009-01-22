@@ -68,7 +68,7 @@ static WRITE8_HANDLER( prog_w )
 		if (active_bank == 2)
 			active_bank = 0;
 
-		memory_set_bank(space->machine, 1, active_bank);		
+		memory_set_bank(space->machine, 1, active_bank);
 	}
 }
 
@@ -82,8 +82,8 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 	static UINT16 n_offs;
 	static UINT16 n_data;
 	static UINT16 add;
-	
-	
+
+
 	if (p2 == 0x3f) // write cg address
 	{
 		if (p1 == 0xbf || p1 == 0x3f)
@@ -111,7 +111,7 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 	{
 		n_offs = ((p1 & 0xc0) << 2 ) + (0xff-offset);
 
-		color_ram[n_offs] = 0;//data & 0x0f;		
+		color_ram[n_offs] = 0;//data & 0x0f;
 
 		if (data < 0x10)
 			video_ram[n_offs] = video_ram[n_offs] + 0x100;
@@ -128,25 +128,25 @@ static WRITE8_HANDLER( drw80pkr_io_w )
 		ay8910_write_port_0_w(space, 1, data);
 
 	// CRTC Register
-	// R0 = 0x1f(31)	Horizontal Total
-	// R1 = 0x18(24)	Horizontal Displayed
-	// R2 = 0x1a(26)	Horizontal Sync Position
-	// R3 = 0x34(52)	HSYNC/VSYNC Widths
-	// R4 = 0x1f(31)	Vertical Total
-	// R5 = 0x01(01)	Vertical Total Adjust
-	// R6 = 0x1b(27)	Vertical Displayed
-	// R7 = 0x1c(28)	Vertical Sync Position
-	// R8 = 0x10		Mode Control
-	//					Non-interlace
-	//					Straight Binary - Ram Addressing
-	//					Shared Memory - Ram Access
-	//					Delay Display Enable one character time
-	//					No Delay Cursor Skew
-	// R9 = 0x07(07)	Scan Line
-	// R10 = 0x00		Cursor Start
-	// R11 = 0x00		Cursor End
-	// R12 = 0x00		Display Start Address (High)
-	// R13 = 0x00		Display Start Address (Low)
+	// R0 = 0x1f(31)    Horizontal Total
+	// R1 = 0x18(24)    Horizontal Displayed
+	// R2 = 0x1a(26)    Horizontal Sync Position
+	// R3 = 0x34(52)    HSYNC/VSYNC Widths
+	// R4 = 0x1f(31)    Vertical Total
+	// R5 = 0x01(01)    Vertical Total Adjust
+	// R6 = 0x1b(27)    Vertical Displayed
+	// R7 = 0x1c(28)    Vertical Sync Position
+	// R8 = 0x10        Mode Control
+	//                  Non-interlace
+	//                  Straight Binary - Ram Addressing
+	//                  Shared Memory - Ram Access
+	//                  Delay Display Enable one character time
+	//                  No Delay Cursor Skew
+	// R9 = 0x07(07)    Scan Line
+	// R10 = 0x00       Cursor Start
+	// R11 = 0x00       Cursor End
+	// R12 = 0x00       Display Start Address (High)
+	// R13 = 0x00       Display Start Address (Low)
     //if (p1 == 0xff && p2 == 0xc7)
 
 	// CRTC Address
@@ -341,8 +341,8 @@ MACHINE_DRIVER_END
 ROM_START( drw80pkr )
 	ROM_REGION( 0x2000, "main", 0 )
 	ROM_LOAD( "pm0.u81",   0x0000, 0x1000, CRC(0f3e97d2) SHA1(aa9e4015246284f32435d7320de667e075412e5b) )
-	ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(5a6ad467) SHA1(0128bd70b65244a0f68031d5f451bf115eeb7609) )	
-    
+	ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(5a6ad467) SHA1(0128bd70b65244a0f68031d5f451bf115eeb7609) )
+
 
 	ROM_REGION( 0x002000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "cg0-a.u74",	 0x0000, 0x1000, CRC(97f5eb92) SHA1(f6c7bb42ccef8a78e8d56104ad942ae5b8e5b0df) )

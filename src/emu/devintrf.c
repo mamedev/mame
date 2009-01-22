@@ -21,7 +21,7 @@
 #define TEMP_STRING_POOL_ENTRIES		16
 #define MAX_STRING_LENGTH				256
 
-// ->started states 
+// ->started states
 //
 // Only 0 and 1 are externally visible in practice, making it a
 // boolean //for external users

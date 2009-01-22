@@ -343,7 +343,7 @@ static void m68901_int_gen(running_machine *machine, int source)
 
 static WRITE16_HANDLER( m68901_w )
 {
-//	UINT8 value = (data >> 8) & 0xff;
+//  UINT8 value = (data >> 8) & 0xff;
 	m68901_base[offset] = data;
 
 	switch (offset)
@@ -640,7 +640,7 @@ static const duart68681_config micro3d_duart68681_config =
 static MACHINE_RESET( micro3d )
 {
 	/* TODO: Check. Also do this for the other CPUs? */
-//	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+//  cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 
 	creg = 0;
 	ti_uart[STATUS] = 1;

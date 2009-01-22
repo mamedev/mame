@@ -132,7 +132,7 @@ static VIDEO_UPDATE( vcombat )
 			for (i = 0; i < 2; ++i)
 			{
 				/* Vcombat's screen renders 'flopped' - very likely because VR headset displays may reflect off mirrors.
-				Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
+                Shadfgtr isn't flopped, so it's not a constant feature of the hardware. */
 
 				/* Combine the two layers */
 				if ((m68k_pix & 0xff) == 0)
@@ -575,7 +575,7 @@ static MACHINE_DRIVER_START( vcombat )
 #endif
 
 	/* Disabled for now as it can't handle multiple screens */
-//	MDRV_MC6845_ADD("crtc", MC6845, 6000000 / 16, mc6845_intf)
+//  MDRV_MC6845_ADD("crtc", MC6845, 6000000 / 16, mc6845_intf)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MDRV_SCREEN_ADD("main", RASTER)

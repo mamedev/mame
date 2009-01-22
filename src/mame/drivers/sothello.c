@@ -2,7 +2,7 @@
  Super Othello (c)1986 Fujiwara/Success
 
     driver by Tomasz Slanina
-    
+
          1    2    3    4     5     6     7      8      9     10     11    12
 +---------------------------------------------------------------------------------+
 |                                                                                 |
@@ -67,7 +67,7 @@ static WRITE8_HANDLER(bank_w)
         case 2: bank=1; break;
         case 4: bank=2; break;
         case 8: bank=3; break;
-    }           
+    }
     memory_set_bankptr(space->machine,1,&RAM[bank*0x4000+0x10000]);
 }
 
@@ -119,9 +119,9 @@ static ADDRESS_MAP_START( maincpu_io_map, ADDRESS_SPACE_IO, 8 )
     AM_RANGE( 0x00, 0x0f) AM_READ_PORT("INPUT1")
     AM_RANGE( 0x10, 0x1f) AM_READ_PORT("INPUT2")
     AM_RANGE( 0x20, 0x2f) AM_READ_PORT("SYSTEM")
-    AM_RANGE( 0x30, 0x30) AM_READ(subcpu_halt_set) 
+    AM_RANGE( 0x30, 0x30) AM_READ(subcpu_halt_set)
     AM_RANGE( 0x31, 0x31) AM_READ(subcpu_halt_clear)
-    AM_RANGE( 0x32, 0x32) AM_READ(subcpu_comm_status) 
+    AM_RANGE( 0x32, 0x32) AM_READ(subcpu_comm_status)
     AM_RANGE( 0x33, 0x33) AM_READ(soundcpu_status_r)
     AM_RANGE( 0x40, 0x4f) AM_WRITE(soundlatch_w)
     AM_RANGE( 0x50, 0x50) AM_WRITE(bank_w)
@@ -143,12 +143,12 @@ static WRITE8_HANDLER(msm_cfg_w)
      bit 1 = 4B/3B 0
      bit 2 = S2    1
      bit 3 = S1    2
-*/   
+*/
     msm5205_playmode_w(0, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2)); /* or maybe 7,6,5,4,3,0,2,1 ??? */
     msm5205_reset_w(0,data&1);
 }
 
-static WRITE8_HANDLER( msm_data_w ) 
+static WRITE8_HANDLER( msm_data_w )
 {
     msm_data = data;
 
@@ -220,33 +220,33 @@ INPUT_PORTS_START( sothello )
  PORT_START("INPUT1")
   PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
   PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) 
+  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
   PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 
   PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
   PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
   PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
   PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-    
+
  PORT_START("INPUT2")
 
   PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
   PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) 
+  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
   PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
   PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
   PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
   PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
   PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-    
+
  PORT_START("SYSTEM")
   PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) 
-  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 ) 
-    
+  PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+
   PORT_BIT( 0xf2, IP_ACTIVE_LOW, IPT_UNUSED )
-    
+
  PORT_START("DSWA")
   PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coinage ) )
   PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
@@ -257,7 +257,7 @@ INPUT_PORTS_START( sothello )
   PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
   PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
   PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-  
+
   PORT_DIPNAME( 0x1c, 0x10, "Timer" )
   PORT_DIPSETTING(    0x1c, "15" )
   PORT_DIPSETTING(    0x18, "20" )
@@ -267,31 +267,31 @@ INPUT_PORTS_START( sothello )
   PORT_DIPSETTING(    0x08, "40" )
   PORT_DIPSETTING(    0x04, "45" )
   PORT_DIPSETTING(    0x00, "50" )
-  
+
   PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
- 
+
  PORT_START("DSWB")
   PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Difficulty ) )
   PORT_DIPSETTING(    0xc0, DEF_STR( Easy ) )
   PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
   PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
   PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-  
+
   PORT_DIPNAME( 0x30, 0x10, "Matta" ) /* undo moves */
   PORT_DIPSETTING(    0x30, "0" )
   PORT_DIPSETTING(    0x20, "1" )
   PORT_DIPSETTING(    0x10, "2" )
   PORT_DIPSETTING(    0x00, "3" )
-  
+
   PORT_DIPNAME( 0x08, 0x08, "Games for 2 players" )
   PORT_DIPSETTING(    0x08, "1" )
   PORT_DIPSETTING(    0x00, "2" )
-  
+
   PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END
 
-static void irqhandler(running_machine *machine, int irq)   
+static void irqhandler(running_machine *machine, int irq)
 {
     cpu_set_input_line(machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -348,7 +348,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( sothello )
 
     /* basic machine hardware */
-    
+
     MDRV_CPU_ADD("main",Z80, MAINCPU_CLOCK)
     MDRV_CPU_PROGRAM_MAP(maincpu_mem_map,0)
     MDRV_CPU_IO_MAP(maincpu_io_map,0)
@@ -362,7 +362,7 @@ static MACHINE_DRIVER_START( sothello )
     MDRV_CPU_PROGRAM_MAP(subcpu_mem_map,0)
 
     MDRV_QUANTUM_TIME(HZ(600))
-    
+
     MDRV_MACHINE_RESET(sothello)
 
     MDRV_SCREEN_ADD("main", RASTER)
@@ -386,7 +386,7 @@ static MACHINE_DRIVER_START( sothello )
     MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-    
+
     MDRV_SOUND_ADD("msm",MSM5205, MSM_CLOCK)
     MDRV_SOUND_CONFIG(msm_interface)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -404,11 +404,11 @@ ROM_START( sothello )
     ROM_LOAD( "3.7c",   0x0000, 0x8000, CRC(47f97bd4) SHA1(52c9638f098fdcf66903fad7dafe3ab171758572) )
     ROM_LOAD( "4.8c",   0x10000, 0x8000, CRC(a98414e9) SHA1(6d14e1f9c79b95101e0aa101034f398af09d7f32) )
     ROM_LOAD( "5.9c",   0x18000, 0x8000, CRC(e5b5d61e) SHA1(2e4b3d85f41d0796a4d61eae40dd824769e1db86) )
-    
+
     ROM_REGION( 0x10000, "sound", 0 )
     ROM_LOAD( "1.7a",   0x0000, 0x8000, CRC(6951536a) SHA1(64d07a692d6a167334c825dc173630b02584fdf6) )
     ROM_LOAD( "2.8a",   0x8000, 0x8000, CRC(9c535317) SHA1(b2e69b489e111d6f8105e68fade6e5abefb825f7) )
-    
+
     ROM_REGION( 0x10000, "sub", 0 )
     ROM_LOAD( "6.7f",   0x8000, 0x8000, CRC(ee80fc78) SHA1(9a9d7925847d7a36930f0761c70f67a9affc5e7c) )
 ROM_END

@@ -122,7 +122,7 @@ static READ8_HANDLER( igs_irqack_r )
 
 static WRITE8_HANDLER( igs_irqack_w )
 {
-//	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+//  cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 	out[2] = data;
 	show_out();
 }
@@ -132,7 +132,7 @@ UINT8 *main_ram;
 static WRITE8_HANDLER( ram_w )
 {
 	main_ram[offset] = data;
-//	logerror("PC %06X: %04x = %02x\n",cpu_get_pc(space->cpu),offset+0xf000,data);
+//  logerror("PC %06X: %04x = %02x\n",cpu_get_pc(space->cpu),offset+0xf000,data);
 }
 
 

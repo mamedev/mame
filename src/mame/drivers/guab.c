@@ -573,7 +573,7 @@ static INPUT_CHANGED( coin_inserted )
 	{
 		UINT32 credit;
 		const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-		
+
 		/* Get the current credit value and add the new coin value */
 		credit = memory_read_dword(space, 0x8002c) + (UINT32)(FPTR)param;
 		memory_write_dword(space, 0x8002c, credit);

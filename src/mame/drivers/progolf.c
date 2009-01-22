@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5fff) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(ay8910_read_port_1_r,ay8910_write_port_1_w)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(ay8910_control_port_1_w)
-//	AM_RANGE(0x8000, 0x8fff) AM_WRITE(interrupt_enable_w) //???
+//  AM_RANGE(0x8000, 0x8fff) AM_WRITE(interrupt_enable_w) //???
 	AM_RANGE(0x9000, 0xafff) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -188,7 +188,7 @@ static MACHINE_DRIVER_START( progolf )
 
   	MDRV_CPU_ADD("audio", M6502, 500000)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
-//	MDRV_CPU_VBLANK_INT("main",nmi_line_pulse)
+//  MDRV_CPU_VBLANK_INT("main",nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

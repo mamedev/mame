@@ -224,13 +224,13 @@ static WRITE8_HANDLER( jan_adpcm_w )
 			adpcm_pos = (data & 0xff) * 0x80;
 			adpcm_idle = 0;
 			msm5205_reset_w(0,0);
-//			printf("%02x 0\n",data);
+//          printf("%02x 0\n",data);
 			break;
 		/*same write as port 2?*/
 		case 1:
-//			adpcm_idle = 1;
-//			msm5205_reset_w(0,1);
-//			printf("%02x 1\n",data);
+//          adpcm_idle = 1;
+//          msm5205_reset_w(0,1);
+//          printf("%02x 1\n",data);
 			break;
 	}
 }

@@ -105,7 +105,7 @@ static TILE_GET_INFO( roz_get_info )
 	else
 	{
 		UINT8 *mask_data = (UINT8 *)(shaperam+4*tile);
-		
+
 		if (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE)
 		{
 			UINT16 *source = (UINT16 *)mask_data;

@@ -4,16 +4,16 @@
 
 Games supported:
 
-	G-LOC Air Battle
-	G-LOC R360
-	Galaxy Force 2
-	Power Drift
-	Rail Chase
-	Strike Fighter
+    G-LOC Air Battle
+    G-LOC R360
+    Galaxy Force 2
+    Power Drift
+    Rail Chase
+    Strike Fighter
 
 Known games currently not dumped:
 
-	Galaxy Force
+    Galaxy Force
 
 ****************************************************************************
 

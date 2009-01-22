@@ -95,7 +95,7 @@ static WRITE16_HANDLER( sengokmj_out_w )
 	coin_lockout_w(1,~data & 2);
 	coin_counter_w(0,data & 4);
 	hopper_io = ((data & 1)<<6);
-//	popmessage("%02x",hopper_io);
+//  popmessage("%02x",hopper_io);
 }
 
 static WRITE16_HANDLER( seibu_z80_com_6_mirror_w )
@@ -239,7 +239,7 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_DIPNAME( 0x0020, 0x0020, "Cash" )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-//	0x40 Hopper
+//  0x40 Hopper
 	PORT_DIPNAME( 0x0080, 0x0080, "Meter" )
 	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
