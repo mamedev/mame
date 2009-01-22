@@ -1,0 +1,301 @@
+/***************************************************************************
+
+  BIG 10
+  ------
+
+  Driver by Angelo Salese, Roberto Fresca & Tomasz Slanina.
+
+
+****************************************************************************
+
+  Dumper Notes:
+
+  Possibly some kind of gambling game.
+
+  Z80A
+  XTAL is 21.?727
+  YM2149
+  8-position DSW x1
+  RAM 6264 x1
+  RAM 41464 x4
+  unknown SDIP64 chip with welded heatsink! Might be a video chip or MCU?
+
+
+****************************************************************************
+
+  Dev Notes...
+
+  - Guessed and hooked the Yamaha VDP (SDIP64 IC). Same VDP used on MSX systems.
+  - Added v9938 stuff, interrupts, video start, machine reset, input ports,
+    DIP switch, ym2149 interface, pre-defined main Xtal and derivatives for
+	z80 and ym2149.
+  - Added NVRAM, defined half of DIP switches bank (coinage & main game rate).
+    Added inputs for coins A, B & C, payout, reset, and service mode.
+  - Reorganized the driver.
+
+****************************************************************************
+
+  How to Play:
+
+  - This is actually a slightly modified Raffle/Bingo/Tombola game;
+  - First off,select the bet amount with the bet button;
+  - Then choose between "Select 10" button (pseudo-random) or user-defined
+    numbers,by pressing the desired number with the numpad then "select"
+    (enters the decimals first then the units,if three or more buttons
+    are pressed the older pressed buttons are discarded,i.e. press 1234
+    then select, 1 and 2 are discarded).
+  - Press "Cancel all" to redo the numbering scheme
+  - Once that you are happy with it,press start to begin the extraction of
+    winning numbers;
+  - If you get at least 4 numbers out of 20 extracted numbers,you win a
+    prize and you are entitled to do a big/small sub-game;
+
+***************************************************************************/
+
+
+#define MASTER_CLOCK		XTAL_21_4772MHz		/* Dumper notes poorly refers to 21.?727 Xtal. */
+
+
+#include "driver.h"
+#include "cpu/z80/z80.h"
+#include "sound/ay8910.h"
+#include "video/v9938.h"
+#include "deprecat.h"
+
+#define VDP_MEM             0x40000
+
+
+/***************************************
+*      Interrupt handling & Video      *
+***************************************/
+
+static void big10_vdp_interrupt(running_machine *machine, int i)
+{
+	cpu_set_input_line (machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
+}
+
+static INTERRUPT_GEN( big10_interrupt )
+{
+	v9938_interrupt(device->machine, 0);
+}
+
+
+VIDEO_START( big10 )
+{
+	VIDEO_START_CALL(generic_bitmapped);
+	v9938_init (machine, 0, machine->primary_screen, tmpbitmap, MODEL_V9938, VDP_MEM, big10_vdp_interrupt);
+	v9938_reset(0);
+}
+
+
+/*************************************
+*           Machine Reset            *
+*************************************/
+
+static MACHINE_RESET(big10)
+{
+	v9938_reset(0);
+}
+
+/*************************************
+*            Input Ports             *
+*************************************/
+
+static UINT8 mux_data;
+
+static WRITE8_HANDLER( mux_w )
+{
+	mux_data = ~data;
+}
+
+static READ8_HANDLER( mux_r )
+{
+	switch(mux_data)
+	{
+		case 1: return input_port_read(space->machine, "IN1");
+		case 2: return input_port_read(space->machine, "IN2");
+		case 4: return input_port_read(space->machine, "IN3");
+	}
+
+	return mux_data; //?
+}
+
+static READ8_HANDLER( big10_dsw_0_r )
+{
+	return input_port_read(space->machine, "DSW2");
+}
+
+static READ8_HANDLER( big10_dsw_1_r )
+{
+	return input_port_read(space->machine, "DSW1");
+}
+
+/**************************************
+*             Memory Map              *
+**************************************/
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( main_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(mux_r)			/* present in test mode */
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")	/* coins and service */
+	AM_RANGE(0x98, 0x98) AM_WRITE(v9938_0_vram_w) AM_READ(v9938_0_vram_r)
+	AM_RANGE(0x99, 0x99) AM_WRITE(v9938_0_command_w) AM_READ(v9938_0_status_r)
+	AM_RANGE(0x9a, 0x9a) AM_WRITE(v9938_0_palette_w)
+	AM_RANGE(0x9b, 0x9b) AM_WRITE(v9938_0_register_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xa1, 0xa1) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xa2, 0xa2) AM_READ(ay8910_read_port_0_r) /* Dip-Switches routes here. */
+ADDRESS_MAP_END
+
+
+/**************************************
+*            Input Ports              *
+**************************************/
+
+static INPUT_PORTS_START( big10 )
+
+	PORT_START("SYSTEM")
+//	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )	/* Service Mode */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE	/* Service Mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W) PORT_NAME("Payout")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_T) PORT_NAME("IN0-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Z) PORT_NAME("IN0-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(2)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Number 0 Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Number 1 Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Number 2 Button")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Number 3 Button")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Number 4 Button")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Number 5 Button")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Number 6 Button")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Number 7 Button")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Number 8 Button")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Number 9 Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("Flip Flop")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("Select")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("Select 10")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Cancel All")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_NAME("Bet Button")
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_NAME("Double Up")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_NAME("Take Score")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_NAME("Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_NAME("Small")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )			PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, "Main Game Rate" )			PORT_DIPLOCATION("DSW1:3,4")
+	PORT_DIPSETTING(    0x00, "60%" )
+	PORT_DIPSETTING(    0x10, "70%" )
+	PORT_DIPSETTING(    0x20, "80%" )
+	PORT_DIPSETTING(    0x30, "90%" )
+	PORT_DIPNAME( 0xC0, 0x00, "Coinage (A=1; B=5; C=10)" )	PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x00, "x1" )
+	PORT_DIPSETTING(    0x40, "x2" )
+	PORT_DIPSETTING(    0x80, "x5" )
+	PORT_DIPSETTING(    0xC0, "x10" )
+
+	/*Unconnected,probably missing from the board*/
+	PORT_START("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+/**********************************
+*       AY-3-8910 Interface       *
+**********************************/
+
+static const ay8910_interface ay8910_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	big10_dsw_0_r,
+	big10_dsw_1_r,
+	mux_w,
+	NULL
+};
+
+
+/**************************************
+*           Machine Driver            *
+**************************************/
+
+static MACHINE_DRIVER_START( big10 )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* guess */
+	MDRV_CPU_PROGRAM_MAP(main_map, 0)
+	MDRV_CPU_IO_MAP(main_io, 0)
+	MDRV_CPU_VBLANK_INT_HACK(big10_interrupt, 262)
+
+	MDRV_MACHINE_RESET(big10)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
+	MDRV_SCREEN_SIZE(512 + 32, (212 + 28) * 2)
+	MDRV_SCREEN_VISIBLE_AREA(0, 512 + 32 - 1, 0, (212 + 28) * 2 - 1)
+
+	MDRV_PALETTE_LENGTH(512)
+	MDRV_PALETTE_INIT(v9938)
+	MDRV_VIDEO_START(big10)
+	MDRV_VIDEO_UPDATE(generic_bitmapped)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK/12)	/* guess */
+	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+MACHINE_DRIVER_END
+
+
+/**************************************
+*              ROM Load               *
+**************************************/
+
+ROM_START( big10 )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "1", 0x0000, 0x4000, CRC(03e50455) SHA1(36834d35d037303e8b9e4ce950d22f11a52e9388) )
+	ROM_LOAD( "2", 0x4000, 0x4000, CRC(b4626a5f) SHA1(a9b3b9575c657748a7f0b60ec2c7411dad0c83c1) )
+	ROM_LOAD( "3", 0x8000, 0x4000, CRC(8d15da74) SHA1(0e114de6fcf79beac800575bfb739e6a6bf35660) )
+ROM_END
+
+
+/**************************************
+*           Game Driver(s)            *
+**************************************/
+
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY    FULLNAME   FLAGS  */
+GAME( 198?, big10,    0,      big10,    big10,    0,     ROT0, "unknown", "Big 10",   0 )

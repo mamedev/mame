@@ -8453,6 +8453,7 @@ Other Sun games
 	DRIVER( spool99a )  /* (c) 1998 Electronic Projects */
 	DRIVER( 4roses )	/* 1999 Unknown */
 	DRIVER( 4rosesa )	/* 1999 Unknown */
+	DRIVER( big10 )		/* 198? Unknown */
 
 	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */

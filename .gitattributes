@@ -1278,6 +1278,7 @@ src/mame/drivers/berzerk.c svneol=native#text/plain
 src/mame/drivers/bestleag.c svneol=native#text/plain
 src/mame/drivers/bfcobra.c svneol=native#text/plain
 src/mame/drivers/bfm_sc2.c svneol=native#text/plain
+src/mame/drivers/big10.c svneol=native#text/plain
 src/mame/drivers/bigevglf.c svneol=native#text/plain
 src/mame/drivers/bigfghtr.c svneol=native#text/plain
 src/mame/drivers/bigstrkb.c svneol=native#text/plain

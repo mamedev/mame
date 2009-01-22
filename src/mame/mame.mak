@@ -1532,6 +1532,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/attckufo.o $(AUDIO)/attckufo.o $(VIDEO)/attckufo.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
 	$(DRIVERS)/beaminv.o \
+	$(DRIVERS)/big10.o \
 	$(DRIVERS)/blackt96.o \
 	$(DRIVERS)/brasil.o \
 	$(DRIVERS)/buster.o \
