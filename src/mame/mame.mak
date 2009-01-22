@@ -1800,6 +1800,8 @@ $(DRIVERS)/tehkanwc.o:	$(LAYOUT)/gridiron.lh
 
 $(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
 
+$(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
+
 $(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh
 
 $(DRIVERS)/turbo.o:		$(LAYOUT)/turbo.lh \

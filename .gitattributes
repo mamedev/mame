@@ -2584,6 +2584,7 @@ src/mame/layout/spacewin.lay -text svneol=native#plain/text
 src/mame/layout/sspeedr.lay svneol=native#text/plain
 src/mame/layout/stactics.lay svneol=native#text/plain
 src/mame/layout/starcas.lay svneol=native#text/plain
+src/mame/layout/stepstag.lay svneol=native#text/plain
 src/mame/layout/subroc3d.lay svneol=native#text/plain
 src/mame/layout/tceptor2.lay svneol=native#text/plain
 src/mame/layout/tenpindx.lay svneol=native#text/plain
