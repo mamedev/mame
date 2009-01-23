@@ -64,7 +64,12 @@
     - Some unknown writes
     - Finish magic10_2 (association coin - credits handling its inputs
       and some reads that drive the note displayed?)
-    - protection (magic102, suprpool, hotslot, mcolors).
+    - Dump/decap/trojan the MCU in the later games (magic102, suprpool, hotslot, mcolors).
+      The MCU shares memory addresses at $500000-$50001f (in magic102)
+      and it can't be simulated since the game logic is all in there,including
+      rngs for the cards and combinations for the points.
+    - Priorities,likely to be hardwired with the color writes (0=tile has the
+      highest priority).
 
 
 ****************************************************************************/
@@ -78,6 +83,7 @@
 static tilemap *layer0_tilemap, *layer1_tilemap, *layer2_tilemap;
 static UINT16 *layer0_videoram, *layer1_videoram, *layer2_videoram;
 static int layer2_offset[2];
+static UINT16 *magic10_vregs;
 
 
 /***************************
@@ -151,19 +157,24 @@ static VIDEO_START( magic10 )
 
 	tilemap_set_transparent_pen(layer1_tilemap, 0);
 	tilemap_set_transparent_pen(layer2_tilemap, 0);
-
-	tilemap_set_scrollx(layer2_tilemap, 0, layer2_offset[0]);
-	tilemap_set_scrolly(layer2_tilemap, 0, layer2_offset[1]);
 }
 
 static VIDEO_UPDATE( magic10 )
 {
+	/*TODO: understand where this comes from. */
+	tilemap_set_scrollx(layer2_tilemap, 0, layer2_offset[0]);
+	tilemap_set_scrolly(layer2_tilemap, 0, layer2_offset[1]);
+
+	/*
+	4 and 6 are y/x global register writes.
+	0 and 2 are y/x writes for the scrolling layer.
+	*/
+	tilemap_set_scrolly(layer1_tilemap, 0, (magic10_vregs[0/2] - magic10_vregs[4/2])+0);
+	tilemap_set_scrollx(layer1_tilemap, 0, (magic10_vregs[2/2] - magic10_vregs[6/2])+4);
+
 	tilemap_draw(bitmap, cliprect, layer0_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, layer1_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, layer2_tilemap, 0, 0);
-
-	tilemap_set_scrollx(layer2_tilemap, 0, layer2_offset[0]);
-	tilemap_set_scrolly(layer2_tilemap, 0, layer2_offset[1]);
 
 	return 0;
 }
@@ -243,12 +254,6 @@ static WRITE16_HANDLER( magic10_out_w )
 	coin_counter_w(0, data & 0x400);
 }
 
-static WRITE16_HANDLER( vid_reg_1_w )	/* layer pos control */
-{
-	layer2_offset[0] = -(data - 5);
-}
-
-
 /***************************
 *       Memory Maps        *
 ***************************/
@@ -265,7 +270,7 @@ static ADDRESS_MAP_START( magic10_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x40000a, 0x40000b) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x40000e, 0x40000f) AM_WRITENOP
-	AM_RANGE(0x400080, 0x400087) AM_WRITENOP	// video registers?
+	AM_RANGE(0x400080, 0x400087) AM_RAM AM_BASE(&magic10_vregs)
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -281,7 +286,7 @@ static ADDRESS_MAP_START( magic10a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITENOP
-	AM_RANGE(0x500080, 0x500087) AM_WRITENOP	// video registers?
+	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE(&magic10_vregs)	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -301,7 +306,7 @@ static ADDRESS_MAP_START( magic102_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x700000, 0x700001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
-	AM_RANGE(0x700080, 0x700087) AM_WRITENOP	// video registers?
+	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE(&magic10_vregs)	// video registers?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotslot_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -320,10 +325,7 @@ static ADDRESS_MAP_START( hotslot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x50001a, 0x50001d) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x70000a, 0x70000b) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
-	AM_RANGE(0x700080, 0x700081) AM_WRITENOP			// video registers
-	AM_RANGE(0x700082, 0x700083) AM_WRITE(vid_reg_1_w)	// video registers
-	AM_RANGE(0x700084, 0x700085) AM_WRITENOP			// video registers
-	AM_RANGE(0x700086, 0x700087) AM_WRITENOP			// video registers
+	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE(&magic10_vregs)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgsafari_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -337,6 +339,7 @@ static ADDRESS_MAP_START( sgsafari_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x50000e, 0x50000f) AM_READ_PORT("IN0")
+	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE(&magic10_vregs)	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 /*
@@ -827,6 +830,9 @@ ROM_START( magic102 )
 	ROM_LOAD16_BYTE( "2.u3",  0x00000, 0x20000, CRC(6fc55fe4) SHA1(392ad92e55aeac9bf5235cceb6b0b415942105a4) )
 	ROM_LOAD16_BYTE( "1.u2",  0x00001, 0x20000, CRC(501507af) SHA1(ceed50c9380a9838cd3d171d2387334edfeff77f) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
+
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "3.u35",        0x00000, 0x20000, CRC(df47bb12) SHA1(b8bcbc9ab764d3159344d93776d13a14c9154086) )
 	ROM_LOAD( "4.u36",        0x20000, 0x20000, CRC(dc242034) SHA1(6a2983c79776df07f29b77f23799fef6f20df24f) )
@@ -882,6 +888,9 @@ ROM_START( suprpool )
 	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "2-1.22a.u3", 0x00000, 0x20000,CRC(5d15037a) SHA1(74cab79a1b08910267262a4c6b501126a4df6cda) )
 	ROM_LOAD16_BYTE( "3-1.22a.u2", 0x00001, 0x20000,CRC(c762cd1c) SHA1(ee05a9e8147d613eb14333e6e7b743fc05982e7c) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
 	ROM_LOAD( "7.u35", 0x00000, 0x20000,  CRC(357d145f) SHA1(9fea0d0c5d6c27bf520c4f81eb0f48a65ff60142) )
@@ -953,6 +962,9 @@ ROM_START( hotslot )
 	ROM_LOAD16_BYTE( "hotslot2.u3", 0x00000, 0x20000, CRC(676cbe32) SHA1(78721326f3334fcdfdaffb72dbcacfb8bb591d51) )
 	ROM_LOAD16_BYTE( "hotslot3.u2", 0x00001, 0x20000, CRC(2c362765) SHA1(c41741c97fe8e5b3a66eb08ebf68d24c6c771ba8) )
 
+	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
+
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics */
 	ROM_LOAD( "hotslot7.u35", 0x00000, 0x40000, CRC(715073c2) SHA1(39085871fee182a9b22c3e042211e76da0ee3024) )
 	ROM_LOAD( "hotslot6.u36", 0x40000, 0x40000, CRC(8ef2e25a) SHA1(d4a3288878fabab7ea193d5dadde1fe9fea6bc8a) )
@@ -1006,6 +1018,9 @@ ROM_START( mcolors )
 	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "m.colors1.7a-2.u3", 0x00000, 0x20000, CRC(02ce6aab) SHA1(349cb639024a818cb88e911788a0146f48d25333) )
 	ROM_LOAD16_BYTE( "m.colors1.7a-3.u2", 0x00001, 0x20000, CRC(076b9680) SHA1(856d1cfaca886d78a36e129a7b41455362932e66) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* h8/330 HD6473308cp10 with internal ROM */
+	ROM_LOAD( "mcu",        0x00000, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics */
 	ROM_LOAD( "m.colors1.7-7.u35", 0x00000, 0x20000, CRC(ec44b289) SHA1(269c965112f0ba308bb5f02d965e32df70310b2c) )
