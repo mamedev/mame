@@ -29,7 +29,7 @@ static STREAM_UPDATE( sid_update )
 
 
 
-static device_start_err sid_start(const device_config *device, int clock, SIDTYPE sidtype)
+static void sid_start(const device_config *device, int clock, SIDTYPE sidtype)
 {
 	SID6581 *sid = device->token;
 	const sid6581_interface *iface = (const sid6581_interface*) device->static_config;
