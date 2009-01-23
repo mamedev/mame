@@ -3477,6 +3477,59 @@ ROM_START( mjyarou )
 	ROM_LOAD( "82s129n.ic4",   0x0100, 0x0100, CRC(f09d3c4c) SHA1(a9e752d75e7f3ebd05add4ccf2f9f15d8f9a8d15) )
 ROM_END
 
+/*
+
+Jansou
+(c)1985 Dyna Industry
+
+upgrade kit for Royal Mahjong
+G85-12-05RL
+
+CPU: Z80A
+OSC: 4.000MHz
+Other: surface scratched 40pin DIP device
+
+ROMs:
+1
+2
+3
+4
+5
+
+Color PROM:
+N82S123AN
+
+
+dumped by sayu
+--- Team Japump!!! ---
+http://japump.i.am/
+
+*/
+/*
+Nothing can be done on this one due of missing main program rom(s) (surface scratched 40pin DIP device).
+A string of the current z80 rom at offset 0x90 says "THE Janso Voice Version 1.0 (c) Copy Right 1985 Dyna",
+so it's just a voice player.
+*/
+ROM_START( jansou )
+	/*Missing main cpu program rom*/
+	ROM_REGION( 0x10000, "game_prg", 0 )
+	ROM_LOAD( "unk", 0x0000, 0x8000, NO_DUMP )
+
+	/*These probably hooks up with the main cpu program,they are standard 4bpp bitmaps.*/
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "2", 0x00000, 0x8000, CRC(fea7f3c6) SHA1(c196be0030b00cfb747b9dbfa387048d20c70b74) )
+	ROM_LOAD( "3", 0x08000, 0x8000, CRC(75a0bef0) SHA1(c2f5b3ddc55b58d3ea784d8b3d0a0f577d313341) )
+	ROM_LOAD( "4", 0x10000, 0x8000, CRC(7304899a) SHA1(636b7673563f75ff2ef95eef3b99f80ef0c45fee) )
+	ROM_LOAD( "5", 0x18000, 0x8000, CRC(57a4d300) SHA1(35d211d50052cd76721dbd6ad02ec7cb56c475d1) )
+
+	/*this is just a z80 Voice Player (and latches port I/O $00 with the main CPU)*/
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "1", 0x0000, 0x8000, CRC(0321ac7e) SHA1(1a0372a25f979461db09cd153c15daaa556c3d1f) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "n82s123an", 0x0000, 0x0020, CRC(e9598146) SHA1(619e7eb76cc3e882b5b3e55cdd23fe00b0a1fe45) )
+ROM_END
+
 static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
@@ -3487,13 +3540,13 @@ static DRIVER_INIT( janptr96 )
 	memory_set_bankptr(machine, 3,generic_nvram);
 }
 
-
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, 0,        ROT0, "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, 0,        ROT0, "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, 0,        ROT0, "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, 0,        ROT0, "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1984,  janoh,    0,        royalmah, royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 1)",                        GAME_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoh,    royalmah, 0,        ROT0, "Toaplan",                    "Jan Oh (set 2)", 						GAME_NOT_WORKING ) // this one is complete?
+GAME( 1985,  jansou,   0,    	 royalmah, royalmah, 0, 	   ROT0, "Dyna", 					   "Jansou", 								GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, 0,        ROT0, "Dyna Electronics",           "Don Den Mahjong [BET] (Japan)",         0 )
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  ippatsu,  ROT0, "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   0,        ROT0, "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
