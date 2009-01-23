@@ -10,6 +10,7 @@ Protection TODO:
 - Check the remaining unmapped read/writes effect;
 - Boss BGM might be wrong / variable;
 - Haven't yet checked if bonus life and difficulty DIP-SW are rightly tested;
+- Demo Sounds DIP-SW doesn't work?
 - Clean-up the whole routine;
 
 
@@ -246,6 +247,8 @@ static UINT16 dblwings_384_data;
 
 static UINT16 boss_move,boss_shoot_type,boss_3_data,boss_4_data,boss_5_data,boss_5sx_data,boss_6_data;
 
+static UINT8 dblewing_sound_irq;
+
 static READ16_HANDLER ( dlbewing_prot_r )
 {
 	switch(offset*2)
@@ -362,7 +365,8 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			return;
 		case 0x380: // sound write
 			soundlatch_w(space,0,data&0xff);
-		 	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+			dblewing_sound_irq |= 0x02;
+		 	cpu_set_input_line(space->machine->cpu[1],0,(dblewing_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 			return;
 		case 0x384:
 			dblwings_384_data = data;
@@ -453,11 +457,12 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER( unk_r )
+static READ8_HANDLER(irq_latch_r)
 {
-	static UINT8 x = 0;
-
-	return x^=1;
+	/* bit 1 of dblewing_sound_irq specifies IRQ command writes */
+	dblewing_sound_irq &= ~0x02;
+	cpu_set_input_line(space->machine->cpu[1], 0, (dblewing_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	return dblewing_sound_irq;
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -466,7 +471,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0xa000, 0xa001) AM_READWRITE(ym2151_status_port_0_r,ym2151_word_0_w)
 	AM_RANGE(0xb000, 0xb000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
- 	AM_RANGE(0xd000, 0xd000) AM_READ(unk_r) //timing? sound latch?
+ 	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
  	AM_RANGE(0xf000, 0xf000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 ADDRESS_MAP_END
 
@@ -642,10 +647,14 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static void sound_irq(running_machine *machine, int irq)
+static void sound_irq(running_machine *machine, int state)
 {
- 	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
-//  mame_printf_debug("sound irq\n");
+	/* bit 0 of dblewing_sound_irq specifies IRQ from sound chip */
+	if (state)
+		dblewing_sound_irq |= 0x01;
+	else
+		dblewing_sound_irq &= ~0x01;
+	cpu_set_input_line(machine->cpu[1], 0, (dblewing_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -662,6 +671,8 @@ static MACHINE_DRIVER_START( dblewing )
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io,0)
+
+	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
