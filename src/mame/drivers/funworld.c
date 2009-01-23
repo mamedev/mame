@@ -31,6 +31,8 @@
     * Pool 10 (italian, set 4),                         C.M.C.,             1997.
     * Tortuga Family (italian),                         C.M.C.,             1997.
     * Pot Game (italian),                               C.M.C.,             1996.
+    * Bottle 10 (italian, set 1),                       C.M.C.,             1996.
+    * Bottle 10 (italian, set 2),                       C.M.C.,             1996.
     * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
     * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
     * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
@@ -150,6 +152,7 @@
     * Elephant Family
     * Tortuga Family
     * Pot Game
+    * Bottle 10
 
     In Italy many people became addicted to videopokers. They put so much money on them,
     and they had to sell the house. Also some engineers modified videopokers to do less
@@ -1005,6 +1008,10 @@
     - Added common MC6845 device interface.
     - Eliminated the screen size & visible area parameters to Magic Card 2.
 
+    [2009/01/23]
+    - Added new sets: Bottle 10 (italian, set 1 & 2).
+    - Updated technical notes.
+
 
     *** TO DO ***
 
@@ -1063,6 +1070,12 @@ static WRITE8_HANDLER(funworld_lamp_b_w)
 {
 	output_set_lamp_value(4, (data >> 0) & 1);		/* button hold5/bet */
 	output_set_lamp_value(6, (data >> 1) & 1);		/* button 7 (start/play) */
+}
+
+static WRITE8_HANDLER(pia1_ca2_w)
+{
+/* TAB and Impera games are writting 0x01 constantly, and 0x00 with each screen change */
+//	popmessage("PIA1 CA2: %02X", data);
 }
 
 
@@ -1946,7 +1959,7 @@ static const pia6821_interface pia1_intf =
 	input_port_2_r, input_port_3_r, 0, 0, 0, 0,
 
 	/* PIA outputs: A, B, CA2, CB2 */
-	0, 0, 0, 0,
+	0, 0, pia1_ca2_w, 0,
 
 	/* PIA IRQs: A, B */
 	0, 0
@@ -2418,6 +2431,40 @@ ROM_START( potgame )
 	ROM_LOAD( "palce16v8h_pot.u5",  0x0000, 0x0157, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "palce20v8h_pot.u22", 0x0200, 0x0157, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "palce20v8h_pot.u23", 0x0400, 0x0157, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
+ROM_START( bottle10 )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "boat_3.bin", 0x8000, 0x8000, CRC(e2db8334) SHA1(22ac4ce361a93b7e6d491e260635755dd562b294) )
+
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "boat_2.bin", 0x0000, 0x8000, CRC(a6b36c3f) SHA1(90b12d9552ad5dbf11a30fc7451da1f3e6763cc3) )
+	ROM_LOAD( "boat_1.bin", 0x8000, 0x8000, CRC(61fd8c19) SHA1(eb8fd8bd7de38a6c8a435e9e36daf699162138a5) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
+ROM_END
+
+ROM_START( bottl10b )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "3.u2", 0x8000, 0x8000, CRC(e2db8334) SHA1(22ac4ce361a93b7e6d491e260635755dd562b294) )
+
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(9395c15b) SHA1(e4caefc6f55b07f5c4370a3b8652fa93e08987ce) )
+	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(61fd8c19) SHA1(eb8fd8bd7de38a6c8a435e9e36daf699162138a5) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
 ROM_END
 
 ROM_START( royalcrd )
@@ -2958,6 +3005,8 @@ GAME( 1996, pool10c,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",   
 GAME( 1997, pool10d,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 4)",                        0 )
 GAME( 1997, tortufam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Tortuga Family (italian)",                        0 )
 GAME( 1996, potgame,  0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pot Game (italian)",                              0 )
+GAME( 1996, bottle10, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Bottle 10 (italian, set 1)",                      0 )
+GAME( 1996, bottl10b, bottle10, cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Bottle 10 (italian, set 2)",                      0 )
 GAME( 1991, royalcrd, 0,        royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 1)",                    0 )
 GAME( 1991, royalcdb, royalcrd, royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 2)",                    0 )
 GAME( 1991, royalcdc, royalcrd, royalcrd, royalcrd, funworld, ROT0, "Evona Electronic","Royal Card (slovak, encrypted)",                  GAME_WRONG_COLORS | GAME_NOT_WORKING )

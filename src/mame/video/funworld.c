@@ -32,6 +32,8 @@
     * Pool 10 (italian, set 4),                         C.M.C.,             1997.
     * Tortuga Family (italian),                         C.M.C.,             1997.
     * Pot Game (italian),                               C.M.C.,             1996.
+    * Bottle 10 (italian, set 1),                       C.M.C.,             1996.
+    * Bottle 10 (italian, set 2),                       C.M.C.,             1996.
     * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
     * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
     * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
@@ -113,6 +115,7 @@ PALETTE_INIT(funworld)
 	}
 }
 
+
 WRITE8_HANDLER( funworld_videoram_w )
 {
 	videoram[offset] = data;
@@ -125,6 +128,7 @@ WRITE8_HANDLER( funworld_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
+
 /**** normal hardware limit ****
     - bits -
     7654 3210
@@ -135,11 +139,11 @@ WRITE8_HANDLER( funworld_colorram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-//  - bits -
-//  7654 3210
-//  xxxx ----   tiles color.
-//  ---- xxxx   unused.
-
+/*  - bits -
+    7654 3210
+    xxxx ----   tiles color.
+    ---- xxxx   unused.
+*/
 	int offs = tile_index;
 	int attr = videoram[offs] + (colorram[offs] << 8);
 	int code = attr & 0xfff;
@@ -147,6 +151,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	SET_TILE_INFO(0, code, color, 0);
 }
+
 
 VIDEO_START(funworld)
 {
@@ -157,6 +162,7 @@ VIDEO_START(magicrd2)
 {
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 4, 8, 112, 34);
 }
+
 
 VIDEO_UPDATE(funworld)
 {
