@@ -37,23 +37,23 @@
 
   How to Play:
 
-  - This is actually a slightly modified Raffle/Bingo/Tombola game;
-  - First off,select the bet amount with the bet button;
-  - Then choose between "Select 10" button (pseudo-random) or user-defined
+  - This is actually a Keno game (slightly modified Raffle/Bingo/Tombola game).
+  - First off, select the bet amount with the BET button.
+  - Then choose between "SELECT 10" button (pseudo-random) or user-defined
     numbers,by pressing the desired number with the numpad then "select"
-    (enters the decimals first then the units,if three or more buttons
-    are pressed the older pressed buttons are discarded,i.e. press 1234
-    then select, 1 and 2 are discarded).
-  - Press "Cancel all" to redo the numbering scheme
-  - Once that you are happy with it,press start to begin the extraction of
-    winning numbers;
-  - If you get at least 4 numbers out of 20 extracted numbers,you win a
-    prize and you are entitled to do a big/small sub-game;
+    (enters the decimals first then the units, if three or more buttons
+    are pressed the older pressed buttons are discarded, i.e. press 1234
+    then SELECT, 1 and 2 are discarded).
+  - Press "CANCEL ALL" to redo the numbering scheme.
+  - Once that you are happy with it, press START to begin the extraction of
+    winning numbers.
+  - If you get at least 2-4 numbers out of 20 extracted numbers, you win a
+    prize and you are entitled to do a big/small (double up) sub-game.
 
 ***************************************************************************/
 
 
-#define MASTER_CLOCK		XTAL_21_4772MHz		/* Dumper notes poorly refers to 21.?727 Xtal. */
+#define MASTER_CLOCK		XTAL_21_4772MHz		/* Dumper notes poorly refers to a 21.?727 Xtal. */
 
 
 #include "driver.h"
@@ -97,9 +97,10 @@ static MACHINE_RESET(big10)
 	v9938_reset(0);
 }
 
-/*************************************
-*            Input Ports             *
-*************************************/
+
+/****************************************
+*  Input Ports Demux & Common Routines  *
+****************************************/
 
 static UINT8 mux_data;
 
@@ -117,18 +118,19 @@ static READ8_HANDLER( mux_r )
 		case 4: return input_port_read(space->machine, "IN3");
 	}
 
-	return mux_data; //?
-}
-
-static READ8_HANDLER( big10_dsw_0_r )
-{
-	return input_port_read(space->machine, "DSW2");
+	return mux_data;
 }
 
 static READ8_HANDLER( big10_dsw_1_r )
 {
 	return input_port_read(space->machine, "DSW1");
 }
+
+static READ8_HANDLER( big10_dsw_2_r )
+{
+	return input_port_read(space->machine, "DSW2");
+}
+
 
 /**************************************
 *             Memory Map              *
@@ -161,41 +163,40 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( big10 )
 
 	PORT_START("SYSTEM")
-//	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )	/* Service Mode */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE	/* Service Mode */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W) PORT_NAME("Payout")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_W) PORT_NAME("Payout")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_T) PORT_NAME("IN0-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_Z) PORT_NAME("IN0-6")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_IMPULSE(2)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Number 0 Button")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Number 1 Button")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Number 2 Button")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Number 3 Button")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Number 4 Button")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Number 5 Button")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Number 6 Button")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Number 7 Button")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Number 0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Number 1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Number 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Number 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Number 4")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Number 5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Number 6")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Number 7")
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Number 8 Button")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Number 9 Button")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("Flip Flop")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("Select")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("Select 10")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Cancel All")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_NAME("Bet Button")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_8_PAD)     PORT_NAME("Number 8")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_CODE(KEYCODE_9_PAD)     PORT_NAME("Number 9")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_CODE(KEYCODE_F)         PORT_NAME("Flip Flop")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )    PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Select")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )    PORT_CODE(KEYCODE_Z)         PORT_NAME("Select 10")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )    PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Cancel All")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_CODE(KEYCODE_2)         PORT_NAME("Start")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_CODE(KEYCODE_1)         PORT_NAME("Bet")
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_NAME("Double Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_NAME("Take Score")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_NAME("Big")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_NAME("Small")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_3) PORT_NAME("Double Up")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_4) PORT_NAME("Take Score")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_A) PORT_NAME("Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_S) PORT_NAME("Small")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
@@ -222,7 +223,7 @@ static INPUT_PORTS_START( big10 )
 	PORT_DIPSETTING(    0x80, "x5" )
 	PORT_DIPSETTING(    0xC0, "x10" )
 
-	/*Unconnected,probably missing from the board*/
+	/* Unconnected, probably missing from the board */
 	PORT_START("DSW2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -236,7 +237,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	big10_dsw_0_r,
+	big10_dsw_2_r,
 	big10_dsw_1_r,
 	mux_w,
 	NULL
