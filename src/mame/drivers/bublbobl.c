@@ -277,6 +277,9 @@ TODO:
 #include "cpu/m6805/m6805.h"
 #include "includes/bublbobl.h"
 
+
+#define MAIN_XTAL 	XTAL_24MHz
+
 #if 0 // doesn't work for some reason
 static WRITE8_HANDLER(soundcpu_reset_w)
 {
@@ -664,12 +667,6 @@ static GFXDECODE_START( bublbobl )
 GFXDECODE_END
 
 
-
-#define MAIN_XTAL 	24000000
-#define HSYNC 		MAIN_XTAL / 4 / 384
-#define VSYNC		HSYNC / 264
-#define VBLANK		1 / VSYNC * (40 / 264)
-
 // handler called by the 2203 emulator when the internal timers cause an IRQ
 static void irqhandler(running_machine *machine, int irq)
 {
@@ -706,11 +703,8 @@ static MACHINE_DRIVER_START( tokio )
 	// video hardware
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(VSYNC)	// 59.185606 Hz
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(VBLANK)) 	// 2560 us
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
 
 	MDRV_GFXDECODE(bublbobl)
 	MDRV_PALETTE_LENGTH(256)
@@ -750,11 +744,8 @@ static MACHINE_DRIVER_START( bublbobl )
 	// video hardware
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(VSYNC)	// 59.185606 Hz
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(VBLANK)) 	// 2560 us
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
 
 	MDRV_GFXDECODE(bublbobl)
 	MDRV_PALETTE_LENGTH(256)
