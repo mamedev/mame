@@ -38,4 +38,4 @@ VIDEO_UPDATE( esripsys );
 WRITE8_HANDLER( esripsys_bg_intensity_w );
 INTERRUPT_GEN( esripsys_vblank_irq );
 
-int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int line_latch);
+int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);

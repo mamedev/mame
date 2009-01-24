@@ -5,7 +5,7 @@
     driver by Phil Bennett
 
     Games supported:
-        * Turbo Sub [2 sets]
+        * Turbo Sub [3 sets]
 
     ROMs wanted:
         * Bouncer
@@ -891,7 +891,117 @@ ROM_START( turbosub )
 	ROM_LOAD( "6331_vid.u155", 0x0240, 0x0020, CRC(63371737) SHA1(f08c03c81322c0de9ee64b4a9f11a1422c5bd463) )
 ROM_END
 
-ROM_START( turbosba )
+ROM_START( turbosb7 )
+	ROM_REGION( 0xc0000, "main_code", 0) /* Non-bankswitched, 6809 #0 code */
+	ROM_LOAD( "mem6u85.bin",    0x18000, 0x4000, CRC(30016c8b) SHA1(0cd2dd7052de0eaa451ff8b0b2224180764c26de) )
+
+	ROM_REGION( 0x48000, "game_cpu", 0 ) /* Bankswitched 6809 code */
+	ROM_LOAD( "mem6u82.bin",    0x10000, 0x2000, CRC(ecb01643) SHA1(32571ed9f2289b7943beb3e518e460c6552bbde7) )
+	ROM_CONTINUE(               0x20000, 0x2000 )
+	ROM_LOAD( "mem6u81.bin",    0x12000, 0x2000, CRC(3938bc3d) SHA1(0b6d770bdad3d40051d214efa38a8900dcd506dd) )
+	ROM_CONTINUE(               0x22000, 0x2000 )
+	ROM_LOAD( "mem6u87.bin",    0x14000, 0x2000, CRC(3398ddfe) SHA1(c2339440931d994f4aecf7943ba46c4e337d5bce) )
+	ROM_CONTINUE(               0x24000, 0x2000 )
+	ROM_LOAD( "mem6u86.bin",    0x16000, 0x2000, CRC(e4835206) SHA1(727a758a1810a1f97d75f063aac98393a5473c72) )
+	ROM_CONTINUE(               0x26000, 0x2000 )
+
+	ROM_LOAD( "mem6u80.bin",    0x30000, 0x2000, CRC(02cffdce) SHA1(18483921274eb1963ad7a64daea1d4190e5c141d) )
+	ROM_CONTINUE(               0x40000, 0x2000 )
+	ROM_LOAD( "mem6u79.bin",    0x32000, 0x2000, CRC(2a756db2) SHA1(c530c9a2f41de331d0d32928303c05c3312037b4) )
+	ROM_CONTINUE(               0x42000, 0x2000 )
+	ROM_LOAD( "mem6u84.bin",    0x34000, 0x2000, CRC(51a7f19b) SHA1(7a174b11b6f84768e3d4c14ce39974bbb3aea02d) )
+	ROM_CONTINUE(               0x44000, 0x2000 )
+	ROM_LOAD( "mem6u83.bin",    0x36000, 0x2000, CRC(eef7963a) SHA1(1f2f7f8fb1d68abd91f94967bb7e283004661d6d) )
+	ROM_CONTINUE(               0x46000, 0x2000 )
+
+	/* e000 - ffff = Upper half of U85 (lower half is blank) */
+	ROM_COPY( "main_code", 0x18000 + 0x2000, 0xe000, 0x2000 )
+
+	ROM_REGION( 0x10000, "frame_cpu", 0 )
+	ROM_LOAD( "pcb4u63.bin", 0xc000, 0x4000, CRC(35701532) SHA1(77d957682aab10ee902c1e47c468b9ab8fe6a512) )
+
+	ROM_REGION( 0x1000, "video_cpu", 0 )
+	ROMX_LOAD( "27s29.u29", 0x0, 0x200, CRC(d580672b) SHA1(b56295a5b780ab5e8ff6817ebb084a8dfad8c281), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u28", 0x1, 0x200, CRC(f7976b87) SHA1(c19a1d375c497f1671170c7833952979819c3812), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u27", 0x2, 0x200, CRC(03ebd3ea) SHA1(109f5369bd36bcf0da5928b96566655c6895c737), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u21", 0x3, 0x200, CRC(e232384b) SHA1(cfc3acc86add06b4cb6addb3455d71123fb359ce), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u20", 0x4, 0x200, CRC(0a8e44d8) SHA1(2df46316510b2dbfd4c9913a1460c00d5572d586), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u19", 0x5, 0x200, CRC(de17e5f0) SHA1(3e14768374e1bda25183aee86a82d220b7f58ff9), ROM_SKIP(7))
+	ROMX_LOAD( "27s29.u18", 0x6, 0x200, CRC(e33ed0a4) SHA1(41edbdc7c022971ce14bd2f419c92714b796fad7), ROM_SKIP(7))
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 )
+	ROM_LOAD( "mem6u66.bin", 0xc000, 0x4000, CRC(5091bf3d) SHA1(7ab872cef1562a45f7533c16bbbae8772673465b) )
+
+	ROM_REGION( 0xc000, "sound_data", 0)
+	ROM_LOAD( "mem6u69.bin", 0x0000, 0x4000, CRC(ad04193b) SHA1(2f660302e60a7e68e079a8dd13266a77c077f939) )
+	ROM_LOAD( "mem6u68.bin", 0x4000, 0x4000, CRC(72e3d09b) SHA1(eefdfcd0c4c32e465f18d40f46cb5bc022c22bfd) )
+	ROM_LOAD( "mem6u67.bin", 0x8000, 0x4000, CRC(f8ae82e9) SHA1(fd27b9fe7872c3c680a1f71a4a5d5eeaa12e4a19) )
+
+	ROM_REGION( 0x40000, "4bpp", 0)
+	ROM_LOAD( "mem6u44.bin", 0x00000, 0x4000, CRC(0dbcf4a8) SHA1(aa104aa9c9a6182e46663c69193c1f414b7e2270) )
+	ROM_CONTINUE(            0x08000, 0x4000 )
+	ROM_LOAD( "mem6u49.bin", 0x10000, 0x4000, CRC(68cf6096) SHA1(557ac00bf06878856b1e79f709d401e7a7ae50b9) )
+	ROM_CONTINUE(            0x18000, 0x4000 )
+	ROM_LOAD( "mem6u54.bin", 0x20000, 0x4000, CRC(561ed51e) SHA1(db4d1bb834216e6c235bc3e91f60e1cab7883769) )
+	ROM_CONTINUE(            0x28000, 0x4000 )
+	ROM_LOAD( "mem6u59.bin", 0x30000, 0x4000, CRC(fff98687) SHA1(f64e2c4b2fb7b2c85e7be81168169d5d5111382a) )
+	ROM_CONTINUE(            0x38000, 0x4000 )
+
+	ROM_LOAD( "mem6u43.bin", 0x04000, 0x4000, CRC(420b5bcb) SHA1(74e25f022d5ad3fdda58af5530182bd0a6db6c0c) )
+	ROM_CONTINUE(            0x0c000, 0x4000 )
+	ROM_LOAD( "mem6u48.bin", 0x14000, 0x4000, CRC(03c67463) SHA1(e1d8b43588948a76d48f4882be522cdcb1254bad) )
+	ROM_CONTINUE(            0x1c000, 0x4000 )
+	ROM_LOAD( "mem6u53.bin", 0x24000, 0x4000, CRC(5b5c4fc8) SHA1(f222631fcd515772a21af41badb3aead2043e484) )
+	ROM_CONTINUE(            0x2c000, 0x4000 )
+	ROM_LOAD( "mem6u58.bin", 0x34000, 0x4000, CRC(3e02ef5b) SHA1(1bd7ac2d5340198d7142c03501a6718995f28a67) )
+	ROM_CONTINUE(            0x3c000, 0x4000 )
+
+	ROM_REGION( 0x40000, "8bpp_l", 0)
+	ROM_LOAD( "mem6u04.bin", 0x00000, 0x4000, CRC(a42581e8) SHA1(ffab2ae5a36095ba1a71b4d1fc88589c27f819bb) )
+	ROM_CONTINUE(            0x08000, 0x4000 )
+	ROM_LOAD( "mem6u14.bin", 0x10000, 0x4000, CRC(52b53a20) SHA1(add08ea5cb47cdcc7e8db5e94bb97aedccbc0be6) )
+	ROM_CONTINUE(            0x18000, 0x4000 )
+	ROM_LOAD( "mem6u24.bin", 0x20000, 0x4000, CRC(6642da40) SHA1(6ded7c04d2d57db92c243cc5af6861cb21b782b6) )
+	ROM_CONTINUE(            0x28000, 0x4000 )
+	ROM_LOAD( "mem6u34.bin", 0x30000, 0x4000, CRC(6e230a0a) SHA1(6855ce817feb9bda777c2d07a362722a03288a7b) )
+	ROM_CONTINUE(            0x38000, 0x4000 )
+
+	ROM_LOAD( "mem6u03.bin", 0x04000, 0x4000, CRC(ed5193ce) SHA1(00544213f604a1e7562f407c3e7ac79cba358942) )
+	ROM_CONTINUE(            0x0c000, 0x4000 )
+	ROM_LOAD( "mem6u13.bin", 0x14000, 0x4000, CRC(26e71525) SHA1(ba820aeb7e113439764c254e91ca83023eaf751e) )
+	ROM_CONTINUE(            0x1c000, 0x4000 )
+	ROM_LOAD( "mem6u23.bin", 0x24000, 0x4000, CRC(8ce207c5) SHA1(d3148f27c8285a05a77d222246208161c95a4cde) )
+	ROM_CONTINUE(            0x2c000, 0x4000 )
+	ROM_LOAD( "mem6u33.bin", 0x34000, 0x4000, CRC(ad12a7ae) SHA1(3f39d039c56cb96d065de4fecca98b17ab4cce3d) )
+	ROM_CONTINUE(            0x3c000, 0x4000 )
+
+	ROM_REGION( 0x40000, "8bpp_r", 0)
+	ROM_LOAD( "mem6u09.bin", 0x00000, 0x4000, CRC(117811ec) SHA1(9b6bef611f265e54bbc120726c3b99149cb3ca37) )
+	ROM_CONTINUE(            0x08000, 0x4000 )
+	ROM_LOAD( "mem6u19.bin", 0x10000, 0x4000, CRC(5c9f6c06) SHA1(50973ea0675a037747ef9bb1360ec741d43a0743) )
+	ROM_CONTINUE(            0x18000, 0x4000 )
+	ROM_LOAD( "mem6u29.bin", 0x20000, 0x4000, CRC(e6414c30) SHA1(ec13ae40d0ad7f702c5a41bfca57b3dfef000c13) )
+	ROM_CONTINUE(            0x28000, 0x4000 )
+	ROM_LOAD( "mem6u39.bin", 0x30000, 0x4000, CRC(f61c0b65) SHA1(6872a775212ca36283e517ba7247f2b380fc8dd5) )
+	ROM_CONTINUE(            0x38000, 0x4000 )
+
+	ROM_LOAD( "mem6u08.bin", 0x04000, 0x4000, CRC(b3fb8861) SHA1(de0ebba8ad82dae88f934f91c745e10538e399c7) )
+	ROM_CONTINUE(            0x0c000, 0x4000 )
+	ROM_LOAD( "mem6u18.bin", 0x14000, 0x4000, CRC(4adff11d) SHA1(7217490fa7c1c339e0b4a865007fad44b3f026c3) )
+	ROM_CONTINUE(            0x1c000, 0x4000 )
+	ROM_LOAD( "mem6u28.bin", 0x24000, 0x4000, CRC(7702b849) SHA1(ba1e73a51d855c360fb5501b686f5c168246e18d) )
+	ROM_CONTINUE(            0x2c000, 0x4000 )
+	ROM_LOAD( "mem6u38.bin", 0x34000, 0x4000, CRC(138dbe03) SHA1(338a6ec2e0072f81a70d99ef4ddeb8410e3cdea6) )
+	ROM_CONTINUE(            0x3c000, 0x4000 )
+
+	ROM_REGION( 0x260, "proms", 0)
+	ROM_LOAD( "27s29.u123",    0x0000, 0x0200, CRC(b2e8770e) SHA1(849292a6b30bb0e6547ce3232438136897a651b0) )
+	ROM_LOAD( "6331_snd.u2",   0x0200, 0x0020, CRC(f1328a5e) SHA1(44d4e802988415d24a0b9eaa38300f5add3a2727) )
+	ROM_LOAD( "6331_rom.u74",  0x0220, 0x0020, CRC(7b72b34e) SHA1(bc4d67a6993beb36a161368428e648d0492ac436) )
+	ROM_LOAD( "6331_vid.u155", 0x0240, 0x0020, CRC(63371737) SHA1(f08c03c81322c0de9ee64b4a9f11a1422c5bd463) )
+ROM_END
+
+ROM_START( turbosb6 )
 	ROM_REGION( 0xc0000, "main_code", 0) /* Non-bankswitched, 6809 #0 code */
 	ROM_LOAD( "u85",    0x18000, 0x4000, CRC(d37ccb06) SHA1(445df1caa4dd4901e474bb0903bf28e536edf493) )
 
@@ -1015,4 +1125,5 @@ ROM_END
  *************************************/
 
 GAME( 1985, turbosub, 0,        esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSCA)", GAME_SUPPORTS_SAVE )
-GAME( 1985, turbosba, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", GAME_SUPPORTS_SAVE )
+GAME( 1985, turbosb7, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC7)", GAME_SUPPORTS_SAVE )
+GAME( 1985, turbosb6, turbosub, esripsys, turbosub, esripsys, ROT0, "Entertainment Sciences", "Turbo Sub (prototype rev. TSC6)", GAME_SUPPORTS_SAVE )

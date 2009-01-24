@@ -69,6 +69,7 @@ enum
 	ESRIP_IPTC,
 	ESRIP_XSCALE,
 	ESRIP_YSCALE,
+	ESRIP_BANK,
 	ESRIP_LINE,
 	ESRIP_FIG,
 	ESRIP_ATTR,
@@ -87,7 +88,7 @@ struct _esrip_config_
 	read16_device_func	fdt_r;
 	write16_device_func	fdt_w;
 	UINT8 (*status_in)(running_machine *machine);
-	int (*draw)(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int line_latch);
+	int (*draw)(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
 	const char* const lbrm_prom;
 };
 

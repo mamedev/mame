@@ -220,7 +220,7 @@ WRITE8_HANDLER( esripsys_bg_intensity_w )
 }
 
 /* Draw graphics to a line buffer */
-int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int line_latch)
+int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
 {
 	UINT8 *colour_buf = line_buffer[esripsys__12sel ? 1 : 0].colour_buf;
 	UINT8 *intensity_buf = line_buffer[esripsys__12sel ? 1 : 0].intensity_buf;
@@ -232,6 +232,9 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 	int x_flip = x_scale & 0x80;
 	int xs_typ = x_scale & 0x40;
 	int xs_val = x_scale & 0x3f;
+
+	/* TODO: Check me */
+	addr ^= bank * 0x8000;
 
 	/* Fig is the number of pixels to draw / 2 - 1 */
 	if (xs_typ)

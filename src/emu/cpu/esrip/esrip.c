@@ -87,6 +87,7 @@ typedef struct
 
 	UINT8	x_scale;
 	UINT8	y_scale;
+	UINT8	img_bank;
 	UINT8	line_latch;
 	UINT16	fig_latch;
 	UINT16	attr_latch;
@@ -113,7 +114,7 @@ typedef struct
 	read16_device_func	fdt_r;
 	write16_device_func	fdt_w;
 	UINT8 (*status_in)(running_machine *machine);
-	int (*draw)(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int line_latch);
+	int (*draw)(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
 } esrip_state;
 
 
@@ -288,6 +289,7 @@ static CPU_INIT( esrip )
 	state_save_register_device_item(device, 0, cpustate->status_out);
 	state_save_register_device_item(device, 0, cpustate->x_scale);
 	state_save_register_device_item(device, 0, cpustate->y_scale);
+	state_save_register_device_item(device, 0, cpustate->img_bank);
 	state_save_register_device_item(device, 0, cpustate->line_latch);
 	state_save_register_device_item(device, 0, cpustate->fig_latch);
 	state_save_register_device_item(device, 0, cpustate->attr_latch);
@@ -1781,8 +1783,6 @@ static CPU_EXECUTE( esrip )
 		cpustate->l6 = (in_h >> 16);
 		cpustate->l7 = (in_h >> 24);
 
-//      if (RISING_EDGE(cpustate->pl7, cpustate->l2, 7))
-
 		/* Colour latch */
 		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 0))
 			cpustate->c_latch = (x_bus >> 12) & 0xf;
@@ -1801,19 +1801,19 @@ static CPU_EXECUTE( esrip )
 			cpustate->attr_latch = x_bus;
 
 			cpustate->fig = 1;
-			cpustate->fig_cycles = cpustate->draw(device->machine, cpustate->adl_latch, cpustate->adr_latch, cpustate->fig_latch, cpustate->attr_latch, cpustate->iaddr_latch, cpustate->c_latch, cpustate->x_scale, cpustate->line_latch);
+			cpustate->fig_cycles = cpustate->draw(device->machine, cpustate->adl_latch, cpustate->adr_latch, cpustate->fig_latch, cpustate->attr_latch, cpustate->iaddr_latch, cpustate->c_latch, cpustate->x_scale, cpustate->img_bank);
 		}
 
 		/* X-scale */
 		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 4))
 			cpustate->x_scale = x_bus >> 8;
 
-		/* Y-scale. Something else uses this too? */
+		/* Y-scale and image bank */
 		if (RISING_EDGE(cpustate->pl4, cpustate->l4, 2))
+		{
 			cpustate->y_scale = x_bus & 0xff;
-
-		/* Unknown */
-//      if (RISING_EDGE(cpustate->pl4, cpustate->l4, 7))
+			cpustate->img_bank = (y_bus >> 14) & 3;
+		}
 
 		/* Image ROM address */
 		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 5))
@@ -2059,6 +2059,7 @@ CPU_GET_INFO( esrip )
 		case CPUINFO_STR_REGISTER + ESRIP_IPTC:			sprintf(info->s, "IPTC: %04X", cpustate->ipt_cnt); break;
 		case CPUINFO_STR_REGISTER + ESRIP_XSCALE:		sprintf(info->s, "XSCL: %04X", cpustate->x_scale); break;
 		case CPUINFO_STR_REGISTER + ESRIP_YSCALE:		sprintf(info->s, "YSCL: %04X", cpustate->y_scale); break;
+		case CPUINFO_STR_REGISTER + ESRIP_BANK:			sprintf(info->s, "BANK: %04X", cpustate->img_bank); break;
 		case CPUINFO_STR_REGISTER + ESRIP_LINE:			sprintf(info->s, "LINE: %04X", cpustate->line_latch); break;
 		case CPUINFO_STR_REGISTER + ESRIP_FIG:			sprintf(info->s, "FIG: %04X", cpustate->fig_latch); break;
 		case CPUINFO_STR_REGISTER + ESRIP_ATTR:			sprintf(info->s, "ATTR: %04X", cpustate->attr_latch); break;
