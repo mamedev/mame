@@ -6,6 +6,82 @@ Himeshikibu (C) 1989 Hi-Soft
 
 *****************************************************************************/
 
+/*
+Himeshikibu
+(c)1989 Hi-Soft (distributed by Rollertron)
+
+CPU: Z80x2
+XTAL1: 8.000MHz
+Sound: YM2203C Y3014B
+
+
+MK-P102 (top board)
+
+  -----------CN1-----------  -----------CN2-----------
+A
+B
+C                                       TMM2018D-45 8         |
+D MB8416A-15                    (27512)4            2         |
+E MB8416A-15                    (27512)3            5         J
+                                                    5         A
+F (EPL10P8)I                                                  M
+G (27256)2                                          8 DSW1    M
+J             (EPL10P8)M                            2         A
+K (27256)1                                          5 DSW2    |
+                                                    5         |
+
+L M5M5165P-12L    Z                 Z               O
+M                 8                 8               P
+N 74HC132         0                 0   MB8416A-15  N
+         BATTERY           XTAL1         (27256)5      3014B
+ 1         2      3          4      5        6      7    8
+
+
+ET-P103A (middle board)
+
+  -----------CN4-----------  -----------CN3-----------
+  -----------CN2-----------  -----------CN1-----------
+12
+11
+10       M5M5117          M5M5117
+ 9                                  (EMPTY)   (EMPTY)
+ 8                                  (EMPTY)   (EMPTY)
+ 7                                  (EMPTY)   (EMPTY)
+ 6                                  (EMPTY)   (EMPTY)
+ 5                                  (EMPTY)   (EMPTY)
+ 4                                  (27512)11 (27512)10
+ 3                                  (27512)9  (27512)8
+ 2                                  (27512)7  (27512)6
+ 1
+    J    H    G     F        E   D     C     B     A
+
+
+MK-P101 (bottom board)
+  -----------CN2-----------  -----------CN1-----------
+L
+K     MB8416A-15
+J     MB8416A-15
+H
+G
+F 2   2
+  7   7
+  5   5
+E 1   1
+  2   2
+ (13)(15)
+D              TMM2018D-45
+  2   2
+  7   7
+C 5   5        TMM2018D-45
+  1   1
+  2   2
+B(12)(14)
+
+A                                                   12.000MHz
+  9   8    7        6       5      4      3      2      1
+
+*/
+
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
