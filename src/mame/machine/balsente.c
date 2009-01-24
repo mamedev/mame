@@ -183,7 +183,11 @@ MACHINE_RESET( balsente )
 
 	/* reset the noise generator */
 	memset(noise_position, 0, sizeof(noise_position));
-	memset(cem_device, 0, sizeof(cem_device));
+
+	for (i = 0; i < ARRAY_LENGTH(cem_device); i++)
+	{
+		cem_device[i]=NULL;
+	}
 
 	/* point the banks to bank 0 */
 	numbanks = (memory_region_length(machine, "main") > 0x40000) ? 16 : 8;
