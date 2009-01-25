@@ -8529,7 +8529,12 @@ Other Sun games
 	DRIVER( cmasterb )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
-
+	DRIVER( doge )		/* (c) ?? */
+	DRIVER( dogh )		/* (c) ?? */
+	DRIVER( dogbr )		/* (c) ?? */
+	DRIVER( dog02 )		/* (c) ?? */
+	DRIVER( dog )		/* (c) ?? */
+	
 	/* STG? */
 	DRIVER ( queen )
 

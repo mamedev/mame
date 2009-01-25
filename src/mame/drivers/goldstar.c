@@ -4514,6 +4514,119 @@ ROM_START( nfb96 )
 ROM_END
 
 
+// this set has an encrypted program rom 
+ROM_START( dog )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "dog_08.rom",   0x00000, 0x10000, CRC(357f13e8) SHA1(ca0872c9f7dc44a4c1c342f7f53c490f6342f1d2) )
+		
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "dog_05.rom",   0x00000, 0x08000, CRC(c03b5632) SHA1(4f603ec5218adcbfce09ec6d3643ffb5006056dd) )
+	ROM_LOAD( "dog_06.rom",   0x08000, 0x08000, CRC(c48e5b5c) SHA1(9d79631b54d9915cd161b5028c1be7879254d9be) )
+	ROM_LOAD( "dog_07.rom",   0x10000, 0x08000, CRC(97033c70) SHA1(4d5746f43f8f4d374ba2f31d21defd21921d39bf) )
+		
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "dog_01.rom",	0x0000, 0x2000, CRC(26eb35ce) SHA1(564c775eda7a026841095b210257aea59288f042) )
+	ROM_LOAD( "dog_02.rom",	0x2000, 0x2000, CRC(0e220d8a) SHA1(f84145250785dae78ea5af6388d91ad24b42ff9c) )
+	ROM_LOAD( "dog_03.rom",	0x4000, 0x2000, CRC(01a7ff6f) SHA1(bfb4ad07d99807eadbb0cb85c5a6cf60a5875f2d) )
+	ROM_LOAD( "dog_04.rom",	0x6000, 0x2000, CRC(be31f6fa) SHA1(b522ff520b3fbb34c55c7bb1fe7dfeecd593d6be) )
+	
+	// missing or uses palette ram?
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40, "proms2", ROMREGION_ERASE00 )
+ROM_END
+
+// this appears to contain 2 program roms, neither encrypted..
+
+ROM_START( doge )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "dogd.prg",   0x00000, 0x10000, CRC(000102e0) SHA1(a1824576845b67fbc1a9a16d5aafa6cd000ea4fb) )
+	ROM_LOAD( "dogdptb.prg",0x00000, 0x10000, CRC(0690f915) SHA1(ed2477ba260a421013603017cfd1e1ba5ecd7f4e) ) // alt program?
+		
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "dogd5.rom",   0x00000, 0x08000, CRC(c03b5632) SHA1(4f603ec5218adcbfce09ec6d3643ffb5006056dd) )
+	ROM_LOAD( "dogd6.rom",   0x08000, 0x08000, CRC(c48e5b5c) SHA1(9d79631b54d9915cd161b5028c1be7879254d9be) )
+	ROM_LOAD( "dogd7.rom",   0x10000, 0x08000, CRC(2f03f1e2) SHA1(b221ad7177fcf4d6d65b8ee9c0f5e4289688c707) )
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "dogd1.rom",	0x0000, 0x2000, CRC(0f9f77b1) SHA1(03719f79a39f93f38e4170143a5654bd74596206) )
+	ROM_LOAD( "dogd2.rom",	0x2000, 0x2000, CRC(6ab19916) SHA1(f125365b3c5546d72662cf439311811ae761f225) )
+	ROM_LOAD( "dogd3.rom",	0x4000, 0x2000, CRC(5d4810a5) SHA1(8e9e50c6c7c13010ecb726041a1ac8eccead96ce) )
+	ROM_LOAD( "dogd4.rom",	0x6000, 0x2000, CRC(be31f6fa) SHA1(b522ff520b3fbb34c55c7bb1fe7dfeecd593d6be) )
+	
+	// missing or uses palette ram?
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40, "proms2", ROMREGION_ERASE00 )
+ROM_END
+
+// this contains elephants etc. instead of the usual symbols, maybe
+// it's meant to work with the above program roms?
+ROM_START( dogh )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "program",   0x00000, 0x10000, NO_DUMP ) // ? there was no code in this set
+		
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "dogtai5",   0x00000, 0x08000, CRC(0c8a4afb) SHA1(994295eea7964d60b6a1db911679739a10be9bbe) )
+	ROM_LOAD( "dogtai6",   0x08000, 0x08000, CRC(e9f5dc36) SHA1(6a4060c901f10202fe935701f1f1087c8477da56) )
+	ROM_LOAD( "dogtai7",   0x10000, 0x08000, CRC(73c4c1aa) SHA1(31a70861dc54b442a1e50adf3f013dbc38fbbbb1) )
+	// alt. replacements for roms 5+6??
+	ROM_LOAD( "dogdif5",   0x00000, 0x08000, CRC(a1986e44) SHA1(3178de9c6063c9f33878b6070db95b2eeb12ffea) )
+	ROM_LOAD( "dogdif6",   0x08000, 0x08000, CRC(a5d389fc) SHA1(3db570c938a387708974f24a110cf25b9b52ac22) )
+		
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "dogtai1",	0x0000, 0x2000, CRC(68ed1c26) SHA1(495a8b57c368b0b7c2a618d4f1e980d5187f411a) )
+	ROM_LOAD( "dogtai2",	0x2000, 0x2000, CRC(b5e25d9b) SHA1(9374f7662f92c10ca6d1af570eaa4d161173283f) )
+	ROM_LOAD( "dogtai3",	0x4000, 0x2000, CRC(df13aeb2) SHA1(942f742a722bab44dd3de270001b60d888c44111) )
+	ROM_LOAD( "dogtai4",	0x6000, 0x2000, CRC(170f07ce) SHA1(4b48841f9c5bdf7bfbc05113148666a5bcdd3d35) )
+	
+	// missing or uses palette ram?
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40, "proms2", ROMREGION_ERASE00 )
+ROM_END
+
+// another set with no program roms.. gfx2 roms look mismatched here too.
+ROM_START( dogbr )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "program",   0x00000, 0x10000, NO_DUMP ) // ? there was no code in this set
+		
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "timedog5.rom",   0x00000, 0x08000, CRC(cf05b66d) SHA1(a711a86f2a82dd685a379fda0cf7240b2ca2696e) )
+	ROM_LOAD( "timedog6.rom",   0x08000, 0x08000, CRC(2d81bdbe) SHA1(56eaa9347014340b902d8f0bc38b719acf56c314) )
+	ROM_LOAD( "timedog7.rom",   0x10000, 0x08000, CRC(f8e410e5) SHA1(1edc863902cfb1605aca08f6970f9bd24147ca0b) )
+		
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "timedog1.rom",	0x0000, 0x2000, CRC(d29e0217) SHA1(df978143ed313b33f848e7337097fe29c1fa4506) )
+	ROM_LOAD( "timedog2.rom",	0x2000, 0x2000, CRC(fafb6a51) SHA1(57e79e5efd525cdf5a4475eedfee2c8fc1417b76) )
+	ROM_LOAD( "timedog3.rom",	0x4000, 0x2000, CRC(6f305ac7) SHA1(55f0d73b783854584195658ab4e74770bc13ba0b) )
+	ROM_LOAD( "timedog4.rom",	0x6000, 0x2000, CRC(807a16fc) SHA1(111e7d171f9278abea666d6ad41b02f2c8bf98d8) )
+	ROM_IGNORE(0x2000)
+	
+	// missing or uses palette ram?
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40, "proms2", ROMREGION_ERASE00 )
+ROM_END
+
+// another set with no program roms.. gfx2 roms look mismatched here too.
+ROM_START( dog02 )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "program",   0x00000, 0x10000, NO_DUMP ) // ? there was no code in this set
+		
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "dogmx5",   0x00000, 0x08000, CRC(c03b5632) SHA1(4f603ec5218adcbfce09ec6d3643ffb5006056dd) )
+	ROM_LOAD( "dogmx6",   0x08000, 0x08000, CRC(c48e5b5c) SHA1(9d79631b54d9915cd161b5028c1be7879254d9be) )
+	ROM_LOAD( "dogmx7",   0x10000, 0x08000, CRC(97033c70) SHA1(4d5746f43f8f4d374ba2f31d21defd21921d39bf) )
+		
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "dogmx1",	0x0000, 0x2000, CRC(b72d2c2c) SHA1(faf60ca0f522868e6dbf7c3ace5c84d8fd001df3) )
+	ROM_LOAD( "dogmx2",	0x2000, 0x2000, CRC(a85f5516) SHA1(1564e6c490883c96bffc561d9115eb53450945ce) )
+	ROM_LOAD( "dogmx3",	0x4000, 0x2000, CRC(f1a8aea8) SHA1(c20b779a73856d94e862d87ad337c9501da86691) )
+	ROM_LOAD( "dogmx4",	0x6000, 0x2000, CRC(be31f6fa) SHA1(b522ff520b3fbb34c55c7bb1fe7dfeecd593d6be) )
+		
+	// missing or uses palette ram?
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40, "proms2", ROMREGION_ERASE00 )
+ROM_END
+
+
 
 static DRIVER_INIT(goldstar)
 {
@@ -4746,6 +4859,17 @@ GAME( 198?, ladylinr, 0,        ladylinr, ladylinr, 0,        ROT0, "TAB Austria
 GAME( 198?, kkojnoli, 0,        kkojnoli, kkojnoli, 0,        ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",              GAME_IMPERFECT_COLORS )
 
 GAME( 198?, mtonic,   0,        ncb3,     cmv801,   0,        ROT0, "Tonic",             "Magical Tonic?",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
+
+// some of these have no program roms, they might be graphic swaps, mcu based, or just incomplete..
+//  the graphic roms also appear to be mismatched in some cases (planes of different gfx)
+//  so these will need a big cleanup at some point
+GAME( 199?, dog,      0,       ncb3,     cmv801,   0,        ROT0, "unknown",             "Time Dog? (set 1)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING ) // no code...
+GAME( 199?, doge,     dog,     ncb3,     cmv801,   0,        ROT0, "unknown",             "Time Dog? (set 2)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 199?, dogh,     dog,     ncb3,     cmv801,   0,        ROT0, "unknown",             "Time Dog? (set 3)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING ) // no code...
+GAME( 199?, dogbr,    dog,     ncb3,     cmv801,   0,        ROT0, "unknown",             "Time Dog? (set 4)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING ) // no code...
+GAME( 199?, dog02,    dog,     ncb3,     cmv801,   0,        ROT0, "unknown",             "Time Dog? (set 5)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING ) // no code...
+
+
 
 // bootlegs of cherry master?
 GAME( 1998, schery98, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
