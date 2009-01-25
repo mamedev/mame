@@ -7,7 +7,9 @@ a.k.a. same Jangou blitter but with NCS CPU for displaying graphics as protectio
 preliminary driver by David Haywood & Angelo Salese
 
 TODO:
--Get the other three games to boot;
+-Get Night Gal Summer to boot;
+-Fix Sweet Gal/Sexy Gal gfxs if necessary (i.e. if the bugs aren't all caused by irq/nmi
+ wrong firing);
 -Proper Z80<->MCU comms,many video problems because of that;
 -Abstract the video chip to a proper video file and get the name of that chip;
 
@@ -15,6 +17,7 @@ TODO:
 
 #include "driver.h"
 #include "sound/ay8910.h"
+#include "sound/2203intf.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 
@@ -135,6 +138,60 @@ static WRITE8_HANDLER(nsc_true_blitter_w )
 					else count++;
 				}
 			}
+		}
+	}
+}
+
+static WRITE8_HANDLER( sexygal_nsc_true_blitter_w )
+{
+	static UINT8 true_blit[7];
+
+	int src,x,y,h,w, flipx;
+	true_blit[offset] = data;
+
+	/*trigger blitter write to ram,might not be correct...*/
+	if(offset == 6)
+	{
+      //printf("%02x %02x %02x %02x %02x %02x %02x\n",true_blit[0],true_blit[1],true_blit[2],true_blit[3],true_blit[4],true_blit[5],true_blit[6]);
+		w = (true_blit[5] & 0xff)+1;
+		h = (true_blit[6] & 0xff)+1;
+		src = ((true_blit[1]<<8)|(true_blit[0]<<0));
+		src |= (true_blit[2]&3)<<16;
+
+
+		x = (true_blit[3] & 0xff);
+		y = (true_blit[4] & 0xff);
+
+		// lowest bit of src controls flipping / draw direction?
+		flipx=(true_blit[0] & 1);
+
+		if (!flipx) src += (w*h)-1;
+		else src -= (w*h)-1;
+
+		{
+			int count = 0;
+			int xcount,ycount;
+			for(ycount=0;ycount<h;ycount++)
+			{
+				for(xcount=0;xcount<w;xcount++)
+				{
+					int drawx = (x+xcount) & 0xff;
+					int drawy = (y+ycount) & 0xff;
+					UINT8 dat = nightgal_gfx_nibble(space->machine,src+count);
+					UINT8 cur_pen_hi = pen_data[(dat & 0xf0)>>4];
+					UINT8 cur_pen_lo = pen_data[(dat & 0x0f)>>0];
+
+					dat = cur_pen_lo | cur_pen_hi<<4;
+
+					if((dat & 0xff) != 0)
+						plot_nightgal_gfx_pixel(dat, drawx,drawy);
+
+					if (!flipx)	count--;
+					else count++;
+				}
+			}
+			//printf("%02x %02x %02x %02x %02x %02x %02x\n",true_blit[0],true_blit[1],true_blit[2],true_blit[3],true_blit[4],true_blit[5],true_blit[6]);
+			//cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
 		}
 	}
 }
@@ -305,6 +362,10 @@ static READ8_HANDLER( input_2p_r )
 *
 ********************************************/
 
+/********************************
+* Night Gal
+********************************/
+
 static ADDRESS_MAP_START( nightgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc100, 0xc100) AM_READ(nsc_latch_r)
@@ -340,6 +401,43 @@ static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1300, 0x130f) AM_READ(blit_vregs_r)
 //  AM_RANGE(0x1000, 0xdfff) AM_ROM AM_REGION("gfx1", 0 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_WRITENOP
+ADDRESS_MAP_END
+
+/********************************
+* Sexy Gal
+********************************/
+
+static ADDRESS_MAP_START( sexygal_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x807f) AM_RAM AM_SHARE(2)
+//	AM_RANGE(0xa000, 0xa000) AM_WRITE(nsc_latch_w) //???
+	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sexygal_io, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00,0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x01,0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+//	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
+	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
+	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA")
+	AM_RANGE(0x12,0x12) AM_READ_PORT("DSWA")
+	AM_RANGE(0x13,0x13) AM_READ_PORT("DSWB")
+	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
+	AM_RANGE(0x12,0x14) AM_WRITE(blitter_w) //data for the nsc to be processed
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sexygal_nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
+	AM_RANGE(0x0081, 0x0083) AM_READ(nsc_blit_r)
+	AM_RANGE(0x0080, 0x0086) AM_WRITE(sexygal_nsc_true_blitter_w)
+
+	AM_RANGE(0x00a0, 0x00af) AM_WRITE(blit_true_vregs_w)
+
+	AM_RANGE(0x1000, 0x103f) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
 /********************************************
@@ -614,12 +712,23 @@ static MACHINE_DRIVER_START( nightgal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
-/*TODO*/
 static MACHINE_DRIVER_START( sexygal )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( nightgal )
-//  MDRV_CPU_MODIFY("main")
-//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+  	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(0,sexygal_map)
+	MDRV_CPU_IO_MAP(0,sexygal_io)
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
+
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_PROGRAM_MAP(sexygal_nsc_map, 0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+	MDRV_SOUND_REMOVE("ay")
+
+	MDRV_SOUND_ADD("ym", YM2203, MASTER_CLOCK / 8)
+	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
 
@@ -906,6 +1015,7 @@ GAME( 1984, nightgal, 0,       nightgal, sexygal,  0, ROT0,"Nichibutsu", "Night 
 GAME( 1984, ngtbunny, 0,       nightgal, sexygal,  0, ROT0,"Nichibutsu", "Night Bunny (Japan 840601 MRN 2-10)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 GAME( 1984, royalngt, ngtbunny,nightgal, sexygal,  0, ROT0,"Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 /* Type 2 HW*/
-GAME( 1985, sexygal,  0,       sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Sexy Gal", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
-GAME( 1985, sweetgal, sexygal, sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Sweet Gal", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1985, sexygal,  0,       sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1985, sweetgal, sexygal, sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+/* Type 3 HW*/
 GAME( 1985, ngalsumr, 0,       sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Night Gal Summer", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
