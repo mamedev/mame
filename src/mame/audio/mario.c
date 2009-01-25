@@ -145,8 +145,8 @@ static DISCRETE_SOUND_START(mario)
 	/************************************************/
 
 	/* DISCRETE_INPUT_DATA */
-    DISCRETE_INPUT_NOT(DS_SOUND0_INV)
-    DISCRETE_INPUT_NOT(DS_SOUND1_INV)
+    DISCRETE_INPUT_PULSE(DS_SOUND0_INV, 1)
+    DISCRETE_INPUT_PULSE(DS_SOUND1_INV, 1)
     DISCRETE_INPUT_NOT(DS_SOUND7_INV)
     DISCRETE_INPUT_DATA(DS_DAC)
 
@@ -229,7 +229,7 @@ static DISCRETE_SOUND_START(mario)
 	// EZV20 equivalent filter circuit ...
 	DISCRETE_CRFILTER(NODE_296,1,NODE_295, RES_K(1), CAP_U(4.7))
 	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 2)
-	//DISCRETE_WAVELOG2(NODE_296, 32767/5.0 * 2, DS_SOUND0_INV, 10000)
+	DISCRETE_WAVELOG2(NODE_296, 32767/5.0 * 2, DS_SOUND0_INV, 10000)
 	//DISCRETE_WAVELOG2(NODE_296, 32767/5.0 * 2, DS_SOUND7_INV, 10000)
 
 DISCRETE_SOUND_END
@@ -375,16 +375,18 @@ WRITE8_HANDLER( mario_sh_tuneselect_w )
 	soundlatch_w(space,offset,data);
 }
 
+/* Sound 0 and 1 are pulsed !*/
+
 /* Mario running sample */
 WRITE8_HANDLER( mario_sh1_w )
 {
-	discrete_sound_w(space,DS_SOUND0_INP,data & 1);
+	discrete_sound_w(space,DS_SOUND0_INP, 0);
 }
 
 /* Luigi running sample */
 WRITE8_HANDLER( mario_sh2_w )
 {
-	discrete_sound_w(space,DS_SOUND1_INP,data & 1);
+	discrete_sound_w(space,DS_SOUND1_INP, 0);
 }
 
 /* Misc samples */
