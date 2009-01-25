@@ -43,11 +43,11 @@ static attotime compute_duration(ttl74123_t *chip)
 	switch (chip->intf->connection_type)
 	{
 	case TTL74123_NOT_GROUNDED_NO_DIODE:
-		duration = 0.28 * chip->intf->res * chip->intf->cap * (1.0 + (0.7 / chip->intf->res));
+		duration = 0.28 * chip->intf->res * chip->intf->cap * (1.0 + (700.0 / chip->intf->res));
 		break;
 
 	case TTL74123_NOT_GROUNDED_DIODE:
-		duration = 0.25 * chip->intf->res * chip->intf->cap * (1.0 + (0.7 / chip->intf->res));
+		duration = 0.25 * chip->intf->res * chip->intf->cap * (1.0 + (700.0 / chip->intf->res));
 		break;
 
 	case TTL74123_GROUNDED:
