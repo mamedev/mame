@@ -4474,6 +4474,46 @@ ROM_START( schery97 )
 	ROM_LOAD( "sc97t.bin", 0x00000, 0x20000, CRC(8598b059) SHA1(9e031e30e58a9c1b3d029004ee0f1616711fa2ae) )
 ROM_END
 
+// this might be 4 different sets (2 fruit bonus, 2 fruit bonus 'se')
+//  will need figuring out once the program roms have been decrypted
+ROM_START( nfb96 )
+	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "fb362c1.bin", 0x00000, 0x10000, CRC(5054418a) SHA1(a4bfe05b0eb3476651c06cb9ff78051e55c943c5) )
+	ROM_LOAD( "fb363c1.bin", 0x10000, 0x10000, CRC(ddc22974) SHA1(86f5d4d32f69d054ee1b444e2c4d470603e0391c) ) // ?? alt program?
+	ROM_LOAD( "fbse354.bin", 0x00000, 0x10000, CRC(89dd3290) SHA1(040aa1daae58a38db66a046a4379975e014a2598) ) // ?? alt program?
+	ROM_LOAD( "fbse362.bin", 0x10000, 0x10000, CRC(aa2576f2) SHA1(b6f0d6078dee01b90e08c09008f299439768c266) ) // ?? alt program?
+
+	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
+	ROM_LOAD( "fb96seh.bin",  0x00000, 0x10000, CRC(12042a0a) SHA1(4bc5f87f4b92f303fef100bf16e3d7b27670b793) )
+	ROM_LOAD( "fb96sel.bin",  0x10000, 0x10000, CRC(d611f10b) SHA1(425cad584e85f21de214bf978555a7811b13aa35) )
+	// alt graphics.. different copyright?
+	ROM_LOAD( "fbseh.bin",  0x00000, 0x10000, CRC(2fc10ce7) SHA1(a2418cfbe7ed217848ace8ea06587bcaa6b2c8f2) )
+	ROM_LOAD( "fbsel.bin",  0x10000, 0x10000, CRC(fb9d679a) SHA1(a4f6246bdbbf2e25f702006b30a62bc7873137de) )
+		
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
+	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+
 
 static DRIVER_INIT(goldstar)
 {
@@ -4709,7 +4749,8 @@ GAME( 198?, mtonic,   0,        ncb3,     cmv801,   0,        ROT0, "Tonic",    
 
 // bootlegs of cherry master?
 GAME( 1998, schery98, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
-GAME( 1998, schery97, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '97",                       GAME_NOT_WORKING )
+GAME( 1997, schery97, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '97",                       GAME_NOT_WORKING )
+GAME( 1996, nfb96,    0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "New Fruit Bonus '96",                       GAME_NOT_WORKING )
 
 /* possible stealth sets:
 

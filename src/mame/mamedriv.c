@@ -8550,6 +8550,7 @@ Other Sun games
 
 	DRIVER( schery98 )	/* (c) 1998 Amcoe */
 	DRIVER( schery97 )	/* (c) 1998 Amcoe */
+	DRIVER( nfb96 )		/* (c) 1996 Amcoe */
 	DRIVER( sfbonus )	/* (c) 199? Amcoe */
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
