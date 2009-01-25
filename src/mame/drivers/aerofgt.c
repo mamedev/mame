@@ -91,9 +91,9 @@ static WRITE16_HANDLER( turbofrc_sound_command_w )
 
 static WRITE16_HANDLER( aerfboot_soundlatch_w )
 {
-	if(data & 0x8000)
+	if(ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space,0,data & 0xff);
+		soundlatch_w(space,0,(data>>8) & 0xff);
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -133,6 +133,20 @@ static WRITE16_HANDLER( pspikesb_oki_banking_w )
 	okim6295_set_bank_base(0, 0x40000 * (data & 3));
 }
 
+/*TODO: sound banking. */
+static WRITE16_HANDLER( aerfboo2_okim6295_banking_w )
+{
+//	if(ACCESSING_BITS_8_15)
+//		okim6295_set_bank_base(0, 0x40000 * ((data & 0xf00)>>8));
+}
+
+static WRITE8_HANDLER( aerfboot_okim6295_banking_w )
+{
+	UINT8 *oki = memory_region(space->machine, "oki");
+	/*bit 2 (0x4) setted too?*/
+	if(data & 0x4)
+		memcpy(&oki[0x20000], &oki[((data & 0x3)*0x20000) + 0x40000], 0x20000);
+}
 
 static ADDRESS_MAP_START( pspikes_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -320,12 +334,15 @@ static ADDRESS_MAP_START( aerfboot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0fe004, 0x0fe005) AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0x0fe006, 0x0fe007) AM_WRITE(aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0fe008, 0x0fe00b) AM_WRITE(turbofrc_gfxbank_w)
+	AM_RANGE(0x0fe00e, 0x0fe00f) AM_WRITE(aerfboot_soundlatch_w)
 	AM_RANGE(0x0fe010, 0x0fe011) AM_WRITENOP
-	AM_RANGE(0x0fe012, 0x0fe013) AM_WRITE(aerfboot_soundlatch_w)
+	AM_RANGE(0x0fe012, 0x0fe013) AM_WRITENOP
 	AM_RANGE(0x0fe400, 0x0fe401) AM_WRITENOP
 	AM_RANGE(0x0fe402, 0x0fe403) AM_WRITENOP
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* used only for the scroll registers */
+	AM_RANGE(0x100000, 0x107fff) AM_WRITENOP
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	AM_RANGE(0x10c000, 0x117fff) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aerfboo2_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -346,10 +363,13 @@ static ADDRESS_MAP_START( aerfboo2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0fe004, 0x0fe005) AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0x0fe006, 0x0fe007) AM_WRITE(aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0fe008, 0x0fe00b) AM_WRITE(turbofrc_gfxbank_w)
-	AM_RANGE(0x0fe010, 0x0fe011) AM_WRITENOP
+	AM_RANGE(0x0fe006, 0x0fe007) AM_READ(okim6295_status_0_msb_r)
+	AM_RANGE(0x0fe00e, 0x0fe00f) AM_WRITE(okim6295_data_0_msb_w)
+	AM_RANGE(0x0fe01e, 0x0fe01f) AM_WRITE(aerfboo2_okim6295_banking_w)
+//	AM_RANGE(0x0fe010, 0x0fe011) AM_WRITENOP
 //  AM_RANGE(0x0fe012, 0x0fe013) AM_WRITE(aerfboot_soundlatch_w)
-	AM_RANGE(0x0fe400, 0x0fe401) AM_WRITENOP
-	AM_RANGE(0x0fe402, 0x0fe403) AM_WRITENOP
+	AM_RANGE(0x0fe400, 0x0fe401) AM_WRITENOP // data for a crtc?
+	AM_RANGE(0x0fe402, 0x0fe403) AM_WRITENOP // address for a crtc?
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* used only for the scroll registers */
 ADDRESS_MAP_END
 
@@ -399,6 +419,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aerfboot_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(aerfboot_okim6295_banking_w)
+	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -2356,12 +2378,9 @@ ROM_START( aerfboot )
 	ROM_LOAD( "afb_ep13.td",  0x000000, 0x40000, CRC(1830f70c) SHA1(1759de9b56e4999defc08b2423eff38ec98c4f17) )
 	ROM_LOAD( "afb_ep11.tb",  0x040000, 0x40000, CRC(6298c0eb) SHA1(ede63849973742c67637eac0ec9cda95ea2ecebc) )
 
-	ROM_REGION( 0x140000, "oki", ROMREGION_ERASEFF ) /* sound samples */
+	ROM_REGION( 0xc0000, "oki", ROMREGION_ERASEFF ) /* sound samples */
 	ROM_LOAD( "afb_ep5.u29",  0x000000, 0x20000, CRC(3559609a) SHA1(6f0b633bf74f41487fc98dcdc43a83eb67f3d14c) )
-	ROM_LOAD( "afb_ep4.u30",  0x040000, 0x20000, CRC(f9652163) SHA1(d8c1fcf44b350cc65378869e4eb188ea232b4948) )
-	ROM_CONTINUE(			  0x080000, 0x20000 )
-	ROM_CONTINUE(			  0x0c0000, 0x20000 )
-	ROM_CONTINUE(			  0x100000, 0x20000 )
+	ROM_LOAD( "afb_ep4.u30",  0x040000, 0x80000, CRC(f9652163) SHA1(d8c1fcf44b350cc65378869e4eb188ea232b4948) )
 ROM_END
 
 ROM_START( aerfboo2 )
@@ -2383,10 +2402,9 @@ ROM_START( aerfboo2 )
 	ROM_LOAD32_BYTE( "g4"        ,   0x000002, 0x80000, CRC(97725694) SHA1(59316e4be043e0b7111c6777b36bcfd39c899e72) )
 	ROM_LOAD32_BYTE( "g3"        ,   0x000003, 0x80000, CRC(7be8cef0) SHA1(b227252fd288e8eb06507397f3ad625465dc1b0a) )
 
-	ROM_REGION( 0x100000, "oki", 0 ) /* sound samples */
+	ROM_REGION( 0x100000, "oki", ROMREGION_ERASEFF ) /* sound samples */
 	ROM_LOAD( "s2"        ,     0x00000, 0x80000, CRC(2e316ee8) SHA1(a163dddee6d8cfd1286059ee561e3a01df49381b) )
 	ROM_LOAD( "s1"        ,     0x80000, 0x80000, CRC(9e09813d) SHA1(582a36b5a46f4d8eaedca22e583b6949535d24a5) )
-
 ROM_END
 
 ROM_START( wbbc97 )
@@ -2437,6 +2455,6 @@ GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt,  0, ROT270, "Video System Co.
 GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Sonic Wings (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_NO_SOUND )
-GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_NO_SOUND )
+GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 GAME( 1997, wbbc97,   0,        wbbc97,   wbbc97,   0, ROT0,   "Comad",            "Beach Festival World Championship 1997", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
