@@ -2183,9 +2183,12 @@ const game_driver * const drivers[] =
 	DRIVER( bgaregnv )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgaregt2 )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgaregcn )	/* (c) 1996 Raizing/8ing */
-	DRIVER( batrider )	/* (c) 1998 Raizing/8ing */
-	DRIVER( batridra )	/* (c) 1998 Raizing/8ing */
-	DRIVER( batridrk )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batrid )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batridu )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batridc )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batridj )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batridk )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batridja )	/* (c) 1998 Raizing/8ing */	
 	DRIVER( bbakraid )	/* (c) 1999 8ing */
 	DRIVER( bbakradu )	/* (c) 1999 8ing */
 
