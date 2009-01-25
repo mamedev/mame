@@ -66,8 +66,8 @@
       and some reads that drive the note displayed?)
     - Dump/decap/trojan the MCU in the later games (magic102, suprpool, hotslot, mcolors).
       The MCU shares memory addresses at $500000-$50001f (in magic102)
-      and it can't be simulated since the game logic is all in there,including
-      rngs for the cards and combinations for the points.
+      It can't be simulated with a high level of confidence because all the game logic is
+	  in there, including rngs for the cards and combinations for the points.
     - Priorities,likely to be hardwired with the color writes (0=tile has the
       highest priority).
 
