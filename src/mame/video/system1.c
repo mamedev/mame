@@ -362,11 +362,9 @@ WRITE8_HANDLER( system1_backgroundram_w )
 }
 
 
-static int system1_draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
+static void system1_draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int sx,sy,offs;
-	int drawn = 0;
-
 
 	priority <<= 3;
 
@@ -390,21 +388,15 @@ static int system1_draw_fg(running_machine *machine, bitmap_t *bitmap, const rec
 			}
 
 			code %= machine->gfx[0]->total_elements;
-			if (machine->gfx[0]->pen_usage[code] & ~1)
-			{
-				drawn = 1;
-
-				drawgfx(bitmap,machine->gfx[0],
-						code,
-						color,
-						flip_screen_get(machine),flip_screen_get(machine),
-						8*sx + blockgal_kludgeoffset,8*sy,
-						cliprect,TRANSPARENCY_PEN,0);
-			}
+			
+			drawgfx(bitmap,machine->gfx[0],
+					code,
+					color,
+					flip_screen_get(machine),flip_screen_get(machine),
+					8*sx + blockgal_kludgeoffset,8*sy,
+					cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
-
-	return drawn;
 }
 
 static void system1_draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
@@ -523,13 +515,9 @@ static void system1_draw_bg(running_machine *machine, bitmap_t *bitmap, const re
 
 VIDEO_UPDATE( system1 )
 {
-	int drawn;
-
-
 	system1_draw_bg(screen->machine, bitmap, cliprect, -1);
-	drawn = system1_draw_fg(screen->machine, bitmap, cliprect, 0);
-	/* redraw low priority bg tiles if necessary */
-	if (drawn) system1_draw_bg(screen->machine, bitmap, cliprect, 0);
+	system1_draw_fg(screen->machine, bitmap, cliprect, 0);
+	system1_draw_bg(screen->machine, bitmap, cliprect, 0);
 	draw_sprites(screen->machine, bitmap);
 	system1_draw_bg(screen->machine, bitmap, cliprect, 1);
 	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
@@ -664,13 +652,9 @@ static void chplft_draw_bg(running_machine *machine, bitmap_t *bitmap, const rec
 
 VIDEO_UPDATE( choplifter )
 {
-	int drawn;
-
-
 	chplft_draw_bg(screen->machine, bitmap, cliprect, -1);
-	drawn = system1_draw_fg(screen->machine, bitmap, cliprect, 0);
-	/* redraw low priority bg tiles if necessary */
-	if (drawn) chplft_draw_bg(screen->machine, bitmap, cliprect, 0);
+	system1_draw_fg(screen->machine, bitmap, cliprect, 0);
+	chplft_draw_bg(screen->machine, bitmap, cliprect, 0);
 	draw_sprites(screen->machine, bitmap);
 	chplft_draw_bg(screen->machine, bitmap, cliprect, 1);
 	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
@@ -884,15 +868,11 @@ VIDEO_UPDATE( ufosensi )
 
 VIDEO_UPDATE( blockgal )
 {
-	int drawn;
-
-
 	blockgal_kludgeoffset = -8;
 
 	system1_draw_bg(screen->machine, bitmap, cliprect, -1);
-	drawn = system1_draw_fg(screen->machine, bitmap, cliprect, 0);
-	/* redraw low priority bg tiles if necessary */
-	if (drawn) system1_draw_bg(screen->machine, bitmap, cliprect, 0);
+	system1_draw_fg(screen->machine, bitmap, cliprect, 0);
+	system1_draw_bg(screen->machine, bitmap, cliprect, 0);
 	draw_sprites(screen->machine, bitmap);
 	system1_draw_bg(screen->machine, bitmap, cliprect, 1);
 	system1_draw_fg(screen->machine, bitmap, cliprect, 1);

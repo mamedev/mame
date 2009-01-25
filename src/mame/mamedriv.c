@@ -3446,7 +3446,8 @@ V-V                           TP-027
 	DRIVER( wboysys2 )      /* 834-5984  (c) 1986 + Escape license (S1) */
 	DRIVER( gardia )	/* 834-6119 (S2?) */
 	DRIVER( gardiab )	/* bootleg */
-	DRIVER( noboranb )	/* bootleg */
+	DRIVER( nob )		/* (c) Data East */
+	DRIVER( nobb )		/* bootleg */
 	DRIVER( blockgal )	/* 834-6303 (S1) */
 	DRIVER( blckgalb )	/* bootleg */
 	DRIVER( tokisens )	/* (c) 1987 (from a bootleg board) (S2) */

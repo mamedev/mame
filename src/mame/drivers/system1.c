@@ -15,7 +15,7 @@ DIP locations verified from manual for:
 TODO: - background is misplaced in wbmlju
       - sprites stick in Pitfall II
       - sprite priorities are probably wrong
-      - remove patch in noboranb if possible and fully understand the
+      - remove patch in nobb if possible and fully understand the
         ports involved in the protection
 
 ******************************************************************************/
@@ -48,50 +48,49 @@ static MACHINE_RESET( wbml )
 	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
-// Noboranka: there seems to be some protection? involving reads / writes to ports in the 2x region
+// nobb - these ports are used for some kind of replacement protection system used by the bootleg
+static int nobb_inport16_step,nobb_inport17_step,nobb_inport23_step;
 
-static int inport16_step,inport17_step,inport23_step;
-
-static READ8_HANDLER( inport16_r )
+static READ8_HANDLER( nobb_inport16_r )
 {
-//  logerror("IN  $16 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),inport16_step);
-	return(inport16_step);
+//  logerror("IN  $16 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),nobb_inport16_step);
+	return(nobb_inport16_step);
 }
 
-static READ8_HANDLER( inport1c_r )
+static READ8_HANDLER( nobb_inport1c_r )
 {
 //  logerror("IN  $1c : pc = %04x - data = 0x80\n",cpu_get_pc(space->cpu));
 	return(0x80);	// infinite loop (at 0x0fb3) until bit 7 is set
 }
 
-static READ8_HANDLER( inport22_r )
+static READ8_HANDLER( nobb_inport22_r )
 {
-//  logerror("IN  $22 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),inport17_step);
-	return(inport17_step);
+//  logerror("IN  $22 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),nobb_inport17_step);
+	return(nobb_inport17_step);
 }
 
-static READ8_HANDLER( inport23_r )
+static READ8_HANDLER( nobb_inport23_r )
 {
-//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(space->cpu),inport23_step);
-	return(inport23_step);
+//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(space->cpu),nobb_inport23_step);
+	return(nobb_inport23_step);
 }
 
-static WRITE8_HANDLER( outport16_w )
+static WRITE8_HANDLER( nobb_outport16_w )
 {
 //  logerror("OUT $16 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
-	inport16_step = data;
+	nobb_inport16_step = data;
 }
 
-static WRITE8_HANDLER( outport17_w )
+static WRITE8_HANDLER( nobb_outport17_w )
 {
 //  logerror("OUT $17 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
-	inport17_step = data;
+	nobb_inport17_step = data;
 }
 
-static WRITE8_HANDLER( outport24_w )
+static WRITE8_HANDLER( nobb_outport24_w )
 {
 //  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
-	inport23_step = data;
+	nobb_inport23_step = data;
 }
 
 static WRITE8_HANDLER( hvymetal_videomode_w )
@@ -325,7 +324,7 @@ static ADDRESS_MAP_START( sht_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("GUNY")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nobo_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nob_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("P2")
@@ -334,12 +333,25 @@ static ADDRESS_MAP_START( nobo_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")		/* DIP1 some games read it from here... */
 	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)	/* sound commands ? */
 	AM_RANGE(0x15, 0x15) AM_READWRITE(system1_videomode_r, brain_videomode_w)	/* video control + bank switching */
-	AM_RANGE(0x16, 0x16) AM_READWRITE(inport16_r, outport16_w)	/* Used - check code at 0x05cb */
-	AM_RANGE(0x17, 0x17) AM_WRITE(outport17_w)		/* Not handled in emul. of other SS1/2 games */
-	AM_RANGE(0x1c, 0x1c) AM_READ(inport1c_r)		/* Shouldn't be called ! */
-	AM_RANGE(0x22, 0x22) AM_READ(inport22_r)		/* Used - check code at 0xb253 */
-	AM_RANGE(0x23, 0x23) AM_READ(inport23_r)		/* Used - check code at 0xb275 and 0xb283 */
-	AM_RANGE(0x24, 0x24) AM_WRITE(outport24_w)			/* Used - check code at 0xb24e and 0xb307 */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( nobb_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("P2")
+	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")		/* DIP2 */
+	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")		/* DIP1 some games read it from here... */
+	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)	/* sound commands ? */
+	AM_RANGE(0x15, 0x15) AM_READWRITE(system1_videomode_r, brain_videomode_w)	/* video control + bank switching */
+	
+	/* protection on the bootleg */
+	AM_RANGE(0x16, 0x16) AM_READWRITE(nobb_inport16_r, nobb_outport16_w)	/* Used - check code at 0x05cb */
+	AM_RANGE(0x17, 0x17) AM_WRITE(nobb_outport17_w)		/* Not handled in emul. of other SS1/2 games */
+	AM_RANGE(0x1c, 0x1c) AM_READ(nobb_inport1c_r)		/* Shouldn't be called ! */
+	AM_RANGE(0x22, 0x22) AM_READ(nobb_inport22_r)		/* Used - check code at 0xb253 */
+	AM_RANGE(0x23, 0x23) AM_READ(nobb_inport23_r)		/* Used - check code at 0xb275 and 0xb283 */
+	AM_RANGE(0x24, 0x24) AM_WRITE(nobb_outport24_w)			/* Used - check code at 0xb24e and 0xb307 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hvymetal_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1157,7 +1169,7 @@ static INPUT_PORTS_START( wboyu )
 	PORT_DIPSETTING(	0x00, "Endless Game" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( noboranb )
+static INPUT_PORTS_START( nob )
 	PORT_INCLUDE( system1_generic )
 
 	PORT_MODIFY("P1")
@@ -1731,14 +1743,29 @@ static MACHINE_DRIVER_START( shtngmst )
 
 MACHINE_DRIVER_END
 
-
-static MACHINE_DRIVER_START( noboranb )
+static MACHINE_DRIVER_START( nob )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_REPLACE( "main", Z80, 8000000)    /* ? guess ? */
+	MDRV_CPU_REPLACE( "main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,nobo_writemem)
-	MDRV_CPU_IO_MAP(nobo_io_map,0)
+	MDRV_CPU_IO_MAP(nob_io_map,0)
+
+	MDRV_MACHINE_RESET(system1_banked)
+
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
+
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( nobb )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM( system1 )
+	MDRV_CPU_REPLACE( "main", Z80, 4000000)
+	MDRV_CPU_PROGRAM_MAP(brain_readmem,nobo_writemem)
+	MDRV_CPU_IO_MAP(nobb_io_map,0)
 
 	MDRV_MACHINE_RESET(system1_banked)
 
@@ -3909,7 +3936,119 @@ ROM_START( ufosensb )
 	ROM_LOAD( "pal20r4.ic69.4c", 0x1000, 0x0144, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-ROM_START( noboranb )
+/*
+
+Noboranka
+Data East, 1986
+
+PCB Layout
+----------
+
+Top
+
+DE-0222-2                           /-Sub PCB on top
+|-------------------------------|--/-----------|
+| DSW2   PK-2                   |              |
+| DSW1                          |              |
+|                             6116             |
+|                             6116             |
+|        20MHz                  |              |
+|J                            DM02             |
+|A                            DM01-------------|
+|M       8255                 DM00             |
+|M  DM03 Z80A                                  |
+|A  6116                                       |
+|                                              |
+|                                         DC-11|
+|  76489                                       |
+|  76489         *DM-12.IC3               PK-1 |
+|MB3730 VOL 8MHz *DM-11       6116             |
+|----------------------------------------------|
+Notes:
+      * - These parts below PCB on a small sub-board DE-0271-0
+      PK1/PK2/DM-11 - PALs
+      DC-11/DM-12 - 82S129 PROMs
+      Z80A clock - 4.00MHz [20/5]
+      76489 clock - 2.00MHz [8/4]
+      VSync - 60.095Hz
+      HSync - 15.444kHz
+
+
+Sub PCB
+
+DE-0272-0
+|---------------|
+|               |
+|               |
+| 8751H         |
+|               |
+|8MHz           |
+|               |
+|---------------|
+8751 clock - 8.000MHz, labelled 'DM'
+
+
+Bottom
+
+DE-0223-2
+|----------------------------------------------|
+|          DECO_291-0  Z80B                    |
+|                                              |
+|    PK-3          TC15G008AP                  |
+|                                       CXK5864|
+|    PK-4      DM04        TMM2018             |
+|                                         DM08 |
+|              DM05        TMM2018             |
+|                                         DM09 |
+|              DM06                            |
+|                                         DM10 |
+|              DM07                            |
+|                            8147       8147   |
+|                                              |
+|                   CXK5814  2148              |
+|                   CXK5814  2148              |
+|----------------------------------------------|
+Notes:
+      PK3/PK4 - PALS
+      DECO_291-0 - Custom DIP28
+      TC15G008AP - Gate Array DIP48
+      Z80B clock - 4.00MHz [20/5]
+
+*/
+
+ROM_START( nob )
+	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "dm08.1f", 0x00000, 0x8000, CRC(98d602d6) SHA1(a0f1e6d243f2e07703bb641434dce46d0ddc15ae) )
+	ROM_LOAD( "dm10.1k", 0x10000, 0x8000, CRC(e7c06663) SHA1(8ae42b0875afe60ef672f2285aeb72da1c7e167b) )
+	ROM_LOAD( "dm09.1h", 0x18000, 0x8000, CRC(dc4c872f) SHA1(aab85203cfd2463ffddfd48e87733fb8d6d8bcf6) )
+
+	ROM_REGION( 0x8000, "mcu", 0 )
+	ROM_LOAD( "8751.mcu", 0x00000, 0x8000, NO_DUMP )
+	
+	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_LOAD( "dm03.9h", 0x0000, 0x4000, CRC(415adf76) SHA1(fbd6f8921aa3246702983ba81fa9ae53fa10c19d) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "dm02.13b", 0x08000, 0x8000, CRC(f12df039) SHA1(159de205f77fd74da30717054e6ddda2c0bb63d0) )
+	ROM_LOAD( "dm01.12b", 0x00000, 0x8000, CRC(446fbcdd) SHA1(e3c8364eccfa6c8af7a57b599238b0e4ebe8cc59) )
+	ROM_LOAD( "dm00.10b", 0x10000, 0x8000, CRC(35f396df) SHA1(ebf0a252513ae2b31ef012ac71d64fb20b8725cc) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* 128k for sprites data */
+	ROM_LOAD( "dm04.5f", 0x00000, 0x8000, CRC(2442b86d) SHA1(2eed80e1ff9cd782990142d0d73ca4fa13db4731) )
+	ROM_LOAD( "dm06.5k", 0x08000, 0x8000, CRC(e33743a6) SHA1(56dce565523f19e673c9272992030386ca648e41) )
+	ROM_LOAD( "dm05.5h", 0x10000, 0x8000, CRC(7fbba01d) SHA1(ded22806ae0d6642b45cd33c0ceab67390a6e319) )
+	ROM_LOAD( "dm07.5l", 0x18000, 0x8000, CRC(85e7a29f) SHA1(0ca77c66599650f157450d703682ec114f0453cf) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	/* the first 2 proms were missing from the dump, but are clearly needed... */
+	ROM_LOAD( "nobo_pr.16d", 0x0000, 0x0100, CRC(95010ac2) SHA1(deaf84b408cd1f3396eb851ef04cc1654d5e9a46) ) /* palette red component */
+	ROM_LOAD( "nobo_pr.15d", 0x0100, 0x0100, CRC(c55aac0c) SHA1(0f7f2d383a90e9f7f319626b4d5565805f44a1f9) ) /* palette green component */
+	ROM_LOAD( "dm-12.ic3", 0x0200, 0x0100, CRC(de394cee) SHA1(511c53f22459e5e238b48685f85b10f5e15f2ac1) ) /* palette blue component */
+	ROM_LOAD( "dc-11.6a", 0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+ROM_END
+
+/* the bootleg has different protection.. */
+ ROM_START( nobb )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "nobo-t.bin", 0x00000, 0x8000, CRC(176fd168) SHA1(f262521f07e5340f175019e2a06a54120a4aa3b7) )
 	ROM_LOAD( "nobo-r.bin", 0x10000, 0x8000, CRC(d61cf3c9) SHA1(0f80011d713c51e67853810813ebba579ade0303) )
@@ -4048,7 +4187,7 @@ static DRIVER_INIT( myherok )
 	myheroj_decode(machine, "main");
 }
 
-static DRIVER_INIT( noboranb )
+static DRIVER_INIT( nobb )
 {
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
@@ -4148,7 +4287,8 @@ GAME( 1986, wboysys2, wboy,     wbml,     wboysys2, wboy,     ROT0,   "Sega (Esc
 GAME( 1986, wbdeluxe, wboy,     system1,  wbdeluxe, 0,        ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
 GAME( 1986, gardia,   0,        brain,    gardia,   gardia,   ROT270, "Sega / Coreland", "Gardia (317-0006)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
 GAME( 1986, gardiab,  gardia,   brain,    gardia,   gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1986, noboranb, 0,        noboranb, noboranb, noboranb, ROT270, "bootleg",         "Noboranka (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1986, nob,      nobb,     nob,      nob,      0,        ROT270, "Data East Corporation", "Noboranka (Japan)", GAME_NOT_WORKING )
+GAME( 1986, nobb,     0,        nobb,     nob,      nobb,     ROT270, "bootleg",               "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blockgal, 0,        system1,  blockgal, blockgal, ROT90,  "Sega / Vic Tokai", "Block Gal (MC-8123B, 317-0029)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
 GAME( 1987, blckgalb, blockgal, blckgalb, blockgal, bootleg,  ROT90,  "bootleg",         "Block Gal (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, tokisens, 0,        wbml,     tokisens, 0,        ROT90,  "Sega",            "Toki no Senshi - Chrono Soldier", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
