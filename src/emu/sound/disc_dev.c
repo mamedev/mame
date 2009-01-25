@@ -1629,7 +1629,11 @@ static DISCRETE_STEP(dsd_ls624)
 				node->output[0] = ((double)lst) * (1.0 + context->remain / sample_t) - ((double)context->state) * context->remain / sample_t;
 				break;
 			case DISC_LS624_OUT_LOGIC:
-				node->output[0] = context->state;
+				/* filter out randomness */
+				if (cntf + cntr > 1)
+					node->output[0] = 1;
+				else
+					node->output[0] = context->state;
 				break;
 			case DISC_LS624_OUT_COUNT_F:
 				node->output[0] = cntf;
