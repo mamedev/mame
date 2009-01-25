@@ -10,6 +10,7 @@
 #define CPS3_VOICES		16
 
 static sound_stream *cps3_stream;
+extern UINT8* cps3_user5region;
 
 typedef struct _cps3_voice_
 {
@@ -22,12 +23,12 @@ static struct
 {
 	cps3_voice voice[CPS3_VOICES];
 	UINT16     key;
+	INT8*	   base;
 } chip;
 
 static STREAM_UPDATE( cps3_stream_update )
 {
 	int i;
-	INT8 *base = (INT8*)memory_region(device->machine, "user5");
 
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
@@ -82,7 +83,7 @@ static STREAM_UPDATE( cps3_stream_update )
 					}
 				}
 
-				sample = base[BYTE4_XOR_LE(start + pos)];
+				sample = chip.base[BYTE4_XOR_LE(start + pos)];
 				frac += step;
 
 				outputs[0][j] += (sample * (vol_l >> 8));
@@ -103,6 +104,8 @@ CUSTOM_START( cps3_sh_start )
 
 	memset(&chip, 0, sizeof(chip));
 
+	chip.base = (INT8*)cps3_user5region;
+	
 	return auto_malloc(1);
 }
 
