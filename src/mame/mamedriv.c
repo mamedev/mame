@@ -8536,7 +8536,11 @@ Other Sun games
 	/* Aristocrat */
 	DRIVER ( 86lions )	/* (c) 1985? */
 	DRIVER ( caswin )	/* (c) 1985 */
-
+	
+	/* Aristocrat Mk5 hardware */
+	DRIVER( reelrock )	/* (c) 1998 */
+	DRIVER( indiandr )	/* (c) 1998 */
+	
 	/* Eagle */
 	DRIVER ( janshi )
 

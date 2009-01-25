@@ -455,6 +455,7 @@ $(MAMEOBJ)/amiga.a: \
 $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/86lions.o \
 	$(DRIVERS)/caswin.o \
+	$(DRIVERS)/aristmk5.o \
 
 $(MAMEOBJ)/atari.a: \
  	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \

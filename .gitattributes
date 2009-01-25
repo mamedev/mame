@@ -1236,6 +1236,7 @@ src/mame/drivers/arabian.c svneol=native#text/plain
 src/mame/drivers/arcadecl.c svneol=native#text/plain
 src/mame/drivers/arcadia.c svneol=native#text/plain
 src/mame/drivers/argus.c svneol=native#text/plain
+src/mame/drivers/aristmk5.c svneol=native#text/plain
 src/mame/drivers/arkanoid.c svneol=native#text/plain
 src/mame/drivers/armedf.c svneol=native#text/plain
 src/mame/drivers/artmagic.c svneol=native#text/plain
