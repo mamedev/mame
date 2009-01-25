@@ -1582,13 +1582,19 @@ static DISCRETE_RESET(dsd_566)
 #define DSD_LS624__OUTTYPE	(*(node->input[4]))
 
 /*
- * These formulas are derived from diagrams in the datasheet!
- * They are not based on any law. The function is not
- * described anywhere.
+ * The datasheet mentions a 600 ohm discharge. It also gives
+ * equivalent circuits for VI and VR. 
  */
 
 #define LS624_F1(x)			(0.19 + 20.0/90.0*(x))
-#define LS624_T(_C, _R, _F)		(-600.0 * (_C) * log(1.0-LS624_F1(_R)*0.12/LS624_F1(_F)))
+#define LS624_T(_C, _R, _F)		((-600.0 * (_C) * log(1.0-LS624_F1(_R)*0.12/LS624_F1(_F))) * 16.0 )
+
+/* The following formula was derived from figures 2 and 3 in LS624 datasheet. Coefficients
+ * where calculated using least square approximation.
+ * This approach gives a bit better results compared to the first approach.
+ */
+#define LS624_F(_C, _VI, _VR)	pow(10, -0.912029404 * log10(_C) + 0.243264328 * (_VI) \
+		          - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
 
 static DISCRETE_STEP(dsd_ls624)
 {
@@ -1602,8 +1608,8 @@ static DISCRETE_STEP(dsd_ls624)
 		int		lst, cntf = 0, cntr = 0;
 
 		sample_t = discrete_current_context->sample_time;	/* Change in time */
-		dt  = LS624_T(DSD_LS624__C, DSD_LS624__VRNG, DSD_LS624__VMOD);
-		dt  = 16 * dt;
+		//dt  = LS624_T(DSD_LS624__C, DSD_LS624__VRNG, DSD_LS624__VMOD) / 2.0;
+		dt  = 1.0f / (2.0f * LS624_F(DSD_LS624__C, DSD_LS624__VMOD, DSD_LS624__VRNG));
 		t   = context->remain;
 		lst = context->state;
 		while (t + dt < sample_t)
