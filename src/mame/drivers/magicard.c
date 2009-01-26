@@ -59,17 +59,16 @@ TODO:
   Chances are that the inputs are located in a RAM-based fashion,similar of the
   way used by spool99 (probably the latter copied from this one). -AS
 
--Fix properly the starting vectors;
-
--Colors;
-
 -Inputs;
 
--Sound;
+-Unknown sound chip (but seems to be a ym-something with 8-bits wide as
+ control port);
 
 -Visible Area;
 
--Clone romset magicrda not checked at all;
+-Protection,especially in magicrda;
+
+-Many unknown memory maps;
 
 *******************************************************************************/
 
@@ -79,6 +78,7 @@ TODO:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/2413intf.h"
 
 static UINT16 *magicram;
 static UINT16 *blit_ram;
@@ -117,6 +117,7 @@ static VIDEO_UPDATE(magicard)
 			count++;
 		}
 	}
+
 	return 0;
 }
 
@@ -130,16 +131,59 @@ static READ16_HANDLER( test_r )
 	return mame_rand(space->machine);
 }
 
+static WRITE16_HANDLER( paletteram_io_w )
+{
+	static int pal_offs,r,g,b,internal_pal_offs;
+
+	switch(offset*2)
+	{
+		case 0:
+			pal_offs = data;
+			break;
+		case 4:
+			internal_pal_offs = 0;
+			break;
+		case 2:
+			switch(internal_pal_offs)
+			{
+				case 0:
+					r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					internal_pal_offs++;
+					break;
+				case 1:
+					g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					internal_pal_offs++;
+					break;
+				case 2:
+					b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					palette_set_color(space->machine, pal_offs, MAKE_RGB(r, g, b));
+					internal_pal_offs = 0;
+					pal_offs++;
+					break;
+			}
+
+			break;
+	}
+}
+
 static ADDRESS_MAP_START( magicard_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE(&magicram)
-	AM_RANGE(0x020000, 0x020001) AM_READ(test_r)
-	AM_RANGE(0x020002, 0x020003) AM_READ(test_r)
+	AM_RANGE(0x020000, 0x03ffff) AM_READ(test_r) AM_WRITENOP
 	AM_RANGE(0x040000, 0x05ffff) AM_RAM
 	AM_RANGE(0x060000, 0x07ffff) AM_RAM AM_BASE(&blit_ram)
 //  AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_REGION("main", 0)
 	AM_RANGE(0x180000, 0x1ffbff) AM_ROM AM_REGION("main", 0)
-	AM_RANGE(0x1ffc00, 0x1fffff) AM_RAM
-	AM_RANGE(0x260000, 0x27ffff) AM_RAM /*???*/
+	AM_RANGE(0x1ffc00, 0x1ffc01) AM_READ(test_r) //protection read,magicrda tests here a lot
+	AM_RANGE(0x1ffc40, 0x1ffc41) AM_READ(test_r)
+	AM_RANGE(0x1ffd00, 0x1ffd05) AM_WRITE(paletteram_io_w) //RAMDAC
+	AM_RANGE(0x1ffd40, 0x1ffd41) AM_WRITE(ym2413_register_port_0_lsb_w) //not the right sound chip,unknown type.
+	AM_RANGE(0x1ffd42, 0x1ffd43) AM_WRITE(ym2413_data_port_0_lsb_w)
+	AM_RANGE(0x1ffd80, 0x1ffd81) AM_READ(test_r)
+	AM_RANGE(0x1ffd80, 0x1ffd81) AM_WRITENOP //?
+	AM_RANGE(0x1fffe0, 0x1fffe1) AM_READ(test_r)
+	AM_RANGE(0x1ffff0, 0x1ffff1) AM_WRITENOP //protection?
+	AM_RANGE(0x1ffff2, 0x1fffff) AM_WRITENOP //?
+	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("main",0)//protection ram?
 ADDRESS_MAP_END
 
 
@@ -156,125 +200,49 @@ MACHINE_RESET( magicard )
 	UINT16 *src    = (UINT16*)memory_region( machine, "main" );
 	UINT16 *dst    = magicram;
 	memcpy (dst, src, 0x20000);
+	device_reset(cputag_get_cpu(machine, "main"));
 }
-
-static PALETTE_INIT( magicard )
-{
-/*  int bit0, bit1, bit2 , r, g, b;
-    int i;
-
-    for (i = 0; i < 0x100; ++i)
-    {
-        bit0 = (color_prom[0] >> 0) & 0x01;
-        bit1 = (color_prom[0] >> 1) & 0x01;
-        bit2 = (color_prom[0] >> 2) & 0x01;
-        r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-        bit0 = (color_prom[0] >> 3) & 0x01;
-        bit1 = (color_prom[0] >> 4) & 0x01;
-        bit2 = (color_prom[0] >> 5) & 0x01;
-        g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-        bit0 = 0;
-        bit1 = (color_prom[0] >> 6) & 0x01;
-        bit2 = (color_prom[0] >> 7) & 0x01;
-        b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-        palette_set_color(machine, i, MAKE_RGB(r, g, b));
-        color_prom++;
-    }*/
-}
-
-/*************************
-*    Graphics Layouts    *
-*************************/
-
-static const gfx_layout mca_charlayout =
-{
-/* text layer is only 1bpp??
-   there are 2 charsets, but very different
-*/
-	8, 10,
-	190,
-	1,		/* 1bpp? */
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 1*8, 0*8, 3*8, 2*8, 5*8, 4*8, 7*8, 6*8, 9*8, 8*8 },
-	8*10
-
-};
-
-static const gfx_layout mca_tilelayout =
-{
-/* this is only to see the GFX and find
-   a proper way to decode
-*/
-	8, 8,
-	0x8000,
-	1,		/* just for testing */
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
-/******************************
-* Graphics Decode Information *
-******************************/
-
-static GFXDECODE_START( magicard )
-	GFXDECODE_ENTRY( "main", 0x21562, mca_charlayout,  0, 32 )
-	GFXDECODE_ENTRY( "main", 0x16470, mca_tilelayout,  0, 32 )
-//  GFXDECODE_ENTRY( "main", 0x22efa, mca_tilelayout,  0, 32 )
-GFXDECODE_END
-
-static GFXDECODE_START( magicrda )
-	GFXDECODE_ENTRY( "main", 0x21562 + 0x792, mca_charlayout,  0, 32 )
-	GFXDECODE_ENTRY( "main", 0x16470, mca_tilelayout,  0, 32 )
-//  GFXDECODE_ENTRY( "main", 0x22efa, mca_tilelayout,  0, 32 )
-GFXDECODE_END
-
 
 /*************************
 *    Machine Drivers     *
 *************************/
 
-#if 0
 /*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
 static INTERRUPT_GEN( magicard_irq )
 {
-	if(input_code_pressed(KEYCODE_Z))
-		cpu_set_input_line(device->machine->cpu[0], 1, HOLD_LINE);
+//	if(input_code_pressed(KEYCODE_Z))
+//		cpu_set_input_line(device->machine->cpu[0], 1, HOLD_LINE);
+//	magicram[0x2004/2]^=0xffff;
 }
-#endif
 
 static MACHINE_DRIVER_START( magicard )
 	MDRV_CPU_ADD("main", M68000, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
 	MDRV_CPU_PROGRAM_MAP(magicard_mem,0)
-//  MDRV_CPU_VBLANK_INT("main", magicard_irq) /* no interrupts? (it erases the vectors..) */
+ 	MDRV_CPU_VBLANK_INT("main", magicard_irq) /* no interrupts? (it erases the vectors..) */
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
-	MDRV_PALETTE_INIT(magicard)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1) //might be 320x240
 
-	MDRV_PALETTE_LENGTH(0x20000/2)
-	MDRV_GFXDECODE(magicard)
+	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(magicard)
 	MDRV_VIDEO_UPDATE(magicard)
 
 	MDRV_MACHINE_RESET(magicard)
 
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ym", YM2413, CLOCK_A/12)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( magicrda )
 	MDRV_IMPORT_FROM(magicard)
 	MDRV_CPU_MODIFY("main")
 
-	MDRV_GFXDECODE(magicrda)
 
 MACHINE_DRIVER_END
 
@@ -313,9 +281,7 @@ ROM_END
 
 static DRIVER_INIT( magicard )
 {
-	UINT16 *src    = (UINT16*)memory_region( machine, "main" );
-	UINT16 *dst    = magicram;
-	memcpy (dst, src, 0x20000);
+	//...
 }
 
 /*    YEAR  NAME      PARENT MACHINE   INPUT  INIT  ROT    COMPANY   FULLNAME             FLAGS... */
