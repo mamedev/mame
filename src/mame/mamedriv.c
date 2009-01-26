@@ -6221,6 +6221,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( strkforc )	/* (c) 1991 Midway */
 	DRIVER( mk )		/* (c) 1992 Midway */
 	DRIVER( mkr4 )		/* (c) 1992 Midway */
+	DRIVER( mkprot8 )	/* (c) 1992 Midway */
 	DRIVER( mkprot9 )	/* (c) 1992 Midway */
 	DRIVER( mkla1 )		/* (c) 1992 Midway */
 	DRIVER( mkla2 )		/* (c) 1992 Midway */
