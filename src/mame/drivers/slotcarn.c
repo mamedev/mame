@@ -544,28 +544,28 @@ static MACHINE_START(merit)
 static const ppi8255_interface scarn_ppi8255_intf[3] =
 {
 	{	/* A, B & C set as input */
-		DEVICE8_PORT("IN0"),	/* Port A read */
-		DEVICE8_PORT("IN1"),	/* Port B read */
-		DEVICE8_PORT("IN2"),	/* Port C read */
-		NULL,					/* Port A write */
-		NULL,					/* Port B write */
-		NULL					/* Port C write */
+		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
+		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
+		DEVCB_INPUT_PORT("IN2"),	/* Port C read */
+		DEVCB_NULL,					/* Port A write */
+		DEVCB_NULL,					/* Port B write */
+		DEVCB_NULL					/* Port C write */
 	},
 	{	/* A set as input */
-		DEVICE8_PORT("DSW1"),	/* Port A read */
-		NULL,					/* Port B read */
-		NULL,					/* Port C read */
-		NULL,					/* Port A write */
-		NULL,					/* Port B write */
-		NULL					/* Port C write */
+		DEVCB_INPUT_PORT("DSW1"),	/* Port A read */
+		DEVCB_NULL,					/* Port B read */
+		DEVCB_NULL,					/* Port C read */
+		DEVCB_NULL,					/* Port A write */
+		DEVCB_NULL,					/* Port B write */
+		DEVCB_NULL					/* Port C write */
 	},
 	{	/* A & B set as input */
-		DEVICE8_PORT("IN3"),	/* Port A read */
-		DEVICE8_PORT("IN4"),	/* Port B read */
-		NULL,					/* Port C read */
-		NULL,					/* Port A write */
-		NULL,					/* Port B write */
-		NULL					/* Port C write */
+		DEVCB_INPUT_PORT("IN3"),	/* Port A read */
+		DEVCB_INPUT_PORT("IN4"),	/* Port B read */
+		DEVCB_NULL,					/* Port C read */
+		DEVCB_NULL,					/* Port A write */
+		DEVCB_NULL,					/* Port B write */
+		DEVCB_NULL					/* Port C write */
 	}
 };
 

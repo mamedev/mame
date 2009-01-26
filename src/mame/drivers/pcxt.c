@@ -481,20 +481,20 @@ static WRITE8_DEVICE_HANDLER( sys_reset_w )
 static const ppi8255_interface filetto_ppi8255_intf[2] =
 {
 	{
-		port_a_r,			/* Port A read */
-		port_b_r,			/* Port B read */
-		port_c_r,  			/* Port C read */
-		NULL,   			/* Port A write */
-		port_b_w,  		 	/* Port B write */
-		NULL				/* Port C write */
+		DEVCB_HANDLER(port_a_r),		/* Port A read */
+		DEVCB_HANDLER(port_b_r),		/* Port B read */
+		DEVCB_HANDLER(port_c_r),  		/* Port C read */
+		DEVCB_NULL,   					/* Port A write */
+		DEVCB_HANDLER(port_b_w),  		/* Port B write */
+		DEVCB_NULL						/* Port C write */
 	},
 	{
-		NULL,				/* Port A read */
-		NULL,				/* Port B read */
-		NULL,				/* Port C read */
-		wss_1_w,			/* Port A write */
-		wss_2_w,			/* Port B write */
-		sys_reset_w			/* Port C write */
+		DEVCB_NULL,						/* Port A read */
+		DEVCB_NULL,						/* Port B read */
+		DEVCB_NULL,						/* Port C read */
+		DEVCB_HANDLER(wss_1_w),			/* Port A write */
+		DEVCB_HANDLER(wss_2_w),			/* Port B write */
+		DEVCB_HANDLER(sys_reset_w)		/* Port C write */
 	}
 };
 

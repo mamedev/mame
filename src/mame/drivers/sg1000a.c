@@ -249,12 +249,12 @@ static WRITE8_DEVICE_HANDLER( sg1000a_coin_counter_w )
 
 static const ppi8255_interface ppi8255_intf =
 {
-	DEVICE8_PORT("P1"),
-	DEVICE8_PORT("P2"),
-	DEVICE8_PORT("DSW"),
-	NULL,
-	NULL,
-	sg1000a_coin_counter_w
+	DEVCB_INPUT_PORT("P1"),
+	DEVCB_INPUT_PORT("P2"),
+	DEVCB_INPUT_PORT("DSW"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(sg1000a_coin_counter_w)
 };
 
 /*************************************

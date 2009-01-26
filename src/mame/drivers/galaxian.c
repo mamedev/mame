@@ -438,33 +438,25 @@ static WRITE8_DEVICE_HANDLER( konami_portc_1_w )
 }
 
 
-static WRITE8_DEVICE_HANDLER( sound_latch_w )
-{
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	soundlatch_w(space, offset, data);
-}
-
-
 static const ppi8255_interface konami_ppi8255_0_intf =
 {
-	DEVICE8_PORT("IN0"),			/* Port A read */
-	DEVICE8_PORT("IN1"),			/* Port B read */
-	DEVICE8_PORT("IN2"),			/* Port C read */
-	NULL,							/* Port A write */
-	NULL,							/* Port B write */
-	konami_portc_0_w				/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
+	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
+	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(konami_portc_0_w)		/* Port C write */
 };
 
 
 static const ppi8255_interface konami_ppi8255_1_intf =
 {
-	NULL,							/* Port A read */
-	NULL,							/* Port B read */
-	DEVICE8_PORT("IN3"),			/* Port C read */
-	sound_latch_w,					/* Port A write */
-	konami_sound_control_w,			/* Port B write */
-	konami_portc_1_w				/* Port C write */
+	DEVCB_NULL,												/* Port A read */
+	DEVCB_NULL,												/* Port B read */
+	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
+	DEVCB_HANDLER(konami_portc_1_w)							/* Port C write */
 };
 
 
@@ -501,12 +493,12 @@ static WRITE8_DEVICE_HANDLER( theend_coin_counter_w )
 
 static const ppi8255_interface theend_ppi8255_0_intf =
 {
-	DEVICE8_PORT("IN0"),			/* Port A read */
-	DEVICE8_PORT("IN1"),			/* Port B read */
-	DEVICE8_PORT("IN2"),			/* Port C read */
-	NULL,							/* Port A write */
-	NULL,							/* Port B write */
-	theend_coin_counter_w			/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),			/* Port A read */
+	DEVCB_INPUT_PORT("IN1"),			/* Port B read */
+	DEVCB_INPUT_PORT("IN2"),			/* Port C read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(theend_coin_counter_w)/* Port C write */
 };
 
 
@@ -560,12 +552,12 @@ static CUSTOM_INPUT( scramble_protection_alt_r )
 
 static const ppi8255_interface scramble_ppi8255_1_intf =
 {
-	NULL,							/* Port A read */
-	NULL,							/* Port B read */
-	scramble_protection_r,			/* Port C read */
-	sound_latch_w,					/* Port A write */
-	konami_sound_control_w,			/* Port B write */
-	scramble_protection_w			/* Port C write */
+	DEVCB_NULL,												/* Port A read */
+	DEVCB_NULL,												/* Port B read */
+	DEVCB_HANDLER(scramble_protection_r),					/* Port C read */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
+	DEVCB_HANDLER(scramble_protection_w)					/* Port C write */
 };
 
 
@@ -625,22 +617,14 @@ static WRITE8_HANDLER( sfx_sample_control_w )
 }
 
 
-static READ8_DEVICE_HANDLER( sound_data2_r )
-{
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
-	return soundlatch2_r(space, offset);
-}
-
-
 static const ppi8255_interface sfx_ppi8255_2_intf =
 {
-	sound_data2_r,					/* Port A read */
-	NULL,							/* Port B read */
-	NULL,							/* Port C read */
-	NULL,							/* Port A write */
-	NULL,							/* Port B write */
-	NULL							/* Port C write */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch2_r),	/* Port A read */
+	DEVCB_NULL,												/* Port B read */
+	DEVCB_NULL,												/* Port C read */
+	DEVCB_NULL,												/* Port A write */
+	DEVCB_NULL,												/* Port B write */
+	DEVCB_NULL												/* Port C write */
 };
 
 
@@ -813,12 +797,12 @@ static WRITE8_HANDLER( scorpion_digitalker_control_w )
 
 static const ppi8255_interface scorpion_ppi8255_1_intf =
 {
-	NULL,							/* Port A read */
-	NULL,							/* Port B read */
-	scorpion_protection_r,			/* Port C read */
-	sound_latch_w,					/* Port A write */
-	konami_sound_control_w,			/* Port B write */
-	scorpion_protection_w			/* Port C write */
+	DEVCB_NULL,												/* Port A read */
+	DEVCB_NULL,												/* Port B read */
+	DEVCB_HANDLER(scorpion_protection_r),					/* Port C read */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
+	DEVCB_HANDLER(scorpion_protection_w)					/* Port C write */
 };
 
 
@@ -1109,12 +1093,12 @@ static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
 
 static const ppi8255_interface moonwar_ppi8255_0_intf =
 {
-	moonwar_input_port_0_r,			/* Port A read */
-	DEVICE8_PORT("IN1"),			/* Port B read */
-	DEVICE8_PORT("IN2"),			/* Port C read */
-	NULL,							/* Port A write */
-	NULL,							/* Port B write */
-	moonwar_port_select_w 			/* Port C write */
+	DEVCB_HANDLER(moonwar_input_port_0_r),	/* Port A read */
+	DEVCB_INPUT_PORT("IN1"),				/* Port B read */
+	DEVCB_INPUT_PORT("IN2"),				/* Port C read */
+	DEVCB_NULL,								/* Port A write */
+	DEVCB_NULL,								/* Port B write */
+	DEVCB_HANDLER(moonwar_port_select_w) 	/* Port C write */
 };
 
 

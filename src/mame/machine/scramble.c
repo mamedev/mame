@@ -174,63 +174,57 @@ WRITE8_HANDLER( hunchbks_mirror_w )
 	memory_write_byte(space, 0x1000+offset,data);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_latch_w )
-{
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	soundlatch_w(space, offset, data);
-}
-
 const ppi8255_interface scramble_ppi_0_intf =
 {
-	DEVICE8_PORT("IN0"),		/* Port A read */
-	DEVICE8_PORT("IN1"),		/* Port B read */
-	DEVICE8_PORT("IN2"),		/* Port C read */
-	NULL,						/* Port A write */
-	NULL,						/* Port B write */
-	NULL 						/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL 						/* Port C write */
 };
 
 const ppi8255_interface scramble_ppi_1_intf =
 {
-	NULL,						/* Port A read */
-	NULL,						/* Port B read */
-	NULL,						/* Port C read */
-	sound_latch_w,				/* Port A write */
-	scramble_sh_irqtrigger_w,	/* Port B write */
-	NULL						/* Port C write */
+	DEVCB_NULL,												/* Port A read */
+	DEVCB_NULL,												/* Port B read */
+	DEVCB_NULL,												/* Port C read */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
+	DEVCB_NULL												/* Port C write */
 };
 
 
 const ppi8255_interface stratgyx_ppi_1_intf =
 {
-	NULL,						/* Port A read */
-	NULL,						/* Port B read */
-	DEVICE8_PORT("IN3"),		/* Port C read */
-	sound_latch_w,				/* Port A write */
-	scramble_sh_irqtrigger_w,	/* Port B write */
-	NULL						/* Port C write */
+	DEVCB_NULL,												/* Port A read */
+	DEVCB_NULL,												/* Port B read */
+	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
+	DEVCB_NULL												/* Port C write */
 };
 
 
 const ppi8255_interface scramble_protection_ppi_1_intf =
 {
-	NULL,						/* Port A read */
-	NULL,						/* Port B read */
-	scramble_protection_r,		/* Port C read */
-	sound_latch_w,				/* Port A write */
-	scramble_sh_irqtrigger_w,	/* Port B write */
-	scramble_protection_w		/* Port C write */
+	DEVCB_NULL,												/* Port A read */
+	DEVCB_NULL,												/* Port B read */
+	DEVCB_HANDLER(scramble_protection_r),					/* Port C read */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
+	DEVCB_HANDLER(scramble_protection_w)					/* Port C write */
 };
 
 
 const ppi8255_interface mrkougar_ppi_1_intf =
 {
-	NULL,						/* Port A read */
-	NULL,						/* Port B read */
-	NULL,						/* Port C read */
-	sound_latch_w,				/* Port A write */
-	mrkougar_sh_irqtrigger_w,	/* Port B write */
-	NULL						/* Port C write */
+	DEVCB_NULL,												/* Port A read */
+	DEVCB_NULL,												/* Port B read */
+	DEVCB_NULL,												/* Port C read */
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_HANDLER(mrkougar_sh_irqtrigger_w),				/* Port B write */
+	DEVCB_NULL												/* Port C write */
 };
 
 

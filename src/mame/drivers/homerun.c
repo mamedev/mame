@@ -37,12 +37,12 @@ static WRITE8_DEVICE_HANDLER(pc_w){homerun_xpc=data;}
 
 static const ppi8255_interface ppi8255_intf =
 {
-	NULL,
-	NULL,
-	NULL,
-	pa_w,
-	pb_w,
-	pc_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(pa_w),
+	DEVCB_HANDLER(pb_w),
+	DEVCB_HANDLER(pc_w)
 };
 
 

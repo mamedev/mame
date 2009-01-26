@@ -477,23 +477,23 @@ static READ8_HANDLER( bbjr_analog_r )
 /* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
 static const ppi8255_interface buggyboy_ppi8255_intf =
 {
-	DEVICE8_PORT("PPI_PORTA"),
-	NULL,
-	DEVICE8_PORT("PPI_PORTC"),
-	NULL,
-	bb_coin_cnt_w,
-	NULL,
+	DEVCB_INPUT_PORT("PPI_PORTA"),
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("PPI_PORTC"),
+	DEVCB_NULL,
+	DEVCB_HANDLER(bb_coin_cnt_w),
+	DEVCB_NULL,
 };
 
 
 static const ppi8255_interface tx1_ppi8255_intf =
 {
-	tx1_ppi_porta_r,
-	tx1_ppi_portb_r,
-	DEVICE8_PORT("PPI_PORTC"),
-	NULL,
-	NULL,
-	tx1_coin_cnt_w
+	DEVCB_HANDLER(tx1_ppi_porta_r),
+	DEVCB_HANDLER(tx1_ppi_portb_r),
+	DEVCB_INPUT_PORT("PPI_PORTC"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(tx1_coin_cnt_w)
 };
 
 

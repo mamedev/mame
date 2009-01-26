@@ -70,20 +70,20 @@ static READ8_DEVICE_HANDLER( adc_status_r );
 static const ppi8255_interface hangon_ppi_intf[2] =
 {
 	{
-		NULL,
-		NULL,
-		NULL,
-		sound_latch_w,
-		video_lamps_w,
-		tilemap_sound_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(sound_latch_w),
+		DEVCB_HANDLER(video_lamps_w),
+		DEVCB_HANDLER(tilemap_sound_w)
 	},
 	{
-		NULL,
-		NULL,
-		adc_status_r,
-		sub_control_adc_w,
-		NULL,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(adc_status_r),
+		DEVCB_HANDLER(sub_control_adc_w),
+		DEVCB_NULL,
+		DEVCB_NULL
 	}
 };
 

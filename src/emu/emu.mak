@@ -44,6 +44,7 @@ EMUOBJS = \
 	$(EMUOBJ)/cpuexec.o \
 	$(EMUOBJ)/crsshair.o \
 	$(EMUOBJ)/debugger.o \
+	$(EMUOBJ)/devcb.o \
 	$(EMUOBJ)/devintrf.o \
 	$(EMUOBJ)/drawgfx.o \
 	$(EMUOBJ)/driver.o \

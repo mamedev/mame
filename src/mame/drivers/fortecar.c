@@ -61,20 +61,10 @@ static READ8_DEVICE_HANDLER( ppi0_portc_r )
 	return (~(eeprom_read_bit()<<1) & 2);
 }
 
-static READ8_DEVICE_HANDLER( ppi0_porta_r )
-{
-	return input_port_read(device->machine, "DSW1");
-}
-
-static READ8_DEVICE_HANDLER( ppi0_portb_r )
-{
-	return input_port_read(device->machine, "IN2");
-}
-
 static const ppi8255_interface ppi0intf =
 {
-	ppi0_porta_r,	ppi0_portb_r,	ppi0_portc_r,
-	NULL,			NULL,			ppi0_portc_w
+	DEVCB_INPUT_PORT("DSW1"),	DEVCB_INPUT_PORT("IN2"),	DEVCB_HANDLER(ppi0_portc_r),
+	DEVCB_NULL,					DEVCB_NULL,					DEVCB_HANDLER(ppi0_portc_w)
 };
 
 static WRITE8_HANDLER( rom_bank_w )

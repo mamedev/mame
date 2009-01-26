@@ -569,20 +569,20 @@ static READ8_DEVICE_HANDLER( snd_rom_r )
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		NULL,							/* Port A read */
-		NULL,							/* Port B read */
-		snd_rom_r,						/* Port C read */
-		snd_rom_addr_l_w,				/* Port A write */
-		snd_rom_addr_h_w,				/* Port B write */
-		NULL							/* Port C write */
+		DEVCB_NULL,							/* Port A read */
+		DEVCB_NULL,							/* Port B read */
+		DEVCB_HANDLER(snd_rom_r),			/* Port C read */
+		DEVCB_HANDLER(snd_rom_addr_l_w),	/* Port A write */
+		DEVCB_HANDLER(snd_rom_addr_h_w),	/* Port B write */
+		DEVCB_NULL							/* Port C write */
 	},
 	{
-		DEVICE8_PORT("DSW1"),			/* Port A read */
-		DEVICE8_PORT("DSW2"),			/* Port B read */
-		DEVICE8_PORT("DSW3"),			/* Port C read */
-		NULL,							/* Port A write */
-		NULL,							/* Port B write */
-		NULL							/* Port C write */
+		DEVCB_INPUT_PORT("DSW1"),			/* Port A read */
+		DEVCB_INPUT_PORT("DSW2"),			/* Port B read */
+		DEVCB_INPUT_PORT("DSW3"),			/* Port C read */
+		DEVCB_NULL,							/* Port A write */
+		DEVCB_NULL,							/* Port B write */
+		DEVCB_NULL							/* Port C write */
 	}
 };
 

@@ -94,20 +94,20 @@ GFXDECODE_END
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	{
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
 	}
 };
 

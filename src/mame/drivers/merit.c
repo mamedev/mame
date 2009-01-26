@@ -988,40 +988,40 @@ static VIDEO_UPDATE( merit )
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		DEVICE8_PORT("IN0"),		/* Port A read */
-		DEVICE8_PORT("IN1"),		/* Port B read */
-		DEVICE8_PORT("IN2"),		/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL						/* Port C write */
+		DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+		DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+		DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_NULL,						/* Port B write */
+		DEVCB_NULL						/* Port C write */
 	},
 	{
-		DEVICE8_PORT("DSW"),		/* Port A read */
-		NULL,						/* Port B read */
-		NULL,						/* Port C read */
-		NULL,						/* Port A write */
-		led1_w,						/* Port B write */
-		misc_w						/* Port C write */
+		DEVCB_INPUT_PORT("DSW"),		/* Port A read */
+		DEVCB_NULL,						/* Port B read */
+		DEVCB_NULL,						/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_HANDLER(led1_w),			/* Port B write */
+		DEVCB_HANDLER(misc_w)			/* Port C write */
 	}
 };
 
 static const ppi8255_interface ppi8255_couple_intf[2] =
 {
 	{
-		DEVICE8_PORT("IN0"),		/* Port A read */
-		DEVICE8_PORT("IN1"),		/* Port B read */
-		DEVICE8_PORT("IN2"),		/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL						/* Port C write */
+		DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+		DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+		DEVCB_INPUT_PORT("IN2"),		/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_NULL,						/* Port B write */
+		DEVCB_NULL						/* Port C write */
 	},
 	{
-		DEVICE8_PORT("DSW"),		/* Port A read */
-		NULL,						/* Port B read */
-		NULL,						/* Port C read */
-		NULL,						/* Port A write */
-		led1_w,						/* Port B write */
-		misc_couple_w				/* Port C write */
+		DEVCB_INPUT_PORT("DSW"),		/* Port A read */
+		DEVCB_NULL,						/* Port B read */
+		DEVCB_NULL,						/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_HANDLER(led1_w),			/* Port B write */
+		DEVCB_HANDLER(misc_couple_w)	/* Port C write */
 	}
 };
 

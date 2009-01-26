@@ -136,15 +136,15 @@ ADDRESS_MAP_END
 
 static const ppi8255_interface ppi0intf =
 {
-	NULL,			ppi0_portb_r,	ppi0_portc_r,
-	ppi0_porta_w,	NULL,			ppi0_portc_w
+	DEVCB_NULL,						DEVCB_HANDLER(ppi0_portb_r),	DEVCB_HANDLER(ppi0_portc_r),
+	DEVCB_HANDLER(ppi0_porta_w),	DEVCB_NULL,						DEVCB_HANDLER(ppi0_portc_w)
 };
 
 
 static const ppi8255_interface ppi1intf =
 {
-	ppi1_porta_r,	NULL,			NULL,
-	NULL,			ppi1_portb_w,	ppi1_portc_w
+	DEVCB_HANDLER(ppi1_porta_r),	DEVCB_NULL,						DEVCB_NULL,
+	DEVCB_NULL,						DEVCB_HANDLER(ppi1_portb_w),	DEVCB_HANDLER(ppi1_portc_w)
 };
 
 

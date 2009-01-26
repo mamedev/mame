@@ -77,12 +77,12 @@ static WRITE8_DEVICE_HANDLER( video_control_w );
 
 static const ppi8255_interface single_ppi_intf =
 {
-	unknown_porta_r,
-	unknown_portb_r,
-	unknown_portc_r,
-	unknown_porta_w,
-	unknown_portb_w,
-	video_control_w
+	DEVCB_HANDLER(unknown_porta_r),
+	DEVCB_HANDLER(unknown_portb_r),
+	DEVCB_HANDLER(unknown_portc_r),
+	DEVCB_HANDLER(unknown_porta_w),
+	DEVCB_HANDLER(unknown_portb_w),
+	DEVCB_HANDLER(video_control_w)
 };
 
 

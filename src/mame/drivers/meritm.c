@@ -694,22 +694,22 @@ static WRITE8_DEVICE_HANDLER(meritm_crt250_port_b_w)
 
 static const ppi8255_interface crt260_ppi8255_intf =
 {
-	NULL,						/* Port A read */
-	NULL,						/* Port B read */
-	meritm_8255_port_c_r,		/* Port C read */
-	NULL,						/* Port A write (used) */
-	NULL,						/* Port B write (used LMP x DRIVE) */
-	NULL						/* Port C write */
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_HANDLER(meritm_8255_port_c_r),	/* Port C read */
+	DEVCB_NULL,								/* Port A write (used) */
+	DEVCB_NULL,								/* Port B write (used LMP x DRIVE) */
+	DEVCB_NULL								/* Port C write */
 };
 
 static const ppi8255_interface crt250_ppi8255_intf =
 {
-	NULL,						/* Port A read */
-	NULL,						/* Port B read */
-	meritm_8255_port_c_r,		/* Port C read */
-	NULL,						/* Port A write (used) */
-	meritm_crt250_port_b_w,		/* Port B write (used LMP x DRIVE) */
-	NULL						/* Port C write */
+	DEVCB_NULL,								/* Port A read */
+	DEVCB_NULL,								/* Port B read */
+	DEVCB_HANDLER(meritm_8255_port_c_r),	/* Port C read */
+	DEVCB_NULL,								/* Port A write (used) */
+	DEVCB_HANDLER(meritm_crt250_port_b_w),	/* Port B write (used LMP x DRIVE) */
+	DEVCB_NULL								/* Port C write */
 };
 
 /*************************************

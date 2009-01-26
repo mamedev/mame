@@ -429,12 +429,12 @@ static const custom_sound_interface sega005_custom_interface =
 
 static const ppi8255_interface ppi8255_005_intf =
 {
-	NULL,
-	NULL,
-	NULL,
-	sega005_sound_a_w,
-	sega005_sound_b_w,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(sega005_sound_a_w),
+	DEVCB_HANDLER(sega005_sound_b_w),
+	DEVCB_NULL
 };
 
 
@@ -820,12 +820,12 @@ ADDRESS_MAP_END
 
 static const ppi8255_interface monsterb_ppi_intf =
 {
-	NULL,
-	NULL,
-	n7751_status_r,
-	monsterb_sound_a_w,
-	monsterb_sound_b_w,
-	n7751_command_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(n7751_status_r),
+	DEVCB_HANDLER(monsterb_sound_a_w),
+	DEVCB_HANDLER(monsterb_sound_b_w),
+	DEVCB_HANDLER(n7751_command_w)
 };
 
 

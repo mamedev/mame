@@ -237,12 +237,12 @@ static const pia6821_interface pia_1_intf =
 
 static const ppi8255_interface ppi8255_intf =
 {
-	DEVICE8_PORT("P1"),				/* Port A read */
-	DEVICE8_PORT("P2"),				/* Port B read */
-	DEVICE8_PORT("SYSTEM"),			/* Port C read */
-	NULL,							/* Port A write */
-	NULL,							/* Port B write */
-	zaccaria_dsw_sel_w, 			/* Port C write */
+	DEVCB_INPUT_PORT("P1"),				/* Port A read */
+	DEVCB_INPUT_PORT("P2"),				/* Port B read */
+	DEVCB_INPUT_PORT("SYSTEM"),			/* Port C read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(zaccaria_dsw_sel_w)	/* Port C write */
 };
 
 

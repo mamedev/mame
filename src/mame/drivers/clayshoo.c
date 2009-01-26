@@ -136,20 +136,20 @@ static void create_analog_timers(running_machine *machine)
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		NULL,					/* Port A read */
-		NULL,					/* Port B read */
-		NULL,					/* Port C read */
-		NULL,					/* Port A write */
-		NULL,					/* Port B write */
-		NULL					/* Port C write */
+		DEVCB_NULL,					/* Port A read */
+		DEVCB_NULL,					/* Port B read */
+		DEVCB_NULL,					/* Port C read */
+		DEVCB_NULL,					/* Port A write */
+		DEVCB_NULL,					/* Port B write */
+		DEVCB_NULL					/* Port C write */
 	},
 	{
-		NULL,					/* Port A read */
-		input_port_r,			/* Port B read */
-		NULL,					/* Port C read */
-		input_port_select_w,	/* Port A write */
-		NULL,					/* Port B write */
-		NULL					/* sound effects, Port C write */
+		DEVCB_NULL,					/* Port A read */
+		DEVCB_HANDLER(input_port_r),/* Port B read */
+		DEVCB_NULL,					/* Port C read */
+		DEVCB_HANDLER(input_port_select_w),	/* Port A write */
+		DEVCB_NULL,					/* Port B write */
+		DEVCB_NULL					/* sound effects, Port C write */
 	}
 };
 

@@ -925,30 +925,23 @@ INPUT_PORTS_END
 
 static const ppi8255_interface zaxxon_ppi_intf =
 {
-	NULL,
-	NULL,
-	NULL,
-	zaxxon_sound_a_w,
-	zaxxon_sound_b_w,
-	zaxxon_sound_c_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(zaxxon_sound_a_w),
+	DEVCB_HANDLER(zaxxon_sound_b_w),
+	DEVCB_HANDLER(zaxxon_sound_c_w)
 };
-
-
-static READ8_DEVICE_HANDLER( sound_latch_r )
-{
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	return soundlatch_r(space, offset);
-}
 
 
 static const ppi8255_interface congo_ppi_intf =
 {
-	sound_latch_r,
-	NULL,
-	NULL,
-	NULL,
-	congo_sound_b_w,
-	congo_sound_c_w
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(congo_sound_b_w),
+	DEVCB_HANDLER(congo_sound_c_w)
 };
 
 

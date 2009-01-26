@@ -309,28 +309,28 @@ static const z80_daisy_chain daisy_chain_sound[] =
 static const ppi8255_interface ppi8255_intf[3] =
 {
 	{
-		DEVICE8_PORT("P1"),			/* Port A read */
-		NULL,						/* Port B read */
-		NULL,						/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		vidctrl_w					/* Port C write */
+		DEVCB_INPUT_PORT("P1"),			/* Port A read */
+		DEVCB_NULL,						/* Port B read */
+		DEVCB_NULL,						/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_NULL,						/* Port B write */
+		DEVCB_HANDLER(vidctrl_w)		/* Port C write */
 	},
 	{
-		DEVICE8_PORT("DSW1"),		/* Port A read */
-		DEVICE8_PORT("DSW2"),		/* Port B read */
-		protection_r,				/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		protection_w				/* Port C write */
+		DEVCB_INPUT_PORT("DSW1"),		/* Port A read */
+		DEVCB_INPUT_PORT("DSW2"),		/* Port B read */
+		DEVCB_HANDLER(protection_r),	/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_NULL,						/* Port B write */
+		DEVCB_HANDLER(protection_w)		/* Port C write */
 	},
 	{
-		NULL,						/* Port A read */
-		NULL,						/* Port B read */
-		NULL,						/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL						/* Port C write */
+		DEVCB_NULL,						/* Port A read */
+		DEVCB_NULL,						/* Port B read */
+		DEVCB_NULL,						/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_NULL,						/* Port B write */
+		DEVCB_NULL						/* Port C write */
 	}
 };
 

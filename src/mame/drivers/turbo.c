@@ -271,36 +271,36 @@ static WRITE8_DEVICE_HANDLER( turbo_ppi3c_w )
 static const ppi8255_interface turbo_8255_intf[4] =
 {
 	{
-		NULL,
-		NULL,
-		NULL,
-		turbo_ppi0a_w,
-		turbo_ppi0b_w,
-		turbo_ppi0c_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(turbo_ppi0a_w),
+		DEVCB_HANDLER(turbo_ppi0b_w),
+		DEVCB_HANDLER(turbo_ppi0c_w)
 	},
 	{
-		NULL,
-		NULL,
-		NULL,
-		turbo_ppi1a_w,
-		turbo_ppi1b_w,
-		turbo_ppi1c_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(turbo_ppi1a_w),
+		DEVCB_HANDLER(turbo_ppi1b_w),
+		DEVCB_HANDLER(turbo_ppi1c_w)
 	},
 	{
-		NULL,
-		NULL,
-		NULL,
-		turbo_sound_a_w,
-		turbo_sound_b_w,
-		turbo_sound_c_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(turbo_sound_a_w),
+		DEVCB_HANDLER(turbo_sound_b_w),
+		DEVCB_HANDLER(turbo_sound_c_w)
 	},
 	{
-		turbo_analog_r,
-		DEVICE8_PORT("DSW2"),
-		NULL,
-		NULL,
-		NULL,
-		turbo_ppi3c_w
+		DEVCB_HANDLER(turbo_analog_r),
+		DEVCB_INPUT_PORT("DSW2"),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(turbo_ppi3c_w)
 	}
 };
 
@@ -353,20 +353,20 @@ static WRITE8_DEVICE_HANDLER( subroc3d_ppi0b_w )
 static const ppi8255_interface subroc3d_8255_intf[2] =
 {
 	{
-		NULL,
-		NULL,
-		NULL,
-		subroc3d_ppi0a_w,
-		subroc3d_ppi0b_w,
-		subroc3d_ppi0c_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(subroc3d_ppi0a_w),
+		DEVCB_HANDLER(subroc3d_ppi0b_w),
+		DEVCB_HANDLER(subroc3d_ppi0c_w)
 	},
 	{
-		NULL,
-		NULL,
-		NULL,
-		subroc3d_sound_a_w,
-		subroc3d_sound_b_w,
-		subroc3d_sound_c_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(subroc3d_sound_a_w),
+		DEVCB_HANDLER(subroc3d_sound_b_w),
+		DEVCB_HANDLER(subroc3d_sound_c_w)
 	}
 };
 
@@ -426,20 +426,20 @@ static WRITE8_DEVICE_HANDLER( buckrog_ppi1c_w )
 static const ppi8255_interface buckrog_8255_intf[2] =
 {
 	{
-		NULL,
-		NULL,
-		NULL,
-		buckrog_ppi0a_w,
-		buckrog_ppi0b_w,
-		buckrog_ppi0c_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(buckrog_ppi0a_w),
+		DEVCB_HANDLER(buckrog_ppi0b_w),
+		DEVCB_HANDLER(buckrog_ppi0c_w)
 	},
 	{
-		NULL,
-		NULL,
-		NULL,
-		buckrog_sound_a_w,
-		buckrog_sound_b_w,
-		buckrog_ppi1c_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(buckrog_sound_a_w),
+		DEVCB_HANDLER(buckrog_sound_b_w),
+		DEVCB_HANDLER(buckrog_ppi1c_w)
 	}
 };
 

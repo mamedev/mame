@@ -1066,13 +1066,13 @@ static INTERRUPT_GEN( iqblocka_interrupt )
 // Dips are read through the 8255
 static const ppi8255_interface iqblocka_ppi8255_intf =
 {
-	DEVICE8_PORT("DSW0"),	// Port A read
-	DEVICE8_PORT("DSW1"),	// Port B read
-	DEVICE8_PORT("DSW2"),	// Port C read
+	DEVCB_INPUT_PORT("DSW0"),	// Port A read
+	DEVCB_INPUT_PORT("DSW1"),	// Port B read
+	DEVCB_INPUT_PORT("DSW2"),	// Port C read
 
-	0,						// Port A write
-	0,						// Port B write
-	0,						// Port C write
+	DEVCB_NULL,						// Port A write
+	DEVCB_NULL,						// Port B write
+	DEVCB_NULL,						// Port C write
 };
 
 static MACHINE_RESET( iqblocka )
@@ -1143,13 +1143,13 @@ static MACHINE_RESET( mgcs )
 
 static const ppi8255_interface mgcs_ppi8255_intf =
 {
-	DEVICE8_PORT("COINS"),	// Port A read
-	mgcs_keys_r,			// Port B read
-	0,						// Port C read (see code at 1C83A)
+	DEVCB_INPUT_PORT("COINS"),		// Port A read
+	DEVCB_HANDLER(mgcs_keys_r),		// Port B read
+	DEVCB_NULL,						// Port C read (see code at 1C83A)
 
-	0,						// Port A write
-	0,						// Port B write
-	0,						// Port C write (with 0/1)
+	DEVCB_NULL,						// Port A write
+	DEVCB_NULL,						// Port B write
+	DEVCB_NULL,						// Port C write (with 0/1)
 };
 
 static MACHINE_DRIVER_START( mgcs )

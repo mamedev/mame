@@ -329,12 +329,12 @@ static WRITE8_DEVICE_HANDLER( output_port_1_w )
 
 static const ppi8255_interface ppi8255_intf =
 {
-	DEVICE8_PORT("IN0"),/* Port A read */
-	DEVICE8_PORT("IN1"),/* Port B read */
-	NULL,				/* Port C read */
-	NULL,				/* Port A write */
-	NULL,				/* Port B write */
-	output_port_1_w,	/* Port C write */
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL,						/* Port A write */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_HANDLER(output_port_1_w),	/* Port C write */
 };
 
 

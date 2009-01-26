@@ -69,20 +69,20 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound2_w );
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		DEVICE8_PORT("IN0"),
-		DEVICE8_PORT("IN1"),
-		DEVICE8_PORT("IN2"),
-		NULL,
-		NULL,
-		NULL
+		DEVCB_INPUT_PORT("IN0"),
+		DEVCB_INPUT_PORT("IN1"),
+		DEVCB_INPUT_PORT("IN2"),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	{
-		NULL,
-		DEVICE8_PORT("CABINET"),
-		NULL,
-		astinvad_sound1_w,
-		astinvad_sound2_w,
-		NULL
+		DEVCB_NULL,
+		DEVCB_INPUT_PORT("CABINET"),
+		DEVCB_NULL,
+		DEVCB_HANDLER(astinvad_sound1_w),
+		DEVCB_HANDLER(astinvad_sound2_w),
+		DEVCB_NULL
 	}
 };
 

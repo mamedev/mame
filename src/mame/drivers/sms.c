@@ -392,20 +392,20 @@ static WRITE8_DEVICE_HANDLER(ppi0_b_w)
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		0,			/* Port A read */
-		0,			/* Port B read */
-		ppi0_c_r,	/* Port C read */
-		ppi0_a_w,	/* Port A write */
-		ppi0_b_w,	/* Port B write */
-		0			/* Port C write */
+		DEVCB_NULL,					/* Port A read */
+		DEVCB_NULL,					/* Port B read */
+		DEVCB_HANDLER(ppi0_c_r),	/* Port C read */
+		DEVCB_HANDLER(ppi0_a_w),	/* Port A write */
+		DEVCB_HANDLER(ppi0_b_w),	/* Port B write */
+		DEVCB_NULL					/* Port C write */
 	},
 	{
-		DEVICE8_PORT("IN0"),	/* Port A read */
-		DEVICE8_PORT("IN1"),	/* Port B read */
-		DEVICE8_PORT("IN2"),	/* Port C read */
-		0,			/* Port A write */
-		0,			/* Port B write */
-		0			/* Port C write */
+		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
+		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
+		DEVCB_INPUT_PORT("IN2"),	/* Port C read */
+		DEVCB_NULL,					/* Port A write */
+		DEVCB_NULL,					/* Port B write */
+		DEVCB_NULL					/* Port C write */
 	}
 };
 

@@ -332,12 +332,12 @@ static WRITE8_HANDLER( sindbadm_SN76496_1_w )
 
 static const ppi8255_interface sindbadm_ppi_intf =
 {
-	NULL,
-	DEVICE8_PORT("FC"),
-	NULL,
-	sindbadm_soundport_w,
-	NULL,
-	sindbadm_misc_w
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("FC"),
+	DEVCB_NULL,
+	DEVCB_HANDLER(sindbadm_soundport_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(sindbadm_misc_w)
 };
 
 

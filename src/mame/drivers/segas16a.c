@@ -186,7 +186,6 @@ static UINT32 n7751_rom_address;
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
 
-static WRITE8_DEVICE_HANDLER( sound_latch_w );
 static WRITE8_DEVICE_HANDLER( video_control_w );
 static WRITE8_DEVICE_HANDLER( tilemap_sound_w );
 
@@ -200,12 +199,12 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w );
 
 static const ppi8255_interface single_ppi_intf =
 {
-	NULL,
-	NULL,
-	NULL,
-	sound_latch_w,
-	video_control_w,
-	tilemap_sound_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),
+	DEVCB_HANDLER(video_control_w),
+	DEVCB_HANDLER(tilemap_sound_w)
 };
 
 
@@ -364,13 +363,6 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
  *  Sound control
  *
  *************************************/
-
-static WRITE8_DEVICE_HANDLER( sound_latch_w )
-{
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	soundlatch_w(space, offset, data);
-}
-
 
 static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 {

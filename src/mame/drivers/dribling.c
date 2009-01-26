@@ -190,20 +190,20 @@ static WRITE8_HANDLER( iowrite )
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		dsr_r,
-		input_mux0_r,
-		NULL,
-		NULL,
-		NULL,
-		misc_w
+		DEVCB_HANDLER(dsr_r),
+		DEVCB_HANDLER(input_mux0_r),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(misc_w)
 	},
 	{
-		NULL,
-		NULL,
-		DEVICE8_PORT("IN0"),
-		sound_w,
-		pb_w,
-		shr_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_INPUT_PORT("IN0"),
+		DEVCB_HANDLER(sound_w),
+		DEVCB_HANDLER(pb_w),
+		DEVCB_HANDLER(shr_w)
 	}
 };
 

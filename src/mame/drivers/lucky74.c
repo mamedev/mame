@@ -1179,36 +1179,36 @@ static void lucky74_adpcm_int(const device_config *device)
 static const ppi8255_interface ppi8255_intf[4] =
 {
 	{	/* A & B set as input */
-		DEVICE8_PORT("IN0"),	/* Port A read, IN0 */
-		DEVICE8_PORT("IN1"),	/* Port B read, IN1 */
-		NULL,					/* Port C read */
-		NULL,					/* Port A write */
-		NULL,					/* Port B write */
-		NULL					/* Port C writes: 0x00 after reset, 0xff during game, and 0xfd when tap F2 for percentage and run count */
+		DEVCB_INPUT_PORT("IN0"),	/* Port A read, IN0 */
+		DEVCB_INPUT_PORT("IN1"),	/* Port B read, IN1 */
+		DEVCB_NULL,					/* Port C read */
+		DEVCB_NULL,					/* Port A write */
+		DEVCB_NULL,					/* Port B write */
+		DEVCB_NULL					/* Port C writes: 0x00 after reset, 0xff during game, and 0xfd when tap F2 for percentage and run count */
 	},
 	{	/* A & C set as input */
-		DEVICE8_PORT("IN2"),	/* Port A read, IN2 */
-		NULL,					/* Port B read */
-		DEVICE8_PORT("IN4"),	/* Port C read, IN4 */
-		NULL,					/* Port A write */
-		NULL,					/* Port B write */
-		NULL					/* Port C write */
+		DEVCB_INPUT_PORT("IN2"),	/* Port A read, IN2 */
+		DEVCB_NULL,					/* Port B read */
+		DEVCB_INPUT_PORT("IN4"),	/* Port C read, IN4 */
+		DEVCB_NULL,					/* Port A write */
+		DEVCB_NULL,					/* Port B write */
+		DEVCB_NULL					/* Port C write */
 	},
 	{	/* A, B & C set as input */
-		DEVICE8_PORT("DSW1"),	/* Port A read, DSW1 */
-		DEVICE8_PORT("DSW2"),	/* Port B read, DSW2 */
-		DEVICE8_PORT("DSW3"),	/* Port C read, DSW3 */
-		NULL,					/* Port A write */
-		NULL,					/* Port B write */
-		NULL					/* Port C write */
+		DEVCB_INPUT_PORT("DSW1"),	/* Port A read, DSW1 */
+		DEVCB_INPUT_PORT("DSW2"),	/* Port B read, DSW2 */
+		DEVCB_INPUT_PORT("DSW3"),	/* Port C read, DSW3 */
+		DEVCB_NULL,					/* Port A write */
+		DEVCB_NULL,					/* Port B write */
+		DEVCB_NULL					/* Port C write */
 	},
 	{	/* A set as input */
-		DEVICE8_PORT("DSW4"),	/* Port A read, DSW4 */
-		NULL,					/* Port B read */
-		NULL,					/* Port C read */
-		NULL,					/* Port A write */
-		lamps_a_w,				/* Port B write, LAMPSA */
-		lamps_b_w				/* Port C write, LAMPSB */
+		DEVCB_INPUT_PORT("DSW4"),	/* Port A read, DSW4 */
+		DEVCB_NULL,					/* Port B read */
+		DEVCB_NULL,					/* Port C read */
+		DEVCB_NULL,					/* Port A write */
+		DEVCB_HANDLER(lamps_a_w),	/* Port B write, LAMPSA */
+		DEVCB_HANDLER(lamps_b_w)	/* Port C write, LAMPSB */
 	}
 };
 

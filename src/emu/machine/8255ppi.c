@@ -99,8 +99,8 @@ struct _ppi8255
 {
 	const ppi8255_interface	*intf;
 
-	read8_device_func port_read[3];
-	write8_device_func port_write[3];
+	devcb_resolved_read8 port_read[3];
+	devcb_resolved_write8 port_write[3];
 
 	/* mode flags */
 	UINT8 group_a_mode;
@@ -234,8 +234,8 @@ static UINT8 ppi8255_read_port(const device_config *device, int port)
 
 	if (ppi8255->in_mask[port])
 	{
-		if (ppi8255->port_read[port] != NULL)
-			ppi8255_input(device, port, CALL_DEVICE8_READ(ppi8255->port_read[port], device, 0));
+		if (ppi8255->port_read[port].read != NULL)
+			ppi8255_input(device, port, devcb_call_read8(&ppi8255->port_read[port], 0));
 
 		result |= ppi8255->read[port] & ppi8255->in_mask[port];
 	}
@@ -287,8 +287,8 @@ static void ppi8255_write_port(const device_config *device, int port)
 		ppi8255_get_handshake_signals(ppi8255, 0, &write_data);
 
 	ppi8255->output[port] = write_data;
-	if (ppi8255->port_write[port] != NULL)
-		(*ppi8255->port_write[port])(device, 0, write_data);
+	if (ppi8255->port_write[port].write != NULL)
+		devcb_call_write8(&ppi8255->port_write[port], 0, write_data);
 }
 
 
@@ -351,47 +351,41 @@ WRITE8_DEVICE_HANDLER( ppi8255_w )
 }
 
 
-void ppi8255_set_port_a_read(const device_config *device, read8_device_func port_a_read)
+void ppi8255_set_port_a_read(const device_config *device, const devcb_read8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
-
-	ppi8255->port_read[0] = port_a_read;
+	devcb_resolve_read8(&ppi8255->port_read[0], config, device);
 }
 
-void ppi8255_set_port_b_read(const device_config *device, read8_device_func port_b_read)
+void ppi8255_set_port_b_read(const device_config *device, const devcb_read8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
-
-	ppi8255->port_read[1] = port_b_read;
+	devcb_resolve_read8(&ppi8255->port_read[1], config, device);
 }
 
-void ppi8255_set_port_c_read(const device_config *device, read8_device_func port_c_read)
+void ppi8255_set_port_c_read(const device_config *device, const devcb_read8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
-
-	ppi8255->port_read[2] = port_c_read;
+	devcb_resolve_read8(&ppi8255->port_read[2], config, device);
 }
 
 
-void ppi8255_set_port_a_write(const device_config *device, write8_device_func port_a_write)
+void ppi8255_set_port_a_write(const device_config *device, const devcb_write8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
-
-	ppi8255->port_write[0] = port_a_write;
+	devcb_resolve_write8(&ppi8255->port_write[0], config, device);
 }
 
-void ppi8255_set_port_b_write(const device_config *device, write8_device_func port_b_write)
+void ppi8255_set_port_b_write(const device_config *device, const devcb_write8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
-
-	ppi8255->port_write[1] = port_b_write;
+	devcb_resolve_write8(&ppi8255->port_write[1], config, device);
 }
 
-void ppi8255_set_port_c_write(const device_config *device, write8_device_func port_c_write)
+void ppi8255_set_port_c_write(const device_config *device, const devcb_write8 *config)
 {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
-
-	ppi8255->port_write[2] = port_c_write;
+	devcb_resolve_write8(&ppi8255->port_write[2], config, device);
 }
 
 
@@ -509,13 +503,13 @@ static DEVICE_START( ppi8255 ) {
 
 	ppi8255->intf = device->static_config;
 
-	ppi8255->port_read[0] = ppi8255->intf->port_a_read;
-	ppi8255->port_read[1] = ppi8255->intf->port_b_read;
-	ppi8255->port_read[2] = ppi8255->intf->port_c_read;
+	devcb_resolve_read8(&ppi8255->port_read[0], &ppi8255->intf->port_a_read, device);
+	devcb_resolve_read8(&ppi8255->port_read[1], &ppi8255->intf->port_b_read, device);
+	devcb_resolve_read8(&ppi8255->port_read[2], &ppi8255->intf->port_c_read, device);
 
-	ppi8255->port_write[0] = ppi8255->intf->port_a_write;
-	ppi8255->port_write[1] = ppi8255->intf->port_b_write;
-	ppi8255->port_write[2] = ppi8255->intf->port_c_write;
+	devcb_resolve_write8(&ppi8255->port_write[0], &ppi8255->intf->port_a_write, device);
+	devcb_resolve_write8(&ppi8255->port_write[1], &ppi8255->intf->port_b_write, device);
+	devcb_resolve_write8(&ppi8255->port_write[2], &ppi8255->intf->port_c_write, device);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, ppi8255->group_a_mode);

@@ -457,12 +457,12 @@ static const ppi8255_interface ppi8255_intf[1] =
    High 4 bits of C set as Output
 */
 	{
-		DEVICE8_PORT("IN0"),	/* Port A read */
-		prot_r,					/* Port B read */
-		DEVICE8_PORT("IN2"),	/* Port C read (Lower Nibble as Input) */
-		NULL,   				/* Port A write */
-		NULL,  		 			/* Port B write */
-		NULL	//ppi_portc_hi_w                /* Port C write (High nibble as Output) */
+		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
+		DEVCB_HANDLER(prot_r),		/* Port B read */
+		DEVCB_INPUT_PORT("IN2"),	/* Port C read (Lower Nibble as Input) */
+		DEVCB_NULL,   				/* Port A write */
+		DEVCB_NULL,  		 		/* Port B write */
+		DEVCB_NULL	//ppi_portc_hi_w                /* Port C write (High nibble as Output) */
 	}
 };
 

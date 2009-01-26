@@ -406,20 +406,20 @@ INPUT_PORTS_END
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		DEVICE8_PORT("IN0"),		// Port A read
-		NULL,						// Port B read
-		DEVICE8_PORT("IN3"),		// Port C read
-		fake_w,						// Port A write
-		lordgun_eeprom_w,			// Port B write
-		fake2_w						// Port C write
+		DEVCB_INPUT_PORT("IN0"),		// Port A read
+		DEVCB_NULL,						// Port B read
+		DEVCB_INPUT_PORT("IN3"),		// Port C read
+		DEVCB_HANDLER(fake_w),			// Port A write
+		DEVCB_HANDLER(lordgun_eeprom_w),// Port B write
+		DEVCB_HANDLER(fake2_w)			// Port C write
 	},
 	{
-		DEVICE8_PORT("IN1"),		// Port A read
-		DEVICE8_PORT("IN2"),		// Port B read
-		DEVICE8_PORT("IN4"),		// Port C read
-		fake_w,						// Port A write
-		fake_w,						// Port B write
-		fake_w						// Port C write
+		DEVCB_INPUT_PORT("IN1"),		// Port A read
+		DEVCB_INPUT_PORT("IN2"),		// Port B read
+		DEVCB_INPUT_PORT("IN4"),		// Port C read
+		DEVCB_HANDLER(fake_w),			// Port A write
+		DEVCB_HANDLER(fake_w),			// Port B write
+		DEVCB_HANDLER(fake_w)			// Port C write
 	}
 };
 
