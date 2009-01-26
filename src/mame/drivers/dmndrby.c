@@ -273,8 +273,8 @@ static const gfx_layout tiles8x8_layout =
 {
 	8,8,
 	RGN_FRAC(1,2),
-	4,
-	{ 0,4,RGN_FRAC(1,2)},
+	3,
+	{ RGN_FRAC(1,2),4,0 },
 	{ 0, 1, 2, 3,8,9,10,11 },
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	16*8
@@ -304,7 +304,7 @@ static const gfx_layout tiles8x8_layout2 =
 };
 
 static GFXDECODE_START( dmndrby )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 32*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 32*16, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0, 8)
 	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16_layout, 16*16, 32 )
 GFXDECODE_END
@@ -338,7 +338,7 @@ static VIDEO_UPDATE(dderby)
 {
 	int x,y,count;
 	int off,scrolly;
-	static int bg=0;
+	static int bg;
 	const gfx_element *gfx = screen->machine->gfx[0];
 	const gfx_element *sprites = screen->machine->gfx[1];
 	const gfx_element *track = screen->machine->gfx[2];
@@ -409,26 +409,19 @@ wouldnt like to say its the most effective way though...
 
 	}
 
-
-	// char tiles. seems right - no idea about the palette
+	/*TODO: Fix / understand how the transparency works properly. */
 	count=0;
 	for (y=0;y<32;y++)
 	{
 		for(x=0;x<32;x++)
 		{
 			int tileno,bank,color;
-			int trans = TRANSPARENCY_NONE;//((dderby_vidattribs[count]&0x10)==0x10)?TRANSPARENCY_PEN:TRANSPARENCY_NONE;
 			tileno=dderby_vidchars[count];
-			bank=dderby_vidattribs[count]&0x20;
-			color=((dderby_vidattribs[count]+bg)&0x1f);
-			if(tileno!=0x38) {
-				if (bank)
-					tileno+=0x100;
+			bank=(dderby_vidattribs[count]&0x20)>>5;
+			tileno|=(bank<<8);
+			color=((dderby_vidattribs[count])&0x1f);
 
-
-
-				drawgfx(bitmap,gfx,tileno,color,0,0,x*8,y*8,cliprect,trans,0);
-			}
+			drawgfx(bitmap,gfx,tileno,color,0,0,x*8,y*8,cliprect,(tileno == 0x38) ? TRANSPARENCY_PEN : TRANSPARENCY_NONE,0);
 
 			count++;
 		}
@@ -508,7 +501,7 @@ static MACHINE_DRIVER_START( dderby )
 	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
 	MDRV_CPU_VBLANK_INT("main", dderby_irq)
-	MDRV_CPU_PERIODIC_INT(dderby_timer_irq, 244)
+	MDRV_CPU_PERIODIC_INT(dderby_timer_irq, 244/2)
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* verified on schematics */
 	MDRV_CPU_PROGRAM_MAP(dderby_sound_map,0)
