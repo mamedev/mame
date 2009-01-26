@@ -8534,11 +8534,7 @@ Other Sun games
 	DRIVER( cmasterb )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
-	DRIVER( doge )		/* (c) ?? */
-	DRIVER( dogh )		/* (c) ?? */
-	DRIVER( dogbr )		/* (c) ?? */
-	DRIVER( dog02 )		/* (c) ?? */
-	DRIVER( dog )		/* (c) ?? */
+
 	
 	/* STG? */
 	DRIVER ( queen )
@@ -8565,6 +8561,12 @@ Other Sun games
 	DRIVER( schery98 )	/* (c) 1998 Amcoe */
 	DRIVER( schery97 )	/* (c) 1998 Amcoe */
 	DRIVER( nfb96 )		/* (c) 1996 Amcoe */
+	DRIVER( nfb96se )		/* bootleg */
+	DRIVER( nfb96sea )		/* bootleg */
+	DRIVER( nfb96seb )		/* bootleg */
+	DRIVER( carb2002 )		/* bootleg */
+	DRIVER( carb2003 )		/* bootleg */	
+	
 	DRIVER( sfbonus )	/* (c) 199? Amcoe */
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
