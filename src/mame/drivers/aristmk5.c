@@ -3,22 +3,7 @@
    Aristocrat MK5 / MKV hardware
    possibly 'Acorn Archimedes on a chip' hardware
 
-   -- is it missing a bios rom?
- 
-  Archimedes computer memory map  
-  0000000 - 1FFFFFF - logical RAM (32 meg)
-  2000000 - 2FFFFFF - physical RAM (supervisor only - max 16MB - requires quad MEMCs)
-  3000000 - 33FFFFF - IOC (IO controllers - supervisor only)
-  3270000 - 33FFFFF - external I/O
-  3350010 - printer (parallel port)
-  3350018 - latch A
-  3350040 - latch B
-  
-  3400000 - 37FFFFF - Low ROM  (expansion ROM)
-  3800000 - 3FFFFFF - High ROM (main ROM)
-  
-  3400000 - 35FFFFF - VICD10 (write - supervisor only)
-  3600000 - 3FFFFFF - MEMC (write - supervisor only)
+   Note: ARM250 mapping is not identical to 
 
 */
 
@@ -31,9 +16,9 @@ static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(memc_logical_r, memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(ioc_r, ioc_w)
-	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(vidc_r, vidc_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("main", 0) AM_WRITE(memc_page_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(memc_r, memc_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("main", 0) AM_WRITE(memc_page_w)
+	AM_RANGE(0x03800000, 0x039fffff) AM_READWRITE(vidc_r, vidc_w)
 ADDRESS_MAP_END
 
 
@@ -94,18 +79,18 @@ MACHINE_DRIVER_END
 
 ROM_START( reelrock )
 	ROM_REGION( 0x800000, "main", 0 ) /* ARM Code */
-	ROM_LOAD16_BYTE( "reelrock.u7",  0x000000, 0x80000, CRC(b60af34f) SHA1(1143380b765db234b3871c0fe04736472fde7de4) )
-	ROM_LOAD16_BYTE( "reelrock.u11", 0x000001, 0x80000, CRC(57e341d0) SHA1(9b0d50763bb74ca5fe404c9cd526633721cf6677) )
-	ROM_LOAD16_BYTE( "reelrock.u8",  0x100000, 0x80000, CRC(57eec667) SHA1(5f3888d75f48b6148f451d7ebb7f99e1a0939f3c) )
-	ROM_LOAD16_BYTE( "reelrock.u12", 0x100001, 0x80000, CRC(4ac20679) SHA1(0ac732ffe6a33806e4a06e87ec875a3e1314e06b) )
+	ROM_LOAD32_WORD( "reelrock.u7",  0x000000, 0x80000, CRC(b60af34f) SHA1(1143380b765db234b3871c0fe04736472fde7de4) )
+	ROM_LOAD32_WORD( "reelrock.u11", 0x000002, 0x80000, CRC(57e341d0) SHA1(9b0d50763bb74ca5fe404c9cd526633721cf6677) )
+	ROM_LOAD32_WORD( "reelrock.u8",  0x100000, 0x80000, CRC(57eec667) SHA1(5f3888d75f48b6148f451d7ebb7f99e1a0939f3c) )
+	ROM_LOAD32_WORD( "reelrock.u12", 0x100002, 0x80000, CRC(4ac20679) SHA1(0ac732ffe6a33806e4a06e87ec875a3e1314e06b) )
 ROM_END
 
 ROM_START( indiandr )
 	ROM_REGION( 0x800000, "main", 0 ) /* ARM Code */
-	ROM_LOAD16_BYTE( "indiandr.u7",  0x000000, 0x80000, CRC(0c924a3e) SHA1(499b4ae601e53173e3ba5f400a40e5ae7bbaa043) )
-	ROM_LOAD16_BYTE( "indiandr.u11", 0x000001, 0x80000, CRC(e371dc0f) SHA1(a01ab7fb63a19c144f2c465ecdfc042695124bdf) )
-	ROM_LOAD16_BYTE( "indiandr.u8",  0x100000, 0x80000, CRC(1c6bfb47) SHA1(7f751cb499a6185a0ab64eeec511583ceeee6ee8) )
-	ROM_LOAD16_BYTE( "indiandr.u12", 0x100001, 0x80000, CRC(4bbe67f6) SHA1(928f88387da66697f1de54f086531f600f80a15e) )
+	ROM_LOAD32_WORD( "indiandr.u7",  0x000000, 0x80000, CRC(0c924a3e) SHA1(499b4ae601e53173e3ba5f400a40e5ae7bbaa043) )
+	ROM_LOAD32_WORD( "indiandr.u11", 0x000002, 0x80000, CRC(e371dc0f) SHA1(a01ab7fb63a19c144f2c465ecdfc042695124bdf) )
+	ROM_LOAD32_WORD( "indiandr.u8",  0x100000, 0x80000, CRC(1c6bfb47) SHA1(7f751cb499a6185a0ab64eeec511583ceeee6ee8) )
+	ROM_LOAD32_WORD( "indiandr.u12", 0x100002, 0x80000, CRC(4bbe67f6) SHA1(928f88387da66697f1de54f086531f600f80a15e) )
 ROM_END
 
 GAME( 1998, reelrock, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98)", GAME_NOT_WORKING|GAME_NO_SOUND )
