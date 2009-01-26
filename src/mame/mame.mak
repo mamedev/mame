@@ -124,8 +124,8 @@ CPUS += ASAP
 CPUS += UPD7810
 CPUS += UPD7807
 CPUS += UPD7801
-CPUS += ARM
-CPUS += ARM7
+CPUS += ARM26
+CPUS += ARM32
 CPUS += JAGUAR
 CPUS += CUBEQCPU
 CPUS += ESRIP
@@ -456,6 +456,7 @@ $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/86lions.o \
 	$(DRIVERS)/caswin.o \
 	$(DRIVERS)/aristmk5.o \
+	$(MACHINE)/archimds.o \
 
 $(MAMEOBJ)/atari.a: \
  	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
