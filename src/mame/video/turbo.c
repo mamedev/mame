@@ -249,17 +249,27 @@ INLINE UINT32 sprite_xscale(UINT8 dacinput, double vr1, double vr2, double cext)
 		vco_cv = 5.0;
 	if (vco_cv < 0.0)
 		vco_cv = 0.0;
-	if (vco_cv < 1.33)
-		vco_freq = (0.68129 + pow(vco_cv + 0.6, 1.285)) * 1e6;
-	else if (vco_cv < 4.3)
-		vco_freq = (3 + (8 - 3) * ((vco_cv - 1.33) / (4.3 - 1.33))) * 1e6;
-	else
-		vco_freq = (-1.560279 + pow(vco_cv - 4.3 + 6, 1.26)) * 1e6;
+	if (cext < 1e-11) 
+	{
+		if (vco_cv < 1.33)
+			vco_freq = (0.68129 + pow(vco_cv + 0.6, 1.285)) * 1e6;
+		else if (vco_cv < 4.3)
+			vco_freq = (3 + (8 - 3) * ((vco_cv - 1.33) / (4.3 - 1.33))) * 1e6;
+		else
+			vco_freq = (-1.560279 + pow(vco_cv - 4.3 + 6, 1.26)) * 1e6;
 
-	/* now scale based on the actual external capacitor; the frequency goes */
-	/* up by a factor of 10 for every factor of 10 the capacitance is reduced */
-	/* approximately */
-	vco_freq *= 50e-12 / cext;
+		/* now scale based on the actual external capacitor; the frequency goes */
+		/* up by a factor of 10 for every factor of 10 the capacitance is reduced */
+		/* approximately */
+		vco_freq *= 50e-12 / cext;
+	}
+	else
+	{
+		/* based on figure 6 of datasheet */
+		vco_freq = -0.9892942 * log10(cext)	- 0.0309697 * vco_cv * vco_cv 
+		              +	0.344079975 * vco_cv - 4.086395841;
+		vco_freq = pow(10.0, vco_freq);
+	}
 
 	/* finally, convert to a fraction (8.24) of 5MHz, which is the pixel clock */
 	return (UINT32)((vco_freq / (5e6 * TURBO_X_SCALE)) * 16777216.0);
@@ -905,7 +915,8 @@ static void buckrog_prepare_sprites(running_machine *machine, turbo_state *state
 			info->plb[level] = 0;
 			info->offset[level] = offset << 1;
 			info->frac[level] = 0;
-			info->step[level] = sprite_xscale(xscale, 1.2e3, 500/*820*/, 220e-12);
+			/* 820 verified in schematics */
+			info->step[level] = sprite_xscale(xscale, 1.2e3, 820, 220e-12);
 		}
 	}
 }
