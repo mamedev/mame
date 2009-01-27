@@ -2188,7 +2188,7 @@ const game_driver * const drivers[] =
 	DRIVER( batridc )	/* (c) 1998 Raizing/8ing */
 	DRIVER( batridj )	/* (c) 1998 Raizing/8ing */
 	DRIVER( batridk )	/* (c) 1998 Raizing/8ing */
-	DRIVER( batridja )	/* (c) 1998 Raizing/8ing */	
+	DRIVER( batridja )	/* (c) 1998 Raizing/8ing */
 	DRIVER( bkraidu )	/* (c) 1999 8ing */
 	DRIVER( bkraiduj )	/* (c) 1999 8ing */
 	DRIVER( bkraidj )	/* (c) 1999 8ing */
@@ -8444,7 +8444,6 @@ Other Sun games
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
 	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
-	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( gamecstl )	/* MAME based bootleg */
 	DRIVER( gamecst2 )	/* MAME based bootleg, version 2.613 */
 	DRIVER( drw80pkr )	/* (c) 1983 IGT */
@@ -8535,18 +8534,18 @@ Other Sun games
 	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
 
-	
+
 	/* STG? */
 	DRIVER ( queen )
 
 	/* Aristocrat */
 	DRIVER ( 86lions )	/* (c) 1985? */
 	DRIVER ( caswin )	/* (c) 1985 */
-	
+
 	/* Aristocrat Mk5 hardware */
 	DRIVER( reelrock )	/* (c) 1998 */
 	DRIVER( indiandr )	/* (c) 1998 */
-	
+
 	/* Eagle */
 	DRIVER ( janshi )
 
@@ -8565,8 +8564,8 @@ Other Sun games
 	DRIVER( nfb96sea )		/* bootleg */
 	DRIVER( nfb96seb )		/* bootleg */
 	DRIVER( carb2002 )		/* bootleg */
-	DRIVER( carb2003 )		/* bootleg */	
-	
+	DRIVER( carb2003 )		/* bootleg */
+
 	DRIVER( sfbonus )	/* (c) 199? Amcoe */
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
@@ -8578,5 +8577,10 @@ Other Sun games
 
 	/* Hi-Soft */
 	DRIVER( himesiki )	/* (c) 1989 Hi-Soft */
+
+	/* Hi-Lo Poker-based */
+	DRIVER( gtipoker )  /* (c) 1983 GTI Inc */
+	DRIVER( norautp )   /* (c) 1988? Noraut */
+	DRIVER( norautpn )  /* (c) 1990? unknown */
 
 #endif	/* DRIVER_RECURSIVE */
