@@ -88,8 +88,10 @@
 
 #define MR_R6		RES_K(4.7)		/* verified                             */
 #define MR_R7		RES_K(4.7)		/* verified                             */
-#define MR_R17		RES_K(27)		/* verified, 30K in schematics          */
-#define MR_R18		RES_K(27)		/* verified, 30K in schematics          */
+#define MR_R17		RES_K(27)		/* 20 according to parts list           */
+									/* 27 verified, 30K in schematics       */
+#define MR_R18		RES_K(27)		/* 20 according to parts list           */
+									/* 27 verified, 30K in schematics       */
 #define MR_R19		RES_K(22)		/* verified                             */
 #define MR_R20		RES_K(22)		/* verified                             */
 #define MR_R40		RES_K(22)		/* verified                             */
@@ -110,7 +112,9 @@
 #define MR_C32		CAP_U(1)		/* illegible on pcb                     */
 #define MR_C39		CAP_N(4.7)		/* not found                            */
 #define MR_C40		CAP_N(22)		/* verified                             */
-#define MR_C41		CAP_U(4.7)		/* verified, hard to read               */
+//#define MR_C41		CAP_U(4.7)		/* verified, hard to read           */
+/* The 60% adjustment is needed to bring this close to recordings           */
+#define MR_C41		(CAP_U(4.7) * 0.6) 
 #define MR_C43		CAP_U(3.3)		/* verified                             */
 #define MR_C44		CAP_U(3.3)		/* verified                             */
 
@@ -124,7 +128,8 @@
 	DISCRETE_ONESHOTR(_N, 0, _T, TTL_HIGH, (0.25 * (_R) * (_C) * (1.0+700./(_R))), DISC_ONESHOT_RETRIG | DISC_ONESHOT_REDGE | DISC_OUT_ACTIVE_LOW)
 
 #define DISCRETE_BITSET(_N, _N1, _B) DISCRETE_TRANSFORM3(_N, _N1, (1 << ((_B)-1)), 0, "01&2>")
-#define DISCRETE_ENERGY_NAND(_N, _E, _N1, _N2) DISCRETE_TRANSFORM3(_N, _N1, _N2, 1, "201*-")
+#define DISCRETE_ENERGY_AND(_N, _E, _N1, _N2) DISCRETE_TRANSFORM2(_N, _N1, _N2, "01*")
+#define DISCRETE_ENERGY_XOR(_N, _E, _N1, _N2) DISCRETE_TRANSFORM2(_N, _N1, _N2, "10-a")
 
 
 static const discrete_mixer_desc mario_mixer_desc =
@@ -163,12 +168,18 @@ static DISCRETE_SOUND_START(mario)
 
 	DISCRETE_LS123(NODE_10, DS_SOUND0_INV, MR_R17, MR_C14)
 	DISCRETE_RCFILTER(NODE_11, 1, NODE_10, MR_R6, MR_C3)
-	DISCRETE_74LS624( NODE_12, 1, NODE_11, VSS, MR_C6, DISC_LS624_OUT_LOGIC)
-	DISCRETE_74LS624( NODE_13, 1, NODE_11, VSS, MR_C17, DISC_LS624_OUT_LOGIC)
+	//DISCRETE_74LS624( NODE_12, 1, NODE_11, VSS, MR_C6, DISC_LS624_OUT_LOGIC)
+	//DISCRETE_74LS624( NODE_13, 1, NODE_11, VSS, MR_C17, DISC_LS624_OUT_LOGIC)
+	DISCRETE_74LS624( NODE_12, 1, NODE_11, VSS, MR_C6, DISC_LS624_OUT_ENERGY)
+	DISCRETE_74LS624( NODE_13, 1, NODE_11, VSS, MR_C17, DISC_LS624_OUT_ENERGY)
 
 	DISCRETE_LOGIC_XOR(NODE_14, 1, NODE_12, NODE_13)
 	DISCRETE_LOGIC_AND(NODE_15, 1, NODE_14, NODE_10)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND0, 1, NODE_15, TTL_HIGH)
+	/* This should be more appropriate, but filters out low frequencies */
+	//DISCRETE_ENERGY_XOR(NODE_14, 1, NODE_12, NODE_13)
+	//DISCRETE_ENERGY_AND(NODE_15, 1, NODE_14, NODE_10)
+	//DISCRETE_MULTIPLY(DS_OUT_SOUND0, 1, NODE_15, 1)
 
 	/************************************************/
 	/* SOUND1                                       */
@@ -176,12 +187,18 @@ static DISCRETE_SOUND_START(mario)
 
 	DISCRETE_LS123(NODE_20, DS_SOUND1_INV, MR_R18, MR_C15)
 	DISCRETE_RCFILTER(NODE_21, 1, NODE_20, MR_R7, MR_C4)
-	DISCRETE_74LS624( NODE_22, 1, NODE_21, VSS, MR_C5, DISC_LS624_OUT_LOGIC)
-	DISCRETE_74LS624( NODE_23, 1, NODE_21, VSS, MR_C16, DISC_LS624_OUT_LOGIC)
+	//DISCRETE_74LS624( NODE_22, 1, NODE_21, VSS, MR_C5, DISC_LS624_OUT_LOGIC)
+	//DISCRETE_74LS624( NODE_23, 1, NODE_21, VSS, MR_C16, DISC_LS624_OUT_LOGIC)
+	DISCRETE_74LS624( NODE_22, 1, NODE_21, VSS, MR_C5, DISC_LS624_OUT_ENERGY)
+	DISCRETE_74LS624( NODE_23, 1, NODE_21, VSS, MR_C16, DISC_LS624_OUT_ENERGY)
 
 	DISCRETE_LOGIC_XOR(NODE_24, 1, NODE_22, NODE_23)
 	DISCRETE_LOGIC_AND(NODE_25, 1, NODE_24, NODE_20)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND1, 1, NODE_25, TTL_HIGH)
+	/* This should be more appropriate, but filters out high frequencies */
+	//DISCRETE_ENERGY_XOR(NODE_24, 1, NODE_22, NODE_23)
+	//DISCRETE_ENERGY_AND(NODE_25, 1, NODE_24, NODE_20)
+	//DISCRETE_MULTIPLY(DS_OUT_SOUND1, 1, NODE_25, 1)
 
 	/************************************************/
 	/* SOUND7                                       */
@@ -197,7 +214,8 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_RCFILTER(NODE_112, 1, NODE_111, MR_R65, MR_C44)
 	DISCRETE_74LS624(NODE_113, 1, NODE_112, VSS, MR_C40, DISC_LS624_OUT_LOGIC)
 
-	DISCRETE_LOGIC_XOR(NODE_115, 1, NODE_102, NODE_113)
+	//DISCRETE_LOGIC_XOR(NODE_115, 1, NODE_102, NODE_113)
+	DISCRETE_ENERGY_XOR(NODE_115, 1, NODE_102, NODE_113)
 
 	DISCRETE_TRANSFORM2(NODE_116, NODE_104, TTL_HIGH, "0!1*")
 	DISCRETE_RCFILTER(NODE_117, 1, NODE_116, MR_R64, MR_C43)
@@ -205,6 +223,8 @@ static DISCRETE_SOUND_START(mario)
 
 	DISCRETE_LOGIC_AND(NODE_120, 1, NODE_115, NODE_110)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND7, 1, NODE_120, TTL_HIGH)
+	//DISCRETE_ENERGY_AND(NODE_120, 1, NODE_115, NODE_110)
+	//DISCRETE_MULTIPLY(DS_OUT_SOUND7, 1, NODE_120, 1)
 
 	/************************************************/
 	/* DAC                                          */
@@ -228,7 +248,7 @@ static DISCRETE_SOUND_START(mario)
      */
 	// EZV20 equivalent filter circuit ...
 	DISCRETE_CRFILTER(NODE_296,1,NODE_295, RES_K(1), CAP_U(4.7))
-	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 2)
+	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 3)
 	//DISCRETE_WAVELOG2(NODE_296, 32767/5.0 * 2, DS_SOUND0_INV, 10000)
 	//DISCRETE_WAVELOG2(NODE_296, 32767/5.0 * 2, DS_SOUND7_INV, 10000)
 
