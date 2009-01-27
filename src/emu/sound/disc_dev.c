@@ -1605,15 +1605,17 @@ static DISCRETE_STEP(dsd_ls624)
 		double	dt;	/* change in time */
 		double	sample_t;
 		double	t;
-		int		lst, cntf = 0, cntr = 0;
+		double  en = 0.0f;
+		int		cntf = 0, cntr = 0;
 
 		sample_t = discrete_current_context->sample_time;	/* Change in time */
 		//dt  = LS624_T(DSD_LS624__C, DSD_LS624__VRNG, DSD_LS624__VMOD) / 2.0;
 		dt  = 1.0f / (2.0f * LS624_F(DSD_LS624__C, DSD_LS624__VMOD, DSD_LS624__VRNG));
 		t   = context->remain;
-		lst = context->state;
-		while (t + dt < sample_t)
+		en += (double) context->state * t;
+		while (t + dt <= sample_t)
 		{
+			en += (double) context->state * dt;
 			context->state = (1 - context->state);
 			if (context->state)
 				cntr++;
@@ -1621,12 +1623,13 @@ static DISCRETE_STEP(dsd_ls624)
 				cntf++;
 			t += dt;
 		}
+		en += (sample_t - t) * (double) context->state;
 		context->remain = t - sample_t;
 
 		switch (context->out_type)
 		{
 			case DISC_LS624_OUT_ENERGY:
-				node->output[0] = ((double)lst) * (1.0 + context->remain / sample_t) - ((double)context->state) * context->remain / sample_t;
+				node->output[0] = en / sample_t;
 				break;
 			case DISC_LS624_OUT_LOGIC:
 				/* filter out randomness */
