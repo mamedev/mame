@@ -840,7 +840,7 @@ static INPUT_PORTS_START( casino5 )
 	PORT_DIPNAME( 0x08, 0x08, "Reset High Scores" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* 1 disaplays additional screens in attract mode - custom ads? */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* 1 displays additional screens in attract mode - custom ads? */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
