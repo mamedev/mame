@@ -22,6 +22,7 @@
 #define __6821NEW_H__
 
 #include "driver.h"
+#include "devcb.h"
 
 
 /***************************************************************************
@@ -41,18 +42,18 @@
 typedef struct _pia6821_interface pia6821_interface;
 struct _pia6821_interface
 {
-	read8_device_func in_a_func;
-	read8_device_func in_b_func;
-	read8_device_func in_ca1_func;
-	read8_device_func in_cb1_func;
-	read8_device_func in_ca2_func;
-	read8_device_func in_cb2_func;
-	write8_device_func out_a_func;
-	write8_device_func out_b_func;
-	write8_device_func out_ca2_func;
-	write8_device_func out_cb2_func;
-	void (*irq_a_func)(const device_config *device, int state);
-	void (*irq_b_func)(const device_config *device, int state);
+	devcb_read8 in_a_func;
+	devcb_read8 in_b_func;
+	devcb_read8 in_ca1_func;
+	devcb_read8 in_cb1_func;
+	devcb_read8 in_ca2_func;
+	devcb_read8 in_cb2_func;
+	devcb_write8 out_a_func;
+	devcb_write8 out_b_func;
+	devcb_write8 out_ca2_func;
+	devcb_write8 out_cb2_func;
+	devcb_write_line irq_a_func;
+	devcb_write_line irq_b_func;
 };
 
 

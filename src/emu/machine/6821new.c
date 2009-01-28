@@ -14,6 +14,19 @@
 typedef struct _pia6821 pia6821;
 struct _pia6821
 {
+	devcb_resolved_read8 in_a_func;
+	devcb_resolved_read8 in_b_func;
+	devcb_resolved_read8 in_ca1_func;
+	devcb_resolved_read8 in_cb1_func;
+	devcb_resolved_read8 in_ca2_func;
+	devcb_resolved_read8 in_cb2_func;
+	devcb_resolved_write8 out_a_func;
+	devcb_resolved_write8 out_b_func;
+	devcb_resolved_write8 out_ca2_func;
+	devcb_resolved_write8 out_cb2_func;
+	devcb_resolved_write_line irq_a_func;
+	devcb_resolved_write_line irq_b_func;
+
 	UINT8 in_a;
 	UINT8 in_ca1;
 	UINT8 in_ca2;
@@ -120,7 +133,24 @@ INLINE const pia6821_interface *get_interface(const device_config *device)
 static DEVICE_START( pia )
 {
 	pia6821 *p = get_token(device);
+	const pia6821_interface *intf = get_interface(device);
+
+	/* clear structure */
 	memset(p, 0, sizeof(*p));
+
+	/* resolve callbacks */
+	devcb_resolve_read8(&p->in_a_func, &intf->in_a_func, device);
+	devcb_resolve_read8(&p->in_b_func, &intf->in_b_func, device);
+	devcb_resolve_read8(&p->in_ca1_func, &intf->in_ca1_func, device);
+	devcb_resolve_read8(&p->in_cb1_func, &intf->in_cb1_func, device);
+	devcb_resolve_read8(&p->in_ca2_func, &intf->in_ca2_func, device);
+	devcb_resolve_read8(&p->in_cb2_func, &intf->in_cb2_func, device);
+	devcb_resolve_write8(&p->out_a_func, &intf->out_a_func, device);
+	devcb_resolve_write8(&p->out_b_func, &intf->out_b_func, device);
+	devcb_resolve_write8(&p->out_ca2_func, &intf->out_ca2_func, device);
+	devcb_resolve_write8(&p->out_cb2_func, &intf->out_cb2_func, device);
+	devcb_resolve_write_line(&p->irq_a_func, &intf->irq_a_func, device);
+	devcb_resolve_write_line(&p->irq_b_func, &intf->irq_b_func, device);
 
 	state_save_register_device_item(device, 0, p->in_a);
 	state_save_register_device_item(device, 0, p->in_ca1);
@@ -164,9 +194,6 @@ static DEVICE_START( pia )
 static DEVICE_RESET( pia )
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
-
-	memset(p, 0, sizeof(*p));
 
 	/*
      * set default read values.
@@ -177,10 +204,46 @@ static DEVICE_RESET( pia )
 	p->in_a = 0xff;
 	p->in_ca1 = TRUE;
 	p->in_ca2 = TRUE;
+	p->out_a = 0;
+	p->out_ca2 = 0;
+	p->port_a_z_mask = 0;
+	p->ddr_a = 0;
+	p->ctl_a = 0;
+	p->irq_a1 = 0;
+	p->irq_a2 = 0;
+	p->irq_a_state = 0;
+	p->in_b = 0;
+	p->in_cb1 = 0;
+	p->in_cb2 = 0;
+	p->out_b = 0;
+	p->out_cb2 = 0;
+	p->last_out_cb2_z = 0;
+	p->ddr_b = 0;
+	p->ctl_b = 0;
+	p->irq_b1 = 0;
+	p->irq_b2 = 0;
+	p->irq_b_state = 0;
+	p->in_a_pushed = 0;
+	p->out_a_needs_pulled = 0;
+	p->in_ca1_pushed = 0;
+	p->in_ca2_pushed = 0;
+	p->out_ca2_needs_pulled = 0;
+	p->in_b_pushed = 0;
+	p->out_b_needs_pulled = 0;
+	p->in_cb1_pushed = 0;
+	p->in_cb2_pushed = 0;
+	p->out_cb2_needs_pulled = 0;
+	p->logged_port_a_not_connected = 0;
+	p->logged_port_b_not_connected = 0;
+	p->logged_ca1_not_connected = 0;
+	p->logged_ca2_not_connected = 0;
+	p->logged_cb1_not_connected = 0;
+	p->logged_cb2_not_connected = 0;
+
 
 	/* clear the IRQs */
-	if (intf->irq_a_func) (*intf->irq_a_func)(device, FALSE);
-	if (intf->irq_b_func) (*intf->irq_b_func)(device, FALSE);
+	devcb_call_write_line(&p->irq_a_func, FALSE);
+	devcb_call_write_line(&p->irq_b_func, FALSE);
 }
 
 
@@ -191,7 +254,6 @@ static DEVICE_RESET( pia )
 static void update_interrupts(const device_config *device)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 	int new_state;
 
 	/* start with IRQ A */
@@ -200,9 +262,7 @@ static void update_interrupts(const device_config *device)
 	if (new_state != p->irq_a_state)
 	{
 		p->irq_a_state = new_state;
-
-		if (intf->irq_a_func)
-			(*intf->irq_a_func)(device, p->irq_a_state);
+		devcb_call_write_line(&p->irq_a_func, p->irq_a_state);
 	}
 
 	/* then do IRQ B */
@@ -211,9 +271,7 @@ static void update_interrupts(const device_config *device)
 	if (new_state != p->irq_b_state)
 	{
 		p->irq_b_state = new_state;
-
-		if (intf->irq_b_func)
-			(*intf->irq_b_func)(device, p->irq_b_state);
+		devcb_call_write_line(&p->irq_b_func, p->irq_b_state);
 	}
 }
 
@@ -225,13 +283,12 @@ static void update_interrupts(const device_config *device)
 static UINT8 get_in_a_value(const device_config *device)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 	UINT8 port_a_data = 0;
 	UINT8 ret;
 
 	/* update the input */
-	if (intf->in_a_func)
-		port_a_data = (*intf->in_a_func)(device, 0);
+	if (p->in_a_func.read != NULL)
+		port_a_data = devcb_call_read8(&p->in_a_func, 0);
 	else
 	{
 		if (p->in_a_pushed)
@@ -267,7 +324,6 @@ static UINT8 get_in_a_value(const device_config *device)
 static UINT8 get_in_b_value(const device_config *device)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 	UINT8 ret;
 
 	if (p->ddr_b == 0xff)
@@ -278,8 +334,8 @@ static UINT8 get_in_b_value(const device_config *device)
 		UINT8 port_b_data;
 
 		/* update the input */
-		if (intf->in_b_func)
-			port_b_data = (*intf->in_b_func)(device, 0);
+		if (p->in_b_func.read != NULL)
+			port_b_data = devcb_call_read8(&p->in_b_func, 0);
 		else
 		{
 			if (p->in_b_pushed)
@@ -345,15 +401,14 @@ static UINT8 get_out_b_value(const device_config *device)
 static void set_out_ca2(const device_config *device, int data)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 
 	if (data != p->out_ca2)
 	{
 		p->out_ca2 = data;
 
 		/* send to output function */
-		if (intf->out_ca2_func)
-			(*intf->out_ca2_func)(device, 0, p->out_ca2);
+		if (p->out_ca2_func.write)
+			devcb_call_write8(&p->out_ca2_func, 0, p->out_ca2);
 		else
 		{
 			if (p->out_ca2_needs_pulled)
@@ -372,7 +427,6 @@ static void set_out_ca2(const device_config *device, int data)
 static void set_out_cb2(const device_config *device, int data)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 
 	int z = pianew_get_output_cb2_z(device);
 
@@ -382,8 +436,8 @@ static void set_out_cb2(const device_config *device, int data)
 		p->last_out_cb2_z = z;
 
 		/* send to output function */
-		if (intf->out_cb2_func)
-			(*intf->out_cb2_func)(device, 0, p->out_cb2);
+		if (p->out_cb2_func.write)
+			devcb_call_write8(&p->out_cb2_func, 0, p->out_cb2);
 		else
 		{
 			if (p->out_cb2_needs_pulled)
@@ -494,20 +548,19 @@ static UINT8 ddr_b_r(const device_config *device)
 static UINT8 control_a_r(const device_config *device)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 	UINT8 ret;
 
 	/* update CA1 & CA2 if callback exists, these in turn may update IRQ's */
-	if (intf->in_ca1_func)
-		pia_ca1_w(device, 0, (*intf->in_ca1_func)(device, 0));
+	if (p->in_ca1_func.read != NULL)
+		pia_ca1_w(device, 0, devcb_call_read8(&p->in_ca1_func, 0));
 	else if (!p->logged_ca1_not_connected && (!p->in_ca1_pushed))
 	{
 		logerror("PIA #%s: Warning! No CA1 read handler. Assuming pin not connected\n", device->tag);
 		p->logged_ca1_not_connected = TRUE;
 	}
 
-	if (intf->in_ca2_func)
-		pia_ca2_w(device, 0, (*intf->in_ca2_func)(device, 0));
+	if (p->in_ca2_func.read != NULL)
+		pia_ca2_w(device, 0, devcb_call_read8(&p->in_ca2_func, 0));
 	else if ( !p->logged_ca2_not_connected && C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
 	{
 		logerror("PIA #%s: Warning! No CA2 read handler. Assuming pin not connected\n", device->tag);
@@ -537,20 +590,19 @@ static UINT8 control_a_r(const device_config *device)
 static UINT8 control_b_r(const device_config *device)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 	UINT8 ret;
 
 	/* update CB1 & CB2 if callback exists, these in turn may update IRQ's */
-	if (intf->in_cb1_func)
-		pia_cb1_w(device, 0, (*intf->in_cb1_func)(device, 0));
+	if (p->in_cb1_func.read != NULL)
+		pia_cb1_w(device, 0, devcb_call_read8(&p->in_cb1_func, 0));
 	else if (!p->logged_cb1_not_connected && !p->in_cb1_pushed)
 	{
 		logerror("PIA #%s: Error! no CB1 read handler. Three-state pin is undefined\n", device->tag);
 		p->logged_cb1_not_connected = TRUE;
 	}
 
-	if (intf->in_cb2_func)
-		pia_cb2_w(device, 0, (*intf->in_cb2_func)(device, 0));
+	if (p->in_cb2_func.read != NULL)
+		pia_cb2_w(device, 0, devcb_call_read8(&p->in_cb2_func, 0));
 	else if (!p->logged_cb2_not_connected && C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
 	{
 		logerror("PIA #%s: Error! No CB2 read handler. Three-state pin is undefined\n", device->tag);
@@ -640,15 +692,14 @@ UINT8 pianew_get_port_b_z_mask(const device_config *device)
 static void send_to_out_a_func(const device_config *device, const char* message)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 
 	/* input pins are pulled high */
 	UINT8 data = get_out_a_value(device);
 
 	LOG(("PIA #%s: %s = %02X\n", device->tag, message, data));
 
-	if (intf->out_a_func)
-		(*intf->out_a_func)(device, 0, data);
+	if (p->out_a_func.write != NULL)
+		devcb_call_write8(&p->out_a_func, 0, data);
 	else
 	{
 		if (p->out_a_needs_pulled)
@@ -666,15 +717,14 @@ static void send_to_out_a_func(const device_config *device, const char* message)
 static void send_to_out_b_func(const device_config *device, const char* message)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 
 	/* input pins are high-impedance - we just send them as zeros for backwards compatibility */
 	UINT8 data = get_out_b_value(device);
 
 	LOG(("PIA #%s: %s = %02X\n", device->tag, message, data));
 
-	if (intf->out_b_func)
-		(*intf->out_b_func)(device, 0, data);
+	if (p->out_b_func.write != NULL)
+		devcb_call_write8(&p->out_b_func, 0, data);
 	else
 	{
 		if (p->out_b_needs_pulled)
@@ -920,9 +970,8 @@ READ8_DEVICE_HANDLER(pia_porta_r)
 void pianew_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 
-	assert_always(intf->in_a_func == NULL, "pia_porta_w() called when in_a_func implemented");
+	assert_always(p->in_a_func.read == NULL, "pia_porta_w() called when in_a_func implemented");
 
 	LOG(("PIA #%s: set input port A = %02X\n", device->tag, data));
 
@@ -1101,9 +1150,8 @@ READ8_DEVICE_HANDLER(pia_portb_r)
 WRITE8_DEVICE_HANDLER(pia_portb_w)
 {
 	pia6821 *p = get_token(device);
-	const pia6821_interface *intf = get_interface(device);
 
-	assert_always(intf->in_b_func == NULL, "pia_set_input_b() called when in_b_func implemented");
+	assert_always(p->in_b_func.read == NULL, "pia_set_input_b() called when in_b_func implemented");
 
 	LOG(("PIA #%s: set input port B = %02X\n", device->tag, data));
 
