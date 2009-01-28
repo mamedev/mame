@@ -124,7 +124,9 @@ WRITE16_HANDLER( seta2_vregs_w )
                grdians =  019a
     */
 
-	COMBINE_DATA(&seta2_vregs[offset]);
+	if ( seta2_vregs[offset] != COMBINE_DATA(&seta2_vregs[offset]) )
+		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",cpu_get_pc(space->cpu),offset*2,data);
+
 	switch( offset*2 )
 	{
 	case 0x1c:	// FLIP SCREEN (myangel)    <- this is actually zoom
@@ -143,9 +145,6 @@ WRITE16_HANDLER( seta2_vregs_w )
 	case 0x30:	// BLANK SCREEN (pzlbowl, myangel)
 		if (data & ~1)	logerror("CPU #0 PC %06X: blank unknown bits %04X\n",cpu_get_pc(space->cpu),data);
 		break;
-
-	default:
-		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",cpu_get_pc(space->cpu),offset*2,data);
 	}
 }
 

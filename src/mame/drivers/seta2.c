@@ -30,6 +30,8 @@ P0-142A                 1999    Puzzle De Bowling                       Nihon Sy
 P0-142A + extra parts   2000    Penguin Brothers                        Subsino
 B0-003A (or B0-003B)    2000    Deer Hunting USA                        Sammy
 B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
+B0-006B                 2001    Funcube 2                               Namco
+B0-006B?                2001    Funcube 4                               Namco
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
 -------------------------------------------------------------------------------------------
@@ -75,6 +77,10 @@ trophyh:
 - mame hangs for around 15 seconds every now and then, at scene changes.
   This is probably due to a couple of frames with an odd or corrupt sprites list,
   taking a long time to render.
+
+funcube:
+- Hacked to run, as they use a ColdFire CPU.
+- Pay-out key causes "unknown error".
 
 ***************************************************************************/
 
@@ -407,9 +413,11 @@ U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pi
 ***************************************************************************/
 
 #include "driver.h"
-#include "cpu/m68000/m68000.h"
+#include "memconv.h"
 #include "deprecat.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/tmp68301.h"
+#include "cpu/h83002/h8.h"
 #include "machine/eeprom.h"
 #include "sound/x1_010.h"
 #include "seta.h"
@@ -818,6 +826,243 @@ static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xfffd0a, 0xfffd0b ) AM_READ_PORT("DSW2")				// parallel data register (DSW 2)
 	AM_RANGE( 0xfffc00, 0xffffff ) AM_READWRITE( SMH_RAM, tmp68301_regs_w) AM_BASE(&tmp68301_regs )	// TMP68301 Registers
 ADDRESS_MAP_END
+
+
+/***************************************************************************
+                                  Funcube
+***************************************************************************/
+
+UINT8 *funcube_outputs;
+UINT8 *funcube_leds;
+
+UINT64 funcube_coin_start_cycles;
+UINT8 funcube_hopper_motor;
+UINT8 funcube_press;
+
+UINT8 funcube_serial_fifo[4];
+UINT8 funcube_serial_count;
+
+// Bus conversion functions:
+
+// RAM shared with the sub CPU
+static READ32_HANDLER( funcube_nvram_dword_r )
+{
+	UINT16 val = generic_nvram16[offset];
+	return ((val & 0xff00) << 8) | (val & 0x00ff);
+}
+
+static WRITE32_HANDLER( funcube_nvram_dword_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		generic_nvram16[offset] = (generic_nvram16[offset] & 0xff00) | (data & 0x000000ff);
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		generic_nvram16[offset] = (generic_nvram16[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
+	}
+}
+
+static WRITE16_HANDLER( spriteram16_word_w )
+{
+	COMBINE_DATA( &spriteram16[offset] );
+}
+
+static READ16_HANDLER( spriteram16_word_r )
+{
+	return spriteram16[offset];
+}
+
+static READ16_HANDLER( paletteram16_word_r )
+{
+	return paletteram16[offset];
+}
+
+READWRITE16BETO32BE( spriteram32_dword, spriteram16_word_r, spriteram16_word_w );
+
+READWRITE16BETO32BE( paletteram32_dword, paletteram16_word_r, paletteram16_xRRRRRGGGGGBBBBB_word_w );
+
+WRITE16BETO32BE( seta2_vregs_dword, seta2_vregs_w );
+
+// Main CPU
+
+// ColdFire peripherals
+
+enum {
+	CF_PPDAT	=	0x1c8/4,
+	CF_MBSR		=	0x1ec/4
+};
+
+static UINT32 *coldfire_regs;
+
+static WRITE32_HANDLER( coldfire_regs_w )
+{
+	COMBINE_DATA( &coldfire_regs[offset] );
+}
+
+static READ32_HANDLER( coldfire_regs_r )
+{
+	switch( offset )
+	{
+		case CF_MBSR:
+			return mame_rand(space->machine);
+
+		case CF_PPDAT:
+			return input_port_read(space->machine, "BATTERY") << 16;
+	}
+
+	return coldfire_regs[offset];
+}
+
+static READ32_HANDLER( funcube_debug_r )
+{
+	UINT32 ret = input_port_read(space->machine,"DEBUG");
+
+	// This bits let you move the crosshair in the inputs / touch panel test with a joystick
+	if (!(video_screen_get_frame_number(space->machine->primary_screen) % 3))
+		ret |= 0x3f;
+
+	return ret;
+}
+
+
+static ADDRESS_MAP_START( funcube_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
+	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
+
+	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ( funcube_debug_r )
+	AM_RANGE( 0x00500004, 0x00500007 ) AM_READWRITE( watchdog_reset32_r, SMH_NOP )
+
+	AM_RANGE( 0x00600000, 0x00600003 ) AM_WRITE( SMH_NOP )	// sound chip
+
+	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE((UINT32**)&spriteram16 ) AM_SIZE(&spriteram_size)
+	AM_RANGE( 0x00840000, 0x0084ffff ) AM_READWRITE( paletteram32_dword_r, paletteram32_dword_w ) AM_BASE((UINT32**)&paletteram16)
+	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE( seta2_vregs_dword_w )                            AM_BASE((UINT32**)&seta2_vregs)
+
+	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE( funcube_nvram_dword_r, funcube_nvram_dword_w )
+
+	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE( coldfire_regs_r, coldfire_regs_w ) AM_BASE(&coldfire_regs)	// Module
+	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM	// SRAM
+ADDRESS_MAP_END
+
+// Sub CPU
+
+static ADDRESS_MAP_START( funcube_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
+	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+ADDRESS_MAP_END
+
+
+
+
+// Simulate coin drop through two sensors
+
+#define FUNCUBE_SUB_CPU_CLOCK (XTAL_14_7456MHz)
+
+static READ8_HANDLER( funcube_coins_r )
+{
+	UINT8 ret = input_port_read(space->machine,"SWITCH");
+	UINT8 coin_bit0 = 1;	// active low
+	UINT8 coin_bit1 = 1;
+
+	UINT8 hopper_bit = (funcube_hopper_motor && !(video_screen_get_frame_number(space->machine->primary_screen)%20)) ? 1 : 0;
+
+	const UINT64 coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK / (1000/20);
+
+	if ( funcube_coin_start_cycles )
+	{
+		UINT64 elapsed = cpu_get_total_cycles(space->cpu) - funcube_coin_start_cycles;
+
+		if ( elapsed < coin_total_cycles/2 )
+			coin_bit0 = 0;
+		else if ( elapsed < coin_total_cycles )
+			coin_bit1 = 0;
+		else
+			funcube_coin_start_cycles = 0;
+	}
+	else
+	{
+		if (!(ret & 1))
+			funcube_coin_start_cycles = cpu_get_total_cycles(space->cpu);
+	}
+
+	return (ret & ~7) | (hopper_bit << 2) | (coin_bit1 << 1) | coin_bit0;
+}
+
+static READ8_HANDLER( funcube_serial_r )
+{
+	UINT8 ret = 0xff;
+
+	switch( funcube_serial_count )
+	{
+		case 4:	ret = funcube_serial_fifo[0];	break;
+		case 3:	ret = funcube_serial_fifo[1];	break;
+		case 2:	ret = funcube_serial_fifo[2];	break;
+		case 1:	ret = funcube_serial_fifo[3];	break;
+	}
+
+	if (funcube_serial_count)
+		funcube_serial_count--;
+
+	return ret;
+}
+
+static void funcube_debug_outputs(void)
+{
+#ifdef MAME_DEBUG
+//	popmessage("LED: %02x OUT: %02x", (int)*funcube_leds, (int)*funcube_outputs);
+#endif
+}
+
+static WRITE8_HANDLER( funcube_leds_w )
+{
+	*funcube_leds = data;
+
+	set_led_status( 0, (~data) & 0x01 );	// win lamp (red)
+	set_led_status( 1, (~data) & 0x02 );	// win lamp (green)
+
+	// Set in a moving pattern: 0111 -> 1011 -> 1101 -> 1110
+	set_led_status( 2, (~data) & 0x10 );
+	set_led_status( 3, (~data) & 0x20 );
+	set_led_status( 4, (~data) & 0x40 );
+	set_led_status( 5, (~data) & 0x80 );
+
+	funcube_debug_outputs();
+}
+
+static READ8_HANDLER( funcube_outputs_r )
+{
+	// Bits 1,2,3 read
+	return *funcube_outputs;
+}
+
+static WRITE8_HANDLER( funcube_outputs_w )
+{
+	*funcube_outputs = data;
+
+	// Bits 0,1,3 written
+
+	// Bit 0: hopper motor
+	funcube_hopper_motor = (~data) & 0x01;
+
+	// Bit 1: high on pay out
+
+	// Bit 3: low after coining up, blinks on pay out
+	set_led_status( 6, (~data) & 0x08 );
+
+	funcube_debug_outputs();
+}
+
+
+static ADDRESS_MAP_START( funcube_sub_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( H8_PORT_7,   H8_PORT_7   )	AM_READ( funcube_coins_r )
+	AM_RANGE( H8_PORT_4,   H8_PORT_4   )	AM_NOP	// unused
+	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE( funcube_outputs_r, funcube_outputs_w ) AM_BASE( &funcube_outputs )
+	AM_RANGE( H8_PORT_B,   H8_PORT_B   )	AM_WRITE( funcube_leds_w )                           AM_BASE( &funcube_leds )
+//	AM_RANGE( H8_SERIAL_0, H8_SERIAL_0 )	// cabinets linking (jpunit)
+	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )	AM_READ( funcube_serial_r )
+ADDRESS_MAP_END
+
 
 
 
@@ -1678,6 +1923,72 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
+                                  Funcube
+***************************************************************************/
+
+static INPUT_PORTS_START( funcube )
+	PORT_START("TOUCH_PRESS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "Touch Screen" )
+
+	PORT_START("TOUCH_X")
+	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_X ) PORT_MINMAX(0,0x5c+1) PORT_CROSSHAIR(X, -(1.0 * 0x05d/0x5c), -1.0/0x5c, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(5) PORT_REVERSE
+
+	PORT_START("TOUCH_Y")
+	PORT_BIT( 0xff, 0x00, IPT_LIGHTGUN_Y ) PORT_MINMAX(0,0x46+1) PORT_CROSSHAIR(Y, -(0xf0-8.0)/0xf0*0x047/0x46, -1.0/0x46, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(5) PORT_REVERSE
+
+	PORT_START("SWITCH")	// c00030.l
+	PORT_BIT(     0x01, IP_ACTIVE_LOW,  IPT_COIN1    ) PORT_IMPULSE(1)	// coin solenoid 1
+	PORT_BIT(     0x02, IP_ACTIVE_HIGH, IPT_SPECIAL  )					// coin solenoid 2
+	PORT_BIT(     0x04, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// hopper sensor
+	PORT_BIT(     0x08, IP_ACTIVE_LOW,  IPT_BUTTON2  )	// game select
+	PORT_BIT(     0x10, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CODE(KEYCODE_O) PORT_NAME( "Pay Out" )
+	PORT_BIT(     0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_NAME( "Reset Key" )
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW   )
+	PORT_BIT(     0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+
+	PORT_START("BATTERY")
+	PORT_DIPNAME( 0x10, 0x10, "Battery" )
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x10, DEF_STR( On ) )
+
+	PORT_START("DEBUG")
+	// 500002.w
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2)
+
+	// 500000.w
+	PORT_DIPNAME(    0x00010000, 0x00010000, "Debug 0" )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00010000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x00020000, 0x00020000, "Debug 1" )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00020000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x00040000, 0x00040000, "Debug 2" )	// Touch-Screen
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00040000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x00080000, 0x00080000, "Debug 3" )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00080000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x00100000, 0x00100000, "Debug 4" )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00100000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x00200000, 0x00200000, "Debug 5" )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00200000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x00400000, 0x00400000, "Debug 6" )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00400000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x00800000, 0x00800000, "Debug 7" )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00800000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+/***************************************************************************
 
 
                             Graphics Layouts
@@ -1769,6 +2080,87 @@ static GFXDECODE_START( seta2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8bpp,    0, 0x8000/16 )	/* 8bpp, but 4bpp granularity */
 	GFXDECODE_ENTRY( "gfx1", 0, layout_3bpp_lo, 0, 0x8000/16 )	/* 3bpp, but 4bpp granularity */
 	GFXDECODE_ENTRY( "gfx1", 0, layout_2bpp_hi, 0, 0x8000/16 )	/* ??? */
+GFXDECODE_END
+
+/***************************************************************************
+                                  Funcube
+***************************************************************************/
+
+static const gfx_layout funcube_layout_4bpp_lo =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(7*8, -8) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+static const gfx_layout funcube_layout_4bpp_hi =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(4*8, -8) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+static const gfx_layout funcube_layout_6bpp =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	6,
+	{ STEP4(7*8, -8), STEP2(3*8, -8) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+static const gfx_layout funcube_layout_8bpp =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(7*8, -8) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+static const gfx_layout funcube_layout_3bpp_lo =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	3,
+	{ 7*8,6*8,5*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+static const gfx_layout funcube_layout_2bpp_hi =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ STEP2(5*8, -8) },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+/*  Tiles are 8bpp, but the hardware is additionally able to discard
+    some bitplanes and use the low 4 bits only, or the high 4 bits only */
+static GFXDECODE_START( funcube )
+	GFXDECODE_ENTRY( "gfx1", 0, funcube_layout_4bpp_lo, 0, 0x8000/16 )
+	GFXDECODE_ENTRY( "gfx1", 0, funcube_layout_4bpp_hi, 0, 0x8000/16 )
+	GFXDECODE_ENTRY( "gfx1", 0, funcube_layout_6bpp,    0, 0x8000/16 )	// 6bpp, but 4bpp granularity
+	GFXDECODE_ENTRY( "gfx1", 0, funcube_layout_8bpp,    0, 0x8000/16 )	// 8bpp, but 4bpp granularity
+	GFXDECODE_ENTRY( "gfx1", 0, funcube_layout_3bpp_lo, 0, 0x8000/16 )	// 3bpp, but 4bpp granularity
+	GFXDECODE_ENTRY( "gfx1", 0, funcube_layout_2bpp_hi, 0, 0x8000/16 )	// ???
 GFXDECODE_END
 
 
@@ -1935,6 +2327,89 @@ static MACHINE_DRIVER_START( samshoot )
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
+MACHINE_DRIVER_END
+
+
+/***************************************************************************
+                                  Funcube
+***************************************************************************/
+
+static INTERRUPT_GEN( funcube_interrupt )
+{
+	switch ( cpu_getiloops(device) )
+	{
+		case 1:  cpu_set_input_line(device, 2, HOLD_LINE); break;
+		case 0:  cpu_set_input_line(device, 1, HOLD_LINE); break;
+	}
+}
+
+static INTERRUPT_GEN( funcube_sub_timer_irq )
+{
+	if ( funcube_serial_count )
+	{
+		cpu_set_input_line(device, H8_SCI_1_RX, HOLD_LINE);
+	}
+	else
+	{
+		UINT8 press   = input_port_read(device->machine,"TOUCH_PRESS");
+		UINT8 release = funcube_press && !press;
+
+		if ( press || release )
+		{
+			funcube_serial_fifo[0] = press ? 0xfe : 0xfd;
+			funcube_serial_fifo[1] = input_port_read(device->machine,"TOUCH_X");
+			funcube_serial_fifo[2] = input_port_read(device->machine,"TOUCH_Y");
+			funcube_serial_fifo[3] = 0xff;
+			funcube_serial_count = 4;
+		}
+
+		funcube_press = press;
+	}
+
+	cpu_set_input_line(device, H8_METRO_TIMER_HACK, HOLD_LINE);
+}
+
+static MACHINE_RESET( funcube )
+{
+	funcube_coin_start_cycles = 0;
+	funcube_serial_count = 0;
+	funcube_press = 0;
+	funcube_hopper_motor = 0;
+}
+
+static MACHINE_DRIVER_START( funcube )
+	MDRV_CPU_ADD("main", M68040, XTAL_25_447MHz) // !! XCF5206 actually !!
+	MDRV_CPU_PROGRAM_MAP(funcube_map, 0)
+	MDRV_CPU_VBLANK_INT_HACK(funcube_interrupt,2)
+
+	MDRV_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(funcube_sub_map, 0)
+	MDRV_CPU_IO_MAP(funcube_sub_io, 0)
+	MDRV_CPU_PERIODIC_INT(funcube_sub_timer_irq, 60*10 )
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_MACHINE_RESET( funcube )
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))	// not accurate
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(0x200, 0x200)
+	MDRV_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
+
+	MDRV_GFXDECODE(funcube)
+	MDRV_PALETTE_LENGTH(0x8000+0xf0)	/* extra 0xf0 because we might draw 256-color object with 16-color granularity */
+
+	MDRV_VIDEO_START(seta2)
+	MDRV_VIDEO_UPDATE(seta2)
+	MDRV_VIDEO_EOF(seta2)
+
+	/* sound hardware */
+
+	// MSM9810B
+
 MACHINE_DRIVER_END
 
 
@@ -2225,18 +2700,145 @@ ROM_START( trophyh ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
 ROM_END
 
-GAME( 1994, gundamex, 0,        gundamex, gundamex, 0, ROT0, "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
-GAME( 1995, grdians,  0,        grdians,  grdians,  0, ROT0, "Banpresto",             "Guardians / Denjin Makai II",                  GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )	// Displays (c) Winky Soft at game's end.
-GAME( 1996, mj4simai, 0,        mj4simai, mj4simai, 0, ROT0, "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", GAME_NO_COCKTAIL )
-GAME( 1996, myangel,  0,        myangel,  myangel,  0, ROT0, "Namco",                 "Kosodate Quiz My Angel (Japan)",               GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, myangel2, 0,        myangel2, myangel2, 0, ROT0, "Namco",                 "Kosodate Quiz My Angel 2 (Japan)",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, pzlbowl,  0,        pzlbowl,  pzlbowl,  0, ROT0, "Nihon System / Moss",   "Puzzle De Bowling (Japan)",                    GAME_NO_COCKTAIL )
-GAME( 2000, penbros,  0,        penbros,  penbros,  0, ROT0, "Subsino",               "Penguin Brothers (Japan)",                     GAME_NO_COCKTAIL )
-GAME( 2000, deerhunt, 0,        samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.3",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhuna, deerhunt, samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.2",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhunb, deerhunt, samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.0",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2000, deerhunc, deerhunt, samshoot, deerhunt, 0, ROT0, "Sammy USA Corporation", "Deer Hunting USA V2",                          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, turkhunt, 0,        samshoot, turkhunt, 0, ROT0, "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, wschamp,  0,        samshoot, wschamp,  0, ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.0",              GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0, ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2002, trophyh,  0,        samshoot, trophyh,  0, ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+/***************************************************************************
+
+FUNCUBE 2 (BET)
+(c)2001 NAMCO,LTD.
+---------------------
+
+screenshot :
+http://www.bandainamcogames.co.jp/aa/am/mg/funcube2
+
+cabinet :
+http://www.bandainamcogames.co.jp/aa/am/mg/funcube
+
+SYSTEM: EVA3_A
+
+CPU   : COLDFIRE XCF5206
+      : H8
+
+SND   : MSM9810
+
+SECURITY : FC21A (PIC)
+
+*IOPR-0 ROM : FC21IOPR-0 (= FUNCUBE 2,3,4,5)
+
+***************************************************************************/
+
+ROM_START( funcube2 )
+	ROM_REGION( 0x80000, "main", 0 ) /* XCF5206 Code */
+	ROM_LOAD( "funcube2-fc21pg0b.u3", 0x00000, 0x80000, CRC(add1c8a6) SHA1(bf91518da659098a4bad4e756533525fcc910570) )
+
+	ROM_REGION( 0x20000, "sub", 0 ) /* H8/3007 Code */
+	ROM_LOAD( "funcube2-fc21iopr.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
+
+	ROM_REGION( 0x300, "pic", 0 ) /* PIC12C508? Code */
+	ROM_LOAD( "funcube2-fc21a", 0x000, 0x300, NO_DUMP )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD32_WORD( "funcube2-fc21obj0.u43", 0x000000, 0x400000, CRC(08cfe6d9) SHA1(d10f362dcde01f7a9855d8f76af3084b5dd1573a) )
+	ROM_LOAD32_WORD( "funcube2-fc21obj1.u42", 0x000002, 0x400000, CRC(4c1fbc20) SHA1(ff83691c19ce3600b31c494eaec26d2ac79e0028) )
+
+	ROM_REGION( 0x400000, "samples", 0 )
+	ROM_LOAD( "funcube2-fc21voi0.u47", 0x00000, 0x400000, CRC(25b5fc3f) SHA1(18b16a14e9ee62f3fea382e9d3fdcd43bdb165f5) )
+ROM_END
+
+static DRIVER_INIT( funcube2 )
+{
+	UINT32 *main = (UINT32 *) memory_region(machine, "main");
+	UINT16 *sub  = (UINT16 *) memory_region(machine, "sub");
+
+	main[0x810/4] = 0xe0214e71;
+	main[0x814/4] = 0x4e71203c;
+
+	main[0x81c/4] = 0x4e714e71;
+
+	main[0xa5c/4] = 0x4e713e3c;
+	main[0xa74/4] = 0x4e713e3c;
+	main[0xa8c/4] = 0x4e7141f9;
+
+	// Sub CPU
+
+	sub[0x4d4/2] = 0x5470;	// rte -> rts
+}
+
+/***************************************************************************
+
+FUNCUBE 4 (BET)
+(c)2002 NAMCO,LTD.
+---------------------
+
+screenshot :
+http://www.bandainamcogames.co.jp/aa/am/mg/funcube4
+
+cabinet :
+http://www.bandainamcogames.co.jp/aa/am/mg/funcube
+
+SYSTEM: EVA3_A
+
+CPU   : COLDFIRE XCF5206
+      : H8
+
+SND   : MSM9810
+
+SECRITY : FC41A (PIC)
+
+*IOPR-0 ROM : FC21IOPR-0 (= FUNCUBE 2,3,4,5)
+
+***************************************************************************/
+
+ROM_START( funcube4 )
+	ROM_REGION( 0x80000, "main", 0 ) /* XCF5206 Code */
+	ROM_LOAD( "funcube4-fc41prg0.u3", 0x00000, 0x80000, CRC(ef870874) SHA1(dcb8dc3f780ca135df55e4b4f3c95620597ad28f) )
+
+	ROM_REGION( 0x20000, "sub", 0 ) /* H8/3007 Code */
+	ROM_LOAD( "funcube2-fc21iopr.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
+
+	ROM_REGION( 0x300, "pic", 0 ) /* PIC12C508? Code */
+	ROM_LOAD( "funcube4-fc41a", 0x000, 0x300, NO_DUMP )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD32_WORD( "funcube4-fc41obj0.u43", 0x000000, 0x400000, CRC(9ff029d5) SHA1(e057f4929aa745ecaf9d4ff7e39974c82e440146) )
+	ROM_LOAD32_WORD( "funcube4-fc41obj1.u42", 0x000002, 0x400000, CRC(5ab7b087) SHA1(c600158b2358cdf947357170044dda2deacd4f37) )
+
+	ROM_REGION( 0x400000, "samples", 0 )
+	ROM_LOAD( "funcube4-fc41snd0.u47", 0x00000, 0x400000, CRC(48337257) SHA1(d1755024b824100070b489f48f6ae921765329e8) )
+ROM_END
+
+// Note: same as funcube2
+static DRIVER_INIT( funcube4 )
+{
+	UINT32 *main = (UINT32 *) memory_region(machine, "main");
+	UINT16 *sub  = (UINT16 *) memory_region(machine, "sub");
+
+	main[0x810/4] = 0xe0214e71;
+	main[0x814/4] = 0x4e71203c;
+
+	main[0x81c/4] = 0x4e714e71;
+
+	main[0xa5c/4] = 0x4e713e3c;
+	main[0xa74/4] = 0x4e713e3c;
+	main[0xa8c/4] = 0x4e7141f9;
+
+	// Sub CPU
+
+	sub[0x4d4/2] = 0x5470;	// rte -> rts
+}
+
+GAME( 1994, gundamex, 0,        gundamex, gundamex, 0,        ROT0, "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )
+GAME( 1995, grdians,  0,        grdians,  grdians,  0,        ROT0, "Banpresto",             "Guardians / Denjin Makai II",                  GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )	// Displays (c) Winky Soft at game's end.
+GAME( 1996, mj4simai, 0,        mj4simai, mj4simai, 0,        ROT0, "Maboroshi Ware",        "Wakakusamonogatari Mahjong Yonshimai (Japan)", GAME_NO_COCKTAIL )
+GAME( 1996, myangel,  0,        myangel,  myangel,  0,        ROT0, "Namco",                 "Kosodate Quiz My Angel (Japan)",               GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, myangel2, 0,        myangel2, myangel2, 0,        ROT0, "Namco",                 "Kosodate Quiz My Angel 2 (Japan)",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, pzlbowl,  0,        pzlbowl,  pzlbowl,  0,        ROT0, "Nihon System / Moss",   "Puzzle De Bowling (Japan)",                    GAME_NO_COCKTAIL )
+GAME( 2000, penbros,  0,        penbros,  penbros,  0,        ROT0, "Subsino",               "Penguin Brothers (Japan)",                     GAME_NO_COCKTAIL )
+GAME( 2000, deerhunt, 0,        samshoot, deerhunt, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.3",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhuna, deerhunt, samshoot, deerhunt, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.2",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhunb, deerhunt, samshoot, deerhunt, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V4.0",                        GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, deerhunc, deerhunt, samshoot, deerhunt, 0,        ROT0, "Sammy USA Corporation", "Deer Hunting USA V2",                          GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, turkhunt, 0,        samshoot, turkhunt, 0,        ROT0, "Sammy USA Corporation", "Turkey Hunting USA V1.0",                      GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, wschamp,  0,        samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V2.0",              GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, wschampa, wschamp,  samshoot, wschamp,  0,        ROT0, "Sammy USA Corporation", "Wing Shooting Championship V1.01",             GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, trophyh,  0,        samshoot, trophyh,  0,        ROT0, "Sammy USA Corporation", "Trophy Hunting - Bear & Moose V1.0",           GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 2001, funcube2, 0,        funcube,  funcube,  funcube2, ROT0, "Namco",                 "Funcube 2 (v1.1)",                             GAME_NO_SOUND )
+GAME( 2001, funcube4, 0,        funcube,  funcube,  funcube4, ROT0, "Namco",                 "Funcube 4 (v1.0)",                             GAME_NO_SOUND )

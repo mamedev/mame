@@ -9,8 +9,9 @@
  LE 20070903 Added divxu.b  shal.l  extu.w  dec.l #Imm,Rd  subx.b
  LE 20080202 Separated 3002/3044/3007, Added or.l  shal.l  rotl.l  not.l  neg.l  exts.w
              sub/or/xor.l #Imm:32,ERd  bset/bnot/bclr.b Rn,@ERd  bst/bist.b #Imm:3,@ERd  bnot.b #Imm:3,@ERd
+ LE 20090128 Added mov.l ers,@aa:16;  bild #xx:3,rd;  eepmov.b;  bnot #xx:3,@aa:8
 
-****************************************************************************/
+***************************************************************************/
 
 #include "debugger.h"
 #include "h8.h"

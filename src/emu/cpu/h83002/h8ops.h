@@ -98,6 +98,7 @@ static UINT8 h8_bset8(h83xx_state *h8, UINT8 src, UINT8 dst);
 static UINT8 h8_bclr8(h83xx_state *h8, UINT8 src, UINT8 dst);
 static void h8_btst8(h83xx_state *h8, UINT8 src, UINT8 dst);
 static void h8_bld8(h83xx_state *h8, UINT8 src, UINT8 dst); // loads to carry
+static void h8_bild8(h83xx_state *h8, UINT8 src, UINT8 dst); // inverts and loads to carry
 static void h8_bor8(h83xx_state *h8, UINT8 src, UINT8 dst); // result in carry
 //static void h8_bxor8(h83xx_state *h8, UINT8 src, UINT8 dst);
 
@@ -322,6 +323,18 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 					h8_mov32(h8, udata32); // flags only
 					h8_mem_write32(h8, address24, udata32);
 					H8_IFETCH_TIMING(4);
+					H8_WORD_TIMING(2, address24);
+					break;
+				case 0x8:
+					// mov.l erx, @aa:16
+					address24=h8_mem_read16(h8, h8->pc);
+					h8->pc += 2;
+					if (address24 & 0x8000)
+						address24 |= 0xff0000;
+					udata32=h8_getreg32(h8, ext16 & 0x7);
+					h8_mov32(h8, udata32); // flags only
+					h8_mem_write32(h8, address24, udata32);
+					H8_IFETCH_TIMING(3);
 					H8_WORD_TIMING(2, address24);
 					break;
 				default:
@@ -1698,6 +1711,7 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 			{
 				switch((opcode>>8)&7)
 				{
+				case 7:	h8_bild8(h8, bitnr, udata8); H8_IFETCH_TIMING(1); break;
 				default:
 					logerror("H8/3xx: Unk. group 7 0-7-1 def %x\n", opcode);
 					h8->h8err = 1;
@@ -1821,28 +1835,67 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 		break;
 		// eepmov
 	case 0xb:
-		if ((opcode & 0xff) == 0xd4)
+		switch (opcode & 0xff)
 		{
-			UINT16 cnt = h8_getreg16(h8, 4);
-
-			H8_IFETCH_TIMING(1);
-			H8_BYTE_TIMING((2*cnt)+2, h8->regs[5]);
-
-			// eepmov.w
-			while (cnt > 0)
+			case 0xd4:	// eepmov.w
 			{
-				h8_mem_write8(h8->regs[6], h8_mem_read8(h8->regs[5]));
-				h8->regs[5]++;
-				h8->regs[6]++;
-				cnt--;
+				ext16 = h8_mem_read16(h8, h8->pc);
+				h8->pc += 2;
+				if (ext16 != 0x598f)
+				{
+					logerror("H8/3xx: Unk. eepmov form\n");
+					h8->h8err = 1;
+				}
+				else
+				{
+					UINT16 cnt = h8_getreg16(h8, 4);
+
+					H8_IFETCH_TIMING(2);
+					H8_BYTE_TIMING((2*cnt)+2, h8->regs[5]);
+
+					while (cnt > 0)
+					{
+						h8_mem_write8(h8->regs[6], h8_mem_read8(h8->regs[5]));
+						h8->regs[5]++;
+						h8->regs[6]++;
+						cnt--;
+					}
+					h8_setreg16(h8, 4, 0);
+				}
 			}
-			h8_setreg16(h8, 4, 0);
-			h8->pc += 2;
-		}
-		else
-		{
-			logerror("H8/3xx: Unk. eepmov form\n");
-			h8->h8err = 1;
+			break;
+
+			case 0x5c:	// eepmov.b
+			{
+				ext16 = h8_mem_read16(h8, h8->pc);
+				h8->pc += 2;
+				if (ext16 != 0x598f)
+				{
+					logerror("H8/3xx: Unk. eepmov form\n");
+					h8->h8err = 1;
+				}
+				else
+				{
+					UINT8 cnt = h8_getreg8(h8, 8+4);
+
+					H8_IFETCH_TIMING(2);
+					H8_BYTE_TIMING((2*cnt)+2, h8->regs[5]);
+
+					while (cnt > 0)
+					{
+						h8_mem_write8(h8->regs[6], h8_mem_read8(h8->regs[5]));
+						h8->regs[5]++;
+						h8->regs[6]++;
+						cnt--;
+					}
+					h8_setreg8(h8, 8+4, 0);
+				}
+			}
+			break;
+
+			default:
+				logerror("H8/3xx: Unk. eepmov form\n");
+				h8->h8err = 1;
 		}
 		break;
 		// bxx.b #xx:3, @rd
@@ -1947,6 +2000,11 @@ static void h8_group7(h83xx_state *h8, UINT16 opcode)
 				bitnr = (ext16>>4)&7;
 				if(ext16&0x80) h8->h8err = 1;
 				udata8 = h8_bset8(h8, bitnr, udata8); h8_mem_write8(address24, udata8); H8_IFETCH_TIMING(2); H8_BYTE_TIMING(2, address24);
+				break;
+			case 0x71:
+				bitnr = (ext16>>4)&7;
+				if(ext16&0x80) h8->h8err = 1;
+				udata8 = h8_bnot8(h8, bitnr, udata8); h8_mem_write8(address24, udata8); H8_IFETCH_TIMING(2); H8_BYTE_TIMING(2, address24);
 				break;
 			case 0x32:
 			case 0x62:
@@ -2484,6 +2542,12 @@ static void h8_bld8(h83xx_state *h8, UINT8 bit, UINT8 dst)
 {
 	// load bit to carry
 	h8->h8cflag = (dst >> bit) & 1;
+}
+
+static void h8_bild8(h83xx_state *h8, UINT8 bit, UINT8 dst)
+{
+	// load inverted bit to carry
+	h8->h8cflag = ((~dst) >> bit) & 1;
 }
 
 static UINT8 h8_bnot8(h83xx_state *h8, UINT8 src, UINT8 dst)

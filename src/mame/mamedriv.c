@@ -6989,6 +6989,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( turkhunt )	/* (c) 2001 Sammy USA Corporation */
 	DRIVER( wschamp )	/* (c) 2001 Sammy USA Corporation */
 	DRIVER( wschampa )	/* (c) 2001 Sammy USA Corporation */
+	DRIVER( funcube2 )	/* (c) 2001 Namco */
+	DRIVER( funcube4 )	/* (c) 2001 Namco */
 	DRIVER( trophyh )	/* (c) 2002 Sammy USA Corporation */
 
 	/* SSV System (Seta, Sammy, Visco) games */
