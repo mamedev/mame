@@ -129,6 +129,16 @@
     - Added pinout scheme.
     - Added technical notes.
 
+    [2009-01-28]
+
+    - Merged GTI Poker (gtipoker.c) with this driver.
+    - Added new memory map and machine driver for gtipoker.
+    - Hooked 2x PPI 8255 to gtipoker.
+    - Hooked the video RAM access ports to gtipoker.
+    - Changed norautpn description from Noraut Poker (No Payout),
+      to Noraut Poker (bootleg), since the game has payout system.
+    - Some clean-ups.
+
 
     TODO:
 
@@ -138,7 +148,6 @@
     - Proper colors (missing PROM?)
     - Lamps layout.
     - Discrete sound.
-    - Merge GTI Poker (gtipoker.c) with this driver.
 
 
 *******************************************************************************/
@@ -167,35 +176,35 @@ static VIDEO_START( norautp )
 
 static VIDEO_UPDATE( norautp )
 {
-	int x,y,count;
+	int x, y, count;
 
 	count = 0;
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //black pen
 
-	for(y=0;y<8;y++)
+	for(y = 0; y < 8; y++)
 	{
 		/*Double width*/
-		if(y==2 || (y>=4 && y<6))
+		if(y == 2 || (y >= 4 && y < 6))
 		{
-			for(x=0;x<16;x++)
+			for(x = 0; x < 16; x++)
 			{
 				int tile = np_vram[count] & 0x3f;
-				int colour = (np_vram[count] & 0xc0)>>6;
+				int colour = (np_vram[count] & 0xc0) >> 6;
 
-				drawgfx(bitmap,screen->machine->gfx[1],tile,colour,0,0,x*32,y*32,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx(bitmap,screen->machine->gfx[1], tile, colour, 0, 0, x * 32, y * 32, cliprect, TRANSPARENCY_NONE, 0);
 
 				count+=2;
 			}
 		}
 		else
 		{
-			for(x=0;x<32;x++)
+			for(x = 0; x < 32; x++)
 			{
 				int tile = np_vram[count] & 0x3f;
-				int colour = (np_vram[count] & 0xc0)>>6;
+				int colour = (np_vram[count] & 0xc0) >> 6;
 
-				drawgfx(bitmap,screen->machine->gfx[0],tile,colour,0,0,x*16,y*32,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx(bitmap,screen->machine->gfx[0], tile, colour, 0, 0, x * 16, y * 32, cliprect, TRANSPARENCY_NONE, 0);
 
 				count++;
 			}
@@ -284,6 +293,7 @@ static WRITE8_HANDLER( vram_addr_w )
 	np_addr = data;
 }
 
+
 /*************************
 * Memory Map Information *
 *************************/
@@ -312,6 +322,23 @@ ADDRESS_MAP_END
   c3 --> W  ; alternate 00 & 01 (in case of PPI, seting reseting bit 0 of hadshaked port)
 
 */
+
+static ADDRESS_MAP_START( gtipoker_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gtipoker_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xdc, 0xdc) AM_WRITE(vram_data_w)
+	AM_RANGE(0xdd, 0xdd) AM_WRITE(vram_addr_w)
+	AM_RANGE(0xde, 0xde) AM_READ(test_r)
+//	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xef, 0xef) AM_READ(test_r)
+ADDRESS_MAP_END
+
 
 /*************************
 *      Input Ports       *
@@ -444,6 +471,7 @@ static const gfx_layout charlayout32x32 =
 	16*16
 };
 
+
 /******************************
 * Graphics Decode Information *
 ******************************/
@@ -486,6 +514,7 @@ static const ppi8255_interface ppi8255_intf[3] =
 	}
 };
 
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -526,16 +555,38 @@ static MACHINE_DRIVER_START( norautp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( gtipoker )
+	MDRV_IMPORT_FROM(norautp)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(gtipoker_map, 0)
+	MDRV_CPU_IO_MAP(gtipoker_portmap, 0)
+
+MACHINE_DRIVER_END
+
+
 /*************************
 *        Rom Load        *
 *************************/
 
 ROM_START( norautp )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "jpoker.bin",	0x0000, 0x2000, CRC(e22ed34d) SHA1(108f034335b5bed183ee316a61880f7b9485b34f) )
+	ROM_LOAD( "jpoker.bin",	    0x0000,  0x2000,  CRC(e22ed34d) SHA1(108f034335b5bed183ee316a61880f7b9485b34f) )
 
 	ROM_REGION( 0x10000, "gfx", ROMREGION_DISPOSE )
 	ROM_LOAD( "displayrom.bin",	0x00000, 0x10000, CRC(ed3605bd) SHA1(0174e880835815558328789226234e36b673b249) )
+ROM_END
+
+/* Has (c)1983 GTI in the roms, and was called 'Poker.zip'  GFX roms contain 16x16 tiles of cards */
+/* Nothing else is known about this set / game */
+
+ROM_START( gtipoker )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "u12.rom", 0x0000, 0x1000, CRC(abaa257a) SHA1(f830213ae0aaad5a9a44ec77c5a186e9e02fa041) )
+	ROM_LOAD( "u18.rom", 0x1000, 0x1000, CRC(1b7e2877) SHA1(717fb70889804baa468203f20b1e7f73b55cc21e) )
+
+	ROM_REGION( 0x1000, "gfx",ROMREGION_DISPOSE )
+	ROM_LOAD( "u31.rom", 0x0000, 0x1000, CRC(2028db2c) SHA1(0f81bb71e88c60df3817f58c28715ce2ea01ad4d) )
 ROM_END
 
 /*
@@ -559,11 +610,14 @@ ROM_START( norautpn )
 	ROM_LOAD( "char.bin",   0x0000, 0x1000, CRC(955eac6f) SHA1(470d8bad1a5d2a0a08dd129e6393c3c3a4ef2159) )
 ROM_END
 
+
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    INIT  ROT    COMPANY        FULLNAME       FLAGS */
-GAME( 1988?, norautp, 0,      norautp, norautp, 0,    ROT0, "Noraut Ltd.", "Noraut Poker", GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT    INIT  ROT    COMPANY        FULLNAME                 FLAGS */
+GAME( 1988, norautp,  0,       norautp,  norautp, 0,    ROT0, "Noraut Ltd.", "Noraut Poker",           GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1983, gtipoker, 0,       gtipoker, norautp, 0,    ROT0, "GTI Inc",     "GTI Poker",              GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+
 /*The following has everything uncertain, seems a bootleg/hack and doesn't have any identification strings in program rom. */
-GAME( 1988?, norautpn,norautp,norautp, poker,   0,    ROT0, "bootleg?",    "Noraut Poker (No Payout)", GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 198?, norautpn, norautp, norautp,  poker,   0,    ROT0, "bootleg?",    "Noraut Poker (bootleg)", GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
