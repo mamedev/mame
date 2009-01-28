@@ -7462,17 +7462,18 @@ Other Sun games
 	DRIVER( moonlght )	/* bootleg */
 	DRIVER( chry10 )	/* bootleg */
 	DRIVER( chrygld )	/* bootleg */
+	DRIVER( cabaret )	/* (c) 1992 AMT */
  	DRIVER( cpoker )	/* (c) 1993? IGS */
  	DRIVER( cpokert )	/* (c) 1993? Tuning */
 	DRIVER( csk227it )	/* (c) 198? IGS */
 	DRIVER( csk234it )	/* (c) 198? IGS */
 	DRIVER( igs_ncs )	/* (c) 198? IGS */
 	DRIVER( igs_ncs2 )	/* (c) 2000 IGS */
+	DRIVER( spk116it )	/* (c) 199? IGS */
 	DRIVER( jackie )	/* (c) 199? IGS */
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
-	DRIVER( cabaret )
 	DRIVER( jingbell )	/* (c) 1995? */
 	DRIVER( gp98 )		/* (c) 19?? */
 	DRIVER( lhb )		/* (c) 1995 */

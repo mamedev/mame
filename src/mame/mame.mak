@@ -752,6 +752,7 @@ $(MAMEOBJ)/greyhnd.a: \
 	$(DRIVERS)/getrivia.o \
 
 $(MAMEOBJ)/igs.a: \
+	$(DRIVERS)/cabaret.o \
 	$(DRIVERS)/ddz.o \
 	$(DRIVERS)/dunhuang.o \
 	$(DRIVERS)/goldstar.o $(VIDEO)/goldstar.o \
@@ -762,6 +763,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/igs017.o \
 	$(DRIVERS)/igs_m027.o \
 	$(DRIVERS)/igs_m68.o \
+	$(DRIVERS)/spoker.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \

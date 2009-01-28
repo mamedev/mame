@@ -264,10 +264,6 @@ static GFXDECODE_START( iqblock )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2, 0,  4 )	/* only color codes 0 and 3 used */
 GFXDECODE_END
 
-static GFXDECODE_START( cabaret )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout1, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout3, 0, 16 )
-GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( iqblock )
@@ -301,36 +297,6 @@ static MACHINE_DRIVER_START( iqblock )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( cabaret )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z180,12000000/2)	/* 6 MHz , appears to use Z180 instructions */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
-
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
-
-	MDRV_GFXDECODE(cabaret)
-	MDRV_PALETTE_LENGTH(1024)
-
-	MDRV_VIDEO_START(iqblock)
-	MDRV_VIDEO_UPDATE(iqblock)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
 
 
 /***************************************************************************
@@ -458,24 +424,6 @@ ROM_START( grndtour )
 	ROM_LOAD( "grand5.u24",        0x4000, 0x4000, CRC(f896efb2) SHA1(8dc8546e363b4ff80983e3b8e2a19ebb7ff30c7b) )
 ROM_END
 
-ROM_START( cabaret )
-	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 64K for extra RAM */
-	ROM_LOAD( "cg-8v204.u97",  0x0000, 0x10000, CRC(44cebf77) SHA1(e3f4e4abf41388f0eed50cf9a0fd0b14aa2f8b93) )
-
-	ROM_REGION( 0x8000, "user1", 0 )
-	ROM_LOAD( "cg-7.u98",  0x0000, 0x8000, CRC(b93ae6f8) SHA1(accb87045c278d5d79fff65bb763aa6e8025a945) )	/* background maps, read by the CPU */
-
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "cg-4.u43",  0x00000, 0x20000, CRC(e509f50a) SHA1(7e68ca54642c92cdb348d5cf9466065938d0e027) )
-	ROM_LOAD( "cg-5.u44",  0x20000, 0x20000, CRC(e2cbf489) SHA1(3a15ed7efd5696656e6d55b54ec0ff779bdb0d98) )
-	ROM_LOAD( "cg-6.u45",  0x40000, 0x20000, CRC(4f2fced7) SHA1(b954856ffdc97fbc99fd3ec087376fbf466d2d5a) )
-
-	ROM_REGION( 0xc000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "cg-1.u40",  0x0000, 0x4000, CRC(7dee8b1f) SHA1(80dbdf6aab9b02cc000956b7894023552428e6a1) )
-	ROM_LOAD( "cg-2.u41",  0x4000, 0x4000, CRC(ce8dea39) SHA1(b30d1678a7b98cd821d2ce7383a83cb7c9f31b5f) )
-	ROM_LOAD( "cg-3.u42",  0x8000, 0x4000, CRC(7e1f821f) SHA1(b709d49f9d1890fe3b8ca7f90affc0017a0ad95e) )
-ROM_END
-
 static DRIVER_INIT( iqblock )
 {
 	UINT8 *rom = memory_region(machine, "main");
@@ -521,27 +469,7 @@ static DRIVER_INIT( grndtour )
 }
 
 
-static DRIVER_INIT( cabaret )
-{
-	UINT8 *rom = memory_region(machine, "main");
-	int i;
-
-	/* decrypt the program ROM */
-	for (i = 0;i < 0xf000;i++)
-	{
-		if ((i & 0xb206) == 0xa002) rom[i] ^= 0x01;	// could be (i & 0x3206) == 0x2002
-	}
-
-	/* initialize pointers for I/O mapped RAM */
-	paletteram         = rom + 0x12000;
-	paletteram_2       = rom + 0x12800;
-	iqblock_fgvideoram = rom + 0x16800;
-	iqblock_bgvideoram = rom + 0x17000;
-	iqblock_video_type=0;
-}
-
 
 GAME( 1993, iqblock,  0, iqblock,  iqblock, iqblock,  ROT0, "IGS", "IQ-Block", 0 )
 GAME( 1993, grndtour, 0, iqblock,  iqblock, grndtour, ROT0, "IGS", "Grand Tour", 0 )
 
-GAME( 19??, cabaret,  0, cabaret,  iqblock, cabaret,  ROT0, "IGS", "Cabaret", GAME_NOT_WORKING | GAME_NO_SOUND )
