@@ -44,14 +44,14 @@ struct _pia6821_interface
 {
 	devcb_read8 in_a_func;
 	devcb_read8 in_b_func;
-	devcb_read8 in_ca1_func;
-	devcb_read8 in_cb1_func;
-	devcb_read8 in_ca2_func;
-	devcb_read8 in_cb2_func;
+	devcb_read_line in_ca1_func;
+	devcb_read_line in_cb1_func;
+	devcb_read_line in_ca2_func;
+	devcb_read_line in_cb2_func;
 	devcb_write8 out_a_func;
 	devcb_write8 out_b_func;
-	devcb_write8 out_ca2_func;
-	devcb_write8 out_cb2_func;
+	devcb_write_line out_ca2_func;
+	devcb_write_line out_cb2_func;
 	devcb_write_line irq_a_func;
 	devcb_write_line irq_b_func;
 };

@@ -16,14 +16,14 @@ struct _pia6821
 {
 	devcb_resolved_read8 in_a_func;
 	devcb_resolved_read8 in_b_func;
-	devcb_resolved_read8 in_ca1_func;
-	devcb_resolved_read8 in_cb1_func;
-	devcb_resolved_read8 in_ca2_func;
-	devcb_resolved_read8 in_cb2_func;
+	devcb_resolved_read_line in_ca1_func;
+	devcb_resolved_read_line in_cb1_func;
+	devcb_resolved_read_line in_ca2_func;
+	devcb_resolved_read_line in_cb2_func;
 	devcb_resolved_write8 out_a_func;
 	devcb_resolved_write8 out_b_func;
-	devcb_resolved_write8 out_ca2_func;
-	devcb_resolved_write8 out_cb2_func;
+	devcb_resolved_write_line out_ca2_func;
+	devcb_resolved_write_line out_cb2_func;
 	devcb_resolved_write_line irq_a_func;
 	devcb_resolved_write_line irq_b_func;
 
@@ -141,14 +141,14 @@ static DEVICE_START( pia )
 	/* resolve callbacks */
 	devcb_resolve_read8(&p->in_a_func, &intf->in_a_func, device);
 	devcb_resolve_read8(&p->in_b_func, &intf->in_b_func, device);
-	devcb_resolve_read8(&p->in_ca1_func, &intf->in_ca1_func, device);
-	devcb_resolve_read8(&p->in_cb1_func, &intf->in_cb1_func, device);
-	devcb_resolve_read8(&p->in_ca2_func, &intf->in_ca2_func, device);
-	devcb_resolve_read8(&p->in_cb2_func, &intf->in_cb2_func, device);
+	devcb_resolve_read_line(&p->in_ca1_func, &intf->in_ca1_func, device);
+	devcb_resolve_read_line(&p->in_cb1_func, &intf->in_cb1_func, device);
+	devcb_resolve_read_line(&p->in_ca2_func, &intf->in_ca2_func, device);
+	devcb_resolve_read_line(&p->in_cb2_func, &intf->in_cb2_func, device);
 	devcb_resolve_write8(&p->out_a_func, &intf->out_a_func, device);
 	devcb_resolve_write8(&p->out_b_func, &intf->out_b_func, device);
-	devcb_resolve_write8(&p->out_ca2_func, &intf->out_ca2_func, device);
-	devcb_resolve_write8(&p->out_cb2_func, &intf->out_cb2_func, device);
+	devcb_resolve_write_line(&p->out_ca2_func, &intf->out_ca2_func, device);
+	devcb_resolve_write_line(&p->out_cb2_func, &intf->out_cb2_func, device);
 	devcb_resolve_write_line(&p->irq_a_func, &intf->irq_a_func, device);
 	devcb_resolve_write_line(&p->irq_b_func, &intf->irq_b_func, device);
 
@@ -408,7 +408,7 @@ static void set_out_ca2(const device_config *device, int data)
 
 		/* send to output function */
 		if (p->out_ca2_func.write)
-			devcb_call_write8(&p->out_ca2_func, 0, p->out_ca2);
+			devcb_call_write_line(&p->out_ca2_func, p->out_ca2);
 		else
 		{
 			if (p->out_ca2_needs_pulled)
@@ -437,7 +437,7 @@ static void set_out_cb2(const device_config *device, int data)
 
 		/* send to output function */
 		if (p->out_cb2_func.write)
-			devcb_call_write8(&p->out_cb2_func, 0, p->out_cb2);
+			devcb_call_write_line(&p->out_cb2_func, p->out_cb2);
 		else
 		{
 			if (p->out_cb2_needs_pulled)
@@ -552,7 +552,7 @@ static UINT8 control_a_r(const device_config *device)
 
 	/* update CA1 & CA2 if callback exists, these in turn may update IRQ's */
 	if (p->in_ca1_func.read != NULL)
-		pia_ca1_w(device, 0, devcb_call_read8(&p->in_ca1_func, 0));
+		pia_ca1_w(device, 0, devcb_call_read_line(&p->in_ca1_func));
 	else if (!p->logged_ca1_not_connected && (!p->in_ca1_pushed))
 	{
 		logerror("PIA #%s: Warning! No CA1 read handler. Assuming pin not connected\n", device->tag);
@@ -560,7 +560,7 @@ static UINT8 control_a_r(const device_config *device)
 	}
 
 	if (p->in_ca2_func.read != NULL)
-		pia_ca2_w(device, 0, devcb_call_read8(&p->in_ca2_func, 0));
+		pia_ca2_w(device, 0, devcb_call_read_line(&p->in_ca2_func));
 	else if ( !p->logged_ca2_not_connected && C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
 	{
 		logerror("PIA #%s: Warning! No CA2 read handler. Assuming pin not connected\n", device->tag);
@@ -594,7 +594,7 @@ static UINT8 control_b_r(const device_config *device)
 
 	/* update CB1 & CB2 if callback exists, these in turn may update IRQ's */
 	if (p->in_cb1_func.read != NULL)
-		pia_cb1_w(device, 0, devcb_call_read8(&p->in_cb1_func, 0));
+		pia_cb1_w(device, 0, devcb_call_read_line(&p->in_cb1_func));
 	else if (!p->logged_cb1_not_connected && !p->in_cb1_pushed)
 	{
 		logerror("PIA #%s: Error! no CB1 read handler. Three-state pin is undefined\n", device->tag);
@@ -602,7 +602,7 @@ static UINT8 control_b_r(const device_config *device)
 	}
 
 	if (p->in_cb2_func.read != NULL)
-		pia_cb2_w(device, 0, devcb_call_read8(&p->in_cb2_func, 0));
+		pia_cb2_w(device, 0, devcb_call_read_line(&p->in_cb2_func));
 	else if (!p->logged_cb2_not_connected && C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
 	{
 		logerror("PIA #%s: Error! No CB2 read handler. Three-state pin is undefined\n", device->tag);
