@@ -829,7 +829,7 @@ static INPUT_PORTS_START( casino5 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Play")
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) // putting this on makes the horse racing game to not work
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 

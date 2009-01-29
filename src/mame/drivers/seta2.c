@@ -2745,21 +2745,21 @@ ROM_END
 
 static DRIVER_INIT( funcube2 )
 {
-	UINT32 *main = (UINT32 *) memory_region(machine, "main");
-	UINT16 *sub  = (UINT16 *) memory_region(machine, "sub");
+	UINT32 *main_cpu = (UINT32 *) memory_region(machine, "main");
+	UINT16 *sub_cpu  = (UINT16 *) memory_region(machine, "sub");
 
-	main[0x810/4] = 0xe0214e71;
-	main[0x814/4] = 0x4e71203c;
+	main_cpu[0x810/4] = 0xe0214e71;
+	main_cpu[0x814/4] = 0x4e71203c;
 
-	main[0x81c/4] = 0x4e714e71;
+	main_cpu[0x81c/4] = 0x4e714e71;
 
-	main[0xa5c/4] = 0x4e713e3c;
-	main[0xa74/4] = 0x4e713e3c;
-	main[0xa8c/4] = 0x4e7141f9;
+	main_cpu[0xa5c/4] = 0x4e713e3c;
+	main_cpu[0xa74/4] = 0x4e713e3c;
+	main_cpu[0xa8c/4] = 0x4e7141f9;
 
 	// Sub CPU
 
-	sub[0x4d4/2] = 0x5470;	// rte -> rts
+	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
 }
 
 /***************************************************************************
@@ -2808,21 +2808,21 @@ ROM_END
 // Note: same as funcube2
 static DRIVER_INIT( funcube4 )
 {
-	UINT32 *main = (UINT32 *) memory_region(machine, "main");
-	UINT16 *sub  = (UINT16 *) memory_region(machine, "sub");
+	UINT32 *main_cpu = (UINT32 *) memory_region(machine, "main");
+	UINT16 *sub_cpu  = (UINT16 *) memory_region(machine, "sub");
 
-	main[0x810/4] = 0xe0214e71;
-	main[0x814/4] = 0x4e71203c;
+	main_cpu[0x810/4] = 0xe0214e71;
+	main_cpu[0x814/4] = 0x4e71203c;
 
-	main[0x81c/4] = 0x4e714e71;
+	main_cpu[0x81c/4] = 0x4e714e71;
 
-	main[0xa5c/4] = 0x4e713e3c;
-	main[0xa74/4] = 0x4e713e3c;
-	main[0xa8c/4] = 0x4e7141f9;
+	main_cpu[0xa5c/4] = 0x4e713e3c;
+	main_cpu[0xa74/4] = 0x4e713e3c;
+	main_cpu[0xa8c/4] = 0x4e7141f9;
 
 	// Sub CPU
 
-	sub[0x4d4/2] = 0x5470;	// rte -> rts
+	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
 }
 
 GAME( 1994, gundamex, 0,        gundamex, gundamex, 0,        ROT0, "Banpresto",             "Mobile Suit Gundam EX Revue",                  0 )

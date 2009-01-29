@@ -8165,6 +8165,7 @@ Other Sun games
 	/* Impera */
 	DRIVER( magicard )	/* (c) 199? */
 	DRIVER( magicrda )	/* (c) 199? */
+	DRIVER( magicrdb )	/* (c) 199? */
 
 	/* Funworld */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */

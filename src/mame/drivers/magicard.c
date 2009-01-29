@@ -440,14 +440,6 @@ static MACHINE_DRIVER_START( magicard )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( magicrda )
-	MDRV_IMPORT_FROM(magicard)
-	MDRV_CPU_MODIFY("main")
-
-
-MACHINE_DRIVER_END
-
-
 /*************************
 *        Rom Load        *
 *************************/
@@ -471,6 +463,14 @@ ROM_START( magicrda )
 	ROM_LOAD("mgorigee.bin",	0x0000,	0x0100, CRC(73522889) SHA1(3e10d6c1585c3a63cff717a0b950528d5373c781) )
 ROM_END
 
+ROM_START( magicrdb )
+	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code & GFX */
+	ROM_LOAD16_WORD_SWAP( "mg_8.bin", 0x00000, 0x80000, CRC(f5499765) SHA1(63bcf40b91b43b218c1f9ec1d126a856f35d0844) )
+
+	/*bigger than the other sets?*/
+	ROM_REGION( 0x20000, "proms", 0 ) /* Color PROM?? */
+	ROM_LOAD16_WORD_SWAP("mg_u3.bin",	0x00000,	0x20000, CRC(2116de31) SHA1(fb9c21ca936532e7c342db4bcaaac31c478b1a35) )
+ROM_END
 
 /*************************
 *      Game Drivers      *
@@ -484,7 +484,8 @@ static DRIVER_INIT( magicard )
 /*    YEAR  NAME      PARENT MACHINE   INPUT  INIT  ROT    COMPANY   FULLNAME             FLAGS... */
 
 GAME( 199?, magicard, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 199?, magicrda, 0,     magicrda, 0,     magicard,    ROT0, "Impera", "Magic Card (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicrda, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 199?, magicrdb, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magic Card (set 3)", GAME_NO_SOUND | GAME_NOT_WORKING )
 
 /*Below here there are CD-I bios defines,to be removed in the end*/
 /*
