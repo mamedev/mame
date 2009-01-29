@@ -177,7 +177,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( kopunch )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 4000000)	/* 4 MHz ???? uses 8080 instructions, not z80 */
+	MDRV_CPU_ADD("main", 8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
 	MDRV_CPU_PROGRAM_MAP(kopunch_map,0)
 	MDRV_CPU_IO_MAP(kopunch_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(kopunch_interrupt,4)	/* ??? */
