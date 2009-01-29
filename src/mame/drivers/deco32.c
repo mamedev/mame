@@ -2162,6 +2162,8 @@ static MACHINE_DRIVER_START( nslasher )
 	MDRV_CPU_PROGRAM_MAP(nslasher_sound,0)
 	MDRV_CPU_IO_MAP(nslasher_io_sound,0)
 
+	MDRV_QUANTUM_TIME(HZ(6000))	/* to improve main<->audio comms */
+
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
