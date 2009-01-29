@@ -1730,6 +1730,7 @@ const game_driver * const drivers[] =
 	DRIVER( volfied )	/* C04 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( volfiedu )	/* C04 (c) 1989 Taito America Corporation (US) */
 	DRIVER( volfiedj )	/* C04 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( volfidjo )	/* C04 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( bonzeadv )	/* B41 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( bonzeado )	/* B41 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( bonzeadu )	/* B41 (c) 1988 Taito America Corporation (US) */
