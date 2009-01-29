@@ -78,7 +78,11 @@ VIDEO_UPDATE( megaplay_normal )
 		UINT16 *dest = BITMAP_ADDR16(bitmap, i, 32);
 		int x;
 		for (x = 0; x < 256; x++)
-			dest[x] = screen->machine->pens[palette_base + cache_bitmap[(i-16) * (16+256+16) + 24 + x]];
+		{
+			UINT8 pix = cache_bitmap[(i-16) * (16+256+16) + 24 + x];
+			if (pix != 0)
+				dest[x] = screen->machine->pens[palette_base + pix];
+		}
 	}
 
 	return 0;
