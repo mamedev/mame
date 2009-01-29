@@ -1000,7 +1000,6 @@ static INPUT_PORTS_START( dkong_config )
 	PORT_CONFNAME( 0x01, 0x01, "Video Hardware" )
 	PORT_CONFSETTING(    0x00, "TKG-02 (Radarscope Conversion)" )
 	PORT_CONFSETTING(    0x01, "TKG-04 (Two board set)" )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dkong )
@@ -1010,6 +1009,21 @@ static INPUT_PORTS_START( dkong )
 	PORT_INCLUDE( dkong_dsw0 )
 
 	PORT_INCLUDE( dkong_config )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dkongf )
+	PORT_INCLUDE( dkong )
+
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x70, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION( "SW1:!5,!6,!7" )
+	PORT_DIPSETTING(    0x70, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radarscp )
@@ -1198,7 +1212,6 @@ static INPUT_PORTS_START( shootgal )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_INCLUDE( dkong_config )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbdk )
@@ -1232,7 +1245,6 @@ static INPUT_PORTS_START( sbdk )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_INCLUDE( dkong_config )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( herbiedk )
@@ -1384,7 +1396,6 @@ static INPUT_PORTS_START( spclforc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
 	PORT_INCLUDE( dkong_config )
-
 INPUT_PORTS_END
 
 
@@ -1418,7 +1429,6 @@ static INPUT_PORTS_START( 8ballact )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
 	PORT_INCLUDE( dkong_config )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drakton )
@@ -1453,7 +1463,6 @@ static INPUT_PORTS_START( drakton )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_INCLUDE( dkong_config )
-
 INPUT_PORTS_END
 
 
@@ -1512,7 +1521,6 @@ static INPUT_PORTS_START( strtheat )
 	PORT_BIT( 0x03, 0x00, IPT_DIAL ) PORT_SENSITIVITY(40) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 
 	PORT_INCLUDE( dkong_config )
-
 INPUT_PORTS_END
 
 /*************************************
@@ -2942,7 +2950,7 @@ GAME( 1981, dkongo,   dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo",
 GAME( 1981, dkongjp,  dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjo,  dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjo1, dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 3) (bad dump?)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dkongf,   dkong,    dkong2b,  dkong,          0,  ROT90, "hack", "Donkey Kong Foundry (hack)", GAME_SUPPORTS_SAVE ) /* from Jeff's Romhack */
+GAME( 2004, dkongf,   dkong,    dkong2b,  dkongf,         0,  ROT90, "hack", "Donkey Kong Foundry (hack)", GAME_SUPPORTS_SAVE ) /* from Jeff's Romhack */
 
 GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (US)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
