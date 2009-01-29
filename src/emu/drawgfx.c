@@ -1928,15 +1928,19 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 				 if (colscroll[col + groupcols] != yscroll)
 				 	break;
 
-			/* compute the cliprect for this group */
-			subclip.min_x = col * colwidth + xscroll;
-			subclip.max_x = (col + groupcols) * colwidth - 1 + xscroll;
-			sect_rect(&subclip, cliprect);
+			/* iterate over reps of the columns in question */
+			yscroll = normalize_yscroll(src, yscroll);
+			for (sx = xscroll - src->width; sx < dest->width; sx += src->width)
+			{
+				/* compute the cliprect for this group */
+				subclip.min_x = col * colwidth + sx;
+				subclip.max_x = (col + groupcols) * colwidth - 1 + sx;
+				sect_rect(&subclip, cliprect);
 
-			/* iterate over all portions of the scroll that overlap the destination */
-			for (sy = normalize_yscroll(src, yscroll) - src->height; sy < dest->height; sy += src->height)
-				for (sx = xscroll - src->width; sx < dest->width; sx += src->width)
+				/* iterate over all portions of the scroll that overlap the destination */
+				for (sy = yscroll - src->height; sy < dest->height; sy += src->height)
 					copybitmap_trans(dest, src, 0, 0, sx, sy, &subclip, transpen);
+			}
 		}
 	}
 
@@ -1962,15 +1966,19 @@ void copyscrollbitmap_trans(bitmap_t *dest, bitmap_t *src, UINT32 numrows, const
 				 if (rowscroll[row + grouprows] != xscroll)
 				 	break;
 
-			/* compute the cliprect for this group */
-			subclip.min_y = row * rowheight + yscroll;
-			subclip.max_y = (row + grouprows) * rowheight - 1 + yscroll;
-			sect_rect(&subclip, cliprect);
+			/* iterate over reps of the rows in question */
+			xscroll = normalize_xscroll(src, xscroll);
+			for (sy = yscroll - src->height; sy < dest->height; sy += src->height)
+			{
+				/* compute the cliprect for this group */
+				subclip.min_y = row * rowheight + sy;
+				subclip.max_y = (row + grouprows) * rowheight - 1 + sy;
+				sect_rect(&subclip, cliprect);
 
-			/* iterate over all portions of the scroll that overlap the destination */
-			for (sx = normalize_xscroll(src, xscroll) - src->width; sx < dest->width; sx += src->width)
-				for (sy = yscroll - src->height; sy < dest->height; sy += src->height)
+				/* iterate over all portions of the scroll that overlap the destination */
+				for (sx = xscroll - src->width; sx < dest->width; sx += src->width)
 					copybitmap_trans(dest, src, 0, 0, sx, sy, &subclip, transpen);
+			}
 		}
 	}
 }
