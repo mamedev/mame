@@ -16,12 +16,11 @@
 
 
 UINT8 arkanoid_paddle_select;
-static UINT8 arkanoid_paddle_value;
 
-static UINT8 z80write,fromz80,m68705write,toz80;
+static UINT8 z80write, fromz80, m68705write, toz80;
 
-static UINT8 portA_in,portA_out,ddrA;
-static UINT8 portC_out,ddrC;
+static UINT8 portA_in, portA_out, ddrA;
+static UINT8 portC_out, ddrC;
 
 
 MACHINE_START( arkanoid )
@@ -519,6 +518,7 @@ READ8_HANDLER( arkanoid_bootleg_d008_r )
 {
 	UINT8 arkanoid_bootleg_d008_bit[8];
 	UINT8 arkanoid_bootleg_d008_val;
+	UINT8 arkanoid_paddle_value = input_port_read(space->machine, "MUX");
 	int b;
 
 	arkanoid_bootleg_d008_bit[4] = arkanoid_bootleg_d008_bit[6] = arkanoid_bootleg_d008_bit[7] = 0;  /* untested bits */
