@@ -1119,32 +1119,34 @@ static const ym2610_interface ym2610_config =
  *
  *************************************/
 
-#define STANDARD_DIPS 																	\
-	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")				\
-	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )										\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )										\
-	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")				\
-	PORT_DIPSETTING(	  0x0000, "1?" )												\
-	PORT_DIPSETTING(	  0x0002, "2?" )												\
-	PORT_DIPNAME( 0x0004, 0x0004, "Autofire (in some games)" ) PORT_DIPLOCATION("SW:3")	\
-	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )										\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )										\
-	PORT_DIPNAME( 0x0038, 0x0038, "COMM Setting" ) PORT_DIPLOCATION("SW:4,5,6")			\
-	PORT_DIPSETTING(	  0x0038, DEF_STR( Off ) )										\
-	PORT_DIPSETTING(	  0x0030, "1" )													\
-	PORT_DIPSETTING(	  0x0020, "2" )													\
-	PORT_DIPSETTING(	  0x0010, "3" )													\
-	PORT_DIPSETTING(	  0x0000, "4" )													\
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")		\
-	PORT_DIPSETTING(	  0x0040, DEF_STR( Off ) )										\
-	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )										\
-	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")					\
-	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )										\
+#define STANDARD_DIPS																		\
+	PORT_DIPNAME( 0x0001, 0x0001, "Test Switch" ) PORT_DIPLOCATION("SW:1")					\
+	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )											\
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
+	PORT_DIPNAME( 0x0002, 0x0002, "Coin Chutes?" ) PORT_DIPLOCATION("SW:2")					\
+	PORT_DIPSETTING(	  0x0000, "1?" )													\
+	PORT_DIPSETTING(	  0x0002, "2?" )													\
+	PORT_DIPNAME( 0x0004, 0x0004, "Autofire (in some games)" ) PORT_DIPLOCATION("SW:3")		\
+	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )											\
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
+	PORT_DIPNAME( 0x0018, 0x0018, "COMM Setting (Cabinet No.)" ) PORT_DIPLOCATION("SW:4,5")	\
+	PORT_DIPSETTING(	  0x0018, "1" )														\
+	PORT_DIPSETTING(	  0x0008, "2" )														\
+	PORT_DIPSETTING(	  0x0010, "3" )														\
+	PORT_DIPSETTING(	  0x0000, "4" )														\
+	PORT_DIPNAME( 0x0020, 0x0020, "COMM Setting (Link Enable)" ) PORT_DIPLOCATION("SW:6")	\
+	PORT_DIPSETTING(	  0x0020, DEF_STR( Off ) )											\
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW:7")			\
+	PORT_DIPSETTING(	  0x0040, DEF_STR( Off ) )											\
+	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )											\
+	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")						\
+	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )											\
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
 
 
 #define STANDARD_IN0														\
-	PORT_START("IN0")													\
+	PORT_START("IN0")														\
 	STANDARD_DIPS															\
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)		\
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)		\
