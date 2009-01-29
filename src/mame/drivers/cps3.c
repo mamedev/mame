@@ -685,14 +685,14 @@ static void cps3_decrypt_bios(running_machine *machine)
 static DRIVER_INIT( cps3 )
 {
 	int i;
-			
+
 	// cache pointers to regions
 	cps3_user4region = memory_region(machine,"user4");
 	cps3_user5region = memory_region(machine,"user5");
 
 	if (!cps3_user4region) cps3_user4region = auto_malloc(USER4REGION_LENGTH);
 	if (!cps3_user5region) cps3_user5region = auto_malloc(USER5REGION_LENGTH);
-	
+
 	// set strict verify
 	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
 

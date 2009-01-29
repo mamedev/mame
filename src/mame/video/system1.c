@@ -388,7 +388,7 @@ static void system1_draw_fg(running_machine *machine, bitmap_t *bitmap, const re
 			}
 
 			code %= machine->gfx[0]->total_elements;
-			
+
 			drawgfx(bitmap,machine->gfx[0],
 					code,
 					color,

@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( nobb_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")		/* DIP1 some games read it from here... */
 	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)	/* sound commands ? */
 	AM_RANGE(0x15, 0x15) AM_READWRITE(system1_videomode_r, brain_videomode_w)	/* video control + bank switching */
-	
+
 	/* protection on the bootleg */
 	AM_RANGE(0x16, 0x16) AM_READWRITE(nobb_inport16_r, nobb_outport16_w)	/* Used - check code at 0x05cb */
 	AM_RANGE(0x17, 0x17) AM_WRITE(nobb_outport17_w)		/* Not handled in emul. of other SS1/2 games */
@@ -4024,7 +4024,7 @@ ROM_START( nob )
 
 	ROM_REGION( 0x8000, "mcu", 0 )
 	ROM_LOAD( "8751.mcu", 0x00000, 0x8000, NO_DUMP )
-	
+
 	ROM_REGION( 0x10000, "sound", 0 )
 	ROM_LOAD( "dm03.9h", 0x0000, 0x4000, CRC(415adf76) SHA1(fbd6f8921aa3246702983ba81fa9ae53fa10c19d) )
 

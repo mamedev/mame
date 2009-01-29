@@ -1010,7 +1010,7 @@ static READ8_HANDLER( funcube_serial_r )
 static void funcube_debug_outputs(void)
 {
 #ifdef MAME_DEBUG
-//	popmessage("LED: %02x OUT: %02x", (int)*funcube_leds, (int)*funcube_outputs);
+//  popmessage("LED: %02x OUT: %02x", (int)*funcube_leds, (int)*funcube_outputs);
 #endif
 }
 
@@ -1059,7 +1059,7 @@ static ADDRESS_MAP_START( funcube_sub_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( H8_PORT_4,   H8_PORT_4   )	AM_NOP	// unused
 	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE( funcube_outputs_r, funcube_outputs_w ) AM_BASE( &funcube_outputs )
 	AM_RANGE( H8_PORT_B,   H8_PORT_B   )	AM_WRITE( funcube_leds_w )                           AM_BASE( &funcube_leds )
-//	AM_RANGE( H8_SERIAL_0, H8_SERIAL_0 )	// cabinets linking (jpunit)
+//  AM_RANGE( H8_SERIAL_0, H8_SERIAL_0 )    // cabinets linking (jpunit)
 	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )	AM_READ( funcube_serial_r )
 ADDRESS_MAP_END
 

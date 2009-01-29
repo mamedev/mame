@@ -1075,7 +1075,7 @@ static WRITE8_HANDLER(funworld_lamp_b_w)
 static WRITE8_HANDLER(pia1_ca2_w)
 {
 /* TAB and Impera games are writting 0x01 constantly, and 0x00 with each screen change */
-//	popmessage("PIA1 CA2: %02X", data);
+//  popmessage("PIA1 CA2: %02X", data);
 }
 
 

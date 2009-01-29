@@ -136,8 +136,8 @@ static WRITE16_HANDLER( pspikesb_oki_banking_w )
 /*TODO: sound banking. */
 static WRITE16_HANDLER( aerfboo2_okim6295_banking_w )
 {
-//	if(ACCESSING_BITS_8_15)
-//		okim6295_set_bank_base(0, 0x40000 * ((data & 0xf00)>>8));
+//  if(ACCESSING_BITS_8_15)
+//      okim6295_set_bank_base(0, 0x40000 * ((data & 0xf00)>>8));
 }
 
 static WRITE8_HANDLER( aerfboot_okim6295_banking_w )
@@ -366,7 +366,7 @@ static ADDRESS_MAP_START( aerfboo2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0fe006, 0x0fe007) AM_READ(okim6295_status_0_msb_r)
 	AM_RANGE(0x0fe00e, 0x0fe00f) AM_WRITE(okim6295_data_0_msb_w)
 	AM_RANGE(0x0fe01e, 0x0fe01f) AM_WRITE(aerfboo2_okim6295_banking_w)
-//	AM_RANGE(0x0fe010, 0x0fe011) AM_WRITENOP
+//  AM_RANGE(0x0fe010, 0x0fe011) AM_WRITENOP
 //  AM_RANGE(0x0fe012, 0x0fe013) AM_WRITE(aerfboot_soundlatch_w)
 	AM_RANGE(0x0fe400, 0x0fe401) AM_WRITENOP // data for a crtc?
 	AM_RANGE(0x0fe402, 0x0fe403) AM_WRITENOP // address for a crtc?

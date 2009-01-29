@@ -4871,12 +4871,12 @@ ROM_END
 /*
    The region of Batrider is controlled by the first byte of rom prg0.u22
    only sets which have been dumped from original PCBs are supported
-   
+
    original ROM labels have no indication of the region.
-    
+
    valid values are:
     ( * denotes that this set has been found on an original PCB )
-	
+
    00 : Nippon *
    01 : USA *
    02 : Europe *
@@ -4904,9 +4904,9 @@ ROM_END
    18 : China *
    19 : No Region?
    1A+: Invalid
-   
+
    For future reference, that would mean the following
-   
+
    ROM_LOAD16_BYTE( "prg0_nippon.u22",       0x000000, 0x080000, CRC(4f3fc729) SHA1(b32d51c254741b82171a86c271679522a7aefd34) )
    ROM_LOAD16_BYTE( "prg0_usa.u22",          0x000000, 0x080000, CRC(2049d007) SHA1(f2a43547a6fc5083b03c1d59a85abbf6e1ce4cd9) )
    ROM_LOAD16_BYTE( "prg0_europe.u22",       0x000000, 0x080000, CRC(91d3e975) SHA1(682885fc17f2424d475c282f239f42faf1aae076) )
@@ -4933,9 +4933,9 @@ ROM_END
    ROM_LOAD16_BYTE( "prg0_korea.u22",        0x000000, 0x080000, CRC(d9d8c907) SHA1(69c197f2a41f288913f042de9eb8274c0df3ac27) )
    ROM_LOAD16_BYTE( "prg0_china.u22",        0x000000, 0x080000, CRC(c3b91f7e) SHA1(6b2376c37808dccda296d90ccd7f577ccff4e4dc) )
    ROM_LOAD16_BYTE( "prg0_none.u22",         0x000000, 0x080000, CRC(accf0850) SHA1(d93e4e80443a40c3a9575dbf21927ef0d1a039b9) )
-   
+
  */
-   
+
 
 ROM_START( batrid )
 	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
@@ -5035,7 +5035,7 @@ ROM_END
 
 ROM_START( batridk )
 	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
-	ROM_LOAD16_BYTE( "prg0_korea.u22", 0x000000, 0x080000, CRC(d9d8c907) SHA1(69c197f2a41f288913f042de9eb8274c0df3ac27) )   
+	ROM_LOAD16_BYTE( "prg0_korea.u22", 0x000000, 0x080000, CRC(d9d8c907) SHA1(69c197f2a41f288913f042de9eb8274c0df3ac27) )
 	ROM_LOAD16_BYTE( "prg1.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )

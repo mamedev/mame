@@ -249,7 +249,7 @@ INLINE UINT32 sprite_xscale(UINT8 dacinput, double vr1, double vr2, double cext)
 		vco_cv = 5.0;
 	if (vco_cv < 0.0)
 		vco_cv = 0.0;
-	if (cext < 1e-11) 
+	if (cext < 1e-11)
 	{
 		if (vco_cv < 1.33)
 			vco_freq = (0.68129 + pow(vco_cv + 0.6, 1.285)) * 1e6;
@@ -266,7 +266,7 @@ INLINE UINT32 sprite_xscale(UINT8 dacinput, double vr1, double vr2, double cext)
 	else
 	{
 		/* based on figure 6 of datasheet */
-		vco_freq = -0.9892942 * log10(cext)	- 0.0309697 * vco_cv * vco_cv 
+		vco_freq = -0.9892942 * log10(cext)	- 0.0309697 * vco_cv * vco_cv
 		              +	0.344079975 * vco_cv - 4.086395841;
 		vco_freq = pow(10.0, vco_freq);
 	}

@@ -45,9 +45,9 @@
 
 
     Noraut Edge Connector (pinouts)
-	--------------------------------
+    --------------------------------
     Component     PN   Solder Side
-	--------------------------------
+    --------------------------------
     GND           01   GND
     5v DC         02   5v DC
                   03
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( norautp_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(vram_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_WRITE(vram_addr_w)
 	AM_RANGE(0xc2, 0xc2) AM_READ(test_r)
-//	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /*
@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( gtipoker_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xdc, 0xdc) AM_WRITE(vram_data_w)
 	AM_RANGE(0xdd, 0xdd) AM_WRITE(vram_addr_w)
 	AM_RANGE(0xde, 0xde) AM_READ(test_r)
-//	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xef, 0xef) AM_READ(test_r)
 ADDRESS_MAP_END
 

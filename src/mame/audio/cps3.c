@@ -105,7 +105,7 @@ CUSTOM_START( cps3_sh_start )
 	memset(&chip, 0, sizeof(chip));
 
 	chip.base = (INT8*)cps3_user5region;
-	
+
 	return auto_malloc(1);
 }
 

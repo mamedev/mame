@@ -28,7 +28,7 @@
   - Guessed and hooked the Yamaha VDP (SDIP64 IC). Same VDP used on MSX systems.
   - Added v9938 stuff, interrupts, video start, machine reset, input ports,
     DIP switch, ym2149 interface, pre-defined main Xtal and derivatives for
-	z80 and ym2149.
+    z80 and ym2149.
   - Added NVRAM, defined half of DIP switches bank (coinage & main game rate).
     Added inputs for coins A, B & C, payout, reset, and service mode.
   - Reorganized the driver.

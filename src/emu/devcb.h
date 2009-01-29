@@ -9,27 +9,27 @@
 
 ****************************************************************************
 
-	These functions are used to adapt multiple read/write handler types
-	to be used with device I/O. In general, a device is expected to
-	declare its desired callback type, and these functions allow other
-	callback types to be adapted appropriately.
-	
-	The desired callback types currently supported include:
-	
-		read_line_device_func:	(device)
-		write_line_device_func:	(device, data)
-		read8_device_func:		(device, offset)
-		write8_device_func:		(device, offset, data)
-	
-	The adapted callback types supported are:
-	
-		input port				(port)
-		read_line_device_func:	(device)
-		write_line_device_func:	(device, data)
-		read8_device_func:		(device, offset)
-		write8_device_func:		(device, offset, data)
-		read8_space_func:		(space, offset)
-		write8_space_func:		(space, offset, data)
+    These functions are used to adapt multiple read/write handler types
+    to be used with device I/O. In general, a device is expected to
+    declare its desired callback type, and these functions allow other
+    callback types to be adapted appropriately.
+
+    The desired callback types currently supported include:
+
+        read_line_device_func:  (device)
+        write_line_device_func: (device, data)
+        read8_device_func:      (device, offset)
+        write8_device_func:     (device, offset, data)
+
+    The adapted callback types supported are:
+
+        input port              (port)
+        read_line_device_func:  (device)
+        write_line_device_func: (device, data)
+        read8_device_func:      (device, offset)
+        write8_device_func:     (device, offset, data)
+        read8_space_func:       (space, offset)
+        write8_space_func:      (space, offset, data)
 
 ***************************************************************************/
 
@@ -217,7 +217,7 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 ***************************************************************************/
 
 /*-------------------------------------------------
-    devcb_call_read_line - call through a 
+    devcb_call_read_line - call through a
     resolved read_line handler
 -------------------------------------------------*/
 
@@ -228,7 +228,7 @@ INLINE int devcb_call_read_line(const devcb_resolved_read_line *resolved)
 
 
 /*-------------------------------------------------
-    devcb_call_read8 - call through a 
+    devcb_call_read8 - call through a
     resolved read8 handler
 -------------------------------------------------*/
 
@@ -239,7 +239,7 @@ INLINE int devcb_call_read8(const devcb_resolved_read8 *resolved, offs_t offset)
 
 
 /*-------------------------------------------------
-    devcb_call_write_line - call through a 
+    devcb_call_write_line - call through a
     resolved write_line handler
 -------------------------------------------------*/
 
@@ -251,7 +251,7 @@ INLINE void devcb_call_write_line(const devcb_resolved_write_line *resolved, int
 
 
 /*-------------------------------------------------
-    devcb_call_write8 - call through a 
+    devcb_call_write8 - call through a
     resolved write8 handler
 -------------------------------------------------*/
 

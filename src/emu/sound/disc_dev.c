@@ -1583,7 +1583,7 @@ static DISCRETE_RESET(dsd_566)
 
 /*
  * The datasheet mentions a 600 ohm discharge. It also gives
- * equivalent circuits for VI and VR. 
+ * equivalent circuits for VI and VR.
  */
 
 #define LS624_F1(x)			(0.19 + 20.0/90.0*(x))

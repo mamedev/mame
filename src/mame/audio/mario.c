@@ -112,9 +112,9 @@
 #define MR_C32		CAP_U(1)		/* illegible on pcb                     */
 #define MR_C39		CAP_N(4.7)		/* not found                            */
 #define MR_C40		CAP_N(22)		/* verified                             */
-//#define MR_C41		CAP_U(4.7)		/* verified, hard to read           */
+//#define MR_C41        CAP_U(4.7)      /* verified, hard to read           */
 /* The 60% adjustment is needed to bring this close to recordings           */
-#define MR_C41		(CAP_U(4.7) * 0.6) 
+#define MR_C41		(CAP_U(4.7) * 0.6)
 #define MR_C43		CAP_U(3.3)		/* verified                             */
 #define MR_C44		CAP_U(3.3)		/* verified                             */
 

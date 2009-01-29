@@ -67,7 +67,7 @@
     - Dump/decap/trojan the MCU in the later games (magic102, suprpool, hotslot, mcolors).
       The MCU shares memory addresses at $500000-$50001f (in magic102)
       It can't be simulated with a high level of confidence because all the game logic is
-	  in there, including rngs for the cards and combinations for the points.
+      in there, including rngs for the cards and combinations for the points.
     - Priorities,likely to be hardwired with the color writes (0=tile has the
       highest priority).
 
@@ -166,9 +166,9 @@ static VIDEO_UPDATE( magic10 )
 	tilemap_set_scrolly(layer2_tilemap, 0, layer2_offset[1]);
 
 	/*
-	4 and 6 are y/x global register writes.
-	0 and 2 are y/x writes for the scrolling layer.
-	*/
+    4 and 6 are y/x global register writes.
+    0 and 2 are y/x writes for the scrolling layer.
+    */
 	tilemap_set_scrolly(layer1_tilemap, 0, (magic10_vregs[0/2] - magic10_vregs[4/2])+0);
 	tilemap_set_scrollx(layer1_tilemap, 0, (magic10_vregs[2/2] - magic10_vregs[6/2])+4);
 

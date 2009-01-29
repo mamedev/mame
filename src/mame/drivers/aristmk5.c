@@ -3,7 +3,7 @@
    Aristocrat MK5 / MKV hardware
    possibly 'Acorn Archimedes on a chip' hardware
 
-   Note: ARM250 mapping is not identical to 
+   Note: ARM250 mapping is not identical to
 
 */
 

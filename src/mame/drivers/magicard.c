@@ -347,8 +347,8 @@ static READ16_HANDLER( philips_66470_r )
 {
 	switch(offset)
 	{
-//		case 0/2:
-//			return mame_rand(space->machine); //TODO
+//      case 0/2:
+//          return mame_rand(space->machine); //TODO
 	}
 
 	printf("[%04x]\n",offset*2);
@@ -361,15 +361,15 @@ static WRITE16_HANDLER( philips_66470_w )
 {
 	COMBINE_DATA(&pcab_vregs[offset]);
 
-//	if(offset == 0x10/2)
-//	{
+//  if(offset == 0x10/2)
+//  {
 		//printf("%04x %04x %04x\n",data,pcab_vregs[0x12/2],pcab_vregs[0x14/2]);
 		//pcab_vregs[0x12/2] = pcab_vregs[0x10/2];
-//	}
+//  }
 }
 
 static ADDRESS_MAP_START( magicard_mem, ADDRESS_SPACE_PROGRAM, 16 )
-//	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
+//  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE(&magicram) /*only 0-7ffff accessed in Magic Card*/
 //  AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_REGION("main", 0)
 	AM_RANGE(0x180000, 0x1ffbff) AM_ROM AM_REGION("main", 0)
@@ -411,9 +411,9 @@ MACHINE_RESET( magicard )
 /*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
 static INTERRUPT_GEN( magicard_irq )
 {
-//	if(input_code_pressed(KEYCODE_Z))
-//		cpu_set_input_line(device->machine->cpu[0], 1, HOLD_LINE);
-//	magicram[0x2004/2]^=0xffff;
+//  if(input_code_pressed(KEYCODE_Z))
+//      cpu_set_input_line(device->machine->cpu[0], 1, HOLD_LINE);
+//  magicram[0x2004/2]^=0xffff;
 }
 
 static MACHINE_DRIVER_START( magicard )
@@ -489,18 +489,18 @@ GAME( 199?, magicrda, 0,     magicrda, 0,     magicard,    ROT0, "Impera", "Magi
 /*Below here there are CD-I bios defines,to be removed in the end*/
 /*
 ROM_START( mcdi200 )
-	ROM_REGION( 0x80000, "main", 0 )
-	ROM_LOAD16_WORD( "mgvx200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a) )
+    ROM_REGION( 0x80000, "main", 0 )
+    ROM_LOAD16_WORD( "mgvx200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a) )
 ROM_END
 
 ROM_START( pcdi490 )
-	ROM_REGION( 0x80000, "main", 0 )
-	ROM_LOAD16_WORD( "phlp490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552) )
+    ROM_REGION( 0x80000, "main", 0 )
+    ROM_LOAD16_WORD( "phlp490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552) )
 ROM_END
 
 ROM_START( pcdi910m )
-	ROM_REGION( 0x80000, "main", 0 )
-	ROM_LOAD16_WORD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05) )
+    ROM_REGION( 0x80000, "main", 0 )
+    ROM_LOAD16_WORD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05) )
 ROM_END
 
 GAME( 199?, mcdi200, 0,     magicard, 0,     magicard,    ROT0, "Philips", "Magnavox CD-I 200 BIOS", GAME_NO_SOUND | GAME_NOT_WORKING )
