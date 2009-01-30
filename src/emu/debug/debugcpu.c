@@ -1736,6 +1736,7 @@ void debug_write_qword(const address_space *space, offs_t address, UINT64 data, 
 UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, int arg)
 {
 	UINT64 result = ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size)), result2;
+	debugcpu_private *global = space->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(space->cpu);
 
 	/* keep in logical range */
@@ -1745,8 +1746,14 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 	if (info->readop != NULL)
 	{
 		UINT64 result;
+
+		/* return early if we got the result directly */
+		memory_set_debugger_access(space, global->debugger_access = TRUE);
 		if ((*info->readop)(space->cpu, address, size, &result))
+		{
+			memory_set_debugger_access(space, global->debugger_access = FALSE);
 			return result;
+		}
 	}
 
 	/* if we're bigger than the address bus, break into smaller pieces */
@@ -1820,6 +1827,10 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 			fatalerror("debug_read_opcode: unknown type = %d", space->dbits / 8 * 10 + size);
 			break;
 	}
+	
+	/* turn on debugger access */
+	if (!global->debugger_access)
+		memory_set_debugger_access(space, global->debugger_access = TRUE);
 
 	/* switch off the size and handle unaligned accesses */
 	switch (size)
@@ -1866,6 +1877,9 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 			}
 			break;
 	}
+
+	/* no longer accessing via the debugger */
+	memory_set_debugger_access(space, global->debugger_access = FALSE);
 	return result;
 }
 

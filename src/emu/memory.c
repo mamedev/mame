@@ -909,7 +909,8 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 		/* ensure future updates to land here as well until we get back into a bank */
 		spacerw->direct.byteend = 0;
 		spacerw->direct.bytestart = 1;
-		logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, byteaddress, space->name);
+		if (!spacerw->debugger_access)
+			logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, byteaddress, space->name);
 		return FALSE;
 	}
 
@@ -2967,9 +2968,9 @@ static direct_range *direct_range_find(address_space *space, offs_t byteaddress,
 
 	/* determine which entry */
 	byteaddress &= space->bytemask;
-	*entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
+	*entry = space->read.table[LEVEL1_INDEX(byteaddress)];
 	if (*entry >= SUBTABLE_BASE)
-		*entry = space->readlookup[LEVEL2_INDEX(*entry, byteaddress)];
+		*entry = space->read.table[LEVEL2_INDEX(*entry, byteaddress)];
 	rangelistptr = &space->direct.rangelist[*entry];
 
 	/* scan our table */
