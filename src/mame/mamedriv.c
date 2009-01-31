@@ -7815,6 +7815,11 @@ Other Sun games
 	DRIVER( tenup )		/* (c) 1988 */
 	DRIVER( tenup3 )	/* (c) 1988 */
 
+	/* JPM System 5 + video expansion 2 Games */
+	DRIVER( monopoly )	/* (c) 1994 */
+	DRIVER( monoplcl )	/* (c) 1995 */
+	DRIVER( monopldx )	/* (c) 1995 */
+
 	/* JPM Impact Games */
 	DRIVER( cluedo )	/* (c) 1995 */
 	DRIVER( cluedo2c )	/* (c) 1995 */

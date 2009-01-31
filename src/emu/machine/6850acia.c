@@ -285,8 +285,6 @@ WRITE8_DEVICE_HANDLER( acia6850_ctrl_w )
 	int wordsel;
 	int divide;
 
-	acia_p->ctrl = data;
-
 	// Counter Divide Select Bits
 
 	divide = data & CR1_0;
@@ -355,21 +353,26 @@ WRITE8_DEVICE_HANDLER( acia6850_ctrl_w )
 		break;
 	}
 
-	// After writing the word type, start receive clock
+	// After writing the word type, set the rx/tx clocks (provided the divide values have changed)
 
-	if (!acia_p->reset)
+	if ((acia_p->ctrl ^ data) & CR1_0)
 	{
-		if (acia_p->rx_clock)
+		if (!acia_p->reset)
 		{
-			attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
-			timer_adjust_periodic(acia_p->rx_timer, rx_period, 0, rx_period);
-		}
-		if (acia_p->tx_clock)
-		{
-			attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
-			timer_adjust_periodic(acia_p->tx_timer, tx_period, 0, tx_period);
+			if (acia_p->rx_clock)
+			{
+				attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
+				timer_adjust_periodic(acia_p->rx_timer, rx_period, 0, rx_period);
+			}
+			if (acia_p->tx_clock)
+			{
+				attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
+				timer_adjust_periodic(acia_p->tx_timer, tx_period, 0, tx_period);
+			}
 		}
 	}
+
+	acia_p->ctrl = data;
 }
 
 

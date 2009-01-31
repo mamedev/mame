@@ -1620,6 +1620,7 @@ src/mame/drivers/jokrwild.c svneol=native#text/plain
 src/mame/drivers/jollyjgr.c svneol=native#text/plain
 src/mame/drivers/jongkyo.c svneol=native#text/plain
 src/mame/drivers/jpmimpct.c svneol=native#text/plain
+src/mame/drivers/jpmsys5.c svneol=native#text/plain
 src/mame/drivers/jrpacman.c svneol=native#text/plain
 src/mame/drivers/junofrst.c svneol=native#text/plain
 src/mame/drivers/kaneko16.c svneol=native#text/plain
