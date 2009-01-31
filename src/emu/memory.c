@@ -876,7 +876,7 @@ direct_update_func memory_set_direct_update_handler(const address_space *space, 
     update the opcode base for the given address
 -------------------------------------------------*/
 
-int memory_set_direct_region(const address_space *space, offs_t byteaddress)
+int memory_set_direct_region(const address_space *space, offs_t *byteaddress)
 {
 	memory_private *memdata = space->machine->memory_data;
 	address_space *spacerw = (address_space *)space;
@@ -884,21 +884,24 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 	const handler_data *handlers;
 	direct_range *range;
 	offs_t maskedbits;
+	offs_t overrideaddress = *byteaddress;
 	UINT8 entry;
 
 	/* allow overrides */
 	if (spacerw->directupdate != NULL)
 	{
-		byteaddress = (*spacerw->directupdate)(spacerw, byteaddress, &spacerw->direct);
-		if (byteaddress == ~0)
+		overrideaddress = (*spacerw->directupdate)(spacerw, overrideaddress, &spacerw->direct);
+		if (overrideaddress == ~0)
 			return TRUE;
+
+		*byteaddress = overrideaddress;
 	}
 
 	/* remove the masked bits (we'll put them back later) */
-	maskedbits = byteaddress & ~spacerw->bytemask;
+	maskedbits = overrideaddress & ~spacerw->bytemask;
 
 	/* find or allocate a matching range */
-	range = direct_range_find(spacerw, byteaddress, &entry);
+	range = direct_range_find(spacerw, overrideaddress, &entry);
 
 	/* keep track of current entry */
 	spacerw->direct.entry = entry;
@@ -910,7 +913,7 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 		spacerw->direct.byteend = 0;
 		spacerw->direct.bytestart = 1;
 		if (!spacerw->debugger_access)
-			logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, byteaddress, space->name);
+			logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, overrideaddress, space->name);
 		return FALSE;
 	}
 
