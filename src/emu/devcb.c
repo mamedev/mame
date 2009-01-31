@@ -98,6 +98,13 @@ static WRITE_LINE_DEVICE_HANDLER( trampoline_write8_to_write_line )
 	(*resolved->real.writedevice)(resolved->realtarget, 0, state);
 }
 
+static WRITE_LINE_DEVICE_HANDLER( trampoline_writecpu_to_write_line )
+{
+	const devcb_resolved_write_line *resolved = (const devcb_resolved_write_line *)device;
+	const device_config *cpu = resolved->realtarget;
+	cpu_set_input_line(cpu, resolved->real.writeline, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_write_line *config, const device_config *device)
 {
 	/* reset the resolved structure */
@@ -117,6 +124,20 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 		if (resolved->realtarget == NULL)
 			fatalerror("devcb_resolve_write_line: unable to find CPU '%s' %s space (requested by %s '%s')", config->tag, address_space_names[space], device_get_name(device), device->tag);
 		resolved->real.writespace = config->writespace;
+	}
+
+	/* cpu line handlers */
+	else if (config->type >= DEVCB_TYPE_CPU_LINE(0) && config->type < DEVCB_TYPE_CPU_LINE(MAX_INPUT_LINES))
+	{
+		FPTR line = (FPTR)config->type - (FPTR)DEVCB_TYPE_CPU_LINE(0);
+		const device_config *cpu = cputag_get_cpu(device->machine, config->tag);
+
+		if (cpu == NULL)
+			fatalerror("devcb_resolve_write_line: unable to find CPU '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
+		resolved->target = resolved;
+		resolved->write = trampoline_writecpu_to_write_line;
+		resolved->realtarget = cpu;
+		resolved->real.writeline = (int) line;
 	}
 
 	/* device handlers */

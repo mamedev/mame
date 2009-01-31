@@ -24,6 +24,7 @@
     The adapted callback types supported are:
 
         input port              (port)
+		cpu input line			(cpu input line)
         read_line_device_func:  (device)
         write_line_device_func: (device, data)
         read8_device_func:      (device, offset)
@@ -49,6 +50,7 @@
 #define DEVCB_TYPE_SELF				((device_type)1)
 #define DEVCB_TYPE_INPUT			((device_type)2)
 #define DEVCB_TYPE_MEMORY(space)	((device_type)(4 + (space)))
+#define DEVCB_TYPE_CPU_LINE(line)	((device_type)(4 + ADDRESS_SPACES + (line)))
 
 
 
@@ -71,6 +73,9 @@
 
 /* read handlers for an I/O port by tag */
 #define DEVCB_INPUT_PORT(tag)				{ DEVCB_TYPE_INPUT, (tag), NULL, NULL, NULL }
+
+/* write handlers for a CPU input line */
+#define DEVCB_CPU_INPUT_LINE(tag,line)		{ DEVCB_TYPE_CPU_LINE(line), (tag), NULL, NULL, NULL }
 
 
 /* macros for defining read_line/write_line functions */
@@ -134,6 +139,7 @@ struct _devcb_resolved_write_line
 	{
 		write8_device_func	writedevice;
 		write8_space_func	writespace;
+		int					writeline;
 	} real;									/* real write function for stubs */
 };
 

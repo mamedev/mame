@@ -135,12 +135,6 @@ static WRITE8_HANDLER( adpcm_w )
 	sp0256_ALD_w(space, 0, data);
 }
 
-static void lrq_callback(const device_config *device, int state)
-{
-	//cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, state);
-}
-
 static ADDRESS_MAP_START( sauro_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xe000, 0xebff) AM_READ(SMH_RAM)
@@ -336,8 +330,8 @@ static const gfx_layout sauro_spritelayout =
 
 static const sp0256_interface sauro_sp256 =
 {
-	lrq_callback,
-	0
+	DEVCB_CPU_INPUT_LINE("audio", INPUT_LINE_NMI),
+	DEVCB_NULL
 };
 
 static GFXDECODE_START( sauro )
