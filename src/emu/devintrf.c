@@ -603,7 +603,6 @@ void device_list_start(running_machine *machine)
 	while (numstarted < devcount)
 	{
 		int prevstarted = numstarted;
-		numstarted = 0;
 
 		/* iterate over devices and start them */
 		for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
