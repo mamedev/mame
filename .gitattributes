@@ -1823,6 +1823,7 @@ src/mame/drivers/orbit.c svneol=native#text/plain
 src/mame/drivers/othldrby.c svneol=native#text/plain
 src/mame/drivers/othunder.c svneol=native#text/plain
 src/mame/drivers/overdriv.c svneol=native#text/plain
+src/mame/drivers/pachifev.c svneol=native#text/plain
 src/mame/drivers/pacland.c svneol=native#text/plain
 src/mame/drivers/pacman.c svneol=native#text/plain
 src/mame/drivers/pandoras.c svneol=native#text/plain

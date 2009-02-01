@@ -8544,20 +8544,19 @@ Other Sun games
 	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
 
-
 	/* STG? */
-	DRIVER ( queen )
+	DRIVER( queen )
 
 	/* Aristocrat */
-	DRIVER ( 86lions )	/* (c) 1985? */
-	DRIVER ( caswin )	/* (c) 1985 */
+	DRIVER( 86lions )	/* (c) 1985? */
+	DRIVER( caswin )	/* (c) 1985 */
 
 	/* Aristocrat Mk5 hardware */
 	DRIVER( reelrock )	/* (c) 1998 */
 	DRIVER( indiandr )	/* (c) 1998 */
 
 	/* Eagle */
-	DRIVER ( janshi )
+	DRIVER( janshi )
 
 	/* Wing */
 	DRIVER( slotcarn )	/* (c) 1985 Wing Co. Ltd */
@@ -8592,5 +8591,8 @@ Other Sun games
 	DRIVER( gtipoker )  /* (c) 1983 GTI Inc */
 	DRIVER( norautp )   /* (c) 1988? Noraut */
 	DRIVER( norautpn )  /* (c) 1990? unknown */
+
+	/* Sanki Denshi Kogyo */
+	DRIVER( pachifev )  /* (c) 1983? */
 
 #endif	/* DRIVER_RECURSIVE */

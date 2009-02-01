@@ -1629,6 +1629,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/oneshot.o $(VIDEO)/oneshot.o \
 	$(DRIVERS)/onetwo.o \
 	$(DRIVERS)/othldrby.o $(VIDEO)/othldrby.o \
+	$(DRIVERS)/pachifev.o \
 	$(DRIVERS)/pangofun.o \
 	$(DRIVERS)/pasha2.o \
 	$(DRIVERS)/pass.o $(VIDEO)/pass.o \
