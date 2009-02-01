@@ -6,6 +6,7 @@
 
 
 CPU    :    TMP68301*
+            ColdFire & H8/3007 (for FUNCUBE)
 
 Custom :    X1-010              Sound: 8 Bit PCM
             DX-101              Sprites
@@ -31,7 +32,7 @@ P0-142A + extra parts   2000    Penguin Brothers                        Subsino
 B0-003A (or B0-003B)    2000    Deer Hunting USA                        Sammy
 B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
 B0-006B                 2001    Funcube 2                               Namco
-B0-006B?                2001    Funcube 4                               Namco
+B0-006B                 2001    Funcube 4                               Namco
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
 -------------------------------------------------------------------------------------------
@@ -39,6 +40,7 @@ B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
 TODO:
 
 - Proper emulation of the TMP68301 CPU, in a core file.
+- Proper emulation of the ColdFire CPU, in a core file.
 - Flip screen / Zooming support.
 - Fix some graphics imperfections (e.g. color depth selection,
   "tilemap" sprites) [all done? - NS]
@@ -186,21 +188,21 @@ PCB Number: P0-142A
 |   |   | |   |   1   1                              | 1 |  |
 |   +---+ +---+                                      | 8 |  |
 |                                          Lattice   |   |  |
-|   D D  +---+                            ispLSI2032 |   |  |
-|   S S  |DX |                  +-------+            +---+  |
-|   W W  |102|                  |Toshiba|     CN2           |
-|   1 2  +---+      BAT1*       |  TMP  |                   |
-|                               | 68301 |  U50*             |
+|J  D D  +---+                            ispLSI2032 |   |  |
+|A  S S  |DX |                  +-------+            +---+  |
+|M  W W  |102|                  |Toshiba|     CN2           |
+|M  1 2  +---+      BAT1*       |  TMP  |                   |
+|A                              | 68301 |  U50*             |
 |                               +-------+                   |
-|                                                           |
-|                  50MHz        +----------+     28MHz      |
-|     +---+                     |          |                |
-|     |DX |     SW1             |   NEC    |    M   M       |
-|     |102|                     |  DX-101  |    2   2       |
-|     +---+         M  M        |          |                |
-|                   1  1        |          |                |
-|                               +----------+                |
-|                                                           |
+|C                                                          |
+|o                 50MHz        +----------+     28MHz      |
+|n    +---+                     |          |                |
+|n    |DX |     SW1             |   NEC    |    M   M       |
+|e    |102|                     |  DX-101  |    2   2       |
+|c    +---+         M  M        |          |                |
+|t                  1  1        |          |                |
+|e                              +----------+                |
+|r                                                          |
 |                             +---+      +---++---++---+    |
 |                             |   |      |   ||   ||   |    |
 |     +---+                   |   |      |   ||   ||   |    |
@@ -251,21 +253,21 @@ PCB Number: P0-142A
 |   |   | |   |       1                              |   |  |
 |   +---+ +---+                                      | U |  |
 |                                          Lattice   | 1 |  |
-|   D D  +---+                            ispLSI2032 | 8 |  |
-|   S S  |DX |                  +-------+            +---+  |
-|   W W  |102|                  |Toshiba|     CN2           |
-|   1 2  +---+      BAT1*       |  TMP  |                   |
-|                               | 68301 |  U50*             |
+|J  D D  +---+                            ispLSI2032 | 8 |  |
+|A  S S  |DX |                  +-------+            +---+  |
+|M  W W  |102|                  |Toshiba|     CN2           |
+|M  1 2  +---+      BAT1*       |  TMP  |                   |
+|A                              | 68301 |  U50*             |
 |                               +-------+                   |
-|                                                           |
-|                  50MHz        +----------+     XM2*       |
-|     +---+                     |          |                |
-|     |DX |     SW1             |   NEC    |    M   M       |
-|     |102|                     |  DX-101  |    2   2       |
-|     +---+         M  M        |          |                |
-|                   1  1        |          |                |
-|                               +----------+                |
-|                                                           |
+|C                                                          |
+|o                 50MHz        +----------+     XM2*       |
+|n    +---+                     |          |                |
+|n    |DX |     SW1             |   NEC    |    M   M       |
+|e    |102|                     |  DX-101  |    2   2       |
+|c    +---+         M  M        |          |                |
+|t                  1  1        |          |                |
+|e                              +----------+                |
+|r                                                          |
 |                             +---+      +---++---++---+    |
 |                             | K |      | K || K || K |    |
 |     +---+                   | U |      | U || U || U |    |
@@ -335,21 +337,21 @@ PCB Number: B0-003A (or B0-003B)
 |   |   | |   |  2    1                              | 1 |  |
 |   +---+ +---+                                      | 8 |  |
 |                                          Lattice   |   |  |
-|   D +---+  C                            ispLSI2032 |   |  |
-|   S |DX |  N   BAT1           +-------+            +---+  |
-|   W |102|  5                  |Toshiba|  D                |
-|   1 +---+                     |  TMP  |  S EEPROM       C |
-|            C                  | 68301 |  W              N |
+|J  D +---+  C                            ispLSI2032 |   |  |
+|A  S |DX |  N   BAT1           +-------+            +---+  |
+|M  W |102|  5                  |Toshiba|  D                |
+|M  1 +---+                     |  TMP  |  S EEPROM       C |
+|A           C                  | 68301 |  W              N |
 |            N  Lattice         +-------+  2              2 |
-|            6  isp1016E                                    |
-|                               +----------+    50MHz       |
-|     +---+                     |          |                |
-|     |DX |  SW1                |   NEC    |    M   M       |
-|     |102|                     |  DX-101  |    3   3       |
-|     +---+         M  M        |          |                |
-|                   1  1        |          |                |
-|                               +----------+                |
-|                                                           |
+|C           6  isp1016E                                    |
+|o                              +----------+    50MHz       |
+|n    +---+                     |          |                |
+|n    |DX |  SW1                |   NEC    |    M   M       |
+|e    |102|                     |  DX-101  |    3   3       |
+|c    +---+         M  M        |          |                |
+|t                  1  1        |          |                |
+|e                              +----------+                |
+|r                                                          |
 |                             +---+      +---++---++---+    |
 |                  28MHz      |   |      |   ||   ||   |    |
 |     +---+                   |   |      |   ||   ||   |    |
@@ -373,21 +375,21 @@ PCB Number: B0-010A - This PCB is slightly revised for 2 player play
 |   |   | |   |  2    1                              | 1 |  |
 |   +---+ +---+                                      | 8 |  |
 |                                          Lattice   |   |  |
-|   D +---+  C                            ispLSI2032 |   |  |
-|   S |DX |  N   BAT1           +-------+            +---+  |
-|   W |102|  5                  |Toshiba|  D                |
-|   1 +---+                     |  TMP  |  S EEPROM       C |
-|            C                  | 68301 |  W              N |
+|J  D +---+  C                            ispLSI2032 |   |  |
+|A  S |DX |  N   BAT1           +-------+            +---+  |
+|M  W |102|  5                  |Toshiba|  D                |
+|M  1 +---+                     |  TMP  |  S EEPROM       C |
+|A           C                  | 68301 |  W              N |
 |            N  Lattice         +-------+  2              2 |
-|            6  isp1016E                                    |
-|                               +----------+    50MHz       |
-|     +---+                     |          |                |
-|     |DX |  SW1                |   NEC    |    M   M       |
-|     |102|                     |  DX-101  |    3   3       |
-|     +---+         M  M        |          |                |
-|                   1  1        |          |                |
-|                               +----------+                |
-|                                                           |
+|C           6  isp1016E                                    |
+|o                              +----------+    50MHz       |
+|n    +---+                     |          |                |
+|n    |DX |  SW1                |   NEC    |    M   M       |
+|e    |102|                     |  DX-101  |    3   3       |
+|c    +---+         M  M        |          |                |
+|t                  1  1        |          |                |
+|e                              +----------+                |
+|r                                                          |
 |                             +---+      +---++---++---+    |
 |                  28MHz      |   |      |   ||   ||   |    |
 |     +---+              C    |   |      |   ||   ||   |    |
@@ -409,6 +411,99 @@ U07 Program rom ST27C801 (odd)
 U18 Mask rom (Samples 23C32000 32Mbit (read as 27C322))
 
 U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pin11 +5v & 27C322 with pin11 GND
+
+***************************************************************************/
+
+/***************************************************************************
+
+               FUNCUBE (BET) Series, includes 2 through 5?
+
+PCB Number: B0-006B (also known as EVA3_A system and is non-JAMMA)
++------------------------------------------------+
+|+--+ S +---+ +---+                CN5           |
+||  | W |   | |   |                          CN6?|
+||  | 4 | U | | U |                              |
+||  |   | 4 | | 4 |     +---+                CN2?|
+||  |   | 2 | | 3 |     |DX |                    |
+||  |   |   | |   |     |102|                    |
+||C |   |   | |   |     +---+                    |
+||N |   +---+ +---+                              |
+||4 |                                            |
+||  |      +----------+   M1                     |
+||  |  M3  |          |                        C |
+||  |      |   NEC    |   M1                   N |
+||  |  M3  |  DX-101  |                        3 |
+||  |      |          |                          |
+||  |      |          |   50MHz                  |
+|+--+      +----------+                          |
+| PIC  25.447MHz         +-----------+           |
+|  CN7                   |    U47    |           |
+|                        +-----------+           |
+|          +-----------+  +---+ +---+       D    |
+|          |     U3    |  |OKI| |DX |       S    |
+|    M2    +-----------+  |   | |102|       W    |
+|                         +---+ +---+       1    |
+|                 ispLSI2032                     |
+|    M1                      +---+               |
+|          +----------+      |IDT|           +--+|
+|          |          |  C   |   |           |  ||
+| C        | ColdFire |  N   +---+           |  ||
+| N  M2    | XCF5206E |  8                   |  ||
+| 1        |          |        +---+         |C ||
+|          |          |        |H8 |         |N ||
+|    M1    +----------+        +---+      D  |9 ||
+|                         14.7456MHz      S  |  ||
+|                            +-----------+W  |  ||
+|            SW1      BAT1   |    U49    |2  +--+|
+|                            +-----------+       |
++------------------------------------------------+
+
+   CPU: ColdFire XCF5206EFT54 (160 Pin PQFP)
+        Hitachi H8/3007 (64130007F20) used for touch screen I/O
+ Video: NEC DX-101 (240 Pin PQFP)
+        NEC DX-102 (52 Pin PQFP x2)
+ Sound: OKI MSM9810B 8-Channel Mixing ADPCM Type Voice Synthesis LSI
+   OSC: 50MHz, 25.447MHz & 14.7456MHz
+ Other: Lattice ispLSI2032 - stamped "EVA3A"
+        BAT1 - CR2032 3Volt
+
+ColdFire XCF5206EFT54:
+  68K/ColdFire V2 core family
+  8K internal SRAM
+  54MHz (max) Bus Frequency
+  32bit External Bus Width
+  2 UART Serial Interfaces
+  2 Timer Channels
+
+PIC - PIC12C508 MCU used for security
+       Labeled FC21A for Funcube 2
+       Labeled FC41A for Funcube 4
+
+Ram M1 are Toshiba TC55257DFL-70L
+Ram M2 are NEC D43001GU-70L
+Ram M3 are ISSI IS62C1024L-70Q
+IDT - IDT 7130 64-pin TQFP High-speed 1K x 8 Dual-Port Static RAM
+
+CN1 - Unused 64 pin double row connecter
+CN2?  2x2 connecter
+CN3 - Unused 50 pin double row connecter
+CN4 - 96 pin triple row connecter
+CN5 - 2x3 pin connecter
+CN6?  3x3 connecter
+CN7 - Unused 20 pin connecter
+CN8 - 8 pin single row connecter
+CN9 - 40 pin double row connecter
+
+DSW1 - 8 position dipswitch
+DSW2 - 2 position dipswitch
+SW1  - Pushbutton
+SW4  - Single position slider switch
+
+U3  - Is a 27C4002 EPROM
+U49 - Is a 27C1001 EPROM
+U42, U43 & U47 are MASK ROMs read as 27C322
+
+The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 
 ***************************************************************************/
 
@@ -2700,47 +2795,40 @@ ROM_START( trophyh ) /* V1.0 is currently the only known version */
 	ROM_LOAD( "as1105m01.u18", 0x100000, 0x400000, CRC(633d0df8) SHA1(3401c424f5c207ef438a9269e0c0e7d482771fed) )
 ROM_END
 
-/***************************************************************************
-
-FUNCUBE 2 (BET)
-(c)2001 NAMCO,LTD.
----------------------
-
-screenshot :
-http://www.bandainamcogames.co.jp/aa/am/mg/funcube2
-
-cabinet :
-http://www.bandainamcogames.co.jp/aa/am/mg/funcube
-
-SYSTEM: EVA3_A
-
-CPU   : COLDFIRE XCF5206
-      : H8
-
-SND   : MSM9810
-
-SECURITY : FC21A (PIC)
-
-*IOPR-0 ROM : FC21IOPR-0 (= FUNCUBE 2,3,4,5)
-
-***************************************************************************/
-
 ROM_START( funcube2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* XCF5206 Code */
-	ROM_LOAD( "funcube2-fc21pg0b.u3", 0x00000, 0x80000, CRC(add1c8a6) SHA1(bf91518da659098a4bad4e756533525fcc910570) )
+	ROM_LOAD( "fc21_prg-0b.u3", 0x00000, 0x80000, CRC(add1c8a6) SHA1(bf91518da659098a4bad4e756533525fcc910570) )
 
 	ROM_REGION( 0x20000, "sub", 0 ) /* H8/3007 Code */
-	ROM_LOAD( "funcube2-fc21iopr.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
+	ROM_LOAD( "fc21_iopr-0.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
 
 	ROM_REGION( 0x300, "pic", 0 ) /* PIC12C508? Code */
-	ROM_LOAD( "funcube2-fc21a", 0x000, 0x300, NO_DUMP )
+	ROM_LOAD( "fc21a", 0x000, 0x300, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD32_WORD( "funcube2-fc21obj0.u43", 0x000000, 0x400000, CRC(08cfe6d9) SHA1(d10f362dcde01f7a9855d8f76af3084b5dd1573a) )
-	ROM_LOAD32_WORD( "funcube2-fc21obj1.u42", 0x000002, 0x400000, CRC(4c1fbc20) SHA1(ff83691c19ce3600b31c494eaec26d2ac79e0028) )
+	ROM_LOAD32_WORD( "fc21_obj-0.u43", 0x000000, 0x400000, CRC(08cfe6d9) SHA1(d10f362dcde01f7a9855d8f76af3084b5dd1573a) )
+	ROM_LOAD32_WORD( "fc21_obj-1.u42", 0x000002, 0x400000, CRC(4c1fbc20) SHA1(ff83691c19ce3600b31c494eaec26d2ac79e0028) )
 
 	ROM_REGION( 0x400000, "samples", 0 )
-	ROM_LOAD( "funcube2-fc21voi0.u47", 0x00000, 0x400000, CRC(25b5fc3f) SHA1(18b16a14e9ee62f3fea382e9d3fdcd43bdb165f5) )
+	ROM_LOAD( "fc21_voi0.u47", 0x00000, 0x400000, CRC(25b5fc3f) SHA1(18b16a14e9ee62f3fea382e9d3fdcd43bdb165f5) )
+ROM_END
+
+ROM_START( funcube4 )
+	ROM_REGION( 0x80000, "main", 0 ) /* XCF5206 Code */
+	ROM_LOAD( "fc41_prg-0.u3", 0x00000, 0x80000, CRC(ef870874) SHA1(dcb8dc3f780ca135df55e4b4f3c95620597ad28f) )
+
+	ROM_REGION( 0x20000, "sub", 0 ) /* H8/3007 Code */
+	ROM_LOAD( "fc21_iopr-0.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
+
+	ROM_REGION( 0x300, "pic", 0 ) /* PIC12C508? Code */
+	ROM_LOAD( "fc41a", 0x000, 0x300, NO_DUMP )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD32_WORD( "fc41_obj-0.u43", 0x000000, 0x400000, CRC(9ff029d5) SHA1(e057f4929aa745ecaf9d4ff7e39974c82e440146) )
+	ROM_LOAD32_WORD( "fc41_obj-1.u42", 0x000002, 0x400000, CRC(5ab7b087) SHA1(c600158b2358cdf947357170044dda2deacd4f37) )
+
+	ROM_REGION( 0x400000, "samples", 0 )
+	ROM_LOAD( "fc41_snd0.u47", 0x00000, 0x400000, CRC(48337257) SHA1(d1755024b824100070b489f48f6ae921765329e8) )
 ROM_END
 
 static DRIVER_INIT( funcube2 )
@@ -2761,49 +2849,6 @@ static DRIVER_INIT( funcube2 )
 
 	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
 }
-
-/***************************************************************************
-
-FUNCUBE 4 (BET)
-(c)2002 NAMCO,LTD.
----------------------
-
-screenshot :
-http://www.bandainamcogames.co.jp/aa/am/mg/funcube4
-
-cabinet :
-http://www.bandainamcogames.co.jp/aa/am/mg/funcube
-
-SYSTEM: EVA3_A
-
-CPU   : COLDFIRE XCF5206
-      : H8
-
-SND   : MSM9810
-
-SECRITY : FC41A (PIC)
-
-*IOPR-0 ROM : FC21IOPR-0 (= FUNCUBE 2,3,4,5)
-
-***************************************************************************/
-
-ROM_START( funcube4 )
-	ROM_REGION( 0x80000, "main", 0 ) /* XCF5206 Code */
-	ROM_LOAD( "funcube4-fc41prg0.u3", 0x00000, 0x80000, CRC(ef870874) SHA1(dcb8dc3f780ca135df55e4b4f3c95620597ad28f) )
-
-	ROM_REGION( 0x20000, "sub", 0 ) /* H8/3007 Code */
-	ROM_LOAD( "funcube2-fc21iopr.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
-
-	ROM_REGION( 0x300, "pic", 0 ) /* PIC12C508? Code */
-	ROM_LOAD( "funcube4-fc41a", 0x000, 0x300, NO_DUMP )
-
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD32_WORD( "funcube4-fc41obj0.u43", 0x000000, 0x400000, CRC(9ff029d5) SHA1(e057f4929aa745ecaf9d4ff7e39974c82e440146) )
-	ROM_LOAD32_WORD( "funcube4-fc41obj1.u42", 0x000002, 0x400000, CRC(5ab7b087) SHA1(c600158b2358cdf947357170044dda2deacd4f37) )
-
-	ROM_REGION( 0x400000, "samples", 0 )
-	ROM_LOAD( "funcube4-fc41snd0.u47", 0x00000, 0x400000, CRC(48337257) SHA1(d1755024b824100070b489f48f6ae921765329e8) )
-ROM_END
 
 // Note: same as funcube2
 static DRIVER_INIT( funcube4 )
