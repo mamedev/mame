@@ -137,7 +137,7 @@ typedef UINT32 (*video_update_func)(const device_config *screen, bitmap_t *bitma
 #define GAME_SUPPORTS_SAVE				0x00000800	/* game supports save states */
 #define GAME_IS_BIOS_ROOT				0x00001000	/* this driver entry is a BIOS root */
 #define GAME_NO_STANDALONE				0x00002000	/* this driver cannot stand alone */
-#define GAME_REQUIRES_ARTWORK			0x00004000	/* this driver cannot stand alone */
+#define GAME_REQUIRES_ARTWORK			0x00004000	/* the driver requires external artwork for key elements of the game */
 
 
 #ifdef MESS
