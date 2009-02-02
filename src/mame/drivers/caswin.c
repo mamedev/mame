@@ -5,8 +5,6 @@ Casino Winner (c) 1985 Aristocrat
 driver by Chris Hardy & Angelo Salese
 
 TODO:
--missing prom;
--NVRAM emulation? Likely to be just backup ram
 -Cherry-type subgames appears to have wrong graphics alignment,maybe it's some fancy window
  effect?
 
@@ -107,7 +105,7 @@ static WRITE8_HANDLER( lamps_w )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ(vvillage_rng_r)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) //maybe not all of it
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&sc0_vram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(sc0_attr_w) AM_BASE(&sc0_attr)
 ADDRESS_MAP_END
@@ -219,6 +217,32 @@ static const ay8910_interface ay8910_config =
 	NULL
 };
 
+static PALETTE_INIT( caswin )
+{
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x40; ++i)
+	{
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 0) & 0x01;
+		bit2 = (color_prom[0] >> 1) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 2) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		bit2 = (color_prom[0] >> 4) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 5) & 0x01;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
+
+
 static MACHINE_DRIVER_START( vvillage )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
@@ -234,8 +258,11 @@ static MACHINE_DRIVER_START( vvillage )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
 	MDRV_GFXDECODE(vvillage)
-	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(0x40)
+	MDRV_PALETTE_INIT(caswin)
 
 	MDRV_VIDEO_START(vvillage)
 	MDRV_VIDEO_UPDATE(vvillage)
@@ -256,9 +283,10 @@ ROM_START( caswin )
 	ROM_LOAD( "cw_4.19", 0x00000, 0x4000, CRC(d2deab75) SHA1(12cf3fd02dbad9a40cfa6cece0cb66ce2c4dc315) )
 	ROM_LOAD( "cw_3.22", 0x04000, 0x4000, CRC(7e79966c) SHA1(39190ee8cd7f3b8f895b32327f3a5555a0713315) )
 
-	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
+	ROM_REGION( 0x40, "proms", 0 )
+	ROM_LOAD( "clr1.bin", 0x00, 0x20, CRC(52e31046) SHA1(71a95a72b591ae7b75af4adff526fca9ae055c5b) )
+	ROM_LOAD( "clr2.bin", 0x20, 0x20, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) )
 ROM_END
 
 
-GAME( 1985, caswin, 0, vvillage, vvillage, 0, ROT270, "Aristocrat",  "Casino Winner", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, caswin, 0, vvillage, vvillage, 0, ROT270, "Aristocrat",  "Casino Winner", GAME_IMPERFECT_GRAPHICS )
