@@ -57,14 +57,14 @@ static SND_RESET( sid )
 
 static SND_START( sid6581 )
 {
-	return sid_start(device, clock, MOS6581);
+	sid_start(device, clock, MOS6581);
 }
 
 
 
 static SND_START( sid8580 )
 {
-	return sid_start(device, clock, MOS8580);
+	sid_start(device, clock, MOS8580);
 }
 
 
