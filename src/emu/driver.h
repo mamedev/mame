@@ -142,7 +142,7 @@ typedef UINT32 (*video_update_func)(const device_config *screen, bitmap_t *bitma
 
 #ifdef MESS
 #define GAME_COMPUTER_MODIFIED      	0x00008000	/* Official? Hack */
-#define GAME_COMPUTER               	0x00001000  /* Driver is a computer (needs full keyboard) */
+#define GAME_COMPUTER               	0x00010000  /* Driver is a computer (needs full keyboard) */
 #endif
 
 
