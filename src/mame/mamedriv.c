@@ -8256,7 +8256,6 @@ Other Sun games
 	DRIVER( trailblz )	/* (c) 1987 Coinmaster */
 	DRIVER( supnudg2 )	/* (c) 1989 Coinmaster */
 	DRIVER( pokeroul ) 	/* (c) 1990 Coinmaster */
-	DRIVER( fruit )     /* (c) 1987? Coinmaster? */
 	DRIVER( egghunt )	/* (c) 1995 Invi Image */
 	DRIVER( magic10 )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic10a )	/* (c) 1995 A.W.P. Games */
