@@ -2812,6 +2812,9 @@ V-V                           TP-027
 	DRIVER( ssf2tbd )
 	DRIVER( ssf2xjd )
 	DRIVER( sgemfd )
+	DRIVER( armwar1d )
+	DRIVER( dimahoud )
+	DRIVER( mmatrixd )
 
 	/* Capcom CPS3 games */
 	DRIVER( sfiii )		/* 04/02/1997 (c) 1997 Capcom */
