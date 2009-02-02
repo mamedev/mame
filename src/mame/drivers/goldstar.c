@@ -4474,6 +4474,68 @@ ROM_START( schery97 )
 	ROM_LOAD( "sc97t.bin", 0x00000, 0x20000, CRC(8598b059) SHA1(9e031e30e58a9c1b3d029004ee0f1616711fa2ae) )
 ROM_END
 
+ROM_START( roypok96 )
+	ROM_REGION( 0x10000, "main", 0 )
+	// 3 revisions of the program?
+	ROM_LOAD( "rp35.bin",	 0x0000, 0x10000, CRC(e1509440) SHA1(30d931b02d4eb74f9a16c57eb12e834cf24f87a9) ) 
+	ROM_LOAD( "rp36.bin",	 0x0000, 0x10000, CRC(7fffff21) SHA1(85533e6aa0c6810cdaed9a6d1f1313f7bc871cbd) )
+	ROM_LOAD( "rp36c3.bin",	 0x0000, 0x10000, CRC(c7317ed7) SHA1(ca88d02c5ea5c03dd9407d71ab88e81c21791fe8) )
+	
+	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
+	ROM_LOAD( "rp35h.bin",  0x00000, 0x10000, CRC(664649ea) SHA1(7915ab31afd2a1bbb8f817f961e0e522d76f5c05) )
+	ROM_LOAD( "rp35l.bin",  0x10000, 0x10000, CRC(ef416c4e) SHA1(5aac157ba15c66f79a7a68935095bef9a2636f7b) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
+	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "rpu19.bin", 0x0000, 0x0100, CRC(deb9ae3c) SHA1(056ce4947244ade1ff70f167a998140745b5cffa) )
+	ROM_LOAD( "rpu20.bin", 0x0100, 0x0100, CRC(b3e0a328) SHA1(f8990fcd1e90d3e9205ee81f1d7dd105dbdcfcd6) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "rpu1920.bin", 0x0000, 0x0100, CRC(e204e8f3) SHA1(9005fe9c72055af690701cd239f4b3665b2fae21) )
+ROM_END
+
+ROM_START( pokonl97 )
+	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "po33.bin",	 0x00000, 0x10000, CRC(55bdd5cf) SHA1(7fd9e5c63ab2439db33710d7684f5df5e7324325) )
+
+	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
+	ROM_LOAD( "po97h.bin",  0x00000, 0x10000, CRC(fe845426) SHA1(80a1ffa28f92ad381ccf01b387afddd3ee849a58) )
+	ROM_LOAD( "po97l.bin",  0x10000, 0x10000, CRC(d389d5be) SHA1(a88db3bf411dd1bdf8dc42c8c440d71b24ef95ee) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
+	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "po97u19.bin", 0x0000, 0x0100, CRC(889dd4b3) SHA1(dc4b2506bf61f1bc4d491c3a9c410be11d93b76f) )
+	ROM_LOAD( "po97u20.bin", 0x0100, 0x0100, CRC(e44d1b48) SHA1(0a21b79c03f33d31303ba6cabc4b5a23d7c9cfe3) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "pou1920.bin", 0x0000, 0x0100, CRC(ceac07bb) SHA1(b6fca4ef937c0a75d6371db405faf15d69462fc4) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // samples
+	ROM_LOAD( "po97t.bin", 0x00000, 0x20000, CRC(dab7cbeb) SHA1(40cf5717485f31d5b5267a9f79ead0d21509d68c) )
+ROM_END
+
 // this might be 4 different sets (2 fruit bonus, 2 fruit bonus 'se')
 //  will need figuring out once the program roms have been decrypted
 ROM_START( nfb96 )
@@ -4513,7 +4575,43 @@ ROM_START( nfb96 )
 	// none?
 ROM_END
 
+// again, probably 4 revisions in here...
+ROM_START( csel96 )
+	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "ch362c1.bin", 0x00000, 0x10000, CRC(10fa984b) SHA1(92ed9838db28deca038c4a5c080a723075ae0c53) )
+	ROM_LOAD( "ch363c1.bin", 0x10000, 0x10000, CRC(e566cea3) SHA1(be81b21267ae2ff64c4dbc58e99a9ff4bf1d21aa) ) // ?? alt program?
+	ROM_LOAD( "chse354.bin", 0x00000, 0x10000, CRC(160f7b78) SHA1(537a91317e613676b748d4e4ec7015183872814b) ) // ?? alt program?
+	ROM_LOAD( "chse362.bin", 0x10000, 0x10000, CRC(66df35d3) SHA1(da33f6413b8cf7b472023abc3e5cfe6d52ed1418) ) // ?? alt program?
 
+	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
+	ROM_LOAD( "ch96seh.bin",  0x00000, 0x10000, CRC(65dee6ba) SHA1(77f5769ed0b745a4735576e9f0ce90dcdd9b5410) )
+	ROM_LOAD( "ch96sel.bin",  0x10000, 0x10000, CRC(c21cc114) SHA1(f7b6ff5ac34dc1a7332e8c1b9cc40f3b65deac05) )
+	// alt graphics.. different copyright?
+	ROM_LOAD( "chseh.bin",  0x00000, 0x10000, CRC(fb90df1d) SHA1(84ec1f40a014a0043b3c3c999428dd274caba1b8) )
+	ROM_LOAD( "chsel.bin",  0x10000, 0x10000, CRC(e0166f3e) SHA1(27e180fe6e03f48771b540e34415eee54951788f) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
+	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, NO_DUMP )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, NO_DUMP )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
 
 
 /* descrambled by looking at CALLs
@@ -4997,6 +5095,10 @@ GAME( 198?, mtonic,   0,        ncb3,     cmv801,   0,        ROT0, "Tonic",    
 GAME( 1998, schery98, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
 GAME( 1997, schery97, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '97",                       GAME_NOT_WORKING )
 GAME( 1996, nfb96,    0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "New Fruit Bonus '96",                       GAME_NOT_WORKING )
+GAME( 1996, roypok96, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Royal Poker '96",                       GAME_NOT_WORKING )
+GAME( 1997, pokonl97, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Poker Only '97",                       GAME_NOT_WORKING )
+GAME( 1996, csel96,   0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Cherry Select '96",                       GAME_NOT_WORKING )
+
 // these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program rom
 // some sets are messy and appear to have mismatched graphic roms, they needed to be sorted out properly
 GAME( 1996, nfb96se,     nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "New Fruit Bonus '96 Special Edition (bootleg, set 1)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
