@@ -22,15 +22,15 @@ static const char *const cpreg[4][32] =
 {
 	{
 		"Index","Random","EntryLo","cpr3",	"Context",	"cpr5",	"cpr6",	"cpr7",
-		"BadVAddr",	"cpr9",	"cpr10","cpr11","SR","Cause","EPC","PRId",
+		"BadVAddr",	"cpr9",	"EntryHi","cpr11","SR","Cause","EPC","PRId",
 		"cpr16","cpr17","cpr18","cpr19","cpr20","cpr21","cpr22","cpr23",
 		"cpr24","cpr25","cpr26","cpr27","cpr28","cpr29","cpr30","cpr31"
 	},
 	{
-		"cpr0",	"cpr1",	"cpr2",	"cpr3",	"cpr4",	"cpr5",	"cpr6",	"cpr7",
-		"cpr8",	"cpr9",	"cpr10","cpr11","cpr12","cpr13","cpr14","cpr15",
-		"cpr16","cpr17","cpr18","cpr19","cpr20","cpr21","cpr22","cpr23",
-		"cpr24","cpr25","cpr26","cpr27","cpr28","cpr29","cpr30","cpr31"
+		"f0",	"f1",	"f2",	"f3",	"f4",	"f5",	"f6",	"f7",
+		"f8",	"f9",	"f10",	"f11",	"f12",	"f13",	"f14",	"f15",
+		"f16",	"f17",	"f18",	"f19",	"f20",	"f21",	"f22",	"f23",
+		"f24",	"f25",	"f26",	"f27",	"f28",	"f29",	"f30",	"f31"
 	},
 	{
 		"cpr0",	"cpr1",	"cpr2",	"cpr3",	"cpr4",	"cpr5",	"cpr6",	"cpr7",
@@ -149,6 +149,89 @@ static UINT32 dasm_cop(UINT32 pc, int cop, UINT32 op, char *buffer)
 	return flags;
 }
 
+static UINT32 dasm_cop1(UINT32 pc, UINT32 op, char *buffer)
+{
+	static const char *const format_table[] =
+	{
+		"?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?",
+		"s","d","?","?","w","l","?","?","?","?","?","?","?","?","?","?"
+	};
+	const char *fmt = format_table[(op >> 21) & 31];
+	int ft = (op >> 16) & 31;
+	int fs = (op >> 11) & 31;
+	int fd = (op >> 6) & 31;
+	int rt = (op >> 16) & 31;
+	int rd = (op >> 11) & 31;
+	UINT32 flags = 0;
+
+	switch ((op >> 21) & 31)
+	{
+		case 0x00:	sprintf(buffer, "mfc1   %s,%s", reg[rt], cpreg[1][rd]);						break;
+		case 0x01:	sprintf(buffer, "dmfc1  %s,%s", reg[rt], cpreg[1][rd]);						break;
+		case 0x02:	sprintf(buffer, "cfc1   %s,%s", reg[rt], ccreg[1][rd]);						break;
+		case 0x04:	sprintf(buffer, "mtc1   %s,%s", reg[rt], cpreg[1][rd]);						break;
+		case 0x05:	sprintf(buffer, "dmtc1  %s,%s", reg[rt], cpreg[1][rd]);						break;
+		case 0x06:	sprintf(buffer, "ctc1   %s,%s", reg[rt], ccreg[1][rd]);						break;
+		case 0x08:	/* BC */
+			switch (rt & 3)
+			{
+				case 0x00:	sprintf(buffer, "bc1f   $%08x,%d", pc + 4 + ((INT16)op << 2), (op >> 18) & 7);		break;
+				case 0x01:	sprintf(buffer, "bc1t   $%08x,%d", pc + 4 + ((INT16)op << 2), (op >> 18) & 7);		break;
+				case 0x02:	sprintf(buffer, "bc1fl  $%08x,%d", pc + 4 + ((INT16)op << 2), (op >> 18) & 7); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+				case 0x03:	sprintf(buffer, "bc1tl  $%08x,%d", pc + 4 + ((INT16)op << 2), (op >> 18) & 7); flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1); break;
+			}
+			break;
+		default:	/* COP */
+			switch (op & 0x3f)
+			{
+				case 0x00:	sprintf(buffer, "add.%s  %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]);	break;
+				case 0x01:	sprintf(buffer, "sub.%s  %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]);	break;
+				case 0x02:	sprintf(buffer, "mul.%s  %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]);	break;
+				case 0x03:	sprintf(buffer, "div.%s  %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], cpreg[1][ft]);	break;
+				case 0x04:	sprintf(buffer, "sqrt.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
+				case 0x05:	sprintf(buffer, "abs.%s  %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
+				case 0x06:	sprintf(buffer, "mov.%s  %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
+				case 0x07:	sprintf(buffer, "neg.%s  %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
+				case 0x08:	sprintf(buffer, "round.l.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x09:	sprintf(buffer, "trunc.l.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x0a:	sprintf(buffer, "ceil.l.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x0b:	sprintf(buffer, "floor.l.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x0c:	sprintf(buffer, "round.w.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x0d:	sprintf(buffer, "trunc.w.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x0e:	sprintf(buffer, "ceil.w.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x0f:	sprintf(buffer, "floor.w.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x11:	sprintf(buffer, "mov%c.%s  %s,%s,%d", ((op >> 16) & 1) ? 't' : 'f', fmt, cpreg[1][fd], cpreg[1][fs], (op >> 18) & 7);	break;
+				case 0x12:	sprintf(buffer, "movz.%s  %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], reg[rt]);		break;
+				case 0x13:	sprintf(buffer, "movn.%s  %s,%s,%s", fmt, cpreg[1][fd], cpreg[1][fs], reg[rt]);		break;
+				case 0x15:	sprintf(buffer, "recip.%s  %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x16:	sprintf(buffer, "rsqrt.%s  %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);				break;
+				case 0x20:	sprintf(buffer, "cvt.s.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
+				case 0x21:	sprintf(buffer, "cvt.d.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
+				case 0x24:	sprintf(buffer, "cvt.w.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
+				case 0x25:	sprintf(buffer, "cvt.l.%s %s,%s", fmt, cpreg[1][fd], cpreg[1][fs]);					break;
+				case 0x30:	sprintf(buffer, "c.f.%s  %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x31:	sprintf(buffer, "c.un.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x32:	sprintf(buffer, "c.eq.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x33:	sprintf(buffer, "c.ueq.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x34:	sprintf(buffer, "c.olt.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x35:	sprintf(buffer, "c.ult.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x36:	sprintf(buffer, "c.ole.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x37:	sprintf(buffer, "c.ule.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x38:	sprintf(buffer, "c.sf.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x39:	sprintf(buffer, "c.ngle.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);break;
+				case 0x3a:	sprintf(buffer, "c.seq.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x3b:	sprintf(buffer, "c.ngl.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x3c:	sprintf(buffer, "c.lt.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x3d:	sprintf(buffer, "c.nge.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x3e:	sprintf(buffer, "c.le.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				case 0x3f:	sprintf(buffer, "c.ngt.%s %s,%s,%d", fmt, cpreg[1][fs], cpreg[1][ft], (op >> 8) & 7);	break;
+				default:	sprintf(buffer, "cop1   $%07x", op & 0x01ffffff);									break;
+			}
+			break;
+	}
+	return flags;
+}
+
 unsigned dasmr3k(char *buffer, unsigned pc, UINT32 op)
 {
 	int rs = (op >> 21) & 31;
@@ -246,7 +329,7 @@ unsigned dasmr3k(char *buffer, unsigned pc, UINT32 op)
 		case 0x0e:	sprintf(buffer, "xori   %s,%s,$%04x", reg[rt], reg[rs], (UINT16)op);			break;
 		case 0x0f:	sprintf(buffer, "lui    %s,$%04x", reg[rt], (UINT16)op);						break;
 		case 0x10:	flags = dasm_cop(pc, 0, op, buffer);											break;
-		case 0x11:	flags = dasm_cop(pc, 1, op, buffer);											break;
+		case 0x11:	flags = dasm_cop1(pc, op, buffer);											break;
 		case 0x12:	flags = dasm_cop(pc, 2, op, buffer);											break;
 		case 0x13:	flags = dasm_cop(pc, 3, op, buffer);											break;
 		case 0x14:	sprintf(buffer, "beql [invalid]");												break;
