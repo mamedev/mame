@@ -8629,6 +8629,8 @@ Other Sun games
 	DRIVER( m_bdrw14 )
 	DRIVER( m_bdrw15 )
 	DRIVER( m_bdrw16 )
+	DRIVER( m_bdrw17 )
+	
 	DRIVER( m_bfocus )
 	DRIVER( m_bcgslm )
 	DRIVER( m_luvjub )

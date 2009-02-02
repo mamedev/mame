@@ -2254,11 +2254,11 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static void sc2_common_init(running_machine *machine)
+static void sc2_common_init(running_machine *machine, int decrypt)
 {
 	UINT8 *rom;
 
-	decode_mainrom(machine, "main");		  // decode main rom
+	if (decrypt) decode_mainrom(machine, "main");		  // decode main rom
 
 	rom = memory_region(machine, "main");
 	if ( rom )
@@ -2284,7 +2284,7 @@ static void adder2_common_init(running_machine *machine)
 
 static DRIVER_INIT (quintoon)
 {
-	sc2_common_init(machine);
+	sc2_common_init(machine, 1);
 	adder2_decode_char_roms(machine);
 	Mechmtr_init(8);					// setup mech meters
 
@@ -2305,7 +2305,7 @@ static DRIVER_INIT (quintoon)
 
 static DRIVER_INIT( pyramid )
 {
-	sc2_common_init(machine);
+	sc2_common_init(machine, 1);
 	adder2_decode_char_roms(machine);			// decode GFX roms
 	adder2_common_init(machine);
 
@@ -2322,7 +2322,7 @@ static DRIVER_INIT( pyramid )
 
 static DRIVER_INIT( sltsbelg )
 {
-	sc2_common_init(machine);
+	sc2_common_init(machine, 1);
 	adder2_decode_char_roms(machine);			// decode GFX roms
 	adder2_common_init(machine);
 
@@ -2336,7 +2336,7 @@ static DRIVER_INIT( sltsbelg )
 
 static DRIVER_INIT( adder_dutch )
 {
-	sc2_common_init(machine);
+	sc2_common_init(machine, 1);
 	adder2_decode_char_roms(machine);			// decode GFX roms
 	adder2_common_init(machine);
 
@@ -2354,7 +2354,7 @@ static DRIVER_INIT( adder_dutch )
 
 static DRIVER_INIT( gldncrwn )
 {
-	sc2_common_init(machine);
+	sc2_common_init(machine, 1);
 	adder2_decode_char_roms(machine);			// decode GFX roms
 	adder2_common_init(machine);
 
@@ -3952,10 +3952,10 @@ static MACHINE_DRIVER_START( scorpion2_dm01 )
 	MDRV_CPU_PERIODIC_INT(bfm_dm01_vbl, 1500 )			/* generate 1500 NMI's per second ?? what is the exact freq?? */
 MACHINE_DRIVER_END
 
-static void sc2awp_common_init(running_machine *machine,int reels)
+static void sc2awp_common_init(running_machine *machine,int reels, int decrypt)
 {
 	int n;
-	sc2_common_init(machine);
+	sc2_common_init(machine, decrypt);
 	/* setup n default 96 half step reels */
 	for ( n = 0; n < reels; n++ )
 	{
@@ -3969,7 +3969,7 @@ static void sc2awp_common_init(running_machine *machine,int reels)
 
 static DRIVER_INIT (drwho)
 {
-	sc2awp_common_init(machine,4);
+	sc2awp_common_init(machine,4, 1);
 	Mechmtr_init(8);
 
 	BFM_BD1_init(0);
@@ -3987,9 +3987,30 @@ static DRIVER_INIT (drwho)
 	Scorpion2_SetSwitchState(7,3, 0);	  /* Token Rear High Level Switch */
 }
 
+static DRIVER_INIT (drwhon)
+{
+	sc2awp_common_init(machine,4, 0);
+	Mechmtr_init(8);
+
+	BFM_BD1_init(0);
+	BFM_BD1_init(1);
+
+	has_hopper = 0;
+
+	Scorpion2_SetSwitchState(4,0, 0);	  /* GBP1 Low Level Switch */
+	Scorpion2_SetSwitchState(4,1, 0);	  /* 20p Low Level Switch */
+	Scorpion2_SetSwitchState(4,2, 0);	  /* Token Front Low Level Switch */
+	Scorpion2_SetSwitchState(4,3, 0);	  /* Token Rear  Low Level Switch */
+	Scorpion2_SetSwitchState(7,0, 0);	  /* GBP1 High Level Switch */
+	Scorpion2_SetSwitchState(7,1, 0);	  /* 20P High Level Switch */
+	Scorpion2_SetSwitchState(7,2, 0);	  /* Token Front High Level Switch */
+	Scorpion2_SetSwitchState(7,3, 0);	  /* Token Rear High Level Switch */
+}
+
+
 static DRIVER_INIT (focus)
 {
-	sc2awp_common_init(machine,6);
+	sc2awp_common_init(machine,6, 1);
 	Mechmtr_init(5);
 
 	BFM_BD1_init(0);
@@ -3997,7 +4018,7 @@ static DRIVER_INIT (focus)
 
 static DRIVER_INIT (cpeno1)
 {
-	sc2awp_common_init(machine,6);
+	sc2awp_common_init(machine,6, 1);
 
 	Mechmtr_init(5);
 
@@ -4041,7 +4062,7 @@ static DRIVER_INIT (cpeno1)
 
 static DRIVER_INIT (bfmcgslm)
 {
-	sc2awp_common_init(machine,6);
+	sc2awp_common_init(machine,6, 1);
 	Mechmtr_init(8);
 	BFM_BD1_init(0);
 	has_hopper = 0;
@@ -4049,7 +4070,7 @@ static DRIVER_INIT (bfmcgslm)
 
 static DRIVER_INIT (luvjub)
 {
-	sc2awp_common_init(machine,6);
+	sc2awp_common_init(machine,6, 1);
 	Mechmtr_init(8);
 	has_hopper = 0;
 
@@ -4213,9 +4234,7 @@ ROM_START( m_bdrw16 )
 ROM_END
 
 
-
-/* this set doesn't boot, bad? different game? */
-/*
+/* not encrypted, bootleg? */
 ROM_START( m_bdrw17 )
 	ROM_REGION( 0x12000, "main", 0 )
 	ROM_LOAD("drwho.bin",	0x00000, 0x10000, CRC(9e53a1f7) SHA1(60c6aa226c96678a6e487fbf0f32554fd85ebd66) )
@@ -4223,7 +4242,7 @@ ROM_START( m_bdrw17 )
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
-*/
+
 
 
 /*********************************************
@@ -4298,7 +4317,7 @@ GAMEL( 1994, m_bdrw13, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "
 GAMEL( 1994, m_bdrw14, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 15)",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
 GAMEL( 1994, m_bdrw15, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 16)",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
 GAMEL( 1994, m_bdrw16, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 17)",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
-//GAMEL( 1994, m_bdrw17, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 18)",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
+GAMEL( 1994, m_bdrw17, m_bdrwho,  scorpion2,	 drwho,		drwhon,		0,		 "BFM",      "Dr.Who The Timelord (set 18, not encrypted)",GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK,layout_drwho)
 
 GAME ( 1995, m_bfocus, 0,		  scorpion3,	 scorpion3,	focus,		0,		 "BFM/ELAM", "Focus (Dutch, Game Card 95-750-347)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK)
 
