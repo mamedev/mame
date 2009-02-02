@@ -554,12 +554,13 @@ $(MAMEOBJ)/atlus.a: \
 $(MAMEOBJ)/barcrest.a: \
 	$(MACHINE)/meters.o \
 	$(DRIVERS)/mpu4.o \
+	$(DRIVERS)/mpu5.o \
 	$(MACHINE)/steppers.o \
 
 $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfcobra.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
-	$(MACHINE)/bfm_bd1.o \
+	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o $(VIDEO)/awpvid.o\
 
 $(MAMEOBJ)/bmc.a: \
 	$(DRIVERS)/bmcbowl.o \
@@ -1711,6 +1712,10 @@ $(DRIVERS)/brasil.o:	$(LAYOUT)/fashion.lh
 $(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
 
 $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
+						$(LAYOUT)/awpdmd.lh \
+						$(LAYOUT)/awpvid14.lh \
+						$(LAYOUT)/awpvid16.lh \
+						$(LAYOUT)/drwho.lh \
 						$(LAYOUT)/gldncrwn.lh \
 						$(LAYOUT)/quintoon.lh \
 						$(LAYOUT)/paradice.lh \

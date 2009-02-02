@@ -8603,4 +8603,39 @@ Other Sun games
 	/* Sanki Denshi Kogyo */
 	DRIVER( pachifev )  /* (c) 1983? */
 
+	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
+	   These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
+	   emulation for pinball machiens.
+	   
+	   the m_ prefix is used to identify them as many have very generic names.
+	   
+	*/
+	
+	/* Scorpion 2 */
+	DRIVER( m_bdrwho )
+	DRIVER( m_bdrwh1 )
+	DRIVER( m_bdrwh2 )
+	DRIVER( m_bdrwh3 )
+	DRIVER( m_bdrwh4 )
+	DRIVER( m_bdrwh5 )
+	DRIVER( m_bdrwh6 )
+	DRIVER( m_bdrwh7 )
+	DRIVER( m_bdrwh8 )
+	DRIVER( m_bdrwh9 )
+	DRIVER( m_bdrw10 )
+	DRIVER( m_bdrw11 )
+	DRIVER( m_bdrw12 )
+	DRIVER( m_bdrw13 )
+	DRIVER( m_bdrw14 )
+	DRIVER( m_bdrw15 )
+	DRIVER( m_bdrw16 )
+	DRIVER( m_bfocus )
+	DRIVER( m_bcgslm )
+	DRIVER( m_luvjub )
+	DRIVER( m_cpeno1 )
+	
+	/* MPU5 */
+	DRIVER( m_honmon )
+
+	
 #endif	/* DRIVER_RECURSIVE */

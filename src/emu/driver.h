@@ -125,22 +125,24 @@ typedef UINT32 (*video_update_func)(const device_config *screen, bitmap_t *bitma
 
 /* ----- flags for game drivers ----- */
 
-#define ORIENTATION_MASK        		0x0007
-#define GAME_NOT_WORKING				0x0008
-#define GAME_UNEMULATED_PROTECTION		0x0010	/* game's protection not fully emulated */
-#define GAME_WRONG_COLORS				0x0020	/* colors are totally wrong */
-#define GAME_IMPERFECT_COLORS			0x0040	/* colors are not 100% accurate, but close */
-#define GAME_IMPERFECT_GRAPHICS			0x0080	/* graphics are wrong/incomplete */
-#define GAME_NO_COCKTAIL				0x0100	/* screen flip support is missing */
-#define GAME_NO_SOUND					0x0200	/* sound is missing */
-#define GAME_IMPERFECT_SOUND			0x0400	/* sound is known to be wrong */
-#define GAME_SUPPORTS_SAVE				0x0800	/* game supports save states */
-#define GAME_IS_BIOS_ROOT				0x1000	/* this driver entry is a BIOS root */
-#define GAME_NO_STANDALONE				0x2000	/* this driver cannot stand alone */
+#define ORIENTATION_MASK        		0x00000007
+#define GAME_NOT_WORKING				0x00000008
+#define GAME_UNEMULATED_PROTECTION		0x00000010	/* game's protection not fully emulated */
+#define GAME_WRONG_COLORS				0x00000020	/* colors are totally wrong */
+#define GAME_IMPERFECT_COLORS			0x00000040	/* colors are not 100% accurate, but close */
+#define GAME_IMPERFECT_GRAPHICS			0x00000080	/* graphics are wrong/incomplete */
+#define GAME_NO_COCKTAIL				0x00000100	/* screen flip support is missing */
+#define GAME_NO_SOUND					0x00000200	/* sound is missing */
+#define GAME_IMPERFECT_SOUND			0x00000400	/* sound is known to be wrong */
+#define GAME_SUPPORTS_SAVE				0x00000800	/* game supports save states */
+#define GAME_IS_BIOS_ROOT				0x00001000	/* this driver entry is a BIOS root */
+#define GAME_NO_STANDALONE				0x00002000	/* this driver cannot stand alone */
+#define GAME_REQUIRES_ARTWORK			0x00004000	/* this driver cannot stand alone */
+
 
 #ifdef MESS
-#define GAME_COMPUTER               	0x8000  /* Driver is a computer (needs full keyboard) */
-#define GAME_COMPUTER_MODIFIED      	0x4000	/* Official? Hack */
+#define GAME_COMPUTER_MODIFIED      	0x00008000	/* Official? Hack */
+#define GAME_COMPUTER               	0x00001000  /* Driver is a computer (needs full keyboard) */
 #endif
 
 

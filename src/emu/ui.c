@@ -290,7 +290,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 				if (show_warnings && astring_len(warnings_string(machine, messagebox_text)) > 0)
 				{
 					ui_set_handler(handler_messagebox_ok, 0);
-					if (machine->gamedrv->flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
+					if (machine->gamedrv->flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
 						messagebox_backcolor = UI_YELLOWCOLOR;
 					if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
 						messagebox_backcolor = UI_REDCOLOR;
@@ -883,6 +883,7 @@ static astring *warnings_string(running_machine *machine, astring *string)
 						GAME_UNEMULATED_PROTECTION | \
 						GAME_WRONG_COLORS | \
 						GAME_IMPERFECT_COLORS | \
+						GAME_REQUIRES_ARTWORK | \
 						GAME_NO_SOUND |  \
 						GAME_IMPERFECT_SOUND |  \
 						GAME_IMPERFECT_GRAPHICS | \
@@ -925,6 +926,13 @@ static astring *warnings_string(running_machine *machine, astring *string)
 			astring_catc(string, "The game lacks sound.\n");
 		if (machine->gamedrv->flags & GAME_NO_COCKTAIL)
 			astring_catc(string, "Screen flipping in cocktail mode is not supported.\n");
+			
+		/* check if external artwork is present before displaying this warning? */
+		if (machine->gamedrv->flags & GAME_REQUIRES_ARTWORK)
+			astring_catc(string, "The game requires external artwork files\n");
+			
+	
+		
 
 		/* if there's a NOT WORKING or UNEMULATED PROTECTION warning, make it stronger */
 		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
