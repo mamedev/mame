@@ -104,6 +104,7 @@ Additional notes
           pexs0006     2
           pexmp006     2
           pexmp017     2
+          pexmp024     2
 
 
 2) Configuration
@@ -1433,6 +1434,23 @@ ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
 	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) )
 ROM_END
 
+ROM_START( pexmp024 ) /* Superboard : Multi-Poker (XMP00024) */
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "xmp00024.u67",   0x00000, 0x10000, CRC(f2df8870) SHA1(bc7fa1d79da07093cf3d3508e226a9c490990e04) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "xm00005p.u66",   0x00000, 0x10000, CRC(c832eac7) SHA1(747d57de602b44ae1276fe1009db1b6de0d2c64c) )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg2240.u77",	 0x00000, 0x8000, CRC(eedef2d4) SHA1(419a90e1f4a840625e6ac7afc2c24d13c908156d) )
+	ROM_LOAD( "mgo-cg2240.u78",	 0x08000, 0x8000, CRC(c596b058) SHA1(d53824f869bceeda482e434cba9a77ba8ce2015f) )
+	ROM_LOAD( "mbo-cg2240.u79",	 0x10000, 0x8000, CRC(ab1a58ee) SHA1(44963f27d5f5d8f9415d88c12b2d40f0ef55c559) )
+	ROM_LOAD( "mxo-cg2240.u80",	 0x18000, 0x8000, CRC(75488ff7) SHA1(a34ae53847b5643b8c4dc182dc59b1fccf22d557) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
@@ -1473,6 +1491,7 @@ GAMEL(1995, pexp0112, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - Int
 
 /* Superboard : multi-poker */
 GAMEL(1995, pexmp006, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XMP00006) Multi-Poker",                 0,   layout_pe_poker )
+GAMEL(1995, pexmp024, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XMP00024) Multi-Poker",                 0,   layout_pe_poker )
 
 /* Superboard : multi-poker (wingboard) */
 GAMEL(1995, pexmp017, 0,      peplus,  peplus_poker, peplussbw,ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard",            0,   layout_pe_poker )
