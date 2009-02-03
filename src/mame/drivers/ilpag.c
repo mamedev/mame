@@ -42,7 +42,7 @@ Note
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 
-static UINT16 *blit_romaddr,*blit_attr1_ram,*blit_dst_ram_loword,*blit_attr2_ram,*blit_dst_ram_hiword,*blit_vregs;
+static UINT16 *blit_romaddr,*blit_attr1_ram,*blit_dst_ram_loword,*blit_attr2_ram,*blit_dst_ram_hiword,*blit_vregs,*blit_transpen;
 static UINT8 *blit_buffer;
 
 static VIDEO_START(ilpag)
@@ -120,6 +120,12 @@ static WRITE16_HANDLER( paletteram_io_w )
 	}
 }
 
+/*
+(TODO: register names should be properly renamed)
+"transpen" 8/2 is for layer clearance;
+"transpen" 10/2 is the trasparency pen;
+"vregs" are pen selects, they select the proper color to render, and are tied to the first three gfx offsets;
+*/
 static WRITE16_HANDLER( blit_copy_w )
 {
 	UINT8 *blit_rom = memory_region(space->machine, "blit_data");
@@ -128,8 +134,10 @@ static WRITE16_HANDLER( blit_copy_w )
 	int x,y,x_size,y_size;
 	UINT32 src;
 
-	printf("blit copy %04x %04x %04x %04x %04x\n", blit_romaddr[0], blit_attr1_ram[0], blit_dst_ram_loword[0], blit_attr2_ram[0], blit_dst_ram_hiword[0] );
-	printf("blit vregs %04x %04x %04x\n",blit_vregs[0/2],blit_vregs[2/2],blit_vregs[4/2]);
+//	printf("blit copy %04x %04x %04x %04x %04x\n", blit_romaddr[0], blit_attr1_ram[0], blit_dst_ram_loword[0], blit_attr2_ram[0], blit_dst_ram_hiword[0] );
+//	printf("blit vregs %04x %04x %04x\n",blit_vregs[0/2],blit_vregs[2/2],blit_vregs[4/2]);
+//	printf("blit transpen %04x %04x %04x %04x %04x %04x %04x %04x\n",blit_transpen[0/2],blit_transpen[2/2],blit_transpen[4/2],blit_transpen[6/2],
+//	                                                               blit_transpen[8/2],blit_transpen[10/2],blit_transpen[12/2],blit_transpen[14/2]);
 
 	blit_dst_xpos = (blit_dst_ram_loword[0] & 0x00ff)*2;
 	blit_dst_ypos = ((blit_dst_ram_loword[0] & 0xff00)>>8);
@@ -139,6 +147,8 @@ static WRITE16_HANDLER( blit_copy_w )
 
 	src = blit_romaddr[0] | (blit_attr1_ram[0] & 0xf00)<<8;
 
+	/*TODO,sizes are 0?*/
+//	if(blit_transpen[0x8/2] & 0x100) { x_size = 512; y_size = 256; }
 
 	for(y=0;y<y_size;y++)
 	{
@@ -146,13 +156,26 @@ static WRITE16_HANDLER( blit_copy_w )
 		{
 			int drawx = (blit_dst_xpos+x)&0x1ff;
 			int drawy = (blit_dst_ypos+y)&0x1ff;
+			if(blit_transpen[0x8/2] & 0x100)
+				blit_buffer[drawy*512+drawx] = 0;
+			else
+			{
+				UINT8 pen_helper;
 
-			blit_buffer[drawy*512+drawx] = blit_rom[src];
+				pen_helper = blit_rom[src] & 0xff;
+				if(blit_transpen[0xa/2] & 0x100) //transparency pen
+				{
+					if(pen_helper)
+						blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 2) ? ((blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+				}
+				else
+					blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 2) ? ((blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+			}
+
 			src++;
 		}
 
 	}
-			//blit_buffer[blit_dst_xpos+(x*0x100)+(y)] = blit_ram[blit_romaddr[0]+(x*0x100)+(y)];
 }
 
 /*bit 0 is the blitter busy flag*/
@@ -197,7 +220,7 @@ static ADDRESS_MAP_START( ilpag_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x225000, 0x225fff) AM_RAM // NVRAM?
 	AM_RANGE(0x900000, 0x900005) AM_WRITE( paletteram_io_w ) //RAMDAC
-	AM_RANGE(0x980000, 0x98000f) AM_RAM //probably transparency pens
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE(&blit_transpen)//probably transparency pens
 	AM_RANGE(0x990000, 0x990005) AM_RAM AM_BASE(&blit_vregs)
 	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE(&blit_romaddr)
 	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE(&blit_attr1_ram)
