@@ -449,16 +449,21 @@ static int validate_driver(int drivnum, const machine_config *config)
 	const game_driver *driver = drivers[drivnum];
 	const game_driver *clone_of;
 	quark_entry *entry;
-	int error = FALSE;
+	int error = FALSE, is_clone;
 	const char *s;
 	UINT32 crc;
 
+	enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
+
 	/* determine the clone */
+	is_clone = strcmp(driver->parent, "0");
 	clone_of = driver_get_clone(driver);
+	if (clone_of && (clone_of->flags & GAME_IS_BIOS_ROOT))
+		is_clone = 0;
 
 	/* if we have at least 100 drivers, validate the clone */
 	/* (100 is arbitrary, but tries to avoid tiny.mak dependencies) */
-	if (driver_list_get_count(drivers) > 100 && !clone_of && strcmp(driver->parent, "0"))
+	if (driver_list_get_count(drivers) > 100 && !clone_of && is_clone)
 	{
 		mame_printf_error("%s: %s is a non-existant clone\n", driver->source_file, driver->parent);
 		error = TRUE;
@@ -479,9 +484,10 @@ static int validate_driver(int drivnum, const machine_config *config)
 	}
 
 	/* make sure the driver name is 8 chars or less */
-	if (strlen(driver->name) > 8)
+	if ((is_clone && strlen(driver->name) > NAME_LEN_CLONE) || ((!is_clone) && strlen(driver->name) > NAME_LEN_PARENT))
 	{
-		mame_printf_error("%s: %s driver name must be 8 characters or less\n", driver->source_file, driver->name);
+		mame_printf_error("%s: %s %s driver name must be %d characters or less\n", driver->source_file, driver->name,
+						  is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
 		error = TRUE;
 	}
 

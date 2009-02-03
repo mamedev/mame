@@ -1154,7 +1154,7 @@ ROM_START( burningf ) /* MVS VERSION */
 	ROM_LOAD16_BYTE( "018-c4.bin", 0x200001, 0x100000, CRC(e2e0aff7) SHA1(1c691c092a6e2787de4f433b0eb9252bfdaa7e16) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( burningh )
+ROM_START( burningfh )
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "018-p1h.bin", 0x000000, 0x080000, CRC(ddffcbf4) SHA1(c646c4bbdb4e9b32df76c90f582ccd69fcc9f8e7) )
 
@@ -1473,7 +1473,7 @@ ROM_START( socbrawl )
 	ROM_LOAD16_BYTE( "031-c4.bin", 0x200001, 0x080000, CRC(ed297de8) SHA1(616f8fa4c86231f3e79faf9f69f8bb909cbc35f0) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( socbrala ) /* MVS VERSION */
+ROM_START( socbrawla ) /* MVS VERSION */
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "031-pg1.bin", 0x000000, 0x080000, CRC(17f034a7) SHA1(2e66c7bd93a08efe63c4894494db50bbf58f60e4) )
 
@@ -1878,7 +1878,7 @@ ROM_START( tophuntr ) /* MVS VERSION */
 	ROM_LOAD16_BYTE( "046-c8.bin", 0x600001, 0x100000, CRC(c944e03d) SHA1(be23999b8ce09ee15ba500ce4d5e2a82a4f58d9b) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( tophunta )
+ROM_START( tophuntra )
 	ROM_REGION( 0x200000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "046-pg1.bin",0x000000, 0x100000, CRC(771e39bc) SHA1(c0e05fd1ca81926438bb75e2fa6894e40ab6521e) )
 	ROM_LOAD16_WORD_SWAP( "046-p2.bin", 0x100000, 0x100000, CRC(f182cb3e) SHA1(6b4e0af5d4e623f0682f37ff5c69e5b705e20028) )
@@ -2312,7 +2312,7 @@ ROM_START( fightfev )
 	ROM_LOAD16_BYTE( "060-c4.bin", 0x0400001, 0x200000, CRC(026f3b62) SHA1(d608483b70d60e7aa0e41f25a8b3fed508129eb7) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( fightfva ) /* MVS VERSION */
+ROM_START( fightfeva ) /* MVS VERSION */
 	ROM_REGION( 0x200000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "060-p1.rom", 0x0000000, 0x100000, CRC(2a104b50) SHA1(3eb663d3df7074e1cdf4c0e450a35c9cf55d8979) )
 
@@ -2833,7 +2833,7 @@ ROM_START( pbobblen ) /* MVS VERSION */
 	ROM_LOAD16_BYTE( "d96-03.c6", 0x400001, 0x80000, CRC(4b42d7eb) SHA1 (042ae50a528cea21cf07771d3915c57aa16fd5af) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( pbobblna )
+ROM_START( pbobblena )
 	/* Does this set exist? Layout correct? */
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "083-p1.bin", 0x000000, 0x080000, CRC(ac1e9ef3) SHA1(a2b125ee70869667431ab125bc29e768500802ad) )
@@ -3985,7 +3985,7 @@ ROM_START( lastblad ) /* MVS VERSION */
 	ROM_LOAD16_BYTE( "234-c6.bin", 0x2000001, 0x400000, CRC(beafd091) SHA1(55df9cc128eb0f00856de3996c946e3efe8f09a5) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( lastbldh ) /* AES VERSION */
+ROM_START( lastbladh ) /* AES VERSION */
 	ROM_REGION( 0x500000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "234-pg1.bin", 0x000000, 0x100000, CRC(cd01c06d) SHA1(d66142571afe07c6191b52f319f1bc8bc8541c14) )
 	ROM_LOAD16_WORD_SWAP( "234-p2.bin", 0x100000, 0x400000, CRC(0fdc289e) SHA1(1ff31c0b0f4f9ddbedaf4bcf927faaae81892ec7) )
@@ -5689,7 +5689,7 @@ ROM_START( samsh5sp ) /* Encrypted Set */
 	ROM_LOAD16_BYTE( "272-c8.bin", 0x3000001, 0x800000, CRC(d49773cd) SHA1(cd8cf3b762d381c1f8f12919579c84a7ef7efb3f) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( samsh5sh ) /* Encrypted Set */
+ROM_START( samsh5sph ) /* Encrypted Set */
 	ROM_REGION( 0x800000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "272-p1c.bin", 0x000000, 0x400000, CRC(9291794d) SHA1(66588ff9b00ffad6508b03423548984e28a3209d) )
 	ROM_LOAD16_WORD_SWAP( "272-p2c.bin", 0x400000, 0x400000, CRC(fa1a7dd8) SHA1(62443dad76d6c1e18f515d7d4ef8e1295a4b7f1d) )
@@ -5724,7 +5724,7 @@ ROM_START( samsh5sh ) /* Encrypted Set */
 	ROM_LOAD16_BYTE( "272-c8.bin", 0x3000001, 0x800000, CRC(d49773cd) SHA1(cd8cf3b762d381c1f8f12919579c84a7ef7efb3f) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( samsh5sn ) /* Encrypted Set */
+ROM_START( samsh5spn ) /* Encrypted Set */
 	ROM_REGION( 0x800000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "272-p1ca.bin", 0x000000, 0x400000, CRC(c30a08dd) SHA1(66864954017c841d7ca8490112c3aa7a71a4da70) )
 	ROM_LOAD16_WORD_SWAP( "272-p2ca.bin", 0x400000, 0x400000, CRC(bd64a518) SHA1(aa259a168930f106377d680db444535411b3bce0) )
@@ -7619,7 +7619,7 @@ GAME( 1991, kotmh,    kotm,     neogeo,   neogeo,   neogeo,   ROT0, "SNK", "King
 GAME( 1991, sengoku,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Sengoku / Sengoku Denshou (set 1)", 0 )
 GAME( 1991, sengokh,  sengoku,  neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Sengoku / Sengoku Denshou (set 2)", 0 )
 GAME( 1991, burningf, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Burning Fight (set 1)", 0 )
-GAME( 1991, burningh, burningf, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Burning Fight (set 2)", 0 )
+GAME( 1991, burningfh,burningf, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Burning Fight (set 2)", 0 )
 GAME( 1990, lbowling, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "League Bowling", 0 )
 GAME( 1991, gpilots,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Ghost Pilots (set 1)", 0 )
 GAME( 1991, gpilotsh, gpilots,  neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Ghost Pilots (set 2)", 0 )
@@ -7632,7 +7632,7 @@ GAME( 1991, 2020bb,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK / Palla
 GAME( 1991, 2020bba,  2020bb,   neogeo,   neogeo,   neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 2)", 0 )
 GAME( 1991, 2020bbh,  2020bb,   neogeo,   neogeo,   neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 3)", 0 )
 GAME( 1991, socbrawl, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Soccer Brawl (set 1)", 0 )
-GAME( 1991, socbrala, socbrawl, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Soccer Brawl (set 2)", 0 )
+GAME( 1991, socbrawla, socbrawl, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Soccer Brawl (set 2)", 0 )
 GAME( 1991, fatfury1, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Fatal Fury - King of Fighters / Garou Densetsu - shukumei no tatakai", 0 )
 GAME( 1991, roboarmy, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Robo Army", 0 )
 //GAME( 1991, roboarma, roboarmy, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Robo Army (set 2)", 0 )
@@ -7646,7 +7646,7 @@ GAME( 1992, aof,      neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Art 
 GAME( 1993, samsho,   neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Samurai Shodown / Samurai Spirits (set 1)", 0 )
 GAME( 1993, samshoh,  samsho,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Samurai Shodown / Samurai Spirits (set 2)", 0 )
 GAME( 1994, tophuntr, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Top Hunter - Roddy & Cathy (set 1)", 0 )
-GAME( 1994, tophunta, tophuntr, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Top Hunter - Roddy & Cathy (set 2)", 0 )
+GAME( 1994, tophuntra,tophuntr, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Top Hunter - Roddy & Cathy (set 2)", 0 )
 GAME( 1992, fatfury2, neogeo,   neogeo,   neogeo,   fatfury2, ROT0, "SNK", "Fatal Fury 2 / Garou Densetsu 2 - arata-naru tatakai", 0 )
 GAME( 1992, ssideki,  neogeo,   neogeo,   neogeo,   fatfury2, ROT0, "SNK", "Super Sidekicks / Tokuten Ou", 0 )
 GAME( 1994, kof94,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '94", 0 )
@@ -7681,7 +7681,7 @@ GAME( 1997, kof97a,   kof97,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The 
 GAME( 1997, kof97pls, kof97,    neogeo,   neogeo,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Plus (bootleg)", 0 )
 GAME( 1997, kog,      kof97,    neogeo,   kog,      kog,      ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", GAME_NOT_WORKING) // protected bootleg
 GAME( 1997, lastblad, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Last Blade / Bakumatsu Roman - Gekka no Kenshi, The (set 1)", 0 )
-GAME( 1997, lastbldh, lastblad, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Last Blade / Bakumatsu Roman - Gekka no Kenshi, The (set 2)", 0 )
+GAME( 1997, lastbladh,lastblad, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Last Blade / Bakumatsu Roman - Gekka no Kenshi, The (set 2)", 0 )
 GAME( 1997, lastsold, lastblad, neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The Last Soldier (Korean release of The Last Blade)", 0 )
 GAME( 1997, irrmaze,  neogeo,   neogeo,   irrmaze,  neogeo,   ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", 0 )
 GAME( 1998, rbff2,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (set 1)", 0 )
@@ -7747,8 +7747,8 @@ GAME( 2003, kf2k3bla, kof2003,  neogeo,   neogeo,   kf2k3pl,  ROT0, "bootleg", "
 GAME( 2003, kf2k3pl,  kof2003,  neogeo,   neogeo,   kf2k3pl,  ROT0, "bootleg", "The King of Fighters 2004 Plus / Hero (The King of Fighters 2003 bootleg)", 0 ) // zooming is wrong because its a bootleg of the pcb version on a cart
 GAME( 2003, kf2k3upl, kof2003,  neogeo,   neogeo,   kf2k3upl, ROT0, "bootleg", "The King of Fighters 2004 Ultra Plus (The King of Fighters 2003 bootleg)", 0 ) // zooming is wrong because its a bootleg of the pcb version on a cart
 GAME( 2003, samsh5sp, neogeo,   neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 1, uncensored)", 0 )
-GAME( 2003, samsh5sh, samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 2, censored)", 0 )
-GAME( 2003, samsh5sn, samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 3, less censored)", 0 )
+GAME( 2003, samsh5sph,samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 2, censored)", 0 )
+GAME( 2003, samsh5spn,samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 3, less censored)", 0 )
 
 /* there are other bootlegs kof96ep, kf2k1pls etc.? -- work out which should be supported */
 
@@ -7835,7 +7835,7 @@ GAME( 1996, wakuwak7, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Sunsoft", "
 
 /* Taito */
 GAME( 1994, pbobblen, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 1)", 0 )
-GAME( 1994, pbobblna, pbobblen, neogeo,   neogeo,   neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 2)", 0 )
+GAME( 1994, pbobblena,pbobblen, neogeo,   neogeo,   neogeo,   ROT0, "Taito", "Puzzle Bobble / Bust-A-Move (Neo-Geo) (set 2)", 0 )
 GAME( 1999, pbobbl2n, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Taito (SNK license)", "Puzzle Bobble 2 / Bust-A-Move Again (Neo-Geo)", 0 )
 GAME( 2003, pnyaa,    neogeo,   neogeo,   neogeo,   pnyaa,    ROT0, "Aiky / Taito", "Pochi and Nyaa", 0 )
 
@@ -7856,7 +7856,7 @@ GAME( 1999, preisle2, neogeo,   neogeo,   neogeo,   preisle2, ROT0, "Yumekobo", 
 
 /* Viccom */
 GAME( 1994, fightfev, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Viccom", "Fight Fever (set 1)", 0 )
-GAME( 1994, fightfva, fightfev, neogeo,   neogeo,   neogeo,   ROT0, "Viccom", "Fight Fever (set 2)", 0 )
+GAME( 1994, fightfeva, fightfev, neogeo,   neogeo,   neogeo,   ROT0, "Viccom", "Fight Fever (set 2)", 0 )
 
 /* Video System Co. */
 GAME( 1994, pspikes2, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Video System Co.", "Power Spikes II", 0 )
