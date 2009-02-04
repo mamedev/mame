@@ -58,15 +58,15 @@ struct _cia_port
 	UINT8		latch;
 	UINT8		in;
 	UINT8		out;
-	UINT8		(*read)(const device_config *);
-	void		(*write)(const device_config *, UINT8);
+	devcb_resolved_read8	read;
+	devcb_resolved_write8	write;
 	UINT8		mask_value; /* in READ operation the value can be forced by a extern electric circuit */
 };
 
 struct _cia_state
 {
 	const device_config *device;
-	void			(*irq_func)(const device_config *device, int state);
+	devcb_resolved_write_line irq_func;
 
 	cia_port		port[2];
 	cia_timer		timer[2];
@@ -140,13 +140,13 @@ static DEVICE_START( cia )
 	/* clear out CIA structure, and copy the interface */
 	memset(cia, 0, sizeof(*cia));
 	cia->device = device;
-	cia->irq_func = intf->irq_func;
+	devcb_resolve_write_line(&cia->irq_func, &intf->irq_func, device);
 
 	/* setup ports */
 	for (p = 0; p < (sizeof(cia->port) / sizeof(cia->port[0])); p++)
 	{
-		cia->port[p].read = intf->port[p].read;
-		cia->port[p].write = intf->port[p].write;
+		devcb_resolve_read8(&cia->port[p].read, &intf->port[p].read, device);
+		devcb_resolve_write8(&cia->port[p].write, &intf->port[p].write, device);
 		cia->port[p].mask_value = 0xff;
 	}
 
@@ -292,8 +292,7 @@ static void cia_update_interrupts(const device_config *device)
 	if (cia->irq != new_irq)
 	{
 		cia->irq = new_irq;
-		if (cia->irq_func)
-			(*cia->irq_func)(device, cia->irq);
+		devcb_call_write_line(&cia->irq_func, cia->irq);
 	}
 }
 
@@ -627,7 +626,7 @@ READ8_DEVICE_HANDLER( cia_r )
 		case CIA_PRA:
 		case CIA_PRB:
 			port = &cia->port[offset & 1];
-			data = port->read ? (*port->read)(device) : 0;
+			data = devcb_call_read8(&port->read, 0);
 			data = ((data & ~port->ddr) | (port->latch & port->ddr)) & port->mask_value;
 			port->in = data;
 
@@ -742,8 +741,7 @@ WRITE8_DEVICE_HANDLER( cia_w )
 			port = &cia->port[offset & 1];
 			port->latch = data;
 			port->out = (data & port->ddr) | (port->in & ~port->ddr);
-			if (port->write != NULL)
-				(*port->write)(device, port->out);
+			devcb_call_write8(&port->write, 0, port->out);
 			break;
 
 		/* port A/B direction */

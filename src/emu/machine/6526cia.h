@@ -10,6 +10,8 @@
 #ifndef __6526CIA_H__
 #define __6526CIA_H__
 
+#include "devcb.h"
+
 
 /***************************************************************************
     MACROS
@@ -42,14 +44,13 @@
 typedef struct _cia6526_interface cia6526_interface;
 struct _cia6526_interface
 {
-	void (*irq_func)(const device_config *device, int state);
+	devcb_write_line irq_func;
 	int tod_clock;
 
 	struct
 	{
-
-		UINT8	(*read)(const device_config *);
-		void	(*write)(const device_config *, UINT8);
+		devcb_read8 read;
+		devcb_write8 write;
 	} port[2];
 };
 

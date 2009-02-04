@@ -30,12 +30,7 @@
  *
  *************************************/
 
-static UINT8 mquake_cia_0_porta_r(const device_config *device)
-{
-	return input_port_read(device->machine, "CIA0PORTA");
-}
-
-static void mquake_cia_0_porta_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
 	memory_set_bank(device->machine, 1, data & 1);
@@ -67,14 +62,14 @@ static void mquake_cia_0_porta_w(const device_config *device, UINT8 data)
  *
  *************************************/
 
-static UINT8 mquake_cia_0_portb_r(const device_config *device)
+static READ8_DEVICE_HANDLER( mquake_cia_0_portb_r )
 {
 	/* parallel port */
 	logerror("%s:CIA0_portb_r\n", cpuexec_describe_context(device->machine));
 	return 0xff;
 }
 
-static void mquake_cia_0_portb_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( mquake_cia_0_portb_w )
 {
 	/* parallel port */
 	logerror("%s:CIA0_portb_w(%02x)\n", cpuexec_describe_context(device->machine), data);
@@ -351,21 +346,21 @@ static MACHINE_RESET(mquake)
 
 static const cia6526_interface cia_0_intf =
 {
-	amiga_cia_0_irq,									/* irq_func */
+	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
 	0,													/* tod_clock */
 	{
-		{ mquake_cia_0_porta_r, mquake_cia_0_porta_w },	/* port A */
-		{ mquake_cia_0_portb_r, mquake_cia_0_portb_w }	/* port B */
+		{ DEVCB_INPUT_PORT("CIA0PORTA"), DEVCB_HANDLER(mquake_cia_0_porta_w) },	/* port A */
+		{ DEVCB_HANDLER(mquake_cia_0_portb_r), DEVCB_HANDLER(mquake_cia_0_portb_w) }	/* port B */
 	}
 };
 
 static const cia6526_interface cia_1_intf =
 {
-	amiga_cia_1_irq,									/* irq_func */
+	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
 	0,													/* tod_clock */
 	{
-		{ NULL, NULL },									/* port A */
-		{ NULL, NULL }									/* port B */
+		{ DEVCB_NULL, DEVCB_NULL },									/* port A */
+		{ DEVCB_NULL, DEVCB_NULL }									/* port B */
 	}
 };
 

@@ -196,7 +196,7 @@ static CUSTOM_INPUT( lightgun_holster_r )
  *
  *************************************/
 
-static void alg_cia_0_porta_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
 	memory_set_bank(device->machine, 1, data & 1);
@@ -212,34 +212,34 @@ static void alg_cia_0_porta_w(const device_config *device, UINT8 data)
 }
 
 
-static UINT8 alg_cia_0_porta_r(const device_config *device)
+static READ8_DEVICE_HANDLER( alg_cia_0_porta_r )
 {
 	return input_port_read(device->machine, "FIRE") | 0x3f;
 }
 
 
-static UINT8 alg_cia_0_portb_r(const device_config *device)
+static READ8_DEVICE_HANDLER( alg_cia_0_portb_r )
 {
 	logerror("%s:alg_cia_0_portb_r\n", cpuexec_describe_context(device->machine));
 	return 0xff;
 }
 
 
-static void alg_cia_0_portb_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( alg_cia_0_portb_w )
 {
 	/* parallel port */
 	logerror("%s:alg_cia_0_portb_w(%02x)\n", cpuexec_describe_context(device->machine), data);
 }
 
 
-static UINT8 alg_cia_1_porta_r(const device_config *device)
+static READ8_DEVICE_HANDLER( alg_cia_1_porta_r )
 {
 	logerror("%s:alg_cia_1_porta_r\n", cpuexec_describe_context(device->machine));
 	return 0xff;
 }
 
 
-static void alg_cia_1_porta_w(const device_config *device, UINT8 data)
+static WRITE8_DEVICE_HANDLER( alg_cia_1_porta_w )
 {
 	logerror("%s:alg_cia_1_porta_w(%02x)\n", cpuexec_describe_context(device->machine), data);
 }
@@ -390,21 +390,21 @@ static const custom_sound_interface amiga_custom_interface =
 
 static const cia6526_interface cia_0_intf =
 {
-	amiga_cia_0_irq,								/* irq_func */
+	DEVCB_LINE(amiga_cia_0_irq),								/* irq_func */
 	0,												/* tod_clock */
 	{
-		{ alg_cia_0_porta_r, alg_cia_0_porta_w },	/* port A */
-		{ alg_cia_0_portb_r, alg_cia_0_portb_w }	/* port B */
+		{ DEVCB_HANDLER(alg_cia_0_porta_r), DEVCB_HANDLER(alg_cia_0_porta_w) },	/* port A */
+		{ DEVCB_HANDLER(alg_cia_0_portb_r), DEVCB_HANDLER(alg_cia_0_portb_w) }	/* port B */
 	}
 };
 
 static const cia6526_interface cia_1_intf =
 {
-	amiga_cia_1_irq,								/* irq_func */
+	DEVCB_LINE(amiga_cia_1_irq),								/* irq_func */
 	0,												/* tod_clock */
 	{
-		{ alg_cia_1_porta_r, alg_cia_1_porta_w, },	/* port A */
-		{ NULL, NULL }								/* port B */
+		{ DEVCB_HANDLER(alg_cia_1_porta_r), DEVCB_HANDLER(alg_cia_1_porta_w), },	/* port A */
+		{ DEVCB_NULL, DEVCB_NULL }								/* port B */
 	}
 };
 
