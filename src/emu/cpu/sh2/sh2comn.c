@@ -22,10 +22,7 @@
 #endif
 
 
-// Atrocious hack that makes the soldivid music correct
-
-//static const int div_tab[4] = { 3, 5, 7, 0 };
-static const int div_tab[4] = { 3, 5, 3, 0 };
+static const int div_tab[4] = { 3, 5, 7, 0 };
 
 INLINE UINT32 RL(SH2 *sh2, offs_t A)
 {
