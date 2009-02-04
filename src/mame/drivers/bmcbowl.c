@@ -475,11 +475,11 @@ static const ay8910_interface ay8910_config =
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ 0, via_b_in,
-	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*outputs: A/B         */ via_a_out, via_b_out,
-	/*outputs: CA/B1,CA/B2 */ 0, 0, via_ca2_out, 0,
-	/*irq                  */ via_irq
+	/*inputs : A/B         */ DEVCB_NULL, DEVCB_HANDLER(via_b_in),
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B         */ DEVCB_HANDLER(via_a_out), DEVCB_HANDLER(via_b_out),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(via_ca2_out), DEVCB_NULL,
+	/*irq                  */ DEVCB_LINE(via_irq)
 };
 
 static MACHINE_RESET( bmcbowl )

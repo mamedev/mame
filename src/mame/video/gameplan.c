@@ -236,31 +236,31 @@ static READ8_DEVICE_HANDLER( vblank_r )
 
 const via6522_interface gameplan_via_0_interface =
 {
-	0, vblank_r,							/*inputs : A/B         */
-	0, 0, 0, 0,								/*inputs : CA/B1,CA/B2 */
-	video_data_w, gameplan_video_command_w,	/*outputs: A/B         */
-	0, 0, video_command_trigger_w, 0,		/*outputs: CA/B1,CA/B2 */
-	via_irq									/*irq                  */
+	DEVCB_NULL, DEVCB_HANDLER(vblank_r),							/*inputs : A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,								/*inputs : CA/B1,CA/B2 */
+	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(gameplan_video_command_w),	/*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(video_command_trigger_w), DEVCB_NULL,		/*outputs: CA/B1,CA/B2 */
+	DEVCB_LINE(via_irq)									/*irq                  */
 };
 
 
 const via6522_interface leprechn_via_0_interface =
 {
-	0, vblank_r,							/*inputs : A/B         */
-	0, 0, 0, 0,								/*inputs : CA/B1,CA/B2 */
-	video_data_w, leprechn_video_command_w,	/*outputs: A/B         */
-	0, 0, video_command_trigger_w, 0,		/*outputs: CA/B1,CA/B2 */
-	via_irq									/*irq                  */
+	DEVCB_NULL, DEVCB_HANDLER(vblank_r),							/*inputs : A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,								/*inputs : CA/B1,CA/B2 */
+	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(leprechn_video_command_w),	/*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(video_command_trigger_w), DEVCB_NULL,		/*outputs: CA/B1,CA/B2 */
+	DEVCB_LINE(via_irq)									/*irq                  */
 };
 
 
 const via6522_interface trvquest_via_0_interface =
 {
-	0, vblank_r,							/*inputs : A/B         */
-	0, 0, 0, 0,								/*inputs : CA/B1,CA/B2 */
-	video_data_w, gameplan_video_command_w,	/*outputs: A/B         */
-	0, 0, video_command_trigger_w, 0,		/*outputs: CA/B1,CA/B2 */
-	0										/*irq                  */
+	DEVCB_NULL, DEVCB_HANDLER(vblank_r),							/*inputs : A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,								/*inputs : CA/B1,CA/B2 */
+	DEVCB_HANDLER(video_data_w), DEVCB_HANDLER(gameplan_video_command_w),	/*outputs: A/B         */
+	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(video_command_trigger_w), DEVCB_NULL,		/*outputs: CA/B1,CA/B2 */
+	DEVCB_NULL										/*irq                  */
 };
 
 

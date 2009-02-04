@@ -293,18 +293,13 @@ static WRITE8_DEVICE_HANDLER( output_cb2 )
 	// ...
 }
 
-static void via_irq(const device_config *device, int state)
-{
-	cpu_set_input_line(device->machine->cpu[0], M6809_FIRQ_LINE, state);
-}
-
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ DEVICE8_PORT("IN0"), DEVICE8_PORT("IN1"),
-	/*inputs : CA/B1,CA/B2 */ input_ca1, input_cb1, input_ca2, input_cb2,
-	/*outputs: A/B         */ output_a, output_b,
-	/*outputs: CA/B1,CA/B2 */ output_ca1, output_cb1, output_ca2, output_cb2,
-	/*irq                  */ via_irq
+	/*inputs : A/B         */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"),
+	/*inputs : CA/B1,CA/B2 */ DEVCB_HANDLER(input_ca1), DEVCB_HANDLER(input_cb1), DEVCB_HANDLER(input_ca2), DEVCB_HANDLER(input_cb2),
+	/*outputs: A/B         */ DEVCB_HANDLER(output_a), DEVCB_HANDLER(output_b),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_HANDLER(output_ca1), DEVCB_HANDLER(output_cb1), DEVCB_HANDLER(output_ca2), DEVCB_HANDLER(output_cb2),
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("main", M6809_FIRQ_LINE)
 };
 
 static INTERRUPT_GEN( lions_irq )

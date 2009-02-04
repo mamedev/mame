@@ -177,20 +177,20 @@ static READ8_DEVICE_HANDLER( via_input_port_3_r ) { return input_port_read_index
 
 static const via6522_interface via_1_interface =
 {
-	/*inputs : A/B         */ via_input_port_0_r, via_input_port_1_r,
-	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
-	/*outputs: A/B         */ NULL, NULL,
-	/*outputs: CA/B1,CA/B2 */ NULL, NULL, trvquest_coin_w, NULL,
-	/*irq                  */ NULL
+	/*inputs : A/B         */ DEVCB_HANDLER(via_input_port_0_r), DEVCB_HANDLER(via_input_port_1_r),
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_NULL,
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(trvquest_coin_w), DEVCB_NULL,
+	/*irq                  */ DEVCB_NULL
 };
 
 static const via6522_interface via_2_interface =
 {
-	/*inputs : A/B         */ via_input_port_2_r, via_input_port_3_r,
-	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
-	/*outputs: A/B         */ NULL, NULL,
-	/*outputs: CA/B1,CA/B2 */ NULL, NULL, trvquest_misc_w, NULL,
-	/*irq                  */ via_irq
+	/*inputs : A/B         */ DEVCB_HANDLER(via_input_port_2_r), DEVCB_HANDLER(via_input_port_3_r),
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_NULL,
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(trvquest_misc_w), DEVCB_NULL,
+	/*irq                  */ DEVCB_LINE(via_irq)
 };
 
 

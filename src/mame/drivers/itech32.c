@@ -711,32 +711,23 @@ static WRITE8_DEVICE_HANDLER( pia_portb_out )
  *
  *************************************/
 
-static void via_irq(const device_config *device, int state)
-{
-	if (state)
-		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
-	else
-		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
-}
-
-
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ 0, 0,
-	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*outputs: A/B         */ 0, pia_portb_out,
-	/*outputs: CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*irq                  */ via_irq
+	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_HANDLER(pia_portb_out),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("sound", M6809_FIRQ_LINE)
 };
 
 
 static const via6522_interface drivedge_via_interface =
 {
-	/*inputs : A/B         */ 0, 0,
-	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*outputs: A/B         */ 0, drivedge_portb_out,
-	/*outputs: CA/B1,CA/B2 */ 0, 0, 0, drivedge_turbo_light,
-	/*irq                  */ via_irq
+	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_HANDLER(drivedge_portb_out),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(drivedge_turbo_light),
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("sound", M6809_FIRQ_LINE)
 };
 
 

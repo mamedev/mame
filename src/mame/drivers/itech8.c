@@ -564,22 +564,13 @@ static const pia6821_interface pia_interface =
  *
  *************************************/
 
-static void via_irq(const device_config *device, int state);
-
-static WRITE8_DEVICE_HANDLER( via_pia_portb_out )
-{
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia_portb_out(space, offset, data);
-}
-
-
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ 0, 0,
-	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*outputs: A/B         */ 0, via_pia_portb_out,
-	/*outputs: CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*irq                  */ via_irq
+	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_MEMORY_HANDLER("main", PROGRAM, pia_portb_out),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("sound", M6809_FIRQ_LINE)
 };
 
 
@@ -843,22 +834,6 @@ static READ8_HANDLER( sound_data_r )
 {
 	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
 	return sound_data;
-}
-
-
-
-/*************************************
- *
- *  Sound 6522 VIA handling
- *
- *************************************/
-
-static void via_irq(const device_config *device, int state)
-{
-	if (state)
-		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
-	else
-		cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

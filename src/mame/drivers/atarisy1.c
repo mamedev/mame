@@ -430,11 +430,11 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ via_pa_r, via_pb_r,
-	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*outputs: A/B         */ via_pa_w, via_pb_w,
-    /*outputs: CA/B1,CA/B2 */ 0, 0, 0, 0,
-	/*irq                  */ 0
+	/*inputs : A/B         */ DEVCB_HANDLER(via_pa_r), DEVCB_HANDLER(via_pb_r),
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B         */ DEVCB_HANDLER(via_pa_w), DEVCB_HANDLER(via_pb_w),
+    /*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*irq                  */ DEVCB_NULL
 };
 
 
