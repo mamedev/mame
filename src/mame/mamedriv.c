@@ -4617,6 +4617,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( drgnbowl )	/* (c) 1992 Nics */
 	DRIVER( wc90 )		/* (c) 1989 Tecmo */
 	DRIVER( wc90a )		/* (c) 1989 Tecmo */
+	DRIVER( wc90b )		/* (c) 1989 Tecmo */
 	DRIVER( wc90t )		/* (c) 1989 Tecmo */
 	DRIVER( wc90b1 )		/* bootleg */
 	DRIVER( wc90b2 )		/* bootleg */
