@@ -7477,6 +7477,7 @@ Other Sun games
 	DRIVER( csk234it )	/* (c) 198? IGS */
 	DRIVER( igs_ncs )	/* (c) 198? IGS */
 	DRIVER( igs_ncs2 )	/* (c) 2000 IGS */
+	DRIVER( spk115it )	/* (c) 199? IGS */
 	DRIVER( spk116it )	/* (c) 199? IGS */
 	DRIVER( jackie )	/* (c) 199? IGS */
 	DRIVER( pktet346 )	/* (c) 199? IGS */
@@ -8609,11 +8610,11 @@ Other Sun games
 	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
 	   These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
 	   emulation for pinball machiens.
-	   
+
 	   the m_ prefix is used to identify them as many have very generic names.
-	   
+
 	*/
-	
+
 	/* Scorpion 2 */
 	DRIVER( m_bdrwho )
 	DRIVER( m_bdrwh1 )
@@ -8633,14 +8634,14 @@ Other Sun games
 	DRIVER( m_bdrw15 )
 	DRIVER( m_bdrw16 )
 	DRIVER( m_bdrw17 )
-	
+
 	DRIVER( m_bfocus )
 	DRIVER( m_bcgslm )
 	DRIVER( m_luvjub )
 	DRIVER( m_cpeno1 )
-	
+
 	/* MPU5 */
 	DRIVER( m_honmon )
 
-	
+
 #endif	/* DRIVER_RECURSIVE */
