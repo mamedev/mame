@@ -341,8 +341,8 @@ static INPUT_PORTS_START( squaitsa )
  	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
  	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
  	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
- 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY // these must be tied to a spinner somehow?
- 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY // ^
+ 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) // special handling for the p1 dial
+ 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // ^
  	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
  	PORT_START("P2")
@@ -351,8 +351,8 @@ static INPUT_PORTS_START( squaitsa )
  	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
  	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
  	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
- 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL // these must be tied to a spinner somehow?
- 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL // ^
+ 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) // special handling for the p2 dial
+ 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) // ^
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW")
@@ -378,6 +378,12 @@ static INPUT_PORTS_START( squaitsa )
     PORT_DIPNAME(    0x80, 0x00, "Protection?" )	/* Left empty in the dips scan */
     PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
     PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
+	PORT_START("DIAL_P1")
+    PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5)
+
+	PORT_START("DIAL_P2")
+    PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_COCKTAIL
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -425,6 +431,58 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	input_port_0_r,
 	input_port_1_r,
+	NULL,
+	NULL
+};
+
+/* squaitsa doesn't map the dial directly, instead it polls the results of the dial thru an external circuitry.
+   I don't know if the following is correct, there can possbily be multiple solutions for the same problem. */
+static READ8_HANDLER( dial_input_p1_r )
+{
+	static UINT8 res,dial_val,old_val;
+
+	dial_val = input_port_read(space->machine, "DIAL_P1");
+
+	if(res != 0x60)
+		res = 0x60;
+	else if(dial_val > old_val)
+		res = 0x40;
+	else if(dial_val < old_val)
+		res = 0x20;
+	else
+		res = 0x60;
+
+	old_val = dial_val;
+
+	return (input_port_read(space->machine, "P1") & 0x9f) | (res);
+}
+
+static READ8_HANDLER( dial_input_p2_r )
+{
+	static UINT8 res,dial_val,old_val;
+
+	dial_val = input_port_read(space->machine, "DIAL_P2");
+
+	if(res != 0x60)
+		res = 0x60;
+	else if(dial_val > old_val)
+		res = 0x40;
+	else if(dial_val < old_val)
+		res = 0x20;
+	else
+		res = 0x60;
+
+	old_val = dial_val;
+
+	return (input_port_read(space->machine, "P2") & 0x9f) | (res);
+}
+
+static const ay8910_interface ay8910_dial_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	dial_input_p1_r,
+	dial_input_p2_r,
 	NULL,
 	NULL
 };
@@ -570,6 +628,14 @@ static MACHINE_DRIVER_START( botanic )
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( squaitsa )
+	MDRV_IMPORT_FROM( botanic )
+	MDRV_SOUND_MODIFY("ay1")
+	MDRV_SOUND_CONFIG(ay8910_dial_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+MACHINE_DRIVER_END
+
 
 /***************************************************************************
 
@@ -902,5 +968,5 @@ GAME( 1984, sbagman,  0, 	   bagman,  sbagman, 0,        ROT270, "Valadon Automa
 GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern license)", "Super Bagman (Stern)", 0 )
 GAME( 1983, pickin,	  0,	   pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 )
 GAME( 1984, botanic,  0,       botanic, botanic, 0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
-GAME( 1984, squaitsa,  0,       botanic, squaitsa, 0,        ROT0, "Itisa", "Squash (Itisa)", GAME_NOT_WORKING )
+GAME( 1984, squaitsa, 0,       squaitsa,squaitsa,0,        ROT0,   "Itisa",              "Squash (Itisa)", 0 )
 
