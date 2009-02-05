@@ -16,8 +16,14 @@ A3-1J
         A1-4P           A1-9N (6301)
                         A1-9P
 
+ Notes:
+ - According to some original screenshots floating around the net, this game uses a weird coloring scheme for
+   the char text that dynamically changes the color of an entire column. For now I can only guess about how
+   it truly works.
+   An original snap of these can be seen at -> http://mamedev.emulab.it/kale/fast/files/A00000211628-007.jpg
+
  To do:
- - Colors seems reasonable, but needs a screenshot of the original thing for understanding if they are 100% correct.
+ - Needs schematics to check if the current implementation of the "global column coloring" is correct.
  - Check unknown read/writes, too many of them.
 
 */
@@ -26,20 +32,7 @@ A3-1J
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static tilemap *fg_tilemap;
-static UINT8 *char_bank;
-
-static WRITE8_HANDLER( supdrapo_videoram_w )
-{
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
-}
-
-static WRITE8_HANDLER( supdrapo_char_bank_w )
-{
-	char_bank[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
-}
+static UINT8 *char_bank,*col_line;
 
 static READ8_HANDLER( sdpoker_rng_r )
 {
@@ -48,13 +41,14 @@ static READ8_HANDLER( sdpoker_rng_r )
 
 static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x50ff) AM_RAM //?
-	AM_RANGE(0x57ff, 0x57ff) AM_RAM //?
-	AM_RANGE(0x5800, 0x58ff) AM_RAM //?
+	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x5800, 0x58ff) AM_RAM AM_SHARE(1) AM_BASE(&col_line)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM //work ram
-	AM_RANGE(0x6800, 0x6bff) AM_RAM_WRITE(supdrapo_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x6c00, 0x6fff) AM_RAM_WRITE(supdrapo_char_bank_w) AM_BASE(&char_bank)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x6c00, 0x6fff) AM_RAM AM_BASE(&char_bank)
 	AM_RANGE(0x7000, 0x7bff) AM_RAM //$7600 seems watchdog
+	AM_RANGE(0x7c00, 0x7c00) AM_WRITENOP //?
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN4") AM_WRITENOP
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN0")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1")
@@ -62,7 +56,7 @@ static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN3") AM_WRITENOP
 	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("IN6")
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("IN5") //dips?
-	AM_RANGE(0x9000, 0x90ff) AM_RAM //?
+	AM_RANGE(0x9000, 0x90ff) AM_RAM
 	AM_RANGE(0x9400, 0x9400) AM_READ(sdpoker_rng_r)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x9801, 0x9801) AM_WRITE(ay8910_control_port_0_w)
@@ -192,34 +186,46 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( supdrapo )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 GFXDECODE_END
-
-static TILE_GET_INFO( get_tile_info )
-{
-	int code = videoram[tile_index] + char_bank[tile_index] * 0x100;
-
-	SET_TILE_INFO( 0, code, 0, 0);
-}
 
 static VIDEO_START( supdrapo )
 {
-	fg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
 static VIDEO_UPDATE( supdrapo )
 {
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	int x,y;
+	int count;
+	int color;
+
+	count = 0;
+
+	for(y=0;y<32;y++)
+	{
+		for(x=0;x<32;x++)
+		{
+			int tile = videoram[count] + char_bank[count] * 0x100;
+			/* Global Column Coloring, GUESS! */
+			color = col_line[(x*2)+1] ? (col_line[(x*2)+1]-1) & 0x7 : 0;
+
+			drawgfx(bitmap,screen->machine->gfx[0],tile,color,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+
+			count++;
+		}
+	}
 
 	return 0;
 }
 
+
+/*Maybe bit 2 & 3 of the second color prom are intensity bits? */
 static PALETTE_INIT( sdpoker )
 {
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
-	for (i = 0; i < 0x10; ++i)
+	for (i = 0; i < 0x100; ++i)
 	{
 		bit0 = 0;//(color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 0) & 0x01;
@@ -253,7 +259,7 @@ static MACHINE_DRIVER_START( supdrapo )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
 	MDRV_GFXDECODE(supdrapo)
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(0x100)
 	MDRV_PALETTE_INIT(sdpoker)
 
 	MDRV_VIDEO_START(supdrapo)
