@@ -398,7 +398,7 @@ INLINE void adjust_addresses(address_space *space, offs_t *start, offs_t *end, o
 	/* adjust to byte values */
 	*start = memory_address_to_byte(space, *start);
 	*end = memory_address_to_byte_end(space, *end);
-	*mask = memory_address_to_byte(space, *mask);
+	*mask = memory_address_to_byte_end(space, *mask);
 	*mirror = memory_address_to_byte(space, *mirror);
 }
 
