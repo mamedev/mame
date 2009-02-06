@@ -1516,6 +1516,14 @@ $(MAMEOBJ)/zaccaria.a: \
 	$(DRIVERS)/zaccaria.o $(VIDEO)/zaccaria.o \
 
 
+#-------------------------------------------------
+# Pinball drivers
+#-------------------------------------------------
+
+$(MAMEOBJ)/zaccaria.a: \
+	$(DRIVERS)/p_s11.o \
+	$(DRIVERS)/p_core.o \
+	$(DRIVERS)/p_wmssnd.o \
 
 #-------------------------------------------------
 # remaining drivers
