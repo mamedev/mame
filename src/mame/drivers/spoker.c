@@ -445,6 +445,6 @@ ROM_START( spk116it )
 	ROM_LOAD( "7.bin",   0x0000, 0x40000, CRC(67789f1c) SHA1(1bef621b4d6399f76020c6310e2e1c2f861679de) )
 ROM_END
 
-GAME( 1993?, spk115it, 0,        spoker, spoker,  spk116it, ROT0, "IGS",    "Super Poker (v115IT)",                      0 )
-GAME( 1993?, spk116it, spk115it, spoker, spoker,  spk116it, ROT0, "IGS",    "Super Poker (v116IT)",                      0 )
+GAME( 1993?, spk116it, 0,        spoker, spoker,  spk116it, ROT0, "IGS",    "Super Poker (v116IT)",                      0 )
+GAME( 1993?, spk115it, spk116it, spoker, spoker,  spk116it, ROT0, "IGS",    "Super Poker (v115IT)",                      0 )
 
