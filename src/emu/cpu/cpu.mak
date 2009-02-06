@@ -1657,6 +1657,39 @@ $(CPUOBJ)/tms32051/tms32051.o:	$(CPUSRC)/tms32051/tms32051.c \
 
 
 #-------------------------------------------------
+# Texas Instruments TMS57002 DSP
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_TMS57002=$(if $(filter TMS57002,$(CPUS)),1,0)
+
+ifneq ($(filter TMS57002,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/tms57002
+CPUOBJS += $(CPUOBJ)/tms57002/tms57002.o
+TMSMAKE += $(BUILDOUT)/tmsmake$(BUILD_EXE)
+endif
+
+$(CPUOBJ)/tms57002/tms57002.o:	$(CPUSRC)/tms57002/tms57002.c \
+								$(CPUSRC)/tms57002/tms57002.h \
+								$(CPUOBJ)/tms57002/tms57002.inc
+
+# rule to generate the C file
+$(CPUOBJ)/tms57002/tms57002.inc: $(TMSMAKE) $(CPUSRC)/tms57002/tmsinstr.lst
+	@echo Generating TMS57002 source file...
+	$(TMSMAKE) $(CPUSRC)/tms57002/tmsinstr.lst $@
+
+# rule to build the generator
+ifneq ($(CROSS_BUILD),1)
+
+BUILD += $(TMSMAKE)
+
+$(TMSMAKE): $(CPUOBJ)/tms57002/tmsmake.o $(LIBOCORE)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
+	
+endif
+
+
+#-------------------------------------------------
 # Toshiba TLCS-90 Series
 #-------------------------------------------------
 

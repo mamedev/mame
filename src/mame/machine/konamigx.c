@@ -2,8 +2,6 @@
  *
  * machine/konamigx.c - contains various System GX hardware abstractions
  *
- * Currently includes: TMS57002 skipper/simulator to make the sound 68k happy.
- *
  */
 
 #include "driver.h"
@@ -11,159 +9,6 @@
 #include "machine/konamigx.h"
 
 #define GX_DEBUG 0
-
-
-static struct
-{
-	UINT8 control;
-	UINT8 program[1024];
-	UINT32 tables[256];
-	int curpos;
-	int bytepos;
-	UINT32 tmp;
-} tms57002;
-
-static int ldw = 0;
-
-
-void tms57002_init(void)
-{
-	tms57002.control = 0;
-}
-
-static void chk_ldw(void)
-{
-	ldw = 0;
-}
-
-WRITE8_HANDLER( tms57002_control_w )
-{
-	chk_ldw();
-
-	switch(tms57002.control)
-	{
-		case 0xf8:
-		break;
-		case 0xf0:
-		break;
-	}
-
-	tms57002.control = data;
-
-	switch(data)
-	{
-		case 0xf8: // Program write
-		case 0xf0: // Table write
-			tms57002.curpos = 0;
-			tms57002.bytepos = 3;
-			tms57002.tmp = 0;
-		break;
-		case 0xf4: // Entry write
-			tms57002.curpos = -1;
-			tms57002.bytepos = 3;
-			tms57002.tmp = 0;
-		break;
-		case 0xfc: // Checksum (?) Status (?)
-			tms57002.bytepos = 3;
-			tms57002.tmp = 0;
-		break;
-		case 0xff: // Standby
-		break;
-		case 0xfe: // Irq
-			/* (place ack of timer IRQ here) */
-		break;
-		default:
-		break;
-	}
-}
-
-READ8_HANDLER( tms57002_status_r )
-{
-	chk_ldw();
-	return 1;
-}
-
-WRITE8_HANDLER( tms57002_data_w )
-{
-	switch(tms57002.control)
-	{
-		case 0xf8:
-			tms57002.program[tms57002.curpos++] = data;
-		break;
-		case 0xf0:
-			tms57002.tmp |= data << (8*tms57002.bytepos);
-			tms57002.bytepos--;
-			if (tms57002.bytepos < 0)
-			{
-				tms57002.bytepos = 3;
-				tms57002.tables[tms57002.curpos++] =  tms57002.tmp;
-				tms57002.tmp = 0;
-			}
-		break;
-		case 0xf4:
-			if (tms57002.curpos == -1)
-	  			tms57002.curpos = data;
-			else
-			{
-				tms57002.tmp |= data << (8*tms57002.bytepos);
-				tms57002.bytepos--;
-
-				if (tms57002.bytepos < 0)
-				{
-					tms57002.bytepos = 3;
-					tms57002.tables[tms57002.curpos] =  tms57002.tmp;
-					tms57002.tmp = 0;
-					tms57002.curpos = -1;
-				}
-			}
-		break;
-		default:
-			ldw++;
-		break;
-	}
-}
-
-READ8_HANDLER( tms57002_data_r )
-{
-	UINT8 res;
-
-	chk_ldw();
-
-	switch(tms57002.control)
-	{
-		case 0xfc:
-			res = tms57002.tmp >> (8*tms57002.bytepos);
-			tms57002.bytepos--;
-
-			if(tms57002.bytepos < 0) tms57002.bytepos = 3;
-		return res;
-	}
-
-	return 0;
-}
-
-
-READ16_HANDLER( tms57002_data_word_r )
-{
-	return(tms57002_data_r(space,0));
-}
-
-READ16_HANDLER( tms57002_status_word_r )
-{
-	return(tms57002_status_r(space,0));
-}
-
-WRITE16_HANDLER( tms57002_control_word_w )
-{
-	tms57002_control_w(space, 0, data);
-}
-
-WRITE16_HANDLER( tms57002_data_word_w )
-{
-	tms57002_data_w(space, 0, data);
-}
-
-
 
 /***************************************************************************/
 /*                                                                         */
@@ -357,7 +202,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 	}
 }
 
-// adpoted from generic K053936_zoom_draw()
+// adapted from generic K053936_zoom_draw()
 static void K053936GP_zoom_draw(running_machine *machine,
 		int chip, UINT16 *ctrl, UINT16 *linectrl,
 		bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap,

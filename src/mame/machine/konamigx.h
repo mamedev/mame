@@ -1,20 +1,6 @@
 #ifndef __MACH_KONAMIGX_H
 #define __MACH_KONAMIGX_H
 
-void tms57002_init(void);
-
-READ8_HANDLER( tms57002_data_r );
-READ8_HANDLER( tms57002_status_r );
-WRITE8_HANDLER( tms57002_control_w );
-WRITE8_HANDLER( tms57002_data_w );
-
-READ16_HANDLER( tms57002_data_word_r );
-READ16_HANDLER( tms57002_status_word_r );
-WRITE16_HANDLER( tms57002_control_word_w );
-WRITE16_HANDLER( tms57002_data_word_w );
-
-
-
 // 2nd-Tier GX/MW Hardware Functions
 void K053247GP_set_SpriteOffset(int offsx, int offsy);
 

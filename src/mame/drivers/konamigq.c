@@ -251,6 +251,24 @@ static WRITE16_HANDLER( sndcomm68k_w )
 	sndtor3k[ offset ] = data;
 }
 
+static READ16_HANDLER(tms57002_data_word_r)
+{
+	return 0;
+}
+
+static WRITE16_HANDLER(tms57002_data_word_w)
+{
+}
+
+static READ16_HANDLER(tms57002_status_word_r)
+{
+	return 0;
+}
+
+static WRITE16_HANDLER(tms57002_control_word_w)
+{
+}
+
 /* 68000 memory handling */
 static ADDRESS_MAP_START( sndreadmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
@@ -364,7 +382,6 @@ static MACHINE_START( konamigq )
 static MACHINE_RESET( konamigq )
 {
 	psx_machine_init(machine);
-	tms57002_init();
 }
 
 static MACHINE_DRIVER_START( konamigq )

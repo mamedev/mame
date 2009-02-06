@@ -2,7 +2,7 @@
  *
  * konamigx.c - Konami System GX
  * Driver by R. Belmont, Acho A. Tang, and Phil Stroffolino.
- * ESC protection emulation and TMS57002 skipper by Olivier Galibert.
+ * ESC protection emulation by Olivier Galibert.
  *
  * Basic hardware consists of:
  * - MC68EC020 main CPU at 24 MHz
@@ -100,6 +100,7 @@
 #include "video/konamiic.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "cpu/tms57002/tms57002.h"
 #include "machine/eeprom.h"
 #include "sound/k054539.h"
 #include "machine/konamigx.h"
@@ -1225,6 +1226,38 @@ static WRITE16_HANDLER( sndcomm68k_w )
 	sndto020[offset] = data;
 }
 
+static INTERRUPT_GEN(tms_sync)
+{
+	tms57002_sync(device);
+}
+
+static READ16_HANDLER(tms57002_data_word_r)
+{
+	return tms57002_data_r(space->machine->cpu[2], 0);
+}
+
+static WRITE16_HANDLER(tms57002_data_word_w)
+{
+	if (ACCESSING_BITS_0_7)
+		tms57002_data_w(space->machine->cpu[2], 0, data);
+}
+
+static READ16_HANDLER(tms57002_status_word_r)
+{
+	return (tms57002_dready_r(space->machine->cpu[2], 0) ? 4 : 0) |
+		(tms57002_empty_r(space->machine->cpu[2], 0) ? 1 : 0);
+}
+
+static WRITE16_HANDLER(tms57002_control_word_w)
+{
+	if (ACCESSING_BITS_0_7) 
+	{
+		tms57002_pload_w(space->machine->cpu[2], 0, data & 4);
+		tms57002_cload_w(space->machine->cpu[2], 0, data & 8);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
 /* 68000 memory handling */
 static ADDRESS_MAP_START( gxsndmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
@@ -1235,6 +1268,10 @@ static ADDRESS_MAP_START( gxsndmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400010, 0x40001f) AM_READ(sndcomm68k_r)
 	AM_RANGE(0x500000, 0x500001) AM_READWRITE(tms57002_status_word_r, tms57002_control_word_w)
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gxtmsmap, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 
 static const k054539_interface k054539_config =
@@ -1309,6 +1346,10 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_CPU_ADD("sound", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(gxsndmap, 0)
 	MDRV_CPU_PERIODIC_INT(irq2_line_hold, 480)
+
+	MDRV_CPU_ADD("dasp", TMS57002, 12500000)
+	MDRV_CPU_DATA_MAP(gxtmsmap, 0)
+	MDRV_CPU_PERIODIC_INT(tms_sync, 48000)
 
 	MDRV_QUANTUM_TIME(HZ(1920))
 
@@ -3288,10 +3329,9 @@ static MACHINE_RESET(konamigx)
 	memset(sndto000, 0, 16);
 	memset(sndto020, 0, 16);
 
-	tms57002_init();
-
 	// sound CPU initially disabled?
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (!strcmp(machine->gamedrv->name, "tkmmpzdm"))
 	{
