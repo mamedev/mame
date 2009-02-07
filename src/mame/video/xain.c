@@ -174,21 +174,23 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 	for (offs = 0; offs < spriteram_size;offs += 4)
 	{
-		int sx,sy,flipx;
+		int sx,sy,flipx,flipy;
 		int attr = spriteram[offs+1];
 		int numtile = spriteram[offs+2] | ((attr & 7) << 8);
 		int color = (attr & 0x38) >> 3;
 
-		sx = 239 - spriteram[offs+3];
+		sx = 238 - spriteram[offs+3];
 		if (sx <= -7) sx += 256;
 		sy = 240 - spriteram[offs];
 		if (sy <= -7) sy += 256;
 		flipx = attr & 0x40;
+		flipy = 0;
 		if (flip_screen_get(machine))
 		{
-			sx = 239 - sx;
+			sx = 238 - sx;
 			sy = 240 - sy;
 			flipx = !flipx;
+			flipy = !flipy;
 		}
 
 		if (attr & 0x80)	/* double height */
@@ -196,14 +198,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			drawgfx(bitmap,machine->gfx[3],
 					numtile,
 					color,
-					flipx,flip_screen_get(machine),
-					sx-1,flip_screen_get(machine) ? sy+16:sy-16,
+					flipx,flipy,
+					sx,flipy ? sy+16:sy-16,
 					cliprect,TRANSPARENCY_PEN,0);
 			drawgfx(bitmap,machine->gfx[3],
 					numtile+1,
 					color,
-					flipx,flip_screen_get(machine),
-					sx-1,sy,
+					flipx,flipy,
+					sx,sy,
 					cliprect,TRANSPARENCY_PEN,0);
 		}
 		else
@@ -211,7 +213,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			drawgfx(bitmap,machine->gfx[3],
 					numtile,
 					color,
-					flipx,flip_screen_get(machine),
+					flipx,flipy,
 					sx,sy,
 					cliprect,TRANSPARENCY_PEN,0);
 		}
