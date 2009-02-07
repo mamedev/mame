@@ -242,26 +242,27 @@
 
   Notes:
 
-  PC847     - High Density Mounting Type Photocoupler
-  CN12      - 13 pin connector with 8 wires to external connectors
-  CN11      - 12 pin connector with 8 wires to external connectors
-  DS2401    - DS2401 911C2  Silicon serial number
-  CN10      - 10 pin connector with 8 wires to external connectors
-  CN14      - 7 pin connector
-  CN13      - 5 pin connector with 2 wires to external connectors
-  ADM232    - ADM232AARN 9933 H48475  High Speed, 5 V, 0.1 uF CMOS RS-232 Drivers/Receivers
-  CN17      - 3 pin connector
-  XC9536    - XILINX XC9536 PC44AEM9933 F1096429A 15C
-  CN15      - 8 pin connector
-  CY7C109   - CY7C109-25VC 931 H 04 404825  128k x 8 Static RAM
-  CN16      - 4 pin connector joining this PCB to the CD-DA IN on the MAIN PCB.
-  XCS50XL   - XILINX XCS50XL PQ208AKP9929 A2033251A 4C
-  AK4309B   - AKM AK4309B 3N932N  16bit SCF DAC
-  CN18      - 6 pin connector
-  MAS3507D  - IM MAS3507D D8 9173 51 HM U 072953.000 ES  MPEG 1/2 Layer 2/3 Audio Decoder
-  CN3       - Connector joining this PCB to the MAIN PCB
-  HYC24855  - ?
-  RCA-L/R   - RCA connectors for left/right audio output
+  PC847       - High Density Mounting Type Photocoupler
+  CN12        - 13 pin connector with 8 wires to external connectors
+  CN11        - 12 pin connector with 8 wires to external connectors
+  DS2401      - DS2401 911C2  Silicon serial number
+  CN10        - 10 pin connector with 8 wires to external connectors
+  CN14        - 7 pin connector
+  CN13        - 5 pin connector with 2 wires to external connectors
+  ADM232      - ADM232AARN 9933 H48475  High Speed, 5 V, 0.1 uF CMOS RS-232 Drivers/Receivers
+  CN17        - 3 pin connector
+  XC9536      - XILINX XC9536 PC44AEM9933 F1096429A 15C
+  CN15        - 8 pin connector
+  CY7C109     - CY7C109-25VC 931 H 04 404825  128k x 8 Static RAM
+  HY51V65164A - 64M bit dynamic EDO RAM
+  CN16        - 4 pin connector joining this PCB to the CD-DA IN on the MAIN PCB.
+  XCS50XL     - XILINX XCS50XL PQ208AKP9929 A2033251A 4C
+  AK4309B     - AKM AK4309B 3N932N  16bit SCF DAC
+  CN18        - 6 pin connector
+  MAS3507D    - IM MAS3507D D8 9173 51 HM U 072953.000 ES  MPEG 1/2 Layer 2/3 Audio Decoder
+  CN3         - Connector joining this PCB to the MAIN PCB
+  HYC24855    - ?
+  RCA-L/R     - RCA connectors for left/right audio output
 
   */
 
