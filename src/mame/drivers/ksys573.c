@@ -211,15 +211,15 @@
   GX894-PWB(B)A (C)1999 KONAMI CO. LTD.
 
              |-------------|
-             |    CN12     |
+             |        CN12 |
              |             |
              | PC847 PC847 |
              |             |
-             |    CN11     |
+             |        CN11 |
              |             |
              | PC847 PC847 |
              |             |
-             |    CN10     |
+             | DS2401 CN10 |
              |             |
              | PC847 PC847 |
              |             |
@@ -245,6 +245,7 @@
   PC847     - High Density Mounting Type Photocoupler
   CN12      - 13 pin connector with 8 wires to external connectors
   CN11      - 12 pin connector with 8 wires to external connectors
+  DS2401    - DS2401 911C2  Silicon serial number
   CN10      - 10 pin connector with 8 wires to external connectors
   CN14      - 7 pin connector
   CN13      - 5 pin connector with 2 wires to external connectors
