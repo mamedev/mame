@@ -136,7 +136,7 @@ LD += /ENTRY:wmainCRTStartup
 endif
 
 # add some VC++-specific defines
-DEFS += -D_CRT_SECURE_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
+DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf=_snprintf
 
 # make msvcprep into a pre-build step
 OSPREBUILD = $(VCONV)
