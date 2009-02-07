@@ -7349,6 +7349,7 @@ Other Sun games
 	DRIVER( mchampda )	/* (c) 1999 ESD */
 	DRIVER( hedpanic )	/* (c) 2000 ESD */
 	DRIVER( hedpanif )	/* (c) 2000 ESD + Fuuki, Co. Ltd. */
+	DRIVER( hedpanio )	/* (c) 1999 ESD */
 	DRIVER( tangtang )	/* (c) 2000 ESD */
 	DRIVER( swatpolc )	/* (c) 2001 ESD */
 

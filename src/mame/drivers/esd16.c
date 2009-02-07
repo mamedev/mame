@@ -18,7 +18,8 @@ Year + Game            PCB             Notes
 ---------------------------------------------------------------------------
 98  Multi Champ        ESD 11-09-98   (also a year 1999 revision)
 99  Multi Champ Deluxe ESD 08-26-1999 (also a year 2000 revision)
-00  Head Panic         ESD 08-26-1999 (All English version)
+99  Head Panic         ESD 08-26-1999 (All English version, copyright 1999)
+00  Head Panic         ESD 08-26-1999 (All English version, copyright 2000)
 00  Head Panic         ESD 08-26-1999 (with Fuuki, Story in Japanese)
 00  Tang Tang          ESD            (no date is marked on PCB)
 01  SWAT Police        ESD            (no date is marked on PCB)
@@ -26,7 +27,7 @@ Year + Game            PCB             Notes
 
 Other ESD games:
 
-Head Panic          (c) 1999 - Undumped, original version is (c) 1999
+Head Panic          (c) 1999 - missing 16Mbit flash roms & esd3 needs redumping
 3 Cushion Billiards (c) 2000 - Undumped
 Deluxe 5            (c) 2000 - Undumped
 Fire Hawk           (c) 2001 - see nmk16.c driver
@@ -966,6 +967,31 @@ ROM_START( hedpanif ) /* Story line in Japanese, game instructions in English */
 ROM_END
 
 
+ROM_START( hedpanio ) /* Story line & game instructions in English, copyright year is 1999 */
+	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "esd2.rom", 0x000000, 0x040000, CRC(70b08424) SHA1(2ba4fb3b749e31db4239a9173b8509366400152f) )
+	ROM_LOAD16_BYTE( "esd1.rom", 0x000001, 0x040000, CRC(4e0682c5) SHA1(f4117f31b6426d7bf126a6c62c489b9347885b42) )
+
+	ROM_REGION( 0x24000, "audio", 0 )		/* Z80 Code */
+	ROM_LOAD( "esd3.rom", 0x00000, 0x0c000, BAD_DUMP CRC(b72b761b) SHA1(9735e05ddc1db38bf81eac89a5312200fc008248) ) /* Should be twice the size, IE: 27C020 */
+	ROM_CONTINUE(         0x10000, 0x14000)
+
+	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
+	ROM_LOAD( "esd6.ju01", 0x200000, 0x200000, CRC(5858372c) SHA1(dc96112587df681d53cf7449bd39477919978325) )
+	ROM_LOAD( "esd7.ju02", 0x000000, 0x200000, CRC(055d525f) SHA1(85ad474691f96e47311a1904015d1c92d3b2d607) )
+	/* expand this to take up 0x200000 bytes too so we can decode it */
+	ROM_LOAD16_BYTE( "esd5.rom", 0x400000, 0x080000, CRC(82c5727f) SHA1(017f1d0c94475c51d17f12e24895f47a273a2dbb) )
+	ROM_FILL(                    0x500000, 0x100000, 0 )
+
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
+	ROM_LOAD16_BYTE( "ver615_esd8.fu35", 0x000000, 0x200000, BAD_DUMP CRC(23aceb4f) SHA1(35d9ebc33b9e1515e47750cfcdfc0bf8bf44b71d) ) /* 16Mbit flash roms with no labels */
+	ROM_LOAD16_BYTE( "ver615_esd9.fu34", 0x000001, 0x200000, BAD_DUMP CRC(76b46cd2) SHA1(679cbf50ae5935e8848868081ecef4ec66424f6c) )
+
+	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "esd4.rom", 0x000000, 0x020000, CRC(d7ca6806) SHA1(8ad668bfb5b7561cc0f3e36dfc3c936b136a4274) )
+ROM_END
+
+
 
 /* Tang Tang
 
@@ -1135,6 +1161,7 @@ GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Mul
 GAME( 1999, mchampda, mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", 0 ) // 26/11/1999 ?
 GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", 0 ) // 17/01/2000 ?
 GAME( 2000, hedpanif, hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", 0 ) // 15/03/2000 ?
+GAME( 1999, hedpanio, hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", GAME_NOT_WORKING ) // 15/06/1999 ?
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", 0 ) // 26/05/2000 ?
