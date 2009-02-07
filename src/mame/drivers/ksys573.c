@@ -21,6 +21,7 @@
   * fix root counters in machine/psx.c so the hack here (actually MAME 0.89's machine/psx.c code)
     can be removed
   * integrate ATAPI code with Aaron's ATA/IDE code
+  * emulate memory card board GE885-PWB(A)A ( contains Toshiba tmpr3904af, ram, rom, tranceiver and glue ).
 
   -----------------------------------------------------------------------------------------
 
@@ -202,7 +203,66 @@
         C2242      - 2SC2242 Transistor
         PC817      - Sharp PC817 Photo-coupler IC (DIP4)
         PAL        - AMD PALCE16V8Q, stamped 'E765Bx' (DIP20)
-*/
+
+
+  Digital I/O PCB
+  ---------------
+
+  GX894-PWB(B)A (C)1999 KONAMI CO. LTD.
+
+             |-------------|
+             |    CN12     |
+             |             |
+             | PC847 PC847 |
+             |             |
+             |    CN11     |
+             |             |
+             | PC847 PC847 |
+             |             |
+             |    CN10     |
+             |             |
+             | PC847 PC847 |
+             |             |
+             |  CN14  CN13 |
+  |----------|             |----------|
+  |                  PC847            |
+  | ADM232 CN17              XC9536   |
+  |                                   |
+  |                    19.6608MHz     |-----------|
+  | ADM232 CN15  CY7C109                          |
+  |                       HY51V65164A HY51V65164A |
+  |                            HY51V65164A        |
+  |      CN16    XCS50XL                          |
+  |                                               |
+  | AK4309B   CN18         29.450MHz  MAS3507D    |
+  |                                               |
+  |                           CN3                 |
+  | HYC24855  RCA-L/R                             |
+  |-----------------------------------------------|
+
+  Notes:
+
+  PC847     - High Density Mounting Type Photocoupler
+  CN12      - 13 pin connector with 8 wires to external connectors
+  CN11      - 12 pin connector with 8 wires to external connectors
+  CN10      - 10 pin connector with 8 wires to external connectors
+  CN14      - 7 pin connector
+  CN13      - 5 pin connector with 2 wires to external connectors
+  ADM232    - ADM232AARN 9933 H48475  High Speed, 5 V, 0.1 uF CMOS RS-232 Drivers/Receivers
+  CN17      - 3 pin connector
+  XC9536    - XILINX XC9536 PC44AEM9933 F1096429A 15C
+  CN15      - 8 pin connector
+  CY7C109   - CY7C109-25VC 931 H 04 404825  128k x 8 Static RAM
+  CN16      - 4 pin connector joining this PCB to the CD-DA IN on the MAIN PCB.
+  XCS50XL   - XILINX XCS50XL PQ208AKP9929 A2033251A 4C
+  AK4309B   - AKM AK4309B 3N932N  16bit SCF DAC
+  CN18      - 6 pin connector
+  MAS3507D  - IM MAS3507D D8 9173 51 HM U 072953.000 ES  MPEG 1/2 Layer 2/3 Audio Decoder
+  CN3       - Connector joining this PCB to the MAIN PCB
+  HYC24855  - ?
+  RCA-L/R   - RCA connectors for left/right audio output
+
+  */
 
 #include "driver.h"
 #include "cdrom.h"
