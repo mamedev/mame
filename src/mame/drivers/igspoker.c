@@ -227,7 +227,7 @@ static size_t protection_res = 0;
 static READ8_HANDLER( custom_io_r )
 {
 #ifdef VERBOSE
-	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(space->cpu),protection_res);
+	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(space->cpu), (int) protection_res);
 #endif
 	return protection_res;
 }
