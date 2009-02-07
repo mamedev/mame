@@ -1437,6 +1437,7 @@ const game_driver * const drivers[] =
 	DRIVER( nspirit )	/* (c) 1988 */
 	DRIVER( nspiritj )	/* (c) 1988 (Japan) */
 	DRIVER( imgfight )	/* (c) 1988 (Japan) */
+	DRIVER( imgfigho )	/* (c) 1988 (Japan) */
 	DRIVER( loht )		/* (c) 1989 */
 	DRIVER( lohtj )		/* (c) 1989 (Japan) */
 	DRIVER( lohtb )		/* (c) 1989 (bootleg) */

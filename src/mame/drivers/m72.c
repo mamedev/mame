@@ -2638,6 +2638,41 @@ ROM_END
 
 ROM_START( imgfight )
 	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD16_BYTE( "if-c-h0-a.bin", 0x00001, 0x10000, CRC(f5c94464) SHA1(5964a00d21ebb358eecc0f10f6221fb684f284df) )
+	ROM_LOAD16_BYTE( "if-c-l0-a.bin", 0x00000, 0x10000, CRC(87c534fe) SHA1(10c231a2b3046a711a1fdcc6c1631a7378295f2f) )
+	ROM_LOAD16_BYTE( "if-c-h3.bin",   0x40001, 0x20000, CRC(ea030541) SHA1(ee4c12773ecced2d755443ce0ca78fb2b2c04805) )
+	ROM_RELOAD(                       0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "if-c-l3.bin",   0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
+	ROM_RELOAD(                       0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "imgfight_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )	/* sprites */
+	ROM_LOAD( "if-c-10.bin",  0x20000, 0x20000, CRC(b7108449) SHA1(1f41ebe7164fab86958caaf6749b99425e682657) )
+	ROM_LOAD( "if-c-20.bin",  0x40000, 0x20000, CRC(aef33cba) SHA1(2d8a8458207d0c790c81b1285366463c8540d190) )
+	ROM_LOAD( "if-c-30.bin",  0x60000, 0x20000, CRC(1f98e695) SHA1(5fddcfb17523f8e96f4b85f0cb15d837b81f2bd4) )
+
+	ROM_REGION( 0x040000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "if-a-a0.bin",  0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )	/* tiles #1 */
+	ROM_LOAD( "if-a-a1.bin",  0x10000, 0x10000, CRC(6bd2845b) SHA1(149cf14f919590da88b9a8e254690da010709862) )
+	ROM_LOAD( "if-a-a2.bin",  0x20000, 0x10000, CRC(090d50e5) SHA1(4f2a7c76320b3f8dafae90a246187e034fe7562b) )
+	ROM_LOAD( "if-a-a3.bin",  0x30000, 0x10000, CRC(3a8e3083) SHA1(8a75d556790b6bea41ead1a5f95589dd293bdf4e) )
+
+	ROM_REGION( 0x040000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD( "if-a-b0.bin",  0x00000, 0x10000, CRC(b425c829) SHA1(0ccd487dba00bb7cb0ff5d1c67f8fee3e68df5d8) )	/* tiles #2 */
+	ROM_LOAD( "if-a-b1.bin",  0x10000, 0x10000, CRC(e9bfe23e) SHA1(f97a68dbdce7e06d07faab19acf7625cdc8eeaa8) )
+	ROM_LOAD( "if-a-b2.bin",  0x20000, 0x10000, CRC(256e50f2) SHA1(9e9fda4f1f1449548942c0da4478f61fe0d263d1) )
+	ROM_LOAD( "if-a-b3.bin",  0x30000, 0x10000, CRC(4c682785) SHA1(f61f1227e0ad629fdfca106306b17a9f6a9959e3) )
+
+	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_LOAD( "if-c-v0.bin",  0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
+	ROM_LOAD( "if-c-v1.bin",  0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
+ROM_END
+
+ROM_START( imgfigho )
+	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "if-c-h0.bin",  0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
 	ROM_LOAD16_BYTE( "if-c-l0.bin",  0x00000, 0x10000, CRC(61f89056) SHA1(3e0724dbc2b00a30193ea6cfac8b4331055d4fd4) )
 	ROM_LOAD16_BYTE( "if-c-h3.bin",  0x40001, 0x20000, CRC(ea030541) SHA1(ee4c12773ecced2d755443ce0ca78fb2b2c04805) )
@@ -3455,7 +3490,8 @@ GAME( 1987, bchopper, 0,        m72,      bchopper, bchopper, ROT0,   "Irem", "B
 GAME( 1987, mrheli,   bchopper, m72,      bchopper, mrheli,   ROT0,   "Irem", "Mr. HELI no Dai-Bouken", GAME_NO_COCKTAIL )
 GAME( 1988, nspirit,  0,        m72,      nspirit,  nspirit,  ROT0,   "Irem", "Ninja Spirit", GAME_NO_COCKTAIL )
 GAME( 1988, nspiritj, nspirit,  m72,      nspirit,  nspiritj, ROT0,   "Irem", "Saigo no Nindou (Japan)", GAME_NO_COCKTAIL )
-GAME( 1988, imgfight, 0,        m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (Japan)", 0 )
+GAME( 1988, imgfight, 0,        m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (revision A, Japan)", 0 )
+GAME( 1988, imgfigho, imgfight, m72,      imgfight, imgfight, ROT270, "Irem", "Image Fight (Japan)", 0 )
 GAME( 1989, loht,     0,        m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma", GAME_NO_COCKTAIL )
 GAME( 1989, lohtj,    loht,     m72,      loht,     loht,     ROT0,   "Irem", "Legend of Hero Tonma (Japan)", GAME_NO_COCKTAIL )
 GAME( 1989, lohtb,    loht,     m72,      loht,     0,        ROT0,   "Irem", "Legend of Hero Tonma (bootleg, set 1)", GAME_NOT_WORKING| GAME_NO_COCKTAIL )
