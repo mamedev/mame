@@ -72,10 +72,14 @@ READ8_DEVICE_HANDLER( msm6242_r )
 		case MSM6242_REG_H10:
 		{
 			int	hour = systime->local_time.hour;
+			int pm = 0;
 
 			/* check for 12/24 hour mode */
 			if ((msm6242->reg[2] & 0x04) == 0) /* 12 hour mode? */
 			{
+				if (hour >= 12)
+					pm = 1;
+				
 				hour %= 12;
 
 				if ( hour == 0 )
@@ -85,7 +89,7 @@ READ8_DEVICE_HANDLER( msm6242_r )
 			if ( offset == MSM6242_REG_H1 )
 				return hour % 10;
 
-			return hour / 10;
+			return (hour / 10) | (pm <<2);
 		}
 
 		case MSM6242_REG_D1: return systime->local_time.mday % 10;
@@ -113,7 +117,7 @@ WRITE8_DEVICE_HANDLER( msm6242_w )
 	{
 		case MSM6242_REG_CD:
 		{
-			msm6242->reg[0] = data;
+			msm6242->reg[0] = data & 0x0f;
 
 			if (data & 1)	/* was Hold set? */
 			{
@@ -123,19 +127,21 @@ WRITE8_DEVICE_HANDLER( msm6242_w )
 			return;
 		}
 
-		case MSM6242_REG_CE: msm6242->reg[1] = data; return;
+		case MSM6242_REG_CE: msm6242->reg[1] = data & 0x0f; return;
 
 		case MSM6242_REG_CF:
 		{
 			/* the 12/24 mode bit can only be changed while REST is 1 */
 			if ((data ^ msm6242->reg[2]) & 0x04)
 			{
+				msm6242->reg[2] = (msm6242->reg[2] & 0x04) | (data & ~0x04);
+
 				if (msm6242->reg[2] & 1)
-					msm6242->reg[2] = data;
+					msm6242->reg[2] = (msm6242->reg[2] & ~0x04) | (data & 0x04);
 			}
 			else
 			{
-				msm6242->reg[2] = data;
+				msm6242->reg[2] = data & 0x0f;
 			}
 			return;
 		}
