@@ -380,15 +380,15 @@ static void tms57002_opc_write_c(tms57002_t *s, UINT32 opcode, UINT32 v)
 {
 	if(opcode & 0x400) {
 		if(opcode & 0x100)
-			return tms57002_write_c(s, opcode & 0xff, v);
+			tms57002_write_c(s, opcode & 0xff, v);
 		else if(opcode & 0x80)
-			return tms57002_write_c(s, s->ca++, v);
+			tms57002_write_c(s, s->ca++, v);
 		else
-			return tms57002_write_c(s, s->ca, v);
+			tms57002_write_c(s, s->ca, v);
 	} else if(opcode & 0x200)
-		return tms57002_write_c(s, s->ca++, v);
+		tms57002_write_c(s, s->ca++, v);
 	else
-		return tms57002_write_c(s, s->ca, v);
+		tms57002_write_c(s, s->ca, v);
 }
 
 static UINT32 tms57002_opc_read_c(tms57002_t *s, UINT32 opcode)
@@ -1081,7 +1081,7 @@ void tms57002_execute(tms57002_t *s)
 	}
 }
 
-static inline int xmode(UINT32 opcode, char type)
+INLINE int xmode(UINT32 opcode, char type)
 {
 	if(((opcode & 0x400) && (type == 'c')) || (!(opcode & 0x400) && (type == 'd'))) {
 		if(opcode & 0x100)
@@ -1096,42 +1096,42 @@ static inline int xmode(UINT32 opcode, char type)
 		return 1;
 }
 
-static inline int sfao(UINT32 st1)
+INLINE int sfao(UINT32 st1)
 {
 	return st1 & ST1_SFAO ? 1 : 0;
 }
 
-static inline int dbp(UINT32 st1)
+INLINE int dbp(UINT32 st1)
 {
 	return st1 & ST1_DBP ? 1 : 0;
 }
 
-static inline int crm(UINT32 st1)
+INLINE int crm(UINT32 st1)
 {
 	return (st1 & ST1_CRM) >> ST1_CRM_SHIFT;
 }
 
-static inline int sfai(UINT32 st1)
+INLINE int sfai(UINT32 st1)
 {
 	return st1 & ST1_SFAI ? 1 : 0;
 }
 
-static inline int sfmo(UINT32 st1)
+INLINE int sfmo(UINT32 st1)
 {
 	return (st1 & ST1_SFMO) >> ST1_SFMO_SHIFT;
 }
 
-static inline int rnd(UINT32 st1)
+INLINE int rnd(UINT32 st1)
 {
 	return (st1 & ST1_RND) >> ST1_RND_SHIFT;
 }
 
-static inline int movm(UINT32 st1)
+INLINE int movm(UINT32 st1)
 {
 	return st1 & ST1_MOVM ? 1 : 0;
 }
 
-static inline int sfma(UINT32 st1)
+INLINE int sfma(UINT32 st1)
 {
 	return (st1 & ST1_SFMA) >> ST1_SFMA_SHIFT;
 }

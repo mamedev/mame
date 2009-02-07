@@ -65,7 +65,7 @@ const static pdesc pp_r[] = {
   { "wd",   1, PWD  },
   { "b",    1, PB   },
   { "sfai", 2, SFAI },
-  { }
+  { 0 }
 };
 
 instr cat1[0x40], cat2[0x80], cat3[0x80];
@@ -93,7 +93,7 @@ vinfo vinf[] = {
   { I_RND,   8, "rnd",   "rnd(s->st1)"        },
   { I_MOVM,  2, "movm",  "movm(s->st1)"       },
   { I_SFMA,  4, "sfma",  "sfma(s->st1)"       },
-  { }
+  { 0 }
 };
 
 char *sconcat(char *dest, const char *src)
@@ -156,7 +156,7 @@ void load(const char *fname)
 	p = buf;
 	while(*p == ' ' || *p == '\t')
 	  p++;
-	i->dasm = strdup(p);
+	i->dasm = _strdup(p);
       }
     } else {
       char *name=0, *cat=0, *id=0, *cyc=0, *rep=0, *type=0;
@@ -224,7 +224,7 @@ void load(const char *fname)
 	exit(1);
       }
 
-      i->name = strdup(name);
+      i->name = _strdup(name);
       i->line = line;
       i->cycles = strtol(cyc, 0, 10);
       i->flags = flags;
@@ -403,7 +403,7 @@ void save_dasm_cat(FILE *f, const char *def, instr *il, int count)
     { "c", 0, PC },
     { "d", 0, PD },
     { "i", 0, PI },
-    { }
+    { 0 }
   };
 
   int i;
@@ -630,7 +630,7 @@ void cintrp_expand(char **p, int s, int e, const int *cv)
       break;
 
     case PC: {
-      const char *r;
+      const char *r = NULL;
       if(cv[IxCMODE] == 0)
 	r = "s->cmem[i->param]";
       else if(cv[IxCMODE] == 1)
@@ -818,7 +818,7 @@ void save_cintrp_cat(FILE *f, instr *il, int count)
   for(i=0; i != count; i++)
     if(il[i].run) {
       int cv[IxCOUNT];
-      int j, k;
+      int j, k = 0;
       unsigned int flags = il[i].flags;
       char buf[16384];
 
