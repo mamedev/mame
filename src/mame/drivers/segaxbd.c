@@ -17,6 +17,218 @@
           voice samples to be played; this game seems to need VERY
           tight synchronization between the 68000 and Z80
 
+
+Sega X-Board System Overview
+Sega, 1987-1990
+
+The following games are known to exist on the X-Board hardware...
+
+AB Cop             (C) Sega 1990
+After Burner       (C) Sega 1987
+After Burner II    (C) Sega 1987
+*Caribbean Boule   (C) Sega 1992
+GP Rider           (C) Sega 1990
+*Last Survivor     (C) Sega 1989
+Line of Fire       (C) Sega 1989
+Racing Hero        (C) Sega 1990
+Super Monaco GP    (C) Sega 1989
+Thunder Blade      (C) Sega 1987
+
+* denotes not dumped. There are also several revisions of the above games not dumper either.
+If you can help, please contact us via http://www.mameworld.net/gurudumps/ or http://www.mamedev.org
+
+Main Board
+----------
+Top    : 834-6335
+Bottom : 171-5494
+Sticker: 834-7088-01 REV. B  SUPER MONACO GP
+Sticker: 834-6335-02 AFTER BURNER
+|-----------------------------------------------------------------------------|
+|IC67 IC66 IC65 IC64 IC58 IC57 IC56 IC55  BATT  CNH  16MHz CNA    CNE     CNF |
+|IC71 IC70 IC69 IC68                      IC107  IC15   IC11    IC7  IC5  IC1 |
+|IC75 IC74 IC73 IC72                             IC16   IC12   IC8   IC6  IC2 |
+|IC79 IC78 IC77 IC76 IC63 IC62 IC61 IC60  IC108  IC17   IC13   IC10 IC9   IC3 |
+|                                                IC18   IC14                  |
+|                                                                             |
+|                                                                             |
+|     IC84              IC81                                                  |
+|                                                                IC23         |
+|                                                                IC22         |
+|                                       IC109                        IC21 IC20|
+|                     IC125      IC118              IC28             IC30 IC29|
+|IC93 IC92 IC91 IC90  IC126                                      IC31         |
+|                                             IC53               IC32         |
+|                     IC32*                              IC40  IC38           |
+|                     IC33*                                    IC39        CNI|
+|IC97 IC96 IC95 IC94        IC127       IC117                                 |
+|                     IC134                                                   |
+|                     IC135                   50MHz                           |
+|                                                                     IC37    |
+|IC101 IC100 IC99 IC98  IC148                                                 |
+|                                        IC165                                |
+|                                                              IC42           |
+|                                 IC150        IC170                  IC41    |
+|IC105 IC104 IC103 IC102                                                      |
+|                    IC154  IC152                  IC160  IC159  DIPSWB DIPSWA|
+|                       IC153     IC151  IC149   CNG      CNB      CNC    CND |
+|-----------------------------------------------------------------------------|
+Notes:
+      ROMs: (ROM locations on the PCB not listed are not populated)
+        Type (note 1) 27C1000    27C1000    27C1000    27C1000    27C1000    27C1000    27C1000    27C1000    27C512     27C512     27C512     831000     831000     831000     831000     831000     831000     831000     831000     831000     831000     831000     831000     27C1000    27C1000    27C1000    27C1000    27C512     27C512     831000     831000     831000
+        Location      IC58       IC63       IC57       IC62       IC20       IC29       IC21       IC30       IC154      IC153      IC152      IC90       IC94       IC98       IC102      IC91       IC95       IC99       IC103      IC92       IC96       IC100      IC104      IC93       IC97       IC101      IC105      IC40       IC17       IC11       IC12       IC13
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+After Burner          EPR-10940  EPR-10941  -          -          EPR-10927  EPR-10928  -          -          EPR-10926  EPR-10925  EPR-10924  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  EPR-10942  EPR-10943  EPR-10944  EPR-10945  EPR-10946  EPR-10947  EPR-10948  EPR-10949  EPR-10922  MPR-10923  MPR-10930  MPR-10931  MPR-11102
+After Burner 2        EPR-11107  EPR-11108  -          -          EPR-11109  EPR-11110  -          -          EPR-11115  EPR-11114  EPR-11113  MPR-10932  MPR-10934  MPR-10936  MPR-10938  MPR-10933  MPR-10935  MPR-10937  MPR-10939  MPR-11103  MPR-11104  MPR-11105  MPR-11106  EPR-11116  EPR-11117  EPR-11118  EPR-11119  EPR-10922  EPR-11112  MPR-10930  MPR-10931  EPR-11102
+Line Of Fire (set 3)  EPR-12849  EPR-12850  -          -          EPR-12804  EPR-12805  EPR-12802  EPR-12803  OPR-12791  OPR-12792  OPR-12793  EPR-12787  EPR-12788  EPR-12789  EPR-12790  EPR-12783  EPR-12784  EPR-12785  EPR-12786  EPR-12779  EPR-12780  EPR-12781  EPR-12782  EPR-12775  EPR-12776  EPR-12777  EPR-12778  -          EPR-12798  EPR-12799  EPR-12800  EPR-12801
+Line Of Fire (set 2)  EPR-12847A EPR-12848A -          -          EPR-12804  EPR-12805  EPR-12802  EPR-12803  OPR-12791  OPR-12792  OPR-12793  EPR-12787  EPR-12788  EPR-12789  EPR-12790  EPR-12783  EPR-12784  EPR-12785  EPR-12786  EPR-12779  EPR-12780  EPR-12781  EPR-12782  EPR-12775  EPR-12776  EPR-12777  EPR-12778  -          EPR-12798  EPR-12799  EPR-12800  EPR-12801
+Line Of Fire (set 1)  EPR-12794  EPR-12795  -          -          EPR-12804  EPR-12805  EPR-12802  EPR-12803  OPR-12791  OPR-12792  OPR-12793  EPR-12787  EPR-12788  EPR-12789  EPR-12790  EPR-12783  EPR-12784  EPR-12785  EPR-12786  EPR-12779  EPR-12780  EPR-12781  EPR-12782  EPR-12775  EPR-12776  EPR-12777  EPR-12778  -          EPR-12798  EPR-12799  EPR-12800  EPR-12801
+Thunder Blade (set 2) EPR-11405  EPR-11406  EPR-11306  EPR-11307  EPR-11390  EPR-11391  EPR-11310  EPR-11311  EPR-11314  EPR-11315  EPR-11316  EPR-11323  EPR-11322  EPR-11321  EPR-11320  EPR-11327  EPR-11326  EPR-11325  EPR-11324  EPR-11331  EPR-11330  EPR-11329  EPR-11328  EPR-11395  EPR-11394  EPR-11393  EPR-11392  EPR-11313  EPR-11396  EPR-11317  EPR-11318  EPR-11319
+Thunder Blade (set 1) EPR-11304  EPR-11305  EPR-11306  EPR-11307  EPR-11308  EPR-11309  EPR-11310  EPR-11311  EPR-11314  EPR-11315  EPR-11316  EPR-11323  EPR-11322  EPR-11321  EPR-11320  EPR-11327  EPR-11326  EPR-11325  EPR-11324  EPR-11331  EPR-11330  EPR-11329  EPR-11328  EPR-11335  EPR-11334  EPR-11333  EPR-11332  EPR-11313  EPR-11312  EPR-11317  EPR-11318  EPR-11319
+Racing Hero           EPR-13129  EPR-13130  EPR-12855  EPR-12856  EPR-12857  EPR-12858  -          -          EPR-12879  EPR-12880  EPR-12881  EPR-12872  EPR-12873  EPR-12874  EPR-12875  EPR-12868  EPR-12869  EPR-12870  EPR-12871  EPR-12864  EPR-12865  EPR-12866  EPR-12867  EPR-12860  EPR-12861  EPR-12862  EPR-12863  -          EPR-12859  EPR-12876  EPR-12877  EPR-12878
+S.Monaco GP (set 9)   EPR-12563B EPR-12564B -          -          EPR-12576A EPR-12577A -          -          EPR-12429  EPR-12430  EPR-12431  MPR-12425  MPR-12426  MPR-12427  MPR-12428  MPR-12421  MPR-12422  MPR-12423  MPR-12424  MPR-12417  MPR-12418  MPR-12419  MPR-12420  EPR-12609  EPR-12610  EPR-12611  EPR-12612  -          EPR-12436  MPR-12437  MPR-12438  MPR-12439
+S.Monaco GP (set 8)   EPR-12563A EPR-12564A -          -          EPR-12576A EPR-12577A -          -          EPR-12429  EPR-12430  EPR-12431  MPR-12425  MPR-12426  MPR-12427  MPR-12428  MPR-12421  MPR-12422  MPR-12423  MPR-12424  MPR-12417  MPR-12418  MPR-12419  MPR-12420  EPR-12609  EPR-12610  EPR-12611  EPR-12612  -          EPR-12436  MPR-12437  MPR-12438  MPR-12439
+S.Monaco GP (set 7)   EPR-12563  EPR-12564  -          -          EPR-12576  EPR-12577  -          -          EPR-12429  EPR-12430  EPR-12431  MPR-12425  MPR-12426  MPR-12427  MPR-12428  MPR-12421  MPR-12422  MPR-12423  MPR-12424  MPR-12417  MPR-12418  MPR-12419  MPR-12420  EPR-12609  EPR-12610  EPR-12611  EPR-12612  -          EPR-12436  MPR-12437  MPR-12438  MPR-12439
+S.Monaco GP (set 6)   EPR-12561C EPR-12562C -          -          EPR-12574A EPR-12575A -          -          EPR-12429  EPR-12430  EPR-12431  MPR-12425  MPR-12426  MPR-12427  MPR-12428  MPR-12421  MPR-12422  MPR-12423  MPR-12424  MPR-12417  MPR-12418  MPR-12419  MPR-12420  EPR-12609  EPR-12610  EPR-12611  EPR-12612  -          EPR-12436  MPR-12437  MPR-12438  MPR-12439
+S.Monaco GP (set 5)   EPR-12561B EPR-12562B -          -          EPR-12574A EPR-12575A -          -          EPR-12429  EPR-12430  EPR-12431  MPR-12425  MPR-12426  MPR-12427  MPR-12428  MPR-12421  MPR-12422  MPR-12423  MPR-12424  MPR-12417  MPR-12418  MPR-12419  MPR-12420  EPR-12609  EPR-12610  EPR-12611  EPR-12612  -          EPR-12436  MPR-12437  MPR-12438  MPR-12439
+S.Monaco GP (set 4)   EPR-12561A EPR-12562A -          -          EPR-12574A EPR-12575A -          -          EPR-12429  EPR-12430  EPR-12431  MPR-12425  MPR-12426  MPR-12427  MPR-12428  MPR-12421  MPR-12422  MPR-12423  MPR-12424  MPR-12417  MPR-12418  MPR-12419  MPR-12420  EPR-12609  EPR-12610  EPR-12611  EPR-12612  -          EPR-12436  MPR-12437  MPR-12438  MPR-12439
+S.Monaco GP (set 3)   EPR-12561  EPR-12562  -          -          EPR-12574A EPR-12575A -          -          EPR-12429  EPR-12430  EPR-12431  MPR-12425  MPR-12426  MPR-12427  MPR-12428  MPR-12421  MPR-12422  MPR-12423  MPR-12424  MPR-12417  MPR-12418  MPR-12419  MPR-12420  EPR-12609  EPR-12610  EPR-12611  EPR-12612  -          EPR-12436  MPR-12437  MPR-12438  MPR-12439
+S.Monaco GP (set 2)   EPR-12432B EPR-12433B -          -          EPR-12441A EPR-12442A -          -          EPR-12429  EPR-12430  EPR-12431  MPR-12425  MPR-12426  MPR-12427  MPR-12428  MPR-12421  MPR-12422  MPR-12423  MPR-12424  MPR-12417  MPR-12418  MPR-12419  MPR-12420  EPR-12413  EPR-12414  EPR-12415  EPR-12416  -          EPR-12436  MPR-12437  MPR-12438  MPR-12439
+S.Monaco GP (set 1)   EPR-12432A EPR-12433A -          -          EPR-12441A EPR-12442A -          -          EPR-12429  EPR-12430  EPR-12431  MPR-12425  MPR-12426  MPR-12427  MPR-12428  MPR-12421  MPR-12422  MPR-12423  MPR-12424  MPR-12417  MPR-12418  MPR-12419  MPR-12420  EPR-12413  EPR-12414  EPR-12415  EPR-12416  -          EPR-12436  MPR-12437  MPR-12438  MPR-12439
+AB Cop                EPR-13568B EPR-13556B EPR-13559  EPR-13558  EPR-13566  EPR-13565  -          -          OPR-13553  OPR-13554  OPR-13555  OPR-13552  OPR-13551  OPR-13550  OPR-13549  OPR-13548  OPR-13547  OPR-13546  OPR-13545  OPR-13544  OPR-13543  OPR-13542  OPR-13541  OPR-13540  OPR-13539  OPR-13538  OPR-13537  EPR-13564  EPR-13560  OPR-13563  OPR-13562  OPR-13561
+GP Rider (set 2)      EPR-13408  EPR-13409  -          -          EPR-13395  EPR-13394  EPR-13393  EPR-13392  EPR-13383  EPR-13384  EPR-13385  EPR-13382  EPR-13381  EPR-13380  EPR-13379  EPR-13378  EPR-13377  EPR-13376  EPR-13375  EPR-13374  EPR-13373  EPR-13372  EPR-13371  EPR-13370  EPR-13369  EPR-13368  EPR-13367  -          EPR-13388  EPR-13391  EPR-13390  EPR-13389
+GP Rider (set 1)      EPR-13406  EPR-13407  -          -          EPR-13395  EPR-13394  EPR-13393  EPR-13392  EPR-13383  EPR-13384  EPR-13385  EPR-13382  EPR-13381  EPR-13380  EPR-13379  EPR-13378  EPR-13377  EPR-13376  EPR-13375  EPR-13374  EPR-13373  EPR-13372  EPR-13371  EPR-13370  EPR-13369  EPR-13368  EPR-13367  -          EPR-13388  EPR-13391  EPR-13390  EPR-13389
+
+Note 1 - PCB can handle 27C1000 / 27C010 / 831000 ROMs via jumpers
+         If label = EPR, ROM is 32 pin 27C1000 or 27C010
+         If label = MPR, ROM is 28 pin 831000
+         For jumper settings, 27C1000 also means 831000 can be used
+         S28 shorted, S26 open = ROMS 90-103 (Groups 1,2) use 831000
+         S28 open, S26 shorted = ROMS 90-103 (Groups 1,2) use 27C010
+         S29 shorted, S27 open = ROMS 90-103 (Groups 3,4) use 831000
+         S29 open, S27 shorted = ROMS 92-105 (Groups 3,4) use 27C010
+         For IC11/12/13, set jumpers S1 open, S2 resistor, S3 open, S4 resistor for 27C1000. Reverse them for 27C010
+         For IC20/29 set jumpers S5 resistor, S6 open, S7 resistor, S8 open for 27C1000. Reverse them for 27C010
+         For IC21/30 set jumpers S9 resistor, S10 open, S11 resistor, S12 open for 27C1000. Reverse them for 27C010
+         For IC57/62 set jumpers S18 resistor, S19 open, S20 resistor, S21 open for 27C1000. Reverse them for 27C010
+         For IC58/63 set jumpers S22 resistor, S23 open, S24 resistor, S25 open for 27C1000. Reverse them for 27C010
+         For IC40 set jumpers S13 open, S14 resistor to set 27C512. Reverse them for 27C256
+         For IC152/153/154 set jumpers S31 open, S32 resistor to set 27C512. Reverse them for 27C256
+
+PALs: (Common to all games except where noted)
+     IC18 : 315-5280 (= CK2605 == PLS153) - Z80 address decoding
+     IC84 : 315-5278 (= PAL16L8) - Sprite ROM bank control
+     IC109: 315-5290 (= PAL16L8) - Main CPU address decoding
+     IC117: 315-5291 (= PAL16L8) - Main CPU address decoding
+     IC127: After Burner - 315-5279 (= PAL16R6)
+            S.Monaco GP  - 315-5304 (= PAL16R6)
+            GP Rider     - 315-5304 (= PAL16R6)
+            Line Of Fire - 315-5304 (= PAL16R6)
+            There could be other different ones or maybe there's just 2 types?
+
+RAM:
+    IC9  : 6116    (2k x8 SRAM) - Sega PCM chip RAM. == TMM2115
+    IC10 : 6116    (2k x8 SRAM) - Sega PCM chip RAM
+    IC16 : 6116    (2k x8 SRAM) - Z80 program RAM
+    IC22 : 6264    (8k x8 SRAM) - Sub CPU Program RAM. == Sony CXK5864 or Fujitsu MB8464 or NEC D4364
+    IC23 : 6264    (8k x8 SRAM) - Sub CPU Program RAM
+    IC31 : 6116    (2k x8 SRAM) - Sub CPU Program RAM
+    IC32 : 6116    (2k x8 SRAM) - Sub CPU Program RAM
+    IC38 : 6264    (8k x8 SRAM) - Road RAM
+    IC39 : 6264    (8k x8 SRAM) - Road RAM
+    IC55 : 6264    (8k x8 SRAM) - Main CPU Program RAM
+    IC56 : 6264    (8k x8 SRAM) - Main CPU Program RAM
+    IC60 : 6264    (8k x8 SRAM) - Main CPU Program RAM
+    IC61 : 6264    (8k x8 SRAM) - Main CPU Program RAM
+    IC64 : TC51832 (32k x8 SRAM) - Sprite GFX RAM. == NEC uPD42832
+    IC65 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC66 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC67 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC68 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC69 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC70 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC71 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC72 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC73 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC74 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC75 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC76 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC77 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC78 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC79 : TC51832 (32k x8 SRAM) - Sprite GFX RAM
+    IC125: MB81C78 (8k x8 SRAM) -
+    IC126: MB81C78 (8k x8 SRAM) -
+    IC132: 6264    (8k x8 SRAM) - Text RAM. \ * On this PCB these are mis-labelled as IC32 and IC33
+    IC133: 6264    (8k x8 SRAM) - Text RAM  /
+    IC134: 62256   (32k x8 SRAM) - Tile / Background GFX RAM
+    IC135: 62256   (32k x8 SRAM) - Tile / Background GFX RAM
+    IC150: 6264    (8k x8 SRAM) -
+    IC151: 6264    (8k x8 SRAM) -
+
+SEGA Custom ICs:
+                IC8  : 315-5218  (QFP100) - Sega Stereo PCM Sound IC with 16 channels. Clock input 16.000MHz
+                IC37 : 315-5248  (QFP100) - Hardware multiplier
+                IC41 : 315-5249  (QFP120) - Hardware divider
+                IC42 : 315-5275  (QFP100) - Road generator, located underneath the PCB
+                IC53 : 315-5250  (QFP120) - 68000 / Z80 interface, hardware comparator
+                IC81 : 315-5211A (PGA179) - Sprite Generator
+                IC107: 315-5248  (QFP100) - Hardware multiplier
+                IC108: 315-5249  (QFP120) - Hardware divider
+                IC148: 315-5197  (PGA135) - Tilemap generator (for Backgrounds)
+                IC149: 315-5242  (Custom) - Color Encoder. Custom ceramic DIP package. Contains
+                                            a QFP44 and some smt resistors/caps etc
+
+OTHER:
+      IC14 : Z80 CPU, clock 4.000MHz [16/4] (DIP40)
+      IC15 : YM2151, clock 4.000MHz [16/4] (DIP24)
+      IC28 : 68000 CPU (sub), clock 12.5000MHz [50/4] (DIP64)
+      IC118: Hitachi FD1094 Encrypted 68000 CPU or regular 68000 CPU (main), clock 12.5000MHz [50/4] (DIP64)
+      IC159: SONY CXD1095 CMOS I/O Port Expander (QFP64)
+      IC160: SONY CXD1095 CMOS I/O Port Expander (QFP64)
+      IC165: ADC0804, for control of analog inputs (DIP20)
+      IC170: Fujitsu MB3773 Reset IC (DIP8)
+      IC1  : NEC uPC324 Low Power Quad Operational Amplifier (DIP14)
+      IC2  : NEC uPC4082 J-FET Dual Input Operational Amplifier (DIP8)
+      IC3  : Yamaha YM3012 Sound Digital to Analog Converter (DIP16)
+      IC5  : M8736 MF6CN-50 (DIP14)
+      IC6  : M8736 MF6CN-50 (DIP14)
+      IC7  : Exar MP7633JN CMOS 10-Bit Multiplying Digital to Analog Converter (== AD7533 / AD7530 / AD7520) (DIP16)
+      BATT : 5.5 volt 0.1uF Super Cap
+      CNA  : 10 pin +5V / GND Power Connector
+      CNB  : 20 pin Analog Controls Connector
+      CNC  : 26 pin Connector for ?
+      CND  : 50 pin Digital Controls/Buttons Connector
+      CNE  : 6 pin Connector for ?
+      CNF  : 4 pin Stereo Sound Output Connector
+      CNG  : 6 pin RGB/Sync/GND Connector
+      CNH  : 10 pin Connector for ?
+      CNI  : 30 pin Expansion Connector (not populated)
+      VSync: 59.6368Hz  \ (measured via EL4583 & TTi PFM1300)
+      HSync: 15.5645kHz /
+
+
+Network Board (used on Super Monaco GP)
+-------------
+
+Top    : 834-6780
+Bottom : 171-5729-01
+Sticker: 834-7112
+|---------| |--| |----------------------|
+|         RX   TX            315-5336   |
+|             315-5337                  |
+|                                       |
+|            16MHz      6264            |
+|                     EPR12587.14       |
+| MB89372P-SH     Z80E        MB8421    |
+|---------------------------------------|
+Notes:
+      PALs     : 315-5337, 315-5336, both PAL16L8
+      Z80 clock: 8.000MHz [16/2]
+      6264     : 8k x8 SRAM
+      MB8421   : Fujitsu 2k x8 Dual-Port SRAM (SDIP52)
+      MB89372  : ?, Manufactured by Fujitsu, SDIP64
+      EPR12587 : 27C256 EPROM
+
+
 ***************************************************************************/
 
 #include "driver.h"
