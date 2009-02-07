@@ -156,7 +156,7 @@ void load(const char *fname)
 	p = buf;
 	while(*p == ' ' || *p == '\t')
 	  p++;
-	i->dasm = _strdup(p);
+	i->dasm = strdup(p);
       }
     } else {
       char *name=0, *cat=0, *id=0, *cyc=0, *rep=0, *type=0;
@@ -224,7 +224,7 @@ void load(const char *fname)
 	exit(1);
       }
 
-      i->name = _strdup(name);
+      i->name = strdup(name);
       i->line = line;
       i->cycles = strtol(cyc, 0, 10);
       i->flags = flags;
