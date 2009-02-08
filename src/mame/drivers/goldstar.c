@@ -4696,8 +4696,23 @@ ROM_END
 // this set has an encrypted program rom
 ROM_START( nfb96sea )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "dog_08.rom",   0x00000, 0x10000, CRC(357f13e8) SHA1(ca0872c9f7dc44a4c1c342f7f53c490f6342f1d2) )
-
+	ROM_LOAD( "dog_08.rom",   0x00000, 0x1000, CRC(357f13e8) SHA1(ca0872c9f7dc44a4c1c342f7f53c490f6342f1d2) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x1000)
+	ROM_CONTINUE(0x9000, 0x1000)
+	ROM_CONTINUE(0xa000, 0x1000)
+	ROM_CONTINUE(0xb000, 0x1000)
+	ROM_CONTINUE(0xc000, 0x1000)
+	ROM_CONTINUE(0xd000, 0x1000)
+	ROM_CONTINUE(0xe000, 0x1000)
+	ROM_CONTINUE(0xf000, 0x1000)
+	
 	/* the graphic roms on this set are a mess, the planes don't match up properly */
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "dog_05.rom",   0x10000, 0x08000, CRC(c03b5632) SHA1(4f603ec5218adcbfce09ec6d3643ffb5006056dd) )
@@ -5053,6 +5068,29 @@ static DRIVER_INIT(lucky8a)
 	ROM[0x0010] = 0x21;
 }
 
+static DRIVER_INIT( nfb96sea )
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for (i = 0;i < 0x10000;i++)
+	{
+		UINT8 x = ROM[i];
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x80, 1,6,7,4,5,2,3,0); break;	
+			case 1: x = BITSWAP8(x^0xa0, 5,6,3,4,1,2,7,0); break;
+			case 2: x = BITSWAP8(x^0x02, 5,6,3,4,1,2,7,0); break;
+			case 3: x = BITSWAP8(x^0xa0, 3,6,1,4,7,2,5,0); break;
+			case 4: x = BITSWAP8(x^0x82, 3,6,1,4,7,2,5,0); break;
+			case 5: x = BITSWAP8(x^0x02, 1,6,7,4,5,2,3,0); break;
+			case 6: x = BITSWAP8(x^0x08, 3,6,1,4,7,2,5,0); break;
+			case 7: x = BITSWAP8(x^0x80, 5,6,3,4,1,2,7,0); break;
+		}
+		
+		ROM[i] = x;
+	}
+}	
 
 /*********************************************
 *                Game Drivers                *
@@ -5102,7 +5140,7 @@ GAME( 1996, csel96,   0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",    
 // these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program rom
 // some sets are messy and appear to have mismatched graphic roms, they needed to be sorted out properly
 GAME( 1996, nfb96se,     nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "New Fruit Bonus '96 Special Edition (bootleg, set 1)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1996, nfb96sea,    nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "New Fruit Bonus '96 Special Edition (bootleg, set 2)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING ) // encrypted program
+GAME( 1996, nfb96sea,    nfb96,     cm,     cmv4,   nfb96sea, ROT0, "bootleg",             "New Fruit Bonus '96 Special Edition (bootleg, set 2)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING ) // encrypted program
 GAME( 1996, nfb96seb,    nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "New Fruit Bonus '96 Special Edition (bootleg, set 3)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 2002, carb2002,    nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "Carriage Bonus 2002 (bootleg)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 2003, carb2003,    nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "Carriage Bonus 2003 (bootleg)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
