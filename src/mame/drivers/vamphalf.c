@@ -8,15 +8,16 @@
  Games Supported:
 
 
-    Minigame Cool Collection  (c) 1999 SemiCom
-    Lup Lup Puzzle            (c) 1999 Omega System       (version 3.0 and 2.9)
-    Puzzle Bang Bang          (c) 1999 Omega System       (version 2.8)
-    Super Lup Lup Puzzle      (c) 1999 Omega System       (version 4.0)
-    Vamp 1/2                  (c) 1999 Danbi & F2 System  (Korea version)
-    Date Quiz Go Go Episode 2 (c) 2000 SemiCom
-    Mission Craft             (c) 2000 Sun                (version 2.4)
-    Final Godori              (c) 2001 SemiCom            (version 2.20.5915)
-    Wyvern Wings              (c) 2001 SemiCom
+    Minigame Cool Collection   (c) 1999 SemiCom
+    Lup Lup Puzzle             (c) 1999 Omega System       (version 3.0 and 2.9)
+    Puzzle Bang Bang           (c) 1999 Omega System       (version 2.8)
+    Super Lup Lup Puzzle       (c) 1999 Omega System       (version 4.0)
+    Vamp 1/2                   (c) 1999 Danbi & F2 System  (Korea version)
+    Date Quiz Go Go Episode 2  (c) 2000 SemiCom
+    Mission Craft              (c) 2000 Sun                (version 2.4)
+    Final Godori               (c) 2001 SemiCom            (version 2.20.5915)
+    Wyvern Wings               (c) 2001 SemiCom
+	Age Of Heroes - Silkroad 2 (c) 2001 Unico			   (v0.63 - 2001/02/07)
 
  Real games bugs:
  - dquizgo2: bugged video test
@@ -65,6 +66,17 @@ static WRITE32_HANDLER( oki32_w )
 {
 	okim6295_data_0_w(space, 0, (data >> 8) & 0xff);
 }
+
+static READ32_HANDLER( oki32_2_r )
+{
+	return okim6295_status_1_r(space, 0) << 8;
+}
+
+static WRITE32_HANDLER( oki32_2_w )
+{
+	okim6295_data_1_w(space, 0, (data >> 8) & 0xff);
+}
+
 
 static READ16_HANDLER( ym2151_status_r )
 {
@@ -236,6 +248,11 @@ static WRITE32_HANDLER( finalgdr_prize_w )
 	}
 }
 
+static WRITE32_HANDLER( aoh_oki_2_bank_w )
+{
+	okim6295_set_bank_base(1, 0x40000 * (data & 0x3));
+}
+
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&wram)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(&tiles)
@@ -318,6 +335,25 @@ static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x60a0, 0x60a3) AM_WRITE(finalgdr_oki_bank_w)
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( aoh_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&wram32)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(&tiles32)
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x80210000, 0x80210003) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x80220000, 0x80220003) AM_READ_PORT("P1_P2")
+	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( aoh_io, ADDRESS_SPACE_IO, 32 )
+	AM_RANGE(0x0480, 0x0483) AM_WRITE(eeprom32_w)
+	AM_RANGE(0x0620, 0x0623) AM_READWRITE(oki32_2_r, oki32_2_w)
+	AM_RANGE(0x0660, 0x0663) AM_READWRITE(oki32_r, oki32_w)
+	AM_RANGE(0x0640, 0x0643) AM_WRITE(ym2151_register32_w)
+	AM_RANGE(0x0644, 0x0647) AM_READWRITE(ym2151_status32_r, ym2151_data32_w)
+	AM_RANGE(0x0680, 0x0683) AM_WRITE(aoh_oki_2_bank_w)
+ADDRESS_MAP_END
+
 /*
 Sprite list:
 
@@ -338,7 +374,6 @@ or
 Offset+3
 -------x xxxxxxxx X offs
 */
-
 static void draw_sprites(const device_config *screen, bitmap_t *bitmap)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -413,11 +448,71 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap)
 	}
 }
 
+static void draw_sprites_aoh(const device_config *screen, bitmap_t *bitmap)
+{
+	const gfx_element *gfx = screen->machine->gfx[0];
+	UINT32 cnt;
+	int block, offs;
+	int code,color,x,y,fx,fy;
+	rectangle clip;
+
+	clip.min_x = video_screen_get_visible_area(screen)->min_x;
+	clip.max_x = video_screen_get_visible_area(screen)->max_x;
+
+	for (block=0; block<0x8000; block+=0x800)
+	{
+		if(flipscreen)
+		{
+			clip.min_y = 256 - (16-(block/0x800))*16;
+			clip.max_y = 256 - ((16-(block/0x800))*16)+15;
+		}
+		else
+		{
+			clip.min_y = (16-(block/0x800))*16;
+			clip.max_y = ((16-(block/0x800))*16)+15;
+		}
+
+		for (cnt=0; cnt<0x800; cnt+=8)
+		{
+			offs = (block + cnt) / 2;
+			{
+				offs /= 2;
+				code  = (tiles32[offs] & 0xffff) | ((tiles32[offs] & 0x3000000) >> 8);
+				color = ((tiles32[offs+1] >> palshift) & 0x7f0000) >> 16;
+
+				x = tiles32[offs+1] & 0x01ff;
+				y = 256 - ((tiles32[offs] & 0x00ff0000) >> 16);
+
+				fx = tiles32[offs] & 0x4000000;
+				fy = 0; // not used ? or it's tiles32[offs] & 0x8000000?
+			}
+
+			if(flipscreen)
+			{
+				fx = !fx;
+				fy = !fy;
+
+				x = 366 - x;
+				y = 256 - y;
+			}
+
+			drawgfx(bitmap,gfx,code,color,fx,fy,x,y,&clip,TRANSPARENCY_PEN,0);
+		}
+	}
+}
+
 
 static VIDEO_UPDATE( common )
 {
 	bitmap_fill(bitmap,cliprect,0);
 	draw_sprites(screen, bitmap);
+	return 0;
+}
+
+static VIDEO_UPDATE( aoh )
+{
+	bitmap_fill(bitmap,cliprect,0);
+	draw_sprites_aoh(screen, bitmap);
 	return 0;
 }
 
@@ -483,6 +578,47 @@ static INPUT_PORTS_START( finalgdr )
 	PORT_SERVICE_NO_TOGGLE( 0x00800000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( aoh )
+	PORT_START("P1_P2")
+	PORT_BIT( 0x000000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x000000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x000000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x000000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x000000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x000000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x000000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) // eeprom bit
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x00100000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static const gfx_layout sprites_layout =
 {
@@ -658,6 +794,46 @@ static MACHINE_DRIVER_START( finalgdr )
 	MDRV_NVRAM_HANDLER(finalgdr)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( aoh )
+	MDRV_CPU_ADD("main", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MDRV_CPU_PROGRAM_MAP(aoh_map,0)
+	MDRV_CPU_IO_MAP(aoh_io,0)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+
+	MDRV_NVRAM_HANDLER(93C46)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(59.185)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(512, 512)
+	MDRV_SCREEN_VISIBLE_AREA(64, 511-64, 16, 255-16)
+
+	MDRV_PALETTE_LENGTH(0x8000)
+	MDRV_GFXDECODE(vamphalf)
+	
+	MDRV_VIDEO_UPDATE(aoh)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("ym", YM2151, 3579545)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+
+	MDRV_SOUND_ADD("oki_1", OKIM6295, 32000000/8)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	
+	MDRV_SOUND_ADD("oki_2", OKIM6295, 32000000/32)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
 /*
@@ -1151,6 +1327,86 @@ ROM_START( dquizgo2 )
 	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(24d5b55f) SHA1(cb4d3a22440831e37df0a7fe5433bea708d60f31) )
 ROM_END
 
+/*
+Age Of Heroes - Silkroad 2
+Unico, 2001
+
+PCB Layout
+----------
+
+|----------------------------------------|
+|UPC1241H  BA4558     32MHz         G05  |
+|TL084  YM3012  ROM3   |--------|   G06  |
+|VOL ULN2003  M6295(1) |A40MX04 |   G07  |
+|       YM2151  ROM4   |PL84    |   G08  |
+|     93C46   M6295(2) |        |        |
+|J  3.579545MHz 62256  |--------|        |
+|A     HY18CV8  62256               G09  |
+|M     GAL22V10           EPM7128   G10  |
+|M      |--------|20MHz             G11  |
+|A      |        |                  G12  |
+|       |E1-32XN |                       |
+|RESET  |        | 62256            62256|
+|TEST   |--------| 62256            62256|
+|ROM1    HY5118164                  62256|
+|ROM2    HY5118164                  62256|
+|----------------------------------------|
+Notes:
+      E1-32XN  - Hyperstone CPU, clock input 20.000MHz (QFP160)
+      A40MX04  - Actel A40MX04-F FPGA (PLCC84)
+      EPM7128  - Altera MAX EPM7128TC100 CPLD (TQFP100)
+      YM2151   - clock 3.579545MHz (DIP24)
+      M6295(1) - clock 4.000MHz [32/8] pin 7 HIGH (QFP44)
+      M6295(2) - clock 1.000MHz [32/32] pin 7 HIGH (QFP44)
+      YM3012   - clock 1.7897725MHz [3.579545/2] (DIP16)
+      TL084    - Texas Instruments TL084 Quad JFET-Input General-Purpose Operational Amplifier (DIP8)
+      BA4558   - Rohm BA4558 Dual Operational Amplifier (DIP8)
+      93C46    - 128 bytes x8 EEPROM (DIP8)
+      HY5118164- Hynix 1M x16 EDO DRAM (SOJ42)
+      62256    - 32k x8 SRAM (DIP28)
+      ROM1/2   - Main program ROMs, type MX29F1610MC-12 (SOP44)
+      ROM3/4   - M6295 Sound Data ROMs, ROM3 = 27C020, ROM4 = 27C040 (both DIP32)
+      G05-G12  - GFX Data ROMs, type Intel E28F640J3A120 64M x8 FlashROM (TSOP56)
+      VSync    - 59.185Hz   \
+      HSync    - 15.625kHz / via EL4583 & TTi PFM1300
+*/
+
+ROM_START( aoh )
+	ROM_REGION32_BE( 0x400000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD16_WORD_SWAP( "rom1", 0x000000, 0x200000, CRC(2e55ff55) SHA1(b2b7605b87ee609dfbc7c21dfae0ef8d847019f0) )
+	ROM_LOAD16_WORD_SWAP( "rom2", 0x200000, 0x200000, CRC(50f8a409) SHA1(a8171b7cf59dd01de1e512ab21607b4f330f40b8) )
+
+	ROM_REGION( 0x4000000, "gfx1", ROMREGION_DISPOSE ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "g05", 0x0000002, 0x800000, CRC(64c8f493) SHA1(d487a74c813abbd0a612f8346eed8a7c3ff3e84e) )
+	ROM_LOAD32_WORD( "g09", 0x0000000, 0x800000, CRC(c359febb) SHA1(7955385748e24dd076bc4f954b193a53c0a729c5) )
+	ROM_LOAD32_WORD( "g06", 0x1000002, 0x800000, CRC(ffbc9fe5) SHA1(5e0e5cfdf6af23db0733c9fedee9c5f9ccde1109) )
+	ROM_LOAD32_WORD( "g10", 0x1000000, 0x800000, CRC(08217573) SHA1(10cecdfc3a1ef835a62325b023d3bca8d0aea67d) )
+	ROM_LOAD32_WORD( "g07", 0x2000002, 0x800000, CRC(5cb3c86a) SHA1(2e89f467c1a220f2510977677215e040295c3dd0) )
+	ROM_LOAD32_WORD( "g11", 0x2000000, 0x800000, CRC(5f0461b8) SHA1(a0ac37d9a357e69367b8fee68bc358bfea5ecca0) )
+	ROM_LOAD32_WORD( "g08", 0x3000002, 0x800000, CRC(1fd08aa0) SHA1(376a91220cd6e63418b04d590b232bb1079a40c7) )
+	ROM_LOAD32_WORD( "g12", 0x3000000, 0x800000, CRC(e437b35f) SHA1(411d2926d619fba057476864f0e580f608830522) )
+	
+	ROM_REGION( 0x40000, "oki_1", 0 ) /* Oki Samples */
+	ROM_LOAD( "rom3", 0x00000, 0x40000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
+	
+	ROM_REGION( 0x80000, "user2", 0 ) /* Oki Samples */
+	ROM_LOAD( "rom4", 0x00000, 0x80000, CRC(bba47755) SHA1(e6eeb5f64eaa88a74536119b731a76921e79f8ff) )
+	
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0x100000, "oki_2", 0 ) /* Samples */
+	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
+	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
+	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
+ROM_END
+
+
+
 static int irq_active(const address_space *space)
 {
 	UINT32 FCR = cpu_get_reg(space->cpu, 27);
@@ -1303,6 +1559,19 @@ static READ16_HANDLER( dquizgo2_speedup_r )
 	return wram[(0xcde70/2)+offset];
 }
 
+static READ32_HANDLER( aoh_speedup_r )
+{
+	if(cpu_get_pc(space->cpu) == 0xb994 )
+	{
+		if(irq_active(space))
+			cpu_spinuntil_int(space->cpu);
+		else
+			cpu_eat_cycles(space->cpu, 50);
+	}
+
+	return wram32[0x28a09c/4];
+}
+
 static DRIVER_INIT( vamphalf )
 {
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0004a840, 0x0004a843, 0, 0, vamphalf_speedup_r );
@@ -1398,6 +1667,14 @@ static DRIVER_INIT( dquizgo2 )
 	flip_bit = 1;
 }
 
+static DRIVER_INIT( aoh )
+{
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x028a09c, 0x028a09f, 0, 0, aoh_speedup_r );
+
+	palshift = 0;
+	/* no flipscreen */
+}
+
 GAME( 1999, coolmini, 0,        coolmini, common,   coolmini, ROT0,   "SemiCom",           "Cool Minigame Collection", 0 )
 GAME( 1999, suplup,   0,        suplup,   common,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0)
 GAME( 1999, luplup,   suplup,   suplup,   common,   luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
@@ -1409,3 +1686,4 @@ GAME( 2000, dquizgo2, 0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",
 GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )
+GAME( 2001, aoh,      0, 		aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )

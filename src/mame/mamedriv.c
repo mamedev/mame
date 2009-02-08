@@ -7326,6 +7326,7 @@ Other Sun games
 	DRIVER( zeropnta )	/* (c) 1998 */
 	DRIVER( zeropnt2 )	/* (c) 1999 */
 	DRIVER( silkroad )	/* (c) 1999 */
+	DRIVER( aoh )		/* (c) 2001 */
 
 	/* Afega games */
 	DRIVER( twinactn )	/* (c) 1996 - bootleg of US AFF Mustang */
