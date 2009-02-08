@@ -336,9 +336,7 @@ ROM_END
 
 static DRIVER_INIT( feversoc )
 {
-//	seibuspi_text_decrypt(memory_region(machine, "gfx1"));
-//	seibuspi_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
-	seibuspi_rise11_sprite_decrypt(memory_region(machine, "gfx1"), 0x200000); //WRONG!
+	seibuspi_rise11_sprite_decrypt_feversoc(memory_region(machine, "gfx1"), 0x200000);
 }
 
 GAME( 2000, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu", "Fever Soccer", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

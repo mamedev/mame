@@ -303,10 +303,31 @@ cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00000300
         plane543 = partial_carry_sum24( plane543, 0x01cb64, 0x01aadd ) ^ 0x016a4c;
         plane210 = partial_carry_sum24( plane210,        i, 0xd6375b ) ^ 0x8bf23b;
 
+feversoc
+
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = D5A90000 & FFFF0000
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 4EB50000 & FFFF0000
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 9A4A0000 & FFFF0000
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = ADB30000 & FFFF0000
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = E9320000 & FFFF0000 //
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 9DF50000 & FFFF0000
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 99E90000 & FFFF0000 //
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = B2590000 & FFFF0000
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 961D0000 & FFFF0000 //
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 8B970000 & FFFF0000 //
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = EAAE0000 & FFFF0000
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = D5AC0000 & FFFF0000 //
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 03000000 & FFFF0000
+
+        plane543 = partial_carry_sum24( plane543, 0x18f5b2, 0x18e999 ) ^ 0x3032e9;
+        plane210 = partial_carry_sum24( plane210,        i, 0x968bd5 ) ^ 0x1d97ac;
+        plane210 = partial_carry_sum24( plane210,        1, 0x000001 );
+
 ******************************************************************************************/
 
 
-void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size)
+void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size,
+	UINT32 k1, UINT32 k2, UINT32 k3, UINT32 k4, UINT32 k5, int feversoc_kludge)
 {
 	int i;
 
@@ -369,8 +390,10 @@ void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size)
 					(BIT(b1, 5)<<22) |
 					(BIT(b3,15)<<23);
 
-		plane543 = partial_carry_sum24( plane543, 0x01cb64, 0x01aadd ) ^ 0x016a4c;
-		plane210 = partial_carry_sum24( plane210,        i, 0xd6375b ) ^ 0x8bf23b;
+		plane543 = partial_carry_sum24( plane543, k1, k2 ) ^ k3;
+		plane210 = partial_carry_sum24( plane210,  i, k4 ) ^ k5;
+		if (feversoc_kludge)
+			plane210 = partial_carry_sum24( plane210,  1, 0x000001 );
 
 		rom[0*size+2*i]   = plane543 >> 16;
 		rom[0*size+2*i+1] = plane543 >>  8;
@@ -386,4 +409,16 @@ void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size)
 		sprite_reorder(&rom[1*size+2*i]);
 		sprite_reorder(&rom[2*size+2*i]);
 	}
+}
+
+
+void seibuspi_rise11_sprite_decrypt_rfjet(UINT8 *rom, int size)
+{
+	seibuspi_rise11_sprite_decrypt(rom, size, 0x01cb64, 0x01aadd, 0x016a4c, 0xd6375b, 0x8bf23b, 0);
+}
+
+
+void seibuspi_rise11_sprite_decrypt_feversoc(UINT8 *rom, int size)
+{
+	seibuspi_rise11_sprite_decrypt(rom, size, 0x18f5b2, 0x18e999, 0x3032e9, 0x968bd5, 0x1d97ac, 1);
 }

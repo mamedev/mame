@@ -2037,7 +2037,7 @@ static DRIVER_INIT( rfjet )
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
 	seibuspi_rise11_text_decrypt(memory_region(machine, "gfx1"));
 	seibuspi_rise11_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
-	seibuspi_rise11_sprite_decrypt(memory_region(machine, "gfx3"), 0x800000);
+	seibuspi_rise11_sprite_decrypt_rfjet(memory_region(machine, "gfx3"), 0x800000);
 
 	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
