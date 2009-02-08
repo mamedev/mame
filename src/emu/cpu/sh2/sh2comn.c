@@ -275,7 +275,7 @@ static void sh2_dmac_check(SH2 *sh2, int dma)
 	{
 		if(sh2->dma_timer_active[dma])
 		{
-			logerror("SH2: DMA %d cancelled in-flight", dma);
+			logerror("SH2: DMA %d cancelled in-flight\n", dma);
 			timer_adjust_oneshot(sh2->dma_timer[dma], attotime_never, 0);
 			sh2->dma_timer_active[dma] = 0;
 		}
