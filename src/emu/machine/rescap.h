@@ -13,5 +13,8 @@
 
 #define RES_2_PARALLEL(r1, r2)			(((r1) * (r2)) / ((r1) + (r2)))
 #define RES_3_PARALLEL(r1, r2, r3)		(1.0 / (1.0 / (r1) + 1.0 / (r2) + 1.0 / (r3)))
+#define RES_4_PARALLEL(r1, r2, r3, r4)  (1.0 / (1.0 / (r1) + 1.0 / (r2) + 1.0 / (r3) + 1.0 / (r4)))
+
+#define RES_2_SERIAL(r1,r2)			    ((r1)+(r2))
 
 #endif
