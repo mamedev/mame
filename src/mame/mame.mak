@@ -1248,6 +1248,7 @@ $(MAMEOBJ)/seibu.a: \
 	$(DRIVERS)/legionna.o $(VIDEO)/legionna.o \
 	$(MACHINE)/seicop.o \
 	$(DRIVERS)/toki.o $(VIDEO)/toki.o \
+	$(DRIVERS)/feversoc.o \
 
 $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/aleck64.o $(MACHINE)/n64.o $(VIDEO)/n64.o \

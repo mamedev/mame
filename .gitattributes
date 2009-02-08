@@ -1481,6 +1481,7 @@ src/mame/drivers/fastfred.c svneol=native#text/plain
 src/mame/drivers/fastlane.c svneol=native#text/plain
 src/mame/drivers/fcombat.c svneol=native#text/plain
 src/mame/drivers/fcrash.c svneol=native#text/plain
+src/mame/drivers/feversoc.c svneol=native#text/plain
 src/mame/drivers/fgoal.c svneol=native#text/plain
 src/mame/drivers/finalizr.c svneol=native#text/plain
 src/mame/drivers/findout.c svneol=native#text/plain

@@ -6483,7 +6483,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Newer V33 PCB with COP3 protection */
 	DRIVER( r2dx_v33 )	/* (c) 1996 Seibu Kaihatsu */
 
-
 	/* Seibu SPI System games */
 
 	DRIVER( senkyu )	/* (c) 1995 Seibu Kaihatsu */
@@ -6523,6 +6522,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rfjeta )	/* (c) 1998 Seibu Kaihatsu (Dream Island license) */
 	DRIVER( rfjetj )	/* (c) 1998 Seibu Kaihatsu */
 	DRIVER( rfjetus )	/* (c) 1998 Seibu Kaihatsu (Fabtek license) */
+
+	/* Seibu System SH2B games */
+	DRIVER( feversoc )  /* (c) 2000 */
 
 	/* Tad games (Tad games run on Seibu hardware) */
 	DRIVER( cabal )		/* (c) 1988 Tad + Fabtek license */
@@ -8650,7 +8652,7 @@ Other Sun games
 	/* Drivers below are pinball machines
 	   There is currently no way of fully supporting these in MAME
 	*/
-	
+
 	DRIVER( sshtl_l7 )
 	DRIVER( sorcr_l1 )
 	DRIVER( sorcr_l2 )
@@ -8726,6 +8728,6 @@ Other Sun games
 	DRIVER( rvrbt_l3 )
 	DRIVER( bbnny_l2 )
 	DRIVER( bbnny_lu )
-	
-	
+
+
 #endif	/* DRIVER_RECURSIVE */
