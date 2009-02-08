@@ -62,6 +62,8 @@ U0564 LH28F800SU OBJ4-1
 #include "includes/seibuspi.h"
 #include "sound/okim6295.h"
 
+#define MASTER_CLOCK XTAL_28_63636MHz
+
 VIDEO_START( feversoc )
 {
 
@@ -76,7 +78,7 @@ VIDEO_UPDATE( feversoc )
 	/*TODO: priorities, h/w and other bits*/
 	for(offs=0;offs<(0x2000/4);offs+=2)
 	{
-		spr_offs = (spriteram32[offs+0] & 0x7fff);
+		spr_offs = (spriteram32[offs+0] & 0x3fff);
 		if(spr_offs == 0)
 			continue;
 		sy = (spriteram32[offs+1] & 0x01ff);
@@ -87,7 +89,7 @@ VIDEO_UPDATE( feversoc )
 
 		for(dy=0;dy<h;dy++)
 			for(dx=0;dx<w;dx++)
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs,colour,0,0,(sx+dx*16),(sy+dy*16),cliprect,TRANSPARENCY_NONE,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),cliprect,TRANSPARENCY_NONE,0);
 	}
 
 	return 0;
@@ -286,7 +288,7 @@ static INTERRUPT_GEN( feversoc_irq )
 static MACHINE_DRIVER_START( feversoc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",SH2,28000000)
+	MDRV_CPU_ADD("main",SH2,MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(feversoc_map,0)
 	MDRV_CPU_VBLANK_INT("main",feversoc_irq)
 
@@ -305,7 +307,7 @@ static MACHINE_DRIVER_START( feversoc )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
