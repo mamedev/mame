@@ -4,11 +4,12 @@ Fever Soccer (c) 2000 Seibu
 
 A down-grade of the Seibu SPI Hardware with SH-2 as main cpu.
 
-preliminary driver by Angelo Salese
+driver by Angelo Salese & Nicola Salmoria
 
 TODO:
-- Decrypt the gfx roms, uses RISE11 encryption with different key;
-- Fix eeprom, sound banking and other minor stuff;
+- Correct color bitplanes;
+- Add eeprom emulation;
+- Real Time Clock emulation (uses a JRC 6355E / NJU6355E)
 
 ============================================================================
 
@@ -75,8 +76,7 @@ VIDEO_UPDATE( feversoc )
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]); //black pen
 
-	/*TODO: priorities, h/w and other bits*/
-	for(offs=0;offs<(0x2000/4);offs+=2)
+	for(offs=(0x2000/4)-2;offs>-1;offs-=2)
 	{
 		spr_offs = (spriteram32[offs+0] & 0x3fff);
 		if(spr_offs == 0)
@@ -84,12 +84,15 @@ VIDEO_UPDATE( feversoc )
 		sy = (spriteram32[offs+1] & 0x01ff);
 		sx = (spriteram32[offs+1] & 0x01ff0000)>>16;
 		colour = (spriteram32[offs+0] & 0x003f0000)>>16;
-		h = ((spriteram32[offs+0] & 0x07000000)>>24)+1;
-		w = ((spriteram32[offs+0] & 0x70000000)>>28)+1;
+		w = ((spriteram32[offs+0] & 0x07000000)>>24)+1;
+		h = ((spriteram32[offs+0] & 0x70000000)>>28)+1;
 
-		for(dy=0;dy<h;dy++)
-			for(dx=0;dx<w;dx++)
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),cliprect,TRANSPARENCY_NONE,0);
+		if( sy & 0x100)
+			sy-=0x200;
+
+		for(dx=0;dx<w;dx++)
+			for(dy=0;dy<h;dy++)
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),cliprect,TRANSPARENCY_PEN,0x1f);
 	}
 
 	return 0;
@@ -125,15 +128,20 @@ static WRITE32_HANDLER( output_w )
 {
 	if(ACCESSING_BITS_16_31)
 	{
-		/* lockout/coin counter and probably eeprom/lamp stuff.*/
-		//...
-		//printf("%04x 0\n",data>>16);
+		/* probably eeprom stuff too */
+		coin_lockout_w(0,~data>>16 & 0x40);
+		coin_lockout_w(1,~data>>16 & 0x40);
+		coin_counter_w(0,data>>16 & 1);
+		//data>>16 & 2 coin out
+		coin_counter_w(1,data>>16 & 4);
+		//data>>16 & 8 coin hopper
+		okim6295_set_bank_base(0, 0x40000 * (((data>>16) & 0x20)>>5));
 	}
 	if(ACCESSING_BITS_0_15)
 	{
-		/* ? */
-		//...
-		//printf("%04x 1\n",data);
+		/* -xxx xxxx lamps*/
+		coin_counter_w(2,data & 0x2000); //key in
+		//data & 0x4000 key out
 	}
 }
 
@@ -142,19 +150,19 @@ static ADDRESS_MAP_START( feversoc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM //work ram
 	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE(&spriteram32)
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
-	AM_RANGE(0x0600000c, 0x0600000f) AM_READWRITE16(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w,0xffff0000)
+	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
+	AM_RANGE(0x0600000c, 0x0600000f) AM_READWRITE16(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w,0xffff0000)
 //	AM_RANGE(0x06010000, 0x06017fff) AM_RAM //contains RISE11 keys and other related stuff.
 	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_BASE(&paletteram32)
 ADDRESS_MAP_END
-
 
 static const gfx_layout spi_spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,3),
 	6,
-	{ 0,8, RGN_FRAC(1,3)+0,RGN_FRAC(1,3)+8,RGN_FRAC(2,3)+0,RGN_FRAC(2,3)+8  },
+	{ RGN_FRAC(0,3)+0,RGN_FRAC(0,3)+8,RGN_FRAC(1,3)+0,RGN_FRAC(1,3)+8,RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0  },
 	{
 		7,6,5,4,3,2,1,0,23,22,21,20,19,18,17,16
 	},
@@ -171,117 +179,56 @@ GFXDECODE_END
 
 static INPUT_PORTS_START( feversoc )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) //hopper i/o
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 //	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) //vblank/eeprom read bit?
 //	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 //	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "SYSTEM" )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED ) //PORT_NAME("Slottle") PORT_CODE(KEYCODE_Z)
+	PORT_DIPNAME( 0x0100, 0x0100, "DIP 1-1" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "DIP 1-2"  )
 	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "DIP 1-3"  )
 	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "DIP 1-4"  )
 	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "DIP 1-5"  )
 	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "DIP 1-6"  )
 	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "DIP 1-7"  )
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "DIP 1-8" )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "SYSTEM" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INTERRUPT_GEN( feversoc_irq )
 {
-/*	static UINT16 x;
-
-	if(input_code_pressed(KEYCODE_H))
-		x++;
-
-	if(input_code_pressed(KEYCODE_J))
-		x--;
-
-	popmessage("%d",x);
-*/
 	cpu_set_input_line(device->machine->cpu[0], 8, HOLD_LINE );
 }
 
@@ -296,9 +243,9 @@ static MACHINE_DRIVER_START( feversoc )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
 	MDRV_GFXDECODE(feversoc)
 	MDRV_PALETTE_LENGTH(0x1000)
 
@@ -307,8 +254,8 @@ static MACHINE_DRIVER_START( feversoc )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000) //pin 7 & frequency not verified (clock should be 28,6363 / n)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ADD("oki", OKIM6295, MASTER_CLOCK/16) //pin 7 & frequency not verified (clock should be 28,6363 / n)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -317,8 +264,6 @@ MACHINE_DRIVER_END
   Game driver(s)
 
 ***************************************************************************/
-
-#define ROM_LOAD24_BYTE(name,offset,length,hash)		ROMX_LOAD(name, offset, length, hash, ROM_SKIP(2))
 
 ROM_START( feversoc )
 	ROM_REGION32_BE( 0x40000, "main", 0 )
@@ -339,4 +284,4 @@ static DRIVER_INIT( feversoc )
 	seibuspi_rise11_sprite_decrypt_feversoc(memory_region(machine, "gfx1"), 0x200000);
 }
 
-GAME( 2000, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu", "Fever Soccer", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 2004, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu", "Fever Soccer", GAME_IMPERFECT_COLORS )
