@@ -278,44 +278,91 @@ static void update_mpu68_interrupts(running_machine *machine)
 /* Communications with 6809 board */
 /* Clock values are currently unknown, and are derived from the 68k board.*/
 
-static void m6809_acia_irq(const device_config *device, int state)
+static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
+{
+	return m68k_m6809_line;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
+{
+	m6809_m68k_line = state;
+}
+
+static READ_LINE_DEVICE_HANDLER( m6809_acia_cts_r )
+{
+	return m6809_acia_cts;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m6809_acia_rts_w )
+{
+	m6809_acia_rts = state;
+}
+
+static READ_LINE_DEVICE_HANDLER( m6809_acia_dcd_r )
+{
+	return m6809_acia_dcd;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m6809_acia_irq )
 {
 	m68k_acia_cts = state;
 	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
+static ACIA6850_INTERFACE( m6809_acia_if )
+{
+	0,
+	0,
+	DEVCB_LINE(m6809_acia_rx_r),/*&m68k_m6809_line,*/
+	DEVCB_LINE(m6809_acia_tx_w),/*&m6809_m68k_line,*/
+	DEVCB_LINE(m6809_acia_cts_r),/*&m6809_acia_cts,*/
+	DEVCB_LINE(m6809_acia_rts_w),/*&m6809_acia_rts,*/
+	DEVCB_LINE(m6809_acia_dcd_r),/*&m6809_acia_dcd,*/
+	DEVCB_LINE(m6809_acia_irq)
+};
 
-static void m68k_acia_irq(const device_config *device, int state)
+static READ_LINE_DEVICE_HANDLER( m68k_acia_rx_r )
+{
+	return m6809_m68k_line;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m68k_acia_tx_w )
+{
+	m68k_m6809_line = state;
+}
+
+static READ_LINE_DEVICE_HANDLER( m68k_acia_cts_r )
+{
+	return m68k_acia_cts;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m68k_acia_rts_w )
+{
+	m6809_acia_dcd = state;
+}
+
+static READ_LINE_DEVICE_HANDLER( m68k_acia_dcd_r )
+{
+	return m6809_acia_rts;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m68k_acia_irq )
 {
 	m6809_acia_cts = state;
 	m6850_irq_state = state;
 	update_mpu68_interrupts(device->machine);
 }
 
-
-static const acia6850_interface m6809_acia_if =
+static ACIA6850_INTERFACE( m68k_acia_if )
 {
 	0,
 	0,
-	&m68k_m6809_line,
-	&m6809_m68k_line,
-	&m6809_acia_cts,
-	&m6809_acia_rts,
-	&m6809_acia_dcd,
-	m6809_acia_irq
-};
-
-
-static const acia6850_interface m68k_acia_if =
-{
-	0,
-	0,
-	&m6809_m68k_line,
-	&m68k_m6809_line,
-	&m68k_acia_cts,
-	&m6809_acia_dcd,
-	&m6809_acia_rts,
-	m68k_acia_irq
+	DEVCB_LINE(m68k_acia_rx_r),/*&m6809_m68k_line,*/
+	DEVCB_LINE(m68k_acia_tx_w),/*&m68k_m6809_line,*/
+	DEVCB_LINE(m68k_acia_cts_r),/*&m68k_acia_cts,*/
+	DEVCB_LINE(m68k_acia_rts_w),/*&m6809_acia_dcd,*/
+	DEVCB_LINE(m68k_acia_dcd_r),/*&m6809_acia_rts,*/
+	DEVCB_LINE(m68k_acia_irq)
 };
 
 
@@ -334,10 +381,10 @@ static WRITE8_HANDLER( vid_o1_callback )
 	{
 		const device_config *acia_0 = device_list_find_by_tag(space->machine->config->devicelist, ACIA6850, "acia6850_0");
 		const device_config *acia_1 = device_list_find_by_tag(space->machine->config->devicelist, ACIA6850, "acia6850_1");
-		acia_tx_clock_in(acia_0);
-		acia_rx_clock_in(acia_0);
-		acia_tx_clock_in(acia_1);
-		acia_rx_clock_in(acia_1);
+		acia6850_tx_clock_in(acia_0);
+		acia6850_rx_clock_in(acia_0);
+		acia6850_tx_clock_in(acia_1);
+		acia6850_rx_clock_in(acia_1);
 	}
 }
 
@@ -1418,8 +1465,8 @@ static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
 
 	/* comms with the MPU4 */
-    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_stat_lsb_r, acia6850_ctrl_lsb_w)
-    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_data_lsb_r, acia6850_data_lsb_w)
+    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
+    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
 
 	AM_RANGE(0xff9000, 0xff900f) AM_READWRITE(ptm6840_1_lsb_r,ptm6840_1_lsb_w)	/* 6840PTM */
 
@@ -1474,8 +1521,8 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0xe05000, 0xe05001) AM_READWRITE(adpcm_r, adpcm_w) */
 
 	/* comms with the MPU4 */
-    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_stat_lsb_r, acia6850_ctrl_lsb_w)
-    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_data_lsb_r, acia6850_data_lsb_w)
+    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
+    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
 
 	AM_RANGE(0xff9000, 0xff900f) AM_READ(  ptm6840_1_lsb_r)
 	AM_RANGE(0xff9000, 0xff900f) AM_WRITE( ptm6840_1_lsb_w)

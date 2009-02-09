@@ -651,15 +651,13 @@ static READ8_HANDLER( dipsw_1_r )
 	return input_port_read(space->machine, "SW1");
 }
 
-static void tx_rx_clk (const device_config *device, int dsw2)
+static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 {
 	int trx_clk;
-	dsw2 = input_port_read(device->machine, "SW2");
+	UINT8 dsw2 = input_port_read(device->machine, "SW2");
 	trx_clk = UART_CLOCK * dsw2 / 128;
 	acia6850_set_rx_clock(device, trx_clk);
 	acia6850_set_tx_clock(device, trx_clk);
-
-	return;
 }
 
 static READ8_HANDLER( dipsw_3_r )
@@ -1846,16 +1844,26 @@ static const pia6821_interface sys905_pia1_intf =
 *    ACIA Interface    *
 ***********************/
 
-static const acia6850_interface acia6850_intf =
+static READ_LINE_DEVICE_HANDLER( acia_rx_r )
+{
+	return rx_line;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( acia_tx_w )
+{
+	tx_line = state;
+}
+
+static ACIA6850_INTERFACE( acia6850_intf )
 {
 	UART_CLOCK,
 	UART_CLOCK,
-	&rx_line,
-	&tx_line,
-	NULL,
-	NULL,
-	NULL,
-	tx_rx_clk
+	DEVCB_LINE(acia_rx_r), /*&rx_line,*/
+	DEVCB_LINE(acia_tx_w), /*&tx_line,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(tx_rx_clk)
 };
 
 

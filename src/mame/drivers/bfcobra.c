@@ -1576,54 +1576,86 @@ static void init_ram(void)
 	memset(video_ram, 0, 0x20000);
 }
 
-static void z80_acia_irq(const device_config *device, int state)
+/*
+    What are the correct ACIA clocks ?
+*/
+
+static READ_LINE_DEVICE_HANDLER( z80_acia_rx_r )
+{
+	return m6809_z80_line;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( z80_acia_tx_w )
+{
+	z80_m6809_line = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( z80_acia_irq )
 {
 	acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
 	update_irqs(device->machine);
 }
 
-static void m6809_data_irq(const device_config *device, int state)
+static ACIA6850_INTERFACE( z80_acia_if )
+{
+	500000,
+	500000,
+	DEVCB_LINE(z80_acia_rx_r), /*&m6809_z80_line,*/
+	DEVCB_LINE(z80_acia_tx_w), /*&z80_m6809_line,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(z80_acia_irq)
+};
+
+static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
+{
+	return z80_m6809_line;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
+{
+	m6809_z80_line = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( m6809_data_irq )
 {
 	cpu_set_input_line(device->machine->cpu[1], M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-/*
-    What are the correct ACIA clocks ?
-*/
-static const acia6850_interface z80_acia_if =
+static ACIA6850_INTERFACE( m6809_acia_if )
 {
 	500000,
 	500000,
-	&m6809_z80_line,
-	&z80_m6809_line,
-	NULL,
-	NULL,
-	NULL,
-	z80_acia_irq
+	DEVCB_LINE(m6809_acia_rx_r),/*&z80_m6809_line,*/
+	DEVCB_LINE(m6809_acia_tx_w),/*&m6809_z80_line,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-static const acia6850_interface m6809_acia_if =
+static READ_LINE_DEVICE_HANDLER( data_acia_rx_r )
 {
-	500000,
-	500000,
-	&z80_m6809_line,
-	&m6809_z80_line,
-	NULL,
-	NULL,
-	NULL,
-	NULL
-};
+	return data_r;
+}
 
-static const acia6850_interface data_acia_if =
+static WRITE_LINE_DEVICE_HANDLER( data_acia_tx_w )
+{
+	 data_t = state;
+}
+
+
+static ACIA6850_INTERFACE( data_acia_if )
 {
 	500000,
 	500000,
-	&data_r,
-	&data_t,
-	NULL,
-	NULL,
-	NULL,
-	m6809_data_irq
+	DEVCB_LINE(data_acia_rx_r),/*data_r,*/
+	DEVCB_LINE(data_acia_tx_w),/*data_t,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(m6809_data_irq)
 };
 
 

@@ -9,6 +9,7 @@
 #ifndef __ACIA6850_H__
 #define __ACIA6850_H__
 
+#include "devcb.h"
 
 /***************************************************************************
     MACROS
@@ -32,7 +33,8 @@
 #define MDRV_ACIA6850_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, ACIA6850)
 
-
+#define ACIA6850_INTERFACE(_name) \
+	const acia6850_interface(_name) =
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -44,13 +46,14 @@ struct _acia6850_interface
 	int	tx_clock;
 	int	rx_clock;
 
-	UINT8 *rx_pin;
-	UINT8 *tx_pin;
-	UINT8 *cts_pin;
-	UINT8 *rts_pin;
-	UINT8 *dcd_pin;
+	devcb_read_line		in_rx_func;
+	devcb_write_line	out_tx_func;
 
-	void (*int_callback)(const device_config *device, int state);
+	devcb_read_line		in_cts_func;
+	devcb_write_line	out_rts_func;
+	devcb_read_line		in_dcd_func;
+
+	devcb_write_line	out_irq_func;
 };
 
 
@@ -60,8 +63,8 @@ struct _acia6850_interface
 
 DEVICE_GET_INFO( acia6850 );
 
-void acia_tx_clock_in(const device_config *device) ATTR_NONNULL;
-void acia_rx_clock_in(const device_config *device) ATTR_NONNULL;
+void acia6850_tx_clock_in(const device_config *device) ATTR_NONNULL;
+void acia6850_rx_clock_in(const device_config *device) ATTR_NONNULL;
 
 void acia6850_set_rx_clock(const device_config *device, int clock) ATTR_NONNULL;
 void acia6850_set_tx_clock(const device_config *device, int clock) ATTR_NONNULL;
@@ -70,15 +73,5 @@ WRITE8_DEVICE_HANDLER( acia6850_ctrl_w );
 READ8_DEVICE_HANDLER( acia6850_stat_r );
 WRITE8_DEVICE_HANDLER( acia6850_data_w );
 READ8_DEVICE_HANDLER( acia6850_data_r );
-
-READ16_DEVICE_HANDLER( acia6850_stat_lsb_r );
-READ16_DEVICE_HANDLER( acia6850_stat_msb_r );
-READ16_DEVICE_HANDLER( acia6850_data_lsb_r );
-READ16_DEVICE_HANDLER( acia6850_data_msb_r );
-
-WRITE16_DEVICE_HANDLER( acia6850_ctrl_msb_w );
-WRITE16_DEVICE_HANDLER( acia6850_ctrl_lsb_w );
-WRITE16_DEVICE_HANDLER( acia6850_data_msb_w );
-WRITE16_DEVICE_HANDLER( acia6850_data_lsb_w );
 
 #endif /* __ACIA6850_H__ */

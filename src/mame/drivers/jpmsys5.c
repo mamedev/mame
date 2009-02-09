@@ -284,19 +284,19 @@ static ADDRESS_MAP_START( 68000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK(1)
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x046000, 0x046001) AM_WRITENOP
-	AM_RANGE(0x046020, 0x046021) AM_DEVREADWRITE(ACIA6850, "acia6850_0", acia6850_stat_lsb_r, acia6850_ctrl_lsb_w)
-	AM_RANGE(0x046022, 0x046023) AM_DEVREADWRITE(ACIA6850, "acia6850_0", acia6850_data_lsb_r, acia6850_data_lsb_w)
+	AM_RANGE(0x046020, 0x046021) AM_DEVREADWRITE8(ACIA6850, "acia6850_0", acia6850_stat_r, acia6850_ctrl_w, 0xff)
+	AM_RANGE(0x046022, 0x046023) AM_DEVREADWRITE8(ACIA6850, "acia6850_0", acia6850_data_r, acia6850_data_w, 0xff)
 	AM_RANGE(0x046040, 0x04604f) AM_READWRITE(ptm6840_0_lsb_r, ptm6840_0_lsb_w)
 	AM_RANGE(0x046060, 0x046061) AM_READ_PORT("DIRECT") AM_WRITENOP
 	AM_RANGE(0x046062, 0x046063) AM_WRITENOP
 	AM_RANGE(0x046064, 0x046065) AM_WRITENOP
 	AM_RANGE(0x046066, 0x046067) AM_WRITENOP
-	AM_RANGE(0x046080, 0x046081) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_stat_lsb_r, acia6850_ctrl_lsb_w)
-	AM_RANGE(0x046082, 0x046083) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_data_lsb_r, acia6850_data_lsb_w)
+	AM_RANGE(0x046080, 0x046081) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
+	AM_RANGE(0x046082, 0x046083) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
 	AM_RANGE(0x046084, 0x046085) AM_READ(unk_r) // PIA?
 	AM_RANGE(0x046088, 0x046089) AM_READ(unk_r) // PIA?
-	AM_RANGE(0x04608c, 0x04608d) AM_DEVREADWRITE(ACIA6850, "acia6850_2", acia6850_stat_lsb_r, acia6850_ctrl_lsb_w)
-	AM_RANGE(0x04608e, 0x04608f) AM_DEVREADWRITE(ACIA6850, "acia6850_2", acia6850_data_lsb_r, acia6850_data_lsb_w)
+	AM_RANGE(0x04608c, 0x04608d) AM_DEVREADWRITE8(ACIA6850, "acia6850_2", acia6850_stat_r, acia6850_ctrl_w, 0xff)
+	AM_RANGE(0x04608e, 0x04608f) AM_DEVREADWRITE8(ACIA6850, "acia6850_2", acia6850_data_r, acia6850_data_w, 0xff)
 	AM_RANGE(0x0460a0, 0x0460a1) AM_WRITE(ym2413_register_port_0_lsb_w)
 	AM_RANGE(0x0460a2, 0x0460a3) AM_WRITE(ym2413_data_port_0_lsb_w)
 	AM_RANGE(0x0460c0, 0x0460c1) AM_WRITENOP
@@ -479,46 +479,92 @@ static const ptm6840_interface ptm_intf =
  *
  *************************************/
 
-static void acia_irq(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( acia_irq )
 {
 	cpu_set_input_line(device->machine->cpu[0], INT_6850ACIA, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* Clocks are incorrect */
-static const acia6850_interface acia0_if =
+
+static READ_LINE_DEVICE_HANDLER( a0_rx_r )
+{
+	return a0_data_in;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( a0_tx_w )
+{
+	a0_data_out = state;
+}
+
+static READ_LINE_DEVICE_HANDLER( a0_dcd_r )
+{
+	return a0_acia_dcd;
+}
+
+static ACIA6850_INTERFACE( acia0_if )
 {
 	10000,
 	10000,
-	&a0_data_in,
-	&a0_data_out,
-	NULL,
-	NULL,
-	&a0_acia_dcd,
-	acia_irq
+	DEVCB_LINE(a0_rx_r), /*&a0_data_in,*/
+	DEVCB_LINE(a0_tx_w), /*&a0_data_out,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(a0_dcd_r), /*&a0_acia_dcd,*/
+	DEVCB_LINE(acia_irq)
 };
 
-static const acia6850_interface acia1_if =
+static READ_LINE_DEVICE_HANDLER( a1_rx_r )
+{
+	return a1_data_in;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( a1_tx_w )
+{
+	a1_data_out = state;
+}
+
+static READ_LINE_DEVICE_HANDLER( a1_dcd_r )
+{
+	return a1_acia_dcd;
+}
+
+static ACIA6850_INTERFACE( acia1_if )
 {
 	10000,
 	10000,
-	&a1_data_in,
-	&a1_data_out,
-	NULL,
-	NULL,
-	&a1_acia_dcd,
-	acia_irq
+	DEVCB_LINE(a1_rx_r), /*&a1_data_in,*/
+	DEVCB_LINE(a1_tx_w), /*&a1_data_out,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(a1_dcd_r), /*&a1_acia_dcd,*/
+	DEVCB_LINE(acia_irq)
 };
 
-static const acia6850_interface acia2_if =
+static READ_LINE_DEVICE_HANDLER( a2_rx_r )
+{
+	return a2_data_in;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( a2_tx_w )
+{
+	a2_data_out = state;
+}
+
+static READ_LINE_DEVICE_HANDLER( a2_dcd_r )
+{
+	return a2_acia_dcd;
+}
+
+static ACIA6850_INTERFACE( acia2_if )
 {
 	10000,
 	10000,
-	&a2_data_in,
-	&a2_data_out,
-	NULL,
-	NULL,
-	&a2_acia_dcd,
-	acia_irq
+	DEVCB_LINE(a2_rx_r), /*&a2_data_in,*/
+	DEVCB_LINE(a2_tx_w), /*&a2_data_out,*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(a2_dcd_r), /*&a2_acia_dcd,*/
+	DEVCB_LINE(acia_irq)
 };
 
 
