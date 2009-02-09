@@ -7,7 +7,6 @@ A down-grade of the Seibu SPI Hardware with SH-2 as main cpu.
 driver by Angelo Salese & Nicola Salmoria
 
 TODO:
-- Correct color bitplanes;
 - Add eeprom emulation;
 - Real Time Clock emulation (uses a JRC 6355E / NJU6355E)
 
@@ -92,7 +91,7 @@ VIDEO_UPDATE( feversoc )
 
 		for(dx=0;dx<w;dx++)
 			for(dy=0;dy<h;dy++)
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),cliprect,TRANSPARENCY_PEN,0x1f);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,0,0,(sx+dx*16),(sy+dy*16),cliprect,TRANSPARENCY_PEN,0x3f);
 	}
 
 	return 0;
@@ -103,15 +102,15 @@ static WRITE32_HANDLER( fs_paletteram_w )
 	int r,g,b;
 	COMBINE_DATA(&paletteram32[offset]);
 
-	b = ((paletteram32[offset] & 0x001f0000)>>16) << 3;
+	r = ((paletteram32[offset] & 0x001f0000)>>16) << 3;
 	g = ((paletteram32[offset] & 0x03e00000)>>16) >> 2;
-	r = ((paletteram32[offset] & 0x7c000000)>>16) >> 7;
+	b = ((paletteram32[offset] & 0x7c000000)>>16) >> 7;
 
 	palette_set_color(space->machine,offset*2+0,MAKE_RGB(r,g,b));
 
-	b = (paletteram32[offset] & 0x001f) << 3;
+	r = (paletteram32[offset] & 0x001f) << 3;
 	g = (paletteram32[offset] & 0x03e0) >> 2;
-	r = (paletteram32[offset] & 0x7c00) >> 7;
+	b = (paletteram32[offset] & 0x7c00) >> 7;
 
 	palette_set_color(space->machine,offset*2+1,MAKE_RGB(r,g,b));
 }
@@ -162,7 +161,7 @@ static const gfx_layout spi_spritelayout =
 	16,16,
 	RGN_FRAC(1,3),
 	6,
-	{ RGN_FRAC(0,3)+0,RGN_FRAC(0,3)+8,RGN_FRAC(1,3)+0,RGN_FRAC(1,3)+8,RGN_FRAC(2,3)+8,RGN_FRAC(2,3)+0  },
+	{ RGN_FRAC(0,3)+0,RGN_FRAC(0,3)+8,RGN_FRAC(1,3)+0,RGN_FRAC(1,3)+8,RGN_FRAC(2,3)+0,RGN_FRAC(2,3)+8 },
 	{
 		7,6,5,4,3,2,1,0,23,22,21,20,19,18,17,16
 	},
@@ -256,7 +255,7 @@ static MACHINE_DRIVER_START( feversoc )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("oki", OKIM6295, MASTER_CLOCK/16) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -284,4 +283,4 @@ static DRIVER_INIT( feversoc )
 	seibuspi_rise11_sprite_decrypt_feversoc(memory_region(machine, "gfx1"), 0x200000);
 }
 
-GAME( 2004, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu", "Fever Soccer", GAME_IMPERFECT_COLORS )
+GAME( 2004, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu", "Fever Soccer", 0 )

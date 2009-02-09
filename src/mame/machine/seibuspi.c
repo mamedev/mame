@@ -319,7 +319,7 @@ CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = EAAE
 CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = D5AC0000 & FFFF0000 //
 CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 03000000 & FFFF0000
 
-        plane543 = partial_carry_sum24( plane543, 0x18f5b2, 0x18e999 ) ^ 0x3032e9;
+        plane543 = partial_carry_sum24( plane543, 0x18f5b2, 0x18e999 ) ^ 0xcf32e9;
         plane210 = partial_carry_sum24( plane210,        i, 0x968bd5 ) ^ 0x1d97ac;
         plane210 = partial_carry_sum24( plane210,        1, 0x000001 );
 
@@ -420,5 +420,5 @@ void seibuspi_rise11_sprite_decrypt_rfjet(UINT8 *rom, int size)
 
 void seibuspi_rise11_sprite_decrypt_feversoc(UINT8 *rom, int size)
 {
-	seibuspi_rise11_sprite_decrypt(rom, size, 0x18f5b2, 0x18e999, 0x3032e9, 0x968bd5, 0x1d97ac, 1);
+	seibuspi_rise11_sprite_decrypt(rom, size, 0x18f5b2, 0x18e999, 0xcf32e9, 0x968bd5, 0x1d97ac, 1);
 }
