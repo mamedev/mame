@@ -3,7 +3,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2413intf.h"
 
-
+static int exp_bank = 0;
 
 static UINT8   *fg_tile_ram, *fg_color_ram;
 static tilemap *fg_tilemap;
@@ -12,7 +12,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = fg_tile_ram[tile_index] | (fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
-	SET_TILE_INFO(1, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
+	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
 static WRITE8_HANDLER( fg_tile_w )
@@ -27,15 +27,120 @@ static WRITE8_HANDLER( fg_color_w )
 	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
+
+
+static UINT8   *bg_scroll, *bg_scroll2;
+
+static WRITE8_HANDLER( bg_scroll_w )
+{
+	bg_scroll[offset] = data;
+}
+
+static tilemap *jackie_reel1_tilemap;
+UINT8 *jackie_reel1_ram;
+
+WRITE8_HANDLER( jackie_reel1_ram_w )
+{
+	jackie_reel1_ram[offset] = data;
+	tilemap_mark_tile_dirty(jackie_reel1_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_jackie_reel1_tile_info )
+{
+	int code = jackie_reel1_ram[tile_index];
+	SET_TILE_INFO(1, code, 0, 0);
+}
+
+
+static tilemap *jackie_reel2_tilemap;
+UINT8 *jackie_reel2_ram;
+
+WRITE8_HANDLER( jackie_reel2_ram_w )
+{
+	jackie_reel2_ram[offset] = data;
+	tilemap_mark_tile_dirty(jackie_reel2_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_jackie_reel2_tile_info )
+{
+	int code = jackie_reel2_ram[tile_index];
+	SET_TILE_INFO(1, code, 0, 0);
+}
+
+static tilemap *jackie_reel3_tilemap;
+UINT8 *jackie_reel3_ram;
+
+WRITE8_HANDLER( jackie_reel3_ram_w )
+{
+	jackie_reel3_ram[offset] = data;
+	tilemap_mark_tile_dirty(jackie_reel3_tilemap,offset);
+}
+
+static TILE_GET_INFO( get_jackie_reel3_tile_info )
+{
+	int code = jackie_reel3_ram[tile_index];
+	SET_TILE_INFO(1, code, 0, 0);
+}
+
 static VIDEO_START(jackie)
 {
+	jackie_reel1_tilemap = tilemap_create(machine,get_jackie_reel1_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	jackie_reel2_tilemap = tilemap_create(machine,get_jackie_reel2_tile_info,tilemap_scan_rows,8,32, 64, 8);
+	jackie_reel3_tilemap = tilemap_create(machine,get_jackie_reel3_tile_info,tilemap_scan_rows,8,32, 64, 8);
+
+	tilemap_set_scroll_cols(jackie_reel1_tilemap, 64);
+	tilemap_set_scroll_cols(jackie_reel2_tilemap, 64);
+	tilemap_set_scroll_cols(jackie_reel3_tilemap, 64);
+
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
+
 static VIDEO_UPDATE(jackie)
 {
+	int i,j;
+	int startclipmin = 0;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
+	for (i=0;i < 0x40;i++)
+	{
+		tilemap_set_scrolly(jackie_reel1_tilemap, i, bg_scroll[i+0x000]);
+		tilemap_set_scrolly(jackie_reel2_tilemap, i, bg_scroll[i+0x040]);
+		tilemap_set_scrolly(jackie_reel3_tilemap, i, bg_scroll[i+0x080]);
+	}
+
+	for (j=0; j < 0x100-1; j++)
+	{
+		rectangle clip;
+		int rowenable = bg_scroll2[j];
+
+		/* draw top of screen */
+		clip.min_x = visarea->min_x;
+		clip.max_x = visarea->max_x;
+		clip.min_y = startclipmin;
+		clip.max_y = startclipmin+1;
+
+		if (rowenable==0)
+		{
+			tilemap_draw(bitmap,&clip,jackie_reel1_tilemap,0,0);
+		}
+		else if (rowenable==1)
+		{
+			tilemap_draw(bitmap,&clip,jackie_reel2_tilemap,0,0);
+		}
+		else if (rowenable==2)
+		{
+			tilemap_draw(bitmap,&clip,jackie_reel3_tilemap,0,0);
+		}
+		else if (rowenable==3)
+		{
+		}
+
+		startclipmin+=1;
+	}
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
@@ -64,14 +169,42 @@ static INTERRUPT_GEN( jackie_interrupt )
 	}
 }
 
-static UINT8 out[3];
+static UINT8  out[3];
+static UINT16 unk_reg[3][5];
 
 static void show_out(void)
 {
 #ifdef MAME_DEBUG
-	popmessage("%02x %02x %02x", out[0], out[1], out[2]);
+//	popmessage("%02x %02x %02x", out[0], out[1], out[2]);
+	popmessage("520: %04x %04x %04x %04x %04x\n560: %04x %04x %04x %04x %04x\n5A0: %04x %04x %04x %04x %04x",
+		unk_reg[0][0],unk_reg[0][1],unk_reg[0][2],unk_reg[0][3],unk_reg[0][4],
+		unk_reg[1][0],unk_reg[1][1],unk_reg[1][2],unk_reg[1][3],unk_reg[1][4],
+		unk_reg[2][0],unk_reg[2][1],unk_reg[2][2],unk_reg[2][3],unk_reg[2][4]
+	);
 #endif
 }
+
+static void jackie_unk_reg_lo_w( int reg, int offset, UINT8 data )
+{
+	unk_reg[reg][offset] &= 0xff00;
+	unk_reg[reg][offset] |= data;
+	show_out();
+}
+
+static WRITE8_HANDLER( jackie_unk_reg1_lo_w ) { jackie_unk_reg_lo_w( 0, offset, data ); }
+static WRITE8_HANDLER( jackie_unk_reg2_lo_w ) { jackie_unk_reg_lo_w( 1, offset, data ); }
+static WRITE8_HANDLER( jackie_unk_reg3_lo_w ) { jackie_unk_reg_lo_w( 2, offset, data ); }
+
+static void jackie_unk_reg_hi_w( int reg, int offset, UINT8 data )
+{
+	unk_reg[reg][offset] &= 0xff;
+	unk_reg[reg][offset] |= data << 8;
+	show_out();
+}
+
+static WRITE8_HANDLER( jackie_unk_reg1_hi_w ) { jackie_unk_reg_hi_w( 0, offset, data ); }
+static WRITE8_HANDLER( jackie_unk_reg2_hi_w ) { jackie_unk_reg_hi_w( 1, offset, data ); }
+static WRITE8_HANDLER( jackie_unk_reg3_hi_w ) { jackie_unk_reg_hi_w( 2, offset, data ); }
 
 static WRITE8_HANDLER( jackie_nmi_and_coins_w )
 {
@@ -82,6 +215,7 @@ static WRITE8_HANDLER( jackie_nmi_and_coins_w )
 
 	set_led_status(6,		data & 0x20);	// led for coin out / hopper active
 
+	exp_bank   = (data & 0x02) ? 1 : 0;		// expram bank number
 	nmi_enable = data & 0x80;     // nmi enable?
 
 	out[0] = data;
@@ -122,26 +256,34 @@ static READ8_HANDLER( igs_irqack_r )
 
 static WRITE8_HANDLER( igs_irqack_w )
 {
-//  cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+//	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 	out[2] = data;
 	show_out();
 }
 
-UINT8 *main_ram;
-
-static WRITE8_HANDLER( ram_w )
+static READ8_HANDLER( expram_r )
 {
-	main_ram[offset] = data;
-//  logerror("PC %06X: %04x = %02x\n",cpu_get_pc(space->cpu),offset+0xf000,data);
+	UINT8 *rom = memory_region(space->machine, "gfx3");
+
+	offset += exp_bank * 0x8000;
+//	logerror("PC %06X: %04x = %02x\n",cpu_get_pc(space->cpu),offset,rom[offset]);
+	return rom[offset];
 }
 
 
 static ADDRESS_MAP_START( jackie_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE( ram_w ) AM_BASE( &main_ram )
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("main", 0xf000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jackie_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0520, 0x0524) AM_WRITE(jackie_unk_reg1_lo_w)
+	AM_RANGE(0x0d20, 0x0d24) AM_WRITE(jackie_unk_reg1_hi_w)
+	AM_RANGE(0x0560, 0x0564) AM_WRITE(jackie_unk_reg2_lo_w)
+	AM_RANGE(0x0d60, 0x0d64) AM_WRITE(jackie_unk_reg2_hi_w)
+	AM_RANGE(0x05a0, 0x05a4) AM_WRITE(jackie_unk_reg3_lo_w)
+	AM_RANGE(0x0da0, 0x0da4) AM_WRITE(jackie_unk_reg3_hi_w)
+	AM_RANGE(0x1000, 0x1107) AM_RAM AM_BASE( &bg_scroll2 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE( &paletteram )
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE( &paletteram_2 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
@@ -158,9 +300,13 @@ static ADDRESS_MAP_START( jackie_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(ym2413_register_port_0_w)
 	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(ym2413_data_port_0_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
+	AM_RANGE(0x6000, 0x60ff) AM_RAM_WRITE( bg_scroll_w ) AM_BASE( &bg_scroll )
+	AM_RANGE(0x6800, 0x69ff) AM_RAM_WRITE( jackie_reel1_ram_w )  AM_BASE( &jackie_reel1_ram )
+	AM_RANGE(0x6a00, 0x6bff) AM_RAM_WRITE( jackie_reel2_ram_w )  AM_BASE( &jackie_reel2_ram )
+	AM_RANGE(0x6c00, 0x6dff) AM_RAM_WRITE( jackie_reel3_ram_w )  AM_BASE( &jackie_reel3_ram )
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE( &fg_tile_ram )
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE( &fg_color_ram )
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("gfx3", 0)
+	AM_RANGE(0x8000, 0xffff) AM_READ(expram_r)
 ADDRESS_MAP_END
 
 static CUSTOM_INPUT( hopper_r )
@@ -255,7 +401,7 @@ static INPUT_PORTS_START( jackie )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3  ) PORT_NAME("Key In")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN4  ) PORT_NAME("Clear")	// pays out
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER  ) PORT_CODE(KEYCODE_T) PORT_NAME("Togglemode")	// Used
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER  ) PORT_CODE(KEYCODE_T) PORT_NAME("Togglemode")	// Used
 	PORT_BIT( 0xC0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BUTTONS1")
@@ -307,8 +453,8 @@ static const gfx_layout layout_8x32x6 =
 };
 
 static GFXDECODE_START( jackie )
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x6,  0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
 
@@ -316,7 +462,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( jackie )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 12000000/2/2)
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(jackie_prg_map,0)
 	MDRV_CPU_IO_MAP(jackie_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(jackie_interrupt,8)
@@ -421,6 +567,9 @@ static DRIVER_INIT( jackie )
 		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
 	}
 	memset( &rom[0xf000], 0, 0x1000);
+
+	// Patch trap
+	rom[0x7e86] = 0xc3;
 }
 
-GAME( 199?,  jackie,   0,        jackie,   jackie, jackie,  ROT0, "IGS",    "Happy Jackie (v110U)",       GAME_NOT_WORKING )
+GAME( 1993,  jackie,   0,        jackie,   jackie, jackie,  ROT0, "IGS",    "Happy Jackie (v110U)",       0 )
