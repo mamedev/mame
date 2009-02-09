@@ -659,6 +659,27 @@ ROM_END
 
 ROM_START( skullfng )
 	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD32_WORD( "sw00-0.2a", 0x000000, 0x80000, CRC(9658d9ce) SHA1(bd5b58a35e4fe301dc13bfe962e674fc8b26cf60) )
+	ROM_LOAD32_WORD( "sw01-0.2b", 0x000002, 0x80000, CRC(c0d83d14) SHA1(42a5e2fa0e26919b94566da3dec622cd25dd9558) )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "mch-00.2e", 0x000001, 0x200000, CRC(d5cc4238) SHA1(f1bd86386e44a3f600475aeab310f7ea632998df) )
+	ROM_LOAD16_BYTE( "mch-01.8m", 0x000000, 0x200000, CRC(d37cf0cd) SHA1(c2fe7062a123ca2df65217c6dced857b803d8a8d) )
+	ROM_LOAD16_BYTE( "mch-02.4e", 0x400001, 0x200000, CRC(4046314d) SHA1(32e3b7ddbe20ffa6ba6ebe9bd55a32e3b3a120f6) )
+	ROM_LOAD16_BYTE( "mch-03.10m",0x400000, 0x200000, CRC(1dea8f6c) SHA1(c2ad59592385a00e323aac9057906c9384b67078) )
+	ROM_LOAD16_BYTE( "mch-04.6e", 0x800001, 0x200000, CRC(4869dfe8) SHA1(296df6274ecb3eed485de24258cf462e3942f1fa) )
+	ROM_LOAD16_BYTE( "mch-05.11m",0x800000, 0x200000, CRC(ef0b54ba) SHA1(3be56c064ac81686096be5f31ad2aad948ba6701) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "sh02-0.6h", 0x000000, 0x80000, CRC(0d3ae757) SHA1(480fc3855d330380b75a47a271f3571a59aee10c) ) /* Labeld SW 02-0, but same contents */
+
+	ROM_REGION( 0x800000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "mch-06.6a",  0x200000, 0x200000, CRC(b2efe4ae) SHA1(5a9dab74c2ba73a65e8f1419b897467804734fa2) )
+	ROM_LOAD( "mch-07.11j", 0x400000, 0x200000, CRC(bc1a50a1) SHA1(3de191fbc92d2ae84e54263f1c70afec6ff7cc3c) )
+ROM_END
+
+ROM_START( skullfnj )
+	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD32_WORD( "sh00-0.2a", 0x000000, 0x80000, CRC(e50358e8) SHA1(e66ac5e1b16273cb905254c99b2bce435145a414) )
 	ROM_LOAD32_WORD( "sh01-0.2b", 0x000002, 0x80000, CRC(2c288bcc) SHA1(4ed1d5818362383240378056bf575f6acf8a593a) )
 
@@ -751,7 +772,8 @@ GAME( 1995, avengrgs, 0,        avengrgs, mlc, avengrgs, ROT0,   "Data East Corp
 GAME( 1995, avengrgj, avengrgs, avengrgs, mlc, avengrgs, ROT0,   "Data East Corporation", "Avengers In Galactic Storm (Japan)", 0 )
 GAME( 1996, stadhr96, 0,        mlc_6bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Stadium Hero 96 (Version EAD)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1996, stadh96a, stadhr96, mlc_6bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Stadium Hero 96 (Version EAJ)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1996, skullfng, 0,        mlc_6bpp, mlc, mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan)", 0 )
+GAME( 1996, skullfng, 0,        mlc_6bpp, mlc, mlc,      ROT270, "Data East Corporation", "Skull Fang (World)", 0 ) /* Version 1.13, Europe, Master 96.02.19 */
+GAME( 1996, skullfnj, skullfng, mlc_6bpp, mlc, mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan)", 0 ) /* Version 1.09, Japan, Master 96.02.08 */
 GAME( 1996, hoops96,  0,        mlc_5bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)", 0 )
 GAME( 1995, ddream95, hoops96,  mlc_5bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4 EAM)", 0 )
 GAME( 1995, hoops95,  hoops96,  mlc_5bpp, mlc, mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)", 0 )

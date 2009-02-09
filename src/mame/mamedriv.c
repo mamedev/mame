@@ -4571,7 +4571,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hoops95 )	/* MCE (c) 1996 Data East Corporation */
 	DRIVER( avengrgs )	/* MCG (c) 1995 Data East Corporation (World) */
 	DRIVER( avengrgj )	/* MCG (c) 1995 Data East Corporation (Japan) */
-	DRIVER( skullfng )	/* MCH (c) 1996 Data East Corporation (Japan) */
+	DRIVER( skullfng )	/* MCH (c) 1996 Data East Corporation (World) */
+	DRIVER( skullfnj )	/* MCH (c) 1996 Data East Corporation (Japan) */
 	DRIVER( stadhr96 )	/* MCM (c) 1996 Data East */
 	DRIVER( stadh96a )	/* MCM (c) 1996 Data East */
 
@@ -7366,7 +7367,7 @@ Other Sun games
 	DRIVER( janoha )	/* (c) 1984 Toaplan */
 	DRIVER( jansou )	/* (c) 1985 Dyna */
 	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
-	DRIVER( mjsenka )   /* (c) 1986 Visco */
+	DRIVER( mjsenka )	/* (c) 1986 Visco */
 	DRIVER( mjyarou )	/* (c) 1986 Visco / Video System */
 	DRIVER( suzume )	/*  ??  (c) 1986 Dyna Electronics */
 	DRIVER( hnayayoi )	/* "02" (c) 1987 Dyna Electronics */
@@ -7604,7 +7605,7 @@ Other Sun games
 	DRIVER( yachtmn )	/* (c) 1982 [Sanritsu] Esco */
 	DRIVER( rougien )	/* (c) 1982 Sanritsu */
 	DRIVER( drmicro )	/* (c) 1983 Sanritsu */
-	DRIVER( jantotsu )  /* (c) 1983 Sanritsu */
+	DRIVER( jantotsu )	/* (c) 1983 Sanritsu */
 	DRIVER( appoooh )	/* (c) 1984 Sega,  made by Sanritsu */
 	DRIVER( robowres )	/* (c) 1986 Sega */
 	DRIVER( robowrb )	/* bootleg */
@@ -8112,14 +8113,14 @@ Other Sun games
 	DRIVER( pbchmp95 )	/* (c) 1995 Veltmeijer Automaten */
 	DRIVER( cardline )	/* (c) 199? Veltmeijer */
 	DRIVER( bmcbowl )	/* (c) 1994 BMC */
-	DRIVER( koftball )  /* (c) 1995 BMC */
+	DRIVER( koftball )	/* (c) 1995 BMC */
 	DRIVER( mpoker )	/* (c) 1983 Merit */
 	DRIVER( pitboss )	/* (c) 1983 Merit */
 	DRIVER( pitbossa )	/* (c) 1983 Merit */
 	DRIVER( casino5 )	/* (c) 1983 Merit */
 	DRIVER( trvwzh )	/* (c) 1985 Merit */
 	DRIVER( trvwzha )	/* (c) 1985 Merit */
-	DRIVER( trvwzhb )   /* (c) 1985 Merit */
+	DRIVER( trvwzhb )	/* (c) 1985 Merit */
 	DRIVER( trvwzv )	/* (c) 1985 Merit */
 	DRIVER( trvwzva )	/* (c) 1985 Merit */
 	DRIVER( trvwz2 )	/* (c) 1985 Merit */
@@ -8128,10 +8129,10 @@ Other Sun games
 	DRIVER( trvwz3ha )	/* (c) 1985 Merit */
 	DRIVER( trvwz3v )	/* (c) 1985 Merit */
 	DRIVER( trvwz4 )	/* (c) 1985 Merit */
-	DRIVER( trvwz4a )   /* (c) 1985 Merit */
+	DRIVER( trvwz4a )	/* (c) 1985 Merit */
 	DRIVER( tictac )	/* (c) 1985 Merit */
 	DRIVER( phrcraze )	/* (c) 1986 Merit */
-	DRIVER( phrcraza )  /* (c) 1986 Merit */
+	DRIVER( phrcraza )	/* (c) 1986 Merit */
 	DRIVER( phrcrazs )	/* (c) 1986 Merit */
 	DRIVER( bigappg )	/* (c) 1986 Merit */
 	DRIVER( dodge )		/* (c) 1986 Merit */
@@ -8483,8 +8484,8 @@ Other Sun games
 	DRIVER( bs94 )		/* (c) 1994 Entretenimientos GEMINIS */
 	DRIVER( jokrwild )	/* (c) 1988 Sigma */
 	DRIVER( pesadelo )	/* (c) 1989 Forte II Games */
-	DRIVER( spool99 )   /* (c) 1998 Electronic Projects */
-	DRIVER( spool99a )  /* (c) 1998 Electronic Projects */
+	DRIVER( spool99 )	/* (c) 1998 Electronic Projects */
+	DRIVER( spool99a )	/* (c) 1998 Electronic Projects */
 	DRIVER( 4roses )	/* 1999 Unknown */
 	DRIVER( 4rosesa )	/* 1999 Unknown */
 	DRIVER( big10 )		/* 198? Unknown */
@@ -8519,9 +8520,9 @@ Other Sun games
 	DRIVER( elvis )		/* (c) 200? unknown */
 
 	/* Intel 8086-based italian gambling games */
-	DRIVER( newmcard )  /* (c) 19?? unknown */
-	DRIVER( brasil )    /* (c) 2000 unknown */
-	DRIVER( fashion )   /* (c) 2000 unknown */
+	DRIVER( newmcard )	/* (c) 19?? unknown */
+	DRIVER( brasil )	/* (c) 2000 unknown */
+	DRIVER( fashion )	/* (c) 2000 unknown */
 
 	/* V30-based italian gambling games */
  	DRIVER( tour4000 )	/* (c) 2000 High Video */
@@ -8534,9 +8535,9 @@ Other Sun games
  	DRIVER( girotutt )	/* (c) 2000 High Video */
 
 	/* M68k based italian gambling games */
-	DRIVER( ilpag )     /* (c) 19?? unknown */
-	DRIVER( mil4000 )   /* (c) 2000 Sure Milano */
-	DRIVER( mil4000a )  /* (c) 2000 Sure Milano */
+	DRIVER( ilpag )		/* (c) 19?? unknown */
+	DRIVER( mil4000 )	/* (c) 2000 Sure Milano */
+	DRIVER( mil4000a )	/* (c) 2000 Sure Milano */
 
 	/* Mitsubishi/Renesas M16/62A italian gambling games */
 	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */
@@ -8587,11 +8588,11 @@ Other Sun games
 	DRIVER( pokonl97 )	/* (c) 1997 Amcoe */
 	DRIVER( csel96 )	/* (c) 1996 Amcoe */
 	DRIVER( nfb96 )		/* (c) 1996 Amcoe */
-	DRIVER( nfb96se )		/* bootleg */
-	DRIVER( nfb96sea )		/* bootleg */
-	DRIVER( nfb96seb )		/* bootleg */
-	DRIVER( carb2002 )		/* bootleg */
-	DRIVER( carb2003 )		/* bootleg */
+	DRIVER( nfb96se )	/* bootleg */
+	DRIVER( nfb96sea )	/* bootleg */
+	DRIVER( nfb96seb )	/* bootleg */
+	DRIVER( carb2002 )	/* bootleg */
+	DRIVER( carb2003 )	/* bootleg */
 
 	DRIVER( sfbonus )	/* (c) 199? Amcoe */
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
@@ -8606,12 +8607,12 @@ Other Sun games
 	DRIVER( himesiki )	/* (c) 1989 Hi-Soft */
 
 	/* Hi-Lo Poker-based */
-	DRIVER( gtipoker )  /* (c) 1983 GTI Inc */
-	DRIVER( norautp )   /* (c) 1988? Noraut */
-	DRIVER( norautpn )  /* (c) 1990? unknown */
+	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
+	DRIVER( norautp )	/* (c) 1988? Noraut */
+	DRIVER( norautpn )	/* (c) 1990? unknown */
 
 	/* Sanki Denshi Kogyo */
-	DRIVER( pachifev )  /* (c) 1983? */
+	DRIVER( pachifev )	/* (c) 1983? */
 
 	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
 	   These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
