@@ -23,6 +23,7 @@ VIDEO_START( avg_mhavoc );
 VIDEO_START( avg_starwars );
 VIDEO_START( avg_quantum );
 VIDEO_START( avg_bzone );
+VIDEO_START( avg_tomcat );
 
 MACHINE_RESET( avgdvg );
 

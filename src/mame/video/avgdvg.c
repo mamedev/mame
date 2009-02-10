@@ -1409,6 +1409,23 @@ static const vgconf avg_quantum =
 	avg_vgrst
 };
 
+static vgconf avg_tomcat =
+{
+	{
+		avg_latch0,
+		avg_latch1,
+		avg_latch2,
+		avg_latch3,
+		avg_strobe0,
+		avg_strobe1,
+		starwars_strobe2,
+		starwars_strobe3
+	},
+	avg_state_addr,
+	avg_data,
+	avg_vggo,
+	avg_vgrst
+};
 
 /*************************************
  *
@@ -1537,3 +1554,8 @@ VIDEO_START( avg_quantum )
 	VIDEO_START_CALL(avg_common);
 }
 
+VIDEO_START( avg_tomcat )
+{
+	vgc = &avg_tomcat;
+	VIDEO_START_CALL(avg_common);
+}

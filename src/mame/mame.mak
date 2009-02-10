@@ -527,6 +527,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/tank8.o $(AUDIO)/tank8.o $(VIDEO)/tank8.o \
 	$(DRIVERS)/tempest.o \
 	$(DRIVERS)/thunderj.o $(VIDEO)/thunderj.o \
+	$(DRIVERS)/tomcat.o \
 	$(DRIVERS)/toobin.o $(VIDEO)/toobin.o \
 	$(DRIVERS)/tourtabl.o $(VIDEO)/tia.o \
 	$(DRIVERS)/triplhnt.o $(AUDIO)/triplhnt.o $(VIDEO)/triplhnt.o \

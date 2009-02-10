@@ -5226,6 +5226,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( alphaone )	/* (proto)          (c) 1983 */
 	DRIVER( alphaona )	/* (proto)          (c) 1983 */
 	DRIVER( esb )		/* 136031           (c) 1985 */
+	DRIVER( tomcat )	/* (proto)			(c) 1985 */
 
 	/* Atari "Centipede hardware" games */
 	DRIVER( warlords )	/* 037153-037159    (c) 1980 */
