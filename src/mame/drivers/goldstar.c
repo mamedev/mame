@@ -4445,7 +4445,37 @@ ROM_END
 ROM_START( schery97 )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "sc352.bin",	 0x00000, 0x10000, CRC(d3857d85) SHA1(e97b2634f0993631023c08f6baf800461abfad12) )
-	ROM_LOAD( "sc352c4.bin", 0x10000, 0x10000, CRC(44f55f6e) SHA1(8b6e8618281de480979de37c7b36a0e68a524f47) ) // ?? alt program?
+
+	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
+	ROM_LOAD( "sc97h.bin",  0x00000, 0x10000, CRC(def39ee2) SHA1(5e6817bd947ebf16d0313285a00876b796b71cab) )
+	ROM_LOAD( "sc97l.bin",  0x10000, 0x10000, CRC(6f4d6aea) SHA1(6809c26e6975cac97b0f8c01a508d4e022859b1a) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
+	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "sc97u19.bin", 0x0000, 0x0100, CRC(6a01caca) SHA1(9b3e9eebb9fcc8770f7e92f0f1c0434516ee613d) )
+	ROM_LOAD( "sc97u20.bin", 0x0100, 0x0100, CRC(5899c1d5) SHA1(c335b99bb58da3a11005a8952a15d9f43bdff157) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "scu1920.bin", 0x0000, 0x0100, CRC(3aa291dd) SHA1(f35c916b5463ff9ec6e57048af29a746148a13af) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // samples
+	ROM_LOAD( "sc97t.bin", 0x00000, 0x20000, CRC(8598b059) SHA1(9e031e30e58a9c1b3d029004ee0f1616711fa2ae) )
+ROM_END
+
+ROM_START( schery97a )
+	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "sc352c4.bin", 0x00000, 0x10000, CRC(44f55f6e) SHA1(8b6e8618281de480979de37c7b36a0e68a524f47) ) // ?? alt program?
 
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "sc97h.bin",  0x00000, 0x10000, CRC(def39ee2) SHA1(5e6817bd947ebf16d0313285a00876b796b71cab) )
@@ -4477,10 +4507,10 @@ ROM_END
 ROM_START( roypok96 )
 	ROM_REGION( 0x10000, "main", 0 )
 	// 3 revisions of the program?
-	ROM_LOAD( "rp35.bin",	 0x0000, 0x10000, CRC(e1509440) SHA1(30d931b02d4eb74f9a16c57eb12e834cf24f87a9) ) 
+	ROM_LOAD( "rp35.bin",	 0x0000, 0x10000, CRC(e1509440) SHA1(30d931b02d4eb74f9a16c57eb12e834cf24f87a9) )
 	ROM_LOAD( "rp36.bin",	 0x0000, 0x10000, CRC(7fffff21) SHA1(85533e6aa0c6810cdaed9a6d1f1313f7bc871cbd) )
 	ROM_LOAD( "rp36c3.bin",	 0x0000, 0x10000, CRC(c7317ed7) SHA1(ca88d02c5ea5c03dd9407d71ab88e81c21791fe8) )
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "rp35h.bin",  0x00000, 0x10000, CRC(664649ea) SHA1(7915ab31afd2a1bbb8f817f961e0e522d76f5c05) )
 	ROM_LOAD( "rp35l.bin",  0x10000, 0x10000, CRC(ef416c4e) SHA1(5aac157ba15c66f79a7a68935095bef9a2636f7b) )
@@ -4712,7 +4742,7 @@ ROM_START( nfb96sea )
 	ROM_CONTINUE(0xd000, 0x1000)
 	ROM_CONTINUE(0xe000, 0x1000)
 	ROM_CONTINUE(0xf000, 0x1000)
-	
+
 	/* the graphic roms on this set are a mess, the planes don't match up properly */
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "dog_05.rom",   0x10000, 0x08000, CRC(c03b5632) SHA1(4f603ec5218adcbfce09ec6d3643ffb5006056dd) )
@@ -5078,7 +5108,7 @@ static DRIVER_INIT( nfb96sea )
 		UINT8 x = ROM[i];
 		switch(i & 7)
 		{
-			case 0: x = BITSWAP8(x^0x80, 1,6,7,4,5,2,3,0); break;	
+			case 0: x = BITSWAP8(x^0x80, 1,6,7,4,5,2,3,0); break;
 			case 1: x = BITSWAP8(x^0xa0, 5,6,3,4,1,2,7,0); break;
 			case 2: x = BITSWAP8(x^0x02, 5,6,3,4,1,2,7,0); break;
 			case 3: x = BITSWAP8(x^0xa0, 3,6,1,4,7,2,5,0); break;
@@ -5087,10 +5117,68 @@ static DRIVER_INIT( nfb96sea )
 			case 6: x = BITSWAP8(x^0x08, 3,6,1,4,7,2,5,0); break;
 			case 7: x = BITSWAP8(x^0x80, 5,6,3,4,1,2,7,0); break;
 		}
-		
+
 		ROM[i] = x;
 	}
-}	
+}
+
+static DRIVER_INIT( schery97 )
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+	for (i = 0;i < 0x10000;i++)
+	{
+		UINT8 x = ROM[i];
+		switch(i & 0x12)
+     	{
+     		case 0x00: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
+     		case 0x02: x = BITSWAP8(x^0x4d, 0,7,6,5,4,3,2,1); break;
+     		case 0x10: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+     		case 0x12: x = BITSWAP8(x^0xbb, 4,3,2,1,0,7,6,5); break;
+     	}
+
+     	ROM[i] = x;
+	}
+}
+
+static DRIVER_INIT( schery97a )
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+	for (i = 0;i < 0x10000;i++)
+	{
+		UINT8 x = ROM[i];
+		switch(i & 6)
+		{
+			case 0: x = BITSWAP8(x^0xb9, 4,0,6,7,3,1,5,2); break;
+			case 2: x = BITSWAP8(x^0x8f, 6,7,4,0,3,2,1,5); break;
+			case 4: x = BITSWAP8(x^0xd2, 3,4,0,2,5,6,1,7); break;
+			case 6: x = BITSWAP8(x^0xd1, 6,0,2,1,4,5,3,7); break;
+		}
+
+		ROM[i] = x;
+	}
+}
+
+
+static DRIVER_INIT( schery98 )
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+	for (i = 0;i < 0x10000;i++)
+	{
+		UINT8 x = ROM[i];
+		switch(i & 0x12)
+		{
+			case 0x00: x = BITSWAP8(x^0x21, 2,1,0,7,6,5,4,3); break;
+			case 0x02: x = BITSWAP8(x^0x45, 2,1,0,7,6,5,4,3); break;
+			case 0x10: x = BITSWAP8(x^0x23, 4,3,2,1,0,7,6,5); break;
+			case 0x12: x = BITSWAP8(x^0x5b, 4,3,2,1,0,7,6,5); break;
+		}
+
+		ROM[i] = x;
+	}
+}
 
 /*********************************************
 *                Game Drivers                *
@@ -5130,8 +5218,9 @@ GAME( 198?, mtonic,   0,        ncb3,     cmv801,   0,        ROT0, "Tonic",    
 
 
 // bootlegs of cherry master?
-GAME( 1998, schery98, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
-GAME( 1997, schery97, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Skill Cherry '97",                       GAME_NOT_WORKING )
+GAME( 1998, schery98, 0,        cmnobmp,  cmv801,   schery98, ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
+GAME( 1997, schery97, 0,        cmnobmp,  cmv801,   schery97, ROT0, "Amcoe",             "Skill Cherry '97 (set 1)",               GAME_NOT_WORKING )
+GAME( 1997, schery97a,schery97, cmnobmp,  cmv801,   schery97a,ROT0, "Amcoe",             "Skill Cherry '97 (set 2)",               GAME_NOT_WORKING )
 GAME( 1996, nfb96,    0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "New Fruit Bonus '96",                       GAME_NOT_WORKING )
 GAME( 1996, roypok96, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Royal Poker '96",                       GAME_NOT_WORKING )
 GAME( 1997, pokonl97, 0,        cmnobmp,  cmv801,   0,        ROT0, "Amcoe",             "Poker Only '97",                       GAME_NOT_WORKING )
