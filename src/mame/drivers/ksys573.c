@@ -232,7 +232,7 @@
   | ADM232 CN15  CY7C109                          |
   |                       HY51V65164A HY51V65164A |
   |                            HY51V65164A        |
-  |      CN16    XCS50XL                          |
+  |      CN16    XCS40XL                          |
   |                                               |
   | AK4309B   CN18         29.450MHz  MAS3507D    |
   |                                               |
@@ -256,7 +256,7 @@
   CY7C109     - CY7C109-25VC 931 H 04 404825  128k x 8 Static RAM
   HY51V65164A - 64M bit dynamic EDO RAM
   CN16        - 4 pin connector joining this PCB to the CD-DA IN on the MAIN PCB.
-  XCS50XL     - XILINX XCS50XL PQ208AKP9929 A2033251A 4C
+  XCS40XL     - XILINX XCS40XL PQ208AKP9929 A2033251A 4C
   AK4309B     - AKM AK4309B 3N932N  16bit SCF DAC
   CN18        - 6 pin connector
   MAS3507D    - IM MAS3507D D8 9173 51 HM U 072953.000 ES  MPEG 1/2 Layer 2/3 Audio Decoder
