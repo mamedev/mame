@@ -1309,6 +1309,7 @@ $(MAMEOBJ)/suna.a: \
 	$(DRIVERS)/goindol.o $(VIDEO)/goindol.o \
 	$(DRIVERS)/suna8.o $(AUDIO)/suna8.o $(VIDEO)/suna8.o \
 	$(DRIVERS)/suna16.o $(VIDEO)/suna16.o \
+	$(DRIVERS)/go2000.o \
 
 $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/40love.o $(VIDEO)/40love.o \
@@ -1586,7 +1587,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/gamecstl.o \
-	$(DRIVERS)/go2000.o \
 	$(DRIVERS)/good.o \
 	$(DRIVERS)/goldnpkr.o \
 	$(DRIVERS)/gotcha.o $(VIDEO)/gotcha.o \
