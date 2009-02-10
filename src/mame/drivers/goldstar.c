@@ -4409,25 +4409,45 @@ ROM_END
 
 /* these 'Amcoe' games look like bootlegs of cherry master
   the z80 roms are encrypted */
-ROM_START( schery98 )
+ROM_START( skill98 )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "sk98133.bin",	 0x0000, 0x10000, CRC(77a5dd54) SHA1(e693f477b42b83f1f5e45fb7c56486119bf91856) )
-
+	ROM_LOAD( "sk98133.bin",	 0x0000, 0x1000, CRC(77a5dd54) SHA1(e693f477b42b83f1f5e45fb7c56486119bf91856) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0x9000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0xb000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000)
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0xf000,0x1000)
+	
+	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "sk98h.bin",  0x00000, 0x10000, CRC(0574357b) SHA1(96a846f6d49dd67ad078ad9240e632f79ae1b437) )
 	ROM_LOAD( "sk98l.bin",  0x10000, 0x10000, CRC(ebe802a4) SHA1(178542c204fd1027874e6d2c099edaa7878c993f) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
-	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
-	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
-	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
-	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
-	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
-	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "sk98u19.bin", 0x0000, 0x0100, CRC(796c7960) SHA1(0f64a8119fd4809a5ac79585b415b34b2a83e9dc) )
@@ -4444,23 +4464,43 @@ ROM_END
 
 ROM_START( schery97 )
 	ROM_REGION( 0x20000, "main", 0 )
-	ROM_LOAD( "sc352.bin",	 0x00000, 0x10000, CRC(d3857d85) SHA1(e97b2634f0993631023c08f6baf800461abfad12) )
-
+	ROM_LOAD( "sc352.bin",	 0x00000, 0x1000, CRC(d3857d85) SHA1(e97b2634f0993631023c08f6baf800461abfad12) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0x9000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0xb000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000)
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0xf000,0x1000)
+	
+	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "sc97h.bin",  0x00000, 0x10000, CRC(def39ee2) SHA1(5e6817bd947ebf16d0313285a00876b796b71cab) )
 	ROM_LOAD( "sc97l.bin",  0x10000, 0x10000, CRC(6f4d6aea) SHA1(6809c26e6975cac97b0f8c01a508d4e022859b1a) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
-	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
-	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
-	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
-	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
-	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
-	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "sc97u19.bin", 0x0000, 0x0100, CRC(6a01caca) SHA1(9b3e9eebb9fcc8770f7e92f0f1c0434516ee613d) )
@@ -4475,23 +4515,43 @@ ROM_END
 
 ROM_START( schery97a )
 	ROM_REGION( 0x20000, "main", 0 )
-	ROM_LOAD( "sc352c4.bin", 0x00000, 0x10000, CRC(44f55f6e) SHA1(8b6e8618281de480979de37c7b36a0e68a524f47) ) // ?? alt program?
-
+	ROM_LOAD( "sc352c4.bin", 0x00000, 0x1000, CRC(44f55f6e) SHA1(8b6e8618281de480979de37c7b36a0e68a524f47) ) // ?? alt program?
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+	ROM_CONTINUE(0x8000,0x1000)
+	ROM_CONTINUE(0x9000,0x1000)
+	ROM_CONTINUE(0xa000,0x1000)
+	ROM_CONTINUE(0xb000,0x1000)
+	ROM_CONTINUE(0xc000,0x1000)
+	ROM_CONTINUE(0xd000,0x1000)
+	ROM_CONTINUE(0xe000,0x1000)
+	ROM_CONTINUE(0xf000,0x1000)
+	
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "sc97h.bin",  0x00000, 0x10000, CRC(def39ee2) SHA1(5e6817bd947ebf16d0313285a00876b796b71cab) )
 	ROM_LOAD( "sc97l.bin",  0x10000, 0x10000, CRC(6f4d6aea) SHA1(6809c26e6975cac97b0f8c01a508d4e022859b1a) )
 
+	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
-	ROM_COPY( "graphics", 0x04000, 0x00000, 0x4000 ) // 1
-	ROM_COPY( "graphics", 0x0c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
-	ROM_COPY( "graphics", 0x14000, 0x0c000, 0x4000 ) // 2
-	ROM_COPY( "graphics", 0x18000, 0x10000, 0x4000 ) // 1
-	ROM_COPY( "graphics", 0x1c000, 0x14000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
 
 	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
-	ROM_COPY( "graphics", 0x00000, 0x04000, 0x4000 )
-	ROM_COPY( "graphics", 0x10000, 0x00000, 0x4000 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "sc97u19.bin", 0x0000, 0x0100, CRC(6a01caca) SHA1(9b3e9eebb9fcc8770f7e92f0f1c0434516ee613d) )
@@ -4585,7 +4645,7 @@ ROM_START( nfb96 )
 	ROM_CONTINUE(0xd000, 0x1000)
 	ROM_CONTINUE(0xe000, 0x1000)
 	ROM_CONTINUE(0xf000, 0x1000)
-	
+		
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 	
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
@@ -5288,6 +5348,12 @@ static DRIVER_INIT( nfb96sea )
 	}
 }
 
+
+static READ8_HANDLER( fixedvalb4_r )
+{
+	return 0xb4;
+}
+
 static DRIVER_INIT( schery97 )
 {
 	int i;
@@ -5305,6 +5371,14 @@ static DRIVER_INIT( schery97 )
 
      	ROM[i] = x;
 	}
+	
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
+	
+}
+
+static READ8_HANDLER( fixedval38_r )
+{
+	return 0x38;
 }
 
 static DRIVER_INIT( schery97a )
@@ -5324,10 +5398,17 @@ static DRIVER_INIT( schery97a )
 
 		ROM[i] = x;
 	}
+	
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedval38_r);
+	
 }
 
+static READ8_HANDLER( fixedvalea_r )
+{
+	return 0xea;
+}
 
-static DRIVER_INIT( schery98 )
+static DRIVER_INIT( skill98 )
 {
 	int i;
 	UINT8 *ROM = memory_region(machine, "main");
@@ -5344,6 +5425,9 @@ static DRIVER_INIT( schery98 )
 
 		ROM[i] = x;
 	}
+	
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1e, 0x1e, 0, 0, fixedvalea_r);
+	
 }
 
 static READ8_HANDLER( fixedval68_r )
@@ -5463,10 +5547,10 @@ GAME( 198?, mtonic,   0,        ncb3,     cmv801,   0,        ROT0, "Tonic",    
 
 
 
-// bootlegs of cherry master?
-GAME( 1998, schery98, 0,        cmnobmp,  cmv801,   schery98, ROT0, "Amcoe",             "Skill Cherry '98",                       GAME_NOT_WORKING )
-GAME( 1997, schery97, 0,        cmnobmp,  cmv801,   schery97, ROT0, "Amcoe",             "Skill Cherry '97 (set 1)",               GAME_NOT_WORKING )
-GAME( 1997, schery97a,schery97, cmnobmp,  cmv801,   schery97a,ROT0, "Amcoe",             "Skill Cherry '97 (set 2)",               GAME_NOT_WORKING )
+
+GAME( 1998, skill98, 0,        cm,  cmv4,   skill98, ROT0, "Amcoe",             "Skill '98",                       GAME_NOT_WORKING )
+GAME( 1997, schery97, 0,        cm,  cmv4,   schery97, ROT0, "Amcoe",             "Skill Cherry '97 (set 1)",               GAME_NOT_WORKING )
+GAME( 1997, schery97a,schery97, cm,  cmv4,   schery97a,ROT0, "Amcoe",             "Skill Cherry '97 (set 2)",               GAME_NOT_WORKING )
 GAME( 1996, nfb96,    0,         cm,  cmv4,   fb36xc1,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 1)",                       GAME_NOT_WORKING )
 GAME( 1996, nfb96a,	  nfb96,    cm,  cmv4,   fb36xc1,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 2)",                       GAME_NOT_WORKING )
 GAME( 1996, nfb96b,   nfb96,    cm,  cmv4,   fbse354,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 3)",                       GAME_NOT_WORKING )
