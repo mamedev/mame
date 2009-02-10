@@ -7488,6 +7488,8 @@ Other Sun games
 	DRIVER( spk116it )	/* (c) 199? IGS */
 	DRIVER( jackie )	/* (c) 1993 IGS */
 	DRIVER( pktet346 )	/* (c) 199? IGS */
+	DRIVER( chleague )	/* (c) 199? IGS */
+	DRIVER( chleagul )	/* (c) 199? IGS */
 	DRIVER( number10 )	/* (c) IGS (Board labeled Playmark Srl) */
 	DRIVER( numbr10l )	/* (c) IGS (Board labeled Playmark Srl) */
 	DRIVER( stellecu )	/* (c) 1998 */
