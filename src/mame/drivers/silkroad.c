@@ -1,18 +1,13 @@
-#include "driver.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2151intf.h"
-#include "sound/okim6295.h"
-
 /* The Legend of Silk Road - Unico 1999 */
 
 /* Preliminary Driver by David Haywood */
 /* Inputs, DIPs by Stephh & R. Belmont */
-/* and preliminary sound hookup by R. Belmont */
-/* todo:
+/* and preliminary sound hookup by R. Belmont + fixes by Pierpaolo Prazzoli */
 
-Clean Up
-
-*/
+#include "driver.h"
+#include "cpu/m68000/m68000.h"
+#include "sound/2151intf.h"
+#include "sound/okim6295.h"
 
 /*
 
@@ -20,7 +15,7 @@ Clean Up
 lev 1 : 0x64 : 0000 01d6 - just rte
 lev 2 : 0x68 : 0000 01d6 - just rte
 lev 3 : 0x6c : 0000 01d6 - just rte
-lev 4 : 0x70 : 0000 012c - vblank?
+lev 4 : 0x70 : 0000 012c - vblank
 lev 5 : 0x74 : 0000 01d6 - just rte
 lev 6 : 0x78 : 0000 01d6 - just rte
 lev 7 : 0x7c : 0000 01d6 - just rte
@@ -156,7 +151,6 @@ static WRITE32_HANDLER(silk_6295_0_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		logerror("OKI0: write %x mem_mask %8x\n", data>>16, mem_mask);
 		okim6295_data_0_w(space, 0, (data>>16) & 0xff);
 	}
 }
@@ -170,7 +164,6 @@ static WRITE32_HANDLER(silk_6295_1_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		logerror("OKI1: write %x mem_mask %8x\n", data>>16, mem_mask);
 		okim6295_data_1_w(space, 0, (data>>16) & 0xff);
 	}
 }
@@ -196,54 +189,42 @@ static WRITE32_HANDLER(silk_ym_dataport_w)
 	}
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x40c000, 0x40cfff) AM_READ(SMH_RAM)
-	AM_RANGE(0x600000, 0x603fff) AM_READ(SMH_RAM)
+static WRITE32_HANDLER(silk_6295_0_bank_w)
+{
+	if (ACCESSING_BITS_24_31)
+	{
+		int bank = (data & 0x3000000) >> 24;
+		if(bank < 3)
+			okim6295_set_bank_base(0, 0x40000 * (bank));
+	}
+}
 
-	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x804000, 0x807fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x808000, 0x80bfff) AM_READ(SMH_RAM)
+static WRITE32_HANDLER(silk_coin_counter_w)
+{
+	if (ACCESSING_BITS_16_23)
+	{
+		coin_counter_w(0, data & 0x10000);
+		coin_counter_w(1, data & 0x80000);
+	}
+}
 
-	AM_RANGE(0xC00000, 0xC00003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xC00004, 0xC00007) AM_READ_PORT("DSW")
-	AM_RANGE(0xC00024, 0xC00027) AM_READ(silk_6295_0_r)
-	AM_RANGE(0xC0002C, 0xC0002f) AM_READ(silk_ym_r)
-	AM_RANGE(0xC00030, 0xC00033) AM_READ(silk_6295_1_r)
-
-	AM_RANGE(0xfe0000, 0xffffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x40c000, 0x40cfff) AM_WRITE(SMH_RAM) AM_BASE(&silkroad_sprram) // sprites
-	AM_RANGE(0x600000, 0x603fff) AM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE(&paletteram32) // palette
-
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(silkroad_fgram_w) AM_BASE(&silkroad_vidram)  // lower Layer
-	AM_RANGE(0x804000, 0x807fff) AM_WRITE(silkroad_fgram2_w) AM_BASE(&silkroad_vidram2)  // higher layer
-	AM_RANGE(0x808000, 0x80bfff) AM_WRITE(silkroad_fgram3_w) AM_BASE(&silkroad_vidram3) // even higher layer
-
-
-	AM_RANGE(0xC00024, 0xC00027) AM_WRITE(silk_6295_0_w)
-	AM_RANGE(0xC00028, 0xC0002b) AM_WRITE(silk_ym_regport_w)
-	AM_RANGE(0xC0002C, 0xC0002f) AM_WRITE(silk_ym_dataport_w)
-	AM_RANGE(0xC00030, 0xC00033) AM_WRITE(silk_6295_1_w)
-
-	// C00038 appears to be the coin counter, bit 0 is pulsed when a coin is inserted
-/*
-    AM_RANGE(0xC00034, 0xC00037) AM_WRITE(SMH_NOP)
-*/
-
-	AM_RANGE(0xC0010c, 0xC00123) AM_WRITE(SMH_RAM) AM_BASE(&silkroad_regs)
-/*
-    AM_RANGE(0xC0010C, 0xC0010f) AM_WRITE(SMH_NOP) // 0
-    AM_RANGE(0xC00110, 0xC00113) AM_WRITE(SMH_NOP) // 1
-    AM_RANGE(0xC00114, 0xC00117) AM_WRITE(SMH_NOP) // 2
-
-    AM_RANGE(0xC0011c, 0xC0011f) AM_WRITE(SMH_NOP) // 4
-    AM_RANGE(0xC00120, 0xC00123) AM_WRITE(SMH_NOP) // 5
-*/
-	AM_RANGE(0xfe0000, 0xffffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x40c000, 0x40cfff) AM_RAM AM_BASE(&silkroad_sprram) // sprites
+	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE(&paletteram32) // palette
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(silkroad_fgram_w) AM_BASE(&silkroad_vidram)  // lower Layer
+	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(silkroad_fgram2_w) AM_BASE(&silkroad_vidram2)  // mid layer
+	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_BASE(&silkroad_vidram3) // higher layer
+	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
+	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("DSW")
+	AM_RANGE(0xc00024, 0xc00027) AM_READWRITE(silk_6295_0_r, silk_6295_0_w)
+	AM_RANGE(0xc00028, 0xc0002b) AM_WRITE(silk_ym_regport_w)
+	AM_RANGE(0xc0002c, 0xc0002f) AM_READWRITE(silk_ym_r, silk_ym_dataport_w)
+	AM_RANGE(0xc00030, 0xc00033) AM_READWRITE(silk_6295_1_r, silk_6295_1_w)
+	AM_RANGE(0xc00034, 0xc00037) AM_WRITE(silk_6295_0_bank_w)
+	AM_RANGE(0xc00038, 0xc0003b) AM_WRITE(silk_coin_counter_w)
+	AM_RANGE(0xc0010c, 0xc00123) AM_WRITE(SMH_RAM) AM_BASE(&silkroad_regs)
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -358,7 +339,7 @@ static MACHINE_DRIVER_START( silkroad )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	/* video hardware */
@@ -446,8 +427,18 @@ ROM_START( silkroad )
 	ROM_LOAD( "rom11.bin",	0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
 	ROM_LOAD( "rom15.bin",	0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
 
-	ROM_REGION( 0x080000, "oki1", 0 )
+	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
+	
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0xc0000, "oki1", 0 ) /* Samples */
+	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "user1", 0x040000, 0x060000, 0x020000)
+	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "user1", 0x060000, 0x0a0000, 0x020000)
 
 	ROM_REGION( 0x080000, "oki2", 0 )
 	ROM_LOAD( "rom01.bin", 0x000000, 0x040000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )

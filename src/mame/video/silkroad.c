@@ -9,60 +9,46 @@
 static tilemap *fg_tilemap,*fg2_tilemap,*fg3_tilemap;
 extern UINT32 *silkroad_vidram,*silkroad_vidram2,*silkroad_vidram3, *silkroad_sprram, *silkroad_regs;
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = silkroad_sprram;
 	UINT32 *finish = source + 0x1000/4;
-	UINT32 *maxspr = source;
-
-	while( maxspr<finish )
-	{
-		int attr = (maxspr[1] & 0x0000ffff);
-
-		if ( (attr & 0xff00) == 0xff00 ) break;
-		maxspr+=2;
-	}
-
-	finish = maxspr-2;
-
-	while( finish>=source )
+	
+	while( source < finish )
 	{
 
-		int xpos = (finish[0] & 0x01ff0000) >> 16;
-		int ypos = (finish[0] & 0x0000ffff);
-		int tileno = (finish[1] & 0xffff0000) >> 16;
-		int attr = (finish[1] & 0x0000ffff);
-
+		int xpos = (source[0] & 0x01ff0000) >> 16;
+		int ypos = (source[0] & 0x0000ffff);
+		int tileno = (source[1] & 0xffff0000) >> 16;
+		int attr = (source[1] & 0x0000ffff);
 		int flipx = (attr & 0x0080);
-
-		int width = (attr & 0x0f00) >> 8;
+		int width = ((attr & 0x0f00) >> 8) + 1;
 		int wcount;
-		int color = (attr & 0x003f) ;
+		int color = (attr & 0x003f) ;		
+		int pri		 =	((attr & 0x1000)>>12);	// Priority (1 = Low)
+		int pri_mask =	~((1 << (pri+1)) - 1);	// Above the first "pri" levels
+		
+		// attr & 0x2000 -> another priority bit?
 
-		int priority = (attr & 0x1000) >> 12;
+		if ( (source[1] & 0xff00) == 0xff00 ) break;
 
 		if ( (attr & 0x8000) == 0x8000 ) tileno+=0x10000;
 
-		width += 1;
-
-
-		if (priority == pri){
-
 		if (!flipx) {
-		for (wcount=0;wcount<width;wcount++) {
-		drawgfx(bitmap,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,cliprect,TRANSPARENCY_PEN,0);
-		}
+			for (wcount=0;wcount<width;wcount++) {
+			pdrawgfx(bitmap,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,cliprect,TRANSPARENCY_PEN,0,pri_mask);
+			}
 
 		} else {
 
-		for (wcount=width;wcount>0;wcount--) {
-		drawgfx(bitmap,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,cliprect,TRANSPARENCY_PEN,0);
-		}
+			for (wcount=width;wcount>0;wcount--) {
+			pdrawgfx(bitmap,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,cliprect,TRANSPARENCY_PEN,0,pri_mask);
+			}
 
-	}
 		}
-	finish-=2;
+		
+		source += 2;
 	}
 }
 
@@ -133,26 +119,20 @@ WRITE32_HANDLER( silkroad_fgram3_w )
 	tilemap_mark_tile_dirty(fg3_tilemap,offset);
 }
 
-
-
-static int enable1, enable2, enable3;
-
 VIDEO_START(silkroad)
 {
-	enable1 = enable2 = enable3 = 1;
-
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,16,16,64, 64);
-		tilemap_set_transparent_pen(fg_tilemap,0);
-
+	fg_tilemap  = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,16,16,64, 64);
 	fg2_tilemap = tilemap_create(machine, get_fg2_tile_info,tilemap_scan_rows,16,16,64, 64);
-		tilemap_set_transparent_pen(fg2_tilemap,0);
-
 	fg3_tilemap = tilemap_create(machine, get_fg3_tile_info,tilemap_scan_rows,16,16,64, 64);
-		tilemap_set_transparent_pen(fg3_tilemap,0);
+	
+	tilemap_set_transparent_pen(fg_tilemap,0);
+	tilemap_set_transparent_pen(fg2_tilemap,0);
+	tilemap_set_transparent_pen(fg3_tilemap,0);
 }
 
 VIDEO_UPDATE(silkroad)
 {
+	bitmap_fill(priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x7c0);
 
 	tilemap_set_scrollx( fg_tilemap, 0, ((silkroad_regs[0] & 0xffff0000) >> 16) );
@@ -163,20 +143,11 @@ VIDEO_UPDATE(silkroad)
 
 	tilemap_set_scrolly( fg2_tilemap, 0, ((silkroad_regs[5] & 0xffff0000) >> 16));
 	tilemap_set_scrollx( fg2_tilemap, 0, (silkroad_regs[2] & 0x0000ffff) >> 0 );
-
-/*
-    if (input_code_pressed(KEYCODE_A)) enable1 ^= 1;
-    if (input_code_pressed(KEYCODE_S)) enable2 ^= 1;
-    if (input_code_pressed(KEYCODE_D)) enable3 ^= 1;
-*/
-
-	if(enable1)	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-
-	draw_sprites(screen->machine, bitmap,cliprect,0);
-	if(enable2)	tilemap_draw(bitmap,cliprect,fg2_tilemap,0,0);
-
-	draw_sprites(screen->machine, bitmap,cliprect,1);
-	if(enable3)	tilemap_draw(bitmap,cliprect,fg3_tilemap,0,0);
+	
+	tilemap_draw(bitmap,cliprect,fg_tilemap, 0,0);
+	tilemap_draw(bitmap,cliprect,fg2_tilemap,0,1);
+	tilemap_draw(bitmap,cliprect,fg3_tilemap,0,2);
+	draw_sprites(screen->machine,bitmap,cliprect);
 
 /*
     popmessage ("Regs %08x %08x %08x %08x %08x",
