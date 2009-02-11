@@ -66,7 +66,7 @@ struct _latch8_config
 
 /* Write bit to discrete node */
 #define MDRV_LATCH8_DISCRETE_NODE(_device, _bit, _node) \
-	MDRV_DEVICE_CONFIG_DATA32_ARRAY(latch8_config, node_device, _bit, _device) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(latch8_config, node_device, _bit, _device) \
 	MDRV_DEVICE_CONFIG_DATA32_ARRAY(latch8_config, node_map, _bit, _node)
 
 /* Upon read, replace bits by reading from another device handler */
