@@ -4,8 +4,6 @@
 
 *************************************************************************/
 
-#include "sound/custom.h"
-
 #define LELAND_BATTERY_RAM_SIZE 0x4000
 #define ATAXX_EXTRA_TRAM_SIZE 0x800
 
@@ -87,8 +85,8 @@ READ8_HANDLER( leland_gated_paletteram_r );
 WRITE8_HANDLER( ataxx_paletteram_and_misc_w );
 READ8_HANDLER( ataxx_paletteram_and_misc_r );
 
-READ8_HANDLER( leland_sound_port_r );
-WRITE8_HANDLER( leland_sound_port_w );
+READ8_DEVICE_HANDLER( leland_sound_port_r );
+WRITE8_DEVICE_HANDLER( leland_sound_port_w );
 
 WRITE8_HANDLER( leland_slave_small_banksw_w );
 WRITE8_HANDLER( leland_slave_large_banksw_w );
@@ -101,10 +99,15 @@ void leland_rotate_memory(running_machine *machine, const char *cpuname);
 
 /*----------- defined in audio/leland.c -----------*/
 
-CUSTOM_START( leland_sh_start );
+DEVICE_GET_INFO( leland_sound );
+#define SOUND_LELAND DEVICE_GET_INFO_NAME(leland_sound)
 
-CUSTOM_START( leland_80186_sh_start );
-CUSTOM_START( redline_80186_sh_start );
+DEVICE_GET_INFO( leland_80186_sound );
+#define SOUND_LELAND_80186 DEVICE_GET_INFO_NAME(leland_80186_sound)
+
+DEVICE_GET_INFO( redline_80186_sound );
+#define SOUND_REDLINE_80186 DEVICE_GET_INFO_NAME(redline_80186_sound)
+
 void leland_dac_update(int dacnum, UINT8 sample);
 
 void leland_80186_sound_init(void);
@@ -127,7 +130,7 @@ ADDRESS_MAP_EXTERN(ataxx_80186_map_io, 16);
 extern UINT8 *ataxx_qram;
 
 WRITE8_HANDLER( leland_scroll_w );
-WRITE8_HANDLER( leland_gfx_port_w );
+WRITE8_DEVICE_HANDLER( leland_gfx_port_w );
 
 WRITE8_HANDLER( leland_master_video_addr_w );
 WRITE8_HANDLER( leland_mvram_port_w );

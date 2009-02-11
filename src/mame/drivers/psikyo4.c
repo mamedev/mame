@@ -363,54 +363,6 @@ static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 }
 #endif
 
-static READ32_HANDLER( psh_ymf_fm_r )
-{
-	return ymf278b_status_port_0_r(space, 0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
-}
-
-static WRITE32_HANDLER( psh_ymf_fm_w )
-{
-	if (ACCESSING_BITS_24_31)	// FM bank 1 address (OPL2/OPL3 compatible)
-	{
-		ymf278b_control_port_0_a_w(space, 0, data>>24);
-	}
-
-	if (ACCESSING_BITS_16_23)	// FM bank 1 data
-	{
-		ymf278b_data_port_0_a_w(space, 0, data>>16);
-	}
-
-	if (ACCESSING_BITS_8_15)	// FM bank 2 address (OPL3/YMF 262 extended)
-	{
-		ymf278b_control_port_0_b_w(space, 0, data>>8);
-	}
-
-	if (ACCESSING_BITS_0_7)	// FM bank 2 data
-	{
-		ymf278b_data_port_0_b_w(space, 0, data);
-	}
-}
-
-static WRITE32_HANDLER( psh_ymf_pcm_w )
-{
-	if (ACCESSING_BITS_24_31)	// PCM address (OPL4/YMF 278B extended)
-	{
-		ymf278b_control_port_0_c_w(space, 0, data>>24);
-
-#if ROMTEST
-		if (data>>24 == 0x06)	// Reset Sample reading (They always write this code immediately before reading data)
-		{
-			sample_offs = 0;
-		}
-#endif
-	}
-
-	if (ACCESSING_BITS_16_23)	// PCM data
-	{
-		ymf278b_data_port_0_c_w(space, 0, data>>16);
-	}
-}
-
 #define PCM_BANK_NO(n)	((ps4_io_select[0] >> (n * 4 + 24)) & 0x07)
 
 static void set_hotgmck_pcm_bank(running_machine *machine, int n)
@@ -447,7 +399,7 @@ static ADDRESS_MAP_START( ps4_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READ(SMH_NOP) // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe8, 0x03003fef) AM_READ(SMH_RAM) // vid regs?
 	AM_RANGE(0x03004000, 0x03005fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x05000000, 0x05000003) AM_READ(psh_ymf_fm_r) // read YMF status
+	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8(SOUND, "ymf", ymf278b_r, 0xffffffff) // read YMF status
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x05800004, 0x05800007) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x06000000, 0x060fffff) AM_READ(SMH_RAM)	// main RAM (1 meg)
@@ -469,18 +421,17 @@ static ADDRESS_MAP_START( ps4_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03003ff8, 0x03003ffb) AM_WRITE(ps4_screen2_brt_w) // screen 2 brightness
 	AM_RANGE(0x03003ffc, 0x03003fff) AM_WRITE(ps4_bgpen_2_dword_w) AM_BASE(&bgpen_2) // screen 2 clear colour
 	AM_RANGE(0x03004000, 0x03005fff) AM_WRITE(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32) // palette
-	AM_RANGE(0x05000000, 0x05000003) AM_WRITE(psh_ymf_fm_w) // first 2 OPL4 register banks
-	AM_RANGE(0x05000004, 0x05000007) AM_WRITE(psh_ymf_pcm_w) // third OPL4 register bank
+	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8(SOUND, "ymf", ymf278b_w, 0xffffffff)
 	AM_RANGE(0x05800008, 0x0580000b) AM_WRITE(SMH_RAM) AM_BASE(&ps4_io_select) // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
 	AM_RANGE(0x06000000, 0x060fffff) AM_WRITE(SMH_RAM) AM_BASE(&ps4_ram)	// work RAM
 ADDRESS_MAP_END
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
 	if (linestate)
-		cpu_set_input_line(machine->cpu[0], 12, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 12, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 12, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 12, CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =

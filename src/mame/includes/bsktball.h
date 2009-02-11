@@ -26,9 +26,9 @@ WRITE8_HANDLER( bsktball_led2_w );
 
 /*----------- defined in audio/bsktball.c -----------*/
 
-WRITE8_HANDLER( bsktball_bounce_w );
-WRITE8_HANDLER( bsktball_note_w );
-WRITE8_HANDLER( bsktball_noise_reset_w );
+WRITE8_DEVICE_HANDLER( bsktball_bounce_w );
+WRITE8_DEVICE_HANDLER( bsktball_note_w );
+WRITE8_DEVICE_HANDLER( bsktball_noise_reset_w );
 
 DISCRETE_SOUND_EXTERN( bsktball );
 

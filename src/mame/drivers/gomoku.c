@@ -21,7 +21,6 @@ todo:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "sound/custom.h"
 #include "includes/gomoku.h"
 
 
@@ -126,11 +125,6 @@ static GFXDECODE_START( gomoku )
 GFXDECODE_END
 
 
-static const custom_sound_interface custom_interface =
-{
-	gomoku_sh_start
-};
-
 static MACHINE_DRIVER_START( gomoku )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 18432000/12)		 /* 1.536 MHz ? */
@@ -155,8 +149,7 @@ static MACHINE_DRIVER_START( gomoku )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("gomoku", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ADD("gomoku", GOMOKU, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

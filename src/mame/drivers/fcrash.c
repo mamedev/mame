@@ -57,8 +57,8 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "sound");
 	int bankaddr;
 
-	sndti_set_output_gain(SOUND_MSM5205, 0, 0, (data & 0x08) ? 0.0 : 1.0);
-	sndti_set_output_gain(SOUND_MSM5205, 1, 0, (data & 0x10) ? 0.0 : 1.0);
+	sound_set_output_gain(devtag_get_device(space->machine, SOUND, "msm1"), 0, (data & 0x08) ? 0.0 : 1.0);
+	sound_set_output_gain(devtag_get_device(space->machine, SOUND, "msm2"), 0, (data & 0x10) ? 0.0 : 1.0);
 
 	bankaddr = ((data & 7) * 0x4000);
 	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bankaddr]);
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 
 static void m5205_int1(const device_config *device)
 {
-	msm5205_data_w(0, sample_buffer1 & 0x0F);
+	msm5205_data_w(device, sample_buffer1 & 0x0F);
 	sample_buffer1 >>= 4;
 	sample_select1 ^= 1;
 	if (sample_select1 == 0)
@@ -75,7 +75,7 @@ static void m5205_int1(const device_config *device)
 
 static void m5205_int2(const device_config *device)
 {
-	msm5205_data_w(1, sample_buffer2 & 0x0F);
+	msm5205_data_w(device, sample_buffer2 & 0x0F);
 	sample_buffer2 >>= 4;
 	sample_select2 ^= 1;
 }
@@ -364,10 +364,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xd800) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0xd801, 0xd801) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
-	AM_RANGE(0xdc00, 0xdc00) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
-	AM_RANGE(0xdc01, 0xdc01) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
+	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xdc00, 0xdc01) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(fcrash_snd_bankswitch_w)
 	AM_RANGE(0xe400, 0xe400) AM_READ(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcrash_msm5205_0_data_w)

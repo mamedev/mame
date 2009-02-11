@@ -31,7 +31,6 @@
 #include "cpu/z80/z80.h"
 #include "leland.h"
 #include "sound/2151intf.h"
-#include "sound/custom.h"
 
 
 #define MASTER_CLOCK		XTAL_28_63636MHz
@@ -288,19 +287,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static const custom_sound_interface i80186_custom_interface =
-{
-    leland_80186_sh_start
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -330,8 +316,7 @@ static MACHINE_DRIVER_START( ataxx )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("leland", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(i80186_custom_interface)
+	MDRV_SOUND_ADD("leland", LELAND_80186, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

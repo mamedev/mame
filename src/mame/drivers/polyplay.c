@@ -119,9 +119,9 @@ static MACHINE_RESET( polyplay )
 	channel2_const = 0;
 
 	polyplay_set_channel1(0);
-	polyplay_play_channel1(0);
+	polyplay_play_channel1(machine, 0);
 	polyplay_set_channel2(0);
-	polyplay_play_channel2(0);
+	polyplay_play_channel2(machine, 0);
 
 	polyplay_timer = timer_alloc(machine, polyplay_timer_callback, NULL);
 }
@@ -192,7 +192,7 @@ static WRITE8_HANDLER( polyplay_sound_channel )
 				polyplay_set_channel1(0);
 			}
 			channel1_const = 0;
-			polyplay_play_channel1(data*prescale1);
+			polyplay_play_channel1(space->machine, data*prescale1);
 
 		}
 		else {
@@ -203,7 +203,7 @@ static WRITE8_HANDLER( polyplay_sound_channel )
 			}
 			if ((data == 0x41) || (data == 0x65) || (data == 0x45)) {
 				polyplay_set_channel1(0);
-				polyplay_play_channel1(0);
+				polyplay_play_channel1(space->machine, 0);
 			}
 		}
 		break;
@@ -213,7 +213,7 @@ static WRITE8_HANDLER( polyplay_sound_channel )
 				polyplay_set_channel2(0);
 			}
 			channel2_const = 0;
-			polyplay_play_channel2(data*prescale2);
+			polyplay_play_channel2(space->machine, data*prescale2);
 
 		}
 		else {
@@ -224,7 +224,7 @@ static WRITE8_HANDLER( polyplay_sound_channel )
 			}
 			if ((data == 0x41) || (data == 0x65) || (data == 0x45)) {
 				polyplay_set_channel2(0);
-				polyplay_play_channel2(0);
+				polyplay_play_channel2(space->machine, 0);
 			}
 		}
 		break;

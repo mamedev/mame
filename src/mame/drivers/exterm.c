@@ -240,13 +240,10 @@ static TIMER_CALLBACK( master_sound_nmi_callback )
 }
 
 
-static WRITE8_HANDLER( ym2151_data_latch_w )
+static WRITE8_DEVICE_HANDLER( ym2151_data_latch_w )
 {
 	/* bit 7 of the sound control selects which port */
-	if (sound_control & 0x80)
-		ym2151_data_port_0_w(space, offset, data);
-	else
-		ym2151_register_port_0_w(space, offset, data);
+	ym2151_w(device, sound_control >> 7, data);
 }
 
 
@@ -276,11 +273,11 @@ static READ8_HANDLER( sound_slave_latch_r )
 }
 
 
-static WRITE8_HANDLER( sound_slave_dac_w )
+static WRITE8_DEVICE_HANDLER( sound_slave_dac_w )
 {
 	/* DAC A is used to modulate DAC B */
 	dac_value[offset & 1] = data;
-	dac_data_16_w(0, (dac_value[0] ^ 0xff) * dac_value[1]);
+	dac_data_16_w(device, (dac_value[0] ^ 0xff) * dac_value[1]);
 }
 
 
@@ -345,7 +342,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(ym2151_data_latch_w)
+	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE(SOUND, "ym", ym2151_data_latch_w)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(sound_nmi_rate_w)
 	AM_RANGE(0x6800, 0x6fff) AM_READ(sound_master_latch_r)
 	AM_RANGE(0x7000, 0x77ff) AM_READ(sound_nmi_to_slave_r)
@@ -358,7 +355,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_READ(sound_slave_latch_r)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(sound_slave_dac_w)
+	AM_RANGE(0x8000, 0xbfff) AM_DEVWRITE(SOUND, "dac", sound_slave_dac_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

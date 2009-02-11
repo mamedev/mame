@@ -11,7 +11,8 @@
 #define  NUM_CHANNELS    (8)
 
 
-struct pcm_channel
+typedef struct _pcm_channel pcm_channel;
+struct _pcm_channel
 {
 	UINT8		enable;
 	UINT8		env;
@@ -23,16 +24,26 @@ struct pcm_channel
 };
 
 
-struct rf5c68pcm
+typedef struct _rf5c68_state rf5c68_state;
+struct _rf5c68_state
 {
 	sound_stream *		stream;
-	struct pcm_channel	chan[NUM_CHANNELS];
+	pcm_channel			chan[NUM_CHANNELS];
 	UINT8				cbank;
 	UINT8				wbank;
 	UINT8				enable;
 	UINT8				data[0x10000];
 };
 
+
+INLINE rf5c68_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_RF5C68);
+	return (rf5c68_state *)device->token;
+}
 
 
 /************************************************/
@@ -41,7 +52,7 @@ struct rf5c68pcm
 
 static STREAM_UPDATE( rf5c68_update )
 {
-	struct rf5c68pcm *chip = param;
+	rf5c68_state *chip = param;
 	stream_sample_t *left = outputs[0];
 	stream_sample_t *right = outputs[1];
 	int i, j;
@@ -57,7 +68,7 @@ static STREAM_UPDATE( rf5c68_update )
 	/* loop over channels */
 	for (i = 0; i < NUM_CHANNELS; i++)
 	{
-		struct pcm_channel *chan = &chip->chan[i];
+		pcm_channel *chan = &chip->chan[i];
 
 		/* if this channel is active, accumulate samples */
 		if (chan->enable)
@@ -121,13 +132,13 @@ static STREAM_UPDATE( rf5c68_update )
 /*    RF5C68 start                              */
 /************************************************/
 
-static SND_START( rf5c68 )
+static DEVICE_START( rf5c68 )
 {
 	/* allocate memory for the chip */
-	struct rf5c68pcm *chip = device->token;
+	rf5c68_state *chip = get_safe_token(device);
 
 	/* allocate the stream */
-	chip->stream = stream_create(device, 0, 2, clock / 384, chip, rf5c68_update);
+	chip->stream = stream_create(device, 0, 2, device->clock / 384, chip, rf5c68_update);
 }
 
 
@@ -135,10 +146,10 @@ static SND_START( rf5c68 )
 /*    RF5C68 write register                     */
 /************************************************/
 
-WRITE8_HANDLER( rf5c68_reg_w )
+WRITE8_DEVICE_HANDLER( rf5c68_w )
 {
-	struct rf5c68pcm *chip = sndti_token(SOUND_RF5C68, 0);
-	struct pcm_channel *chan = &chip->chan[chip->cbank];
+	rf5c68_state *chip = get_safe_token(device);
+	pcm_channel *chan = &chip->chan[chip->cbank];
 	int i;
 
 	/* force the stream to update first */
@@ -201,9 +212,9 @@ WRITE8_HANDLER( rf5c68_reg_w )
 /*    RF5C68 read memory                        */
 /************************************************/
 
-READ8_HANDLER( rf5c68_r )
+READ8_DEVICE_HANDLER( rf5c68_mem_r )
 {
-	struct rf5c68pcm *chip = sndti_token(SOUND_RF5C68, 0);
+	rf5c68_state *chip = get_safe_token(device);
 	return chip->data[chip->wbank * 0x1000 + offset];
 }
 
@@ -212,9 +223,9 @@ READ8_HANDLER( rf5c68_r )
 /*    RF5C68 write memory                       */
 /************************************************/
 
-WRITE8_HANDLER( rf5c68_w )
+WRITE8_DEVICE_HANDLER( rf5c68_mem_w )
 {
-	struct rf5c68pcm *chip = sndti_token(SOUND_RF5C68, 0);
+	rf5c68_state *chip = get_safe_token(device);
 	chip->data[chip->wbank * 0x1000 + offset] = data;
 }
 
@@ -224,34 +235,24 @@ WRITE8_HANDLER( rf5c68_w )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( rf5c68 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( rf5c68 )
+DEVICE_GET_INFO( rf5c68 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct rf5c68pcm);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(rf5c68_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( rf5c68 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( rf5c68 );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( rf5c68 );			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "RF5C68");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ricoh PCM");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "RF5C68");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Ricoh PCM");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

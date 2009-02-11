@@ -183,7 +183,6 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
-#include "sound/custom.h"
 #include "sound/sp0250.h"
 #include "streams.h"
 #include "gottlieb.h"
@@ -1896,8 +1895,7 @@ static MACHINE_DRIVER_START( g2laser )
 	MDRV_SCREEN_REMOVE("main")
 	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
 
-	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	/* right channel is processed as data */
 MACHINE_DRIVER_END

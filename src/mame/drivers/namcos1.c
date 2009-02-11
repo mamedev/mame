@@ -382,9 +382,9 @@ static WRITE8_HANDLER( namcos1_coin_w )
 	coin_counter_w(1,data & 4);
 }
 
-static void namcos1_update_DACs(void)
+static void namcos1_update_DACs(running_machine *machine)
 {
-	dac_signed_data_16_w(0,0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
+	dac_signed_data_16_w(devtag_get_device(machine, SOUND, "dac"),0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
 }
 
 void namcos1_init_DACs(void)
@@ -407,19 +407,19 @@ static WRITE8_HANDLER( namcos1_dac_gain_w )
 	value = (data >> 3) & 3; /* GAIN2,GAIN3 */
 	dac1_gain = 0x20 * (value+1);
 
-	namcos1_update_DACs();
+	namcos1_update_DACs(space->machine);
 }
 
 static WRITE8_HANDLER( namcos1_dac0_w )
 {
 	dac0_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs();
+	namcos1_update_DACs(space->machine);
 }
 
 static WRITE8_HANDLER( namcos1_dac1_w )
 {
 	dac1_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs();
+	namcos1_update_DACs(space->machine);
 }
 
 
@@ -464,10 +464,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(17)	/* Banked ROMs */
-	AM_RANGE(0x4000, 0x4001) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x5000, 0x53ff) AM_READWRITE(namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) AM_BASE(&namco_wavedata) /* PSG ( Shared ) */
+	AM_RANGE(0x4000, 0x4001) AM_DEVREAD(SOUND, "ym", ym2151_status_port_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE(SOUND, "namco", namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) AM_BASE(&namco_wavedata) /* PSG ( Shared ) */
 	AM_RANGE(0x7000, 0x77ff) AM_RAMBANK(18)	/* TRIRAM (shared) */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM	/* Sound RAM 3 */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos1_sound_bankswitch_w) /* ROM bank selector */
@@ -947,9 +946,9 @@ GFXDECODE_END
 
 
 
-static void namcos1_sound_interrupt( running_machine *machine, int irq )
+static void namcos1_sound_interrupt( const device_config *device, int irq )
 {
-	cpu_set_input_line(machine->cpu[2], M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[2], M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

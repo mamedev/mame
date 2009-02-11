@@ -1424,16 +1424,16 @@ static WRITE8_HANDLER( latch_w )
 	}
 }
 
-static READ8_HANDLER( upd7759_r )
+static READ8_DEVICE_HANDLER( upd_r )
 {
-	return 2 | upd7759_busy_r(0);
+	return 2 | upd7759_busy_r(device);
 }
 
-static WRITE8_HANDLER( upd7759_w )
+static WRITE8_DEVICE_HANDLER( upd_w )
 {
-	upd7759_reset_w(0, data & 0x80);
-	upd7759_port_w(0, data & 0x3f);
-	upd7759_start_w(0, data & 0x40 ? 0 : 1);
+	upd7759_reset_w(device, data & 0x80);
+	upd7759_port_w(device, 0, data & 0x3f);
+	upd7759_start_w(device, data & 0x40 ? 0 : 1);
 }
 
 static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1444,8 +1444,8 @@ static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_RAM		// W
 	AM_RANGE(0x2A00, 0x2A02) AM_READWRITE(latch_r, latch_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(int_latch_r)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x3201, 0x3201) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
+	AM_RANGE(0x3201, 0x3201) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
 	AM_RANGE(0x3404, 0x3404) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0x3405, 0x3405) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0x3406, 0x3406) AM_DEVREADWRITE(ACIA6850, "acia6850_2", acia6850_stat_r, acia6850_ctrl_w)
@@ -1453,7 +1453,7 @@ static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x3408, 0x3408) AM_NOP
 //  AM_RANGE(0x340A, 0x340A) AM_NOP
 //  AM_RANGE(0x3600, 0x3600) AM_NOP
-	AM_RANGE(0x3801, 0x3801) AM_READWRITE(upd7759_r, upd7759_w)
+	AM_RANGE(0x3801, 0x3801) AM_DEVREADWRITE(SOUND, "upd", upd_r, upd_w)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)	/* Watchdog */
 ADDRESS_MAP_END

@@ -289,7 +289,7 @@ static INTERRUPT_GEN( gsword_snd_interrupt )
 	}
 }
 
-static WRITE8_HANDLER( gsword_nmi_set_w )
+static WRITE8_DEVICE_HANDLER( gsword_nmi_set_w )
 {
 /*  mame_printf_debug("AY write %02X\n",data);*/
 
@@ -329,31 +329,31 @@ static WRITE8_HANDLER( josvolly_nmi_enable_w )
 	josvolly_nmi_enable = 1;
 }
 
-static WRITE8_HANDLER( gsword_AY8910_control_port_0_w )
+static WRITE8_DEVICE_HANDLER( gsword_AY8910_control_port_0_w )
 {
-	ay8910_control_port_0_w(space,offset,data);
+	ay8910_address_w(device,offset,data);
 	fake8910_0 = data;
 }
-static WRITE8_HANDLER( gsword_AY8910_control_port_1_w )
+static WRITE8_DEVICE_HANDLER( gsword_AY8910_control_port_1_w )
 {
-	ay8910_control_port_1_w(space,offset,data);
+	ay8910_address_w(device,offset,data);
 	fake8910_1 = data;
 }
 
-static READ8_HANDLER( gsword_fake_0_r )
+static READ8_DEVICE_HANDLER( gsword_fake_0_r )
 {
 	return fake8910_0+1;
 }
-static READ8_HANDLER( gsword_fake_1_r )
+static READ8_DEVICE_HANDLER( gsword_fake_1_r )
 {
 	return fake8910_1+1;
 }
 
-static WRITE8_HANDLER( gsword_adpcm_data_w )
+static WRITE8_DEVICE_HANDLER( gsword_adpcm_data_w )
 {
-	msm5205_data_w (0,data & 0x0f); /* bit 0..3 */
-	msm5205_reset_w(0,(data>>5)&1); /* bit 5    */
-	msm5205_vclk_w(0,(data>>4)&1);  /* bit 4    */
+	msm5205_data_w (device,data & 0x0f); /* bit 0..3 */
+	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w(device,(data>>4)&1);  /* bit 4    */
 }
 
 static WRITE8_HANDLER( adpcm_soundcommand_w )
@@ -398,10 +398,10 @@ static ADDRESS_MAP_START( cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(TAITO8741_2_w) AM_READ(TAITO8741_2_r)
 	AM_RANGE(0x20, 0x21) AM_WRITE(TAITO8741_3_w) AM_READ(TAITO8741_3_r)
 	AM_RANGE(0x40, 0x41) AM_WRITE(TAITO8741_1_w) AM_READ(TAITO8741_1_r)
-	AM_RANGE(0x60, 0x60) AM_WRITE(gsword_AY8910_control_port_0_w) AM_READ(gsword_fake_0_r)
-	AM_RANGE(0x61, 0x61) AM_WRITE(ay8910_write_port_0_w)          AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(gsword_AY8910_control_port_1_w) AM_READ(gsword_fake_1_r)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_write_port_1_w)          AM_READ(ay8910_read_port_1_r)
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE(SOUND, "ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE(SOUND, "ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r,        ay8910_data_w)
 //
 	AM_RANGE(0xe0, 0xe0) AM_READ(SMH_NOP) /* ?? */
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(SMH_NOP) /* ?? */
@@ -412,7 +412,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(gsword_adpcm_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "msm", gsword_adpcm_data_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -432,10 +432,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( josvolly_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(gsword_AY8910_control_port_0_w) AM_READ(gsword_fake_0_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)          AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x40, 0x40) AM_WRITE(gsword_AY8910_control_port_1_w) AM_READ(gsword_fake_1_r)
-	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_write_port_1_w)          AM_READ(ay8910_read_port_1_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(SOUND, "ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(SOUND, "ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
+	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r,        ay8910_data_w)
 
 	AM_RANGE(0x81, 0x81) AM_WRITE(josvolly_nmi_enable_w)
 	AM_RANGE(0xC1, 0xC1) AM_NOP // irq clear
@@ -679,10 +679,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	gsword_nmi_set_w, /* portA write */
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(gsword_nmi_set_w), /* portA write */
+	DEVCB_NULL
 };
 
 static const msm5205_interface msm5205_config =

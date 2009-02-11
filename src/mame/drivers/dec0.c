@@ -295,42 +295,18 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( YM3812_w )
-{
-	switch (offset) {
-	case 0:
-		ym3812_control_port_0_w(space,0,data);
-		break;
-	case 1:
-		ym3812_write_port_0_w(space,0,data);
-		break;
-	}
-}
-
-static WRITE8_HANDLER( YM2203_w )
-{
-	switch (offset) {
-	case 0:
-		ym2203_control_port_0_w(space,0,data);
-		break;
-	case 1:
-		ym2203_write_port_0_w(space,0,data);
-		break;
-	}
-}
-
 static ADDRESS_MAP_START( dec0_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x3800, 0x3800) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dec0_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0801) AM_WRITE(YM2203_w)
-	AM_RANGE(0x1000, 0x1001) AM_WRITE(YM3812_w)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym2", ym3812_w)
+	AM_RANGE(0x3800, 0x3800) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -338,32 +314,32 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slyspy_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(SMH_NOP) /* Protection counter */
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slyspy_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x090000, 0x090001) AM_WRITE(YM3812_w)
-	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(YM2203_w)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE(SOUND, "ym2", ym3812_w)
+	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( midres_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x130000, 0x130001) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0x138000, 0x138001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( midres_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x108000, 0x108001) AM_WRITE(YM3812_w)
-	AM_RANGE(0x118000, 0x118001) AM_WRITE(YM2203_w)
-	AM_RANGE(0x130000, 0x130001) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x108000, 0x108001) AM_DEVWRITE(SOUND, "ym2", ym3812_w)
+	AM_RANGE(0x118000, 0x118001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
@@ -823,14 +799,14 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(running_machine *machine, int linestate)
+static void sound_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate); /* IRQ */
+	cpu_set_input_line(device->machine->cpu[1],0,linestate); /* IRQ */
 }
 
-static void sound_irq2(running_machine *machine, int linestate)
+static void sound_irq2(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],1,linestate); /* IRQ2 */
+	cpu_set_input_line(device->machine->cpu[1],1,linestate); /* IRQ2 */
 }
 
 static const ym3812_interface ym3812_config =

@@ -11,24 +11,22 @@ typedef struct _scsp_interface scsp_interface;
 struct _scsp_interface
 {
 	int roffset;				/* offset in the region */
-	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
+	void (*irq_callback)(const device_config *device, int state);	/* irq callback */
 };
 
-void SCSP_set_ram_base(int which, void *base);
+void scsp_set_ram_base(const device_config *device, void *base);
 
 // SCSP register access
-READ16_HANDLER( scsp_0_r );
-WRITE16_HANDLER( scsp_0_w );
-READ16_HANDLER( scsp_1_r );
-WRITE16_HANDLER( scsp_1_w );
+READ16_DEVICE_HANDLER( scsp_r );
+WRITE16_DEVICE_HANDLER( scsp_w );
 
 // MIDI I/O access (used for comms on Model 2/3)
-WRITE16_HANDLER( scsp_midi_in );
-READ16_HANDLER( scsp_midi_out_r );
+WRITE16_DEVICE_HANDLER( scsp_midi_in );
+READ16_DEVICE_HANDLER( scsp_midi_out_r );
 
 extern UINT32* stv_scu;
 
-SND_GET_INFO( scsp );
-#define SOUND_SCSP SND_GET_INFO_NAME( scsp )
+DEVICE_GET_INFO( scsp );
+#define SOUND_SCSP DEVICE_GET_INFO_NAME( scsp )
 
 #endif /* __SCSP_H__ */

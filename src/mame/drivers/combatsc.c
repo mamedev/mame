@@ -222,34 +222,39 @@ static WRITE8_HANDLER( combasc_sh_irqtrigger_w )
 	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
-static WRITE8_HANDLER( combasc_play_w )
+static READ8_DEVICE_HANDLER( combasc_busy_r )
 {
-	upd7759_start_w(0, data & 2);
+	return upd7759_busy_r(device) ? 1 : 0;
 }
 
-static WRITE8_HANDLER( combasc_voice_reset_w )
+static WRITE8_DEVICE_HANDLER( combasc_play_w )
 {
-    upd7759_reset_w(0,data & 1);
+	upd7759_start_w(device, data & 2);
 }
 
-static WRITE8_HANDLER( combasc_portA_w )
+static WRITE8_DEVICE_HANDLER( combasc_voice_reset_w )
+{
+    upd7759_reset_w(device,data & 1);
+}
+
+static WRITE8_DEVICE_HANDLER( combasc_portA_w )
 {
 	/* unknown. always write 0 */
 }
 
 static emu_timer *combasc_interleave_timer;
 
-static READ8_HANDLER ( combasc_YM2203_status_port_0_r )
+static READ8_DEVICE_HANDLER ( combasc_ym2203_r )
 {
 	static int boost = 1;
-	int status = ym2203_status_port_0_r(space,0);
+	int status = ym2203_r(device,offset);
 
-	if (cpu_get_pc(space->cpu) == 0x334)
+	if (cpu_get_pc(device->machine->cpu[1]) == 0x334)
 	{
 		if (boost)
 		{
 			boost = 0;
-			timer_adjust_periodic(combasc_interleave_timer, attotime_zero, 0, cpu_clocks_to_attotime(space->cpu,80));
+			timer_adjust_periodic(combasc_interleave_timer, attotime_zero, 0, cpu_clocks_to_attotime(device->machine->cpu[1],80));
 		}
 		else if (status & 2)
 		{
@@ -321,8 +326,8 @@ static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)					/* ROM */
 	AM_RANGE(0x8000, 0x87ef) AM_READ(SMH_RAM)					/* RAM */
 	AM_RANGE(0x87f0, 0x87ff) AM_READ(SMH_RAM)					/* ??? */
-	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)		/* YM 2203 */
-	AM_RANGE(0x9008, 0x9008) AM_READ(ym2203_status_port_0_r)		/* ??? */
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)	/* YM 2203 */
+	AM_RANGE(0x9008, 0x9009) AM_DEVREAD(SOUND, "ym", ym2203_r)	/* ??? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)				/* soundlatch_r? */
 	AM_RANGE(0x8800, 0xfffb) AM_READ(SMH_ROM)					/* ROM? */
 	AM_RANGE(0xfffc, 0xffff) AM_READ(SMH_RAM)					/* ??? */
@@ -332,8 +337,7 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)				/* ROM */
 	AM_RANGE(0x8000, 0x87ef) AM_WRITE(SMH_RAM)				/* RAM */
 	AM_RANGE(0x87f0, 0x87ff) AM_WRITE(SMH_RAM)				/* ??? */
- 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)/* YM 2203 */
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)	/* YM 2203 */
+ 	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)	/* YM 2203 */
 	//AM_RANGE(0x9800, 0x9800) AM_WRITE(combasc_unknown_w_1)    /* OKIM5205? */
 	//AM_RANGE(0xa800, 0xa800) AM_WRITE(combasc_unknown_w_2)    /* OKIM5205? */
 	AM_RANGE(0x8800, 0xfffb) AM_WRITE(SMH_ROM)				/* ROM */
@@ -344,19 +348,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( combasc_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)					/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)					/* RAM */
-	AM_RANGE(0xb000, 0xb000) AM_READ(upd7759_0_busy_r)			/* upd7759 busy? */
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD(SOUND, "upd", combasc_busy_r)	/* upd7759 busy? */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)				/* soundlatch_r? */
-	AM_RANGE(0xe000, 0xe000) AM_READ(combasc_YM2203_status_port_0_r)	/* YM 2203 intercepted */
+	AM_RANGE(0xe000, 0xe001) AM_DEVREAD(SOUND, "ym", combasc_ym2203_r)	/* YM 2203 intercepted */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( combasc_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)				/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)				/* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(combasc_play_w)			/* upd7759 play voice */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(upd7759_0_port_w)		/* upd7759 voice select */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(combasc_voice_reset_w)	/* upd7759 reset? */
- 	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2203_control_port_0_w)/* YM 2203 */
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2203_write_port_0_w)	/* YM 2203 */
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE(SOUND, "upd", combasc_play_w)			/* upd7759 play voice */
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE(SOUND, "upd", upd7759_port_w)			/* upd7759 voice select */
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(SOUND, "upd", combasc_voice_reset_w)	/* upd7759 reset? */
+ 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE(SOUND, "ym", ym2203_w)	/* YM 2203 */
 ADDRESS_MAP_END
 
 
@@ -563,10 +566,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		combasc_portA_w,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(combasc_portA_w),
+		DEVCB_NULL
 	},
 	NULL
 };

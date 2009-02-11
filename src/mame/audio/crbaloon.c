@@ -30,43 +30,43 @@
 
 
 
-void crbaloon_audio_set_music_freq(const address_space *space, UINT8 freq)
+WRITE8_DEVICE_HANDLER( crbaloon_audio_set_music_freq )
 {
-	discrete_sound_w(space, CRBALOON_MUSIC_DATA, freq);
+	discrete_sound_w(device, CRBALOON_MUSIC_DATA, data);
 }
 
 
-void crbaloon_audio_set_music_enable(const address_space *space, int enabled)
+WRITE8_DEVICE_HANDLER( crbaloon_audio_set_music_enable )
 {
-	discrete_sound_w(space, CRBALOON_MUSIC_EN, enabled);
+	discrete_sound_w(device, CRBALOON_MUSIC_EN, data);
 }
 
 
-void crbaloon_audio_set_explosion_enable(int enabled)
+void crbaloon_audio_set_explosion_enable(const device_config *sn, int enabled)
 {
-	sn76477_enable_w(0, enabled);
+	sn76477_enable_w(sn, enabled);
 }
 
 
-void crbaloon_audio_set_breath_enable(int enabled)
+void crbaloon_audio_set_breath_enable(const device_config *sn, int enabled)
 {
 	/* changes slf_res to 10k (middle of two 10k resistors)
        it also puts a tantal capacitor against GND on the output,
        but this section of the schematics is not readable. */
-	sn76477_slf_res_w(0, enabled ? RES_K(10) : RES_K(20) );
+	sn76477_slf_res_w(sn, enabled ? RES_K(10) : RES_K(20) );
 }
 
 
-void crbaloon_audio_set_appear_enable(int enabled)
+void crbaloon_audio_set_appear_enable(const device_config *sn, int enabled)
 {
 	/* APPEAR is connected to MIXER B */
-	sn76477_mixer_b_w(0, enabled);
+	sn76477_mixer_b_w(sn, enabled);
 }
 
 
-void crbaloon_audio_set_laugh_enable(const address_space *space, int enabled)
+WRITE8_DEVICE_HANDLER( crbaloon_audio_set_laugh_enable )
 {
-	discrete_sound_w(space, CRBALOON_LAUGH_EN, enabled);
+	discrete_sound_w(device, CRBALOON_LAUGH_EN, data);
 }
 
 

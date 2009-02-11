@@ -43,6 +43,7 @@ To do:
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
+#include "sound/3526intf.h"
 #include "sound/msm5205.h"
 #include "includes/dec8.h"
 
@@ -405,13 +406,13 @@ static void csilver_adpcm_int(const device_config *device)
 	if (toggle)
 		cpu_set_input_line(device->machine->cpu[2],M6502_IRQ_LINE,HOLD_LINE);
 
-	msm5205_data_w (0,msm5205next>>4);
+	msm5205_data_w (device,msm5205next>>4);
 	msm5205next<<=4;
 }
 
-static READ8_HANDLER( csilver_adpcm_reset_r )
+static READ8_DEVICE_HANDLER( csilver_adpcm_reset_r )
 {
-	msm5205_reset_w(0,0);
+	msm5205_reset_w(device,0);
 	return 0;
 }
 
@@ -924,20 +925,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dec8_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym3812_control_port_0_w) /* OPL */
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE(SOUND, "ym2", ym3812_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
 static ADDRESS_MAP_START( oscar_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym3526_control_port_0_w) /* OPL */
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE(SOUND, "ym2", ym3526_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -950,10 +947,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ym3526_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3526_control_port_0_w) /* OPL? */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym2", ym3526_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -961,17 +956,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( csilver_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3400, 0x3400) AM_READ(csilver_adpcm_reset_r)	/* ? not sure */
+	AM_RANGE(0x3400, 0x3400) AM_DEVREAD(SOUND, "msm", csilver_adpcm_reset_r)	/* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK3)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3526_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym2", ym3526_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
@@ -1971,14 +1964,14 @@ GFXDECODE_END
 /******************************************************************************/
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate); /* M6502_IRQ_LINE */
+	cpu_set_input_line(device->machine->cpu[1],0,linestate); /* M6502_IRQ_LINE */
 }
 
-static void oscar_irqhandler(running_machine *machine, int linestate)
+static void oscar_irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[2],0,linestate); /* M6502_IRQ_LINE */
+	cpu_set_input_line(device->machine->cpu[2],0,linestate); /* M6502_IRQ_LINE */
 }
 
 static const ym3526_interface ym3526_config =

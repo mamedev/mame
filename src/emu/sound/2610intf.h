@@ -11,49 +11,26 @@ void ym2610_update_request(void *param);
 typedef struct _ym2610_interface ym2610_interface;
 struct _ym2610_interface
 {
-	void ( *handler )( running_machine *machine, int irq );	/* IRQ handler for the YM2610 */
+	void ( *handler )( const device_config *device, int irq );	/* IRQ handler for the YM2610 */
 };
 
-/************************************************/
-/* Chip 0 functions                             */
-/************************************************/
-READ8_HANDLER( ym2610_status_port_0_a_r );
-READ16_HANDLER( ym2610_status_port_0_a_lsb_r );
-READ8_HANDLER( ym2610_status_port_0_b_r );
-READ16_HANDLER( ym2610_status_port_0_b_lsb_r );
-READ8_HANDLER( ym2610_read_port_0_r );
-READ16_HANDLER( ym2610_read_port_0_lsb_r );
-WRITE8_HANDLER( ym2610_control_port_0_a_w );
-WRITE16_HANDLER( ym2610_control_port_0_a_lsb_w );
-WRITE8_HANDLER( ym2610_control_port_0_b_w );
-WRITE16_HANDLER( ym2610_control_port_0_b_lsb_w );
-WRITE8_HANDLER( ym2610_data_port_0_a_w );
-WRITE16_HANDLER( ym2610_data_port_0_a_lsb_w );
-WRITE8_HANDLER( ym2610_data_port_0_b_w );
-WRITE16_HANDLER( ym2610_data_port_0_b_lsb_w );
+READ8_DEVICE_HANDLER( ym2610_r );
+WRITE8_DEVICE_HANDLER( ym2610_w );
 
-/************************************************/
-/* Chip 1 functions                             */
-/************************************************/
-READ8_HANDLER( ym2610_status_port_1_a_r );
-READ16_HANDLER( ym2610_status_port_1_a_lsb_r );
-READ8_HANDLER( ym2610_status_port_1_b_r );
-READ16_HANDLER( ym2610_status_port_1_b_lsb_r );
-READ8_HANDLER( ym2610_read_port_1_r );
-READ16_HANDLER( ym2610_read_port_1_lsb_r );
-WRITE8_HANDLER( ym2610_control_port_1_a_w );
-WRITE16_HANDLER( ym2610_control_port_1_a_lsb_w );
-WRITE8_HANDLER( ym2610_control_port_1_b_w );
-WRITE16_HANDLER( ym2610_control_port_1_b_lsb_w );
-WRITE8_HANDLER( ym2610_data_port_1_a_w );
-WRITE16_HANDLER( ym2610_data_port_1_a_lsb_w );
-WRITE8_HANDLER( ym2610_data_port_1_b_w );
-WRITE16_HANDLER( ym2610_data_port_1_b_lsb_w );
+READ8_DEVICE_HANDLER( ym2610_status_port_a_r );
+READ8_DEVICE_HANDLER( ym2610_status_port_b_r );
+READ8_DEVICE_HANDLER( ym2610_read_port_r );
 
-SND_GET_INFO( ym2610 );
-SND_GET_INFO( ym2610b );
+WRITE8_DEVICE_HANDLER( ym2610_control_port_a_w );
+WRITE8_DEVICE_HANDLER( ym2610_control_port_b_w );
+WRITE8_DEVICE_HANDLER( ym2610_data_port_a_w );
+WRITE8_DEVICE_HANDLER( ym2610_data_port_b_w );
 
-#define SOUND_YM2610 SND_GET_INFO_NAME( ym2610 )
-#define SOUND_YM2610B SND_GET_INFO_NAME( ym2610b )
+
+DEVICE_GET_INFO( ym2610 );
+DEVICE_GET_INFO( ym2610b );
+
+#define SOUND_YM2610 DEVICE_GET_INFO_NAME( ym2610 )
+#define SOUND_YM2610B DEVICE_GET_INFO_NAME( ym2610b )
 
 #endif /* __2610INTF_H__ */

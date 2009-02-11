@@ -51,7 +51,7 @@ Dip locations verified with manual for brkthru (US conv. kit) and darwin
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 
 
 #define MASTER_CLOCK		XTAL_12MHz
@@ -138,12 +138,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym3526_control_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE(SOUND, "ym2", ym3526_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
-	AM_RANGE(0x6000, 0x6000) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -325,9 +322,9 @@ static GFXDECODE_START( brkthru )
 GFXDECODE_END
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,linestate);
+	cpu_set_input_line(device->machine->cpu[1],M6809_IRQ_LINE,linestate);
 }
 
 static const ym3526_interface ym3526_config =

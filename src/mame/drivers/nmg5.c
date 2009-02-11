@@ -278,9 +278,9 @@ static WRITE16_HANDLER( priority_reg_w )
 		popmessage("unknown priority_reg value = %d\n",priority_reg);
 }
 
-static WRITE8_HANDLER( oki_banking_w )
+static WRITE8_DEVICE_HANDLER( oki_banking_w )
 {
-	okim6295_set_bank_base(0, (data & 1) ? 0x40000 : 0 );
+	okim6295_set_bank_base(device, (data & 1) ? 0x40000 : 0 );
 }
 
 /*******************************************************************
@@ -346,11 +346,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(oki_banking_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "oki", oki_banking_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r)
-	AM_RANGE(0x1c, 0x1c) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nmg5 )
@@ -958,9 +957,9 @@ static GFXDECODE_START( pclubys )
 GFXDECODE_END
 
 
-static void soundirq(running_machine *machine, int state)
+static void soundirq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1], 0, state);
+	cpu_set_input_line(device->machine->cpu[1], 0, state);
 }
 
 static const ym3812_interface ym3812_intf =

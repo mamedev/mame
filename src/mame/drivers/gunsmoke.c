@@ -134,10 +134,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

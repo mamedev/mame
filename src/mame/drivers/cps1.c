@@ -288,9 +288,9 @@ static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bankaddr]);
 }
 
-static WRITE8_HANDLER( cps1_oki_pin7_w )
+static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
 {
-	okim6295_set_pin7(0, (data & 1));
+	okim6295_set_pin7(device, (data & 1));
 }
 
 static WRITE16_HANDLER( cps1_soundlatch_w )
@@ -632,11 +632,10 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE(SOUND, "2151", ym2151_r, ym2151_w)
+	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(cps1_snd_bankswitch_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(cps1_oki_pin7_w) /* controls pin 7 of OKI chip */
+	AM_RANGE(0xf006, 0xf006) AM_DEVWRITE(SOUND, "oki", cps1_oki_pin7_w) /* controls pin 7 of OKI chip */
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)	/* Sound command */
 	AM_RANGE(0xf00a, 0xf00a) AM_READ(soundlatch2_r) /* Sound timer fade */
 ADDRESS_MAP_END
@@ -664,11 +663,9 @@ ADDRESS_MAP_START( qsound_sub_map, ADDRESS_SPACE_PROGRAM, 8 )	// used by cps2.c 
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)	/* banked (contains music data) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&qsound_sharedram1)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(qsound_data_h_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(qsound_data_l_w)
-	AM_RANGE(0xd002, 0xd002) AM_WRITE(qsound_cmd_w)
+	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE(SOUND, "qsound", qsound_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_banksw_w)
-	AM_RANGE(0xd007, 0xd007) AM_READ(qsound_status_r)
+	AM_RANGE(0xd007, 0xd007) AM_DEVREAD(SOUND, "qsound", qsound_r)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&qsound_sharedram2)
 ADDRESS_MAP_END
 
@@ -2737,9 +2734,9 @@ GFXDECODE_END
 
 
 
-static void cps1_irq_handler_mus(running_machine *machine, int irq)
+static void cps1_irq_handler_mus(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -2891,7 +2888,7 @@ ADDRESS_MAP_END
 
 static void m5205_int1(const device_config *device)
 {
-//  msm5205_data_w(0, sample_buffer1 & 0x0F);
+//  msm5205_data_w(device, sample_buffer1 & 0x0F);
 //  sample_buffer1 >>= 4;
 //  sample_select1 ^= 1;
 //  if (sample_select1 == 0)
@@ -2900,7 +2897,7 @@ static void m5205_int1(const device_config *device)
 
 static void m5205_int2(const device_config *device)
 {
-//  msm5205_data_w(1, sample_buffer2 & 0x0F);
+//  msm5205_data_w(device, sample_buffer2 & 0x0F);
 //  sample_buffer2 >>= 4;
 //  sample_select2 ^= 1;
 }

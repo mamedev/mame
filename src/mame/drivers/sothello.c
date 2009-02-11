@@ -125,9 +125,8 @@ static ADDRESS_MAP_START( maincpu_io_map, ADDRESS_SPACE_IO, 8 )
     AM_RANGE( 0x33, 0x33) AM_READ(soundcpu_status_r)
     AM_RANGE( 0x40, 0x4f) AM_WRITE(soundlatch_w)
     AM_RANGE( 0x50, 0x50) AM_WRITE(bank_w)
-    AM_RANGE( 0x60, 0x60) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-    AM_RANGE( 0x61, 0x61) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
-    AM_RANGE( 0x62, 0x62) AM_READ(ym2203_status_port_0_r) /* not sure, but the A1 line is ignored, code @ $8b8 */
+    AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
+   						/* not sure, but the A1 line is ignored, code @ $8b8 */
     AM_RANGE( 0x70, 0x70) AM_WRITE( v9938_0_vram_w ) AM_READ( v9938_0_vram_r )
     AM_RANGE( 0x71, 0x71) AM_WRITE( v9938_0_command_w ) AM_READ( v9938_0_status_r )
     AM_RANGE( 0x72, 0x72) AM_WRITE( v9938_0_palette_w )
@@ -136,7 +135,7 @@ ADDRESS_MAP_END
 
 /* sound Z80 */
 
-static WRITE8_HANDLER(msm_cfg_w)
+static WRITE8_DEVICE_HANDLER(msm_cfg_w)
 {
 /*
      bit 0 = RESET
@@ -144,8 +143,8 @@ static WRITE8_HANDLER(msm_cfg_w)
      bit 2 = S2    1
      bit 3 = S1    2
 */
-    msm5205_playmode_w(0, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2)); /* or maybe 7,6,5,4,3,0,2,1 ??? */
-    msm5205_reset_w(0,data&1);
+    msm5205_playmode_w(device, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2)); /* or maybe 7,6,5,4,3,0,2,1 ??? */
+    msm5205_reset_w(device,data&1);
 }
 
 static WRITE8_HANDLER( msm_data_w )
@@ -178,7 +177,7 @@ static ADDRESS_MAP_START( soundcpu_io_map, ADDRESS_SPACE_IO, 8 )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
     AM_RANGE(0x01, 0x01) AM_WRITE(msm_data_w)
-    AM_RANGE(0x02, 0x02) AM_WRITE(msm_cfg_w)
+    AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "msm", msm_cfg_w)
     AM_RANGE(0x03, 0x03) AM_WRITE(soundcpu_busyflag_set_w)
     AM_RANGE(0x04, 0x04) AM_WRITE(soundcpu_busyflag_reset_w)
     AM_RANGE(0x05, 0x05) AM_WRITE(soundcpu_int_clear_w)
@@ -291,9 +290,9 @@ INPUT_PORTS_START( sothello )
 
 INPUT_PORTS_END
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-    cpu_set_input_line(machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
+    cpu_set_input_line(device->machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void sothello_vdp_interrupt(running_machine *machine, int i)
@@ -309,7 +308,7 @@ static INTERRUPT_GEN( sothello_interrupt )
 static void adpcm_int(const device_config *device)
 {
     /* only 4 bits are used */
-    msm5205_data_w( 0, msm_data & 0x0f );
+    msm5205_data_w( device, msm_data & 0x0f );
     cpu_set_input_line(device->machine->cpu[1], 0, ASSERT_LINE );
 }
 
@@ -337,10 +336,10 @@ static const ym2203_interface ym2203_config =
     {
         AY8910_LEGACY_OUTPUT,
         AY8910_DEFAULT_LOADS,
-        input_port_3_r,     /* DSW-1 connected to port */
-        input_port_4_r,     /* DSW-2 connected to port  */
-        NULL,
-        NULL,
+		DEVCB_INPUT_PORT("DSWA"),
+		DEVCB_INPUT_PORT("DSWB"),
+        DEVCB_NULL,
+        DEVCB_NULL,
     },
     irqhandler
 };
@@ -378,7 +377,7 @@ static MACHINE_DRIVER_START( sothello )
 
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
-    MDRV_SOUND_ADD("ym1", YM2203, YM_CLOCK)
+    MDRV_SOUND_ADD("ym", YM2203, YM_CLOCK)
     MDRV_SOUND_CONFIG(ym2203_config)
     MDRV_SOUND_ROUTE(0, "mono", 0.25)
     MDRV_SOUND_ROUTE(1, "mono", 0.25)

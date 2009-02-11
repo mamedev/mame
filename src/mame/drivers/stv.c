@@ -1952,19 +1952,6 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 	return (sound_ram[offset*2]<<16)|sound_ram[offset*2+1];
 }
 
-static READ32_HANDLER( stv_scsp_regs_r32 )
-{
-	offset <<= 1;
-	return (scsp_0_r(space, offset+1, 0xffff) | (scsp_0_r(space, offset, 0xffff)<<16));
-}
-
-static WRITE32_HANDLER( stv_scsp_regs_w32 )
-{
-	offset <<= 1;
-	scsp_0_w(space, offset, data>>16, mem_mask >> 16);
-	scsp_0_w(space, offset+1, data, mem_mask);
-}
-
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  *
  * Enter into Radiant Silver Gun specific menu for a test...                       */
 static WRITE32_HANDLER( minit_w )
@@ -2005,7 +1992,7 @@ static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE(stv_sh2_soundram_r, stv_sh2_soundram_w)
 	//AM_RANGE(0x05a80000, 0x05afffff) AM_READ(stv_sh2_random_r)
-	AM_RANGE(0x05b00000, 0x05b00fff) AM_READWRITE(stv_scsp_regs_r32, stv_scsp_regs_w32)
+	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16(SOUND, "scsp", scsp_r, scsp_w, 0xffffffff)
 	/* VDP1 */
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(stv_vdp1_vram_r, stv_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(stv_vdp1_framebuffer0_r, stv_vdp1_framebuffer0_w)
@@ -2021,7 +2008,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&sound_ram)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(scsp_0_r, scsp_0_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE(SOUND, "scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
 #define STV_PLAYER_INPUTS(_n_, _b1_, _b2_, _b3_)							\
@@ -2472,7 +2459,7 @@ static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(running_machine *machine, int irq)
+static void scsp_irq(const device_config *device, int irq)
 {
 	// don't bother the 68k if it's off
 	if (!en_68k)
@@ -2483,15 +2470,15 @@ static void scsp_irq(running_machine *machine, int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpu_set_input_line(machine->cpu[2], irq, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[2], irq, ASSERT_LINE);
 	}
 	else if (irq < 0)
 	{
-		cpu_set_input_line(machine->cpu[2], -irq, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[2], -irq, CLEAR_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[2], scsp_last_line, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[2], scsp_last_line, CLEAR_LINE);
 	}
 }
 
@@ -2503,7 +2490,7 @@ static const scsp_interface scsp_config =
 
 static MACHINE_START( stv )
 {
-	SCSP_set_ram_base(0, sound_ram);
+	scsp_set_ram_base(devtag_get_device(machine, SOUND, "scsp"), sound_ram);
 
 	// save states
 	state_save_register_global_pointer(machine, smpc_ram, 0x80);

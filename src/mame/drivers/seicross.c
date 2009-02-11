@@ -91,16 +91,16 @@ static MACHINE_RESET( friskyt )
 
 
 
-static READ8_HANDLER( friskyt_portB_r )
+static READ8_DEVICE_HANDLER( friskyt_portB_r )
 {
-	return (portb & 0x9f) | (input_port_read_safe(space->machine, "DEBUG", 0) & 0x60);
+	return (portb & 0x9f) | (input_port_read_safe(device->machine, "DEBUG", 0) & 0x60);
 }
 
-static WRITE8_HANDLER( friskyt_portB_w )
+static WRITE8_DEVICE_HANDLER( friskyt_portB_w )
 {
 //logerror("PC %04x: 8910 port B = %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 is IRQ enable */
-	cpu_interrupt_enable(space->machine->cpu[0],data & 1);
+	cpu_interrupt_enable(device->machine->cpu[0],data & 1);
 
 	/* bit 1 flips screen */
 
@@ -108,8 +108,8 @@ static WRITE8_HANDLER( friskyt_portB_w )
 	if (((portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	/* other bits unknown */
@@ -133,19 +133,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x04, 0x04) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x08) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x08) AM_DEVREAD(SOUND, "ay", ay8910_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_nvram_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
@@ -155,7 +151,7 @@ static ADDRESS_MAP_START( mcu_no_nvram_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("DSW2")		/* DSW2 */
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("DSW3")		/* DSW3 */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
@@ -394,10 +390,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	friskyt_portB_r,
-	NULL,
-	friskyt_portB_w
+	DEVCB_NULL,
+	DEVCB_HANDLER(friskyt_portB_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(friskyt_portB_w)
 };
 
 

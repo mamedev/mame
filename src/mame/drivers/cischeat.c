@@ -579,8 +579,8 @@ static WRITE16_HANDLER( scudhamm_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(0, 0x40000 * ((data >> 0) & 0x3) );
-		okim6295_set_bank_base(1, 0x40000 * ((data >> 4) & 0x3) );
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki1"), 0x40000 * ((data >> 0) & 0x3) );
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki2"), 0x40000 * ((data >> 4) & 0x3) );
 	}
 }
 
@@ -592,8 +592,8 @@ static ADDRESS_MAP_START( readmem_scudhamm, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_READ(SMH_RAM					)	// Scroll RAM 2
 	AM_RANGE(0x0b8000, 0x0bffff) AM_READ(SMH_RAM					)	// Palette
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0")					// Buttons
-	AM_RANGE(0x100014, 0x100015) AM_READ(okim6295_status_0_lsb_r	)	// Sound
-	AM_RANGE(0x100018, 0x100019) AM_READ(okim6295_status_1_lsb_r	)	//
+	AM_RANGE(0x100014, 0x100015) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff	)	// Sound
+	AM_RANGE(0x100018, 0x100019) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff	)	//
 	AM_RANGE(0x100040, 0x100041) AM_READ(scudhamm_analog_r			)	// A / D
 	AM_RANGE(0x100044, 0x100045) AM_READ(scudhamm_motor_pos_r		)	// Motor Position
 	AM_RANGE(0x100050, 0x100051) AM_READ(scudhamm_motor_status_r	)	// Motor Limit Switches
@@ -609,8 +609,8 @@ static ADDRESS_MAP_START( writemem_scudhamm, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b8000, 0x0bffff) AM_WRITE(scudhamm_paletteram16_w) AM_BASE(	&paletteram16			)	// Palette
  	AM_RANGE(0x100000, 0x100001) AM_WRITE(scudhamm_oki_bank_w		)	// Sound
  	AM_RANGE(0x100008, 0x100009) AM_WRITE(scudhamm_leds_w			)	// Leds
-	AM_RANGE(0x100014, 0x100015) AM_WRITE(okim6295_data_0_lsb_w		)	// Sound
-	AM_RANGE(0x100018, 0x100019) AM_WRITE(okim6295_data_1_lsb_w		)	//
+	AM_RANGE(0x100014, 0x100015) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff		)	// Sound
+	AM_RANGE(0x100018, 0x100019) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff		)	//
 	AM_RANGE(0x10001c, 0x10001d) AM_WRITE(scudhamm_enable_w			)	// ?
 	AM_RANGE(0x100040, 0x100041) AM_WRITE(SMH_NOP					)	// ? 0 written before reading
 	AM_RANGE(0x100050, 0x100051) AM_WRITE(scudhamm_motor_command_w	)	// Move Motor
@@ -692,8 +692,8 @@ static ADDRESS_MAP_START( readmem_armchmp2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100008, 0x100009) AM_READ(armchmp2_buttons_r			)	// Buttons + Sensors
 	AM_RANGE(0x10000c, 0x10000d) AM_READ(armchmp2_analog_r			)	// A / D
 	AM_RANGE(0x100010, 0x100011) AM_READ(armchmp2_motor_status_r	)	// Motor Limit Switches?
-	AM_RANGE(0x100014, 0x100015) AM_READ(okim6295_status_0_lsb_r	)	// Sound
-	AM_RANGE(0x100018, 0x100019) AM_READ(okim6295_status_1_lsb_r	)	//
+	AM_RANGE(0x100014, 0x100015) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff	)	// Sound
+	AM_RANGE(0x100018, 0x100019) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff	)	//
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_armchmp2, ADDRESS_SPACE_PROGRAM, 16 )
@@ -707,8 +707,8 @@ static ADDRESS_MAP_START( writemem_armchmp2, ADDRESS_SPACE_PROGRAM, 16 )
  	AM_RANGE(0x100008, 0x100009) AM_WRITE(armchmp2_leds_w			)	// Leds + Coin Counters
  	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(SMH_NOP					)	// ?
 	AM_RANGE(0x100010, 0x100011) AM_WRITE(armchmp2_motor_command_w	)	// Move Motor
-	AM_RANGE(0x100014, 0x100015) AM_WRITE(okim6295_data_0_lsb_w		)	// Sound
-	AM_RANGE(0x100018, 0x100019) AM_WRITE(okim6295_data_1_lsb_w		)	//
+	AM_RANGE(0x100014, 0x100015) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff		)	// Sound
+	AM_RANGE(0x100018, 0x100019) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff		)	//
 ADDRESS_MAP_END
 
 
@@ -843,8 +843,8 @@ static WRITE16_HANDLER( bigrun_soundbank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(0, 0x40000 * ((data >> 0) & 1) );
-		okim6295_set_bank_base(1, 0x40000 * ((data >> 4) & 1) );
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki1"), 0x40000 * ((data >> 0) & 1) );
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki2"), 0x40000 * ((data >> 4) & 1) );
 	}
 }
 
@@ -852,9 +852,9 @@ static ADDRESS_MAP_START( bigrun_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM						)	// ROM
 	AM_RANGE(0x0f0000, 0x0fffff) AM_READ(SMH_RAM						)	// RAM
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r				)	// From Main CPU
-	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r	)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(okim6295_status_0_lsb_r		)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(okim6295_status_1_lsb_r		)
+	AM_RANGE(0x080000, 0x080003) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff )
+	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff )
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigrun_sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -862,10 +862,9 @@ static ADDRESS_MAP_START( bigrun_sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0x040000, 0x040001) AM_WRITE(bigrun_soundbank_w			)	// Sample Banking
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w			)	// To Main CPU
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w	)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w		)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w			)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w			)
+	AM_RANGE(0x080000, 0x080003) AM_DEVWRITE8(SOUND, "ym", ym2151_w, 0x00ff	)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff	)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff )
 ADDRESS_MAP_END
 
 
@@ -873,34 +872,29 @@ ADDRESS_MAP_END
                                 Cisco Heat
 **************************************************************************/
 
-static WRITE16_HANDLER( cischeat_soundbank_0_w )
+static WRITE16_DEVICE_HANDLER( cischeat_soundbank_w )
 {
-	if (ACCESSING_BITS_0_7)	okim6295_set_bank_base(0, 0x40000 * (data & 1) );
-}
-static WRITE16_HANDLER( cischeat_soundbank_1_w )
-{
-	if (ACCESSING_BITS_0_7)	okim6295_set_bank_base(1, 0x40000 * (data & 1) );
+	if (ACCESSING_BITS_0_7)	okim6295_set_bank_base(device, 0x40000 * (data & 1) );
 }
 
 static ADDRESS_MAP_START( cischeat_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM						)	// ROM
 	AM_RANGE(0x0f0000, 0x0fffff) AM_READ(SMH_RAM						)	// RAM
 	AM_RANGE(0x060004, 0x060005) AM_READ(soundlatch_word_r				)	// From Main CPU
-	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r	)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(okim6295_status_0_lsb_r		)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(okim6295_status_1_lsb_r		)
+	AM_RANGE(0x080000, 0x080003) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff )
+	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff		)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff		)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cischeat_sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0x0f0000, 0x0fffff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0x040002, 0x040003) AM_WRITE(cischeat_soundbank_0_w		)	// Sample Banking
-	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_1_w		)	// Sample Banking
+	AM_RANGE(0x040002, 0x040003) AM_DEVWRITE(SOUND, "oki1", cischeat_soundbank_w		)	// Sample Banking
+	AM_RANGE(0x040004, 0x040005) AM_DEVWRITE(SOUND, "oki2", cischeat_soundbank_w		)	// Sample Banking
 	AM_RANGE(0x060002, 0x060003) AM_WRITE(soundlatch2_word_w			)	// To Main CPU
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w	)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w		)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w			)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w			)
+	AM_RANGE(0x080000, 0x080003) AM_DEVWRITE8(SOUND, "ym", ym2151_w, 0x00ff )
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff			)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff			)
 ADDRESS_MAP_END
 
 
@@ -912,21 +906,20 @@ static ADDRESS_MAP_START( f1gpstar_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM						)	// ROM
 	AM_RANGE(0x0e0000, 0x0fffff) AM_READ(SMH_RAM						)	// RAM              (cischeat: f0000-fffff)
 	AM_RANGE(0x060000, 0x060001) AM_READ(soundlatch_word_r				)	// From Main CPU    (cischeat: 60004)
-	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r	)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(okim6295_status_0_lsb_r		)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(okim6295_status_1_lsb_r		)
+	AM_RANGE(0x080000, 0x080003) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff )
+	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff		)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff		)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( f1gpstar_sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0x0e0000, 0x0fffff) AM_WRITE(SMH_RAM						)	// RAM              (cischeat: f0000-fffff)
-	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_0_w		)	// Sample Banking   (cischeat: 40002)
-	AM_RANGE(0x040008, 0x040009) AM_WRITE(cischeat_soundbank_1_w		)	// Sample Banking   (cischeat: 40004)
+	AM_RANGE(0x040004, 0x040005) AM_DEVWRITE(SOUND, "oki1", cischeat_soundbank_w		)	// Sample Banking   (cischeat: 40002)
+	AM_RANGE(0x040008, 0x040009) AM_DEVWRITE(SOUND, "oki2", cischeat_soundbank_w		)	// Sample Banking   (cischeat: 40004)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w			)	// To Main CPU      (cischeat: 60002)
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w	)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w		)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w			)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w			)
+	AM_RANGE(0x080000, 0x080003) AM_DEVWRITE8(SOUND, "ym", ym2151_w, 0x00ff )
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff			)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff			)
 ADDRESS_MAP_END
 
 
@@ -938,22 +931,21 @@ static ADDRESS_MAP_START( f1gpstr2_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM						)	// ROM
 	AM_RANGE(0x0e0000, 0x0fffff) AM_READ(SMH_RAM						)	// RAM
 	AM_RANGE(0x060004, 0x060005) AM_READ(soundlatch_word_r				)	// From Main CPU    (f1gpstar: 60000)
-	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r	)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(okim6295_status_0_lsb_r		)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(okim6295_status_1_lsb_r		)
+	AM_RANGE(0x080002, 0x080003) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff )
+	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff		)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff		)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( f1gpstr2_sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0x0e0000, 0x0fffff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_0_w		)	// Sample Banking
-	AM_RANGE(0x040008, 0x040009) AM_WRITE(cischeat_soundbank_1_w		)	// Sample Banking
+	AM_RANGE(0x040004, 0x040005) AM_DEVWRITE(SOUND, "oki1", cischeat_soundbank_w)	// Sample Banking
+	AM_RANGE(0x040008, 0x040009) AM_DEVWRITE(SOUND, "oki2", cischeat_soundbank_w)	// Sample Banking
 	AM_RANGE(0x04000e, 0x04000f) AM_WRITE(SMH_NOP						)	// ? 0              (f1gpstar: no)
 	AM_RANGE(0x060002, 0x060003) AM_WRITE(soundlatch2_word_w			)	// To Main CPU      (f1gpstar: 60000)
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w	)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w		)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w			)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w			)
+	AM_RANGE(0x080000, 0x080003) AM_DEVWRITE8(SOUND, "ym", ym2151_w, 0x00ff )
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff			)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff			)
 ADDRESS_MAP_END
 
 /**************************************************************************

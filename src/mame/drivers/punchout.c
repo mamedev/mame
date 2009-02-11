@@ -140,22 +140,22 @@ DRIVER_INIT( armwrest );
 static CUSTOM_INPUT( punchout_vlm5030_busy_r )
 {
 	/* bit 4 of DSW1 is busy pin level */
-	return (vlm5030_bsy()) ? 0x00 : 0x01;
+	return (vlm5030_bsy(devtag_get_device(field->port->machine, SOUND, "vlm"))) ? 0x00 : 0x01;
 }
 
-static WRITE8_HANDLER( punchout_speech_reset_w )
+static WRITE8_DEVICE_HANDLER( punchout_speech_reset_w )
 {
-	vlm5030_rst( data&0x01 );
+	vlm5030_rst( device, data&0x01 );
 }
 
-static WRITE8_HANDLER( punchout_speech_st_w )
+static WRITE8_DEVICE_HANDLER( punchout_speech_st_w )
 {
-	vlm5030_st( data&0x01 );
+	vlm5030_st( device, data&0x01 );
 }
 
-static WRITE8_HANDLER( punchout_speech_vcu_w )
+static WRITE8_DEVICE_HANDLER( punchout_speech_vcu_w )
 {
-	vlm5030_vcu( data & 0x01 );
+	vlm5030_vcu( device, data & 0x01 );
 }
 
 static WRITE8_HANDLER( punchout_2a03_reset_w )
@@ -427,16 +427,16 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(SMH_NOP)	/* the 2A03 #1 is not present */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(vlm5030_data_w)	/* VLM5030 */
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w)	/* VLM5030 */
 	AM_RANGE(0x05, 0x05) AM_WRITE(SMH_NOP)	/* unused */
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x08, 0x08) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(SMH_NOP)	/* watchdog reset, seldom used because 08 clears the watchdog as well */
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(SMH_NOP)	/* ?? */
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(punchout_2a03_reset_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(punchout_speech_reset_w)	/* VLM5030 */
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(punchout_speech_st_w)	/* VLM5030 */
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(punchout_speech_vcu_w)	/* VLM5030 */
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE(SOUND, "vlm", punchout_speech_reset_w)	/* VLM5030 */
+	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE(SOUND, "vlm", punchout_speech_st_w)	/* VLM5030 */
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE(SOUND, "vlm", punchout_speech_vcu_w)	/* VLM5030 */
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(SMH_NOP)	/* enable NVRAM ? */
 
 	/* protection ports - Super Punchout only (move to install handler?) */
@@ -459,13 +459,13 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
-	AM_RANGE(0x4000, 0x4017) AM_READ(nes_psg_0_r)
+	AM_RANGE(0x4000, 0x4017) AM_DEVREAD(SOUND, "nes", nes_psg_r)
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0x4017) AM_WRITE(nes_psg_0_w)
+	AM_RANGE(0x4000, 0x4017) AM_DEVWRITE(SOUND, "nes", nes_psg_w)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 

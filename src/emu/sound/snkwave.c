@@ -16,7 +16,8 @@
 #define CLOCK_SHIFT 8
 
 
-struct snkwave_sound
+typedef struct _snkwave_state snkwave_state;
+struct _snkwave_state
 {
 	/* global sound parameters */
 	sound_stream * stream;
@@ -32,6 +33,15 @@ struct snkwave_sound
 	INT16 waveform[WAVEFORM_LENGTH];
 };
 
+INLINE snkwave_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_SNKWAVE);
+	return (snkwave_state *)device->token;
+}
+
 
 /* update the decoded waveform data */
 /* The programmable waveform consists of 8 3-bit nibbles.
@@ -41,7 +51,7 @@ struct snkwave_sound
    So the sequence 01234567 will play as
    89ABCDEF76543210
 */
-static void update_waveform(struct snkwave_sound *chip, unsigned int offset, UINT8 data)
+static void update_waveform(snkwave_state *chip, unsigned int offset, UINT8 data)
 {
 	assert(offset < WAVEFORM_LENGTH/4);
 
@@ -55,7 +65,7 @@ static void update_waveform(struct snkwave_sound *chip, unsigned int offset, UIN
 /* generate sound to the mix buffer */
 static STREAM_UPDATE( snkwave_update )
 {
-	struct snkwave_sound *chip = param;
+	snkwave_state *chip = param;
 	stream_sample_t *buffer = outputs[0];
 
 	/* zap the contents of the buffer */
@@ -99,14 +109,14 @@ static STREAM_UPDATE( snkwave_update )
 }
 
 
-static SND_START( snkwave )
+static DEVICE_START( snkwave )
 {
-	struct snkwave_sound *chip = device->token;
+	snkwave_state *chip = get_safe_token(device);
 
 	assert(device->static_config == 0);
 
 	/* adjust internal clock */
-	chip->external_clock = clock;
+	chip->external_clock = device->clock;
 
 	/* adjust output clock */
 	chip->sample_rate = chip->external_clock >> CLOCK_SHIFT;
@@ -135,9 +145,9 @@ static SND_START( snkwave )
     2-5         waveform (8 3-bit nibbles)
 */
 
-WRITE8_HANDLER( snkwave_w )
+WRITE8_DEVICE_HANDLER( snkwave_w )
 {
-	struct snkwave_sound *chip = sndti_token(SOUND_SNKWAVE, 0);
+	snkwave_state *chip = get_safe_token(device);
 
 	stream_update(chip->stream);
 
@@ -158,33 +168,23 @@ WRITE8_HANDLER( snkwave_w )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( snkwave )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( snkwave )
+DEVICE_GET_INFO( snkwave )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct snkwave_sound); 		break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(snkwave_state); 		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( snkwave );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( snkwave );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( snkwave );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SNK Wave");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "SNK Wave");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SNK Wave");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "SNK Wave");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

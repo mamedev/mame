@@ -93,10 +93,8 @@ static ADDRESS_MAP_START( sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
-	AM_RANGE(0xe002, 0xe002) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
-	AM_RANGE(0xe003, 0xe003) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -228,9 +226,9 @@ GFXDECODE_END
 
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -238,7 +236,7 @@ static const ym2203_interface ym2203_config =
 	{
 			AY8910_LEGACY_OUTPUT,
 			AY8910_DEFAULT_LOADS,
-			NULL, NULL, NULL, NULL,
+			DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	},
 	irqhandler
 };

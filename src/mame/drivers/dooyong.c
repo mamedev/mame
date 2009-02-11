@@ -305,54 +305,45 @@ static ADDRESS_MAP_START( lastday_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0xf001, 0xf001) AM_READ(ym2203_read_port_0_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ(ym2203_status_port_1_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(ym2203_read_port_1_r)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREAD(SOUND, "ym1", ym2203_r)
+	AM_RANGE(0xf002, 0xf003) AM_DEVREAD(SOUND, "ym1", ym2203_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastday_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0xf002, 0xf003) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pollux_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
-	AM_RANGE(0xf802, 0xf802) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0xf803, 0xf803) AM_READ(ym2203_read_port_0_r)
-	AM_RANGE(0xf804, 0xf804) AM_READ(ym2203_status_port_1_r)
-	AM_RANGE(0xf805, 0xf805) AM_READ(ym2203_read_port_1_r)
+	AM_RANGE(0xf802, 0xf803) AM_DEVREAD(SOUND, "ym1", ym2203_r)
+	AM_RANGE(0xf804, 0xf805) AM_DEVREAD(SOUND, "ym2", ym2203_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pollux_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf802, 0xf802) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xf804, 0xf804) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0xf805, 0xf805) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0xf802, 0xf803) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0xf804, 0xf805) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bluehawk_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
-	AM_RANGE(0xf809, 0xf809) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0xf80a, 0xf80a) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0xf808, 0xf809) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0xf80a, 0xf80a) AM_DEVREAD(SOUND, "oki", okim6295_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bluehawk_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xf809, 0xf809) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0xf80a, 0xf80a) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xf808, 0xf809) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0xf80a, 0xf80a) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -812,12 +803,12 @@ static GFXDECODE_START( popbingo )
 	GFXDECODE_ENTRY( "gfx2", 0, popbingo_tilelayout, 256,  1 )
 GFXDECODE_END
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static READ8_HANDLER( unk_r )
+static READ8_DEVICE_HANDLER( unk_r )
 {
 	return 0;
 }
@@ -827,7 +818,7 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		unk_r, NULL, NULL, NULL
+		DEVCB_HANDLER(unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };
@@ -837,7 +828,7 @@ static const ym2203_interface ym2203_interface_2 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		unk_r, NULL, NULL, NULL
+		DEVCB_HANDLER(unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	NULL
 };

@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( readmem_alt, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2000, 0x21ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2800) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)	/* foreground */
 	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM)	/* background */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
@@ -119,8 +119,7 @@ static ADDRESS_MAP_START( writemem_alt, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
 	AM_RANGE(0x2000, 0x21ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
 	AM_RANGE(0x3800, 0x3fff) AM_WRITE(shootout_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
@@ -130,15 +129,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -262,14 +260,14 @@ static GFXDECODE_START( shootout )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,		16 ) /* tiles */
 GFXDECODE_END
 
-static void shootout_snd_irq(running_machine *machine, int linestate)
+static void shootout_snd_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate);
+	cpu_set_input_line(device->machine->cpu[1],0,linestate);
 }
 
-static void shootout_snd2_irq(running_machine *machine, int linestate)
+static void shootout_snd2_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[0],0,linestate);
+	cpu_set_input_line(device->machine->cpu[0],0,linestate);
 }
 
 static const ym2203_interface ym2203_config =
@@ -277,7 +275,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	shootout_snd_irq
 };
@@ -287,10 +285,10 @@ static const ym2203_interface ym2203_interface2 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		shootout_bankswitch_w,
-		shootout_flipscreen_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_MEMORY_HANDLER("main", PROGRAM, shootout_bankswitch_w),
+		DEVCB_MEMORY_HANDLER("main", PROGRAM, shootout_flipscreen_w)
 	},
 	shootout_snd2_irq
 };

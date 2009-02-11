@@ -21,11 +21,11 @@ static UINT8 yscroll;
 static UINT8 flipscreen;
 
 
-WRITE8_HANDLER( xxmissio_scroll_x_w )
+WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w )
 {
 	xscroll = data;
 }
-WRITE8_HANDLER( xxmissio_scroll_y_w )
+WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w )
 {
 	yscroll = data;
 }

@@ -541,9 +541,6 @@ static INPUT_PORTS_START( sblast2b )
 
 INPUT_PORTS_END
 
-static const custom_sound_interface snes_sound_interface =
-{ snes_sh_start };
-
 static MACHINE_DRIVER_START( kinstb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", G65816, 3580000)	/* 2.68Mhz, also 3.58Mhz */
@@ -569,8 +566,7 @@ static MACHINE_DRIVER_START( kinstb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("snes", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(snes_sound_interface)
+	MDRV_SOUND_ADD("snes", SNES, 0)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
 MACHINE_DRIVER_END

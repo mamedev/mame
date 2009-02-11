@@ -2,7 +2,8 @@
 #include "streams.h"
 #include "flt_rc.h"
 
-struct filter_rc_info
+typedef struct _filter_rc_state filter_rc_state;
+struct _filter_rc_state
 {
 	const device_config *device;
 	sound_stream *	stream;
@@ -11,6 +12,15 @@ struct filter_rc_info
 	int				type;
 };
 
+INLINE filter_rc_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_FILTER_RC);
+	return (filter_rc_state *)device->token;
+}
+
 const flt_rc_config flt_rc_ac_default = {FLT_RC_AC, 10000, 0, 0, CAP_U(1)};
 
 
@@ -18,7 +28,7 @@ static STREAM_UPDATE( filter_rc_update )
 {
 	stream_sample_t *src = inputs[0];
 	stream_sample_t *dst = outputs[0];
-	struct filter_rc_info *info = param;
+	filter_rc_state *info = param;
 	int memory = info->memory;
 
 	switch (info->type)
@@ -42,7 +52,7 @@ static STREAM_UPDATE( filter_rc_update )
 	info->memory = memory;
 }
 
-static void set_RC_info(struct filter_rc_info *info, int type, double R1, double R2, double R3, double C)
+static void set_RC_info(filter_rc_state *info, int type, double R1, double R2, double R3, double C)
 {
 	double Req;
 
@@ -80,9 +90,9 @@ static void set_RC_info(struct filter_rc_info *info, int type, double R1, double
 }
 
 
-static SND_START( filter_rc )
+static DEVICE_START( filter_rc )
 {
-	struct filter_rc_info *info = device->token;
+	filter_rc_state *info = get_safe_token(device);
 	const flt_rc_config *conf = device->static_config;
 
 	info->device = device;
@@ -94,12 +104,9 @@ static SND_START( filter_rc )
 }
 
 
-void filter_rc_set_RC(int num, int type, double R1, double R2, double R3, double C)
+void filter_rc_set_RC(const device_config *device, int type, double R1, double R2, double R3, double C)
 {
-	struct filter_rc_info *info = sndti_token(SOUND_FILTER_RC, num);
-
-	if(!info)
-		return;
+	filter_rc_state *info = get_safe_token(device);
 
 	stream_update(info->stream);
 
@@ -111,34 +118,24 @@ void filter_rc_set_RC(int num, int type, double R1, double R2, double R3, double
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( filter_rc )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( filter_rc )
+DEVICE_GET_INFO( filter_rc )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct filter_rc_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(filter_rc_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( filter_rc );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( filter_rc );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */										break;
-		case SNDINFO_PTR_RESET:							/* Nothing */										break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( filter_rc );	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "RC Filter");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Filters");							break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "RC Filter");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Filters");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

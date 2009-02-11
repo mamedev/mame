@@ -128,27 +128,27 @@ static WRITE8_HANDLER( counter_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( wldarrow_dac_1_w )
+static WRITE8_DEVICE_HANDLER( wldarrow_dac_1_w )
 {
-	dac_data_w(0, 0x00);
+	dac_data_w(device, 0x00);
 }
 
 
-static WRITE8_HANDLER( wldarrow_dac_2_w )
+static WRITE8_DEVICE_HANDLER( wldarrow_dac_2_w )
 {
-	dac_data_w(0, 0x55);
+	dac_data_w(device, 0x55);
 }
 
 
-static WRITE8_HANDLER( wldarrow_dac_3_w )
+static WRITE8_DEVICE_HANDLER( wldarrow_dac_3_w )
 {
-	dac_data_w(0, 0xaa);
+	dac_data_w(device, 0xaa);
 }
 
 
-static WRITE8_HANDLER( wldarrow_dac_4_w )
+static WRITE8_DEVICE_HANDLER( wldarrow_dac_4_w )
 {
-	dac_data_w(0, 0xff);
+	dac_data_w(device, 0xff);
 }
 
 
@@ -166,13 +166,13 @@ static ADDRESS_MAP_START( wldarrow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(&wldarrow_videoram_1)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(&wldarrow_videoram_2)
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BITSW") AM_WRITE(wldarrow_dac_1_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BITSW") AM_DEVWRITE(SOUND, "dac", wldarrow_dac_1_w)
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE(lights_1_w)
 	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2") AM_WRITE(lights_2_w)
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(counter_w)
-	AM_RANGE(0xf00f, 0xf00f) AM_WRITE(wldarrow_dac_2_w)
-	AM_RANGE(0xf0f0, 0xf0f0) AM_WRITE(wldarrow_dac_3_w)
-	AM_RANGE(0xf0ff, 0xf0ff) AM_WRITE(wldarrow_dac_4_w)
+	AM_RANGE(0xf00f, 0xf00f) AM_DEVWRITE(SOUND, "dac", wldarrow_dac_2_w)
+	AM_RANGE(0xf0f0, 0xf0f0) AM_DEVWRITE(SOUND, "dac", wldarrow_dac_3_w)
+	AM_RANGE(0xf0ff, 0xf0ff) AM_DEVWRITE(SOUND, "dac", wldarrow_dac_4_w)
 ADDRESS_MAP_END
 
 

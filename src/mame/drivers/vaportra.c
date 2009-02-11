@@ -79,36 +79,12 @@ static READ8_HANDLER( vaportra_soundlatch_r )
 	return soundlatch_r(space, offset);
 }
 
-static WRITE8_HANDLER( YM2151_w )
-{
-	switch (offset) {
-	case 0:
-		ym2151_register_port_0_w(space,0,data);
-		break;
-	case 1:
-		ym2151_data_port_0_w(space,0,data);
-		break;
-	}
-}
-
-static WRITE8_HANDLER( YM2203_w )
-{
-	switch (offset) {
-	case 0:
-		ym2203_control_port_0_w(space,0,data);
-		break;
-	case 1:
-		ym2203_write_port_0_w(space,0,data);
-		break;
-	}
-}
-
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(ym2203_status_port_0_r, YM2203_w)
-	AM_RANGE(0x110000, 0x110001) AM_READWRITE(ym2151_status_port_0_r, YM2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
-	AM_RANGE(0x130000, 0x130001) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE(SOUND, "ym2", ym2151_r, ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE(SOUND, "oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(vaportra_soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READWRITE(SMH_BANK8,SMH_BANK8)  /* ??? LOOKUP ??? */
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
@@ -228,9 +204,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(running_machine *machine, int state)
+static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1],1,state); /* IRQ 2 */
+	cpu_set_input_line(device->machine->cpu[1],1,state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

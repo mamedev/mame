@@ -47,23 +47,11 @@ static WRITE8_HANDLER( bogeyman_8910_control_w )
 
 	// bit 5 goes to 8910 #0 BDIR pin
 	if ((last & 0x20) == 0x20 && (data & 0x20) == 0x00)
-	{
-		// bit 4 goes to the 8910 #0 BC1 pin
-		if (last & 0x10)
-			ay8910_control_port_0_w(space,0,psg_latch);
-		else
-			ay8910_write_port_0_w(space,0,psg_latch);
-	}
+		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay1"), last >> 4, psg_latch);
 
 	// bit 7 goes to 8910 #1 BDIR pin
 	if ((last & 0x80) == 0x80 && (data & 0x80) == 0x00)
-	{
-		// bit 6 goes to the 8910 #1 BC1 pin
-		if (last & 0x40)
-			ay8910_control_port_1_w(space,0,psg_latch);
-		else
-			ay8910_write_port_1_w(space,0,psg_latch);
-	}
+		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay2"), last >> 6, psg_latch);
 
 	last = data;
 }

@@ -427,21 +427,13 @@ static WRITE16_HANDLER( ddealer_mcu_shared_w )
 	}
 }
 
-static WRITE16_HANDLER( YM2203_w )
-{
-	switch (offset) {
-	case 0: ym2203_control_port_0_w(space,0,data & 0xff); break;
-	case 1: ym2203_write_port_0_w(space,0,data & 0xff); break;
-	}
-}
-
 static ADDRESS_MAP_START( ddealer, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("UNK")
-	AM_RANGE(0x084000, 0x084003) AM_WRITE( YM2203_w ) // ym ?
+	AM_RANGE(0x084000, 0x084003) AM_DEVWRITE8(SOUND, "ym", ym2203_w, 0x00ff) // ym ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) // palette ram
 	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE(ddealer_vregs_w) AM_BASE(&ddealer_vregs) // palette ram
 

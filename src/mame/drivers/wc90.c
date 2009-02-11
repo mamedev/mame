@@ -144,10 +144,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(ym2608_status_port_0_a_r, ym2608_control_port_0_a_w)
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(ym2608_data_port_0_a_w)
-	AM_RANGE(0xf802, 0xf802) AM_READWRITE(ym2608_status_port_0_b_r, ym2608_control_port_0_b_w)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(ym2608_data_port_0_b_w)
+	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE(SOUND, "ym", ym2608_r, ym2608_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(SMH_NOP) /* ??? adpcm ??? */
 	AM_RANGE(0xfc10, 0xfc10) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -283,9 +280,9 @@ GFXDECODE_END
 
 
 /* handler called by the 2608 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =
@@ -293,7 +290,7 @@ static const ym2608_interface ym2608_config =
 	{
 		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };

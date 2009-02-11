@@ -87,7 +87,7 @@ static READ8_HANDLER( zaccaria_dsw_r )
 
 
 
-static WRITE8_HANDLER( ay8910_port0a_w )
+static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 {
 	// bits 0-2 go to a weird kind of DAC ??
 	// bits 3-4 control the analog drum emulation on 8910 #0 ch. A
@@ -96,10 +96,10 @@ static WRITE8_HANDLER( ay8910_port0a_w )
 	{
 		/* TODO: is this right? it sound awful */
 		static const int table[4] = { 0x05, 0x1b, 0x0b, 0x55 };
-		dac_signed_data_w(0,table[(data & 0x06) >> 1]);
+		dac_signed_data_w(devtag_get_device(device->machine, SOUND, "dac1"),table[(data & 0x06) >> 1]);
 	}
 	else
-		dac_signed_data_w(0,0x80);
+		dac_signed_data_w(devtag_get_device(device->machine, SOUND, "dac1"),0x80);
 }
 
 
@@ -110,10 +110,7 @@ static int active_8910, port0a, acs;
 
 static READ8_HANDLER( zaccaria_port0a_r )
 {
-	if (active_8910 == 0)
-		return ay8910_read_port_0_r(space,0);
-	else
-		return ay8910_read_port_1_r(space,0);
+	return ay8910_r(devtag_get_device(space->machine, SOUND, (active_8910 == 0) ? "ay1" : "ay2"), 0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -130,10 +127,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		if (last & 0x01)
-			ay8910_control_port_0_w(space,0,port0a);
-		else
-			ay8910_write_port_0_w(space,0,port0a);
+		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay1"), last, port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -145,10 +139,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		if (last & 0x04)
-			ay8910_control_port_1_w(space,0,port0a);
-		else
-			ay8910_write_port_1_w(space,0,port0a);
+		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay2"), last >> 2, port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -175,7 +166,8 @@ static int port1a,port1b;
 
 static READ8_HANDLER( zaccaria_port1a_r )
 {
-	if (~port1b & 1) return tms5220_status_r(space,0);
+	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+	if (~port1b & 1) return tms5220_status_r(tms,0);
 	else return port1a;
 }
 
@@ -186,12 +178,13 @@ static WRITE8_HANDLER( zaccaria_port1a_w )
 
 static WRITE8_HANDLER( zaccaria_port1b_w )
 {
+	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
 	port1b = data;
 
 	// bit 0 = /RS
 
 	// bit 1 = /WS
-	if (~data & 2) tms5220_data_w(space,0,port1a);
+	if (~data & 2) tms5220_data_w(tms,0,port1a);
 
 	// bit 3 = "ACS" (goes, inverted, to input port 6 bit 3)
 	acs = ~data & 0x08;
@@ -212,9 +205,9 @@ return counter;
 
 }
 
-static void tms5220_irq_handler(running_machine *machine, int state)
+static void tms5220_irq_handler(const device_config *device, int state)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	pia_1_cb1_w(space,0,state ? 0 : 1);
 }
 
@@ -270,9 +263,9 @@ static WRITE8_HANDLER( sound1_command_w )
 	soundlatch2_w(space,0,data);
 }
 
-static WRITE8_HANDLER( mc1408_data_w )
+static WRITE8_DEVICE_HANDLER( mc1408_data_w )
 {
-	dac_data_w(1,data);
+	dac_data_w(device,data);
 }
 
 
@@ -363,7 +356,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0090, 0x0093) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(mc1408_data_w)	/* MC1408 */
+	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE(SOUND, "dac2", mc1408_data_w)	/* MC1408 */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w)
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
@@ -554,10 +547,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	soundlatch2_r,
-	ay8910_port0a_w,
-	NULL
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch2_r),
+	DEVCB_HANDLER(ay8910_port0a_w),
+	DEVCB_NULL
 };
 
 static const tms5220_interface tms5220_config =

@@ -214,17 +214,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8801, 0x8801) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x8800, 0x8801) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 ADDRESS_MAP_END
 
 
@@ -416,9 +415,9 @@ static GFXDECODE_START( mugsmash )
 	GFXDECODE_ENTRY( "gfx2", 0, mugsmash2_layout,  0x100, 256  ) /* bg tiles */
 GFXDECODE_END
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(device->machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

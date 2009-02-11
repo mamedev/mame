@@ -26,7 +26,6 @@ TODO:
 #include "streams.h"
 #include "sound/sn76496.h"
 #include "sound/okim6295.h"
-#include "sound/custom.h"
 
 extern UINT8 *mjkjidai_videoram;
 
@@ -74,16 +73,31 @@ static STREAM_UPDATE( mjkjidai_adpcm_callback )
 	}
 }
 
-static CUSTOM_START( mjkjidai_adpcm_start )
+static DEVICE_START( mjkjidai_adpcm )
 {
 	running_machine *machine = device->machine;
 	struct mjkjidai_adpcm_state *state = &mjkjidai_adpcm;
 	state->playing = 0;
-	state->stream = stream_create(device, 0, 1, clock, state, mjkjidai_adpcm_callback);
+	state->stream = stream_create(device, 0, 1, device->clock, state, mjkjidai_adpcm_callback);
 	state->base = memory_region(machine, "adpcm");
 	reset_adpcm(&state->adpcm);
-	return state;
 }
+
+static DEVICE_GET_INFO( mjkjidai_adpcm )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mjkjidai_adpcm);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Custom ADPCM");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+#define SOUND_MJKJIDAI DEVICE_GET_INFO_NAME(mjkjidai_adpcm)
+
 
 static void mjkjidai_adpcm_play (int offset, int lenght)
 {
@@ -183,8 +197,8 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
-	AM_RANGE(0x20, 0x20) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(adpcm_w)
 ADDRESS_MAP_END
 
@@ -341,13 +355,6 @@ static GFXDECODE_START( mjkjidai )
 GFXDECODE_END
 
 
-static const custom_sound_interface adpcm_interface =
-{
-	mjkjidai_adpcm_start
-};
-
-
-
 static MACHINE_DRIVER_START( mjkjidai )
 
 	/* basic machine hardware */
@@ -382,8 +389,7 @@ static MACHINE_DRIVER_START( mjkjidai )
 	MDRV_SOUND_ADD("sn2", SN76489, 10000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("adpcm", CUSTOM, 6000)
-	MDRV_SOUND_CONFIG(adpcm_interface)
+	MDRV_SOUND_ADD("adpcm", MJKJIDAI, 6000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

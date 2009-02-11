@@ -134,11 +134,11 @@ static READ8_HANDLER( samples_r )
 	return memory_region(space->machine, "adpcm")[offset];
 }
 
-static WRITE8_HANDLER( adpcm_w )
+static WRITE8_DEVICE_HANDLER( adpcm_w )
 {
-	msm5205_data_w(0,data);         /* bit0..3  */
-	msm5205_reset_w(0,(data>>5)&1); /* bit 5    */
-	msm5205_vclk_w (0,(data>>4)&1); /* bit4     */
+	msm5205_data_w(device,data);         /* bit0..3  */
+	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w (device,(data>>4)&1); /* bit4     */
 }
 
 static WRITE8_HANDLER( ctrl_w )
@@ -203,9 +203,9 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(keyboard_r, SMH_NOP)	// ??
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, keyboard_w)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x8021, 0x8021) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE(SOUND, "msm", adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(SMH_NOP)	// ??
 	AM_RANGE(0xbc04, 0xbc04) AM_WRITE(SMH_NOP)	// ??
@@ -216,9 +216,9 @@ static ADDRESS_MAP_START( themj_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(keyboard_r, SMH_NOP)	// ??
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, keyboard_w)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x8021, 0x8021) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE(SOUND, "msm", adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(SMH_NOP)	// ??
 	AM_RANGE(0x80a0, 0x80a0) AM_WRITE(themj_rombank_w)
@@ -429,8 +429,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,
-	input_port_1_r
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_INPUT_PORT("DSW1")
 };
 
 static const msm5205_interface msm5205_config =

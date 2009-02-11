@@ -409,36 +409,36 @@ static void reset_sound_region(running_machine *machine)
 	memory_set_bankptr(machine,  10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
+static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region(space->machine);
+	reset_sound_region(device->machine);
 }
 
 static void topspeed_msm5205_vck(const device_config *device)
 {
 	if (adpcm_data != -1)
 	{
-		msm5205_data_w(0, adpcm_data & 0x0f);
+		msm5205_data_w(device, adpcm_data & 0x0f);
 		adpcm_data = -1;
 	}
 	else
 	{
 		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0x1ffff;
-		msm5205_data_w(0, adpcm_data >> 4);
+		msm5205_data_w(device, adpcm_data >> 4);
 	}
 }
 
-static WRITE8_HANDLER( topspeed_msm5205_address_w )
+static WRITE8_DEVICE_HANDLER( topspeed_msm5205_address_w )
 {
 	adpcm_pos = (adpcm_pos & 0x00ff) | (data << 8);
-	msm5205_reset_w(0, 0);
+	msm5205_reset_w(device, 0);
 }
 
-static WRITE8_HANDLER( topspeed_msm5205_stop_w )
+static WRITE8_DEVICE_HANDLER( topspeed_msm5205_stop_w )
 {
-	msm5205_reset_w(0, 1);
+	msm5205_reset_w(device, 1);
 	adpcm_pos &= 0xff00;
 }
 
@@ -507,20 +507,19 @@ static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9001, 0x9001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2151_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(topspeed_msm5205_address_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "msm", topspeed_msm5205_address_w)
 //  AM_RANGE(0xb400, 0xb400) // msm5205 start? doesn't seem to work right
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(topspeed_msm5205_stop_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE(SOUND, "msm", topspeed_msm5205_stop_w)
 //  AM_RANGE(0xc000, 0xc000) // ??
 //  AM_RANGE(0xc400, 0xc400) // ??
 //  AM_RANGE(0xc800, 0xc800) // ??
@@ -654,9 +653,9 @@ GFXDECODE_END
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 
-static void irq_handler(running_machine *machine, int irq)	/* assumes Z80 sandwiched between 68Ks */
+static void irq_handler(const device_config *device, int irq)	/* assumes Z80 sandwiched between 68Ks */
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

@@ -267,7 +267,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "sound/sn76477.h"
-#include "sound/custom.h"
 #include "sound/samples.h"
 #include "rockola.h"
 
@@ -849,8 +848,7 @@ static MACHINE_DRIVER_START( sasuke )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("rockola", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ADD("rockola", ROCKOLA, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
@@ -924,8 +922,7 @@ static MACHINE_DRIVER_START( vanguard )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("rockola", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ADD("rockola", ROCKOLA, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)

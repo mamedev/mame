@@ -300,10 +300,10 @@ static WRITE16_HANDLER( crtc_w )
 	crtc_select ^= 1;
 }
 
-static WRITE16_HANDLER( dac_w )
+static WRITE16_DEVICE_HANDLER( vcombat_dac_w )
 {
 	INT16 newval = ((INT16)data - 0x6000) << 2;
-	dac_signed_data_16_w(0, newval + 0x8000);
+	dac_signed_data_16_w(device, newval + 0x8000);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -366,7 +366,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(dac_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE(SOUND, "dac", vcombat_dac_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(sound_resetmain_r)   /* Ping M0's reset line */
 	AM_RANGE(0x180000, 0x180001) AM_RAM AM_SHARE(4)   /* M1<-M0 */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_RAM AM_SHARE(5)   /* M1->M0 */

@@ -8,66 +8,49 @@ void ym2612_update_request(void *param);
 typedef struct _ym2612_interface ym2612_interface;
 struct _ym2612_interface
 {
-	void (*handler)(running_machine *machine, int irq);
+	void (*handler)(const device_config *device, int irq);
 };
 
+READ8_DEVICE_HANDLER( ym2612_r );
+WRITE8_DEVICE_HANDLER( ym2612_w );
 
-/************************************************/
-/* Chip 0 functions                             */
-/************************************************/
-READ8_HANDLER( ym2612_status_port_0_a_r );  /* A=0 : OPN status */
-READ8_HANDLER( ym2612_status_port_0_b_r );  /* A=2 : don't care */
-READ8_HANDLER( ym2612_read_port_0_r );        /* A=1 : don't care */
-WRITE8_HANDLER( ym2612_control_port_0_a_w ); /* A=0:OPN  address */
-WRITE8_HANDLER( ym2612_control_port_0_b_w ); /* A=2:OPN2 address */
-WRITE8_HANDLER( ym2612_data_port_0_a_w );    /* A=1:OPN  data    */
-WRITE8_HANDLER( ym2612_data_port_0_b_w );    /* A=3:OPN2 data    */
+READ8_DEVICE_HANDLER( ym2612_status_port_a_r );
+READ8_DEVICE_HANDLER( ym2612_status_port_b_r );
+READ8_DEVICE_HANDLER( ym2612_data_port_a_r );
+READ8_DEVICE_HANDLER( ym2612_data_port_b_r );
 
-/************************************************/
-/* Chip 1 functions                             */
-/************************************************/
-READ8_HANDLER( ym2612_status_port_1_a_r );
-READ8_HANDLER( ym2612_status_port_1_b_r );
-READ8_HANDLER( ym2612_read_port_1_r );
-WRITE8_HANDLER( ym2612_control_port_1_a_w );
-WRITE8_HANDLER( ym2612_control_port_1_b_w );
-WRITE8_HANDLER( ym2612_data_port_1_a_w );
-WRITE8_HANDLER( ym2612_data_port_1_b_w );
+WRITE8_DEVICE_HANDLER( ym2612_control_port_a_w );
+WRITE8_DEVICE_HANDLER( ym2612_control_port_b_w );
+WRITE8_DEVICE_HANDLER( ym2612_data_port_a_w );
+WRITE8_DEVICE_HANDLER( ym2612_data_port_b_w );
 
-SND_GET_INFO( ym2612 );
-#define SOUND_YM2612 SND_GET_INFO_NAME( ym2612 )
+
+DEVICE_GET_INFO( ym2612 );
+#define SOUND_YM2612 DEVICE_GET_INFO_NAME( ym2612 )
 
 
 typedef struct _ym3438_interface ym3438_interface;
 struct _ym3438_interface
 {
-	void (*handler)(running_machine *machine, int irq);
+	void (*handler)(const device_config *device, int irq);
 };
 
 
-/************************************************/
-/* Chip 0 functions                             */
-/************************************************/
-READ8_HANDLER( ym3438_status_port_0_a_r );  /* A=0 : OPN status */
-READ8_HANDLER( ym3438_status_port_0_b_r );  /* A=2 : don't care */
-READ8_HANDLER( ym3438_read_port_0_r );        /* A=1 : don't care */
-WRITE8_HANDLER( ym3438_control_port_0_a_w ); /* A=0:OPN  address */
-WRITE8_HANDLER( ym3438_control_port_0_b_w ); /* A=2:OPN2 address */
-WRITE8_HANDLER( ym3438_data_port_0_a_w );    /* A=1:OPN  data    */
-WRITE8_HANDLER( ym3438_data_port_0_b_w );    /* A=3:OPN2 data    */
+#define ym3438_r				ym2612_r
+#define ym3438_w				ym2612_w
 
-/************************************************/
-/* Chip 1 functions                             */
-/************************************************/
-READ8_HANDLER( ym3438_status_port_1_a_r );
-READ8_HANDLER( ym3438_status_port_1_b_r );
-READ8_HANDLER( ym3438_read_port_1_r );
-WRITE8_HANDLER( ym3438_control_port_1_a_w );
-WRITE8_HANDLER( ym3438_control_port_1_b_w );
-WRITE8_HANDLER( ym3438_data_port_1_a_w );
-WRITE8_HANDLER( ym3438_data_port_1_b_w );
+#define ym3438_status_port_a_r	ym2612_status_port_a_r
+#define ym3438_status_port_b_r	ym2612_status_port_b_r
+#define ym3438_data_port_a_r	ym2612_data_port_a_r
+#define ym3438_data_port_b_r	ym2612_data_port_b_r
 
-SND_GET_INFO( ym3438 );
-#define SOUND_YM3438 SND_GET_INFO_NAME( ym3438 )
+#define ym3438_control_port_a_w	ym2612_control_port_a_w
+#define ym3438_control_port_b_w	ym2612_control_port_b_w
+#define ym3438_data_port_a_w	ym2612_data_port_a_w
+#define ym3438_data_port_b_w	ym2612_data_port_b_w
+
+
+DEVICE_GET_INFO( ym3438 );
+#define SOUND_YM3438 DEVICE_GET_INFO_NAME( ym3438 )
 
 #endif /* __2612INTF_H__ */

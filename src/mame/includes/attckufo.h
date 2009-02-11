@@ -1,9 +1,9 @@
-#include "sound/custom.h"
-
 /*----------- defined in audio/attckufo.c -----------*/
 
 void attckufo_soundport_w (int offset, int data);
-CUSTOM_START( attckufo_custom_start );
+
+DEVICE_GET_INFO( attckufo_sound );
+#define SOUND_ATTCKUFO DEVICE_GET_INFO_NAME(attckufo_sound)
 
 
 /*----------- defined in video/attckufo.c -----------*/

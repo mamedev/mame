@@ -23,7 +23,8 @@
 #define	SAMPLE_GAIN				10000.0
 
 
-struct hc55516_data
+typedef struct _hc55516_state hc55516_state;
+struct _hc55516_state
 {
 	sound_stream *channel;
 	int		clock;		/* 0 = software driven, non-0 = oscillator */
@@ -52,17 +53,28 @@ static STREAM_UPDATE( hc55516_update );
 
 
 
-static void start_common(const device_config *device, int clock,
-						  UINT8 _shiftreg_mask, int _active_clock_hi)
+INLINE hc55516_state *get_safe_token(const device_config *device)
 {
-	struct hc55516_data *chip = device->token;
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_HC55516 ||
+		   sound_get_type(device) == SOUND_MC3417 ||
+		   sound_get_type(device) == SOUND_MC3418);
+	return (hc55516_state *)device->token;
+}
+
+
+static void start_common(const device_config *device, UINT8 _shiftreg_mask, int _active_clock_hi)
+{
+	hc55516_state *chip = get_safe_token(device);
 
 	/* compute the fixed charge, decay, and leak time constants */
 	charge = pow(exp(-1), 1.0 / (FILTER_CHARGE_TC * 16000.0));
 	decay = pow(exp(-1), 1.0 / (FILTER_DECAY_TC * 16000.0));
 	leak = pow(exp(-1), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
 
-	chip->clock = clock;
+	chip->clock = device->clock;
 	chip->shiftreg_mask = _shiftreg_mask;
 	chip->active_clock_hi = _active_clock_hi;
 	chip->last_clock_state = 0;
@@ -82,53 +94,53 @@ static void start_common(const device_config *device, int clock,
 }
 
 
-static SND_START( hc55516 )
+static DEVICE_START( hc55516 )
 {
-	start_common(device, clock, 0x07, TRUE);
+	start_common(device, 0x07, TRUE);
 }
 
 
-static SND_START( mc3417 )
+static DEVICE_START( mc3417 )
 {
-	start_common(device, clock, 0x07, FALSE);
+	start_common(device, 0x07, FALSE);
 }
 
 
-static SND_START( mc3418 )
+static DEVICE_START( mc3418 )
 {
-	start_common(device, clock, 0x0f, FALSE);
+	start_common(device, 0x0f, FALSE);
 }
 
 
 
-static SND_RESET( hc55516 )
+static DEVICE_RESET( hc55516 )
 {
-	struct hc55516_data *chip = device->token;
+	hc55516_state *chip = get_safe_token(device);
 	chip->last_clock_state = 0;
 }
 
 
 
-INLINE int is_external_osciallator(struct hc55516_data *chip)
+INLINE int is_external_osciallator(hc55516_state *chip)
 {
 	return chip->clock != 0;
 }
 
 
-INLINE int is_active_clock_transition(struct hc55516_data *chip, int clock_state)
+INLINE int is_active_clock_transition(hc55516_state *chip, int clock_state)
 {
 	return (( chip->active_clock_hi && !chip->last_clock_state &&  clock_state) ||
 			(!chip->active_clock_hi &&  chip->last_clock_state && !clock_state));
 }
 
 
-INLINE int current_clock_state(struct hc55516_data *chip)
+INLINE int current_clock_state(hc55516_state *chip)
 {
 	return ((UINT64)chip->update_count * chip->clock * 2 / SAMPLE_RATE) & 0x01;
 }
 
 
-static void process_digit(struct hc55516_data *chip)
+static void process_digit(hc55516_state *chip)
 {
 	double integrator = chip->integrator, temp;
 
@@ -177,7 +189,7 @@ static void process_digit(struct hc55516_data *chip)
 
 static STREAM_UPDATE( hc55516_update )
 {
-	struct hc55516_data *chip = param;
+	hc55516_state *chip = param;
 	stream_sample_t *buffer = outputs[0];
 	int i;
 	INT32 sample, slope;
@@ -234,9 +246,9 @@ static STREAM_UPDATE( hc55516_update )
 }
 
 
-void hc55516_clock_w(int num, int state)
+void hc55516_clock_w(const device_config *device, int state)
 {
-	struct hc55516_data *chip = sndti_token(SOUND_HC55516, num);
+	hc55516_state *chip = get_safe_token(device);
 	UINT8 clock_state = state ? TRUE : FALSE;
 
 	/* only makes sense for setups with a software driven clock */
@@ -259,9 +271,9 @@ void hc55516_clock_w(int num, int state)
 }
 
 
-void hc55516_digit_w(int num, int digit)
+void hc55516_digit_w(const device_config *device, int digit)
 {
-	struct hc55516_data *chip = sndti_token(SOUND_HC55516, num);
+	hc55516_state *chip = get_safe_token(device);
 
 	if (is_external_osciallator(chip))
 	{
@@ -273,29 +285,9 @@ void hc55516_digit_w(int num, int digit)
 }
 
 
-void hc55516_clock_clear_w(int num)
+int hc55516_clock_state_r(const device_config *device)
 {
-	hc55516_clock_w(num, 0);
-}
-
-
-void hc55516_clock_set_w(int num)
-{
-	hc55516_clock_w(num, 1);
-}
-
-
-void hc55516_digit_clock_clear_w(int num, int digit)
-{
-	struct hc55516_data *chip = sndti_token(SOUND_HC55516, num);
-	chip->digit = digit & 1;
-	hc55516_clock_w(num, 0);
-}
-
-
-int hc55516_clock_state_r(int num)
-{
-	struct hc55516_data *chip = sndti_token(SOUND_HC55516, num);
+	hc55516_state *chip = get_safe_token(device);
 
 	/* only makes sense for setups with an external oscillator */
 	assert(is_external_osciallator(chip));
@@ -307,67 +299,50 @@ int hc55516_clock_state_r(int num)
 
 
 
-WRITE8_HANDLER( hc55516_0_digit_w )	{ hc55516_digit_w(0, data); }
-WRITE8_HANDLER( hc55516_0_clock_w )	{ hc55516_clock_w(0, data); }
-WRITE8_HANDLER( hc55516_0_clock_clear_w )	{ hc55516_clock_clear_w(0); }
-WRITE8_HANDLER( hc55516_0_clock_set_w )		{ hc55516_clock_set_w(0); }
-WRITE8_HANDLER( hc55516_0_digit_clock_clear_w )	{ hc55516_digit_clock_clear_w(0, data); }
-READ8_HANDLER ( hc55516_0_clock_state_r )	{ return hc55516_clock_state_r(0); }
-
-WRITE8_HANDLER( hc55516_1_digit_w ) { hc55516_digit_w(1, data); }
-WRITE8_HANDLER( hc55516_1_clock_w ) { hc55516_clock_w(1, data); }
-WRITE8_HANDLER( hc55516_1_clock_clear_w ) { hc55516_clock_clear_w(1); }
-WRITE8_HANDLER( hc55516_1_clock_set_w )  { hc55516_clock_set_w(1); }
-WRITE8_HANDLER( hc55516_1_digit_clock_clear_w ) { hc55516_digit_clock_clear_w(1, data); }
-READ8_HANDLER ( hc55516_1_clock_state_r )	{ return hc55516_clock_state_r(1); }
-
-
-
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-SND_GET_INFO( hc55516 )
+DEVICE_GET_INFO( hc55516 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct hc55516_data);		break;
-		case SNDINFO_FCT_ALIAS:							info->type = SOUND_HC55516;					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(hc55516_state);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( hc55516 );	break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( hc55516 );	break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( hc55516 );	break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( hc55516 );	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "HC-55516");				break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "CVSD");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "2.1");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "HC-55516");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "CVSD");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.1");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
 
-SND_GET_INFO( mc3417 )
+DEVICE_GET_INFO( mc3417 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( mc3417 );		break;
-		case SNDINFO_PTR_RESET:							/* chip has no reset pin */					break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "MC3417");					break;
-		default: 										SND_GET_INFO_CALL(hc55516);					break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( mc3417 );		break;
+		case DEVINFO_FCT_RESET:							/* chip has no reset pin */					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MC3417");					break;
+		default: 										DEVICE_GET_INFO_CALL(hc55516);					break;
 	}
 }
 
 
-SND_GET_INFO( mc3418 )
+DEVICE_GET_INFO( mc3418 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( mc3418 );		break;
-		case SNDINFO_PTR_RESET:							/* chip has no reset pin */					break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "MC3418");					break;
-		default: 										SND_GET_INFO_CALL(hc55516);					break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( mc3418 );		break;
+		case DEVINFO_FCT_RESET:							/* chip has no reset pin */					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MC3418");					break;
+		default: 										DEVICE_GET_INFO_CALL(hc55516);					break;
 	}
 }

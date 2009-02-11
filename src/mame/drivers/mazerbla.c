@@ -1055,7 +1055,7 @@ ADDRESS_MAP_END
 
 static UINT8 soundlatch;
 
-static READ8_HANDLER( soundcommand_r )
+static READ8_DEVICE_HANDLER( soundcommand_r )
 {
 	return soundlatch;
 }
@@ -1101,7 +1101,7 @@ static WRITE8_HANDLER( sound_nmi_clear_w )
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( gg_led_ctrl_w )
+static WRITE8_DEVICE_HANDLER( gg_led_ctrl_w )
 {
 	/* bit 0, bit 1 - led on */
 	set_led_status(1,data&0x01);
@@ -1110,17 +1110,15 @@ static WRITE8_HANDLER( gg_led_ctrl_w )
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD(SOUND, "ay1", ay8910_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(SMH_RAM) /* main RAM (stack) */
 
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_int_clear_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_clear_w)
@@ -1454,20 +1452,20 @@ static const ay8910_interface ay8912_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	soundcommand_r,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_HANDLER(soundcommand_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface ay8912_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	NULL,
-	gg_led_ctrl_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(gg_led_ctrl_w)
 };
 
 

@@ -18,23 +18,27 @@ static int sign_x_4, sign_y_4;
 
 WRITE8_HANDLER( atarifb_out1_w )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+
 	CTRLD = data;
 
-	discrete_sound_w(space, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(space, ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(space, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(discrete, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(discrete, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(discrete, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(discrete, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 }
 
 
 WRITE8_HANDLER( atarifb4_out1_w )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+
 	CTRLD = data;
 
-	discrete_sound_w(space, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(space, ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(space, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(discrete, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(discrete, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(discrete, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(discrete, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 
 	coin_counter_w (1, data & 0x80);
 }
@@ -42,12 +46,14 @@ WRITE8_HANDLER( atarifb4_out1_w )
 
 WRITE8_HANDLER( abaseb_out1_w )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+
 	CTRLD = data;
 
-	discrete_sound_w(space, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(space, ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(space, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(discrete, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(discrete, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(discrete, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(discrete, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 
 	if (data & 0x80)
 	{
@@ -66,6 +72,8 @@ WRITE8_HANDLER( abaseb_out1_w )
 
 WRITE8_HANDLER( soccer_out1_w )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+
 	CTRLD = data;
 
 	/* bit 0 = whistle */
@@ -76,10 +84,10 @@ WRITE8_HANDLER( soccer_out1_w )
 	/* bit 5-6 = trackball CTRL bits */
 	/* bit 7 = Rule LED */
 
-	discrete_sound_w(space, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(space, ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(space, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(discrete, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(discrete, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(discrete, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(discrete, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 
 //  set_led_status(0,data & 0x10);  // !!!!!!!!!! Is this correct????
 	set_led_status(1,data & 0x80);
@@ -88,7 +96,9 @@ WRITE8_HANDLER( soccer_out1_w )
 
 WRITE8_HANDLER( atarifb_out2_w )
 {
-	discrete_sound_w(space, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+
+	discrete_sound_w(discrete, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
 	coin_counter_w (0, data & 0x10);
 }
@@ -96,7 +106,9 @@ WRITE8_HANDLER( atarifb_out2_w )
 
 WRITE8_HANDLER( soccer_out2_w )
 {
-	discrete_sound_w(space, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+
+	discrete_sound_w(discrete, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
 	coin_counter_w (0, data & 0x10);
 	coin_counter_w (1, data & 0x20);

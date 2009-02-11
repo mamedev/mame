@@ -58,8 +58,10 @@ CHANNEL_DEBUG enables the following keys:
    rendering instead of sample-based.
 */
 
-struct k054539_info {
+typedef struct _k054539_state k054539_state;
+struct _k054539_state {
 	const k054539_interface *intf;
+	const device_config *device;
 	double voltab[256];
 	double pantab[0xf];
 
@@ -87,33 +89,42 @@ struct k054539_info {
 	} channels[8];
 };
 
+INLINE k054539_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_K054539);
+	return (k054539_state *)device->token;
+}
+
 //*
 
-void k054539_init_flags(int chip, int flags)
+void k054539_init_flags(const device_config *device, int flags)
 {
-	struct k054539_info *info = sndti_token(SOUND_K054539, chip);
+	k054539_state *info = get_safe_token(device);
 	info->k054539_flags = flags;
 }
 
-void k054539_set_gain(int chip, int channel, double gain)
+void k054539_set_gain(const device_config *device, int channel, double gain)
 {
-	struct k054539_info *info = sndti_token(SOUND_K054539, chip);
+	k054539_state *info = get_safe_token(device);
 	if (gain >= 0) info->k054539_gain[channel] = gain;
 }
 //*
 
-static int k054539_regupdate(struct k054539_info *info)
+static int k054539_regupdate(k054539_state *info)
 {
 	return !(info->regs[0x22f] & 0x80);
 }
 
-static void k054539_keyon(struct k054539_info *info, int channel)
+static void k054539_keyon(k054539_state *info, int channel)
 {
 	if(k054539_regupdate(info))
 		info->regs[0x22c] |= 1 << channel;
 }
 
-static void k054539_keyoff(struct k054539_info *info, int channel)
+static void k054539_keyoff(k054539_state *info, int channel)
 {
 	if(k054539_regupdate(info))
 		info->regs[0x22c] &= ~(1 << channel);
@@ -121,7 +132,7 @@ static void k054539_keyoff(struct k054539_info *info, int channel)
 
 static STREAM_UPDATE( k054539_update )
 {
-	struct k054539_info *info = param;
+	k054539_state *info = param;
 #define VOL_CAP 1.80
 
 	static const INT16 dpcm[16] = {
@@ -427,12 +438,12 @@ else
 
 static TIMER_CALLBACK( k054539_irq )
 {
-	struct k054539_info *info = ptr;
+	k054539_state *info = ptr;
 	if(info->regs[0x22f] & 0x20)
-		info->intf->irq(machine);
+		info->intf->irq(info->device);
 }
 
-static void k054539_init_chip(const device_config *device, struct k054539_info *info, int clock)
+static void k054539_init_chip(const device_config *device, k054539_state *info)
 {
 	int i;
 
@@ -441,10 +452,10 @@ static void k054539_init_chip(const device_config *device, struct k054539_info *
 	info->k054539_flags |= K054539_UPDATE_AT_KEYON; //* make it default until proven otherwise
 
 	// Real size of 0x4000, the addon is to simplify the reverb buffer computations
-	info->ram = auto_malloc(0x4000*2+clock/50*2);
+	info->ram = auto_malloc(0x4000*2+device->clock/50*2);
 	info->reverb_pos = 0;
 	info->cur_ptr = 0;
-	memset(info->ram, 0, 0x4000*2+clock/50*2);
+	memset(info->ram, 0, 0x4000*2+device->clock/50*2);
 
 	info->rom = device->region;
 	info->rom_size = device->regionbytes;
@@ -466,16 +477,17 @@ static void k054539_init_chip(const device_config *device, struct k054539_info *
 		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
 		timer_pulse(device->machine, ATTOTIME_IN_HZ(480), info, 0, k054539_irq);
 
-	info->stream = stream_create(device, 0, 2, clock, info, k054539_update);
+	info->stream = stream_create(device, 0, 2, device->clock, info, k054539_update);
 
 	state_save_register_device_item_array(device, 0, info->regs);
 	state_save_register_device_item_pointer(device, 0, info->ram,  0x4000);
 	state_save_register_device_item(device, 0, info->cur_ptr);
 }
 
-static void k054539_w(int chip, offs_t offset, UINT8 data) //*
+WRITE8_DEVICE_HANDLER( k054539_w )
 {
-	struct k054539_info *info = sndti_token(SOUND_K054539, chip);
+	k054539_state *info = get_safe_token(device);
+
 #if 0
 	int voice, reg;
 
@@ -524,7 +536,7 @@ static void k054539_w(int chip, offs_t offset, UINT8 data) //*
 		case 0x13f:
 			pan = data >= 0x11 && data <= 0x1f ? data - 0x11 : 0x18 - 0x11;
 			if(info->intf->apan)
-				info->intf->apan(info->pantab[pan], info->pantab[0xe - pan]);
+				info->intf->apan(info->device, info->pantab[pan], info->pantab[0xe - pan]);
 		break;
 
 		case 0x214:
@@ -599,7 +611,7 @@ static void k054539_w(int chip, offs_t offset, UINT8 data) //*
 
 static STATE_POSTLOAD( reset_zones )
 {
-	struct k054539_info *info = param;
+	k054539_state *info = param;
 	int data = info->regs[0x22e];
 	info->cur_zone =
 		data == 0x80 ? info->ram :
@@ -607,9 +619,9 @@ static STATE_POSTLOAD( reset_zones )
 	info->cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 }
 
-static UINT8 k054539_r(int chip, offs_t offset)
+READ8_DEVICE_HANDLER( k054539_r )
 {
-	struct k054539_info *info = sndti_token(SOUND_K054539, chip);
+	k054539_state *info = get_safe_token(device);
 	switch(offset) {
 	case 0x22d:
 		if(info->regs[0x22f] & 0x10) {
@@ -629,11 +641,13 @@ static UINT8 k054539_r(int chip, offs_t offset)
 	return info->regs[offset];
 }
 
-static SND_START( k054539 )
+static DEVICE_START( k054539 )
 {
 	static const k054539_interface defintrf = { 0 };
 	int i;
-	struct k054539_info *info = device->token;
+	k054539_state *info = get_safe_token(device);
+	
+	info->device = device;
 
 	for (i = 0; i < 8; i++)
 		info->k054539_gain[i] = 1.0;
@@ -663,29 +677,9 @@ static SND_START( k054539 )
 	for(i=0; i<0xf; i++)
 		info->pantab[i] = sqrt(i) / sqrt(0xe);
 
-	k054539_init_chip(device, info, clock);
+	k054539_init_chip(device, info);
 
 	state_save_register_postload(device->machine, reset_zones, info);
-}
-
-WRITE8_HANDLER( k054539_0_w )
-{
-	k054539_w(0, offset, data);
-}
-
-READ8_HANDLER( k054539_0_r )
-{
-	return k054539_r(0, offset);
-}
-
-WRITE8_HANDLER( k054539_1_w )
-{
-	k054539_w(1, offset, data);
-}
-
-READ8_HANDLER( k054539_1_r )
-{
-	return k054539_r(1, offset);
 }
 
 
@@ -695,34 +689,24 @@ READ8_HANDLER( k054539_1_r )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( k054539 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( k054539 )
+DEVICE_GET_INFO( k054539 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct k054539_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(k054539_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k054539 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k054539 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							/* nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( k054539 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							/* nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "K054539");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Konami custom");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "K054539");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Konami custom");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

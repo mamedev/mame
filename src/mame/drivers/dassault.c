@@ -271,20 +271,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0x110000, 0x110001) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0x120000, 0x120001) AM_READ(okim6295_status_0_r)
-	AM_RANGE(0x130000, 0x130001) AM_READ(okim6295_status_1_r)
+	AM_RANGE(0x100000, 0x100001) AM_DEVREAD(SOUND, "ym1", ym2203_r)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREAD(SOUND, "ym2", ym2151_r)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREAD(SOUND, "oki1", okim6295_r)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREAD(SOUND, "oki2", okim6295_r)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(ym2203_word_0_w)
-	AM_RANGE(0x110000, 0x110001) AM_WRITE(ym2151_word_0_w)
-	AM_RANGE(0x120000, 0x120001) AM_WRITE(okim6295_data_0_w)
-	AM_RANGE(0x130000, 0x130001) AM_WRITE(okim6295_data_1_w)
+	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVWRITE(SOUND, "ym2", ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVWRITE(SOUND, "oki1", okim6295_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVWRITE(SOUND, "oki2", okim6295_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
@@ -532,15 +532,15 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq(running_machine *machine, int state)
+static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[2],1,state);
+	cpu_set_input_line(device->machine->cpu[2],1,state);
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
 	/* the second OKIM6295 ROM is bank switched */
-	okim6295_set_bank_base(1, (data & 1) * 0x40000);
+	okim6295_set_bank_base(devtag_get_device(device->machine, SOUND, "oki2"), (data & 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =

@@ -54,17 +54,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-//  AM_RANGE(0x4002, 0x4002) AM_READ(ay8910_read_port_0_r)  /* ?? */
-	AM_RANGE(0x6001, 0x6001) AM_READ(ym2203_read_port_0_r)
+//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD(SOUND, "ay", ay8910_r)  /* ?? */
+	AM_RANGE(0x6000, 0x6001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -195,10 +193,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		soundlatch_r,
-		soundlatch2_r,
-		NULL,
-		NULL
+		DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+		DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch2_r),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };

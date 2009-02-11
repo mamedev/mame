@@ -274,12 +274,12 @@ static WRITE16_HANDLER( fashion_write2_w )
 	}
 }
 
-static WRITE16_HANDLER( write3_w )
+static WRITE16_DEVICE_HANDLER( write3_w )
 {
 	if (t3 != data) {
 		t3 = data;
-		okim6376_data_0_lsb_w(space, 0, t3, mem_mask);
-		okim6376_data_0_lsb_w(space, 0, (1 << 4), mem_mask);
+		okim6376_w(device, 0, t3);
+		okim6376_w(device, 0, (1 << 4));
 	}
 //  popmessage("%04x %04x",t1,t3);
 }
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( brasil_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE( blit_status_w )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITE( write2_w ) // coin counter & coin lockout
- 	AM_RANGE(0x0006, 0x0007) AM_WRITE( write3_w ) // sound chip routes here
+ 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( SOUND, "samples", write3_w ) // sound chip routes here
  	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ( read3_r )
@@ -317,7 +317,7 @@ static ADDRESS_MAP_START( vidpokr2_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITE( write2_w ) // coin counter & coin lockout
 	AM_RANGE(0x0004, 0x0005) AM_WRITE( vidpokr2_vblank_w )
- 	AM_RANGE(0x0006, 0x0007) AM_WRITE( write3_w ) // sound chip routes here
+ 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( SOUND, "samples", write3_w ) // sound chip routes here
  	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ( vidpokr2_vblank_r )

@@ -106,11 +106,11 @@ static WRITE8_HANDLER( gbusters_sh_irqtrigger_w )
 	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
-static WRITE8_HANDLER( gbusters_snd_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
 {
 	int bank_B = ((data >> 2) & 0x01);	/* ?? */
 	int bank_A = ((data) & 0x01);		/* ?? */
-	k007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( device, bank_A, bank_B );
 
 #if 0
 	{
@@ -153,17 +153,16 @@ static ADDRESS_MAP_START( gbusters_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM 878h01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)	/* 007232 registers */
-	AM_RANGE(0xc001, 0xc001) AM_READ(ym2151_status_port_0_r)	/* YM 2151 */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami", k007232_r)	/* 007232 registers */
+	AM_RANGE(0xc001, 0xc001) AM_DEVREAD(SOUND, "ym", ym2151_status_port_r)	/* YM 2151 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gbusters_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM 878h01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)		/* 007232 registers */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)	/* YM 2151 */
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)		/* YM 2151 */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(gbusters_snd_bankswitch_w)	/* 007232 bankswitch? */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami", k007232_w)		/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)		/* YM 2151 */
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE(SOUND, "konami", gbusters_snd_bankswitch_w)	/* 007232 bankswitch? */
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -283,10 +282,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void volume_callback(int v)
+static void volume_callback(const device_config *device, int v)
 {
-	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =

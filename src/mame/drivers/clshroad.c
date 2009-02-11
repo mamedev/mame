@@ -19,7 +19,6 @@ XTAL        :   18.432 MHz
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "sound/custom.h"
 
 /* Variables & functions defined in video: */
 
@@ -37,7 +36,10 @@ VIDEO_START( clshroad );
 VIDEO_UPDATE( clshroad );
 
 extern UINT8 *wiping_soundregs;
-CUSTOM_START( wiping_sh_start );
+
+DEVICE_GET_INFO( wiping_sound );
+#define SOUND_WIPING DEVICE_GET_INFO_NAME(wiping_sound)
+
 WRITE8_HANDLER( wiping_sound_w );
 
 
@@ -246,13 +248,6 @@ GFXDECODE_END
 
 
 
-static const custom_sound_interface custom_interface =
-{
-	wiping_sh_start
-};
-
-
-
 static MACHINE_DRIVER_START( firebatl )
 
 	/* basic machine hardware */
@@ -284,8 +279,7 @@ static MACHINE_DRIVER_START( firebatl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ADD("custom", WIPING, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -320,8 +314,7 @@ static MACHINE_DRIVER_START( clshroad )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ADD("custom", WIPING, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

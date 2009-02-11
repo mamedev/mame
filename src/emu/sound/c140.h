@@ -5,10 +5,10 @@
 #ifndef __C140_H__
 #define __C140_H__
 
-READ8_HANDLER( c140_r );
-WRITE8_HANDLER( c140_w );
+READ8_DEVICE_HANDLER( c140_r );
+WRITE8_DEVICE_HANDLER( c140_w );
 
-void c140_set_base(int which, void *base);
+void c140_set_base(const device_config *device, void *base);
 
 enum
 {
@@ -23,7 +23,7 @@ struct _c140_interface {
     int banking_type;
 };
 
-SND_GET_INFO( c140 );
-#define SOUND_C140 SND_GET_INFO_NAME( c140 )
+DEVICE_GET_INFO( c140 );
+#define SOUND_C140 DEVICE_GET_INFO_NAME( c140 )
 
 #endif /* __C140_H__ */

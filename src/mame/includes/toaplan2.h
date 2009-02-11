@@ -1,9 +1,9 @@
 /*----------- defined in audio/toaplan2.c -----------*/
 
-void dogyuun_okisnd_w(const address_space *space, int data);
-void kbash_okisnd_w(const address_space *space, int data);
-void fixeight_okisnd_w(const address_space *space, int data);
-void batsugun_okisnd_w(const address_space *space, int data);
+void dogyuun_okisnd_w(const device_config *device, int data);
+void kbash_okisnd_w(const device_config *device, int data);
+void fixeight_okisnd_w(const device_config *device, int data);
+void batsugun_okisnd_w(const device_config *device, int data);
 
 
 /*----------- defined in drivers/toaplan2.c -----------*/

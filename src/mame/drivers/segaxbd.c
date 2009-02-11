@@ -390,9 +390,9 @@ static void sound_data_w(running_machine *machine, UINT8 data)
 }
 
 
-static void sound_cpu_irq(running_machine *machine, int state)
+static void sound_cpu_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[2], 0, state);
+	cpu_set_input_line(device->machine->cpu[2], 0, state);
 }
 
 
@@ -786,15 +786,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_READWRITE(sega_pcm_r, sega_pcm_w)
+	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE(SOUND, "pcm", sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
@@ -1367,7 +1366,7 @@ static MACHINE_DRIVER_START( xboard )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("2151", YM2151, SOUND_CLOCK/4)
+	MDRV_SOUND_ADD("ym", YM2151, SOUND_CLOCK/4)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.43)
 	MDRV_SOUND_ROUTE(1, "right", 0.43)

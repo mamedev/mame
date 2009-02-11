@@ -968,15 +968,14 @@ static ADDRESS_MAP_START( masterw_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masterw_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -985,9 +984,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(ym2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -996,10 +993,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -1013,17 +1007,16 @@ static ADDRESS_MAP_START( viofight_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( viofight_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xb000, 0xb001) AM_WRITE(okim6295_data_0_w)		/* yes, both addresses for the same chip */
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE(SOUND, "oki", okim6295_w)		/* yes, both addresses for the same chip */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -2353,9 +2346,9 @@ GFXDECODE_END
 
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -2368,10 +2361,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		bankswitch_w,
-		NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_MEMORY_HANDLER("audio", PROGRAM, bankswitch_w),
+		DEVCB_NULL,
 	},
 	irqhandler
 };
@@ -2391,10 +2384,10 @@ static void mb87078_gain_changed(running_machine *machine, int channel, int perc
 {
 	if (channel==1)
 	{
-		sound_type type = machine->config->sound[0].type;
-		sndti_set_output_gain(type, 0, 0, percent / 100.0);
-		sndti_set_output_gain(type, 1, 0, percent / 100.0);
-		sndti_set_output_gain(type, 2, 0, percent / 100.0);
+		const device_config *ym = devtag_get_device(machine, SOUND, "ym");
+		sound_set_output_gain(ym, 0, percent / 100.0);
+		sound_set_output_gain(ym, 1, percent / 100.0);
+		sound_set_output_gain(ym, 2, percent / 100.0);
 		//popmessage("MB87078 gain ch#%i percent=%i",channel,percent);
 	}
 }

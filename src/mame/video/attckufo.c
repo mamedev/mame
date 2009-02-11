@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "sound/custom.h"
 #include "includes/attckufo.h"
 
 #define MAX_LINES 261

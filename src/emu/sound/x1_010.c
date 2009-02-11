@@ -79,7 +79,8 @@ typedef struct {
 	unsigned char	reserve[2];
 } X1_010_CHANNEL;
 
-struct x1_010_info
+typedef struct _x1_010_state x1_010_state;
+struct _x1_010_state
 {
 	/* Variables only used here */
 	int	rate;								// Output sampling rate (Hz)
@@ -98,13 +99,22 @@ struct x1_010_info
 /* mixer tables and internal buffers */
 //static short  *mixer_buffer = NULL;
 
+INLINE x1_010_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_X1_010);
+	return (x1_010_state *)device->token;
+}
+
 
 /*--------------------------------------------------------------
  generate sound to the mix buffer
 --------------------------------------------------------------*/
 static STREAM_UPDATE( seta_update )
 {
-	struct x1_010_info *info = param;
+	x1_010_state *info = param;
 	X1_010_CHANNEL	*reg;
 	int		ch, i, volL, volR, freq;
 	register INT8	*start, *end, data;
@@ -191,15 +201,15 @@ static STREAM_UPDATE( seta_update )
 
 
 
-static SND_START( x1_010 )
+static DEVICE_START( x1_010 )
 {
 	int i;
 	const x1_010_interface *intf = device->static_config;
-	struct x1_010_info *info = device->token;
+	x1_010_state *info = device->token;
 
 	info->region		= device->region;
-	info->base_clock	= clock;
-	info->rate			= clock / 1024;
+	info->base_clock	= device->clock;
+	info->rate			= device->clock / 1024;
 	info->address		= intf->adr;
 
 	for( i = 0; i < SETA_NUM_CHANNELS; i++ ) {
@@ -207,16 +217,16 @@ static SND_START( x1_010 )
 		info->env_offset[i] = 0;
 	}
 	/* Print some more debug info */
-	LOG_SOUND(("masterclock = %d rate = %d\n", clock, info->rate ));
+	LOG_SOUND(("masterclock = %d rate = %d\n", device->clock, info->rate ));
 
 	/* get stream channels */
 	info->stream = stream_create(device,0,2,info->rate,info,seta_update);
 }
 
 
-void seta_sound_enable_w(int data)
+void seta_sound_enable_w(const device_config *device, int data)
 {
-	struct x1_010_info *info = sndti_token(SOUND_X1_010, 0);
+	x1_010_state *info = get_safe_token(device);
 	info->sound_enable = data;
 }
 
@@ -225,9 +235,9 @@ void seta_sound_enable_w(int data)
 /* Use these for 8 bit CPUs */
 
 
-READ8_HANDLER( seta_sound_r )
+READ8_DEVICE_HANDLER( seta_sound_r )
 {
-	struct x1_010_info *info = sndti_token(SOUND_X1_010, 0);
+	x1_010_state *info = get_safe_token(device);
 	offset ^= info->address;
 	return info->reg[offset];
 }
@@ -235,9 +245,9 @@ READ8_HANDLER( seta_sound_r )
 
 
 
-WRITE8_HANDLER( seta_sound_w )
+WRITE8_DEVICE_HANDLER( seta_sound_w )
 {
-	struct x1_010_info *info = sndti_token(SOUND_X1_010, 0);
+	x1_010_state *info = get_safe_token(device);
 	int channel, reg;
 	offset ^= info->address;
 
@@ -249,7 +259,7 @@ WRITE8_HANDLER( seta_sound_w )
 	 	info->smp_offset[channel] = 0;
 	 	info->env_offset[channel] = 0;
 	}
-	LOG_REGISTER_WRITE(("PC: %06X : offset %6X : data %2X\n", cpu_get_pc(space->cpu), offset, data ));
+	LOG_REGISTER_WRITE(("%s: offset %6X : data %2X\n", cpuexec_describe_context(device->machine), offset, data ));
 	info->reg[offset] = data;
 }
 
@@ -258,23 +268,23 @@ WRITE8_HANDLER( seta_sound_w )
 
 /* Use these for 16 bit CPUs */
 
-READ16_HANDLER( seta_sound_word_r )
+READ16_DEVICE_HANDLER( seta_sound_word_r )
 {
-	struct x1_010_info *info = sndti_token(SOUND_X1_010, 0);
+	x1_010_state *info = get_safe_token(device);
 	UINT16	ret;
 
 	ret = info->HI_WORD_BUF[offset]<<8;
-	ret += (seta_sound_r( space, offset )&0xff);
-	LOG_REGISTER_READ(( "Read X1-010 PC:%06X Offset:%04X Data:%04X\n", cpu_get_pc(space->cpu), offset, ret ));
+	ret += (seta_sound_r( device, offset )&0xff);
+	LOG_REGISTER_READ(( "%s: Read X1-010 Offset:%04X Data:%04X\n", cpuexec_describe_context(device->machine), offset, ret ));
 	return ret;
 }
 
-WRITE16_HANDLER( seta_sound_word_w )
+WRITE16_DEVICE_HANDLER( seta_sound_word_w )
 {
-	struct x1_010_info *info = sndti_token(SOUND_X1_010, 0);
+	x1_010_state *info = get_safe_token(device);
 	info->HI_WORD_BUF[offset] = (data>>8)&0xff;
-	seta_sound_w( space, offset, data&0xff );
-	LOG_REGISTER_WRITE(( "Write X1-010 PC:%06X Offset:%04X Data:%04X\n", cpu_get_pc(space->cpu), offset, data ));
+	seta_sound_w( device, offset, data&0xff );
+	LOG_REGISTER_WRITE(( "%s: Write X1-010 Offset:%04X Data:%04X\n", cpuexec_describe_context(device->machine), offset, data ));
 }
 
 
@@ -283,34 +293,24 @@ WRITE16_HANDLER( seta_sound_word_w )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( x1_010 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( x1_010 )
+DEVICE_GET_INFO( x1_010 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct x1_010_info); 			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(x1_010_state); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( x1_010 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( x1_010 );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( x1_010 );			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "X1-010");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Seta custom");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "X1-010");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Seta custom");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

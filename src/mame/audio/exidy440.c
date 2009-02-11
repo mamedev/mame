@@ -131,7 +131,7 @@ static void fir_filter(INT32 *input, INT16 *output, int count);
  *
  *************************************/
 
-static CUSTOM_START( exidy440_sh_start )
+static DEVICE_START( exidy440_sound )
 {
 	running_machine *machine = device->machine;
 	int i, length;
@@ -156,13 +156,13 @@ static CUSTOM_START( exidy440_sh_start )
 	state_save_register_global(machine, m6844_interrupt);
 	state_save_register_global(machine, m6844_chain);
 
-	channel_frequency[0] = clock;   /* channels 0 and 1 are run by FCLK */
-	channel_frequency[1] = clock;
-	channel_frequency[2] = clock/2; /* channels 2 and 3 are run by SCLK */
-	channel_frequency[3] = clock/2;
+	channel_frequency[0] = device->clock;   /* channels 0 and 1 are run by FCLK */
+	channel_frequency[1] = device->clock;
+	channel_frequency[2] = device->clock/2; /* channels 2 and 3 are run by SCLK */
+	channel_frequency[3] = device->clock/2;
 
 	/* get stream channels */
-	stream = stream_create(device, 0, 2, clock, NULL, channel_update);
+	stream = stream_create(device, 0, 2, device->clock, NULL, channel_update);
 
 	/* allocate the sample cache */
 	length = memory_region_length(machine, "cvsd") * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
@@ -173,13 +173,11 @@ static CUSTOM_START( exidy440_sh_start )
 	reset_sound_cache();
 
 	/* allocate the mixer buffer */
-	mixer_buffer_left = auto_malloc(2 * clock * sizeof(INT32));
-	mixer_buffer_right = mixer_buffer_left + clock;
+	mixer_buffer_left = auto_malloc(2 * device->clock * sizeof(INT32));
+	mixer_buffer_right = mixer_buffer_left + device->clock;
 
 	if (SOUND_LOG)
 		debuglog = fopen("sound.log", "w");
-
-	return auto_malloc(1);
 }
 
 
@@ -190,7 +188,7 @@ static CUSTOM_START( exidy440_sh_start )
  *
  *************************************/
 
-static CUSTOM_STOP( exidy440_sh_stop )
+static DEVICE_STOP( exidy440_sound )
 {
 	if (SOUND_LOG && debuglog)
 		fclose(debuglog);
@@ -915,11 +913,22 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const custom_sound_interface custom_interface =
+static DEVICE_GET_INFO( exidy440_sound )
 {
-	exidy440_sh_start,
-	exidy440_sh_stop
-};
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(exidy440_sound);	break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME(exidy440_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Exidy 440 CVSD");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+
+#define SOUND_EXIDY440 DEVICE_GET_INFO_NAME( exidy440_sound )
 
 
 
@@ -937,8 +946,7 @@ MACHINE_DRIVER_START( exidy440_audio )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("custom", CUSTOM, EXIDY440_MASTER_CLOCK/256)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ADD("custom", EXIDY440, EXIDY440_MASTER_CLOCK/256)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 

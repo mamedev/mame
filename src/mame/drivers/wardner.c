@@ -235,8 +235,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
 
@@ -416,9 +415,9 @@ static const gfx_layout spritelayout =
 
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate);
+	cpu_set_input_line(device->machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =

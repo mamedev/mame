@@ -6,7 +6,6 @@
 #include "streams.h"
 #include "sound/filter.h"
 #include "machine/rescap.h"
-#include "sound/custom.h"
 #include "namco54.h"
 #include "polepos.h"
 
@@ -99,7 +98,7 @@ static STREAM_UPDATE( engine_sound_update )
 /************************************/
 /* Sound handler start              */
 /************************************/
-CUSTOM_START( polepos_sh_start )
+static DEVICE_START( polepos_sound )
 {
 	stream = stream_create(device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
 	sample_msb = sample_lsb = 0;
@@ -114,18 +113,31 @@ CUSTOM_START( polepos_sh_start )
      * a high pass filter. */
 	filter2_setup(device, FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1,
 									&filter_engine[2]);
-
-	return auto_malloc(1);
 }
 
 /************************************/
 /* Sound handler reset              */
 /************************************/
-CUSTOM_RESET( polepos_sh_reset )
+static DEVICE_RESET( polepos_sound )
 {
 	int loop;
 	for (loop = 0; loop < 3; loop++) filter2_reset(&filter_engine[loop]);
 }
+
+DEVICE_GET_INFO( polepos_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(polepos_sound);	break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(polepos_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Pole Position Custom");		break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
 
 /************************************/
 /* Write LSB of engine sound        */

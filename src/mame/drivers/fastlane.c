@@ -60,7 +60,7 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
-	k007232_set_bank(1,0 + ((data & 0x10) >> 4),2 + ((data & 0x10) >> 4));
+	k007232_set_bank(devtag_get_device(space->machine, SOUND, "konami2"),0 + ((data & 0x10) >> 4),2 + ((data & 0x10) >> 4));
 
 	/* other bits seems to be unused */
 }
@@ -68,21 +68,13 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 /* Read and write handlers for one K007232 chip:
    even and odd register are mapped swapped */
 
-static READ8_HANDLER( fastlane_k007232_read_port_0_r )
+static READ8_DEVICE_HANDLER( fastlane_k007232_r )
 {
-	return k007232_read_port_0_r(space, offset ^ 1);
+	return k007232_r(device, offset ^ 1);
 }
-static WRITE8_HANDLER( fastlane_k007232_write_port_0_w )
+static WRITE8_DEVICE_HANDLER( fastlane_k007232_w )
 {
-	k007232_write_port_0_w(space, offset ^ 1, data);
-}
-static READ8_HANDLER( fastlane_k007232_read_port_1_r )
-{
-	return k007232_read_port_1_r(space, offset ^ 1);
-}
-static WRITE8_HANDLER( fastlane_k007232_write_port_1_w )
-{
-	k007232_write_port_1_w(space, offset ^ 1, data);
+	k007232_w(device, offset ^ 1, data);
 }
 
 
@@ -95,8 +87,8 @@ static ADDRESS_MAP_START( fastlane_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0901, 0x0901) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d00, 0x0d0d) AM_READ(fastlane_k007232_read_port_0_r)/* 007232 registers (chip 1) */
-	AM_RANGE(0x0e00, 0x0e0d) AM_READ(fastlane_k007232_read_port_1_r)/* 007232 registers (chip 2) */
+	AM_RANGE(0x0d00, 0x0d0d) AM_DEVREAD(SOUND, "konami1", fastlane_k007232_r)/* 007232 registers (chip 1) */
+	AM_RANGE(0x0e00, 0x0e0d) AM_DEVREAD(SOUND, "konami2", fastlane_k007232_r)/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_READ(K051733_r)			/* 051733 (protection) */
 	AM_RANGE(0x1000, 0x1fff) AM_READ(SMH_RAM)			/* Palette RAM/Work RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)			/* Video RAM + Sprite RAM */
@@ -108,8 +100,8 @@ static ADDRESS_MAP_START( fastlane_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x005f) AM_WRITE(k007121_registers_w) AM_BASE(&fastlane_k007121_regs)/* 007121 registers */
 	AM_RANGE(0x0b00, 0x0b00) AM_WRITE(watchdog_reset_w)		/* watchdog reset */
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(fastlane_bankswitch_w)	/* bankswitch control */
-	AM_RANGE(0x0d00, 0x0d0d) AM_WRITE(fastlane_k007232_write_port_0_w)	/* 007232 registers (chip 1) */
-	AM_RANGE(0x0e00, 0x0e0d) AM_WRITE(fastlane_k007232_write_port_1_w)	/* 007232 registers (chip 2) */
+	AM_RANGE(0x0d00, 0x0d0d) AM_DEVWRITE(SOUND, "konami1", fastlane_k007232_w)	/* 007232 registers (chip 1) */
+	AM_RANGE(0x0e00, 0x0e0d) AM_DEVWRITE(SOUND, "konami2", fastlane_k007232_w)	/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_WRITE(K051733_w)				/* 051733 (protection) */
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)/* palette RAM */
 	AM_RANGE(0x1800, 0x1fff) AM_WRITE(SMH_RAM)				/* Work RAM */
@@ -248,16 +240,16 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void volume_callback0(int v)
+static void volume_callback0(const device_config *device, int v)
 {
-	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
-static void volume_callback1(int v)
+static void volume_callback1(const device_config *device, int v)
 {
-	k007232_set_volume(1,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(1,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_interface_1 =

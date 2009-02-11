@@ -48,11 +48,16 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( D7759_write_port_0_w )
+static WRITE8_DEVICE_HANDLER( D7759_write_port_0_w )
 {
-	upd7759_port_w(offset,data);
-	upd7759_start_w (0,0);
-	upd7759_start_w (0,1);
+	upd7759_port_w(device, 0, data);
+	upd7759_start_w(device, 0);
+	upd7759_start_w(device, 1);
+}
+
+static WRITE8_DEVICE_HANDLER( D7759_upd_reset_w )
+{
+	upd7759_reset_w(device, data & 1);
 }
 
 static ADDRESS_MAP_START( prehisle_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -64,10 +69,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prehisle_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(D7759_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(upd7759_0_reset_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(SOUND, "ym", ym3812_status_port_r, ym3812_control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE(SOUND, "ym", ym3812_write_port_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE(SOUND, "upd", D7759_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "upd", D7759_upd_reset_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -195,9 +200,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =

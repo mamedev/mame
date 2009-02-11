@@ -34,12 +34,12 @@ struct _sp0256_interface
 
 void sp0256_bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
 
-WRITE8_HANDLER( sp0256_ALD_w );
+WRITE8_DEVICE_HANDLER( sp0256_ALD_w );
 
-READ16_HANDLER( spb640_r );
-WRITE16_HANDLER( spb640_w );
+READ16_DEVICE_HANDLER( spb640_r );
+WRITE16_DEVICE_HANDLER( spb640_w );
 
-SND_GET_INFO( sp0256 );
-#define SOUND_SP0256 SND_GET_INFO_NAME( sp0256 )
+DEVICE_GET_INFO( sp0256 );
+#define SOUND_SP0256 DEVICE_GET_INFO_NAME( sp0256 )
 
 #endif /* __SP0256_H__ */

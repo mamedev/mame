@@ -377,8 +377,8 @@ static ADDRESS_MAP_START( io_map_skylncr, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x20, 0x20) AM_WRITE( skylncr_coin_w )
 
-	AM_RANGE(0x30, 0x30) AM_WRITE( ay8910_control_port_0_w )
-	AM_RANGE(0x31, 0x31) AM_READWRITE( ay8910_read_port_0_r , ay8910_write_port_0_w )
+	AM_RANGE(0x30, 0x31) AM_DEVWRITE( SOUND, "ay", ay8910_address_data_w )
+	AM_RANGE(0x31, 0x31) AM_DEVREAD( SOUND, "ay", ay8910_r )
 
 	AM_RANGE(0x40, 0x41) AM_WRITE( skylncr_paletteram_w )
 	AM_RANGE(0x50, 0x51) AM_WRITE( skylncr_paletteram2_w )
@@ -638,10 +638,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_6_r,
-	input_port_7_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW3"),
+	DEVCB_INPUT_PORT("DSW4"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

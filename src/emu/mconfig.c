@@ -58,90 +58,12 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 
 void machine_config_free(machine_config *config)
 {
-	int soundnum;
-
 	/* release the device list */
 	while (config->devicelist != NULL)
 		device_list_remove(&config->devicelist, config->devicelist->type, config->devicelist->tag);
 
-	/* release the strings */
-	for (soundnum = 0; soundnum < ARRAY_LENGTH(config->soundtag); soundnum++)
-		if (config->soundtag[soundnum] != NULL)
-			astring_free(config->soundtag[soundnum]);
-
 	/* release the configuration itself */
 	free(config);
-}
-
-
-/*-------------------------------------------------
-    sound_add - add a sound system during
-    machine driver expansion
--------------------------------------------------*/
-
-static sound_config *sound_add(machine_config *machine, const char *tag, sound_type type, int clock)
-{
-	int soundnum;
-
-	for (soundnum = 0; soundnum < MAX_SOUND; soundnum++)
-		if (machine->sound[soundnum].type == SOUND_DUMMY)
-		{
-			if (machine->soundtag[soundnum] == NULL)
-				machine->soundtag[soundnum] = astring_alloc();
-			astring_cpyc(machine->soundtag[soundnum], tag);
-			machine->sound[soundnum].tag = astring_c(machine->soundtag[soundnum]);
-			machine->sound[soundnum].type = type;
-			machine->sound[soundnum].clock = clock;
-			machine->sound[soundnum].config = NULL;
-			machine->sound[soundnum].routes = 0;
-			return &machine->sound[soundnum];
-		}
-
-	fatalerror("Out of sounds!\n");
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    sound_find - find a tagged sound system during
-    machine driver expansion
--------------------------------------------------*/
-
-static sound_config *sound_find(machine_config *machine, const char *tag)
-{
-	int soundnum;
-
-	for (soundnum = 0; soundnum < MAX_SOUND; soundnum++)
-		if (machine->sound[soundnum].tag && strcmp(machine->sound[soundnum].tag, tag) == 0)
-			return &machine->sound[soundnum];
-
-	fatalerror("Can't find sound '%s'!\n", tag);
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    sound_remove - remove a tagged sound system
-    during machine driver expansion
--------------------------------------------------*/
-
-static void sound_remove(machine_config *machine, const char *tag)
-{
-	int soundnum;
-
-	for (soundnum = 0; soundnum < MAX_SOUND; soundnum++)
-		if (machine->sound[soundnum].tag && strcmp(machine->sound[soundnum].tag, tag) == 0)
-		{
-			if (machine->soundtag[soundnum] != NULL)
-				astring_free(machine->soundtag[soundnum]);
-			memmove(&machine->sound[soundnum], &machine->sound[soundnum + 1], sizeof(machine->sound[0]) * (MAX_SOUND - soundnum - 1));
-			memmove(&machine->soundtag[soundnum], &machine->soundtag[soundnum + 1], sizeof(machine->soundtag[0]) * (MAX_SOUND - soundnum - 1));
-			memset(&machine->sound[MAX_SOUND - 1], 0, sizeof(machine->sound[0]));
-			memset(&machine->soundtag[MAX_SOUND - 1], 0, sizeof(machine->soundtag[0]));
-			return;
-		}
-
-	fatalerror("Can't find sound '%s'!\n", tag);
 }
 
 
@@ -155,15 +77,13 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	UINT32 entrytype = MCONFIG_TOKEN_INVALID;
 	astring *tempstring = astring_alloc();
 	device_config *device = NULL;
-	sound_config *sound = NULL;
 
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
 	{
-		int size, offset, bits, in, out;
-		UINT32 data32, clock, gain;
+		int size, offset, bits;
+		UINT32 data32, clock;
 		device_type devtype;
-		sound_type type;
 		const char *tag;
 		UINT64 data64;
 
@@ -356,57 +276,6 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			case MCONFIG_TOKEN_SOUND_RESET:
 				config->sound_reset = TOKEN_GET_PTR(tokens, sound_reset);
-				break;
-
-			/* add/remove/replace sounds */
-			case MCONFIG_TOKEN_SOUND_ADD:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
-				type = TOKEN_GET_PTR(tokens, sndtype);
-				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_add(config, device_build_tag(tempstring, owner, tag), type, clock);
-				break;
-
-			case MCONFIG_TOKEN_SOUND_REMOVE:
-				sound_remove(config, TOKEN_GET_STRING(tokens));
-				break;
-
-			case MCONFIG_TOKEN_SOUND_MODIFY:
-				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, device_build_tag(tempstring, owner, tag));
-				if (sound == NULL)
-					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
-				sound->routes = 0;
-				break;
-
-			case MCONFIG_TOKEN_SOUND_CONFIG:
-				assert(sound != NULL);
-				sound->config = TOKEN_GET_PTR(tokens, voidptr);
-				break;
-
-			case MCONFIG_TOKEN_SOUND_REPLACE:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, clock, 32);
-				type = TOKEN_GET_PTR(tokens, sndtype);
-				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, device_build_tag(tempstring, owner, tag));
-				if (sound == NULL)
-					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
-				sound->type = type;
-				sound->clock = clock;
-				sound->config = NULL;
-				sound->routes = 0;
-				break;
-
-			case MCONFIG_TOKEN_SOUND_ROUTE:
-				assert(sound != NULL);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK4(tokens, entrytype, 8, out, -12, in, -12, gain, 32);
-				sound->route[sound->routes].input = in;
-				sound->route[sound->routes].output = out;
-				sound->route[sound->routes].gain = (float)gain / 16777216.0f;
-				sound->route[sound->routes].target = TOKEN_GET_STRING(tokens);
-				sound->routes++;
 				break;
 
 			default:

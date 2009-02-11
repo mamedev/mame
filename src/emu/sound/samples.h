@@ -27,32 +27,20 @@ struct _samples_interface
 #define SAMPLES_START(name) void name(const device_config *device)
 
 
-void sample_start_n(int num,int channel,int samplenum,int loop);
-void sample_start_raw_n(int num,int channel,const INT16 *sampledata,int samples,int frequency,int loop);
-void sample_set_freq_n(int num,int channel,int freq);
-void sample_set_volume_n(int num,int channel,float volume);
-void sample_set_pause_n(int num,int channel,int pause);
-void sample_stop_n(int num,int channel);
-int sample_get_base_freq_n(int num,int channel);
-int sample_playing_n(int num,int channel);
-int sample_loaded_n(int num,int samplenum);
-
-/* shortcuts for backwards compatibilty */
-void sample_start(int channel,int samplenum,int loop);
-void sample_start_raw(int channel,const INT16 *sampledata,int samples,int frequency,int loop);
-void sample_set_freq(int channel,int freq);
-void sample_set_volume(int channel,float volume);
-void sample_set_pause(int channel,int pause);
-void sample_stop(int channel);
-int sample_get_base_freq(int channel);
-int sample_playing(int channel);
-int sample_loaded(int samplenum);
+void sample_start(const device_config *device,int channel,int samplenum,int loop);
+void sample_start_raw(const device_config *device,int channel,const INT16 *sampledata,int samples,int frequency,int loop);
+void sample_set_freq(const device_config *device,int channel,int freq);
+void sample_set_volume(const device_config *device,int channel,float volume);
+void sample_set_pause(const device_config *device,int channel,int pause);
+void sample_stop(const device_config *device,int channel);
+int sample_get_base_freq(const device_config *device,int channel);
+int sample_playing(const device_config *device,int channel);
 
 /* helper function that reads samples from disk - this can be used by other */
 /* drivers as well (e.g. a sound chip emulator needing drum samples) */
 struct loaded_samples *readsamples(const char *const *samplenames, const char *name);
 
-SND_GET_INFO( samples );
-#define SOUND_SAMPLES SND_GET_INFO_NAME( samples )
+DEVICE_GET_INFO( samples );
+#define SOUND_SAMPLES DEVICE_GET_INFO_NAME( samples )
 
 #endif /* __SAMPLES_H__ */

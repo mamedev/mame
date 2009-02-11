@@ -227,10 +227,10 @@ static ADDRESS_MAP_START( asteroid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(asteroid_bank_switch_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(asteroid_explode_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(asteroid_thump_w)
-	AM_RANGE(0x3c00, 0x3c05) AM_WRITE(asteroid_sounds_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(asteroid_noise_reset_w)
+	AM_RANGE(0x3600, 0x3600) AM_DEVWRITE(SOUND, "discrete", asteroid_explode_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE(SOUND, "discrete", asteroid_thump_w)
+	AM_RANGE(0x3c00, 0x3c05) AM_DEVWRITE(SOUND, "discrete", asteroid_sounds_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE(SOUND, "discrete", asteroid_noise_reset_w)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x4000)
 	AM_RANGE(0x5000, 0x57ff) AM_ROM						/* vector rom */
 	AM_RANGE(0x6800, 0x7fff) AM_ROM
@@ -245,18 +245,18 @@ static ADDRESS_MAP_START( astdelux_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2007) AM_READ(asteroid_IN0_r)	/* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
-	AM_RANGE(0x2c00, 0x2c0f) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0x2c00, 0x2c0f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x2c40, 0x2c7f) AM_READ(atari_vg_earom_r)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x3200, 0x323f) AM_WRITE(atari_vg_earom_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(asteroid_explode_w)
+	AM_RANGE(0x3600, 0x3600) AM_DEVWRITE(SOUND, "discrete", asteroid_explode_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(atari_vg_earom_ctrl_w)
 	AM_RANGE(0x3c00, 0x3c01) AM_WRITE(astdelux_led_w)
-	AM_RANGE(0x3c03, 0x3c03) AM_WRITE(astdelux_sounds_w)
+	AM_RANGE(0x3c03, 0x3c03) AM_DEVWRITE(SOUND, "discrete", astdelux_sounds_w)
 	AM_RANGE(0x3c04, 0x3c04) AM_WRITE(astdelux_bank_switch_w)
 	AM_RANGE(0x3c05, 0x3c07) AM_WRITE(astdelux_coin_counter_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(asteroid_noise_reset_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE(SOUND, "discrete", asteroid_noise_reset_w)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x4000)
 	AM_RANGE(0x4800, 0x57ff) AM_ROM						/* vector rom */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -273,8 +273,8 @@ static ADDRESS_MAP_START( llander_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x3200, 0x3200) AM_WRITE(llander_led_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(llander_sounds_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(llander_snd_reset_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_DEVWRITE(SOUND, "discrete", llander_sounds_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE(SOUND, "discrete", llander_snd_reset_w)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x4000)
 	AM_RANGE(0x4800, 0x5fff) AM_ROM						/* vector rom */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -577,8 +577,8 @@ INPUT_PORTS_END
 
 static const pokey_interface pokey_config =
 {
-	{ 0 },
-	input_port_3_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW2")
 };
 
 
@@ -610,7 +610,7 @@ static MACHINE_DRIVER_START( asteroid )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("disc", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(asteroid)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 MACHINE_DRIVER_END
@@ -634,7 +634,7 @@ static MACHINE_DRIVER_START( astdelux )
 	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("disc", DISCRETE, 0)
+	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(astdelux)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -661,7 +661,7 @@ static MACHINE_DRIVER_START( llander )
 	MDRV_VIDEO_UPDATE(vector)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("disc", DISCRETE, 0)
+	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(llander)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -171,40 +171,8 @@ static MACHINE_RESET( segac2 )
 
 ******************************************************************************/
 
-/* handle reads from the YM3438 */
-static READ16_HANDLER( ym3438_r )
-{
-	switch (offset)
-	{
-		case 0: return ym3438_status_port_0_a_r(space, 0);
-		case 1: return ym3438_read_port_0_r(space, 0);
-		case 2: return ym3438_status_port_0_b_r(space, 0);
-	}
-	return 0xff;
-}
-
-
-/* handle writes to the YM3438 */
-static WRITE16_HANDLER( ym3438_w )
-{
-	/* only works if we're accessing the low byte */
-	if (ACCESSING_BITS_0_7)
-	{
-		static UINT8 last_port;
-
-		switch (offset)
-		{
-			case 0: ym3438_control_port_0_a_w(space, 0, data & 0xff);	last_port = data;	break;
-			case 1: ym3438_data_port_0_a_w(space, 0, data & 0xff);							break;
-			case 2: ym3438_control_port_0_b_w(space, 0, data & 0xff);	last_port = data;	break;
-			case 3: ym3438_data_port_0_b_w(space, 0, data & 0xff);							break;
-		}
-	}
-}
-
-
 /* handle writes to the UPD7759 */
-static WRITE16_HANDLER( segac2_upd7759_w )
+static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 {
 	/* make sure we have a UPD chip */
 	if (!sound_banks)
@@ -213,9 +181,9 @@ static WRITE16_HANDLER( segac2_upd7759_w )
 	/* only works if we're accessing the low byte */
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_port_w(0, data & 0xff);
-		upd7759_start_w(0, 0);
-		upd7759_start_w(0, 1);
+		upd7759_port_w(device, 0, data & 0xff);
+		upd7759_start_w(device, 0);
+		upd7759_start_w(device, 1);
 	}
 }
 
@@ -373,7 +341,7 @@ static READ16_HANDLER( io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && sound_banks)
-				return (input_port_read(space->machine, portnames[offset]) & 0xbf) | (upd7759_0_busy_r(space,0) << 6);
+				return (input_port_read(space->machine, portnames[offset]) & 0xbf) | (upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd")) << 6);
 			return input_port_read(space->machine, portnames[offset]);
 
 		/* 'SEGA' protection */
@@ -460,15 +428,19 @@ static WRITE16_HANDLER( io_chip_w )
 			}
 			if (sound_banks > 1)
 			{
+				const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
 				newbank = (data >> 2) & (sound_banks - 1);
-				upd7759_set_bank_base(0, newbank * 0x20000);
+				upd7759_set_bank_base(upd, newbank * 0x20000);
 			}
 			break;
 
 		/* CNT register */
 		case 0x1c/2:
 			if (sound_banks > 1)
-				upd7759_reset_w(0, (data >> 1) & 1);
+			{
+				const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
+				upd7759_reset_w(upd, (data >> 1) & 1);
+			}
 			break;
 	}
 }
@@ -653,8 +625,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_MIRROR(0x13fdfe) AM_READWRITE(prot_r, prot_w)
 	AM_RANGE(0x800200, 0x800201) AM_MIRROR(0x13fdfe) AM_WRITE(control_w)
 	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE(io_chip_r, io_chip_w)
-	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_READWRITE(ym3438_r, ym3438_w)
-	AM_RANGE(0x880000, 0x880001) AM_MIRROR(0x13fefe) AM_WRITE(segac2_upd7759_w)
+	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8(SOUND, "ym", ym3438_r, ym3438_w, 0x00ff)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
@@ -1341,10 +1312,10 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
-static void  segac2_irq2_interrupt(running_machine *machine, int state)
+static void  segac2_irq2_interrupt(const device_config *device, int state)
 {
 	//printf("sound irq %d\n", state);
-	cpu_set_input_line(machine->cpu[0], 2, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym3438_interface ym3438_intf =
 {
@@ -1394,7 +1365,6 @@ static MACHINE_DRIVER_START( segac )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, XL2_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-
 
 	MDRV_MACHINE_START(segac2)
 	MDRV_MACHINE_RESET(segac2)
@@ -1849,6 +1819,8 @@ it should be, otherwise I don't see how the formula could be computed.
 
 static void segac2_common_init(running_machine* machine, int (*func)(int in))
 {
+	const device_config *upd = devtag_get_device(machine, SOUND, "upd");
+
 	DRIVER_INIT_CALL( megadriv_c2 );
 
 	prot_func = func;
@@ -1857,6 +1829,9 @@ static void segac2_common_init(running_machine* machine, int (*func)(int in))
 	genesis_has_z80 = 0;
 	genesis_always_irq6 = 1;
 	genesis_other_hacks = 0;
+
+	if (upd != NULL)
+		memory_install_write16_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), upd, 0x880000, 0x880001, 0, 0x13fefe, segac2_upd7759_w);
 }
 
 

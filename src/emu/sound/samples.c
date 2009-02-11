@@ -226,9 +226,9 @@ struct loaded_samples *readsamples(const char *const *samplenames, const char *b
 /* Start one of the samples loaded from disk. Note: channel must be in the range */
 /* 0 .. Samplesinterface->channels-1. It is NOT the discrete channel to pass to */
 /* mixer_play_sample() */
-void sample_start_n(int num,int channel,int samplenum,int loop)
+void sample_start(const device_config *device,int channel,int samplenum,int loop)
 {
-    struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
+    struct samples_info *info = device->token;
     struct sample_channel *chan;
     struct loaded_sample *sample;
 
@@ -256,15 +256,10 @@ void sample_start_n(int num,int channel,int samplenum,int loop)
 	chan->loop = loop;
 }
 
-void sample_start(int channel,int samplenum,int loop)
-{
-    sample_start_n(0,channel,samplenum,loop);
-}
 
-
-void sample_start_raw_n(int num,int channel,const INT16 *sampledata,int samples,int frequency,int loop)
+void sample_start_raw(const device_config *device,int channel,const INT16 *sampledata,int samples,int frequency,int loop)
 {
-    struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
+    struct samples_info *info = device->token;
     struct sample_channel *chan;
 
     assert( channel < info->numchannels );
@@ -285,15 +280,10 @@ void sample_start_raw_n(int num,int channel,const INT16 *sampledata,int samples,
 	chan->loop = loop;
 }
 
-void sample_start_raw(int channel,const INT16 *sampledata,int samples,int frequency,int loop)
-{
-    sample_start_raw_n(0,channel,sampledata,samples,frequency,loop);
-}
 
-
-void sample_set_freq_n(int num,int channel,int freq)
+void sample_set_freq(const device_config *device,int channel,int freq)
 {
-    struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
+    struct samples_info *info = device->token;
     struct sample_channel *chan;
 
     assert( channel < info->numchannels );
@@ -306,15 +296,10 @@ void sample_set_freq_n(int num,int channel,int freq)
 	chan->step = ((INT64)freq << FRAC_BITS) / info->device->machine->sample_rate;
 }
 
-void sample_set_freq(int channel,int freq)
-{
-    sample_set_freq_n(0,channel,freq);
-}
 
-
-void sample_set_volume_n(int num,int channel,float volume)
+void sample_set_volume(const device_config *device,int channel,float volume)
 {
-    struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
+    struct samples_info *info = device->token;
     struct sample_channel *chan;
 
     assert( channel < info->numchannels );
@@ -324,15 +309,10 @@ void sample_set_volume_n(int num,int channel,float volume)
 	stream_set_output_gain(chan->stream, 0, volume);
 }
 
-void sample_set_volume(int channel,float volume)
-{
-    sample_set_volume_n(0,channel,volume);
-}
 
-
-void sample_set_pause_n(int num,int channel,int pause)
+void sample_set_pause(const device_config *device,int channel,int pause)
 {
-    struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
+    struct samples_info *info = device->token;
     struct sample_channel *chan;
 
     assert( channel < info->numchannels );
@@ -345,15 +325,10 @@ void sample_set_pause_n(int num,int channel,int pause)
 	chan->paused = pause;
 }
 
-void sample_set_pause(int channel,int pause)
-{
-    sample_set_pause_n(0,channel,pause);
-}
 
-
-void sample_stop_n(int num,int channel)
+void sample_stop(const device_config *device,int channel)
 {
-    struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
+    struct samples_info *info = device->token;
     struct sample_channel *chan;
 
     assert( channel < info->numchannels );
@@ -366,15 +341,10 @@ void sample_stop_n(int num,int channel)
     chan->source_num = -1;
 }
 
-void sample_stop(int channel)
-{
-    sample_stop_n(0,channel);
-}
 
-
-int sample_get_base_freq_n(int num,int channel)
+int sample_get_base_freq(const device_config *device,int channel)
 {
-    struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
+    struct samples_info *info = device->token;
     struct sample_channel *chan;
 
     assert( channel < info->numchannels );
@@ -386,15 +356,10 @@ int sample_get_base_freq_n(int num,int channel)
 	return chan->basefreq;
 }
 
-int sample_get_base_freq(int channel)
-{
-    return sample_get_base_freq_n(0,channel);
-}
 
-
-int sample_playing_n(int num,int channel)
+int sample_playing(const device_config *device,int channel)
 {
-    struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
+    struct samples_info *info = device->token;
     struct sample_channel *chan;
 
     assert( channel < info->numchannels );
@@ -404,32 +369,6 @@ int sample_playing_n(int num,int channel)
 	/* force an update before we start */
 	stream_update(chan->stream);
 	return (chan->source != NULL);
-}
-
-int sample_playing(int channel)
-{
-    return sample_playing_n(0,channel);
-}
-
-
-int sample_loaded_n(int num,int samplenum)
-{
-    int ret = 0;
-    struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
-
-    if (info->samples != NULL)
-    {
-        assert( samplenum < info->samples->total );
-
-        ret = (info->samples->sample[samplenum].data != NULL);
-    }
-
-    return ret;
-}
-
-int sample_loaded(int samplenum)
-{
-    return sample_loaded_n(0,samplenum);
 }
 
 
@@ -520,7 +459,7 @@ static STATE_POSTLOAD( samples_postload )
 }
 
 
-static SND_START( samples )
+static DEVICE_START( samples )
 {
 	int i;
 	const samples_interface *intf = device->static_config;
@@ -568,34 +507,24 @@ static SND_START( samples )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( samples )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( samples )
+DEVICE_GET_INFO( samples )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct samples_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct samples_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-        case SNDINFO_PTR_SET_INFO:                      info->set_info = SND_SET_INFO_NAME( samples );	break;
-        case SNDINFO_PTR_START:                         info->start = SND_START_NAME( samples );		break;
-        case SNDINFO_PTR_STOP:                          /* Nothing */                           		break;
-        case SNDINFO_PTR_RESET:                         /* Nothing */                           		break;
+        case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME( samples );		break;
+        case DEVINFO_FCT_STOP:                          /* Nothing */                           		break;
+        case DEVINFO_FCT_RESET:                         /* Nothing */                           		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-        case SNDINFO_STR_NAME:                          strcpy(info->s, "Samples");                    	break;
-        case SNDINFO_STR_CORE_FAMILY:                   strcpy(info->s, "Big Hack");                   	break;
-        case SNDINFO_STR_CORE_VERSION:                  strcpy(info->s, "1.1");                        	break;
-        case SNDINFO_STR_CORE_FILE:                     strcpy(info->s, __FILE__);                     		break;
-        case SNDINFO_STR_CORE_CREDITS:                  strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+        case DEVINFO_STR_NAME:                          strcpy(info->s, "Samples");                    	break;
+        case DEVINFO_STR_FAMILY:                   strcpy(info->s, "Big Hack");                   	break;
+        case DEVINFO_STR_VERSION:                  strcpy(info->s, "1.1");                        	break;
+        case DEVINFO_STR_SOURCE_FILE:                     strcpy(info->s, __FILE__);                     		break;
+        case DEVINFO_STR_CREDITS:                  strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

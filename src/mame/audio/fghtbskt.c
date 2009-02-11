@@ -12,7 +12,10 @@ static INT16 *samplebuf;
 WRITE8_HANDLER( fghtbskt_samples_w )
 {
 	if( data & 1 )
-		sample_start_raw(0, samplebuf + ((data & 0xf0) << 8), 0x2000, 8000, 0);
+	{
+		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+		sample_start_raw(samples, 0, samplebuf + ((data & 0xf0) << 8), 0x2000, 8000, 0);
+	}
 }
 
 SAMPLES_START( fghtbskt_sh_start )

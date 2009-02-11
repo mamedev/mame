@@ -1092,12 +1092,12 @@ static WRITE8_HANDLER( sound_int_control_hi_w )
 }
 
 
-static void ym3438_irq_handler(running_machine *machine, int state)
+static void ym3438_irq_handler(const device_config *device, int state)
 {
 	if (state)
-		signal_sound_irq(machine, SOUND_IRQ_YM3438);
+		signal_sound_irq(device->machine, SOUND_IRQ_YM3438);
 	else
-		clear_sound_irq(machine, SOUND_IRQ_YM3438);
+		clear_sound_irq(device->machine, SOUND_IRQ_YM3438);
 }
 
 
@@ -1122,15 +1122,15 @@ static WRITE8_HANDLER( sound_bank_hi_w )
 }
 
 
-static WRITE8_HANDLER( multipcm_bank_w )
+static WRITE8_DEVICE_HANDLER( multipcm_bank_w )
 {
-	multi_pcm_set_bank(0, 0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
+	multipcm_set_bank(device, 0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
 }
 
 
-static WRITE8_HANDLER( scross_bank_w )
+static WRITE8_DEVICE_HANDLER( scross_bank_w )
 {
-	multi_pcm_set_bank(0, 0x80000 * (data & 7), 0x80000 * (data & 7));
+	multipcm_set_bank(device, 0x80000 * (data & 7), 0x80000 * (data & 7));
 }
 
 
@@ -1234,22 +1234,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( system32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("sound", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_WRITE(rf5c68_reg_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(rf5c68_r, rf5c68_w)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE(SOUND, "rf", rf5c68_w)
+	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE(SOUND, "rf", rf5c68_mem_r, rf5c68_mem_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&z80_shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( system32_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0c) AM_READWRITE(ym3438_status_port_0_a_r, ym3438_control_port_0_a_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_0_a_w)
-	AM_RANGE(0x82, 0x82) AM_MIRROR(0x0c) AM_WRITE(ym3438_control_port_0_b_w)
-	AM_RANGE(0x83, 0x83) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_0_b_w)
-	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0c) AM_READWRITE(ym3438_status_port_1_a_r, ym3438_control_port_1_a_w)
-	AM_RANGE(0x91, 0x91) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_1_a_w)
-	AM_RANGE(0x92, 0x92) AM_MIRROR(0x0c) AM_WRITE(ym3438_control_port_1_b_w)
-	AM_RANGE(0x93, 0x93) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_1_b_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE(SOUND, "ym1", ym3438_r, ym3438_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE(SOUND, "ym2", ym3438_r, ym3438_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
 	AM_RANGE(0xb0, 0xbf) AM_WRITE(sound_bank_hi_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
@@ -1261,19 +1255,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multi32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("sound", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(multi_pcm_reg_0_r, multi_pcm_reg_0_w)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE(SOUND, "sega", multipcm_r, multipcm_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&z80_shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( multi32_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0c) AM_READWRITE(ym3438_status_port_0_a_r, ym3438_control_port_0_a_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_0_a_w)
-	AM_RANGE(0x82, 0x82) AM_MIRROR(0x0c) AM_WRITE(ym3438_control_port_0_b_w)
-	AM_RANGE(0x83, 0x83) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_0_b_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE(SOUND, "ym", ym3438_r, ym3438_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(multipcm_bank_w)
+	AM_RANGE(0xb0, 0xbf) AM_DEVWRITE(SOUND, "sega", multipcm_bank_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
 	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x04) AM_WRITE(sound_int_control_hi_w)
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(sound_dummy_r, sound_dummy_w)
@@ -3947,8 +3938,9 @@ static DRIVER_INIT( radr )
 
 static DRIVER_INIT( scross )
 {
+	const device_config *multipcm = devtag_get_device(machine, SOUND, "sega");
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xb0, 0xbf, 0, 0, scross_bank_w);
+	memory_install_write8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
 }
 
 

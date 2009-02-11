@@ -114,6 +114,7 @@ static WRITE8_HANDLER( circusc_coin_counter_w )
 
 static WRITE8_HANDLER(circusc_sound_w)
 {
+	const device_config *device;
 	//int c;
 
 	switch (offset & 7)
@@ -125,24 +126,28 @@ static WRITE8_HANDLER(circusc_sound_w)
 
 		/* CS3 */
 		case 1:
-			sn76496_0_w(space, 0, sn_latch);
+			device = devtag_get_device(space->machine, SOUND, "sn1");
+			sn76496_w(device, 0, sn_latch);
 			break;
 
 		/* CS4 */
 		case 2:
-			sn76496_1_w(space, 0, sn_latch);
+			device = devtag_get_device(space->machine, SOUND, "sn2");
+			sn76496_w(device, 0, sn_latch);
 			break;
 
 		/* CS5 */
 		case 3:
-			discrete_sound_w(space, NODE_03, data);
+			device = devtag_get_device(space->machine, SOUND, "discrete");
+			discrete_sound_w(device, NODE_03, data);
 			break;
 
 		/* CS6 */
 		case 4:
-			discrete_sound_w(space, NODE_05, (offset & 0x20) >> 5);
-			discrete_sound_w(space, NODE_06, (offset & 0x18) >> 3);
-			discrete_sound_w(space, NODE_07, (offset & 0x40) >> 6);
+			device = devtag_get_device(space->machine, SOUND, "discrete");
+			discrete_sound_w(device, NODE_05, (offset & 0x20) >> 5);
+			discrete_sound_w(device, NODE_06, (offset & 0x18) >> 3);
+			discrete_sound_w(device, NODE_07, (offset & 0x40) >> 6);
 			break;
 	}
 }

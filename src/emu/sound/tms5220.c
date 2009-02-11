@@ -91,7 +91,7 @@ struct tms5220
 	UINT8 buffer_empty;		/* FIFO is empty*/
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
 
-	void (*irq_func)(running_machine *machine, int state); /* called when the state of the IRQ pin changes */
+	void (*irq_func)(const device_config *device, int state); /* called when the state of the IRQ pin changes */
 
 
 	/* these contain data describing the current and previous voice frames */
@@ -126,9 +126,9 @@ struct tms5220
 	INT8 excitation_data;
 
 	/* R Nabet : These have been added to emulate speech Roms */
-	int (*read_callback)(int count);
-	void (*load_address_callback)(int data);
-	void (*read_and_branch_callback)(void);
+	int (*read_callback)(const device_config *device, int count);
+	void (*load_address_callback)(const device_config *device, int data);
+	void (*read_and_branch_callback)(const device_config *device);
 	UINT8 schedule_dummy_read;			/* set after each load address, so that next read operation
                                               is preceded by a dummy read */
 
@@ -257,7 +257,7 @@ void tms5220_reset_chip(void *chip)
 	/* initialize the chip state */
 	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if tms->buffer_empty or tms->buffer_low are 0 */
 	tms->tms5220_speaking = tms->speak_external = tms->talk_status = tms->first_frame = tms->last_frame = tms->irq_pin = 0;
-	if (tms->irq_func) tms->irq_func(tms->device->machine, 0);
+	if (tms->irq_func) tms->irq_func(tms->device, 0);
 	tms->buffer_empty = tms->buffer_low = 1;
 
 	tms->RDB_flag = FALSE;
@@ -277,7 +277,7 @@ void tms5220_reset_chip(void *chip)
 	memset(tms->x, 0, sizeof(tms->x));
 
 	if (tms->load_address_callback)
-		(*tms->load_address_callback)(0);
+		(*tms->load_address_callback)(tms->device, 0);
 
 	tms->schedule_dummy_read = TRUE;
 }
@@ -290,7 +290,7 @@ void tms5220_reset_chip(void *chip)
 
 ***********************************************************************************************/
 
-void tms5220_set_irq(void *chip, void (*func)(running_machine *, int))
+void tms5220_set_irq(void *chip, void (*func)(const device_config *, int))
 {
 	struct tms5220 *tms = chip;
     tms->irq_func = func;
@@ -303,7 +303,7 @@ void tms5220_set_irq(void *chip, void (*func)(running_machine *, int))
 
 ***********************************************************************************************/
 
-void tms5220_set_read(void *chip, int (*func)(int))
+void tms5220_set_read(void *chip, int (*func)(const device_config *, int))
 {
 	struct tms5220 *tms = chip;
 	tms->read_callback = func;
@@ -316,7 +316,7 @@ void tms5220_set_read(void *chip, int (*func)(int))
 
 ***********************************************************************************************/
 
-void tms5220_set_load_address(void *chip, void (*func)(int))
+void tms5220_set_load_address(void *chip, void (*func)(const device_config *, int))
 {
 	struct tms5220 *tms = chip;
 	tms->load_address_callback = func;
@@ -329,7 +329,7 @@ void tms5220_set_load_address(void *chip, void (*func)(int))
 
 ***********************************************************************************************/
 
-void tms5220_set_read_and_branch(void *chip, void (*func)(void))
+void tms5220_set_read_and_branch(void *chip, void (*func)(const device_config *))
 {
 	struct tms5220 *tms = chip;
 	tms->read_and_branch_callback = func;
@@ -447,7 +447,7 @@ int tms5220_ready_read(void *chip)
 
 /**********************************************************************************************
 
-     tms5220_ready_read -- returns the number of cycles until ready is asserted
+     tms5220_cycles_to_ready -- returns the number of cycles until ready is asserted
 
 ***********************************************************************************************/
 
@@ -866,10 +866,10 @@ static void process_command(struct tms5220 *tms)
 			{
 				tms->schedule_dummy_read = FALSE;
 				if (tms->read_callback)
-					(*tms->read_callback)(1);
+					(*tms->read_callback)(tms->device, 1);
 			}
 			if (tms->read_callback)
-				tms->data_register = (*tms->read_callback)(8);	/* read one byte from speech ROM... */
+				tms->data_register = (*tms->read_callback)(tms->device, 8);	/* read one byte from speech ROM... */
 			tms->RDB_flag = TRUE;
 			break;
 
@@ -877,14 +877,14 @@ static void process_command(struct tms5220 *tms)
 			if (DEBUG_5220) logerror("read and branch command received\n");
 			tms->RDB_flag = FALSE;
 			if (tms->read_and_branch_callback)
-				(*tms->read_and_branch_callback)();
+				(*tms->read_and_branch_callback)(tms->device);
 			break;
 
 		case 0x40 : /* load address */
 			/* tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
               This code does not care about this. */
 			if (tms->load_address_callback)
-				(*tms->load_address_callback)(cmd & 0x0f);
+				(*tms->load_address_callback)(tms->device, cmd & 0x0f);
 			tms->schedule_dummy_read = TRUE;
 			break;
 
@@ -893,7 +893,7 @@ static void process_command(struct tms5220 *tms)
 			{
 				tms->schedule_dummy_read = FALSE;
 				if (tms->read_callback)
-					(*tms->read_callback)(1);
+					(*tms->read_callback)(tms->device, 1);
 			}
 			tms->tms5220_speaking = 1;
 			tms->speak_external = 0;
@@ -923,7 +923,7 @@ static void process_command(struct tms5220 *tms)
 			{
 				tms->schedule_dummy_read = FALSE;
 				if (tms->read_callback)
-					(*tms->read_callback)(1);
+					(*tms->read_callback)(tms->device, 1);
 			}
 			tms5220_reset_chip(tms);
 			break;
@@ -965,7 +965,7 @@ static int extract_bits(struct tms5220 *tms, int count)
 	{
 		/* extract from speech ROM */
 		if (tms->read_callback)
-			val = (* tms->read_callback)(count);
+			val = (* tms->read_callback)(tms->device, count);
 	}
 
     return val;
@@ -1194,6 +1194,6 @@ static void check_buffer_low(struct tms5220 *tms)
 static void set_interrupt_state(struct tms5220 *tms, int state)
 {
     if (tms->irq_func && state != tms->irq_pin)
-    	tms->irq_func(tms->device->machine, state);
+    	tms->irq_func(tms->device, state);
     tms->irq_pin = state;
 }

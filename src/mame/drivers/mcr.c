@@ -413,12 +413,14 @@ static WRITE8_HANDLER( kroozr_op4_w )
 
 static WRITE8_HANDLER( journey_op4_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+
 	/* if we're not playing the sample yet, start it */
-	if (!sample_playing(0))
-		sample_start(0, 0, 1);
+	if (!sample_playing(samples, 0))
+		sample_start(samples, 0, 0, 1);
 
 	/* bit 0 turns cassette on/off */
-	sample_set_pause(0, ~data & 1);
+	sample_set_pause(samples, 0, ~data & 1);
 }
 
 

@@ -191,9 +191,9 @@ static READ8_HANDLER( z80_input2_r )
                 SOUND
 ******************************************************/
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(space->machine, 10, (data-1) & 0x03);
+	memory_set_bank(device->machine, 10, (data-1) & 0x03);
 }
 
 /***********************************************************
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9001, 0x9001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2151_r)
 	AM_RANGE(0x9002, 0x9100) AM_READ(SMH_RAM)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -322,8 +322,8 @@ static MACHINE_RESET( opwolf )
 	adpcm_end[0] = adpcm_end[1] = 0;
 	adpcm_data[0] = adpcm_data[1] = -1;
 
-	msm5205_reset_w(0, 1);
-	msm5205_reset_w(1, 1);
+	msm5205_reset_w(devtag_get_device(machine, SOUND, "msm1"), 1);
+	msm5205_reset_w(devtag_get_device(machine, SOUND, "msm2"), 1);
 }
 
 static void opwolf_msm5205_vck(const device_config *device)
@@ -331,20 +331,20 @@ static void opwolf_msm5205_vck(const device_config *device)
 	int chip = (strcmp(device->tag, "msm1") == 0) ? 0 : 1;
 	if (adpcm_data[chip] != -1)
 	{
-		msm5205_data_w(chip, adpcm_data[chip] & 0x0f);
+		msm5205_data_w(device, adpcm_data[chip] & 0x0f);
 		adpcm_data[chip] = -1;
 		if (adpcm_pos[chip] == adpcm_end[chip])
-			msm5205_reset_w(chip, 1);
+			msm5205_reset_w(device, 1);
 	}
 	else
 	{
 		adpcm_data[chip] = memory_region(device->machine, "adpcm")[adpcm_pos[chip]];
 		adpcm_pos[chip] = (adpcm_pos[chip] + 1) & 0x7ffff;
-		msm5205_data_w(chip, adpcm_data[chip] >> 4);
+		msm5205_data_w(device, adpcm_data[chip] >> 4);
 	}
 }
 
-static WRITE8_HANDLER( opwolf_adpcm_b_w )
+static WRITE8_DEVICE_HANDLER( opwolf_adpcm_b_w )
 {
 	int start;
 	int end;
@@ -359,14 +359,14 @@ static WRITE8_HANDLER( opwolf_adpcm_b_w )
 		end   *=16;
 		adpcm_pos[0] = start;
 		adpcm_end[0] = end;
-		msm5205_reset_w(0, 0);
+		msm5205_reset_w(device, 0);
 	}
 
 //  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(space->cpu) );
 }
 
 
-static WRITE8_HANDLER( opwolf_adpcm_c_w )
+static WRITE8_DEVICE_HANDLER( opwolf_adpcm_c_w )
 {
 	int start;
 	int end;
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( opwolf_adpcm_c_w )
 		end   *=16;
 		adpcm_pos[1] = start;
 		adpcm_end[1] = end;
-		msm5205_reset_w(1, 0);
+		msm5205_reset_w(device, 0);
 	}
 
 //  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(space->cpu) );
@@ -402,12 +402,11 @@ static WRITE8_HANDLER( opwolf_adpcm_e_w )
 static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xb000, 0xb006) AM_WRITE(opwolf_adpcm_b_w)
-	AM_RANGE(0xc000, 0xc006) AM_WRITE(opwolf_adpcm_c_w)
+	AM_RANGE(0xb000, 0xb006) AM_DEVWRITE(SOUND, "msm1", opwolf_adpcm_b_w)
+	AM_RANGE(0xc000, 0xc006) AM_DEVWRITE(SOUND, "msm2", opwolf_adpcm_c_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(opwolf_adpcm_d_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(opwolf_adpcm_e_w)
 ADDRESS_MAP_END
@@ -551,9 +550,9 @@ GFXDECODE_END
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

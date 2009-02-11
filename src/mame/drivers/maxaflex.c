@@ -243,7 +243,7 @@ static ADDRESS_MAP_START(a600xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
     AM_RANGE(0xd300, 0xd3ff) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
@@ -421,9 +421,9 @@ static PALETTE_INIT( atari )
 
 
 static const pokey_interface pokey_config = {
-	{ 0 },
-	0,
-	0,0,
+	{ DEVCB_NULL },
+	DEVCB_NULL,
+	DEVCB_NULL,DEVCB_NULL,
 	atari_interrupt_cb
 };
 

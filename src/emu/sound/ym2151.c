@@ -160,8 +160,8 @@ typedef struct
 
 	UINT32		noise_tab[32];			/* 17bit Noise Generator periods */
 
-	void (*irqhandler)(running_machine *machine, int irq);		/* IRQ function handler */
-	write8_space_func porthandler;		/* port write function handler */
+	void (*irqhandler)(const device_config *device, int irq);		/* IRQ function handler */
+	write8_device_func porthandler;		/* port write function handler */
 
 	const device_config *device;
 	unsigned int clock;					/* chip clock in Hz (passed from 2151intf.c) */
@@ -787,7 +787,7 @@ static TIMER_CALLBACK( irqAon_callback )
 
 	chip->irqlinestate |= 1;
 
-	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(machine, 1);
+	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(chip->device, 1);
 }
 
 static TIMER_CALLBACK( irqBon_callback )
@@ -797,7 +797,7 @@ static TIMER_CALLBACK( irqBon_callback )
 
 	chip->irqlinestate |= 2;
 
-	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(machine, 1);
+	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(chip->device, 1);
 }
 
 static TIMER_CALLBACK( irqAoff_callback )
@@ -807,7 +807,7 @@ static TIMER_CALLBACK( irqAoff_callback )
 
 	chip->irqlinestate &= ~1;
 
-	if (oldstate == 1 && chip->irqhandler) (*chip->irqhandler)(machine, 0);
+	if (oldstate == 1 && chip->irqhandler) (*chip->irqhandler)(chip->device, 0);
 }
 
 static TIMER_CALLBACK( irqBoff_callback )
@@ -817,7 +817,7 @@ static TIMER_CALLBACK( irqBoff_callback )
 
 	chip->irqlinestate &= ~2;
 
-	if (oldstate == 2 && chip->irqhandler) (*chip->irqhandler)(machine, 0);
+	if (oldstate == 2 && chip->irqhandler) (*chip->irqhandler)(chip->device, 0);
 }
 
 static TIMER_CALLBACK( timer_callback_a )
@@ -1044,8 +1044,6 @@ INLINE void refresh_EG(YM2151Operator * op)
 void ym2151_write_reg(void *_chip, int r, int v)
 {
 	YM2151 *chip = _chip;
-	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(chip->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	YM2151Operator *op = &chip->oper[ (r&0x07)*4+((r&0x18)>>3) ];
 
 	/* adjust bus to 8 bits */
@@ -1108,7 +1106,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~1;
-				if ((oldstate==1) && (chip->irqhandler)) (*chip->irqhandler)(machine, 0);
+				if ((oldstate==1) && (chip->irqhandler)) (*chip->irqhandler)(chip->device, 0);
 #endif
 			}
 
@@ -1120,7 +1118,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~2;
-				if ((oldstate==2) && (chip->irqhandler)) (*chip->irqhandler)(machine, 0);
+				if ((oldstate==2) && (chip->irqhandler)) (*chip->irqhandler)(chip->device, 0);
 #endif
 			}
 
@@ -1192,7 +1190,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 		case 0x1b:	/* CT2, CT1, LFO waveform */
 			chip->ct = v >> 6;
 			chip->lfo_wsel = v & 3;
-			if (chip->porthandler) (*chip->porthandler)(space, 0 , chip->ct );
+			if (chip->porthandler) (*chip->porthandler)(chip->device, 0 , chip->ct );
 			break;
 
 		default:
@@ -2394,7 +2392,7 @@ void ym2151_update_one(void *chip, SAMP **buffers, int length)
 			{
 				int oldstate = PSG->status & 3;
 				PSG->status |= 2;
-				if ((!oldstate) && (PSG->irqhandler)) (*PSG->irqhandler)(machine, 1);
+				if ((!oldstate) && (PSG->irqhandler)) (*PSG->irqhandler)(chip->device, 1);
 			}
 		}
 	}
@@ -2472,7 +2470,7 @@ void ym2151_update_one(void *chip, SAMP **buffers, int length)
 				{
 					int oldstate = PSG->status & 3;
 					PSG->status |= 1;
-					if ((!oldstate) && (PSG->irqhandler)) (*PSG->irqhandler)(machine, 1);
+					if ((!oldstate) && (PSG->irqhandler)) (*PSG->irqhandler)(chip->device, 1);
 				}
 				if (PSG->irq_enable & 0x80)
 					PSG->csm_req = 2;	/* request KEY ON / KEY OFF sequence */
@@ -2483,13 +2481,13 @@ void ym2151_update_one(void *chip, SAMP **buffers, int length)
 	}
 }
 
-void ym2151_set_irq_handler(void *chip, void(*handler)(running_machine *machine, int irq))
+void ym2151_set_irq_handler(void *chip, void(*handler)(const device_config *device, int irq))
 {
 	YM2151 *PSG = chip;
 	PSG->irqhandler = handler;
 }
 
-void ym2151_set_port_write_handler(void *chip, write8_space_func handler)
+void ym2151_set_port_write_handler(void *chip, write8_device_func handler)
 {
 	YM2151 *PSG = chip;
 	PSG->porthandler = handler;

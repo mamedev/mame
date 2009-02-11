@@ -7,7 +7,6 @@
 #include "driver.h"
 #include "streams.h"
 #include "sound/ay8910.h"
-#include "sound/custom.h"
 #include "video/resnet.h"
 #include "includes/tx1.h"
 
@@ -149,7 +148,7 @@ static int eng2[4];
 
 ***************************************************************************/
 
-WRITE8_HANDLER( tx1_ay8910_a_w )
+WRITE8_DEVICE_HANDLER( tx1_ay8910_a_w )
 {
 	stream_update(stream);
 
@@ -157,7 +156,7 @@ WRITE8_HANDLER( tx1_ay8910_a_w )
 	ay_outputa = ~data;
 }
 
-WRITE8_HANDLER( tx1_ay8910_b_w )
+WRITE8_DEVICE_HANDLER( tx1_ay8910_b_w )
 {
 	double gain;
 
@@ -167,9 +166,9 @@ WRITE8_HANDLER( tx1_ay8910_b_w )
 
 	/* It'll do until we get quadrophonic speaker support! */
 	gain = BIT(ay_outputb, 4) ? 1.5 : 2.0;
-	sndti_set_output_gain(SOUND_AY8910, 0, 0, gain);
-	sndti_set_output_gain(SOUND_AY8910, 0, 1, gain);
-	sndti_set_output_gain(SOUND_AY8910, 0, 2, gain);
+	sound_set_output_gain(device, 0, gain);
+	sound_set_output_gain(device, 1, gain);
+	sound_set_output_gain(device, 2, gain);
 }
 
 /***************************************************************************
@@ -271,7 +270,7 @@ static STREAM_UPDATE( tx1_stream_update )
 }
 
 
-CUSTOM_START( tx1_sh_start )
+static DEVICE_START( tx1_sound )
 {
 	running_machine *machine = device->machine;
 	static const int r0[4] = { 390e3, 180e3, 180e3, 180e3 };
@@ -288,14 +287,27 @@ CUSTOM_START( tx1_sh_start )
 			4, &r0[0], weights0, 0, 0,
 			3, &r1[0], weights1, 0, 0,
 			3, &r2[0], weights2, 0, 0);
-
-	return auto_malloc(1);
 }
 
-CUSTOM_RESET( tx1_sh_reset )
+static DEVICE_RESET( tx1_sound )
 {
 	step0 = step1 = step2 = 0;
 }
+
+DEVICE_GET_INFO( tx1_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tx1_sound);		break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(tx1_sound);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TX-1 Custom");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
 
 /*************************************
  *
@@ -386,27 +398,29 @@ static const double bb_engine_gains[16] =
 
 ***************************************************************************/
 
-WRITE8_HANDLER( bb_ym1_a_w )
+WRITE8_DEVICE_HANDLER( bb_ym1_a_w )
 {
 	stream_update(stream);
 	ym1_outputa = data ^ 0xff;
 }
 
-WRITE8_HANDLER( bb_ym2_a_w )
+WRITE8_DEVICE_HANDLER( bb_ym2_a_w )
 {
 	stream_update(stream);
 	ym2_outputa = data ^ 0xff;
 }
 
-WRITE8_HANDLER( bb_ym2_b_w )
+WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 {
+	const device_config *ay1 = devtag_get_device(device->machine, SOUND, "ay1");
+	const device_config *ay2 = devtag_get_device(device->machine, SOUND, "ay2");
 	double gain;
 
 	stream_update(stream);
 
 	ym2_outputb = data ^ 0xff;
 
-	if (!strcmp(space->machine->gamedrv->name, "buggybjr"))
+	if (!strcmp(device->machine->gamedrv->name, "buggybjr"))
 	{
 		coin_counter_w(0, data & 0x01);
 		coin_counter_w(1, data & 0x02);
@@ -416,15 +430,15 @@ WRITE8_HANDLER( bb_ym2_b_w )
 
 	/* Rear left speaker */
 	gain = data & 0x80 ? 1.0 : 2.0;
-	sndti_set_output_gain(SOUND_AY8910, 0, 0, gain);
-	sndti_set_output_gain(SOUND_AY8910, 0, 1, gain);
-	sndti_set_output_gain(SOUND_AY8910, 0, 2, gain);
+	sound_set_output_gain(ay1, 0, gain);
+	sound_set_output_gain(ay1, 1, gain);
+	sound_set_output_gain(ay1, 2, gain);
 
 	/* Rear right speaker */
 	gain = data & 0x40 ? 1.0 : 2.0;
-	sndti_set_output_gain(SOUND_AY8910, 1, 0, gain);
-	sndti_set_output_gain(SOUND_AY8910, 1, 1, gain);
-	sndti_set_output_gain(SOUND_AY8910, 1, 2, gain);
+	sound_set_output_gain(ay2, 0, gain);
+	sound_set_output_gain(ay2, 1, gain);
+	sound_set_output_gain(ay2, 2, gain);
 }
 
 /* This is admittedly a bit of a hack job... */
@@ -507,7 +521,7 @@ static STREAM_UPDATE( buggyboy_stream_update )
 	}
 }
 
-CUSTOM_START( buggyboy_sh_start )
+static DEVICE_START( buggyboy_sound )
 {
 	running_machine *machine = device->machine;
 	static const int resistors[4] = { 330000, 220000, 330000, 220000 };
@@ -529,11 +543,9 @@ CUSTOM_START( buggyboy_sh_start )
 	/* Allocate the stream */
 	stream = stream_create(device, 0, 2, machine->sample_rate, NULL, buggyboy_stream_update);
 	freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
-
-	return auto_malloc(1);
 }
 
-CUSTOM_RESET( buggyboy_sh_reset )
+static DEVICE_RESET( buggyboy_sound )
 {
 	step0 = step1 = 0;
 
@@ -543,3 +555,19 @@ CUSTOM_RESET( buggyboy_sh_reset )
 	noise_lfsrc = 0;
 	noise_lfsrd = 0;
 }
+
+DEVICE_GET_INFO( buggyboy_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(buggyboy_sound);	break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(buggyboy_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Buggy Boy Custom");			break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+

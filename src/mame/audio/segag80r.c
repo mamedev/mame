@@ -16,7 +16,6 @@
 #include "sound/samples.h"
 #include "sound/tms36xx.h"
 #include "sound/dac.h"
-#include "sound/custom.h"
 
 
 
@@ -28,6 +27,9 @@
 
 #define SEGA005_555_TIMER_FREQ		(1.44 / ((15000 + 2 * 4700) * 1.5e-6))
 #define SEGA005_COUNTER_FREQ		(100000)	/* unknown, just a guess */
+
+static DEVICE_GET_INFO( sega005_sound );
+#define SOUND_005 DEVICE_GET_INFO_NAME(sega005_sound)
 
 
 
@@ -242,6 +244,7 @@ WRITE8_HANDLER( astrob_sound_w )
 	{
 		120.0f, 82.0f, 62.0f, 56.0f, 47.0f, 39.0f, 33.0f, 27.0f, 24.0f, 22.0f
 	};
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	float freq_factor;
 
 	UINT8 diff = data ^ sound_state[offset];
@@ -251,54 +254,54 @@ WRITE8_HANDLER( astrob_sound_w )
 	{
 		case 0:
 			/* INVADER-1: channel 0 */
-			if ((diff & 0x01) && !(data & 0x01)) sample_start(0, (data & 0x80) ? 0 : 1, TRUE);
-			if ((data & 0x01) && sample_playing(0)) sample_stop(0);
+			if ((diff & 0x01) && !(data & 0x01)) sample_start(samples, 0, (data & 0x80) ? 0 : 1, TRUE);
+			if ((data & 0x01) && sample_playing(samples, 0)) sample_stop(samples, 0);
 
 			/* INVADER-2: channel 1 */
-			if ((diff & 0x02) && !(data & 0x02)) sample_start(1, (data & 0x80) ? 2 : 3, TRUE);
-			if ((data & 0x02) && sample_playing(1)) sample_stop(1);
+			if ((diff & 0x02) && !(data & 0x02)) sample_start(samples, 1, (data & 0x80) ? 2 : 3, TRUE);
+			if ((data & 0x02) && sample_playing(samples, 1)) sample_stop(samples, 1);
 
 			/* INVADER-3: channel 2 */
-			if ((diff & 0x04) && !(data & 0x04)) sample_start(2, (data & 0x80) ? 4 : 5, TRUE);
-			if ((data & 0x04) && sample_playing(2)) sample_stop(2);
+			if ((diff & 0x04) && !(data & 0x04)) sample_start(samples, 2, (data & 0x80) ? 4 : 5, TRUE);
+			if ((data & 0x04) && sample_playing(samples, 2)) sample_stop(samples, 2);
 
 			/* INVADER-4: channel 3 */
-			if ((diff & 0x08) && !(data & 0x08)) sample_start(3, (data & 0x80) ? 6 : 7, TRUE);
-			if ((data & 0x08) && sample_playing(3)) sample_stop(3);
+			if ((diff & 0x08) && !(data & 0x08)) sample_start(samples, 3, (data & 0x80) ? 6 : 7, TRUE);
+			if ((data & 0x08) && sample_playing(samples, 3)) sample_stop(samples, 3);
 
 			/* ASTROIDS: channel 4 */
-			if ((diff & 0x10) && !(data & 0x10)) sample_start(4, 8, TRUE);
-			if ((data & 0x10) && sample_playing(4)) sample_stop(4);
+			if ((diff & 0x10) && !(data & 0x10)) sample_start(samples, 4, 8, TRUE);
+			if ((data & 0x10) && sample_playing(samples, 4)) sample_stop(samples, 4);
 
 			/* MUTE */
 			sound_global_enable(!(data & 0x20));
 
 			/* REFILL: channel 5 */
-			if (!(data & 0x40) && !sample_playing(5)) sample_start(5, 9, FALSE);
-			if ( (data & 0x40) && sample_playing(5))  sample_stop(5);
+			if (!(data & 0x40) && !sample_playing(samples, 5)) sample_start(samples, 5, 9, FALSE);
+			if ( (data & 0x40) && sample_playing(samples, 5))  sample_stop(samples, 5);
 
 			/* WARP: changes which sample is played for the INVADER samples above */
 			if (diff & 0x80)
 			{
-				if (sample_playing(0)) sample_start(0, (data & 0x80) ? 0 : 1, TRUE);
-				if (sample_playing(1)) sample_start(1, (data & 0x80) ? 2 : 3, TRUE);
-				if (sample_playing(2)) sample_start(2, (data & 0x80) ? 4 : 5, TRUE);
-				if (sample_playing(3)) sample_start(3, (data & 0x80) ? 6 : 7, TRUE);
+				if (sample_playing(samples, 0)) sample_start(samples, 0, (data & 0x80) ? 0 : 1, TRUE);
+				if (sample_playing(samples, 1)) sample_start(samples, 1, (data & 0x80) ? 2 : 3, TRUE);
+				if (sample_playing(samples, 2)) sample_start(samples, 2, (data & 0x80) ? 4 : 5, TRUE);
+				if (sample_playing(samples, 3)) sample_start(samples, 3, (data & 0x80) ? 6 : 7, TRUE);
 			}
 			break;
 
 		case 1:
 			/* LASER #1: channel 6 */
-			if ((diff & 0x01) && !(data & 0x01)) sample_start(6, 10, FALSE);
+			if ((diff & 0x01) && !(data & 0x01)) sample_start(samples, 6, 10, FALSE);
 
 			/* LASER #2: channel 7 */
-			if ((diff & 0x02) && !(data & 0x02)) sample_start(7, 11, FALSE);
+			if ((diff & 0x02) && !(data & 0x02)) sample_start(samples, 7, 11, FALSE);
 
 			/* SHORT EXPL: channel 8 */
-			if ((diff & 0x04) && !(data & 0x04)) sample_start(8, 12, FALSE);
+			if ((diff & 0x04) && !(data & 0x04)) sample_start(samples, 8, 12, FALSE);
 
 			/* LONG EXPL: channel 8 */
-			if ((diff & 0x08) && !(data & 0x08)) sample_start(8, 13, FALSE);
+			if ((diff & 0x08) && !(data & 0x08)) sample_start(samples, 8, 13, FALSE);
 
 			/* ATTACK RATE */
 			if ((diff & 0x10) && !(data & 0x10)) sound_rate = (sound_rate + 1) % 10;
@@ -307,10 +310,10 @@ WRITE8_HANDLER( astrob_sound_w )
 			if (!(data & 0x20)) sound_rate = 0;
 
 			/* BONUS: channel 9 */
-			if ((diff & 0x40) && !(data & 0x40)) sample_start(9, 14, FALSE);
+			if ((diff & 0x40) && !(data & 0x40)) sample_start(samples, 9, 14, FALSE);
 
 			/* SONAR: channel 10 */
-			if ((diff & 0x80) && !(data & 0x80)) sample_start(10, 15, FALSE);
+			if ((diff & 0x80) && !(data & 0x80)) sample_start(samples, 10, 15, FALSE);
 			break;
 	}
 
@@ -324,10 +327,10 @@ WRITE8_HANDLER( astrob_sound_w )
 
 	/* adjust the sample rate of invader sounds based the sound_rate */
 	/* this is an approximation */
-	if (sample_playing(0)) sample_set_freq(0, sample_get_base_freq(0) * freq_factor);
-	if (sample_playing(1)) sample_set_freq(1, sample_get_base_freq(1) * freq_factor);
-	if (sample_playing(2)) sample_set_freq(2, sample_get_base_freq(2) * freq_factor);
-	if (sample_playing(3)) sample_set_freq(3, sample_get_base_freq(3) * freq_factor);
+	if (sample_playing(samples, 0)) sample_set_freq(samples, 0, sample_get_base_freq(samples, 0) * freq_factor);
+	if (sample_playing(samples, 1)) sample_set_freq(samples, 1, sample_get_base_freq(samples, 1) * freq_factor);
+	if (sample_playing(samples, 2)) sample_set_freq(samples, 2, sample_get_base_freq(samples, 2) * freq_factor);
+	if (sample_playing(samples, 3)) sample_set_freq(samples, 3, sample_get_base_freq(samples, 3) * freq_factor);
 }
 
 
@@ -339,7 +342,6 @@ WRITE8_HANDLER( astrob_sound_w )
  *************************************/
 
 static SOUND_START( 005 );
-static CUSTOM_START( sega005_custom_start );
 static STREAM_UPDATE( sega005_stream_update );
 static TIMER_CALLBACK( sega005_auto_timer );
 static WRITE8_DEVICE_HANDLER( sega005_sound_a_w );
@@ -421,12 +423,6 @@ static const samples_interface sega005_samples_interface =
 };
 
 
-static const custom_sound_interface sega005_custom_interface =
-{
-	sega005_custom_start
-};
-
-
 static const ppi8255_interface ppi8255_005_intf =
 {
 	DEVCB_NULL,
@@ -449,8 +445,7 @@ MACHINE_DRIVER_START( 005_sound_board )
 	MDRV_SOUND_CONFIG(sega005_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("005", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(sega005_custom_interface)
+	MDRV_SOUND_ADD("005", 005, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -481,31 +476,32 @@ static SOUND_START( 005 )
 
 static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 {
+	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
 	UINT8 diff = data ^ sound_state[0];
 	sound_state[0] = data;
 
 	/* LARGE EXPL: channel 0 */
-	if ((diff & 0x01) && !(data & 0x01)) sample_start(0, 0, FALSE);
+	if ((diff & 0x01) && !(data & 0x01)) sample_start(samples, 0, 0, FALSE);
 
 	/* SMALL EXPL: channel 1 */
-	if ((diff & 0x02) && !(data & 0x02)) sample_start(1, 1, FALSE);
+	if ((diff & 0x02) && !(data & 0x02)) sample_start(samples, 1, 1, FALSE);
 
 	/* DROP BOMB: channel 2 */
-	if ((diff & 0x04) && !(data & 0x04)) sample_start(2, 2, FALSE);
+	if ((diff & 0x04) && !(data & 0x04)) sample_start(samples, 2, 2, FALSE);
 
 	/* SHOOT PISTOL: channel 3 */
-	if ((diff & 0x08) && !(data & 0x08)) sample_start(3, 3, FALSE);
+	if ((diff & 0x08) && !(data & 0x08)) sample_start(samples, 3, 3, FALSE);
 
 	/* MISSILE: channel 4 */
-	if ((diff & 0x10) && !(data & 0x10)) sample_start(4, 4, FALSE);
+	if ((diff & 0x10) && !(data & 0x10)) sample_start(samples, 4, 4, FALSE);
 
 	/* HELICOPTER: channel 5 */
-	if ((diff & 0x20) && !(data & 0x20) && !sample_playing(5)) sample_start(5, 5, TRUE);
-	if ((diff & 0x20) &&  (data & 0x20)) sample_stop(5);
+	if ((diff & 0x20) && !(data & 0x20) && !sample_playing(samples, 5)) sample_start(samples, 5, 5, TRUE);
+	if ((diff & 0x20) &&  (data & 0x20)) sample_stop(samples, 5);
 
 	/* WHISTLE: channel 6 */
-	if ((diff & 0x40) && !(data & 0x40) && !sample_playing(6)) sample_start(6, 6, TRUE);
-	if ((diff & 0x40) &&  (data & 0x40)) sample_stop(6);
+	if ((diff & 0x40) && !(data & 0x40) && !sample_playing(samples, 6)) sample_start(samples, 6, 6, TRUE);
+	if ((diff & 0x40) &&  (data & 0x40)) sample_stop(samples, 6);
 }
 
 
@@ -577,7 +573,7 @@ static WRITE8_DEVICE_HANDLER( sega005_sound_b_w )
  *
  *************************************/
 
-static CUSTOM_START( sega005_custom_start )
+static DEVICE_START( sega005_sound )
 {
 	running_machine *machine = device->machine;
 
@@ -590,8 +586,20 @@ static CUSTOM_START( sega005_custom_start )
 	/* set the initial sound data */
 	sound_data = 0x00;
 	sega005_update_sound_data(machine);
+}
 
-	return auto_malloc(1);
+
+static DEVICE_GET_INFO( sega005_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sega005_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "005 Custom");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }
 
 
@@ -696,6 +704,7 @@ static SOUND_START( spaceod )
 
 WRITE8_HANDLER( spaceod_sound_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	UINT8 diff = data ^ sound_state[offset];
 	sound_state[offset] = data;
 
@@ -703,40 +712,40 @@ WRITE8_HANDLER( spaceod_sound_w )
 	{
 		case 0:
 			/* BACK G: channel 0 */
-			if ((diff & 0x01) && !(data & 0x01) && !sample_playing(0)) sample_start(0, 7, TRUE);
-			if ((diff & 0x01) &&  (data & 0x01)) sample_stop(0);
+			if ((diff & 0x01) && !(data & 0x01) && !sample_playing(samples, 0)) sample_start(samples, 0, 7, TRUE);
+			if ((diff & 0x01) &&  (data & 0x01)) sample_stop(samples, 0);
 
 			/* SHORT EXP: channel 1 */
-			if ((diff & 0x04) && !(data & 0x04)) sample_start(1, 2, FALSE);
+			if ((diff & 0x04) && !(data & 0x04)) sample_start(samples, 1, 2, FALSE);
 
 			/* ACCELERATE: channel 2 */
-			if ((diff & 0x10) && !(data & 0x10)) sample_start(2, 8, FALSE);
+			if ((diff & 0x10) && !(data & 0x10)) sample_start(samples, 2, 8, FALSE);
 
 			/* BATTLE STAR: channel 3 */
-			if ((diff & 0x20) && !(data & 0x20)) sample_start(3, 10, FALSE);
+			if ((diff & 0x20) && !(data & 0x20)) sample_start(samples, 3, 10, FALSE);
 
 			/* D BOMB: channel 4 */
-			if ((diff & 0x40) && !(data & 0x40)) sample_start(4, 1, FALSE);
+			if ((diff & 0x40) && !(data & 0x40)) sample_start(samples, 4, 1, FALSE);
 
 			/* LONG EXP: channel 5 */
-			if ((diff & 0x80) && !(data & 0x80)) sample_start(5, 3, FALSE);
+			if ((diff & 0x80) && !(data & 0x80)) sample_start(samples, 5, 3, FALSE);
 			break;
 
 		case 1:
 			/* SHOT: channel 6 */
-			if ((diff & 0x01) && !(data & 0x01)) sample_start(6, 0, FALSE);
+			if ((diff & 0x01) && !(data & 0x01)) sample_start(samples, 6, 0, FALSE);
 
 			/* BONUS UP: channel 7 */
-			if ((diff & 0x02) && !(data & 0x02)) sample_start(7, 6, FALSE);
+			if ((diff & 0x02) && !(data & 0x02)) sample_start(samples, 7, 6, FALSE);
 
 			/* WARP: channel 8 */
-			if ((diff & 0x08) && !(data & 0x08)) sample_start(8, 4, FALSE);
+			if ((diff & 0x08) && !(data & 0x08)) sample_start(samples, 8, 4, FALSE);
 
 			/* APPEARANCE UFO: channel 9 */
-			if ((diff & 0x40) && !(data & 0x40)) sample_start(9, 5, FALSE);
+			if ((diff & 0x40) && !(data & 0x40)) sample_start(samples, 9, 5, FALSE);
 
 			/* BLACK HOLE: channel 10 */
-			if ((diff & 0x80) && !(data & 0x80)) sample_start(10, 9, FALSE);
+			if ((diff & 0x80) && !(data & 0x80)) sample_start(samples, 10, 9, FALSE);
 			break;
 	}
 }
@@ -805,7 +814,7 @@ static ADDRESS_MAP_START( monsterb_7751_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_DEVWRITE(I8243, "audio_8243", n7751_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE(I8243, "audio_8243", i8243_prog_w)
 ADDRESS_MAP_END
@@ -880,14 +889,15 @@ static SOUND_START( monsterb )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 {
+	const device_config *tms = devtag_get_device(device->machine, SOUND, "music");
 	int enable_val;
 
 	/* Lower four data lines get decoded into 13 control lines */
-	tms36xx_note_w(0, 0, data & 15);
+	tms36xx_note_w(tms, 0, data & 15);
 
 	/* Top four data lines address an 82S123 ROM that enables/disables voices */
 	enable_val = memory_region(device->machine, "prom")[(data & 0xF0) >> 4];
-	tms3617_enable_w(0, enable_val >> 2);
+	tms3617_enable_w(tms, enable_val >> 2);
 }
 
 
@@ -900,14 +910,15 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w )
 {
+	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
 	UINT8 diff = data ^ sound_state[1];
 	sound_state[1] = data;
 
 	/* SHOT: channel 0 */
-	if ((diff & 0x01) && !(data & 0x01)) sample_start(0, 0, FALSE);
+	if ((diff & 0x01) && !(data & 0x01)) sample_start(samples, 0, 0, FALSE);
 
 	/* DIVE: channel 1 */
-	if ((diff & 0x02) && !(data & 0x02)) sample_start(1, 1, FALSE);
+	if ((diff & 0x02) && !(data & 0x02)) sample_start(samples, 1, 1, FALSE);
 
     /* TODO: D7 on Port B might affect TMS3617 output (mute?) */
 }

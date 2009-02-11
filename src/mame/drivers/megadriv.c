@@ -1005,8 +1005,8 @@ WRITE16_HANDLER( megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_BITS_0_7) sn76496_0_w(space, 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) sn76496_0_w(space, 0, (data >>8) & 0xff);
+			if (ACCESSING_BITS_0_7) sn76496_w(devtag_get_device(space->machine, SOUND, "sn"), 0, data & 0xff);
+			//if (ACCESSING_BITS_8_15) sn76496_w(devtag_get_device(space->machine, SOUND, "sn"), 0, (data >>8) & 0xff);
 			break;
 
 		default:
@@ -1406,26 +1406,16 @@ READ16_HANDLER( megadriv_vdp_r )
 	return retvalue;
 }
 
-static READ16_HANDLER( megadriv_68k_YM2612_read)
+static READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
 {
 	//mame_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
 	{
-		switch (offset)
-		{
-			case 0:
-				if (ACCESSING_BITS_8_15)	 return ym2612_status_port_0_a_r(space, 0) << 8;
-				else 				 return ym2612_status_port_0_a_r(space, 0);
-				break;
-			case 1:
-				if (ACCESSING_BITS_8_15)	return ym2612_status_port_0_a_r(space, 0) << 8;
-				else 				return ym2612_status_port_0_a_r(space, 0);
-				break;
-		}
+		return ym2612_r(device, offset);
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access YM2612 (read) without bus\n", cpu_get_pc(space->cpu));
+		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", cpuexec_describe_context(device->machine));
 		return 0;
 	}
 
@@ -1434,52 +1424,16 @@ static READ16_HANDLER( megadriv_68k_YM2612_read)
 
 
 
-static WRITE16_HANDLER( megadriv_68k_YM2612_write)
+static WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
 {
 	//mame_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
 	{
-		switch (offset)
-		{
-			case 0:
-				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_a_w	(space, 0,	(data >> 8) & 0xff);
-				else 				ym2612_data_port_0_a_w		(space, 0,	(data >> 0) & 0xff);
-				break;
-			case 1:
-				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_b_w	(space, 0,	(data >> 8) & 0xff);
-				else 				ym2612_data_port_0_b_w		(space, 0,	(data >> 0) & 0xff);
-				break;
-		}
+		ym2612_w(device, offset, data);
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access YM2612 (write) without bus\n", cpu_get_pc(space->cpu));
-	}
-}
-
-static READ8_HANDLER( megadriv_z80_YM2612_read )
-{
-	switch (offset)
-	{
-		case 0: return ym2612_status_port_0_a_r(space,0);
-		case 1: return ym2612_status_port_0_a_r(space,0);
-		case 2: return ym2612_status_port_0_a_r(space,0);
-		case 3: return ym2612_status_port_0_a_r(space,0);
-
-	}
-
-	return 0x00;
-}
-
-static WRITE8_HANDLER( megadriv_z80_YM2612_write )
-{
-	//mame_printf_debug("megadriv_z80_YM2612_write %02x %02x\n",offset,data);
-	switch (offset)
-	{
-		case 0: ym2612_control_port_0_a_w(space, 0, data); break;
-		case 1: ym2612_data_port_0_a_w(space, 0, data); break;
-		case 2: ym2612_control_port_0_b_w(space, 0, data); break;
-		case 3: ym2612_data_port_0_b_w(space, 0, data); break;
+		logerror("%s: 68000 attempting to access YM2612 (write) without bus\n", cpuexec_describe_context(device->machine));
 	}
 }
 
@@ -2193,7 +2147,7 @@ static ADDRESS_MAP_START( megadriv_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
 	AM_RANGE(0xa00000 , 0xa01fff) AM_READ(megadriv_68k_read_z80_ram)
-	AM_RANGE(0xa04000 , 0xa04003) AM_READ(megadriv_68k_YM2612_read)
+	AM_RANGE(0xa04000 , 0xa04003) AM_DEVREAD8(SOUND, "ym", megadriv_68k_YM2612_read, 0xffff)
 
 	AM_RANGE(0xa10000 , 0xa1001f) AM_READ(megadriv_68k_io_read)
 
@@ -2220,7 +2174,7 @@ static ADDRESS_MAP_START( megadriv_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xa00000 , 0xa01fff) AM_WRITE(megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000 , 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000 , 0xa04003) AM_WRITE(megadriv_68k_YM2612_write)
+	AM_RANGE(0xa04000 , 0xa04003) AM_DEVWRITE8(SOUND, "ym", megadriv_68k_YM2612_write, 0xffff)
 
 	AM_RANGE(0xa06000 , 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
 
@@ -2390,7 +2344,7 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset=1;
 			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
-			sndti_reset(SOUND_YM2612, 0);
+			devtag_reset(space->machine, SOUND, "ym");
 		}
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
@@ -2406,7 +2360,7 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset=1;
 			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
-			sndti_reset(SOUND_YM2612, 0);
+			devtag_reset(space->machine, SOUND, "ym");
 
 		}
 	}
@@ -2423,7 +2377,7 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset=1;
 			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
-			sndti_reset(SOUND_YM2612, 0);
+			devtag_reset(space->machine, SOUND, "ym");
 		}
 	}
 }
@@ -2481,7 +2435,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			sn76496_0_w(space, 0, data);
+			sn76496_w(devtag_get_device(space->machine, SOUND, "sn"), 0, data);
 			break;
 
 		default:
@@ -2512,7 +2466,7 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 	else if (fulladdress == 0xc00011)
 	{
 		/* quite a few early games write here, most of the later ones don't */
-		sn76496_0_w(space, 0, data);
+		sn76496_w(devtag_get_device(space->machine, SOUND, "sn"), 0, data);
 	}
 	else
 	{
@@ -2541,7 +2495,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000 , 0x1fff) AM_READ(SMH_BANK1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
-	AM_RANGE(0x4000 , 0x4003) AM_READ(megadriv_z80_YM2612_read)
+	AM_RANGE(0x4000 , 0x4003) AM_DEVREAD(SOUND, "ym", ym2612_r)
 
 	AM_RANGE(0x6100 , 0x7eff) AM_READ(megadriv_z80_unmapped_read)
 
@@ -2552,7 +2506,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000 , 0x1fff) AM_WRITE(SMH_BANK1) AM_MIRROR(0x2000)
-	AM_RANGE(0x4000 , 0x4003) AM_WRITE(megadriv_z80_YM2612_write)
+	AM_RANGE(0x4000 , 0x4003) AM_DEVWRITE(SOUND, "ym", ym2612_w)
 
 	AM_RANGE(0x7f00 , 0x7fff) AM_WRITE(megadriv_z80_vdp_write)
 
@@ -6613,6 +6567,8 @@ static WRITE8_HANDLER( z80_unmapped_w )
 /* sets the megadrive z80 to it's normal ports / map */
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 {
+	const device_config *ym = devtag_get_device(machine, SOUND, "ym");
+
 	/* INIT THE PORTS *********************************************************************************************/
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
@@ -6630,7 +6586,7 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 	// not allowed??
 //  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4000, 0x4003, 0, 0, megadriv_z80_YM2612_read, megadriv_z80_YM2612_write);
+	memory_install_readwrite8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), ym, 0x4000, 0x4003, 0, 0, ym2612_r, ym2612_w);
 	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
 	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
 	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);

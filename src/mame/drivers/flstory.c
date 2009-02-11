@@ -189,29 +189,29 @@ static UINT8 snd_ctrl1=0;
 static UINT8 snd_ctrl2=0;
 static UINT8 snd_ctrl3=0;
 
-static WRITE8_HANDLER( sound_control_0_w )
+static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
 	snd_ctrl0 = data & 0xff;
 //  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3);
 
 	/* this definitely controls main melody voice on 2'-1 and 4'-1 outputs */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 0, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 1, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 2, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 3, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 0, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 1, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 2, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 3, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group1 from msm5232 */
 
 }
-static WRITE8_HANDLER( sound_control_1_w )
+static WRITE8_DEVICE_HANDLER( sound_control_1_w )
 {
 	snd_ctrl1 = data & 0xff;
 //  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3);
-	sndti_set_output_gain(SOUND_MSM5232, 0, 4, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 5, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 6, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 7, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 4, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 5, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 6, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 7, vol_ctrl[ (snd_ctrl1>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
 }
 
-static WRITE8_HANDLER( sound_control_2_w )
+static WRITE8_DEVICE_HANDLER( sound_control_2_w )
 {
 	int i;
 
@@ -219,10 +219,10 @@ static WRITE8_HANDLER( sound_control_2_w )
 //  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3);
 
 	for (i=0; i<3; i++)
-		sndti_set_output_gain (SOUND_AY8910, 0, i, vol_ctrl[ (snd_ctrl2>>4) & 15 ] / 100.0);	/* ym2149f all */
+		sound_set_output_gain (device, i, vol_ctrl[ (snd_ctrl2>>4) & 15 ] / 100.0);	/* ym2149f all */
 }
 
-static WRITE8_HANDLER( sound_control_3_w ) /* unknown */
+static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 {
 	snd_ctrl3 = data & 0xff;
 //  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", snd_ctrl0, snd_ctrl1, snd_ctrl2, snd_ctrl3);
@@ -232,15 +232,14 @@ static WRITE8_HANDLER( sound_control_3_w ) /* unknown */
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xca00, 0xca0d) AM_WRITE(msm5232_0_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
-	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE(SOUND, "msm", msm5232_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE(SOUND, "msm", sound_control_0_w)
+	AM_RANGE(0xce00, 0xce00) AM_DEVWRITE(SOUND, "msm", sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_r, to_main_w)
 	AM_RANGE(0xda00, 0xda00) AM_READWRITE(SMH_NOP, nmi_enable_w)			/* unknown read*/
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xde00, 0xde00) AM_READWRITE(SMH_NOP, dac_0_signed_data_w)	/* signed 8-bit DAC &  unknown read */
+	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE(SOUND, "dac", dac_w)	/* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
 ADDRESS_MAP_END
 
@@ -641,10 +640,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	sound_control_2_w,
-	sound_control_3_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SOUND, "ay", sound_control_2_w),
+	DEVCB_HANDLER(sound_control_3_w)
 };
 
 static const msm5232_interface msm5232_config =

@@ -185,8 +185,8 @@ static ADDRESS_MAP_START( speedatk_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(speedatk_videoregs_w) // HD46505SP video registers
 	AM_RANGE(0x24, 0x24) AM_WRITE(SMH_NOP) //video timing
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW") AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW") /* likely ay8910 input port, not direct */
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	/*Used only during attract mode,unknown meaning.*/
 	AM_RANGE(0x60, 0x60) AM_READWRITE(SMH_NOP,SMH_NOP)//write the result to $62/$65
 	AM_RANGE(0x61, 0x61) AM_READ(SMH_NOP)//write the result to $66

@@ -128,7 +128,6 @@ TODO:
 
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
-#include "sound/custom.h"
 #include "warpwarp.h"
 #include "geebee.lh"
 #include "sos.lh"
@@ -721,17 +720,6 @@ static GFXDECODE_START( color )
 GFXDECODE_END
 
 
-static const custom_sound_interface geebee_custom_interface =
-{
-	geebee_sh_start
-};
-
-static const custom_sound_interface warpwarp_custom_interface =
-{
-	warpwarp_sh_start
-};
-
-
 
 static MACHINE_DRIVER_START( geebee )
 
@@ -756,8 +744,7 @@ static MACHINE_DRIVER_START( geebee )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("geebee", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(geebee_custom_interface)
+	MDRV_SOUND_ADD("geebee", GEEBEE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -796,8 +783,7 @@ static MACHINE_DRIVER_START( bombbee )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("warpwarp", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(warpwarp_custom_interface)
+	MDRV_SOUND_ADD("warpwarp", WARPWARP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

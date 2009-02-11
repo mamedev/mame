@@ -75,7 +75,8 @@ struct lpc12_t
 };
 
 
-struct sp0256
+typedef struct _sp0256_state sp0256_state;
+struct _sp0256_state
 {
 	const device_config *device;
 	sound_stream  *stream;	        /* MAME core sound stream                       */
@@ -132,6 +133,16 @@ static const INT16 qtbl[128] =
     496,    497,    498,    499,    500,    501,    502,    503,
     504,    505,    506,    507,    508,    509,    510,    511
 };
+
+INLINE sp0256_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_SP0256);
+	return (sp0256_state *)device->token;
+}
+
 
 /* ======================================================================== */
 /*  LIMIT            -- Limiter function for digital sample output.         */
@@ -680,7 +691,7 @@ void sp0256_bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length)
 /* ======================================================================== */
 /*  SP0256_GETB  -- Get up to 8 bits at the current PC.                     */
 /* ======================================================================== */
-static UINT32 sp0256_getb(struct sp0256 *sp, int len)
+static UINT32 sp0256_getb(sp0256_state *sp, int len)
 {
     UINT32 data = 0;
     UINT32 d0, d1;
@@ -740,7 +751,7 @@ static UINT32 sp0256_getb(struct sp0256 *sp, int len)
 /*                  instructions either until the repeat count != 0 or      */
 /*                  the sequencer gets halted by a RTS to 0.                */
 /* ======================================================================== */
-static void sp0256_micro(struct sp0256 *sp)
+static void sp0256_micro(sp0256_state *sp)
 {
     UINT8  immed4;
     UINT8  opcode;
@@ -1094,7 +1105,7 @@ static void sp0256_micro(struct sp0256 *sp)
 
 static STREAM_UPDATE( sp0256_update )
 {
-	struct sp0256 *sp = param;
+	sp0256_state *sp = param;
 	stream_sample_t *output = outputs[0];
 	int output_index = 0;
 	int length, did_samp, old_idx;
@@ -1169,10 +1180,10 @@ static STREAM_UPDATE( sp0256_update )
 	}
 }
 
-static SND_START( sp0256 )
+static DEVICE_START( sp0256 )
 {
 	const sp0256_interface *intf = device->static_config;
-	struct sp0256 *sp = device->token;
+	sp0256_state *sp = get_safe_token(device);
 
 	sp->device = device;
 	devcb_resolve_write_line(&sp->drq, &intf->lrq_callback, device);
@@ -1180,7 +1191,7 @@ static SND_START( sp0256 )
 	devcb_call_write_line(&sp->drq, 1);
 	devcb_call_write_line(&sp->sby, 1);
 
-	sp->stream = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, sp, sp0256_update);
+	sp->stream = stream_create(device, 0, 1, device->clock / CLOCK_DIVIDER, sp, sp0256_update);
 
     /* -------------------------------------------------------------------- */
     /*  Configure our internal variables.                                   */
@@ -1209,13 +1220,13 @@ static SND_START( sp0256 )
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 }
 
-static SND_STOP( sp0256 )
+static DEVICE_STOP( sp0256 )
 {
-	struct sp0256 *sp = device->token;
+	sp0256_state *sp = get_safe_token(device);
 	free( sp->scratch );
 }
 
-static void sp0256_reset(struct sp0256 *sp)
+static void sp0256_reset(sp0256_state *sp)
 {
 	/* ---------------------------------------------------------------- */
 	/*  Reset the FIFO and SP0256.                                      */
@@ -1238,14 +1249,14 @@ static void sp0256_reset(struct sp0256 *sp)
 	SET_SBY(1)
 }
 
-static SND_RESET( sp0256 )
+static DEVICE_RESET( sp0256 )
 {
-	sp0256_reset(device->token);
+	sp0256_reset(get_safe_token(device));
 }
 
-WRITE8_HANDLER( sp0256_ALD_w )
+WRITE8_DEVICE_HANDLER( sp0256_ALD_w )
 {
-	struct sp0256 *sp = sndti_token(SOUND_SP0256, 0);
+	sp0256_state *sp = get_safe_token(device);
 
 	/* ---------------------------------------------------------------- */
 	/*  Drop writes to the ALD register if we're busy.                  */
@@ -1269,9 +1280,9 @@ WRITE8_HANDLER( sp0256_ALD_w )
 	return;
 }
 
-READ16_HANDLER( spb640_r )
+READ16_DEVICE_HANDLER( spb640_r )
 {
-	struct sp0256 *sp = sndti_token(SOUND_SP0256, 0);
+	sp0256_state *sp = get_safe_token(device);
 
     /* -------------------------------------------------------------------- */
     /*  Offset 0 returns the SP0256 LRQ status on bit 15.                   */
@@ -1295,13 +1306,13 @@ READ16_HANDLER( spb640_r )
     return 0x00FF;
 }
 
-WRITE16_HANDLER( spb640_w )
+WRITE16_DEVICE_HANDLER( spb640_w )
 {
-	struct sp0256 *sp = sndti_token(SOUND_SP0256, 0);
+	sp0256_state *sp = get_safe_token(device);
 
 	if( offset == 0 )
 	{
-		sp0256_ALD_w( space, 0, data & 0xff );
+		sp0256_ALD_w( device, 0, data & 0xff );
 		return;
 	}
 
@@ -1344,34 +1355,24 @@ WRITE16_HANDLER( spb640_w )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( sp0256 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( sp0256 )
+DEVICE_GET_INFO( sp0256 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct sp0256); 				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sp0256_state); 				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sp0256 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sp0256 );			break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( sp0256 );			break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( sp0256 );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sp0256 );			break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( sp0256 );			break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( sp0256 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SP0256");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "GI");							break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Joseph Zbiciak, tim lindner"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SP0256");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "GI");							break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Joseph Zbiciak, tim lindner"); break;
 	}
 }
 

@@ -251,23 +251,6 @@ static WRITE32_HANDLER( dreamwld_palette_w )
 	palette_set_color_rgb(space->machine, color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 
-static READ32_HANDLER( dreamwld_6295_0_r )
-{
-	return okim6295_status_0_r(space, 0)<<24;
-}
-
-static WRITE32_HANDLER( dreamwld_6295_0_w )
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		okim6295_data_0_w(space, 0, (data>>24) & 0xff);
-	}
-	else
-	{
-		logerror("OKI0: unk write %x mem_mask %8x\n", data, mem_mask);
-	}
-}
-
 static void dreamwld_oki_setbank( running_machine *machine, UINT8 chip, UINT8 bank )
 {
 	/* 0x30000-0x3ffff is banked.
@@ -287,23 +270,6 @@ static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 	else
 	{
 		logerror("OKI0: unk bank write %x mem_mask %8x\n", data, mem_mask);
-	}
-}
-
-static READ32_HANDLER( dreamwld_6295_1_r )
-{
-	return okim6295_status_1_r(space, 0)<<24;
-}
-
-static WRITE32_HANDLER( dreamwld_6295_1_w )
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		okim6295_data_1_w(space, 0, (data>>24) & 0xff);
-	}
-	else
-	{
-		logerror("OKI1: unk write %x mem_mask %8x\n", data, mem_mask);
 	}
 }
 
@@ -332,10 +298,10 @@ static ADDRESS_MAP_START( dreamwld_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
 
 	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE( dreamwld_6295_0_bank_w ) // sfx
-	AM_RANGE(0xc00018, 0xc0001b) AM_READWRITE( dreamwld_6295_0_r, dreamwld_6295_0_w) // sfx
+	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8( SOUND, "oki1", okim6295_r, okim6295_w, 0xff000000 ) // sfx
 
 	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE( dreamwld_6295_1_bank_w ) // sfx
-	AM_RANGE(0xc00028, 0xc0002b) AM_READWRITE( dreamwld_6295_1_r, dreamwld_6295_1_w) // sfx
+	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8( SOUND, "oki2", okim6295_r, okim6295_w, 0xff000000 ) // sfx
 
 	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
 

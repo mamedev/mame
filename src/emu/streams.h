@@ -16,6 +16,14 @@
 
 
 /***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define STREAMS_UPDATE_FREQUENCY	ATTOTIME_IN_HZ(50)
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -35,10 +43,7 @@ typedef void (*stream_update_func)(const device_config *device, void *param, str
 /* ----- system-level management ----- */
 
 /* initialize the streams engine */
-void streams_init(running_machine *machine, attoseconds_t update_subseconds);
-
-/* set the tag to be associated with all streams allocated from now on */
-void streams_set_tag(running_machine *machine, void *streamtag);
+void streams_init(running_machine *machine);
 
 /* update all the streams periodically */
 void streams_update(running_machine *machine);
@@ -49,6 +54,12 @@ void streams_update(running_machine *machine);
 
 /* create a new stream */
 sound_stream *stream_create(const device_config *device, int inputs, int outputs, int sample_rate, void *param, stream_update_func callback);
+
+/* convert a device/output pair to a stream/output pair */
+int stream_device_output_to_stream_output(const device_config *device, int outputnum, sound_stream **streamptr, int *streamoutputptr);
+
+/* convert a device/input pair to a stream/input pair */
+int stream_device_input_to_stream_input(const device_config *device, int inputnum, sound_stream **streamptr, int *streaminputptr);
 
 /* configure a stream's input */
 void stream_set_input(sound_stream *stream, int index, sound_stream *input_stream, int output_index, float gain);
@@ -79,8 +90,11 @@ attotime stream_get_sample_period(sound_stream *stream);
 
 /* ----- stream information and control ----- */
 
-/* find a stream using a tag and index */
-sound_stream *stream_find_by_tag(running_machine *machine, void *streamtag, int streamindex);
+/* return the total number of outputs for the given device */
+int stream_get_device_outputs(const device_config *device);
+
+/* find a stream using a device and index */
+sound_stream *stream_find_by_device(const device_config *device, int streamindex);
 
 /* return the number of inputs for a given stream */
 int stream_get_inputs(sound_stream *stream);

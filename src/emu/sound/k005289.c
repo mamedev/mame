@@ -40,7 +40,8 @@ typedef struct
 	const unsigned char *wave;
 } k005289_sound_channel;
 
-struct k005289_info
+typedef struct _k005289_state k005289_state;
+struct _k005289_state
 {
 	k005289_sound_channel channel_list[2];
 
@@ -60,8 +61,17 @@ struct k005289_info
 	int k005289_A_latch,k005289_B_latch;
 };
 
+INLINE k005289_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_K005289);
+	return (k005289_state *)device->token;
+}
+
 /* build a table to divide by the number of voices */
-static void make_mixer_table(struct k005289_info *info, int voices)
+static void make_mixer_table(k005289_state *info, int voices)
 {
 	int count = voices * 128;
 	int i;
@@ -87,7 +97,7 @@ static void make_mixer_table(struct k005289_info *info, int voices)
 /* generate sound to the mix buffer */
 static STREAM_UPDATE( K005289_update )
 {
-	struct k005289_info *info = param;
+	k005289_state *info = param;
 	k005289_sound_channel *voice=info->channel_list;
 	stream_sample_t *buffer = outputs[0];
 	short *mix;
@@ -148,17 +158,17 @@ static STREAM_UPDATE( K005289_update )
 		*buffer++ = info->mixer_lookup[*mix++];
 }
 
-static SND_START( k005289 )
+static DEVICE_START( k005289 )
 {
 	k005289_sound_channel *voice;
-	struct k005289_info *info = device->token;
+	k005289_state *info = get_safe_token(device);
 
 	voice = info->channel_list;
 
 	/* get stream channels */
-	info->rate = clock/16;
+	info->rate = device->clock/16;
 	info->stream = stream_create(device, 0, 1, info->rate, info, K005289_update);
-	info->mclock = clock;
+	info->mclock = device->clock;
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	info->mixer_buffer = auto_malloc(2 * sizeof(short) * info->rate);
@@ -182,7 +192,7 @@ static SND_START( k005289 )
 
 /********************************************************************************/
 
-static void k005289_recompute(struct k005289_info *info)
+static void k005289_recompute(k005289_state *info)
 {
 	k005289_sound_channel *voice = info->channel_list;
 
@@ -196,44 +206,44 @@ static void k005289_recompute(struct k005289_info *info)
 	voice[1].wave = &info->sound_prom[32 * info->k005289_B_waveform + 0x100];
 }
 
-WRITE8_HANDLER( k005289_control_A_w )
+WRITE8_DEVICE_HANDLER( k005289_control_A_w )
 {
-	struct k005289_info *info = sndti_token(SOUND_K005289, 0);
+	k005289_state *info = get_safe_token(device);
 	info->k005289_A_volume=data&0xf;
 	info->k005289_A_waveform=data>>5;
 	k005289_recompute(info);
 }
 
-WRITE8_HANDLER( k005289_control_B_w )
+WRITE8_DEVICE_HANDLER( k005289_control_B_w )
 {
-	struct k005289_info *info = sndti_token(SOUND_K005289, 0);
+	k005289_state *info = get_safe_token(device);
 	info->k005289_B_volume=data&0xf;
 	info->k005289_B_waveform=data>>5;
 	k005289_recompute(info);
 }
 
-WRITE8_HANDLER( k005289_pitch_A_w )
+WRITE8_DEVICE_HANDLER( k005289_pitch_A_w )
 {
-	struct k005289_info *info = sndti_token(SOUND_K005289, 0);
+	k005289_state *info = get_safe_token(device);
 	info->k005289_A_latch = 0x1000 - offset;
 }
 
-WRITE8_HANDLER( k005289_pitch_B_w )
+WRITE8_DEVICE_HANDLER( k005289_pitch_B_w )
 {
-	struct k005289_info *info = sndti_token(SOUND_K005289, 0);
+	k005289_state *info = get_safe_token(device);
 	info->k005289_B_latch = 0x1000 - offset;
 }
 
-WRITE8_HANDLER( k005289_keylatch_A_w )
+WRITE8_DEVICE_HANDLER( k005289_keylatch_A_w )
 {
-	struct k005289_info *info = sndti_token(SOUND_K005289, 0);
+	k005289_state *info = get_safe_token(device);
 	info->k005289_A_frequency = info->k005289_A_latch;
 	k005289_recompute(info);
 }
 
-WRITE8_HANDLER( k005289_keylatch_B_w )
+WRITE8_DEVICE_HANDLER( k005289_keylatch_B_w )
 {
-	struct k005289_info *info = sndti_token(SOUND_K005289, 0);
+	k005289_state *info = get_safe_token(device);
 	info->k005289_B_frequency = info->k005289_B_latch;
 	k005289_recompute(info);
 }
@@ -245,34 +255,24 @@ WRITE8_HANDLER( k005289_keylatch_B_w )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( k005289 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( k005289 )
+DEVICE_GET_INFO( k005289 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct k005289_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(k005289_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k005289 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k005289 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							/* nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( k005289 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							/* nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "K005289");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Konami custom");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "K005289");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Konami custom");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

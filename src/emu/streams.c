@@ -114,7 +114,6 @@ struct _sound_stream
 	/* linking information */
 	const device_config *	device;				/* owning device */
 	sound_stream *		next;					/* next stream in the chain */
-	void *				tag;					/* tag (used for identification) */
 	int					index;					/* index for save states */
 
 	/* general information */
@@ -154,7 +153,6 @@ struct _streams_private
 {
 	sound_stream *		stream_head;			/* pointer to first stream */
 	sound_stream **		stream_tailptr;			/* pointer to pointer to last stream */
-	void *				current_tag;			/* current tag to assign to new streams */
 	int					stream_index;			/* index of the current stream */
 	attoseconds_t		update_attoseconds;		/* attoseconds between global updates */
 	attotime			last_update;			/* last update time */
@@ -215,7 +213,7 @@ INLINE INT32 time_to_sampindex(const streams_private *strdata, const sound_strea
     streams_init - initialize the streams engine
 -------------------------------------------------*/
 
-void streams_init(running_machine *machine, attoseconds_t update_attoseconds)
+void streams_init(running_machine *machine)
 {
 	streams_private *strdata;
 
@@ -225,7 +223,7 @@ void streams_init(running_machine *machine, attoseconds_t update_attoseconds)
 
 	/* reset globals */
 	strdata->stream_tailptr = &strdata->stream_head;
-	strdata->update_attoseconds = update_attoseconds;
+	strdata->update_attoseconds = STREAMS_UPDATE_FREQUENCY.attoseconds;
 
 	/* set the global pointer */
 	machine->streams_data = strdata;
@@ -233,18 +231,6 @@ void streams_init(running_machine *machine, attoseconds_t update_attoseconds)
 	/* register global states */
 	state_save_register_global(machine, strdata->last_update.seconds);
 	state_save_register_global(machine, strdata->last_update.attoseconds);
-}
-
-
-/*-------------------------------------------------
-    streams_set_tag - set the tag to be associated
-    with all streams allocated from now on
--------------------------------------------------*/
-
-void streams_set_tag(running_machine *machine, void *streamtag)
-{
-	streams_private *strdata = machine->streams_data;
-	strdata->current_tag = streamtag;
 }
 
 
@@ -364,7 +350,6 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 
 	/* fill in the data */
 	stream->device = device;
-	stream->tag = strdata->current_tag;
 	stream->index = strdata->stream_index++;
 	stream->sample_rate = sample_rate;
 	stream->inputs = inputs;
@@ -423,6 +408,60 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 	stream->output_base_sampindex = -stream->max_samples_per_update;
 
 	return stream;
+}
+
+
+/*-------------------------------------------------
+    stream_device_output_to_stream_output - 
+    convert a device/output pair to a stream/
+    output pair
+-------------------------------------------------*/
+
+int stream_device_output_to_stream_output(const device_config *device, int outputnum, sound_stream **streamptr, int *streamoutputptr)
+{
+	streams_private *strdata = device->machine->streams_data;
+	sound_stream *stream;
+
+	/* scan the list looking for the nth stream that matches the tag */
+	for (stream = strdata->stream_head; stream != NULL; stream = stream->next)
+		if (stream->device == device)
+		{
+			if (outputnum < stream->outputs)
+			{
+				*streamptr = stream;
+				*streamoutputptr = outputnum;
+				return TRUE;
+			}
+			outputnum -= stream->outputs;
+		}
+	return FALSE;
+}
+
+
+/*-------------------------------------------------
+    stream_device_input_to_stream_input - 
+    convert a device/input pair to a stream/
+    input pair
+-------------------------------------------------*/
+
+int stream_device_input_to_stream_input(const device_config *device, int inputnum, sound_stream **streamptr, int *streaminputptr)
+{
+	streams_private *strdata = device->machine->streams_data;
+	sound_stream *stream;
+
+	/* scan the list looking for the nth stream that matches the tag */
+	for (stream = strdata->stream_head; stream != NULL; stream = stream->next)
+		if (stream->device == device)
+		{
+			if (inputnum < stream->inputs)
+			{
+				*streamptr = stream;
+				*streaminputptr = inputnum;
+				return TRUE;
+			}
+			inputnum -= stream->inputs;
+		}
+	return FALSE;
 }
 
 
@@ -565,18 +604,37 @@ attotime stream_get_sample_period(sound_stream *stream)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    stream_find_by_tag - find a stream using a
-    tag and index
+    stream_get_device_outputs - return the total 
+    number of outputs for the given device
 -------------------------------------------------*/
 
-sound_stream *stream_find_by_tag(running_machine *machine, void *streamtag, int streamindex)
+int stream_get_device_outputs(const device_config *device)
 {
-	streams_private *strdata = machine->streams_data;
+	streams_private *strdata = device->machine->streams_data;
+	sound_stream *stream;
+	int outputs = 0;
+
+	/* scan the list looking for the nth stream that matches the tag */
+	for (stream = strdata->stream_head; stream != NULL; stream = stream->next)
+		if (stream->device == device)
+			outputs += stream->outputs;
+	return outputs;
+}
+
+
+/*-------------------------------------------------
+    stream_find_by_device - find a stream using a
+    device and index
+-------------------------------------------------*/
+
+sound_stream *stream_find_by_device(const device_config *device, int streamindex)
+{
+	streams_private *strdata = device->machine->streams_data;
 	sound_stream *stream;
 
 	/* scan the list looking for the nth stream that matches the tag */
-	for (stream = strdata->stream_head; stream; stream = stream->next)
-		if (stream->tag == streamtag && streamindex-- == 0)
+	for (stream = strdata->stream_head; stream != NULL; stream = stream->next)
+		if (stream->device == device && streamindex-- == 0)
 			return stream;
 	return NULL;
 }

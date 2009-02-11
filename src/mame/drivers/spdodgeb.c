@@ -61,12 +61,13 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( spd_adpcm_w )
 {
 	int chip = offset & 1;
+	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (chip == 0) ? "msm1" : "msm2");
 
 	switch (offset/2)
 	{
 		case 3:
 			adpcm_idle[chip] = 1;
-			msm5205_reset_w(chip,1);
+			msm5205_reset_w(adpcm,1);
 			break;
 
 		case 2:
@@ -79,7 +80,7 @@ static WRITE8_HANDLER( spd_adpcm_w )
 
 		case 0:
 			adpcm_idle[chip] = 0;
-			msm5205_reset_w(chip,0);
+			msm5205_reset_w(adpcm,0);
 			break;
 	}
 }
@@ -90,11 +91,11 @@ static void spd_adpcm_int(const device_config *device)
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
 	{
 		adpcm_idle[chip] = 1;
-		msm5205_reset_w(chip,1);
+		msm5205_reset_w(device,1);
 	}
 	else if (adpcm_data[chip] != -1)
 	{
-		msm5205_data_w(chip,adpcm_data[chip] & 0x0f);
+		msm5205_data_w(device,adpcm_data[chip] & 0x0f);
 		adpcm_data[chip] = -1;
 	}
 	else
@@ -102,7 +103,7 @@ static void spd_adpcm_int(const device_config *device)
 		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
-		msm5205_data_w(chip,adpcm_data[chip] >> 4);
+		msm5205_data_w(device,adpcm_data[chip] >> 4);
 	}
 }
 
@@ -299,8 +300,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE(SOUND, "ym", ym3812_w)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(spd_adpcm_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -413,9 +413,9 @@ static GFXDECODE_START( spdodgeb )
 GFXDECODE_END
 
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =

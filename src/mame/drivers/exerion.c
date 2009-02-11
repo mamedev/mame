@@ -55,17 +55,17 @@ static INPUT_CHANGED( coin_inserted )
 static UINT8 porta;
 static UINT8 portb;
 
-static READ8_HANDLER( exerion_porta_r )
+static READ8_DEVICE_HANDLER( exerion_porta_r )
 {
 	porta ^= 0x40;
 	return porta;
 }
 
 
-static WRITE8_HANDLER( exerion_portb_w )
+static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 {
 	/* pull the expected value from the ROM */
-	porta = memory_region(space->machine, "main")[0x5f76];
+	porta = memory_region(device->machine, "main")[0x5f76];
 	portb = data;
 
 	logerror("Port B = %02X\n", data);
@@ -100,11 +100,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(exerion_videoreg_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xd801, 0xd801) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0xd802, 0xd802) AM_READ(ay8910_read_port_1_r)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0xd802, 0xd802) AM_DEVREAD(SOUND, "ay2", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -263,10 +261,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	exerion_porta_r,
-	NULL,
-	NULL,
-	exerion_portb_w
+	DEVCB_HANDLER(exerion_porta_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(exerion_portb_w)
 };
 
 

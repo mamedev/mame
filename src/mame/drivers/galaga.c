@@ -915,7 +915,7 @@ static MACHINE_RESET( digdug )
 static ADDRESS_MAP_START( bosco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP			/* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
-	AM_RANGE(0x6800, 0x681f) AM_WRITE(pacman_sound_w) AM_BASE(&namco_soundregs)
+	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE(SOUND, "namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
@@ -937,7 +937,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( galaga_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP			/* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
-	AM_RANGE(0x6800, 0x681f) AM_WRITE(pacman_sound_w) AM_BASE(&namco_soundregs)
+	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE(SOUND, "namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
@@ -954,7 +954,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( xevious_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP			/* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
-	AM_RANGE(0x6800, 0x681f) AM_WRITE(pacman_sound_w) AM_BASE(&namco_soundregs)
+	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE(SOUND, "namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)	/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
@@ -974,7 +974,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( digdug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP			/* the only area different for each CPU */
-	AM_RANGE(0x6800, 0x681f) AM_WRITE(pacman_sound_w) AM_BASE(&namco_soundregs)
+	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE(SOUND, "namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
@@ -1677,7 +1677,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
-	MDRV_SOUND_ADD("namco2", NAMCO_52XX, MASTER_CLOCK/12)	/* 1.536 MHz */
+	MDRV_SOUND_ADD("namco52", NAMCO_52XX, MASTER_CLOCK/12)	/* 1.536 MHz */
 	MDRV_SOUND_CONFIG(namco_52xx_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
@@ -1954,7 +1954,7 @@ ROM_START( bosco )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco2", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -1995,7 +1995,7 @@ ROM_START( boscoo )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco2", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2036,7 +2036,7 @@ ROM_START( boscoo2 )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco2", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2084,7 +2084,7 @@ ROM_START( boscomd )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco2", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
@@ -2128,7 +2128,7 @@ ROM_START( boscomdo )
 	ROM_LOAD( "prom.1d",      0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
 	ROM_LOAD( "prom.5c",      0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 
-	ROM_REGION( 0x3000, "namco2", 0 )	/* ROMs for digitised speech */
+	ROM_REGION( 0x3000, "namco52", 0 )	/* ROMs for digitised speech */
 	ROM_LOAD( "4900.5n",      0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
 	ROM_LOAD( "5000.5m",      0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
 	ROM_LOAD( "5100.5l",      0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )

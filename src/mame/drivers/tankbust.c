@@ -50,14 +50,14 @@ static WRITE8_HANDLER( tankbust_soundlatch_w )
 	timer_call_after_resynch(space->machine, NULL, data,soundlatch_callback);
 }
 
-static READ8_HANDLER( tankbust_soundlatch_r )
+static READ8_DEVICE_HANDLER( tankbust_soundlatch_r )
 {
 	return latch;
 }
 
 //port B of ay8910#0
 static UINT32 timer1=0;
-static READ8_HANDLER( tankbust_soundtimer_r )
+static READ8_DEVICE_HANDLER( tankbust_soundtimer_r )
 {
 	int ret;
 
@@ -213,12 +213,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map_cpu2, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x30, 0x30) AM_READ(ay8910_read_port_1_r)
-	AM_RANGE(0x30, 0x30) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
+	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r, ay8910_address_w)
 ADDRESS_MAP_END
 
 
@@ -328,10 +326,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	tankbust_soundlatch_r,
-	tankbust_soundtimer_r,
-	NULL,
-	NULL
+	DEVCB_HANDLER(tankbust_soundlatch_r),
+	DEVCB_HANDLER(tankbust_soundtimer_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_RESET( tankbust )

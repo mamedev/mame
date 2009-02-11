@@ -72,7 +72,8 @@ struct QSOUND_CHANNEL
 	INT32 offset;	 /* current offset counter */
 };
 
-struct qsound_info
+typedef struct _qsound_state qsound_state;
+struct _qsound_state
 {
 	/* Private variables */
 	sound_stream * stream;				/* Audio stream */
@@ -88,13 +89,23 @@ struct qsound_info
 	FILE *fpRawDataR;
 };
 
+INLINE qsound_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_QSOUND);
+	return (qsound_state *)device->token;
+}
+
+
 /* Function prototypes */
 static STREAM_UPDATE( qsound_update );
-static void qsound_set_command(struct qsound_info *chip, int data, int value);
+static void qsound_set_command(qsound_state *chip, int data, int value);
 
-static SND_START( qsound )
+static DEVICE_START( qsound )
 {
-	struct qsound_info *chip = device->token;
+	qsound_state *chip = get_safe_token(device);
 	int i;
 
 	chip->sample_rom = (QSOUND_SRC_SAMPLE *)device->region;
@@ -118,7 +129,7 @@ static SND_START( qsound )
 		/* Allocate stream */
 		chip->stream = stream_create(
 			device, 0, 2,
-			clock / QSOUND_CLOCKDIV,
+			device->clock / QSOUND_CLOCKDIV,
 			chip,
 			qsound_update );
 	}
@@ -147,9 +158,9 @@ static SND_START( qsound )
 	}
 }
 
-static SND_STOP( qsound )
+static DEVICE_STOP( qsound )
 {
-	struct qsound_info *chip = device->token;
+	qsound_state *chip = get_safe_token(device);
 	if (chip->fpRawDataR)
 	{
 		fclose(chip->fpRawDataR);
@@ -162,31 +173,36 @@ static SND_STOP( qsound )
 	chip->fpRawDataL = NULL;
 }
 
-WRITE8_HANDLER( qsound_data_h_w )
+WRITE8_DEVICE_HANDLER( qsound_w )
 {
-	struct qsound_info *chip = sndti_token(SOUND_QSOUND, 0);
-	chip->data=(chip->data&0xff)|(data<<8);
+	qsound_state *chip = get_safe_token(device);
+	switch (offset)
+	{
+		case 0:
+			chip->data=(chip->data&0xff)|(data<<8);
+			break;
+		
+		case 1:
+			chip->data=(chip->data&0xff00)|data;
+			break;
+		
+		case 2:
+			qsound_set_command(chip, data, chip->data);
+			break;
+		
+		default:
+			logerror("%s: unexpected qsound write to offset %d == %02X\n", cpuexec_describe_context(device->machine), offset, data);
+			break;
+	}
 }
 
-WRITE8_HANDLER( qsound_data_l_w )
-{
-	struct qsound_info *chip = sndti_token(SOUND_QSOUND, 0);
-	chip->data=(chip->data&0xff00)|data;
-}
-
-WRITE8_HANDLER( qsound_cmd_w )
-{
-	struct qsound_info *chip = sndti_token(SOUND_QSOUND, 0);
-	qsound_set_command(chip, data, chip->data);
-}
-
-READ8_HANDLER( qsound_status_r )
+READ8_DEVICE_HANDLER( qsound_r )
 {
 	/* Port ready bit (0x80 if ready) */
 	return 0x80;
 }
 
-static void qsound_set_command(struct qsound_info *chip, int data, int value)
+static void qsound_set_command(qsound_state *chip, int data, int value)
 {
 	int ch=0,reg=0;
 	if (data < 0x80)
@@ -301,7 +317,7 @@ static void qsound_set_command(struct qsound_info *chip, int data, int value)
 
 static STREAM_UPDATE( qsound_update )
 {
-	struct qsound_info *chip = param;
+	qsound_state *chip = param;
 	int i,j;
 	int rvol, lvol, count;
 	struct QSOUND_CHANNEL *pC=&chip->channel[0];
@@ -364,34 +380,24 @@ static STREAM_UPDATE( qsound_update )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( qsound )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( qsound )
+DEVICE_GET_INFO( qsound )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct qsound_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(qsound_state);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( qsound );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( qsound );			break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( qsound );			break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( qsound );			break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( qsound );			break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Q-Sound");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Capcom custom");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Q-Sound");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Capcom custom");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

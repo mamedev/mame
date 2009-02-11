@@ -126,7 +126,7 @@ const pia6821_interface williams_pia_1_intf =
 const pia6821_interface williams_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_MEMORY_HANDLER("main", PROGRAM, dac_0_data_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER(SOUND, "wmsdac", dac_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 
@@ -150,7 +150,7 @@ const pia6821_interface lottofun_pia_0_intf =
 const pia6821_interface sinistar_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_MEMORY_HANDLER("main", PROGRAM, dac_0_data_w), DEVCB_NULL, DEVCB_MEMORY_HANDLER("main", PROGRAM, hc55516_0_digit_w), DEVCB_MEMORY_HANDLER("main", PROGRAM, hc55516_0_clock_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER(SOUND, "wmsdac", dac_w), DEVCB_NULL, DEVCB_DEVICE_LINE(SOUND, "cvsd", hc55516_digit_w), DEVCB_DEVICE_LINE(SOUND, "cvsd", hc55516_clock_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 
@@ -198,7 +198,7 @@ const pia6821_interface williams2_pia_1_intf =
 const pia6821_interface williams2_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER(PIA6821, "pia_1", pia_portb_w), DEVCB_MEMORY_HANDLER("main", PROGRAM, dac_0_data_w), DEVCB_DEVICE_HANDLER(PIA6821, "pia_1", pia_cb1_w), DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER(PIA6821, "pia_1", pia_portb_w), DEVCB_DEVICE_HANDLER(SOUND, "wmsdac", dac_w), DEVCB_DEVICE_HANDLER(PIA6821, "pia_1", pia_cb1_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 
@@ -246,7 +246,7 @@ const pia6821_interface tshoot_pia_1_intf =
 const pia6821_interface tshoot_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER(PIA6821, "pia_1", pia_portb_w), DEVCB_MEMORY_HANDLER("main", PROGRAM, dac_0_data_w), DEVCB_DEVICE_HANDLER(PIA6821, "pia_1", pia_cb1_w), DEVCB_HANDLER(tshoot_maxvol_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER(PIA6821, "pia_1", pia_portb_w), DEVCB_DEVICE_HANDLER(SOUND, "wmsdac", dac_w), DEVCB_DEVICE_HANDLER(PIA6821, "pia_1", pia_cb1_w), DEVCB_HANDLER(tshoot_maxvol_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 

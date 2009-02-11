@@ -136,8 +136,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shanghai_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x02, 0x03) AM_READWRITE(HD63484_data_r, HD63484_data_w)
-	AM_RANGE(0x20, 0x21) AM_READWRITE(ym2203_status_port_0_lsb_r, ym2203_control_port_0_lsb_w)
-	AM_RANGE(0x22, 0x23) AM_READWRITE(ym2203_read_port_0_lsb_r, ym2203_write_port_0_lsb_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8(SOUND, "ym", ym2203_r, ym2203_w, 0x00ff)
 	AM_RANGE(0x40, 0x41) AM_READ_PORT("P1")
 	AM_RANGE(0x44, 0x45) AM_READ_PORT("P2")
 	AM_RANGE(0x48, 0x49) AM_READ_PORT("SYSTEM")
@@ -151,8 +150,7 @@ static ADDRESS_MAP_START( shangha2_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x20, 0x21) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x30, 0x31) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x32, 0x33) AM_READWRITE(HD63484_data_r, HD63484_data_w)
-	AM_RANGE(0x40, 0x41) AM_READWRITE(ym2203_status_port_0_lsb_r, ym2203_control_port_0_lsb_w)
-	AM_RANGE(0x42, 0x43) AM_READWRITE(ym2203_read_port_0_lsb_r, ym2203_write_port_0_lsb_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8(SOUND, "ym", ym2203_r, ym2203_w, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
 
@@ -402,10 +400,10 @@ static const ym2203_interface sh_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_3_r,
-		input_port_4_r,
-		NULL,
-		NULL
+		DEVCB_INPUT_PORT("DSW1"),
+		DEVCB_INPUT_PORT("DSW2"),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };
@@ -416,8 +414,8 @@ static const ym2203_interface kothello_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_4_r,
-		NULL, NULL, NULL
+		DEVCB_INPUT_PORT("DSW"),
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	seibu_ym2203_irqhandler
 };

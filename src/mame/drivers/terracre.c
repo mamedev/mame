@@ -86,7 +86,7 @@ AT-2
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/2203intf.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 
 static const UINT16 *mpProtData;
 static UINT8 mAmazonProtCmd;
@@ -266,20 +266,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_3526_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym3526_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym3526_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(dac_0_signed_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dac_1_signed_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ym", ym3526_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "dac1", dac_signed_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "dac2", dac_signed_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_2203_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(dac_0_signed_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dac_1_signed_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "dac1", dac_signed_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "dac2", dac_signed_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

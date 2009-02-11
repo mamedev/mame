@@ -186,13 +186,13 @@ static WRITE16_HANDLER( tv_vcf_bankselect_w )
 }
 
 
-static WRITE16_HANDLER( tv_oki6395_w )
+static WRITE16_DEVICE_HANDLER( tv_oki6395_w )
 {
 	static int okidata;
-	if (okidata != data) {
+	if (ACCESSING_BITS_0_7 && okidata != data) {
 		okidata = data;
-		okim6376_data_0_lsb_w(space, 0, data, mem_mask);
-		okim6376_data_0_lsb_w(space, 0, (1 << 4), mem_mask);
+		okim6376_w(device, 0, data);
+		okim6376_w(device, 0, (1 << 4));
 	}
 }
 
@@ -206,12 +206,12 @@ static ADDRESS_MAP_START( tv_vcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_vcf_io, ADDRESS_SPACE_IO, 16 )
- 	AM_RANGE(0x0006, 0x0007) AM_WRITE( tv_oki6395_w )
+ 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( SOUND, "oki", tv_oki6395_w )
  	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ( read3_r )
  	AM_RANGE(0x0010, 0x0015) AM_WRITE( tv_vcf_paletteram_w )
- 	AM_RANGE(0x0030, 0x0031) AM_WRITE( tv_vcf_bankselect_w ) AM_READ( okim6376_status_0_lsb_r )
+ 	AM_RANGE(0x0030, 0x0031) AM_WRITE( tv_vcf_bankselect_w ) AM_DEVREAD8( SOUND, "oki", okim6376_r, 0x00ff )
 ADDRESS_MAP_END
 
 
@@ -226,13 +226,13 @@ static READ16_HANDLER( tv_ncf_read2_r )
 	return (input_port_read(space->machine, "IN1") & 0xbf) | resetpulse;
 }
 
-static WRITE16_HANDLER( tv_ncf_oki6395_w )
+static WRITE16_DEVICE_HANDLER( tv_ncf_oki6395_w )
 {
 	static int okidata;
-	if (okidata != data) {
+	if (ACCESSING_BITS_0_7 && okidata != data) {
 		okidata = data;
-		okim6376_data_0_lsb_w(space, 0, data | 0x80, mem_mask);
-		okim6376_data_0_lsb_w(space, 0, (1 << 4), mem_mask);
+		okim6376_w(device, 0, data | 0x80);
+		okim6376_w(device, 0, (1 << 4));
 	}
 }
 static ADDRESS_MAP_START( tv_ncf_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( tv_ncf_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_ncf_io, ADDRESS_SPACE_IO, 16 )
- 	AM_RANGE(0x0008, 0x0009) AM_WRITE( tv_ncf_oki6395_w )
+ 	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE( SOUND, "oki", tv_ncf_oki6395_w )
  	AM_RANGE(0x000c, 0x000d) AM_READ( read1_r )
 	AM_RANGE(0x0010, 0x0011) AM_READ( tv_ncf_read2_r )
 	AM_RANGE(0x0012, 0x0013) AM_READ( read3_r )
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( tv_tcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_tcf_io, ADDRESS_SPACE_IO, 16 )
- 	AM_RANGE(0x0006, 0x0007) AM_WRITE( tv_oki6395_w )
+ 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( SOUND, "oki", tv_oki6395_w )
  	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x0030, 0x0031) AM_READ( read3_r ) AM_WRITE( tv_tcf_bankselect_w )

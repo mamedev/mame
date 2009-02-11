@@ -638,9 +638,9 @@ static WRITE8_HANDLER( itech8_nmi_ack_w )
 }
 
 
-static void generate_sound_irq(running_machine *machine, int state)
+static void generate_sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -785,7 +785,7 @@ static WRITE8_HANDLER( pia_portb_out )
 }
 
 
-static WRITE8_HANDLER( ym2203_portb_out )
+static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 {
 	logerror("YM2203 port B write = %02x\n", data);
 
@@ -794,7 +794,7 @@ static WRITE8_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	pia_portb_data = data;
-	ticket_dispenser_w(space, 0, data & 0x80);
+	ticket_dispenser_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data & 0x80);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -968,10 +968,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound2203_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0002) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0002) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0002) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -980,10 +979,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound2608b_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x2000, 0x2000) AM_READ(sound_data_r)
-	AM_RANGE(0x4000, 0x4000) AM_READWRITE(ym2608_status_port_0_a_r, ym2608_control_port_0_a_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym2608_data_port_0_a_w)
-	AM_RANGE(0x4002, 0x4002) AM_READWRITE(ym2608_status_port_0_b_r, ym2608_control_port_0_b_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE(ym2608_data_port_0_b_w)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE(SOUND, "ym", ym2608_r, ym2608_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -993,10 +989,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound3812_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x5000, 0x5003) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1006,10 +1001,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound3812_external_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1689,10 +1683,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		NULL,
-		ym2203_portb_out,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(ym2203_portb_out)
 	},
 	generate_sound_irq
 };
@@ -1703,10 +1697,10 @@ static const ym2608_interface ym2608b_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		NULL,
-		ym2203_portb_out,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(ym2203_portb_out),
 	},
 	generate_sound_irq
 };

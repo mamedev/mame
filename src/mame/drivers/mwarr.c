@@ -71,9 +71,9 @@ static WRITE16_HANDLER( tx_videoram_w )
 	tilemap_mark_tile_dirty(tx_tilemap,offset);
 }
 
-static WRITE16_HANDLER( oki1_bank_w )
+static WRITE16_DEVICE_HANDLER( oki1_bank_w )
 {
-	okim6295_set_bank_base(1, 0x40000 * (data & 3));
+	okim6295_set_bank_base(device, 0x40000 * (data & 3));
 }
 
 static WRITE16_HANDLER( sprites_commands_w )
@@ -144,12 +144,12 @@ static ADDRESS_MAP_START( mwarr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x110001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x110004, 0x110005) AM_READ_PORT("DSW")
-	AM_RANGE(0x110010, 0x110011) AM_WRITE(oki1_bank_w)
+	AM_RANGE(0x110010, 0x110011) AM_DEVWRITE(SOUND, "oki2", oki1_bank_w)
 	AM_RANGE(0x110014, 0x110015) AM_WRITE(mwarr_brightness_w)
 	AM_RANGE(0x110016, 0x110017) AM_WRITE(sprites_commands_w)
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_BASE(&mwarr_ram)
-	AM_RANGE(0x180000, 0x180001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
-	AM_RANGE(0x190000, 0x190001) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w)
+	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8(SOUND, "oki1", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8(SOUND, "oki2", okim6295_r, okim6295_w, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mwarr )

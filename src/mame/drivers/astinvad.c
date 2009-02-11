@@ -257,14 +257,15 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 
 static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 {
+	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
 	int bits_gone_hi = data & ~sound_state[0];
 	sound_state[0] = data;
 
-	if (bits_gone_hi & 0x01) sample_start(0, SND_UFO, 1);
-	if (!(data & 0x01))      sample_stop(0);
-	if (bits_gone_hi & 0x02) sample_start(1, SND_SHOT, 0);
-	if (bits_gone_hi & 0x04) sample_start(2, SND_BASEHIT, 0);
-	if (bits_gone_hi & 0x08) sample_start(3, SND_INVADERHIT, 0);
+	if (bits_gone_hi & 0x01) sample_start(samples, 0, SND_UFO, 1);
+	if (!(data & 0x01))      sample_stop(samples, 0);
+	if (bits_gone_hi & 0x02) sample_start(samples, 1, SND_SHOT, 0);
+	if (bits_gone_hi & 0x04) sample_start(samples, 2, SND_BASEHIT, 0);
+	if (bits_gone_hi & 0x08) sample_start(samples, 3, SND_INVADERHIT, 0);
 
 	sound_global_enable(data & 0x20);
 	screen_red = data & 0x04;
@@ -273,14 +274,15 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 
 static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 {
+	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
 	int bits_gone_hi = data & ~sound_state[1];
 	sound_state[1] = data;
 
-	if (bits_gone_hi & 0x01) sample_start(5, SND_FLEET1, 0);
-	if (bits_gone_hi & 0x02) sample_start(5, SND_FLEET2, 0);
-	if (bits_gone_hi & 0x04) sample_start(5, SND_FLEET3, 0);
-	if (bits_gone_hi & 0x08) sample_start(5, SND_FLEET4, 0);
-	if (bits_gone_hi & 0x10) sample_start(4, SND_UFOHIT, 0);
+	if (bits_gone_hi & 0x01) sample_start(samples, 5, SND_FLEET1, 0);
+	if (bits_gone_hi & 0x02) sample_start(samples, 5, SND_FLEET2, 0);
+	if (bits_gone_hi & 0x04) sample_start(samples, 5, SND_FLEET3, 0);
+	if (bits_gone_hi & 0x08) sample_start(samples, 5, SND_FLEET4, 0);
+	if (bits_gone_hi & 0x10) sample_start(samples, 4, SND_UFOHIT, 0);
 
 	screen_flip = (input_port_read(device->machine, "CABINET") & data & 0x20) ? 0xff : 0x00;
 }
@@ -288,30 +290,32 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 
 static WRITE8_HANDLER( spaceint_sound1_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	int bits_gone_hi = data & ~sound_state[0];
 	sound_state[0] = data;
 
-	if (bits_gone_hi & 0x01) sample_start(1, SND_SHOT, 0);
-	if (bits_gone_hi & 0x02) sample_start(2, SND_BASEHIT, 0);
-	if (bits_gone_hi & 0x04) sample_start(4, SND_UFOHIT, 0);
-	if (bits_gone_hi & 0x08) sample_start(0, SND_UFO, 1);
-	if (!(data & 0x08))      sample_stop(0);
+	if (bits_gone_hi & 0x01) sample_start(samples, 1, SND_SHOT, 0);
+	if (bits_gone_hi & 0x02) sample_start(samples, 2, SND_BASEHIT, 0);
+	if (bits_gone_hi & 0x04) sample_start(samples, 4, SND_UFOHIT, 0);
+	if (bits_gone_hi & 0x08) sample_start(samples, 0, SND_UFO, 1);
+	if (!(data & 0x08))      sample_stop(samples, 0);
 
-	if (bits_gone_hi & 0x10) sample_start(5, SND_FLEET1, 0);
-	if (bits_gone_hi & 0x20) sample_start(5, SND_FLEET2, 0);
-	if (bits_gone_hi & 0x40) sample_start(5, SND_FLEET3, 0);
-	if (bits_gone_hi & 0x80) sample_start(5, SND_FLEET4, 0);
+	if (bits_gone_hi & 0x10) sample_start(samples, 5, SND_FLEET1, 0);
+	if (bits_gone_hi & 0x20) sample_start(samples, 5, SND_FLEET2, 0);
+	if (bits_gone_hi & 0x40) sample_start(samples, 5, SND_FLEET3, 0);
+	if (bits_gone_hi & 0x80) sample_start(samples, 5, SND_FLEET4, 0);
 }
 
 
 static WRITE8_HANDLER( spaceint_sound2_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	int bits_gone_hi = data & ~sound_state[1];
 	sound_state[1] = data;
 
 	sound_global_enable(data & 0x02);
 
-	if (bits_gone_hi & 0x04) sample_start(3, SND_INVADERHIT, 0);
+	if (bits_gone_hi & 0x04) sample_start(samples, 3, SND_INVADERHIT, 0);
 
 	screen_flip = (input_port_read(space->machine, "CABINET") & data & 0x80) ? 0xff : 0x00;
 }

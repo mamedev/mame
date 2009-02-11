@@ -24,19 +24,19 @@ struct _msm5205_interface
 };
 
 /* reset signal should keep for 2cycle of VCLK      */
-void msm5205_reset_w (int num, int reset);
+void msm5205_reset_w (const device_config *device, int reset);
 /* adpcmata is latched after vclk_interrupt callback */
-void msm5205_data_w (int num, int data);
+void msm5205_data_w (const device_config *device, int data);
 /* VCLK slave mode option                                        */
 /* if VCLK and reset or data is changed at the same time,        */
 /* Call msm5205_vclk_w after msm5205_data_w and msm5205_reset_w. */
-void msm5205_vclk_w (int num, int reset);
+void msm5205_vclk_w (const device_config *device, int reset);
 /* option , selected pin seletor */
-void msm5205_playmode_w(int num,int _select);
+void msm5205_playmode_w(const device_config *device, int _select);
 
-void msm5205_set_volume(int num,int volume);
+void msm5205_set_volume(const device_config *device,int volume);
 
-SND_GET_INFO( msm5205 );
-#define SOUND_MSM5205 SND_GET_INFO_NAME( msm5205 )
+DEVICE_GET_INFO( msm5205 );
+#define SOUND_MSM5205 DEVICE_GET_INFO_NAME( msm5205 )
 
 #endif /* __MSM5205_H__ */

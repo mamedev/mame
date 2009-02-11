@@ -43,7 +43,8 @@ struct ADPCMVoice
 	UINT32 volume;			/* output volume */
 };
 
-struct okim6295
+typedef struct _okim6295_state okim6295_state;
+struct _okim6295_state
 {
 	#define OKIM6295_VOICES		4
 	struct ADPCMVoice voice[OKIM6295_VOICES];
@@ -90,6 +91,15 @@ static int tables_computed = 0;
 const okim6295_interface okim6295_interface_pin7high = { 1 };
 const okim6295_interface okim6295_interface_pin7low = { 0 };
 
+
+INLINE okim6295_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_OKIM6295);
+	return (okim6295_state *)device->token;
+}
 
 
 /**********************************************************************************************
@@ -187,7 +197,7 @@ INT16 clock_adpcm(struct adpcm_state *state, UINT8 nibble)
 
 ***********************************************************************************************/
 
-static void generate_adpcm(struct okim6295 *chip, struct ADPCMVoice *voice, INT16 *buffer, int samples)
+static void generate_adpcm(okim6295_state *chip, struct ADPCMVoice *voice, INT16 *buffer, int samples)
 {
 	/* if this voice is active */
 	if (voice->playing)
@@ -253,7 +263,7 @@ static void generate_adpcm(struct okim6295 *chip, struct ADPCMVoice *voice, INT1
 
 static STREAM_UPDATE( okim6295_update )
 {
-	struct okim6295 *chip = param;
+	okim6295_state *chip = param;
 	int i;
 
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -299,7 +309,7 @@ static void adpcm_state_save_register(struct ADPCMVoice *voice, const device_con
 	state_save_register_device_item(device, index, voice->base_offset);
 }
 
-static void okim6295_state_save_register(struct okim6295 *info, const device_config *device)
+static void okim6295_state_save_register(okim6295_state *info, const device_config *device)
 {
 	int j;
 
@@ -313,14 +323,14 @@ static void okim6295_state_save_register(struct okim6295 *info, const device_con
 
 /**********************************************************************************************
 
-     SND_START( okim6295 ) -- start emulation of an OKIM6295-compatible chip
+     DEVICE_START( okim6295 ) -- start emulation of an OKIM6295-compatible chip
 
 ***********************************************************************************************/
 
-static SND_START( okim6295 )
+static DEVICE_START( okim6295 )
 {
 	const okim6295_interface *intf = device->static_config;
-	struct okim6295 *info = device->token;
+	okim6295_state *info = get_safe_token(device);
 	int voice;
 	int divisor = intf->pin7 ? 132 : 165;
 
@@ -332,10 +342,10 @@ static SND_START( okim6295 )
 	if (intf->rgnoverride != NULL)
 		info->region_base = memory_region(device->machine, intf->rgnoverride);
 
-	info->master_clock = clock;
+	info->master_clock = device->clock;
 
 	/* generate the name and create the stream */
-	info->stream = stream_create(device, 0, 1, clock/divisor, info, okim6295_update);
+	info->stream = stream_create(device, 0, 1, device->clock/divisor, info, okim6295_update);
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6295_VOICES; voice++)
@@ -352,13 +362,13 @@ static SND_START( okim6295 )
 
 /**********************************************************************************************
 
-     SND_RESET( okim6295 ) -- stop emulation of an OKIM6295-compatible chip
+     DEVICE_RESET( okim6295 ) -- stop emulation of an OKIM6295-compatible chip
 
 ***********************************************************************************************/
 
-static SND_RESET( okim6295 )
+static DEVICE_RESET( okim6295 )
 {
-	struct okim6295 *info = device->token;
+	okim6295_state *info = get_safe_token(device);
 	int i;
 
 	stream_update(info->stream);
@@ -374,9 +384,9 @@ static SND_RESET( okim6295 )
 
 ***********************************************************************************************/
 
-void okim6295_set_bank_base(int which, int base)
+void okim6295_set_bank_base(const device_config *device, int base)
 {
-	struct okim6295 *info = sndti_token(SOUND_OKIM6295, which);
+	okim6295_state *info = get_safe_token(device);
 	stream_update(info->stream);
 	info->bank_offset = base;
 }
@@ -389,9 +399,9 @@ void okim6295_set_bank_base(int which, int base)
 
 ***********************************************************************************************/
 
-void okim6295_set_pin7(int which, int pin7)
+void okim6295_set_pin7(const device_config *device, int pin7)
 {
-	struct okim6295 *info = sndti_token(SOUND_OKIM6295, which);
+	okim6295_state *info = get_safe_token(device);
 	int divisor = pin7 ? 132 : 165;
 
 	stream_set_sample_rate(info->stream, info->master_clock/divisor);
@@ -404,9 +414,9 @@ void okim6295_set_pin7(int which, int pin7)
 
 ***********************************************************************************************/
 
-static int okim6295_status_r(int num)
+READ8_DEVICE_HANDLER( okim6295_r )
 {
-	struct okim6295 *info = sndti_token(SOUND_OKIM6295, num);
+	okim6295_state *info = get_safe_token(device);
 	int i, result;
 
 	result = 0xf0;	/* naname expects bits 4-7 to be 1 */
@@ -433,9 +443,9 @@ static int okim6295_status_r(int num)
 
 ***********************************************************************************************/
 
-static void okim6295_data_w(int num, int data)
+WRITE8_DEVICE_HANDLER( okim6295_w )
 {
-	struct okim6295 *info = sndti_token(SOUND_OKIM6295, num);
+	okim6295_state *info = get_safe_token(device);
 
 	/* if a command is pending, process the second half */
 	if (info->command != -1)
@@ -479,13 +489,13 @@ static void okim6295_data_w(int num, int data)
 					}
 					else
 					{
-						logerror("OKIM6295:%d requested to play sample %02x on non-stopped voice\n",num,info->command);
+						logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",device->tag,info->command);
 					}
 				}
 				/* invalid samples go here */
 				else
 				{
-					logerror("OKIM6295:%d requested to play invalid sample %02x\n",num,info->command);
+					logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",device->tag,info->command);
 					voice->playing = 0;
 				}
 			}
@@ -524,152 +534,27 @@ static void okim6295_data_w(int num, int data)
 
 
 
-/**********************************************************************************************
-
-     okim6295_status_0_r -- generic status read functions
-     okim6295_status_1_r
-
-***********************************************************************************************/
-
-READ8_HANDLER( okim6295_status_0_r )
-{
-	return okim6295_status_r(0);
-}
-
-READ8_HANDLER( okim6295_status_1_r )
-{
-	return okim6295_status_r(1);
-}
-
-READ8_HANDLER( okim6295_status_2_r )
-{
-	return okim6295_status_r(2);
-}
-
-READ16_HANDLER( okim6295_status_0_lsb_r )
-{
-	return okim6295_status_r(0);
-}
-
-READ16_HANDLER( okim6295_status_1_lsb_r )
-{
-	return okim6295_status_r(1);
-}
-
-READ16_HANDLER( okim6295_status_2_lsb_r )
-{
-	return okim6295_status_r(2);
-}
-
-READ16_HANDLER( okim6295_status_0_msb_r )
-{
-	return okim6295_status_r(0) << 8;
-}
-
-READ16_HANDLER( okim6295_status_1_msb_r )
-{
-	return okim6295_status_r(1) << 8;
-}
-
-READ16_HANDLER( okim6295_status_2_msb_r )
-{
-	return okim6295_status_r(2) << 8;
-}
-
-
-
-/**********************************************************************************************
-
-     okim6295_data_0_w -- generic data write functions
-     okim6295_data_1_w
-
-***********************************************************************************************/
-
-WRITE8_HANDLER( okim6295_data_0_w )
-{
-	okim6295_data_w(0, data);
-}
-
-WRITE8_HANDLER( okim6295_data_1_w )
-{
-	okim6295_data_w(1, data);
-}
-
-WRITE8_HANDLER( okim6295_data_2_w )
-{
-	okim6295_data_w(2, data);
-}
-
-WRITE16_HANDLER( okim6295_data_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6295_data_w(0, data & 0xff);
-}
-
-WRITE16_HANDLER( okim6295_data_1_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6295_data_w(1, data & 0xff);
-}
-
-WRITE16_HANDLER( okim6295_data_2_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6295_data_w(2, data & 0xff);
-}
-
-WRITE16_HANDLER( okim6295_data_0_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6295_data_w(0, data >> 8);
-}
-
-WRITE16_HANDLER( okim6295_data_1_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6295_data_w(1, data >> 8);
-}
-
-WRITE16_HANDLER( okim6295_data_2_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6295_data_w(2, data >> 8);
-}
-
-
-
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( okim6295 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( okim6295 )
+DEVICE_GET_INFO( okim6295 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct okim6295);					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(okim6295_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( okim6295 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( okim6295 );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */										break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( okim6295 );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( okim6295 );			break;
+		case DEVINFO_FCT_STOP:							/* nothing */										break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( okim6295 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "OKI6295");							break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "OKI ADPCM");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "OKI6295");							break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "OKI ADPCM");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
-

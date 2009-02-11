@@ -130,19 +130,19 @@ ADDRESS_MAP_END
 
 static int adpcm;
 
-static WRITE8_HANDLER( yunsung8_sound_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audio");
+	UINT8 *RAM = memory_region(device->machine, "audio");
 	int bank = data & 7;
 
-	if ( bank != (data&(~0x20)) ) 	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
+	if ( bank != (data&(~0x20)) ) 	logerror("%s: Bank %02X\n",cpuexec_describe_context(device->machine),data);
 
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	memory_set_bankptr(space->machine, 2, RAM);
+	memory_set_bankptr(device->machine, 2, RAM);
 
-	msm5205_reset_w(0,data & 0x20);
+	msm5205_reset_w(device,data & 0x20);
 }
 
 static WRITE8_HANDLER( yunsung8_adpcm_w )
@@ -156,10 +156,9 @@ static WRITE8_HANDLER( yunsung8_adpcm_w )
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK2,SMH_ROM		)	// Banked ROM
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(yunsung8_sound_bankswitch_w	)	// ROM Bank
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "msm", yunsung8_sound_bankswitch_w	)	// ROM Bank
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w				)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_control_port_0_w		)	// YM3812
-	AM_RANGE(0xec01, 0xec01) AM_WRITE(ym3812_write_port_0_w			)
+	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE(SOUND, "ym", ym3812_w		)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r					)	// From Main CPU
 ADDRESS_MAP_END
@@ -489,7 +488,7 @@ static void yunsung8_adpcm_int(const device_config *device)
 {
 	static int toggle=0;
 
-	msm5205_data_w (0,adpcm>>4);
+	msm5205_data_w (device,adpcm>>4);
 	adpcm<<=4;
 
 	toggle ^= 1;

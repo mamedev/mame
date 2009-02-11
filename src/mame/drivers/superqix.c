@@ -149,6 +149,7 @@ static SAMPLES_START( pbillian_sh_start )
 
 static WRITE8_HANDLER( pbillian_sample_trigger_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	int start,end;
 
 	start = data << 7;
@@ -157,7 +158,7 @@ static WRITE8_HANDLER( pbillian_sample_trigger_w )
 	while (end < 0x8000 && samplebuf[end] != (0xff^0x80))
 		end++;
 
-	sample_start_raw(0, samplebuf + start, end - start, 5000, 0); // 5khz ?
+	sample_start_raw(samples, 0, samplebuf + start, end - start, 5000, 0); // 5khz ?
 }
 
 
@@ -195,13 +196,13 @@ The MCU acts this way:
 static UINT8 port1, port3, port3_latch, from_mcu, from_z80, portb;
 static int from_mcu_pending, from_z80_pending, invert_coin_lockout;
 
-static READ8_HANDLER( in4_mcu_r )
+static READ8_DEVICE_HANDLER( in4_mcu_r )
 {
 //  logerror("%04x: in4_mcu_r\n",cpu_get_pc(space->cpu));
-	return input_port_read(space->machine, "P2") | (from_mcu_pending << 6) | (from_z80_pending << 7);
+	return input_port_read(device->machine, "P2") | (from_mcu_pending << 6) | (from_z80_pending << 7);
 }
 
-static READ8_HANDLER( sqix_from_mcu_r )
+static READ8_DEVICE_HANDLER( sqix_from_mcu_r )
 {
 //  logerror("%04x: read mcu answer (%02x)\n",cpu_get_pc(space->cpu),from_mcu);
 	return from_mcu;
@@ -220,7 +221,7 @@ static READ8_HANDLER( mcu_acknowledge_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( sqix_z80_mcu_w )
+static WRITE8_DEVICE_HANDLER( sqix_z80_mcu_w )
 {
 //  logerror("%04x: sqix_z80_mcu_w %02x\n",cpu_get_pc(space->cpu),data);
 	portb = data;
@@ -298,9 +299,9 @@ static READ8_HANDLER( nmi_ack_r )
 	return 0;
 }
 
-static READ8_HANDLER( bootleg_in0_r )
+static READ8_DEVICE_HANDLER( bootleg_in0_r )
 {
-	return BITSWAP8(input_port_read(space->machine, "DSW1"), 0,1,2,3,4,5,6,7);
+	return BITSWAP8(input_port_read(device->machine, "DSW1"), 0,1,2,3,4,5,6,7);
 }
 
 static WRITE8_HANDLER( bootleg_flipscreen_w )
@@ -449,10 +450,10 @@ logerror("%04x: z80 reads answer %02x\n",cpu_get_pc(space->cpu),from_mcu);
 	return from_mcu;
 }
 
-static READ8_HANDLER(hotsmash_ay_port_a_r)
+static READ8_DEVICE_HANDLER(hotsmash_ay_port_a_r)
 {
 //logerror("%04x: ay_port_a_r and mcu_pending is %d\n",cpu_get_pc(space->cpu),from_mcu_pending);
-	return input_port_read(space->machine, "SYSTEM") | ((from_mcu_pending^1) << 7);
+	return input_port_read(device->machine, "SYSTEM") | ((from_mcu_pending^1) << 7);
 }
 
 /**************************************************************************
@@ -484,11 +485,11 @@ static READ8_HANDLER(pbillian_from_mcu_r)
 	return 0;
 }
 
-static READ8_HANDLER(pbillian_ay_port_a_r)
+static READ8_DEVICE_HANDLER(pbillian_ay_port_a_r)
 {
 //  logerror("%04x: ay_port_a_r\n",cpu_get_pc(space->cpu));
 	 /* bits 76------  MCU status bits */
-	return (mame_rand(space->machine) & 0xc0) | input_port_read(space->machine, "BUTTONS");
+	return (mame_rand(device->machine) & 0xc0) | input_port_read(device->machine, "BUTTONS");
 }
 
 
@@ -538,9 +539,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillian_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0401, 0x0401) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x0402, 0x0402) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x0403, 0x0403) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(pbillian_from_mcu_r)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(pbillian_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w)
@@ -552,9 +552,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0401, 0x0401) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x0402, 0x0402) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x0403, 0x0403) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(hotsmash_from_mcu_r)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(hotsmash_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w)
@@ -566,12 +565,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0401, 0x0401) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x0402, 0x0402) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x0403, 0x0403) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x0405, 0x0405) AM_READ(ay8910_read_port_1_r)
-	AM_RANGE(0x0406, 0x0406) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x0407, 0x0407) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x0405, 0x0405) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x0406, 0x0407) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(mcu_acknowledge_r)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
 	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
@@ -581,12 +578,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bootleg_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
-	AM_RANGE(0x0401, 0x0401) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x0402, 0x0402) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x0403, 0x0403) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x0405, 0x0405) AM_READ(ay8910_read_port_1_r)
-	AM_RANGE(0x0406, 0x0406) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x0407, 0x0407) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x0405, 0x0405) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x0406, 0x0407) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(bootleg_flipscreen_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
 	AM_RANGE(0x0418, 0x0418) AM_READ_PORT("SYSTEM")
@@ -907,60 +902,60 @@ static const ay8910_interface pbillian_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	pbillian_ay_port_a_r,			/* port Aread */
-	input_port_2_r,					/* port Bread */
-	NULL,
-	NULL
+	DEVCB_HANDLER(pbillian_ay_port_a_r),			/* port Aread */
+	DEVCB_INPUT_PORT("SYSTEM"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface hotsmash_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	hotsmash_ay_port_a_r,			/* port Aread */
-	input_port_2_r,					/* port Bread */
-	NULL,
-	NULL
+	DEVCB_HANDLER(hotsmash_ay_port_a_r),			/* port Aread */
+	DEVCB_INPUT_PORT("SYSTEM"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface sqix_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_3_r,	/* port Aread */
-	in4_mcu_r,		/* port Bread */
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("P1"),
+	DEVCB_HANDLER(in4_mcu_r),		/* port Bread */
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface sqix_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_1_r,		/* port Aread */
-	sqix_from_mcu_r,	/* port Bread */
-	NULL,				/* port Awrite */
-	sqix_z80_mcu_w		/* port Bwrite */
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_HANDLER(sqix_from_mcu_r),	/* port Bread */
+	DEVCB_NULL,				/* port Awrite */
+	DEVCB_HANDLER(sqix_z80_mcu_w)		/* port Bwrite */
 };
 
 static const ay8910_interface bootleg_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_3_r,		/* port Aread */
-	input_port_4_r,		/* port Bread */
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("P1"),
+	DEVCB_INPUT_PORT("P2"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface bootleg_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_1_r,		/* port Aread */
-	bootleg_in0_r,		/* port Bread */
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_HANDLER(bootleg_in0_r),		/* port Bread */
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

@@ -207,7 +207,6 @@
 #include "machine/mathbox.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
-#include "sound/custom.h"
 #include "rendlay.h"
 #include "bzone.h"
 
@@ -286,9 +285,9 @@ static WRITE8_HANDLER( bzone_coin_counter_w )
  *
  *************************************/
 
-static READ8_HANDLER( redbaron_joy_r )
+static READ8_DEVICE_HANDLER( redbaron_joy_r )
 {
-	return input_port_read(space->machine, rb_input_select ? "FAKE1" : "FAKE2");
+	return input_port_read(device->machine, rb_input_select ? "FAKE1" : "FAKE2");
 }
 
 
@@ -312,7 +311,7 @@ static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_READ(mb_status_r)
 	AM_RANGE(0x1810, 0x1810) AM_READ(mb_lo_r)
 	AM_RANGE(0x1818, 0x1818) AM_READ(mb_hi_r)
-	AM_RANGE(0x1820, 0x182f) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1840, 0x1840) AM_WRITE(bzone_sounds_w)
 	AM_RANGE(0x1860, 0x187f) AM_WRITE(mb_go_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
@@ -336,7 +335,7 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_sounds_w)	/* and select joystick pot also */
 	AM_RANGE(0x180a, 0x180a) AM_WRITE(SMH_NOP)				/* sound reset, yet todo */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(atari_vg_earom_ctrl_w)
-	AM_RANGE(0x1810, 0x181f) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1820, 0x185f) AM_READWRITE(atari_vg_earom_r, atari_vg_earom_w)
 	AM_RANGE(0x1860, 0x187f) AM_WRITE(mb_go_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
@@ -529,27 +528,15 @@ INPUT_PORTS_END
 
 static const pokey_interface bzone_pokey_interface =
 {
-	{ 0 },
-	input_port_3_r
-};
-
-
-static const custom_sound_interface bzone_custom_interface =
-{
-	bzone_sh_start
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("IN3")
 };
 
 
 static const pokey_interface redbaron_pokey_interface =
 {
-	{ 0 },
-	redbaron_joy_r
-};
-
-
-static const custom_sound_interface redbaron_custom_interface =
-{
-	redbaron_sh_start
+	{ DEVCB_NULL },
+	DEVCB_HANDLER(redbaron_joy_r)
 };
 
 
@@ -585,8 +572,7 @@ static MACHINE_DRIVER_START( bzone )
 	MDRV_SOUND_CONFIG(bzone_pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(bzone_custom_interface)
+	MDRV_SOUND_ADD("custom", BZONE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -627,8 +613,7 @@ static MACHINE_DRIVER_START( redbaron )
 	MDRV_SOUND_CONFIG(redbaron_pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_REPLACE("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(redbaron_custom_interface)
+	MDRV_SOUND_REPLACE("custom", REDBARON, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

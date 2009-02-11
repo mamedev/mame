@@ -91,8 +91,7 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0x8801, 0x8801) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(SMH_NOP)    /* ? */
 ADDRESS_MAP_END
 
@@ -216,9 +215,9 @@ GFXDECODE_END
 
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -226,10 +225,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_0_r,    /* DSW A */
-		input_port_1_r,    /* DSW B */
-		NULL,
-		NULL,
+		DEVCB_INPUT_PORT("DSWA"),
+		DEVCB_INPUT_PORT("DSWB"),
+		DEVCB_NULL,
+		DEVCB_NULL,
 	},
 	irqhandler
 };

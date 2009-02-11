@@ -130,7 +130,8 @@ void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
     Handlers for early Seibu/Tad games with dual channel ADPCM
 */
 
-static struct seibu_adpcm_state
+typedef struct _seibu_adpcm_state seibu_adpcm_state;
+struct _seibu_adpcm_state
 {
 	struct adpcm_state adpcm;
 	sound_stream *stream;
@@ -139,11 +140,11 @@ static struct seibu_adpcm_state
 	UINT8 playing;
 	UINT8 allocated;
 	UINT8 *base;
-} seibu_adpcm[2];
+};
 
 static STREAM_UPDATE( seibu_adpcm_callback )
 {
-	struct seibu_adpcm_state *state = param;
+	seibu_adpcm_state *state = param;
 	stream_sample_t *dest = outputs[0];
 
 	while (state->playing && samples > 0)
@@ -168,30 +169,33 @@ static STREAM_UPDATE( seibu_adpcm_callback )
 	}
 }
 
-static CUSTOM_START( seibu_adpcm_start )
+static DEVICE_START( seibu_adpcm )
 {
 	running_machine *machine = device->machine;
-	int i;
+	seibu_adpcm_state *state = device->token;
 
-	for (i = 0; i < 2; i++)
-		if (!seibu_adpcm[i].allocated)
-		{
-			struct seibu_adpcm_state *state = &seibu_adpcm[i];
-			state->allocated = 1;
-			state->playing = 0;
-			state->stream = stream_create(device, 0, 1, clock, state, seibu_adpcm_callback);
-			state->base = memory_region(machine, "adpcm");
-			reset_adpcm(&state->adpcm);
-			return state;
-		}
-	return NULL;
+	state->playing = 0;
+	state->stream = stream_create(device, 0, 1, device->clock, state, seibu_adpcm_callback);
+	state->base = memory_region(machine, "adpcm");
+	reset_adpcm(&state->adpcm);
 }
 
-static CUSTOM_STOP( seibu_adpcm_stop )
+DEVICE_GET_INFO( seibu_adpcm )
 {
-	struct seibu_adpcm_state *state = token;
-	state->allocated = 0;
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(seibu_adpcm_state);			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(seibu_adpcm);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Seibu ADPCM");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }
+
 
 // "decrypt" is a bit flowery here, as it's probably just line-swapping to
 // simplify PCB layout/routing rather than intentional protection, but it
@@ -209,69 +213,39 @@ void seibu_adpcm_decrypt(running_machine *machine, const char *region)
 	}
 }
 
-WRITE8_HANDLER( seibu_adpcm_adr_1_w )
+WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w )
 {
-	if (seibu_adpcm[0].stream)
-		stream_update(seibu_adpcm[0].stream);
+	seibu_adpcm_state *state = device->token;
+
+	if (state->stream)
+		stream_update(state->stream);
 	if (offset)
 	{
-		seibu_adpcm[0].end = data<<8;
+		state->end = data<<8;
 	}
 	else
 	{
-		seibu_adpcm[0].current = data<<8;
-		seibu_adpcm[0].nibble = 4;
+		state->current = data<<8;
+		state->nibble = 4;
 	}
 }
 
-WRITE8_HANDLER( seibu_adpcm_ctl_1_w )
+WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w )
 {
+	seibu_adpcm_state *state = device->token;
+
 	// sequence is 00 02 01 each time.
-	if (seibu_adpcm[0].stream)
-		stream_update(seibu_adpcm[0].stream);
+	if (state->stream)
+		stream_update(state->stream);
 	switch (data)
 	{
 		case 0:
-			seibu_adpcm[0].playing = 0;
+			state->playing = 0;
 			break;
 		case 2:
 			break;
 		case 1:
-			seibu_adpcm[0].playing = 1;
-			break;
-
-	}
-}
-
-WRITE8_HANDLER( seibu_adpcm_adr_2_w )
-{
-	if (seibu_adpcm[1].stream)
-		stream_update(seibu_adpcm[1].stream);
-	if (offset)
-	{
-		seibu_adpcm[1].end = (data<<8) + 0x10000;
-	}
-	else
-	{
-		seibu_adpcm[1].current = (data<<8) + 0x10000;
-		seibu_adpcm[1].nibble = 4;
-	}
-}
-
-WRITE8_HANDLER( seibu_adpcm_ctl_2_w )
-{
-	// sequence is 00 02 01 each time.
-	if (seibu_adpcm[1].stream)
-		stream_update(seibu_adpcm[1].stream);
-	switch (data)
-	{
-		case 0:
-			seibu_adpcm[1].playing = 0;
-			break;
-		case 2:
-			break;
-		case 1:
-			seibu_adpcm[1].playing = 1;
+			state->playing = 1;
 			break;
 
 	}
@@ -338,19 +312,19 @@ WRITE8_HANDLER( seibu_rst18_ack_w )
 	update_irq_lines(space->machine, RST18_CLEAR);
 }
 
-void seibu_ym3812_irqhandler(running_machine *machine, int linestate)
+void seibu_ym3812_irqhandler(const device_config *device, int linestate)
 {
-	update_irq_lines(machine, linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(device->machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2151_irqhandler(running_machine *machine, int linestate)
+void seibu_ym2151_irqhandler(const device_config *device, int linestate)
 {
-	update_irq_lines(machine, linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(device->machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2203_irqhandler(running_machine *machine, int linestate)
+void seibu_ym2203_irqhandler(const device_config *device, int linestate)
 {
-	update_irq_lines(machine, linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(device->machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
 /***************************************************************************/
@@ -473,12 +447,6 @@ const ym3812_interface seibu_ym3812_interface =
 	seibu_ym3812_irqhandler
 };
 
-const custom_sound_interface seibu_adpcm_interface =
-{
-	seibu_adpcm_start,
-	seibu_adpcm_stop
-};
-
 const ym2151_interface seibu_ym2151_interface =
 {
 	seibu_ym2151_irqhandler
@@ -489,7 +457,7 @@ const ym2203_interface seibu_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	seibu_ym2203_irqhandler
 };
@@ -504,14 +472,13 @@ ADDRESS_MAP_START( seibu_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
 	AM_RANGE(0x4007, 0x4007) AM_WRITE(seibu_bank_w)
-	AM_RANGE(0x4008, 0x4008) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x4009, 0x4009) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
@@ -524,14 +491,13 @@ ADDRESS_MAP_START( seibu2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
 	AM_RANGE(0x4007, 0x4007) AM_WRITE(seibu_bank_w)
-	AM_RANGE(0x4008, 0x4008) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x4009, 0x4009) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
@@ -543,15 +509,14 @@ ADDRESS_MAP_START( seibu2_raiden2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
 	AM_RANGE(0x4007, 0x4007) AM_WRITE(seibu_bank_w)
-	AM_RANGE(0x4008, 0x4008) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x4009, 0x4009) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
-	AM_RANGE(0x6002, 0x6002) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0x6002, 0x6002) AM_DEVREADWRITE(SOUND, "oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
@@ -564,15 +529,13 @@ ADDRESS_MAP_START( seibu3_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
 	AM_RANGE(0x4007, 0x4007) AM_WRITE(seibu_bank_w)
-	AM_RANGE(0x4008, 0x4008) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x4009, 0x4009) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
-	AM_RANGE(0x6008, 0x6008) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
-	AM_RANGE(0x6009, 0x6009) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
+	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
@@ -583,19 +546,17 @@ ADDRESS_MAP_START( seibu3_adpcm_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(seibu_irq_clear_w)
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_WRITE(seibu_adpcm_adr_1_w)
+	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE(SOUND, "adpcm1", seibu_adpcm_adr_w)
 	AM_RANGE(0x4007, 0x4007) AM_WRITE(seibu_bank_w)
-	AM_RANGE(0x4008, 0x4008) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x4009, 0x4009) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_WRITE(seibu_adpcm_ctl_1_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE(SOUND, "adpcm1", seibu_adpcm_ctl_w)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
-	AM_RANGE(0x6005, 0x6006) AM_WRITE(seibu_adpcm_adr_2_w)
-	AM_RANGE(0x6008, 0x6008) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
-	AM_RANGE(0x6009, 0x6009) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
-	AM_RANGE(0x601a, 0x601a) AM_WRITE(seibu_adpcm_ctl_2_w)
+	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE(SOUND, "adpcm2", seibu_adpcm_adr_w)
+	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE(SOUND, "adpcm2", seibu_adpcm_ctl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END

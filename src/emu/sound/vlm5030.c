@@ -86,7 +86,8 @@ chirp 12-..: vokume   0   : silent
 #define IP_SIZE_FAST    (120/FR_SIZE)
 #define IP_SIZE_FASTER  ( 80/FR_SIZE)
 
-struct vlm5030_info
+typedef struct _vlm5030_state vml5030_state;
+struct _vlm5030_state
 {
 	const device_config *device;
 	const vlm5030_interface *intf;
@@ -218,7 +219,16 @@ static const INT16 K5_table[] = {
        0,   -8127,  -16384,  -24511,   32638,   24511,   16254,    8127
 };
 
-static int get_bits(struct vlm5030_info *chip, int sbit,int bits)
+INLINE vml5030_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_VLM5030);
+	return (vml5030_state *)device->token;
+}
+
+static int get_bits(vml5030_state *chip, int sbit,int bits)
 {
 	int offset = chip->address + (sbit>>3);
 	int data;
@@ -232,7 +242,7 @@ static int get_bits(struct vlm5030_info *chip, int sbit,int bits)
 }
 
 /* get next frame */
-static int parse_frame (struct vlm5030_info *chip)
+static int parse_frame (vml5030_state *chip)
 {
 	unsigned char cmd;
 	int i;
@@ -289,7 +299,7 @@ static int parse_frame (struct vlm5030_info *chip)
 /* decode and buffering data */
 static STREAM_UPDATE( vlm5030_update_callback )
 {
-	struct vlm5030_info *chip = param;
+	vml5030_state *chip = param;
 	int buf_count=0;
 	int interp_effect;
 	int i;
@@ -444,13 +454,13 @@ phase_stop:
 }
 
 /* realtime update */
-static void vlm5030_update(struct vlm5030_info *chip)
+static void vlm5030_update(vml5030_state *chip)
 {
 	stream_update(chip->channel);
 }
 
 /* setup parameteroption when RST=H */
-static void vlm5030_setup_parameter(struct vlm5030_info *chip, UINT8 param)
+static void vlm5030_setup_parameter(vml5030_state *chip, UINT8 param)
 {
 	/* latch parameter value */
 	chip->parameter = param;
@@ -478,7 +488,7 @@ static void vlm5030_setup_parameter(struct vlm5030_info *chip, UINT8 param)
 
 static STATE_POSTLOAD( vlm5030_restore_state )
 {
-	struct vlm5030_info *chip = param;
+	vml5030_state *chip = param;
 	int i;
 
 	int interp_effect = FR_SIZE - (chip->interp_count%FR_SIZE);
@@ -494,7 +504,7 @@ static STATE_POSTLOAD( vlm5030_restore_state )
 }
 
 
-static void vlm5030_reset(struct vlm5030_info *chip)
+static void vlm5030_reset(vml5030_state *chip)
 {
 	chip->phase = PH_RESET;
 	chip->address = 0;
@@ -515,38 +525,38 @@ static void vlm5030_reset(struct vlm5030_info *chip)
 	vlm5030_setup_parameter(chip, 0x00);
 }
 
-static SND_RESET( vlm5030 )
+static DEVICE_RESET( vlm5030 )
 {
-	vlm5030_reset(device->token);
+	vlm5030_reset(get_safe_token(device));
 }
 
 
 /* set speech rom address */
-void vlm5030_set_rom(void *speech_rom)
+void vlm5030_set_rom(const device_config *device, void *speech_rom)
 {
-	struct vlm5030_info *chip = sndti_token(SOUND_VLM5030, 0);
+	vml5030_state *chip = get_safe_token(device);
 	chip->rom = (UINT8 *)speech_rom;
 }
 
 /* get BSY pin level */
-int vlm5030_bsy(void)
+int vlm5030_bsy(const device_config *device)
 {
-	struct vlm5030_info *chip = sndti_token(SOUND_VLM5030, 0);
+	vml5030_state *chip = get_safe_token(device);
 	vlm5030_update(chip);
 	return chip->pin_BSY;
 }
 
 /* latch contoll data */
-WRITE8_HANDLER( vlm5030_data_w )
+WRITE8_DEVICE_HANDLER( vlm5030_data_w )
 {
-	struct vlm5030_info *chip = sndti_token(SOUND_VLM5030, 0);
+	vml5030_state *chip = get_safe_token(device);
 	chip->latch_data = (UINT8)data;
 }
 
 /* set RST pin level : reset / set table address A8-A15 */
-void vlm5030_rst (int pin )
+void vlm5030_rst (const device_config *device, int pin )
 {
-	struct vlm5030_info *chip = sndti_token(SOUND_VLM5030, 0);
+	vml5030_state *chip = get_safe_token(device);
 	if( chip->pin_RST )
 	{
 		if( !pin )
@@ -569,18 +579,18 @@ void vlm5030_rst (int pin )
 }
 
 /* set VCU pin level : ?? unknown */
-void vlm5030_vcu(int pin)
+void vlm5030_vcu(const device_config *device, int pin)
 {
-	struct vlm5030_info *chip = sndti_token(SOUND_VLM5030, 0);
+	vml5030_state *chip = get_safe_token(device);
 	/* direct mode / indirect mode */
 	chip->pin_VCU = pin;
 	return;
 }
 
 /* set ST pin level  : set table address A0-A7 / start speech */
-void vlm5030_st(int pin )
+void vlm5030_st(const device_config *device, int pin )
 {
-	struct vlm5030_info *chip = sndti_token(SOUND_VLM5030, 0);
+	vml5030_state *chip = get_safe_token(device);
 	int table;
 
 	if( chip->pin_ST != pin )
@@ -637,16 +647,16 @@ if( chip->interp_step != 1)
 
 /* start VLM5030 with sound rom              */
 /* speech_rom == 0 -> use sampling data mode */
-static SND_START( vlm5030 )
+static DEVICE_START( vlm5030 )
 {
 	const vlm5030_interface defintrf = { 0 };
 	int emulation_rate;
-	struct vlm5030_info *chip = device->token;
+	vml5030_state *chip = get_safe_token(device);
 
 	chip->device = device;
 	chip->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
-	emulation_rate = clock / 440;
+	emulation_rate = device->clock / 440;
 
 	/* reset input pins */
 	chip->pin_RST = chip->pin_ST = chip->pin_VCU= 0;
@@ -693,34 +703,24 @@ static SND_START( vlm5030 )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( vlm5030 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( vlm5030 )
+DEVICE_GET_INFO( vlm5030 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct vlm5030_info); 			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vml5030_state); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( vlm5030 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( vlm5030 );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( vlm5030 );		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( vlm5030 );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( vlm5030 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "VLM5030");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "VLM speech");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VLM5030");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "VLM speech");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

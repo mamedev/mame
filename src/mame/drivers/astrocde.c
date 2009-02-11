@@ -206,43 +206,45 @@ static WRITE8_HANDLER( seawolf2_lamps_w )
 
 static WRITE8_HANDLER( seawolf2_sound_1_w )  // Port 40
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 	port_1_last = data;
 
-	if (rising_bits & 0x01) sample_start(1, 1, 0);  /* Left Torpedo */
-	if (rising_bits & 0x02) sample_start(0, 0, 0);  /* Left Ship Hit */
-	if (rising_bits & 0x04) sample_start(4, 4, 0);  /* Left Mine Hit */
-	if (rising_bits & 0x08) sample_start(6, 1, 0);  /* Right Torpedo */
-	if (rising_bits & 0x10) sample_start(5, 0, 0);  /* Right Ship Hit */
-	if (rising_bits & 0x20) sample_start(9, 4, 0);  /* Right Mine Hit */
+	if (rising_bits & 0x01) sample_start(samples, 1, 1, 0);  /* Left Torpedo */
+	if (rising_bits & 0x02) sample_start(samples, 0, 0, 0);  /* Left Ship Hit */
+	if (rising_bits & 0x04) sample_start(samples, 4, 4, 0);  /* Left Mine Hit */
+	if (rising_bits & 0x08) sample_start(samples, 6, 1, 0);  /* Right Torpedo */
+	if (rising_bits & 0x10) sample_start(samples, 5, 0, 0);  /* Right Ship Hit */
+	if (rising_bits & 0x20) sample_start(samples, 9, 4, 0);  /* Right Mine Hit */
 }
 
 
 static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 	port_2_last = data;
 
-	sample_set_volume(0, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(1, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(3, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(4, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(5, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(6, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(8, (data & 0x80) ? 1.0 : 0.0);
-	sample_set_volume(9, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(samples, 0, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(samples, 1, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(samples, 3, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(samples, 4, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(samples, 5, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(samples, 6, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(samples, 8, (data & 0x80) ? 1.0 : 0.0);
+	sample_set_volume(samples, 9, (data & 0x80) ? 1.0 : 0.0);
 
 	/* dive panning controlled by low 3 bits */
-	sample_set_volume(2, (float)(~data & 0x07) / 7.0);
-	sample_set_volume(7, (float)(data & 0x07) / 7.0);
+	sample_set_volume(samples, 2, (float)(~data & 0x07) / 7.0);
+	sample_set_volume(samples, 7, (float)(data & 0x07) / 7.0);
 
 	if (rising_bits & 0x08)
 	{
-		sample_start(2, 2, 0);
-		sample_start(7, 2, 0);
+		sample_start(samples, 2, 2, 0);
+		sample_start(samples, 7, 2, 0);
 	}
-	if (rising_bits & 0x10) sample_start(8, 3, 0);  /* Right Sonar */
-	if (rising_bits & 0x20) sample_start(3, 3, 0);  /* Left Sonar */
+	if (rising_bits & 0x10) sample_start(samples, 8, 3, 0);  /* Right Sonar */
+	if (rising_bits & 0x20) sample_start(samples, 3, 3, 0);  /* Left Sonar */
 
 	coin_counter_w(0, data & 0x40);    /* Coin Counter */
 }
@@ -334,8 +336,8 @@ static READ8_HANDLER( gorf_io_1_r )
 		case 4: astrocade_sparkle[2] = data;	break;
 		case 5: astrocade_sparkle[3] = data;	break;
 		case 6:
-			sndti_set_output_gain(SOUND_ASTROCADE, 0, 0, data ? 0.0 : 1.0);
-			sndti_set_output_gain(SOUND_SAMPLES,   0, 0, data ? 1.0 : 0.0);
+			sound_set_output_gain(devtag_get_device(space->machine, SOUND, "astrocade1"), 0, data ? 0.0 : 1.0);
+			sound_set_output_gain(devtag_get_device(space->machine, SOUND, "samples"), 0, data ? 1.0 : 0.0);
 			break;
 		case 7:	mame_printf_debug("io_1:%d\n", data); break;
 	}
@@ -516,10 +518,10 @@ static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_5_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DIPSW"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -679,7 +681,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map_stereo_pattern, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
-	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(astrocade_sound2_w)
+	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE(SOUND, "astrocade2", astrocade_sound_w)
 	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END
@@ -687,7 +689,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map_16col_pattern, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
-	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_WRITE(astrocade_sound2_w)
+	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE(SOUND, "astrocade2", astrocade_sound_w)
 	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
 	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE(profpac_page_select_w)
 	AM_RANGE(0x00c3, 0x00c3) AM_MIRROR(0xff00) AM_READ(profpac_intercept_r)
@@ -712,9 +714,9 @@ static ADDRESS_MAP_START( tenpin_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)
-	AM_RANGE(0x98, 0x98) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x98, 0x98) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x9a, 0x9a) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x98, 0x98) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x98, 0x98) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x9a, 0x9a) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -1295,7 +1297,7 @@ static MACHINE_DRIVER_START( astrocade_mono_sound )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("astrocade",  ASTROCADE, ASTROCADE_CLOCK/4)
+	MDRV_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -803,7 +803,7 @@ static ADDRESS_MAP_START( kyros_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(dac_0_signed_data_w)
+	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE(SOUND, "dac", dac_signed_w)
 	AM_RANGE(0xe006, 0xe00e) AM_WRITE(SMH_NOP) // soundboard I/O's, ignored
 /* reference only
     AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_NOP) // NMI: diminishing saw-tooth
@@ -819,7 +819,7 @@ static ADDRESS_MAP_START( sstingry_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc100, 0xc100) AM_READ(soundlatch_r)
 	AM_RANGE(0xc102, 0xc102) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0xc104, 0xc104) AM_WRITE(dac_0_signed_data_w)
+	AM_RANGE(0xc104, 0xc104) AM_DEVWRITE(SOUND, "dac", dac_signed_w)
 	AM_RANGE(0xc106, 0xc10e) AM_WRITENOP // soundboard I/O's, ignored
 ADDRESS_MAP_END
 
@@ -831,8 +831,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( alpha68k_I_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(soundlatch_r, soundlatch_clear_w)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE(SOUND, "ym", ym3812_status_port_r, ym3812_control_port_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE(SOUND, "ym", ym3812_write_port_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xfc00, 0xfc00) AM_RAM // unknown port
 ADDRESS_MAP_END
@@ -847,36 +847,31 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(dac_0_signed_data_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(ym2413_register_port_0_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2413_data_port_0_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE(SOUND, "dac", dac_signed_w)
+	AM_RANGE(0x0a, 0x0b) AM_DEVWRITE(SOUND, "ym2", ym2413_w)
+	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(sound_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kyros_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ym2203_write_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0x90, 0x90) AM_WRITE(ym2203_write_port_2_w)
-	AM_RANGE(0x91, 0x91) AM_WRITE(ym2203_control_port_2_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
+	AM_RANGE(0x90, 0x91) AM_DEVWRITE(SOUND, "ym3", ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jongbou_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnexspce_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(SOUND, "ym", ym3812_status_port_r, ym3812_control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE(SOUND, "ym", ym3812_write_port_w)
 	AM_RANGE(0x3b, 0x3b) AM_READNOP // unknown read port
 	AM_RANGE(0x3d, 0x3d) AM_READNOP // unknown read port
 	AM_RANGE(0x7b, 0x7b) AM_READNOP // unknown read port
@@ -1879,7 +1874,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r)
 };
 
 static const ym2203_interface ym2203_config =
@@ -1887,13 +1882,13 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		soundlatch_r
+		DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r)
 	}
 };
 
-static void YM3812_irq(running_machine *machine, int param)
+static void YM3812_irq(const device_config *device, int param)
 {
-	cpu_set_input_line(machine->cpu[1], 0, (param) ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =

@@ -149,15 +149,9 @@ static MACHINE_START( exctsccr )
 
 
 // Champion Baseball has only one DAC
-static WRITE8_HANDLER( champbas_dac_w )
+static WRITE8_DEVICE_HANDLER( champbas_dac_w )
 {
-	dac_signed_data_w(0, data << 2);
-}
-
-// Exciting Soccer has two
-static WRITE8_HANDLER( exctsccr_DAC_data_w )
-{
-	dac_signed_data_w(offset, data << 2);
+	dac_signed_data_w(device, data << 2);
 }
 
 
@@ -219,8 +213,7 @@ AB 1010_1011
 static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) /* MCU shared RAM */
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -247,8 +240,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
@@ -280,8 +272,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) // MCU not used (though it's present on the board)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 //  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&spriteram_2) /* ??? */
@@ -335,7 +326,7 @@ static ADDRESS_MAP_START( champbas_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITENOP	// 4-bit return code to main CPU (not used)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(champbas_dac_w)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE(SOUND, "dac", champbas_dac_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -343,7 +334,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccr_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc008, 0xc009) AM_WRITE(exctsccr_DAC_data_w)
+	AM_RANGE(0xc008, 0xc008) AM_DEVWRITE(SOUND, "dac1", champbas_dac_w)
+	AM_RANGE(0xc009, 0xc009) AM_DEVWRITE(SOUND, "dac2", champbas_dac_w)
 	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_r)
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP /* ??? */
@@ -351,14 +343,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccr_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
-	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x86, 0x86) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x87, 0x87) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x8a, 0x8a) AM_WRITE(ay8910_write_port_2_w)
-	AM_RANGE(0x8b, 0x8b) AM_WRITE(ay8910_control_port_2_w)
-	AM_RANGE(0x8e, 0x8e) AM_WRITE(ay8910_write_port_3_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(ay8910_control_port_3_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x86, 0x87) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
+	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE(SOUND, "ay3", ay8910_data_address_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE(SOUND, "ay4", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 

@@ -384,6 +384,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out3_w )
 WRITE8_DEVICE_HANDLER( cdp1869_out4_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
+	const device_config *cdp = devtag_get_device(device->machine, SOUND, "cdp");
 
 	UINT16 word = cdp1802_get_r_x(cdp1869);
 
@@ -414,15 +415,16 @@ WRITE8_DEVICE_HANDLER( cdp1869_out4_w )
 	cdp1869->tonediv = (word & 0x7f00) >> 8;
 
 	// fork out to CDP1869 sound core
-	cdp1869_set_toneamp(0, cdp1869->toneamp);
-	cdp1869_set_tonefreq(0, cdp1869->tonefreq);
-	cdp1869_set_toneoff(0, cdp1869->toneoff);
-	cdp1869_set_tonediv(0, cdp1869->tonediv);
+	cdp1869_set_toneamp(cdp, cdp1869->toneamp);
+	cdp1869_set_tonefreq(cdp, cdp1869->tonefreq);
+	cdp1869_set_toneoff(cdp, cdp1869->toneoff);
+	cdp1869_set_tonediv(cdp, cdp1869->tonediv);
 }
 
 WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
+	const device_config *cdp = devtag_get_device(device->machine, SOUND, "cdp");
 
 	UINT16 word = cdp1802_get_r_x(cdp1869);
 
@@ -463,9 +465,9 @@ WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
 	cdp1869->wnoff = BIT(word, 15);
 
 	// fork out to CDP1869 sound core
-	cdp1869_set_wnamp(0, cdp1869->wnamp);
-	cdp1869_set_wnfreq(0, cdp1869->wnfreq);
-	cdp1869_set_wnoff(0, cdp1869->wnoff);
+	cdp1869_set_wnamp(cdp, cdp1869->wnamp);
+	cdp1869_set_wnfreq(cdp, cdp1869->wnfreq);
+	cdp1869_set_wnoff(cdp, cdp1869->wnoff);
 
 	if (cdp1869->cmem)
 	{

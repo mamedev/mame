@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( splash_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_READ(SMH_ROM)					/* ROM */
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)				/* Sound latch */
-	AM_RANGE(0xf000, 0xf000) AM_READ(ym3812_status_port_0_r)		/* YM3812 */
+	AM_RANGE(0xf000, 0xf001) AM_DEVREAD(SOUND, "ym", ym3812_r)	/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)					/* RAM */
 ADDRESS_MAP_END
 
@@ -145,7 +145,7 @@ static WRITE8_HANDLER( splash_adpcm_data_w ){
 
 static void splash_msm5205_int(const device_config *device)
 {
-	msm5205_data_w(0,adpcm_data >> 4);
+	msm5205_data_w(device,adpcm_data >> 4);
 	adpcm_data = (adpcm_data << 4) & 0xf0;
 }
 
@@ -154,8 +154,7 @@ static ADDRESS_MAP_START( splash_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_WRITE(SMH_ROM)					/* ROM */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)		/* ADPCM data for the MSM5205 chip */
 //  AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_NOP)                 /* ??? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym3812_control_port_0_w)	/* YM3812 */
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym3812_write_port_0_w)		/* YM3812 */
+	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE(SOUND, "ym", ym3812_w)	/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)					/* RAM */
 ADDRESS_MAP_END
 
@@ -213,8 +212,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roldf_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x12, 0x12) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x12, 0x13) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0x40, 0x40) AM_NOP	/* NMI ack */
 	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -472,7 +470,7 @@ static MACHINE_DRIVER_START( splash )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
-static void ym_irq(running_machine *machine, int state)
+static void ym_irq(const device_config *device, int state)
 {
 	logerror("2203 IRQ: %d\n", state);
 }
@@ -482,7 +480,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	ym_irq
 };

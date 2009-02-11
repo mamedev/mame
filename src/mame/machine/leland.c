@@ -374,12 +374,11 @@ MACHINE_START( leland )
 
 MACHINE_RESET( leland )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(machine->primary_screen, 8, 0), 8);
 
 	/* reset globals */
 	leland_gfx_control = 0x00;
-	leland_sound_port_w(space, 0, 0xff);
+	leland_sound_port_w(devtag_get_device(machine, SOUND, "ay8910.1"), 0, 0xff);
 	wcol_enable = 0;
 
 	dangerz_x = 512;
@@ -1170,7 +1169,7 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x03:	/* /IGID */
 		case 0x13:
-			result = ay8910_read_port_0_r(space, offset);
+			result = ay8910_r(devtag_get_device(space->machine, SOUND, "ay8910.1"), offset);
 			break;
 
 		case 0x10:	/* /GIN0 */
@@ -1209,11 +1208,8 @@ WRITE8_HANDLER( leland_master_output_w )
 			break;
 
 		case 0x0a:	/* /OGIA */
-			ay8910_control_port_0_w(space, 0, data);
-			break;
-
 		case 0x0b:	/* /OGID */
-			ay8910_write_port_0_w(space, 0, data);
+			ay8910_address_data_w(devtag_get_device(space->machine, SOUND, "ay8910.1"), offset, data);
 			break;
 
 		case 0x0c:	/* /BKXL */
@@ -1371,16 +1367,16 @@ READ8_HANDLER( ataxx_paletteram_and_misc_r )
  *
  *************************************/
 
-READ8_HANDLER( leland_sound_port_r )
+READ8_DEVICE_HANDLER( leland_sound_port_r )
 {
     return leland_gfx_control;
 }
 
 
-WRITE8_HANDLER( leland_sound_port_w )
+WRITE8_DEVICE_HANDLER( leland_sound_port_w )
 {
     /* update the graphics banking */
-   	leland_gfx_port_w(space, 0, data);
+   	leland_gfx_port_w(device, 0, data);
 
 	/* set the new value */
     leland_gfx_control = data;
@@ -1389,9 +1385,9 @@ WRITE8_HANDLER( leland_sound_port_w )
     /* some bankswitching occurs here */
 	if (LOG_BANKSWITCHING_M)
 		if ((sound_port_bank ^ data) & 0x24)
-			logerror("%04X:sound_port_bank = %02X\n", cpu_get_pc(space->cpu), data & 0x24);
+			logerror("%s:sound_port_bank = %02X\n", cpuexec_describe_context(device->machine), data & 0x24);
     sound_port_bank = data & 0x24;
-    (*leland_update_master_bank)(space->machine);
+    (*leland_update_master_bank)(device->machine);
 }
 
 

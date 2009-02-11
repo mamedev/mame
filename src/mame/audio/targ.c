@@ -45,50 +45,52 @@ static const INT16 sine_wave[32] =
 
 
 
-static void adjust_sample(UINT8 freq)
+static void adjust_sample(const device_config *samples, UINT8 freq)
 {
 	tone_freq = freq;
 
 	if ((tone_freq == 0xff) || (tone_freq == 0x00))
-		sample_set_volume(3, 0);
+		sample_set_volume(samples, 3, 0);
 	else
 	{
-		sample_set_freq(3, 1.0 * max_freq / (0xff - tone_freq));
-		sample_set_volume(3, tone_active);
+		sample_set_freq(samples, 3, 1.0 * max_freq / (0xff - tone_freq));
+		sample_set_volume(samples, 3, tone_active);
 	}
 }
 
 
 WRITE8_HANDLER( targ_audio_1_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+
 	/* CPU music */
 	if ((data & 0x01) != (port_1_last & 0x01))
-		dac_data_w(0,(data & 0x01) * 0xff);
+		dac_data_w(devtag_get_device(space->machine, SOUND, "dac"),(data & 0x01) * 0xff);
 
 	/* shot */
-	if (FALLING_EDGE(0x02) && !sample_playing(0))  sample_start(0,1,0);
-	if (RISING_EDGE(0x02)) sample_stop(0);
+	if (FALLING_EDGE(0x02) && !sample_playing(samples, 0))  sample_start(samples, 0,1,0);
+	if (RISING_EDGE(0x02)) sample_stop(samples, 0);
 
 	/* crash */
 	if (RISING_EDGE(0x20))
 	{
 		if (data & 0x40)
-			sample_start(1,2,0);
+			sample_start(samples, 1,2,0);
 		else
-			sample_start(1,0,0);
+			sample_start(samples, 1,0,0);
 	}
 
 	/* Sspec */
 	if (data & 0x10)
-		sample_stop(2);
+		sample_stop(samples, 2);
 	else
 	{
 		if ((data & 0x08) != (port_1_last & 0x08))
 		{
 			if (data & 0x08)
-				sample_start(2,3,1);
+				sample_start(samples, 2,3,1);
 			else
-				sample_start(2,4,1);
+				sample_start(samples, 2,4,1);
 		}
 	}
 
@@ -98,7 +100,7 @@ WRITE8_HANDLER( targ_audio_1_w )
 		tone_pointer = 0;
 		tone_active = 0;
 
-		adjust_sample(tone_freq);
+		adjust_sample(samples, tone_freq);
 	}
 
 	if (RISING_EDGE(0x80))
@@ -112,11 +114,12 @@ WRITE8_HANDLER( targ_audio_2_w )
 {
 	if ((data & 0x01) && !(port_2_last & 0x01))
 	{
+		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 		UINT8 *prom = memory_region(space->machine, "targ");
 
 		tone_pointer = (tone_pointer + 1) & 0x0f;
 
-		adjust_sample(prom[((data & 0x02) << 3) | tone_pointer]);
+		adjust_sample(samples, prom[((data & 0x02) << 3) | tone_pointer]);
 	}
 
 	port_2_last = data;
@@ -125,7 +128,8 @@ WRITE8_HANDLER( targ_audio_2_w )
 
 WRITE8_HANDLER( spectar_audio_2_w )
 {
-	adjust_sample(data);
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	adjust_sample(samples, data);
 }
 
 
@@ -143,13 +147,14 @@ static const char *const sample_names[] =
 
 static void common_audio_start(running_machine *machine, int freq)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 	max_freq = freq;
 
 	tone_freq = 0;
 	tone_active = 0;
 
-	sample_set_volume(3, 0);
-	sample_start_raw(3, sine_wave, 32, 1000, 1);
+	sample_set_volume(samples, 3, 0);
+	sample_start_raw(samples, 3, sine_wave, 32, 1000, 1);
 
 	state_save_register_global(machine, port_1_last);
 	state_save_register_global(machine, port_2_last);

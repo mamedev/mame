@@ -166,14 +166,14 @@ static ADDRESS_MAP_START( pandoras_readmem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)				/* ROM */
 	AM_RANGE(0x2000, 0x23ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0x6001, 0x6001) AM_READ(ay8910_read_port_0_r)	/* AY-8910 */
+	AM_RANGE(0x6001, 0x6001) AM_DEVREAD(SOUND, "ay", ay8910_r)	/* AY-8910 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)				/* ROM */
 	AM_RANGE(0x2000, 0x23ff) AM_WRITE(SMH_RAM)				/* RAM */
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_0_w)/* AY-8910 */
-	AM_RANGE(0x6002, 0x6002) AM_WRITE(ay8910_write_port_0_w)	/* AY-8910 */
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)/* AY-8910 */
+	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)	/* AY-8910 */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(pandoras_i8039_irqtrigger_w)/* cause INT on the 8039 */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch2_w)			/* sound command to the 8039 */
 ADDRESS_MAP_END
@@ -188,7 +188,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
@@ -354,24 +354,24 @@ static MACHINE_RESET( pandoras )
 	irq_enable_a = irq_enable_b = 0;
 }
 
-static READ8_HANDLER( pandoras_portA_r )
+static READ8_DEVICE_HANDLER( pandoras_portA_r )
 {
 	return i8039_status;
 }
 
-static READ8_HANDLER( pandoras_portB_r )
+static READ8_DEVICE_HANDLER( pandoras_portB_r )
 {
-	return (cputag_get_total_cycles(space->machine, "audio") / 512) & 0x0f;
+	return (cputag_get_total_cycles(device->machine, "audio") / 512) & 0x0f;
 }
 
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	pandoras_portA_r,	// not used
-	pandoras_portB_r,
-	NULL,
-	NULL
+	DEVCB_HANDLER(pandoras_portA_r),	// not used
+	DEVCB_HANDLER(pandoras_portB_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( pandoras )

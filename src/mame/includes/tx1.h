@@ -4,7 +4,6 @@
 
 *************************************************************************/
 #include "machine/8255ppi.h"
-#include "sound/custom.h"
 
 #define TX1_PIXEL_CLOCK		(XTAL_18MHz / 3)
 #define TX1_HBSTART			256
@@ -53,16 +52,16 @@ MACHINE_START( buggyboy );
 READ8_HANDLER( tx1_pit8253_r );
 WRITE8_HANDLER( tx1_pit8253_w );
 
-WRITE8_HANDLER( bb_ym1_a_w );
-WRITE8_HANDLER( bb_ym2_a_w );
-WRITE8_HANDLER( bb_ym2_b_w );
-CUSTOM_START( buggyboy_sh_start );
-CUSTOM_RESET( buggyboy_sh_reset );
+WRITE8_DEVICE_HANDLER( bb_ym1_a_w );
+WRITE8_DEVICE_HANDLER( bb_ym2_a_w );
+WRITE8_DEVICE_HANDLER( bb_ym2_b_w );
+DEVICE_GET_INFO( buggyboy_sound );
+#define SOUND_BUGGYBOY DEVICE_GET_INFO_NAME(buggyboy_sound)
 
-WRITE8_HANDLER( tx1_ay8910_a_w );
-WRITE8_HANDLER( tx1_ay8910_b_w );
-CUSTOM_START( tx1_sh_start );
-CUSTOM_RESET( tx1_sh_reset );
+WRITE8_DEVICE_HANDLER( tx1_ay8910_a_w );
+WRITE8_DEVICE_HANDLER( tx1_ay8910_b_w );
+DEVICE_GET_INFO( tx1_sound );
+#define SOUND_TX1 DEVICE_GET_INFO_NAME(tx1_sound)
 
 
 /*----------- defined in video/tx1.c -----------*/

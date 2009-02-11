@@ -58,8 +58,7 @@ static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("IN5") //dips?
 	AM_RANGE(0x9000, 0x90ff) AM_RAM
 	AM_RANGE(0x9400, 0x9400) AM_READ(sdpoker_rng_r)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x9801, 0x9801) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( supdrapo )

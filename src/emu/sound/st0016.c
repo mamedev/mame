@@ -12,24 +12,40 @@
 #define VERBOSE (0)
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-UINT8 *st0016_sound_regs;
-
-struct st0016_info
+typedef struct _st0016_state st0016_state;
+struct _st0016_state
 {
 	sound_stream * stream;
 	UINT8 **sound_ram;
 	int vpos[8], frac[8], lponce[8];
+	UINT8 regs[0x100];
 };
 
-WRITE8_HANDLER(st0016_snd_w)
+INLINE st0016_state *get_safe_token(const device_config *device)
 {
-	struct st0016_info *info = sndti_token(SOUND_ST0016, 0);
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_ST0016);
+	return (st0016_state *)device->token;
+}
+
+
+READ8_DEVICE_HANDLER( st0016_snd_r )
+{
+	st0016_state *info = get_safe_token(device);
+	return info->regs[offset];
+}
+
+WRITE8_DEVICE_HANDLER( st0016_snd_w )
+{
+	st0016_state *info = get_safe_token(device);
 	int voice = offset/32;
 	int reg = offset & 0x1f;
-	int oldreg = st0016_sound_regs[offset];
+	int oldreg = info->regs[offset];
 	int vbase = offset & ~0x1f;
 
-	st0016_sound_regs[offset] = data;
+	info->regs[offset] = data;
 
 	if ((voice < 8) && (data != oldreg))
 	{
@@ -38,19 +54,19 @@ WRITE8_HANDLER(st0016_snd_w)
 			info->vpos[voice] = info->frac[voice] = info->lponce[voice] = 0;
 
 			LOG(("Key on V%02d: st %06x-%06x lp %06x-%06x frq %x flg %x\n", voice,
-				st0016_sound_regs[vbase+2]<<16 | st0016_sound_regs[vbase+1]<<8 | st0016_sound_regs[vbase+2],
-				st0016_sound_regs[vbase+0xe]<<16 | st0016_sound_regs[vbase+0xd]<<8 | st0016_sound_regs[vbase+0xc],
-				st0016_sound_regs[vbase+6]<<16 | st0016_sound_regs[vbase+5]<<8 | st0016_sound_regs[vbase+4],
-				st0016_sound_regs[vbase+0xa]<<16 | st0016_sound_regs[vbase+0x9]<<8 | st0016_sound_regs[vbase+0x8],
-				st0016_sound_regs[vbase+0x11]<<8 | st0016_sound_regs[vbase+0x10],
-				st0016_sound_regs[vbase+0x16]));
+				info->regs[vbase+2]<<16 | info->regs[vbase+1]<<8 | info->regs[vbase+2],
+				info->regs[vbase+0xe]<<16 | info->regs[vbase+0xd]<<8 | info->regs[vbase+0xc],
+				info->regs[vbase+6]<<16 | info->regs[vbase+5]<<8 | info->regs[vbase+4],
+				info->regs[vbase+0xa]<<16 | info->regs[vbase+0x9]<<8 | info->regs[vbase+0x8],
+				info->regs[vbase+0x11]<<8 | info->regs[vbase+0x10],
+				info->regs[vbase+0x16]));
 		}
 	}
 }
 
 static STREAM_UPDATE( st0016_update )
 {
-	struct st0016_info *info = param;
+	st0016_state *info = param;
 	UINT8 *sound_ram = *info->sound_ram;
 	int v, i, snum;
 	unsigned char *slot;
@@ -63,7 +79,7 @@ static STREAM_UPDATE( st0016_update )
 
 	for (v = 0; v < 8; v++)
 	{
-		slot = (unsigned char *)&st0016_sound_regs[v * 32];
+		slot = (unsigned char *)&info->regs[v * 32];
 
 		if (slot[0x16] & 0x06)
 		{
@@ -124,10 +140,10 @@ static STREAM_UPDATE( st0016_update )
 	}
 }
 
-static SND_START( st0016 )
+static DEVICE_START( st0016 )
 {
 	const st0016_interface *intf = device->static_config;
-	struct st0016_info *info = device->token;
+	st0016_state *info = get_safe_token(device);
 
 	info->sound_ram = intf->p_soundram;
 
@@ -140,34 +156,24 @@ static SND_START( st0016 )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( st0016 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( st0016 )
+DEVICE_GET_INFO( st0016 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct st0016_info); 			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(st0016_state); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( st0016 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( st0016 );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( st0016 );			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "ST0016");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Seta custom");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "ST0016");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Seta custom");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

@@ -177,15 +177,15 @@ static WRITE8_HANDLER( egghunt_soundlatch_w )
 	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 }
 
-static READ8_HANDLER( egghunt_okibanking_r )
+static READ8_DEVICE_HANDLER( egghunt_okibanking_r )
 {
 	return egghunt_okibanking;
 }
 
-static WRITE8_HANDLER( egghunt_okibanking_w )
+static WRITE8_DEVICE_HANDLER( egghunt_okibanking_w )
 {
 	egghunt_okibanking = data;
-	okim6295_set_bank_base(0, (data & 0x10) ? 0x40000 : 0);
+	okim6295_set_bank_base(device, (data & 0x10) ? 0x40000 : 0);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -218,14 +218,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe004, 0xe004) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0xe004, 0xe004) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(egghunt_okibanking_r, egghunt_okibanking_w)
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE(SOUND, "oki", egghunt_okibanking_r, egghunt_okibanking_w)
+	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 

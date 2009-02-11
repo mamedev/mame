@@ -96,15 +96,15 @@ static const int gyruss_timer[10] =
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x09, 0x0a, 0x0b, 0x0a, 0x0d
 };
 
-static READ8_HANDLER( gyruss_portA_r )
+static READ8_DEVICE_HANDLER( gyruss_portA_r )
 {
-	return gyruss_timer[(cputag_get_total_cycles(space->machine, "audio") / 1024) % 10];
+	return gyruss_timer[(cputag_get_total_cycles(device->machine, "audio") / 1024) % 10];
 }
 
 
-static WRITE8_HANDLER( gyruss_dac_w )
+static WRITE8_DEVICE_HANDLER( gyruss_dac_w )
 {
-	discrete_sound_w(space, NODE(16), data);
+	discrete_sound_w(device, NODE(16), data);
 }
 
 static WRITE8_HANDLER( gyruss_irq_clear_w )
@@ -112,7 +112,7 @@ static WRITE8_HANDLER( gyruss_irq_clear_w )
 	cputag_set_input_line(space->machine, "audio2", 0, CLEAR_LINE);
 }
 
-static void filter_w(const address_space *space, int chip, int data)
+static void filter_w(const device_config *device, int chip, int data)
 {
 	int i;
 
@@ -121,19 +121,19 @@ static void filter_w(const address_space *space, int chip, int data)
 	{
 		/* low bit: 47000pF = 0.047uF */
 		/* high bit: 220000pF = 0.22uF */
-		discrete_sound_w(space, NODE(3 * chip + i + 21), data & 3);
+		discrete_sound_w(device, NODE(3 * chip + i + 21), data & 3);
 		data >>= 2;
 	}
 }
 
-static WRITE8_HANDLER( gyruss_filter0_w )
+static WRITE8_DEVICE_HANDLER( gyruss_filter0_w )
 {
-	filter_w(space, 0,data);
+	filter_w(device, 0,data);
 }
 
-static WRITE8_HANDLER( gyruss_filter1_w )
+static WRITE8_DEVICE_HANDLER( gyruss_filter1_w )
 {
-	filter_w(space, 1,data);
+	filter_w(device, 1,data);
 }
 
 
@@ -183,21 +183,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_1_w)
-  	AM_RANGE(0x05, 0x05) AM_READ(ay8910_read_port_1_r)
-	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_control_port_2_w)
-	AM_RANGE(0x09, 0x09) AM_READ(ay8910_read_port_2_r)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(ay8910_write_port_2_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(ay8910_control_port_3_w)
-  	AM_RANGE(0x0d, 0x0d) AM_READ(ay8910_read_port_3_r)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(ay8910_write_port_3_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_4_w)
-  	AM_RANGE(0x11, 0x11) AM_READ(ay8910_read_port_4_r)
-	AM_RANGE(0x12, 0x12) AM_WRITE(ay8910_write_port_4_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+  	AM_RANGE(0x05, 0x05) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE(SOUND, "ay3", ay8910_address_w)
+	AM_RANGE(0x09, 0x09) AM_DEVREAD(SOUND, "ay3", ay8910_r)
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE(SOUND, "ay3", ay8910_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE(SOUND, "ay4", ay8910_address_w)
+  	AM_RANGE(0x0d, 0x0d) AM_DEVREAD(SOUND, "ay4", ay8910_r)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE(SOUND, "ay4", ay8910_data_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "ay5", ay8910_address_w)
+  	AM_RANGE(0x11, 0x11) AM_DEVREAD(SOUND, "ay5", ay8910_r)
+	AM_RANGE(0x12, 0x12) AM_DEVWRITE(SOUND, "ay5", ay8910_data_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(gyruss_i8039_irq_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
@@ -208,7 +208,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(gyruss_dac_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(SOUND, "discrete", gyruss_dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)
 ADDRESS_MAP_END
 
@@ -363,50 +363,50 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	NULL,
-	NULL,
-	NULL,
-	gyruss_filter0_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SOUND, "discrete", gyruss_filter0_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	NULL,
-	NULL,
-	NULL,
-	gyruss_filter1_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SOUND, "discrete", gyruss_filter1_w)
 };
 
 static const ay8910_interface ay8910_interface_3 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	gyruss_portA_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_HANDLER(gyruss_portA_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface ay8910_interface_4 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface ay8910_interface_5 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const discrete_mixer_desc konami_right_mixer_desc =
@@ -543,35 +543,35 @@ static MACHINE_DRIVER_START( gyruss )
 
 	MDRV_SOUND_ADD("ay1", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
-	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
-	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
-	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
-	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
+	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
+	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
 
 	MDRV_SOUND_ADD("ay3", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_3)
-	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 6)
-	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 7)
-	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 8)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 6)
+	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 7)
+	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 8)
 
 	MDRV_SOUND_ADD("ay4", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_4)
-	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 9)
-	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 10)
-	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 11)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 9)
+	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 10)
+	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 11)
 
 	MDRV_SOUND_ADD("ay5", AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_5)
-	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 12)
-	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 13)
-	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 14)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 12)
+	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 13)
+	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 14)
 
-	MDRV_SOUND_ADD("konami", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(gyruss_sound)
 	MDRV_SOUND_ROUTE(0, "right", 1.0)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

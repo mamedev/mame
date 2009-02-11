@@ -311,15 +311,9 @@ static WRITE8_DEVICE_HANDLER( sindbadm_misc_w )
 
 
 /* the data lines are flipped */
-static WRITE8_HANDLER( sindbadm_SN76496_0_w )
+static WRITE8_DEVICE_HANDLER( sindbadm_SN76496_w )
 {
-	sn76496_0_w(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
-}
-
-
-static WRITE8_HANDLER( sindbadm_SN76496_1_w )
-{
-	sn76496_1_w(space, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+	sn76496_w(device, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
 
 
@@ -397,8 +391,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sindbadm_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_SN76496_0_w)
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_WRITE(sindbadm_SN76496_1_w)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "sn1", sindbadm_SN76496_w)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "sn2", sindbadm_SN76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

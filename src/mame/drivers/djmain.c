@@ -169,44 +169,24 @@ static WRITE32_HANDLER( sndram_w )
 
 //---------
 
-static READ16_HANDLER( dual539_16_r )
+static READ16_HANDLER( dual539_r )
 {
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_1_r(space, offset);
+		ret |= k054539_r(devtag_get_device(space->machine, SOUND, "konami2"), offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_0_r(space, offset)<<8;
+		ret |= k054539_r(devtag_get_device(space->machine, SOUND, "konami1"), offset)<<8;
 
 	return ret;
 }
 
-static WRITE16_HANDLER( dual539_16_w )
+static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_1_w(space, offset, data);
+		k054539_w(devtag_get_device(space->machine, SOUND, "konami2"), offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_0_w(space, offset, data>>8);
-}
-
-static READ32_HANDLER( dual539_r )
-{
-	UINT32 data = 0;
-
-	if (ACCESSING_BITS_16_31)
-		data |= dual539_16_r(space, offset * 2, mem_mask >> 16) << 16;
-	if (ACCESSING_BITS_0_15)
-		data |= dual539_16_r(space, offset * 2 + 1, mem_mask);
-
-	return data;
-}
-
-static WRITE32_HANDLER( dual539_w )
-{
-	if (ACCESSING_BITS_16_31)
-		dual539_16_w(space, offset * 2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15)
-		dual539_16_w(space, offset * 2 + 1, data, mem_mask);
+		k054539_w(devtag_get_device(space->machine, SOUND, "konami1"), offset, data>>8);
 }
 
 
@@ -485,7 +465,7 @@ static ADDRESS_MAP_START( memory_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x580000, 0x58003f) AM_READWRITE(K056832_long_r, K056832_long_w)		// VIDEO REG (tilemap)
 	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)					// ??
 	AM_RANGE(0x5a0000, 0x5a005f) AM_WRITE(K055555_long_w)					// 055555: priority encoder
-	AM_RANGE(0x5b0000, 0x5b04ff) AM_READWRITE(dual539_r, dual539_w)				// SOUND regs
+	AM_RANGE(0x5b0000, 0x5b04ff) AM_READWRITE16(dual539_r, dual539_w, 0xffffffff)				// SOUND regs
 	AM_RANGE(0x5c0000, 0x5c0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x5c8000, 0x5c8003) AM_READ_PORT("DSW")
 	AM_RANGE(0x5d0000, 0x5d0003) AM_WRITE(light_ctrl_1_w)					// light/coin blocker control

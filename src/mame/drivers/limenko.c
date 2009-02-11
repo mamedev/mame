@@ -208,11 +208,11 @@ static READ8_HANDLER( spotty_sound_r )
 	if(spotty_sound_cmd == 0xf7)
 		return soundlatch_r(space,0);
 	else
-		return okim6295_status_0_r(space,0);
+		return okim6295_r(devtag_get_device(space->machine, SOUND, "oki"),0);
 }
 
 static ADDRESS_MAP_START( spotty_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(spotty_sound_r, okim6295_data_0_w) //? sound latch and ?
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(spotty_sound_r) AM_DEVWRITE(SOUND, "oki", okim6295_w) //? sound latch and ?
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
 ADDRESS_MAP_END
 

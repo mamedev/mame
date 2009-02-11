@@ -104,9 +104,8 @@ $8000 - $ffff   ROM
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 #include "sound/okim6295.h"
-#include "sound/custom.h"
 
 extern VIDEO_UPDATE( renegade );
 extern VIDEO_START( renegade );
@@ -165,16 +164,31 @@ static STREAM_UPDATE( renegade_adpcm_callback )
 	}
 }
 
-static CUSTOM_START( renegade_adpcm_start )
+static DEVICE_START( renegade_adpcm )
 {
 	running_machine *machine = device->machine;
 	struct renegade_adpcm_state *state = &renegade_adpcm;
 	state->playing = 0;
-	state->stream = stream_create(device, 0, 1, clock, state, renegade_adpcm_callback);
+	state->stream = stream_create(device, 0, 1, device->clock, state, renegade_adpcm_callback);
 	state->base = memory_region(machine, "adpcm");
 	reset_adpcm(&state->adpcm);
-	return state;
 }
+
+static DEVICE_GET_INFO( renegade_adpcm )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(renegade_adpcm);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Renegade Custom ADPCM");		break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+#define SOUND_RENEGADE_ADPCM DEVICE_GET_INFO_NAME(renegade_adpcm)
+
 
 static WRITE8_HANDLER( adpcm_play_w )
 {
@@ -555,7 +569,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ(ym3526_status_port_0_r)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREAD(SOUND, "ym", ym3526_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -563,8 +577,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(SMH_NOP) // this gets written the same values as 0x2000
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_play_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(ym3526_control_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE(SOUND, "ym", ym3526_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP) /* adpcm related? stereo pan? */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -764,19 +777,14 @@ GFXDECODE_END
 
 
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, linestate);
+	cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =
 {
 	irqhandler
-};
-
-static const custom_sound_interface adpcm_interface =
-{
-	renegade_adpcm_start
 };
 
 
@@ -821,8 +829,7 @@ static MACHINE_DRIVER_START( renegade )
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("adpcm", CUSTOM, 8000)
-	MDRV_SOUND_CONFIG(adpcm_interface)
+	MDRV_SOUND_ADD("adpcm", RENEGADE_ADPCM, 8000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

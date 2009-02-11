@@ -53,10 +53,11 @@ static const device_config *jsacpu;
 static const char *test_port;
 static UINT16 test_mask;
 
-static UINT8 has_pokey;
-static UINT8 has_ym2151;
-static UINT8 has_tms5220;
-static UINT8 has_oki6295;
+static const device_config *pokey;
+static const device_config *ym2151;
+static const device_config *tms5220;
+static const device_config *oki6295;
+static const device_config *oki6295_l, *oki6295_r;
 
 static UINT32 oki6295_bank_base;
 
@@ -106,7 +107,6 @@ static void init_save_state(running_machine *machine)
 
 void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 {
-	int i;
 	UINT8 *rgn;
 
 	/* copy in the parameters */
@@ -121,23 +121,16 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	bank_source_data = &rgn[0x10000];
 
 	/* determine which sound hardware is installed */
-	has_tms5220 = has_oki6295 = has_pokey = has_ym2151 = 0;
-	for (i = 0; i < MAX_SOUND; i++)
-	{
-		sound_type type = machine->config->sound[i].type;
-		if (type == SOUND_TMS5220)
-			has_tms5220 = 1;
-		if (type == SOUND_OKIM6295)
-			has_oki6295 = 1;
-		if (type == SOUND_POKEY)
-			has_pokey = 1;
-		if (type == SOUND_YM2151)
-			has_ym2151 = 1;
-	}
+	tms5220 = devtag_get_device(machine, SOUND, "tms");
+	ym2151 = devtag_get_device(machine, SOUND, "ym");
+	pokey = devtag_get_device(machine, SOUND, "pokey");
+	oki6295 = devtag_get_device(machine, SOUND, "adpcm");
+	oki6295_l = devtag_get_device(machine, SOUND, "adpcml");
+	oki6295_r = devtag_get_device(machine, SOUND, "adpcmr");
 
 	/* install POKEY memory handlers */
-	if (has_pokey)
-		memory_install_readwrite8_handler(cpu_get_address_space(jsacpu, ADDRESS_SPACE_PROGRAM), 0x2c00, 0x2c0f, 0, 0, pokey1_r, pokey1_w);
+	if (pokey != NULL)
+		memory_install_readwrite8_device_handler(cpu_get_address_space(jsacpu, ADDRESS_SPACE_PROGRAM), pokey, 0x2c00, 0x2c0f, 0, 0, pokey_r, pokey_w);
 
 	init_save_state(machine);
 	atarijsa_reset();
@@ -223,7 +216,7 @@ static READ8_HANDLER( jsa1_io_r )
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x80;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
-			if (!has_tms5220 || tms5220_ready_r()) result ^= 0x10;
+			if (tms5220 == NULL || tms5220_ready_r(tms5220)) result ^= 0x10;
 			break;
 
 		case 0x006:		/* /IRQACK */
@@ -276,14 +269,14 @@ static WRITE8_HANDLER( jsa1_io_w )
             */
 
 			/* handle TMS5220 I/O */
-			if (has_tms5220)
+			if (tms5220 != NULL)
 			{
 				int count;
 
 				if (((data ^ last_ctl) & 0x02) && (data & 0x02))
-					tms5220_data_w(space, 0, speech_data);
+					tms5220_data_w(tms5220, 0, speech_data);
 				count = 5 | ((data >> 2) & 2);
-				tms5220_set_frequency(JSA_MASTER_CLOCK*2 / (16 - count));
+				tms5220_set_frequency(tms5220, JSA_MASTER_CLOCK*2 / (16 - count));
 			}
 
 			/* coin counters */
@@ -325,8 +318,8 @@ static READ8_HANDLER( jsa2_io_r )
 	switch (offset & 0x206)
 	{
 		case 0x000:		/* /RDV */
-			if (has_oki6295)
-				result = okim6295_status_0_r(space, offset);
+			if (oki6295 != NULL)
+				result = okim6295_r(oki6295, offset);
 			else
 				logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
@@ -383,8 +376,8 @@ static WRITE8_HANDLER( jsa2_io_w )
 			break;
 
 		case 0x200:		/* /WRV */
-			if (has_oki6295)
-				okim6295_data_0_w(space, offset, data);
+			if (oki6295 != NULL)
+				okim6295_w(oki6295, offset, data);
 			else
 				logerror("atarijsa: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
@@ -413,7 +406,8 @@ static WRITE8_HANDLER( jsa2_io_w )
 			coin_counter_w(0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			if (has_oki6295) okim6295_set_pin7(0, data & 8);
+			if (oki6295 != NULL)
+				okim6295_set_pin7(oki6295, data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -446,8 +440,8 @@ static READ8_HANDLER( jsa3_io_r )
 	switch (offset & 0x206)
 	{
 		case 0x000:		/* /RDV */
-			if (has_oki6295)
-				result = okim6295_status_0_r(space, offset);
+			if (oki6295 != NULL)
+				result = okim6295_r(oki6295, offset);
 			break;
 
 		case 0x002:		/* /RDP */
@@ -506,8 +500,8 @@ static WRITE8_HANDLER( jsa3_io_w )
 			break;
 
 		case 0x200:		/* /WRV */
-			if (has_oki6295)
-				okim6295_data_0_w(space, offset, data);
+			if (oki6295 != NULL)
+				okim6295_w(oki6295, offset, data);
 			break;
 
 		case 0x202:		/* /WRP */
@@ -526,9 +520,8 @@ static WRITE8_HANDLER( jsa3_io_w )
             */
 
 			/* update the OKI bank */
-
 			oki6295_bank_base = (0x40000 * ((data >> 1) & 1)) | (oki6295_bank_base & 0x80000);
-			if (has_oki6295) okim6295_set_bank_base(0, oki6295_bank_base);
+			if (oki6295 != NULL) okim6295_set_bank_base(oki6295, oki6295_bank_base);
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -539,7 +532,8 @@ static WRITE8_HANDLER( jsa3_io_w )
 			coin_counter_w(0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			if (has_oki6295) okim6295_set_pin7(0, data & 8);
+			if (oki6295_l != NULL) okim6295_set_pin7(oki6295_l, data & 8);
+			if (oki6295_r != NULL) okim6295_set_pin7(oki6295_r, data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -553,7 +547,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 			/* update the OKI bank */
 			oki6295_bank_base = (0x80000 * ((data >> 4) & 1)) | (oki6295_bank_base & 0x40000);
-			if (has_oki6295) okim6295_set_bank_base(0, oki6295_bank_base);
+			if (oki6295 != NULL) okim6295_set_bank_base(oki6295, oki6295_bank_base);
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -578,13 +572,8 @@ static READ8_HANDLER( jsa3s_io_r )
 	switch (offset & 0x206)
 	{
 		case 0x000:		/* /RDV */
-			if (has_oki6295)
-			{
-				if (offset & 1)
-					result = okim6295_status_1_r(space, offset);
-				else
-					result = okim6295_status_0_r(space, offset);
-			}
+			if (oki6295_l != NULL)
+				result = okim6295_r((offset & 1) ? oki6295_r : oki6295_l, offset);
 			break;
 
 		case 0x002:		/* /RDP */
@@ -643,13 +632,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			break;
 
 		case 0x200:		/* /WRV */
-			if (has_oki6295)
-			{
-				if (offset & 1)
-					okim6295_data_1_w(space, offset, data);
-				else
-					okim6295_data_0_w(space, offset, data);
-			}
+			if (oki6295_l != NULL)
+				okim6295_w((offset & 1) ? oki6295_r : oki6295_l, 0, data);
 			break;
 
 		case 0x202:		/* /WRP */
@@ -669,7 +653,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 			/* update the OKI bank */
 			oki6295_bank_base = (0x40000 * ((data >> 1) & 1)) | (oki6295_bank_base & 0x80000);
-			okim6295_set_bank_base(0, oki6295_bank_base);
+			okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "adpcml"), oki6295_bank_base);
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -680,8 +664,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			coin_counter_w(0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			okim6295_set_pin7(0, data & 8);
-			okim6295_set_pin7(1, data & 8);
+			okim6295_set_pin7(oki6295_l, data & 8);
+			okim6295_set_pin7(oki6295_r, data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -695,8 +679,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 			/* update the OKI bank */
 			oki6295_bank_base = (0x80000 * ((data >> 4) & 1)) | (oki6295_bank_base & 0x40000);
-			okim6295_set_bank_base(0, oki6295_bank_base);
-			okim6295_set_bank_base(1, 0x40000 * (data >> 6));
+			okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "adpcml"), oki6295_bank_base);
+			okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "adpcmr"), 0x40000 * (data >> 6));
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -716,10 +700,10 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 static void update_all_volumes(running_machine *machine )
 {
-	if (has_pokey) atarigen_set_pokey_vol(machine, overall_volume * pokey_volume / 100);
-	if (has_ym2151) atarigen_set_ym2151_vol(machine, overall_volume * ym2151_volume / 100);
-	if (has_tms5220) atarigen_set_tms5220_vol(machine, overall_volume * tms5220_volume / 100);
-	if (has_oki6295) atarigen_set_oki6295_vol(machine, overall_volume * oki6295_volume / 100);
+	if (pokey != NULL) atarigen_set_pokey_vol(machine, overall_volume * pokey_volume / 100);
+	if (ym2151 != NULL) atarigen_set_ym2151_vol(machine, overall_volume * ym2151_volume / 100);
+	if (tms5220 != NULL) atarigen_set_tms5220_vol(machine, overall_volume * tms5220_volume / 100);
+	if (oki6295 != NULL || oki6295_l != NULL || oki6295_r != NULL) atarigen_set_oki6295_vol(machine, overall_volume * oki6295_volume / 100);
 }
 
 
@@ -732,9 +716,7 @@ static void update_all_volumes(running_machine *machine )
 
 static ADDRESS_MAP_START( atarijsa1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x2000, 0x2001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa1_io_r, jsa1_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -742,9 +724,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atarijsa2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x2000, 0x2001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa2_io_r, jsa2_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -753,9 +733,7 @@ ADDRESS_MAP_END
 /* full map verified from schematics and Batman GALs */
 static ADDRESS_MAP_START( atarijsa3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07fe) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x07fe) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3_io_r, jsa3_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -763,9 +741,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atarijsa3s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07fe) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x07fe) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3s_io_r, jsa3s_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END

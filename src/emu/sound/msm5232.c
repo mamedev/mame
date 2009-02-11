@@ -71,9 +71,20 @@ typedef struct {
 	int		rate;		/* sample rate in Hz */
 
 	double	external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
-	void (*gate_handler)(int state);	/* callback called when the GATE output pin changes state */
+	const device_config *device;
+	void (*gate_handler)(const device_config *device, int state);	/* callback called when the GATE output pin changes state */
 
 } MSM5232;
+
+
+INLINE MSM5232 *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_MSM5232);
+	return (MSM5232 *)device->token;
+}
 
 
 /* Default chip clock is 2119040 Hz */
@@ -250,9 +261,6 @@ static void msm5232_init_voice(MSM5232 *chip, int i)
 }
 
 
-static void msm5232_write(MSM5232 *chip, int ofst, int data);
-
-
 static void msm5232_gate_update(MSM5232 *chip)
 {
 	int new_state = (chip->control2 & 0x20) ? chip->voi[7].GF : 0;
@@ -260,19 +268,20 @@ static void msm5232_gate_update(MSM5232 *chip)
 	if (chip->gate != new_state && chip->gate_handler)
 	{
 		chip->gate = new_state;
-		(*chip->gate_handler)(new_state);
+		(*chip->gate_handler)(chip->device, new_state);
 	}
 }
 
 
-static void msm5232_reset(MSM5232 *chip)
+static DEVICE_RESET( msm5232 )
 {
+	MSM5232 *chip = get_safe_token(device);
 	int i;
 
 	for (i=0; i<8; i++)
 	{
-		msm5232_write(chip,i,0x80);
-		msm5232_write(chip,i,0x00);
+		msm5232_w(device,i,0x80);
+		msm5232_w(device,i,0x00);
 	}
 	chip->noise_cnt		= 0;
 	chip->noise_rng		= 1;
@@ -291,11 +300,6 @@ static void msm5232_reset(MSM5232 *chip)
 	chip->EN_out2[1]	= 0;
 
 	msm5232_gate_update(chip);
-}
-
-static SND_RESET( msm5232 )
-{
-	msm5232_reset(device->token);
 }
 
 static void msm5232_init(MSM5232 *chip, const msm5232_interface *intf, int clock, int rate)
@@ -319,10 +323,9 @@ static void msm5232_init(MSM5232 *chip, const msm5232_interface *intf, int clock
 		memset(&chip->voi[j],0,sizeof(VOICE));
 		msm5232_init_voice(chip,j);
 	}
-	msm5232_reset( chip );
 }
 
-static void msm5232_shutdown(void *chip)
+static DEVICE_STOP( msm5232 )
 {
 #ifdef SAVE_SAMPLE
 	fclose(sample[8]);
@@ -339,14 +342,18 @@ static void msm5232_shutdown(void *chip)
 #endif
 }
 
-static void msm5232_write(MSM5232 *chip, int ofst, int data)
+WRITE8_DEVICE_HANDLER( msm5232_w )
 {
-	if (ofst > 0x0d)
+	MSM5232 *chip = get_safe_token(device);
+
+	if (offset > 0x0d)
 		return;
 
-	if (ofst < 0x08) /* pitch */
+	stream_update (chip->stream);
+
+	if (offset < 0x08) /* pitch */
 	{
-		int ch = ofst&7;
+		int ch = offset&7;
 
 		chip->voi[ch].GF = ((data&0x80)>>7);
 		if (ch == 7)
@@ -402,7 +409,7 @@ static void msm5232_write(MSM5232 *chip, int ofst, int data)
 	else
 	{
 		int i;
-		switch(ofst)
+		switch(offset)
 		{
 		case 0x08:	/* group1 attack */
 			for (i=0; i<4; i++)
@@ -778,39 +785,22 @@ static STREAM_UPDATE( MSM5232_update_one )
 
 /* MAME Interface */
 
-static SND_START( msm5232 )
+static DEVICE_START( msm5232 )
 {
 	const msm5232_interface *intf = device->static_config;
-	int rate = clock/CLOCK_RATE_DIVIDER;
+	int rate = device->clock/CLOCK_RATE_DIVIDER;
 	MSM5232 *chip = device->token;
+	
+	chip->device = device;
 
-	msm5232_init(chip, intf, clock, rate);
+	msm5232_init(chip, intf, device->clock, rate);
 
 	chip->stream = stream_create(device,0,11,rate,chip,MSM5232_update_one);
 }
 
-static SND_STOP( msm5232 )
+void msm5232_set_clock(const device_config *device, int clock)
 {
-	msm5232_shutdown(device->token);
-}
-
-WRITE8_HANDLER ( msm5232_0_w )
-{
-	MSM5232 *chip = sndti_token(SOUND_MSM5232, 0);
-	stream_update (chip->stream);
-	msm5232_write(chip, offset, data);
-}
-
-WRITE8_HANDLER ( msm5232_1_w )
-{
-	MSM5232 *chip = sndti_token(SOUND_MSM5232, 1);
-	stream_update (chip->stream);
-	msm5232_write(chip, offset, data);
-}
-
-void msm5232_set_clock(void *_chip, int clock)
-{
-	MSM5232 *chip = _chip;
+	MSM5232 *chip = get_safe_token(device);
 
 	if (chip->clock != clock)
 	{
@@ -828,34 +818,24 @@ void msm5232_set_clock(void *_chip, int clock)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( msm5232 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( msm5232 )
+DEVICE_GET_INFO( msm5232 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(MSM5232);						break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(MSM5232);						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( msm5232 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( msm5232 );		break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( msm5232 );			break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( msm5232 );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( msm5232 );		break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( msm5232 );			break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( msm5232 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "MSM5232");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Oki Tone");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MSM5232");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Oki Tone");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.1");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

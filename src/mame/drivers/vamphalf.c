@@ -43,74 +43,18 @@ static UINT16 semicom_prot_data[2];
 static UINT16 finalgdr_backupram_bank = 1;
 static UINT8 *finalgdr_backupram;
 
-static READ16_HANDLER( oki_r )
+static READ16_DEVICE_HANDLER( oki_r )
 {
 	if(offset)
-		return okim6295_status_0_r(space, 0);
+		return okim6295_r(device, 0);
 	else
 		return 0;
 }
 
-static WRITE16_HANDLER( oki_w )
+static WRITE16_DEVICE_HANDLER( oki_w )
 {
 	if(offset)
-		okim6295_data_0_w(space, 0, data);
-}
-
-static READ32_HANDLER( oki32_r )
-{
-	return okim6295_status_0_r(space, 0) << 8;
-}
-
-static WRITE32_HANDLER( oki32_w )
-{
-	okim6295_data_0_w(space, 0, (data >> 8) & 0xff);
-}
-
-static READ32_HANDLER( oki32_2_r )
-{
-	return okim6295_status_1_r(space, 0) << 8;
-}
-
-static WRITE32_HANDLER( oki32_2_w )
-{
-	okim6295_data_1_w(space, 0, (data >> 8) & 0xff);
-}
-
-
-static READ16_HANDLER( ym2151_status_r )
-{
-	if(offset)
-		return ym2151_status_port_0_r(space, 0);
-	else
-		return 0;
-}
-
-static WRITE16_HANDLER( ym2151_data_w )
-{
-	if(offset)
-		ym2151_data_port_0_w(space, 0, data);
-}
-
-static WRITE16_HANDLER( ym2151_register_w )
-{
-	if(offset)
-		ym2151_register_port_0_w(space, 0, data);
-}
-
-static READ32_HANDLER( ym2151_status32_r )
-{
-	return ym2151_status_port_0_r(space, 0) << 8;
-}
-
-static WRITE32_HANDLER( ym2151_data32_w )
-{
-	ym2151_data_port_0_w(space, 0, (data >> 8) & 0xff);
-}
-
-static WRITE32_HANDLER( ym2151_register32_w )
-{
-	ym2151_register_port_0_w(space, 0, (data >> 8) & 0xff);
+		okim6295_w(device, 0, data);
 }
 
 static READ16_HANDLER( eeprom_r )
@@ -210,9 +154,9 @@ F94B
 	semicom_prot_idx = 8;
 }
 
-static WRITE32_HANDLER( finalgdr_oki_bank_w )
+static WRITE32_DEVICE_HANDLER( finalgdr_oki_bank_w )
 {
-	okim6295_set_bank_base(0, 0x40000 * ((data & 0x300) >> 8));
+	okim6295_set_bank_base(device, 0x40000 * ((data & 0x300) >> 8));
 }
 
 static WRITE32_HANDLER( finalgdr_backupram_bank_w )
@@ -248,9 +192,9 @@ static WRITE32_HANDLER( finalgdr_prize_w )
 	}
 }
 
-static WRITE32_HANDLER( aoh_oki_2_bank_w )
+static WRITE32_DEVICE_HANDLER( aoh_oki_bank_w )
 {
-	okim6295_set_bank_base(1, 0x40000 * (data & 0x3));
+	okim6295_set_bank_base(device, 0x40000 * (data & 0x3));
 }
 
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -268,9 +212,9 @@ static ADDRESS_MAP_START( common_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vamphalf_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x0c0, 0x0c3) AM_READWRITE(oki_r, oki_w)
-	AM_RANGE(0x140, 0x143) AM_WRITE(ym2151_register_w)
-	AM_RANGE(0x144, 0x147) AM_READWRITE(ym2151_status_r, ym2151_data_w)
+	AM_RANGE(0x0c0, 0x0c3) AM_DEVREADWRITE(SOUND, "oki", oki_r, oki_w)
+	AM_RANGE(0x140, 0x143) AM_DEVWRITE8(SOUND, "ym", ym2151_register_port_w, 0x00ff)
+	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8(SOUND, "ym", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 	AM_RANGE(0x1c0, 0x1c3) AM_READ(eeprom_r)
 	AM_RANGE(0x240, 0x243) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x600, 0x603) AM_READ_PORT("SYSTEM")
@@ -291,9 +235,9 @@ static ADDRESS_MAP_START( coolmini_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x308, 0x30b) AM_WRITE(eeprom_w)
-	AM_RANGE(0x4c0, 0x4c3) AM_READWRITE(oki_r, oki_w)
-	AM_RANGE(0x540, 0x543) AM_WRITE(ym2151_register_w)
-	AM_RANGE(0x544, 0x547) AM_READWRITE(ym2151_status_r, ym2151_data_w)
+	AM_RANGE(0x4c0, 0x4c3) AM_DEVREADWRITE(SOUND, "oki", oki_r, oki_w)
+	AM_RANGE(0x540, 0x543) AM_DEVWRITE8(SOUND, "ym", ym2151_register_port_w, 0x00ff)
+	AM_RANGE(0x546, 0x547) AM_DEVREADWRITE8(SOUND, "ym", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 	AM_RANGE(0x7c0, 0x7c3) AM_READ(eeprom_r)
 ADDRESS_MAP_END
 
@@ -301,9 +245,9 @@ static ADDRESS_MAP_START( suplup_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x020, 0x023) AM_WRITE(eeprom_w)
 	AM_RANGE(0x040, 0x043) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x060, 0x063) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x080, 0x083) AM_READWRITE(oki_r, oki_w)
-	AM_RANGE(0x0c0, 0x0c3) AM_WRITE(ym2151_register_w)
-	AM_RANGE(0x0c4, 0x0c7) AM_READWRITE(ym2151_status_r, ym2151_data_w)
+	AM_RANGE(0x080, 0x083) AM_DEVREADWRITE(SOUND, "oki", oki_r, oki_w)
+	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8(SOUND, "ym", ym2151_register_port_w, 0x00ff)
+	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8(SOUND, "ym", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 	AM_RANGE(0x100, 0x103) AM_READ(eeprom_r)
 ADDRESS_MAP_END
 
@@ -321,10 +265,9 @@ static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x2400, 0x2403) AM_READ(finalgdr_prot_r)
 	AM_RANGE(0x2800, 0x2803) AM_WRITE(finalgdr_backupram_bank_w)
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
-	AM_RANGE(0x3000, 0x3003) AM_WRITE(ym2151_register32_w)
-	AM_RANGE(0x3004, 0x3007) AM_READWRITE(ym2151_status32_r, ym2151_data32_w)
+	AM_RANGE(0x3000, 0x3007) AM_DEVREADWRITE8(SOUND, "ym", ym2151_r, ym2151_w, 0x0000ff00)
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x3400, 0x3403) AM_READWRITE(oki32_r, oki32_w)
+	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x0000ff00)
 	AM_RANGE(0x3c00, 0x3c03) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x4400, 0x4403) AM_READ(eeprom32_r)
 	AM_RANGE(0x6000, 0x6003) AM_READNOP //?
@@ -332,7 +275,7 @@ static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x6040, 0x6043) AM_WRITE(finalgdr_prot_w)
 	//AM_RANGE(0x6080, 0x6083) AM_WRITE(flipscreen32_w) //?
 	AM_RANGE(0x6060, 0x6063) AM_WRITE(finalgdr_prize_w)
-	AM_RANGE(0x60a0, 0x60a3) AM_WRITE(finalgdr_oki_bank_w)
+	AM_RANGE(0x60a0, 0x60a3) AM_DEVWRITE(SOUND, "oki", finalgdr_oki_bank_w)
 ADDRESS_MAP_END
 
 
@@ -347,11 +290,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0480, 0x0483) AM_WRITE(eeprom32_w)
-	AM_RANGE(0x0620, 0x0623) AM_READWRITE(oki32_2_r, oki32_2_w)
-	AM_RANGE(0x0660, 0x0663) AM_READWRITE(oki32_r, oki32_w)
-	AM_RANGE(0x0640, 0x0643) AM_WRITE(ym2151_register32_w)
-	AM_RANGE(0x0644, 0x0647) AM_READWRITE(ym2151_status32_r, ym2151_data32_w)
-	AM_RANGE(0x0680, 0x0683) AM_WRITE(aoh_oki_2_bank_w)
+	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8(SOUND, "oki_2", okim6295_r, okim6295_w, 0x0000ff00)
+	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8(SOUND, "oki_1", okim6295_r, okim6295_w, 0x0000ff00)
+	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8(SOUND, "ym", ym2151_r, ym2151_w, 0x0000ff00)
+	AM_RANGE(0x0680, 0x0683) AM_DEVWRITE(SOUND, "oki_2", aoh_oki_bank_w)
 ADDRESS_MAP_END
 
 /*

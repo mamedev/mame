@@ -19,7 +19,6 @@ gorf_sh_ update- Null
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "sound/custom.h"
 #include "sound/samples.h"
 #include "includes/astrocde.h"
 
@@ -117,6 +116,7 @@ static int plural = 0;
 
 READ8_HANDLER( gorf_speech_r )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
     int Phoneme,Intonation;
     int i = 0;
 
@@ -131,7 +131,7 @@ READ8_HANDLER( gorf_speech_r )
     logerror("Date : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
 
 	 if(Phoneme==63) {
-   		sample_stop(0);
+   		sample_stop(samples, 0);
                 if (strlen(totalword)>2) logerror("Clearing sample %s\n",totalword);
                 totalword[0] = 0;				   /* Clear the total word stack */
 					 return data;
@@ -144,8 +144,8 @@ READ8_HANDLER( gorf_speech_r )
 		 if (plural != 0) {
 			 logerror("found a possible plural at %d\n",plural-1);
 			 if (!strcmp("S",totalword)) {		   /* Plural check */
-				 sample_start(0, num_samples-2, 0);	   /* play the sample at position of word */
-				 sample_set_freq(0, 11025);    /* play at correct rate */
+				 sample_start(samples, 0, num_samples-2, 0);	   /* play the sample at position of word */
+				 sample_set_freq(samples, 0, 11025);    /* play at correct rate */
 				 totalword[0] = 0;				   /* Clear the total word stack */
 				 oldword[0] = 0;				   /* Clear the total word stack */
 				 return data;
@@ -167,8 +167,8 @@ READ8_HANDLER( gorf_speech_r )
 			 } else {
              plural=0;
           }
-          sample_start(0, i, 0);	                   /* play the sample at position of word */
-          sample_set_freq(0, 11025);       /* play at correct rate */
+          sample_start(samples, 0, i, 0);	                   /* play the sample at position of word */
+          sample_set_freq(samples, 0, 11025);       /* play at correct rate */
           logerror("Playing sample %d",i);
           totalword[0] = 0;				   /* Clear the total word stack */
           return data;
@@ -182,5 +182,6 @@ READ8_HANDLER( gorf_speech_r )
 
 CUSTOM_INPUT( gorf_speech_status_r )
 {
-	return !sample_playing(0);
+	const device_config *samples = devtag_get_device(field->port->machine, SOUND, "samples");
+	return !sample_playing(samples, 0);
 }

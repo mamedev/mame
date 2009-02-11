@@ -593,7 +593,7 @@ WRITE32_HANDLER(memc_w)
 				else
 				{
 					timer_adjust_oneshot(snd_timer, attotime_never, 0);
-					dac_signed_data_w(0, 0x80);
+					dac_signed_data_w(devtag_get_device(space->machine, SOUND, "dac"), 0x80);
 				}
 				break;
 

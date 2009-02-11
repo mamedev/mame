@@ -207,9 +207,9 @@ static READ8_HANDLER( dual_pokey_r )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		return pokey1_r(space, pokey_reg);
+		return pokey_r(devtag_get_device(space->machine, SOUND, "pokey1"), pokey_reg);
 	else
-		return pokey2_r(space, pokey_reg);
+		return pokey_r(devtag_get_device(space->machine, SOUND, "pokey2"), pokey_reg);
 }
 
 
@@ -220,9 +220,9 @@ static WRITE8_HANDLER( dual_pokey_w )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		pokey1_w(space, pokey_reg, data);
+		pokey_w(devtag_get_device(space->machine, SOUND, "pokey1"), pokey_reg, data);
 	else
-		pokey2_w(space, pokey_reg, data);
+		pokey_w(devtag_get_device(space->machine, SOUND, "pokey2"), pokey_reg, data);
 }
 
 
@@ -240,7 +240,8 @@ static WRITE8_HANDLER( speech_data_w )
 
 static WRITE8_HANDLER( speech_strobe_w )
 {
-	tms5220_data_w(space, 0, speech_write_buffer);
+	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+	tms5220_data_w(tms, 0, speech_write_buffer);
 }
 
 /*************************************
@@ -479,8 +480,8 @@ INPUT_PORTS_END
 
 static const pokey_interface pokey_config =
 {
-	{ 0 },
-	input_port_3_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW1")
 };
 
 
@@ -514,17 +515,17 @@ static MACHINE_DRIVER_START( mhavoc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey.1", POKEY, MHAVOC_CLOCK_1_25M)
+	MDRV_SOUND_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
 	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("pokey.2", POKEY, MHAVOC_CLOCK_1_25M)
+	MDRV_SOUND_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("pokey.3", POKEY, MHAVOC_CLOCK_1_25M)
+	MDRV_SOUND_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("pokey.4", POKEY, MHAVOC_CLOCK_1_25M)
+	MDRV_SOUND_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -549,14 +550,14 @@ static MACHINE_DRIVER_START( alphaone )
 	MDRV_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("pokey.1", POKEY, MHAVOC_CLOCK_1_25M)
+	MDRV_SOUND_REPLACE("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_REPLACE("pokey.2", POKEY, MHAVOC_CLOCK_1_25M)
+	MDRV_SOUND_REPLACE("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_REMOVE("pokey.3")
-	MDRV_SOUND_REMOVE("pokey.4")
+	MDRV_SOUND_REMOVE("pokey3")
+	MDRV_SOUND_REMOVE("pokey4")
 MACHINE_DRIVER_END
 
 

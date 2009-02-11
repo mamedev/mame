@@ -400,29 +400,26 @@ static READ8_HANDLER(prot_read_700x)
  * Status from ES8712?
  * BIT1 is zero when no sample is playing?
  */
-static READ8_HANDLER(read_8010) {	return 0x00; }
+static READ8_DEVICE_HANDLER(read_8010) {	return 0x00; }
 
-static WRITE8_HANDLER(xscroll_w)
+static WRITE8_DEVICE_HANDLER(xscroll_w)
 {
 	scrollx=data;
 }
-static WRITE8_HANDLER(yscroll_w)
+static WRITE8_DEVICE_HANDLER(yscroll_w)
 {
 	scrolly=data;
 }
-
-static READ8_HANDLER(portA_r) {	return input_port_read(space->machine, "YM_PortA"); }
-static READ8_HANDLER(portB_r) {	return input_port_read(space->machine, "YM_PortB");}
 
 static const ym2203_interface ym2203_interface_0 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		portA_r,
-		portB_r,
-		NULL,
-		NULL
+		DEVCB_INPUT_PORT("YM_PortA"),
+		DEVCB_INPUT_PORT("YM_PortB"),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };
@@ -432,10 +429,10 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		xscroll_w,
-		yscroll_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(xscroll_w),
+		DEVCB_HANDLER(yscroll_w)
 	},
 	NULL
 };
@@ -443,10 +440,8 @@ static const ym2203_interface ym2203_interface_1 =
 static ADDRESS_MAP_START( map_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, UNBANKED_SIZE-1) AM_ROM
 	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
-	AM_RANGE(0x8008, 0x8008) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
-	AM_RANGE(0x8009, 0x8009) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
 	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(gfx0_vram_r, gfx0_vram_w) AM_BASE(&gfx0_vram)
 	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(gfx0_cram_r, gfx0_cram_w) AM_BASE(&gfx0_cram)
@@ -463,11 +458,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( map_sub, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
-	AM_RANGE(0x8008, 0x8008) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
-	AM_RANGE(0x8009, 0x8009) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
-	AM_RANGE(0x8010, 0x8016) AM_READWRITE(read_8010, es8712_data_0_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE(SOUND, "es", read_8010, es8712_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE(2)

@@ -224,8 +224,18 @@ static READ8_HANDLER( twin16_sres_r )
 static WRITE8_HANDLER( twin16_sres_w )
 {
 	/* bit 1 resets the UPD7795C sound chip */
-	upd7759_reset_w(0, data & 0x02);
+	upd7759_reset_w(devtag_get_device(space->machine, SOUND, "upd"), data & 0x02);
 	twin16_soundlatch = data;
+}
+
+static WRITE8_DEVICE_HANDLER( twin16_upd_start_w )
+{
+	upd7759_start_w(device, data & 1);
+}
+
+static READ8_DEVICE_HANDLER( twin16_upd_busy_r )
+{
+	return upd7759_busy_r(device) ? 1 : 0;
 }
 
 static READ16_HANDLER( cuebrckj_nvram_r )
@@ -250,12 +260,11 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(twin16_sres_r, twin16_sres_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(upd7759_0_port_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(upd7759_0_start_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(upd7759_0_busy_r, SMH_NOP)	// ??? write ???
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE(SOUND, "konami", k007232_r, k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE(SOUND, "upd", upd7759_port_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "upd", twin16_upd_start_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREAD(SOUND, "upd", twin16_upd_busy_r) AM_WRITENOP	// ??? write ???
 	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -867,10 +876,10 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static void volume_callback(int v)
+static void volume_callback(const device_config *device, int v)
 {
-	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =

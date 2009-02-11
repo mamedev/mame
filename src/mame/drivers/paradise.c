@@ -55,12 +55,11 @@ static WRITE8_HANDLER( paradise_rombank_w )
 	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + bank * 0x4000);
 }
 
-static WRITE8_HANDLER( paradise_okibank_w )
+static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
 {
-	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown oki bank bits %02X\n",cpu_get_pc(space->cpu),data);
+	if (data & ~0x02)	logerror("%s: unknown oki bank bits %02X\n",cpuexec_describe_context(device->machine),data);
 
-	if (sndti_exists(SOUND_OKIM6295, 1))
-		okim6295_set_bank_base(1, (data & 0x02) ? 0x40000 : 0);
+	okim6295_set_bank_base(device, (data & 0x02) ? 0x40000 : 0);
 }
 
 static WRITE8_HANDLER( torus_coin_counter_w )
@@ -102,14 +101,29 @@ static ADDRESS_MAP_START( paradise_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w	)	// ROM bank
-	AM_RANGE(0x2007, 0x2007) AM_WRITE(paradise_okibank_w	)	// OKI 1 samples bank
-	AM_RANGE(0x2010, 0x2010) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)	// OKI 0
+	AM_RANGE(0x2007, 0x2007) AM_DEVWRITE(SOUND, "oki2", paradise_okibank_w	)	// OKI 1 samples bank
+	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)	// OKI 0
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1"			)
 	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2"			)
 	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1"				)
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2"				)
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM"			)
-	AM_RANGE(0x2030, 0x2030) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)	// OKI 1
+	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE(SOUND, "oki2", okim6295_r, okim6295_w)	// OKI 1
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE(&videoram) 	// Pixmap
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( torus_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE(&paletteram)	// Palette
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w	)	// Layers priority
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
+	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
+	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w	)	// ROM bank
+	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)	// OKI 0
+	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1"			)
+	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2"			)
+	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1"				)
+	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2"				)
+	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM"			)
 	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE(&videoram) 	// Pixmap
 ADDRESS_MAP_END
 
@@ -572,6 +586,7 @@ static MACHINE_DRIVER_START( torus )
 	MDRV_IMPORT_FROM(paradise)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(torus_map,0)
+	MDRV_CPU_IO_MAP(torus_io_map,0)
 
 	MDRV_GFXDECODE(torus)
 
@@ -585,6 +600,7 @@ static MACHINE_DRIVER_START( madball )
 	MDRV_IMPORT_FROM(paradise)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(torus_map,0)
+	MDRV_CPU_IO_MAP(torus_io_map,0)
 
 	MDRV_GFXDECODE(madball)
 

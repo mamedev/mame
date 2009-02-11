@@ -202,7 +202,7 @@ WRITE16_HANDLER( hdsnd68k_320com_w );
 
 READ16_HANDLER( hdsnddsp_get_bio );
 
-WRITE16_HANDLER( hdsnddsp_dac_w );
+WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w );
 WRITE16_HANDLER( hdsnddsp_comport_w );
 WRITE16_HANDLER( hdsnddsp_mute_w );
 WRITE16_HANDLER( hdsnddsp_gen68kirq_w );

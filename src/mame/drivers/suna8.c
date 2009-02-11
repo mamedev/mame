@@ -964,7 +964,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hardhead_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(ym3812_status_port_0_r 	)	// ? unsure
+	AM_RANGE(0xc800, 0xc800) AM_DEVREAD(SOUND, "ym", ym3812_status_port_r)	// ? unsure
 	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
@@ -972,10 +972,8 @@ static ADDRESS_MAP_START( hardhead_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	//
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym3812_control_port_0_w	)	// YM3812
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym3812_write_port_0_w		)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(ay8910_control_port_0_w	)	// AY8910
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(ay8910_write_port_0_w		)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w		)
 ADDRESS_MAP_END
 
 
@@ -999,10 +997,8 @@ static ADDRESS_MAP_START( rranger_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	//
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_0_w	)	// YM2203
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_0_w		)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(ym2203_control_port_1_w	)	// AY8910
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(ym2203_write_port_1_w		)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym1", ym2203_w )
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE(SOUND, "ym2", ym2203_w	)
 ADDRESS_MAP_END
 
 
@@ -1018,10 +1014,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brickzn_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM					)	// ROM
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym3812_control_port_0_w	)	// YM3812
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym3812_write_port_0_w		)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(ay8910_control_port_0_w	)	// AY8910
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(ay8910_write_port_0_w		)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym3812_w	)
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w		)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w				)	// To PCM CPU
 ADDRESS_MAP_END
@@ -1039,7 +1033,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( brickzn_pcm_w )
 {
-	dac_signed_data_w( offset, (data & 0xf) * 0x11 );
+	static const char *dacs[] = { "dac1", "dac2", "dac3", "dac4" };
+	dac_signed_data_w( devtag_get_device(space->machine, SOUND, dacs[offset & 3]), (data & 0xf) * 0x11 );
 }
 
 
@@ -1451,9 +1446,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void soundirq(running_machine *machine, int state)
+static void soundirq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1], 0, state);
+	cpu_set_input_line(device->machine->cpu[1], 0, state);
 }
 
 /* In games with only 2 CPUs, port A&B of the AY8910 are used
@@ -1469,10 +1464,10 @@ static const ay8910_interface hardhead_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	suna8_play_samples_w,
-	suna8_samples_number_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SOUND, "samples", suna8_play_samples_w),
+	DEVCB_DEVICE_HANDLER(SOUND, "samples", suna8_samples_number_w)
 };
 
 static const samples_interface suna8_samples_interface =
@@ -1688,10 +1683,10 @@ static const ay8910_interface starfigh_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	suna8_play_samples_w,
-	suna8_samples_number_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SOUND, "samples", suna8_play_samples_w),
+	DEVCB_DEVICE_HANDLER(SOUND, "samples", suna8_samples_number_w)
 };
 
 static MACHINE_DRIVER_START( starfigh )

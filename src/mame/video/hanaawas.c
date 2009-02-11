@@ -78,12 +78,12 @@ WRITE8_HANDLER( hanaawas_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, (offset + (flip_screen_get(space->machine) ? -1 : 1)) & 0x03ff);
 }
 
-WRITE8_HANDLER( hanaawas_portB_w )
+WRITE8_DEVICE_HANDLER( hanaawas_portB_w )
 {
 	/* bit 7 is flip screen */
-	if (flip_screen_get(space->machine) != (~data & 0x80))
+	if (flip_screen_get(device->machine) != (~data & 0x80))
 	{
-		flip_screen_set(space->machine, ~data & 0x80);
+		flip_screen_set(device->machine, ~data & 0x80);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }

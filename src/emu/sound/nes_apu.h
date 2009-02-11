@@ -42,12 +42,10 @@ struct _nes_interface
 	const char *cpu_tag;  /* CPU tag */
 };
 
-READ8_HANDLER( nes_psg_0_r );
-READ8_HANDLER( nes_psg_1_r );
-WRITE8_HANDLER( nes_psg_0_w );
-WRITE8_HANDLER( nes_psg_1_w );
+READ8_DEVICE_HANDLER( nes_psg_r );
+WRITE8_DEVICE_HANDLER( nes_psg_w );
 
-SND_GET_INFO( nesapu );
-#define SOUND_NES SND_GET_INFO_NAME( nesapu )
+DEVICE_GET_INFO( nesapu );
+#define SOUND_NES DEVICE_GET_INFO_NAME( nesapu )
 
 #endif /* __NES_APU_H__ */

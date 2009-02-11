@@ -102,7 +102,7 @@ static WRITE8_HANDLER( firefox_disc_lock_w )
 
 static WRITE8_HANDLER( audio_enable_w )
 {
-	sndti_set_output_gain(SOUND_CUSTOM, 0, ~offset & 1, (data & 0x80) ? 1.0 : 0.0);
+	sound_set_output_gain(devtag_get_device(space->machine, SOUND, "ldsound"), ~offset & 1, (data & 0x80) ? 1.0 : 0.0);
 }
 
 static WRITE8_HANDLER( firefox_disc_reset_w )
@@ -300,22 +300,23 @@ static UINT8 riot_porta_r(const device_config *device, UINT8 olddata)
 	/* bit 2 = TMS /ready */
 	/* bit 1 = TMS /read */
 	/* bit 0 = TMS /write */
-
-	return (main_to_sound_flag << 7) | (sound_to_main_flag << 6) | 0x10 | (!tms5220_ready_r() << 2);
+	
+	const device_config *tms = devtag_get_device(device->machine, SOUND, "tms");
+	return (main_to_sound_flag << 7) | (sound_to_main_flag << 6) | 0x10 | (!tms5220_ready_r(tms) << 2);
 }
 
 
 static void riot_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[1], ADDRESS_SPACE_PROGRAM);
+	const device_config *tms = devtag_get_device(device->machine, SOUND, "tms");
 
 	/* handle 5220 read */
 	if ((olddata & 2) != 0 && (newdata & 2) == 0)
-		riot6532_portb_in_set(device, tms5220_status_r(space, 0), 0xff);
+		riot6532_portb_in_set(device, tms5220_status_r(tms, 0), 0xff);
 
 	/* handle 5220 write */
 	if ((olddata & 1) != 0 && (newdata & 1) == 0)
-		tms5220_data_w(space, 0, riot6532_portb_out_get(device));
+		tms5220_data_w(tms, 0, riot6532_portb_out_get(device));
 }
 
 
@@ -505,10 +506,10 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x07e0) AM_DEVREADWRITE(RIOT6532,"riot",riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x1000) AM_READ(main_to_sound_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_to_main_w)
-	AM_RANGE(0x2000, 0x200f) AM_READWRITE(pokey1_r, pokey1_w)
-	AM_RANGE(0x2800, 0x280f) AM_READWRITE(pokey2_r, pokey2_w)
-	AM_RANGE(0x3000, 0x300f) AM_READWRITE(pokey3_r, pokey3_w)
-	AM_RANGE(0x3800, 0x380f) AM_READWRITE(pokey4_r, pokey4_w)
+	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE(SOUND, "pokey3", pokey_r, pokey_w)
+	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE(SOUND, "pokey4", pokey_r, pokey_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -702,8 +703,7 @@ static MACHINE_DRIVER_START( firefox )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
 
-	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 MACHINE_DRIVER_END

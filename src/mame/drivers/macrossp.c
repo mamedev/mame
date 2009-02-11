@@ -462,17 +462,11 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x200000, 0x207fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x400000, 0x40007f) AM_READ(es5506_data_0_word_r)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x200000, 0x207fff) AM_RAM
+	AM_RANGE(0x400000, 0x40007f) AM_DEVREADWRITE8(SOUND, "ensoniq", es5506_r, es5506_w, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_READ(macrossp_soundcmd_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x200000, 0x207fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x400000, 0x40007f) AM_WRITE(es5506_data_0_word_w)
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/
@@ -613,13 +607,13 @@ GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
 	logerror("ES5506 irq %d\n",irq);
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
     but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
-//  cpu_set_input_line(machine->cpu[1],1,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(device->cpu[1],1,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const es5506_interface es5506_config =
@@ -639,7 +633,7 @@ static MACHINE_DRIVER_START( macrossp )
 	MDRV_CPU_VBLANK_INT("main", irq3_line_hold) // there are others ...
 
 	MDRV_CPU_ADD("audio", M68000, 32000000/2)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

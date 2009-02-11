@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( blmbycar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700008, 0x700009) AM_READ(blmbycar_pot_wheel_r								)	// Wheel (potentiometer)
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_NOP											)	// ? Wheel
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(blmbycar_okibank_w								)	// Sound
-	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)	// Sound
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)	// Sound
 	AM_RANGE(0x70006a, 0x70006b) AM_WRITE(blmbycar_pot_wheel_reset_w						)	// Wheel (potentiometer)
 	AM_RANGE(0x70007a, 0x70007b) AM_WRITE(blmbycar_pot_wheel_shift_w						)	//
 ADDRESS_MAP_END
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( watrball_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700008, 0x700009) AM_READ(waterball_unk_r	     							)   // 0x0008 must toggle
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_NOP											)	// ?? busy
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(blmbycar_okibank_w								)	// Sound
-	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)	//
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)	//
 ADDRESS_MAP_END
 
 /***************************************************************************

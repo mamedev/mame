@@ -634,7 +634,7 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan2_coin_w(space, offset, data & 0xff);
-		okim6295_set_bank_base(0, (((data & 0x10) >> 4) * 0x40000));
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"), (((data & 0x10) >> 4) * 0x40000));
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -851,7 +851,7 @@ static WRITE16_HANDLER( dogyuun_snd_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_data = data;
-		dogyuun_okisnd_w(space, data);
+		dogyuun_okisnd_w(devtag_get_device(space->machine, SOUND, "oki"), data);
 	}
 	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),mcu_data);
 }
@@ -870,7 +870,7 @@ static WRITE16_HANDLER( kbash_snd_cpu_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kbash_okisnd_w(space, data);
+		kbash_okisnd_w(devtag_get_device(space->machine, SOUND, "oki"), data);
 	}
 	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",cpu_get_previouspc(space->cpu),data);
 }
@@ -907,7 +907,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 		if (mcu_data & 0xff00)
 		{
 			mcu_data = (mcu_data & 0xff00) | (data & 0xff);
-			fixeight_okisnd_w(space, data);
+			fixeight_okisnd_w(devtag_get_device(space->machine, SOUND, "oki"), data);
 		}
 		else if (mcu_data == 0xff00)
 		{
@@ -951,7 +951,7 @@ static WRITE16_HANDLER( batsugun_snd_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_data = data;
-		batsugun_okisnd_w(space, data);
+		batsugun_okisnd_w(devtag_get_device(space->machine, SOUND, "oki"), data);
 	}
 	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port %02x\n",cpu_get_previouspc(space->cpu),mcu_data,(offset*2));
 }
@@ -969,22 +969,22 @@ static WRITE16_HANDLER( V25_sharedram_w )
 	}
 }
 
-static WRITE16_HANDLER( oki_bankswitch_w )
+static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(0, (data & 1) * 0x40000);
+		okim6295_set_bank_base(device, (data & 1) * 0x40000);
 	}
 }
 
-static WRITE16_HANDLER( fixeighb_oki_bankswitch_w )
+static WRITE16_DEVICE_HANDLER( fixeighb_oki_bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 7;
 		if (data <= 4)
 		{
-			UINT8 *fixeighb_oki = memory_region(space->machine, "oki");
+			UINT8 *fixeighb_oki = memory_region(device->machine, "oki");
 			memcpy(&fixeighb_oki[0x30000], &fixeighb_oki[(data * 0x10000) + 0x40000], 0x10000);
 		}
 	}
@@ -1287,7 +1287,7 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 }
 
 
-static void bbakraid_irqhandler(running_machine *machine, int state)
+static void bbakraid_irqhandler(const device_config *device, int state)
 {
 	/* Not used ???  Connected to a test pin (TP082) */
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
@@ -1411,9 +1411,9 @@ static ADDRESS_MAP_START( kbash2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x200020, 0x200021) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w)
-	AM_RANGE(0x200024, 0x200025) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
-	AM_RANGE(0x200028, 0x200029) AM_WRITE(oki_bankswitch_w)
+	AM_RANGE(0x200020, 0x200021) AM_DEVREADWRITE8(SOUND, "oki2", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x200024, 0x200025) AM_DEVREADWRITE8(SOUND, "oki1", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x200028, 0x200029) AM_DEVWRITE(SOUND, "oki1", oki_bankswitch_w)
 	AM_RANGE(0x20002c, 0x20002d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)	/* VideoRAM selector/offset */
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1444,9 +1444,8 @@ static ADDRESS_MAP_START( truxton2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("IN1")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN2")
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("SYS")
-	AM_RANGE(0x700010, 0x700011) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
-	AM_RANGE(0x700014, 0x700015) AM_WRITE(ym2151_register_port_0_lsb_w)
-	AM_RANGE(0x700016, 0x700017) AM_READWRITE(ym2151_status_port_0_lsb_r, ym2151_data_port_0_lsb_w)
+	AM_RANGE(0x700010, 0x700011) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x700014, 0x700017) AM_DEVREADWRITE8(SOUND, "ym", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(toaplan2_coin_word_w)		/* Coin count/lock */
 ADDRESS_MAP_END
 
@@ -1547,8 +1546,8 @@ static ADDRESS_MAP_START( fixeighb_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
 	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSWB")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
-	AM_RANGE(0x200014, 0x200015) AM_WRITE(fixeighb_oki_bankswitch_w)	/* Sound banking. Code at $4084c, $5070 */
-	AM_RANGE(0x200018, 0x200019) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x200014, 0x200015) AM_DEVWRITE(SOUND, "oki", fixeighb_oki_bankswitch_w)	/* Sound banking. Code at $4084c, $5070 */
+	AM_RANGE(0x200018, 0x200019) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x20001c, 0x20001d) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toaplan2_0_voffs_w)	/* VideoRAM selector/offset */
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(toaplan2_0_videoram16_r, toaplan2_0_videoram16_w)	/* Tile/Sprite VideoRAM */
@@ -1683,9 +1682,8 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(ym2151_register_port_0_lsb_w)
-	AM_RANGE(0x500002, 0x500003) AM_READWRITE(ym2151_status_port_0_lsb_r, ym2151_data_port_0_lsb_w)
-	AM_RANGE(0x600000, 0x600001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x500000, 0x500003) AM_DEVREADWRITE8(SOUND, "ym", ym2151_r, ym2151_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("JMPR")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSWB")
@@ -1694,7 +1692,7 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("IN3")
 	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("IN4")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYS")
-	AM_RANGE(0x700030, 0x700031) AM_WRITE(oki_bankswitch_w)		/* Sample bank switch */
+	AM_RANGE(0x700030, 0x700031) AM_DEVWRITE(SOUND, "oki", oki_bankswitch_w)		/* Sample bank switch */
 	AM_RANGE(0x700034, 0x700035) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 ADDRESS_MAP_END
 
@@ -1844,17 +1842,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&toaplan2_shared_ram)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( raizing_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0xe004, 0xe004) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(toaplan2_coin_w)
 ADDRESS_MAP_END
 
@@ -1863,9 +1859,8 @@ static ADDRESS_MAP_START( bgaregga_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0xe004, 0xe004) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(raizing_okim6295_bankselect_0)
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(raizing_okim6295_bankselect_1)
 	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(bgaregga_bankswitch_w)
@@ -1890,10 +1885,9 @@ static ADDRESS_MAP_START( batrider_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0x82, 0x82) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
-	AM_RANGE(0x84, 0x84) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x82, 0x82) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE(SOUND, "oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x88, 0x88) AM_WRITE(batrider_bankswitch_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(raizing_okim6295_bankselect_0)
 	AM_RANGE(0xc2, 0xc2) AM_WRITE(raizing_okim6295_bankselect_1)
@@ -1917,8 +1911,7 @@ static ADDRESS_MAP_START( bbakraid_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ymz280b_register_0_w)
-	AM_RANGE(0x81, 0x81) AM_READWRITE(ymz280b_status_0_r, ymz280b_data_0_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE(SOUND, "ymz", ymz280b_r, ymz280b_w)
 ADDRESS_MAP_END
 
 
@@ -1938,10 +1931,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( V25_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 //  AM_RANGE(0x00000, 0x007ff) AM_RAM                           /* External shared RAM (Banked) */
-	AM_RANGE(0x04000, 0x04000) AM_READWRITE(ym2151_status_port_0_r, ym2151_register_port_0_w)
-	AM_RANGE(0x04001, 0x04001) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x04002, 0x04002) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
-//  AM_RANGE(0x04004, 0x04004) AM_WRITE(oki_bankswitch_w)
+	AM_RANGE(0x04000, 0x04001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x04002, 0x04002) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+//  AM_RANGE(0x04004, 0x04004) AM_DEVWRITE(SOUND, "oki", oki_bankswitch_w)
 	AM_RANGE(0x04008, 0x04008) AM_READ_PORT("IN1")
 	AM_RANGE(0x0400a, 0x0400a) AM_READ_PORT("IN2")
 	AM_RANGE(0x0400c, 0x0400c) AM_READ_PORT("SYS")
@@ -1969,8 +1961,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x00000) AM_WRITE( ym2151_register_port_0_w )
-	AM_RANGE(0x00001, 0x00001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 
 	AM_RANGE(0x07800, 0x07fff) AM_RAM AM_SHARE(6)
 
@@ -3349,9 +3340,9 @@ static GFXDECODE_START( fixeighb )
 	GFXDECODE_ENTRY( "gfx2", 0, fixeighblayout , 0, 128 )
 GFXDECODE_END
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate);
+	cpu_set_input_line(device->machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -3845,7 +3836,7 @@ static MACHINE_RESET(batsugun)
 	#endif
 }
 
-static void batsugun_ym2151_irqhandler(running_machine *machine, int linestate)
+static void batsugun_ym2151_irqhandler(const device_config *device, int linestate)
 {
 	logerror("batsugun_ym2151_irqhandler %02x\n",linestate);
 //  update_irq_lines(machine, linestate ? assert : clear);

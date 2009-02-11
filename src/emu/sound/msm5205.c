@@ -28,7 +28,8 @@
  *
  */
 
-struct MSM5205Voice
+typedef struct _msm5205_state msm5205_state;
+struct _msm5205_state
 {
 	const msm5205_interface *intf;
 	const device_config *device;
@@ -45,8 +46,17 @@ struct MSM5205Voice
 	int diff_lookup[49*16];
 };
 
+INLINE msm5205_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_MSM5205);
+	return (msm5205_state *)device->token;
+}
 
-static void msm5205_playmode(struct MSM5205Voice *voice,int select);
+
+static void msm5205_playmode(msm5205_state *voice,int select);
 
 /*
  * ADPCM lockup tabe
@@ -59,7 +69,7 @@ static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
  *   Compute the difference table
  */
 
-static void ComputeTables (struct MSM5205Voice *voice)
+static void ComputeTables (msm5205_state *voice)
 {
 	/* nibble to bit map */
 	static const int nbl2bit[16][4] =
@@ -93,7 +103,7 @@ static void ComputeTables (struct MSM5205Voice *voice)
 /* stream update callbacks */
 static STREAM_UPDATE( MSM5205_update )
 {
-	struct MSM5205Voice *voice = param;
+	msm5205_state *voice = param;
 	stream_sample_t *buffer = outputs[0];
 
 	/* if this voice is active */
@@ -113,7 +123,7 @@ static STREAM_UPDATE( MSM5205_update )
 /* timer callback at VCLK low eddge */
 static TIMER_CALLBACK( MSM5205_vclk_callback )
 {
-	struct MSM5205Voice *voice = ptr;
+	msm5205_state *voice = ptr;
 	int val;
 	int new_signal;
 	/* callback user handler and latch next data */
@@ -148,8 +158,10 @@ static TIMER_CALLBACK( MSM5205_vclk_callback )
 /*
  *    Reset emulation of an MSM5205-compatible chip
  */
-static void msm5205_reset(struct MSM5205Voice *voice)
+static DEVICE_RESET( msm5205 )
 {
+	msm5205_state *voice = get_safe_token(device);
+	
 	/* initialize work */
 	voice->data    = 0;
 	voice->vclk    = 0;
@@ -161,33 +173,28 @@ static void msm5205_reset(struct MSM5205Voice *voice)
 }
 
 
-static SND_RESET( msm5205 )
-{
-	msm5205_reset(device->token);
-}
-
 /*
  *    Start emulation of an MSM5205-compatible chip
  */
 
-static SND_START( msm5205 )
+static DEVICE_START( msm5205 )
 {
-	struct MSM5205Voice *voice = device->token;
+	msm5205_state *voice = get_safe_token(device);
 
 	/* save a global pointer to our interface */
 	voice->intf = device->static_config;
 	voice->device = device;
-	voice->clock = clock;
+	voice->clock = device->clock;
 
 	/* compute the difference tables */
 	ComputeTables (voice);
 
 	/* stream system initialize */
-	voice->stream = stream_create(device,0,1,clock,voice,MSM5205_update);
+	voice->stream = stream_create(device,0,1,device->clock,voice,MSM5205_update);
 	voice->timer = timer_alloc(device->machine, MSM5205_vclk_callback, voice);
 
 	/* initialize */
-	msm5205_reset(voice);
+	DEVICE_RESET_CALL(msm5205);
 
 	/* register for save states */
 	state_save_register_device_item(device, 0, voice->clock);
@@ -204,13 +211,13 @@ static SND_START( msm5205 )
  *    Handle an update of the vclk status of a chip (1 is reset ON, 0 is reset OFF)
  *    This function can use selector = MSM5205_SEX only
  */
-void msm5205_vclk_w (int num, int vclk)
+void msm5205_vclk_w (const device_config *device, int vclk)
 {
-	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
+	msm5205_state *voice = get_safe_token(device);
 
 	if( voice->prescaler != 0 )
 	{
-		logerror("error: msm5205_vclk_w() called with chip = %d, but VCLK selected master mode\n", num);
+		logerror("error: msm5205_vclk_w() called with chip = '%s', but VCLK selected master mode\n", device->tag);
 	}
 	else
 	{
@@ -226,9 +233,9 @@ void msm5205_vclk_w (int num, int vclk)
  *    Handle an update of the reset status of a chip (1 is reset ON, 0 is reset OFF)
  */
 
-void msm5205_reset_w (int num, int reset)
+void msm5205_reset_w (const device_config *device, int reset)
 {
-	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
+	msm5205_state *voice = get_safe_token(device);
 	voice->reset = reset;
 }
 
@@ -236,9 +243,9 @@ void msm5205_reset_w (int num, int reset)
  *    Handle an update of the data to the chip
  */
 
-void msm5205_data_w (int num, int data)
+void msm5205_data_w (const device_config *device, int data)
 {
-	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
+	msm5205_state *voice = get_safe_token(device);
 	if( voice->bitwidth == 4)
 		voice->data = data & 0x0f;
 	else
@@ -249,13 +256,13 @@ void msm5205_data_w (int num, int data)
  *    Handle an change of the selector
  */
 
-void msm5205_playmode_w(int num,int select)
+void msm5205_playmode_w(const device_config *device, int select)
 {
-	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
+	msm5205_state *voice = get_safe_token(device);
 	msm5205_playmode(voice,select);
 }
 
-static void msm5205_playmode(struct MSM5205Voice *voice,int select)
+static void msm5205_playmode(msm5205_state *voice,int select)
 {
 	static const int prescaler_table[4] = {96,48,64,0};
 	int prescaler = prescaler_table[select & 3];
@@ -286,9 +293,9 @@ static void msm5205_playmode(struct MSM5205Voice *voice,int select)
 }
 
 
-void msm5205_set_volume(int num,int volume)
+void msm5205_set_volume(const device_config *device,int volume)
 {
-	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
+	msm5205_state *voice = get_safe_token(device);
 
 	stream_set_output_gain(voice->stream,0,volume / 100.0);
 }
@@ -300,34 +307,24 @@ void msm5205_set_volume(int num,int volume)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( msm5205 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( msm5205 )
+DEVICE_GET_INFO( msm5205 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct MSM5205Voice);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(msm5205_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( msm5205 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( msm5205 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( msm5205 );		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( msm5205 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( msm5205 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "MSM5205");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "ADPCM");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MSM5205");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "ADPCM");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

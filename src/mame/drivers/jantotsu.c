@@ -216,20 +216,20 @@ static UINT32 adpcm_pos;
 static UINT8 adpcm_idle;
 static int adpcm_data;
 
-static WRITE8_HANDLER( jan_adpcm_w )
+static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
 {
 	switch (offset)
 	{
 		case 0:
 			adpcm_pos = (data & 0xff) * 0x80;
 			adpcm_idle = 0;
-			msm5205_reset_w(0,0);
+			msm5205_reset_w(device,0);
 //          printf("%02x 0\n",data);
 			break;
 		/*same write as port 2?*/
 		case 1:
 //          adpcm_idle = 1;
-//          msm5205_reset_w(0,1);
+//          msm5205_reset_w(device,1);
 //          printf("%02x 1\n",data);
 			break;
 	}
@@ -242,7 +242,7 @@ static void jan_adpcm_int(const device_config *device)
 	if (adpcm_pos >= 0x8000 || adpcm_idle)
 	{
 		//adpcm_idle = 1;
-		msm5205_reset_w(0,1);
+		msm5205_reset_w(device,1);
 		trigger = 0;
 	}
 	else
@@ -250,7 +250,7 @@ static void jan_adpcm_int(const device_config *device)
 		UINT8 *ROM = memory_region(device->machine, "adpcm");
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos] & 0x0f) : (ROM[adpcm_pos] & 0xf0)>>4) );
-		msm5205_data_w(0,adpcm_data & 0xf);
+		msm5205_data_w(device,adpcm_data & 0xf);
 		trigger^=1;
 		if(trigger == 0)
 		{
@@ -270,9 +270,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jantotsu_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(sn76496_0_w)
-	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_WRITE(sn76496_1_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(jan_adpcm_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE(SOUND, "sn1", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "adpcm", jan_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(jantotsu_mux_r,jantotsu_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(bankaddr_w)
 ADDRESS_MAP_END

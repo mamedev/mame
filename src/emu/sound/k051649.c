@@ -38,7 +38,8 @@ typedef struct
 	signed char waveform[32];		/* 19991207.CAB */
 } k051649_sound_channel;
 
-struct k051649_info
+typedef struct _k051649_state k051649_state;
+struct _k051649_state
 {
 	k051649_sound_channel channel_list[5];
 
@@ -54,8 +55,17 @@ struct k051649_info
 	int f[10];
 };
 
+INLINE k051649_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_K051649);
+	return (k051649_state *)device->token;
+}
+
 /* build a table to divide by the number of voices */
-static void make_mixer_table(struct k051649_info *info, int voices)
+static void make_mixer_table(k051649_state *info, int voices)
 {
 	int count = voices * 256;
 	int i;
@@ -81,7 +91,7 @@ static void make_mixer_table(struct k051649_info *info, int voices)
 /* generate sound to the mix buffer */
 static STREAM_UPDATE( k051649_update )
 {
-	struct k051649_info *info = param;
+	k051649_state *info = param;
 	k051649_sound_channel *voice=info->channel_list;
 	stream_sample_t *buffer = outputs[0];
 	short *mix;
@@ -125,14 +135,14 @@ static STREAM_UPDATE( k051649_update )
 		*buffer++ = info->mixer_lookup[*mix++];
 }
 
-static SND_START( k051649 )
+static DEVICE_START( k051649 )
 {
-	struct k051649_info *info = device->token;
+	k051649_state *info = get_safe_token(device);
 
 	/* get stream channels */
-	info->rate = clock/16;
+	info->rate = device->clock/16;
 	info->stream = stream_create(device, 0, 1, info->rate, info, k051649_update);
-	info->mclock = clock;
+	info->mclock = device->clock;
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
 	info->mixer_buffer = auto_malloc(2 * sizeof(short) * info->rate);
@@ -141,9 +151,9 @@ static SND_START( k051649 )
 	make_mixer_table(info, 5);
 }
 
-static SND_RESET( k051649 )
+static DEVICE_RESET( k051649 )
 {
-	struct k051649_info *info = device->token;
+	k051649_state *info = get_safe_token(device);
 	k051649_sound_channel *voice = info->channel_list;
 	int i;
 
@@ -157,9 +167,9 @@ static SND_RESET( k051649 )
 
 /********************************************************************************/
 
-WRITE8_HANDLER( k051649_waveform_w )
+WRITE8_DEVICE_HANDLER( k051649_waveform_w )
 {
-	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
+	k051649_state *info = get_safe_token(device);
 	stream_update(info->stream);
 	info->channel_list[offset>>5].waveform[offset&0x1f]=data;
 	/* SY 20001114: Channel 5 shares the waveform with channel 4 */
@@ -167,39 +177,39 @@ WRITE8_HANDLER( k051649_waveform_w )
 		info->channel_list[4].waveform[offset&0x1f]=data;
 }
 
-READ8_HANDLER ( k051649_waveform_r )
+READ8_DEVICE_HANDLER ( k051649_waveform_r )
 {
-	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
+	k051649_state *info = get_safe_token(device);
 	return info->channel_list[offset>>5].waveform[offset&0x1f];
 }
 
 /* SY 20001114: Channel 5 doesn't share the waveform with channel 4 on this chip */
-WRITE8_HANDLER( k052539_waveform_w )
+WRITE8_DEVICE_HANDLER( k052539_waveform_w )
 {
-	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
+	k051649_state *info = get_safe_token(device);
 	stream_update(info->stream);
 	info->channel_list[offset>>5].waveform[offset&0x1f]=data;
 }
 
-WRITE8_HANDLER( k051649_volume_w )
+WRITE8_DEVICE_HANDLER( k051649_volume_w )
 {
-	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
+	k051649_state *info = get_safe_token(device);
 	stream_update(info->stream);
 	info->channel_list[offset&0x7].volume=data&0xf;
 }
 
-WRITE8_HANDLER( k051649_frequency_w )
+WRITE8_DEVICE_HANDLER( k051649_frequency_w )
 {
-	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
+	k051649_state *info = get_safe_token(device);
 	info->f[offset]=data;
 
 	stream_update(info->stream);
 	info->channel_list[offset>>1].frequency=(info->f[offset&0xe] + (info->f[offset|1]<<8))&0xfff;
 }
 
-WRITE8_HANDLER( k051649_keyonoff_w )
+WRITE8_DEVICE_HANDLER( k051649_keyonoff_w )
 {
-	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
+	k051649_state *info = get_safe_token(device);
 	stream_update(info->stream);
 	info->channel_list[0].key=data&1;
 	info->channel_list[1].key=data&2;
@@ -215,34 +225,24 @@ WRITE8_HANDLER( k051649_keyonoff_w )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( k051649 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( k051649 )
+DEVICE_GET_INFO( k051649 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct k051649_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(k051649_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k051649 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k051649 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( k051649 );		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( k051649 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( k051649 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "K051649");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Konami custom");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "K051649");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Konami custom");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

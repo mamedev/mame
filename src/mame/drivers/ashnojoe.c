@@ -163,8 +163,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READ(sound_latch_r)
 	AM_RANGE(0x06, 0x06) AM_READ(sound_latch_status_r)
@@ -292,23 +291,23 @@ static GFXDECODE_START( ashnojoe )
 GFXDECODE_END
 
 
-static void ym2203_irq_handler(running_machine *machine, int irq)
+static void ym2203_irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( ym2203_write_a )
+static WRITE8_DEVICE_HANDLER( ym2203_write_a )
 {
 	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
 	if (data == 0xff)
 		return;
 
-	msm5205_reset_w(0, !(data & 0x01));
+	msm5205_reset_w(device, !(data & 0x01));
 }
 
-static WRITE8_HANDLER( ym2203_write_b )
+static WRITE8_DEVICE_HANDLER( ym2203_write_b )
 {
-	memory_set_bankptr(space->machine, 4, memory_region(space->machine, "adpcm") + ((data & 0xf) * 0x8000));
+	memory_set_bankptr(device->machine, 4, memory_region(device->machine, "adpcm") + ((data & 0xf) * 0x8000));
 }
 
 static const ym2203_interface ym2203_config =
@@ -316,10 +315,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		ym2203_write_a,
-		ym2203_write_b,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_DEVICE_HANDLER(SOUND, "msm", ym2203_write_a),
+		DEVCB_HANDLER(ym2203_write_b),
 	},
 	ym2203_irq_handler
 };
@@ -328,11 +327,11 @@ static void ashnojoe_vclk_cb(const device_config *device)
 {
 	if (msm5205_vclk_toggle == 0)
 	{
-		msm5205_data_w(0, adpcm_byte >> 4);
+		msm5205_data_w(device, adpcm_byte >> 4);
 	}
 	else
 	{
-		msm5205_data_w(0, adpcm_byte & 0xf);
+		msm5205_data_w(device, adpcm_byte & 0xf);
 		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 

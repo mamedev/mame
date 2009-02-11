@@ -121,8 +121,8 @@ static WRITE8_HANDLER( sound_reset_w ) {
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( sound_control_w ) {
-	msm5205_reset_w( 0, !( data & 1 ) );
+static WRITE8_DEVICE_HANDLER( sound_control_w ) {
+	msm5205_reset_w( device, !( data & 1 ) );
 	sound_nmi_enable = ( ( data >> 1 ) & 1 );
 }
 
@@ -151,12 +151,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(soundlatch_r, ay8910_control_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(sound_control_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "msm", sound_control_w)
 ADDRESS_MAP_END
 
 /********************
@@ -215,11 +214,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kc_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -385,9 +382,9 @@ static void msmint(const device_config *device) {
 	static int counter = 0;
 
 	if ( msm_play_lo_nibble )
-		msm5205_data_w( 0, msm_data & 0x0f );
+		msm5205_data_w( device, msm_data & 0x0f );
 	else
-		msm5205_data_w( 0, ( msm_data >> 4 ) & 0x0f );
+		msm5205_data_w( device, ( msm_data >> 4 ) & 0x0f );
 
 	msm_play_lo_nibble ^= 1;
 

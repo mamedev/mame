@@ -329,16 +329,17 @@ static WRITE8_HANDLER( snd_irq_w )
 
 static WRITE8_HANDLER( snddata_w )
 {
-	int num_ays = (sndti_exists(SOUND_AY8910, 1)) ? 2 : 1;
+	const device_config *ay1 = devtag_get_device(space->machine, SOUND, "ay1");
+	const device_config *ay2 = devtag_get_device(space->machine, SOUND, "ay2");
 
 	if ((p2 & 0xf0) == 0xe0)
-		ay8910_control_port_0_w(space,0,offset);
+		ay8910_address_w(ay1,0,offset);
 	else if ((p2 & 0xf0) == 0xa0)
-		ay8910_write_port_0_w(space,0,offset);
-	else if (num_ays == 2 && (p1 & 0xe0) == 0x60)
-		ay8910_control_port_1_w(space,0,offset);
-	else if (num_ays == 2 && (p1 & 0xe0) == 0x40)
-		 ay8910_write_port_1_w(space,0,offset);
+		ay8910_data_w(ay1,0,offset);
+	else if (ay2 != NULL && (p1 & 0xe0) == 0x60)
+		ay8910_address_w(ay2,0,offset);
+	else if (ay2 != NULL && (p1 & 0xe0) == 0x40)
+		 ay8910_data_w(ay2,0,offset);
 	else if ((p2 & 0xf0) == 0x70 )
 		sound_status=offset;
 }
@@ -709,7 +710,7 @@ static MACHINE_DRIVER_START( fghtbskt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, XTAL_12MHz/8)
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)

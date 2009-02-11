@@ -83,11 +83,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
 	AM_RANGE(0x80, 0x81) AM_WRITE(shisen_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(m72_sample_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE(SOUND, "dac", m72_sample_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(m72_sound_irq_ack_w)
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
 ADDRESS_MAP_END

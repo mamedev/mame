@@ -66,7 +66,8 @@
 ***********************************************************************************************/
 
 /* struct describing a single playing voice */
-struct ES5506Voice
+typedef struct _es5506_voice es5506_voice;
+struct _es5506_voice
 {
 	/* external state */
 	UINT32		control;				/* control register */
@@ -97,7 +98,8 @@ struct ES5506Voice
 	UINT32 		accum_mask;
 };
 
-struct ES5506Chip
+typedef struct _es5506_state es5506_state;
+struct _es5506_state
 {
 	sound_stream *stream;				/* which stream are we using */
 	int			sample_rate;			/* current sample rate */
@@ -105,7 +107,7 @@ struct ES5506Chip
 	UINT32 		write_latch;			/* currently accumulated data for write */
 	UINT32 		read_latch;				/* currently accumulated data for read */
 	UINT32 		master_clock;			/* master clock frequency */
-	void 		(*irq_callback)(running_machine *, int);	/* IRQ callback */
+	void 		(*irq_callback)(const device_config *, int);	/* IRQ callback */
 	UINT16		(*port_read)(void);		/* input port read */
 
 	UINT8 		current_page;			/* current register page */
@@ -116,7 +118,7 @@ struct ES5506Chip
 	UINT8		lrend;					/* LR_END register */
 	UINT8		irqv;					/* IRQV register */
 
-	struct 		ES5506Voice voice[32];	/* the 32 voices */
+	es5506_voice voice[32];				/* the 32 voices */
 
 	INT32 *		scratch;
 
@@ -128,6 +130,16 @@ struct ES5506Chip
 	void *		wavraw;					/* raw waveform */
 #endif
 };
+
+
+INLINE es5506_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_ES5505 || sound_get_type(device) == SOUND_ES5506);
+	return (es5506_state *)device->token;
+}
 
 
 
@@ -147,14 +159,14 @@ static FILE *eslog;
 
 ***********************************************************************************************/
 
-static void update_irq_state(struct ES5506Chip *chip)
+static void update_irq_state(es5506_state *chip)
 {
 	/* ES5505/6 irq line has been set high - inform the host */
 	if (chip->irq_callback)
-		(*chip->irq_callback)(chip->device->machine, 1); /* IRQB set high */
+		(*chip->irq_callback)(chip->device, 1); /* IRQB set high */
 }
 
-static void update_internal_irq_state(struct ES5506Chip *chip)
+static void update_internal_irq_state(es5506_state *chip)
 {
 	/*  Host (cpu) has just read the voice interrupt vector (voice IRQ ack).
 
@@ -168,7 +180,7 @@ static void update_internal_irq_state(struct ES5506Chip *chip)
 	chip->irqv=0x80;
 
 	if (chip->irq_callback)
-		(*chip->irq_callback)(chip->device->machine, 0); /* IRQB set low */
+		(*chip->irq_callback)(chip->device, 0); /* IRQB set low */
 }
 
 /**********************************************************************************************
@@ -177,7 +189,7 @@ static void update_internal_irq_state(struct ES5506Chip *chip)
 
 ***********************************************************************************************/
 
-static void compute_tables(struct ES5506Chip *chip)
+static void compute_tables(es5506_state *chip)
 {
 	int i;
 
@@ -441,7 +453,7 @@ do																					\
 
 ***********************************************************************************************/
 
-static void generate_dummy(struct ES5506Chip *chip, struct ES5506Voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
+static void generate_dummy(es5506_state *chip, es5506_voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
 {
 	UINT32 freqcount = voice->freqcount;
 	UINT32 accum = voice->accum & voice->accum_mask;
@@ -502,7 +514,7 @@ alldone:
 
 ***********************************************************************************************/
 
-static void generate_ulaw(struct ES5506Chip *chip, struct ES5506Voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
+static void generate_ulaw(es5506_state *chip, es5506_voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
 {
 	UINT32 freqcount = voice->freqcount;
 	UINT32 accum = voice->accum & voice->accum_mask;
@@ -608,7 +620,7 @@ alldone:
 
 ***********************************************************************************************/
 
-static void generate_pcm(struct ES5506Chip *chip, struct ES5506Voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
+static void generate_pcm(es5506_state *chip, es5506_voice *voice, UINT16 *base, INT32 *lbuffer, INT32 *rbuffer, int samples)
 {
 	UINT32 freqcount = voice->freqcount;
 	UINT32 accum = voice->accum & voice->accum_mask;
@@ -706,7 +718,7 @@ alldone:
 
 ***********************************************************************************************/
 
-static void generate_samples(struct ES5506Chip *chip, INT32 *left, INT32 *right, int samples)
+static void generate_samples(es5506_state *chip, INT32 *left, INT32 *right, int samples)
 {
 	int v;
 
@@ -721,7 +733,7 @@ static void generate_samples(struct ES5506Chip *chip, INT32 *left, INT32 *right,
 	/* loop over voices */
 	for (v = 0; v <= chip->active_voices; v++)
 	{
-		struct ES5506Voice *voice = &chip->voice[v];
+		es5506_voice *voice = &chip->voice[v];
 		UINT16 *base = chip->region_base[voice->control >> 14];
 
 		/* special case: if end == start, stop the voice */
@@ -769,7 +781,7 @@ logerror("IRQ raised on voice %d!!\n",v);
 
 static STREAM_UPDATE( es5506_update )
 {
-	struct ES5506Chip *chip = param;
+	es5506_state *chip = param;
 	INT32 *lsrc = chip->scratch, *rsrc = chip->scratch;
 	stream_sample_t *ldest = outputs[0];
 	stream_sample_t *rdest = outputs[1];
@@ -815,14 +827,14 @@ static STREAM_UPDATE( es5506_update )
 
 /**********************************************************************************************
 
-     SND_START( es5506 ) -- start emulation of the ES5506
+     DEVICE_START( es5506 ) -- start emulation of the ES5506
 
 ***********************************************************************************************/
 
-static void es5506_start_common(const device_config *device, int clock, const void *config, sound_type sndtype)
+static void es5506_start_common(const device_config *device, const void *config, sound_type sndtype)
 {
 	const es5506_interface *intf = config;
-	struct ES5506Chip *chip = device->token;
+	es5506_state *chip = get_safe_token(device);
 	int j;
 	UINT32 accum_mask;
 
@@ -834,7 +846,7 @@ static void es5506_start_common(const device_config *device, int clock, const vo
 	compute_tables(chip);
 
 	/* create the stream */
-	chip->stream = stream_create(device, 0, 2, clock / (16*32), chip, es5506_update);
+	chip->stream = stream_create(device, 0, 2, device->clock / (16*32), chip, es5506_update);
 
 	/* initialize the regions */
 	chip->region_base[0] = intf->region0 ? (UINT16 *)memory_region(device->machine, intf->region0) : NULL;
@@ -844,7 +856,7 @@ static void es5506_start_common(const device_config *device, int clock, const vo
 
 	/* initialize the rest of the structure */
 	chip->device = device;
-	chip->master_clock = clock;
+	chip->master_clock = device->clock;
 	chip->irq_callback = intf->irq_callback;
 	chip->irqv = 0x80;
 
@@ -867,20 +879,20 @@ static void es5506_start_common(const device_config *device, int clock, const vo
 }
 
 
-static SND_START( es5506 )
+static DEVICE_START( es5506 )
 {
-	es5506_start_common(device, clock, device->static_config, SOUND_ES5506);
+	es5506_start_common(device, device->static_config, SOUND_ES5506);
 }
 
 
 
 /**********************************************************************************************
 
-     SND_STOP( es5506 ) -- stop emulation of the ES5506
+     DEVICE_STOP( es5506 ) -- stop emulation of the ES5506
 
 ***********************************************************************************************/
 
-static SND_STOP( es5506 )
+static DEVICE_STOP( es5506 )
 {
 	/* debugging */
 	if (LOG_COMMANDS && eslog)
@@ -903,7 +915,7 @@ static SND_STOP( es5506 )
 }
 
 
-static SND_RESET( es5506 )
+static DEVICE_RESET( es5506 )
 {
 }
 
@@ -915,7 +927,7 @@ static SND_RESET( es5506 )
 
 ***********************************************************************************************/
 
-INLINE void es5506_reg_write_low(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset, UINT32 data)
+INLINE void es5506_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT32 data)
 {
 	switch (offset)
 	{
@@ -1012,7 +1024,7 @@ INLINE void es5506_reg_write_low(struct ES5506Chip *chip, struct ES5506Voice *vo
 }
 
 
-INLINE void es5506_reg_write_high(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset, UINT32 data)
+INLINE void es5506_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT32 data)
 {
 	switch (offset)
 	{
@@ -1098,7 +1110,7 @@ INLINE void es5506_reg_write_high(struct ES5506Chip *chip, struct ES5506Voice *v
 	}
 }
 
-INLINE void es5506_reg_write_test(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset, UINT32 data)
+INLINE void es5506_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT32 data)
 {
 	switch (offset)
 	{
@@ -1177,9 +1189,10 @@ INLINE void es5506_reg_write_test(struct ES5506Chip *chip, struct ES5506Voice *v
 	}
 }
 
-static void es5506_reg_write(struct ES5506Chip *chip, offs_t offset, UINT8 data)
+WRITE8_DEVICE_HANDLER( es5506_w )
 {
-	struct ES5506Voice *voice = &chip->voice[chip->current_page & 0x1f];
+	es5506_state *chip = get_safe_token(device);
+	es5506_voice *voice = &chip->voice[chip->current_page & 0x1f];
 	int shift = 8 * (offset & 3);
 
 	/* accumulate the data */
@@ -1212,7 +1225,7 @@ static void es5506_reg_write(struct ES5506Chip *chip, offs_t offset, UINT8 data)
 
 ***********************************************************************************************/
 
-INLINE UINT32 es5506_reg_read_low(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset)
+INLINE UINT32 es5506_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_t offset)
 {
 	UINT32 result = 0;
 
@@ -1288,7 +1301,7 @@ INLINE UINT32 es5506_reg_read_low(struct ES5506Chip *chip, struct ES5506Voice *v
 }
 
 
-INLINE UINT32 es5506_reg_read_high(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset)
+INLINE UINT32 es5506_reg_read_high(es5506_state *chip, es5506_voice *voice, offs_t offset)
 {
 	UINT32 result = 0;
 
@@ -1363,7 +1376,7 @@ INLINE UINT32 es5506_reg_read_high(struct ES5506Chip *chip, struct ES5506Voice *
 	return result;
 }
 
-INLINE UINT32 es5506_reg_read_test(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset)
+INLINE UINT32 es5506_reg_read_test(es5506_state *chip, es5506_voice *voice, offs_t offset)
 {
 	UINT32 result = 0;
 
@@ -1385,9 +1398,10 @@ INLINE UINT32 es5506_reg_read_test(struct ES5506Chip *chip, struct ES5506Voice *
 	return result;
 }
 
-static UINT8 es5506_reg_read(struct ES5506Chip *chip, offs_t offset)
+READ8_DEVICE_HANDLER( es5506_r )
 {
-	struct ES5506Voice *voice = &chip->voice[chip->current_page & 0x1f];
+	es5506_state *chip = get_safe_token(device);
+	es5506_voice *voice = &chip->voice[chip->current_page & 0x1f];
 	int shift = 8 * (offset & 3);
 
 	/* only read on offset 0 */
@@ -1417,84 +1431,20 @@ static UINT8 es5506_reg_read(struct ES5506Chip *chip, offs_t offset)
 
 
 
-/**********************************************************************************************
-
-     es5506_data_0_r/es5506_data_1_r -- handle a read from the status register
-
-**********************************************************************************************/
-
-READ8_HANDLER( es5506_data_0_r )
+void es5506_voice_bank_w(const device_config *device, int voice, int bank)
 {
-	return es5506_reg_read(sndti_token(SOUND_ES5506, 0), offset);
-}
-
-READ8_HANDLER( es5506_data_1_r )
-{
-	return es5506_reg_read(sndti_token(SOUND_ES5506, 1), offset);
-}
-
-READ16_HANDLER( es5506_data_0_word_r )
-{
-	return es5506_reg_read(sndti_token(SOUND_ES5506, 0), offset);
-}
-
-READ16_HANDLER( es5506_data_1_word_r )
-{
-	return es5506_reg_read(sndti_token(SOUND_ES5506, 1), offset);
-}
-
-
-
-/**********************************************************************************************
-
-     es5506_data_0_w/es5506_data_1_w -- handle a write to the current register
-
-***********************************************************************************************/
-
-WRITE8_HANDLER( es5506_data_0_w )
-{
-	es5506_reg_write(sndti_token(SOUND_ES5506, 0), offset, data);
-}
-
-WRITE8_HANDLER( es5506_data_1_w )
-{
-	es5506_reg_write(sndti_token(SOUND_ES5506, 1), offset, data);
-}
-
-WRITE16_HANDLER( es5506_data_0_word_w )
-{
-	if (ACCESSING_BITS_0_7)
-		es5506_reg_write(sndti_token(SOUND_ES5506, 0), offset, data);
-}
-
-WRITE16_HANDLER( es5506_data_1_word_w )
-{
-	if (ACCESSING_BITS_0_7)
-		es5506_reg_write(sndti_token(SOUND_ES5506, 1), offset, data);
-}
-
-
-
-void es5506_voice_bank_0_w(int voice, int bank)
-{
-	struct ES5506Chip *chip = sndti_token(SOUND_ES5506, 0);
-	chip->voice[voice].exbank=bank;
-}
-
-void es5506_voice_bank_1_w(int voice, int bank)
-{
-	struct ES5506Chip *chip = sndti_token(SOUND_ES5506, 1);
+	es5506_state *chip = get_safe_token(device);
 	chip->voice[voice].exbank=bank;
 }
 
 
 /**********************************************************************************************
 
-     SND_START( es5505 ) -- start emulation of the ES5505
+     DEVICE_START( es5505 ) -- start emulation of the ES5505
 
 ***********************************************************************************************/
 
-static SND_START( es5505 )
+static DEVICE_START( es5505 )
 {
 	const es5505_interface *intf = device->static_config;
 	es5506_interface es5506intf;
@@ -1506,26 +1456,26 @@ static SND_START( es5505 )
 	es5506intf.irq_callback = intf->irq_callback;
 	es5506intf.read_port = intf->read_port;
 
-	es5506_start_common(device, clock, &es5506intf, SOUND_ES5505);
+	es5506_start_common(device, &es5506intf, SOUND_ES5505);
 }
 
 
 
 /**********************************************************************************************
 
-     SND_STOP( es5505 ) -- stop emulation of the ES5505
+     DEVICE_STOP( es5505 ) -- stop emulation of the ES5505
 
 ***********************************************************************************************/
 
-static SND_STOP( es5505 )
+static DEVICE_STOP( es5505 )
 {
-	SND_STOP_CALL( es5506 );
+	DEVICE_STOP_CALL( es5506 );
 }
 
 
-static SND_RESET( es5505 )
+static DEVICE_RESET( es5505 )
 {
-	SND_RESET_CALL( es5506 );
+	DEVICE_RESET_CALL( es5506 );
 }
 
 
@@ -1536,7 +1486,7 @@ static SND_RESET( es5505 )
 
 ***********************************************************************************************/
 
-INLINE void es5505_reg_write_low(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void es5505_reg_write_low(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	running_machine *machine = chip->device->machine;
 
@@ -1691,7 +1641,7 @@ INLINE void es5505_reg_write_low(struct ES5506Chip *chip, struct ES5506Voice *vo
 }
 
 
-INLINE void es5505_reg_write_high(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void es5505_reg_write_high(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	running_machine *machine = chip->device->machine;
 
@@ -1799,7 +1749,7 @@ INLINE void es5505_reg_write_high(struct ES5506Chip *chip, struct ES5506Voice *v
 }
 
 
-INLINE void es5505_reg_write_test(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void es5505_reg_write_test(es5506_state *chip, es5506_voice *voice, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	switch (offset)
 	{
@@ -1843,9 +1793,10 @@ INLINE void es5505_reg_write_test(struct ES5506Chip *chip, struct ES5506Voice *v
 }
 
 
-static void es5505_reg_write(struct ES5506Chip *chip, offs_t offset, UINT16 data, UINT16 mem_mask)
+WRITE16_DEVICE_HANDLER( es5505_w )
 {
-	struct ES5506Voice *voice = &chip->voice[chip->current_page & 0x1f];
+	es5506_state *chip = get_safe_token(device);
+	es5506_voice *voice = &chip->voice[chip->current_page & 0x1f];
 
 //  logerror("%s:ES5505 write %02x/%02x = %04x & %04x\n", cpuexec_describe_context(machine), chip->current_page, offset, data, mem_mask);
 
@@ -1869,7 +1820,7 @@ static void es5505_reg_write(struct ES5506Chip *chip, offs_t offset, UINT16 data
 
 ***********************************************************************************************/
 
-INLINE UINT16 es5505_reg_read_low(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset)
+INLINE UINT16 es5505_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_t offset)
 {
 	UINT16 result = 0;
 
@@ -1947,7 +1898,7 @@ INLINE UINT16 es5505_reg_read_low(struct ES5506Chip *chip, struct ES5506Voice *v
 }
 
 
-INLINE UINT16 es5505_reg_read_high(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset)
+INLINE UINT16 es5505_reg_read_high(es5506_state *chip, es5506_voice *voice, offs_t offset)
 {
 	UINT16 result = 0;
 
@@ -2020,7 +1971,7 @@ INLINE UINT16 es5505_reg_read_high(struct ES5506Chip *chip, struct ES5506Voice *
 }
 
 
-INLINE UINT16 es5505_reg_read_test(struct ES5506Chip *chip, struct ES5506Voice *voice, offs_t offset)
+INLINE UINT16 es5505_reg_read_test(es5506_state *chip, es5506_voice *voice, offs_t offset)
 {
 	UINT16 result = 0;
 
@@ -2053,9 +2004,10 @@ INLINE UINT16 es5505_reg_read_test(struct ES5506Chip *chip, struct ES5506Voice *
 }
 
 
-static UINT16 es5505_reg_read(struct ES5506Chip *chip, offs_t offset)
+READ16_DEVICE_HANDLER( es5505_r )
 {
-	struct ES5506Voice *voice = &chip->voice[chip->current_page & 0x1f];
+	es5506_state *chip = get_safe_token(device);
+	es5506_voice *voice = &chip->voice[chip->current_page & 0x1f];
 	UINT16 result = 0;
 
 	if (LOG_COMMANDS && eslog)
@@ -2081,50 +2033,9 @@ static UINT16 es5505_reg_read(struct ES5506Chip *chip, offs_t offset)
 
 
 
-/**********************************************************************************************
-
-     es5505_data_0_r/es5505_data_1_r -- handle a read from the status register
-
-***********************************************************************************************/
-
-READ16_HANDLER( es5505_data_0_r )
+void es5505_voice_bank_w(const device_config *device, int voice, int bank)
 {
-	return es5505_reg_read(sndti_token(SOUND_ES5505, 0), offset);
-}
-
-READ16_HANDLER( es5505_data_1_r )
-{
-	return es5505_reg_read(sndti_token(SOUND_ES5505, 1), offset);
-}
-
-/**********************************************************************************************
-
-     es5505_data_0_w/es5505_data_1_w -- handle a write to the current register
-
-***********************************************************************************************/
-
-WRITE16_HANDLER( es5505_data_0_w )
-{
-	es5505_reg_write(sndti_token(SOUND_ES5505, 0), offset, data, mem_mask);
-}
-
-WRITE16_HANDLER( es5505_data_1_w )
-{
-	es5505_reg_write(sndti_token(SOUND_ES5505, 1), offset, data, mem_mask);
-}
-
-void es5505_voice_bank_0_w(int voice, int bank)
-{
-	struct ES5506Chip *chip = sndti_token(SOUND_ES5505, 0);
-#if RAINE_CHECK
-	chip->voice[voice].control = CONTROL_STOPMASK;
-#endif
-	chip->voice[voice].exbank=bank;
-}
-
-void es5505_voice_bank_1_w(int voice, int bank)
-{
-	struct ES5506Chip *chip = sndti_token(SOUND_ES5505, 1);
+	es5506_state *chip = get_safe_token(device);
 #if RAINE_CHECK
 	chip->voice[voice].control = CONTROL_STOPMASK;
 #endif
@@ -2138,34 +2049,24 @@ void es5505_voice_bank_1_w(int voice, int bank)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( es5505 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( es5505 )
+DEVICE_GET_INFO( es5505 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ES5506Chip);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(es5506_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es5505 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( es5505 );				break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( es5505 );				break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( es5505 );				break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( es5505 );		break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( es5505 );		break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( es5505 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "ES5505");							break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ensoniq Wavetable");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "ES5505");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Ensoniq Wavetable");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -2174,34 +2075,24 @@ SND_GET_INFO( es5505 )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( es5506 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( es5506 )
+DEVICE_GET_INFO( es5506 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ES5506Chip);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(es5506_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es5506 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( es5506 );				break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( es5506 );				break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( es5506 );				break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( es5506 );		break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( es5506 );		break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( es5506 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "ES5506");							break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ensoniq Wavetable");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "ES5506");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Ensoniq Wavetable");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

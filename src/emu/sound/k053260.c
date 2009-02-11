@@ -16,7 +16,9 @@
 
 #define BASE_SHIFT	16
 
-struct k053260_channel_def {
+typedef struct _k053260_channel k053260_channel;
+struct _k053260_channel
+{
 	UINT32		rate;
 	UINT32		size;
 	UINT32		start;
@@ -29,20 +31,31 @@ struct k053260_channel_def {
 	int					ppcm; /* packed PCM ( 4 bit signed ) */
 	int					ppcm_data;
 };
-struct k053260_chip_def {
+
+typedef struct _k053260_state k053260_state;
+struct _k053260_state {
 	sound_stream *					channel;
 	int								mode;
 	int								regs[0x30];
 	UINT8					*rom;
 	int								rom_size;
 	UINT32					*delta_table;
-	struct k053260_channel_def		channels[4];
+	k053260_channel		channels[4];
 	const k053260_interface			*intf;
 	const device_config *device;
 };
 
+INLINE k053260_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_K053260);
+	return (k053260_state *)device->token;
+}
 
-static void InitDeltaTable( struct k053260_chip_def *ic, int rate, int clock ) {
+
+static void InitDeltaTable( k053260_state *ic, int rate, int clock ) {
 	int		i;
 	double	base = ( double )rate;
 	double	max = (double)(clock); /* Hz */
@@ -65,7 +78,8 @@ static void InitDeltaTable( struct k053260_chip_def *ic, int rate, int clock ) {
 	}
 }
 
-static void k053260_reset(struct k053260_chip_def *ic) {
+DEVICE_RESET( k053260 ) {
+	k053260_state *ic = get_safe_token(device);
 	int i;
 
 	for( i = 0; i < 4; i++ ) {
@@ -82,11 +96,6 @@ static void k053260_reset(struct k053260_chip_def *ic) {
 		ic->channels[i].ppcm_data = 0;
 	}
 }
-
-static SND_RESET( k053260 ) {
-	k053260_reset(device->token);
-}
-
 
 INLINE int limit( int val, int max, int min ) {
 	if ( val > max )
@@ -108,7 +117,7 @@ static STREAM_UPDATE( k053260_update ) {
 	UINT32 delta[4], end[4], pos[4];
 	int dataL, dataR;
 	signed char d;
-	struct k053260_chip_def *ic = param;
+	k053260_state *ic = param;
 
 	/* precache some values */
 	for ( i = 0; i < 4; i++ ) {
@@ -199,11 +208,11 @@ static STREAM_UPDATE( k053260_update ) {
 	}
 }
 
-static SND_START( k053260 )
+static DEVICE_START( k053260 )
 {
 	static const k053260_interface defintrf = { 0 };
-	struct k053260_chip_def *ic = device->token;
-	int rate = clock / 32;
+	k053260_state *ic = get_safe_token(device);
+	int rate = device->clock / 32;
 	int i;
 
 	/* Initialize our chip structure */
@@ -219,7 +228,7 @@ static SND_START( k053260 )
 		ic->rom_size = memory_region_length(device->machine, ic->intf->rgnoverride);
 	}
 
-	k053260_reset( ic );
+	DEVICE_RESET_CALL(k053260);
 
 	for ( i = 0; i < 0x30; i++ )
 		ic->regs[i] = 0;
@@ -228,14 +237,14 @@ static SND_START( k053260 )
 
 	ic->channel = stream_create( device, 0, 2, rate, ic, k053260_update );
 
-	InitDeltaTable( ic, rate, clock );
+	InitDeltaTable( ic, rate, device->clock );
 
 	/* setup SH1 timer if necessary */
 	if ( ic->intf->irq )
-		timer_pulse( device->machine, attotime_mul(ATTOTIME_IN_HZ(clock), 32), NULL, 0, ic->intf->irq );
+		timer_pulse( device->machine, attotime_mul(ATTOTIME_IN_HZ(device->clock), 32), NULL, 0, ic->intf->irq );
 }
 
-INLINE void check_bounds( struct k053260_chip_def *ic, int channel ) {
+INLINE void check_bounds( k053260_state *ic, int channel ) {
 
 	int channel_start = ( ic->channels[channel].bank << 16 ) + ic->channels[channel].start;
 	int channel_end = channel_start + ic->channels[channel].size - 1;
@@ -256,13 +265,13 @@ INLINE void check_bounds( struct k053260_chip_def *ic, int channel ) {
 	if (LOG) logerror("K053260: Sample Start = %06x, Sample End = %06x, Sample rate = %04x, PPCM = %s\n", channel_start, channel_end, ic->channels[channel].rate, ic->channels[channel].ppcm ? "yes" : "no" );
 }
 
-static void k053260_write( const address_space *space, offs_t offset, UINT8 data, int chip )
+WRITE8_DEVICE_HANDLER( k053260_w )
 {
 	int i, t;
 	int r = offset;
 	int v = data;
 
-	struct k053260_chip_def *ic = sndti_token(SOUND_K053260, chip);
+	k053260_state *ic = get_safe_token(device);
 
 	if ( r > 0x2f ) {
 		logerror("K053260: Writing past registers\n" );
@@ -373,9 +382,9 @@ static void k053260_write( const address_space *space, offs_t offset, UINT8 data
 	}
 }
 
-static UINT8 k053260_read( const address_space *space,  offs_t offset, int chip )
+READ8_DEVICE_HANDLER( k053260_r )
 {
-	struct k053260_chip_def *ic = sndti_token(SOUND_K053260, chip);
+	k053260_state *ic = get_safe_token(device);
 
 	switch ( offset ) {
 		case 0x29: /* channel status */
@@ -397,7 +406,7 @@ static UINT8 k053260_read( const address_space *space,  offs_t offset, int chip 
 				ic->channels[0].pos += ( 1 << 16 );
 
 				if ( offs > ic->rom_size ) {
-					logerror("%s: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n", cpuexec_describe_context(space->machine),offs,ic->rom_size );
+					logerror("%s: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n", cpuexec_describe_context(device->machine),offs,ic->rom_size );
 
 					return 0;
 				}
@@ -410,86 +419,28 @@ static UINT8 k053260_read( const address_space *space,  offs_t offset, int chip 
 	return ic->regs[offset];
 }
 
-/**************************************************************************************************/
-/* Accesors */
-
-READ8_HANDLER( k053260_0_r )
-{
-	return k053260_read( space, offset, 0 );
-}
-
-WRITE8_HANDLER( k053260_0_w )
-{
-	k053260_write( space, offset, data, 0 );
-}
-
-READ8_HANDLER( k053260_1_r )
-{
-	return k053260_read( space, offset, 1 );
-}
-
-WRITE8_HANDLER( k053260_1_w )
-{
-	k053260_write( space, offset, data, 1 );
-}
-
-WRITE16_HANDLER( k053260_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		k053260_0_w (space, offset, data & 0xff);
-}
-
-READ16_HANDLER( k053260_0_lsb_r )
-{
-	return k053260_0_r(space, offset);
-}
-
-WRITE16_HANDLER( k053260_1_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		k053260_1_w (space, offset, data & 0xff);
-}
-
-READ16_HANDLER( k053260_1_lsb_r )
-{
-	return k053260_1_r(space, offset);
-}
-
-
-
-
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( k053260 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( k053260 )
+DEVICE_GET_INFO( k053260 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct k053260_chip_def);		break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(k053260_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k053260 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k053260 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( k053260);			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( k053260 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( k053260);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "K053260");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Konami custom");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "K053260");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Konami custom");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

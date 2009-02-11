@@ -682,12 +682,12 @@ static SAMPLES_START( kageki_init_samples )
 
 
 static int kageki_csport_sel = 0;
-static READ8_HANDLER( kageki_csport_r )
+static READ8_DEVICE_HANDLER( kageki_csport_r )
 {
 	int	dsw, dsw1, dsw2;
 
-	dsw1 = input_port_read(space->machine, "DSWA");
-	dsw2 = input_port_read(space->machine, "DSWB");
+	dsw1 = input_port_read(device->machine, "DSWA");
+	dsw2 = input_port_read(device->machine, "DSWB");
 
 	switch (kageki_csport_sel)
 	{
@@ -711,7 +711,7 @@ static READ8_HANDLER( kageki_csport_r )
 	return (dsw & 0xff);
 }
 
-static WRITE8_HANDLER( kageki_csport_w )
+static WRITE8_DEVICE_HANDLER( kageki_csport_w )
 {
 	char mess[80];
 
@@ -723,32 +723,32 @@ static WRITE8_HANDLER( kageki_csport_w )
 		if (data > MAX_SAMPLES)
 		{
 			// stop samples
-			sample_stop(0);
+			sample_stop(device, 0);
 			sprintf(mess, "VOICE:%02X STOP", data);
 		} else {
 			// play samples
-			sample_start_raw(0, sampledata[data], samplesize[data], 7000, 0);
+			sample_start_raw(device, 0, sampledata[data], samplesize[data], 7000, 0);
 			sprintf(mess, "VOICE:%02X PLAY", data);
 		}
 	//  popmessage(mess);
 	}
 }
 
-static WRITE8_HANDLER( kabukiz_sound_bank_w )
+static WRITE8_DEVICE_HANDLER( kabukiz_sound_bank_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
 	{
-		UINT8 *ROM = memory_region(space->machine, "audio");
-		memory_set_bankptr(space->machine, 3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
+		UINT8 *ROM = memory_region(device->machine, "audio");
+		memory_set_bankptr(device->machine, 3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
 	}
 }
 
-static WRITE8_HANDLER( kabukiz_sample_w )
+static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
-		dac_0_data_w(space, 0, data);
+		dac_data_w(device, data);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -794,8 +794,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xb000, 0xb000) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0xb001, 0xb001) AM_READ(ym2203_read_port_0_r)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0xc000, 0xc001) AM_READ(tnzs_mcu_r)	/* plain input ports in insectx (memory handler */
 									/* changed in insectx_init() ) */
 	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM)
@@ -808,8 +807,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(tnzs_mcu_w)	/* not present in insectx */
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(tnzs_sharedram_w)
@@ -818,8 +816,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kageki_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xb000, 0xb000) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0xb001, 0xb001) AM_READ(ym2203_read_port_0_r)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
@@ -830,8 +827,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kageki_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(tnzs_sharedram_w)
 ADDRESS_MAP_END
@@ -888,8 +884,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnzsb_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -945,8 +940,7 @@ static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK2, SMH_ROM)
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(jpopnics_subbankswitch_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN0") AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN2")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSWA")
@@ -1580,19 +1574,19 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_0_r,		/* DSW1 connected to port A */
-		input_port_1_r,		/* DSW2 connected to port B */
-		NULL,
-		NULL
+		DEVCB_INPUT_PORT("DSWA"),
+		DEVCB_INPUT_PORT("DSWB"),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };
 
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface kageki_ym2203_interface =
@@ -1600,10 +1594,10 @@ static const ym2203_interface kageki_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		kageki_csport_r,
-		NULL,
-		NULL,
-		kageki_csport_w
+		DEVCB_HANDLER(kageki_csport_r),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_DEVICE_HANDLER(SOUND, "samples", kageki_csport_w)
 	},
 };
 
@@ -1612,7 +1606,7 @@ static const ym2203_interface ym2203b_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };
@@ -1622,10 +1616,10 @@ static const ym2203_interface kabukiz_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		kabukiz_sound_bank_w,
-		kabukiz_sample_w,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(kabukiz_sound_bank_w),
+		DEVCB_DEVICE_HANDLER(SOUND, "dac", kabukiz_sample_w)
 	},
 	irqhandler
 };
@@ -1875,7 +1869,7 @@ static MACHINE_DRIVER_START( tnzsb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym2203", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203b_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
@@ -1895,7 +1889,7 @@ static MACHINE_DRIVER_START( kabukiz )
 	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(kabukiz_cpu2_map,0)
 
-	MDRV_SOUND_MODIFY("ym2203")
+	MDRV_SOUND_MODIFY("ym")
 	MDRV_SOUND_CONFIG(kabukiz_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)

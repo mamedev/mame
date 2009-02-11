@@ -64,6 +64,8 @@ VIDEO_START( starcrus )
 
 WRITE8_HANDLER( starcrus_ship_parm_1_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+
     s1_sprite = data&0x1f;
     engine1_on = ((data&0x20)>>5)^0x01;
 
@@ -72,7 +74,7 @@ WRITE8_HANDLER( starcrus_ship_parm_1_w )
 		if (starcrus_engine_sound_playing == 0)
 		{
         	starcrus_engine_sound_playing = 1;
-        	sample_start(0,0,1);	/* engine sample */
+        	sample_start(samples, 0,0,1);	/* engine sample */
 
 		}
     }
@@ -81,13 +83,15 @@ WRITE8_HANDLER( starcrus_ship_parm_1_w )
 		if (starcrus_engine_sound_playing == 1)
 		{
         	starcrus_engine_sound_playing = 0;
-			sample_stop(0);
+			sample_stop(samples, 0);
 		}
 	}
 }
 
 WRITE8_HANDLER( starcrus_ship_parm_2_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+
     s2_sprite = data&0x1f;
     set_led_status(2,~data & 0x80); 		/* game over lamp */
     coin_counter_w(0, ((data&0x40)>>6)^0x01); 	/* coin counter */
@@ -98,7 +102,7 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 		if (starcrus_engine_sound_playing == 0)
 		{
         	starcrus_engine_sound_playing = 1;
-        	sample_start(0,0,1);	/* engine sample */
+        	sample_start(samples,0,0,1);	/* engine sample */
 		}
     }
     else
@@ -106,7 +110,7 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 		if (starcrus_engine_sound_playing == 1)
 		{
         	starcrus_engine_sound_playing = 0;
-			sample_stop(0);
+			sample_stop(samples,0);
 		}
 	}
 
@@ -114,6 +118,8 @@ WRITE8_HANDLER( starcrus_ship_parm_2_w )
 
 WRITE8_HANDLER( starcrus_proj_parm_1_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+
     p1_sprite = data&0x0f;
     launch1_on = ((data&0x20)>>5)^0x01;
     explode1_on = ((data&0x10)>>4)^0x01;
@@ -123,7 +129,7 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 		if (starcrus_explode_sound_playing == 0)
 		{
 			starcrus_explode_sound_playing = 1;
-			sample_start(1,1,1);	/* explosion initial sample */
+			sample_start(samples, 1,1,1);	/* explosion initial sample */
 		}
 	}
 	else
@@ -131,7 +137,7 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 		if (starcrus_explode_sound_playing == 1)
 		{
 			starcrus_explode_sound_playing = 0;
-			sample_start(1,2,0);	/* explosion ending sample */
+			sample_start(samples, 1,2,0);	/* explosion ending sample */
 		}
 	}
 
@@ -140,7 +146,7 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 		if (starcrus_launch1_sound_playing == 0)
 		{
 			starcrus_launch1_sound_playing = 1;
-			sample_start(2,3,0);	/* launch sample */
+			sample_start(samples, 2,3,0);	/* launch sample */
 		}
 	}
 	else
@@ -151,6 +157,8 @@ WRITE8_HANDLER( starcrus_proj_parm_1_w )
 
 WRITE8_HANDLER( starcrus_proj_parm_2_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+
     p2_sprite = data&0x0f;
     launch2_on = ((data&0x20)>>5)^0x01;
     explode2_on = ((data&0x10)>>4)^0x01;
@@ -160,7 +168,7 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w )
 		if (starcrus_explode_sound_playing == 0)
 		{
 			starcrus_explode_sound_playing = 1;
-			sample_start(1,1,1);	/* explosion initial sample */
+			sample_start(samples, 1,1,1);	/* explosion initial sample */
 		}
 	}
 	else
@@ -168,7 +176,7 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w )
 		if (starcrus_explode_sound_playing == 1)
 		{
 			starcrus_explode_sound_playing = 0;
-			sample_start(1,2,0);	/* explosion ending sample */
+			sample_start(samples, 1,2,0);	/* explosion ending sample */
 		}
 	}
 
@@ -177,7 +185,7 @@ WRITE8_HANDLER( starcrus_proj_parm_2_w )
 		if (starcrus_launch2_sound_playing == 0)
 		{
 			starcrus_launch2_sound_playing = 1;
-			sample_start(3,3,0);	/* launch sample */
+			sample_start(samples, 3,3,0);	/* launch sample */
 		}
 	}
 	else

@@ -89,8 +89,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x5000, 0x500f) AM_READWRITE(lions_via_r, lions_via_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ(test_r)//AM_READ_PORT("IN0")
-	AM_RANGE(0x5382, 0x5382) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x5383, 0x5383) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x5382, 0x5383) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -214,10 +213,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_2_r,	/* DSW? */
-	input_port_3_r,	/* DSW? */
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("IN2"),	/* DSW? */
+	DEVCB_INPUT_PORT("IN3"),	/* DSW? */
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 //static READ8_DEVICE_HANDLER( input_a )

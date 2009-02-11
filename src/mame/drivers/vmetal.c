@@ -153,7 +153,7 @@ static READ16_HANDLER ( varia_dips_bit3_r ) { return ((input_port_read(space->ma
 static READ16_HANDLER ( varia_dips_bit2_r ) { return ((input_port_read(space->machine, "DSW2") & 0x02) << 6) | ((input_port_read(space->machine, "DSW1") & 0x02) << 5); }
 static READ16_HANDLER ( varia_dips_bit1_r ) { return ((input_port_read(space->machine, "DSW2") & 0x01) << 7) | ((input_port_read(space->machine, "DSW1") & 0x01) << 6); }
 
-static WRITE16_HANDLER( vmetal_control_w )
+static WRITE8_DEVICE_HANDLER( vmetal_control_w )
 {
 	/* Lower nibble is the coin control bits shown in
        service mode, but in game mode they're different */
@@ -163,20 +163,20 @@ static WRITE16_HANDLER( vmetal_control_w )
 	coin_lockout_w(1,data & 0x02);	/* never activated in game mode?? */
 
 	if ((data & 0x40) == 0)
-		sndti_reset(SOUND_ES8712, 0);
+		device_reset(device);
 	else
-		es8712_play(0);
+		es8712_play(device);
 
 	if (data & 0x10)
-		es8712_set_bank_base(0, 0x100000);
+		es8712_set_bank_base(device, 0x100000);
 	else
-		es8712_set_bank_base(0, 0x000000);
+		es8712_set_bank_base(device, 0x000000);
 
 	if (data & 0xa0)
-		logerror("PC:%06x - Writing unknown bits %04x to $200000\n",cpu_get_previouspc(space->cpu),data);
+		logerror("%s:Writing unknown bits %04x to $200000\n",cpuexec_describe_context(device->machine),data);
 }
 
-static WRITE16_HANDLER( vmetal_es8712_w )
+static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
 {
 	/* Many samples in the ADPCM ROM are actually not used.
 
@@ -208,8 +208,8 @@ static WRITE16_HANDLER( vmetal_es8712_w )
     16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
     */
 
-	es8712_data_0_lsb_w(space, offset, data, mem_mask);
-	logerror("PC:%06x - Writing %04x to ES8712 offset %02x\n",cpu_get_previouspc(space->cpu),data,offset);
+	es8712_w(device, offset, data);
+	logerror("%s:Writing %04x to ES8712 offset %02x\n",cpuexec_describe_context(device->machine),data,offset);
 }
 
 
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE(&vmetal_videoregs)
 	AM_RANGE(0x179700, 0x179713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_WRITE(vmetal_control_w)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8(SOUND, "es", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 
 	/* i have no idea whats meant to be going on here .. it seems to read one bit of the dips from some of them, protection ??? */
@@ -250,9 +250,9 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x31fffc, 0x31fffd) AM_READ(varia_dips_bit1_r )  // 0x40 = dip1-1 , 0x80 = dip2-1
 	AM_RANGE(0x31fffe, 0x31ffff) AM_READ(varia_random )  // nothing?
 
-	AM_RANGE(0x400000, 0x400001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w )
-	AM_RANGE(0x400002, 0x400003) AM_WRITE(okim6295_data_0_lsb_w )	// Volume/channel info
-	AM_RANGE(0x500000, 0x50000d) AM_WRITE(vmetal_es8712_w)
+	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)	// Volume/channel info
+	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8(SOUND, "es", vmetal_es8712_w, 0x00ff)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

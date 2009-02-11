@@ -76,8 +76,8 @@
 #define PSG_BC_LATCH_ADDRESS    ( MUSIC_PORT2_PSG_BDIR | MUSIC_PORT2_PSG_BC1 )
 
 
-#define PLAY(id,loop)           sample_start( id, id, loop )
-#define STOP(id)                sample_stop( id )
+#define PLAY(samp,id,loop)      sample_start( samp, id, id, loop )
+#define STOP(samp,id)           sample_stop( samp, id )
 
 
 /* sample file names */
@@ -128,6 +128,7 @@ static int psgData = 0;
 WRITE8_HANDLER( carnival_audio_1_w )
 {
 	static int port1State = 0;
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;
@@ -152,60 +153,61 @@ WRITE8_HANDLER( carnival_audio_1_w )
 
 	if ( bitsGoneLow & OUT_PORT_1_RIFLE_SHOT )
 	{
-		PLAY( SND_RIFLE_SHOT, 0 );
+		PLAY( samples, SND_RIFLE_SHOT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_CLANG )
 	{
-		PLAY( SND_CLANG, 0 );
+		PLAY( samples, SND_CLANG, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_DUCK_1 )
 	{
-		PLAY( SND_DUCK_1, 1 );
+		PLAY( samples, SND_DUCK_1, 1 );
 	}
 	if ( bitsGoneHigh & OUT_PORT_1_DUCK_1 )
 	{
-		STOP( SND_DUCK_1 );
+		STOP( samples, SND_DUCK_1 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_DUCK_2 )
 	{
-		PLAY( SND_DUCK_2, 1 );
+		PLAY( samples, SND_DUCK_2, 1 );
 	}
 	if ( bitsGoneHigh & OUT_PORT_1_DUCK_2 )
 	{
-		STOP( SND_DUCK_2 );
+		STOP( samples, SND_DUCK_2 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_DUCK_3 )
 	{
-		PLAY( SND_DUCK_3, 1 );
+		PLAY( samples, SND_DUCK_3, 1 );
 	}
 	if ( bitsGoneHigh & OUT_PORT_1_DUCK_3 )
 	{
-		STOP( SND_DUCK_3 );
+		STOP( samples, SND_DUCK_3 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_PIPE_HIT )
 	{
-		PLAY( SND_PIPE_HIT, 0 );
+		PLAY( samples, SND_PIPE_HIT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_BONUS_1 )
 	{
-		PLAY( SND_BONUS_1, 0 );
+		PLAY( samples, SND_BONUS_1, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_BONUS_2 )
 	{
-		PLAY( SND_BONUS_2, 0 );
+		PLAY( samples, SND_BONUS_2, 0 );
 	}
 }
 
 
 WRITE8_HANDLER( carnival_audio_2_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;
@@ -228,10 +230,10 @@ WRITE8_HANDLER( carnival_audio_2_w )
 	port2State = data;
 
 	if ( bitsGoneLow & OUT_PORT_2_BEAR )
-		PLAY( SND_BEAR, 0 );
+		PLAY( samples, SND_BEAR, 0 );
 
 	if ( bitsGoneLow & OUT_PORT_2_RANKING )
-		PLAY( SND_RANKING, 0 );
+		PLAY( samples, SND_RANKING, 0 );
 
 	if ( bitsGoneHigh & OUT_PORT_2_MUSIC_RESET )
 		/* reset output is no longer asserted active low */
@@ -252,7 +254,7 @@ static WRITE8_HANDLER( carnival_music_port_1_w )
 }
 
 
-static WRITE8_HANDLER( carnival_music_port_2_w )
+static WRITE8_DEVICE_HANDLER( carnival_music_port_2_w )
 {
 	static int psgSelect = 0;
 	int newSelect;
@@ -273,11 +275,11 @@ static WRITE8_HANDLER( carnival_music_port_2_w )
 			break;
 
 		case PSG_BC_WRITE:
-			ay8910_write_port_0_w( space, 0, psgData );
+			ay8910_data_w( device, 0, psgData );
 			break;
 
 		case PSG_BC_LATCH_ADDRESS:
-			ay8910_control_port_0_w( space, 0, psgData );
+			ay8910_address_w( device, 0, psgData );
 			break;
 		}
 	}
@@ -291,7 +293,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( carnival_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(carnival_music_port_t1_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(carnival_music_port_1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(carnival_music_port_2_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE(SOUND, "psg", carnival_music_port_2_w)
 ADDRESS_MAP_END
 
 

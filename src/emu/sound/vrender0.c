@@ -14,7 +14,8 @@ reverb
 interrupts
 *************/
 
-struct _VR0Chip
+typedef struct _vr0_state vr0_state; 
+struct _vr0_state
 {
 	UINT32 *TexBase;
 	UINT32 *FBBase;
@@ -23,11 +24,20 @@ struct _VR0Chip
 	sound_stream * stream;
 };
 
-static void VR0_RenderAudio(struct _VR0Chip *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r);
+INLINE vr0_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_VRENDER0);
+	return (vr0_state *)device->token;
+}
+
+static void VR0_RenderAudio(vr0_state *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r);
 
 static STREAM_UPDATE( VR0_Update )
 {
-	struct _VR0Chip *VR0 = param;
+	vr0_state *VR0 = param;
 	VR0_RenderAudio(VR0, samples,outputs[0],outputs[1]);
 }
 
@@ -87,17 +97,17 @@ static const unsigned short ULawTo16[]=
 #define LOOPEND(chan)   (GETSOUNDREG32(chan,0x10)&0x3fffff)
 #define ENVVOL(chan)    (GETSOUNDREG32(chan,0x04)&0xffffff)
 */
-void vr0_snd_set_areas(UINT32 *texture,UINT32 *frame)
+void vr0_snd_set_areas(const device_config *device,UINT32 *texture,UINT32 *frame)
 {
-	struct _VR0Chip *VR0 = sndti_token(SOUND_VRENDER0, 0);
+	vr0_state *VR0 = get_safe_token(device);
 	VR0->TexBase=texture;
 	VR0->FBBase=frame;
 }
 
-static SND_START( vrender0 )
+static DEVICE_START( vrender0 )
 {
 	const vr0_interface *intf;
-	struct _VR0Chip *VR0 = device->token;
+	vr0_state *VR0 = get_safe_token(device);
 
 	intf=device->static_config;
 
@@ -107,9 +117,9 @@ static SND_START( vrender0 )
 	VR0->stream = stream_create(device, 0, 2, 44100, VR0, VR0_Update);
 }
 
-WRITE32_HANDLER(vr0_snd_write)
+WRITE32_DEVICE_HANDLER(vr0_snd_write)
 {
-	struct _VR0Chip *VR0 = sndti_token(SOUND_VRENDER0, 0);
+	vr0_state *VR0 = get_safe_token(device);
 	if(offset==0x404/4)
 	{
 		data&=0xffff;
@@ -132,13 +142,13 @@ WRITE32_HANDLER(vr0_snd_write)
 }
 
 
-READ32_HANDLER(vr0_snd_read)
+READ32_DEVICE_HANDLER(vr0_snd_read)
 {
-	struct _VR0Chip *VR0 = sndti_token(SOUND_VRENDER0, 0);
+	vr0_state *VR0 = get_safe_token(device);
 	return VR0->SOUNDREGS[offset];
 }
 
-static void VR0_RenderAudio(struct _VR0Chip *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r)
+static void VR0_RenderAudio(vr0_state *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r)
 {
 	INT16 *SAMPLES;
 	UINT32 st=STATUS;
@@ -237,34 +247,24 @@ static void VR0_RenderAudio(struct _VR0Chip *VR0, int nsamples,stream_sample_t *
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( vrender0 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( vrender0 )
+DEVICE_GET_INFO( vrender0 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct _VR0Chip);	 			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vr0_state);	 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( vrender0 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( vrender0 );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( vrender0 );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "VRender0");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "???");							break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "VRender0");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "???");							break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

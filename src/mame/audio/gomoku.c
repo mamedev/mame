@@ -53,7 +53,7 @@ static short *mixer_buffer_2;
 
 
 /* build a table to divide by the number of voices; gain is specified as gain*16 */
-static int make_mixer_table(int voices, int gain)
+static void make_mixer_table(int voices, int gain)
 {
 	int count = voices * 128;
 	int i;
@@ -72,8 +72,6 @@ static int make_mixer_table(int voices, int gain)
 		mixer_lookup[ i] = val;
 		mixer_lookup[-i] = -val;
 	}
-
-	return 0;
 }
 
 
@@ -162,7 +160,7 @@ static STREAM_UPDATE( gomoku_update_mono )
 
 
 
-CUSTOM_START( gomoku_sh_start )
+static DEVICE_START( gomoku_sound )
 {
 	running_machine *machine = device->machine;
 	sound_channel *voice;
@@ -176,8 +174,7 @@ CUSTOM_START( gomoku_sh_start )
 	mixer_buffer_2 = mixer_buffer + samplerate;
 
 	/* build the mixer table */
-	if (make_mixer_table(8, defgain))
-		return NULL;
+	make_mixer_table(8, defgain);
 
 	/* extract globals from the interface */
 	num_voices = MAX_VOICES;
@@ -197,8 +194,20 @@ CUSTOM_START( gomoku_sh_start )
 		voice->volume = 0;
 		voice->oneshotplaying = 0;
 	}
+}
 
-	return auto_malloc(1);
+
+DEVICE_GET_INFO( gomoku_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(gomoku_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Gomoku Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }
 
 

@@ -45,21 +45,21 @@ static UINT8 r6532_porta_r(const device_config *device, UINT8 olddata)
 	/* d0 (out) TMS5220 Not Write       */
 	/* Note: bit 4 is always set to avoid sound self test */
 
-	return (olddata & 0xc0) | 0x10 | (!tms5220_ready_r() << 2);
+	return (olddata & 0xc0) | 0x10 | (!tms5220_ready_r(devtag_get_device(device->machine, SOUND, "tms")) << 2);
 }
 
 
 static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *tms = devtag_get_device(device->machine, SOUND, "tms");
 
 	/* handle 5220 read */
 	if ((olddata & 2) != 0 && (newdata & 2) == 0)
-		riot6532_portb_in_set(riot, tms5220_status_r(space, 0), 0xff);
+		riot6532_portb_in_set(riot, tms5220_status_r(tms, 0), 0xff);
 
 	/* handle 5220 write */
 	if ((olddata & 1) != 0 && (newdata & 1) == 0)
-		tms5220_data_w(space, 0, riot6532_portb_out_get(riot));
+		tms5220_data_w(tms, 0, riot6532_portb_out_get(riot));
 }
 
 

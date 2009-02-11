@@ -169,8 +169,8 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x1000, 0x100f) AM_READWRITE(pokey1_r, pokey1_w)		/* DSW0 also */
-	AM_RANGE(0x1800, 0x180f) AM_READWRITE(pokey2_r, pokey2_w)		/* DSW1 also */
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)		/* DSW0 also */
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)		/* DSW1 also */
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P1")
 	AM_RANGE(0x2200, 0x2200) AM_READ_PORT("P2")
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM")
@@ -312,14 +312,14 @@ GFXDECODE_END
 
 static const pokey_interface pokey_interface_1 =
 {
-	{ 0 },
-	input_port_3_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("START"),
 };
 
 static const pokey_interface pokey_interface_2 =
 {
-	{ 0 },
-	input_port_4_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW"),
 };
 
 

@@ -82,7 +82,6 @@
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 #include "leland.h"
-#include "sound/custom.h"
 #include "sound/2151intf.h"
 
 
@@ -132,7 +131,7 @@ static STREAM_UPDATE( leland_update )
 }
 
 
-CUSTOM_START( leland_sh_start )
+static DEVICE_START( leland_sound )
 {
 	/* reset globals */
 	dac_buffer[0] = dac_buffer[1] = NULL;
@@ -145,8 +144,20 @@ CUSTOM_START( leland_sh_start )
 	/* allocate memory */
 	dac_buffer[0] = auto_malloc(DAC_BUFFER_SIZE);
 	dac_buffer[1] = auto_malloc(DAC_BUFFER_SIZE);
+}
 
-	return auto_malloc(1);
+
+DEVICE_GET_INFO( leland_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(leland_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Leland DAC");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }
 
 
@@ -500,17 +511,14 @@ static STREAM_UPDATE( leland_80186_extern_update )
 static TIMER_CALLBACK( internal_timer_int );
 static TIMER_CALLBACK( dma_timer_callback );
 
-static void *common_sh_start(const device_config *device, int clock, const custom_sound_interface *config)
+static DEVICE_START( common_sh_start )
 {
 	running_machine *machine = device->machine;
-	const address_space *dmaspace = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
+	const address_space *dmaspace = memory_find_address_space(cputag_get_cpu(machine, "audio"), ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */
-	has_ym2151 = 0;
-	for (i = 0; i < MAX_SOUND; i++)
-		if (machine->config->sound[i].type == SOUND_YM2151)
-			has_ym2151 = 1;
+	has_ym2151 = (devtag_get_device(device->machine, SOUND, "ym") != NULL);
 
 	/* allocate separate streams for the DMA and non-DMA DACs */
 	dma_stream = stream_create(device, 0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
@@ -535,20 +543,46 @@ static void *common_sh_start(const device_config *device, int clock, const custo
 
 	for (i = 0; i < 9; i++)
 		counter[i].timer = timer_alloc(machine, NULL, NULL);
-
-	return auto_malloc(1);
 }
 
-CUSTOM_START( leland_80186_sh_start )
+static DEVICE_START( leland_80186_sound )
 {
 	is_redline = 0;
-	return common_sh_start(device, clock, config);
+	DEVICE_START_CALL(common_sh_start);
 }
 
-CUSTOM_START( redline_80186_sh_start )
+static DEVICE_START( redline_80186_sound )
 {
 	is_redline = 1;
-	return common_sh_start(device, clock, config);
+	DEVICE_START_CALL(common_sh_start);
+}
+
+
+DEVICE_GET_INFO( leland_80186_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(leland_80186_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Leland 80186 DAC");			break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+
+DEVICE_GET_INFO( redline_80186_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(redline_80186_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Redline Racer 80186 DAC");		break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }
 
 
@@ -2009,7 +2043,7 @@ static READ16_HANDLER( peripheral_r )
 			if (!has_ym2151)
 				return pit8254_r(space, offset | 0x40, mem_mask);
 			else
-				return ym2151_status_port_0_lsb_r(space, offset, mem_mask);
+				return ym2151_r(devtag_get_device(space->machine, SOUND, "ym"), offset);
 
 		case 4:
 			if (is_redline)
@@ -2044,10 +2078,8 @@ static WRITE16_HANDLER( peripheral_w )
 		case 3:
 			if (!has_ym2151)
 				pit8254_w(space, offset | 0x40, data, mem_mask);
-			else if (offset == 0)
-				ym2151_register_port_0_lsb_w(space, offset, data, mem_mask);
-			else if (offset == 1)
-				ym2151_data_port_0_lsb_w(space, offset, data, mem_mask);
+			else
+				ym2151_w(devtag_get_device(space->machine, SOUND, "ym"), offset, data);
 			break;
 
 		case 4:

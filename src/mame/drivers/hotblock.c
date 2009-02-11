@@ -109,8 +109,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hotblock_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(hotblock_port0_w)
 	AM_RANGE(0x0004, 0x0004) AM_READ(hotblock_port4_r) AM_WRITE(hotblock_port4_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_READ( ay8910_read_port_0_r ) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD(SOUND, "ay", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -181,10 +181,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,
-	input_port_1_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("P1"),
+	DEVCB_INPUT_PORT("P2"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

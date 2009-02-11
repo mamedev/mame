@@ -190,15 +190,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
 //  AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -324,9 +323,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(running_machine *machine, int state)
+static void irqhandler(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1],0,state);
+	cpu_set_input_line(device->machine->cpu[1],0,state);
 }
 
 static const ym2203_interface ym2203_config =
@@ -334,7 +333,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };

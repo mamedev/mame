@@ -261,14 +261,13 @@ static STREAM_UPDATE( amiga_stream_update )
  *
  *************************************/
 
-CUSTOM_START( amiga_sh_start )
+static DEVICE_START( amiga_sound )
 {
 	running_machine *machine = device->machine;
 	int i;
 
 	/* allocate a new audio state */
-	audio_state = auto_malloc(sizeof(*audio_state));
-	memset(audio_state, 0, sizeof(*audio_state));
+	audio_state = device->token;
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;
@@ -276,6 +275,24 @@ CUSTOM_START( amiga_sh_start )
 	}
 
 	/* create the stream */
-	audio_state->stream = stream_create(device, 0, 4, clock / CLOCK_DIVIDER, audio_state, amiga_stream_update);
-	return audio_state;
+	audio_state->stream = stream_create(device, 0, 4, device->clock / CLOCK_DIVIDER, audio_state, amiga_stream_update);
 }
+
+
+DEVICE_GET_INFO( amiga_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(*audio_state);					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(amiga_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Amiga Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+

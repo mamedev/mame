@@ -15,7 +15,6 @@
 #define __LASERDSC_H__
 
 #include "chd.h"
-#include "sound/custom.h"
 
 
 
@@ -153,14 +152,6 @@ struct _laserdisc_config
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-extern const custom_sound_interface laserdisc_custom_interface;
-
-
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
@@ -232,6 +223,10 @@ void laserdisc_set_config(const device_config *device, const laserdisc_config *c
 /* device get info callback */
 #define LASERDISC DEVICE_GET_INFO_NAME(laserdisc)
 DEVICE_GET_INFO( laserdisc );
+
+/* audio get info callback */
+#define SOUND_LASERDISC DEVICE_GET_INFO_NAME(laserdisc_sound)
+DEVICE_GET_INFO( laserdisc_sound );
 
 
 #endif 	/* __LASERDSC_H__ */

@@ -679,7 +679,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		pokey1_w(space, offset & 0x0f, data);
+		pokey_w(devtag_get_device(space->machine, SOUND, "pokey"), offset & 0x0f, data);
 
 	/* OUT0 */
 	else if (offset < 0x4900)
@@ -738,7 +738,7 @@ static READ8_HANDLER( missile_r )
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		result = pokey1_r(space, offset & 0x0f);
+		result = pokey_r(devtag_get_device(space->machine, SOUND, "pokey"), offset & 0x0f);
 
 	/* IN0 */
 	else if (offset < 0x4900)
@@ -962,8 +962,8 @@ INPUT_PORTS_END
 
 static const pokey_interface pokey_config =
 {
-	{ 0 },
-	input_port_3_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("R8")
 };
 
 

@@ -97,11 +97,11 @@ static READ16_HANDLER( oneshot_gun_y_p2_r )
 	return gun_y_p2;
 }
 
-static WRITE16_HANDLER( soundbank_w )
+static WRITE16_DEVICE_HANDLER( soundbank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(0, 0x40000 * ((data & 0x03) ^ 0x03));
+		okim6295_set_bank_base(device, 0x40000 * ((data & 0x03) ^ 0x03));
 	}
 }
 
@@ -135,24 +135,23 @@ static ADDRESS_MAP_START( oneshot_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x182000, 0x182fff) AM_WRITE(oneshot_bg_videoram_w) AM_BASE(&oneshot_bg_videoram) // credits etc.
 	AM_RANGE(0x188000, 0x18800f) AM_WRITE(SMH_RAM) AM_BASE(&oneshot_scroll)	// scroll registers???
 	AM_RANGE(0x190010, 0x190011) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x190018, 0x190019) AM_WRITE(soundbank_w)
+	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE(SOUND, "oki", soundbank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8001, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(ym3812_status_port_0_r)
-	AM_RANGE(0xe010, 0xe010) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREAD(SOUND, "ym", ym3812_r)
+	AM_RANGE(0xe010, 0xe010) AM_DEVREAD(SOUND, "oki", okim6295_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x8001, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0xe010, 0xe010) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE(SOUND, "ym", ym3812_w)
+	AM_RANGE(0xe010, 0xe010) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( oneshot )
@@ -351,9 +350,9 @@ static GFXDECODE_START( oneshot )
 	GFXDECODE_ENTRY( "gfx1", 0, oneshot8x8_layout,     0x00, 4  ) /* sprites */
 GFXDECODE_END
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =

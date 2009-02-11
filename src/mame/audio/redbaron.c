@@ -18,7 +18,6 @@
 #include "driver.h"
 #include "streams.h"
 #include "bzone.h"
-#include "sound/custom.h"
 #include "sound/pokey.h"
 
 #define OUTPUT_RATE		(48000)
@@ -56,10 +55,10 @@ WRITE8_HANDLER( redbaron_sounds_w )
     rb_input_select = data & 1;
 }
 
-WRITE8_HANDLER( redbaron_pokey_w )
+WRITE8_DEVICE_HANDLER( redbaron_pokey_w )
 {
     if( latch & 0x20 )
-        pokey1_w(space, offset, data);
+        pokey_w(device, offset, data);
 }
 
 static STREAM_UPDATE( redbaron_sound_update )
@@ -169,7 +168,7 @@ static STREAM_UPDATE( redbaron_sound_update )
 	}
 }
 
-CUSTOM_START( redbaron_sh_start )
+static DEVICE_START( redbaron_sound )
 {
 	int i;
 
@@ -208,6 +207,20 @@ CUSTOM_START( redbaron_sh_start )
 	}
 
 	channel = stream_create(device, 0, 1, OUTPUT_RATE, 0, redbaron_sound_update);
-
-	return auto_malloc(1);
 }
+
+
+DEVICE_GET_INFO( redbaron_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(redbaron_sound);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Red Baron Custom");			break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+

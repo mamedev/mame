@@ -28,7 +28,7 @@ Year + Game                 By      Board      Hardware
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "sound/ay8910.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 
 /* Variables and functions defined in video: */
 
@@ -254,15 +254,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bssoccer_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0xf801, 0xf801) AM_READ(ym2151_status_port_0_r	)	// YM2151
+	AM_RANGE(0xf800, 0xf801) AM_DEVREAD(SOUND, "ym", ym2151_r	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM					)	// RAM
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(ym2151_register_port_0_w	)	// YM2151
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(ym2151_data_port_0_w		)	//
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE(SOUND, "ym", ym2151_w	)	// YM2151
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(soundlatch2_w 			)	// To PCM Z80 #1
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(soundlatch3_w 			)	// To PCM Z80 #2
 ADDRESS_MAP_END
@@ -274,15 +273,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0xf801, 0xf801) AM_READ(ym2151_status_port_0_r	)	// YM2151
+	AM_RANGE(0xf800, 0xf801) AM_DEVREAD(SOUND, "ym", ym2151_r	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( uballoon_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM					)	// RAM
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(ym2151_register_port_0_w	)	// YM2151
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(ym2151_data_port_0_w		)	//
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE(SOUND, "ym", ym2151_w	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w				)	// To PCM Z80
 ADDRESS_MAP_END
 
@@ -293,15 +291,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sunaq_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xe82f) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0xe830, 0xf7ff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0xf801, 0xf801) AM_READ(ym2151_status_port_0_r	)	// YM2151
+	AM_RANGE(0xf800, 0xf801) AM_DEVREAD(SOUND, "ym", ym2151_r	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sunaq_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xe82f) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xe830, 0xf7ff) AM_WRITE(SMH_RAM					)	// RAM (writes to efxx, could be a program bug tho)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(ym2151_register_port_0_w	)	// YM2151
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(ym2151_data_port_0_w		)	//
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE(SOUND, "ym", ym2151_w	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w				)	// To PCM Z80
 ADDRESS_MAP_END
 
@@ -311,10 +308,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestbest_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM									// ROM
-	AM_RANGE( 0xc000, 0xc000 ) AM_WRITE( ym3526_control_port_0_w	)	// YM3526
-	AM_RANGE( 0xc001, 0xc001 ) AM_WRITE( ym3526_write_port_0_w		)	//
-	AM_RANGE( 0xc002, 0xc002 ) AM_WRITE( ay8910_control_port_0_w	)	// AY8910
-	AM_RANGE( 0xc003, 0xc003 ) AM_WRITE( ay8910_write_port_0_w		)	//
+	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE( SOUND, "ym", ym3526_w	)	//
+	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE( SOUND, "ay", ay8910_address_data_w	)	// AY8910
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM									// RAM
 	AM_RANGE( 0xf000, 0xf000 ) AM_WRITE( soundlatch2_w				)	// To PCM Z80
 	AM_RANGE( 0xf800, 0xf800 ) AM_READ ( soundlatch_r				)	// From Main CPU
@@ -379,12 +374,12 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( bssoccer_DAC_1_w )
 {
-	dac_data_w( 0 + (offset & 1), (data & 0xf) * 0x11 );
+	dac_data_w( devtag_get_device(space->machine, SOUND, (offset & 1) ? "dac2" : "dac1"), (data & 0xf) * 0x11 );
 }
 
 static WRITE8_HANDLER( bssoccer_DAC_2_w )
 {
-	dac_data_w( 2 + (offset & 1), (data & 0xf) * 0x11 );
+	dac_data_w( devtag_get_device(space->machine, SOUND, (offset & 1) ? "dac4" : "dac3"), (data & 0xf) * 0x11 );
 }
 
 static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, ADDRESS_SPACE_IO, 8 )
@@ -998,9 +993,9 @@ MACHINE_DRIVER_END
                             Best Of Best
 ***************************************************************************/
 
-static void bestbest_ym3526_irqhandler(running_machine *machine, int state)
+static void bestbest_ym3526_irqhandler(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_IRQ0, state);
 }
 
 static const ym3526_interface bestbest_ym3526_interface =
@@ -1008,7 +1003,7 @@ static const ym3526_interface bestbest_ym3526_interface =
 	bestbest_ym3526_irqhandler
 };
 
-static WRITE8_HANDLER( bestbest_ay8910_port_a_w )
+static WRITE8_DEVICE_HANDLER( bestbest_ay8910_port_a_w )
 {
 	// ?
 }
@@ -1017,8 +1012,8 @@ static const ay8910_interface bestbest_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,						NULL,
-	bestbest_ay8910_port_a_w,	NULL
+	DEVCB_NULL,									DEVCB_NULL,
+	DEVCB_HANDLER(bestbest_ay8910_port_a_w),	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( bestbest )

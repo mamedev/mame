@@ -331,7 +331,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( st0016_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xe900, 0xe9ff) AM_RAM_WRITE(st0016_snd_w) AM_BASE(&st0016_sound_regs)
+	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE(SOUND, "st", st0016_snd_r, st0016_snd_w)
 	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END

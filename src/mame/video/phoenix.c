@@ -430,7 +430,7 @@ READ8_HANDLER( survival_input_port_0_r )
 	return survival_input_latches[0];
 }
 
-READ8_HANDLER( survival_protection_r )
+READ8_DEVICE_HANDLER( survival_protection_r )
 {
 	return survival_protection_value;
 }

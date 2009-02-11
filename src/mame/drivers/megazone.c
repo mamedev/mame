@@ -34,7 +34,7 @@ VIDEO_UPDATE( megazone );
 
 
 
-static READ8_HANDLER( megazone_portA_r )
+static READ8_DEVICE_HANDLER( megazone_portA_r )
 {
 	int clock,timer;
 
@@ -46,7 +46,7 @@ static READ8_HANDLER( megazone_portA_r )
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
 
-	clock = cputag_get_total_cycles(space->machine, "audio") * 7159/12288;	/* = (14318/8)/(18432/6) */
+	clock = cputag_get_total_cycles(device->machine, "audio") * 7159/12288;	/* = (14318/8)/(18432/6) */
 	timer = (clock / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
@@ -54,8 +54,9 @@ static READ8_HANDLER( megazone_portA_r )
 	return (timer << 4) | i8039_status;
 }
 
-static WRITE8_HANDLER( megazone_portB_w )
+static WRITE8_DEVICE_HANDLER( megazone_portB_w )
 {
+	static const char *fltname[] = { "filter.0.0", "filter.0.1", "filter.0.2" };
 	int i;
 
 
@@ -68,7 +69,7 @@ static WRITE8_HANDLER( megazone_portB_w )
 		if (data & 1) C +=  10000;	/*  10000pF = 0.01uF */
 		if (data & 2) C += 220000;	/* 220000pF = 0.22uF */
 		data >>= 2;
-		filter_rc_set_RC(i,FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
+		filter_rc_set_RC(devtag_get_device(device->machine, SOUND, fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
 	}
 }
 
@@ -134,9 +135,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x00, 0x02) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x00, 0x02) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -149,7 +150,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
@@ -296,10 +297,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	megazone_portA_r,
-	NULL,
-	NULL,
-	megazone_portB_w
+	DEVCB_HANDLER(megazone_portA_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(megazone_portB_w)
 };
 
 

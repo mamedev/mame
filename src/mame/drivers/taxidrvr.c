@@ -76,19 +76,19 @@ static WRITE8_DEVICE_HANDLER( p1c_w )
 	s3 = (data & 2) >> 1;
 }
 
-static READ8_HANDLER( p8910_0a_r )
+static READ8_DEVICE_HANDLER( p8910_0a_r )
 {
 	return latchA;
 }
 
-static READ8_HANDLER( p8910_1a_r )
+static READ8_DEVICE_HANDLER( p8910_1a_r )
 {
 	return s3;
 }
 
 /* note that a lot of writes happen with port B set as input. I think this is a bug in the
    original, since it works anyway even if the communication is flawed. */
-static WRITE8_HANDLER( p8910_0b_w )
+static WRITE8_DEVICE_HANDLER( p8910_0b_w )
 {
 	s4 = data & 1;
 }
@@ -183,10 +183,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD(SOUND, "ay2", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -340,20 +340,20 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	p8910_0a_r,
-	NULL,
-	NULL,
-	p8910_0b_w
+	DEVCB_HANDLER(p8910_0a_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(p8910_0b_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	p8910_1a_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_HANDLER(p8910_1a_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

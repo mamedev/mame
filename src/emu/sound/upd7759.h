@@ -16,20 +16,14 @@ struct _upd7759_interface
 	void (*drqcallback)(const device_config *device, int param);	/* drq callback (per chip, slave mode only) */
 };
 
-void upd7759_set_bank_base(int which, offs_t base);
+void upd7759_set_bank_base(const device_config *device, offs_t base);
 
-void upd7759_reset_w(int num, UINT8 data);
+void upd7759_reset_w(const device_config *device, UINT8 data);
+void upd7759_start_w(const device_config *device, UINT8 data);
+int upd7759_busy_r(const device_config *device);
+WRITE8_DEVICE_HANDLER( upd7759_port_w );
 
-void upd7759_port_w(int num, UINT8 data);
-void upd7759_start_w(int num, UINT8 data);
-int upd7759_busy_r(int num);
-
-WRITE8_HANDLER( upd7759_0_reset_w );
-WRITE8_HANDLER( upd7759_0_port_w );
-WRITE8_HANDLER( upd7759_0_start_w );
-READ8_HANDLER( upd7759_0_busy_r );
-
-SND_GET_INFO( upd7759 );
-#define SOUND_UPD7759 SND_GET_INFO_NAME( upd7759 )
+DEVICE_GET_INFO( upd7759 );
+#define SOUND_UPD7759 DEVICE_GET_INFO_NAME( upd7759 )
 
 #endif /* __UPD7759_H__ */

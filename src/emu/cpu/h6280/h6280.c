@@ -356,12 +356,12 @@ static CPU_TRANSLATE( h6280 )
 	return TRUE;
 }
 
-UINT8 h6280io_get_buffer(device_config *device)
+UINT8 h6280io_get_buffer(const device_config *device)
 {
 	h6280_Regs* cpustate = device->token;
 	return cpustate->io_buffer;
 }
-void h6280io_set_buffer(device_config *device, UINT8 data)
+void h6280io_set_buffer(const device_config *device, UINT8 data)
 {
 	h6280_Regs* cpustate = device->token;
 	cpustate->io_buffer=data;

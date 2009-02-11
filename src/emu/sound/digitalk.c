@@ -285,6 +285,17 @@ static const int pitch_vals[32] = {
 	61, 60, 58, 56, 55, 53, 52, 50, 49, 48, 46, 45, 43, 42, 41, 40
 };
 
+
+INLINE digitalker *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_DIGITALKER);
+	return (digitalker *)device->token;
+}
+
+
 static void digitalker_write(digitalker *dg, UINT8 *adr, UINT8 vol, INT8 dac)
 {
 	INT16 v;
@@ -569,11 +580,6 @@ static STREAM_UPDATE(digitalker_update)
 	}
 }
 
-static void digitalker_data_w(digitalker *dg, UINT8 data)
-{
-	dg->data = data;
-}
-
 static void digitalker_cs_w(digitalker *dg, int line)
 {
 	UINT8 cs = line == ASSERT_LINE ? 1 : 0;
@@ -639,12 +645,12 @@ static void digitalker_register_for_save(digitalker *dg)
 	state_save_register_device_item_array(dg->device, 0, dg->dac);
 }
 
-static SND_START(digitalker)
+static DEVICE_START(digitalker)
 {
-	digitalker *dg = device->token;
+	digitalker *dg = get_safe_token(device);
 	dg->device = device;
 	dg->rom = memory_region(device->machine, device->tag);
-	dg->stream = stream_create(device, 0, 1, clock/4, dg, digitalker_update);
+	dg->stream = stream_create(device, 0, 1, device->clock/4, dg, digitalker_update);
 	dg->dac_index = 128;
 	dg->data = 0xff;
 	dg->cs = dg->cms = dg->wr = 1;
@@ -654,53 +660,47 @@ static SND_START(digitalker)
 	digitalker_register_for_save(dg);
 }
 
-static SND_SET_INFO(digitalker)
-{
-	/* no parameters to set */
-}
-
-SND_GET_INFO(digitalker)
+DEVICE_GET_INFO(digitalker)
 {
 	switch(state) {
-	case SNDINFO_INT_TOKEN_BYTES:	info->i = sizeof(digitalker); break;
-	case SNDINFO_PTR_SET_INFO:		info->set_info = SND_SET_INFO_NAME(digitalker); break;
-	case SNDINFO_PTR_START:			info->start = SND_START_NAME(digitalker); break;
-	case SNDINFO_PTR_STOP:      	break;
-	case SNDINFO_PTR_RESET:     	break;
-	case SNDINFO_STR_NAME:      	strcpy(info->s, "Digitalker"); break;
-	case SNDINFO_STR_CORE_FAMILY:	strcpy(info->s, "National Semiconductor"); break;
-	case SNDINFO_STR_CORE_VERSION:	strcpy(info->s, "1.0"); break;
-	case SNDINFO_STR_CORE_FILE:		strcpy(info->s, __FILE__); break;
-	case SNDINFO_STR_CORE_CREDITS:	strcpy(info->s, "Copyright Olivier Galibert"); break;
+	case DEVINFO_INT_TOKEN_BYTES:	info->i = sizeof(digitalker); break;
+	case DEVINFO_FCT_START:			info->start = DEVICE_START_NAME(digitalker); break;
+	case DEVINFO_FCT_STOP:      	break;
+	case DEVINFO_FCT_RESET:     	break;
+	case DEVINFO_STR_NAME:      	strcpy(info->s, "Digitalker"); break;
+	case DEVINFO_STR_FAMILY:	strcpy(info->s, "National Semiconductor"); break;
+	case DEVINFO_STR_VERSION:	strcpy(info->s, "1.0"); break;
+	case DEVINFO_STR_SOURCE_FILE:		strcpy(info->s, __FILE__); break;
+	case DEVINFO_STR_CREDITS:	strcpy(info->s, "Copyright Olivier Galibert"); break;
 	}
 }
 
-void digitalker_0_cs_w(int line)
+void digitalker_0_cs_w(const device_config *device, int line)
 {
-	digitalker *dg = sndti_token(SOUND_DIGITALKER, 0);
+	digitalker *dg = get_safe_token(device);
 	digitalker_cs_w(dg, line);
 }
 
-void digitalker_0_cms_w(int line)
+void digitalker_0_cms_w(const device_config *device, int line)
 {
-	digitalker *dg = sndti_token(SOUND_DIGITALKER, 0);
+	digitalker *dg = get_safe_token(device);
 	digitalker_cms_w(dg, line);
 }
 
-void digitalker_0_wr_w(int line)
+void digitalker_0_wr_w(const device_config *device, int line)
 {
-	digitalker *dg = sndti_token(SOUND_DIGITALKER, 0);
+	digitalker *dg = get_safe_token(device);
 	digitalker_wr_w(dg, line);
 }
 
-int digitalker_0_intr_r(void)
+int digitalker_0_intr_r(const device_config *device)
 {
-	digitalker *dg = sndti_token(SOUND_DIGITALKER, 0);
+	digitalker *dg = get_safe_token(device);
 	return digitalker_intr_r(dg);
 }
 
-WRITE8_HANDLER(digitalker_0_data_w)
+WRITE8_DEVICE_HANDLER( digitalker_data_w )
 {
-	digitalker *dg = sndti_token(SOUND_DIGITALKER, 0);
-	digitalker_data_w(dg, data);
+	digitalker *dg = get_safe_token(device);
+	dg->data = data;
 }

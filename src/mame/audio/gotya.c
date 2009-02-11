@@ -41,13 +41,14 @@ static const struct gotya_sample gotya_samples[] =
 
 WRITE8_HANDLER( gotya_soundlatch_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	static int theme_playing;
 	int sample_number;
 
 
 	if (data == 0)
 	{
-		sample_stop(0);
+		sample_stop(samples, 0);
 		theme_playing = 0;
 		return;
 	}
@@ -67,7 +68,7 @@ WRITE8_HANDLER( gotya_soundlatch_w )
 				return;
 			}
 
-			sample_start(gotya_samples[sample_number].channel,
+			sample_start(samples, gotya_samples[sample_number].channel,
 						 sample_number,
 						 gotya_samples[sample_number].looping);
 

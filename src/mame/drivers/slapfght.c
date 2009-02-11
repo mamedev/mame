@@ -560,26 +560,26 @@ static ADDRESS_MAP_START( perfrman_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8800, 0x880f) AM_READ(slapfight_dpram_r)
 	AM_RANGE(0x8810, 0x8fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xa081, 0xa081) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0xa091, 0xa091) AM_READ(ay8910_read_port_1_r)
+	AM_RANGE(0xa081, 0xa081) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0xa091, 0xa091) AM_DEVREAD(SOUND, "ay2", ay8910_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( perfrman_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8800, 0x880f) AM_WRITE(slapfight_dpram_w)
 	AM_RANGE(0x8810, 0x8fff) AM_WRITE(SMH_BANK1)	/* Shared RAM with main CPU */
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xa082, 0xa082) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xa090, 0xa090) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xa092, 0xa092) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
+	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
+	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
 	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
 //  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xa081, 0xa081) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0xa091, 0xa091) AM_READ(ay8910_read_port_1_r)
+	AM_RANGE(0xa081, 0xa081) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0xa091, 0xa091) AM_DEVREAD(SOUND, "ay2", ay8910_r)
 	AM_RANGE(0xc800, 0xc80f) AM_READ(slapfight_dpram_r)
 	AM_RANGE(0xc810, 0xcfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd000, 0xffff) AM_READ(SMH_RAM)
@@ -587,10 +587,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xa082, 0xa082) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xa090, 0xa090) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xa092, 0xa092) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
+	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
+	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
 	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
 	AM_RANGE(0xc800, 0xc80f) AM_WRITE(slapfight_dpram_w)
 	AM_RANGE(0xc810, 0xcfff) AM_WRITE(SMH_RAM)
@@ -899,20 +899,20 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,
-	input_port_1_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("IN0"),
+	DEVCB_INPUT_PORT("IN1"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_2_r,
-	input_port_3_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static VIDEO_EOF( perfrman )

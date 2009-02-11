@@ -226,10 +226,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( calorie_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x11, 0x11) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD(SOUND, "ay2", ay8910_r)
 	// 3rd ?
 	AM_RANGE(0x00, 0xff) AM_WRITE(bogus_w)
 ADDRESS_MAP_END

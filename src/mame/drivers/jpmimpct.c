@@ -496,30 +496,30 @@ static READ16_HANDLER( inputs1_r )
  *  Sound control
  *
  *************************************/
-static WRITE16_HANDLER( volume_w )
+static WRITE16_DEVICE_HANDLER( volume_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_set_bank_base(0, 0x20000 * ((data >> 1) & 3));
-		upd7759_reset_w(0, data & 0x01);
+		upd7759_set_bank_base(device, 0x20000 * ((data >> 1) & 3));
+		upd7759_reset_w(device, data & 0x01);
 	}
 }
 
-static WRITE16_HANDLER( upd7759_w )
+static WRITE16_DEVICE_HANDLER( upd7759_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_port_w(0, data);
-		upd7759_start_w(0, 0);
-		upd7759_start_w(0, 1);
+		upd7759_port_w(device, 0, data);
+		upd7759_start_w(device, 0);
+		upd7759_start_w(device, 1);
 	}
 }
 
-static READ16_HANDLER( upd7759_r )
+static READ16_DEVICE_HANDLER( upd7759_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return upd7759_busy_r(0);
+		return upd7759_busy_r(device);
 	}
 
 	return 0xffff;
@@ -630,9 +630,9 @@ static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
 	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
 	AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
-	AM_RANGE(0x00480080, 0x00480081) AM_WRITE(upd7759_w)
-	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
-	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
+	AM_RANGE(0x00480080, 0x00480081) AM_DEVWRITE(SOUND, "upd", upd7759_w)
+	AM_RANGE(0x00480082, 0x00480083) AM_DEVWRITE(SOUND, "upd", volume_w)
+	AM_RANGE(0x00480084, 0x00480085) AM_DEVREAD(SOUND, "upd", upd7759_r)
 	AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
 	AM_RANGE(0x00800000, 0x00800007) AM_READWRITE(m68k_tms_r, m68k_tms_w)
 	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM

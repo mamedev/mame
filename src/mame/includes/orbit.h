@@ -18,10 +18,10 @@
 
 /*----------- defined in audio/orbit.c -----------*/
 
-WRITE8_HANDLER( orbit_note_w );
-WRITE8_HANDLER( orbit_note_amp_w );
-WRITE8_HANDLER( orbit_noise_amp_w );
-WRITE8_HANDLER( orbit_noise_rst_w );
+WRITE8_DEVICE_HANDLER( orbit_note_w );
+WRITE8_DEVICE_HANDLER( orbit_note_amp_w );
+WRITE8_DEVICE_HANDLER( orbit_noise_amp_w );
+WRITE8_DEVICE_HANDLER( orbit_noise_rst_w );
 
 DISCRETE_SOUND_EXTERN( orbit );
 

@@ -154,8 +154,9 @@ static TIMER_CALLBACK( noise_timer_cb )
 {
 	if( !noise_enable && noisevolume > 0 )
 	{
+		const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 		noisevolume -= (noisevolume / 10) + 1;
-		sample_set_volume(CHANNEL_NOISE,noisevolume / 100.0);
+		sample_set_volume(samples, CHANNEL_NOISE,noisevolume / 100.0);
 	}
 }
 
@@ -165,8 +166,9 @@ WRITE8_HANDLER( galaxian_noise_enable_w )
 
 	if( noise_enable )
 	{
+		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 		noisevolume = 100;
-		sample_set_volume(CHANNEL_NOISE,noisevolume / 100.0);
+		sample_set_volume(samples, CHANNEL_NOISE,noisevolume / 100.0);
 	}
 }
 
@@ -174,8 +176,9 @@ WRITE8_HANDLER( galaxian_shoot_enable_w )
 {
 	if( data & 1 && !(last_port2 & 1) )
 	{
-		sample_start_raw(CHANNEL_SHOOT, shootwave, shoot_length, shoot_rate, 0);
-		sample_set_volume(CHANNEL_SHOOT,SHOOT_VOLUME);
+		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+		sample_start_raw(samples, CHANNEL_SHOOT, shootwave, shoot_length, shoot_rate, 0);
+		sample_set_volume(samples, CHANNEL_SHOOT,SHOOT_VOLUME);
 	}
 	last_port2=data;
 }
@@ -188,11 +191,11 @@ static SAMPLES_START( galaxian_sh_start )
 
 	freq = MAXFREQ;
 
-	sample_set_volume(CHANNEL_NOISE, NOISE_VOLUME);
-	sample_set_volume(CHANNEL_SHOOT, SHOOT_VOLUME);
-	sample_set_volume(CHANNEL_LFO+0, LFO_VOLUME);
-	sample_set_volume(CHANNEL_LFO+1, LFO_VOLUME);
-	sample_set_volume(CHANNEL_LFO+2, LFO_VOLUME);
+	sample_set_volume(device, CHANNEL_NOISE, NOISE_VOLUME);
+	sample_set_volume(device, CHANNEL_SHOOT, SHOOT_VOLUME);
+	sample_set_volume(device, CHANNEL_LFO+0, LFO_VOLUME);
+	sample_set_volume(device, CHANNEL_LFO+1, LFO_VOLUME);
+	sample_set_volume(device, CHANNEL_LFO+2, LFO_VOLUME);
 
 	noisewave = auto_malloc(NOISE_LENGTH * sizeof(INT16));
 
@@ -379,18 +382,18 @@ static SAMPLES_START( galaxian_sh_start )
 	tone_stream = stream_create(device,0,1,SOUND_CLOCK/STEPS,NULL,tone_update);
 	stream_set_output_gain(tone_stream, 0, TOOTHSAW_VOLUME);
 
-	sample_set_volume(CHANNEL_NOISE,0);
-	sample_start_raw(CHANNEL_NOISE,noisewave,NOISE_LENGTH,NOISE_RATE,1);
+	sample_set_volume(device, CHANNEL_NOISE,0);
+	sample_start_raw(device, CHANNEL_NOISE,noisewave,NOISE_LENGTH,NOISE_RATE,1);
 
-	sample_set_volume(CHANNEL_SHOOT,0);
-	sample_start_raw(CHANNEL_SHOOT,shootwave,SHOOT_LENGTH,SHOOT_RATE,1);
+	sample_set_volume(device, CHANNEL_SHOOT,0);
+	sample_start_raw(device, CHANNEL_SHOOT,shootwave,SHOOT_LENGTH,SHOOT_RATE,1);
 
-	sample_set_volume(CHANNEL_LFO+0,0);
-	sample_start_raw(CHANNEL_LFO+0,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
-	sample_set_volume(CHANNEL_LFO+1,0);
-	sample_start_raw(CHANNEL_LFO+1,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
-	sample_set_volume(CHANNEL_LFO+2,0);
-	sample_start_raw(CHANNEL_LFO+2,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
+	sample_set_volume(device, CHANNEL_LFO+0,0);
+	sample_start_raw(device, CHANNEL_LFO+0,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
+	sample_set_volume(device, CHANNEL_LFO+1,0);
+	sample_start_raw(device, CHANNEL_LFO+1,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
+	sample_set_volume(device, CHANNEL_LFO+2,0);
+	sample_start_raw(device, CHANNEL_LFO+2,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
 
 	noisetimer = timer_alloc(machine, noise_timer_cb, NULL);
 	timer_adjust_periodic(noisetimer, ATTOTIME_IN_NSEC((155000+22000)/100*693*22), 0, ATTOTIME_IN_NSEC((155000+22000)/100*693*22));
@@ -414,7 +417,8 @@ static SAMPLES_START( galaxian_sh_start )
 
 WRITE8_HANDLER( galaxian_background_enable_w )
 {
-	sample_set_volume(CHANNEL_LFO+offset,(data & 1) ? LFO_VOLUME : 0);
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	sample_set_volume(samples, CHANNEL_LFO+offset,(data & 1) ? LFO_VOLUME : 0);
 }
 
 static TIMER_CALLBACK( lfo_timer_cb )
@@ -538,6 +542,8 @@ WRITE8_HANDLER( galaxian_lfo_freq_w )
 
 static TIMER_CALLBACK( galaxian_sh_update )
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/*
      * NE555 8R, 8S and 8T are used as pulse position modulators
      * FS1 Ra=100k, Rb=470k and C=0.01uF
@@ -548,9 +554,9 @@ static TIMER_CALLBACK( galaxian_sh_update )
      *  -> 0.693 * 540k * 0.01uF -> 3742.2us = 267Hz
      */
 
-	sample_set_freq(CHANNEL_LFO+0, sizeof(backgroundwave)*freq*(100+2*470)/(100+2*470) );
-	sample_set_freq(CHANNEL_LFO+1, sizeof(backgroundwave)*freq*(100+2*330)/(100+2*470) );
-	sample_set_freq(CHANNEL_LFO+2, sizeof(backgroundwave)*freq*(100+2*220)/(100+2*470) );
+	sample_set_freq(samples, CHANNEL_LFO+0, sizeof(backgroundwave)*freq*(100+2*470)/(100+2*470) );
+	sample_set_freq(samples, CHANNEL_LFO+1, sizeof(backgroundwave)*freq*(100+2*330)/(100+2*470) );
+	sample_set_freq(samples, CHANNEL_LFO+2, sizeof(backgroundwave)*freq*(100+2*220)/(100+2*470) );
 }
 
 

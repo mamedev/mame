@@ -38,7 +38,8 @@ void triplhnt_set_collision(running_machine *machine, int code)
 
 static void triplhnt_update_misc(running_machine *machine, int offset)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+	const device_config *discrete = devtag_get_device(machine, SOUND, "discrete");
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
 
@@ -73,22 +74,22 @@ static void triplhnt_update_misc(running_machine *machine, int offset)
 	coin_lockout_w(0, !(triplhnt_misc_flags & 0x08));
 	coin_lockout_w(1, !(triplhnt_misc_flags & 0x08));
 
-	discrete_sound_w(space, TRIPLHNT_SCREECH_EN, triplhnt_misc_flags & 0x04);	// screech
-	discrete_sound_w(space, TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise
-	discrete_sound_w(space, TRIPLHNT_BEAR_EN, triplhnt_misc_flags & 0x80);	// bear
+	discrete_sound_w(discrete, TRIPLHNT_SCREECH_EN, triplhnt_misc_flags & 0x04);	// screech
+	discrete_sound_w(discrete, TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise
+	discrete_sound_w(discrete, TRIPLHNT_BEAR_EN, triplhnt_misc_flags & 0x80);	// bear
 
 	is_witch_hunt = input_port_read(machine, "0C09") == 0x40;
 	bit = ~triplhnt_misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */
-	if (!sample_playing(0))
-		sample_start(0, 0, 1);
-	if (!sample_playing(1))
-		sample_start(1, 1, 1);
+	if (!sample_playing(samples, 0))
+		sample_start(samples, 0, 0, 1);
+	if (!sample_playing(samples, 1))
+		sample_start(samples, 1, 1, 1);
 
 	/* bit 6 turns cassette on/off */
-	sample_set_pause(0,  is_witch_hunt || bit);
-	sample_set_pause(1, !is_witch_hunt || bit);
+	sample_set_pause(samples, 0,  is_witch_hunt || bit);
+	sample_set_pause(samples, 1, !is_witch_hunt || bit);
 }
 
 

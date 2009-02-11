@@ -199,41 +199,41 @@ static WRITE8_HANDLER( sprint4_lockout_w )
 #endif
 
 
-static WRITE8_HANDLER( sprint4_screech_1_w )
+static WRITE8_DEVICE_HANDLER( sprint4_screech_1_w )
 {
-	discrete_sound_w(space, SPRINT4_SCREECH_EN_1, offset & 1);
+	discrete_sound_w(device, SPRINT4_SCREECH_EN_1, offset & 1);
 }
 
 
-static WRITE8_HANDLER( sprint4_screech_2_w )
+static WRITE8_DEVICE_HANDLER( sprint4_screech_2_w )
 {
-	discrete_sound_w(space, SPRINT4_SCREECH_EN_2, offset & 1);
+	discrete_sound_w(device, SPRINT4_SCREECH_EN_2, offset & 1);
 }
 
 
-static WRITE8_HANDLER( sprint4_screech_3_w )
+static WRITE8_DEVICE_HANDLER( sprint4_screech_3_w )
 {
-	discrete_sound_w(space, SPRINT4_SCREECH_EN_3, offset & 1);
+	discrete_sound_w(device, SPRINT4_SCREECH_EN_3, offset & 1);
 }
 
 
-static WRITE8_HANDLER( sprint4_screech_4_w )
+static WRITE8_DEVICE_HANDLER( sprint4_screech_4_w )
 {
-	discrete_sound_w(space, SPRINT4_SCREECH_EN_4, offset & 1);
+	discrete_sound_w(device, SPRINT4_SCREECH_EN_4, offset & 1);
 }
 
 
 
 
-static WRITE8_HANDLER( sprint4_bang_w )
+static WRITE8_DEVICE_HANDLER( sprint4_bang_w )
 {
-	discrete_sound_w(space, SPRINT4_BANG_DATA, data & 0x0f);
+	discrete_sound_w(device, SPRINT4_BANG_DATA, data & 0x0f);
 }
 
 
-static WRITE8_HANDLER( sprint4_attract_w )
+static WRITE8_DEVICE_HANDLER( sprint4_attract_w )
 {
-	discrete_sound_w(space, SPRINT4_ATTRACT_EN, data & 1);
+	discrete_sound_w(device, SPRINT4_ATTRACT_EN, data & 1);
 }
 
 
@@ -252,16 +252,16 @@ static ADDRESS_MAP_START( sprint4_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")
 
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x71f) AM_WRITE(sprint4_attract_w)
+	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x71f) AM_DEVWRITE(SOUND, "discrete", sprint4_attract_w)
 	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_WRITE(sprint4_collision_reset_w)
 	AM_RANGE(0x0040, 0x0041) AM_MIRROR(0x718) AM_WRITE(sprint4_da_latch_w)
-	AM_RANGE(0x0042, 0x0043) AM_MIRROR(0x718) AM_WRITE(sprint4_bang_w)
+	AM_RANGE(0x0042, 0x0043) AM_MIRROR(0x718) AM_DEVWRITE(SOUND, "discrete", sprint4_bang_w)
 	AM_RANGE(0x0044, 0x0045) AM_MIRROR(0x718) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0060, 0x0067) AM_MIRROR(0x710) AM_WRITE(sprint4_lamp_w)
-	AM_RANGE(0x0068, 0x0069) AM_MIRROR(0x710) AM_WRITE(sprint4_screech_1_w)
-	AM_RANGE(0x006a, 0x006b) AM_MIRROR(0x710) AM_WRITE(sprint4_screech_2_w)
-	AM_RANGE(0x006c, 0x006d) AM_MIRROR(0x710) AM_WRITE(sprint4_screech_3_w)
-	AM_RANGE(0x006e, 0x006f) AM_MIRROR(0x710) AM_WRITE(sprint4_screech_4_w)
+	AM_RANGE(0x0068, 0x0069) AM_MIRROR(0x710) AM_DEVWRITE(SOUND, "discrete", sprint4_screech_1_w)
+	AM_RANGE(0x006a, 0x006b) AM_MIRROR(0x710) AM_DEVWRITE(SOUND, "discrete", sprint4_screech_2_w)
+	AM_RANGE(0x006c, 0x006d) AM_MIRROR(0x710) AM_DEVWRITE(SOUND, "discrete", sprint4_screech_3_w)
+	AM_RANGE(0x006e, 0x006f) AM_MIRROR(0x710) AM_DEVWRITE(SOUND, "discrete", sprint4_screech_4_w)
 
 	AM_RANGE(0x2000, 0x27ff) AM_NOP /* diagnostic ROM */
 	AM_RANGE(0x2800, 0x3fff) AM_ROM

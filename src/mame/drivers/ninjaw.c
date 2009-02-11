@@ -271,10 +271,11 @@ static READ16_HANDLER( ninjaw_sound_r )
 static int ninjaw_pandata[4];
 static WRITE8_HANDLER( ninjaw_pancontrol )
 {
-  offset = offset&3;
-  ninjaw_pandata[offset] = (float)data * (100.f / 255.0f);
-  //popmessage(" pan %02x %02x %02x %02x", ninjaw_pandata[0], ninjaw_pandata[1], ninjaw_pandata[2], ninjaw_pandata[3] );
-  flt_volume_set_volume(offset, ninjaw_pandata[offset] / 100.0);
+	static const char *fltname[] = { "2610.1.l", "2610.1.r", "2610.2.l", "2610.2.r" };
+	offset = offset&3;
+	ninjaw_pandata[offset] = (float)data * (100.f / 255.0f);
+	//popmessage(" pan %02x %02x %02x %02x", ninjaw_pandata[0], ninjaw_pandata[1], ninjaw_pandata[2], ninjaw_pandata[3] );
+	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, fltname[offset]), ninjaw_pandata[offset] / 100.0);
 }
 
 
@@ -409,9 +410,7 @@ static ADDRESS_MAP_START( z80_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(ym2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -420,10 +419,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(ninjaw_pancontrol) /* pan */
@@ -569,9 +565,9 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -585,7 +581,7 @@ static const ym2610_interface ym2610_config =
 **************************************************************/
 
 #if 0
-static int subwoofer_sh_start(const sound_config *msound)
+static DEVICE_START( subwoofer )
 {
 	/* Adjust the lowpass filter of the first three YM2610 channels */
 
@@ -599,12 +595,20 @@ static int subwoofer_sh_start(const sound_config *msound)
 	return 0;
 }
 
-static const custom_sound_interface subwoofer_interface =
+static DEVICE_GET_INFO( subwoofer )
 {
-	subwoofer_sh_start,
-	0, /* none */
-	0 /* none */
-};
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(subwoofer);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Subwoofer");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+#define SOUND_SUBWOOFER DEVICE_GET_INFO_NAME(subwoofer)
 #endif
 
 
@@ -687,7 +691,7 @@ static MACHINE_DRIVER_START( ninjaw )
 	MDRV_SOUND_ADD("2610.2.r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-//  MDRV_SOUND_ADD("subwoofer", CUSTOM, subwoofer_interface)
+//  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 MACHINE_DRIVER_END
 
 
@@ -760,7 +764,7 @@ static MACHINE_DRIVER_START( darius2 )
 	MDRV_SOUND_ADD("2610.2.r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-//  MDRV_SOUND_ADD("subwoofer", CUSTOM, subwoofer_interface)
+//  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 MACHINE_DRIVER_END
 
 

@@ -191,9 +191,9 @@ static READ16_HANDLER( sound_status_r )
 	return soundlatch2_r(space,0);
 }
 
-static void sound_nmi(running_machine *machine)
+static void sound_nmi(const device_config *device)
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( gijoe )
@@ -250,14 +250,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xebff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xfa2f) AM_READ(k054539_0_r)
+	AM_RANGE(0xf800, 0xfa2f) AM_DEVREAD(SOUND, "konami", k054539_r)
 	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xebff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xfa2f) AM_WRITE(k054539_0_w)
+	AM_RANGE(0xf800, 0xfa2f) AM_DEVWRITE(SOUND, "konami", k054539_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
 

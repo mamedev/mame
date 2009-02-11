@@ -96,7 +96,7 @@ static WRITE8_HANDLER( junofrst_bankselect_w )
 }
 
 
-static READ8_HANDLER( junofrst_portA_r )
+static READ8_DEVICE_HANDLER( junofrst_portA_r )
 {
 	int timer;
 
@@ -105,7 +105,7 @@ static READ8_HANDLER( junofrst_portA_r )
 	/* divided by 1024 to get this timer */
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	timer = (cputag_get_total_cycles(space->machine, "audio") / (1024/2)) & 0x0f;
+	timer = (cputag_get_total_cycles(device->machine, "audio") / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
 
@@ -113,8 +113,9 @@ static READ8_HANDLER( junofrst_portA_r )
 }
 
 
-static WRITE8_HANDLER( junofrst_portB_w )
+static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 {
+	static const char *fltname[] = { "filter.0.0", "filter.0.1", "filter.0.2" };
 	int i;
 
 
@@ -127,7 +128,7 @@ static WRITE8_HANDLER( junofrst_portB_w )
 		if (data & 1) C += 47000;	/* 47000pF = 0.047uF */
 		if (data & 2) C += 220000;	/* 220000pF = 0.22uF */
 		data >>= 2;
-		filter_rc_set_RC(i,FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
+		filter_rc_set_RC(devtag_get_device(device->machine, SOUND, fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
 	}
 }
 
@@ -202,9 +203,9 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(junofrst_i8039_irq_w)
 ADDRESS_MAP_END
@@ -217,7 +218,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
@@ -322,10 +323,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	junofrst_portA_r,
-	NULL,
-	NULL,
-	junofrst_portB_w
+	DEVCB_HANDLER(junofrst_portA_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(junofrst_portB_w)
 };
 
 

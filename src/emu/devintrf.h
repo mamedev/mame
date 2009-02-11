@@ -336,6 +336,7 @@ void device_set_clock(const device_config *device, UINT32 clock);
 void device_delay_init(const device_config *device);
 
 
+
 /* ----- device information getters ----- */
 
 /* return an integer state value from an allocated device */

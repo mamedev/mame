@@ -1454,8 +1454,8 @@ static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&mpu4_vid_mainram) /* mainram / char address ram? */
 
 	/* what is here, the sound chip? Assume so */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(saa1099_control_port_0_lsb_w)
-	AM_RANGE(0x900002, 0x900003) AM_WRITE(saa1099_write_port_0_lsb_w)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8(SOUND, "saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8(SOUND, "saa", saa1099_data_w, 0x00ff)
 
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w) /* the palette chip */
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
@@ -1507,8 +1507,8 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 
 	/* what is here, the sound chip? Assume so */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(saa1099_control_port_0_lsb_w)
-	AM_RANGE(0x900002, 0x900003) AM_WRITE(saa1099_write_port_0_lsb_w)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8(SOUND, "saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8(SOUND, "saa", saa1099_data_w, 0x00ff)
 
 	/* the palette chip */
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w) /* the palette chip */

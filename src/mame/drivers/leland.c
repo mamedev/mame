@@ -47,7 +47,6 @@
 #include "cpu/z80/z80.h"
 #include "leland.h"
 #include "sound/ay8910.h"
-#include "sound/custom.h"
 
 
 #define MASTER_CLOCK		XTAL_12MHz
@@ -692,28 +691,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_SINGLE_OUTPUT,
 	{1000, 0, 0},
-	leland_sound_port_r,
-	0,
-	leland_sound_port_w,
-	0
-};
-
-
-static const custom_sound_interface dac_custom_interface =
-{
-    leland_sh_start
-};
-
-
-static const custom_sound_interface i80186_custom_interface =
-{
-    leland_80186_sh_start
-};
-
-
-static const custom_sound_interface redline_custom_interface =
-{
-  	redline_80186_sh_start
+	DEVCB_HANDLER(leland_sound_port_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(leland_sound_port_w),
+	DEVCB_NULL
 };
 
 
@@ -754,8 +735,7 @@ static MACHINE_DRIVER_START( leland )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(dac_custom_interface)
+	MDRV_SOUND_ADD("custom", LELAND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -770,8 +750,7 @@ static MACHINE_DRIVER_START( redline )
 	MDRV_CPU_IO_MAP(redline_80186_map_io,0)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(redline_custom_interface)
+	MDRV_SOUND_REPLACE("custom", REDLINE_80186, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -785,8 +764,7 @@ static MACHINE_DRIVER_START( quarterb )
 	MDRV_CPU_IO_MAP(leland_80186_map_io,0)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("custom", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(i80186_custom_interface)
+	MDRV_SOUND_REPLACE("custom", LELAND_80186, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

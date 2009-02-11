@@ -161,29 +161,31 @@ static const samples_interface spacewar_samples_interface =
 
 static void spacewar_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/* Explosion - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
-		sample_start(0, (mame_rand(machine) & 1) ? 0 : 6, 0);
+		sample_start(samples, 0, (mame_rand(machine) & 1) ? 0 : 6, 0);
 
 	/* Fire sound - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x02))
-		sample_start(1, (mame_rand(machine) & 1) ? 1 : 7, 0);
+		sample_start(samples, 1, (mame_rand(machine) & 1) ? 1 : 7, 0);
 
 	/* Player 1 thrust - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
-		sample_start(3, 3, 1);
+		sample_start(samples, 3, 3, 1);
 	if (SOUNDVAL_RISING_EDGE(0x04))
-		sample_stop(3);
+		sample_stop(samples, 3);
 
 	/* Player 2 thrust - 0=on, 1-off */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
-		sample_start(4, 4, 1);
+		sample_start(samples, 4, 4, 1);
 	if (SOUNDVAL_RISING_EDGE(0x08))
-		sample_stop(4);
+		sample_stop(samples, 4);
 
 	/* Mute - 0=off, 1=on */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
-		sample_start(2, 2, 1);	/* play idle sound */
+		sample_start(samples, 2, 2, 1);	/* play idle sound */
 	if (SOUNDVAL_RISING_EDGE(0x10))
 	{
         int i;
@@ -191,10 +193,10 @@ static void spacewar_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bi
 		/* turn off all but the idle sound */
 		for (i = 0; i < 5; i++)
 			if (i != 2)
-				sample_stop(i);
+				sample_stop(samples, i);
 
 		/* Pop when board is shut off */
-		sample_start(2, 5, 0);
+		sample_start(samples, 2, 5, 0);
 	}
 }
 
@@ -238,17 +240,19 @@ static const samples_interface barrier_samples_interface =
 
 static void barrier_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/* Player die - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
-		sample_start(0, 0, 0);
+		sample_start(samples, 0, 0, 0);
 
 	/* Player move - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x02))
-		sample_start(1, 1, 0);
+		sample_start(samples, 1, 1, 0);
 
 	/* Enemy move - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
-		sample_start(2, 2, 0);
+		sample_start(samples, 2, 2, 0);
 }
 
 static MACHINE_RESET( barrier )
@@ -289,6 +293,8 @@ static const samples_interface speedfrk_samples_interface =
 
 static void speedfrk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/* on the falling edge of bit 0x08, clock the inverse of bit 0x04 into the top of the shiftreg */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
 	{
@@ -301,9 +307,9 @@ static void speedfrk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bi
 
 	/* off-road - 1=on, 0=off */
 	if (SOUNDVAL_RISING_EDGE(0x10))
-		sample_start(0, 0, 1);
+		sample_start(samples, 0, 0, 1);
 	if (SOUNDVAL_FALLING_EDGE(0x10))
-		sample_stop(0);
+		sample_stop(samples, 0);
 
     /* start LED is controlled by bit 0x02 */
     set_led_status(0, ~sound_val & 0x02);
@@ -352,35 +358,37 @@ static const samples_interface starhawk_samples_interface =
 
 static void starhawk_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/* explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
-		sample_start(0, 0, 0);
+		sample_start(samples, 0, 0, 0);
 
 	/* right laser - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x02))
-		sample_start(1, 1, 0);
+		sample_start(samples, 1, 1, 0);
 
 	/* left laser - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
-		sample_start(2, 2, 0);
+		sample_start(samples, 2, 2, 0);
 
 	/* K - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
-		sample_start(3, 3, 1);
+		sample_start(samples, 3, 3, 1);
 	if (SOUNDVAL_RISING_EDGE(0x08))
-		sample_stop(3);
+		sample_stop(samples, 3);
 
 	/* master - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
-		sample_start(4, 4, 1);
+		sample_start(samples, 4, 4, 1);
 	if (SOUNDVAL_RISING_EDGE(0x10))
-		sample_stop(4);
+		sample_stop(samples, 4);
 
 	/* K exit - 1=on, 0=off */
 	if (SOUNDVAL_RISING_EDGE(0x80))
-		sample_start(3, 5, 1);
+		sample_start(samples, 3, 5, 1);
 	if (SOUNDVAL_FALLING_EDGE(0x80))
-		sample_stop(3);
+		sample_stop(samples, 3);
 }
 
 static MACHINE_RESET( starhawk )
@@ -426,29 +434,31 @@ static const samples_interface sundance_samples_interface =
 
 static void sundance_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/* bong - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
-		sample_start(0, 0, 0);
+		sample_start(samples, 0, 0, 0);
 
 	/* whoosh - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x02))
-		sample_start(1, 1, 0);
+		sample_start(samples, 1, 1, 0);
 
 	/* explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
-		sample_start(2, 2, 0);
+		sample_start(samples, 2, 2, 0);
 
 	/* ping - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
-		sample_start(3, 3, 0);
+		sample_start(samples, 3, 3, 0);
 
 	/* ping - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
-		sample_start(4, 4, 0);
+		sample_start(samples, 4, 4, 0);
 
 	/* hatch - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x80))
-		sample_start(5, 5, 0);
+		sample_start(samples, 5, 5, 0);
 }
 
 static MACHINE_RESET( sundance )
@@ -497,38 +507,40 @@ static void tailg_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
 	/* the falling edge of bit 0x10 clocks bit 0x08 into the mux selected by bits 0x07 */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
 	{
+		const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 		/* update the shift register (actually just a simple mux) */
 		current_shift = (current_shift & ~(1 << (sound_val & 7))) | (((sound_val >> 3) & 1) << (sound_val & 7));
 
 		/* explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x01))
-			sample_start(0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 
 		/* rumble - 0=on, 1=off */
 		if (SHIFTREG_FALLING_EDGE(0x02))
-			sample_start(1, 1, 1);
+			sample_start(samples, 1, 1, 1);
 		if (SHIFTREG_RISING_EDGE(0x02))
-			sample_stop(1);
+			sample_stop(samples, 1);
 
 		/* laser - 0=on, 1=off */
 		if (SHIFTREG_FALLING_EDGE(0x04))
-			sample_start(2, 2, 1);
+			sample_start(samples, 2, 2, 1);
 		if (SHIFTREG_RISING_EDGE(0x04))
-			sample_stop(2);
+			sample_stop(samples, 2);
 
 		/* shield - 0=on, 1=off */
 		if (SHIFTREG_FALLING_EDGE(0x08))
-			sample_start(3, 3, 1);
+			sample_start(samples, 3, 3, 1);
 		if (SHIFTREG_RISING_EDGE(0x08))
-			sample_stop(3);
+			sample_stop(samples, 3);
 
 		/* bounce - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x10))
-			sample_start(4, 4, 0);
+			sample_start(samples, 4, 4, 0);
 
 		/* hyperspace - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x20))
-			sample_start(5, 5, 0);
+			sample_start(samples, 5, 5, 0);
 
 		/* LED */
 		set_led_status(0, current_shift & 0x40);
@@ -580,29 +592,31 @@ static const samples_interface warrior_samples_interface =
 
 static void warrior_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/* normal level - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x01))
-		sample_start(0, 0, 1);
+		sample_start(samples, 0, 0, 1);
 	if (SOUNDVAL_RISING_EDGE(0x01))
-		sample_stop(0);
+		sample_stop(samples, 0);
 
 	/* hi level - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x02))
-		sample_start(1, 1, 1);
+		sample_start(samples, 1, 1, 1);
 	if (SOUNDVAL_RISING_EDGE(0x02))
-		sample_stop(1);
+		sample_stop(samples, 1);
 
 	/* explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
-		sample_start(2, 2, 0);
+		sample_start(samples, 2, 2, 0);
 
 	/* fall - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
-		sample_start(3, 3, 0);
+		sample_start(samples, 3, 3, 0);
 
 	/* appear - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
-		sample_start(4, 4, 0);
+		sample_start(samples, 4, 4, 0);
 }
 
 static MACHINE_RESET( warrior )
@@ -649,6 +663,8 @@ static const samples_interface armora_samples_interface =
 
 static void armora_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
 		current_shift = ((current_shift >> 1) & 0x7f) | (sound_val & 0x80);
@@ -660,19 +676,19 @@ static void armora_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
 
 		/* lo explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x10))
-			sample_start(0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 
 		/* jeep fire - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x20))
-			sample_start(1, 1, 0);
+			sample_start(samples, 1, 1, 0);
 
 		/* hi explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x40))
-			sample_start(2, 2, 0);
+			sample_start(samples, 2, 2, 0);
 
 		/* tank fire - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x80))
-			sample_start(3, 3, 0);
+			sample_start(samples, 3, 3, 0);
 
 		/* remember the previous value */
 		last_shift = current_shift;
@@ -681,21 +697,21 @@ static void armora_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
 	/* tank sound - 0=on, 1=off */
 	/* still not totally correct - should be multiple speeds based on remaining bits in shift reg */
 	if (SOUNDVAL_FALLING_EDGE(0x02))
-		sample_start(4, 4, 1);
+		sample_start(samples, 4, 4, 1);
 	if (SOUNDVAL_RISING_EDGE(0x02))
-		sample_stop(4);
+		sample_stop(samples, 4);
 
 	/* beep sound - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
-		sample_start(5, 5, 1);
+		sample_start(samples, 5, 5, 1);
 	if (SOUNDVAL_RISING_EDGE(0x04))
-		sample_stop(5);
+		sample_stop(samples, 5);
 
 	/* chopper sound - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
-		sample_start(6, 6, 1);
+		sample_start(samples, 6, 6, 1);
 	if (SOUNDVAL_RISING_EDGE(0x08))
-		sample_stop(6);
+		sample_stop(samples, 6);
 }
 
 static MACHINE_RESET( armora )
@@ -748,6 +764,8 @@ static const samples_interface ripoff_samples_interface =
 
 static void ripoff_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/* on the rising edge of bit 0x02, clock bit 0x01 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x02))
 		current_shift = ((current_shift >> 1) & 0x7f) | ((sound_val << 7) & 0x80);
@@ -757,19 +775,19 @@ static void ripoff_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
 	{
 		/* background - 0=on, 1=off, selected by bits 0x38 */
 		if ((((current_shift ^ last_shift) & 0x38) && !(current_shift & 0x04)) || SHIFTREG_FALLING_EDGE(0x04))
-			sample_start(5, 5 + ((current_shift >> 5) & 7), 1);
+			sample_start(samples, 5, 5 + ((current_shift >> 5) & 7), 1);
 		if (SHIFTREG_RISING_EDGE(0x04))
-			sample_stop(5);
+			sample_stop(samples, 5);
 
 		/* beep - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x02))
-			sample_start(0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 
 		/* motor - 0=on, 1=off */
 		if (SHIFTREG_FALLING_EDGE(0x01))
-			sample_start(1, 1, 1);
+			sample_start(samples, 1, 1, 1);
 		if (SHIFTREG_RISING_EDGE(0x01))
-			sample_stop(1);
+			sample_stop(samples, 1);
 
 		/* remember the previous value */
 		last_shift = current_shift;
@@ -777,15 +795,15 @@ static void ripoff_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
 
 	/* torpedo - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
-		sample_start(2, 2, 0);
+		sample_start(samples, 2, 2, 0);
 
 	/* laser - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x10))
-		sample_start(3, 3, 0);
+		sample_start(samples, 3, 3, 0);
 
 	/* explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x80))
-		sample_start(4, 4, 0);
+		sample_start(samples, 4, 4, 0);
 }
 
 static MACHINE_RESET( ripoff )
@@ -833,6 +851,7 @@ static const samples_interface starcas_samples_interface =
 
 static void starcas_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -844,29 +863,29 @@ static void starcas_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bit
 	{
 		/* fireball - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x80))
-			sample_start(0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 
 		/* shield hit - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x40))
-			sample_start(1, 1, 0);
+			sample_start(samples, 1, 1, 0);
 
 		/* star sound - 0=off, 1=on */
 		if (SHIFTREG_RISING_EDGE(0x20))
-			sample_start(2, 2, 1);
+			sample_start(samples, 2, 2, 1);
 		if (SHIFTREG_FALLING_EDGE(0x20))
-			sample_stop(2);
+			sample_stop(samples, 2);
 
 		/* thrust sound - 1=off, 0=on*/
 		if (SHIFTREG_FALLING_EDGE(0x10))
-			sample_start(3, 3, 1);
+			sample_start(samples, 3, 3, 1);
 		if (SHIFTREG_RISING_EDGE(0x10))
-			sample_stop(3);
+			sample_stop(samples, 3);
 
 		/* drone - 1=off, 0=on */
 		if (SHIFTREG_FALLING_EDGE(0x08))
-			sample_start(4, 4, 1);
+			sample_start(samples, 4, 4, 1);
 		if (SHIFTREG_RISING_EDGE(0x08))
-			sample_stop(4);
+			sample_stop(samples, 4);
 
 		/* latch the drone pitch */
 		target_pitch = (current_shift & 7) + ((current_shift & 2) << 2);
@@ -879,7 +898,7 @@ static void starcas_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bit
                 current_pitch -= 225;
             if (current_pitch < target_pitch)
                 current_pitch += 150;
-            sample_set_freq(4, current_pitch);
+            sample_set_freq(samples, 4, current_pitch);
             last_frame = video_screen_get_frame_number(machine->primary_screen);
         }
 
@@ -889,15 +908,15 @@ static void starcas_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bit
 
 	/* loud explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x02))
-		sample_start(5, 5, 0);
+		sample_start(samples, 5, 5, 0);
 
 	/* soft explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
-		sample_start(6, 6, 0);
+		sample_start(samples, 6, 6, 0);
 
 	/* player fire - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
-		sample_start(7, 7, 0);
+		sample_start(samples, 7, 7, 0);
 }
 
 static MACHINE_RESET( starcas )
@@ -945,6 +964,7 @@ static const samples_interface solarq_samples_interface =
 
 static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 	static float target_volume, current_volume;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -959,53 +979,53 @@ static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
 
 		/* loud explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x80))
-			sample_start(0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 
 		/* soft explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x40))
-			sample_start(1, 1, 0);
+			sample_start(samples, 1, 1, 0);
 
 		/* thrust - 0=on, 1=off */
 		if (SHIFTREG_FALLING_EDGE(0x20))
 		{
 			target_volume = 1.0;
-			if (!sample_playing(2))
-				sample_start(2, 2, 1);
+			if (!sample_playing(samples, 2))
+				sample_start(samples, 2, 2, 1);
 		}
 		if (SHIFTREG_RISING_EDGE(0x20))
 			target_volume = 0;
 
 		/* ramp the thrust volume */
-        if (sample_playing(2) && video_screen_get_frame_number(machine->primary_screen) > last_frame)
+        if (sample_playing(samples, 2) && video_screen_get_frame_number(machine->primary_screen) > last_frame)
         {
             if (current_volume > target_volume)
                 current_volume -= 0.078f;
             if (current_volume < target_volume)
                 current_volume += 0.078f;
             if (current_volume > 0)
-                sample_set_volume(2, current_volume);
+                sample_set_volume(samples, 2, current_volume);
             else
-                sample_stop(2);
+                sample_stop(samples, 2);
             last_frame = video_screen_get_frame_number(machine->primary_screen);
         }
 
 		/* fire - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x10))
-			sample_start(3, 3, 0);
+			sample_start(samples, 3, 3, 0);
 
 		/* capture - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x08))
-			sample_start(4, 4, 0);
+			sample_start(samples, 4, 4, 0);
 
 		/* nuke - 1=on, 0=off */
 		if (SHIFTREG_RISING_EDGE(0x04))
-			sample_start(5, 5, 1);
+			sample_start(samples, 5, 5, 1);
 		if (SHIFTREG_FALLING_EDGE(0x04))
-			sample_stop(5);
+			sample_stop(samples, 5);
 
 		/* photon - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x02))
-			sample_start(6, 6, 0);
+			sample_start(samples, 6, 6, 0);
 
 		/* remember the previous value */
 		last_shift = current_shift;
@@ -1018,17 +1038,17 @@ static void solarq_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits
 
 		/* start/stop the music sample on the high bit */
 		if (SHIFTREG2_RISING_EDGE(0x8000))
-			sample_start(7, 7, 1);
+			sample_start(samples, 7, 7, 1);
 		if (SHIFTREG2_FALLING_EDGE(0x8000))
-			sample_stop(7);
+			sample_stop(samples, 7);
 
 		/* set the frequency */
 		freq = 56818.181818 / (4096 - (current_shift & 0xfff));
-		sample_set_freq(7, 44100 * freq / 1050);
+		sample_set_freq(samples, 7, 44100 * freq / 1050);
 
 		/* set the volume */
 		vol = (~current_shift >> 12) & 7;
-		sample_set_volume(7, vol / 7.0);
+		sample_set_volume(samples, 7, vol / 7.0);
 
 		/* remember the previous value */
 		last_shift2 = current_shift;
@@ -1084,6 +1104,8 @@ static const samples_interface boxingb_samples_interface =
 
 static void boxingb_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
 		current_shift = ((current_shift >> 1) & 0x7fff) | ((sound_val << 8) & 0x8000);
@@ -1096,37 +1118,37 @@ static void boxingb_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bit
 
 		/* soft explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x80))
-			sample_start(0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 
 		/* loud explosion - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x40))
-			sample_start(1, 1, 0);
+			sample_start(samples, 1, 1, 0);
 
 		/* chirping birds - 0=on, 1=off */
 		if (SHIFTREG_FALLING_EDGE(0x20))
-			sample_start(2, 2, 0);
+			sample_start(samples, 2, 2, 0);
 		if (SHIFTREG_RISING_EDGE(0x20))
-			sample_stop(2);
+			sample_stop(samples, 2);
 
 		/* egg cracking - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x10))
-			sample_start(3, 3, 0);
+			sample_start(samples, 3, 3, 0);
 
 		/* bug pushing A - rising edge */
 		if (SHIFTREG_RISING_EDGE(0x08))
-			sample_start(4, 4, 0);
+			sample_start(samples, 4, 4, 0);
 
 		/* bug pushing B - rising edge */
 		if (SHIFTREG_RISING_EDGE(0x04))
-			sample_start(5, 5, 0);
+			sample_start(samples, 5, 5, 0);
 
 		/* bug dying - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x02))
-			sample_start(6, 6, 0);
+			sample_start(samples, 6, 6, 0);
 
 		/* beetle on screen - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x01))
-			sample_start(7, 7, 0);
+			sample_start(samples, 7, 7, 0);
 
 		/* remember the previous value */
 		last_shift = current_shift;
@@ -1139,21 +1161,21 @@ static void boxingb_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bit
 
 		/* start/stop the music sample on the high bit */
 		if (SHIFTREG2_RISING_EDGE(0x8000))
-			sample_start(8, 8, 1);
+			sample_start(samples, 8, 8, 1);
 		if (SHIFTREG2_FALLING_EDGE(0x8000))
-			sample_stop(8);
+			sample_stop(samples, 8);
 
 		/* set the frequency */
 		freq = 56818.181818 / (4096 - (current_shift & 0xfff));
-		sample_set_freq(8, 44100 * freq / 1050);
+		sample_set_freq(samples, 8, 44100 * freq / 1050);
 
 		/* set the volume */
 		vol = (~current_shift >> 12) & 3;
-		sample_set_volume(8, vol / 3.0);
+		sample_set_volume(samples, 8, vol / 3.0);
 
         /* cannon - falling edge */
         if (SHIFTREG2_RISING_EDGE(0x4000))
-        	sample_start(9, 9, 0);
+        	sample_start(samples, 9, 9, 0);
 
 		/* remember the previous value */
 		last_shift2 = current_shift;
@@ -1161,11 +1183,11 @@ static void boxingb_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bit
 
 	/* bounce - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x04))
-		sample_start(10, 10, 0);
+		sample_start(samples, 10, 10, 0);
 
 	/* bell - falling edge */
 	if (SOUNDVAL_RISING_EDGE(0x08))
-		sample_start(11, 11, 0);
+		sample_start(samples, 11, 11, 0);
 }
 
 static MACHINE_RESET( boxingb )
@@ -1213,6 +1235,7 @@ static const samples_interface wotw_samples_interface =
 
 static void wotw_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1224,29 +1247,29 @@ static void wotw_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_c
 	{
 		/* fireball - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x80))
-			sample_start(0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 
 		/* shield hit - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x40))
-			sample_start(1, 1, 0);
+			sample_start(samples, 1, 1, 0);
 
 		/* star sound - 0=off, 1=on */
 		if (SHIFTREG_RISING_EDGE(0x20))
-			sample_start(2, 2, 1);
+			sample_start(samples, 2, 2, 1);
 		if (SHIFTREG_FALLING_EDGE(0x20))
-			sample_stop(2);
+			sample_stop(samples, 2);
 
 		/* thrust sound - 1=off, 0=on*/
 		if (SHIFTREG_FALLING_EDGE(0x10))
-			sample_start(3, 3, 1);
+			sample_start(samples, 3, 3, 1);
 		if (SHIFTREG_RISING_EDGE(0x10))
-			sample_stop(3);
+			sample_stop(samples, 3);
 
 		/* drone - 1=off, 0=on */
 		if (SHIFTREG_FALLING_EDGE(0x08))
-			sample_start(4, 4, 1);
+			sample_start(samples, 4, 4, 1);
 		if (SHIFTREG_RISING_EDGE(0x08))
-			sample_stop(4);
+			sample_stop(samples, 4);
 
 		/* latch the drone pitch */
 		target_pitch = (current_shift & 7) + ((current_shift & 2) << 2);
@@ -1259,7 +1282,7 @@ static void wotw_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_c
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
-            sample_set_freq(4, current_pitch);
+            sample_set_freq(samples, 4, current_pitch);
             last_frame = video_screen_get_frame_number(machine->primary_screen);
         }
 
@@ -1269,15 +1292,15 @@ static void wotw_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_c
 
 	/* loud explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x02))
-		sample_start(5, 5, 0);
+		sample_start(samples, 5, 5, 0);
 
 	/* soft explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
-		sample_start(6, 6, 0);
+		sample_start(samples, 6, 6, 0);
 
 	/* player fire - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
-		sample_start(7, 7, 0);
+		sample_start(samples, 7, 7, 0);
 }
 
 static MACHINE_RESET( wotw )
@@ -1325,6 +1348,7 @@ static const samples_interface wotwc_samples_interface =
 
 static void wotwc_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_changed)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
@@ -1336,29 +1360,29 @@ static void wotwc_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
 	{
 		/* fireball - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x80))
-			sample_start(0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 
 		/* shield hit - falling edge */
 		if (SHIFTREG_FALLING_EDGE(0x40))
-			sample_start(1, 1, 0);
+			sample_start(samples, 1, 1, 0);
 
 		/* star sound - 0=off, 1=on */
 		if (SHIFTREG_RISING_EDGE(0x20))
-			sample_start(2, 2, 1);
+			sample_start(samples, 2, 2, 1);
 		if (SHIFTREG_FALLING_EDGE(0x20))
-			sample_stop(2);
+			sample_stop(samples, 2);
 
 		/* thrust sound - 1=off, 0=on*/
 		if (SHIFTREG_FALLING_EDGE(0x10))
-			sample_start(3, 3, 1);
+			sample_start(samples, 3, 3, 1);
 		if (SHIFTREG_RISING_EDGE(0x10))
-			sample_stop(3);
+			sample_stop(samples, 3);
 
 		/* drone - 1=off, 0=on */
 		if (SHIFTREG_FALLING_EDGE(0x08))
-			sample_start(4, 4, 1);
+			sample_start(samples, 4, 4, 1);
 		if (SHIFTREG_RISING_EDGE(0x08))
-			sample_stop(4);
+			sample_stop(samples, 4);
 
 		/* latch the drone pitch */
 		target_pitch = (current_shift & 7) + ((current_shift & 2) << 2);
@@ -1371,7 +1395,7 @@ static void wotwc_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
-            sample_set_freq(4, current_pitch);
+            sample_set_freq(samples, 4, current_pitch);
             last_frame = video_screen_get_frame_number(machine->primary_screen);
         }
 
@@ -1381,15 +1405,15 @@ static void wotwc_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
 
 	/* loud explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x02))
-		sample_start(5, 5, 0);
+		sample_start(samples, 5, 5, 0);
 
 	/* soft explosion - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
-		sample_start(6, 6, 0);
+		sample_start(samples, 6, 6, 0);
 
 	/* player fire - falling edge */
 	if (SOUNDVAL_FALLING_EDGE(0x08))
-		sample_start(7, 7, 0);
+		sample_start(samples, 7, 7, 0);
 }
 
 static MACHINE_RESET( wotwc )
@@ -1433,20 +1457,20 @@ static void demon_sound_w(running_machine *machine, UINT8 sound_val, UINT8 bits_
 }
 
 
-static READ8_HANDLER( sound_porta_r )
+static READ8_DEVICE_HANDLER( sound_porta_r )
 {
 	/* bits 0-3 are the sound data; bit 4 is the data ready */
 	return sound_fifo[sound_fifo_out] | ((sound_fifo_in != sound_fifo_out) << 4);
 }
 
 
-static READ8_HANDLER( sound_portb_r )
+static READ8_DEVICE_HANDLER( sound_portb_r )
 {
 	return last_portb_write;
 }
 
 
-static WRITE8_HANDLER( sound_portb_w )
+static WRITE8_DEVICE_HANDLER( sound_portb_w )
 {
 	/* watch for a 0->1 edge on bit 0 ("shift out") to advance the data pointer */
 	if ((data & 1) != (last_portb_write & 1) && (data & 1) != 0)
@@ -1465,7 +1489,7 @@ static WRITE8_HANDLER( sound_portb_w )
 }
 
 
-static WRITE8_HANDLER( sound_output_w )
+static WRITE8_DEVICE_HANDLER( sound_output_w )
 {
 	logerror("sound_output = %02X\n", data);
 }
@@ -1475,20 +1499,20 @@ static const ay8910_interface demon_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	sound_porta_r,
-	sound_portb_r,
-	0,
-	sound_portb_w
+	DEVCB_HANDLER(sound_porta_r),
+	DEVCB_HANDLER(sound_portb_r),
+	DEVCB_NULL,
+	DEVCB_HANDLER(sound_portb_w)
 };
 
 static const ay8910_interface demon_ay8910_interface_3 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	0,
-	0,
-	0,
-	sound_output_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(sound_output_w)
 };
 
 
@@ -1518,22 +1542,19 @@ static MACHINE_RESET( demon_sound )
 	last_portb_write = 0xff;
 
 	/* turn off channel A on AY8910 #0 because it is used as a low-pass filter */
-	ay8910_set_volume(0, 0, 0);
+	ay8910_set_volume(devtag_get_device(machine, SOUND, "ay1"), 0, 0);
 }
 
 
 static ADDRESS_MAP_START( demon_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x4001, 0x4001) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x5001, 0x5001) AM_READ(ay8910_read_port_1_r)
-	AM_RANGE(0x5002, 0x5002) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x5003, 0x5003) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x6001, 0x6001) AM_READ(ay8910_read_port_2_r)
-	AM_RANGE(0x6002, 0x6002) AM_WRITE(ay8910_write_port_2_w)
-	AM_RANGE(0x6003, 0x6003) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x4002, 0x4003) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x5002, 0x5003) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVREAD(SOUND, "ay3", ay8910_r)
+	AM_RANGE(0x6002, 0x6003) AM_DEVWRITE(SOUND, "ay3", ay8910_data_address_w)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(SMH_NOP)  /* watchdog? */
 ADDRESS_MAP_END
 

@@ -10,7 +10,6 @@
 #include <math.h>
 #include "driver.h"
 #include "streams.h"
-#include "sound/custom.h"
 #include "includes/warpwarp.h"
 
 #define CLOCK_16H	(18432000/3/2/16)
@@ -204,7 +203,7 @@ static STREAM_UPDATE( warpwarp_sound_update )
     }
 }
 
-CUSTOM_START( warpwarp_sh_start )
+static DEVICE_START( warpwarp_sound )
 {
 	running_machine *machine = device->machine;
 	int i;
@@ -218,5 +217,20 @@ CUSTOM_START( warpwarp_sh_start )
 
 	sound_volume_timer = timer_alloc(machine, sound_volume_decay, NULL);
 	music_volume_timer = timer_alloc(machine, music_volume_decay, NULL);
-    return auto_malloc(1);
 }
+
+
+DEVICE_GET_INFO( warpwarp_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(warpwarp_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Warp Warp Custom");			break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+

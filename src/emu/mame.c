@@ -25,7 +25,6 @@
             - calls init_machine() [mame.c]
 
             init_machine() [mame.c]
-                - calls sndintrf_init() [sndintrf.c] to determine which sound chips are available
                 - calls fileio_init() [fileio.c] to initialize file I/O info
                 - calls config_init() [config.c] to initialize configuration system
                 - calls input_init() [input.c] to initialize the input system
@@ -86,6 +85,7 @@
 #include "ui.h"
 #include "uimenu.h"
 #include "uiinput.h"
+#include "streams.h"
 #include "deprecat.h"
 #include "debug/debugcon.h"
 
@@ -1470,7 +1470,6 @@ static void init_machine(running_machine *machine)
 	time_t newbase;
 
 	/* initialize basic can't-fail systems here */
-	sndintrf_init(machine);
 	fileio_init(machine);
 	config_init(machine);
 	input_init(machine);
@@ -1508,6 +1507,9 @@ static void init_machine(running_machine *machine)
 
 	/* intialize UI input */
 	ui_input_init(machine);
+	
+	/* initialize the streams engine before the sound devices start */
+	streams_init(machine);
 
 	/* first load ROMs, then populate memory, and finally initialize CPUs */
 	/* these operations must proceed in this order */

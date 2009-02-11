@@ -357,15 +357,15 @@ static WRITE8_HANDLER( sound_data_w )
 }
 
 
-static READ8_HANDLER( sound_latch_r )
+static READ8_DEVICE_HANDLER( sound_latch_r )
 {
 	return BITSWAP8(sound_latch,0,1,2,3,4,5,6,7);
 }
 
 
-static WRITE8_HANDLER( protection_data_w )
+static WRITE8_DEVICE_HANDLER( protection_data_w )
 {
-if (LOG_PROT) logerror("Protection Data Write: %x at %x\n", data, cpu_get_pc(space->cpu));
+if (LOG_PROT) logerror("%s: Protection Data Write: %x\n", cpuexec_describe_context(device->machine), data);
 	protection_data = data;
 }
 
@@ -396,10 +396,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	sound_latch_r,
-	0,
-	0,
-	protection_data_w
+	DEVCB_HANDLER(sound_latch_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(protection_data_w)
 };
 
 
@@ -445,9 +445,8 @@ static ADDRESS_MAP_START( engima2_audio_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVREAD(SOUND, "ay", ay8910_r)
 	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ffc) AM_NOP
 	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END

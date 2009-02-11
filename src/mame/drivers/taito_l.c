@@ -95,10 +95,10 @@ static UINT8 *palette_ram;
 static UINT8 *empty_ram;
 static UINT8 *shared_ram;
 
-static read8_space_func porte0_r;
-static read8_space_func porte1_r;
-static read8_space_func portf0_r;
-static read8_space_func portf1_r;
+static const char *porte0_tag;
+static const char *porte1_tag;
+static const char *portf0_tag;
+static const char *portf1_tag;
 
 static int adpcm_pos;
 static int adpcm_data;
@@ -176,92 +176,92 @@ static void machine_init(running_machine *machine)
 static MACHINE_RESET( fhawk )
 {
 	machine_init(machine);
-	porte0_r = 0;
-	porte1_r = 0;
-	portf0_r = 0;
-	portf1_r = 0;
+	porte0_tag = NULL;
+	porte1_tag = NULL;
+	portf0_tag = NULL;
+	portf1_tag = NULL;
 }
 
 static MACHINE_RESET( raimais )
 {
 	machine_init(machine);
-	porte0_r = 0;
-	porte1_r = 0;
-	portf0_r = 0;
-	portf1_r = 0;
+	porte0_tag = NULL;
+	porte1_tag = NULL;
+	portf0_tag = NULL;
+	portf1_tag = NULL;
 }
 
 static MACHINE_RESET( champwr )
 {
 	machine_init(machine);
-	porte0_r = 0;
-	porte1_r = 0;
-	portf0_r = 0;
-	portf1_r = 0;
+	porte0_tag = NULL;
+	porte1_tag = NULL;
+	portf0_tag = NULL;
+	portf1_tag = NULL;
 }
 
 
 static MACHINE_RESET( kurikint )
 {
 	machine_init(machine);
-	porte0_r = 0;
-	porte1_r = 0;
-	portf0_r = 0;
-	portf1_r = 0;
+	porte0_tag = NULL;
+	porte1_tag = NULL;
+	portf0_tag = NULL;
+	portf1_tag = NULL;
 }
 
 static MACHINE_RESET( evilston )
 {
 	machine_init(machine);
-	porte0_r = 0;
-	porte1_r = 0;
-	portf0_r = 0;
-	portf1_r = 0;
+	porte0_tag = NULL;
+	porte1_tag = NULL;
+	portf0_tag = NULL;
+	portf1_tag = NULL;
 }
 
 static MACHINE_RESET( puzznic )
 {
 	machine_init(machine);
-	porte0_r = input_port_0_r;
-	porte1_r = input_port_1_r;
-	portf0_r = input_port_2_r;
-	portf1_r = input_port_3_r;
+	porte0_tag = "DSWA";
+	porte1_tag = "DSWB";
+	portf0_tag = "IN0";
+	portf1_tag = "IN1";
 }
 
 static MACHINE_RESET( plotting )
 {
 	machine_init(machine);
-	porte0_r = input_port_0_r;
-	porte1_r = input_port_1_r;
-	portf0_r = input_port_2_r;
-	portf1_r = input_port_3_r;
+	porte0_tag = "DSWA";
+	porte1_tag = "DSWB";
+	portf0_tag = "IN0";
+	portf1_tag = "IN1";
 }
 
 static MACHINE_RESET( palamed )
 {
 	machine_init(machine);
-	porte0_r = input_port_0_r;
-	porte1_r = 0;
-	portf0_r = input_port_1_r;
-	portf1_r = 0;
+	porte0_tag = "DSWA";
+	porte1_tag = NULL;
+	portf0_tag = "DSWB";
+	portf1_tag = NULL;
 }
 
 static MACHINE_RESET( cachat )
 {
 	machine_init(machine);
-	porte0_r = input_port_0_r;
-	porte1_r = 0;
-	portf0_r = input_port_1_r;
-	portf1_r = 0;
+	porte0_tag = "DSWA";
+	porte1_tag = NULL;
+	portf0_tag = "DSWB";
+	portf1_tag = NULL;
 }
 
 static MACHINE_RESET( horshoes )
 {
 	machine_init(machine);
-	porte0_r = input_port_0_r;
-	porte1_r = input_port_1_r;
-	portf0_r = input_port_2_r;
-	portf1_r = input_port_3_r;
+	porte0_tag = "DSWA";
+	porte1_tag = "DSWB";
+	portf0_tag = "IN0";
+	portf1_tag = "IN1";
 }
 
 
@@ -448,28 +448,20 @@ static WRITE8_HANDLER( control2_w )
 	coin_counter_w(1,data & 0x08);
 }
 
-static READ8_HANDLER( portA_r )
+static READ8_DEVICE_HANDLER( portA_r )
 {
-	if (extport == 0) return porte0_r(space,0);
-	else return porte1_r(space,0);
+	return input_port_read(device->machine, (extport == 0) ? porte0_tag : porte1_tag);
 }
 
-static READ8_HANDLER( portB_r )
+static READ8_DEVICE_HANDLER( portB_r )
 {
-	if (extport == 0) return portf0_r(space,0);
-	else return portf1_r(space,0);
+	return input_port_read(device->machine, (extport == 0) ? portf0_tag : portf1_tag);
 }
 
-static READ8_HANDLER( ym2203_data0_r )
+static READ8_DEVICE_HANDLER( extport_select_and_ym2203_r )
 {
-	extport = 0;
-	return ym2203_read_port_0_r(space,offset);
-}
-
-static READ8_HANDLER( ym2203_data1_r )
-{
-	extport = 1;
-	return ym2203_read_port_0_r(space,offset);
+	extport = (offset >> 1) & 1;
+	return ym2203_r(device, offset & 1);
 }
 
 static const UINT8 puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
@@ -570,14 +562,14 @@ static void champwr_msm5205_vck(const device_config *device)
 {
 	if (adpcm_data != -1)
 	{
-		msm5205_data_w(0, adpcm_data & 0x0f);
+		msm5205_data_w(device, adpcm_data & 0x0f);
 		adpcm_data = -1;
 	}
 	else
 	{
 		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0x1ffff;
-		msm5205_data_w(0, adpcm_data >> 4);
+		msm5205_data_w(device, adpcm_data >> 4);
 	}
 }
 
@@ -591,20 +583,20 @@ static WRITE8_HANDLER( champwr_msm5205_hi_w )
 	adpcm_pos = ((adpcm_pos & 0x00ffff) | (data << 16)) & 0x1ffff;
 }
 
-static WRITE8_HANDLER( champwr_msm5205_start_w )
+static WRITE8_DEVICE_HANDLER( champwr_msm5205_start_w )
 {
-	msm5205_reset_w(0, 0);
+	msm5205_reset_w(device, 0);
 }
 
-static WRITE8_HANDLER( champwr_msm5205_stop_w )
+static WRITE8_DEVICE_HANDLER( champwr_msm5205_stop_w )
 {
-	msm5205_reset_w(0, 1);
+	msm5205_reset_w(device, 1);
 	adpcm_pos &= 0x1ff00;
 }
 
-static WRITE8_HANDLER( champwr_msm5205_volume_w )
+static WRITE8_DEVICE_HANDLER( champwr_msm5205_volume_w )
 {
-	sndti_set_output_gain(SOUND_MSM5205, 0, 0, data / 255.0);
+	sound_set_output_gain(device, 0, data / 255.0);
 }
 
 
@@ -673,14 +665,11 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 	AM_RANGE(0xff08, 0xff08) AM_WRITE(rombankswitch_w)
 
 #define COMMON_SINGLE_READ \
-	AM_RANGE(0xa000, 0xa000) AM_READ(ym2203_status_port_0_r)	\
-	AM_RANGE(0xa001, 0xa001) AM_READ(ym2203_data0_r)			\
-	AM_RANGE(0xa003, 0xa003) AM_READ(ym2203_data1_r)			\
+	AM_RANGE(0xa000, 0xa001) AM_DEVREAD(SOUND, "ym", extport_select_and_ym2203_r)	\
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
 
 #define COMMON_SINGLE_WRITE \
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_0_w)	\
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_0_w)		\
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym", ym2203_w)		\
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
 
 
@@ -727,7 +716,7 @@ static ADDRESS_MAP_START( fhawk_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(SMH_NOP)
 	AM_RANGE(0xe001, 0xe001) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fhawk_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -735,8 +724,7 @@ static ADDRESS_MAP_START( fhawk_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raimais_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -775,9 +763,7 @@ static ADDRESS_MAP_START( raimais_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(ym2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -793,10 +779,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static ADDRESS_MAP_START( raimais_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -849,7 +832,7 @@ static ADDRESS_MAP_START( champwr_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(SMH_NOP)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -857,14 +840,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champwr_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(champwr_msm5205_hi_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(champwr_msm5205_lo_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(champwr_msm5205_start_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(champwr_msm5205_stop_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE(SOUND, "msm", champwr_msm5205_start_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "msm", champwr_msm5205_stop_w)
 ADDRESS_MAP_END
 
 
@@ -889,7 +871,7 @@ static ADDRESS_MAP_START( kurikint_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(shared_r)
-	AM_RANGE(0xe800, 0xe800) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREAD(SOUND, "ym", ym2203_r)
 #if 0
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
@@ -903,8 +885,7 @@ static ADDRESS_MAP_START( kurikint_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 #if 0
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 #endif
@@ -1053,7 +1034,7 @@ static ADDRESS_MAP_START( evilston_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(shared_r)//shared_r },
-	AM_RANGE(0xe800, 0xe800) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK7)
 ADDRESS_MAP_END
 
@@ -1061,8 +1042,7 @@ static ADDRESS_MAP_START( evilston_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -2030,21 +2010,21 @@ GFXDECODE_END
 
 
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( portA_w )
+static WRITE8_DEVICE_HANDLER( portA_w )
 {
 	if (cur_bank != (data & 0x03) )
 	{
 		int bankaddress;
-		UINT8 *RAM = memory_region(space->machine, "audio");
+		UINT8 *RAM = memory_region(device->machine, "audio");
 
 		cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (cur_bank-1) * 0x4000;
-		memory_set_bankptr(space->machine, 7,&RAM[bankaddress]);
+		memory_set_bankptr(device->machine, 7,&RAM[bankaddress]);
 		//logerror ("YM2203 bank change val=%02x  pc=%04x\n",cur_bank, cpu_get_pc(space->cpu) );
 	}
 }
@@ -2054,10 +2034,10 @@ static const ym2203_interface ym2203_interface_triple =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		portA_w,
-		NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(portA_w),
+		DEVCB_NULL,
 	},
 	irqhandler
 };
@@ -2067,10 +2047,10 @@ static const ym2203_interface ym2203_interface_champwr =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		portA_w,
-		champwr_msm5205_volume_w,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(portA_w),
+		DEVCB_DEVICE_HANDLER(SOUND, "msm", champwr_msm5205_volume_w),
 	},
 	irqhandler
 };
@@ -2092,10 +2072,10 @@ static const ym2203_interface ym2203_interface_single =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		portA_r,
-		portB_r,
-		NULL,
-		NULL
+		DEVCB_HANDLER(portA_r),
+		DEVCB_HANDLER(portB_r),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };

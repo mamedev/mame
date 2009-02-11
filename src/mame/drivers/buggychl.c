@@ -188,11 +188,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x4801, 0x4801) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x4802, 0x4802) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x4803, 0x4803) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x4810, 0x481d) AM_WRITE(msm5232_0_w)
+	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE(SOUND, "msm", msm5232_w)
 	AM_RANGE(0x4820, 0x4820) AM_WRITE(SMH_RAM)	/* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_WRITE(SMH_RAM)	/* TRBL/BASS for the 7630 on the MSM5232 output  */
 //  AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_RAM)  /* to main cpu */
@@ -358,19 +356,19 @@ GFXDECODE_END
 
 
 
-static WRITE8_HANDLER( portA_0_w )
+static WRITE8_DEVICE_HANDLER( portA_0_w )
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 }
-static WRITE8_HANDLER( portB_0_w )
+static WRITE8_DEVICE_HANDLER( portB_0_w )
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
-static WRITE8_HANDLER( portA_1_w )
+static WRITE8_DEVICE_HANDLER( portA_1_w )
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 }
-static WRITE8_HANDLER( portB_1_w )
+static WRITE8_DEVICE_HANDLER( portB_1_w )
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
@@ -380,20 +378,20 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	portA_0_w,
-	portB_0_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(portA_0_w),
+	DEVCB_HANDLER(portB_0_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	portA_1_w,
-	portB_1_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(portA_1_w),
+	DEVCB_HANDLER(portB_1_w)
 };
 
 static const msm5232_interface msm5232_config =

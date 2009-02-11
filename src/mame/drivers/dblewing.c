@@ -468,11 +468,11 @@ static READ8_HANDLER(irq_latch_r)
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
- 	AM_RANGE(0xa000, 0xa001) AM_READWRITE(ym2151_status_port_0_r,ym2151_word_0_w)
-	AM_RANGE(0xb000, 0xb000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
+ 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym2151_status_port_r,ym2151_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r,okim6295_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
  	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
- 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
+ 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r,okim6295_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
@@ -647,14 +647,14 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static void sound_irq(running_machine *machine, int state)
+static void sound_irq(const device_config *device, int state)
 {
 	/* bit 0 of dblewing_sound_irq specifies IRQ from sound chip */
 	if (state)
 		dblewing_sound_irq |= 0x01;
 	else
 		dblewing_sound_irq &= ~0x01;
-	cpu_set_input_line(machine->cpu[1], 0, (dblewing_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, (dblewing_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

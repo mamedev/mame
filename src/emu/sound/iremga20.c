@@ -46,7 +46,8 @@ struct IremGA20_channel_def
 	UINT32 play;
 };
 
-struct IremGA20_chip_def
+typedef struct _ga20_state ga20_state;
+struct _ga20_state
 {
 	UINT8 *rom;
 	INT32 rom_size;
@@ -55,9 +56,20 @@ struct IremGA20_chip_def
 	struct IremGA20_channel_def channel[4];
 };
 
+
+INLINE ga20_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_IREMGA20);
+	return (ga20_state *)device->token;
+}
+
+
 static STREAM_UPDATE( IremGA20_update )
 {
-	struct IremGA20_chip_def *chip = param;
+	ga20_state *chip = param;
 	UINT32 rate[4], pos[4], frac[4], end[4], vol[4], play[4];
 	UINT8 *pSamples;
 	stream_sample_t *outL, *outR;
@@ -131,14 +143,10 @@ static STREAM_UPDATE( IremGA20_update )
 	}
 }
 
-WRITE16_HANDLER( irem_ga20_w )
+WRITE8_DEVICE_HANDLER( irem_ga20_w )
 {
-	struct IremGA20_chip_def *chip = sndti_token(SOUND_IREMGA20, 0);
+	ga20_state *chip = get_safe_token(device);
 	int channel;
-
-	/* only low byte hooked up? */
-	if (!ACCESSING_BITS_0_7)
-		return;
 
 	//logerror("GA20:  Offset %02x, data %04x\n",offset,data);
 
@@ -182,9 +190,9 @@ WRITE16_HANDLER( irem_ga20_w )
 	}
 }
 
-READ16_HANDLER( irem_ga20_r )
+READ8_DEVICE_HANDLER( irem_ga20_r )
 {
-	struct IremGA20_chip_def *chip = sndti_token(SOUND_IREMGA20, 0);
+	ga20_state *chip = get_safe_token(device);
 	int channel;
 
 	stream_update(chip->stream);
@@ -204,7 +212,7 @@ READ16_HANDLER( irem_ga20_r )
 	return 0;
 }
 
-static void iremga20_reset(struct IremGA20_chip_def *chip)
+static void iremga20_reset(ga20_state *chip)
 {
 	int i;
 
@@ -223,14 +231,14 @@ static void iremga20_reset(struct IremGA20_chip_def *chip)
 }
 
 
-static SND_RESET( iremga20 )
+static DEVICE_RESET( iremga20 )
 {
-	iremga20_reset(device->token);
+	iremga20_reset(get_safe_token(device));
 }
 
-static SND_START( iremga20 )
+static DEVICE_START( iremga20 )
 {
-	struct IremGA20_chip_def *chip = device->token;
+	ga20_state *chip = get_safe_token(device);
 	int i;
 
 	/* Initialize our chip structure */
@@ -242,7 +250,7 @@ static SND_START( iremga20 )
 	for ( i = 0; i < 0x40; i++ )
 		chip->regs[i] = 0;
 
-	chip->stream = stream_create( device, 0, 2, clock/4, chip, IremGA20_update );
+	chip->stream = stream_create( device, 0, 2, device->clock/4, chip, IremGA20_update );
 
 	state_save_register_device_item_array(device, 0, chip->regs);
 	for (i = 0; i < 4; i++)
@@ -266,34 +274,24 @@ static SND_START( iremga20 )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( iremga20 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( iremga20 )
+DEVICE_GET_INFO( iremga20 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct IremGA20_chip_def);		break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ga20_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( iremga20 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( iremga20 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( iremga20 );		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( iremga20 );	break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( iremga20 );	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Irem GA20");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Irem custom");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Irem GA20");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Irem custom");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

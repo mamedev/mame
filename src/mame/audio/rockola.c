@@ -12,7 +12,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "sound/custom.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
 #include "rockola.h"
@@ -51,11 +50,6 @@ static sound_stream * tone_stream;
 static int Sound0StopOnRollover;
 static UINT8 LastPort1;
 
-
-const custom_sound_interface custom_interface =
-{
-	rockola_sh_start
-};
 
 static const char *const sasuke_sample_names[] =
 {
@@ -626,7 +620,7 @@ void rockola_set_music_clock(double clock_time)
 	tone_clock = 0;
 }
 
-CUSTOM_START( rockola_sh_start )
+static DEVICE_START( rockola_sound )
 {
 	// adjusted
 	rockola_set_music_freq(43000);
@@ -635,8 +629,19 @@ CUSTOM_START( rockola_sh_start )
 	rockola_set_music_clock(M_LN2 * (RES_K(18) * 2 + RES_K(1)) * CAP_U(1));
 
 	tone_stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, rockola_tone_update);
+}
 
-	return auto_malloc(1);
+DEVICE_GET_INFO( rockola_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(rockola_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Rockola Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }
 
 int rockola_music0_playing(void)
@@ -647,6 +652,7 @@ int rockola_music0_playing(void)
 
 WRITE8_HANDLER( sasuke_sound_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	switch (offset)
 	{
 	case 0:
@@ -664,13 +670,13 @@ WRITE8_HANDLER( sasuke_sound_w )
         */
 
 		if ((~data & 0x01) && (LastPort1 & 0x01))
-			sample_start(0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 		if ((~data & 0x02) && (LastPort1 & 0x02))
-			sample_start(1, 1, 0);
+			sample_start(samples, 1, 1, 0);
 		if ((~data & 0x04) && (LastPort1 & 0x04))
-			sample_start(2, 2, 0);
+			sample_start(samples, 2, 2, 0);
 		if ((~data & 0x08) && (LastPort1 & 0x08))
-			sample_start(3, 3, 0);
+			sample_start(samples, 3, 3, 0);
 
 		if ((data & 0x80) && (~LastPort1 & 0x80))
 		{
@@ -712,6 +718,7 @@ WRITE8_HANDLER( sasuke_sound_w )
 
 WRITE8_HANDLER( satansat_sound_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	switch (offset)
 	{
 	case 0:
@@ -726,7 +733,7 @@ WRITE8_HANDLER( satansat_sound_w )
 
 		/* bit 2 = analog sound trigger */
 		if (data & 0x04 && !(LastPort1 & 0x04))
-			sample_start(0, 1, 0);
+			sample_start(samples, 0, 1, 0);
 
 		if (data & 0x08)
 		{
@@ -774,6 +781,7 @@ WRITE8_HANDLER( satansat_sound_w )
 
 WRITE8_HANDLER( vanguard_sound_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	switch (offset)
 	{
 	case 0:
@@ -799,13 +807,13 @@ WRITE8_HANDLER( vanguard_sound_w )
 		/* play noise samples requested by sound command byte */
 		/* SHOT A */
 		if (data & 0x20 && !(LastPort1 & 0x20))
-			sample_start(1, 0, 0);
+			sample_start(samples, 1, 0, 0);
 		else if (!(data & 0x20) && LastPort1 & 0x20)
-			sample_stop(1);
+			sample_stop(samples, 1);
 
 		/* BOMB */
 		if (data & 0x80 && !(LastPort1 & 0x80))
-			sample_start(2, 1, 0);
+			sample_start(samples, 2, 1, 0);
 
 		if (data & 0x08)
 		{
@@ -819,7 +827,7 @@ WRITE8_HANDLER( vanguard_sound_w )
 		}
 
 		/* SHOT B */
-		sn76477_enable_w(1, (data & 0x40) ? 0 : 1);
+		sn76477_enable_w(devtag_get_device(space->machine, SOUND, "sn76477.2"), (data & 0x40) ? 0 : 1);
 
 		LastPort1 = data;
 		break;
@@ -909,7 +917,7 @@ WRITE8_HANDLER( fantasy_sound_w )
 		}
 
 		/* BOMB */
-		discrete_sound_w(space, FANTASY_BOMB_EN, data & 0x80);
+		discrete_sound_w(devtag_get_device(space->machine, SOUND, "discrete"), FANTASY_BOMB_EN, data & 0x80);
 
 		LastPort1 = data;
 		break;
@@ -1010,7 +1018,7 @@ static int	hd38880_data_bytes;
 static double	hd38880_speed;
 
 
-static void rockola_speech_w(UINT8 data, const UINT16 *table, int start)
+static void rockola_speech_w(running_machine *machine, UINT8 data, const UINT16 *table, int start)
 {
 	/*
         bit description
@@ -1026,6 +1034,7 @@ static void rockola_speech_w(UINT8 data, const UINT16 *table, int start)
 
 	if ((data & HD38880_CTP) && (data & HD38880_CMV))
 	{
+		const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 		data &= HD68880_SYBS;
 
 		switch (hd38880_cmd)
@@ -1036,7 +1045,7 @@ static void rockola_speech_w(UINT8 data, const UINT16 *table, int start)
 			case HD38880_START:
 				logerror("speech: START\n");
 
-				if (hd38880_data_bytes == 5 && !sample_playing(0))
+				if (hd38880_data_bytes == 5 && !sample_playing(samples, 0))
 				{
 					int i;
 
@@ -1044,7 +1053,8 @@ static void rockola_speech_w(UINT8 data, const UINT16 *table, int start)
 					{
 						if (table[i] && table[i] == hd38880_addr)
 						{
-							sample_start(0, start + i, 0);
+							const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+							sample_start(samples, 0, start + i, 0);
 							break;
 						}
 					}
@@ -1056,7 +1066,7 @@ static void rockola_speech_w(UINT8 data, const UINT16 *table, int start)
 				break;
 
 			case HD38880_STOP:
-				sample_stop(0);
+				sample_stop(samples, 0);
 				logerror("speech: STOP\n");
 				break;
 
@@ -1173,7 +1183,7 @@ WRITE8_HANDLER( vanguard_speech_w )
 		0x054ce
 	};
 
-	rockola_speech_w(data, vanguard_table, 2);
+	rockola_speech_w(space->machine, data, vanguard_table, 2);
 }
 
 WRITE8_HANDLER( fantasy_speech_w )
@@ -1198,5 +1208,5 @@ WRITE8_HANDLER( fantasy_speech_w )
 		0
 	};
 
-	rockola_speech_w(data, fantasy_table, 0);
+	rockola_speech_w(space->machine, data, fantasy_table, 0);
 }

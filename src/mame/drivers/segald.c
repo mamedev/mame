@@ -356,8 +356,7 @@ static MACHINE_DRIVER_START( astron )
 	/* sound hardare */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

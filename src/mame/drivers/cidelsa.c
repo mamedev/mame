@@ -75,9 +75,9 @@ static WRITE8_HANDLER( draco_sound_bankswitch_w )
 	memory_set_bank(space->machine, 1, bank);
 }
 
-static WRITE8_HANDLER( draco_sound_g_w )
+static WRITE8_DEVICE_HANDLER( draco_sound_g_w )
 {
-	cidelsa_state *state = space->machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data;
 
 	/*
 
@@ -93,15 +93,15 @@ static WRITE8_HANDLER( draco_sound_g_w )
 	switch (data)
 	{
 	case 0x01:
-		ay8910_write_port_0_w(space, 0, state->draco_ay_latch);
+		ay8910_data_w(device, 0, state->draco_ay_latch);
 		break;
 
 	case 0x02:
-		state->draco_ay_latch = ay8910_read_port_0_r(space, 0);
+		state->draco_ay_latch = ay8910_r(device, 0);
 		break;
 
 	case 0x03:
-		ay8910_control_port_0_w(space, 0, state->draco_ay_latch);
+		ay8910_address_w(device, 0, state->draco_ay_latch);
 		break;
 	}
 }
@@ -127,7 +127,7 @@ static WRITE8_HANDLER( draco_sound_ay8910_w )
 	state->draco_ay_latch = data;
 }
 
-static WRITE8_HANDLER( draco_ay8910_port_a_w )
+static WRITE8_DEVICE_HANDLER( draco_ay8910_port_a_w )
 {
 	/*
       bit   description
@@ -143,7 +143,7 @@ static WRITE8_HANDLER( draco_ay8910_port_a_w )
     */
 }
 
-static WRITE8_HANDLER( draco_ay8910_port_b_w )
+static WRITE8_DEVICE_HANDLER( draco_ay8910_port_b_w )
 {
 	/*
       bit   description
@@ -163,10 +163,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_SINGLE_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	draco_ay8910_port_a_w,
-	draco_ay8910_port_b_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(draco_ay8910_port_a_w),
+	DEVCB_HANDLER(draco_ay8910_port_b_w)
 };
 
 /* Read/Write Handlers */
@@ -365,7 +365,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( draco_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(draco_sound_bankswitch_w)
-	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_WRITE(draco_sound_g_w)
+	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_DEVWRITE(SOUND, "ay", draco_sound_g_w)
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(draco_sound_ay8910_r, draco_sound_ay8910_w)
 	AM_RANGE(COP400_PORT_IN, COP400_PORT_IN) AM_READ(draco_sound_in_r)
 	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_NOP

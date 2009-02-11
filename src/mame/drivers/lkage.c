@@ -174,8 +174,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(ym2203_status_port_1_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym1", ym2203_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREAD(SOUND, "ym2", ym2203_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)
 	AM_RANGE(0xb001, 0xb001) AM_READ(SMH_NOP)	/* ??? */
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostic ROM? */
@@ -184,10 +184,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	/* ??? */
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(lkage_sh_nmi_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
@@ -356,9 +354,9 @@ static GFXDECODE_START( lkage )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,  0, 16 )
 GFXDECODE_END
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -366,7 +364,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };

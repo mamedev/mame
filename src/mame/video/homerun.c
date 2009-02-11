@@ -9,9 +9,9 @@ UINT8 *homerun_videoram;
 
 #define half_screen 116
 
-WRITE8_HANDLER(homerun_banking_w)
+WRITE8_DEVICE_HANDLER(homerun_banking_w)
 {
-	if(video_screen_get_vpos(space->machine->primary_screen)>half_screen)
+	if(video_screen_get_vpos(device->machine->primary_screen)>half_screen)
 		homerun_gc_down=data&3;
 	else
 		homerun_gc_up=data&3;
@@ -20,9 +20,9 @@ WRITE8_HANDLER(homerun_banking_w)
 
 	data>>=5;
 	if(!data)
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") );
+		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "main") );
 	else
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x10000 + (((data-1)&0x7)*0x4000 ));
+		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "main") + 0x10000 + (((data-1)&0x7)*0x4000 ));
 }
 
 WRITE8_HANDLER( homerun_videoram_w )

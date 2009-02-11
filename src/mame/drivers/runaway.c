@@ -67,9 +67,9 @@ static READ8_HANDLER( runaway_input_r )
 }
 
 
-static READ8_HANDLER( runaway_pot_r )
+static READ8_DEVICE_HANDLER( runaway_pot_r )
 {
-	return (input_port_read(space->machine, "7000") << (7 - offset)) & 0x80;
+	return (input_port_read(device->machine, "7000") << (7 - offset)) & 0x80;
 }
 
 
@@ -91,8 +91,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3007) AM_READ(runaway_input_r)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("4000")
 	AM_RANGE(0x5000, 0x5000) AM_READ(atari_vg_earom_r)
-	AM_RANGE(0x6000, 0x600f) AM_READ(pokey1_r)
-	AM_RANGE(0x7000, 0x700f) AM_READ(pokey2_r)
+	AM_RANGE(0x6000, 0x600f) AM_DEVREAD(SOUND, "pokey1", pokey_r)
+	AM_RANGE(0x7000, 0x700f) AM_DEVREAD(SOUND, "pokey2", pokey_r)
 	AM_RANGE(0x8000, 0xcfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)	/* for the interrupt vectors */
 ADDRESS_MAP_END
@@ -110,8 +110,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(SMH_NOP) /* coin counter? */
 	AM_RANGE(0x2003, 0x2004) AM_WRITE(runaway_led_w)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(runaway_tile_bank_w)
-	AM_RANGE(0x6000, 0x600f) AM_WRITE(pokey1_w)
-	AM_RANGE(0x7000, 0x700f) AM_WRITE(pokey2_w)
+	AM_RANGE(0x6000, 0x600f) AM_DEVWRITE(SOUND, "pokey1", pokey_w)
+	AM_RANGE(0x7000, 0x700f) AM_DEVWRITE(SOUND, "pokey2", pokey_w)
 	AM_RANGE(0x8000, 0xcfff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -340,13 +340,22 @@ GFXDECODE_END
 
 static const pokey_interface pokey_interface_1 =
 {
-	{ 0 },
-	input_port_3_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("6008")
 };
 
 static const pokey_interface pokey_interface_2 =
 {
-	{ runaway_pot_r,runaway_pot_r,runaway_pot_r,runaway_pot_r,runaway_pot_r,runaway_pot_r,runaway_pot_r,runaway_pot_r }
+	{
+		DEVCB_HANDLER(runaway_pot_r),
+		DEVCB_HANDLER(runaway_pot_r),
+		DEVCB_HANDLER(runaway_pot_r),
+		DEVCB_HANDLER(runaway_pot_r),
+		DEVCB_HANDLER(runaway_pot_r),
+		DEVCB_HANDLER(runaway_pot_r),
+		DEVCB_HANDLER(runaway_pot_r),
+		DEVCB_HANDLER(runaway_pot_r)
+	}
 };
 
 

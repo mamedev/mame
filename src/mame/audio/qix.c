@@ -23,12 +23,14 @@ Audio handlers
 
 WRITE8_HANDLER( qix_dac_w )
 {
-	discrete_sound_w(space, QIX_DAC_DATA, data);
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	discrete_sound_w(discrete, QIX_DAC_DATA, data);
 }
 
 WRITE8_HANDLER( qix_vol_w )
 {
-	discrete_sound_w(space, QIX_VOL_DATA, data);
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	discrete_sound_w(discrete, QIX_VOL_DATA, data);
 }
 
 
@@ -122,10 +124,12 @@ MACHINE_DRIVER_START( slither_audio )
 	MDRV_SPEAKER_REMOVE("left")
 	MDRV_SPEAKER_REMOVE("right")
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+	
+	MDRV_SOUND_REMOVE("discrete")
 
-	MDRV_SOUND_REPLACE("discrete", SN76489, SLITHER_CLOCK_OSC/4/4)
+	MDRV_SOUND_ADD("sn1", SN76489, SLITHER_CLOCK_OSC/4/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("sn", SN76489, SLITHER_CLOCK_OSC/4/4)
+	MDRV_SOUND_ADD("sn2", SN76489, SLITHER_CLOCK_OSC/4/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END

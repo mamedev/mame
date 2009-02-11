@@ -1,12 +1,12 @@
-#include "sound/custom.h"
-
 /*----------- defined in audio/flower.c -----------*/
 
 extern UINT8 *flower_soundregs1,*flower_soundregs2;
 
 WRITE8_HANDLER( flower_sound1_w );
 WRITE8_HANDLER( flower_sound2_w );
-CUSTOM_START( flower_sh_start );
+
+DEVICE_GET_INFO( flower_sound );
+#define SOUND_FLOWER DEVICE_GET_INFO_NAME(flower_sound)
 
 
 /*----------- defined in video/flower.c -----------*/

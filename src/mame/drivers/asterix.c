@@ -107,9 +107,9 @@ static INTERRUPT_GEN( asterix_interrupt )
                                               mask used is 0 or 7 */
 }
 
-static READ16_HANDLER( asterix_sound_r )
+static READ8_DEVICE_HANDLER( asterix_sound_r )
 {
-	return k053260_0_r(space,2 + offset);
+	return k053260_r(device,2 + offset);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
 	AM_RANGE(0x380002, 0x380003) AM_READ(control1_r)
 	AM_RANGE(0x380100, 0x380101) AM_WRITE(control2_w)
-	AM_RANGE(0x380200, 0x380203) AM_READWRITE(asterix_sound_r, k053260_0_lsb_w)
+	AM_RANGE(0x380200, 0x380203) AM_DEVREADWRITE8(SOUND, "konami", asterix_sound_r, k053260_w, 0x00ff)
 	AM_RANGE(0x380300, 0x380301) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x380400, 0x380401) AM_WRITE(asterix_spritebank_w)
 	AM_RANGE(0x380500, 0x38051f) AM_WRITE(K053251_lsb_w)
@@ -201,10 +201,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf801, 0xf801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0xfa00, 0xfa2f) AM_READWRITE(k053260_0_r, k053260_0_w)
+	AM_RANGE(0xf801, 0xf801) AM_DEVREADWRITE(SOUND, "ym", ym2151_status_port_r, ym2151_data_port_w)
+	AM_RANGE(0xfa00, 0xfa2f) AM_DEVREADWRITE(SOUND, "konami", k053260_r, k053260_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE(SOUND, "ym", ym2151_register_port_w)
 ADDRESS_MAP_END
 
 

@@ -330,8 +330,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START (sound_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER ( ppi_port_c_w )
@@ -443,9 +442,9 @@ static INTERRUPT_GEN( sfkick_interrupt )
 {
 	v9938_interrupt(device->machine, 0);
 }
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	cpu_set_input_line_and_vector(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 static const ym2203_interface ym2203_config =
@@ -453,7 +452,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		0,0,0,0,
+		DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,DEVCB_NULL,
 	},
 	irqhandler
 };

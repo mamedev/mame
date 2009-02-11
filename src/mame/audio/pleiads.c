@@ -8,7 +8,6 @@
  ****************************************************************************/
 #include "driver.h"
 #include "streams.h"
-#include "sound/custom.h"
 #include "sound/tms36xx.h"
 #include "includes/phoenix.h"
 
@@ -437,7 +436,7 @@ WRITE8_HANDLER( pleiads_sound_control_b_w )
 	if (pitch == 3)
 		pitch = 2;	/* 2 and 3 are the same */
 
-	tms36xx_note_w(0, pitch, note);
+	tms36xx_note_w(devtag_get_device(space->machine, SOUND, "tms"), pitch, note);
 
 	stream_update(channel);
 	sound_latch_b = data;
@@ -454,7 +453,7 @@ WRITE8_HANDLER( pleiads_sound_control_c_w )
 	sound_latch_c = data;
 }
 
-static void *common_sh_start(const device_config *device, const custom_sound_interface *config, const char *name)
+static DEVICE_START( common_sh_start )
 {
 	running_machine *machine = device->machine;
 	int i, j;
@@ -478,12 +477,9 @@ static void *common_sh_start(const device_config *device, const custom_sound_int
 	}
 
 	channel = stream_create(device, 0, 1, machine->sample_rate, NULL, pleiads_sound_update);
-
-	/* just a dummy alloc to make the caller happy */
-	return auto_malloc(1);
 }
 
-CUSTOM_START( pleiads_sh_start )
+static DEVICE_START( pleiads_sound )
 {
 	/* The real values are _unknown_!
      * I took the ones from Naughty Boy / Pop Flamer
@@ -541,10 +537,24 @@ CUSTOM_START( pleiads_sh_start )
       freq = 1.44 / ((100000+2*1000) * 0.01e-6) = approx. 1412 Hz */
 	noise_freq = 1412;	/* higher noise rate than popflame/naughtyb??? */
 
-	return common_sh_start(device, config, "Custom (Pleiads)");
+	DEVICE_START_CALL(common_sh_start);
 }
 
-CUSTOM_START( naughtyb_sh_start )
+DEVICE_GET_INFO( pleiads_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(pleiads_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Pleiads Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+
+static DEVICE_START( naughtyb_sound )
 {
 	/* charge 10u??? through 330K (R??) -> 3.3s */
 	pa5_charge_time = 3.3;
@@ -598,10 +608,24 @@ CUSTOM_START( naughtyb_sh_start )
       freq = 1.44 / ((200000+2*1000) * 0.01e-6) = approx. 713 Hz */
 	noise_freq = 713;
 
-	return common_sh_start(device, config, "Custom (Naughty Boy)");
+	DEVICE_START_CALL(common_sh_start);
 }
 
-CUSTOM_START( popflame_sh_start )
+DEVICE_GET_INFO( naughtyb_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(naughtyb_sound);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Naughty Boy Custom");			break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+
+static DEVICE_START( popflame_sound )
 {
 	/* charge 10u (C63 in Pop Flamer) through 330K -> 3.3s */
 	pa5_charge_time = 3.3;
@@ -655,5 +679,18 @@ CUSTOM_START( popflame_sh_start )
       freq = 1.44 / ((200000+2*1000) * 0.01e-6) = approx. 713 Hz */
 	noise_freq = 713;
 
-	return common_sh_start(device, config, "Custom (Pop Flamer)");
+	DEVICE_START_CALL(common_sh_start);
+}
+
+DEVICE_GET_INFO( popflame_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(popflame_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Pop Flamer Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }

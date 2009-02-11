@@ -280,7 +280,7 @@ static STREAM_UPDATE( tiamc1_sound_update )
 	}
 }
 
-CUSTOM_START( tiamc1_sh_start )
+static DEVICE_START( tiamc1_sound )
 {
 	running_machine *machine = device->machine;
 	int i, j;
@@ -288,7 +288,7 @@ CUSTOM_START( tiamc1_sh_start )
 	timer8253_reset(&timer0);
 	timer8253_reset(&timer1);
 
-	channel = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, 0, tiamc1_sound_update);
+	channel = stream_create(device, 0, 1, device->clock / CLOCK_DIVIDER, 0, tiamc1_sound_update);
 
 	timer1_divider = 0;
 
@@ -309,7 +309,20 @@ CUSTOM_START( tiamc1_sh_start )
 	}
 
 	state_save_register_global(machine, timer1_divider);
-
-	return channel;
 }
+
+
+DEVICE_GET_INFO( tiamc1_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tiamc1_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TIA-MC1 Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
 

@@ -148,14 +148,10 @@ static READ8_HANDLER( AY8910_port_r )
 	UINT8 ret = 0;
 
 	if (AY8910_selected & 0x08)
-{
-		ret = ay8910_read_port_0_r(space, offset);
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Read: %x\n", cpu_get_pc(space->cpu), ret);}
+		ret = ay8910_r(devtag_get_device(space->machine, SOUND, "ay1"), 0);
 
 	if (AY8910_selected & 0x10)
-{
-		ret = ay8910_read_port_1_r(space, offset);
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Read: %x\n", cpu_get_pc(space->cpu), ret);}
+		ret = ay8910_r(devtag_get_device(space->machine, SOUND, "ay2"), 0);
 
 	return ret;
 }
@@ -163,29 +159,11 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Read: %x\n", cpu_get_p
 
 static WRITE8_HANDLER( AY8910_port_w )
 {
-	if (AY8910_selected & 0x04)
-	{
-		if (AY8910_selected & 0x08)
-{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Control Write: %x\n", cpu_get_pc(space->cpu), data);
-			ay8910_control_port_0_w(space, offset, data);
-}
-		if (AY8910_selected & 0x10)
-{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Control Write: %x\n", cpu_get_pc(space->cpu), data);
-			ay8910_control_port_1_w(space, offset, data);
-}
-	}
-	else
-	{
-		if (AY8910_selected & 0x08)
-{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Write: %x\n", cpu_get_pc(space->cpu), data);
-			ay8910_write_port_0_w(space, offset, data);
-}
+	if (AY8910_selected & 0x08)
+		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay1"), AY8910_selected >> 2, data);
 
-		if (AY8910_selected & 0x10)
-{if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Write: %x\n", cpu_get_pc(space->cpu), data);
-			ay8910_write_port_1_w(space, offset, data);
-}
-	}
+	if (AY8910_selected & 0x10)
+		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay2"), AY8910_selected >> 2, data);
 }
 
 
@@ -193,10 +171,10 @@ static const ay8910_interface ay8910_1_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_3_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSWB"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -204,10 +182,10 @@ static const ay8910_interface ay8910_2_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_1_r,
-	input_port_2_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("IN1"),
+	DEVCB_INPUT_PORT("DSWA"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

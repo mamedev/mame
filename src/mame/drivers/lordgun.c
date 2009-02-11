@@ -235,21 +235,20 @@ static ADDRESS_MAP_START( lordgun_soundmem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( lordgun_okibank_w )
+static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 {
-	okim6295_set_bank_base(0, (data & 2) ? 0x40000 : 0);
-	if (data & ~3)	logerror("%04x: unknown okibank bits %02x\n", cpu_get_pc(space->cpu), data);
+	okim6295_set_bank_base(device, (data & 2) ? 0x40000 : 0);
+	if (data & ~3)	logerror("%s: unknown okibank bits %02x\n", cpuexec_describe_context(device->machine), data);
 //  popmessage("OKI %x", data);
 }
 
 static ADDRESS_MAP_START( lordgun_soundio_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x1000, 0x1000) AM_WRITE( ym3812_control_port_0_w )
-	AM_RANGE(0x1001, 0x1001) AM_WRITE( ym3812_write_port_0_w )
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE( SOUND, "ym", ym3812_w )
+	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_READ( SMH_NOP )
-	AM_RANGE(0x6000, 0x6000) AM_WRITE( lordgun_okibank_w )
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE( SOUND, "oki", lordgun_okibank_w )
 ADDRESS_MAP_END
 
 
@@ -257,10 +256,9 @@ static ADDRESS_MAP_START( hfh_soundio_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_READ( SMH_NOP )
-	AM_RANGE(0x7000, 0x7000) AM_WRITE( ym3812_control_port_0_w )
-	AM_RANGE(0x7001, 0x7001) AM_WRITE( ym3812_write_port_0_w )
-	AM_RANGE(0x7400, 0x7400) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
-	AM_RANGE(0x7800, 0x7800) AM_READWRITE( okim6295_status_1_r, okim6295_data_1_w )
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE( SOUND, "ym", ym3812_w )
+	AM_RANGE(0x7400, 0x7400) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x7800, 0x7800) AM_DEVREADWRITE( SOUND, "oki2", okim6295_r, okim6295_w )
 ADDRESS_MAP_END
 
 
@@ -423,9 +421,9 @@ static const ppi8255_interface ppi8255_intf[2] =
 	}
 };
 
-static void soundirq(running_machine *machine, int state)
+static void soundirq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1], 0, state);
+	cpu_set_input_line(device->machine->cpu[1], 0, state);
 }
 
 static const ym3812_interface lordgun_ym3812_interface =

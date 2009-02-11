@@ -134,9 +134,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(SOUND, "ym", ym3812_status_port_r, ym3812_control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE(SOUND, "ym", ym3812_write_port_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_w)
 ADDRESS_MAP_END
 
@@ -264,9 +264,9 @@ static VIDEO_UPDATE( onetwo )
 	return 0;
 }
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate);
+	cpu_set_input_line(device->machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =

@@ -101,7 +101,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	interrupt_enable_w(space, 0,data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(0,((data & 0x80) >> 7) * 255);
+	dac_data_w(devtag_get_device(device->machine, SOUND, "dac"), ((data & 0x80) >> 7) * 255);
 
 //  logerror("%s: sound_w %02x\n",cpuexec_describe_context(device->machine),data);
 //  popmessage("%02x",data);

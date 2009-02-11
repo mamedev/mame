@@ -157,7 +157,8 @@
 #define DIV_64		28		 /* divisor for 1.78979 MHz clock to 63.9211 kHz */
 #define DIV_15		114 	 /* divisor for 1.78979 MHz clock to 15.6999 kHz */
 
-struct POKEYregisters
+typedef struct _pokey_state pokey_state;
+struct _pokey_state
 {
 	INT32 counter[4];		/* channel counter */
 	INT32 divisor[4];		/* channel divisor (modulo value) */
@@ -182,11 +183,11 @@ struct POKEYregisters
 	int timer_param[3];		/* computed parameters for these timers */
 	emu_timer *rtimer;     /* timer for calculating the random offset */
 	emu_timer *ptimer[8];	/* pot timers */
-	read8_space_func pot_r[8];
-	read8_space_func allpot_r;
-	read8_space_func serin_r;
-	write8_space_func serout_w;
-	void (*interrupt_cb)(running_machine *machine, int mask);
+	devcb_resolved_read8 pot_r[8];
+	devcb_resolved_read8 allpot_r;
+	devcb_resolved_read8 serin_r;
+	devcb_resolved_write8 serout_w;
+	void (*interrupt_cb)(const device_config *device, int mask);
 	UINT8 AUDF[4];          /* AUDFx (D200, D202, D204, D206) */
 	UINT8 AUDC[4];			/* AUDCx (D201, D203, D205, D207) */
 	UINT8 POTx[8];			/* POTx   (R/D200-D207) */
@@ -523,9 +524,19 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 #endif
 
 
+INLINE pokey_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_POKEY);
+	return (pokey_state *)device->token;
+}
+
+
 static STREAM_UPDATE( pokey_update )
 {
-	struct POKEYregisters *chip = param;
+	pokey_state *chip = param;
 	stream_sample_t *buffer = outputs[0];
 	PROCESS_POKEY(chip);
 }
@@ -566,7 +577,7 @@ static void rand_init(UINT8 *rng, int size, int left, int right, int add)
 }
 
 
-static void register_for_save(struct POKEYregisters *chip, const device_config *device)
+static void register_for_save(pokey_state *chip, const device_config *device)
 {
 	state_save_register_device_item_array(device, 0, chip->counter);
 	state_save_register_device_item_array(device, 0, chip->divisor);
@@ -606,16 +617,16 @@ static void register_for_save(struct POKEYregisters *chip, const device_config *
 }
 
 
-static SND_START( pokey )
+static DEVICE_START( pokey )
 {
-	struct POKEYregisters *chip = device->token;
-	int sample_rate = clock;
+	pokey_state *chip = get_safe_token(device);
+	int sample_rate = device->clock;
 	int i;
 
 	if (device->static_config)
 		memcpy(&chip->intf, device->static_config, sizeof(pokey_interface));
 	chip->device = device;
-	chip->clock_period = ATTOTIME_IN_HZ(clock);
+	chip->clock_period = ATTOTIME_IN_HZ(device->clock);
 
 	/* calculate the A/D times
      * In normal, slow mode (SKCTL bit SK_PADDLE is clear) the conversion
@@ -624,8 +635,8 @@ static SND_START( pokey )
      * In quick mode (SK_PADDLE set) the conversion is done very fast
      * (takes two scanlines) but the result is not as accurate.
      */
-	chip->ad_time_fast = attotime_div(attotime_mul(ATTOTIME_IN_NSEC(64000*2/228), FREQ_17_EXACT), clock);
-	chip->ad_time_slow = attotime_div(attotime_mul(ATTOTIME_IN_NSEC(64000      ), FREQ_17_EXACT), clock);
+	chip->ad_time_fast = attotime_div(attotime_mul(ATTOTIME_IN_NSEC(64000*2/228), FREQ_17_EXACT), device->clock);
+	chip->ad_time_slow = attotime_div(attotime_mul(ATTOTIME_IN_NSEC(64000      ), FREQ_17_EXACT), device->clock);
 
 	/* initialize the poly counters */
 	poly_init(chip->poly4,   4, 3, 1, 0x00004);
@@ -637,7 +648,7 @@ static SND_START( pokey )
 	rand_init(chip->rand9,   9, 8, 1, 0x00180);
 	rand_init(chip->rand17, 17,16, 1, 0x1c000);
 
-	chip->samplerate_24_8 = (clock << 8) / sample_rate;
+	chip->samplerate_24_8 = (device->clock << 8) / sample_rate;
 	chip->divisor[CHAN1] = 4;
 	chip->divisor[CHAN2] = 4;
 	chip->divisor[CHAN3] = 4;
@@ -654,11 +665,11 @@ static SND_START( pokey )
 	for (i=0; i<8; i++)
 	{
 		chip->ptimer[i] = timer_alloc(device->machine, pokey_pot_trigger, chip);
-		chip->pot_r[i] = chip->intf.pot_r[i];
+		devcb_resolve_read8(&chip->pot_r[i], &chip->intf.pot_r[i], device);
 	}
-	chip->allpot_r = chip->intf.allpot_r;
-	chip->serin_r = chip->intf.serin_r;
-	chip->serout_w = chip->intf.serout_w;
+	devcb_resolve_read8(&chip->allpot_r, &chip->intf.allpot_r, device);
+	devcb_resolve_read8(&chip->serin_r, &chip->intf.serin_r, device);
+	devcb_resolve_write8(&chip->serout_w, &chip->intf.serout_w, device);
 	chip->interrupt_cb = chip->intf.interrupt_cb;
 
 	chip->channel = stream_create(device, 0, 1, sample_rate, chip, pokey_update);
@@ -668,7 +679,7 @@ static SND_START( pokey )
 
 static TIMER_CALLBACK( pokey_timer_expire )
 {
-	struct POKEYregisters *p = ptr;
+	pokey_state *p = ptr;
 	int timers = param;
 
 	LOG_TIMER(("POKEY #%p timer %d with IRQEN $%02x\n", p, timers, p->IRQEN));
@@ -682,7 +693,7 @@ static TIMER_CALLBACK( pokey_timer_expire )
 		p->IRQST |= timers;
         /* call back an application supplied function to handle the interrupt */
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(machine, timers);
+			(*p->interrupt_cb)(p->device, timers);
     }
 }
 
@@ -736,44 +747,44 @@ static char *audctl2str(int val)
     return buff;
 }
 
-static TIMER_CALLBACK( pokey_serin_ready )
+static TIMER_CALLBACK( pokey_serin_ready_cb )
 {
-	struct POKEYregisters *p = ptr;
+	pokey_state *p = ptr;
     if( p->IRQEN & IRQ_SERIN )
 	{
 		/* set the enabled timer irq status bits */
 		p->IRQST |= IRQ_SERIN;
 		/* call back an application supplied function to handle the interrupt */
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(machine, IRQ_SERIN);
+			(*p->interrupt_cb)(p->device, IRQ_SERIN);
 	}
 }
 
-static TIMER_CALLBACK( pokey_serout_ready )
+static TIMER_CALLBACK( pokey_serout_ready_cb )
 {
-	struct POKEYregisters *p = ptr;
+	pokey_state *p = ptr;
     if( p->IRQEN & IRQ_SEROR )
 	{
 		p->IRQST |= IRQ_SEROR;
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(machine, IRQ_SEROR);
+			(*p->interrupt_cb)(p->device, IRQ_SEROR);
 	}
 }
 
 static TIMER_CALLBACK( pokey_serout_complete )
 {
-	struct POKEYregisters *p = ptr;
+	pokey_state *p = ptr;
     if( p->IRQEN & IRQ_SEROC )
 	{
 		p->IRQST |= IRQ_SEROC;
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(machine, IRQ_SEROC);
+			(*p->interrupt_cb)(p->device, IRQ_SEROC);
 	}
 }
 
 static TIMER_CALLBACK( pokey_pot_trigger )
 {
-	struct POKEYregisters *p = ptr;
+	pokey_state *p = ptr;
 	int pot = param;
 	LOG(("POKEY #%p POT%d triggers after %dus\n", p, pot, (int)(1000000 * attotime_to_double(timer_timeelapsed(p->ptimer[pot])))));
 	p->ALLPOT &= ~(1 << pot);	/* set the enabled timer irq status bits */
@@ -781,7 +792,7 @@ static TIMER_CALLBACK( pokey_pot_trigger )
 
 #define AD_TIME  ((p->SKCTL & SK_PADDLE) ? p->ad_time_fast : p->ad_time_slow)
 
-static void pokey_potgo(const address_space *space, struct POKEYregisters *p)
+static void pokey_potgo(pokey_state *p)
 {
     int pot;
 
@@ -792,9 +803,9 @@ static void pokey_potgo(const address_space *space, struct POKEYregisters *p)
     for( pot = 0; pot < 8; pot++ )
 	{
 		p->POTx[pot] = 0xff;
-		if( p->pot_r[pot] )
+		if( p->pot_r[pot].read )
 		{
-			int r = (*p->pot_r[pot])(space, pot);
+			int r = devcb_call_read8(&p->pot_r[pot], pot);
 
 			LOG(("POKEY %s pot_r(%d) returned $%02x\n", p->device->tag, pot, r));
 			if( r != -1 )
@@ -810,29 +821,18 @@ static void pokey_potgo(const address_space *space, struct POKEYregisters *p)
 	}
 }
 
-static int pokey_register_r(int chip, int offs)
+READ8_DEVICE_HANDLER( pokey_r )
 {
-	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
-	/* temporary hack until this is converted to a device */
-	const address_space *space;
+	pokey_state *p = get_safe_token(device);
 	int data = 0, pot;
 	UINT32 adjust = 0;
 
-#ifdef MAME_DEBUG
-	if( !p )
-	{
-		logerror("POKEY #%d is >= number of Pokeys!\n", chip);
-		return data;
-	}
-#endif
-
-	space = memory_find_address_space(p->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	switch (offs & 15)
+	switch (offset & 15)
 	{
 	case POT0_C: case POT1_C: case POT2_C: case POT3_C:
 	case POT4_C: case POT5_C: case POT6_C: case POT7_C:
-		pot = offs & 7;
-		if( p->pot_r[pot] )
+		pot = offset & 7;
+		if( p->pot_r[pot].read )
 		{
 			/*
              * If the conversion is not yet finished (ptimer running),
@@ -842,16 +842,16 @@ static int pokey_register_r(int chip, int offs)
 			if( p->ALLPOT & (1 << pot) )
 			{
 				data = timer_timeelapsed(p->ptimer[pot]).attoseconds / AD_TIME.attoseconds;
-				LOG(("POKEY #%d read POT%d (interpolated) $%02x\n", chip, pot, data));
+				LOG(("POKEY '%s' read POT%d (interpolated) $%02x\n", p->device->tag, pot, data));
             }
 			else
 			{
 				data = p->POTx[pot];
-				LOG(("POKEY #%d read POT%d (final value)  $%02x\n", chip, pot, data));
+				LOG(("POKEY '%s' read POT%d (final value)  $%02x\n", p->device->tag, pot, data));
 			}
 		}
 		else
-			logerror("%s: warning - read p[chip] #%d POT%d\n", cpuexec_describe_context(p->device->machine), chip, pot);
+			logerror("%s: warning - read '%s' POT%d\n", cpuexec_describe_context(p->device->machine), p->device->tag, pot);
 		break;
 
     case ALLPOT_C:
@@ -862,17 +862,17 @@ static int pokey_register_r(int chip, int offs)
 		if( (p->SKCTL & SK_RESET) == 0)
 		{
 			data = 0;
-			LOG(("POKEY #%d ALLPOT internal $%02x (reset)\n", chip, data));
+			LOG(("POKEY '%s' ALLPOT internal $%02x (reset)\n", p->device->tag, data));
 		}
-		else if( p->allpot_r )
+		else if( p->allpot_r.read )
 		{
-			data = (*p->allpot_r)(space, offs);
-			LOG(("POKEY #%d ALLPOT callback $%02x\n", chip, data));
+			data = devcb_call_read8(&p->allpot_r, offset);
+			LOG(("POKEY '%s' ALLPOT callback $%02x\n", p->device->tag, data));
 		}
 		else
 		{
 			data = p->ALLPOT;
-			LOG(("POKEY #%d ALLPOT internal $%02x\n", chip, data));
+			LOG(("POKEY '%s' ALLPOT internal $%02x\n", p->device->tag, data));
 		}
 		break;
 
@@ -900,17 +900,17 @@ static int pokey_register_r(int chip, int offs)
 			adjust = 1;
 			p->r9 = 0;
 			p->r17 = 0;
-            LOG_RAND(("POKEY #%d rand17 frozen (SKCTL): $%02x\n", chip, p->RANDOM));
+            LOG_RAND(("POKEY '%s' rand17 frozen (SKCTL): $%02x\n", p->device->tag, p->RANDOM));
 		}
 		if( p->AUDCTL & POLY9 )
 		{
 			p->RANDOM = p->rand9[p->r9];
-			LOG_RAND(("POKEY #%d adjust %u rand9[$%05x]: $%02x\n", chip, adjust, p->r9, p->RANDOM));
+			LOG_RAND(("POKEY '%s' adjust %u rand9[$%05x]: $%02x\n", p->device->tag, adjust, p->r9, p->RANDOM));
 		}
 		else
 		{
 			p->RANDOM = p->rand17[p->r17];
-			LOG_RAND(("POKEY #%d adjust %u rand17[$%05x]: $%02x\n", chip, adjust, p->r17, p->RANDOM));
+			LOG_RAND(("POKEY '%s' adjust %u rand17[$%05x]: $%02x\n", p->device->tag, adjust, p->r17, p->RANDOM));
 		}
 		if (adjust > 0)
 			timer_adjust_oneshot(p->rtimer, attotime_never, 0);
@@ -918,85 +918,57 @@ static int pokey_register_r(int chip, int offs)
 		break;
 
 	case SERIN_C:
-		if( p->serin_r )
-			p->SERIN = (*p->serin_r)(space, offs);
+		if( p->serin_r.read )
+			p->SERIN = devcb_call_read8(&p->serin_r, offset);
 		data = p->SERIN;
-		LOG(("POKEY #%d SERIN  $%02x\n", chip, data));
+		LOG(("POKEY '%s' SERIN  $%02x\n", p->device->tag, data));
 		break;
 
 	case IRQST_C:
 		/* IRQST is an active low input port; we keep it active high */
 		/* internally to ease the (un-)masking of bits */
 		data = p->IRQST ^ 0xff;
-		LOG(("POKEY #%d IRQST  $%02x\n", chip, data));
+		LOG(("POKEY '%s' IRQST  $%02x\n", p->device->tag, data));
 		break;
 
 	case SKSTAT_C:
 		/* SKSTAT is also an active low input port */
 		data = p->SKSTAT ^ 0xff;
-		LOG(("POKEY #%d SKSTAT $%02x\n", chip, data));
+		LOG(("POKEY '%s' SKSTAT $%02x\n", p->device->tag, data));
 		break;
 
 	default:
-		LOG(("POKEY #%d register $%02x\n", chip, offs));
+		LOG(("POKEY '%s' register $%02x\n", p->device->tag, offset));
         break;
     }
     return data;
 }
 
-READ8_HANDLER( pokey1_r )
-{
-	return pokey_register_r(0, offset);
-}
-
-READ8_HANDLER( pokey2_r )
-{
-	return pokey_register_r(1, offset);
-}
-
-READ8_HANDLER( pokey3_r )
-{
-	return pokey_register_r(2, offset);
-}
-
-READ8_HANDLER( pokey4_r )
-{
-	return pokey_register_r(3, offset);
-}
-
 READ8_HANDLER( quad_pokey_r )
 {
+	static const char *devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
 
-	return pokey_register_r(pokey_num, pokey_reg);
+	return pokey_r(devtag_get_device(space->machine, SOUND, devname[pokey_num]), pokey_reg);
 }
 
 
-static void pokey_register_w(int chip, int offs, int data)
+WRITE8_DEVICE_HANDLER( pokey_w )
 {
-	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
-	/* temporary hack until this is converted to a device */
-	const address_space *space = memory_find_address_space(p->device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pokey_state *p = get_safe_token(device);
 	int ch_mask = 0, new_val;
 
-#ifdef MAME_DEBUG
-	if( !p )
-	{
-		logerror("POKEY #%d is >= number of Pokeys!\n", chip);
-		return;
-	}
-#endif
 	stream_update(p->channel);
 
     /* determine which address was changed */
-	switch (offs & 15)
+	switch (offset & 15)
     {
     case AUDF1_C:
 		if( data == p->AUDF[CHAN1] )
             return;
-		LOG_SOUND(("POKEY #%d AUDF1  $%02x\n", chip, data));
+		LOG_SOUND(("POKEY '%s' AUDF1  $%02x\n", p->device->tag, data));
 		p->AUDF[CHAN1] = data;
         ch_mask = 1 << CHAN1;
 		if( p->AUDCTL & CH12_JOINED )		/* if ch 1&2 tied together */
@@ -1006,7 +978,7 @@ static void pokey_register_w(int chip, int offs, int data)
     case AUDC1_C:
 		if( data == p->AUDC[CHAN1] )
             return;
-		LOG_SOUND(("POKEY #%d AUDC1  $%02x (%s)\n", chip, data, audc2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDC1  $%02x (%s)\n", p->device->tag, data, audc2str(data)));
 		p->AUDC[CHAN1] = data;
         ch_mask = 1 << CHAN1;
         break;
@@ -1014,7 +986,7 @@ static void pokey_register_w(int chip, int offs, int data)
     case AUDF2_C:
 		if( data == p->AUDF[CHAN2] )
             return;
-		LOG_SOUND(("POKEY #%d AUDF2  $%02x\n", chip, data));
+		LOG_SOUND(("POKEY '%s' AUDF2  $%02x\n", p->device->tag, data));
 		p->AUDF[CHAN2] = data;
         ch_mask = 1 << CHAN2;
         break;
@@ -1022,7 +994,7 @@ static void pokey_register_w(int chip, int offs, int data)
     case AUDC2_C:
 		if( data == p->AUDC[CHAN2] )
             return;
-		LOG_SOUND(("POKEY #%d AUDC2  $%02x (%s)\n", chip, data, audc2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDC2  $%02x (%s)\n", p->device->tag, data, audc2str(data)));
 		p->AUDC[CHAN2] = data;
         ch_mask = 1 << CHAN2;
         break;
@@ -1030,7 +1002,7 @@ static void pokey_register_w(int chip, int offs, int data)
     case AUDF3_C:
 		if( data == p->AUDF[CHAN3] )
             return;
-		LOG_SOUND(("POKEY #%d AUDF3  $%02x\n", chip, data));
+		LOG_SOUND(("POKEY '%s' AUDF3  $%02x\n", p->device->tag, data));
 		p->AUDF[CHAN3] = data;
         ch_mask = 1 << CHAN3;
 
@@ -1041,7 +1013,7 @@ static void pokey_register_w(int chip, int offs, int data)
     case AUDC3_C:
 		if( data == p->AUDC[CHAN3] )
             return;
-		LOG_SOUND(("POKEY #%d AUDC3  $%02x (%s)\n", chip, data, audc2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDC3  $%02x (%s)\n", p->device->tag, data, audc2str(data)));
 		p->AUDC[CHAN3] = data;
         ch_mask = 1 << CHAN3;
         break;
@@ -1049,7 +1021,7 @@ static void pokey_register_w(int chip, int offs, int data)
     case AUDF4_C:
 		if( data == p->AUDF[CHAN4] )
             return;
-		LOG_SOUND(("POKEY #%d AUDF4  $%02x\n", chip, data));
+		LOG_SOUND(("POKEY '%s' AUDF4  $%02x\n", p->device->tag, data));
 		p->AUDF[CHAN4] = data;
         ch_mask = 1 << CHAN4;
         break;
@@ -1057,7 +1029,7 @@ static void pokey_register_w(int chip, int offs, int data)
     case AUDC4_C:
 		if( data == p->AUDC[CHAN4] )
             return;
-		LOG_SOUND(("POKEY #%d AUDC4  $%02x (%s)\n", chip, data, audc2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDC4  $%02x (%s)\n", p->device->tag, data, audc2str(data)));
 		p->AUDC[CHAN4] = data;
         ch_mask = 1 << CHAN4;
         break;
@@ -1065,7 +1037,7 @@ static void pokey_register_w(int chip, int offs, int data)
     case AUDCTL_C:
 		if( data == p->AUDCTL )
             return;
-		LOG_SOUND(("POKEY #%d AUDCTL $%02x (%s)\n", chip, data, audctl2str(data)));
+		LOG_SOUND(("POKEY '%s' AUDCTL $%02x (%s)\n", p->device->tag, data, audctl2str(data)));
 		p->AUDCTL = data;
         ch_mask = 15;       /* all channels */
         /* determine the base multiplier for the 'div by n' calculations */
@@ -1074,7 +1046,7 @@ static void pokey_register_w(int chip, int offs, int data)
 
     case STIMER_C:
         /* first remove any existing timers */
-		LOG_TIMER(("POKEY #%d STIMER $%02x\n", chip, data));
+		LOG_TIMER(("POKEY '%s' STIMER $%02x\n", p->device->tag, data));
 
 		timer_adjust_oneshot(p->timer[TIMER1], attotime_never, p->timer_param[TIMER1]);
 		timer_adjust_oneshot(p->timer[TIMER2], attotime_never, p->timer_param[TIMER2]);
@@ -1092,10 +1064,10 @@ static void pokey_register_w(int chip, int offs, int data)
         {
 			if( p->divisor[CHAN2] > 4 )
 			{
-				LOG_TIMER(("POKEY #%d timer1+2 after %d clocks\n", chip, p->divisor[CHAN2]));
+				LOG_TIMER(("POKEY '%s' timer1+2 after %d clocks\n", p->device->tag, p->divisor[CHAN2]));
 				/* set timer #1 _and_ #2 event after timer_div clocks of joined CHAN1+CHAN2 */
 				p->timer_period[TIMER2] = attotime_mul(p->clock_period, p->divisor[CHAN2]);
-				p->timer_param[TIMER2] = (chip<<3)|IRQ_TIMR2|IRQ_TIMR1;
+				p->timer_param[TIMER2] = IRQ_TIMR2|IRQ_TIMR1;
 				timer_adjust_periodic(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_param[TIMER2], p->timer_period[TIMER2]);
 			}
         }
@@ -1103,19 +1075,19 @@ static void pokey_register_w(int chip, int offs, int data)
         {
 			if( p->divisor[CHAN1] > 4 )
 			{
-				LOG_TIMER(("POKEY #%d timer1 after %d clocks\n", chip, p->divisor[CHAN1]));
+				LOG_TIMER(("POKEY '%s' timer1 after %d clocks\n", p->device->tag, p->divisor[CHAN1]));
 				/* set timer #1 event after timer_div clocks of CHAN1 */
 				p->timer_period[TIMER1] = attotime_mul(p->clock_period, p->divisor[CHAN1]);
-				p->timer_param[TIMER1] = (chip<<3)|IRQ_TIMR1;
+				p->timer_param[TIMER1] = IRQ_TIMR1;
 				timer_adjust_periodic(p->timer[TIMER1], p->timer_period[TIMER1], p->timer_param[TIMER1], p->timer_period[TIMER1]);
 			}
 
 			if( p->divisor[CHAN2] > 4 )
 			{
-				LOG_TIMER(("POKEY #%d timer2 after %d clocks\n", chip, p->divisor[CHAN2]));
+				LOG_TIMER(("POKEY '%s' timer2 after %d clocks\n", p->device->tag, p->divisor[CHAN2]));
 				/* set timer #2 event after timer_div clocks of CHAN2 */
 				p->timer_period[TIMER2] = attotime_mul(p->clock_period, p->divisor[CHAN2]);
-				p->timer_param[TIMER2] = (chip<<3)|IRQ_TIMR2;
+				p->timer_param[TIMER2] = IRQ_TIMR2;
 				timer_adjust_periodic(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_param[TIMER2], p->timer_period[TIMER2]);
 			}
         }
@@ -1129,10 +1101,10 @@ static void pokey_register_w(int chip, int offs, int data)
             {
 				if( p->divisor[CHAN4] > 4 )
 				{
-					LOG_TIMER(("POKEY #%d timer4 after %d clocks\n", chip, p->divisor[CHAN4]));
+					LOG_TIMER(("POKEY '%s' timer4 after %d clocks\n", p->device->tag, p->divisor[CHAN4]));
 					/* set timer #4 event after timer_div clocks of CHAN4 */
 					p->timer_period[TIMER4] = attotime_mul(p->clock_period, p->divisor[CHAN4]);
-					p->timer_param[TIMER4] = (chip<<3)|IRQ_TIMR4;
+					p->timer_param[TIMER4] = IRQ_TIMR4;
 					timer_adjust_periodic(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_param[TIMER4], p->timer_period[TIMER4]);
 				}
             }
@@ -1141,10 +1113,10 @@ static void pokey_register_w(int chip, int offs, int data)
         {
 			if( p->divisor[CHAN4] > 4 )
 			{
-				LOG_TIMER(("POKEY #%d timer4 after %d clocks\n", chip, p->divisor[CHAN4]));
+				LOG_TIMER(("POKEY '%s' timer4 after %d clocks\n", p->device->tag, p->divisor[CHAN4]));
 				/* set timer #4 event after timer_div clocks of CHAN4 */
 				p->timer_period[TIMER4] = attotime_mul(p->clock_period, p->divisor[CHAN4]);
-				p->timer_param[TIMER4] = (chip<<3)|IRQ_TIMR4;
+				p->timer_param[TIMER4] = IRQ_TIMR4;
 				timer_adjust_periodic(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_param[TIMER4], p->timer_period[TIMER4]);
 			}
         }
@@ -1156,32 +1128,31 @@ static void pokey_register_w(int chip, int offs, int data)
 
     case SKREST_C:
         /* reset SKSTAT */
-		LOG(("POKEY #%d SKREST $%02x\n", chip, data));
+		LOG(("POKEY '%s' SKREST $%02x\n", p->device->tag, data));
 		p->SKSTAT &= ~(SK_FRAME|SK_OVERRUN|SK_KBERR);
         break;
 
     case POTGO_C:
-		LOG(("POKEY #%d POTGO  $%02x\n", chip, data));
-		pokey_potgo(space, p);
+		LOG(("POKEY '%s' POTGO  $%02x\n", p->device->tag, data));
+		pokey_potgo(p);
         break;
 
     case SEROUT_C:
-		LOG(("POKEY #%d SEROUT $%02x\n", chip, data));
-		if (p->serout_w)
-			(*p->serout_w)(space, offs, data);
+		LOG(("POKEY '%s' SEROUT $%02x\n", p->device->tag, data));
+		devcb_call_write8(&p->serout_w, offset, data);
 		p->SKSTAT |= SK_SEROUT;
         /*
          * These are arbitrary values, tested with some custom boot
          * loaders from Ballblazer and Escape from Fractalus
          * The real times are unknown
          */
-        timer_set(space->machine, ATTOTIME_IN_USEC(200), p, 0, pokey_serout_ready);
+        timer_set(device->machine, ATTOTIME_IN_USEC(200), p, 0, pokey_serout_ready_cb);
         /* 10 bits (assumption 1 start, 8 data and 1 stop bit) take how long? */
-        timer_set(space->machine, ATTOTIME_IN_USEC(2000), p, 0, pokey_serout_complete);
+        timer_set(device->machine, ATTOTIME_IN_USEC(2000), p, 0, pokey_serout_complete);
         break;
 
     case IRQEN_C:
-		LOG(("POKEY #%d IRQEN  $%02x\n", chip, data));
+		LOG(("POKEY '%s' IRQEN  $%02x\n", p->device->tag, data));
 
         /* acknowledge one or more IRQST bits ? */
 		if( p->IRQST & ~data )
@@ -1207,12 +1178,12 @@ static void pokey_register_w(int chip, int offs, int data)
     case SKCTL_C:
 		if( data == p->SKCTL )
             return;
-		LOG(("POKEY #%d SKCTL  $%02x\n", chip, data));
+		LOG(("POKEY '%s' SKCTL  $%02x\n", p->device->tag, data));
 		p->SKCTL = data;
         if( !(data & SK_RESET) )
         {
-            pokey_register_w(chip, IRQEN_C,  0);
-            pokey_register_w(chip, SKREST_C, 0);
+            pokey_w(device, IRQEN_C,  0);
+            pokey_w(device, SKREST_C, 0);
         }
         break;
     }
@@ -1235,7 +1206,7 @@ static void pokey_register_w(int chip, int offs, int data)
         else
 			new_val = (p->AUDF[CHAN1] + DIVADD_LOCLK) * p->clockmult;
 
-		LOG_SOUND(("POKEY #%d chan1 %d\n", chip, new_val));
+		LOG_SOUND(("POKEY '%s' chan1 %d\n", p->device->tag, new_val));
 
 		p->volume[CHAN1] = (p->AUDC[CHAN1] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
         p->divisor[CHAN1] = new_val;
@@ -1265,12 +1236,12 @@ static void pokey_register_w(int chip, int offs, int data)
 				new_val = p->AUDF[CHAN2] * 256 + p->AUDF[CHAN1] + DIVADD_HICLK_JOINED;
             else
 				new_val = (p->AUDF[CHAN2] * 256 + p->AUDF[CHAN1] + DIVADD_LOCLK) * p->clockmult;
-			LOG_SOUND(("POKEY #%d chan1+2 %d\n", chip, new_val));
+			LOG_SOUND(("POKEY '%s' chan1+2 %d\n", p->device->tag, new_val));
         }
         else
 		{
 			new_val = (p->AUDF[CHAN2] + DIVADD_LOCLK) * p->clockmult;
-			LOG_SOUND(("POKEY #%d chan2 %d\n", chip, new_val));
+			LOG_SOUND(("POKEY '%s' chan2 %d\n", p->device->tag, new_val));
 		}
 
 		p->volume[CHAN2] = (p->AUDC[CHAN2] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
@@ -1300,7 +1271,7 @@ static void pokey_register_w(int chip, int offs, int data)
         else
 			new_val = (p->AUDF[CHAN3] + DIVADD_LOCLK) * p->clockmult;
 
-		LOG_SOUND(("POKEY #%d chan3 %d\n", chip, new_val));
+		LOG_SOUND(("POKEY '%s' chan3 %d\n", p->device->tag, new_val));
 
 		p->volume[CHAN3] = (p->AUDC[CHAN3] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
 		p->divisor[CHAN3] = new_val;
@@ -1330,12 +1301,12 @@ static void pokey_register_w(int chip, int offs, int data)
 				new_val = p->AUDF[CHAN4] * 256 + p->AUDF[CHAN3] + DIVADD_HICLK_JOINED;
             else
 				new_val = (p->AUDF[CHAN4] * 256 + p->AUDF[CHAN3] + DIVADD_LOCLK) * p->clockmult;
-			LOG_SOUND(("POKEY #%d chan3+4 %d\n", chip, new_val));
+			LOG_SOUND(("POKEY '%s' chan3+4 %d\n", p->device->tag, new_val));
         }
         else
 		{
 			new_val = (p->AUDF[CHAN4] + DIVADD_LOCLK) * p->clockmult;
-			LOG_SOUND(("POKEY #%d chan4 %d\n", chip, new_val));
+			LOG_SOUND(("POKEY '%s' chan4 %d\n", p->device->tag, new_val));
 		}
 
 		p->volume[CHAN4] = (p->AUDC[CHAN4] & VOLUME_MASK) * POKEY_DEFAULT_GAIN;
@@ -1359,62 +1330,25 @@ static void pokey_register_w(int chip, int offs, int data)
     }
 }
 
-WRITE8_HANDLER( pokey1_w )
-{
-	pokey_register_w(0,offset,data);
-}
-
-WRITE8_HANDLER( pokey2_w )
-{
-    pokey_register_w(1,offset,data);
-}
-
-WRITE8_HANDLER( pokey3_w )
-{
-    pokey_register_w(2,offset,data);
-}
-
-WRITE8_HANDLER( pokey4_w )
-{
-    pokey_register_w(3,offset,data);
-}
-
 WRITE8_HANDLER( quad_pokey_w )
 {
+	static const char *devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
     int pokey_num = (offset >> 3) & ~0x04;
     int control = (offset & 0x20) >> 2;
     int pokey_reg = (offset % 8) | control;
 
-    pokey_register_w(pokey_num, pokey_reg, data);
+    pokey_w(devtag_get_device(space->machine, SOUND, devname[pokey_num]), pokey_reg, data);
 }
 
-void pokey1_serin_ready(int after)
+void pokey_serin_ready(const device_config *device, int after)
 {
-	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 0);
-	timer_set(p->device->machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
+	pokey_state *p = get_safe_token(device);
+	timer_set(device->machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready_cb);
 }
 
-void pokey2_serin_ready(int after)
+void pokey_break_w(const device_config *device, int shift)
 {
-	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 1);
-	timer_set(p->device->machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
-}
-
-void pokey3_serin_ready(int after)
-{
-	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 2);
-	timer_set(p->device->machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
-}
-
-void pokey4_serin_ready(int after)
-{
-	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 3);
-	timer_set(p->device->machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
-}
-
-static void pokey_break_w(int chip, int shift)
-{
-	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
+	pokey_state *p = get_safe_token(device);
 	if( shift )                     /* shift code ? */
 		p->SKSTAT |= SK_SHIFT;
 	else
@@ -1425,33 +1359,13 @@ static void pokey_break_w(int chip, int shift)
 		/* set break IRQ status and call back the interrupt handler */
 		p->IRQST |= IRQ_BREAK;
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(p->device->machine, IRQ_BREAK);
+			(*p->interrupt_cb)(device, IRQ_BREAK);
 	}
 }
 
-void pokey1_break_w(int shift)
+void pokey_kbcode_w(const device_config *device, int kbcode, int make)
 {
-	pokey_break_w(0, shift);
-}
-
-void pokey2_break_w(int shift)
-{
-	pokey_break_w(1, shift);
-}
-
-void pokey3_break_w(int shift)
-{
-	pokey_break_w(2, shift);
-}
-
-void pokey4_break_w(int shift)
-{
-	pokey_break_w(3, shift);
-}
-
-static void pokey_kbcode_w(int chip, int kbcode, int make)
-{
-	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
+	pokey_state *p = get_safe_token(device);
     /* make code ? */
 	if( make )
 	{
@@ -1469,7 +1383,7 @@ static void pokey_kbcode_w(int chip, int kbcode, int make)
 				p->SKSTAT |= SK_KBERR;
 			p->IRQST |= IRQ_KEYBD;
 			if( p->interrupt_cb )
-				(*p->interrupt_cb)(p->device->machine, IRQ_KEYBD);
+				(*p->interrupt_cb)(device, IRQ_KEYBD);
 		}
 	}
 	else
@@ -1479,26 +1393,6 @@ static void pokey_kbcode_w(int chip, int kbcode, int make)
     }
 }
 
-void pokey1_kbcode_w(int kbcode, int make)
-{
-	pokey_kbcode_w(0, kbcode, make);
-}
-
-void pokey2_kbcode_w(int kbcode, int make)
-{
-	pokey_kbcode_w(1, kbcode, make);
-}
-
-void pokey3_kbcode_w(int kbcode, int make)
-{
-	pokey_kbcode_w(2, kbcode, make);
-}
-
-void pokey4_kbcode_w(int kbcode, int make)
-{
-	pokey_kbcode_w(3, kbcode, make);
-}
-
 
 
 
@@ -1506,34 +1400,24 @@ void pokey4_kbcode_w(int kbcode, int make)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( pokey )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( pokey )
+DEVICE_GET_INFO( pokey )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct POKEYregisters);		break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(pokey_state);		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( pokey );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( pokey );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( pokey );			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "POKEY");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Atari custom");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "4.51");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "POKEY");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Atari custom");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.51");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

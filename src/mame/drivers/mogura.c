@@ -88,10 +88,10 @@ static WRITE8_HANDLER( mogura_tileram_w )
 	tilemap_mark_tile_dirty(mogura_tilemap,offset&0x7ff);
 }
 
-static WRITE8_HANDLER(dac_w)
+static WRITE8_HANDLER(mogura_dac_w)
 {
-	dac_0_data_w(space, 0, data & 0xf0 );	/* left */
-	dac_1_data_w(space, 0, (data & 0x0f)<<4 );	/* right */
+	dac_data_w(devtag_get_device(space->machine, SOUND, "dac1"), data & 0xf0 );	/* left */
+	dac_data_w(devtag_get_device(space->machine, SOUND, "dac2"), (data & 0x0f)<<4 );	/* right */
 }
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("P3")
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("P4")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x14, 0x14) AM_WRITE(dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
+	AM_RANGE(0x14, 0x14) AM_WRITE(mogura_dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
 ADDRESS_MAP_END
 
 

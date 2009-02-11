@@ -183,8 +183,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("JOY")
-	AM_RANGE(0x3800, 0x3800) AM_READ(ym2203_status_port_0_r) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x3801, 0x3801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -296,24 +295,24 @@ GFXDECODE_END
 /***************************************************************************/
 
 
-static WRITE8_HANDLER(chanbara_ay_out_0_w)
+static WRITE8_DEVICE_HANDLER(chanbara_ay_out_0_w)
 {
 //  printf("chanbara_ay_out_0_w %02x\n",data);
 	scroll=data;
 }
 
-static WRITE8_HANDLER(chanbara_ay_out_1_w)
+static WRITE8_DEVICE_HANDLER(chanbara_ay_out_1_w)
 {
 //  printf("chanbara_ay_out_1_w %02x\n",data);
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "user1") + ((data&4)?0x4000:0x0000) );
+	memory_set_bankptr(device->machine, 1, memory_region(device->machine, "user1") + ((data&4)?0x4000:0x0000) );
 	scrollhi = data & 0x03;
 
 	//if (data&0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n",data&0xf8);
 }
 
-static void sound_irq(running_machine *machine, int linestate)
+static void sound_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[0],0,linestate);
+	cpu_set_input_line(device->machine->cpu[0],0,linestate);
 }
 
 
@@ -322,10 +321,10 @@ static const ym2203_interface ym2203_config =
 	{
 			AY8910_LEGACY_OUTPUT,
 			AY8910_DEFAULT_LOADS,
-			0,
-			0,
-			chanbara_ay_out_0_w,
-			chanbara_ay_out_1_w,
+			DEVCB_NULL,
+			DEVCB_NULL,
+			DEVCB_HANDLER(chanbara_ay_out_0_w),
+			DEVCB_HANDLER(chanbara_ay_out_1_w),
 	},
 	sound_irq
 };

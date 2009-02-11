@@ -55,7 +55,7 @@ static void pcktgal_adpcm_int(const device_config *device)
 {
 	static int toggle;
 
-	msm5205_data_w(0,msm5205next >> 4);
+	msm5205_data_w(device,msm5205next >> 4);
 	msm5205next<<=4;
 
 	toggle = 1 - toggle;
@@ -68,9 +68,9 @@ static WRITE8_HANDLER( pcktgal_adpcm_data_w )
 	msm5205next=data;
 }
 
-static READ8_HANDLER( pcktgal_adpcm_reset_r )
+static READ8_DEVICE_HANDLER( pcktgal_adpcm_reset_r )
 {
-	msm5205_reset_w(0,0);
+	msm5205_reset_w(device,0);
 	return 0;
 }
 
@@ -102,17 +102,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3400, 0x3400) AM_READ(pcktgal_adpcm_reset_r)	/* ? not sure */
+	AM_RANGE(0x3400, 0x3400) AM_DEVREAD(SOUND, "msm", pcktgal_adpcm_reset_r)	/* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK3)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym2", ym3812_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(pcktgal_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pcktgal_sound_bank_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)

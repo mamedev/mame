@@ -114,26 +114,6 @@ static MACHINE_RESET( arcadecl )
 
 /*************************************
  *
- *  MSM6295 I/O
- *
- *************************************/
-
-static READ16_HANDLER( adpcm_r )
-{
-	return (okim6295_status_0_r(space, offset) << 8) | 0x00ff;
-}
-
-
-static WRITE16_HANDLER( adpcm_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6295_data_0_w(space, offset, (data >> 8) & 0xff);
-}
-
-
-
-/*************************************
- *
  *  Latch write
  *
  *************************************/
@@ -149,7 +129,7 @@ static WRITE16_HANDLER( latch_w )
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(0, (data & 0x80) ? 0x40000 : 0x00000);
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"), (data & 0x80) ? 0x40000 : 0x00000);
 		atarigen_set_oki6295_vol(space->machine, (data & 0x001f) * 100 / 0x1f);
 	}
 }
@@ -180,7 +160,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x640040, 0x64004f) AM_WRITE(latch_w)
 	AM_RANGE(0x640060, 0x64006f) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x641000, 0x641fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0x642000, 0x642001) AM_READWRITE(adpcm_r, adpcm_w)
+	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0xff00)
 	AM_RANGE(0x646000, 0x646fff) AM_WRITE(atarigen_scanline_int_ack_w)
 	AM_RANGE(0x647000, 0x647fff) AM_WRITE(watchdog_reset16_w)
 ADDRESS_MAP_END

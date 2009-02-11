@@ -332,9 +332,9 @@ static WRITE8_HANDLER( looping_souint_clr )
 }
 
 
-static void looping_spcint(running_machine *machine, int state)
+static void looping_spcint(const device_config *device, int state)
 {
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, state, 6);
+	cpu_set_input_line_and_vector(device->machine->cpu[1], 0, state, 6);
 }
 
 
@@ -352,7 +352,7 @@ static WRITE8_HANDLER( looping_soundlatch_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( looping_sound_sw )
+static WRITE8_DEVICE_HANDLER( looping_sound_sw )
 {
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
@@ -365,9 +365,9 @@ static WRITE8_HANDLER( looping_sound_sw )
         0007 = AFA
     */
 
-	looping_state *state = space->machine->driver_data;
+	looping_state *state = device->machine->driver_data;
 	state->sound[offset + 1] = data ^ 1;
-	dac_data_w(0, ((state->sound[2] << 7) + (state->sound[3] << 6)) * state->sound[7]);
+	dac_data_w(device, ((state->sound[2] << 7) + (state->sound[3] << 6)) * state->sound[7]);
 }
 
 
@@ -378,18 +378,18 @@ static WRITE8_HANDLER( looping_sound_sw )
  *
  *************************************/
 
-static WRITE8_HANDLER( ay_enable_w )
+static WRITE8_DEVICE_HANDLER( ay_enable_w )
 {
 	int output;
 
 	for (output = 0; output < 3; output++)
-		sndti_set_output_gain(SOUND_AY8910, 0, output, (data & 1) ? 1.0 : 0.0);
+		sound_set_output_gain(device, output, (data & 1) ? 1.0 : 0.0);
 }
 
 
-static WRITE8_HANDLER( speech_enable_w )
+static WRITE8_DEVICE_HANDLER( speech_enable_w )
 {
-	sndti_set_output_gain(SOUND_TMS5220, 0, 0, (data & 1) ? 1.0 : 0.0);
+	sound_set_output_gain(device, 0, (data & 1) ? 1.0 : 0.0);
 }
 
 
@@ -499,19 +499,19 @@ static ADDRESS_MAP_START( looping_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
-	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READWRITE(SMH_NOP, ay8910_write_port_0_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 	AM_RANGE(0x3c03, 0x3c03) AM_MIRROR(0x00f6) AM_NOP
-	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READWRITE(SMH_NOP, tms5220_data_w)
-	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_READWRITE(tms5220_status_r, SMH_NOP)
+	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_DEVREADWRITE(SOUND, "tms", SMH_NOP, tms5220_data_w)
+	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREADWRITE(SOUND, "tms", tms5220_status_r, SMH_NOP)
 	AM_RANGE(0x3e03, 0x3e03) AM_MIRROR(0x00f6) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x000, 0x000) AM_WRITE(looping_souint_clr)
-	AM_RANGE(0x001, 0x007) AM_WRITE(looping_sound_sw)
-	AM_RANGE(0x008, 0x008) AM_WRITE(ay_enable_w)
-	AM_RANGE(0x009, 0x009) AM_WRITE(speech_enable_w)
+	AM_RANGE(0x001, 0x007) AM_DEVWRITE(SOUND, "dac", looping_sound_sw)
+	AM_RANGE(0x008, 0x008) AM_DEVWRITE(SOUND, "ay", ay_enable_w)
+	AM_RANGE(0x009, 0x009) AM_DEVWRITE(SOUND, "tms", speech_enable_w)
 	AM_RANGE(0x00a, 0x00a) AM_WRITE(ballon_enable_w)
 ADDRESS_MAP_END
 
@@ -567,10 +567,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static COP400_INTERFACE( looping_cop_intf )

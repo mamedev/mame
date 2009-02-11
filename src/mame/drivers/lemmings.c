@@ -118,17 +118,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0801, 0x0801) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0x1000, 0x1000) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x0800, 0x0801) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0x1000, 0x1000) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(lemmings_sound_ack_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -256,9 +255,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(running_machine *machine, int state)
+static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1],0,state);
+	cpu_set_input_line(device->machine->cpu[1],0,state);
 }
 
 static const ym2151_interface ym2151_config =

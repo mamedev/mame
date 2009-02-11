@@ -251,7 +251,7 @@ static WRITE8_HANDLER( tturfbl_msm5205_data_w )
 
 static void tturfbl_msm5205_callback(const device_config *device)
 {
-	msm5205_data_w(0, (sample_buffer >> 4) & 0x0F);
+	msm5205_data_w(device, (sample_buffer >> 4) & 0x0F);
 	sample_buffer <<= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
@@ -321,14 +321,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tturfbl_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREAD(SOUND, "ym", ym2151_r)
 	AM_RANGE(0x80, 0x80) AM_READ(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tturfbl_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x80, 0x80) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
@@ -348,14 +347,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREAD(SOUND, "ym", ym2151_r)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 ADDRESS_MAP_END
 
 
@@ -368,22 +366,21 @@ static ADDRESS_MAP_START( sound_readmem_7759, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( upd7759_bank_w ) //*
+static WRITE8_DEVICE_HANDLER( upd7759_bank_w ) //*
 {
-	int offs, size = memory_region_length(space->machine, "sound") - 0x10000;
+	int offs, size = memory_region_length(device->machine, "sound") - 0x10000;
 
-	upd7759_reset_w(0, data & 0x40);
+	upd7759_reset_w(device, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "sound") + offs);
+	memory_set_bankptr(device->machine, 1, memory_region(device->machine, "sound") + offs);
 }
 
 
 static ADDRESS_MAP_START( sound_writeport_7759, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(upd7759_bank_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(upd7759_0_port_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE(SOUND, "7759", upd7759_bank_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "7759", upd7759_port_w)
 ADDRESS_MAP_END
 
 
@@ -452,7 +449,7 @@ static MACHINE_DRIVER_START( system16 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("2151", YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "left", 0.32)
 	MDRV_SOUND_ROUTE(1, "right", 0.32)
 MACHINE_DRIVER_END

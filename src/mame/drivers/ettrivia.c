@@ -94,20 +94,20 @@ static WRITE8_HANDLER( b800_w )
 		/* special case to return the value written to 0xb000 */
 		/* does it reset the chips too ? */
 		case 0:	break;
-		case 0xc4: b000_ret = ay8910_read_port_0_r(space,0);	break;
-		case 0x94: b000_ret = ay8910_read_port_1_r(space,0);	break;
-		case 0x86: b000_ret = ay8910_read_port_2_r(space,0);	break;
+		case 0xc4: b000_ret = ay8910_r(devtag_get_device(space->machine, SOUND, "ay1"), 0);	break;
+		case 0x94: b000_ret = ay8910_r(devtag_get_device(space->machine, SOUND, "ay2"), 0);	break;
+		case 0x86: b000_ret = ay8910_r(devtag_get_device(space->machine, SOUND, "ay3"), 0);	break;
 
 		case 0x80:
 			switch(b800_prev)
 			{
-				case 0xe0: ay8910_control_port_0_w(space,0,b000_val);	break;
-				case 0x98: ay8910_control_port_1_w(space,0,b000_val);	break;
-				case 0x83: ay8910_control_port_2_w(space,0,b000_val);	break;
+				case 0xe0: ay8910_address_w(devtag_get_device(space->machine, SOUND, "ay1"),0,b000_val);	break;
+				case 0x98: ay8910_address_w(devtag_get_device(space->machine, SOUND, "ay2"),0,b000_val);	break;
+				case 0x83: ay8910_address_w(devtag_get_device(space->machine, SOUND, "ay3"),0,b000_val);	break;
 
-				case 0xa0: ay8910_write_port_0_w(space,0,b000_val);	break;
-				case 0x88: ay8910_write_port_1_w(space,0,b000_val);	break;
-				case 0x81: ay8910_write_port_2_w(space,0,b000_val);	break;
+				case 0xa0: ay8910_data_w(devtag_get_device(space->machine, SOUND, "ay1"),0,b000_val);	break;
+				case 0x88: ay8910_data_w(devtag_get_device(space->machine, SOUND, "ay2"),0,b000_val);	break;
+				case 0x81: ay8910_data_w(devtag_get_device(space->machine, SOUND, "ay3"),0,b000_val);	break;
 
 			}
 		break;
@@ -212,20 +212,20 @@ static const ay8910_interface ay8912_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_1_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("IN1"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface ay8912_interface_3 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("IN0"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

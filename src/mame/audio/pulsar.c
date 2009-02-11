@@ -28,8 +28,8 @@
 #define OUT_PORT_2_MOVMAZE		0x10
 
 
-#define PLAY(id,loop)           sample_start( id, id, loop )
-#define STOP(id)                sample_stop( id )
+#define PLAY(samp,id,loop)           sample_start( samp, id, id, loop )
+#define STOP(samp,id)                sample_stop( samp, id )
 
 
 /* sample file names */
@@ -88,6 +88,7 @@ static int port1State = 0;
 
 WRITE8_HANDLER( pulsar_audio_1_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;
@@ -101,43 +102,44 @@ WRITE8_HANDLER( pulsar_audio_1_w )
 
 	if ( bitsGoneLow & OUT_PORT_1_CLANG )
 	{
-		PLAY( SND_CLANG, 0 );
+		PLAY( samples, SND_CLANG, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_KEY )
 	{
-		PLAY( SND_KEY, 0 );
+		PLAY( samples, SND_KEY, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_ALIENHIT )
 	{
-		PLAY( SND_ALIENHIT, 0 );
+		PLAY( samples, SND_ALIENHIT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_PHIT )
 	{
-		PLAY( SND_PHIT, 0 );
+		PLAY( samples, SND_PHIT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_ASHOOT )
 	{
-		PLAY( SND_ASHOOT, 0 );
+		PLAY( samples, SND_ASHOOT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_PSHOOT )
 	{
-		PLAY( SND_PSHOOT, 0 );
+		PLAY( samples, SND_PSHOOT, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_1_BONUS )
 	{
-		PLAY( SND_BONUS, 0 );
+		PLAY( samples, SND_BONUS, 0 );
 	}
 }
 
 
 WRITE8_HANDLER( pulsar_audio_2_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	static int port2State = 0;
 	int bitsChanged;
 	int bitsGoneHigh;
@@ -152,38 +154,38 @@ WRITE8_HANDLER( pulsar_audio_2_w )
 
 	if ( bitsGoneLow & OUT_PORT_2_SIZZLE )
 	{
-		PLAY( SND_SIZZLE, 0 );
+		PLAY( samples, SND_SIZZLE, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_GATE )
 	{
-		sample_start( SND_CLANG, SND_GATE, 0 );
+		sample_start( samples, SND_CLANG, SND_GATE, 0 );
 	}
 	if ( bitsGoneHigh & OUT_PORT_2_GATE )
 	{
-		STOP( SND_CLANG );
+		STOP( samples, SND_CLANG );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_BIRTH )
 	{
-		PLAY( SND_BIRTH, 0 );
+		PLAY( samples, SND_BIRTH, 0 );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_HBEAT )
 	{
-		PLAY( SND_HBEAT, 1 );
+		PLAY( samples, SND_HBEAT, 1 );
 	}
 	if ( bitsGoneHigh & OUT_PORT_2_HBEAT )
 	{
-		STOP( SND_HBEAT );
+		STOP( samples, SND_HBEAT );
 	}
 
 	if ( bitsGoneLow & OUT_PORT_2_MOVMAZE )
 	{
-		PLAY( SND_MOVMAZE, 1 );
+		PLAY( samples, SND_MOVMAZE, 1 );
 	}
 	if ( bitsGoneHigh & OUT_PORT_2_MOVMAZE )
 	{
-		STOP( SND_MOVMAZE );
+		STOP( samples, SND_MOVMAZE );
 	}
 }

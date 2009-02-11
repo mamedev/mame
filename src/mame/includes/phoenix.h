@@ -1,5 +1,4 @@
 #include "sound/discrete.h"
-#include "sound/custom.h"
 
 
 /*----------- video timing  -----------*/
@@ -21,10 +20,11 @@ SOUND_START( phoenix );
 
 DISCRETE_SOUND_EXTERN( phoenix );
 
-WRITE8_HANDLER( phoenix_sound_control_a_w );
-WRITE8_HANDLER( phoenix_sound_control_b_w );
+WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w );
+WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w );
 
-CUSTOM_START( phoenix_sh_start );
+DEVICE_GET_INFO( phoenix_sound );
+#define SOUND_PHOENIX DEVICE_GET_INFO_NAME(phoenix_sound)
 
 /*----------- defined in audio/pleiads.c -----------*/
 
@@ -32,9 +32,14 @@ WRITE8_HANDLER( pleiads_sound_control_a_w );
 WRITE8_HANDLER( pleiads_sound_control_b_w );
 WRITE8_HANDLER( pleiads_sound_control_c_w );
 
-CUSTOM_START( pleiads_sh_start );
-CUSTOM_START( naughtyb_sh_start );
-CUSTOM_START( popflame_sh_start );
+DEVICE_GET_INFO( pleiads_sound );
+#define SOUND_PLEIADS DEVICE_GET_INFO_NAME(pleiads_sound)
+
+DEVICE_GET_INFO( naughtyb_sound );
+#define SOUND_NAUGHTYB DEVICE_GET_INFO_NAME(naughtyb_sound)
+
+DEVICE_GET_INFO( popflame_sound );
+#define SOUND_POPFLAME DEVICE_GET_INFO_NAME(popflame_sound)
 
 /*----------- defined in video/naughtyb.c -----------*/
 
@@ -66,7 +71,7 @@ WRITE8_HANDLER( phoenix_scroll_w );
 CUSTOM_INPUT( player_input_r );
 CUSTOM_INPUT( pleiads_protection_r );
 READ8_HANDLER( survival_input_port_0_r );
-READ8_HANDLER( survival_protection_r );
+READ8_DEVICE_HANDLER( survival_protection_r );
 
 int survival_sid_callback( const device_config *device );
 

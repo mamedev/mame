@@ -59,6 +59,7 @@ static UINT32 pixel_clock = 0;
 
 static WRITE8_HANDLER( panic_sound_output_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
     static int sound_enabled=1;
 
     /* Sound Enable / Disable */
@@ -67,7 +68,7 @@ static WRITE8_HANDLER( panic_sound_output_w )
     {
     	int count;
     	if (data == 0)
-        	for(count=0; count<9; count++) sample_stop(count);
+        	for(count=0; count<9; count++) sample_stop(samples, count);
 
     	sound_enabled = data;
     }
@@ -76,50 +77,50 @@ static WRITE8_HANDLER( panic_sound_output_w )
     {
         switch (offset)
         {
-		case 0:  if (data) sample_start(0, 0, 0); break;  	/* Walk */
-        case 1:  if (data) sample_start(0, 5, 0); break;  	/* Enemy Die 1 */
+		case 0:  if (data) sample_start(samples, 0, 0, 0); break;  	/* Walk */
+        case 1:  if (data) sample_start(samples, 0, 5, 0); break;  	/* Enemy Die 1 */
         case 2:  if (data)								  	/* Drop 1 */
 				 {
-					 if (!sample_playing(1))
+					 if (!sample_playing(samples, 1))
 					 {
-						 sample_stop(2);
-						 sample_start(1, 3, 0);
+						 sample_stop(samples, 2);
+						 sample_start(samples, 1, 3, 0);
 					 }
 				 }
 				 else
-				 	sample_stop(1);
+				 	sample_stop(samples, 1);
 				 	break;
 
-		case 3:	 if (data && !sample_playing(6))			/* Oxygen */
-					sample_start(6, 9, 1);
+		case 3:	 if (data && !sample_playing(samples, 6))			/* Oxygen */
+					sample_start(samples, 6, 9, 1);
                  break;
 
         case 4:  break;										/* Drop 2 */
-        case 5:  if (data) sample_start(0, 5, 0); break;	/* Enemy Die 2 (use same sample as 1) */
-        case 6:  if (data && !sample_playing(1) && !sample_playing(3))   /* Hang */
-                 	sample_start(2, 2, 0);
+        case 5:  if (data) sample_start(samples, 0, 5, 0); break;	/* Enemy Die 2 (use same sample as 1) */
+        case 6:  if (data && !sample_playing(samples, 1) && !sample_playing(samples, 3))   /* Hang */
+                 	sample_start(samples, 2, 2, 0);
                     break;
 
 		case 7:  if (data) 									/* Escape */
 				 {
-					 sample_stop(2);
-					 sample_start(3, 4, 0);
+					 sample_stop(samples, 2);
+					 sample_start(samples, 3, 4, 0);
 				 }
 				 else
-				 	 sample_stop(3);
+				 	 sample_stop(samples, 3);
                      break;
 
-    	case 8:  if (data) sample_start(0, 1, 0); break;	/* Stairs */
+    	case 8:  if (data) sample_start(samples, 0, 1, 0); break;	/* Stairs */
     	case 9:  if (data)									/* Extend */
-				 	sample_start(4, 8, 0);
+				 	sample_start(samples, 4, 8, 0);
 				 else
-					sample_stop(4);
+					sample_stop(samples, 4);
 	  			 break;
 
-        case 10: dac_data_w(0, data); break;				/* Bonus */
-		case 15: if (data) sample_start(0, 6, 0); break;	/* Player Die */
-		case 16: if (data) sample_start(5, 7, 0); break;	/* Enemy Laugh */
-        case 17: if (data) sample_start(0, 10, 0); break;	/* Coin - Not triggered by software */
+        case 10: dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), data); break;/* Bonus */
+		case 15: if (data) sample_start(samples, 0, 6, 0); break;	/* Player Die */
+		case 16: if (data) sample_start(samples, 5, 7, 0); break;	/* Enemy Laugh */
+        case 17: if (data) sample_start(samples, 0, 10, 0); break;	/* Coin - Not triggered by software */
         }
     }
 
@@ -135,6 +136,7 @@ static WRITE8_HANDLER( panic_sound_output2_w )
 
 static WRITE8_HANDLER( cosmicg_output_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	static int march_select;
     static int gun_die_select;
     static int sound_enabled;
@@ -147,7 +149,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 
     	sound_enabled = data;
     	if (data == 0)
-        	for(count=0;count<9;count++) sample_stop(count);
+        	for(count=0;count<9;count++) sample_stop(samples, count);
     }
 
     if (sound_enabled)
@@ -158,38 +160,38 @@ static WRITE8_HANDLER( cosmicg_output_w )
 		/* as other cosmic series games, but it never seems to */
 		/* be used for anything. It is implemented for sake of */
 		/* completness. Maybe it plays a tune if you win ?     */
-		case 1:  dac_data_w(0, -data); break;
-		case 2:  if (data) sample_start (0, march_select, 0); break;	/* March Sound */
+		case 1:  dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), -data); break;
+		case 2:  if (data) sample_start (samples, 0, march_select, 0); break;	/* March Sound */
 		case 3:  march_select = (march_select & 0xfe) | data; break;
         case 4:  march_select = (march_select & 0xfd) | (data << 1); break;
         case 5:  march_select = (march_select & 0xfb) | (data << 2); break;
 
         case 6:  if (data)  							/* Killer Attack (crawly thing at bottom of screen) */
-					sample_start(1, 8, 1);
+					sample_start(samples, 1, 8, 1);
 				 else
-					sample_stop(1);
+					sample_stop(samples, 1);
 				 break;
 
 		case 7:  if (data)								/* Bonus Chance & Got Bonus */
 				 {
-					 sample_stop(4);
-					 sample_start(4, 10, 0);
+					 sample_stop(samples, 4);
+					 sample_start(samples, 4, 10, 0);
 				 }
 				 break;
 
 		case 8:  if (data)
 				 {
-					 if (!sample_playing(4)) sample_start(4, 9, 1);
+					 if (!sample_playing(samples, 4)) sample_start(samples, 4, 9, 1);
 				 }
 				 else
-				 	sample_stop(4);
+				 	sample_stop(samples, 4);
 				 break;
 
-		case 9:  if (data) sample_start(3, 11, 0); break;	/* Got Ship */
+		case 9:  if (data) sample_start(samples, 3, 11, 0); break;	/* Got Ship */
 //      case 11: watchdog_reset_w(0, 0); break;             /* Watchdog */
-		case 13: if (data) sample_start(8, 13-gun_die_select, 0); break;  /* Got Monster / Gunshot */
+		case 13: if (data) sample_start(samples, 8, 13-gun_die_select, 0); break;  /* Got Monster / Gunshot */
 		case 14: gun_die_select = data; break;
-		case 15: if (data) sample_start(5, 14, 0); break;	/* Coin Extend (extra base) */
+		case 15: if (data) sample_start(samples, 5, 14, 0); break;	/* Coin Extend (extra base) */
         }
     }
 
@@ -201,6 +203,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 
 static WRITE8_HANDLER( cosmica_sound_output_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
     static int  sound_enabled=1;
     static int dive_bomb_b_select=0;
 
@@ -209,10 +212,10 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
     {
     	int count;
     	if (data == 0)
-        	for(count=0; count<12; count++) sample_stop(count);
+        	for(count=0; count<12; count++) sample_stop(samples, count);
 	else
 	{
-	  sample_start(0, 0, 1); /*Background Noise*/
+	  sample_start(samples, 0, 0, 1); /*Background Noise*/
 	}
 
     	sound_enabled = data;
@@ -222,7 +225,7 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
     {
         switch (offset)
         {
-		case 0: if (data) sample_start(1, 2, 0); break; /*Dive Bombing Type A*/
+		case 0: if (data) sample_start(samples, 1, 2, 0); break; /*Dive Bombing Type A*/
 
 		case 2:	/*Dive Bombing Type B (Main Control)*/
 
@@ -235,65 +238,65 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 
 			    case 2:
 
-					if (sample_playing(2))
+					if (sample_playing(samples, 2))
 					{
-					  sample_stop(2);
-	   				  sample_start(2, 3, 0); break;
+					  sample_stop(samples, 2);
+	   				  sample_start(samples, 2, 3, 0); break;
 					}
 					else
- 		    			 sample_start(2, 3, 0); break;
+ 		    			 sample_start(samples, 2, 3, 0); break;
 
 
 			    case 3:
 
-					if (sample_playing(3))
+					if (sample_playing(samples, 3))
 					{
-					  sample_stop(3);
-	   				  sample_start(3, 4, 0); break;
+					  sample_stop(samples, 3);
+	   				  sample_start(samples, 3, 4, 0); break;
 					}
 					else
- 		    			 sample_start(3, 4, 0); break;
+ 		    			 sample_start(samples, 3, 4, 0); break;
 
 
 			    case 4:
-					if (sample_playing(4))
+					if (sample_playing(samples, 4))
 					{
-					  sample_stop(4);
-	   				  sample_start(4, 5, 0); break;
+					  sample_stop(samples, 4);
+	   				  sample_start(samples, 4, 5, 0); break;
 					}
 					else
-	 	    			 sample_start(4, 5, 0); break;
+	 	    			 sample_start(samples, 4, 5, 0); break;
 
 
 
 			    case 5:
-					if (sample_playing(5))
+					if (sample_playing(samples, 5))
 					{
-					  sample_stop(5);
-	   				  sample_start(5, 6, 0); break;
+					  sample_stop(samples, 5);
+	   				  sample_start(samples, 5, 6, 0); break;
 					}
 					else
- 		    			 sample_start(5, 6, 0); break;
+ 		    			 sample_start(samples, 5, 6, 0); break;
 
 
 			    case 6:
-					if (sample_playing(6))
+					if (sample_playing(samples, 6))
 					{
-					  sample_stop(6);
-	   				  sample_start(6, 7, 0); break;
+					  sample_stop(samples, 6);
+	   				  sample_start(samples, 6, 7, 0); break;
 					}
 					else
- 		    			 sample_start(6, 7, 0); break;
+ 		    			 sample_start(samples, 6, 7, 0); break;
 
 			    case 7:
 
-					if (sample_playing(7))
+					if (sample_playing(samples, 7))
 					{
-					  sample_stop(7);
-	   				  sample_start(7, 8, 0); break;
+					  sample_stop(samples, 7);
+	   				  sample_start(samples, 7, 8, 0); break;
 					}
 					else
- 		    			 sample_start(7, 8, 0); break;
+ 		    			 sample_start(samples, 7, 8, 0); break;
 			  }
 			}
 
@@ -324,22 +327,22 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 			break;
 
 
-		case 6: if (data) sample_start(8, 9, 0); break; /*Fire Control*/
+		case 6: if (data) sample_start(samples, 8, 9, 0); break; /*Fire Control*/
 
-		case 7: if (data) sample_start(9, 10, 0); break; /*Small Explosion*/
+		case 7: if (data) sample_start(samples, 9, 10, 0); break; /*Small Explosion*/
 
-		case 8: if (data) sample_start(10, 11, 0); break; /*Loud Explosion*/
+		case 8: if (data) sample_start(samples, 10, 11, 0); break; /*Loud Explosion*/
 
 		case 9:
 		 if (data)
-		  sample_start(11, 1, 1);
+		  sample_start(samples, 11, 1, 1);
 		else
-		 sample_stop(11);
+		 sample_stop(samples, 11);
 
 		break; /*Extend Sound control*/
 
 		case 12:
-		 if (data) sample_start(11,12, 0); break; /*Insert Coin*/
+		 if (data) sample_start(samples, 11,12, 0); break; /*Insert Coin*/
         }
     }
 
@@ -536,7 +539,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magspot_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
@@ -1593,10 +1596,11 @@ static DRIVER_INIT( devzone )
 
 static DRIVER_INIT( nomnlnd )
 {
+	const device_config *dac = devtag_get_device(machine, SOUND, "dac");
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800, 0x4800, 0, 0, SMH_NOP);
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x480a, 0x480a, 0, 0, dac_0_data_w);
+	memory_install_write8_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dac, 0x480a, 0x480a, 0, 0, dac_w);
 }
 
 

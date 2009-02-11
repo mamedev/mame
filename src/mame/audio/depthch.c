@@ -13,8 +13,8 @@
 #define OUT_PORT_1_SONAR        0x08
 
 
-#define PLAY(id,loop)           sample_start( id, id, loop )
-#define STOP(id)                sample_stop( id )
+#define PLAY(samp,id,loop)      sample_start( samp, id, id, loop )
+#define STOP(samp,id)           sample_stop( samp, id )
 
 
 /* sample file names */
@@ -56,6 +56,7 @@ enum
 WRITE8_HANDLER( depthch_audio_w )
 {
 	static int port1State = 0;
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	int bitsChanged;
 	int bitsGoneHigh;
 	int bitsGoneLow;
@@ -69,25 +70,25 @@ WRITE8_HANDLER( depthch_audio_w )
 
 	if ( bitsGoneHigh & OUT_PORT_1_LONGEXPL )
 	{
-		PLAY( SND_LONGEXPL, 0 );
+		PLAY( samples, SND_LONGEXPL, 0 );
 	}
 
 	if ( bitsGoneHigh & OUT_PORT_1_SHRTEXPL )
 	{
-		PLAY( SND_SHRTEXPL, 0 );
+		PLAY( samples, SND_SHRTEXPL, 0 );
 	}
 
 	if ( bitsGoneHigh & OUT_PORT_1_SPRAY )
 	{
-		PLAY( SND_SPRAY, 0 );
+		PLAY( samples, SND_SPRAY, 0 );
 	}
 
 	if ( bitsGoneHigh & OUT_PORT_1_SONAR )
 	{
-		PLAY( SND_SONAR, 1 );
+		PLAY( samples, SND_SONAR, 1 );
 	}
 	if ( bitsGoneLow & OUT_PORT_1_SONAR )
 	{
-		STOP( SND_SONAR );
+		STOP( samples, SND_SONAR );
 	}
 }

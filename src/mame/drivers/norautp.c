@@ -263,18 +263,15 @@ static WRITE8_DEVICE_HANDLER( ccounter_w )
 	coin_counter_w(0, data & 0x20);	/* Coin1 */
 	coin_counter_w(1, data & 0x10);	/* Coin2 */
 	coin_counter_w(2, data & 0x08);	/* Payout */
-
 }
 
 static WRITE8_DEVICE_HANDLER( sndlamp_w )
 {
-
 	output_set_lamp_value(8, (data >> 0) & 1);		/* Start? */
 	output_set_lamp_value(9, (data >> 1) & 1);		/* Bet */
 
 	/* the 4 MSB are for discrete (or DAC) sound */
-	dac_data_w(0, (data & 0xf0));		/* Sound DAC? */
-
+	dac_data_w(devtag_get_device(device->machine, SOUND, "dac"), (data & 0xf0));		/* Sound DAC? */
 }
 
 /*game waits for bit 7 (0x80) to be set.*/

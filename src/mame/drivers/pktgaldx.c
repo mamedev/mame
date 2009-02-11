@@ -70,9 +70,9 @@ extern UINT16* pcktgaldb_sprites;
 
 /**********************************************************************************/
 
-static WRITE16_HANDLER(pktgaldx_oki_bank_w)
+static WRITE16_DEVICE_HANDLER(pktgaldx_oki_bank_w)
 {
-	okim6295_set_bank_base(1, (data & 3) * 0x40000);
+	okim6295_set_bank_base(device, (data & 3) * 0x40000);
 }
 
 /**********************************************************************************/
@@ -88,13 +88,13 @@ static ADDRESS_MAP_START( pktgaldx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x130000, 0x130fff) AM_RAM_WRITE(deco16_nonbuffered_palette_w) AM_BASE(&paletteram16)
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(okim6295_data_0_lsb_w)
-	AM_RANGE(0x140006, 0x140007) AM_READ(okim6295_status_0_lsb_r)
-	AM_RANGE(0x150000, 0x15000f) AM_WRITE(okim6295_data_1_lsb_w)
-	AM_RANGE(0x150006, 0x150007) AM_READ(okim6295_status_1_lsb_r)
+	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff)
+	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff)
+	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff)
+	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff)
 
 	AM_RANGE(0x161800, 0x16180f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x164800, 0x164801) AM_WRITE(pktgaldx_oki_bank_w)
+	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE(SOUND, "oki2", pktgaldx_oki_bank_w)
 	AM_RANGE(0x167800, 0x167fff) AM_READ(deco16_104_pktgaldx_prot_r) AM_WRITE(deco16_104_pktgaldx_prot_w) AM_BASE(&deco16_prot_ram)
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 ADDRESS_MAP_END

@@ -57,9 +57,9 @@ static TIMER_CALLBACK( dac_irq )
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
 }
 
-static WRITE8_HANDLER( audio_dac_w)
+static WRITE8_DEVICE_HANDLER( audio_dac_w)
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(device->machine, "main");
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 
@@ -81,9 +81,9 @@ static WRITE8_HANDLER( audio_dac_w)
 
 	dac_address += 0x10000;
 
-	dac_data_w( 0, rom[dac_address+cur_dac_address_index] );
+	dac_data_w( device, rom[dac_address+cur_dac_address_index] );
 
-	timer_set( space->machine, ATTOTIME_IN_HZ( 16000 ), NULL, 0, dac_irq );
+	timer_set( device->machine, ATTOTIME_IN_HZ( 16000 ), NULL, 0, dac_irq );
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
-	AM_RANGE(0x5080, 0x5080) AM_WRITE(audio_dac_w)
+	AM_RANGE(0x5080, 0x5080) AM_DEVWRITE(SOUND, "dac", audio_dac_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

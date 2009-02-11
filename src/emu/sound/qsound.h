@@ -11,12 +11,10 @@
 
 #define QSOUND_CLOCK    4000000   /* default 4MHz clock */
 
-WRITE8_HANDLER( qsound_data_h_w );
-WRITE8_HANDLER( qsound_data_l_w );
-WRITE8_HANDLER( qsound_cmd_w );
-READ8_HANDLER( qsound_status_r );
+WRITE8_DEVICE_HANDLER( qsound_w );
+READ8_DEVICE_HANDLER( qsound_r );
 
-SND_GET_INFO( qsound );
-#define SOUND_QSOUND SND_GET_INFO_NAME( qsound )
+DEVICE_GET_INFO( qsound );
+#define SOUND_QSOUND DEVICE_GET_INFO_NAME( qsound )
 
 #endif /* __QSOUND_H__ */

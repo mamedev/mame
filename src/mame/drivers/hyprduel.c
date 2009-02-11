@@ -510,8 +510,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyprduel_readmem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_READ(SMH_RAM						)
 	AM_RANGE(0x004000, 0x007fff) AM_READ(SMH_RAM						)
-	AM_RANGE(0x400002, 0x400003) AM_READ(ym2151_status_port_0_lsb_r	)
-	AM_RANGE(0x400004, 0x400005) AM_READ(okim6295_status_0_lsb_r		)
+	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff )
+	AM_RANGE(0x400004, 0x400005) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff )
 	AM_RANGE(0xc00000, 0xc07fff) AM_READ(SMH_RAM						)
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ(SMH_RAM						)
 ADDRESS_MAP_END
@@ -519,9 +519,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyprduel_writemem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram1_2	)	// shadow ($c00000 - $c03fff : vector, write ok)
 	AM_RANGE(0x004000, 0x007fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram2_2	)	// shadow ($fe4000 - $fe7fff : read only)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(ym2151_register_port_0_lsb_w	)
-	AM_RANGE(0x400002, 0x400003) AM_WRITE(ym2151_data_port_0_lsb_w		)
-	AM_RANGE(0x400004, 0x400005) AM_WRITE(okim6295_data_0_lsb_w			)
+	AM_RANGE(0x400000, 0x400003) AM_DEVWRITE8(SOUND, "ym", ym2151_w, 0x00ff )
+	AM_RANGE(0x400004, 0x400005) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP						)
 	AM_RANGE(0xc00000, 0xc07fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram1_1	)	// (sound driver)
 	AM_RANGE(0xfe0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram2_1	)
@@ -578,8 +577,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magerror_readmem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_READ(SMH_RAM						)
 	AM_RANGE(0x004000, 0x007fff) AM_READ(SMH_RAM						)
-//  AM_RANGE(0x400002, 0x400003) AM_READ(ym2151_status_port_0_lsb_r )
-	AM_RANGE(0x400004, 0x400005) AM_READ(okim6295_status_0_lsb_r		)
+//  AM_RANGE(0x400000, 0x400003) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff )
+	AM_RANGE(0x400004, 0x400005) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff)
 	AM_RANGE(0xc00000, 0xc07fff) AM_READ(SMH_RAM						)
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ(SMH_RAM						)
 ADDRESS_MAP_END
@@ -587,9 +586,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magerror_writemem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x003fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram1_2	)	// shadow ($c00000 - $c03fff : vector, write ok)
 	AM_RANGE(0x004000, 0x007fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram2_2	)	// shadow ($fe4000 - $fe7fff : read only)
-  	AM_RANGE(0x400000, 0x400001) AM_WRITE(ym2413_register_port_0_lsb_w  )
-  	AM_RANGE(0x400002, 0x400003) AM_WRITE(ym2413_data_port_0_lsb_w      )
-	AM_RANGE(0x400004, 0x400005) AM_WRITE(okim6295_data_0_lsb_w			)
+  	AM_RANGE(0x400000, 0x400003) AM_DEVWRITE8(SOUND, "ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x400004, 0x400005) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP						)
 	AM_RANGE(0xc00000, 0xc07fff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram1_1	)	// (sound driver)
 	AM_RANGE(0xfe0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&hypr_sub_sharedram2_1	)
@@ -703,9 +701,9 @@ GFXDECODE_END
                             Sound Communication
 ***************************************************************************/
 
-static void sound_irq(running_machine *machine, int state)
+static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1], 1, HOLD_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
 }
 
 static const ym2151_interface ym2151_config =

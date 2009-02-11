@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
 	AM_RANGE(0x1f801000, 0x1f80100f) AM_RAM /* ?? */
 	AM_RANGE(0x1f801010, 0x1f801013) AM_NOP
-	AM_RANGE(0x1f801014, 0x1f801017) AM_READWRITE(psx_spu_delay_r, psx_spu_delay_w)
+	AM_RANGE(0x1f801014, 0x1f801017) AM_DEVREADWRITE(SOUND, "spu", psx_spu_delay_r, psx_spu_delay_w)
 	AM_RANGE(0x1f801018, 0x1f80101f) AM_NOP
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(psx_com_delay_r, psx_com_delay_w)
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_NOP
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
 	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE(psx_spu_r, psx_spu_w)
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE(SOUND, "spu", psx_spu_r, psx_spu_w)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
@@ -422,10 +422,15 @@ static void zn_driver_init( running_machine *machine )
 	dip_timer = timer_alloc(machine,  dip_timer_fired, NULL );
 }
 
+static void psx_spu_irq(const device_config *device, UINT32 data)
+{
+	psx_irq_set(device->machine, data);
+}
+
 static const psx_spu_interface psxspu_interface =
 {
 	&g_p_n_psxram,
-	psx_irq_set,
+	psx_spu_irq,
 	psx_dma_install_read_handler,
 	psx_dma_install_write_handler
 };
@@ -680,11 +685,9 @@ static MACHINE_RESET( coh1000c )
 static ADDRESS_MAP_START( qsound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(10)		/* banked (contains music data) */
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(qsound_data_h_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(qsound_data_l_w)
-	AM_RANGE(0xd002, 0xd002) AM_WRITE(qsound_cmd_w)
+	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE(SOUND, "qsound", qsound_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_bankswitch_w)
-	AM_RANGE(0xd007, 0xd007) AM_READ(qsound_status_r)
+	AM_RANGE(0xd007, 0xd007) AM_DEVREAD(SOUND, "qsound", qsound_r)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1196,10 +1199,7 @@ static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)	/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym2610_status_port_0_a_r, ym2610_control_port_0_a_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(ym2610_read_port_0_r, ym2610_data_port_0_a_w)
-	AM_RANGE(0xe002, 0xe002) AM_READWRITE(ym2610_status_port_0_b_r, ym2610_control_port_0_b_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE(SOUND, "ym", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -1209,9 +1209,9 @@ static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -1826,26 +1826,11 @@ static MACHINE_RESET( coh1002e )
 	zn_machine_init(machine);
 }
 
-static READ16_HANDLER( psarc_ymf_r )
-{
-	return ymf271_0_r(space,0);
-}
-
-static WRITE16_HANDLER( psarc_ymf_w )
-{
-	ymf271_0_w(space, offset, data);
-}
-
-static READ16_HANDLER( psarc_latch_r )
-{
-	return soundlatch_r(space,0);
-}
-
 static ADDRESS_MAP_START( psarc_snd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x10001f) AM_READWRITE( psarc_ymf_r, psarc_ymf_w )
-	AM_RANGE(0x180008, 0x180009) AM_READ( psarc_latch_r )
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8( SOUND, "ymf", ymf271_r, ymf271_w, 0x00ff )
+	AM_RANGE(0x180008, 0x180009) AM_READ8( soundlatch_r, 0x00ff )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITENOP
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
 ADDRESS_MAP_END
@@ -2756,8 +2741,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbaj_z80_port_map, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x84, 0x84 ) AM_READWRITE( ymz280b_status_0_r, ymz280b_register_0_w )
-	AM_RANGE( 0x85, 0x85 ) AM_READWRITE( ymz280b_status_0_r, ymz280b_data_0_w )
+	AM_RANGE( 0x84, 0x85 ) AM_DEVREADWRITE( SOUND, "ymz", ymz280b_r, ymz280b_w )
 	AM_RANGE( 0x90, 0x90 ) AM_READWRITE( cbaj_z80_latch_r, cbaj_z80_latch_w )
 	AM_RANGE( 0x91, 0x91 ) AM_READ( cbaj_z80_ready_r )
 ADDRESS_MAP_END

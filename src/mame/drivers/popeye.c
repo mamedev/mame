@@ -147,10 +147,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD(SOUND, "ay", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -434,22 +435,22 @@ GFXDECODE_END
 
 static int dswbit;
 
-static WRITE8_HANDLER( popeye_portB_w )
+static WRITE8_DEVICE_HANDLER( popeye_portB_w )
 {
 	/* bit 0 flips screen */
-	flip_screen_set(space->machine, data & 1);
+	flip_screen_set(device->machine, data & 1);
 
 	/* bits 1-3 select DSW1 bit to read */
 	dswbit = (data & 0x0e) >> 1;
 }
 
-static READ8_HANDLER( popeye_portA_r )
+static READ8_DEVICE_HANDLER( popeye_portA_r )
 {
 	int res;
 
 
-	res = input_port_read(space->machine, "DSW0");
-	res |= (input_port_read(space->machine, "DSW1") << (7-dswbit)) & 0x80;
+	res = input_port_read(device->machine, "DSW0");
+	res |= (input_port_read(device->machine, "DSW1") << (7-dswbit)) & 0x80;
 
 	return res;
 }
@@ -458,10 +459,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	popeye_portA_r,
-	NULL,
-	NULL,
-	popeye_portB_w
+	DEVCB_HANDLER(popeye_portA_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(popeye_portB_w)
 };
 
 

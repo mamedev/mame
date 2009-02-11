@@ -117,7 +117,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	}
 }
 
-static WRITE8_HANDLER(unk_w)
+static WRITE8_DEVICE_HANDLER(unk_w)
 {
 
 }
@@ -126,10 +126,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	unk_w,
-	unk_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(unk_w),
+	DEVCB_HANDLER(unk_w)
 };
 
 static const msm5232_interface msm5232_config =
@@ -189,9 +189,8 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xc803, 0xc803) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xc900, 0xc90d) AM_WRITE(msm5232_0_w)
+	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE(SOUND, "msm", msm5232_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(SMH_NOP)

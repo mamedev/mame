@@ -334,15 +334,15 @@ static CUSTOM_INPUT( clock_r )
 }
 
 
-static READ8_HANDLER( input_port_1_bit_r )
+static READ8_DEVICE_HANDLER( input_port_1_bit_r )
 {
-	return (input_port_read(space->machine, "IN1/DSW0") & (1 << offset)) ? 0 : 228;
+	return (input_port_read(device->machine, "IN1/DSW0") & (1 << offset)) ? 0 : 228;
 }
 
 
-static READ8_HANDLER( input_port_2_bit_r )
+static READ8_DEVICE_HANDLER( input_port_2_bit_r )
 {
-	return (input_port_read(space->machine, "IN2") & (1 << offset)) ? 0 : 228;
+	return (input_port_read(device->machine, "IN2") & (1 << offset)) ? 0 : 228;
 }
 
 
@@ -397,8 +397,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6060, 0x6060) AM_READ(mb_lo_r)
 	AM_RANGE(0x6070, 0x6070) AM_READ(mb_hi_r)
 	AM_RANGE(0x6080, 0x609f) AM_WRITE(mb_go_w)
-	AM_RANGE(0x60c0, 0x60cf) AM_READWRITE(pokey1_r, pokey1_w)
-	AM_RANGE(0x60d0, 0x60df) AM_READWRITE(pokey2_r, pokey2_w)
+	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
 	AM_RANGE(0x9000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
@@ -531,14 +531,30 @@ INPUT_PORTS_END
 
 static const pokey_interface pokey_interface_1 =
 {
-	{ input_port_1_bit_r,input_port_1_bit_r,input_port_1_bit_r,input_port_1_bit_r,
-	  input_port_1_bit_r,input_port_1_bit_r,input_port_1_bit_r,input_port_1_bit_r }
+	{
+		DEVCB_HANDLER(input_port_1_bit_r),
+		DEVCB_HANDLER(input_port_1_bit_r),
+		DEVCB_HANDLER(input_port_1_bit_r),
+		DEVCB_HANDLER(input_port_1_bit_r),
+		DEVCB_HANDLER(input_port_1_bit_r),
+		DEVCB_HANDLER(input_port_1_bit_r),
+		DEVCB_HANDLER(input_port_1_bit_r),
+		DEVCB_HANDLER(input_port_1_bit_r)
+	}
 };
 
 static const pokey_interface pokey_interface_2 =
 {
-	{ input_port_2_bit_r,input_port_2_bit_r,input_port_2_bit_r,input_port_2_bit_r,
-	  input_port_2_bit_r,input_port_2_bit_r,input_port_2_bit_r,input_port_2_bit_r }
+	{
+		DEVCB_HANDLER(input_port_2_bit_r),
+		DEVCB_HANDLER(input_port_2_bit_r),
+		DEVCB_HANDLER(input_port_2_bit_r),
+		DEVCB_HANDLER(input_port_2_bit_r),
+		DEVCB_HANDLER(input_port_2_bit_r),
+		DEVCB_HANDLER(input_port_2_bit_r),
+		DEVCB_HANDLER(input_port_2_bit_r),
+		DEVCB_HANDLER(input_port_2_bit_r)
+	}
 };
 
 

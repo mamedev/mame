@@ -131,8 +131,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_WRITE(SMH_NOP)	/* Z180 internal registers */
 	AM_RANGE(0x30, 0x30) AM_READ(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x71, 0x71) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x72, 0x72) AM_READWRITE(protection_r, protection_w)
 	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
 	AM_RANGE(0x76, 0x76) AM_READ_PORT("P2")
@@ -142,8 +141,7 @@ static ADDRESS_MAP_START( gfire2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_WRITE(SMH_NOP)	/* Z180 internal registers */
 	AM_RANGE(0x30, 0x30) AM_READ(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x71, 0x71) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x72, 0x72) AM_READWRITE(gfire2_protection_r, gfire2_protection_w)
 	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
 	AM_RANGE(0x76, 0x76) AM_READ_PORT("P2")
@@ -265,10 +263,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_2_r,
-		NULL,
-		NULL,
-		NULL
+		DEVCB_INPUT_PORT("DSW"),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };

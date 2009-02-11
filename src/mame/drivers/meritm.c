@@ -562,8 +562,8 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE(Z80PIO, "z80pio_0", z80pio_r, z80pio_w)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(Z80PIO, "z80pio_1", z80pio_r, z80pio_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
@@ -589,8 +589,8 @@ static ADDRESS_MAP_START( meritm_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE(Z80PIO, "z80pio_0", z80pio_r, z80pio_w)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(Z80PIO, "z80pio_1", z80pio_r, z80pio_w)
 	AM_RANGE(0x60, 0x67) AM_READWRITE(pc16552d_0_r,pc16552d_0_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_bank_w)
 ADDRESS_MAP_END
 
@@ -723,12 +723,7 @@ static const ppi8255_interface crt250_ppi8255_intf =
  Port B: Bits 0,1 used
 */
 
-static READ8_HANDLER(meritm_ay8930_port_a_r)
-{
-	return input_port_read_safe(space->machine, "DSW", 0);
-};
-
-static WRITE8_HANDLER(meritm_ay8930_port_b_w)
+static WRITE8_DEVICE_HANDLER(meritm_ay8930_port_b_w)
 {
 	// lamps
 };
@@ -737,10 +732,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	meritm_ay8930_port_a_r, /* Port A read */
-	NULL, /* Port B read */
-	NULL, /* Port A write */
-	meritm_ay8930_port_b_w  /* Port B write */
+	DEVCB_INPUT_PORT("DSW"), /* Port A read */
+	DEVCB_NULL, /* Port B read */
+	DEVCB_NULL, /* Port A write */
+	DEVCB_HANDLER(meritm_ay8930_port_b_w)  /* Port B write */
 };
 
 /*************************************

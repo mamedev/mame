@@ -159,6 +159,9 @@ static READ8_HANDLER( pc3259_r )
 
 static WRITE8_HANDLER( port_sound_w )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
 	cpu_interrupt_enable(space->machine->cpu[0], (data & 0x01) ? TRUE : FALSE);
 	crbaloon_set_clear_collision_address((data & 0x01) ? TRUE : FALSE);
@@ -167,29 +170,23 @@ static WRITE8_HANDLER( port_sound_w )
 	sound_global_enable((data & 0x02) ? TRUE : FALSE);
 
 	/* D2 - unlabeled - music enable */
-	crbaloon_audio_set_music_enable(space, (data & 0x04) ? TRUE : FALSE);
+	crbaloon_audio_set_music_enable(discrete, 0, (data & 0x04) ? TRUE : FALSE);
 
 	/* D3 - EXPLOSION */
-	crbaloon_audio_set_explosion_enable((data & 0x08) ? TRUE : FALSE);
+	crbaloon_audio_set_explosion_enable(sn, (data & 0x08) ? TRUE : FALSE);
 
 	/* D4 - BREATH */
-	crbaloon_audio_set_breath_enable((data & 0x10) ? TRUE : FALSE);
+	crbaloon_audio_set_breath_enable(sn, (data & 0x10) ? TRUE : FALSE);
 
 	/* D5 - APPEAR */
-	crbaloon_audio_set_appear_enable((data & 0x20) ? TRUE : FALSE);
+	crbaloon_audio_set_appear_enable(sn, (data & 0x20) ? TRUE : FALSE);
 
 	/* D6 - unlabeled - laugh enable */
-	crbaloon_audio_set_laugh_enable(space, (data & 0x40) ? TRUE : FALSE);
+	crbaloon_audio_set_laugh_enable(discrete, 0, (data & 0x40) ? TRUE : FALSE);
 
 	/* D7 - unlabeled - goes to PC3259 pin 16 */
 
 	pc3259_update();
-}
-
-
-static WRITE8_HANDLER( port_music_w )
-{
-	crbaloon_audio_set_music_freq(space, data);
 }
 
 
@@ -227,7 +224,7 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)	/* not connected */
 	AM_RANGE(0x01, 0x01) AM_WRITE(SMH_NOP) /* watchdog */
 	AM_RANGE(0x02, 0x04) AM_WRITE(SMH_RAM) AM_BASE(&crbaloon_spriteram)
-	AM_RANGE(0x05, 0x05) AM_WRITE(port_music_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", crbaloon_audio_set_music_freq)
 	AM_RANGE(0x06, 0x06) AM_WRITE(port_sound_w)
 	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_BASE(&pc3092_data)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(SMH_NOP) /* MSK - to PC3259 */
@@ -346,10 +343,11 @@ GFXDECODE_END
 static MACHINE_RESET( crballoon )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	const device_config *discrete = devtag_get_device(machine, SOUND, "discrete");
 
 	pc3092_reset();
 	port_sound_w(space, 0, 0);
-	port_music_w(space, 0, 0);
+	crbaloon_audio_set_music_freq(discrete, 0, 0);
 }
 
 

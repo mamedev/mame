@@ -234,10 +234,7 @@ static ADDRESS_MAP_START( drill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE(&unkram)// video stuff, 460000 - video regs ?
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x502000, 0x503fff) AM_RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ(ym2610_status_port_0_a_lsb_r) AM_WRITE(ym2610_control_port_0_a_lsb_w)
-	AM_RANGE(0x600002, 0x600003) AM_READ(ym2610_read_port_0_lsb_r) AM_WRITE(ym2610_data_port_0_a_lsb_w)
-	AM_RANGE(0x600004, 0x600005) AM_READ(ym2610_status_port_0_b_lsb_r) AM_WRITE(ym2610_control_port_0_b_lsb_w)
-	AM_RANGE(0x600006, 0x600007) AM_WRITE(ym2610_data_port_0_b_lsb_w)
+	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8(SOUND, "ym", ym2610_r, ym2610_w, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_RAM
 	AM_RANGE(0x60000e, 0x60000f) AM_RAM
 	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE(&iodata) // i/o
@@ -394,9 +391,9 @@ static INTERRUPT_GEN( drill_interrupt )
 }
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-//  cpu_set_input_line(machine->cpu[0],5,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(device->machine->cpu[0],5,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

@@ -99,14 +99,10 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READ(aztarac_snd_command_r)
-	AM_RANGE(0x8c00, 0x8c00) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x8c02, 0x8c02) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0x8c03, 0x8c03) AM_READWRITE(ay8910_read_port_1_r, ay8910_control_port_1_w)
-	AM_RANGE(0x8c04, 0x8c04) AM_READWRITE(ay8910_read_port_2_r, ay8910_write_port_2_w)
-	AM_RANGE(0x8c05, 0x8c05) AM_READWRITE(ay8910_read_port_2_r, ay8910_control_port_2_w)
-	AM_RANGE(0x8c06, 0x8c06) AM_READWRITE(ay8910_read_port_3_r, ay8910_write_port_3_w)
-	AM_RANGE(0x8c07, 0x8c07) AM_READWRITE(ay8910_read_port_3_r, ay8910_control_port_3_w)
+	AM_RANGE(0x8c00, 0x8c01) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r, ay8910_data_address_w)
+	AM_RANGE(0x8c02, 0x8c03) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_data_address_w)
+	AM_RANGE(0x8c04, 0x8c05) AM_DEVREADWRITE(SOUND, "ay3", ay8910_r, ay8910_data_address_w)
+	AM_RANGE(0x8c06, 0x8c07) AM_DEVREADWRITE(SOUND, "ay4", ay8910_r, ay8910_data_address_w)
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(aztarac_snd_status_r, aztarac_snd_status_w)
 ADDRESS_MAP_END
 

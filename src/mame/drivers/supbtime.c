@@ -117,24 +117,12 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( YM2151_w )
-{
-	switch (offset) {
-	case 0:
-		ym2151_register_port_0_w(space,0,data);
-		break;
-	case 1:
-		ym2151_data_port_0_w(space,0,data);
-		break;
-	}
-}
-
 /* Physical memory map (21 bits) */
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x100000, 0x100001) AM_READ(SMH_NOP)
-	AM_RANGE(0x110000, 0x110001) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0x120000, 0x120001) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0x130000, 0x130001) AM_READ(SMH_NOP) /* This board only has 1 oki chip */
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
@@ -143,8 +131,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(SMH_NOP) /* YM2203 - this board doesn't have one */
-	AM_RANGE(0x110000, 0x110001) AM_WRITE(YM2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	AM_RANGE(0x130000, 0x130001) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
@@ -353,9 +341,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(running_machine *machine, int state)
+static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1],1,state); /* IRQ 2 */
+	cpu_set_input_line(device->machine->cpu[1],1,state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

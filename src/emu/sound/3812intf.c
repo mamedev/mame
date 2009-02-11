@@ -24,37 +24,48 @@
 #include "sound/fmopl.h"
 
 
-#if BUILD_YM3812
-
-struct ym3812_info
+typedef struct _ym3812_state ym3812_state;
+struct _ym3812_state
 {
 	sound_stream *	stream;
-	emu_timer *	timer[2];
+	emu_timer *		timer[2];
 	void *			chip;
 	const ym3812_interface *intf;
 	const device_config *device;
 };
 
-static void IRQHandler_3812(void *param,int irq)
+
+INLINE ym3812_state *get_safe_token(const device_config *device)
 {
-	struct ym3812_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(info->device->machine, irq ? ASSERT_LINE : CLEAR_LINE);
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_YM3812);
+	return (ym3812_state *)device->token;
 }
-static TIMER_CALLBACK( timer_callback_3812_0 )
+
+
+
+static void IRQHandler(void *param,int irq)
 {
-	struct ym3812_info *info = ptr;
+	ym3812_state *info = param;
+	if (info->intf->handler) (info->intf->handler)(info->device, irq ? ASSERT_LINE : CLEAR_LINE);
+}
+static TIMER_CALLBACK( timer_callback_0 )
+{
+	ym3812_state *info = ptr;
 	ym3812_timer_over(info->chip,0);
 }
 
-static TIMER_CALLBACK( timer_callback_3812_1 )
+static TIMER_CALLBACK( timer_callback_1 )
 {
-	struct ym3812_info *info = ptr;
+	ym3812_state *info = ptr;
 	ym3812_timer_over(info->chip,1);
 }
 
-static void TimerHandler_3812(void *param,int c,attotime period)
+static void TimerHandler(void *param,int c,attotime period)
 {
-	struct ym3812_info *info = param;
+	ym3812_state *info = param;
 	if( attotime_compare(period, attotime_zero) == 0 )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[c], 0);
@@ -68,485 +79,93 @@ static void TimerHandler_3812(void *param,int c,attotime period)
 
 static STREAM_UPDATE( ym3812_stream_update )
 {
-	struct ym3812_info *info = param;
+	ym3812_state *info = param;
 	ym3812_update_one(info->chip, outputs[0], samples);
 }
 
-static void _stream_update_3812(void * param, int interval)
+static void _stream_update(void * param, int interval)
 {
-	struct ym3812_info *info = param;
+	ym3812_state *info = param;
 	stream_update(info->stream);
 }
 
 
-static SND_START( ym3812 )
+static DEVICE_START( ym3812 )
 {
 	static const ym3812_interface dummy = { 0 };
-	struct ym3812_info *info = device->token;
-	int rate = clock/72;
+	ym3812_state *info = get_safe_token(device);
+	int rate = device->clock/72;
 
 	info->intf = device->static_config ? device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */
-	info->chip = ym3812_init(device,clock,rate);
+	info->chip = ym3812_init(device,device->clock,rate);
 	assert_always(info->chip != NULL, "Error creating YM3812 chip");
 
 	info->stream = stream_create(device,0,1,rate,info,ym3812_stream_update);
 
 	/* YM3812 setup */
-	ym3812_set_timer_handler (info->chip, TimerHandler_3812, info);
-	ym3812_set_irq_handler   (info->chip, IRQHandler_3812, info);
-	ym3812_set_update_handler(info->chip, _stream_update_3812, info);
+	ym3812_set_timer_handler (info->chip, TimerHandler, info);
+	ym3812_set_irq_handler   (info->chip, IRQHandler, info);
+	ym3812_set_update_handler(info->chip, _stream_update, info);
 
-	info->timer[0] = timer_alloc(device->machine, timer_callback_3812_0, info);
-	info->timer[1] = timer_alloc(device->machine, timer_callback_3812_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_1, info);
 }
 
-static SND_STOP( ym3812 )
+static DEVICE_STOP( ym3812 )
 {
-	struct ym3812_info *info = device->token;
+	ym3812_state *info = get_safe_token(device);
 	ym3812_shutdown(info->chip);
 }
 
-static SND_RESET( ym3812 )
+static DEVICE_RESET( ym3812 )
 {
-	struct ym3812_info *info = device->token;
+	ym3812_state *info = get_safe_token(device);
 	ym3812_reset_chip(info->chip);
 }
 
-WRITE8_HANDLER( ym3812_control_port_0_w ) {
-	struct ym3812_info *info = sndti_token(SOUND_YM3812, 0);
-	ym3812_write(info->chip, 0, data);
-}
-WRITE8_HANDLER( ym3812_write_port_0_w ) {
-	struct ym3812_info *info = sndti_token(SOUND_YM3812, 0);
-	ym3812_write(info->chip, 1, data);
-}
-READ8_HANDLER( ym3812_status_port_0_r ) {
-	struct ym3812_info *info = sndti_token(SOUND_YM3812, 0);
-	return ym3812_read(info->chip, 0);
-}
-READ8_HANDLER( ym3812_read_port_0_r ) {
-	struct ym3812_info *info = sndti_token(SOUND_YM3812, 0);
-	return ym3812_read(info->chip, 1);
+
+READ8_DEVICE_HANDLER( ym3812_r )
+{
+	ym3812_state *info = get_safe_token(device);
+	return ym3812_read(info->chip, offset & 1);
 }
 
+WRITE8_DEVICE_HANDLER( ym3812_w )
+{
+	ym3812_state *info = get_safe_token(device);
+	ym3812_write(info->chip, offset & 1, data);
+}
 
-WRITE8_HANDLER( ym3812_control_port_1_w ) {
-	struct ym3812_info *info = sndti_token(SOUND_YM3812, 1);
-	ym3812_write(info->chip, 0, data);
-}
-WRITE8_HANDLER( ym3812_write_port_1_w ) {
-	struct ym3812_info *info = sndti_token(SOUND_YM3812, 1);
-	ym3812_write(info->chip, 1, data);
-}
-READ8_HANDLER( ym3812_status_port_1_r ) {
-	struct ym3812_info *info = sndti_token(SOUND_YM3812, 1);
-	return ym3812_read(info->chip, 0);
-}
-READ8_HANDLER( ym3812_read_port_1_r ) {
-	struct ym3812_info *info = sndti_token(SOUND_YM3812, 1);
-	return ym3812_read(info->chip, 1);
-}
+READ8_DEVICE_HANDLER( ym3812_status_port_r ) { return ym3812_r(device, 0); }
+READ8_DEVICE_HANDLER( ym3812_read_port_r ) { return ym3812_r(device, 1); }
+WRITE8_DEVICE_HANDLER( ym3812_control_port_w ) { ym3812_w(device, 0, data); }
+WRITE8_DEVICE_HANDLER( ym3812_write_port_w ) { ym3812_w(device, 1, data); }
+
 
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( ym3812 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( ym3812 )
+DEVICE_GET_INFO( ym3812 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym3812_info);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ym3812_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym3812 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym3812 );				break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym3812 );				break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym3812 );				break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym3812 );				break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( ym3812 );				break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( ym3812 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "YM3812");							break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "YM3812");							break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
-
-#endif
-
-
-#if BUILD_YM3526
-
-struct ym3526_info
-{
-	sound_stream *	stream;
-	emu_timer *	timer[2];
-	void *			chip;
-	const ym3526_interface *intf;
-	const device_config *device;
-};
-
-
-/* IRQ Handler */
-static void IRQHandler_3526(void *param,int irq)
-{
-	struct ym3526_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(info->device->machine, irq ? ASSERT_LINE : CLEAR_LINE);
-}
-/* Timer overflow callback from timer.c */
-static TIMER_CALLBACK( timer_callback_3526_0 )
-{
-	struct ym3526_info *info = ptr;
-	ym3526_timer_over(info->chip,0);
-}
-static TIMER_CALLBACK( timer_callback_3526_1 )
-{
-	struct ym3526_info *info = ptr;
-	ym3526_timer_over(info->chip,1);
-}
-/* TimerHandler from fm.c */
-static void TimerHandler_3526(void *param,int c,attotime period)
-{
-	struct ym3526_info *info = param;
-	if( attotime_compare(period, attotime_zero) == 0 )
-	{	/* Reset FM Timer */
-		timer_enable(info->timer[c], 0);
-	}
-	else
-	{	/* Start FM Timer */
-		timer_adjust_oneshot(info->timer[c], period, 0);
-	}
-}
-
-
-static STREAM_UPDATE( ym3526_stream_update )
-{
-	struct ym3526_info *info = param;
-	ym3526_update_one(info->chip, outputs[0], samples);
-}
-
-static void _stream_update_3526(void *param, int interval)
-{
-	struct ym3526_info *info = param;
-	stream_update(info->stream);
-}
-
-
-static SND_START( ym3526 )
-{
-	static const ym3526_interface dummy = { 0 };
-	struct ym3526_info *info = device->token;
-	int rate = clock/72;
-
-	info->intf = device->static_config ? device->static_config : &dummy;
-	info->device = device;
-
-	/* stream system initialize */
-	info->chip = ym3526_init(device,clock,rate);
-	assert_always(info->chip != NULL, "Error creating YM3526 chip");
-
-	info->stream = stream_create(device,0,1,rate,info,ym3526_stream_update);
-	/* YM3526 setup */
-	ym3526_set_timer_handler (info->chip, TimerHandler_3526, info);
-	ym3526_set_irq_handler   (info->chip, IRQHandler_3526, info);
-	ym3526_set_update_handler(info->chip, _stream_update_3526, info);
-
-	info->timer[0] = timer_alloc(device->machine, timer_callback_3526_0, info);
-	info->timer[1] = timer_alloc(device->machine, timer_callback_3526_1, info);
-}
-
-static SND_STOP( ym3526 )
-{
-	struct ym3526_info *info = device->token;
-	ym3526_shutdown(info->chip);
-}
-
-static SND_RESET( ym3526 )
-{
-	struct ym3526_info *info = device->token;
-	ym3526_reset_chip(info->chip);
-}
-
-WRITE8_HANDLER( ym3526_control_port_0_w ) {
-	struct ym3526_info *info = sndti_token(SOUND_YM3526, 0);
-	ym3526_write(info->chip, 0, data);
-}
-WRITE8_HANDLER( ym3526_write_port_0_w ) {
-	struct ym3526_info *info = sndti_token(SOUND_YM3526, 0);
-	ym3526_write(info->chip, 1, data);
-}
-READ8_HANDLER( ym3526_status_port_0_r ) {
-	struct ym3526_info *info = sndti_token(SOUND_YM3526, 0);
-	return ym3526_read(info->chip, 0);
-}
-READ8_HANDLER( ym3526_read_port_0_r ) {
-	struct ym3526_info *info = sndti_token(SOUND_YM3526, 0);
-	return ym3526_read(info->chip, 1);
-}
-
-
-WRITE8_HANDLER( ym3526_control_port_1_w ) {
-	struct ym3526_info *info = sndti_token(SOUND_YM3526, 1);
-	ym3526_write(info->chip, 0, data);
-}
-WRITE8_HANDLER( ym3526_write_port_1_w ) {
-	struct ym3526_info *info = sndti_token(SOUND_YM3526, 1);
-	ym3526_write(info->chip, 1, data);
-}
-READ8_HANDLER( ym3526_status_port_1_r ) {
-	struct ym3526_info *info = sndti_token(SOUND_YM3526, 1);
-	return ym3526_read(info->chip, 0);
-}
-READ8_HANDLER( ym3526_read_port_1_r ) {
-	struct ym3526_info *info = sndti_token(SOUND_YM3526, 1);
-	return ym3526_read(info->chip, 1);
-}
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-static SND_SET_INFO( ym3526 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( ym3526 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym3526_info);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym3526 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym3526 );				break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym3526 );				break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym3526 );				break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "YM3526");							break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-#endif
-
-
-#if BUILD_Y8950
-
-struct y8950_info
-{
-	sound_stream *	stream;
-	emu_timer *	timer[2];
-	void *			chip;
-	const y8950_interface *intf;
-	const device_config *device;
-};
-
-static void IRQHandler_8950(void *param,int irq)
-{
-	struct y8950_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(info->device->machine, irq ? ASSERT_LINE : CLEAR_LINE);
-}
-static TIMER_CALLBACK( timer_callback_8950_0 )
-{
-	struct y8950_info *info = ptr;
-	y8950_timer_over(info->chip,0);
-}
-static TIMER_CALLBACK( timer_callback_8950_1 )
-{
-	struct y8950_info *info = ptr;
-	y8950_timer_over(info->chip,1);
-}
-static void TimerHandler_8950(void *param,int c,attotime period)
-{
-	struct y8950_info *info = param;
-	if( attotime_compare(period, attotime_zero) == 0 )
-	{	/* Reset FM Timer */
-		timer_enable(info->timer[c], 0);
-	}
-	else
-	{	/* Start FM Timer */
-		timer_adjust_oneshot(info->timer[c], period, 0);
-	}
-}
-
-
-static unsigned char Y8950PortHandler_r(void *param)
-{
-	struct y8950_info *info = param;
-	if (info->intf->portread)
-		return info->intf->portread(info->device,0);
-	return 0;
-}
-
-static void Y8950PortHandler_w(void *param,unsigned char data)
-{
-	struct y8950_info *info = param;
-	if (info->intf->portwrite)
-		info->intf->portwrite(info->device,0,data);
-}
-
-static unsigned char Y8950KeyboardHandler_r(void *param)
-{
-	struct y8950_info *info = param;
-	if (info->intf->keyboardread)
-		return info->intf->keyboardread(info->device,0);
-	return 0;
-}
-
-static void Y8950KeyboardHandler_w(void *param,unsigned char data)
-{
-	struct y8950_info *info = param;
-	if (info->intf->keyboardwrite)
-		info->intf->keyboardwrite(info->device,0,data);
-}
-
-static STREAM_UPDATE( y8950_stream_update )
-{
-	struct y8950_info *info = param;
-	y8950_update_one(info->chip, outputs[0], samples);
-}
-
-static void _stream_update_8950(void *param, int interval)
-{
-	struct y8950_info *info = param;
-	stream_update(info->stream);
-}
-
-
-static SND_START( y8950 )
-{
-	static const y8950_interface dummy = { 0 };
-	struct y8950_info *info = device->token;
-	int rate = clock/72;
-
-	info->intf = device->static_config ? device->static_config : &dummy;
-	info->device = device;
-
-	/* stream system initialize */
-	info->chip = y8950_init(device,clock,rate);
-	assert_always(info->chip != NULL, "Error creating Y8950 chip");
-
-	/* ADPCM ROM data */
-	y8950_set_delta_t_memory(info->chip, device->region, device->regionbytes);
-
-	info->stream = stream_create(device,0,1,rate,info,y8950_stream_update);
-
-	/* port and keyboard handler */
-	y8950_set_port_handler(info->chip, Y8950PortHandler_w, Y8950PortHandler_r, info);
-	y8950_set_keyboard_handler(info->chip, Y8950KeyboardHandler_w, Y8950KeyboardHandler_r, info);
-
-	/* Y8950 setup */
-	y8950_set_timer_handler (info->chip, TimerHandler_8950, info);
-	y8950_set_irq_handler   (info->chip, IRQHandler_8950, info);
-	y8950_set_update_handler(info->chip, _stream_update_8950, info);
-
-	info->timer[0] = timer_alloc(device->machine, timer_callback_8950_0, info);
-	info->timer[1] = timer_alloc(device->machine, timer_callback_8950_1, info);
-}
-
-static SND_STOP( y8950 )
-{
-	struct y8950_info *info = device->token;
-	y8950_shutdown(info->chip);
-}
-
-static SND_RESET( y8950 )
-{
-	struct y8950_info *info = device->token;
-	y8950_reset_chip(info->chip);
-}
-
-WRITE8_HANDLER( y8950_control_port_0_w ) {
-	struct y8950_info *info = sndti_token(SOUND_Y8950, 0);
-	y8950_write(info->chip, 0, data);
-}
-WRITE8_HANDLER( y8950_write_port_0_w ) {
-	struct y8950_info *info = sndti_token(SOUND_Y8950, 0);
-	y8950_write(info->chip, 1, data);
-}
-READ8_HANDLER( y8950_status_port_0_r ) {
-	struct y8950_info *info = sndti_token(SOUND_Y8950, 0);
-	return y8950_read(info->chip, 0);
-}
-READ8_HANDLER( y8950_read_port_0_r ) {
-	struct y8950_info *info = sndti_token(SOUND_Y8950, 0);
-	return y8950_read(info->chip, 1);
-}
-
-
-WRITE8_HANDLER( y8950_control_port_1_w ) {
-	struct y8950_info *info = sndti_token(SOUND_Y8950, 1);
-	y8950_write(info->chip, 0, data);
-}
-WRITE8_HANDLER( y8950_write_port_1_w ) {
-	struct y8950_info *info = sndti_token(SOUND_Y8950, 1);
-	y8950_write(info->chip, 1, data);
-}
-READ8_HANDLER( y8950_status_port_1_r ) {
-	struct y8950_info *info = sndti_token(SOUND_Y8950, 1);
-	return y8950_read(info->chip, 0);
-}
-READ8_HANDLER( y8950_read_port_1_r ) {
-	struct y8950_info *info = sndti_token(SOUND_Y8950, 1);
-	return y8950_read(info->chip, 1);
-}
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-static SND_SET_INFO( y8950 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( y8950 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct y8950_info);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( y8950 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( y8950 );				break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( y8950 );				break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( y8950 );				break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Y8950");							break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-#endif

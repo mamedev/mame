@@ -554,10 +554,11 @@ static READ8_HANDLER( tms5220_r )
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		UINT8 status = tms5220_status_r(space, 0);
+		const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+		UINT8 status = tms5220_status_r(tms, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
-		return (!tms5220_ready_r() << 7) | (!tms5220_int_r() << 6) | status;
+		return (!tms5220_ready_r(tms) << 7) | (!tms5220_int_r(tms) << 6) | status;
 	}
 
 	return 0xff;
@@ -566,15 +567,16 @@ static READ8_HANDLER( tms5220_r )
 /* TODO: Implement correctly using the state PROM */
 static WRITE8_HANDLER( tms5220_w )
 {
+	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
 	if (offset == 0)
 	{
 		tms_data = data;
-		tms5220_data_w(0, 0, tms_data);
+		tms5220_data_w(tms, 0, tms_data);
 	}
 #if 0
 	if (offset == 1)
 	{
-		tms5220_data_w(0, 0, tms_data);
+		tms5220_data_w(tms, 0, tms_data);
 	}
 #endif
 }
@@ -587,7 +589,7 @@ static WRITE8_HANDLER( control_w )
 
 
 /* 10-bit MC3410CL DAC */
-static WRITE8_HANDLER( dac_w )
+static WRITE8_DEVICE_HANDLER( esripsys_dac_w )
 {
 	if (offset == 0)
 	{
@@ -601,7 +603,7 @@ static WRITE8_HANDLER( dac_w )
             The 8-bit DAC modulates the 10-bit DAC.
             Shift down to prevent clipping.
         */
-		dac_signed_data_16_w(0, (dac_vol * dac_data) >> 1);
+		dac_signed_data_16_w(device, (dac_vol * dac_data) >> 1);
 	}
 }
 
@@ -646,7 +648,7 @@ static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* Not installed on later PCBs */
 	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
-	AM_RANGE(0x200a, 0x200b) AM_WRITE(dac_w)
+	AM_RANGE(0x200a, 0x200b) AM_DEVWRITE(SOUND, "dac", esripsys_dac_w)
 	AM_RANGE(0x200c, 0x200c) AM_WRITE(volume_dac_w)
 	AM_RANGE(0x200d, 0x200d) AM_WRITE(control_w)
 	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)

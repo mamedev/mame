@@ -4,8 +4,6 @@
 
 ***************************************************************************/
 
-#include "sound/custom.h"
-
 #define ASTROCADE_CLOCK		(XTAL_14_31818MHz/2)
 
 #define AC_SOUND_PRESENT	(0x01)

@@ -391,9 +391,9 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
                                                        The Mahjong games and Block Block need special input treatment */
 	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_12_r, ym2413_data_port_0_w)		/* mgakuen only */
-	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_13_r, ym2413_register_port_0_w)	/* mgakuen only */
-	AM_RANGE(0x05, 0x05) AM_READWRITE(pang_port5_r, okim6295_data_0_w)
+	AM_RANGE(0x03, 0x03) AM_READ(input_port_12_r) AM_DEVWRITE(SOUND, "ym", ym2413_data_port_w)		/* mgakuen only */
+	AM_RANGE(0x04, 0x04) AM_READ(input_port_13_r) AM_DEVWRITE(SOUND, "ym", ym2413_register_port_w)	/* mgakuen only */
+	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)				/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
 	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
@@ -418,8 +418,8 @@ static ADDRESS_MAP_START( spangb_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)	/* Super Pang needs a kludge to initialize EEPROM. */
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_WRITE(ym2413_data_port_0_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ym2413_register_port_0_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "ym", ym2413_data_port_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "ym", ym2413_register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
@@ -451,23 +451,23 @@ ADDRESS_MAP_END
 
 /**** Monsters World ****/
 
-static WRITE8_HANDLER( oki_banking_w )
+static WRITE8_DEVICE_HANDLER( oki_banking_w )
 {
-	okim6295_set_bank_base(0, 0x40000 * (data & 3));
+	okim6295_set_bank_base(device, 0x40000 * (data & 3));
 }
 
 static ADDRESS_MAP_START( mstworld_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mstworld_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE(SOUND, "oki", oki_banking_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER(mstworld_sound_w)
@@ -1178,7 +1178,7 @@ static MACHINE_DRIVER_START( pang )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym2413",YM2413, 4000000) /* (verified on pcb) */
+	MDRV_SOUND_ADD("ym",YM2413, 4000000) /* (verified on pcb) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1203,7 +1203,7 @@ GFXDECODE_END
 
 static void spangbl_adpcm_int(const device_config *device)
 {
-	msm5205_data_w(0, sample_buffer & 0x0F);
+	msm5205_data_w(device, sample_buffer & 0x0F);
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)

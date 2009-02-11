@@ -273,7 +273,7 @@ static WRITE8_DEVICE_HANDLER( led1_w )
 	set_led_status(4,~data & 0x10);
 }
 
-static WRITE8_HANDLER( led2_w )
+static WRITE8_DEVICE_HANDLER( led2_w )
 {
 	/* 5 button lamps player 2 */
 	set_led_status(5,~data & 0x01);
@@ -405,8 +405,8 @@ static ADDRESS_MAP_START( trvwhiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trvwhiz_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x8100, 0x8100) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -426,8 +426,8 @@ static ADDRESS_MAP_START( phrcraze_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phrcraze_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -447,8 +447,8 @@ static ADDRESS_MAP_START( tictac_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tictac_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -1100,8 +1100,8 @@ static const ay8910_interface merit_ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL, NULL,
-	led2_w, NULL
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_HANDLER(led2_w), DEVCB_NULL
 };
 
 static NVRAM_HANDLER(dodge)

@@ -6,7 +6,7 @@
 
 **************************************************************************
 
-SND_START(votrax)- Start emulation, load samples from Votrax subdirectory
+DEVICE_START(votrax)- Start emulation, load samples from Votrax subdirectory
 votrax_w         - Write data to votrax port
 votrax_status_r  - Return busy status (-1 = busy)
 
@@ -21,7 +21,8 @@ the variable VotraxBaseFrequency, this is defaulted to 8000
 #include "votrax.h"
 
 
-struct votrax_info
+typedef struct _votrax_state votrax_state;
+struct _votrax_state
 {
 	const device_config *device;
 	int		stream;
@@ -36,6 +37,15 @@ struct votrax_info
 
 	struct  loaded_samples *samples;
 };
+
+INLINE votrax_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_VOTRAX);
+	return (votrax_state *)device->token;
+}
 
 #define FRAC_BITS		24
 #define FRAC_ONE		(1 << FRAC_BITS)
@@ -61,7 +71,7 @@ static const char *const VotraxTable[65] =
 
 static STREAM_UPDATE( votrax_update_sound )
 {
-	struct votrax_info *info = param;
+	votrax_state *info = param;
 	stream_sample_t *buffer = outputs[0];
 
 	if (info->sample)
@@ -101,9 +111,9 @@ static STREAM_UPDATE( votrax_update_sound )
 }
 
 
-static SND_START( votrax )
+static DEVICE_START( votrax )
 {
-	struct votrax_info *votrax = device->token;
+	votrax_state *votrax = get_safe_token(device);
 
 	votrax->device = device;
 	votrax->samples = readsamples(VotraxTable,"votrax");
@@ -117,9 +127,9 @@ static SND_START( votrax )
 }
 
 
-void votrax_w(int data)
+WRITE8_DEVICE_HANDLER( votrax_w )
 {
-	struct votrax_info *info = sndti_token(SOUND_VOTRAX, 0);
+	votrax_state *info = get_safe_token(device);
 	int Phoneme,Intonation;
 
 	stream_update(info->channel);
@@ -142,9 +152,9 @@ void votrax_w(int data)
 	}
 }
 
-int votrax_status_r(void)
+int votrax_status_r(const device_config *device)
 {
-	struct votrax_info *info = sndti_token(SOUND_VOTRAX, 0);
+	votrax_state *info = get_safe_token(device);
 	stream_update(info->channel);
     return (info->sample != NULL);
 }
@@ -155,34 +165,24 @@ int votrax_status_r(void)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( votrax )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( votrax )
+DEVICE_GET_INFO( votrax )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct votrax_info); 			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(votrax_state); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( votrax );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( votrax );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( votrax );			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Votrax SC-01");				break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Votrax speech");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Votrax SC-01");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Votrax speech");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

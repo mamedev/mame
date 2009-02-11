@@ -63,20 +63,20 @@ extern VIDEO_UPDATE( yiear );
 
 /* in audio/trackfld.c */
 extern WRITE8_HANDLER( konami_SN76496_latch_w );
-extern WRITE8_HANDLER( konami_SN76496_0_w );
+extern WRITE8_DEVICE_HANDLER( konami_SN76496_w );
 
 
-static READ8_HANDLER( yiear_speech_r )
+static READ8_DEVICE_HANDLER( yiear_speech_r )
 {
-	if (vlm5030_bsy()) return 1;
+	if (vlm5030_bsy(device)) return 1;
 	else return 0;
 }
 
-static WRITE8_HANDLER( yiear_VLM5030_control_w )
+static WRITE8_DEVICE_HANDLER( yiear_VLM5030_control_w )
 {
 	/* bit 0 is latch direction */
-	vlm5030_st( ( data >> 1 ) & 1 );
-	vlm5030_rst( ( data >> 2 ) & 1 );
+	vlm5030_st( device, ( data >> 1 ) & 1 );
+	vlm5030_rst( device, ( data >> 2 ) & 1 );
 }
 
 static INTERRUPT_GEN( yiear_nmi_interrupt )
@@ -87,12 +87,12 @@ static INTERRUPT_GEN( yiear_nmi_interrupt )
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_READ(yiear_speech_r)
+	AM_RANGE(0x0000, 0x0000) AM_DEVREAD(SOUND, "vlm", yiear_speech_r)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(yiear_control_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(konami_SN76496_latch_w)
-	AM_RANGE(0x4900, 0x4900) AM_WRITE(konami_SN76496_0_w)
-	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(yiear_VLM5030_control_w)
-	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(vlm5030_data_w)
+	AM_RANGE(0x4900, 0x4900) AM_DEVWRITE(SOUND, "sn", konami_SN76496_w)
+	AM_RANGE(0x4a00, 0x4a00) AM_DEVWRITE(SOUND, "vlm", yiear_VLM5030_control_w)
+	AM_RANGE(0x4b00, 0x4b00) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w)
 	AM_RANGE(0x4c00, 0x4c00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x4d00, 0x4d00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x4e00, 0x4e00) AM_READ_PORT("SYSTEM")

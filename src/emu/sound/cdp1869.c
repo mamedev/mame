@@ -14,7 +14,8 @@
 #include "streams.h"
 #include "sound/cdp1869.h"
 
-struct CDP1869
+typedef struct _cdp1869_state cdp1869_state;
+struct _cdp1869_state
 {
 	const device_config *device;
 	sound_stream *stream;	/* returned by stream_create() */
@@ -34,6 +35,15 @@ struct CDP1869
 	UINT8 wnamp;
 };
 
+INLINE cdp1869_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_CDP1869);
+	return (cdp1869_state *)device->token;
+}
+
 /*************************************
  *
  *  Stream update
@@ -42,7 +52,7 @@ struct CDP1869
 
 static STREAM_UPDATE( cdp1869_update )
 {
-	struct CDP1869 *info = param;
+	cdp1869_state *info = param;
 	INT16 signal = info->signal;
 	stream_sample_t *buffer = outputs[0];
 
@@ -103,16 +113,16 @@ static STREAM_UPDATE( cdp1869_update )
  *
  *************************************/
 
-static SND_START( cdp1869 )
+static DEVICE_START( cdp1869 )
 {
-	struct CDP1869 *info = device->token;
+	cdp1869_state *info = get_safe_token(device);
 
 	info->device = device;
 	info->stream = stream_create(device, 0, 1, device->machine->sample_rate, info, cdp1869_update );
 	info->incr = 0;
 	info->signal = 0x07fff;
 
-	info->clock = clock;
+	info->clock = device->clock;
 	info->toneoff = 1;
 	info->wnoff = 1;
 	info->tonediv = 0;
@@ -122,45 +132,45 @@ static SND_START( cdp1869 )
 	info->wnamp = 0;
 }
 
-void cdp1869_set_toneamp(int which, int value)
+void cdp1869_set_toneamp(const device_config *device, int value)
 {
-	struct CDP1869 *info = sndti_token(SOUND_CDP1869, which);
+	cdp1869_state *info = get_safe_token(device);
 	info->toneamp = value & 0x0f;
 }
 
-void cdp1869_set_tonefreq(int which, int value)
+void cdp1869_set_tonefreq(const device_config *device, int value)
 {
-	struct CDP1869 *info = sndti_token(SOUND_CDP1869, which);
+	cdp1869_state *info = get_safe_token(device);
 	info->tonefreq = value & 0x07;
 }
 
-void cdp1869_set_toneoff(int which, int value)
+void cdp1869_set_toneoff(const device_config *device, int value)
 {
-	struct CDP1869 *info = sndti_token(SOUND_CDP1869, which);
+	cdp1869_state *info = get_safe_token(device);
 	info->toneoff = value & 0x01;
 }
 
-void cdp1869_set_tonediv(int which, int value)
+void cdp1869_set_tonediv(const device_config *device, int value)
 {
-	struct CDP1869 *info = sndti_token(SOUND_CDP1869, which);
+	cdp1869_state *info = get_safe_token(device);
 	info->tonediv = value & 0x7f;
 }
 
-void cdp1869_set_wnamp(int which, int value)
+void cdp1869_set_wnamp(const device_config *device, int value)
 {
-	struct CDP1869 *info = sndti_token(SOUND_CDP1869, which);
+	cdp1869_state *info = get_safe_token(device);
 	info->wnamp = value & 0x0f;
 }
 
-void cdp1869_set_wnfreq(int which, int value)
+void cdp1869_set_wnfreq(const device_config *device, int value)
 {
-	struct CDP1869 *info = sndti_token(SOUND_CDP1869, which);
+	cdp1869_state *info = get_safe_token(device);
 	info->wnfreq = value & 0x07;
 }
 
-void cdp1869_set_wnoff(int which, int value)
+void cdp1869_set_wnoff(const device_config *device, int value)
 {
-	struct CDP1869 *info = sndti_token(SOUND_CDP1869, which);
+	cdp1869_state *info = get_safe_token(device);
 	info->wnoff = value & 0x01;
 }
 
@@ -168,32 +178,23 @@ void cdp1869_set_wnoff(int which, int value)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( cdp1869 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-SND_GET_INFO( cdp1869 )
+DEVICE_GET_INFO( cdp1869 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct CDP1869);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1869_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( cdp1869 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( cdp1869 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							/* nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( cdp1869 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							/* nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "CDP1869");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "RCA CDP1869");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CDP1869");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "RCA CDP1869");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

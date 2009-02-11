@@ -44,7 +44,6 @@
 #include "cpu/z80/z80.h"
 #include "cpu/i86/i86.h"
 #include "sound/ay8910.h"
-#include "sound/custom.h"
 #include "rendlay.h"
 #include "tx1.h"
 
@@ -546,8 +545,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tx1_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 
@@ -625,10 +623,10 @@ ADDRESS_MAP_END
 /* Common */
 static ADDRESS_MAP_START( buggyboy_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD(SOUND, "ym1", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ym1", ay8910_data_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD(SOUND, "ym2", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ym2", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 
@@ -642,10 +640,10 @@ static const ay8910_interface tx1_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	tx1_ay8910_a_w,
-	tx1_ay8910_b_w,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(tx1_ay8910_a_w),
+	DEVCB_HANDLER(tx1_ay8910_b_w),
 };
 
 
@@ -653,20 +651,20 @@ static const ay8910_interface buggyboy_ym2149_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	bb_ym1_a_w,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(bb_ym1_a_w),
+	DEVCB_NULL,
 };
 
 static const ay8910_interface buggyboy_ym2149_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	bb_ym2_a_w,
-	bb_ym2_b_w,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(bb_ym2_a_w),
+	DEVCB_HANDLER(bb_ym2_b_w),
 };
 
 
@@ -675,10 +673,10 @@ static const ay8910_interface buggybjr_ym2149_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_1_r,
-	input_port_2_r,
-	NULL,
-	NULL,
+	DEVCB_INPUT_PORT("YM2149_IC19_A"),
+	DEVCB_INPUT_PORT("YM2149_IC19_B"),
+	DEVCB_NULL,
+	DEVCB_NULL,
 };
 
 /* YM2149 IC24 */
@@ -686,24 +684,10 @@ static const ay8910_interface buggybjr_ym2149_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	bb_ym2_a_w,
-	bb_ym2_b_w,
-};
-
-static const custom_sound_interface tx1_custom_interface =
-{
-	tx1_sh_start,
-	NULL,
-	tx1_sh_reset
-};
-
-static const custom_sound_interface bb_custom_interface =
-{
-	buggyboy_sh_start,
-	NULL,
-	buggyboy_sh_reset
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(bb_ym2_a_w),
+	DEVCB_HANDLER(bb_ym2_b_w),
 };
 
 
@@ -761,8 +745,7 @@ static MACHINE_DRIVER_START( tx1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.1)
 
-	MDRV_SOUND_ADD("tx1", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(tx1_custom_interface)
+	MDRV_SOUND_ADD("tx1", TX1, 0)
 	MDRV_SOUND_ROUTE(0, "frontleft", 0.2)
 	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_DRIVER_END
@@ -817,8 +800,7 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_SOUND_CONFIG(buggyboy_ym2149_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
-	MDRV_SOUND_ADD("buggyboy", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(bb_custom_interface)
+	MDRV_SOUND_ADD("buggyboy", BUGGYBOY, 0)
 	MDRV_SOUND_ROUTE(0, "frontleft", 0.2)
 	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_DRIVER_END
@@ -869,8 +851,7 @@ static MACHINE_DRIVER_START( buggybjr )
 	MDRV_SOUND_CONFIG(buggybjr_ym2149_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
-	MDRV_SOUND_ADD("buggyboy", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(bb_custom_interface)
+	MDRV_SOUND_ADD("buggyboy", BUGGYBOY, 0)
 	MDRV_SOUND_ROUTE(0, "frontleft", 0.2)
 	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_DRIVER_END

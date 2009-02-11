@@ -337,136 +337,148 @@ static UINT32 darius_def_vol[0x10];
 static UINT8 darius_vol[DARIUS_VOL_MAX];
 static UINT8 darius_pan[DARIUS_PAN_MAX];
 
-static void update_fm0( void )
+static void update_fm0( running_machine *machine )
 {
+	const device_config *lvol = devtag_get_device(machine, SOUND, "filter0.3l");
+	const device_config *rvol = devtag_get_device(machine, SOUND, "filter0.3r");
 	int left, right;
 	left  = (        darius_pan[0]  * darius_vol[6])>>8;
 	right = ((0xff - darius_pan[0]) * darius_vol[6])>>8;
-	if (sndti_exists(SOUND_FILTER_VOLUME, 6))
-		flt_volume_set_volume(6, left / 100.0);
-	if (sndti_exists(SOUND_FILTER_VOLUME, 7))
-		flt_volume_set_volume(7, right / 100.0); /* FM #0 */
+	if (lvol != NULL)
+		flt_volume_set_volume(lvol, left / 100.0);
+	if (rvol != NULL)
+		flt_volume_set_volume(rvol, right / 100.0); /* FM #0 */
 }
 
-static void update_fm1( void )
+static void update_fm1( running_machine *machine )
 {
+	const device_config *lvol = devtag_get_device(machine, SOUND, "filter1.3l");
+	const device_config *rvol = devtag_get_device(machine, SOUND, "filter1.3r");
 	int left, right;
 	left  = (        darius_pan[1]  * darius_vol[7])>>8;
 	right = ((0xff - darius_pan[1]) * darius_vol[7])>>8;
-	if (sndti_exists(SOUND_FILTER_VOLUME, 14))
-		flt_volume_set_volume(14, left / 100.0);
-	if (sndti_exists(SOUND_FILTER_VOLUME, 15))
-		flt_volume_set_volume(15, right / 100.0); /* FM #1 */
+	if (lvol != NULL)
+		flt_volume_set_volume(lvol, left / 100.0);
+	if (rvol != NULL)
+		flt_volume_set_volume(rvol, right / 100.0); /* FM #1 */
 }
 
-static void update_psg0( int port )
+static void update_psg0( running_machine *machine, int port )
 {
+	static const char *fltname[3][2] = { { "filter0.0l", "filter0.0r" }, { "filter0.1l", "filter0.1r" }, { "filter0.2l", "filter0.2r" } };
+	const device_config *lvol = devtag_get_device(machine, SOUND, fltname[port][0]);
+	const device_config *rvol = devtag_get_device(machine, SOUND, fltname[port][1]);
 	int left, right;
 	left  = (        darius_pan[2]  * darius_vol[port])>>8;
 	right = ((0xff - darius_pan[2]) * darius_vol[port])>>8;
-	if (sndti_exists(SOUND_FILTER_VOLUME, port*2+0))
-		flt_volume_set_volume(port*2+0, left / 100.0);
-	if (sndti_exists(SOUND_FILTER_VOLUME, port*2+1))
-		flt_volume_set_volume(port*2+1, right / 100.0);
+	if (lvol != NULL)
+		flt_volume_set_volume(lvol, left / 100.0);
+	if (rvol != NULL)
+		flt_volume_set_volume(rvol, right / 100.0);
 }
 
-static void update_psg1( int port )
+static void update_psg1( running_machine *machine, int port )
 {
+	static const char *fltname[3][2] = { { "filter0.0l", "filter0.0r" }, { "filter0.1l", "filter0.1r" }, { "filter0.2l", "filter0.2r" } };
+	const device_config *lvol = devtag_get_device(machine, SOUND, fltname[port][0]);
+	const device_config *rvol = devtag_get_device(machine, SOUND, fltname[port][1]);
 	int left, right;
 	left  = (        darius_pan[3]  * darius_vol[port + 3])>>8;
 	right = ((0xff - darius_pan[3]) * darius_vol[port + 3])>>8;
-	if (sndti_exists(SOUND_FILTER_VOLUME, port*2+0+8))
-		flt_volume_set_volume(port*2+0+8, left / 100.0);
-	if (sndti_exists(SOUND_FILTER_VOLUME, port*2+1+8))
-		flt_volume_set_volume(port*2+1+8, right / 100.0);
+	if (lvol != NULL)
+		flt_volume_set_volume(lvol, left / 100.0);
+	if (rvol != NULL)
+		flt_volume_set_volume(rvol, right / 100.0);
 }
 
-static void update_da( void )
+static void update_da( running_machine *machine )
 {
+	const device_config *lvol = devtag_get_device(machine, SOUND, "msm5205.l");
+	const device_config *rvol = devtag_get_device(machine, SOUND, "msm5205.r");
 	int left, right;
 	left  = darius_def_vol[(darius_pan[4]>>4)&0x0f];
 	right = darius_def_vol[(darius_pan[4]>>0)&0x0f];
-	if (sndti_exists(SOUND_FILTER_VOLUME, 16))
-		flt_volume_set_volume(16, left / 100.0);
-	if (sndti_exists(SOUND_FILTER_VOLUME, 17))
-		flt_volume_set_volume(17, right / 100.0); /* FM #1 */
+	if (lvol != NULL)
+		flt_volume_set_volume(lvol, left / 100.0);
+	if (rvol != NULL)
+		flt_volume_set_volume(rvol, right / 100.0); /* FM #1 */
 }
 
 static WRITE8_HANDLER( darius_fm0_pan )
 {
 	darius_pan[0] = data&0xff;  /* data 0x00:right 0xff:left */
-	update_fm0();
+	update_fm0(space->machine);
 }
 
 static WRITE8_HANDLER( darius_fm1_pan )
 {
 	darius_pan[1] = data&0xff;
-	update_fm1();
+	update_fm1(space->machine);
 }
 
 static WRITE8_HANDLER( darius_psg0_pan )
 {
 	darius_pan[2] = data&0xff;
-	update_psg0( 0 );
-	update_psg0( 1 );
-	update_psg0( 2 );
+	update_psg0( space->machine, 0 );
+	update_psg0( space->machine, 1 );
+	update_psg0( space->machine, 2 );
 }
 
 static WRITE8_HANDLER( darius_psg1_pan )
 {
 	darius_pan[3] = data&0xff;
-	update_psg1( 0 );
-	update_psg1( 1 );
-	update_psg1( 2 );
+	update_psg1( space->machine, 0 );
+	update_psg1( space->machine, 1 );
+	update_psg1( space->machine, 2 );
 }
 
 static WRITE8_HANDLER( darius_da_pan )
 {
 	darius_pan[4] = data&0xff;
-	update_da();
+	update_da(space->machine);
 }
 
 /**** Mixer Control ****/
 
-static WRITE8_HANDLER( darius_write_portA0 )
+static WRITE8_DEVICE_HANDLER( darius_write_portA0 )
 {
 	// volume control FM #0 PSG #0 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", darius_pan[0], darius_pan[1], darius_pan[2], darius_pan[3], darius_pan[4] );
 	//popmessage(" A0 %02x A1 %02x B0 %02x B1 %02x", port[0], port[1], port[2], port[3] );
 	darius_vol[0] = darius_def_vol[(data>>4)&0x0f];
 	darius_vol[6] = darius_def_vol[(data>>0)&0x0f];
-	update_fm0();
-	update_psg0( 0 );
+	update_fm0(device->machine);
+	update_psg0( device->machine, 0 );
 }
 
-static WRITE8_HANDLER( darius_write_portA1 )
+static WRITE8_DEVICE_HANDLER( darius_write_portA1 )
 {
 	// volume control FM #1 PSG #1 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", darius_pan[0], darius_pan[1], darius_pan[2], darius_pan[3], darius_pan[4] );
 	darius_vol[3] = darius_def_vol[(data>>4)&0x0f];
 	darius_vol[7] = darius_def_vol[(data>>0)&0x0f];
-	update_fm1();
-	update_psg1( 0 );
+	update_fm1(device->machine);
+	update_psg1( device->machine, 0 );
 }
 
-static WRITE8_HANDLER( darius_write_portB0 )
+static WRITE8_DEVICE_HANDLER( darius_write_portB0 )
 {
 	// volume control PSG #0 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", darius_pan[0], darius_pan[1], darius_pan[2], darius_pan[3], darius_pan[4] );
 	darius_vol[1] = darius_def_vol[(data>>4)&0x0f];
 	darius_vol[2] = darius_def_vol[(data>>0)&0x0f];
-	update_psg0( 1 );
-	update_psg0( 2 );
+	update_psg0( device->machine, 1 );
+	update_psg0( device->machine, 2 );
 }
 
-static WRITE8_HANDLER( darius_write_portB1 )
+static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
 {
 	// volume control PSG #1 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", darius_pan[0], darius_pan[1], darius_pan[2], darius_pan[3], darius_pan[4] );
 	darius_vol[4] = darius_def_vol[(data>>4)&0x0f];
 	darius_vol[5] = darius_def_vol[(data>>0)&0x0f];
-	update_psg1( 1 );
-	update_psg1( 2 );
+	update_psg1( device->machine, 1 );
+	update_psg1( device->machine, 2 );
 }
 
 
@@ -477,10 +489,8 @@ static WRITE8_HANDLER( darius_write_portB1 )
 static ADDRESS_MAP_START( darius_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0x9001, 0x9001) AM_READ(ym2203_read_port_0_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(ym2203_status_port_1_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(ym2203_read_port_1_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym1", ym2203_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREAD(SOUND, "ym2", ym2203_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(SMH_NOP)
 	AM_RANGE(0xb001, 0xb001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -488,10 +498,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darius_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
@@ -555,17 +563,17 @@ static WRITE8_HANDLER ( adpcm_nmi_enable )
 	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(space->cpu) ); */
 }
 
-static WRITE8_HANDLER( adpcm_data_w )
+static WRITE8_DEVICE_HANDLER( adpcm_data_w )
 {
-	msm5205_data_w (0,   data         );
-	msm5205_reset_w(0, !(data & 0x20) );	/* my best guess, but it could be output enable as well */
+	msm5205_data_w (device,   data         );
+	msm5205_reset_w(device, !(data & 0x20) );	/* my best guess, but it could be output enable as well */
 }
 
 static ADDRESS_MAP_START( darius_sound2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(adpcm_command_read, adpcm_nmi_disable)
 	AM_RANGE(0x01, 0x01) AM_WRITE(adpcm_nmi_enable)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(readport2, adpcm_data_w)	/* readport2 ??? */
+	AM_RANGE(0x02, 0x02) AM_READ(readport2) AM_DEVWRITE(SOUND, "msm", adpcm_data_w)	/* readport2 ??? */
 	AM_RANGE(0x03, 0x03) AM_READ(readport3)	/* ??? */
 ADDRESS_MAP_END
 
@@ -793,9 +801,9 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)	/* assumes Z80 sandwiched between 68Ks */
+static void irqhandler(const device_config *device, int irq)	/* assumes Z80 sandwiched between 68Ks */
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_interface_1 =
@@ -803,10 +811,10 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,					/* portA read */
-		NULL,
-		darius_write_portA0,	/* portA write */
-		darius_write_portB0,	/* portB write */
+		DEVCB_NULL,					/* portA read */
+		DEVCB_NULL,
+		DEVCB_HANDLER(darius_write_portA0),	/* portA write */
+		DEVCB_HANDLER(darius_write_portB0),	/* portB write */
 	},
 	irqhandler
 };
@@ -816,10 +824,10 @@ static const ym2203_interface ym2203_interface_2 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,					/* portA read */
-		NULL,
-		darius_write_portA1,	/* portA write */
-		darius_write_portB1		/* portB write */
+		DEVCB_NULL,					/* portA read */
+		DEVCB_NULL,
+		DEVCB_HANDLER(darius_write_portA1),	/* portA write */
+		DEVCB_HANDLER(darius_write_portB1)		/* portB write */
 	},
 };
 

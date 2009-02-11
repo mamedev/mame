@@ -85,11 +85,7 @@ struct _bsmt2000_chip
 ***************************************************************************/
 
 /* core implementation */
-static void bsmt2000_reset(bsmt2000_chip *chip);
 static STREAM_UPDATE( bsmt2000_update );
-
-/* read/write access */
-static void bsmt2000_reg_write(bsmt2000_chip *chip, offs_t offset, UINT16 data);
 
 /* local functions */
 static void set_mode(bsmt2000_chip *chip);
@@ -98,21 +94,36 @@ static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8
 
 
 /***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE bsmt2000_chip *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_BSMT2000);
+	return (bsmt2000_chip *)device->token;
+}
+
+
+
+/***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
 
 /*-------------------------------------------------
-    SND_START( bsmt2000 ) - initialization callback
+    DEVICE_START( bsmt2000 ) - initialization callback
 -------------------------------------------------*/
 
-static SND_START( bsmt2000 )
+static DEVICE_START( bsmt2000 )
 {
-	bsmt2000_chip *chip = device->token;
+	bsmt2000_chip *chip = get_safe_token(device);
 	int voicenum;
 
 	/* create a stream at a nominal sample rate (real one specified later) */
-	chip->stream = stream_create(device, 0, 2, clock / 1000, chip, bsmt2000_update);
-	chip->clock = clock;
+	chip->stream = stream_create(device, 0, 2, device->clock / 1000, chip, bsmt2000_update);
+	chip->clock = device->clock;
 
 	/* initialize the regions */
 	chip->region_base = (INT8 *)device->region;
@@ -140,18 +151,16 @@ static SND_START( bsmt2000 )
 		state_save_register_device_item(device, voicenum, voice->rightvol);
 		state_save_register_device_item(device, voicenum, voice->fraction);
 	}
-
-	/* reset the chip -- this also configures the default mode */
-	bsmt2000_reset(chip);
 }
 
 
 /*-------------------------------------------------
-    SND_RESET( bsmt2000 ) - chip reset callback
+    DEVICE_RESET( bsmt2000 ) - chip reset callback
 -------------------------------------------------*/
 
-static void bsmt2000_reset(bsmt2000_chip *chip)
+static DEVICE_RESET( bsmt2000 )
 {
+	bsmt2000_chip *chip = get_safe_token(device);
 	int voicenum;
 
 	/* reset all the voice data */
@@ -165,11 +174,6 @@ static void bsmt2000_reset(bsmt2000_chip *chip)
 
 	/* recompute the mode */
 	set_mode(chip);
-}
-
-static SND_RESET( bsmt2000 )
-{
-	bsmt2000_reset(device->token);
 }
 
 
@@ -316,8 +320,10 @@ static STREAM_UPDATE( bsmt2000_update )
     bsmt2000_reg_write - handle a register write
 -------------------------------------------------*/
 
-static void bsmt2000_reg_write(bsmt2000_chip *chip, offs_t offset, UINT16 data)
+WRITE16_DEVICE_HANDLER( bsmt2000_data_w )
 {
+	bsmt2000_chip *chip = get_safe_token(device);
+
 	if (LOG_COMMANDS) mame_printf_debug("BSMT write: reg %02X = %04X\n", offset, data);
 
 	/* remember the last write */
@@ -339,21 +345,6 @@ static void bsmt2000_reg_write(bsmt2000_chip *chip, offs_t offset, UINT16 data)
 			chip->adpcm_delta_n = 10;
 		}
 	}
-}
-
-
-
-/***************************************************************************
-    PER-CHIP READ/WRITE HANDLERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    bsmt2000_data_0_w - write to chip 0
--------------------------------------------------*/
-
-WRITE16_HANDLER( bsmt2000_data_0_w )
-{
-	bsmt2000_reg_write(sndti_token(SOUND_BSMT2000, 0), offset, data);
 }
 
 
@@ -472,42 +463,26 @@ static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8
 ***************************************************************************/
 
 /*-------------------------------------------------
-    SND_SET_INFO( bsmt2000 ) - callback for
-    setting chip information
--------------------------------------------------*/
-
-static SND_SET_INFO( bsmt2000 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
-    SND_GET_INFO( bsmt2000 ) - callback for
+    DEVICE_GET_INFO( bsmt2000 ) - callback for
     retrieving chip information
 -------------------------------------------------*/
 
-SND_GET_INFO( bsmt2000 )
+DEVICE_GET_INFO( bsmt2000 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(bsmt2000_chip);					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(bsmt2000_chip);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( bsmt2000 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( bsmt2000 );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */										break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( bsmt2000 );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( bsmt2000 );			break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( bsmt2000 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "BSMT2000");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Data East Wavetable");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "BSMT2000");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Data East Wavetable");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

@@ -158,7 +158,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 //      logerror("PortB reading %02x from the 68K\n",data);
 	}
 	else if ((playmark_oki_control & 0x38) == 0x28) {
-		data = (okim6295_status_0_r(space,0) & 0x0f);
+		data = (okim6295_r(devtag_get_device(space->machine, SOUND, "oki"),0) & 0x0f);
 //      logerror("PortB reading %02x from the OKI status port\n",data);
 	}
 
@@ -176,7 +176,7 @@ static READ8_HANDLER( playmark_snd_flag_r )
 }
 
 
-static WRITE8_HANDLER( playmark_oki_banking_w )
+static WRITE8_DEVICE_HANDLER( playmark_oki_banking_w )
 {
 	static int old_bank = 0;
 
@@ -184,9 +184,9 @@ static WRITE8_HANDLER( playmark_oki_banking_w )
 	{
 		old_bank = data & 7;
 
-		if(((old_bank - 1) * 0x40000) < memory_region_length(space->machine, "oki"))
+		if(((old_bank - 1) * 0x40000) < memory_region_length(device->machine, "oki"))
 		{
-			okim6295_set_bank_base(0, 0x40000 * (old_bank - 1));
+			okim6295_set_bank_base(device, 0x40000 * (old_bank - 1));
 		}
 	}
 }
@@ -196,7 +196,7 @@ static WRITE8_HANDLER( playmark_oki_w )
 	playmark_oki_command = data;
 }
 
-static WRITE8_HANDLER( playmark_snd_control_w )
+static WRITE8_DEVICE_HANDLER( playmark_snd_control_w )
 {
     /*  This port controls communications to and from the 68K, and the OKI
         device.
@@ -216,7 +216,7 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 	if ((data & 0x38) == 0x18)
 	{
 //      logerror("Writing %02x to OKI1, PortC=%02x, Code=%02x\n",playmark_oki_command,playmark_oki_control,playmark_snd_command);
-		okim6295_data_0_w(space, 0, playmark_oki_command);
+		okim6295_w(device, 0, playmark_oki_command);
 	}
 }
 
@@ -341,9 +341,9 @@ ADDRESS_MAP_END
 	/* $000 - 07F  PIC16C57 Internal Data RAM */
 
 static ADDRESS_MAP_START( playmark_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_WRITE(playmark_oki_banking_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "oki", playmark_oki_banking_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, playmark_snd_control_w)
+	AM_RANGE(0x02, 0x02) AM_READ(playmark_snd_flag_r) AM_DEVWRITE(SOUND, "oki", playmark_snd_control_w)
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 

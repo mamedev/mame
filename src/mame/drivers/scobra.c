@@ -74,10 +74,10 @@ static const ay8910_interface hustler_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r,
-	frogger_portB_r,
-	NULL,
-	NULL
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_HANDLER(frogger_portB_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static READ8_DEVICE_HANDLER(scobra_type2_ppi8255_r)
@@ -406,10 +406,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scobra_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -425,15 +425,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hustlerb_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
 /* stratgyx coinage DIPs are spread accross two input ports */
@@ -923,10 +923,10 @@ static const ay8910_interface scobra_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r,
-	scramble_portB_r,
-	NULL,
-	NULL
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_HANDLER(scramble_portB_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

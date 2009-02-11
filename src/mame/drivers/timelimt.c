@@ -101,12 +101,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0x8c, 0x8c) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x8c, 0x8d) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x8d, 0x8d) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x8e, 0x8e) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x8e, 0x8f) AM_READ(ay8910_read_port_1_r)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_address_data_w)
 ADDRESS_MAP_END
 
 /***************************************************************************/
@@ -245,10 +241,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static INTERRUPT_GEN( timelimt_irq ) {

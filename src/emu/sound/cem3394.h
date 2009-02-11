@@ -30,7 +30,7 @@ enum
 };
 
 /* set the voltage going to a particular parameter */
-void cem3394_set_voltage(int chip, int input, double voltage);
+void cem3394_set_voltage(const device_config *device, int input, double voltage);
 
 /* get the translated parameter associated with the given input as follows:
     CEM3394_VCO_FREQUENCY:      frequency in Hz
@@ -41,9 +41,9 @@ void cem3394_set_voltage(int chip, int input, double voltage);
     CEM3394_FILTER_RESONANCE:   resonance, from 0.0 to 1.0
     CEM3394_FILTER_FREQENCY:    frequency, in Hz
     CEM3394_FINAL_GAIN:         gain, in dB */
-double cem3394_get_parameter(int chip, int input);
+double cem3394_get_parameter(const device_config *device, int input);
 
-SND_GET_INFO( cem3394 );
-#define SOUND_CEM3394 SND_GET_INFO_NAME( cem3394 )
+DEVICE_GET_INFO( cem3394 );
+#define SOUND_CEM3394 DEVICE_GET_INFO_NAME( cem3394 )
 
 #endif /* __CEM3394_H__ */

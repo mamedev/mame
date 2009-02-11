@@ -242,9 +242,9 @@ VIDEO_UPDATE(powerbls);
 static TIMER_CALLBACK( music_playback )
 {
 	int pattern = 0;
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *device = devtag_get_device(machine, SOUND, "oki");
 
-	if ((okim6295_status_0_r(space,0) & 0x08) == 0)
+	if ((okim6295_r(device,0) & 0x08) == 0)
 	{
 		if (sslam_bar != 0) {
 			sslam_bar += 1;
@@ -265,8 +265,8 @@ static TIMER_CALLBACK( music_playback )
 		}
 		if (pattern) {
 			logerror("Changing bar in music track to pattern %02x\n",pattern);
-			okim6295_data_0_w(space,0,(0x80 | pattern));
-			okim6295_data_0_w(space,0,0x81);
+			okim6295_w(device,0,(0x80 | pattern));
+			okim6295_w(device,0,0x81);
 		}
 	}
 //  {
@@ -276,9 +276,9 @@ static TIMER_CALLBACK( music_playback )
 }
 
 
-static void sslam_play(const address_space *space, int track, int data)
+static void sslam_play(const device_config *device, int track, int data)
 {
-	int status = okim6295_status_0_r(space,0);
+	int status = okim6295_r(device,0);
 
 	if (data < 0x80) {
 		if (track) {
@@ -286,24 +286,24 @@ static void sslam_play(const address_space *space, int track, int data)
 				sslam_track  = data;
 				sslam_bar = 1;
 				if (status & 0x08)
-					okim6295_data_0_w(space,0,0x40);
-				okim6295_data_0_w(space,0,(0x80 | data));
-				okim6295_data_0_w(space,0,0x81);
+					okim6295_w(device,0,0x40);
+				okim6295_w(device,0,(0x80 | data));
+				okim6295_w(device,0,0x81);
 				timer_adjust_periodic(music_timer, ATTOTIME_IN_MSEC(4), 0, ATTOTIME_IN_HZ(250));	/* 250Hz for smooth sequencing */
 			}
 		}
 		else {
 			if ((status & 0x01) == 0) {
-				okim6295_data_0_w(space,0,(0x80 | data));
-				okim6295_data_0_w(space,0,0x11);
+				okim6295_w(device,0,(0x80 | data));
+				okim6295_w(device,0,0x11);
 			}
 			else if ((status & 0x02) == 0) {
-				okim6295_data_0_w(space,0,(0x80 | data));
-				okim6295_data_0_w(space,0,0x21);
+				okim6295_w(device,0,(0x80 | data));
+				okim6295_w(device,0,0x21);
 			}
 			else if ((status & 0x04) == 0) {
-				okim6295_data_0_w(space,0,(0x80 | data));
-				okim6295_data_0_w(space,0,0x41);
+				okim6295_w(device,0,(0x80 | data));
+				okim6295_w(device,0,0x41);
 			}
 		}
 	}
@@ -315,20 +315,20 @@ static void sslam_play(const address_space *space, int track, int data)
 			sslam_bar = 0;
 		}
 		data &= 0x7f;
-		okim6295_data_0_w(space,0,data);
+		okim6295_w(device,0,data);
 	}
 }
 
-static WRITE16_HANDLER( sslam_snd_w )
+static WRITE16_DEVICE_HANDLER( sslam_snd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("PC:%06x Writing %04x to Sound CPU\n",cpu_get_previouspc(space->cpu),data);
+		logerror("%s Writing %04x to Sound CPU\n",cpuexec_describe_context(device->machine),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				/* This should reset the sound MCU and stop audio playback, but here, it */
 				/* chops the first coin insert. So let's only stop any playing melodies. */
-				sslam_play(space, 1, (0x80 | 0x40));		/* Stop playing the melody */
+				sslam_play(device, 1, (0x80 | 0x40));		/* Stop playing the melody */
 			}
 			else {
 				logerror("Unknown command (%02x) sent to the Sound controller\n",data);
@@ -348,13 +348,13 @@ static WRITE16_HANDLER( sslam_snd_w )
 			else if (sslam_sound >= 0x70) {
 				/* These vocals are in bank 1, but a bug in the actual MCU doesn't set the bank */
 //              if (sslam_snd_bank != 1)
-//                  okim6295_set_bank_base(0, (1 * 0x40000));
+//                  okim6295_set_bank_base(device, (1 * 0x40000));
 //              sslam_snd_bank = 1;
-				sslam_play(space, 0, sslam_sound);
+				sslam_play(device, 0, sslam_sound);
 			}
 			else if (sslam_sound >= 0x69) {
 				if (sslam_snd_bank != 2)
-					okim6295_set_bank_base(0, (2 * 0x40000));
+					okim6295_set_bank_base(device, (2 * 0x40000));
 				sslam_snd_bank = 2;
 				switch (sslam_sound)
 				{
@@ -363,18 +363,18 @@ static WRITE16_HANDLER( sslam_snd_w )
 					case 0x6c:	sslam_melody = 7; break;
 					default:	sslam_melody = 0; sslam_bar = 0; break;	/* Invalid */
 				}
-				sslam_play(space, sslam_melody, sslam_sound);
+				sslam_play(device, sslam_melody, sslam_sound);
 			}
 			else if (sslam_sound >= 0x65) {
 				if (sslam_snd_bank != 1)
-					okim6295_set_bank_base(0, (1 * 0x40000));
+					okim6295_set_bank_base(device, (1 * 0x40000));
 				sslam_snd_bank = 1;
 				sslam_melody = 4;
-				sslam_play(space, sslam_melody, sslam_sound);
+				sslam_play(device, sslam_melody, sslam_sound);
 			}
 			else if (sslam_sound >= 0x60) {
 				if (sslam_snd_bank != 0)
-					okim6295_set_bank_base(0, (0 * 0x40000));
+					okim6295_set_bank_base(device, (0 * 0x40000));
 				sslam_snd_bank = 0;
 				switch (sslam_sound)
 				{
@@ -383,10 +383,10 @@ static WRITE16_HANDLER( sslam_snd_w )
 					case 0x64:	sslam_melody = 3; break;
 					default:	sslam_melody = 0; sslam_bar = 0; break;	/* Invalid */
 				}
-				sslam_play(space, sslam_melody, sslam_sound);
+				sslam_play(device, sslam_melody, sslam_sound);
 			}
 			else {
-				sslam_play(space, 0, sslam_sound);
+				sslam_play(device, 0, sslam_sound);
 			}
 		}
 	}
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( sslam_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300018, 0x300019) AM_READ_PORT("IN4")
 	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(sslam_snd_w)
+	AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE(SOUND, "oki", sslam_snd_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM	  /* Main RAM */
 
 	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
@@ -458,7 +458,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 		data = soundlatch_r(space,0);
 	}
 	else if ((playmark_oki_control & 0x38) == 0x28) {
-		data = (okim6295_status_0_r(space,0) & 0x0f);
+		data = (okim6295_r(devtag_get_device(space->machine, SOUND, "oki"),0) & 0x0f);
 	}
 
 	return data;
@@ -478,13 +478,13 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 		if(playmark_oki_bank != ((data & 3) - 1))
 		{
 			playmark_oki_bank = (data & 3) - 1;
-			okim6295_set_bank_base(0, 0x40000 * playmark_oki_bank);
+			okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"), 0x40000 * playmark_oki_bank);
 		}
 	}
 
 	if ((data & 0x38) == 0x18)
 	{
-		okim6295_data_0_w(space, 0, playmark_oki_command);
+		okim6295_w(devtag_get_device(space->machine, SOUND, "oki"), 0, playmark_oki_command);
 	}
 
 //  !(data & 0x80) -> sound enable

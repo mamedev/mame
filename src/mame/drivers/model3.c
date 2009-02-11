@@ -1346,7 +1346,7 @@ static WRITE64_HANDLER(model3_sound_w)
 	// serial configuration writes
 	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
 	{
-		scsp_midi_in(space, 0, (data>>56)&0xff, 0);
+		scsp_midi_in(devtag_get_device(space->machine, SOUND, "scsp1"), 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
@@ -4253,9 +4253,9 @@ static WRITE16_HANDLER( model3snd_ctrl )
 
 static ADDRESS_MAP_START( model3_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1", 0) AM_BASE(&model3_soundram)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(scsp_0_r, scsp_0_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE(SOUND, "scsp1", scsp_r, scsp_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2", 0)
-	AM_RANGE(0x300000, 0x300fff) AM_READWRITE(scsp_1_r, scsp_1_w)
+	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE(SOUND, "scsp2", scsp_r, scsp_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model3snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audio", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("samples", 0)
@@ -4265,15 +4265,15 @@ ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(running_machine *machine, int irq)
+static void scsp_irq(const device_config *device, int irq)
 {
  	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpu_set_input_line(machine->cpu[1], irq, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[1], irq, ASSERT_LINE);
 	}
 	else
-		cpu_set_input_line(machine->cpu[1], -irq, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], -irq, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =

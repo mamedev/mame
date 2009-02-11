@@ -44,7 +44,8 @@
 #include "astrocde.h"
 
 
-struct astrocade_info
+typedef struct _astrocade_state astrocade_state;
+struct _astrocade_state
 {
 	sound_stream *stream;		/* sound stream */
 
@@ -69,6 +70,16 @@ struct astrocade_info
 };
 
 
+INLINE astrocade_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_ASTROCADE);
+	return (astrocade_state *)device->token;
+}
+
+
 
 /*************************************
  *
@@ -78,7 +89,7 @@ struct astrocade_info
 
 static STREAM_UPDATE( astrocade_update )
 {
-	struct astrocade_info *chip = param;
+	astrocade_state *chip = param;
 	stream_sample_t *dest = outputs[0];
 	UINT16 noise_state;
 	UINT8 master_count;
@@ -196,8 +207,10 @@ static STREAM_UPDATE( astrocade_update )
  *
  *************************************/
 
-static void astrocade_reset(struct astrocade_info *chip)
+static DEVICE_RESET( astrocade )
 {
+	astrocade_state *chip = get_safe_token(device);
+
 	memset(chip->reg, 0, sizeof(chip->reg));
 
 	chip->master_count = 0;
@@ -216,11 +229,6 @@ static void astrocade_reset(struct astrocade_info *chip)
 	chip->c_state = 0;
 }
 
-static SND_RESET( astrocade )
-{
-	astrocade_reset(device->token);
-}
-
 
 /*************************************
  *
@@ -228,7 +236,7 @@ static SND_RESET( astrocade )
  *
  *************************************/
 
-static void astrocade_state_save_register(struct astrocade_info *chip, const device_config *device)
+static void astrocade_state_save_register(astrocade_state *chip, const device_config *device)
 {
 	state_save_register_device_item_array(device, 0, chip->reg);
 
@@ -256,9 +264,9 @@ static void astrocade_state_save_register(struct astrocade_info *chip, const dev
  *
  *************************************/
 
-static SND_START( astrocade )
+static DEVICE_START( astrocade )
 {
-	struct astrocade_info *chip = device->token;
+	astrocade_state *chip = get_safe_token(device);
 	int i;
 
 	/* generate a bitswap table for the noise */
@@ -266,10 +274,10 @@ static SND_START( astrocade )
 		chip->bitswap[i] = BITSWAP8(i, 0,1,2,3,4,5,6,7);
 
 	/* allocate a stream for output */
-	chip->stream = stream_create(device, 0, 1, clock, chip, astrocade_update);
+	chip->stream = stream_create(device, 0, 1, device->clock, chip, astrocade_update);
 
 	/* reset state */
-	astrocade_reset(chip);
+	DEVICE_RESET_CALL(astrocade);
 	astrocade_state_save_register(chip, device);
 }
 
@@ -281,33 +289,20 @@ static SND_START( astrocade )
  *
  *************************************/
 
-static void astrocade_sound_w(UINT8 num, offs_t offset, UINT8 data)
+WRITE8_DEVICE_HANDLER( astrocade_sound_w )
 {
-	struct astrocade_info *chip = sndti_token(SOUND_ASTROCADE, num);
+	astrocade_state *chip = get_safe_token(device);
+
+	if ((offset & 8) != 0)
+		offset = (offset >> 8) & 7;
+	else
+		offset &= 7;
 
 	/* update */
 	stream_update(chip->stream);
 
 	/* stash the new register value */
 	chip->reg[offset & 7] = data;
-}
-
-
-WRITE8_HANDLER( astrocade_sound1_w )
-{
-	if ((offset & 8) != 0)
-		astrocade_sound_w(0, (offset >> 8) & 7, data);
-	else
-		astrocade_sound_w(0, offset & 7, data);
-}
-
-
-WRITE8_HANDLER( astrocade_sound2_w )
-{
-	if ((offset & 8) != 0)
-		astrocade_sound_w(1, (offset >> 8) & 7, data);
-	else
-		astrocade_sound_w(1, offset & 7, data);
 }
 
 
@@ -318,33 +313,22 @@ WRITE8_HANDLER( astrocade_sound2_w )
  *
  *************************************/
 
-static SND_SET_INFO( astrocade )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( astrocade )
+DEVICE_GET_INFO( astrocade )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct astrocade_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(astrocade_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( astrocade );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( astrocade );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */										break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( astrocade );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( astrocade );		break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( astrocade );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Astrocade");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Bally");							break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "2.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Astrocade");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Bally");							break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

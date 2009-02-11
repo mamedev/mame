@@ -3,6 +3,8 @@
 #ifndef __AY8910_H__
 #define __AY8910_H__
 
+#include "devcb.h"
+
 /*
 AY-3-8910A: 2 I/O ports
 AY-3-8912A: 1 I/O port
@@ -66,63 +68,25 @@ struct _ay8910_interface
 {
 	int					flags;			/* Flags */
 	int					res_load[3]; 	/* Load on channel in ohms */
-	read8_space_func	portAread;
-	read8_space_func	portBread;
-	write8_space_func	portAwrite;
-	write8_space_func	portBwrite;
+	devcb_read8			portAread;
+	devcb_read8			portBread;
+	devcb_write8		portAwrite;
+	devcb_write8		portBwrite;
 };
 
 
-void ay8910_set_volume(int chip,int channel,int volume);
+void ay8910_set_volume(const device_config *device,int channel,int volume);
 
+READ8_DEVICE_HANDLER( ay8910_r );
+WRITE8_DEVICE_HANDLER( ay8910_address_w );
+WRITE8_DEVICE_HANDLER( ay8910_data_w );
 
-READ8_HANDLER( ay8910_read_port_0_r );
-READ8_HANDLER( ay8910_read_port_1_r );
-READ8_HANDLER( ay8910_read_port_2_r );
-READ8_HANDLER( ay8910_read_port_3_r );
-READ8_HANDLER( ay8910_read_port_4_r );
-READ16_HANDLER( ay8910_read_port_0_lsb_r );
-READ16_HANDLER( ay8910_read_port_1_lsb_r );
-READ16_HANDLER( ay8910_read_port_2_lsb_r );
-READ16_HANDLER( ay8910_read_port_3_lsb_r );
-READ16_HANDLER( ay8910_read_port_4_lsb_r );
-READ16_HANDLER( ay8910_read_port_0_msb_r );
-READ16_HANDLER( ay8910_read_port_1_msb_r );
-READ16_HANDLER( ay8910_read_port_2_msb_r );
-READ16_HANDLER( ay8910_read_port_3_msb_r );
-READ16_HANDLER( ay8910_read_port_4_msb_r );
+/* use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address' */
+WRITE8_DEVICE_HANDLER( ay8910_data_address_w );
 
-WRITE8_HANDLER( ay8910_control_port_0_w );
-WRITE8_HANDLER( ay8910_control_port_1_w );
-WRITE8_HANDLER( ay8910_control_port_2_w );
-WRITE8_HANDLER( ay8910_control_port_3_w );
-WRITE8_HANDLER( ay8910_control_port_4_w );
-WRITE16_HANDLER( ay8910_control_port_0_lsb_w );
-WRITE16_HANDLER( ay8910_control_port_1_lsb_w );
-WRITE16_HANDLER( ay8910_control_port_2_lsb_w );
-WRITE16_HANDLER( ay8910_control_port_3_lsb_w );
-WRITE16_HANDLER( ay8910_control_port_4_lsb_w );
-WRITE16_HANDLER( ay8910_control_port_0_msb_w );
-WRITE16_HANDLER( ay8910_control_port_1_msb_w );
-WRITE16_HANDLER( ay8910_control_port_2_msb_w );
-WRITE16_HANDLER( ay8910_control_port_3_msb_w );
-WRITE16_HANDLER( ay8910_control_port_4_msb_w );
+/* use this when BC1 == !A0; here, BC1=0 selects 'latch address' and BC1=1 selects 'data' */
+WRITE8_DEVICE_HANDLER( ay8910_address_data_w );
 
-WRITE8_HANDLER( ay8910_write_port_0_w );
-WRITE8_HANDLER( ay8910_write_port_1_w );
-WRITE8_HANDLER( ay8910_write_port_2_w );
-WRITE8_HANDLER( ay8910_write_port_3_w );
-WRITE8_HANDLER( ay8910_write_port_4_w );
-WRITE16_HANDLER( ay8910_write_port_0_lsb_w );
-WRITE16_HANDLER( ay8910_write_port_1_lsb_w );
-WRITE16_HANDLER( ay8910_write_port_2_lsb_w );
-WRITE16_HANDLER( ay8910_write_port_3_lsb_w );
-WRITE16_HANDLER( ay8910_write_port_4_lsb_w );
-WRITE16_HANDLER( ay8910_write_port_0_msb_w );
-WRITE16_HANDLER( ay8910_write_port_1_msb_w );
-WRITE16_HANDLER( ay8910_write_port_2_msb_w );
-WRITE16_HANDLER( ay8910_write_port_3_msb_w );
-WRITE16_HANDLER( ay8910_write_port_4_msb_w );
 
 /*********** An interface for SSG of YM2203 ***********/
 
@@ -134,22 +98,22 @@ void ay8910_set_clock_ym(void *chip, int clock);
 void ay8910_write_ym(void *chip, int addr, int data);
 int ay8910_read_ym(void *chip);
 
-SND_GET_INFO( ay8910 );
-SND_GET_INFO( ay8912 );
-SND_GET_INFO( ay8913 );
-SND_GET_INFO( ay8930 );
-SND_GET_INFO( ym2149 );
-SND_GET_INFO( ym3439 );
-SND_GET_INFO( ymz284 );
-SND_GET_INFO( ymz294 );
+DEVICE_GET_INFO( ay8910 );
+DEVICE_GET_INFO( ay8912 );
+DEVICE_GET_INFO( ay8913 );
+DEVICE_GET_INFO( ay8930 );
+DEVICE_GET_INFO( ym2149 );
+DEVICE_GET_INFO( ym3439 );
+DEVICE_GET_INFO( ymz284 );
+DEVICE_GET_INFO( ymz294 );
 
-#define SOUND_AY8910 SND_GET_INFO_NAME( ay8910 )
-#define SOUND_AY8912 SND_GET_INFO_NAME( ay8912 )
-#define SOUND_AY8913 SND_GET_INFO_NAME( ay8913 )
-#define SOUND_AY8930 SND_GET_INFO_NAME( ay8930 )
-#define SOUND_YM2149 SND_GET_INFO_NAME( ym2149 )
-#define SOUND_YM3439 SND_GET_INFO_NAME( ym3439 )
-#define SOUND_YMZ284 SND_GET_INFO_NAME( ymz284 )
-#define SOUND_YMZ294 SND_GET_INFO_NAME( ymz294 )
+#define SOUND_AY8910 DEVICE_GET_INFO_NAME( ay8910 )
+#define SOUND_AY8912 DEVICE_GET_INFO_NAME( ay8912 )
+#define SOUND_AY8913 DEVICE_GET_INFO_NAME( ay8913 )
+#define SOUND_AY8930 DEVICE_GET_INFO_NAME( ay8930 )
+#define SOUND_YM2149 DEVICE_GET_INFO_NAME( ym2149 )
+#define SOUND_YM3439 DEVICE_GET_INFO_NAME( ym3439 )
+#define SOUND_YMZ284 DEVICE_GET_INFO_NAME( ymz284 )
+#define SOUND_YMZ294 DEVICE_GET_INFO_NAME( ymz294 )
 
 #endif /* __AY8910_H__ */

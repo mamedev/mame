@@ -70,26 +70,6 @@ static MACHINE_RESET( klax )
 
 /*************************************
  *
- *  Sound I/O
- *
- *************************************/
-
-static READ16_HANDLER( adpcm_r )
-{
-	return okim6295_status_0_r(space, offset) | 0xff00;
-}
-
-
-static WRITE16_HANDLER( adpcm_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6295_data_0_w(space, offset, data & 0xff);
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -99,7 +79,7 @@ static ADDRESS_MAP_START( main_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READ(atarigen_eeprom_r)
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1")
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
-	AM_RANGE(0x270000, 0x270001) AM_READ(adpcm_r)
+	AM_RANGE(0x270000, 0x270001) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -110,7 +90,7 @@ static ADDRESS_MAP_START( main_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_WRITE(atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(klax_latch_w)
-	AM_RANGE(0x270000, 0x270001) AM_WRITE(adpcm_w)
+	AM_RANGE(0x270000, 0x270001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)

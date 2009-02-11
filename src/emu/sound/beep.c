@@ -18,8 +18,8 @@
 
 #define BEEP_RATE			48000
 
-
-struct beep_sound
+typedef struct _beep_state beep_state;
+struct _beep_state
 {
 	sound_stream *stream; 	/* stream number */
 	int enable; 			/* enable beep */
@@ -27,6 +27,16 @@ struct beep_sound
 	int incr;				/* initial wave state */
 	INT16 signal;			/* current signal */
 };
+
+
+INLINE beep_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_BEEP);
+	return (beep_state *)device->token;
+}
 
 
 
@@ -38,7 +48,7 @@ struct beep_sound
 
 static STREAM_UPDATE( beep_sound_update )
 {
-	struct beep_sound *bs = (struct beep_sound *) param;
+	beep_state *bs = (beep_state *) param;
 	stream_sample_t *buffer = outputs[0];
 	INT16 signal = bs->signal;
 	int clock = 0, rate = BEEP_RATE / 2;
@@ -81,9 +91,9 @@ static STREAM_UPDATE( beep_sound_update )
  *
  *************************************/
 
-static SND_START( beep )
+static DEVICE_START( beep )
 {
-	struct beep_sound *pBeep = device->token;
+	beep_state *pBeep = get_safe_token(device);
 
 	pBeep->stream = stream_create(device, 0, 1, BEEP_RATE, pBeep, beep_sound_update );
 	pBeep->enable = 0;
@@ -100,9 +110,9 @@ static SND_START( beep )
  *
  *************************************/
 
-void beep_set_state( int num, int on )
+void beep_set_state(const device_config *device, int on)
 {
-	struct beep_sound *info = sndti_token(SOUND_BEEP, num);
+	beep_state *info = get_safe_token(device);
 
 	/* only update if new state is not the same as old state */
 	if (info->enable == on)
@@ -124,9 +134,9 @@ void beep_set_state( int num, int on )
  *
  *************************************/
 
-void beep_set_frequency(int num,int frequency)
+void beep_set_frequency(const device_config *device,int frequency)
 {
-	struct beep_sound *info = sndti_token(SOUND_BEEP, num);
+	beep_state *info = get_safe_token(device);
 
 	if (info->frequency == frequency)
 		return;
@@ -145,15 +155,15 @@ void beep_set_frequency(int num,int frequency)
  *
  *************************************/
 
-void beep_set_volume(int num, int volume)
+void beep_set_volume(const device_config *device, int volume)
 {
-	struct beep_sound *info = sndti_token(SOUND_BEEP, num);
+	beep_state *info = get_safe_token(device);
 
 	stream_update(info->stream);
 
 	volume = 100 * volume / 7;
 
-	sndti_set_output_gain(SOUND_BEEP, num, 0, volume );
+	sound_set_output_gain(device, 0, volume);
 }
 
 
@@ -162,33 +172,21 @@ void beep_set_volume(int num, int volume)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( beep )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( beep )
+DEVICE_GET_INFO( beep )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct beep_sound);		break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(beep_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( beep );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( beep );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */								break;
-		case SNDINFO_PTR_RESET:							/* nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( beep );	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Beep");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Beep");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright The MESS Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Beep");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Beep");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright The MESS Team"); break;
 	}
 }

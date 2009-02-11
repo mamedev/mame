@@ -51,7 +51,8 @@ Jan 12, 2005.  The 555 is probably an external playback frequency.
 #include "namco52.h"
 
 
-struct namco_52xx
+typedef struct _namco_52xx namco_52xx;
+struct _namco_52xx
 {
 	const namco_52xx_interface *intf;	/* pointer to our config data */
 	UINT8 *rom;			/* pointer to sample ROM */
@@ -69,12 +70,23 @@ struct namco_52xx
 	filter2_context n52_lp_filter;
 };
 
-static void namco_52xx_reset(struct namco_52xx *chip);
+
+INLINE namco_52xx *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_NAMCO_52XX);
+	return (namco_52xx *)device->token;
+}
+
+
+static void namco_52xx_reset(namco_52xx *chip);
 
 
 static STREAM_UPDATE( namco_52xx_stream_update_one )
 {
-	struct namco_52xx *chip = param;
+	namco_52xx *chip = param;
 	int i, rom_pos, whole_pb_cycles, buf;
 	stream_sample_t *buffer = outputs[0];
 
@@ -119,7 +131,7 @@ static STREAM_UPDATE( namco_52xx_stream_update_one )
 	}
 }
 
-static void namco_52xx_reset(struct namco_52xx *chip)
+static void namco_52xx_reset(namco_52xx *chip)
 {
 	chip->n52_pb_cycle = chip->n52_start = chip->n52_end = chip->n52_length = chip->n52_pos = 0;
 
@@ -127,15 +139,15 @@ static void namco_52xx_reset(struct namco_52xx *chip)
 	filter2_reset(&chip->n52_lp_filter);
 }
 
-static SND_RESET( namco_52xx )
+static DEVICE_RESET( namco_52xx )
 {
 	namco_52xx_reset(device->token);
 }
 
-static SND_START( namco_52xx )
+static DEVICE_START( namco_52xx )
 {
-	struct namco_52xx *chip = device->token;
-	int rate = clock/32;
+	namco_52xx *chip = device->token;
+	int rate = device->clock/32;
 
 	chip->intf = device->static_config;
 	chip->rom     = device->region;
@@ -144,7 +156,7 @@ static SND_START( namco_52xx )
 	if (chip->intf->play_rate == 0)
 	{
 		/* If play clock is 0 (grounded) then default to internal clock */
-		chip->n52_step = (double)clock / 384 / rate;
+		chip->n52_step = (double)device->clock / 384 / rate;
 	}
 	else
 	{
@@ -167,9 +179,9 @@ static SND_START( namco_52xx )
 }
 
 
-void namcoio_52xx_write(int data)
+void namcoio_52xx_write(const device_config *device, int data)
 {
-	struct namco_52xx *chip = sndti_token(SOUND_NAMCO_52XX, 0);
+	namco_52xx *chip = get_safe_token(device);
 	data &= 0x0f;
 
 	if (data != 0)
@@ -194,34 +206,24 @@ void namcoio_52xx_write(int data)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( namco_52xx )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( namco_52xx )
+DEVICE_GET_INFO( namco_52xx )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct namco_52xx);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(namco_52xx);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_52xx );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco_52xx );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */										break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( namco_52xx );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( namco_52xx );			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */										break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( namco_52xx );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Namco 52XX");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Namco custom");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Namco 52XX");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Namco custom");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

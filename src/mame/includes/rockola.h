@@ -9,7 +9,6 @@
 
 /*----------- defined in audio/rockola.c -----------*/
 
-extern const custom_sound_interface custom_interface;
 extern const samples_interface sasuke_samples_interface;
 extern const samples_interface vanguard_samples_interface;
 extern const samples_interface fantasy_samples_interface;
@@ -28,7 +27,9 @@ extern WRITE8_HANDLER( vanguard_speech_w );
 extern WRITE8_HANDLER( fantasy_sound_w );
 extern WRITE8_HANDLER( fantasy_speech_w );
 
-CUSTOM_START( rockola_sh_start );
+DEVICE_GET_INFO( rockola_sound );
+#define SOUND_ROCKOLA DEVICE_GET_INFO_NAME(rockola_sound)
+
 void rockola_set_music_clock(double clock_time);
 void rockola_set_music_freq(int freq);
 int rockola_music0_playing(void);

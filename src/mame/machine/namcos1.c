@@ -627,7 +627,7 @@ static READ8_HANDLER( soundram_r )
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		return namcos1_cus30_r(space,offset);
+		return namcos1_cus30_r(devtag_get_device(space->machine, SOUND, "namco"),offset);
 	}
 	else
 	{
@@ -645,7 +645,7 @@ static WRITE8_HANDLER( soundram_w )
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		namcos1_cus30_w(space,offset,data);
+		namcos1_cus30_w(devtag_get_device(space->machine, SOUND, "namco"),offset,data);
 	}
 	else
 	{

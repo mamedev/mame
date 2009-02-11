@@ -77,14 +77,14 @@ static INTERRUPT_GEN( jb_interrupt_nmi )
 }
 
 
-static READ8_HANDLER( jailbrek_speech_r ) {
-	return ( vlm5030_bsy() ? 1 : 0 );
+static READ8_DEVICE_HANDLER( jailbrek_speech_r ) {
+	return ( vlm5030_bsy(device) ? 1 : 0 );
 }
 
-static WRITE8_HANDLER( jailbrek_speech_w ) {
+static WRITE8_DEVICE_HANDLER( jailbrek_speech_w ) {
 	/* bit 0 could be latch direction like in yiear */
-	vlm5030_st( ( data >> 1 ) & 1 );
-	vlm5030_rst( ( data >> 2 ) & 1 );
+	vlm5030_st( device, ( data >> 1 ) & 1 );
+	vlm5030_rst( device, ( data >> 2 ) & 1 );
 }
 
 static ADDRESS_MAP_START( jailbrek_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -100,15 +100,15 @@ static ADDRESS_MAP_START( jailbrek_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x2043, 0x2043) AM_WRITENOP /* ??? */
     AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w) /* irq, nmi enable, screen flip */
 	AM_RANGE(0x3000, 0x307f) AM_RAM /* related to sprites? */
-	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2") AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2") AM_DEVWRITE(SOUND, "sn", sn76496_w)
 	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3") AM_WRITENOP /* mirror of the previous? */
 	AM_RANGE(0x3300, 0x3300) AM_READ_PORT("SYSTEM") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3301, 0x3301) AM_READ_PORT("P1")
 	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
 	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(jailbrek_speech_w) /* speech pins */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(vlm5030_data_w) /* speech data */
-	AM_RANGE(0x6000, 0x6000) AM_READ(jailbrek_speech_r)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(SOUND, "vlm", jailbrek_speech_w) /* speech pins */
+	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w) /* speech data */
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD(SOUND, "vlm", jailbrek_speech_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

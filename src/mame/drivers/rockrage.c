@@ -90,14 +90,14 @@ static WRITE8_HANDLER( rockrage_sh_irqtrigger_w )
 	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
 }
 
-static READ8_HANDLER( rockrage_VLM5030_busy_r ) {
-	return ( vlm5030_bsy() ? 1 : 0 );
+static READ8_DEVICE_HANDLER( rockrage_VLM5030_busy_r ) {
+	return ( vlm5030_bsy(device) ? 1 : 0 );
 }
 
-static WRITE8_HANDLER( rockrage_speech_w ) {
+static WRITE8_DEVICE_HANDLER( rockrage_speech_w ) {
 	/* bit2 = data bus enable */
-	vlm5030_rst( ( data >> 1 ) & 0x01 );
-	vlm5030_st(  ( data >> 0 ) & 0x01 );
+	vlm5030_rst( device, ( data >> 1 ) & 0x01 );
+	vlm5030_st( device, ( data >> 0 ) & 0x01 );
 }
 
 static ADDRESS_MAP_START( rockrage_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -131,18 +131,17 @@ static ADDRESS_MAP_START( rockrage_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rockrage_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x3000, 0x3000) AM_READ(rockrage_VLM5030_busy_r)/* VLM5030 */
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD(SOUND, "vlm", rockrage_VLM5030_busy_r)/* VLM5030 */
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0x6001, 0x6001) AM_READ(ym2151_status_port_0_r)	/* YM 2151 */
+	AM_RANGE(0x6000, 0x6001) AM_DEVREAD(SOUND, "ym", ym2151_r)	/* YM 2151 */
 	AM_RANGE(0x7000, 0x77ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rockrage_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(vlm5030_data_w) 			/* VLM5030 */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(rockrage_speech_w)			/* VLM5030 */
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(ym2151_register_port_0_w)	/* YM 2151 */
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(ym2151_data_port_0_w)		/* YM 2151 */
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w) 			/* VLM5030 */
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(SOUND, "vlm", rockrage_speech_w)			/* VLM5030 */
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "ym", ym2151_w)		/* YM 2151 */
 	AM_RANGE(0x7000, 0x77ff) AM_WRITE(SMH_RAM)					/* RAM */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END

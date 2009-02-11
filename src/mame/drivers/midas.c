@@ -238,8 +238,7 @@ static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb40000, 0xb40001) AM_READ( ret_ffff )
 	AM_RANGE(0xb60000, 0xb60001) AM_READ( ret_ffff )
 
-	AM_RANGE(0xb80008, 0xb80009) AM_WRITE( ymz280b_register_0_lsb_w )
-	AM_RANGE(0xb8000a, 0xb8000b) AM_READWRITE( ymz280b_status_0_lsb_r, ymz280b_data_0_lsb_w )
+	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8( SOUND, "ymz", ymz280b_r, ymz280b_w, 0x00ff )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("IN4")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("IN3")
@@ -422,7 +421,7 @@ static INPUT_PORTS_START( livequiz )
 INPUT_PORTS_END
 
 
-static void livequiz_irqhandler(running_machine *machine, int state)
+static void livequiz_irqhandler(const device_config *device, int state)
 {
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }

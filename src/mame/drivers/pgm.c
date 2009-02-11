@@ -397,7 +397,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 	if (PGMLOGERROR) logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
 
 	if(data == 0x5050) {
-		sndti_reset(SOUND_ICS2115, 0);
+		devtag_reset(space->machine, SOUND, "ics");
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 		if(0) {
@@ -435,9 +435,9 @@ static WRITE8_HANDLER( z80_l3_w )
 	soundlatch3_w(space, 0, data);
 }
 
-static void sound_irq(running_machine *machine, int level)
+static void sound_irq(const device_config *device, int level)
 {
-	cpu_set_input_line(machine->cpu[1], 0, level);
+	cpu_set_input_line(device->machine->cpu[1], 0, level);
 }
 
 static const ics2115_interface pgm_ics2115_interface = {
@@ -702,7 +702,7 @@ static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x8000, 0x8003) AM_READWRITE(ics2115_r, ics2115_w)
+	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE(SOUND, "ics", ics2115_r, ics2115_w)
 	AM_RANGE(0x8100, 0x81ff) AM_READWRITE(soundlatch3_r, z80_l3_w)
 	AM_RANGE(0x8200, 0x82ff) AM_READWRITE(soundlatch_r, soundlatch_w)
 	AM_RANGE(0x8400, 0x84ff) AM_READWRITE(soundlatch2_r, soundlatch2_w)

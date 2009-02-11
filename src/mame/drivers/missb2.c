@@ -16,7 +16,7 @@ OKI M6295 sound ROM dump is bad.
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 #include "includes/bublbobl.h"
 
 static UINT8 *bg_paletteram, *missb2_bgvram;
@@ -182,9 +182,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym3526_r, ym3526_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r) AM_WRITENOP // message for main cpu
 	AM_RANGE(0xb001, 0xb001) AM_READNOP AM_WRITE(bublbobl_sh_nmi_enable_w)	// bit 0: message pending for main cpu, bit 1: message pending for sound cpu
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w)
@@ -334,10 +333,10 @@ GFXDECODE_END
 /* Sound Interfaces */
 
 // Handler called by the 3526 emulator when the internal timers cause an IRQ
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
 	logerror("YM3526 firing an IRQ\n");
-//  cpu_set_input_line(machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(device->machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3526_interface ym3526_config =

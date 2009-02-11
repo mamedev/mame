@@ -83,31 +83,23 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_portb_w )
  *
  *************************************/
 
-static READ16_HANDLER( es5503_word_lsb_r )
+static WRITE8_DEVICE_HANDLER( mquake_es5503_w )
 {
-	return (ACCESSING_BITS_0_7) ? (es5503_reg_0_r(space, offset) | 0xff00) : 0xffff;
-}
-
-static WRITE16_HANDLER( es5503_word_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
+	// 5503 ROM is banked by the output channel (it's a handy 4-bit output from the 5503)
+	if (offset < 0xe0)
 	{
-		// 5503 ROM is banked by the output channel (it's a handy 4-bit output from the 5503)
-		if (offset < 0xe0)
+		// if it's an oscillator control register
+		if ((offset & 0xe0) == 0xa0)
 		{
-			// if it's an oscillator control register
-			if ((offset & 0xe0) == 0xa0)
+			// if not writing a "halt", set the bank
+			if (!(data & 1))
 			{
-				// if not writing a "halt", set the bank
-				if (!(data & 1))
-				{
-					es5503_set_base_0(memory_region(space->machine, "ensoniq") + ((data>>4)*0x10000));
-				}
+				es5503_set_base(device, memory_region(device->machine, "ensoniq") + ((data>>4)*0x10000));
 			}
 		}
-
-		es5503_reg_0_w(space, offset, data);
 	}
+
+	es5503_w(device, offset, data);
 }
 
 
@@ -154,7 +146,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x204000, 0x2041ff) AM_READWRITE(es5503_word_lsb_r, es5503_word_lsb_w)
+	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8(SOUND, "ensoniq", es5503_r, mquake_es5503_w, 0x00ff)
 	AM_RANGE(0x282000, 0x282001) AM_READ_PORT("SW.LO")
 	AM_RANGE(0x282002, 0x282003) AM_READ_PORT("SW.HI")
 	AM_RANGE(0x284000, 0x28400f) AM_WRITE(output_w)
@@ -316,12 +308,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const custom_sound_interface amiga_custom_interface =
-{
-	amiga_sh_start
-};
-
-
 static const es5503_interface es5503_intf =
 {
 	NULL,
@@ -333,7 +319,7 @@ static const es5503_interface es5503_intf =
 static MACHINE_RESET(mquake)
 {
 	/* set ES5503 wave memory (this is banked in 64k increments) */
-	es5503_set_base_0(memory_region(machine, "ensoniq"));
+	es5503_set_base(devtag_get_device(machine, SOUND, "ensoniq"), memory_region(machine, "ensoniq"));
 
 	MACHINE_RESET_CALL(amiga);
 }
@@ -392,8 +378,7 @@ static MACHINE_DRIVER_START( mquake )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("amiga", CUSTOM, 3579545)
-	MDRV_SOUND_CONFIG(amiga_custom_interface)
+	MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "right", 0.50)

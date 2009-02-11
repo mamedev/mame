@@ -184,9 +184,13 @@ MACHINE_RESET( balsente )
 	/* reset the noise generator */
 	memset(noise_position, 0, sizeof(noise_position));
 
+	/* find the CEM devices */
 	for (i = 0; i < ARRAY_LENGTH(cem_device); i++)
 	{
-		cem_device[i]=NULL;
+		char name[10];
+		sprintf(name, "cem%d", i+1);
+		cem_device[i] = devtag_get_device(machine, SOUND, name);
+		assert(cem_device[i] != NULL);
 	}
 
 	/* point the banks to bank 0 */
@@ -962,17 +966,17 @@ static void update_counter_0_timer(void)
 	/* find the counter with the maximum frequency */
 	/* this is used to calibrate the timers at startup */
 	for (i = 0; i < 6; i++)
-		if (cem3394_get_parameter(i, CEM3394_FINAL_GAIN) < 10.0)
+		if (cem3394_get_parameter(cem_device[i], CEM3394_FINAL_GAIN) < 10.0)
 		{
 			double tempfreq;
 
 			/* if the filter resonance is high, then they're calibrating the filter frequency */
-			if (cem3394_get_parameter(i, CEM3394_FILTER_RESONANCE) > 0.9)
-				tempfreq = cem3394_get_parameter(i, CEM3394_FILTER_FREQENCY);
+			if (cem3394_get_parameter(cem_device[i], CEM3394_FILTER_RESONANCE) > 0.9)
+				tempfreq = cem3394_get_parameter(cem_device[i], CEM3394_FILTER_FREQENCY);
 
 			/* otherwise, they're calibrating the VCO frequency */
 			else
-				tempfreq = cem3394_get_parameter(i, CEM3394_VCO_FREQUENCY);
+				tempfreq = cem3394_get_parameter(cem_device[i], CEM3394_VCO_FREQUENCY);
 
 			if (tempfreq > maxfreq) maxfreq = tempfreq;
 		}
@@ -1017,7 +1021,7 @@ WRITE8_HANDLER( balsente_counter_control_w )
 	{
 		int ch;
 		for (ch = 0; ch < 6; ch++)
-			sndti_set_output_gain(SOUND_CEM3394, ch, 0, (data & 0x01) ? 1.0 : 0);
+			sound_set_output_gain(cem_device[ch], 0, (data & 0x01) ? 1.0 : 0);
 	}
 
 	/* bit D1 is hooked to counter 0's gate */
@@ -1081,14 +1085,14 @@ WRITE8_HANDLER( balsente_chip_select_w )
 			double temp = 0;
 
 			/* remember the previous value */
-			temp = cem3394_get_parameter(i, reg);
+			temp = cem3394_get_parameter(cem_device[i], reg);
 
 			/* set the voltage */
-			cem3394_set_voltage(i, reg, voltage);
+			cem3394_set_voltage(cem_device[i], reg, voltage);
 
 			/* only log changes */
 #if LOG_CEM_WRITES
-			if (temp != cem3394_get_parameter(i, reg))
+			if (temp != cem3394_get_parameter(cem_device[i], reg))
 			{
 				static const char *const names[] =
 				{

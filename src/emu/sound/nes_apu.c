@@ -58,7 +58,8 @@
 #define  SYNCS_MAX2     0x80
 
 /* GLOBAL VARIABLES */
-struct nesapu_info
+typedef struct _nesapu_state nesapu_state;
+struct _nesapu_state
 {
 	apu_t   APU;			       /* Actual APUs */
 	float   apu_incsize;           /* Adjustment increment */
@@ -73,6 +74,15 @@ struct nesapu_info
 };
 
 
+INLINE nesapu_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_NES);
+	return (nesapu_state *)device->token;
+}
+
 /* INTERNAL FUNCTIONS */
 
 /* INITIALIZE WAVE TIMES RELATIVE TO SAMPLE RATE */
@@ -85,7 +95,7 @@ static void create_vbltimes(uint32 * table,const uint8 *vbl,unsigned int rate)
 }
 
 /* INITIALIZE SAMPLE TIMES IN TERMS OF VSYNCS */
-static void create_syncs(struct nesapu_info *info, unsigned long sps)
+static void create_syncs(nesapu_state *info, unsigned long sps)
 {
   int i;
   unsigned long val=sps;
@@ -125,7 +135,7 @@ static void create_noise(uint8 *buf, const int bits, int size)
 /* TODO: sound channels should *ALL* have DC volume decay */
 
 /* OUTPUT SQUARE WAVE SAMPLE (VALUES FROM -16 to +15) */
-static int8 apu_square(struct nesapu_info *info, square_t *chan)
+static int8 apu_square(nesapu_state *info, square_t *chan)
 {
    int env_delay;
    int sweep_delay;
@@ -200,7 +210,7 @@ static int8 apu_square(struct nesapu_info *info, square_t *chan)
 }
 
 /* OUTPUT TRIANGLE WAVE SAMPLE (VALUES FROM -16 to +15) */
-static int8 apu_triangle(struct nesapu_info *info, triangle_t *chan)
+static int8 apu_triangle(nesapu_state *info, triangle_t *chan)
 {
    int freq;
    int8 output;
@@ -258,7 +268,7 @@ static int8 apu_triangle(struct nesapu_info *info, triangle_t *chan)
 }
 
 /* OUTPUT NOISE WAVE SAMPLE (VALUES FROM -16 to +15) */
-static int8 apu_noise(struct nesapu_info *info, noise_t *chan)
+static int8 apu_noise(nesapu_state *info, noise_t *chan)
 {
    int freq, env_delay;
    uint8 outvol;
@@ -337,7 +347,7 @@ INLINE void apu_dpcmreset(dpcm_t *chan)
 
 /* OUTPUT DPCM WAVE SAMPLE (VALUES FROM -64 to +63) */
 /* TODO: centerline naughtiness */
-static int8 apu_dpcm(struct nesapu_info *info, dpcm_t *chan)
+static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 {
    int freq, bit_pos;
 
@@ -401,7 +411,7 @@ static int8 apu_dpcm(struct nesapu_info *info, dpcm_t *chan)
 }
 
 /* WRITE REGISTER VALUE */
-INLINE void apu_regwrite(struct nesapu_info *info,int address, uint8 value)
+INLINE void apu_regwrite(nesapu_state *info,int address, uint8 value)
 {
    int chan = (address & 4) ? 1 : 0;
 
@@ -598,7 +608,7 @@ logerror("invalid apu write: $%02X at $%04X\n", value, address);
 }
 
 /* UPDATE SOUND BUFFER USING CURRENT DATA */
-INLINE void apu_update(struct nesapu_info *info, stream_sample_t *buffer16, int samples)
+INLINE void apu_update(nesapu_state *info, stream_sample_t *buffer16, int samples)
 {
    int accum;
 
@@ -621,9 +631,8 @@ INLINE void apu_update(struct nesapu_info *info, stream_sample_t *buffer16, int 
 }
 
 /* READ VALUES FROM REGISTERS */
-INLINE uint8 apu_read(int chip,int address)
+INLINE uint8 apu_read(nesapu_state *info,int address)
 {
-  struct nesapu_info *info = sndti_token(SOUND_NES, chip);
   if (address == 0x0f) /*FIXED* Address $4015 has different behaviour*/
   	{
   	int readval = 0;
@@ -643,9 +652,8 @@ INLINE uint8 apu_read(int chip,int address)
 }
 
 /* WRITE VALUE TO TEMP REGISTRY AND QUEUE EVENT */
-INLINE void apu_write(int chip,int address, uint8 value)
+INLINE void apu_write(nesapu_state *info,int address, uint8 value)
 {
-  struct nesapu_info *info = sndti_token(SOUND_NES, chip);
    info->APU.regs[address]=value;
    stream_update(info->stream);
    apu_regwrite(info,address,value);
@@ -654,32 +662,30 @@ INLINE void apu_write(int chip,int address, uint8 value)
 /* EXTERNAL INTERFACE FUNCTIONS */
 
 /* REGISTER READ/WRITE FUNCTIONS */
-READ8_HANDLER( nes_psg_0_r ) {return apu_read(0,offset);}
-READ8_HANDLER( nes_psg_1_r ) {return apu_read(1,offset);}
-WRITE8_HANDLER( nes_psg_0_w ) {apu_write(0,offset,data);}
-WRITE8_HANDLER( nes_psg_1_w ) {apu_write(1,offset,data);}
+READ8_DEVICE_HANDLER( nes_psg_r ) {return apu_read(get_safe_token(device),offset);}
+WRITE8_DEVICE_HANDLER( nes_psg_w ) {apu_write(get_safe_token(device),offset,data);}
 
 /* UPDATE APU SYSTEM */
 static STREAM_UPDATE( nes_psg_update_sound )
 {
-  struct nesapu_info *info = param;
+  nesapu_state *info = param;
   apu_update(info, outputs[0], samples);
 }
 
 
 /* INITIALIZE APU SYSTEM */
-static SND_START( nesapu )
+static DEVICE_START( nesapu )
 {
 	const nes_interface *intf = device->static_config;
-	struct nesapu_info *info = device->token;
-	int rate = clock / 4;
+	nesapu_state *info = get_safe_token(device);
+	int rate = device->clock / 4;
 	int i;
 
 	/* Initialize global variables */
 	info->samps_per_sync = rate / ATTOSECONDS_TO_HZ(video_screen_get_frame_period(device->machine->primary_screen).attoseconds);
 	info->buffer_size = info->samps_per_sync;
 	info->real_rate = info->samps_per_sync * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(device->machine->primary_screen).attoseconds);
-	info->apu_incsize = (float) (clock / (float) info->real_rate);
+	info->apu_incsize = (float) (device->clock / (float) info->real_rate);
 
 	/* Use initializer calls */
 	create_noise(info->noise_lut, 13, NOISE_LONG);
@@ -755,34 +761,24 @@ static SND_START( nesapu )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( nesapu )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( nesapu )
+DEVICE_GET_INFO( nesapu )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct nesapu_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(nesapu_state);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( nesapu );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( nesapu );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( nesapu );			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "N2A03");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Nintendo custom");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);      					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team");  break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "N2A03");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Nintendo custom");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);      					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team");  break;
 	}
 }
 

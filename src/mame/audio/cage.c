@@ -57,6 +57,8 @@ static UINT16 cage_control;
 
 static UINT32 *speedup_ram;
 
+static const device_config *dmadac[DAC_BUFFER_CHANNELS];
+
 
 
 /*************************************
@@ -154,6 +156,7 @@ static WRITE32_HANDLER( speedup_w );
 void cage_init(running_machine *machine, offs_t speedup)
 {
 	attotime cage_cpu_clock_period;
+	int chan;
 
 	cage_irqhandler = NULL;
 
@@ -170,6 +173,13 @@ void cage_init(running_machine *machine, offs_t speedup)
 
 	if (speedup)
 		speedup_ram = memory_install_write32_handler(cpu_get_address_space(cage_cpu, ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
+
+	for (chan = 0; chan < DAC_BUFFER_CHANNELS; chan++)
+	{
+		char buffer[10];
+		sprintf(buffer, "dac%d", chan);
+		dmadac[chan] = devtag_get_device(machine, SOUND, buffer);
+	}
 
 	state_save_register_global(machine, cpu_to_cage_ready);
 	state_save_register_global(machine, cage_to_cpu_ready);
@@ -253,10 +263,10 @@ static void update_dma_state(const address_space *space)
 			sound_data[i % STACK_SOUND_BUFSIZE] = memory_read_dword(space, addr * 4);
 			addr += inc;
 			if (i % STACK_SOUND_BUFSIZE == STACK_SOUND_BUFSIZE - 1)
-				dmadac_transfer(0, DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);
+				dmadac_transfer(&dmadac[0], DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);
 		}
 		if (tms32031_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE != 0)
-			dmadac_transfer(0, DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, (tms32031_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE) / DAC_BUFFER_CHANNELS, sound_data);
+			dmadac_transfer(&dmadac[0], DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, (tms32031_io_regs[DMA_TRANSFER_COUNT] % STACK_SOUND_BUFSIZE) / DAC_BUFFER_CHANNELS, sound_data);
 
 		/* compute the time of the interrupt and set the timer */
 		if (!dma_timer_enabled)
@@ -333,7 +343,7 @@ static void update_timer(int which)
  *
  *************************************/
 
-static void update_serial(void)
+static void update_serial(running_machine *machine)
 {
 	attotime serial_clock_period, bit_clock_period;
 	UINT32 freq;
@@ -355,8 +365,8 @@ static void update_serial(void)
 	freq = ATTOSECONDS_TO_HZ(serial_period_per_word.attoseconds) / DAC_BUFFER_CHANNELS;
 	if (freq > 0 && freq < 100000)
 	{
-		dmadac_set_frequency(0, DAC_BUFFER_CHANNELS, freq);
-		dmadac_enable(0, DAC_BUFFER_CHANNELS, 1);
+		dmadac_set_frequency(&dmadac[0], DAC_BUFFER_CHANNELS, freq);
+		dmadac_enable(&dmadac[0], DAC_BUFFER_CHANNELS, 1);
 	}
 }
 
@@ -429,7 +439,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 		case SPORT_GLOBAL_CTL:
 		case SPORT_TIMER_CTL:
 		case SPORT_TIMER_PERIOD:
-			update_serial();
+			update_serial(space->machine);
 			break;
 	}
 }

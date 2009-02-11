@@ -2,7 +2,6 @@
 #define _SNES_H_
 
 #include "streams.h"
-#include "sound/custom.h"
 
 /*
     SNES timing theory:
@@ -493,7 +492,9 @@ extern WRITE8_HANDLER( spc_io_w );
 extern READ8_HANDLER( spc_ram_r );
 extern WRITE8_HANDLER( spc_ram_w );
 extern READ8_HANDLER( spc_ipl_r );
-extern CUSTOM_START( snes_sh_start );
+extern DEVICE_GET_INFO( snes_sound );
+#define SOUND_SNES DEVICE_GET_INFO_NAME( snes_sound )
+
 extern STREAM_UPDATE( snes_sh_update );
 
 /* Stuff from OpenSPC 0.3.99 by Brad Martin */

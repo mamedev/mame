@@ -12,13 +12,13 @@ struct _gaelcosnd_interface
 
 extern UINT16 *gaelco_sndregs;
 
-WRITE16_HANDLER( gaelcosnd_w );
-READ16_HANDLER( gaelcosnd_r );
+WRITE16_DEVICE_HANDLER( gaelcosnd_w );
+READ16_DEVICE_HANDLER( gaelcosnd_r );
 
-SND_GET_INFO( gaelco_gae1 );
-SND_GET_INFO( gaelco_cg1v );
+DEVICE_GET_INFO( gaelco_gae1 );
+DEVICE_GET_INFO( gaelco_cg1v );
 
-#define SOUND_GAELCO_GAE1 SND_GET_INFO_NAME( gaelco_gae1 )
-#define SOUND_GAELCO_CG1V SND_GET_INFO_NAME( gaelco_cg1v )
+#define SOUND_GAELCO_GAE1 DEVICE_GET_INFO_NAME( gaelco_gae1 )
+#define SOUND_GAELCO_CG1V DEVICE_GET_INFO_NAME( gaelco_cg1v )
 
 #endif /* __GALELCO_H__ */

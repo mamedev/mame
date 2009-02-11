@@ -1331,37 +1331,6 @@ static WRITE32_HANDLER( rtc_w )
 
 /*****************************************************************************/
 
-static READ32_HANDLER( sound_r )
-{
-	UINT32 r = 0;
-
-//  printf("sound_r: %08X, %08X\n", offset, mem_mask);
-
-	if (ACCESSING_BITS_24_31)	/* External RAM read */
-	{
-		r |= ymz280b_data_0_r(space, offset) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= ymz280b_status_0_r(space, offset) << 16;
-	}
-
-	return r;
-}
-
-static WRITE32_HANDLER( sound_w )
-{
-//  printf("sound_w: %08X, %08X, %08X\n", offset, data, mem_mask);
-	if (ACCESSING_BITS_24_31)
-	{
-		ymz280b_register_0_w(space, offset, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		ymz280b_data_0_w(space, offset, (data >> 16) & 0xff);
-	}
-}
-
 static const int cab_data[2] = { 0x0, 0x8 };
 static const int kbm_cab_data[2] = { 0x2, 0x8 };
 static const int ppd_cab_data[2] = { 0x1, 0x9 };
@@ -1783,7 +1752,7 @@ static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x74000000, 0x740003ff) AM_READWRITE(ppc_spu_share_r, ppc_spu_share_w) // SPU shared RAM
 	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ(cabinet_r)
 	AM_RANGE(0x7d000340, 0x7d000347) AM_READ(sensor_r)
-	AM_RANGE(0x7d000400, 0x7d000403) AM_READWRITE(sound_r, sound_w)
+	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8(SOUND, "ymz", ymz280b_r, ymz280b_w, 0xffff0000)
 	AM_RANGE(0x7d000800, 0x7d000803) AM_READ(input_r)
 	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE(flashram_r, flashram_w)
 	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE(soundflash_r, soundflash_w)
@@ -1817,19 +1786,14 @@ static READ8_DEVICE_HANDLER( soundram_r )
 	return 0;
 }
 
-static WRITE8_DEVICE_HANDLER( soundram_w )
-{
-}
-
-static void sound_irq_callback(running_machine *machine, int state)
+static void sound_irq_callback(const device_config *device, int state)
 {
 }
 
 static const ymz280b_interface ymz280b_intf =
 {
 	sound_irq_callback,			// irq
-	soundram_r,
-	soundram_w,
+	DEVCB_HANDLER(soundram_r)
 };
 
 static NVRAM_HANDLER(firebeat)
@@ -2012,7 +1976,7 @@ static MACHINE_RESET( firebeat )
 	}
 
 	SCSIGetDevice( atapi_device_data[1], &cd );
-	cdda_set_cdrom(0, cd);
+	cdda_set_cdrom(devtag_get_device(machine, SOUND, "cdda"), cd);
 }
 
 static MACHINE_DRIVER_START(firebeat)

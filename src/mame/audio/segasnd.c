@@ -192,7 +192,7 @@ static WRITE8_HANDLER( speech_p2_w )
  *
  *************************************/
 
-static void speech_drq_w(int level)
+static void speech_drq_w(const device_config *device, int level)
 {
 	speech_drq = (level == ASSERT_LINE);
 }
@@ -248,7 +248,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speech_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(speech_rom_r)
-	AM_RANGE(0x00, 0xff) AM_WRITE(sp0250_w)
+	AM_RANGE(0x00, 0xff) AM_DEVWRITE(SOUND, "speech", sp0250_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(speech_p1_r, speech_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(speech_p2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(speech_t0_r)
@@ -639,7 +639,7 @@ static STREAM_UPDATE( usb_stream_update )
 }
 
 
-static CUSTOM_START( usb_start )
+static DEVICE_START( usb_sound )
 {
 	running_machine *machine = device->machine;
 	filter_state temp;
@@ -727,9 +727,23 @@ static CUSTOM_START( usb_start )
 	state_save_register_item(machine, "usb", NULL, 0, usb.noise_filters[2].capval);
 	state_save_register_item(machine, "usb", NULL, 0, usb.noise_filters[3].capval);
 	state_save_register_item(machine, "usb", NULL, 0, usb.noise_filters[4].capval);
-
-	return usb.stream;
 }
+
+
+static DEVICE_GET_INFO( usb_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(usb_sound);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Sega Universal Sound Board");	break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+#define SOUND_USB DEVICE_GET_INFO_NAME(usb_sound)
 
 
 
@@ -898,19 +912,6 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  USB sound definitions
- *
- *************************************/
-
-static const custom_sound_interface usb_custom_interface =
-{
-    usb_start
-};
-
-
-
-/*************************************
- *
  *  USB machine drivers
  *
  *************************************/
@@ -923,8 +924,7 @@ MACHINE_DRIVER_START( sega_universal_sound_board )
 	MDRV_CPU_IO_MAP(usb_portmap, 0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("usb", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(usb_custom_interface)
+	MDRV_SOUND_ADD("usb", USB, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

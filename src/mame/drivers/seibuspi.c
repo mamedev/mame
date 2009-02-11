@@ -851,6 +851,8 @@ static WRITE32_HANDLER( ds2404_clk_w )
 
 static WRITE32_HANDLER( eeprom_w )
 {
+	const device_config *oki2 = devtag_get_device(space->machine, SOUND, "oki2");
+	
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
 		rf2_set_layer_banks(data >> 16);
@@ -860,8 +862,8 @@ static WRITE32_HANDLER( eeprom_w )
 	}
 
 	// oki banking
-	if (sndti_exists(SOUND_OKIM6295, 1))
-		okim6295_set_bank_base(1, (data & 0x4000000) ? 0x40000 : 0);
+	if (oki2 != NULL)
+		okim6295_set_bank_base(oki2, (data & 0x4000000) ? 0x40000 : 0);
 }
 
 static WRITE32_HANDLER( z80_prg_fifo_w )
@@ -906,30 +908,6 @@ static READ32_HANDLER( spi_controls2_r )
 		return input_port_read(space->machine, "SYSTEM");
 	}
 	return 0xffffffff;
-}
-
-static READ32_HANDLER( spi_6295_0_r )
-{
-	return okim6295_status_0_r(space, 0);
-}
-
-static READ32_HANDLER( spi_6295_1_r )
-{
-	return okim6295_status_1_r(space, 0);
-}
-
-static WRITE32_HANDLER( spi_6295_0_w )
-{
-	if( ACCESSING_BITS_0_7 ) {
-		okim6295_data_0_w(space, 0, data & 0xff);
-	}
-}
-
-static WRITE32_HANDLER( spi_6295_1_w )
-{
-	if( ACCESSING_BITS_0_7 ) {
-		okim6295_data_1_w(space, 0, data & 0xff);
-	}
 }
 
 /********************************************************************/
@@ -1046,7 +1024,7 @@ static ADDRESS_MAP_START( spisound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x400b, 0x400b) AM_WRITENOP			/* Unknown */
 	AM_RANGE(0x4013, 0x4013) AM_READ(z80_coin_r)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)		/* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
-	AM_RANGE(0x6000, 0x600f) AM_READWRITE(ymf271_0_r, ymf271_0_w)
+	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE(SOUND, "ymf", ymf271_r, ymf271_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
@@ -1077,18 +1055,18 @@ static WRITE8_DEVICE_HANDLER( flashrom_write )
 	}
 }
 
-static void irqhandler(running_machine *machine, int state)
+static void irqhandler(const device_config *device, int state)
 {
 	if (state)
-		cpu_set_input_line_and_vector(machine->cpu[1], 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
+		cpu_set_input_line_and_vector(device->machine->cpu[1], 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
 	else
-		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static const ymf271_interface ymf271_config =
 {
-	flashrom_read,
-	flashrom_write,
+	DEVCB_HANDLER(flashrom_read),
+	DEVCB_HANDLER(flashrom_write),
 	irqhandler
 };
 
@@ -1112,8 +1090,8 @@ static ADDRESS_MAP_START( seibu386_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE(eeprom_w)
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE(&spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x01200000, 0x01200003) AM_READWRITE(spi_6295_0_r, spi_6295_0_w)
-	AM_RANGE(0x01200004, 0x01200007) AM_READWRITE(spi_6295_1_r, spi_6295_1_w)
+	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8(SOUND, "oki1", okim6295_r, okim6295_w, 0x000000ff)
+	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8(SOUND, "oki2", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)		/* ROM location in real-mode */
 ADDRESS_MAP_END
 

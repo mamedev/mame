@@ -1482,6 +1482,8 @@ static READ16_HANDLER( taitoz_msb_sound_r )
 /**** sound pan control ****/
 static WRITE8_HANDLER( taitoz_pancontrol )
 {
+	static const char *fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
+
 //  static UINT8 taitoz_pandata[4];
 
 	offset = offset&3;
@@ -1489,7 +1491,7 @@ static WRITE8_HANDLER( taitoz_pancontrol )
 //  taitoz_pandata[offset] = data;
 //  popmessage(" pan %02x %02x %02x %02x", taitoz_pandata[0], taitoz_pandata[1], taitoz_pandata[2], taitoz_pandata[3] );
 
-	flt_volume_set_volume(offset, data / 255.0f);
+	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, fltname[offset & 3]), data / 255.0f);
 }
 
 static WRITE16_HANDLER( spacegun_pancontrol )
@@ -1694,9 +1696,7 @@ static ADDRESS_MAP_START( bshark_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10bfff) AM_READ(SMH_RAM)
 	AM_RANGE(0x110000, 0x113fff) AM_READ(sharedram_r)
 //  AM_RANGE(0x40000a, 0x40000b) AM_READ(taitoz_unknown_r)  // ???
-	AM_RANGE(0x600000, 0x600001) AM_READ(ym2610_status_port_0_a_lsb_r)
-	AM_RANGE(0x600002, 0x600003) AM_READ(ym2610_read_port_0_lsb_r)
-	AM_RANGE(0x600004, 0x600005) AM_READ(ym2610_status_port_0_b_lsb_r)
+	AM_RANGE(0x600000, 0x600007) AM_DEVREAD8(SOUND, "ym", ym2610_r, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_READ(SMH_NOP)
 	AM_RANGE(0x60000e, 0x60000f) AM_READ(SMH_NOP)
 	AM_RANGE(0x800000, 0x801fff) AM_READ(TC0150ROD_word_r)	/* "root ram" */
@@ -1707,10 +1707,7 @@ static ADDRESS_MAP_START( bshark_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x110000, 0x113fff) AM_WRITE(sharedram_w)
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(spacegun_pancontrol)  /* pan */
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(ym2610_control_port_0_a_lsb_w)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE(ym2610_data_port_0_a_lsb_w)
-	AM_RANGE(0x600004, 0x600005) AM_WRITE(ym2610_control_port_0_b_lsb_w)
-	AM_RANGE(0x600006, 0x600007) AM_WRITE(ym2610_data_port_0_b_lsb_w)
+	AM_RANGE(0x600000, 0x600007) AM_DEVWRITE8(SOUND, "ym", ym2610_w, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(SMH_NOP)	// interrupt controller?
 	AM_RANGE(0x60000e, 0x60000f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x800000, 0x801fff) AM_WRITE(TC0150ROD_word_w)	/* "root ram" */
@@ -1876,9 +1873,7 @@ static ADDRESS_MAP_START( spacegun_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20c000, 0x20ffff) AM_READ(SMH_RAM)	/* local CPUB ram */
 	AM_RANGE(0x210000, 0x21ffff) AM_READ(sharedram_r)
 	AM_RANGE(0x800000, 0x80000f) AM_READ(spacegun_input_bypass_r)
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(ym2610_status_port_0_a_lsb_r)
-	AM_RANGE(0xc00002, 0xc00003) AM_READ(ym2610_read_port_0_lsb_r)
-	AM_RANGE(0xc00004, 0xc00005) AM_READ(ym2610_status_port_0_b_lsb_r)
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVREAD8(SOUND, "ym", ym2610_r, 0x00ff)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ(SMH_NOP)
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(SMH_NOP)
 	AM_RANGE(0xf00000, 0xf00007) AM_READ(spacegun_lightgun_r)
@@ -1889,10 +1884,7 @@ static ADDRESS_MAP_START( spacegun_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20c000, 0x20ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x210000, 0x21ffff) AM_WRITE(sharedram_w)
 	AM_RANGE(0x800000, 0x80000f) AM_WRITE(spacegun_output_bypass_w)
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(ym2610_control_port_0_a_lsb_w)
-	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(ym2610_data_port_0_a_lsb_w)
-	AM_RANGE(0xc00004, 0xc00005) AM_WRITE(ym2610_control_port_0_b_lsb_w)
-	AM_RANGE(0xc00006, 0xc00007) AM_WRITE(ym2610_data_port_0_b_lsb_w)
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVWRITE8(SOUND, "ym", ym2610_w, 0x00ff)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITE(SMH_NOP)	// interrupt controller?
 	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xc20000, 0xc20007) AM_WRITE(spacegun_pancontrol)  /* pan */
@@ -1998,9 +1990,7 @@ static ADDRESS_MAP_START( z80_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(ym2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -2009,10 +1999,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(taitoz_pancontrol) /* pan */
@@ -3043,16 +3030,16 @@ Interface B is for games which lack a Z80 (Spacegun, Bshark).
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)	// assumes Z80 sandwiched between 68Ks
+static void irqhandler(const device_config *device, int irq)	// assumes Z80 sandwiched between 68Ks
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandlerb(running_machine *machine, int irq)
+static void irqhandlerb(const device_config *device, int irq)
 {
 	// DG: this is probably specific to Z80 and wrong?
-//  cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -3071,7 +3058,7 @@ static const ym2610_interface ym2610_interfaceb =
 **************************************************************/
 
 #if 0
-static int subwoofer_sh_start(const sound_config *msound)
+static DEVICE_START( subwoofer )
 {
 	/* Adjust the lowpass filter of the first three YM2610 channels */
 
@@ -3081,16 +3068,20 @@ static int subwoofer_sh_start(const sound_config *msound)
 	mixer_set_lowpass_frequency(0,20);
 	mixer_set_lowpass_frequency(1,20);
 	mixer_set_lowpass_frequency(2,20);
-
-	return 0;
 }
 
-static const custom_sound_interface subwoofer_interface =
+static DEVICE_GET_INFO( subwoofer )
 {
-	subwoofer_sh_start,
-	0, /* none */
-	0 /* none */
-};
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(subwoofer);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Subwoofer");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
 #endif
 
 
@@ -3180,7 +3171,7 @@ static MACHINE_DRIVER_START( contcirc )
 	MDRV_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 
-//  MDRV_SOUND_ADD("subwoofer", CUSTOM, subwoofer_interface)
+//  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 MACHINE_DRIVER_END
 
 
@@ -3291,7 +3282,7 @@ static MACHINE_DRIVER_START( enforce )
 	MDRV_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 
-//  MDRV_SOUND_ADD("subwoofer", CUSTOM, subwoofer_interface)
+//  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 MACHINE_DRIVER_END
 
 

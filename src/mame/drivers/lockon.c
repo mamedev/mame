@@ -207,8 +207,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x02, 0x02) AM_NOP
 ADDRESS_MAP_END
 
@@ -415,21 +414,21 @@ static WRITE8_HANDLER( sound_vol )
 	double lgain = gains[data & 0xf];
 	double rgain = gains[data >> 4];
 
-	flt_volume_set_volume(0, lgain);
-	flt_volume_set_volume(2, lgain);
-	flt_volume_set_volume(4, lgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.1l"), lgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.2l"), lgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.3l"), lgain);
 
-	flt_volume_set_volume(1, rgain);
-	flt_volume_set_volume(3, rgain);
-	flt_volume_set_volume(5, rgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.1r"), rgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.2r"), rgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.3r"), rgain);
 }
 
-static void ym2203_irq(running_machine *machine, int irq)
+static void ym2203_irq(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[SOUND_CPU], 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(device->machine->cpu[SOUND_CPU], 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static WRITE8_HANDLER( ym2203_out_b )
+static WRITE8_DEVICE_HANDLER( ym2203_out_b )
 {
 	coin_counter_w(0, data & 0x80);
 	coin_counter_w(1, data & 0x40);
@@ -444,10 +443,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_1_r,
-		NULL,
-		NULL,
-		ym2203_out_b,
+		DEVCB_INPUT_PORT("YM2203"),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(ym2203_out_b),
 	},
 	ym2203_irq
 };

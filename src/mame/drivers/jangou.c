@@ -228,25 +228,25 @@ static WRITE8_HANDLER( output_w )
 //  coin_lockout_w(0,~data & 0x20);
 }
 
-static READ8_HANDLER( input_mux_r )
+static READ8_DEVICE_HANDLER( input_mux_r )
 {
 	switch(mux_data)
 	{
-		case 0x01: return input_port_read(space->machine, "PL1_1");
-		case 0x02: return input_port_read(space->machine, "PL1_2");
-		case 0x04: return input_port_read(space->machine, "PL2_1");
-		case 0x08: return input_port_read(space->machine, "PL2_2");
-		case 0x10: return input_port_read(space->machine, "PL1_3");
-		case 0x20: return input_port_read(space->machine, "PL2_3");
+		case 0x01: return input_port_read(device->machine, "PL1_1");
+		case 0x02: return input_port_read(device->machine, "PL1_2");
+		case 0x04: return input_port_read(device->machine, "PL2_1");
+		case 0x08: return input_port_read(device->machine, "PL2_2");
+		case 0x10: return input_port_read(device->machine, "PL1_3");
+		case 0x20: return input_port_read(device->machine, "PL2_3");
 	}
 //  printf("%04x\n",mux_data);
 
 	return 0xff;
 }
 
-static READ8_HANDLER( input_system_r )
+static READ8_DEVICE_HANDLER( input_system_r )
 {
-	return input_port_read(space->machine, "SYSTEM");
+	return input_port_read(device->machine, "SYSTEM");
 }
 
 
@@ -277,7 +277,7 @@ static WRITE8_HANDLER( cvsd_w )
 static TIMER_CALLBACK( cvsd_bit_timer_callback )
 {
 	/* Data is shifted out at the MSB */
-	hc55516_digit_w(0, (cvsd_shiftreg >> 7) & 1);
+	hc55516_digit_w(devtag_get_device(machine, SOUND, "cvsd"), (cvsd_shiftreg >> 7) & 1);
 	cvsd_shiftreg <<= 1;
 
 	/* Trigger an IRQ for every 8 shifted bits */
@@ -296,11 +296,11 @@ static void jngolady_vclk_cb(const device_config *device)
 {
 	if (msm5205_vclk_toggle == 0)
 	{
-		msm5205_data_w(0, adpcm_byte >> 4);
+		msm5205_data_w(device, adpcm_byte >> 4);
 	}
 	else
 	{
-		msm5205_data_w(0, adpcm_byte & 0xf);
+		msm5205_data_w(device, adpcm_byte & 0xf);
 		cpu_set_input_line(device->machine->cpu[1], 0, HOLD_LINE);
 	}
 
@@ -350,9 +350,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x02,0x02) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x03,0x03) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ(blitter_status_r)
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
@@ -422,9 +421,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntrygrl_cpu0_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x02,0x02) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x03,0x03) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
@@ -617,10 +615,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_mux_r,
-	input_system_r,
-	NULL,
-	NULL
+	DEVCB_HANDLER(input_mux_r),
+	DEVCB_HANDLER(input_system_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const msm5205_interface msm5205_config =

@@ -221,11 +221,6 @@ static GFXDECODE_START( tiamc1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
-static const custom_sound_interface tiamc1_custom_interface =
-{
-        tiamc1_sh_start
-};
-
 
 static MACHINE_DRIVER_START( tiamc1 )
 	/* basic machine hardware */
@@ -255,8 +250,7 @@ static MACHINE_DRIVER_START( tiamc1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2x8253", CUSTOM, 16000000/9)
-	MDRV_SOUND_CONFIG(tiamc1_custom_interface)
+	MDRV_SOUND_ADD("2x8253", TIAMC1, 16000000/9)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

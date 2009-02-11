@@ -60,13 +60,13 @@ static SOUND_START( timeplt )
 /* Bit 7 comes from the QA output of the LS90 producing a sequence of   */
 /*       0, 0, 0, 0, 0, 1, 1, 1, 1, 1                                   */
 
-static READ8_HANDLER( timeplt_portB_r )
+static READ8_DEVICE_HANDLER( timeplt_portB_r )
 {
 	static const int timeplt_timer[10] =
 	{
 		0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
 	};
-	return timeplt_timer[(cputag_get_total_cycles(space->machine, "tpsound") / 512) % 10];
+	return timeplt_timer[(cputag_get_total_cycles(device->machine, "tpsound") / 512) % 10];
 }
 
 
@@ -77,24 +77,24 @@ static READ8_HANDLER( timeplt_portB_r )
  *
  *************************************/
 
-static void filter_w(int chip, int channel, int data)
+static void filter_w(const device_config *device, int data)
 {
 	int C = 0;
 
 	if (data & 1) C += 220000;	/* 220000pF = 0.220uF */
 	if (data & 2) C +=  47000;	/*  47000pF = 0.047uF */
-	filter_rc_set_RC(3*chip + channel,FLT_RC_LOWPASS, 1000,5100,0,CAP_P(C));
+	filter_rc_set_RC(device,FLT_RC_LOWPASS, 1000,5100,0,CAP_P(C));
 }
 
 
 static WRITE8_HANDLER( timeplt_filter_w )
 {
-	filter_w(0, 0, (offset >>  6) & 3);
-	filter_w(0, 1, (offset >>  8) & 3);
-	filter_w(0, 2, (offset >> 10) & 3);
-	filter_w(1, 0, (offset >>  0) & 3);
-	filter_w(1, 1, (offset >>  2) & 3);
-	filter_w(1, 2, (offset >>  4) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.0"), (offset >>  6) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.1"), (offset >>  8) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.2"), (offset >> 10) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.1.0"), (offset >>  0) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.1.1"), (offset >>  2) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.1.2"), (offset >>  4) & 3);
 }
 
 
@@ -127,10 +127,10 @@ WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 static ADDRESS_MAP_START( timeplt_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(timeplt_filter_w)
 ADDRESS_MAP_END
 
@@ -139,10 +139,10 @@ static ADDRESS_MAP_START( locomotn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(timeplt_filter_w)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
 ADDRESS_MAP_END
 
 
@@ -157,10 +157,10 @@ static const ay8910_interface timeplt_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r,
-	timeplt_portB_r,
-	NULL,
-	NULL
+	DEVCB_MEMORY_HANDLER("tpsound", PROGRAM, soundlatch_r),
+	DEVCB_HANDLER(timeplt_portB_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

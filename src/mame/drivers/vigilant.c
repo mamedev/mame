@@ -120,23 +120,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x81) AM_READWRITE(soundlatch_r, vigilant_sample_addr_w)	/* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_WRITE(m72_sample_w)			/* COUNT UP */
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE(SOUND, "dac", m72_sample_w)			/* COUNT UP */
 	AM_RANGE(0x83, 0x83) AM_WRITE(m72_sound_irq_ack_w)	/* IRQ clear */
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)	/* S ROM C */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( buccanrs_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)				/* SDRE */
 	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_sample_addr_w)	/* STL / STH */
-	AM_RANGE(0x82, 0x82) AM_WRITE(m72_sample_w)				/* COUNT UP */
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE(SOUND, "dac", m72_sample_w)				/* COUNT UP */
 	AM_RANGE(0x83, 0x83) AM_WRITE(m72_sound_irq_ack_w)		/* IRQ clear */
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)				/* S ROM C */
 ADDRESS_MAP_END
@@ -521,7 +518,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	m72_ym2151_irq_handler
 };

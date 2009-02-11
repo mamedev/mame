@@ -5,9 +5,10 @@
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "cpuintrf.h"
 #include "cdrom.h"
 #include "cdda.h"
+#include "sound.h"
+#include "driver.h"
 
 typedef struct _cdda_info cdda_info;
 struct _cdda_info
@@ -22,6 +23,15 @@ struct _cdda_info
 	UINT32				audio_samples;
 	UINT32				audio_bptr;
 };
+
+INLINE cdda_info *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_CDDA);
+	return (cdda_info *)device->token;
+}
 
 #define MAX_SECTORS ( 4 )
 
@@ -40,13 +50,13 @@ static STREAM_UPDATE( cdda_update )
 
 
 /*-------------------------------------------------
-    SND_START( cdda ) - audio start callback
+    DEVICE_START( cdda ) - audio start callback
 -------------------------------------------------*/
 
-static SND_START( cdda )
+static DEVICE_START( cdda )
 {
 	const struct CDDAinterface *intf;
-	cdda_info *info = device->token;
+	cdda_info *info = get_safe_token(device);
 
 	/* allocate an audio cache */
 	info->audio_cache = auto_malloc( CD_MAX_SECTOR_DATA * MAX_SECTORS );
@@ -71,37 +81,31 @@ static SND_START( cdda )
     given CDDA stream
 -------------------------------------------------*/
 
-void cdda_set_cdrom(int num, void *file)
+void cdda_set_cdrom(const device_config *device, void *file)
 {
-	cdda_info *info = sndti_token(SOUND_CDDA, num);
+	cdda_info *info = get_safe_token(device);
 	info->disc = (cdrom_file *)file;
 }
 
 
 /*-------------------------------------------------
-    cdda_num_from_cdrom - find the CDDA stream
+    cdda_from_cdrom - find the CDDA stream
     that references the given CD-ROM file
 -------------------------------------------------*/
 
-int cdda_num_from_cdrom(void *file)
+const device_config *cdda_from_cdrom(running_machine *machine, void *file)
 {
-	int index = 0;
-
-	do
-	{
-		cdda_info *info;
-
-		if (!sndti_exists(SOUND_CDDA, index))
-			return -1;
-
-		info = sndti_token(SOUND_CDDA, index);
-
-		if (info == NULL)
-			return -1;
-		if (info->disc == file)
-			return index;
-		index++;
-	} while (1);
+	const device_config *device;
+	
+	for (device = sound_first(machine->config); device != NULL; device = sound_next(device))
+		if (sound_get_type(device) == SOUND_CDDA)
+		{
+			cdda_info *info = get_safe_token(device);
+			if (info->disc == file)
+				return device;
+		}
+	
+	return NULL;
 }
 
 
@@ -110,9 +114,9 @@ int cdda_num_from_cdrom(void *file)
     Book audio track
 -------------------------------------------------*/
 
-void cdda_start_audio(int num, UINT32 startlba, UINT32 numblocks)
+void cdda_start_audio(const device_config *device, UINT32 startlba, UINT32 numblocks)
 {
-	cdda_info *info = sndti_token(SOUND_CDDA, num);
+	cdda_info *info = get_safe_token(device);
 
 	stream_update(info->stream);
 	info->audio_playing = TRUE;
@@ -128,9 +132,9 @@ void cdda_start_audio(int num, UINT32 startlba, UINT32 numblocks)
     audio track
 -------------------------------------------------*/
 
-void cdda_stop_audio(int num)
+void cdda_stop_audio(const device_config *device)
 {
-	cdda_info *info = sndti_token(SOUND_CDDA, num);
+	cdda_info *info = get_safe_token(device);
 
 	stream_update(info->stream);
 	info->audio_playing = FALSE;
@@ -143,9 +147,9 @@ void cdda_stop_audio(int num)
     a Red Book audio track
 -------------------------------------------------*/
 
-void cdda_pause_audio(int num, int pause)
+void cdda_pause_audio(const device_config *device, int pause)
 {
-	cdda_info *info = sndti_token(SOUND_CDDA, num);
+	cdda_info *info = get_safe_token(device);
 
 	stream_update(info->stream);
 	info->audio_pause = pause;
@@ -157,9 +161,9 @@ void cdda_pause_audio(int num, int pause)
     (physical sector) during Red Book playback
 -------------------------------------------------*/
 
-UINT32 cdda_get_audio_lba(int num)
+UINT32 cdda_get_audio_lba(const device_config *device)
 {
-	cdda_info *info = sndti_token(SOUND_CDDA, num);
+	cdda_info *info = get_safe_token(device);
 
 	stream_update(info->stream);
 	return info->audio_lba;
@@ -171,9 +175,9 @@ UINT32 cdda_get_audio_lba(int num)
     playback status
 -------------------------------------------------*/
 
-int cdda_audio_active(int num)
+int cdda_audio_active(const device_config *device)
 {
-	cdda_info *info = sndti_token(SOUND_CDDA, num);
+	cdda_info *info = get_safe_token(device);
 
 	stream_update(info->stream);
 	return info->audio_playing;
@@ -185,9 +189,9 @@ int cdda_audio_active(int num)
     playback is paused
 -------------------------------------------------*/
 
-int cdda_audio_paused(int num)
+int cdda_audio_paused(const device_config *device)
 {
-	cdda_info *info = sndti_token(SOUND_CDDA, num);
+	cdda_info *info = get_safe_token(device);
 	return info->audio_pause;
 }
 
@@ -197,9 +201,9 @@ int cdda_audio_paused(int num)
     track reached it's natural end
 -------------------------------------------------*/
 
-int cdda_audio_ended(int num)
+int cdda_audio_ended(const device_config *device)
 {
-	cdda_info *info = sndti_token(SOUND_CDDA, num);
+	cdda_info *info = get_safe_token(device);
 	return info->audio_ended_normally;
 }
 
@@ -296,34 +300,24 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( cdda )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( cdda )
+DEVICE_GET_INFO( cdda )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdda_info);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdda_info);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( cdda );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( cdda );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */								break;
-		case SNDINFO_PTR_RESET:							/* nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( cdda );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */								break;
+		case DEVINFO_FCT_RESET:							/* nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "CD/DA");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "CD Audio");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CD/DA");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "CD Audio");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

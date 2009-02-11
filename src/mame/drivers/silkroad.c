@@ -140,62 +140,13 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 	palette_set_color_rgb(space->machine,offset,pal5bit(paletteram32[offset] >> (10+16)),pal5bit(paletteram32[offset] >> (5+16)),pal5bit(paletteram32[offset] >> (0+16)));
 }
 
-/* sound I/O */
-
-static READ32_HANDLER(silk_6295_0_r)
-{
-	return okim6295_status_0_r(space, 0)<<16;
-}
-
-static WRITE32_HANDLER(silk_6295_0_w)
-{
-	if (ACCESSING_BITS_16_23)
-	{
-		okim6295_data_0_w(space, 0, (data>>16) & 0xff);
-	}
-}
-
-static READ32_HANDLER(silk_6295_1_r)
-{
-	return okim6295_status_1_r(space, 0)<<16;
-}
-
-static WRITE32_HANDLER(silk_6295_1_w)
-{
-	if (ACCESSING_BITS_16_23)
-	{
-		okim6295_data_1_w(space, 0, (data>>16) & 0xff);
-	}
-}
-
-static READ32_HANDLER(silk_ym_r)
-{
-	return ym2151_status_port_0_r(space, 0)<<16;
-}
-
-static WRITE32_HANDLER(silk_ym_regport_w)
-{
-	if (ACCESSING_BITS_16_23)
-	{
-		ym2151_register_port_0_w(space, 0, (data>>16) & 0xff);
-	}
-}
-
-static WRITE32_HANDLER(silk_ym_dataport_w)
-{
-	if (ACCESSING_BITS_16_23)
-	{
-		ym2151_data_port_0_w(space, 0, (data>>16) & 0xff);
-	}
-}
-
-static WRITE32_HANDLER(silk_6295_0_bank_w)
+static WRITE32_DEVICE_HANDLER(silk_6295_bank_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
 		int bank = (data & 0x3000000) >> 24;
 		if(bank < 3)
-			okim6295_set_bank_base(0, 0x40000 * (bank));
+			okim6295_set_bank_base(device, 0x40000 * (bank));
 	}
 }
 
@@ -217,11 +168,10 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_BASE(&silkroad_vidram3) // higher layer
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("DSW")
-	AM_RANGE(0xc00024, 0xc00027) AM_READWRITE(silk_6295_0_r, silk_6295_0_w)
-	AM_RANGE(0xc00028, 0xc0002b) AM_WRITE(silk_ym_regport_w)
-	AM_RANGE(0xc0002c, 0xc0002f) AM_READWRITE(silk_ym_r, silk_ym_dataport_w)
-	AM_RANGE(0xc00030, 0xc00033) AM_READWRITE(silk_6295_1_r, silk_6295_1_w)
-	AM_RANGE(0xc00034, 0xc00037) AM_WRITE(silk_6295_0_bank_w)
+	AM_RANGE(0xC00024, 0xC00027) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff0000)
+	AM_RANGE(0xC00028, 0xC0002f) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff0000)
+	AM_RANGE(0xC00030, 0xC00033) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff0000)
+	AM_RANGE(0xc00034, 0xc00037) AM_DEVWRITE(SOUND, "oki1", silk_6295_bank_w)
 	AM_RANGE(0xc00038, 0xc0003b) AM_WRITE(silk_coin_counter_w)
 	AM_RANGE(0xc0010c, 0xc00123) AM_WRITE(SMH_RAM) AM_BASE(&silkroad_regs)
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM

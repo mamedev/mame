@@ -173,7 +173,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "sound/3812intf.h"
+#include "sound/8950intf.h"
 
 static tilemap *tx_tilemap;
 static UINT16 *tx_vram;
@@ -392,10 +392,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff ) AM_ROM
 	AM_RANGE(0x8000, 0x9fff ) AM_RAM
-	AM_RANGE(0xa000, 0xa000 ) AM_READWRITE(y8950_status_port_0_r,y8950_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001 ) AM_READWRITE(soundport_r,y8950_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000 ) AM_READWRITE(y8950_status_port_1_r,y8950_control_port_1_w)
-	AM_RANGE(0xc001, 0xc001 ) AM_WRITE(y8950_write_port_1_w)
+	AM_RANGE(0xa001, 0xa001 ) AM_READ(soundport_r)
+	AM_RANGE(0xa000, 0xa001 ) AM_DEVREADWRITE(SOUND, "ym1", y8950_r, y8950_w)
+	AM_RANGE(0xc000, 0xc001 ) AM_DEVREADWRITE(SOUND, "ym2", y8950_r, y8950_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cybertnk )

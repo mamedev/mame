@@ -56,7 +56,8 @@ enum
 
 UINT16 *nile_sound_regs;
 
-struct nile_info
+typedef struct _nile_state nile_state;
+struct _nile_state
 {
 	sound_stream * stream;
 	UINT8 *sound_ram;
@@ -64,9 +65,19 @@ struct nile_info
 	UINT16 ctrl;
 };
 
-WRITE16_HANDLER(nile_sndctrl_w)
+INLINE nile_state *get_safe_token(const device_config *device)
 {
-	struct nile_info *info = sndti_token(SOUND_NILE, 0);
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_NILE);
+	return (nile_state *)device->token;
+}
+
+
+WRITE16_DEVICE_HANDLER( nile_sndctrl_w )
+{
+	nile_state *info = get_safe_token(device);
 	UINT16 ctrl=info->ctrl;
 
 	stream_update(info->stream);
@@ -78,18 +89,18 @@ WRITE16_HANDLER(nile_sndctrl_w)
 	ctrl^=info->ctrl;
 }
 
-READ16_HANDLER(nile_sndctrl_r)
+READ16_DEVICE_HANDLER( nile_sndctrl_r )
 {
-	struct nile_info *info = sndti_token(SOUND_NILE, 0);
+	nile_state *info = get_safe_token(device);
 
 	stream_update(info->stream);
 
 	return info->ctrl;
 }
 
-READ16_HANDLER(nile_snd_r)
+READ16_DEVICE_HANDLER( nile_snd_r )
 {
-	struct nile_info *info = sndti_token(SOUND_NILE, 0);
+	nile_state *info = get_safe_token(device);
 	int reg=offset&0xf;
 
 	stream_update(info->stream);
@@ -111,9 +122,9 @@ READ16_HANDLER(nile_snd_r)
 	return nile_sound_regs[offset];
 }
 
-WRITE16_HANDLER(nile_snd_w)
+WRITE16_DEVICE_HANDLER( nile_snd_w )
 {
-	struct nile_info *info = sndti_token(SOUND_NILE, 0);
+	nile_state *info = get_safe_token(device);
 	int v, r;
 
 	stream_update(info->stream);
@@ -133,7 +144,7 @@ WRITE16_HANDLER(nile_snd_w)
 
 static STREAM_UPDATE( nile_update )
 {
-	struct nile_info *info = param;
+	nile_state *info = param;
 	UINT8 *sound_ram = info->sound_ram;
 	int v, i, snum;
 	UINT16 *slot;
@@ -216,9 +227,9 @@ static STREAM_UPDATE( nile_update )
 	}
 }
 
-static SND_START( nile )
+static DEVICE_START( nile )
 {
-	struct nile_info *info = device->token;
+	nile_state *info = get_safe_token(device);
 
 	info->sound_ram = device->region;
 
@@ -231,34 +242,24 @@ static SND_START( nile )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( nile )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( nile )
+DEVICE_GET_INFO( nile )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct nile_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(nile_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( nile );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( nile );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */								break;
-		case SNDINFO_PTR_RESET:							/* Nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( nile );	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "NiLe");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Seta custom");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "NiLe");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Seta custom");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

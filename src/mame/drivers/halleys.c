@@ -1577,7 +1577,7 @@ static WRITE8_HANDLER( firq_ack_w )
 }
 
 
-static WRITE8_HANDLER( sndnmi_msk_w )
+static WRITE8_DEVICE_HANDLER( sndnmi_msk_w )
 {
 	sndnmi_mask = data & 1;
 }
@@ -1663,9 +1663,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4801, 0x4801) AM_READ(ay8910_read_port_1_r)
-	AM_RANGE(0x4803, 0x4803) AM_READ(ay8910_read_port_2_r)
-	AM_RANGE(0x4805, 0x4805) AM_READ(ay8910_read_port_3_r)
+	AM_RANGE(0x4801, 0x4801) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x4803, 0x4803) AM_DEVREAD(SOUND, "ay3", ay8910_r)
+	AM_RANGE(0x4805, 0x4805) AM_DEVREAD(SOUND, "ay4", ay8910_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)		// space for diagnostic ROM
 ADDRESS_MAP_END
@@ -1674,12 +1674,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x4801, 0x4801) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x4802, 0x4802) AM_WRITE(ay8910_control_port_2_w)
-	AM_RANGE(0x4803, 0x4803) AM_WRITE(ay8910_write_port_2_w)
-	AM_RANGE(0x4804, 0x4804) AM_WRITE(ay8910_control_port_3_w)
-	AM_RANGE(0x4805, 0x4805) AM_WRITE(ay8910_write_port_3_w)
+	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
+	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE(SOUND, "ay4", ay8910_address_data_w)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -1940,10 +1937,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	NULL,
-	sndnmi_msk_w // port Bwrite
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(sndnmi_msk_w) // port Bwrite
 };
 
 

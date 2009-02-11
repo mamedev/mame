@@ -144,10 +144,10 @@ WRITE16_HANDLER( rpunch_crtc_register_w );
  *
  *************************************/
 
-static void ym2151_irq_gen(running_machine *machine, int state)
+static void ym2151_irq_gen(const device_config *device, int state)
 {
 	ym2151_irq = state;
-	cpu_set_input_line(machine->cpu[1], 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -213,23 +213,23 @@ static READ16_HANDLER( sound_busy_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( upd_control_w )
+static WRITE8_DEVICE_HANDLER( upd_control_w )
 {
 	if ((data & 1) != upd_rom_bank)
 	{
-		UINT8 *snd = memory_region(space->machine, "upd");
+		UINT8 *snd = memory_region(device->machine, "upd");
 		upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (upd_rom_bank + 1), 0x20000);
 	}
-	upd7759_reset_w(0, data >> 7);
+	upd7759_reset_w(device, data >> 7);
 }
 
 
-static WRITE8_HANDLER( upd_data_w )
+static WRITE8_DEVICE_HANDLER( upd_data_w )
 {
-	upd7759_port_w(0, data);
-	upd7759_start_w(0, 0);
-	upd7759_start_w(0, 1);
+	upd7759_port_w(device, 0, data);
+	upd7759_start_w(device, 0);
+	upd7759_start_w(device, 1);
 }
 
 
@@ -281,7 +281,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xf001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREAD(SOUND, "ym", ym2151_r)
 	AM_RANGE(0xf200, 0xf200) AM_READ(sound_command_r)
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -289,10 +289,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(upd_control_w)
-	AM_RANGE(0xf600, 0xf600) AM_WRITE(upd_data_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE(SOUND, "upd", upd_control_w)
+	AM_RANGE(0xf600, 0xf600) AM_DEVWRITE(SOUND, "upd", upd_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 

@@ -10,20 +10,20 @@ struct _vlm5030_interface
 };
 
 /* set speech rom address */
-void vlm5030_set_rom(void *speech_rom);
+void vlm5030_set_rom(const device_config *device, void *speech_rom);
 
 /* get BSY pin level */
-int vlm5030_bsy(void);
+int vlm5030_bsy(const device_config *device);
 /* latch contoll data */
-WRITE8_HANDLER( vlm5030_data_w );
+WRITE8_DEVICE_HANDLER( vlm5030_data_w );
 /* set RST pin level : reset / set table address A8-A15 */
-void vlm5030_rst (int pin );
+void vlm5030_rst (const device_config *device, int pin );
 /* set VCU pin level : ?? unknown */
-void vlm5030_vcu(int pin );
+void vlm5030_vcu(const device_config *device, int pin );
 /* set ST pin level  : set table address A0-A7 / start speech */
-void vlm5030_st(int pin );
+void vlm5030_st(const device_config *device, int pin );
 
-SND_GET_INFO( vlm5030 );
-#define SOUND_VLM5030 SND_GET_INFO_NAME( vlm5030 )
+DEVICE_GET_INFO( vlm5030 );
+#define SOUND_VLM5030 DEVICE_GET_INFO_NAME( vlm5030 )
 
 #endif /* __VLM5030_H__ */

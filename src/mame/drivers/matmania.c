@@ -36,7 +36,7 @@ The driver has been updated accordingly.
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 #include "includes/matmania.h"
 
 static WRITE8_HANDLER( matmania_sh_command_w )
@@ -44,12 +44,6 @@ static WRITE8_HANDLER( matmania_sh_command_w )
 	soundlatch_w(space,offset,data);
 	cpu_set_input_line(space->machine->cpu[1],M6502_IRQ_LINE,HOLD_LINE);
 }
-
-static WRITE8_HANDLER( matmania_dac_w )
-{
-	dac_signed_data_w(0,data);
-}
-
 
 static WRITE8_HANDLER( maniach_sh_command_w )
 {
@@ -126,11 +120,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x2003, 0x2003) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x2004, 0x2004) AM_WRITE(matmania_dac_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
+	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE(SOUND, "dac", dac_signed_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -142,9 +134,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniach_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym3526_control_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym3526_write_port_0_w)
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(matmania_dac_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE(SOUND, "ym", ym3526_w)
+	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE(SOUND, "dac", dac_signed_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -362,9 +353,9 @@ MACHINE_DRIVER_END
 
 
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],1,linestate);
+	cpu_set_input_line(device->machine->cpu[1],1,linestate);
 }
 
 static const ym3526_interface ym3526_config =

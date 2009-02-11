@@ -71,9 +71,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
-	AM_RANGE(0xf810, 0xf810) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0xf811, 0xf811) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE(SOUND, "ym", ym3812_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(SMH_NOP, SMH_NOP)	/* irq ack ?? */
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -195,9 +194,9 @@ GFXDECODE_END
 
 
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate);
+	cpu_set_input_line(device->machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =

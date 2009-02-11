@@ -72,6 +72,7 @@ typedef struct {
 typedef struct {
 	sound_stream *stream;
 	const device_config *device;
+	const device_config *cpudevice;
     UINT8 select;
     UINT8 balance;
     UINT8 lfo_frequency;
@@ -81,6 +82,16 @@ typedef struct {
     UINT32 noise_freq_tab[32];
     UINT32 wave_freq_tab[4096];
 } c6280_t;
+
+INLINE c6280_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_C6280);
+	return (c6280_t *)device->token;
+}
+
 
 /* only needed for io_buffer */
 #include "cpu/h6280/h6280.h"
@@ -98,6 +109,9 @@ static void c6280_init(const device_config *device, c6280_t *p, double clk, doub
     memset(p, 0, sizeof(c6280_t));
 
     p->device = device;
+    p->cpudevice = cputag_get_cpu(device->machine, device->tag);
+    if (p->cpudevice == NULL)
+    	fatalerror("c6280_init: no CPU found with tag of '%s'\n", device->tag);
 
     /* Make waveform frequency table */
     for(i = 0; i < 4096; i += 1)
@@ -307,21 +321,30 @@ static STREAM_UPDATE( c6280_update )
 /* MAME specific code                                                       */
 /*--------------------------------------------------------------------------*/
 
-static SND_START( c6280 )
+static DEVICE_START( c6280 )
 {
-    int rate = clock/16;
-    c6280_t *info = device->token;
+    int rate = device->clock/16;
+    c6280_t *info = get_safe_token(device);
 
     /* Initialize PSG emulator */
-    c6280_init(device, info, clock, rate);
+    c6280_init(device, info, device->clock, rate);
 
     /* Create stereo stream */
     info->stream = stream_create(device, 0, 2, rate, info, c6280_update);
 }
 
-READ8_HANDLER( c6280_r ) { return h6280io_get_buffer((device_config*)space->cpu); }
-WRITE8_HANDLER( c6280_0_w ) {  h6280io_set_buffer((device_config*)space->cpu, data); c6280_write(sndti_token(SOUND_C6280, 0),offset,data); }
-WRITE8_HANDLER( c6280_1_w ) {  h6280io_set_buffer((device_config*)space->cpu, data); c6280_write(sndti_token(SOUND_C6280, 1),offset,data); }
+READ8_DEVICE_HANDLER( c6280_r )
+{
+    c6280_t *info = get_safe_token(device);
+	return h6280io_get_buffer(info->cpudevice);
+}
+
+WRITE8_DEVICE_HANDLER( c6280_w )
+{
+    c6280_t *info = get_safe_token(device);
+	h6280io_set_buffer(info->cpudevice, data); 
+	c6280_write(info, offset, data);
+}
 
 
 
@@ -329,34 +352,24 @@ WRITE8_HANDLER( c6280_1_w ) {  h6280io_set_buffer((device_config*)space->cpu, da
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( c6280 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( c6280 )
+DEVICE_GET_INFO( c6280 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(c6280_t);						break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c6280_t);						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c6280 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( c6280 );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							/* nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( c6280 );			break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							/* nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "HuC6280");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "????");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "HuC6280");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "????");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

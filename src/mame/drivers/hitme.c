@@ -180,7 +180,7 @@ static READ8_HANDLER( hitme_port_3_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( output_port_0_w )
+static WRITE8_DEVICE_HANDLER( output_port_0_w )
 {
 	/*
         Note: We compute the timeout time on a write here. Unfortunately, the situation is
@@ -188,20 +188,20 @@ static WRITE8_HANDLER( output_port_0_w )
         In fact, it is very important that our timing calculation timeout AFTER the sound
         system's equivalent computation, or else we will hang notes.
     */
-	UINT8 raw_game_speed = input_port_read(space->machine, "R3");
+	UINT8 raw_game_speed = input_port_read(device->machine, "R3");
 	double resistance = raw_game_speed * 25000 / 100;
 	attotime duration = attotime_make(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data+1));
-	timeout_time = attotime_add(timer_get_time(space->machine), duration);
+	timeout_time = attotime_add(timer_get_time(device->machine), duration);
 
-	discrete_sound_w(space, HITME_DOWNCOUNT_VAL, data);
-	discrete_sound_w(space, HITME_OUT0, 1);
+	discrete_sound_w(device, HITME_DOWNCOUNT_VAL, data);
+	discrete_sound_w(device, HITME_OUT0, 1);
 }
 
 
-static WRITE8_HANDLER( output_port_1_w )
+static WRITE8_DEVICE_HANDLER( output_port_1_w )
 {
-	discrete_sound_w(space, HITME_ENABLE_VAL, data);
-	discrete_sound_w(space, HITME_OUT1, 1);
+	discrete_sound_w(device, HITME_ENABLE_VAL, data);
+	discrete_sound_w(device, HITME_OUT1, 1);
 }
 
 
@@ -230,8 +230,8 @@ static ADDRESS_MAP_START( hitme_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1700, 0x17ff) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x1800, 0x18ff) AM_READ_PORT("IN4")
 	AM_RANGE(0x1900, 0x19ff) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(output_port_0_w)
-	AM_RANGE(0x1e00, 0x1fff) AM_WRITE(output_port_1_w)
+	AM_RANGE(0x1d00, 0x1dff) AM_DEVWRITE(SOUND, "discrete", output_port_0_w)
+	AM_RANGE(0x1e00, 0x1fff) AM_DEVWRITE(SOUND, "discrete", output_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -242,8 +242,8 @@ static ADDRESS_MAP_START( hitme_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x17, 0x17) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("IN4")
 	AM_RANGE(0x19, 0x19) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d, 0x1d) AM_WRITE(output_port_0_w)
-	AM_RANGE(0x1e, 0x1f) AM_WRITE(output_port_1_w)
+	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE(SOUND, "discrete", output_port_0_w)
+	AM_RANGE(0x1e, 0x1f) AM_DEVWRITE(SOUND, "discrete", output_port_1_w)
 ADDRESS_MAP_END
 
 

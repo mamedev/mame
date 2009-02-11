@@ -846,9 +846,9 @@ static READ8_HANDLER( driveout_sound_command_r)
 
 static INT32 oki_bank = 0;
 
-static void reset_driveout_sound_region(void)
+static void reset_driveout_sound_region(running_machine *machine)
 {
-	okim6295_set_bank_base(0, oki_bank*0x40000);
+	okim6295_set_bank_base(devtag_get_device(machine, SOUND, "oki"), oki_bank*0x40000);
 }
 
 static WRITE8_HANDLER (oki_bank_w)
@@ -857,7 +857,7 @@ static WRITE8_HANDLER (oki_bank_w)
 	{
 		oki_bank = (data&3);
 	}
-	reset_driveout_sound_region();
+	reset_driveout_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER ( driveout_sound_command_w )
@@ -1668,9 +1668,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(ym2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -1679,10 +1677,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -1698,28 +1693,27 @@ static ADDRESS_MAP_START( camltrya_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)	// I can't see a bank control, but there ARE some bytes past 0x8000
 //  AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD(SOUND, "oki", okim6295_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camltrya_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE(unknown_w)    // probably controlling sample player?
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(okim6295_data_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driveout_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(driveout_sound_command_r)
 ADDRESS_MAP_END
 
@@ -1727,7 +1721,7 @@ static ADDRESS_MAP_START( driveout_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -3659,9 +3653,9 @@ GFXDECODE_END
 
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -3670,7 +3664,7 @@ static const ym2610_interface ym2610_config =
 };
 
 
-static WRITE8_HANDLER( camltrya_porta_w )
+static WRITE8_DEVICE_HANDLER( camltrya_porta_w )
 {
 	// Implement //
 }
@@ -3680,10 +3674,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,				/* portA read */
-		NULL,
-		camltrya_porta_w,	/* portA write - not implemented */
-		NULL,				/* portB write */
+		DEVCB_NULL,				/* portA read */
+		DEVCB_NULL,
+		DEVCB_HANDLER(camltrya_porta_w),	/* portA write - not implemented */
+		DEVCB_NULL,				/* portB write */
 	},
 	irq_handler
 };
@@ -5807,7 +5801,7 @@ static DRIVER_INIT( mjnquest )
 
 static STATE_POSTLOAD( driveout_postload )
 {
-	reset_driveout_sound_region();
+	reset_driveout_sound_region(machine);
 }
 
 static DRIVER_INIT( driveout )

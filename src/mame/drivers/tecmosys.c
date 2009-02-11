@@ -566,17 +566,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ymf262_status_0_r, ymf262_register_a_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ymf262_data_a_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ymf262_register_b_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ymf262_data_b_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(SOUND, "ymf", ymf262_r, ymf262_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x60, 0x60) AM_READWRITE(ymz280b_status_0_r, ymz280b_register_0_w)
-	AM_RANGE(0x61, 0x61) AM_WRITE(ymz280b_data_0_w)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE(SOUND, "ymz", ymz280b_r, ymz280b_w)
 ADDRESS_MAP_END
 
 
@@ -889,10 +885,10 @@ static VIDEO_UPDATE(deroon)
 */
 
 
-static void sound_irq(running_machine *machine, int irq)
+static void sound_irq(const device_config *device, int irq)
 {
 	/* IRQ */
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf262_interface tecmosys_ymf262_interface =

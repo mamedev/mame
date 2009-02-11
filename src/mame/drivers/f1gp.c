@@ -198,10 +198,7 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w)	// f1gp
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w)	// f1gp2
 	AM_RANGE(0x14, 0x14) AM_READWRITE(soundlatch_r, pending_command_clear_w)
-	AM_RANGE(0x18, 0x18) AM_READWRITE(ym2610_status_port_0_a_r, ym2610_control_port_0_a_w)
-	AM_RANGE(0x19, 0x19) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0x1a, 0x1a) AM_READWRITE(ym2610_status_port_0_b_r, ym2610_control_port_0_b_w)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(SOUND, "ym", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( f1gpb_misc_w )
@@ -253,7 +250,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_READNOP //?
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITENOP
 	AM_RANGE(0xfff00a, 0xfff00b) AM_RAM AM_BASE(&f1gpb_fgregs)
-	AM_RANGE(0xfff00e, 0xfff00f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0xfff00e, 0xfff00f) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
 	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
 	AM_RANGE(0xfff020, 0xfff023) AM_RAM //?
@@ -458,9 +455,9 @@ GFXDECODE_END
 
 
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

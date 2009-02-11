@@ -30,7 +30,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 
 WRITE8_HANDLER( galivan_scrollx_w );
 WRITE8_HANDLER( galivan_scrolly_w );
@@ -165,10 +165,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym3526_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym3526_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(dac_0_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(dac_1_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ym", ym3526_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "dac1", dac_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "dac2", dac_w)
 /*  AM_RANGE(0x04, 0x04) AM_READ(SMH_NOP)    value read and *discarded*    */
 	AM_RANGE(0x06, 0x06) AM_READ(galivan_sound_command_r)
 ADDRESS_MAP_END

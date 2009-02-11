@@ -344,7 +344,7 @@ static void on_scorpion2_reset(running_machine *machine)
 
 	e2ram_reset();
 
-	sndti_reset(SOUND_YM2413, 0);
+	devtag_reset(machine, SOUND, "ym");
 
   // reset stepper motors /////////////////////////////////////////////////
 	{
@@ -703,36 +703,38 @@ static WRITE8_HANDLER( volume_override_w )
 
 	if ( old != volume_override )
 	{
+		const device_config *ym = devtag_get_device(space->machine, SOUND, "ym");
+		const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
 		float percent = volume_override? 1.0f : (32-global_volume)/32.0f;
 
-		sndti_set_output_gain(SOUND_YM2413,  0, 0, percent);
-		sndti_set_output_gain(SOUND_YM2413,  0, 1, percent);
-		sndti_set_output_gain(SOUND_UPD7759, 0, 0, percent);
+		sound_set_output_gain(ym, 0, percent);
+		sound_set_output_gain(ym, 1, percent);
+		sound_set_output_gain(upd, 0, percent);
 	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( nec_reset_w )
+static WRITE8_DEVICE_HANDLER( nec_reset_w )
 {
-	upd7759_start_w(0, 0);
-	upd7759_reset_w(0, data);
+	upd7759_start_w(device, 0);
+	upd7759_reset_w(device, data);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( nec_latch_w )
+static WRITE8_DEVICE_HANDLER( nec_latch_w )
 {
 	int bank = 0;
 
 	if ( data & 0x80 )         bank |= 0x01;
 	if ( expansion_latch & 2 ) bank |= 0x02;
 
-	upd7759_set_bank_base(0, bank*0x20000);
+	upd7759_set_bank_base(device, bank*0x20000);
 
-	upd7759_port_w(0, data&0x3F);	// setup sample
-	upd7759_start_w(0, 0);
-	upd7759_start_w(0, 1);
+	upd7759_port_w(device, 0, data&0x3F);	// setup sample
+	upd7759_start_w(device, 0);
+	upd7759_start_w(device, 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -779,7 +781,7 @@ static READ8_HANDLER( vfd_status_hop_r )	// on video games, hopper inputs are co
 		}
 	}
 
-	if ( !upd7759_busy_r(0) ) result |= 0x80;			  // update sound busy input
+	if ( !upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd")) ) result |= 0x80;			  // update sound busy input
 
 	return result;
 }
@@ -815,11 +817,13 @@ static WRITE8_HANDLER( expansion_latch_w )
 			}
 
 			{
+				const device_config *ym = devtag_get_device(space->machine, SOUND, "ym");
+				const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
 				float percent = volume_override ? 1.0f : (32-global_volume)/32.0f;
 
-				sndti_set_output_gain(SOUND_YM2413,  0, 0, percent);
-				sndti_set_output_gain(SOUND_YM2413,  0, 1, percent);
-				sndti_set_output_gain(SOUND_UPD7759, 0, 0, percent);
+				sound_set_output_gain(ym, 0, percent);
+				sound_set_output_gain(ym, 1, percent);
+				sound_set_output_gain(upd, 0, percent);
 			}
 		}
 	}
@@ -1542,11 +1546,10 @@ static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)			// vfd1 data
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)			// vfd1+vfd2 reset line
 
-	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)			// this is where it reads?
-	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)			// upd7759 reset line
+	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)			// this is where it reads?
+	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE(SOUND, "upd", nec_reset_w)			// upd7759 reset line
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)				// custom chip unlock
-	AM_RANGE(0x2D00, 0x2D00) AM_WRITE(ym2413_register_port_0_w)
-	AM_RANGE(0x2D01, 0x2D01) AM_WRITE(ym2413_data_port_0_w)
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE(SOUND, "ym", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)			// write bank (rom page select for 0x6000 - 0x7fff )
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)			// vfd2 data
 
@@ -2728,7 +2731,7 @@ static READ8_HANDLER( vfd_status_r )
 
 	int result = optic_pattern;
 
-	if ( !upd7759_busy_r(0) ) result |= 0x80;
+	if ( !upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd")) ) result |= 0x80;
 
 	return result;
 }
@@ -2742,7 +2745,7 @@ static READ8_HANDLER( vfd_status_dm01_r )
 
 	int result = optic_pattern;
 
-	if ( !upd7759_busy_r(0) ) result |= 0x80;
+	if ( !upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd")) ) result |= 0x80;
 
 	if ( BFM_dm01_busy() ) result |= 0x40;
 
@@ -2843,11 +2846,10 @@ static ADDRESS_MAP_START( sc2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)					/* vfd1 data */
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)					/* vfd1+vfd2 reset line */
 
-	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)
-	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)
+	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)
+	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE(SOUND, "upd", nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)						/* custom chip unlock */
-	AM_RANGE(0x2D00, 0x2D00) AM_WRITE(ym2413_register_port_0_w)
-	AM_RANGE(0x2D01, 0x2D01) AM_WRITE(ym2413_data_port_0_w)
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE(SOUND, "ym", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)					/* vfd2 data */
 
@@ -2893,11 +2895,10 @@ static ADDRESS_MAP_START( sc3_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)
 
-	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)
-	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)
+	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)
+	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE(SOUND, "upd", nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)
-	AM_RANGE(0x2D00, 0x2D00) AM_WRITE(ym2413_register_port_0_w)
-	AM_RANGE(0x2D01, 0x2D01) AM_WRITE(ym2413_data_port_0_w)
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE(SOUND, "ym", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
@@ -2943,11 +2944,10 @@ static ADDRESS_MAP_START( memmap_sc2_dm01, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_dm01_w)
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)
 
-	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)
-	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)
+	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)
+	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE(SOUND, "upd", nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)
-	AM_RANGE(0x2D00, 0x2D00) AM_WRITE(ym2413_register_port_0_w)
-	AM_RANGE(0x2D01, 0x2D01) AM_WRITE(ym2413_data_port_0_w)
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE(SOUND, "ym", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)
 	AM_RANGE(0x3FFE, 0x3FFE) AM_READ( direct_input_r)
@@ -3899,7 +3899,7 @@ static MACHINE_DRIVER_START( scorpion2 )
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym2413",YM2413, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("ym",YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NVRAM_HANDLER(bfm_sc2)
@@ -3926,7 +3926,7 @@ static MACHINE_DRIVER_START( scorpion2_dm01 )
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym2413",YM2413, XTAL_3_579545MHz)
+	MDRV_SOUND_ADD("ym",YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)

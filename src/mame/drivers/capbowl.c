@@ -204,9 +204,9 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
  *
  *************************************/
 
-static void firqhandler(running_machine *machine, int irq)
+static void firqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -276,10 +276,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP  				/* Not hooked up according to the schematics */
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -334,10 +333,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		ticket_dispenser_r,
-		NULL,
-		NULL,
-		ticket_dispenser_w,  /* Also a status LED. See memory map above */
+		DEVCB_MEMORY_HANDLER("main", PROGRAM, ticket_dispenser_r),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_MEMORY_HANDLER("main", PROGRAM, ticket_dispenser_w),  /* Also a status LED. See memory map above */
 	},
 	firqhandler
 };

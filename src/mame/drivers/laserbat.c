@@ -602,10 +602,7 @@ static int active_8910,port0a;
 
 static READ8_HANDLER( zaccaria_port0a_r )
 {
-	if (active_8910 == 0)
-		return ay8910_read_port_0_r(space,0);
-	else
-		return ay8910_read_port_1_r(space,0);
+	return ay8910_r(devtag_get_device(space->machine, SOUND, (active_8910 == 0) ? "ay1" : "ay2"), 0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -622,10 +619,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		if (last & 0x01)
-			ay8910_control_port_0_w(space,0,port0a);
-		else
-			ay8910_write_port_0_w(space,0,port0a);
+		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay1"), last >> 0, port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -637,10 +631,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		if (last & 0x04)
-			ay8910_control_port_1_w(space,0,port0a);
-		else
-			ay8910_write_port_1_w(space,0,port0a);
+		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay2"), last >> 2, port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -663,10 +654,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	soundlatch_r,
-	NULL,//ay8910_port0a_w,
-	NULL
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_NULL,//ay8910_port0a_w,
+	DEVCB_NULL
 };
 
 static MACHINE_START( catnmous )

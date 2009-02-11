@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&tnzs_objram)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(seta_sound_r, seta_sound_w)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE(SOUND, "x1", seta_sound_r, seta_sound_w)
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE(&tnzs_vdcram)
 	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE(&tnzs_scrollram) /* scrolling info */
 	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_WRITE(champbwl_objctrl_w) AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */

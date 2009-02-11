@@ -41,7 +41,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 
 PALETTE_INIT( karnov );
 VIDEO_UPDATE( karnov );
@@ -370,10 +370,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karnov_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(ym3526_control_port_0_w) /* OPL */
-	AM_RANGE(0x1801, 0x1801) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE(SOUND, "ym2", ym3526_w)
  	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -690,9 +688,9 @@ static INTERRUPT_GEN( karnov_interrupt )
 	cpu_set_input_line(device,7,HOLD_LINE);	/* VBL */
 }
 
-static void sound_irq(running_machine *machine, int linestate)
+static void sound_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate); /* IRQ */
+	cpu_set_input_line(device->machine->cpu[1],0,linestate); /* IRQ */
 }
 
 static const ym3526_interface ym3526_config =

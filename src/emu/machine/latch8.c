@@ -34,7 +34,6 @@ INLINE latch8_t *get_safe_token(const device_config *device) {
 static void update(const device_config *device, UINT8 new_val, UINT8 mask)
 {
 	/*  temporary hack until the discrete system is a device */
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	latch8_t *latch8 = get_safe_token(device);
 	UINT8 old_val = latch8->value;
 
@@ -46,7 +45,7 @@ static void update(const device_config *device, UINT8 new_val, UINT8 mask)
 		UINT8 changed = old_val ^ latch8->value;
 		for (i=0; i<8; i++)
 			if (((changed & (1<<i)) != 0) && latch8->intf->node_map[i] != 0)
-				discrete_sound_w(space, latch8->intf->node_map[i] , (latch8->value >> i) & 1);
+				discrete_sound_w(devtag_get_device(device->machine, SOUND, latch8->intf->node_device[i]), latch8->intf->node_map[i] , (latch8->value >> i) & 1);
 	}
 }
 
@@ -196,7 +195,11 @@ static DEVICE_START( latch8 )
 	/* setup nodemap */
 	for (i=0; i<8; i++)
 		if (latch8->intf->node_map[i] )
+		{
+			if (!latch8->intf->node_device[i])
+				fatalerror("Device %s: Bit %d has invalid discrete device\n", device->tag, i);
 			latch8->has_node_map = 1;
+		}
 
 	/* setup device read handlers */
 	for (i=0; i<8; i++)

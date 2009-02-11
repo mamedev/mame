@@ -349,18 +349,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplep_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "8910.1", ay8910_data_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(SOUND, "8910.1", ay8910_r)
 	AM_RANGE(0x02, 0x02) AM_READ(triplep_pip_r)
 	AM_RANGE(0x03, 0x03) AM_READ(triplep_pap_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotshock_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "8910.1", ay8910_address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE(SOUND, "8910.1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(SOUND, "8910.2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "8910.2", ay8910_address_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( hncholms_prot_r )
@@ -1224,28 +1224,28 @@ static const ay8910_interface scramble_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r,
-	scramble_portB_r,
-	NULL,
-	NULL
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_HANDLER(scramble_portB_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface hotshock_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	hotshock_soundlatch_r,
-	scramble_portB_r,
-	NULL,
-	NULL
+	DEVCB_HANDLER(hotshock_soundlatch_r),
+	DEVCB_HANDLER(scramble_portB_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface triplep_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 };
 
 
@@ -1304,10 +1304,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scramble_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "8910.1", ay8910_address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE(SOUND, "8910.1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE(SOUND, "8910.2", ay8910_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE(SOUND, "8910.2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( scramble )

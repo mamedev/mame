@@ -93,9 +93,9 @@ static WRITE8_HANDLER( parodius_3fc0_w )
 	/* other bits unknown */
 }
 
-static READ8_HANDLER( parodius_sound_r )
+static READ8_DEVICE_HANDLER( parodius_sound_r )
 {
-	return k053260_0_r(space,2 + offset);
+	return k053260_r(device,2 + offset);
 }
 
 static WRITE8_HANDLER( parodius_sh_irqtrigger_w )
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( parodius_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f90, 0x3f90) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3fa0, 0x3faf) AM_READ(K053244_r)
 	AM_RANGE(0x3fc0, 0x3fc0) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x3fcc, 0x3fcd) AM_READ(parodius_sound_r)	/* K053260 */
+	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREAD(SOUND, "konami", parodius_sound_r)	/* K053260 */
 	AM_RANGE(0x2000, 0x27ff) AM_READ(parodius_052109_053245_r)
 	AM_RANGE(0x2000, 0x5fff) AM_READ(K052109_r)
 	AM_RANGE(0x6000, 0x9fff) AM_READ(SMH_BANK1)			/* banked ROM */
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( parodius_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE(parodius_3fc0_w)
 	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
 	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
-	AM_RANGE(0x3fcc, 0x3fcd) AM_WRITE(k053260_0_w)
+	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVWRITE(SOUND, "konami", k053260_w)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(parodius_052109_053245_w)
 	AM_RANGE(0x2000, 0x5fff) AM_WRITE(K052109_w)
 	AM_RANGE(0x6000, 0x9fff) AM_WRITE(SMH_ROM)					/* banked ROM */
@@ -163,17 +163,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( parodius_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf801, 0xf801) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0xfc00, 0xfc2f) AM_READ(k053260_0_r)
+	AM_RANGE(0xf800, 0xf801) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREAD(SOUND, "konami", k053260_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( parodius_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_WRITE(k053260_0_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVWRITE(SOUND, "konami", k053260_w)
 ADDRESS_MAP_END
 
 /***************************************************************************

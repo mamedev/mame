@@ -199,14 +199,14 @@ static const sn76477_interface sn76477_intf =
 };
 
 
-static void port_a_u2_u3_w(int which, UINT8 data)
+static void port_a_u2_u3_w(const device_config *device, UINT8 data)
 {
-	sn76477_vco_voltage_w(which, 2.35 * (data & 0x7f) / 128.0);
-	sn76477_enable_w(which, (data >> 7) & 0x01);
+	sn76477_vco_voltage_w(device, 2.35 * (data & 0x7f) / 128.0);
+	sn76477_enable_w(device, (data >> 7) & 0x01);
 }
 
 
-static void port_b_u2_u3_w(int which, UINT8 data)
+static void port_b_u2_u3_w(const device_config *device, UINT8 data)
 {
 	static const double resistances[] =
 	{
@@ -220,54 +220,54 @@ static void port_b_u2_u3_w(int which, UINT8 data)
 	  RES_K(47)
 	};
 
-	sn76477_mixer_a_w      (which, (data >> 0) & 0x01);
-	sn76477_mixer_b_w      (which, (data >> 1) & 0x01);
-	sn76477_mixer_c_w      (which, (data >> 2) & 0x01);
-	sn76477_envelope_1_w   (which, (data >> 3) & 0x01);
-	sn76477_envelope_2_w   (which, (data >> 4) & 0x01);
-	sn76477_amplitude_res_w(which, resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
+	sn76477_mixer_a_w      (device, (data >> 0) & 0x01);
+	sn76477_mixer_b_w      (device, (data >> 1) & 0x01);
+	sn76477_mixer_c_w      (device, (data >> 2) & 0x01);
+	sn76477_envelope_1_w   (device, (data >> 3) & 0x01);
+	sn76477_envelope_2_w   (device, (data >> 4) & 0x01);
+	sn76477_amplitude_res_w(device, resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
 }
 
 
-static void ca2_u2_u3_w(int which, UINT8 data)
+static void ca2_u2_u3_w(const device_config *device, UINT8 data)
 {
-	sn76477_vco_w(which, data);
+	sn76477_vco_w(device, data);
 }
 
 
 static WRITE8_HANDLER( port_a_u2_w )
 {
-	port_a_u2_u3_w(0, data);
+	port_a_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn1"), data);
 }
 
 
 static WRITE8_HANDLER( port_a_u3_w )
 {
-	port_a_u2_u3_w(1, data);
+	port_a_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn2"), data);
 }
 
 
 static WRITE8_HANDLER( port_b_u2_w )
 {
-	port_b_u2_u3_w(0, data);
+	port_b_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn1"), data);
 }
 
 
 static WRITE8_HANDLER( port_b_u3_w )
 {
-	port_b_u2_u3_w(1, data);
+	port_b_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn2"), data);
 }
 
 
 static WRITE8_HANDLER( ca2_u2_w )
 {
-	ca2_u2_u3_w(0, data);
+	ca2_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn1"), data);
 }
 
 
 static WRITE8_HANDLER( ca2_u3_w )
 {
-	ca2_u2_u3_w(1, data);
+	ca2_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn2"), data);
 }
 
 

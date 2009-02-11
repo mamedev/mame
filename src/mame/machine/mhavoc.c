@@ -220,7 +220,7 @@ WRITE8_HANDLER( mhavoc_rom_banksel_w )
 
 CUSTOM_INPUT( tms5220_r )
 {
-	return tms5220_ready_r() ? 0 : 1;
+	return tms5220_ready_r(devtag_get_device(field->port->machine, SOUND, "tms")) ? 0 : 1;
 }
 
 CUSTOM_INPUT( mhavoc_bit67_r )

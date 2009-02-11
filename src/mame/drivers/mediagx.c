@@ -118,6 +118,8 @@ static UINT8 ad1847_regs[16];
 static UINT32 ad1847_sample_counter = 0;
 static UINT32 ad1847_sample_rate;
 
+static const device_config *dmadac[2];
+
 static struct {
 	const device_config	*pit8254;
 	const device_config	*pic8259_1;
@@ -636,14 +638,14 @@ static TIMER_CALLBACK( sound_timer_callback )
 	ad1847_sample_counter = 0;
 	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
 
-	dmadac_transfer(0, 1, 0, 1, dacl_ptr, dacl);
-	dmadac_transfer(1, 1, 0, 1, dacr_ptr, dacr);
+	dmadac_transfer(&dmadac[0], 1, 0, 1, dacl_ptr, dacl);
+	dmadac_transfer(&dmadac[1], 1, 0, 1, dacr_ptr, dacr);
 
 	dacl_ptr = 0;
 	dacr_ptr = 0;
 }
 
-static void ad1847_reg_write(int reg, UINT8 data)
+static void ad1847_reg_write(running_machine *machine, int reg, UINT8 data)
 {
 	static const int divide_factor[] = { 3072, 1536, 896, 768, 448, 384, 512, 2560 };
 
@@ -660,7 +662,7 @@ static void ad1847_reg_write(int reg, UINT8 data)
 				ad1847_sample_rate = 24576000 / divide_factor[(data >> 1) & 0x7];
 			}
 
-			dmadac_set_frequency(0, 2, ad1847_sample_rate);
+			dmadac_set_frequency(&dmadac[0], 2, ad1847_sample_rate);
 
 			if (data & 0x20)
 			{
@@ -711,7 +713,7 @@ static WRITE32_HANDLER( ad1847_w )
 	else if (offset == 3)
 	{
 		int reg = (data >> 8) & 0xf;
-		ad1847_reg_write(reg, data & 0xff);
+		ad1847_reg_write(space->machine, reg, data & 0xff);
 	}
 }
 
@@ -964,7 +966,9 @@ static MACHINE_RESET(mediagx)
 	sound_timer = timer_alloc(machine, sound_timer_callback, NULL);
 	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
 
-	dmadac_enable(0, 2, 1);
+	dmadac[0] = devtag_get_device(machine, SOUND, "dac1");
+	dmadac[1] = devtag_get_device(machine, SOUND, "dac2");
+	dmadac_enable(&dmadac[0], 2, 1);
 	devtag_reset(machine, IDE_CONTROLLER, "ide");
 }
 

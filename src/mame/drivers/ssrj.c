@@ -74,7 +74,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
 	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
-	AM_RANGE(0xf401, 0xf401) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xf401, 0xf401) AM_DEVREAD(SOUND, "ay", ay8910_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -86,8 +86,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(SMH_RAM) AM_BASE(&ssrj_scrollram)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(SMH_NOP) /* unknown */
-	AM_RANGE(0xf401, 0xf401) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xf400, 0xf401) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(SMH_NOP) /* wheel ? */
 ADDRESS_MAP_END
@@ -155,10 +154,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL, /* not used ? */
-	input_port_3_r,
-	NULL,
-	NULL
+	DEVCB_NULL, /* not used ? */
+	DEVCB_INPUT_PORT("IN3"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

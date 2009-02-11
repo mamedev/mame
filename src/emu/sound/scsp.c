@@ -177,6 +177,7 @@ struct _SLOT
 
 #define USEDSP
 
+typedef struct _SCSP SCSP;
 struct _SCSP
 {
 	union
@@ -194,7 +195,7 @@ struct _SCSP
 	unsigned char *SCSPRAM;
 	UINT32 SCSPRAM_LENGTH;
 	char Master;
-	void (*Int68kCB)(running_machine *machine, int irq);
+	void (*Int68kCB)(const device_config *device, int irq);
 	sound_stream * stream;
 
 	INT32 *buffertmpl,*buffertmpr;
@@ -244,6 +245,16 @@ static int length;
 
 static signed short *RBUFDST;	//this points to where the sample will be stored in the RingBuf
 
+
+INLINE SCSP *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_SCSP);
+	return (SCSP *)device->token;
+}
+
 static unsigned char DecodeSCI(struct _SCSP *SCSP,unsigned char irq)
 {
 	unsigned char SCI=0;
@@ -261,7 +272,6 @@ static void CheckPendingIRQ(struct _SCSP *SCSP)
 {
 	UINT32 pend=SCSP->udata.data[0x20/2];
 	UINT32 en=SCSP->udata.data[0x1e/2];
-	running_machine *machine = SCSP->device->machine;
 
 	if(SCSP->MidiW!=SCSP->MidiR)
 	{
@@ -273,48 +283,47 @@ static void CheckPendingIRQ(struct _SCSP *SCSP)
 	if(pend&0x40)
 		if(en&0x40)
 		{
-			SCSP->Int68kCB(machine, SCSP->IrqTimA);
+			SCSP->Int68kCB(SCSP->device, SCSP->IrqTimA);
 			return;
 		}
 	if(pend&0x80)
 		if(en&0x80)
 		{
-			SCSP->Int68kCB(machine, SCSP->IrqTimBC);
+			SCSP->Int68kCB(SCSP->device, SCSP->IrqTimBC);
 			return;
 		}
 	if(pend&0x100)
 		if(en&0x100)
 		{
-			SCSP->Int68kCB(machine, SCSP->IrqTimBC);
+			SCSP->Int68kCB(SCSP->device, SCSP->IrqTimBC);
 			return;
 		}
 	if(pend&8)
 		if (en&8)
 		{
-			SCSP->Int68kCB(machine, SCSP->IrqMidi);
+			SCSP->Int68kCB(SCSP->device, SCSP->IrqMidi);
 			SCSP->udata.data[0x20/2] &= ~8;
 			return;
 		}
 
-	SCSP->Int68kCB(machine, 0);
+	SCSP->Int68kCB(SCSP->device, 0);
 }
 
 static void ResetInterrupts(struct _SCSP *SCSP)
 {
 	UINT32 reset = SCSP->udata.data[0x22/2];
-	running_machine *machine = SCSP->device->machine;
 
 	if (reset & 0x40)
 	{
-		SCSP->Int68kCB(machine, -SCSP->IrqTimA);
+		SCSP->Int68kCB(SCSP->device, -SCSP->IrqTimA);
 	}
 	if (reset & 0x180)
 	{
-		SCSP->Int68kCB(machine, -SCSP->IrqTimBC);
+		SCSP->Int68kCB(SCSP->device, -SCSP->IrqTimBC);
 	}
 	if (reset & 0x8)
 	{
-		SCSP->Int68kCB(machine, -SCSP->IrqMidi);
+		SCSP->Int68kCB(SCSP->device, -SCSP->IrqMidi);
 	}
 
 	CheckPendingIRQ(SCSP);
@@ -718,7 +727,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			scsp_midi_in(space, 0, SCSP->udata.data[0x6/2]&0xff, 0);
+			scsp_midi_in(devtag_get_device(space->machine, SOUND, "scsp"), 0, SCSP->udata.data[0x6/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:
@@ -839,7 +848,7 @@ static void SCSP_UpdateRegR(struct _SCSP *SCSP, int reg)
 				unsigned short v=SCSP->udata.data[0x5/2];
 				v&=0xff00;
 				v|=SCSP->MidiStack[SCSP->MidiR];
-				SCSP[0].Int68kCB(SCSP->device->machine, -SCSP->IrqMidi);	// cancel the IRQ
+				SCSP[0].Int68kCB(SCSP->device, -SCSP->IrqMidi);	// cancel the IRQ
 				if(SCSP->MidiR!=SCSP->MidiW)
 				{
 					++SCSP->MidiR;
@@ -1221,11 +1230,11 @@ static STREAM_UPDATE( SCSP_Update )
 	SCSP_DoMasterSamples(SCSP, samples);
 }
 
-static SND_START( scsp )
+static DEVICE_START( scsp )
 {
 	const scsp_interface *intf;
 
-	struct _SCSP *SCSP = device->token;
+	struct _SCSP *SCSP = get_safe_token(device);
 
 	intf = device->static_config;
 
@@ -1241,9 +1250,9 @@ static SND_START( scsp )
 }
 
 
-void SCSP_set_ram_base(int which, void *base)
+void scsp_set_ram_base(const device_config *device, void *base)
 {
-	struct _SCSP *SCSP = sndti_token(SOUND_SCSP, which);
+	struct _SCSP *SCSP = get_safe_token(device);
 	if (SCSP)
 	{
 		SCSP->SCSPRAM = base;
@@ -1254,9 +1263,9 @@ void SCSP_set_ram_base(int which, void *base)
 }
 
 
-READ16_HANDLER( scsp_0_r )
+READ16_DEVICE_HANDLER( scsp_r )
 {
-	struct _SCSP *SCSP = sndti_token(SOUND_SCSP, 0);
+	struct _SCSP *SCSP = get_safe_token(device);
 
 	stream_update(SCSP->stream);
 
@@ -1265,9 +1274,9 @@ READ16_HANDLER( scsp_0_r )
 
 UINT32* stv_scu;
 
-WRITE16_HANDLER( scsp_0_w )
+WRITE16_DEVICE_HANDLER( scsp_w )
 {
-	struct _SCSP *SCSP = sndti_token(SOUND_SCSP, 0);
+	struct _SCSP *SCSP = get_safe_token(device);
 	UINT16 tmp, *scsp_regs;
 
 	stream_update(SCSP->stream);
@@ -1305,7 +1314,7 @@ WRITE16_HANDLER( scsp_0_w )
 		SCSP->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(space, SCSP);
+			dma_scsp(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), SCSP);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;
@@ -1313,7 +1322,7 @@ WRITE16_HANDLER( scsp_0_w )
 		case 0x42a:
 			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
 			{
-				cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
+				cpu_set_input_line_and_vector(device->machine->cpu[0], 9, HOLD_LINE , 0x46);
 			    logerror("SCSP: Main CPU interrupt\n");
 			}
 		break;
@@ -1324,25 +1333,9 @@ WRITE16_HANDLER( scsp_0_w )
 	}
 }
 
-READ16_HANDLER( scsp_1_r )
+WRITE16_DEVICE_HANDLER( scsp_midi_in )
 {
-	struct _SCSP *SCSP = sndti_token(SOUND_SCSP, 1);
-	return SCSP_r16(SCSP, offset*2);
-}
-
-WRITE16_HANDLER( scsp_1_w )
-{
-	struct _SCSP *SCSP = sndti_token(SOUND_SCSP, 1);
-	unsigned short tmp;
-
-	tmp = SCSP_r16(SCSP, offset*2);
-	COMBINE_DATA(&tmp);
-	SCSP_w16(SCSP, offset*2, tmp);
-}
-
-WRITE16_HANDLER( scsp_midi_in )
-{
-	struct _SCSP *SCSP = sndti_token(SOUND_SCSP, 0);
+	struct _SCSP *SCSP = get_safe_token(device);
 
 	SCSP->MidiStack[SCSP->MidiW++]=data;
 	SCSP->MidiW &= 31;
@@ -1350,9 +1343,9 @@ WRITE16_HANDLER( scsp_midi_in )
 	CheckPendingIRQ(SCSP);
 }
 
-READ16_HANDLER( scsp_midi_out_r )
+READ16_DEVICE_HANDLER( scsp_midi_out_r )
 {
-	struct _SCSP *SCSP = sndti_token(SOUND_SCSP, 0);
+	struct _SCSP *SCSP = get_safe_token(device);
 	unsigned char val;
 
 	val=SCSP->MidiStack[SCSP->MidiR++];
@@ -1366,34 +1359,24 @@ READ16_HANDLER( scsp_midi_out_r )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( scsp )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( scsp )
+DEVICE_GET_INFO( scsp )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct _SCSP);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct _SCSP);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( scsp );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( scsp );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */								break;
-		case SNDINFO_PTR_RESET:							/* Nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( scsp );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							/* Nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SCSP");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Sega/Yamaha custom");		break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "2.1.1");					break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SCSP");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Sega/Yamaha custom");		break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.1.1");					break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

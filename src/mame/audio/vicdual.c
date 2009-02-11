@@ -132,7 +132,8 @@ MACHINE_DRIVER_END
 
 static TIMER_CALLBACK( frogs_croak_callback )
 {
-	sample_stop(2);
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+	sample_stop(samples, 2);
 }
 
 
@@ -144,24 +145,26 @@ MACHINE_START( frogs_audio )
 
 WRITE8_HANDLER( frogs_audio_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND_SAMPLES, "samples");
+	const device_config *discrete = devtag_get_device(space->machine, SOUND_SAMPLES, "discrete");
 	static int last_croak = 0;
 	static int last_buzzz = 0;
 	int new_croak = data & 0x08;
 	int new_buzzz = data & 0x10;
 
-//  discrete_sound_w(space, FROGS_HOP_EN, data & 0x01);
-//  discrete_sound_w(space, FROGS_JUMP_EN, data & 0x02);
-	discrete_sound_w(space, FROGS_TONGUE_EN, data & 0x04);
-//  discrete_sound_w(space, FROGS_CAPTURE_EN, data & 0x08);
-//  discrete_sound_w(space, FROGS_FLY_EN, data & 0x10);
-//  discrete_sound_w(space, FROGS_SPLASH_EN, data & 0x80);
+//  discrete_sound_w(discrete, FROGS_HOP_EN, data & 0x01);
+//  discrete_sound_w(discrete, FROGS_JUMP_EN, data & 0x02);
+	discrete_sound_w(discrete, FROGS_TONGUE_EN, data & 0x04);
+//  discrete_sound_w(discrete, FROGS_CAPTURE_EN, data & 0x08);
+//  discrete_sound_w(discrete, FROGS_FLY_EN, data & 0x10);
+//  discrete_sound_w(discrete, FROGS_SPLASH_EN, data & 0x80);
 
 	if (data & 0x01)
-		sample_start (3, 3, 0);	// Hop
+		sample_start (samples, 3, 3, 0);	// Hop
 	if (data & 0x02)
-		sample_start (0, 0, 0);	// Boing
+		sample_start (samples, 0, 0, 0);	// Boing
 	if (new_croak)
-		sample_start (2, 2, 0);	// Croak
+		sample_start (samples, 2, 2, 0);	// Croak
 	else
 	{
 		if (last_croak)
@@ -184,12 +187,12 @@ WRITE8_HANDLER( frogs_audio_w )
          * 12 seconds.
          */
 		if (!last_buzzz)
-			sample_start (1, 1, 1);	// Buzzz
+			sample_start (samples, 1, 1, 1);	// Buzzz
 	}
 	else
-		sample_stop(1);
+		sample_stop(samples, 1);
 	if (data & 0x80)
-		sample_start (4, 4, 0);	// Splash
+		sample_start (samples, 4, 4, 0);	// Splash
 
 	last_croak = new_croak;
 	last_buzzz = new_buzzz;
@@ -459,29 +462,31 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( headon_audio_w )
 {
-	if (!sndti_exists(SOUND_DISCRETE, 0))
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	if (discrete == NULL)
 		return;
-	discrete_sound_w(space, HEADON_HISPEED_PC_EN, data & 0x01);
-	discrete_sound_w(space, HEADON_SCREECH1_EN, data & 0x02);
-	discrete_sound_w(space, HEADON_CRASH_EN, data & 0x04);
-	discrete_sound_w(space, HEADON_HISPEED_CC_EN, data & 0x08);
-	discrete_sound_w(space, HEADON_SCREECH2_EN, data & 0x10);
-	discrete_sound_w(space, HEADON_BONUS_EN, data & 0x20);
-	discrete_sound_w(space, HEADON_CAR_ON_EN, data & 0x40);
+	discrete_sound_w(discrete, HEADON_HISPEED_PC_EN, data & 0x01);
+	discrete_sound_w(discrete, HEADON_SCREECH1_EN, data & 0x02);
+	discrete_sound_w(discrete, HEADON_CRASH_EN, data & 0x04);
+	discrete_sound_w(discrete, HEADON_HISPEED_CC_EN, data & 0x08);
+	discrete_sound_w(discrete, HEADON_SCREECH2_EN, data & 0x10);
+	discrete_sound_w(discrete, HEADON_BONUS_EN, data & 0x20);
+	discrete_sound_w(discrete, HEADON_CAR_ON_EN, data & 0x40);
 
 }
 
 WRITE8_HANDLER( invho2_audio_w )
 {
-	if (!sndti_exists(SOUND_DISCRETE, 0))
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	if (discrete == NULL)
 		return;
-	discrete_sound_w(space, HEADON_HISPEED_PC_EN, data & 0x10);
-	discrete_sound_w(space, HEADON_SCREECH1_EN, data & 0x08);
-	discrete_sound_w(space, HEADON_CRASH_EN, data & 0x80);
-	discrete_sound_w(space, HEADON_HISPEED_CC_EN, data & 0x40);
-	discrete_sound_w(space, HEADON_SCREECH2_EN, data & 0x04);
-	discrete_sound_w(space, HEADON_BONUS_EN, data & 0x02);
-	discrete_sound_w(space, HEADON_CAR_ON_EN, data & 0x20);
+	discrete_sound_w(discrete, HEADON_HISPEED_PC_EN, data & 0x10);
+	discrete_sound_w(discrete, HEADON_SCREECH1_EN, data & 0x08);
+	discrete_sound_w(discrete, HEADON_CRASH_EN, data & 0x80);
+	discrete_sound_w(discrete, HEADON_HISPEED_CC_EN, data & 0x40);
+	discrete_sound_w(discrete, HEADON_SCREECH2_EN, data & 0x04);
+	discrete_sound_w(discrete, HEADON_BONUS_EN, data & 0x02);
+	discrete_sound_w(discrete, HEADON_CAR_ON_EN, data & 0x20);
 
 }
 

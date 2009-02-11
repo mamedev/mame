@@ -123,12 +123,12 @@ static WRITE16_HANDLER( dbz_sound_cause_nmi )
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void dbz_sound_irq(running_machine *machine, int irq)
+static void dbz_sound_irq(const device_config *device, int irq)
 {
 	if (irq)
-		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dbz_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -183,17 +183,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dbz_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xc001) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0xd000, 0xd002) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0xd000, 0xd002) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0xd000, 0xd001) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_io_map, ADDRESS_SPACE_IO, 8 )

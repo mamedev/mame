@@ -309,10 +309,10 @@ static WRITE8_HANDLER( m72_mcu_high_w )
 	logerror("high: %02x %02x %08x\n", offset, data, mcu_sample_addr);
 }
 
-static WRITE8_HANDLER( m72_snd_cpu_sample_w )
+static WRITE8_DEVICE_HANDLER( m72_snd_cpu_sample_w )
 {
-	//dac_signed_data_w(0,data);
-	dac_data_w(0,data);
+	//dac_signed_data_w(device, data);
+	dac_data_w(device, data);
 }
 
 static READ8_HANDLER( m72_snd_cpu_sample_r )
@@ -322,20 +322,22 @@ static READ8_HANDLER( m72_snd_cpu_sample_r )
 
 INLINE DRIVER_INIT( loht_mcu )
 {
-	const device_config *cpu = cputag_get_cpu(machine, "main");
-	const device_config *sndcpu = cputag_get_cpu(machine, "sound");
+	const address_space *program = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *io = cputag_get_address_space(machine, "main", ADDRESS_SPACE_IO);
+	const address_space *sndio = cputag_get_address_space(machine, "sound", ADDRESS_SPACE_IO);
+	const device_config *dac = devtag_get_device(machine, SOUND, "dac");
 
 	protection_ram = auto_malloc(0x10000);
-	memory_install_read16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
-	memory_install_write16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
+	memory_install_read16_handler(program, 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
+	memory_install_write16_handler(program, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
 	memory_set_bankptr(machine, 1, protection_ram);
 
-	//memory_install_write16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
-	memory_install_write16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
+	//memory_install_write16_handler(io, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(io, 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
 
 	/* sound cpu */
-	memory_install_write8_handler(cpu_get_address_space(sndcpu, ADDRESS_SPACE_IO), 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
-	memory_install_read8_handler (cpu_get_address_space(sndcpu, ADDRESS_SPACE_IO), 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
+	memory_install_write8_device_handler(sndio, dac, 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
+	memory_install_read8_handler (sndio, 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
 
 #if 0
 	/* running the mcu at twice the speed, the following
@@ -406,7 +408,7 @@ static INTERRUPT_GEN(fake_nmi)
 	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int sample = m72_sample_r(space,0);
 	if (sample)
-		m72_sample_w(space,0,sample);
+		m72_sample_w(devtag_get_device(device->machine, SOUND, "dac"),0,sample);
 }
 
 
@@ -1029,23 +1031,29 @@ static ADDRESS_MAP_START( sound_rom_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( rtype_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(m72_sound_irq_ack_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(m72_sample_w)
+	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_WRITE(m72_sound_irq_ack_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE(SOUND, "dac", m72_sample_w)
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rtype2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
 	AM_RANGE(0x80, 0x81) AM_WRITE(rtype2_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(m72_sample_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE(SOUND, "dac", m72_sample_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(m72_sound_irq_ack_w)
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
 ADDRESS_MAP_END
@@ -1053,8 +1061,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( poundfor_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_WRITE(poundfor_sample_addr_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_r)
 	AM_RANGE(0x42, 0x42) AM_WRITE(m72_sound_irq_ack_w)
 ADDRESS_MAP_END
@@ -1789,7 +1796,7 @@ static MACHINE_DRIVER_START( rtype )
 
 	MDRV_CPU_ADD("sound",Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_ram_map,0)
-	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_IO_MAP(rtype_sound_portmap,0)
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	MDRV_MACHINE_START(m72)

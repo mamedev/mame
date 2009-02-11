@@ -148,12 +148,12 @@ static WRITE8_HANDLER( fromance_rombank_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( fromance_adpcm_reset_w )
+static WRITE8_DEVICE_HANDLER( fromance_adpcm_reset_w )
 {
 	fromance_adpcm_reset = (data & 0x01);
 	fromance_vclk_left = 0;
 
-	msm5205_reset_w(0, !(data & 0x01));
+	msm5205_reset_w(device, !(data & 0x01));
 }
 
 
@@ -173,7 +173,7 @@ static void fromance_adpcm_int(const device_config *device)
 	/* clock the data through */
 	if (fromance_vclk_left)
 	{
-		msm5205_data_w(0, (fromance_adpcm_data >> 4));
+		msm5205_data_w(device, (fromance_adpcm_data >> 4));
 		fromance_adpcm_data <<= 4;
 		fromance_vclk_left--;
 	}
@@ -335,10 +335,9 @@ static ADDRESS_MAP_START( nekkyoku_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0xe2, 0xe5) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0xe6, 0xe6) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0xe7, 0xe7) AM_WRITE(fromance_adpcm_reset_w)
+	AM_RANGE(0xe7, 0xe7) AM_DEVWRITE(SOUND, "msm", fromance_adpcm_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0xe9, 0xe9) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xea, 0xea) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xe9, 0xea) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idolmj_sub_io_map, ADDRESS_SPACE_IO, 8 )
@@ -350,10 +349,9 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE(SOUND, "msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x29, 0x29) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x2a, 0x2a) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x29, 0x2a) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_io_map, ADDRESS_SPACE_IO, 8 )
@@ -365,10 +363,9 @@ static ADDRESS_MAP_START( fromance_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE(SOUND, "msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x2a, 0x2a) AM_WRITE(ym2413_register_port_0_w)
-	AM_RANGE(0x2b, 0x2b) AM_WRITE(ym2413_data_port_0_w)
+	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE(SOUND, "ym", ym2413_w)
 ADDRESS_MAP_END
 
 

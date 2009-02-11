@@ -338,8 +338,8 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x092000, 0x09201f) AM_READWRITE(bmcbowl_via_r, bmcbowl_via_w)
 
 	AM_RANGE(0x093000, 0x093003) AM_WRITE(SMH_NOP)  // related to music
-	AM_RANGE(0x092800, 0x092801) AM_WRITE(ay8910_write_port_0_msb_w		)
-	AM_RANGE(0x092802, 0x092803) AM_READ(ay8910_read_port_0_msb_r) AM_WRITE(ay8910_control_port_0_msb_w	)
+	AM_RANGE(0x092800, 0x092803) AM_DEVWRITE8(SOUND, "ay", ay8910_data_address_w, 0xff00)
+	AM_RANGE(0x092802, 0x092803) AM_DEVREAD8(SOUND, "ay", ay8910_r, 0xff00)
 	AM_RANGE(0x093802, 0x093803) AM_READ_PORT("IN0")
 	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_BASE((UINT16 **)&stats_ram) AM_SIZE(&stats_ram_size) /* 8 bit */
 	AM_RANGE(0x097000, 0x097001) AM_READ(SMH_NOP)
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&bmcbowl_vid2)
 
-	AM_RANGE(0x28c000, 0x28c001) AM_READWRITE(okim6295_status_0_msb_r,okim6295_data_0_msb_w)
+	AM_RANGE(0x28c000, 0x28c001) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0xff00)
 
 	/* protection device*/
 	AM_RANGE(0x30c000, 0x30c001) AM_WRITE(SMH_NOP)
@@ -444,19 +444,19 @@ static INPUT_PORTS_START( bmcbowl )
 
 INPUT_PORTS_END
 
-static READ8_HANDLER(dips1_r)
+static READ8_DEVICE_HANDLER(dips1_r)
 {
 	switch(bmc_input)
 	{
-			case 0x00:	return  input_port_read(space->machine, "IN1");
-			case 0x40:	return  input_port_read(space->machine, "IN2");
+			case 0x00:	return  input_port_read(device->machine, "IN1");
+			case 0x40:	return  input_port_read(device->machine, "IN2");
 	}
-	logerror("unknown input - %X (PC=%X)\n",bmc_input,cpu_get_previouspc(space->cpu));
+	logerror("%s:unknown input - %X\n",cpuexec_describe_context(device->machine),bmc_input);
 	return 0xff;
 }
 
 
-static WRITE8_HANDLER(input_mux_w)
+static WRITE8_DEVICE_HANDLER(input_mux_w)
 {
 	bmc_input=data;
 }
@@ -466,10 +466,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	dips1_r,
-	NULL,
-	NULL,
-	input_mux_w
+	DEVCB_HANDLER(dips1_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(input_mux_w)
 };
 
 

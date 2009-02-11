@@ -716,7 +716,7 @@ static WRITE8_HANDLER( custom_09R81P_port_w )
 	lucky74_adpcm_reg[offset] = data;
 }
 
-static WRITE8_HANDLER( ym2149_portb_w )
+static WRITE8_DEVICE_HANDLER( ym2149_portb_w )
 {
 /*  when is in game mode writes 0x0a.
     when is in test mode writes 0x0e.
@@ -725,7 +725,7 @@ static WRITE8_HANDLER( ym2149_portb_w )
     bit 0 contains the screen orientation.
 */
 	ym2149_portb = data;
-	flip_screen_set(space->machine, data & 0x01);
+	flip_screen_set(device->machine, data & 0x01);
 }
 
 static READ8_HANDLER( usart_8251_r )
@@ -828,12 +828,12 @@ static ADDRESS_MAP_START( lucky74_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
 	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
 	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE(PPI8255, "ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */
-	AM_RANGE(0xf100, 0xf100) AM_WRITE(sn76496_0_w)											/* SN76489 #1 */
+	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE(SOUND, "sn1", sn76496_w)							/* SN76489 #1 */
 	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports 2 & 4 */
-	AM_RANGE(0xf300, 0xf300) AM_WRITE(sn76496_1_w)											/* SN76489 #2 */
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(ay8910_control_port_0_w)								/* YM2149 control */
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(sn76496_2_w)											/* SN76489 #3 */
-	AM_RANGE(0xf600, 0xf600) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)		/* YM2149 (Input Port 1) */
+	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE(SOUND, "sn2", sn76496_w)							/* SN76489 #2 */
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)						/* YM2149 control */
+	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE(SOUND, "sn3", sn76496_w)							/* SN76489 #3 */
+	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)			/* YM2149 (Input Port 1) */
 	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)						/* USART 8251 port */
 	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
 ADDRESS_MAP_END
@@ -1146,11 +1146,11 @@ static void lucky74_adpcm_int(const device_config *device)
 			/* transferring 1st nibble */
 			lucky74_adpcm_data = memory_region(device->machine, "adpcm")[lucky74_adpcm_pos];
 			lucky74_adpcm_pos = (lucky74_adpcm_pos + 1) & 0xffff;
-			msm5205_data_w(0, lucky74_adpcm_data >> 4);
+			msm5205_data_w(device, lucky74_adpcm_data >> 4);
 
 			if (lucky74_adpcm_pos == lucky74_adpcm_end)
 			{
-				msm5205_reset_w(0, 0);			/* reset the M5205 */
+				msm5205_reset_w(device, 0);			/* reset the M5205 */
 				lucky74_adpcm_reg[05] = 0;		/* clean trigger register */
 				lucky74_adpcm_busy_line = 0x01;	/* deactivate busy flag */
 				logerror("end of sample.\n");
@@ -1159,7 +1159,7 @@ static void lucky74_adpcm_int(const device_config *device)
 		else
 		{
 			/* transferring 2nd nibble */
-			msm5205_data_w(0, lucky74_adpcm_data & 0x0f);
+			msm5205_data_w(device, lucky74_adpcm_data & 0x0f);
 			lucky74_adpcm_data = -1;
 		}
 	}
@@ -1221,10 +1221,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_3_r,
-	NULL,	/* a sort of status byte */
-	NULL,
-	ym2149_portb_w
+	DEVCB_INPUT_PORT("IN3"),
+	DEVCB_NULL,	/* a sort of status byte */
+	DEVCB_NULL,
+	DEVCB_HANDLER(ym2149_portb_w)
 };
 
 static const msm5205_interface msm5205_config =
@@ -1284,7 +1284,7 @@ static MACHINE_DRIVER_START( lucky74 )
 	MDRV_SOUND_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ym", AY8910, C_06B49P_CLKOUT_04)	/* 1.5 MHz. */
+	MDRV_SOUND_ADD("ay", AY8910, C_06B49P_CLKOUT_04)	/* 1.5 MHz. */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)			/* not routed to audio hardware */
 

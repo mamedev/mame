@@ -94,10 +94,16 @@ static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
 	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
+static READ8_DEVICE_HANDLER( mainevt_sh_busy_r )
+{
+	return upd7759_busy_r(device);
+}
+
 static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
 {
-	upd7759_reset_w(0, data & 2);
-	upd7759_start_w(0, data & 1);
+	const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
+	upd7759_reset_w(upd, data & 2);
+	upd7759_start_w(upd, data & 1);
 
 	interrupt_enable_w(space,0,data & 4);
 }
@@ -116,13 +122,13 @@ static WRITE8_HANDLER( mainevt_sh_bankswitch_w )
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);
 	bank_B=((data>>2)&0x3);
-	k007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( devtag_get_device(space->machine, SOUND, "konami"), bank_A, bank_B );
 
 	/* bits 4-5 select the UPD7759 bank */
-	upd7759_set_bank_base(0, ((data >> 4) & 0x03) * 0x20000);
+	upd7759_set_bank_base(devtag_get_device(space->machine, SOUND, "upd"), ((data >> 4) & 0x03) * 0x20000);
 }
 
-static WRITE8_HANDLER( dv_sh_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( dv_sh_bankswitch_w )
 {
 	int bank_A,bank_B;
 
@@ -131,7 +137,7 @@ static WRITE8_HANDLER( dv_sh_bankswitch_w )
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);
 	bank_B=((data>>2)&0x3);
-	k007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( device, bank_A, bank_B );
 }
 
 
@@ -199,15 +205,15 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(upd7759_0_busy_r)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami", k007232_r)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD(SOUND, "upd", mainevt_sh_busy_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(upd7759_0_port_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami", k007232_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE(SOUND, "upd", upd7759_port_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(mainevt_sh_irqcontrol_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mainevt_sh_bankswitch_w)
 ADDRESS_MAP_END
@@ -216,18 +222,17 @@ static ADDRESS_MAP_START( dv_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
-	AM_RANGE(0xc001, 0xc001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami", k007232_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym2151_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami", k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(devstor_sh_irqcontrol_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(dv_sh_bankswitch_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE(SOUND, "konami", dv_sh_bankswitch_w)
 ADDRESS_MAP_END
 
 
@@ -479,10 +484,10 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
-static void volume_callback(int v)
+static void volume_callback(const device_config *device, int v)
 {
-	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =

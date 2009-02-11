@@ -27,7 +27,7 @@ extern UINT8 *homerun_videoram;
 
 WRITE8_HANDLER( homerun_videoram_w );
 WRITE8_HANDLER( homerun_color_w );
-WRITE8_HANDLER( homerun_banking_w );
+WRITE8_DEVICE_HANDLER( homerun_banking_w );
 VIDEO_START(homerun);
 VIDEO_UPDATE(homerun);
 
@@ -103,8 +103,7 @@ static ADDRESS_MAP_START( homerun_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("IN1")
-	AM_RANGE(0x70, 0x70) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x71, 0x71) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 static const ym2203_interface ym2203_config =
@@ -112,10 +111,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_3_r,
-		NULL,
-		NULL,
-		homerun_banking_w
+		DEVCB_INPUT_PORT("DSW"),
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(homerun_banking_w)
 	},
 	NULL
 };

@@ -355,8 +355,8 @@ static ADDRESS_MAP_START( bwidow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
 	AM_RANGE(0x2800, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_READWRITE(pokey1_r, pokey1_w)
-	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(pokey2_r, pokey2_w)
+	AM_RANGE(0x6000, 0x67ff) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x6800, 0x6fff) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(atari_vg_earom_r)
 	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("IN0")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN3")
@@ -385,8 +385,8 @@ static ADDRESS_MAP_START( spacduel_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
 	AM_RANGE(0x0e80, 0x0e80) AM_WRITE(atari_vg_earom_ctrl_w)
 	AM_RANGE(0x0f00, 0x0f3f) AM_WRITE(atari_vg_earom_w)
-	AM_RANGE(0x1000, 0x100f) AM_READWRITE(pokey1_r, pokey1_w)
-	AM_RANGE(0x1400, 0x140f) AM_READWRITE(pokey2_r, pokey2_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -690,15 +690,15 @@ INPUT_PORTS_END
 
 static const pokey_interface pokey_interface_1 =
 {
-	{ 0 },
-	input_port_1_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW0")
 };
 
 
 static const pokey_interface pokey_interface_2 =
 {
-	{ 0 },
-	input_port_2_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW1")
 };
 
 

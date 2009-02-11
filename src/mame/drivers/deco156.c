@@ -152,7 +152,7 @@ static WRITE32_HANDLER(hvysmsh_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7) {
 
-		okim6295_set_bank_base(1, 0x40000 * (data & 0x7) );
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki2"), 0x40000 * (data & 0x7) );
 
 		eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(data & 0x10);
@@ -160,30 +160,9 @@ static WRITE32_HANDLER(hvysmsh_eeprom_w)
 	}
 }
 
-static WRITE32_HANDLER( hvysmsh_oki_0_bank_w )
+static WRITE32_DEVICE_HANDLER( hvysmsh_oki_0_bank_w )
 {
-	okim6295_set_bank_base(0, (data & 1) * 0x40000);
-}
-
-static READ32_HANDLER(hvysmsh_oki_0_r)
-{
-	return okim6295_status_0_r(space, 0);
-}
-
-static WRITE32_HANDLER(hvysmsh_oki_0_w)
-{
-//  data & 0xff00 is written sometimes too. game bug or needed data?
-	okim6295_data_0_w(space,0,data&0xff);
-}
-
-static READ32_HANDLER(hvysmsh_oki_1_r)
-{
-	return okim6295_status_1_r(space, 0);
-}
-
-static WRITE32_HANDLER(hvysmsh_oki_1_w)
-{
-	okim6295_data_1_w(space,0,data&0xff);
+	okim6295_set_bank_base(device, (data & 1) * 0x40000);
 }
 
 static WRITE32_HANDLER(wcvol95_eeprom_w)
@@ -199,20 +178,6 @@ static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	palette_set_color_rgb(space->machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
-}
-
-
-static READ32_HANDLER( deco156_snd_r )
-{
-	return ymz280b_status_0_r(space, 0);
-}
-
-static WRITE32_HANDLER( deco156_snd_w )
-{
-	if (offset)
-		ymz280b_data_0_w(space, 0, data);
-	else
-		ymz280b_register_0_w(space, 0, data);
 }
 
 /***************************************************************************/
@@ -235,9 +200,9 @@ static ADDRESS_MAP_START( hvysmsh_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x120000, 0x120003) AM_WRITE(SMH_NOP) // Volume control in low byte
 	AM_RANGE(0x120004, 0x120007) AM_WRITE(hvysmsh_eeprom_w)
 	AM_RANGE(0x120008, 0x12000b) AM_WRITE(SMH_NOP) // IRQ ack?
-	AM_RANGE(0x12000c, 0x12000f) AM_WRITE(hvysmsh_oki_0_bank_w)
-	AM_RANGE(0x140000, 0x140003) AM_READ(hvysmsh_oki_0_r) AM_WRITE(hvysmsh_oki_0_w)
-	AM_RANGE(0x160000, 0x160003) AM_READ(hvysmsh_oki_1_r) AM_WRITE(hvysmsh_oki_1_w)
+	AM_RANGE(0x12000c, 0x12000f) AM_DEVWRITE(SOUND, "oki1", hvysmsh_oki_0_bank_w)
+	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8(SOUND, "oki1", okim6295_r, okim6295_w, 0x000000ff)
+	AM_RANGE(0x160000, 0x160003) AM_DEVREADWRITE8(SOUND, "oki2", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x180000, 0x18001f) AM_READWRITE( wcvol95_pf12_control_r, wcvol95_pf12_control_w )
 	AM_RANGE(0x190000, 0x191fff) AM_READWRITE( wcvol95_pf1_data_r, wcvol95_pf1_data_w )
 	AM_RANGE(0x194000, 0x195fff) AM_READWRITE( wcvol95_pf2_data_r, wcvol95_pf2_data_w )
@@ -261,7 +226,7 @@ static ADDRESS_MAP_START( wcvol95_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x160000, 0x161fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
 	AM_RANGE(0x180000, 0x180fff) AM_READ(SMH_RAM) AM_WRITE(wcvol95_nonbuffered_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x1a0000, 0x1a0007) AM_READ(deco156_snd_r) AM_WRITE(deco156_snd_w)
+	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8(SOUND, "ymz", ymz280b_r, ymz280b_w, 0x000000ff)
 ADDRESS_MAP_END
 
 
@@ -390,7 +355,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq_gen(running_machine *machine, int state)
+static void sound_irq_gen(const device_config *device, int state)
 {
 	logerror("sound irq\n");
 }

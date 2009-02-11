@@ -36,7 +36,8 @@ should be 312, but 312 = 39*8 so it doesn't look right because a divider by 39 i
 */
 #define CLOCK_DIVIDER (7*6*8)
 
-struct sp0250
+typedef struct _sp0250_state sp0250_state;
+struct _sp0250_state
 {
 	INT16 amp;
 	UINT8 pitch;
@@ -49,7 +50,8 @@ struct sp0250
 	UINT8 fifo[15];
 	int fifo_pos;
 
-	void (*drq)(int state);
+	const device_config *device;
+	void (*drq)(const device_config *device, int state);
 
 	struct
 	{
@@ -57,6 +59,15 @@ struct sp0250
 		INT16 z1, z2;
 	} filter[6];
 };
+
+INLINE sp0250_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_SP0250);
+	return (sp0250_state *)device->token;
+}
 
 
 static UINT16 sp0250_ga(UINT8 v)
@@ -85,7 +96,7 @@ static INT16 sp0250_gc(UINT8 v)
 	return res;
 }
 
-static void sp0250_load_values(struct sp0250 *sp)
+static void sp0250_load_values(sp0250_state *sp)
 {
 	int f;
 
@@ -108,7 +119,7 @@ static void sp0250_load_values(struct sp0250 *sp)
 	sp->filter[5].F = sp0250_gc(sp->fifo[14]);
 	sp->fifo_pos = 0;
 	if (sp->drq != NULL)
-		sp->drq(ASSERT_LINE);
+		sp->drq(sp->device, ASSERT_LINE);
 
 	sp->pcount = 0;
 	sp->rcount = 0;
@@ -121,13 +132,13 @@ static void sp0250_load_values(struct sp0250 *sp)
 
 static TIMER_CALLBACK( sp0250_timer_tick )
 {
-	struct sp0250 *sp = ptr;
+	sp0250_state *sp = ptr;
 	stream_update(sp->stream);
 }
 
 static STREAM_UPDATE( sp0250_update )
 {
-	struct sp0250 *sp = param;
+	sp0250_state *sp = param;
 	stream_sample_t *output = outputs[0];
 	int i;
 	for (i = 0; i < samples; i++)
@@ -192,41 +203,42 @@ static STREAM_UPDATE( sp0250_update )
 }
 
 
-static SND_START( sp0250 )
+static DEVICE_START( sp0250 )
 {
 	const struct sp0250_interface *intf = device->static_config;
-	struct sp0250 *sp = device->token;
+	sp0250_state *sp = get_safe_token(device);
 
+	sp->device = device;
 	sp->RNG = 1;
 	sp->drq = (intf != NULL) ? intf->drq_callback : NULL;
 	if (sp->drq != NULL)
 	{
-		sp->drq(ASSERT_LINE);
-		timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(clock), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
+		sp->drq(sp->device, ASSERT_LINE);
+		timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(device->clock), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
 	}
 
-	sp->stream = stream_create(device, 0, 1, clock / CLOCK_DIVIDER, sp, sp0250_update);
+	sp->stream = stream_create(device, 0, 1, device->clock / CLOCK_DIVIDER, sp, sp0250_update);
 }
 
 
-WRITE8_HANDLER( sp0250_w )
+WRITE8_DEVICE_HANDLER( sp0250_w )
 {
-	struct sp0250 *sp = sndti_token(SOUND_SP0250, 0);
+	sp0250_state *sp = get_safe_token(device);
 	stream_update(sp->stream);
 	if (sp->fifo_pos != 15)
 	{
 		sp->fifo[sp->fifo_pos++] = data;
 		if (sp->fifo_pos == 15 && sp->drq != NULL)
-			sp->drq(CLEAR_LINE);
+			sp->drq(sp->device, CLEAR_LINE);
 	}
 	else
-		logerror("%s: overflow SP0250 FIFO\n", cpuexec_describe_context(space->machine));
+		logerror("%s: overflow SP0250 FIFO\n", cpuexec_describe_context(device->machine));
 }
 
 
-UINT8 sp0250_drq_r(void)
+UINT8 sp0250_drq_r(const device_config *device)
 {
-	struct sp0250 *sp = sndti_token(SOUND_SP0250, 0);
+	sp0250_state *sp = get_safe_token(device);
 	stream_update(sp->stream);
 	return (sp->fifo_pos == 15) ? CLEAR_LINE : ASSERT_LINE;
 }
@@ -237,34 +249,24 @@ UINT8 sp0250_drq_r(void)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( sp0250 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( sp0250 )
+DEVICE_GET_INFO( sp0250 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct sp0250); 				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sp0250_state); 				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sp0250 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sp0250 );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sp0250 );			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SP0250");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "GI speech");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SP0250");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "GI speech");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.1");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

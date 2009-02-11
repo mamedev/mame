@@ -142,7 +142,7 @@ static READ8_HANDLER( cliff_irq_ack_r )
 	return 0x00;
 }
 
-static WRITE8_HANDLER( cliff_sound_overlay_w )
+static WRITE8_DEVICE_HANDLER( cliff_sound_overlay_w )
 {
 	int sound = data & 3;
 	int overlay = ( data & 0x10 ) ? 1 : 0;
@@ -150,18 +150,18 @@ static WRITE8_HANDLER( cliff_sound_overlay_w )
 	/* configure pen 0 and 1 as transparent in the renderer and use it as the compositing color */
 	if (overlay)
 	{
-		palette_set_color(space->machine, 0, palette_get_color(space->machine, 0) & MAKE_ARGB(0,255,255,255));
-		palette_set_color(space->machine, 1, palette_get_color(space->machine, 1) & MAKE_ARGB(0,255,255,255));
+		palette_set_color(device->machine, 0, palette_get_color(device->machine, 0) & MAKE_ARGB(0,255,255,255));
+		palette_set_color(device->machine, 1, palette_get_color(device->machine, 1) & MAKE_ARGB(0,255,255,255));
 	}
 	else
 	{
-		palette_set_color(space->machine, 0, palette_get_color(space->machine, 0) | MAKE_ARGB(255,0,0,0));
-		palette_set_color(space->machine, 1, palette_get_color(space->machine, 1) | MAKE_ARGB(255,0,0,0));
+		palette_set_color(device->machine, 0, palette_get_color(device->machine, 0) | MAKE_ARGB(255,0,0,0));
+		palette_set_color(device->machine, 1, palette_get_color(device->machine, 1) | MAKE_ARGB(255,0,0,0));
 	}
 
 	/* audio */
-	discrete_sound_w(space, CLIFF_ENABLE_SND_1, sound&1);
-	discrete_sound_w(space, CLIFF_ENABLE_SND_2, (sound>>1)&1);
+	discrete_sound_w(device, CLIFF_ENABLE_SND_1, sound&1);
+	discrete_sound_w(device, CLIFF_ENABLE_SND_2, (sound>>1)&1);
 }
 
 static WRITE8_HANDLER( cliff_ldwire_w )
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( mainport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x44, 0x44) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0x45, 0x45) AM_READ(TMS9928A_vram_r)
-	AM_RANGE(0x46, 0x46) AM_WRITE(cliff_sound_overlay_w)
+	AM_RANGE(0x46, 0x46) AM_DEVWRITE(SOUND, "discrete", cliff_sound_overlay_w)
 	AM_RANGE(0x50, 0x52) AM_READ(cliff_phillips_code_r)
 	AM_RANGE(0x53, 0x53) AM_READ(cliff_irq_ack_r)
 	AM_RANGE(0x54, 0x54) AM_WRITE(TMS9928A_register_w)
@@ -706,8 +706,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 

@@ -49,10 +49,10 @@ SAMPLES_START( meadows_sh_start )
 	freq1 = freq2 = 1000;
 	latched_0c01 = latched_0c02 = latched_0c03 = 0;
 
-	sample_set_volume(0,0);
-	sample_start_raw(0,waveform,ARRAY_LENGTH(waveform),freq1,1);
-	sample_set_volume(1,0);
-	sample_start_raw(1,waveform,ARRAY_LENGTH(waveform),freq2,1);
+	sample_set_volume(device,0,0);
+	sample_start_raw(device,0,waveform,ARRAY_LENGTH(waveform),freq1,1);
+	sample_set_volume(device,1,0);
+	sample_start_raw(device,1,waveform,ARRAY_LENGTH(waveform),freq2,1);
 }
 
 /************************************/
@@ -60,6 +60,7 @@ SAMPLES_START( meadows_sh_start )
 /************************************/
 void meadows_sh_update(running_machine *machine)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 	int preset, amp;
 
 	if (latched_0c01 != meadows_0c01 || latched_0c03 != meadows_0c03)
@@ -76,8 +77,8 @@ void meadows_sh_update(running_machine *machine)
 			freq1 = BASE_CTR1 / (preset + 1);
 		else amp = 0;
 		logerror("meadows ctr1 channel #%d preset:%3d freq:%5d amp:%d\n", channel, preset, freq1, amp);
-		sample_set_freq(0, freq1 * sizeof(waveform)/2);
-		sample_set_volume(0,amp/255.0);
+		sample_set_freq(samples, 0, freq1 * sizeof(waveform)/2);
+		sample_set_volume(samples, 0,amp/255.0);
 	}
 
 	if (latched_0c02 != meadows_0c02 || latched_0c03 != meadows_0c03)
@@ -94,8 +95,8 @@ void meadows_sh_update(running_machine *machine)
 		}
 		else amp = 0;
 		logerror("meadows ctr2 channel #%d preset:%3d freq:%5d amp:%d\n", channel+1, preset, freq2, amp);
-		sample_set_freq(1, freq2 * sizeof(waveform));
-		sample_set_volume(1,amp/255.0);
+		sample_set_freq(samples, 1, freq2 * sizeof(waveform));
+		sample_set_volume(samples, 1,amp/255.0);
 	}
 
 	if (latched_0c03 != meadows_0c03)
@@ -103,9 +104,9 @@ void meadows_sh_update(running_machine *machine)
 		dac_enable = meadows_0c03 & ENABLE_DAC;
 
 		if (dac_enable)
-			dac_data_w(0, meadows_dac);
+			dac_data_w(devtag_get_device(machine, SOUND, "dac"), meadows_dac);
 		else
-			dac_data_w(0, 0);
+			dac_data_w(devtag_get_device(machine, SOUND, "dac"), 0);
 	}
 
 	latched_0c01 = meadows_0c01;
@@ -116,13 +117,13 @@ void meadows_sh_update(running_machine *machine)
 /************************************/
 /* Write DAC value                  */
 /************************************/
-void meadows_sh_dac_w(int data)
+void meadows_sh_dac_w(running_machine *machine, int data)
 {
 	meadows_dac = data;
 	if (dac_enable)
-		dac_data_w(0, meadows_dac);
+		dac_data_w(devtag_get_device(machine, SOUND, "dac"), meadows_dac);
 	else
-		dac_data_w(0, 0);
+		dac_data_w(devtag_get_device(machine, SOUND, "dac"), 0);
 }
 
 

@@ -54,8 +54,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(shaolins_nmi_w)	/* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 										/* bit 3, bit 4 = coin counters */
 	AM_RANGE(0x0100, 0x0100) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x0300, 0x0300) AM_WRITE(sn76496_0_w) 	/* trigger chip to read from latch. The program always */
-	AM_RANGE(0x0400, 0x0400) AM_WRITE(sn76496_1_w) 	/* writes the same number as the latch, so we don't */
+	AM_RANGE(0x0300, 0x0300) AM_DEVWRITE(SOUND, "sn1", sn76496_w) 	/* trigger chip to read from latch. The program always */
+	AM_RANGE(0x0400, 0x0400) AM_DEVWRITE(SOUND, "sn2", sn76496_w) 	/* writes the same number as the latch, so we don't */
 										/* bother emulating them. */
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(SMH_NOP)	/* latch for 76496 #0 */
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_NOP)	/* latch for 76496 #1 */

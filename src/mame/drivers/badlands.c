@@ -337,8 +337,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(ym2151_status_port_0_r, ym2151_register_port_0_w)
-	AM_RANGE(0x2000, 0x2001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(audio_io_r, audio_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END

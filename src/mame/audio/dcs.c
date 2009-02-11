@@ -293,6 +293,7 @@ struct _dcs_state
 	UINT8		channels;
 	UINT16		size;
 	UINT16		incs;
+	const device_config *dmadac[6];
 	emu_timer *	reg_timer;
 	emu_timer *	sport_timer;
 	emu_timer *	internal_timer;
@@ -933,6 +934,7 @@ void dcs_init(running_machine *machine)
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.rev = 1;
 	dcs.channels = 1;
+	dcs.dmadac[0] = devtag_get_device(machine, SOUND, "dac1");
 
 	/* configure boot and sound ROMs */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -982,6 +984,8 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.channels = 2;
+	dcs.dmadac[0] = devtag_get_device(machine, SOUND, "dac1");
+	dcs.dmadac[1] = devtag_get_device(machine, SOUND, "dac2");
 
 	/* always boot from the base of "dcs" */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -1246,7 +1250,7 @@ static WRITE16_HANDLER( sdrc_w )
 		/* offset 1 controls RAM mapping */
 		case 1:
 			sdrc.reg[1] = data;
-//          dmadac_enable(0, dcs.channels, SDRC_MUTE);
+//          dmadac_enable(&dcs.dmadac[0], dcs.channels, SDRC_MUTE);
 			if (diff & 0x0003)
 				sdrc_remap_memory(space->machine);
 			break;
@@ -1331,7 +1335,7 @@ static WRITE16_HANDLER( dsio_w )
 			dsio.reg[1] = data;
 
 			/* determine /MUTE and number of channels */
-			dmadac_enable(0, dcs.channels, DSIO_MUTE);
+			dmadac_enable(&dcs.dmadac[0], dcs.channels, DSIO_MUTE);
 
 			/* bit 0 resets the FIFO */
 			midway_ioasic_fifo_reset_w(space->machine, DSIO_EMPTY_FIFO ^ 1);
@@ -1374,7 +1378,7 @@ static READ16_HANDLER( denver_r )
 
 static WRITE16_HANDLER( denver_w )
 {
-	int enable, channels;
+	int enable, channels, chan;
 
 	switch (offset)
 	{
@@ -1390,9 +1394,15 @@ static WRITE16_HANDLER( denver_w )
 			if (channels != dcs.channels)
 			{
 				dcs.channels = channels;
-				dmadac_enable(0, dcs.channels, enable);
+				for (chan = 0; chan < dcs.channels; chan++)
+				{
+					char buffer[10];
+					sprintf(buffer, "dac%d", chan);
+					dcs.dmadac[chan] = devtag_get_device(space->machine, SOUND, buffer);
+				}
+				dmadac_enable(&dcs.dmadac[0], dcs.channels, enable);
 				if (dcs.channels < 6)
-					dmadac_enable(dcs.channels, 6 - dcs.channels, FALSE);
+					dmadac_enable(&dcs.dmadac[dcs.channels], 6 - dcs.channels, FALSE);
 				recompute_sample_rate(space->machine);
 			}
 			break;
@@ -1862,7 +1872,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			/* see if SPORT1 got disabled */
 			if ((data & 0x0800) == 0)
 			{
-				dmadac_enable(0, dcs.channels, 0);
+				dmadac_enable(&dcs.dmadac[0], dcs.channels, 0);
 				timer_adjust_oneshot(dcs.reg_timer, attotime_never, 0);
 			}
 			break;
@@ -1871,7 +1881,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			/* autobuffer off: nuke the timer, and disable the DAC */
 			if ((data & 0x0002) == 0)
 			{
-				dmadac_enable(0, dcs.channels, 0);
+				dmadac_enable(&dcs.dmadac[0], dcs.channels, 0);
 				timer_adjust_oneshot(dcs.reg_timer, attotime_never, 0);
 			}
 			break;
@@ -1936,7 +1946,7 @@ static TIMER_CALLBACK( dcs_irq )
 		}
 
 		if (dcs.channels)
-			dmadac_transfer(0, dcs.channels, 1, dcs.channels, (dcs.size / 2) / dcs.channels, buffer);
+			dmadac_transfer(&dcs.dmadac[0], dcs.channels, 1, dcs.channels, (dcs.size / 2) / dcs.channels, buffer);
 	}
 
 	/* check for wrapping */
@@ -1977,8 +1987,8 @@ static void recompute_sample_rate(running_machine *machine)
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
 	sample_period = attotime_mul(sample_period, 16 * dcs.channels);
-	dmadac_set_frequency(0, dcs.channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
-	dmadac_enable(0, dcs.channels, 1);
+	dmadac_set_frequency(&dcs.dmadac[0], dcs.channels, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
+	dmadac_enable(&dcs.dmadac[0], dcs.channels, 1);
 
 	/* fire off a timer wich will hit every half-buffer */
 	if (dcs.incs)
@@ -2034,7 +2044,7 @@ static void sound_tx_callback(const device_config *device, int port, INT32 data)
 	}
 
 	/* if we get there, something went wrong. Disable playing */
-	dmadac_enable(0, dcs.channels, 0);
+	dmadac_enable(&dcs.dmadac[0], dcs.channels, 0);
 
 	/* remove timer */
 	timer_adjust_oneshot(dcs.reg_timer, attotime_never, 0);

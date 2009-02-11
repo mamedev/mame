@@ -129,9 +129,9 @@ VIDEO_UPDATE( actionhw );
 
 
 #ifdef UNUSED_FUNCTION
-static void kickgoal_play(int melody, int data)
+static void kickgoal_play(const device_config *device, int melody, int data)
 {
-	int status = okim6295_status_0_r(0);
+	int status = okim6295_r(device,0);
 
 	logerror("Playing sample %01x:%02x from command %02x\n",kickgoal_snd_bank,kickgoal_sound,data);
 	if (kickgoal_sound == 0) popmessage("Unknown sound command %02x",kickgoal_sound);
@@ -141,35 +141,35 @@ static void kickgoal_play(int melody, int data)
 			kickgoal_melody      = kickgoal_sound;
 			kickgoal_melody_loop = kickgoal_sound;
 			if (status & 0x08)
-				okim6295_data_0_w(0,0x40);
-			okim6295_data_0_w(0,(0x80 | kickgoal_melody));
-			okim6295_data_0_w(0,0x81);
+				okim6295_w(device,0,0x40);
+			okim6295_w(device,0,(0x80 | kickgoal_melody));
+			okim6295_w(device,0,0x81);
 		}
 	}
 	else {
 		if ((status & 0x01) == 0) {
-		okim6295_data_0_w(0,(0x80 | kickgoal_sound));
-			okim6295_data_0_w(0,0x11);
+		okim6295_w(device,0,(0x80 | kickgoal_sound));
+			okim6295_w(device,0,0x11);
 		}
 		else if ((status & 0x02) == 0) {
-		okim6295_data_0_w(0,(0x80 | kickgoal_sound));
-			okim6295_data_0_w(0,0x21);
+		okim6295_w(device,0,(0x80 | kickgoal_sound));
+			okim6295_w(device,0,0x21);
 		}
 		else if ((status & 0x04) == 0) {
-		okim6295_data_0_w(0,(0x80 | kickgoal_sound));
-			okim6295_data_0_w(0,0x41);
+		okim6295_w(device,0,(0x80 | kickgoal_sound));
+			okim6295_w(device,0,0x41);
 		}
 	}
 }
 
-WRITE16_HANDLER( kickgoal_snd_w )
+WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		logerror("PC:%06x Writing %04x to Sound CPU\n",cpu_get_previouspc(space->cpu),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
-				okim6295_data_0_w(0,0x40);	/* Stop playing the melody */
+				okim6295_w(device,0,0x40);	/* Stop playing the melody */
 				kickgoal_melody      = 0x00;
 				kickgoal_melody_loop = 0x00;
 			}
@@ -178,56 +178,56 @@ WRITE16_HANDLER( kickgoal_snd_w )
 			}
 		}
 		else if (data == 0) {
-			okim6295_data_0_w(0,0x38);		/* Stop playing effects */
+			okim6295_w(device,0,0x38);		/* Stop playing effects */
 		}
 		else {
 			kickgoal_sound = kickgoal_cmd_snd[data];
 
 			if (kickgoal_sound >= 0x70) {
 				if (kickgoal_snd_bank != 1)
-					okim6295_set_bank_base(0, (1 * 0x40000));
+					okim6295_set_bank_base(device, (1 * 0x40000));
 				kickgoal_snd_bank = 1;
-				kickgoal_play(0, data);
+				kickgoal_play(device, 0, data);
 			}
 			else if (kickgoal_sound >= 0x69) {
 				if (kickgoal_snd_bank != 2)
-					okim6295_set_bank_base(0, (2 * 0x40000));
+					okim6295_set_bank_base(device, (2 * 0x40000));
 				kickgoal_snd_bank = 2;
-				kickgoal_play(4, data);
+				kickgoal_play(device, 4, data);
 			}
 			else if (kickgoal_sound >= 0x65) {
 				if (kickgoal_snd_bank != 1)
-					okim6295_set_bank_base(0, (1 * 0x40000));
+					okim6295_set_bank_base(device, (1 * 0x40000));
 				kickgoal_snd_bank = 1;
-				kickgoal_play(4, data);
+				kickgoal_play(device, 4, data);
 			}
 			else if (kickgoal_sound >= 0x60) {
 				kickgoal_snd_bank = 0;
-					okim6295_set_bank_base(0, (0 * 0x40000));
+					okim6295_set_bank_base(device, (0 * 0x40000));
 				kickgoal_snd_bank = 0;
-				kickgoal_play(4, data);
+				kickgoal_play(device, 4, data);
 			}
 			else {
-				kickgoal_play(0, data);
+				kickgoal_play(device, 0, data);
 			}
 		}
 	}
 }
 #endif
 
-static WRITE16_HANDLER( actionhw_snd_w )
+static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 {
-	logerror("PC:%06x Writing %04x to Sound CPU - mask %04x\n",cpu_get_previouspc(space->cpu),data,mem_mask);
+	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",cpuexec_describe_context(device->machine),data,mem_mask);
 
 	if (!ACCESSING_BITS_0_7) data >>= 8;
 
 	switch (data)
 	{
-		case 0xfc:	okim6295_set_bank_base(0, (0 * 0x40000)); break;
-		case 0xfd:	okim6295_set_bank_base(0, (2 * 0x40000)); break;
-		case 0xfe:	okim6295_set_bank_base(0, (1 * 0x40000)); break;
-		case 0xff:	okim6295_set_bank_base(0, (3 * 0x40000)); break;
-		case 0x78:	okim6295_data_0_w(space,0,data);
+		case 0xfc:	okim6295_set_bank_base(device, (0 * 0x40000)); break;
+		case 0xfd:	okim6295_set_bank_base(device, (2 * 0x40000)); break;
+		case 0xfe:	okim6295_set_bank_base(device, (1 * 0x40000)); break;
+		case 0xff:	okim6295_set_bank_base(device, (3 * 0x40000)); break;
+		case 0x78:	okim6295_w(device,0,data);
 					snd_sam[0]=00; snd_sam[1]=00; snd_sam[2]=00; snd_sam[3]=00;
 					break;
 		default:	if (snd_new) /* Play new sample */
@@ -235,44 +235,44 @@ static WRITE16_HANDLER( actionhw_snd_w )
 						if ((data & 0x80) && (snd_sam[3] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((okim6295_status_0_r(space,0) & 0x08) != 0x08)
+							if ((okim6295_r(device,0) & 0x08) != 0x08)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								okim6295_data_0_w(space,0,snd_new);
-								okim6295_data_0_w(space,0,data);
+								okim6295_w(device,0,snd_new);
+								okim6295_w(device,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x40) && (snd_sam[2] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((okim6295_status_0_r(space,0) & 0x04) != 0x04)
+							if ((okim6295_r(device,0) & 0x04) != 0x04)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								okim6295_data_0_w(space,0,snd_new);
-								okim6295_data_0_w(space,0,data);
+								okim6295_w(device,0,snd_new);
+								okim6295_w(device,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x20) && (snd_sam[1] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((okim6295_status_0_r(space,0) & 0x02) != 0x02)
+							if ((okim6295_r(device,0) & 0x02) != 0x02)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								okim6295_data_0_w(space,0,snd_new);
-								okim6295_data_0_w(space,0,data);
+								okim6295_w(device,0,snd_new);
+								okim6295_w(device,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x10) && (snd_sam[0] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((okim6295_status_0_r(space,0) & 0x01) != 0x01)
+							if ((okim6295_r(device,0) & 0x01) != 0x01)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								okim6295_data_0_w(space,0,snd_new);
-								okim6295_data_0_w(space,0,data);
+								okim6295_w(device,0,snd_new);
+								okim6295_w(device,0,data);
 							}
 							snd_new = 00;
 						}
@@ -287,7 +287,7 @@ static WRITE16_HANDLER( actionhw_snd_w )
 					else /* Turn a channel off */
 					{
 						logerror("Turning channel %02x off\n",data);
-						okim6295_data_0_w(space,0,data);
+						okim6295_w(device,0,data);
 						if (data & 0x40) snd_sam[3] = 00;
 						if (data & 0x20) snd_sam[2] = 00;
 						if (data & 0x10) snd_sam[1] = 00;
@@ -306,9 +306,9 @@ static int m6295_bank;
 static UINT16 m6295_key_delay;
 static INTERRUPT_GEN( kickgoal_interrupt )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *adpcm = devtag_get_device(device->machine, SOUND, "oki");
 
-	if ((okim6295_status_0_r(space,0) & 0x08) == 0)
+	if ((okim6295_r(adpcm,0) & 0x08) == 0)
 	{
 		switch(kickgoal_melody_loop)
 		{
@@ -337,8 +337,8 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		if (kickgoal_melody_loop)
 		{
 //          logerror("Changing to sample %02x\n",kickgoal_melody_loop);
-			okim6295_data_0_w(space,0,((0x80 | kickgoal_melody_loop) & 0xff));
-			okim6295_data_0_w(space,0,0x81);
+			okim6295_w(adpcm,0,((0x80 | kickgoal_melody_loop) & 0xff));
+			okim6295_w(adpcm,0,0x81);
 		}
 	}
 	if ( input_code_pressed_once(KEYCODE_PGUP) )
@@ -349,7 +349,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			m6295_bank &= 0x03;
 			if (m6295_bank == 0x03) m6295_bank = 0x00;
 			popmessage("Changing Bank to %02x",m6295_bank);
-			okim6295_set_bank_base(0, ((m6295_bank) * 0x40000));
+			okim6295_set_bank_base(adpcm, ((m6295_bank) * 0x40000));
 
 			if (m6295_key_delay == 0xffff) m6295_key_delay = 0x00;
 			else m6295_key_delay = (0x30 * oki_time_base);
@@ -365,7 +365,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			m6295_bank &= 0x03;
 			if (m6295_bank == 0x03) m6295_bank = 0x02;
 			popmessage("Changing Bank to %02x",m6295_bank);
-			okim6295_set_bank_base(0, ((m6295_bank) * 0x40000));
+			okim6295_set_bank_base(adpcm, ((m6295_bank) * 0x40000));
 
 			if (m6295_key_delay == 0xffff) m6295_key_delay = 0x00;
 			else m6295_key_delay = (0x30 * oki_time_base);
@@ -379,11 +379,11 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		{
 			m6295_comm += 1;
 			m6295_comm &= 0x7f;
-			if (m6295_comm == 0x00) { okim6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
-			if (m6295_comm == 0x60) { okim6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
-			if (m6295_comm == 0x65) { okim6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
-			if (m6295_comm == 0x69) { okim6295_set_bank_base(0, (2 * 0x40000)); m6295_bank = 2; }
-			if (m6295_comm == 0x70) { okim6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
+			if (m6295_comm == 0x00) { okim6295_set_bank_base(adpcm, (0 * 0x40000)); m6295_bank = 0; }
+			if (m6295_comm == 0x60) { okim6295_set_bank_base(adpcm, (0 * 0x40000)); m6295_bank = 0; }
+			if (m6295_comm == 0x65) { okim6295_set_bank_base(adpcm, (1 * 0x40000)); m6295_bank = 1; }
+			if (m6295_comm == 0x69) { okim6295_set_bank_base(adpcm, (2 * 0x40000)); m6295_bank = 2; }
+			if (m6295_comm == 0x70) { okim6295_set_bank_base(adpcm, (1 * 0x40000)); m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x",m6295_comm,m6295_bank);
 
 			if (m6295_key_delay == 0xffff) m6295_key_delay = 0x00;
@@ -398,11 +398,11 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		{
 			m6295_comm -= 1;
 			m6295_comm &= 0x7f;
-			if (m6295_comm == 0x2b) { okim6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
-			if (m6295_comm == 0x64) { okim6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
-			if (m6295_comm == 0x68) { okim6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
-			if (m6295_comm == 0x6c) { okim6295_set_bank_base(0, (2 * 0x40000)); m6295_bank = 2; }
-			if (m6295_comm == 0x76) { okim6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
+			if (m6295_comm == 0x2b) { okim6295_set_bank_base(adpcm, (0 * 0x40000)); m6295_bank = 0; }
+			if (m6295_comm == 0x64) { okim6295_set_bank_base(adpcm, (0 * 0x40000)); m6295_bank = 0; }
+			if (m6295_comm == 0x68) { okim6295_set_bank_base(adpcm, (1 * 0x40000)); m6295_bank = 1; }
+			if (m6295_comm == 0x6c) { okim6295_set_bank_base(adpcm, (2 * 0x40000)); m6295_bank = 2; }
+			if (m6295_comm == 0x76) { okim6295_set_bank_base(adpcm, (1 * 0x40000)); m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x",m6295_comm,m6295_bank);
 
 			if (m6295_key_delay == 0xffff) m6295_key_delay = 0x00;
@@ -415,9 +415,9 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 	{
 		if (m6295_key_delay >= (0x80 * oki_time_base))
 		{
-			okim6295_data_0_w(space,0,0x78);
-			okim6295_data_0_w(space,0,(0x80 | m6295_comm));
-			okim6295_data_0_w(space,0,0x11);
+			okim6295_w(adpcm,0,0x78);
+			okim6295_w(adpcm,0,(0x80 | m6295_comm));
+			okim6295_w(adpcm,0,0x11);
 
 			popmessage("Playing sound %02x on Bank %02x",m6295_comm,m6295_bank);
 
@@ -500,11 +500,11 @@ static WRITE16_HANDLER( kickgoal_eeprom_w )
 
 static ADDRESS_MAP_START( kickgoal_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-/// AM_RANGE(0x30001e, 0x30001f) AM_WRITE(kickgoal_snd_w)
+/// AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE(SOUND, "oki", kickgoal_snd_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("SYSTEM")
 /// AM_RANGE(0x800004, 0x800005) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x800004, 0x800005) AM_WRITE(actionhw_snd_w)
+	AM_RANGE(0x800004, 0x800005) AM_DEVWRITE(SOUND, "oki", actionhw_snd_w)
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(kickgoal_eeprom_w)
 	AM_RANGE(0x900006, 0x900007) AM_READ(kickgoal_eeprom_r)
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(kickgoal_fgram_w) AM_BASE(&kickgoal_fgram) /* FG Layer */

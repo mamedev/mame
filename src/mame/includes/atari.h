@@ -50,7 +50,7 @@ DEVICE_IMAGE_UNLOAD( a5200_cart );
 
  READ8_HANDLER ( atari_serin_r );
 WRITE8_HANDLER ( atari_serout_w );
-void atari_interrupt_cb(running_machine *machine, int mask);
+void atari_interrupt_cb(const device_config *device, int mask);
 
 void a800_handle_keyboard(running_machine *machine);
 void a5200_handle_keypads(running_machine *machine);

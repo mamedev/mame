@@ -95,8 +95,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)
 	AM_RANGE(0xc1, 0xc2) AM_READ(key_matrix_r)	// 0xc0-c3 8255ppi
 	AM_RANGE(0xc3, 0xc3) AM_WRITE(SMH_NOP)		// 0xc0-c3 8255ppi
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xd1, 0xd1) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -268,10 +267,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_0_r,
-		input_port_1_r,
-		NULL,
-		NULL
+		DEVCB_INPUT_PORT("DSW1"),
+		DEVCB_INPUT_PORT("DSW2"),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };

@@ -53,7 +53,7 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-#include "sound/3812intf.h"
+#include "sound/8950intf.h"
 
 /* Variables only used here */
 
@@ -181,10 +181,8 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(MC6840_control_port_1_w)	/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(MC6840_write_port_0_w)		/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x0803, 0x0803) AM_WRITE(MC6840_write_port_1_w)		/* Takahiro Nogi. 1999/09/27 */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(y8950_control_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(y8950_write_port_0_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE(SOUND, "ym", y8950_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

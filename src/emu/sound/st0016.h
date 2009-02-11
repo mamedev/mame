@@ -9,11 +9,10 @@ struct _st0016_interface
 	UINT8 **p_soundram;
 };
 
-extern UINT8 *st0016_sound_regs;
+READ8_DEVICE_HANDLER( st0016_snd_r );
+WRITE8_DEVICE_HANDLER( st0016_snd_w );
 
-WRITE8_HANDLER(st0016_snd_w);
-
-SND_GET_INFO( st0016 );
-#define SOUND_ST0016 SND_GET_INFO_NAME( st0016 )
+DEVICE_GET_INFO( st0016 );
+#define SOUND_ST0016 DEVICE_GET_INFO_NAME( st0016 )
 
 #endif /* __ST0016_H__ */

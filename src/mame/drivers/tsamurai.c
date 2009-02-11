@@ -227,8 +227,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_m660_io_map, ADDRESS_SPACE_IO, 8 )
@@ -240,8 +239,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vsgongf_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( sound_command1_r )
@@ -249,18 +247,8 @@ static READ8_HANDLER( sound_command1_r )
 	return sound_command1;
 }
 
-static WRITE8_HANDLER( sound_out1_w )
-{
-	dac_data_w(0,data);
-}
-
 static READ8_HANDLER( sound_command2_r ){
 	return sound_command2;
-}
-
-static WRITE8_HANDLER( sound_out2_w )
-{
-	dac_data_w(1,data);
 }
 
 static READ8_HANDLER( sound_command3_r ){
@@ -277,7 +265,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x6001, 0x6001) AM_WRITE(SMH_NOP) /* ? - probably clear IRQ */
-	AM_RANGE(0x6002, 0x6002) AM_WRITE(sound_out1_w)
+	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE(SOUND, "dac1", dac_w)
 	AM_RANGE(0x7f00, 0x7fff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -292,7 +280,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x6001, 0x6001) AM_WRITE(SMH_NOP) /* ? - probably clear IRQ */
-	AM_RANGE(0x6002, 0x6002) AM_WRITE(sound_out2_w)
+	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE(SOUND, "dac2", dac_w)
 	AM_RANGE(0x7f00, 0x7fff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -307,7 +295,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound1_m660, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(SMH_NOP) /* ? - probably clear IRQ */
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(sound_out1_w)
+	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE(SOUND, "dac1", dac_w)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -322,7 +310,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound2_m660, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(SMH_NOP) /* ? - probably clear IRQ */
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(sound_out2_w)
+	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE(SOUND, "dac2", dac_w)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -330,8 +318,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound3_m660_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound3_m660, ADDRESS_SPACE_PROGRAM, 8 )
@@ -430,7 +417,7 @@ static ADDRESS_MAP_START( writemem_sound_vsgongf, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x6000, 0x63ff) AM_WRITE(SMH_RAM) /* work RAM */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(vsgongf_sound_nmi_enable_w) /* NMI enable */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_out1_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE(SOUND, "dac", dac_w)
 ADDRESS_MAP_END
 
 /*******************************************************************************/

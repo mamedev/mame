@@ -328,16 +328,16 @@ UINT16* suprtrio_control;
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( tumblepb_oki_w )
+static WRITE16_DEVICE_HANDLER( tumblepb_oki_w )
 {
 	if (mem_mask==0xffff)
 	{
-		okim6295_data_0_w(space,0,data&0xff);
+		okim6295_w(device,0,data&0xff);
 		//printf("tumbleb_oki_w %04x %04x\n",data,mem_mask);
 	}
 	else
 	{
-		okim6295_data_0_w(space,0,(data>>8)&0xff);
+		okim6295_w(device,0,(data>>8)&0xff);
 		//printf("tumbleb_oki_w %04x %04x\n",data,mem_mask);
 	}
     /* STUFF IN OTHER BYTE TOO..*/
@@ -456,16 +456,16 @@ static int tumblep_music_command;
 static int tumblep_music_bank;
 static int tumbleb2_music_is_playing;
 
-static void tumbleb2_playmusic(const address_space *space)
+static void tumbleb2_playmusic(const device_config *device)
 {
-	int status = okim6295_status_0_r(space,0);
+	int status = okim6295_r(device,0);
 
 	if (tumbleb2_music_is_playing)
 	{
 		if ((status&0x08)==0x00)
 		{
-			okim6295_data_0_w(space,0,0x80|tumblep_music_command);
-			okim6295_data_0_w(space,0,0x00|0x82);
+			okim6295_w(device,0,0x80|tumblep_music_command);
+			okim6295_w(device,0,0x00|0x82);
 		}
 	}
 }
@@ -474,7 +474,7 @@ static void tumbleb2_playmusic(const address_space *space)
 static INTERRUPT_GEN( tumbleb2_interrupt )
 {
 	cpu_set_input_line(device, 6, HOLD_LINE);
-	tumbleb2_playmusic(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM));
+	tumbleb2_playmusic(devtag_get_device(device->machine, SOUND, "oki"));
 }
 
 static const int tumbleb_sound_lookup[256] = {
@@ -504,24 +504,24 @@ static void tumbleb2_set_music_bank(running_machine *machine, int bank)
 	memcpy(&oki[0x38000], &oki[0x80000+0x38000+0x8000*bank],0x8000);
 }
 
-static void tumbleb2_play_sound (const address_space *space, int data)
+static void tumbleb2_play_sound (const device_config *device, int data)
 {
-	int status = okim6295_status_0_r(space,0);
+	int status = okim6295_r(device,0);
 
 	if ((status&0x01)==0x00)
 	{
-		okim6295_data_0_w(space,0,0x80|data);
-		okim6295_data_0_w(space,0,0x00|0x12);
+		okim6295_w(device,0,0x80|data);
+		okim6295_w(device,0,0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		okim6295_data_0_w(space,0,0x80|data);
-		okim6295_data_0_w(space,0,0x00|0x22);
+		okim6295_w(device,0,0x80|data);
+		okim6295_w(device,0,0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		okim6295_data_0_w(space,0,0x80|data);
-		okim6295_data_0_w(space,0,0x00|0x42);
+		okim6295_w(device,0,0x80|data);
+		okim6295_w(device,0,0x00|0x42);
 	}
 }
 
@@ -537,15 +537,15 @@ static void tumbleb2_play_sound (const address_space *space, int data)
 // bank 7 = how to play?
 // bank 8 = boss???
 
-static void process_tumbleb2_music_command(const address_space *space, int data)
+static void process_tumbleb2_music_command(const device_config *device, int data)
 {
-	int status = okim6295_status_0_r(space,0);
+	int status = okim6295_r(device,0);
 
 	if (data == 1) // stop?
 	{
 		if ((status&0x08)==0x08)
 		{
-			okim6295_data_0_w(space,0,0x40);		/* Stop playing music */
+			okim6295_w(device,0,0x40);		/* Stop playing music */
 			tumbleb2_music_is_playing = 0;
 		}
 	}
@@ -554,7 +554,7 @@ static void process_tumbleb2_music_command(const address_space *space, int data)
 		if (tumbleb2_music_is_playing != data)
 		{
 			tumbleb2_music_is_playing = data;
-			okim6295_data_0_w(space,0,0x40); // stop the current music
+			okim6295_w(device,0,0x40); // stop the current music
 			switch (data)
 			{
 				case 0x04: // map screen
@@ -627,8 +627,8 @@ static void process_tumbleb2_music_command(const address_space *space, int data)
 					tumblep_music_command = 0x38;
 					break;
 			}
-			tumbleb2_set_music_bank(space->machine, tumblep_music_bank);
-			tumbleb2_playmusic(space);
+			tumbleb2_set_music_bank(device->machine, tumblep_music_bank);
+			tumbleb2_playmusic(device);
 
 		}
 
@@ -637,7 +637,7 @@ static void process_tumbleb2_music_command(const address_space *space, int data)
 }
 
 
-static WRITE16_HANDLER(tumbleb2_soundmcu_w)
+static WRITE16_DEVICE_HANDLER( tumbleb2_soundmcu_w )
 {
 	int sound;
 
@@ -650,11 +650,11 @@ static WRITE16_HANDLER(tumbleb2_soundmcu_w)
 	}
 	else if (sound == -2)
 	{
-		process_tumbleb2_music_command(space, data);
+		process_tumbleb2_music_command(device, data);
 	}
 	else
 	{
-		tumbleb2_play_sound(space, sound);
+		tumbleb2_play_sound(device, sound);
 	}
 }
 
@@ -667,7 +667,7 @@ static ADDRESS_MAP_START( tumblepopb_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 #endif
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(tumblepb_prot_r, tumblepb_oki_w)
+	AM_RANGE(0x100000, 0x100001) AM_READ(tumblepb_prot_r) AM_DEVWRITE(SOUND, "oki", tumblepb_oki_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&tumblepb_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* Bootleg sprite buffer */
@@ -691,9 +691,8 @@ static ADDRESS_MAP_START( fncywld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 #endif
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(ym2151_status_port_0_lsb_r, ym2151_register_port_0_lsb_w)
-	AM_RANGE(0x100002, 0x100003) AM_READWRITE(SMH_NOP, ym2151_data_port_0_lsb_w)
-	AM_RANGE(0x100004, 0x100005) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8(SOUND, "ym", ym2151_r, ym2151_w, 0x00ff)
+	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* sprites */
 	AM_RANGE(0x160800, 0x16080f) AM_WRITE(SMH_RAM) /* goes slightly past the end of spriteram? */
@@ -786,20 +785,6 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-#ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( YM2151_w )
-{
-	switch (offset) {
-	case 0:
-		ym2151_register_port_0_w(0,data);
-		break;
-	case 1:
-		ym2151_data_port_0_w(0,data);
-		break;
-	}
-}
-#endif
-
 static WRITE16_HANDLER( semicom_soundcmd_w )
 {
 	if (ACCESSING_BITS_0_7)
@@ -821,9 +806,17 @@ static WRITE8_HANDLER( oki_sound_bank_w )
 static ADDRESS_MAP_START( semicom_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+//  AM_RANGE(0xf006, 0xf006) ??
+	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
+	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( suprtrio_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xcfff) AM_ROM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM
+	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 //  AM_RANGE(0xf006, 0xf006) ??
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
@@ -848,9 +841,8 @@ static READ8_HANDLER(jumppop_z80latch_r)
 
 static ADDRESS_MAP_START( jumppop_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ym", ym3812_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x03, 0x03) AM_READ(jumppop_z80latch_r)
 	AM_RANGE(0x04, 0x04) AM_NOP
 	AM_RANGE(0x05, 0x05) AM_WRITE(jumppop_z80_bank_w)
@@ -891,7 +883,7 @@ static ADDRESS_MAP_START( jumpkids_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(jumpkids_oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -2127,9 +2119,9 @@ MACHINE_DRIVER_END
 
 
 
-static void semicom_irqhandler(running_machine *machine, int irq)
+static void semicom_irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2178,7 +2170,7 @@ static MACHINE_DRIVER_START( htchctch )
 	/* sound hardware - same as hyperpac */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym2151", YM2151, 3427190)
+	MDRV_SOUND_ADD("ym", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
@@ -2198,7 +2190,7 @@ static MACHINE_DRIVER_START( bcstory )
 	MDRV_IMPORT_FROM(htchctch)
 	MDRV_VIDEO_UPDATE( bcstory )
 
-	MDRV_SOUND_REPLACE("ym2151", YM2151, 3427190)
+	MDRV_SOUND_REPLACE("ym", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
@@ -2219,7 +2211,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( metlsavr )
 	MDRV_IMPORT_FROM(cookbib)
 
-	MDRV_SOUND_REPLACE("ym2151", YM2151, 3427190)
+	MDRV_SOUND_REPLACE("ym", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.10)
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
@@ -2270,7 +2262,7 @@ static MACHINE_DRIVER_START( suprtrio )
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(semicom_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(suprtrio_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3292,13 +3284,15 @@ static DRIVER_INIT( tumblepb )
 
 static DRIVER_INIT( tumbleb2 )
 {
+	const device_config *oki = devtag_get_device(machine, SOUND, "oki");
+
 	tumblepb_gfx1_rearrange(machine);
 
 	#if TUMBLEP_HACK
 	tumblepb_patch_code(machine, 0x000132);
 	#endif
 
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x100001, 0, 0, tumbleb2_soundmcu_w );
+	memory_install_write16_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), oki, 0x100000, 0x100001, 0, 0, tumbleb2_soundmcu_w );
 
 }
 

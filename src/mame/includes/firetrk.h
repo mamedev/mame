@@ -32,14 +32,14 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 /*----------- defined in audio/firetrk.c -----------*/
 
-WRITE8_HANDLER( firetrk_skid_reset_w );
-WRITE8_HANDLER( montecar_skid_reset_w );
-WRITE8_HANDLER( firetrk_crash_snd_w );
-WRITE8_HANDLER( firetrk_skid_snd_w );
-WRITE8_HANDLER( firetrk_motor_snd_w );
-WRITE8_HANDLER( superbug_motor_snd_w );
-WRITE8_HANDLER( firetrk_xtndply_w );
-WRITE8_HANDLER( superbug_asr_w );
+WRITE8_DEVICE_HANDLER( firetrk_skid_reset_w );
+WRITE8_DEVICE_HANDLER( montecar_skid_reset_w );
+WRITE8_DEVICE_HANDLER( firetrk_crash_snd_w );
+WRITE8_DEVICE_HANDLER( firetrk_skid_snd_w );
+WRITE8_DEVICE_HANDLER( firetrk_motor_snd_w );
+WRITE8_DEVICE_HANDLER( superbug_motor_snd_w );
+WRITE8_DEVICE_HANDLER( firetrk_xtndply_w );
+WRITE8_DEVICE_HANDLER( superbug_asr_w );
 
 DISCRETE_SOUND_EXTERN( firetrk );
 DISCRETE_SOUND_EXTERN( superbug );

@@ -46,14 +46,11 @@ static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
-static WRITE8_HANDLER( ironhors_filter_w )
+static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
 {
-	if (sndti_exists(SOUND_DISCRETE, 2))
-	{
-		discrete_sound_w(space, NODE_11, (data & 0x04) >> 2);
-		discrete_sound_w(space, NODE_12, (data & 0x02) >> 1);
-		discrete_sound_w(space, NODE_13, (data & 0x01) >> 0);
-	}
+	discrete_sound_w(device, NODE_11, (data & 0x04) >> 2);
+	discrete_sound_w(device, NODE_12, (data & 0x02) >> 1);
+	discrete_sound_w(device, NODE_13, (data & 0x01) >> 0);
 }
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -92,16 +89,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym2203", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( farwest_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(soundlatch_r, ym2203_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE(SOUND, "ym2203", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -342,10 +337,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		ironhors_filter_w,
-		NULL
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_DEVICE_HANDLER(SOUND, "disc_ih", ironhors_filter_w),
+		DEVCB_NULL
 	},
 	NULL
 };

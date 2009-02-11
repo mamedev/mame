@@ -160,7 +160,6 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/262intf.h"
 #include "sound/ymf278b.h"
 
 static emu_timer *raster_interrupt_timer;
@@ -353,12 +352,7 @@ static ADDRESS_MAP_START( fuuki32_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(ymf262_status_0_r, ymf262_register_a_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(ymf262_data_a_0_w)
-	AM_RANGE(0x42, 0x42) AM_WRITE(ymf262_register_b_0_w)
-	AM_RANGE(0x43, 0x43) AM_WRITE(ymf262_data_b_0_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(ymf278b_control_port_0_c_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(ymf278b_data_port_0_c_w)
+	AM_RANGE(0x40, 0x45) AM_DEVREADWRITE(SOUND, "ymf", ymf278b_r, ymf278b_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -583,12 +577,12 @@ static MACHINE_RESET( fuuki32 )
 }
 
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ymf262_interface fuuki32_ymf262_interface =
+static const ymf278b_interface fuuki32_ymf278b_interface =
 {
 	irqhandler		/* irq */
 };
@@ -625,14 +619,7 @@ static MACHINE_DRIVER_START( fuuki32 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ymf1", YMF262, FM_SOUND_CLOCK) /* 33.8688MHz OSC divided by 2 is 16.9344MHz */
-	MDRV_SOUND_CONFIG(fuuki32_ymf262_interface)
-	MDRV_SOUND_ROUTE(0, "left", 0.50)
-	MDRV_SOUND_ROUTE(1, "right", 0.50)
-	MDRV_SOUND_ROUTE(2, "left", 0.50)
-	MDRV_SOUND_ROUTE(3, "right", 0.50)
-
-	MDRV_SOUND_ADD("ymf2", YMF278B, YMF278B_STD_CLOCK) /* YMF278B_STD_CLOCK = OSC 33.8688MHz */
+	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK) /* YMF278B_STD_CLOCK = OSC 33.8688MHz */
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 MACHINE_DRIVER_END
@@ -684,10 +671,7 @@ ROM_START( asurabld )
 	ROM_REGION( 0x200000, "gfx4", ROMREGION_DISPOSE ) // background tiles
 	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(e681155e) SHA1(458845b9c86df72685d92d0d4052aacc2fa7d1bd) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
-	ROM_LOAD( "pcm.u6", 0x00000, 0x400000, CRC(ac72225a) SHA1(8d16399ed34ac5bd69dbf43b2de2b0db9ac1c610) )
-
-	ROM_REGION( 0x400000, "ymf2", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
 	ROM_LOAD( "pcm.u6", 0x00000, 0x400000, CRC(ac72225a) SHA1(8d16399ed34ac5bd69dbf43b2de2b0db9ac1c610) )
 ROM_END
 
@@ -731,10 +715,7 @@ ROM_START( asurabus )
 	ROM_REGION( 0x200000, "gfx4", ROMREGION_DISPOSE ) // background tiles
 	ROM_LOAD( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
-	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
-
-	ROM_REGION( 0x400000, "ymf2", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
 ROM_END
 

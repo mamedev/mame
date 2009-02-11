@@ -466,47 +466,42 @@ static VIDEO_UPDATE( berzerk )
  *
  *************************************/
 
-static const custom_sound_interface berzerk_custom_interface =
-{
-	exidy_sh6840_sh_start,
-	0,
-	exidy_sh6840_sh_reset
-};
-
-
 static WRITE8_HANDLER( berzerk_audio_w )
 {
+	const device_config *device;
 	int clock_divisor;
 
 	switch (offset)
 	{
 	/* offset 4 writes to the S14001A */
 	case 4:
+		device = devtag_get_device(space->machine, SOUND, "speech");
 		switch (data >> 6)
 		{
 		/* write data to the S14001 */
 		case 0:
 			/* only if not busy */
-			if (!s14001a_bsy_0_r())
+			if (!s14001a_bsy_r(device))
 			{
-				s14001a_reg_0_w(data & 0x3f);
+				s14001a_reg_w(device, data & 0x3f);
 
 				/* clock the chip -- via a 555 timer */
-				s14001a_rst_0_w(1);
-				s14001a_rst_0_w(0);
+				s14001a_rst_w(device, 1);
+				s14001a_rst_w(device, 0);
 			}
 
 			break;
 
 		case 1:
+			device = devtag_get_device(space->machine, SOUND, "speech");
 			/* volume */
-			s14001a_set_volume(((data & 0x38) >> 3) + 1);
+			s14001a_set_volume(device, ((data & 0x38) >> 3) + 1);
 
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
                giving a final clock from 19.5kHz to 34.7kHz */
 			clock_divisor = 16 - (data & 0x07);
 
-			s14001a_set_clock(S14001_CLOCK / clock_divisor / 8);
+			s14001a_set_clock(device, S14001_CLOCK / clock_divisor / 8);
 			break;
 
 		default: break; /* 2 and 3 are not connected */
@@ -530,7 +525,8 @@ static WRITE8_HANDLER( berzerk_audio_w )
 
 static READ8_HANDLER( berzerk_audio_r )
 {
-	return ((offset == 4) && !s14001a_bsy_0_r()) ? 0x40 : 0x00;
+	const device_config *device = devtag_get_device(space->machine, SOUND, "speech");
+	return ((offset == 4) && !s14001a_bsy_r(device)) ? 0x40 : 0x00;
 }
 
 
@@ -861,8 +857,7 @@ static MACHINE_DRIVER_START( berzerk )
 	MDRV_SOUND_ADD("speech", S14001A, 0)	/* placeholder - the clock is software controllable */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("exidy", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(berzerk_custom_interface)
+	MDRV_SOUND_ADD("exidy", EXIDY, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

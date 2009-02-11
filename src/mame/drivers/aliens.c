@@ -77,7 +77,7 @@ static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
 	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( aliens_snd_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
 {
 	/* b1: bank for chanel A */
 	/* b0: bank for chanel B */
@@ -85,7 +85,7 @@ static WRITE8_HANDLER( aliens_snd_bankswitch_w )
 	int bank_A = ((data >> 1) & 0x01);
 	int bank_B = ((data) & 0x01);
 
-	k007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( devtag_get_device(device->machine, SOUND, "konami"), bank_A, bank_B );
 }
 
 
@@ -107,10 +107,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aliens_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM g04_b03.bin */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)				/* soundlatch_r */
-	AM_RANGE(0xe000, 0xe00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
+	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE(SOUND, "konami", k007232_r, k007232_w)
 ADDRESS_MAP_END
 
 
@@ -215,10 +214,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void volume_callback(int v)
+static void volume_callback(const device_config *device, int v)
 {
-	k007232_set_volume(0,0,(v & 0x0f) * 0x11,0);
-	k007232_set_volume(0,1,0,(v >> 4) * 0x11);
+	k007232_set_volume(device,0,(v & 0x0f) * 0x11,0);
+	k007232_set_volume(device,1,0,(v >> 4) * 0x11);
 }
 
 static const k007232_interface k007232_config =

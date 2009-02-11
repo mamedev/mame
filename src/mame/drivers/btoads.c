@@ -146,7 +146,7 @@ static WRITE8_HANDLER( sound_int_state_w )
 {
 	/* top bit controls BSMT2000 reset */
 	if (!(sound_int_state & 0x80) && (data & 0x80))
-		sndti_reset(SOUND_BSMT2000, 0);
+		devtag_reset(space->machine, SOUND, "bsmt");
 
 	/* also clears interrupts */
 	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
@@ -167,11 +167,11 @@ static READ8_HANDLER( bsmt_ready_r )
 }
 
 
-static WRITE8_HANDLER( bsmt2000_port_w )
+static WRITE8_DEVICE_HANDLER( bsmt2000_port_w )
 {
 	UINT16 reg = offset >> 8;
 	UINT16 val = ((offset & 0xff) << 8) | data;
-	bsmt2000_data_0_w(space, reg, val, 0xffff);
+	bsmt2000_data_w(device, reg, val, 0xffff);
 }
 
 
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(bsmt2000_port_w)
+	AM_RANGE(0x0000, 0x7fff) AM_DEVWRITE(SOUND, "bsmt", bsmt2000_port_w)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(sound_int_state_w)
 	AM_RANGE(0x8004, 0x8004) AM_READ(sound_data_ready_r)

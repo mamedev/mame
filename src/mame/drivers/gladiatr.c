@@ -276,36 +276,31 @@ static MACHINE_RESET( gladiator )
 	}
 }
 
-/* YM2203 port A handler (input) */
-static READ8_HANDLER( gladiator_dsw3_r )
-{
-	return input_port_read(space->machine, "DSW3");
-}
 /* YM2203 port B handler (output) */
-static WRITE8_HANDLER( gladiator_int_control_w )
+static WRITE8_DEVICE_HANDLER( gladiator_int_control_w )
 {
 	/* bit 7   : SSRST = sound reset ? */
 	/* bit 6-1 : N.C.                  */
 	/* bit 0   : ??                    */
 }
 /* YM2203 IRQ */
-static void gladiator_ym_irq(running_machine *machine, int irq)
+static void gladiator_ym_irq(const device_config *device, int irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
-static WRITE8_HANDLER( glad_adpcm_w )
+static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
+	UINT8 *rom = memory_region(device->machine, "audio") + 0x10000;
 
 	/* bit6 = bank offset */
-	memory_set_bankptr(space->machine, 2,rom + ((data & 0x40) ? 0xc000 : 0));
+	memory_set_bankptr(device->machine, 2,rom + ((data & 0x40) ? 0xc000 : 0));
 
-	msm5205_data_w(0,data);         /* bit0..3  */
-	msm5205_reset_w(0,(data>>5)&1); /* bit 5    */
-	msm5205_vclk_w (0,(data>>4)&1); /* bit4     */
+	msm5205_data_w(device,data);         /* bit0..3  */
+	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w (device,(data>>4)&1); /* bit4     */
 }
 
 static WRITE8_HANDLER( glad_cpu_sound_command_w )
@@ -416,8 +411,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READ(ym2203_read_port_0_r) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x20, 0x21) AM_READ(qx1_r) AM_WRITE(qx1_w)
 	AM_RANGE(0x40, 0x40) AM_READ(SMH_NOP)
 	AM_RANGE(0x60, 0x61) AM_READ(qx2_r) AM_WRITE(qx2_w)
@@ -445,7 +439,7 @@ static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(glad_adpcm_w)
+	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE(SOUND, "msm", glad_adpcm_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(glad_cpu_sound_command_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK(2)
 ADDRESS_MAP_END
@@ -464,8 +458,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x20, 0x21) AM_READWRITE(TAITO8741_1_r, TAITO8741_1_w)
 	AM_RANGE(0x40, 0x40) AM_NOP	// WRITE(sub_irq_ack_w)
 	AM_RANGE(0x60, 0x61) AM_READWRITE(TAITO8741_2_r, TAITO8741_2_w)
@@ -650,9 +643,9 @@ GFXDECODE_END
 
 
 
-static READ8_HANDLER(f1_r)
+static READ8_DEVICE_HANDLER(f1_r)
 {
-	return mame_rand(space->machine);
+	return mame_rand(device->machine);
 }
 
 static const ym2203_interface ppking_ym2203_interface =
@@ -660,10 +653,10 @@ static const ym2203_interface ppking_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		f1_r,
-		f1_r,
-		NULL,
-		NULL
+		DEVCB_HANDLER(f1_r),
+		DEVCB_HANDLER(f1_r),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };
@@ -673,10 +666,10 @@ static const ym2203_interface gladiatr_ym2203_interface =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		gladiator_dsw3_r,         /* port B read */
-		gladiator_int_control_w, /* port A write */
-		NULL,
+		DEVCB_NULL,
+		DEVCB_INPUT_PORT("DSW3"),         		/* port B read */
+		DEVCB_HANDLER(gladiator_int_control_w), /* port A write */
+		DEVCB_NULL,
 	},
 	gladiator_ym_irq          /* NMI request for 2nd cpu */
 };

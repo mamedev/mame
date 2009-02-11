@@ -81,11 +81,11 @@ static WRITE8_HANDLER( rom_bank_w )
 	}
 }
 
-static WRITE8_HANDLER( ayporta_w )
+static WRITE8_DEVICE_HANDLER( ayporta_w )
 {
 }
 
-static WRITE8_HANDLER( ayportb_w )
+static WRITE8_DEVICE_HANDLER( ayportb_w )
 {
 }
 
@@ -93,10 +93,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	ayporta_w,
-	ayportb_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ayporta_w),
+	DEVCB_HANDLER(ayportb_w)
 };
 
 static ADDRESS_MAP_START( fortecar_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -109,8 +109,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x21) AM_WRITE(fortecar_videoregs_w) // MC6845?
-	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0x60, 0x62) AM_DEVREADWRITE(PPI8255, "fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
 	AM_RANGE(0x81, 0x81) AM_WRITE(rom_bank_w) //completely wrong,might not be there...
  	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0") //written too,multiplexer?

@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( readmem_D, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(okim6295_status_0_lsb_r)
+	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff)
 //  { 0x100000, 0x100001  protection
 	AM_RANGE(0x1f0000, 0x1fffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -361,7 +361,7 @@ static ADDRESS_MAP_START( writemem_D, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d4000, 0x0d7fff) AM_WRITE(megasys1_scrollram_2_w) AM_BASE(&megasys1_scrollram[2])
 	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_WRITE(megasys1_scrollram_0_w) AM_BASE(&megasys1_scrollram[0])
-	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(okim6295_data_0_lsb_w)
+	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)
 //  { 0x100000, 0x100001  protection
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(SMH_RAM) AM_BASE(&megasys1_ram)
 ADDRESS_MAP_END
@@ -425,26 +425,18 @@ ADDRESS_MAP_END
 */
 
 /* YM2151 IRQ */
-static void megasys1_sound_irq(running_machine *machine, int irq)
+static void megasys1_sound_irq(const device_config *device, int irq)
 {
 	if (irq)
-		cpu_set_input_line(machine->cpu[1], 4, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 4, HOLD_LINE);
 }
 
-static READ16_HANDLER( oki_status_0_r )
+static READ8_DEVICE_HANDLER( oki_status_r )
 {
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return okim6295_status_0_lsb_r(space,offset,mem_mask);
-}
-
-static READ16_HANDLER( oki_status_1_r )
-{
-	if (megasys1_ignore_oki_status == 1)
-		return 0;
-	else
-		return okim6295_status_1_lsb_r(space,offset,mem_mask);
+		return okim6295_r(device,offset);
 }
 
 /***************************************************************************
@@ -455,19 +447,18 @@ static READ16_HANDLER( oki_status_1_r )
 static ADDRESS_MAP_START( sound_readmem_A, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)
-	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(oki_status_0_r)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(oki_status_1_r)
+	AM_RANGE(0x080000, 0x080003) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8(SOUND, "oki1", oki_status_r, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8(SOUND, "oki2", oki_status_r, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem_A, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	// to main cpu
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w)
+	AM_RANGE(0x080000, 0x080003) AM_DEVWRITE8(SOUND, "ym", ym2151_w, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -485,9 +476,9 @@ static ADDRESS_MAP_START( sound_readmem_B, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)	/* from main cpu */
 	AM_RANGE(0x060000, 0x060001) AM_READ(soundlatch_word_r)	/* from main cpu */
-	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(oki_status_0_r)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(oki_status_1_r)
+	AM_RANGE(0x080000, 0x080003) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8(SOUND, "oki1", oki_status_r, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8(SOUND, "oki2", oki_status_r, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0effff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -495,10 +486,9 @@ static ADDRESS_MAP_START( sound_writemem_B, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(SMH_ROM	)
 	AM_RANGE(0x040000, 0x040001) AM_WRITE(soundlatch2_word_w)	/* to main cpu */
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	/* to main cpu */
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w)
+	AM_RANGE(0x080000, 0x080003) AM_DEVWRITE8(SOUND, "ym", ym2151_w, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0effff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -527,8 +517,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -1660,7 +1649,7 @@ static MACHINE_DRIVER_START( system_D )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1",OKIM6295, SYS_D_CPU_CLOCK/4)	/* 2MHz (8MHz / 4) */
+	MDRV_SOUND_ADD("oki",OKIM6295, SYS_D_CPU_CLOCK/4)	/* 2MHz (8MHz / 4) */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1679,9 +1668,9 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1690,7 +1679,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irq_handler
 };
@@ -3809,19 +3798,16 @@ static DRIVER_INIT( iganinju )
 								// not like lev 3 interrupts
 }
 
-static WRITE16_HANDLER( okim6295_data_0_both_w )
+static WRITE16_DEVICE_HANDLER( okim6295_both_w )
 {
-	if (ACCESSING_BITS_0_7)	okim6295_data_0_w(space, 0, (data >> 0) & 0xff );
-	else				okim6295_data_0_w(space, 0, (data >> 8) & 0xff );
-}
-static WRITE16_HANDLER( okim6295_data_1_both_w )
-{
-	if (ACCESSING_BITS_0_7)	okim6295_data_1_w(space, 0, (data >> 0) & 0xff );
-	else				okim6295_data_1_w(space, 0, (data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7)	okim6295_w(device, 0, (data >> 0) & 0xff );
+	else				okim6295_w(device, 0, (data >> 8) & 0xff );
 }
 
 static DRIVER_INIT( jitsupro )
 {
+	const device_config *oki1 = devtag_get_device(machine, SOUND, "oki1");
+	const device_config *oki2 = devtag_get_device(machine, SOUND, "oki2");
 	UINT16 *RAM  = (UINT16 *) memory_region(machine, "main");
 
 	astyanax_rom_decode(machine, "main");		// Code
@@ -3833,8 +3819,8 @@ static DRIVER_INIT( jitsupro )
 	RAM[0x438/2] = 0x4e71;	//
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xa0000, 0xa0003, 0, 0, okim6295_data_0_both_w);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc0000, 0xc0003, 0, 0, okim6295_data_1_both_w);
+	memory_install_write16_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), oki1, 0xa0000, 0xa0003, 0, 0, okim6295_both_w);
+	memory_install_write16_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), oki2, 0xc0000, 0xc0003, 0, 0, okim6295_both_w);
 }
 
 static DRIVER_INIT( peekaboo )

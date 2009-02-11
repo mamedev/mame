@@ -19,7 +19,8 @@
 #include "streams.h"
 #include "rf5c400.h"
 
-struct rf5c400_info
+typedef struct _rf5c400_state rf5c400_state;
+struct _rf5c400_state
 {
 	INT16 *rom;
 	UINT32 rom_length;
@@ -90,6 +91,16 @@ enum {
 };
 
 
+INLINE rf5c400_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_RF5C400);
+	return (rf5c400_state *)device->token;
+}
+
+
 /*****************************************************************************/
 
 static UINT8 decode80(UINT8 val)
@@ -105,7 +116,7 @@ static UINT8 decode80(UINT8 val)
 static STREAM_UPDATE( rf5c400_update )
 {
 	int i, ch;
-	struct rf5c400_info *info = param;
+	rf5c400_state *info = param;
 	INT16 *rom = info->rom;
 	UINT32 start, end, loop;
 	UINT64 pos;
@@ -226,7 +237,7 @@ static STREAM_UPDATE( rf5c400_update )
 	}
 }
 
-static void rf5c400_init_chip(const device_config *device, struct rf5c400_info *info, int clock)
+static void rf5c400_init_chip(const device_config *device, rf5c400_state *info)
 {
 	int i;
 
@@ -334,21 +345,21 @@ static void rf5c400_init_chip(const device_config *device, struct rf5c400_info *
 		state_save_register_device_item(device, i, info->channels[i].env_scale);
 	}
 
-	info->stream = stream_create(device, 0, 2, clock/384, info, rf5c400_update);
+	info->stream = stream_create(device, 0, 2, device->clock/384, info, rf5c400_update);
 }
 
 
-static SND_START( rf5c400 )
+static DEVICE_START( rf5c400 )
 {
-	struct rf5c400_info *info = device->token;
+	rf5c400_state *info = get_safe_token(device);
 
-	rf5c400_init_chip(device, info, clock);
+	rf5c400_init_chip(device, info);
 }
 
 /*****************************************************************************/
 
 static UINT16 rf5c400_status = 0;
-static UINT16 rf5c400_r(int chipnum, int offset)
+READ16_DEVICE_HANDLER( rf5c400_r )
 {
 	switch(offset)
 	{
@@ -366,9 +377,9 @@ static UINT16 rf5c400_r(int chipnum, int offset)
 	return 0;
 }
 
-static void rf5c400_w(int chipnum, int offset, UINT16 data)
+WRITE16_DEVICE_HANDLER( rf5c400_w )
 {
-	struct rf5c400_info *info = sndti_token(SOUND_RF5C400, chipnum);
+	rf5c400_state *info = get_safe_token(device);
 
 	if (offset < 0x400)
 	{
@@ -547,47 +558,27 @@ static void rf5c400_w(int chipnum, int offset, UINT16 data)
 	}
 }
 
-READ16_HANDLER( rf5c400_0_r )
-{
-	return rf5c400_r(0, offset);
-}
-
-WRITE16_HANDLER( rf5c400_0_w )
-{
-	rf5c400_w(0, offset, data);
-}
-
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( rf5c400 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( rf5c400 )
+DEVICE_GET_INFO( rf5c400 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct rf5c400_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(rf5c400_state);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( rf5c400 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( rf5c400 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							/* nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( rf5c400 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							/* nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "RF5C400");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Ricoh PCM");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team & hoot development team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "RF5C400");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Ricoh PCM");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.1");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team & hoot development team"); break;
 	}
 }

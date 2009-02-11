@@ -14,6 +14,7 @@ segac2.c
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/2612intf.h"
 #include "genesis.h"
 
 #define MASTER_CLOCK		53693100
@@ -132,10 +133,10 @@ INTERRUPT_GEN( genesis_vblank_interrupt )
 
 
 /* interrupt callback to generate the YM3438 interrupt */
-void genesis_irq2_interrupt(running_machine *machine, int state)
+void genesis_irq2_interrupt(const device_config *device, int state)
 {
 	irq2_int = state;
-	update_interrupts(machine);
+	update_interrupts(device->machine);
 }
 
 
@@ -253,17 +254,9 @@ READ16_HANDLER ( genesis_68k_to_z80_r )
 	/* YM2610 */
 	if ((offset >= 0x4000) && (offset <= 0x5fff))
 	{
-		switch (offset & 3)
-		{
-		case 0:
-			if (ACCESSING_BITS_8_15)	 return ym3438_status_port_0_a_r(space, 0) << 8;
-			else 				 return ym3438_read_port_0_r(space, 0);
-			break;
-		case 2:
-			if (ACCESSING_BITS_8_15)	return ym3438_status_port_0_b_r(space, 0) << 8;
-			else 				return 0;
-			break;
-		}
+		if (ACCESSING_BITS_0_7)
+			offset += 1;
+		return ym3438_r(devtag_get_device(space->machine, SOUND, "ym"), offset);
 	}
 
 	/* Bank Register */
@@ -313,17 +306,9 @@ READ16_HANDLER ( megaplay_68k_to_z80_r )
 	/* YM2610 */
 	if ((offset >= 0x4000) && (offset <= 0x5fff))
 	{
-		switch (offset & 3)
-		{
-		case 0:
-			if (ACCESSING_BITS_8_15)	 return ym3438_status_port_0_a_r(space, 0) << 8;
-			else 				 return ym3438_read_port_0_r(space, 0);
-			break;
-		case 2:
-			if (ACCESSING_BITS_8_15)	return ym3438_status_port_0_b_r(space, 0) << 8;
-			else 				return 0;
-			break;
-		}
+		if (ACCESSING_BITS_0_7)
+			offset += 1;
+		return ym3438_r(devtag_get_device(space->machine, SOUND, "ym"), offset);
 	}
 
 	/* Bank Register */
@@ -362,18 +347,19 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 	}
 
 
-	/* YM2610 */
+	/* YM2612 */
 	if ((offset >= 0x4000) && (offset <= 0x5fff))
 	{
+		const device_config *ym = devtag_get_device(space->machine, SOUND, "ym");
 		switch (offset & 3)
 		{
 		case 0:
-			if (ACCESSING_BITS_8_15)	ym3438_control_port_0_a_w	(space, 0,	(data >> 8) & 0xff);
-			else 				ym3438_data_port_0_a_w		(space, 0,	(data >> 0) & 0xff);
+			if (ACCESSING_BITS_8_15)	ym3438_control_port_a_w	(ym, 0,	(data >> 8) & 0xff);
+			else 				ym3438_data_port_a_w		(ym, 0,	(data >> 0) & 0xff);
 			break;
 		case 2:
-			if (ACCESSING_BITS_8_15)	ym3438_control_port_0_b_w	(space, 0,	(data >> 8) & 0xff);
-			else 				ym3438_data_port_0_b_w		(space, 0,	(data >> 0) & 0xff);
+			if (ACCESSING_BITS_8_15)	ym3438_control_port_b_w	(ym, 0,	(data >> 8) & 0xff);
+			else 				ym3438_data_port_b_w		(ym, 0,	(data >> 0) & 0xff);
 			break;
 		}
 	}
@@ -397,8 +383,9 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 
 		if ( (offset >= 0x10) && (offset <=0x17) )
 		{
-			if (ACCESSING_BITS_0_7) sn76496_0_w(space, 0, data & 0xff);
-			if (ACCESSING_BITS_8_15) sn76496_0_w(space, 0, (data >>8) & 0xff);
+			const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+			if (ACCESSING_BITS_0_7) sn76496_w(sn, 0, data & 0xff);
+			if (ACCESSING_BITS_8_15) sn76496_w(sn, 0, (data >>8) & 0xff);
 		}
 
 	}
@@ -525,13 +512,7 @@ READ8_HANDLER ( genesis_z80_r )
 	/* YM2610 */
 	if ((offset >= 0x4000) && (offset <= 0x5fff))
 	{
-		switch (offset & 3)
-		{
-		case 0: return ym3438_status_port_0_a_r(space, 0);
-		case 1: return ym3438_read_port_0_r(space, 0);
-		case 2: return ym3438_status_port_0_b_r(space, 0);
-		case 3: return 0;
-		}
+		return ym3438_r(devtag_get_device(space->machine, SOUND, "ym"), offset);
 	}
 
 	/* Bank Register */
@@ -562,17 +543,7 @@ WRITE8_HANDLER ( genesis_z80_w )
 	/* YM2610 */
 	if ((offset >= 0x4000) && (offset <= 0x5fff))
 	{
-		switch (offset & 3)
-		{
-		case 0: ym3438_control_port_0_a_w	(space, 0,	data);
-			break;
-		case 1: ym3438_data_port_0_a_w		(space, 0, data);
-			break;
-		case 2: ym3438_control_port_0_b_w	(space, 0,	data);
-			break;
-		case 3: ym3438_data_port_0_b_w		(space, 0,	data);
-			break;
-		}
+		ym3438_w(devtag_get_device(space->machine, SOUND, "ym"), offset & 3, data);
 	}
 
 	/* Bank Register */

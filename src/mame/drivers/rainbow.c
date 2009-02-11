@@ -347,9 +347,9 @@ ADDRESS_MAP_END
               Jumping uses two YM2203's
 ***********************************************************/
 
-static WRITE8_HANDLER( bankswitch_w )
+static WRITE8_DEVICE_HANDLER( bankswitch_w )
 {
-	memory_set_bankptr(space->machine, 5, memory_region(space->machine, "audio") + ((data - 1) & 3) * 0x4000 + 0x10000);
+	memory_set_bankptr(device->machine, 5, memory_region(device->machine, "audio") + ((data - 1) & 3) * 0x4000 + 0x10000);
 }
 
 static READ8_HANDLER( jumping_latch_r )
@@ -362,7 +362,7 @@ static ADDRESS_MAP_START( rainbow_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK5)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9001, 0x9001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2151_r)
 	AM_RANGE(0x9002, 0x9100) AM_READ(SMH_RAM)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -370,8 +370,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rainbow_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -379,8 +378,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jumping_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xb000, 0xb000) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0xb400, 0xb400) AM_READ(ym2203_status_port_1_r)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREAD(SOUND, "ym1", ym2203_r)
+	AM_RANGE(0xb400, 0xb401) AM_DEVREAD(SOUND, "ym2", ym2203_r)
 	AM_RANGE(0xb800, 0xb800) AM_READ(jumping_latch_r)
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -388,10 +387,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jumping_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xb400, 0xb400) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0xb401, 0xb401) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0xb400, 0xb401) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)	/* looks like a bankswitch, but sound works with or without it */
 ADDRESS_MAP_END
 
@@ -592,9 +589,9 @@ GFXDECODE_END
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

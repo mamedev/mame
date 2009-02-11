@@ -806,27 +806,29 @@ static WRITE16_HANDLER( na1mcu_shared_w )
 	COMBINE_DATA(&namcona1_workram[offset]);
 }
 
-static READ16_HANDLER(snd_r)
+static READ16_DEVICE_HANDLER(snd_r)
 {
-	return c140_r(space,offset*2+1) | c140_r(space,offset*2)<<8;
+	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
+	return c140_r(device,offset*2+1) | c140_r(device,offset*2)<<8;
 }
 
-static WRITE16_HANDLER(snd_w)
+static WRITE16_DEVICE_HANDLER(snd_w)
 {
+	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
 	if (ACCESSING_BITS_0_7)
 	{
-		c140_w(space,(offset*2)+1, data);
+		c140_w(device,(offset*2)+1, data);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		c140_w(space,(offset*2), data>>8);
+		c140_w(device,(offset*2), data>>8);
 	}
 }
 
 static ADDRESS_MAP_START( namcona1_mcu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000800, 0x000fff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_mcu)	// "Mailslot" communications ports
-	AM_RANGE(0x001000, 0x001fff) AM_READWRITE(snd_r, snd_w)				// C140-alike sound chip
+	AM_RANGE(0x001000, 0x001fff) AM_DEVREADWRITE(SOUND, "c140", snd_r, snd_w)	// C140-alike sound chip
 	AM_RANGE(0x002000, 0x002fff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w)	// mirror of first page of shared work RAM
 	AM_RANGE(0x003000, 0x00afff) AM_RAM						// there is a 32k RAM chip according to CGFM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0)			// internal ROM BIOS
@@ -917,7 +919,7 @@ static WRITE8_HANDLER( port8_w )
 
 static MACHINE_START( namcona1 )
 {
-	c140_set_base(0, namcona1_workram);
+	c140_set_base(devtag_get_device(machine, SOUND, "c140"), namcona1_workram);
 }
 
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
@@ -1036,7 +1038,7 @@ static MACHINE_DRIVER_START( namcona1 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("namco", C140, 44100)
+	MDRV_SOUND_ADD("c140", C140, 44100)
 	MDRV_SOUND_CONFIG(C140_interface_typeA)
 	MDRV_SOUND_ROUTE(0, "right", 1.00)
 	MDRV_SOUND_ROUTE(1, "left", 1.00)

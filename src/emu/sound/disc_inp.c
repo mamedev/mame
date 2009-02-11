@@ -30,9 +30,18 @@ struct dss_adjustment_context
 	double		scale;
 };
 
-UINT8 discrete_sound_n_r(void *chip, offs_t offset)
+INLINE discrete_info *get_safe_token(const device_config *device)
 {
-	discrete_info    *info = chip;
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_DISCRETE);
+	return (discrete_info *)device->token;
+}
+
+READ8_DEVICE_HANDLER(discrete_sound_r)
+{
+	discrete_info    *info = get_safe_token(device);
 	node_description *node = discrete_find_node(info, offset);
 
 	UINT8 data = 0;
@@ -56,29 +65,9 @@ UINT8 discrete_sound_n_r(void *chip, offs_t offset)
     return data;
 }
 
-READ8_HANDLER(discrete_sound_r)
+WRITE8_DEVICE_HANDLER(discrete_sound_w)
 {
-	return discrete_sound_n_r(sndti_token(SOUND_DISCRETE, 0), offset);
-}
-
-READ8_HANDLER(discrete_sound_1_r)
-{
-	return discrete_sound_n_r(sndti_token(SOUND_DISCRETE, 1), offset);
-}
-
-READ8_HANDLER(discrete_sound_2_r)
-{
-	return discrete_sound_n_r(sndti_token(SOUND_DISCRETE, 2), offset);
-}
-
-READ8_HANDLER(discrete_sound_3_r)
-{
-	return discrete_sound_n_r(sndti_token(SOUND_DISCRETE, 3), offset);
-}
-
-void discrete_sound_n_w(void *chip, offs_t offset, UINT8 data)
-{
-	discrete_info    *info = chip;
+	discrete_info    *info = get_safe_token(device);
 	node_description *node = discrete_find_node(info, offset);
 
 	/* Update the node input value if it's a proper input node */
@@ -116,26 +105,6 @@ void discrete_sound_n_w(void *chip, offs_t offset, UINT8 data)
 	{
 		discrete_log("discrete_sound_w write to non-existent NODE_%02d\n", offset-NODE_00);
 	}
-}
-
-WRITE8_HANDLER(discrete_sound_w)
-{
-	discrete_sound_n_w(sndti_token(SOUND_DISCRETE, 0), offset, data);
-}
-
-WRITE8_HANDLER(discrete_sound_1_w)
-{
-	discrete_sound_n_w(sndti_token(SOUND_DISCRETE, 1), offset, data);
-}
-
-WRITE8_HANDLER(discrete_sound_2_w)
-{
-	discrete_sound_n_w(sndti_token(SOUND_DISCRETE, 2), offset, data);
-}
-
-WRITE8_HANDLER(discrete_sound_3_w)
-{
-	discrete_sound_n_w(sndti_token(SOUND_DISCRETE, 3), offset, data);
 }
 
 /************************************************************************

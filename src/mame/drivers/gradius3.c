@@ -157,14 +157,14 @@ static WRITE16_HANDLER( sound_irq_w )
 	cpu_set_input_line_and_vector(space->machine->cpu[2],0,HOLD_LINE,0xff);
 }
 
-static WRITE8_HANDLER( sound_bank_w )
+static WRITE8_DEVICE_HANDLER( sound_bank_w )
 {
 	int bank_A, bank_B;
 
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( device, bank_A, bank_B );
 }
 
 
@@ -205,11 +205,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gradius3_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE(SOUND, "konami", sound_bank_w)				/* 007232 bankswitch */
 	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_r)
-	AM_RANGE(0xf020, 0xf02d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
-	AM_RANGE(0xf030, 0xf030) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xf031, 0xf031) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE(SOUND, "konami", k007232_r, k007232_w)
+	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -321,10 +320,10 @@ INPUT_PORTS_END
 
 
 
-static void volume_callback(int v)
+static void volume_callback(const device_config *device, int v)
 {
-	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =

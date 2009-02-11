@@ -73,7 +73,7 @@ extern VIDEO_UPDATE( blueprnt );
 
 static int dipsw;
 
-static WRITE8_HANDLER( dipsw_w )
+static WRITE8_DEVICE_HANDLER( dipsw_w )
 {
 	dipsw = data;
 }
@@ -115,12 +115,10 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x6002, 0x6002) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x8002, 0x8002) AM_READ(ay8910_read_port_1_r)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x6002, 0x6002) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x8002, 0x8002) AM_DEVREAD(SOUND, "ay2", ay8910_r)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -252,20 +250,20 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	soundlatch_r,
-	dipsw_w,
-	NULL
+	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_HANDLER(dipsw_w),
+	DEVCB_NULL
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_2_r,
-	input_port_3_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DILSW1"),
+	DEVCB_INPUT_PORT("DILSW2"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Machine Driver */

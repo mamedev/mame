@@ -28,7 +28,9 @@ typedef struct
 	int silence_counter;
 } voice;
 
-struct namco_63701x
+
+typedef struct _namco_63701x namco_63701x;
+struct _namco_63701x
 {
 	voice voices[2];
 	sound_stream * stream;		/* channel assigned by the mixer */
@@ -45,9 +47,19 @@ struct namco_63701x
 static const int vol_table[4] = { 26, 84, 200, 258 };
 
 
+INLINE namco_63701x *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_NAMCO_63701X);
+	return (namco_63701x *)device->token;
+}
+
+
 static STREAM_UPDATE( namco_63701x_update )
 {
-	struct namco_63701x *chip = param;
+	namco_63701x *chip = param;
 	int ch;
 
 	for (ch = 0;ch < 2;ch++)
@@ -99,20 +111,20 @@ static STREAM_UPDATE( namco_63701x_update )
 }
 
 
-static SND_START( namco_63701x )
+static DEVICE_START( namco_63701x )
 {
-	struct namco_63701x *chip = device->token;
+	namco_63701x *chip = get_safe_token(device);
 
 	chip->rom = device->region;
 
-	chip->stream = stream_create(device, 0, 2, clock/1000, chip, namco_63701x_update);
+	chip->stream = stream_create(device, 0, 2, device->clock/1000, chip, namco_63701x_update);
 }
 
 
 
-void namco_63701x_write(int offset, int data)
+WRITE8_DEVICE_HANDLER( namco_63701x_w )
 {
-	struct namco_63701x *chip = sndti_token(SOUND_NAMCO_63701X, 0);
+	namco_63701x *chip = get_safe_token(device);
 	int ch = offset / 2;
 
 	if (offset & 1)
@@ -154,34 +166,24 @@ void namco_63701x_write(int offset, int data)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( namco_63701x )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( namco_63701x )
+DEVICE_GET_INFO( namco_63701x )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct namco_63701x);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(namco_63701x);						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_63701x );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco_63701x );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */										break;
-		case SNDINFO_PTR_RESET:							/* Nothing */										break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( namco_63701x );	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */										break;
+		case DEVINFO_FCT_RESET:							/* Nothing */										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Namco 63701X");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Namco custom");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Namco 63701X");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Namco custom");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

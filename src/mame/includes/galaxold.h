@@ -195,10 +195,10 @@ void sfx_sh_init(running_machine *machine);
 WRITE8_HANDLER( scramble_filter_w );
 WRITE8_HANDLER( frogger_filter_w );
 
-READ8_HANDLER( scramble_portB_r );
-READ8_HANDLER( frogger_portB_r );
+READ8_DEVICE_HANDLER( scramble_portB_r );
+READ8_DEVICE_HANDLER( frogger_portB_r );
 
-READ8_HANDLER( hotshock_soundlatch_r );
+READ8_DEVICE_HANDLER( hotshock_soundlatch_r );
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w );
 WRITE8_HANDLER( sfx_sh_irqtrigger_w );

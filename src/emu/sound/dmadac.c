@@ -40,7 +40,8 @@
  *
  *************************************/
 
-struct dmadac_channel_data
+typedef struct _dmadac_state dmadac_state;
+struct _dmadac_state
 {
 	/* sound stream and buffers */
 	sound_stream *	channel;
@@ -55,6 +56,15 @@ struct dmadac_channel_data
 };
 
 
+INLINE dmadac_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_DMADAC);
+	return (dmadac_state *)device->token;
+}
+
 
 /*************************************
  *
@@ -64,7 +74,7 @@ struct dmadac_channel_data
 
 static STREAM_UPDATE( dmadac_update )
 {
-	struct dmadac_channel_data *ch = param;
+	dmadac_state *ch = param;
 	stream_sample_t *output = outputs[0];
 	INT16 *source = ch->buffer;
 	UINT32 curout = ch->bufout;
@@ -91,9 +101,9 @@ static STREAM_UPDATE( dmadac_update )
  *
  *************************************/
 
-static SND_START( dmadac )
+static DEVICE_START( dmadac )
 {
-	struct dmadac_channel_data *info = device->token;
+	dmadac_state *info = device->token;
 
 	/* allocate a clear a buffer */
 	info->buffer = auto_malloc(sizeof(info->buffer[0]) * BUFFER_SIZE);
@@ -122,21 +132,21 @@ static SND_START( dmadac )
  *
  *************************************/
 
-void dmadac_transfer(UINT8 first_channel, UINT8 num_channels, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data)
+void dmadac_transfer(const device_config **devlist, UINT8 num_channels, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data)
 {
 	int i, j;
 
 	/* flush out as much data as we can */
 	for (i = 0; i < num_channels; i++)
 	{
-		struct dmadac_channel_data *info = sndti_token(SOUND_DMADAC, first_channel + i);
+		dmadac_state *info = get_safe_token(devlist[i]);
 		stream_update(info->channel);
 	}
 
 	/* loop over all channels and accumulate the data */
 	for (i = 0; i < num_channels; i++)
 	{
-		struct dmadac_channel_data *ch = sndti_token(SOUND_DMADAC, first_channel + i);
+		dmadac_state *ch = get_safe_token(devlist[i]);
 		if (ch->enabled)
 		{
 			int maxin = (ch->bufout + BUFFER_SIZE - 1) % BUFFER_SIZE;
@@ -168,14 +178,14 @@ void dmadac_transfer(UINT8 first_channel, UINT8 num_channels, offs_t channel_spa
  *
  *************************************/
 
-void dmadac_enable(UINT8 first_channel, UINT8 num_channels, UINT8 enable)
+void dmadac_enable(const device_config **devlist, UINT8 num_channels, UINT8 enable)
 {
 	int i;
 
 	/* flush out as much data as we can */
 	for (i = 0; i < num_channels; i++)
 	{
-		struct dmadac_channel_data *info = sndti_token(SOUND_DMADAC, first_channel + i);
+		dmadac_state *info = get_safe_token(devlist[i]);
 		stream_update(info->channel);
 		info->enabled = enable;
 		if (!enable)
@@ -191,14 +201,14 @@ void dmadac_enable(UINT8 first_channel, UINT8 num_channels, UINT8 enable)
  *
  *************************************/
 
-void dmadac_set_frequency(UINT8 first_channel, UINT8 num_channels, double frequency)
+void dmadac_set_frequency(const device_config **devlist, UINT8 num_channels, double frequency)
 {
 	int i;
 
 	/* set the sample rate on each channel */
 	for (i = 0; i < num_channels; i++)
 	{
-		struct dmadac_channel_data *info = sndti_token(SOUND_DMADAC, first_channel + i);
+		dmadac_state *info = get_safe_token(devlist[i]);
 		stream_set_sample_rate(info->channel, frequency);
 	}
 }
@@ -211,14 +221,14 @@ void dmadac_set_frequency(UINT8 first_channel, UINT8 num_channels, double freque
  *
  *************************************/
 
-void dmadac_set_volume(UINT8 first_channel, UINT8 num_channels, UINT16 volume)
+void dmadac_set_volume(const device_config **devlist, UINT8 num_channels, UINT16 volume)
 {
 	int i;
 
 	/* flush out as much data as we can */
 	for (i = 0; i < num_channels; i++)
 	{
-		struct dmadac_channel_data *info = sndti_token(SOUND_DMADAC, first_channel + i);
+		dmadac_state *info = get_safe_token(devlist[i]);
 		stream_update(info->channel);
 		info->volume = volume;
 	}
@@ -230,34 +240,24 @@ void dmadac_set_volume(UINT8 first_channel, UINT8 num_channels, UINT16 volume)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( dmadac )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( dmadac )
+DEVICE_GET_INFO( dmadac )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct dmadac_channel_data);	break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dmadac_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( dmadac );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( dmadac );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							/* nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( dmadac );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							/* nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "DMA-driven DAC");				break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "DAC");							break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "DMA-driven DAC");				break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "DAC");							break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

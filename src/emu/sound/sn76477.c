@@ -196,7 +196,8 @@ static const double out_neg_gain[] =
  *
  *****************************************************************************/
 
-struct SN76477
+typedef struct _sn76477_state sn76477_state;
+struct _sn76477_state
 {
 	/* chip's external interface */
 	UINT32 enable;
@@ -262,6 +263,15 @@ struct SN76477
 };
 
 
+INLINE sn76477_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_SN76477);
+	return (sn76477_state *)device->token;
+}
+
 
 /*****************************************************************************
  *
@@ -293,7 +303,7 @@ INLINE double min(double a, double b)
  *
  *****************************************************************************/
 
-static double compute_one_shot_cap_charging_rate(struct SN76477 *sn) /* in V/sec */
+static double compute_one_shot_cap_charging_rate(sn76477_state *sn) /* in V/sec */
 {
 	/* this formula was derived using the data points below
 
@@ -331,7 +341,7 @@ static double compute_one_shot_cap_charging_rate(struct SN76477 *sn) /* in V/sec
 }
 
 
-static double compute_one_shot_cap_discharging_rate(struct SN76477 *sn) /* in V/sec */
+static double compute_one_shot_cap_discharging_rate(sn76477_state *sn) /* in V/sec */
 {
 	/* this formula was derived using the data points below
 
@@ -359,7 +369,7 @@ static double compute_one_shot_cap_discharging_rate(struct SN76477 *sn) /* in V/
 }
 
 
-static double compute_slf_cap_charging_rate(struct SN76477 *sn) /* in V/sec */
+static double compute_slf_cap_charging_rate(sn76477_state *sn) /* in V/sec */
 {
 	/* this formula was derived using the data points below
 
@@ -382,7 +392,7 @@ static double compute_slf_cap_charging_rate(struct SN76477 *sn) /* in V/sec */
 }
 
 
-static double compute_slf_cap_discharging_rate(struct SN76477 *sn) /* in V/sec */
+static double compute_slf_cap_discharging_rate(sn76477_state *sn) /* in V/sec */
 {
 	/* this formula was derived using the data points below
 
@@ -405,7 +415,7 @@ static double compute_slf_cap_discharging_rate(struct SN76477 *sn) /* in V/sec *
 }
 
 
-static double compute_vco_cap_charging_discharging_rate(struct SN76477 *sn) /* in V/sec */
+static double compute_vco_cap_charging_discharging_rate(sn76477_state *sn) /* in V/sec */
 {
 	double ret = 0;
 
@@ -418,7 +428,7 @@ static double compute_vco_cap_charging_discharging_rate(struct SN76477 *sn) /* i
 }
 
 
-static double compute_vco_duty_cycle(struct SN76477 *sn) /* no measure, just a number */
+static double compute_vco_duty_cycle(sn76477_state *sn) /* no measure, just a number */
 {
 	double ret = 0.5;	/* 50% */
 
@@ -433,7 +443,7 @@ static double compute_vco_duty_cycle(struct SN76477 *sn) /* no measure, just a n
 }
 
 
-static UINT32 compute_noise_gen_freq(struct SN76477 *sn) /* in Hz */
+static UINT32 compute_noise_gen_freq(sn76477_state *sn) /* in Hz */
 {
 	/* this formula was derived using the data points below
 
@@ -475,7 +485,7 @@ static UINT32 compute_noise_gen_freq(struct SN76477 *sn) /* in Hz */
 }
 
 
-static double compute_noise_filter_cap_charging_rate(struct SN76477 *sn) /* in V/sec */
+static double compute_noise_filter_cap_charging_rate(sn76477_state *sn) /* in V/sec */
 {
 	/* this formula was derived using the data points below
 
@@ -513,7 +523,7 @@ static double compute_noise_filter_cap_charging_rate(struct SN76477 *sn) /* in V
 }
 
 
-static double compute_noise_filter_cap_discharging_rate(struct SN76477 *sn) /* in V/sec */
+static double compute_noise_filter_cap_discharging_rate(sn76477_state *sn) /* in V/sec */
 {
 	/* this formula was derived using the data points below
 
@@ -551,7 +561,7 @@ static double compute_noise_filter_cap_discharging_rate(struct SN76477 *sn) /* i
 }
 
 
-static double compute_attack_decay_cap_charging_rate(struct SN76477 *sn)  /* in V/sec */
+static double compute_attack_decay_cap_charging_rate(sn76477_state *sn)  /* in V/sec */
 {
 	double ret = 0;
 
@@ -576,7 +586,7 @@ static double compute_attack_decay_cap_charging_rate(struct SN76477 *sn)  /* in 
 }
 
 
-static double compute_attack_decay_cap_discharging_rate(struct SN76477 *sn)  /* in V/sec */
+static double compute_attack_decay_cap_discharging_rate(sn76477_state *sn)  /* in V/sec */
 {
 	double ret = 0;
 
@@ -601,7 +611,7 @@ static double compute_attack_decay_cap_discharging_rate(struct SN76477 *sn)  /* 
 }
 
 
-static double compute_center_to_peak_voltage_out(struct SN76477 *sn)
+static double compute_center_to_peak_voltage_out(sn76477_state *sn)
 {
 	/* this formula was derived using the data points below
 
@@ -635,7 +645,7 @@ static double compute_center_to_peak_voltage_out(struct SN76477 *sn)
  *
  *****************************************************************************/
 
-static void log_enable_line(struct SN76477 *sn)
+static void log_enable_line(sn76477_state *sn)
 {
 	static const char *const desc[] =
 	{
@@ -646,7 +656,7 @@ static void log_enable_line(struct SN76477 *sn)
 }
 
 
-static void log_mixer_mode(struct SN76477 *sn)
+static void log_mixer_mode(sn76477_state *sn)
 {
 	static const char *const desc[] =
 	{
@@ -658,7 +668,7 @@ static void log_mixer_mode(struct SN76477 *sn)
 }
 
 
-static void log_envelope_mode(struct SN76477 *sn)
+static void log_envelope_mode(sn76477_state *sn)
 {
 	static const char *const desc[] =
 	{
@@ -669,7 +679,7 @@ static void log_envelope_mode(struct SN76477 *sn)
 }
 
 
-static void log_vco_mode(struct SN76477 *sn)
+static void log_vco_mode(sn76477_state *sn)
 {
 	static const char *const desc[] =
 	{
@@ -680,7 +690,7 @@ static void log_vco_mode(struct SN76477 *sn)
 }
 
 
-static void log_one_shot_time(struct SN76477 *sn)
+static void log_one_shot_time(sn76477_state *sn)
 {
 	if (!sn->one_shot_cap_voltage_ext)
 	{
@@ -700,7 +710,7 @@ static void log_one_shot_time(struct SN76477 *sn)
 }
 
 
-static void log_slf_freq(struct SN76477 *sn)
+static void log_slf_freq(sn76477_state *sn)
 {
 	if (!sn->slf_cap_voltage_ext)
 	{
@@ -723,19 +733,19 @@ static void log_slf_freq(struct SN76477 *sn)
 }
 
 
-static void log_vco_pitch_voltage(struct SN76477 *sn)
+static void log_vco_pitch_voltage(sn76477_state *sn)
 {
 	LOG(1, ("SN76477 '%s':       VCO pitch voltage (19): %.2fV\n", sn->device->tag, sn->pitch_voltage));
 }
 
 
-static void log_vco_duty_cycle(struct SN76477 *sn)
+static void log_vco_duty_cycle(sn76477_state *sn)
 {
 	LOG(1, ("SN76477 '%s':       VCO duty cycle (16,19): %.0f%%\n", sn->device->tag, compute_vco_duty_cycle(sn) * 100.0));
 }
 
 
-static void log_vco_freq(struct SN76477 *sn)
+static void log_vco_freq(sn76477_state *sn)
 {
 	if (!sn->vco_cap_voltage_ext)
 	{
@@ -758,7 +768,7 @@ static void log_vco_freq(struct SN76477 *sn)
 }
 
 
-static void log_vco_ext_voltage(struct SN76477 *sn)
+static void log_vco_ext_voltage(sn76477_state *sn)
 {
 	if (sn->vco_voltage <= VCO_MAX_EXT_VOLTAGE)
 	{
@@ -776,7 +786,7 @@ static void log_vco_ext_voltage(struct SN76477 *sn)
 }
 
 
-static void log_noise_gen_freq(struct SN76477 *sn)
+static void log_noise_gen_freq(sn76477_state *sn)
 {
 	if (sn->noise_clock_ext)
 	{
@@ -796,7 +806,7 @@ static void log_noise_gen_freq(struct SN76477 *sn)
 }
 
 
-static void log_noise_filter_freq(struct SN76477 *sn)
+static void log_noise_filter_freq(sn76477_state *sn)
 {
 	if (!sn->noise_filter_cap_voltage_ext)
 	{
@@ -828,7 +838,7 @@ static void log_noise_filter_freq(struct SN76477 *sn)
 }
 
 
-static void log_attack_time(struct SN76477 *sn)
+static void log_attack_time(sn76477_state *sn)
 {
 	if (!sn->attack_decay_cap_voltage_ext)
 	{
@@ -848,7 +858,7 @@ static void log_attack_time(struct SN76477 *sn)
 }
 
 
-static void log_decay_time(struct SN76477 *sn)
+static void log_decay_time(sn76477_state *sn)
 {
 	if (!sn->attack_decay_cap_voltage_ext)
 	{
@@ -868,7 +878,7 @@ static void log_decay_time(struct SN76477 *sn)
 }
 
 
-static void log_voltage_out(struct SN76477 *sn)
+static void log_voltage_out(sn76477_state *sn)
 {
 	LOG(1, ("SN76477 '%s':    Voltage OUT range (11,12): %.2fV - %.2fV (clips above %.2fV)\n",
 			sn->device->tag,
@@ -878,7 +888,7 @@ static void log_voltage_out(struct SN76477 *sn)
 }
 
 
-static void log_complete_state(struct SN76477 *sn)
+static void log_complete_state(sn76477_state *sn)
 {
 	log_enable_line(sn);
 	log_mixer_mode(sn);
@@ -906,7 +916,7 @@ static void log_complete_state(struct SN76477 *sn)
  *****************************************************************************/
 
 
-static void open_wav_file(struct SN76477 *sn)
+static void open_wav_file(sn76477_state *sn)
 {
 	char wav_file_name[30];
 
@@ -917,13 +927,13 @@ static void open_wav_file(struct SN76477 *sn)
 }
 
 
-static void close_wav_file(struct SN76477 *sn)
+static void close_wav_file(sn76477_state *sn)
 {
 	wav_close(sn->file);
 }
 
 
-static void add_wav_data(struct SN76477 *sn, INT16 data_l, INT16 data_r)
+static void add_wav_data(sn76477_state *sn, INT16 data_l, INT16 data_r)
 {
 	wav_add_data_16lr(sn->file, &data_l, &data_r, 1);
 }
@@ -936,13 +946,13 @@ static void add_wav_data(struct SN76477 *sn, INT16 data_l, INT16 data_r)
  *
  *****************************************************************************/
 
-static void intialize_noise(struct SN76477 *sn)
+static void intialize_noise(sn76477_state *sn)
 {
 	sn->rng = 0;
 }
 
 
-INLINE UINT32 generate_next_real_noise_bit(struct SN76477 *sn)
+INLINE UINT32 generate_next_real_noise_bit(sn76477_state *sn)
 {
 	UINT32 out = ((sn->rng >> 28) & 1) ^ ((sn->rng >> 0) & 1);
 
@@ -965,7 +975,7 @@ INLINE UINT32 generate_next_real_noise_bit(struct SN76477 *sn)
  *
  *****************************************************************************/
 
-static void _SN76477_enable_w(struct SN76477 *sn, UINT32 data)
+static void _SN76477_enable_w(sn76477_state *sn, UINT32 data)
 {
 	sn->enable = data;
 
@@ -981,7 +991,7 @@ static void _SN76477_enable_w(struct SN76477 *sn, UINT32 data)
 }
 
 
-static void SN76477_test_enable_w(struct SN76477 *sn, UINT32 data)
+static void SN76477_test_enable_w(sn76477_state *sn, UINT32 data)
 {
 	if (data != sn->enable)
 	{
@@ -994,10 +1004,10 @@ static void SN76477_test_enable_w(struct SN76477 *sn, UINT32 data)
 }
 
 
-void sn76477_enable_w(int chip, UINT32 data)
+void sn76477_enable_w(const device_config *device, UINT32 data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
@@ -1013,16 +1023,16 @@ void sn76477_enable_w(int chip, UINT32 data)
  *
  *****************************************************************************/
 
-static void _SN76477_mixer_a_w(struct SN76477 *sn, UINT32 data)
+static void _SN76477_mixer_a_w(sn76477_state *sn, UINT32 data)
 {
 	sn->mixer_mode = (sn->mixer_mode & ~0x01) | (data << 0);
 }
 
 
-void sn76477_mixer_a_w(int chip, UINT32 data)
+void sn76477_mixer_a_w(const device_config *device, UINT32 data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
@@ -1038,16 +1048,16 @@ void sn76477_mixer_a_w(int chip, UINT32 data)
 }
 
 
-static void _SN76477_mixer_b_w(struct SN76477 *sn, UINT32 data)
+static void _SN76477_mixer_b_w(sn76477_state *sn, UINT32 data)
 {
 	sn->mixer_mode = (sn->mixer_mode & ~0x02) | (data << 1);
 }
 
 
-void sn76477_mixer_b_w(int chip, UINT32 data)
+void sn76477_mixer_b_w(const device_config *device, UINT32 data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
@@ -1063,16 +1073,16 @@ void sn76477_mixer_b_w(int chip, UINT32 data)
 }
 
 
-static void _SN76477_mixer_c_w(struct SN76477 *sn, UINT32 data)
+static void _SN76477_mixer_c_w(sn76477_state *sn, UINT32 data)
 {
 	sn->mixer_mode = (sn->mixer_mode & ~0x04) | (data << 2);
 }
 
 
-void sn76477_mixer_c_w(int chip, UINT32 data)
+void sn76477_mixer_c_w(const device_config *device, UINT32 data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
@@ -1095,16 +1105,16 @@ void sn76477_mixer_c_w(int chip, UINT32 data)
  *
  *****************************************************************************/
 
-static void _SN76477_envelope_1_w(struct SN76477 *sn, UINT32 data)
+static void _SN76477_envelope_1_w(sn76477_state *sn, UINT32 data)
 {
 	sn->envelope_mode = (sn->envelope_mode & ~0x01) | (data << 0);
 }
 
 
-void sn76477_envelope_1_w(int chip, UINT32 data)
+void sn76477_envelope_1_w(const device_config *device, UINT32 data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
@@ -1120,16 +1130,16 @@ void sn76477_envelope_1_w(int chip, UINT32 data)
 }
 
 
-static void _SN76477_envelope_2_w(struct SN76477 *sn, UINT32 data)
+static void _SN76477_envelope_2_w(sn76477_state *sn, UINT32 data)
 {
 	sn->envelope_mode = (sn->envelope_mode & ~0x02) | (data << 1);
 }
 
 
-void sn76477_envelope_2_w(int chip, UINT32 data)
+void sn76477_envelope_2_w(const device_config *device, UINT32 data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
@@ -1152,16 +1162,16 @@ void sn76477_envelope_2_w(int chip, UINT32 data)
  *
  *****************************************************************************/
 
-static void _SN76477_vco_w(struct SN76477 *sn, UINT32 data)
+static void _SN76477_vco_w(sn76477_state *sn, UINT32 data)
 {
 	sn->vco_mode = data;
 }
 
 
-void sn76477_vco_w(int chip, UINT32 data)
+void sn76477_vco_w(const device_config *device, UINT32 data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
@@ -1184,16 +1194,16 @@ void sn76477_vco_w(int chip, UINT32 data)
  *
  *****************************************************************************/
 
-static void _SN76477_one_shot_res_w(struct SN76477 *sn, double data)
+static void _SN76477_one_shot_res_w(sn76477_state *sn, double data)
 {
 	sn->one_shot_res = data;
 }
 
 
-void sn76477_one_shot_res_w(int chip, double data)
+void sn76477_one_shot_res_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1216,16 +1226,16 @@ void sn76477_one_shot_res_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_one_shot_cap_w(struct SN76477 *sn, double data)
+static void _SN76477_one_shot_cap_w(sn76477_state *sn, double data)
 {
 	sn->one_shot_cap = data;
 }
 
 
-void sn76477_one_shot_cap_w(int chip, double data)
+void sn76477_one_shot_cap_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1248,10 +1258,10 @@ void sn76477_one_shot_cap_w(int chip, double data)
  *
  *****************************************************************************/
 
-void sn76477_one_shot_cap_voltage_w(int chip, double data)
+void sn76477_one_shot_cap_voltage_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
 
@@ -1291,16 +1301,16 @@ void sn76477_one_shot_cap_voltage_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_slf_res_w(struct SN76477 *sn, double data)
+static void _SN76477_slf_res_w(sn76477_state *sn, double data)
 {
 	sn->slf_res = data;
 }
 
 
-void sn76477_slf_res_w(int chip, double data)
+void sn76477_slf_res_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1323,16 +1333,16 @@ void sn76477_slf_res_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_slf_cap_w(struct SN76477 *sn, double data)
+static void _SN76477_slf_cap_w(sn76477_state *sn, double data)
 {
 	sn->slf_cap = data;
 }
 
 
-void sn76477_slf_cap_w(int chip, double data)
+void sn76477_slf_cap_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1357,10 +1367,10 @@ void sn76477_slf_cap_w(int chip, double data)
  *
  *****************************************************************************/
 
-void sn76477_slf_cap_voltage_w(int chip, double data)
+void sn76477_slf_cap_voltage_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
 
@@ -1400,16 +1410,16 @@ void sn76477_slf_cap_voltage_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_vco_res_w(struct SN76477 *sn, double data)
+static void _SN76477_vco_res_w(sn76477_state *sn, double data)
 {
 	sn->vco_res = data;
 }
 
 
-void sn76477_vco_res_w(int chip, double data)
+void sn76477_vco_res_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1432,16 +1442,16 @@ void sn76477_vco_res_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_vco_cap_w(struct SN76477 *sn, double data)
+static void _SN76477_vco_cap_w(sn76477_state *sn, double data)
 {
 	sn->vco_cap = data;
 }
 
 
-void sn76477_vco_cap_w(int chip, double data)
+void sn76477_vco_cap_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1464,10 +1474,10 @@ void sn76477_vco_cap_w(int chip, double data)
  *
  *****************************************************************************/
 
-void sn76477_vco_cap_voltage_w(int chip, double data)
+void sn76477_vco_cap_voltage_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
 
@@ -1507,16 +1517,16 @@ void sn76477_vco_cap_voltage_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_vco_voltage_w(struct SN76477 *sn, double data)
+static void _SN76477_vco_voltage_w(sn76477_state *sn, double data)
 {
 	sn->vco_voltage = data;
 }
 
 
-void sn76477_vco_voltage_w(int chip, double data)
+void sn76477_vco_voltage_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_VOLTAGE;
 
@@ -1540,16 +1550,16 @@ void sn76477_vco_voltage_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_pitch_voltage_w(struct SN76477 *sn, double data)
+static void _SN76477_pitch_voltage_w(sn76477_state *sn, double data)
 {
 	sn->pitch_voltage = data;
 }
 
 
-void sn76477_pitch_voltage_w(int chip, double data)
+void sn76477_pitch_voltage_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_VOLTAGE;
 
@@ -1573,10 +1583,10 @@ void sn76477_pitch_voltage_w(int chip, double data)
  *
  *****************************************************************************/
 
-void sn76477_noise_clock_w(int chip, UINT32 data)
+void sn76477_noise_clock_w(const device_config *device, UINT32 data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_BOOLEAN;
 
@@ -1604,7 +1614,7 @@ void sn76477_noise_clock_w(int chip, UINT32 data)
  *
  *****************************************************************************/
 
-static void _SN76477_noise_clock_res_w(struct SN76477 *sn, double data)
+static void _SN76477_noise_clock_res_w(sn76477_state *sn, double data)
 {
 	if (data == 0)
 	{
@@ -1619,10 +1629,10 @@ static void _SN76477_noise_clock_res_w(struct SN76477 *sn, double data)
 }
 
 
-void sn76477_noise_clock_res_w(int chip, double data)
+void sn76477_noise_clock_res_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1646,16 +1656,16 @@ void sn76477_noise_clock_res_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_noise_filter_res_w(struct SN76477 *sn, double data)
+static void _SN76477_noise_filter_res_w(sn76477_state *sn, double data)
 {
 	sn->noise_filter_res = data;
 }
 
 
-void sn76477_noise_filter_res_w(int chip, double data)
+void sn76477_noise_filter_res_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1678,16 +1688,16 @@ void sn76477_noise_filter_res_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_noise_filter_cap_w(struct SN76477 *sn, double data)
+static void _SN76477_noise_filter_cap_w(sn76477_state *sn, double data)
 {
 	sn->noise_filter_cap = data;
 }
 
 
-void sn76477_noise_filter_cap_w(int chip, double data)
+void sn76477_noise_filter_cap_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1710,10 +1720,10 @@ void sn76477_noise_filter_cap_w(int chip, double data)
  *
  *****************************************************************************/
 
-void sn76477_noise_filter_cap_voltage_w(int chip, double data)
+void sn76477_noise_filter_cap_voltage_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
 
@@ -1753,16 +1763,16 @@ void sn76477_noise_filter_cap_voltage_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_attack_res_w(struct SN76477 *sn, double data)
+static void _SN76477_attack_res_w(sn76477_state *sn, double data)
 {
 	sn->attack_res = data;
 }
 
 
-void sn76477_attack_res_w(int chip, double data)
+void sn76477_attack_res_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1785,16 +1795,16 @@ void sn76477_attack_res_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_decay_res_w(struct SN76477 *sn, double data)
+static void _SN76477_decay_res_w(sn76477_state *sn, double data)
 {
 	sn->decay_res = data;
 }
 
 
-void sn76477_decay_res_w(int chip, double data)
+void sn76477_decay_res_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1817,16 +1827,16 @@ void sn76477_decay_res_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_attack_decay_cap_w(struct SN76477 *sn, double data)
+static void _SN76477_attack_decay_cap_w(sn76477_state *sn, double data)
 {
 	sn->attack_decay_cap = data;
 }
 
 
-void sn76477_attack_decay_cap_w(int chip, double data)
+void sn76477_attack_decay_cap_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1850,10 +1860,10 @@ void sn76477_attack_decay_cap_w(int chip, double data)
  *
  *****************************************************************************/
 
-void sn76477_attack_decay_cap_voltage_w(int chip, double data)
+void sn76477_attack_decay_cap_voltage_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_CAP_VOLTAGE;
 
@@ -1895,16 +1905,16 @@ void sn76477_attack_decay_cap_voltage_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_amplitude_res_w(struct SN76477 *sn, double data)
+static void _SN76477_amplitude_res_w(sn76477_state *sn, double data)
 {
 	sn->amplitude_res = data;
 }
 
 
-void sn76477_amplitude_res_w(int chip, double data)
+void sn76477_amplitude_res_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1927,16 +1937,16 @@ void sn76477_amplitude_res_w(int chip, double data)
  *
  *****************************************************************************/
 
-static void _SN76477_feedback_res_w(struct SN76477 *sn, double data)
+static void _SN76477_feedback_res_w(sn76477_state *sn, double data)
 {
 	sn->feedback_res = data;
 }
 
 
-void sn76477_feedback_res_w(int chip, double data)
+void sn76477_feedback_res_w(const device_config *device, double data)
 {
 #if TEST_MODE == 0
-	struct SN76477 *sn = sndti_token(SOUND_SN76477, chip);
+	sn76477_state *sn = get_safe_token(device);
 
 	CHECK_CHIP_NUM_AND_POSITIVE;
 
@@ -1978,7 +1988,7 @@ static STREAM_UPDATE( SN76477_update )
 	double voltage_out;
 	double center_to_peak_voltage_out;
 
-	struct SN76477 *sn = param;
+	sn76477_state *sn = param;
 	stream_sample_t *buffer = outputs[0];
 
 
@@ -2322,7 +2332,7 @@ static STREAM_UPDATE( SN76477_update )
  *
  *****************************************************************************/
 
-static void state_save_register(const device_config *device, struct SN76477 *sn)
+static void state_save_register(const device_config *device, sn76477_state *sn)
 {
 	state_save_register_device_item(device, 0, sn->enable);
 	state_save_register_device_item(device, 0, sn->envelope_mode);
@@ -2386,9 +2396,9 @@ static void state_save_register(const device_config *device, struct SN76477 *sn)
  *
  *****************************************************************************/
 
-static SND_START( sn76477 )
+static DEVICE_START( sn76477 )
 {
-	struct SN76477 *sn = device->token;
+	sn76477_state *sn = get_safe_token(device);
 	sn76477_interface *intf;
 
 
@@ -2403,9 +2413,9 @@ static SND_START( sn76477 )
 
 	sn->channel = stream_create(device, 0, 1, device->machine->sample_rate, sn, SN76477_update);
 
-	if (clock > 0)
+	if (device->clock > 0)
 	{
-		sn->sample_rate = clock;
+		sn->sample_rate = device->clock;
 	}
 	else
 	{
@@ -2454,27 +2464,27 @@ static SND_START( sn76477 )
 }
 
 
-static SND_STOP( sn76477 )
+static DEVICE_STOP( sn76477 )
 {
-	struct SN76477 *sn = device->token;
+	sn76477_state *sn = get_safe_token(device);
 
 	if (LOG_WAV)
 		close_wav_file(sn);
 }
 
 
-SND_GET_INFO( sn76477 )
+DEVICE_GET_INFO( sn76477 )
 {
 	switch (state)
 	{
-	case SNDINFO_INT_TOKEN_BYTES:	info->i = sizeof(struct SN76477); break;
-	case SNDINFO_PTR_START:			info->start = SND_START_NAME( sn76477 ); break;
-	case SNDINFO_PTR_STOP:			info->stop = SND_STOP_NAME( sn76477 ); break;
-	case SNDINFO_STR_NAME:			strcpy(info->s, "SN76477"); break;
-	case SNDINFO_STR_CORE_FAMILY:	strcpy(info->s, "Analog"); break;
-	case SNDINFO_STR_CORE_VERSION:	strcpy(info->s, "2.1"); break;
-	case SNDINFO_STR_CORE_FILE:		strcpy(info->s, __FILE__); break;
-	case SNDINFO_STR_CORE_CREDITS:	strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+	case DEVINFO_INT_TOKEN_BYTES:	info->i = sizeof(sn76477_state); break;
+	case DEVINFO_FCT_START:			info->start = DEVICE_START_NAME( sn76477 ); break;
+	case DEVINFO_FCT_STOP:			info->stop = DEVICE_STOP_NAME( sn76477 ); break;
+	case DEVINFO_STR_NAME:			strcpy(info->s, "SN76477"); break;
+	case DEVINFO_STR_FAMILY:	strcpy(info->s, "Analog"); break;
+	case DEVINFO_STR_VERSION:	strcpy(info->s, "2.1"); break;
+	case DEVINFO_STR_SOURCE_FILE:		strcpy(info->s, __FILE__); break;
+	case DEVINFO_STR_CREDITS:	strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

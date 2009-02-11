@@ -104,7 +104,7 @@ static MACHINE_RESET(big10)
 
 static UINT8 mux_data;
 
-static WRITE8_HANDLER( mux_w )
+static WRITE8_DEVICE_HANDLER( mux_w )
 {
 	mux_data = ~data;
 }
@@ -119,16 +119,6 @@ static READ8_HANDLER( mux_r )
 	}
 
 	return mux_data;
-}
-
-static READ8_HANDLER( big10_dsw_1_r )
-{
-	return input_port_read(space->machine, "DSW1");
-}
-
-static READ8_HANDLER( big10_dsw_2_r )
-{
-	return input_port_read(space->machine, "DSW2");
 }
 
 
@@ -150,9 +140,8 @@ static ADDRESS_MAP_START( main_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x99, 0x99) AM_WRITE(v9938_0_command_w) AM_READ(v9938_0_status_r)
 	AM_RANGE(0x9a, 0x9a) AM_WRITE(v9938_0_palette_w)
 	AM_RANGE(0x9b, 0x9b) AM_WRITE(v9938_0_register_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xa1, 0xa1) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xa2, 0xa2) AM_READ(ay8910_read_port_0_r) /* Dip-Switches routes here. */
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD(SOUND, "ay", ay8910_r) /* Dip-Switches routes here. */
 ADDRESS_MAP_END
 
 
@@ -237,10 +226,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	big10_dsw_2_r,
-	big10_dsw_1_r,
-	mux_w,
-	NULL
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_HANDLER(mux_w),
+	DEVCB_NULL
 };
 
 

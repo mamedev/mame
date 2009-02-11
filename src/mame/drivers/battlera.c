@@ -93,21 +93,13 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( YM2203_w )
-{
-	switch (offset) {
-	case 0: ym2203_control_port_0_w(space,0,data); break;
-	case 1: ym2203_write_port_0_w(space,0,data); break;
-	}
-}
-
 static int msm5205next;
 
 static void battlera_adpcm_int(const device_config *device)
 {
 	static int toggle;
 
-	msm5205_data_w(0,msm5205next >> 4);
+	msm5205_data_w(device,msm5205next >> 4);
 	msm5205next<<=4;
 
 	toggle = 1 - toggle;
@@ -120,18 +112,18 @@ static WRITE8_HANDLER( battlera_adpcm_data_w )
 	msm5205next=data;
 }
 
-static WRITE8_HANDLER( battlera_adpcm_reset_w )
+static WRITE8_DEVICE_HANDLER( battlera_adpcm_reset_w )
 {
-	msm5205_reset_w(0,0);
+	msm5205_reset_w(device,0);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_WRITE(YM2203_w)
+	AM_RANGE(0x040000, 0x040001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(battlera_adpcm_data_w)
-	AM_RANGE(0x1fe800, 0x1fe80f) AM_WRITE(c6280_0_w)
+	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE(SOUND, "audio", c6280_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(7) /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(soundlatch_r, battlera_adpcm_reset_w)
+	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_r) AM_DEVWRITE(SOUND, "msm", battlera_adpcm_reset_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
@@ -278,7 +270,7 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.85)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.85)
 
-	MDRV_SOUND_ADD("huc", C6280, 21477270/6)
+	MDRV_SOUND_ADD("audio", C6280, 21477270/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 MACHINE_DRIVER_END

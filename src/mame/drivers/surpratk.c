@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( surpratk_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5f8e, 0x5f8e) AM_READ_PORT("DSW3")
 	AM_RANGE(0x5f8f, 0x5f8f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f90, 0x5f90) AM_READ_PORT("DSW2")
-//  AM_RANGE(0x5f91, 0x5f91) AM_READ(ym2151_status_port_0_r)    /* ? */
+//  AM_RANGE(0x5f91, 0x5f91) AM_DEVREAD(SOUND, "ym", ym2151_status_port_r)    /* ? */
 	AM_RANGE(0x5fa0, 0x5faf) AM_READ(K053244_r)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(K052109_r)
@@ -107,8 +107,7 @@ static ADDRESS_MAP_START( surpratk_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fa0, 0x5faf) AM_WRITE(K053244_w)
 	AM_RANGE(0x5fb0, 0x5fbf) AM_WRITE(K053251_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_WRITE(surpratk_5fc0_w)
-	AM_RANGE(0x5fd0, 0x5fd0) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x5fd1, 0x5fd1) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(K052109_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
@@ -221,9 +220,9 @@ INPUT_PORTS_END
 
 
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[0],KONAMI_FIRQ_LINE,linestate);
+	cpu_set_input_line(device->machine->cpu[0],KONAMI_FIRQ_LINE,linestate);
 }
 
 static const ym2151_interface ym2151_config =

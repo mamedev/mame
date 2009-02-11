@@ -46,11 +46,9 @@ Memo:
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
-#define DAC_0_WRITE	dac_0_signed_data_w
-#define DAC_1_WRITE	dac_1_signed_data_w
+#define DAC_WRITE	dac_signed_w
 #else
-#define DAC_0_WRITE	dac_0_data_w
-#define DAC_1_WRITE	dac_1_data_w
+#define DAC_WRITE	dac_w
 #endif
 
 
@@ -124,10 +122,10 @@ static WRITE8_HANDLER( tmpz84c011_pio_w)
 			niyanpai_soundbank_w(space->machine, data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_1_WRITE(space, 0, data);
+			DAC_WRITE(devtag_get_device(space->machine, SOUND, "dac2"), 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_0_WRITE(space, 0, data);
+			DAC_WRITE(devtag_get_device(space->machine, SOUND, "dac1"), 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;
@@ -479,8 +477,7 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
 	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
 	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ym", ym3812_w)
 ADDRESS_MAP_END
 
 

@@ -219,12 +219,12 @@ static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 	timer_call_after_resynch(space->machine, NULL, CPU_CLEAR,setirq_callback);
 }
 
-static void t5182_ym2151_irq_handler(running_machine *machine, int irq)
+static void t5182_ym2151_irq_handler(const device_config *device, int irq)
 {
 	if (irq)
-		timer_call_after_resynch(machine, NULL, YM2151_ASSERT,setirq_callback);
+		timer_call_after_resynch(device->machine, NULL, YM2151_ASSERT,setirq_callback);
 	else
-		timer_call_after_resynch(machine, NULL, YM2151_CLEAR,setirq_callback);
+		timer_call_after_resynch(device->machine, NULL, YM2151_CLEAR,setirq_callback);
 }
 
 
@@ -307,8 +307,7 @@ ADDRESS_MAP_END
 	// 50  W test mode status flags (bit 0 = ROM test fail, bit 1 = RAM test fail, bit 2 = YM2151 IRQ not received)
 ADDRESS_MAP_START( t5182_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(t5182_sharedram_semaphore_snd_acquire_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(t5182_sharedram_semaphore_snd_release_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(t5182_ym2151_irq_ack_w)

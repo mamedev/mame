@@ -22,7 +22,8 @@
 
 
 /* struct describing a playing ADPCM chip */
-struct es8712
+typedef struct _es8712_state es8712_state;
+struct _es8712_state
 {
 	UINT8 playing;			/* 1 if we're actively playing */
 
@@ -47,6 +48,16 @@ static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 
 /* lookup table for the precomputed difference */
 static int diff_lookup[49*16];
+
+
+INLINE es8712_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_ES8712);
+	return (es8712_state *)device->token;
+}
 
 
 /**********************************************************************************************
@@ -94,7 +105,7 @@ static void compute_tables(void)
 
 ***********************************************************************************************/
 
-static void generate_adpcm(struct es8712 *chip, stream_sample_t *buffer, int samples)
+static void generate_adpcm(es8712_state *chip, stream_sample_t *buffer, int samples)
 {
 	/* if this chip is active */
 	if (chip->playing)
@@ -168,7 +179,7 @@ static void generate_adpcm(struct es8712 *chip, stream_sample_t *buffer, int sam
 static STREAM_UPDATE( es8712_update )
 {
 	stream_sample_t *buffer = outputs[0];
-	struct es8712 *chip = param;
+	es8712_state *chip = param;
 
 	/* generate them into our buffer */
 	generate_adpcm(chip, buffer, samples);
@@ -182,7 +193,7 @@ static STREAM_UPDATE( es8712_update )
 
 ***********************************************************************************************/
 
-static void es8712_state_save_register(struct es8712 *chip, const device_config *device)
+static void es8712_state_save_register(es8712_state *chip, const device_config *device)
 {
 	state_save_register_device_item(device, 0, chip->bank_offset);
 
@@ -203,13 +214,13 @@ static void es8712_state_save_register(struct es8712 *chip, const device_config 
 
 /**********************************************************************************************
 
-    SND_START( es8712 ) -- start emulation of an ES8712 chip
+    DEVICE_START( es8712 ) -- start emulation of an ES8712 chip
 
 ***********************************************************************************************/
 
-static SND_START( es8712 )
+static DEVICE_START( es8712 )
 {
-	struct es8712 *chip = device->token;
+	es8712_state *chip = device->token;
 
 	compute_tables();
 
@@ -221,7 +232,7 @@ static SND_START( es8712 )
 	chip->region_base = device->region;
 
 	/* generate the name and create the stream */
-	chip->stream = stream_create(device, 0, 1, clock, chip, es8712_update);
+	chip->stream = stream_create(device, 0, 1, device->clock, chip, es8712_update);
 
 	/* initialize the rest of the structure */
 	chip->signal = -2;
@@ -233,13 +244,13 @@ static SND_START( es8712 )
 
 /*************************************************************************************
 
-     SND_RESET( es8712 ) -- stop emulation of an ES8712-compatible chip
+     DEVICE_RESET( es8712 ) -- stop emulation of an ES8712-compatible chip
 
 **************************************************************************************/
 
-static SND_RESET( es8712 )
+static DEVICE_RESET( es8712 )
 {
-	struct es8712 *chip = device->token;
+	es8712_state *chip = device->token;
 
 	if (chip->playing)
 	{
@@ -257,9 +268,9 @@ static SND_RESET( es8712 )
 
 *****************************************************************************/
 
-void es8712_set_bank_base(int which, int base)
+void es8712_set_bank_base(const device_config *device, int base)
 {
-	struct es8712 *chip = sndti_token(SOUND_ES8712, which);
+	es8712_state *chip = device->token;
 	stream_update(chip->stream);
 	chip->bank_offset = base;
 }
@@ -271,9 +282,9 @@ void es8712_set_bank_base(int which, int base)
 
 *****************************************************************************/
 
-void es8712_set_frequency(int which, int frequency)
+void es8712_set_frequency(const device_config *device, int frequency)
 {
-	struct es8712 *chip = sndti_token(SOUND_ES8712, which);
+	es8712_state *chip = device->token;
 
 	/* update the stream and set the new base */
 	stream_update(chip->stream);
@@ -288,9 +299,9 @@ void es8712_set_frequency(int which, int frequency)
 
 ***********************************************************************************************/
 
-void es8712_play(int which)
+void es8712_play(const device_config *device)
 {
-	struct es8712 *chip = sndti_token(SOUND_ES8712, which);
+	es8712_state *chip = get_safe_token(device);
 
 
 	if (chip->start < chip->end)
@@ -311,7 +322,7 @@ void es8712_play(int which)
 	/* invalid samples go here */
 	else
 	{
-		logerror("ES871295:%d requested to play invalid sample range %06x-%06x\n",which,chip->start,chip->end);
+		logerror("ES871295:'%s' requested to play invalid sample range %06x-%06x\n",device->tag,chip->start,chip->end);
 
 		if (chip->playing)
 		{
@@ -348,9 +359,9 @@ void es8712_play(int which)
  *
 ***********************************************************************************************/
 
-static void ES8712_data_w(int which, int offset, UINT32 data)
+WRITE8_DEVICE_HANDLER( es8712_w )
 {
-	struct es8712 *chip = sndti_token(SOUND_ES8712, which);
+	es8712_state *chip = get_safe_token(device);
 	switch (offset)
 	{
 		case 00:	chip->start &= 0x000fff00;
@@ -366,62 +377,11 @@ static void ES8712_data_w(int which, int offset, UINT32 data)
 		case 05:	chip->end   &= 0x0000ffff;
 					chip->end   |= ((data & 0x0f) << 16); break;
 		case 06:
-				es8712_play(which);
+				es8712_play(device);
 				break;
 		default:	break;
 	}
 	chip->start &= 0xfffff; chip->end &= 0xfffff;
-}
-
-WRITE8_HANDLER( es8712_data_0_w )
-{
-	ES8712_data_w(0, offset, data);
-}
-
-WRITE8_HANDLER( es8712_data_1_w )
-{
-	ES8712_data_w(1, offset, data);
-}
-
-WRITE8_HANDLER( es8712_data_2_w )
-{
-	ES8712_data_w(2, offset, data);
-}
-
-WRITE16_HANDLER( es8712_data_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		ES8712_data_w(0, offset, data & 0xff);
-}
-
-WRITE16_HANDLER( es8712_data_1_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		ES8712_data_w(1, offset, data & 0xff);
-}
-
-WRITE16_HANDLER( es8712_data_2_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		ES8712_data_w(2, offset, data & 0xff);
-}
-
-WRITE16_HANDLER( es8712_data_0_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		ES8712_data_w(0, offset, data >> 8);
-}
-
-WRITE16_HANDLER( es8712_data_1_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		ES8712_data_w(1, offset, data >> 8);
-}
-
-WRITE16_HANDLER( es8712_data_2_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		ES8712_data_w(2, offset, data >> 8);
 }
 
 
@@ -430,34 +390,24 @@ WRITE16_HANDLER( es8712_data_2_msb_w )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( es8712 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( es8712 )
+DEVICE_GET_INFO( es8712 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct es8712);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(es8712_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es8712 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( es8712 );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( es8712 );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( es8712 );			break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( es8712 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "ES8712");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Excellent Systems ADPCM");		break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "ES8712");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Excellent Systems ADPCM");		break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

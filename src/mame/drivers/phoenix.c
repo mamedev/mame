@@ -34,7 +34,6 @@ Pleiads:
 #include "sound/tms36xx.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
-#include "sound/custom.h"
 #include "phoenix.h"
 
 
@@ -43,8 +42,8 @@ static ADDRESS_MAP_START( phoenix_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK1, phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(phoenix_sound_control_a_w)
-	AM_RANGE(0x6800, 0x6bff) AM_WRITE(phoenix_sound_control_b_w)
+	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE(SOUND, "discrete", phoenix_sound_control_a_w)
+	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE(SOUND, "discrete", phoenix_sound_control_b_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")	 						/* IN0 or IN1 */
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")	 						/* DSW */
 ADDRESS_MAP_END
@@ -65,8 +64,8 @@ static ADDRESS_MAP_START( survival_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK1, phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6800, 0x68ff) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x6900, 0x69ff) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x6900, 0x69ff) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ(survival_input_port_0_r)				/* IN0 or IN1 */
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0") 							/* DSW */
 ADDRESS_MAP_END
@@ -398,11 +397,6 @@ static const tms36xx_interface phoenix_tms36xx_interface =
     0.21       /* tune speed (time between beats) */
 };
 
-static const custom_sound_interface phoenix_custom_interface =
-{
-	phoenix_sh_start
-};
-
 static const tms36xx_interface pleiads_tms36xx_interface =
 {
 	TMS3615,	/* TMS36xx subtype(s) */
@@ -415,19 +409,14 @@ static const tms36xx_interface pleiads_tms36xx_interface =
 	{0.33,0.33,0,0.33,0,0.33}
 };
 
-static const custom_sound_interface pleiads_custom_interface =
-{
-	pleiads_sh_start
-};
-
 static const ay8910_interface survival_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	survival_protection_r,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_HANDLER(survival_protection_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -467,8 +456,7 @@ static MACHINE_DRIVER_START( phoenix )
 	MDRV_SOUND_CONFIG(phoenix_tms36xx_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD("cust", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(phoenix_custom_interface)
+	MDRV_SOUND_ADD("cust", PHOENIX, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 120000)
@@ -494,8 +482,7 @@ static MACHINE_DRIVER_START( pleiads )
 	MDRV_SOUND_CONFIG(pleiads_tms36xx_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_REPLACE("cust", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(pleiads_custom_interface)
+	MDRV_SOUND_REPLACE("cust", PLEIADS, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_REMOVE("discrete")

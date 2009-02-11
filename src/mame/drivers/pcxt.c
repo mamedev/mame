@@ -455,11 +455,13 @@ static READ8_DEVICE_HANDLER( port_c_r )
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	port_b_data = data;
-//  hc55516_digit_w(0, data);
+// const device_config *beep = devtag_get_device(device->machine, SOUND, "beep");
+// const device_config *cvsd = devtag_get_device(device->machine, SOUND, "cvsd");
+//  hc55516_digit_w(cvsd, data);
 //  popmessage("%02x\n",data);
-//  beep_set_state(0, 0);
-//  beep_set_state(0, 1);
-//  beep_set_frequency(0, port_b_data);
+//  beep_set_state(beep, 0);
+//  beep_set_state(beep, 1);
+//  beep_set_frequency(beep, port_b_data);
 }
 
 static WRITE8_DEVICE_HANDLER( wss_1_w )

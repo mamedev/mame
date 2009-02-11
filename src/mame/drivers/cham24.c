@@ -66,19 +66,19 @@ static WRITE8_HANDLER( sprite_dma_w )
 	ppu2c0x_spriteram_dma( space, 0, source );
 }
 
-static READ8_HANDLER( psg_4015_r )
+static READ8_DEVICE_HANDLER( psg_4015_r )
 {
-	return nes_psg_0_r(space,0x15);
+	return nes_psg_r(device,0x15);
 }
 
-static WRITE8_HANDLER( psg_4015_w )
+static WRITE8_DEVICE_HANDLER( psg_4015_w )
 {
-	nes_psg_0_w(space,0x15, data);
+	nes_psg_w(device,0x15, data);
 }
 
-static WRITE8_HANDLER( psg_4017_w )
+static WRITE8_DEVICE_HANDLER( psg_4017_w )
 {
-	nes_psg_0_w(space,0x17, data);
+	nes_psg_w(device,0x17, data);
 }
 
 static UINT32 in_0;
@@ -159,11 +159,11 @@ static WRITE8_HANDLER( cham24_mapper_w )
 static ADDRESS_MAP_START( cham24_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)
-	AM_RANGE(0x4000, 0x4013) AM_READWRITE(nes_psg_0_r, nes_psg_0_w)			/* PSG primary registers */
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE(SOUND, "nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)			/* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE(SOUND, "nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(cham24_IN0_r,        cham24_IN0_w)			/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READWRITE(cham24_IN1_r,        psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(cham24_IN1_r) AM_DEVWRITE(SOUND, "nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(cham24_mapper_w)
 ADDRESS_MAP_END
 

@@ -45,20 +45,6 @@ static WRITE16_HANDLER( pkscramble_bgtilemap_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset >> 1);
 }
 
-static WRITE16_HANDLER( pkscramble_YM2203_w )
-{
-	switch (offset)
-	{
-		case 0: ym2203_control_port_0_w(space,0,data & 0xff);break;
-		case 1: ym2203_write_port_0_w(space,0,data & 0xff);break;
-	}
-}
-
-static READ16_HANDLER( pkscramble_YM2203_r )
-{
-	return ym2203_status_port_0_r(space,0);
-}
-
 // input bit 0x20 in port1 should stay low until bit 0x20 is written here, then
 // it should stay high for some time (currently we cheat keeping the input always active)
 static WRITE16_HANDLER( pkscramble_output_w )
@@ -112,8 +98,7 @@ static ADDRESS_MAP_START( pkscramble_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x049018, 0x049019) AM_WRITENOP
 	AM_RANGE(0x04901c, 0x04901d) AM_WRITENOP
 	AM_RANGE(0x049020, 0x049021) AM_WRITENOP
-	AM_RANGE(0x04900c, 0x04900d) AM_READ(pkscramble_YM2203_r)
-	AM_RANGE(0x04900c, 0x04900f) AM_WRITE(pkscramble_YM2203_w)
+	AM_RANGE(0x04900c, 0x04900f) AM_DEVREADWRITE8(SOUND, "ym", ym2203_r, ym2203_w, 0x00ff)
 	AM_RANGE(0x052086, 0x052087) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -258,10 +243,10 @@ static GFXDECODE_START( pkscram )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
 	if(out & 0x10)
-		cpu_set_input_line(machine->cpu[0],2,irq ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0],2,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -269,7 +254,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };

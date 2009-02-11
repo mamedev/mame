@@ -21,7 +21,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/cubeqcpu/cubeqcpu.h"
 #include "sound/dac.h"
-#include "sound/custom.h"
 #include "streams.h"
 #include "machine/laserdsc.h"
 
@@ -465,7 +464,18 @@ static MACHINE_RESET( cubeqst )
 /* Called by the sound CPU emulation */
 static void sound_dac_w(const device_config *device, UINT16 data)
 {
-	dac_signed_data_16_w(data & 15, (data & 0xfff0) ^ 0x8000);
+	static const char *dacs[] =
+	{
+		"rdac0", "ldac0",
+		"rdac1", "ldac1",
+		"rdac2", "ldac2",
+		"rdac3", "ldac3",
+		"rdac4", "ldac4",
+		"rdac5", "ldac5",
+		"rdac6", "ldac6",
+		"rdac7", "ldac7"
+	};
+	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, dacs[data & 15]), (data & 0xfff0) ^ 0x8000);
 }
 
 static const cubeqst_snd_config snd_config =
@@ -527,8 +537,7 @@ static MACHINE_DRIVER_START( cubeqst )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 

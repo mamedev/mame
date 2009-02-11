@@ -81,7 +81,7 @@ static MACHINE_RESET( relief )
 	atarigen_interrupt_reset(update_interrupts);
 	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 
-	okim6295_set_bank_base(0, 0);
+	okim6295_set_bank_base(devtag_get_device(machine, SOUND, "oki"), 0);
 	ym2413_volume = 15;
 	overall_volume = 127;
 	adpcm_bank_base = 0;
@@ -122,7 +122,7 @@ static WRITE16_HANDLER( audio_control_w )
 	if (ACCESSING_BITS_8_15)
 		adpcm_bank_base = (0x100000 * ((data >> 8) & 1)) | (adpcm_bank_base & 0x0c0000);
 
-	okim6295_set_bank_base(0, adpcm_bank_base);
+	okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"), adpcm_bank_base);
 }
 
 
@@ -140,45 +140,6 @@ static WRITE16_HANDLER( audio_volume_w )
 
 /*************************************
  *
- *  MSM5295 I/O
- *
- *************************************/
-
-static READ16_HANDLER( adpcm_r )
-{
-	return okim6295_status_0_r(space, offset) | 0xff00;
-}
-
-
-static WRITE16_HANDLER( adpcm_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6295_data_0_w(space, offset, data & 0xff);
-}
-
-
-
-/*************************************
- *
- *  YM2413 I/O
- *
- *************************************/
-
-static WRITE16_HANDLER( ym2413_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		if (offset & 1)
-			ym2413_data_port_0_w(space, 0, data & 0xff);
-		else
-			ym2413_register_port_0_w(space, 0, data & 0xff);
-	}
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -187,8 +148,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x140000, 0x140003) AM_WRITE(ym2413_w)
-	AM_RANGE(0x140010, 0x140011) AM_READWRITE(adpcm_r, adpcm_w)
+	AM_RANGE(0x140000, 0x140003) AM_DEVWRITE8(SOUND, "ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x140010, 0x140011) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x140020, 0x140021) AM_WRITE(audio_volume_w)
 	AM_RANGE(0x140030, 0x140031) AM_WRITE(audio_control_w)
 	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(atarigen_eeprom_upper_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)

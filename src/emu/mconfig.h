@@ -137,9 +137,6 @@ struct _machine_config
 	video_eof_func			video_eof;				/* end-of-frame video callback */
 	video_update_func 		video_update; 			/* video update callback */
 
-	sound_config			sound[MAX_SOUND];		/* array of sound chips in the system */
-	astring *				soundtag[MAX_SOUND];	/* allocated strings for each sound tag */
-
 	sound_start_func		sound_start;			/* one-time sound start callback */
 	sound_reset_func		sound_reset;			/* sound reset callback */
 
@@ -173,7 +170,6 @@ union _machine_config_token
 	palette_init_func palette_init;
 	video_eof_func video_eof;
 	video_update_func video_update;
-	sound_type sndtype;
 };
 
 
@@ -197,78 +193,6 @@ union _machine_config_token
 #define MDRV_IMPORT_FROM(_name) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_INCLUDE, 8), \
 	TOKEN_PTR(tokenptr, machine_config_##_name),
-
-
-/* add/remove/config devices */
-#define MDRV_DEVICE_ADD(_tag, _type, _clock) \
-	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_ADD, 8, _clock, 32), \
-	TOKEN_PTR(devtype, _type), \
-	TOKEN_STRING(_tag),
-
-#define MDRV_DEVICE_REMOVE(_tag, _type) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_REMOVE, 8), \
-	TOKEN_PTR(devtype, _type), \
-	TOKEN_STRING(_tag),
-
-#define MDRV_DEVICE_MODIFY(_tag, _type)	\
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_MODIFY, 8), \
-	TOKEN_PTR(devtype, _type), \
-	TOKEN_STRING(_tag),
-
-#define MDRV_DEVICE_CONFIG(_config) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
-	TOKEN_PTR(voidptr, &(_config)),
-
-#define MDRV_DEVICE_CLOCK(_clock) \
-	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_CLOCK, 8, _clock, 32),
-
-#define structsizeof(_struct, _field) sizeof(((_struct *)NULL)->_field)
-
-#define MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(_size, _offset, _val) \
-	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA32, 8, (_size), 6, (_offset), 12), \
-	TOKEN_UINT32((UINT32)(_val)),
-
-#define MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val) \
-	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
-
-#define MDRV_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val) \
-	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
-
-#define MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
-	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
-
-#define MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(_size, _offset, _val) \
-	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA64, 8, (_size), 6, (_offset), 12), \
-	TOKEN_UINT64((UINT64)(_val)),
-
-#define MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val) \
-	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
-
-#define MDRV_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val) \
-	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
-
-#define MDRV_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
-	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
-
-#define MDRV_DEVICE_CONFIG_DATAFP32(_struct, _field, _val, _fixbits) \
-	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32, 8, structsizeof(_struct, _field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
-	TOKEN_UINT32((INT32)((float)(_val) * (float)(1 << (_fixbits)))),
-
-#define MDRV_DEVICE_CONFIG_DATAFP64(_struct, _field, _val, _fixbits) \
-	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64, 8, structsizeof(_struct, _field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
-	TOKEN_UINT64((INT64)((float)(_val) * (float)((UINT64)1 << (_fixbits)))),
-
-#ifdef PTR64
-#define MDRV_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(_struct, _size, _offset)
-#define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val)
-#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MDRV_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val)
-#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MDRV_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
-#else
-#define MDRV_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(_struct, _size, _offset)
-#define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val)
-#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val)
-#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
-#endif
 
 
 /* core parameters */
@@ -347,24 +271,6 @@ union _machine_config_token
 	TOKEN_PTR(video_update, video_update_##_func),
 
 
-/* add/remove speakers */
-#define MDRV_SPEAKER_ADD(_tag, _x, _y, _z) \
-	MDRV_DEVICE_ADD(_tag, SPEAKER_OUTPUT, 0) \
-	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, x, _x, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, y, _y, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, z, _z, 24)
-
-#define MDRV_SPEAKER_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, SPEAKER_OUTPUT)
-
-#define MDRV_SPEAKER_STANDARD_MONO(_tag) \
-	MDRV_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
-
-#define MDRV_SPEAKER_STANDARD_STEREO(_tagl, _tagr) \
-	MDRV_SPEAKER_ADD(_tagl, -0.2, 0.0, 1.0) \
-	MDRV_SPEAKER_ADD(_tagr, 0.2, 0.0, 1.0)
-
-
 /* core sound functions */
 #define MDRV_SOUND_START(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_START, 8), \
@@ -375,35 +281,95 @@ union _machine_config_token
 	TOKEN_PTR(sound_start, sound_reset_##_func),
 
 
-/* add/remove/replace sounds */
-#define MDRV_SOUND_ADD(_tag, _type, _clock) \
-	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_SOUND_ADD, 8, _clock, 32), \
-	TOKEN_PTR(sndtype, SOUND_##_type), \
+/* add/remove devices */
+#define MDRV_DEVICE_ADD(_tag, _type, _clock) \
+	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_ADD, 8, _clock, 32), \
+	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define MDRV_SOUND_REMOVE(_tag) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_REMOVE, 8), \
+#define MDRV_DEVICE_REMOVE(_tag, _type) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_REMOVE, 8), \
+	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define MDRV_SOUND_MODIFY(_tag) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_MODIFY, 8), \
+#define MDRV_DEVICE_MODIFY(_tag, _type)	\
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_MODIFY, 8), \
+	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define MDRV_SOUND_CONFIG(_config) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_CONFIG, 8), \
+
+/* configure devices */
+#define MDRV_DEVICE_CONFIG(_config) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
 	TOKEN_PTR(voidptr, &(_config)),
 
-#define MDRV_SOUND_REPLACE(_tag, _type, _clock) \
-	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_SOUND_REPLACE, 8, _clock, 32), \
-	TOKEN_PTR(sndtype, SOUND_##_type), \
-	TOKEN_STRING(_tag),
+#define MDRV_DEVICE_CONFIG_CLEAR() \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
+	TOKEN_PTR(voidptr, NULL),
 
-#define MDRV_SOUND_ROUTE_EX(_output, _target, _gain, _input)			\
-	TOKEN_UINT64_PACK4(MCONFIG_TOKEN_SOUND_ROUTE, 8, _output, 12, _input, 12, (UINT32)((float)(_gain) * 16777216.0f), 32), \
-	TOKEN_STRING(_target),
+#define MDRV_DEVICE_CLOCK(_clock) \
+	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_CLOCK, 8, _clock, 32),
 
-#define MDRV_SOUND_ROUTE(_output, _target, _gain) \
-	MDRV_SOUND_ROUTE_EX(_output, _target, _gain, -1)
+#define structsizeof(_struct, _field) sizeof(((_struct *)NULL)->_field)
+
+
+/* inline device configurations that require 32 bits of storage in the token */
+#define MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(_size, _offset, _val) \
+	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA32, 8, _size, 6, _offset, 12), \
+	TOKEN_UINT32((UINT32)(_val)),
+
+#define MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val) \
+	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
+
+#define MDRV_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val) \
+	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
+
+#define MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
+	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
+
+
+/* inline device configurations that require 32 bits of fixed-point storage in the token */
+#define MDRV_DEVICE_CONFIG_DATAFP32_EXPLICIT(_size, _offset, _val, _fixbits) \
+	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32, 8, _size, 6, _fixbits, 6, _offset, 12), \
+	TOKEN_UINT32((INT32)((float)(_val) * (float)(1 << (_fixbits)))),
+
+#define MDRV_DEVICE_CONFIG_DATAFP32(_struct, _field, _val, _fixbits) \
+	MDRV_DEVICE_CONFIG_DATAFP32_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val, _fixbits)
+
+#define MDRV_DEVICE_CONFIG_DATAFP32_ARRAY(_struct, _field, _index, _val, _fixbits) \
+	MDRV_DEVICE_CONFIG_DATAFP32_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val, _fixbits)
+
+#define MDRV_DEVICE_CONFIG_DATAFP32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val, _fixbits) \
+	MDRV_DEVICE_CONFIG_DATAFP32_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val, _fixbits)
+
+
+/* inline device configurations that require 64 bits of storage in the token */
+#define MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(_size, _offset, _val) \
+	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA64, 8, _size, 6, _offset, 12), \
+	TOKEN_UINT64((UINT64)(_val)),
+
+#define MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val) \
+	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
+
+#define MDRV_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val) \
+	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
+
+#define MDRV_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
+	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
+
+
+/* inline device configurations that require a pointer-sized amount of storage in the token */
+#ifdef PTR64
+#define MDRV_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(_struct, _size, _offset)
+#define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val)
+#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MDRV_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val)
+#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MDRV_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
+#else
+#define MDRV_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(_struct, _size, _offset)
+#define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val)
+#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val)
+#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
+#endif
 
 
 

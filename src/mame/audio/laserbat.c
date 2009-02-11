@@ -13,6 +13,7 @@ WRITE8_HANDLER( laserbat_csound1_w )
 
 WRITE8_HANDLER( laserbat_csound2_w )
 {
+	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
 	int ksound = 0;
 
 	if (data & 0x01)
@@ -55,11 +56,11 @@ WRITE8_HANDLER( laserbat_csound2_w )
 			break;
 		}
 
-		sn76477_noise_filter_res_w(0, noise_filter_res);
-		sn76477_vco_res_w(0, vco_res);
+		sn76477_noise_filter_res_w(sn, noise_filter_res);
+		sn76477_vco_res_w(sn, vco_res);
 
-		sn76477_enable_w(0, (csound1 & 0x08) ? 1 : 0); // AB SOUND
-		sn76477_mixer_b_w(0, (csound1 & 0x10) ? 1 : 0); // _VCO/NOISE
+		sn76477_enable_w(sn, (csound1 & 0x08) ? 1 : 0); // AB SOUND
+		sn76477_mixer_b_w(sn, (csound1 & 0x10) ? 1 : 0); // _VCO/NOISE
 
 		degr = (csound1 & 0x20) ? 1 : 0;
 		filt = (csound1 & 0x40) ? 1 : 0;
@@ -67,21 +68,21 @@ WRITE8_HANDLER( laserbat_csound2_w )
 		us = 0; // sn76477 pin 12
 	}
 
-	sn76477_vco_w(0, (data & 0x40) ? 0 : 1);
+	sn76477_vco_w(sn, (data & 0x40) ? 0 : 1);
 
 	switch((data & 0x1c) >> 2)
 	{
 	case 0x00:
-		sn76477_slf_res_w(0, RES_K(27));
+		sn76477_slf_res_w(sn, RES_K(27));
 		break;
 	case 0x01:
-		sn76477_slf_res_w(0, RES_K(22));
+		sn76477_slf_res_w(sn, RES_K(22));
 		break;
 	case 0x02:
-		sn76477_slf_res_w(0, RES_K(22));
+		sn76477_slf_res_w(sn, RES_K(22));
 		break;
 	case 0x03:
-		sn76477_slf_res_w(0, RES_K(12));
+		sn76477_slf_res_w(sn, RES_K(12));
 		break;
 	case 0x04: // not connected
 		break;
@@ -98,8 +99,8 @@ WRITE8_HANDLER( laserbat_csound2_w )
 
 	ksound = ((data & 0x02) << 23) + (ksound3 << 16) + (ksound2 << 8) + ksound1;
 
-	tms3615_enable_w(0, ksound & 0x1fff);
-	tms3615_enable_w(1, (ksound >> 13) << 1);
+	tms3615_enable_w(devtag_get_device(space->machine, SOUND, "tms1"), ksound & 0x1fff);
+	tms3615_enable_w(devtag_get_device(space->machine, SOUND, "tms2"), (ksound >> 13) << 1);
 
 	bit14 = (data & 0x20) ? 1 : 0;
 

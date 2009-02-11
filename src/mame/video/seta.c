@@ -279,9 +279,10 @@ WRITE16_HANDLER( seta_vregs_w )
         ---- ---- ---- ---0     Coin #0 Counter     */
 			if (ACCESSING_BITS_0_7)
 			{
+				const device_config *x1_010 = devtag_get_device(space->machine, SOUND, "x1");
 				seta_coin_lockout_w (space->machine, data & 0x0f);
-				if (sndti_exists(SOUND_X1_010, 0))
-					seta_sound_enable_w (data & 0x20);
+				if (x1_010 != NULL)
+					seta_sound_enable_w (x1_010, data & 0x20);
 				coin_counter_w(0,data & 0x01);
 				coin_counter_w(1,data & 0x02);
 			}

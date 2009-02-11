@@ -107,9 +107,9 @@ typedef struct
 	UINT8 ext_read;
 
 	const UINT8 *rom;
-	read8_device_func ext_mem_read;
-	write8_device_func ext_mem_write;
-	void (*irq_callback)(running_machine *, int);
+	devcb_resolved_read8 ext_mem_read;
+	devcb_resolved_write8 ext_mem_write;
+	void (*irq_callback)(const device_config *, int);
 
 	UINT32 clock;
 	sound_stream * stream;
@@ -251,6 +251,16 @@ static const int feedback_level[8] = { 0, 1, 2, 4, 8, 16, 32, 64 };
 static int channel_attenuation[16];
 static int total_level[128];
 static int env_volume_table[256];
+
+INLINE YMF271Chip *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_YMF271);
+	return (YMF271Chip *)device->token;
+}
+
 
 INLINE int GET_KEYSCALED_RATE(int rate, int keycode, int keyscale)
 {
@@ -1355,7 +1365,7 @@ static TIMER_CALLBACK( ymf271_timer_a_tick )
 	if (chip->enable & 4)
 	{
 		chip->irqstate |= 1;
-		if (chip->irq_callback) chip->irq_callback(machine, 1);
+		if (chip->irq_callback) chip->irq_callback(chip->device, 1);
 	}
 }
 
@@ -1368,14 +1378,14 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 	if (chip->enable & 8)
 	{
 		chip->irqstate |= 2;
-		if (chip->irq_callback) chip->irq_callback(machine, 1);
+		if (chip->irq_callback) chip->irq_callback(chip->device, 1);
 	}
 }
 
 static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 {
-	if( chip->ext_mem_read ) {
-		return chip->ext_mem_read(chip->device,address);
+	if( chip->ext_mem_read.read ) {
+		return devcb_call_read8(&chip->ext_mem_read, address);
 	} else {
 		if( address < 0x800000)
 			return chip->rom[address];
@@ -1385,9 +1395,7 @@ static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 
 static void ymf271_write_ext_memory(YMF271Chip *chip, UINT32 address, UINT8 data)
 {
-	if( chip->ext_mem_write ) {
-		chip->ext_mem_write(chip->device, address, data);
-	}
+	devcb_call_write8(&chip->ext_mem_write, address, data);
 }
 
 static void ymf271_write_timer(YMF271Chip *chip, int data)
@@ -1395,7 +1403,6 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 	int slotnum;
 	YMF271Group *group;
 	attotime period;
-	running_machine *machine = chip->device->machine;
 
 	slotnum = fm_tab[chip->timerreg & 0xf];
 	group = &chip->groups[slotnum];
@@ -1453,7 +1460,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					chip->irqstate &= ~1;
 					chip->status &= ~1;
 
-					if (chip->irq_callback) chip->irq_callback(machine, 0);
+					if (chip->irq_callback) chip->irq_callback(chip->device, 0);
 
 					//period = (double)(256.0 - chip->timerAVal ) * ( 384.0 * 4.0 / (double)CLOCK);
 					period = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 384 * (1024 - chip->timerAVal));
@@ -1465,7 +1472,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					chip->irqstate &= ~2;
 					chip->status &= ~2;
 
-					if (chip->irq_callback) chip->irq_callback(machine, 0);
+					if (chip->irq_callback) chip->irq_callback(chip->device, 0);
 
 					period = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 384 * 16 * (256 - chip->timerBVal));
 
@@ -1497,9 +1504,9 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 	}
 }
 
-static void ymf271_w(int chipnum, int offset, int data)
+WRITE8_DEVICE_HANDLER( ymf271_w )
 {
-	YMF271Chip *chip = sndti_token(SOUND_YMF271, chipnum);
+	YMF271Chip *chip = get_safe_token(device);
 
 	switch (offset)
 	{
@@ -1542,10 +1549,10 @@ static void ymf271_w(int chipnum, int offset, int data)
 	}
 }
 
-static int ymf271_r(int chipnum, int offset)
+READ8_DEVICE_HANDLER( ymf271_r )
 {
 	UINT8 value;
-	YMF271Chip *chip = sndti_token(SOUND_YMF271, chipnum);
+	YMF271Chip *chip = get_safe_token(device);
 
 	switch(offset)
 	{
@@ -1723,7 +1730,7 @@ static void init_state(YMF271Chip *chip, const device_config *device)
 	state_save_register_device_item(device, 0, chip->ext_read);
 }
 
-static void ymf271_init(const device_config *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_device_func ext_read, write8_device_func ext_write)
+static void ymf271_init(const device_config *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(const device_config *,int), const devcb_read8 *ext_read, const devcb_write8 *ext_write)
 {
 	chip->timA = timer_alloc(device->machine, ymf271_timer_a_tick, chip);
 	chip->timB = timer_alloc(device->machine, ymf271_timer_b_tick, chip);
@@ -1731,27 +1738,27 @@ static void ymf271_init(const device_config *device, YMF271Chip *chip, UINT8 *ro
 	chip->rom = rom;
 	chip->irq_callback = cb;
 
-	chip->ext_mem_read = ext_read;
-	chip->ext_mem_write = ext_write;
+	devcb_resolve_read8(&chip->ext_mem_read, ext_read, device);
+	devcb_resolve_write8(&chip->ext_mem_write, ext_write, device);
 
 	init_tables();
 	init_state(chip, device);
 }
 
-static SND_START( ymf271 )
+static DEVICE_START( ymf271 )
 {
-	static const ymf271_interface defintrf = { 0 };
+	static const ymf271_interface defintrf = { DEVCB_NULL };
 	const ymf271_interface *intf;
 	int i;
-	YMF271Chip *chip = device->token;
+	YMF271Chip *chip = get_safe_token(device);
 
 	chip->device = device;
-	chip->clock = clock;
+	chip->clock = device->clock;
 
 	intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
-	ymf271_init(device, chip, device->region, intf->irq_callback, intf->ext_read, intf->ext_write);
-	chip->stream = stream_create(device, 0, 2, clock/384, chip, ymf271_update);
+	ymf271_init(device, chip, device->region, intf->irq_callback, &intf->ext_read, &intf->ext_write);
+	chip->stream = stream_create(device, 0, 2, device->clock/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)
 	{
@@ -1769,30 +1776,10 @@ static SND_START( ymf271 )
 	}
 }
 
-READ8_HANDLER( ymf271_0_r )
-{
-	return ymf271_r(0, offset);
-}
-
-WRITE8_HANDLER( ymf271_0_w )
-{
-	ymf271_w(0, offset, data);
-}
-
-READ8_HANDLER( ymf271_1_r )
-{
-	return ymf271_r(1, offset);
-}
-
-WRITE8_HANDLER( ymf271_1_w )
-{
-	ymf271_w(1, offset, data);
-}
-
-static SND_RESET( ymf271 )
+static DEVICE_RESET( ymf271 )
 {
 	int i;
-	YMF271Chip *chip = device->token;
+	YMF271Chip *chip = get_safe_token(device);
 
 	for (i = 0; i < 48; i++)
 	{
@@ -1805,33 +1792,23 @@ static SND_RESET( ymf271 )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( ymf271 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( ymf271 )
+DEVICE_GET_INFO( ymf271 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(YMF271Chip); 					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(YMF271Chip); 					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf271 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf271 );			break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ymf271 );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ymf271 );			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( ymf271 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "YMF271");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "YMF271");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha FM");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

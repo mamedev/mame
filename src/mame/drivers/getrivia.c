@@ -151,7 +151,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	interrupt_enable_w(space, 0, data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(0,((data & 0x80) >> 7) * 255);
+	dac_data_w(devtag_get_device(device->machine, SOUND, "dac"), ((data & 0x80) >> 7) * 255);
 }
 
 static WRITE8_DEVICE_HANDLER( sound2_w )
@@ -168,7 +168,7 @@ static WRITE8_DEVICE_HANDLER( sound2_w )
 	set_led_status(12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(0,((data & 0x80) >> 7) * 255);
+	dac_data_w(devtag_get_device(device->machine, SOUND, "dac"), ((data & 0x80) >> 7) * 255);
 }
 
 static WRITE8_DEVICE_HANDLER( lamps2_w )

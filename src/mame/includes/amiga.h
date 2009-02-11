@@ -10,8 +10,6 @@ Ernesto Corvi & Mariusz Wojcieszek
 #ifndef __AMIGA_H__
 #define __AMIGA_H__
 
-#include "sound/custom.h"
-
 
 /* A bit of a trick here: some registers are 32-bit. In order to efficiently */
 /* read them on both big-endian and little-endian systems, we store the custom */
@@ -391,7 +389,9 @@ const amiga_machine_interface *amiga_get_interface(void);
 
 /*----------- defined in audio/amiga.c -----------*/
 
-CUSTOM_START( amiga_sh_start );
+DEVICE_GET_INFO( amiga_sound );
+#define SOUND_AMIGA DEVICE_GET_INFO_NAME(amiga_sound)
+
 void amiga_audio_update(void);
 void amiga_audio_data_w(int which, UINT16 data);
 

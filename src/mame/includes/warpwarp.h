@@ -1,5 +1,3 @@
-#include "sound/custom.h"
-
 /*----------- defined in video/warpwarp.c -----------*/
 
 extern UINT8 *geebee_videoram,*warpwarp_videoram;
@@ -25,7 +23,8 @@ WRITE8_HANDLER( geebee_videoram_w );
 /*----------- defined in audio/geebee.c -----------*/
 
 WRITE8_HANDLER( geebee_sound_w );
-CUSTOM_START( geebee_sh_start );
+DEVICE_GET_INFO( geebee_sound );
+#define SOUND_GEEBEE DEVICE_GET_INFO_NAME(geebee_sound)
 
 
 /*----------- defined in audio/warpwarp.c -----------*/
@@ -33,4 +32,5 @@ CUSTOM_START( geebee_sh_start );
 WRITE8_HANDLER( warpwarp_sound_w );
 WRITE8_HANDLER( warpwarp_music1_w );
 WRITE8_HANDLER( warpwarp_music2_w );
-CUSTOM_START( warpwarp_sh_start );
+DEVICE_GET_INFO( warpwarp_sound );
+#define SOUND_WARPWARP DEVICE_GET_INFO_NAME(warpwarp_sound)

@@ -173,39 +173,39 @@ static void idsoccer_adpcm_int(const device_config *device)
 	if (adpcm_pos >= memory_region_length(device->machine, "adpcm"))
 	{
 		adpcm_idle = 1;
-		msm5205_reset_w(0, 1);
+		msm5205_reset_w(device, 1);
 	}
 	else if (adpcm_data != -1)
 	{
-		msm5205_data_w(0, adpcm_data & 0x0f);
+		msm5205_data_w(device, adpcm_data & 0x0f);
 		adpcm_data = -1;
 	}
 	else
 	{
 		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos++];
-		msm5205_data_w(0, adpcm_data >> 4);
+		msm5205_data_w(device, adpcm_data >> 4);
 	}
 }
 
-static READ8_HANDLER( idsoccer_adpcm_status_r )
+static READ8_DEVICE_HANDLER( idsoccer_adpcm_status_r )
 {
 	// this is wrong, but the samples work anyway!!
 	adpcm_status ^= 0x80;
 	return adpcm_status;
 }
 
-static WRITE8_HANDLER( idsoccer_adpcm_w )
+static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
 {
 	if (data & 0x80)
 	{
 		adpcm_idle = 1;
-		msm5205_reset_w(0, 1);
+		msm5205_reset_w(device, 1);
 	}
 	else
 	{
 		adpcm_pos = (data & 0x7f) * 0x200;
 		adpcm_idle = 0;
-		msm5205_reset_w(0, 0);
+		msm5205_reset_w(device, 0);
 	}
 }
 
@@ -233,10 +233,10 @@ static ADDRESS_MAP_START( docastle_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc084, 0xc084) AM_READWRITE(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(sn76496_1_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(sn76496_2_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(sn76496_3_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
+	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE(SOUND, "sn3", sn76496_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE(SOUND, "sn4", sn76496_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( docastle_map3, ADDRESS_SPACE_PROGRAM, 8 )
@@ -269,10 +269,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dorunrun_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(sn76496_1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(sn76496_2_w)
-	AM_RANGE(0xac00, 0xac00) AM_WRITE(sn76496_3_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
+	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
+	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE(SOUND, "sn3", sn76496_w)
+	AM_RANGE(0xac00, 0xac00) AM_DEVWRITE(SOUND, "sn4", sn76496_w)
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
@@ -293,7 +293,7 @@ static ADDRESS_MAP_START( idsoccer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(idsoccer_adpcm_status_r, idsoccer_adpcm_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE(SOUND, "msm", idsoccer_adpcm_status_r, idsoccer_adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
@@ -308,10 +308,10 @@ static ADDRESS_MAP_START( idsoccer_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc084, 0xc084) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(docastle_flipscreen_on_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(sn76496_1_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(sn76496_2_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(sn76496_3_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
+	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE(SOUND, "sn3", sn76496_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE(SOUND, "sn4", sn76496_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

@@ -89,14 +89,14 @@ static WRITE16_HANDLER( tile_banking_w )
 	}
 }
 
-static WRITE16_HANDLER( oki_banking )
+static WRITE16_DEVICE_HANDLER( oki_banking )
 {
 	if(data & 3)
 	{
 		int addr = 0x40000 * ((data & 3) - 1);
 
-		if(addr < memory_region_length(space->machine, "oki"))
-			okim6295_set_bank_base(0, addr);
+		if(addr < memory_region_length(device->machine, "oki"))
+			okim6295_set_bank_base(device, addr);
 	}
 }
 
@@ -112,8 +112,8 @@ static ADDRESS_MAP_START( magicstk_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2") AM_WRITE(magicstk_coin_eeprom_w)
 	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
-	AM_RANGE(0x0c201e, 0x0c201f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x0c201c, 0x0c201d) AM_DEVWRITE(SOUND, "oki", oki_banking)
+	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP
 	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
@@ -132,8 +132,8 @@ static ADDRESS_MAP_START( powerbal_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2")
 	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
-	AM_RANGE(0x0c201e, 0x0c201f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x0c201c, 0x0c201d) AM_DEVWRITE(SOUND, "oki", oki_banking)
+	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITENOP
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM
 	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)

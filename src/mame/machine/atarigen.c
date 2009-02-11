@@ -672,10 +672,10 @@ WRITE8_HANDLER( atarigen_6502_irq_ack_w )
     IRQ line.
 ---------------------------------------------------------------*/
 
-void atarigen_ym2151_irq_gen(running_machine *machine, int irq)
+void atarigen_ym2151_irq_gen(const device_config *device, int irq)
 {
 	ym2151_int = irq;
-	update_6502_irq(machine);
+	update_6502_irq(device->machine);
 }
 
 
@@ -874,17 +874,11 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
 
 void atarigen_set_vol(running_machine *machine, int volume, sound_type type)
 {
-	int sndindex = 0;
-	int ch;
-
-	for (ch = 0; ch < MAX_SOUND; ch++)
-		if (machine->config->sound[ch].type == type)
-		{
-			int output;
-			for (output = 0; output < 2; output++)
-				sndti_set_output_gain(type, sndindex, output, volume / 100.0);
-			sndindex++;
-		}
+	const device_config *device;
+	
+	for (device = sound_first(machine->config); device != NULL; device = sound_next(device))
+		if (sound_get_type(device) == type)
+			sound_set_output_gain(device, ALL_OUTPUTS, volume / 100.0);
 }
 
 

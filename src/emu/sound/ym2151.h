@@ -78,10 +78,10 @@ void ym2151_write_reg(void *chip, int r, int v);
 int ym2151_read_status(void *chip);
 
 /* set interrupt handler on YM2151 chip number 'n'*/
-void ym2151_set_irq_handler(void *chip, void (*handler)(running_machine *machine, int irq));
+void ym2151_set_irq_handler(void *chip, void (*handler)(const device_config *device, int irq));
 
 /* set port write handler on YM2151 chip number 'n'*/
-void ym2151_set_port_write_handler(void *chip, write8_space_func handler);
+void ym2151_set_port_write_handler(void *chip, write8_device_func handler);
 
 /* refresh chip when load state */
 STATE_POSTLOAD( ym2151_postload );

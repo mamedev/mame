@@ -151,7 +151,7 @@ INTERRUPT_GEN( atarigen_6502_irq_gen );
 READ8_HANDLER( atarigen_6502_irq_ack_r );
 WRITE8_HANDLER( atarigen_6502_irq_ack_w );
 
-void atarigen_ym2151_irq_gen(running_machine *machine, int irq);
+void atarigen_ym2151_irq_gen(const device_config *device, int irq);
 
 WRITE16_HANDLER( atarigen_sound_w );
 READ16_HANDLER( atarigen_sound_r );

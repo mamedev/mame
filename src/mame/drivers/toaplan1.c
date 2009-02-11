@@ -282,8 +282,7 @@ static ADDRESS_MAP_START( rallybik_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_WRITE(rallybik_coin_w)	/* Coin counter/lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
-	AM_RANGE(0x60, 0x60) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x61, 0x61) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x70, 0x70) AM_READ_PORT("TJUMP")
 ADDRESS_MAP_END
 
@@ -295,8 +294,7 @@ static ADDRESS_MAP_START( truxton_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("DSWB")
-	AM_RANGE(0x60, 0x60) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x61, 0x61) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x70, 0x70) AM_READ_PORT("TJUMP")
 ADDRESS_MAP_END
 
@@ -309,8 +307,7 @@ static ADDRESS_MAP_START( hellfire_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("P1")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("P2")
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70, 0x70) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zerowing_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -322,14 +319,12 @@ static ADDRESS_MAP_START( zerowing_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x88, 0x88) AM_READ_PORT("TJUMP")
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
-	AM_RANGE(0xa8, 0xa8) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0xa9, 0xa9) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xa8, 0xa9) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demonwld_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("TJUMP")
 	AM_RANGE(0x40, 0x40) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("SYSTEM")
@@ -341,8 +336,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( outzone_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(toaplan1_coin_w)	/* Coin counter/lockout */
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSWA")
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSWB")
@@ -1228,9 +1222,9 @@ static GFXDECODE_START( vm )
 GFXDECODE_END
 
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate);
+	cpu_set_input_line(device->machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =

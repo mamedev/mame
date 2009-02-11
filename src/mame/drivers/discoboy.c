@@ -329,7 +329,7 @@ ADDRESS_MAP_END
 
 static void splash_msm5205_int(const device_config *device)
 {
-	msm5205_data_w(0,adpcm_data >> 4);
+	msm5205_data_w(device,adpcm_data >> 4);
 //  adpcm_data = (adpcm_data << 4) & 0xf0;
 }
 
@@ -342,8 +342,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0xec01, 0xec01) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE(SOUND, "ym", ym3812_w)
 ADDRESS_MAP_END
 
 

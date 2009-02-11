@@ -457,9 +457,9 @@ static READ8_HANDLER( mario_sh_tune_r )
 		return (SND[(0x1000 + (p2 & 0x0f)*256+offset) & mask]);
 }
 
-static WRITE8_HANDLER( mario_sh_sound_w )
+static WRITE8_DEVICE_HANDLER( mario_sh_sound_w )
 {
-	discrete_sound_w(space,DS_DAC,data);
+	discrete_sound_w(device,DS_DAC,data);
 }
 
 static WRITE8_HANDLER( mario_sh_p1_w )
@@ -499,17 +499,17 @@ WRITE8_HANDLER( mario_sh_tuneselect_w )
 /* Sound 0 and 1 are pulsed !*/
 
 /* Mario running sample */
-WRITE8_HANDLER( mario_sh1_w )
+WRITE8_DEVICE_HANDLER( mario_sh1_w )
 {
 	printf("sound0\n");
-	discrete_sound_w(space,DS_SOUND0_INP, 0);
+	discrete_sound_w(device,DS_SOUND0_INP, 0);
 }
 
 /* Luigi running sample */
-WRITE8_HANDLER( mario_sh2_w )
+WRITE8_DEVICE_HANDLER( mario_sh2_w )
 {
 	printf("sound1\n");
-	discrete_sound_w(space,DS_SOUND1_INP, 0);
+	discrete_sound_w(device,DS_SOUND1_INP, 0);
 }
 
 /* Misc samples */
@@ -544,7 +544,7 @@ WRITE8_HANDLER( mario_sh3_w )
 			I8035_P1_W_AH(space,3,data & 1);
 			break;
 		case 7: /* skid */
-			discrete_sound_w(space,DS_SOUND7_INP,data & 1);
+			discrete_sound_w(devtag_get_device(space->machine, SOUND, "discrete"),DS_SOUND7_INP,data & 1);
 			break;
 	}
 }
@@ -561,7 +561,7 @@ static ADDRESS_MAP_START( mario_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mario_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(mario_sh_tune_r, mario_sh_sound_w)
+	AM_RANGE(0x00, 0xff) AM_READ(mario_sh_tune_r) AM_DEVWRITE(SOUND, "discrete", mario_sh_sound_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mario_sh_p1_r, mario_sh_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mario_sh_p2_r, mario_sh_p2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mario_sh_t0_r)
@@ -571,8 +571,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( masao_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -585,10 +585,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

@@ -189,6 +189,8 @@ static int dsc0, dsc1;
 
 static WRITE8_HANDLER( sound_command_w )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+
 	switch (offset)
 	{
 		// 0x90 triggers a jump to non-existant address(development system?) and must be filtered
@@ -198,14 +200,14 @@ static WRITE8_HANDLER( sound_command_w )
 
 		// explosion sound trigger(analog?)
 		case 0x08:
-			discrete_sound_w(space, STINGER_BOOM_EN1, dsc1);
-			discrete_sound_w(space, STINGER_BOOM_EN2, dsc1^=1);
+			discrete_sound_w(discrete, STINGER_BOOM_EN1, dsc1);
+			discrete_sound_w(discrete, STINGER_BOOM_EN2, dsc1^=1);
 		break;
 
 		// player shot sound trigger(analog?)
 		case 0x0a:
-			discrete_sound_w(space, STINGER_SHOT_EN1, dsc0);
-			discrete_sound_w(space, STINGER_SHOT_EN2, dsc0^=1);
+			discrete_sound_w(discrete, STINGER_SHOT_EN1, dsc0);
+			discrete_sound_w(discrete, STINGER_SHOT_EN2, dsc0^=1);
 		break;
 	}
 }
@@ -261,12 +263,18 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Stinger/Scion */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_2_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(ay8910_write_port_2_w)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_1_w)				/* Wiz only */
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(ay8910_write_port_1_w)				/* Wiz only */
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE(SOUND, "8910.3", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE(SOUND, "8910.1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "8910.2", ay8910_address_data_w)				/* Wiz only */
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Wiz */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( stinger_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Stinger/Scion */
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE(SOUND, "8910.1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "8910.2", ay8910_address_data_w)				/* Wiz only */
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Wiz */
 ADDRESS_MAP_END
 
@@ -733,6 +741,9 @@ static MACHINE_DRIVER_START( stinger )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(wiz)
+	
+	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_PROGRAM_MAP(stinger_sound_map,0)
 
 	/* video hardware */
 	MDRV_GFXDECODE(stinger)

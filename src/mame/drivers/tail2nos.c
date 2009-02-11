@@ -63,9 +63,9 @@ static WRITE16_HANDLER( tail2nos_K051316_ctrl_0_w )
 		K051316_ctrl_0_w(space,offset,data & 0xff);
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(space->machine, 3,memory_region(space->machine, "audio") + 0x10000 + (data & 0x01) * 0x8000);
+	memory_set_bankptr(device->machine, 3,memory_region(device->machine, "audio") + 0x10000 + (data & 0x01) * 0x8000);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -94,13 +94,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(soundlatch_r, SMH_NOP)	/* the write is a clear pending command */
-	AM_RANGE(0x08, 0x08) AM_WRITE(ym2608_control_port_0_a_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ym2608_data_port_0_a_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(ym2608_control_port_0_b_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2608_data_port_0_b_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVWRITE(SOUND, "ym", ym2608_w)
 #if 0
-	AM_RANGE(0x18, 0x18) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0x1a, 0x1a) AM_READ(ym2610_status_port_0_b_r)
+	AM_RANGE(0x18, 0x1b) AM_DEVREAD(SOUND, "ym", ym2608_r)
 #endif
 ADDRESS_MAP_END
 
@@ -217,9 +213,9 @@ GFXDECODE_END
 
 
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =
@@ -227,10 +223,10 @@ static const ym2608_interface ym2608_config =
 	{
 		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		NULL,
-		sound_bankswitch_w,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_HANDLER(sound_bankswitch_w)
 	},
 	irqhandler
 };

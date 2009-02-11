@@ -171,10 +171,10 @@ static ADDRESS_MAP_START( goldstar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("UNK1")
 	AM_RANGE(0xf811, 0xf811) AM_READ_PORT("UNK2")
 	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf830, 0xf830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
-	AM_RANGE(0xf840, 0xf840) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
-	AM_RANGE(0xfb00, 0xfb00) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
+	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xfd00, 0xfdff) AM_READWRITE(SMH_RAM,paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
@@ -202,11 +202,11 @@ static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0xf810, 0xf813) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
-	AM_RANGE(0xf830, 0xf830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
-	AM_RANGE(0xf840, 0xf840) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
 //  AM_RANGE(0xf850, 0xf850) AM_WRITE(ncb3_p1_flip_w)   // need flip?
 //  AM_RANGE(0xf860, 0xf860) AM_WRITE(ncb3_p2_flip_w)   // need flip?
-	AM_RANGE(0xf870, 0xf870) AM_WRITE(sn76496_0_w)	/* guess... device is initialized, but doesn't seems to be used.*/
+	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE(SOUND, "sn", sn76496_w)	/* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ncb3_readwriteport, ADDRESS_SPACE_IO, 8 )
@@ -282,9 +282,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
@@ -298,9 +297,8 @@ static ADDRESS_MAP_START( cmast91_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
-	AM_RANGE(0x21, 0x21) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x22, 0x22) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x23, 0x23) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x21, 0x21) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( lucky8_outport_w )
@@ -323,10 +321,10 @@ static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
-	AM_RANGE(0xb830, 0xb830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
-	AM_RANGE(0xb840, 0xb840) AM_WRITE(ay8910_control_port_0_w)	/* no sound... only use both ports for DSWs */
+	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)	/* no sound... only use both ports for DSWs */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
-	AM_RANGE(0xb870, 0xb870) AM_WRITE(sn76496_0_w)	/* sound */
+	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE(SOUND, "sn", sn76496_w)	/* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -349,7 +347,7 @@ static ADDRESS_MAP_START( kkojnoli_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb830, 0xb830) AM_WRITENOP		/* no ay8910 */
 	AM_RANGE(0xb840, 0xb840) AM_WRITENOP		/* no ay8910 */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
-	AM_RANGE(0xb870, 0xb870) AM_WRITE(sn76496_0_w)	/* sound */
+	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE(SOUND, "sn", sn76496_w)	/* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -384,10 +382,10 @@ static ADDRESS_MAP_START( ladylinr_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* DSW bank */
-	AM_RANGE(0xb830, 0xb830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
-	AM_RANGE(0xb840, 0xb840) AM_WRITE(ay8910_control_port_0_w)	/* no sound... only use ports */
+	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)	/* no sound... only use ports */
 	AM_RANGE(0xb850, 0xb850) AM_WRITENOP	/* just turn off the lamps, if exist */
-	AM_RANGE(0xb870, 0xb870) AM_WRITE(sn76496_0_w)	/* sound */
+	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE(SOUND, "sn", sn76496_w)	/* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -2975,40 +2973,40 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_7_r,	/* DSW 4 */
-	input_port_6_r,	/* DSW 3 */
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW4"),
+	DEVCB_INPUT_PORT("DSW3"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface cm_ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_6_r,	/* DSW 4 */
-	input_port_7_r,	/* DSW 5 */
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW4"),
+	DEVCB_INPUT_PORT("DSW5"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface lucky8_ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_7_r,	/* DSW 3 */
-	input_port_8_r,	/* DSW 4 */
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW3"),
+	DEVCB_INPUT_PORT("DSW4"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface ladylinr_ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( goldstar )
@@ -3211,7 +3209,7 @@ static MACHINE_DRIVER_START( chrygld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
+	MDRV_SOUND_ADD("sn", SN76489, PSG_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("ay", AY8910, AY_CLOCK)
@@ -3254,7 +3252,7 @@ static MACHINE_DRIVER_START( ncb3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
+	MDRV_SOUND_ADD("sn", SN76489, PSG_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("ay", AY8910, AY_CLOCK)
@@ -3400,7 +3398,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
+	MDRV_SOUND_ADD("sn", SN76489, PSG_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("ay", AY8910, AY_CLOCK)
@@ -3441,7 +3439,7 @@ static MACHINE_DRIVER_START( kkojnoli )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
+	MDRV_SOUND_ADD("sn", SN76489, PSG_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 MACHINE_DRIVER_END
@@ -3478,7 +3476,7 @@ static MACHINE_DRIVER_START( ladylinr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
 
-	MDRV_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
+	MDRV_SOUND_ADD("sn", SN76489, PSG_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("ay", AY8910, AY_CLOCK)

@@ -351,14 +351,14 @@ static READ8_HANDLER( dunhuang_service_r )
 	;
 }
 
-static READ8_HANDLER( dunhuang_dsw_r )
+static READ8_DEVICE_HANDLER( dunhuang_dsw_r )
 {
-	if (!(dunhuang_input & 0x01))	return input_port_read(space->machine, "DSW1");
-	if (!(dunhuang_input & 0x02))	return input_port_read(space->machine, "DSW2");
-	if (!(dunhuang_input & 0x04))	return input_port_read(space->machine, "DSW3");
-	if (!(dunhuang_input & 0x08))	return input_port_read(space->machine, "DSW4");
-	if (!(dunhuang_input & 0x10))	return input_port_read(space->machine, "DSW5");
-	logerror("%06x: warning, unknown dsw bits read, dunhuang_input = %02x\n", cpu_get_pc(space->cpu), dunhuang_input);
+	if (!(dunhuang_input & 0x01))	return input_port_read(device->machine, "DSW1");
+	if (!(dunhuang_input & 0x02))	return input_port_read(device->machine, "DSW2");
+	if (!(dunhuang_input & 0x04))	return input_port_read(device->machine, "DSW3");
+	if (!(dunhuang_input & 0x08))	return input_port_read(device->machine, "DSW4");
+	if (!(dunhuang_input & 0x10))	return input_port_read(device->machine, "DSW5");
+	logerror("%s: warning, unknown dsw bits read, dunhuang_input = %02x\n", cpuexec_describe_context(device->machine), dunhuang_input);
 	return 0xff;
 }
 static READ8_HANDLER( dunhuang_input_r )
@@ -368,7 +368,7 @@ static READ8_HANDLER( dunhuang_input_r )
 	if (!(dunhuang_input & 0x04))	return input_port_read(space->machine, "IN2");
 	if (!(dunhuang_input & 0x08))	return input_port_read(space->machine, "IN3");
 	if (!(dunhuang_input & 0x10))	return input_port_read(space->machine, "IN4");
-	logerror("%06x: warning, unknown input bits read, dunhuang_input = %02x\n", cpu_get_pc(space->cpu), dunhuang_input);
+	logerror("%s: warning, unknown input bits read, dunhuang_input = %02x\n", cpuexec_describe_context(space->machine), dunhuang_input);
 	return 0xff;
 }
 
@@ -417,8 +417,8 @@ static ADDRESS_MAP_START( dunhuang_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE( 0x001b, 0x001b ) AM_WRITE( dunhuang_block_dest_w )
 
-	AM_RANGE( 0x0081, 0x0081 ) AM_WRITE( ym2413_register_port_0_w	)
-	AM_RANGE( 0x0089, 0x0089 ) AM_WRITE( ym2413_data_port_0_w		)
+	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE( SOUND, "ym", ym2413_register_port_w	)
+	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE( SOUND, "ym", ym2413_data_port_w		)
 
 //  AM_RANGE( 0x0082, 0x0082 ) AM_WRITE( dunhuang_82_w )
 
@@ -431,9 +431,9 @@ static ADDRESS_MAP_START( dunhuang_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0086, 0x0086 ) AM_WRITE( dunhuang_rombank_w )
 	AM_RANGE( 0x0087, 0x0087 ) AM_WRITE( dunhuang_layers_w )
 
-	AM_RANGE( 0x0088, 0x0088 ) AM_READ( ay8910_read_port_0_r )
-	AM_RANGE( 0x0090, 0x0090 ) AM_WRITE( ay8910_write_port_0_w )
-	AM_RANGE( 0x0098, 0x0098 ) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE( 0x0088, 0x0088 ) AM_DEVREAD( SOUND, "ay8910", ay8910_r )
+	AM_RANGE( 0x0090, 0x0090 ) AM_DEVWRITE( SOUND, "ay8910", ay8910_data_w )
+	AM_RANGE( 0x0098, 0x0098 ) AM_DEVWRITE( SOUND, "ay8910", ay8910_address_w )
 ADDRESS_MAP_END
 
 
@@ -669,8 +669,8 @@ static const ay8910_interface dunhuang_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	//  A                   B
-	NULL,					dunhuang_dsw_r,	// R
-	dunhuang_input_w,		NULL			// W
+	DEVCB_NULL,							DEVCB_HANDLER(dunhuang_dsw_r),	// R
+	DEVCB_MEMORY_HANDLER("main", PROGRAM, dunhuang_input_w),	DEVCB_NULL						// W
 };
 
 static MACHINE_DRIVER_START( dunhuang )

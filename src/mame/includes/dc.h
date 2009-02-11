@@ -23,11 +23,11 @@ READ64_HANDLER( dc_modem_r );
 WRITE64_HANDLER( dc_modem_w );
 READ64_HANDLER( dc_rtc_r );
 WRITE64_HANDLER( dc_rtc_w );
-READ64_HANDLER( dc_aica_reg_r );
-WRITE64_HANDLER( dc_aica_reg_w );
+READ64_DEVICE_HANDLER( dc_aica_reg_r );
+WRITE64_DEVICE_HANDLER( dc_aica_reg_w );
 
-READ32_HANDLER( dc_arm_aica_r );
-WRITE32_HANDLER( dc_arm_aica_w );
+READ32_DEVICE_HANDLER( dc_arm_aica_r );
+WRITE32_DEVICE_HANDLER( dc_arm_aica_w );
 
 MACHINE_START( dc );
 MACHINE_RESET( dc );

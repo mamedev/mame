@@ -19,31 +19,6 @@
 
 static UINT32 *mosaicf2_videoram;
 
-static READ32_HANDLER( oki_32bit_r )
-{
-	return okim6295_status_0_r(space, 0);
-}
-
-static WRITE32_HANDLER( oki_32bit_w )
-{
-	okim6295_data_0_w(space, 0, data & 0xff);
-}
-
-static READ32_HANDLER( ym2151_status_32bit_r )
-{
-	return ym2151_status_port_0_r(space, 0);
-}
-
-static WRITE32_HANDLER( ym2151_data_32bit_w )
-{
-	ym2151_data_port_0_w(space, 0, data & 0xff);
-}
-
-static WRITE32_HANDLER( ym2151_register_32bit_w )
-{
-	ym2151_register_port_0_w(space,0,data & 0xff);
-}
-
 static READ32_HANDLER( eeprom_r )
 {
 	return eeprom_read_bit();
@@ -104,14 +79,14 @@ static READ32_HANDLER( f32_input_port_1_r )
 
 
 static ADDRESS_MAP_START( mosaicf2_io, ADDRESS_SPACE_IO, 32 )
-	AM_RANGE(0x4000, 0x4003) AM_READ(oki_32bit_r)
-	AM_RANGE(0x4810, 0x4813) AM_READ(ym2151_status_32bit_r)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x000000ff)
+	AM_RANGE(0x4810, 0x4813) AM_DEVREAD8(SOUND, "ym", ym2151_status_port_r, 0x000000ff)
 	AM_RANGE(0x5000, 0x5003) AM_READ_PORT("P1")
 	AM_RANGE(0x5200, 0x5203) AM_READ(f32_input_port_1_r)
 	AM_RANGE(0x5400, 0x5403) AM_READ(eeprom_r)
-	AM_RANGE(0x6000, 0x6003) AM_WRITE(oki_32bit_w)
-	AM_RANGE(0x6800, 0x6803) AM_WRITE(ym2151_data_32bit_w)
-	AM_RANGE(0x6810, 0x6813) AM_WRITE(ym2151_register_32bit_w)
+	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x000000ff)
+	AM_RANGE(0x6800, 0x6803) AM_DEVWRITE8(SOUND, "ym", ym2151_data_port_w, 0x000000ff)
+	AM_RANGE(0x6810, 0x6813) AM_DEVWRITE8(SOUND, "ym", ym2151_register_port_w, 0x000000ff)
 	AM_RANGE(0x7000, 0x7003) AM_WRITE(eeprom_clock_line_w)
 	AM_RANGE(0x7200, 0x7203) AM_WRITE(eeprom_cs_line_w)
 	AM_RANGE(0x7400, 0x7403) AM_WRITE(eeprom_bit_w)

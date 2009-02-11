@@ -183,7 +183,7 @@ static void vck_callback(const device_config *device)
 		UINT8 data = memory_region(device->machine, "adpcm")[sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		msm5205_data_w(0, (data >> (4 * (~sample_offset & 1))) & 0x0f);
+		msm5205_data_w(device, (data >> (4 * (~sample_offset & 1))) & 0x0f);
 		sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
@@ -193,19 +193,19 @@ static void vck_callback(const device_config *device)
 
 			/* if we hit 0xff, automatically turn off playback */
 			if (sample_count == 0xff)
-				msm5205_reset_w(0, 1);
+				msm5205_reset_w(device, 1);
 		}
 	}
 }
 
 
-static WRITE8_HANDLER( crgolfhi_sample_w )
+static WRITE8_DEVICE_HANDLER( crgolfhi_sample_w )
 {
 	switch (offset)
 	{
 		/* offset 0 holds the MSM5205 in reset */
 		case 0:
-			msm5205_reset_w(0, 1);
+			msm5205_reset_w(device, 1);
 			break;
 
 		/* offset 1 is the length/256 nibbles */
@@ -220,7 +220,7 @@ static WRITE8_HANDLER( crgolfhi_sample_w )
 
 		/* offset 3 turns on playback */
 		case 3:
-			msm5205_reset_w(0, 0);
+			msm5205_reset_w(device, 0);
 			break;
 	}
 }
@@ -258,8 +258,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(switch_input_r, switch_input_select_w)
 	AM_RANGE(0xe001, 0xe001) AM_READWRITE(analog_input_r, unknown_w)
@@ -581,7 +580,8 @@ ROM_END
 
 static DRIVER_INIT( crgolfhi )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
+	const device_config *msm = devtag_get_device(machine, SOUND, "msm");
+	memory_install_write8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 
 

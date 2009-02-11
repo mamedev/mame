@@ -119,20 +119,6 @@ static void xtheball_from_shiftreg(const address_space *space, UINT32 address, U
 
 /*************************************
  *
- *  Sound data access
- *
- *************************************/
-
-static WRITE16_HANDLER( dac_w )
-{
-	if (ACCESSING_BITS_8_15)
-		dac_data_w(0, data >> 8);
-}
-
-
-
-/*************************************
- *
  *  Output ports
  *
  *************************************/
@@ -249,7 +235,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x03040160, 0x0304016f) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x03040170, 0x0304017f) AM_READ_PORT("SERVICE1")
 	AM_RANGE(0x03040180, 0x0304018f) AM_READ(analogy_watchdog_r)
-	AM_RANGE(0x03060000, 0x0306000f) AM_WRITE(dac_w)
+	AM_RANGE(0x03060000, 0x0306000f) AM_DEVWRITE8(SOUND, "dac", dac_w, 0xff00)
 	AM_RANGE(0x04000000, 0x057fffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1", 0)

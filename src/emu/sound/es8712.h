@@ -5,21 +5,13 @@
 
 /* An interface for the ES8712 ADPCM chip */
 
-void es8712_play(int which);
-void es8712_set_bank_base(int which, int base);
-void es8712_set_frequency(int which, int frequency);
+void es8712_play(const device_config *device);
+void es8712_set_bank_base(const device_config *device, int base);
+void es8712_set_frequency(const device_config *device, int frequency);
 
-WRITE8_HANDLER( es8712_data_0_w );
-WRITE8_HANDLER( es8712_data_1_w );
-WRITE8_HANDLER( es8712_data_2_w );
-WRITE16_HANDLER( es8712_data_0_lsb_w );
-WRITE16_HANDLER( es8712_data_1_lsb_w );
-WRITE16_HANDLER( es8712_data_2_lsb_w );
-WRITE16_HANDLER( es8712_data_0_msb_w );
-WRITE16_HANDLER( es8712_data_1_msb_w );
-WRITE16_HANDLER( es8712_data_2_msb_w );
+WRITE8_DEVICE_HANDLER( es8712_w );
 
-SND_GET_INFO( es8712 );
-#define SOUND_ES8712 SND_GET_INFO_NAME( es8712 )
+DEVICE_GET_INFO( es8712 );
+#define SOUND_ES8712 DEVICE_GET_INFO_NAME( es8712 )
 
 #endif /* __ES8712_H__ */

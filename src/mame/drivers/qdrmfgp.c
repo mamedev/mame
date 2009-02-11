@@ -85,11 +85,12 @@ static WRITE16_HANDLER( gp_control_w )
 		int vol = generic_nvram16[0x10] & 0xff;
 		if (vol)
 		{
+			const device_config *k054539 = devtag_get_device(space->machine, SOUND, "konami");
 			int i;
 			double gain = vol / 90.0;
 
 			for (i=0; i<8; i++)
-				k054539_set_gain(0, i, gain);
+				k054539_set_gain(k054539, i, gain);
 		}
 	}
 }
@@ -114,11 +115,12 @@ static WRITE16_HANDLER( gp2_control_w )
 		int vol = generic_nvram16[0x8] & 0xff;
 		if (vol)
 		{
+			const device_config *k054539 = devtag_get_device(space->machine, SOUND, "konami");
 			int i;
 			double gain = vol / 90.0;
 
 			for (i=0; i<8; i++)
-				k054539_set_gain(0, i, gain);
+				k054539_set_gain(k054539, i, gain);
 		}
 	}
 }
@@ -189,20 +191,6 @@ static WRITE16_HANDLER( sndram_w )
 		if (offset >= 0x40000)
 			sndram[offset+0xc00000-0x900000] = data & 0xff;
 	}
-}
-
-static READ16_HANDLER( k054539_word_r )
-{
-	if (ACCESSING_BITS_0_7)
-		return k054539_0_r(space, offset);
-
-	return 0;
-}
-
-static WRITE16_HANDLER( k054539_word_w )
-{
-	if (ACCESSING_BITS_0_7)
-		k054539_0_w(space, offset, data);
 }
 
 /*************/
@@ -347,7 +335,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x320000, 0x32001f) AM_READ(K053252_word_r)		/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")			/* battery power & service sw */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")			/* inputport */
-	AM_RANGE(0x800000, 0x80045f) AM_READ(k054539_word_r)		/* sound regs */
+	AM_RANGE(0x800000, 0x80045f) AM_DEVREAD8(SOUND, "konami", k054539_r, 0x00ff)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_READ(K056832_ram_word_r)	/* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_READ(K056832_ram_word_r)	/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)				/* gfxrom through */
@@ -367,7 +355,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(SMH_NOP)			/* unknown */
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp_control_w)			/* control reg */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(SMH_NOP)			/* Watchdog */
-	AM_RANGE(0x800000, 0x80045f) AM_WRITE(k054539_word_w)		/* sound regs */
+	AM_RANGE(0x800000, 0x80045f) AM_DEVWRITE8(SOUND, "konami", k054539_w, 0x00ff)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_WRITE(K056832_ram_word_w)	/* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_WRITE(K056832_ram_word_w)	/* vram (mirror) */
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVWRITE(IDE_CONTROLLER, "ide", ide_std_w)			/* IDE control regs */
@@ -384,7 +372,7 @@ static ADDRESS_MAP_START( gp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x320000, 0x32001f) AM_READ(K053252_word_r)		/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")			/* battery power & service */
 	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")			/* inputport */
-	AM_RANGE(0x800000, 0x80045f) AM_READ(k054539_word_r)		/* sound regs */
+	AM_RANGE(0x800000, 0x80045f) AM_DEVREAD8(SOUND, "konami", k054539_r, 0x00ff)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_READ(gp2_vram_r)			/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_READ(gp2_vram_mirror_r)		/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)				/* gfxrom through */
@@ -404,7 +392,7 @@ static ADDRESS_MAP_START( gp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(SMH_NOP)			/* unknown */
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp2_control_w)		/* control reg */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(SMH_NOP)			/* Watchdog */
-	AM_RANGE(0x800000, 0x80045f) AM_WRITE(k054539_word_w)		/* sound regs */
+	AM_RANGE(0x800000, 0x80045f) AM_DEVWRITE8(SOUND, "konami", k054539_w, 0x00ff)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_WRITE(gp2_vram_w)			/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_WRITE(gp2_vram_mirror_w)	/* vram (mirror) */
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVWRITE(IDE_CONTROLLER, "ide", ide_std_w)			/* IDE control regs */
@@ -599,10 +587,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void sound_irq(running_machine *machine)
+static void sound_irq(const device_config *device)
 {
 	if (control & 0x0001)
-		cpu_set_input_line(machine->cpu[0], 1, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], 1, HOLD_LINE);
 }
 
 static const k054539_interface k054539_config =

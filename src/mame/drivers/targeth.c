@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")			/* Service & Guns Reload? */
 	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(SMH_NOP)					/* ??? Guns reload related? */
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)	/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)	/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)	/* OKI6295 status register */
 	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(targeth_coin_counter_w)	/* Coin counters */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM								/* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END

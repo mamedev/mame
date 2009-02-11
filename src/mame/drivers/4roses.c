@@ -346,10 +346,10 @@ static const ay8910_interface ay8910_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,				/* portA in  */
-	NULL,				/* portB in  */
-	NULL,				/* portA out */
-	NULL				/* portB out */
+	DEVCB_NULL,				/* portA in  */
+	DEVCB_NULL,				/* portB in  */
+	DEVCB_NULL,				/* portA out */
+	DEVCB_NULL				/* portB out */
 };
 
 

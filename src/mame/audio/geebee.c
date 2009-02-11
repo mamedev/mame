@@ -10,7 +10,6 @@
 #include <math.h>
 #include "driver.h"
 #include "streams.h"
-#include "sound/custom.h"
 #include "includes/warpwarp.h"
 
 static emu_timer *volume_timer = NULL;
@@ -112,7 +111,7 @@ static STREAM_UPDATE( geebee_sound_update )
     }
 }
 
-CUSTOM_START( geebee_sh_start )
+static DEVICE_START( geebee_sound )
 {
 	running_machine *machine = device->machine;
 	int i;
@@ -127,5 +126,19 @@ CUSTOM_START( geebee_sh_start )
 	vcount = 0;
 
 	volume_timer = timer_alloc(machine, volume_decay, NULL);
-    return auto_malloc(1);
 }
+
+DEVICE_GET_INFO( geebee_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(geebee_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Gee Bee Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+

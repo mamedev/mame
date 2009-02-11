@@ -32,15 +32,15 @@
 #ifndef __CDP1869_H__
 #define __CDP1869_H__
 
-void cdp1869_set_toneamp(int which, int value);
-void cdp1869_set_tonefreq(int which, int value);
-void cdp1869_set_toneoff(int which, int value);
-void cdp1869_set_tonediv(int which, int value);
-void cdp1869_set_wnamp(int which, int value);
-void cdp1869_set_wnfreq(int which, int value);
-void cdp1869_set_wnoff(int which, int value);
+void cdp1869_set_toneamp(const device_config *device, int value);
+void cdp1869_set_tonefreq(const device_config *device, int value);
+void cdp1869_set_toneoff(const device_config *device, int value);
+void cdp1869_set_tonediv(const device_config *device, int value);
+void cdp1869_set_wnamp(const device_config *device, int value);
+void cdp1869_set_wnfreq(const device_config *device, int value);
+void cdp1869_set_wnoff(const device_config *device, int value);
 
-SND_GET_INFO( cdp1869 );
-#define SOUND_CDP1869 SND_GET_INFO_NAME( cdp1869 )
+DEVICE_GET_INFO( cdp1869 );
+#define SOUND_CDP1869 DEVICE_GET_INFO_NAME( cdp1869 )
 
 #endif /* __CDP1869_H__ */

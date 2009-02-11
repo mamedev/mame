@@ -3,19 +3,11 @@
 #ifndef __BEEP_H__
 #define __BEEP_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void beep_set_state(const device_config *device, int on);
+void beep_set_frequency(const device_config *device, int frequency);
+void beep_set_volume(const device_config *device, int volume);
 
-void beep_set_state(int,int);
-void beep_set_frequency(int,int);
-void beep_set_volume(int,int);
-
-SND_GET_INFO( beep );
-#define SOUND_BEEP SND_GET_INFO_NAME( beep )
-
-#ifdef __cplusplus
-}
-#endif
+DEVICE_GET_INFO( beep );
+#define SOUND_BEEP DEVICE_GET_INFO_NAME( beep )
 
 #endif /* __BEEP_H__ */

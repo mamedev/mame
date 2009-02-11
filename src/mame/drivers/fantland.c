@@ -49,11 +49,13 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i86.h"
 #include "sound/2151intf.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 
 VIDEO_UPDATE( fantland );
+
+static const char *msm_name[4] = { "msm1", "msm2", "msm3", "msm4" };
 
 /***************************************************************************
 
@@ -280,9 +282,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantland_sound_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
-	AM_RANGE( 0x0100, 0x0100 ) AM_WRITE( ym2151_register_port_0_w )
-	AM_RANGE( 0x0101, 0x0101 ) AM_READWRITE( ym2151_status_port_0_r, ym2151_data_port_0_w )
-	AM_RANGE( 0x0180, 0x0180 ) AM_WRITE( dac_0_data_w )
+	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( SOUND, "ym", ym2151_r, ym2151_w )
+	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE( SOUND, "dac", dac_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( galaxygn_sound_iomap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
+	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( SOUND, "ym", ym2151_r, ym2151_w )
 ADDRESS_MAP_END
 
 
@@ -299,17 +305,17 @@ static struct
 
 }	borntofi_adpcm[4];
 
-static void borntofi_adpcm_start(int voice)
+static void borntofi_adpcm_start(const device_config *device, int voice)
 {
-	msm5205_reset_w(voice,0);
+	msm5205_reset_w(device,0);
 	borntofi_adpcm[voice].playing = 1;
 	borntofi_adpcm[voice].nibble  = 0;
 //  logerror("%s: adpcm start = %06x, stop = %06x\n", cpuexec_describe_context(device->machine), borntofi_adpcm[voice].addr[0], borntofi_adpcm[voice].addr[1]);
 }
 
-static void borntofi_adpcm_stop(int voice)
+static void borntofi_adpcm_stop(const device_config *device, int voice)
 {
-	msm5205_reset_w(voice,1);
+	msm5205_reset_w(device,1);
 	borntofi_adpcm[voice].playing = 0;
 }
 
@@ -323,8 +329,8 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 		// Play / Stop
 		switch(data)
 		{
-			case 0x00:		borntofi_adpcm_stop(voice);			break;
-			case 0x03:		borntofi_adpcm_start(voice);		break;
+			case 0x00:		borntofi_adpcm_stop(devtag_get_device(space->machine, SOUND, msm_name[voice]), voice);			break;
+			case 0x03:		borntofi_adpcm_start(devtag_get_device(space->machine, SOUND, msm_name[voice]), voice);		break;
 			default:		logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", cpu_get_pc(space->cpu), reg, data);
 		}
 	}
@@ -355,18 +361,18 @@ static void borntofi_adpcm_int(const device_config *device, int voice)
 
 	if (start >= len)
 	{
-		borntofi_adpcm_stop(voice);
+		borntofi_adpcm_stop(device, voice);
 		logerror("adpcm address out of range: %06x\n", start);
 		return;
 	}
 
 	if (start >= stop)
 	{
-		borntofi_adpcm_stop(voice);
+		borntofi_adpcm_stop(device, voice);
 	}
 	else
 	{
-        msm5205_data_w( voice, rom[start/2] >> ((start & 1) * 4) );
+        msm5205_data_w( device, rom[start/2] >> ((start & 1) * 4) );
 		borntofi_adpcm[voice].nibble++;
 	}
 }
@@ -393,8 +399,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wheelrun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE( ym3526_status_port_0_r, ym3526_control_port_0_w )
-	AM_RANGE(0xa001, 0xa001) AM_WRITE( ym3526_write_port_0_w )
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym3526_r, ym3526_w )
 
 	AM_RANGE(0xb000, 0xb000) AM_WRITE( SMH_NOP )	// on a car crash / hit
 	AM_RANGE(0xc000, 0xc000) AM_WRITE( SMH_NOP )	// ""
@@ -857,9 +862,9 @@ static MACHINE_DRIVER_START( fantland )
 MACHINE_DRIVER_END
 
 
-static void galaxygn_sound_irq(running_machine *machine, int line)
+static void galaxygn_sound_irq(const device_config *device, int line)
 {
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	cpu_set_input_line_and_vector(device->machine->cpu[1], 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
 static const ym2151_interface galaxygn_ym2151_interface =
@@ -875,7 +880,7 @@ static MACHINE_DRIVER_START( galaxygn )
 
 	MDRV_CPU_ADD("audio", I8088, 8000000)        // ?
 	MDRV_CPU_PROGRAM_MAP(fantland_sound_map, 0)
-	MDRV_CPU_IO_MAP(fantland_sound_iomap, 0)
+	MDRV_CPU_IO_MAP(galaxygn_sound_iomap, 0)
 	// IRQ by YM2151, NMI when soundlatch is written
 
 	MDRV_MACHINE_RESET(fantland)
@@ -932,7 +937,7 @@ static MACHINE_RESET( borntofi )
 	MACHINE_RESET_CALL(fantland);
 
 	for (voice = 0; voice < 4; voice++)
-		borntofi_adpcm_stop(voice);
+		borntofi_adpcm_stop(devtag_get_device(machine, SOUND, msm_name[voice]), voice);
 }
 
 static MACHINE_DRIVER_START( borntofi )
@@ -970,9 +975,9 @@ MACHINE_DRIVER_END
 
 
 
-static void wheelrun_ym3526_irqhandler(running_machine *machine, int state)
+static void wheelrun_ym3526_irqhandler(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_IRQ0, state);
 }
 
 static const ym3526_interface wheelrun_ym3526_interface =

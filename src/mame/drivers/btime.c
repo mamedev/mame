@@ -111,13 +111,13 @@ static WRITE8_HANDLER( audio_nmi_enable_w )
 	}
 }
 
-static WRITE8_HANDLER( ay_audio_nmi_enable_w )
+static WRITE8_DEVICE_HANDLER( ay_audio_nmi_enable_w )
 {
 	/* port A bit 0, when 1, inhibits the NMI */
 	if (audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
 	{
 		audio_nmi_enabled = ~data & 1;
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -423,10 +423,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_BASE(&audio_rambase)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x7fff) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x9fff) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
 	AM_RANGE(0xa000, 0xbfff) AM_READ(audio_command_r)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(audio_nmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
@@ -434,10 +434,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( disco_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
+	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
+	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(soundlatch_r, SMH_NOP) /* ack ? */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1240,7 +1240,7 @@ static const ay8910_interface ay1_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL, NULL, ay_audio_nmi_enable_w, NULL
+	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(ay_audio_nmi_enable_w), DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( btime )

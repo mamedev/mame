@@ -137,14 +137,14 @@ static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
-static WRITE8_HANDLER( fuuki16_oki_banking_w )
+static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )
 {
 	/*
         data & 0x06 is always equals to data & 0x60
         data & 0x10 is always set
     */
 
-	okim6295_set_bank_base(0, ((data & 6) >> 1) * 0x40000);
+	okim6295_set_bank_base(device, ((data & 6) >> 1) * 0x40000);
 }
 
 static ADDRESS_MAP_START( fuuki16_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -163,14 +163,12 @@ static ADDRESS_MAP_START( fuuki16_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w 	)	// ROM Bank
 	AM_RANGE(0x11, 0x11) AM_READWRITE(soundlatch_r, SMH_NOP	)	// From Main CPU / ? To Main CPU ?
-	AM_RANGE(0x20, 0x20) AM_WRITE(fuuki16_oki_banking_w		)	// Oki Banking
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE(SOUND, "oki", fuuki16_oki_banking_w		)	// Oki Banking
 	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP					)	// ? In the NMI routine
-	AM_RANGE(0x40, 0x40) AM_WRITE(ym2203_control_port_0_w	)	// YM2203
-	AM_RANGE(0x41, 0x41) AM_WRITE(ym2203_write_port_0_w		)
-	AM_RANGE(0x50, 0x50) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)	// YM3812
-	AM_RANGE(0x51, 0x51) AM_WRITE(ym3812_write_port_0_w		)
-	AM_RANGE(0x60, 0x60) AM_READ(okim6295_status_0_r		)	// M6295
-	AM_RANGE(0x61, 0x61) AM_WRITE(okim6295_data_0_w			)	// M6295
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ym1", ym2203_w	)
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE(SOUND, "ym2", ym3812_r, ym3812_w		)
+	AM_RANGE(0x60, 0x60) AM_DEVREAD(SOUND, "oki", okim6295_r)	// M6295
+	AM_RANGE(0x61, 0x61) AM_DEVWRITE(SOUND, "oki", okim6295_w)	// M6295
 ADDRESS_MAP_END
 
 
@@ -407,9 +405,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void soundirq(running_machine *machine, int state)
+static void soundirq(const device_config *device, int state)
 {
-	cpu_set_input_line(machine->cpu[1], 0, state);
+	cpu_set_input_line(device->machine->cpu[1], 0, state);
 }
 
 static const ym3812_interface fuuki16_ym3812_intf =

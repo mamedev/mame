@@ -319,11 +319,11 @@ READ16_HANDLER( hdsnddsp_get_bio )
  *
  *************************************/
 
-WRITE16_HANDLER( hdsnddsp_dac_w )
+WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w )
 {
 	/* DAC L */
 	if (!dacmute)
-		dac_signed_data_16_w(offset, data ^ 0x8000);
+		dac_signed_data_16_w(device, data ^ 0x8000);
 }
 
 

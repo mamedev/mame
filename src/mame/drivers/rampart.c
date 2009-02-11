@@ -72,45 +72,6 @@ static MACHINE_RESET( rampart )
 
 /*************************************
  *
- *  MSM5295 I/O
- *
- *************************************/
-
-static READ16_HANDLER( adpcm_r )
-{
-	return (okim6295_status_0_r(space, offset) << 8) | 0x00ff;
-}
-
-
-static WRITE16_HANDLER( adpcm_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6295_data_0_w(space, offset, (data >> 8) & 0xff);
-}
-
-
-
-/*************************************
- *
- *  YM2413 I/O
- *
- *************************************/
-
-static WRITE16_HANDLER( ym2413_w )
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		if (offset & 1)
-			ym2413_data_port_0_w(space, 0, (data >> 8) & 0xff);
-		else
-			ym2413_register_port_0_w(space, 0, (data >> 8) & 0xff);
-	}
-}
-
-
-
-/*************************************
- *
  *  Latch write
  *
  *************************************/
@@ -147,10 +108,10 @@ static WRITE16_HANDLER( latch_w )
 	{
 		atarigen_set_oki6295_vol(space->machine, (data & 0x0020) ? 100 : 0);
 		if (!(data & 0x0010))
-			sndti_reset(SOUND_OKIM6295, 0);
+			devtag_reset(space->machine, SOUND, "oki");
 		atarigen_set_ym2413_vol(space->machine, ((data >> 1) & 7) * 100 / 7);
 		if (!(data & 0x0001))
-			sndti_reset(SOUND_YM2413, 0);
+			devtag_reset(space->machine, SOUND, "ym");
 	}
 }
 
@@ -174,8 +135,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x3e0800, 0x3e3f3f) AM_MIRROR(0x010000) AM_RAM
 	AM_RANGE(0x3e3f40, 0x3e3f7f) AM_MIRROR(0x010000) AM_RAM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
 	AM_RANGE(0x3e3f80, 0x3effff) AM_MIRROR(0x010000) AM_RAM
-	AM_RANGE(0x460000, 0x460001) AM_MIRROR(0x019ffe) AM_READWRITE(adpcm_r, adpcm_w)
-	AM_RANGE(0x480000, 0x480003) AM_MIRROR(0x019ffc) AM_WRITE(ym2413_w)
+	AM_RANGE(0x460000, 0x460001) AM_MIRROR(0x019ffe) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0xff00)
+	AM_RANGE(0x480000, 0x480003) AM_MIRROR(0x019ffc) AM_DEVWRITE8(SOUND, "ym", ym2413_w, 0xff00)
 	AM_RANGE(0x500000, 0x500fff) AM_MIRROR(0x019000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0x5a6000, 0x5a6001) AM_MIRROR(0x019ffe) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x640000, 0x640001) AM_MIRROR(0x019ffe) AM_WRITE(latch_w)

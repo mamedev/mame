@@ -180,13 +180,13 @@ static WRITE8_HANDLER( sound2_bank_w )
 }
 
 
-static WRITE8_HANDLER( msm5205_w )
+static WRITE8_DEVICE_HANDLER( msm5205_w )
 {
-	msm5205_reset_w(offset,(data>>7)&1);
+	msm5205_reset_w(device,(data>>7)&1);
 	/* ?? bit 6?? */
-	msm5205_data_w(offset,data);
-	msm5205_vclk_w(offset,1);
-	msm5205_vclk_w(offset,0);
+	msm5205_data_w(device,data);
+	msm5205_vclk_w(device,1);
+	msm5205_vclk_w(device,0);
 }
 
 
@@ -254,14 +254,13 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREAD(SOUND, "ym", ym2151_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
 ADDRESS_MAP_END
 
 
@@ -278,7 +277,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(msm5205_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "msm1", msm5205_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE(SOUND, "msm2", msm5205_w)
 	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound2_bank_w)
 ADDRESS_MAP_END
@@ -793,9 +793,9 @@ GFXDECODE_END
 
 
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

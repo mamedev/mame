@@ -22,8 +22,8 @@ static attotime time_released;
 static UINT8 prev = 0;
 static UINT8 mask = 0;
 
-static WRITE8_HANDLER(videopin_out1_w);
-static WRITE8_HANDLER(videopin_out2_w);
+static WRITE8_DEVICE_HANDLER(videopin_out1_w);
+static WRITE8_DEVICE_HANDLER(videopin_out2_w);
 
 
 static void update_plunger(running_machine *machine)
@@ -66,14 +66,14 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static MACHINE_RESET( videopin )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *discrete = devtag_get_device(machine, SOUND, "discrete");
 
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, interrupt_callback);
 
 	/* both output latches are cleared on reset */
 
-	videopin_out1_w(space, 0, 0);
-	videopin_out2_w(space, 0, 0);
+	videopin_out1_w(discrete, 0, 0);
+	videopin_out2_w(discrete, 0, 0);
 }
 
 
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( videopin_led_w )
 }
 
 
-static WRITE8_HANDLER( videopin_out1_w )
+static WRITE8_DEVICE_HANDLER( videopin_out1_w )
 {
 	/* D0 => OCTAVE0  */
 	/* D1 => OCTACE1  */
@@ -152,16 +152,16 @@ static WRITE8_HANDLER( videopin_out1_w )
 	mask = ~data & 0x10;
 
 	if (mask)
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 
 	coin_lockout_global_w(~data & 0x08);
 
 	/* Convert octave data to divide value and write to sound */
-	discrete_sound_w(space, VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
+	discrete_sound_w(device, VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
 }
 
 
-static WRITE8_HANDLER( videopin_out2_w )
+static WRITE8_DEVICE_HANDLER( videopin_out2_w )
 {
 	/* D0 => VOL0      */
 	/* D1 => VOL1      */
@@ -174,17 +174,17 @@ static WRITE8_HANDLER( videopin_out2_w )
 
 	coin_counter_w(0, data & 0x10);
 
-	discrete_sound_w(space, VIDEOPIN_BELL_EN, data & 0x40);	// Bell
-	discrete_sound_w(space, VIDEOPIN_BONG_EN, data & 0x20);	// Bong
-	discrete_sound_w(space, VIDEOPIN_ATTRACT_EN, data & 0x80);	// Attract
-	discrete_sound_w(space, VIDEOPIN_VOL_DATA, data & 0x07);		// Vol0,1,2
+	discrete_sound_w(device, VIDEOPIN_BELL_EN, data & 0x40);	// Bell
+	discrete_sound_w(device, VIDEOPIN_BONG_EN, data & 0x20);	// Bong
+	discrete_sound_w(device, VIDEOPIN_ATTRACT_EN, data & 0x80);	// Attract
+	discrete_sound_w(device, VIDEOPIN_VOL_DATA, data & 0x07);		// Vol0,1,2
 }
 
 
-static WRITE8_HANDLER( videopin_note_dvsr_w )
+static WRITE8_DEVICE_HANDLER( videopin_note_dvsr_w )
 {
 	/* note data */
-	discrete_sound_w(space, VIDEOPIN_NOTE_DATA, ~data &0xff);
+	discrete_sound_w(device, VIDEOPIN_NOTE_DATA, ~data &0xff);
 }
 
 
@@ -197,12 +197,12 @@ static WRITE8_HANDLER( videopin_note_dvsr_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(videopin_video_ram_w) AM_BASE(&videopin_video_ram)
-	AM_RANGE(0x0800, 0x0800) AM_READWRITE(videopin_misc_r, videopin_note_dvsr_w)
+	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r) AM_DEVWRITE(SOUND, "discrete", videopin_note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0804, 0x0804) AM_WRITE(videopin_ball_w)
-	AM_RANGE(0x0805, 0x0805) AM_WRITE(videopin_out1_w)
-	AM_RANGE(0x0806, 0x0806) AM_WRITE(videopin_out2_w)
+	AM_RANGE(0x0805, 0x0805) AM_DEVWRITE(SOUND, "discrete", videopin_out1_w)
+	AM_RANGE(0x0806, 0x0806) AM_DEVWRITE(SOUND, "discrete", videopin_out2_w)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW")
 	AM_RANGE(0x2000, 0x3fff) AM_ROM

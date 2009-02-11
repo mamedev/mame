@@ -327,7 +327,7 @@ static WRITE8_HANDLER( cus115_w )
 		case 1:
 		case 2:
 		case 3:
-			namco_63701x_write((offset & 0x1e00) >> 9,data);
+			namco_63701x_w(devtag_get_device(space->machine, SOUND, "namco2"), (offset & 0x1e00) >> 9,data);
 			break;
 
 		case 4:
@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w) AM_BASE(&rthunder_videoram1)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w) AM_BASE(&rthunder_videoram2)
 
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(namcos1_cus30_r,namcos1_cus30_w) AM_BASE(&namco_wavedata) /* PSG device, shared RAM */
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE(SOUND, "namco", namcos1_cus30_r,namcos1_cus30_w) AM_BASE(&namco_wavedata) /* PSG device, shared RAM */
 
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w)
 
@@ -412,11 +412,9 @@ CPU2_MEMORY( wndrmomo, 0x2000, 0x4000, 0x6000, UNUSED, UNUSED, 0xc000, 0xc800 )
 static ADDRESS_MAP_START( NAME##_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )					\
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_internal_registers_r,hd63701_internal_registers_w)	\
 	AM_RANGE(0x0080, 0x00ff) AM_RAM														\
-	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(namcos1_cus30_r,namcos1_cus30_w) /* PSG device, shared RAM */	\
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE(SOUND, "namco", namcos1_cus30_r,namcos1_cus30_w) /* PSG device, shared RAM */	\
 	AM_RANGE(0x1400, 0x1fff) AM_RAM														\
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_READ(ym2151_status_port_0_r)			\
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x00) AM_WRITE(ym2151_register_port_0_w)		\
-	AM_RANGE(ADDR_INPUT+0x01, ADDR_INPUT+0x01) AM_WRITE(ym2151_data_port_0_w)			\
+	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)	\
 	AM_RANGE(ADDR_INPUT+0x20, ADDR_INPUT+0x20) AM_READ_PORT("IN0")						\
 	AM_RANGE(ADDR_INPUT+0x21, ADDR_INPUT+0x21) AM_READ_PORT("IN1")						\
 	AM_RANGE(ADDR_INPUT+0x30, ADDR_INPUT+0x30) AM_READ(dsw0_r)							\

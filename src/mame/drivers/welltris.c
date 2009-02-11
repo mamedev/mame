@@ -397,10 +397,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(welltris_sh_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(ym2610_status_port_0_a_r,ym2610_control_port_0_a_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0x0a, 0x0a) AM_READWRITE(ym2610_status_port_0_b_r,ym2610_control_port_0_b_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(SOUND, "ym", ym2610_r, ym2610_w)
 	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_r)
 	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
 ADDRESS_MAP_END
@@ -689,9 +686,9 @@ GFXDECODE_END
 
 
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

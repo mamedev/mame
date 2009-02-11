@@ -65,16 +65,16 @@ static void appoooh_adpcm_int(const device_config *device)
 		{
             UINT8 *RAM = memory_region(device->machine, "adpcm");
             appoooh_adpcm_data = RAM[appoooh_adpcm_address++];
-			msm5205_data_w(0, appoooh_adpcm_data >> 4);
+			msm5205_data_w(device, appoooh_adpcm_data >> 4);
 			if(appoooh_adpcm_data == 0x70)
 			{
                 appoooh_adpcm_address = 0xffffffff;
-				msm5205_reset_w(0,1);
+				msm5205_reset_w(device,1);
 			}
 		}
         else
         {
-			msm5205_data_w(0,appoooh_adpcm_data & 0x0f );
+			msm5205_data_w(device,appoooh_adpcm_data & 0x0f );
 			appoooh_adpcm_data = -1;
 		}
 	}
@@ -82,8 +82,9 @@ static void appoooh_adpcm_int(const device_config *device)
 /* adpcm address write */
 static WRITE8_HANDLER( appoooh_adpcm_w )
 {
+	const device_config *adpcm = devtag_get_device(space->machine, SOUND, "msm");
     appoooh_adpcm_address = data << 8;
-	msm5205_reset_w(0,0);
+	msm5205_reset_w(adpcm,0);
 	appoooh_adpcm_data = 0xffffffff;
 }
 
@@ -107,9 +108,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(sn76496_0_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(sn76496_1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sn76496_2_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE(SOUND, "sn1", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE(SOUND, "sn2", sn76496_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "sn3", sn76496_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(appoooh_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("BUTTON3") AM_WRITE(appoooh_out_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(appoooh_scroll_w) /* unknown */

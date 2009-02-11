@@ -78,36 +78,12 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( YM3812_w )
-{
-	switch (offset) {
-	case 0:
-		ym3812_control_port_0_w(space,0,data);
-		break;
-	case 1:
-		ym3812_write_port_0_w(space,0,data);
-		break;
-	}
-}
-
-static WRITE8_HANDLER( YM2203_w )
-{
-	switch (offset) {
-	case 0:
-		ym2203_control_port_0_w(space,0,data);
-		break;
-	case 1:
-		ym2203_write_port_0_w(space,0,data);
-		break;
-	}
-}
-
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_WRITE(YM2203_w)
-	AM_RANGE(0x1000, 0x1001) AM_WRITE(YM3812_w)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym2", ym3812_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -231,9 +207,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate);
+	cpu_set_input_line(device->machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =

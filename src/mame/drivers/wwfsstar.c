@@ -189,9 +189,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(ym2151_status_port_0_r,ym2151_data_port_0_w)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -420,9 +419,9 @@ GFXDECODE_END
  Straight from Ddragon 3
 *******************************************************************************/
 
-static void wwfsstar_ymirq_handler(running_machine *machine, int irq)
+static void wwfsstar_ymirq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(device->machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

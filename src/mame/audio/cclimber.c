@@ -27,6 +27,7 @@ static void cclimber_play_sample(running_machine *machine, int start,int freq,in
 	int len;
 	int romlen = memory_region_length(machine, "samples");
 	const UINT8 *rom = memory_region(machine, "samples");
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 
 
 	if (!rom) return;
@@ -46,13 +47,13 @@ static void cclimber_play_sample(running_machine *machine, int start,int freq,in
 		len++;
 	}
 
-	sample_start_raw(0,samplebuf,2 * len,freq,0);
+	sample_start_raw(samples,0,samplebuf,2 * len,freq,0);
 }
 
 
 static int sample_num,sample_freq,sample_volume;
 
-static WRITE8_HANDLER( cclimber_sample_select_w )
+static WRITE8_DEVICE_HANDLER( cclimber_sample_select_w )
 {
 	sample_num = data;
 }
@@ -81,10 +82,10 @@ const ay8910_interface cclimber_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	cclimber_sample_select_w,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(cclimber_sample_select_w),
+	DEVCB_NULL
 };
 
 const samples_interface cclimber_samples_interface =

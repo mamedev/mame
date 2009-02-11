@@ -10,7 +10,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "sound/custom.h"
 #include "sound/tms36xx.h"
 #include "phoenix.h"
 
@@ -476,14 +475,14 @@ DISCRETE_SOUND_START(phoenix)
 	DISCRETE_OUTPUT(NODE_90, 1)
 DISCRETE_SOUND_END
 
-WRITE8_HANDLER( phoenix_sound_control_a_w )
+WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w )
 {
-	discrete_sound_w(space, PHOENIX_EFFECT_2_DATA, data & 0x0f);
-	discrete_sound_w(space, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
+	discrete_sound_w(device, PHOENIX_EFFECT_2_DATA, data & 0x0f);
+	discrete_sound_w(device, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
 #if 0
 	/* future handling of noise sounds */
-	discrete_sound_w(PHOENIX_EFFECT_3_EN  , data & 0x40);
-	discrete_sound_w(PHOENIX_EFFECT_4_EN  , data & 0x80);
+	discrete_sound_w(device, PHOENIX_EFFECT_3_EN  , data & 0x40);
+	discrete_sound_w(device, PHOENIX_EFFECT_4_EN  , data & 0x80);
 #endif
 	stream_update(channel);
 	sound_latch_a = data;
@@ -509,17 +508,17 @@ SOUND_START( phoenix)
 
 }
 
-WRITE8_HANDLER( phoenix_sound_control_b_w )
+WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w )
 {
-	discrete_sound_w(space, PHOENIX_EFFECT_1_DATA, data & 0x0f);
-	discrete_sound_w(space, PHOENIX_EFFECT_1_FILT, data & 0x20);
-	discrete_sound_w(space, PHOENIX_EFFECT_1_FREQ, data & 0x10);
+	discrete_sound_w(device, PHOENIX_EFFECT_1_DATA, data & 0x0f);
+	discrete_sound_w(device, PHOENIX_EFFECT_1_FILT, data & 0x20);
+	discrete_sound_w(device, PHOENIX_EFFECT_1_FREQ, data & 0x10);
 
 	/* update the tune that the MM6221AA is playing */
-	mm6221aa_tune_w(0, data >> 6);
+	mm6221aa_tune_w(devtag_get_device(device->machine, SOUND, "tms"), data >> 6);
 }
 
-CUSTOM_START( phoenix_sh_start )
+static DEVICE_START( phoenix_sound )
 {
 	running_machine *machine = device->machine;
 	int i, j;
@@ -545,7 +544,17 @@ CUSTOM_START( phoenix_sh_start )
 	channel = stream_create(device, 0, 1, machine->sample_rate, 0, phoenix_sound_update);
 
 	state_save_register_global_pointer(machine, poly18, (1ul << (18-5)) );
+}
 
-	/* a dummy token */
-	return auto_malloc(1);
+DEVICE_GET_INFO( phoenix_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(phoenix_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Phoenix Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }

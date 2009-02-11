@@ -72,9 +72,9 @@ static READ8_HANDLER( amspdwy_wheel_1_r )
     return amspdwy_wheel_r(space->machine, 0);
 }
 
-static READ8_HANDLER( amspdwy_sound_r )
+static READ8_DEVICE_HANDLER( amspdwy_sound_r )
 {
-	return (ym2151_status_port_0_r(space,0) & ~ 0x30) | input_port_read(space->machine, "IN0");
+	return (ym2151_status_port_r(device,0) & ~ 0x30) | input_port_read(device->machine, "IN0");
 }
 
 static WRITE8_HANDLER( amspdwy_sound_w )
@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)							// Player 1
 	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)							// Player 2
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP										// ? Exiting IRQ
-	AM_RANGE(0xb400, 0xb400) AM_READWRITE(amspdwy_sound_r, amspdwy_sound_w)		// YM2151 status, To Sound CPU
+	AM_RANGE(0xb400, 0xb400) AM_DEVREAD(SOUND, "ym", amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)		// YM2151 status, To Sound CPU
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)// Sprites
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM												// Work RAM
 ADDRESS_MAP_END
@@ -125,8 +125,7 @@ static ADDRESS_MAP_START( amspdwy_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 //  AM_RANGE(0x8000, 0x8000) AM_WRITENOP                            // ? Written with 0 at the start
 	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_r)					// From Main CPU
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2151_register_port_0_w)		// YM2151
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2151_data_port_0_w)			//
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)			//
 	AM_RANGE(0xc000, 0xdfff) AM_RAM									// Work RAM
 	AM_RANGE(0xffff, 0xffff) AM_READNOP								// ??? IY = FFFF at the start ?
 ADDRESS_MAP_END
@@ -249,9 +248,9 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface amspdwy_ym2151_interface =

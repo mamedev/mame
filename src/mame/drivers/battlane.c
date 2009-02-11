@@ -11,7 +11,7 @@
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 
 extern UINT8 *battlane_spriteram;
 extern UINT8 *battlane_tileram;
@@ -97,8 +97,7 @@ static ADDRESS_MAP_START( battlane_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c01, 0x1c01) AM_READ_PORT("P2") AM_WRITE(battlane_scrollx_w)
 	AM_RANGE(0x1c02, 0x1c02) AM_READ_PORT("DSW1") AM_WRITE(battlane_scrolly_w)
 	AM_RANGE(0x1c03, 0x1c03) AM_READ_PORT("DSW2") AM_WRITE(battlane_cpu_command_w)
-	AM_RANGE(0x1c04, 0x1c04) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0x1c05, 0x1c05) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x1c04, 0x1c05) AM_DEVREADWRITE(SOUND, "ym", ym3526_r, ym3526_w)
 	AM_RANGE(0x1e00, 0x1e3f) AM_WRITE(battlane_palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(battlane_bitmap_w) AM_SHARE(4)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -241,9 +240,9 @@ static GFXDECODE_START( battlane )
 GFXDECODE_END
 
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3526_interface ym3526_config =

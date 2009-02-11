@@ -15,7 +15,6 @@
 #include "streams.h"
 #include "vbiparse.h"
 #include "config.h"
-#include "sound/custom.h"
 
 
 
@@ -105,7 +104,7 @@ struct _ldcore_data
 	UINT32				audiobufout;			/* output index */
 	UINT32				audiocursamples;		/* current samples this track */
 	UINT32				audiomaxsamples;		/* maximum samples per track */
-	int					audiocustom;			/* custom sound index */
+	const device_config *audiocustom;			/* custom sound device */
 
 	/* metadata */
 	vbi_metadata		metadata[2];			/* metadata parsed from the stream, for each field */
@@ -145,7 +144,7 @@ struct _sound_token
 static TIMER_CALLBACK( perform_player_update );
 static void read_track_data(laserdisc_state *ld);
 static void process_track_data(const device_config *device);
-static CUSTOM_START( custom_start );
+static DEVICE_START( laserdisc_sound );
 static STREAM_UPDATE( custom_stream_callback );
 static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void configuration_save(running_machine *machine, int config_type, xml_data_node *parentnode);
@@ -165,11 +164,6 @@ static const ldplayer_interface *const player_interfaces[] =
 //  &ldp1450_interface,
 //  &vp932_interface,
 	&vp931_interface
-};
-
-const custom_sound_interface laserdisc_custom_interface =
-{
-	custom_start
 };
 
 
@@ -198,11 +192,12 @@ INLINE laserdisc_state *get_safe_token(const device_config *device)
     current time
 -------------------------------------------------*/
 
-INLINE void update_audio(ldcore_data *ldcore)
+INLINE void update_audio(laserdisc_state *ld)
 {
-	if (ldcore->audiocustom != -1)
+	ldcore_data *ldcore = ld->core;
+	if (ldcore->audiocustom != NULL)
 	{
-		sound_token *token = custom_get_token(ldcore->audiocustom);
+		sound_token *token = ldcore->audiocustom->token;
 		stream_update(token->stream);
 	}
 }
@@ -338,7 +333,7 @@ static TIMER_CALLBACK( perform_player_update )
 		add_and_clamp_track(ldcore, (*ldcore->intf.update)(ld, &ldcore->metadata[ldcore->fieldnum], ldcore->fieldnum, curtime));
 
 	/* flush any audio before we read more */
-	update_audio(ldcore);
+	update_audio(ld);
 
 	/* start reading the track data for the next round */
 	ldcore->fieldnum ^= 1;
@@ -530,7 +525,7 @@ laserdisc_state *ldcore_get_safe_token(const device_config *device)
 
 void ldcore_set_audio_squelch(laserdisc_state *ld, UINT8 squelchleft, UINT8 squelchright)
 {
-	update_audio(ld->core);
+	update_audio(ld);
 	ld->core->audiosquelch = (squelchleft ? 1 : 0) | (squelchright ? 2 : 0);
 }
 
@@ -939,16 +934,37 @@ static void process_track_data(const device_config *device)
 
 
 /*-------------------------------------------------
-    custom_start - custom audio start
+    laserdisc_sound_start - custom audio start
     for laserdiscs
 -------------------------------------------------*/
 
-static CUSTOM_START( custom_start )
+static DEVICE_START( laserdisc_sound )
 {
-	sound_token *token = auto_malloc(sizeof(*token));
+	sound_token *token = device->token;
 	token->stream = stream_create(device, 0, 2, 48000, token, custom_stream_callback);
 	token->ld = NULL;
-	return token;
+}
+
+
+/*-------------------------------------------------
+    laserdisc_sound_get_info - information
+    callback for laserdisc audio
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( laserdisc_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sound_token);				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(laserdisc_sound);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Laserdisc Analog");			break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }
 
 
@@ -1412,19 +1428,9 @@ static void init_audio(const device_config *device)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
-	int sndnum;
 
 	/* find the custom audio */
-	ldcore->audiocustom = 0;
-	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-	{
-		if (device->machine->config->sound[sndnum].tag != NULL && strcmp(device->machine->config->sound[sndnum].tag, ldcore->config.sound) == 0)
-			break;
-		if (device->machine->config->sound[sndnum].type == SOUND_CUSTOM)
-			ldcore->audiocustom++;
-	}
-	if (sndnum == MAX_SOUND)
-		ldcore->audiocustom = -1;
+	ldcore->audiocustom = devtag_get_device(device->machine, SOUND, ldcore->config.sound);
 
 	/* allocate audio buffers */
 	ldcore->audiomaxsamples = ((UINT64)ldcore->samplerate * 1000000 + ldcore->fps_times_1million - 1) / ldcore->fps_times_1million;
@@ -1541,9 +1547,9 @@ static DEVICE_RESET( laserdisc )
 	ldcore->intf = *player_interfaces[pltype];
 
 	/* attempt to wire up the audio */
-	if (ldcore->audiocustom != -1)
+	if (ldcore->audiocustom != NULL)
 	{
-		sound_token *token = custom_get_token(ldcore->audiocustom);
+		sound_token *token = ldcore->audiocustom->token;
 		token->ld = ld;
 		stream_set_sample_rate(token->stream, ldcore->samplerate);
 	}

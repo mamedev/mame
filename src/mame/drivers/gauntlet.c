@@ -231,7 +231,7 @@ static READ8_HANDLER( switch_6502_r )
 
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x80;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x40;
-	if (tms5220_ready_r()) temp ^= 0x20;
+	if (tms5220_ready_r(devtag_get_device(space->machine, SOUND, "tms"))) temp ^= 0x20;
 	if (!(input_port_read(space->machine, "803008") & 0x0008)) temp ^= 0x10;
 
 	return temp;
@@ -260,6 +260,7 @@ static WRITE8_HANDLER( tms5220_w )
 
 static WRITE8_HANDLER( sound_ctl_w )
 {
+	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */
@@ -267,18 +268,18 @@ static WRITE8_HANDLER( sound_ctl_w )
 
 		case 1:	/* speech write, bit D7, active low */
 			if (((data ^ last_speech_write) & 0x80) && (data & 0x80))
-				tms5220_data_w(space, 0, speech_val);
+				tms5220_data_w(tms, 0, speech_val);
 			last_speech_write = data;
 			break;
 
 		case 2:	/* speech reset, bit D7, active low */
 			if (((data ^ last_speech_write) & 0x80) && (data & 0x80))
-				sndti_reset(SOUND_TMS5220, 0);
+				device_reset(tms);
 			break;
 
 		case 3:	/* speech squeak, bit D7 */
 			data = 5 | ((data >> 6) & 2);
-			tms5220_set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
+			tms5220_set_frequency(tms, ATARI_CLOCK_14MHz/2 / (16 - data));
 			break;
 	}
 }
@@ -355,9 +356,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_READ(atarigen_6502_sound_r)
 	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE(mixer_w)
 	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE(switch_6502_r, sound_ctl_w)
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_READWRITE(pokey1_r, pokey1_w)
-	AM_RANGE(0x1810, 0x1810) AM_MIRROR(0x27ce) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x1811, 0x1811) AM_MIRROR(0x27ce) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_WRITE(tms5220_w)
 	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x27c0) AM_READWRITE(atarigen_6502_irq_ack_r, atarigen_6502_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM

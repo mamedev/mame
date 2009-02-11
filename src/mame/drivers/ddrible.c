@@ -91,40 +91,36 @@ static WRITE8_HANDLER( ddrible_coin_counter_w )
 	coin_counter_w(1,(data >> 1) & 0x01);
 }
 
-static READ8_HANDLER( ddrible_vlm5030_busy_r )
+static READ8_DEVICE_HANDLER( ddrible_vlm5030_busy_r )
 {
-	return mame_rand(space->machine); /* patch */
+	return mame_rand(device->machine); /* patch */
 	/* FIXME: remove ? */
 #if 0
-	if (vlm5030_bsy()) return 1;
+	if (vlm5030_bsy(device)) return 1;
 	else return 0;
 #endif
 }
 
-static WRITE8_HANDLER( ddrible_vlm5030_ctrl_w )
+static WRITE8_DEVICE_HANDLER( ddrible_vlm5030_ctrl_w )
 {
-	UINT8 *SPEECH_ROM = memory_region(space->machine, "vlm");
+	UINT8 *SPEECH_ROM = memory_region(device->machine, "vlm");
+	
 	/* b7 : vlm data bus OE   */
 	/* b6 : VLM5030-RST       */
 	/* b5 : VLM5030-ST        */
 	/* b4 : VLM5300-VCU       */
 	/* b3 : ROM bank select   */
-	if (sndti_exists(SOUND_VLM5030, 0))
-	{
-		vlm5030_rst( data & 0x40 ? 1 : 0 );
-		vlm5030_st(  data & 0x20 ? 1 : 0 );
-		vlm5030_vcu( data & 0x10 ? 1 : 0 );
-		vlm5030_set_rom(&SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
-	}
+	vlm5030_rst( device, data & 0x40 ? 1 : 0 );
+	vlm5030_st(  device, data & 0x20 ? 1 : 0 );
+	vlm5030_vcu( device, data & 0x10 ? 1 : 0 );
+	vlm5030_set_rom(device, &SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
+
 	/* b2 : SSG-C rc filter enable */
 	/* b1 : SSG-B rc filter enable */
 	/* b0 : SSG-A rc filter enable */
-	if (sndti_exists(SOUND_FILTER_RC, 2))
-	{
-		filter_rc_set_RC(2,FLT_RC_LOWPASS, 1000,2200,1000,data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
-		filter_rc_set_RC(1,FLT_RC_LOWPASS, 1000,2200,1000,data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
-		filter_rc_set_RC(0,FLT_RC_LOWPASS, 1000,2200,1000,data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
-	}
+	filter_rc_set_RC(devtag_get_device(device->machine, SOUND, "filter3"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	filter_rc_set_RC(devtag_get_device(device->machine, SOUND, "filter2"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	filter_rc_set_RC(devtag_get_device(device->machine, SOUND, "filter1"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 
@@ -173,16 +169,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)					/* shared RAM with CPU #1 */
-	AM_RANGE(0x1000, 0x1000) AM_READ(ym2203_status_port_0_r)		/* YM2203 */
-	AM_RANGE(0x1001, 0x1001) AM_READ(ym2203_read_port_0_r)		/* YM2203 */
+	AM_RANGE(0x1000, 0x1001) AM_DEVREAD(SOUND, "ym", ym2203_r)		/* YM2203 */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&ddrible_snd_sharedram)	/* shared RAM with CPU #1 */
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym2203_control_port_0_w)			/* YM2203 */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym2203_write_port_0_w)				/* YM2203 */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(vlm5030_data_w)						/* Speech data */
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym", ym2203_w)				/* YM2203 */
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w)						/* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)							/* ROM */
 ADDRESS_MAP_END
 
@@ -323,10 +317,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		ddrible_vlm5030_busy_r,
-		ddrible_vlm5030_ctrl_w,
-		NULL
+		DEVCB_NULL,
+		DEVCB_DEVICE_HANDLER(SOUND, "vlm", ddrible_vlm5030_busy_r),
+		DEVCB_DEVICE_HANDLER(SOUND, "vlm", ddrible_vlm5030_ctrl_w),
+		DEVCB_NULL
 	},
 	NULL
 };

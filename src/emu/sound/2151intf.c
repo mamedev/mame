@@ -13,43 +13,55 @@
 #include "ym2151.h"
 
 
-struct ym2151_info
+typedef struct _ym2151_state ym2151_state;
+struct _ym2151_state
 {
-	sound_stream *	stream;
-	emu_timer *	timer[2];
-	void *			chip;
+	sound_stream *			stream;
+	emu_timer *				timer[2];
+	void *					chip;
+	UINT8					lastreg;
 	const ym2151_interface *intf;
 };
 
 
+INLINE ym2151_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_YM2151);
+	return (ym2151_state *)device->token;
+}
+
+
 static STREAM_UPDATE( ym2151_update )
 {
-	struct ym2151_info *info = param;
+	ym2151_state *info = param;
 	ym2151_update_one(info->chip, outputs, samples);
 }
 
 
 static STATE_POSTLOAD( ym2151intf_postload )
 {
-	struct ym2151_info *info = param;
+	ym2151_state *info = param;
 	ym2151_postload(machine, info->chip);
 }
 
 
-static SND_START( ym2151 )
+static DEVICE_START( ym2151 )
 {
 	static const ym2151_interface dummy = { 0 };
-	struct ym2151_info *info = device->token;
+	ym2151_state *info = device->token;
 	int rate;
 
 	info->intf = device->static_config ? device->static_config : &dummy;
 
-	rate = clock/64;
+	rate = device->clock/64;
 
 	/* stream setup */
 	info->stream = stream_create(device,0,2,rate,info,ym2151_update);
 
-	info->chip = ym2151_init(device,clock,rate);
+	info->chip = ym2151_init(device,device->clock,rate);
 	assert_always(info->chip != NULL, "Error creating YM2151 chip");
 
 	state_save_register_postload(device->machine, ym2151intf_postload, info);
@@ -59,175 +71,66 @@ static SND_START( ym2151 )
 }
 
 
-static SND_STOP( ym2151 )
+static DEVICE_STOP( ym2151 )
 {
-	struct ym2151_info *info = device->token;
+	ym2151_state *info = device->token;
 	ym2151_shutdown(info->chip);
 }
 
-static SND_RESET( ym2151 )
+static DEVICE_RESET( ym2151 )
 {
-	struct ym2151_info *info = device->token;
+	ym2151_state *info = device->token;
 	ym2151_reset_chip(info->chip);
 }
 
-static int lastreg0,lastreg1,lastreg2;
 
-READ8_HANDLER( ym2151_status_port_0_r )
+READ8_DEVICE_HANDLER( ym2151_r )
 {
-	struct ym2151_info *token = sndti_token(SOUND_YM2151, 0);
-	stream_update(token->stream);
-	return ym2151_read_status(token->chip);
-}
-
-READ8_HANDLER( ym2151_status_port_1_r )
-{
-	struct ym2151_info *token = sndti_token(SOUND_YM2151, 1);
-	stream_update(token->stream);
-	return ym2151_read_status(token->chip);
-}
-
-READ8_HANDLER( ym2151_status_port_2_r )
-{
-	struct ym2151_info *token = sndti_token(SOUND_YM2151, 2);
-	stream_update(token->stream);
-	return ym2151_read_status(token->chip);
-}
-
-WRITE8_HANDLER( ym2151_register_port_0_w )
-{
-	lastreg0 = data;
-}
-WRITE8_HANDLER( ym2151_register_port_1_w )
-{
-	lastreg1 = data;
-}
-WRITE8_HANDLER( ym2151_register_port_2_w )
-{
-	lastreg2 = data;
-}
-
-WRITE8_HANDLER( ym2151_data_port_0_w )
-{
-	struct ym2151_info *token = sndti_token(SOUND_YM2151, 0);
-	stream_update(token->stream);
-	ym2151_write_reg(token->chip,lastreg0,data);
-}
-
-WRITE8_HANDLER( ym2151_data_port_1_w )
-{
-	struct ym2151_info *token = sndti_token(SOUND_YM2151, 1);
-	stream_update(token->stream);
-	ym2151_write_reg(token->chip,lastreg1,data);
-}
-
-WRITE8_HANDLER( ym2151_data_port_2_w )
-{
-	struct ym2151_info *token = sndti_token(SOUND_YM2151, 2);
-	stream_update(token->stream);
-	ym2151_write_reg(token->chip,lastreg2,data);
-}
-
-WRITE8_HANDLER( ym2151_word_0_w )
-{
-	if (offset)
-		ym2151_data_port_0_w(space,0,data);
+	ym2151_state *token = get_safe_token(device);
+	if (offset & 1)
+		return ym2151_read_status(token->chip);
 	else
-		ym2151_register_port_0_w(space,0,data);
+		return 0xff;	/* confirmed on a real YM2151 */
 }
 
-WRITE8_HANDLER( ym2151_word_1_w )
+WRITE8_DEVICE_HANDLER( ym2151_w )
 {
-	if (offset)
-		ym2151_data_port_1_w(space,0,data);
+	ym2151_state *token = get_safe_token(device);
+	if (offset & 1)
+		ym2151_write_reg(token->chip, token->lastreg, data);
 	else
-		ym2151_register_port_1_w(space,0,data);
-}
-
-READ16_HANDLER( ym2151_status_port_0_lsb_r )
-{
-	return ym2151_status_port_0_r(space,0);
-}
-
-READ16_HANDLER( ym2151_status_port_1_lsb_r )
-{
-	return ym2151_status_port_1_r(space,0);
-}
-
-READ16_HANDLER( ym2151_status_port_2_lsb_r )
-{
-	return ym2151_status_port_2_r(space,0);
+		token->lastreg = data;
 }
 
 
-WRITE16_HANDLER( ym2151_register_port_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		ym2151_register_port_0_w(space, 0, data & 0xff);
-}
+READ8_DEVICE_HANDLER( ym2151_status_port_r ) { return ym2151_r(device, 1); }
 
-WRITE16_HANDLER( ym2151_register_port_1_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		ym2151_register_port_1_w(space, 0, data & 0xff);
-}
+WRITE8_DEVICE_HANDLER( ym2151_register_port_w ) { ym2151_w(device, 0, data); }
+WRITE8_DEVICE_HANDLER( ym2151_data_port_w ) { ym2151_w(device, 1, data); }
 
-WRITE16_HANDLER( ym2151_register_port_2_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		ym2151_register_port_2_w(space, 0, data & 0xff);
-}
-
-WRITE16_HANDLER( ym2151_data_port_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		ym2151_data_port_0_w(space, 0, data & 0xff);
-}
-
-WRITE16_HANDLER( ym2151_data_port_1_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		ym2151_data_port_1_w(space, 0, data & 0xff);
-}
-
-WRITE16_HANDLER( ym2151_data_port_2_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		ym2151_data_port_2_w(space, 0, data & 0xff);
-}
 
 
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( ym2151 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( ym2151 )
+DEVICE_GET_INFO( ym2151 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ym2151_info);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ym2151_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2151 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2151 );				break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym2151 );				break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2151 );				break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ym2151 );		break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( ym2151 );		break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( ym2151 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "YM2151");							break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "YM2151");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha FM");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

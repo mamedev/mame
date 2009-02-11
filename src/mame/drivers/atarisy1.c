@@ -404,35 +404,34 @@ static READ8_DEVICE_HANDLER( via_pa_r )
 
 static WRITE8_DEVICE_HANDLER( via_pb_w )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 old = tms5220_ctl;
 	tms5220_ctl = data;
 
 	/* write strobe */
 	if (!(old & 1) && (tms5220_ctl & 1))
-		tms5220_data_w(space, 0, tms5220_out_data);
+		tms5220_data_w(device, 0, tms5220_out_data);
 
 	/* read strobe */
 	if (!(old & 2) && (tms5220_ctl & 2))
-		tms5220_in_data = tms5220_status_r(space, 0);
+		tms5220_in_data = tms5220_status_r(device, 0);
 
 	/* bit 4 is connected to an up-counter, clocked by SYCLKB */
 	data = 5 | ((data >> 3) & 2);
-	tms5220_set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
+	tms5220_set_frequency(device, ATARI_CLOCK_14MHz/2 / (16 - data));
 }
 
 
 static READ8_DEVICE_HANDLER( via_pb_r )
 {
-	return (!tms5220_ready_r() << 2) | (!tms5220_int_r() << 3);
+	return (!tms5220_ready_r(device) << 2) | (!tms5220_int_r(device) << 3);
 }
 
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ DEVCB_HANDLER(via_pa_r), DEVCB_HANDLER(via_pb_r),
+	/*inputs : A/B         */ DEVCB_HANDLER(via_pa_r), DEVCB_DEVICE_HANDLER(SOUND, "tms", via_pb_r),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_HANDLER(via_pa_w), DEVCB_HANDLER(via_pb_w),
+	/*outputs: A/B         */ DEVCB_HANDLER(via_pa_w), DEVCB_DEVICE_HANDLER(SOUND, "tms", via_pb_w),
     /*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irq                  */ DEVCB_NULL
 };
@@ -495,12 +494,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x1800, 0x1801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x1810, 0x1810) AM_READWRITE(atarigen_6502_sound_r, atarigen_6502_sound_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ(switch_6502_r)
 	AM_RANGE(0x1824, 0x1825) AM_WRITE(led_w)
-	AM_RANGE(0x1870, 0x187f) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

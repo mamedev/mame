@@ -44,9 +44,9 @@ static const int scramble_timer[10] =
 	0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
 };
 
-READ8_HANDLER( scramble_portB_r )
+READ8_DEVICE_HANDLER( scramble_portB_r )
 {
-	return scramble_timer[(cpu_get_total_cycles(space->cpu)/512) % 10];
+	return scramble_timer[(cputag_get_total_cycles(device->machine, "audio")/512) % 10];
 }
 
 
@@ -73,9 +73,9 @@ static const int frogger_timer[10] =
 	0x00, 0x10, 0x08, 0x18, 0x40, 0x90, 0x88, 0x98, 0x88, 0xd0
 };
 
-READ8_HANDLER( frogger_portB_r )
+READ8_DEVICE_HANDLER( frogger_portB_r )
 {
-	return frogger_timer[(cpu_get_total_cycles(space->cpu)/512) % 10];
+	return frogger_timer[(cputag_get_total_cycles(device->machine, "audio")/512) % 10];
 }
 
 
@@ -159,13 +159,13 @@ WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
 }
 
-READ8_HANDLER( hotshock_soundlatch_r )
+READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
-	return soundlatch_r(space,0);
+	cpu_set_input_line(device->machine->cpu[1], 0, CLEAR_LINE);
+	return soundlatch_r(cpu_get_address_space(device->machine->cpu[1], ADDRESS_SPACE_PROGRAM),0);
 }
 
-static void filter_w(int chip, int channel, int data)
+static void filter_w(const device_config *device, int data)
 {
 	int C;
 
@@ -175,25 +175,25 @@ static void filter_w(int chip, int channel, int data)
 		C += 220000;	/* 220000pF = 0.220uF */
 	if (data & 2)
 		C +=  47000;	/*  47000pF = 0.047uF */
-	if (sndti_exists(SOUND_FILTER_RC, 3*chip + channel))
-		filter_rc_set_RC(3*chip + channel,FLT_RC_LOWPASS,1000,5100,0,CAP_P(C));
+	if (device != NULL)
+		filter_rc_set_RC(device,FLT_RC_LOWPASS,1000,5100,0,CAP_P(C));
 }
 
 WRITE8_HANDLER( scramble_filter_w )
 {
-	filter_w(1, 0, (offset >>  0) & 3);
-	filter_w(1, 1, (offset >>  2) & 3);
-	filter_w(1, 2, (offset >>  4) & 3);
-	filter_w(0, 0, (offset >>  6) & 3);
-	filter_w(0, 1, (offset >>  8) & 3);
-	filter_w(0, 2, (offset >> 10) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.1.0"), (offset >>  0) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.1.1"), (offset >>  2) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.1.2"), (offset >>  4) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.0"), (offset >>  6) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.1"), (offset >>  8) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.2"), (offset >> 10) & 3);
 }
 
 WRITE8_HANDLER( frogger_filter_w )
 {
-	filter_w(0, 0, (offset >>  6) & 3);
-	filter_w(0, 1, (offset >>  8) & 3);
-	filter_w(0, 2, (offset >> 10) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.0"), (offset >>  6) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.1"), (offset >>  8) & 3);
+	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.2"), (offset >> 10) & 3);
 }
 
 
@@ -300,7 +300,7 @@ static UINT8 speech_cnt;
 
 static TIMER_CALLBACK( ad2083_step )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *tms = devtag_get_device(machine, SOUND, "tms");
 
 	/* only 16 bytes needed ... The original dump is bad. This
      * is what is needed to get speech to work. The prom data has
@@ -328,8 +328,8 @@ static TIMER_CALLBACK( ad2083_step )
 	if (ctrl & 0x40)
 		speech_rom_address = 0;
 
-	tms5110_ctl_w(space, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
-	tms5110_pdc_w(space, 0, ctrl & 0x02 ? 0 : 1);
+	tms5110_ctl_w(tms, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
+	tms5110_pdc_w(tms, 0, ctrl & 0x02 ? 0 : 1);
 
 	if (!(ctrl & 0x80))
 		timer_set(machine, ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);
@@ -383,20 +383,20 @@ static const ay8910_interface ad2083_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	scramble_portB_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_HANDLER(scramble_portB_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const ay8910_interface ad2083_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	hotshock_soundlatch_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_HANDLER(hotshock_soundlatch_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static ADDRESS_MAP_START( ad2083_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -407,10 +407,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ad2083_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ad2083_tms5110_ctrl_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
 ADDRESS_MAP_END
 
 static SOUND_START( ad2083 )

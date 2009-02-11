@@ -47,7 +47,8 @@
 
 #define STEP 0x10000
 
-struct SN76496
+typedef struct _sn76496_state sn76496_state;
+struct _sn76496_state
 {
 	sound_stream * Channel;
 	int SampleRate;
@@ -66,10 +67,24 @@ struct SN76496
 };
 
 
-
-static void SN76496Write(int chip,int data)
+INLINE sn76496_state *get_safe_token(const device_config *device)
 {
-	struct SN76496 *R = sndti_token(SOUND_SN76496, chip);
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_SN76496 ||
+		   sound_get_type(device) == SOUND_SN76489 ||
+		   sound_get_type(device) == SOUND_SN76489A ||
+		   sound_get_type(device) == SOUND_SN76494 ||
+		   sound_get_type(device) == SOUND_GAMEGEAR ||
+		   sound_get_type(device) == SOUND_SMSIII);
+	return (sn76496_state *)device->token;
+}
+
+
+WRITE8_DEVICE_HANDLER( sn76496_w )
+{
+	sn76496_state *R = get_safe_token(device);
 	int n, r, c;
 
 
@@ -127,17 +142,10 @@ static void SN76496Write(int chip,int data)
 
 
 
-WRITE8_HANDLER( sn76496_0_w ) {	SN76496Write(0,data); }
-WRITE8_HANDLER( sn76496_1_w ) {	SN76496Write(1,data); }
-WRITE8_HANDLER( sn76496_2_w ) {	SN76496Write(2,data); }
-WRITE8_HANDLER( sn76496_3_w ) {	SN76496Write(3,data); }
-WRITE8_HANDLER( sn76496_4_w ) {	SN76496Write(4,data); }
-
-
 static STREAM_UPDATE( SN76496Update )
 {
 	int i;
-	struct SN76496 *R = param;
+	sn76496_state *R = param;
 	stream_sample_t *buffer = outputs[0];
 
 
@@ -251,7 +259,7 @@ static STREAM_UPDATE( SN76496Update )
 
 
 
-static void SN76496_set_gain(struct SN76496 *R,int gain)
+static void SN76496_set_gain(sn76496_state *R,int gain)
 {
 	int i;
 	double out;
@@ -278,9 +286,9 @@ static void SN76496_set_gain(struct SN76496 *R,int gain)
 
 
 
-static int SN76496_init(const device_config *device, int clock, struct SN76496 *R)
+static int SN76496_init(const device_config *device, sn76496_state *R)
 {
-	int sample_rate = clock/16;
+	int sample_rate = device->clock/16;
 	int i;
 
 	R->Channel = stream_create(device,0,1,sample_rate,R,SN76496Update);
@@ -314,11 +322,11 @@ static int SN76496_init(const device_config *device, int clock, struct SN76496 *
 }
 
 
-static void generic_start(const device_config *device, int clock, int feedbackmask, int noisetaps, int noiseinvert)
+static void generic_start(const device_config *device, int feedbackmask, int noisetaps, int noiseinvert)
 {
-	struct SN76496 *chip = device->token;
+	sn76496_state *chip = get_safe_token(device);
 
-	if (SN76496_init(device,clock,chip) != 0)
+	if (SN76496_init(device,chip) != 0)
 		fatalerror("Error creating SN76496 chip");
 	SN76496_set_gain(chip, 0);
 
@@ -337,34 +345,34 @@ static void generic_start(const device_config *device, int clock, int feedbackma
 }
 
 
-static SND_START( sn76489 )
+static DEVICE_START( sn76489 )
 {
-	generic_start(device, clock, 0x4000, 0x03, TRUE);
+	generic_start(device, 0x4000, 0x03, TRUE);
 }
 
-static SND_START( sn76489a )
+static DEVICE_START( sn76489a )
 {
-	generic_start(device, clock, 0x8000, 0x06, FALSE);
+	generic_start(device, 0x8000, 0x06, FALSE);
 }
 
-static SND_START( sn76494 )
+static DEVICE_START( sn76494 )
 {
-	generic_start(device, clock, 0x8000, 0x06, FALSE);
+	generic_start(device, 0x8000, 0x06, FALSE);
 }
 
-static SND_START( sn76496 )
+static DEVICE_START( sn76496 )
 {
-	generic_start(device, clock, 0x8000, 0x06, FALSE);
+	generic_start(device, 0x8000, 0x06, FALSE);
 }
 
-static SND_START( gamegear )
+static DEVICE_START( gamegear )
 {
-	generic_start(device, clock, 0x8000, 0x09, FALSE);
+	generic_start(device, 0x8000, 0x09, FALSE);
 }
 
-static SND_START( smsiii )
+static DEVICE_START( smsiii )
 {
-	generic_start(device, clock, 0x8000, 0x09, FALSE);
+	generic_start(device, 0x8000, 0x09, FALSE);
 }
 
 
@@ -372,84 +380,73 @@ static SND_START( smsiii )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( sn76496 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( sn76496 )
+DEVICE_GET_INFO( sn76496 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct SN76496); 				break;
-		case SNDINFO_FCT_ALIAS:							info->type = SOUND_SN76496;						break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sn76496_state); 				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sn76496 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76496 );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76496 );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SN76496");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "TI PSG");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SN76496");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "TI PSG");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.1");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
-SND_GET_INFO( sn76489 )
+DEVICE_GET_INFO( sn76489 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76489 );		break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SN76489");						break;
-		default: 										SND_GET_INFO_CALL(sn76496);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76489 );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SN76489");						break;
+		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
-SND_GET_INFO( sn76489a )
+DEVICE_GET_INFO( sn76489a )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76489a );		break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SN76489A");					break;
-		default: 										SND_GET_INFO_CALL(sn76496);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76489a );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SN76489A");					break;
+		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
-SND_GET_INFO( sn76494 )
+DEVICE_GET_INFO( sn76494 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76494 );		break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SN76494");						break;
-		default: 										SND_GET_INFO_CALL(sn76496);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sn76494 );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SN76494");						break;
+		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
-SND_GET_INFO( gamegear )
+DEVICE_GET_INFO( gamegear )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gamegear );		break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Game Gear PSG");				break;
-		default: 										SND_GET_INFO_CALL(sn76496);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( gamegear );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Game Gear PSG");				break;
+		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
 
-SND_GET_INFO( smsiii )
+DEVICE_GET_INFO( smsiii )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( smsiii );			break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SMSIII PSG");					break;
-		default: 										SND_GET_INFO_CALL(sn76496);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( smsiii );			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SMSIII PSG");					break;
+		default: 										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }

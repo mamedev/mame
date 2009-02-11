@@ -97,8 +97,8 @@ MACHINE_RESET( mw8080bw );
 
 /*----------- defined in audio/mw8080bw.c -----------*/
 
-WRITE8_HANDLER( midway_tone_generator_lo_w );
-WRITE8_HANDLER( midway_tone_generator_hi_w );
+WRITE8_DEVICE_HANDLER( midway_tone_generator_lo_w );
+WRITE8_DEVICE_HANDLER( midway_tone_generator_hi_w );
 
 MACHINE_DRIVER_EXTERN( seawolf_audio );
 WRITE8_HANDLER( seawolf_audio_w );
@@ -107,27 +107,27 @@ MACHINE_DRIVER_EXTERN( gunfight_audio );
 WRITE8_HANDLER( gunfight_audio_w );
 
 MACHINE_DRIVER_EXTERN( tornbase_audio );
-WRITE8_HANDLER( tornbase_audio_w );
+WRITE8_DEVICE_HANDLER( tornbase_audio_w );
 
 MACHINE_DRIVER_EXTERN( zzzap_audio );
 WRITE8_HANDLER( zzzap_audio_1_w );
 WRITE8_HANDLER( zzzap_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( maze_audio );
-void maze_write_discrete(running_machine *machine, UINT8 maze_tone_timing_state);
+void maze_write_discrete(const device_config *device, UINT8 maze_tone_timing_state);
 
 MACHINE_DRIVER_EXTERN( boothill_audio );
-WRITE8_HANDLER( boothill_audio_w );
+WRITE8_DEVICE_HANDLER( boothill_audio_w );
 
 MACHINE_DRIVER_EXTERN( checkmat_audio );
-WRITE8_HANDLER( checkmat_audio_w );
+WRITE8_DEVICE_HANDLER( checkmat_audio_w );
 
 MACHINE_DRIVER_EXTERN( desertgu_audio );
-WRITE8_HANDLER( desertgu_audio_1_w );
-WRITE8_HANDLER( desertgu_audio_2_w );
+WRITE8_DEVICE_HANDLER( desertgu_audio_1_w );
+WRITE8_DEVICE_HANDLER( desertgu_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( dplay_audio );
-WRITE8_HANDLER( dplay_audio_w );
+WRITE8_DEVICE_HANDLER( dplay_audio_w );
 
 MACHINE_DRIVER_EXTERN( gmissile_audio );
 WRITE8_HANDLER( gmissile_audio_1_w );
@@ -140,7 +140,7 @@ WRITE8_HANDLER( m4_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( clowns_audio );
 WRITE8_HANDLER( clowns_audio_1_w );
-WRITE8_HANDLER( clowns_audio_2_w );
+WRITE8_DEVICE_HANDLER( clowns_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( shuffle_audio );
 WRITE8_HANDLER( shuffle_audio_1_w );
@@ -150,16 +150,16 @@ MACHINE_DRIVER_EXTERN( dogpatch_audio );
 WRITE8_HANDLER( dogpatch_audio_w );
 
 MACHINE_DRIVER_EXTERN( spcenctr_audio );
-WRITE8_HANDLER( spcenctr_audio_1_w );
-WRITE8_HANDLER( spcenctr_audio_2_w );
-WRITE8_HANDLER( spcenctr_audio_3_w );
+WRITE8_DEVICE_HANDLER( spcenctr_audio_1_w );
+WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w );
+WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w );
 
 MACHINE_DRIVER_EXTERN( phantom2_audio );
 WRITE8_HANDLER( phantom2_audio_1_w );
 WRITE8_HANDLER( phantom2_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( bowler_audio );
-WRITE8_HANDLER( bowler_audio_1_w );
+WRITE8_DEVICE_HANDLER( bowler_audio_1_w );
 WRITE8_HANDLER( bowler_audio_2_w );
 WRITE8_HANDLER( bowler_audio_3_w );
 WRITE8_HANDLER( bowler_audio_4_w );
@@ -168,17 +168,17 @@ WRITE8_HANDLER( bowler_audio_6_w );
 
 MACHINE_DRIVER_EXTERN( invaders_samples_audio );
 MACHINE_DRIVER_EXTERN( invaders_audio );
-WRITE8_HANDLER( invaders_audio_1_w );
-WRITE8_HANDLER( invaders_audio_2_w );
+WRITE8_DEVICE_HANDLER( invaders_audio_1_w );
+WRITE8_DEVICE_HANDLER( invaders_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( blueshrk_audio );
-WRITE8_HANDLER( blueshrk_audio_w );
+WRITE8_DEVICE_HANDLER( blueshrk_audio_w );
 
 MACHINE_DRIVER_EXTERN( invad2ct_audio );
-WRITE8_HANDLER( invad2ct_audio_1_w );
-WRITE8_HANDLER( invad2ct_audio_2_w );
-WRITE8_HANDLER( invad2ct_audio_3_w );
-WRITE8_HANDLER( invad2ct_audio_4_w );
+WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w );
+WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w );
+WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w );
+WRITE8_DEVICE_HANDLER( invad2ct_audio_4_w );
 
 
 

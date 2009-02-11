@@ -281,8 +281,8 @@ GFXDECODE_END
 
 static const pokey_interface pokey_config =
 {
-	{ 0 },
-	input_port_4_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW2")
 };
 
 

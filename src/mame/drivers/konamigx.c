@@ -1200,9 +1200,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_1_r(space, offset);
+		ret |= k054539_r(devtag_get_device(space->machine, SOUND, "konami2"), offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_0_r(space, offset)<<8;
+		ret |= k054539_r(devtag_get_device(space->machine, SOUND, "konami1"), offset)<<8;
 
 	return ret;
 }
@@ -1210,9 +1210,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_1_w(space, offset, data);
+		k054539_w(devtag_get_device(space->machine, SOUND, "konami2"), offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_0_w(space, offset, data>>8);
+		k054539_w(devtag_get_device(space->machine, SOUND, "konami1"), offset, data>>8);
 }
 
 static READ16_HANDLER( sndcomm68k_r )
@@ -3312,6 +3312,7 @@ static MACHINE_START( konamigx )
 
 static MACHINE_RESET(konamigx)
 {
+	const device_config *k054539_2 = devtag_get_device(machine, SOUND, "konami2");
 	int i;
 
 	konamigx_wrport1_0 = konamigx_wrport1_1 = 0;
@@ -3336,15 +3337,15 @@ static MACHINE_RESET(konamigx)
 	if (!strcmp(machine->gamedrv->name, "tkmmpzdm"))
 	{
 		// boost voice(chip 1 channel 3-7)
-		for (i=3; i<=7; i++) k054539_set_gain(1, i, 2.0);
+		for (i=3; i<=7; i++) k054539_set_gain(k054539_2, i, 2.0);
 	}
 	else if ((!strcmp(machine->gamedrv->name, "dragoonj")) || (!strcmp(machine->gamedrv->name, "dragoona")))
 	{
 		// soften percussions(chip 1 channel 0-3), boost voice(chip 1 channel 4-7)
 		for (i=0; i<=3; i++)
 		{
-			k054539_set_gain(1, i, 0.8);
-			k054539_set_gain(1, i+4, 2.0);
+			k054539_set_gain(k054539_2, i, 0.8);
+			k054539_set_gain(k054539_2, i+4, 2.0);
 		}
 	}
 }

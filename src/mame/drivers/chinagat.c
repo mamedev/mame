@@ -248,17 +248,17 @@ static WRITE8_HANDLER( saiyugb1_adpcm_rom_addr_w )
 	saiyugb1_i8748_P1 = data;
 }
 
-static WRITE8_HANDLER( saiyugb1_adpcm_control_w )
+static WRITE8_DEVICE_HANDLER( saiyugb1_adpcm_control_w )
 {
 	/* i8748 Port 2 write */
 
-	UINT8 *saiyugb1_adpcm_rom = memory_region(space->machine, "adpcm");
+	UINT8 *saiyugb1_adpcm_rom = memory_region(device->machine, "adpcm");
 
 	if (data & 0x80)	/* Reset m5205 and disable ADPCM ROM outputs */
 	{
 		logerror("ADPCM output disabled\n");
 		saiyugb1_pcm_nibble = 0x0f;
-		msm5205_reset_w(0,1);
+		msm5205_reset_w(device,1);
 	}
 	else
 	{
@@ -287,7 +287,7 @@ static WRITE8_HANDLER( saiyugb1_adpcm_control_w )
 
 		if ( ((saiyugb1_i8748_P2 & 0xc) >= 8) && ((data & 0xc) == 4) )
 		{
-			msm5205_data_w (0, saiyugb1_pcm_nibble);
+			msm5205_data_w (device, saiyugb1_pcm_nibble);
 			logerror("Writing %02x to m5205\n",saiyugb1_pcm_nibble);
 		}
 		logerror("$ROM=%08x  P1=%02x  P2=%02x  Prev_P2=%02x  Nibble=%1x  PCM_data=%02x\n",saiyugb1_adpcm_addr,saiyugb1_i8748_P1,data,saiyugb1_i8748_P2,saiyugb1_pcm_shift,saiyugb1_pcm_nibble);
@@ -295,7 +295,7 @@ static WRITE8_HANDLER( saiyugb1_adpcm_control_w )
 	saiyugb1_i8748_P2 = data;
 }
 
-static WRITE8_HANDLER( saiyugb1_m5205_clk_w )
+static WRITE8_DEVICE_HANDLER( saiyugb1_m5205_clk_w )
 {
 	/* i8748 T0 output clk mode */
 	/* This signal goes through a divide by 8 counter */
@@ -307,12 +307,12 @@ static WRITE8_HANDLER( saiyugb1_m5205_clk_w )
 	saiyugb1_m5205_clk++;
 	if (saiyugb1_m5205_clk == 8)
 	}
-		msm5205_vclk_w (0, 1);		/* ??? */
+		msm5205_vclk_w (device, 1);		/* ??? */
 		saiyugb1_m5205_clk = 0;
 	}
 	else
 	}
-		msm5205_vclk_w (0, 0);		/* ??? */
+		msm5205_vclk_w (device, 0);		/* ??? */
 	}
 #endif
 }
@@ -365,9 +365,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -377,26 +376,22 @@ static ADDRESS_MAP_START( ym2203c_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 // 8804 and/or 8805 make a gong sound when the coin goes in
 // but only on the title screen....
 
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(ym2203_write_port_0_w)
-//  AM_RANGE(0x8802, 0x8802) AM_READWRITE(okim6295_data_0_w, okim6295_status_0_r)
-//  AM_RANGE(0x8803, 0x8803) AM_WRITE(okim6295_data_0_w)
-	AM_RANGE(0x8804, 0x8804) AM_READWRITE(ym2203_status_port_1_r,  ym2203_control_port_1_w)
-	AM_RANGE(0x8805, 0x8805) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
+//  AM_RANGE(0x8802, 0x8802) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+//  AM_RANGE(0x8803, 0x8803) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
 //  AM_RANGE(0x8804, 0x8804) AM_WRITE(SMH_RAM)
 //  AM_RANGE(0x8805, 0x8805) AM_WRITE(SMH_RAM)
 
-//  AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
-//  AM_RANGE(0x8801, 0x8801) AM_WRITE(ym2151_data_port_0_w)
-//  AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+//  AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+//  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saiyugb1_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(saiyugb1_mcu_command_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -408,10 +403,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8748_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(saiyugb1_mcu_command_r)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(saiyugb1_m5205_clk_w) 		/* Drives the clock on the m5205 at 1/8 of this frequency */
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_DEVWRITE(SOUND, "adpcm", saiyugb1_m5205_clk_w) 		/* Drives the clock on the m5205 at 1/8 of this frequency */
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(saiyugb1_m5205_irq_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(saiyugb1_adpcm_rom_addr_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(saiyugb1_adpcm_control_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE(SOUND, "adpcm", saiyugb1_adpcm_control_w)
 ADDRESS_MAP_END
 
 
@@ -523,9 +518,9 @@ static GFXDECODE_START( chinagat )
 GFXDECODE_END
 
 
-static void chinagat_irq_handler(running_machine *machine, int irq)
+static void chinagat_irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(device->machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -546,7 +541,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	chinagat_irq_handler
 };

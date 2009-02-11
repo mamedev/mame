@@ -1052,7 +1052,7 @@ VIDEO_UPDATE( funworld );
 * Read/Write Handlers *
 **********************/
 
-static WRITE8_HANDLER(funworld_lamp_a_w)
+static WRITE8_DEVICE_HANDLER(funworld_lamp_a_w)
 {
 	coin_counter_w(0, data & 0x01);					/* credit in counter */
 
@@ -1066,7 +1066,7 @@ static WRITE8_HANDLER(funworld_lamp_a_w)
 	output_set_lamp_value(3, (data >> 7) & 1);		/* button hold4/high */
 }
 
-static WRITE8_HANDLER(funworld_lamp_b_w)
+static WRITE8_DEVICE_HANDLER(funworld_lamp_b_w)
 {
 	output_set_lamp_value(4, (data >> 0) & 1);		/* button hold5/bet */
 	output_set_lamp_value(6, (data >> 1) & 1);		/* button 7 (start/play) */
@@ -1087,8 +1087,8 @@ static ADDRESS_MAP_START( funworld_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0800, 0x0803) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x0c01, 0x0c01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD(SOUND, "ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE(SOUND, "ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
@@ -1102,8 +1102,8 @@ static ADDRESS_MAP_START( magicrd2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0800, 0x0803) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x0c01, 0x0c01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD(SOUND, "ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE(SOUND, "ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x2c00, 0x2cff) AM_RAM	/* range for protection */
@@ -1118,8 +1118,8 @@ static ADDRESS_MAP_START( cuoreuno_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0800, 0x0803) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x0c01, 0x0c01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD(SOUND, "ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE(SOUND, "ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* some unknown reads */
@@ -1133,8 +1133,8 @@ static ADDRESS_MAP_START( royalmcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x2800, 0x2803) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x2a00, 0x2a03) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x2c00, 0x2c00) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x2c01, 0x2c01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x2c00, 0x2c00) AM_DEVREAD(SOUND, "ay8910", ay8910_r)
+	AM_RANGE(0x2c00, 0x2c01) AM_DEVWRITE(SOUND, "ay8910", ay8910_address_data_w)
 	AM_RANGE(0x2e00, 0x2e00) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x2e01, 0x2e01) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
@@ -1149,8 +1149,8 @@ static ADDRESS_MAP_START( saloon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x081c, 0x081c) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x081d, 0x081d) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_2_r)
-	AM_RANGE(0x1800, 0x1800) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREAD(SOUND, "ay8910", ay8910_r)
+	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE(SOUND, "ay8910", ay8910_address_data_w)
 //  AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads... maybe a DSW */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
@@ -1974,10 +1974,10 @@ static const ay8910_interface ay8910_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,				/* portA in  */
-	NULL,				/* portB in  */
-	funworld_lamp_a_w,	/* portA out */
-	funworld_lamp_b_w	/* portB out */
+	DEVCB_NULL,							/* portA in  */
+	DEVCB_NULL,							/* portB in  */
+	DEVCB_HANDLER(funworld_lamp_a_w),	/* portA out */
+	DEVCB_HANDLER(funworld_lamp_b_w)	/* portB out */
 };
 
 

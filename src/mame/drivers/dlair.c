@@ -40,7 +40,6 @@
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "sound/ay8910.h"
-#include "sound/custom.h"
 #include "sound/beep.h"
 #include "dlair.lh"
 
@@ -210,11 +209,12 @@ static MACHINE_RESET( dlair )
 static INTERRUPT_GEN( vblank_callback )
 {
 	/* also update the speaker on the European version */
-	if (sndti_exists(SOUND_BEEP, 0))
+	const device_config *beep = devtag_get_device(device->machine, SOUND, "beep");
+	if (beep != NULL)
 	{
 		const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "ctc");
-		beep_set_state(0, 1);
-		beep_set_frequency(0, ATTOSECONDS_TO_HZ(z80ctc_getperiod(ctc, 0).attoseconds));
+		beep_set_state(beep, 1);
+		beep_set_frequency(beep, ATTOSECONDS_TO_HZ(z80ctc_getperiod(ctc, 0).attoseconds));
 	}
 }
 
@@ -376,13 +376,13 @@ static WRITE8_DEVICE_HANDLER( sio_w )
 static ADDRESS_MAP_START( dlus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc7) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc7) AM_DEVREAD(SOUND, "ay", ay8910_r)
 	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x1fc7) AM_READ_PORT("CONTROLS")
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x1fc7) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x1fc7) AM_READ(laserdisc_r)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fc7) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fc7) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1fc7) AM_WRITE(misc_w)
-	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1fc7) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1fc7) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
 	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1fc7) AM_WRITE(laserdisc_w)
 	AM_RANGE(0xe030, 0xe037) AM_MIRROR(0x1fc0) AM_WRITE(led_den2_w)
 	AM_RANGE(0xe038, 0xe03f) AM_MIRROR(0x1fc0) AM_WRITE(led_den1_w)
@@ -679,8 +679,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,
-	input_port_1_r
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_INPUT_PORT("DSW2")
 };
 
 
@@ -712,8 +712,7 @@ static MACHINE_DRIVER_START( dlair_base )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.33)
 
-	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -766,8 +765,7 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.33)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.33)
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ADD("laserdisc", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

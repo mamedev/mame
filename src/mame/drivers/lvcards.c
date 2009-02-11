@@ -177,8 +177,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lvcards_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lvpoker_map, ADDRESS_SPACE_PROGRAM, 8  )
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( ponttehk )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Coinout Sensor") //Token Out
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )//Motor On?
 
-	PORT_START("DSW1")
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x07, "Winning Percentage" )
 	PORT_DIPSETTING(    0x06, "70%" )
 	PORT_DIPSETTING(    0x05, "74%" )
@@ -410,7 +410,7 @@ static INPUT_PORTS_START( ponttehk )
 	PORT_DIPSETTING(    0x80, "Disabled" )
 	PORT_DIPSETTING(    0x00, "Enabled" )
 
-	PORT_START("DSW2")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x06, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
@@ -461,10 +461,10 @@ static const ay8910_interface lcay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_3_r, //DSW0
-	input_port_4_r,  //DSW1
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW0"),
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

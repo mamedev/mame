@@ -70,13 +70,13 @@ static READ8_HANDLER(madalien_sound_command_r )
 }
 
 
-static WRITE8_HANDLER( madalien_portA_w )
+static WRITE8_DEVICE_HANDLER( madalien_portA_w )
 {
-	discrete_sound_w(space, MADALIEN_8910_PORTA, data);
+	discrete_sound_w(device, MADALIEN_8910_PORTA, data);
 }
-static WRITE8_HANDLER( madalien_portB_w )
+static WRITE8_DEVICE_HANDLER( madalien_portB_w )
 {
-	discrete_sound_w(space, MADALIEN_8910_PORTB, data);
+	discrete_sound_w(device, MADALIEN_8910_PORTB, data);
 }
 
 
@@ -112,8 +112,7 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_RAM /* unknown device in an epoxy block, might be tilt detection */
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_READ(madalien_sound_command_r)
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x1ffc) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x8000, 0x8001) AM_MIRROR(0x1ffc) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x1ffc) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -166,10 +165,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	madalien_portA_w,
-	madalien_portB_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SOUND, "discrete", madalien_portA_w),
+	DEVCB_DEVICE_HANDLER(SOUND, "discrete", madalien_portB_w)
 };
 
 

@@ -21,7 +21,6 @@ D0  explosion enable        gates a noise generator
 #include "driver.h"
 #include "streams.h"
 #include "bzone.h"
-#include "sound/custom.h"
 
 #define OUTPUT_RATE (6000*4)
 
@@ -271,7 +270,7 @@ static STREAM_UPDATE( bzone_sound_update )
 	}
 }
 
-CUSTOM_START( bzone_sh_start )
+static DEVICE_START( bzone_sound )
 {
 	int i;
 
@@ -280,6 +279,20 @@ CUSTOM_START( bzone_sh_start )
 		discharge[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 
 	channel = stream_create(device, 0, 1, OUTPUT_RATE, 0, bzone_sound_update);
-
-	return auto_malloc(1);
 }
+
+
+DEVICE_GET_INFO( bzone_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(bzone_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Battlezone Engine");			break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
+

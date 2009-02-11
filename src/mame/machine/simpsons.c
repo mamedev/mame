@@ -102,9 +102,9 @@ READ8_HANDLER( simpsons_sound_interrupt_r )
 	return 0x00;
 }
 
-READ8_HANDLER( simpsons_sound_r )
+READ8_DEVICE_HANDLER( simpsons_sound_r )
 {
-	return k053260_0_r(space, 2 + offset);
+	return k053260_r(device, 2 + offset);
 }
 
 

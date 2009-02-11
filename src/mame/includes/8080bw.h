@@ -5,7 +5,6 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
-#include "sound/custom.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
 
@@ -39,12 +38,12 @@ WRITE8_HANDLER( ballbomb_sh_port_2_w );
 
 WRITE8_HANDLER( indianbt_sh_port_1_w );
 WRITE8_HANDLER( indianbt_sh_port_2_w );
-WRITE8_HANDLER( indianbt_sh_port_3_w );
+WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( indianbt );
 
-WRITE8_HANDLER( polaris_sh_port_1_w );
-WRITE8_HANDLER( polaris_sh_port_2_w );
-WRITE8_HANDLER( polaris_sh_port_3_w );
+WRITE8_DEVICE_HANDLER( polaris_sh_port_1_w );
+WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w );
+WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w );
 DISCRETE_SOUND_EXTERN( polaris );
 
 MACHINE_RESET( schaser );

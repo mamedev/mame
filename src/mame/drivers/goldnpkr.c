@@ -864,12 +864,14 @@ static WRITE8_HANDLER( lamps_a_w )
 
 static WRITE8_HANDLER( sound_w )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+
 	/* 555 voltage controlled */
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
-	discrete_sound_w(space, NODE_01, data >> 3 & 0x01);
-	discrete_sound_w(space, NODE_10, data & 0x07);
+	discrete_sound_w(discrete, NODE_01, data >> 3 & 0x01);
+	discrete_sound_w(discrete, NODE_10, data & 0x07);
 }
 
 

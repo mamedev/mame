@@ -146,7 +146,8 @@ enum
 
 *************************************************************/
 
-struct upd7759_chip
+typedef struct _upd7759_state upd7759_state;
+struct _upd7759_state
 {
 	const device_config *device;
 	sound_stream *channel;					/* stream channel for playback */
@@ -218,8 +219,18 @@ static const int upd7759_step[16][16] =
 	{ 6, 20, 36, 54, 76, 104, 144, 214, -6, -20, -36, -54, -76, -104, -144, -214 },
 };
 
-static const int upd7759_state[16] = { -1, -1, 0, 0, 1, 2, 2, 3, -1, -1, 0, 0, 1, 2, 2, 3 };
+static const int upd7759_state_table[16] = { -1, -1, 0, 0, 1, 2, 2, 3, -1, -1, 0, 0, 1, 2, 2, 3 };
 
+
+
+INLINE upd7759_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_UPD7759);
+	return (upd7759_state *)device->token;
+}
 
 
 /************************************************************
@@ -228,11 +239,11 @@ static const int upd7759_state[16] = { -1, -1, 0, 0, 1, 2, 2, 3, -1, -1, 0, 0, 1
 
 *************************************************************/
 
-INLINE void update_adpcm(struct upd7759_chip *chip, int data)
+INLINE void update_adpcm(upd7759_state *chip, int data)
 {
 	/* update the sample and the state */
 	chip->sample += upd7759_step[chip->adpcm_state][data];
-	chip->adpcm_state += upd7759_state[data];
+	chip->adpcm_state += upd7759_state_table[data];
 
 	/* clamp the state to 0..15 */
 	if (chip->adpcm_state < 0)
@@ -249,7 +260,7 @@ INLINE void update_adpcm(struct upd7759_chip *chip, int data)
 
 *************************************************************/
 
-static void advance_state(struct upd7759_chip *chip)
+static void advance_state(upd7759_state *chip)
 {
 	switch (chip->state)
 	{
@@ -462,7 +473,7 @@ static void advance_state(struct upd7759_chip *chip)
 
 static STREAM_UPDATE( upd7759_update )
 {
-	struct upd7759_chip *chip = param;
+	upd7759_state *chip = param;
 	INT32 clocks_left = chip->clocks_left;
 	INT16 sample = chip->sample;
 	UINT32 step = chip->step;
@@ -525,7 +536,7 @@ static STREAM_UPDATE( upd7759_update )
 
 static TIMER_CALLBACK( upd7759_slave_update )
 {
-	struct upd7759_chip *chip = ptr;
+	upd7759_state *chip = ptr;
 	UINT8 olddrq = chip->drq;
 
 	/* update the stream */
@@ -552,7 +563,7 @@ static TIMER_CALLBACK( upd7759_slave_update )
 
 *************************************************************/
 
-static void upd7759_reset(struct upd7759_chip *chip)
+static void upd7759_reset(upd7759_state *chip)
 {
 	chip->pos                = 0;
 	chip->fifo_in            = 0;
@@ -580,7 +591,7 @@ static void upd7759_reset(struct upd7759_chip *chip)
 }
 
 
-static SND_RESET( upd7759 )
+static DEVICE_RESET( upd7759 )
 {
 	upd7759_reset(device->token);
 }
@@ -588,12 +599,12 @@ static SND_RESET( upd7759 )
 
 static STATE_POSTLOAD( upd7759_postload )
 {
-	struct upd7759_chip *chip = (struct upd7759_chip *)param;
+	upd7759_state *chip = (upd7759_state *)param;
 	chip->rom = chip->rombase + chip->romoffset;
 }
 
 
-static void register_for_save(struct upd7759_chip *chip, const device_config *device)
+static void register_for_save(upd7759_state *chip, const device_config *device)
 {
 	state_save_register_device_item(device, 0, chip->pos);
 	state_save_register_device_item(device, 0, chip->step);
@@ -626,22 +637,22 @@ static void register_for_save(struct upd7759_chip *chip, const device_config *de
 }
 
 
-static SND_START( upd7759 )
+static DEVICE_START( upd7759 )
 {
 	static const upd7759_interface defintrf = { 0 };
 	const upd7759_interface *intf = (device->static_config != NULL) ? device->static_config : &defintrf;
-	struct upd7759_chip *chip = device->token;
+	upd7759_state *chip = device->token;
 
 	chip->device = device;
 
 	/* allocate a stream channel */
-	chip->channel = stream_create(device, 0, 1, clock/4, chip, upd7759_update);
+	chip->channel = stream_create(device, 0, 1, device->clock/4, chip, upd7759_update);
 
 	/* compute the stepping rate based on the chip's clock speed */
 	chip->step = 4 * FRAC_ONE;
 
 	/* compute the clock period */
-	chip->clock_period = ATTOTIME_IN_HZ(clock);
+	chip->clock_period = ATTOTIME_IN_HZ(device->clock);
 
 	/* set the intial state */
 	chip->state = STATE_IDLE;
@@ -672,10 +683,10 @@ static SND_START( upd7759 )
 
 *************************************************************/
 
-void upd7759_reset_w(int which, UINT8 data)
+void upd7759_reset_w(const device_config *device, UINT8 data)
 {
 	/* update the reset value */
-	struct upd7759_chip *chip = sndti_token(SOUND_UPD7759, which);
+	upd7759_state *chip = get_safe_token(device);
 	UINT8 oldreset = chip->reset;
 	chip->reset = (data != 0);
 
@@ -687,10 +698,10 @@ void upd7759_reset_w(int which, UINT8 data)
 		upd7759_reset(chip);
 }
 
-void upd7759_start_w(int which, UINT8 data)
+void upd7759_start_w(const device_config *device, UINT8 data)
 {
 	/* update the start value */
-	struct upd7759_chip *chip = sndti_token(SOUND_UPD7759, which);
+	upd7759_state *chip = get_safe_token(device);
 	UINT8 oldstart = chip->start;
 	chip->start = (data != 0);
 
@@ -711,61 +722,28 @@ void upd7759_start_w(int which, UINT8 data)
 }
 
 
-void upd7759_port_w(int which, UINT8 data)
+WRITE8_DEVICE_HANDLER( upd7759_port_w )
 {
 	/* update the FIFO value */
-	struct upd7759_chip *chip = sndti_token(SOUND_UPD7759, which);
+	upd7759_state *chip = get_safe_token(device);
 	chip->fifo_in = data;
 }
 
 
-int upd7759_busy_r(int which)
+int upd7759_busy_r(const device_config *device)
 {
 	/* return /BUSY */
-	struct upd7759_chip *chip = sndti_token(SOUND_UPD7759, which);
+	upd7759_state *chip = get_safe_token(device);
 	return (chip->state == STATE_IDLE);
 }
 
 
-void upd7759_set_bank_base(int which, UINT32 base)
+void upd7759_set_bank_base(const device_config *device, UINT32 base)
 {
-	struct upd7759_chip *chip = sndti_token(SOUND_UPD7759, which);
+	upd7759_state *chip = get_safe_token(device);
 	chip->rom = chip->rombase + base;
 	chip->romoffset = base;
 }
-
-
-
-/************************************************************
-
-    Convenience handlers
-
-*************************************************************/
-
-WRITE8_HANDLER(upd7759_0_start_w)
-{
-	upd7759_start_w(0,data);
-}
-
-
-WRITE8_HANDLER(upd7759_0_reset_w)
-{
-	upd7759_reset_w(0,data);
-}
-
-
-WRITE8_HANDLER(upd7759_0_port_w)
-{
-	upd7759_port_w(0,data);
-}
-
-
-READ8_HANDLER(upd7759_0_busy_r)
-{
-	return upd7759_busy_r(0);
-}
-
-
 
 
 
@@ -773,34 +751,24 @@ READ8_HANDLER(upd7759_0_busy_r)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( upd7759 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( upd7759 )
+DEVICE_GET_INFO( upd7759 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct upd7759_chip); 			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(upd7759_state); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( upd7759 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( upd7759 );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( upd7759 );		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( upd7759 );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( upd7759 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "UPD7759");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "NEC ADPCM");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "UPD7759");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "NEC ADPCM");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

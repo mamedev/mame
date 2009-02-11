@@ -159,14 +159,16 @@ static MACHINE_RESET( tickee )
  *
  *************************************/
 
-static READ8_HANDLER( port1_r )
+static READ8_DEVICE_HANDLER( port1_r )
 {
-	return input_port_read(space->machine, "IN0") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
+	const address_space *space = cputag_get_address_space(device->machine, "main", ADDRESS_SPACE_PROGRAM);
+	return input_port_read(device->machine, "IN0") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
 }
 
-static READ8_HANDLER( port2_r )
+static READ8_DEVICE_HANDLER( port2_r )
 {
-	return input_port_read(space->machine, "IN2") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
+	const address_space *space = cputag_get_address_space(device->machine, "main", ADDRESS_SPACE_PROGRAM);
+	return input_port_read(device->machine, "IN2") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
 }
 
 
@@ -213,10 +215,10 @@ static ADDRESS_MAP_START( tickee_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x04100000, 0x041000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
-	AM_RANGE(0x04200000, 0x0420000f) AM_READWRITE(ay8910_read_port_0_lsb_r, ay8910_control_port_0_lsb_w)
-	AM_RANGE(0x04200010, 0x0420001f) AM_WRITE(ay8910_write_port_0_lsb_w)
-	AM_RANGE(0x04200100, 0x0420010f) AM_READWRITE(ay8910_read_port_1_lsb_r, ay8910_control_port_1_lsb_w)
-	AM_RANGE(0x04200110, 0x0420011f) AM_WRITE(ay8910_write_port_1_lsb_w)
+	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8(SOUND, "ym1", ay8910_r, 0x00ff)
+	AM_RANGE(0x04200000, 0x0420001f) AM_DEVWRITE8(SOUND, "ym1", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREAD8(SOUND, "ym2", ay8910_r, 0x00ff)
+	AM_RANGE(0x04200100, 0x0420011f) AM_DEVWRITE8(SOUND, "ym2", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_BASE(&tickee_control)
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
@@ -231,10 +233,10 @@ static ADDRESS_MAP_START( ghoshunt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04100000, 0x04103fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x04200000, 0x042000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
-	AM_RANGE(0x04300000, 0x0430000f) AM_READWRITE(ay8910_read_port_0_lsb_r, ay8910_control_port_0_lsb_w)
-	AM_RANGE(0x04300010, 0x0430001f) AM_WRITE(ay8910_write_port_0_lsb_w)
-	AM_RANGE(0x04300100, 0x0430010f) AM_READWRITE(ay8910_read_port_1_lsb_r, ay8910_control_port_1_lsb_w)
-	AM_RANGE(0x04300110, 0x0430011f) AM_WRITE(ay8910_write_port_1_lsb_w)
+	AM_RANGE(0x04300000, 0x0430000f) AM_DEVREAD8(SOUND, "ym1", ay8910_r, 0x00ff)
+	AM_RANGE(0x04300000, 0x0430001f) AM_DEVWRITE8(SOUND, "ym1", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x04300100, 0x0430010f) AM_DEVREAD8(SOUND, "ym2", ay8910_r, 0x00ff)
+	AM_RANGE(0x04300100, 0x0430011f) AM_DEVWRITE8(SOUND, "ym2", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04500000, 0x0450007f) AM_WRITE(tickee_control_w) AM_BASE(&tickee_control)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
@@ -378,20 +380,20 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,
- 	input_port_2_r,
- 	NULL,
- 	NULL
+	DEVCB_INPUT_PORT("DSW"),
+	DEVCB_INPUT_PORT("IN1"),
+ 	DEVCB_NULL,
+ 	DEVCB_NULL
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	port1_r,
-	port2_r,
-	NULL,
-	NULL
+	DEVCB_HANDLER(port1_r),
+	DEVCB_HANDLER(port2_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

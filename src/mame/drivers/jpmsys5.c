@@ -247,28 +247,28 @@ static READ16_HANDLER( mux_r )
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( upd7759_w )
+static WRITE16_DEVICE_HANDLER( jpm_upd7759_w )
 {
 	if (offset == 0)
 	{
-		upd7759_port_w(0, data & 0xff);
-		upd7759_start_w(0, 0);
-		upd7759_start_w(0, 1);
+		upd7759_port_w(device, 0, data & 0xff);
+		upd7759_start_w(device, 0);
+		upd7759_start_w(device, 1);
 	}
 	else if (offset == 2)
 	{
-		upd7759_reset_w(0, ~data & 0x4);
-		upd7759_set_bank_base(0, (data & 2) ? 0x20000 : 0);
+		upd7759_reset_w(device, ~data & 0x4);
+		upd7759_set_bank_base(device, (data & 2) ? 0x20000 : 0);
 	}
 	else
 	{
-		logerror("upd7759: Unknown write to %x with %x (PC:%04x)\n", offset, data, cpu_get_previouspc(space->cpu));
+		logerror("%s: upd7759: Unknown write to %x with %x\n", cpuexec_describe_context(device->machine),  offset, data);
 	}
 }
 
-static READ16_HANDLER( upd7759_r )
+static READ16_DEVICE_HANDLER( jpm_upd7759_r )
 {
-	return 0x14 | upd7759_busy_r(0);
+	return 0x14 | upd7759_busy_r(device);
 }
 
 
@@ -297,13 +297,12 @@ static ADDRESS_MAP_START( 68000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x046088, 0x046089) AM_READ(unk_r) // PIA?
 	AM_RANGE(0x04608c, 0x04608d) AM_DEVREADWRITE8(ACIA6850, "acia6850_2", acia6850_stat_r, acia6850_ctrl_w, 0xff)
 	AM_RANGE(0x04608e, 0x04608f) AM_DEVREADWRITE8(ACIA6850, "acia6850_2", acia6850_data_r, acia6850_data_w, 0xff)
-	AM_RANGE(0x0460a0, 0x0460a1) AM_WRITE(ym2413_register_port_0_lsb_w)
-	AM_RANGE(0x0460a2, 0x0460a3) AM_WRITE(ym2413_data_port_0_lsb_w)
+	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8(SOUND, "ym2413", ym2413_w, 0x00ff)
 	AM_RANGE(0x0460c0, 0x0460c1) AM_WRITENOP
 	AM_RANGE(0x0460e0, 0x0460e5) AM_WRITE(ramdac_w)
 	AM_RANGE(0x048000, 0x04801f) AM_READWRITE(coins_r, coins_w)
 	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)
-	AM_RANGE(0x04c100, 0x04c105) AM_READWRITE(upd7759_r, upd7759_w)
+	AM_RANGE(0x04c100, 0x04c105) AM_DEVREADWRITE(SOUND, "upd7759", jpm_upd7759_r, jpm_upd7759_w)
 	AM_RANGE(0x800000, 0xcfffff) AM_READWRITE(sys5_tms34061_r, sys5_tms34061_w)
 ADDRESS_MAP_END
 

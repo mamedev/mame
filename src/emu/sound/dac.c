@@ -8,7 +8,8 @@
 #define DEFAULT_SAMPLE_RATE (48000 * 4)
 
 
-struct dac_info
+typedef struct _dac_state dac_state;
+struct _dac_state
 {
 	sound_stream	*channel;
 	INT16			output;
@@ -17,10 +18,19 @@ struct dac_info
 };
 
 
+INLINE dac_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_DAC);
+	return (dac_state *)device->token;
+}
+
 
 static STREAM_UPDATE( DAC_update )
 {
-	struct dac_info *info = param;
+	dac_state *info = param;
 	stream_sample_t *buffer = outputs[0];
 	INT16 out = info->output;
 
@@ -28,9 +38,9 @@ static STREAM_UPDATE( DAC_update )
 }
 
 
-void dac_data_w(int num,UINT8 data)
+void dac_data_w(const device_config *device, UINT8 data)
 {
-	struct dac_info *info = sndti_token(SOUND_DAC, num);
+	dac_state *info = get_safe_token(device);
 	INT16 out = info->UnsignedVolTable[data];
 
 	if (info->output != out)
@@ -42,9 +52,9 @@ void dac_data_w(int num,UINT8 data)
 }
 
 
-void dac_signed_data_w(int num,UINT8 data)
+void dac_signed_data_w(const device_config *device, UINT8 data)
 {
-	struct dac_info *info = sndti_token(SOUND_DAC, num);
+	dac_state *info = get_safe_token(device);
 	INT16 out = info->SignedVolTable[data];
 
 	if (info->output != out)
@@ -56,9 +66,9 @@ void dac_signed_data_w(int num,UINT8 data)
 }
 
 
-void dac_data_16_w(int num,UINT16 data)
+void dac_data_16_w(const device_config *device, UINT16 data)
 {
-	struct dac_info *info = sndti_token(SOUND_DAC, num);
+	dac_state *info = get_safe_token(device);
 	INT16 out = data >> 1;		/* range      0..32767 */
 
 	if (info->output != out)
@@ -70,9 +80,9 @@ void dac_data_16_w(int num,UINT16 data)
 }
 
 
-void dac_signed_data_16_w(int num,UINT16 data)
+void dac_signed_data_16_w(const device_config *device, UINT16 data)
 {
-	struct dac_info *info = sndti_token(SOUND_DAC, num);
+	dac_state *info = get_safe_token(device);
 	INT16 out = (INT32)data - (INT32)0x08000;	/* range -32768..32767 */
 						/* casts avoid potential overflow on some ABIs */
 
@@ -85,10 +95,9 @@ void dac_signed_data_16_w(int num,UINT16 data)
 }
 
 
-static void DAC_build_voltable(struct dac_info *info)
+static void DAC_build_voltable(dac_state *info)
 {
 	int i;
-
 
 	/* build volume table (linear) */
 	for (i = 0;i < 256;i++)
@@ -99,13 +108,13 @@ static void DAC_build_voltable(struct dac_info *info)
 }
 
 
-static SND_START( dac )
+static DEVICE_START( dac )
 {
-	struct dac_info *info = device->token;
+	dac_state *info = get_safe_token(device);
 
 	DAC_build_voltable(info);
 
-	info->channel = stream_create(device,0,1,clock ? clock : DEFAULT_SAMPLE_RATE,info,DAC_update);
+	info->channel = stream_create(device,0,1,device->clock ? device->clock : DEFAULT_SAMPLE_RATE,info,DAC_update);
 	info->output = 0;
 
 	state_save_register_device_item(device, 0, info->output);
@@ -113,36 +122,15 @@ static SND_START( dac )
 
 
 
-WRITE8_HANDLER( dac_0_data_w )
+WRITE8_DEVICE_HANDLER( dac_w )
 {
-	dac_data_w(0,data);
+	dac_data_w(device, data);
 }
 
-WRITE8_HANDLER( dac_1_data_w )
+WRITE8_DEVICE_HANDLER( dac_signed_w )
 {
-	dac_data_w(1,data);
+	dac_signed_data_w(device, data);
 }
-
-WRITE8_HANDLER( dac_2_data_w )
-{
-	dac_data_w(2,data);
-}
-
-WRITE8_HANDLER( dac_0_signed_data_w )
-{
-	dac_signed_data_w(0,data);
-}
-
-WRITE8_HANDLER( dac_1_signed_data_w )
-{
-	dac_signed_data_w(1,data);
-}
-
-WRITE8_HANDLER( dac_2_signed_data_w )
-{
-	dac_signed_data_w(2,data);
-}
-
 
 
 
@@ -150,34 +138,23 @@ WRITE8_HANDLER( dac_2_signed_data_w )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( dac )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( dac )
+DEVICE_GET_INFO( dac )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct dac_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dac_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( dac );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( dac );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */								break;
-		case SNDINFO_PTR_RESET:							/* nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( dac );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */								break;
+		case DEVINFO_FCT_RESET:							/* nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "DAC");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "DAC");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "DAC");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "DAC");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
-

@@ -124,10 +124,10 @@ static WRITE8_HANDLER( sound_bank_w )
 
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( devtag_get_device(space->machine, SOUND, "konami1"), bank_A, bank_B );
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 6) & 0x03);
-	k007232_set_bank( 1, bank_A, bank_B );
+	k007232_set_bank( devtag_get_device(space->machine, SOUND, "konami2"), bank_A, bank_B );
 }
 
 
@@ -155,8 +155,8 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
-	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(k007232_read_port_1_r, k007232_write_port_1_w)
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE(SOUND, "konami1", k007232_r, k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE(SOUND, "konami2", k007232_r, k007232_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_enable_w)
 ADDRESS_MAP_END
@@ -279,16 +279,16 @@ INPUT_PORTS_END
 
 
 
-static void volume_callback0(int v)
+static void volume_callback0(const device_config *device, int v)
 {
-	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
-static void volume_callback1(int v)
+static void volume_callback1(const device_config *device, int v)
 {
-	k007232_set_volume(1,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(1,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_interface_1 =

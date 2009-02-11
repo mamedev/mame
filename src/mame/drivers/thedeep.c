@@ -179,8 +179,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w	)	// YM2203
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w		)	//
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE(SOUND, "ym", ym2203_w	)	//
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r				)	// From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -307,9 +306,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface thedeep_ym2203_intf =
@@ -317,7 +316,7 @@ static const ym2203_interface thedeep_ym2203_intf =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };

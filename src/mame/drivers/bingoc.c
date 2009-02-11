@@ -81,15 +81,15 @@ static WRITE16_HANDLER( main_sound_latch_w )
 }
 #endif
 
-static WRITE8_HANDLER( bingoc_play_w )
+static WRITE8_DEVICE_HANDLER( bingoc_play_w )
 {
 	/*
     ---- --x- sound rom banking
     ---- ---x start-stop sample
     */
-	UINT8 *upd = memory_region(space->machine, "upd");
+	UINT8 *upd = memory_region(device->machine, "upd");
 	memcpy(&upd[0x00000], &upd[0x20000 + (((data & 2)>>1) * 0x20000)], 0x20000);
-	upd7759_start_w(0, data & 1);
+	upd7759_start_w(device, data & 1);
 //  printf("%02x\n",data);
 }
 
@@ -110,10 +110,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(bingoc_play_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(upd7759_0_port_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE(SOUND, "upd", bingoc_play_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "upd", upd7759_port_w)
 #if !SOUND_TEST
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r) //soundlatch
 #else

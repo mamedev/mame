@@ -524,8 +524,9 @@ static WRITE8_HANDLER( sound_io_w )
 		}
 		case 0x03:
 		{
-			upd7759_set_bank_base(0, (data & 0x4) ? 0x20000 : 0);
-			upd7759_0_reset_w(space, 0, (data & 0x10) ? 0 : 1);
+			const device_config *upd = devtag_get_device(space->machine, SOUND, "upd7759");
+			upd7759_set_bank_base(upd, (data & 0x4) ? 0x20000 : 0);
+			upd7759_reset_w(upd, (data & 0x10) ? 0 : 1);
 			break;
 		}
 	}
@@ -536,16 +537,16 @@ static READ8_HANDLER( sound_io_r )
 	switch (offset)
 	{
 		case 0x01:	return (sound_port_latch[offset] & 0x7f) | input_port_read_safe(space->machine, "SOUND_SW", 0);
-		case 0x03:	return (sound_port_latch[offset] & 0xf7) | (upd7759_0_busy_r(space, 0) ? 0x08 : 0);
+		case 0x03:	return (sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd7759")) ? 0x08 : 0);
 		default:	return 0;
 	}
 }
 
-static WRITE8_HANDLER( upd7759_port_start_w )
+static WRITE8_DEVICE_HANDLER( upd7759_port_start_w )
 {
-	upd7759_0_port_w(space, offset, data);
-	upd7759_0_start_w(space, offset, 0);
-	upd7759_0_start_w(space, offset, 1);
+	upd7759_port_w(device, 0, data);
+	upd7759_start_w(device, 0);
+	upd7759_start_w(device, 1);
 }
 
 
@@ -595,9 +596,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xfd01, 0xfd01) AM_READWRITE(ym2151_status_port_0_r,ym2151_data_port_0_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(upd7759_port_start_w)
+	AM_RANGE(0xfd00, 0xfd01) AM_DEVREADWRITE(SOUND, "ym2151", ym2151_r, ym2151_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE(SOUND, "upd7759", upd7759_port_start_w)
 	AM_RANGE(0xff00, 0xff00) AM_NOP		/* DAC A */
 	AM_RANGE(0xff01, 0xff01) AM_NOP		/* DAC B */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(sound_io_r,sound_io_w)

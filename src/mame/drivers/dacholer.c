@@ -136,12 +136,9 @@ static ADDRESS_MAP_START( snd_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(adpcm_w)
-	AM_RANGE(0x86, 0x86) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x87, 0x87) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x8a, 0x8a) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x8b, 0x8b) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x8e, 0x8e) AM_WRITE(ay8910_write_port_2_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x86, 0x87) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE(SOUND, "ay3", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 
@@ -384,7 +381,7 @@ static void adpcm_int(const device_config *device)
 {
 	if(snd_interrupt_enable == 1 || (snd_interrupt_enable ==0 && msm_toggle==1))
 	{
-		msm5205_data_w(0,msm_data >> 4);
+		msm5205_data_w(device,msm_data >> 4);
 		msm_data<<=4;
 		msm_toggle^=1;
 		if (msm_toggle==0)

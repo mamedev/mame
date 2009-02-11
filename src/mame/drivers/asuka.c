@@ -262,20 +262,25 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "audio") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
 }
 
+static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
+{
+	memory_set_bankptr(device->machine,  1, memory_region(device->machine, "audio") + ((data-1) & 0x03) * 0x4000 + 0x10000 );
+}
+
 
 
 static void asuka_msm5205_vck(const device_config *device)
 {
 	if (adpcm_data != -1)
 	{
-		msm5205_data_w(0, adpcm_data & 0x0f);
+		msm5205_data_w(device, adpcm_data & 0x0f);
 		adpcm_data = -1;
 	}
 	else
 	{
 		adpcm_data = memory_region(device->machine, "ym")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0xffff;
-		msm5205_data_w(0, adpcm_data >> 4);
+		msm5205_data_w(device, adpcm_data >> 4);
 	}
 }
 
@@ -284,14 +289,14 @@ static WRITE8_HANDLER( asuka_msm5205_address_w )
 	adpcm_pos = (adpcm_pos & 0x00ff) | (data << 8);
 }
 
-static WRITE8_HANDLER( asuka_msm5205_start_w )
+static WRITE8_DEVICE_HANDLER( asuka_msm5205_start_w )
 {
-	msm5205_reset_w(0, 0);
+	msm5205_reset_w(device, 0);
 }
 
-static WRITE8_HANDLER( asuka_msm5205_stop_w )
+static WRITE8_DEVICE_HANDLER( asuka_msm5205_stop_w )
 {
-	msm5205_reset_w(0, 1);
+	msm5205_reset_w(device, 1);
 	adpcm_pos &= 0xff00;
 }
 
@@ -388,10 +393,7 @@ static ADDRESS_MAP_START( bonzeadv_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym2610_status_port_0_a_r, ym2610_control_port_0_a_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(ym2610_read_port_0_r, ym2610_data_port_0_a_w)
-	AM_RANGE(0xe002, 0xe002) AM_READWRITE(ym2610_status_port_0_b_r, ym2610_control_port_0_b_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE(SOUND, "ym", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
@@ -405,14 +407,13 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 //  AM_RANGE(0x9002, 0x9100) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(asuka_msm5205_address_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(asuka_msm5205_start_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(asuka_msm5205_stop_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(SOUND, "msm", asuka_msm5205_start_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE(SOUND, "msm", asuka_msm5205_stop_w)
 ADDRESS_MAP_END
 
 /* no MSM5205 */
@@ -420,8 +421,7 @@ static ADDRESS_MAP_START( cadash_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -753,9 +753,9 @@ GFXDECODE_END
                 SOUND
 **************************************************************/
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -767,7 +767,7 @@ static const ym2610_interface ym2610_config =
 static const ym2151_interface ym2151_config =
 {
 	irq_handler,
-	sound_bankswitch_w
+	sound_bankswitch_2151_w
 };
 
 static const msm5205_interface msm5205_config =

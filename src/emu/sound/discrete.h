@@ -4294,17 +4294,10 @@ node_description *discrete_find_node(void *chip, int node);
 void discrete_sound_n_w(void *chip, offs_t offset, UINT8 data);
 UINT8 discrete_sound_n_r(void *chip, offs_t offset);
 
-WRITE8_HANDLER(discrete_sound_w);
-WRITE8_HANDLER(discrete_sound_1_w);
-WRITE8_HANDLER(discrete_sound_2_w);
-WRITE8_HANDLER(discrete_sound_3_w);
+WRITE8_DEVICE_HANDLER( discrete_sound_w );
+READ8_DEVICE_HANDLER( discrete_sound_r );
 
-READ8_HANDLER(discrete_sound_r);
-READ8_HANDLER(discrete_sound_1_r);
-READ8_HANDLER(discrete_sound_2_r);
-READ8_HANDLER(discrete_sound_3_r);
-
-SND_GET_INFO( discrete );
-#define SOUND_DISCRETE SND_GET_INFO_NAME( discrete )
+DEVICE_GET_INFO( discrete );
+#define SOUND_DISCRETE DEVICE_GET_INFO_NAME( discrete )
 
 #endif /* __DISCRETE_H__ */

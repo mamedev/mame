@@ -95,6 +95,11 @@ static struct
 	UINT8 to_main;		// answer to main CPU
 	int protection_check;
 
+	running_machine *machine;	
+	const device_config *ymdevice;
+	const device_config *oki1device;
+	const device_config *oki2device;
+
 	/* C001      */	UINT8 last_command;		// last command received
 	/* C016      */	UINT8 oki_playing;		// bitmap of active Oki channels
 	/* C020-C19F */	struct fm_control fm_control[FM_CHANNELS];
@@ -133,20 +138,18 @@ static UINT16 read16(int address)
 
 *****************************/
 
-static void oki_play_sample(const address_space *space, int sample_no)
+static void oki_play_sample(int sample_no)
 {
 	UINT16 table_start = (sample_no & 0x80) ? read16(SAMPLE_TABLE_1) : read16(SAMPLE_TABLE_0);
 	UINT8 byte1 = read8(table_start + 2 * (sample_no & 0x7f) + 0);
 	UINT8 byte2 = read8(table_start + 2 * (sample_no & 0x7f) + 1);
 	int chip = (byte1 & 0x80) >> 7;
+	const device_config *okidevice = (chip) ? NMK004_state.oki2device : NMK004_state.oki1device;
 
 	if ((byte1 & 0x7f) == 0)
 	{
 		// stop all channels
-		if (chip == 0)
-			okim6295_data_0_w(space, 0, 0x78 );
-		else
-			okim6295_data_1_w(space, 0, 0x78 );
+		okim6295_w(okidevice, 0, 0x78 );
 	}
 	else
 	{
@@ -160,37 +163,26 @@ static void oki_play_sample(const address_space *space, int sample_no)
 		NMK004_state.oki_playing |= 1 << (ch + 4*chip);
 
 		// stop channel
-		if (chip == 0)
-			okim6295_data_0_w(space, 0, (0x08 << ch) );
-		else
-			okim6295_data_1_w(space, 0, (0x08 << ch) );
+		okim6295_w(okidevice, 0, (0x08 << ch) );
 
 		if (sample != 0)
 		{
-			UINT8 *rom = memory_region(space->machine, (chip == 0) ? "oki1" : "oki2");
+			UINT8 *rom = memory_region(NMK004_state.machine, (chip == 0) ? "oki1" : "oki2");
 			int bank = (byte2 & 0x0c) >> 2;
 			int vol = (byte2 & 0x70) >> 4;
 
 			if (bank != 3)
 				memcpy(rom + 0x20000,rom + 0x40000 + bank * 0x20000,0x20000);
 
-			if (chip == 0)
-			{
-				okim6295_data_0_w(space, 0, 0x80 | sample );
-				okim6295_data_0_w(space, 0, (0x10 << ch) | vol );
-			}
-			else
-			{
-				okim6295_data_1_w(space, 0, 0x80 | sample );
-				okim6295_data_1_w(space, 0, (0x10 << ch) | vol );
-			}
+			okim6295_w(okidevice, 0, 0x80 | sample );
+			okim6295_w(okidevice, 0, (0x10 << ch) | vol );
 		}
 	}
 }
 
-static void oki_update_state(const address_space *space)
+static void oki_update_state(void)
 {
-	NMK004_state.oki_playing = ((okim6295_status_1_r(space, 0) & 0x0f) << 4) | (okim6295_status_0_r(space, 0) & 0x0f);
+	NMK004_state.oki_playing = ((okim6295_r(NMK004_state.oki2device, 0) & 0x0f) << 4) | (okim6295_r(NMK004_state.oki1device, 0) & 0x0f);
 }
 
 
@@ -201,7 +193,7 @@ static void oki_update_state(const address_space *space)
 
 *****************************/
 
-static void effects_update(const address_space *space, int channel)
+static void effects_update(int channel)
 {
 	struct effects_control *effects = &NMK004_state.effects_control[channel];
 
@@ -233,7 +225,7 @@ static void effects_update(const address_space *space, int channel)
 					switch (token)
 					{
 						case 0xef:	// play sample
-							oki_play_sample(space, read8(effects->current++));
+							oki_play_sample(read8(effects->current++));
 							break;
 
 						case 0xf6:	// jump
@@ -308,7 +300,7 @@ static void effects_update(const address_space *space, int channel)
 
 *****************************/
 
-static void fm_update(const address_space *space, int channel)
+static void fm_update(int channel)
 {
 	struct fm_control *fm = &NMK004_state.fm_control[channel];
 
@@ -348,7 +340,7 @@ static void fm_update(const address_space *space, int channel)
 					switch (token)
 					{
 //                      case 0xef:  // play sample
-//                          oki_play_sample(machine, read8(fm->current++));
+//                          oki_play_sample(read8(fm->current++));
 //                          break;
 
 						case 0xf0:	// slot (for keyon ym2203 command)
@@ -356,8 +348,8 @@ static void fm_update(const address_space *space, int channel)
 							fm->slot = read8(fm->current++);
 							if (channel < 3 || !(NMK004_state.fm_control[channel-3].flags & FM_FLAG_ACTIVE))
 							{
-								ym2203_control_port_0_w(space, 0, 0x28);	// keyon/off
-								ym2203_write_port_0_w(space, 0, channel % 3);
+								ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x28);	// keyon/off
+								ym2203_write_port_w(NMK004_state.ymdevice, 0, channel % 3);
 							}
 							break;
 
@@ -585,7 +577,7 @@ popmessage("%02x %02x%02x%02x%02x %02x %02x%02x%02x%02x %02x %02x%02x%02x%02x",
 }
 
 
-static void fm_voices_update(const address_space *space )
+static void fm_voices_update(void)
 {
 	static const int ym2203_registers[0x18] =
 	{
@@ -605,8 +597,8 @@ static void fm_voices_update(const address_space *space )
 
 			for (i = 0; i < 0x18; i++)
 			{
-				ym2203_control_port_0_w(space, 0, ym2203_registers[i] + channel);
-				ym2203_write_port_0_w(space, 0, fm1->voice_params[i]);
+				ym2203_control_port_w(NMK004_state.ymdevice, 0, ym2203_registers[i] + channel);
+				ym2203_write_port_w(NMK004_state.ymdevice, 0, fm1->voice_params[i]);
 			}
 		}
 
@@ -618,8 +610,8 @@ static void fm_voices_update(const address_space *space )
 			{
 				for (i = 0; i < 0x18; i++)
 				{
-					ym2203_control_port_0_w(space, 0, ym2203_registers[i] + channel);
-					ym2203_write_port_0_w(space, 0, fm2->voice_params[i]);
+					ym2203_control_port_w(NMK004_state.ymdevice, 0, ym2203_registers[i] + channel);
+					ym2203_write_port_w(NMK004_state.ymdevice, 0, fm2->voice_params[i]);
 				}
 			}
 		}
@@ -627,25 +619,25 @@ static void fm_voices_update(const address_space *space )
 
 		if (fm1->flags & FM_FLAG_ACTIVE)
 		{
-			ym2203_control_port_0_w(space, 0, 0xb0 + channel);	// self-feedback
-			ym2203_write_port_0_w(space, 0, fm1->self_feedback);
+			ym2203_control_port_w(NMK004_state.ymdevice, 0, 0xb0 + channel);	// self-feedback
+			ym2203_write_port_w(NMK004_state.ymdevice, 0, fm1->self_feedback);
 
-			ym2203_control_port_0_w(space, 0, 0xa4 + channel);	// F-number
-			ym2203_write_port_0_w(space, 0, fm1->f_number >> 8);
+			ym2203_control_port_w(NMK004_state.ymdevice, 0, 0xa4 + channel);	// F-number
+			ym2203_write_port_w(NMK004_state.ymdevice, 0, fm1->f_number >> 8);
 
-			ym2203_control_port_0_w(space, 0, 0xa0 + channel);	// F-number
-			ym2203_write_port_0_w(space, 0, fm1->f_number & 0xff);
+			ym2203_control_port_w(NMK004_state.ymdevice, 0, 0xa0 + channel);	// F-number
+			ym2203_write_port_w(NMK004_state.ymdevice, 0, fm1->f_number & 0xff);
 		}
 		else
 		{
-			ym2203_control_port_0_w(space, 0, 0xb0 + channel);	// self-feedback
-			ym2203_write_port_0_w(space, 0, fm2->self_feedback);
+			ym2203_control_port_w(NMK004_state.ymdevice, 0, 0xb0 + channel);	// self-feedback
+			ym2203_write_port_w(NMK004_state.ymdevice, 0, fm2->self_feedback);
 
-			ym2203_control_port_0_w(space, 0, 0xa4 + channel);	// F-number
-			ym2203_write_port_0_w(space, 0, fm2->f_number >> 8);
+			ym2203_control_port_w(NMK004_state.ymdevice, 0, 0xa4 + channel);	// F-number
+			ym2203_write_port_w(NMK004_state.ymdevice, 0, fm2->f_number >> 8);
 
-			ym2203_control_port_0_w(space, 0, 0xa0 + channel);	// F-number
-			ym2203_write_port_0_w(space, 0, fm2->f_number & 0xff);
+			ym2203_control_port_w(NMK004_state.ymdevice, 0, 0xa0 + channel);	// F-number
+			ym2203_write_port_w(NMK004_state.ymdevice, 0, fm2->f_number & 0xff);
 		}
 
 
@@ -654,8 +646,8 @@ static void fm_voices_update(const address_space *space )
 		{
 			fm1->flags &= ~FM_FLAG_MUST_SEND_KEYON;
 
-			ym2203_control_port_0_w(space, 0, 0x28);	// keyon/off
-			ym2203_write_port_0_w(space, 0, fm1->slot | channel);
+			ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x28);	// keyon/off
+			ym2203_write_port_w(NMK004_state.ymdevice, 0, fm1->slot | channel);
 		}
 
 		if (fm2->flags & FM_FLAG_MUST_SEND_KEYON)
@@ -664,8 +656,8 @@ static void fm_voices_update(const address_space *space )
 
 			if (!(fm1->flags & FM_FLAG_ACTIVE))
 			{
-				ym2203_control_port_0_w(space, 0, 0x28);	// keyon/off
-				ym2203_write_port_0_w(space, 0, fm2->slot | channel);
+				ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x28);	// keyon/off
+				ym2203_write_port_w(NMK004_state.ymdevice, 0, fm2->slot | channel);
 			}
 		}
 	}
@@ -679,7 +671,7 @@ static void fm_voices_update(const address_space *space )
 
 *****************************/
 
-static void psg_update(const address_space *space, int channel)
+static void psg_update(int channel)
 {
 	struct psg_control *psg = &NMK004_state.psg_control[channel];
 
@@ -703,11 +695,11 @@ static void psg_update(const address_space *space, int channel)
 			psg->flags &= ~PSG_FLAG_NOISE_NOT_ENABLED;
 
 			// enable noise, disable tone on this channel
-			ym2203_control_port_0_w(space, 0, 0x07);
-			enable = ym2203_read_port_0_r(space, 0);
+			ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x07);
+			enable = ym2203_read_port_r(NMK004_state.ymdevice, 0);
 			enable |=  (0x01 << channel);	// disable tone
 			enable &= ~(0x08 << channel);	// enable noise
-			ym2203_write_port_0_w(space, 0, enable);
+			ym2203_write_port_w(NMK004_state.ymdevice, 0, enable);
 		}
 
 
@@ -741,11 +733,11 @@ static void psg_update(const address_space *space, int channel)
 							psg->flags &= ~PSG_FLAG_NOISE_NOT_ENABLED;
 
 							// enable noise, disable tone on this channel
-							ym2203_control_port_0_w(space, 0, 0x07);
-							enable = ym2203_read_port_0_r(space, 0);
+							ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x07);
+							enable = ym2203_read_port_r(NMK004_state.ymdevice, 0);
 							enable |=  (0x01 << channel);	// disable tone
 							enable &= ~(0x08 << channel);	// enable noise
-							ym2203_write_port_0_w(space, 0, enable);
+							ym2203_write_port_w(NMK004_state.ymdevice, 0, enable);
 							break;
 
 						case 0xf2:	// set volume shape
@@ -790,8 +782,8 @@ static void psg_update(const address_space *space, int channel)
 							psg->volume_shape = 0;
 
 							// mute channel
-							ym2203_control_port_0_w(space, 0, 8 + channel);
-							ym2203_write_port_0_w(space, 0, 0);
+							ym2203_control_port_w(NMK004_state.ymdevice, 0, 8 + channel);
+							ym2203_write_port_w(NMK004_state.ymdevice, 0, 0);
 							return;
 					}
 				}
@@ -831,10 +823,10 @@ static void psg_update(const address_space *space, int channel)
 
 					period >>= octave;
 
-					ym2203_control_port_0_w(space, 0, 2 * channel + 1);
-					ym2203_write_port_0_w(space, 0, (period & 0x0f00) >> 8);
-					ym2203_control_port_0_w(space, 0, 2 * channel + 0);
-					ym2203_write_port_0_w(space, 0, (period & 0x00ff));
+					ym2203_control_port_w(NMK004_state.ymdevice, 0, 2 * channel + 1);
+					ym2203_write_port_w(NMK004_state.ymdevice, 0, (period & 0x0f00) >> 8);
+					ym2203_control_port_w(NMK004_state.ymdevice, 0, 2 * channel + 0);
+					ym2203_write_port_w(NMK004_state.ymdevice, 0, (period & 0x00ff));
 
 					psg->note_period_hi_bits = (period & 0x0f00) >> 8;
 				}
@@ -847,15 +839,15 @@ static void psg_update(const address_space *space, int channel)
 						psg->flags |= PSG_FLAG_NOISE_NOT_ENABLED;
 
 						// disable noise, enable tone on this channel
-						ym2203_control_port_0_w(space, 0, 0x07);
-						enable = ym2203_read_port_0_r(space, 0);
+						ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x07);
+						enable = ym2203_read_port_r(NMK004_state.ymdevice, 0);
 						enable &= ~(0x01 << channel);	// enable tone
 						enable |=  (0x08 << channel);	// disable noise
-						ym2203_write_port_0_w(space, 0, enable);
+						ym2203_write_port_w(NMK004_state.ymdevice, 0, enable);
 					}
 
-					ym2203_control_port_0_w(space, 0, 0x06);	// noise period
-					ym2203_write_port_0_w(space, 0, psg->note);
+					ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x06);	// noise period
+					ym2203_write_port_w(NMK004_state.ymdevice, 0, psg->note);
 					psg->note_period_hi_bits = psg->note;
 				}
 			}
@@ -880,8 +872,8 @@ static void psg_update(const address_space *space, int channel)
 				volume = 0;
 
 			// set volume
-			ym2203_control_port_0_w(space, 0, 8 + channel);
-			ym2203_write_port_0_w(space, 0, volume & 0x0f);
+			ym2203_control_port_w(NMK004_state.ymdevice, 0, 8 + channel);
+			ym2203_write_port_w(NMK004_state.ymdevice, 0, volume & 0x0f);
 		}
 	}
 }
@@ -894,7 +886,7 @@ static void psg_update(const address_space *space, int channel)
 
 *****************************/
 
-static void get_command(const address_space *space)
+static void get_command(void)
 {
 	static const UINT8 from_main[] =
 	{
@@ -931,7 +923,7 @@ static void get_command(const address_space *space)
 
 		if ((cmd_table & 0xff00) == 0)
 		{
-			oki_play_sample(space, cmd_table);
+			oki_play_sample(cmd_table);
 		}
 		else
 		{
@@ -979,39 +971,38 @@ static void get_command(const address_space *space)
 
 
 
-static void update_music(const address_space *space)
+static void update_music(void)
 {
 	int channel;
 
 	for (channel = 0; channel < FM_CHANNELS; channel++)
-		fm_update(space, channel);
-	fm_voices_update(space);
+		fm_update(channel);
+	fm_voices_update();
 
 	for (channel = 0; channel < PSG_CHANNELS; channel++)
-		psg_update(space, channel);
+		psg_update(channel);
 
 	for (channel = 0; channel < EFFECTS_CHANNELS; channel++)
-		effects_update(space, channel);
+		effects_update(channel);
 }
 
 
 
-void NMK004_irq(running_machine *machine, int irq)
+void NMK004_irq(const device_config *device, int irq)
 {
 	if (irq)
 	{
-		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-		int status = ym2203_status_port_0_r(space,0);
+		int status = ym2203_status_port_r(device,0);
 
 		if (status & 1)	// timer A expired
 		{
-			oki_update_state(space);
-			get_command(space);
-			update_music(space);
+			oki_update_state();
+			get_command();
+			update_music();
 
 			// restart timer
-			ym2203_control_port_0_w(space, 0, 0x27);
-			ym2203_write_port_0_w(space, 0, 0x15);
+			ym2203_control_port_w(device, 0, 0x27);
+			ym2203_write_port_w(device, 0, 0x15);
 		}
 	}
 }
@@ -1019,7 +1010,6 @@ void NMK004_irq(running_machine *machine, int irq)
 
 static TIMER_CALLBACK( real_nmk004_init )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	static const UINT8 ym2203_init[] =
 	{
 		0x07,0x38,0x08,0x00,0x09,0x00,0x0A,0x00,0x24,0xB3,0x25,0x00,0x26,0xF9,0x27,0x15,
@@ -1032,18 +1022,18 @@ static TIMER_CALLBACK( real_nmk004_init )
 
 	NMK004_state.rom = memory_region(machine, "audio");
 
-	ym2203_control_port_0_w(space, 0, 0x2f);
+	ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x2f);
 
 	i = 0;
 	while (ym2203_init[i] != 0xff)
 	{
-		ym2203_control_port_0_w(space, 0, ym2203_init[i++]);
-		ym2203_write_port_0_w(space, 0, ym2203_init[i++]);
+		ym2203_control_port_w(NMK004_state.ymdevice, 0, ym2203_init[i++]);
+		ym2203_write_port_w(NMK004_state.ymdevice, 0, ym2203_init[i++]);
 	}
 
 	NMK004_state.oki_playing = 0;
 
-	oki_play_sample(space, 0);
+	oki_play_sample(0);
 
 	NMK004_state.protection_check = 0;
 }
@@ -1052,6 +1042,11 @@ void NMK004_init(running_machine *machine)
 {
 	/* we have to do this via a timer because we get called before the sound reset */
 	timer_call_after_resynch(machine, NULL, 0, real_nmk004_init);
+	
+	NMK004_state.machine = machine;
+	NMK004_state.ymdevice = devtag_get_device(machine, SOUND, "ym");
+	NMK004_state.oki1device = devtag_get_device(machine, SOUND, "oki1");
+	NMK004_state.oki2device = devtag_get_device(machine, SOUND, "oki2");
 }
 
 
@@ -1059,18 +1054,18 @@ WRITE16_HANDLER( NMK004_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-logerror("%06x: NMK004_w %02x\n",cpu_get_pc(space->cpu),data);
+//logerror("%06x: NMK004_w %02x\n",cpu_get_pc(space->cpu),data);
 		NMK004_state.from_main = data & 0xff;
 	}
 }
 
 READ16_HANDLER( NMK004_r )
 {
-static int last;
+//static int last;
 	int res = NMK004_state.to_main;
 
-if (res != last) logerror("%06x: NMK004_r %02x\n",cpu_get_pc(space->cpu),res);
-last = res;
+//if (res != last) logerror("%06x: NMK004_r %02x\n",cpu_get_pc(space->cpu),res);
+//last = res;
 
 	return res;
 }

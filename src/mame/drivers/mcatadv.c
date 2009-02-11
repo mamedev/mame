@@ -238,18 +238,14 @@ static ADDRESS_MAP_START( mcatadv_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM		)	// ROM
 	AM_RANGE(0x4000, 0xbfff) AM_READ(SMH_BANK1		)	// ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM		)	// RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r		)
-	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r		)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcatadv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM		)	// ROM
 	AM_RANGE(0x4000, 0xbfff) AM_WRITE(SMH_ROM		)	// ROM
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM		)	// RAM
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
 ADDRESS_MAP_END
 
@@ -273,12 +269,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nost_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2610_control_port_0_a_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ym2610_control_port_0_b_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ym2610_data_port_0_b_w)
-	AM_RANGE(0x04, 0x05) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0x06, 0x07) AM_READ(ym2610_status_port_0_b_r)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE(SOUND, "ym", ym2610_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREAD(SOUND, "ym", ym2610_r)
 	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
@@ -460,9 +452,9 @@ GFXDECODE_END
 
 
 /* Stolen from Psikyo.c */
-static void sound_irq( running_machine *machine, int irq )
+static void sound_irq( const device_config *device, int irq )
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym2610_interface mcatadv_ym2610_interface =
 {

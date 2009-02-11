@@ -64,48 +64,40 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd801, 0xd801) AM_WRITE(kncljoe_control_w)
-	AM_RANGE(0xd802, 0xd802) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0xd803, 0xd803) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
+	AM_RANGE(0xd803, 0xd803) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
 	AM_RANGE(0xd807, 0xd807) AM_READ(SMH_NOP)		/* unknown read */
 	AM_RANGE(0xd817, 0xd817) AM_READ(SMH_NOP)		/* unknown read */
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( m6803_port1_w )
+static WRITE8_DEVICE_HANDLER( m6803_port1_w )
 {
 	port1 = data;
 }
 
-static WRITE8_HANDLER( m6803_port2_w )
+static WRITE8_DEVICE_HANDLER( m6803_port2_w )
 {
 
 	/* write latch */
 	if ((port2 & 0x01) && !(data & 0x01))
 	{
 		/* control or data port? */
-		if (port2 & 0x04)
-		{
-			if (port2 & 0x08)
-				ay8910_control_port_0_w(space, 0, port1);
-		}
-		else
-		{
-			if (port2 & 0x08)
-				ay8910_write_port_0_w(space, 0, port1);
-		}
+		if (port2 & 0x08)
+			ay8910_data_address_w(device, port2 >> 2, port1);
 	}
 	port2 = data;
 }
 
-static READ8_HANDLER( m6803_port1_r )
+static READ8_DEVICE_HANDLER( m6803_port1_r )
 {
 	if (port2 & 0x08)
-		return ay8910_read_port_0_r(space, 0);
+		return ay8910_r(device, 0);
 	return 0xff;
 }
 
-static READ8_HANDLER( m6803_port2_r )
+static READ8_DEVICE_HANDLER( m6803_port2_r )
 {
 	return 0;
 }
@@ -115,7 +107,7 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER(unused_w)
+static WRITE8_DEVICE_HANDLER(unused_w)
 {
 	//unused - no MSM on the pcb
 }
@@ -128,8 +120,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_READWRITE(m6803_port1_r, m6803_port1_w)
-	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
+	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_DEVREADWRITE(SOUND, "ay", m6803_port1_r, m6803_port1_w)
+	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_DEVREADWRITE(SOUND, "ay", m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
 
 
@@ -249,10 +241,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r,
-	NULL,
-	NULL,
-	unused_w
+	DEVCB_MEMORY_HANDLER("sound", PROGRAM, soundlatch_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(unused_w)
 };
 
 static INTERRUPT_GEN (sound_nmi)

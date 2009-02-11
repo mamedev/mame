@@ -30,16 +30,16 @@ extern UINT8 *asteroid_ram1, *asteroid_ram2;
 DISCRETE_SOUND_EXTERN( asteroid );
 DISCRETE_SOUND_EXTERN( astdelux );
 
-WRITE8_HANDLER( asteroid_explode_w );
-WRITE8_HANDLER( asteroid_thump_w );
-WRITE8_HANDLER( asteroid_sounds_w );
-WRITE8_HANDLER( asteroid_noise_reset_w );
-WRITE8_HANDLER( astdelux_sounds_w );
+WRITE8_DEVICE_HANDLER( asteroid_explode_w );
+WRITE8_DEVICE_HANDLER( asteroid_thump_w );
+WRITE8_DEVICE_HANDLER( asteroid_sounds_w );
+WRITE8_DEVICE_HANDLER( asteroid_noise_reset_w );
+WRITE8_DEVICE_HANDLER( astdelux_sounds_w );
 
 
 /*----------- defined in audio/llander.c -----------*/
 
 DISCRETE_SOUND_EXTERN( llander );
 
-WRITE8_HANDLER( llander_snd_reset_w );
-WRITE8_HANDLER( llander_sounds_w );
+WRITE8_DEVICE_HANDLER( llander_snd_reset_w );
+WRITE8_DEVICE_HANDLER( llander_sounds_w );

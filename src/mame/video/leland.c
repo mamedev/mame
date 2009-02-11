@@ -150,9 +150,9 @@ WRITE8_HANDLER( leland_scroll_w )
 }
 
 
-WRITE8_HANDLER( leland_gfx_port_w )
+WRITE8_DEVICE_HANDLER( leland_gfx_port_w )
 {
-	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	video_screen_update_partial(device->machine->primary_screen, video_screen_get_vpos(device->machine->primary_screen));
 	gfxbank = data;
 }
 

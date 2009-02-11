@@ -81,7 +81,6 @@
 #include "cpu/m6809/m6809.h"
 #include "gridlee.h"
 #include "balsente.h"
-#include "sound/custom.h"
 #include "sound/samples.h"
 
 
@@ -417,12 +416,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const custom_sound_interface custom_interface =
-{
-	gridlee_sh_start
-};
-
-
 static const char *const sample_names[] =
 {
 	"*gridlee",
@@ -469,8 +462,7 @@ static MACHINE_DRIVER_START( gridlee )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("gridlee", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ADD("gridlee", GRIDLEE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)

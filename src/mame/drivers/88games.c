@@ -107,17 +107,21 @@ static READ8_HANDLER( cheat2_r )
 	return res;
 }
 
-static int speech_chip;
+static char speech_chip[8];
 static WRITE8_HANDLER( speech_control_w )
 {
-	speech_chip = ( data & 4 ) ? 1 : 0;
-	upd7759_reset_w( speech_chip, data & 2 );
-	upd7759_start_w( speech_chip, data & 1 );
+	const device_config *upd;
+	
+	strcpy(speech_chip, ( data & 4 ) ? "upd2" : "upd1");
+
+	upd = devtag_get_device(space->machine, SOUND, speech_chip);
+	upd7759_reset_w( upd, data & 2 );
+	upd7759_start_w( upd, data & 1 );
 }
 
 static WRITE8_HANDLER( speech_msg_w )
 {
-	upd7759_port_w( speech_chip, data );
+	upd7759_port_w( devtag_get_device(space->machine, SOUND, speech_chip), 0, data );
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -147,8 +151,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(speech_msg_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(speech_control_w)
 ADDRESS_MAP_END
 
@@ -521,7 +524,7 @@ static MACHINE_START( 88games )
 {
     state_save_register_global(machine, videobank);
     state_save_register_global(machine, zoomreadroms);
-    state_save_register_global(machine, speech_chip);
+    state_save_register_global_array(machine, speech_chip);
 }
 
 static DRIVER_INIT( 88games )

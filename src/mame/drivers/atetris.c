@@ -209,8 +209,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE(&paletteram)
 	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_READWRITE(pokey1_r, pokey1_w)
-	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_READWRITE(pokey2_r, pokey2_w)
+	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITE(nvram_enable_w)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(irq_ack_w)
@@ -226,9 +226,9 @@ static ADDRESS_MAP_START( atetrsb2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE(&paletteram)
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x2802, 0x2802) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0x2804, 0x2804) AM_WRITE(sn76496_1_w)
-	AM_RANGE(0x2806, 0x2806) AM_WRITE(sn76496_2_w)
+	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
+	AM_RANGE(0x2804, 0x2804) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
+	AM_RANGE(0x2806, 0x2806) AM_DEVWRITE(SOUND, "sn3", sn76496_w)
 	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("IN0")
 	AM_RANGE(0x2818, 0x2818) AM_READ_PORT("IN1")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(watchdog_reset_w)
@@ -320,15 +320,15 @@ GFXDECODE_END
 
 static const pokey_interface pokey_interface_1 =
 {
-	{ 0 },
-	input_port_0_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("IN0")
 };
 
 
 static const pokey_interface pokey_interface_2 =
 {
-	{ 0 },
-	input_port_1_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("IN1")
 };
 
 

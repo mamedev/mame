@@ -77,7 +77,7 @@ static void toki_adpcm_int (const device_config *device)
 {
 	static int toggle=0;
 
-	msm5205_data_w (0,msm5205next);
+	msm5205_data_w (device,msm5205next);
 	msm5205next>>=4;
 
 	toggle ^= 1;
@@ -85,17 +85,17 @@ static void toki_adpcm_int (const device_config *device)
 		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( toki_adpcm_control_w )
+static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "audio");
+	UINT8 *RAM = memory_region(device->machine, "audio");
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(device->machine, 1,&RAM[bankaddress]);
 
-	msm5205_reset_w(0,data & 0x08);
+	msm5205_reset_w(device,data & 0x08);
 }
 
 static WRITE8_HANDLER( toki_adpcm_data_w )
@@ -150,12 +150,9 @@ static ADDRESS_MAP_START( tokib_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(toki_adpcm_control_w)	/* MSM5205 + ROM bank */
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "msm", toki_adpcm_control_w)	/* MSM5205 + ROM bank */
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
-	AM_RANGE(0xec00, 0xec00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0xec01, 0xec01) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0xec08, 0xec08) AM_WRITE(ym3812_control_port_0_w)	/* mirror address, it seems */
-	AM_RANGE(0xec09, 0xec09) AM_WRITE(ym3812_write_port_0_w)	/* mirror address, it seems */
+	AM_RANGE(0xec00, 0xec01) AM_MIRROR(0x0008) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

@@ -155,10 +155,10 @@ static ADDRESS_MAP_START( bking_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM //only bking3
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4400, 0x4400) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x4401, 0x4401) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x4402, 0x4402) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x4403, 0x4403) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x4400, 0x4401) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x4401, 0x4401) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x4402, 0x4403) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x4403, 0x4403) AM_DEVREAD(SOUND, "ay2", ay8910_r)
 	AM_RANGE(0x4800, 0x4800) AM_READ(soundlatch_r)
 	AM_RANGE(0x4802, 0x4802) AM_READWRITE(bking_sndnmi_disable_r, bking_sndnmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM   /* Space for diagnostic ROM */
@@ -412,7 +412,7 @@ static GFXDECODE_START( bking )
 GFXDECODE_END
 
 
-static WRITE8_HANDLER( portb_w )
+static WRITE8_DEVICE_HANDLER( portb_w )
 {
 	/* don't know what this is... could be a filter */
 	if (data != 0x00) logerror("portB = %02x\n",data);
@@ -422,10 +422,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	dac_0_signed_data_w,
-	portb_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SOUND, "dac", dac_signed_w),
+	DEVCB_HANDLER(portb_w)
 };
 
 static MACHINE_DRIVER_START( bking )

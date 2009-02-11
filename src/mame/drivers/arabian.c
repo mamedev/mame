@@ -89,7 +89,7 @@ static UINT8 *custom_cpu_ram;
  *
  *************************************/
 
-static WRITE8_HANDLER( ay8910_porta_w )
+static WRITE8_DEVICE_HANDLER( ay8910_porta_w )
 {
 	/*
         bit 7 = ENA
@@ -102,7 +102,7 @@ static WRITE8_HANDLER( ay8910_porta_w )
 }
 
 
-static WRITE8_HANDLER( ay8910_portb_w )
+static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 {
 	/*
         bit 5 = /IREQ to custom CPU
@@ -230,8 +230,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -347,10 +347,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	ay8910_porta_w,
-	ay8910_portb_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ay8910_porta_w),
+	DEVCB_HANDLER(ay8910_portb_w)
 };
 
 

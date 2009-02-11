@@ -2444,7 +2444,6 @@ void * ym2203_init(void *param, const device_config *device, int clock, int rate
 	F2203->OPN.ST.timer_handler = timer_handler;
 	F2203->OPN.ST.IRQ_Handler   = IRQHandler;
 	F2203->OPN.ST.SSG           = ssg;
-	ym2203_reset_chip(F2203);
 
 #ifdef __STATE_H__
 	YM2203_save_state(F2203, device);
@@ -3688,8 +3687,6 @@ void * ym2608_init(void *param, const device_config *device, int clock, int rate
 	F2608->pcmbuf   = YM2608_ADPCM_ROM;
 	F2608->pcm_size = 0x2000;
 
-	ym2608_reset_chip(F2608);
-
 	Init_ADPCMATable();
 
 #ifdef __STATE_H__
@@ -4368,8 +4365,6 @@ void *ym2610_init(void *param, const device_config *device, int clock, int rate,
 	F2610->deltaT.status_change_which_chip = F2610;
 	F2610->deltaT.status_change_EOS_bit = 0x80;	/* status flag: set bit7 on End Of Sample */
 
-	ym2610_reset_chip(F2610);
-
 	Init_ADPCMATable();
 #ifdef __STATE_H__
 	YM2610_save_state(F2610, device);
@@ -4822,7 +4817,6 @@ void * ym2612_init(void *param, const device_config *device, int clock, int rate
 	/* Extend handler */
 	F2612->OPN.ST.timer_handler = timer_handler;
 	F2612->OPN.ST.IRQ_Handler   = IRQHandler;
-	ym2612_reset_chip(F2612);
 
 #ifdef __STATE_H__
 	YM2612_save_state(F2612, device);

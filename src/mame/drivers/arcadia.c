@@ -49,7 +49,6 @@
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/custom.h"
 #include "includes/amiga.h"
 #include "machine/6526cia.h"
 
@@ -254,19 +253,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static const custom_sound_interface amiga_custom_interface =
-{
-	amiga_sh_start
-};
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -318,8 +304,7 @@ static MACHINE_DRIVER_START( arcadia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("amiga", CUSTOM, 3579545)
-	MDRV_SOUND_CONFIG(amiga_custom_interface)
+	MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "right", 0.50)

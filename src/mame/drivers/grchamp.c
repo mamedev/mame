@@ -243,6 +243,7 @@ static WRITE8_HANDLER( led_board_w )
 
 static WRITE8_HANDLER( cpu1_outputs_w )
 {
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
 	grchamp_state *state = space->machine->driver_data;
 	UINT8 diff = data ^ state->cpu1_out[offset];
 	state->cpu1_out[offset] = data;
@@ -306,18 +307,18 @@ static WRITE8_HANDLER( cpu1_outputs_w )
 			/* bit 2-4: ATTACK UP 1-3 */
 			/* bit 5-6: SIFT 1-2 */
 			/* bit 7:   ENGINE CS */
-			discrete_sound_w(space, GRCHAMP_ENGINE_CS_EN, data & 0x80);
-			discrete_sound_w(space, GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
-			discrete_sound_w(space, GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
-			discrete_sound_w(space, GRCHAMP_IDLING_EN, data & 0x02);
-			discrete_sound_w(space, GRCHAMP_FOG_EN, data & 0x01);
+			discrete_sound_w(discrete, GRCHAMP_ENGINE_CS_EN, data & 0x80);
+			discrete_sound_w(discrete, GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
+			discrete_sound_w(discrete, GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
+			discrete_sound_w(discrete, GRCHAMP_IDLING_EN, data & 0x02);
+			discrete_sound_w(discrete, GRCHAMP_FOG_EN, data & 0x01);
 			break;
 
 		case 0x0d: /* OUTD */
 			/* bit 0-3: ATTACK SPEED 1-4 */
 			/* bit 4-7: PLAYER SPEED 1-4 */
-			discrete_sound_w(space, GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
-			discrete_sound_w(space, GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
+			discrete_sound_w(discrete, GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
+			discrete_sound_w(discrete, GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
 			break;
 
 		default:
@@ -420,22 +421,22 @@ static READ8_HANDLER( main_to_sub_comm_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( grchamp_portA_0_w )
+static WRITE8_DEVICE_HANDLER( grchamp_portA_0_w )
 {
-	discrete_sound_w(space, GRCHAMP_A_DATA, data);
+	discrete_sound_w(device, GRCHAMP_A_DATA, data);
 }
 
-static WRITE8_HANDLER( grchamp_portB_0_w )
+static WRITE8_DEVICE_HANDLER( grchamp_portB_0_w )
 {
-	discrete_sound_w(space, GRCHAMP_B_DATA, 255-data);
+	discrete_sound_w(device, GRCHAMP_B_DATA, 255-data);
 }
 
-static WRITE8_HANDLER( grchamp_portA_2_w )
+static WRITE8_DEVICE_HANDLER( grchamp_portA_2_w )
 {
 	/* A0/A1 modify the output of AY8910 #2 */
 	/* A7 contributes to the discrete logic hanging off of AY8910 #0 */
 }
-static WRITE8_HANDLER( grchamp_portB_2_w )
+static WRITE8_DEVICE_HANDLER( grchamp_portB_2_w )
 {
 	/* B0 connects elsewhere */
 }
@@ -452,20 +453,20 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	grchamp_portA_0_w,
-	grchamp_portB_0_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SOUND, "discrete", grchamp_portA_0_w),
+	DEVCB_DEVICE_HANDLER(SOUND, "discrete", grchamp_portB_0_w)
 };
 
 static const ay8910_interface ay8910_interface_3 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	grchamp_portA_2_w,
-	grchamp_portB_2_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(grchamp_portA_2_w),
+	DEVCB_HANDLER(grchamp_portB_2_w)
 };
 
 
@@ -564,12 +565,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x07f8) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x4801, 0x4801) AM_MIRROR(0x07f8) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x4802, 0x4802) AM_MIRROR(0x07f8) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x4803, 0x4803) AM_MIRROR(0x07f8) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0x4804, 0x4804) AM_MIRROR(0x07fa) AM_WRITE(ay8910_control_port_2_w)
-	AM_RANGE(0x4805, 0x4805) AM_MIRROR(0x07fa) AM_READWRITE(ay8910_read_port_2_r, ay8910_write_port_2_w)
+	AM_RANGE(0x4800, 0x4801) AM_MIRROR(0x07f8) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x4801, 0x4801) AM_MIRROR(0x07f8) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x4802, 0x4803) AM_MIRROR(0x07f8) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x4803, 0x4803) AM_MIRROR(0x07f8) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x4804, 0x4805) AM_MIRROR(0x07fa) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
+	AM_RANGE(0x4805, 0x4805) AM_MIRROR(0x07fa) AM_DEVREAD(SOUND, "ay3", ay8910_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

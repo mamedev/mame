@@ -65,16 +65,11 @@ static WRITE8_HANDLER( sound_data_w )
 	soundlatch = data;
 }
 
-static WRITE8_HANDLER( sound_control_w )
+static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 	static int last;
 	if ((last & 0x04) == 0x04 && (data & 0x4) == 0x00)
-	{
-		if (last & 0x01)
-			ay8910_control_port_0_w(space,0,soundlatch);
-		else
-			ay8910_write_port_0_w(space,0,soundlatch);
-	}
+		ay8910_data_address_w(device, last, soundlatch);
 	last=data;
 }
 
@@ -90,7 +85,7 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x23, 0x23) AM_WRITE(sound_data_w)
-	AM_RANGE(0x33, 0x33) AM_WRITE(sound_control_w)
+	AM_RANGE(0x33, 0x33) AM_DEVWRITE(SOUND, "ay", sound_control_w)
 ADDRESS_MAP_END
 
 

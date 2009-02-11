@@ -68,13 +68,14 @@ MACHINE_START( astrof_audio )
 
 WRITE8_HANDLER( astrof_audio_1_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	if (astrof_death_playing)
-		astrof_death_playing = sample_playing(CHANNEL_EXPLOSION);
+		astrof_death_playing = sample_playing(samples, CHANNEL_EXPLOSION);
 
 	if (astrof_bosskill_playing)
-		astrof_bosskill_playing = sample_playing(CHANNEL_EXPLOSION);
+		astrof_bosskill_playing = sample_playing(samples, CHANNEL_EXPLOSION);
 
 	/* D2 - explosion */
 	if (rising_bits & 0x04)
@@ -88,19 +89,19 @@ WRITE8_HANDLER( astrof_audio_1_w )
 	if ((data & 0x08) && (~port_1_last & 0x08))
 	{
 		int sample = SAMPLE_WAVE + (data & 3);
-		sample_start(CHANNEL_WAVE, sample, 1);
+		sample_start(samples, CHANNEL_WAVE, sample, 1);
 	}
 
 	if ((~data & 0x08) && (port_1_last & 0x08))
-		sample_stop(CHANNEL_WAVE);
+		sample_stop(samples, CHANNEL_WAVE);
 
 	/* D4 - boss laser */
 	if ((rising_bits & 0x10) && !astrof_bosskill_playing)
-		sample_start(CHANNEL_BOSSFIRE, SAMPLE_BOSSFIRE, 0);
+		sample_start(samples, CHANNEL_BOSSFIRE, SAMPLE_BOSSFIRE, 0);
 
 	/* D5 - fire */
 	if ((rising_bits & 0x20) && !astrof_bosskill_playing)
-		sample_start(CHANNEL_FIRE, SAMPLE_FIRE, 0);
+		sample_start(samples, CHANNEL_FIRE, SAMPLE_FIRE, 0);
 
 	/* D6 - don't know. Probably something to do with the explosion sounds */
 
@@ -113,6 +114,7 @@ WRITE8_HANDLER( astrof_audio_1_w )
 
 WRITE8_HANDLER( astrof_audio_2_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	/* D0-D2 - explosion select (triggered by D2 of the other port */
@@ -126,20 +128,20 @@ logerror("Explosion: %x\n", data);
 		{
 			if (!astrof_bosskill_playing)
 			{
-				sample_start(CHANNEL_EXPLOSION, SAMPLE_BOSSKILL, 0);
+				sample_start(samples, CHANNEL_EXPLOSION, SAMPLE_BOSSKILL, 0);
 
 				astrof_bosskill_playing = 1;
 			}
 		}
 		else if (data & 0x02)
-			sample_start(CHANNEL_EXPLOSION, SAMPLE_BOSSHIT, 0);
+			sample_start(samples, CHANNEL_EXPLOSION, SAMPLE_BOSSHIT, 0);
 		else if (data & 0x01)
-			sample_start(CHANNEL_EXPLOSION, SAMPLE_EKILLED, 0);
+			sample_start(samples, CHANNEL_EXPLOSION, SAMPLE_EKILLED, 0);
 		else
 		{
 			if (!astrof_death_playing)
 			{
-				sample_start(CHANNEL_EXPLOSION, SAMPLE_DEATH, 0);
+				sample_start(samples, CHANNEL_EXPLOSION, SAMPLE_DEATH, 0);
 
 				astrof_death_playing = 1;
 			}
@@ -150,7 +152,7 @@ logerror("Explosion: %x\n", data);
 
 	/* D3 - low fuel warning */
 	if (rising_bits & 0x08)
-		sample_start(CHANNEL_FUEL, SAMPLE_FUEL, 0);
+		sample_start(samples, CHANNEL_FUEL, SAMPLE_FUEL, 0);
 
 	port_2_last = data;
 }
@@ -217,6 +219,8 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( tomahawk_audio_w )
 {
+	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+
 	/* D0 - sonar */
 
 	/* D1 - UFO explosion */
@@ -228,7 +232,7 @@ WRITE8_HANDLER( tomahawk_audio_w )
 	/* D4 - UFO */
 
 	/* D5 - UFO under water */
-	sn76477_enable_w(0, (~data >> 5) & 0x01);
+	sn76477_enable_w(sn, (~data >> 5) & 0x01);
 
 	/* D6 - explosion */
 

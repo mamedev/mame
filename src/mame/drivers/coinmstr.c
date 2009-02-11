@@ -197,8 +197,8 @@ static ADDRESS_MAP_START( quizmstr_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(question_r)
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x41, 0x41) AM_DEVREAD(SOUND, "ay", ay8910_r)
 	AM_RANGE(0x48, 0x4b) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x50, 0x53) AM_READNOP
 	AM_RANGE(0x50, 0x53) AM_WRITENOP
@@ -215,8 +215,8 @@ static ADDRESS_MAP_START( trailblz_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE(H46505, "crtc", mc6845_address_w)
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE(H46505, "crtc", mc6845_register_w)
-	AM_RANGE(0x48, 0x48) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x49, 0x49) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x48, 0x49) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x49, 0x49) AM_DEVREAD(SOUND, "ay", ay8910_r)
 	AM_RANGE(0x50, 0x53) AM_READWRITE(pia_0_r, pia_0_w) //?
 	AM_RANGE(0x60, 0x63) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x70, 0x73) AM_READWRITE(pia_2_r, pia_2_w)
@@ -239,8 +239,8 @@ static ADDRESS_MAP_START( supnudg2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x68, 0x69) AM_READNOP
 	AM_RANGE(0x68, 0x6b) AM_WRITENOP
 	AM_RANGE(0x6b, 0x6b) AM_READNOP
-	AM_RANGE(0x78, 0x78) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x79, 0x79) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x78, 0x79) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x79, 0x79) AM_DEVREAD(SOUND, "ay", ay8910_r)
 	AM_RANGE(0xc0, 0xc1) AM_READNOP
 	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
@@ -249,8 +249,8 @@ static ADDRESS_MAP_START( pokeroul_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE(H46505, "crtc", mc6845_address_w)
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE(H46505, "crtc", mc6845_register_w)
-	AM_RANGE(0x48, 0x48) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x49, 0x49) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x48, 0x49) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x49, 0x49) AM_DEVREAD(SOUND, "ay", ay8910_r)
 	AM_RANGE(0x58, 0x5b) AM_READWRITE(pia_0_r, pia_0_w) /* confirmed */
 	AM_RANGE(0x68, 0x6b) AM_READWRITE(pia_1_r, pia_1_w) /* confirmed */
 	AM_RANGE(0x78, 0x7b) AM_READWRITE(pia_2_r, pia_2_w) /* confirmed */
@@ -809,10 +809,10 @@ static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_4_r,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const mc6845_interface h46505_intf =

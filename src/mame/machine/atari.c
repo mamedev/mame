@@ -39,7 +39,7 @@ static void a600xl_mmu(running_machine *machine, UINT8 new_mmu);
 
 static void pokey_reset(running_machine *machine);
 
-void atari_interrupt_cb(running_machine *machine, int mask)
+void atari_interrupt_cb(const device_config *device, int mask)
 {
 
 	if (VERBOSE_POKEY)
@@ -68,7 +68,7 @@ void atari_interrupt_cb(running_machine *machine, int mask)
 			logerror("atari interrupt_cb TIMR1\n");
 	}
 
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, HOLD_LINE);
 }
 
 /**************************************************************
@@ -517,6 +517,7 @@ static const UINT8 keys[64][4] = {
 
 void a800_handle_keyboard(running_machine *machine)
 {
+	const device_config *pokey = devtag_get_device(machine, SOUND, "pokey");
 	static int atari_last = 0xff;
 	int i, modifiers, atari_code;
 	char tag[64];
@@ -544,16 +545,16 @@ void a800_handle_keyboard(running_machine *machine)
 				atari_last = atari_code;
 				if( (atari_code & 0x3f) == AKEY_BREAK )
 				{
-					pokey1_break_w(atari_code & 0x40);
+					pokey_break_w(pokey, atari_code & 0x40);
 					return;
 				}
-				pokey1_kbcode_w(atari_code, 1);
+				pokey_kbcode_w(pokey, atari_code, 1);
 				return;
 			}
 		}
 	}
 	/* remove key pressed status bit from skstat */
-	pokey1_kbcode_w(AKEY_NONE, 0);
+	pokey_kbcode_w(pokey, AKEY_NONE, 0);
 	atari_last = AKEY_NONE;
 }
 
@@ -562,6 +563,7 @@ void a800_handle_keyboard(running_machine *machine)
 /* absolutely no clue what to do here :((( */
 void a5200_handle_keypads(running_machine *machine)
 {
+	const device_config *pokey = devtag_get_device(machine, SOUND, "pokey");
 	int i, modifiers;
 	static int atari_last = 0xff;
 
@@ -585,10 +587,10 @@ void a5200_handle_keypads(running_machine *machine)
 			atari_last = i;
 			if( i == 0 )
 			{
-				pokey1_break_w(i & 0x40);
+				pokey_break_w(pokey, i & 0x40);
 				return;
 			}
-			pokey1_kbcode_w((i << 1) | 0x21, 1);
+			pokey_kbcode_w(pokey, (i << 1) | 0x21, 1);
 			return;
 		}
 	}
@@ -598,16 +600,16 @@ void a5200_handle_keypads(running_machine *machine)
 	{
 		if (atari_last == 0xFE)
 			return;
-		pokey1_kbcode_w(0x61, 1);
-		//pokey1_break_w(0x40);
+		pokey_kbcode_w(pokey, 0x61, 1);
+		//pokey_break_w(pokey, 0x40);
 		atari_last = 0xFE;
 		return;
 	}
 	else if (atari_last == 0xFE)
-		pokey1_kbcode_w(0x21, 1);
+		pokey_kbcode_w(pokey, 0x21, 1);
 
 	/* remove key pressed status bit from skstat */
-	pokey1_kbcode_w(0xFF, 0);
+	pokey_kbcode_w(pokey, 0xFF, 0);
 	atari_last = 0xff;
 }
 
@@ -691,8 +693,8 @@ static void a800_setbank(running_machine *machine, int n)
 
 static void pokey_reset(running_machine *machine)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pokey1_w(space,15,0);
+	const device_config *pokey = devtag_get_device(machine, SOUND, "pokey");
+	pokey_w(pokey,15,0);
 }
 
 
@@ -716,10 +718,11 @@ static UINT8 console_read(const address_space *space)
 
 static void console_write(const address_space *space, UINT8 data)
 {
+	const device_config *dac = devtag_get_device(space->machine, SOUND, "dac");
 	if (data & 0x08)
-		dac_data_w(0, -120);
+		dac_data_w(dac, -120);
 	else
-		dac_data_w(0, +120);
+		dac_data_w(dac, +120);
 }
 
 
@@ -744,7 +747,7 @@ static void atari_machine_start(running_machine *machine, int type, const pia682
 	memset(&gtia_intf, 0, sizeof(gtia_intf));
 	if (input_port_by_tag(machine->portconfig, "console") != NULL)
 		gtia_intf.console_read = console_read;
-	if (sndti_exists(SOUND_DAC, 0))
+	if (devtag_get_device(machine, SOUND, "dac") != NULL)
 		gtia_intf.console_write = console_write;
 	gtia_init(machine, &gtia_intf);
 

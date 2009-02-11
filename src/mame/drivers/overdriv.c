@@ -215,14 +215,9 @@ static WRITE16_HANDLER( sharedram_w )
 
 
 
-static READ16_HANDLER( overdriv_sound_0_r )
+static READ8_DEVICE_HANDLER( overdriv_sound_r )
 {
-	return k053260_0_r(space,2 + offset);
-}
-
-static READ16_HANDLER( overdriv_sound_1_r )
-{
-	return k053260_1_r(space,2 + offset);
+	return k053260_r(device,2 + offset);
 }
 
 static WRITE16_HANDLER( overdriv_soundirq_w )
@@ -250,8 +245,8 @@ static ADDRESS_MAP_START( overdriv_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
-	AM_RANGE(0x1d8000, 0x1d8003) AM_READ(overdriv_sound_0_r)	/* K053260 */
-	AM_RANGE(0x1e0000, 0x1e0003) AM_READ(overdriv_sound_1_r)	/* K053260 */
+	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVREAD8(SOUND, "konami1", overdriv_sound_r, 0x00ff)	/* K053260 */
+	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVREAD8(SOUND, "konami2", overdriv_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x200000, 0x203fff) AM_READ(sharedram_r)
 	AM_RANGE(0x210000, 0x210fff) AM_READ(K051316_0_msb_r)
 	AM_RANGE(0x218000, 0x218fff) AM_READ(K051316_1_msb_r)
@@ -269,8 +264,8 @@ static ADDRESS_MAP_START( overdriv_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c001f) AM_WRITE(K051316_ctrl_0_msb_w)
 	AM_RANGE(0x1c8000, 0x1c801f) AM_WRITE(K051316_ctrl_1_msb_w)
 	AM_RANGE(0x1d0000, 0x1d001f) AM_WRITE(K053251_msb_w)
-	AM_RANGE(0x1d8000, 0x1d8003) AM_WRITE(k053260_0_lsb_w)
-	AM_RANGE(0x1e0000, 0x1e0003) AM_WRITE(k053260_1_lsb_w)
+	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVWRITE8(SOUND, "konami1", k053260_w, 0x00ff)
+	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVWRITE8(SOUND, "konami2", k053260_w, 0x00ff)
 	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(overdriv_soundirq_w)
 	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, coin counter, start lamp, other? */
 	AM_RANGE(0x1f8000, 0x1f8001) AM_WRITE(eeprom_w)
@@ -313,18 +308,17 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( overdriv_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0201, 0x0201) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0x0400, 0x042f) AM_READ(k053260_0_r)
-	AM_RANGE(0x0600, 0x062f) AM_READ(k053260_1_r)
+	AM_RANGE(0x0200, 0x0201) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0x0400, 0x042f) AM_DEVREAD(SOUND, "konami1", k053260_r)
+	AM_RANGE(0x0600, 0x062f) AM_DEVREAD(SOUND, "konami2", k053260_r)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( overdriv_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0200, 0x0200) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x0201, 0x0201) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0x0400, 0x042f) AM_WRITE(k053260_0_w)
-	AM_RANGE(0x0600, 0x062f) AM_WRITE(k053260_1_w)
+	AM_RANGE(0x0200, 0x0201) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0x0400, 0x042f) AM_DEVWRITE(SOUND, "konami1", k053260_w)
+	AM_RANGE(0x0600, 0x062f) AM_DEVWRITE(SOUND, "konami2", k053260_w)
 	AM_RANGE(0x0800, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END

@@ -109,23 +109,23 @@ static WRITE8_HANDLER( tp84_filter_w )
 	C = 0;
 	if (offset & 0x008) C +=  47000;	/*  47000pF = 0.047uF */
 	if (offset & 0x010) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(0,FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	filter_rc_set_RC(devtag_get_device(space->machine, SOUND, "filter1"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #1 (optional) */
 	C = 0;
 	if (offset & 0x020) C +=  47000;	/*  47000pF = 0.047uF */
 	if (offset & 0x040) C += 470000;	/* 470000pF = 0.47uF */
-//  filter_rc_set_RC(1,1000,2200,1000,C);
+//  filter_rc_set_RC(devtag_get_device(space->machine, SOUND, "filter2"),1000,2200,1000,C);
 
 	/* 76489 #2 */
 	C = 0;
 	if (offset & 0x080) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(1,FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	filter_rc_set_RC(devtag_get_device(space->machine, SOUND, "filter2"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #3 */
 	C = 0;
 	if (offset & 0x100) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(2,FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	filter_rc_set_RC(devtag_get_device(space->machine, SOUND, "filter3"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
 static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
@@ -196,9 +196,9 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_READ(tp84_sh_timer_r)
 	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(tp84_filter_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(sn76496_1_w)
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(sn76496_2_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
+	AM_RANGE(0xc003, 0xc003) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
+	AM_RANGE(0xc004, 0xc004) AM_DEVWRITE(SOUND, "sn3", sn76496_w)
 ADDRESS_MAP_END
 
 

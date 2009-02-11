@@ -110,7 +110,7 @@ static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 	}
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
-	if (data) sample_stop (2);
+	if (data) sample_stop (devtag_get_device(space->machine, SOUND, "samples"), 2);
 //  interrupt_enable_w (offset, !data);
 }
 
@@ -128,25 +128,32 @@ static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
 static WRITE8_HANDLER( tankbatt_sh_expl_w )
 {
 	if (tankbatt_sound_enable)
-		sample_start (1, 3, 0);
+	{
+		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+		sample_start (samples, 1, 3, 0);
+	}
 }
 
 static WRITE8_HANDLER( tankbatt_sh_engine_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	if (tankbatt_sound_enable)
 	{
 		if (data)
-			sample_start (2, 2, 1);
+			sample_start (samples, 2, 2, 1);
 		else
-			sample_start (2, 1, 1);
+			sample_start (samples, 2, 1, 1);
 	}
-	else sample_stop (2);
+	else sample_stop (samples, 2);
 }
 
 static WRITE8_HANDLER( tankbatt_sh_fire_w )
 {
 	if (tankbatt_sound_enable)
-		sample_start (0, 0, 0);
+	{
+		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+		sample_start (samples, 0, 0, 0);
+	}
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

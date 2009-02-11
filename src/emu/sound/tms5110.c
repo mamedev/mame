@@ -112,7 +112,7 @@ struct tms5110
 
 	/* external callback */
 	int (*M0_callback)(const device_config *);
-	void (*set_load_address)(int);
+	void (*set_load_address)(const device_config *, int);
 	const device_config *device;
 
 	/* these contain data describing the current and previous voice frames */
@@ -294,7 +294,7 @@ void tms5110_set_M0_callback(void *chip, int (*func)(const device_config *))
 
 ******************************************************************************************/
 
-void tms5110_set_load_address(void *chip, void (*func)(int))
+void tms5110_set_load_address(void *chip, void (*func)(const device_config *, int))
 {
 	struct tms5110 *tms = chip;
 	tms->set_load_address = func;
@@ -764,7 +764,7 @@ void tms5110_PDC_set(void *chip, int data)
 				tms->addr_bit = (tms->addr_bit + 4) % 12;
 				tms->schedule_dummy_read = TRUE;
 				if (tms->set_load_address)
-					tms->set_load_address(tms->address);
+					tms->set_load_address(tms->device, tms->address);
 			}
 			else
 			{

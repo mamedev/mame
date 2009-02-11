@@ -30,11 +30,11 @@ WRITE8_HANDLER( subs_lamp2_w );
 
 /*----------- defined in audio/subs.c -----------*/
 
-WRITE8_HANDLER( subs_noise_reset_w );
-WRITE8_HANDLER( subs_sonar2_w );
-WRITE8_HANDLER( subs_sonar1_w );
-WRITE8_HANDLER( subs_crash_w );
-WRITE8_HANDLER( subs_explode_w );
+WRITE8_DEVICE_HANDLER( subs_noise_reset_w );
+WRITE8_DEVICE_HANDLER( subs_sonar2_w );
+WRITE8_DEVICE_HANDLER( subs_sonar1_w );
+WRITE8_DEVICE_HANDLER( subs_crash_w );
+WRITE8_DEVICE_HANDLER( subs_explode_w );
 
 DISCRETE_SOUND_EXTERN( subs );
 

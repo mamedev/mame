@@ -5,6 +5,7 @@
 
 /* an interface for the OKIM6258 and similar chips */
 
+typedef struct _okim6258_interface okim6258_interface;
 struct _okim6258_interface
 {
 	int divider;
@@ -12,7 +13,6 @@ struct _okim6258_interface
 	int output_12bits;
 };
 
-typedef struct _okim6258_interface okim6258_interface;
 
 #define FOSC_DIV_BY_1024	0
 #define FOSC_DIV_BY_768		1
@@ -24,28 +24,16 @@ typedef struct _okim6258_interface okim6258_interface;
 #define	OUTPUT_10BITS		0
 #define	OUTPUT_12BITS		1
 
-void okim6258_set_divider(int which, int val);
-void okim6258_set_clock(int which, int val);
-int okim6258_get_vclk(int which);
+void okim6258_set_divider(const device_config *device, int val);
+void okim6258_set_clock(const device_config *device, int val);
+int okim6258_get_vclk(const device_config *device);
 
-READ8_HANDLER( okim6258_status_0_r );
-READ16_HANDLER( okim6258_status_0_lsb_r );
-READ16_HANDLER( okim6258_status_0_msb_r );
-READ8_HANDLER( okim6258_data_0_r );
-READ16_HANDLER( okim6258_data_0_lsb_r );
-READ16_HANDLER( okim6258_data_0_msb_r );
-WRITE8_HANDLER( okim6258_data_0_w );
-WRITE8_HANDLER( okim6258_data_1_w );
-WRITE8_HANDLER( okim6258_data_2_w );
-WRITE16_HANDLER( okim6258_data_0_lsb_w );
-WRITE16_HANDLER( okim6258_data_1_lsb_w );
-WRITE16_HANDLER( okim6258_data_2_lsb_w );
-WRITE16_HANDLER( okim6258_data_0_msb_w );
-WRITE16_HANDLER( okim6258_data_1_msb_w );
-WRITE16_HANDLER( okim6258_data_2_msb_w );
-WRITE16_HANDLER( okim6258_ctrl_0_lsb_w );
+READ8_DEVICE_HANDLER( okim6258_status_r );
+READ8_DEVICE_HANDLER( okim6258_data_r );
+WRITE8_DEVICE_HANDLER( okim6258_data_w );
+WRITE8_DEVICE_HANDLER( okim6258_ctrl_w );
 
-SND_GET_INFO( okim6258 );
-#define SOUND_OKIM6258 SND_GET_INFO_NAME( okim6258 )
+DEVICE_GET_INFO( okim6258 );
+#define SOUND_OKIM6258 DEVICE_GET_INFO_NAME( okim6258 )
 
 #endif /* __OKIM6258_H__ */

@@ -83,13 +83,13 @@ static WRITE8_HANDLER(ctrl_w)
 	memory_set_bank(space->machine, 1, data >> 6);
 }
 
-static WRITE8_HANDLER( ym_port_w1 )
+static WRITE8_DEVICE_HANDLER( ym_port_w1 )
 {
 	logerror("ym_write port 1 %02x\n",data);
 }
 
 
-static WRITE8_HANDLER( ym_port_w2 )
+static WRITE8_DEVICE_HANDLER( ym_port_w2 )
 {
 	logerror("ym_write port 2 %02x\n",data);
 }
@@ -100,10 +100,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_0_r,
-		input_port_1_r,
-		ym_port_w1,
-		ym_port_w2
+		DEVCB_INPUT_PORT("DSW1"),
+		DEVCB_INPUT_PORT("DSW2"),
+		DEVCB_HANDLER(ym_port_w1),
+		DEVCB_HANDLER(ym_port_w2)
 	},
 };
 
@@ -198,8 +198,7 @@ static ADDRESS_MAP_START( chinsan_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(chinsan_port00_w)
 	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
-	AM_RANGE(0x10, 0x10) AM_READ(ym2203_status_port_0_r) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x11, 0x11) AM_READ(ym2203_read_port_0_r) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
 

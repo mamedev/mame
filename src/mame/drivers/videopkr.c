@@ -813,18 +813,18 @@ static READ8_HANDLER(baby_sound_p2_r)
 	return sbp2;
 }
 
-static WRITE8_HANDLER(baby_sound_p2_w)
+static WRITE8_DEVICE_HANDLER(baby_sound_p2_w)
 {
 	sbp2 = data;
-	dac_0_data_w(space, 0, data);
+	dac_data_w(device, data);
 }
 
-static READ8_HANDLER(baby_sound_p3_r)
+static READ8_DEVICE_HANDLER(baby_sound_p3_r)
 {
 	return sbp3;
 }
 
-static WRITE8_HANDLER(baby_sound_p3_w)
+static WRITE8_DEVICE_HANDLER(baby_sound_p3_w)
 {
 	UINT8 lmp_ports, ay_intf;
 	sbp3 = data;
@@ -836,7 +836,7 @@ static WRITE8_HANDLER(baby_sound_p3_w)
 
 	if (!(sbp3 & 0x10))
 	{
-		ay8910_reset_ym(sndti_token(SOUND_AY8910, 0));
+		device_reset(device);
 		logerror("AY3-8910: Reset\n");
 	}
 
@@ -847,11 +847,11 @@ static WRITE8_HANDLER(baby_sound_p3_w)
 		case 0x00:	break;
 		case 0x01:	break;
 		case 0x02:	break;
-		case 0x03:	ay8910_write_port_0_w(space, 1, sbp0); break;
+		case 0x03:	ay8910_data_w(device, 1, sbp0); break;
 		case 0x04:	break;
-		case 0x05:	sbp0 = ay8910_read_port_0_r(space, sbp0); break;
+		case 0x05:	sbp0 = ay8910_r(device, sbp0); break;
 		case 0x06:	break;
-		case 0x07:	ay8910_control_port_0_w(space, 0, sbp0); break;
+		case 0x07:	ay8910_address_w(device, 0, sbp0); break;
 	}
 }
 
@@ -891,7 +891,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(sound_p2_r, sound_p2_w)
 ADDRESS_MAP_END
 
@@ -905,8 +905,8 @@ static ADDRESS_MAP_START( i8051_sound_port, ADDRESS_SPACE_IO, 8 )
 	/* ports */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(baby_sound_p0_r, baby_sound_p0_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(baby_sound_p1_r, baby_sound_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(baby_sound_p2_r, baby_sound_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(baby_sound_p3_r, baby_sound_p3_w)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READ(baby_sound_p2_r) AM_DEVWRITE(SOUND, "dac", baby_sound_p2_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_DEVREADWRITE(SOUND, "ay", baby_sound_p3_r, baby_sound_p3_w)
 ADDRESS_MAP_END
 
 
@@ -1145,10 +1145,10 @@ static const ay8910_interface ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	/* no ports used */
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /************************
@@ -1187,7 +1187,7 @@ static MACHINE_DRIVER_START( videopkr )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sound", DAC, 0)
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 MACHINE_DRIVER_END
 

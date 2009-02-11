@@ -259,12 +259,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tubep_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_2_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(ay8910_write_port_2_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_READ(tubep_soundlatch_r)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tubep_sound_unknown)
 ADDRESS_MAP_END
@@ -542,24 +539,24 @@ static READ8_HANDLER( rjammer_soundlatch_r )
 }
 
 
-static WRITE8_HANDLER( rjammer_voice_startstop_w )
+static WRITE8_DEVICE_HANDLER( rjammer_voice_startstop_w )
 {
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
 	// 0 -stop; 1-start
-	msm5205_reset_w (0, (data&1)^1 );
+	msm5205_reset_w (device, (data&1)^1 );
 
 	return;
 }
 
 
-static WRITE8_HANDLER( rjammer_voice_frequency_select_w )
+static WRITE8_DEVICE_HANDLER( rjammer_voice_frequency_select_w )
 {
 	/* bit 0 of data selects voice frequency on MSM5205 */
 	// 0 -4 KHz; 1- 8KHz
 	if (data&1)
-		msm5205_playmode_w(0,MSM5205_S48_4B);	/* 8 KHz */
+		msm5205_playmode_w(device,MSM5205_S48_4B);	/* 8 KHz */
 	else
-		msm5205_playmode_w(0,MSM5205_S96_4B);	/* 4 KHz */
+		msm5205_playmode_w(device,MSM5205_S96_4B);	/* 4 KHz */
 
 	return;
 }
@@ -571,12 +568,12 @@ static void rjammer_adpcm_vck (const device_config *device)
 
 	if (ls74==1)
 	{
-		msm5205_data_w(0, (ls377>>0) & 15 );
+		msm5205_data_w(device, (ls377>>0) & 15 );
 		cpu_set_input_line(device->machine->cpu[2], 0, ASSERT_LINE );
 	}
 	else
 	{
-		msm5205_data_w(0, (ls377>>4) & 15 );
+		msm5205_data_w(device, (ls377>>4) & 15 );
 	}
 
 }
@@ -616,40 +613,37 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rjammer_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(rjammer_soundlatch_r)
-	AM_RANGE(0x10, 0x10) AM_WRITE(rjammer_voice_startstop_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(rjammer_voice_frequency_select_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "msm", rjammer_voice_startstop_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE(SOUND, "msm", rjammer_voice_frequency_select_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(rjammer_voice_input_w)
-	AM_RANGE(0x90, 0x90) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x91, 0x91) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x92, 0x92) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x93, 0x93) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE(ay8910_control_port_2_w)
-	AM_RANGE(0x95, 0x95) AM_WRITE(ay8910_write_port_2_w)
+	AM_RANGE(0x90, 0x91) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x92, 0x93) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x94, 0x95) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
 	AM_RANGE(0x96, 0x96) AM_WRITE(rjammer_voice_intensity_control_w)
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( ay8910_portA_0_w )
+static WRITE8_DEVICE_HANDLER( ay8910_portA_0_w )
 {
 		//analog sound control
 }
-static WRITE8_HANDLER( ay8910_portB_0_w )
+static WRITE8_DEVICE_HANDLER( ay8910_portB_0_w )
 {
 		//analog sound control
 }
-static WRITE8_HANDLER( ay8910_portA_1_w )
+static WRITE8_DEVICE_HANDLER( ay8910_portA_1_w )
 {
 		//analog sound control
 }
-static WRITE8_HANDLER( ay8910_portB_1_w )
+static WRITE8_DEVICE_HANDLER( ay8910_portB_1_w )
 {
 		//analog sound control
 }
-static WRITE8_HANDLER( ay8910_portA_2_w )
+static WRITE8_DEVICE_HANDLER( ay8910_portA_2_w )
 {
 		//analog sound control
 }
-static WRITE8_HANDLER( ay8910_portB_2_w )
+static WRITE8_DEVICE_HANDLER( ay8910_portB_2_w )
 {
 		//analog sound control
 }
@@ -860,30 +854,30 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	ay8910_portA_0_w, /* write port A */
-	ay8910_portB_0_w  /* write port B */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ay8910_portA_0_w), /* write port A */
+	DEVCB_HANDLER(ay8910_portB_0_w)  /* write port B */
 };
 
 static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	ay8910_portA_1_w, /* write port A */
-	ay8910_portB_1_w  /* write port B */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ay8910_portA_1_w), /* write port A */
+	DEVCB_HANDLER(ay8910_portB_1_w)  /* write port B */
 };
 
 static const ay8910_interface ay8910_interface_3 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	ay8910_portA_2_w, /* write port A */
-	ay8910_portB_2_w  /* write port B */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ay8910_portA_2_w), /* write port A */
+	DEVCB_HANDLER(ay8910_portB_2_w)  /* write port B */
 };
 
 static const msm5205_interface msm5205_config =

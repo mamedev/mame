@@ -32,7 +32,7 @@ extern WRITE16_HANDLER(genesis_ctrl_w);
 extern WRITE16_HANDLER ( genesis_68k_to_z80_w );
 extern READ16_HANDLER ( genesis_68k_to_z80_r );
 extern INTERRUPT_GEN( genesis_vblank_interrupt );
-extern void genesis_irq2_interrupt(running_machine *machine, int state);
+extern void genesis_irq2_interrupt(const device_config *device, int state);
 
 /*----------- defined in video/genesis.c -----------*/
 

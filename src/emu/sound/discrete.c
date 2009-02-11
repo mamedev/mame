@@ -26,9 +26,9 @@
  * Core software takes care of traversing the netlist in the correct
  * order
  *
- * SND_START(discrete)      - Read Node list, initialise & reset
- * SND_STOP(discrete)       - Shutdown discrete sound system
- * SND_RESET(discrete)      - Put sound system back to time 0
+ * DEVICE_START(discrete)      - Read Node list, initialise & reset
+ * DEVICE_STOP(discrete)       - Shutdown discrete sound system
+ * DEVICE_RESET(discrete)      - Put sound system back to time 0
  * discrete_stream_update() - This does the real update to the sim
  *
  ************************************************************************/
@@ -69,7 +69,7 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list, co
 static void find_input_nodes(discrete_info *info, discrete_sound_block *block_list);
 static void setup_output_nodes(const device_config *device, discrete_info *info);
 static void setup_disc_logs(discrete_info *info);
-static SND_RESET( discrete );
+static DEVICE_RESET( discrete );
 
 
 
@@ -245,7 +245,7 @@ node_description *discrete_find_node(void *chip, int node)
  *
  *************************************/
 
-static SND_START( discrete )
+static DEVICE_START( discrete )
 {
 	discrete_sound_block *intf = (discrete_sound_block *)device->static_config;
 	discrete_info *info = device->token;
@@ -254,8 +254,8 @@ static SND_START( discrete )
 	info->device = device;
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
-	if (clock)
-		info->sample_rate = clock;
+	if (device->clock)
+		info->sample_rate = device->clock;
 	else
 		info->sample_rate = device->machine->sample_rate;
 	info->sample_time = 1.0 / info->sample_rate;
@@ -325,7 +325,7 @@ static SND_START( discrete )
  *
  *************************************/
 
-static SND_STOP( discrete )
+static DEVICE_STOP( discrete )
 {
 	discrete_info *info = device->token;
 	int log_num;
@@ -385,7 +385,7 @@ static SND_STOP( discrete )
  *
  *************************************/
 
-static SND_RESET( discrete )
+static DEVICE_RESET( discrete )
 {
 	discrete_info *info = device->token;
 	int nodenum;
@@ -737,34 +737,24 @@ static void setup_disc_logs(discrete_info *info)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( discrete )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( discrete )
+DEVICE_GET_INFO( discrete )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(discrete_info);					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(discrete_info);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( discrete );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( discrete );			break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( discrete );				break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( discrete );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( discrete );			break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( discrete );				break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( discrete );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Discrete");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Analog");							break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Discrete");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Analog");							break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.1");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

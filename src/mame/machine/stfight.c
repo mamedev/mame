@@ -205,22 +205,22 @@ void stfight_adpcm_int(const device_config *device)
     // finished playing sample?
     if( adpcm_data_offs == adpcm_data_end )
     {
-        msm5205_reset_w( 0, 1 );
+        msm5205_reset_w( device, 1 );
         return;
     }
 
 	if( toggle == 0 )
-		msm5205_data_w( 0, ( adpcm_data >> 4 ) & 0x0f );
+		msm5205_data_w( device, ( adpcm_data >> 4 ) & 0x0f );
 	else
 	{
-		msm5205_data_w( 0, adpcm_data & 0x0f );
+		msm5205_data_w( device, adpcm_data & 0x0f );
 		adpcm_data_offs++;
 	}
 
 	toggle ^= 1;
 }
 
-WRITE8_HANDLER( stfight_adpcm_control_w )
+WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w )
 {
     if( data < 0x08 )
     {
@@ -228,7 +228,7 @@ WRITE8_HANDLER( stfight_adpcm_control_w )
         adpcm_data_end = sampleLimits[data+1];
     }
 
-    msm5205_reset_w( 0, data & 0x08 ? 1 : 0 );
+    msm5205_reset_w( device, data & 0x08 ? 1 : 0 );
 }
 
 WRITE8_HANDLER( stfight_e800_w )

@@ -267,12 +267,12 @@ GFXDECODE_END
 
 /*** MORE SOUND RELATED ******************************************************/
 
-static void gs_ym2610_irq(running_machine *machine, int irq)
+static void gs_ym2610_irq(const device_config *device, int irq)
 {
 	if (irq)
-		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -330,10 +330,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2610_status_port_0_a_r, ym2610_control_port_0_a_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(ym2610_status_port_0_b_r, ym2610_control_port_0_b_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(SOUND, "ym", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(gs_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(gs_sh_pending_command_clear_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)

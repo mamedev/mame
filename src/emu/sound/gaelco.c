@@ -56,7 +56,8 @@ UINT16 *gaelco_sndregs;
 static sound_type chip_type;
 
 /* this structure defines a channel */
-struct gaelcosnd_channel
+typedef struct _gaelco_sound_channel gaelco_sound_channel;
+struct _gaelco_sound_channel
 {
 	int active;			/* is it playing? */
 	int loop;			/* = 0 no looping, = 1 looping */
@@ -64,18 +65,28 @@ struct gaelcosnd_channel
 };
 
 /* this structure defines the Gaelco custom sound chip */
-struct GAELCOSND
+typedef struct _gaelco_sound_state gaelco_sound_state;
+struct _gaelco_sound_state
 {
 	sound_stream *stream;									/* our stream */
 	UINT8 *snd_data;										/* PCM data */
 	int banks[4];											/* start of each ROM bank */
-	struct gaelcosnd_channel channel[GAELCO_NUM_CHANNELS];	/* 7 stereo channels */
+	gaelco_sound_channel channel[GAELCO_NUM_CHANNELS];	/* 7 stereo channels */
 
 	/* table for converting from 8 to 16 bits with volume control */
 	INT16 volume_table[VOLUME_LEVELS][256];
 };
 
 static void *	wavraw;					/* raw waveform */
+
+INLINE gaelco_sound_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_GAELCO_GAE1 || sound_get_type(device) == SOUND_GAELCO_CG1V);
+	return (gaelco_sound_state *)device->token;
+}
 
 /*============================================================================
                         CG-1V/GAE1 Sound Update
@@ -85,7 +96,7 @@ static void *	wavraw;					/* raw waveform */
 
 static STREAM_UPDATE( gaelco_update )
 {
-	struct GAELCOSND *info = param;
+	gaelco_sound_state *info = param;
 	int j, ch;
 
     /* fill all data needed */
@@ -95,7 +106,7 @@ static STREAM_UPDATE( gaelco_update )
 		/* for each channel */
 		for (ch = 0; ch < GAELCO_NUM_CHANNELS; ch ++){
 			int ch_data_l = 0, ch_data_r = 0;
-			struct gaelcosnd_channel *channel = &info->channel[ch];
+			gaelco_sound_channel *channel = &info->channel[ch];
 
 			/* if the channel is playing */
 			if (channel->active == 1){
@@ -187,9 +198,9 @@ static STREAM_UPDATE( gaelco_update )
                         CG-1V/GAE1 Read Handler
   ============================================================================*/
 
-READ16_HANDLER( gaelcosnd_r )
+READ16_DEVICE_HANDLER( gaelcosnd_r )
 {
-	LOG_READ_WRITES(("%06x: (GAE1): read from %04x\n", cpu_get_pc(space->cpu), offset));
+	LOG_READ_WRITES(("%s: (GAE1): read from %04x\n", cpuexec_describe_context(device->machine), offset));
 
 	return gaelco_sndregs[offset];
 }
@@ -198,12 +209,12 @@ READ16_HANDLER( gaelcosnd_r )
                         CG-1V/GAE1 Write Handler
   ============================================================================*/
 
-WRITE16_HANDLER( gaelcosnd_w )
+WRITE16_DEVICE_HANDLER( gaelcosnd_w )
 {
-	struct GAELCOSND *info = sndti_token(chip_type, 0);
-	struct gaelcosnd_channel *channel = &info->channel[offset >> 3];
+	gaelco_sound_state *info = get_safe_token(device);
+	gaelco_sound_channel *channel = &info->channel[offset >> 3];
 
-	LOG_READ_WRITES(("%06x: (GAE1): write %04x to %04x\n", cpu_get_pc(space->cpu), data, offset));
+	LOG_READ_WRITES(("%s: (GAE1): write %04x to %04x\n", cpuexec_describe_context(device->machine), data, offset));
 
 	/* first update the stream to this point in time */
 	stream_update(info->stream);
@@ -242,14 +253,14 @@ WRITE16_HANDLER( gaelcosnd_w )
                         CG-1V/GAE1 Init
   ============================================================================*/
 
-static void gaelcosnd_start(sound_type sndtype, const device_config *device, int clock)
+static DEVICE_START( gaelco )
 {
 	int j, vol;
 	const gaelcosnd_interface *intf = device->static_config;
 
-	struct GAELCOSND *info = device->token;
+	gaelco_sound_state *info = get_safe_token(device);
 
-	chip_type = sndtype;
+	chip_type = sound_get_type(device);
 
 	/* copy rom banks */
 	for (j = 0; j < 4; j++){
@@ -271,18 +282,8 @@ static void gaelcosnd_start(sound_type sndtype, const device_config *device, int
 		wavraw = wav_open("gae1_snd.wav", 8000, 2);
 }
 
-static SND_START( gaelco_gae1 )
-{
-	gaelcosnd_start(SOUND_GAELCO_GAE1, device, clock);
-}
 
-static SND_START( gaelco_cg1v )
-{
-	gaelcosnd_start(SOUND_GAELCO_CG1V, device, clock);
-}
-
-
-static SND_STOP( gaelco )
+static DEVICE_STOP( gaelco )
 {
 	if (wavraw)
 		wav_close(wavraw);
@@ -296,34 +297,24 @@ static SND_STOP( gaelco )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( gaelco_gae1 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( gaelco_gae1 )
+DEVICE_GET_INFO( gaelco_gae1 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct GAELCOSND);					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(gaelco_sound_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( gaelco_gae1 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gaelco_gae1 );		break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( gaelco );				break;
-		case SNDINFO_PTR_RESET:							/* nothing */										break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( gaelco );		break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( gaelco );				break;
+		case DEVINFO_FCT_RESET:							/* nothing */										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Gaelco GAE1");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Gaelco custom");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Gaelco GAE1");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Gaelco custom");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
@@ -333,34 +324,24 @@ SND_GET_INFO( gaelco_gae1 )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( gaelco_cg1v )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( gaelco_cg1v )
+DEVICE_GET_INFO( gaelco_cg1v )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct GAELCOSND);					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(gaelco_sound_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( gaelco_cg1v );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gaelco_cg1v );		break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( gaelco );				break;
-		case SNDINFO_PTR_RESET:							/* nothing */										break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( gaelco );		break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( gaelco );				break;
+		case DEVINFO_FCT_RESET:							/* nothing */										break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Gaelco CG1V");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Gaelco custom");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Gaelco CG1V");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Gaelco custom");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

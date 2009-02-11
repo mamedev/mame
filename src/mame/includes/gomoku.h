@@ -1,5 +1,3 @@
-#include "sound/custom.h"
-
 /*----------- defined in audio/gomoku.c -----------*/
 
 extern UINT8 *gomoku_soundregs1;
@@ -7,7 +5,9 @@ extern UINT8 *gomoku_soundregs2;
 
 WRITE8_HANDLER( gomoku_sound1_w );
 WRITE8_HANDLER( gomoku_sound2_w );
-CUSTOM_START( gomoku_sh_start );
+
+DEVICE_GET_INFO( gomoku_sound );
+#define SOUND_GOMOKU DEVICE_GET_INFO_NAME(gomoku_sound)
 
 
 /*----------- defined in video/gomoku.c -----------*/

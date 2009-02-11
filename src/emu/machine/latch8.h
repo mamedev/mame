@@ -40,6 +40,7 @@ struct _latch8_config
 	UINT32					xor;  /* after mask */
 	UINT32					nosync;
 	UINT32					node_map[8];
+	const char *			node_device[8];
 	latch8_devread			devread[8];
 };
 
@@ -64,7 +65,8 @@ struct _latch8_config
 	MDRV_DEVICE_CONFIG_DATA32(latch8_config, nosync, _nosync)
 
 /* Write bit to discrete node */
-#define MDRV_LATCH8_DISCRETE_NODE(_bit, _node) \
+#define MDRV_LATCH8_DISCRETE_NODE(_device, _bit, _node) \
+	MDRV_DEVICE_CONFIG_DATA32_ARRAY(latch8_config, node_device, _bit, _device) \
 	MDRV_DEVICE_CONFIG_DATA32_ARRAY(latch8_config, node_map, _bit, _node)
 
 /* Upon read, replace bits by reading from another device handler */

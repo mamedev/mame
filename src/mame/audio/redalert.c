@@ -53,7 +53,7 @@ static UINT8 ay8910_latch_1;
  *
  *************************************/
 
-static WRITE8_HANDLER( redalert_analog_w )
+static WRITE8_DEVICE_HANDLER( redalert_analog_w )
 {
 	/* this port triggers analog sounds
        D0 = Formation Aircraft?
@@ -87,7 +87,7 @@ WRITE8_HANDLER( redalert_audio_command_w )
 }
 
 
-static WRITE8_HANDLER( redalert_AY8910_w )
+static WRITE8_DEVICE_HANDLER( redalert_AY8910_w )
 {
 	/* BC2 is connected to a pull-up resistor, so BC2=1 always */
 	switch (data & 0x03)
@@ -98,18 +98,15 @@ static WRITE8_HANDLER( redalert_AY8910_w )
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
-			ay8910_latch_1 = ay8910_read_port_0_r(space, 0);
+			ay8910_latch_1 = ay8910_r(device, 0);
 			break;
 
 		/* BC1=0, BDIR=1 : write to PSG */
-		case 0x02:
-			ay8910_write_port_0_w(space, 0, ay8910_latch_2);
-			break;
-
 		/* BC1=1, BDIR=1 : latch address */
-		default:
+		case 0x02:
 		case 0x03:
-			ay8910_control_port_0_w(space, 0, ay8910_latch_2);
+		default:
+			ay8910_data_address_w(device, data, ay8910_latch_2);
 			break;
 	}
 }
@@ -131,15 +128,17 @@ static const ay8910_interface redalert_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r, NULL,		/* port A/B read */
-	NULL, redalert_analog_w	/* port A/B write */
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r), 
+	DEVCB_NULL,		/* port A/B read */
+	DEVCB_NULL, 
+	DEVCB_HANDLER(redalert_analog_w)	/* port A/B write */
 };
 
 
 static ADDRESS_MAP_START( redalert_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READWRITE(SMH_NOP, redalert_AY8910_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_DEVWRITE(SOUND, "ay", redalert_AY8910_w)
 	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x0ffe) AM_READWRITE(redalert_ay8910_latch_1_r, redalert_ay8910_latch_2_w)
 	AM_RANGE(0x2000, 0x6fff) AM_NOP
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
@@ -173,13 +172,13 @@ WRITE8_HANDLER( redalert_voice_command_w )
 
 static void sod_callback(const device_config *device, int data)
 {
-	hc55516_digit_w(0, data);
+	hc55516_digit_w(devtag_get_device(device->machine, SOUND, "cvsd"), data);
 }
 
 
 static int sid_callback(const device_config *device)
 {
-	return hc55516_clock_state_r(0);
+	return hc55516_clock_state_r(devtag_get_device(device->machine, SOUND, "cvsd"));
 }
 
 
@@ -312,32 +311,35 @@ static READ8_HANDLER( demoneye_ay8910_latch_2_r )
 
 static WRITE8_HANDLER( demoneye_ay8910_data_w )
 {
+	const device_config *ay1 = devtag_get_device(space->machine, SOUND, "ay1");
+	const device_config *ay2 = devtag_get_device(space->machine, SOUND, "ay2");
+
 	switch (ay8910_latch_1 & 0x03)
 	{
 		case 0x00:
 			if (ay8910_latch_1 & 0x10)
-				ay8910_write_port_0_w(space, 0, data);
+				ay8910_data_w(ay1, 0, data);
 
 			if (ay8910_latch_1 & 0x20)
-				ay8910_write_port_1_w(space, 0, data);
+				ay8910_data_w(ay2, 0, data);
 
 			break;
 
 		case 0x01:
 			if (ay8910_latch_1 & 0x10)
-				ay8910_latch_2 = ay8910_read_port_0_r(space, 0);
+				ay8910_latch_2 = ay8910_r(ay1, 0);
 
 			if (ay8910_latch_1 & 0x20)
-				ay8910_latch_2 = ay8910_read_port_1_r(space, 0);
+				ay8910_latch_2 = ay8910_r(ay2, 0);
 
 			break;
 
 		case 0x03:
 			if (ay8910_latch_1 & 0x10)
-				ay8910_control_port_0_w(space, 0, data);
+				ay8910_address_w(ay1, 0, data);
 
 			if (ay8910_latch_1 & 0x20)
-				ay8910_control_port_1_w(space, 0, data);
+				ay8910_address_w(ay2, 0, data);
 
 			break;
 
@@ -360,8 +362,10 @@ static const ay8910_interface demoneye_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r, NULL,	/* port A/B read */
-	NULL, NULL				/* port A/B write */
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r), 
+	DEVCB_NULL,	/* port A/B read */
+	DEVCB_NULL, 
+	DEVCB_NULL				/* port A/B write */
 };
 
 

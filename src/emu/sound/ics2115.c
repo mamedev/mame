@@ -41,7 +41,8 @@
 
 enum { V_ON = 1, V_DONE = 2 };
 
-struct ics2115
+typedef struct _ics2115_state ics2115_state;
+struct _ics2115_state
 {
 	const ics2115_interface *intf;
 	const device_config *device;
@@ -67,7 +68,16 @@ struct ics2115
 	sound_stream * stream;
 };
 
-static void recalc_irq(struct ics2115 *chip)
+INLINE ics2115_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_ICS2115);
+	return (ics2115_state *)device->token;
+}
+
+static void recalc_irq(ics2115_state *chip)
 {
 	int i;
     int irq = 0;
@@ -79,14 +89,14 @@ static void recalc_irq(struct ics2115 *chip)
 	if(irq != chip->irq_on) {
 		chip->irq_on = irq;
 		if(chip->intf->irq_cb)
-			chip->intf->irq_cb(chip->device->machine, irq ? ASSERT_LINE : CLEAR_LINE);
+			chip->intf->irq_cb(chip->device, irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 
 static STREAM_UPDATE( update )
 {
-	struct ics2115 *chip = param;
+	ics2115_state *chip = param;
 	int osc, i;
 	int rec_irq = 0;
 
@@ -134,7 +144,7 @@ static STREAM_UPDATE( update )
 		recalc_irq(chip);
 }
 
-static void keyon(struct ics2115 *chip, int osc)
+static void keyon(ics2115_state *chip, int osc)
 {
 	if (ICS2115LOGERROR) logerror("ICS2115: KEYON %2d conf:%02x vctl:%02x a:%07x.%03x l:%05x.%x e:%05x.%x v:%03x f:%d\n",
 			 osc,
@@ -154,19 +164,19 @@ static void keyon(struct ics2115 *chip, int osc)
 
 static TIMER_CALLBACK( timer_cb_0 )
 {
-	struct ics2115 *chip = ptr;
+	ics2115_state *chip = ptr;
 	chip->irq_pend |= 1<<0;
 	recalc_irq(chip);
 }
 
 static TIMER_CALLBACK( timer_cb_1 )
 {
-	struct ics2115 *chip = ptr;
+	ics2115_state *chip = ptr;
 	chip->irq_pend |= 1<<1;
 	recalc_irq(chip);
 }
 
-static void recalc_timer(struct ics2115 *chip, int timer)
+static void recalc_timer(ics2115_state *chip, int timer)
 {
 	UINT64 period = 1000000000 * chip->timer[timer].scale*chip->timer[timer].preset / 33868800;
 	if(period)
@@ -190,7 +200,7 @@ static void recalc_timer(struct ics2115 *chip, int timer)
 }
 
 
-static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
+static void ics2115_reg_w(ics2115_state *chip, UINT8 reg, UINT8 data, int msb)
 {
 	running_machine *machine = chip->device->machine;
 
@@ -377,7 +387,7 @@ static void ics2115_reg_w(struct ics2115 *chip, UINT8 reg, UINT8 data, int msb)
 	}
 }
 
-static UINT16 ics2115_reg_r(struct ics2115 *chip, UINT8 reg)
+static UINT16 ics2115_reg_r(ics2115_state *chip, UINT8 reg)
 {
 	running_machine *machine = chip->device->machine;
 
@@ -439,9 +449,9 @@ static UINT16 ics2115_reg_r(struct ics2115 *chip, UINT8 reg)
 }
 
 
-static SND_START( ics2115 )
+static DEVICE_START( ics2115 )
 {
-	struct ics2115 *chip = device->token;
+	ics2115_state *chip = get_safe_token(device);
 	int i;
 
 	chip->device = device;
@@ -465,9 +475,9 @@ static SND_START( ics2115 )
 	}
 }
 
-READ8_HANDLER( ics2115_r )
+READ8_DEVICE_HANDLER( ics2115_r )
 {
-	struct ics2115 *chip = sndti_token(SOUND_ICS2115, 0);
+	ics2115_state *chip = get_safe_token(device);
 	switch(offset) {
 	case 0: {
 		UINT8 res = 0;
@@ -496,9 +506,9 @@ READ8_HANDLER( ics2115_r )
 	}
 }
 
-WRITE8_HANDLER( ics2115_w )
+WRITE8_DEVICE_HANDLER( ics2115_w )
 {
-	struct ics2115 *chip = sndti_token(SOUND_ICS2115, 0);
+	ics2115_state *chip = get_safe_token(device);
 	switch(offset) {
 	case 1:
 		chip->reg = data;
@@ -513,9 +523,9 @@ WRITE8_HANDLER( ics2115_w )
 	//  if (ICS2115LOGERROR) logerror("ICS2115: wi %d, %02x\n", cpuexec_describe_context(space->machine), offset, data);
 }
 
-static SND_RESET( ics2115 )
+static DEVICE_RESET( ics2115 )
 {
-	struct ics2115 *chip = device->token;
+	ics2115_state *chip = get_safe_token(device);
 	chip->irq_en = 0;
 	chip->irq_pend = 0;
 	memset(chip->voice, 0, sizeof(chip->voice));
@@ -533,34 +543,24 @@ static SND_RESET( ics2115 )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( ics2115 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( ics2115 )
+DEVICE_GET_INFO( ics2115 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct ics2115);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ics2115_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ics2115 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ics2115 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ics2115 );		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ics2115 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( ics2115 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "ICS2115");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "ICS");							break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.01");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "ICS2115");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "ICS");							break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.01");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

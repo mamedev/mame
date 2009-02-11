@@ -64,19 +64,19 @@ static SOUND_START( samples )
 		DISCRETE_OP_AMP_TRIG_VCA(MIDWAY_TONE_SND, MIDWAY_TONE_BEFORE_AMP_SND, MIDWAY_TONE_EN, 0, 12, 0, &discrete_op_amp_tvca_info)
 
 
-WRITE8_HANDLER( midway_tone_generator_lo_w )
+WRITE8_DEVICE_HANDLER( midway_tone_generator_lo_w )
 {
-	discrete_sound_w(space, MIDWAY_TONE_EN, (data >> 0) & 0x01);
+	discrete_sound_w(device, MIDWAY_TONE_EN, (data >> 0) & 0x01);
 
-	discrete_sound_w(space, MIDWAY_TONE_DATA_L, (data >> 1) & 0x1f);
+	discrete_sound_w(device, MIDWAY_TONE_DATA_L, (data >> 1) & 0x1f);
 
 	/* D6 and D7 are not connected */
 }
 
 
-WRITE8_HANDLER( midway_tone_generator_hi_w )
+WRITE8_DEVICE_HANDLER( midway_tone_generator_hi_w )
 {
-	discrete_sound_w(space, MIDWAY_TONE_DATA_H, data & 0x3f);
+	discrete_sound_w(device, MIDWAY_TONE_DATA_H, data & 0x3f);
 
 	/* D6 and D7 are not connected */
 }
@@ -146,22 +146,23 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( seawolf_audio_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* if (data & 0x01)  enable SHIP HIT sound */
-	if (rising_bits & 0x01) sample_start_n(0, 0, 0, 0);
+	if (rising_bits & 0x01) sample_start(samples, 0, 0, 0);
 
 	/* if (data & 0x02)  enable TORPEDO sound */
-	if (rising_bits & 0x02) sample_start_n(0, 1, 1, 0);
+	if (rising_bits & 0x02) sample_start(samples, 1, 1, 0);
 
 	/* if (data & 0x04)  enable DIVE sound */
-	if (rising_bits & 0x04) sample_start_n(0, 2, 2, 0);
+	if (rising_bits & 0x04) sample_start(samples, 2, 2, 0);
 
 	/* if (data & 0x08)  enable SONAR sound */
-	if (rising_bits & 0x08) sample_start_n(0, 3, 3, 0);
+	if (rising_bits & 0x08) sample_start(samples, 3, 3, 0);
 
 	/* if (data & 0x10)  enable MINE HIT sound */
-	if (rising_bits & 0x10) sample_start_n(0, 4, 4, 0);
+	if (rising_bits & 0x10) sample_start(samples, 4, 4, 0);
 
 	coin_counter_w(0, (data >> 5) & 0x01);
 
@@ -211,6 +212,9 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( gunfight_audio_w )
 {
+	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
+
 	/* D0 and D1 are just tied to 1k resistors */
 
 	coin_counter_w(0, (data >> 2) & 0x01);
@@ -223,22 +227,22 @@ WRITE8_HANDLER( gunfight_audio_w )
 
 	case 0x01:
 		/* enable LEFT SHOOT sound (left speaker) */
-		sample_start_n(0, 0, 0, 0);
+		sample_start(samples0, 0, 0, 0);
 		break;
 
 	case 0x02:
 		/* enable RIGHT SHOOT sound (right speaker) */
-		sample_start_n(1, 0, 0, 0);
+		sample_start(samples1, 0, 0, 0);
 		break;
 
 	case 0x03:
 		/* enable LEFT HIT sound (left speaker) */
-		sample_start_n(0, 0, 1, 0);
+		sample_start(samples0, 0, 1, 0);
 		break;
 
 	case 0x04:
 		/* enable RIGHT HIT sound (right speaker) */
-		sample_start_n(1, 0, 1, 0);
+		sample_start(samples1, 0, 1, 0);
 		break;
 
 	default:
@@ -309,19 +313,19 @@ MACHINE_DRIVER_START( tornbase_audio )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( tornbase_audio_w )
+WRITE8_DEVICE_HANDLER( tornbase_audio_w )
 {
-	discrete_sound_w(space, TORNBASE_TONE_240_EN, (data >> 0) & 0x01);
+	discrete_sound_w(device, TORNBASE_TONE_240_EN, (data >> 0) & 0x01);
 
-	discrete_sound_w(space, TORNBASE_TONE_960_EN, (data >> 1) & 0x01);
+	discrete_sound_w(device, TORNBASE_TONE_960_EN, (data >> 1) & 0x01);
 
-	discrete_sound_w(space, TORNBASE_TONE_120_EN, (data >> 2) & 0x01);
+	discrete_sound_w(device, TORNBASE_TONE_120_EN, (data >> 2) & 0x01);
 
 	/* if (data & 0x08)  enable SIREN sound */
 
 	/* if (data & 0x10)  enable CHEER sound */
 
-	if (tornbase_get_cabinet_type(space->machine) == TORNBASE_CAB_TYPE_UPRIGHT_OLD)
+	if (tornbase_get_cabinet_type(device->machine) == TORNBASE_CAB_TYPE_UPRIGHT_OLD)
 	{
 		/* if (data & 0x20)  enable WHISTLE sound */
 
@@ -565,24 +569,22 @@ MACHINE_DRIVER_START( maze_audio )
 MACHINE_DRIVER_END
 
 
-void maze_write_discrete(running_machine *machine, UINT8 maze_tone_timing_state)
+void maze_write_discrete(const device_config *device, UINT8 maze_tone_timing_state)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
 	/* controls need to be active low */
-	int controls = ~input_port_read(machine, "IN0") & 0xff;
+	int controls = ~input_port_read(device->machine, "IN0") & 0xff;
 
-	discrete_sound_w(space, MAZE_TONE_TIMING, maze_tone_timing_state);
-	discrete_sound_w(space, MAZE_P1_DATA, controls & 0x0f);
-	discrete_sound_w(space, MAZE_P2_DATA, (controls >> 4) & 0x0f);
-	discrete_sound_w(space, MAZE_JOYSTICK_IN_USE, controls != 0xff);
+	discrete_sound_w(device, MAZE_TONE_TIMING, maze_tone_timing_state);
+	discrete_sound_w(device, MAZE_P1_DATA, controls & 0x0f);
+	discrete_sound_w(device, MAZE_P2_DATA, (controls >> 4) & 0x0f);
+	discrete_sound_w(device, MAZE_JOYSTICK_IN_USE, controls != 0xff);
 
 	/* The coin line is connected directly to the discrete circuit. */
 	/* We can't really do that, so updating it with the tone timing is close enough. */
 	/* A better option might be to update it at vblank or set a timer to do it. */
 	/* The only noticeable difference doing it here, is that the controls don't */
 	/* imediately start making tones if pressed right after the coin is inserted. */
-	discrete_sound_w(space, MAZE_COIN, (~input_port_read(machine, "IN1") >> 3) & 0x01);
+	discrete_sound_w(device, MAZE_COIN, (~input_port_read(device->machine, "IN1") >> 3) & 0x01);
 }
 
 
@@ -803,21 +805,21 @@ MACHINE_DRIVER_START( boothill_audio )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( boothill_audio_w )
+WRITE8_DEVICE_HANDLER( boothill_audio_w )
 {
 	/* D0 and D1 are not connected */
 
 	coin_counter_w(0, (data >> 2) & 0x01);
 
-	discrete_sound_w(space, BOOTHILL_GAME_ON_EN, (data >> 3) & 0x01);
+	discrete_sound_w(device, BOOTHILL_GAME_ON_EN, (data >> 3) & 0x01);
 
-	discrete_sound_w(space, BOOTHILL_LEFT_SHOT_EN, (data >> 4) & 0x01);
+	discrete_sound_w(device, BOOTHILL_LEFT_SHOT_EN, (data >> 4) & 0x01);
 
-	discrete_sound_w(space, BOOTHILL_RIGHT_SHOT_EN, (data >> 5) & 0x01);
+	discrete_sound_w(device, BOOTHILL_RIGHT_SHOT_EN, (data >> 5) & 0x01);
 
-	discrete_sound_w(space, BOOTHILL_LEFT_HIT_EN, (data >> 6) & 0x01);
+	discrete_sound_w(device, BOOTHILL_LEFT_HIT_EN, (data >> 6) & 0x01);
 
-	discrete_sound_w(space, BOOTHILL_RIGHT_HIT_EN, (data >> 7) & 0x01);
+	discrete_sound_w(device, BOOTHILL_RIGHT_HIT_EN, (data >> 7) & 0x01);
 }
 
 
@@ -1037,18 +1039,18 @@ MACHINE_DRIVER_START( checkmat_audio )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( checkmat_audio_w )
+WRITE8_DEVICE_HANDLER( checkmat_audio_w )
 {
-	discrete_sound_w(space, CHECKMAT_TONE_EN, data & 0x01);
+	discrete_sound_w(device, CHECKMAT_TONE_EN, data & 0x01);
 
-	discrete_sound_w(space, CHECKMAT_BOOM_EN, (data >> 1) & 0x01);
+	discrete_sound_w(device, CHECKMAT_BOOM_EN, (data >> 1) & 0x01);
 
 	coin_counter_w(0, (data >> 2) & 0x01);
 
 	sound_global_enable((data >> 3) & 0x01);
 
-	discrete_sound_w(space, CHECKMAT_TONE_DATA_45, (data >> 4) & 0x03);
-	discrete_sound_w(space, CHECKMAT_TONE_DATA_67, (data >> 6) & 0x03);
+	discrete_sound_w(device, CHECKMAT_TONE_DATA_45, (data >> 4) & 0x03);
+	discrete_sound_w(device, CHECKMAT_TONE_DATA_67, (data >> 6) & 0x03);
 }
 
 
@@ -1276,29 +1278,29 @@ MACHINE_DRIVER_START( desertgu_audio )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( desertgu_audio_1_w )
+WRITE8_DEVICE_HANDLER( desertgu_audio_1_w )
 {
 	/* D0 and D1 are not connected */
 
 	coin_counter_w(0, (data >> 2) & 0x01);
 
-	discrete_sound_w(space, DESERTGU_GAME_ON_EN, (data >> 3) & 0x01);
+	discrete_sound_w(device, DESERTGU_GAME_ON_EN, (data >> 3) & 0x01);
 
-	discrete_sound_w(space, DESERTGU_RIFLE_SHOT_EN, (data >> 4) & 0x01);
+	discrete_sound_w(device, DESERTGU_RIFLE_SHOT_EN, (data >> 4) & 0x01);
 
-	discrete_sound_w(space, DESERTGU_BOTTLE_HIT_EN, (data >> 5) & 0x01);
+	discrete_sound_w(device, DESERTGU_BOTTLE_HIT_EN, (data >> 5) & 0x01);
 
-	discrete_sound_w(space, DESERTGU_ROAD_RUNNER_HIT_EN, (data >> 6) & 0x01);
+	discrete_sound_w(device, DESERTGU_ROAD_RUNNER_HIT_EN, (data >> 6) & 0x01);
 
-	discrete_sound_w(space, DESERTGU_CREATURE_HIT_EN, (data >> 7) & 0x01);
+	discrete_sound_w(device, DESERTGU_CREATURE_HIT_EN, (data >> 7) & 0x01);
 }
 
 
-WRITE8_HANDLER( desertgu_audio_2_w )
+WRITE8_DEVICE_HANDLER( desertgu_audio_2_w )
 {
-	discrete_sound_w(space, DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
+	discrete_sound_w(device, DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
 
-	discrete_sound_w(space, DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
+	discrete_sound_w(device, DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
 
 	output_set_value("KICKER", (data >> 2) & 0x01);
 
@@ -1570,17 +1572,17 @@ MACHINE_DRIVER_START( dplay_audio )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( dplay_audio_w )
+WRITE8_DEVICE_HANDLER( dplay_audio_w )
 {
-	discrete_sound_w(space, DPLAY_TONE_ON_EN, (data >> 0) & 0x01);
+	discrete_sound_w(device, DPLAY_TONE_ON_EN, (data >> 0) & 0x01);
 
-	discrete_sound_w(space, DPLAY_CHEER_EN, (data >> 1) & 0x01);
+	discrete_sound_w(device, DPLAY_CHEER_EN, (data >> 1) & 0x01);
 
-	discrete_sound_w(space, DPLAY_SIREN_EN, (data >> 2) & 0x01);
+	discrete_sound_w(device, DPLAY_SIREN_EN, (data >> 2) & 0x01);
 
-	discrete_sound_w(space, DPLAY_WHISTLE_EN, (data >> 3) & 0x01);
+	discrete_sound_w(device, DPLAY_WHISTLE_EN, (data >> 3) & 0x01);
 
-	discrete_sound_w(space, DPLAY_GAME_ON_EN, (data >> 4) & 0x01);
+	discrete_sound_w(device, DPLAY_GAME_ON_EN, (data >> 4) & 0x01);
 
 	coin_counter_w(0, (data >> 5) & 0x01);
 
@@ -1632,6 +1634,8 @@ WRITE8_HANDLER( gmissile_audio_1_w )
        reversed (D5=R, D7=L), but the software confirms that
        ours is right */
 
+	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* D0 and D1 are not connected */
@@ -1641,18 +1645,18 @@ WRITE8_HANDLER( gmissile_audio_1_w )
 	sound_global_enable((data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable RIGHT MISSILE sound (goes to right speaker) */
-	if (rising_bits & 0x10) sample_start_n(1, 0, 0, 0);
+	if (rising_bits & 0x10) sample_start(samples1, 0, 0, 0);
 
 	/* if (data & 0x20)  enable LEFT EXPLOSION sound (goes to left speaker) */
 	output_set_value("L_EXP_LIGHT", (data >> 5) & 0x01);
-	if (rising_bits & 0x20) sample_start_n(0, 0, 1, 0);
+	if (rising_bits & 0x20) sample_start(samples0, 0, 1, 0);
 
 	/* if (data & 0x40)  enable LEFT MISSILE sound (goes to left speaker) */
-	if (rising_bits & 0x40) sample_start_n(0, 0, 0, 0);
+	if (rising_bits & 0x40) sample_start(samples0, 0, 0, 0);
 
 	/* if (data & 0x80)  enable RIGHT EXPLOSION sound (goes to right speaker) */
 	output_set_value("R_EXP_LIGHT", (data >> 7) & 0x01);
-	if (rising_bits & 0x80) sample_start_n(1, 0, 1, 0);
+	if (rising_bits & 0x80) sample_start(samples1, 0, 1, 0);
 
 	port_1_last = data;
 }
@@ -1726,6 +1730,8 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( m4_audio_1_w )
 {
+	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* D0 and D1 are not connected */
@@ -1735,16 +1741,16 @@ WRITE8_HANDLER( m4_audio_1_w )
 	sound_global_enable((data >> 3) & 0x01);
 
 	/* if (data & 0x10)  enable LEFT PLAYER SHOT sound (goes to left speaker) */
-	if (rising_bits & 0x10) sample_start_n(0, 0, 0, 0);
+	if (rising_bits & 0x10) sample_start(samples0, 0, 0, 0);
 
 	/* if (data & 0x20)  enable RIGHT PLAYER SHOT sound (goes to right speaker) */
-	if (rising_bits & 0x20) sample_start_n(1, 0, 0, 0);
+	if (rising_bits & 0x20) sample_start(samples1, 0, 0, 0);
 
 	/* if (data & 0x40)  enable LEFT PLAYER EXPLOSION sound via 300K res (goes to left speaker) */
-	if (rising_bits & 0x40) sample_start_n(0, 1, 1, 0);
+	if (rising_bits & 0x40) sample_start(samples0, 1, 1, 0);
 
 	/* if (data & 0x80)  enable RIGHT PLAYER EXPLOSION sound via 300K res (goes to right speaker) */
-	if (rising_bits & 0x80) sample_start_n(1, 1, 1, 0);
+	if (rising_bits & 0x80) sample_start(samples1, 1, 1, 0);
 
 	port_1_last = data;
 }
@@ -1752,13 +1758,15 @@ WRITE8_HANDLER( m4_audio_1_w )
 
 WRITE8_HANDLER( m4_audio_2_w )
 {
+	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	/* if (data & 0x01)  enable LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker) */
-	if (rising_bits & 0x01) sample_start_n(0, 1, 1, 0);
+	if (rising_bits & 0x01) sample_start(samples0, 1, 1, 0);
 
 	/* if (data & 0x02)  enable RIGHT PLAYER EXPLOSION sound via 510K res (goes to right speaker) */
-	if (rising_bits & 0x02) sample_start_n(1, 1, 1, 0);
+	if (rising_bits & 0x02) sample_start(samples1, 1, 1, 0);
 
 	/* if (data & 0x04)  enable LEFT TANK MOTOR sound (goes to left speaker) */
 
@@ -2022,21 +2030,22 @@ WRITE8_HANDLER( clowns_audio_1_w )
 }
 
 
-WRITE8_HANDLER( clowns_audio_2_w )
+WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 {
+	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 
-	discrete_sound_w(space, CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
+	discrete_sound_w(device, CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
 
-	discrete_sound_w(space, CLOWNS_POP_MIDDLE_EN, (data >> 1) & 0x01);
+	discrete_sound_w(device, CLOWNS_POP_MIDDLE_EN, (data >> 1) & 0x01);
 
-	discrete_sound_w(space, CLOWNS_POP_TOP_EN, (data >> 2) & 0x01);
+	discrete_sound_w(device, CLOWNS_POP_TOP_EN, (data >> 2) & 0x01);
 
 	sound_global_enable((data >> 3) & 0x01);
 
-	discrete_sound_w(space, CLOWNS_SPRINGBOARD_HIT_EN, (data >> 4) & 0x01);
+	discrete_sound_w(device, CLOWNS_SPRINGBOARD_HIT_EN, (data >> 4) & 0x01);
 
-	if (rising_bits & 0x20) sample_start_n(0, 0, 0, 0);  /* springboard miss */
+	if (rising_bits & 0x20) sample_start(samples, 0, 0, 0);  /* springboard miss */
 
 	/* D6 and D7 are not connected */
 
@@ -2696,26 +2705,26 @@ MACHINE_DRIVER_END
 
 
 
-WRITE8_HANDLER( spcenctr_audio_1_w )
+WRITE8_DEVICE_HANDLER( spcenctr_audio_1_w )
 {
 	sound_global_enable((data >> 0) & 0x01);
 
 	/* D1 is marked as 'OPTIONAL SWITCH VIDEO FOR COCKTAIL',
        but it is never set by the software */
 
-	discrete_sound_w(space, SPCENCTR_CRASH_EN, (data >> 2) & 0x01);
+	discrete_sound_w(device, SPCENCTR_CRASH_EN, (data >> 2) & 0x01);
 
 	/* D3-D7 are not connected */
 }
 
 
-WRITE8_HANDLER( spcenctr_audio_2_w )
+WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w )
 {
 	/* set WIND SOUND FREQ(data & 0x0f)  0, if no wind */
 
-	discrete_sound_w(space, SPCENCTR_EXPLOSION_EN, (data >> 4) & 0x01);
+	discrete_sound_w(device, SPCENCTR_EXPLOSION_EN, (data >> 4) & 0x01);
 
-	discrete_sound_w(space, SPCENCTR_PLAYER_SHOT_EN, (data >> 5) & 0x01);
+	discrete_sound_w(device, SPCENCTR_PLAYER_SHOT_EN, (data >> 5) & 0x01);
 
 	/* D6 and D7 are not connected */
 
@@ -2723,19 +2732,21 @@ WRITE8_HANDLER( spcenctr_audio_2_w )
 }
 
 
-WRITE8_HANDLER( spcenctr_audio_3_w )
+WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w )
 {
+	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn");
+
 	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
 
-	discrete_sound_w(space, SPCENCTR_ENEMY_SHIP_SHOT_EN, (data >> 1) & 0x01);
+	discrete_sound_w(device, SPCENCTR_ENEMY_SHIP_SHOT_EN, (data >> 1) & 0x01);
 
 	spcenctr_set_strobe_state((data >> 2) & 0x01);
 
 	output_set_value("LAMP", (data >> 3) & 0x01);
 
-	discrete_sound_w(space, SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
+	discrete_sound_w(device, SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
 
-	sn76477_enable_w(0, (data >> 5) & 0x01);	/* saucer sound */
+	sn76477_enable_w(sn, (data >> 5) & 0x01);	/* saucer sound */
 
 	/* D6 and D7 are not connected */
 }
@@ -2776,10 +2787,11 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( phantom2_audio_1_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* if (data & 0x01)  enable PLAYER SHOT sound */
-	if (rising_bits & 0x01) sample_start_n(0, 0, 0, 0);
+	if (rising_bits & 0x01) sample_start(samples, 0, 0, 0);
 
 	/* if (data & 0x02)  enable ENEMY SHOT sound */
 
@@ -2797,12 +2809,13 @@ WRITE8_HANDLER( phantom2_audio_1_w )
 
 WRITE8_HANDLER( phantom2_audio_2_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	/* D0-D2 are not connected */
 
 	/* if (data & 0x08)  enable EXPLOSION sound */
-	if (rising_bits & 0x08) sample_start_n(0, 1, 1, 0);
+	if (rising_bits & 0x08) sample_start(samples, 1, 1, 0);
 
 	output_set_value("EXPLAMP", (data >> 4) & 0x01);
 
@@ -2902,7 +2915,7 @@ MACHINE_DRIVER_START( bowler_audio )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( bowler_audio_1_w )
+WRITE8_DEVICE_HANDLER( bowler_audio_1_w )
 {
 	/* D0 - selects controller on the cocktail PCB */
 
@@ -2910,7 +2923,7 @@ WRITE8_HANDLER( bowler_audio_1_w )
 
 	sound_global_enable((data >> 2) & 0x01);
 
-	discrete_sound_w(space, BOWLER_FOWL_EN, (data >> 3) & 0x01);
+	discrete_sound_w(device, BOWLER_FOWL_EN, (data >> 3) & 0x01);
 
 	/* D4 - appears to be a screen flip, but it's
             shown unconnected on the schematics for both the
@@ -3634,14 +3647,16 @@ MACHINE_DRIVER_START( invaders_audio )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( invaders_audio_1_w )
+WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 {
-	sn76477_enable_w(0, (~data >> 0) & 0x01);	/* saucer sound */
+	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn");
 
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
+	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
+
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
 
 	sound_global_enable(data & 0x20);
 
@@ -3649,13 +3664,13 @@ WRITE8_HANDLER( invaders_audio_1_w )
 }
 
 
-WRITE8_HANDLER( invaders_audio_2_w )
+WRITE8_DEVICE_HANDLER( invaders_audio_2_w )
 {
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
 
 	/* the flip screen line is only connected on the cocktail PCB */
-	if (invaders_is_cabinet_cocktail(space->machine))
+	if (invaders_is_cabinet_cocktail(device->machine))
 	{
 		invaders_set_flip_screen((data >> 5) & 0x01);
 	}
@@ -3786,20 +3801,20 @@ MACHINE_DRIVER_START( blueshrk_audio )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( blueshrk_audio_w )
+WRITE8_DEVICE_HANDLER( blueshrk_audio_w )
 {
-	discrete_sound_w(space, BLUESHRK_GAME_ON_EN, (data >> 0) & 0x01);
+	discrete_sound_w(device, BLUESHRK_GAME_ON_EN, (data >> 0) & 0x01);
 
-	/* discrete_sound_w(BLUESHRK_SHOT_EN, (data >> 1) & 0x01); */
+	/* discrete_sound_w(device, BLUESHRK_SHOT_EN, (data >> 1) & 0x01); */
 
-	discrete_sound_w(space, BLUESHRK_HIT_EN, (data >> 2) & 0x01);
+	discrete_sound_w(device, BLUESHRK_HIT_EN, (data >> 2) & 0x01);
 
-	/* discrete_sound_w(BLUESHRK_SHARK_EN, (data >> 3) & 0x01); */
+	/* discrete_sound_w(device, BLUESHRK_SHARK_EN, (data >> 3) & 0x01); */
 
 	/* if (data & 0x10)  enable KILLED DIVER sound, this circuit
        doesn't appear to be on the schematics */
 
-	/* discrete_sound_w(BLUESHRK_OCTOPUS_EN, (data >> 5) & 0x01); */
+	/* discrete_sound_w(device, BLUESHRK_OCTOPUS_EN, (data >> 5) & 0x01); */
 
 	/* D6 and D7 are not connected */
 }
@@ -4014,14 +4029,16 @@ MACHINE_DRIVER_START( invad2ct_audio )
 MACHINE_DRIVER_END
 
 
-WRITE8_HANDLER( invad2ct_audio_1_w )
+WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w )
 {
-	sn76477_enable_w(0, (~data >> 0) & 0x01);	/* saucer sound */
+	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn1");
 
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
+	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
+
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 1), data & 0x08);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 1), data & 0x10);
 
 	sound_global_enable(data & 0x20);
 
@@ -4029,32 +4046,34 @@ WRITE8_HANDLER( invad2ct_audio_1_w )
 }
 
 
-WRITE8_HANDLER( invad2ct_audio_2_w )
+WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w )
 {
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
 
 	/* D5-D7 are not connected */
 }
 
 
-WRITE8_HANDLER( invad2ct_audio_3_w )
+WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w )
 {
-	sn76477_enable_w(1, (~data >> 0) & 0x01);	/* saucer sound */
+	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn2");
 
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 2), data & 0x08);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 2), data & 0x10);
+	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
+
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_INVADER_HIT_EN, 2), data & 0x08);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_BONUS_MISSLE_BASE_EN, 2), data & 0x10);
 
 	/* D5-D7 are not connected */
 }
 
 
-WRITE8_HANDLER( invad2ct_audio_4_w )
+WRITE8_DEVICE_HANDLER( invad2ct_audio_4_w )
 {
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_FLEET_DATA, 2), data & 0x0f);
-	discrete_sound_w(space, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 2), data & 0x10);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_FLEET_DATA, 2), data & 0x0f);
+	discrete_sound_w(device, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 2), data & 0x10);
 
 	/* D5-D7 are not connected */
 }

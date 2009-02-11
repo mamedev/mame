@@ -289,19 +289,19 @@ static MACHINE_RESET( ta7630 )
 static UINT8 snd_ctrl0=0;
 static UINT8 snd_ctrl1=0;
 
-static WRITE8_HANDLER( sound_control_0_w )
+static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
 	snd_ctrl0 = data & 0xff;
 	//popmessage("SND0 0=%2x 1=%2x", snd_ctrl0, snd_ctrl1);
 
-	sndti_set_output_gain(SOUND_MSM5232, 0, 0, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 1, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 2, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 3, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 4, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 5, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 6, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
-	sndti_set_output_gain(SOUND_MSM5232, 0, 7, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 0, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 1, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 2, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 3, vol_ctrl[  snd_ctrl0     & 15 ] / 100.0);	/* group1 from msm5232 */
+	sound_set_output_gain(device, 4, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 5, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 6, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
+	sound_set_output_gain(device, 7, vol_ctrl[ (snd_ctrl0>>4) & 15 ] / 100.0);	/* group2 from msm5232 */
 }
 static WRITE8_HANDLER( sound_control_1_w )
 {
@@ -315,12 +315,10 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x8010, 0x801d) AM_WRITE(msm5232_0_w)
-	AM_RANGE(0x8020, 0x8020) AM_WRITE(sound_control_0_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE(SOUND, "msm", msm5232_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVWRITE(SOUND, "msm", sound_control_0_w)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)
 
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)

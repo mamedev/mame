@@ -18,10 +18,10 @@
 
 /*----------- defined in audio/canyon.c -----------*/
 
-WRITE8_HANDLER( canyon_motor_w );
-WRITE8_HANDLER( canyon_explode_w );
-WRITE8_HANDLER( canyon_attract_w );
-WRITE8_HANDLER( canyon_whistle_w );
+WRITE8_DEVICE_HANDLER( canyon_motor_w );
+WRITE8_DEVICE_HANDLER( canyon_explode_w );
+WRITE8_DEVICE_HANDLER( canyon_attract_w );
+WRITE8_DEVICE_HANDLER( canyon_whistle_w );
 
 DISCRETE_SOUND_EXTERN( canyon );
 

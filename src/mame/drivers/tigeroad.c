@@ -162,12 +162,12 @@ static WRITE16_HANDLER( tigeroad_soundcmd_w )
 		soundlatch_w(space,offset,data >> 8);
 }
 
-static WRITE8_HANDLER( msm5205_w )
+static WRITE8_DEVICE_HANDLER( msm5205_w )
 {
-	msm5205_reset_w(offset,(data>>7)&1);
-	msm5205_data_w(offset,data);
-	msm5205_vclk_w(offset,1);
-	msm5205_vclk_w(offset,0);
+	msm5205_reset_w(device,(data>>7)&1);
+	msm5205_data_w(device,data);
+	msm5205_vclk_w(device,1);
+	msm5205_vclk_w(device,0);
 }
 
 
@@ -191,10 +191,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -211,7 +209,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sample_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE(SOUND, "msm", msm5205_w)
 ADDRESS_MAP_END
 
 
@@ -501,9 +499,9 @@ GFXDECODE_END
 
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -511,7 +509,7 @@ static const ym2203_interface ym2203_config =
 	{
 			AY8910_LEGACY_OUTPUT,
 			AY8910_DEFAULT_LOADS,
-			NULL, NULL, NULL, NULL,
+			DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	},
 	irqhandler
 };

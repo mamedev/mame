@@ -442,7 +442,7 @@ static WRITE8_HANDLER( audio_1_answer_w )
 }
 
 
-static WRITE8_HANDLER( nyny_ay8910_37_port_a_w )
+static WRITE8_DEVICE_HANDLER( nyny_ay8910_37_port_a_w )
 {
 	/* not sure what this does */
 
@@ -450,20 +450,14 @@ static WRITE8_HANDLER( nyny_ay8910_37_port_a_w )
 }
 
 
-static WRITE8_HANDLER( nyny_ay8910_37_port_b_w )
-{
-	dac_data_w(0, data);
-}
-
-
 static const ay8910_interface ay8910_37_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	nyny_ay8910_37_port_a_w,
-	nyny_ay8910_37_port_b_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(nyny_ay8910_37_port_a_w),
+	DEVCB_DEVICE_HANDLER(SOUND, "dac", dac_w)
 };
 
 
@@ -471,10 +465,10 @@ static const ay8910_interface ay8910_64_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_3_r,
-	input_port_2_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("SW2"),
+	DEVCB_INPUT_PORT("SW1"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -543,10 +537,10 @@ static ADDRESS_MAP_START( nyny_audio_1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READWRITE(soundlatch_r, audio_1_answer_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ_PORT("SW3")
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
-	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffc) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x3002, 0x3002) AM_MIRROR(0x0ffc) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0x3003, 0x3003) AM_MIRROR(0x0ffc) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x0ffc) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x3002, 0x3002) AM_MIRROR(0x0ffc) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x0ffc) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
 	AM_RANGE(0x4000, 0x4fff) AM_NOP
 	AM_RANGE(0x5000, 0x57ff) AM_MIRROR(0x0800) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_MIRROR(0x0800) AM_ROM
@@ -559,8 +553,8 @@ static ADDRESS_MAP_START( nyny_audio_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_r)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READWRITE(ay8910_read_port_2_r, ay8910_write_port_2_w)
-	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(SOUND, "ay3", ay8910_r)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0ffe) AM_DEVWRITE(SOUND, "ay3", ay8910_data_address_w)
 	AM_RANGE(0x3000, 0x6fff) AM_NOP
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
 ADDRESS_MAP_END

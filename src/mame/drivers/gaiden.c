@@ -433,7 +433,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM) 	/* raiga only */
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD(SOUND, "oki", okim6295_r)
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(SMH_NOP)	/* ?? */
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -442,11 +442,9 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_ROM) 	/* raiga only */
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(okim6295_data_0_w)
-	AM_RANGE(0xf810, 0xf810) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xf811, 0xf811) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xf820, 0xf820) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0xf821, 0xf821) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(SMH_NOP)	/* ?? */
 ADDRESS_MAP_END
 
@@ -457,9 +455,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnbowl_sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -855,9 +852,9 @@ static GFXDECODE_START( drgnbowl )
 GFXDECODE_END
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -865,7 +862,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };

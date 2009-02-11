@@ -144,16 +144,16 @@ static WRITE8_HANDLER( wc90b_sound_command_w )
 	cpu_set_input_line(space->machine->cpu[2],0,HOLD_LINE);
 }
 
-static WRITE8_HANDLER( adpcm_control_w )
+static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "sub");
+	UINT8 *RAM = memory_region(device->machine, "sub");
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(space->machine, 3,&RAM[bankaddress]);
+	memory_set_bankptr(device->machine, 3,&RAM[bankaddress]);
 
-	msm5205_reset_w(0,data & 0x08);
+	msm5205_reset_w(device,data & 0x08);
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
@@ -197,10 +197,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "msm", adpcm_control_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
-	AM_RANGE(0xe801, 0xe801) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -347,9 +346,9 @@ GFXDECODE_END
 
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -357,7 +356,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };
@@ -366,7 +365,7 @@ static void adpcm_int(const device_config *device)
 {
 	static int toggle = 0;
 
-	msm5205_data_w (0,msm5205next);
+	msm5205_data_w (device,msm5205next);
 	msm5205next>>=4;
 
 	toggle ^= 1;

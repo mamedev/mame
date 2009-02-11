@@ -485,12 +485,12 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 static void print_game_sampleof(FILE *out, const game_driver *game, const machine_config *config)
 {
 #if (HAS_SAMPLES)
-	int sndnum;
+	const device_config *device;
 
-	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound) && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
-		if (config->sound[sndnum].type == SOUND_SAMPLES)
+	for (device = sound_first(config); device != NULL; device = sound_next(device))
+		if (sound_get_type(device) == SOUND_SAMPLES)
 		{
-			const char *const *samplenames = ((const samples_interface *)config->sound[sndnum].config)->samplenames;
+			const char *const *samplenames = ((const samples_interface *)device->static_config)->samplenames;
 			if (samplenames != NULL)
 			{
 				int sampnum;
@@ -518,13 +518,13 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 static void print_game_sample(FILE *out, const game_driver *game, const machine_config *config)
 {
 #if (HAS_SAMPLES)
-	int sndnum;
+	const device_config *device;
 
 	/* iterate over sound chips looking for samples */
-	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound) && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
-		if (config->sound[sndnum].type == SOUND_SAMPLES)
+	for (device = sound_first(config); device != NULL; device = sound_next(device))
+		if (sound_get_type(device) == SOUND_SAMPLES)
 		{
-			const char *const *samplenames = ((const samples_interface *)config->sound[sndnum].config)->samplenames;
+			const char *const *samplenames = ((const samples_interface *)device->static_config)->samplenames;
 			if (samplenames != NULL)
 			{
 				int sampnum;
@@ -563,7 +563,6 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 static void print_game_chips(FILE *out, const game_driver *game, const machine_config *config)
 {
 	const device_config *device;
-	int chipnum;
 
 	/* iterate over CPUs */
 	for (device = cpu_first(config); device != NULL; device = cpu_next(device))
@@ -577,17 +576,16 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 	}
 
 	/* iterate over sound chips */
-	for (chipnum = 0; chipnum < ARRAY_LENGTH(config->sound); chipnum++)
-		if (config->sound[chipnum].type != SOUND_DUMMY)
-		{
-			fprintf(out, "\t\t<chip");
-			fprintf(out, " type=\"audio\"");
-			fprintf(out, " tag=\"%s\"", xml_normalize_string(config->sound[chipnum].tag));
-			fprintf(out, " name=\"%s\"", xml_normalize_string(sndtype_get_name(config->sound[chipnum].type)));
-			if (config->sound[chipnum].clock != 0)
-				fprintf(out, " clock=\"%d\"", config->sound[chipnum].clock);
-			fprintf(out, "/>\n");
-		}
+	for (device = sound_first(config); device != NULL; device = sound_next(device))
+	{
+		fprintf(out, "\t\t<chip");
+		fprintf(out, " type=\"audio\"");
+		fprintf(out, " tag=\"%s\"", xml_normalize_string(device->tag));
+		fprintf(out, " name=\"%s\"", xml_normalize_string(device_get_name(device)));
+		if (device->clock != 0)
+			fprintf(out, " clock=\"%d\"", device->clock);
+		fprintf(out, "/>\n");
+	}
 }
 
 
@@ -684,19 +682,9 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
 static void print_game_sound(FILE *out, const game_driver *game, const machine_config *config)
 {
 	int speakers = speaker_output_count(config);
-	int has_sound = FALSE;
-	int sndnum;
 
-	/* see if we have any sound chips to report */
-	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound); sndnum++)
-		if (config->sound[sndnum].type != SOUND_DUMMY)
-		{
-			has_sound = TRUE;
-			break;
-		}
-
-	/* if we have sound, count the number of speakers */
-	if (!has_sound)
+	/* if we have no sound, zero out the speaker count */
+	if (sound_first(config) == NULL)
 		speakers = 0;
 
 	fprintf(out, "\t\t<sound channels=\"%d\"/>\n", speakers);

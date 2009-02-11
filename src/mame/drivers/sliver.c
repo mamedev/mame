@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( soundmem_prg, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0100, 0x0100) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
+	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
 	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_r)
 	/* ports */
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE( oki_setbank )

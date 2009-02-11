@@ -56,6 +56,15 @@ typedef struct kdacApcm
 #define   BASE_SHIFT    (12)
 
 
+INLINE KDAC_A_PCM *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_K007232);
+	return (KDAC_A_PCM *)device->token;
+}
+
 
 #if 0
 static const int kdac_note[] = {
@@ -169,7 +178,7 @@ static const float kdaca_fn[][2] = {
 #endif
 
 /*************************************************************/
-static void KDAC_A_make_fncode( struct kdacApcm *info ){
+static void KDAC_A_make_fncode( KDAC_A_PCM *info ){
   int i;
 #if 0
   int i, j, k;
@@ -218,7 +227,7 @@ static void KDAC_A_make_fncode( struct kdacApcm *info ){
 
 static STREAM_UPDATE( KDAC_A_update )
 {
-  struct kdacApcm *info = param;
+  KDAC_A_PCM *info = param;
   int i;
 
   memset(outputs[0],0,samples * sizeof(*outputs[0]));
@@ -293,11 +302,11 @@ static STREAM_UPDATE( KDAC_A_update )
 /************************************************/
 /*    Konami PCM start                          */
 /************************************************/
-static SND_START( k007232 )
+static DEVICE_START( k007232 )
 {
 	static const k007232_interface defintrf = { 0 };
 	int i;
-	struct kdacApcm *info = device->token;
+	KDAC_A_PCM *info = get_safe_token(device);
 
 	info->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
@@ -307,7 +316,7 @@ static SND_START( k007232 )
 	info->pcmbuf[1] = device->region;
 	info->pcmlimit  = device->regionbytes;
 
-	info->clock = clock;
+	info->clock = device->clock;
 
 	for( i = 0; i < KDAC_A_PCM_MAX; i++ )
 	{
@@ -323,7 +332,7 @@ static SND_START( k007232 )
 
 	for( i = 0; i < 0x10; i++ )  info->wreg[i] = 0;
 
-	info->stream = stream_create(device,0,2,clock/128,info,KDAC_A_update);
+	info->stream = stream_create(device,0,2,device->clock/128,info,KDAC_A_update);
 
 	KDAC_A_make_fncode(info);
 }
@@ -331,10 +340,11 @@ static SND_START( k007232 )
 /************************************************/
 /*    Konami PCM write register                 */
 /************************************************/
-static void k007232_WriteReg( int r, int v, int chip )
+WRITE8_DEVICE_HANDLER( k007232_w )
 {
-  struct kdacApcm *info = sndti_token(SOUND_K007232, chip);
-  int  data;
+  KDAC_A_PCM *info = get_safe_token(device);
+  int r = offset;
+  int v = data;
 
   stream_update(info->stream);
 
@@ -342,7 +352,7 @@ static void k007232_WriteReg( int r, int v, int chip )
 
   if (r == 0x0c){
     /* external port, usually volume control */
-    if (info->intf->portwritehandler) (*info->intf->portwritehandler)(v);
+    if (info->intf->portwritehandler) (*info->intf->portwritehandler)(device,v);
     return;
   }
   else if( r == 0x0d ){
@@ -394,9 +404,10 @@ static void k007232_WriteReg( int r, int v, int chip )
 /************************************************/
 /*    Konami PCM read register                  */
 /************************************************/
-static int k007232_ReadReg( int r, int chip )
+READ8_DEVICE_HANDLER( k007232_r )
 {
-  struct kdacApcm *info = sndti_token(SOUND_K007232, chip);
+  KDAC_A_PCM *info = get_safe_token(device);
+  int r = offset;
   int  ch = 0;
 
   if( r == 0x0005 || r == 0x000b ){
@@ -419,46 +430,16 @@ static int k007232_ReadReg( int r, int chip )
 
 /*****************************************************************************/
 
-WRITE8_HANDLER( k007232_write_port_0_w )
+void k007232_set_volume(const device_config *device,int channel,int volumeA,int volumeB)
 {
-  k007232_WriteReg(offset,data,0);
-}
-
-READ8_HANDLER( k007232_read_port_0_r )
-{
-  return k007232_ReadReg(offset,0);
-}
-
-WRITE8_HANDLER( k007232_write_port_1_w )
-{
-  k007232_WriteReg(offset,data,1);
-}
-
-READ8_HANDLER( k007232_read_port_1_r )
-{
-  return k007232_ReadReg(offset,1);
-}
-
-WRITE8_HANDLER( k007232_write_port_2_w )
-{
-  k007232_WriteReg(offset,data,2);
-}
-
-READ8_HANDLER( k007232_read_port_2_r )
-{
-  return k007232_ReadReg(offset,2);
-}
-
-void k007232_set_volume(int chip,int channel,int volumeA,int volumeB)
-{
-  struct kdacApcm *info = sndti_token(SOUND_K007232, chip);
+  KDAC_A_PCM *info = get_safe_token(device);
   info->vol[channel][0] = volumeA;
   info->vol[channel][1] = volumeB;
 }
 
-void k007232_set_bank( int chip, int chABank, int chBBank )
+void k007232_set_bank( const device_config *device, int chABank, int chBBank )
 {
-  struct kdacApcm *info = sndti_token(SOUND_K007232, chip);
+  KDAC_A_PCM *info = get_safe_token(device);
   info->bank[0] = chABank<<17;
   info->bank[1] = chBBank<<17;
 }
@@ -473,34 +454,24 @@ void k007232_set_bank( int chip, int chABank, int chBBank )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( k007232 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( k007232 )
+DEVICE_GET_INFO( k007232 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct kdacApcm);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(KDAC_A_PCM);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k007232 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k007232 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */									break;
-		case SNDINFO_PTR_RESET:							/* nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( k007232 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */									break;
+		case DEVINFO_FCT_RESET:							/* nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "K007232");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Konami custom");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "K007232");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Konami custom");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

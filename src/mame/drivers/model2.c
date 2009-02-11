@@ -924,7 +924,7 @@ static WRITE32_HANDLER( model2_serial_w )
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		scsp_midi_in(space, 0, data&0xff, 0);
+		scsp_midi_in(devtag_get_device(space->machine, SOUND, "scsp"), 0, data&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
@@ -1582,61 +1582,9 @@ static READ16_HANDLER( m1_snd_v60_ready_r )
 	return 1;
 }
 
-static READ16_HANDLER( m1_snd_mpcm0_r )
+static WRITE16_DEVICE_HANDLER( m1_snd_mpcm_bnk_w )
 {
-	return multi_pcm_reg_0_r(space, 0);
-}
-
-static WRITE16_HANDLER( m1_snd_mpcm0_w )
-{
-	multi_pcm_reg_0_w(space, offset, data);
-}
-
-static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
-{
-	multi_pcm_set_bank(0, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
-}
-
-static READ16_HANDLER( m1_snd_mpcm1_r )
-{
-	return multi_pcm_reg_1_r(space, 0);
-}
-
-static WRITE16_HANDLER( m1_snd_mpcm1_w )
-{
-	multi_pcm_reg_1_w(space, offset, data);
-}
-
-static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
-{
-	multi_pcm_set_bank(1, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
-}
-
-static READ16_HANDLER( m1_snd_ym_r )
-{
-	return ym3438_status_port_0_a_r(space, 0);
-}
-
-static WRITE16_HANDLER( m1_snd_ym_w )
-{
-	switch (offset)
-	{
-		case 0:
-			ym3438_control_port_0_a_w(space, 0, data);
-			break;
-
-		case 1:
-			ym3438_data_port_0_a_w(space, 0, data);
-			break;
-
-		case 2:
-			ym3438_control_port_0_b_w(space, 0, data);
-			break;
-
-		case 3:
-			ym3438_data_port_0_b_w(space, 0, data);
-			break;
-	}
+	multipcm_set_bank(device, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
 }
 
 static WRITE16_HANDLER( m1_snd_68k_latch1_w )
@@ -1652,12 +1600,12 @@ static ADDRESS_MAP_START( model1_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("audio", 0x20000)	// mirror of second program ROM
 	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE( m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
 	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE( m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
-	AM_RANGE(0xc40000, 0xc40007) AM_READWRITE( m1_snd_mpcm0_r, m1_snd_mpcm0_w )
+	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8( SOUND, "sega1", multipcm_r, multipcm_w, 0x00ff )
 	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
-	AM_RANGE(0xc50000, 0xc50001) AM_WRITE( m1_snd_mpcm0_bnk_w )
-	AM_RANGE(0xc60000, 0xc60007) AM_READWRITE( m1_snd_mpcm1_r, m1_snd_mpcm1_w )
-	AM_RANGE(0xc70000, 0xc70001) AM_WRITE( m1_snd_mpcm1_bnk_w )
-	AM_RANGE(0xd00000, 0xd00007) AM_READWRITE( m1_snd_ym_r, m1_snd_ym_w )
+	AM_RANGE(0xc50000, 0xc50001) AM_DEVWRITE( SOUND, "sega1", m1_snd_mpcm_bnk_w )
+	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8( SOUND, "sega2", multipcm_r, multipcm_w, 0x00ff )
+	AM_RANGE(0xc70000, 0xc70001) AM_DEVWRITE( SOUND, "sega2", m1_snd_mpcm_bnk_w )
+	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8( SOUND, "ym", ym3438_r, ym3438_w, 0x00ff )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1684,7 +1632,7 @@ static WRITE16_HANDLER( model2snd_ctrl )
 
 static ADDRESS_MAP_START( model2_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audio", 0) AM_BASE(&model2_soundram)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(scsp_0_r, scsp_0_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE(SOUND, "scsp", scsp_r, scsp_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audio", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("scsp", 0)
@@ -1694,15 +1642,15 @@ ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(running_machine *machine, int irq)
+static void scsp_irq(const device_config *device, int irq)
 {
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpu_set_input_line(machine->cpu[1], irq, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[1], irq, ASSERT_LINE);
 	}
 	else
-		cpu_set_input_line(machine->cpu[1], -irq, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[1], -irq, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =

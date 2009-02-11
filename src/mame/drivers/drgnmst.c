@@ -91,8 +91,8 @@ static READ8_HANDLER( drgnmst_snd_command_r )
 
 	switch (drgnmst_oki_control & 0x1f)
 	{
-		case 0x12:	data = (okim6295_status_1_r(space, 0) & 0x0f); break;
-		case 0x16:	data = (okim6295_status_0_r(space, 0) & 0x0f); break;
+		case 0x12:	data = (okim6295_r(devtag_get_device(space->machine, SOUND, "oki2"), 0) & 0x0f); break;
+		case 0x16:	data = (okim6295_r(devtag_get_device(space->machine, SOUND, "oki1"), 0) & 0x0f); break;
 		case 0x0b:
 		case 0x0f:	data = drgnmst_snd_command; break;
 		default:	break;
@@ -159,12 +159,12 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
 	if (oki_new_bank != drgnmst_oki0_bank) {
 		drgnmst_oki0_bank = oki_new_bank;
 		if (drgnmst_oki0_bank) oki_new_bank--;
-		okim6295_set_bank_base(0, (oki_new_bank * 0x40000));
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki1"), (oki_new_bank * 0x40000));
 	}
 	oki_new_bank = ((pic16c5x_port0 & 0x3) >> 0) | ((drgnmst_oki_control & 0x20) >> 3);
 	if (oki_new_bank != drgnmst_oki1_bank) {
 		drgnmst_oki1_bank = oki_new_bank;
-		okim6295_set_bank_base(1, (oki_new_bank * 0x40000));
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki2"), (oki_new_bank * 0x40000));
 	}
 
 	switch(drgnmst_oki_control & 0x1f)
@@ -172,12 +172,12 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
 		case 0x11:
 //                  logerror("Writing %02x to OKI1",drgnmst_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n",drgnmst_oki_control,drgnmst_snd_command,drgnmst_oki0_bank,drgnmst_oki1_bank);
-					okim6295_data_1_w(space, 0, drgnmst_oki_command);
+					okim6295_w(devtag_get_device(space->machine, SOUND, "oki2"), 0, drgnmst_oki_command);
 					break;
 		case 0x15:
 //                  logerror("Writing %02x to OKI0",drgnmst_oki_command);
 //                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n",drgnmst_oki_control,drgnmst_snd_command,drgnmst_oki0_bank,drgnmst_oki1_bank);
-					okim6295_data_0_w(space, 0, drgnmst_oki_command);
+					okim6295_w(devtag_get_device(space->machine, SOUND, "oki1"), 0, drgnmst_oki_command);
 					break;
 		default:	break;
 	}

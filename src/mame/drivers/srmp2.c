@@ -191,7 +191,7 @@ static WRITE16_HANDLER( mjyuugi_adpcm_bank_w )
 }
 
 
-static WRITE16_HANDLER( srmp2_adpcm_code_w )
+static WRITE16_DEVICE_HANDLER( srmp2_adpcm_code_w )
 {
 /*
     - Received data may be playing ADPCM number.
@@ -200,7 +200,7 @@ static WRITE16_HANDLER( srmp2_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	UINT8 *ROM = memory_region(space->machine, "adpcm");
+	UINT8 *ROM = memory_region(device->machine, "adpcm");
 
 	srmp2_adpcm_sptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	srmp2_adpcm_eptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -209,12 +209,12 @@ static WRITE16_HANDLER( srmp2_adpcm_code_w )
 	srmp2_adpcm_sptr += (srmp2_adpcm_bank * 0x10000);
 	srmp2_adpcm_eptr += (srmp2_adpcm_bank * 0x10000);
 
-	msm5205_reset_w(0, 0);
+	msm5205_reset_w(device, 0);
 	srmp2_adpcm_data = -1;
 }
 
 
-static WRITE8_HANDLER( srmp3_adpcm_code_w )
+static WRITE8_DEVICE_HANDLER( srmp3_adpcm_code_w )
 {
 /*
     - Received data may be playing ADPCM number.
@@ -223,7 +223,7 @@ static WRITE8_HANDLER( srmp3_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	UINT8 *ROM = memory_region(space->machine, "adpcm");
+	UINT8 *ROM = memory_region(device->machine, "adpcm");
 
 	srmp2_adpcm_sptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	srmp2_adpcm_eptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -232,7 +232,7 @@ static WRITE8_HANDLER( srmp3_adpcm_code_w )
 	srmp2_adpcm_sptr += (srmp2_adpcm_bank * 0x10000);
 	srmp2_adpcm_eptr += (srmp2_adpcm_bank * 0x10000);
 
-	msm5205_reset_w(0, 0);
+	msm5205_reset_w(device, 0);
 	srmp2_adpcm_data = -1;
 }
 
@@ -249,25 +249,25 @@ static void srmp2_adpcm_int(const device_config *device)
 
 			if (srmp2_adpcm_sptr >= srmp2_adpcm_eptr)
 			{
-				msm5205_reset_w(0, 1);
+				msm5205_reset_w(device, 1);
 				srmp2_adpcm_data = 0;
 				srmp2_adpcm_sptr = 0;
 			}
 			else
 			{
-				msm5205_data_w(0, ((srmp2_adpcm_data >> 4) & 0x0f));
+				msm5205_data_w(device, ((srmp2_adpcm_data >> 4) & 0x0f));
 			}
 		}
 		else
 		{
-			msm5205_data_w(0, ((srmp2_adpcm_data >> 0) & 0x0f));
+			msm5205_data_w(device, ((srmp2_adpcm_data >> 0) & 0x0f));
 			srmp2_adpcm_sptr++;
 			srmp2_adpcm_data = -1;
 		}
 	}
 	else
 	{
-		msm5205_reset_w(0, 1);
+		msm5205_reset_w(device, 1);
 	}
 }
 
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( srmp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(srmp2_cchip_status_0_r)	/* Custom chip status ??? */
 	AM_RANGE(0xb00002, 0xb00003) AM_READ(srmp2_cchip_status_1_r)	/* Custom chip status ??? */
-	AM_RANGE(0xf00000, 0xf00001) AM_READ(ay8910_read_port_0_lsb_r)
+	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8(SOUND, "ay", ay8910_r, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -409,12 +409,11 @@ static ADDRESS_MAP_START( srmp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(srmp2_input_1_w)			/* I/O ??? */
 	AM_RANGE(0xa00002, 0xa00003) AM_WRITE(srmp2_input_2_w)			/* I/O ??? */
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(srmp2_adpcm_code_w)			/* ADPCM number */
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE(SOUND, "msm", srmp2_adpcm_code_w)			/* ADPCM number */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP)					/* ??? */
-	AM_RANGE(0xf00000, 0xf00001) AM_WRITE(ay8910_control_port_0_lsb_w)
-	AM_RANGE(0xf00002, 0xf00003) AM_WRITE(ay8910_write_port_0_lsb_w)
+	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8(SOUND, "ay", ay8910_address_data_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -432,7 +431,7 @@ static ADDRESS_MAP_START( mjyuugi_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900002, 0x900003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(srmp2_cchip_status_0_r)	/* custom chip status ??? */
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_cchip_status_1_r)	/* custom chip status ??? */
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(ay8910_read_port_0_lsb_r)
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8(SOUND, "ay", ay8910_r, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00609) AM_READ(SMH_RAM)				/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_READ(SMH_RAM)				/* ??? */
 	AM_RANGE(0xe00000, 0xe03fff) AM_READ(SMH_RAM)				/* Sprites Code + X + Attr */
@@ -446,9 +445,8 @@ static ADDRESS_MAP_START( mjyuugi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(srmp2_input_1_w)			/* I/O ??? */
 	AM_RANGE(0x900002, 0x900003) AM_WRITE(srmp2_input_2_w)			/* I/O ??? */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(srmp2_adpcm_code_w)			/* ADPCM number */
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(ay8910_control_port_0_lsb_w)
-	AM_RANGE(0xb00002, 0xb00003) AM_WRITE(ay8910_write_port_0_lsb_w)
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE(SOUND, "msm", srmp2_adpcm_code_w)			/* ADPCM number */
+	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8(SOUND, "ay", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xd00000, 0xd00609) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)	/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_WRITE(SMH_RAM)					/* ??? only writes $00fa */
@@ -589,13 +587,12 @@ static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_WRITE(SMH_NOP)								/* elapsed interrupt signal */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE(srmp3_flags_w)	/* coin, service | GFX bank, counter, lockout */
 	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)						/* ROM bank select */
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(srmp3_adpcm_code_w)					/* ADPCM number */
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE(SOUND, "msm", srmp3_adpcm_code_w)					/* ADPCM number */
 	AM_RANGE(0xa1, 0xa1) AM_READ(srmp3_cchip_status_0_r)				/* custom chip status ??? */
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(srmp3_input_r, srmp3_input_1_w)	/* key matrix | I/O ??? */
 	AM_RANGE(0xc1, 0xc1) AM_READWRITE(srmp3_cchip_status_1_r, srmp3_input_2_w)	/* custom chip status ??? | I/O ??? */
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xe2, 0xe2) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0xe2, 0xe2) AM_DEVREAD(SOUND, "ay", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -1023,10 +1020,10 @@ static const ay8910_interface srmp2_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_2_r,				/* Input A: DSW 2 */
-	input_port_1_r,				/* Input B: DSW 1 */
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

@@ -424,7 +424,7 @@ static WRITE8_HANDLER( n7751_command_w )
 }
 
 
-static WRITE8_HANDLER( n7751_control_w )
+static WRITE8_DEVICE_HANDLER( n7751_control_w )
 {
 	/*
         YM2151 output port
@@ -432,9 +432,9 @@ static WRITE8_HANDLER( n7751_control_w )
         D1 = /RESET line on 7751
         D0 = /IRQ line on 7751
     */
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(space->machine->cpu[2], 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[2], 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -841,8 +841,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(n7751_command_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
@@ -858,7 +857,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( n7751_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READ(n7751_rom_r)
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_DEVREADWRITE(I8243, "n7751_8243", n7751_p2_r, n7751_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE(I8243, "n7751_8243", i8243_prog_w)
 ADDRESS_MAP_END
@@ -1802,7 +1801,7 @@ static MACHINE_DRIVER_START( system16a )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2151", YM2151, 4000000)
+	MDRV_SOUND_ADD("ym", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
@@ -1816,7 +1815,7 @@ static MACHINE_DRIVER_START( system16a_no7751 )
 	MDRV_CPU_REMOVE("n7751")
 	MDRV_SOUND_REMOVE("dac")
 
-	MDRV_SOUND_REPLACE("2151", YM2151, 4000000)
+	MDRV_SOUND_REPLACE("ym", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

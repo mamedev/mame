@@ -24,7 +24,8 @@
 
 static const int dividers[4] = { 1024, 768, 512, 512 };
 
-struct okim6258
+typedef struct _okim6258_state okim6258_state;
+struct _okim6258_state
 {
 	UINT8  status;
 
@@ -49,6 +50,15 @@ static int diff_lookup[49*16];
 
 /* tables computed? */
 static int tables_computed = 0;
+
+INLINE okim6258_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_OKIM6258);
+	return (okim6258_state *)device->token;
+}
 
 /**********************************************************************************************
 
@@ -90,7 +100,7 @@ static void compute_tables(void)
 }
 
 
-static INT16 clock_adpcm(struct okim6258 *chip, UINT8 nibble)
+static INT16 clock_adpcm(okim6258_state *chip, UINT8 nibble)
 {
 	INT32 max = (1 << (chip->output_bits - 1)) - 1;
 	INT32 min = -(1 << (chip->output_bits - 1));
@@ -122,7 +132,7 @@ static INT16 clock_adpcm(struct okim6258 *chip, UINT8 nibble)
 
 static STREAM_UPDATE( okim6258_update )
 {
-	struct okim6258 *chip = param;
+	okim6258_state *chip = param;
 	stream_sample_t *buffer = outputs[0];
 
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -164,7 +174,7 @@ static STREAM_UPDATE( okim6258_update )
 
 ***********************************************************************************************/
 
-static void okim6258_state_save_register(struct okim6258 *info, const device_config *device)
+static void okim6258_state_save_register(okim6258_state *info, const device_config *device)
 {
 	state_save_register_device_item(device, 0, info->status);
 	state_save_register_device_item(device, 0, info->master_clock);
@@ -182,21 +192,21 @@ static void okim6258_state_save_register(struct okim6258 *info, const device_con
 
 ***********************************************************************************************/
 
-static SND_START( okim6258 )
+static DEVICE_START( okim6258 )
 {
 	const okim6258_interface *intf = device->static_config;
-	struct okim6258 *info = device->token;
+	okim6258_state *info = get_safe_token(device);
 
 	compute_tables();
 
-	info->master_clock = clock;
+	info->master_clock = device->clock;
 	info->adpcm_type = intf->adpcm_type;
 
 	/* D/A precision is 10-bits but 12-bit data can be output serially to an external DAC */
 	info->output_bits = intf->output_12bits ? 12 : 10;
 	info->divider = dividers[intf->divider];
 
-	info->stream = stream_create(device, 0, 1, clock/info->divider, info, okim6258_update);
+	info->stream = stream_create(device, 0, 1, device->clock/info->divider, info, okim6258_update);
 
 	info->signal = -2;
 	info->step = 0;
@@ -211,9 +221,9 @@ static SND_START( okim6258 )
 
 ***********************************************************************************************/
 
-static SND_RESET( okim6258 )
+static DEVICE_RESET( okim6258 )
 {
-	struct okim6258 *info = device->token;
+	okim6258_state *info = get_safe_token(device);
 
 	stream_update(info->stream);
 
@@ -229,9 +239,9 @@ static SND_RESET( okim6258 )
 
 ***********************************************************************************************/
 
-void okim6258_set_divider(int which, int val)
+void okim6258_set_divider(const device_config *device, int val)
 {
-	struct okim6258 *info = sndti_token(SOUND_OKIM6258, which);
+	okim6258_state *info = get_safe_token(device);
 	int divider = dividers[val];
 
 	info->divider = dividers[val];
@@ -245,9 +255,9 @@ void okim6258_set_divider(int which, int val)
 
 ***********************************************************************************************/
 
-void okim6258_set_clock(int which, int val)
+void okim6258_set_clock(const device_config *device, int val)
 {
-	struct okim6258 *info = sndti_token(SOUND_OKIM6258, which);
+	okim6258_state *info = get_safe_token(device);
 
 	info->master_clock = val;
 	stream_set_sample_rate(info->stream, info->master_clock / info->divider);
@@ -260,9 +270,9 @@ void okim6258_set_clock(int which, int val)
 
 ***********************************************************************************************/
 
-int okim6258_get_vclk(int which)
+int okim6258_get_vclk(const device_config *device)
 {
-	struct okim6258 *info = sndti_token(SOUND_OKIM6258, which);
+	okim6258_state *info = get_safe_token(device);
 
 	return (info->master_clock / info->divider);
 }
@@ -274,9 +284,9 @@ int okim6258_get_vclk(int which)
 
 ***********************************************************************************************/
 
-static int okim6258_status_r(int num)
+READ8_DEVICE_HANDLER( okim6258_status_r )
 {
-	struct okim6258 *info = sndti_token(SOUND_OKIM6258, num);
+	okim6258_state *info = get_safe_token(device);
 
 	stream_update(info->stream);
 
@@ -289,9 +299,9 @@ static int okim6258_status_r(int num)
      okim6258_data_w -- write to the control port of an OKIM6258-compatible chip
 
 ***********************************************************************************************/
-static void okim6258_data_w(int num, int data)
+WRITE8_DEVICE_HANDLER( okim6258_data_w )
 {
-	struct okim6258 *info = sndti_token(SOUND_OKIM6258, num);
+	okim6258_state *info = get_safe_token(device);
 
 	/* update the stream */
 	stream_update(info->stream);
@@ -307,9 +317,9 @@ static void okim6258_data_w(int num, int data)
 
 ***********************************************************************************************/
 
-static void okim6258_ctrl_w(int num, int data)
+WRITE8_DEVICE_HANDLER( okim6258_ctrl_w )
 {
-	struct okim6258 *info = sndti_token(SOUND_OKIM6258, num);
+	okim6258_state *info = get_safe_token(device);
 
 	stream_update(info->stream);
 
@@ -348,142 +358,30 @@ static void okim6258_ctrl_w(int num, int data)
 }
 
 
-/**********************************************************************************************
-
-     okim6258_status_0_r -- generic status read functions
-
-***********************************************************************************************/
-
-READ8_HANDLER( okim6258_status_0_r )
-{
-	return okim6258_status_r(0);
-}
-
-READ16_HANDLER( okim6258_status_0_lsb_r )
-{
-	return okim6258_status_r(0);
-}
-
-READ16_HANDLER( okim6258_status_0_msb_r )
-{
-	return okim6258_status_r(0) << 8;
-}
-
-READ8_HANDLER( okim6258_data_0_r )
-{
-	// TODO
-	return 0;
-}
-
-READ16_HANDLER( okim6258_data_0_lsb_r )
-{
-	// TODO
-	return 0;
-}
-
-READ16_HANDLER( okim6258_data_0_msb_r )
-{
-	// TODO
-	return 0;
-}
-
-/**********************************************************************************************
-
-     okim6258_data_0_w -- generic data write functions
-     okim6258_data_1_w
-
-***********************************************************************************************/
-
-WRITE8_HANDLER( okim6258_data_0_w )
-{
-	okim6258_data_w(0, data);
-}
-
-WRITE8_HANDLER( okim6258_data_1_w )
-{
-	okim6258_data_w(1, data);
-}
-
-WRITE8_HANDLER( okim6258_data_2_w )
-{
-	okim6258_data_w(2, data);
-}
-
-WRITE16_HANDLER( okim6258_data_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6258_data_w(0, data & 0xff);
-}
-
-WRITE16_HANDLER( okim6258_data_1_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6258_data_w(1, data & 0xff);
-}
-
-WRITE16_HANDLER( okim6258_data_2_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6258_data_w(2, data & 0xff);
-}
-
-WRITE16_HANDLER( okim6258_data_0_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6258_data_w(0, data >> 8);
-}
-
-WRITE16_HANDLER( okim6258_data_1_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6258_data_w(1, data >> 8);
-}
-
-WRITE16_HANDLER( okim6258_data_2_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6258_data_w(2, data >> 8);
-}
-
-WRITE16_HANDLER( okim6258_ctrl_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6258_ctrl_w(0, data & 0xff);
-}
 
 
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( okim6258 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( okim6258 )
+DEVICE_GET_INFO( okim6258 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct okim6258);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(okim6258_state);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME(okim6258); break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME(okim6258);		break;
-		case SNDINFO_PTR_STOP:							/* nothing */								break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME(okim6258);		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(okim6258);		break;
+		case DEVINFO_FCT_STOP:							/* nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(okim6258);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "OKI6258");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "OKI ADPCM");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "OKI6258");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "OKI ADPCM");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

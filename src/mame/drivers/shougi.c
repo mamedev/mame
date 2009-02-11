@@ -278,8 +278,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(shougi_watchdog_reset_w)	/* game won't boot if watchdog doesn't work */
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE(1) /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE(2) /* 2114 x 2 (0x400 x 4bit each) */
 

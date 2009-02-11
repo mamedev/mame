@@ -24,7 +24,6 @@
 #include "cpu/z80/z80.h"
 #include "render.h"
 #include "sound/sn76496.h"
-#include "sound/custom.h"
 #include "machine/laserdsc.h"
 #include "video/resnet.h"
 
@@ -187,7 +186,7 @@ static ADDRESS_MAP_START( superdq_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x04, 0x04) AM_READWRITE(superdq_ld_r,sn76496_0_w)
+	AM_RANGE(0x04, 0x04) AM_READ(superdq_ld_r) AM_DEVWRITE(SOUND, "sn", sn76496_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(superdq_io_w)
 	AM_RANGE(0x0c, 0x0d) AM_NOP /* HD46505S */
 ADDRESS_MAP_END
@@ -326,8 +325,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.8)
 
-	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

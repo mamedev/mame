@@ -172,8 +172,8 @@ static ADDRESS_MAP_START( slotcarn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0xafff) AM_ROM // spielbud
 
 
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xb100, 0xb100) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0xb100, 0xb100) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
 
 	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0xba00, 0xba03) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
@@ -194,8 +194,8 @@ ADDRESS_MAP_END
 
 // spielbud - is the ay mirrored, or are there now 2?
 static ADDRESS_MAP_START( spielbud_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xb100, 0xb100) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0xb100, 0xb100) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 /********************************
@@ -578,10 +578,10 @@ static const ay8910_interface scarn_ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	input_port_6_r,	/* DSW2 */
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

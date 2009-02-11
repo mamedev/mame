@@ -22,7 +22,8 @@
 
 
 /* the state of the streamed output */
-struct tms5110_info
+typedef struct _tms5110_state tms5110_state;
+struct _tms5110_state
 {
 	const tms5110_interface *intf;
 	const UINT8 *table;
@@ -32,12 +33,28 @@ struct tms5110_info
 };
 
 
+INLINE tms5110_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_TMS5110 ||
+		   sound_get_type(device) == SOUND_TMS5100 ||
+		   sound_get_type(device) == SOUND_TMS5110A ||
+		   sound_get_type(device) == SOUND_CD2801 ||
+		   sound_get_type(device) == SOUND_TMC0281 ||
+		   sound_get_type(device) == SOUND_CD2802 ||
+		   sound_get_type(device) == SOUND_M58817);
+	return (tms5110_state *)device->token;
+}
+
+
 /* static function prototypes */
 static STREAM_UPDATE( tms5110_update );
 
 static int speech_rom_read_bit(const device_config *device)
 {
-	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
+	tms5110_state *info = get_safe_token(device);
 
 	int r;
 
@@ -51,23 +68,23 @@ static int speech_rom_read_bit(const device_config *device)
 	return r;
 }
 
-static void speech_rom_set_addr(int addr)
+static void speech_rom_set_addr(const device_config *device, int addr)
 {
-	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
+	tms5110_state *info = get_safe_token(device);
 
 	info->speech_rom_bitnum = addr * 8 - 1;
 }
 
 /******************************************************************************
 
-     SND_START( tms5110 ) -- allocate buffers and reset the 5110
+     DEVICE_START( tms5110 ) -- allocate buffers and reset the 5110
 
 ******************************************************************************/
 
-static SND_START( tms5110 )
+static DEVICE_START( tms5110 )
 {
 	static const tms5110_interface dummy = { 0 };
-	struct tms5110_info *info = device->token;
+	tms5110_state *info = get_safe_token(device);
 
 	info->intf = device->static_config ? device->static_config : &dummy;
 	info->table = device->region;
@@ -76,7 +93,7 @@ static SND_START( tms5110 )
 	assert_always(info->chip != NULL, "Error creating TMS5110 chip");
 
 	/* initialize a stream */
-	info->stream = stream_create(device, 0, 1, clock / 80, info, tms5110_update);
+	info->stream = stream_create(device, 0, 1, device->clock / 80, info, tms5110_update);
 
 	if (info->table == NULL)
 	{
@@ -94,65 +111,65 @@ static SND_START( tms5110 )
     tms5110_reset_chip(info->chip);
 }
 
-static SND_START( tms5100 )
+static DEVICE_START( tms5100 )
 {
-	struct tms5110_info *info = device->token;
-	SND_START_CALL( tms5110 );
+	tms5110_state *info = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_5100);
 }
 
-static SND_START( tms5110a )
+static DEVICE_START( tms5110a )
 {
-	struct tms5110_info *info = device->token;
-	SND_START_CALL( tms5110 );
+	tms5110_state *info = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_5110A);
 }
 
-static SND_START( cd2801 )
+static DEVICE_START( cd2801 )
 {
-	struct tms5110_info *info = device->token;
-	SND_START_CALL( tms5110 );
+	tms5110_state *info = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2801);
 }
 
-static SND_START( tmc0281 )
+static DEVICE_START( tmc0281 )
 {
-	struct tms5110_info *info = device->token;
-	SND_START_CALL( tms5110 );
+	tms5110_state *info = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_TMC0281);
 }
 
-static SND_START( cd2802 )
+static DEVICE_START( cd2802 )
 {
-	struct tms5110_info *info = device->token;
-	SND_START_CALL( tms5110 );
+	tms5110_state *info = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2802);
 }
 
-static SND_START( m58817 )
+static DEVICE_START( m58817 )
 {
-	struct tms5110_info *info = device->token;
-	SND_START_CALL( tms5110 );
+	tms5110_state *info = get_safe_token(device);
+	DEVICE_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_M58817);
 }
 
 
 /******************************************************************************
 
-     SND_STOP( tms5110 ) -- free buffers
+     DEVICE_STOP( tms5110 ) -- free buffers
 
 ******************************************************************************/
 
-static SND_STOP( tms5110 )
+static DEVICE_STOP( tms5110 )
 {
-	struct tms5110_info *info = device->token;
+	tms5110_state *info = get_safe_token(device);
 	tms5110_destroy(info->chip);
 }
 
 
-static SND_RESET( tms5110 )
+static DEVICE_RESET( tms5110 )
 {
-	struct tms5110_info *info = device->token;
+	tms5110_state *info = get_safe_token(device);
 	tms5110_reset_chip(info->chip);
 }
 
@@ -165,9 +182,9 @@ commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
 
 ******************************************************************************/
 
-WRITE8_HANDLER( tms5110_ctl_w )
+WRITE8_DEVICE_HANDLER( tms5110_ctl_w )
 {
-	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
+	tms5110_state *info = get_safe_token(device);
 
     /* bring up to date first */
     stream_update(info->stream);
@@ -180,9 +197,9 @@ WRITE8_HANDLER( tms5110_ctl_w )
 
 ******************************************************************************/
 
-WRITE8_HANDLER( tms5110_pdc_w )
+WRITE8_DEVICE_HANDLER( tms5110_pdc_w )
 {
-	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
+	tms5110_state *info = get_safe_token(device);
 
     /* bring up to date first */
     stream_update(info->stream);
@@ -197,9 +214,9 @@ WRITE8_HANDLER( tms5110_pdc_w )
 
 ******************************************************************************/
 
-READ8_HANDLER( tms5110_status_r )
+READ8_DEVICE_HANDLER( tms5110_status_r )
 {
-	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
+	tms5110_state *info = get_safe_token(device);
 
     /* bring up to date first */
     stream_update(info->stream);
@@ -214,9 +231,9 @@ READ8_HANDLER( tms5110_status_r )
 
 ******************************************************************************/
 
-int tms5110_ready_r(void)
+int tms5110_ready_r(const device_config *device)
 {
-	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
+	tms5110_state *info = get_safe_token(device);
 
     /* bring up to date first */
     stream_update(info->stream);
@@ -233,7 +250,7 @@ int tms5110_ready_r(void)
 
 static STREAM_UPDATE( tms5110_update )
 {
-	struct tms5110_info *info = param;
+	tms5110_state *info = param;
 	INT16 sample_data[MAX_SAMPLE_CHUNK];
 	stream_sample_t *buffer = outputs[0];
 
@@ -261,9 +278,9 @@ static STREAM_UPDATE( tms5110_update )
 
 ******************************************************************************/
 
-void tms5110_set_frequency(int frequency)
+void tms5110_set_frequency(const device_config *device, int frequency)
 {
-	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
+	tms5110_state *info = get_safe_token(device);
 	stream_set_sample_rate(info->stream, frequency / 80);
 }
 
@@ -274,96 +291,83 @@ void tms5110_set_frequency(int frequency)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( tms5110 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-SND_GET_INFO( tms5110 )
+DEVICE_GET_INFO( tms5110 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct tms5110_info);			break;
-		case SNDINFO_FCT_ALIAS:							info->type = SOUND_TMS5110;						break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tms5110_state);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( tms5110 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms5110 );		break;
-		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( tms5110 );			break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( tms5110 );		break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( tms5110 );		break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( tms5110 );			break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( tms5110 );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "TMS5110");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "TI Speech");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS5110");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "TI Speech");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 
-SND_GET_INFO( tms5100 )
+DEVICE_GET_INFO( tms5100 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms5100 );		break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "TMS5100");						break;
-		default: 										SND_GET_INFO_CALL(tms5110);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( tms5100 );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS5100");						break;
+		default: 										DEVICE_GET_INFO_CALL(tms5110);						break;
 	}
 }
 
-SND_GET_INFO( tms5110a )
+DEVICE_GET_INFO( tms5110a )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms5110a );		break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "TMS5100A");					break;
-		default: 										SND_GET_INFO_CALL(tms5110);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( tms5110a );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS5100A");					break;
+		default: 										DEVICE_GET_INFO_CALL(tms5110);						break;
 	}
 }
 
-SND_GET_INFO( cd2801 )
+DEVICE_GET_INFO( cd2801 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( cd2801 );			break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "CD2801");						break;
-		default: 										SND_GET_INFO_CALL(tms5110);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( cd2801 );			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CD2801");						break;
+		default: 										DEVICE_GET_INFO_CALL(tms5110);						break;
 	}
 }
 
-SND_GET_INFO( tmc0281 )
+DEVICE_GET_INFO( tmc0281 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tmc0281 );		break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "TMS5100");						break;
-		default: 										SND_GET_INFO_CALL(tms5110);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( tmc0281 );		break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS5100");						break;
+		default: 										DEVICE_GET_INFO_CALL(tms5110);						break;
 	}
 }
 
-SND_GET_INFO( cd2802 )
+DEVICE_GET_INFO( cd2802 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( cd2802 );			break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "CD2802");						break;
-		default: 										SND_GET_INFO_CALL(tms5110);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( cd2802 );			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CD2802");						break;
+		default: 										DEVICE_GET_INFO_CALL(tms5110);						break;
 	}
 }
 
-SND_GET_INFO( m58817 )
+DEVICE_GET_INFO( m58817 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( m58817 );			break;
-		case SNDINFO_STR_NAME:							strcpy(info->s, "M58817");						break;
-		default: 										SND_GET_INFO_CALL(tms5110);						break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( m58817 );			break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "M58817");						break;
+		default: 										DEVICE_GET_INFO_CALL(tms5110);						break;
 	}
 }
-
-
-

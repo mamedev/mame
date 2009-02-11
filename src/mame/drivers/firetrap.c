@@ -60,7 +60,7 @@ write:
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/3812intf.h"
+#include "sound/3526intf.h"
 #include "sound/msm5205.h"
 
 
@@ -206,7 +206,7 @@ static WRITE8_HANDLER( firetrap_sound_command_w )
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
 {
-	msm5205_reset_w(offset,~data & 0x01);
+	msm5205_reset_w(devtag_get_device(space->machine, SOUND, "msm"),~data & 0x01);
 	firetrap_irq_enable = data & 0x02;
 }
 
@@ -225,7 +225,7 @@ static void firetrap_adpcm_int (const device_config *device)
 {
 	static int toggle=0;
 
-	msm5205_data_w (0,msm5205next>>4);
+	msm5205_data_w (device,msm5205next>>4);
 	msm5205next<<=4;
 
 	toggle ^= 1;
@@ -317,8 +317,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3526_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym", ym3526_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)

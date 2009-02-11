@@ -344,7 +344,7 @@ static WRITE8_HANDLER( ddragon2_sub_irq_w )
 }
 
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
 	cpu_set_input_line(snd_cpu, ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
 }
@@ -429,13 +429,14 @@ static WRITE8_HANDLER( ddragon_spriteram_w )
 
 static WRITE8_HANDLER( dd_adpcm_w )
 {
-	int chip = offset & 1;
+	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (offset & 1) ? "adpcm2" : "adpcm1");
+	int chip = (strcmp(adpcm->tag, "adpcm1") == 0) ? 0 : 1;
 
 	switch (offset/2)
 	{
 		case 3:
 			adpcm_idle[chip] = 1;
-			msm5205_reset_w(chip,1);
+			msm5205_reset_w(adpcm,1);
 			break;
 
 		case 2:
@@ -448,7 +449,7 @@ static WRITE8_HANDLER( dd_adpcm_w )
 
 		case 0:
 			adpcm_idle[chip] = 0;
-			msm5205_reset_w(chip,0);
+			msm5205_reset_w(adpcm,0);
 			break;
 	}
 }
@@ -460,11 +461,11 @@ static void dd_adpcm_int(const device_config *device)
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
 	{
 		adpcm_idle[chip] = 1;
-		msm5205_reset_w(chip,1);
+		msm5205_reset_w(device,1);
 	}
 	else if (adpcm_data[chip] != -1)
 	{
-		msm5205_data_w(chip, adpcm_data[chip] & 0x0f);
+		msm5205_data_w(device, adpcm_data[chip] & 0x0f);
 		adpcm_data[chip] = -1;
 	}
 	else
@@ -472,7 +473,7 @@ static void dd_adpcm_int(const device_config *device)
 		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
-		msm5205_data_w(chip,adpcm_data[chip] >> 4);
+		msm5205_data_w(device,adpcm_data[chip] >> 4);
 	}
 }
 
@@ -585,8 +586,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
 	AM_RANGE(0x1800, 0x1800) AM_READ(dd_adpcm_status_r)
-	AM_RANGE(0x2800, 0x2800) AM_READWRITE(ym2151_status_port_0_r, ym2151_register_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE(SOUND, "fm", ym2151_r, ym2151_w)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(dd_adpcm_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -595,9 +595,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dd2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE(SOUND, "fm", ym2151_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -1109,7 +1108,7 @@ static MACHINE_DRIVER_START( ddragon2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, SOUND_CLOCK)
+	MDRV_SOUND_ADD("fm", YM2151, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)

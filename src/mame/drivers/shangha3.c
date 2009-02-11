@@ -91,7 +91,7 @@ static WRITE16_HANDLER( heberpop_coinctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		okim6295_set_bank_base(0,(data & 0x08) ? 0x40000 : 0x00000);
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"),(data & 0x08) ? 0x40000 : 0x00000);
 
 		coin_lockout_w(0,~data & 0x04);
 		coin_lockout_w(1,~data & 0x04);
@@ -105,7 +105,7 @@ static WRITE16_HANDLER( blocken_coinctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		okim6295_set_bank_base(0, ((data >> 4) & 3) * 0x40000);
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"), ((data >> 4) & 3) * 0x40000);
 
 		coin_lockout_w(0,~data & 0x04);
 		coin_lockout_w(1,~data & 0x04);
@@ -131,9 +131,9 @@ static ADDRESS_MAP_START( shangha3_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x20001e, 0x20001f) AM_READ(ay8910_read_port_0_lsb_r)
+	AM_RANGE(0x20001e, 0x20001f) AM_DEVREAD8(SOUND, "ay", ay8910_r, 0x00ff)
 	AM_RANGE(0x20004e, 0x20004f) AM_READ(shangha3_prot_r)
-	AM_RANGE(0x20006e, 0x20006f) AM_READ(okim6295_status_0_lsb_r)
+	AM_RANGE(0x20006e, 0x20006f) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff)
 	AM_RANGE(0x300000, 0x30ffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -143,10 +143,10 @@ static ADDRESS_MAP_START( shangha3_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(SMH_NOP)	/* irq ack? */
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(shangha3_coinctrl_w)
-	AM_RANGE(0x20002e, 0x20002f) AM_WRITE(ay8910_write_port_0_lsb_w)
-	AM_RANGE(0x20003e, 0x20003f) AM_WRITE(ay8910_control_port_0_lsb_w)
+	AM_RANGE(0x20002e, 0x20002f) AM_DEVWRITE8(SOUND, "ay", ay8910_data_w, 0x00ff)
+	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8(SOUND, "ay", ay8910_address_w, 0x00ff)
 	AM_RANGE(0x20004e, 0x20004f) AM_WRITE(shangha3_prot_w)
-	AM_RANGE(0x20006e, 0x20006f) AM_WRITE(okim6295_data_0_lsb_w)
+	AM_RANGE(0x20006e, 0x20006f) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(SMH_RAM) AM_BASE(&shangha3_ram) AM_SIZE(&shangha3_ram_size)	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
@@ -211,11 +211,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3438_status_port_0_a_r, ym3438_control_port_0_a_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym3438_data_port_0_a_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ym3438_control_port_0_b_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ym3438_data_port_0_b_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(SOUND, "ym", ym3438_r, ym3438_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -489,15 +486,15 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_3_r,
-	input_port_2_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, linestate);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, linestate);
 }
 
 static const ym3438_interface ym3438_config =

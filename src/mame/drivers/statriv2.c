@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( statriv2_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
 	AM_RANGE(0x2b, 0x2b) AM_READ(statriv2_questions_read)		// question data
-	AM_RANGE(0xb1, 0xb1) AM_READ(ay8910_read_port_0_r)		// ???
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD(SOUND, "ay", ay8910_r)		// ???
 	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
@@ -347,8 +347,7 @@ static ADDRESS_MAP_START( statriv2_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x23, 0x23) AM_WRITE(SMH_NOP)				// ???
 	AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_low_w)
 	AM_RANGE(0x2a, 0x2a) AM_WRITE(question_offset_high_w)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xb1, 0xb1) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
@@ -356,7 +355,7 @@ static ADDRESS_MAP_START( statriv4_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
 	AM_RANGE(0x28, 0x28) AM_READ(statriv2_questions_read)		// question data
-	AM_RANGE(0xb1, 0xb1) AM_READ(ay8910_read_port_0_r)		// ???
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD(SOUND, "ay", ay8910_r)		// ???
 	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
@@ -365,8 +364,7 @@ static ADDRESS_MAP_START( statriv4_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x23, 0x23) AM_WRITE(SMH_NOP)				// ???
 	AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_high_w)
 	AM_RANGE(0x2a, 0x2a) AM_WRITE(question_offset_low_w)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xb1, 0xb1) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
@@ -374,7 +372,7 @@ static ADDRESS_MAP_START( supertr2_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
 	AM_RANGE(0x28, 0x28) AM_READ(supertr2_questions_read)                // question data
-	AM_RANGE(0xb1, 0xb1) AM_READ(ay8910_read_port_0_r)		// ???
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD(SOUND, "ay", ay8910_r)		// ???
 	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)			// ???
 ADDRESS_MAP_END
 
@@ -384,8 +382,7 @@ static ADDRESS_MAP_START( supertr2_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x28, 0x28) AM_WRITE(question_offset_low_w)
 	AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_med_w)
 	AM_RANGE(0x2a, 0x2a) AM_WRITE(question_offset_high_w)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xb1, 0xb1) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
@@ -394,8 +391,7 @@ static ADDRESS_MAP_START( trivquiz_writeport, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x23, 0x23) AM_WRITE(SMH_NOP)                               // ???
     AM_RANGE(0x28, 0x28) AM_WRITE(question_offset_low_w)
     AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_high_w)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xb1, 0xb1) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
@@ -403,7 +399,7 @@ static ADDRESS_MAP_START( trivquiz_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
 	AM_RANGE(0x2a, 0x2a) AM_READ(statriv2_questions_read)                // question data
-	AM_RANGE(0xb1, 0xb1) AM_READ(ay8910_read_port_0_r)		// ???
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD(SOUND, "ay", ay8910_r)		// ???
 	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
@@ -411,7 +407,7 @@ static ADDRESS_MAP_START( supertr3_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
 	AM_RANGE(0x28, 0x28) AM_READ(supertr3_questions_read)                // question data
-	AM_RANGE(0xb1, 0xb1) AM_READ(ay8910_read_port_0_r)		// ???
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD(SOUND, "ay", ay8910_r)		// ???
 	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
@@ -419,15 +415,15 @@ static ADDRESS_MAP_START( hangman_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
 	AM_RANGE(0x28, 0x28) AM_READ(hangman_questions_read)                // question data
-	AM_RANGE(0xb1, 0xb1) AM_READ(ay8910_read_port_0_r)		// ???
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD(SOUND, "ay", ay8910_r)		// ???
 	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)			// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statusbj_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xb1, 0xb1) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD(SOUND, "ay", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_READWRITE(SMH_NOP, SMH_NOP)		/* 9927 CRT controller? */
 //  AM_RANGE(0xce,0xce) AM_READ(test_r)
 ADDRESS_MAP_END

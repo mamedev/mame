@@ -155,22 +155,22 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-WRITE8_HANDLER( poolshrk_scratch_sound_w )
+WRITE8_DEVICE_HANDLER( poolshrk_scratch_sound_w )
 {
-	discrete_sound_w(space, POOLSHRK_SCRATCH_SND, offset & 1);
+	discrete_sound_w(device, POOLSHRK_SCRATCH_SND, offset & 1);
 }
 
-WRITE8_HANDLER( poolshrk_score_sound_w )
+WRITE8_DEVICE_HANDLER( poolshrk_score_sound_w )
 {
-	discrete_sound_w(space, POOLSHRK_SCORE_EN, 1); /* this will trigger the sound code for 1 sample */
+	discrete_sound_w(device, POOLSHRK_SCORE_EN, 1); /* this will trigger the sound code for 1 sample */
 }
 
-WRITE8_HANDLER( poolshrk_click_sound_w )
+WRITE8_DEVICE_HANDLER( poolshrk_click_sound_w )
 {
-	discrete_sound_w(space, POOLSHRK_CLICK_EN, 1); /* this will trigger the sound code for 1 sample */
+	discrete_sound_w(device, POOLSHRK_CLICK_EN, 1); /* this will trigger the sound code for 1 sample */
 }
 
-WRITE8_HANDLER( poolshrk_bump_sound_w )
+WRITE8_DEVICE_HANDLER( poolshrk_bump_sound_w )
 {
-	discrete_sound_w(space, POOLSHRK_BUMP_EN, offset & 1);
+	discrete_sound_w(device, POOLSHRK_BUMP_EN, offset & 1);
 }

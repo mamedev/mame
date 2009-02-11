@@ -88,7 +88,8 @@ typedef struct
 	long	sample_loop;
 } VOICE;
 
-struct c140_info
+typedef struct _c140_state c140_state;
+struct _c140_state
 {
 	int sample_rate;
 	sound_stream *stream;
@@ -106,6 +107,16 @@ struct c140_info
 	VOICE voi[MAX_VOICE];
 };
 
+INLINE c140_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_C140);
+	return (c140_state *)device->token;
+}
+
+
 static void init_voice( VOICE *v )
 {
 	v->key=0;
@@ -119,9 +130,9 @@ static void init_voice( VOICE *v )
 	v->sample_end=0;
 	v->sample_loop=0;
 }
-READ8_HANDLER( c140_r )
+READ8_DEVICE_HANDLER( c140_r )
 {
-	struct c140_info *info = sndti_token(SOUND_C140, 0);
+	c140_state *info = get_safe_token(device);
 	offset&=0x1ff;
 	return info->REG[offset];
 }
@@ -134,7 +145,7 @@ READ8_HANDLER( c140_r )
    is done by a small PAL or GAL external to the sound chip, which can be switched
    per-game or at least per-PCB revision as addressing range needs grow.
  */
-static long find_sample(struct c140_info *info, long adrs, long bank, int voice)
+static long find_sample(c140_state *info, long adrs, long bank, int voice)
 {
 	long newadr = 0;
 
@@ -184,9 +195,9 @@ static long find_sample(struct c140_info *info, long adrs, long bank, int voice)
 
 	return (newadr);
 }
-WRITE8_HANDLER( c140_w )
+WRITE8_DEVICE_HANDLER( c140_w )
 {
-	struct c140_info *info = sndti_token(SOUND_C140, 0);
+	c140_state *info = get_safe_token(device);
 	stream_update(info->stream);
 
 	offset&=0x1ff;
@@ -246,9 +257,9 @@ WRITE8_HANDLER( c140_w )
 	}
 }
 
-void c140_set_base(int which, void *base)
+void c140_set_base(const device_config *device, void *base)
 {
-	struct c140_info *info = sndti_token(SOUND_C140, 0);
+	c140_state *info = get_safe_token(device);
 	info->pRom = base;
 }
 
@@ -261,7 +272,7 @@ INLINE int limit(INT32 in)
 
 static STREAM_UPDATE( update_stereo )
 {
-	struct c140_info *info = param;
+	c140_state *info = param;
 	int		i,j;
 
 	INT32	rvol,lvol;
@@ -454,12 +465,12 @@ static STREAM_UPDATE( update_stereo )
 	}
 }
 
-static SND_START( c140 )
+static DEVICE_START( c140 )
 {
 	const c140_interface *intf = device->static_config;
-	struct c140_info *info = device->token;
+	c140_state *info = get_safe_token(device);
 
-	info->sample_rate=info->baserate=clock;
+	info->sample_rate=info->baserate=device->clock;
 
 	info->banking_type = intf->banking_type;
 
@@ -496,34 +507,24 @@ static SND_START( c140 )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( c140 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( c140 )
+DEVICE_GET_INFO( c140 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct c140_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c140_state);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c140 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( c140 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */								break;
-		case SNDINFO_PTR_RESET:							/* nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( c140 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */								break;
+		case DEVINFO_FCT_RESET:							/* nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "C140");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Namco PCM");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "C140");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Namco PCM");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

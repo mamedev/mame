@@ -42,8 +42,8 @@ VIDEO_UPDATE( trackfld );
 
 WRITE8_HANDLER( konami_sh_irqtrigger_w );
 READ8_HANDLER( trackfld_sh_timer_r );
-READ8_HANDLER( trackfld_speech_r );
-WRITE8_HANDLER( trackfld_sound_w );
+READ8_DEVICE_HANDLER( trackfld_speech_r );
+WRITE8_DEVICE_HANDLER( trackfld_sound_w );
 READ8_HANDLER( hyprolyb_speech_r );
 WRITE8_HANDLER( hyprolyb_ADPCM_data_w );
 
@@ -259,23 +259,23 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_READ(trackfld_sh_timer_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(SMH_NOP) // reaktor reads here
 	AM_RANGE(0xe001, 0xe001) AM_READ(SMH_NOP) // reaktor reads here
-	AM_RANGE(0xe002, 0xe002) AM_READ(trackfld_speech_r)
+	AM_RANGE(0xe002, 0xe002) AM_DEVREAD(SOUND, "vlm", trackfld_speech_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sn76496_0_w)	/* Loads the snd command into the snd latch */
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE(SOUND, "sn", sn76496_w)	/* Loads the snd command into the snd latch */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_NOP)		/* This address triggers the SN chip to read the data port. */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "dac", dac_w)
 /* There are lots more addresses which are used for setting a two bit volume
     controls for speech and music
 
     Currently these are un-supported by Mame
 */
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(SMH_NOP) /* watch dog ? */
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(vlm5030_data_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(trackfld_sound_w) /* e003 speech control */
+	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w)
+	AM_RANGE(0xe000, 0xefff) AM_DEVWRITE(SOUND, "vlm", trackfld_sound_w) /* e003 speech control */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyprolyb_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -289,9 +289,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyprolyb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sn76496_0_w)	/* Loads the snd command into the snd latch */
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE(SOUND, "sn", sn76496_w)	/* Loads the snd command into the snd latch */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_NOP)		/* This address triggers the SN chip to read the data port. */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "dac", dac_w)
 /* There are lots more addresses which are used for setting a two bit volume
     controls for speech and music
 

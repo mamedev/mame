@@ -123,15 +123,13 @@ Sub_MemMap( flashgla, 0x7fff, 0xe000, 0xc040, 0xc080, 0xc0c0 )
  *
  *************************************/
 
-#define Sub_PortMap( name, ay0_base, ay1_base )								\
-static ADDRESS_MAP_START( name##_sub_portmap, ADDRESS_SPACE_IO, 8 )			\
-	ADDRESS_MAP_GLOBAL_MASK(0xff)										\
-	AM_RANGE(ay0_base+0, ay0_base+0) AM_WRITE(ay8910_control_port_0_w)		\
-	AM_RANGE(ay0_base+1, ay0_base+1) AM_WRITE(ay8910_write_port_0_w)		\
-	AM_RANGE(ay0_base+2, ay0_base+2) AM_READ(ay8910_read_port_0_r)			\
-	AM_RANGE(ay1_base+0, ay1_base+0) AM_WRITE(ay8910_control_port_1_w)		\
-	AM_RANGE(ay1_base+1, ay1_base+1) AM_WRITE(ay8910_write_port_1_w)		\
-ADDRESS_MAP_END																\
+#define Sub_PortMap( name, ay0_base, ay1_base )											\
+static ADDRESS_MAP_START( name##_sub_portmap, ADDRESS_SPACE_IO, 8 )						\
+	ADDRESS_MAP_GLOBAL_MASK(0xff)														\
+	AM_RANGE(ay0_base+0, ay0_base+1) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)	\
+	AM_RANGE(ay0_base+2, ay0_base+2) AM_DEVREAD(SOUND, "ay1", ay8910_r)					\
+	AM_RANGE(ay1_base+0, ay1_base+1) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)	\
+ADDRESS_MAP_END																			\
 
 Sub_PortMap( gyrodine, 0x00, 0xc0 )
 Sub_PortMap( sonofphx, 0x00, 0x40 )
@@ -447,10 +445,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,
-	input_port_1_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

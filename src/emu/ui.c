@@ -986,7 +986,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	int scrcount = video_screen_count(machine->config);
 	const device_config *scandevice;
 	const device_config *device;
-	int sndnum;
+	int found_sound = FALSE;
 	int count;
 
 	/* print description, manufacturer, and CPU: */
@@ -1017,31 +1017,32 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	}
 
 	/* loop over all sound chips */
-	for (sndnum = 0; sndnum < MAX_SOUND && machine->config->sound[sndnum].type != SOUND_DUMMY; sndnum += count)
+	for (device = sound_first(machine->config); device != NULL; device = scandevice)
 	{
-		sound_type type = machine->config->sound[sndnum].type;
-		int clock = machine->config->sound[sndnum].clock;
-
 		/* append the Sound: string */
-		if (sndnum == 0)
+		if (!found_sound)
 			astring_catc(string, "\nSound:\n");
+		found_sound = TRUE;
 
 		/* count how many identical sound chips we have */
-		for (count = 1; sndnum + count < MAX_SOUND; count++)
-			if (machine->config->sound[sndnum + count].type != type ||
-		        machine->config->sound[sndnum + count].clock != clock)
-		    	break;
+		count = 1;
+		for (scandevice = device->typenext; scandevice != NULL; scandevice = scandevice->typenext)
+		{
+			if (sound_get_type(device) != sound_get_type(scandevice) || device->clock != scandevice->clock)
+				break;
+			count++;
+		}
 
-		/* if more than one, prepend a #x in front of the SND name */
+		/* if more than one, prepend a #x in front of the CPU name */
 		if (count > 1)
 			astring_catprintf(string, "%d" UTF8_MULTIPLY, count);
-		astring_catc(string, sndtype_get_name(type));
+		astring_catc(string, device_get_name(device));
 
 		/* display clock in kHz or MHz */
-		if (clock >= 1000000)
-			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", clock / 1000000, clock % 1000000);
-		else if (clock != 0)
-			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", clock / 1000, clock % 1000);
+		if (device->clock >= 1000000)
+			astring_catprintf(string, " %d.%06d" UTF8_NBSP "MHz\n", device->clock / 1000000, device->clock % 1000000);
+		else if (device->clock != 0)
+			astring_catprintf(string, " %d.%03d" UTF8_NBSP "kHz\n", device->clock / 1000, device->clock % 1000);
 		else
 			astring_catc(string, "\n");
 	}

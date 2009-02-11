@@ -254,7 +254,7 @@ static WRITE8_HANDLER( audio_hardware_w )
 	switch (offset & 3)
 	{
 		case 0: /* DAC */
-			meadows_sh_dac_w(data ^ 0xff);
+			meadows_sh_dac_w(space->machine, data ^ 0xff);
             break;
 
 		case 1: /* counter clk 5 MHz / 256 */

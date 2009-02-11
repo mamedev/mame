@@ -1004,10 +1004,9 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 					if ((toaplan2_sub_cpu == CPU_2_Z80) && (data == 3))
 					{
 						/* HACK! When tilted, sound CPU needs to be reset. */
-						if (machine->config->sound[0].type == SOUND_YM3812)
 						{
 							cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
-							sndti_reset(SOUND_YM3812, 0);
+							devtag_reset(machine, SOUND, "ym");
 						}
 					}
 

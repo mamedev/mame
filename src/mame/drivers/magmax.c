@@ -64,7 +64,7 @@ static READ8_HANDLER( magmax_sound_r )
 	return (sound_latch | LS74_q);
 }
 
-static WRITE8_HANDLER( ay8910_portB_0_w )
+static WRITE8_DEVICE_HANDLER( ay8910_portB_0_w )
 {
 	/*bit 0 is input to CLR line of the LS74*/
 	LS74_clr = data & 1;
@@ -114,8 +114,11 @@ static MACHINE_RESET( magmax )
 
 
 
-static WRITE8_HANDLER( ay8910_portA_0_w )
+static WRITE8_DEVICE_HANDLER( ay8910_portA_0_w )
 {
+const device_config *ay1 = devtag_get_device(device->machine, SOUND, "ay1");
+const device_config *ay2 = devtag_get_device(device->machine, SOUND, "ay2");
+const device_config *ay3 = devtag_get_device(device->machine, SOUND, "ay3");
 float percent;
 
 /*There are three AY8910 chips and four(!) separate amplifiers on the board
@@ -170,26 +173,26 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 	/*popmessage("gain_ctrl = %2x",data&0x0f);*/
 
 	percent = (gain_control & 1) ? 1.0 : 0.50;
-	sndti_set_output_gain(SOUND_AY8910, 0, 0, percent);
+	sound_set_output_gain(ay1, 0, percent);
 //fixme:    set_RC_filter(0,10000,100000000,0,10000);   /* 10K, 10000pF = 0.010uF */
 
 	percent = (gain_control & 2) ? 0.45 : 0.23;
-	sndti_set_output_gain(SOUND_AY8910, 0, 1, percent);
-	sndti_set_output_gain(SOUND_AY8910, 0, 2, percent);
-	sndti_set_output_gain(SOUND_AY8910, 1, 0, percent);
-	sndti_set_output_gain(SOUND_AY8910, 1, 1, percent);
+	sound_set_output_gain(ay1, 1, percent);
+	sound_set_output_gain(ay1, 2, percent);
+	sound_set_output_gain(ay2, 0, percent);
+	sound_set_output_gain(ay2, 1, percent);
 //fixme:    set_RC_filter(1,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(2,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(3,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 //fixme:    set_RC_filter(4,4700,100000000,0,4700); /*  4.7K, 4700pF = 0.0047uF */
 
 	percent = (gain_control & 4) ? 0.45 : 0.23;
-	sndti_set_output_gain(SOUND_AY8910, 1, 2, percent);
-	sndti_set_output_gain(SOUND_AY8910, 2, 0, percent);
+	sound_set_output_gain(ay2, 2, percent);
+	sound_set_output_gain(ay3, 0, percent);
 
 	percent = (gain_control & 8) ? 0.45 : 0.23;
-	sndti_set_output_gain(SOUND_AY8910, 2, 1, percent);
-	sndti_set_output_gain(SOUND_AY8910, 2, 2, percent);
+	sound_set_output_gain(ay3, 1, percent);
+	sound_set_output_gain(ay3, 2, percent);
 }
 
 static WRITE16_HANDLER( magmax_vreg_w )
@@ -243,12 +246,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magmax_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_2_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(ay8910_write_port_2_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_READ(magmax_sound_r)
 ADDRESS_MAP_END
 
@@ -360,10 +360,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	NULL,
-	NULL,
-	ay8910_portA_0_w, /*write port A*/
-	ay8910_portB_0_w  /*write port B*/
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ay8910_portA_0_w), /*write port A*/
+	DEVCB_HANDLER(ay8910_portB_0_w)  /*write port B*/
 };
 
 

@@ -210,24 +210,14 @@ static WRITE8_HANDLER( yumefuda_videoregs_w )
 	}
 }
 
-static READ8_HANDLER( in7_r )
-{
-	return input_port_read(space->machine, "DSW1");
-}
-
-static READ8_HANDLER( in8_r )
-{
-	return input_port_read(space->machine, "DSW2");
-}
-
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	in7_r,
-	in8_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /***************************************************************************************/
@@ -248,8 +238,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(yumefuda_videoregs_w) // HD46505SP video registers
-	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(mux_w)
 	AM_RANGE(0x81, 0x81) AM_READ(eeprom_r)
 	AM_RANGE(0x82, 0x82) AM_READ(mux_r)

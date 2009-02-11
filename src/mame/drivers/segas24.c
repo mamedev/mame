@@ -591,8 +591,6 @@ static UINT8 mahmajn_io_r(running_machine *machine, int port)
 
 static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
 	switch(port)
 	{
 	case 3:
@@ -600,7 +598,7 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		dac_0_signed_data_w(space, 0, data);
+		dac_signed_data_w(devtag_get_device(machine, SOUND, "dac"), data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -609,14 +607,12 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 
 static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-
 	switch(port)
 	{
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		dac_0_signed_data_w(space,0, data);
+		dac_signed_data_w(devtag_get_device(machine, SOUND, "dac"), data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -703,7 +699,7 @@ static void reset_reset(running_machine *machine)
 			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	if(changed & 4)
-		sndti_reset(SOUND_YM2151, 0);
+		devtag_reset(machine, SOUND, "ym");
 	prev_resetcontrol = resetcontrol;
 }
 
@@ -741,25 +737,6 @@ static WRITE16_HANDLER( curbank_w )
 	}
 }
 
-
-// YM2151
-
-static READ16_HANDLER( ym_status_r )
-{
-	return ym2151_status_port_0_r(space, 0);
-}
-
-static WRITE16_HANDLER( ym_register_w )
-{
-	if(ACCESSING_BITS_0_7)
-		ym2151_register_port_0_w(space, 0, data);
-}
-
-static WRITE16_HANDLER( ym_data_w )
-{
-	if(ACCESSING_BITS_0_7)
-		ym2151_data_port_0_w(space, 0, data);
-}
 
 
 // Protection magic latch
@@ -965,11 +942,11 @@ static INTERRUPT_GEN(irq_vbl)
 	}
 }
 
-static void irq_ym(running_machine *machine, int irq)
+static void irq_ym(const device_config *device, int irq)
 {
 	irq_yms = irq;
-	cpu_set_input_line(machine->cpu[0], IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1036,8 +1013,7 @@ static ADDRESS_MAP_START( system24_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
 	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
 	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
-	AM_RANGE(0x800100, 0x800101) AM_MIRROR(0x1ffe00) AM_WRITE(ym_register_w)
-	AM_RANGE(0x800102, 0x800103) AM_MIRROR(0x1ffe00) AM_READWRITE(ym_status_r, ym_data_w)
+	AM_RANGE(0x800100, 0x800103) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8(SOUND, "ym", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00007) AM_MIRROR(0x0ffff8) AM_READWRITE(irq_r, irq_w)
 	AM_RANGE(0xb00000, 0xb00007) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0xb00008, 0xb0000f) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_status_r, fdc_ctrl_w)
@@ -1074,8 +1050,7 @@ static ADDRESS_MAP_START( system24_cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
 	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
 	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
-	AM_RANGE(0x800100, 0x800101) AM_MIRROR(0x1ffe00) AM_WRITE(ym_register_w)
-	AM_RANGE(0x800102, 0x800103) AM_MIRROR(0x1ffe00) AM_READWRITE(ym_status_r, ym_data_w)
+	AM_RANGE(0x800100, 0x800103) AM_MIRROR(0x1ffe00) AM_DEVREADWRITE8(SOUND, "ym", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00007) AM_MIRROR(0x0ffff8) AM_READWRITE(irq_r, irq_w)
 	AM_RANGE(0xb00000, 0xb00007) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0xb00008, 0xb0000f) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_status_r, fdc_ctrl_w)

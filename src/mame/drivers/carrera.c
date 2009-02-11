@@ -74,8 +74,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5")
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP) // ?
-	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( carrera )
@@ -259,9 +258,9 @@ static VIDEO_UPDATE(carrera)
 	return 0;
 }
 
-static READ8_HANDLER( unknown_r )
+static READ8_DEVICE_HANDLER( unknown_r )
 {
-	return mame_rand(space->machine);
+	return mame_rand(device->machine);
 }
 
 /* these are set as input, but I have no idea which input port it uses is for the AY */
@@ -269,10 +268,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	unknown_r,
-	unknown_r,
-	NULL,
-	NULL
+	DEVCB_HANDLER(unknown_r),
+	DEVCB_HANDLER(unknown_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static PALETTE_INIT(carrera)

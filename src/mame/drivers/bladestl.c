@@ -94,14 +94,18 @@ static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 	//logerror("(sound) write %02x\n", data);
 }
 
-static WRITE8_HANDLER( bladestl_port_B_w ){
+static WRITE8_DEVICE_HANDLER( bladestl_port_B_w ){
 	/* bit 1, 2 unknown */
-	upd7759_set_bank_base(0, ((data & 0x38) >> 3)*0x20000);
+	upd7759_set_bank_base(device, ((data & 0x38) >> 3)*0x20000);
 }
 
-static WRITE8_HANDLER( bladestl_speech_ctrl_w ){
-	upd7759_reset_w(0, data & 1);
-	upd7759_start_w(0, data & 2);
+static READ8_DEVICE_HANDLER( bladestl_speech_busy_r ){
+	return upd7759_busy_r(device) ? 1 : 0;
+}
+
+static WRITE8_DEVICE_HANDLER( bladestl_speech_ctrl_w ){
+	upd7759_reset_w(device, data & 1);
+	upd7759_start_w(device, data & 2);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -128,10 +132,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)	/* YM2203 */
-	AM_RANGE(0x1001, 0x1001) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)		/* YM2203 */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(bladestl_speech_ctrl_w)	/* UPD7759 */
-	AM_RANGE(0x4000, 0x4000) AM_READ(upd7759_0_busy_r)			/* UPD7759 */
+	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)		/* YM2203 */
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE(SOUND, "upd", bladestl_speech_ctrl_w)	/* UPD7759 */
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD(SOUND, "upd", bladestl_speech_busy_r)			/* UPD7759 */
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)				/* soundlatch_r */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -304,10 +307,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		NULL,
-		upd7759_0_port_w,
-		bladestl_port_B_w
+		DEVCB_NULL,
+		DEVCB_NULL,
+		DEVCB_DEVICE_HANDLER(SOUND, "upd", upd7759_port_w),
+		DEVCB_DEVICE_HANDLER(SOUND, "upd", bladestl_port_B_w)
 	},
 	NULL
 };

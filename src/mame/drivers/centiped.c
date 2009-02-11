@@ -625,9 +625,9 @@ static WRITE8_HANDLER( led_w )
 }
 
 
-static READ8_HANDLER( caterplr_rand_r )
+static READ8_DEVICE_HANDLER( caterplr_rand_r )
 {
-	return mame_rand(space->machine) % 0xff;
+	return mame_rand(device->machine) % 0xff;
 }
 
 
@@ -650,17 +650,17 @@ static WRITE8_HANDLER( bullsdrt_coin_count_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( caterplr_AY8910_w )
+static WRITE8_DEVICE_HANDLER( caterplr_AY8910_w )
 {
-	ay8910_control_port_0_w(space, 0, offset);
-	ay8910_write_port_0_w(space, 0, data);
+	ay8910_address_w(device, 0, offset);
+	ay8910_data_w(device, 0, data);
 }
 
 
-static READ8_HANDLER( caterplr_AY8910_r )
+static READ8_DEVICE_HANDLER( caterplr_AY8910_r )
 {
-	ay8910_control_port_0_w(space, 0, offset);
-	return ay8910_read_port_0_r(space, 0);
+	ay8910_address_w(device, 0, offset);
+	return ay8910_r(device, 0);
 }
 
 
@@ -682,7 +682,7 @@ static ADDRESS_MAP_START( centiped_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x0c02, 0x0c02) AM_READ(centiped_IN2_r)	/* IN2 */
 	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("IN3")		/* IN3 */
-	AM_RANGE(0x1000, 0x100f) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1400, 0x140f) AM_WRITE(centiped_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x1600, 0x163f) AM_WRITE(atari_vg_earom_w)
 	AM_RANGE(0x1680, 0x1680) AM_WRITE(atari_vg_earom_ctrl_w)
@@ -707,8 +707,8 @@ static ADDRESS_MAP_START( centipdb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x4000) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x0c02, 0x0c02) AM_MIRROR(0x4000) AM_READ(centiped_IN2_r)	/* IN2 */
 	AM_RANGE(0x0c03, 0x0c03) AM_MIRROR(0x4000) AM_READ_PORT("IN3")		/* IN3 */
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x4000) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x4000) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
+	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x4000) AM_DEVWRITE(SOUND, "pokey", ay8910_data_address_w)
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x4000) AM_DEVREAD(SOUND, "pokey", ay8910_r)
 	AM_RANGE(0x1400, 0x140f) AM_MIRROR(0x4000) AM_WRITE(centiped_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x1600, 0x163f) AM_MIRROR(0x4000) AM_WRITE(atari_vg_earom_w)
 	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x4000) AM_WRITE(atari_vg_earom_ctrl_w)
@@ -733,8 +733,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( milliped_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x040f) AM_READWRITE(pokey1_r, pokey1_w)
-	AM_RANGE(0x0800, 0x080f) AM_READWRITE(pokey2_r, pokey2_w)
+	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
+	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x2000, 0x2000) AM_READ(centiped_IN0_r)
@@ -772,7 +772,7 @@ static ADDRESS_MAP_START( warlords_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")	/* DSW2 */
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("IN1")	/* IN1 */
-	AM_RANGE(0x1000, 0x100f) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x1c00, 0x1c02) AM_WRITE(coin_count_w)
 	AM_RANGE(0x1c03, 0x1c06) AM_WRITE(led_w)
@@ -791,8 +791,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mazeinv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x040f) AM_READWRITE(pokey1_r, pokey1_w)
-	AM_RANGE(0x0800, 0x080f) AM_READWRITE(pokey2_r, pokey2_w)
+	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
+	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
@@ -848,7 +848,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bullsdrt_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(bullsdrt_sprites_bank_w)
 	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_BASE(&bullsdrt_tiles_bankram)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(bullsdrt_data_port_r, sn76496_0_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrt_data_port_r) AM_DEVWRITE(SOUND, "sn", sn76496_w)
 ADDRESS_MAP_END
 
 
@@ -1550,27 +1550,32 @@ static const ay8910_interface centipdb_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	caterplr_rand_r
+	DEVCB_HANDLER(caterplr_rand_r)
 };
 
 
 static const pokey_interface milliped_pokey_interface_1 =
 {
-	{ 0 },
-	input_port_4_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW1")
 };
 
 
 static const pokey_interface milliped_pokey_interface_2 =
 {
-	{ 0 },
-	input_port_5_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW2")
 };
 
 
 static const pokey_interface warlords_pokey_interface =
 {
-	{ input_port_4_r,input_port_5_r,input_port_6_r,input_port_7_r }
+	{ 	
+		DEVCB_INPUT_PORT("PADDLE0"),
+		DEVCB_INPUT_PORT("PADDLE1"),
+		DEVCB_INPUT_PORT("PADDLE2"),
+		DEVCB_INPUT_PORT("PADDLE3")
+	}
 };
 
 
@@ -1970,15 +1975,19 @@ ROM_END
 
 static DRIVER_INIT( caterplr )
 {
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x100f, 0, 0, caterplr_AY8910_r, caterplr_AY8910_w);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1780, 0x1780, 0, 0, caterplr_rand_r);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *device = devtag_get_device(machine, SOUND, "pokey");
+	memory_install_readwrite8_device_handler(space, device, 0x1000, 0x100f, 0, 0, caterplr_AY8910_r, caterplr_AY8910_w);
+	memory_install_read8_device_handler(space, device, 0x1780, 0x1780, 0, 0, caterplr_rand_r);
 }
 
 
 static DRIVER_INIT( magworm )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1001, 0x1001, 0, 0, ay8910_control_port_0_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1003, 0x1003, 0, 0, ay8910_read_port_0_r, ay8910_write_port_0_w);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *device = devtag_get_device(machine, SOUND, "pokey");
+	memory_install_write8_device_handler(space, device, 0x1001, 0x1001, 0, 0, ay8910_address_w);
+	memory_install_readwrite8_device_handler(space, device, 0x1003, 0x1003, 0, 0, ay8910_r, ay8910_data_w);
 }
 
 

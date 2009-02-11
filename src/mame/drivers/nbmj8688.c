@@ -43,9 +43,9 @@ TODO:
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
-#define DAC_0_WRITE	dac_0_signed_data_w
+#define DAC_WRITE	dac_signed_w
 #else
-#define DAC_0_WRITE	dac_0_data_w
+#define DAC_WRITE	dac_w
 #endif
 
 
@@ -323,7 +323,7 @@ static READ8_HANDLER( ff_r )
 static ADDRESS_MAP_START( readport_secolove, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD(SOUND, "psg", ay8910_r)
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
 	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
@@ -335,13 +335,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writeport_secolove, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "psg", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(nbmj8688_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -355,7 +354,7 @@ static WRITE8_HANDLER( barline_output_w )
 static ADDRESS_MAP_START( readport_barline, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x80, 0x80) AM_READ(ym3812_status_port_0_r)
+	AM_RANGE(0x80, 0x81) AM_DEVREAD(SOUND, "psg", ym3812_r)
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
 	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
@@ -368,13 +367,12 @@ static ADDRESS_MAP_START( writeport_barline, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_sndrombank1_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "psg", ym3812_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(nbmj8688_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(barline_output_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
-//  AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE) //not used
+//  AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE) //not used
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -382,13 +380,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writeport_crystalg, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "psg", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(nbmj8688_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(crystalg_romsel_w)
 //  AM_RANGE(0xf0, 0xf0) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
@@ -397,7 +394,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readport_otonano, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x80, 0x80) AM_READ(ym3812_status_port_0_r)
+	AM_RANGE(0x80, 0x81) AM_DEVREAD(SOUND, "psg", ym3812_r)
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
 	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
@@ -412,11 +409,10 @@ static ADDRESS_MAP_START( writeport_otonano, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x3f) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(mjsikaku_romsel_w)
 	AM_RANGE(0x70, 0x77) AM_WRITE(nbmj8688_blitter_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "psg", ym3812_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -425,7 +421,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readport_kaguya, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD(SOUND, "psg", ay8910_r)
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
 	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
@@ -440,11 +436,10 @@ static ADDRESS_MAP_START( writeport_kaguya, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x3f) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(mjsikaku_romsel_w)
 	AM_RANGE(0x70, 0x77) AM_WRITE(nbmj8688_blitter_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "psg", ay8910_data_address_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -457,11 +452,10 @@ static ADDRESS_MAP_START( writeport_iemoto, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE(nb1413m3_sndrombank2_w)
 	AM_RANGE(0x40, 0x47) AM_WRITE(nbmj8688_blitter_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(seiha_romsel_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "psg", ay8910_data_address_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -473,12 +467,11 @@ static ADDRESS_MAP_START( writeport_seiha, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE(nb1413m3_sndrombank2_w)
 	AM_RANGE(0x20, 0x3f) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(seiha_romsel_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "psg", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(nbmj8688_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -489,11 +482,10 @@ static ADDRESS_MAP_START( writeport_mjgaiden, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x20, 0x3f) AM_WRITE(nbmj8688_clut_w)
     AM_RANGE(0x50, 0x50) AM_WRITE(mjsikaku_romsel_w)
     AM_RANGE(0x90, 0x97) AM_WRITE(nbmj8688_blitter_w)
-    AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-    AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+    AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "psg", ay8910_data_address_w)
     AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
     AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
-    AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+    AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
     AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
     AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -507,13 +499,12 @@ static ADDRESS_MAP_START( writeport_p16bit_LCD, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x45, 0x45) AM_WRITE(nbmj8688_HD61830B_1_instr_w)
 	AM_RANGE(0x46, 0x46) AM_WRITE(nbmj8688_HD61830B_both_data_w)
 	AM_RANGE(0x47, 0x47) AM_WRITE(nbmj8688_HD61830B_both_instr_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "psg", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(nbmj8688_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(secolove_romsel_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -537,11 +528,10 @@ static ADDRESS_MAP_START( writeport_mjsikaku, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x3f) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(mjsikaku_romsel_w)
 	AM_RANGE(0x60, 0x67) AM_WRITE(nbmj8688_blitter_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "psg", ym3812_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -550,7 +540,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readport_mmsikaku, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD(SOUND, "psg", ay8910_r)
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
 	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
@@ -566,11 +556,10 @@ static ADDRESS_MAP_START( writeport_mmsikaku, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x3f) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(mjsikaku_romsel_w)
 	AM_RANGE(0x40, 0x47) AM_WRITE(nbmj8688_blitter_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "psg", ay8910_data_address_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE(SOUND, "dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(mjsikaku_gfxflag2_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(mjsikaku_scrolly_w)
 ADDRESS_MAP_END
@@ -2948,10 +2937,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	nb1413m3_dipsw1_r,		// DIPSW-A read
-	nb1413m3_dipsw2_r,		// DIPSW-B read
-	NULL,
-	NULL
+	DEVCB_MEMORY_HANDLER("main", IO, nb1413m3_dipsw1_r),		// DIPSW-A read
+	DEVCB_MEMORY_HANDLER("main", IO, nb1413m3_dipsw2_r),		// DIPSW-B read
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -2982,7 +2971,7 @@ static MACHINE_DRIVER_START( NBMJDRV_4096 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("8910", AY8910, 1250000)
+	MDRV_SOUND_ADD("psg", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
@@ -3065,7 +3054,7 @@ static MACHINE_DRIVER_START( barline )
 	MDRV_CPU_IO_MAP(readport_barline, writeport_barline)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 
-	MDRV_SOUND_REPLACE("8910", YM3812, 20000000/8)
+	MDRV_SOUND_REPLACE("psg", YM3812, 20000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_REMOVE("dac")
@@ -3128,7 +3117,7 @@ static MACHINE_DRIVER_START( mbmj_p16bit_LCD )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("8910", AY8910, 1250000)
+	MDRV_SOUND_ADD("psg", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
@@ -3198,7 +3187,7 @@ static MACHINE_DRIVER_START( mjsikaku )
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 144)    // nmiclock = 70
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("8910", YM3812, 20000000/8)
+	MDRV_SOUND_REPLACE("psg", YM3812, 20000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 

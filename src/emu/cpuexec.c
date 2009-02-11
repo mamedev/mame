@@ -433,7 +433,7 @@ const char *cpuexec_describe_context(running_machine *machine)
 
 
 /***************************************************************************
-    VIDEO SCREEN DEVICE INTERFACE
+    CPU DEVICE INTERFACE
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -536,9 +536,9 @@ static DEVICE_START( cpu )
 	/* if no state registered for saving, we can't save */
 	if (num_regs == 0)
 	{
-		logerror("CPU '%s' did not register any state to save!\n", cpu_get_name(device));
+		logerror("CPU '%s' did not register any state to save!\n", device->tag);
 		if (device->machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-			fatalerror("CPU '%s' did not register any state to save!", cpu_get_name(device));
+			fatalerror("CPU '%s' did not register any state to save!", device->tag);
 	}
 
 	/* register some internal states as well */

@@ -36,16 +36,17 @@ DISCRETE_SOUND_START(blockade)
 	DISCRETE_OUTPUT(NODE_10, 7500)
 DISCRETE_SOUND_END
 
-WRITE8_HANDLER( blockade_sound_freq_w )
+WRITE8_DEVICE_HANDLER( blockade_sound_freq_w )
 {
-	discrete_sound_w(space,BLOCKADE_NOTE_DATA, data);
+	discrete_sound_w(device,BLOCKADE_NOTE_DATA, data);
     return;
 }
 
 WRITE8_HANDLER( blockade_env_on_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
     if (BLOCKADE_LOG) mame_printf_debug("Boom Start\n");
-    sample_start(0,0,0);
+    sample_start(samples, 0,0,0);
     return;
 }
 

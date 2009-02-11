@@ -165,18 +165,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigkarnk_readmem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0x0800, 0x0801) AM_READ(okim6295_status_0_r)	/* OKI6295 */
-	AM_RANGE(0x0a00, 0x0a00) AM_READ(ym3812_status_port_0_r)	/* YM3812 */
+	AM_RANGE(0x0800, 0x0801) AM_DEVREAD(SOUND, "oki", okim6295_r)	/* OKI6295 */
+	AM_RANGE(0x0a00, 0x0a01) AM_DEVREAD(SOUND, "ym", ym3812_r)	/* YM3812 */
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(soundlatch_r)			/* Sound latch */
 	AM_RANGE(0x0c00, 0xffff) AM_READ(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigkarnk_writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)				/* RAM */
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(okim6295_data_0_w)		/* OKI6295 */
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(SOUND, "oki", okim6295_w)		/* OKI6295 */
 //  AM_RANGE(0x0900, 0x0900) AM_WRITE(SMH_NOP)             /* enable sound output? */
-	AM_RANGE(0x0a00, 0x0a00) AM_WRITE(ym3812_control_port_0_w)/* YM3812 */
-	AM_RANGE(0x0a01, 0x0a01) AM_WRITE(ym3812_write_port_0_w)	/* YM3812 */
+	AM_RANGE(0x0a00, 0x0a01) AM_DEVWRITE(SOUND, "ym", ym3812_w)	/* YM3812 */
 	AM_RANGE(0x0c00, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
 
@@ -300,7 +299,7 @@ static ADDRESS_MAP_START( maniacsq_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000e, 0x70000f) AM_READ(okim6295_status_0_lsb_r)/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff)/* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)			/* Work RAM */
 ADDRESS_MAP_END
 
@@ -322,7 +321,7 @@ static ADDRESS_MAP_START( maniacsq_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_WRITE(SMH_RAM) AM_BASE(&gaelco_spriteram)			/* Sprite RAM */
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)					/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(okim6295_data_0_lsb_w)					/* OKI6295 data register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)					/* OKI6295 data register */
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)								/* Work RAM */
 ADDRESS_MAP_END
 
@@ -600,7 +599,7 @@ static ADDRESS_MAP_START( squash_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000e, 0x70000f) AM_READ(okim6295_status_0_lsb_r)/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff)/* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)			/* Work RAM */
 ADDRESS_MAP_END
 
@@ -613,7 +612,7 @@ static ADDRESS_MAP_START( squash_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_WRITE(SMH_RAM) AM_BASE(&gaelco_spriteram)			/* Sprite RAM */
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)					/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(okim6295_data_0_lsb_w)					/* OKI6295 data register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)					/* OKI6295 data register */
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)								/* Work RAM */
 ADDRESS_MAP_END
 
@@ -764,7 +763,7 @@ static ADDRESS_MAP_START( thoop_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_WRITE(SMH_RAM) AM_BASE(&gaelco_spriteram)			/* Sprite RAM */
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)					/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(okim6295_data_0_lsb_w)					/* OKI6295 data register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)					/* OKI6295 data register */
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)								/* Work RAM */
 ADDRESS_MAP_END
 

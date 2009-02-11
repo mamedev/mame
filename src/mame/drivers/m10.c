@@ -222,6 +222,7 @@ static MACHINE_RESET( irem )
 
 static WRITE8_HANDLER( m10_ctrl_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	m10_state *state = space->machine->driver_data;
 
 #if DEBUG
@@ -246,27 +247,27 @@ static WRITE8_HANDLER( m10_ctrl_w )
 			break;
 		case 0x01:
 			/* MISSILE sound */
-			sample_start_n(0, 0, 0, 0);
+			sample_start(samples, 0, 0, 0);
 			break;
 		case 0x02:
 			/* EXPLOSION sound */
-			sample_start_n(0, 1, 1, 0);
+			sample_start(samples, 1, 1, 0);
 			break;
 		case 0x03:
 			/* INVADER HIT sound */
-			sample_start_n(0, 2, 2, 0);
+			sample_start(samples, 2, 2, 0);
 			break;
 		case 0x04:
 			/* BONUS BASE sound */
-			sample_start_n(0, 3, 8, 0);
+			sample_start(samples, 3, 8, 0);
 			break;
 		case 0x05:
 			/* FLEET MOVE sound */
-			sample_start_n(0, 3, 3, 0);
+			sample_start(samples, 3, 3, 0);
 			break;
 		case 0x06:
 			/* SAUCER HIT SOUND */
-			sample_start_n(0, 2, 7, 0);
+			sample_start(samples, 2, 7, 0);
 			break;
 		default:
 			popmessage("Unknown sound M10: %02x\n", data & 0x07);
@@ -274,9 +275,9 @@ static WRITE8_HANDLER( m10_ctrl_w )
 	}
 	/* UFO SOUND */
 	if (data & 0x08)
-		sample_stop_n(0, 4);
+		sample_stop(samples, 4);
 	else
-		sample_start_n(0, 4, 9, 1);
+		sample_start(samples, 4, 9, 1);
 
 }
 
@@ -369,6 +370,7 @@ static WRITE8_HANDLER( m10_a500_w )
 static WRITE8_HANDLER( m11_a100_w )
 {
 	static int last = 0x00;
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	int raising_bits = data & ~last;
 	//int falling_bits = ~data & last;
 
@@ -382,27 +384,28 @@ static WRITE8_HANDLER( m11_a100_w )
 	// audio control!
 	/* MISSILE sound */
 	if (raising_bits & 0x01)
-		sample_start_n(0, 0, 0, 0);
+		sample_start(samples, 0, 0, 0);
 
 	/* EXPLOSION sound */
 	if (raising_bits & 0x02)
-		sample_start_n(0, 1, 1, 0);
+		sample_start(samples, 1, 1, 0);
 
 	/* Rapidly falling parachute */
 	if (raising_bits & 0x04)
-		sample_start_n(0, 3, 8, 0);
+		sample_start(samples, 3, 8, 0);
 
 	/* Background sound ? */
 	if (data & 0x10)
-		sample_start_n(0, 4, 9, 1);
+		sample_start(samples, 4, 9, 1);
 	else
-		sample_stop_n(0, 4);
+		sample_stop(samples, 4);
 
 }
 
 static WRITE8_HANDLER( m15_a100_w )
 {
 	static int last = 0x00;
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	//int raising_bits = data & ~last;
 	int falling_bits = ~data & last;
 
@@ -425,34 +428,34 @@ static WRITE8_HANDLER( m15_a100_w )
 #endif
 	/* DOT sound */
 	if (falling_bits & 0x40)
-		sample_start_n(0, 0, 0, 0);
+		sample_start(samples, 0, 0, 0);
 #if 0
 	if (raising_bits & 0x40)
-		sample_stop_n(0, 0);
+		sample_stop(samples, 0);
 #endif
 
 	/* EXPLOSION sound */
 	if (falling_bits & 0x08)
-		sample_start_n(0, 1, 1, 0);
+		sample_start(samples, 1, 1, 0);
 #if 0
 	if (raising_bits & 0x08)
-		sample_stop_n(0, 1);
+		sample_stop(samples, 1);
 #endif
 
 	/* player changes lane */
 	if (falling_bits & 0x10)
-		sample_start_n(0, 3, 3, 0);
+		sample_start(samples, 3, 3, 0);
 #if 0
 	if (raising_bits & 0x10)
-		sample_stop_n(0, 3);
+		sample_stop(samples, 3);
 #endif
 
 	/* computer car changes lane */
 	if (falling_bits & 0x20)
-		sample_start_n(0, 4, 4, 0);
+		sample_start(samples, 4, 4, 0);
 #if 0
 	if (raising_bits & 0x20)
-		sample_stop_n(0, 4);
+		sample_stop(samples, 4);
 #endif
 
 	last = data;

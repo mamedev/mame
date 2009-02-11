@@ -118,14 +118,14 @@ static WRITE16_HANDLER( drtomy_vram_bg_w )
 	tilemap_mark_tile_dirty(tilemap_bg,offset);
 }
 
-static WRITE16_HANDLER( drtomy_okibank_w )
+static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 {
 	static int oki_bank;
 
 	if(oki_bank != (data & 3))
 	{
 		oki_bank = data & 3;
-		okim6295_set_bank_base(0, oki_bank * 0x40000);
+		okim6295_set_bank_base(device, oki_bank * 0x40000);
 	}
 
 	/* unknown bit 2 -> (data & 4) */
@@ -141,8 +141,8 @@ static ADDRESS_MAP_START( drtomy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(drtomy_okibank_w) /* OKI banking */
-	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w) /* OKI 6295*/
+	AM_RANGE(0x70000c, 0x70000d) AM_DEVWRITE(SOUND, "oki", drtomy_okibank_w) /* OKI banking */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff) /* OKI 6295*/
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM	/* Work RAM */
 ADDRESS_MAP_END
 

@@ -43,7 +43,7 @@ static int random_offset;
 
 static void gottlieb1_sh_w(const device_config *riot, UINT8 data);
 static void gottlieb2_sh_w(const address_space *space, UINT8 data);
-static void trigger_sample(running_machine *machine, UINT8 data);
+static void trigger_sample(const device_config *samples, UINT8 data);
 
 
 
@@ -74,12 +74,13 @@ WRITE8_HANDLER( gottlieb_sh_w )
 
 static void gottlieb1_sh_w(const device_config *riot, UINT8 data)
 {
+	const device_config *samples = devtag_get_device(riot->machine, SOUND, "samples");
 	int pa7 = (data & 0x0f) != 0xf;
 	int pa0_5 = ~data & 0x3f;
 
 	/* snoop the data looking for commands that need samples */
-	if (pa7 && sndti_exists(SOUND_SAMPLES, 0))
-		trigger_sample(riot->machine, pa0_5);
+	if (pa7 && samples != NULL)
+		trigger_sample(samples, pa0_5);
 
 	/* write the command data to the low 6 bits, and the trigger to the upper bit */
 	riot6532_porta_in_set(riot, pa0_5 | (pa7 << 7), 0xbf);
@@ -129,27 +130,27 @@ static const riot6532_interface gottlieb_riot6532_intf =
  *
  *************************************/
 
-static void play_sample(const char *phonemes)
+static void play_sample(const device_config *samples, const char *phonemes)
 {
 	if (strcmp(phonemes, " HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert - Hello, I am turned on */
-		sample_start(0, 42, 0);
+		sample_start(samples, 0, 42, 0);
 	else if (strcmp(phonemes, "BAH1EH1Y") == 0)							  /* Q-Bert - Bye, bye */
-		sample_start(0, 43, 0);
+		sample_start(samples, 0, 43, 0);
 	else if (strcmp(phonemes, "A2YHT LEH2FTTH") == 0) 					  /* Reactor - Eight left */
-		sample_start(0, 0, 0);
+		sample_start(samples, 0, 0, 0);
 	else if (strcmp(phonemes, "SI3KS DTYN LEH2FTTH") == 0) 				  /* Reactor - Sixteen left */
-		sample_start(0, 1, 0);
+		sample_start(samples, 0, 1, 0);
 	else if (strcmp(phonemes, "WO2RNYNG KO2R UH1NSDTABUH1L") == 0) 		  /* Reactor - Warning core unstable */
-		sample_start(0, 5, 0);
+		sample_start(samples, 0, 5, 0);
 	else if (strcmp(phonemes, "CHAMBERR   AE1EH2KTI1VA1I3DTEH1DT ") == 0) /* Reactor - Chamber activated */
-		sample_start(0, 7, 0);
+		sample_start(samples, 0, 7, 0);
 }
 
 
-static void trigger_sample(running_machine *machine, UINT8 data)
+static void trigger_sample(const device_config *samples, UINT8 data)
 {
 	/* Reactor samples */
-	if (strcmp(machine->gamedrv->name, "reactor") == 0)
+	if (strcmp(samples->machine->gamedrv->name, "reactor") == 0)
 	{
 		switch (data)
 		{
@@ -157,7 +158,7 @@ static void trigger_sample(running_machine *machine, UINT8 data)
 			case 56:
 			case 57:
 			case 59:
-				sample_start(0, data - 53, 0);
+				sample_start(samples, 0, data - 53, 0);
 				break;
 
 			case 31:
@@ -167,7 +168,7 @@ static void trigger_sample(running_machine *machine, UINT8 data)
 			case 39:
 				score_sample++;
 				if (score_sample < 20)
-					sample_start(0, score_sample, 0);
+					sample_start(samples, 0, score_sample, 0);
 				break;
 		}
 	}
@@ -182,16 +183,16 @@ static void trigger_sample(running_machine *machine, UINT8 data)
 			case 19:
 			case 20:
 			case 21:
-				sample_start(0, (data - 17) * 8 + random_offset, 0);
+				sample_start(samples, 0, (data - 17) * 8 + random_offset, 0);
 				random_offset = (random_offset + 1) & 7;
 				break;
 
 			case 22:
-				sample_start(0,40,0);
+				sample_start(samples, 0,40,0);
 				break;
 
 			case 23:
-				sample_start(0,41,0);
+				sample_start(samples, 0,41,0);
 				break;
 		}
 	}
@@ -201,11 +202,12 @@ static void trigger_sample(running_machine *machine, UINT8 data)
 #ifdef UNUSED_FUNCTION
 void gottlieb_knocker(running_machine *machine)
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	if (!strcmp(machine->gamedrv->name,"reactor"))	/* reactor */
 	{
 	}
-	else if (sndti_exists(SOUND_SAMPLES, 0))	/* qbert */
-		sample_start(0,44,0);
+	else if (samples != NULL)	/* qbert */
+		sample_start(samples, 0,44,0);
 }
 #endif
 
@@ -248,6 +250,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 	{
 		if (votrax_queuepos > 1)
 		{
+			const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 			int last = -1;
 			int i;
 			char phonemes[200];
@@ -265,7 +268,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 			}
 
 			printf("Votrax played '%s'\n", phonemes);
-			play_sample(phonemes);
+			play_sample(samples, phonemes);
 #if 0
 			popmessage("%s", phonemes);
 #endif
@@ -315,7 +318,7 @@ static ADDRESS_MAP_START( gottlieb_sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0de0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_WRITE(vortrax_data_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(speech_clock_dac_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -472,16 +475,16 @@ static WRITE8_HANDLER( nmi_rate_w )
 
 static CUSTOM_INPUT( speech_drq_custom_r )
 {
-	return sp0250_drq_r();
+	return sp0250_drq_r(devtag_get_device(field->port->machine, SOUND, "sp"));
 }
 
 
-static WRITE8_HANDLER( dac_w )
+static WRITE8_DEVICE_HANDLER( gottlieb_dac_w )
 {
 	/* dual DAC; the first DAC serves as the reference voltage for the
        second, effectively scaling the output */
 	dac_data[offset] = data;
-	dac_data_16_w(0, dac_data[0] * dac_data[1]);
+	dac_data_16_w(device, dac_data[0] * dac_data[1]);
 }
 
 
@@ -499,33 +502,26 @@ static WRITE8_HANDLER( speech_control_w )
 	if ((previous & 0x04) != 0 && (data & 0x04) == 0)
 	{
 		/* bit 3 selects which of the two 8913 to enable */
-		if (data & 0x08)
-		{
-			/* bit 4 goes to the 8913 BC1 pin */
-			if (data & 0x10)
-				ay8910_control_port_0_w(space, 0, *psg_latch);
-			else
-				ay8910_write_port_0_w(space, 0, *psg_latch);
-		}
-		else
-		{
-			/* bit 4 goes to the 8913 BC1 pin */
-			if (data & 0x10)
-				ay8910_control_port_1_w(space, 0, *psg_latch);
-			else
-				ay8910_write_port_1_w(space, 0, *psg_latch);
-		}
+		/* bit 4 goes to the 8913 BC1 pin */
+		const device_config *ay = devtag_get_device(space->machine, SOUND, (data & 0x08) ? "ay1" : "ay2");
+		ay8910_data_address_w(ay, data >> 4, *psg_latch);
 	}
 
 	/* bit 5 goes to the speech chip DIRECT DATA TEST pin */
 
 	/* bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data */
 	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
-		sp0250_w(space, 0, *sp0250_latch);
+	{
+		const device_config *sp = devtag_get_device(space->machine, SOUND, "sp");
+		sp0250_w(sp, 0, *sp0250_latch);
+	}
 
 	/* bit 7 goes to the speech chip RESET pin */
 	if ((previous ^ data) & 0x80)
-		sndti_reset(SOUND_SP0250, 0);
+	{
+		const device_config *sp = devtag_get_device(space->machine, SOUND, "sp");
+		device_reset(sp);
+	}
 }
 
 
@@ -573,7 +569,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gottlieb_audio2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x3c00) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x3ffe) AM_WRITE(dac_w) AM_BASE(&dac_data)
+	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x3ffe) AM_DEVWRITE(SOUND, "dac1", gottlieb_dac_w) AM_BASE(&dac_data)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3fff) AM_READ(audio_data_r)
 	AM_RANGE(0xe000, 0xffff) AM_MIRROR(0x2000) AM_ROM
 ADDRESS_MAP_END

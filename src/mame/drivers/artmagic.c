@@ -116,7 +116,7 @@ static WRITE16_HANDLER( control_w )
 
 	/* OKI banking here */
 	if (offset == 0)
-		okim6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(space->machine, "oki"));
+		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"), (((data >> 4) & 1) * 0x40000) % memory_region_length(space->machine, "oki"));
 
 	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(space->cpu), offset, data);
 }
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE(&control)
 	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x360000, 0x360001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x360000, 0x360001) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( stonebal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x30000e, 0x30000f) AM_READ_PORT("30000e")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE(&control)
 	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 

@@ -1274,17 +1274,17 @@ static WRITE16_HANDLER( unknown_rgn2_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( upd7759_control_w )
+static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 {
-	int size = memory_region_length(space->machine, "sound") - 0x10000;
+	int size = memory_region_length(device->machine, "sound") - 0x10000;
 	if (size > 0)
 	{
 		int bankoffs = 0;
 
 		/* it is important to write in this order: if the /START line goes low
            at the same time /RESET goes low, no sample should be started */
-		upd7759_start_w(0, data & 0x80);
-		upd7759_reset_w(0, data & 0x40);
+		upd7759_start_w(device, data & 0x80);
+		upd7759_reset_w(device, data & 0x40);
 
 		/* banking depends on the ROM board */
 		switch (rom_board)
@@ -1333,14 +1333,14 @@ static WRITE8_HANDLER( upd7759_control_w )
 				bankoffs += (data & 0x07) * 0x04000;
 				break;
 		}
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "sound") + 0x10000 + (bankoffs % size));
+		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "sound") + 0x10000 + (bankoffs % size));
 	}
 }
 
 
-static READ8_HANDLER( upd7759_status_r )
+static READ8_DEVICE_HANDLER( upd7759_status_r )
 {
-	return upd7759_busy_r(0) << 7;
+	return upd7759_busy_r(device) << 7;
 }
 
 
@@ -1558,12 +1558,7 @@ static void wrestwar_i8751_sim(running_machine *machine)
 
 static WRITE16_HANDLER( atomicp_sound_w )
 {
-	if (ACCESSING_BITS_8_15)
-		switch (offset & 1)
-		{
-			case 0:	ym2413_register_port_0_w(space, 0, data >> 8);	break;
-			case 1:	ym2413_data_port_0_w(space, 0, data >> 8);		break;
-		}
+	ym2413_w(devtag_get_device(space->machine, SOUND, "ym"), offset, data >> 8);
 }
 
 
@@ -1790,10 +1785,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_WRITE(upd7759_control_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_READWRITE(upd7759_status_r, upd7759_0_port_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE(SOUND, "upd", upd7759_control_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_DEVREADWRITE(SOUND, "upd", upd7759_status_r, upd7759_port_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -3271,10 +3265,10 @@ static MACHINE_DRIVER_START( system16b )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2151", YM2151, MASTER_CLOCK_8MHz/2)
+	MDRV_SOUND_ADD("ym", YM2151, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
-	MDRV_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(upd7759_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_DRIVER_END
@@ -3306,10 +3300,10 @@ static MACHINE_DRIVER_START( atomicp )
 	MDRV_MACHINE_RESET(atomicp)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("2151", YM2413, 5000000) /* 20MHz OSC divided by 4 */
+	MDRV_SOUND_REPLACE("ym", YM2413, 5000000) /* 20MHz OSC divided by 4 */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_REMOVE("7759")
+	MDRV_SOUND_REMOVE("upd")
 MACHINE_DRIVER_END
 
 

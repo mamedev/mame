@@ -13,23 +13,23 @@
 static INT16 *samplebuf;
 static int sample;
 
-WRITE8_HANDLER( suna8_play_samples_w )
+WRITE8_DEVICE_HANDLER( suna8_play_samples_w )
 {
 	if( data )
 	{
 		if( ~data & 0x10 )
 		{
-			sample_start_raw(0, &samplebuf[0x800*sample], 0x0800, 4000, 0);
+			sample_start_raw(device, 0, &samplebuf[0x800*sample], 0x0800, 4000, 0);
 		}
 		else if( ~data & 0x08 )
 		{
 			sample &= 3;
-			sample_start_raw(0, &samplebuf[0x800*(sample+7)], 0x0800, 4000, 0);
+			sample_start_raw(device, 0, &samplebuf[0x800*(sample+7)], 0x0800, 4000, 0);
 		}
 	}
 }
 
-WRITE8_HANDLER( suna8_samples_number_w )
+WRITE8_DEVICE_HANDLER( suna8_samples_number_w )
 {
 	sample = data & 0xf;
 }

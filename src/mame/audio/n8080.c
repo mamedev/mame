@@ -85,7 +85,7 @@ static const sn76477_interface spacefev_sn76477_interface =
 };
 
 
-static void spacefev_update_SN76477_status(running_machine *machine)
+static void spacefev_update_SN76477_status(const device_config *sn)
 {
 	double dblR0 = RES_M(1.0);
 	double dblR1 = RES_M(1.5);
@@ -99,70 +99,70 @@ static void spacefev_update_SN76477_status(running_machine *machine)
 		dblR1 = 1 / (1 / RES_K(620) + 1 / dblR1); /* ? */
 	}
 
-	sn76477_decay_res_w(0, dblR0);
+	sn76477_decay_res_w(sn, dblR0);
 
-	sn76477_vco_res_w(0, dblR1);
+	sn76477_vco_res_w(sn, dblR1);
 
-	sn76477_enable_w(0,
+	sn76477_enable_w(sn,
 		!mono_flop[0] &&
 		!mono_flop[1] &&
 		!mono_flop[2]);
 
-	sn76477_vco_w(0, mono_flop[1]);
+	sn76477_vco_w(sn, mono_flop[1]);
 
-	sn76477_mixer_b_w(0, mono_flop[0]);
+	sn76477_mixer_b_w(sn, mono_flop[0]);
 }
 
 
-static void sheriff_update_SN76477_status(running_machine *machine)
+static void sheriff_update_SN76477_status(const device_config *sn)
 {
 	if (mono_flop[1])
 	{
-		sn76477_vco_voltage_w(0, 5);
+		sn76477_vco_voltage_w(sn, 5);
 	}
 	else
 	{
-		sn76477_vco_voltage_w(0, 0);
+		sn76477_vco_voltage_w(sn, 0);
 	}
 
-	sn76477_enable_w(0,
+	sn76477_enable_w(sn,
 		!mono_flop[0] &&
 		!mono_flop[1]);
 
-	sn76477_vco_w(0, mono_flop[0]);
+	sn76477_vco_w(sn, mono_flop[0]);
 
-	sn76477_mixer_b_w(0, !mono_flop[0]);
+	sn76477_mixer_b_w(sn, !mono_flop[0]);
 }
 
 
-static void update_SN76477_status(running_machine *machine)
+static void update_SN76477_status(const device_config *device)
 {
 	if (n8080_hardware == 1)
 	{
-		spacefev_update_SN76477_status(machine);
+		spacefev_update_SN76477_status(device);
 	}
 	if (n8080_hardware == 2)
 	{
-		sheriff_update_SN76477_status(machine);
+		sheriff_update_SN76477_status(device);
 	}
 }
 
 
-static void start_mono_flop(running_machine *machine, int n, attotime expire)
+static void start_mono_flop(const device_config *sn, int n, attotime expire)
 {
 	mono_flop[n] = 1;
 
-	update_SN76477_status(machine);
+	update_SN76477_status(sn);
 
 	timer_adjust_oneshot(sound_timer[n], expire, n);
 }
 
 
-static void stop_mono_flop(running_machine *machine, int n)
+static void stop_mono_flop(const device_config *sn, int n)
 {
 	mono_flop[n] = 0;
 
-	update_SN76477_status(machine);
+	update_SN76477_status(sn);
 
 	timer_adjust_oneshot(sound_timer[n], attotime_never, n);
 }
@@ -170,33 +170,34 @@ static void stop_mono_flop(running_machine *machine, int n)
 
 static TIMER_CALLBACK( stop_mono_flop_callback )
 {
-	stop_mono_flop(machine, param);
+	stop_mono_flop(devtag_get_device(machine, SOUND, "sn"), param);
 }
 
 
 static void spacefev_sound_pins_changed(running_machine *machine)
 {
+	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
 
 	if (changes & (1 << 0x3))
 	{
-		stop_mono_flop(machine, 1);
+		stop_mono_flop(sn, 1);
 	}
 	if (changes & ((1 << 0x3) | (1 << 0x6)))
 	{
-		stop_mono_flop(machine, 2);
+		stop_mono_flop(sn, 2);
 	}
 	if (changes & (1 << 0x3))
 	{
-		start_mono_flop(machine, 0, ATTOTIME_IN_USEC(550 * 36 * 100));
+		start_mono_flop(sn, 0, ATTOTIME_IN_USEC(550 * 36 * 100));
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(machine, 1, ATTOTIME_IN_USEC(550 * 22 * 33));
+		start_mono_flop(sn, 1, ATTOTIME_IN_USEC(550 * 22 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(machine, 2, ATTOTIME_IN_USEC(550 * 22 * 33));
+		start_mono_flop(sn, 2, ATTOTIME_IN_USEC(550 * 22 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
@@ -207,19 +208,20 @@ static void spacefev_sound_pins_changed(running_machine *machine)
 
 static void sheriff_sound_pins_changed(running_machine *machine)
 {
+	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
 
 	if (changes & (1 << 0x6))
 	{
-		stop_mono_flop(machine, 1);
+		stop_mono_flop(sn, 1);
 	}
 	if (changes & (1 << 0x6))
 	{
-		start_mono_flop(machine, 0, ATTOTIME_IN_USEC(550 * 33 * 33));
+		start_mono_flop(sn, 0, ATTOTIME_IN_USEC(550 * 33 * 33));
 	}
 	if (changes & (1 << 0x4))
 	{
-		start_mono_flop(machine, 1, ATTOTIME_IN_USEC(550 * 33 * 33));
+		start_mono_flop(sn, 1, ATTOTIME_IN_USEC(550 * 33 * 33));
 	}
 	if (changes & ((1 << 0x2) | (1 << 0x3) | (1 << 0x5)))
 	{
@@ -408,13 +410,13 @@ static READ8_HANDLER( helifire_8035_p2_r )
 
 static WRITE8_HANDLER( n8080_dac_w )
 {
-	dac_data_w(0, data & 0x80);
+	dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), data & 0x80);
 }
 
 
 static WRITE8_HANDLER( helifire_dac_w )
 {
-	dac_data_w(0, data * helifire_dac_volume);
+	dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), data * helifire_dac_volume);
 }
 
 
@@ -440,6 +442,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 
 static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 {
+	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
 	double voltage = 0;
 
 	if (mono_flop[2])
@@ -447,7 +450,7 @@ static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 		voltage = 5 * (1 - exp(- attotime_to_double(timer_timeelapsed(sound_timer[2])) / 0.22));
 	}
 
-	sn76477_vco_voltage_w(0, voltage);
+	sn76477_vco_voltage_w(sn, voltage);
 }
 
 

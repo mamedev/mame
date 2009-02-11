@@ -55,10 +55,8 @@ if (data & 0xe0) popmessage("bankswitch %02x",data);
 
 static ADDRESS_MAP_START( labyrunr_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0020, 0x005f) AM_READ(SMH_RAM)	/* scroll registers */
-	AM_RANGE(0x0801, 0x0801) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0x0800, 0x0800) AM_READ(ym2203_read_port_0_r)
-	AM_RANGE(0x0901, 0x0901) AM_READ(ym2203_status_port_1_r)
-	AM_RANGE(0x0900, 0x0900) AM_READ(ym2203_read_port_1_r)
+	AM_RANGE(0x0800, 0x0801) AM_DEVREAD(SOUND, "ym1", ym2203_r)
+	AM_RANGE(0x0900, 0x0901) AM_DEVREAD(SOUND, "ym2", ym2203_r)
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("P2")
 	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("P1")
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("SYSTEM")
@@ -73,10 +71,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( labyrunr_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(K007121_ctrl_0_w)
 	AM_RANGE(0x0020, 0x005f) AM_WRITE(SMH_RAM)	AM_BASE(&labyrunr_scrollram) /* scroll registers */
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x0901, 0x0901) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0x0900, 0x0900) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
+	AM_RANGE(0x0900, 0x0901) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
 	AM_RANGE(0x0d00, 0x0d1f) AM_WRITE(K051733_w)				/* 051733 (protection) */
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(watchdog_reset_w)
@@ -227,10 +223,10 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_0_r,
-		input_port_1_r,
-		NULL,
-		NULL
+		DEVCB_INPUT_PORT("DSW1"),
+		DEVCB_INPUT_PORT("DSW2"),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };
@@ -240,10 +236,10 @@ static const ym2203_interface ym2203_interface_2 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL,
-		input_port_2_r,
-		NULL,
-		NULL
+		DEVCB_NULL,
+		DEVCB_INPUT_PORT("DSW3"),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };

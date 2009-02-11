@@ -899,7 +899,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 }
 
 static ADDRESS_MAP_START( namcoc75_am, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x002000, 0x002fff) AM_READWRITE( c352_0_r, c352_0_w )
+	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE(SOUND, "c352", c352_r, c352_w)
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(nbmcu_shared_w) AM_BASE(&namconb_shareram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)

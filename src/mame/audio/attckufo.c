@@ -8,7 +8,6 @@
 #include <math.h>
 #include "driver.h"
 #include "streams.h"
-#include "sound/custom.h"
 #include "includes/attckufo.h"
 
 /*
@@ -208,7 +207,7 @@ static STREAM_UPDATE( attckufo_update )
 /************************************/
 
 
-CUSTOM_START( attckufo_custom_start )
+DEVICE_START( attckufo_sound )
 {
 	int i;
 
@@ -261,6 +260,20 @@ CUSTOM_START( attckufo_custom_start )
 	{
 		tone[i] = (INT16)(sin (2 * M_PI * i / tonesize) * 127 + 0.5);
 	}
-	return (void *) ~0;
 }
+
+
+DEVICE_GET_INFO( attckufo_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(attckufo_sound);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Attack Ufo Custom");			break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
+}
+
 

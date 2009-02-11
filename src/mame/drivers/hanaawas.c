@@ -32,7 +32,7 @@
 
 extern WRITE8_HANDLER( hanaawas_videoram_w );
 extern WRITE8_HANDLER( hanaawas_colorram_w );
-extern WRITE8_HANDLER( hanaawas_portB_w );
+extern WRITE8_DEVICE_HANDLER( hanaawas_portB_w );
 
 extern PALETTE_INIT( hanaawas );
 extern VIDEO_START( hanaawas );
@@ -99,8 +99,8 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(hanaawas_input_port_0_r, hanaawas_inputs_mux_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP /* it must return 0 */
-	AM_RANGE(0x10, 0x10) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hanaawas )
@@ -192,10 +192,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_1_r,
-	NULL,
-	NULL,
-	hanaawas_portB_w
+	DEVCB_INPUT_PORT("DSW"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(hanaawas_portB_w)
 };
 
 

@@ -104,7 +104,6 @@ TODO:
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "sound/custom.h"
 #include "sound/tms36xx.h"
 #include "includes/phoenix.h"
 
@@ -352,16 +351,6 @@ GFXDECODE_END
 
 
 
-static const custom_sound_interface naughtyb_custom_interface =
-{
-	naughtyb_sh_start
-};
-
-static const custom_sound_interface popflame_custom_interface =
-{
-	popflame_sh_start
-};
-
 static const tms36xx_interface tms3615_interface =
 {
 	TMS3615,	/* TMS36xx subtype */
@@ -407,8 +396,7 @@ static MACHINE_DRIVER_START( naughtyb )
 	MDRV_SOUND_CONFIG(tms3615_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD("naughtyb", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(naughtyb_custom_interface)
+	MDRV_SOUND_ADD("naughtyb", NAUGHTYB, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 MACHINE_DRIVER_END
 
@@ -443,8 +431,7 @@ static MACHINE_DRIVER_START( popflame )
 	MDRV_SOUND_CONFIG(tms3615_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD("popflame", CUSTOM, 0)
-	MDRV_SOUND_CONFIG(popflame_custom_interface)
+	MDRV_SOUND_ADD("popflame", POPFLAME, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 MACHINE_DRIVER_END
 

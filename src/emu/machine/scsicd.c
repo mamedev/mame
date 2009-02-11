@@ -45,7 +45,7 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 	SCSICd *our_this = SCSIThis( &SCSIClassCDROM, scsiInstance );
 
 	cdrom_file *cdrom = our_this->cdrom;
-	int cddanum;
+	const device_config *cdda;
 	int trk;
 
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
@@ -71,10 +71,10 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			return SCSILengthFromUINT8( &command[ 4 ] );
 
 		case 0x1b: // START STOP UNIT
-			cddanum = cdda_num_from_cdrom(cdrom);
-			if (cddanum != -1)
+			cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+			if (cdda != NULL)
 			{
-				cdda_stop_audio(cddanum);
+				cdda_stop_audio(cdda);
 			}
 			SCSISetPhase( scsiInstance, SCSI_PHASE_STATUS );
 			return 0;
@@ -104,10 +104,10 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 				our_this->cur_subblock = 0;
 			}
 
-			cddanum = cdda_num_from_cdrom(cdrom);
-			if (cddanum != -1)
+			cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+			if (cdda != NULL)
 			{
-				cdda_stop_audio(cddanum);
+				cdda_stop_audio(cdda);
 			}
 
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
@@ -144,10 +144,10 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 				length = 4;
 			}
 
-			cddanum = cdda_num_from_cdrom(cdrom);
-			if (cddanum != -1)
+			cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+			if (cdda != NULL)
 			{
-				cdda_stop_audio(cddanum);
+				cdda_stop_audio(cdda);
 			}
 
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
@@ -174,9 +174,9 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
 			{
 				our_this->play_err_flag = 0;
-				cddanum = cdda_num_from_cdrom(cdrom);
-				if (cddanum != -1)
-					cdda_start_audio(cddanum, our_this->lba, our_this->blocks);
+				cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+				if (cdda != NULL)
+					cdda_start_audio(cdda, our_this->lba, our_this->blocks);
 			}
 			else
 			{
@@ -204,9 +204,9 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 
 			if (our_this->blocks && cdrom)
 			{
-				cddanum = cdda_num_from_cdrom(cdrom);
-				if (cddanum != -1)
-					cdda_start_audio(cddanum, our_this->lba, our_this->blocks);
+				cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+				if (cdda != NULL)
+					cdda_start_audio(cdda, our_this->lba, our_this->blocks);
 			}
 
 			logerror("SCSICD: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], our_this->blocks);
@@ -216,9 +216,9 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 		case 0x4b: // PAUSE/RESUME
 			if (cdrom)
 			{
-				cddanum = cdda_num_from_cdrom(cdrom);
-				if (cddanum != -1)
-					cdda_pause_audio(cddanum, (command[8] & 0x01) ^ 0x01);
+				cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+				if (cdda != NULL)
+					cdda_pause_audio(cdda, (command[8] & 0x01) ^ 0x01);
 			}
 
 			logerror("SCSICD: PAUSE/RESUME: %s\n", command[8]&1 ? "RESUME" : "PAUSE");
@@ -255,9 +255,9 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
 			{
 				our_this->play_err_flag = 0;
-				cddanum = cdda_num_from_cdrom(cdrom);
-				if (cddanum != -1)
-					cdda_start_audio(cddanum, our_this->lba, our_this->blocks);
+				cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+				if (cdda != NULL)
+					cdda_start_audio(cdda, our_this->lba, our_this->blocks);
 			}
 			else
 			{
@@ -283,10 +283,10 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 				our_this->cur_subblock = 0;
 			}
 
-			cddanum = cdda_num_from_cdrom(cdrom);
-			if (cddanum != -1)
+			cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+			if (cdda != NULL)
 			{
-				cdda_stop_audio(cddanum);
+				cdda_stop_audio(cdda);
 			}
 
 			SCSISetPhase( scsiInstance, SCSI_PHASE_DATAIN );
@@ -317,7 +317,7 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 	cdrom_file *cdrom = our_this->cdrom;
 	UINT32 temp;
 	UINT8 tmp_buffer[2048];
-	int cddanum;
+	const device_config *cdda;
 
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
@@ -330,8 +330,8 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 
 			data[0] = 0x71;	// deferred error
 
-			cddanum = cdda_num_from_cdrom(cdrom);
-			if (cddanum != -1 && cdda_audio_active(cddanum))
+			cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+			if (cdda != NULL && cdda_audio_active(cdda))
 			{
 				data[12] = 0x00;
 				data[13] = 0x11;	// AUDIO PLAY OPERATION IN PROGRESS
@@ -423,11 +423,11 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 
 					msf = command[1] & 0x2;
 
-					cddanum = cdda_num_from_cdrom(cdrom);
-					audio_active = cddanum != -1 && cdda_audio_active(cddanum);
+					cdda = cdda_from_cdrom(scsiInstance->machine, cdrom);
+					audio_active = cdda != NULL && cdda_audio_active(cdda);
 					if (audio_active)
 					{
-						if (cdda_audio_paused(cddanum))
+						if (cdda_audio_paused(cdda))
 						{
 							data[1] = 0x12;		// audio is paused
 						}
@@ -438,7 +438,7 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 					}
 					else
 					{
-						if (cddanum != -1 && cdda_audio_ended(cddanum))
+						if (cdda != NULL && cdda_audio_ended(cdda))
 						{
 							data[1] = 0x13;	// ended successfully
 						}
@@ -452,7 +452,7 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 					// if audio is playing, get the latest LBA from the CDROM layer
 					if (audio_active)
 					{
-						our_this->last_lba = cdda_get_audio_lba(cddanum);
+						our_this->last_lba = cdda_get_audio_lba(cdda);
 					}
 					else
 					{

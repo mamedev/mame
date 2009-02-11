@@ -6,7 +6,8 @@
 #include "streams.h"
 #include "segapcm.h"
 
-struct segapcm
+typedef struct _segapcm_state segapcm_state;
+struct _segapcm_state
 {
 	UINT8  *ram;
 	UINT8 low[16];
@@ -16,9 +17,18 @@ struct segapcm
 	sound_stream * stream;
 };
 
+INLINE segapcm_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_SEGAPCM);
+	return (segapcm_state *)device->token;
+}
+
 static STREAM_UPDATE( SEGAPCM_update )
 {
-	struct segapcm *spcm = param;
+	segapcm_state *spcm = param;
 	int ch;
 
 	/* clear the buffers */
@@ -76,11 +86,11 @@ static STREAM_UPDATE( SEGAPCM_update )
 		}
 }
 
-static SND_START( segapcm )
+static DEVICE_START( segapcm )
 {
 	const sega_pcm_interface *intf = device->static_config;
 	int mask, rom_mask, len;
-	struct segapcm *spcm = device->token;
+	segapcm_state *spcm = get_safe_token(device);
 
 	spcm->rom = (const UINT8 *)device->region;
 	spcm->ram = auto_malloc(0x800);
@@ -98,23 +108,23 @@ static SND_START( segapcm )
 
 	spcm->bankmask = mask & (rom_mask >> spcm->bankshift);
 
-	spcm->stream = stream_create(device, 0, 2, clock / 128, spcm, SEGAPCM_update);
+	spcm->stream = stream_create(device, 0, 2, device->clock / 128, spcm, SEGAPCM_update);
 
 	state_save_register_device_item_array(device, 0, spcm->low);
 	state_save_register_device_item_pointer(device, 0, spcm->ram, 0x800);
 }
 
 
-WRITE8_HANDLER( sega_pcm_w )
+WRITE8_DEVICE_HANDLER( sega_pcm_w )
 {
-	struct segapcm *spcm = sndti_token(SOUND_SEGAPCM, 0);
+	segapcm_state *spcm = get_safe_token(device);
 	stream_update(spcm->stream);
 	spcm->ram[offset & 0x07ff] = data;
 }
 
-READ8_HANDLER( sega_pcm_r )
+READ8_DEVICE_HANDLER( sega_pcm_r )
 {
-	struct segapcm *spcm = sndti_token(SOUND_SEGAPCM, 0);
+	segapcm_state *spcm = get_safe_token(device);
 	stream_update(spcm->stream);
 	return spcm->ram[offset & 0x07ff];
 }
@@ -125,33 +135,23 @@ READ8_HANDLER( sega_pcm_r )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( segapcm )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( segapcm )
+DEVICE_GET_INFO( segapcm )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct segapcm);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(segapcm_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( segapcm );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( segapcm );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( segapcm );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Sega PCM");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Sega custom");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Sega PCM");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Sega custom");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }

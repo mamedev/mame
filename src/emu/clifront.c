@@ -339,7 +339,6 @@ int cli_info_listxml(core_options *options, const char *gamename)
 {
 	/* since print_mame_xml expands the machine driver, we need to set things up */
 	init_resource_tracking();
-	sndintrf_init(NULL);
 
 	print_mame_xml(stdout, drivers, gamename);
 
@@ -604,20 +603,19 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 
 	/* since we expand the machine driver, we need to set things up */
 	init_resource_tracking();
-	sndintrf_init(NULL);
 
 	/* iterate over drivers */
 	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
-			int sndnum;
+			const device_config *device;
 
 			/* find samples interfaces */
-			for (sndnum = 0; sndnum < MAX_SOUND && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
-				if (config->sound[sndnum].type == SOUND_SAMPLES)
+			for (device = sound_first(config); device != NULL; device = sound_next(device))
+				if (sound_get_type(device) == SOUND_SAMPLES)
 				{
-					const char *const *samplenames = ((const samples_interface *)config->sound[sndnum].config)->samplenames;
+					const char *const *samplenames = ((const samples_interface *)device->static_config)->samplenames;
 					int sampnum;
 
 					/* if the list is legit, walk it and print the sample info */

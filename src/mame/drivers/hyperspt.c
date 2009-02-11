@@ -27,11 +27,11 @@ extern VIDEO_UPDATE( roadf );
 
 extern WRITE8_HANDLER( konami_sh_irqtrigger_w );
 extern READ8_HANDLER( hyperspt_sh_timer_r );
-extern WRITE8_HANDLER( hyperspt_sound_w );
+extern WRITE8_DEVICE_HANDLER( hyperspt_sound_w );
 
 /* these routines lurk in audio/trackfld.c */
 extern WRITE8_HANDLER( konami_SN76496_latch_w );
-extern WRITE8_HANDLER( konami_SN76496_0_w );
+extern WRITE8_DEVICE_HANDLER( konami_SN76496_w );
 
 
 static WRITE8_HANDLER( hyperspt_coin_counter_w )
@@ -124,11 +124,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(vlm5030_data_w) /* speech data */
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(hyperspt_sound_w)	  /* speech and output control */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w) /* speech data */
+	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE(SOUND, "vlm", hyperspt_sound_w)	  /* speech and output control */
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_0_w) 	 /* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE(SOUND, "sn", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 

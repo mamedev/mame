@@ -67,7 +67,6 @@ VIDEO_UPDATE( dynamski );
 /***************************************************************************************/
 
 static UINT8 bbx_sound_enable;
-static UINT8 bbx_AY8910_control;
 static UINT8 sound_latch;
 
 /***************************************************************************************/
@@ -99,58 +98,31 @@ static WRITE8_HANDLER( shangkid_sound_enable_w )
 	bbx_sound_enable = data;
 }
 
-static WRITE8_HANDLER( shangkid_bbx_AY8910_control_w )
+static WRITE8_DEVICE_HANDLER( chinhero_ay8910_porta_w )
 {
-	bbx_AY8910_control = data;
-	ay8910_control_port_0_w( space, offset, data );
-}
-
-static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
-{
-	switch( bbx_AY8910_control )
+	if( bbx_sound_enable )
 	{
-	case 0x0e:
-		if( bbx_sound_enable )
-		{
-			if( data == 0x01 )
-				/* 0->1 transition triggers interrupt on Sound CPU */
-				cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE );
-		}
-		break;
-
-	case 0x0f:
-		sound_latch = data;
-		break;
-
-	default:
-		ay8910_write_port_0_w( space, offset, data );
-		break;
+		if( data == 0x01 )
+			/* 0->1 transition triggers interrupt on Sound CPU */
+			cpu_set_input_line(device->machine->cpu[2], 0, HOLD_LINE );
 	}
 }
 
-static WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
+static WRITE8_DEVICE_HANDLER( shangkid_ay8910_porta_w )
 {
-	switch( bbx_AY8910_control )
+	if( bbx_sound_enable )
 	{
-	case 0x0e:
-		if( bbx_sound_enable )
-		{
-			if( data == 0x01 )
-				/* 0->1 transition triggers interrupt on Sound CPU */
-				cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE );
-		}
-		else
-			memory_set_bank(space->machine, 2, data ? 0 : 1);
-		break;
-
-	case 0x0f:
-		sound_latch = data;
-		break;
-
-	default:
-		ay8910_write_port_0_w( space, offset, data );
-		break;
+		if( data == 0x01 )
+			/* 0->1 transition triggers interrupt on Sound CPU */
+			cpu_set_input_line(device->machine->cpu[2], 0, HOLD_LINE );
 	}
+	else
+		memory_set_bank(device->machine, 2, data ? 0 : 1);
+}
+
+static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
+{
+	sound_latch = data;
 }
 
 /***************************************************************************************/
@@ -352,14 +324,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinhero_bbx_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(shangkid_bbx_AY8910_control_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(chinhero_bbx_AY8910_write_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_bbx_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(shangkid_bbx_AY8910_control_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(shangkid_bbx_AY8910_write_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -376,10 +346,32 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(shangkid_soundlatch_r, dac_0_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ(shangkid_soundlatch_r) AM_DEVWRITE(SOUND, "dac", dac_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
+
+static const ay8910_interface chinhero_ay8910_interface =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(chinhero_ay8910_porta_w),
+	DEVCB_HANDLER(ay8910_portb_w)
+};
+
+
+static const ay8910_interface shangkid_ay8910_interface =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(shangkid_ay8910_porta_w),
+	DEVCB_HANDLER(ay8910_portb_w)
+};
+
 
 static MACHINE_DRIVER_START( chinhero )
 
@@ -423,6 +415,7 @@ static MACHINE_DRIVER_START( chinhero )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ay", AY8910, XTAL_18_432MHz/12) /* verified on pcb */
+	MDRV_SOUND_CONFIG(chinhero_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
@@ -445,6 +438,9 @@ static MACHINE_DRIVER_START( shangkid )
 
 	/* video hardware */
 	MDRV_GFXDECODE(shangkid)
+	
+	MDRV_SOUND_MODIFY("ay")
+	MDRV_SOUND_CONFIG(shangkid_ay8910_interface)
 MACHINE_DRIVER_END
 
 
@@ -467,8 +463,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dynamski_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* ports are reversed */
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( dynamski )

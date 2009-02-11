@@ -5,13 +5,13 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
-#include "sound/custom.h"
 
 
 /*----------- defined in audio/polepos.c -----------*/
 
-CUSTOM_START( polepos_sh_start );
-CUSTOM_RESET( polepos_sh_reset );
+DEVICE_GET_INFO( polepos_sound );
+#define SOUND_POLEPOS DEVICE_GET_INFO_NAME(polepos_sound)
+
 WRITE8_HANDLER( polepos_engine_sound_lsb_w );
 WRITE8_HANDLER( polepos_engine_sound_msb_w );
 

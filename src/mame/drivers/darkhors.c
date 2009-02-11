@@ -250,17 +250,6 @@ static WRITE32_HANDLER( darkhors_eeprom_w )
 	}
 }
 
-static WRITE32_HANDLER( okim6295_data_0_msb32_w )
-{
-	if (ACCESSING_BITS_24_31)
-		okim6295_data_0_msb_w(space, offset, data >> 16, mem_mask >> 16);
-}
-
-static READ32_HANDLER( okim6295_status_0_msb32_r )
-{
-	return okim6295_status_0_msb_r(space, offset, mem_mask >> 16) << 16;
-}
-
 static WRITE32_HANDLER( paletteram32_xBBBBBGGGGGRRRRR_dword_w )
 {
 	paletteram16 = (UINT16 *)paletteram32;
@@ -315,7 +304,7 @@ static ADDRESS_MAP_START( darkhors_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")
 	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("580004")
 	AM_RANGE(0x580008, 0x58000b) AM_READ( darkhors_input_sel_r		)
-	AM_RANGE(0x580084, 0x580087) AM_READ( okim6295_status_0_msb32_r	)
+	AM_RANGE(0x580084, 0x580087) AM_DEVREAD8( SOUND, "oki", okim6295_r, 0xff000000	)
 	AM_RANGE(0x580200, 0x580203) AM_READ( SMH_NOP					)
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
@@ -328,7 +317,7 @@ static ADDRESS_MAP_START( darkhors_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x490040, 0x490043) AM_WRITE( darkhors_eeprom_w		)
 	AM_RANGE(0x58000c, 0x58000f) AM_WRITE( darkhors_input_sel_w		)
 	AM_RANGE(0x4e0080, 0x4e0083) AM_WRITE( darkhors_unk1_w			)
-	AM_RANGE(0x580084, 0x580087) AM_WRITE( okim6295_data_0_msb32_w	)
+	AM_RANGE(0x580084, 0x580087) AM_DEVWRITE8( SOUND, "oki", okim6295_w, 0xff000000	)
 	AM_RANGE(0x800000, 0x86bfff) AM_WRITE( SMH_RAM				)
 	AM_RANGE(0x86c000, 0x86ffff) AM_WRITE( darkhors_tmapram_w		)	AM_BASE(&darkhors_tmapram)
 	AM_RANGE(0x870000, 0x873fff) AM_WRITE( darkhors_tmapram2_w		)	AM_BASE(&darkhors_tmapram2)

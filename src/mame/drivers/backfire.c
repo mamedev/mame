@@ -265,20 +265,6 @@ static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 	palette_set_color_rgb(space->machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
-
-static READ32_HANDLER( deco156_snd_r )
-{
-	return ymz280b_status_0_r(space, 0);
-}
-
-static WRITE32_HANDLER( deco156_snd_w )
-{
-	if (offset)
-		ymz280b_data_0_w(space, 0, data);
-	else
-		ymz280b_register_0_w(space, 0, data);
-}
-
 /* map 32-bit writes to 16-bit */
 
 static READ32_HANDLER( backfire_pf1_rowscroll_r ) { return deco16_pf1_rowscroll[offset]^0xffff0000; }
@@ -353,7 +339,7 @@ static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0x1e8000, 0x1e8003) AM_READ(backfire_wheel1_r)
 //  AM_RANGE(0x1e8004, 0x1e8007) AM_READ(backfire_wheel2_r)
 
-	AM_RANGE(0x1c0000, 0x1c0007) AM_READ(deco156_snd_r) AM_WRITE(deco156_snd_w)
+	AM_RANGE(0x1c0000, 0x1c0007) AM_DEVREADWRITE8(SOUND, "ymz", ymz280b_r, ymz280b_w, 0x000000ff)
 ADDRESS_MAP_END
 
 
@@ -459,7 +445,7 @@ static GFXDECODE_START( backfire )
 GFXDECODE_END
 
 
-static void sound_irq_gen(running_machine *machine, int state)
+static void sound_irq_gen(const device_config *device, int state)
 {
 	logerror("sound irq\n");
 }

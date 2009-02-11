@@ -7,7 +7,6 @@
 #include "driver.h"
 #include "streams.h"
 #include "gridlee.h"
-#include "sound/custom.h"
 #include "sound/samples.h"
 
 
@@ -63,7 +62,7 @@ static STREAM_UPDATE( gridlee_stream_update )
  *
  *************************************/
 
-CUSTOM_START( gridlee_sh_start )
+static DEVICE_START( gridlee_sound )
 {
 	running_machine *machine = device->machine;
 
@@ -71,15 +70,28 @@ CUSTOM_START( gridlee_sh_start )
 	gridlee_stream = stream_create(device, 0, 1, machine->sample_rate, NULL, gridlee_stream_update);
 
 	freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
+}
 
-	return auto_malloc(1);
+
+DEVICE_GET_INFO( gridlee_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(gridlee_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Gridlee Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }
 
 
 
 WRITE8_HANDLER( gridlee_sound_w )
 {
-static UINT8 sound_data[24];
+	static UINT8 sound_data[24];
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 
 	stream_update(gridlee_stream);
 
@@ -87,13 +99,13 @@ static UINT8 sound_data[24];
 	{
 		case 0x04:
 			if (data == 0xef && sound_data[offset] != 0xef)
-				sample_start(4, 1, 0);
+				sample_start(samples, 4, 1, 0);
 			else if (data != 0xef && sound_data[offset] == 0xef)
-				sample_stop(4);
+				sample_stop(samples, 4);
 //          if (!(data & 0x01) && (sound_data[offset] & 0x01))
-//              sample_start(5, 1, 0);
+//              sample_start(samples, 5, 1, 0);
 //          else if ((data & 0x01) && !(sound_data[offset] & 0x01))
-//              sample_stop(5);
+//              sample_stop(samples, 5);
 			break;
 
 		case 0x0c:
@@ -101,9 +113,9 @@ static UINT8 sound_data[24];
 		case 0x0e:
 		case 0x0f:
 			if ((data & 1) && !(sound_data[offset] & 1))
-				sample_start(offset - 0x0c, 1 - sound_data[offset - 4], 0);
+				sample_start(samples, offset - 0x0c, 1 - sound_data[offset - 4], 0);
 			else if (!(data & 1) && (sound_data[offset] & 1))
-				sample_stop(offset - 0x0c);
+				sample_stop(samples, offset - 0x0c);
 			break;
 
 		case 0x08+0x08:

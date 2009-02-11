@@ -739,8 +739,8 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_BASE(&s3000_ram)
 
 	// Sound and Dipswitches
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1") AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 
     // Superboard Data
 	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_BASE(&s5000_ram)
@@ -1042,8 +1042,9 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_VIDEO_UPDATE(peplus)
 
 	// sound hardware
-	MDRV_SOUND_ADD("ay", AY8912, SOUND_CLOCK)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ay", AY8912, SOUND_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 

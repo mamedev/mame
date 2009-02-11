@@ -37,9 +37,8 @@ static ADDRESS_MAP_START( io_mem, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x98, 0x98) AM_READWRITE( TMS9928A_vram_r, TMS9928A_vram_w )
 	AM_RANGE(0x99, 0x99) AM_READWRITE( TMS9928A_register_r, TMS9928A_register_w )
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xa1, 0xa1) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xa2, 0xa2) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD(SOUND, "ay", ay8910_r)
 
 //Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
 //( http://map.tni.nl/resources/msx_io_ports.php#ppi )
@@ -63,12 +62,12 @@ static INPUT_PORTS_START( pesadelo )
 INPUT_PORTS_END
 
 
-static READ8_HANDLER(forte2_ay8910_read_input)
+static READ8_DEVICE_HANDLER(forte2_ay8910_read_input)
 {
-	return input_port_read(space->machine, "IN0") | (forte2_input_mask&0x3f);
+	return input_port_read(device->machine, "IN0") | (forte2_input_mask&0x3f);
 }
 
-static WRITE8_HANDLER( forte2_ay8910_set_input_mask )
+static WRITE8_DEVICE_HANDLER( forte2_ay8910_set_input_mask )
 {
 	/* PSG reg 15, writes 0 at coin insert, 0xff at boot and game over */
 	forte2_input_mask = data;
@@ -78,10 +77,10 @@ static const ay8910_interface forte2_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	forte2_ay8910_read_input,
-	NULL,
-	NULL,
-	forte2_ay8910_set_input_mask
+	DEVCB_HANDLER(forte2_ay8910_read_input),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(forte2_ay8910_set_input_mask)
 };
 
 

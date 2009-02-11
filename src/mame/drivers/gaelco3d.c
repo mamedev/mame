@@ -168,6 +168,7 @@ static UINT16 *adsp_control_regs;
 static UINT16 *adsp_fastram_base;
 static UINT8 adsp_ireg;
 static offs_t adsp_ireg_base, adsp_incs, adsp_size;
+static const device_config *dmadac[SOUND_CHANNELS];
 
 static void adsp_tx_callback(const device_config *device, int port, INT32 data);
 static TIMER_CALLBACK( adsp_autobuffer_irq );
@@ -202,6 +203,13 @@ static MACHINE_RESET( common )
 
 	/* keep the TMS32031 halted until the code is ready to go */
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+
+	for (i = 0; i < SOUND_CHANNELS; i++)
+	{
+		char buffer[10];
+		sprintf(buffer, "dac%d", i);
+		dmadac[i] = devtag_get_device(machine, SOUND, buffer);
+	}
 
 	/* Save state support */
 	state_save_register_global(machine, sound_data);
@@ -501,7 +509,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			/* see if SPORT1 got disabled */
 			if ((data & 0x0800) == 0)
 			{
-				dmadac_enable(0, SOUND_CHANNELS, 0);
+				dmadac_enable(&dmadac[0], SOUND_CHANNELS, 0);
 				timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 			}
 			break;
@@ -510,7 +518,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			/* autobuffer off: nuke the timer, and disable the DAC */
 			if ((data & 0x0002) == 0)
 			{
-				dmadac_enable(0, SOUND_CHANNELS, 0);
+				dmadac_enable(&dmadac[0], SOUND_CHANNELS, 0);
 				timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 			}
 			break;
@@ -547,7 +555,7 @@ static TIMER_CALLBACK( adsp_autobuffer_irq )
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", adsp_ireg, reg, adsp_incs, adsp_size);
 	if (adsp_incs)
-		dmadac_transfer(0, SOUND_CHANNELS, adsp_incs, SOUND_CHANNELS * adsp_incs, adsp_size / (SOUND_CHANNELS * adsp_incs), (INT16 *)&adsp_fastram_base[reg - 0x3800]);
+		dmadac_transfer(&dmadac[0], SOUND_CHANNELS, adsp_incs, SOUND_CHANNELS * adsp_incs, adsp_size / (SOUND_CHANNELS * adsp_incs), (INT16 *)&adsp_fastram_base[reg - 0x3800]);
 
 	/* increment it */
 	reg += adsp_size;
@@ -612,8 +620,8 @@ static void adsp_tx_callback(const device_config *device, int port, INT32 data)
 			/* now put it down to samples, so we know what the channel frequency has to be */
 			sample_period = attotime_mul(sample_period, 16 * SOUND_CHANNELS);
 
- 			dmadac_set_frequency(0, SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
-			dmadac_enable(0, SOUND_CHANNELS, 1);
+ 			dmadac_set_frequency(&dmadac[0], SOUND_CHANNELS, ATTOSECONDS_TO_HZ(sample_period.attoseconds));
+			dmadac_enable(&dmadac[0], SOUND_CHANNELS, 1);
 
 			/* fire off a timer wich will hit every half-buffer */
 			sample_period = attotime_div(attotime_mul(sample_period, adsp_size), SOUND_CHANNELS * adsp_incs);
@@ -627,7 +635,7 @@ static void adsp_tx_callback(const device_config *device, int port, INT32 data)
 	}
 
 	/* if we get there, something went wrong. Disable playing */
-	dmadac_enable(0, SOUND_CHANNELS, 0);
+	dmadac_enable(&dmadac[0], SOUND_CHANNELS, 0);
 
 	/* remove timer */
 	timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);

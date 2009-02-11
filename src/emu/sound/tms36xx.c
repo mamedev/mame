@@ -12,7 +12,8 @@
 /* the frequencies are later adjusted by "* clock / FSCALE" */
 #define FSCALE	1024
 
-struct TMS36XX {
+typedef struct _tms_state tms_state;
+struct _tms_state {
 	char *subtype;		/* subtype name MM6221AA, TMS3615 or TMS3617 */
 	sound_stream * channel;	/* returned by stream_create() */
 
@@ -340,10 +341,19 @@ static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 	}
 
 
+INLINE tms_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_TMS36XX);
+	return (tms_state *)device->token;
+}
+
 
 static STREAM_UPDATE( tms36xx_sound_update )
 {
-	struct TMS36XX *tms = param;
+	tms_state *tms = param;
 	int samplerate = tms->samplerate;
 	stream_sample_t *buffer = outputs[0];
 
@@ -393,7 +403,7 @@ static STREAM_UPDATE( tms36xx_sound_update )
 	}
 }
 
-static void tms36xx_reset_counters(struct TMS36XX *tms)
+static void tms36xx_reset_counters(tms_state *tms)
 {
     tms->tune_counter = 0;
     tms->note_counter = 0;
@@ -401,9 +411,9 @@ static void tms36xx_reset_counters(struct TMS36XX *tms)
 	memset(tms->counter, 0, sizeof(tms->counter));
 }
 
-void mm6221aa_tune_w(int chip, int tune)
+void mm6221aa_tune_w(const device_config *device, int tune)
 {
-	struct TMS36XX *tms = sndti_token(SOUND_TMS36XX, chip);
+	tms_state *tms = get_safe_token(device);
 
     /* which tune? */
     tune &= 3;
@@ -420,9 +430,9 @@ void mm6221aa_tune_w(int chip, int tune)
     tms->tune_max = 96; /* fixed for now */
 }
 
-void tms36xx_note_w(int chip, int octave, int note)
+void tms36xx_note_w(const device_config *device, int octave, int note)
 {
-	struct TMS36XX *tms = sndti_token(SOUND_TMS36XX, chip);
+	tms_state *tms = get_safe_token(device);
 
 	octave &= 3;
 	note &= 15;
@@ -443,7 +453,7 @@ void tms36xx_note_w(int chip, int octave, int note)
 	tms->tune_max = note + 1;
 }
 
-static void tms3617_enable(struct TMS36XX *tms, int enable)
+static void tms3617_enable(tms_state *tms, int enable)
 {
 	int i, bits = 0;
 
@@ -479,23 +489,23 @@ static void tms3617_enable(struct TMS36XX *tms, int enable)
 	LOG(("%s\n", bits ? "" : " none"));
 }
 
-void tms3617_enable_w(int chip, int enable)
+void tms3617_enable_w(const device_config *device, int enable)
 {
-	struct TMS36XX *tms = sndti_token(SOUND_TMS36XX, chip);
+	tms_state *tms = get_safe_token(device);
 	tms3617_enable(tms, enable);
 }
 
-static SND_START( tms36xx )
+static DEVICE_START( tms36xx )
 {
 	int j;
-	struct TMS36XX *tms = device->token;
+	tms_state *tms = get_safe_token(device);
 	int enable;
 
 	tms->intf = device->static_config;
 
-   tms->channel = stream_create(device, 0, 1, clock * 64, tms, tms36xx_sound_update);
-	tms->samplerate = clock * 64;
-	tms->basefreq = clock;
+   tms->channel = stream_create(device, 0, 1, device->clock * 64, tms, tms36xx_sound_update);
+	tms->samplerate = device->clock * 64;
+	tms->basefreq = device->clock;
 	enable = 0;
    for (j = 0; j < 6; j++)
 	{
@@ -523,34 +533,24 @@ static SND_START( tms36xx )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( tms36xx )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( tms36xx )
+DEVICE_GET_INFO( tms36xx )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct TMS36XX); 				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tms_state); 				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( tms36xx );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms36xx );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( tms36xx );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "TMS36XX");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "TI PSG");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "TMS36XX");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "TI PSG");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

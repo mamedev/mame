@@ -71,7 +71,7 @@ static int service_mode(running_machine *machine)
 
 static INTERRUPT_GEN( sprint2 )
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	const device_config *discrete = devtag_get_device(device->machine, SOUND, "discrete");
 	static UINT8 dial[2];
 
 	/* handle steering wheels */
@@ -105,9 +105,9 @@ static INTERRUPT_GEN( sprint2 )
 		}
 	}
 
-	discrete_sound_w(space, SPRINT2_MOTORSND1_DATA, sprint2_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
-	discrete_sound_w(space, SPRINT2_MOTORSND2_DATA, sprint2_video_ram[0x395] & 15);
-	discrete_sound_w(space, SPRINT2_CRASHSND_DATA, sprint2_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
+	discrete_sound_w(discrete, SPRINT2_MOTORSND1_DATA, sprint2_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
+	discrete_sound_w(discrete, SPRINT2_MOTORSND2_DATA, sprint2_video_ram[0x395] & 15);
+	discrete_sound_w(discrete, SPRINT2_CRASHSND_DATA, sprint2_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -209,30 +209,30 @@ static WRITE8_HANDLER( sprint2_wram_w )
 }
 
 
-static WRITE8_HANDLER( sprint2_attract_w )
+static WRITE8_DEVICE_HANDLER( sprint2_attract_w )
 {
 	attract = offset & 1;
 
 	// also DOMINOS_ATTRACT_EN
-	discrete_sound_w(space, SPRINT2_ATTRACT_EN, attract);
+	discrete_sound_w(device, SPRINT2_ATTRACT_EN, attract);
 }
 
 
-static WRITE8_HANDLER( sprint2_noise_reset_w )
+static WRITE8_DEVICE_HANDLER( sprint2_noise_reset_w )
 {
-	discrete_sound_w(space, SPRINT2_NOISE_RESET, 0);
+	discrete_sound_w(device, SPRINT2_NOISE_RESET, 0);
 }
 
 
-static WRITE8_HANDLER( sprint2_skid1_w )
+static WRITE8_DEVICE_HANDLER( sprint2_skid1_w )
 {
 	// also DOMINOS_TUMBLE_EN
-	discrete_sound_w(space, SPRINT2_SKIDSND1_EN, offset & 1);
+	discrete_sound_w(device, SPRINT2_SKIDSND1_EN, offset & 1);
 }
 
-static WRITE8_HANDLER( sprint2_skid2_w )
+static WRITE8_DEVICE_HANDLER( sprint2_skid2_w )
 {
-	discrete_sound_w(space, SPRINT2_SKIDSND2_EN, offset & 1);
+	discrete_sound_w(device, SPRINT2_SKIDSND2_EN, offset & 1);
 }
 
 
@@ -267,9 +267,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_WRITE(sprint2_wram_w)
 	AM_RANGE(0x0400, 0x07ff) AM_WRITE(sprint2_video_ram_w) AM_BASE(&sprint2_video_ram)
-	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(sprint2_attract_w)
-	AM_RANGE(0x0c10, 0x0c1f) AM_WRITE(sprint2_skid1_w)
-	AM_RANGE(0x0c20, 0x0c2f) AM_WRITE(sprint2_skid2_w)
+	AM_RANGE(0x0c00, 0x0c0f) AM_DEVWRITE(SOUND, "discrete", sprint2_attract_w)
+	AM_RANGE(0x0c10, 0x0c1f) AM_DEVWRITE(SOUND, "discrete", sprint2_skid1_w)
+	AM_RANGE(0x0c20, 0x0c2f) AM_DEVWRITE(SOUND, "discrete", sprint2_skid2_w)
 	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
 	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
 	AM_RANGE(0x0c60, 0x0c6f) AM_WRITE(SMH_NOP) /* SPARE */
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE(sprint2_collision_reset2_w)
 	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE(sprint2_steering_reset1_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_WRITE(sprint2_steering_reset2_w)
-	AM_RANGE(0x0f00, 0x0f7f) AM_WRITE(sprint2_noise_reset_w)
+	AM_RANGE(0x0f00, 0x0f7f) AM_DEVWRITE(SOUND, "discrete", sprint2_noise_reset_w)
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -541,8 +541,10 @@ static MACHINE_DRIVER_START( sprint1 )
 	MDRV_SPEAKER_REMOVE("left")
 	MDRV_SPEAKER_REMOVE("right")
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+	
+	MDRV_SOUND_REMOVE("discrete")
 
-	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(sprint1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -557,7 +559,9 @@ static MACHINE_DRIVER_START( dominos )
 	MDRV_SPEAKER_REMOVE("right")
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
+	MDRV_SOUND_REMOVE("discrete")
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(dominos)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

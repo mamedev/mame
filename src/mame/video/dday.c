@@ -297,7 +297,7 @@ WRITE8_HANDLER( dday_control_w )
 
 	/* bit 4 is sound enable */
 	if (!(data & 0x10) && (control & 0x10))
-		sndti_reset(SOUND_AY8910, 0);
+		devtag_reset(space->machine, SOUND, "ay");
 
 	sound_global_enable(data & 0x10);
 

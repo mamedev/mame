@@ -52,9 +52,12 @@ PS4  J8635      PS4  J8541       PS4  J8648
 #include "includes/mexico86.h"
 
 //AT
-static READ8_HANDLER( kiki_2203_r )
+static READ8_DEVICE_HANDLER( kiki_ym2203_r )
 {
-	return(ym2203_status_port_0_r(space,0) & 0x7f);
+	UINT8 result = ym2203_r(device, offset);
+	if (offset == 0)
+		result &= 0x7f;
+	return result;
 }
 //ZT
 
@@ -99,16 +102,14 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xa7ff) AM_READ(shared_r)
 	AM_RANGE(0xa800, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xc000) AM_READ(kiki_2203_r) //AT
-	AM_RANGE(0xc001, 0xc001) AM_READ(ym2203_read_port_0_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", kiki_ym2203_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0xa7ff) AM_WRITE(shared_w)
 	AM_RANGE(0xa800, 0xbfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m68705_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -357,10 +358,10 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_3_r,
-		input_port_4_r,
-		NULL,
-		NULL
+		DEVCB_INPUT_PORT("DSW0"),
+		DEVCB_INPUT_PORT("DSW1"),
+		DEVCB_NULL,
+		DEVCB_NULL
 	},
 	NULL
 };

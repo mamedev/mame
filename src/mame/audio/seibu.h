@@ -28,7 +28,6 @@
 #include "sound/2151intf.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "sound/custom.h"
 
 ADDRESS_MAP_EXTERN(seibu_sound_map, 8);
 ADDRESS_MAP_EXTERN(seibu2_sound_map, 8);
@@ -48,9 +47,9 @@ WRITE8_HANDLER( seibu_rst10_ack_w );
 WRITE8_HANDLER( seibu_rst18_ack_w );
 WRITE8_HANDLER( seibu_bank_w );
 WRITE8_HANDLER( seibu_coin_w );
-void seibu_ym3812_irqhandler(running_machine *machine, int linestate);
-void seibu_ym2151_irqhandler(running_machine *machine, int linestate);
-void seibu_ym2203_irqhandler(running_machine *machine, int linestate);
+void seibu_ym3812_irqhandler(const device_config *device, int linestate);
+void seibu_ym2151_irqhandler(const device_config *device, int linestate);
+void seibu_ym2203_irqhandler(const device_config *device, int linestate);
 READ8_HANDLER( seibu_soundlatch_r );
 READ8_HANDLER( seibu_main_data_pending_r );
 WRITE8_HANDLER( seibu_main_data_w );
@@ -58,13 +57,13 @@ MACHINE_RESET( seibu_sound );
 void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length);
 
 void seibu_adpcm_decrypt(running_machine *machine, const char *region);
-WRITE8_HANDLER( seibu_adpcm_adr_1_w );
-WRITE8_HANDLER( seibu_adpcm_ctl_1_w );
-WRITE8_HANDLER( seibu_adpcm_adr_2_w );
-WRITE8_HANDLER( seibu_adpcm_ctl_2_w );
+WRITE8_DEVICE_HANDLER( seibu_adpcm_adr_w );
+WRITE8_DEVICE_HANDLER( seibu_adpcm_ctl_w );
+
+DEVICE_GET_INFO( seibu_adpcm );
+#define SOUND_SEIBU_ADPCM DEVICE_GET_INFO_NAME(seibu_adpcm)
 
 extern const ym3812_interface seibu_ym3812_interface;
-extern const custom_sound_interface seibu_adpcm_interface;
 extern const ym2151_interface seibu_ym2151_interface;
 extern const ym2203_interface seibu_ym2203_interface;
 
@@ -159,12 +158,10 @@ extern const ym2203_interface seibu_ym2203_interface;
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)						\
 
 #define SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE							\
-	MDRV_SOUND_ADD("adpcm1", CUSTOM, 8000)							\
-	MDRV_SOUND_CONFIG(seibu_adpcm_interface)						\
+	MDRV_SOUND_ADD("adpcm1", SEIBU_ADPCM, 8000)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) 					\
 																	\
-	MDRV_SOUND_ADD("adpcm2", CUSTOM, 8000)							\
-	MDRV_SOUND_CONFIG(seibu_adpcm_interface)						\
+	MDRV_SOUND_ADD("adpcm2", SEIBU_ADPCM, 8000)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 
 

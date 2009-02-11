@@ -38,7 +38,7 @@ static TIMER_CALLBACK( dac_callback )
 {
 	UINT8 *DACROM = memory_region(machine, "samples");
 
-	dac_data_w(0,DACROM[(dac_bank * 0x10000 + dac_adr++) & 0x1ffff]);
+	dac_data_w(devtag_get_device(machine, SOUND, "dac"),DACROM[(dac_bank * 0x10000 + dac_adr++) & 0x1ffff]);
 
 	if (((dac_adr & 0xff00 ) >> 8) !=  dac_adr_e )
 		timer_set(machine, attotime_mul(ATTOTIME_IN_HZ(MCLK), 1024), NULL, 0, dac_callback);
@@ -166,9 +166,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mjsister_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(SMH_NOP) /* HD46505? */
-	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x11, 0x11) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x12, 0x12) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x12, 0x12) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 	AM_RANGE(0x20, 0x20) AM_READ(mjsister_keys_r)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
 	AM_RANGE(0x30, 0x30) AM_WRITE(mjsister_banksel1_w)
@@ -299,10 +299,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,
-	input_port_1_r,
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( mjsister )

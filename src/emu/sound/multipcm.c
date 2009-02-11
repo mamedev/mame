@@ -91,6 +91,7 @@ struct _SLOT
 	struct _LFO ALFO;	//AM lfo
 };
 
+typedef struct _MultiPCM MultiPCM;
 struct _MultiPCM
 {
 	sound_stream * stream;
@@ -124,6 +125,17 @@ static const int val2chan[] =
 
 
 #define MULTIPCM_RATE	44100.0
+
+
+INLINE MultiPCM *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_MULTIPCM);
+	return (MultiPCM *)device->token;
+}
+
 
 /*******************************
         ENVELOPE SECTION
@@ -193,7 +205,7 @@ static unsigned int Get_RATE(unsigned int *Steps,unsigned int rate,unsigned int 
 	return Steps[r];
 }
 
-static void EG_Calc(struct _MultiPCM *ptChip,struct _SLOT *slot)
+static void EG_Calc(MultiPCM *ptChip,struct _SLOT *slot)
 {
 	int octave=((slot->Regs[3]>>4)-1)&0xf;
 	int rate;
@@ -293,7 +305,7 @@ INLINE signed int ALFO_Step(struct _LFO *LFO)
 	return p<<(SHIFT-LFO_SHIFT);
 }
 
-static void LFO_ComputeStep(struct _MultiPCM *ptChip,struct _LFO *LFO,UINT32 LFOF,UINT32 LFOS,int ALFO)
+static void LFO_ComputeStep(MultiPCM *ptChip,struct _LFO *LFO,UINT32 LFOF,UINT32 LFOS,int ALFO)
 {
 	float step=(float) LFOFreq[LFOF]*256.0/(float) ptChip->Rate;
 	LFO->phase_step=(unsigned int) ((float) (1<<LFO_SHIFT)*step);
@@ -311,7 +323,7 @@ static void LFO_ComputeStep(struct _MultiPCM *ptChip,struct _LFO *LFO,UINT32 LFO
 
 
 
-static void WriteSlot(struct _MultiPCM *ptChip,struct _SLOT *slot,int reg,unsigned char data)
+static void WriteSlot(MultiPCM *ptChip,struct _SLOT *slot,int reg,unsigned char data)
 {
 	slot->Regs[reg]=data;
 
@@ -415,7 +427,7 @@ static void WriteSlot(struct _MultiPCM *ptChip,struct _SLOT *slot,int reg,unsign
 
 static STREAM_UPDATE( MultiPCM_update )
 {
-	struct _MultiPCM *ptChip = param;
+	MultiPCM *ptChip = param;
 	stream_sample_t  *datap[2];
 	int i,sl;
 
@@ -480,19 +492,19 @@ static STREAM_UPDATE( MultiPCM_update )
 	}
 }
 
-static unsigned char multi_pcm_reg_r(int chip, int offset)
+READ8_DEVICE_HANDLER( multipcm_r )
 {
-//  struct _MultiPCM *ptChip = sndti_token(SOUND_MULTIPCM, chip);
+//	MultiPCM *ptChip = get_safe_token(device);
 	return 0;
 }
 
-static SND_START( multipcm )
+static DEVICE_START( multipcm )
 {
-	struct _MultiPCM *ptChip = device->token;
+	MultiPCM *ptChip = get_safe_token(device);
 	int i;
 
 	ptChip->ROM=(INT8 *)device->region;
-	ptChip->Rate=(float) clock / MULTIPCM_CLOCKDIV;
+	ptChip->Rate=(float) device->clock / MULTIPCM_CLOCKDIV;
 
 	ptChip->stream = stream_create(device, 0, 2, ptChip->Rate, ptChip, MultiPCM_update);
 
@@ -636,9 +648,9 @@ static SND_START( multipcm )
 }
 
 
-static void multi_pcm_reg_w(int chip, int offset, UINT8 data)
+WRITE8_DEVICE_HANDLER( multipcm_w )
 {
-	struct _MultiPCM *ptChip = sndti_token(SOUND_MULTIPCM, chip);
+	MultiPCM *ptChip = get_safe_token(device);
 	switch(offset)
 	{
 		case 0:		//Data write
@@ -656,29 +668,9 @@ static void multi_pcm_reg_w(int chip, int offset, UINT8 data)
 
 /* MAME/M1 access functions */
 
-READ8_HANDLER( multi_pcm_reg_0_r )
+void multipcm_set_bank(const device_config *device, UINT32 leftoffs, UINT32 rightoffs)
 {
-	return multi_pcm_reg_r(0, offset);
-}
-
-WRITE8_HANDLER( multi_pcm_reg_0_w )
-{
-	multi_pcm_reg_w(0, offset, data);
-}
-
-READ8_HANDLER( multi_pcm_reg_1_r )
-{
-	return multi_pcm_reg_r(1, offset);
-}
-
-WRITE8_HANDLER( multi_pcm_reg_1_w )
-{
-	multi_pcm_reg_w(1, offset, data);
-}
-
-void multi_pcm_set_bank(int which, UINT32 leftoffs, UINT32 rightoffs)
-{
-	struct _MultiPCM *ptChip = sndti_token(SOUND_MULTIPCM, which);
+	MultiPCM *ptChip = get_safe_token(device);
 	ptChip->BankL = leftoffs;
 	ptChip->BankR = rightoffs;
 }
@@ -689,34 +681,24 @@ void multi_pcm_set_bank(int which, UINT32 leftoffs, UINT32 rightoffs)
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( multipcm )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( multipcm )
+DEVICE_GET_INFO( multipcm )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct _MultiPCM);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(MultiPCM);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( multipcm );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( multipcm );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( multipcm );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "Sega/Yamaha 315-5560");		break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Sega custom");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "2.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Sega/Yamaha 315-5560");		break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Sega custom");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "2.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

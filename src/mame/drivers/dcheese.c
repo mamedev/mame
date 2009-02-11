@@ -182,19 +182,19 @@ static WRITE8_HANDLER( sound_control_w )
 	/* bit 0x20 = LED */
 	/* bit 0x40 = BSMT2000 reset */
 	if ((diff & 0x40) && (data & 0x40))
-		sndti_reset(SOUND_BSMT2000, 0);
+		devtag_reset(space->machine, SOUND, "bmst");
 	if (data != 0x40 && data != 0x60)
 		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(space->cpu), data);
 }
 
 
-static WRITE8_HANDLER( bsmt_data_w )
+static WRITE8_DEVICE_HANDLER( bsmt_data_w )
 {
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)
 		sound_msb_latch = data;
 	else
-		bsmt2000_data_0_w(space, offset/2, (sound_msb_latch << 8) | data, 0xffff);
+		bsmt2000_data_w(device, offset/2, (sound_msb_latch << 8) | data, 0xffff);
 }
 
 
@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sound_status_r, sound_control_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(sound_command_r)
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0700) AM_WRITE(bsmt_data_w)
+	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0700) AM_DEVWRITE(SOUND, "bsmt", bsmt_data_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END

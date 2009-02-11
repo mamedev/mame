@@ -30,9 +30,9 @@ Memo:
 
 #define	SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
-#define DAC_0_WRITE	dac_0_signed_data_w
+#define DAC_WRITE	dac_signed_w
 #else
-#define DAC_0_WRITE	dac_0_data_w
+#define DAC_WRITE	dac_w
 #endif
 
 
@@ -69,15 +69,14 @@ static ADDRESS_MAP_START( hyhoo_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_nmi_clock_w)
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x90, 0x97) AM_WRITE(hyhoo_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r, nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_RAM) AM_BASE(&hyhoo_clut)
-	AM_RANGE(0xd0, 0xd0) AM_READWRITE(SMH_NOP, DAC_0_WRITE)		// unknown read
+	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE(SOUND, "dac", DAC_WRITE)		// unknown read
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
 	AM_RANGE(0xe0, 0xe1) AM_READ(nb1413m3_gfxrom_r)
 	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r)
@@ -251,10 +250,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_0_r,				// DIPSW-A read
-	input_port_1_r,				// DIPSW-B read
-	NULL,
-	NULL
+	DEVCB_INPUT_PORT("DSWA"),
+	DEVCB_INPUT_PORT("DSWB"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

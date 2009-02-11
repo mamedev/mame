@@ -227,8 +227,8 @@ static ADDRESS_MAP_START( liberatr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(liberatr_coin_counter_w)
 	AM_RANGE(0x6c07, 0x6c07) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_planet_select)
 	AM_RANGE(0x6e00, 0x6e3f) AM_WRITE(atari_vg_earom_w)
-	AM_RANGE(0x7000, 0x701f) AM_READWRITE(pokey2_r, pokey2_w)
-	AM_RANGE(0x7800, 0x781f) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x7800, 0x781f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x8000, 0xefff) AM_ROM
 	AM_RANGE(0xfffa, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -260,8 +260,8 @@ static ADDRESS_MAP_START( liberat2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(liberatr_coin_counter_w)
 	AM_RANGE(0x4c07, 0x4c07) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_planet_select)
 	AM_RANGE(0x4e00, 0x4e3f) AM_WRITE(atari_vg_earom_w)
-	AM_RANGE(0x5000, 0x501f) AM_READWRITE(pokey2_r, pokey2_w)
-	AM_RANGE(0x5800, 0x581f) AM_READWRITE(pokey1_r, pokey1_w)
+	AM_RANGE(0x5000, 0x501f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x5800, 0x581f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
 	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xfffa, 0xffff) AM_ROM
@@ -361,15 +361,15 @@ INPUT_PORTS_END
 
 static const pokey_interface pokey_interface_1 =
 {
-	{ 0 },
-	input_port_3_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW2")
 };
 
 
 static const pokey_interface pokey_interface_2 =
 {
-	{ 0 },
-	input_port_2_r
+	{ DEVCB_NULL },
+	DEVCB_INPUT_PORT("DSW1")
 };
 
 

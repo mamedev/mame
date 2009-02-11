@@ -20,10 +20,10 @@ struct _sega_pcm_interface
 	int  bank;
 };
 
-WRITE8_HANDLER( sega_pcm_w );
-READ8_HANDLER( sega_pcm_r );
+WRITE8_DEVICE_HANDLER( sega_pcm_w );
+READ8_DEVICE_HANDLER( sega_pcm_r );
 
-SND_GET_INFO( segapcm );
-#define SOUND_SEGAPCM SND_GET_INFO_NAME( segapcm )
+DEVICE_GET_INFO( segapcm );
+#define SOUND_SEGAPCM DEVICE_GET_INFO_NAME( segapcm )
 
 #endif /* __SEGAPCM_H__ */

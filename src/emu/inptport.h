@@ -677,14 +677,6 @@ struct _inp_header
 /* macro for wrapping a default string */
 #define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
 
-/* macros for referencing input ports in place of read handlers */
-#define HANDLER_PORT(name, type)		((type)("\0\0\0\0" name))
-#define DEVICE8_PORT(name)				HANDLER_PORT(name, read8_device_func)
-#define MACHINE8_PORT(name)				HANDLER_PORT(name, read8_space_func)
-#define IS_HANDLER_PORT(ptr)			(((const char *)(ptr))[0] == 0 && ((const char *)(ptr))[1] == 0 && ((const char *)(ptr))[2] == 0 && ((const char *)(ptr))[3] == 0)
-#define CALL_DEVICE8_READ(ptr,d,offs)	(IS_HANDLER_PORT(ptr) ? input_port_read((d)->machine, ((const char *)(ptr)) + 4) : (*ptr)(d, offs))
-#define CALL_MACHINE8_READ(ptr,m,offs)	(IS_HANDLER_PORT(ptr) ? input_port_read((m), ((const char *)(ptr)) + 4) : (*ptr)(m, offs))
-
 
 
 /***************************************************************************

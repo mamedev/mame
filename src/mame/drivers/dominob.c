@@ -126,8 +126,8 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(SMH_ROM, SMH_NOP) // there are some garbage writes to ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xd001, 0xd001) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0xd001, 0xd001) AM_DEVREAD(SOUND, "ay", ay8910_r)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(dominob_d008_w)
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("IN0")
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("IN1") AM_WRITE(SMH_NOP)
@@ -239,10 +239,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	input_port_5_r,
-	input_port_4_r,
-	NULL,
-	NULL
+	DEVCB_NULL,//input_port_5_r,
+	DEVCB_INPUT_PORT("DSW"),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

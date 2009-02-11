@@ -641,12 +641,11 @@ static ADDRESS_MAP_START( iqblocka_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE( input_select_w )
 	AM_RANGE( 0x8001, 0x8001 ) AM_READ ( input_r )
 
-	AM_RANGE( 0x9000, 0x9000 ) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
+	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
 
 	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "BUTTONS" )
 
-	AM_RANGE( 0xb000, 0xb000 ) AM_WRITE( ym2413_register_port_0_w )
-	AM_RANGE( 0xb001, 0xb001 ) AM_WRITE( ym2413_data_port_0_w )
+	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE( SOUND, "ym", ym2413_w )
 ADDRESS_MAP_END
 
 
@@ -769,7 +768,7 @@ static ADDRESS_MAP_START( mgcs, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE( (UINT16**)&bg_videoram )
 
 	// oki banking?
-	AM_RANGE( 0xa12000, 0xa12001 ) AM_READWRITE( okim6295_status_0_lsb_r, okim6295_data_0_lsb_w )
+	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8( SOUND, "oki", okim6295_r, okim6295_w, 0x00ff )
 ADDRESS_MAP_END
 
 

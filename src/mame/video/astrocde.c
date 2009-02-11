@@ -646,7 +646,7 @@ WRITE8_HANDLER( astrocade_data_chip_register_w )
 		case 0x17:	/* noise volume register */
 		case 0x18:	/* sound block transfer */
 			if (astrocade_video_config & AC_SOUND_PRESENT)
-				astrocade_sound1_w(space, offset, data);
+				astrocade_sound_w(devtag_get_device(space->machine, SOUND, "astrocade1"), offset, data);
 			break;
 
 		case 0x19:	/* expand register */

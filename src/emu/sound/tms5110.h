@@ -34,7 +34,7 @@ void tms5110_set_variant(void *chip, int variant);
 
 void tms5110_reset_chip(void *chip);
 void tms5110_set_M0_callback(void *chip, int (*func)(const device_config *));
-void tms5110_set_load_address(void *chip, void (*func)(int));
+void tms5110_set_load_address(void *chip, void (*func)(const device_config *, int));
 
 void tms5110_CTL_set(void *chip, int data);
 void tms5110_PDC_set(void *chip, int data);

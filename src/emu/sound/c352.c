@@ -65,7 +65,8 @@ typedef struct
 	UINT32	pos;
 } c352_ch_t;
 
-struct c352_info
+typedef struct _c352_state c352_state;
+struct _c352_state
 {
 	sound_stream *stream;
 	c352_ch_t c352_ch[32];
@@ -82,8 +83,17 @@ struct c352_info
 	unsigned int mseq_reg;
 };
 
+INLINE c352_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_C352);
+	return (c352_state *)device->token;
+}
+
 // noise generator
-static int get_mseq_bit(struct c352_info *info)
+static int get_mseq_bit(c352_state *info)
 {
 	unsigned int mask = (1 << (7 - 1));
 	unsigned int reg = info->mseq_reg;
@@ -103,7 +113,7 @@ static int get_mseq_bit(struct c352_info *info)
 	return (reg & 1);
 }
 
-static void c352_mix_one_channel(struct c352_info *info, unsigned long ch, long sample_count)
+static void c352_mix_one_channel(c352_state *info, unsigned long ch, long sample_count)
 {
 	int i;
 
@@ -327,7 +337,7 @@ static void c352_mix_one_channel(struct c352_info *info, unsigned long ch, long 
 
 static STREAM_UPDATE( c352_update )
 {
-	struct c352_info *info = param;
+	c352_state *info = param;
 	int i, j;
 	stream_sample_t *bufferl = outputs[0];
 	stream_sample_t *bufferr = outputs[1];
@@ -353,7 +363,7 @@ static STREAM_UPDATE( c352_update )
 	}
 }
 
-static unsigned short c352_read_reg16(struct c352_info *info, unsigned long address)
+static unsigned short c352_read_reg16(c352_state *info, unsigned long address)
 {
 	unsigned long	chan;
 	unsigned short	val;
@@ -379,7 +389,7 @@ static unsigned short c352_read_reg16(struct c352_info *info, unsigned long addr
 	return val;
 }
 
-static void c352_write_reg16(struct c352_info *info, unsigned long address, unsigned short val)
+static void c352_write_reg16(c352_state *info, unsigned long address, unsigned short val)
 {
 	unsigned long	chan;
 	int i;
@@ -481,7 +491,7 @@ static void c352_write_reg16(struct c352_info *info, unsigned long address, unsi
 	}
 }
 
-static void c352_init(struct c352_info *info, const device_config *device)
+static void c352_init(c352_state *info, const device_config *device)
 {
 	int i;
 	double x_max = 32752.0;
@@ -530,14 +540,14 @@ static void c352_init(struct c352_info *info, const device_config *device)
 	}
 }
 
-static SND_START( c352 )
+static DEVICE_START( c352 )
 {
-	struct c352_info *info = device->token;
+	c352_state *info = get_safe_token(device);
 
 	info->c352_rom_samples = device->region;
 	info->c352_rom_length = device->regionbytes;
 
-	info->sample_rate_base = clock / 192;
+	info->sample_rate_base = device->clock / 192;
 
 	info->stream = stream_create(device, 0, 4, info->sample_rate_base, info, c352_update);
 
@@ -545,16 +555,16 @@ static SND_START( c352 )
 }
 
 
-READ16_HANDLER( c352_0_r )
+READ16_DEVICE_HANDLER( c352_r )
 {
-	return(c352_read_reg16(sndti_token(SOUND_C352, 0), offset*2));
+	return(c352_read_reg16(get_safe_token(device), offset*2));
 }
 
-WRITE16_HANDLER( c352_0_w )
+WRITE16_DEVICE_HANDLER( c352_w )
 {
 	if (mem_mask == 0xffff)
 	{
-		c352_write_reg16(sndti_token(SOUND_C352, 0), offset*2, data);
+		c352_write_reg16(get_safe_token(device), offset*2, data);
 	}
 	else
 	{
@@ -572,34 +582,24 @@ WRITE16_HANDLER( c352_0_w )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( c352 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( c352 )
+DEVICE_GET_INFO( c352 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct c352_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c352_state);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c352 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( c352 );		break;
-		case SNDINFO_PTR_STOP:							/* nothing */								break;
-		case SNDINFO_PTR_RESET:							/* nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( c352 );		break;
+		case DEVINFO_FCT_STOP:							/* nothing */								break;
+		case DEVINFO_FCT_RESET:							/* nothing */								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "C352");					break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Namco PCM");				break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");						break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "C352");					break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Namco PCM");				break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.1");						break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

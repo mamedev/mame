@@ -148,11 +148,6 @@ static READ8_HANDLER( audio_t1_r )
 	return (soundlatch_r(space, 0) == 0);
 }
 
-static WRITE8_HANDLER( audio_dac_w )
-{
-	dac_0_signed_data_w(space, 0, data);
-}
-
 // memory map taken from the manual
 
 static ADDRESS_MAP_START( quasar, ADDRESS_SPACE_PROGRAM, 8 )
@@ -190,7 +185,7 @@ static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x80) AM_READ(quasar_sh_command_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)
-  	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(audio_dac_w)
+  	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(SOUND, "dac", dac_signed_w)
 ADDRESS_MAP_END
 
 /************************************************************************

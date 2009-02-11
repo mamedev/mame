@@ -49,6 +49,7 @@ static int temp_string_pool_index;
 
 static void device_list_stop(running_machine *machine);
 static void device_list_reset(running_machine *machine);
+static void set_default_string(UINT32 state, char *buffer);
 
 
 
@@ -608,18 +609,20 @@ void device_list_start(running_machine *machine)
 		for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 		{
 			device_start_func start = (device_start_func)device_get_info_fct(device, DEVINFO_FCT_START);
-
 			assert(start != NULL);
+
 			if (!device->started)
 			{
 				device->started = DEVICE_STARTING;
 				(*start)(device);
+
+				/* if the start was delayed, move back to the stopped state, otherwise count it */
 				if (device->started == DEVICE_DELAYED)
 					device->started = DEVICE_STOPPED;
 				else
 				{
 					device->started = DEVICE_STARTED;
-					numstarted ++;
+					numstarted++;
 				}
 			}
 		}
@@ -632,15 +635,17 @@ void device_list_start(running_machine *machine)
 
 
 /*-------------------------------------------------
-    device_delay_init - delay the startup of a given
-    device for dependency reasons
+    device_delay_init - delay the startup of a 
+    given device for dependency reasons
 -------------------------------------------------*/
+
 void device_delay_init(const device_config *device)
 {
 	if (device->started != DEVICE_STARTING && device->started != DEVICE_DELAYED)
 		fatalerror("Error: Calling device_delay_init on a device not in the process of starting.");
 	((device_config *)device)->started = DEVICE_DELAYED;
 }
+
 
 /*-------------------------------------------------
     device_list_stop - stop the configured list
@@ -811,6 +816,8 @@ const char *device_get_info_string(const device_config *device, UINT32 state)
 	/* retrieve the value */
 	info.s = get_temp_string_buffer();
 	(*device->type)(device, state, &info);
+	if (info.s[0] == 0)
+		set_default_string(state, info.s);
 	return info.s;
 }
 
@@ -876,6 +883,8 @@ const char *devtype_get_info_string(device_type type, UINT32 state)
 	/* retrieve the value */
 	info.s = get_temp_string_buffer();
 	(*type)(NULL, state, &info);
+	if (info.s[0] == 0)
+		set_default_string(state, info.s);
 	return info.s;
 }
 
@@ -942,4 +951,27 @@ void device_set_info_fct(const device_config *device, UINT32 state, genf *data)
 	/* set the value */
 	info.f = data;
 	(*device->set_info)(device, state, &info);
+}
+
+
+
+/***************************************************************************
+    DEVICE INFORMATION SETTERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    set_default_string - compute a default string
+    if none is provided
+-------------------------------------------------*/
+
+static void set_default_string(UINT32 state, char *buffer)
+{
+	switch (state)
+	{
+		case DEVINFO_STR_NAME:			strcpy(buffer, "Custom");						break;
+		case DEVINFO_STR_FAMILY:		strcpy(buffer, "Custom");						break;
+		case DEVINFO_STR_VERSION:		strcpy(buffer, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:	strcpy(buffer, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:		strcpy(buffer, "Copyright Nicola Salmoria and the MAME Team"); break;
+	}
 }

@@ -2257,14 +2257,6 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 //static sh2_cpu_core sh2cp_conf_slave  = { 1 };
 
 
-static const custom_sound_interface custom_interface =
-{
-	cps3_sh_start
-};
-
-
-
-
 static const SCSIConfigTable dev_table =
 {
 	1,                                      /* 1 SCSI device */
@@ -2580,8 +2572,7 @@ static MACHINE_DRIVER_START( cps3 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("cps3", CUSTOM, MASTER_CLOCK / 3)
-	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ADD("cps3", CPS3, MASTER_CLOCK / 3)
 	MDRV_SOUND_ROUTE(1, "left", 1.0)
 	MDRV_SOUND_ROUTE(0, "right", 1.0)
 MACHINE_DRIVER_END

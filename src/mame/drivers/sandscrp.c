@@ -272,9 +272,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sandscrp_soundport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sandscrp_bankswitch_w)	// ROM Bank
-	AM_RANGE(0x02, 0x02) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)	// YM2203
-	AM_RANGE(0x03, 0x03) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)		// PORTA/B read
-	AM_RANGE(0x04, 0x04) AM_WRITE(okim6295_data_0_w)		// OKIM6295
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)		// PORTA/B read
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "oki", okim6295_w)		// OKIM6295
 	AM_RANGE(0x06, 0x06) AM_WRITE(sandscrp_soundlatch_w)	//
 	AM_RANGE(0x07, 0x07) AM_READ(sandscrp_soundlatch_r)		//
 	AM_RANGE(0x08, 0x08) AM_READ(sandscrp_latchstatus_r)	//
@@ -413,9 +412,9 @@ GFXDECODE_END
 
 /* YM3014B + YM2203C */
 
-static void irq_handler(running_machine *machine, int irq)
+static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_intf_sandscrp =
@@ -423,10 +422,10 @@ static const ym2203_interface ym2203_intf_sandscrp =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		input_port_4_r,	/* Port A Read - DSW 1 */
-		input_port_5_r,	/* Port B Read - DSW 2 */
-		NULL,	/* Port A Write */
-		NULL,	/* Port B Write */
+		DEVCB_INPUT_PORT("DSW1"), /* Port A Read */
+		DEVCB_INPUT_PORT("DSW2"), /* Port B Read */
+		DEVCB_NULL,	/* Port A Write */
+		DEVCB_NULL,	/* Port B Write */
 	},
 	irq_handler	/* IRQ handler */
 };

@@ -86,32 +86,31 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static WRITE8_HANDLER( sound_bank_w )
+static WRITE8_DEVICE_HANDLER( sound_bank_w )
 {
 	int bank_A=(data&0x3);
 	int bank_B=((data>>2)&0x3);
-	k007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank(device, bank_A, bank_B );
 }
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(ym3812_status_port_0_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREAD(SOUND, "ym", ym3812_r)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami1", k007232_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9800, 0x987f) AM_WRITE(k051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_WRITE(k051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_WRITE(k051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_WRITE(k051649_keyonoff_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(sound_bank_w) /* 7232 bankswitch */
+	AM_RANGE(0x9800, 0x987f) AM_DEVWRITE(SOUND, "konami2", k051649_waveform_w)
+	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE(SOUND, "konami2", k051649_frequency_w)
+	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE(SOUND, "konami2", k051649_volume_w)
+	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE(SOUND, "konami2", k051649_keyonoff_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym", ym3812_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami1", k007232_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(SOUND, "konami1", sound_bank_w) /* 7232 bankswitch */
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -241,15 +240,15 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-//  cpu_set_input_line(machine->cpu[1],0,linestate);
+//  cpu_set_input_line(device->machine->cpu[1],0,linestate);
 }
 
-static void volume_callback(int v)
+static void volume_callback(const device_config *device, int v)
 {
-	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(device,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(device,1,0,(v & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =

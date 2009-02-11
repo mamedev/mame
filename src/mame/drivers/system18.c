@@ -170,7 +170,7 @@ static WRITE8_HANDLER( shdancbl_msm5205_data_w )
 
 static void shdancbl_msm5205_callback(const device_config *device)
 {
-	msm5205_data_w(0, sample_buffer & 0x0F);
+	msm5205_data_w(device, sample_buffer & 0x0F);
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
@@ -227,14 +227,8 @@ static ADDRESS_MAP_START( shdancbl_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(shdancbl_soundbank_r)
 	AM_RANGE(0xc400, 0xc400) AM_READ(soundlatch_r)
-	AM_RANGE(0xcc00, 0xcc00) AM_READ(ym3438_status_port_0_a_r)
-	AM_RANGE(0xcc01, 0xcc01) AM_READ(ym3438_status_port_0_b_r)
-	AM_RANGE(0xcc02, 0xcc02) AM_READ(ym3438_status_port_0_b_r)
-	AM_RANGE(0xcc03, 0xcc03) AM_READ(ym3438_status_port_0_b_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(ym3438_status_port_1_a_r)
-	AM_RANGE(0xd001, 0xd001) AM_READ(ym3438_status_port_1_b_r)
-	AM_RANGE(0xd002, 0xd002) AM_READ(ym3438_status_port_1_b_r)
-	AM_RANGE(0xd003, 0xd003) AM_READ(ym3438_status_port_1_b_r)
+	AM_RANGE(0xcc00, 0xcc03) AM_DEVREAD(SOUND, "3438.0", ym3438_r)
+	AM_RANGE(0xd000, 0xd003) AM_DEVREAD(SOUND, "3438.1", ym3438_r)
 	AM_RANGE(0xdf00, 0xdfff) AM_READ(SMH_NOP)
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -244,14 +238,8 @@ static ADDRESS_MAP_START(shdancbl_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_NOP) /* ROM bank */
 	AM_RANGE(0xc000, 0xc00f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(shdancbl_msm5205_data_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(ym3438_control_port_0_a_w)
-	AM_RANGE(0xcc01, 0xcc01) AM_WRITE(ym3438_data_port_0_a_w)
-	AM_RANGE(0xcc02, 0xcc02) AM_WRITE(ym3438_control_port_0_b_w)
-	AM_RANGE(0xcc03, 0xcc03) AM_WRITE(ym3438_data_port_0_b_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(ym3438_control_port_1_a_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(ym3438_data_port_1_a_w)
-	AM_RANGE(0xd002, 0xd002) AM_WRITE(ym3438_control_port_1_b_w)
-	AM_RANGE(0xd003, 0xd003) AM_WRITE(ym3438_data_port_1_b_w)
+	AM_RANGE(0xcc00, 0xcc03) AM_DEVWRITE(SOUND, "3438.0", ym3438_w)
+	AM_RANGE(0xd000, 0xd003) AM_DEVWRITE(SOUND, "3438.1", ym3438_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(shdancbl_bankctrl_w)
 	AM_RANGE(0xdf00, 0xdfff) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
@@ -278,15 +266,15 @@ static ADDRESS_MAP_START( sound_readmem_18, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xa000, 0xbfff) AM_READ(system18_bank_r)
 	/**** D/A register ****/
-	AM_RANGE(0xd000, 0xdfff) AM_READ(rf5c68_r)
+	AM_RANGE(0xd000, 0xdfff) AM_DEVREAD(SOUND, "5c68", rf5c68_mem_r)
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem_18, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	/**** D/A register ****/
-	AM_RANGE(0xc000, 0xc008) AM_WRITE(rf5c68_reg_w)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(rf5c68_w)
+	AM_RANGE(0xc000, 0xc008) AM_DEVWRITE(SOUND, "5c68", rf5c68_w)
+	AM_RANGE(0xd000, 0xdfff) AM_DEVWRITE(SOUND, "5c68", rf5c68_mem_w)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)	//??
 ADDRESS_MAP_END
 
@@ -304,17 +292,8 @@ static WRITE8_HANDLER( sys18_soundbank_w )
 
 static ADDRESS_MAP_START( sound_18_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(ym3438_status_port_0_a_r, ym3438_control_port_0_a_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ym3438_data_port_0_a_w)
-//  AM_RANGE(0x82, 0x82) AM_READ(ym3438_status_port_0_b_r)
-	AM_RANGE(0x82, 0x82) AM_WRITE(ym3438_control_port_0_b_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(ym3438_data_port_0_b_w)
-//  AM_RANGE(0x90, 0x90) AM_READ(ym3438_status_port_1_a_r)
-	AM_RANGE(0x90, 0x90) AM_WRITE(ym3438_control_port_1_a_w)
-	AM_RANGE(0x91, 0x91) AM_WRITE(ym3438_data_port_1_a_w)
-//  AM_RANGE(0x92, 0x92) AM_READ(ym3438_status_port_1_b_r)
-	AM_RANGE(0x92, 0x92) AM_WRITE(ym3438_control_port_1_b_w)
-	AM_RANGE(0x93, 0x93) AM_WRITE(ym3438_data_port_1_b_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(SOUND, "3438.0", ym3438_r, ym3438_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(SOUND, "3438.1", ym3438_r, ym3438_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(sys18_soundbank_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

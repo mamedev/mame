@@ -118,7 +118,8 @@ typedef struct
 	int irq_line;
 
 	UINT8 port_A, port_B, port_C;
-	void (*irq_callback)(running_machine *, int);
+	void (*irq_callback)(const device_config *, int);
+	const device_config *device;
 
 	const UINT8 *rom;
 	int clock;
@@ -129,6 +130,15 @@ typedef struct
 
 	sound_stream * stream;
 } YMF278BChip;
+
+INLINE YMF278BChip *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_YMF278B);
+	return (YMF278BChip *)device->token;
+}
 
 static INT32 *mix;
 
@@ -340,7 +350,7 @@ static void ymf278b_irq_check(running_machine *machine, YMF278BChip *chip)
 	int prev_line = chip->irq_line;
 	chip->irq_line = chip->current_irq ? ASSERT_LINE : CLEAR_LINE;
 	if(chip->irq_line != prev_line && chip->irq_callback)
-		chip->irq_callback(machine, chip->irq_line);
+		chip->irq_callback(chip->device, chip->irq_line);
 }
 
 static TIMER_CALLBACK( ymf278b_timer_a_tick )
@@ -605,77 +615,82 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 	}
 }
 
-static UINT8 ymf278b_status_port_r(int num)
+READ8_DEVICE_HANDLER( ymf278b_r )
 {
-	YMF278BChip *chip = sndti_token(SOUND_YMF278B, num);
-	return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+	YMF278BChip *chip = get_safe_token(device);
+
+	switch (offset)
+	{
+		case 0:
+			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
+
+		default:
+			logerror("%s: unexpected write at offset %X to ymf278b\n", cpuexec_describe_context(device->machine), offset);
+			break;
+	}
+	return 0xff;
 }
 
-// Not implemented yet
-static UINT8 ymf278b_data_port_r(int num)
+WRITE8_DEVICE_HANDLER( ymf278b_w )
 {
-	return 0;
+	YMF278BChip *chip = get_safe_token(device);
+
+	switch (offset)
+	{
+		case 0:
+			chip->port_A = data;
+			break;
+
+		case 1:
+			ymf278b_A_w(device->machine, chip, chip->port_A, data);
+			break;
+
+		case 2:
+			chip->port_B = data;
+			break;
+
+		case 3:
+			ymf278b_B_w(chip, chip->port_B, data);
+			break;
+
+		case 4:
+			chip->port_C = data;
+			break;
+
+		case 5:
+			ymf278b_C_w(chip, chip->port_C, data);
+			break;
+		
+		default:
+			logerror("%s: unexpected write at offset %X to ymf278b = %02X\n", cpuexec_describe_context(device->machine), offset, data);
+			break;
+	}
 }
 
-static void ymf278b_control_port_A_w(int num, UINT8 data)
+static void ymf278b_init(const device_config *device, YMF278BChip *chip, void (*cb)(const device_config *, int))
 {
-	YMF278BChip *chip = sndti_token(SOUND_YMF278B, num);
-	chip->port_A = data;
-}
-
-static void ymf278b_data_port_A_w(running_machine *machine, int num, UINT8 data)
-{
-	YMF278BChip *chip = sndti_token(SOUND_YMF278B, num);
-	ymf278b_A_w(machine, chip, chip->port_A, data);
-}
-
-static void ymf278b_control_port_B_w(int num, UINT8 data)
-{
-	YMF278BChip *chip = sndti_token(SOUND_YMF278B, num);
-	chip->port_B = data;
-}
-
-static void ymf278b_data_port_B_w(int num, UINT8 data)
-{
-	YMF278BChip *chip = sndti_token(SOUND_YMF278B, num);
-	ymf278b_B_w(chip, chip->port_B, data);
-}
-
-static void ymf278b_control_port_C_w(int num, UINT8 data)
-{
-	YMF278BChip *chip = sndti_token(SOUND_YMF278B, num);
-	chip->port_C = data;
-}
-
-static void ymf278b_data_port_C_w(int num, UINT8 data)
-{
-	YMF278BChip *chip = sndti_token(SOUND_YMF278B, num);
-	ymf278b_C_w(chip, chip->port_C, data);
-}
-
-static void ymf278b_init(running_machine *machine, YMF278BChip *chip, UINT8 *rom, void (*cb)(running_machine *, int), int clock)
-{
-	chip->rom = rom;
+	chip->rom = device->region;
 	chip->irq_callback = cb;
-	chip->timer_a = timer_alloc(machine, ymf278b_timer_a_tick, chip);
-	chip->timer_b = timer_alloc(machine, ymf278b_timer_b_tick, chip);
+	chip->timer_a = timer_alloc(device->machine, ymf278b_timer_a_tick, chip);
+	chip->timer_b = timer_alloc(device->machine, ymf278b_timer_b_tick, chip);
 	chip->irq_line = CLEAR_LINE;
-	chip->clock = clock;
+	chip->clock = device->clock;
 
 	mix = auto_malloc(44100*2*sizeof(*mix));
 }
 
-static SND_START( ymf278b )
+static DEVICE_START( ymf278b )
 {
 	static const ymf278b_interface defintrf = { 0 };
 	const ymf278b_interface *intf;
 	int i;
-	YMF278BChip *chip = device->token;
+	YMF278BChip *chip = get_safe_token(device);
 
+	chip->device = device;
 	intf = (device->static_config != NULL) ? device->static_config : &defintrf;
 
-	ymf278b_init(device->machine, chip, device->region, intf->irq_callback, clock);
-	chip->stream = stream_create(device, 0, 2, clock/768, chip, ymf278b_pcm_update);
+	ymf278b_init(device, chip, intf->irq_callback);
+	chip->stream = stream_create(device, 0, 2, device->clock/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB
 	for(i = 0; i < 256; i++)
@@ -697,122 +712,30 @@ static SND_START( ymf278b )
 }
 
 
-READ8_HANDLER( ymf278b_status_port_0_r )
-{
-	return ymf278b_status_port_r(0);
-}
-
-READ8_HANDLER( ymf278b_data_port_0_r )
-{
-	return ymf278b_data_port_r(0);
-}
-
-WRITE8_HANDLER( ymf278b_control_port_0_a_w )
-{
-	ymf278b_control_port_A_w(0, data);
-}
-
-WRITE8_HANDLER( ymf278b_data_port_0_a_w )
-{
-	ymf278b_data_port_A_w(space->machine, 0, data);
-}
-
-WRITE8_HANDLER( ymf278b_control_port_0_b_w )
-{
-	ymf278b_control_port_B_w(0, data);
-}
-
-WRITE8_HANDLER( ymf278b_data_port_0_b_w )
-{
-	ymf278b_data_port_B_w(0, data);
-}
-
-WRITE8_HANDLER( ymf278b_control_port_0_c_w )
-{
-	ymf278b_control_port_C_w(0, data);
-}
-
-WRITE8_HANDLER( ymf278b_data_port_0_c_w )
-{
-	ymf278b_data_port_C_w(0, data);
-}
-
-
-READ8_HANDLER( ymf278b_status_port_1_r )
-{
-	return ymf278b_status_port_r(1);
-}
-
-READ8_HANDLER( ymf278b_data_port_1_r )
-{
-	return ymf278b_data_port_r(1);
-}
-
-WRITE8_HANDLER( ymf278b_control_port_1_a_w )
-{
-	ymf278b_control_port_A_w(1, data);
-}
-
-WRITE8_HANDLER( ymf278b_data_port_1_a_w )
-{
-	ymf278b_data_port_A_w(space->machine, 1, data);
-}
-
-WRITE8_HANDLER( ymf278b_control_port_1_b_w )
-{
-	ymf278b_control_port_B_w(1, data);
-}
-
-WRITE8_HANDLER( ymf278b_data_port_1_b_w )
-{
-	ymf278b_data_port_B_w(1, data);
-}
-
-WRITE8_HANDLER( ymf278b_control_port_1_c_w )
-{
-	ymf278b_control_port_C_w(1, data);
-}
-
-WRITE8_HANDLER( ymf278b_data_port_1_c_w )
-{
-	ymf278b_data_port_C_w(1, data);
-}
-
-
 
 
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( ymf278b )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( ymf278b )
+DEVICE_GET_INFO( ymf278b )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(YMF278BChip); 					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(YMF278BChip); 					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf278b );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf278b );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ymf278b );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "YMF278B");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha FM");					break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "YMF278B");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha FM");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

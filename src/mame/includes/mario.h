@@ -72,8 +72,8 @@ VIDEO_UPDATE( mario );
 
 /*----------- defined in audio/mario.c -----------*/
 
-WRITE8_HANDLER( mario_sh1_w );
-WRITE8_HANDLER( mario_sh2_w );
+WRITE8_DEVICE_HANDLER( mario_sh1_w );
+WRITE8_DEVICE_HANDLER( mario_sh2_w );
 WRITE8_HANDLER( mario_sh3_w );
 
 WRITE8_HANDLER( mario_sh_tuneselect_w );

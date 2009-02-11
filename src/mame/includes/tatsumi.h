@@ -32,8 +32,8 @@ WRITE16_HANDLER( apache3_a0000_w );
 WRITE16_HANDLER( roundup5_d0000_w );
 WRITE16_HANDLER( roundup5_e0000_w );
 
-READ8_HANDLER(tatsumi_hack_ym2151_r);
-READ8_HANDLER(tatsumi_hack_oki_r);
+READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r);
+READ8_DEVICE_HANDLER(tatsumi_hack_oki_r);
 
 extern UINT16 *tatsumi_68k_ram;
 extern UINT8 *apache3_z80_ram;

@@ -117,31 +117,6 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 
-static READ16_HANDLER( sound_r )
-{
-	UINT16 r = 0;
-	int reg = offset * 2;
-
-	if (ACCESSING_BITS_8_15)
-		r |= k054539_0_r(space, reg+0) << 8;
-
-	if (ACCESSING_BITS_0_7)
-		r |= k054539_0_r(space, reg+1) << 0;
-
-	return r;
-}
-
-static WRITE16_HANDLER( sound_w )
-{
-	int reg = offset * 2;
-
-	if (ACCESSING_BITS_8_15)
-		k054539_0_w(space, reg+0, (data >> 8) & 0xff);
-
-	if (ACCESSING_BITS_0_7)
-		k054539_0_w(space, reg+1, (data >> 0) & 0xff);
-}
-
 static READ16_HANDLER( K056800_68k_r )
 {
 	UINT16 r = 0;
@@ -169,7 +144,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00100000, 0x00101fff) AM_RAM
 	AM_RANGE(0x00200000, 0x00200007) AM_WRITE(K056800_68k_w)
 	AM_RANGE(0x00200008, 0x0020000f) AM_READ(K056800_68k_r)
-	AM_RANGE(0x00400000, 0x004002ff) AM_READWRITE(sound_r, sound_w)
+	AM_RANGE(0x00400000, 0x004002ff) AM_DEVREADWRITE8(SOUND, "konami", k054539_r, k054539_w, 0xffff)
 ADDRESS_MAP_END
 
 /*****************************************************************************/

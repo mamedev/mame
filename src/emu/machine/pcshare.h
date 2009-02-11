@@ -1,5 +1,3 @@
-#include "sound/custom.h"
-
 /* flags for init_pc_common */
 #define PCCOMMON_KEYBOARD_PC	0
 #define PCCOMMON_KEYBOARD_AT	1

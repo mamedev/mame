@@ -219,6 +219,7 @@ static SAMPLES_START( ninjakd2_init_samples )
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
 	const UINT8* const rom = memory_region(space->machine, "samples");
 
 	// only Ninja Kid II uses this
@@ -236,9 +237,9 @@ static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 			++end;
 
 		if (end - start)
-			sample_start_raw(0, &ninjakd2_sampledata[start], end - start, NE555_FREQUENCY, 0);
+			sample_start_raw(samples, 0, &ninjakd2_sampledata[start], end - start, NE555_FREQUENCY, 0);
 		else
-			sample_stop(0);
+			sample_stop(samples, 0);
 	}
 }
 
@@ -470,10 +471,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjakd2_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "2203.1", ym2203_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "2203.2", ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -896,9 +895,9 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -906,7 +905,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		NULL, NULL, NULL, NULL
+		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
 	irqhandler
 };

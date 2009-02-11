@@ -8,7 +8,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "sound/custom.h"
 
 
 /* 8 voices max */
@@ -53,7 +52,7 @@ static short *mixer_buffer_2;
 
 
 /* build a table to divide by the number of voices; gain is specified as gain*16 */
-static int make_mixer_table(int voices, int gain)
+static void make_mixer_table(int voices, int gain)
 {
 	int count = voices * 128;
 	int i;
@@ -72,8 +71,6 @@ static int make_mixer_table(int voices, int gain)
 		mixer_lookup[ i] = val;
 		mixer_lookup[-i] = -val;
 	}
-
-	return 0;
 }
 
 
@@ -161,7 +158,7 @@ static STREAM_UPDATE( wiping_update_mono )
 
 
 
-CUSTOM_START( wiping_sh_start )
+static DEVICE_START( wiping_sound )
 {
 	running_machine *machine = device->machine;
 	sound_channel *voice;
@@ -174,8 +171,7 @@ CUSTOM_START( wiping_sh_start )
 	mixer_buffer_2 = mixer_buffer + samplerate;
 
 	/* build the mixer table */
-	if (make_mixer_table(8, defgain))
-		return NULL;
+	make_mixer_table(8, defgain);
 
 	/* extract globals from the interface */
 	num_voices = 8;
@@ -195,8 +191,20 @@ CUSTOM_START( wiping_sh_start )
 		voice->wave = &sound_prom[0];
 		voice->counter = 0;
 	}
+}
 
-	return auto_malloc(1);
+
+DEVICE_GET_INFO( wiping_sound )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(wiping_sound);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "Wiping Custom");				break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+	}
 }
 
 

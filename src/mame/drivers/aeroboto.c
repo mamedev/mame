@@ -99,12 +99,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x9002, 0x9002) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(ay8910_write_port_1_w)
-	AM_RANGE(0xa002, 0xa002) AM_READ(ay8910_read_port_1_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x9002, 0x9002) AM_DEVREAD(SOUND, "ay1", ay8910_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0xa002, 0xa002) AM_DEVREAD(SOUND, "ay2", ay8910_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -223,10 +221,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	soundlatch_r,
-	soundlatch2_r,
-	NULL,
-	NULL
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch2_r),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_START( formatz )

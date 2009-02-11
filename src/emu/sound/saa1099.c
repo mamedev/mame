@@ -100,7 +100,8 @@ struct saa1099_noise
 };
 
 /* this structure defines a SAA1099 chip */
-struct SAA1099
+typedef struct _saa1099_state saa1099_state;
+struct _saa1099_state
 {
 	const device_config *device;
 	sound_stream * stream;			/* our stream */
@@ -169,7 +170,18 @@ static const UINT8 envelope[8][64] = {
 	  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15 }
 };
 
-static void saa1099_envelope(struct SAA1099 *saa, int ch)
+
+INLINE saa1099_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_SAA1099);
+	return (saa1099_state *)device->token;
+}
+
+
+static void saa1099_envelope(saa1099_state *saa, int ch)
 {
 	if (saa->env_enable[ch])
 	{
@@ -214,7 +226,7 @@ static void saa1099_envelope(struct SAA1099 *saa, int ch)
 
 static STREAM_UPDATE( saa1099_update )
 {
-	struct SAA1099 *saa = param;
+	saa1099_state *saa = param;
     int j, ch;
 
 	/* if the channels are disabled we're done */
@@ -312,26 +324,26 @@ static STREAM_UPDATE( saa1099_update )
 
 
 
-static SND_START( saa1099 )
+static DEVICE_START( saa1099 )
 {
-	struct SAA1099 *saa = device->token;
+	saa1099_state *saa = get_safe_token(device);
 
 	/* copy global parameters */
 	saa->device = device;
-	saa->sample_rate = clock / 256;
+	saa->sample_rate = device->clock / 256;
 
 	/* for each chip allocate one stream */
 	saa->stream = stream_create(device, 0, 2, saa->sample_rate, saa, saa1099_update);
 }
 
-static void saa1099_control_port_w( int chip, int reg, int data )
+WRITE8_DEVICE_HANDLER( saa1099_control_w )
 {
-	struct SAA1099 *saa = sndti_token(SOUND_SAA1099, chip);
+	saa1099_state *saa = get_safe_token(device);
 
 	if ((data & 0xff) > 0x1c)
 	{
 		/* Error! */
-                logerror("%s: (SAA1099 #%d) Unknown register selected\n",cpuexec_describe_context(saa->device->machine), chip);
+                logerror("%s: (SAA1099 '%s') Unknown register selected\n",cpuexec_describe_context(device->machine), device->tag);
 	}
 
 	saa->selected_reg = data & 0x1f;
@@ -346,9 +358,9 @@ static void saa1099_control_port_w( int chip, int reg, int data )
 }
 
 
-static void saa1099_write_port_w( int chip, int offset, int data )
+WRITE8_DEVICE_HANDLER( saa1099_data_w )
 {
-	struct SAA1099 *saa = sndti_token(SOUND_SAA1099, chip);
+	saa1099_state *saa = get_safe_token(device);
 	int reg = saa->selected_reg;
 	int ch;
 
@@ -417,7 +429,7 @@ static void saa1099_write_port_w( int chip, int offset, int data )
 			int i;
 
 			/* Synch & Reset generators */
-			logerror("%s: (SAA1099 #%d) -reg 0x1c- Chip reset\n",cpuexec_describe_context(saa->device->machine), chip);
+			logerror("%s: (SAA1099 '%s') -reg 0x1c- Chip reset\n",cpuexec_describe_context(device->machine), device->tag);
 			for (i = 0; i < 6; i++)
 			{
                 saa->channels[i].level = 0;
@@ -426,93 +438,33 @@ static void saa1099_write_port_w( int chip, int offset, int data )
 		}
 		break;
 	default:	/* Error! */
-		logerror("%s: (SAA1099 #%d) Unknown operation (reg:%02x, data:%02x)\n",cpuexec_describe_context(saa->device->machine), chip, reg, data);
+		logerror("%s: (SAA1099 '%s') Unknown operation (reg:%02x, data:%02x)\n",cpuexec_describe_context(device->machine), device->tag, reg, data);
 	}
 }
-
-
-/*******************************************
-    SAA1099 interface functions
-*******************************************/
-
-WRITE8_HANDLER( saa1099_control_port_0_w )
-{
-	saa1099_control_port_w(0, offset, data);
-}
-
-WRITE8_HANDLER( saa1099_write_port_0_w )
-{
-	saa1099_write_port_w(0, offset, data);
-}
-
-WRITE8_HANDLER( saa1099_control_port_1_w )
-{
-	saa1099_control_port_w(1, offset, data);
-}
-
-WRITE8_HANDLER( saa1099_write_port_1_w )
-{
-	saa1099_write_port_w(1, offset, data);
-}
-
-WRITE16_HANDLER( saa1099_control_port_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		saa1099_control_port_w(0, offset, data & 0xff);
-}
-
-WRITE16_HANDLER( saa1099_write_port_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		saa1099_write_port_w(0, offset, data & 0xff);
-}
-
-WRITE16_HANDLER( saa1099_control_port_1_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		saa1099_control_port_w(1, offset, data & 0xff);
-}
-
-WRITE16_HANDLER( saa1099_write_port_1_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		saa1099_write_port_w(1, offset, data & 0xff);
-}
-
 
 
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( saa1099 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( saa1099 )
+DEVICE_GET_INFO( saa1099 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct SAA1099);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(saa1099_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( saa1099 );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( saa1099 );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( saa1099 );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "SAA1099");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Philips");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "SAA1099");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Philips");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

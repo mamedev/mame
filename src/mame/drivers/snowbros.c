@@ -111,8 +111,8 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	int status = okim6295_status_0_r(space,0);
+	const device_config *adpcm = devtag_get_device(device->machine, SOUND, "oki");
+	int status = okim6295_r(adpcm,0);
 
 	cpu_set_input_line(device, cpu_getiloops(device) + 2, HOLD_LINE);	/* IRQs 4, 3, and 2 */
 
@@ -120,8 +120,8 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x00)
 		{
-			okim6295_data_0_w(space,0,0x80|sb3_music);
-			okim6295_data_0_w(space,0,0x00|0x82);
+			okim6295_w(adpcm,0,0x80|sb3_music);
+			okim6295_w(adpcm,0,0x00|0x82);
 		}
 
 	}
@@ -129,7 +129,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x08)
 		{
-			okim6295_data_0_w(space,0,0x40);		/* Stop playing music */
+			okim6295_w(adpcm,0,0x40);		/* Stop playing music */
 		}
 	}
 
@@ -197,8 +197,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -256,19 +255,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( honeydol_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe010, 0xe010) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0xe010, 0xe010) AM_DEVREAD(SOUND, "oki", okim6295_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe010, 0xe010) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xe010, 0xe010) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)	// not connected?
-	AM_RANGE(0x03, 0x03) AM_WRITE(ym3812_write_port_0_w)								// not connected?
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)								// not connected?
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -311,29 +309,29 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( twinadv_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-//  AM_RANGE(0xe010, 0xe010) AM_READ(okim6295_status_0_r)
+//  AM_RANGE(0xe010, 0xe010) AM_DEVREAD(SOUND, "oki", okim6295_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twinadv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-//  AM_RANGE(0xe010, 0xe010) AM_WRITE(okim6295_data_0_w)
+//  AM_RANGE(0xe010, 0xe010) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( twinadv_oki_bank_w )
+static WRITE8_DEVICE_HANDLER( twinadv_oki_bank_w )
 {
 	int bank = (data &0x02)>>1;
 
 	if (data&0xfd) logerror ("Unused bank bits! %02x\n",data);
 
-	okim6295_set_bank_base(0, bank * 0x40000);
+	okim6295_set_bank_base(device, bank * 0x40000);
 }
 
 static ADDRESS_MAP_START( twinadv_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(soundlatch_r, soundlatch_w) // back to 68k?
-	AM_RANGE(0x04, 0x04) AM_WRITE(twinadv_oki_bank_w) // oki bank?
-	AM_RANGE(0x06, 0x06) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "oki", twinadv_oki_bank_w) // oki bank?
+	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 ADDRESS_MAP_END
 
 
@@ -372,16 +370,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyperpac_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf001, 0xf001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREAD(SOUND, "ym", ym2151_r)
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyperpac_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 //  AM_RANGE(0xf006, 0xf006) ???
 ADDRESS_MAP_END
 
@@ -433,35 +430,35 @@ static void sb3_play_music(running_machine *machine, int data)
 	}
 }
 
-static void sb3_play_sound (const address_space *space, int data)
+static void sb3_play_sound (const device_config *device, int data)
 {
-	int status = okim6295_status_0_r(space,0);
+	int status = okim6295_r(device,0);
 
 	if ((status&0x01)==0x00)
 	{
-		okim6295_data_0_w(space,0,0x80|data);
-		okim6295_data_0_w(space,0,0x00|0x12);
+		okim6295_w(device,0,0x80|data);
+		okim6295_w(device,0,0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		okim6295_data_0_w(space,0,0x80|data);
-		okim6295_data_0_w(space,0,0x00|0x22);
+		okim6295_w(device,0,0x80|data);
+		okim6295_w(device,0,0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		okim6295_data_0_w(space,0,0x80|data);
-		okim6295_data_0_w(space,0,0x00|0x42);
+		okim6295_w(device,0,0x80|data);
+		okim6295_w(device,0,0x00|0x42);
 	}
 
 
 }
 
-static WRITE16_HANDLER( sb3_sound_w )
+static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 {
 	if (data == 0x00fe)
 	{
 		sb3_music_is_playing = 0;
-		okim6295_data_0_w(space,0,0x78);		/* Stop sounds */
+		okim6295_w(device,0,0x78);		/* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
 	{
@@ -469,22 +466,22 @@ static WRITE16_HANDLER( sb3_sound_w )
 
 		if (data <= 0x21)
 		{
-			sb3_play_sound(space, data);
+			sb3_play_sound(device, data);
 		}
 
 		if (data>=0x22 && data<=0x31)
 		{
-			sb3_play_music(space->machine, data);
+			sb3_play_music(device->machine, data);
 		}
 
 		if ((data>=0x30) && (data<=0x51))
 		{
-			sb3_play_sound(space, data-0x30);
+			sb3_play_sound(device, data-0x30);
 		}
 
 		if (data>=0x52 && data<=0x5f)
 		{
-			sb3_play_music(space->machine, data-0x30);
+			sb3_play_music(device->machine, data-0x30);
 		}
 
 	}
@@ -507,7 +504,7 @@ static ADDRESS_MAP_START( writemem3, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE( 0x100000, 0x103fff) AM_WRITE(SMH_RAM)
 	AM_RANGE( 0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE( 0x300000, 0x300001) AM_WRITE(sb3_sound_w)  // ?
+	AM_RANGE( 0x300000, 0x300001) AM_DEVWRITE(SOUND, "oki", sb3_sound_w)  // ?
 	AM_RANGE( 0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE( 0x600000, 0x6003ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE (&paletteram16)
 	AM_RANGE( 0x700000, 0x7021ff) AM_WRITE(SMH_RAM) AM_BASE( &spriteram16) AM_SIZE( &spriteram_size )
@@ -1495,9 +1492,9 @@ static GFXDECODE_START( hyperpac )
 GFXDECODE_END
 
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
-static void irqhandler(running_machine *machine, int irq)
+static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* SnowBros Sound */
@@ -1562,7 +1559,7 @@ static MACHINE_DRIVER_START( snowbros )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("3812", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1594,7 +1591,7 @@ static MACHINE_DRIVER_START( semicom )
 	MDRV_GFXDECODE(hyperpac)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("3812", YM2151, 4000000)
+	MDRV_SOUND_REPLACE("ym", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
@@ -1658,7 +1655,7 @@ static MACHINE_DRIVER_START( honeydol )
 
 	/* sound hardware */
 
-	MDRV_SOUND_ADD("3812", YM3812, 3000000)
+	MDRV_SOUND_ADD("ym", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1731,7 +1728,7 @@ static MACHINE_DRIVER_START( finalttr )
 
 	MDRV_MACHINE_RESET ( finalttr )
 
-	MDRV_SOUND_REPLACE("3812", YM2151, 4000000)
+	MDRV_SOUND_REPLACE("ym", YM2151, 4000000)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.08)
 	MDRV_SOUND_ROUTE(1, "mono", 0.08)

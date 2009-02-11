@@ -59,26 +59,28 @@ static WRITE8_HANDLER( m6803_port1_w )
 
 static WRITE8_HANDLER( m6803_port2_w )
 {
-
 	/* write latch */
 	if ((port2 & 0x01) && !(data & 0x01))
 	{
+		const device_config *ay1 = devtag_get_device(space->machine, SOUND, "ay1");
+		const device_config *ay2 = devtag_get_device(space->machine, SOUND, "ay2");
+
 		/* control or data port? */
 		if (port2 & 0x04)
 		{
 			/* PSG 0 or 1? */
 			if (port2 & 0x08)
-				ay8910_control_port_0_w(space, 0, port1);
+				ay8910_address_w(ay1, 0, port1);
 			if (port2 & 0x10)
-				ay8910_control_port_1_w(space, 0, port1);
+				ay8910_address_w(ay2, 0, port1);
 		}
 		else
 		{
 			/* PSG 0 or 1? */
 			if (port2 & 0x08)
-				ay8910_write_port_0_w(space, 0, port1);
+				ay8910_data_w(ay1, 0, port1);
 			if (port2 & 0x10)
-				ay8910_write_port_1_w(space, 0, port1);
+				ay8910_data_w(ay2, 0, port1);
 		}
 	}
 	port2 = data;
@@ -96,9 +98,9 @@ static READ8_HANDLER( m6803_port1_r )
 {
 	/* PSG 0 or 1? */
 	if (port2 & 0x08)
-		return ay8910_read_port_0_r(space, 0);
+		return ay8910_r(devtag_get_device(space->machine, SOUND, "ay1"), 0);
 	if (port2 & 0x10)
-		return ay8910_read_port_1_r(space, 0);
+		return ay8910_r(devtag_get_device(space->machine, SOUND, "ay2"), 0);
 	return 0xff;
 }
 
@@ -116,21 +118,24 @@ static READ8_HANDLER( m6803_port2_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( ay8910_0_portb_w )
+static WRITE8_DEVICE_HANDLER( ay8910_0_portb_w )
 {
+	const device_config *adpcm0 = devtag_get_device(device->machine, SOUND, "msm1");
+	const device_config *adpcm1 = devtag_get_device(device->machine, SOUND, "msm2");
+	
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
-	msm5205_playmode_w(0, (data >> 2) & 7);
-	if (sndti_exists(SOUND_MSM5205, 1))
-		msm5205_playmode_w(1, ((data >> 2) & 4) | 3);	/* always in slave mode */
+	msm5205_playmode_w(adpcm0, (data >> 2) & 7);
+	if (adpcm1 != NULL)
+		msm5205_playmode_w(adpcm1, ((data >> 2) & 4) | 3);	/* always in slave mode */
 
 	/* bits 0 and 1 reset the two chips */
-	msm5205_reset_w(0, data & 1);
-	if (sndti_exists(SOUND_MSM5205, 1))
-		msm5205_reset_w(1, data & 2);
+	msm5205_reset_w(adpcm0, data & 1);
+	if (adpcm1 != NULL)
+		msm5205_reset_w(adpcm1, data & 2);
 }
 
 
-static WRITE8_HANDLER( ay8910_1_porta_w )
+static WRITE8_DEVICE_HANDLER( ay8910_1_porta_w )
 {
 #ifdef MAME_DEBUG
 	if (data & 0x0f) popmessage("analog sound %x",data&0x0f);
@@ -154,15 +159,24 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 static WRITE8_HANDLER( m52_adpcm_w )
 {
 	if (offset & 1)
-		msm5205_data_w(0, data);
-	if ((offset & 2) && sndti_exists(SOUND_MSM5205, 1))
-		msm5205_data_w(1, data);
+	{
+		const device_config *adpcm = devtag_get_device(space->machine, SOUND, "msm1");
+		msm5205_data_w(adpcm, data);
+	}
+	if (offset & 2)
+	{
+		const device_config *adpcm = devtag_get_device(space->machine, SOUND, "msm2");
+		if (adpcm != NULL)
+			msm5205_data_w(adpcm, data);
+	}
 }
 
 
 static WRITE8_HANDLER( m62_adpcm_w )
 {
-	msm5205_data_w(offset, data);
+	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (offset & 1) ? "msm2" : "msm1");
+	if (adpcm != NULL)
+		msm5205_data_w(adpcm, data);
 }
 
 
@@ -175,13 +189,15 @@ static WRITE8_HANDLER( m62_adpcm_w )
 
 static void adpcm_int(const device_config *device)
 {
+	const device_config *msm2 = devtag_get_device(device->machine, SOUND, "msm2");
+	
 	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
-	if (sndti_exists(SOUND_MSM5205, 1))
+	if (msm2 != NULL)
 	{
-		msm5205_vclk_w(1,1);
-		msm5205_vclk_w(1,0);
+		msm5205_vclk_w(msm2,1);
+		msm5205_vclk_w(msm2,0);
 	}
 }
 
@@ -203,20 +219,20 @@ static const ay8910_interface irem_ay8910_interface_1 =
 {
 	AY8910_SINGLE_OUTPUT,
 	{470, 0, 0},
-	soundlatch_r,
-	NULL,
-	NULL,
-	ay8910_0_portb_w
+	DEVCB_MEMORY_HANDLER("iremsound", PROGRAM, soundlatch_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ay8910_0_portb_w)
 };
 
 static const ay8910_interface irem_ay8910_interface_2 =
 {
 	AY8910_SINGLE_OUTPUT,
 	{470, 0, 0},
-	NULL,
-	NULL,
-	ay8910_1_porta_w,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ay8910_1_porta_w),
+	DEVCB_NULL
 };
 
 static const msm5205_interface irem_msm5205_interface_1 =
@@ -400,15 +416,15 @@ MACHINE_DRIVER_START( m52_sound_c_audio )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay8910.0", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
 
-	MDRV_SOUND_ADD("ay8910.1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_2)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
 
-	MDRV_SOUND_ADD("msm5250", MSM5205, XTAL_384kHz) /* verified on pcb */
+	MDRV_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_msm5205_interface_1)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
 

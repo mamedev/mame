@@ -48,11 +48,11 @@ static READ8_HANDLER( rollerg_K051316_r )
 	else return K051316_0_r(space, offset);
 }
 
-static READ8_HANDLER( rollerg_sound_r )
+static READ8_DEVICE_HANDLER( rollerg_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return k053260_0_r(space, 2 + offset);
+	return k053260_r(device, 2 + offset);
 }
 
 static WRITE8_HANDLER( soundirq_w )
@@ -78,7 +78,7 @@ static READ8_HANDLER( pip_r )
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0020, 0x0020) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x0030, 0x0031) AM_READ(rollerg_sound_r)	/* K053260 */
+	AM_RANGE(0x0030, 0x0031) AM_DEVREAD(SOUND, "konami", rollerg_sound_r)	/* K053260 */
 	AM_RANGE(0x0050, 0x0050) AM_READ_PORT("P1")
 	AM_RANGE(0x0051, 0x0051) AM_READ_PORT("P2")
 	AM_RANGE(0x0052, 0x0052) AM_READ_PORT("DSW3")
@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0010, 0x0010) AM_WRITE(rollerg_0010_w)
 	AM_RANGE(0x0020, 0x0020) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x0030, 0x0031) AM_WRITE(k053260_0_w)
+	AM_RANGE(0x0030, 0x0031) AM_DEVWRITE(SOUND, "konami", k053260_w)
 	AM_RANGE(0x0040, 0x0040) AM_WRITE(soundirq_w)
 	AM_RANGE(0x0100, 0x010f) AM_WRITE(SMH_NOP)	/* 053252? */
 	AM_RANGE(0x0200, 0x020f) AM_WRITE(K051316_ctrl_0_w)
@@ -112,16 +112,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa02f) AM_READ(k053260_0_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ(ym3812_status_port_0_r)
+	AM_RANGE(0xa000, 0xa02f) AM_DEVREAD(SOUND, "konami", k053260_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym3812_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa02f) AM_WRITE(k053260_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xa000, 0xa02f) AM_DEVWRITE(SOUND, "konami", k053260_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym3812_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
 

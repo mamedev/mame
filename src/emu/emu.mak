@@ -68,7 +68,6 @@ EMUOBJS = \
 	$(EMUOBJ)/restrack.o \
 	$(EMUOBJ)/romload.o \
 	$(EMUOBJ)/sound.o \
-	$(EMUOBJ)/sndintrf.o \
 	$(EMUOBJ)/state.o \
 	$(EMUOBJ)/streams.o \
 	$(EMUOBJ)/tilemap.o \

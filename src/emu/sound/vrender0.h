@@ -10,12 +10,12 @@ struct _vr0_interface
 	UINT32 RegBase;
 };
 
-void vr0_snd_set_areas(UINT32 *texture,UINT32 *frame);
+void vr0_snd_set_areas(const device_config *device,UINT32 *texture,UINT32 *frame);
 
-READ32_HANDLER(vr0_snd_read);
-WRITE32_HANDLER(vr0_snd_write);
+READ32_DEVICE_HANDLER( vr0_snd_read );
+WRITE32_DEVICE_HANDLER( vr0_snd_write );
 
-SND_GET_INFO( vrender0 );
-#define SOUND_VRENDER0 SND_GET_INFO_NAME( vrender0 )
+DEVICE_GET_INFO( vrender0 );
+#define SOUND_VRENDER0 DEVICE_GET_INFO_NAME( vrender0 )
 
 #endif /* __VRENDER0_H__ */

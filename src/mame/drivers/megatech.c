@@ -363,7 +363,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-	sndti_reset(SOUND_YM2612, 0);
+	devtag_reset(machine, SOUND, "ym");
 
 	sprintf(tempname, "game%d", gameno);
 	game_region = memory_region(machine, tempname);

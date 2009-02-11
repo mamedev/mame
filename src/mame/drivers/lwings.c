@@ -260,12 +260,12 @@ static READ8_HANDLER( avengers_soundlatch2_r )
 	return(data);
 }
 
-static WRITE8_HANDLER( msm5205_w )
+static WRITE8_DEVICE_HANDLER( msm5205_w )
 {
-	msm5205_reset_w(offset,(data>>7)&1);
-	msm5205_data_w(offset,data);
-	msm5205_vclk_w(offset,1);
-	msm5205_vclk_w(offset,0);
+	msm5205_reset_w(device,(data>>7)&1);
+	msm5205_data_w(device,data);
+	msm5205_vclk_w(device,1);
+	msm5205_vclk_w(device,0);
 }
 
 static ADDRESS_MAP_START( avengers_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -354,10 +354,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2203_control_port_1_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE(SOUND, "2203a", ym2203_w)
+	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE(SOUND, "2203b", ym2203_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_RAM) AM_BASE(&avengers_soundlatch2)
 ADDRESS_MAP_END
 
@@ -374,13 +372,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( avengers_adpcm_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(avengers_adpcm_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE(SOUND, "5205", msm5205_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adpcm_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE(SOUND, "5205", msm5205_w)
 ADDRESS_MAP_END
 
 /*************************************

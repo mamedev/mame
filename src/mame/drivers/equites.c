@@ -418,15 +418,16 @@ static float cymvol,hihatvol;
 
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
 {
+	const device_config *msm = devtag_get_device(machine, SOUND, "msm");
 	UINT8 frq = input_port_read(machine, FRQ_ADJUSTER_TAG);
 
-	msm5232_set_clock(sndti_token(SOUND_MSM5232, 0), MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
+	msm5232_set_clock(msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
 //popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", eq8155_port_c,eq8155_port_a,ay_port_a,ay_port_b,eq_cymbal_ctrl&15);
 
 	cymvol *= 0.94f;
 	hihatvol *= 0.94f;
 
-	sndti_set_output_gain(SOUND_MSM5232, 0, 10, hihatvol + cymvol * (ay_port_b & 3) * 0.33);	/* NO from msm5232 */
+	sound_set_output_gain(msm, 0, hihatvol + cymvol * (ay_port_b & 3) * 0.33);	/* NO from msm5232 */
 }
 
 static SOUND_START(equites)
@@ -489,17 +490,17 @@ static WRITE8_HANDLER(equites_c0f8_w)
 static int hihat,cymbal;
 #endif
 
-static WRITE8_HANDLER(equites_8910porta_w)
+static WRITE8_DEVICE_HANDLER(equites_8910porta_w)
 {
 	// bongo 1
-	sample_set_volume(0, ((data & 0x30)>>4) * 0.33);
+	sample_set_volume(device, 0, ((data & 0x30)>>4) * 0.33);
 	if (data & ~ay_port_a & 0x80)
-		sample_start(0, 0, 0);
+		sample_start(device, 0, 0, 0);
 
 	// bongo 2
-	sample_set_volume(1, (data & 0x03) * 0.33);
+	sample_set_volume(device, 1, (data & 0x03) * 0.33);
 	if (data & ~ay_port_a & 0x08)
-		sample_start(1, 1, 0);
+		sample_start(device, 1, 1, 0);
 
 	ay_port_a = data;
 
@@ -508,7 +509,7 @@ popmessage("HH %d(%d) CYM %d(%d)",hihat,BIT(ay_port_b,6),cymbal,ay_port_b&3);
 #endif
 }
 
-static WRITE8_HANDLER(equites_8910portb_w)
+static WRITE8_DEVICE_HANDLER(equites_8910portb_w)
 {
 #if POPDRUMKIT
 if (data & ~ay_port_b & 0x08) cymbal++;
@@ -516,9 +517,9 @@ if (data & ~ay_port_b & 0x04) hihat++;
 #endif
 
 	// bongo 3
-	sample_set_volume(2, ((data & 0x30)>>4) * 0.33);
+	sample_set_volume(device, 2, ((data & 0x30)>>4) * 0.33);
 	if (data & ~ay_port_b & 0x80)
-		sample_start(2, 2, 0);
+		sample_start(device, 2, 2, 0);
 
 	// FIXME I'm just enabling the MSM5232 Noise Output for now. Proper emulation
 	// of the analog circuitry should be done instead.
@@ -550,7 +551,7 @@ static WRITE8_HANDLER(equites_cymbal_ctrl_w)
 
 
 
-static void equites_update_dac(void)
+static void equites_update_dac(running_machine *machine)
 {
 	// there is only one latch, which is used to drive two DAC channels.
 	// When the channel is enabled in the 4066, it goes to a series of
@@ -559,25 +560,25 @@ static void equites_update_dac(void)
 	// Note that PB0 goes through three filters while PB1 only goes through one.
 
 	if (equites_8155_portb & 1)
-		dac_signed_data_w(0, equites_dac_latch);
+		dac_signed_data_w(devtag_get_device(machine, SOUND, "dac1"), equites_dac_latch);
 
 	if (equites_8155_portb & 2)
-		dac_signed_data_w(1, equites_dac_latch);
+		dac_signed_data_w(devtag_get_device(machine, SOUND, "dac2"), equites_dac_latch);
 }
 
 static WRITE8_HANDLER(equites_dac_latch_w)
 {
 	equites_dac_latch = data<<2;
-	equites_update_dac();
+	equites_update_dac(space->machine);
 }
 
 static WRITE8_HANDLER(equites_8155_portb_w)
 {
 	equites_8155_portb = data;
-	equites_update_dac();
+	equites_update_dac(space->machine);
 }
 
-static void equites_msm5232_gate(int state)
+static void equites_msm5232_gate(const device_config *device, int state)
 {
 }
 
@@ -599,6 +600,7 @@ static INTERRUPT_GEN( equites_interrupt )
 static WRITE8_HANDLER(equites_8155_w)
 {
 	static int timer_count;
+	const device_config *device;
 
 	// FIXME proper 8155 emulation must be implemented
 	switch( offset )
@@ -610,14 +612,15 @@ static WRITE8_HANDLER(equites_8155_w)
 		case 1: //logerror( "8155 I/O Port A write %x\n", data );
 			eq8155_port_a = data;
 
-			sndti_set_output_gain(SOUND_MSM5232, 0, 0, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sndti_set_output_gain(SOUND_MSM5232, 0, 1, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sndti_set_output_gain(SOUND_MSM5232, 0, 2, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sndti_set_output_gain(SOUND_MSM5232, 0, 3, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			sndti_set_output_gain(SOUND_MSM5232, 0, 4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			sndti_set_output_gain(SOUND_MSM5232, 0, 5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			sndti_set_output_gain(SOUND_MSM5232, 0, 6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			sndti_set_output_gain(SOUND_MSM5232, 0, 7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			device = devtag_get_device(space->machine, SOUND, "msm");
+			sound_set_output_gain(device, 0, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			sound_set_output_gain(device, 1, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			sound_set_output_gain(device, 2, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			sound_set_output_gain(device, 3, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			sound_set_output_gain(device, 4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			sound_set_output_gain(device, 5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			sound_set_output_gain(device, 6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			sound_set_output_gain(device, 7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
 
 			break;
 		case 2: //logerror( "8155 I/O Port B write %x\n", data );
@@ -626,11 +629,12 @@ static WRITE8_HANDLER(equites_8155_w)
 		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
 			eq8155_port_c = data;
 
-			sndti_set_output_gain(SOUND_MSM5232, 0, 8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
+			device = devtag_get_device(space->machine, SOUND, "msm");
+			sound_set_output_gain(device, 8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
 			if (data & 0x20)
-				sndti_set_output_gain(SOUND_MSM5232, 0, 9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
+				sound_set_output_gain(device, 9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
 			else
-				sndti_set_output_gain(SOUND_MSM5232, 0, 9, 0);	/* SOLO 16' from msm5232 */
+				sound_set_output_gain(device, 9, 0);	/* SOLO 16' from msm5232 */
 
 			break;
 		case 4: //logerror( "8155 Timer low 8 bits write %x\n", data );
@@ -755,9 +759,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc080, 0xc08d) AM_WRITE(msm5232_0_w)
-	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xc0a1, 0xc0a1) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE(SOUND, "msm", msm5232_w)
+	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)	// followed by 1 (and usually 0) on 8155 port B
@@ -1126,10 +1129,10 @@ static const ay8910_interface equites_8910intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	0,
-	0,
-	equites_8910porta_w,
-	equites_8910portb_w
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER(SOUND, "samples", equites_8910porta_w),
+	DEVCB_DEVICE_HANDLER(SOUND, "samples", equites_8910portb_w)
 };
 
 

@@ -20,6 +20,7 @@
 #define __POKEY_H__
 
 #include "sndintrf.h"
+#include "devcb.h"
 
 /* CONSTANT DEFINITIONS */
 
@@ -71,42 +72,26 @@
 typedef struct _pokey_interface pokey_interface;
 struct _pokey_interface
 {
-	read8_space_func pot_r[8];
-	read8_space_func allpot_r;
-	read8_space_func serin_r;
-	write8_space_func serout_w;
-	void (*interrupt_cb)(running_machine *machine, int mask);
+	devcb_read8 pot_r[8];
+	devcb_read8 allpot_r;
+	devcb_read8 serin_r;
+	devcb_write8 serout_w;
+	void (*interrupt_cb)(const device_config *device, int mask);
 };
 
 
-READ8_HANDLER( pokey1_r );
-READ8_HANDLER( pokey2_r );
-READ8_HANDLER( pokey3_r );
-READ8_HANDLER( pokey4_r );
-READ8_HANDLER( quad_pokey_r );
+READ8_DEVICE_HANDLER( pokey_r );
+WRITE8_DEVICE_HANDLER( pokey_w );
 
-WRITE8_HANDLER( pokey1_w );
-WRITE8_HANDLER( pokey2_w );
-WRITE8_HANDLER( pokey3_w );
-WRITE8_HANDLER( pokey4_w );
+/* fix me: eventually this should be a single device with pokey subdevices */
+READ8_HANDLER( quad_pokey_r );
 WRITE8_HANDLER( quad_pokey_w );
 
-void pokey1_serin_ready (int after);
-void pokey2_serin_ready (int after);
-void pokey3_serin_ready (int after);
-void pokey4_serin_ready (int after);
+void pokey_serin_ready (const device_config *device, int after);
+void pokey_break_w (const device_config *device, int shift);
+void pokey_kbcode_w (const device_config *device, int kbcode, int make);
 
-void pokey1_break_w (int shift);
-void pokey2_break_w (int shift);
-void pokey3_break_w (int shift);
-void pokey4_break_w (int shift);
-
-void pokey1_kbcode_w (int kbcode, int make);
-void pokey2_kbcode_w (int kbcode, int make);
-void pokey3_kbcode_w (int kbcode, int make);
-void pokey4_kbcode_w (int kbcode, int make);
-
-SND_GET_INFO( pokey );
-#define SOUND_POKEY SND_GET_INFO_NAME( pokey )
+DEVICE_GET_INFO( pokey );
+#define SOUND_POKEY DEVICE_GET_INFO_NAME( pokey )
 
 #endif	/* __POKEY_H__ */

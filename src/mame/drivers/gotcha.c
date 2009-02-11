@@ -96,11 +96,11 @@ static WRITE16_HANDLER( gotcha_lamps_w )
 #endif
 }
 
-static WRITE16_HANDLER( gotcha_oki_bank_w )
+static WRITE16_DEVICE_HANDLER( gotcha_oki_bank_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		okim6295_set_bank_base(0,(((~data & 0x0100) >> 8) * 0x40000));
+		okim6295_set_bank_base(device,(((~data & 0x0100) >> 8) * 0x40000));
 	}
 }
 
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(gotcha_oki_bank_w)
+	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE(SOUND, "oki", gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x140000, 0x1405ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x160000, 0x1607ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
@@ -135,16 +135,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc001, 0xc001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym2151_r)
 	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0xc002, 0xc003) AM_WRITE(okim6295_data_0_w)	// TWO addresses!
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE(SOUND, "oki", okim6295_w)	// TWO addresses!
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -261,9 +260,9 @@ GFXDECODE_END
 
 
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[1],0,linestate);
+	cpu_set_input_line(device->machine->cpu[1],0,linestate);
 }
 
 static const ym2151_interface ym2151_config =

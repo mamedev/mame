@@ -34,7 +34,8 @@ struct ADPCMVoice
 	INT32 step;
 };
 
-struct okim6376
+typedef struct _okim6376_state okim6376_state;
+struct _okim6376_state
 {
 	#define OKIM6376_VOICES		2
 	struct ADPCMVoice voice[OKIM6376_VOICES];
@@ -62,6 +63,16 @@ static int volume_table[4] =
 
 /* tables computed? */
 static int tables_computed = 0;
+
+
+INLINE okim6376_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_OKIM6376);
+	return (okim6376_state *)device->token;
+}
 
 
 
@@ -160,7 +171,7 @@ static INT16 clock_adpcm(struct ADPCMVoice *voice, UINT8 nibble)
 
 ***********************************************************************************************/
 
-static void generate_adpcm(struct okim6376 *chip, struct ADPCMVoice *voice, INT16 *buffer, int samples)
+static void generate_adpcm(okim6376_state *chip, struct ADPCMVoice *voice, INT16 *buffer, int samples)
 {
 	/* if this voice is active */
 	if (voice->playing)
@@ -224,7 +235,7 @@ static void generate_adpcm(struct okim6376 *chip, struct ADPCMVoice *voice, INT1
 
 static STREAM_UPDATE( okim6376_update )
 {
-	struct okim6376 *chip = param;
+	okim6376_state *chip = param;
 	int i;
 
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -270,7 +281,7 @@ static void adpcm_state_save_register(struct ADPCMVoice *voice, const device_con
 	state_save_register_device_item(device, index, voice->base_offset);
 }
 
-static void okim6376_state_save_register(struct okim6376 *info, const device_config *device)
+static void okim6376_state_save_register(okim6376_state *info, const device_config *device)
 {
 	int j;
 
@@ -283,13 +294,13 @@ static void okim6376_state_save_register(struct okim6376 *info, const device_con
 
 /**********************************************************************************************
 
-     SND_START( okim6376 ) -- start emulation of an OKIM6376-compatible chip
+     DEVICE_START( okim6376 ) -- start emulation of an OKIM6376-compatible chip
 
 ***********************************************************************************************/
 
-static SND_START( okim6376 )
+static DEVICE_START( okim6376 )
 {
-	struct okim6376 *info = device->token;
+	okim6376_state *info = get_safe_token(device);
 	int voice;
 	int divisor = 165;
 
@@ -297,10 +308,10 @@ static SND_START( okim6376 )
 
 	info->command = -1;
 	info->region_base = device->region;
-	info->master_clock = clock;
+	info->master_clock = device->clock;
 
 	/* generate the name and create the stream */
-	info->stream = stream_create(device, 0, 1, clock/divisor, info, okim6376_update);
+	info->stream = stream_create(device, 0, 1, device->clock/divisor, info, okim6376_update);
 
 	/* initialize the voices */
 	for (voice = 0; voice < OKIM6376_VOICES; voice++)
@@ -317,13 +328,13 @@ static SND_START( okim6376 )
 
 /**********************************************************************************************
 
-     SND_RESET( okim6376 ) -- stop emulation of an OKIM6376-compatible chip
+     DEVICE_RESET( okim6376 ) -- stop emulation of an OKIM6376-compatible chip
 
 ***********************************************************************************************/
 
-static SND_RESET( okim6376 )
+static DEVICE_RESET( okim6376 )
 {
-	struct okim6376 *info = device->token;
+	okim6376_state *info = get_safe_token(device);
 	int i;
 
 	stream_update(info->stream);
@@ -340,9 +351,9 @@ static SND_RESET( okim6376 )
 
 ***********************************************************************************************/
 
-static int okim6376_status_r(int num)
+READ8_DEVICE_HANDLER( okim6376_r )
 {
-	struct okim6376 *info = sndti_token(SOUND_OKIM6376, num);
+	okim6376_state *info = get_safe_token(device);
 	int i, result;
 
 	result = 0xff;
@@ -369,9 +380,9 @@ static int okim6376_status_r(int num)
 
 ***********************************************************************************************/
 
-static void okim6376_data_w(int num, int data)
+WRITE8_DEVICE_HANDLER( okim6376_w )
 {
-	struct okim6376 *info = sndti_token(SOUND_OKIM6376, num);
+	okim6376_state *info = get_safe_token(device);
 
 	/* if a command is pending, process the second half */
 	if (info->command != -1)
@@ -420,7 +431,7 @@ static void okim6376_data_w(int num, int data)
 					}
 					else
 					{
-						logerror("OKIM6376:%d requested to play sample %02x on non-stopped voice\n",num,info->command);
+						logerror("OKIM6376:'%s' requested to play sample %02x on non-stopped voice\n",device->tag,info->command);
 					}
 				}
 			}
@@ -461,152 +472,28 @@ static void okim6376_data_w(int num, int data)
 
 
 
-/**********************************************************************************************
-
-     okim6376_status_0_r -- generic status read functions
-     okim6376_status_1_r
-
-***********************************************************************************************/
-
-READ8_HANDLER( okim6376_status_0_r )
-{
-	return okim6376_status_r(0);
-}
-
-READ8_HANDLER( okim6376_status_1_r )
-{
-	return okim6376_status_r(1);
-}
-
-READ8_HANDLER( okim6376_status_2_r )
-{
-	return okim6376_status_r(2);
-}
-
-READ16_HANDLER( okim6376_status_0_lsb_r )
-{
-	return okim6376_status_r(0);
-}
-
-READ16_HANDLER( okim6376_status_1_lsb_r )
-{
-	return okim6376_status_r(1);
-}
-
-READ16_HANDLER( okim6376_status_2_lsb_r )
-{
-	return okim6376_status_r(2);
-}
-
-READ16_HANDLER( okim6376_status_0_msb_r )
-{
-	return okim6376_status_r(0) << 8;
-}
-
-READ16_HANDLER( okim6376_status_1_msb_r )
-{
-	return okim6376_status_r(1) << 8;
-}
-
-READ16_HANDLER( okim6376_status_2_msb_r )
-{
-	return okim6376_status_r(2) << 8;
-}
-
-
-
-/**********************************************************************************************
-
-     okim6376_data_0_w -- generic data write functions
-     okim6376_data_1_w
-
-***********************************************************************************************/
-
-WRITE8_HANDLER( okim6376_data_0_w )
-{
-	okim6376_data_w(0, data);
-}
-
-WRITE8_HANDLER( okim6376_data_1_w )
-{
-	okim6376_data_w(1, data);
-}
-
-WRITE8_HANDLER( okim6376_data_2_w )
-{
-	okim6376_data_w(2, data);
-}
-
-WRITE16_HANDLER( okim6376_data_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6376_data_w(0, data & 0xff);
-}
-
-WRITE16_HANDLER( okim6376_data_1_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6376_data_w(1, data & 0xff);
-}
-
-WRITE16_HANDLER( okim6376_data_2_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		okim6376_data_w(2, data & 0xff);
-}
-
-WRITE16_HANDLER( okim6376_data_0_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6376_data_w(0, data >> 8);
-}
-
-WRITE16_HANDLER( okim6376_data_1_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6376_data_w(1, data >> 8);
-}
-
-WRITE16_HANDLER( okim6376_data_2_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		okim6376_data_w(2, data >> 8);
-}
-
-
-
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( okim6376 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( okim6376 )
+DEVICE_GET_INFO( okim6376 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct okim6376);					break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(okim6376_state);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( okim6376 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( okim6376 );			break;
-		case SNDINFO_PTR_STOP:							/* nothing */										break;
-		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( okim6376 );			break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( okim6376 );			break;
+		case DEVINFO_FCT_STOP:							/* nothing */										break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( okim6376 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "OKI6376");							break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "OKI ADPCM");						break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");								break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);							break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "OKI6376");							break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "OKI ADPCM");						break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");								break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);							break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

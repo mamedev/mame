@@ -51,7 +51,7 @@ static WRITE8_HANDLER( sound_data_w )
 	ay_data = data;
 }
 
-static WRITE8_HANDLER( sound_control_w )
+static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 /*
     AY 3-8910 :
@@ -62,8 +62,8 @@ static WRITE8_HANDLER( sound_control_w )
     D3 - /Reset
 
 */
-	if ((data &7)==7) ay8910_control_port_0_w(space,0,ay_data);
-	if ((data &7)==6) ay8910_write_port_0_w(space,0,ay_data);
+	if ((data &7)==7) ay8910_address_w(device,0,ay_data);
+	if ((data &7)==6) ay8910_data_w(device,0,ay_data);
 }
 
 
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( dynadice_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(sound_control_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "ay", sound_control_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dynadice )

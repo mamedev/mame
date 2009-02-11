@@ -77,7 +77,8 @@ struct YMZ280BVoice
 	UINT8 irq_schedule;		/* 1 if the IRQ state is updated by timer */
 };
 
-struct YMZ280BChip
+typedef struct _ymz280b_state ymz280b_state;
+struct _ymz280b_state
 {
 	sound_stream * stream;			/* which stream are we using */
 	UINT8 *region_base;				/* pointer to the base of the region */
@@ -88,11 +89,11 @@ struct YMZ280BChip
 	UINT8 irq_enable;				/* current IRQ enable */
 	UINT8 keyon_enable;				/* key on enable */
 	double master_clock;			/* master clock frequency */
-	void (*irq_callback)(running_machine *, int);		/* IRQ callback */
+	void (*irq_callback)(const device_config *, int);		/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
-	read8_device_func ext_ram_read;		/* external RAM read handler */
-	write8_device_func ext_ram_write;	/* external RAM write handler */
+	devcb_resolved_read8 ext_ram_read;		/* external RAM read handler */
+	devcb_resolved_write8 ext_ram_write;	/* external RAM write handler */
 
 #if MAKE_WAVS
 	void *		wavresample;			/* resampled waveform */
@@ -131,8 +132,17 @@ static const timer_fired_func update_irq_state_cb[] =
 };
 
 
+INLINE ymz280b_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_YMZ280B);
+	return (ymz280b_state *)device->token;
+}
 
-INLINE void update_irq_state(struct YMZ280BChip *chip)
+
+INLINE void update_irq_state(ymz280b_state *chip)
 {
 	int irq_bits = chip->status_register & chip->irq_mask;
 
@@ -145,20 +155,20 @@ INLINE void update_irq_state(struct YMZ280BChip *chip)
 	{
 		chip->irq_state = 1;
 		if (chip->irq_callback)
-			(*chip->irq_callback)(chip->device->machine, 1);
+			(*chip->irq_callback)(chip->device, 1);
 		else logerror("YMZ280B: IRQ generated, but no callback specified!");
 	}
 	else if (!irq_bits && chip->irq_state)
 	{
 		chip->irq_state = 0;
 		if (chip->irq_callback)
-			(*chip->irq_callback)(chip->device->machine, 0);
+			(*chip->irq_callback)(chip->device, 0);
 		else logerror("YMZ280B: IRQ generated, but no callback specified!");
 	}
 }
 
 
-INLINE void update_step(struct YMZ280BChip *chip, struct YMZ280BVoice *voice)
+INLINE void update_step(ymz280b_state *chip, struct YMZ280BVoice *voice)
 {
 	double frequency;
 
@@ -193,7 +203,7 @@ INLINE void update_volumes(struct YMZ280BVoice *voice)
 
 static STATE_POSTLOAD( YMZ280B_state_save_update_step )
 {
-	struct YMZ280BChip *chip = param;
+	ymz280b_state *chip = param;
 	int j;
 	for (j = 0; j < 8; j++)
 	{
@@ -207,7 +217,7 @@ static STATE_POSTLOAD( YMZ280B_state_save_update_step )
 
 static void update_irq_state_timer_common(void *param, int voicenum)
 {
-	struct YMZ280BChip *chip = param;
+	ymz280b_state *chip = param;
 	struct YMZ280BVoice *voice = &chip->voice[voicenum];
 
 	if(!voice->irq_schedule) return;
@@ -490,7 +500,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 
 static STREAM_UPDATE( ymz280b_update )
 {
-	struct YMZ280BChip *chip = param;
+	ymz280b_state *chip = param;
 	stream_sample_t *lacc = outputs[0];
 	stream_sample_t *racc = outputs[1];
 	int v;
@@ -623,25 +633,25 @@ static STREAM_UPDATE( ymz280b_update )
 
 /**********************************************************************************************
 
-     SND_START( ymz280b ) -- start emulation of the YMZ280B
+     DEVICE_START( ymz280b ) -- start emulation of the YMZ280B
 
 ***********************************************************************************************/
 
-static SND_START( ymz280b )
+static DEVICE_START( ymz280b )
 {
 	static const ymz280b_interface defintrf = { 0 };
 	const ymz280b_interface *intf = (device->static_config != NULL) ? device->static_config : &defintrf;
-	struct YMZ280BChip *chip = device->token;
+	ymz280b_state *chip = get_safe_token(device);
 
 	chip->device = device;
-	chip->ext_ram_read = intf->ext_read;
-	chip->ext_ram_write = intf->ext_write;
+	devcb_resolve_read8(&chip->ext_ram_read, &intf->ext_read, device);
+	devcb_resolve_write8(&chip->ext_ram_write, &intf->ext_write, device);
 
 	/* compute ADPCM tables */
 	compute_tables();
 
 	/* initialize the rest of the structure */
-	chip->master_clock = (double)clock / 384.0;
+	chip->master_clock = (double)device->clock / 384.0;
 	chip->region_base = device->region;
 	chip->irq_callback = intf->irq_callback;
 
@@ -700,36 +710,11 @@ static SND_START( ymz280b )
 
 /**********************************************************************************************
 
-     SND_STOP( YMZ280B_sh ) -- stop emulation of the YMZ280B
-
-***********************************************************************************************/
-
-#ifdef UNUSED_FUNCTION
-SND_STOP( YMZ280B_sh )
-{
-#if MAKE_WAVS
-{
-	int i;
-
-	for (i = 0; i < MAX_BSMT2000; i++)
-	{
-		if (ymz280b[i].wavresample)
-			wav_close(ymz280b[i].wavresample);
-	}
-}
-#endif
-}
-#endif
-
-
-
-/**********************************************************************************************
-
      write_to_register -- handle a write to the current register
 
 ***********************************************************************************************/
 
-static void write_to_register(struct YMZ280BChip *chip, int data)
+static void write_to_register(ymz280b_state *chip, int data)
 {
 	struct YMZ280BVoice *voice;
 	int i;
@@ -860,10 +845,8 @@ static void write_to_register(struct YMZ280BChip *chip, int data)
 				break;
 
 			case 0x87:		/* RAM write */
-				if (chip->ext_ram_write)
-				{
-					chip->ext_ram_write(chip->device, chip->rom_readback_addr, data);
-				}
+				if (chip->ext_ram_write.write)
+					devcb_call_write8(&chip->ext_ram_write, chip->rom_readback_addr, data);
 				else
 					logerror("YMZ280B attempted RAM write to %X\n", chip->rom_readback_addr);
 				break;
@@ -913,7 +896,7 @@ static void write_to_register(struct YMZ280BChip *chip, int data)
 
 ***********************************************************************************************/
 
-static int compute_status(struct YMZ280BChip *chip)
+static int compute_status(ymz280b_state *chip)
 {
 	UINT8 result;
 
@@ -943,150 +926,26 @@ static int compute_status(struct YMZ280BChip *chip)
 
 ***********************************************************************************************/
 
-READ8_HANDLER( ymz280b_status_0_r )
+READ8_DEVICE_HANDLER( ymz280b_r )
 {
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	return compute_status(chip);
+	ymz280b_state *chip = get_safe_token(device);
+
+	if ((offset & 1) == 0)
+		return devcb_call_read8(&chip->ext_ram_read, chip->rom_readback_addr++ - 1);
+	else
+		return compute_status(chip);
 }
 
-READ8_HANDLER( ymz280b_status_1_r )
+
+WRITE8_DEVICE_HANDLER( ymz280b_w )
 {
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	return compute_status(chip);
+	ymz280b_state *chip = get_safe_token(device);
+
+	if ((offset & 1) == 0)
+		chip->current_register = data;
+	else
+		write_to_register(chip, data);
 }
-
-READ16_HANDLER( ymz280b_status_0_lsb_r )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	return compute_status(chip);
-}
-
-READ16_HANDLER( ymz280b_status_0_msb_r )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	return compute_status(chip) << 8;
-}
-
-READ16_HANDLER( ymz280b_status_1_lsb_r )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	return compute_status(chip);
-}
-
-READ16_HANDLER( ymz280b_status_1_msb_r )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	return compute_status(chip) << 8;
-}
-
-/**********************************************************************************************
-
-     ymz280b_register_0_w/ymz280b_register_1_w -- handle a write to the register select
-
-***********************************************************************************************/
-
-WRITE8_HANDLER( ymz280b_register_0_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	chip->current_register = data;
-}
-
-WRITE8_HANDLER( ymz280b_register_1_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	chip->current_register = data;
-}
-
-WRITE16_HANDLER( ymz280b_register_0_lsb_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	if (ACCESSING_BITS_0_7)	chip->current_register = data & 0xff;
-}
-
-WRITE16_HANDLER( ymz280b_register_0_msb_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	if (ACCESSING_BITS_8_15)	chip->current_register = (data >> 8) & 0xff;
-}
-
-WRITE16_HANDLER( ymz280b_register_1_lsb_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	if (ACCESSING_BITS_0_7)	chip->current_register = data & 0xff;
-}
-
-WRITE16_HANDLER( ymz280b_register_1_msb_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	if (ACCESSING_BITS_8_15)	chip->current_register = (data >> 8) & 0xff;
-}
-
-/**********************************************************************************************
-
-     ymz280b_data_0_w/ymz280b_data_1_w -- handle a write to the current register
-
-***********************************************************************************************/
-
-WRITE8_HANDLER( ymz280b_data_0_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	write_to_register(chip, data);
-}
-
-WRITE8_HANDLER( ymz280b_data_1_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	write_to_register(chip, data);
-}
-
-WRITE16_HANDLER( ymz280b_data_0_lsb_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	if (ACCESSING_BITS_0_7)	write_to_register(chip, data & 0xff);
-}
-
-WRITE16_HANDLER( ymz280b_data_0_msb_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	if (ACCESSING_BITS_8_15)	write_to_register(chip, (data >> 8) & 0xff);
-}
-
-WRITE16_HANDLER( ymz280b_data_1_lsb_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	if (ACCESSING_BITS_0_7)	write_to_register(chip, data & 0xff);
-}
-
-WRITE16_HANDLER( ymz280b_data_1_msb_w )
-{
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	if (ACCESSING_BITS_8_15)	write_to_register(chip, (data >> 8) & 0xff);
-}
-
-/**********************************************************************************************
-
-     ymz280b_data_0_r/ymz280b_data_1_r -- handle an external RAM read
-
-***********************************************************************************************/
-
-READ8_HANDLER( ymz280b_data_0_r )
-{
-	UINT8 data;
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	data = chip->ext_ram_read(chip->device, chip->rom_readback_addr - 1);
-	chip->rom_readback_addr++;
-	return data;
-}
-
-READ8_HANDLER( ymz280b_data_1_r )
-{
-	UINT8 data;
-	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	data = chip->ext_ram_read(chip->device, chip->rom_readback_addr - 1);
-	chip->rom_readback_addr++;
-	return data;
-}
-
 
 
 
@@ -1094,34 +953,24 @@ READ8_HANDLER( ymz280b_data_1_r )
  * Generic get_info
  **************************************************************************/
 
-static SND_SET_INFO( ymz280b )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-SND_GET_INFO( ymz280b )
+DEVICE_GET_INFO( ymz280b )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case SNDINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct YMZ280BChip);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ymz280b_state);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymz280b );	break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymz280b );		break;
-		case SNDINFO_PTR_STOP:							/* Nothing */									break;
-		case SNDINFO_PTR_RESET:							/* Nothing */									break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( ymz280b );		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */									break;
+		case DEVINFO_FCT_RESET:							/* Nothing */									break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case SNDINFO_STR_NAME:							strcpy(info->s, "YMZ280B");						break;
-		case SNDINFO_STR_CORE_FAMILY:					strcpy(info->s, "Yamaha Wavetable");			break;
-		case SNDINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
-		case SNDINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
-		case SNDINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "YMZ280B");						break;
+		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Yamaha Wavetable");			break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
+		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
 

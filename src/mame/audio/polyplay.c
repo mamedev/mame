@@ -47,28 +47,30 @@ void polyplay_set_channel2(int active)
 	channel_playing2 = active;
 }
 
-void polyplay_play_channel1(int data)
+void polyplay_play_channel1(running_machine *machine, int data)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 	if (data) {
 		freq1 = 2457600 / 16 / data / 8;
-		sample_set_volume(0, channel_playing1 * 1.0);
-		sample_start_raw(0, backgroundwave, ARRAY_LENGTH(backgroundwave), sizeof(backgroundwave)*freq1,1);
+		sample_set_volume(samples, 0, channel_playing1 * 1.0);
+		sample_start_raw(samples, 0, backgroundwave, ARRAY_LENGTH(backgroundwave), sizeof(backgroundwave)*freq1,1);
 	}
 	else {
-		sample_stop(0);
-		sample_stop(1);
+		sample_stop(samples, 0);
+		sample_stop(samples, 1);
 	}
 }
 
-void polyplay_play_channel2(int data)
+void polyplay_play_channel2(running_machine *machine, int data)
 {
+	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
 	if (data) {
 		freq2 = 2457600 / 16 / data / 8;
-		sample_set_volume(1, channel_playing2 * 1.0);
-		sample_start_raw(1, backgroundwave, ARRAY_LENGTH(backgroundwave), sizeof(backgroundwave)*freq2,1);
+		sample_set_volume(samples, 1, channel_playing2 * 1.0);
+		sample_start_raw(samples, 1, backgroundwave, ARRAY_LENGTH(backgroundwave), sizeof(backgroundwave)*freq2,1);
 	}
 	else {
-		sample_stop(0);
-		sample_stop(1);
+		sample_stop(samples, 0);
+		sample_stop(samples, 1);
 	}
 }

@@ -163,8 +163,9 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tbowl_adpcm_start_w )
 {
+	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (offset & 1) ? "msm2" : "msm1");
 	adpcm_pos[offset & 1] = data << 8;
-	msm5205_reset_w(offset & 1,0);
+	msm5205_reset_w(adpcm,0);
 }
 
 static WRITE8_HANDLER( tbowl_adpcm_end_w )
@@ -174,7 +175,8 @@ static WRITE8_HANDLER( tbowl_adpcm_end_w )
 
 static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 {
-	msm5205_set_volume(offset & 1, (data & 0x7f) * 100 / 0x7f);
+	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (offset & 1) ? "msm2" : "msm1");
+	msm5205_set_volume(adpcm, (data & 0x7f) * 100 / 0x7f);
 }
 
 static void tbowl_adpcm_int(const device_config *device)
@@ -182,10 +184,10 @@ static void tbowl_adpcm_int(const device_config *device)
 	int num = (strcmp(device->tag, "msm1") == 0) ? 0 : 1;
 	if (adpcm_pos[num] >= adpcm_end[num] ||
 				adpcm_pos[num] >= memory_region_length(device->machine, "adpcm")/2)
-		msm5205_reset_w(num,1);
+		msm5205_reset_w(device,1);
 	else if (adpcm_data[num] != -1)
 	{
-		msm5205_data_w(num,adpcm_data[num] & 0x0f);
+		msm5205_data_w(device,adpcm_data[num] & 0x0f);
 		adpcm_data[num] = -1;
 	}
 	else
@@ -193,17 +195,15 @@ static void tbowl_adpcm_int(const device_config *device)
 		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * num;
 
 		adpcm_data[num] = ROM[adpcm_pos[num]++];
-		msm5205_data_w(num,adpcm_data[num] >> 4);
+		msm5205_data_w(device,adpcm_data[num] >> 4);
 	}
 }
 
 static ADDRESS_MAP_START( 6206A_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(ym3812_control_port_1_w)
-	AM_RANGE(0xd801, 0xd801) AM_WRITE(ym3812_write_port_1_w)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE(SOUND, "ym1", ym3812_w)
+	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE(SOUND, "ym2", ym3812_w)
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(tbowl_adpcm_end_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(tbowl_adpcm_start_w)
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(tbowl_adpcm_vol_w)
@@ -442,12 +442,12 @@ GFXDECODE_END
 
 */
 
-static void irqhandler(running_machine *machine, int linestate)
+static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(machine->cpu[2],0,linestate);
+	cpu_set_input_line(device->machine->cpu[2],0,linestate);
 }
 
-static const ym3526_interface ym3526_config =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
@@ -523,7 +523,7 @@ static MACHINE_DRIVER_START( tbowl )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3812, 4000000)
-	MDRV_SOUND_CONFIG(ym3526_config)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 4000000)
