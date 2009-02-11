@@ -19,9 +19,13 @@ P1, P2 & P3 4-pin connectors (unkown purpose)
 2008-08:
 Added Dips and Dip locations based on Service Mode.
 
+TODO:
+- Merge this driver with SunA16 driver.
+
 Notes:
 - Maybe SA stands for SunA? The z80 memory map matches the one seen in Ultra Balloon,
-  and the only difference stands in the DAC used.
+  and the only difference stands in the DAC used. And the sprite chip is the same as
+  the one used in SunA16 driver as well.
 
 */
 
@@ -188,21 +192,94 @@ static VIDEO_UPDATE(go2000)
 		}
 	}
 
-	/*Spriteram, TODO*/
+	/*Sprite RAM code actually copied from video/suna16.c with minor modifications.*/
 	{
-		int tile,offs;
+	int offs;
 
-		for(offs=0;offs<(0x800/2);offs+=4)
+	int max_x = video_screen_get_width(screen->machine->primary_screen) - 8;
+	int max_y = video_screen_get_height(screen->machine->primary_screen) - 8;
+
+	for ( offs = 0xf800/2; offs < 0x10000/2 ; offs += 4/2 )
+	{
+		int srcpg, srcx,srcy, dimx,dimy;
+		int tile_x, tile_xinc, tile_xstart;
+		int tile_y, tile_yinc;
+		int dx, dy;
+		int flipx, y0;
+
+		int y		=	go2000_video[ offs + 0 + 0x00000 / 2 ];
+		int x		=	go2000_video[ offs + 1 + 0x00000 / 2 ];
+		int dim 	=	go2000_video2[ offs + 0 + 0x00000 / 2 ];
+
+		int bank	=	(x >> 12) & 0xf;
+
+		srcpg	=	((y & 0xf000) >> 12) + ((x & 0x0200) >> 5); // src page
+		srcx	=	((y   >> 8) & 0xf) * 2; 					// src col
+		srcy	=	((dim >> 0) & 0xf) * 2; 					// src row
+
+		switch ( (dim >> 4) & 0xc )
 		{
-			x = go2000_video[(0xf800/2)+offs+1];
-			y = go2000_video[(0xf800/2)+offs+2]-0x30;
-			tile = go2000_video[(0xf800/2)+offs+0] & 0x1fff;
-			drawgfx(bitmap,screen->machine->gfx[0],tile+0,0,0,0,x+0,y+0,cliprect,TRANSPARENCY_PEN,0xf);
-			drawgfx(bitmap,screen->machine->gfx[0],tile+1,0,0,0,x+8,y+0,cliprect,TRANSPARENCY_PEN,0xf);
-			drawgfx(bitmap,screen->machine->gfx[0],tile+2,0,0,0,x+0,y+8,cliprect,TRANSPARENCY_PEN,0xf);
-			drawgfx(bitmap,screen->machine->gfx[0],tile+3,0,0,0,x+8,y+8,cliprect,TRANSPARENCY_PEN,0xf);
-
+			case 0x0:	dimx = 2;	dimy =	2;	y0 = 0x100; break;
+			case 0x4:	dimx = 4;	dimy =	4;	y0 = 0x100; break;
+			case 0x8:	dimx = 2;	dimy = 32;	y0 = 0x130; break;
+			default:
+			case 0xc:	dimx = 4;	dimy = 32;	y0 = 0x120; break;
 		}
+
+		if (dimx==4)	{ flipx = srcx & 2; 	srcx &= ~2; }
+		else			{ flipx = 0; }
+
+		x = (x & 0xff) - (x & 0x100);
+		y = (y0 - (y & 0xff) - dimy*8 ) & 0xff;
+
+		if (flipx)	{ tile_xstart = dimx-1; tile_xinc = -1; }
+		else		{ tile_xstart = 0;		tile_xinc = +1; }
+
+		tile_y = 0; 	tile_yinc = +1;
+
+		for (dy = 0; dy < dimy * 8; dy += 8)
+		{
+			tile_x = tile_xstart;
+
+			for (dx = 0; dx < dimx * 8; dx += 8)
+			{
+				int addr	=	(srcpg * 0x20 * 0x20) +
+								((srcx + tile_x) & 0x1f) * 0x20 +
+								((srcy + tile_y) & 0x1f);
+
+				int tile	=	go2000_video[ addr + 0x00000 / 2 ];
+				int attr	=	go2000_video2[ addr + 0x00000 / 2 ];
+
+				int sx		=	x + dx;
+				int sy		=	(y + dy) & 0xff;
+
+				int tile_flipx	=	tile & 0x4000;
+				int tile_flipy	=	tile & 0x8000;
+
+				if (flipx)	tile_flipx = !tile_flipx;
+
+				if (flip_screen_get(screen->machine))
+				{
+					sx = max_x - sx;
+					sy = max_y - sy;
+					tile_flipx = !tile_flipx;
+					tile_flipy = !tile_flipy;
+				}
+
+				drawgfx(	bitmap, screen->machine->gfx[0],
+							(tile & 0x1fff) + bank*0x4000,
+							attr,
+							tile_flipx, tile_flipy,
+							sx, sy,
+							cliprect,TRANSPARENCY_PEN,15	);
+
+				tile_x += tile_xinc;
+			}
+
+			tile_y += tile_yinc;
+		}
+
+	}
 	}
 
 	return 0;
@@ -260,4 +337,4 @@ ROM_START( go2000 )
 ROM_END
 
 
-GAME( 2000, go2000,    0, go2000,    go2000,    0, ROT0,  "SA", "Go 2000", GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, go2000,    0, go2000,    go2000,    0, ROT0,  "SA", "Go 2000", 0 )
