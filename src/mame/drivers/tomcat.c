@@ -197,6 +197,7 @@ static READ16_HANDLER(dsp_BIO_r)
 		else
 		{
 			assert(0);
+			return 0;
 		}
 	}
 	else
