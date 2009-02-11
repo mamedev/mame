@@ -895,9 +895,19 @@ static DRIVER_INIT (luckygrl)
 }
 
 
-/* flyer shows a bet version of Jangou Lady too,does it truly exists?*/
 GAME( 1983, jangou,    0,    jangou,   jangou,    0,        ROT0, "Nichibutsu",   "Jangou [BET] (Japan)", GAME_NO_COCKTAIL )
-/* Jangou Night */
 GAME( 1984, jngolady,  0,    jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
 GAME( 1984, cntrygrl,  0,    cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
+/* The following might not run there... */
 GAME( 1984?,luckygrl,  0,    cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing", 		  "Lucky Girl? (Wing)", GAME_NOT_WORKING )
+
+/*
+Some other games that might run on this HW:
+	Jangou (non-BET version) (WR score listed on MyCom magazines)
+	Jangou Night (first "mature" mahjong ever made)
+	Jangou Lady (BET version) (images on the flyer, it might not exists)
+	Hana Royal
+	Hana Puter
+	Royal Card
+	Fruits Bunny (clone of Country Girl)
+*/
