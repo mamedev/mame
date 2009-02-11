@@ -27,7 +27,7 @@ custom IC on startup!! (writes to 000414)
 
 // add two numbers generating carry from one bit to the next only if
 // the corresponding bit in carry_mask is 1
-static int partial_carry_sum(int add1,int add2,int carry_mask,int bits)
+static UINT32 partial_carry_sum(UINT32 add1,UINT32 add2,UINT32 carry_mask,int bits)
 {
 	int i,res,carry;
 
@@ -53,19 +53,19 @@ static int partial_carry_sum(int add1,int add2,int carry_mask,int bits)
 	return res;
 }
 
-static int partial_carry_sum24(int add1,int add2,int carry_mask)
+static UINT32 partial_carry_sum32(UINT32 add1,UINT32 add2,UINT32 carry_mask)
+{
+	return partial_carry_sum(add1,add2,carry_mask,32);
+}
+
+static UINT32 partial_carry_sum24(UINT32 add1,UINT32 add2,UINT32 carry_mask)
 {
 	return partial_carry_sum(add1,add2,carry_mask,24);
 }
 
-static int partial_carry_sum16(int add1,int add2,int carry_mask)
+static UINT32 partial_carry_sum16(UINT32 add1,UINT32 add2,UINT32 carry_mask)
 {
 	return partial_carry_sum(add1,add2,carry_mask,16);
-}
-
-static int partial_carry_sum8(int add1,int add2,int carry_mask)
-{
-	return partial_carry_sum(add1,add2,carry_mask,8);
 }
 
 
@@ -183,31 +183,28 @@ void seibuspi_rise11_bg_decrypt(UINT8 *rom, int size)
 
 
 
-static int dec12(int val)
-{
-	return partial_carry_sum16( val, 0x018a, 0x018a ) ^ 0xccd8;
-}
+/******************************************************************************************
 
-static int dec3(int val)
-{
-	return partial_carry_sum8( val, 0x05, 0x1d ) ^ 0x6c;
-}
+rdft2
 
-static int dec4(int val)
-{
-	return partial_carry_sum8( val, 0x42, 0x46 ) ^ 0xa2;
-}
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00000000 & 0000FFFF
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000ABCB & 0000FFFF // okok
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000ABCB & 0000FFFF	// duplicate
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00006543 & 0000FFFF	// okok
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 000021D9 & 0000FFFF	// ok??
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00006655 & 0000FFFF // okok
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 000099AA & 0000FFFF // okok
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00006655 & 0000FFFF // duplicate
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 000099AA & 0000FFFF // duplicate
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00000C1D & 0000FFFF // okok
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000A346 & 0000FFFF // okok
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00005237 & 0000FFFF // okok
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000A948 & 0000FFFF // okok
 
-static int dec5(int val)
-{
-	return partial_carry_sum8( val, 0x21, 0x27 ) ^ 0x52;
-}
+		plane54   = partial_carry_sum16( plane54, 0xabcb, 0x55aa ) ^ 0x6699;
+		plane3210 = partial_carry_sum32( plane3210, 0x654321d9 ^ 0x42, 0x1d463748 ) ^ 0x0ca352a9;
 
-static int dec6(int val)
-{
-	return partial_carry_sum8( val, 0x08, 0x08 ) ^ 0x3a;
-}
-
+******************************************************************************************/
 
 static void sprite_reorder(UINT8 *buffer)
 {
@@ -222,41 +219,38 @@ static void sprite_reorder(UINT8 *buffer)
 	memcpy(buffer, temp, 64);
 }
 
-/* actually this is for the 2000 version - original version might be different */
 void seibuspi_rise10_sprite_decrypt(UINT8 *rom, int size)
 {
-	int i,j;
-	int s = size/2;
+	int i;
 
-	for( i=0; i < s; i+=32 ) {
-		sprite_reorder(&rom[2*i]);
-		sprite_reorder(&rom[2*(s+i)]);
-		sprite_reorder(&rom[2*((s*2)+i)]);
-		for( j=0; j < 32; j++ ) {
-			int b1,b2;
-			int d12,d3,d4,d5,d6;
+	for (i = 0; i < size/2; i++)
+	{
+		UINT32 plane54,plane3210;
 
-			b1 = rom[2*((s*2)+i+j)] + (rom[2*((s*2)+i+j)+1] << 8) + (rom[2*(s+i+j)] << 16) + (rom[2*(s+i+j)+1] << 24);
-			b1 = BITSWAP32(b1,
-					7,31,26,0,18,9,19,8,
-					27,6,15,21,1,28,10,20,
-					3,5,29,17,14,22,2,11,
-					23,13,24,4,16,12,25,30);
-			b2 = rom[2*(i+j)] + (rom[2*(i+j)+1] << 8);
+		plane54 = rom[0*size+2*i] + (rom[0*size+2*i+1] << 8);
+		plane3210 = BITSWAP32(
+				rom[2*size+2*i] + (rom[2*size+2*i+1] << 8) + (rom[1*size+2*i] << 16) + (rom[1*size+2*i+1] << 24),
+				23,13,24,4,16,12,25,30,
+				3,5,29,17,14,22,2,11,
+				27,6,15,21,1,28,10,20,
+				7,31,26,0,18,9,19,8);
 
-			d12 = dec12(b2);
-			d3 = dec3((b1 >>  0) & 0xff);
-			d4 = dec4((b1 >>  8) & 0xff);
-			d5 = dec5((b1 >> 16) & 0xff);
-			d6 = dec6((b1 >> 24) & 0xff);
+		plane54   = partial_carry_sum16( plane54, 0xabcb, 0x55aa ) ^ 0x6699;
+		plane3210 = partial_carry_sum32( plane3210, 0x654321d9 ^ 0x42, 0x1d463748 ) ^ 0x0ca352a9;
 
-			rom[2*(i+j)] = d12 >> 8;
-			rom[2*(i+j)+1] = d12;
-			rom[2*(s+i+j)] = d3;
-			rom[2*(s+i+j)+1] = d4;
-			rom[2*((s*2)+i+j)] = d5;
-			rom[2*((s*2)+i+j)+1] = d6;
-		}
+		rom[0*size+2*i]   = plane54   >>  8;
+		rom[0*size+2*i+1] = plane54   >>  0;
+		rom[1*size+2*i]   = plane3210 >> 24;
+		rom[1*size+2*i+1] = plane3210 >> 16;
+		rom[2*size+2*i]   = plane3210 >>  8;
+		rom[2*size+2*i+1] = plane3210 >>  0;
+	}
+
+	for (i = 0; i < size/2; i += 32)
+	{
+		sprite_reorder(&rom[0*size+2*i]);
+		sprite_reorder(&rom[1*size+2*i]);
+		sprite_reorder(&rom[2*size+2*i]);
 	}
 }
 
@@ -265,61 +259,43 @@ void seibuspi_rise10_sprite_decrypt(UINT8 *rom, int size)
 
 /******************************************************************************************
 
-rf2_eur (we don't have the gfx ROMs for this one)
-
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 00000000 & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 0000ABCB & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 0000ABCB & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 00006543 & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 000021D9 & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 00006655 & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 000099AA & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 00006655 & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 000099AA & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 00000C1D & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 0000A346 & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 00005237 & 0000FFFF
-cpu #0 (PC=002A097D): unmapped program memory dword write to 0000054C = 0000A948 & 0000FFFF
-
-        plane543 = partial_carry_sum24( plane543, 0x??????, 0x??2199 ) ^ 0x??d9aa;
-        plane210 = partial_carry_sum24( plane210,        i, 0x990c52 ) ^ 0xaa1d37;
-
 rfjet
 
 cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00000000 & 0000FFFF
 cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00000000 & 0000FFFF
-cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 000055AB & 0000FFFF
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 000055AB & 0000FFFF // okok
 cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00000000 & 0000FFFF
-cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 0000AA6A & 0000FFFF //
-cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 0000ABCB & 0000FFFF
-cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 0000DD4C & 0000FFFF //
-cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00006543 & 0000FFFF
-cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 0000D68B & 0000FFFF //
-cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 000037F2 & 0000FFFF //
-cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 000021D9 & 0000FFFF
-cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00005B3B & 0000FFFF //
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 0000AA6A & 0000FFFF // okok
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 0000ABCB & 0000FFFF // okok
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 0000DD4C & 0000FFFF // okok
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00006543 & 0000FFFF // no??
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 0000D68B & 0000FFFF // okok
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 000037F2 & 0000FFFF // okok
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 000021D9 & 0000FFFF // ????
+cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00005B3B & 0000FFFF // okok
 cpu #0 (PC=002C40F9): unmapped program memory dword write to 0000054C = 00000300 & 0000FFFF
 
-        plane543 = partial_carry_sum24( plane543, 0x01cb64, 0x01aadd ) ^ 0x016a4c;
+        plane543 = partial_carry_sum32( plane543, 0xabcb64, 0x55aadd ) ^ 0xab6a4c;
         plane210 = partial_carry_sum24( plane210,        i, 0xd6375b ) ^ 0x8bf23b;
+
 
 feversoc
 
 CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = D5A90000 & FFFF0000
 CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 4EB50000 & FFFF0000
-CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 9A4A0000 & FFFF0000
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 9A4A0000 & FFFF0000 // okok
 CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = ADB30000 & FFFF0000
-CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = E9320000 & FFFF0000 //
-CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 9DF50000 & FFFF0000
-CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 99E90000 & FFFF0000 //
-CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = B2590000 & FFFF0000
-CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 961D0000 & FFFF0000 //
-CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 8B970000 & FFFF0000 //
-CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = EAAE0000 & FFFF0000
-CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = D5AC0000 & FFFF0000 //
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = E9320000 & FFFF0000 // okok
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 9DF50000 & FFFF0000 // okok
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 99E90000 & FFFF0000 // okok
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = B2590000 & FFFF0000 // ok??
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 961D0000 & FFFF0000 // okok
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 8B970000 & FFFF0000 // okok
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = EAAE0000 & FFFF0000 // ????
+CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = D5AC0000 & FFFF0000 // okok
 CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 03000000 & FFFF0000
 
-        plane543 = partial_carry_sum24( plane543, 0x18f5b2, 0x18e999 ) ^ 0xcf32e9;
+        plane543 = partial_carry_sum32( plane543, 0x9df5b2, 0x9ae999 ) ^ 0x4a32e9;
         plane210 = partial_carry_sum24( plane210,        i, 0x968bd5 ) ^ 0x1d97ac;
         plane210 = partial_carry_sum24( plane210,        1, 0x000001 );
 
@@ -333,8 +309,8 @@ void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size,
 
 	for (i = 0; i < size/2; i++)
 	{
-		int b1,b2,b3;
-		int plane543,plane210;
+		UINT16 b1,b2,b3;
+		UINT32 plane543,plane210;
 
 		b1 = rom[0*size+2*i] + (rom[0*size+2*i+1] << 8);
 		b2 = rom[1*size+2*i] + (rom[1*size+2*i+1] << 8);
@@ -390,7 +366,7 @@ void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size,
 					(BIT(b1, 5)<<22) |
 					(BIT(b3,15)<<23);
 
-		plane543 = partial_carry_sum24( plane543, k1, k2 ) ^ k3;
+		plane543 = partial_carry_sum32( plane543, k1, k2 ) ^ k3;
 		plane210 = partial_carry_sum24( plane210,  i, k4 ) ^ k5;
 		if (feversoc_kludge)
 			plane210 = partial_carry_sum24( plane210,  1, 0x000001 );
@@ -414,11 +390,11 @@ void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size,
 
 void seibuspi_rise11_sprite_decrypt_rfjet(UINT8 *rom, int size)
 {
-	seibuspi_rise11_sprite_decrypt(rom, size, 0x01cb64, 0x01aadd, 0x016a4c, 0xd6375b, 0x8bf23b, 0);
+	seibuspi_rise11_sprite_decrypt(rom, size, 0xabcb64, 0x55aadd, 0xab6a4c, 0xd6375b, 0x8bf23b, 0);
 }
 
 
 void seibuspi_rise11_sprite_decrypt_feversoc(UINT8 *rom, int size)
 {
-	seibuspi_rise11_sprite_decrypt(rom, size, 0x18f5b2, 0x18e999, 0xcf32e9, 0x968bd5, 0x1d97ac, 1);
+	seibuspi_rise11_sprite_decrypt(rom, size, 0x9df5b2, 0x9ae999, 0x4a32e9, 0x968bd5, 0x1d97ac, 1);
 }

@@ -1297,7 +1297,7 @@ INPUT_PORTS_END
 
 #define PLANE_CHAR 0
 #define PLANE_TILE 0
-#define PLANE_SPRITE 1
+#define PLANE_SPRITE 0
 
 static const gfx_layout spi_charlayout =
 {
