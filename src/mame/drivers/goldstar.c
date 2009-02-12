@@ -5673,7 +5673,10 @@ static READ8_HANDLER( fixedvalb4_r )
 {
 	return 0xb4;
 }
-
+static READ8_HANDLER( fixedvala8_r )
+{
+	return 0xa8;
+}
 static DRIVER_INIT( schery97 )
 {
 	int i;
@@ -5691,7 +5694,9 @@ static DRIVER_INIT( schery97 )
 
      	ROM[i] = x;
 	}
-	
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
+
+
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
 	
 }
@@ -5718,6 +5723,8 @@ static DRIVER_INIT( schery97a )
 
 		ROM[i] = x;
 	}
+	
+	
 	
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedval38_r);
 	
