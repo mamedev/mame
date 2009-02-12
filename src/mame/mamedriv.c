@@ -8608,13 +8608,23 @@ Other Sun games
 	DRIVER( nfb96seb )	/* bootleg */
 	DRIVER( carb2002 )	/* bootleg */
 	DRIVER( carb2003 )	/* bootleg */
-
-	DRIVER( sfbonus )	/* (c) 199? Amcoe */
-	DRIVER( sfbonusa )  /* (c) 199? Amcoe */
+	
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( mtonic )	/* 198? (c) Tonic */
 
+	DRIVER( sfbonus )	/* (c) 199? Amcoe */
+	DRIVER( sfbonusa )  /* (c) 199? Amcoe */
+	DRIVER( parrot3 )
+	DRIVER( hldspin1 )
+	DRIVER( hldspin2 )
+	DRIVER( fcnudge )
+	DRIVER( pickwin )
+	DRIVER( pickwina )
+	DRIVER( tighook )
+	DRIVER( robadv2 )
+	DRIVER( pirpok2 )
+	
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 	DRIVER( spielbud )	/* (c) 1985 ADP */
