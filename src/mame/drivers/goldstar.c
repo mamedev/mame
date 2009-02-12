@@ -5697,7 +5697,7 @@ static DRIVER_INIT( schery97 )
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
-	
+	/* Oki 6295 at 0x20 */
 }
 
 static READ8_HANDLER( fixedval38_r )
@@ -5726,7 +5726,7 @@ static DRIVER_INIT( schery97a )
 	
 	
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedval38_r);
-	
+	/* Oki 6295 at 0x20 */
 }
 
 static READ8_HANDLER( fixedvalea_r )
@@ -5753,7 +5753,7 @@ static DRIVER_INIT( skill98 )
 	}
 	
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1e, 0x1e, 0, 0, fixedvalea_r);
-	
+	/* Oki 6295 at 0x20 */
 }
 
 static READ8_HANDLER( fixedval68_r )
@@ -5855,6 +5855,10 @@ static READ8_HANDLER( fixedval90_r )
 	return 0x90;
 }
 
+static READ8_HANDLER( fixedval84_r )
+{
+	return 0x84;
+}
 
 static DRIVER_INIT( rp35 )
 {
@@ -5873,6 +5877,7 @@ static DRIVER_INIT( rp35 )
 		ROM[i] = x;
 	}
 
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x5e, 0x5e, 0, 0, fixedval84_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x36, 0x36, 0, 0, fixedval90_r);
 }
 
@@ -5933,6 +5938,12 @@ static READ8_HANDLER( fixedval09_r )
 	return 0x09;
 }
 
+static READ8_HANDLER( fixedval74_r )
+{
+	return 0x74;
+}
+
+
 static DRIVER_INIT( po33 )
 {
 	int i;
@@ -5950,8 +5961,9 @@ static DRIVER_INIT( po33 )
 		
 		ROM[i] = x;
 	}
-
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x32, 0x32, 0, 0, fixedval74_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x12, 0x12, 0, 0, fixedval09_r);
+	/* oki6295 at 0x20 */
 }
 
 static READ8_HANDLER( fixedval58_r )
