@@ -13,7 +13,7 @@ Video hardware
 UINT8 *himesiki_bg_ram;
 static tilemap *himesiki_bg_tilemap;
 
-static int himesiki_scrollx[1];
+static int himesiki_scrollx[2];
 static int himesiki_flip;
 
 
