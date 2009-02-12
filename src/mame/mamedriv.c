@@ -8600,7 +8600,7 @@ Other Sun games
 	DRIVER( nc96txt )	/* (c) 2000 Amcoe */
 	DRIVER( nfb96 )		/* (c) 1996 Amcoe */
 	DRIVER( nfb96a )	/* (c) 1996 Amcoe */
-	DRIVER( nfb96b )	/* (c) 1996 Amcoe */	
+	DRIVER( nfb96b )	/* (c) 1996 Amcoe */
 	DRIVER( nfb96c )	/* (c) 1996 Amcoe */
 	DRIVER( nfb96txt )	/* (c) 2000 Amcoe */
 	DRIVER( nfb96se )	/* bootleg */
@@ -8610,6 +8610,7 @@ Other Sun games
 	DRIVER( carb2003 )	/* bootleg */
 
 	DRIVER( sfbonus )	/* (c) 199? Amcoe */
+	DRIVER( sfbonusa )  /* (c) 199? Amcoe */
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( mtonic )	/* 198? (c) Tonic */
