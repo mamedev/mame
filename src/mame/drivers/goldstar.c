@@ -4891,14 +4891,7 @@ ROM_START( nfb96c )
 	ROM_CONTINUE(0x6000, 0x1000)
 	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
-	ROM_CONTINUE(0x8000, 0x1000)
-	ROM_CONTINUE(0x9000, 0x1000)
-	ROM_CONTINUE(0xa000, 0x1000)
-	ROM_CONTINUE(0xb000, 0x1000)
-	ROM_CONTINUE(0xc000, 0x1000)
-	ROM_CONTINUE(0xd000, 0x1000)
-	ROM_CONTINUE(0xe000, 0x1000)
-	ROM_CONTINUE(0xf000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
 	
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 	
@@ -4933,10 +4926,52 @@ ROM_START( nfb96c )
 ROM_END
 
 
+ROM_START( nfb96txt )
+	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "tf122axt.bin", 0x00000, 0x1000, CRC(50b5b105) SHA1(01348c463985d9967b2494b649fa02edbd61f698) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+	
+	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	
+	/* these graphic roms display a different copyright */	
+	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
+	ROM_LOAD( "txfbh.bin",  0x00000, 0x10000, CRC(9e9ba897) SHA1(901bb2596ff67c0290977fd508247aa1da0a09b9) )
+	ROM_LOAD( "txfbl.bin",  0x10000, 0x10000, CRC(d1b8920c) SHA1(c6dc065134724baafed4c1cfa4aaf3c23dfb7a32) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
 
 
-
-ROM_START( csel96 )
+ROM_START( nc96 )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "ch362c1.bin", 0x00000, 0x1000, CRC(10fa984b) SHA1(92ed9838db28deca038c4a5c080a723075ae0c53) )
 	ROM_CONTINUE(0x4000, 0x1000)
@@ -4981,7 +5016,7 @@ ROM_START( csel96 )
 ROM_END
 
 
-ROM_START( csel96a )
+ROM_START( nc96a )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "ch363c1.bin", 0x00000, 0x1000, CRC(e566cea3) SHA1(be81b21267ae2ff64c4dbc58e99a9ff4bf1d21aa) ) // ?? alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
@@ -5027,7 +5062,7 @@ ROM_END
 
 
 
-ROM_START( csel96b )
+ROM_START( nc96b )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "chse354.bin", 0x00000, 0x1000, CRC(160f7b78) SHA1(537a91317e613676b748d4e4ec7015183872814b) ) // ?? alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
@@ -5073,7 +5108,7 @@ ROM_START( csel96b )
 ROM_END
 
 
-ROM_START( csel96c )
+ROM_START( nc96c )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "chse362.bin", 0x00000, 0x1000, CRC(66df35d3) SHA1(da33f6413b8cf7b472023abc3e5cfe6d52ed1418) ) // ?? alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
@@ -5088,6 +5123,50 @@ ROM_START( csel96c )
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "ch96seh.bin",  0x00000, 0x10000, CRC(65dee6ba) SHA1(77f5769ed0b745a4735576e9f0ce90dcdd9b5410) )
 	ROM_LOAD( "ch96sel.bin",  0x10000, 0x10000, CRC(c21cc114) SHA1(f7b6ff5ac34dc1a7332e8c1b9cc40f3b65deac05) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+	
+	// no proms present, using nfb96 ones
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
+	ROM_LOAD( "chu20.bin", 0x0100, 0x0100, CRC(05224f73) SHA1(051c3ee9c63f5436e4f6c355fc308f37910a88ef) )
+
+	ROM_REGION( 0x100, "sku1920.bin", 0 ) // colours again?
+	ROM_LOAD( "chu1920.bin", 0x0000, 0x0100, CRC(71b0e11d) SHA1(1d2a2a31d8571f580c0cb7f4833823841072b31f) )
+
+	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
+	// none?
+ROM_END
+
+ROM_START( nc96txt )
+	ROM_REGION( 0x20000, "main", 0 )
+	ROM_LOAD( "tc132axt.bin", 0x00000, 0x1000, CRC(a77dc042) SHA1(1076a6687da1871b666bd214a755b68f5e1aeb8c) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+	
+	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
+	ROM_LOAD( "txchh.bin",  0x00000, 0x10000, CRC(07621bde) SHA1(65fd52545a399694394e623a7249d180d1a4fa9f) )
+	ROM_LOAD( "txchl.bin",  0x10000, 0x10000, CRC(3b00b7dc) SHA1(99d513d23eea28fedf59ad272a3280abd0d3c2ab) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 	
@@ -5861,8 +5940,31 @@ static DRIVER_INIT( po33 )
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x12, 0x12, 0, 0, fixedval09_r);
 }
 
+static READ8_HANDLER( fixedval58_r )
+{
+	return 0x58;
+}
 
+static DRIVER_INIT( tc132axt )
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+	for (i = 0;i < 0x10000;i++)
+	{
+		UINT8 x = ROM[i];
+			
+		switch(i & 0x22) {
+			case 0x00: x = BITSWAP8(x^0x5f, 6,4,3,7,0,5,2,1); break;
+			case 0x02: x = BITSWAP8(x^0xe7, 4,6,3,0,7,5,1,2); break;
+			case 0x20: x = BITSWAP8(x^0x18, 0,3,5,2,4,7,1,6); break;
+			case 0x22: x = BITSWAP8(x^0x74, 2,0,4,1,6,7,3,5); break;
+		}
+		
+		ROM[i] = x;
+	}
 
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fixedval58_r);
+}
 
 
 /*********************************************
@@ -5912,16 +6014,18 @@ GAME( 1996, nfb96,    0,        cm,  cmv4,   fb36xc1,        ROT0, "Amcoe",     
 GAME( 1996, nfb96a,	  nfb96,    cm,  cmv4,   fb36xc1,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 2)",                       GAME_NOT_WORKING )
 GAME( 1996, nfb96b,   nfb96,    cm,  cmv4,   fbse354,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 3)",                       GAME_NOT_WORKING )
 GAME( 1996, nfb96c,   nfb96,    cm,  cmv4,   fbse362,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 4)",                       GAME_NOT_WORKING )
+GAME( 1996, nfb96txt, nfb96,    cm,  cmv4,   tc132axt,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 5, Texas XT)",                       GAME_NOT_WORKING )
 
 GAME( 1996, roypok96, 0,        cm,  cmv4,   rp35,     ROT0, "Amcoe",             "Royal Poker '96 (set 1)",                       GAME_NOT_WORKING )
 GAME( 1996, roypok96a,roypok96, cm,  cmv4,   rp36,     ROT0, "Amcoe",             "Royal Poker '96 (set 2)",                       GAME_NOT_WORKING )
 GAME( 1996, roypok96b,roypok96, cm,  cmv4,   rp36c3,    ROT0, "Amcoe",             "Royal Poker '96 (set 3)",                       GAME_NOT_WORKING )
 GAME( 1997, pokonl97, 0,        cm,  cmv4,   po33,        ROT0, "Amcoe",             "Poker Only '97",                       GAME_NOT_WORKING )
 
-GAME( 1996, csel96,   nfb96,    cm,  cmv4,   fb36xc1,  ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 1)",                       GAME_NOT_WORKING )
-GAME( 1996, csel96a,  nfb96,    cm,  cmv4,   fb36xc1,  ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 2)",                       GAME_NOT_WORKING )
-GAME( 1996, csel96b,  nfb96,    cm,  cmv4,   fbse354,        ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 3)",                       GAME_NOT_WORKING )
-GAME( 1996, csel96c,  nfb96,    cm,  cmv4,   fbse362,        ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 4)",                       GAME_NOT_WORKING )
+GAME( 1996, nc96,   nfb96,    cm,  cmv4,   fb36xc1,  ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 1)",                       GAME_NOT_WORKING )
+GAME( 1996, nc96a,  nfb96,    cm,  cmv4,   fb36xc1,  ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 2)",                       GAME_NOT_WORKING )
+GAME( 1996, nc96b,  nfb96,    cm,  cmv4,   fbse354,        ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 3)",                       GAME_NOT_WORKING )
+GAME( 1996, nc96c,  nfb96,    cm,  cmv4,   fbse362,        ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 4)",                       GAME_NOT_WORKING )
+GAME( 2000, nc96txt,nfb96,    cm,  cmv4,   tc132axt,       ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 5, Texas XT)",                       GAME_NOT_WORKING )
 
 // these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program rom
 // some sets are messy and appear to have mismatched graphic roms, they needed to be sorted out properly

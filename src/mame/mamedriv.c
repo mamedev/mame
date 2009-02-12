@@ -8592,14 +8592,16 @@ Other Sun games
 	DRIVER( roypok96a )	/* (c) 1996 Amcoe */
 	DRIVER( roypok96b )	/* (c) 1996 Amcoe */
 	DRIVER( pokonl97 )	/* (c) 1997 Amcoe */
-	DRIVER( csel96 )	/* (c) 1996 Amcoe */
-	DRIVER( csel96a )	/* (c) 1996 Amcoe */
-	DRIVER( csel96b )	/* (c) 1996 Amcoe */
-	DRIVER( csel96c )	/* (c) 1996 Amcoe */	
+	DRIVER( nc96 )		/* (c) 1996 Amcoe */
+	DRIVER( nc96a )		/* (c) 1996 Amcoe */
+	DRIVER( nc96b )		/* (c) 1996 Amcoe */
+	DRIVER( nc96c )		/* (c) 1996 Amcoe */
+	DRIVER( nc96txt )	/* (c) 2000 Amcoe */
 	DRIVER( nfb96 )		/* (c) 1996 Amcoe */
 	DRIVER( nfb96a )	/* (c) 1996 Amcoe */
 	DRIVER( nfb96b )	/* (c) 1996 Amcoe */	
 	DRIVER( nfb96c )	/* (c) 1996 Amcoe */
+	DRIVER( nfb96txt )	/* (c) 2000 Amcoe */
 	DRIVER( nfb96se )	/* bootleg */
 	DRIVER( nfb96sea )	/* bootleg */
 	DRIVER( nfb96seb )	/* bootleg */
