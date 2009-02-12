@@ -57,9 +57,35 @@ static ADDRESS_MAP_START( sfbonus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
+static READ8_HANDLER( sfbonus_unk_r )
+{
+	return mame_rand(space->machine);
+}
+
 static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0400, 0x0400) AM_READ(sfbonus_unk_r)	
+	AM_RANGE(0x0408, 0x0408) AM_READ(sfbonus_unk_r)	
+	AM_RANGE(0x0410, 0x0410) AM_READ(sfbonus_unk_r)	
+
+	AM_RANGE(0x0438, 0x0438) AM_READ(sfbonus_unk_r)	
+	
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE( paletteram_io_w )
+	
+	AM_RANGE(0x2400, 0x241f) AM_RAM
+
+	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_unk_r)	
+	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_unk_r)	AM_WRITE(SMH_NOP)
+
+	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_unk_r)	
+	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_unk_r) AM_WRITE(SMH_NOP)
+
+	AM_RANGE(0x3801, 0x3801) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x3802, 0x3802) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x3803, 0x3803) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x3806, 0x3806) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x3807, 0x3807) AM_WRITE(SMH_NOP)	
 ADDRESS_MAP_END
+
 
 VIDEO_START(sfbonus)
 {

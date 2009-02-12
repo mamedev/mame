@@ -6040,6 +6040,40 @@ static DRIVER_INIT( tc132axt )
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fixedval58_r);
 }
 
+static READ8_HANDLER( fixedvale4_r )
+{
+	return 0xe4;
+}
+
+static READ8_HANDLER( fixedvalc7_r )
+{
+	return 0xc7;
+}
+
+static DRIVER_INIT( match133 )
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+	for (i = 0;i < 0x10000;i++)
+	{
+		UINT8 x = ROM[i];
+			
+		switch(i & 0x12) {
+			case 0x00: x = BITSWAP8(x^0xde, 3,2,1,0,7,6,5,4); break;
+			case 0x02: x = BITSWAP8(x^0x3d, 1,0,7,6,5,4,3,2); break;
+			case 0x10: x = BITSWAP8(x^0x2f, 4,3,2,1,0,7,6,5); break;
+			case 0x12: x = BITSWAP8(x^0x5c, 4,3,2,1,0,7,6,5); break;
+		}
+		
+		ROM[i] = x;
+	}
+	
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedvalc7_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1a, 0x1a, 0, 0, fixedvale4_r);
+}
+
+
+
 
 /*********************************************
 *                Game Drivers                *
@@ -6080,7 +6114,7 @@ GAME( 198?, mtonic,   0,        ncb3,     cmv801,   0,        ROT0, "Tonic",    
 
 
 GAME( 1998, skill98, 0,         cm,  cmv4,   skill98, ROT0, "Amcoe",             "Skill '98",                       GAME_NOT_WORKING )
-GAME( 1998, match98, 0,         cm,  cmv4,   skill98, ROT0, "Amcoe",             "Match '98",                       GAME_NOT_WORKING )
+GAME( 1998, match98, 0,         cm,  cmv4,   match133, ROT0, "Amcoe",             "Match '98",                       GAME_NOT_WORKING )
 
 GAME( 1997, schery97, 0,        cm,  cmv4,   schery97, ROT0, "Amcoe",             "Skill Cherry '97 (set 1)",               GAME_NOT_WORKING )
 GAME( 1997, schery97a,schery97, cm,  cmv4,   schery97a,ROT0, "Amcoe",             "Skill Cherry '97 (set 2)",               GAME_NOT_WORKING )
