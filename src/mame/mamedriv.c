@@ -8586,6 +8586,7 @@ Other Sun games
 	DRIVER( luckgrln )	/* (c) 1991 Wing Co. Ltd */
 
 	DRIVER( skill98 )	/* (c) 1998 Amcoe */
+	DRIVER( match98 )	/* (c) 1998 Amcoe */
 	DRIVER( schery97 )	/* (c) 1998 Amcoe */
 	DRIVER( schery97a )	/* (c) 1998 Amcoe */
 	DRIVER( roypok96 )	/* (c) 1996 Amcoe */
