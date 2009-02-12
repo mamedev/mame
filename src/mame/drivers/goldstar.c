@@ -5694,9 +5694,8 @@ static DRIVER_INIT( schery97 )
 
      	ROM[i] = x;
 	}
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
 
-
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
 	
 }
@@ -5794,6 +5793,11 @@ static READ8_HANDLER( fixedval96_r )
 	return 0x96;
 }
 
+static READ8_HANDLER( fixedvalaa_r )
+{
+	return 0xaa;
+}
+
 static DRIVER_INIT( fbse354 )
 {
 	int i;
@@ -5810,9 +5814,12 @@ static DRIVER_INIT( fbse354 )
 		}
 		ROM[i] = x;
 	}
-	
+	// nfb96b needs both of these
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x23, 0x23, 0, 0, fixedval80_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x6e, 0x6e, 0, 0, fixedval96_r); // csel96b
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x5a, 0x5a, 0, 0, fixedvalaa_r);
+	
+	// csel96b
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x6e, 0x6e, 0, 0, fixedval96_r); 
 
 }
 
@@ -6016,7 +6023,7 @@ GAME( 1998, skill98, 0,         cm,  cmv4,   skill98, ROT0, "Amcoe",            
 
 GAME( 1997, schery97, 0,        cm,  cmv4,   schery97, ROT0, "Amcoe",             "Skill Cherry '97 (set 1)",               GAME_NOT_WORKING )
 GAME( 1997, schery97a,schery97, cm,  cmv4,   schery97a,ROT0, "Amcoe",             "Skill Cherry '97 (set 2)",               GAME_NOT_WORKING )
-
+ 
 GAME( 1996, nfb96,    0,        cm,  cmv4,   fb36xc1,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 1)",                       GAME_NOT_WORKING )
 GAME( 1996, nfb96a,	  nfb96,    cm,  cmv4,   fb36xc1,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 2)",                       GAME_NOT_WORKING )
 GAME( 1996, nfb96b,   nfb96,    cm,  cmv4,   fbse354,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 3)",                       GAME_NOT_WORKING )
