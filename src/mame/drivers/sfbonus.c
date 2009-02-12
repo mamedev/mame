@@ -180,6 +180,6 @@ static DRIVER_INIT( sfbonus )
 	}
 }
 
-GAME( 199?, sfbonus,    0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, sfbonusa,   sfbonus,  sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, sfbonus,    0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, sfbonusa,   sfbonus,  sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
