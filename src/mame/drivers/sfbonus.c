@@ -43,8 +43,17 @@ static WRITE8_HANDLER( paletteram_io_w )
 	}
 }
 
+static UINT8* sfbonus_videoram;
+
+
+static WRITE8_HANDLER( sfbonus_videoram_w )
+{
+	sfbonus_videoram[offset] = data;
+	
+}
+
 static ADDRESS_MAP_START( sfbonus_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_ROM //writes to 0-7fff?
+	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM) AM_WRITE(sfbonus_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -59,6 +68,22 @@ VIDEO_START(sfbonus)
 
 VIDEO_UPDATE(sfbonus)
 {
+	int y,x;
+	int count = 0;
+	const gfx_element *gfx = screen->machine->gfx[0];
+	
+	for (y=0;y<64;y++)
+	{
+		for (x=0;x<64;x++)
+		{
+			UINT16 tiledat = sfbonus_videoram[count] | (sfbonus_videoram[count+1]<<8);
+			count+=2;
+			
+			drawgfx(bitmap,gfx,tiledat,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+
+		}
+	
+	}
 	return 0;
 }
 
@@ -76,11 +101,27 @@ static const gfx_layout sfbonus_layout =
 	8*64
 };
 
+static const gfx_layout sfbonus32_layout =
+{
+	8,32,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,
+      8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64,
+	  16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
+	  24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64
+	  },
+	32*64
+};
+
+
 
 static GFXDECODE_START( sfbonus )
 	GFXDECODE_ENTRY( "gfx1", 0, sfbonus_layout,   0x0, 2  )
-	GFXDECODE_ENTRY( "gfx2", 0, sfbonus_layout,   0x0, 2  )
-	GFXDECODE_ENTRY( "gfx3", 0, sfbonus_layout,   0x0, 2  )
+	GFXDECODE_ENTRY( "gfx2", 0, sfbonus32_layout,   0x0, 2  )
+	GFXDECODE_ENTRY( "gfx3", 0, sfbonus32_layout,   0x0, 2  )
 GFXDECODE_END
 
 
@@ -118,6 +159,9 @@ ROM_START( sfbonus )
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+
+	
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "skfbrom3.bin", 0x00000, 0x80000, CRC(36119517) SHA1(241bb256ab3ba595dcb0c81fd2e60ed35dd7c197) )
 	ROM_LOAD16_BYTE( "skfbrom4.bin", 0x00001, 0x80000, CRC(a655bac1) SHA1(0faea01c09409f9182f08370dcc0b466a799f17f) )
@@ -140,6 +184,8 @@ ROM_START( sfbonusa )
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "skfbrom3.bin", 0x00000, 0x80000, CRC(36119517) SHA1(241bb256ab3ba595dcb0c81fd2e60ed35dd7c197) )
 	ROM_LOAD16_BYTE( "skfbrom4.bin", 0x00001, 0x80000, CRC(a655bac1) SHA1(0faea01c09409f9182f08370dcc0b466a799f17f) )
@@ -178,6 +224,10 @@ static DRIVER_INIT( sfbonus )
 
 		ROM[i] = x;
 	}
+	
+	sfbonus_videoram = memory_region(machine,"user1");
+	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
+	
 }
 
 GAME( 199?, sfbonus,    0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
