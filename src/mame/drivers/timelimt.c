@@ -186,7 +186,7 @@ static INPUT_PORTS_START( progress )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "20,000 & 100,000" )
 	PORT_DIPSETTING(    0x20, "50,000 & 200,000" )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) /* Manual shows "SCREEN" Table=On / Upright=Off */
