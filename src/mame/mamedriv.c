@@ -8589,6 +8589,8 @@ Other Sun games
 	DRIVER( schery97 )	/* (c) 1998 Amcoe */
 	DRIVER( schery97a )	/* (c) 1998 Amcoe */
 	DRIVER( roypok96 )	/* (c) 1996 Amcoe */
+	DRIVER( roypok96a )	/* (c) 1996 Amcoe */
+	DRIVER( roypok96b )	/* (c) 1996 Amcoe */
 	DRIVER( pokonl97 )	/* (c) 1997 Amcoe */
 	DRIVER( csel96 )	/* (c) 1996 Amcoe */
 	DRIVER( nfb96 )		/* (c) 1996 Amcoe */
