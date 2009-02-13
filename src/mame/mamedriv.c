@@ -8633,6 +8633,12 @@ Other Sun games
 	DRIVER( dblchal )
 	DRIVER( sfruitb )
 	DRIVER( fb2gen )
+	DRIVER( fb2nd )
+	DRIVER( fb4 )
+	DRIVER( act2000 )
+	DRIVER( act2000a )
+	DRIVER( ch2000 )
+	DRIVER( fb2000 )
 	
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
