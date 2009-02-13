@@ -7,6 +7,33 @@
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 
+static UINT8* sfbonus_videoram;
+
+VIDEO_START(sfbonus)
+{
+
+}
+
+VIDEO_UPDATE(sfbonus)
+{
+	int y,x;
+	int count = 0;
+	const gfx_element *gfx = screen->machine->gfx[0];
+
+	for (y=0;y<64;y++)
+	{
+		for (x=0;x<128;x++)
+		{
+			UINT16 tiledat = sfbonus_videoram[count] | (sfbonus_videoram[count+1]<<8);
+
+			drawgfx(bitmap,gfx,tiledat,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			count+=2;
+		}
+
+	}
+	return 0;
+}
+
 
 static WRITE8_HANDLER( paletteram_io_w )
 {
@@ -43,17 +70,14 @@ static WRITE8_HANDLER( paletteram_io_w )
 	}
 }
 
-static UINT8* sfbonus_videoram;
-
-
 static WRITE8_HANDLER( sfbonus_videoram_w )
 {
 	sfbonus_videoram[offset] = data;
-	
+
 }
 
 static ADDRESS_MAP_START( sfbonus_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM) AM_WRITE(sfbonus_videoram_w)
+	AM_RANGE(0x0000, 0xefff) AM_ROMBANK(1) AM_WRITE(sfbonus_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -62,58 +86,142 @@ static READ8_HANDLER( sfbonus_unk_r )
 	return mame_rand(space->machine);
 }
 
-static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0400, 0x0400) AM_READ(sfbonus_unk_r)	
-	AM_RANGE(0x0408, 0x0408) AM_READ(sfbonus_unk_r)	
-	AM_RANGE(0x0410, 0x0410) AM_READ(sfbonus_unk_r)	
+static WRITE8_HANDLER( sfbonus_bank_w )
+{
+	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 bank;
 
-	AM_RANGE(0x0438, 0x0438) AM_READ(sfbonus_unk_r)	
-	
+	bank = data & 3;
+
+	memory_set_bankptr(space->machine, 1, &ROM[bank * 0x10000]);
+}
+
+static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("IN0")
+	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("IN1")
+	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("IN2")
+
+	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("IN3")
+
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE( paletteram_io_w )
-	
+
 	AM_RANGE(0x2400, 0x241f) AM_RAM
 
-	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_unk_r)	
+	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_unk_r)
 	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_unk_r)	AM_WRITE(SMH_NOP)
 
-	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_unk_r)	
+	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_unk_r)
 	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_unk_r) AM_WRITE(SMH_NOP)
+
+	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
+	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_unk_r) AM_WRITE(SMH_NOP)
 
 	AM_RANGE(0x3801, 0x3801) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x3802, 0x3802) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x3803, 0x3803) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x3806, 0x3806) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x3807, 0x3807) AM_WRITE(SMH_NOP)	
+	AM_RANGE(0x3807, 0x3807) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
-
-VIDEO_START(sfbonus)
-{
-
-}
-
-VIDEO_UPDATE(sfbonus)
-{
-	int y,x;
-	int count = 0;
-	const gfx_element *gfx = screen->machine->gfx[0];
-	
-	for (y=0;y<64;y++)
-	{
-		for (x=0;x<64;x++)
-		{
-			UINT16 tiledat = sfbonus_videoram[count] | (sfbonus_videoram[count+1]<<8);
-			count+=2;
-			
-			drawgfx(bitmap,gfx,tiledat,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
-
-		}
-	
-	}
-	return 0;
-}
-
 static INPUT_PORTS_START( sfbonus )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Test button")  PORT_CODE(KEYCODE_Z)
+	PORT_DIPNAME( 0x02, 0x02, "IN2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout sfbonus_layout =
@@ -150,11 +258,21 @@ static GFXDECODE_START( sfbonus )
 GFXDECODE_END
 
 
+static MACHINE_RESET( sfbonus )
+{
+	UINT8 *ROM = memory_region(machine, "main");
+
+	memory_set_bankptr(machine, 1, &ROM[0]);
+}
+
 static MACHINE_DRIVER_START( sfbonus )
 	MDRV_CPU_ADD("main", Z80, 16000000) // unknown CPU
 	MDRV_CPU_PROGRAM_MAP(0,sfbonus_map)
 	MDRV_CPU_IO_MAP(0,sfbonus_io)
 	MDRV_CPU_VBLANK_INT("main",irq0_line_hold)
+//	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
+
+	MDRV_MACHINE_RESET( sfbonus )
 
 	MDRV_GFXDECODE(sfbonus)
 
@@ -162,8 +280,8 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_SIZE(128*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1)
 
 	MDRV_PALETTE_LENGTH(0x100)
 
@@ -327,7 +445,7 @@ ROM_END
 ROM_START( pirpok2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3p20.bin", 0x00000, 0x40000, CRC(0e477094) SHA1(cd35c9ac1ed4b843886b1fc554e749f38573ca21) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p3rom2.bin", 0x00000, 0x20000, CRC(db6182e4) SHA1(65f05247629d5a1f37bf179f468acf8420342d2c) )
 
@@ -385,10 +503,10 @@ static DRIVER_INIT( sfbonus )
 
 		ROM[i] = x;
 	}
-	
+
 	sfbonus_videoram = auto_malloc(0x10000);
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
-	
+
 }
 
 GAME( 199?, sfbonus,    0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
