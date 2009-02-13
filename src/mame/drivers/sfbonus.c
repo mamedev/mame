@@ -19,6 +19,7 @@ VIDEO_UPDATE(sfbonus)
 	int y,x;
 	int count = 0;
 	const gfx_element *gfx = screen->machine->gfx[0];
+	const gfx_element *gfx2 = screen->machine->gfx[1];
 
 	for (y=0;y<64;y++)
 	{
@@ -31,6 +32,19 @@ VIDEO_UPDATE(sfbonus)
 		}
 
 	}
+	
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<64;x++)
+		{
+			UINT16 tiledat = sfbonus_videoram[count] | (sfbonus_videoram[count+1]<<8);
+
+			drawgfx(bitmap,gfx2,tiledat,0,0,0,x*8,y*32,cliprect,TRANSPARENCY_PEN,255);
+			count+=2;
+		}
+
+	}	
+	
 	return 0;
 }
 
@@ -280,8 +294,8 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1)
+	MDRV_SCREEN_SIZE(128*8, 128*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
 
 	MDRV_PALETTE_LENGTH(0x100)
 
