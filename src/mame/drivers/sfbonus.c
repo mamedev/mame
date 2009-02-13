@@ -23,12 +23,14 @@ static UINT8 *sfbonus_vregs;
 static TILE_GET_INFO( get_sfbonus_tile_info )
 {
 	int code = sfbonus_tilemap_ram[(tile_index*2)+0] | (sfbonus_tilemap_ram[(tile_index*2)+1]<<8);
+	int flipx = (sfbonus_tilemap_ram[(tile_index*2)+1] & 0x80)>>7;
+	// bit 6 might be flipy
 
 	SET_TILE_INFO(
 			0,
 			code,
 			0,
-			0);
+			TILE_FLIPYX(flipx));
 }
 
 static TILE_GET_INFO( get_sfbonus_reel_tile_info )
@@ -103,14 +105,14 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 
 		sfbonus_reel3_ram[offset] = data;
 		tilemap_mark_tile_dirty(sfbonus_reel3_tilemap,offset/2);
-	}	
+	}
 	else if (offset<0x6000) /* 0x5800 - 0x5fff */
 	{
 		offset-=0x5800;
 
 		sfbonus_reel4_ram[offset] = data;
 		tilemap_mark_tile_dirty(sfbonus_reel4_tilemap,offset/2);
-	}	
+	}
 	else if (offset<0x8000)
 	{
 		offset -=0x6000;
@@ -144,7 +146,7 @@ VIDEO_START(sfbonus)
 	tilemap_set_scroll_cols(sfbonus_reel_tilemap, 64);
 	tilemap_set_scroll_cols(sfbonus_reel2_tilemap, 64);
 	tilemap_set_scroll_cols(sfbonus_reel3_tilemap, 64);
-	tilemap_set_scroll_cols(sfbonus_reel4_tilemap, 64);	
+	tilemap_set_scroll_cols(sfbonus_reel4_tilemap, 64);
 }
 
 
@@ -153,13 +155,13 @@ VIDEO_UPDATE(sfbonus)
 //	int y,x;
 //	int count = 0;
 //	const gfx_element *gfx2 = screen->machine->gfx[1];
-#if 0
 	tilemap_set_scrolly(sfbonus_tilemap, 0, (sfbonus_vregs[2] | sfbonus_vregs[3]<<8));
+#if 0
 	tilemap_set_scrolly(sfbonus_reel_tilemap, 0, (sfbonus_vregs[6] | sfbonus_vregs[7]<<8));
 #endif
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]);
 //	tilemap_draw(bitmap,cliprect,sfbonus_reel_tilemap,0,0);
-	
+
 	{
 		int zz;
 		int i;
@@ -167,13 +169,13 @@ VIDEO_UPDATE(sfbonus)
 		const rectangle *visarea = video_screen_get_visible_area(screen);
 		UINT8* selectbase = &sfbonus_videoram[0x600];
 		UINT8* bg_scroll = &sfbonus_videoram[0x000];
-		
+
 		for (i= 0;i < 0x80;i++)
 		{
 			int scroll;
 			scroll = bg_scroll[(i*2)+0x000] | (bg_scroll[(i*2)+0x001]<<8);
 			tilemap_set_scrolly(sfbonus_reel_tilemap, i, scroll);
-	
+
 			scroll = bg_scroll[(i*2)+0x080] | (bg_scroll[(i*2)+0x081]<<8);
 			tilemap_set_scrolly(sfbonus_reel2_tilemap, i, scroll);
 
@@ -183,7 +185,7 @@ VIDEO_UPDATE(sfbonus)
 			scroll = bg_scroll[(i*2)+0x180] | (bg_scroll[(i*2)+0x181]<<8);
 			tilemap_set_scrolly(sfbonus_reel4_tilemap, i, scroll);
 		}
-		
+
 
 
 
@@ -199,7 +201,7 @@ VIDEO_UPDATE(sfbonus)
 			clip.max_y = startclipmin+1;
 
 			if (rowenable==0)
-			{ 
+			{
 				tilemap_draw(bitmap,&clip,sfbonus_reel_tilemap,0,0);
 			}
 			else if (rowenable==0x5)
@@ -222,7 +224,7 @@ VIDEO_UPDATE(sfbonus)
 			startclipmin+=1;
 		}
 
-		
+
 		tilemap_draw(bitmap,cliprect,sfbonus_tilemap,0,0);
 	}
 
@@ -308,6 +310,11 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("IN1")
 	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("IN2")
 
+	AM_RANGE(0x0418, 0x0418) AM_READ_PORT("IN4")
+	AM_RANGE(0x0420, 0x0420) AM_READ_PORT("IN5")
+	AM_RANGE(0x0428, 0x0428) AM_READ_PORT("IN6")
+	AM_RANGE(0x0430, 0x0430) AM_READ_PORT("IN7")
+
 	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("IN3")
 
 	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
@@ -352,6 +359,61 @@ static INPUT_PORTS_START( sfbonus )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) //causes "printer busy" msg.
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Account Test")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Port Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 2") PORT_CODE(KEYCODE_X)
+	PORT_DIPNAME( 0x02, 0x02, "IN1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Stop 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("All Stop") PORT_CODE(KEYCODE_V)
+	PORT_DIPNAME( 0x40, 0x40, "IN1-1" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x02, 0x02, "IN2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Help") PORT_CODE(KEYCODE_H)
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -364,11 +426,9 @@ static INPUT_PORTS_START( sfbonus )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Move Reel") PORT_CODE(KEYCODE_Q)
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x01, 0x01, "IN4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -392,9 +452,11 @@ static INPUT_PORTS_START( sfbonus )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Test button")  PORT_CODE(KEYCODE_Z)
-	PORT_DIPNAME( 0x02, 0x02, "IN2" )
+	PORT_START("IN5")
+	PORT_DIPNAME( 0x01, 0x01, "IN5" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
@@ -415,8 +477,33 @@ static INPUT_PORTS_START( sfbonus )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_START("IN6")
+	PORT_DIPNAME( 0x01, 0x01, "IN6" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("IN7")
+	PORT_DIPNAME( 0x01, 0x01, "IN7" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -520,7 +607,7 @@ ROM_START( sfbonus )
 
 	ROM_REGION( 0x10000, "user1", 0 ) /* Z80  Code */
 
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1012,9 +1099,9 @@ static DRIVER_INIT( sfbonus )
 
 	sfbonus_reel4_ram = auto_malloc(0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel4_ram , 0x0800);
-	
-	
-	
+
+
+
 	sfbonus_videoram = memory_region(machine,"user1");
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
 
