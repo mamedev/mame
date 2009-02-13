@@ -7,32 +7,82 @@
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 
+static tilemap *sfbonus_tilemap;
+static tilemap *sfbonus_reel_tilemap;
+static UINT8 *sfbonus_tilemap_ram;
+static UINT8 *sfbonus_reel_ram;
 static UINT8* sfbonus_videoram;
 
-VIDEO_START(sfbonus)
+static TILE_GET_INFO( get_sfbonus_tile_info )
 {
+	int code = sfbonus_tilemap_ram[(tile_index*2)+0] | (sfbonus_tilemap_ram[(tile_index*2)+1]<<8);
+
+	SET_TILE_INFO(
+			0,
+			code,
+			0,
+			0);
+}
+
+static TILE_GET_INFO( get_sfbonus_reel_tile_info )
+{
+	int code = sfbonus_reel_ram[(tile_index*2)+0] | (sfbonus_reel_ram[(tile_index*2)+1]<<8);
+
+	SET_TILE_INFO(
+			1,
+			code,
+			0,
+			0);
+}
+
+
+static WRITE8_HANDLER( sfbonus_videoram_w )
+{
+	if (offset<0x4000)
+	{
+		sfbonus_tilemap_ram[offset] = data;
+		tilemap_mark_tile_dirty(sfbonus_tilemap,offset/2);
+	}
+	else if (offset<0x6000)
+	{
+		offset-=0x4000;
+		
+		sfbonus_reel_ram[offset] = data;
+		tilemap_mark_tile_dirty(sfbonus_reel_tilemap,offset/2);
+	}
+	else if (offset<0x8000)
+	{
+		// scroll regs etc.
+		//printf("access vram at %04x\n",offset);
+		sfbonus_videoram[offset-0x6000] = data;
+	}
+	else
+	{
+		printf("access vram at %04x\n",offset);
+	}
 
 }
 
+
+
+VIDEO_START(sfbonus)
+{
+	sfbonus_tilemap = tilemap_create(machine,get_sfbonus_tile_info,tilemap_scan_rows,8,8, 128, 64);
+	sfbonus_reel_tilemap = tilemap_create(machine,get_sfbonus_reel_tile_info,tilemap_scan_rows,8,32, 64, 64);
+
+	tilemap_set_transparent_pen(sfbonus_tilemap,255);
+	tilemap_set_transparent_pen(sfbonus_reel_tilemap,255);
+}
+
+
 VIDEO_UPDATE(sfbonus)
 {
-	int y,x;
-	int count = 0;
-	const gfx_element *gfx = screen->machine->gfx[0];
-	const gfx_element *gfx2 = screen->machine->gfx[1];
+//	int y,x;
+//	int count = 0;
+//	const gfx_element *gfx2 = screen->machine->gfx[1];
 
-	for (y=0;y<64;y++)
-	{
-		for (x=0;x<128;x++)
-		{
-			UINT16 tiledat = sfbonus_videoram[count] | (sfbonus_videoram[count+1]<<8);
-
-			drawgfx(bitmap,gfx,tiledat,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
-			count+=2;
-		}
-
-	}
-	
+	tilemap_draw(bitmap,cliprect,sfbonus_tilemap,0,0);
+	/*
 	for (y=0;y<32;y++)
 	{
 		for (x=0;x<64;x++)
@@ -44,7 +94,7 @@ VIDEO_UPDATE(sfbonus)
 		}
 
 	}	
-	
+	*/
 	return 0;
 }
 
@@ -84,14 +134,10 @@ static WRITE8_HANDLER( paletteram_io_w )
 	}
 }
 
-static WRITE8_HANDLER( sfbonus_videoram_w )
-{
-	sfbonus_videoram[offset] = data;
 
-}
 
 static ADDRESS_MAP_START( sfbonus_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_ROMBANK(1) AM_WRITE(sfbonus_videoram_w)
+	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK(1) AM_WRITE(sfbonus_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -117,6 +163,8 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("IN3")
 
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(SMH_NOP)	
+	
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE( paletteram_io_w )
 
 	AM_RANGE(0x2400, 0x241f) AM_RAM
@@ -127,9 +175,18 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_unk_r)
 	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_unk_r) AM_WRITE(SMH_NOP)
 
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP)		
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
 	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_unk_r) AM_WRITE(SMH_NOP)
 
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1801, 0x1801) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1802, 0x1802) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1803, 0x1803) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1804, 0x1804) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1805, 0x1805) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1806, 0x1806) AM_WRITE(SMH_NOP)	
+	
 	AM_RANGE(0x3801, 0x3801) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x3802, 0x3802) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x3803, 0x3803) AM_WRITE(SMH_NOP)
@@ -294,8 +351,8 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128*8, 128*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 128*8-1)
+	MDRV_SCREEN_SIZE(128*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1)
 
 	MDRV_PALETTE_LENGTH(0x100)
 
@@ -658,7 +715,14 @@ static DRIVER_INIT( sfbonus )
 
 		ROM[i] = x;
 	}
+	
+	sfbonus_tilemap_ram = auto_malloc(0x4000);
+	state_save_register_global_pointer(machine, sfbonus_tilemap_ram , 0x4000);
 
+	sfbonus_reel_ram = auto_malloc(0x2000);
+	state_save_register_global_pointer(machine, sfbonus_reel_ram , 0x2000);
+
+	
 	sfbonus_videoram = auto_malloc(0x10000);
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
 
