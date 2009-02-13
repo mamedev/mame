@@ -9,8 +9,14 @@
 
 static tilemap *sfbonus_tilemap;
 static tilemap *sfbonus_reel_tilemap;
+static tilemap *sfbonus_reel2_tilemap;
+static tilemap *sfbonus_reel3_tilemap;
+static tilemap *sfbonus_reel4_tilemap;
 static UINT8 *sfbonus_tilemap_ram;
 static UINT8 *sfbonus_reel_ram;
+static UINT8 *sfbonus_reel2_ram;
+static UINT8 *sfbonus_reel3_ram;
+static UINT8 *sfbonus_reel4_ram;
 static UINT8* sfbonus_videoram;
 static UINT8 *sfbonus_vregs;
 
@@ -36,26 +42,81 @@ static TILE_GET_INFO( get_sfbonus_reel_tile_info )
 			0);
 }
 
+static TILE_GET_INFO( get_sfbonus_reel2_tile_info )
+{
+	int code = sfbonus_reel2_ram[(tile_index*2)+0] | (sfbonus_reel2_ram[(tile_index*2)+1]<<8);
+
+	SET_TILE_INFO(
+			1,
+			code,
+			0,
+			0);
+}
+
+static TILE_GET_INFO( get_sfbonus_reel3_tile_info )
+{
+	int code = sfbonus_reel3_ram[(tile_index*2)+0] | (sfbonus_reel3_ram[(tile_index*2)+1]<<8);
+
+	SET_TILE_INFO(
+			1,
+			code,
+			0,
+			0);
+}
+
+static TILE_GET_INFO( get_sfbonus_reel4_tile_info )
+{
+	int code = sfbonus_reel4_ram[(tile_index*2)+0] | (sfbonus_reel4_ram[(tile_index*2)+1]<<8);
+
+	SET_TILE_INFO(
+			1,
+			code,
+			0,
+			0);
+}
+
 
 static WRITE8_HANDLER( sfbonus_videoram_w )
 {
-	if (offset<0x4000)
+	if (offset<0x4000) /* 0x0000 - 0x3fff */
 	{
 		sfbonus_tilemap_ram[offset] = data;
 		tilemap_mark_tile_dirty(sfbonus_tilemap,offset/2);
 	}
-	else if (offset<0x6000)
+	else if (offset<0x4800) /* 0x4000 - 0x47ff */
 	{
 		offset-=0x4000;
 
 		sfbonus_reel_ram[offset] = data;
 		tilemap_mark_tile_dirty(sfbonus_reel_tilemap,offset/2);
 	}
+	else if (offset<0x5000)  /* 0x4800 - 0x4fff */
+	{
+		offset-=0x4800;
+
+		sfbonus_reel2_ram[offset] = data;
+		tilemap_mark_tile_dirty(sfbonus_reel2_tilemap,offset/2);
+	}
+	else if (offset<0x5800) /* 0x5000 - 0x57ff */
+	{
+		offset-=0x5000;
+
+		sfbonus_reel3_ram[offset] = data;
+		tilemap_mark_tile_dirty(sfbonus_reel3_tilemap,offset/2);
+	}	
+	else if (offset<0x6000) /* 0x5800 - 0x5fff */
+	{
+		offset-=0x5800;
+
+		sfbonus_reel4_ram[offset] = data;
+		tilemap_mark_tile_dirty(sfbonus_reel4_tilemap,offset/2);
+	}	
 	else if (offset<0x8000)
 	{
+		offset -=0x6000;
 		// scroll regs etc.
 		//printf("access vram at %04x\n",offset);
-		sfbonus_videoram[offset-0x6000] = data;
+		sfbonus_videoram[offset] = data;
 	}
 	else
 	{
@@ -69,10 +130,21 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 VIDEO_START(sfbonus)
 {
 	sfbonus_tilemap = tilemap_create(machine,get_sfbonus_tile_info,tilemap_scan_rows,8,8, 128, 64);
-	sfbonus_reel_tilemap = tilemap_create(machine,get_sfbonus_reel_tile_info,tilemap_scan_rows,8,32, 64, 64);
+	sfbonus_reel_tilemap = tilemap_create(machine,get_sfbonus_reel_tile_info,tilemap_scan_rows,8,32, 64, 16);
+	sfbonus_reel2_tilemap = tilemap_create(machine,get_sfbonus_reel2_tile_info,tilemap_scan_rows,8,32, 64, 16);
+	sfbonus_reel3_tilemap = tilemap_create(machine,get_sfbonus_reel3_tile_info,tilemap_scan_rows,8,32, 64, 16);
+	sfbonus_reel4_tilemap = tilemap_create(machine,get_sfbonus_reel4_tile_info,tilemap_scan_rows,8,32, 64, 16);
 
-	tilemap_set_transparent_pen(sfbonus_tilemap,255);
+	tilemap_set_transparent_pen(sfbonus_tilemap,0);
 	tilemap_set_transparent_pen(sfbonus_reel_tilemap,255);
+	tilemap_set_transparent_pen(sfbonus_reel2_tilemap,255);
+	tilemap_set_transparent_pen(sfbonus_reel3_tilemap,255);
+	tilemap_set_transparent_pen(sfbonus_reel4_tilemap,255);
+
+	tilemap_set_scroll_cols(sfbonus_reel_tilemap, 64);
+	tilemap_set_scroll_cols(sfbonus_reel2_tilemap, 64);
+	tilemap_set_scroll_cols(sfbonus_reel3_tilemap, 64);
+	tilemap_set_scroll_cols(sfbonus_reel4_tilemap, 64);	
 }
 
 
@@ -81,12 +153,78 @@ VIDEO_UPDATE(sfbonus)
 //	int y,x;
 //	int count = 0;
 //	const gfx_element *gfx2 = screen->machine->gfx[1];
-
+#if 0
 	tilemap_set_scrolly(sfbonus_tilemap, 0, (sfbonus_vregs[2] | sfbonus_vregs[3]<<8));
 	tilemap_set_scrolly(sfbonus_reel_tilemap, 0, (sfbonus_vregs[6] | sfbonus_vregs[7]<<8));
+#endif
+	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]);
+//	tilemap_draw(bitmap,cliprect,sfbonus_reel_tilemap,0,0);
+	
+	{
+		int zz;
+		int i;
+		int startclipmin = 0;
+		const rectangle *visarea = video_screen_get_visible_area(screen);
+		UINT8* selectbase = &sfbonus_videoram[0x600];
+		UINT8* bg_scroll = &sfbonus_videoram[0x000];
+		
+		for (i= 0;i < 0x80;i++)
+		{
+			int scroll;
+			scroll = bg_scroll[(i*2)+0x000] | (bg_scroll[(i*2)+0x001]<<8);
+			tilemap_set_scrolly(sfbonus_reel_tilemap, i, scroll);
+	
+			scroll = bg_scroll[(i*2)+0x080] | (bg_scroll[(i*2)+0x081]<<8);
+			tilemap_set_scrolly(sfbonus_reel2_tilemap, i, scroll);
 
-	tilemap_draw(bitmap,cliprect,sfbonus_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,sfbonus_reel_tilemap,0,0);
+			scroll = bg_scroll[(i*2)+0x100] | (bg_scroll[(i*2)+0x101]<<8);
+			tilemap_set_scrolly(sfbonus_reel3_tilemap, i, scroll);
+
+			scroll = bg_scroll[(i*2)+0x180] | (bg_scroll[(i*2)+0x181]<<8);
+			tilemap_set_scrolly(sfbonus_reel4_tilemap, i, scroll);
+		}
+		
+
+
+
+		for (zz=0;zz<0x100;zz++) // -8 because of visible area (2*8 = 16)
+		{
+			rectangle clip;
+			int rowenable = selectbase[zz];
+
+			/* draw top of screen */
+			clip.min_x = visarea->min_x;
+			clip.max_x = visarea->max_x;
+			clip.min_y = startclipmin;
+			clip.max_y = startclipmin+1;
+
+			if (rowenable==0)
+			{ 
+				tilemap_draw(bitmap,&clip,sfbonus_reel_tilemap,0,0);
+			}
+			else if (rowenable==0x5)
+			{
+				tilemap_draw(bitmap,&clip,sfbonus_reel2_tilemap,0,0);
+			}
+			else if (rowenable==0xa)
+			{
+				tilemap_draw(bitmap,&clip,sfbonus_reel3_tilemap,0,0);
+			}
+			else if (rowenable==0xf)
+			{
+				tilemap_draw(bitmap,&clip,sfbonus_reel4_tilemap,0,0);
+			}
+			else
+			{
+				bitmap_fill(bitmap,&clip,screen->machine->pens[rowenable]);
+			}
+
+			startclipmin+=1;
+		}
+
+		
+		tilemap_draw(bitmap,cliprect,sfbonus_tilemap,0,0);
+	}
 
 //	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %d",sfbonus_vregs[0+test_vregs],sfbonus_vregs[1+test_vregs],sfbonus_vregs[2+test_vregs],
 //	sfbonus_vregs[3+test_vregs],sfbonus_vregs[4+test_vregs],sfbonus_vregs[5+test_vregs],sfbonus_vregs[6+test_vregs],sfbonus_vregs[7+test_vregs],test_vregs);
@@ -380,6 +518,9 @@ ROM_START( sfbonus )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfb16.bin", 0x00000, 0x40000, CRC(bfd53646) SHA1(bd58f8c6d5386649a6fc0f4bac46d1b6cd6248b1) )
 
+	ROM_REGION( 0x10000, "user1", 0 ) /* Z80  Code */
+
+	
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -860,11 +1001,21 @@ static DRIVER_INIT( sfbonus )
 	sfbonus_tilemap_ram = auto_malloc(0x4000);
 	state_save_register_global_pointer(machine, sfbonus_tilemap_ram , 0x4000);
 
-	sfbonus_reel_ram = auto_malloc(0x2000);
-	state_save_register_global_pointer(machine, sfbonus_reel_ram , 0x2000);
+	sfbonus_reel_ram = auto_malloc(0x0800);
+	state_save_register_global_pointer(machine, sfbonus_reel_ram , 0x0800);
 
+	sfbonus_reel2_ram = auto_malloc(0x0800);
+	state_save_register_global_pointer(machine, sfbonus_reel2_ram , 0x0800);
 
-	sfbonus_videoram = auto_malloc(0x10000);
+	sfbonus_reel3_ram = auto_malloc(0x0800);
+	state_save_register_global_pointer(machine, sfbonus_reel3_ram , 0x0800);
+
+	sfbonus_reel4_ram = auto_malloc(0x0800);
+	state_save_register_global_pointer(machine, sfbonus_reel4_ram , 0x0800);
+	
+	
+	
+	sfbonus_videoram = memory_region(machine,"user1");
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
 
 }
