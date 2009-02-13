@@ -3517,8 +3517,8 @@ ROM_START( spacedx )
 	ROM_LOAD( "pal16l8b-d72-06.ic50",  0x0200, 0x0104, CRC(e4aa4b2b) SHA1(46710ec46e6753656e502007b5515a56b60deb55) )
 	ROM_LOAD( "palce20v8-d72-07.ic28", 0x0400, 0x0157, CRC(6359e64c) SHA1(83786f047aef591eb147a16a282f5312b36bc489) )
 	ROM_LOAD( "palce20v8-d72-09.ic47", 0x0600, 0x0157, CRC(de1760fd) SHA1(332156699408e5b0a698f031c01f8aa85c3d5d32) )
-	ROM_LOAD( "palce16v8-d72-10.ic12-read_1", 0x0800, 0x0117, NO_DUMP CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* One or both of these is bad */
-	ROM_LOAD( "palce16v8-d72-10.ic12-read_2", 0x0800, 0x0117, NO_DUMP CRC(a01c8336) SHA1(25c0ec11e84d1b22c48bbe22f7a32cd7c5d69e94) ) /* we to need to verify this dump */
+	ROM_LOAD( "palce16v8-d72-10.ic12-read_1", 0x0800, 0x0117, BAD_DUMP CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* One or both of these is bad */
+	ROM_LOAD( "palce16v8-d72-10.ic12-read_2", 0x0800, 0x0117, BAD_DUMP CRC(a01c8336) SHA1(25c0ec11e84d1b22c48bbe22f7a32cd7c5d69e94) ) /* we to need to verify this dump */
 	ROM_LOAD( "pal20l8b-d89-04.ic40",  0x0a00, 0x0144, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
@@ -3543,8 +3543,8 @@ ROM_START( spacedxj )
 	ROM_LOAD( "pal16l8-d72-06.ic50",   0x0200, 0x0104, CRC(e96b7f37) SHA1(568087d0ab0ed55814deccc11630d3e26f765450) )
 	ROM_LOAD( "palce20v8-d72-07.ic28", 0x0400, 0x0157, CRC(6359e64c) SHA1(83786f047aef591eb147a16a282f5312b36bc489) )
 	ROM_LOAD( "palce20v8-d72-09.ic47", 0x0600, 0x0157, CRC(de1760fd) SHA1(332156699408e5b0a698f031c01f8aa85c3d5d32) )
-	ROM_LOAD( "palce16v8-d72-10.ic12-read_1", 0x0800, 0x0117, NO_DUMP CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* One or both of these is bad */
-	ROM_LOAD( "palce16v8-d72-10.ic12-read_2", 0x0800, 0x0117, NO_DUMP CRC(a01c8336) SHA1(25c0ec11e84d1b22c48bbe22f7a32cd7c5d69e94) ) /* we to need to verify this dump */
+	ROM_LOAD( "palce16v8-d72-10.ic12-read_1", 0x0800, 0x0117, BAD_DUMP CRC(a5181ba2) SHA1(8315d6efa26be2ed98d4c0b39a196033789ab947) ) /* One or both of these is bad */
+	ROM_LOAD( "palce16v8-d72-10.ic12-read_2", 0x0800, 0x0117, BAD_DUMP CRC(a01c8336) SHA1(25c0ec11e84d1b22c48bbe22f7a32cd7c5d69e94) ) /* we to need to verify this dump */
 	ROM_LOAD( "pal20l8b-d89-04.ic40",  0x0a00, 0x0144, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
