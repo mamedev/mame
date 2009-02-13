@@ -286,7 +286,7 @@ static WRITE8_HANDLER( paletteram_io_w )
 
 
 static ADDRESS_MAP_START( sfbonus_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK(1) AM_WRITE(sfbonus_videoram_w)
+	AM_RANGE(0x0000, 0xefff) AM_ROMBANK(1) AM_WRITE(sfbonus_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -605,8 +605,7 @@ ROM_START( sfbonus )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfb16.bin", 0x00000, 0x40000, CRC(bfd53646) SHA1(bd58f8c6d5386649a6fc0f4bac46d1b6cd6248b1) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) /* Z80  Code */
-
+	//ROM_REGION( 0x10000, "user1", 0 ) /* Z80  Code */
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
@@ -1060,7 +1059,28 @@ ROM_START( act2000a )
 ROM_END
 
 
+static DRIVER_INIT( sfbonus_common)
+{
+	sfbonus_tilemap_ram = auto_malloc(0x4000);
+	state_save_register_global_pointer(machine, sfbonus_tilemap_ram , 0x4000);
 
+	sfbonus_reel_ram = auto_malloc(0x0800);
+	state_save_register_global_pointer(machine, sfbonus_reel_ram , 0x0800);
+
+	sfbonus_reel2_ram = auto_malloc(0x0800);
+	state_save_register_global_pointer(machine, sfbonus_reel2_ram , 0x0800);
+
+	sfbonus_reel3_ram = auto_malloc(0x0800);
+	state_save_register_global_pointer(machine, sfbonus_reel3_ram , 0x0800);
+
+	sfbonus_reel4_ram = auto_malloc(0x0800);
+	state_save_register_global_pointer(machine, sfbonus_reel4_ram , 0x0800);
+
+
+
+	sfbonus_videoram = auto_malloc(0x10000);//memory_region(machine,"user1");
+	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
+}
 static DRIVER_INIT( sfbonus )
 {
 	int i;
@@ -1084,27 +1104,49 @@ static DRIVER_INIT( sfbonus )
 
 		ROM[i] = x;
 	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
 
-	sfbonus_tilemap_ram = auto_malloc(0x4000);
-	state_save_register_global_pointer(machine, sfbonus_tilemap_ram , 0x4000);
+DRIVER_INIT(act2000)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
 
-	sfbonus_reel_ram = auto_malloc(0x0800);
-	state_save_register_global_pointer(machine, sfbonus_reel_ram , 0x0800);
+	for(i=0;i<0x40000;i++)
+	{
+		UINT8 x = ROM[i];
 
-	sfbonus_reel2_ram = auto_malloc(0x0800);
-	state_save_register_global_pointer(machine, sfbonus_reel2_ram , 0x0800);
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x25, 1,2,7,6,5,4,3,0); break;		
+			case 1: x = BITSWAP8(x^0xE6, 1,7,6,5,4,3,0,2); break;	
+			case 2: x = BITSWAP8(x^0x20, 2,4,1,7,6,5,0,3); break;			
+			case 3: x = BITSWAP8(x^0xBF, 0,3,1,2,4,7,6,5); break;		
+			case 4: x = BITSWAP8(x^0x2E, 1,3,7,6,5,2,0,4); break;		
+			case 5: x = BITSWAP8(x^0xE0, 3,7,6,5,2,0,4,1); break;			
+			case 6: x = BITSWAP8(x^0x2D, 4,1,2,7,6,5,0,3); break;
+			case 7: x = BITSWAP8(x^0xB2, 2,0,4,1,3,7,6,5); break;
+			
+		}
 
-	sfbonus_reel3_ram = auto_malloc(0x0800);
-	state_save_register_global_pointer(machine, sfbonus_reel3_ram , 0x0800);
-
-	sfbonus_reel4_ram = auto_malloc(0x0800);
-	state_save_register_global_pointer(machine, sfbonus_reel4_ram , 0x0800);
-
-
-
-	sfbonus_videoram = memory_region(machine,"user1");
-	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
-
+		ROM[i] = x;
+	}
+	
+	#if 0
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decr_%s", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(ROM, 0x40000, 1, fp);
+			fclose(fp);
+		}
+	}	
+	#endif
+	
+	DRIVER_INIT_CALL(sfbonus_common);	
 }
 
 GAME( 199?, sfbonus,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -1127,8 +1169,8 @@ GAME( 2000, sfruitb,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amco
 GAME( 2000, fb2gen,      0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb2nd,       0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb4,         0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Fruit Bonus 4", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, act2000,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Action 2000 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, act2000a,    act2000,  sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Action 2000 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, act2000,     0,        sfbonus,    sfbonus,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, act2000a,    act2000,  sfbonus,    sfbonus,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 //sets below are incomplete
 GAME( 2000, ch2000,      0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Cherry 2000", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb2000,      0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Fruit Bonus 2000", GAME_NOT_WORKING|GAME_NO_SOUND )
