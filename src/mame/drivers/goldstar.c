@@ -6286,21 +6286,21 @@ GAME( 198?, mtonic,    0,        ncb3,     cmv801,   0,         ROT0, "Tonic",  
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT       ROT    COMPANY    FULLNAME                                                FLAGS  */
 
-GAME( 1997, schery97,  0,        cm,       schery97, schery97,  ROT0, "Amcoe",   "Skill Cherry '97 (ver. sc3.52)",                        0 )	/* running in CB hardware */
-GAME( 1997, schery97a, schery97, cm,       schery97, schery97a, ROT0, "Amcoe",   "Skill Cherry '97 (ver. sc3.52c4)",                      0 )	/* running in C4 hardware */
-GAME( 1998, skill98,   0,        cm,       schery97, skill98,   ROT0, "Amcoe",   "Skill '98 (ver. s98-1.33)",                             0 )
-GAME( 1998, match98,   0,        cm,       cmv4,     match133,  ROT0, "Amcoe",   "Match '98",                                             GAME_NOT_WORKING )
+GAME( 1997, schery97,  0,        cm,       schery97, schery97,  ROT0, "Amcoe",   "Skill Cherry '97 (ver. sc3.52)",                        GAME_NO_SOUND )	/* running in CB hardware */
+GAME( 1997, schery97a, schery97, cm,       schery97, schery97a, ROT0, "Amcoe",   "Skill Cherry '97 (ver. sc3.52c4)",                      GAME_NO_SOUND )	/* running in C4 hardware */
+GAME( 1998, skill98,   0,        cm,       schery97, skill98,   ROT0, "Amcoe",   "Skill '98 (ver. s98-1.33)",                             GAME_NO_SOUND )
+GAME( 1998, match98,   0,        cm,       cmv4,     match133,  ROT0, "Amcoe",   "Match '98 (ver. 1.33)",                                 GAME_NOT_WORKING )
 
-GAME( 1996, nfb96,     0,        cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 1)",           GAME_NOT_WORKING )
-GAME( 1996, nfb96a,	   nfb96,    cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 2)",           GAME_NOT_WORKING )
-GAME( 1996, nfb96b,    nfb96,    cm,       cmv4,     fbse354,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 3)",           GAME_NOT_WORKING )
-GAME( 1996, nfb96c,    nfb96,    cm,       cmv4,     fbse362,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 4)",           GAME_NOT_WORKING )
+GAME( 1996, nfb96,     0,        cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 1)",           GAME_NOT_WORKING )	/* ver. 00-3.62 */
+GAME( 1996, nfb96a,	   nfb96,    cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 2)",           GAME_NOT_WORKING )	/* ver. 02-3.63 */
+GAME( 1996, nfb96b,    nfb96,    cm,       cmv4,     fbse354,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 3)",           GAME_NOT_WORKING )	/* ver. 00-3.54 */
+GAME( 1996, nfb96c,    nfb96,    cm,       cmv4,     fbse362,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 4)",           GAME_NOT_WORKING )	/* ver. 00-3.62 ??? */
 GAME( 1996, nfb96txt,  nfb96,    cm,       cmv4,     tc132axt,  ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 5, Texas XT)", GAME_NOT_WORKING )
 
-GAME( 1996, roypok96,  0,        cm,       cmv4,     rp35,      ROT0, "Amcoe",   "Royal Poker '96 (set 1)",                               GAME_NOT_WORKING )
-GAME( 1996, roypok96a, roypok96, cm,       cmv4,     rp36,      ROT0, "Amcoe",   "Royal Poker '96 (set 2)",                               GAME_NOT_WORKING )
-GAME( 1996, roypok96b, roypok96, cm,       cmv4,     rp36c3,    ROT0, "Amcoe",   "Royal Poker '96 (set 3)",                               GAME_NOT_WORKING )
-GAME( 1997, pokonl97,  0,        cm,       cmv4,     po33,      ROT0, "Amcoe",   "Poker Only '97",                                        GAME_NOT_WORKING )
+GAME( 1996, roypok96,  0,        cm,       cmv4,     rp35,      ROT0, "Amcoe",   "Royal Poker '96 (set 1)",                               GAME_NOT_WORKING )	/* ver. 97-3.5 */
+GAME( 1996, roypok96a, roypok96, cm,       cmv4,     rp36,      ROT0, "Amcoe",   "Royal Poker '96 (set 2)",                               GAME_NOT_WORKING )	/* ver. 98-3.6 */
+GAME( 1996, roypok96b, roypok96, cm,       cmv4,     rp36c3,    ROT0, "Amcoe",   "Royal Poker '96 (set 3)",                               GAME_NOT_WORKING )	/* ver. 98-3.6 ??? */
+GAME( 1997, pokonl97,  0,        cm,       cmv4,     po33,      ROT0, "Amcoe",   "Poker Only '97",                                        GAME_NOT_WORKING )	/* ver. 3.3 */
  
 GAME( 1996, nc96,      nfb96,    cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (set 1)",                GAME_NOT_WORKING )
 GAME( 1996, nc96a,     nfb96,    cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (set 2)",                GAME_NOT_WORKING )
