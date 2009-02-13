@@ -93,5 +93,24 @@ ROM_START( indiandr )
 	ROM_LOAD32_WORD( "indiandr.u12", 0x100002, 0x80000, CRC(4bbe67f6) SHA1(928f88387da66697f1de54f086531f600f80a15e) )
 ROM_END
 
+ROM_START( swthrt2v )
+	ROM_REGION( 0x800000, "main", 0 ) /* ARM Code */
+	ROM_LOAD32_WORD( "swthrt2v.u7",  0x000000, 0x80000, CRC(f51b2faa) SHA1(dbcfdbee92af5f89a8a2611bbc687ee0cc907642) )
+	ROM_LOAD32_WORD( "swthrt2v.u11", 0x000002, 0x80000, CRC(bd7ead91) SHA1(9f775428a4aa0b0a8ee17aed9be620edc2020c5e) )
+ROM_END
+
+ROM_START( margmgc )
+	ROM_REGION( 0x800000, "main", 0 ) /* ARM Code */
+	ROM_LOAD32_WORD( "margmgc.u7",  0x000000, 0x80000, CRC(eee7ebaf) SHA1(bad0c08578877f84325c07d51c6ed76c40b70720) )
+	ROM_LOAD32_WORD( "margmgc.u11", 0x000002, 0x80000, CRC(4901a166) SHA1(8afe6f08b4ac5c17744dff73939c4bc93124fdf1) )
+	ROM_LOAD32_WORD( "margmgc.u8",  0x100000, 0x80000, CRC(b0d78efe) SHA1(bc8b345290f4d31c6553f1e2700bc8324b4eeeac) )
+	ROM_LOAD32_WORD( "margmgc.u12", 0x100002, 0x80000, CRC(90ff59a8) SHA1(c9e342db2b5e8c3f45efa8496bc369385046e920) )
+	ROM_LOAD32_WORD( "margmgc.u9",  0x200000, 0x80000, CRC(1f0ca910) SHA1(be7a2f395eae09a29faf99ba34551fbc38f20fdb) )
+	ROM_LOAD32_WORD( "margmgc.u13", 0x200002, 0x80000, CRC(3f702945) SHA1(a6c9a848d059c1e564fdc5a65bf8c9600853edfa) )
+ROM_END
+
+
+GAME( 1995, swthrt2v, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (C - 07/09/95, Venezuela version)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1998, reelrock, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1998, indiandr, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (B - 15/12/98)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, margmgc,  0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (A - 07/07/2000)", GAME_NOT_WORKING|GAME_NO_SOUND )

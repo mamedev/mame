@@ -8571,8 +8571,10 @@ Other Sun games
 	DRIVER( caswin )	/* (c) 1985 */
 
 	/* Aristocrat Mk5 hardware */
+	DRIVER( swthrt2v )	/* (c) 1995 */
 	DRIVER( reelrock )	/* (c) 1998 */
 	DRIVER( indiandr )	/* (c) 1998 */
+	DRIVER( margmgc )	/* (c) 2000 */
 
 	/* Eagle */
 	DRIVER( janshi )
