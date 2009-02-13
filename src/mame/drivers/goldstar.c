@@ -3,6 +3,7 @@
   Golden Star
   Cherry Master
   Lucky 8 Lines
+  Some Amcoe games
 
   Golden Star and Cherry Master seem to be almost the same thing, running on
   different hardware.  There are also various bootlegs / hacks, it isn't clear
@@ -2627,7 +2628,178 @@ static INPUT_PORTS_START( kkojnoli )
 	PORT_DIPNAME( 0x80, 0x00, "W-UP Type" )			PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, "Reels (automatic)" )
 	PORT_DIPSETTING(    0x00, "Flowers (Big/Small)" )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( schery97 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Stop All / Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Stop 1 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("Stop 3 / Take / Select Card")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Stop 2 / Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("Start")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2) PORT_NAME("Note In")		/* Note In */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_Q) PORT_NAME("Key In")	/* Key In */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)							/* Coin A */
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W) PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Settings")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Stats")
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x03, "Game Level (Difficulty)" )	PORT_DIPLOCATION("DSW1:1,2,3")	/* OK */
+	PORT_DIPSETTING(    0x07, "Level 1" )
+	PORT_DIPSETTING(    0x06, "Level 2" )
+	PORT_DIPSETTING(    0x05, "Level 3" )
+	PORT_DIPSETTING(    0x04, "Level 4" )
+	PORT_DIPSETTING(    0x03, "Level 5" )
+	PORT_DIPSETTING(    0x02, "Level 6" )
+	PORT_DIPSETTING(    0x01, "Level 7" )
+	PORT_DIPSETTING(    0x00, "Level 8" )
+	PORT_DIPNAME( 0x38, 0x38, "Maximum Play" )				PORT_DIPLOCATION("DSW1:4,5,6")	/* OK */
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x10, "24" )
+	PORT_DIPSETTING(    0x18, "32" )
+	PORT_DIPSETTING(    0x20, "40" )
+	PORT_DIPSETTING(    0x28, "48" )
+	PORT_DIPSETTING(    0x30, "64" )
+	PORT_DIPSETTING(    0x38, "80" )
+	PORT_DIPNAME( 0xc0, 0x80, "Minimum Play for Bonus" )	PORT_DIPLOCATION("DSW1:7,8")	/* OK */
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x80, "16" )
+	PORT_DIPSETTING(    0xc0, "24" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Double-Up Game" )			PORT_DIPLOCATION("DSW2:1")	/* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "Skill Spinning" )			PORT_DIPLOCATION("DSW2:2")	/* OK (listed as Non-Stop spinning in the manual) */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x1c, 0x10, "Coin In" )					PORT_DIPLOCATION("DSW2:3,4,5")	/* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x14, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x1c, "1 Coin/100 Credits" )
+	PORT_DIPNAME( 0x60, 0x00, "Note In" )					PORT_DIPLOCATION("DSW2:6,7")	/* OK */
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPSETTING(    0x20, "200" )
+	PORT_DIPSETTING(    0x40, "500" )
+	PORT_DIPSETTING(    0x60, "1000" )
+	PORT_DIPNAME( 0x80, 0x00, "WARNING: Always Off" )		PORT_DIPLOCATION("DSW2:8")	/* Listed that way in the manual */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x03, 0x02, "Minimum Play to Start" )			PORT_DIPLOCATION("DSW3:1,2")	/* OK */
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "8" )
+	PORT_DIPSETTING(    0x02, "10" )	/* 16 in the manual */
+	PORT_DIPSETTING(    0x03, "16" )	/* 24 in the manual */
+	PORT_DIPNAME( 0x0c, 0x08, "Max Coin In & Note In Point" )	PORT_DIPLOCATION("DSW3:3,4")	/* OK */
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPSETTING(    0x04, "5000" )
+	PORT_DIPSETTING(    0x08, "10000" )
+	PORT_DIPSETTING(    0x0c, "90000" )
+	PORT_DIPNAME( 0xf0, 0xd0, "Clear / Ticket Unit" )			PORT_DIPLOCATION("DSW3:5,6,7,8")	/* OK */
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x30, "10" )
+	PORT_DIPSETTING(    0x40, "15" )
+	PORT_DIPSETTING(    0x50, "20" )
+	PORT_DIPSETTING(    0x60, "25" )
+	PORT_DIPSETTING(    0x70, "30" )
+	PORT_DIPSETTING(    0x80, "40" )
+	PORT_DIPSETTING(    0x90, "50" )
+	PORT_DIPSETTING(    0xa0, "60" )
+	PORT_DIPSETTING(    0xb0, "75" )
+	PORT_DIPSETTING(    0xc0, "80" )
+	PORT_DIPSETTING(    0xd0, "100" )
+	PORT_DIPSETTING(    0xe0, "200" )
+	PORT_DIPSETTING(    0xf0, "500" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "Check Account" )							PORT_DIPLOCATION("DSW4:1")	/* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, "Show In Confirm Screen" )				PORT_DIPLOCATION("DSW4:2")	/* OK */
+	PORT_DIPSETTING(    0x00, "Level of Difficulty" )	/* percentage in the manual */
+	PORT_DIPSETTING(    0x02, "Percentage" )			/* level of difficulty in the manual */
+	PORT_DIPNAME( 0x04, 0x00, "Initial Bonus Settings After Reset" )	PORT_DIPLOCATION("DSW4:3")	/* OK (need a reset after change) */
+	PORT_DIPSETTING(    0x00, "Type 1" )
+	PORT_DIPSETTING(    0x04, "Type 2" )
+	PORT_DIPNAME( 0x08, 0x08, "Bonus Accumulation" )					PORT_DIPLOCATION("DSW4:4")	/* OK (need a reset after change) */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, "Auto Ticket Dispense" )					PORT_DIPLOCATION("DSW4:5")	/* OK (need a reset after change) */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xe0, 0xe0, "Ticket Dispense Mode" )					PORT_DIPLOCATION("DSW4:6,7,8")	/* OK */
+	PORT_DIPSETTING(    0xe0, "Continuous" )
+	PORT_DIPSETTING(    0xc0, "Max 1 Ticket Per Game" )
+	PORT_DIPSETTING(    0xa0, "Max 2 Ticket Per Game" )
+	PORT_DIPSETTING(    0x80, "Max 3 Ticket Per Game" )
+	PORT_DIPSETTING(    0x60, "Max 4 Ticket Per Game" )
+	PORT_DIPSETTING(    0x40, "Max 5 Ticket Per Game" )
+	PORT_DIPSETTING(    0x20, "Max 8 Ticket Per Game" )
+	PORT_DIPSETTING(    0x00, "Max 10 Ticket Per Game" )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )									PORT_DIPLOCATION("DSW5:1")	/* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	/* the following ones work with version 3.51 onward */
+	PORT_DIPNAME( 0x02, 0x00, "Limit Score of Each Game to Max 10x Bet or $5.00" )	PORT_DIPLOCATION("DSW5:2")	/* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )		PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )		PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )	PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, DEF_STR( Unused ) )	PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPNAME( 0x04, 0x00, "Play Remaining Score when No Credit" )				PORT_DIPLOCATION("DSW5:3")	/* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )		PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )		PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )	PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x04, DEF_STR( Unused ) )	PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPNAME( 0x08, 0x00, "Reset Remaining Score to Zero" )						PORT_DIPLOCATION("DSW5:4")	/* OK */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )		PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )		PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )	PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, DEF_STR( Unused ) )	PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPNAME( 0x10, 0x00, "Ticket Dispense from Score" )						PORT_DIPLOCATION("DSW5:5")	/* OK */
+	PORT_DIPSETTING(    0x00, "Use TDDD" )			PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x10, "Use Interface" )		PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )	PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( Unused ) )	PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPNAME( 0x20, 0x00, "Reel Speed (ver 2.3)" )								PORT_DIPLOCATION("DSW5:6")	/* OK (turn the machine off/on after change) */
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x20, "Fast" )
+	PORT_DIPNAME( 0x40, 0x00, "Talking (ver 2.1)" )									PORT_DIPLOCATION("DSW5:7")	/* OK (turn the machine off/on after change) */
+	PORT_DIPSETTING(    0x00, "Very Little" )
+	PORT_DIPSETTING(    0x40, "Full" )
+	PORT_DIPNAME( 0x80, 0x00, "Count Game to Issue Ticket" )						PORT_DIPLOCATION("DSW5:8")	/* OK (turn the machine off/on after change) */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -6079,79 +6251,77 @@ static DRIVER_INIT( match133 )
 *                Game Drivers                *
 **********************************************
 
-      YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY              FULLNAME                                 FLAGS  */
-GAME( 199?, goldstar, 0,        goldstar, goldstar, goldstar, ROT0, "IGS",               "Golden Star",                            0 )
-GAME( 199?, goldstbl, goldstar, goldstbl, goldstar, 0,        ROT0, "IGS",               "Golden Star (Blue version)",             0 )
-GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",    0 )
-GAME( 199?, chrygld,  0,        chrygld,  chrygld,  chrygld,  ROT0, "bootleg",           "Cherry Gold I",                          0 )
-GAME( 199?, chry10,   0,        chrygld,  chry10,   chry10,   ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",      0 )
+      YEAR  NAME       PARENT    MACHINE   INPUT     INIT       ROT    COMPANY              FULLNAME                                      FLAGS  */
+GAME( 199?, goldstar,  0,        goldstar, goldstar, goldstar,  ROT0, "IGS",               "Golden Star",                                 0 )
+GAME( 199?, goldstbl,  goldstar, goldstbl, goldstar, 0,         ROT0, "IGS",               "Golden Star (Blue version)",                  0 )
+GAME( 199?, moonlght,  goldstar, moonlght, goldstar, 0,         ROT0, "bootleg",           "Moon Light (bootleg of Golden Star)",         0 )
+GAME( 199?, chrygld,   0,        chrygld,  chrygld,  chrygld,   ROT0, "bootleg",           "Cherry Gold I",                               0 )
+GAME( 199?, chry10,    0,        chrygld,  chry10,   chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0 )
 
 // are these really dyna, or bootlegs?
-GAME( 199?, ncb3,     0,        ncb3,     ncb3,     0,        ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",     0 )
-GAME( 199?, cb3a,     ncb3,     ncb3,     cb3a,     0,        ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",     0 )
-GAME( 199?, cb3,      ncb3,     ncb3,     ncb3,     cb3,      ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)", 0 )
+GAME( 199?, ncb3,      0,        ncb3,     ncb3,     0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0 )
+GAME( 199?, cb3a,      ncb3,     ncb3,     cb3a,     0,         ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0 )
+GAME( 199?, cb3,       ncb3,     ncb3,     ncb3,     cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0 )
 
 // cherry master hardware has a rather different mem map, but is basically the same
-GAME( 198?, cmv801,   0,        cm,       cmv801,   cm,       ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",      0 ) /* says ED-96 where the manufacturer is on some games.. */
+GAME( 198?, cmv801,    0,        cm,       cmv801,   cm,        ROT0, "Corsica",           "Cherry Master (Corsica, ver.8.01)",           0 ) /* says ED-96 where the manufacturer is on some games.. */
 
-GAME( 1992, cmv4,     0,        cm,       cmv4,     cmv4,     ROT0, "Dyna",              "Cherry Master (ver.4, set 1)",           0 )
-GAME( 1992, cmv4a,    cmv4,     cm,       cmv4,     cmv4,     ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",           GAME_NOT_WORKING )	/* stealth game? */
-GAME( 1991, cmaster,  0,        cm,       cmaster,  0,        ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",      0 )
-GAME( 1991, cmasterb, cmaster,  cm,       cmasterb, cmv4,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",      0 )
-GAME( 1991, cmasterc, cmaster,  cm,       cmasterc, cmv4,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",      GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, cmast91,  0,        cmast91,  cmast91,  cmast91,  ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",           0 )
-
-
-GAME( 1989, lucky8,   0,        lucky8,   lucky8,   0,        ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",              0 )
-GAME( 1989, lucky8a,  lucky8,   lucky8,   lucky8a,  lucky8a,  ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",              0 )
-GAME( 198?, ladylinr, 0,        ladylinr, ladylinr, 0,        ROT0, "TAB Austria",       "Lady Liner",                             0 )
-GAME( 198?, kkojnoli, 0,        kkojnoli, kkojnoli, 0,        ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",              GAME_IMPERFECT_COLORS )
-
-GAME( 198?, mtonic,   0,        ncb3,     cmv801,   0,        ROT0, "Tonic",             "Magical Tonic?",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1992, cmv4,      0,        cm,       cmv4,     cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 1)",                0 )
+GAME( 1992, cmv4a,     cmv4,     cm,       cmv4,     cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                GAME_NOT_WORKING )	/* stealth game? */
+GAME( 1991, cmaster,   0,        cm,       cmaster,  0,         ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0 )
+GAME( 1991, cmasterb,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0 )
+GAME( 1991, cmasterc,  cmaster,  cm,       cmasterc, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",           GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, cmast91,   0,        cmast91,  cmast91,  cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 
 
+GAME( 1989, lucky8,    0,        lucky8,   lucky8,   0,         ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 1)",                   0 )
+GAME( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  lucky8a,   ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",                   0 )
+GAME( 198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austria",       "Lady Liner",                                  0 )
+GAME( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",                   GAME_IMPERFECT_COLORS )
+
+GAME( 198?, mtonic,    0,        ncb3,     cmv801,   0,         ROT0, "Tonic",             "Magical Tonic?",                              GAME_WRONG_COLORS | GAME_NOT_WORKING )
 
 
+/* --- Amcoe games --- */
 
-GAME( 1998, skill98, 0,         cm,  cmv4,   skill98, ROT0, "Amcoe",             "Skill '98",                       GAME_NOT_WORKING )
-GAME( 1998, match98, 0,         cm,  cmv4,   match133, ROT0, "Amcoe",             "Match '98",                       GAME_NOT_WORKING )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT       ROT    COMPANY    FULLNAME                                                FLAGS  */
 
-GAME( 1997, schery97, 0,        cm,  cmv4,   schery97, ROT0, "Amcoe",             "Skill Cherry '97 (set 1)",               GAME_NOT_WORKING )
-GAME( 1997, schery97a,schery97, cm,  cmv4,   schery97a,ROT0, "Amcoe",             "Skill Cherry '97 (set 2)",               GAME_NOT_WORKING )
+GAME( 1997, schery97,  0,        cm,       schery97, schery97,  ROT0, "Amcoe",   "Skill Cherry '97 (ver. sc3.52)",                        0 )	/* running in CB hardware */
+GAME( 1997, schery97a, schery97, cm,       schery97, schery97a, ROT0, "Amcoe",   "Skill Cherry '97 (ver. sc3.52c4)",                      0 )	/* running in C4 hardware */
+GAME( 1998, skill98,   0,        cm,       schery97, skill98,   ROT0, "Amcoe",   "Skill '98 (ver. s98-1.33)",                             0 )
+GAME( 1998, match98,   0,        cm,       cmv4,     match133,  ROT0, "Amcoe",   "Match '98",                                             GAME_NOT_WORKING )
+
+GAME( 1996, nfb96,     0,        cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 1)",           GAME_NOT_WORKING )
+GAME( 1996, nfb96a,	   nfb96,    cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 2)",           GAME_NOT_WORKING )
+GAME( 1996, nfb96b,    nfb96,    cm,       cmv4,     fbse354,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 3)",           GAME_NOT_WORKING )
+GAME( 1996, nfb96c,    nfb96,    cm,       cmv4,     fbse362,   ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 4)",           GAME_NOT_WORKING )
+GAME( 1996, nfb96txt,  nfb96,    cm,       cmv4,     tc132axt,  ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (set 5, Texas XT)", GAME_NOT_WORKING )
+
+GAME( 1996, roypok96,  0,        cm,       cmv4,     rp35,      ROT0, "Amcoe",   "Royal Poker '96 (set 1)",                               GAME_NOT_WORKING )
+GAME( 1996, roypok96a, roypok96, cm,       cmv4,     rp36,      ROT0, "Amcoe",   "Royal Poker '96 (set 2)",                               GAME_NOT_WORKING )
+GAME( 1996, roypok96b, roypok96, cm,       cmv4,     rp36c3,    ROT0, "Amcoe",   "Royal Poker '96 (set 3)",                               GAME_NOT_WORKING )
+GAME( 1997, pokonl97,  0,        cm,       cmv4,     po33,      ROT0, "Amcoe",   "Poker Only '97",                                        GAME_NOT_WORKING )
  
-GAME( 1996, nfb96,    0,        cm,  cmv4,   fb36xc1,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 1)",                       GAME_NOT_WORKING )
-GAME( 1996, nfb96a,	  nfb96,    cm,  cmv4,   fb36xc1,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 2)",                       GAME_NOT_WORKING )
-GAME( 1996, nfb96b,   nfb96,    cm,  cmv4,   fbse354,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 3)",                       GAME_NOT_WORKING )
-GAME( 1996, nfb96c,   nfb96,    cm,  cmv4,   fbse362,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 4)",                       GAME_NOT_WORKING )
-GAME( 1996, nfb96txt, nfb96,    cm,  cmv4,   tc132axt,        ROT0, "Amcoe",             "New Fruit Bonus '96 Special Edition (set 5, Texas XT)",                       GAME_NOT_WORKING )
+GAME( 1996, nc96,      nfb96,    cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (set 1)",                GAME_NOT_WORKING )
+GAME( 1996, nc96a,     nfb96,    cm,       cmv4,     fb36xc1,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (set 2)",                GAME_NOT_WORKING )
+GAME( 1996, nc96b,     nfb96,    cm,       cmv4,     fbse354,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (set 3)",                GAME_NOT_WORKING )
+GAME( 1996, nc96c,     nfb96,    cm,       cmv4,     fbse362,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (set 4)",                GAME_NOT_WORKING )
+GAME( 2000, nc96txt,   nfb96,    cm,       cmv4,     tc132axt,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (set 5, Texas XT)",      GAME_NOT_WORKING )
 
-GAME( 1996, roypok96, 0,        cm,  cmv4,   rp35,     ROT0, "Amcoe",             "Royal Poker '96 (set 1)",                       GAME_NOT_WORKING )
-GAME( 1996, roypok96a,roypok96, cm,  cmv4,   rp36,     ROT0, "Amcoe",             "Royal Poker '96 (set 2)",                       GAME_NOT_WORKING )
-GAME( 1996, roypok96b,roypok96, cm,  cmv4,   rp36c3,    ROT0, "Amcoe",             "Royal Poker '96 (set 3)",                       GAME_NOT_WORKING )
-GAME( 1997, pokonl97, 0,        cm,  cmv4,   po33,        ROT0, "Amcoe",             "Poker Only '97",                       GAME_NOT_WORKING )
 
-GAME( 1996, nc96,   nfb96,    cm,  cmv4,   fb36xc1,  ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 1)",                       GAME_NOT_WORKING )
-GAME( 1996, nc96a,  nfb96,    cm,  cmv4,   fb36xc1,  ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 2)",                       GAME_NOT_WORKING )
-GAME( 1996, nc96b,  nfb96,    cm,  cmv4,   fbse354,        ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 3)",                       GAME_NOT_WORKING )
-GAME( 1996, nc96c,  nfb96,    cm,  cmv4,   fbse362,        ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 4)",                       GAME_NOT_WORKING )
-GAME( 2000, nc96txt,nfb96,    cm,  cmv4,   tc132axt,       ROT0, "Amcoe",             "New Cherry '96 Special Edition (set 5, Texas XT)",                       GAME_NOT_WORKING )
-
-// these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program rom
-// some sets are messy and appear to have mismatched graphic roms, they needed to be sorted out properly
-GAME( 1996, nfb96se,     nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "New Fruit Bonus '96 Special Edition (bootleg, set 1)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1996, nfb96sea,    nfb96,     cm,     cmv4,   nfb96sea, ROT0, "bootleg",             "New Fruit Bonus '96 Special Edition (bootleg, set 2)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING ) // encrypted program
-GAME( 1996, nfb96seb,    nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "New Fruit Bonus '96 Special Edition (bootleg, set 3)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 2002, carb2002,    nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "Carriage Bonus 2002 (bootleg)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 2003, carb2003,    nfb96,     cm,     cmv4,   0,        ROT0, "bootleg",             "Carriage Bonus 2003 (bootleg)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
+/* these all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program rom
+   some sets are messy and appear to have mismatched graphic roms, they needed to be sorted out properly
+*/
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT       ROT    COMPANY    FULLNAME                                                FLAGS  */
+GAME( 1996, nfb96se,   nfb96,    cm,       cmv4,     0,         ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg, set 1)",  GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1996, nfb96sea,  nfb96,    cm,       cmv4,     nfb96sea,  ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg, set 2)",  GAME_WRONG_COLORS | GAME_NOT_WORKING ) // encrypted program
+GAME( 1996, nfb96seb,  nfb96,    cm,       cmv4,     0,         ROT0, "bootleg", "New Fruit Bonus '96 Special Edition (bootleg, set 3)",  GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 2002, carb2002,  nfb96,    cm,       cmv4,     0,         ROT0, "bootleg", "Carriage Bonus 2002 (bootleg)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 2003, carb2003,  nfb96,    cm,       cmv4,     0,         ROT0, "bootleg", "Carriage Bonus 2003 (bootleg)",                         GAME_WRONG_COLORS | GAME_NOT_WORKING )
 
 
 /* possible stealth sets:
 
- - cmaster
- - cmv4
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.
- - cm2v841
- - cm2841a
- - cmast91
 
 */
