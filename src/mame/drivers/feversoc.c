@@ -29,6 +29,7 @@ GFX CHIP: RISE11 (custom graphics chip with programmable decryption)
 
 Other: Battery (CR2032)
        Sigma XLINX 9572
+       JRC 6355E Serial Real Time Clock (connected to a 32.768KHz OSC)
 
 RAM: BSI BS62LV1024SC-70 (x2)
      EtronTech EM51256C-15J (x4)
