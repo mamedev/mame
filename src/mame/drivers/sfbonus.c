@@ -36,45 +36,49 @@ static TILE_GET_INFO( get_sfbonus_tile_info )
 static TILE_GET_INFO( get_sfbonus_reel_tile_info )
 {
 	int code = sfbonus_reel_ram[(tile_index*2)+0] | (sfbonus_reel_ram[(tile_index*2)+1]<<8);
+	int flipx = (sfbonus_reel_ram[(tile_index*2)+1] & 0x80)>>7;
 
 	SET_TILE_INFO(
 			1,
 			code,
 			0,
-			0);
+			TILE_FLIPYX(flipx));
 }
 
 static TILE_GET_INFO( get_sfbonus_reel2_tile_info )
 {
 	int code = sfbonus_reel2_ram[(tile_index*2)+0] | (sfbonus_reel2_ram[(tile_index*2)+1]<<8);
+	int flipx = (sfbonus_reel2_ram[(tile_index*2)+1] & 0x80)>>7;
 
 	SET_TILE_INFO(
 			1,
 			code,
 			0,
-			0);
+			TILE_FLIPYX(flipx));
 }
 
 static TILE_GET_INFO( get_sfbonus_reel3_tile_info )
 {
 	int code = sfbonus_reel3_ram[(tile_index*2)+0] | (sfbonus_reel3_ram[(tile_index*2)+1]<<8);
+	int flipx = (sfbonus_reel3_ram[(tile_index*2)+1] & 0x80)>>7;
 
 	SET_TILE_INFO(
 			1,
 			code,
 			0,
-			0);
+			TILE_FLIPYX(flipx));
 }
 
 static TILE_GET_INFO( get_sfbonus_reel4_tile_info )
 {
 	int code = sfbonus_reel4_ram[(tile_index*2)+0] | (sfbonus_reel4_ram[(tile_index*2)+1]<<8);
+	int flipx = (sfbonus_reel4_ram[(tile_index*2)+1] & 0x80)>>7;
 
 	SET_TILE_INFO(
 			1,
 			code,
 			0,
-			0);
+			TILE_FLIPYX(flipx));
 }
 
 
@@ -1081,6 +1085,7 @@ static DRIVER_INIT( sfbonus_common)
 	sfbonus_videoram = auto_malloc(0x10000);//memory_region(machine,"user1");
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
 
+#if 0
 	{
 		UINT8 *ROM = memory_region(machine, "main");
 			FILE *fp;
@@ -1092,10 +1097,10 @@ static DRIVER_INIT( sfbonus_common)
 			fwrite(ROM, 0x40000, 1, fp);
 			fclose(fp);
 		}
-	}	
-		
-	
+	}
+#endif
 }
+
 static DRIVER_INIT( sfbonus )
 {
 	int i;
@@ -1133,21 +1138,21 @@ DRIVER_INIT(act2000)
 
 		switch(i & 7)
 		{
-			case 0: x = BITSWAP8(x^0x25, 1,2,7,6,5,4,3,0); break;		
-			case 1: x = BITSWAP8(x^0xE6, 1,7,6,5,4,3,0,2); break;	
-			case 2: x = BITSWAP8(x^0x20, 2,4,1,7,6,5,0,3); break;			
-			case 3: x = BITSWAP8(x^0xBF, 0,3,1,2,4,7,6,5); break;		
-			case 4: x = BITSWAP8(x^0x2E, 1,3,7,6,5,2,0,4); break;		
-			case 5: x = BITSWAP8(x^0xE0, 3,7,6,5,2,0,4,1); break;			
+			case 0: x = BITSWAP8(x^0x25, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xE6, 1,7,6,5,4,3,0,2); break;
+			case 2: x = BITSWAP8(x^0x20, 2,4,1,7,6,5,0,3); break;
+			case 3: x = BITSWAP8(x^0xBF, 0,3,1,2,4,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x2E, 1,3,7,6,5,2,0,4); break;
+			case 5: x = BITSWAP8(x^0xE0, 3,7,6,5,2,0,4,1); break;
 			case 6: x = BITSWAP8(x^0x2D, 4,1,2,7,6,5,0,3); break;
 			case 7: x = BITSWAP8(x^0xB2, 2,0,4,1,3,7,6,5); break;
-			
+
 		}
 
 		ROM[i] = x;
 	}
-	
-	DRIVER_INIT_CALL(sfbonus_common);	
+
+	DRIVER_INIT_CALL(sfbonus_common);
 }
 
 DRIVER_INIT(dblchal)
@@ -1161,22 +1166,22 @@ DRIVER_INIT(dblchal)
 
 		switch(i & 7)
 		{
-		
+
 			case 0: x = BITSWAP8(x^0x3D, 0,3,7,6,5,2,1,4); break;
 			case 1: x = BITSWAP8(x^0xF3, 3,7,6,5,1,0,4,2); break;
-			case 2: x = BITSWAP8(x^0x3D, 2,0,1,7,6,5,3,4); break;		
-			case 3: x = BITSWAP8(x^0xA8, 3,4,2,0,1,7,6,5); break;	
+			case 2: x = BITSWAP8(x^0x3D, 2,0,1,7,6,5,3,4); break;
+			case 3: x = BITSWAP8(x^0xA8, 3,4,2,0,1,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3D, 2,3,7,6,5,1,0,4); break;
-			case 5: x = BITSWAP8(x^0xEF, 2,7,6,5,1,0,3,4); break;		
+			case 5: x = BITSWAP8(x^0xEF, 2,7,6,5,1,0,3,4); break;
 			case 6: x = BITSWAP8(x^0x3A, 4,2,3,7,6,5,1,0); break;
 			case 7: x = BITSWAP8(x^0xBA, 2,4,1,0,3,7,6,5); break;
     		}
 
 		ROM[i] = x;
 	}
-	
 
-	DRIVER_INIT_CALL(sfbonus_common);	
+
+	DRIVER_INIT_CALL(sfbonus_common);
 }
 
 
