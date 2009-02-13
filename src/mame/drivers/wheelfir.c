@@ -20,6 +20,7 @@ CPU
 1x BT478KPJ50-615-9132F
 1x S9530AG-ADC0808-CCV
 1x oscillator 32.000000MHz
+1x ST93C46 EEPROM
 
 ROMs
 
@@ -31,7 +32,7 @@ ROMs
 Note
 
 1x JAMMA connector
-1x VGA connector
+1x VGA connector - Used to link 2 PCBs together
 2x trimmer (volume)
 
 
