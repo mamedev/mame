@@ -12,6 +12,7 @@ static tilemap *sfbonus_reel_tilemap;
 static UINT8 *sfbonus_tilemap_ram;
 static UINT8 *sfbonus_reel_ram;
 static UINT8* sfbonus_videoram;
+static UINT8 *sfbonus_vregs;
 
 static TILE_GET_INFO( get_sfbonus_tile_info )
 {
@@ -46,7 +47,7 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 	else if (offset<0x6000)
 	{
 		offset-=0x4000;
-		
+
 		sfbonus_reel_ram[offset] = data;
 		tilemap_mark_tile_dirty(sfbonus_reel_tilemap,offset/2);
 	}
@@ -81,7 +82,15 @@ VIDEO_UPDATE(sfbonus)
 //	int count = 0;
 //	const gfx_element *gfx2 = screen->machine->gfx[1];
 
+	tilemap_set_scrolly(sfbonus_tilemap, 0, (sfbonus_vregs[2] | sfbonus_vregs[3]<<8));
+	tilemap_set_scrolly(sfbonus_reel_tilemap, 0, (sfbonus_vregs[6] | sfbonus_vregs[7]<<8));
+
 	tilemap_draw(bitmap,cliprect,sfbonus_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,sfbonus_reel_tilemap,0,0);
+
+//	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %d",sfbonus_vregs[0+test_vregs],sfbonus_vregs[1+test_vregs],sfbonus_vregs[2+test_vregs],
+//	sfbonus_vregs[3+test_vregs],sfbonus_vregs[4+test_vregs],sfbonus_vregs[5+test_vregs],sfbonus_vregs[6+test_vregs],sfbonus_vregs[7+test_vregs],test_vregs);
+
 	/*
 	for (y=0;y<32;y++)
 	{
@@ -93,7 +102,7 @@ VIDEO_UPDATE(sfbonus)
 			count+=2;
 		}
 
-	}	
+	}
 	*/
 	return 0;
 }
@@ -163,11 +172,11 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("IN3")
 
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(SMH_NOP)	
-	
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE( paletteram_io_w )
 
-	AM_RANGE(0x2400, 0x241f) AM_RAM
+	AM_RANGE(0x2400, 0x241f) AM_RAM AM_BASE(&sfbonus_vregs)
 
 	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_unk_r)
 	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_unk_r)	AM_WRITE(SMH_NOP)
@@ -175,7 +184,7 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_unk_r)
 	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_unk_r) AM_WRITE(SMH_NOP)
 
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP)		
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
 	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_unk_r) AM_WRITE(SMH_NOP)
 
@@ -185,8 +194,8 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1803, 0x1803) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x1804, 0x1804) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x1806, 0x1806) AM_WRITE(SMH_NOP)	
-	
+	AM_RANGE(0x1806, 0x1806) AM_WRITE(SMH_NOP)
+
 	AM_RANGE(0x3801, 0x3801) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x3802, 0x3802) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x3803, 0x3803) AM_WRITE(SMH_NOP)
@@ -359,11 +368,11 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_VIDEO_START(sfbonus)
 	MDRV_VIDEO_UPDATE(sfbonus)
 
-//  MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-//  MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-//  MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.47)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.47)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)
 MACHINE_DRIVER_END
 
 // the gfx2 roms might be swapped on these sets
@@ -534,7 +543,7 @@ ROM_START( anibonus )
 	ROM_LOAD16_BYTE( "abrom3n.bin", 0x00000, 0x80000, CRC(aab2161a) SHA1(d472746c68720935fedfc6b2d06a4fe1152cc804) )
 	ROM_LOAD16_BYTE( "abrom4n.bin", 0x00001, 0x80000, CRC(d776862c) SHA1(03b3c0e9adb11b560b8773e88ea97e712323f25e) )
 
-	
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5.bin", 0x00000, 0x80000, CRC(74b4fa88) SHA1(922d9c4f864be2b125269a69639e6206aec26d72) )
 	ROM_LOAD16_BYTE( "abrom6.bin", 0x00001, 0x80000, CRC(e8f4b079) SHA1(2597fa17b6a13e634ba9fe846661d09c65fa8cf2) )
@@ -557,7 +566,7 @@ ROM_START( abnudge )
 	ROM_LOAD16_BYTE( "abrom3n.bin", 0x00000, 0x80000, CRC(aab2161a) SHA1(d472746c68720935fedfc6b2d06a4fe1152cc804) )
 	ROM_LOAD16_BYTE( "abrom4n.bin", 0x00001, 0x80000, CRC(d776862c) SHA1(03b3c0e9adb11b560b8773e88ea97e712323f25e) )
 
-	
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
@@ -578,7 +587,7 @@ ROM_START( anithunt )
 	ROM_LOAD16_BYTE( "athrom3.bin", 0x00000, 0x80000, CRC(f784ec01) SHA1(69474fc9d10882fd9ec0c02675193df7aa31f6a7) )
 	ROM_LOAD16_BYTE( "athrom4.bin", 0x00001, 0x80000, CRC(49749939) SHA1(6deb10c2b51b5718f0cba31f6bda54bcc001bc71) )
 
-	
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ath-rom5.bin", 0x00000, 0x80000, CRC(536a7e23) SHA1(51dc6b2b022a672810b00e1006b0c7ee610a4e4f) )
 	ROM_LOAD16_BYTE( "ath-rom6.bin", 0x00001, 0x80000, CRC(23bc5067) SHA1(1e279e58437b897c7a68c9cdd15277c6a906a142) )
@@ -764,7 +773,7 @@ Action 2000 by AMCOE
 
 
 Graphics - HM86171-80 ? 28DIP
-Processor - Amcoe Saltire ? 208PQFP 
+Processor - Amcoe Saltire ? 208PQFP
 
 QUARTZ OSCILLATORS 12.000, 4.9152 and 27.000
 
@@ -847,14 +856,14 @@ static DRIVER_INIT( sfbonus )
 
 		ROM[i] = x;
 	}
-	
+
 	sfbonus_tilemap_ram = auto_malloc(0x4000);
 	state_save_register_global_pointer(machine, sfbonus_tilemap_ram , 0x4000);
 
 	sfbonus_reel_ram = auto_malloc(0x2000);
 	state_save_register_global_pointer(machine, sfbonus_reel_ram , 0x2000);
 
-	
+
 	sfbonus_videoram = auto_malloc(0x10000);
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
 
