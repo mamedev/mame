@@ -8622,8 +8622,15 @@ Other Sun games
 	DRIVER( pickwin )
 	DRIVER( pickwina )
 	DRIVER( tighook )
+	DRIVER( robadv )	
 	DRIVER( robadv2 )
 	DRIVER( pirpok2 )
+	DRIVER( anibonus )
+	DRIVER( abnudge )
+	DRIVER( anithunt )
+	DRIVER( dblchal )
+	DRIVER( sfruitb )
+	DRIVER( fb2gen )
 	
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
