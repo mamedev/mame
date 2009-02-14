@@ -689,6 +689,55 @@ ROM_START( sfbonusa )
 	ROM_LOAD16_BYTE( "skfbrom6a.bin", 0x00001, 0x80000, CRC(b9a39e5a) SHA1(cb875db25d8bccf48542bd6dbecc474b1205563b) )
 ROM_END
 
+ROM_START( sfbonusb )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
+	ROM_LOAD( "skfbb19r.bin", 0x00000, 0x40000, CRC(e185c0b7) SHA1(241aa3dc65f4399c465e43c5f7079f66f9998f01) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "skfbrom3.bin", 0x00000, 0x80000, CRC(36119517) SHA1(241bb256ab3ba595dcb0c81fd2e60ed35dd7c197) )
+	ROM_LOAD16_BYTE( "skfbrom4.bin", 0x00001, 0x80000, CRC(a655bac1) SHA1(0faea01c09409f9182f08370dcc0b466a799f17f) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "skfbrom5a.bin", 0x00000, 0x80000, CRC(ed07a635) SHA1(a31ee06d8cb78c43affa9d899e9cec87a0875934) )
+	ROM_LOAD16_BYTE( "skfbrom6a.bin", 0x00001, 0x80000, CRC(b9a39e5a) SHA1(cb875db25d8bccf48542bd6dbecc474b1205563b) )
+ROM_END
+
+ROM_START( sfbonusd )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
+	ROM_LOAD( "skfbd19r.bin", 0x00000, 0x40000, CRC(9e189177) SHA1(bb48053c516d036a1d18713d45a186a994a4c685) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "skfbrom3.bin", 0x00000, 0x80000, CRC(36119517) SHA1(241bb256ab3ba595dcb0c81fd2e60ed35dd7c197) )
+	ROM_LOAD16_BYTE( "skfbrom4.bin", 0x00001, 0x80000, CRC(a655bac1) SHA1(0faea01c09409f9182f08370dcc0b466a799f17f) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "skfbrom5a.bin", 0x00000, 0x80000, CRC(ed07a635) SHA1(a31ee06d8cb78c43affa9d899e9cec87a0875934) )
+	ROM_LOAD16_BYTE( "skfbrom6a.bin", 0x00001, 0x80000, CRC(b9a39e5a) SHA1(cb875db25d8bccf48542bd6dbecc474b1205563b) )
+ROM_END
+
+ROM_START( sfbonusv )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
+	ROM_LOAD( "skfbv19r.bin", 0x00000, 0x40000, CRC(f032be45) SHA1(63007ee7de6203ed7bda34e127328d085df20369) )
+	
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "skfbrom3.bin", 0x00000, 0x80000, CRC(36119517) SHA1(241bb256ab3ba595dcb0c81fd2e60ed35dd7c197) )
+	ROM_LOAD16_BYTE( "skfbrom4.bin", 0x00001, 0x80000, CRC(a655bac1) SHA1(0faea01c09409f9182f08370dcc0b466a799f17f) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "skfbrom5a.bin", 0x00000, 0x80000, CRC(ed07a635) SHA1(a31ee06d8cb78c43affa9d899e9cec87a0875934) )
+	ROM_LOAD16_BYTE( "skfbrom6a.bin", 0x00001, 0x80000, CRC(b9a39e5a) SHA1(cb875db25d8bccf48542bd6dbecc474b1205563b) )
+ROM_END
+
+
 ROM_START( parrot3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "p4p24.bin", 0x00000, 0x40000, CRC(356a49c8) SHA1(7e0ed7d1063675b66bfe28c427712249654be6ab) )
@@ -850,6 +899,23 @@ ROM_START( hldspin2 )
 	ROM_LOAD16_BYTE( "hs_6.bin", 0x00001, 0x40000, CRC(801703e4) SHA1(7da822b03a6d4f53a49bb1fedc9e1262d8a84782) )
 ROM_END
 
+ROM_START( hldspin2b )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "hs2v28r.bin", 0x00000, 0x40000, CRC(6f2fd1b3) SHA1(fe45508d95f61415dc1961a20ebb99f24b773c7d) )
+	ROM_LOAD( "hs2d28r.bin", 0x00000, 0x40000, CRC(6e38ca1a) SHA1(9ef5522dfec75fa9b3809524f033e24817e325e3) )
+	ROM_LOAD( "hs2b28r.bin", 0x00000, 0x40000, CRC(43c2a1b1) SHA1(da1e6d72e03297b014cb947e5c28769ad8457dec) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "hs_2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "hs2_3.bin", 0x00000, 0x40000, CRC(b6890061) SHA1(c196f8740d8487b108cff58d77a203b2d8431a67) )
+	ROM_LOAD16_BYTE( "hs2_4.bin", 0x00001, 0x40000, CRC(132a2312) SHA1(9ad5c3a3ca895d290ff584f605f05d70386cfa10) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "hs_5.bin", 0x00000, 0x40000, CRC(09931910) SHA1(cac792f7c67d0ea274ecb369cef0554a033e8d88) )
+	ROM_LOAD16_BYTE( "hs_6.bin", 0x00001, 0x40000, CRC(801703e4) SHA1(7da822b03a6d4f53a49bb1fedc9e1262d8a84782) )
+ROM_END
 
 
 ROM_START( pickwin )
@@ -1031,9 +1097,52 @@ ROM_START( tighooka )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
 ROM_END
 
+
+
+ROM_START( tighookb )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "thkc20lt.bin", 0x00000, 0x40000, CRC(dc683f21) SHA1(f0e570b9570969dcff0c5349c5de9712c2abc754) )
+	ROM_LOAD( "thkc21r.bin", 0x00000, 0x40000, CRC(04bf78b1) SHA1(75408eb3fe67177ac5364cf72579ba09cf16b2fd) )
+	ROM_LOAD( "thkd20lt.bin", 0x00000, 0x40000, CRC(2be25e14) SHA1(2d906ce8d505bc2620ed218fdb401c0faf426eda) )
+	ROM_LOAD( "thkd21r.bin", 0x00000, 0x40000,  CRC(407a2a93) SHA1(c729e5fc4b08ea0e0fcc2e6b4fd742b1dc461a0e) )
+	ROM_LOAD( "thkv20lt.bin", 0x00000, 0x40000, CRC(07a8e921) SHA1(2c92ec7187d441d1b205eea626d32a6a41a53918) )
+	ROM_LOAD( "thkv21e.bin", 0x00000, 0x40000, CRC(df0df2fa) SHA1(244086e9233f36531c005f6f9a09128738771753) )
+	ROM_LOAD( "thkv21r.bin", 0x00000, 0x40000, CRC(30ade52d) SHA1(ae59b7fd79581b3fa0b764648ccf34dc0fcc886e) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "thkrom2.bin", 0x00000, 0x40000, CRC(61b61b75) SHA1(e71c5ab6aedb7ca4db32a2f4d7d2818dcdd92417) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "thkrom3.bin", 0x00000, 0x80000, CRC(ec4b4144) SHA1(36df0686b405a3c99707a6b63ad14bff1cd7b443) )
+	ROM_LOAD16_BYTE( "thkrom4.bin", 0x00001, 0x80000, CRC(dbd1c526) SHA1(1f82f3e132bb5ac598e5d95254de48357130a0a0) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
+	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+ROM_END
+
 ROM_START( robadv )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "ra15.bin", 0x00000, 0x40000, CRC(dd7e4ec9) SHA1(038b03855eaa8be1a97e34534822465a10886e10) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "rarom2.bin", 0x00000, 0x40000, CRC(092392cb) SHA1(fd52a0c4f46cb3242bf1b9e35ad5f41cda64010b) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rarom3.bin", 0x00000, 0x80000, CRC(94e4cd71) SHA1(5c01e276dea3df7c367210af3d0d2399935c81c6) )
+	ROM_LOAD16_BYTE( "rarom4.bin", 0x00001, 0x80000, CRC(72cfec99) SHA1(6612b8d04c0cc97dc5315fda861b606a6c158ea6) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "rarom5.bin", 0x00000, 0x80000, CRC(9bf41c2b) SHA1(8cc8ca5c2c63223e670e00ca5802b8677856bc16) )
+	ROM_LOAD16_BYTE( "rarom6.bin", 0x00001, 0x80000, CRC(0fb69b4c) SHA1(8e1aaf5ade707b4045d55ff64e72cfe5db696332) )
+ROM_END
+
+ROM_START( robadva )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "r1ac17r.bin", 0x00000, 0x40000, CRC(2e086ad9) SHA1(4cf96cf702fe38895d3ba3582cb7d74d79bc2208) )
+	ROM_LOAD( "r1ad17r.bin", 0x00000, 0x40000, CRC(a00411d0) SHA1(007a3cf7bdd99a0200a2e34b89487f74a60c5561) )
+	ROM_LOAD( "r1av17e.bin", 0x00000, 0x40000, CRC(75c6960a) SHA1(9ca85f04bf5549027dd89f47ddb78f2618d4620c) )
+	ROM_LOAD( "r1av17r.bin", 0x00000, 0x40000, CRC(1f97fa41) SHA1(b148bac2d96549a15135fe2a8a72913b880aa6c2) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "rarom2.bin", 0x00000, 0x40000, CRC(092392cb) SHA1(fd52a0c4f46cb3242bf1b9e35ad5f41cda64010b) )
@@ -1550,6 +1659,28 @@ ROM_START( robadv2a )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
 ROM_END
 
+ROM_START( robadv2b )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "r2ac17lt.bin", 0x00000, 0x40000, CRC(47ce9172) SHA1(e05be868c48e53f131936070abd350914f9befcf) )
+	ROM_LOAD( "r2ad17lt.bin", 0x00000, 0x40000, CRC(e0ea8ce9) SHA1(cf6a58d1cc654c41ae245f26fff6b26483bc01ce) )
+	ROM_LOAD( "r2av17e.bin", 0x00000, 0x40000, CRC(81166cbd) SHA1(a2751752a95cac5181311af867457cac48854283) )
+	ROM_LOAD( "r2av17lt.bin", 0x00000, 0x40000, CRC(0ebc91fe) SHA1(d64a29e05ce62d662eccb025ea905275eb8806f9) )
+	ROM_LOAD( "r2av17r.bin", 0x00000, 0x40000, CRC(17350817) SHA1(5e1c978cd4cf0f319f49c366c3b7634500c873dd) )
+	ROM_LOAD( "r2av17sh.bin", 0x00000, 0x40000, CRC(fe4a3199) SHA1(d8c8f3d4e399e757b551748435ede1cb6a04ee3b) )
+	
+	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "rarom2.bin", 0x00000, 0x40000, CRC(092392cb) SHA1(fd52a0c4f46cb3242bf1b9e35ad5f41cda64010b) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "ra2rom3.bin", 0x00000, 0x80000, CRC(eacd0cf7) SHA1(a04ddc339d330be4b278f12a54fe65d7eb08ffd0) )
+	ROM_LOAD16_BYTE( "ra2rom4.bin", 0x00001, 0x80000, CRC(adac68d2) SHA1(6287a979a57004b1c4eea7f539550e23bac22904) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
+	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+ROM_END
+
+
 ROM_START( pirpok2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3p20.bin", 0x00000, 0x40000, CRC(0e477094) SHA1(cd35c9ac1ed4b843886b1fc554e749f38573ca21) )
@@ -1701,7 +1832,7 @@ ROM_START( sfruitb )
 	ROM_LOAD( "sfb20b.bin", 0x00000, 0x40000, CRC(6fe1b8ba) SHA1(46fe3940d80578f3818702fd449fc4119ea5fc30) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	/* none? */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
@@ -1717,7 +1848,7 @@ ROM_START( sfruitb2 )
 	ROM_LOAD( "sfb20.bin", 0x00000, 0x40000, CRC(73a2be7f) SHA1(95b51a63ede10247fde944d980d85781947a8435) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	/* none? */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
@@ -1733,7 +1864,7 @@ ROM_START( sfruitb3 )
 	ROM_LOAD( "sfb18xt.bin", 0x00000, 0x40000, CRC(15a7fc47) SHA1(4f1af0bab7807a69f8c67c8e83b35c8c5c2a13f1) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	/* none? */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
@@ -1744,6 +1875,184 @@ ROM_START( sfruitb3 )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
 ROM_END
 
+ROM_START( sfruitbb )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbb20lt.bin", 0x00000, 0x40000, CRC(418fbd9e) SHA1(b78e788b7bad85ce8f8709f20dcded25be9dac01) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+ROM_START( sfruitbb2 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbb22b.bin", 0x00000, 0x40000,  CRC(16abe969) SHA1(97ca2f223fb16c1003544c7454e470a31f54b3b3) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+ROM_START( sfruitbb3 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbb25r.bin", 0x00000, 0x40000, CRC(bcb51221) SHA1(6df07a52557d8305fec45c8a030141cb15204548) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+ROM_START( sfruitbd )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbd20lt.bin", 0x00000, 0x40000, CRC(9d0ebc24) SHA1(790050a35f91e683a5e2c2231c6b861a05eba04a) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+ROM_START( sfruitbd2 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbd22b.bin", 0x00000, 0x40000,  CRC(065bb398) SHA1(dd3092729bca420cdd338749d9bd779970dcd1c7) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+ROM_START( sfruitbd3 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbd25r.bin", 0x00000, 0x40000, CRC(bb7bee79) SHA1(c66e62df0996486bead90331b714e9aa62bd585f) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+
+ROM_START( sfruitbv )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbv25r.bin", 0x00000, 0x40000, CRC(beb1ee59) SHA1(d6f72d66085309f33965640b25c788657eee01e1) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+ROM_START( sfruitbv2 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbv25e.bin", 0x00000, 0x40000, CRC(a9c7edba) SHA1(f860b1077a9a12ff49e2dea0aac888e210787327) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+ROM_START( sfruitbv3 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbv22eb.bin", 0x00000, 0x40000,  CRC(64d31a39) SHA1(cd2fc75b8d16e444796c52255de298b3b52e40e6) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+ROM_START( sfruitbv4 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbv22b.bin", 0x00000, 0x40000,  CRC(ec0e8486) SHA1(249b8ecada6b7c0b3e16baa614620af80d7d8c6e) )
+		
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+ROM_START( sfruitbv5 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "sfbv20lt.bin", 0x00000, 0x40000, CRC(63560472) SHA1(14446f2d8fd0314ca00478159cbb0507ac096e34) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "sfbrom3.bin", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "sfbrom4.bin", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+ROM_END
+
+
 ROM_START( fb2gen )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb2g16xt.bin", 0x00000, 0x40000, CRC(ea525ebb) SHA1(965bba045ba69ac4316b27d0d69b130119f9ce04) )
@@ -1752,12 +2061,12 @@ ROM_START( fb2gen )
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fb2grom3.bin", 0x00000, 0x80000, CRC(a4f33c67) SHA1(ec7f539725b2684add019c1dad3f230b5c798daa) )
-	ROM_LOAD16_BYTE( "fb2grom4.bin", 0x00001, 0x80000, CRC(c142f2af) SHA1(3323de8cd09b64c1c8ccf51acf74444e577fdfb3) )
+	ROM_LOAD16_BYTE( "fb2grom3_older.bin", 0x00000, 0x80000, CRC(a4f33c67) SHA1(ec7f539725b2684add019c1dad3f230b5c798daa) )
+	ROM_LOAD16_BYTE( "fb2grom4_older.bin", 0x00001, 0x80000, CRC(c142f2af) SHA1(3323de8cd09b64c1c8ccf51acf74444e577fdfb3) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(1c4172a8) SHA1(c45a57cd799681d442de02f8f07dbd9751929ca4) )
-	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(953fdcc4) SHA1(c57e2b4a8273e789b96d39fe28d02bec5359b5f4) )
+	ROM_LOAD16_BYTE( "fb2grom5_older.bin", 0x00000, 0x80000, CRC(1c4172a8) SHA1(c45a57cd799681d442de02f8f07dbd9751929ca4) )
+	ROM_LOAD16_BYTE( "fb2grom6_older.bin", 0x00001, 0x80000, CRC(953fdcc4) SHA1(c57e2b4a8273e789b96d39fe28d02bec5359b5f4) )
 ROM_END
 
 ROM_START( fb2gena )
@@ -1768,19 +2077,63 @@ ROM_START( fb2gena )
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fb2grom3.bin", 0x00000, 0x80000, CRC(a4f33c67) SHA1(ec7f539725b2684add019c1dad3f230b5c798daa) )
-	ROM_LOAD16_BYTE( "fb2grom4.bin", 0x00001, 0x80000, CRC(c142f2af) SHA1(3323de8cd09b64c1c8ccf51acf74444e577fdfb3) )
+	ROM_LOAD16_BYTE( "fb2grom3_older.bin", 0x00000, 0x80000, CRC(a4f33c67) SHA1(ec7f539725b2684add019c1dad3f230b5c798daa) )
+	ROM_LOAD16_BYTE( "fb2grom4_older.bin", 0x00001, 0x80000, CRC(c142f2af) SHA1(3323de8cd09b64c1c8ccf51acf74444e577fdfb3) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(1c4172a8) SHA1(c45a57cd799681d442de02f8f07dbd9751929ca4) )
-	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(953fdcc4) SHA1(c57e2b4a8273e789b96d39fe28d02bec5359b5f4) )
+	ROM_LOAD16_BYTE( "fb2grom5_older.bin", 0x00000, 0x80000, CRC(1c4172a8) SHA1(c45a57cd799681d442de02f8f07dbd9751929ca4) )
+	ROM_LOAD16_BYTE( "fb2grom6_older.bin", 0x00001, 0x80000, CRC(953fdcc4) SHA1(c57e2b4a8273e789b96d39fe28d02bec5359b5f4) )
 ROM_END
 
+
+ROM_START( fb2genb )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "f2gc18lt.bin", 0x00000, 0x40000, CRC(d22f7e92) SHA1(8e2a8554bcb2e8f86d6d43672e7e4535ee4f89cf) )
+	ROM_LOAD( "f2gc18r.bin", 0x00000, 0x40000, CRC(f0adc7a4) SHA1(109490212d8c0bd25d6beb271939a83c06e468c6) )
+	ROM_LOAD( "f2gd18lt.bin", 0x00000, 0x40000, CRC(b9f7978b) SHA1(739f8000e589ecad50be072c5e90727e96b00765) )
+	ROM_LOAD( "f2gd18r.bin", 0x00000, 0x40000, CRC(6a97bc44) SHA1(ef1d611c009cb1f5ff674fa30413607e3fbcbc45) )
+	ROM_LOAD( "f2gv18e.bin", 0x00000, 0x40000, CRC(a24059c0) SHA1(e9bcf506a82e35a8c69f20fa700dd5e7025d56c2) )
+	ROM_LOAD( "f2gv18lt.bin", 0x00000, 0x40000, CRC(d2b45ef3) SHA1(e058004d042aac6dde67f0e7f924d204965b3b72) )
+	ROM_LOAD( "f2gv18r.bin", 0x00000, 0x40000, CRC(c827362b) SHA1(3a407d8f009666cc80d1588d034ed135e18ec34b) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fb2grom3.bin", 0x00000, 0x80000, CRC(21ade753) SHA1(ca70ab941740983626f4d274aa4a9edea366f38a) )
+	ROM_LOAD16_BYTE( "fb2grom4.bin", 0x00001, 0x80000, CRC(56605a08) SHA1(09022dc797dd824a973c5126cafe7b086a94184c) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(6aa1e45d) SHA1(a821c98513ad851f5f9e2452620feb662c28f8bb) )
+	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(1a525dcf) SHA1(20b1b2d6bdb0953300a6d9937b582fd5e20931ed) )
+ROM_END
 
 ROM_START( fb2nd )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb2e15.bin", 0x00000, 0x40000, CRC(40a4bc95) SHA1(f84d8615e5a247a6db7792e54d236fbd5008d794) )
 
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fb2erom3.bin", 0x00000, 0x80000, CRC(58201f71) SHA1(1e8d44105194a619d75d106cebcef783edc810f2) )
+	ROM_LOAD16_BYTE( "fb2erom4.bin", 0x00001, 0x80000, CRC(4f8cb873) SHA1(7fae47e41abb8e3fffd584f9a5507168c06b8b6b) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fb2erom5.bin", 0x00000, 0x80000, CRC(1bc55876) SHA1(d04ff7bf97145d45de943129bc9f3cbe27f4588e) )
+	ROM_LOAD16_BYTE( "fb2erom6.bin", 0x00001, 0x80000, CRC(71b43f19) SHA1(a0b7f2b1968e6c083f9793f1249edb339422370d) )
+ROM_END
+
+// sort these
+ROM_START( fb2ndc )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "f2ec18lt.bin", 0x00000, 0x40000, CRC(675e413d) SHA1(e15fc96a8be701a01e1154dfea2c7d24c8239215) )
+	ROM_LOAD( "f2ec18r.bin", 0x00000, 0x40000, CRC(d993916c) SHA1(3ca93c42a6e6f7cfbd4bfbcd2375f66b66a066ca) )
+	ROM_LOAD( "f2ed18lt.bin", 0x00000, 0x40000, CRC(3c469121) SHA1(0a694ff77dd2f797acf5889a8773bb798f64f11b) )
+	ROM_LOAD( "f2ed18r.bin", 0x00000, 0x40000, CRC(48a4dbcd) SHA1(e1a2163be6345983d05b1931b5619678f025d667) )
+	ROM_LOAD( "f2ev18lt.bin", 0x00000, 0x40000, CRC(b59418b9) SHA1(8d45709176db09d052a26d57f41bc18d78632ad0) )
+	ROM_LOAD( "f2ev18r.bin", 0x00000, 0x40000, CRC(22abfee6) SHA1(f5542042aa60238decc0c29553e682971744f535) )
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
 
@@ -1823,6 +2176,40 @@ ROM_START( fb4a )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+ROM_END
+
+ROM_START( fb4b )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "fb4b15r.bin", 0x00000, 0x40000, CRC(511a1c54) SHA1(7b554be602e74088ca4ab90a0b10965dc30b18ab) )
+	ROM_LOAD( "fb4c15lt.bin", 0x00000, 0x40000, CRC(280a0d31) SHA1(dba0dc3f14f08f8045934acd85cb549ca4292808) )
+	ROM_LOAD( "fb4c15r.bin", 0x00000, 0x40000, CRC(f50ce62f) SHA1(7a1c37f42da0506ff3bcebcd587f0105004b47e2) )
+	ROM_LOAD( "fb4d15lt.bin", 0x00000, 0x40000,  CRC(41b0177b) SHA1(9fc74f54a21fb2846e9f818e9b9714643cad0295) )
+	ROM_LOAD( "fb4d15r.bin", 0x00000, 0x40000, CRC(aeed6133) SHA1(8658708fbfd7f662f72a30a3f37baca98e931589) )
+	ROM_LOAD( "fb4v15e.bin", 0x00000, 0x40000, CRC(b28db56e) SHA1(b14c0b62fc1c3195ee3703b5500f5a36a2cde3e2) )
+	ROM_LOAD( "fb4v15lt.bin", 0x00000, 0x40000, CRC(d1cf9bd8) SHA1(59b1507e2d37eef8bea8d07194465506a52e7286))
+	ROM_LOAD( "fb4v15r.bin", 0x00000, 0x40000, CRC(891f119f) SHA1(1823826cd958a951a930b9a1a23f7cf092ed6ab2) )
+	ROM_LOAD( "fb4b15lt.bin", 0x00000, 0x40000, CRC(480651c3) SHA1(3ac434070b00c04eda9c78209e1c6e21fd488287) )
+   	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	// exp CGA & XVGA dual versions
+	ROM_LOAD16_BYTE( "fb4rom3e.bin", 0x00000, 0x80000, CRC(d47d9969) SHA1(172771896b9ac75c34ae4c9958e26ba30371bdde) )
+	ROM_LOAD16_BYTE( "fb4rom4e.bin", 0x00001, 0x80000, CRC(680fc5d1) SHA1(92d46b72584d2bc906901d7e7f44c017995ef2c0) )
+
+	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
+	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
+	
+	
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	// exp CGA & XVGA dual versions
+	ROM_LOAD16_BYTE( "fb4rom5e.bin", 0x00000, 0x80000, CRC(ddc02e07) SHA1(b1cce95ab09822646c835b066d4510a51633d107) )
+	ROM_LOAD16_BYTE( "fb4rom6e.bin", 0x00001, 0x80000, CRC(e3de53a4) SHA1(3168ec7e10eee205655ee259fb5ba7201d7eb711) )
+
+	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
+	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+	
 ROM_END
 
 ROM_START( ch2000 )
@@ -2263,6 +2650,30 @@ ROM_START( pir2001b )
 	ROM_LOAD16_BYTE( "piratrom6.bin", 0x00001, 0x80000, CRC(470ff052) SHA1(b63293e2f244d992e64df085d6565931b982dcd3) )
 ROM_END
 
+// sort these
+ROM_START( pir2001b2 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "pi1d24xt.bin", 0x00000, 0x40000,CRC(0e3e68ed) SHA1(a0e007a1f905dd6e7ba6a8202c9e21893ff819e3) )
+	ROM_LOAD( "pi1d25r.bin", 0x00000, 0x40000, CRC(579a753e) SHA1(82d70362c22d4a4f4836f1e10effdc05041bd425) )
+	ROM_LOAD( "pi1v24xt.bin", 0x00000, 0x40000, CRC(bc69b7e2) SHA1(bb4fc3ce17a9e97823bd9801fa549e5ddba6787d) )
+	ROM_LOAD( "pi1v25e.bin", 0x00000, 0x40000, CRC(0440d844) SHA1(14f62aee8cb56cdfa399b8052181f60fcbcedbba) )
+	ROM_LOAD( "pi1v25r.bin", 0x00000, 0x40000, CRC(666207ea) SHA1(0d1fbd10aa85d4e5b8072266ce52b535b275fc5a) )	
+	ROM_LOAD( "pi1b25r.bin", 0x00000, 0x40000, CRC(6f2624e4) SHA1(e1669d81bf708c65778d81ed4f5c793725edde3f) )
+	ROM_LOAD( "pi1b24xt.bin", 0x00000, 0x40000, CRC(62adfe66) SHA1(e85ea2c0d00f29238f17c87e65a6b749336ffd50) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "piratrom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "piratrom3.bin", 0x00000, 0x80000, CRC(5a718b09) SHA1(7ea20a5c9cf8875b9c3cc95a708911fb87abebf7) )
+	ROM_LOAD16_BYTE( "piratrom4.bin", 0x00001, 0x80000, CRC(123cdc93) SHA1(c4963c0a31eb25f15ec1902c9777643cf2c3e8c3) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "piratrom5.bin", 0x00000, 0x80000, CRC(6d7e502a) SHA1(4910a0bb1e779e04e87eb6cba092f976f85c0f96) )
+	ROM_LOAD16_BYTE( "piratrom6.bin", 0x00001, 0x80000, CRC(470ff052) SHA1(b63293e2f244d992e64df085d6565931b982dcd3) )
+ROM_END
+
+
 ROM_START( pir2002 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi218n.bin", 0x00000, 0x40000,  CRC(bd6a35f5) SHA1(1cf5c7e65f3d99aee3579d890dbac3c818735307) )
@@ -2310,6 +2721,30 @@ ROM_START( pir2002b )
 	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
 	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
 ROM_END
+
+/* these had the pir2001 sound rom in, mistake? */
+ROM_START( pir2002b2 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "pi2d19xt.bin", 0x00000, 0x40000, CRC(1c045c9a) SHA1(dd3c6d2c1f084b4af262e52339d0c25c7e733b70) )
+	ROM_LOAD( "pi2d20r.bin", 0x00000, 0x40000,  CRC(83a264c4) SHA1(7de1902f5b63d6c44df5726c450ff21b5d911ec4) )
+	ROM_LOAD( "pi2v19xt.bin", 0x00000, 0x40000, CRC(0ef73818) SHA1(7d1c856c78f4d7b36f318725de3dffb5ad9279fe) )
+	ROM_LOAD( "pi2v20e.bin", 0x00000, 0x40000,  CRC(208fec36) SHA1(779f87cb436e7d59b6c410921b030430020577ec) )
+	ROM_LOAD( "pi2v20r.bin", 0x00000, 0x40000,  CRC(e4155252) SHA1(136ac929633bc6ee759285dcdb725aaaf7cdf225) )
+	ROM_LOAD( "pi2b20r.bin", 0x00000, 0x40000,  CRC(4b2e45c0) SHA1(b96ba54034a0e61d53e317559bfe83f337e63618) )
+	ROM_LOAD( "pi2b19xt.bin", 0x00000, 0x40000, CRC(c9eed644) SHA1(6cd40196bdd8e84738c970198e770f87964aab5d) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "pirom3.bin", 0x00000, 0x80000, CRC(ad175fea) SHA1(07585fcb0d4828fb2b99bebfe583e54a835636ed) )
+	ROM_LOAD16_BYTE( "pirom4.bin", 0x00001, 0x80000, CRC(a94061ec) SHA1(2c3b37a1144a873f0b4b884cbeb938947270f5a3) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
+	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
+ROM_END
+
 
 ROM_START( classice )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
@@ -4302,6 +4737,135 @@ static DRIVER_INIT(parrot3v2)
 	DRIVER_INIT_CALL(sfbonus_common);
 } 
 
+static DRIVER_INIT(sfruitbd)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
+			case 1: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
+			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break; // 
+			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+} 
+
+static DRIVER_INIT(sfruitbv)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x25, 2,1,0,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}  
+
+static DRIVER_INIT(sfruitbv2)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x25, 2,1,0,7,6,5,4,3); break; 
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+} 
+  
+static DRIVER_INIT(sfbonusd)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 1: x = BITSWAP8(x^0xef, 1,7,6,5,4,3,0,2); break;
+			case 2: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xad, 4,3,0,1,2,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xaa, 4,3,1,2,0,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+} 
+  
+static DRIVER_INIT(sfbonusv)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x25, 2,1,0,7,6,5,4,3); break; // 20176543
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+  
+      
+  
+
+  
   
 /*
 			case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
@@ -4317,6 +4881,9 @@ static DRIVER_INIT(parrot3v2)
 
 GAME( 199?, sfbonus,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, sfbonusa,    sfbonus,  sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, sfbonusb,    sfbonus,  sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, sfbonusd,    sfbonus,  sfbonus,    sfbonus,    sfbonusd, ROT0,  "Amcoe", "Skill Fruit Bonus (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, sfbonusv,    sfbonus,  sfbonus,    sfbonus,    sfbonusv, ROT0,  "Amcoe", "Skill Fruit Bonus (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 199?, parrot3,     0,        sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, parrot3b,    parrot3,  sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -4329,7 +4896,8 @@ GAME( 2000, hldspin1b,   hldspin1, sfbonus,    sfbonus,    hldspin1, ROT0,  "Amc
 GAME( 2000, hldspin1d,   hldspin1, sfbonus,    sfbonus,    hldspin1d, ROT0,  "Amcoe", "Hold & Spin I (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, hldspin1v,   hldspin1, sfbonus,    sfbonus,    hldspin1v, ROT0,  "Amcoe", "Hold & Spin I (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, hldspin2,    0,        sfbonus,    sfbonus,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2,    0,        sfbonus,    sfbonus,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2b,   hldspin2,        sfbonus,    sfbonus,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 2000, fcnudge,     0,        sfbonus,    sfbonus,    abnudge, ROT0,  "Amcoe", "Fruit Carnival Nudge (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fruitcar,    fcnudge,  sfbonus,    parrot3,    fruitcar, ROT0,  "Amcoe", "Fruit Carnival Nudge (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -4348,11 +4916,14 @@ GAME( 2000, pickwinv3,    pickwin,  sfbonus,    sfbonus,    pickwinv, ROT0,  "Am
 
 GAME( 2000, tighook,     0,        sfbonus,    sfbonus,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, tighooka,    tighook,  sfbonus,    sfbonus,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, tighookb,    tighook,  sfbonus,    sfbonus,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, robadv,      0,        sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv,      0,        sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadva,     robadv,   sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 2000, robadv2,     0,        sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, robadv2a,    robadv2,  sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv2b,    robadv2,  sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 2000, pirpok2,     0,        sfbonus,    sfbonus,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, pirpok2b,    pirpok2,  sfbonus,    sfbonus,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -4393,16 +4964,30 @@ GAME( 2000, anithuntv,   anithunt, sfbonus,    sfbonus,    anithuntv, ROT0,  "Am
 
 GAME( 2000, sfruitb,     0,        sfbonus,    sfbonus,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0B)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, sfruitb2,    sfruitb,  sfbonus,    sfbonus,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbb,    sfruitb,  sfbonus,    sfbonus,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbb2,    sfruitb,  sfbonus,    sfbonus,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbb3,    sfruitb,  sfbonus,    sfbonus,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbd,    sfruitb,  sfbonus,    sfbonus,    sfruitbd, ROT0,  "Amcoe", "Super Fruit Bonus (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbd2,    sfruitb,  sfbonus,    sfbonus,    sfruitbd, ROT0,  "Amcoe", "Super Fruit Bonus (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbd3,    sfruitb,  sfbonus,    sfbonus,    sfruitbd, ROT0,  "Amcoe", "Super Fruit Bonus (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbv,    sfruitb,  sfbonus,    sfbonus,    sfruitbv, ROT0,  "Amcoe", "Super Fruit Bonus (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbv2,    sfruitb,  sfbonus,    sfbonus,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbv3,    sfruitb,  sfbonus,    sfbonus,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbv4,    sfruitb,  sfbonus,    sfbonus,    sfruitbv, ROT0,  "Amcoe", "Super Fruit Bonus (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, sfruitbv5,    sfruitb,  sfbonus,    sfbonus,    sfruitbv, ROT0,  "Amcoe", "Super Fruit Bonus (set 13)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, sfruitb3,    sfruitb,  sfbonus,    sfbonus,    sfruitb, ROT0,  "Amcoe", "Texas Super Fruit Bonus (Version 1.80XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
 GAME( 2000, fb2gen,      0,        sfbonus,    sfbonus,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb2gena,     fb2gen,   sfbonus,    sfbonus,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb2genb,     fb2gen,   sfbonus,    sfbonus,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb2nd,       0,        sfbonus,    sfbonus,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb2nd,       0,        sfbonus,    sfbonus,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb2ndc,       fb2nd,   sfbonus,    sfbonus,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 2000, fb4,         0,        sfbonus,    sfbonus,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.3XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb4a,        fb4,      sfbonus,    sfbonus,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4b,        fb4,      sfbonus,    sfbonus,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
 GAME( 2000, act2000,     0,        sfbonus,    sfbonus,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -4432,10 +5017,12 @@ GAME( 2000, ch2000d2,    ch2000,   sfbonus,    sfbonus,    ch2000d, ROT0,  "Amco
 GAME( 2001, pir2001,     0,        sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2001, pir2001a,    pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2001, pir2001b,    pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001b2,    pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 2002, pir2002,     0,        sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2002, pir2002a,    pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2002, pir2002b,    pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002b2,    pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 200?, classice,    0,        sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 200?, classicea,   classice, sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
