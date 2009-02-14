@@ -908,4 +908,5 @@ Some other games that might run on this HW:
 	Hana Puter
 	Royal Card
 	Fruits Bunny (clone of Country Girl)
+	Monoshiri Quiz Osyaberi Macha (Logitec, same board as jangou)
 */
