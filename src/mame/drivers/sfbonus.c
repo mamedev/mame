@@ -808,7 +808,7 @@ ROM_END
 ROM_START( abnudge )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab17n.bin", 0x00000, 0x40000, CRC(aca7c2af) SHA1(8f23b4aff006fcd983769f833c2fabdbb087d36b) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	/* None? */
 
@@ -827,6 +827,7 @@ ROM_START( anithunt )
 	ROM_LOAD( "ath15.bin", 0x00000, 0x40000, CRC(917ae674) SHA1(67808a9d3bd48a8f7f839eb85356269a357581ad) )
 	ROM_LOAD( "ath17.bin", 0x00000, 0x40000, CRC(07facf55) SHA1(2de5ca12e06a6896099672ec7383e6324d23fa12) )
 
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	/* None? */
 
@@ -905,8 +906,8 @@ ROM_START( fcnudge )
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	/* none? */
 
-	//ROM_REGION( 0x80000, "user1", 0 ) /* reference */
-	//ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
+	ROM_REGION( 0x80000, "user1", 0 ) /* reference */
+	ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
 		
 	
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -1216,33 +1217,6 @@ DRIVER_INIT(dblchal)
 	DRIVER_INIT_CALL(sfbonus_common);
 }
 
-static DRIVER_INIT(parrot3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "main");
-
-	for(i=0;i<0x40000;i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-
-			case 0: x = BITSWAP8(x^0x26, 1,2,7,6,5,4,3,0); break;// 12765430
-			case 1: x = BITSWAP8(x^0xF6, 1,7,6,5,4,3,0,2); break;// 17654302
-			case 2: x = BITSWAP8(x^0x29, 4,0,1,7,6,5,2,3); break;// 40176523
-			case 3: x = BITSWAP8(x^0xAD, 0,3,1,2,4,7,6,5); break;// 03124765
-			case 4: x = BITSWAP8(x^0x2E, 1,3,7,6,5,2,0,4); break;//  13765204
-			case 5: x = BITSWAP8(x^0xE0, 3,7,6,5,2,0,4,1); break;//37652041
-			case 6: x = BITSWAP8(x^0x39, 4,1,2,7,6,5,0,3); break;// 41276503
-			case 7: x = BITSWAP8(x^0xB2, 2,0,4,1,3,7,6,5); break;// 20413765
-    		}
-		ROM[i] = x;
-	}
-
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
 
 static DRIVER_INIT(hldspin1)
 {
@@ -1558,7 +1532,60 @@ static DRIVER_INIT(ch2000)
 	DRIVER_INIT_CALL(sfbonus_common);	
 } 
 
-  
+static DRIVER_INIT(anithunt)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<0x40000;i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+ 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xe7, 4,7,6,5,0,3,1,2); break;
+			case 2: x = BITSWAP8(x^0x33, 0,2,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xb3, 0,3,4,2,1,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x2a, 1,3,7,6,5,2,0,4); break;
+			case 5: x = BITSWAP8(x^0xe4, 3,7,6,5,2,0,4,1); break;
+			case 6: x = BITSWAP8(x^0x2d, 4,1,3,7,6,5,2,0); break;
+			case 7: x = BITSWAP8(x^0xb6, 0,3,2,1,4,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
+
+static DRIVER_INIT(abnudge)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<0x40000;i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+ 			case 0: x = BITSWAP8(x^0x33, 0,3,7,6,5,2,1,4); break;
+			case 1: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,4,2); break;
+			case 2: x = BITSWAP8(x^0x36, 4,2,3,7,6,5,1,0); break;
+			case 3: x = BITSWAP8(x^0xa8, 3,2,4,0,1,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x2c, 0,1,7,6,5,2,4,3); break;
+			case 5: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,4,2); break;
+			case 6: x = BITSWAP8(x^0x26, 2,4,3,7,6,5,1,0); break;
+			case 7: x = BITSWAP8(x^0xbe, 4,1,3,0,2,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
+
+
+
 /*
  			case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 			case 1: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
@@ -1572,10 +1599,10 @@ static DRIVER_INIT(ch2000)
 
 GAME( 199?, sfbonus,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, sfbonusa,    sfbonus,  sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, parrot3,     0,        sfbonus,    parrot3,    parrot3, ROT0,  "Amcoe", "Parrot Poker III", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, parrot3,     0,        sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Parrot Poker III", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, hldspin1,    0,        sfbonus,    sfbonus,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, hldspin2,    0,        sfbonus,    sfbonus,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fcnudge,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Fruit Carnival Nudge", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fcnudge,     0,        sfbonus,    sfbonus,    abnudge, ROT0,  "Amcoe", "Fruit Carnival Nudge", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, pickwin,     0,        sfbonus,    sfbonus,    pickwin, ROT0,  "Amcoe", "Pick & Win (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, pickwina,    pickwin,  sfbonus,    sfbonus,    pickwin, ROT0,  "Amcoe", "Pick & Win (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, tighook,     0,        sfbonus,    sfbonus,    tighook, ROT0,  "Amcoe", "Tiger Hook", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -1583,9 +1610,9 @@ GAME( 2000, robadv,      0,        sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe
 GAME( 2000, robadv2,     0,        sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure 2", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, pirpok2,     0,        sfbonus,    sfbonus,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, anibonus,    0,        sfbonus,    sfbonus,    anibonus, ROT0,  "Amcoe", "Animal Bonus", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, abnudge,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Animal Bonus Nudge", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, abnudge,     0,        sfbonus,    sfbonus,    abnudge, ROT0,  "Amcoe", "Animal Bonus Nudge", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, dblchal,     0,        sfbonus,    sfbonus,    dblchal, ROT0,  "Amcoe", "Double Challenge", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anithunt,    0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Animal Treasure Hunt", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, anithunt,    0,        sfbonus,    sfbonus,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, sfruitb,     0,        sfbonus,    sfbonus,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb2gen,      0,        sfbonus,    sfbonus,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb2nd,       0,        sfbonus,    sfbonus,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition", GAME_NOT_WORKING|GAME_NO_SOUND )
