@@ -1124,7 +1124,7 @@ ROM_END
 ROM_START( ch2000v3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2v41lt.bin", 0x00000, 0x40000, CRC(182ed2ff) SHA1(82df7021ec15fa2867f24292060d4a8089d5f49c) )
-	
+		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1407,8 +1407,8 @@ ROM_START( atworld )
 	ROM_LOAD( "awd13e.bin", 0x00000, 0x80000, CRC(ec46b48d) SHA1(bfae55520bb36a6dfb55e12b115e818d9cd060e7) )
 	ROM_LOAD( "awd13r.bin", 0x00000, 0x80000, CRC(786079a8) SHA1(862abc511c5ac0d667c6b9abd914ce6035e9aed9) )
 
-	ROM_REGION( 0x80000, "user1", 0 ) /* reference */
- 	ROM_LOAD( "dummy2.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
+//	ROM_REGION( 0x80000, "user1", 0 ) /* reference */
+// 	ROM_LOAD( "dummy2.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "aw_rom2.bin", 0x00000, 0x40000, CRC(aff26a52) SHA1(176fb42d735a85cdc3b74d6dde76fea9115bf36d) )
@@ -1487,11 +1487,13 @@ static DRIVER_INIT( sfbonus_common)
 	}
 }
 
+
+
 static DRIVER_INIT( sfbonus )
 {
+
 	int i;
 	UINT8 *ROM = memory_region(machine, "main");
-
 	for(i=0;i<memory_region_length(machine, "main");i++)
 	{
 		UINT8 x = ROM[i];
@@ -2206,6 +2208,85 @@ static DRIVER_INIT(ch2000v2)
 } //
 
 
+
+static DRIVER_INIT(ch2000d)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x38, 0,2,7,6,5,4,3,1); break;
+			case 1: x = BITSWAP8(x^0xed, 0,7,6,5,4,3,2,1); break;
+			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);	
+}
+
+static DRIVER_INIT(ch2000v3)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3f, 1,0,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);	
+}
+
+static DRIVER_INIT(ch2000c)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x29, 2,3,7,6,5,0,4,1); break;
+			case 1: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,3,4); break;
+			case 2: x = BITSWAP8(x^0x33, 0,1,3,7,6,5,2,4); break;
+			case 3: x = BITSWAP8(x^0xa6, 1,0,3,4,2,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x25, 4,1,7,6,5,3,2,0); break;
+			case 5: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,3,4); break;
+			case 6: x = BITSWAP8(x^0x35, 0,1,4,7,6,5,3,2); break;
+			case 7: x = BITSWAP8(x^0xbe, 1,0,4,2,3,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);	
+}
+
+
+  
+
 /*
 			case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 			case 1: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
@@ -2249,11 +2330,11 @@ GAME( 2000, ch2000b,     ch2000,   sfbonus,    sfbonus,    ch2000, ROT0,  "Amcoe
 GAME( 2000, ch2000b2,    ch2000,   sfbonus,    sfbonus,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, ch2000v,     ch2000,   sfbonus,    sfbonus,    ch2000v, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, ch2000v2,    ch2000,   sfbonus,    sfbonus,    ch2000v2,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000v3,    ch2000,   sfbonus,    sfbonus,    ch2000v2,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000c,     ch2000,   sfbonus,    sfbonus,    ch2000v, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000c2,    ch2000,   sfbonus,    sfbonus,    ch2000v2,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000d,     ch2000,   sfbonus,    sfbonus,    ch2000v, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000d2,    ch2000,   sfbonus,    sfbonus,    ch2000v2,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000v3,    ch2000,   sfbonus,    sfbonus,    ch2000v3,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000c,     ch2000,   sfbonus,    sfbonus,    ch2000c, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000c2,    ch2000,   sfbonus,    sfbonus,    ch2000c,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000d,     ch2000,   sfbonus,    sfbonus,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000d2,    ch2000,   sfbonus,    sfbonus,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2001, pir2001,     0,        sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2002, pir2002,     0,        sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 200?, classice,    0,        sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition", GAME_NOT_WORKING|GAME_NO_SOUND )
