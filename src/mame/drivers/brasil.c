@@ -10,7 +10,8 @@ Notes:
  "Maximum credit = 10.000 Italian Lire" on title screen.
 
 TODO:
--understand how the blitter deletes some background parts in Bra$il / Fashion and understand how
+-merge the games in this driver to the highvdeo.c;
+-understand how the video chip deletes some background parts in Bra$il / Fashion and understand how
  the status registers really works;
 -inputs are grossly mapped;
 -add the sound chip into MAME (OkiM6376),it's an alternative version of the more common OkiM6295.
@@ -64,6 +65,35 @@ static VIDEO_UPDATE(brasil)
 	return 0;
 }
 
+static VIDEO_UPDATE(ciclone)
+{
+	int x,y,count;
+
+	count = (0/2);
+
+	for(y=0;y<300;y++)
+	{
+		for(x=0;x<200;x++)
+		{
+			UINT32 color;
+
+			color = ((blit_ram[count]) & 0x00ff)>>0;
+
+			if((x*2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
+
+			color = ((blit_ram[count]) & 0xff00)>>8;
+
+			if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
+
+			count++;
+		}
+	}
+
+	return 0;
+}
+
 static VIDEO_UPDATE(vidpokr2)
 {
 	int x,y,count;
@@ -107,6 +137,21 @@ static READ16_HANDLER( blit_status_r )
 
 		return 3 | vblank_bit;
 		case 2: return (unk_latch & 3); //and 0x3f
+	}
+
+	return 0;
+}
+
+/*Ciclone*/
+static READ16_HANDLER( ciclone_blit_status_r )
+{
+	switch(offset*2)
+	{
+		case 0:
+		vblank_bit^=0x10;
+
+		return 0 | vblank_bit;
+		case 2: return 0x15; //and 0x3f
 	}
 
 	return 0;
@@ -284,6 +329,20 @@ static WRITE16_DEVICE_HANDLER( write3_w )
 //  popmessage("%04x %04x",t1,t3);
 }
 
+static WRITE16_HANDLER( tv_tcf_paletteram_w )
+{
+	int r, g, b, color;
+
+	COMBINE_DATA(&paletteram16[offset]);
+
+	color = paletteram16[offset];
+	r = (color >> 8) & 0xf8;
+	g = (color >> 3) & 0xf8;
+	b = (color << 3) & 0xf8;
+
+	palette_set_color_rgb(space->machine, offset, r, g, b);
+}
+
 static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM /*irq vector area + work ram*/
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
@@ -323,6 +382,27 @@ static ADDRESS_MAP_START( vidpokr2_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x000c, 0x000d) AM_READ( vidpokr2_vblank_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ( read3_r )
 	AM_RANGE(0x0010, 0x0015) AM_WRITE( paletteram_io_w )
+//  AM_RANGE(0x000e, 0x000f) AM_WRITE
+//  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ciclone_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM /*irq vector area + work ram*/
+	AM_RANGE(0x40000, 0x5ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
+	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE( tv_tcf_paletteram_w ) AM_BASE(&paletteram16) /*blitter ram*/
+	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
+	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ciclone_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x0030, 0x0033) AM_READ( ciclone_blit_status_r )
+	AM_RANGE(0x0030, 0x0031) AM_WRITE( blit_status_w )
+	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
+	AM_RANGE(0x0002, 0x0003) AM_WRITE( write2_w ) // coin counter & coin lockout
+ 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( SOUND, "samples", write3_w ) // sound chip routes here
+ 	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
+	AM_RANGE(0x000e, 0x000f) AM_READ( read3_r )
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 ADDRESS_MAP_END
@@ -570,6 +650,7 @@ static INPUT_PORTS_START( fashion )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+/*Actually NMI*/
 static INTERRUPT_GEN( vblank_irq )
 {
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
@@ -602,6 +683,32 @@ static MACHINE_DRIVER_START( brasil )
 
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( ciclone )
+	MDRV_CPU_ADD("main", I80186, 20000000 )	// ?
+	MDRV_CPU_PROGRAM_MAP(ciclone_map,0)
+	MDRV_CPU_IO_MAP(ciclone_io,0)
+	MDRV_CPU_VBLANK_INT("main", vblank_irq)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(400, 300)
+	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
+
+	MDRV_PALETTE_LENGTH(0x200)
+
+	MDRV_VIDEO_START(brasil)
+	MDRV_VIDEO_UPDATE(ciclone)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	//OkiM6376
+	MDRV_SOUND_ADD("samples", OKIM6376, XTAL_12MHz/2/2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vidpokr2 )
 	MDRV_CPU_ADD("main", V30, 8000000 )	// ?
@@ -721,6 +828,19 @@ ROM_START( fashion )
 	ROM_LOAD( "sound-fashion-v-1-memory4m.u16", 0x00000, 0x80000, CRC(2927c799) SHA1(f11cad096a23fee10bfdff5bf944c96e30f4a8b8) )
 ROM_END
 
+ROM_START( ciclone )
+	ROM_REGION( 0x200000, "user1", 0 ) /* N80C186XL25 Code */
+	ROM_LOAD16_BYTE( "hclv1.u7", 0x000000, 0x100000, CRC(071c64f2) SHA1(5125c3caf77258260bfa4c24dd612cedf61fe7f2) )
+	ROM_LOAD16_BYTE( "hclv1.u8", 0x000001, 0x100000, CRC(c2ed99b4) SHA1(a1a3bfa9a6ea53979c20d60ccd7eb1773c805fc8) )
+
+	ROM_REGION( 0x040000, "boot_prg", 0 ) /*copy for program code*/
+	ROM_COPY( "user1", 0x1c0000, 0x000000, 0x40000 )
+
+	ROM_REGION( 0x080000, "samples", 0 ) /* M6376 Samples */
+	ROM_LOAD( "hclv1.u16", 0x00000, 0x80000, CRC(45b2b53a) SHA1(983bcc5869d84938ba278f26339dd72c17ed1d00) )
+ROM_END
+
+
 static DRIVER_INIT( fashion )
 {
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0002, 0x0003, 0, 0, fashion_write2_w );
@@ -729,3 +849,4 @@ static DRIVER_INIT( fashion )
 GAMEL( 19??, newmcard,  0,      vidpokr2,    brasil,   0,       ROT0,  "New High Video?", "New Magic Card",         0,                           layout_fashion )
 GAMEL( 2000, brasil,    0,      brasil,      brasil,   0,       ROT0,  "New High Video?", "Bra$il (Version 3)",     GAME_IMPERFECT_GRAPHICS, layout_fashion )
 GAMEL( 2000, fashion,   brasil, brasil,      fashion,  fashion, ROT0,  "New High Video?", "Fashion (Version 2.14)", GAME_IMPERFECT_GRAPHICS, layout_fashion )
+GAMEL( 2000, ciclone,   0,      ciclone,     brasil,   0,       ROT0,  "New High Video?", "Ciclone", GAME_IMPERFECT_GRAPHICS, layout_fashion )

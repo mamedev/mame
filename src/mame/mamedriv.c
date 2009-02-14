@@ -8529,6 +8529,7 @@ Other Sun games
 	DRIVER( newmcard )	/* (c) 19?? unknown */
 	DRIVER( brasil )	/* (c) 2000 unknown */
 	DRIVER( fashion )	/* (c) 2000 unknown */
+	DRIVER( ciclone )   /* (c) 2000 unknown */
 
 	/* V30-based italian gambling games */
  	DRIVER( tour4000 )	/* (c) 2000 High Video */
@@ -8613,7 +8614,7 @@ Other Sun games
 	DRIVER( nfb96seb )	/* bootleg */
 	DRIVER( carb2002 )	/* bootleg */
 	DRIVER( carb2003 )	/* bootleg */
-	
+
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
 	DRIVER( mtonic )	/* 198? (c) Tonic */
@@ -8642,10 +8643,10 @@ Other Sun games
 	DRIVER( pickwind2 )
 	DRIVER( pickwinv )
 	DRIVER( pickwinv2 )
-	DRIVER( pickwinv3 )	
+	DRIVER( pickwinv3 )
 	DRIVER( tighook )
 	DRIVER( tighooka )
-	DRIVER( robadv )	
+	DRIVER( robadv )
 	DRIVER( robadv2 )
 	DRIVER( robadv2a )
 	DRIVER( pirpok2 )
@@ -8679,7 +8680,7 @@ Other Sun games
 	DRIVER( dblchalb )
 	DRIVER( dblchalc )
 	DRIVER( dblchald )
-	DRIVER( dblchalv )	
+	DRIVER( dblchalv )
 	DRIVER( sfruitb )
 	DRIVER( sfruitb2 )
 	DRIVER( sfruitb3 )
@@ -8709,7 +8710,7 @@ Other Sun games
 	DRIVER( ch2000c )
 	DRIVER( ch2000c2 )
 	DRIVER( ch2000d )
-	DRIVER( ch2000d2 )	
+	DRIVER( ch2000d2 )
 	DRIVER( pir2001 )
 	DRIVER( pir2001a )
 	DRIVER( pir2001b )
@@ -8733,7 +8734,7 @@ Other Sun games
 	DRIVER( moneymacd2 )
 	DRIVER( atworld )
 	DRIVER( atworlda )
-	
+
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 	DRIVER( spielbud )	/* (c) 1985 ADP */
