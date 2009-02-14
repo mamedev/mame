@@ -1552,7 +1552,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/big10.o \
 	$(DRIVERS)/blackt96.o \
-	$(DRIVERS)/brasil.o \
 	$(DRIVERS)/buster.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
@@ -1717,7 +1716,7 @@ $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
 
 $(DRIVERS)/avalnche.o:	$(LAYOUT)/avalnche.lh
 
-$(DRIVERS)/brasil.o:	$(LAYOUT)/fashion.lh
+$(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
 
