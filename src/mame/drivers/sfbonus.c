@@ -642,7 +642,7 @@ ROM_END
 ROM_START( parrot3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "p4p24.bin", 0x00000, 0x40000, CRC(356a49c8) SHA1(7e0ed7d1063675b66bfe28c427712249654be6ab) )
-
+	
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p4rom2.bin", 0x00000, 0x40000, CRC(d0574efc) SHA1(dd6628450883f0f723744e7caf6525bca7b18a43) )
 
@@ -1084,11 +1084,31 @@ static DRIVER_INIT( sfbonus_common)
 
 	sfbonus_videoram = auto_malloc(0x10000);//memory_region(machine,"user1");
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
-
+	
+	// dummy.rom helper
 #if 0
 	{
 		UINT8 *ROM = memory_region(machine, "main");
-			FILE *fp;
+		UINT8* ROM2 = memory_region(machine,"user1");
+		
+		if (ROM2)
+		{	
+			int x;
+			int y;
+			for (y=0;y<0x8;y++)
+			{
+				for (x=0;x<0x20*0x8;x+=0x8)
+				{
+					printf("%02x %02x ", ROM[x+y], ROM2[x+y]);		
+				}
+				printf("\n");
+			}
+		}
+	}
+	
+	{
+		UINT8 *ROM = memory_region(machine, "main");
+		FILE *fp;
 		char filename[256];
 		sprintf(filename,"decr_%s", machine->gamedrv->name);
 		fp=fopen(filename, "w+b");
@@ -1184,10 +1204,46 @@ DRIVER_INIT(dblchal)
 	DRIVER_INIT_CALL(sfbonus_common);
 }
 
+static DRIVER_INIT(parrot3)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<0x40000;i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+		
+			case 0: x = BITSWAP8(x^0x26, 1,2,7,6,5,4,3,0); break;// 12765430
+			case 1: x = BITSWAP8(x^0xF6, 1,7,6,5,4,3,0,2); break;// 17654302
+			case 2: x = BITSWAP8(x^0x29, 4,0,1,7,6,5,2,3); break;// 40176523
+			case 3: x = BITSWAP8(x^0xAD, 0,3,1,2,4,7,6,5); break;// 03124765
+			case 4: x = BITSWAP8(x^0x2E, 1,3,7,6,5,2,0,4); break;//  13765204
+			case 5: x = BITSWAP8(x^0xE0, 3,7,6,5,2,0,4,1); break;//37652041
+			case 6: x = BITSWAP8(x^0x39, 4,1,2,7,6,5,0,3); break;// 41276503
+			case 7: x = BITSWAP8(x^0xB2, 2,0,4,1,3,7,6,5); break;// 20413765
+    		}      
+		ROM[i] = x;
+	}
+	
+
+	DRIVER_INIT_CALL(sfbonus_common);	
+}
+
+   	//		case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+	//		case 1: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+	//		case 2: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+	//		case 3: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+	//		case 4: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+	//		case 5: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;	
+	//		case 6: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+	//		case 7: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;  
 
 GAME( 199?, sfbonus,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, sfbonusa,    sfbonus,  sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, parrot3,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Parrot Poker III", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, parrot3,     0,        sfbonus,    sfbonus,    parrot3, ROT0,  "Amcoe", "Parrot Poker III", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, hldspin1,    0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Hold & Spin I", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, hldspin2,    0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Hold & Spin II", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fcnudge,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Fruit Carnival Nudge", GAME_NOT_WORKING|GAME_NO_SOUND )
