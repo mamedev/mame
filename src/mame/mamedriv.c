@@ -4523,8 +4523,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( fghthstu )	/* MBF (c) 1993 Data East Corporation (US) */
 	DRIVER( fghthsta )	/* MBF (c) 1993 Data East Corporation (US) */
 	DRIVER( fghthstj )	/* MBF (c) 1993 Data East Corporation (Japan) */
-	DRIVER( hvysmsh )	/* MBG */
-	DRIVER( hvysmsha )	/* MBG */
+	DRIVER( hvysmsh )	/* MBG (c) 1993 Data East Corporation (World) */
+	DRIVER( hvysmsha )	/* MBG (c) 1993 Data East Corporation (Asia) */
+	DRIVER( hvysmshj )	/* MBG (c) 1993 Data East Corporation (Japan) */
 	DRIVER( nslasher )	/* MBH (c) 1993 Data East Corporation */
 	DRIVER( nslashej )	/* MBH (c) 1993 Data East Corporation (Japan)*/
 	DRIVER( nslashes )	/* MBH (c) 1993 Data East Corporation (Japan)*/
@@ -5041,10 +5042,12 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* PowerPC based Konami games */
 	DRIVER( fiveside )	/*   479 (c)1995 */
-	DRIVER( thunderh )	/* GX680 (c)1996 */
+	DRIVER( thunderh )	/* GX680 (c)1996 Euro EAA */
+	DRIVER( thundrhu )	/* GX680 (c)1996 USA UAA */
 	DRIVER( slrasslt )	/* GX792 (c)1996 */
-	DRIVER( gticlub )	/* GX688 (c)1996 */
-	DRIVER( gticlubj )	/* GX688 (c)1996 */
+	DRIVER( gticlub )	/* GX688 (c)1996 Euro EAA */
+	DRIVER( gticluba )	/* GX688 (c)1996 Asia AAA */
+	DRIVER( gticlubj )	/* GX688 (c)1996 Japan JAA */
 	DRIVER( hangplt )	/* GX685 (c)1997 */
 	DRIVER( nbapbp )	/* GX778 (c)1998 */
 	DRIVER( terabrst )	/* GX??? (c)1998 */

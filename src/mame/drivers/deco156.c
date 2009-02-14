@@ -500,54 +500,79 @@ Notes:
 
 */
 
-ROM_START( hvysmsh )
+ROM_START( hvysmsh ) /* Europe -2  1993/06/30 */
 	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
-	ROM_LOAD32_WORD( "lp00-2.2j",    0x000002, 0x080000, CRC(3f8fd724) SHA1(8efb27b96dbdc58715eb44c7846f30d485e1ded4) )
-	ROM_LOAD32_WORD( "lp01-2.3j",    0x000000, 0x080000, CRC(a6fe282a) SHA1(10295b740ced35b3bb1f48ca3af2e985912405ec) )
+	ROM_LOAD32_WORD( "lt00-2.2j", 0x000002, 0x080000, CRC(f6e10fc0) SHA1(76189260ca0a79500d62c4aa8e3aed6cfca3e102) )
+	ROM_LOAD32_WORD( "lt01-2.3j", 0x000000, 0x080000, CRC(ce2a75e2) SHA1(4119a3175d7c394041197f01523a6eaa3d9ba398) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "mbg-00.9a",    0x000000, 0x080000, CRC(7d94eb16) SHA1(31cf5302eba37e935865822aebd76c700bc51eaf) )
+	ROM_LOAD( "mbg-00.9a",  0x000000, 0x080000, CRC(7d94eb16) SHA1(31cf5302eba37e935865822aebd76c700bc51eaf) )
 	ROM_CONTINUE( 0x100000, 0x080000)
 	ROM_CONTINUE( 0x080000, 0x080000)
 	ROM_CONTINUE( 0x180000, 0x080000)
 
 	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "mbg-01.10a",    0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
-	ROM_LOAD16_BYTE( "mbg-02.11a",    0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
+	ROM_LOAD16_BYTE( "mbg-01.10a", 0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
+	ROM_LOAD16_BYTE( "mbg-02.11a", 0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "mbg-03.10k",    0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
+	ROM_LOAD( "mbg-03.10k", 0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
 
 	ROM_REGION( 0x200000, "oki2", 0 ) /* Oki samples */
-	ROM_LOAD( "mbg-04.11k",    0x00000, 0x200000, CRC(2281c758) SHA1(934691b4002ecd6bc9a09b8970ff18a09451d492) )
+	ROM_LOAD( "mbg-04.11k", 0x00000, 0x200000, CRC(2281c758) SHA1(934691b4002ecd6bc9a09b8970ff18a09451d492) )
 
 //  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
-//  ROM_LOAD( "93c46.8k",    0x00, 0x80, CRC(d31fbd5b) SHA1(bf044408c637f6b39afd30ccb86af183ec0acc02) )
+//  ROM_LOAD( "93c46.8k", 0x00, 0x80, CRC(d31fbd5b) SHA1(bf044408c637f6b39afd30ccb86af183ec0acc02) )
 ROM_END
 
-ROM_START( hvysmsha )
+ROM_START( hvysmshj ) /* Japan -2  1993/06/30 */
 	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
-	ROM_LOAD32_WORD( "2j.bin",    0x000002, 0x080000, CRC(333a92c1) SHA1(b7e174ea081febb765298aa1c6533b2f9f162bce) )
-	ROM_LOAD32_WORD( "3j.bin",    0x000000, 0x080000, CRC(8c24c5ed) SHA1(ab9689530f4f4a6015ce0a6f8e0d796b0618cd79) )
+	ROM_LOAD32_WORD( "lp00-2.2j", 0x000002, 0x080000, CRC(3f8fd724) SHA1(8efb27b96dbdc58715eb44c7846f30d485e1ded4) )
+	ROM_LOAD32_WORD( "lp01-2.3j", 0x000000, 0x080000, CRC(a6fe282a) SHA1(10295b740ced35b3bb1f48ca3af2e985912405ec) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "mbg-00.9a",    0x000000, 0x080000, CRC(7d94eb16) SHA1(31cf5302eba37e935865822aebd76c700bc51eaf) )
+	ROM_LOAD( "mbg-00.9a",  0x000000, 0x080000, CRC(7d94eb16) SHA1(31cf5302eba37e935865822aebd76c700bc51eaf) )
 	ROM_CONTINUE( 0x100000, 0x080000)
 	ROM_CONTINUE( 0x080000, 0x080000)
 	ROM_CONTINUE( 0x180000, 0x080000)
 
 	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "mbg-01.10a",    0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
-	ROM_LOAD16_BYTE( "mbg-02.11a",    0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
+	ROM_LOAD16_BYTE( "mbg-01.10a", 0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
+	ROM_LOAD16_BYTE( "mbg-02.11a", 0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "mbg-03.10k",    0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
+	ROM_LOAD( "mbg-03.10k", 0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
 
 	ROM_REGION( 0x200000, "oki2", 0 ) /* Oki samples */
-	ROM_LOAD( "mbg-04.11k",    0x00000, 0x200000, CRC(2281c758) SHA1(934691b4002ecd6bc9a09b8970ff18a09451d492) )
+	ROM_LOAD( "mbg-04.11k", 0x00000, 0x200000, CRC(2281c758) SHA1(934691b4002ecd6bc9a09b8970ff18a09451d492) )
 
 //  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
-//  ROM_LOAD( "93c46.8k",    0x00, 0x80, CRC(d31fbd5b) SHA1(bf044408c637f6b39afd30ccb86af183ec0acc02) )
+//  ROM_LOAD( "93c46.8k", 0x00, 0x80, CRC(d31fbd5b) SHA1(bf044408c637f6b39afd30ccb86af183ec0acc02) )
+ROM_END
+
+ROM_START( hvysmsha ) /* Asia -4  1993/09/06 */
+	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_LOAD32_WORD( "xx00-4.2j", 0x000002, 0x080000, CRC(333a92c1) SHA1(b7e174ea081febb765298aa1c6533b2f9f162bce) ) /* "xx" is NOT the correct region code, this needs */
+	ROM_LOAD32_WORD( "xx01-4.3j", 0x000000, 0x080000, CRC(8c24c5ed) SHA1(ab9689530f4f4a6015ce0a6f8e0d796b0618cd79) ) /* to be verified and corrected at some point */
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "mbg-00.9a",  0x000000, 0x080000, CRC(7d94eb16) SHA1(31cf5302eba37e935865822aebd76c700bc51eaf) )
+	ROM_CONTINUE( 0x100000, 0x080000)
+	ROM_CONTINUE( 0x080000, 0x080000)
+	ROM_CONTINUE( 0x180000, 0x080000)
+
+	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "mbg-01.10a", 0x000000, 0x200000, CRC(bcd7fb29) SHA1(a54a813b5adcb4df0bfdd58285b1f8e17fbbb7a2) )
+	ROM_LOAD16_BYTE( "mbg-02.11a", 0x000001, 0x200000, CRC(0cc16440) SHA1(1cbf620a9d875ec87dd28a97a256584b6ef277cd) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "mbg-03.10k", 0x00000, 0x80000,  CRC(4b809420) SHA1(ad0278745002320804a31af0b772f9ab5f075027) )
+
+	ROM_REGION( 0x200000, "oki2", 0 ) /* Oki samples */
+	ROM_LOAD( "mbg-04.11k", 0x00000, 0x200000, CRC(2281c758) SHA1(934691b4002ecd6bc9a09b8970ff18a09451d492) )
+
+//  ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
+//  ROM_LOAD( "93c46.8k", 0x00, 0x80, CRC(d31fbd5b) SHA1(bf044408c637f6b39afd30ccb86af183ec0acc02) )
 ROM_END
 
 /*
@@ -654,6 +679,7 @@ static DRIVER_INIT( wcvol95 )
 
 /**********************************************************************************/
 
-GAME( 1993, hvysmsh,  0,        hvysmsh,       hvysmsh,  hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", 0)
-GAME( 1993, hvysmsha,  hvysmsh,        hvysmsh,       hvysmsh,  hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", 0)
-GAME( 1995, wcvol95,  0,        wcvol95,       wcvol95,  wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)",0 )
+GAME( 1993, hvysmsh,  0,       hvysmsh, hvysmsh, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Europe version -2)", 0)
+GAME( 1993, hvysmsha, hvysmsh, hvysmsh, hvysmsh, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Asia version -4)", 0)
+GAME( 1993, hvysmshj, hvysmsh, hvysmsh, hvysmsh, hvysmsh,  ROT0, "Data East Corporation", "Heavy Smash (Japan version -2)", 0)
+GAME( 1995, wcvol95,  0,       wcvol95, wcvol95, wcvol95,  ROT0, "Data East Corporation", "World Cup Volley '95 (Japan v1.0)",0 )
