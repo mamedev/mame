@@ -8638,6 +8638,9 @@ Other Sun games
 	DRIVER( act2000 )
 	DRIVER( act2000a )
 	DRIVER( ch2000 )
+	DRIVER( pir2001 )
+	DRIVER( pir2002 )
+	DRIVER( classice )
 	
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
