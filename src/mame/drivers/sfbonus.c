@@ -39,7 +39,7 @@ static TILE_GET_INFO( get_sfbonus_reel_tile_info )
 {
 	int code = sfbonus_reel_ram[(tile_index*2)+0] | (sfbonus_reel_ram[(tile_index*2)+1]<<8);
 	int flipx = (sfbonus_reel_ram[(tile_index*2)+1] & 0x80)>>7;
-	int flipy = (sfbonus_reel_ram[(tile_index*2)+1] & 0x40)>>5;
+	int flipy = 0;//(sfbonus_reel_ram[(tile_index*2)+1] & 0x40)>>5;
 
 	SET_TILE_INFO(
 			1,
@@ -52,7 +52,7 @@ static TILE_GET_INFO( get_sfbonus_reel2_tile_info )
 {
 	int code = sfbonus_reel2_ram[(tile_index*2)+0] | (sfbonus_reel2_ram[(tile_index*2)+1]<<8);
 	int flipx = (sfbonus_reel2_ram[(tile_index*2)+1] & 0x80)>>7;
-	int flipy = (sfbonus_reel2_ram[(tile_index*2)+1] & 0x40)>>5;
+	int flipy = 0;//(sfbonus_reel2_ram[(tile_index*2)+1] & 0x40)>>5;
 
 	SET_TILE_INFO(
 			1,
@@ -65,7 +65,7 @@ static TILE_GET_INFO( get_sfbonus_reel3_tile_info )
 {
 	int code = sfbonus_reel3_ram[(tile_index*2)+0] | (sfbonus_reel3_ram[(tile_index*2)+1]<<8);
 	int flipx = (sfbonus_reel3_ram[(tile_index*2)+1] & 0x80)>>7;
-	int flipy = (sfbonus_reel3_ram[(tile_index*2)+1] & 0x40)>>5;
+	int flipy = 0;//(sfbonus_reel3_ram[(tile_index*2)+1] & 0x40)>>5;
 
 	SET_TILE_INFO(
 			1,
@@ -78,7 +78,7 @@ static TILE_GET_INFO( get_sfbonus_reel4_tile_info )
 {
 	int code = sfbonus_reel4_ram[(tile_index*2)+0] | (sfbonus_reel4_ram[(tile_index*2)+1]<<8);
 	int flipx = (sfbonus_reel4_ram[(tile_index*2)+1] & 0x80)>>7;
-	int flipy = (sfbonus_reel4_ram[(tile_index*2)+1] & 0x40)>>5;
+	int flipy = 0;//(sfbonus_reel4_ram[(tile_index*2)+1] & 0x40)>>5;
 
 	SET_TILE_INFO(
 			1,
@@ -127,7 +127,7 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 	{
 		offset -=0x6000;
 		// scroll regs etc.
-		//printf("access vram at %04x\n",offset);
+		//logerror("access vram at [%04x] <- %02x\n",offset,data);
 		sfbonus_videoram[offset] = data;
 	}
 	else
