@@ -8654,9 +8654,18 @@ Other Sun games
 	DRIVER( pir2001 )
 	DRIVER( pir2002 )
 	DRIVER( classice )
+	DRIVER( classicea )
+	DRIVER( classiced )
+	DRIVER( classiced2 )
+	DRIVER( classiced3 )
+	DRIVER( classicev )
+	DRIVER( classicev2 )
+	DRIVER( classicev3 )
 	DRIVER( seawld )
+	DRIVER( seawlda )
 	DRIVER( moneymac )
 	DRIVER( atworld )
+	DRIVER( atworlda )
 	
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */

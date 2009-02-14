@@ -746,7 +746,7 @@ ROM_START( tighook )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "thk17.bin", 0x00000, 0x40000, CRC(0e27d3dd) SHA1(c85e2e03c36e0f6ec95e15597a6bd58e8eeb6353) )
 	ROM_LOAD( "thk17xt.bin", 0x00000, 0x40000, CRC(02ca5fe2) SHA1(daa66d5ef7336e311cc8bb78ec6625620b9b2800) )
-
+	
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "thkrom2.bin", 0x00000, 0x40000, CRC(61b61b75) SHA1(e71c5ab6aedb7ca4db32a2f4d7d2818dcdd92417) )
 
@@ -812,7 +812,7 @@ ROM_END
 ROM_START( abnudge )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab17n.bin", 0x00000, 0x40000, CRC(aca7c2af) SHA1(8f23b4aff006fcd983769f833c2fabdbb087d36b) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	/* None? */
 
@@ -831,7 +831,7 @@ ROM_START( anithunt )
 	ROM_LOAD( "ath15.bin", 0x00000, 0x40000, CRC(917ae674) SHA1(67808a9d3bd48a8f7f839eb85356269a357581ad) )
 	ROM_LOAD( "ath17.bin", 0x00000, 0x40000, CRC(07facf55) SHA1(2de5ca12e06a6896099672ec7383e6324d23fa12) )
 
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	/* None? */
 
@@ -886,7 +886,7 @@ ROM_END
 ROM_START( pirpok2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3p20.bin", 0x00000, 0x40000, CRC(0e477094) SHA1(cd35c9ac1ed4b843886b1fc554e749f38573ca21) )
-
+	
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p3rom2.bin", 0x00000, 0x20000, CRC(db6182e4) SHA1(65f05247629d5a1f37bf179f468acf8420342d2c) )
 
@@ -909,7 +909,7 @@ ROM_START( fcnudge )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
-
+	
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fcrom3n.bin", 0x00000, 0x80000, CRC(3d1c3d7f) SHA1(bcb20c08a0a2a36775052ae45258862afc00d61d) )
 	ROM_LOAD16_BYTE( "fcrom4n.bin", 0x00001, 0x80000, CRC(a047861e) SHA1(b5d160c25945c7c103160e80d545cb3e1091e631) )
@@ -927,10 +927,10 @@ ROM_START( fruitcar )
 
 //	ROM_REGION( 0x80000, "user1", 0 ) /* reference */
 //	ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
-
+		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
-
+	
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fcrom3n.bin", 0x00000, 0x80000, CRC(3d1c3d7f) SHA1(bcb20c08a0a2a36775052ae45258862afc00d61d) )
 	ROM_LOAD16_BYTE( "fcrom4n.bin", 0x00001, 0x80000, CRC(a047861e) SHA1(b5d160c25945c7c103160e80d545cb3e1091e631) )
@@ -963,7 +963,7 @@ ROM_START( fb2gen )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb2g15r.bin", 0x00000, 0x40000, CRC(a8daf67d) SHA1(6e980748ec77c4842676f14ffffe3f630879e9d9) )
 	ROM_LOAD( "fb2g16xt.bin", 0x00000, 0x40000, CRC(ea525ebb) SHA1(965bba045ba69ac4316b27d0d69b130119f9ce04) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
 	//ROM_LOAD( "fb2grom2a.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed))
@@ -980,7 +980,7 @@ ROM_END
 ROM_START( fb2nd )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb2e15.bin", 0x00000, 0x40000, CRC(40a4bc95) SHA1(f84d8615e5a247a6db7792e54d236fbd5008d794) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
 
@@ -997,7 +997,7 @@ ROM_START( fb4 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb24k12b.bin", 0x00000, 0x40000, CRC(b238411c) SHA1(947a243141766583ce170e1f92769952281bf386) )
 	ROM_LOAD( "fb24k13t.bin", 0x00000, 0x40000, CRC(ef2407cf) SHA1(4bfb8cd738d576e482828529bca3031b55cc165d) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
@@ -1079,7 +1079,7 @@ ROM_END
 ROM_START( ch2000b2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2b41lt.bin", 0x00000, 0x40000, CRC(0c8c40b0) SHA1(091fe168b0915940f7a15e33845dfd62c0a581df))
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1128,7 +1128,7 @@ ROM_END
 ROM_START( ch2000v3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2v41lt.bin", 0x00000, 0x40000, CRC(182ed2ff) SHA1(82df7021ec15fa2867f24292060d4a8089d5f49c) )
-
+		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1144,7 +1144,7 @@ ROM_END
 ROM_START( ch2000c )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2c41lt.bin", 0x00000, 0x40000, CRC(bb6ddba8) SHA1(9f95cc35408f61f07ce0306fb41f3c31ec9ebe87) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1160,7 +1160,7 @@ ROM_END
 ROM_START( ch2000c2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2c44r.bin", 0x00000, 0x40000,  CRC(d898129f) SHA1(1fdc35dd0332ecd705665db3b268e5d05f9d65dd) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1177,7 +1177,7 @@ ROM_END
 ROM_START( ch2000d )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2d41lt.bin", 0x00000, 0x40000, CRC(d49d4303) SHA1(5e75e6d04ff96de212131fecf76c0e300b49b21d) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1193,7 +1193,7 @@ ROM_END
 ROM_START( ch2000d2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2d44r.bin", 0x00000, 0x40000,  CRC(c00fd8c5) SHA1(f7977ec5797f2d20f21b018207808ab9d9d36d71) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fbrom2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1283,7 +1283,7 @@ ROM_START( act2000b )
 	ROM_LOAD( "a2v35e.bin", 0x00000, 0x40000, CRC(dfe5c8b5) SHA1(09ac6df25395d0a5c632c05ba93bf784b69319a0) )
 	ROM_LOAD( "a2v35r.bin", 0x00000, 0x40000, CRC(e9651cea) SHA1(5717bf21e8b82f7d3e668235f189af2aaac9c425) )
 
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "a2klink2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1323,7 +1323,7 @@ ROM_START( pir2002 )
 
 //	ROM_REGION( 0x80000, "user1", 0 ) /* reference */
 //	ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -1338,17 +1338,23 @@ ROM_END
 
 ROM_START( classice )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
-	ROM_LOAD( "fcs16r.bin", 0x00000, 0x40000, CRC(0813e904) SHA1(87b6bb3c1ac17eb663673c948e6c33d1058c22e2) )
-	ROM_LOAD( "fcsd16e.bin", 0x00000, 0x40000, CRC(74134183) SHA1(b59727dc0fae022e97bb60c444a3a78d811aa1ad) )
-	ROM_LOAD( "fcsd16lt.bin", 0x00000, 0x40000, CRC(623c5e2e) SHA1(63bbb7b1f8668828c5c8da8ae025077eca0b5d53) )
-	ROM_LOAD( "fcsd16r.bin", 0x00000, 0x40000, CRC(097dd178) SHA1(b5e251ce8fb323d20ff3722d048d98c4fab0f4a4) )
-	ROM_LOAD( "fcsv16e.bin", 0x00000, 0x40000, CRC(fe472583) SHA1(dd8642c33456d62b47e272fb63d4bf88e11d4c70) )
-	ROM_LOAD( "fcsv16lt.bin", 0x00000, 0x40000, CRC(33393a1f) SHA1(03da07380129f07e5126b5faa37157b97f2c902e) )
-	ROM_LOAD( "fcsv16r.bin", 0x00000, 0x40000, CRC(e0744057) SHA1(bb389cce5d77eed6f74eb46afa90712f803f357b) )
 	ROM_LOAD( "fcs16lt.bin", 0x00000, 0x40000, CRC(e4b3437a) SHA1(2ecbaead72bb20af58c7f470097901ac1c58f296) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fcsrom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(4a96ab78) SHA1(b8f98cd9789ba5cc13eacf34db765ca8d5635903) )
 
-//	ROM_REGION( 0x80000, "user1", 0 ) /* reference */
-// 	ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fcsrom3.bin", 0x00000, 0x40000, CRC(0ba6207a) SHA1(06d1b5826da3af2cb55c64ee69772b7fb3e6bf89) )
+	ROM_LOAD16_BYTE( "fcsrom4.bin", 0x00001, 0x40000, CRC(149dcf7d) SHA1(1f4e0f54cdb22ee9a867861a2a7d659cd339a0a2) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
+	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+ROM_END
+
+ROM_START( classicea )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "fcs16r.bin", 0x00000, 0x40000, CRC(0813e904) SHA1(87b6bb3c1ac17eb663673c948e6c33d1058c22e2) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fcsrom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(4a96ab78) SHA1(b8f98cd9789ba5cc13eacf34db765ca8d5635903) )
@@ -1362,14 +1368,106 @@ ROM_START( classice )
 	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
 ROM_END
 
+ROM_START( classiced )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "fcsd16r.bin", 0x00000, 0x40000, CRC(097dd178) SHA1(b5e251ce8fb323d20ff3722d048d98c4fab0f4a4) )
+
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fcsrom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(4a96ab78) SHA1(b8f98cd9789ba5cc13eacf34db765ca8d5635903) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fcsrom3.bin", 0x00000, 0x40000, CRC(0ba6207a) SHA1(06d1b5826da3af2cb55c64ee69772b7fb3e6bf89) )
+	ROM_LOAD16_BYTE( "fcsrom4.bin", 0x00001, 0x40000, CRC(149dcf7d) SHA1(1f4e0f54cdb22ee9a867861a2a7d659cd339a0a2) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
+	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+ROM_END
+
+ROM_START( classiced2 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "fcsd16lt.bin", 0x00000, 0x40000, CRC(623c5e2e) SHA1(63bbb7b1f8668828c5c8da8ae025077eca0b5d53) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fcsrom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(4a96ab78) SHA1(b8f98cd9789ba5cc13eacf34db765ca8d5635903) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fcsrom3.bin", 0x00000, 0x40000, CRC(0ba6207a) SHA1(06d1b5826da3af2cb55c64ee69772b7fb3e6bf89) )
+	ROM_LOAD16_BYTE( "fcsrom4.bin", 0x00001, 0x40000, CRC(149dcf7d) SHA1(1f4e0f54cdb22ee9a867861a2a7d659cd339a0a2) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
+	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+ROM_END
+
+ROM_START( classiced3 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "fcsd16e.bin", 0x00000, 0x40000, CRC(74134183) SHA1(b59727dc0fae022e97bb60c444a3a78d811aa1ad) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fcsrom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(4a96ab78) SHA1(b8f98cd9789ba5cc13eacf34db765ca8d5635903) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fcsrom3.bin", 0x00000, 0x40000, CRC(0ba6207a) SHA1(06d1b5826da3af2cb55c64ee69772b7fb3e6bf89) )
+	ROM_LOAD16_BYTE( "fcsrom4.bin", 0x00001, 0x40000, CRC(149dcf7d) SHA1(1f4e0f54cdb22ee9a867861a2a7d659cd339a0a2) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
+	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+ROM_END
+
+ROM_START( classicev )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "fcsv16r.bin", 0x00000, 0x40000, CRC(e0744057) SHA1(bb389cce5d77eed6f74eb46afa90712f803f357b) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fcsrom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(4a96ab78) SHA1(b8f98cd9789ba5cc13eacf34db765ca8d5635903) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fcsrom3.bin", 0x00000, 0x40000, CRC(0ba6207a) SHA1(06d1b5826da3af2cb55c64ee69772b7fb3e6bf89) )
+	ROM_LOAD16_BYTE( "fcsrom4.bin", 0x00001, 0x40000, CRC(149dcf7d) SHA1(1f4e0f54cdb22ee9a867861a2a7d659cd339a0a2) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
+	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+ROM_END
+
+ROM_START( classicev2 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "fcsv16lt.bin", 0x00000, 0x40000, CRC(33393a1f) SHA1(03da07380129f07e5126b5faa37157b97f2c902e) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fcsrom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(4a96ab78) SHA1(b8f98cd9789ba5cc13eacf34db765ca8d5635903) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fcsrom3.bin", 0x00000, 0x40000, CRC(0ba6207a) SHA1(06d1b5826da3af2cb55c64ee69772b7fb3e6bf89) )
+	ROM_LOAD16_BYTE( "fcsrom4.bin", 0x00001, 0x40000, CRC(149dcf7d) SHA1(1f4e0f54cdb22ee9a867861a2a7d659cd339a0a2) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
+	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+ROM_END
+
+ROM_START( classicev3 )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "fcsv16e.bin", 0x00000, 0x40000, CRC(fe472583) SHA1(dd8642c33456d62b47e272fb63d4bf88e11d4c70) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "fcsrom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(4a96ab78) SHA1(b8f98cd9789ba5cc13eacf34db765ca8d5635903) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fcsrom3.bin", 0x00000, 0x40000, CRC(0ba6207a) SHA1(06d1b5826da3af2cb55c64ee69772b7fb3e6bf89) )
+	ROM_LOAD16_BYTE( "fcsrom4.bin", 0x00001, 0x40000, CRC(149dcf7d) SHA1(1f4e0f54cdb22ee9a867861a2a7d659cd339a0a2) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
+	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+ROM_END
 
 ROM_START( seawld )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
-	ROM_LOAD( "swv16e.bin", 0x00000, 0x80000, CRC(3f53a6b0) SHA1(2d00f3b5c04b47551f23799a3bcba29ab38ff63c) )
 	ROM_LOAD( "swd16r.bin", 0x00000, 0x80000, CRC(081c84c1) SHA1(5f0d40c38ca26d3633cfe4c7ead2773a1dcc177d) )
-
-	//ROM_REGION( 0x80000, "user1", 0 ) /* reference */
-	//ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "swrom2.bin", 0x00000, 0x40000, CRC(e1afe0ad) SHA1(097233255b486944b79a8504b4312173ab1aad06) )
@@ -1383,6 +1481,23 @@ ROM_START( seawld )
 	ROM_LOAD16_BYTE( "swrom6.bin", 0x00001, 0x80000, CRC(5c9a4847) SHA1(f19aca69f42282e3e88e50e2b4fe05cde990a3e6) )
 ROM_END
 
+ROM_START( seawlda )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "swv16e.bin", 0x00000, 0x80000, CRC(3f53a6b0) SHA1(2d00f3b5c04b47551f23799a3bcba29ab38ff63c) )
+	
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "swrom2.bin", 0x00000, 0x40000, CRC(e1afe0ad) SHA1(097233255b486944b79a8504b4312173ab1aad06) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "swrom3.bin", 0x00000, 0x80000, CRC(091b6966) SHA1(4ac17ca80cdb584a4d32f81688ce374bd8bd9cc6) )
+	ROM_LOAD16_BYTE( "swrom4.bin", 0x00001, 0x80000, CRC(539651dc) SHA1(45473cd7205ba0c0e44c76d3f6a8fa2f66b2798c) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "swrom5.bin", 0x00000, 0x80000, CRC(cd6aa69f) SHA1(abcbda547b0c6f4a03ed3500f55ff32bc23bedeb) )
+	ROM_LOAD16_BYTE( "swrom6.bin", 0x00001, 0x80000, CRC(5c9a4847) SHA1(f19aca69f42282e3e88e50e2b4fe05cde990a3e6) )
+ROM_END
+
+
 ROM_START( moneymac )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "mmd17lt.bin", 0x00000, 0x40000, CRC(85a72381) SHA1(eaee2504a205b3b8ce7cbe1f69d276ad131b0554) )
@@ -1393,7 +1508,7 @@ ROM_START( moneymac )
 
 //	ROM_REGION( 0x80000, "user1", 0 ) /* reference */
  //	ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
-
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "mmrom2.bin", 0x00000, 0x40000, CRC(fc3195e6) SHA1(a13c22c0cd5cdbc833e0f7e229ce4afe2cf2b466) )
 
@@ -1408,11 +1523,7 @@ ROM_END
 
 ROM_START( atworld )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
-	ROM_LOAD( "awd13e.bin", 0x00000, 0x80000, CRC(ec46b48d) SHA1(bfae55520bb36a6dfb55e12b115e818d9cd060e7) )
 	ROM_LOAD( "awd13r.bin", 0x00000, 0x80000, CRC(786079a8) SHA1(862abc511c5ac0d667c6b9abd914ce6035e9aed9) )
-
-//	ROM_REGION( 0x80000, "user1", 0 ) /* reference */
-// 	ROM_LOAD( "dummy2.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "aw_rom2.bin", 0x00000, 0x40000, CRC(aff26a52) SHA1(176fb42d735a85cdc3b74d6dde76fea9115bf36d) )
@@ -1426,7 +1537,21 @@ ROM_START( atworld )
 	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
 ROM_END
 
+ROM_START( atworlda )
+	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "awd13e.bin", 0x00000, 0x80000, CRC(ec46b48d) SHA1(bfae55520bb36a6dfb55e12b115e818d9cd060e7) )
 
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "aw_rom2.bin", 0x00000, 0x40000, CRC(aff26a52) SHA1(176fb42d735a85cdc3b74d6dde76fea9115bf36d) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "aw_rom3.bin", 0x00000, 0x80000, CRC(36db794a) SHA1(a5cb32fc401faf52e221f0a4d8bbfae819e7d08b) )
+	ROM_LOAD16_BYTE( "aw_rom4.bin", 0x00001, 0x80000, CRC(3927d187) SHA1(4d6e509ec6cc33e6985142894bbce547e1ee9f4f) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "aw_rom5.bin", 0x00000, 0x80000, CRC(c461c4d5) SHA1(2815511f8ae9b74c44aa9987eebf1a14642b4458) )
+	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
+ROM_END
 
 
 static DRIVER_INIT( sfbonus_common)
@@ -1459,6 +1584,8 @@ static DRIVER_INIT( sfbonus_common)
 
 		if (ROM2)
 		{
+			printf("X %02x %02x %02x %02x %02x %02x %02x %02x\n", ROM[0x50], ROM[0x51], ROM[0x52], ROM[0x53], ROM[0x54], ROM[0x55],ROM[0x56],ROM[0x57]);   
+		
 			{
 
 				int x;
@@ -1754,11 +1881,11 @@ static DRIVER_INIT(tighook)
 			case 5: x = BITSWAP8(x^0xff, 2,7,6,5,1,0,3,4); break;
 			case 6: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,3,4); break;
 			case 7: x = BITSWAP8(x^0xa7, 1,0,4,2,3,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
+	DRIVER_INIT_CALL(sfbonus_common);	
 }
 
 static DRIVER_INIT(sfruitb)
@@ -1780,12 +1907,12 @@ static DRIVER_INIT(sfruitb)
 			case 5: x = BITSWAP8(x^0xf6, 3,7,6,5,2,0,1,4); break;
 			case 6: x = BITSWAP8(x^0x37, 4,1,3,7,6,5,2,0); break;
 			case 7: x = BITSWAP8(x^0xb9, 0,3,4,1,2,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(fb2gen)
 {
@@ -1806,12 +1933,12 @@ static DRIVER_INIT(fb2gen)
 			case 5: x = BITSWAP8(x^0xf8, 2,7,6,5,1,4,3,0); break;
 			case 6: x = BITSWAP8(x^0x23, 4,0,3,7,6,5,2,1); break;
 			case 7: x = BITSWAP8(x^0xb8, 2,1,4,0,3,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(fb2nd)
 {
@@ -1832,12 +1959,12 @@ static DRIVER_INIT(fb2nd)
 			case 5: x = BITSWAP8(x^0xfd, 4,7,6,5,3,1,2,0); break;
 			case 6: x = BITSWAP8(x^0x3a, 4,1,2,7,6,5,3,0); break;
 			case 7: x = BITSWAP8(x^0xbd, 3,4,2,0,1,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(fb4)
 {
@@ -1858,12 +1985,12 @@ static DRIVER_INIT(fb4)
 			case 5: x = BITSWAP8(x^0xff, 1,7,6,5,2,3,0,4); break;
 			case 6: x = BITSWAP8(x^0x3f, 1,0,4,7,6,5,3,2); break;
 			case 7: x = BITSWAP8(x^0xae, 2,3,0,4,1,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(ch2000)
 {
@@ -1884,12 +2011,12 @@ static DRIVER_INIT(ch2000)
 			case 5: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,3,4); break;
 			case 6: x = BITSWAP8(x^0x35, 0,1,4,7,6,5,3,2); break;
 			case 7: x = BITSWAP8(x^0xbe, 1,0,4,2,3,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(anithunt)
 {
@@ -1910,12 +2037,12 @@ static DRIVER_INIT(anithunt)
 			case 5: x = BITSWAP8(x^0xe4, 3,7,6,5,2,0,4,1); break;
 			case 6: x = BITSWAP8(x^0x2d, 4,1,3,7,6,5,2,0); break;
 			case 7: x = BITSWAP8(x^0xb6, 0,3,2,1,4,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(abnudge)
 {
@@ -1936,12 +2063,12 @@ static DRIVER_INIT(abnudge)
 			case 5: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,4,2); break;
 			case 6: x = BITSWAP8(x^0x26, 2,4,3,7,6,5,1,0); break;
 			case 7: x = BITSWAP8(x^0xbe, 4,1,3,0,2,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(pir2001)
 {
@@ -1962,12 +2089,12 @@ static DRIVER_INIT(pir2001)
 			case 5: x = BITSWAP8(x^0xf7, 1,7,6,5,4,3,0,2); break;
 			case 6: x = BITSWAP8(x^0x27, 4,1,2,7,6,5,0,3); break;
 			case 7: x = BITSWAP8(x^0xaf, 0,3,2,4,1,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(pir2002)
 {
@@ -1988,12 +2115,12 @@ static DRIVER_INIT(pir2002)
 			case 5: x = BITSWAP8(x^0xf9, 2,7,6,5,4,3,0,1); break;
 			case 6: x = BITSWAP8(x^0x3a, 4,1,2,7,6,5,0,3); break;
 			case 7: x = BITSWAP8(x^0xb7, 1,0,3,2,4,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 
 static DRIVER_INIT(classice)
@@ -2015,12 +2142,12 @@ static DRIVER_INIT(classice)
 			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,0,1); break;
 			case 6: x = BITSWAP8(x^0x22, 0,2,1,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xad, 4,3,0,2,1,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 //
 static DRIVER_INIT(seawld)
@@ -2042,15 +2169,15 @@ static DRIVER_INIT(seawld)
 			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,2,0); break;
 			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
+	DRIVER_INIT_CALL(sfbonus_common);	
 }
 
  //mmv17r.bin
-
+ 
 static DRIVER_INIT(moneymac)
 {
 	int i;
@@ -2070,12 +2197,12 @@ static DRIVER_INIT(moneymac)
 			case 5: x = BITSWAP8(x^0xeb, 0,7,6,5,4,3,2,1); break;
 			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 
 static DRIVER_INIT(atworld)
@@ -2097,14 +2224,14 @@ static DRIVER_INIT(atworld)
 			case 5: x = BITSWAP8(x^0xe8, 1,7,6,5,4,3,0,2); break;
 			case 6: x = BITSWAP8(x^0x22, 0,1,2,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
+	
 
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(fruitcar)
 {
@@ -2125,14 +2252,14 @@ static DRIVER_INIT(fruitcar)
 			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
 			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
-
+ 
 static DRIVER_INIT(act2000b)
 {
 	int i;
@@ -2152,12 +2279,12 @@ static DRIVER_INIT(act2000b)
 			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
 			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
-}
+	DRIVER_INIT_CALL(sfbonus_common);	
+} 
 
 static DRIVER_INIT(ch2000v)
 {
@@ -2172,17 +2299,17 @@ static DRIVER_INIT(ch2000v)
 		{
 			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
 			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;  
 			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3f, 1,0,7,6,5,4,3,2); break;
 			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
 			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
+	DRIVER_INIT_CALL(sfbonus_common);	
 } //
 
 static DRIVER_INIT(ch2000v2)
@@ -2204,11 +2331,11 @@ static DRIVER_INIT(ch2000v2)
 			case 5: x = BITSWAP8(x^0xec, 0,7,6,5,4,3,2,1); break;
 			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
 
-	DRIVER_INIT_CALL(sfbonus_common);
+	DRIVER_INIT_CALL(sfbonus_common);	
 } //
 
 
@@ -2232,10 +2359,10 @@ static DRIVER_INIT(ch2000d)
 			case 5: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
 			case 6: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
-	DRIVER_INIT_CALL(sfbonus_common);
+	DRIVER_INIT_CALL(sfbonus_common);	
 }
 
 static DRIVER_INIT(ch2000v3)
@@ -2257,10 +2384,10 @@ static DRIVER_INIT(ch2000v3)
 			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
 			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
 			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
-	DRIVER_INIT_CALL(sfbonus_common);
+	DRIVER_INIT_CALL(sfbonus_common);	
 }
 
 static DRIVER_INIT(ch2000c)
@@ -2282,15 +2409,163 @@ static DRIVER_INIT(ch2000c)
 			case 5: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,3,4); break;
 			case 6: x = BITSWAP8(x^0x35, 0,1,4,7,6,5,3,2); break;
 			case 7: x = BITSWAP8(x^0xbe, 1,0,4,2,3,7,6,5); break;
-    	}
+    	}      
 		ROM[i] = x;
 	}
-	DRIVER_INIT_CALL(sfbonus_common);
+	DRIVER_INIT_CALL(sfbonus_common);	
 }
 
+static DRIVER_INIT(classiced)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
 
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
 
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x38, 0,2,7,6,5,4,3,1); break;
+			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xaa, 4,3,2,0,1,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xe8, 0,7,6,5,4,3,1,2); break;
+			case 6: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xa8, 4,3,0,2,1,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);	
+}
 
+static DRIVER_INIT(classiced3)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3b, 2,1,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xaa, 4,3,2,0,1,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xe8, 0,7,6,5,4,3,1,2); break;
+			case 6: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xae, 4,3,1,0,2,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);	
+}  
+
+static DRIVER_INIT(classicev)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3a, 2,1,7,6,5,4,3,0); break;
+			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);	
+}  // 
+
+static DRIVER_INIT(classicev3)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
+			case 5: x = BITSWAP8(x^0xe9, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);	
+}  //  
+
+static DRIVER_INIT(seawlda)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x22, 0,2,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3a, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);	
+}  //  
+
+static DRIVER_INIT(atworlda)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
+			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
+			case 2: x = BITSWAP8(x^0x26, 1,0,2,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x22, 0,1,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
+    	}      
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);	
+}  //  
+
+  
 /*
 			case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 			case 1: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
@@ -2300,7 +2575,7 @@ static DRIVER_INIT(ch2000c)
 			case 5: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 			case 6: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 			case 7: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-
+ 
 */
 
 GAME( 199?, sfbonus,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -2341,8 +2616,20 @@ GAME( 2000, ch2000d,     ch2000,   sfbonus,    sfbonus,    ch2000d, ROT0,  "Amco
 GAME( 2000, ch2000d2,    ch2000,   sfbonus,    sfbonus,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2001, pir2001,     0,        sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2002, pir2002,     0,        sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classice,    0,        sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, seawld,      0,        sfbonus,    parrot3,    seawld, ROT0,  "Amcoe", "Sea World", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classice,    0,        sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicea,   classice, sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classiced,   classice, sfbonus,    parrot3,    classiced,ROT0,  "Amcoe", "Classic Edition (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classiced2,  classice, sfbonus,    parrot3,    classiced,ROT0,  "Amcoe", "Classic Edition (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classiced3,  classice, sfbonus,    parrot3,    classiced3,ROT0,  "Amcoe", "Classic Edition (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicev,   classice, sfbonus,    parrot3,    classicev,ROT0,  "Amcoe", "Classic Edition (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicev2,  classice, sfbonus,    parrot3,    classicev,ROT0,  "Amcoe", "Classic Edition (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicev3,  classice, sfbonus,    parrot3,    classicev3,ROT0,  "Amcoe", "Classic Edition (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, seawld,      0,        sfbonus,    parrot3,    seawld, ROT0,  "Amcoe", "Sea World (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, seawlda,     seawld,   sfbonus,    parrot3,    seawlda, ROT0,  "Amcoe", "Sea World (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
 GAME( 200?, moneymac,    0,        sfbonus,    parrot3,    moneymac, ROT0,  "Amcoe", "Money Machine", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, atworld,     0,        sfbonus,    parrot3,    atworld, ROT0,  "Amcoe", "Around The World", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, atworld,     0,        sfbonus,    parrot3,    atworld, ROT0,  "Amcoe", "Around The World (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, atworlda,    atworld,  sfbonus,    parrot3,    atworlda, ROT0,  "Amcoe", "Around The World (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
