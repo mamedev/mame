@@ -412,8 +412,8 @@ WRITE8_DEVICE_HANDLER( bb_ym2_a_w )
 
 WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 {
-	const device_config *ay1 = devtag_get_device(device->machine, SOUND, "ay1");
-	const device_config *ay2 = devtag_get_device(device->machine, SOUND, "ay2");
+	const device_config *ym1 = devtag_get_device(device->machine, SOUND, "ym1");
+	const device_config *ym2 = devtag_get_device(device->machine, SOUND, "ym2");
 	double gain;
 
 	stream_update(stream);
@@ -426,19 +426,23 @@ WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 		coin_counter_w(1, data & 0x02);
 	}
 
-	/* Until we support > 2 speakers, double the gain of the front speakers */
+	/*
+		Until we support > 2 speakers, double the gain of the front speakers
+
+		TODO: We do support more than 2 speakers but the output is downmixed to stereo.
+	*/
 
 	/* Rear left speaker */
 	gain = data & 0x80 ? 1.0 : 2.0;
-	sound_set_output_gain(ay1, 0, gain);
-	sound_set_output_gain(ay1, 1, gain);
-	sound_set_output_gain(ay1, 2, gain);
+	sound_set_output_gain(ym1, 0, gain);
+	sound_set_output_gain(ym1, 1, gain);
+	sound_set_output_gain(ym1, 2, gain);
 
 	/* Rear right speaker */
 	gain = data & 0x40 ? 1.0 : 2.0;
-	sound_set_output_gain(ay2, 0, gain);
-	sound_set_output_gain(ay2, 1, gain);
-	sound_set_output_gain(ay2, 2, gain);
+	sound_set_output_gain(ym2, 0, gain);
+	sound_set_output_gain(ym2, 1, gain);
+	sound_set_output_gain(ym2, 2, gain);
 }
 
 /* This is admittedly a bit of a hack job... */
