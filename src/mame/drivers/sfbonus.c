@@ -352,12 +352,13 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x3807, 0x3807) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
+/* 8-liners input define */
 static INPUT_PORTS_START( sfbonus )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) // credit clear
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
@@ -369,7 +370,7 @@ static INPUT_PORTS_START( sfbonus )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Account Test")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Port Test")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) //probably some kind of service button or remote
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 2") PORT_CODE(KEYCODE_X)
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
@@ -381,9 +382,7 @@ static INPUT_PORTS_START( sfbonus )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Stop 1") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("All Stop") PORT_CODE(KEYCODE_V)
-	PORT_DIPNAME( 0x40, 0x40, "IN1-1" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -533,6 +532,22 @@ static INPUT_PORTS_START( sfbonus )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+/* pokers input define */
+static INPUT_PORTS_START( parrot3 )
+	PORT_INCLUDE(sfbonus)
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4 / Small") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1 / Bet") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3 / W-Up") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cancel All") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2 / Big") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static const gfx_layout sfbonus_layout =
 {
 	8,8,
@@ -597,11 +612,11 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_VIDEO_START(sfbonus)
 	MDRV_VIDEO_UPDATE(sfbonus)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.47)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.47)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 // the gfx2 roms might be swapped on these sets
@@ -642,7 +657,7 @@ ROM_END
 ROM_START( parrot3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "p4p24.bin", 0x00000, 0x40000, CRC(356a49c8) SHA1(7e0ed7d1063675b66bfe28c427712249654be6ab) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p4rom2.bin", 0x00000, 0x40000, CRC(d0574efc) SHA1(dd6628450883f0f723744e7caf6525bca7b18a43) )
 
@@ -1086,7 +1101,7 @@ static DRIVER_INIT( sfbonus_common)
 
 	sfbonus_videoram = auto_malloc(0x10000);//memory_region(machine,"user1");
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
-	
+
 	// dummy.rom helper
 	{
 		UINT8 *ROM = memory_region(machine, "main");
@@ -1095,7 +1110,7 @@ static DRIVER_INIT( sfbonus_common)
 		if (ROM2)
 		{
 			{
-			
+
 				int x;
 				int y;
 				for (y=0;y<0x8;y++)
@@ -1104,13 +1119,13 @@ static DRIVER_INIT( sfbonus_common)
 					printf("a.exe ");
 					for (x=0;x<0x20*0x8;x+=0x8)
 					{
-						printf("%02x %02x ", ROM[x+y], ROM2[x+y]);		
+						printf("%02x %02x ", ROM[x+y], ROM2[x+y]);
 					}
 					printf("\n");
 				}
-				
+
 			}
-			
+
 			{
 				UINT8 *ROM = memory_region(machine, "main");
 				FILE *fp;
@@ -1221,7 +1236,7 @@ static DRIVER_INIT(parrot3)
 
 		switch(i & 7)
 		{
-		
+
 			case 0: x = BITSWAP8(x^0x26, 1,2,7,6,5,4,3,0); break;// 12765430
 			case 1: x = BITSWAP8(x^0xF6, 1,7,6,5,4,3,0,2); break;// 17654302
 			case 2: x = BITSWAP8(x^0x29, 4,0,1,7,6,5,2,3); break;// 40176523
@@ -1230,12 +1245,12 @@ static DRIVER_INIT(parrot3)
 			case 5: x = BITSWAP8(x^0xE0, 3,7,6,5,2,0,4,1); break;//37652041
 			case 6: x = BITSWAP8(x^0x39, 4,1,2,7,6,5,0,3); break;// 41276503
 			case 7: x = BITSWAP8(x^0xB2, 2,0,4,1,3,7,6,5); break;// 20413765
-    		}      
+    		}
 		ROM[i] = x;
 	}
-	
 
-	DRIVER_INIT_CALL(sfbonus_common);	
+
+	DRIVER_INIT_CALL(sfbonus_common);
 }
 
 static DRIVER_INIT(hldspin1)
@@ -1254,15 +1269,15 @@ static DRIVER_INIT(hldspin1)
 			case 2: x = BITSWAP8(x^0x31, 1,4,3,7,6,5,2,0); break;
 			case 3: x = BITSWAP8(x^0xbc, 0,3,4,2,1,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x24, 4,3,7,6,5,2,0,1); break;
-			case 5: x = BITSWAP8(x^0xf8, 3,7,6,5,2,0,1,4); break;	
+			case 5: x = BITSWAP8(x^0xf8, 3,7,6,5,2,0,1,4); break;
 			case 6: x = BITSWAP8(x^0x39, 1,4,2,7,6,5,0,3); break;
-			case 7: x = BITSWAP8(x^0xaf, 0,3,2,1,4,7,6,5); break;  
-    	}      
+			case 7: x = BITSWAP8(x^0xaf, 0,3,2,1,4,7,6,5); break;
+    	}
 		ROM[i] = x;
 	}
-	
 
-	DRIVER_INIT_CALL(sfbonus_common);	
+
+	DRIVER_INIT_CALL(sfbonus_common);
 }
 
 static DRIVER_INIT(hldspin2)
@@ -1281,15 +1296,15 @@ static DRIVER_INIT(hldspin2)
 			case 2: x = BITSWAP8(x^0x33, 1,0,3,7,6,5,2,4); break;
 			case 3: x = BITSWAP8(x^0xa6, 1,0,4,3,2,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x37, 0,1,7,6,5,3,2,4); break;
-			case 5: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,4,3); break;	
+			case 5: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,4,3); break;
 			case 6: x = BITSWAP8(x^0x36, 1,0,4,7,6,5,3,2); break;
-			case 7: x = BITSWAP8(x^0xa2, 1,0,2,4,3,7,6,5); break;  
-    	}      
+			case 7: x = BITSWAP8(x^0xa2, 1,0,2,4,3,7,6,5); break;
+    	}
 		ROM[i] = x;
 	}
 
 
-	DRIVER_INIT_CALL(sfbonus_common);	
+	DRIVER_INIT_CALL(sfbonus_common);
 }
 /*
  			case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
@@ -1297,14 +1312,14 @@ static DRIVER_INIT(hldspin2)
 			case 2: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 			case 3: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 			case 4: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-			case 5: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;	
+			case 5: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 			case 6: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-			case 7: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;  
+			case 7: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 */
-  
+
 GAME( 199?, sfbonus,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, sfbonusa,    sfbonus,  sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, parrot3,     0,        sfbonus,    sfbonus,    parrot3, ROT0,  "Amcoe", "Parrot Poker III", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 199?, parrot3,     0,        sfbonus,    parrot3,    parrot3, ROT0,  "Amcoe", "Parrot Poker III", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, hldspin1,    0,        sfbonus,    sfbonus,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, hldspin2,    0,        sfbonus,    sfbonus,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fcnudge,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Fruit Carnival Nudge", GAME_NOT_WORKING|GAME_NO_SOUND )
