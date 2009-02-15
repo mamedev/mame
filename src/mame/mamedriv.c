@@ -8804,7 +8804,7 @@ Other Sun games
 	DRIVER( moneymacd2 )
 	DRIVER( atworld )
 	DRIVER( atworlda )
-
+	
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 	DRIVER( spielbud )	/* (c) 1985 ADP */

@@ -2,7 +2,18 @@
 "CGA" Amcoe HW (c) 1999-2004 Amcoe
 
 Notes:
-- Some games requires a password, it's 123456 for Robin's Adventure, might be the same for the others.
+- Some games requires an operator password to prevent players from changing the settings
+  it defaults to 123456
+
+- The games don't cope well with corrupt NVRAM, and may fail to boot completely(!)
+  
+- There are still some video problems, coin cut in half on pir2002v2 & missing spinning 7 on classice for example
+  maybe the reel tilemap should be one big tilemap, and the 'select' ram is extra scroll bits..
+
+- Inputs not done, Lamps not done  
+  
+ Thanks to Olivier Galibert for the handy bitswapper tool :-) 
+  
 */
 
 #include "driver.h"
@@ -163,111 +174,134 @@ VIDEO_START(sfbonus)
 	tilemap_set_transparent_pen(sfbonus_reel3_tilemap,255);
 	tilemap_set_transparent_pen(sfbonus_reel4_tilemap,255);
 
+	tilemap_set_scroll_rows(sfbonus_tilemap,64);	
+	
 	tilemap_set_scroll_cols(sfbonus_reel_tilemap, 64);
 	tilemap_set_scroll_cols(sfbonus_reel2_tilemap, 64);
 	tilemap_set_scroll_cols(sfbonus_reel3_tilemap, 64);
 	tilemap_set_scroll_cols(sfbonus_reel4_tilemap, 64);
+
+	
 }
 
+static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const device_config *screen, int catagory)
+{
+	int zz;
+	int i;
+	int startclipmin;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	UINT8* selectbase = &sfbonus_videoram[0x600];
+	UINT8* bg_scroll = &sfbonus_videoram[0x000];
+	UINT8* reels_rowscroll = &sfbonus_videoram[0x400];
+	int globalyscrollreels = (sfbonus_vregs[6] | sfbonus_vregs[7]<<8);
+	int globalxscrollreels = (sfbonus_vregs[4] | sfbonus_vregs[5]<<8);
+	globalyscrollreels += 8;
+	globalxscrollreels += 8;
+	
+	startclipmin = 0;
+	
+	for (i= 0;i < 0x80;i++)
+	{
+		int scroll;
+		scroll = bg_scroll[(i*2)+0x000] | (bg_scroll[(i*2)+0x001]<<8);
+		tilemap_set_scrolly(sfbonus_reel_tilemap, i, scroll + globalyscrollreels );
+
+		scroll = bg_scroll[(i*2)+0x080] | (bg_scroll[(i*2)+0x081]<<8);
+		tilemap_set_scrolly(sfbonus_reel2_tilemap, i, scroll + globalyscrollreels);
+
+		scroll = bg_scroll[(i*2)+0x100] | (bg_scroll[(i*2)+0x101]<<8);
+		tilemap_set_scrolly(sfbonus_reel3_tilemap, i, scroll + globalyscrollreels);
+
+		scroll = bg_scroll[(i*2)+0x180] | (bg_scroll[(i*2)+0x181]<<8);
+		tilemap_set_scrolly(sfbonus_reel4_tilemap, i, scroll + globalyscrollreels);
+	}
+
+//	printf("------------\n");
+	for (zz=0;zz<288;zz++)
+	{
+		rectangle clip;
+		
+		// other bits are used too..
+		int line = ((zz+globalyscrollreels)&0x1ff);
+		int rowenable = selectbase[line]&0x3;
+		int xxxscroll;
+		int rowscroll;
+		
+		rowscroll = reels_rowscroll[((line/8)*2)+0x000] | (reels_rowscroll[((line/8)*2)+0x001]<<8);
+		
+		xxxscroll = globalxscrollreels + rowscroll;
+		
+		//printf("%04x %04x %d\n",zz, xxxscroll, line/8);
+		
+		/* draw top of screen */
+		clip.min_x = visarea->min_x;
+		clip.max_x = 511;
+		clip.min_y = startclipmin;
+		clip.max_y = startclipmin+1;
+
+		tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
+		tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
+		tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
+		tilemap_set_scrollx(sfbonus_reel4_tilemap, 0, xxxscroll );
+
+		
+		// other bits are set, what do they mean?
+		if (rowenable==0)
+		{			
+			tilemap_draw(bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+		}
+		else if (rowenable==0x1)
+		{
+			tilemap_draw(bitmap,&clip,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+		}
+		else if (rowenable==0x2)
+		{
+			tilemap_draw(bitmap,&clip,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+		}
+		else if (rowenable==0x3)
+		{
+			tilemap_draw(bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+		}
+		else
+		{
+			bitmap_fill(bitmap,&clip,screen->machine->pens[rowenable]);
+		}
+
+		startclipmin+=1;
+	}
+
+}
 
 VIDEO_UPDATE(sfbonus)
 {
-//	int y,x;
-//	int count = 0;
-//	const gfx_element *gfx2 = screen->machine->gfx[1];
-	tilemap_set_scrolly(sfbonus_tilemap, 0, (sfbonus_vregs[2] | sfbonus_vregs[3]<<8));
-#if 0
-	tilemap_set_scrolly(sfbonus_reel_tilemap, 0, (sfbonus_vregs[6] | sfbonus_vregs[7]<<8));
-#endif
+
+	int globalyscroll = (sfbonus_vregs[2] | sfbonus_vregs[3]<<8);
+	int globalxscroll = (sfbonus_vregs[0] | sfbonus_vregs[1]<<8);
+	UINT8* front_rowscroll = &sfbonus_videoram[0x200];
+	int i;
+	
+	// align to 0
+	globalyscroll += 8;
+	globalxscroll += 8;
+	
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]);
-//	tilemap_draw(bitmap,cliprect,sfbonus_reel_tilemap,0,0);
+	
+	/* Low Priority Reels */
+	sfbonus_draw_reel_layer(screen->machine,bitmap,cliprect, screen, 0);
 
+	/* Normal Tilemap */
+	tilemap_set_scrolly(sfbonus_tilemap, 0, globalyscroll );
+	for (i=0;i<64;i++)
 	{
-		int zz;
-		int i;
-		int startclipmin = 0;
-		const rectangle *visarea = video_screen_get_visible_area(screen);
-		UINT8* selectbase = &sfbonus_videoram[0x600];
-		UINT8* bg_scroll = &sfbonus_videoram[0x000];
-
-		for (i= 0;i < 0x80;i++)
-		{
-			int scroll;
-			scroll = bg_scroll[(i*2)+0x000] | (bg_scroll[(i*2)+0x001]<<8);
-			tilemap_set_scrolly(sfbonus_reel_tilemap, i, scroll);
-
-			scroll = bg_scroll[(i*2)+0x080] | (bg_scroll[(i*2)+0x081]<<8);
-			tilemap_set_scrolly(sfbonus_reel2_tilemap, i, scroll);
-
-			scroll = bg_scroll[(i*2)+0x100] | (bg_scroll[(i*2)+0x101]<<8);
-			tilemap_set_scrolly(sfbonus_reel3_tilemap, i, scroll);
-
-			scroll = bg_scroll[(i*2)+0x180] | (bg_scroll[(i*2)+0x181]<<8);
-			tilemap_set_scrolly(sfbonus_reel4_tilemap, i, scroll);
-		}
-
-
-
-
-		for (zz=0;zz<0x100;zz++) // -8 because of visible area (2*8 = 16)
-		{
-			rectangle clip;
-			int rowenable = selectbase[zz];
-
-			/* draw top of screen */
-			clip.min_x = visarea->min_x;
-			clip.max_x = visarea->max_x;
-			clip.min_y = startclipmin;
-			clip.max_y = startclipmin+1;
-
-			if (rowenable==0)
-			{
-				tilemap_draw(bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(0),0);
-			}
-			else if (rowenable==0x5)
-			{
-				tilemap_draw(bitmap,&clip,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(0),0);
-			}
-			else if (rowenable==0xa)
-			{
-				tilemap_draw(bitmap,&clip,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(0),0);
-			}
-			else if (rowenable==0xf)
-			{
-				tilemap_draw(bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(0),0);
-			}
-			else
-			{
-				bitmap_fill(bitmap,&clip,screen->machine->pens[rowenable]);
-			}
-
-			startclipmin+=1;
-		}
-
-
-		tilemap_draw(bitmap,cliprect,sfbonus_tilemap,0,0);
-		tilemap_draw(bitmap,cliprect,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
-		tilemap_draw(bitmap,cliprect,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
-		tilemap_draw(bitmap,cliprect,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
-		tilemap_draw(bitmap,cliprect,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
+		int scroll;
+		scroll = front_rowscroll[(i*2)+0x000] | (front_rowscroll[(i*2)+0x001]<<8);
+		tilemap_set_scrollx(sfbonus_tilemap, i, scroll+globalxscroll );
 	}
+	tilemap_draw(bitmap,cliprect,sfbonus_tilemap,0,0);
 
-//	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x %d",sfbonus_vregs[0+test_vregs],sfbonus_vregs[1+test_vregs],sfbonus_vregs[2+test_vregs],
-//	sfbonus_vregs[3+test_vregs],sfbonus_vregs[4+test_vregs],sfbonus_vregs[5+test_vregs],sfbonus_vregs[6+test_vregs],sfbonus_vregs[7+test_vregs],test_vregs);
-
-	/*
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<64;x++)
-		{
-			UINT16 tiledat = sfbonus_videoram[count] | (sfbonus_videoram[count+1]<<8);
-
-			drawgfx(bitmap,gfx2,tiledat,0,0,0,x*8,y*32,cliprect,TRANSPARENCY_PEN,255);
-			count+=2;
-		}
-
-	}
-	*/
+	/* High Priority Reels */
+	sfbonus_draw_reel_layer(screen->machine,bitmap,cliprect, screen, 1);
+	
 	return 0;
 }
 
@@ -618,13 +652,13 @@ static NVRAM_HANDLER( sfbonus )
 		if (file)
 			mame_fread(file,nvram,nvram_size);
 		else
-			memset(nvram,0xff,nvram_size);
+			memset(nvram,0x00,nvram_size);
 	}
 }
 
 
 static MACHINE_DRIVER_START( sfbonus )
-	MDRV_CPU_ADD("main", Z80, 4000000) // custom packaged z80 CPU ?? Mhz
+	MDRV_CPU_ADD("main", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
 	MDRV_CPU_PROGRAM_MAP(0,sfbonus_map)
 	MDRV_CPU_IO_MAP(0,sfbonus_io)
 	MDRV_CPU_VBLANK_INT("main",irq0_line_hold)
@@ -642,7 +676,7 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(128*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
 
 	MDRV_PALETTE_LENGTH(0x100)
 
@@ -677,6 +711,9 @@ ROM_START( sfbonusa )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfb17.bin", 0x00000, 0x40000, CRC(e28ede82) SHA1(f320c4c9c30ec280ee2437d1ad4d2b6270580916) )
 
+	ROM_REGION( 0x010000, "debugram", ROMREGION_ERASE00 ) /* DEBUG */
+
+	
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -2572,6 +2609,8 @@ ROM_START( fb4a )
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
+	ROM_REGION( 0x040000, "debugram", ROMREGION_ERASE00 )
+	
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
@@ -3581,6 +3620,9 @@ ROM_START( seawld )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "swd16r.bin", 0x00000, 0x80000, CRC(081c84c1) SHA1(5f0d40c38ca26d3633cfe4c7ead2773a1dcc177d) )
 
+	ROM_REGION( 0x010000, "debugram", ROMREGION_ERASE00 ) /* DEBUG */
+	
+	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "swrom2.bin", 0x00000, 0x40000, CRC(e1afe0ad) SHA1(097233255b486944b79a8504b4312173ab1aad06) )
 
@@ -3723,7 +3765,9 @@ ROM_START( atworlda )
 	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
 ROM_END
 
-
+//ROM_REGION( 0x80000, "user1", 0 ) /* Z80 Code */
+//ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
+	
 static DRIVER_INIT( sfbonus_common)
 {
 	sfbonus_tilemap_ram = auto_malloc(0x4000);
@@ -3741,9 +3785,11 @@ static DRIVER_INIT( sfbonus_common)
 	sfbonus_reel4_ram = auto_malloc(0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel4_ram , 0x0800);
 
+	// hack, because the debugger is broken
+	sfbonus_videoram = memory_region(machine,"debugram");
+	if (!sfbonus_videoram) sfbonus_videoram = auto_malloc(0x10000);
+	
 
-
-	sfbonus_videoram = auto_malloc(0x10000);//memory_region(machine,"user1");
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
 
 	// dummy.rom helper
@@ -6120,8 +6166,410 @@ static DRIVER_INIT(fb4v3)
 	DRIVER_INIT_CALL(sfbonus_common);
 }
 
+#if 0
+static DRIVER_INIT(fb5)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
 
-  
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x20, 0,3,7,6,5,1,4,2); break;
+			case 1: x = BITSWAP8(x^0xf1, 1,7,6,5,3,2,4,0); break;
+			case 2: x = BITSWAP8(x^0x33, 2,3,1,7,6,5,0,4); break; // 
+			case 3: x = BITSWAP8(x^0xaf, 2,0,1,4,3,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x2d, 2,4,7,6,5,1,0,3); break;
+			case 5: x = BITSWAP8(x^0xfb, 4,7,6,5,1,0,3,2); break;
+			case 6: x = BITSWAP8(x^0x34, 2,0,4,7,6,5,3,1); break;
+			case 7: x = BITSWAP8(x^0xb7, 1,0,3,2,4,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}  
+
+static DRIVER_INIT(fb5d)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3e, 2,1,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 1,7,6,5,4,3,2,0); break;
+			case 2: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xad, 4,3,0,1,2,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xaa, 4,3,1,2,0,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}  
+
+static DRIVER_INIT(fb5v)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3f, 1,0,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+
+static DRIVER_INIT(fb6)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+ 
+
+
+ static DRIVER_INIT(fb6d)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+
+static DRIVER_INIT(fb6v)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x23, 0,2,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+} 
+
+static DRIVER_INIT(fb6v3)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x26, 0,2,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}   
+
+static DRIVER_INIT(fb6s)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x24, 0,2,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xec, 0,7,6,5,4,3,2,1); break;
+			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+
+static DRIVER_INIT(version4)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x26, 1,0,2,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+
+static DRIVER_INIT(bugfever)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+
+static DRIVER_INIT(bugfeverd)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x26, 1,0,2,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3a, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xe8, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+
+static DRIVER_INIT(bugfeverv)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
+			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
+			case 2: x = BITSWAP8(x^0x22, 0,2,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3a, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x22, 0,1,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+
+static DRIVER_INIT(bugfeverv2)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x23, 0,2,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x26, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+
+static DRIVER_INIT(dvisland)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
+			case 6: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+} 
+
+
+static DRIVER_INIT(funriver)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x24, 0,2,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xec, 0,7,6,5,4,3,2,1); break;
+			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+
+static DRIVER_INIT(funriverv)
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for(i=0;i<memory_region_length(machine, "main");i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 7)
+		{
+			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
+			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
+			case 2: x = BITSWAP8(x^0x26, 0,2,1,7,6,5,4,3); break;
+			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
+			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
+			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
+			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
+			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
+    	}
+		ROM[i] = x;
+	}
+	DRIVER_INIT_CALL(sfbonus_common);
+}
+#endif
   
   
 /*
@@ -6177,11 +6625,11 @@ GAME( 2000, tighook,     0,        sfbonus,    sfbonus,    tighook, ROT0,  "Amco
 GAME( 2000, tighooka,    tighook,  sfbonus,    sfbonus,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, tighookc,    tighook,  sfbonus,    sfbonus,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, tighookc2,   tighook,  sfbonus,    sfbonus,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookv,    tighook,  sfbonus,    sfbonus,    tighookv, ROT0,  "Amcoe", "Tiger Hook (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookv2,   tighook,  sfbonus,    sfbonus,    tighookv2, ROT0,  "Amcoe", "Tiger Hook (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND ) // has odd issues
-GAME( 2000, tighookv3,   tighook,  sfbonus,    sfbonus,    tighookv, ROT0,  "Amcoe", "Tiger Hook (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookd,    tighook,  sfbonus,    sfbonus,    tighookd, ROT0,  "Amcoe", "Tiger Hook (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookd2,   tighook,  sfbonus,    sfbonus,    tighookd, ROT0,  "Amcoe", "Tiger Hook (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, tighookv,    tighook,  sfbonus,    parrot3,    tighookv, ROT0,  "Amcoe", "Tiger Hook (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, tighookv2,   tighook,  sfbonus,    parrot3,    tighookv2, ROT0,  "Amcoe", "Tiger Hook (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, tighookv3,   tighook,  sfbonus,    parrot3,    tighookv, ROT0,  "Amcoe", "Tiger Hook (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, tighookd,    tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, tighookd2,   tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 2000, robadv,      0,        sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, robadvc,     robadv,   sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -6267,8 +6715,8 @@ GAME( 2000, fb2ndc,      fb2nd,   sfbonus,    sfbonus,    fb2nd, ROT0,  "Amcoe",
 GAME( 2000, fb2ndc2,     fb2nd,   sfbonus,    sfbonus,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb2ndv,      fb2nd,   sfbonus,    sfbonus,    fb2ndv, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb2ndv2,     fb2nd,   sfbonus,    sfbonus,    fb2ndv, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2ndd,      fb2nd,   sfbonus,    sfbonus,    fb2ndd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2ndd2,     fb2nd,   sfbonus,    sfbonus,    fb2ndd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND ) // double check this, it crashes
+GAME( 2000, fb2ndd,      fb2nd,   sfbonus,    parrot3,    fb2ndd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb2ndd2,     fb2nd,   sfbonus,    parrot3,    fb2ndd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 GAME( 2000, fb4,         0,        sfbonus,    sfbonus,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.3XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb4a,        fb4,      sfbonus,    sfbonus,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -6281,6 +6729,7 @@ GAME( 2000, fb4d2,       fb4,      sfbonus,    parrot3,    fb4d, ROT0,  "Amcoe",
 GAME( 2000, fb4v,        fb4,      sfbonus,    parrot3,    fb4v, ROT0,  "Amcoe", "Fruit Bonus 4 (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb4v2,       fb4,      sfbonus,    parrot3,    fb4v, ROT0,  "Amcoe", "Fruit Bonus 4 (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb4v3,       fb4,      sfbonus,    parrot3,    fb4v3, ROT0,  "Amcoe", "Fruit Bonus 4 (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
 
 
 GAME( 1999, act2000,     0,        sfbonus,    sfbonus,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
