@@ -247,13 +247,14 @@ TODO:
   snk68.c for another game that needs this). tdfever dots still flicker a lot,
   however I'm not sure if this is an emulation bug or the real game behaviour.
 
-- psychos: in all games using the gwar video, palette colors 0x180-0x1ff are not
-  used because bit 3 of the sprite attribute is used for tile bank select instead.
-  In all games, those colors 0x180-0x1ff are a copy of 0x100-0x17f so even if the
-  bit was wired to the palette, it would make no difference. In psychos, however,
-  the colors are different. Game colors appear to be correct as they are, and
-  connecting bit 3 would break them, so it's unknown if colors 0x180-0x1ff should
-  be used and how.
+- psychos: the pcb has glitches (colored lines of length up to 16 pixels) during
+  scrolling on the left side of the screen. This doesn't happen in the emulation
+  so it might be an unemulated  hardware bug.
+
+- worldwar: at the beginning of the game, the bottom 16 pixels of the bg are
+  blank. I think that this is related to the psychos glitch above, i.e. the pcb
+  wouldn't display that area correctly anyway so operators were supposed to
+  adjust the screen size to make them invisible.
 
 ***************************************************************************/
 
@@ -3549,9 +3550,8 @@ GFXDECODE_END
 static GFXDECODE_START( gwar )
 	GFXDECODE_ENTRY( "tx_tiles",   0, charlayout_4bpp,      0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "bg_tiles",   0, tilelayout_4bpp,      0x300, 0x100>>4 )
-	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_4bpp,    0x100, 0x080>>4 )
+	GFXDECODE_ENTRY( "sp16_tiles", 0, spritelayout_4bpp,    0x100, 0x100>>4 )
 	GFXDECODE_ENTRY( "sp32_tiles", 0, bigspritelayout_4bpp, 0x200, 0x100>>4 )
-	/* what about colors 0x180-0x1ff? */
 GFXDECODE_END
 
 static GFXDECODE_START( tdfever )
@@ -3880,10 +3880,9 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	// visible area uncertain but this size avoids glitches at the bottom of the screen
-	// in worldwar at the beginning of the game
+	// this visible area matches the psychos pcb
 	MDRV_SCREEN_SIZE(50*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 0*8, 28*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(gwar)
 	MDRV_PALETTE_LENGTH(0x400)
@@ -3902,6 +3901,15 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SOUND_ADD("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_SOUND_CONFIG(y8950_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( psychos )
+
+	MDRV_IMPORT_FROM(bermudat)
+
+	/* video hardware */
+	MDRV_VIDEO_START(psychos)
 MACHINE_DRIVER_END
 
 
@@ -6190,8 +6198,8 @@ GAME( 1987, bermudat, 0,        bermudat, bermudat, 0,        ROT270, "SNK", "Be
 GAME( 1987, bermudaj, bermudat, bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (Japan)", 0 )
 GAME( 1987, worldwar, 0,        bermudat, worldwar, 0,        ROT270, "SNK", "World Wars (World?)", 0 )
 GAME( 1987, bermudaa, worldwar, bermudat, bermudaa, 0,        ROT270, "SNK", "Bermuda Triangle (World Wars) (US)", 0 )
-GAME( 1987, psychos,  0,        bermudat, psychos,  0,        ROT0,   "SNK", "Psycho Soldier (US)", 0 )
-GAME( 1987, psychosj, psychos,  bermudat, psychos,  0,        ROT0,   "SNK", "Psycho Soldier (Japan)", 0 )
+GAME( 1987, psychos,  0,        psychos,  psychos,  0,        ROT0,   "SNK", "Psycho Soldier (US)", 0 )
+GAME( 1987, psychosj, psychos,  psychos,  psychos,  0,        ROT0,   "SNK", "Psycho Soldier (Japan)", 0 )
 GAME( 1987, gwar,     0,        gwar,     gwar,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )
 GAME( 1987, gwarj,    gwar,     gwar,     gwar,     0,        ROT270, "SNK", "Guevara (Japan)", 0 )
 GAME( 1987, gwara,    gwar,     gwara,    gwar,     0,        ROT270, "SNK", "Guerrilla War (Version 1)", 0 )

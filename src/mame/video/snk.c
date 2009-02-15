@@ -35,6 +35,7 @@ static UINT8 sprite_split_point;
 static int num_sprites, yscroll_mask;
 static UINT32 bg_tile_offset;
 static UINT32 tx_tile_offset;
+static int is_psychos;
 
 static UINT8 empty_tile[16*16];
 static UINT8 drawmode_table[16];
@@ -169,6 +170,10 @@ static TILE_GET_INFO( gwar_get_bg_tile_info )
 	int attr = snk_bg_videoram[2*tile_index+1];
 	int code = snk_bg_videoram[2*tile_index] | ((attr & 0x0f) << 8);
 	int color = (attr & 0xf0) >> 4;
+
+	if (is_psychos)	// psychos has a separate palette bank bit
+		color &= 7;
+
 	SET_TILE_INFO(1,
 			code,
 			color,
@@ -354,6 +359,14 @@ VIDEO_START( gwar )
 	tilemap_set_scrolldy(bg_tilemap,  0, -32);
 
 	tx_tile_offset = 0;
+
+	is_psychos = 0;
+}
+
+VIDEO_START( psychos )
+{
+	VIDEO_START_CALL(gwar);
+	is_psychos = 1;
 }
 
 VIDEO_START( tdfever )
@@ -595,6 +608,9 @@ WRITE8_HANDLER( gwar_tx_bank_w )
 		tx_tile_offset = (data & 0x30) << 4;
 		tilemap_mark_all_tiles_dirty(tx_tilemap);
 	}
+
+	if (is_psychos)
+		tilemap_set_palette_offset(bg_tilemap, (data & 0x80));
 }
 
 WRITE8_HANDLER( gwar_videoattrs_w )
@@ -849,6 +865,8 @@ static void tdfever_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 			case 16:
 				tile_number |= ((attributes & 0x08) << 5) | ((attributes & 0x60) << 4);
 				color &= 7;	// attribute bit 3 is used for bank select
+				if (from == 0)
+					color |= 8;	// low priority sprites use the other palette bank
 				break;
 
 			case 32:

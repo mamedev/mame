@@ -25,6 +25,7 @@ extern VIDEO_START( aso );
 extern VIDEO_START( tnk3 );
 extern VIDEO_START( ikari );
 extern VIDEO_START( gwar );
+extern VIDEO_START( psychos );
 extern VIDEO_START( tdfever );
 
 extern VIDEO_UPDATE( marvins );
