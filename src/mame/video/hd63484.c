@@ -11,6 +11,8 @@ this chip is used in:
 #include "driver.h"
 #include "video/hd63484.h"
 
+#define LOG_COMMANDS 0
+
 static int get_pixel(int x,int y);
 
 /* the on-chip FIFO is 16 bytes long, but we use a larger one to simplify */
@@ -971,12 +973,14 @@ static void HD63484_command_w(running_machine *machine, UINT16 cmd)
 
 	if (fifo_counter >= len)
 	{
+#if LOG_COMMANDS
 		int i;
 
 		logerror("%s: HD63484 command %s (%04x) ",cpuexec_describe_context(machine),instruction_name[fifo[0]>>10],fifo[0]);
 		for (i = 1;i < fifo_counter;i++)
 			logerror("%04x ",fifo[i]);
 		logerror("\n");
+#endif
 
 		if (fifo[0] == 0x0400) { /* ORG */
 			org = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
@@ -1029,6 +1033,65 @@ static void HD63484_command_w(running_machine *machine, UINT16 cmd)
 			else if (fifo[0] == 0x080d)
 				{
 					rwp = (rwp & 0xff000) | ((fifo[1] & 0xfff0) >> 4);
+				}
+			else
+				logerror("unsupported register\n");
+		}
+		else if ((fifo[0] & 0xffe0) == 0x0c00)	/* RPR */
+		{
+			if (fifo[0] == 0x0c00)
+				fifo[1] = cl0;
+			else if (fifo[0] == 0x0c01)
+				fifo[1] = cl1;
+			else if (fifo[0] == 0x0c02)
+				fifo[1] = ccmp;
+			else if (fifo[0] == 0x0c03)
+				fifo[1] = edg;
+			else if (fifo[0] == 0x0c04)
+				fifo[1] = mask;
+			else if (fifo[0] == 0x0c05)
+				{
+					fifo[1] = (ppy << 12) | (pzcy << 8) | (ppx << 4) | pzcx;
+				}
+			else if (fifo[0] == 0x0c06)
+				{
+					fifo[1] = (psx << 12) | (psx << 4);
+				}
+			else if (fifo[0] == 0x0c07)
+				{
+					fifo[1] = (pey << 12) | (pzy << 8) | (pex << 4) | pzx;
+				}
+			else if (fifo[0] == 0x0c08)
+				fifo[1] = xmin;
+			else if (fifo[0] == 0x0c09)
+				fifo[1] = ymin;
+			else if (fifo[0] == 0x0c0a)
+				fifo[1] = xmax;
+			else if (fifo[0] == 0x0c0b)
+				fifo[1] = ymax;
+			else if (fifo[0] == 0x0c0c)
+				{
+					fifo[1] = (rwp_dn << 14) | ((rwp >> 12) & 0xff);
+				}
+			else if (fifo[0] == 0x0c0d)
+				{
+					fifo[1] = (rwp & 0x0fff) << 4;
+				}
+			else if (fifo[0] == 0x0c10)
+				{
+					// TODO
+				}
+			else if (fifo[0] == 0x0c11)
+				{
+					// TODO
+				}
+			else if (fifo[0] == 0x0c12)
+				{
+					fifo[1] = cpx;
+				}
+			else if (fifo[0] == 0x0c13)
+				{
+					fifo[1] = cpy;
 				}
 			else
 				logerror("unsupported register\n");
@@ -1341,7 +1404,9 @@ static int regno;
 
 READ16_HANDLER( HD63484_status_r )
 {
-	if (cpu_get_pc(space->cpu) != 0xfced6 && cpu_get_pc(space->cpu) != 0xfe1d6) logerror("%05x: HD63484 status read\n",cpu_get_pc(space->cpu));
+//	if (cpu_get_pc(space->cpu) != 0xfced6 && cpu_get_pc(space->cpu) != 0xfe1d6)
+//		logerror("%05x: HD63484 status read\n",cpu_get_pc(space->cpu));
+
 	return 0xff22|(mame_rand(space->machine) & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
 }
 
@@ -1359,7 +1424,11 @@ WRITE16_HANDLER( HD63484_data_w )
 	if ( !strcmp(space->machine->gamedrv->name, "skattva")) HD63484_reg[2/2] = (HD63484_reg[2/2] & 0xf8ff) | 0x0200; // hack to set proper color depth in skattva
 
 	if (regno & 0x80) regno += 2;	/* autoincrement */
-logerror("PC %05x: HD63484 register %02x write %04x\n",cpu_get_pc(space->cpu),regno,HD63484_reg[regno/2]);
+
+#if LOG_COMMANDS
+	logerror("PC %05x: HD63484 register %02x write %04x\n",cpu_get_pc(space->cpu),regno,HD63484_reg[regno/2]);
+#endif
+
 	if (regno == 0)	/* FIFO */
 		HD63484_command_w(space->machine, HD63484_reg[0]);
 }
@@ -1372,12 +1441,16 @@ READ16_HANDLER( HD63484_data_r )
 		res = video_screen_get_vpos(space->machine->primary_screen);
 	else if (regno == 0)
 	{
-logerror("%05x: HD63484 read FIFO\n",cpu_get_pc(space->cpu));
+#if LOG_COMMANDS
+		logerror("%05x: HD63484 read FIFO\n",cpu_get_pc(space->cpu));
+#endif
 		res = readfifo;
 	}
 	else
 	{
-logerror("%05x: HD63484 read register %02x\n",cpu_get_pc(space->cpu),regno);
+#if LOG_COMMANDS
+		logerror("%05x: HD63484 read register %02x\n",cpu_get_pc(space->cpu),regno);
+#endif
 		res = 0;
 	}
 
