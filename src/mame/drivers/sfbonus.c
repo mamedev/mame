@@ -227,9 +227,6 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		int xxxscroll;
 		int rowscroll;
 		
-		rowscroll = reels_rowscroll[((line/8)*2)+0x000] | (reels_rowscroll[((line/8)*2)+0x001]<<8);
-		
-		xxxscroll = globalxscrollreels + rowscroll;
 		
 		//printf("%04x %04x %d\n",zz, xxxscroll, line/8);
 		
@@ -239,9 +236,20 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		clip.min_y = startclipmin;
 		clip.max_y = startclipmin+1;
 
+		rowscroll = reels_rowscroll[((line/8)*2)+0x000] | (reels_rowscroll[((line/8)*2)+0x001]<<8);
+		xxxscroll = globalxscrollreels + rowscroll;	
 		tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
+
+		rowscroll = reels_rowscroll[((line/8)*2)+0x080] | (reels_rowscroll[((line/8)*2)+0x081]<<8);
+		xxxscroll = globalxscrollreels + rowscroll;	
 		tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
+
+		rowscroll = reels_rowscroll[((line/8)*2)+0x100] | (reels_rowscroll[((line/8)*2)+0x101]<<8);
+		xxxscroll = globalxscrollreels + rowscroll;	
 		tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
+
+		rowscroll = reels_rowscroll[((line/8)*2)+0x180] | (reels_rowscroll[((line/8)*2)+0x181]<<8);
+		xxxscroll = globalxscrollreels + rowscroll;	
 		tilemap_set_scrollx(sfbonus_reel4_tilemap, 0, xxxscroll );
 
 		
@@ -6631,20 +6639,20 @@ GAME( 2000, tighookv3,   tighook,  sfbonus,    parrot3,    tighookv, ROT0,  "Amc
 GAME( 2000, tighookd,    tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, tighookd2,   tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, robadv,      0,        sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadvc,     robadv,   sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadvd,     robadv,   sfbonus,    sfbonus,    robadv2d, ROT0,  "Amcoe", "Robin Adventure (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadvv1,    robadv,   sfbonus,    sfbonus,    robadv2v4, ROT0,  "Amcoe", "Robin Adventure (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadvv2,    robadv,   sfbonus,    sfbonus,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv,      0,        sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadvc,     robadv,   sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadvd,     robadv,   sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadvv1,    robadv,   sfbonus,    parrot3,    robadv2v4, ROT0,  "Amcoe", "Robin Adventure (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadvv2,    robadv,   sfbonus,    parrot3,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, robadv2,     0,        sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2a,    robadv2,  sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2c,    robadv2,  sfbonus,    sfbonus,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2v1,   robadv2,  sfbonus,    sfbonus,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure 2 (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2v2,   robadv2,  sfbonus,    sfbonus,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure 2 (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2v3,   robadv2,  sfbonus,    sfbonus,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure 2 (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2v4,   robadv2,  sfbonus,    sfbonus,    robadv2v4, ROT0,  "Amcoe", "Robin Adventure 2 (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2d,    robadv2,  sfbonus,    sfbonus,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv2,     0,        sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv2a,    robadv2,  sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv2c,    robadv2,  sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv2v1,   robadv2,  sfbonus,    parrot3,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure 2 (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv2v2,   robadv2,  sfbonus,    parrot3,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure 2 (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv2v3,   robadv2,  sfbonus,    parrot3,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure 2 (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv2v4,   robadv2,  sfbonus,    parrot3,    robadv2v4, ROT0,  "Amcoe", "Robin Adventure 2 (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, robadv2d,    robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
 GAME( 2000, pirpok2,     0,        sfbonus,    sfbonus,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
