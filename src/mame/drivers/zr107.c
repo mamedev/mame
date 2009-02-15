@@ -1,7 +1,8 @@
-/*  Konami ZR107 System
+/*
+    Konami 'ZR107' Hardware
+    Konami, 1995-1996
 
     Driver by Ville Linde
-
 
 
     Hardware overview:
@@ -29,25 +30,14 @@
         2x KS10081 (custom 3D texel unit)
 
 
-    Hardware configurations:
+    Known games on this hardware:
 
-    Game                           | ID        | CPU PCB      | CG Board(s)
+    Game                     | Year | ID    | CPU PCB | CG Board(s)
     --------------------------------------------------------------------------
-    Midnight Run                   | GX???     | ZR107        | ZR107
-    Winding Heat                   | GX677     | ZR107        | ZR107
-    Jetwave / Waveshark            | GX678     | ZR107        | GN678
+    Midnight Run             | 1995 | GX??? | ZR107   | ZR107
+    Winding Heat             | 1996 | GX677 | ZR107   | ZR107
+    Jet Wave / Wave Shark    | 1996 | GX678 | ZR107   | GN678
 
-
-Konami 'ZR107' Hardware
-Konami, 1995-1996
-
-Known games on this hardware include....
-
-Game                   (C)      Year
--------------------------------------
-Midnight Run           Konami   1995
-Jet Wave / Wave Shark  Konami   1996 (top board only)
-Winding Heat           Konami   1996
 
 PCB Layouts
 -----------
@@ -102,12 +92,12 @@ Notes:
 
 ROM Usage
 ---------
-                            |-------------------------- ROM Locations ---------------------------|
-Game                        5R      3R      5N      13U       15U       17U       20U       19L
---------------------------------------------------------------------------------------------------
-Midnight Run (code# unknown)xxxA08  xxxA09  xxxA10  xxxExx04  xxxExx03  xxxExx02  xxxExx01  xxxA07
-Jet Wave                    678A08  678A09  678A10  678UAB04  678UAB03  678UAB02  678UAB01  678A07
-Winding Heat                677A08  677A09  677A10  677UBC04  677UBC03  677UBC02  677UBC01  677A07
+                            |-------------------------- ROM Locations -------------------------------|
+Game                        5R      3R      5N      13U        15U        17U        20U        19L
+------------------------------------------------------------------------------------------------------
+Midnight Run                477A08  477A09  477A10  476EA1A04  476EA1A03  476EA1A02  476EA1A01  477A07
+Jet Wave                    678A08  678A09  678A10  678UAB04   678UAB03   678UAB02   678UAB01   678A07
+Winding Heat                677A08  677A09  677A10  677UBC04   677UBC03   677UBC02   677UBC01   677A07
 
 
 Bottom Board
@@ -164,7 +154,7 @@ ROM Usage
                  |--------------- ROM Locations ---------------|
 Game             35A     35B     2H      5H      7H      9H
 ---------------------------------------------------------------
-Midnight Run     xxxA12  xxxA11  xxxA16  xxxA15  xxxA14  xxxA13 (xxx= code unknown)
+Midnight Run     477A12  477A11  477A16  477A15  477A14  477A13
 Jet Wave         - see note -
 Winding Heat     677A12  677A11  677A16  677A15  677A14  677A13
 
@@ -860,28 +850,28 @@ static DRIVER_INIT(jetwave)
 
 ROM_START(midnrun)
 	ROM_REGION(0x200000, "user1", 0)	/* PowerPC program roms */
-	ROM_LOAD32_BYTE("midnight.20u", 0x000003, 0x80000, CRC(ea70edf2) SHA1(51c882383a150ba118ccd39eb869525fcf5eee3c) )
-	ROM_LOAD32_BYTE("midnight.17u", 0x000002, 0x80000, CRC(1462994f) SHA1(c8614c6c416f81737cc77c46eea6d8d440bc8cf3) )
-	ROM_LOAD32_BYTE("midnight.15u", 0x000001, 0x80000, CRC(b770ae46) SHA1(c61daa8353802957eb1c2e2c6204c3a98569627e) )
-	ROM_LOAD32_BYTE("midnight.13u", 0x000000, 0x80000, CRC(9644b277) SHA1(b9cb812b6035dfd93032d277c8aa0037cf6b3dbe) )
+	ROM_LOAD32_BYTE( "476ea1a01.20u", 0x000003, 0x80000, CRC(ea70edf2) SHA1(51c882383a150ba118ccd39eb869525fcf5eee3c) )
+	ROM_LOAD32_BYTE( "476ea1a02.17u", 0x000002, 0x80000, CRC(1462994f) SHA1(c8614c6c416f81737cc77c46eea6d8d440bc8cf3) )
+	ROM_LOAD32_BYTE( "476ea1a03.15u", 0x000001, 0x80000, CRC(b770ae46) SHA1(c61daa8353802957eb1c2e2c6204c3a98569627e) )
+	ROM_LOAD32_BYTE( "476ea1a04.13u", 0x000000, 0x80000, CRC(9644b277) SHA1(b9cb812b6035dfd93032d277c8aa0037cf6b3dbe) )
 
 	ROM_REGION(0x20000, "audio", 0)		/* M68K program */
-	ROM_LOAD16_WORD_SWAP("midnight.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
+	ROM_LOAD16_WORD_SWAP( "477a07.19l", 0x000000, 0x20000, CRC(a82c0ba1) SHA1(dad69f2e5e75009d70cc2748477248ec47627c30) )
 
 	ROM_REGION(0x100000, "gfx2", 0)	/* Tilemap */
-	ROM_LOAD16_BYTE("midnight.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
-	ROM_LOAD16_BYTE("midnight.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
+	ROM_LOAD16_BYTE( "477a11.35b", 0x000000, 0x80000, CRC(85eef04b) SHA1(02e26d2d4a8b29894370f28d2a49fdf5c7d23f95) )
+	ROM_LOAD16_BYTE( "477a12.35a", 0x000001, 0x80000, CRC(451d7777) SHA1(0bf280ca475100778bbfd3f023547bf0413fc8b7) )
 
 	ROM_REGION(0x800000, "gfx1", 0)	/* Texture data */
-	ROM_LOAD32_BYTE("midnight.m9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
-	ROM_LOAD32_BYTE("midnight.7h",  0x000001, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
-	ROM_LOAD32_BYTE("midnight.5h",  0x000002, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
-	ROM_LOAD32_BYTE("midnight.m2h", 0x000003, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
+	ROM_LOAD32_BYTE( "477a13.9h", 0x000000, 0x200000, CRC(b1ee901d) SHA1(b1432cb1379b35d99d3f2b7f6409db6f7e88121d) )
+	ROM_LOAD32_BYTE( "477a14.7h",  0x000001, 0x200000, CRC(9ffa8cc5) SHA1(eaa19e26df721bec281444ca1c5ccc9e48df1b0b) )
+	ROM_LOAD32_BYTE( "477a15.5h",  0x000002, 0x200000, CRC(e337fce7) SHA1(c84875f3275efd47273508b340231721f5a631d2) )
+	ROM_LOAD32_BYTE( "477a16.2h", 0x000003, 0x200000, CRC(2c03ee63) SHA1(6b74d340dddf92bb4e4b1e037f003d58c65d8d9b) )
 
 	ROM_REGION(0x600000, "shared", 0)	/* Sound data */
-	ROM_LOAD("midnight.m3r", 0x000000, 0x200000, CRC(f431e29f) SHA1(e6082d88f86abb63d02ac34e70873b58f88b0ddc) )
-	ROM_LOAD("midnight.m5n", 0x200000, 0x200000, CRC(8db31bd4) SHA1(d662d3bb6e8b44a01ffa158f5d7425454aad49a3) )
-	ROM_LOAD("midnight.m5r", 0x400000, 0x200000, CRC(d320dbde) SHA1(eb602cad6ac7c7151c9f29d39b10041d5a354164) )
+	ROM_LOAD( "477a09.3r", 0x000000, 0x200000, CRC(f431e29f) SHA1(e6082d88f86abb63d02ac34e70873b58f88b0ddc) )
+	ROM_LOAD( "477a10.5n", 0x200000, 0x200000, CRC(8db31bd4) SHA1(d662d3bb6e8b44a01ffa158f5d7425454aad49a3) )
+	ROM_LOAD( "477a08.5r", 0x400000, 0x200000, CRC(d320dbde) SHA1(eb602cad6ac7c7151c9f29d39b10041d5a354164) )
 ROM_END
 
 ROM_START(windheat)
