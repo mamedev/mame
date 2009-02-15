@@ -4,14 +4,16 @@
 
 	Driver by Mariusz Wojcieszek
 
-	Notes/ToDo:
+	Notes:
+	- game has no sound, while sound hardware was developed, sound program was
+	  not prepared
+
+	ToDo:
 	- add proper timing of interrupts and framerate (currently commented out,
 	  as they cause test mode to hang)
 	- vector quality appears to be worse than original game (compared to original
 	  game videos)
 	- verify controls
-	- sound hardware (6502, 2xPOKEY, YM2151, TMS5220, 6532) is not emulated, program
-	  for sound was not written and game actually has no sound
 	- implement game linking (after MAME supports network)
 	- current implementation of 68010 <-> tms32010 is a little bit hacky, after
 	  tms32010 is started by 68010, 68010 is suspended until tms32010 reads command
@@ -23,9 +25,14 @@
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
+#include "cpu/m6502/m6502.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "machine/timekpr.h"
+#include "machine/6532riot.h"
+#include "sound/pokey.h"
+#include "sound/5220intf.h"
+#include "sound/2151intf.h"
 
 static int tomcat_control_num;
 static UINT16 *tomcat_shared_ram;
@@ -264,6 +271,32 @@ static ADDRESS_MAP_START( dsp_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(dsp_BIO_r)
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER(soundlatches_w)
+{
+	switch(offset)
+	{
+		case 0x00: break; // XLOAD 0	Write the Sequential ROM counter Low Byte
+		case 0x20: break; // XLOAD 1	Write the Sequential ROM counter High Byte
+		case 0x40: break; // SOUNDWR	Write to Sound Interface Latch (read by Main)
+		case 0x60: break; // unused
+		case 0x80: break; // XREAD		Read the Sequential ROM (64K bytes) and increment the counter
+		case 0xa0: break; // unused
+		case 0xc0: break; // SOUNDREAD	Read the Sound Interface Latch (written by Main)
+	}
+}
+
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x3000, 0x30df) AM_WRITE(soundlatches_w)
+	AM_RANGE(0x30e0, 0x30e0) AM_NOP // COINRD Inputs: D7 = Coin L, D6 = Coin R, D5 = SOUNDFLAG
+	AM_RANGE(0x5000, 0x507f) AM_RAM	// 6532 ram
+	AM_RANGE(0x5080, 0x509f) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x6000, 0x601f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x8000, 0xffff) AM_NOP // main sound program rom
+ADDRESS_MAP_END
+
 INPUT_PORTS_START( tomcat )
 	PORT_START("IN0")	/* INPUTS */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
@@ -314,6 +347,27 @@ static NVRAM_HANDLER(tomcat)
 			memset(tomcat_nvram, 0x00, 0x800);
 }
 
+static const riot6532_interface tomcat_riot6532_intf =
+{
+	NULL,
+/*
+	PA0 = /WS	OUTPUT	(TMS-5220 WRITE STROBE)
+	PA1 = /RS	OUTPUT	(TMS-5220 READ STROBE)
+	PA2 = /READY	INPUT	(TMS-5220 READY FLAG)
+	PA3 = FSEL	OUTPUT	Select TMS5220 clock; 
+			 	0 = 325 KHz (8 KHz sampling)
+			 	1 = 398 KHz (10 KHz sampling)
+	PA4 = /CC1	OUTPUT	Coin Counter 1	
+	PA5 = /CC2	OUTPUT	Coin Counter 2
+	PA6 = /MUSRES 	OUTPUT  (Reset the Yamaha)
+	PA7 = MAINFLAG	INPUT	
+*/
+	NULL,
+	NULL,
+	NULL,	//	PB0 - PB7	OUTPUT	Speech Data
+	NULL	// connected to IRQ line of 6502
+};
+
 static MACHINE_DRIVER_START(tomcat)
 	MDRV_CPU_ADD("main", M68010, XTAL_12MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(tomcat_map, 0)
@@ -323,6 +377,12 @@ static MACHINE_DRIVER_START(tomcat)
 	MDRV_CPU_ADD("dsp", TMS32010, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP( dsp_map, 0 )
 	MDRV_CPU_IO_MAP( dsp_io_map, 0 )
+
+	MDRV_CPU_ADD("sound", M6502, XTAL_14_31818MHz / 8 )
+	MDRV_CPU_FLAGS( CPU_DISABLE )
+	MDRV_CPU_PROGRAM_MAP( sound_map, 0 )
+
+	MDRV_RIOT6532_ADD("riot", XTAL_14_31818MHz / 8, tomcat_riot6532_intf)
 
 	MDRV_QUANTUM_TIME(HZ(4000))
 
@@ -341,6 +401,20 @@ static MACHINE_DRIVER_START(tomcat)
 	MDRV_VIDEO_START(avg_tomcat)
 	MDRV_VIDEO_UPDATE(vector)
 
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SOUND_ADD("pokey1", POKEY, XTAL_14_31818MHz / 8)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.20)
+
+	MDRV_SOUND_ADD("pokey2", POKEY, XTAL_14_31818MHz / 8)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.20)
+
+	MDRV_SOUND_ADD("tms", TMS5220, 325000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_14_31818MHz / 4)
+	MDRV_SOUND_ROUTE(0, "left", 0.60)
+	MDRV_SOUND_ROUTE(1, "right", 0.60)
 MACHINE_DRIVER_END
 
-GAME( 1985, tomcat, 0,        tomcat, tomcat, 0, ROT0, "Atari", "TomCat (prototype)", GAME_NO_SOUND )
+GAME( 1985, tomcat, 0,        tomcat, tomcat, 0, ROT0, "Atari", "TomCat (prototype)", 0 )
