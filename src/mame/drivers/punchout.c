@@ -7,11 +7,16 @@ The most significant changes are that Punchout has a larger bottom tilemap,
 with scrolling, while Arm Wrestling has an additional FG tilemap displayed on
 the bottom screen.
 
-- money bag placement might not be 100% correct in Arm Wrestingl, however
+- money bag placement might not be 100% correct in Arm Wrestling, however
   the more serious part of armwrest35b9yel (unplayable bonus round after rounds
   5 and 9) is now fixed.
 
 driver by Nicola Salmoria
+
+TODO:
+- Finish emulation of RP5C01 and RP5H01 for spnchout. The RP5C01 features don't
+  seem to be used at all except for very basic protection e.g. relying on the
+  masking done by the internal registers.
 
 
 main CPU:
@@ -166,227 +171,167 @@ static WRITE8_HANDLER( punchout_2a03_reset_w )
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-static int prot_mode_sel; /* Mode selector */
-static int prot_mem[16];
+static int rp5c01_mode_sel; /* Mode selector */
+static int rp5c01_mem[16*4];
 
-static READ8_HANDLER( spunchout_prot_r ) {
+static READ8_HANDLER( spunchout_rp5c01_r )
+{
+	logerror("%04x: prot_r %x\n",cpu_get_previouspc(space->cpu),offset);
 
-	switch ( offset ) {
-		case 0x00:
-			if ( prot_mode_sel == 0x0a )
-				return memory_read_byte(space, 0xd012);
+	if (offset <= 0x0c)
+	{
+		switch (rp5c01_mode_sel & 3)
+		{
+			case 0:	// time
+				switch ( offset )
+				{
+					case 0x00:	// 1-second counter
+						return rp5c01_mem[0x00];
 
-			if ( prot_mode_sel == 0x0b || prot_mode_sel == 0x23 )
-				return memory_read_byte(space, 0xd7c1);
+					case 0x01:	// 10-second counter
+						return rp5c01_mem[0x01] & 0x7;
 
-			return prot_mem[offset];
+					case 0x02:	// 1-minute counter
+						return rp5c01_mem[0x02];
 
-		case 0x01:
-			if ( prot_mode_sel == 0x08 ) /* PC = 0x0b6a */
-				return 0x00; /* under 6 */
-		break;
+					case 0x03:	// 10-minute counter
+						return rp5c01_mem[0x03] & 0x07;
 
-		case 0x02:
-			if ( prot_mode_sel == 0x0b ) /* PC = 0x0613 */
-				return 0x09; /* write "JMP (HL)"code to 0d79fh */
-			if ( prot_mode_sel == 0x09 ) /* PC = 0x20f9, 0x22d9 */
-				return prot_mem[offset]; /* act as registers */
-		break;
+					case 0x04:	// 1-hour counter
+						return rp5c01_mem[0x04];
 
-		case 0x03:
-			if ( prot_mode_sel == 0x09 ) /* PC = 0x1e4c */
-				return prot_mem[offset] & 0x07; /* act as registers with mask */
-		break;
+					case 0x05:	// 10-hour counter
+						return rp5c01_mem[0x05] & 0x03;
 
-		case 0x05:
-			if ( prot_mode_sel == 0x09 ) /* PC = 0x29D1 */
-				return prot_mem[offset] & 0x03; /* AND 0FH -> AND 06H */
-		break;
+					case 0x06:	// day-of-the-week counter
+						return rp5c01_mem[0x06] & 0x07;
 
-		case 0x06:
-			if ( prot_mode_sel == 0x0b ) /* PC = 0x2dd8 */
-				return 0x0a; /* E=00, HL=23E6, D = (ret and 0x0f), HL+DE = 2de6 */
+					case 0x07:	// 1-day counter
+						return rp5c01_mem[0x07];
 
-			if ( prot_mode_sel == 0x09 ) /* PC = 0x2289 */
-				return prot_mem[offset] & 0x07; /* act as registers with mask */
-		break;
+					case 0x08:	// 10-day counter
+						return rp5c01_mem[0x08] & 0x03;
 
-		case 0x09:
-			if ( prot_mode_sel == 0x09 ) /* PC = 0x0313 */
-				return ( prot_mem[15] << 4 ); /* pipe through register 0xf7 << 4 */
-				/* (ret or 0x10) -> (D7DF),(D7A0) - (D7DF),(D7A0) = 0d0h(ret nc) */
-		break;
+					case 0x09:	// 1-month counter
+						return rp5c01_mem[0x09];
 
-		case 0x0a:
-			if ( prot_mode_sel == 0x0b ) /* PC = 0x060a */
-				return 0x05; /* write "JMP (IX)"code to 0d79eh */
-			if ( prot_mode_sel == 0x09 ) /* PC = 0x1bd7 */
-				return prot_mem[offset] & 0x01; /* AND 0FH -> AND 01H */
-		break;
+					case 0x0a:	// 10-month counter
+						return rp5c01_mem[0x0a] & 0x01;
 
-		case 0x0b:
-			if ( prot_mode_sel == 0x09 ) /* PC = 0x2AA3 */
-				return prot_mem[11] & 0x03;	/* AND 0FH -> AND 03H */
-		break;
+					case 0x0b:	// 1-year counter
+						return rp5c01_mem[0x0b];
 
-		case 0x0c:
-			/* PC = 0x2162 */
-			/* B = 0(return value) */
-			return 0x00;
-		case 0x0d:
-			return prot_mode_sel;
+					case 0x0c:	// 10-year counter
+						return rp5c01_mem[0x0c];
+				}
+				break;
+
+			case 1:	// alarm
+				switch ( offset )
+				{
+					case 0x00:	// n/a
+						return 0x00;
+
+					case 0x01:	// n/a
+						return 0x00;
+
+					case 0x02:	// 1-minute alarm register
+						return rp5c01_mem[0x12];
+
+					case 0x03:	// 10-minute alarm register
+						return rp5c01_mem[0x13] & 0x07;
+
+					case 0x04:	// 1-hour alarm register
+						return rp5c01_mem[0x14];
+
+					case 0x05:	// 10-hour alarm register
+						return rp5c01_mem[0x15] & 0x03;
+
+					case 0x06:	// day-of-the-week alarm register
+						return rp5c01_mem[0x16] & 0x07;
+
+					case 0x07:	// 1-day alarm register
+						return rp5c01_mem[0x17];
+
+					case 0x08:	// 10-day alarm register
+						return rp5c01_mem[0x18] & 0x03;
+
+					case 0x09:	// n/a
+						return 0x00;
+
+					case 0x0a:	// /12/24 select register
+						return rp5c01_mem[0x1a] & 0x01;
+
+					case 0x0b:	// leap year count
+						return rp5c01_mem[0x1b] & 0x03;
+
+					case 0x0c:	// n/a
+						return 0x00;
+				}
+				break;
+
+			case 2:	// RAM BLOCK 10
+			case 3:	// RAM BLOCK 11
+				return rp5c01_mem[0x10 * (rp5c01_mode_sel & 3) + offset];
+		}
+	}
+	else if (offset == 0x0d)
+	{
+		return rp5c01_mode_sel;
 	}
 
-	logerror("Read from unknown protection? port %02x ( selector = %02x )\n", offset, prot_mode_sel );
-
-	return prot_mem[offset];
+	logerror("Read from unknown protection? port %02x ( selector = %02x )\n", offset, rp5c01_mode_sel );
+	return 0;
 }
 
-static WRITE8_HANDLER( spunchout_prot_w ) {
+static WRITE8_HANDLER( spunchout_rp5c01_w )
+{
+	data &= 0x0f;
 
-	switch ( offset ) {
-		case 0x00:
-			if ( prot_mode_sel == 0x0a ) {
-				memory_write_byte(space, 0xd012, data);
-				return;
-			}
+	logerror("%04x: prot_w %x = %02x\n",cpu_get_previouspc(space->cpu),offset,data);
 
-			if ( prot_mode_sel == 0x0b || prot_mode_sel == 0x23 ) {
-				memory_write_byte(space, 0xd7c1, data);
-				return;
-			}
-
-			prot_mem[offset] = data;
-			return;
-
-		case 0x02:
-			if ( prot_mode_sel == 0x09 ) { /* PC = 0x20f7, 0x22d7 */
-				prot_mem[offset] = data;
-				return;
-			}
-		break;
-
-		case 0x03:
-			if ( prot_mode_sel == 0x09 ) { /* PC = 0x1e4c */
-				prot_mem[offset] = data;
-				return;
-			}
-		break;
-
-		case 0x05:
-			prot_mem[offset] = data;
-			return;
-
-		case 0x06:
-			if ( prot_mode_sel == 0x09 ) { /* PC = 0x2287 */
-				prot_mem[offset] = data;
-				return;
-			}
-		break;
-
-		case 0x0b:
-			prot_mem[offset] = data;
-			return;
-
-		case 0x0d: /* PC = all over the code */
-			prot_mode_sel = data;
-			return;
-
-		case 0x0f:
-			prot_mem[offset] = data;
-			return;
+	if (offset <= 0x0c)
+	{
+		rp5c01_mem[0x10 * (rp5c01_mode_sel & 3) + offset] = data;
 	}
-
-	logerror("Wrote to unknown protection? port %02x ( %02x )\n", offset, data );
-
-	prot_mem[offset] = data;
+	else if (offset == 0x0d)
+	{
+		rp5c01_mode_sel = data;
+		logerror("MODE: Timer EN = %d  Alarm EN = %d  MODE %d\n",BIT(data,3),BIT(data,2),data&3);
+	}
+	else if (offset == 0x0e)
+	{
+		logerror("TEST = %d",data);
+	}
+	else if (offset == 0x0f)
+	{
+		logerror("RESET: /1Hz = %d  /16Hz = %d  Timer = %d  Timer = %d\n",BIT(data,3),BIT(data,2),BIT(data,1),BIT(data,0));
+	}
 }
 
-static READ8_HANDLER( spunchout_prot_0_r ) {
-	return spunchout_prot_r( space, 0 );
+static READ8_HANDLER( spunchout_exp_r )
+{
+	// bit 7 = DATA OUT from RP5H01
+	// bit 6 = COUNTER OUT from RP5H01
+	// bit 5 = /ALARM from RP5C01
+	// bit 4 = n.c.
+	// bits 3-0 = D3-D0 from RP5C01
+
+	UINT8 ret = spunchout_rp5c01_r( space, offset >> 4 );
+
+	// FIXME hack
+	/* PC = 0x0313 */
+	/* (ret or 0x10) -> (D7DF),(D7A0) - (D7DF),(D7A0) = 0d0h(ret nc) */
+
+	if (cpu_get_previouspc(space->cpu) == 0x0313)
+		ret |= 0xc0;
+
+	return ret;
 }
 
-static WRITE8_HANDLER( spunchout_prot_0_w ) {
-	spunchout_prot_w( space, 0, data );
-}
-
-static READ8_HANDLER( spunchout_prot_1_r ) {
-	return spunchout_prot_r( space, 1 );
-}
-
-static WRITE8_HANDLER( spunchout_prot_1_w ) {
-	spunchout_prot_w( space, 1, data );
-}
-
-static READ8_HANDLER( spunchout_prot_2_r ) {
-	return spunchout_prot_r( space, 2 );
-}
-
-static WRITE8_HANDLER( spunchout_prot_2_w ) {
-	spunchout_prot_w( space, 2, data );
-}
-
-static READ8_HANDLER( spunchout_prot_3_r ) {
-	return spunchout_prot_r( space, 3 );
-}
-
-static WRITE8_HANDLER( spunchout_prot_3_w ) {
-	spunchout_prot_w( space, 3, data );
-}
-
-static READ8_HANDLER( spunchout_prot_5_r ) {
-	return spunchout_prot_r( space, 5 );
-}
-
-static WRITE8_HANDLER( spunchout_prot_5_w ) {
-	spunchout_prot_w( space, 5, data );
-}
-
-
-static READ8_HANDLER( spunchout_prot_6_r ) {
-	return spunchout_prot_r( space, 6 );
-}
-
-static WRITE8_HANDLER( spunchout_prot_6_w ) {
-	spunchout_prot_w( space, 6, data );
-}
-
-static READ8_HANDLER( spunchout_prot_9_r ) {
-	return spunchout_prot_r( space, 9 );
-}
-
-static READ8_HANDLER( spunchout_prot_b_r ) {
-	return spunchout_prot_r( space, 11 );
-}
-
-static WRITE8_HANDLER( spunchout_prot_b_w ) {
-	spunchout_prot_w( space, 11, data );
-}
-
-static READ8_HANDLER( spunchout_prot_c_r ) {
-	return spunchout_prot_r( space, 12 );
-}
-
-static WRITE8_HANDLER( spunchout_prot_d_w ) {
-	spunchout_prot_w( space, 13, data );
-}
-
-static READ8_HANDLER( spunchout_prot_a_r ) {
-	return spunchout_prot_r( space, 10 );
-}
-
-static WRITE8_HANDLER( spunchout_prot_a_w ) {
-	spunchout_prot_w( space, 10, data );
-}
-
-#if 0
-static READ8_HANDLER( spunchout_prot_f_r ) {
-	return spunchout_prot_r( space, 15 );
-}
-#endif
-
-static WRITE8_HANDLER( spunchout_prot_f_w ) {
-	spunchout_prot_w( space, 15, data );
+static WRITE8_HANDLER( spunchout_exp_w )
+{
+	spunchout_rp5c01_w( space, offset >> 4, data );
 }
 
 
@@ -428,8 +373,8 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w)	/* VLM5030 */
-	AM_RANGE(0x05, 0x05) AM_WRITE(SMH_NOP)	/* unused */
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
+//	AM_RANGE(0x05, 0x05) AM_WRITE(SMH_NOP)	/* unused */
+//	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x08, 0x08) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(SMH_NOP)	/* watchdog reset, seldom used because 08 clears the watchdog as well */
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(SMH_NOP)	/* ?? */
@@ -440,19 +385,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(SMH_NOP)	/* enable NVRAM ? */
 
 	/* protection ports - Super Punchout only (move to install handler?) */
-	AM_RANGE(0x07, 0x07) AM_READWRITE(spunchout_prot_0_r, spunchout_prot_0_w)
-	AM_RANGE(0x17, 0x17) AM_READWRITE(spunchout_prot_1_r, spunchout_prot_1_w)
-	AM_RANGE(0x27, 0x27) AM_READWRITE(spunchout_prot_2_r, spunchout_prot_2_w)
-	AM_RANGE(0x37, 0x37) AM_READWRITE(spunchout_prot_3_r, spunchout_prot_3_w)
-	AM_RANGE(0x57, 0x57) AM_READWRITE(spunchout_prot_5_r, spunchout_prot_5_w)
-	AM_RANGE(0x67, 0x67) AM_READWRITE(spunchout_prot_6_r, spunchout_prot_6_w)
-	AM_RANGE(0x97, 0x97) AM_READ(spunchout_prot_9_r)
-	AM_RANGE(0xa7, 0xa7) AM_READWRITE(spunchout_prot_a_r, spunchout_prot_a_w)
-	AM_RANGE(0xb7, 0xb7) AM_READWRITE(spunchout_prot_b_r, spunchout_prot_b_w)
-	AM_RANGE(0xc7, 0xc7) AM_READ(spunchout_prot_c_r)
-	AM_RANGE(0xd7, 0xd7) AM_WRITE(spunchout_prot_d_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE(spunchout_prot_f_w)
-	/* AM_RANGE(0xf7, 0xf7) AM_READ(spunchout_prot_f_r) */
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -670,8 +603,8 @@ static const nes_interface nes_config =
 
 static MACHINE_RESET( punchout )
 {
-	prot_mode_sel = -1;
-	memset(prot_mem, 0, sizeof(prot_mem));
+	rp5c01_mode_sel = 0;
+	memset(rp5c01_mem, 0, sizeof(rp5c01_mem));
 }
 
 
