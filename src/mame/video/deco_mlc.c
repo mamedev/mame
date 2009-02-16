@@ -10,9 +10,9 @@
 
 #include "driver.h"
 
-extern int mlc_raster_table[9][256];
-extern UINT32 mlc_clipper[32];
-static bitmap_t *temp_bitmap;
+//extern int mlc_raster_table[9][256];
+//extern UINT32 mlc_clipper[32];
+//static bitmap_t *temp_bitmap;
 static UINT32 colour_mask, *mlc_buffered_spriteram;
 UINT32 *mlc_vram, *mlc_clip_ram;
 
@@ -27,7 +27,7 @@ VIDEO_START( mlc )
 	else
 		colour_mask=0x1f;
 
-	temp_bitmap = auto_bitmap_alloc( 512, 512, BITMAP_FORMAT_RGB32 );
+//	temp_bitmap = auto_bitmap_alloc( 512, 512, BITMAP_FORMAT_RGB32 );
 	mlc_buffered_spriteram = auto_malloc(0x3000);
 }
 
@@ -239,9 +239,9 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 	int useIndicesInRom=0;
 	int hibits=0;
 	int tileFormat=0;
-	int rasterMode=0;
-	int lastRasterMode=0;
-	int rasterDirty=0;
+//	int rasterMode=0;
+//	int lastRasterMode=0;
+//	int rasterDirty=0;
 	int clipper=0;
 	rectangle user_clip;
 	UINT32* mlc_spriteram=mlc_buffered_spriteram; // spriteram32
@@ -300,7 +300,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 		fx = mlc_spriteram[offs+1]&0x8000;
 		fy = mlc_spriteram[offs+1]&0x4000;
 		color = mlc_spriteram[offs+1]&0xff;
-		rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
+//		rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
 		clipper = (mlc_spriteram[offs+1]>>8)&0x3;
 		indx = mlc_spriteram[offs+0]&0x3fff;
 		yscale = mlc_spriteram[offs+4]&0x3ff;
@@ -316,10 +316,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 		user_clip.min_x=mlc_clip_ram[(clipper*4)+2];
 		user_clip.max_x=mlc_clip_ram[(clipper*4)+3];
 
-		if (user_clip.min_y < cliprect->min_y) user_clip.min_y=cliprect->min_y;
-		if (user_clip.max_y > cliprect->max_y) user_clip.max_y=cliprect->max_y;
-		if (user_clip.min_x < cliprect->min_x) user_clip.min_x=cliprect->min_x;
-		if (user_clip.max_x > cliprect->max_x) user_clip.max_x=cliprect->max_x;
+		sect_rect(&user_clip, cliprect);
 
 		/* Any colours out of range (for the bpp value) trigger 'shadow' mode */
 		if (color & (colour_mask+1))
@@ -482,8 +479,8 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 					}
 				}
 
-				if (rasterMode)
-					rasterDirty=1;
+//				if (rasterMode)
+//					rasterDirty=1;
 
 				mlc_drawgfxzoom(machine,
 								/*rasterMode ? temp_bitmap : */bitmap,machine->gfx[0],
@@ -500,13 +497,13 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 			ybase+=yinc;
 		}
 
-		if (lastRasterMode!=0 && rasterDirty)
-		{
-	//      blitRaster(bitmap, rasterMode);
-//          bitmap_fill(temp_bitmap,cliprect,0);
-			rasterDirty=0;
-		}
-		lastRasterMode=rasterMode;
+//		if (lastRasterMode!=0 && rasterDirty)
+//		{
+//			blitRaster(bitmap, rasterMode);
+//			bitmap_fill(temp_bitmap,cliprect,0);
+//			rasterDirty=0;
+//		}
+//		lastRasterMode=rasterMode;
 
 		if (use8bppMode)
 			offs-=8;
