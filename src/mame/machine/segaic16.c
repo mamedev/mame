@@ -82,7 +82,7 @@ static struct compare_timer_chip compare_timer[2];
  *
  *************************************/
 
-static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip);
+static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip, int decrypt);
 
 
 
@@ -136,7 +136,7 @@ void segaic16_memory_mapper_init(const device_config *cpu, const segaic16_memory
 	chip->sound_r = sound_r_callback;
 
 	/* create the initial regions */
-	segaic16_memory_mapper_reset(cpu->machine);
+	update_memory_mapping(cpu->machine, chip, 0);
 }
 
 
@@ -146,7 +146,7 @@ void segaic16_memory_mapper_reset(running_machine *machine)
 
 	/* zap to 0 and remap everything */
 	memset(chip->regs, 0, sizeof(chip->regs));
-	update_memory_mapping(machine, chip);
+	update_memory_mapping(machine, chip, 1);
 }
 
 
@@ -156,7 +156,7 @@ void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_da
 
 	/* zap to 0 and remap everything */
 	memcpy(&chip->regs[0x10], map_data, 0x10);
-	update_memory_mapping(machine, chip);
+	update_memory_mapping(machine, chip, 1);
 }
 
 
@@ -276,7 +276,7 @@ static void memory_mapper_w(const address_space *space, struct memory_mapper_chi
 		case 0x1c:	case 0x1d:
 		case 0x1e:	case 0x1f:
 			if (oldval != data)
-				update_memory_mapping(space->machine, chip);
+				update_memory_mapping(space->machine, chip, 1);
 			break;
 
 		default:
@@ -324,7 +324,7 @@ static UINT16 memory_mapper_r(struct memory_mapper_chip *chip, offs_t offset, UI
 }
 
 
-static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip)
+static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip, int decrypt)
 {
 	int rgnum;
 
@@ -379,15 +379,19 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 			}
 			else if (rgn->romoffset != ~0)
 			{
-				UINT8 *decrypted;
+				UINT8 *decrypted = NULL;
 
-				decrypted = fd1094_get_decrypted_base();
-				if (!decrypted)
-					decrypted = fd1089_get_decrypted_base();
-
-				memory_configure_bank(machine, banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);
+				if (decrypt)
+				{
+					decrypted = fd1094_get_decrypted_base();
+					if (!decrypted)
+						decrypted = fd1089_get_decrypted_base();
+				}
 				if (decrypted)
-					memory_configure_bank_decrypted(machine, banknum, 0, 1, decrypted ? (decrypted + region_start) : 0, 0);
+					memory_configure_bank_decrypted(machine, banknum, 0, 1, decrypted + region_start, 0);
+				else
+					memory_configure_bank(machine, banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);
+
 				memory_set_bank(machine, banknum, 0);
 			}
 		}
@@ -588,9 +592,9 @@ WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(space, 2, offset, data, mem_ma
 
 void segaic16_compare_timer_init(int which, void (*sound_write_callback)(running_machine *, UINT8), void (*timer_ack_callback)(running_machine *))
 {
+	memset(&compare_timer[which], 0, sizeof(compare_timer[which]));
 	compare_timer[which].sound_w = sound_write_callback;
 	compare_timer[which].timer_ack = timer_ack_callback;
-	compare_timer[which].counter = 0;
 }
 
 
