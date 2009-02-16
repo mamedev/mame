@@ -646,6 +646,30 @@ ROM_START( phoenixt )
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
+ROM_START( phoenixj )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "pn01.45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "pn02.46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
+	ROM_LOAD( "pn03.47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "pn04.48",   0x1800, 0x0800, CRC(dd41f22b) SHA1(cb3748e18a99e35d99b5f18cee2a9796dd5646f9) )
+	ROM_LOAD( "pn05.49",   0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "pn06.50",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "pn07.51",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "pn08.52",   0x3800, 0x0800, CRC(b9915263) SHA1(f61396077b23364b5b26f62c6923394d23a37eb3) )
+
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "pn11.23",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "pn12.24",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "pn09.39",   0x0000, 0x0800, CRC(53413e8f) SHA1(d772358505b973b10da840d204afb210c0c746ec) )
+	ROM_LOAD( "pn10.40",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "pn14.40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "pn13.41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+ROM_END
+
 ROM_START( phoenix3 )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "phoenix3.45",  0x0000, 0x0800, CRC(a362cda0) SHA1(5ab38afaf92179c965533326574c773f6a63dbbb) )
@@ -1021,6 +1045,7 @@ GAME( 1980, phoenix,  0,        phoenix,  phoenix,  0,        ROT90, "Amstar", "
 GAME( 1980, phoenixa, phoenix,  phoenix,  phoenixa, 0,        ROT90, "Amstar (Centuri license)", "Phoenix (Centuri, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, phoenixb, phoenix,  phoenix,  phoenixa, 0,        ROT90, "Amstar (Centuri license)", "Phoenix (Centuri, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, phoenixt, phoenix,  phoenix,  phoenixt, 0,        ROT90, "Taito", "Phoenix (Taito)", GAME_SUPPORTS_SAVE )
+GAME( 1980, phoenixj, phoenix,  phoenix,  phoenixt, 0,        ROT90, "Taito", "Phoenix (Taito Japan Ver.)", GAME_SUPPORTS_SAVE )
 GAME( 1980, phoenix3, phoenix,  phoenix,  phoenix3, 0,        ROT90, "bootleg", "Phoenix (T.P.N.)", GAME_SUPPORTS_SAVE )
 GAME( 1981, phoenixc, phoenix,  phoenix,  phoenixt, 0,        ROT90, "bootleg?", "Phoenix (IRECSA, G.G.I Corp)", GAME_SUPPORTS_SAVE )
 GAME( 1981, condor,   phoenix,  condor,   condor,   condor,   ROT90, "Sidam (bootleg)",       "Condor (bootleg of Phoenix)", GAME_SUPPORTS_SAVE )
