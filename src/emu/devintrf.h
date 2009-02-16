@@ -75,6 +75,7 @@ enum
 		DEVINFO_FCT_EXECUTE,							/* R/O: device_execute_func */
 		DEVINFO_FCT_VALIDITY_CHECK,						/* R/O: device_validity_check_func */
 		DEVINFO_FCT_NVRAM,								/* R/O: device_nvram_func */
+		DEVINFO_FCT_CUSTOM_CONFIG,						/* R/O: device_custom_config_func */
 
 	DEVINFO_FCT_CLASS_SPECIFIC = 0x24000,				/* R/W: device-specific values start here */
 	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				/* R/W: device-specific values start here */
@@ -131,6 +132,10 @@ enum
 #define DEVICE_VALIDITY_CHECK_NAME(name)	device_validity_check_##name
 #define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device)
 #define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK(name)(driver, device)
+
+#define DEVICE_CUSTOM_CONFIG_NAME(name)		device_custom_config_##name
+#define DEVICE_CUSTOM_CONFIG(name)			const union _machine_config_token *DEVICE_CUSTOM_CONFIG_NAME(name)(const device_config *device, UINT32 entrytype, const union _machine_config_token *tokens)
+#define DEVICE_CUSTOM_CONFIG_CALL(name)		DEVICE_CUSTOM_CONFIG(name)(device, entrytype, tokens)
 
 
 /* shorthand for accessing devices by machine/type/tag */
@@ -191,6 +196,7 @@ typedef INT32 (*device_execute_func)(const device_config *device, INT32 clocks);
 typedef void (*device_reset_func)(const device_config *device);
 typedef void (*device_nvram_func)(const device_config *device, mame_file *file, int read_or_write);
 typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device);
+typedef const union _machine_config_token *(*device_custom_config_func)(const device_config *device, UINT32 entrytype, const union _machine_config_token *tokens);
 
 
 /* a device_type is simply a pointer to its get_info function */
@@ -211,6 +217,7 @@ union _deviceinfo
 	device_reset_func		reset;					/* DEVINFO_FCT_RESET */
 	device_execute_func 	execute;				/* DEVINFO_FCT_EXECUTE */
 	device_validity_check_func validity_check;		/* DEVINFO_FCT_VALIDITY_CHECK */
+	device_custom_config_func custom_config;		/* DEVINFO_FCT_CUSTOM_CONFIG */
 	device_nvram_func		nvram;					/* DEVINFO_FCT_NVRAM */
 	const rom_entry *		romregion;				/* DEVINFO_PTR_ROM_REGION */
 	const union _machine_config_token *machine_config;/* DEVINFO_PTR_MACHINE_CONFIG */

@@ -21,7 +21,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_OUTPUTS		256				/* maximum number of outputs a sound chip can support */
+#define MAX_OUTPUTS		4095			/* maximum number of outputs a sound chip can support */
 #define ALL_OUTPUTS 	(MAX_OUTPUTS)	/* special value indicating all outputs for the current chip */
 
 
@@ -56,8 +56,10 @@ typedef device_type sound_type;
 typedef struct _sound_route sound_route;
 struct _sound_route
 {
-	const char *		target;					/* tag of the target */
-	int					input;					/* input ID, -1 is default behavior */
+	sound_route *		next;					/* pointer to next route */
+	UINT32				output;					/* output index, or ALL_OUTPUTS */
+	const char *		target;					/* target tag */
+	UINT32				input;					/* target input index */
 	float				gain;					/* gain */
 };
 
@@ -67,7 +69,7 @@ typedef struct _sound_config sound_config;
 struct _sound_config
 {
 	sound_type			type;					/* type of sound chip */
-	sound_route			route[ALL_OUTPUTS+1];	/* one route per output */
+	sound_route *		routelist;				/* list of sound routes */
 };
 
 
@@ -104,19 +106,23 @@ struct _speaker_config
 	MDRV_DEVICE_MODIFY(_tag, SOUND) \
 	MDRV_DEVICE_CONFIG_CLEAR() \
 	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_##_type) \
-	MDRV_DEVICE_CLOCK(_clock)
+	MDRV_DEVICE_CLOCK(_clock) \
+	MDRV_SOUND_ROUTES_RESET()
 
 #define MDRV_SOUND_CONFIG(_config) \
 	MDRV_DEVICE_CONFIG(_config)
 
+
+/* sound routine is too complex for standard decoding, so we use a custom config */
 #define MDRV_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(sound_config, route, _output, sound_route, target, _target) \
-	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(sound_config, route, _output, sound_route, input, _input) \
-	MDRV_DEVICE_CONFIG_DATAFP32_ARRAY_MEMBER(sound_config, route, _output, sound_route, gain, _gain, 24)
+	TOKEN_UINT64_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1, 8, _output, 12, _input, 12, ((float)(_gain) * (float)(1 << 24)), 32), \
+	TOKEN_PTR(stringptr, _target),
 
 #define MDRV_SOUND_ROUTE(_output, _target, _gain) \
 	MDRV_SOUND_ROUTE_EX(_output, _target, _gain, 0)
 
+#define MDRV_SOUND_ROUTES_RESET() \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE, 8),
 
 
 /* add/remove speakers */

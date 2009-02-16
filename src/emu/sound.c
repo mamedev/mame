@@ -318,6 +318,54 @@ static DEVICE_START( sound )
 
 
 /*-------------------------------------------------
+    device_custom_config_sound - custom inline
+    config callback for populating sound routes
+-------------------------------------------------*/
+
+static DEVICE_CUSTOM_CONFIG( sound )
+{
+	sound_config *config = device->inline_config;
+	
+	switch (entrytype)
+	{
+		/* custom config 1 is a new route */
+		case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1:
+		{
+			sound_route **routeptr;
+			int output, input;
+			UINT32 gain;
+
+			/* put back the token that was originally fetched so we can grab a packed 64-bit token */
+			TOKEN_UNGET_UINT32(tokens);
+			TOKEN_GET_UINT64_UNPACK4(tokens, entrytype, 8, output, 12, input, 12, gain, 32);
+		
+			/* allocate a new route */
+			for (routeptr = &config->routelist; *routeptr != NULL; routeptr = &(*routeptr)->next) ;
+			*routeptr = malloc_or_die(sizeof(**routeptr));
+			(*routeptr)->next = NULL;
+			(*routeptr)->output = output;
+			(*routeptr)->input = input;
+			(*routeptr)->gain = (float)gain * (1.0f / (float)(1 << 24));
+			(*routeptr)->target = TOKEN_GET_STRING(tokens);
+			break;
+		}
+	
+		/* custom config free is also used as a reset of sound routes */
+		case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE:
+			while (config->routelist != NULL)
+			{
+				sound_route *temp = config->routelist;
+				config->routelist = temp->next;
+				free(temp);
+			}
+			break;
+	}
+	
+	return tokens;
+}
+
+
+/*-------------------------------------------------
     device_get_info_sound - device get info
     callback
 -------------------------------------------------*/
@@ -340,6 +388,7 @@ DEVICE_GET_INFO( sound )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(sound); 	break;
 		case DEVINFO_FCT_SET_INFO:				info->set_info = NULL;						break;
+		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVICE_CUSTOM_CONFIG_NAME(sound);	break;
 		
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:
@@ -369,36 +418,30 @@ DEVICE_GET_INFO( sound )
 static void route_sound(running_machine *machine)
 {
 	astring *tempstring = astring_alloc();
-	int routenum, outputnum;
 	const device_config *curspeak;
 	const device_config *sound;
+	int outputnum;
 
 	/* first count up the inputs for each speaker */
 	for (sound = sound_first(machine->config); sound != NULL; sound = sound_next(sound))
 	{
 		const sound_config *config = sound->inline_config;
 		int numoutputs = stream_get_device_outputs(sound);
-		int numassigned = 0;
+		const sound_route *route;
 		
 		/* iterate over all routes */
-		for (routenum = 0; routenum <= ALL_OUTPUTS; routenum++)
+		for (route = config->routelist; route != NULL; route = route->next)
 		{
-			const sound_route *mroute = &config->route[routenum];
-			if (mroute->target != NULL)
-			{
-				const device_config *target_speaker = devtag_get_device(machine, SPEAKER_OUTPUT, mroute->target);
-				const device_config *target_sound = devtag_get_device(machine, SOUND, mroute->target);
-				int numentries = (routenum != ALL_OUTPUTS) ? 1 : (numoutputs - numassigned);
-				
-				/* if neither found, it's fatal */
-				if (target_speaker == NULL && target_sound == NULL)
-					fatalerror("Sound route \"%s\" not found!\n", mroute->target);
+			const device_config *target_speaker = devtag_get_device(machine, SPEAKER_OUTPUT, route->target);
+			const device_config *target_sound = devtag_get_device(machine, SOUND, route->target);
+			
+			/* if neither found, it's fatal */
+			if (target_speaker == NULL && target_sound == NULL)
+				fatalerror("Sound route \"%s\" not found!\n", route->target);
 
-				/* if we got a speaker, bump its input count */
-				if (target_speaker != NULL)
-					get_safe_token(target_speaker)->inputs += numentries;
-				numassigned += numentries;
-			}
+			/* if we got a speaker, bump its input count */
+			if (target_speaker != NULL)
+				get_safe_token(target_speaker)->inputs += (route->output == ALL_OUTPUTS) ? numoutputs : 1;
 		}
 	}
 	
@@ -422,59 +465,52 @@ static void route_sound(running_machine *machine)
 	{
 		const sound_config *config = sound->inline_config;
 		int numoutputs = stream_get_device_outputs(sound);
-		UINT8 assigned[MAX_OUTPUTS] = { FALSE };
+		const sound_route *route;
 		
 		/* iterate over all routes */
-		for (routenum = 0; routenum <= ALL_OUTPUTS; routenum++)
+		for (route = config->routelist; route != NULL; route = route->next)
 		{
-			const sound_route *mroute = &config->route[routenum];
-			if (mroute->target != NULL)
-			{
-				const device_config *target_speaker = devtag_get_device(machine, SPEAKER_OUTPUT, mroute->target);
-				const device_config *target_sound = devtag_get_device(machine, SOUND, mroute->target);
-				int inputnum = mroute->input;
-				sound_stream *stream;
-				int streamoutput;
+			const device_config *target_speaker = devtag_get_device(machine, SPEAKER_OUTPUT, route->target);
+			const device_config *target_sound = devtag_get_device(machine, SOUND, route->target);
+			int inputnum = route->input;
+			sound_stream *stream;
+			int streamoutput;
 
-				/* iterate over all outputs, matching any that apply */
-				for (outputnum = 0; outputnum < numoutputs; outputnum++)
-					if (routenum == outputnum || (routenum == ALL_OUTPUTS && !assigned[outputnum]))
+			/* iterate over all outputs, matching any that apply */
+			for (outputnum = 0; outputnum < numoutputs; outputnum++)
+				if (route->output == outputnum || route->output == ALL_OUTPUTS)
+				{
+					/* if it's a speaker, set the input */
+					if (target_speaker != NULL)
 					{
-						/* mark this output as assigned */
-						assigned[outputnum] = TRUE;
+						speaker_info *speakerinfo = get_safe_token(target_speaker);
 
-						/* if it's a speaker, set the input */
-						if (target_speaker != NULL)
-						{
-							speaker_info *speakerinfo = get_safe_token(target_speaker);
+						/* generate text for the UI */
+						astring_printf(tempstring, "Speaker '%s': %s '%s'", target_speaker->tag, device_get_name(sound), sound->tag);
+						if (numoutputs > 1)
+							astring_catprintf(tempstring, " Ch.%d", outputnum);
 
-							/* generate text for the UI */
-							astring_printf(tempstring, "Speaker '%s': %s '%s'", target_speaker->tag, device_get_name(sound), sound->tag);
-							if (numoutputs > 1)
-								astring_catprintf(tempstring, " Ch.%d", outputnum);
+						/* fill in the input data on this speaker */
+						speakerinfo->input[speakerinfo->inputs].gain = route->gain;
+						speakerinfo->input[speakerinfo->inputs].default_gain = route->gain;
+						speakerinfo->input[speakerinfo->inputs].name = auto_strdup(astring_c(tempstring));
 
-							/* fill in the input data on this speaker */
-							speakerinfo->input[speakerinfo->inputs].gain = mroute->gain;
-							speakerinfo->input[speakerinfo->inputs].default_gain = mroute->gain;
-							speakerinfo->input[speakerinfo->inputs].name = auto_strdup(astring_c(tempstring));
-
-							/* connect the output to the input */
-							if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
-								stream_set_input(speakerinfo->mixer_stream, speakerinfo->inputs++, stream, streamoutput, mroute->gain);
-						}
-						
-						/* otherwise, it's a sound chip */
-						else
-						{
-							sound_stream *inputstream;
-							int streaminput;
-							
-							if (stream_device_input_to_stream_input(target_sound, inputnum++, &inputstream, &streaminput))
-								if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
-									stream_set_input(inputstream, streaminput, stream, streamoutput, mroute->gain);
-						}
+						/* connect the output to the input */
+						if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
+							stream_set_input(speakerinfo->mixer_stream, speakerinfo->inputs++, stream, streamoutput, route->gain);
 					}
-			}
+					
+					/* otherwise, it's a sound chip */
+					else
+					{
+						sound_stream *inputstream;
+						int streaminput;
+						
+						if (stream_device_input_to_stream_input(target_sound, inputnum++, &inputstream, &streaminput))
+							if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
+								stream_set_input(inputstream, streaminput, stream, streamoutput, route->gain);
+					}
+				}
 		}
 	}
 

@@ -37,14 +37,22 @@ enum
 
 	MCONFIG_TOKEN_DEVICE_ADD,
 	MCONFIG_TOKEN_DEVICE_REMOVE,
-	MCONFIG_TOKEN_DEVICE_REPLACE,
 	MCONFIG_TOKEN_DEVICE_MODIFY,
 	MCONFIG_TOKEN_DEVICE_CLOCK,
 	MCONFIG_TOKEN_DEVICE_CONFIG,
 	MCONFIG_TOKEN_DEVICE_CONFIG_DATA32,
 	MCONFIG_TOKEN_DEVICE_CONFIG_DATA64,
 	MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32,
-	MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_2,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_3,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_4,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_5,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_6,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_7,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_8,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_9,
+	MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE,
 
 	MCONFIG_TOKEN_DRIVER_DATA,
 	MCONFIG_TOKEN_QUANTUM_TIME,
@@ -70,13 +78,6 @@ enum
 
 	MCONFIG_TOKEN_SOUND_START,
 	MCONFIG_TOKEN_SOUND_RESET,
-
-	MCONFIG_TOKEN_SOUND_ADD,
-	MCONFIG_TOKEN_SOUND_REMOVE,
-	MCONFIG_TOKEN_SOUND_MODIFY,
-	MCONFIG_TOKEN_SOUND_CONFIG,
-	MCONFIG_TOKEN_SOUND_REPLACE,
-	MCONFIG_TOKEN_SOUND_ROUTE,
 };
 
 
@@ -172,6 +173,9 @@ union _machine_config_token
 	video_update_func video_update;
 };
 
+
+/* helper macro for returning the size of a field within a struct; similar to offsetof() */
+#define structsizeof(_struct, _field) sizeof(((_struct *)NULL)->_field)
 
 
 /* start/end tags for the machine driver */
@@ -310,12 +314,10 @@ union _machine_config_token
 #define MDRV_DEVICE_CLOCK(_clock) \
 	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_CLOCK, 8, _clock, 32),
 
-#define structsizeof(_struct, _field) sizeof(((_struct *)NULL)->_field)
-
 
 /* inline device configurations that require 32 bits of storage in the token */
 #define MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(_size, _offset, _val) \
-	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA32, 8, _size, 6, _offset, 12), \
+	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA32, 8, _size, 4, _offset, 12), \
 	TOKEN_UINT32((UINT32)(_val)),
 
 #define MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val) \
@@ -330,7 +332,7 @@ union _machine_config_token
 
 /* inline device configurations that require 32 bits of fixed-point storage in the token */
 #define MDRV_DEVICE_CONFIG_DATAFP32_EXPLICIT(_size, _offset, _val, _fixbits) \
-	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32, 8, _size, 6, _fixbits, 6, _offset, 12), \
+	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32, 8, _size, 4, _fixbits, 6, _offset, 12), \
 	TOKEN_UINT32((INT32)((float)(_val) * (float)(1 << (_fixbits)))),
 
 #define MDRV_DEVICE_CONFIG_DATAFP32(_struct, _field, _val, _fixbits) \
@@ -345,7 +347,7 @@ union _machine_config_token
 
 /* inline device configurations that require 64 bits of storage in the token */
 #define MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(_size, _offset, _val) \
-	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA64, 8, _size, 6, _offset, 12), \
+	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA64, 8, _size, 4, _offset, 12), \
 	TOKEN_UINT64((UINT64)(_val)),
 
 #define MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val) \

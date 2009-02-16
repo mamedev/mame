@@ -1498,32 +1498,28 @@ static int validate_sound(int drivnum, const machine_config *config)
 	for (cursound = sound_first(config); cursound != NULL; cursound = sound_next(cursound))
 	{
 		const sound_config *curconfig = cursound->inline_config;
-		int routenum;
+		const sound_route *route;
 
 		/* loop over all the routes */
-		for (routenum = 0; routenum <= ALL_OUTPUTS; routenum++)
+		for (route = curconfig->routelist; route != NULL; route = route->next)
 		{
-			const sound_route *mroute = &curconfig->route[routenum];
-			if (mroute->target != NULL)
+			/* find a speaker with the requested tag */
+			for (checkspeak = speaker_output_first(config); checkspeak != NULL; checkspeak = speaker_output_next(checkspeak))
+				if (strcmp(route->target, checkspeak->tag) == 0)
+					break;
+
+			/* if we didn't find one, look for another sound chip with the tag */
+			if (checkspeak == NULL)
 			{
-				/* find a speaker with the requested tag */
-				for (checkspeak = speaker_output_first(config); checkspeak != NULL; checkspeak = speaker_output_next(checkspeak))
-					if (strcmp(mroute->target, checkspeak->tag) == 0)
+				for (checksound = sound_first(config); checksound != NULL; checksound = sound_next(checksound))
+					if (checksound != cursound && strcmp(route->target, checksound->tag) == 0)
 						break;
 
-				/* if we didn't find one, look for another sound chip with the tag */
-				if (checkspeak == NULL)
+				/* if we didn't find one, it's an error */
+				if (checksound == NULL)
 				{
-					for (checksound = sound_first(config); checksound != NULL; checksound = sound_next(checksound))
-						if (checksound != cursound && strcmp(mroute->target, checksound->tag) == 0)
-							break;
-
-					/* if we didn't find one, it's an error */
-					if (checksound == NULL)
-					{
-						mame_printf_error("%s: %s attempting to route sound to non-existant speaker '%s'\n", driver->source_file, driver->name, mroute->target);
-						error = TRUE;
-					}
+					mame_printf_error("%s: %s attempting to route sound to non-existant speaker '%s'\n", driver->source_file, driver->name, route->target);
+					error = TRUE;
 				}
 			}
 		}

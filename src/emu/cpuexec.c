@@ -707,6 +707,10 @@ DEVICE_GET_INFO( cpu )
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(cpu); 		break;
 
 		default:
+			/* if we don't have a device pointer, ignore everything else */
+			if (device == NULL)
+				break;
+
 			/* if we have a state pointer, we can handle some stuff for free */
 			if (device->token != NULL)
 			{

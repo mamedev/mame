@@ -28,7 +28,7 @@
 
 
 /***************************************************************************
-    MACROS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 /* include this at the top of your union to get the standard fields */
@@ -45,6 +45,19 @@
 	const UINT64 *	ui64ptr;	\
 	const INT64 *	i64ptr;		\
 
+
+/* generic_token can be used when there are no particularly special types */
+typedef struct _generic_token generic_token;
+struct _generic_token
+{
+	TOKEN_COMMON_FIELDS
+};
+
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
 /* ----- compile-time token generation macros ----- */
 
