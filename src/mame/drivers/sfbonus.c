@@ -10,11 +10,8 @@ Notes:
 - There are still some video problems, coin cut in half on pir2002v2 & missing spinning 7 on classice for example
   maybe the reel tilemap should be one big tilemap, and the 'select' ram is extra scroll bits..
   
-  The 'left' side graphics on several playfields are missing too.
-  They are in the first reel tilemap (reel_tilemap) but the tilemap select ram for that row has a different tilemap
-  enabled (for the actual reels).  Furthermore the first tilemap often has rowscroll values at that point, so forcing
-  it to be drawn results in it being misplaced.  There must be a rowscroll disable, or the first reel tilemap is a
-  special case.
+- The code to handle the 'multple' reel layers is dubious.  rowscroll values are always used
+  based on only one of the tilemaps displayed in that screen region.
   
 
 - Inputs not done, Lamps not done  
@@ -231,6 +228,7 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		// other bits are used too..
 		int line = ((zz+globalyscrollreels)&0x1ff);
 		int rowenable = selectbase[line]&0x3;
+		int rowenable2 = (selectbase[line]&0xc)>>2;
 		int xxxscroll;
 		int rowscroll;
 		
@@ -243,24 +241,63 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		clip.min_y = startclipmin;
 		clip.max_y = startclipmin;
 
-		rowscroll = reels_rowscroll[((line/8)*2)+0x000] | (reels_rowscroll[((line/8)*2)+0x001]<<8);
-		xxxscroll = globalxscrollreels + rowscroll;	
-		tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
-
-		rowscroll = reels_rowscroll[((line/8)*2)+0x080] | (reels_rowscroll[((line/8)*2)+0x081]<<8);
-		xxxscroll = globalxscrollreels + rowscroll;	
-		tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
-
-		rowscroll = reels_rowscroll[((line/8)*2)+0x100] | (reels_rowscroll[((line/8)*2)+0x101]<<8);
-		xxxscroll = globalxscrollreels + rowscroll;	
-		tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
-
-		rowscroll = reels_rowscroll[((line/8)*2)+0x180] | (reels_rowscroll[((line/8)*2)+0x181]<<8);
-		xxxscroll = globalxscrollreels + rowscroll;	
-		tilemap_set_scrollx(sfbonus_reel4_tilemap, 0, xxxscroll );
 
 		
 		// other bits are set, what do they mean?
+		if (rowenable==0)
+		{			
+			rowscroll = reels_rowscroll[((line/8)*2)+0x000] | (reels_rowscroll[((line/8)*2)+0x001]<<8);
+			xxxscroll = globalxscrollreels + rowscroll;	
+			tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
+			tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
+			tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
+			tilemap_set_scrollx(sfbonus_reel4_tilemap, 0, xxxscroll );
+		}
+		else if (rowenable==0x1)
+		{
+			rowscroll = reels_rowscroll[((line/8)*2)+0x080] | (reels_rowscroll[((line/8)*2)+0x081]<<8);
+			xxxscroll = globalxscrollreels + rowscroll;	
+			tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
+			tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
+			tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
+			tilemap_set_scrollx(sfbonus_reel4_tilemap, 0, xxxscroll );
+		}
+		else if (rowenable==0x2)
+		{
+			rowscroll = reels_rowscroll[((line/8)*2)+0x100] | (reels_rowscroll[((line/8)*2)+0x101]<<8);
+			xxxscroll = globalxscrollreels + rowscroll;	
+			tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
+			tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
+			tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
+			tilemap_set_scrollx(sfbonus_reel4_tilemap, 0, xxxscroll );
+		}
+		else if (rowenable==0x3)
+		{
+			rowscroll = reels_rowscroll[((line/8)*2)+0x180] | (reels_rowscroll[((line/8)*2)+0x181]<<8);
+			xxxscroll = globalxscrollreels + rowscroll;	
+			tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
+			tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
+			tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
+			tilemap_set_scrollx(sfbonus_reel4_tilemap, 0, xxxscroll );
+		}
+	
+		if (rowenable2==0)
+		{			
+			tilemap_draw(bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+		}
+		else if (rowenable2==0x1)
+		{
+			tilemap_draw(bitmap,&clip,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+		}
+		else if (rowenable2==0x2)
+		{
+			tilemap_draw(bitmap,&clip,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+		}
+		else if (rowenable2==0x3)
+		{
+			tilemap_draw(bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+		}
+		
 		if (rowenable==0)
 		{			
 			tilemap_draw(bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
@@ -277,11 +314,7 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		{
 			tilemap_draw(bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
 		}
-		else
-		{
-			bitmap_fill(bitmap,&clip,screen->machine->pens[rowenable]);
-		}
-
+			
 		startclipmin+=1;
 	}
 
