@@ -11,6 +11,72 @@
     Known bugs:
         * none at this time
 
+***************************************************************************
+
+Revolution X
+Midway, 1994
+
+This is the only known game on Midway X-Unit hardware.
+
+PCB Layout
+----------
+
+5770-13534-04
+WILLIAMS ELECTRONIC GAMES INC.
+|----------------------------------------------------------------------------------------------------------------|
+|   P8       PIC16C57  BR2325                LED1  LED2                                                          |
+|3.6864MHz   MAX691  RESET_SW   |---------|                      42S4260                                         |
+|SCC2691   LH5268               |LATTICE  |                                                                      |
+|ADC0848                        |PLSI 1032|     MACH110          42S4260             |--------|       40MHz      |
+|P4                             |(A-17719)|    (A-17720)                             |TMS34020|                  |
+|                               |---------|                      42S4260             |        |                  |
+|               8MHz                                                                 |        |                  |
+|P12                                           GAL16V8           42S4260             |--------|                  |
+|   P7                                        (A-17721)                                                          |
+|                        HM538123                                                                                |
+|                                                                                                                |
+|--| FUSE                HM538123                                                                                |
+   | ULN2064                                                                                                     |
+|--|                     HM538123                    25MHz       U51           U52           U53         U54     |
+|                                                                                                                |
+|                        HM538123                                U63           U64           U65         U66     |
+|J                                             |-----------|                                                     |
+|A                       HM538123              |5410-12862 |     U71           U72           U73         U74     |
+|M                                             |-00        |                                                     |
+|M             MB84256   HM538123              |WILLIAMS   |     U81           U82           U83         U84     |
+|A             MB84256                         |ELECTRONICS|                                                     |
+|                        HM538123              |-----------|     U91           U92           U93         U94     |
+|                                                                                                                |
+|                        HM538123                                U101          U102          U103        U104    |
+|--|     DIPSW(U105)           DIPSW(U108)        GAL16V8                                                        |
+   |                                             (A-17722)       U110          U111          U112        U113    |
+|--|                                                                                                             |
+|          P2       P6      P10     P3      P5                   U120          U121          U122        U123    |
+|----------------------------------------------------------------------------------------------------------------|
+Notes:                                                         |                                               |
+      TMS34020 - clock 40MHz                                   |--------------- All ROMs 27C4001 --------------|
+      PIC16C57 - clock 0.625MHz [25/40]
+      VSync    - 54.7074Hz
+      HSync    - 15.8104kHz
+      HM538123 - Hitachi HM538123 128k x8 Multiport CMOS Video DRAM with 256 x8 Serial Access Memory
+      42S4260  - NEC 42S4260 256k x16 DRAM
+      MB84256  - 32k x8 SRAM
+      LH5268   - 8k x8 SRAM for CMOS storage / settings
+      SCC2691  - Philips SCC2691 Universal asynchronous receiver/transmitter (UART)
+      MAX691   - Maxim MAX691 Microprocessor Supervisory Circuit (for battery backup power switching)
+      ADC0848  - Analog Devices ADC0848 8-Bit Microprocessor Compatible A/D Converter with Multiplexer Option
+      P2       - Player 3 controls connector
+      P3       - Player 4 controls connector
+      P4       - Gun connector
+      P5       - 15 pin connector
+      P6       - 7 pin connector
+      P7       - Power connector for sound board
+      P8       - Sound board data cable connector
+      P10      - 10 pin connector
+      P12      - 4 pin connector
+
+There's a separate sound board also, but it wasn't available so is not documented here.
+
 **************************************************************************/
 
 #include "driver.h"
@@ -278,6 +344,10 @@ ROM_START( revx )
 	ROM_LOAD( "revx.52",  0x0e80000, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
 	ROM_LOAD( "revx.53",  0x0f00000, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
 	ROM_LOAD( "revx.54",  0x0f80000, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "a-17722.u1",   0x000, 0x117, CRC(054de7a3) SHA1(bb7abaec50ed704c03b44d5d54296898f7c80d38) )
+	ROM_LOAD( "a-17721.u955", 0x200, 0x117, CRC(033fe902) SHA1(6efb4e519ed3c9d49fff046a679762b506b3a75b) )
 ROM_END
 
 
