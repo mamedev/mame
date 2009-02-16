@@ -25,6 +25,8 @@ extern WRITE8_HANDLER( ironhors_flipscreen_w );
 extern PALETTE_INIT( ironhors );
 extern VIDEO_START( ironhors );
 extern VIDEO_UPDATE( ironhors );
+extern VIDEO_START( farwest );
+extern VIDEO_UPDATE( farwest );
 
 
 static INTERRUPT_GEN( ironhors_interrupt )
@@ -92,6 +94,39 @@ static ADDRESS_MAP_START( slave_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym2203", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( farwest_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0002) AM_RAM
+	//20=31db
+
+	AM_RANGE(0x0005, 0x001f) AM_RAM
+	AM_RANGE(0x31db, 0x31fa) AM_RAM AM_BASE(&ironhors_scroll)
+	AM_RANGE(0x0040, 0x005f) AM_RAM
+	AM_RANGE(0x0060, 0x00ff) AM_RAM
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x0900, 0x0900) /*AM_READ_PORT("DSW3") */AM_WRITE(ironhors_sh_irqtrigger_w)
+	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW1") //AM_WRITE(ironhors_palettebank_w)
+	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW2") AM_WRITE(ironhors_flipscreen_w)
+	AM_RANGE(0x0b01, 0x0b01) AM_READ_PORT("DSW1") //AM_WRITE(ironhors_palettebank_w)
+	AM_RANGE(0x0b02, 0x0b02) AM_READ_PORT("P1")
+	AM_RANGE(0x0b03, 0x0b03) AM_READ_PORT("SYSTEM")
+
+
+
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(ironhors_sh_irqtrigger_w)
+	AM_RANGE(0x1a00, 0x1a00) AM_RAM AM_BASE(&ironhors_interrupt_enable)
+	AM_RANGE(0x1a01, 0x1a01) AM_RAM_WRITE(ironhors_charbank_w)
+	AM_RANGE(0x1a02, 0x1a02) AM_WRITE(ironhors_palettebank_w)
+	AM_RANGE(0x0000, 0x1bff) AM_ROM
+//	AM_RANGE(0x1c00, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM
+	AM_RANGE(0x1c00, 0x1dff) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0x3000, 0x38ff) AM_RAM
+	AM_RANGE(0x1e00, 0x1eff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3900, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( farwest_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -389,15 +424,57 @@ static MACHINE_DRIVER_START( ironhors )
 
 MACHINE_DRIVER_END
 
+static INTERRUPT_GEN( farwest_interrupt )
+{
+	if (cpu_getiloops(device) &1)
+	{
+		if (*ironhors_interrupt_enable & 4)
+			cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+	}
+	else //if (cpu_getiloops() % 2)
+	{
+		if (*ironhors_interrupt_enable & 1)
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	}
+}
+
+static READ8_DEVICE_HANDLER( farwest_soundlatch_r )
+{
+	return soundlatch_r(cpu_get_address_space(device->machine->cpu[1], ADDRESS_SPACE_PROGRAM),0);
+}
+
+static const ym2203_interface farwest_ym2203_config =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL,
+		DEVCB_HANDLER(farwest_soundlatch_r),
+		DEVCB_DEVICE_HANDLER(SOUND, "disc_ih", ironhors_filter_w),
+		DEVCB_NULL
+	},
+	NULL
+};
+
+
 
 static MACHINE_DRIVER_START( farwest )
 	MDRV_IMPORT_FROM(ironhors)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(farwest_master_map, 0)
+	MDRV_CPU_VBLANK_INT_HACK(farwest_interrupt,255)
 
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_PROGRAM_MAP(farwest_slave_map, 0)
 	MDRV_CPU_IO_MAP(0, 0)
 
 	MDRV_GFXDECODE(farwest)
+	MDRV_VIDEO_START(farwest)
+	MDRV_VIDEO_UPDATE(farwest)
+
+	MDRV_SOUND_MODIFY("ym2203")
+	MDRV_SOUND_CONFIG(farwest_ym2203_config)
 MACHINE_DRIVER_END
 
 
@@ -456,7 +533,7 @@ ROM_START( farwest )
 	ROM_REGION( 0x12000, "main", 0 )	/* 64k for code + 8k for extra ROM */
 	ROM_LOAD( "ironhors.008", 0x04000, 0x4000, CRC(b1c8246c) SHA1(4ceb098bb0b4efcbe50bb4b23bd27a60dabf2b3e) )
 	ROM_LOAD( "ironhors.009", 0x08000, 0x8000, CRC(ea34ecfc) SHA1(8c7f12e76d2b9eb592ebf1bfd3e16a6b130da8e5) )
-	ROM_LOAD( "ironhors.007", 0x10000, 0x2000, CRC(471182b7) SHA1(48ff58cbbf971b257e8099ec331397cf73dc8325) )	/* don't know what this is for */
+	ROM_LOAD( "ironhors.007", 0x00000, 0x2000, CRC(471182b7) SHA1(48ff58cbbf971b257e8099ec331397cf73dc8325) )	/* don't know what this is for */
 
 	ROM_REGION( 0x10000, "sound", 0 )
 	ROM_LOAD( "ironhors.010", 0x0000, 0x4000, CRC(a28231a6) SHA1(617e8fdf8129081c6a1bbbf140837a375a51da72) )

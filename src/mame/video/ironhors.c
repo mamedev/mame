@@ -252,3 +252,127 @@ VIDEO_UPDATE( ironhors )
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
+
+static TILE_GET_INFO( farwest_get_bg_tile_info )
+{
+	int code = videoram[tile_index] + ((colorram[tile_index] & 0x40) << 2) +
+		((colorram[tile_index] & 0x20) << 4) + (charbank << 10);
+	int color = (colorram[tile_index] & 0x0f) + 16 * palettebank;
+	int flags = 0;//((colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |	((colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+
+	SET_TILE_INFO(0, code, color, flags);
+}
+
+VIDEO_START( farwest )
+{
+	bg_tilemap = tilemap_create(machine, farwest_get_bg_tile_info, tilemap_scan_rows,
+		 8, 8, 32, 32);
+
+	tilemap_set_scroll_rows(bg_tilemap, 32);
+}
+
+static void farwest_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	int offs;
+	UINT8 *sr=spriteram_2;
+	UINT8 *sr2=spriteram;
+
+//	if (spriterambank != 0)
+	//	sr = spriteram;
+	//else
+		//sr = ;
+
+	for (offs = 0;offs < spriteram_size;offs += 4)
+	{
+		int sx = sr[offs+2];
+		int sy = sr[offs+1];
+		int flipx = sr[offs+3] & 0x20;
+		int flipy = sr[offs+3] & 0x40;
+		int code = (sr[offs] << 2) + ((sr2[offs] & 0x03) << 10) + ((sr2[offs] & 0x0c) >> 2);
+		int color = ((sr2[offs] & 0xf0)>>4) + 16 * palettebank;
+
+
+
+	//  int mod = flip_screen_get() ? -8 : 8;
+
+//		if (flip_screen_get())
+		{
+		//	sx = 240 - sx;
+			sy = 240 - sy;
+		//	flipx = !flipx;
+		//	flipy = !flipy;
+		}
+
+		switch (sr[offs+3] & 0x0c)
+		{
+			case 0x00:	/* 16x16 */
+				drawgfx(bitmap,machine->gfx[1],
+						code/4,
+						color,
+						flipx,flipy,
+						sx,sy,
+						cliprect,TRANSPARENCY_PEN,0);
+				break;
+
+			case 0x04:	/* 16x8 */
+				{
+					if (flip_screen_get(machine)) sy += 8; // this fixes the train wheels' position
+
+					drawgfx(bitmap,machine->gfx[2],
+							code & ~1,
+							color,
+							flipx,flipy,
+							flipx?sx+8:sx,sy,
+							cliprect,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[2],
+							code | 1,
+							color,
+							flipx,flipy,
+							flipx?sx:sx+8,sy,
+							cliprect,TRANSPARENCY_PEN,0);
+				}
+				break;
+
+			case 0x08:	/* 8x16 */
+				{
+					drawgfx(bitmap,machine->gfx[2],
+							code & ~2,
+							color,
+							flipx,flipy,
+							sx,flipy?sy+8:sy,
+							cliprect,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[2],
+							code | 2,
+							color,
+							flipx,flipy,
+							sx,flipy?sy:sy+8,
+							cliprect,TRANSPARENCY_PEN,0);
+				}
+				break;
+
+			case 0x0c:	/* 8x8 */
+				{
+					drawgfx(bitmap,machine->gfx[2],
+							code,
+							color,
+							flipx,flipy,
+							sx,sy,
+							cliprect,TRANSPARENCY_PEN,0);
+				}
+				break;
+		}
+	}
+}
+
+VIDEO_UPDATE( farwest)
+{
+	int row;
+
+	for (row = 0; row < 32; row++)
+		tilemap_set_scrollx(bg_tilemap, row, ironhors_scroll[row]);
+
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	farwest_draw_sprites(screen->machine, bitmap, cliprect);
+	return 0;
+}
+
