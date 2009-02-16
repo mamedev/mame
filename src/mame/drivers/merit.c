@@ -818,6 +818,7 @@ static INPUT_PORTS_START( pitboss )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( casino5 )
@@ -1096,6 +1097,26 @@ static const ppi8255_interface ppi8255_couple_intf[2] =
 	}
 };
 
+static const ppi8255_interface ppi8255_pitboss_intf[2] =
+{
+	{
+		DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+		DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+		DEVCB_NULL,						/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_NULL,						/* Port B write */
+		DEVCB_NULL						/* Port C write */
+	},
+	{
+		DEVCB_NULL,						/* Port A read */
+		DEVCB_NULL,						/* Port B read */
+		DEVCB_NULL,						/* Port C read */
+		DEVCB_NULL,						/* Port A write */
+		DEVCB_HANDLER(led1_w),			/* Port B write */
+		DEVCB_HANDLER(misc_couple_w)	/* Port C write */
+	}
+};
+
 static const ay8910_interface merit_ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -1135,8 +1156,8 @@ static MACHINE_DRIVER_START( pitboss )
 	MDRV_CPU_PROGRAM_MAP(pitboss_map,0)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_pitboss_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_pitboss_intf[1] )
 
 	MDRV_MACHINE_START(merit)
 	/* video hardware */
