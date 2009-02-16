@@ -4209,6 +4209,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hod2bios )
 
 	DRIVER( naomi2 )
+	DRIVER( vstrik3c )
 	DRIVER( vstrik3 )
 	DRIVER( vf4 )
 	DRIVER( initd )

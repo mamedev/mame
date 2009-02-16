@@ -3085,6 +3085,38 @@ GAME( 200?, vathlete,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          
 
 /* Naomi 2 & Naomi 2 GD-ROM */
 
+ROM_START( vstrik3c )
+
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x400000, "user1", 0)
+	ROM_LOAD("epr23663.22", 0x0000000, 0x0400000, CRC(7007fec7) SHA1(523168f0b218d0bd5c815d65bf0caba2c8468c9d) )
+
+	ROM_REGION( 0xa800000, "user2", 0)
+	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic4", 0x1800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic5", 0x2000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic6", 0x2800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic7", 0x3000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic8", 0x3800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic9", 0x4000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic10",0x4800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic11",0x5000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic12",0x5800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic13",0x6000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic14",0x6800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic15",0x7000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic16",0x7800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic17",0x8000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic18",0x8800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic19",0x9000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic20",0x9800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic21",0xa000000, 0x0800000, NO_DUMP )
+ROM_END
+
+ 
 
 ROM_START( vstrik3 )
 	NAOMI2_BIOS
@@ -3135,6 +3167,10 @@ ROM_START( initd )
 ROM_END
 
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+
+//Naomi 2 Cart Games
+GAME( 200?, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0, "Sega",          "Virtua Striker 3 (Cart) (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
 // GDS-xxxx (first party games?)
 GAME( 200?, vstrik3, naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, vf4,     naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 (GDS-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
