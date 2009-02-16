@@ -997,7 +997,7 @@ static void tms57002_execute_cat1(tms57002_t *s, UINT32 opcode)
 #undef INTRP1
 
 	default:
-		abort();
+		fatalerror("Unhandled case in tms57002_execute_cat1");
 	}
 }
 
@@ -1012,7 +1012,7 @@ static void tms57002_execute_cat2_pre(tms57002_t *s, UINT32 opcode)
 #undef INTRP2A
 
 	default:
-		abort();
+		fatalerror("Unhandled case in tms57002_execute_cat2_pre");
 	}
 }
 
@@ -1028,7 +1028,7 @@ static void tms57002_execute_cat2_post(tms57002_t *s, UINT32 opcode)
 #undef INTRP2B
 
 	default:
-		abort();
+		fatalerror("Unhandled case in tms57002_execute_cat2_post");
 	}
 }
 
@@ -1043,7 +1043,7 @@ static void tms57002_execute_cat3(tms57002_t *s, UINT32 opcode)
 #undef INTRP3
 
 	default:
-		abort();
+		fatalerror("Unhandled case in tms57002_execute_cat3");
 	}
 }
 
@@ -1165,7 +1165,7 @@ static void tms57002_decode_cat1(tms57002_t *s, UINT32 opcode, unsigned short *o
 #undef CDEC1
 
 	default:
-		abort();
+		fatalerror("Unhandled case in tms57002_decode_cat1");
 	}
 }
 
@@ -1180,7 +1180,7 @@ static void tms57002_decode_cat2_pre(tms57002_t *s, UINT32 opcode, unsigned shor
 #undef CDEC2A
 
 	default:
-		abort();
+		fatalerror("Unhandled case in tms57002_decode_cat2_pre");
 	}
 }
 
@@ -1195,7 +1195,7 @@ static void tms57002_decode_cat2_post(tms57002_t *s, UINT32 opcode, unsigned sho
 #undef CDEC2B
 
 	default:
-		abort();
+		fatalerror("Unhandled case in tms57002_decode_cat2_post");
 	}
 }
 
@@ -1210,7 +1210,7 @@ static void tms57002_decode_cat3(tms57002_t *s, UINT32 opcode, unsigned short *o
 #undef CDEC3
 
 	default:
-		abort();
+		fatalerror("Unhandled case in tms57002_decode_cat3");
 	}
 }
 
@@ -1353,7 +1353,7 @@ static CPU_EXECUTE(tms57002)
 #undef CINTRP
 
 			default:
-				abort();
+				fatalerror("Unhandled opcode in tms57002_execute");
 			}
 		}
 	inst:
