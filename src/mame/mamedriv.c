@@ -1844,7 +1844,8 @@ const game_driver * const drivers[] =
 
 	/* Taito B-System games */
 	DRIVER( masterw )	/* B72 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( masterwu )	/* B72 (c) 1989 America Corporation (US) */
+	DRIVER( masterwu )	/* B72 (c) 1989 Taito America Corporation (US) */
+	DRIVER( masterwj )	/* B72 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( nastar )	/* B81 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( nastarw )	/* B81 (c) 1988 Taito America Corporation (US) */
 	DRIVER( rastsag2 )	/* B81 (c) 1988 Taito Corporation (Japan) */
