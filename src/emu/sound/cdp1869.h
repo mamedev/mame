@@ -1,5 +1,9 @@
 /*
 
+    RCA CDP1869/70/76 Video Interface System (VIS)
+
+    http://homepage.mac.com/ruske/cosmacelf/cdp1869.pdf
+
                         ________________                                            ________________
            TPA   1  ---|       \/       |---  40  Vdd          PREDISPLAY_   1  ---|       \/       |---  40  Vdd
            TPB   2  ---|                |---  39  PMSEL          *DISPLAY_   2  ---|                |---  39  PAL/NTSC_
@@ -27,20 +31,152 @@
 
 */
 
-#pragma once
+#ifndef __CDP1869__
+#define __CDP1869__
 
-#ifndef __CDP1869_H__
-#define __CDP1869_H__
+#include "devcb.h"
 
-void cdp1869_set_toneamp(const device_config *device, int value);
-void cdp1869_set_tonefreq(const device_config *device, int value);
-void cdp1869_set_toneoff(const device_config *device, int value);
-void cdp1869_set_tonediv(const device_config *device, int value);
-void cdp1869_set_wnamp(const device_config *device, int value);
-void cdp1869_set_wnfreq(const device_config *device, int value);
-void cdp1869_set_wnoff(const device_config *device, int value);
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
+#define CDP1869_DOT_CLK_PAL			5626000.0
+#define CDP1869_DOT_CLK_NTSC		5670000.0
+#define CDP1869_COLOR_CLK_PAL		8867236.0
+#define CDP1869_COLOR_CLK_NTSC		7159090.0
+
+#define CDP1869_CPU_CLK_PAL			(CDP1869_DOT_CLK_PAL / 2)
+#define CDP1869_CPU_CLK_NTSC		(CDP1869_DOT_CLK_NTSC / 2)
+
+#define CDP1869_CHAR_WIDTH			6
+
+#define CDP1869_HSYNC_START			(56 * CDP1869_CHAR_WIDTH)
+#define CDP1869_HSYNC_END			(60 * CDP1869_CHAR_WIDTH)
+#define CDP1869_HBLANK_START		(54 * CDP1869_CHAR_WIDTH)
+#define CDP1869_HBLANK_END			( 5 * CDP1869_CHAR_WIDTH)
+#define CDP1869_SCREEN_START_PAL	( 9 * CDP1869_CHAR_WIDTH)
+#define CDP1869_SCREEN_START_NTSC	(10 * CDP1869_CHAR_WIDTH)
+#define CDP1869_SCREEN_START		(10 * CDP1869_CHAR_WIDTH)
+#define CDP1869_SCREEN_END			(50 * CDP1869_CHAR_WIDTH)
+#define CDP1869_SCREEN_WIDTH		(60 * CDP1869_CHAR_WIDTH)
+
+#define CDP1869_TOTAL_SCANLINES_PAL				312
+#define CDP1869_SCANLINE_VBLANK_START_PAL		304
+#define CDP1869_SCANLINE_VBLANK_END_PAL			10
+#define CDP1869_SCANLINE_VSYNC_START_PAL		308
+#define CDP1869_SCANLINE_VSYNC_END_PAL			312
+#define CDP1869_SCANLINE_DISPLAY_START_PAL		44
+#define CDP1869_SCANLINE_DISPLAY_END_PAL		260
+#define CDP1869_SCANLINE_PREDISPLAY_START_PAL	43
+#define CDP1869_SCANLINE_PREDISPLAY_END_PAL		260
+#define CDP1869_VISIBLE_SCANLINES_PAL			(CDP1869_SCANLINE_DISPLAY_END_PAL - CDP1869_SCANLINE_DISPLAY_START_PAL)
+
+#define CDP1869_TOTAL_SCANLINES_NTSC			262
+#define CDP1869_SCANLINE_VBLANK_START_NTSC		252
+#define CDP1869_SCANLINE_VBLANK_END_NTSC		10
+#define CDP1869_SCANLINE_VSYNC_START_NTSC		258
+#define CDP1869_SCANLINE_VSYNC_END_NTSC			262
+#define CDP1869_SCANLINE_DISPLAY_START_NTSC		36
+#define CDP1869_SCANLINE_DISPLAY_END_NTSC		228
+#define CDP1869_SCANLINE_PREDISPLAY_START_NTSC	35
+#define CDP1869_SCANLINE_PREDISPLAY_END_NTSC	228
+#define CDP1869_VISIBLE_SCANLINES_NTSC			(CDP1869_SCANLINE_DISPLAY_END_NTSC - CDP1869_SCANLINE_DISPLAY_START_NTSC)
+
+#define	CDP1869_PALETTE_LENGTH	8+64
+
+#define CDP1869 DEVICE_GET_INFO_NAME(cdp1869)
+#define SOUND_CDP1869 CDP1869
+
+#define MDRV_CDP1869_ADD(_tag, _pixclock, _config) \
+	MDRV_DEVICE_ADD(_tag, SOUND, _pixclock) \
+	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_CDP1869) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_CDP1869_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, SOUND)
+
+#define CDP1869_INTERFACE(_name) const cdp1869_interface (_name) =
+
+#define CDP1869_CHAR_RAM_READ(name) UINT8 name(const device_config *device, UINT16 pma, UINT8 cma)
+#define CDP1869_CHAR_RAM_WRITE(name) void name(const device_config *device, UINT16 pma, UINT8 cma, UINT8 data)
+#define CDP1869_PAGE_RAM_READ(name) UINT8 name(const device_config *device, UINT16 pma)
+#define CDP1869_PAGE_RAM_WRITE(name) void name(const device_config *device, UINT16 pma, UINT8 data)
+#define CDP1869_PCB_READ(name) int name(const device_config *device, UINT16 pma, UINT8 cma)
+#define CDP1869_ON_PRD_CHANGED(name) void name(const device_config *device, int prd)
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef UINT8 (*cdp1869_char_ram_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
+typedef void (*cdp1869_char_ram_write_func)(const device_config *device, UINT16 pma, UINT8 cma, UINT8 data);
+typedef UINT8 (*cdp1869_page_ram_read_func)(const device_config *device, UINT16 pma);
+typedef void (*cdp1869_page_ram_write_func)(const device_config *device, UINT16 pma, UINT8 data);
+typedef int (*cdp1869_pcb_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
+
+typedef enum _cdp1869_format cdp1869_format;
+enum _cdp1869_format {
+	CDP1869_NTSC = 0,
+	CDP1869_PAL
+};
+
+/* interface */
+typedef struct _cdp1869_interface cdp1869_interface;
+struct _cdp1869_interface
+{
+	const char *cpu_tag;		/* CPU we work together with */
+	const char *screen_tag;		/* screen we are acting on */
+
+	/* pixel clock of the chip is the device clock */
+	int color_clock;			/* the chroma clock of the chip */
+
+	cdp1869_format pal_ntsc;	/* screen format */
+
+	/* page memory read function */
+	cdp1869_page_ram_read_func		page_ram_r;
+
+	/* page memory write function */
+	cdp1869_page_ram_write_func		page_ram_w;
+
+	/* page memory color bit read function */
+	cdp1869_pcb_read_func			pcb_r;
+
+	/* character memory read function */
+	cdp1869_char_ram_read_func		char_ram_r;
+
+	/* character memory write function */
+	cdp1869_char_ram_write_func		char_ram_w;
+
+	/* if specified, this gets called for every change of the predisplay pin (CDP1870/76 pin 1) */
+	devcb_write_line				out_prd_func;
+};
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+/* device interface */
 DEVICE_GET_INFO( cdp1869 );
-#define SOUND_CDP1869 DEVICE_GET_INFO_NAME( cdp1869 )
 
-#endif /* __CDP1869_H__ */
+/* palette initialization */
+PALETTE_INIT( cdp1869 );
+
+/* register access */
+WRITE8_DEVICE_HANDLER( cdp1869_out3_w );
+WRITE8_DEVICE_HANDLER( cdp1869_out4_w );
+WRITE8_DEVICE_HANDLER( cdp1869_out5_w );
+WRITE8_DEVICE_HANDLER( cdp1869_out6_w );
+WRITE8_DEVICE_HANDLER( cdp1869_out7_w );
+
+/* character memory access */
+READ8_DEVICE_HANDLER ( cdp1869_charram_r );
+WRITE8_DEVICE_HANDLER ( cdp1869_charram_w );
+
+/* page memory access */
+READ8_DEVICE_HANDLER ( cdp1869_pageram_r );
+WRITE8_DEVICE_HANDLER ( cdp1869_pageram_w );
+
+/* screen update */
+void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+
+#endif

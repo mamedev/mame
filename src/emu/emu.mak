@@ -176,7 +176,6 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/z80sio.o \
 
 EMUVIDEOOBJS = \
- 	$(EMUVIDEO)/cdp1869.o \
 	$(EMUVIDEO)/generic.o \
  	$(EMUVIDEO)/mc6845.o \
 	$(EMUVIDEO)/poly.o \

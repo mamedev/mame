@@ -25,18 +25,15 @@
 #ifndef __CDP1852__
 #define __CDP1852__
 
+#include "devcb.h"
+
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
+
 #define CDP1852_CLOCK_HIGH	0
 
-typedef UINT8 (*cdp1852_data_read_func) (const device_config *device);
-#define CDP1852_DATA_READ(name) UINT8 name(const device_config *device)
-
-typedef void (*cdp1852_data_write_func) (const device_config *device, UINT8 data);
-#define CDP1852_DATA_WRITE(name) void name(const device_config *device, UINT8 data)
-
-typedef void (*cdp1852_on_sr_changed_func) (const device_config *device, int level);
-#define CDP1852_ON_SR_CHANGED(name) void name(const device_config *device, int level)
-
-#define CDP1852		DEVICE_GET_INFO_NAME(cdp1852)
+#define CDP1852 DEVICE_GET_INFO_NAME(cdp1852)
 
 #define MDRV_CDP1852_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, CDP1852, _clock) \
@@ -45,6 +42,12 @@ typedef void (*cdp1852_on_sr_changed_func) (const device_config *device, int lev
 #define MDRV_CDP1852_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, CDP1852)
 
+#define CDP1852_INTERFACE(_name) \
+	const cdp1852_interface (_name)=
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef enum _cdp1852_mode cdp1852_mode;
 enum _cdp1852_mode {
@@ -52,22 +55,24 @@ enum _cdp1852_mode {
 	CDP1852_MODE_OUTPUT
 };
 
-/* interface */
 typedef struct _cdp1852_interface cdp1852_interface;
 struct _cdp1852_interface
 {
-	int mode;					/* operation mode */
+	int mode;				/* operation mode */
 
 	/* this gets called for every external data read */
-	cdp1852_data_read_func			data_r;
+	devcb_read8				in_data_func;
 
 	/* this gets called for every external data write */
-	cdp1852_data_write_func			data_w;
+	devcb_write8			out_data_func;
 
 	/* this gets called for every change of the SR pin (pin 23) */
-	cdp1852_on_sr_changed_func		on_sr_changed;
+	devcb_write_line		out_sr_func;
 };
-#define CDP1852_INTERFACE(name) const cdp1852_interface (name)=
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 /* device interface */
 DEVICE_GET_INFO( cdp1852 );

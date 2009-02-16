@@ -10,11 +10,18 @@
 #include "driver.h"
 #include "cdp1852.h"
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 typedef struct _cdp1852_t cdp1852_t;
 struct _cdp1852_t
 {
-	const cdp1852_interface *intf;	/* interface */
+	devcb_resolved_write_line	out_sr_func;
+	devcb_resolved_read8		in_data_func;
+	devcb_resolved_write8		out_data_func;
 
+	cdp1852_mode mode;				/* operation mode */
 	int new_data;					/* new data written */
 	UINT8 data;						/* data latch */
 	UINT8 next_data;				/* next data*/
@@ -26,41 +33,59 @@ struct _cdp1852_t
 	emu_timer *scan_timer;			/* scan timer */
 };
 
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
 INLINE cdp1852_t *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-
 	return (cdp1852_t *)device->token;
 }
 
-static void set_sr_line(const device_config *device, int level)
+INLINE const cdp1852_interface *get_interface(const device_config *device)
 {
-	cdp1852_t *cdp1852 = get_safe_token(device);
+	assert(device != NULL);
+	assert((device->type == CDP1852));
+	return (const cdp1852_interface *) device->static_config;
+}
 
-	if (cdp1852->intf->on_sr_changed)
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    set_sr_line - service request out
+-------------------------------------------------*/
+
+static void set_sr_line(cdp1852_t *cdp1852, int level)
+{
+	if (cdp1852->sr != level)
 	{
-		if (cdp1852->sr != level)
-		{
-			cdp1852->intf->on_sr_changed(device, level);
-			cdp1852->sr = level;
-		}
+		cdp1852->sr = level;
+
+		devcb_call_write_line(&cdp1852->out_sr_func, cdp1852->sr);
 	}
 }
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( cdp1852_scan_tick )
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cdp1852_scan_tick )
 {
 	const device_config *device = ptr;
 	cdp1852_t *cdp1852 = get_safe_token(device);
 
-	switch (cdp1852->intf->mode)
+	switch (cdp1852->mode)
 	{
 	case CDP1852_MODE_INPUT:
-		// input data into register
-		cdp1852->data = cdp1852->intf->data_r(device);
+		/* input data into register */
+		cdp1852->data = devcb_call_read8(&cdp1852->in_data_func, 0);
 
-		// signal processor
-		set_sr_line(device, 0);
+		/* signal processor */
+		set_sr_line(cdp1852, 0);
 		break;
 
 	case CDP1852_MODE_OUTPUT:
@@ -68,80 +93,79 @@ static TIMER_CALLBACK( cdp1852_scan_tick )
 		{
 			cdp1852->new_data = 0;
 
-			// latch data into register
+			/* latch data into register */
 			cdp1852->data = cdp1852->next_data;
 
-			// output data
-			cdp1852->intf->data_w(device, cdp1852->data);
+			/* output data */
+			devcb_call_write8(&cdp1852->out_data_func, 0, cdp1852->data);
 
-			// signal peripheral device
-			set_sr_line(device, 1);
+			/* signal peripheral device */
+			set_sr_line(cdp1852, 1);
 
 			cdp1852->next_sr = 0;
 		}
 		else
 		{
-			set_sr_line(device, cdp1852->next_sr);
+			set_sr_line(cdp1852, cdp1852->next_sr);
 		}
 		break;
 	}
 }
 
-/* Data Access */
+/*-------------------------------------------------
+    cdp1852_data_r - data register read
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( cdp1852_data_r )
 {
 	cdp1852_t *cdp1852 = get_safe_token(device);
 
-	if (cdp1852->intf->mode == CDP1852_MODE_INPUT && device->clock == 0)
+	if (cdp1852->mode == CDP1852_MODE_INPUT && device->clock == 0)
 	{
 		// input data into register
-		cdp1852->data = cdp1852->intf->data_r(device);
+		cdp1852->data = devcb_call_read8(&cdp1852->in_data_func, 0);
 	}
 
-	set_sr_line(device, 1);
+	set_sr_line(cdp1852, 1);
 
 	return cdp1852->data;
 }
+
+/*-------------------------------------------------
+    cdp1852_data_r - data register write
+-------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1852_data_w )
 {
 	cdp1852_t *cdp1852 = get_safe_token(device);
 
-	if (cdp1852->intf->mode == CDP1852_MODE_OUTPUT)
+	if (cdp1852->mode == CDP1852_MODE_OUTPUT)
 	{
 		cdp1852->next_data = data;
 		cdp1852->new_data = 1;
 	}
 }
 
-/* Device Interface */
+/*-------------------------------------------------
+    DEVICE_START( cdp1852 )
+-------------------------------------------------*/
 
 static DEVICE_START( cdp1852 )
 {
 	cdp1852_t *cdp1852 = get_safe_token(device);
+	const cdp1852_interface *intf = get_interface(device);
 
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag != NULL);
+	/* resolve callbacks */
+	devcb_resolve_read8(&cdp1852->in_data_func, &intf->in_data_func, device);
+	devcb_resolve_write8(&cdp1852->out_data_func, &intf->out_data_func, device);
+	devcb_resolve_write_line(&cdp1852->out_sr_func, &intf->out_sr_func, device);
 
-	cdp1852->intf = device->static_config;
+	/* set initial values */
+	cdp1852->mode = intf->mode;
 
-	assert(cdp1852->intf != NULL);
-
-	if (cdp1852->intf->mode == CDP1852_MODE_INPUT)
-	{
-		assert(cdp1852->intf->data_r != NULL);
-	}
-	else
-	{
-		assert(device->clock > 0);
-		assert(cdp1852->intf->data_w != NULL);
-	}
-
-	/* create the timers */
 	if (device->clock > 0)
 	{
+		/* create the scan timer */
 		cdp1852->scan_timer = timer_alloc(device->machine, cdp1852_scan_tick, (void *)device);
 		timer_adjust_periodic(cdp1852->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
 	}
@@ -154,35 +178,35 @@ static DEVICE_START( cdp1852 )
 	state_save_register_device_item(device, 0, cdp1852->next_sr);
 }
 
+/*-------------------------------------------------
+    DEVICE_RESET( cdp1852 )
+-------------------------------------------------*/
+
 static DEVICE_RESET( cdp1852 )
 {
 	cdp1852_t *cdp1852 = get_safe_token(device);
 
-	// reset data register
+	/* reset data register */
 	cdp1852->data = 0;
 
-	if (cdp1852->intf->mode == CDP1852_MODE_INPUT)
+	if (cdp1852->mode == CDP1852_MODE_INPUT)
 	{
-		// reset service request flip-flop
-		set_sr_line(device, 1);
+		/* reset service request flip-flop */
+		set_sr_line(cdp1852, 1);
 	}
 	else
 	{
-		// output data
-		cdp1852->intf->data_w(device, 0);
+		/* output data */
+		devcb_call_write8(&cdp1852->out_data_func, 0, cdp1852->data);
 
-		// reset service request flip-flop
-		set_sr_line(device, 0);
+		/* reset service request flip-flop */
+		set_sr_line(cdp1852, 0);
 	}
 }
 
-static DEVICE_SET_INFO( cdp1852 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
+/*-------------------------------------------------
+    DEVICE_GET_INFO( cdp1852 )
+-------------------------------------------------*/
 
 DEVICE_GET_INFO( cdp1852 )
 {
@@ -194,7 +218,7 @@ DEVICE_GET_INFO( cdp1852 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(cdp1852); break;
+		case DEVINFO_FCT_SET_INFO:						/* Nothing */								break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1852);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cdp1852);	break;
