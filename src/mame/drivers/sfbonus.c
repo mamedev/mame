@@ -9,6 +9,13 @@ Notes:
   
 - There are still some video problems, coin cut in half on pir2002v2 & missing spinning 7 on classice for example
   maybe the reel tilemap should be one big tilemap, and the 'select' ram is extra scroll bits..
+  
+  The 'left' side graphics on several playfields are missing too.
+  They are in the first reel tilemap (reel_tilemap) but the tilemap select ram for that row has a different tilemap
+  enabled (for the actual reels).  Furthermore the first tilemap often has rowscroll values at that point, so forcing
+  it to be drawn results in it being misplaced.  There must be a rowscroll disable, or the first reel tilemap is a
+  special case.
+  
 
 - Inputs not done, Lamps not done  
   
@@ -234,7 +241,7 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		clip.min_x = visarea->min_x;
 		clip.max_x = 511;
 		clip.min_y = startclipmin;
-		clip.max_y = startclipmin+1;
+		clip.max_y = startclipmin;
 
 		rowscroll = reels_rowscroll[((line/8)*2)+0x000] | (reels_rowscroll[((line/8)*2)+0x001]<<8);
 		xxxscroll = globalxscrollreels + rowscroll;	
