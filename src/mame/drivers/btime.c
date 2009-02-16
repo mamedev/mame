@@ -32,10 +32,86 @@ These boards use two 8910's for sound, controlled by a dedicated 6502. The
 main processor triggers an IRQ request when writing a command to the sound
 CPU.
 
-Main clock: XTAL = 12 MHz
-Horizontal video frequency: HSYNC = XTAL/768?? = 15.625 kHz ??
-Video frequency: VSYNC = HSYNC/272 = 57.44 Hz ?
-VBlank duration: 1/VSYNC * (24/272) = 1536 us ?
+
+PCB Layouts
+-----------
+
+Zoar
+Data East, 1982
+
+Top PCB
+
+DE-0123
+|---------------------------------|
+|UPC1181H   SW2         Z17.15B   |
+|   VOL     SW1                  |-|
+|                       Z16.13B  | |
+|          2128         Z15.12B  | |
+|                         X      | |
+|        AY-3-8910        X      |-|
+|           AY-3-8910    DIP24    |
+|                    6502         |
+|1                      Z13.6B    |
+|8                               |-|
+|W                      Z12.4B   | |
+|A                               | |
+|Y                      Z11.3B   | |
+|                                |-|
+|  555                  Z10.1B    |
+|---------------------------------|
+Notes:
+      6502      - clock 500.0kHz [12/24]
+      AY-3-8910 - clock 3.00MHz(both) [12/4]
+      2128      - 2k x8 SRAM == 6116
+      X         - Position for a socket, but not populated with anything
+      DIP24     - Empty socket. There are rumours that this socket would hold test mode code or something else.
+                  It's possible a factory test ROM did exist for factory-only testing as this was common with
+                  several manufacturers at the time. However the PCB came from the factory with this socket empty
+                  so it would be extremely unlikely to find a PCB with that socket populated.
+      SW1/2     - 8 position DIP switches
+                  To set cocktail mode, set DIP#1 SW7 & 8 OFF. The player has 2 buttons only and the screen will flip between PL1 & PL2
+                  To set upright mode, set DIP#1 SW7 & 8 ON. The player has 3 buttons and the screen will not flip between PL1 & PL2
+                  DIP Notes:
+                           SW1 #5 is unused
+                           SW1 #6 must remain OFF otherwise the game will not boot-up and just displays garbage.
+                           There is no TEST mode.
+                           SW2 #5 is listed in the manual as "Panel B". This enables or removes the 2nd button.
+                           There were two types of panels supplied, either cocktail or upright cabs. The cocktail panel
+                           doesn't have 3 buttons. The 2 buttons are air-air missile and air-ground missile/bomb and
+                           there's an extra button for accelerate on the 3 button panel. On the 2 button panel, button 1 is
+                           the air-air and air-ground missile/bomb weapon button and is auto selected based on the enemies on
+                           screen and the 2nd button is wired to accelerate. There is no button for manually selecting
+                           the missiles/bombs.
+
+Bottom PCB
+
+DE-0122
+|---------------------------------|
+|    Z08.15L     PB3  PB0   2128  |
+|    Z07.14L     2128  |-------| |-|
+|                2128  |       | | |
+|    Z06.12L           | CPU-7 | | |
+|                      |       | | |
+|    Z05.11L           |       | |-|
+|                      |-------|  |
+|    Z04.9L                       |
+|    Z03.8L               Z19.7B  |
+|                    AM93425     |-|
+|1   Z02.6L  AM93425 AM93425     | |
+|0   Z01.5L  AM93425 AM93425 PB2 | |
+|W   Z00.3L  AM93425  PB4   PB1  | |
+|A   Z21.2L    PB4           555 |-|
+|Y   Z20.1L                12MHz  |
+|---------------------------------|
+Notes:
+      CPU-7     - Epoxy block containing a 6502 clocked at 1.5MHz [12/8]
+                  and possibly something else ^_^
+      2128      - 2k x8 SRAM == 6116
+      AM93425   - 1k x1 SRAM == 2125
+      PB*       - PALs (not dumped, registered types)
+      Z19/20/21 - PROMs, type Harris 7603 (32 bytes)
+      VSync     - 57.4358Hz
+      HSync     - 15.6235kHz
 
 
 Note on Lock'n'Chase:
@@ -82,6 +158,7 @@ enum
 
 static WRITE8_HANDLER( audio_command_w );
 static READ8_HANDLER( audio_command_r );
+static READ8_HANDLER( zoar_dsw1_read );
 
 static UINT8 *decrypted;
 static UINT8 *rambase;
@@ -339,7 +416,7 @@ static ADDRESS_MAP_START( zoar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(zoar_video_control_w)
-	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
+	AM_RANGE(0x9800, 0x9800) AM_READ(zoar_dsw1_read)
 	AM_RANGE(0x9801, 0x9801) AM_READ_PORT("DSW2")
 	AM_RANGE(0x9802, 0x9802) AM_READ_PORT("P1")
 	AM_RANGE(0x9803, 0x9803) AM_READ_PORT("P2")
@@ -473,6 +550,10 @@ static READ8_HANDLER( audio_command_r )
 	return soundlatch_r(space,offset);
 }
 
+static READ8_HANDLER( zoar_dsw1_read )
+{
+	return (!video_screen_get_vblank(space->machine->primary_screen) << 7) | (input_port_read(space->machine, "DSW1") & 0x7f);
+}
 
 static INPUT_PORTS_START( btime )
 	PORT_START("P1")
@@ -662,52 +743,45 @@ static INPUT_PORTS_START( zoar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_irq_lo, 0)
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW I:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW I:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 	/* Manual says bit 4,5 have to stay OFF */
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW I:5" )    /* almost certainly unused */
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )    /* almost certainly unused */
 	/* Service mode doesn't work because of missing ROMs */
-	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW I:6" )
-	PORT_DIPNAME( 0x40, 0x00, "Control Panel" ) PORT_DIPLOCATION("SW I:7")
+	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPNAME( 0x40, 0x00, "Control Panel" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-//  PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW I:8")
-//  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-//  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK  )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW II:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW II:2,3")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:2,3")
 	PORT_DIPSETTING(    0x06, "5000" )
 	PORT_DIPSETTING(    0x04, "10000" )
 	PORT_DIPSETTING(    0x02, "15000"  )
 	PORT_DIPSETTING(    0x00, "20000"  )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW II:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x00, "Weapon Select" ) PORT_DIPLOCATION("SW II:5")
+	PORT_DIPNAME( 0x10, 0x00, "Weapon Select" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "Manual" )
 	PORT_DIPSETTING(    0x10, "Auto" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW II:6")		/* These 3 switches     */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )										/* have to do with      */
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )										/* coinage.             */
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW II:7")		/* See code at $d234.   */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )										/* Feel free to figure  */
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )										/* them out.            */
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW II:8")		/* Manual says to leave */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )										/* them OFF.            */
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )	/* These 3 switches have something to do with coinage  */
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )	/* See code at $d234. Feel free to figure them out     */
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )	/* Manual says to leave them OFF                       */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lnc )
@@ -1362,6 +1436,13 @@ static MACHINE_DRIVER_START( zoar )
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_VIDEO_UPDATE(zoar)
+
+	MDRV_SOUND_REPLACE("ay1", AY8910, HCLK1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	MDRV_SOUND_CONFIG(ay1_intf)
+
+	MDRV_SOUND_REPLACE("ay2", AY8910, HCLK1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_DRIVER_END
 
 
@@ -1511,8 +1592,6 @@ ROM_START( cookrace )
 	ROM_LOAD( "f9.clr",       0x0000, 0x0020, CRC(c2348c1d) SHA1(a7cc4b499b6c89c5966711f8bb922026c2978e1a) )	/* palette */
 	ROM_LOAD( "b7",           0x0020, 0x0020, CRC(e4268fa6) SHA1(93f74e633c3a19755e78e0e2883109cd8ccde9a8) )	/* unknown */
 ROM_END
-
-
 
 ROM_START( tisland )
 	ROM_REGION( 0x10000, "main", 0 )
@@ -1710,37 +1789,38 @@ ROM_END
 
 ROM_START( zoar )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "zoar15",       0xd000, 0x1000, CRC(1f0cfdb7) SHA1(ce7e871f17c52b6eaf99cfb721e702e4f0e6bb25) )
-	ROM_LOAD( "zoar16",       0xe000, 0x1000, CRC(7685999c) SHA1(fabe38d71e797ae0b04b5d3aba228b4c85d96185) )
-	ROM_LOAD( "zoar17",       0xf000, 0x1000, CRC(619ea867) SHA1(0a3735384f03a1052d54ab799b5e37038d8ece2a) )
+	ROM_LOAD( "z15.12b", 0xd000, 0x1000, CRC(1f0cfdb7) SHA1(ce7e871f17c52b6eaf99cfb721e702e4f0e6bb25) )
+	ROM_LOAD( "z16.13b", 0xe000, 0x1000, CRC(7685999c) SHA1(fabe38d71e797ae0b04b5d3aba228b4c85d96185) )
+	ROM_LOAD( "z17.15b", 0xf000, 0x1000, CRC(619ea867) SHA1(0a3735384f03a1052d54ab799b5e37038d8ece2a) )
 
 	ROM_REGION( 0x10000, "audio", 0 )
-	ROM_LOAD( "zoar09",       0xe000, 0x1000, CRC(18d96ff1) SHA1(671d934a451e0b042450ea86d24c3751a39b38f8) )
+	ROM_LOAD( "z09.13c", 0xe000, 0x1000, CRC(18d96ff1) SHA1(671d934a451e0b042450ea86d24c3751a39b38f8) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "zoar00",       0x0000, 0x1000, CRC(fd2dcb64) SHA1(1a49a6ec6ffd354d872b1af83d55ec96e8215b2b) )
-	ROM_LOAD( "zoar01",       0x1000, 0x1000, CRC(74d3ca48) SHA1(2c75ea246f86a057467deb35ef6a6e72f667dd84) )
-	ROM_LOAD( "zoar03",       0x2000, 0x1000, CRC(77b7df14) SHA1(a1cbc214fc849b7e3417b1156d1e4440ab67f631) )
-	ROM_LOAD( "zoar04",       0x3000, 0x1000, CRC(9be786de) SHA1(480733a1438dffa4b0fac6f76bf84a0deec5d1fa) )
-	ROM_LOAD( "zoar06",       0x4000, 0x1000, CRC(07638c71) SHA1(1a7fc49657ac7ac0033bd60c86663bd615079230) )
-	ROM_LOAD( "zoar07",       0x5000, 0x1000, CRC(f4710f25) SHA1(08b4cc4252f83a689cded38d9a5a50f55ee6beee) )
+	ROM_LOAD( "z00.3l",  0x0000, 0x1000, CRC(fd2dcb64) SHA1(1a49a6ec6ffd354d872b1af83d55ec96e8215b2b) )
+	ROM_LOAD( "z01.5l",  0x1000, 0x1000, CRC(74d3ca48) SHA1(2c75ea246f86a057467deb35ef6a6e72f667dd84) )
+	ROM_LOAD( "z03.8l",  0x2000, 0x1000, CRC(77b7df14) SHA1(a1cbc214fc849b7e3417b1156d1e4440ab67f631) )
+	ROM_LOAD( "z04.9l",  0x3000, 0x1000, CRC(9be786de) SHA1(480733a1438dffa4b0fac6f76bf84a0deec5d1fa) )
+	ROM_LOAD( "z06.12l", 0x4000, 0x1000, CRC(07638c71) SHA1(1a7fc49657ac7ac0033bd60c86663bd615079230) )
+	ROM_LOAD( "z07.14l", 0x5000, 0x1000, CRC(f4710f25) SHA1(08b4cc4252f83a689cded38d9a5a50f55ee6beee) )
 
 	ROM_REGION( 0x1800, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "zoar10",       0x0000, 0x0800, CRC(aa8bcab8) SHA1(81f1a9fd754fd6f8030ff6b5aa80c7670be9d02e) )
-	ROM_LOAD( "zoar11",       0x0800, 0x0800, CRC(dcdad357) SHA1(d1569e1d38f14f5f457547e24df4f80f726c6157) )
-	ROM_LOAD( "zoar12",       0x1000, 0x0800, CRC(ed317e40) SHA1(db70889af5f233ca71acf734abfbdb74b6a393c0) )
+	ROM_LOAD( "z10.1b",  0x0000, 0x0800, CRC(aa8bcab8) SHA1(81f1a9fd754fd6f8030ff6b5aa80c7670be9d02e) )
+	ROM_LOAD( "z11.3b",  0x0800, 0x0800, CRC(dcdad357) SHA1(d1569e1d38f14f5f457547e24df4f80f726c6157) )
+	ROM_LOAD( "z12.4b",  0x1000, 0x0800, CRC(ed317e40) SHA1(db70889af5f233ca71acf734abfbdb74b6a393c0) )
 
 	ROM_REGION( 0x3000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "zoar02",       0x0000, 0x1000, CRC(d8c3c122) SHA1(841006cc84622e851df462a64696b64bb8cb62a1) )
-	ROM_LOAD( "zoar05",       0x1000, 0x1000, CRC(05dc6b09) SHA1(197c720544a090e12980513b441a2b9cf04e212f) )
-	ROM_LOAD( "zoar08",       0x2000, 0x1000, CRC(9a148551) SHA1(db92dd7552c6f76a062910f37a3fe3524fdffd38) )
+	ROM_LOAD( "z02.6l",  0x0000, 0x1000, CRC(d8c3c122) SHA1(841006cc84622e851df462a64696b64bb8cb62a1) )
+	ROM_LOAD( "z05.14l", 0x1000, 0x1000, CRC(05dc6b09) SHA1(197c720544a090e12980513b441a2b9cf04e212f) )
+	ROM_LOAD( "z08.15l", 0x2000, 0x1000, CRC(9a148551) SHA1(db92dd7552c6f76a062910f37a3fe3524fdffd38) )
 
 	ROM_REGION( 0x1000, "bg_map", 0 )	/* background tilemaps */
-	ROM_LOAD( "zoar13",       0x0000, 0x1000, CRC(8fefa960) SHA1(614026aa71703dd3898e470f45730e5c6934b31b) )
+	ROM_LOAD( "z13.6b",  0x0000, 0x1000, CRC(8fefa960) SHA1(614026aa71703dd3898e470f45730e5c6934b31b) )
 
-	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "z20-1l",       0x0000, 0x0020, CRC(a63f0a07) SHA1(16532d3ac0536ad4b712005fd722ee8c14d02e9b) )
-	ROM_LOAD( "z21-1l",       0x0020, 0x0020, CRC(5e1e5788) SHA1(56068b209cc7c734bbcbb9858f40faa6474c8095) )
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "z20.1l",  0x0000, 0x0020, CRC(a63f0a07) SHA1(16532d3ac0536ad4b712005fd722ee8c14d02e9b) )
+	ROM_LOAD( "z21.2l",  0x0020, 0x0020, CRC(5e1e5788) SHA1(56068b209cc7c734bbcbb9858f40faa6474c8095) )
+	ROM_LOAD( "z19.7b",  0x0040, 0x0020, CRC(03ee3a96) SHA1(4acb4061ef0d8a1fab50207fc81a54bfa4c7455d) )
 ROM_END
 
 ROM_START( disco )
