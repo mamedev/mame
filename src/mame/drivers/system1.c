@@ -257,6 +257,25 @@ static ADDRESS_MAP_START( chplft_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xef00, 0xefff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( gardiab_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM) // ROM
+	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd800, 0xddff) AM_WRITE(system1_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe7bd, 0xe7bd) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_y)	// ???
+	AM_RANGE(0xe7c0, 0xe7c1) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_x)
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
+	AM_RANGE(0xe800, 0xeeff) AM_WRITE(system1_backgroundram_w) AM_BASE(&system1_backgroundram) AM_SIZE(&system1_backgroundram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(system1_background_collisionram_w) AM_BASE(&system1_background_collisionram)
+	AM_RANGE(0xf800, 0xfbff) AM_WRITE(system1_sprites_collisionram_w) AM_BASE(&system1_sprites_collisionram)
+
+	 /* needed for P.O.S.T. */
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xde00, 0xdfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xef00, 0xefff) AM_WRITE(SMH_RAM)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( dakkochn_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
@@ -1789,6 +1808,19 @@ static MACHINE_DRIVER_START( chplft )
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( gardiab )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM( chplft )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(brain_readmem,gardiab_writemem)
+	MDRV_CPU_IO_MAP(chplft_io_map,0)
+
+	MDRV_MACHINE_RESET(system1_banked)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(system1)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dakkochn )
 
@@ -4425,7 +4457,7 @@ GAME( 1986, wboyu,    wboy,     system1,  wboyu,    0,        ROT0,   "Sega (Esc
 GAME( 1986, wboysys2, wboy,     wbml,     wboysys2, wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wbdeluxe, wboy,     system1,  wbdeluxe, 0,        ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
 GAME( 1986, gardia,   0,        brain,    gardia,   gardia,   ROT270, "Sega / Coreland", "Gardia (317-0006)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1986, gardiab,  gardia,   brain,    gardia,   gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, gardiab,  gardia,   gardiab,  gardia,   gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1986, nob,      nobb,     nob,      nob,      0,        ROT270, "Data East Corporation", "Noboranka (Japan)", GAME_NOT_WORKING )
 GAME( 1986, nobb,     0,        nobb,     nob,      nobb,     ROT270, "bootleg",               "Noboranka (Japan, bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blockgal, 0,        system1,  blockgal, blockgal, ROT90,  "Sega / Vic Tokai", "Block Gal (MC-8123B, 317-0029)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
