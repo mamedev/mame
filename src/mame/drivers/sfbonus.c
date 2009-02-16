@@ -24,6 +24,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 
+static bitmap_t *temp_reel_bitmap;
 static tilemap *sfbonus_tilemap;
 static tilemap *sfbonus_reel_tilemap;
 static tilemap *sfbonus_reel2_tilemap;
@@ -58,12 +59,12 @@ static TILE_GET_INFO( get_sfbonus_reel_tile_info )
 	int flipx = (sfbonus_reel_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = 0;//(sfbonus_reel_ram[(tile_index*2)+1] & 0x40)>>5;
 
-	tileinfo->category = (sfbonus_reel_ram[(tile_index*2)+1] & 0x40)>>6;
+	int priority = (sfbonus_reel_ram[(tile_index*2)+1] & 0x40)>>6;
 
 	SET_TILE_INFO(
 			1,
 			code,
-			0,
+			priority,  // colour aboused as priority
 			TILE_FLIPYX(flipx | flipy));
 }
 
@@ -73,12 +74,12 @@ static TILE_GET_INFO( get_sfbonus_reel2_tile_info )
 	int flipx = (sfbonus_reel2_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = 0;//(sfbonus_reel2_ram[(tile_index*2)+1] & 0x40)>>5;
 
-	tileinfo->category = (sfbonus_reel2_ram[(tile_index*2)+1] & 0x40)>>6;
+	int priority = (sfbonus_reel2_ram[(tile_index*2)+1] & 0x40)>>6;
 
 	SET_TILE_INFO(
 			1,
 			code,
-			0,
+			priority,  // colour aboused as priority
 			TILE_FLIPYX(flipx | flipy));
 }
 
@@ -88,12 +89,12 @@ static TILE_GET_INFO( get_sfbonus_reel3_tile_info )
 	int flipx = (sfbonus_reel3_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = 0;//(sfbonus_reel3_ram[(tile_index*2)+1] & 0x40)>>5;
 
-	tileinfo->category = (sfbonus_reel3_ram[(tile_index*2)+1] & 0x40)>>6;
+	int priority = (sfbonus_reel3_ram[(tile_index*2)+1] & 0x40)>>6;
 
 	SET_TILE_INFO(
 			1,
 			code,
-			0,
+			priority,  // colour aboused as priority
 			TILE_FLIPYX(flipx | flipy));
 }
 
@@ -103,12 +104,12 @@ static TILE_GET_INFO( get_sfbonus_reel4_tile_info )
 	int flipx = (sfbonus_reel4_ram[(tile_index*2)+1] & 0x80)>>7;
 	int flipy = 0;//(sfbonus_reel4_ram[(tile_index*2)+1] & 0x40)>>5;
 
-	tileinfo->category = (sfbonus_reel4_ram[(tile_index*2)+1] & 0x40)>>6;
+	int priority = (sfbonus_reel4_ram[(tile_index*2)+1] & 0x40)>>6;
 
 	SET_TILE_INFO(
 			1,
 			code,
-			0,
+			priority, // colour aboused as priority
 			TILE_FLIPYX(flipx | flipy));
 }
 
@@ -166,6 +167,8 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 
 VIDEO_START(sfbonus)
 {
+	temp_reel_bitmap = auto_bitmap_alloc(1024,512,BITMAP_FORMAT_INDEXED16);
+	
 	sfbonus_tilemap = tilemap_create(machine,get_sfbonus_tile_info,tilemap_scan_rows,8,8, 128, 64);
 	sfbonus_reel_tilemap = tilemap_create(machine,get_sfbonus_reel_tile_info,tilemap_scan_rows,8,32, 64, 16);
 	sfbonus_reel2_tilemap = tilemap_create(machine,get_sfbonus_reel2_tile_info,tilemap_scan_rows,8,32, 64, 16);
@@ -283,37 +286,43 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 	
 		if (rowenable2==0)
 		{			
-			tilemap_draw(bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),3);
 		}
-		else if (rowenable2==0x1)
-		{
-			tilemap_draw(bitmap,&clip,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
-		}
-		else if (rowenable2==0x2)
-		{
-			tilemap_draw(bitmap,&clip,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
-		}
-		else if (rowenable2==0x3)
-		{
-			tilemap_draw(bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
-		}
-		
 		if (rowenable==0)
 		{			
-			tilemap_draw(bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
-		}
-		else if (rowenable==0x1)
+			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),3);
+		}	
+		
+		if (rowenable2==0x1)
 		{
-			tilemap_draw(bitmap,&clip,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),2);
 		}
-		else if (rowenable==0x2)
+		if (rowenable==0x1)
 		{
-			tilemap_draw(bitmap,&clip,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
-		}
-		else if (rowenable==0x3)
+			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),2);
+		}	
+		
+		if (rowenable2==0x2)
 		{
-			tilemap_draw(bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),0);
+			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),1);
 		}
+		if (rowenable==0x2)
+		{
+			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),1);
+		}
+		
+		if (rowenable2==0x3)
+		{
+			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),4);
+		}
+		if (rowenable==0x3)
+		{
+			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),4);
+		}
+	
+	
+
+
 			
 		startclipmin+=1;
 	}
@@ -333,10 +342,27 @@ VIDEO_UPDATE(sfbonus)
 	globalxscroll += 8;
 	
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]);
-	
-	/* Low Priority Reels */
-	sfbonus_draw_reel_layer(screen->machine,bitmap,cliprect, screen, 0);
+	bitmap_fill(temp_reel_bitmap,cliprect,screen->machine->pens[0]);
 
+	/* render reels to bitmap */
+	sfbonus_draw_reel_layer(screen->machine,temp_reel_bitmap,cliprect, screen, 0);
+
+	{
+		int y,x;
+		
+		for (y=0;y<288;y++)
+		{
+			for (x=0;x<512;x++)
+			{
+				UINT16* src = BITMAP_ADDR16(temp_reel_bitmap, y, x);
+				UINT16* dst = BITMAP_ADDR16(bitmap, y, x);
+				
+				if ((src[0]&0x100)==0x000)
+					dst[0] = src[0];		
+			}
+		}
+	}
+	
 	/* Normal Tilemap */
 	tilemap_set_scrolly(sfbonus_tilemap, 0, globalyscroll );
 	for (i=0;i<64;i++)
@@ -347,8 +373,24 @@ VIDEO_UPDATE(sfbonus)
 	}
 	tilemap_draw(bitmap,cliprect,sfbonus_tilemap,0,0);
 
+	{
+		int y,x;
+		
+		for (y=0;y<288;y++)
+		{
+			for (x=0;x<512;x++)
+			{
+				UINT16* src = BITMAP_ADDR16(temp_reel_bitmap, y, x);
+				UINT16* dst = BITMAP_ADDR16(bitmap, y, x);
+				
+				if ((src[0]&0x100)==0x100)
+					dst[0] = src[0]-0x100;		
+			}
+		}
+	}	
+	
 	/* High Priority Reels */
-	sfbonus_draw_reel_layer(screen->machine,bitmap,cliprect, screen, 1);
+//	sfbonus_draw_reel_layer(screen->machine,bitmap,cliprect, screen, 1);
 	
 	return 0;
 }
@@ -726,7 +768,7 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_SCREEN_SIZE(128*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
 
-	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
 
 	MDRV_VIDEO_START(sfbonus)
 	MDRV_VIDEO_UPDATE(sfbonus)
