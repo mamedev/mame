@@ -501,14 +501,12 @@ WRITE8_HANDLER( mario_sh_tuneselect_w )
 /* Mario running sample */
 WRITE8_DEVICE_HANDLER( mario_sh1_w )
 {
-	printf("sound0\n");
 	discrete_sound_w(device,DS_SOUND0_INP, 0);
 }
 
 /* Luigi running sample */
 WRITE8_DEVICE_HANDLER( mario_sh2_w )
 {
-	printf("sound1\n");
 	discrete_sound_w(device,DS_SOUND1_INP, 0);
 }
 
