@@ -1397,7 +1397,7 @@ static WRITE16_HANDLER( denver_w )
 				for (chan = 0; chan < dcs.channels; chan++)
 				{
 					char buffer[10];
-					sprintf(buffer, "dac%d", chan);
+					sprintf(buffer, "dac%d", chan + 1);
 					dcs.dmadac[chan] = devtag_get_device(space->machine, SOUND, buffer);
 				}
 				dmadac_enable(&dcs.dmadac[0], dcs.channels, enable);

@@ -107,21 +107,21 @@ static READ8_HANDLER( cheat2_r )
 	return res;
 }
 
-static char speech_chip[8];
+static UINT8 speech_chip[8];
 static WRITE8_HANDLER( speech_control_w )
 {
 	const device_config *upd;
 	
-	strcpy(speech_chip, ( data & 4 ) ? "upd2" : "upd1");
+	strcpy((char *)speech_chip, ( data & 4 ) ? "upd2" : "upd1");
 
-	upd = devtag_get_device(space->machine, SOUND, speech_chip);
+	upd = devtag_get_device(space->machine, SOUND, (char *)speech_chip);
 	upd7759_reset_w( upd, data & 2 );
 	upd7759_start_w( upd, data & 1 );
 }
 
 static WRITE8_HANDLER( speech_msg_w )
 {
-	upd7759_port_w( devtag_get_device(space->machine, SOUND, speech_chip), 0, data );
+	upd7759_port_w( devtag_get_device(space->machine, SOUND, (char *)speech_chip), 0, data );
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

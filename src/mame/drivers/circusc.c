@@ -138,13 +138,13 @@ static WRITE8_HANDLER(circusc_sound_w)
 
 		/* CS5 */
 		case 3:
-			device = devtag_get_device(space->machine, SOUND, "discrete");
+			device = devtag_get_device(space->machine, SOUND, "fltdisc");
 			discrete_sound_w(device, NODE_03, data);
 			break;
 
 		/* CS6 */
 		case 4:
-			device = devtag_get_device(space->machine, SOUND, "discrete");
+			device = devtag_get_device(space->machine, SOUND, "fltdisc");
 			discrete_sound_w(device, NODE_05, (offset & 0x20) >> 5);
 			discrete_sound_w(device, NODE_06, (offset & 0x18) >> 3);
 			discrete_sound_w(device, NODE_07, (offset & 0x40) >> 6);
