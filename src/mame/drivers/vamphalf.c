@@ -1505,11 +1505,13 @@ static READ32_HANDLER( aoh_speedup_r )
 {
 	if(cpu_get_pc(space->cpu) == 0xb994 )
 	{
-		if(irq_active(space))
-			cpu_spinuntil_int(space->cpu);
-		else
-			cpu_eat_cycles(space->cpu, 50);
+		cpu_eat_cycles(space->cpu, 500);
 	}
+	else if (cpu_get_pc(space->cpu) == 0xba40 )
+	{
+		cpu_eat_cycles(space->cpu, 500);
+	}
+
 
 	return wram32[0x28a09c/4];
 }
