@@ -24,7 +24,7 @@
     The adapted callback types supported are:
 
         input port              (port)
-		cpu input line			(cpu input line)
+        cpu input line          (cpu input line)
         read_line_device_func:  (device)
         write_line_device_func: (device, data)
         read8_device_func:      (device, offset)

@@ -1133,7 +1133,7 @@ ROM_END
 - No scroll in the attract.
 - Analysis page in operator/supervisor mode.
 - Min-Max bet, and a kind of 3-strings password given in supervisor mode.
- 
+
 */
 ROM_START( ampkr228 )
 	ROM_REGION( 0x10000, "main", 0 )

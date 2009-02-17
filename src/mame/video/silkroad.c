@@ -14,7 +14,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = silkroad_sprram;
 	UINT32 *finish = source + 0x1000/4;
-	
+
 	while( source < finish )
 	{
 
@@ -25,10 +25,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int flipx = (attr & 0x0080);
 		int width = ((attr & 0x0f00) >> 8) + 1;
 		int wcount;
-		int color = (attr & 0x003f) ;		
+		int color = (attr & 0x003f) ;
 		int pri		 =	((attr & 0x1000)>>12);	// Priority (1 = Low)
 		int pri_mask =	~((1 << (pri+1)) - 1);	// Above the first "pri" levels
-		
+
 		// attr & 0x2000 -> another priority bit?
 
 		if ( (source[1] & 0xff00) == 0xff00 ) break;
@@ -47,7 +47,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			}
 
 		}
-		
+
 		source += 2;
 	}
 }
@@ -124,7 +124,7 @@ VIDEO_START(silkroad)
 	fg_tilemap  = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,16,16,64, 64);
 	fg2_tilemap = tilemap_create(machine, get_fg2_tile_info,tilemap_scan_rows,16,16,64, 64);
 	fg3_tilemap = tilemap_create(machine, get_fg3_tile_info,tilemap_scan_rows,16,16,64, 64);
-	
+
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(fg2_tilemap,0);
 	tilemap_set_transparent_pen(fg3_tilemap,0);
@@ -143,7 +143,7 @@ VIDEO_UPDATE(silkroad)
 
 	tilemap_set_scrolly( fg2_tilemap, 0, ((silkroad_regs[5] & 0xffff0000) >> 16));
 	tilemap_set_scrollx( fg2_tilemap, 0, (silkroad_regs[2] & 0x0000ffff) >> 0 );
-	
+
 	tilemap_draw(bitmap,cliprect,fg_tilemap, 0,0);
 	tilemap_draw(bitmap,cliprect,fg2_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,fg3_tilemap,0,2);

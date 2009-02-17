@@ -10,7 +10,7 @@
 
     - white noise
     - scanline based update
-	- CMSEL output
+    - CMSEL output
 
 */
 
@@ -101,8 +101,8 @@ INLINE cdp1869_t *get_safe_token(const device_config *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
-	update_prd_changed_timer - update predisplay
-	changed timer
+    update_prd_changed_timer - update predisplay
+    changed timer
 -------------------------------------------------*/
 
 static void update_prd_changed_timer(cdp1869_t *cdp1869)
@@ -152,7 +152,7 @@ static void update_prd_changed_timer(cdp1869_t *cdp1869)
 }
 
 /*-------------------------------------------------
-	TIMER_CALLBACK( prd_changed_tick )
+    TIMER_CALLBACK( prd_changed_tick )
 -------------------------------------------------*/
 
 static TIMER_CALLBACK( prd_changed_tick )
@@ -166,7 +166,7 @@ static TIMER_CALLBACK( prd_changed_tick )
 }
 
 /*-------------------------------------------------
-	STATE_POSTLOAD( cdp1869_state_save_postload )
+    STATE_POSTLOAD( cdp1869_state_save_postload )
 -------------------------------------------------*/
 
 static STATE_POSTLOAD( cdp1869_state_save_postload )
@@ -175,7 +175,7 @@ static STATE_POSTLOAD( cdp1869_state_save_postload )
 }
 
 /*-------------------------------------------------
-	cdp1802_get_r_x - get CDP1802 R(X) value
+    cdp1802_get_r_x - get CDP1802 R(X) value
 -------------------------------------------------*/
 
 static UINT16 cdp1802_get_r_x(cdp1869_t *cdp1869)
@@ -184,7 +184,7 @@ static UINT16 cdp1802_get_r_x(cdp1869_t *cdp1869)
 }
 
 /*-------------------------------------------------
-	get_rgb - get RGB value
+    get_rgb - get RGB value
 -------------------------------------------------*/
 
 static rgb_t get_rgb(int i, int c, int l)
@@ -205,7 +205,7 @@ static rgb_t get_rgb(int i, int c, int l)
 }
 
 /*-------------------------------------------------
-	get_lines - get number of character lines
+    get_lines - get number of character lines
 -------------------------------------------------*/
 
 static int get_lines(const device_config *device)
@@ -227,7 +227,7 @@ static int get_lines(const device_config *device)
 }
 
 /*-------------------------------------------------
-	get_pmemsize - get page memory size
+    get_pmemsize - get page memory size
 -------------------------------------------------*/
 
 static UINT16 get_pmemsize(const device_config *device, int cols, int rows)
@@ -243,7 +243,7 @@ static UINT16 get_pmemsize(const device_config *device, int cols, int rows)
 }
 
 /*-------------------------------------------------
-	get_pma - get page memory address
+    get_pma - get page memory address
 -------------------------------------------------*/
 
 static UINT16 get_pma(const device_config *device)
@@ -261,7 +261,7 @@ static UINT16 get_pma(const device_config *device)
 }
 
 /*-------------------------------------------------
-	get_pen - get pen for color bits
+    get_pen - get pen for color bits
 -------------------------------------------------*/
 
 static int get_pen(const device_config *device, int ccb0, int ccb1, int pcb)
@@ -305,7 +305,7 @@ static int get_pen(const device_config *device, int ccb0, int ccb1, int pcb)
 }
 
 /*-------------------------------------------------
-	draw_line - draw character line
+    draw_line - draw character line
 -------------------------------------------------*/
 
 static void draw_line(const device_config *device, bitmap_t *bitmap, int x, int y, int data, int color)
@@ -350,7 +350,7 @@ static void draw_line(const device_config *device, bitmap_t *bitmap, int x, int 
 }
 
 /*-------------------------------------------------
-	draw_char - draw character
+    draw_char - draw character
 -------------------------------------------------*/
 
 static void draw_char(const device_config *device, bitmap_t *bitmap, int x, int y, UINT16 pma, const rectangle *screenrect)
@@ -381,7 +381,7 @@ static void draw_char(const device_config *device, bitmap_t *bitmap, int x, int 
 }
 
 /*-------------------------------------------------
-	PALETTE_INIT( cdp1869 )
+    PALETTE_INIT( cdp1869 )
 -------------------------------------------------*/
 
 PALETTE_INIT( cdp1869 )
@@ -406,7 +406,7 @@ PALETTE_INIT( cdp1869 )
 }
 
 /*-------------------------------------------------
-	cdp1869_out3_w - register 3 write
+    cdp1869_out3_w - register 3 write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1869_out3_w )
@@ -434,7 +434,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out3_w )
 }
 
 /*-------------------------------------------------
-	cdp1869_out4_w - register 4 write
+    cdp1869_out4_w - register 4 write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1869_out4_w )
@@ -470,7 +470,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out4_w )
 }
 
 /*-------------------------------------------------
-	cdp1869_out5_w - register 5 write
+    cdp1869_out5_w - register 5 write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
@@ -525,7 +525,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
 }
 
 /*-------------------------------------------------
-	cdp1869_out6_w - register 6 write
+    cdp1869_out6_w - register 6 write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1869_out6_w )
@@ -558,7 +558,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out6_w )
 }
 
 /*-------------------------------------------------
-	cdp1869_out7_w - register 7 write
+    cdp1869_out7_w - register 7 write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1869_out7_w )
@@ -591,7 +591,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out7_w )
 }
 
 /*-------------------------------------------------
-	cdp1869_pageram_r - page memory read
+    cdp1869_pageram_r - page memory read
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( cdp1869_pageram_r )
@@ -613,7 +613,7 @@ READ8_DEVICE_HANDLER( cdp1869_pageram_r )
 }
 
 /*-------------------------------------------------
-	cdp1869_pageram_w - page memory write
+    cdp1869_pageram_w - page memory write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1869_pageram_w )
@@ -638,7 +638,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_pageram_w )
 }
 
 /*-------------------------------------------------
-	cdp1869_charram_r - character memory read
+    cdp1869_charram_r - character memory read
 -------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( cdp1869_charram_r )
@@ -666,7 +666,7 @@ READ8_DEVICE_HANDLER( cdp1869_charram_r )
 }
 
 /*-------------------------------------------------
-	cdp1869_charram_w - character memory write
+    cdp1869_charram_w - character memory write
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER( cdp1869_charram_w )
@@ -697,7 +697,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_charram_w )
 }
 
 /*-------------------------------------------------
-	cdp1869_update - screen update
+    cdp1869_update - screen update
 -------------------------------------------------*/
 
 void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
@@ -778,7 +778,7 @@ void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectang
 }
 
 /*-------------------------------------------------
-	STREAM_UPDATE( cdp1869_stream_update )
+    STREAM_UPDATE( cdp1869_stream_update )
 -------------------------------------------------*/
 
 static STREAM_UPDATE( cdp1869_stream_update )
@@ -839,7 +839,7 @@ static STREAM_UPDATE( cdp1869_stream_update )
 }
 
 /*-------------------------------------------------
-	DEVICE_START( cdp1869 )
+    DEVICE_START( cdp1869 )
 -------------------------------------------------*/
 
 static DEVICE_START( cdp1869 )
@@ -904,7 +904,7 @@ static DEVICE_START( cdp1869 )
 }
 
 /*-------------------------------------------------
-	DEVICE_GET_INFO( cdp1869 )
+    DEVICE_GET_INFO( cdp1869 )
 -------------------------------------------------*/
 
 DEVICE_GET_INFO( cdp1869 )

@@ -258,7 +258,7 @@ static TILE_GET_INFO( farwest_get_bg_tile_info )
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x40) << 2) +
 		((colorram[tile_index] & 0x20) << 4) + (charbank << 10);
 	int color = (colorram[tile_index] & 0x0f) + 16 * palettebank;
-	int flags = 0;//((colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |	((colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
+	int flags = 0;//((colorram[tile_index] & 0x10) ? TILE_FLIPX : 0) |  ((colorram[tile_index] & 0x20) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(0, code, color, flags);
 }
@@ -277,8 +277,8 @@ static void farwest_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	UINT8 *sr=spriteram_2;
 	UINT8 *sr2=spriteram;
 
-//	if (spriterambank != 0)
-	//	sr = spriteram;
+//  if (spriterambank != 0)
+	//  sr = spriteram;
 	//else
 		//sr = ;
 
@@ -295,12 +295,12 @@ static void farwest_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 	//  int mod = flip_screen_get() ? -8 : 8;
 
-//		if (flip_screen_get())
+//      if (flip_screen_get())
 		{
-		//	sx = 240 - sx;
+		//  sx = 240 - sx;
 			sy = 240 - sy;
-		//	flipx = !flipx;
-		//	flipy = !flipy;
+		//  flipx = !flipx;
+		//  flipy = !flipy;
 		}
 
 		switch (sr[offs+3] & 0x0c)

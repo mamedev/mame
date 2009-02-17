@@ -17,7 +17,7 @@
     Mission Craft              (c) 2000 Sun                (version 2.4)
     Final Godori               (c) 2001 SemiCom            (version 2.20.5915)
     Wyvern Wings               (c) 2001 SemiCom
-	Age Of Heroes - Silkroad 2 (c) 2001 Unico			   (v0.63 - 2001/02/07)
+    Age Of Heroes - Silkroad 2 (c) 2001 Unico              (v0.63 - 2001/02/07)
 
  Real games bugs:
  - dquizgo2: bugged video test
@@ -757,7 +757,7 @@ static MACHINE_DRIVER_START( aoh )
 
 	MDRV_PALETTE_LENGTH(0x8000)
 	MDRV_GFXDECODE(vamphalf)
-	
+
 	MDRV_VIDEO_UPDATE(aoh)
 
 	/* sound hardware */
@@ -771,7 +771,7 @@ static MACHINE_DRIVER_START( aoh )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	
+
 	MDRV_SOUND_ADD("oki_2", OKIM6295, 32000000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
@@ -1327,13 +1327,13 @@ ROM_START( aoh )
 	ROM_LOAD32_WORD( "g11", 0x2000000, 0x800000, CRC(5f0461b8) SHA1(a0ac37d9a357e69367b8fee68bc358bfea5ecca0) )
 	ROM_LOAD32_WORD( "g08", 0x3000002, 0x800000, CRC(1fd08aa0) SHA1(376a91220cd6e63418b04d590b232bb1079a40c7) )
 	ROM_LOAD32_WORD( "g12", 0x3000000, 0x800000, CRC(e437b35f) SHA1(411d2926d619fba057476864f0e580f608830522) )
-	
+
 	ROM_REGION( 0x40000, "oki_1", 0 ) /* Oki Samples */
 	ROM_LOAD( "rom3", 0x00000, 0x40000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
-	
+
 	ROM_REGION( 0x80000, "user2", 0 ) /* Oki Samples */
 	ROM_LOAD( "rom4", 0x00000, 0x80000, CRC(bba47755) SHA1(e6eeb5f64eaa88a74536119b731a76921e79f8ff) )
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x100000, "oki_2", 0 ) /* Samples */

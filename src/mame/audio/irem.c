@@ -122,7 +122,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_0_portb_w )
 {
 	const device_config *adpcm0 = devtag_get_device(device->machine, SOUND, "msm1");
 	const device_config *adpcm1 = devtag_get_device(device->machine, SOUND, "msm2");
-	
+
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
 	msm5205_playmode_w(adpcm0, (data >> 2) & 7);
 	if (adpcm1 != NULL)
@@ -190,7 +190,7 @@ static WRITE8_HANDLER( m62_adpcm_w )
 static void adpcm_int(const device_config *device)
 {
 	const device_config *msm2 = devtag_get_device(device->machine, SOUND, "msm2");
-	
+
 	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */

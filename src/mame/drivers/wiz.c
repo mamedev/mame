@@ -741,7 +741,7 @@ static MACHINE_DRIVER_START( stinger )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(wiz)
-	
+
 	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(stinger_sound_map,0)
 

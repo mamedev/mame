@@ -494,7 +494,7 @@ static STREAM_UPDATE( MultiPCM_update )
 
 READ8_DEVICE_HANDLER( multipcm_r )
 {
-//	MultiPCM *ptChip = get_safe_token(device);
+//  MultiPCM *ptChip = get_safe_token(device);
 	return 0;
 }
 

@@ -901,12 +901,12 @@ GAME( 1984?,luckygrl,  0,    cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing", 		  "L
 
 /*
 Some other games that might run on this HW:
-	Jangou (non-BET version) (WR score listed on MyCom magazines)
-	Jangou Night (first "mature" mahjong ever made)
-	Jangou Lady (BET version) (images on the flyer, it might not exists)
-	Hana Royal
-	Hana Puter
-	Royal Card
-	Fruits Bunny (clone of Country Girl)
-	Monoshiri Quiz Osyaberi Macha (Logitec, same board as jangou)
+    Jangou (non-BET version) (WR score listed on MyCom magazines)
+    Jangou Night (first "mature" mahjong ever made)
+    Jangou Lady (BET version) (images on the flyer, it might not exists)
+    Hana Royal
+    Hana Puter
+    Royal Card
+    Fruits Bunny (clone of Country Girl)
+    Monoshiri Quiz Osyaberi Macha (Logitec, same board as jangou)
 */

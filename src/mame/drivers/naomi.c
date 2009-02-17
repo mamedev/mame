@@ -3116,7 +3116,7 @@ ROM_START( vstrik3c )
 	ROM_LOAD("ic21",0xa000000, 0x0800000, NO_DUMP )
 ROM_END
 
- 
+
 
 ROM_START( vstrik3 )
 	NAOMI2_BIOS

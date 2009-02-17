@@ -161,7 +161,7 @@ static TIMER_CALLBACK( MSM5205_vclk_callback )
 static DEVICE_RESET( msm5205 )
 {
 	msm5205_state *voice = get_safe_token(device);
-	
+
 	/* initialize work */
 	voice->data    = 0;
 	voice->vclk    = 0;

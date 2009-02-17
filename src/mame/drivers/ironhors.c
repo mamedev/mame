@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( farwest_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a01, 0x1a01) AM_RAM_WRITE(ironhors_charbank_w)
 	AM_RANGE(0x1a02, 0x1a02) AM_WRITE(ironhors_palettebank_w)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
-//	AM_RANGE(0x1c00, 0x1fff) AM_RAM
+//  AM_RANGE(0x1c00, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM

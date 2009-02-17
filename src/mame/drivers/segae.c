@@ -2159,7 +2159,7 @@ static void init_ports_systeme(running_machine *machine)
 	const address_space *io = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 	const device_config *sn1 = devtag_get_device(machine, SOUND, "sn1");
 	const device_config *sn2 = devtag_get_device(machine, SOUND, "sn2");
-	
+
 	memory_install_write8_device_handler(io, sn2, 0x7b, 0x7b, 0, 0, sn76496_w);
 	memory_install_write8_device_handler(io, sn1, 0x7e, 0x7f, 0, 0, sn76496_w);
 	memory_install_read8_handler        (io, 0x7e, 0x7e, 0, 0, sms_vcounter_r);

@@ -175,7 +175,7 @@ static UINT16 unk_reg[3][5];
 static void show_out(void)
 {
 #ifdef MAME_DEBUG
-//	popmessage("%02x %02x %02x", out[0], out[1], out[2]);
+//  popmessage("%02x %02x %02x", out[0], out[1], out[2]);
 	popmessage("520: %04x %04x %04x %04x %04x\n560: %04x %04x %04x %04x %04x\n5A0: %04x %04x %04x %04x %04x",
 		unk_reg[0][0],unk_reg[0][1],unk_reg[0][2],unk_reg[0][3],unk_reg[0][4],
 		unk_reg[1][0],unk_reg[1][1],unk_reg[1][2],unk_reg[1][3],unk_reg[1][4],
@@ -256,7 +256,7 @@ static READ8_HANDLER( igs_irqack_r )
 
 static WRITE8_HANDLER( igs_irqack_w )
 {
-//	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+//  cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 	out[2] = data;
 	show_out();
 }
@@ -266,7 +266,7 @@ static READ8_HANDLER( expram_r )
 	UINT8 *rom = memory_region(space->machine, "gfx3");
 
 	offset += exp_bank * 0x8000;
-//	logerror("PC %06X: %04x = %02x\n",cpu_get_pc(space->cpu),offset,rom[offset]);
+//  logerror("PC %06X: %04x = %02x\n",cpu_get_pc(space->cpu),offset,rom[offset]);
 	return rom[offset];
 }
 

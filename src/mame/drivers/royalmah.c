@@ -2697,7 +2697,7 @@ ROM_START( mjifb3 )
 	ROM_LOAD( "d29-2.4d",   0x000, 0x200, CRC(78252f6a) SHA1(1869147bc6b7573c2543bdf6b17d6c3c1debdddb) )
 	ROM_LOAD( "d29-1.4c",   0x200, 0x200, CRC(4aaec8cf) SHA1(fbe1c3729d078a422ffe68dfde495fcb9f329cdd) )
 ROM_END
-		
+
 /***************************************************************************
 
     Colour proms are TBP28S42's

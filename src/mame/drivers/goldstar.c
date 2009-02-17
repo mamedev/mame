@@ -4401,7 +4401,7 @@ static PALETTE_INIT(cm)
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
 		palette_set_color_rgb(machine, i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
-	}	
+	}
 }
 
 static PALETTE_INIT(cmast91)
@@ -5813,9 +5813,9 @@ ROM_START( skill98 )
 	ROM_CONTINUE(0xd000,0x1000)
 	ROM_CONTINUE(0xe000,0x1000)
 	ROM_CONTINUE(0xf000,0x1000)
-	
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "sk98h.bin",  0x00000, 0x10000, CRC(0574357b) SHA1(96a846f6d49dd67ad078ad9240e632f79ae1b437) )
 	ROM_LOAD( "sk98l.bin",  0x10000, 0x10000, CRC(ebe802a4) SHA1(178542c204fd1027874e6d2c099edaa7878c993f) )
@@ -5865,9 +5865,9 @@ ROM_START( schery97 )
 	ROM_CONTINUE(0xd000,0x1000)
 	ROM_CONTINUE(0xe000,0x1000)
 	ROM_CONTINUE(0xf000,0x1000)
-	
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "sc97h.bin",  0x00000, 0x10000, CRC(def39ee2) SHA1(5e6817bd947ebf16d0313285a00876b796b71cab) )
 	ROM_LOAD( "sc97l.bin",  0x10000, 0x10000, CRC(6f4d6aea) SHA1(6809c26e6975cac97b0f8c01a508d4e022859b1a) )
@@ -5915,13 +5915,13 @@ ROM_START( schery97a )
 	ROM_CONTINUE(0xd000,0x1000)
 	ROM_CONTINUE(0xe000,0x1000)
 	ROM_CONTINUE(0xf000,0x1000)
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "sc97h.bin",  0x00000, 0x10000, CRC(def39ee2) SHA1(5e6817bd947ebf16d0313285a00876b796b71cab) )
 	ROM_LOAD( "sc97l.bin",  0x10000, 0x10000, CRC(6f4d6aea) SHA1(6809c26e6975cac97b0f8c01a508d4e022859b1a) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -5964,7 +5964,7 @@ ROM_START( roypok96 )
 	ROM_LOAD( "rp35l.bin",  0x10000, 0x10000, CRC(ef416c4e) SHA1(5aac157ba15c66f79a7a68935095bef9a2636f7b) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -5999,13 +5999,13 @@ ROM_START( roypok96a )
 	ROM_CONTINUE(0x5000,0x1000)
 	ROM_CONTINUE(0x8000,0x8000)
 
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "rp35h.bin",  0x00000, 0x10000, CRC(664649ea) SHA1(7915ab31afd2a1bbb8f817f961e0e522d76f5c05) )
 	ROM_LOAD( "rp35l.bin",  0x10000, 0x10000, CRC(ef416c4e) SHA1(5aac157ba15c66f79a7a68935095bef9a2636f7b) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -6041,13 +6041,13 @@ ROM_START( roypok96b )
 	ROM_CONTINUE(0x5000,0x1000)
 	ROM_CONTINUE(0x8000,0x8000)
 
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "rp35h.bin",  0x00000, 0x10000, CRC(664649ea) SHA1(7915ab31afd2a1bbb8f817f961e0e522d76f5c05) )
 	ROM_LOAD( "rp35l.bin",  0x10000, 0x10000, CRC(ef416c4e) SHA1(5aac157ba15c66f79a7a68935095bef9a2636f7b) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -6084,13 +6084,13 @@ ROM_START( pokonl97 )
 	ROM_CONTINUE(0x2000,0x1000)
 	ROM_CONTINUE(0x5000,0x1000)
 	ROM_CONTINUE(0x8000,0x8000)
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "po97h.bin",  0x00000, 0x10000, CRC(fe845426) SHA1(80a1ffa28f92ad381ccf01b387afddd3ee849a58) )
 	ROM_LOAD( "po97l.bin",  0x10000, 0x10000, CRC(d389d5be) SHA1(a88db3bf411dd1bdf8dc42c8c440d71b24ef95ee) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -6105,7 +6105,7 @@ ROM_START( pokonl97 )
 	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
 
-	
+
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "po97u19.bin", 0x0000, 0x0100, CRC(889dd4b3) SHA1(dc4b2506bf61f1bc4d491c3a9c410be11d93b76f) )
 	ROM_LOAD( "po97u20.bin", 0x0100, 0x0100, CRC(e44d1b48) SHA1(0a21b79c03f33d31303ba6cabc4b5a23d7c9cfe3) )
@@ -6136,9 +6136,9 @@ ROM_START( nfb96 )
 	ROM_CONTINUE(0xd000, 0x1000)
 	ROM_CONTINUE(0xe000, 0x1000)
 	ROM_CONTINUE(0xf000, 0x1000)
-		
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "fbseh.bin",  0x00000, 0x10000, CRC(2fc10ce7) SHA1(a2418cfbe7ed217848ace8ea06587bcaa6b2c8f2) )
 	ROM_LOAD( "fbsel.bin",  0x10000, 0x10000, CRC(fb9d679a) SHA1(a4f6246bdbbf2e25f702006b30a62bc7873137de) )
@@ -6186,10 +6186,10 @@ ROM_START( nfb96a )
 	ROM_CONTINUE(0xd000, 0x1000)
 	ROM_CONTINUE(0xe000, 0x1000)
 	ROM_CONTINUE(0xf000, 0x1000)
-	
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
-	
+
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "fbseh.bin",  0x00000, 0x10000, CRC(2fc10ce7) SHA1(a2418cfbe7ed217848ace8ea06587bcaa6b2c8f2) )
 	ROM_LOAD( "fbsel.bin",  0x10000, 0x10000, CRC(fb9d679a) SHA1(a4f6246bdbbf2e25f702006b30a62bc7873137de) )
@@ -6237,9 +6237,9 @@ ROM_START( nfb96b )
 	ROM_CONTINUE(0xd000, 0x1000)
 	ROM_CONTINUE(0xe000, 0x1000)
 	ROM_CONTINUE(0xf000, 0x1000)
-	
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	/* these graphic roms display a different copyright */
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "fb96seh.bin",  0x00000, 0x10000, CRC(12042a0a) SHA1(4bc5f87f4b92f303fef100bf16e3d7b27670b793) )
@@ -6281,10 +6281,10 @@ ROM_START( nfb96c )
 	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
-	
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
-	/* these graphic roms display a different copyright */	
+
+	/* these graphic roms display a different copyright */
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "fb96seh.bin",  0x00000, 0x10000, CRC(12042a0a) SHA1(4bc5f87f4b92f303fef100bf16e3d7b27670b793) )
 	ROM_LOAD( "fb96sel.bin",  0x10000, 0x10000, CRC(d611f10b) SHA1(425cad584e85f21de214bf978555a7811b13aa35) )
@@ -6326,10 +6326,10 @@ ROM_START( nfb96txt )
 	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
-	
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
-	/* these graphic roms display a different copyright */	
+
+	/* these graphic roms display a different copyright */
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "txfbh.bin",  0x00000, 0x10000, CRC(9e9ba897) SHA1(901bb2596ff67c0290977fd508247aa1da0a09b9) )
 	ROM_LOAD( "txfbl.bin",  0x10000, 0x10000, CRC(d1b8920c) SHA1(c6dc065134724baafed4c1cfa4aaf3c23dfb7a32) )
@@ -6371,13 +6371,13 @@ ROM_START( nc96 )
 	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "chseh.bin",  0x00000, 0x10000, CRC(fb90df1d) SHA1(84ec1f40a014a0043b3c3c999428dd274caba1b8) )
 	ROM_LOAD( "chsel.bin",  0x10000, 0x10000, CRC(e0166f3e) SHA1(27e180fe6e03f48771b540e34415eee54951788f) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -6391,7 +6391,7 @@ ROM_START( nc96 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
 	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
-	
+
 	// no proms present, using nfb96 ones
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
@@ -6416,13 +6416,13 @@ ROM_START( nc96a )
 	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "chseh.bin",  0x00000, 0x10000, CRC(fb90df1d) SHA1(84ec1f40a014a0043b3c3c999428dd274caba1b8) )
 	ROM_LOAD( "chsel.bin",  0x10000, 0x10000, CRC(e0166f3e) SHA1(27e180fe6e03f48771b540e34415eee54951788f) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -6436,7 +6436,7 @@ ROM_START( nc96a )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
 	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
-	
+
 	// no proms present, using nfb96 ones
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
@@ -6462,14 +6462,14 @@ ROM_START( nc96b )
 	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "ch96seh.bin",  0x00000, 0x10000, CRC(65dee6ba) SHA1(77f5769ed0b745a4735576e9f0ce90dcdd9b5410) )
 	ROM_LOAD( "ch96sel.bin",  0x10000, 0x10000, CRC(c21cc114) SHA1(f7b6ff5ac34dc1a7332e8c1b9cc40f3b65deac05) )
 
-	
+
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -6483,7 +6483,7 @@ ROM_START( nc96b )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
 	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
-	
+
 	// no proms present, using nfb96 ones
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
@@ -6508,13 +6508,13 @@ ROM_START( nc96c )
 	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "ch96seh.bin",  0x00000, 0x10000, CRC(65dee6ba) SHA1(77f5769ed0b745a4735576e9f0ce90dcdd9b5410) )
 	ROM_LOAD( "ch96sel.bin",  0x10000, 0x10000, CRC(c21cc114) SHA1(f7b6ff5ac34dc1a7332e8c1b9cc40f3b65deac05) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -6528,7 +6528,7 @@ ROM_START( nc96c )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
 	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
-	
+
 	// no proms present, using nfb96 ones
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
@@ -6552,13 +6552,13 @@ ROM_START( nc96txt )
 	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "txchh.bin",  0x00000, 0x10000, CRC(07621bde) SHA1(65fd52545a399694394e623a7249d180d1a4fa9f) )
 	ROM_LOAD( "txchl.bin",  0x10000, 0x10000, CRC(3b00b7dc) SHA1(99d513d23eea28fedf59ad272a3280abd0d3c2ab) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -6572,7 +6572,7 @@ ROM_START( nc96txt )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
 	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
-	
+
 	// no proms present, using nfb96 ones
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "chu19.bin", 0x0000, 0x0100, CRC(fafc43ad) SHA1(e94592b83f19e5f9b6205473c1e06b36405ebfc2) )
@@ -6596,13 +6596,13 @@ ROM_START( match98 )
 	ROM_CONTINUE(0x2000, 0x1000)
 	ROM_CONTINUE(0x5000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
-	
+
 	ROM_REGION( 0x20000, "graphics", ROMREGION_DISPOSE )
 	ROM_LOAD( "match98h.bin",  0x00000, 0x10000, CRC(94899f26) SHA1(1b6f953b6251496d7d06fb0a2d0b861e04ebc3df) )
 	ROM_LOAD( "match98l.bin",  0x10000, 0x10000, CRC(6db4b962) SHA1(7d476e244d70a86dacf85dd9c790f63aef4b7cd9) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	
+
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
 	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
@@ -6616,7 +6616,7 @@ ROM_START( match98 )
 	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
 	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
 	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
-	
+
 	ROM_REGION( 0x200, "proms", 0 ) // palette
 	ROM_LOAD( "matchu19.bin", 0x0000, 0x0100, CRC(59cd3566) SHA1(e9726aad631d86e2c122e3d75f87abc22ea7ef97) )
 	ROM_LOAD( "matchu20.bin", 0x0100, 0x0100, CRC(f421503c) SHA1(591c80d6ff63021fab31b3bfcde1b47cd75fd7bb) )
@@ -6626,7 +6626,7 @@ ROM_START( match98 )
 
 	ROM_REGION( 0x100, "proms3", 0 ) // ? none of the other sets have this
 	ROM_LOAD( "matchu8.bin", 0x0000, 0x0100, CRC(dba4579d) SHA1(fba0a5adad13728c805fbe9666a8e02484cfa821) )
-	
+
 	ROM_REGION( 0x80000, "oki", ROMREGION_ERASEFF ) // samples
 	ROM_LOAD( "match98t.bin", 0x00000, 0x40000, CRC(830f4e01) SHA1(fbc41e9100a69663b0f799aee447edd5fabd2af7) )
 ROM_END
@@ -7085,7 +7085,7 @@ static DRIVER_INIT( nfb96sea )
 {
 	int i;
 	UINT8 *ROM = memory_region(machine, "main");
-	
+
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7159,9 +7159,9 @@ static DRIVER_INIT( schery97a )
 
 		ROM[i] = x;
 	}
-	
-	
-	
+
+
+
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedval38_r);
 	/* Oki 6295 at 0x20 */
 }
@@ -7188,7 +7188,7 @@ static DRIVER_INIT( skill98 )
 
 		ROM[i] = x;
 	}
-	
+
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1e, 0x1e, 0, 0, fixedvalea_r);
 	/* Oki 6295 at 0x20 */
 }
@@ -7205,7 +7205,7 @@ static DRIVER_INIT( fb36xc1 )
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
-		
+
 	     switch(i & 0x12)
 		 {
 		     case 0x00: x = BITSWAP8(x^0xf5, 6,4,3,7,0,1,5,2); break;
@@ -7215,7 +7215,7 @@ static DRIVER_INIT( fb36xc1 )
 	     }
 		ROM[i] = x;
 	}
-	
+
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x31, 0x31, 0, 0, fixedval68_r);
 
 }
@@ -7242,7 +7242,7 @@ static DRIVER_INIT( fbse354 )
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
-		
+
 		switch(i & 5) {
 		    case 0: x = BITSWAP8(x^0x6a, 2,1,0,7,6,5,4,3); break;
 		    case 1: x = BITSWAP8(x^0xcc, 0,7,6,5,4,3,2,1); break;
@@ -7254,9 +7254,9 @@ static DRIVER_INIT( fbse354 )
 	// nfb96b needs both of these
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x23, 0x23, 0, 0, fixedval80_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x5a, 0x5a, 0, 0, fixedvalaa_r);
-	
+
 	// csel96b
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x6e, 0x6e, 0, 0, fixedval96_r); 
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x6e, 0x6e, 0, 0, fixedval96_r);
 
 }
 
@@ -7273,7 +7273,7 @@ static DRIVER_INIT( fbse362 )
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
-		
+
 		switch(i & 5) {
 		    case 0: x = BITSWAP8(x^0xce, 1,0,7,6,5,4,3,2); break;
 		    case 1: x = BITSWAP8(x^0x9e, 3,2,1,0,7,6,5,4); break;
@@ -7282,7 +7282,7 @@ static DRIVER_INIT( fbse362 )
 		}
 		ROM[i] = x;
 	}
-	
+
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x2e, 0x2e, 0, 0, fixedvalbe_r);
 
 }
@@ -7304,7 +7304,7 @@ static DRIVER_INIT( rp35 )
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
-		
+
 		switch(i & 3) {
 			case 0: x = BITSWAP8(x^0x2a, 0,7,6,5,4,3,2,1); break;
 			case 1: x = BITSWAP8(x^0x1c, 4,3,2,1,0,7,6,5); break;
@@ -7330,14 +7330,14 @@ static DRIVER_INIT( rp36 )
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
-		
+
 		switch(i & 5) {
 			case 0: x = BITSWAP8(x^0xee, 2,1,0,7,6,5,4,3); break;
 			case 1: x = BITSWAP8(x^0x9f, 3,2,1,0,7,6,5,4); break;
 			case 4: x = BITSWAP8(x^0xc7, 3,2,1,0,7,6,5,4); break;
 			case 5: x = BITSWAP8(x^0xc3, 3,2,1,0,7,6,5,4); break;
 		}
-		
+
 		ROM[i] = x;
 	}
 
@@ -7356,14 +7356,14 @@ static DRIVER_INIT( rp36c3 )
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
-		
+
 		switch(i & 0xa) {
 			case 0x0: x = BITSWAP8(x^0xfd, 6,4,0,7,3,1,5,2); break;
 			case 0x2: x = BITSWAP8(x^0xee, 4,6,7,0,3,2,1,5); break;
 			case 0x8: x = BITSWAP8(x^0x2c, 0,3,4,2,5,6,1,7); break;
 			case 0xa: x = BITSWAP8(x^0xd6, 2,0,6,1,4,5,3,7); break;
 		}
-		
+
 		ROM[i] = x;
 	}
 
@@ -7388,14 +7388,14 @@ static DRIVER_INIT( po33 )
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
-		
+
 		switch(i & 0x14) {
 			case 0x00: x = BITSWAP8(x^0xde, 2,1,0,7,6,5,4,3); break;
 			case 0x04: x = BITSWAP8(x^0x3c, 0,7,6,5,4,3,2,1); break;
 			case 0x10: x = BITSWAP8(x^0x2f, 3,2,1,0,7,6,5,4); break;
 			case 0x14: x = BITSWAP8(x^0x5b, 4,3,2,1,0,7,6,5); break;
 		}
-		
+
 		ROM[i] = x;
 	}
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x32, 0x32, 0, 0, fixedval74_r);
@@ -7415,14 +7415,14 @@ static DRIVER_INIT( tc132axt )
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
-			
+
 		switch(i & 0x22) {
 			case 0x00: x = BITSWAP8(x^0x5f, 6,4,3,7,0,5,2,1); break;
 			case 0x02: x = BITSWAP8(x^0xe7, 4,6,3,0,7,5,1,2); break;
 			case 0x20: x = BITSWAP8(x^0x18, 0,3,5,2,4,7,1,6); break;
 			case 0x22: x = BITSWAP8(x^0x74, 2,0,4,1,6,7,3,5); break;
 		}
-		
+
 		ROM[i] = x;
 	}
 
@@ -7446,17 +7446,17 @@ static DRIVER_INIT( match133 )
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
-			
+
 		switch(i & 0x12) {
 			case 0x00: x = BITSWAP8(x^0xde, 3,2,1,0,7,6,5,4); break;
 			case 0x02: x = BITSWAP8(x^0x3d, 1,0,7,6,5,4,3,2); break;
 			case 0x10: x = BITSWAP8(x^0x2f, 4,3,2,1,0,7,6,5); break;
 			case 0x12: x = BITSWAP8(x^0x5c, 4,3,2,1,0,7,6,5); break;
 		}
-		
+
 		ROM[i] = x;
 	}
-	
+
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedvalc7_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x1a, 0x1a, 0, 0, fixedvale4_r);
 }

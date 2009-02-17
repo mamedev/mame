@@ -189,10 +189,10 @@ static WRITE16_HANDLER( blit_copy_w )
 	if(x_size == 0) { x_size = 0x200; }
 
 	/* TODO: used by steaser "Game Over" msg on attract mode*/
-//	if(y_size == 1) { y_size = 32; }
+//  if(y_size == 1) { y_size = 32; }
 
 	src = blit_romaddr[0] | (blit_attr1_ram[0] & 0x1f00)<<8;
-//	src|= (blit_transpen[0xc/2] & 0x0100)<<12;
+//  src|= (blit_transpen[0xc/2] & 0x0100)<<12;
 
 	for(y=0;y<y_size;y++)
 	{
@@ -230,7 +230,7 @@ static READ16_HANDLER( blitter_status_r )
 /*TODO*/
 static WRITE16_HANDLER( lamps_w )
 {
-//	popmessage("%02x",data);
+//  popmessage("%02x",data);
 }
 
 static READ16_HANDLER( test_r )
@@ -241,7 +241,7 @@ static READ16_HANDLER( test_r )
 #if 0
 static WRITE16_HANDLER( irq_callback_w )
 {
-//	popmessage("%02x",data);
+//  popmessage("%02x",data);
 	cpu_set_input_line(space->machine->cpu[0],3,HOLD_LINE );
 }
 
@@ -257,8 +257,8 @@ static ADDRESS_MAP_START( ilpag_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blit_data", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 
-// 	AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
-//	AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
+//  AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
+//  AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
 
 	AM_RANGE(0x900000, 0x900005) AM_WRITE( paletteram_io_w ) //RAMDAC
 	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE(&blit_transpen) //video registers for the blitter write
@@ -272,9 +272,9 @@ static ADDRESS_MAP_START( ilpag_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
 	AM_RANGE(0xc00180, 0xc00181) AM_READ_PORT("IN2")
-// 	AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
+//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
 	AM_RANGE(0xc00380, 0xc00381) AM_READ_PORT("IN3")
-// 	AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
+//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( steaser_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -283,9 +283,9 @@ static ADDRESS_MAP_START( steaser_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 
  	AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
-// 	AM_RANGE(0x840000, 0x840001) AM_WRITE(sound_write_w)
+//  AM_RANGE(0x840000, 0x840001) AM_WRITE(sound_write_w)
 	AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
-//	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(sound_write_w)
+//  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(sound_write_w)
 
 	AM_RANGE(0x900000, 0x900005) AM_WRITE( paletteram_io_w ) //RAMDAC
 	AM_RANGE(0x940000, 0x940001) AM_WRITENOP //? Seems a dword write for some read, written consecutively
@@ -301,11 +301,11 @@ static ADDRESS_MAP_START( steaser_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
 	AM_RANGE(0x9f0000, 0x9f0001) AM_WRITENOP //???
 
-//	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
+//  AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
 	AM_RANGE(0xbd0000, 0xbd0001) AM_READ(test_r)
-// 	AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
-//	AM_RANGE(0xc00380, 0xc00381) AM_READ_PORT("IN3")
-// 	AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
+//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
+//  AM_RANGE(0xc00380, 0xc00381) AM_READ_PORT("IN3")
+//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ilpag )
@@ -351,14 +351,14 @@ static INPUT_PORTS_START( ilpag )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 /*
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Take Button") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Risk Button") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Take Button") PORT_CODE(KEYCODE_A)
+    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
+    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Risk Button") PORT_CODE(KEYCODE_S)
+    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
 */
 	PORT_START("IN3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
@@ -398,14 +398,14 @@ static INPUT_PORTS_START( ilpag )
 INPUT_PORTS_END
 
 /*
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Take Button") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Risk Button") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Take Button") PORT_CODE(KEYCODE_A)
+    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
+    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Risk Button") PORT_CODE(KEYCODE_S)
+    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
 */
 
 static INPUT_PORTS_START( steaser )
@@ -486,12 +486,12 @@ MACHINE_DRIVER_END
 
 static TIMER_DEVICE_CALLBACK( steaser_mcu_sim )
 {
-//	static int i;
+//  static int i;
 	/*first off, signal the "MCU is running" flag*/
 	generic_nvram16[0x932/2] = 0xffff;
 	/*clear the inputs (they are impulsed)*/
-//	for(i=0;i<8;i+=2)
-//		generic_nvram16[((0x8a0)+i)/2] = 0;
+//  for(i=0;i<8;i+=2)
+//      generic_nvram16[((0x8a0)+i)/2] = 0;
 	/*finally, read the inputs*/
 	generic_nvram16[0x89e/2] = input_port_read(timer->machine, "MENU") & 0xffff;
 	generic_nvram16[0x8a0/2] = input_port_read(timer->machine, "STAT") & 0xffff;

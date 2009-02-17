@@ -337,7 +337,7 @@ static READ8_DEVICE_HANDLER( pot_r )
 
 static const pokey_interface pokey_config =
 {
-	{ 
+	{
 		DEVCB_HANDLER(pot_r),
 		DEVCB_HANDLER(pot_r),
 		DEVCB_HANDLER(pot_r),

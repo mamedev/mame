@@ -6,18 +6,18 @@ Notes:
   it defaults to 123456
 
 - The games don't cope well with corrupt NVRAM, and may fail to boot completely(!)
-  
+
 - There are still some video problems, coin cut in half on pir2002v2 & missing spinning 7 on classice for example
   maybe the reel tilemap should be one big tilemap, and the 'select' ram is extra scroll bits..
-  
+
 - The code to handle the 'multple' reel layers is dubious.  rowscroll values are always used
   based on only one of the tilemaps displayed in that screen region.
-  
 
-- Inputs not done, Lamps not done  
-  
- Thanks to Olivier Galibert for the handy bitswapper tool :-) 
-  
+
+- Inputs not done, Lamps not done
+
+ Thanks to Olivier Galibert for the handy bitswapper tool :-)
+
 */
 
 #include "driver.h"
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 VIDEO_START(sfbonus)
 {
 	temp_reel_bitmap = auto_bitmap_alloc(1024,512,BITMAP_FORMAT_INDEXED16);
-	
+
 	sfbonus_tilemap = tilemap_create(machine,get_sfbonus_tile_info,tilemap_scan_rows,8,8, 128, 64);
 	sfbonus_reel_tilemap = tilemap_create(machine,get_sfbonus_reel_tile_info,tilemap_scan_rows,8,32, 64, 16);
 	sfbonus_reel2_tilemap = tilemap_create(machine,get_sfbonus_reel2_tile_info,tilemap_scan_rows,8,32, 64, 16);
@@ -181,14 +181,14 @@ VIDEO_START(sfbonus)
 	tilemap_set_transparent_pen(sfbonus_reel3_tilemap,255);
 	tilemap_set_transparent_pen(sfbonus_reel4_tilemap,255);
 
-	tilemap_set_scroll_rows(sfbonus_tilemap,64);	
-	
+	tilemap_set_scroll_rows(sfbonus_tilemap,64);
+
 	tilemap_set_scroll_cols(sfbonus_reel_tilemap, 64);
 	tilemap_set_scroll_cols(sfbonus_reel2_tilemap, 64);
 	tilemap_set_scroll_cols(sfbonus_reel3_tilemap, 64);
 	tilemap_set_scroll_cols(sfbonus_reel4_tilemap, 64);
 
-	
+
 }
 
 static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const device_config *screen, int catagory)
@@ -204,9 +204,9 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 	int globalxscrollreels = (sfbonus_vregs[4] | sfbonus_vregs[5]<<8);
 	globalyscrollreels += 8;
 	globalxscrollreels += 8;
-	
+
 	startclipmin = 0;
-	
+
 	for (i= 0;i < 0x80;i++)
 	{
 		int scroll;
@@ -223,21 +223,21 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		tilemap_set_scrolly(sfbonus_reel4_tilemap, i, scroll + globalyscrollreels);
 	}
 
-//	printf("------------\n");
+//  printf("------------\n");
 	for (zz=0;zz<288;zz++)
 	{
 		rectangle clip;
-		
+
 		// other bits are used too..
 		int line = ((zz+globalyscrollreels)&0x1ff);
 		int rowenable = selectbase[line]&0x3;
 		int rowenable2 = (selectbase[line]&0xc)>>2;
 		int xxxscroll;
 		int rowscroll;
-		
-		
+
+
 		//printf("%04x %04x %d\n",zz, xxxscroll, line/8);
-		
+
 		/* draw top of screen */
 		clip.min_x = visarea->min_x;
 		clip.max_x = 511;
@@ -245,12 +245,12 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		clip.max_y = startclipmin;
 
 
-		
+
 		// other bits are set, what do they mean?
 		if (rowenable==0)
-		{			
+		{
 			rowscroll = reels_rowscroll[((line/8)*2)+0x000] | (reels_rowscroll[((line/8)*2)+0x001]<<8);
-			xxxscroll = globalxscrollreels + rowscroll;	
+			xxxscroll = globalxscrollreels + rowscroll;
 			tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
 			tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
 			tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
@@ -259,7 +259,7 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		else if (rowenable==0x1)
 		{
 			rowscroll = reels_rowscroll[((line/8)*2)+0x080] | (reels_rowscroll[((line/8)*2)+0x081]<<8);
-			xxxscroll = globalxscrollreels + rowscroll;	
+			xxxscroll = globalxscrollreels + rowscroll;
 			tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
 			tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
 			tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
@@ -268,7 +268,7 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		else if (rowenable==0x2)
 		{
 			rowscroll = reels_rowscroll[((line/8)*2)+0x100] | (reels_rowscroll[((line/8)*2)+0x101]<<8);
-			xxxscroll = globalxscrollreels + rowscroll;	
+			xxxscroll = globalxscrollreels + rowscroll;
 			tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
 			tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
 			tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
@@ -277,22 +277,22 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		else if (rowenable==0x3)
 		{
 			rowscroll = reels_rowscroll[((line/8)*2)+0x180] | (reels_rowscroll[((line/8)*2)+0x181]<<8);
-			xxxscroll = globalxscrollreels + rowscroll;	
+			xxxscroll = globalxscrollreels + rowscroll;
 			tilemap_set_scrollx(sfbonus_reel_tilemap, 0, xxxscroll  );
 			tilemap_set_scrollx(sfbonus_reel2_tilemap, 0, xxxscroll );
 			tilemap_set_scrollx(sfbonus_reel3_tilemap, 0, xxxscroll );
 			tilemap_set_scrollx(sfbonus_reel4_tilemap, 0, xxxscroll );
 		}
-	
+
 		if (rowenable2==0)
-		{			
+		{
 			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),3);
 		}
 		if (rowenable==0)
-		{			
+		{
 			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel_tilemap,TILEMAP_DRAW_CATEGORY(catagory),3);
-		}	
-		
+		}
+
 		if (rowenable2==0x1)
 		{
 			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),2);
@@ -300,8 +300,8 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		if (rowenable==0x1)
 		{
 			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel2_tilemap,TILEMAP_DRAW_CATEGORY(catagory),2);
-		}	
-		
+		}
+
 		if (rowenable2==0x2)
 		{
 			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),1);
@@ -310,7 +310,7 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		{
 			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel3_tilemap,TILEMAP_DRAW_CATEGORY(catagory),1);
 		}
-		
+
 		if (rowenable2==0x3)
 		{
 			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),4);
@@ -319,11 +319,11 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 		{
 			tilemap_draw(temp_reel_bitmap,&clip,sfbonus_reel4_tilemap,TILEMAP_DRAW_CATEGORY(catagory),4);
 		}
-	
-	
 
 
-			
+
+
+
 		startclipmin+=1;
 	}
 
@@ -336,11 +336,11 @@ VIDEO_UPDATE(sfbonus)
 	int globalxscroll = (sfbonus_vregs[0] | sfbonus_vregs[1]<<8);
 	UINT8* front_rowscroll = &sfbonus_videoram[0x200];
 	int i;
-	
+
 	// align to 0
 	globalyscroll += 8;
 	globalxscroll += 8;
-	
+
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]);
 	bitmap_fill(temp_reel_bitmap,cliprect,screen->machine->pens[0]);
 
@@ -349,20 +349,20 @@ VIDEO_UPDATE(sfbonus)
 
 	{
 		int y,x;
-		
+
 		for (y=0;y<288;y++)
 		{
 			for (x=0;x<512;x++)
 			{
 				UINT16* src = BITMAP_ADDR16(temp_reel_bitmap, y, x);
 				UINT16* dst = BITMAP_ADDR16(bitmap, y, x);
-				
+
 				if ((src[0]&0x100)==0x000)
-					dst[0] = src[0];		
+					dst[0] = src[0];
 			}
 		}
 	}
-	
+
 	/* Normal Tilemap */
 	tilemap_set_scrolly(sfbonus_tilemap, 0, globalyscroll );
 	for (i=0;i<64;i++)
@@ -375,23 +375,23 @@ VIDEO_UPDATE(sfbonus)
 
 	{
 		int y,x;
-		
+
 		for (y=0;y<288;y++)
 		{
 			for (x=0;x<512;x++)
 			{
 				UINT16* src = BITMAP_ADDR16(temp_reel_bitmap, y, x);
 				UINT16* dst = BITMAP_ADDR16(bitmap, y, x);
-				
+
 				if ((src[0]&0x100)==0x100)
-					dst[0] = src[0]-0x100;		
+					dst[0] = src[0]-0x100;
 			}
 		}
-	}	
-	
+	}
+
 	/* High Priority Reels */
-//	sfbonus_draw_reel_layer(screen->machine,bitmap,cliprect, screen, 1);
-	
+//  sfbonus_draw_reel_layer(screen->machine,bitmap,cliprect, screen, 1);
+
 	return 0;
 }
 
@@ -752,13 +752,13 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_CPU_PROGRAM_MAP(0,sfbonus_map)
 	MDRV_CPU_IO_MAP(0,sfbonus_io)
 	MDRV_CPU_VBLANK_INT("main",irq0_line_hold)
-//	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
+//  MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
 
 	MDRV_MACHINE_RESET( sfbonus )
 
 	MDRV_NVRAM_HANDLER(sfbonus)
 
-	
+
 	MDRV_GFXDECODE(sfbonus)
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -803,7 +803,7 @@ ROM_START( sfbonusa )
 
 	ROM_REGION( 0x010000, "debugram", ROMREGION_ERASE00 ) /* DEBUG */
 
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -851,7 +851,7 @@ ROM_END
 ROM_START( sfbonusv )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfbv19r.bin", 0x00000, 0x40000, CRC(f032be45) SHA1(63007ee7de6203ed7bda34e127328d085df20369) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "skfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -887,7 +887,7 @@ ROM_START( parrot3b )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p4rom2.bin", 0x00000, 0x40000, CRC(d0574efc) SHA1(dd6628450883f0f723744e7caf6525bca7b18a43) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "p4rom3.bin", 0x00000, 0x80000, CRC(2701d7ab) SHA1(9efeaa3dab2aa3f20501876db2100eae4a5b8af1) )
 	ROM_LOAD16_BYTE( "p4rom4.bin", 0x00001, 0x80000, CRC(46ebe619) SHA1(811c2d35e4e04e8ecd7f4f2a7040de302d2ed91c) )
@@ -903,7 +903,7 @@ ROM_START( parrot3d )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p4rom2.bin", 0x00000, 0x40000, CRC(d0574efc) SHA1(dd6628450883f0f723744e7caf6525bca7b18a43) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "p4rom3.bin", 0x00000, 0x80000, CRC(2701d7ab) SHA1(9efeaa3dab2aa3f20501876db2100eae4a5b8af1) )
 	ROM_LOAD16_BYTE( "p4rom4.bin", 0x00001, 0x80000, CRC(46ebe619) SHA1(811c2d35e4e04e8ecd7f4f2a7040de302d2ed91c) )
@@ -980,7 +980,7 @@ ROM_END
 ROM_START( hldspin1d )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs1d27t.bin", 0x00000, 0x40000, CRC(c3fc35a3) SHA1(59a02815e004738f5eee43dffbeaca34412da308) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "hs_2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -996,7 +996,7 @@ ROM_END
 ROM_START( hldspin1v )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs1v27t.bin", 0x00000, 0x40000, CRC(99347659) SHA1(f8af779046e93a2514dc59b11bb8d7a11487b08e) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "hs_2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1127,7 +1127,7 @@ ROM_START( pickwinb2 )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "pw-2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "pw-3.bin", 0x00000, 0x40000, CRC(9a27acbd) SHA1(3a3a6d0b5f6eeeebcb2ccaff773b8971b3bfd3c7) )
 	ROM_LOAD16_BYTE( "pw-4.bin", 0x00001, 0x40000, CRC(6b629619) SHA1(3842a7579f67866aa9744b0d6fa6a47c923be6fe) )
@@ -1144,8 +1144,8 @@ ROM_START( pickwind )
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "pw-2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
-	
-	
+
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "pw-3.bin", 0x00000, 0x40000, CRC(9a27acbd) SHA1(3a3a6d0b5f6eeeebcb2ccaff773b8971b3bfd3c7) )
 	ROM_LOAD16_BYTE( "pw-4.bin", 0x00001, 0x40000, CRC(6b629619) SHA1(3842a7579f67866aa9744b0d6fa6a47c923be6fe) )
@@ -1158,7 +1158,7 @@ ROM_END
 ROM_START( pickwind2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pwd29r.bin", 0x00000, 0x40000, CRC(cb9f77e1) SHA1(5c851e70537ad4e418c3b6aca394bd2ecc4b4c08) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "pw-2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
@@ -1177,7 +1177,7 @@ ROM_START( pickwinv )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "pw-2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "pw-3.bin", 0x00000, 0x40000, CRC(9a27acbd) SHA1(3a3a6d0b5f6eeeebcb2ccaff773b8971b3bfd3c7) )
 	ROM_LOAD16_BYTE( "pw-4.bin", 0x00001, 0x40000, CRC(6b629619) SHA1(3842a7579f67866aa9744b0d6fa6a47c923be6fe) )
@@ -1194,7 +1194,7 @@ ROM_START( pickwinv2 )
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "pw-2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "pw-3.bin", 0x00000, 0x40000, CRC(9a27acbd) SHA1(3a3a6d0b5f6eeeebcb2ccaff773b8971b3bfd3c7) )
 	ROM_LOAD16_BYTE( "pw-4.bin", 0x00001, 0x40000, CRC(6b629619) SHA1(3842a7579f67866aa9744b0d6fa6a47c923be6fe) )
@@ -1210,7 +1210,7 @@ ROM_START( pickwinv3 )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "pw-2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "pw-3.bin", 0x00000, 0x40000, CRC(9a27acbd) SHA1(3a3a6d0b5f6eeeebcb2ccaff773b8971b3bfd3c7) )
 	ROM_LOAD16_BYTE( "pw-4.bin", 0x00001, 0x40000, CRC(6b629619) SHA1(3842a7579f67866aa9744b0d6fa6a47c923be6fe) )
@@ -1305,7 +1305,7 @@ ROM_END
 ROM_START( tighookv2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkv21e.bin", 0x00000, 0x40000, CRC(df0df2fa) SHA1(244086e9233f36531c005f6f9a09128738771753) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "thkrom2.bin", 0x00000, 0x40000, CRC(61b61b75) SHA1(e71c5ab6aedb7ca4db32a2f4d7d2818dcdd92417) )
 
@@ -1321,7 +1321,7 @@ ROM_END
 ROM_START( tighookv3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkv20lt.bin", 0x00000, 0x40000, CRC(07a8e921) SHA1(2c92ec7187d441d1b205eea626d32a6a41a53918) )
-		
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "thkrom2.bin", 0x00000, 0x40000, CRC(61b61b75) SHA1(e71c5ab6aedb7ca4db32a2f4d7d2818dcdd92417) )
 
@@ -1353,7 +1353,7 @@ ROM_END
 ROM_START( tighookd2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkd20lt.bin", 0x00000, 0x40000, CRC(2be25e14) SHA1(2d906ce8d505bc2620ed218fdb401c0faf426eda) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "thkrom2.bin", 0x00000, 0x40000, CRC(61b61b75) SHA1(e71c5ab6aedb7ca4db32a2f4d7d2818dcdd92417) )
 
@@ -1490,8 +1490,8 @@ ROM_START( anibonus3 )
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
-	
-	/* unsure which gfx roms */	
+
+	/* unsure which gfx roms */
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "abrom3.bin", 0x00000, 0x80000, CRC(85f19e19) SHA1(2dd259af132e0cfd34974526c96f0d96ff868516) )
 	ROM_LOAD16_BYTE( "abrom4.bin", 0x00001, 0x80000, CRC(c12b954c) SHA1(83556abbad0f285360da5f5e0fb93514d46b436b) )
@@ -1538,7 +1538,7 @@ ROM_START( anibonus5 )
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
-	/* unsure which gfx roms */	
+	/* unsure which gfx roms */
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "abrom3.bin", 0x00000, 0x80000, CRC(85f19e19) SHA1(2dd259af132e0cfd34974526c96f0d96ff868516) )
 	ROM_LOAD16_BYTE( "abrom4.bin", 0x00001, 0x80000, CRC(c12b954c) SHA1(83556abbad0f285360da5f5e0fb93514d46b436b) )
@@ -1561,7 +1561,7 @@ ROM_START( anibonus6 )
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
-	/* unsure which gfx roms */	
+	/* unsure which gfx roms */
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "abrom3.bin", 0x00000, 0x80000, CRC(85f19e19) SHA1(2dd259af132e0cfd34974526c96f0d96ff868516) )
 	ROM_LOAD16_BYTE( "abrom4.bin", 0x00001, 0x80000, CRC(c12b954c) SHA1(83556abbad0f285360da5f5e0fb93514d46b436b) )
@@ -1602,7 +1602,7 @@ ROM_START( anibonusb2 )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "abrom3n.bin", 0x00000, 0x80000, CRC(aab2161a) SHA1(d472746c68720935fedfc6b2d06a4fe1152cc804) )
 	ROM_LOAD16_BYTE( "abrom4n.bin", 0x00001, 0x80000, CRC(d776862c) SHA1(03b3c0e9adb11b560b8773e88ea97e712323f25e) )
@@ -1647,7 +1647,7 @@ ROM_END
 ROM_START( anibonusv )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "abv18r.bin", 0x00000, 0x40000, CRC(56672865) SHA1(44d141b307a2cb0cb4731ad6db8235941f80ae23) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1663,7 +1663,7 @@ ROM_END
 ROM_START( anibonusv2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "abv18lt.bin", 0x00000, 0x40000, CRC(26bc1901) SHA1(c17f6bf5380c3c141cc79f4fb2e01bb8299e93b0) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1679,7 +1679,7 @@ ROM_END
 ROM_START( anibonusv3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "abv18e.bin", 0x00000, 0x40000, CRC(c05b8fb5) SHA1(8ae4e00a66d2825ceea072c58750915618477304) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1727,7 +1727,7 @@ ROM_END
 ROM_START( abnudged )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "abd20n.bin", 0x00000, 0x40000, CRC(e189ca0b) SHA1(ba3a3f84b302b737043ac56b0872d65c4ea77903) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1743,7 +1743,7 @@ ROM_END
 ROM_START( abnudgev )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "abv21n.bin", 0x00000, 0x40000, CRC(48d8f3a6) SHA1(5ccde4bf574ba779dc43769fda62aa6d9b284a8e) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1759,7 +1759,7 @@ ROM_END
 ROM_START( anithunt )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "ath17.bin", 0x00000, 0x40000, CRC(07facf55) SHA1(2de5ca12e06a6896099672ec7383e6324d23fa12) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "athrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1791,7 +1791,7 @@ ROM_END
 ROM_START( anithuntb )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "athb19r.bin", 0x00000, 0x40000, CRC(71d0604f) SHA1(c2f40c58dce2f6b69dc0234c0fb7a656ea04168b) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "athrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1807,7 +1807,7 @@ ROM_END
 ROM_START( anithuntd )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "athd19r.bin", 0x00000, 0x40000, CRC(807585d4) SHA1(643ceb51e81797b330310ddbe9e0d8b21ba215e5) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "athrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1823,7 +1823,7 @@ ROM_END
 ROM_START( anithuntv )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "athv19r.bin", 0x00000, 0x40000, CRC(74c2cf89) SHA1(f3efad66f668a0a6dbf35a0c6518ece842d069e6) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "athrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -1840,7 +1840,7 @@ ROM_END
 ROM_START( dblchal )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "dc11.bin", 0x00000, 0x40000, CRC(05a27f07) SHA1(02b7b2731f8821bd7e0e3be005bd3024db0a7e42) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "dcrom2.bin", 0x00000, 0x20000, CRC(ce099327) SHA1(b1dc43839e9e3bf788141d58c81e1380a12d582a) )
 
@@ -1856,7 +1856,7 @@ ROM_END
 ROM_START( dblchalb )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "dcb15r.bin", 0x00000, 0x40000, CRC(d89a9756) SHA1(7a4cb88da9d02351a996202fb5b4545db042867b) )
-		
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "dcrom2.bin", 0x00000, 0x20000, CRC(ce099327) SHA1(b1dc43839e9e3bf788141d58c81e1380a12d582a) )
 
@@ -1872,7 +1872,7 @@ ROM_END
 ROM_START( dblchalc )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "dcc15r.bin", 0x00000, 0x40000, CRC(ac0ed555) SHA1(5ac93132a94fec8811b4b5525dd2d31eb6749d6e) )
-		
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "dcrom2.bin", 0x00000, 0x20000, CRC(ce099327) SHA1(b1dc43839e9e3bf788141d58c81e1380a12d582a) )
 
@@ -1888,7 +1888,7 @@ ROM_END
 ROM_START( dblchald )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "dcd15r.bin", 0x00000, 0x40000, CRC(2b72350d) SHA1(439765028417af6ceeb2724c7b7e737a209bf844) )
-		
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "dcrom2.bin", 0x00000, 0x20000, CRC(ce099327) SHA1(b1dc43839e9e3bf788141d58c81e1380a12d582a) )
 
@@ -1904,7 +1904,7 @@ ROM_END
 ROM_START( dblchalv )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "dcv15r.bin", 0x00000, 0x40000, CRC(1e5fc8fd) SHA1(9b688966bd52828fde31003510ee6a2a3444525d) )
-		
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "dcrom2.bin", 0x00000, 0x20000, CRC(ce099327) SHA1(b1dc43839e9e3bf788141d58c81e1380a12d582a) )
 
@@ -1969,7 +1969,7 @@ ROM_END
 ROM_START( robadv2v1 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2av17sh.bin", 0x00000, 0x40000, CRC(fe4a3199) SHA1(d8c8f3d4e399e757b551748435ede1cb6a04ee3b) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "rarom2.bin", 0x00000, 0x40000, CRC(092392cb) SHA1(fd52a0c4f46cb3242bf1b9e35ad5f41cda64010b) )
 
@@ -2001,7 +2001,7 @@ ROM_END
 ROM_START( robadv2v3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2av17lt.bin", 0x00000, 0x40000, CRC(0ebc91fe) SHA1(d64a29e05ce62d662eccb025ea905275eb8806f9) )
-		
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "rarom2.bin", 0x00000, 0x40000, CRC(092392cb) SHA1(fd52a0c4f46cb3242bf1b9e35ad5f41cda64010b) )
 
@@ -2017,7 +2017,7 @@ ROM_END
 ROM_START( robadv2v4 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2av17e.bin", 0x00000, 0x40000, CRC(81166cbd) SHA1(a2751752a95cac5181311af867457cac48854283) )
-		
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "rarom2.bin", 0x00000, 0x40000, CRC(092392cb) SHA1(fd52a0c4f46cb3242bf1b9e35ad5f41cda64010b) )
 
@@ -2033,7 +2033,7 @@ ROM_END
 ROM_START( robadv2d )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2ad17lt.bin", 0x00000, 0x40000, CRC(e0ea8ce9) SHA1(cf6a58d1cc654c41ae245f26fff6b26483bc01ce) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "rarom2.bin", 0x00000, 0x40000, CRC(092392cb) SHA1(fd52a0c4f46cb3242bf1b9e35ad5f41cda64010b) )
 
@@ -2068,7 +2068,7 @@ ROM_START( pirpok2b )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p3rom2.bin", 0x00000, 0x20000, CRC(db6182e4) SHA1(65f05247629d5a1f37bf179f468acf8420342d2c) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "p3rom3.bin", 0x00000, 0x80000, CRC(34d3e6c5) SHA1(1d89677605188f135c8dbbc2ab20510cae7548fe) )
 	ROM_LOAD16_BYTE( "p3rom4.bin", 0x00001, 0x80000, CRC(3861b5fb) SHA1(72f085a1fd951919f479e5c6984304f7bbddc054) )
@@ -2081,7 +2081,7 @@ ROM_END
 ROM_START( pirpok2d )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3pd22r.bin", 0x00000, 0x40000, CRC(10262317) SHA1(561088d1ace055cd568d667f690e95fc9ee3fed3) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p3rom2.bin", 0x00000, 0x20000, CRC(db6182e4) SHA1(65f05247629d5a1f37bf179f468acf8420342d2c) )
 
@@ -2113,7 +2113,7 @@ ROM_END
 ROM_START( pirpok2v2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3pv24e.bin", 0x00000, 0x40000, CRC(0e77fb66) SHA1(732f9c160682dcfb6839c0ad28dfe7e4899e693c) )
-	
+
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "p3rom2.bin", 0x00000, 0x20000, CRC(db6182e4) SHA1(65f05247629d5a1f37bf179f468acf8420342d2c) )
 
@@ -2126,7 +2126,7 @@ ROM_START( pirpok2v2 )
 	ROM_LOAD16_BYTE( "p3rom6.bin", 0x00001, 0x80000, CRC(d990cbb8) SHA1(6f822e38bf401b2eb0b2e36f3b4fc6822fafd3fa) )
 ROM_END
 
-    
+
 
 ROM_START( fcnudge )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
@@ -2163,7 +2163,7 @@ ROM_END
 ROM_START( fruitcar2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcb20n.bin", 0x00000, 0x40000, CRC(f8de6fe2) SHA1(ff47b3f467e701897471b6aa912c086019d9ee6a) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -2179,7 +2179,7 @@ ROM_END
 ROM_START( fruitcar3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcd20n.bin", 0x00000, 0x40000, CRC(64c6a5cc) SHA1(dadc22ef7c2415c269619f63bca7761775eacf74) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "abrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -2340,7 +2340,7 @@ ROM_END
 ROM_START( sfruitbv )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv25r.bin", 0x00000, 0x40000, CRC(beb1ee59) SHA1(d6f72d66085309f33965640b25c788657eee01e1) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -2356,7 +2356,7 @@ ROM_END
 ROM_START( sfruitbv2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv25e.bin", 0x00000, 0x40000, CRC(a9c7edba) SHA1(f860b1077a9a12ff49e2dea0aac888e210787327) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -2372,7 +2372,7 @@ ROM_END
 ROM_START( sfruitbv3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv22eb.bin", 0x00000, 0x40000,  CRC(64d31a39) SHA1(cd2fc75b8d16e444796c52255de298b3b52e40e6) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -2388,7 +2388,7 @@ ROM_END
 ROM_START( sfruitbv4 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv22b.bin", 0x00000, 0x40000,  CRC(ec0e8486) SHA1(249b8ecada6b7c0b3e16baa614620af80d7d8c6e) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -2404,7 +2404,7 @@ ROM_END
 ROM_START( sfruitbv5 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv20lt.bin", 0x00000, 0x40000, CRC(63560472) SHA1(14446f2d8fd0314ca00478159cbb0507ac096e34) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "sfbrom2.bin", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
 
@@ -2486,7 +2486,7 @@ ROM_END
 ROM_START( fb2genv )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2gv18r.bin", 0x00000, 0x40000, CRC(c827362b) SHA1(3a407d8f009666cc80d1588d034ed135e18ec34b) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
 
@@ -2521,7 +2521,7 @@ ROM_START( fb2genv3 )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb2grom3.bin", 0x00000, 0x80000, CRC(21ade753) SHA1(ca70ab941740983626f4d274aa4a9edea366f38a) )
 	ROM_LOAD16_BYTE( "fb2grom4.bin", 0x00001, 0x80000, CRC(56605a08) SHA1(09022dc797dd824a973c5126cafe7b086a94184c) )
@@ -2537,7 +2537,7 @@ ROM_START( fb2gend )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb2grom3.bin", 0x00000, 0x80000, CRC(21ade753) SHA1(ca70ab941740983626f4d274aa4a9edea366f38a) )
 	ROM_LOAD16_BYTE( "fb2grom4.bin", 0x00001, 0x80000, CRC(56605a08) SHA1(09022dc797dd824a973c5126cafe7b086a94184c) )
@@ -2631,7 +2631,7 @@ ROM_END
 ROM_START( fb2ndv2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2ev18lt.bin", 0x00000, 0x40000, CRC(b59418b9) SHA1(8d45709176db09d052a26d57f41bc18d78632ad0) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
 
@@ -2647,7 +2647,7 @@ ROM_END
 ROM_START( fb2ndd )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2ed18r.bin", 0x00000, 0x40000, CRC(48a4dbcd) SHA1(e1a2163be6345983d05b1931b5619678f025d667) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
 
@@ -2663,7 +2663,7 @@ ROM_END
 ROM_START( fb2ndd2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2ed18lt.bin", 0x00000, 0x40000, CRC(3c469121) SHA1(0a694ff77dd2f797acf5889a8773bb798f64f11b) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb2grom2.bin", 0x00000, 0x40000, CRC(1cbbd43a) SHA1(6e31c3bdd677d9d3cb445294cf17a0efcb16d4ed) )
 
@@ -2700,7 +2700,7 @@ ROM_START( fb4a )
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
 	ROM_REGION( 0x040000, "debugram", ROMREGION_ERASE00 )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
@@ -2713,15 +2713,15 @@ ROM_END
 ROM_START( fb4b )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4b15lt.bin", 0x00000, 0x40000, CRC(480651c3) SHA1(3ac434070b00c04eda9c78209e1c6e21fd488287) )
-   	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
-	
-	
+
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
@@ -2730,50 +2730,50 @@ ROM_END
 ROM_START( fb4b2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4b15r.bin", 0x00000, 0x40000, CRC(511a1c54) SHA1(7b554be602e74088ca4ab90a0b10965dc30b18ab) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
-	
-	
+
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
-	
+
 ROM_END
 
 ROM_START( fb4v )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4v15r.bin", 0x00000, 0x40000, CRC(891f119f) SHA1(1823826cd958a951a930b9a1a23f7cf092ed6ab2) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
-	
-	
+
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
-	
+
 ROM_END
 
 ROM_START( fb4v2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4v15lt.bin", 0x00000, 0x40000, CRC(d1cf9bd8) SHA1(59b1507e2d37eef8bea8d07194465506a52e7286))
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
-	
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
@@ -2782,14 +2782,14 @@ ROM_END
 ROM_START( fb4v3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4v15e.bin", 0x00000, 0x40000, CRC(b28db56e) SHA1(b14c0b62fc1c3195ee3703b5500f5a36a2cde3e2) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
-		
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3e.bin", 0x00000, 0x80000, CRC(d47d9969) SHA1(172771896b9ac75c34ae4c9958e26ba30371bdde) )
 	ROM_LOAD16_BYTE( "fb4rom4e.bin", 0x00001, 0x80000, CRC(680fc5d1) SHA1(92d46b72584d2bc906901d7e7f44c017995ef2c0) )
-		
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5e.bin", 0x00000, 0x80000, CRC(ddc02e07) SHA1(b1cce95ab09822646c835b066d4510a51633d107) )
 	ROM_LOAD16_BYTE( "fb4rom6e.bin", 0x00001, 0x80000, CRC(e3de53a4) SHA1(3168ec7e10eee205655ee259fb5ba7201d7eb711) )
@@ -2798,15 +2798,15 @@ ROM_END
 ROM_START( fb4d )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4d15r.bin", 0x00000, 0x40000, CRC(aeed6133) SHA1(8658708fbfd7f662f72a30a3f37baca98e931589) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
-	
-	
+
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
@@ -2815,15 +2815,15 @@ ROM_END
 ROM_START( fb4d2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4d15lt.bin", 0x00000, 0x40000,  CRC(41b0177b) SHA1(9fc74f54a21fb2846e9f818e9b9714643cad0295) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
-	
-	
+
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
@@ -2832,15 +2832,15 @@ ROM_END
 ROM_START( fb4c )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4c15r.bin", 0x00000, 0x40000, CRC(f50ce62f) SHA1(7a1c37f42da0506ff3bcebcd587f0105004b47e2) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
-	
-	
+
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
@@ -2849,15 +2849,15 @@ ROM_END
 ROM_START( fb4c2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4c15lt.bin", 0x00000, 0x40000, CRC(280a0d31) SHA1(dba0dc3f14f08f8045934acd85cb549ca4292808) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb4rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
-	
-	
+
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
@@ -3336,8 +3336,8 @@ ROM_END
 
 ROM_START( pir2001v )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
-	ROM_LOAD( "pi1v25r.bin", 0x00000, 0x40000, CRC(666207ea) SHA1(0d1fbd10aa85d4e5b8072266ce52b535b275fc5a) )	
-	
+	ROM_LOAD( "pi1v25r.bin", 0x00000, 0x40000, CRC(666207ea) SHA1(0d1fbd10aa85d4e5b8072266ce52b535b275fc5a) )
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "piratrom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3353,7 +3353,7 @@ ROM_END
 ROM_START( pir2001v2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1v25e.bin", 0x00000, 0x40000, CRC(0440d844) SHA1(14f62aee8cb56cdfa399b8052181f60fcbcedbba) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "piratrom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3369,7 +3369,7 @@ ROM_END
 ROM_START( pir2001v3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1v24xt.bin", 0x00000, 0x40000, CRC(bc69b7e2) SHA1(bb4fc3ce17a9e97823bd9801fa549e5ddba6787d) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "piratrom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3385,7 +3385,7 @@ ROM_END
 ROM_START( pir2001d )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1d25r.bin", 0x00000, 0x40000, CRC(579a753e) SHA1(82d70362c22d4a4f4836f1e10effdc05041bd425) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "piratrom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3401,7 +3401,7 @@ ROM_END
 ROM_START( pir2001d2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1d24xt.bin", 0x00000, 0x40000,CRC(0e3e68ed) SHA1(a0e007a1f905dd6e7ba6a8202c9e21893ff819e3) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "piratrom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3466,7 +3466,7 @@ ROM_END
 ROM_START( pir2002b2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2b19xt.bin", 0x00000, 0x40000, CRC(c9eed644) SHA1(6cd40196bdd8e84738c970198e770f87964aab5d) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3482,7 +3482,7 @@ ROM_END
 ROM_START( pir2002b3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2b20r.bin", 0x00000, 0x40000,  CRC(4b2e45c0) SHA1(b96ba54034a0e61d53e317559bfe83f337e63618) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3498,12 +3498,12 @@ ROM_END
 ROM_START( pir2002v )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2v20r.bin", 0x00000, 0x40000,  CRC(e4155252) SHA1(136ac929633bc6ee759285dcdb725aaaf7cdf225) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
 
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "pirom3.bin", 0x00000, 0x80000, CRC(ad175fea) SHA1(07585fcb0d4828fb2b99bebfe583e54a835636ed) )
 	ROM_LOAD16_BYTE( "pirom4.bin", 0x00001, 0x80000, CRC(a94061ec) SHA1(2c3b37a1144a873f0b4b884cbeb938947270f5a3) )
@@ -3516,7 +3516,7 @@ ROM_END
 ROM_START( pir2002v2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2v20e.bin", 0x00000, 0x40000,  CRC(208fec36) SHA1(779f87cb436e7d59b6c410921b030430020577ec) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3532,7 +3532,7 @@ ROM_END
 ROM_START( pir2002v3 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2v19xt.bin", 0x00000, 0x40000, CRC(0ef73818) SHA1(7d1c856c78f4d7b36f318725de3dffb5ad9279fe) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3548,8 +3548,8 @@ ROM_END
 ROM_START( pir2002d )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2d20r.bin", 0x00000, 0x40000,  CRC(83a264c4) SHA1(7de1902f5b63d6c44df5726c450ff21b5d911ec4) )
-		
-	
+
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3565,7 +3565,7 @@ ROM_END
 ROM_START( pir2002d2 )
 	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2d19xt.bin", 0x00000, 0x40000, CRC(1c045c9a) SHA1(dd3c6d2c1f084b4af262e52339d0c25c7e733b70) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
 
@@ -3711,8 +3711,8 @@ ROM_START( seawld )
 	ROM_LOAD( "swd16r.bin", 0x00000, 0x80000, CRC(081c84c1) SHA1(5f0d40c38ca26d3633cfe4c7ead2773a1dcc177d) )
 
 	ROM_REGION( 0x010000, "debugram", ROMREGION_ERASE00 ) /* DEBUG */
-	
-	
+
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "swrom2.bin", 0x00000, 0x40000, CRC(e1afe0ad) SHA1(097233255b486944b79a8504b4312173ab1aad06) )
 
@@ -3857,7 +3857,7 @@ ROM_END
 
 //ROM_REGION( 0x80000, "user1", 0 ) /* Z80 Code */
 //ROM_LOAD( "dummy.rom", 0x00000, 0x40000, CRC(1) SHA1(1) )
-	
+
 static DRIVER_INIT( sfbonus_common)
 {
 	sfbonus_tilemap_ram = auto_malloc(0x4000);
@@ -3878,7 +3878,7 @@ static DRIVER_INIT( sfbonus_common)
 	// hack, because the debugger is broken
 	sfbonus_videoram = memory_region(machine,"debugram");
 	if (!sfbonus_videoram) sfbonus_videoram = auto_malloc(0x10000);
-	
+
 
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
 
@@ -4971,7 +4971,7 @@ static DRIVER_INIT(anibonus3)
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
 }
-  
+
 static DRIVER_INIT(fruitcar2)
 {
 	int i;
@@ -5047,7 +5047,7 @@ static DRIVER_INIT(moneymacv)
 	DRIVER_INIT_CALL(sfbonus_common);
 }//
 
-  
+
 static DRIVER_INIT(moneymacd)
 {
 	int i;
@@ -5096,7 +5096,7 @@ static DRIVER_INIT(pirpok2d)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-}// 
+}//
 
 static DRIVER_INIT(pirpok2v)
 {
@@ -5172,7 +5172,7 @@ static DRIVER_INIT(dblchald)
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
 }
- 
+
 static DRIVER_INIT(dblchalv)
 {
 	int i;
@@ -5196,8 +5196,8 @@ static DRIVER_INIT(dblchalv)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} // 
-  
+} //
+
 static DRIVER_INIT(abnudged)
 {
 	int i;
@@ -5222,8 +5222,8 @@ static DRIVER_INIT(abnudged)
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
 }
-  
-  
+
+
 static DRIVER_INIT(abnudgev)
 {
 	int i;
@@ -5248,7 +5248,7 @@ static DRIVER_INIT(abnudgev)
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
 }
-  
+
 static DRIVER_INIT(pickwind)
 {
 	int i;
@@ -5272,8 +5272,8 @@ static DRIVER_INIT(pickwind)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} // 
-  
+} //
+
 static DRIVER_INIT(pickwinv)
 {
 	int i;
@@ -5297,9 +5297,9 @@ static DRIVER_INIT(pickwinv)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
- 
- 
+}
+
+
 static DRIVER_INIT(pickwinv2)
 {
 	int i;
@@ -5323,7 +5323,7 @@ static DRIVER_INIT(pickwinv2)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(anithuntd)
 {
@@ -5373,8 +5373,8 @@ static DRIVER_INIT(anithuntv)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-}  // 
- 
+}  //
+
 static DRIVER_INIT(anibonusd)
 {
 	int i;
@@ -5398,7 +5398,7 @@ static DRIVER_INIT(anibonusd)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(anibonusv)
 {
@@ -5423,7 +5423,7 @@ static DRIVER_INIT(anibonusv)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(anibonusv3)
 {
@@ -5473,7 +5473,7 @@ static DRIVER_INIT(hldspin1d)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
  static DRIVER_INIT(hldspin1v)
 {
@@ -5488,7 +5488,7 @@ static DRIVER_INIT(hldspin1d)
 		{
 			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
 			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; 
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
 			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
 			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
@@ -5498,9 +5498,9 @@ static DRIVER_INIT(hldspin1d)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
-    
+
 static DRIVER_INIT(parrot3d)
 {
 	int i;
@@ -5539,7 +5539,7 @@ static DRIVER_INIT(parrot3v)
 		{
 			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
 			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
 			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
@@ -5549,7 +5549,7 @@ static DRIVER_INIT(parrot3v)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(parrot3v2)
 {
@@ -5574,7 +5574,7 @@ static DRIVER_INIT(parrot3v2)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(sfruitbd)
 {
@@ -5589,7 +5589,7 @@ static DRIVER_INIT(sfruitbd)
 		{
 			case 0: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
 			case 1: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
 			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
@@ -5599,7 +5599,7 @@ static DRIVER_INIT(sfruitbd)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(sfruitbv)
 {
@@ -5624,7 +5624,7 @@ static DRIVER_INIT(sfruitbv)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-}  
+}
 
 static DRIVER_INIT(sfruitbv2)
 {
@@ -5639,7 +5639,7 @@ static DRIVER_INIT(sfruitbv2)
 		{
 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
 			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x25, 2,1,0,7,6,5,4,3); break; 
+			case 2: x = BITSWAP8(x^0x25, 2,1,0,7,6,5,4,3); break;
 			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
 			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
@@ -5649,8 +5649,8 @@ static DRIVER_INIT(sfruitbv2)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
-  
+}
+
 static DRIVER_INIT(sfbonusd)
 {
 	int i;
@@ -5674,8 +5674,8 @@ static DRIVER_INIT(sfbonusd)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
-  
+}
+
 static DRIVER_INIT(sfbonusv)
 {
 	int i;
@@ -5700,7 +5700,7 @@ static DRIVER_INIT(sfbonusv)
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
 }
-  
+
 static DRIVER_INIT(fb2ndv)
 {
 	int i;
@@ -5714,7 +5714,7 @@ static DRIVER_INIT(fb2ndv)
 		{
 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
 			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3a, 2,1,7,6,5,4,3,0); break;
 			case 5: x = BITSWAP8(x^0xec, 0,7,6,5,4,3,2,1); break;
@@ -5724,8 +5724,8 @@ static DRIVER_INIT(fb2ndv)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-}     
-  
+}
+
 static DRIVER_INIT(fb2ndd)
 {
 	int i;
@@ -5739,7 +5739,7 @@ static DRIVER_INIT(fb2ndd)
 		{
 			case 0: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
 			case 1: x = BITSWAP8(x^0xeb, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xad, 4,3,0,1,2,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
 			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,1,0); break;
@@ -5749,7 +5749,7 @@ static DRIVER_INIT(fb2ndd)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-}     
+}
 
 static DRIVER_INIT(robadv2v1)
 {
@@ -5774,8 +5774,8 @@ static DRIVER_INIT(robadv2v1)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
- 
+}
+
 static DRIVER_INIT(robadv2v4)
 {
 	int i;
@@ -5799,7 +5799,7 @@ static DRIVER_INIT(robadv2v4)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(robadv2d)
 {
@@ -5824,7 +5824,7 @@ static DRIVER_INIT(robadv2d)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(hldspin2d)
 {
@@ -5839,7 +5839,7 @@ static DRIVER_INIT(hldspin2d)
 		{
 			case 0: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
 			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3e, 0,2,7,6,5,4,3,1); break;
 			case 5: x = BITSWAP8(x^0xeb, 1,7,6,5,4,3,0,2); break;
@@ -5864,7 +5864,7 @@ static DRIVER_INIT(hldspin2v)
 		{
 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
 			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
 			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
@@ -5924,7 +5924,7 @@ static DRIVER_INIT(tighookv2)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(tighookd)
 {
@@ -5939,7 +5939,7 @@ static DRIVER_INIT(tighookd)
 		{
 			case 0: x = BITSWAP8(x^0x3d, 0,1,7,6,5,4,3,2); break;
 			case 1: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x26, 2,1,0,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x26, 2,1,0,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
 			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
@@ -5949,7 +5949,7 @@ static DRIVER_INIT(tighookd)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(pir2001v)
 {
@@ -5974,7 +5974,7 @@ static DRIVER_INIT(pir2001v)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(pir2001v2)
 {
@@ -5989,7 +5989,7 @@ static DRIVER_INIT(pir2001v2)
 		{
 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
 			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x39, 1,0,7,6,5,4,3,2); break;
 			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
@@ -6015,7 +6015,7 @@ static DRIVER_INIT(pir2001d)
 		{
 			case 0: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
 			case 1: x = BITSWAP8(x^0xeb, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3e, 0,2,7,6,5,4,3,1); break;
 			case 5: x = BITSWAP8(x^0xeb, 1,7,6,5,4,3,0,2); break;
@@ -6053,7 +6053,7 @@ static DRIVER_INIT(pir2002d)
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
 }
- 
+
 static DRIVER_INIT(pir2002v)
 {
 	int i;
@@ -6067,7 +6067,7 @@ static DRIVER_INIT(pir2002v)
 		{
 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
 			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,0,1,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x23, 2,0,1,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
 			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
@@ -6093,7 +6093,7 @@ static DRIVER_INIT(pir2002v2)
 		{
 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
 			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x26, 2,0,1,7,6,5,4,3); break; // 
+			case 2: x = BITSWAP8(x^0x26, 2,0,1,7,6,5,4,3); break; //
 			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
 			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
@@ -6130,7 +6130,7 @@ static DRIVER_INIT(fb2genv)
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
 }
- 
+
 static DRIVER_INIT(fb2genv3)
 {
 	int i;
@@ -6154,8 +6154,8 @@ static DRIVER_INIT(fb2genv3)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
-     
+}
+
 static DRIVER_INIT(fb2gend)
 {
 	int i;
@@ -6179,7 +6179,7 @@ static DRIVER_INIT(fb2gend)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(fb4d)
 {
@@ -6204,7 +6204,7 @@ static DRIVER_INIT(fb4d)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(fb4v)
 {
@@ -6229,7 +6229,7 @@ static DRIVER_INIT(fb4v)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(fb4v3)
 {
@@ -6270,7 +6270,7 @@ static DRIVER_INIT(fb5)
 		{
 			case 0: x = BITSWAP8(x^0x20, 0,3,7,6,5,1,4,2); break;
 			case 1: x = BITSWAP8(x^0xf1, 1,7,6,5,3,2,4,0); break;
-			case 2: x = BITSWAP8(x^0x33, 2,3,1,7,6,5,0,4); break; // 
+			case 2: x = BITSWAP8(x^0x33, 2,3,1,7,6,5,0,4); break; //
 			case 3: x = BITSWAP8(x^0xaf, 2,0,1,4,3,7,6,5); break;
 			case 4: x = BITSWAP8(x^0x2d, 2,4,7,6,5,1,0,3); break;
 			case 5: x = BITSWAP8(x^0xfb, 4,7,6,5,1,0,3,2); break;
@@ -6280,7 +6280,7 @@ static DRIVER_INIT(fb5)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-}  
+}
 
 static DRIVER_INIT(fb5d)
 {
@@ -6305,7 +6305,7 @@ static DRIVER_INIT(fb5d)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-}  
+}
 
 static DRIVER_INIT(fb5v)
 {
@@ -6356,7 +6356,7 @@ static DRIVER_INIT(fb6)
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
 }
- 
+
 
 
  static DRIVER_INIT(fb6d)
@@ -6407,7 +6407,7 @@ static DRIVER_INIT(fb6v)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 static DRIVER_INIT(fb6v3)
 {
@@ -6432,7 +6432,7 @@ static DRIVER_INIT(fb6v3)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-}   
+}
 
 static DRIVER_INIT(fb6s)
 {
@@ -6607,7 +6607,7 @@ static DRIVER_INIT(dvisland)
 		ROM[i] = x;
 	}
 	DRIVER_INIT_CALL(sfbonus_common);
-} 
+}
 
 
 static DRIVER_INIT(funriver)
@@ -6660,17 +6660,17 @@ static DRIVER_INIT(funriverv)
 	DRIVER_INIT_CALL(sfbonus_common);
 }
 #endif
-  
-  
+
+
 /*
-			case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-			case 1: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-			case 2: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-			case 3: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-			case 4: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-			case 5: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-			case 6: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-			case 7: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+            case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+            case 1: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+            case 2: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+            case 3: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+            case 4: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+            case 5: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+            case 6: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+            case 7: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
 
 */
 

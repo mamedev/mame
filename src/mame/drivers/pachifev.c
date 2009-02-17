@@ -9,7 +9,7 @@ XTAL:12.000MHZ
 RY050012   (TEXAS INSTRUMENTS)
 XTAL:10.738MHZ
 
-SOUND	:MSM5205 & ?
+SOUND   :MSM5205 & ?
 
 DIP SWITCH:8BIT x 3
 
@@ -71,7 +71,7 @@ static void pf_adpcm_int(const device_config *device)
 		{
 			adpcm_pos++;
 			//if((ROM[adpcm_pos] & 0xff) == 0xff)
-			//	adpcm_idle = 1;
+			//  adpcm_idle = 1;
 		}
 	}
 }
@@ -93,8 +93,8 @@ static MACHINE_DRIVER_START( pachifev )
 	MDRV_CPU_ADD("main",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(pachifev_map,0)
 	MDRV_CPU_IO_MAP(pachifev_io,0)
-//	MDRV_CPU_FLAGS(CPU_DISABLE)
-//	MDRV_CPU_VBLANK_INT("main",irq0_line_hold)
+//  MDRV_CPU_FLAGS(CPU_DISABLE)
+//  MDRV_CPU_VBLANK_INT("main",irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

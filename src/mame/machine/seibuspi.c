@@ -189,9 +189,9 @@ rdft2
 
 CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00000000 & 0000FFFF
 CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000ABCB & 0000FFFF // okok
-CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000ABCB & 0000FFFF	// duplicate
-CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00006543 & 0000FFFF	// okok
-CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 000021D9 & 0000FFFF	// ok??
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000ABCB & 0000FFFF // duplicate
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00006543 & 0000FFFF // okok
+CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 000021D9 & 0000FFFF // ok??
 CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00006655 & 0000FFFF // okok
 CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 000099AA & 0000FFFF // okok
 CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00006655 & 0000FFFF // duplicate
@@ -201,8 +201,8 @@ CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000
 CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 00005237 & 0000FFFF // okok
 CPU 'main' (PC=002A0709): unmapped program memory dword write to 0000054C = 0000A948 & 0000FFFF // okok
 
-		plane54   = partial_carry_sum16( plane54, 0xabcb, 0x55aa ) ^ 0x6699;
-		plane3210 = partial_carry_sum32( plane3210, 0x654321d9 ^ 0x42, 0x1d463748 ) ^ 0x0ca352a9;
+        plane54   = partial_carry_sum16( plane54, 0xabcb, 0x55aa ) ^ 0x6699;
+        plane3210 = partial_carry_sum32( plane3210, 0x654321d9 ^ 0x42, 0x1d463748 ) ^ 0x0ca352a9;
 
 ******************************************************************************************/
 

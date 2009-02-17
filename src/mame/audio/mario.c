@@ -22,7 +22,7 @@
 /* as connected to +5V on schematics. This does not match      */
 /* recordings                                                  */
 
-#define RUN_VCO_VOLTAGE		(0.0)	/* 5 in schematics */	
+#define RUN_VCO_VOLTAGE		(0.0)	/* 5 in schematics */
 
 #define USE_8039	(0)			/* set to 1 to try 8039 hack */
 
@@ -144,7 +144,7 @@
 /************************************************************************
  *
  * Custom mario run
- * 
+ *
  * Two VCO with XOR'd signal
  *
  * input[0]    - Enable / Amplitude
@@ -160,14 +160,14 @@
  *             C1                  |
  *            -||-                 |
  *           |    |                 -- +---
- *           ------          ---       |AND|    R1               
- *  In1 >---+   Y1 +--------+   |      |(*)+---ZZZ--+------> Out 
- *          |      |        |XOR+------+---         |            
- *          |      |     ---+   |                   | 
+ *           ------          ---       |AND|    R1
+ *  In1 >---+   Y1 +--------+   |      |(*)+---ZZZ--+------> Out
+ *          |      |        |XOR+------+---         |
+ *          |      |     ---+   |                   |
  *          |      |    |    ---                   ---
  *  In2 >---+   Y2 +----                           --- C3
- *           ------                                 |    
- *           |    |                                Gnd   
+ *           ------                                 |
+ *           |    |                                Gnd
  *            -||-
  *             C2
  ************************************************************************/
@@ -196,10 +196,10 @@ static DISCRETE_STEP( mario_custom_run )
 	double	t2	= 0.5 / LS624_F(MARIO_CUSTOM_C2, MARIO_CUSTOM_IN2, RUN_VCO_VOLTAGE);
 	double  sample_t = discrete_current_context->sample_time;
 	double  vn, t;
-	
+
 	//if (MARIO_CUSTOM_VOUT)
-	//	printf("%f %f %f %f\n", MARIO_CUSTOM_IN1, MARIO_CUSTOM_IN2, 0.5 / t1, 0.5 / t2);
-	while (sample_t > 0.0f) 
+	//  printf("%f %f %f %f\n", MARIO_CUSTOM_IN1, MARIO_CUSTOM_IN2, 0.5 / t1, 0.5 / t2);
+	while (sample_t > 0.0f)
 	{
 		/* state before time advance */
 		vn = (double) (context->state1 ^ context->state2);
@@ -240,7 +240,7 @@ static DISCRETE_STEP( mario_custom_run )
 				sample_t = 0.0f;
 			}
 		}
-		
+
 		context->vc3 += (vn - context->vc3) * (1.0 - exp(- t / (MARIO_CUSTOM_R1 * MARIO_CUSTOM_C3)));
 	}
 	node->output[0] = context->vc3;
@@ -284,7 +284,7 @@ static DISCRETE_SOUND_START(mario)
 
 	DISCRETE_LS123(NODE_10, DS_SOUND0_INV, MR_R17, CAP_AGE(MR_C14, 0.7))
 	DISCRETE_RCFILTER(NODE_11, 1, NODE_10, MR_R6, CAP_AGE(MR_C3, 0.5) )
-	DISCRETE_CUSTOM7(NODE_12, NODE_10, NODE_11, NODE_11, MR_C6, MR_C17, 
+	DISCRETE_CUSTOM7(NODE_12, NODE_10, NODE_11, NODE_11, MR_C6, MR_C17,
 			MR_MIXER_RPAR, MR_C31, &mario_custom_run_info)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND0, 1, NODE_12, MR_MIXER_RPAR / MR_R20)
 
@@ -294,7 +294,7 @@ static DISCRETE_SOUND_START(mario)
 
 	DISCRETE_LS123(NODE_20, DS_SOUND1_INV, MR_R18, CAP_AGE(MR_C15, 0.7))
 	DISCRETE_RCFILTER(NODE_21, 1, NODE_20, MR_R7, CAP_AGE(MR_C4, 0.5) )
-	DISCRETE_CUSTOM7(NODE_22, NODE_20, NODE_21, NODE_21, MR_C5, MR_C16, 
+	DISCRETE_CUSTOM7(NODE_22, NODE_20, NODE_21, NODE_21, MR_C5, MR_C16,
 		MR_MIXER_RPAR, MR_C31, &mario_custom_run_info)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND1, 1, NODE_22, MR_MIXER_RPAR / MR_R19)
 
@@ -332,7 +332,7 @@ static DISCRETE_SOUND_START(mario)
 
 	DISCRETE_MULTIPLY(NODE_170, 1, DS_DAC, TTL_HIGH/256.0)
 	DISCRETE_RCFILTER(NODE_171, 1, NODE_170, RES_K(750), CAP_P(200))
-	
+
 	DISCRETE_MULTIPLY(NODE_172, 1, NODE_171, MR_MIXER_RPAR / MR_R40)
 	DISCRETE_RCFILTER(DS_OUT_DAC, 1, NODE_172, MR_MIXER_RPAR, MR_C31)
 

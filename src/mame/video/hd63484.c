@@ -1404,8 +1404,8 @@ static int regno;
 
 READ16_HANDLER( HD63484_status_r )
 {
-//	if (cpu_get_pc(space->cpu) != 0xfced6 && cpu_get_pc(space->cpu) != 0xfe1d6)
-//		logerror("%05x: HD63484 status read\n",cpu_get_pc(space->cpu));
+//  if (cpu_get_pc(space->cpu) != 0xfced6 && cpu_get_pc(space->cpu) != 0xfe1d6)
+//      logerror("%05x: HD63484 status read\n",cpu_get_pc(space->cpu));
 
 	return 0xff22|(mame_rand(space->machine) & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
 }

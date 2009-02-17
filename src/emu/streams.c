@@ -412,7 +412,7 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 
 
 /*-------------------------------------------------
-    stream_device_output_to_stream_output - 
+    stream_device_output_to_stream_output -
     convert a device/output pair to a stream/
     output pair
 -------------------------------------------------*/
@@ -439,7 +439,7 @@ int stream_device_output_to_stream_output(const device_config *device, int outpu
 
 
 /*-------------------------------------------------
-    stream_device_input_to_stream_input - 
+    stream_device_input_to_stream_input -
     convert a device/input pair to a stream/
     input pair
 -------------------------------------------------*/
@@ -604,7 +604,7 @@ attotime stream_get_sample_period(sound_stream *stream)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    stream_get_device_outputs - return the total 
+    stream_get_device_outputs - return the total
     number of outputs for the given device
 -------------------------------------------------*/
 

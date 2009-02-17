@@ -438,7 +438,7 @@ static MACHINE_DRIVER_START( shangkid )
 
 	/* video hardware */
 	MDRV_GFXDECODE(shangkid)
-	
+
 	MDRV_SOUND_MODIFY("ay")
 	MDRV_SOUND_CONFIG(shangkid_ay8910_interface)
 MACHINE_DRIVER_END

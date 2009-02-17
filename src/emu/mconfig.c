@@ -32,7 +32,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 ***************************************************************************/
 
 /*-------------------------------------------------
-    remove_device - remove the head device from 
+    remove_device - remove the head device from
     the given configuration
 -------------------------------------------------*/
 
@@ -40,7 +40,7 @@ INLINE void remove_device(device_config **listheadptr, device_type type, const c
 {
 	device_config *device = (device_config *)device_list_find_by_tag(*listheadptr, type, tag);
 	device_custom_config_func custom;
-	
+
 	assert(device != NULL);
 
 	/* call the custom config free function first */
@@ -162,7 +162,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				assert(device != NULL);
 				device->static_config = TOKEN_GET_PTR(tokens, voidptr);
 				break;
-			
+
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_1:
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_2:
 			case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_3:

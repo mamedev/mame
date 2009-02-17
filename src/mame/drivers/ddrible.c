@@ -104,7 +104,7 @@ static READ8_DEVICE_HANDLER( ddrible_vlm5030_busy_r )
 static WRITE8_DEVICE_HANDLER( ddrible_vlm5030_ctrl_w )
 {
 	UINT8 *SPEECH_ROM = memory_region(device->machine, "vlm");
-	
+
 	/* b7 : vlm data bus OE   */
 	/* b6 : VLM5030-RST       */
 	/* b5 : VLM5030-ST        */

@@ -111,7 +111,7 @@ static UINT8 speech_chip[8];
 static WRITE8_HANDLER( speech_control_w )
 {
 	const device_config *upd;
-	
+
 	strcpy((char *)speech_chip, ( data & 4 ) ? "upd2" : "upd1");
 
 	upd = devtag_get_device(space->machine, SOUND, (char *)speech_chip);

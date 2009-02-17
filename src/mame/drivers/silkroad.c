@@ -379,7 +379,7 @@ ROM_START( silkroad )
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
-	
+
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0xc0000, "oki1", 0 ) /* Samples */

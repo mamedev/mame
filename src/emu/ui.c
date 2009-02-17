@@ -926,13 +926,13 @@ static astring *warnings_string(running_machine *machine, astring *string)
 			astring_catc(string, "The game lacks sound.\n");
 		if (machine->gamedrv->flags & GAME_NO_COCKTAIL)
 			astring_catc(string, "Screen flipping in cocktail mode is not supported.\n");
-			
+
 		/* check if external artwork is present before displaying this warning? */
 		if (machine->gamedrv->flags & GAME_REQUIRES_ARTWORK)
 			astring_catc(string, "The game requires external artwork files\n");
-			
-	
-		
+
+
+
 
 		/* if there's a NOT WORKING or UNEMULATED PROTECTION warning, make it stronger */
 		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))

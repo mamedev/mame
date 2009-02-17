@@ -185,9 +185,9 @@ ADDRESS_MAP_END
 // (see also Model 3):
 static ADDRESS_MAP_START( system_h1_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM
-//	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE(SOUND, "scsp1", scsp_r, scsp_w)
+//  AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE(SOUND, "scsp1", scsp_r, scsp_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
-//	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE(SOUND, "scsp2", scsp_r, scsp_w)
+//  AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE(SOUND, "scsp2", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
 

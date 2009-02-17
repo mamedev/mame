@@ -196,7 +196,7 @@ DEVICE_GET_INFO( ym3438 )
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "YM3438");							break;
-		
+
 		default:										DEVICE_GET_INFO_CALL(ym2612);						break;
 	}
 }

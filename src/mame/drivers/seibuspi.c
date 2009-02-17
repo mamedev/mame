@@ -852,7 +852,7 @@ static WRITE32_HANDLER( ds2404_clk_w )
 static WRITE32_HANDLER( eeprom_w )
 {
 	const device_config *oki2 = devtag_get_device(space->machine, SOUND, "oki2");
-	
+
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
 		rf2_set_layer_banks(data >> 16);

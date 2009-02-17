@@ -58,7 +58,7 @@ FIX:  csk227it has video issues, as after Ability game, bg_tilemap is not reset
     background tilemap.
 
 FIX: PK Tetris have an input named AMUSE which I couldn't map.  Maybe it is
-	necessary for the Amuse game, because I can't understand how to play it.
+    necessary for the Amuse game, because I can't understand how to play it.
 
 *****************************************************************************/
 

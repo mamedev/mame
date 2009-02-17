@@ -96,7 +96,7 @@ void cdda_set_cdrom(const device_config *device, void *file)
 const device_config *cdda_from_cdrom(running_machine *machine, void *file)
 {
 	const device_config *device;
-	
+
 	for (device = sound_first(machine->config); device != NULL; device = sound_next(device))
 		if (sound_get_type(device) == SOUND_CDDA)
 		{
@@ -104,7 +104,7 @@ const device_config *cdda_from_cdrom(running_machine *machine, void *file)
 			if (info->disc == file)
 				return device;
 		}
-	
+
 	return NULL;
 }
 

@@ -342,7 +342,7 @@ READ8_DEVICE_HANDLER( c6280_r )
 WRITE8_DEVICE_HANDLER( c6280_w )
 {
     c6280_t *info = get_safe_token(device);
-	h6280io_set_buffer(info->cpudevice, data); 
+	h6280io_set_buffer(info->cpudevice, data);
 	c6280_write(info, offset, data);
 }
 

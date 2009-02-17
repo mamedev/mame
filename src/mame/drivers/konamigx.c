@@ -1250,7 +1250,7 @@ static READ16_HANDLER(tms57002_status_word_r)
 
 static WRITE16_HANDLER(tms57002_control_word_w)
 {
-	if (ACCESSING_BITS_0_7) 
+	if (ACCESSING_BITS_0_7)
 	{
 		tms57002_pload_w(space->machine->cpu[2], 0, data & 4);
 		tms57002_cload_w(space->machine->cpu[2], 0, data & 8);

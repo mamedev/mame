@@ -646,7 +646,7 @@ static DEVICE_START( k054539 )
 	static const k054539_interface defintrf = { 0 };
 	int i;
 	k054539_state *info = get_safe_token(device);
-	
+
 	info->device = device;
 
 	for (i = 0; i < 8; i++)

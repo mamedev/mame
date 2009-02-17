@@ -63,7 +63,7 @@ static const ssg_callbacks psgintf =
 static void IRQHandler(void *param,int irq)
 {
 	ym2203_state *info = param;
-	if (info->intf->handler != NULL) 
+	if (info->intf->handler != NULL)
 		(*info->intf->handler)(info->device, irq);
 }
 

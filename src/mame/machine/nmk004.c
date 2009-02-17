@@ -95,7 +95,7 @@ static struct
 	UINT8 to_main;		// answer to main CPU
 	int protection_check;
 
-	running_machine *machine;	
+	running_machine *machine;
 	const device_config *ymdevice;
 	const device_config *oki1device;
 	const device_config *oki2device;
@@ -1019,7 +1019,7 @@ static TIMER_CALLBACK( real_nmk004_init )
 	int i;
 
 	memset(&NMK004_state, 0, sizeof(NMK004_state));
-	
+
 	NMK004_state.machine = machine;
 	NMK004_state.ymdevice = devtag_get_device(machine, SOUND, "ym");
 	NMK004_state.oki1device = devtag_get_device(machine, SOUND, "oki1");

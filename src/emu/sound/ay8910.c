@@ -963,7 +963,7 @@ DEVICE_GET_INFO( ymz294 )
  *************************************/
 
 READ8_DEVICE_HANDLER( ay8910_r )
-{ 
+{
 	return ay8910_read_ym(get_safe_token(device));
 }
 

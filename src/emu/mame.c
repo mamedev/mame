@@ -1507,7 +1507,7 @@ static void init_machine(running_machine *machine)
 
 	/* intialize UI input */
 	ui_input_init(machine);
-	
+
 	/* initialize the streams engine before the sound devices start */
 	streams_init(machine);
 

@@ -660,7 +660,7 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 		case 5:
 			ymf278b_C_w(chip, chip->port_C, data);
 			break;
-		
+
 		default:
 			logerror("%s: unexpected write at offset %X to ymf278b = %02X\n", cpuexec_describe_context(device->machine), offset, data);
 			break;

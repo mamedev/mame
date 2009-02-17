@@ -14,7 +14,7 @@ reverb
 interrupts
 *************/
 
-typedef struct _vr0_state vr0_state; 
+typedef struct _vr0_state vr0_state;
 struct _vr0_state
 {
 	UINT32 *TexBase;

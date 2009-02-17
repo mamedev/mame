@@ -1,15 +1,15 @@
 /*
 
-	MPU5
+    MPU5
 
-	Skeleton Driver
-	
-	 -- there are a wide range of titles running on this hardware, the recent ones are said to be encrypted
-	 -- the driver does nothing, and currently only serves to act as a placeholder to document what existed on this hardware
-	 
-	 -- the main CPU is a 68340, which is a 32-bit 680xx variant with modified opcodes etc.
+    Skeleton Driver
 
-	 -- should there be a bios using an 8-bit cpu like MPU4, or is the 68340 the only CPU?
+     -- there are a wide range of titles running on this hardware, the recent ones are said to be encrypted
+     -- the driver does nothing, and currently only serves to act as a placeholder to document what existed on this hardware
+
+     -- the main CPU is a 68340, which is a 32-bit 680xx variant with modified opcodes etc.
+
+     -- should there be a bios using an 8-bit cpu like MPU4, or is the 68340 the only CPU?
 
 */
 
@@ -37,7 +37,7 @@ VIDEO_UPDATE(mpu5)
 static MACHINE_DRIVER_START( mpu5 )
 	MDRV_CPU_ADD("main", M68EC020, 16000000)	 // ?
 	MDRV_CPU_PROGRAM_MAP(mpu5_map,0)
-	
+
 	/* actually non-video? */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

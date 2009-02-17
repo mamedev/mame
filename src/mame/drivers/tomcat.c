@@ -1,23 +1,23 @@
 /*
 
-	Atari Tomcat prototype hardware
+    Atari Tomcat prototype hardware
 
-	Driver by Mariusz Wojcieszek
+    Driver by Mariusz Wojcieszek
 
-	Notes:
-	- game has no sound, while sound hardware was developed, sound program was
-	  not prepared
+    Notes:
+    - game has no sound, while sound hardware was developed, sound program was
+      not prepared
 
-	ToDo:
-	- add proper timing of interrupts and framerate (currently commented out,
-	  as they cause test mode to hang)
-	- vector quality appears to be worse than original game (compared to original
-	  game videos)
-	- verify controls
-	- implement game linking (after MAME supports network)
-	- current implementation of 68010 <-> tms32010 is a little bit hacky, after
-	  tms32010 is started by 68010, 68010 is suspended until tms32010 reads command
-	  and starts executing
+    ToDo:
+    - add proper timing of interrupts and framerate (currently commented out,
+      as they cause test mode to hang)
+    - vector quality appears to be worse than original game (compared to original
+      game videos)
+    - verify controls
+    - implement game linking (after MAME supports network)
+    - current implementation of 68010 <-> tms32010 is a little bit hacky, after
+      tms32010 is started by 68010, 68010 is suspended until tms32010 reads command
+      and starts executing
 
 */
 
@@ -128,26 +128,26 @@ static WRITE16_HANDLER(tomcat_txbuffh_w)
 
 static WRITE16_HANDLER(tomcat_sndresl_w)
 {
-	// Sound Reset Low	     (Address Strobe)
+	// Sound Reset Low       (Address Strobe)
 	// Reset Sound System
 }
 
 static WRITE16_HANDLER(tomcat_sndresh_w)
 {
-	// Sound Reset high	     (Address Strobe)
+	// Sound Reset high      (Address Strobe)
 	// Release reset of sound system
 }
 
 static WRITE16_HANDLER(tomcat_mresl_w)
 {
-	// 320 Reset Low	     (Address Strobe)
+	// 320 Reset Low         (Address Strobe)
 	// Reset TMS320
 	cpu_set_input_line(cputag_get_cpu(space->machine, "dsp"), INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER(tomcat_mresh_w)
 {
-	// 320 Reset high	     (Address Strobe)
+	// 320 Reset high        (Address Strobe)
 	// Release reset of TMS320
 	dsp_BIO = 0;
 	cpu_set_input_line(cputag_get_cpu(space->machine, "dsp"), INPUT_LINE_RESET, CLEAR_LINE);
@@ -162,14 +162,14 @@ static WRITE16_HANDLER(tomcat_irqclr_w)
 static READ16_HANDLER(tomcat_inputs2_r)
 {
 /*
-*		D15	LNKFLAG		(Game Link)
-*		D14	PC3		   "    "
-*		D13	PC2		   "    "
-*		D12	PC0		   "    "
-*		D11	MAINFLAG	(Sound System)
-*		D10	SOUNDFLAG	   "    "
-*		D9	/IDLE*		(TMS320 System)
-*		D8
+*       D15 LNKFLAG     (Game Link)
+*       D14 PC3        "    "
+*       D13 PC2        "    "
+*       D12 PC0        "    "
+*       D11 MAINFLAG    (Sound System)
+*       D10 SOUNDFLAG      "    "
+*       D9  /IDLE*      (TMS320 System)
+*       D8
 */
 	return dsp_idle ? 0 : (1 << 9);
 }
@@ -275,13 +275,13 @@ static WRITE8_HANDLER(soundlatches_w)
 {
 	switch(offset)
 	{
-		case 0x00: break; // XLOAD 0	Write the Sequential ROM counter Low Byte
-		case 0x20: break; // XLOAD 1	Write the Sequential ROM counter High Byte
-		case 0x40: break; // SOUNDWR	Write to Sound Interface Latch (read by Main)
+		case 0x00: break; // XLOAD 0    Write the Sequential ROM counter Low Byte
+		case 0x20: break; // XLOAD 1    Write the Sequential ROM counter High Byte
+		case 0x40: break; // SOUNDWR    Write to Sound Interface Latch (read by Main)
 		case 0x60: break; // unused
-		case 0x80: break; // XREAD		Read the Sequential ROM (64K bytes) and increment the counter
+		case 0x80: break; // XREAD      Read the Sequential ROM (64K bytes) and increment the counter
 		case 0xa0: break; // unused
-		case 0xc0: break; // SOUNDREAD	Read the Sound Interface Latch (written by Main)
+		case 0xc0: break; // SOUNDREAD  Read the Sound Interface Latch (written by Main)
 	}
 }
 
@@ -351,20 +351,20 @@ static const riot6532_interface tomcat_riot6532_intf =
 {
 	NULL,
 /*
-	PA0 = /WS	OUTPUT	(TMS-5220 WRITE STROBE)
-	PA1 = /RS	OUTPUT	(TMS-5220 READ STROBE)
-	PA2 = /READY	INPUT	(TMS-5220 READY FLAG)
-	PA3 = FSEL	OUTPUT	Select TMS5220 clock; 
-			 	0 = 325 KHz (8 KHz sampling)
-			 	1 = 398 KHz (10 KHz sampling)
-	PA4 = /CC1	OUTPUT	Coin Counter 1	
-	PA5 = /CC2	OUTPUT	Coin Counter 2
-	PA6 = /MUSRES 	OUTPUT  (Reset the Yamaha)
-	PA7 = MAINFLAG	INPUT	
+    PA0 = /WS   OUTPUT  (TMS-5220 WRITE STROBE)
+    PA1 = /RS   OUTPUT  (TMS-5220 READ STROBE)
+    PA2 = /READY    INPUT   (TMS-5220 READY FLAG)
+    PA3 = FSEL  OUTPUT  Select TMS5220 clock;
+                0 = 325 KHz (8 KHz sampling)
+                1 = 398 KHz (10 KHz sampling)
+    PA4 = /CC1  OUTPUT  Coin Counter 1
+    PA5 = /CC2  OUTPUT  Coin Counter 2
+    PA6 = /MUSRES   OUTPUT  (Reset the Yamaha)
+    PA7 = MAINFLAG  INPUT
 */
 	NULL,
 	NULL,
-	NULL,	//	PB0 - PB7	OUTPUT	Speech Data
+	NULL,	//  PB0 - PB7   OUTPUT  Speech Data
 	NULL	// connected to IRQ line of 6502
 };
 

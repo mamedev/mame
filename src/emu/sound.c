@@ -289,11 +289,11 @@ static DEVICE_START( sound )
 	{
 		sound_stream *stream = stream_find_by_device(device, outputnum);
 		int curoutput, numoutputs;
-		
+
 		/* stop when we run out of streams */
 		if (stream == NULL)
 			break;
-		
+
 		/* accumulate the number of outputs from this stream */
 		numoutputs = stream_get_outputs(stream);
 		assert(classdata->outputs < MAX_OUTPUTS);
@@ -325,7 +325,7 @@ static DEVICE_START( sound )
 static DEVICE_CUSTOM_CONFIG( sound )
 {
 	sound_config *config = device->inline_config;
-	
+
 	switch (entrytype)
 	{
 		/* custom config 1 is a new route */
@@ -338,7 +338,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 			/* put back the token that was originally fetched so we can grab a packed 64-bit token */
 			TOKEN_UNGET_UINT32(tokens);
 			TOKEN_GET_UINT64_UNPACK4(tokens, entrytype, 8, output, 12, input, 12, gain, 32);
-		
+
 			/* allocate a new route */
 			for (routeptr = &config->routelist; *routeptr != NULL; routeptr = &(*routeptr)->next) ;
 			*routeptr = malloc_or_die(sizeof(**routeptr));
@@ -349,7 +349,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 			(*routeptr)->target = TOKEN_GET_STRING(tokens);
 			break;
 		}
-	
+
 		/* custom config free is also used as a reset of sound routes */
 		case MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE:
 			while (config->routelist != NULL)
@@ -360,7 +360,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 			}
 			break;
 	}
-	
+
 	return tokens;
 }
 
@@ -389,7 +389,7 @@ DEVICE_GET_INFO( sound )
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(sound); 	break;
 		case DEVINFO_FCT_SET_INFO:				info->set_info = NULL;						break;
 		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVICE_CUSTOM_CONFIG_NAME(sound);	break;
-		
+
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:
 			if (config != NULL)
@@ -428,13 +428,13 @@ static void route_sound(running_machine *machine)
 		const sound_config *config = sound->inline_config;
 		int numoutputs = stream_get_device_outputs(sound);
 		const sound_route *route;
-		
+
 		/* iterate over all routes */
 		for (route = config->routelist; route != NULL; route = route->next)
 		{
 			const device_config *target_speaker = devtag_get_device(machine, SPEAKER_OUTPUT, route->target);
 			const device_config *target_sound = devtag_get_device(machine, SOUND, route->target);
-			
+
 			/* if neither found, it's fatal */
 			if (target_speaker == NULL && target_sound == NULL)
 				fatalerror("Sound route \"%s\" not found!\n", route->target);
@@ -444,7 +444,7 @@ static void route_sound(running_machine *machine)
 				get_safe_token(target_speaker)->inputs += (route->output == ALL_OUTPUTS) ? numoutputs : 1;
 		}
 	}
-	
+
 	/* now allocate the mixers and input data */
 	for (curspeak = speaker_output_first(machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
@@ -466,7 +466,7 @@ static void route_sound(running_machine *machine)
 		const sound_config *config = sound->inline_config;
 		int numoutputs = stream_get_device_outputs(sound);
 		const sound_route *route;
-		
+
 		/* iterate over all routes */
 		for (route = config->routelist; route != NULL; route = route->next)
 		{
@@ -499,13 +499,13 @@ static void route_sound(running_machine *machine)
 						if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
 							stream_set_input(speakerinfo->mixer_stream, speakerinfo->inputs++, stream, streamoutput, route->gain);
 					}
-					
+
 					/* otherwise, it's a sound chip */
 					else
 					{
 						sound_stream *inputstream;
 						int streaminput;
-						
+
 						if (stream_device_input_to_stream_input(target_sound, inputnum++, &inputstream, &streaminput))
 							if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
 								stream_set_input(inputstream, streaminput, stream, streamoutput, route->gain);
@@ -514,7 +514,7 @@ static void route_sound(running_machine *machine)
 		}
 	}
 
-	/* free up our temporary string */	
+	/* free up our temporary string */
 	astring_free(tempstring);
 }
 
@@ -915,7 +915,7 @@ void sound_set_output_gain(const device_config *device, int output, float gain)
 {
 	sound_stream *stream;
 	int outputnum;
-	
+
 	if (stream_device_output_to_stream_output(device, output, &stream, &outputnum))
 		stream_set_output_gain(stream, outputnum, gain);
 }

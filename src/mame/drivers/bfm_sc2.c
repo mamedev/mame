@@ -2625,12 +2625,12 @@ GAMEL( 1997, gldncrwn, 0,		  scorpion2_vid, gldncrwn,  gldncrwn,   0,       "BFM
 /**************************************************************************
 
     Mechanical Scorpion 2 Games
-		AGEMAME driver
-		
+        AGEMAME driver
+
 ***************************************************************************
 
   30-12-2006: J Wallace: Fixed init routines.
-  07-03-2006: El Condor: Recoded to more accurately represent the hardware 
+  07-03-2006: El Condor: Recoded to more accurately represent the hardware
               setup.
   18-01-2006: Cleaned up for MAME inclusion
   19-08-2005: Re-Animator
@@ -2903,7 +2903,7 @@ static ADDRESS_MAP_START( sc3_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM
-//	AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)
+//  AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)
 	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
 ADDRESS_MAP_END
@@ -2953,7 +2953,7 @@ static ADDRESS_MAP_START( memmap_sc2_dm01, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3FFE, 0x3FFE) AM_READ( direct_input_r)
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM
-//	AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)
+//  AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)
 	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
 ADDRESS_MAP_END
@@ -4094,7 +4094,7 @@ static DRIVER_INIT (luvjub)
 }
 
 /*********************************************
-Dr.Who The Timelord 
+Dr.Who The Timelord
 *********************************************/
 
 ROM_START( m_bdrwho )
@@ -4285,7 +4285,7 @@ ROM_START( m_luvjub )
 ROM_END
 
 /*********************************************
-Club Public Enemy No.1 
+Club Public Enemy No.1
 *********************************************/
 
 ROM_START( m_cpeno1 )

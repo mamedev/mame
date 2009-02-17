@@ -128,9 +128,9 @@ static const ay8910_interface redalert_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r), 
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
 	DEVCB_NULL,		/* port A/B read */
-	DEVCB_NULL, 
+	DEVCB_NULL,
 	DEVCB_HANDLER(redalert_analog_w)	/* port A/B write */
 };
 
@@ -362,9 +362,9 @@ static const ay8910_interface demoneye_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r), 
+	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
 	DEVCB_NULL,	/* port A/B read */
-	DEVCB_NULL, 
+	DEVCB_NULL,
 	DEVCB_NULL				/* port A/B write */
 };
 

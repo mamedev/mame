@@ -1685,7 +1685,7 @@ BUILD += $(TMSMAKE)
 $(TMSMAKE): $(CPUOBJ)/tms57002/tmsmake.o $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
-	
+
 endif
 
 

@@ -635,7 +635,7 @@ void device_list_start(running_machine *machine)
 
 
 /*-------------------------------------------------
-    device_delay_init - delay the startup of a 
+    device_delay_init - delay the startup of a
     given device for dependency reasons
 -------------------------------------------------*/
 

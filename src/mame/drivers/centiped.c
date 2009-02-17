@@ -1570,7 +1570,7 @@ static const pokey_interface milliped_pokey_interface_2 =
 
 static const pokey_interface warlords_pokey_interface =
 {
-	{ 	
+	{
 		DEVCB_INPUT_PORT("PADDLE0"),
 		DEVCB_INPUT_PORT("PADDLE1"),
 		DEVCB_INPUT_PORT("PADDLE2"),

@@ -310,7 +310,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine)
 
 	const address_space *io = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO);
 	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
-	
+
 	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
 	memory_install_read8_handler     (io, 0x7e, 0x7e, 0, 0, md_sms_vdp_vcounter_r);

@@ -721,7 +721,7 @@ static WRITE16_HANDLER( hotchase_soundlatch_w )
 static WRITE8_HANDLER( hotchase_sound_control_w )
 {
 	const device_config *sound[3];
-	
+
 	int reg[8];
 
 	sound[0] = devtag_get_device(space->machine, SOUND, "konami1");

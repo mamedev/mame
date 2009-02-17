@@ -181,15 +181,15 @@ WRITE8_DEVICE_HANDLER( qsound_w )
 		case 0:
 			chip->data=(chip->data&0xff)|(data<<8);
 			break;
-		
+
 		case 1:
 			chip->data=(chip->data&0xff00)|data;
 			break;
-		
+
 		case 2:
 			qsound_set_command(chip, data, chip->data);
 			break;
-		
+
 		default:
 			logerror("%s: unexpected qsound write to offset %d == %02X\n", cpuexec_describe_context(device->machine), offset, data);
 			break;

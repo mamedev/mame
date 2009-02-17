@@ -199,7 +199,7 @@ WRITE8_DEVICE_HANDLER(tms57002_pload_w)
 	if(data)
 		s->sti &= ~IN_PLOAD;
 	else
-		s->sti |= IN_PLOAD;  
+		s->sti |= IN_PLOAD;
 
 	if(olds ^ s->sti)
 		s->hidx = 0;
@@ -212,7 +212,7 @@ WRITE8_DEVICE_HANDLER(tms57002_cload_w)
 	if(data)
 		s->sti &= ~IN_CLOAD;
 	else
-		s->sti |= IN_CLOAD;  
+		s->sti |= IN_CLOAD;
 	if(olds ^ s->sti)
 		s->hidx = 0;
 }
@@ -233,7 +233,7 @@ static CPU_RESET(tms57002)
 				ST0_PBCO | ST0_CNS);
 	s->st1 &= ~(ST1_AOV | ST1_SFAI | ST1_SFAO | ST1_MOVM | ST1_MOV |
 				ST1_SFMA | ST1_SFMO | ST1_RND | ST1_CRM | ST1_DBP);
-	
+
 	s->xba = 0; // Not sure but makes sense
 
 	tms57002_cache_flush(s);
@@ -268,7 +268,7 @@ WRITE8_DEVICE_HANDLER(tms57002_data_w)
 				memory_write_dword_32le(s->program, (s->pc++) << 2, val);
 				break;
 			}
-		}      
+		}
 		break;
 	case IN_CLOAD:
 		if(s->sti & SU_CVAL) {
@@ -283,7 +283,7 @@ WRITE8_DEVICE_HANDLER(tms57002_data_w)
 			s->hidx = 0;
 			s->sti |= SU_CVAL;
 		}
-    
+
 		break;
 	case IN_PLOAD|IN_CLOAD:
 		s->host[s->hidx++] = data;
@@ -1073,7 +1073,7 @@ void tms57002_execute(tms57002_t *s)
 			s->sti &= ~S_BRANCH;
 		else
 			s->pc++; // Wraps if it reaches 256
-      
+
 		if(s->rptc_next) {
 			s->rptc = s->rptc_next;
 			s->rptc_next = 0;
@@ -1308,7 +1308,7 @@ static int tms57002_decode_get_pc(tms57002_t *s)
 			s->cache.inst[cs.ipc].next = ipc;
 			break;
 		}
-		cs.hnode = tms57002_get_hashnode(s, adr, s->st1, pnode);    
+		cs.hnode = tms57002_get_hashnode(s, adr, s->st1, pnode);
 	}
 
 	s->st1 = st1;
@@ -1367,7 +1367,7 @@ static CPU_EXECUTE(tms57002)
 			ipc = -1;
 		} else
 			s->pc++; // Wraps if it reaches 256, next wraps too
-      
+
 		if(s->rptc_next) {
 			s->rptc = s->rptc_next;
 			s->rptc_next = 0;

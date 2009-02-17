@@ -27,7 +27,7 @@ VIDEO_START( mlc )
 	else
 		colour_mask=0x1f;
 
-//	temp_bitmap = auto_bitmap_alloc( 512, 512, BITMAP_FORMAT_RGB32 );
+//  temp_bitmap = auto_bitmap_alloc( 512, 512, BITMAP_FORMAT_RGB32 );
 	mlc_buffered_spriteram = auto_malloc(0x3000);
 }
 
@@ -239,9 +239,9 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 	int useIndicesInRom=0;
 	int hibits=0;
 	int tileFormat=0;
-//	int rasterMode=0;
-//	int lastRasterMode=0;
-//	int rasterDirty=0;
+//  int rasterMode=0;
+//  int lastRasterMode=0;
+//  int rasterDirty=0;
 	int clipper=0;
 	rectangle user_clip;
 	UINT32* mlc_spriteram=mlc_buffered_spriteram; // spriteram32
@@ -300,7 +300,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 		fx = mlc_spriteram[offs+1]&0x8000;
 		fy = mlc_spriteram[offs+1]&0x4000;
 		color = mlc_spriteram[offs+1]&0xff;
-//		rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
+//      rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
 		clipper = (mlc_spriteram[offs+1]>>8)&0x3;
 		indx = mlc_spriteram[offs+0]&0x3fff;
 		yscale = mlc_spriteram[offs+4]&0x3ff;
@@ -479,8 +479,8 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 					}
 				}
 
-//				if (rasterMode)
-//					rasterDirty=1;
+//              if (rasterMode)
+//                  rasterDirty=1;
 
 				mlc_drawgfxzoom(machine,
 								/*rasterMode ? temp_bitmap : */bitmap,machine->gfx[0],
@@ -497,13 +497,13 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 			ybase+=yinc;
 		}
 
-//		if (lastRasterMode!=0 && rasterDirty)
-//		{
-//			blitRaster(bitmap, rasterMode);
-//			bitmap_fill(temp_bitmap,cliprect,0);
-//			rasterDirty=0;
-//		}
-//		lastRasterMode=rasterMode;
+//      if (lastRasterMode!=0 && rasterDirty)
+//      {
+//          blitRaster(bitmap, rasterMode);
+//          bitmap_fill(temp_bitmap,cliprect,0);
+//          rasterDirty=0;
+//      }
+//      lastRasterMode=rasterMode;
 
 		if (use8bppMode)
 			offs-=8;

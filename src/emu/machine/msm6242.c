@@ -79,7 +79,7 @@ READ8_DEVICE_HANDLER( msm6242_r )
 			{
 				if (hour >= 12)
 					pm = 1;
-				
+
 				hour %= 12;
 
 				if ( hour == 0 )

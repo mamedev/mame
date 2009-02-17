@@ -236,7 +236,7 @@ static DEVICE_START( via6522 )
 	const via6522_interface *intf = get_interface(device);
 
 	memset(v, 0, sizeof(*v));
-	
+
 	devcb_resolve_read8(&v->in_a_func, &intf->in_a_func, device);
 	devcb_resolve_read8(&v->in_b_func, &intf->in_b_func, device);
 	devcb_resolve_read_line(&v->in_ca1_func, &intf->in_ca1_func, device);

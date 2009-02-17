@@ -1827,7 +1827,7 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 			fatalerror("debug_read_opcode: unknown type = %d", space->dbits / 8 * 10 + size);
 			break;
 	}
-	
+
 	/* turn on debugger access */
 	if (!global->debugger_access)
 		memory_set_debugger_access(space, global->debugger_access = TRUE);

@@ -561,6 +561,7 @@ const game_driver * const drivers[] =
 	DRIVER( phoenixa )	/* (c) 1980 Amstar + Centuri license */
 	DRIVER( phoenixb )	/* (c) 1980 Amstar + Centuri license */
 	DRIVER( phoenixt )	/* (c) 1980 Taito */
+	DRIVER( phoenixj )	/* (c) 1980 Taito */
 	DRIVER( phoenix3 )	/* bootleg */
 	DRIVER( phoenixc )	/* bootleg */
 	DRIVER( condor )	/* bootleg */
@@ -5231,7 +5232,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( alphaone )	/* (proto)          (c) 1983 */
 	DRIVER( alphaona )	/* (proto)          (c) 1983 */
 	DRIVER( esb )		/* 136031           (c) 1985 */
-	DRIVER( tomcat )	/* (proto)			(c) 1985 */
+	DRIVER( tomcat )	/* (proto)          (c) 1985 */
 
 	/* Atari "Centipede hardware" games */
 	DRIVER( warlords )	/* 037153-037159    (c) 1980 */
@@ -8662,16 +8663,16 @@ Other Sun games
 	DRIVER( tighooka )
 	DRIVER( tighookc )
 	DRIVER( tighookc2 )
-	DRIVER( tighookv )	
+	DRIVER( tighookv )
 	DRIVER( tighookv2 )
 	DRIVER( tighookv3 )
 	DRIVER( tighookd )
-	DRIVER( tighookd2 )	
+	DRIVER( tighookd2 )
 	DRIVER( robadv )
 	DRIVER( robadvc )
 	DRIVER( robadvd )
 	DRIVER( robadvv1 )
-	DRIVER( robadvv2 )	
+	DRIVER( robadvv2 )
 	DRIVER( robadv2 )
 	DRIVER( robadv2a )
 	DRIVER( robadv2c )
@@ -8679,7 +8680,7 @@ Other Sun games
 	DRIVER( robadv2v2 )
 	DRIVER( robadv2v3 )
 	DRIVER( robadv2v4 )
-	DRIVER( robadv2d )	
+	DRIVER( robadv2d )
 	DRIVER( pirpok2 )
 	DRIVER( pirpok2b )
 	DRIVER( pirpok2d )
@@ -8725,7 +8726,7 @@ Other Sun games
 	DRIVER( sfruitbv2 )
 	DRIVER( sfruitbv3 )
 	DRIVER( sfruitbv4 )
-	DRIVER( sfruitbv5 )	
+	DRIVER( sfruitbv5 )
 	DRIVER( fb2gen )
 	DRIVER( fb2gena )
 	DRIVER( fb2genc )
@@ -8741,7 +8742,7 @@ Other Sun games
 	DRIVER( fb2ndv )
 	DRIVER( fb2ndv2 )
 	DRIVER( fb2ndd )
-	DRIVER( fb2ndd2 )		
+	DRIVER( fb2ndd2 )
 	DRIVER( fb4 )
 	DRIVER( fb4a )
 	DRIVER( fb4b )
@@ -8752,7 +8753,7 @@ Other Sun games
 	DRIVER( fb4d2 )
 	DRIVER( fb4v )
 	DRIVER( fb4v2 )
-	DRIVER( fb4v3 )	
+	DRIVER( fb4v3 )
 	DRIVER( act2000 )
 	DRIVER( act2000a )
 	DRIVER( act2000a2 )
@@ -8784,7 +8785,7 @@ Other Sun games
 	DRIVER( pir2001v2 )
 	DRIVER( pir2001v3 )
 	DRIVER( pir2001d )
-	DRIVER( pir2001d2 )	
+	DRIVER( pir2001d2 )
 	DRIVER( pir2002 )
 	DRIVER( pir2002a )
 	DRIVER( pir2002b )
@@ -8794,7 +8795,7 @@ Other Sun games
 	DRIVER( pir2002v2 )
 	DRIVER( pir2002v3 )
 	DRIVER( pir2002d )
-	DRIVER( pir2002d2 )		
+	DRIVER( pir2002d2 )
 	DRIVER( classice )
 	DRIVER( classicea )
 	DRIVER( classiced )
@@ -8812,7 +8813,7 @@ Other Sun games
 	DRIVER( moneymacd2 )
 	DRIVER( atworld )
 	DRIVER( atworlda )
-	
+
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 	DRIVER( spielbud )	/* (c) 1985 ADP */
@@ -8829,12 +8830,12 @@ Other Sun games
 	DRIVER( pachifev )	/* (c) 1983? */
 
 	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
-	   These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
-	   emulation for pinball machiens.
+       These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
+       emulation for pinball machiens.
 
-	   the m_ prefix is used to identify them as many have very generic names.
+       the m_ prefix is used to identify them as many have very generic names.
 
-	*/
+    */
 
 	/* Scorpion 2 */
 	DRIVER( m_bdrwho )

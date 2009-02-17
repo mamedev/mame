@@ -875,7 +875,7 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
 void atarigen_set_vol(running_machine *machine, int volume, sound_type type)
 {
 	const device_config *device;
-	
+
 	for (device = sound_first(machine->config); device != NULL; device = sound_next(device))
 		if (sound_get_type(device) == type)
 			sound_set_output_gain(device, ALL_OUTPUTS, volume / 100.0);

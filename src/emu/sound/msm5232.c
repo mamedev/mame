@@ -790,7 +790,7 @@ static DEVICE_START( msm5232 )
 	const msm5232_interface *intf = device->static_config;
 	int rate = device->clock/CLOCK_RATE_DIVIDER;
 	MSM5232 *chip = device->token;
-	
+
 	chip->device = device;
 
 	msm5232_init(chip, intf, device->clock, rate);

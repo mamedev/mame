@@ -427,10 +427,10 @@ WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 	}
 
 	/*
-		Until we support > 2 speakers, double the gain of the front speakers
+        Until we support > 2 speakers, double the gain of the front speakers
 
-		TODO: We do support more than 2 speakers but the output is downmixed to stereo.
-	*/
+        TODO: We do support more than 2 speakers but the output is downmixed to stereo.
+    */
 
 	/* Rear left speaker */
 	gain = data & 0x80 ? 1.0 : 2.0;

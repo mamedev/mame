@@ -72,7 +72,7 @@ static bitmap_t *dm_bitmap;
 #else
 #define VERBOSE 0
 #endif
- 
+
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 ///////////////////////////////////////////////////////////////////////////
