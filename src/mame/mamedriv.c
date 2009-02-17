@@ -8263,6 +8263,7 @@ Other Sun games
 	DRIVER( ampkr2b1 )	/* 1990 bootleg */
 	DRIVER( ampkr2b2 )	/* 1990 bootleg */
 	DRIVER( ampkr2b3 )	/* 1994 bootleg */
+	DRIVER( ampkr228 )	/* 1990 bootleg */
 	DRIVER( pkrdewin )	/* 1990 bootleg */
 	DRIVER( ampkr95 )	/* 1995 bootleg */
 	DRIVER( videomat )	/* 1990 bootleg */
