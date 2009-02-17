@@ -57,7 +57,7 @@ static void pf_adpcm_int(const device_config *device)
 	if (adpcm_pos >= 0x4000/* || adpcm_idle*/)
 	{
 		//adpcm_idle = 1;
-		msm5205_reset_w(0,1);
+		msm5205_reset_w(device,1);
 		trigger = 0;
 	}
 	else
@@ -65,7 +65,7 @@ static void pf_adpcm_int(const device_config *device)
 		UINT8 *ROM = memory_region(device->machine, "adpcm");
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos] & 0x0f) : (ROM[adpcm_pos] & 0xf0)>>4) );
-		msm5205_data_w(0,adpcm_data & 0xf);
+		msm5205_data_w(device,adpcm_data & 0xf);
 		trigger^=1;
 		if(trigger == 0)
 		{
