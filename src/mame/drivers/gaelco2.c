@@ -1373,7 +1373,52 @@ ROM_START( wrally2 )
 	ROM_FILL(				0x0900000, 0x0100000, 0x0 )			/* Empty */
 ROM_END
 
+/*
+CPU	1x MC68HC000FN12 (main)(u18)
+1x CG-1V-149 (u42)(sound/gfx? maybe the same as Gaelco)
+1x DALLAS DS5002FP (not dumped)(u44)
+1x TDA1543 (sound)(u20)
+1x LM358N (sound)(u7)
+1x TDA2003 (sound)(u1)
+1x oscillator 34.000 MHz (xtal1)
+1x oscillator 11.0592 MHz (xtal2)
+ROMs	2x AM27C010 (u39,u40)
+4x NM27C040Q (u50,u52,u53,u54)
+1x M27C801 (u51)
 
+6x RAM CY7C199 (u22,u23,u26,u27,u55,u56)
+2x RAM KM428C256TR (u37,u41)
+1x RAM GM76C256CLLFW70 (u47)(close to Dallas)
+
+1x PALCE16V8H (u28)(read protected -> extracted with CmD's PALdumper - it's registered)
+1x PALCE16V8H (u29)(read protected -> extracted with CmD's PALdumper)
+Note	1x 28x2 edge connector
+1x 2 legs connector (jp1)
+1x 4 legs connector (jp2)
+1x 12 legs connector (jp3)
+1x 5 legs connector (jp4)
+1x RS232 connector
+1x trimmer (volume)
+1x battery 3V (bt1)
+
+*/
+
+ROM_START( grtesoro )
+	/*1.u40 is bad, on every 32 bytes the first four are always 0xff.*/
+	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "2.u39",	0x000000, 0x020000, CRC(9939299e) SHA1(55303a2adf199f4b5a60f57be7480b0e119f8624) )
+	ROM_LOAD16_BYTE( "1.u40",	0x000001, 0x020000, BAD_DUMP CRC(311c2f94) SHA1(963d6b5f479598145146fcb8b7c6ce77fbc92b07) )
+
+	ROM_REGION( 0x0300000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_LOAD( "3.u54",	0x0000000, 0x0080000, CRC(085008ed) SHA1(06eb4f972d79eab13b1b3b6829ef280e079abdb6) )
+	ROM_LOAD( "4.u53",	0x0080000, 0x0080000, CRC(94dc37a7) SHA1(28f9832b61541b292682a6e2d2264abccd138a2e) )
+	ROM_LOAD( "5.u52",	0x0100000, 0x0080000, CRC(19b939f4) SHA1(7281709aa3ab1decb84bf7ab10492fb6ec197c80) )
+	ROM_LOAD( "6.u51",	0x0180000, 0x0100000, CRC(6dafc11c) SHA1(2aa3d6318418578433b3060bda6e27adf794dea4) )
+	ROM_LOAD( "7.u50",  0x0280000, 0x0080000, CRC(e80c6d39) SHA1(b3ae5d66c48c2ba6665a181e311b0c834384258a) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
+ROM_END
 
 GAME( 1994, aligator, 0,        alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt", GAME_UNEMULATED_PROTECTION )
 GAME( 1994, aligatun, aligator, alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
@@ -1386,3 +1431,4 @@ GAME( 1996, snowboar, 0,        snowboar, snowboar, snowboar, ROT0, "Gaelco", "S
 GAME( 1996, snowbalt, snowboar, snowboar, snowboar, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", GAME_UNEMULATED_PROTECTION )
 GAME( 1998, bang,     0,        bang,     bang,     bang,     ROT0, "Gaelco", "Bang!", 0 )
 GAME( 1998, bangj,    bang,     bang,     bang,     bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
+GAME( 1999, grtesoro, 0,        maniacsq, maniacsq, 0,        ROT0, "Nova Desirec", "Gran Tesoro? (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

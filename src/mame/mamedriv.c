@@ -6845,6 +6845,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( snowbalt )	/* (c) 1996 - Ref 960419/1 */
 	DRIVER( bang )		/* (c) 1998 - Ref ??? */
 	DRIVER( bangj )		/* (c) 1999 - Ref ??? */
+	DRIVER( grtesoro )  /* (c) 1999 - Ref ??? */
 
 	/* Gaelco 3D games */
 	DRIVER( speedup )	/* (c) 1996 - Ref ??? */
