@@ -1682,9 +1682,6 @@ static MACHINE_DRIVER_START( joust2 )
 	MDRV_MACHINE_START(joust2)
 	MDRV_MACHINE_RESET(joust2)
 
-	/* sound hardware */
-	MDRV_SOUND_REMOVE("wmsdac")
-
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_1", joust2_pia_1_intf)
 	MDRV_PIA6821_ADD("pia_3", joust2_pia_3_intf)

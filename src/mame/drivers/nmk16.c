@@ -1001,7 +1001,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ssmissin_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREAD(SOUND, "oki", okim6295_r)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREAD(SOUND, "oki1", okim6295_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -1009,7 +1009,7 @@ static ADDRESS_MAP_START( ssmissin_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ssmissin_soundbank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE(SOUND, "oki1", okim6295_w)
 ADDRESS_MAP_END
 
 
@@ -4093,7 +4093,7 @@ static MACHINE_DRIVER_START( ssmissin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 8000000/8) /* 1 Mhz, pin 7 high */
+	MDRV_SOUND_ADD("oki1", OKIM6295, 8000000/8) /* 1 Mhz, pin 7 high */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -4802,7 +4802,7 @@ static ADDRESS_MAP_START( afega_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM									// RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)					// From Main CPU
 	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)	// YM2151
-	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)		// M6295
+	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)		// M6295
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( firehawk_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4829,8 +4829,8 @@ static WRITE8_DEVICE_HANDLER( twinactn_oki_bank_w )
 static ADDRESS_MAP_START( twinactn_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE(SOUND, "oki", twinactn_oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE(SOUND, "oki1", twinactn_oki_bank_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)		// From Main CPU
 ADDRESS_MAP_END
 
@@ -4959,7 +4959,7 @@ static MACHINE_DRIVER_START( stagger1 )
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_4MHz/4) /* verified on pcb */
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_4MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.70)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.70)
@@ -5069,7 +5069,7 @@ static MACHINE_DRIVER_START( twinactn )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -5387,7 +5387,7 @@ ROM_START( mustangb )
 	ROM_LOAD16_BYTE( "90058-8",    0x00000, 0x80000, CRC(560bff04) SHA1(b005642adc81d878971ecbdead8ef5e604c90ae2) )
 	ROM_LOAD16_BYTE( "90058-9",    0x00001, 0x80000, CRC(b9d72a03) SHA1(43ee9def1b6c491c6832562d66c1af54d81d9b3c) )
 
-	ROM_REGION( 0x010000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x010000, "oki1", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "mustang.17",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
@@ -5639,7 +5639,7 @@ ROM_START( tdragonb )
 	ROM_LOAD16_BYTE( "td_10.bin",	0x000000, 0x080000, CRC(bfd0ec5d) SHA1(7983661f74e8695f56e45c6e5c278d7d86431052) )	/* Sprites */
 	ROM_LOAD16_BYTE( "td_09.bin",	0x000001, 0x080000, CRC(b6e074eb) SHA1(bdde068f03415391b5edaa42f1389df0f7eef899) )	/* Sprites */
 
-	ROM_REGION( 0x010000, "oki", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x010000, "oki1", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "td_01.bin",     0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 

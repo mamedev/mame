@@ -1019,6 +1019,11 @@ static TIMER_CALLBACK( real_nmk004_init )
 	int i;
 
 	memset(&NMK004_state, 0, sizeof(NMK004_state));
+	
+	NMK004_state.machine = machine;
+	NMK004_state.ymdevice = devtag_get_device(machine, SOUND, "ym");
+	NMK004_state.oki1device = devtag_get_device(machine, SOUND, "oki1");
+	NMK004_state.oki2device = devtag_get_device(machine, SOUND, "oki2");
 
 	NMK004_state.rom = memory_region(machine, "audio");
 
@@ -1042,11 +1047,6 @@ void NMK004_init(running_machine *machine)
 {
 	/* we have to do this via a timer because we get called before the sound reset */
 	timer_call_after_resynch(machine, NULL, 0, real_nmk004_init);
-	
-	NMK004_state.machine = machine;
-	NMK004_state.ymdevice = devtag_get_device(machine, SOUND, "ym");
-	NMK004_state.oki1device = devtag_get_device(machine, SOUND, "oki1");
-	NMK004_state.oki2device = devtag_get_device(machine, SOUND, "oki2");
 }
 
 

@@ -207,7 +207,7 @@ static MACHINE_RESET( common )
 	for (i = 0; i < SOUND_CHANNELS; i++)
 	{
 		char buffer[10];
-		sprintf(buffer, "dac%d", i);
+		sprintf(buffer, "dac%d", i + 1);
 		dmadac[i] = devtag_get_device(machine, SOUND, buffer);
 	}
 

@@ -307,19 +307,23 @@ READ8_HANDLER( md_sms_ioport_dd_r )
 static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x7e, 0x7e, 0, 0, md_sms_vdp_vcounter_r, sms_sn76496_w);
-	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, sms_sn76496_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xbe, 0xbe, 0, 0, md_sms_vdp_data_r, md_sms_vdp_data_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xbf, 0xbf, 0, 0, md_sms_vdp_ctrl_r, md_sms_vdp_ctrl_w);
+	const address_space *io = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO);
+	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
+	
+	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
-	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x10, 0x10, 0, 0, megatech_sms_ioport_dd_r); // super tetris
+	memory_install_read8_handler     (io, 0x7e, 0x7e, 0, 0, md_sms_vdp_vcounter_r);
+	memory_install_write8_device_handler(io, sn, 0x7e, 0x7f, 0, 0, sn76496_w);
+	memory_install_readwrite8_handler(io, 0xbe, 0xbe, 0, 0, md_sms_vdp_data_r, md_sms_vdp_data_w);
+	memory_install_readwrite8_handler(io, 0xbf, 0xbf, 0, 0, md_sms_vdp_ctrl_r, md_sms_vdp_ctrl_w);
 
-	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xdc, 0xdc, 0, 0, megatech_sms_ioport_dc_r);
-	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xdd, 0xdd, 0, 0, megatech_sms_ioport_dd_r);
-	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xde, 0xde, 0, 0, megatech_sms_ioport_dd_r);
-	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xdf, 0xdf, 0, 0, megatech_sms_ioport_dd_r); // adams family
+	memory_install_read8_handler     (io, 0x10, 0x10, 0, 0, megatech_sms_ioport_dd_r); // super tetris
+
+	memory_install_read8_handler     (io, 0xdc, 0xdc, 0, 0, megatech_sms_ioport_dc_r);
+	memory_install_read8_handler     (io, 0xdd, 0xdd, 0, 0, megatech_sms_ioport_dd_r);
+	memory_install_read8_handler     (io, 0xde, 0xde, 0, 0, megatech_sms_ioport_dd_r);
+	memory_install_read8_handler     (io, 0xdf, 0xdf, 0, 0, megatech_sms_ioport_dd_r); // adams family
 }
 
 static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)

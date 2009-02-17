@@ -641,7 +641,7 @@ static DRIVER_INIT( rng )
 
 static MACHINE_RESET( rng )
 {
-	k054539_init_flags(devtag_get_device(machine, SOUND, "konami"), K054539_REVERSE_STEREO);
+	k054539_init_flags(devtag_get_device(machine, SOUND, "konami1"), K054539_REVERSE_STEREO);
 
 	memset(rng_sysreg, 0, 0x20);
 

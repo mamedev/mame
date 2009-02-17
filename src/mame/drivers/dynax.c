@@ -2713,7 +2713,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mjelct3 )
-	PORT_START("DSW2")	/* 7c21 (select = 00) */
+	PORT_START("DSW0")	/* 7c21 (select = 00) */
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
 	PORT_DIPSETTING(    0x03, "0" )	// 20
 	PORT_DIPSETTING(    0x00, "1" )	// 32
@@ -2838,7 +2838,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mjelctrn )
-	PORT_START("DSW2")	/* 7c21 (select = 00) */
+	PORT_START("DSW0")	/* 7c21 (select = 00) */
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
 	PORT_DIPSETTING(    0x03, "0" )	// 20
 	PORT_DIPSETTING(    0x00, "1" )	// 32
@@ -2963,7 +2963,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( majxtal7 )
-	PORT_START("DSW2")	/* select = 00 */
+	PORT_START("DSW0")	/* select = 00 */
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
 	PORT_DIPSETTING(    0x03, "0" )	// 20
 	PORT_DIPSETTING(    0x00, "1" )	// 32
@@ -3087,7 +3087,7 @@ static INPUT_PORTS_START( majxtal7 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( neruton )
-	PORT_START("DSW2") /* 6a77 (select = 00) */
+	PORT_START("DSW0") /* 6a77 (select = 00) */
 	PORT_DIPNAME( 0x07, 0x07, "Time Setting" )
 	PORT_DIPSETTING(    0x07, "08:30" )
 	PORT_DIPSETTING(    0x06, "09:00" )

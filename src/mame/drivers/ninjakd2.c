@@ -204,8 +204,8 @@ static WRITE8_HANDLER( ninjakd2_soundreset_w )
 static SAMPLES_START( ninjakd2_init_samples )
 {
 	running_machine *machine = device->machine;
-	const UINT8* const rom = memory_region(machine, "samples");
-	const int length = memory_region_length(machine, "samples");
+	const UINT8* const rom = memory_region(machine, "pcm");
+	const int length = memory_region_length(machine, "pcm");
 	INT16* const sampledata = auto_malloc(length * sizeof(sampledata[0]));
 
 	int i;
@@ -219,13 +219,13 @@ static SAMPLES_START( ninjakd2_init_samples )
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
-	const UINT8* const rom = memory_region(space->machine, "samples");
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "pcm");
+	const UINT8* const rom = memory_region(space->machine, "pcm");
 
 	// only Ninja Kid II uses this
 	if (rom)
 	{
-		const int length = memory_region_length(space->machine, "samples");
+		const int length = memory_region_length(space->machine, "pcm");
 
 		const int start = data << 8;
 
@@ -1055,7 +1055,7 @@ ROM_START( ninjakd2 )
 	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
 	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
-	ROM_REGION( 0x10000, "samples", 0 )
+	ROM_REGION( 0x10000, "pcm", 0 )
 	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )	// unsigned 8-bit pcm samples
 ROM_END
 
@@ -1082,7 +1082,7 @@ ROM_START( ninjak2a )
 	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )
 	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )
 
-	ROM_REGION( 0x10000, "samples", 0 )
+	ROM_REGION( 0x10000, "pcm", 0 )
 	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )	// unsigned 8-bit pcm samples
 ROM_END
 
@@ -1109,7 +1109,7 @@ ROM_START( ninjak2b )
 	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )	// 11.2m
 	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )	// 10.2p
 
-	ROM_REGION( 0x10000, "samples", 0 )
+	ROM_REGION( 0x10000, "pcm", 0 )
 	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )	// 9.6d  unsigned 8-bit pcm samples
 ROM_END
 
@@ -1138,7 +1138,7 @@ ROM_START( rdaction )
 	ROM_LOAD( "nk2_11.rom",   0x00000, 0x10000, CRC(41a714b3) SHA1(b05f48d71a9837914c12c13e0b479c8a6dc8c25e) )	// 11.2n
 	ROM_LOAD( "nk2_10.rom",   0x10000, 0x10000, CRC(c913c4ab) SHA1(f822c5621b3e32c1a284f6367bdcace81c1c74b3) )	// 10.2r
 
-	ROM_REGION( 0x10000, "samples", 0 )
+	ROM_REGION( 0x10000, "pcm", 0 )
 	ROM_LOAD( "nk2_09.rom",   0x0000, 0x10000, CRC(c1d2d170) SHA1(0f325815086fde90fd85360d3660042b0b68ba96) )	// 9.6c  unsigned 8-bit pcm samples
 ROM_END
 

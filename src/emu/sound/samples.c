@@ -3,7 +3,8 @@
 #include "samples.h"
 
 
-struct sample_channel
+typedef struct _sample_channel sample_channel;
+struct _sample_channel
 {
 	sound_stream *stream;
 	const INT16 *source;
@@ -17,13 +18,25 @@ struct sample_channel
 	UINT8		paused;
 };
 
-struct samples_info
+
+typedef struct _samples_info samples_info;
+struct _samples_info
 {
 	const device_config *device;
 	int			numchannels;	/* how many channels */
-	struct sample_channel *channel;/* array of channels */
+	sample_channel *channel;/* array of channels */
 	struct loaded_samples *samples;/* array of samples */
 };
+
+
+INLINE samples_info *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SOUND);
+	assert(sound_get_type(device) == SOUND_SAMPLES);
+	return (samples_info *)device->token;
+}
 
 
 
@@ -228,8 +241,8 @@ struct loaded_samples *readsamples(const char *const *samplenames, const char *b
 /* mixer_play_sample() */
 void sample_start(const device_config *device,int channel,int samplenum,int loop)
 {
-    struct samples_info *info = device->token;
-    struct sample_channel *chan;
+    samples_info *info = get_safe_token(device);
+    sample_channel *chan;
     struct loaded_sample *sample;
 
 	/* if samples are disabled, just return quietly */
@@ -259,8 +272,8 @@ void sample_start(const device_config *device,int channel,int samplenum,int loop
 
 void sample_start_raw(const device_config *device,int channel,const INT16 *sampledata,int samples,int frequency,int loop)
 {
-    struct samples_info *info = device->token;
-    struct sample_channel *chan;
+    samples_info *info = get_safe_token(device);
+    sample_channel *chan;
 
     assert( channel < info->numchannels );
 
@@ -283,8 +296,8 @@ void sample_start_raw(const device_config *device,int channel,const INT16 *sampl
 
 void sample_set_freq(const device_config *device,int channel,int freq)
 {
-    struct samples_info *info = device->token;
-    struct sample_channel *chan;
+    samples_info *info = get_safe_token(device);
+    sample_channel *chan;
 
     assert( channel < info->numchannels );
 
@@ -299,8 +312,8 @@ void sample_set_freq(const device_config *device,int channel,int freq)
 
 void sample_set_volume(const device_config *device,int channel,float volume)
 {
-    struct samples_info *info = device->token;
-    struct sample_channel *chan;
+    samples_info *info = get_safe_token(device);
+    sample_channel *chan;
 
     assert( channel < info->numchannels );
 
@@ -312,8 +325,8 @@ void sample_set_volume(const device_config *device,int channel,float volume)
 
 void sample_set_pause(const device_config *device,int channel,int pause)
 {
-    struct samples_info *info = device->token;
-    struct sample_channel *chan;
+    samples_info *info = get_safe_token(device);
+    sample_channel *chan;
 
     assert( channel < info->numchannels );
 
@@ -328,8 +341,8 @@ void sample_set_pause(const device_config *device,int channel,int pause)
 
 void sample_stop(const device_config *device,int channel)
 {
-    struct samples_info *info = device->token;
-    struct sample_channel *chan;
+    samples_info *info = get_safe_token(device);
+    sample_channel *chan;
 
     assert( channel < info->numchannels );
 
@@ -344,8 +357,8 @@ void sample_stop(const device_config *device,int channel)
 
 int sample_get_base_freq(const device_config *device,int channel)
 {
-    struct samples_info *info = device->token;
-    struct sample_channel *chan;
+    samples_info *info = get_safe_token(device);
+    sample_channel *chan;
 
     assert( channel < info->numchannels );
 
@@ -359,8 +372,8 @@ int sample_get_base_freq(const device_config *device,int channel)
 
 int sample_playing(const device_config *device,int channel)
 {
-    struct samples_info *info = device->token;
-    struct sample_channel *chan;
+    samples_info *info = get_safe_token(device);
+    sample_channel *chan;
 
     assert( channel < info->numchannels );
 
@@ -374,7 +387,7 @@ int sample_playing(const device_config *device,int channel)
 
 static STREAM_UPDATE( sample_update_sound )
 {
-	struct sample_channel *chan = param;
+	sample_channel *chan = param;
 	stream_sample_t *buffer = outputs[0];
 
 	if (chan->source && !chan->paused)
@@ -426,13 +439,13 @@ static STREAM_UPDATE( sample_update_sound )
 
 static STATE_POSTLOAD( samples_postload )
 {
-	struct samples_info *info = param;
+	samples_info *info = param;
 	int i;
 
 	/* loop over channels */
 	for (i = 0; i < info->numchannels; i++)
 	{
-		struct sample_channel *chan = &info->channel[i];
+		sample_channel *chan = &info->channel[i];
 
 		/* attach any samples that were loaded and playing */
 		if (chan->source_num >= 0 && chan->source_num < info->samples->total)
@@ -463,7 +476,7 @@ static DEVICE_START( samples )
 {
 	int i;
 	const samples_interface *intf = device->static_config;
-	struct samples_info *info = device->token;
+	samples_info *info = get_safe_token(device);
 
 	info->device = device;
 
@@ -512,7 +525,7 @@ DEVICE_GET_INFO( samples )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct samples_info);			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(samples_info);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
         case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME( samples );		break;

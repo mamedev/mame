@@ -163,7 +163,7 @@ static WRITE32_HANDLER( control_w )
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (control_data & 0x80000000))
 	{
-		const device_config *device = devtag_get_device(space->machine, SOUND, "bmst");
+		const device_config *device = devtag_get_device(space->machine, SOUND, "bsmt");
 		bsmt2000_data_w(device, bsmt_data_bank, 0, 0xffff);
 		device_reset(device);
 	}

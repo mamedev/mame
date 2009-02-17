@@ -934,7 +934,7 @@ void dcs_init(running_machine *machine)
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.rev = 1;
 	dcs.channels = 1;
-	dcs.dmadac[0] = devtag_get_device(machine, SOUND, "dac1");
+	dcs.dmadac[0] = devtag_get_device(machine, SOUND, "dac");
 
 	/* configure boot and sound ROMs */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");

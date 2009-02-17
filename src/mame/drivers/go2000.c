@@ -57,11 +57,6 @@ static ADDRESS_MAP_START( go2000_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xe00020, 0xe00021) AM_WRITENOP
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( go2000_dac_w )
-{
-	dac_data_w( 0 , data & 0xff );
-}
-
 static WRITE8_HANDLER( go2000_pcm_1_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "sound");
@@ -78,7 +73,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( go2000_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x00, 0x00) AM_WRITE(go2000_dac_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "dac1", dac_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(go2000_pcm_1_bankswitch_w)
 ADDRESS_MAP_END
 
