@@ -58,7 +58,7 @@ static DEVICE_RESET( sid )
 
 static DEVICE_START( sid6581 )
 {
-	sid_start(devices, MOS6581);
+	sid_start(device, MOS6581);
 }
 
 
