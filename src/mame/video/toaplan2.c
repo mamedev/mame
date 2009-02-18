@@ -1006,13 +1006,10 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 						/* HACK! When tilted, sound CPU needs to be reset. */
 						const device_config *ym = device_list_find_by_tag(machine->config->devicelist, SOUND, "ym");
 
-						if (ym != NULL)
+						if (ym && (sound_get_type(ym) == SOUND_YM3812))
 						{
-							if (!strcmp(device_get_info_string(ym, DEVINFO_STR_NAME), "YM3812"))
-							{
-								cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
-								devtag_reset(machine, SOUND, "ym");
-							}
+							cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+							devtag_reset(machine, SOUND, "ym");
 						}
 					}
 
