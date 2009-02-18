@@ -145,8 +145,8 @@ MACHINE_START( frogs_audio )
 
 WRITE8_HANDLER( frogs_audio_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND_SAMPLES, "samples");
-	const device_config *discrete = devtag_get_device(space->machine, SOUND_SAMPLES, "discrete");
+	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
 	static int last_croak = 0;
 	static int last_buzzz = 0;
 	int new_croak = data & 0x08;
