@@ -57,7 +57,7 @@ static WRITE8_DEVICE_HANDLER( D7759_write_port_0_w )
 
 static WRITE8_DEVICE_HANDLER( D7759_upd_reset_w )
 {
-	upd7759_reset_w(device, data & 1);
+	upd7759_reset_w(device, data & 0x80);
 }
 
 static ADDRESS_MAP_START( prehisle_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
