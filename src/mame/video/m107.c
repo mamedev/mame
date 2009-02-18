@@ -255,11 +255,11 @@ static void m107_update_scroll_positions(void)
 
 		if (m107_control[0x08 + laynum] & 0x02)
 		{
-			const UINT16 *scrolldata = m107_vram_data + (0xf000 + 0x400 * laynum) / 2;
+			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x400 * laynum) / 2;
 
 			tilemap_set_scroll_rows(layer->tmap, 512);
 			for (i = 0; i < 512; i++)
-				tilemap_set_scrollx(layer->tmap, i, scrolldata[i]);
+				tilemap_set_scrollx(layer->tmap, i, scrolldata[i] + m107_control[1 + 2 * laynum]);
 		}
 		else
 		{
