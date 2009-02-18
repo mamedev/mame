@@ -371,16 +371,17 @@ WRITE8_DEVICE_HANDLER( k007232_w )
     switch (r){
     case 0x00:
     case 0x01:
+	{
 				/**** address step ****/
-      data = (((((unsigned int)info->wreg[reg_port*0x06 + 0x01])<<8)&0x0100) | (((unsigned int)info->wreg[reg_port*0x06 + 0x00])&0x00ff));
+      int idx = (((((unsigned int)info->wreg[reg_port*0x06 + 0x01])<<8)&0x0100) | (((unsigned int)info->wreg[reg_port*0x06 + 0x00])&0x00ff));
 #if 0
       if( !reg_port && r == 1 )
-	logerror("%04x\n" ,data );
+	logerror("%04x\n" ,idx );
 #endif
 
-      info->step[reg_port] = info->fncode[data];
+      info->step[reg_port] = info->fncode[idx];
       break;
-
+	}
     case 0x02:
     case 0x03:
     case 0x04:
