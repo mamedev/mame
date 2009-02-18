@@ -1401,12 +1401,16 @@ Note	1x 28x2 edge connector
 1x trimmer (volume)
 1x battery 3V (bt1)
 
+Title is uncertain. A string at 27e00 says: "Play 2000 v5.01 (c) 1999", but
+there are also some gfxs that says "Gran Tesoro" all over the place.
+I don't know what's the correct title for this one...
+
 */
 
 ROM_START( grtesoro )
-	/*1.u40 is bad, on every 32 bytes the first four are always 0xff.*/
+	/*at least 1.u40 is bad, on every 0x40 bytes the first four are always 0xff.*/
 	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
-	ROM_LOAD16_BYTE( "2.u39",	0x000000, 0x020000, CRC(9939299e) SHA1(55303a2adf199f4b5a60f57be7480b0e119f8624) )
+	ROM_LOAD16_BYTE( "2.u39",	0x000000, 0x020000, BAD_DUMP CRC(9939299e) SHA1(55303a2adf199f4b5a60f57be7480b0e119f8624) )
 	ROM_LOAD16_BYTE( "1.u40",	0x000001, 0x020000, BAD_DUMP CRC(311c2f94) SHA1(963d6b5f479598145146fcb8b7c6ce77fbc92b07) )
 
 	ROM_REGION( 0x0300000, "gfx1", 0 ) /* GFX + Sound */
@@ -1431,4 +1435,4 @@ GAME( 1996, snowboar, 0,        snowboar, snowboar, snowboar, ROT0, "Gaelco", "S
 GAME( 1996, snowbalt, snowboar, snowboar, snowboar, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", GAME_UNEMULATED_PROTECTION )
 GAME( 1998, bang,     0,        bang,     bang,     bang,     ROT0, "Gaelco", "Bang!", 0 )
 GAME( 1998, bangj,    bang,     bang,     bang,     bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
-GAME( 1999, grtesoro, 0,        maniacsq, maniacsq, 0,        ROT0, "Nova Desirec", "Gran Tesoro? (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1999, grtesoro, 0,        maniacsq, maniacsq, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
