@@ -1768,6 +1768,7 @@ src/mame/drivers/mrjong.c svneol=native#text/plain
 src/mame/drivers/ms32.c svneol=native#text/plain
 src/mame/drivers/msisaac.c svneol=native#text/plain
 src/mame/drivers/mugsmash.c svneol=native#text/plain
+src/mame/drivers/multfish.c svneol=native#text/plain
 src/mame/drivers/multigam.c svneol=native#text/plain
 src/mame/drivers/munchmo.c svneol=native#text/plain
 src/mame/drivers/murogem.c svneol=native#text/plain

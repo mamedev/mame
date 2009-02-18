@@ -1685,6 +1685,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/cb2001.o \
 	$(DRIVERS)/sfbonus.o \
+	$(DRIVERS)/multfish.o \
 
 #-------------------------------------------------
 # layout dependencies

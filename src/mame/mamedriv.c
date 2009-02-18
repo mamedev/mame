@@ -8830,6 +8830,24 @@ Other Sun games
 	/* Sanki Denshi Kogyo */
 	DRIVER( pachifev )	/* (c) 1983? */
 
+	/* Igro */
+	DRIVER( mfish )
+	DRIVER( mfish_2 )
+	DRIVER( mfish_2a )
+	DRIVER( mfish_3 )
+	DRIVER( mfish_4 )
+	DRIVER( mfish_5 )
+	DRIVER( mfish_6 )
+	DRIVER( mfish_7 )
+	DRIVER( mfish_8 )
+	DRIVER( mfish_9 )
+	DRIVER( mfish_10 )
+	DRIVER( mfish_11 )
+	DRIVER( mfish_12 )
+	DRIVER( mfish_13 )
+
+
+	
 	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
        These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
        emulation for pinball machiens.
