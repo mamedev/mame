@@ -1283,30 +1283,45 @@ ROM_START( pitboss )
 	ROM_LOAD( "u7-0.rom",  0x4000, 0x2000, CRC(306351b9) SHA1(32cd243aa65571ee7fc72971b6a16beeb4ed9d85) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "u39.rom",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
-	ROM_LOAD( "u38.rom",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
-	ROM_LOAD( "u37.rom",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "u40.rom",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
-ROM_START( pitbossa )
+ROM_START( pitbossa ) /* Program roms were hand labeled */
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "pbhd.u5", 0x0000, 0x2000, CRC(97f870bd) SHA1(b1b01abff0385e3b0585e49f78b93bcf56e434ef) ) /* Games included in this set are: */
+	ROM_LOAD( "pbhd.u6", 0x2000, 0x2000, CRC(086e699b) SHA1(a1d1eafaac9262f924f175961aa52c6d8e779bf0) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
+	ROM_LOAD( "pbhd.u7", 0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+ROM_END
+
+ROM_START( pitbossb )
  	ROM_REGION( 0x10000, "main", 0 )
  	ROM_LOAD( "m4a1.u5",   0x0000, 0x2000, CRC(f5284472) SHA1(9170b90d06caa382be29feb2f6e80993bba1e07e) ) /* Games included in this set are: */
  	ROM_LOAD( "m4a1.u6",   0x2000, 0x2000, CRC(dd8df5fe) SHA1(dab8c1077058263729b2589dd9bf9989ad53be1c) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
  	ROM_LOAD( "m4a1.u7",   0x4000, 0x2000, CRC(5fa5d436) SHA1(9f3fd81eae7f378268f3b4af8fd299ffb97d7fb6) )
 
  	ROM_REGION( 0x6000, "gfx1", 0 )
- 	ROM_LOAD( "chr2.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) )
- 	ROM_LOAD( "chr2.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) )
-	ROM_LOAD( "chr2.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) )
+ 	ROM_LOAD( "chr2.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
+ 	ROM_LOAD( "chr2.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1983 Merit industries   Phila. PA. */
+	ROM_LOAD( "chr2.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                   */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "chr2.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
 ROM_END
 
-ROM_START( pitbossb )
+ROM_START( pitbossc ) /* Program roms on a CTR-202 daughter card */
  	ROM_REGION( 0x10000, "main", 0 )
  	ROM_LOAD( "2214-04.u5-0",   0x0000, 0x2000, CRC(10b782e7) SHA1(158819898ad81506c47b76ffe2a949ee7208740f) ) /* Games included in this set are: */
  	ROM_LOAD( "2214-04.u6-0",   0x2000, 0x2000, CRC(c3fd6510) SHA1(8c89fd2cbcb6f12fa6427883700971f7c39f6ccf) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
@@ -1314,12 +1329,12 @@ ROM_START( pitbossb )
  	ROM_LOAD( "2214-04.u7-0",   0x6000, 0x4000, CRC(c5cf7060) SHA1(4a3209ad24ae649348b0e0470fc446d37b667975) ) /* 27128 eprom */
 
  	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
 	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.u40",  0x0000, 0x2000, CRC(db62c5ec) SHA1(a9967eb51436f342902fa3ce9c43d4d1ec5e0f3c) )
+	ROM_LOAD( "chr7.rom.u40",  0x0000, 0x2000, CRC(db62c5ec) SHA1(a9967eb51436f342902fa3ce9c43d4d1ec5e0f3c) )
 ROM_END
 
 ROM_START( casino5 )
@@ -1867,9 +1882,10 @@ static DRIVER_INIT( couple )
 	memory_set_bankptr(machine, 1,ROM + 0x10000 + (0x2000 * 2));
 }
 
-GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "Pit Boss (Set 1)",                            GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossa, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "Pit Boss (Set 2)",                            GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossb, pitboss, casino5,  pitboss,  0,      ROT0,  "Merit", "Pit Boss (Set 3)",                            GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 1)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossa, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 2)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossb, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 3)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossc, pitboss, casino5,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 4)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1984, casino5,  0,       casino5,  casino5,  0,      ROT0,  "Merit", "Casino Five",                                 GAME_SUPPORTS_SAVE )
 
