@@ -160,7 +160,18 @@ static INPUT_PORTS_START( galaxia )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout tiles8x8_layout =
+static const gfx_layout tiles8x8x1_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	1,
+	{ RGN_FRAC(0,1) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout tiles8x8x2_layout =
 {
 	8,8,
 	RGN_FRAC(1,2),
@@ -172,7 +183,11 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( galaxia )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x2_layout, 0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( astrowar )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x1_layout, 0, 16 )
 GFXDECODE_END
 
 
@@ -203,6 +218,10 @@ static MACHINE_DRIVER_START( galaxia )
 	MDRV_VIDEO_UPDATE(galaxia)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( astrowar )
+	MDRV_IMPORT_FROM( galaxia )
+	MDRV_GFXDECODE(astrowar)
+MACHINE_DRIVER_END
 
 ROM_START( galaxia )
 	ROM_REGION( 0x10000, "main", 0 )
@@ -254,4 +273,4 @@ static DRIVER_INIT(galaxia)
 }
 
 GAME( 1979, galaxia, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1980, astrowar, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Astro Wars", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1980, astrowar, 0, astrowar, galaxia, galaxia, ROT90, "Zaccaria", "Astro Wars", GAME_NOT_WORKING|GAME_NO_SOUND|GAME_WRONG_COLORS )
