@@ -87,8 +87,12 @@ static DEVICE_RESET( ym2151 )
 READ8_DEVICE_HANDLER( ym2151_r )
 {
 	ym2151_state *token = get_safe_token(device);
+
 	if (offset & 1)
+	{
+		stream_update(token->stream);
 		return ym2151_read_status(token->chip);
+	}
 	else
 		return 0xff;	/* confirmed on a real YM2151 */
 }
@@ -96,8 +100,12 @@ READ8_DEVICE_HANDLER( ym2151_r )
 WRITE8_DEVICE_HANDLER( ym2151_w )
 {
 	ym2151_state *token = get_safe_token(device);
+
 	if (offset & 1)
+	{
+		stream_update(token->stream);
 		ym2151_write_reg(token->chip, token->lastreg, data);
+	}
 	else
 		token->lastreg = data;
 }
