@@ -7696,6 +7696,7 @@ Other Sun games
 	DRIVER( hiryuken )	/* (c) 1985 Taito */
 
 	/* Tatsumi Games */
+	DRIVER( kingdrby )  /* (c) 1981 Tatsumi */
 	DRIVER( tx1 )		/* (c) 1983 Tatsumi */
 	DRIVER( tx1a )		/* (c) 1983 Tatsumi */
 	/* TX-1 V8 */		/* (c) 1984 Tatsumi */
@@ -7708,6 +7709,7 @@ Other Sun games
 	DRIVER( roundup5 )	/* (c) 1989 Tatsumi */
 	DRIVER( cyclwarr )	/* (c) 1991 Tatsumi */
 	DRIVER( bigfight )	/* (c) 1992 Tatsumi */
+	/* Life */          /* (c) 1997 Tatsumi */
 
 	/* Electronic Devices */
 	DRIVER( mugsmash )	/* (c) Electronic Devices (Italy) / 3D Games (England) */
@@ -8848,7 +8850,7 @@ Other Sun games
 	DRIVER( mfish_13 )
 
 
-	
+
 	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
        These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
        emulation for pinball machiens.

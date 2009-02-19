@@ -1630,6 +1630,7 @@ src/mame/drivers/kangaroo.c svneol=native#text/plain
 src/mame/drivers/karnov.c svneol=native#text/plain
 src/mame/drivers/kchamp.c svneol=native#text/plain
 src/mame/drivers/kickgoal.c svneol=native#text/plain
+src/mame/drivers/kingdrby.c svneol=native#text/plain
 src/mame/drivers/kingobox.c svneol=native#text/plain
 src/mame/drivers/kingpin.c svneol=native#text/plain
 src/mame/drivers/kinst.c svneol=native#text/plain
