@@ -37,7 +37,6 @@
 #include "driver.h"
 #include "sound/ay8910.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 
 #define multfish_VIDRAM_SIZE (0x2000*0x10)
 #define multfish_BRAM_SIZE (0x2000*0x10)
@@ -48,6 +47,37 @@ static UINT8* multfish_bram;
 static int multfish_disp_enable;
 
 /* Video Part */
+
+static tilemap *multfish_tilemap;
+static tilemap *multfish_reel_tilemap;
+
+
+static TILE_GET_INFO( get_multfish_tile_info )
+{
+	int code = multfish_vid[tile_index*2+0x0000] | (multfish_vid[tile_index*2+0x0001] << 8);
+	int attr = multfish_vid[tile_index*2+0x1000] | (multfish_vid[tile_index*2+0x1001] << 8);
+	
+	tileinfo->category = (attr&0x100)>>8;
+
+	SET_TILE_INFO(
+			0,
+			code&0x1fff,
+			attr&0x7,
+			0);
+}
+
+static TILE_GET_INFO( get_multfish_reel_tile_info )
+{
+	int code = multfish_vid[tile_index*2+0x2000] | (multfish_vid[tile_index*2+0x2001] << 8);
+	
+	SET_TILE_INFO(
+			0,
+			(code&0x1fff)+0x2000,
+			(code>>14)+0x8,
+			0);
+}
+
+
 static VIDEO_START(multfish)
 {
 	multfish_vid = auto_malloc(multfish_VIDRAM_SIZE);
@@ -57,104 +87,76 @@ static VIDEO_START(multfish)
 	multfish_bram = auto_malloc(multfish_BRAM_SIZE);
 	memset(multfish_bram,0x00,multfish_BRAM_SIZE);
 	state_save_register_global_pointer(machine, multfish_bram, multfish_BRAM_SIZE);
+	
+	multfish_tilemap = tilemap_create(machine,get_multfish_tile_info,tilemap_scan_rows,16,16, 64, 32);
+	tilemap_set_transparent_pen(multfish_tilemap,255);
+	
+	multfish_reel_tilemap = tilemap_create(machine,get_multfish_reel_tile_info,tilemap_scan_rows,16,16, 64, 64);
+	tilemap_set_transparent_pen(multfish_reel_tilemap,255);
+	tilemap_set_scroll_cols(multfish_reel_tilemap, 64);
 }
+
+
+
+
 
 static VIDEO_UPDATE(multfish)
 {
-	int y,x,count;
-	gfx_element* gfx = screen->machine->gfx[0];
+	int i;
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	if (!multfish_disp_enable) return 0;
 
 	/* Draw lower part of static tilemap (low pri tiles) */
-	count = 0x0000;
-	for (y=0;y<64;y++)
+	tilemap_draw(bitmap,cliprect,multfish_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
+	
+	/* Setup the column scroll and draw the reels */
+	for (i=0;i<64;i++)
 	{
-		for (x=0;x<64;x++)
-		{
-			int tile, pal;
-
-			tile = multfish_vid[count*2+0] | (multfish_vid[count*2+1] << 8);
-			pal = multfish_vid[count*2+0+0x1000] | (multfish_vid[count*2+1+0x1000] << 8);
-			if ((pal & 0x0100))
-			{
-				tile &=0x1fff;
-				pal &=0x7;
-				drawgfx(bitmap,gfx,tile,pal,0,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,255);
-			}
-			count++;
-		}
+		int colscroll = (multfish_vid[i*2] | multfish_vid[i*2+1] << 8);
+		tilemap_set_scrolly(multfish_reel_tilemap, i, colscroll );
 	}
-
-	/* Draw scrollable tilemap (used for reels etc.) */
-	count = 0x1000;
-	for (y=0;y<64;y++)
-	{
-		for (x=0;x<64;x++)
-		{
-			int tile, pal;
-			int colscroll;
-			colscroll = (multfish_vid[x*2] | multfish_vid[x*2+1] << 8);
-			tile = multfish_vid[count*2+0] | (multfish_vid[count*2+1] << 8);
-			pal = tile>>14;
-
-			tile &=0x1fff;
-			tile |=0x2000;
-			drawgfx(bitmap,gfx,tile,pal+8,0,0,x*16,(y*16-colscroll)&0x3ff,cliprect,TRANSPARENCY_PEN,255);
-
-			count++;
-
-		}
-	}
+	tilemap_draw(bitmap,cliprect,multfish_reel_tilemap,0,0);
 
 	/* Draw upper part of static tilemap (high pri tiles) */
-	count = 0x0000;
-	for (y=0;y<64;y++)
-	{
-		for (x=0;x<64;x++)
-		{
-			int tile, pal;
+	tilemap_draw(bitmap,cliprect,multfish_tilemap,TILEMAP_DRAW_CATEGORY(0),0);
 
-			tile = multfish_vid[count*2+0] | (multfish_vid[count*2+1] << 8);
-			pal = multfish_vid[count*2+0+0x1000] | (multfish_vid[count*2+1+0x1000] << 8);
-			if (!(pal & 0x0100))
-			{
-				tile &=0x1fff;
-				pal &=0x7;
-				drawgfx(bitmap,gfx,tile,pal,0,0,x*16,y*16,cliprect,TRANSPARENCY_PEN,255);
-			}
-			count++;
-		}
-	}
-
-	/* set palette */
-	{
-		int z;
-		int c = 0x4000;
-
-		for (z=0;z<0x1000;z++)
-		{
-			int r,g,b;
-			int coldat;
-
-			coldat = multfish_vid[c+z*2+0] | (multfish_vid[c+z*2+1] << 8);
-
-			r = ( (coldat &0x001f)>> 0);
-			g = ( (coldat &0x1f00)>> 8);
-			b = ( (coldat &0x00e0)>> (5));
-			b|= ( (coldat &0xe000)>> (8+5-3));
-
-			palette_set_color_rgb(screen->machine, z, r<<3, g<<3, b<<2);
-
-		}
-	}
 	return 0;
 }
 
 static WRITE8_HANDLER( multfish_vid_w )
 {
 	multfish_vid[offset]=data;
+	
+	// 0x0000 - 0x1fff is normal tilemap
+	if (offset < 0x2000)
+	{
+		tilemap_mark_tile_dirty(multfish_tilemap,(offset&0xfff)/2);
+
+	}
+	// 0x2000 - 0x2fff is for the reels
+	else if (offset < 0x4000)
+	{
+		tilemap_mark_tile_dirty(multfish_reel_tilemap,(offset&0x1fff)/2);
+	}
+	else if (offset < 0x6000)
+	{
+		int r,g,b;
+		int coldat;
+
+		coldat = multfish_vid[(offset&0xfffe)] | (multfish_vid[(offset&0xfffe)^1] << 8);
+
+		r = ( (coldat &0x001f)>> 0);
+		g = ( (coldat &0x1f00)>> 8);
+		b = ( (coldat &0x00e0)>> (5));
+		b|= ( (coldat &0xe000)>> (8+5-3));
+
+		palette_set_color_rgb(space->machine, (offset-0x4000)/2, r<<3, g<<3, b<<2);		
+	}
+	else
+	{
+		// probably just work ram
+	}
 }
 
 static WRITE8_HANDLER( multfish_bank_w )
@@ -186,7 +188,7 @@ static WRITE8_HANDLER( bankedram_w )
 	}
 	else
 	{
-		multfish_vid[offset+0x2000*rambk] = data;
+		multfish_vid_w(space, offset+0x2000*rambk, data);
 	}
 }
 
@@ -207,8 +209,7 @@ static READ8_HANDLER( ray_r )
 
 
 static ADDRESS_MAP_START( multfish_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE( multfish_vid_w )
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_ROM, multfish_vid_w)
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bankedram_r, bankedram_w)
@@ -345,14 +346,14 @@ WRITE8_HANDLER( multfish_f4_w )
 
 static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_0_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_1_r)
-	AM_RANGE(0x12, 0x12) AM_READ(input_port_2_r)
-	AM_RANGE(0x13, 0x13) AM_READ(input_port_3_r)
-	AM_RANGE(0x14, 0x14) AM_READ(input_port_4_r)
-	AM_RANGE(0x15, 0x15) AM_READ(input_port_5_r)
-	AM_RANGE(0x16, 0x16) AM_READ(input_port_6_r)
-	AM_RANGE(0x17, 0x17) AM_READ(input_port_7_r)
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
+	AM_RANGE(0x13, 0x13) AM_READ_PORT("IN3")
+	AM_RANGE(0x14, 0x14) AM_READ_PORT("IN4")
+	AM_RANGE(0x15, 0x15) AM_READ_PORT("IN5")
+	AM_RANGE(0x16, 0x16) AM_READ_PORT("IN6")
+	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
 
 	/* Write ports not hooked up yet (lights etc.) */
 //	AM_RANGE(0x30, 0x30) AM_WRITE(multfish_port30_w)
@@ -377,13 +378,7 @@ static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf4, 0xf4)  AM_WRITE(multfish_f4_w) // display enable?
 
 	/* mirrors of the rom banking */
-	AM_RANGE(0xf8, 0xf8)  AM_WRITE(multfish_bank_w)
-	AM_RANGE(0xf9, 0xf9)  AM_WRITE(multfish_bank_w)
-	AM_RANGE(0xfa, 0xfa)  AM_WRITE(multfish_bank_w)
-	AM_RANGE(0xfb, 0xfb)  AM_WRITE(multfish_bank_w)
-	AM_RANGE(0xfc, 0xfc)  AM_WRITE(multfish_bank_w)
-	AM_RANGE(0xfd, 0xfd)  AM_WRITE(multfish_bank_w)
-
+	AM_RANGE(0xf8, 0xfd)  AM_WRITE(multfish_bank_w)
 ADDRESS_MAP_END
 
 
