@@ -232,7 +232,6 @@ static MACHINE_START( bzone )
 {
 	state_save_register_global(machine, analog_data);
 	mb_register_states(machine);
-	atari_vg_register_states(machine);
 }
 
 
