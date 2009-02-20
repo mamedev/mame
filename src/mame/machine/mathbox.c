@@ -8,14 +8,11 @@
 #include "driver.h"
 #include "mathbox.h"
 
-typedef short s16;
-typedef int s32;
-
 /* math box scratch registers */
-static s16 mb_reg [16];
+static INT16 mb_reg [16];
 
 /* math box result */
-static s16 mb_result = 0;
+static INT16 mb_result = 0;
 
 #define REG0 mb_reg [0x00]
 #define REG1 mb_reg [0x01]
@@ -41,8 +38,8 @@ static s16 mb_result = 0;
 
 WRITE8_HANDLER( mb_go_w )
 {
-  s32 mb_temp;  /* temp 32-bit multiply results */
-  s16 mb_q;     /* temp used in division */
+  INT32 mb_temp;  /* temp 32-bit multiply results */
+  INT16 mb_q;     /* temp used in division */
   int msb;
 
   LOG(("math box command %02x data %02x  ", offset, data));
@@ -85,17 +82,17 @@ WRITE8_HANDLER( mb_go_w )
 
       REG5 = (REG5 & 0x00ff) | (data << 8);
 
-      REGf = (s16)0xffff;
+      REGf = (INT16)0xffff;
       REG4 -= REG2;
       REG5 -= REG3;
 
     step_048:
 
-      mb_temp = ((s32) REG0) * ((s32) REG4);
+      mb_temp = ((INT32) REG0) * ((INT32) REG4);
       REGc = mb_temp >> 16;
       REGe = mb_temp & 0xffff;
 
-      mb_temp = ((s32) -REG1) * ((s32) REG5);
+      mb_temp = ((INT32) -REG1) * ((INT32) REG5);
       REG7 = mb_temp >> 16;
       mb_q = mb_temp & 0xffff;
 
@@ -119,11 +116,11 @@ WRITE8_HANDLER( mb_go_w )
 
     case 0x12:
 
-      mb_temp = ((s32) REG1) * ((s32) REG4);
+      mb_temp = ((INT32) REG1) * ((INT32) REG4);
       REGc = mb_temp >> 16;
       REG9 = mb_temp & 0xffff;
 
-      mb_temp = ((s32) REG0) * ((s32) REG5);
+      mb_temp = ((INT32) REG0) * ((INT32) REG5);
       REG8 = mb_temp >> 16;
       mb_q = mb_temp & 0xffff;
 
