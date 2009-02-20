@@ -12,12 +12,11 @@
 
 
 
-static SID6581 *get_sid(int indx)
+static SID6581 *get_sid(const device_config *device)
 {
-	return NULL;
-//  sound_type type = sndnum_to_sndti(indx, NULL);
-//  assert((type == SOUND_SID6581) || (type == SOUND_SID8580));
-//  return (SID6581 *) sndti_token(space->machine, type, indx);
+	assert(device != NULL);
+	assert((sound_get_type(device) == SOUND_SID6581) || (sound_get_type(device) == SOUND_SID8580));
+	return (SID6581 *) device->token;
 }
 
 
@@ -70,24 +69,15 @@ static DEVICE_START( sid8580 )
 
 
 
-READ8_HANDLER ( sid6581_0_port_r )
+READ8_DEVICE_HANDLER  ( sid6581_r )
 {
-	return sid6581_port_r(space->machine, get_sid(0), offset);
+	return sid6581_port_r(device->machine, get_sid(device), offset);
 }
 
-READ8_HANDLER ( sid6581_1_port_r )
-{
-	return sid6581_port_r(space->machine, get_sid(1), offset);
-}
 
-WRITE8_HANDLER ( sid6581_0_port_w )
+WRITE8_DEVICE_HANDLER ( sid6581_w )
 {
-	sid6581_port_w(get_sid(0), offset, data);
-}
-
-WRITE8_HANDLER ( sid6581_1_port_w )
-{
-	sid6581_port_w(get_sid(1), offset, data);
+	sid6581_port_w(get_sid(device), offset, data);
 }
 
 

@@ -27,10 +27,8 @@ struct _sid6581_interface
 } ;
 
 
-READ8_HANDLER  ( sid6581_0_port_r );
-READ8_HANDLER  ( sid6581_1_port_r );
-WRITE8_HANDLER ( sid6581_0_port_w );
-WRITE8_HANDLER ( sid6581_1_port_w );
+READ8_DEVICE_HANDLER  ( sid6581_r );
+WRITE8_DEVICE_HANDLER ( sid6581_w );
 
 DEVICE_GET_INFO( sid6581 );
 DEVICE_GET_INFO( sid8580 );
