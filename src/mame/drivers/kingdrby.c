@@ -1,4 +1,14 @@
 /*
+
+Press "Q" to get this running (vblank bit?)
+
+TODO:
+- remaining video issues;
+- inputs;
+- colors (probably needs a color prom);
+- unknown memories;
+- clean-ups!
+
 file   : readme.txt
 author : Stefan Lindberg
 created: 2009-01-03
@@ -52,48 +62,119 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "sound/ay8910.h"
 
 static UINT8 *kingdrby_vram,*kingdrby_attr;
+static tilemap *sc0_tilemap,*sc0w_tilemap;
+
+static TILE_GET_INFO( get_sc0_tile_info )
+{
+	int tile = kingdrby_vram[tile_index] | kingdrby_attr[tile_index]<<8;
+	int color = (kingdrby_attr[tile_index] & 0xfe) >> 1;
+
+	tile&=0x1ff;
+
+	SET_TILE_INFO(
+			1,
+			tile,
+			color,
+			0);
+}
+
 
 static VIDEO_START(kingdrby)
 {
-
+	sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,24);
+	sc0w_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
 static VIDEO_UPDATE(kingdrby)
 {
-	const gfx_element *gfx = screen->machine->gfx[1];
 	int count = 0;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	rectangle clip;
+	tilemap_set_scrollx( sc0_tilemap,0, kingdrby_vram[0x342]);
+	tilemap_set_scrolly( sc0_tilemap,0, kingdrby_vram[0x341]);
+	tilemap_set_scrolly( sc0w_tilemap,0, 32);
 
-	int y,x;
+	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
+	clip.min_x = visarea->min_x;
+	clip.max_x = 256;
+	clip.min_y = 192;
+	clip.max_y = visarea->max_y;
 
+	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
+	tilemap_draw(bitmap,&clip,sc0w_tilemap,0,0);
 
-	for (y=0;y<32;y++)
+	/*sprites not yet understood.*/
+	for(count=0;count<0x100;count+=4)
 	{
-		for (x=0;x<32;x++)
-		{
-			int tile = kingdrby_vram[count]|kingdrby_attr[count]<<8;
-			tile&=0x1ff;
-			//int colour = tile>>12;
-			drawgfx(bitmap,gfx,tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+		int x,y,spr_offs,colour,dir,fx;
 
-			count++;
+		spr_offs = (spriteram[count]);
+		spr_offs &=0x7f;
+		spr_offs*=4;
+		colour = 0;//(spriteram[count] & 0xff);
+		fx = spriteram[count] & 0x80;
+		dir = (spriteram[count+3] & 0xc0)>>6;
+		y = 0x100-spriteram[count+1];
+		x = spriteram[count+2];
+		if(fx)
+		{
+			drawgfx(bitmap,screen->machine->gfx[0],spr_offs,colour,fx,0,x+48,y,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],spr_offs+1,colour,fx,0,x+32,y,cliprect,TRANSPARENCY_PEN,0);
+			if(dir == 0)
+			{
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+2,colour,fx,0,x+16,y,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+3,colour,fx,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+			}
+			else if(dir == 2)
+			{
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+2,colour,fx,0,x+48,y+16,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+3,colour,fx,0,x+32,y+16,cliprect,TRANSPARENCY_PEN,0);
+			}
+		}
+		else
+		{
+			drawgfx(bitmap,screen->machine->gfx[0],spr_offs,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],spr_offs+1,colour,0,0,x+16,y,cliprect,TRANSPARENCY_PEN,0);
+			if(dir == 0)
+			{
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+2,colour,0,0,x+32,y,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+3,colour,0,0,x+48,y,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+4,colour,0,0,x,y+16,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+5,colour,0,0,x+16,y+16,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+6,colour,0,0,x+32,y+16,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+7,colour,0,0,x+48,y+16,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+8,colour,0,0,x,y+32,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+9,colour,0,0,x+16,y+32,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+10,colour,0,0,x+32,y+32,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+11,colour,0,0,x+48,y+32,cliprect,TRANSPARENCY_PEN,0);
+			}
+			else if(dir == 2)
+			{
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+2,colour,0,0,x,y+16,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+3,colour,0,0,x+16,y+16,cliprect,TRANSPARENCY_PEN,0);
+			}
 		}
 	}
+
 	return 0;
 }
 
 static WRITE8_DEVICE_HANDLER( outport0_w )
 {
-//	popmessage("PPI0 port C out: %02X", data);
+//	printf("PPI0 port C out: %02X\n", data);
 }
 
 static WRITE8_DEVICE_HANDLER( outport1_w )
 {
-//	popmessage("PPI1 port A out: %02X", data);
+//	const address_space *space = cpu_get_address_space(device->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
+
+//	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+//	soundlatch_w(space,0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( outport2_w )
 {
-//	popmessage("PPI1 port C(upper) out: %02X", data);
+//	printf("PPI1 port C(upper) out: %02X\n", data);
 }
 
 #if 0
@@ -103,35 +184,30 @@ static READ8_HANDLER( ff_r )
 }
 #endif
 
-static UINT8 latch;
-
-static WRITE8_HANDLER( master_latch_w)
+static WRITE8_HANDLER( sc0_vram_w )
 {
-//	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
-	latch = data;
+	kingdrby_vram[offset] = data;
+	tilemap_mark_tile_dirty(sc0_tilemap,offset);
+	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
 }
 
-static READ8_HANDLER( slave_latch_r )
+static WRITE8_HANDLER( sc0_attr_w )
 {
-//	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
-	return latch;
-}
-
-static READ8_HANDLER( master_latch_r )
-{
-	return mame_rand(space->machine);
+	kingdrby_attr[offset] = data;
+	tilemap_mark_tile_dirty(sc0_tilemap,offset);
+	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
 }
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x3885, 0x3885) AM_READWRITE(master_latch_r,master_latch_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&kingdrby_vram)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&kingdrby_attr)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0xc00) AM_SHARE(1)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&kingdrby_vram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(sc0_attr_w) AM_BASE(&kingdrby_attr)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x00, 0x00) AM_READ_PORT("UNK")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -141,16 +217,17 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x7400, 0x77ff) AM_RAM
+	AM_RANGE(0x7400, 0x75ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x7c00, 0x7c00) AM_READ(slave_latch_r)
+//	AM_RANGE(0x7a00, 0x7a00) AM_READ_PORT("UNK")
+	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x00, 0x00) AM_READ_PORT("UNK")
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
@@ -159,7 +236,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
@@ -210,41 +287,145 @@ static const ppi8255_interface ppi8255_intf[2] =
 static INPUT_PORTS_START( kingdrby )
 
 	PORT_START("IN0")	// ppi0 (5000)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("1P 1C/1C") //service?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P 1C/1C") //service?
+	PORT_DIPNAME( 0x10, 0x10, "Hopper I/O" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Credit Clear") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Credit Clear")
+
 
 	PORT_START("IN1")	// ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-1") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-2") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-3") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-4") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-6") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-7") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-8") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Unknown bit") PORT_CODE(KEYCODE_Q) //vblank?
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )  PORT_NAME( "Analyzer" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("1P 1C/10C")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P 1C/10C")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")	// ppi1 (6001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-5") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-6") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-7") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-8") PORT_CODE(KEYCODE_K)
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN3")	// ppi1 (6002)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Game Type?" ) //enables two new msgs "advance" and "exchange" in analyzer mode
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "POST Check" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("UNK")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout layout8x8x2 =
@@ -263,21 +444,21 @@ static const gfx_layout layout8x8x2 =
 
 static const gfx_layout layout16x16x2 =
 {
-	8,8,
+	16,16,
 	RGN_FRAC(1,2),
 	2,
 	{
 		RGN_FRAC(0,2),
 		RGN_FRAC(1,2),
 	},
-	{ STEP16(0,1) },
-	{ STEP16(0,16) },
+	{ 0,1,2,3,4,5,6,7,16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7, },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8  },
 	16*16
 };
 
 static GFXDECODE_START( kingdrby )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, layout8x8x2, 0, 0x1 )
-	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0, 0x1 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, layout16x16x2, 0, 0x40 )
+	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0, 0x40 )
 GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
@@ -292,27 +473,12 @@ static const mc6845_interface mc6845_intf =
 	NULL	/* VSYNC callback */
 };
 
-static READ8_DEVICE_HANDLER( test3_r )
-{
-	static UINT8 x;
-
-	if(input_code_pressed(KEYCODE_Z))
-		x++;
-
-	if(input_code_pressed(KEYCODE_X))
-		x--;
-
-	popmessage("%02x",x);
-
-	return x;
-}
-
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(test3_r),
-	DEVCB_HANDLER(test3_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -327,12 +493,11 @@ static MACHINE_DRIVER_START( kingdrby )
 	MDRV_CPU_PROGRAM_MAP(slave_map,0)
 	MDRV_CPU_IO_MAP(slave_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-//	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
 
-	MDRV_CPU_ADD("sound", Z80, CLK_1/8)		/* Or maybe it's the 20 mhz one? */
+	MDRV_CPU_ADD("sound", Z80, CLK_2)		/* Or maybe it's the 20 mhz one? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) //to be removed from here...
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_QUANTUM_PERFECT_CPU("master")
 
@@ -342,7 +507,7 @@ static MACHINE_DRIVER_START( kingdrby )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	MDRV_GFXDECODE(kingdrby)
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -360,7 +525,7 @@ static MACHINE_DRIVER_START( kingdrby )
 
 	MDRV_SOUND_ADD("ay", AY8910, CLK_1/16)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 
@@ -391,8 +556,8 @@ ROM_START( kingdrby )
 
 	/* These last 2 ROMs are a good distance away on the PCB */
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "s9_a.k8",  0x1000, 0x1000, CRC(CA82CD81) SHA1(FDF47DF7705C8D0AE70B5A0E29B35819F3D0749A) )
-	ROM_LOAD( "s10_a.l8", 0x0000, 0x1000, CRC(37B2736F) SHA1(15EF3F563AEBD1F5506135C7C01E9A1DB30A9CCC) )
+	ROM_LOAD( "s9_a.k8",  0x0000, 0x1000, CRC(CA82CD81) SHA1(FDF47DF7705C8D0AE70B5A0E29B35819F3D0749A) )
+	ROM_LOAD( "s10_a.l8", 0x1000, 0x1000, CRC(37B2736F) SHA1(15EF3F563AEBD1F5506135C7C01E9A1DB30A9CCC) )
 ROM_END
 
 /*    YEAR  NAME    PARENT  MACHINE  INPUT    INIT     MONITOR COMPANY     FULLNAME   FLAGS */
