@@ -1228,6 +1228,35 @@ ROM_START( gslgr94u )
 	ROM_LOAD( "gse-sha0.bin", 0, 0x80000, CRC(6b2beabb) SHA1(815f7aef44735584edd4a9ca7e672471d07f225e) )
 ROM_END
 
+ROM_START( gslgr94j )
+	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_LOAD32_WORD( "gs41mprl.15b", 0x00002, 0x80000, CRC(5759bdb5) SHA1(a0fb332c484e168369a69cd9dd8ea72e5f4565df) )
+	ROM_LOAD32_WORD( "gs41mpru.13b", 0x00000, 0x80000, CRC(78bde1e7) SHA1(911d33897f03c59c6505f5f755d80471ff019812) )
+
+	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
+	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
+
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
+	ROM_LOAD( "gs41spr0.5b", 0, 0x80000, CRC(3e2b6d55) SHA1(f6a1ecaee3a9a7a535850084e469aa7f873f301e) )
+
+	ROM_REGION( 0x200000, "c352", 0 )
+	ROM_LOAD( "gs4voi0.5j", 0, 0x200000, CRC(c3053a90) SHA1(e76799b33b2457421255b03786bc24266d59c7dd) )
+
+	ROM_REGION( 0x800000, NAMCONB1_SPRITEGFXREGION, ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "gs4obj0l.bin", 0x000001, 0x200000, CRC(3b499da0) SHA1(91ad5f68dbda64dd07e1133eb09ee69da3da3103) )
+	ROM_LOAD16_BYTE( "gs4obj0u.bin", 0x000000, 0x200000, CRC(80016b50) SHA1(9f7604c196835d31894ba4db1de43d7d2614da84) )
+	ROM_LOAD16_BYTE( "gs4obj1l.bin", 0x200001, 0x200000, CRC(1f4847a7) SHA1(908e419e42fa8bd786cc3bc96d5ccb3a47c8e2dc) )
+	ROM_LOAD16_BYTE( "gs4obj1u.bin", 0x200000, 0x200000, CRC(49bc48cd) SHA1(6bcc41546f3bd609e3aa962e5ce3bf5bc6b9229a) )
+
+	ROM_REGION( 0x400000, NAMCONB1_TILEGFXREGION, ROMREGION_DISPOSE )
+	ROM_LOAD( "gs4chr0.8j",  0x000000, 0x100000, CRC(8c6c682e) SHA1(ecf21035d5af28299c9cdb98d5d811b4d52857b8) )
+	ROM_LOAD( "gs4chr1.9j",  0x100000, 0x100000, CRC(523989f7) SHA1(fae0e2f58e9a8d0ddc7297b567579849e24e0a40) )
+	ROM_LOAD( "gs4chr2.10j", 0x200000, 0x100000, CRC(37569559) SHA1(ce31673f51c6302f4fb4e4c377e6693a40874f81) )
+	ROM_LOAD( "gs4chr3.11j", 0x300000, 0x100000, CRC(73ca58f6) SHA1(44bdc943fb10dc53279662cd528169a27d57e478) )
+
+	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
+	ROM_LOAD( "gs4sha0.5m", 0, 0x80000, CRC(40e7e6a5) SHA1(70af76b6034e0d6e1b96bf54c973ab411e5907ab) )
+ROM_END
 
 /*
 Great Sluggers (Japan)
@@ -1958,6 +1987,7 @@ GAME( 1994, ptblank,  0,        namconb1, gunbulet, gunbulet, ROT0,  "Namco", "P
 GAME( 1994, gunbulet, ptblank,  namconb1, gunbulet, gunbulet, ROT0,  "Namco", "Gun Bullet (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1993, gslugrsj, 0,        namconb1, nbsports, gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1994, gslgr94u, 0,        namconb1, nbsports, gslgr94u, ROT0,  "Namco", "Great Sluggers '94", GAME_IMPERFECT_SOUND )
+GAME( 1994, gslgr94j, gslgr94u, namconb1, nbsports, gslgr94u, ROT0,  "Namco", "Great Sluggers '94 (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1995, sws95,    0,        namconb1, nbsports, sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1996, sws96,    0,        namconb1, nbsports, sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1997, sws97,    0,        namconb1, nbsports, sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", GAME_IMPERFECT_SOUND )

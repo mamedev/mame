@@ -829,6 +829,7 @@ const game_driver * const drivers[] =
 	DRIVER( gunbulet )	/* (c) 1994 (Japan) */
 	DRIVER( gslugrsj )	/* (c) 1993 (Japan) */
 	DRIVER( gslgr94u )	/* (c) 1994 */
+	DRIVER( gslgr94j )	/* (c) 1994 (Japan) */
 	DRIVER( sws95 )		/* (c) 1995 (Japan) */
 	DRIVER( sws96 )		/* (c) 1996 (Japan) */
 	DRIVER( sws97 )		/* (c) 1997 (Japan) */
