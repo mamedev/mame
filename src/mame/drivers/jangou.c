@@ -744,6 +744,65 @@ ROM_START( jangou )
 ROM_END
 
 /*
+
+Monoshiri Quiz Osyaberi Macha (c)1983 Logitec
+Same board as jangou
+
+CPU: Z80x2
+Sound: AY-3-8910, HC55536
+XTAL: 20.000MHz
+
+all EPROMs are 2764
+
+POM1.9D -- Programs
+POM2.9E |
+POM3.9F |
+POM4.9G |
+POM5.9H /
+
+POM6.9L -- Programs
+POM7.9M |
+POM8.9N |
+POM9.9P /
+
+POM10.5N -- Graphics
+POM11.5M |
+POM12.BIN|
+POM13.BIN /
+(12 and 13 is on small daughter board plugged into the socket 5L)
+
+IC3G.BIN - Color PROM
+
+RAM: HM6116LP-3 (16KbitSRAM location 9C, next to POM1)
+     M5K4164NP-15 (64KbitDRAM location 4E, 4F, 4G, 4H)
+
+*/
+
+ROM_START( macha )
+	ROM_REGION( 0x10000, "cpu0", 0 )
+	ROM_LOAD( "pom1.9d", 0x00000, 0x02000, CRC(fbe28b4e) SHA1(2617f8c107b64aa540158a772a725eb68982e095) )
+	ROM_LOAD( "pom2.9e", 0x02000, 0x02000, CRC(16a8d176) SHA1(30fe65d3a1744afc70c25c29119db3f5e7126601) )
+	ROM_LOAD( "pom3.9f", 0x04000, 0x02000, CRC(c31eeb04) SHA1(65d4873fcaff677f03721139dc80b2fe5108c633) )
+	ROM_LOAD( "pom4.9g", 0x06000, 0x02000, CRC(bdb0dd0e) SHA1(d8039fb9996e8707a0c5ca0760d4d6792bbe7270) )
+	ROM_LOAD( "pom5.9h", 0x08000, 0x02000, CRC(db6d86e8) SHA1(e9c0f52abd504f39187d0fb7de5b7fffc795204c) )
+
+	ROM_REGION( 0x8000, "cpu1", 0 )
+	ROM_LOAD( "pom9.9p", 0x00000, 0x02000, CRC(f4d4e0a8) SHA1(914fe35d4434b826ca3b0a230b87017b033dd512) )
+	ROM_LOAD( "pom8.9n", 0x02000, 0x02000, CRC(8be49178) SHA1(2233d964a25ef61063b97891f6ad46d6eb10b0c6) )
+	ROM_LOAD( "pom7.9m", 0x04000, 0x02000, CRC(48a89180) SHA1(36e916583cc89090880111320537b545620d95fd) )
+	ROM_LOAD( "pom6.9l", 0x06000, 0x02000, CRC(7dbafffe) SHA1(2f0c5a340625df30029874ca447f0662ea354547) )
+
+	ROM_REGION( 0x10000, "gfx", 0 )
+	ROM_LOAD( "pom10.5n",  0x00000, 0x02000, CRC(5e387db0) SHA1(72fd6d3ae722260cb50d1040faa128f3e5427402) )
+	ROM_LOAD( "pom11.5m",  0x02000, 0x02000, CRC(17b54f4e) SHA1(5ecbebc063b5eb888ec1dbf210f54fa3a774ab70) )
+	ROM_LOAD( "pom12.bin", 0x04000, 0x02000, CRC(5f1b73ca) SHA1(b8ce01a3975505a2a6b4d4c688b6c7ae4f6df07d) )
+	ROM_LOAD( "pom13.bin", 0x06000, 0x02000, CRC(91c489f2) SHA1(a4d2fcebdbdea73ca03722104732e7c6efda5d4d) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "ic3g.bin", 0x00, 0x20,  CRC(d5243aa5) SHA1(d70d5dcb1a3241bec16589ed2eb1cc0054c9ed8e) )
+ROM_END
+
+/*
 Jangou Lady
 (c)1984 Nihon Bussan
 
@@ -893,11 +952,12 @@ static DRIVER_INIT (luckygrl)
 }
 
 
-GAME( 1983, jangou,    0,    jangou,   jangou,    0,        ROT0, "Nichibutsu",   "Jangou [BET] (Japan)", GAME_NO_COCKTAIL )
-GAME( 1984, jngolady,  0,    jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
-GAME( 1984, cntrygrl,  0,    cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
+GAME( 1983, jangou,     0,    jangou,   jangou,    0,        ROT0, "Nichibutsu",   "Jangou [BET] (Japan)", GAME_NO_COCKTAIL )
+GAME( 1983, macha, jangou,    jangou,   jangou,    0,        ROT0, "Logitec",   "Monoshiri Quiz Osyaberi Macha (Japan)", GAME_NO_COCKTAIL )
+GAME( 1984, jngolady,   0,    jngolady, jngolady,  jngolady, ROT0, "Nichibutsu",   "Jangou Lady (Japan)", GAME_NO_COCKTAIL )
+GAME( 1984, cntrygrl,   0,    cntrygrl, cntrygrl,  0,        ROT0, "Royal Denshi", "Country Girl (Japan)",  GAME_NO_COCKTAIL )
 /* The following might not run there... */
-GAME( 1984?,luckygrl,  0,    cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing", 		  "Lucky Girl? (Wing)", GAME_NOT_WORKING )
+GAME( 1984?,luckygrl,   0,    cntrygrl, cntrygrl,  luckygrl, ROT0, "Wing", 		  "Lucky Girl? (Wing)", GAME_NOT_WORKING )
 
 /*
 Some other games that might run on this HW:
@@ -908,5 +968,4 @@ Some other games that might run on this HW:
     Hana Puter
     Royal Card
     Fruits Bunny (clone of Country Girl)
-    Monoshiri Quiz Osyaberi Macha (Logitec, same board as jangou)
 */
