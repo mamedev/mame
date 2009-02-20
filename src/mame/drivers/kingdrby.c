@@ -1,9 +1,7 @@
 /*
 
-Press "Q" to get this running (vblank bit?)
-
 TODO:
-- remaining video issues;
+- remaining video issues, priorities, sprites etc.;
 - inputs;
 - colors (probably needs a color prom);
 - unknown memories;
@@ -67,7 +65,7 @@ static tilemap *sc0_tilemap,*sc0w_tilemap;
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	int tile = kingdrby_vram[tile_index] | kingdrby_attr[tile_index]<<8;
-	int color = (kingdrby_attr[tile_index] & 0xfe) >> 1;
+	int color = (kingdrby_attr[tile_index] & 0xf0) >> 4;
 
 	tile&=0x1ff;
 
@@ -103,56 +101,44 @@ static VIDEO_UPDATE(kingdrby)
 	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
 	tilemap_draw(bitmap,&clip,sc0w_tilemap,0,0);
 
-	/*sprites not yet understood.*/
+	/*sprites not fully understood.*/
 	for(count=0;count<0x100;count+=4)
 	{
-		int x,y,spr_offs,colour,dir,fx;
+		int x,y,spr_offs,colour,fx,mode,dx,dy,h,w;
 
 		spr_offs = (spriteram[count]);
 		spr_offs &=0x7f;
 		spr_offs*=4;
-		colour = 0;//(spriteram[count] & 0xff);
+		colour = 0;
 		fx = spriteram[count] & 0x80;
-		dir = (spriteram[count+3] & 0xc0)>>6;
-		y = 0x100-spriteram[count+1];
+		if(spriteram[count+1] == 0)
+			y = 0;
+		else
+			y = 0x100-spriteram[count+1];
 		x = spriteram[count+2];
+		mode = (spriteram[count+3] & 0xff);
+
+		if((mode & 1) == 1)
+			continue;
+
+		/*a simpler way?*/
+		if((mode & 0xe0) == 0xc0 )      { h = 1; w = 1; }
+		else if((mode & 0xe0) == 0xa0 ) { h = 2; w = 2; }
+		else if((mode & 0xe0) == 0x80 ) { h = 2; w = 2; }
+		else if((mode & 0xe0) == 0xe0 ) { h = 2; w = 2; }
+		else              {  h = 3; w = 4; }
+
 		if(fx)
 		{
-			drawgfx(bitmap,screen->machine->gfx[0],spr_offs,colour,fx,0,x+48,y,cliprect,TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,screen->machine->gfx[0],spr_offs+1,colour,fx,0,x+32,y,cliprect,TRANSPARENCY_PEN,0);
-			if(dir == 0)
-			{
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+2,colour,fx,0,x+16,y,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+3,colour,fx,0,x,y,cliprect,TRANSPARENCY_PEN,0);
-			}
-			else if(dir == 2)
-			{
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+2,colour,fx,0,x+48,y+16,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+3,colour,fx,0,x+32,y+16,cliprect,TRANSPARENCY_PEN,0);
-			}
+			for(dy=0;dy<h;dy++)
+				for(dx=0;dx<w;dx++)
+					drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,1,0,(x+16*w)-dx*16,y+dy*16,cliprect,TRANSPARENCY_PEN,0);
 		}
 		else
 		{
-			drawgfx(bitmap,screen->machine->gfx[0],spr_offs,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
-			drawgfx(bitmap,screen->machine->gfx[0],spr_offs+1,colour,0,0,x+16,y,cliprect,TRANSPARENCY_PEN,0);
-			if(dir == 0)
-			{
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+2,colour,0,0,x+32,y,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+3,colour,0,0,x+48,y,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+4,colour,0,0,x,y+16,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+5,colour,0,0,x+16,y+16,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+6,colour,0,0,x+32,y+16,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+7,colour,0,0,x+48,y+16,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+8,colour,0,0,x,y+32,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+9,colour,0,0,x+16,y+32,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+10,colour,0,0,x+32,y+32,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+11,colour,0,0,x+48,y+32,cliprect,TRANSPARENCY_PEN,0);
-			}
-			else if(dir == 2)
-			{
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+2,colour,0,0,x,y+16,cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,screen->machine->gfx[0],spr_offs+3,colour,0,0,x+16,y+16,cliprect,TRANSPARENCY_PEN,0);
-			}
+			for(dy=0;dy<h;dy++)
+				for(dx=0;dx<w;dx++)
+					drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,0,0,x+dx*16,y+dy*16,cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 
@@ -306,7 +292,7 @@ static INPUT_PORTS_START( kingdrby )
 
 
 	PORT_START("IN1")	// ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Unknown bit") PORT_CODE(KEYCODE_Q) //vblank?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK ) //?
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -511,7 +497,7 @@ static MACHINE_DRIVER_START( kingdrby )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)	/* controlled by CRTC */
