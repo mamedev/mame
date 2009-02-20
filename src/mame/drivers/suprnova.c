@@ -1033,6 +1033,7 @@ static DRIVER_INIT( teljan )   { skns_sprite_kludge(+5,+1); init_skns(machine); 
 static DRIVER_INIT( sengekis ) { skns_sprite_kludge(-192,-272); init_skns(machine); memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60b74bc, 0x60b74bf, 0, 0, sengekis_speedup_r ); set_drc_pcflush(machine, 0x60006ec); }
 static DRIVER_INIT( sengekij ) { skns_sprite_kludge(-192,-272); init_skns(machine); memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60b7380, 0x60b7383, 0, 0, sengekij_speedup_r ); set_drc_pcflush(machine, 0x60006ec); }
 static DRIVER_INIT( sarukani ) { skns_sprite_kludge(-1,-1); init_skns(machine); set_drc_pcflush(machine, 0x4013b42); } // Speedup is in skns_io_w()
+static DRIVER_INIT( galpans3 ) { skns_sprite_kludge(-1,-1); init_skns(machine);  }
 
 
 
@@ -1204,6 +1205,27 @@ ROM_START( galpansu )
 	ROM_LOAD( "4",  0x000000, 0x400000, CRC(0348e8e1) SHA1(8a21c7e5cea0bc08a2595213d689c58c0251fdb5) )
 ROM_END
 
+ROM_START( galpans3 )
+	ROM_REGION( 0x080000, "main", 0 ) /* SH-2 Code */
+	ROM_LOAD       ( "sknsj1.u10",   0x000000, 0x080000, CRC(7e2b836c) SHA1(92c5a7a2472496028bff0e5980d41dd294f42144) ) /* Japan BIOS */
+
+	ROM_REGION32_BE( 0x200000, "user1", 0 ) /* SH-2 Code mapped at 0x04000000 */
+	ROM_LOAD16_BYTE( "gpss3.u10", 0x000000, 0x100000, CRC(c1449a72) SHA1(02db81a0ea349742d6ddf71d59fcfce45f0c5212) )
+	ROM_LOAD16_BYTE( "gpss3.u8",  0x000001, 0x100000, CRC(11eb44cf) SHA1(482ef27fa86d6777def46918eac8be019896c0b0) )
+
+	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_LOAD( "u24.bin", 0x000000, 0x800000, CRC(70613168) SHA1(637c50e733dbc0226b1e0acc8000faa7e8977cb6) )
+
+	ROM_REGION( 0x800000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "u16.bin", 0x000000, 0x800000, CRC(a96daf2a) SHA1(40f4c32158d320146aeeac34c15ca6816a6876bc) )
+
+	ROM_REGION( 0x800000, "gfx3", ROMREGION_ERASE00 ) /* Tiles Plane B */
+	/* First 0x040000 bytes (0x03ff Tiles) are RAM Based Tiles */
+	/* 0x040000 - 0x3fffff empty? */
+
+	ROM_REGION( 0x400000, "ymz", 0 ) /* Samples */
+	ROM_LOAD( "u4.bin", 0x000000, 0x400000, CRC(bf5736c6) SHA1(781292d87e9da1d21c1ac540baefff5e2f84a3f5) )
+ROM_END
 
 ROM_START( gutsn )
 	ROM_REGION( 0x080000, "main", 0 ) /* SH-2 Code */
@@ -1592,4 +1614,5 @@ GAME( 1997, sengekis, skns,    skns, skns,     sengekis, ROT90, "Kaneko / Warash
 GAME( 1997, sengekij, sengekis,skns, skns,     sengekij, ROT90, "Kaneko / Warashi", "Sengeki Striker (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, vblokbrk, skns,    skns, vblokbrk, sarukani, ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Asia)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, sarukani, vblokbrk,skns, vblokbrk, sarukani, ROT0,  "Kaneko / Mediaworks", "Saru-Kani-Hamu-Zou (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2002, galpans3, skns,    skns, galpanis, galpans3, ROT0,  "Kaneko", "Gals Panic S3 (Japan)", GAME_IMPERFECT_GRAPHICS )
 

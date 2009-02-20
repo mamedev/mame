@@ -6935,6 +6935,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jjparad2 )	/* (c) 1997 Electro Design Co. (Japan) */
 	DRIVER( ryouran )	/* (c) 1998 Electro Design Co. (Japan) */
 	DRIVER( teljan )	/* (c) 1999 Electro Design Co. (Japan) */
+	DRIVER( galpans3 )	/* (c) 2002 Kaneko (Japan) */
 
 	/* Seta games (seta.c) */
 	DRIVER( hanaawas )	/* (c) SetaKikaku */
