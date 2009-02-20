@@ -5,8 +5,10 @@
 
 UINT16 tatsumi_control_word=0;
 static UINT16 tatsumi_last_control=0;
-static UINT16 tatsumi_last_irq=0;
 static UINT8 apache3_adc;
+UINT16 apache3_rotate_ctrl[12];
+static int apache3_rot_idx;
+
 
 UINT16 *tatsumi_68k_ram;
 UINT8 *apache3_z80_ram;
@@ -15,12 +17,11 @@ UINT8 *apache3_z80_ram;
 
 void tatsumi_reset(running_machine *machine)
 {
-	tatsumi_last_irq=0;
-	tatsumi_last_control=0;
-	tatsumi_control_word=0;
-	apache3_adc=0;
+	tatsumi_last_control = 0;
+	tatsumi_control_word = 0;
+	apache3_adc = 0;
+	apache3_rot_idx = 0;
 
-	state_save_register_global(machine, tatsumi_last_irq);
 	state_save_register_global(machine, tatsumi_last_control);
 	state_save_register_global(machine, tatsumi_control_word);
 	state_save_register_global(machine, apache3_adc);
@@ -50,8 +51,6 @@ WRITE16_HANDLER( apache3_bank_w )
 		logerror("Unknown control Word: %04x\n",tatsumi_control_word);
 		cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_HALT, CLEAR_LINE); // ?
 	}
-	if ((tatsumi_control_word&0x8)==0 && !(tatsumi_last_control&0x8))
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_IRQ4, ASSERT_LINE);
 
 	if (tatsumi_control_word&0x10)
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
@@ -66,22 +65,11 @@ WRITE16_HANDLER( apache3_bank_w )
 	tatsumi_last_control=tatsumi_control_word;
 }
 
-WRITE16_HANDLER( apache3_irq_ack_w )
+// D1 = /ZBREQ  - Z80 bus request
+// D0 = /GRDACC - Allow 68000 access to road pattern RAM
+WRITE16_HANDLER( apache3_z80_ctrl_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_IRQ4, CLEAR_LINE);
-
-	if ((data&2) && (tatsumi_last_irq&2)==0)
-	{
-		cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_HALT, ASSERT_LINE);
-	}
-
-	if ((tatsumi_last_irq&2) && (data&2)==0)
-	{
-		cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_HALT, CLEAR_LINE);
-		cpu_set_input_line_and_vector(space->machine->cpu[3], 0, HOLD_LINE, 0xc7 | 0x10);
-	}
-
-	tatsumi_last_irq=data;
+	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_HALT, data & 2 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ16_HANDLER( apache3_v30_v20_r )
@@ -114,36 +102,48 @@ WRITE16_HANDLER( apache3_v30_v20_w )
 	}
 }
 
-READ16_HANDLER(apache3_z80_r)
+READ16_HANDLER( apache3_z80_r )
 {
 	return apache3_z80_ram[offset];
 }
 
-WRITE16_HANDLER(apache3_z80_w)
+WRITE16_HANDLER( apache3_z80_w )
 {
 	apache3_z80_ram[offset]=data&0xff;
 }
 
 READ8_HANDLER( apache3_adc_r )
 {
-	if (apache3_adc==0)
-		return input_port_read(space->machine, "STICKX");
-	return input_port_read(space->machine, "STICKY");
+	switch (apache3_adc)
+	{
+		case 0: return input_port_read(space->machine, "STICK_X");
+		case 1: return input_port_read(space->machine, "STICK_Y");
+		case 2: return 0; // VSP1
+		case 3: return 0;
+		case 4: return (UINT8)((255./100) * (100 - input_port_read(space->machine, "VR1")));
+		case 5: return input_port_read(space->machine, "THROTTLE");
+		case 6: return 0; // RPSNC
+		case 7: return 0; // LPSNC
+	}
+
+	return 0;
 }
 
 WRITE8_HANDLER( apache3_adc_w )
 {
-	apache3_adc=offset;
+	apache3_adc = offset;
 }
 
-UINT16 apache3_a0000[16]; // TODO
-static int a3counter=0; // TODO
-
-WRITE16_HANDLER( apache3_a0000_w )
+/* Ground/sky rotation control
+ *
+ * There are 12 16-bit values that are
+ * presumably loaded into the 8 TZ2213 custom
+ * accumulators and counters.
+ */
+WRITE16_HANDLER( apache3_rotate_w )
 {
-	if (a3counter>15) // TODO
-		return;
-	apache3_a0000[a3counter++]=data;
+	apache3_rotate_ctrl[apache3_rot_idx] = data;
+	apache3_rot_idx = (apache3_rot_idx + 1) % 12;
 }
 
 /******************************************************************************/

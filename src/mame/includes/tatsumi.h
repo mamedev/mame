@@ -14,21 +14,21 @@ extern UINT16 *roundup5_unknown0, *roundup5_unknown1, *roundup5_unknown2;
 
 READ16_HANDLER( apache3_bank_r );
 WRITE16_HANDLER( apache3_bank_w );
-WRITE16_HANDLER( apache3_irq_ack_w );
+WRITE16_HANDLER( apache3_z80_ctrl_w );
 READ16_HANDLER( apache3_v30_v20_r );
 WRITE16_HANDLER( apache3_v30_v20_w );
 READ16_HANDLER( roundup_v30_z80_r );
 WRITE16_HANDLER( roundup_v30_z80_w );
 READ16_HANDLER( tatsumi_v30_68000_r );
 WRITE16_HANDLER( tatsumi_v30_68000_w ) ;
-READ16_HANDLER(apache3_z80_r);
-WRITE16_HANDLER(apache3_z80_w);
+READ16_HANDLER( apache3_z80_r );
+WRITE16_HANDLER( apache3_z80_w );
 READ8_HANDLER( apache3_adc_r );
 WRITE8_HANDLER( apache3_adc_w );
-WRITE16_HANDLER(cyclwarr_control_w);
-READ16_HANDLER(cyclwarr_control_r);
+WRITE16_HANDLER( apache3_rotate_w );
+WRITE16_HANDLER( cyclwarr_control_w );
+READ16_HANDLER( cyclwarr_control_r );
 WRITE16_HANDLER( roundup5_control_w );
-WRITE16_HANDLER( apache3_a0000_w );
 WRITE16_HANDLER( roundup5_d0000_w );
 WRITE16_HANDLER( roundup5_e0000_w );
 
@@ -38,7 +38,8 @@ READ8_DEVICE_HANDLER(tatsumi_hack_oki_r);
 extern UINT16 *tatsumi_68k_ram;
 extern UINT8 *apache3_z80_ram;
 extern UINT16 tatsumi_control_word;
-extern UINT16 apache3_a0000[16];
+extern UINT16 apache3_rotate_ctrl[12];
+extern UINT16 *apache3_g_ram;
 
 void tatsumi_reset(running_machine *machine);
 
@@ -52,9 +53,11 @@ READ16_HANDLER( cyclwarr_videoram0_r );
 WRITE16_HANDLER( cyclwarr_videoram0_w );
 READ16_HANDLER( cyclwarr_videoram1_r );
 WRITE16_HANDLER( cyclwarr_videoram1_w );
-READ16_HANDLER(roundup5_vram_r);
-WRITE16_HANDLER(roundup5_vram_w);
-WRITE16_HANDLER(apache3_palette_w);
+READ16_HANDLER( roundup5_vram_r );
+WRITE16_HANDLER( roundup5_vram_w );
+WRITE16_HANDLER( apache3_palette_w );
+WRITE8_HANDLER( apache3_road_x_w );
+WRITE16_HANDLER( apache3_road_z_w );
 
 extern UINT16* tatsumi_sprite_control_ram;
 extern UINT16 *cyclwarr_videoram0, *cyclwarr_videoram1;

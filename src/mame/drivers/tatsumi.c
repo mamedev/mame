@@ -146,7 +146,7 @@
 #include "sound/okim6295.h"
 
 static UINT16 *cyclwarr_cpua_ram, *cyclwarr_cpub_ram;
-static UINT16 *tatsumi_c_ram, *apache3_g_ram;
+UINT16 *apache3_g_ram;
 UINT16 *roundup5_d0000_ram, *roundup5_e0000_ram;
 UINT8 *tatsumi_rom_sprite_lookup1, *tatsumi_rom_sprite_lookup2;
 UINT8 *tatsumi_rom_clut0, *tatsumi_rom_clut1;
@@ -155,7 +155,6 @@ static UINT16 bigfight_a20000[8];
 UINT16 bigfight_a40000[2];
 static UINT16 bigfight_a60000[2];
 extern UINT16 bigfight_bank;
-static UINT8 *apache3_bg_ram;
 
 /***************************************************************************/
 
@@ -189,7 +188,8 @@ static WRITE16_HANDLER(cyclwarr_sound_w)
 /***************************************************************************/
 
 static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x07fff) AM_RAM
+	AM_RANGE(0x00000, 0x03fff) AM_RAM
+	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM_WRITE(apache3_palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0e800, 0x0e803) AM_WRITE(SMH_NOP) // CRT
@@ -206,10 +206,10 @@ static ADDRESS_MAP_START( apache3_68000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x80000, 0x83fff) AM_RAM AM_BASE(&tatsumi_68k_ram)
 	AM_RANGE(0x90000, 0x93fff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x9a000, 0x9a1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE(&tatsumi_sprite_control_ram)
-	AM_RANGE(0xa0000, 0xa0001) AM_WRITE(apache3_a0000_w)
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(apache3_irq_ack_w) //todo - z80 reset?
-	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(SMH_RAM) AM_BASE(&tatsumi_c_ram)
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_BASE(&apache3_g_ram)
+	AM_RANGE(0xa0000, 0xa0001) AM_WRITE(apache3_rotate_w) // /BNKCS
+	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(apache3_z80_ctrl_w)
+	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(apache3_road_z_w) // /LINCS
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_BASE(&apache3_g_ram) // /GRDCS
 	AM_RANGE(0xe0000, 0xe7fff) AM_READWRITE(apache3_z80_r, apache3_z80_w)
 ADDRESS_MAP_END
 
@@ -224,8 +224,8 @@ static ADDRESS_MAP_START( apache3_v20_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apache3_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x1fff) AM_RAM AM_BASE(&apache3_z80_ram)
-	AM_RANGE(0x08000, 0x83ff) AM_RAM AM_BASE(&apache3_bg_ram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&apache3_z80_ram)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(apache3_road_x_w)
 ADDRESS_MAP_END
 
 /*****************************************************************/
@@ -382,11 +382,17 @@ static INPUT_PORTS_START( apache3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Missile" )
 
-	PORT_START("STICKX")
+	PORT_START("STICK_X")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START("STICKY")
+	PORT_START("STICK_Y")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("THROTTLE")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Z ) PORT_SENSITIVITY(25) PORT_KEYDELTA(79)
+
+	PORT_START("VR1")
+	PORT_ADJUSTER(100, "VR1")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0000, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
@@ -830,31 +836,45 @@ static INTERRUPT_GEN( roundup5_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
+static void apache3_68000_reset(const device_config *device)
+{
+	cpu_set_input_line(device->machine->cpu[3], INPUT_LINE_RESET, PULSE_LINE);
+}
+
+static MACHINE_RESET( apache3 )
+{
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE); // TODO
+
+	/* Hook the RESET line, which resets the Z80 */
+	device_set_info_fct(machine->cpu[1], CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)apache3_68000_reset);
+}
+
 static MACHINE_DRIVER_START( apache3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD("main", V30,20000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(apache3_v30_map,0)
 	MDRV_CPU_VBLANK_INT("main", roundup5_interrupt)
 
-	MDRV_CPU_ADD("sub", M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD("sub", M68000,20000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(apache3_68000_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", V20, 8000000) //???
+	MDRV_CPU_ADD("audio", V20, 16000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(apache3_v20_map,0)
 
-	MDRV_CPU_ADD("sub2", Z80, 8000000) //???
+	MDRV_CPU_ADD("sub2", Z80, 6250000)
 	MDRV_CPU_PROGRAM_MAP(apache3_z80_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_MACHINE_RESET(apache3)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(6000000, 400, 0, 320, 280, 0, 240) // TODO: Hook up CRTC
 
 	MDRV_GFXDECODE(apache3)
 	MDRV_PALETTE_LENGTH(1024 + 4096) /* 1024 real colours, and 4096 arranged as series of cluts */
@@ -1056,6 +1076,61 @@ ROM_START( apache3 )
 	ROM_REGION( 0x30000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "ap-28c.171",   0x000000, 0x20000, CRC(b349f0c2) SHA1(cb1ff1c0e784f669c87ab1eccd3b358950761b74) )
 	ROM_LOAD( "ap-29c.176",   0x020000, 0x10000, CRC(b38fced3) SHA1(72f61a719f393957bcccf14687bfbb2e7a5f7aee) )
+
+	ROM_REGION( 0x200, "proms", 0 ) /* Road stripe PROM */
+	ROM_LOAD( "am27s29.ic41",   0x000, 0x200, CRC(c981f1e0) SHA1(7d8492d9f4033ab3734c09ee23016a0b210648b5) )
+ROM_END
+
+ROM_START( apache3a )
+	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_LOAD16_BYTE( "ap-25c.125",   0x0a0001, 0x10000, CRC(7bc496a6) SHA1(5491d06181d729407e975b85a8715fdc3b489c67) )
+	ROM_LOAD16_BYTE( "ap-26c.133",   0x0a0000, 0x10000, CRC(9393a470) SHA1(00376f7a545629a83eb5a90b9d1685a68430e4ce) )
+	ROM_LOAD16_BYTE( "ap-23g.110",   0x0e0001, 0x10000, CRC(0ab485e4) SHA1(d8d0695312732c31cedcb1c298810a6793835e80) )
+	ROM_LOAD16_BYTE( "ap-24g.118",   0x0e0000, 0x10000, CRC(6348e196) SHA1(6be537491a56a28b62981cae6db8dfc4eb2fece2) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 68000 sub cpu */
+	ROM_LOAD16_BYTE( "ap-19c.80",   0x000001, 0x10000, CRC(0908e468) SHA1(a2d725993bd4cd5425468736154fd3dd9dd7b060) )
+	ROM_LOAD16_BYTE( "ap-21c.97",   0x000000, 0x10000, CRC(38a056fb) SHA1(67c8ae58670cebde0771854e1fb5fc2eb2543ecc) )
+	ROM_LOAD16_BYTE( "ap-20a.89",   0x040001, 0x20000, CRC(92d24b5e) SHA1(1ea270d46a607e47b7e0961b532316aa05dc8f4e) )
+	ROM_LOAD16_BYTE( "ap-22a.105",  0x040000, 0x20000, CRC(a8458a92) SHA1(43674731c2e9962c2bfbb73a85484cf03d6be223) )
+
+	ROM_REGION( 0x100000, "audio", 0 ) /* 64k code for sound V20 */
+	ROM_LOAD( "ap-27d.151",   0x0f0000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
+	/* Filled in by both regions below */
+
+	ROM_REGION( 0x100000, "gfx2", 0)
+	ROM_LOAD32_BYTE( "ap-00c.15",   0x000000, 0x20000, CRC(ad1ddc2b) SHA1(81f64663c4892ab5fb0e2dc99513dbfee73f15b8) )
+	ROM_LOAD32_BYTE( "ap-01c.22",   0x000001, 0x20000, CRC(6286ff00) SHA1(920da4a3a441dbf54ad86c0f4fb6f47a867e9cda) )
+	ROM_LOAD32_BYTE( "ap-04c.58",   0x000002, 0x20000, CRC(dc6d55e4) SHA1(9f48f8d6aa1a329a71913139a8d5a50d95a9b9e5) )
+	ROM_LOAD32_BYTE( "ap-05c.65",   0x000003, 0x20000, CRC(2e6e495f) SHA1(af610f265da53735b20ddc6df1bda47fc54ee0c3) )
+	ROM_LOAD32_BYTE( "ap-02c.34",   0x080000, 0x20000, CRC(af4ee7cb) SHA1(4fe2361b7431971b07671f145abf1ea5861d01db) )
+	ROM_LOAD32_BYTE( "ap-03c.46",   0x080001, 0x20000, CRC(60ab495c) SHA1(18340d4fba550495b1e52f8023a0a2ec6349dfeb) )
+	ROM_LOAD32_BYTE( "ap-06c.71",   0x080002, 0x20000, CRC(0ea90e55) SHA1(b16d6b8be4853797507d3e5c933a9dd1d451308e) )
+	ROM_LOAD32_BYTE( "ap-07c.75",   0x080003, 0x20000, CRC(ba685543) SHA1(140a2b708d4e4de4d207fc2c4a96a5cab8639988) )
+
+	ROM_REGION( 0x100000, "gfx3", 0)
+	ROM_LOAD32_BYTE( "ap-08c.14",   0x000000, 0x20000, CRC(6437b580) SHA1(2b2ba42add18bbec04fbcf53645a8d44b972e26a) )
+	ROM_LOAD32_BYTE( "ap-09c.21",   0x000001, 0x20000, CRC(54d18ef9) SHA1(40ebc6ea49b2a501fe843d60bec8c32d07f2d25d) )
+	ROM_LOAD32_BYTE( "ap-12c.57",   0x000002, 0x20000, CRC(f95cf5cf) SHA1(ce373c648cbf3e4863bbc3a1175efe065c75eb13) )
+	ROM_LOAD32_BYTE( "ap-13c.64",   0x000003, 0x20000, CRC(67a248c3) SHA1(cc945f7cfecaaab5075c1a3d202369b070d4c656) )
+	ROM_LOAD32_BYTE( "ap-10c.33",   0x080000, 0x20000, CRC(74418df4) SHA1(cc1206b10afc2de919b2fb9899486122d27290a4) )
+	ROM_LOAD32_BYTE( "ap-11c.45",   0x080001, 0x20000, CRC(195bf78e) SHA1(c3c472f3c4244545b89491b6ebec4f838a6bbb73) )
+	ROM_LOAD32_BYTE( "ap-14c.70",   0x080002, 0x20000, CRC(58f7fe16) SHA1(a5b87b42b85808c226df0d2a7b7cdde12d474a41) )
+	ROM_LOAD32_BYTE( "ap-15c.74",   0x080003, 0x20000, CRC(1ffd5496) SHA1(25efb568957fc9441a40a7d64cc6afe1a14b392b) )
+
+	ROM_REGION( 0x18000, "gfx4", ROMREGION_DISPOSE )
+	ROM_LOAD( "ap-18e.73",   0x000000, 0x10000, CRC(d7861a26) SHA1(b1a1e089a293a5536d342c9edafbea303f4f128c) )
+	ROM_LOAD( "ap-16e.63",   0x008000, 0x10000, CRC(d3251965) SHA1(aef4f58a6f773060434abda9d7f5f003693577bf) )
+	ROM_LOAD( "ap-17e.68",   0x008000, 0x08000, CRC(4509c2ed) SHA1(97a6a6710e83aca212ce43d06c3f26c35f9782b8) )
+
+	ROM_REGION( 0x30000, "oki", 0 )	 /* ADPCM samples */
+	ROM_LOAD( "ap-28c.171",   0x000000, 0x20000, CRC(b349f0c2) SHA1(cb1ff1c0e784f669c87ab1eccd3b358950761b74) )
+	ROM_LOAD( "ap-29c.176",   0x020000, 0x10000, CRC(b38fced3) SHA1(72f61a719f393957bcccf14687bfbb2e7a5f7aee) )
+
+	ROM_REGION( 0x200, "proms", 0 ) /* Road stripe PROM */
+	ROM_LOAD( "am27s29.ic41",   0x000, 0x200, CRC(c981f1e0) SHA1(7d8492d9f4033ab3734c09ee23016a0b210648b5) )
 ROM_END
 
 ROM_START( roundup5 )
@@ -1202,8 +1277,6 @@ static DRIVER_INIT( apache3 )
 	UINT8 *src2 = memory_region(machine, "gfx3");
 	int i;
 
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_HALT, ASSERT_LINE); // ?
-
 	for (i=0; i<0x100000; i+=32) {
 		memcpy(dst,src1,32);
 		src1+=32;
@@ -1220,6 +1293,8 @@ static DRIVER_INIT( apache3 )
 	tatsumi_rom_clut1 = memory_region(machine, "gfx3")+ 0x100000 - 0x800;
 
 	tatsumi_reset(machine);
+
+	// TODO: ym2151_set_port_write_handler for CT1/CT2 outputs
 }
 
 static DRIVER_INIT( roundup5 )
@@ -1286,7 +1361,8 @@ static DRIVER_INIT( cyclwarr )
 /* http://www.tatsu-mi.co.jp/game/trace/index.html */
 
 /* 1987 Gray Out */
-GAME( 1988, apache3,  0, apache3,   apache3,  apache3,  ROT0, "Tatsumi", "Apache 3", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, roundup5, 0, roundup5,  roundup5, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, cyclwarr, 0, cyclwarr,  cyclwarr, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", GAME_IMPERFECT_GRAPHICS)
-GAME( 1992, bigfight, 0, bigfight,  bigfight, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS)
+GAME( 1988, apache3,  0,       apache3,   apache3,  apache3,  ROT0, "Tatsumi", "Apache 3", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, apache3a, apache3, apache3,   apache3,  apache3,  ROT0, "Tatsumi", "Apache 3 (Kana Corporation license)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, roundup5, 0,       roundup5,  roundup5, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, cyclwarr, 0,       cyclwarr,  cyclwarr, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", GAME_IMPERFECT_GRAPHICS)
+GAME( 1992, bigfight, 0,       bigfight,  bigfight, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS)

@@ -7705,9 +7705,11 @@ Other Sun games
 	DRIVER( buggybjr )	/* (c) 1986 Tatsumi */
 	DRIVER( lockon )	/* (c) 1986 Tatsumi */
 	DRIVER( lockonc )	/* (c) 1986 Tatsumi */
-	/* Gray Out */		/* (c) 1987 Tatsumi */
+	/* Gray-Out */		/* (c) 1987 Tatsumi */
 	DRIVER( apache3 )	/* (c) 1988 Tatsumi */
+	DRIVER( apache3a )	/* (c) 1988 Tatsumi + Kana Corporation license */
 	DRIVER( roundup5 )	/* (c) 1989 Tatsumi */
+	/* Round Up 5 cockpit */
 	DRIVER( cyclwarr )	/* (c) 1991 Tatsumi */
 	DRIVER( bigfight )	/* (c) 1992 Tatsumi */
 	/* Life */          /* (c) 1997 Tatsumi */

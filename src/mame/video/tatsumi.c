@@ -6,6 +6,9 @@ static tilemap *layer0, *layer1, *layer2, *layer3;
 
 static bitmap_t *temp_bitmap;
 
+static UINT8 *apache3_road_x_ram;
+static UINT8 apache3_road_z;
+
 UINT16 *roundup_r_ram, *roundup_p_ram, *roundup_l_ram;
 UINT16 *cyclwarr_videoram0, *cyclwarr_videoram1;
 UINT16* tatsumi_sprite_control_ram;
@@ -31,13 +34,24 @@ WRITE16_HANDLER(tatsumi_sprite_control_w)
 
 /******************************************************************************/
 
-READ16_HANDLER(roundup5_vram_r)
+WRITE16_HANDLER( apache3_road_z_w )
+{
+	apache3_road_z = data & 0xff;
+}
+
+WRITE8_HANDLER( apache3_road_x_w )
+{
+	// Note: Double buffered. Yes, this is correct :)
+	apache3_road_x_ram[data] = offset;
+}
+
+READ16_HANDLER( roundup5_vram_r )
 {
 	offset+=((tatsumi_control_word&0x0c00)>>10) * 0xc000;
 	return roundup5_vram[offset];
 }
 
-WRITE16_HANDLER(roundup5_vram_w)
+WRITE16_HANDLER( roundup5_vram_w )
 {
 	offset+=((tatsumi_control_word&0x0c00)>>10) * 0xc000;
 
@@ -52,7 +66,7 @@ WRITE16_HANDLER(roundup5_vram_w)
 }
 
 
-WRITE16_HANDLER(roundup5_palette_w)
+WRITE16_HANDLER( roundup5_palette_w )
 {
 //  static int hack=0;
 	int word;
@@ -84,7 +98,7 @@ bit 0:  3.9kOhm resistor
 }
 
 
-WRITE16_HANDLER(apache3_palette_w)
+WRITE16_HANDLER( apache3_palette_w )
 {
 //  static int hack=0;
 
@@ -194,6 +208,7 @@ VIDEO_START( apache3 )
 	tx_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,64,64);
 	shadow_pen_array = auto_malloc(8192);
 	temp_bitmap = auto_bitmap_alloc(512, 512, BITMAP_FORMAT_RGB32);
+	apache3_road_x_ram = auto_malloc(512 * sizeof(UINT16));
 
 	memset(shadow_pen_array, 0, 8192);
 	tilemap_set_transparent_pen(tx_layer,0);
@@ -597,7 +612,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			bitmap_fill(temp_bitmap, 0, 0);
 		}
 
-extent_x=extent_y=0;
+		extent_x=extent_y=0;
 
 		src1+=4;
 		h=0;
@@ -997,14 +1012,81 @@ static void draw_bg(running_machine *machine, bitmap_t *dst, tilemap *src, const
 	}
 }
 
+/* Draw the sky and ground, applying rotation (eventually). Experimental! */
+#if 0
+static void draw_ground(running_machine *machine, bitmap_t *dst, const rectangle *cliprect)
+{
+	int x, y;
+	const UINT8 *lut = memory_region(machine, "proms");
+
+	UINT16 gva = 0x180; // TODO
+	UINT8 sky_val = apache3_rotate_ctrl[1] & 0xff;
+
+	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
+	{
+		UINT16 rgdb = 0;//apache3_road_x_ram[gva & 0xff];
+		UINT16 gha = 0xf60; // test
+		int ln = (((lut[gva & 0x7f] & 0x7f) + (apache3_road_z & 0x7f)) >> 5) & 3;
+
+		if (gva & 0x100)
+		{
+			/* Sky */
+			for (x = cliprect->min_x; x <= cliprect->max_x; ++x)
+			{
+				*BITMAP_ADDR32(dst, y, x) = machine->pens[0x100 + (sky_val & 0x7f)];
+
+				/* Update horizontal counter? */
+				gha = (gha + 1) & 0xfff;
+			}
+		}
+		else
+		{
+			/* Ground */
+			for (x = cliprect->min_x; x <= cliprect->max_x; ++x)
+			{
+				UINT8 colour;
+				UINT16 hval;
+				UINT8 pixels;
+				int pix_sel;
+
+				hval = (rgdb + gha) & 0xfff; // Not quite
+
+				if (hval & 0x800)
+					hval ^= 0x1ff; // TEST
+				else
+					hval = hval;
+
+				pixels = apache3_g_ram[(((gva & 0xff) << 7) | ((hval >> 2) & 0x7f))];
+				pix_sel = hval & 3;
+
+				colour = (pixels >> (pix_sel << 1)) & 3;
+				colour = (BIT(hval, 11) << 4) | (colour << 2) | ln;
+
+				/* Draw the pixel */
+				*BITMAP_ADDR32(dst, y, x) = machine->pens[0x200 + colour];
+
+				/* Update horizontal counter */
+				gha = (gha + 1) & 0xfff;
+			}
+		}
+
+		/* Update sky counter */
+		sky_val++;
+		gva = (gva + 1) & 0x1ff;
+	}
+}
+#endif
 /**********************************************************************/
 
 VIDEO_UPDATE( apache3 )
 {
 	update_cluts(screen->machine, 1024, 0, 2048);
 
+	tilemap_set_scrollx(tx_layer,0,24);
+
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]);
-	draw_sky(screen->machine, bitmap, cliprect, 256, apache3_a0000[1]);
+	draw_sky(screen->machine, bitmap, cliprect, 256, apache3_rotate_ctrl[1]);
+//	draw_ground(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap,cliprect,0, (tatsumi_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);
 	return 0;
