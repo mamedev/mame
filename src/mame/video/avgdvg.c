@@ -1522,6 +1522,9 @@ VIDEO_START( dvg )
 	vg_run_timer = timer_alloc(machine, run_state_machine, NULL);
 
 	register_state (machine);
+
+	state_save_register_item_pointer(machine, "AVG", NULL, 0, vectorram, vectorram_size);
+
 	VIDEO_START_CALL(vector);
 }
 
@@ -1529,6 +1532,8 @@ VIDEO_START( avg )
 {
 	vgc = &avg_default;
 	VIDEO_START_CALL(avg_common);
+
+	state_save_register_item_pointer(machine, "AVG", NULL, 0, vectorram, vectorram_size);
 }
 
 VIDEO_START( avg_starwars )
@@ -1549,6 +1554,8 @@ VIDEO_START( avg_mhavoc )
 {
 	vgc = &avg_mhavoc;
 	VIDEO_START_CALL(avg_common);
+
+	state_save_register_item_pointer(machine, "AVG", NULL, 0, vectorram, vectorram_size);
 }
 
 VIDEO_START( avg_bzone )

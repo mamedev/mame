@@ -28,7 +28,7 @@ static UINT8 gamma_irq_clock;
 
 static UINT8 has_gamma_cpu;
 
-
+static UINT8 speech_write_buffer;
 
 /*************************************
  *
@@ -126,6 +126,8 @@ MACHINE_RESET( mhavoc )
 	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock);
 	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock_enable);
 	state_save_register_item(machine, "misc", NULL, 0, gamma_irq_clock);
+	
+	state_save_register_item(machine, "misc", NULL, 0, speech_write_buffer);
 }
 
 
@@ -309,4 +311,36 @@ WRITE8_HANDLER( mhavoc_out_1_w )
 
 	/* Bit 0 = right coin counter */
 	coin_counter_w(1, data & 0x01);
+}
+
+/*************************************
+ *
+ *  Speech access
+ *
+ *************************************/
+
+static WRITE8_HANDLER( mhavocrv_speech_data_w )
+{
+	speech_write_buffer = data;
+}
+
+
+static WRITE8_HANDLER( mhavocrv_speech_strobe_w )
+{
+	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+	tms5220_data_w(tms, 0, speech_write_buffer);
+}
+
+/*************************************
+ *
+ *  Driver-specific init
+ *
+ *************************************/
+
+DRIVER_INIT( mhavocrv )
+{
+	/* install the speech support that was only optionally stuffed for use */
+	/* in the Return to Vax hack */
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x5800, 0x5800, 0, 0, mhavocrv_speech_data_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x5900, 0x5900, 0, 0, mhavocrv_speech_strobe_w);
 }

@@ -21,6 +21,7 @@ WRITE8_HANDLER( mhavoc_alpha_irq_ack_w );
 WRITE8_HANDLER( mhavoc_gamma_irq_ack_w );
 
 MACHINE_RESET( mhavoc );
+DRIVER_INIT( mhavocrv );
 
 WRITE8_HANDLER( mhavoc_gamma_w );
 READ8_HANDLER( mhavoc_alpha_r );
@@ -41,5 +42,6 @@ CUSTOM_INPUT( mhavoc_bit67_r );
 WRITE8_HANDLER( mhavoc_out_0_w );
 WRITE8_HANDLER( alphaone_out_0_w );
 WRITE8_HANDLER( mhavoc_out_1_w );
+
 
 extern UINT8 *mhavoc_zram0, *mhavoc_zram1;
