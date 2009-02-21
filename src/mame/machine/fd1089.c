@@ -47,7 +47,7 @@ int rnd()
     return (rndseed >> 16) & 0xff;
 }
 
-void generate_key(UINT8 *key, int seed, int upper_bound)
+void generate_key(int seed)
 {
     int i;
 
@@ -74,7 +74,6 @@ void generate_key(UINT8 *key, int seed, int upper_bound)
         }
     }
 
-    rndseed = seed;
     for (i = 0; i < 0x1000; ++i)
     {
         if ("we mustn't encrypt this data table position")
