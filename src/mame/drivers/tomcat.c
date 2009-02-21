@@ -333,6 +333,11 @@ static MACHINE_START(tomcat)
 
 	tomcat_nvram = auto_malloc(0x800);
 
+	state_save_register_global_pointer(machine, tomcat_nvram, 0x800); 
+	state_save_register_global(machine, tomcat_control_num);
+	state_save_register_global(machine, dsp_BIO);
+	state_save_register_global(machine, dsp_idle);
+
 	dsp_BIO = 0;
 }
 
@@ -417,4 +422,4 @@ static MACHINE_DRIVER_START(tomcat)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 MACHINE_DRIVER_END
 
-GAME( 1985, tomcat, 0,        tomcat, tomcat, 0, ROT0, "Atari", "TomCat (prototype)", 0 )
+GAME( 1985, tomcat, 0,        tomcat, tomcat, 0, ROT0, "Atari", "TomCat (prototype)", GAME_SUPPORTS_SAVE )
