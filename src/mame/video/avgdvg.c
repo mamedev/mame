@@ -57,16 +57,18 @@ UINT16 *quantum_vectorram;
  *
  *************************************/
 
-typedef struct _vgvector
+typedef struct _vgvector vgvector;
+struct _vgvector
 {
 	int x; int y;
 	rgb_t color;
 	int intensity;
 	int arg1; int arg2;
 	int status;
-} vgvector;
+};
 
-typedef struct _vgdata
+typedef struct _vgdata vgdata;
+struct _vgdata
 {
 	running_machine *machine;
 
@@ -107,16 +109,17 @@ typedef struct _vgdata
 	INT32 clipy_min;
 	INT32 clipx_max;
 	INT32 clipy_max;
-} vgdata;
+};
 
-typedef struct _vgconf
+typedef struct _vgconf vgconf;
+struct _vgconf
 {
 	int (*handler[8])(vgdata *);
 	UINT8 (*state_addr)(vgdata *);
 	void (*update_databus)(vgdata *);
 	void (*vggo)(vgdata *);
 	void (*vgrst)(vgdata *);
-} vgconf;
+};
 
 
 /*************************************
@@ -1466,6 +1469,11 @@ static void register_state (running_machine *machine)
 	state_save_register_item(machine, "AVG", NULL, 0, vg->clipy_min);
 	state_save_register_item(machine, "AVG", NULL, 0, vg->clipx_max);
 	state_save_register_item(machine, "AVG", NULL, 0, vg->clipy_max);
+	
+	state_save_register_item(machine, "AVG", NULL, 0, flip_x);
+	state_save_register_item(machine, "AVG", NULL, 0, flip_y);
+	state_save_register_item_pointer(machine, "AVG", NULL, 0, vectorram, vectorram_size);
+
 }
 
 static VIDEO_START( avg_common )
