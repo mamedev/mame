@@ -1472,7 +1472,6 @@ static void register_state (running_machine *machine)
 	
 	state_save_register_item(machine, "AVG", NULL, 0, flip_x);
 	state_save_register_item(machine, "AVG", NULL, 0, flip_y);
-	state_save_register_item_pointer(machine, "AVG", NULL, 0, vectorram, vectorram_size);
 
 }
 
@@ -1542,6 +1541,8 @@ VIDEO_START( avg_tempest )
 {
 	vgc = &avg_tempest;
 	VIDEO_START_CALL(avg_common);
+	
+	state_save_register_item_pointer(machine, "AVG", NULL, 0, vectorram, vectorram_size);
 }
 
 VIDEO_START( avg_mhavoc )
@@ -1554,6 +1555,8 @@ VIDEO_START( avg_bzone )
 {
 	vgc = &avg_bzone;
 	VIDEO_START_CALL(avg_common);
+
+	state_save_register_item_pointer(machine, "AVG", NULL, 0, vectorram, vectorram_size);
 }
 
 VIDEO_START( avg_quantum )
