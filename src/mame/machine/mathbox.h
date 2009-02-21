@@ -5,8 +5,29 @@
  *
  */
 
-WRITE8_HANDLER( mb_go_w );
-READ8_HANDLER( mb_status_r );
-READ8_HANDLER( mb_lo_r );
-READ8_HANDLER( mb_hi_r );
-void mb_register_states(running_machine *machine);
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_MATHBOX_ADD(_tag) \
+	MDRV_DEVICE_ADD(_tag, MATHBOX, 0)
+
+#define MDRV_MATHBOX_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, MATHBOX)
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+WRITE8_DEVICE_HANDLER( mathbox_go_w );
+READ8_DEVICE_HANDLER( mathbox_status_r );
+READ8_DEVICE_HANDLER( mathbox_lo_r );
+READ8_DEVICE_HANDLER( mathbox_hi_r );
+
+/* ----- device interface ----- */
+
+#define MATHBOX DEVICE_GET_INFO_NAME(mathbox)
+DEVICE_GET_INFO( mathbox );

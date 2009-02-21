@@ -8,36 +8,64 @@
 #include "driver.h"
 #include "mathbox.h"
 
-/* math box scratch registers */
-static INT16 mb_reg [16];
-
-/* math box result */
-static INT16 mb_result = 0;
-
-#define REG0 mb_reg [0x00]
-#define REG1 mb_reg [0x01]
-#define REG2 mb_reg [0x02]
-#define REG3 mb_reg [0x03]
-#define REG4 mb_reg [0x04]
-#define REG5 mb_reg [0x05]
-#define REG6 mb_reg [0x06]
-#define REG7 mb_reg [0x07]
-#define REG8 mb_reg [0x08]
-#define REG9 mb_reg [0x09]
-#define REGa mb_reg [0x0a]
-#define REGb mb_reg [0x0b]
-#define REGc mb_reg [0x0c]
-#define REGd mb_reg [0x0d]
-#define REGe mb_reg [0x0e]
-#define REGf mb_reg [0x0f]
+#define REG0 mb->reg [0x00]
+#define REG1 mb->reg [0x01]
+#define REG2 mb->reg [0x02]
+#define REG3 mb->reg [0x03]
+#define REG4 mb->reg [0x04]
+#define REG5 mb->reg [0x05]
+#define REG6 mb->reg [0x06]
+#define REG7 mb->reg [0x07]
+#define REG8 mb->reg [0x08]
+#define REG9 mb->reg [0x09]
+#define REGa mb->reg [0x0a]
+#define REGb mb->reg [0x0b]
+#define REGc mb->reg [0x0c]
+#define REGd mb->reg [0x0d]
+#define REGe mb->reg [0x0e]
+#define REGf mb->reg [0x0f]
 
 
 #define MB_TEST 0
 #define LOG(x) do { if (MB_TEST) logerror x; } while (0)
 
-
-WRITE8_HANDLER( mb_go_w )
+typedef struct _mathbox_state mathbox_state;
+struct _mathbox_state
 {
+	const device_config *device;
+	/* math box scratch registers */
+	INT16 reg[16];
+
+	/* math box result */
+	INT16 result;
+};
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    get_safe_token - convert a device's token
+    into a mathbox_state
+-------------------------------------------------*/
+
+INLINE mathbox_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == MATHBOX);
+	return (mathbox_state *)device->token;
+}
+
+
+
+
+WRITE8_DEVICE_HANDLER( mathbox_go_w )
+{
+  mathbox_state *mb = get_safe_token(device);
+
   INT32 mb_temp;  /* temp 32-bit multiply results */
   INT16 mb_q;     /* temp used in division */
   int msb;
@@ -46,37 +74,37 @@ WRITE8_HANDLER( mb_go_w )
 
   switch (offset)
     {
-    case 0x00: mb_result = REG0 = (REG0 & 0xff00) | data;        break;
-    case 0x01: mb_result = REG0 = (REG0 & 0x00ff) | (data << 8); break;
-    case 0x02: mb_result = REG1 = (REG1 & 0xff00) | data;        break;
-    case 0x03: mb_result = REG1 = (REG1 & 0x00ff) | (data << 8); break;
-    case 0x04: mb_result = REG2 = (REG2 & 0xff00) | data;        break;
-    case 0x05: mb_result = REG2 = (REG2 & 0x00ff) | (data << 8); break;
-    case 0x06: mb_result = REG3 = (REG3 & 0xff00) | data;        break;
-    case 0x07: mb_result = REG3 = (REG3 & 0x00ff) | (data << 8); break;
-    case 0x08: mb_result = REG4 = (REG4 & 0xff00) | data;        break;
-    case 0x09: mb_result = REG4 = (REG4 & 0x00ff) | (data << 8); break;
+    case 0x00: mb->result = REG0 = (REG0 & 0xff00) | data;        break;
+    case 0x01: mb->result = REG0 = (REG0 & 0x00ff) | (data << 8); break;
+    case 0x02: mb->result = REG1 = (REG1 & 0xff00) | data;        break;
+    case 0x03: mb->result = REG1 = (REG1 & 0x00ff) | (data << 8); break;
+    case 0x04: mb->result = REG2 = (REG2 & 0xff00) | data;        break;
+    case 0x05: mb->result = REG2 = (REG2 & 0x00ff) | (data << 8); break;
+    case 0x06: mb->result = REG3 = (REG3 & 0xff00) | data;        break;
+    case 0x07: mb->result = REG3 = (REG3 & 0x00ff) | (data << 8); break;
+    case 0x08: mb->result = REG4 = (REG4 & 0xff00) | data;        break;
+    case 0x09: mb->result = REG4 = (REG4 & 0x00ff) | (data << 8); break;
 
-    case 0x0a: mb_result = REG5 = (REG5 & 0xff00) | data;        break;
+    case 0x0a: mb->result = REG5 = (REG5 & 0xff00) | data;        break;
       /* note: no function loads low part of REG5 without performing a computation */
 
-    case 0x0c: mb_result = REG6 = data; break;
+    case 0x0c: mb->result = REG6 = data; break;
       /* note: no function loads high part of REG6 */
 
-    case 0x15: mb_result = REG7 = (REG7 & 0xff00) | data;        break;
-    case 0x16: mb_result = REG7 = (REG7 & 0x00ff) | (data << 8); break;
+    case 0x15: mb->result = REG7 = (REG7 & 0xff00) | data;        break;
+    case 0x16: mb->result = REG7 = (REG7 & 0x00ff) | (data << 8); break;
 
-    case 0x1a: mb_result = REG8 = (REG8 & 0xff00) | data;        break;
-    case 0x1b: mb_result = REG8 = (REG8 & 0x00ff) | (data << 8); break;
+    case 0x1a: mb->result = REG8 = (REG8 & 0xff00) | data;        break;
+    case 0x1b: mb->result = REG8 = (REG8 & 0x00ff) | (data << 8); break;
 
-    case 0x0d: mb_result = REGa = (REGa & 0xff00) | data;        break;
-    case 0x0e: mb_result = REGa = (REGa & 0x00ff) | (data << 8); break;
-    case 0x0f: mb_result = REGb = (REGb & 0xff00) | data;        break;
-    case 0x10: mb_result = REGb = (REGb & 0x00ff) | (data << 8); break;
+    case 0x0d: mb->result = REGa = (REGa & 0xff00) | data;        break;
+    case 0x0e: mb->result = REGa = (REGa & 0x00ff) | (data << 8); break;
+    case 0x0f: mb->result = REGb = (REGb & 0xff00) | data;        break;
+    case 0x10: mb->result = REGb = (REGb & 0x00ff) | (data << 8); break;
 
-    case 0x17: mb_result = REG7; break;
-    case 0x19: mb_result = REG8; break;
-    case 0x18: mb_result = REG9; break;
+    case 0x17: mb->result = REG7; break;
+    case 0x19: mb->result = REG8; break;
+    case 0x18: mb->result = REG9; break;
 
     case 0x0b:
 
@@ -105,7 +133,7 @@ WRITE8_HANDLER( mb_go_w )
       if (mb_q < 0)
 	REG7++;
 
-      mb_result = REG7;
+      mb->result = REG7;
 
       if (REGf < 0)
 	break;
@@ -134,7 +162,7 @@ WRITE8_HANDLER( mb_go_w )
 	REG8++;
       REG9 <<= 1;  /* why? only to get the desired load address? */
 
-      mb_result = REG8;
+      mb->result = REG8;
 
       if (REGf < 0)
 	break;
@@ -194,9 +222,9 @@ WRITE8_HANDLER( mb_go_w )
       while (--REGf >= 0);
 
       if (REGe >= 0)
-	mb_result = mb_q;
+	mb->result = mb_q;
       else
-	mb_result = - mb_q;
+	mb->result = - mb_q;
       break;
 
     case 0x11:
@@ -219,7 +247,7 @@ WRITE8_HANDLER( mb_go_w )
 	}
       while (--REG6 >= 0);
 
-      mb_result = REG8;
+      mb->result = REG8;
       break;
 
     case 0x1d:
@@ -244,7 +272,7 @@ WRITE8_HANDLER( mb_go_w )
       REGc >>= 2;
       REGd += REGc;
       REGc >>= 1;
-      mb_result = REGd = (REGc + REGd);
+      mb->result = REGd = (REGc + REGd);
       break;
 
     case 0x1f:
@@ -253,26 +281,95 @@ WRITE8_HANDLER( mb_go_w )
       break;
     }
 
-  LOG(("  result %04x\n", mb_result & 0xffff));
+  LOG(("  result %04x\n", mb->result & 0xffff));
 }
 
-READ8_HANDLER( mb_status_r )
+READ8_DEVICE_HANDLER( mathbox_status_r )
 {
 	return 0x00; /* always done! */
 }
 
-READ8_HANDLER( mb_lo_r )
+READ8_DEVICE_HANDLER( mathbox_lo_r )
 {
-	return mb_result & 0xff;
+	mathbox_state *mb = get_safe_token(device);
+
+	return mb->result & 0xff;
 }
 
-READ8_HANDLER( mb_hi_r )
+READ8_DEVICE_HANDLER( mathbox_hi_r )
 {
-	return (mb_result >> 8) & 0xff;
+	mathbox_state *mb = get_safe_token(device);
+
+	return (mb->result >> 8) & 0xff;
 }
 
-void mb_register_states(running_machine *machine)
+
+
+/***************************************************************************
+    DEVICE INTERFACE
+***************************************************************************/
+
+/*-------------------------------------------------
+    mathbox_portb_r - return port B output
+    value
+-------------------------------------------------*/
+
+static DEVICE_START( mathbox )
 {
-	state_save_register_global(machine, mb_result);
-	state_save_register_global_array(machine, mb_reg);
+	mathbox_state *mb = get_safe_token(device);
+
+	/* validate arguments */
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
+
+	/* set static values */
+	mb->device = device;
+
+	/* register for save states */
+	state_save_register_device_item(device, 0, mb->result);
+	state_save_register_device_item_array(device, 0, mb->reg);
+}
+
+
+static DEVICE_RESET( mathbox )
+{
+	mathbox_state *mb = get_safe_token(device);
+
+	mb->result = 0;
+	memset(mb->reg, 0, sizeof(INT16)*16);
+}
+
+
+static DEVICE_SET_INFO( mathbox )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+DEVICE_GET_INFO( mathbox )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mathbox_state);		break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mathbox); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mathbox);break;
+		case DEVINFO_FCT_STOP:							/* Nothing */							break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mathbox);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "MATHBOX");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "I/O devices");			break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+	}
 }

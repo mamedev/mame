@@ -231,7 +231,6 @@ UINT8 rb_input_select;
 static MACHINE_START( bzone )
 {
 	state_save_register_global(machine, analog_data);
-	mb_register_states(machine);
 }
 
 
@@ -239,7 +238,6 @@ static MACHINE_START( redbaron )
 {
 	state_save_register_global(machine, analog_data);
 	state_save_register_global(machine, rb_input_select);
-	mb_register_states(machine);
 	atari_vg_register_states(machine);
 }
 
@@ -307,12 +305,12 @@ static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1200, 0x1200) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1600, 0x1600) AM_WRITE(avgdvg_reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ(mb_status_r)
-	AM_RANGE(0x1810, 0x1810) AM_READ(mb_lo_r)
-	AM_RANGE(0x1818, 0x1818) AM_READ(mb_hi_r)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREAD(MATHBOX, "mathbox", mathbox_status_r)
+	AM_RANGE(0x1810, 0x1810) AM_DEVREAD(MATHBOX, "mathbox", mathbox_lo_r)
+	AM_RANGE(0x1818, 0x1818) AM_DEVREAD(MATHBOX, "mathbox", mathbox_hi_r)
 	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1840, 0x1840) AM_WRITE(bzone_sounds_w)
-	AM_RANGE(0x1860, 0x187f) AM_WRITE(mb_go_w)
+	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE(MATHBOX, "mathbox", mathbox_go_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -327,16 +325,16 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1200, 0x1200) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1600, 0x1600) AM_WRITE(avgdvg_reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ(mb_status_r)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREAD(MATHBOX, "mathbox", mathbox_status_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN4")
-	AM_RANGE(0x1804, 0x1804) AM_READ(mb_lo_r)
-	AM_RANGE(0x1806, 0x1806) AM_READ(mb_hi_r)
+	AM_RANGE(0x1804, 0x1804) AM_DEVREAD(MATHBOX, "mathbox", mathbox_lo_r)
+	AM_RANGE(0x1806, 0x1806) AM_DEVREAD(MATHBOX, "mathbox", mathbox_hi_r)
 	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_sounds_w)	/* and select joystick pot also */
 	AM_RANGE(0x180a, 0x180a) AM_WRITE(SMH_NOP)				/* sound reset, yet todo */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(atari_vg_earom_ctrl_w)
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1820, 0x185f) AM_READWRITE(atari_vg_earom_r, atari_vg_earom_w)
-	AM_RANGE(0x1860, 0x187f) AM_WRITE(mb_go_w)
+	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE(MATHBOX, "mathbox", mathbox_go_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -563,6 +561,9 @@ static MACHINE_DRIVER_START( bzone )
 
 	MDRV_VIDEO_START(avg_bzone)
 	MDRV_VIDEO_UPDATE(vector)
+
+	/* Drivers */
+	MDRV_MATHBOX_ADD("mathbox")
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
