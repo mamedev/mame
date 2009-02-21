@@ -285,7 +285,7 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
 
-#define MASTER_CLOCK (12096000)
+#define MASTER_CLOCK (XTAL_12_096MHz)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
 #define TEMPEST_KNOB_P1_TAG	("KNOBP1")
@@ -295,6 +295,13 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 
 
 static UINT8 tempest_player_select;
+
+static MACHINE_START( tempest )
+{
+	state_save_register_global(machine, tempest_player_select);
+	mb_register_states(machine);
+	atari_vg_register_states(machine);
+}
 
 /*************************************
  *
@@ -573,6 +580,8 @@ static MACHINE_DRIVER_START( tempest )
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
 	MDRV_WATCHDOG_TIME_INIT(HZ(CLOCK_3KHZ / 256))
 	MDRV_NVRAM_HANDLER(atari_vg)
+	
+	MDRV_MACHINE_START(tempest)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", VECTOR)
@@ -586,11 +595,11 @@ static MACHINE_DRIVER_START( tempest )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey1", POKEY, 12096000/8)
+	MDRV_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(pokey_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("pokey2", POKEY, 12096000/8)
+	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -783,8 +792,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, tempest,  0,       tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 3)", 0 )
-GAME( 1980, tempest1, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 1)", 0 )
-GAME( 1980, tempest2, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 2)", 0 )
-GAME( 1980, tempest3, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 2, Revised Hardware)", 0 )
-GAME( 1980, temptube, tempest, tempest, tempest, 0, ROT270, "hack",  "Tempest Tubes", 0 )
+GAME( 1980, tempest,  0,       tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1980, tempest1, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 1)", GAME_SUPPORTS_SAVE)
+GAME( 1980, tempest2, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 2)", GAME_SUPPORTS_SAVE )
+GAME( 1980, tempest3, tempest, tempest, tempest, 0, ROT270, "Atari", "Tempest (rev 2, Revised Hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1980, temptube, tempest, tempest, tempest, 0, ROT270, "hack",  "Tempest Tubes", GAME_SUPPORTS_SAVE )
