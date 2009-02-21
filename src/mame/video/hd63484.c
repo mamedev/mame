@@ -9,6 +9,7 @@ this chip is used in:
 ***************************************************************************/
 
 #include "driver.h"
+#include "math.h"
 #include "video/hd63484.h"
 
 #define LOG_COMMANDS 0
@@ -843,6 +844,17 @@ static void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 
 }
 
+static void circle(INT16 sx, INT16 sy, UINT16 r, INT16 col)
+{
+	const float DEG2RAD = 3.14159/180;
+	int i;
+	for (i = 0; i < 360 * (r / 10); i++)
+	{
+		float degInRad = i * DEG2RAD / (r / 10);
+		dot(sx + cos(degInRad) * r,sy + sin(degInRad) * r,col & 7,cl0);
+	} 
+}
+
 static void paint(int sx, int sy, int col)
 {
 	int getpixel;
@@ -1217,6 +1229,10 @@ static void HD63484_command_w(running_machine *machine, UINT16 cmd)
 				sy = ey;
 			}
 			line(sx,sy,cpx,cpy,fifo[0]&7);
+		}
+		else if ((fifo[0] & 0xfe00) == 0xa800)	/* CRCL  added*/
+		{
+			circle(cpx,cpy,fifo[1] & 0x1fff,fifo[0]&7); // only 13 bit are used for the radius
 		}
 		else if ((fifo[0] & 0xfff8) == 0xc000)	/* AFRCT */
 		{
