@@ -7,6 +7,7 @@ driver by Andrew Gardner, Angelo Salese & Roberto Fresca
 TODO:
 - remaining video issues, priorities, sprites etc.;
 - inputs;
+- "Hopper timeout" msg if you win;
 - colors (probably needs a color prom);
 - add backup ram emulation;
 - unknown memories;
@@ -74,7 +75,17 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
  *************************************/
 
 static UINT8 *kingdrby_vram,*kingdrby_attr;
-static tilemap *sc0_tilemap,*sc0w_tilemap;
+static tilemap *sc0_tilemap,*sc0w_tilemap,*sc1_tilemap;
+
+/*
+tile
+xxxx xxxx tile number
+attr
+xxxx ---- basic color
+---- x--- priority
+---- -xx- extra color bank?
+---- ---x tile bank
+*/
 
 static TILE_GET_INFO( get_sc0_tile_info )
 {
@@ -82,6 +93,7 @@ static TILE_GET_INFO( get_sc0_tile_info )
 	int color = (kingdrby_attr[tile_index] & 0xf0) >> 4;
 
 	tile&=0x1ff;
+	color = (kingdrby_attr[tile_index] & 0x6)<<3;
 
 	SET_TILE_INFO(
 			1,
@@ -90,11 +102,30 @@ static TILE_GET_INFO( get_sc0_tile_info )
 			0);
 }
 
+static TILE_GET_INFO( get_sc1_tile_info )
+{
+	int tile = kingdrby_vram[tile_index] | kingdrby_attr[tile_index]<<8;
+	int color = (kingdrby_attr[tile_index] & 0xf0) >> 4;
+
+	tile&=0x1ff;
+	color = (kingdrby_attr[tile_index] & 0x6)<<3;
+
+	SET_TILE_INFO(
+			1,
+			tile,
+			color,
+			0);
+
+	tileinfo->category = (kingdrby_attr[tile_index] & 0x08)>>3;
+}
 
 static VIDEO_START(kingdrby)
 {
 	sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,24);
+	sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,tilemap_scan_rows,8,8,32,24);
 	sc0w_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
+
+	tilemap_set_transparent_pen(sc1_tilemap,0);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -104,29 +135,29 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	/*sprites not fully understood.*/
 	for(count=0;count<0x48;count+=4)
 	{
-		int x,y,spr_offs,colour,fx,mode,dx,dy,h,w;
+		int x,y,spr_offs,colour,fx,dx,dy,h,w,mode;
+
+		if((spriteram[count+3] & 1) == 1)
+			continue;
 
 		spr_offs = (spriteram[count]);
 		spr_offs &=0x7f;
+		mode = spr_offs;
 		spr_offs*=4;
-		colour = 0;
+		colour = (spriteram[count+3] & 0xf0)>>4;
 		fx = spriteram[count] & 0x80;
 		if(spriteram[count+1] == 0)
 			y = 0;
 		else
 			y = 0x100-spriteram[count+1];
 		x = spriteram[count+2];
-		mode = (spriteram[count+3] & 0xff);
 
-		if((mode & 1) == 1)
-			continue;
-
-		/*a simpler way?*/
-		if((mode & 0xe0) == 0xc0 )      { h = 1; w = 1; }
-		else if((mode & 0xe0) == 0xa0 ) { h = 2; w = 2; }
-		else if((mode & 0xe0) == 0x80 ) { h = 2; w = 2; }
-		else if((mode & 0xe0) == 0xe0 ) { h = 2; w = 2; }
-		else              {  h = 3; w = 4; }
+		/*TODO: I really believe that this is actually driven by a prom.*/
+		if((mode  >= 0x168/4) && (mode <= 0x17f/4))     { h = 1; w = 1; }
+		else if((mode >= 0x18c/4) && (mode <= 0x18f/4)) { h = 1; w = 1; }
+		else if((mode >= 0x19c/4) && (mode <= 0x19f/4)) { h = 1; w = 1; }
+		else if((mode & 3) == 3 || (mode) >= 0x13c/4)  { h = 2; w = 2; }
+		else                                           { h = 3; w = 4; }
 
 		if(fx)
 		{
@@ -149,6 +180,8 @@ static VIDEO_UPDATE(kingdrby)
 	rectangle clip;
 	tilemap_set_scrollx( sc0_tilemap,0, kingdrby_vram[0x342]);
 	tilemap_set_scrolly( sc0_tilemap,0, kingdrby_vram[0x341]);
+	tilemap_set_scrollx( sc1_tilemap,0, kingdrby_vram[0x342]);
+	tilemap_set_scrolly( sc1_tilemap,0, kingdrby_vram[0x341]);
 	tilemap_set_scrolly( sc0w_tilemap,0, 32);
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
@@ -157,9 +190,11 @@ static VIDEO_UPDATE(kingdrby)
 	clip.min_y = 192;
 	clip.max_y = visarea->max_y;
 
+	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
 	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
-	tilemap_draw(bitmap,&clip,sc0w_tilemap,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect);
+	tilemap_draw(bitmap,cliprect,sc1_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
+	tilemap_draw(bitmap,&clip,sc0w_tilemap,0,0);
 
 	return 0;
 }
@@ -169,6 +204,7 @@ static WRITE8_HANDLER( sc0_vram_w )
 	kingdrby_vram[offset] = data;
 	tilemap_mark_tile_dirty(sc0_tilemap,offset);
 	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
+	tilemap_mark_tile_dirty(sc1_tilemap,offset);
 }
 
 static WRITE8_HANDLER( sc0_attr_w )
@@ -176,11 +212,12 @@ static WRITE8_HANDLER( sc0_attr_w )
 	kingdrby_attr[offset] = data;
 	tilemap_mark_tile_dirty(sc0_tilemap,offset);
 	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
+	tilemap_mark_tile_dirty(sc1_tilemap,offset);
 }
 
 /*************************************
  *
- *  I/O (TODO)
+ *  I/O
  *
  *************************************/
 
@@ -197,9 +234,72 @@ static WRITE8_DEVICE_HANDLER( outport1_w )
 //	soundlatch_w(space,0, data);
 }
 
+static UINT8 mux_data;
+
 static WRITE8_DEVICE_HANDLER( outport2_w )
 {
 //	printf("PPI1 port C(upper) out: %02X\n", data);
+	mux_data = data & 0x80;
+}
+
+static READ8_DEVICE_HANDLER( input_mux_r )
+{
+	if(mux_data & 0x80)
+		return input_port_read(device->machine,"MUX0");
+	else
+		return input_port_read(device->machine,"MUX1");
+}
+
+static READ8_DEVICE_HANDLER( key_matrix_r )
+{
+	static UINT16 p1_val,p2_val;
+	static UINT8 p1_res,p2_res;
+
+	p1_val = input_port_read(device->machine,"KEY_1P");
+	p2_val = input_port_read(device->machine,"KEY_2P");
+
+	p1_res = 0;
+	p2_res = 0;
+
+	switch(p1_val)
+	{
+		case 0x0001: p1_res = 0x01; break;
+		case 0x0002: p1_res = 0x02; break;
+		case 0x0004: p1_res = 0x03; break;
+		case 0x0008: p1_res = 0x04; break;
+		case 0x0010: p1_res = 0x05; break;
+		case 0x0020: p1_res = 0x06; break;
+		case 0x0040: p1_res = 0x07; break;
+		case 0x0080: p1_res = 0x08; break;
+		case 0x0100: p1_res = 0x09; break;
+		case 0x0200: p1_res = 0x0a; break;
+		case 0x0400: p1_res = 0x0b; break;
+		case 0x0800: p1_res = 0x0c; break;
+		case 0x1000: p1_res = 0x0d; break;
+		case 0x2000: p1_res = 0x0e; break;
+		case 0x4000: p1_res = 0x0f; break;
+	}
+
+	switch(p2_val)
+	{
+		case 0x0001: p2_res = 0x01; break;
+		case 0x0002: p2_res = 0x02; break;
+		case 0x0004: p2_res = 0x03; break;
+		case 0x0008: p2_res = 0x04; break;
+		case 0x0010: p2_res = 0x05; break;
+		case 0x0020: p2_res = 0x06; break;
+		case 0x0040: p2_res = 0x07; break;
+		case 0x0080: p2_res = 0x08; break;
+		case 0x0100: p2_res = 0x09; break;
+		case 0x0200: p2_res = 0x0a; break;
+		case 0x0400: p2_res = 0x0b; break;
+		case 0x0800: p2_res = 0x0c; break;
+		case 0x1000: p2_res = 0x0d; break;
+		case 0x2000: p2_res = 0x0e; break;
+		case 0x4000: p2_res = 0x0f; break;
+	}
+
+	return p1_res | (p2_res<<4);
 }
 
 /*************************************
@@ -230,7 +330,7 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7400, 0x75ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-//	AM_RANGE(0x7a00, 0x7a00) AM_READ_PORT("UNK")
+	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
@@ -274,8 +374,8 @@ static const ppi8255_interface ppi8255_intf[2] =
 	/* B & C (lower) as input, A & C (upper) as output */
 	{
 		DEVCB_NULL,					/* Port A read */
-		DEVCB_INPUT_PORT("IN2"),	/* Port B read */
-		DEVCB_INPUT_PORT("IN3"),	/* Port C read */
+		DEVCB_HANDLER(key_matrix_r),/* Port B read */
+		DEVCB_HANDLER(input_mux_r),	/* Port C read */
 		DEVCB_HANDLER(outport1_w),  /* Port A write */
 		DEVCB_NULL,					/* Port B write */
 		DEVCB_HANDLER(outport2_w)	/* Port C write */
@@ -298,14 +398,14 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("1P 1C/1C") //service?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P 1C/1C") //service?
-	PORT_DIPNAME( 0x10, 0x10, "Hopper I/O" )
+	PORT_DIPNAME( 0x10, 0x10, "1P Hopper I/O" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "2P Hopper I/O" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Credit Clear") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Credit Clear")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Advance Button") //TODO: change this
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Advance Button")
 
 
 	PORT_START("IN1")	// ppi0 (5001)
@@ -326,7 +426,43 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN2")	// ppi1 (6001)
+	PORT_START("KEY_1P")	// ppi1 (6001)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("1P 1-2") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("1P 1-3") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1P 1-4") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1P 1-5") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("1P 1-6") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("1P 2-3") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("1P 2-4") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("1P 2-5") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("1P 2-6") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("1P 3-4") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("1P 3-5") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("1P 3-6") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("1P 4-5") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("1P 4-6") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("1P 5-6") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("KEY_2P")	// ppi1 (6001)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("2P 1-2") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("2P 1-3") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("2P 1-4") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2P 1-5") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2P 1-6") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("2P 2-3") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("2P 2-4") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("2P 2-5") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("2P 2-6") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("2P 3-4") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("2P 3-5") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("2P 3-6") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("2P 4-5") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("2P 4-6") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("2P 5-6") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("MUX0")	// ppi1 (6002)
 	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -352,7 +488,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")	// ppi1 (6002)
+	PORT_START("MUX1")
 	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -403,32 +539,6 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("UNK")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /*************************************
@@ -466,8 +576,8 @@ static const gfx_layout layout16x16x2 =
 };
 
 static GFXDECODE_START( kingdrby )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16x2, 0, 0x40 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, layout8x8x2,   0, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16x2, 0, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, layout8x8x2,   0, 0x80 )
 GFXDECODE_END
 
 /**********************************************************************************************************
@@ -509,6 +619,32 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
+/* mame default palette doesn't suit well with this game, so we add a dummy color_prom initialization.*/
+static PALETTE_INIT(kingdrby)
+{
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x200; ++i)
+	{
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
+
 static MACHINE_DRIVER_START( kingdrby )
 	MDRV_CPU_ADD("master", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(master_map,0)
@@ -531,7 +667,8 @@ static MACHINE_DRIVER_START( kingdrby )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	MDRV_GFXDECODE(kingdrby)
-	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(0x200)
+	MDRV_PALETTE_INIT(kingdrby)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
