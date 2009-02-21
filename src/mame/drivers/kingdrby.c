@@ -9,6 +9,7 @@ TODO:
 - inputs;
 - "Hopper timeout" msg if you win;
 - colors (probably needs a color prom);
+- Discrete sound part? (there's a Rossini's "William Tell" bgm on the Chinese bootlegs)
 - add backup ram emulation;
 - unknown memories;
 - the name "King Derby" is a raw guess, there's a chance that it uses a different name
@@ -228,10 +229,11 @@ static WRITE8_DEVICE_HANDLER( outport0_w )
 
 static WRITE8_DEVICE_HANDLER( outport1_w )
 {
-//	const address_space *space = cpu_get_address_space(device->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
 
-//	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
-//	soundlatch_w(space,0, data);
+	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0, data);
+//	printf("%02x\n",data);
 }
 
 static UINT8 mux_data;
@@ -302,6 +304,13 @@ static READ8_DEVICE_HANDLER( key_matrix_r )
 	return p1_res | (p2_res<<4);
 }
 
+static READ8_DEVICE_HANDLER( sound_cmd_r )
+{
+	const address_space *space = cpu_get_address_space(device->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
+
+	return soundlatch_r(space, 0);
+}
+
 /*************************************
  *
  * Memory Map
@@ -317,7 +326,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) AM_READ_PORT("UNK")
+	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -330,13 +339,14 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7400, 0x75ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x7800, 0x780f) AM_WRITENOP // discrete sound writes?
 	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) AM_READ_PORT("UNK")
+	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -346,8 +356,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -605,7 +615,7 @@ static const mc6845_interface mc6845_intf =
 
 /*************************************
  *
- *  Sound HW Config (TODO)
+ *  Sound HW Config
  *
  *************************************/
 
@@ -613,10 +623,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_HANDLER(sound_cmd_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
 /* mame default palette doesn't suit well with this game, so we add a dummy color_prom initialization.*/
@@ -659,7 +666,7 @@ static MACHINE_DRIVER_START( kingdrby )
 	MDRV_CPU_ADD("sound", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,1000) /* guess, controls ay8910 tempo.*/
 
 	MDRV_QUANTUM_PERFECT_CPU("master")
 
@@ -684,7 +691,7 @@ static MACHINE_DRIVER_START( kingdrby )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, CLK_1/16)	/* guess */
+	MDRV_SOUND_ADD("ay", AY8910, CLK_1/8)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -726,4 +733,4 @@ ROM_START( kingdrby )
 	ROM_LOAD( "prom.x", 0x0000, 0x0200, NO_DUMP )
 ROM_END
 
-GAME( 1981, kingdrby,  0,      kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby",   GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1981, kingdrby,  0,      kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby",   GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
