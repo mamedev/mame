@@ -985,8 +985,8 @@ static ADDRESS_MAP_START( digdug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE(3) AM_BASE(&digdug_posram)	/* work RAM + sprite registers */
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE(4) AM_BASE(&digdug_flpram)	/* work RAM + sprite registers */
 	AM_RANGE(0xa000, 0xa007) AM_READNOP AM_WRITE(digdug_PORT_w)		/* video latches (spurious reads when setting latch bits) */
-	AM_RANGE(0xb800, 0xb83f) AM_READWRITE(atari_vg_earom_r, atari_vg_earom_w)	/* non volatile memory data */
-	AM_RANGE(0xb840, 0xb840) AM_WRITE(atari_vg_earom_ctrl_w)					/* non volatile memory control */
+	AM_RANGE(0xb800, 0xb83f) AM_DEVREADWRITE(ATARIVGEAROM, "earom", atari_vg_earom_r, atari_vg_earom_w)	/* non volatile memory data */
+	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)					/* non volatile memory control */
 ADDRESS_MAP_END
 
 
@@ -1859,6 +1859,8 @@ static MACHINE_DRIVER_START( digdug )
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(digdug)
+	
+	MDRV_ATARIVGEAROM_ADD("earom")
 	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* video hardware */

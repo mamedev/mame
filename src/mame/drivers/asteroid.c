@@ -246,12 +246,12 @@ static ADDRESS_MAP_START( astdelux_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
 	AM_RANGE(0x2c00, 0x2c0f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
-	AM_RANGE(0x2c40, 0x2c7f) AM_READ(atari_vg_earom_r)
+	AM_RANGE(0x2c40, 0x2c7f) AM_DEVREAD(ATARIVGEAROM, "earom", atari_vg_earom_r)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
-	AM_RANGE(0x3200, 0x323f) AM_WRITE(atari_vg_earom_w)
+	AM_RANGE(0x3200, 0x323f) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3600, 0x3600) AM_DEVWRITE(SOUND, "discrete", asteroid_explode_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(atari_vg_earom_ctrl_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
 	AM_RANGE(0x3c00, 0x3c01) AM_WRITE(astdelux_led_w)
 	AM_RANGE(0x3c03, 0x3c03) AM_DEVWRITE(SOUND, "discrete", astdelux_sounds_w)
 	AM_RANGE(0x3c04, 0x3c04) AM_WRITE(astdelux_bank_switch_w)
@@ -631,6 +631,7 @@ static MACHINE_DRIVER_START( astdelux )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(astdelux_map,0)
 
+	MDRV_ATARIVGEAROM_ADD("earom")
 	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* sound hardware */

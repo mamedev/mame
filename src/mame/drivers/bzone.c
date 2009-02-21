@@ -238,7 +238,6 @@ static MACHINE_START( redbaron )
 {
 	state_save_register_global(machine, analog_data);
 	state_save_register_global(machine, rb_input_select);
-	atari_vg_register_states(machine);
 }
 
 
@@ -331,9 +330,9 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1806, 0x1806) AM_DEVREAD(MATHBOX, "mathbox", mathbox_hi_r)
 	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_sounds_w)	/* and select joystick pot also */
 	AM_RANGE(0x180a, 0x180a) AM_WRITE(SMH_NOP)				/* sound reset, yet todo */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(atari_vg_earom_ctrl_w)
+	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
-	AM_RANGE(0x1820, 0x185f) AM_READWRITE(atari_vg_earom_r, atari_vg_earom_w)
+	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE(ATARIVGEAROM, "earom", atari_vg_earom_r, atari_vg_earom_w)
 	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE(MATHBOX, "mathbox", mathbox_go_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
@@ -599,6 +598,7 @@ static MACHINE_DRIVER_START( redbaron )
 
 	MDRV_MACHINE_START(redbaron)
 
+	MDRV_ATARIVGEAROM_ADD("earom")
 	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* video hardware */

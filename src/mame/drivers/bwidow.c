@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( bwidow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x6800, 0x6fff) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ(atari_vg_earom_r)
+	AM_RANGE(0x7000, 0x7000) AM_DEVREAD(ATARIVGEAROM, "earom", atari_vg_earom_r)
 	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("IN0")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN3")
 	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN4")
@@ -365,8 +365,8 @@ static ADDRESS_MAP_START( bwidow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8840, 0x8840) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x8880, 0x8880) AM_WRITE(avgdvg_reset_w)
 	AM_RANGE(0x88c0, 0x88c0) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
-	AM_RANGE(0x8900, 0x8900) AM_WRITE(atari_vg_earom_ctrl_w)
-	AM_RANGE(0x8940, 0x897f) AM_WRITE(atari_vg_earom_w)
+	AM_RANGE(0x8900, 0x8900) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
+	AM_RANGE(0x8940, 0x897f) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
 	AM_RANGE(0x8980, 0x89ed) AM_WRITE(SMH_NOP) /* watchdog clear */
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -377,14 +377,14 @@ static ADDRESS_MAP_START( spacduel_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0900, 0x0907) AM_READ(spacduel_IN3_r)	/* IN1 */
 	AM_RANGE(0x0905, 0x0906) AM_WRITE(SMH_NOP) /* ignore? */
-	AM_RANGE(0x0a00, 0x0a00) AM_READ(atari_vg_earom_r)
+	AM_RANGE(0x0a00, 0x0a00) AM_DEVREAD(ATARIVGEAROM, "earom", atari_vg_earom_r)
 //  AM_RANGE(0x0c00, 0x0c00) AM_WRITE(coin_counter_w) /* coin out */
 	AM_RANGE(0x0c80, 0x0c80) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x0d00, 0x0d00) AM_WRITE(SMH_NOP) /* watchdog clear */
 	AM_RANGE(0x0d80, 0x0d80) AM_WRITE(avgdvg_reset_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
-	AM_RANGE(0x0e80, 0x0e80) AM_WRITE(atari_vg_earom_ctrl_w)
-	AM_RANGE(0x0f00, 0x0f3f) AM_WRITE(atari_vg_earom_w)
+	AM_RANGE(0x0e80, 0x0e80) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
+	AM_RANGE(0x0f00, 0x0f3f) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
@@ -716,6 +716,7 @@ static MACHINE_DRIVER_START( bwidow )
 	MDRV_CPU_PROGRAM_MAP(bwidow_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
 
+	MDRV_ATARIVGEAROM_ADD("earom")
 	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* video hardware */

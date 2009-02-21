@@ -299,7 +299,6 @@ static UINT8 tempest_player_select;
 static MACHINE_START( tempest )
 {
 	state_save_register_global(machine, tempest_player_select);
-	atari_vg_register_states(machine);
 }
 
 /*************************************
@@ -397,9 +396,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(wdclr_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(avgdvg_reset_w)
-	AM_RANGE(0x6000, 0x603f) AM_WRITE(atari_vg_earom_w)
-	AM_RANGE(0x6040, 0x6040) AM_DEVREAD(MATHBOX, "mathbox", mathbox_status_r) AM_WRITE(atari_vg_earom_ctrl_w)
-	AM_RANGE(0x6050, 0x6050) AM_READ(atari_vg_earom_r)
+	AM_RANGE(0x6000, 0x603f) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
+	AM_RANGE(0x6040, 0x6040) AM_DEVREAD(MATHBOX, "mathbox", mathbox_status_r) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
+	AM_RANGE(0x6050, 0x6050) AM_DEVREAD(ATARIVGEAROM, "earom", atari_vg_earom_r)
 	AM_RANGE(0x6060, 0x6060) AM_DEVREAD(MATHBOX, "mathbox", mathbox_lo_r)
 	AM_RANGE(0x6070, 0x6070) AM_DEVREAD(MATHBOX, "mathbox", mathbox_hi_r)
 	AM_RANGE(0x6080, 0x609f) AM_DEVWRITE(MATHBOX, "mathbox", mathbox_go_w)
@@ -578,6 +577,8 @@ static MACHINE_DRIVER_START( tempest )
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
 	MDRV_WATCHDOG_TIME_INIT(HZ(CLOCK_3KHZ / 256))
+
+	MDRV_ATARIVGEAROM_ADD("earom")
 	MDRV_NVRAM_HANDLER(atari_vg)
 	
 	MDRV_MACHINE_START(tempest)
