@@ -124,24 +124,24 @@ static const gfx_layout layout8x8x2 =
 	8*8
 };
 
-static const gfx_layout layout8x8x4 =
+static const gfx_layout layout16x16x4 =
 {
-	8,8,
+	16,16,
 	RGN_FRAC(1,4),
 	4,
 	{
 		RGN_FRAC(0,4),
 		RGN_FRAC(1,4),
 		RGN_FRAC(2,4),
-		RGN_FRAC(3,4)
+		RGN_FRAC(3,4),
 	},
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
+	{ 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7,0,1,2,3,4,5,6,7 },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8  },
+	16*16
 };
 
 static GFXDECODE_START( cowrace )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, layout8x8x4, 0, 0x1 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, layout16x16x4, 0, 0x1 )
 	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0, 0x1 )
 GFXDECODE_END
 
@@ -170,6 +170,8 @@ static MACHINE_DRIVER_START( cowrace )
 	MDRV_CPU_PROGRAM_MAP(mem_map_cowrace,0)
 	MDRV_CPU_IO_MAP(io_map_cowrace,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+	/* missing slave z80? (like in King Derby)*/
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(mem_map_sound_cowrace,0)
@@ -223,4 +225,4 @@ ROM_START( cowrace )
 	ROM_LOAD( "u4.bin", 0x00000, 0x20000, CRC(f92a3ab5) SHA1(fc164492793597eadb8a50154410936edb74fa23) )
 ROM_END
 
-GAME( 19??, cowrace, 0, cowrace, cowrace, 0,	ROT0, "<unknown>", "Cow Race", GAME_NOT_WORKING )
+GAME( 2000, cowrace, kingdrby, cowrace, cowrace, 0,	ROT0, "bootleg", "Cow Race (hack of King Derby)", GAME_NOT_WORKING )
