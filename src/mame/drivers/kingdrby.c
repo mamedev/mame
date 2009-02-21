@@ -1,11 +1,19 @@
-/*
+/*******************************************************************************************
+
+King Derby (c) 1981 Tatsumi
+
+driver by Andrew Gardner, Angelo Salese & Roberto Fresca
 
 TODO:
 - remaining video issues, priorities, sprites etc.;
 - inputs;
 - colors (probably needs a color prom);
+- add backup ram emulation;
 - unknown memories;
-- clean-ups!
+- the name "King Derby" is a raw guess, there's a chance that it uses a different name
+  (but there isn't any title screen on the game?)
+
+============================================================================================
 
 file   : readme.txt
 author : Stefan Lindberg
@@ -48,16 +56,22 @@ s8.g2          4096     0xad667c05      D2732D
 s9_a.ka        4096     0xca82cd81      D2732D
 sg1_b.e1       4096     0x92ef3c13      D2732D
 
-*/
-
-#define CLK_1	XTAL_20MHz
-#define CLK_2	XTAL_3_579545MHz
+*******************************************************************************************/
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
+
+#define CLK_1	XTAL_20MHz
+#define CLK_2	XTAL_3_579545MHz
+
+/*************************************
+ *
+ *  Video Hardware
+ *
+ *************************************/
 
 static UINT8 *kingdrby_vram,*kingdrby_attr;
 static tilemap *sc0_tilemap,*sc0w_tilemap;
@@ -83,26 +97,12 @@ static VIDEO_START(kingdrby)
 	sc0w_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
-static VIDEO_UPDATE(kingdrby)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int count = 0;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
-	rectangle clip;
-	tilemap_set_scrollx( sc0_tilemap,0, kingdrby_vram[0x342]);
-	tilemap_set_scrolly( sc0_tilemap,0, kingdrby_vram[0x341]);
-	tilemap_set_scrolly( sc0w_tilemap,0, 32);
-
-	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
-	clip.min_x = visarea->min_x;
-	clip.max_x = 256;
-	clip.min_y = 192;
-	clip.max_y = visarea->max_y;
-
-	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
-	tilemap_draw(bitmap,&clip,sc0w_tilemap,0,0);
 
 	/*sprites not fully understood.*/
-	for(count=0;count<0x100;count+=4)
+	for(count=0;count<0x48;count+=4)
 	{
 		int x,y,spr_offs,colour,fx,mode,dx,dy,h,w;
 
@@ -132,18 +132,57 @@ static VIDEO_UPDATE(kingdrby)
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,1,0,(x+16*w)-dx*16,y+dy*16,cliprect,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,1,0,(x+16*w)-dx*16,y+dy*16,cliprect,TRANSPARENCY_PEN,0);
 		}
 		else
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					drawgfx(bitmap,screen->machine->gfx[0],spr_offs++,colour,0,0,x+dx*16,y+dy*16,cliprect,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,0,0,x+dx*16,y+dy*16,cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
+}
+
+static VIDEO_UPDATE(kingdrby)
+{
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	rectangle clip;
+	tilemap_set_scrollx( sc0_tilemap,0, kingdrby_vram[0x342]);
+	tilemap_set_scrolly( sc0_tilemap,0, kingdrby_vram[0x341]);
+	tilemap_set_scrolly( sc0w_tilemap,0, 32);
+
+	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
+	clip.min_x = visarea->min_x;
+	clip.max_x = 256;
+	clip.min_y = 192;
+	clip.max_y = visarea->max_y;
+
+	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
+	tilemap_draw(bitmap,&clip,sc0w_tilemap,0,0);
+	draw_sprites(screen->machine,bitmap,cliprect);
 
 	return 0;
 }
+
+static WRITE8_HANDLER( sc0_vram_w )
+{
+	kingdrby_vram[offset] = data;
+	tilemap_mark_tile_dirty(sc0_tilemap,offset);
+	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
+}
+
+static WRITE8_HANDLER( sc0_attr_w )
+{
+	kingdrby_attr[offset] = data;
+	tilemap_mark_tile_dirty(sc0_tilemap,offset);
+	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
+}
+
+/*************************************
+ *
+ *  I/O (TODO)
+ *
+ *************************************/
 
 static WRITE8_DEVICE_HANDLER( outport0_w )
 {
@@ -163,26 +202,11 @@ static WRITE8_DEVICE_HANDLER( outport2_w )
 //	printf("PPI1 port C(upper) out: %02X\n", data);
 }
 
-#if 0
-static READ8_HANDLER( ff_r )
-{
-	return 0xff;
-}
-#endif
-
-static WRITE8_HANDLER( sc0_vram_w )
-{
-	kingdrby_vram[offset] = data;
-	tilemap_mark_tile_dirty(sc0_tilemap,offset);
-	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
-}
-
-static WRITE8_HANDLER( sc0_attr_w )
-{
-	kingdrby_attr[offset] = data;
-	tilemap_mark_tile_dirty(sc0_tilemap,offset);
-	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
-}
+/*************************************
+ *
+ * Memory Map
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
@@ -226,26 +250,14 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
-/*
-  slave
-
-  5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
-  6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
-
-  7c00  unknown read.
-
-  crtc:         6845 type.
-  screen size:  384x272    registers 00 & 04. (value-1)
-  visible area: 256x224    registers 01 & 06.
-
-  the clocks are a guess, but is the only logical combination I found to get a reasonable vertical of ~53Hz.
-
-  the code is stuck with last checksum calculation. both z80 are halted.
-
-  feeding the slave 7c00 read with value !=0, the code requests something from master 3885.
-  feeding both, we have unmapped slave writes to 7400-744b and 0's to 7801-780f.
-
-*/
+/*************************************
+*
+* PPI configuration
+*
+* 5000-5003 PPI group modes 0/0 - A & B as input, C (all) as output.
+* 6000-6003 PPI group modes 0/0 - B & C (lower) as input, A & C (upper) as output.
+*
+*************************************/
 
 static const ppi8255_interface ppi8255_intf[2] =
 {
@@ -270,8 +282,13 @@ static const ppi8255_interface ppi8255_intf[2] =
 	}
 };
 
-static INPUT_PORTS_START( kingdrby )
+/*************************************
+ *
+ *  Input Port Definitions
+ *
+ *************************************/
 
+static INPUT_PORTS_START( kingdrby )
 	PORT_START("IN0")	// ppi0 (5000)
 	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -414,6 +431,12 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+/*************************************
+*
+* GFX decoding
+*
+*************************************/
+
 static const gfx_layout layout8x8x2 =
 {
 	8,8,
@@ -443,9 +466,20 @@ static const gfx_layout layout16x16x2 =
 };
 
 static GFXDECODE_START( kingdrby )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, layout16x16x2, 0, 0x40 )
-	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0, 0x40 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, layout16x16x2, 0, 0x40 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, layout8x8x2,   0, 0x40 )
 GFXDECODE_END
+
+/**********************************************************************************************************
+*
+* MC6845 interface
+*
+* screen size:  384x272    registers 00 & 04. (value-1)
+* visible area: 256x224    registers 01 & 06.
+*
+* the clocks are a guess, but is the only logical combination I found to get a reasonable vertical of ~53Hz.
+*
+***********************************************************************************************************/
 
 static const mc6845_interface mc6845_intf =
 {
@@ -458,6 +492,12 @@ static const mc6845_interface mc6845_intf =
 	NULL,	/* HSYNC callback */
 	NULL	/* VSYNC callback */
 };
+
+/*************************************
+ *
+ *  Sound HW Config (TODO)
+ *
+ *************************************/
 
 static const ay8910_interface ay8910_config =
 {
@@ -480,14 +520,12 @@ static MACHINE_DRIVER_START( kingdrby )
 	MDRV_CPU_IO_MAP(slave_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, CLK_2)		/* Or maybe it's the 20 mhz one? */
+	MDRV_CPU_ADD("sound", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_QUANTUM_PERFECT_CPU("master")
-
-	//MDRV_MACHINE_RESET(kingdrby)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
@@ -517,34 +555,38 @@ MACHINE_DRIVER_END
 
 ROM_START( kingdrby )
 	ROM_REGION( 0x3000, "master", 0 )
-	ROM_LOAD( "im4_d.d6",  0x0000, 0x1000, CRC(20F2D999) SHA1(91DB46059F32B4791460DF3330260F4E60F016A5) )
-	ROM_LOAD( "im5_d.c6",  0x1000, 0x1000, CRC(C192CECC) SHA1(63436BF3D9C1E34F6549830C8164295B7758D666) )
-	ROM_LOAD( "im6_d.b6",  0x2000, 0x1000, CRC(257F4E0D) SHA1(CD61F3CF70C536AA207EBFDD28BE54AC586B5249) )
+	ROM_LOAD( "im4_d.d6",  0x0000, 0x1000, CRC(20f2d999) SHA1(91db46059f32b4791460df3330260f4e60f016a5) )
+	ROM_LOAD( "im5_d.c6",  0x1000, 0x1000, CRC(c192cecc) SHA1(63436bf3d9c1e34f6549830c8164295b7758d666) )
+	ROM_LOAD( "im6_d.b6",  0x2000, 0x1000, CRC(257f4e0d) SHA1(cd61f3cf70c536aa207ebfdd28be54ac586b5249) )
 
 	ROM_REGION( 0x1000, "sound", 0 )
-	ROM_LOAD( "sg1_b.e1", 0x0000, 0x1000, CRC(92EF3C13) SHA1(1BF1E4106B37AADFC02822184510740E18A54D5C) )
+	ROM_LOAD( "sg1_b.e1", 0x0000, 0x1000, CRC(92ef3c13) SHA1(1bf1e4106b37aadfc02822184510740e18a54d5c) )
 
 	ROM_REGION( 0x4000, "slave", 0 )
-	ROM_LOAD( "im1_yk.g1", 0x0000, 0x1000, CRC(1921605D) SHA1(0AA6F7195EA59D0080620AB02A737E5C319DD3E7) )
-	ROM_LOAD( "im2_yk.f1", 0x1000, 0x1000, CRC(8504314E) SHA1(309645E17FB3149DCE57AE6844CC58652A1EEB35) )
-	ROM_LOAD( "im3_yk.e1", 0x2000, 0x1000, CRC(B0E473EC) SHA1(234598548B2A2A8F53D40BC07C3B1759074B7D93) )
+	ROM_LOAD( "im1_yk.g1", 0x0000, 0x1000, CRC(1921605d) SHA1(0aa6f7195ea59d0080620ab02a737e5c319dd3e7) )
+	ROM_LOAD( "im2_yk.f1", 0x1000, 0x1000, CRC(8504314e) SHA1(309645e17fb3149dce57ae6844cc58652a1eeb35) )
+	ROM_LOAD( "im3_yk.e1", 0x2000, 0x1000, CRC(b0e473ec) SHA1(234598548b2a2a8f53d40bc07c3b1759074b7d93) )
 	ROM_COPY( "sound", 0x0000, 0x3000, 0x1000 )
 
+	/* sprites gfxs */
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "s1.d1",    0x0000, 0x1000, CRC(26974007) SHA1(5079DAF9AD7D84F935C256458060DB9497DAEF91) )
-	ROM_LOAD( "s2.e1",    0x1000, 0x1000, CRC(BEDEBFA7) SHA1(5A2116ED4AF6BC4B72199017515980E4A937236C) )
-	ROM_LOAD( "s3.f1",    0x2000, 0x1000, CRC(0AA59571) SHA1(5005FFDD0030E4D4C1D8033FD3C78177C0FBD1B0) )
-	ROM_LOAD( "s4.g1",    0x3000, 0x1000, CRC(CCD5FB0E) SHA1(3EE4377D15E7731586B7A3457DBAE52EDAED72D3) )
-	ROM_LOAD( "s5.d2",    0x4000, 0x1000, CRC(32613DF3) SHA1(21CE057C416E6F1D0A3E112D640B1CF52BA69206) )
-	ROM_LOAD( "s6.e2",    0x5000, 0x1000, CRC(A151C422) SHA1(354EFAEE64C8CC457F96CBA4722F6A0DF66E14D3) )
-	ROM_LOAD( "s7.f2",    0x6000, 0x1000, CRC(7CFCEE55) SHA1(590AC02941E82371D56113D052EB4D4BCDBF83B0) )
-	ROM_LOAD( "s8.g2",    0x7000, 0x1000, CRC(AD667C05) SHA1(D9BDF3A125EBA2D40191B0659C2007CCBC6FD12B) )
+	ROM_LOAD( "s1.d1",    0x0000, 0x1000, CRC(26974007) SHA1(5079daf9ad7d84f935c256458060db9497daef91) )
+	ROM_LOAD( "s2.e1",    0x1000, 0x1000, CRC(bedebfa7) SHA1(5a2116ed4af6bc4b72199017515980e4a937236c) )
+	ROM_LOAD( "s3.f1",    0x2000, 0x1000, CRC(0aa59571) SHA1(5005ffdd0030e4d4c1d8033fd3c78177c0fbd1b0) )
+	ROM_LOAD( "s4.g1",    0x3000, 0x1000, CRC(ccd5fb0e) SHA1(3ee4377d15e7731586b7a3457dbae52edaed72d3) )
+	ROM_LOAD( "s5.d2",    0x4000, 0x1000, CRC(32613df3) SHA1(21ce057c416e6f1d0a3e112d640b1cf52ba69206) )
+	ROM_LOAD( "s6.e2",    0x5000, 0x1000, CRC(a151c422) SHA1(354efaee64c8cc457f96cba4722f6a0df66e14d3) )
+	ROM_LOAD( "s7.f2",    0x6000, 0x1000, CRC(7cfcee55) SHA1(590ac02941e82371d56113d052eb4d4bcdbf83b0) )
+	ROM_LOAD( "s8.g2",    0x7000, 0x1000, CRC(ad667c05) SHA1(d9bdf3a125eba2d40191b0659c2007ccbc6fd12b) )
 
-	/* These last 2 ROMs are a good distance away on the PCB */
+	/* tile gfxs */
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "s9_a.k8",  0x0000, 0x1000, CRC(CA82CD81) SHA1(FDF47DF7705C8D0AE70B5A0E29B35819F3D0749A) )
-	ROM_LOAD( "s10_a.l8", 0x1000, 0x1000, CRC(37B2736F) SHA1(15EF3F563AEBD1F5506135C7C01E9A1DB30A9CCC) )
+	ROM_LOAD( "s9_a.k8",  0x0000, 0x1000, CRC(ca82cd81) SHA1(fdf47df7705c8d0ae70b5a0e29b35819f3d0749a) )
+	ROM_LOAD( "s10_a.l8", 0x1000, 0x1000, CRC(37b2736f) SHA1(15ef3f563aebd1f5506135c7c01e9a1db30a9ccc) )
+
+	/* color proms */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom.x", 0x0000, 0x0200, NO_DUMP )
 ROM_END
 
-/*    YEAR  NAME    PARENT  MACHINE  INPUT    INIT     MONITOR COMPANY     FULLNAME   FLAGS */
-GAME( 1981, kingdrby,  0,      kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby?",   GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1981, kingdrby,  0,      kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby",   GAME_NOT_WORKING | GAME_NO_SOUND )
