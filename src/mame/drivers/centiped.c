@@ -1596,7 +1596,6 @@ static MACHINE_DRIVER_START( centiped )
 	MDRV_MACHINE_RESET(centiped)
 	
 	MDRV_ATARIVGEAROM_ADD("earom")
-	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* timer */
 	MDRV_TIMER_ADD_SCANLINE("32v", generate_interrupt, "main", 0, 16)
@@ -1725,7 +1724,6 @@ static MACHINE_DRIVER_START( bullsdrt )
 	MDRV_CPU_IO_MAP(bullsdrt_port_map,0)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
-	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

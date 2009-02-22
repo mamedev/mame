@@ -632,7 +632,6 @@ static MACHINE_DRIVER_START( astdelux )
 	MDRV_CPU_PROGRAM_MAP(astdelux_map,0)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
-	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)

@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-NVRAM_HANDLER( atari_vg );
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -27,4 +27,5 @@ WRITE8_DEVICE_HANDLER( atari_vg_earom_ctrl_w );
 /* ----- device interface ----- */
 
 #define ATARIVGEAROM DEVICE_GET_INFO_NAME(atari_vg_earom)
+
 DEVICE_GET_INFO( atari_vg_earom );

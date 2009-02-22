@@ -717,7 +717,6 @@ static MACHINE_DRIVER_START( bwidow )
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
-	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", VECTOR)

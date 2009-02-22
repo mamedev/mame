@@ -388,7 +388,6 @@ static MACHINE_DRIVER_START( liberatr )
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
-	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

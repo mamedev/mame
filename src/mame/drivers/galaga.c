@@ -1861,7 +1861,6 @@ static MACHINE_DRIVER_START( digdug )
 	MDRV_MACHINE_RESET(digdug)
 	
 	MDRV_ATARIVGEAROM_ADD("earom")
-	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

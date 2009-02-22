@@ -368,7 +368,6 @@ static MACHINE_DRIVER_START( runaway )
 	MDRV_MACHINE_RESET(runaway)
 	
 	MDRV_ATARIVGEAROM_ADD("earom")
-	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

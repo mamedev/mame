@@ -599,7 +599,6 @@ static MACHINE_DRIVER_START( redbaron )
 	MDRV_MACHINE_START(redbaron)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
-	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("main")

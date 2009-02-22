@@ -85,13 +85,9 @@ WRITE8_DEVICE_HANDLER( atari_vg_earom_ctrl_w )
 }
 
 
-NVRAM_HANDLER( atari_vg )
+static DEVICE_NVRAM( atari_vg_earom )
 {
-	const device_config *device = device_list_first(machine->config->devicelist, ATARIVGEAROM);
-	atari_vg_earom_state *earom;
-	
-	assert(device != NULL);
-	earom = get_safe_token(device);
+	atari_vg_earom_state *earom = get_safe_token(device);
 
 	if (read_or_write)
 		mame_fwrite(file,earom->rom,EAROM_SIZE);
@@ -154,12 +150,13 @@ DEVICE_GET_INFO( atari_vg_earom )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(atari_vg_earom); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(atari_vg_earom);break;
+		case DEVINFO_FCT_NVRAM:							info->nvram = DEVICE_NVRAM_NAME(atari_vg_earom); break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(atari_vg_earom);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "atari_vg_earom");		break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "I/O devices");			break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "EEPROM");				break;
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
