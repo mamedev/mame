@@ -5768,6 +5768,21 @@ YM2203
 
 */
 
+static DRIVER_INIT(mtonic)
+{
+	int A;
+	UINT8 *ROM = memory_region(machine, "main");
+
+	for (A = 0;A < 0x8000;A++)
+	{
+		if ((A & 4) == 4)
+			ROM[A] ^= 0x01;
+			
+		ROM[A] = BITSWAP8(ROM[A], 3,6,5,4,7,2,1,0);
+	}	
+}
+
+
 ROM_START( mtonic )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "8.e6",	0x0000, 0x8000, CRC(01daf2af) SHA1(cb9b12c79dce3c9123510a49dffc9f3cee056cf6) )
@@ -7496,7 +7511,7 @@ GAME( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  lucky8a,   ROT0, "Wing Co.L
 GAME( 198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austria",       "Lady Liner",                                  0 )
 GAME( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",                   GAME_IMPERFECT_COLORS )
 
-GAME( 198?, mtonic,    0,        ncb3,     cmv801,   0,         ROT0, "Tonic",             "Magical Tonic?",                              GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 198?, mtonic,    0,        ncb3,     cmv801,   mtonic,         ROT0, "Tonic",             "Magical Tonic?",                              GAME_WRONG_COLORS | GAME_NOT_WORKING )
 
 
 /* --- Amcoe games --- */
