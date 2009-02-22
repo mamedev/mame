@@ -1312,7 +1312,7 @@ GFXDECODE_END
 /***************************************************************************
   Discrete Filtering and Mixing
   
-  All values taken from Burger King Schematics.
+  All values taken from Burger Time Schematics.
 
  ****************************************************************************/
 
@@ -1365,8 +1365,8 @@ static DISCRETE_SOUND_START( btime_sound )
 	DISCRETE_MIXER2(NODE_40, 1, NODE_22, NODE_30, &btime_sound_mixer_desc)
 	DISCRETE_CRFILTER(NODE_41, 1, NODE_40, RES_K(10), CAP_U(10))
 	/* Amplifier not modelled */
-	/* Assuming a 8 Ohm impedance speaker */
-	DISCRETE_CRFILTER(NODE_42, 1, NODE_41, 6.0, CAP_U(100))
+	/* Assuming a 4 Ohm impedance speaker */
+	DISCRETE_CRFILTER(NODE_42, 1, NODE_41, 3.0, CAP_U(100))
 	
 	DISCRETE_OUTPUT(NODE_42, 32767.0 / 5. * 20.0)
 
