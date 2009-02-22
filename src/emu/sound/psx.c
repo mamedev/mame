@@ -80,6 +80,7 @@ struct psxinfo
 	UINT32 m_n_loop[ MAX_CHANNEL ];
 
 	sound_stream *stream;
+	int installHack;
 };
 
 INLINE struct psxinfo *get_safe_token(const device_config *device)
@@ -355,8 +356,7 @@ static DEVICE_START( psxspu )
 	state_save_register_device_item_array( device, 0, chip->m_p_n_s2 );
 	state_save_register_device_item_array( device, 0, chip->m_n_loop );
 
-	chip->intf->spu_install_read_handler( 4, spu_read );
-	chip->intf->spu_install_write_handler( 4, spu_write );
+	chip->installHack = 0;
 
 	chip->stream = stream_create( device, 0, 2, 44100, chip, PSXSPU_update );
 }
@@ -452,6 +452,15 @@ WRITE32_DEVICE_HANDLER( psx_spu_w )
 	running_machine *machine = device->machine;
 	int n_channel;
 	n_channel = offset / 4;
+
+	if( !chip->installHack )
+	{
+		chip->intf->spu_install_read_handler( 4, spu_read );
+		chip->intf->spu_install_write_handler( 4, spu_write );
+
+		chip->installHack = 1;
+	}
+
 	if( n_channel < MAX_CHANNEL )
 	{
 		switch( offset % 4 )
