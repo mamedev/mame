@@ -140,6 +140,7 @@ A few notes:
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "sound/discrete.h"
 #include "includes/btime.h"
 
 #define MASTER_CLOCK 	XTAL_12MHz
@@ -1308,14 +1309,69 @@ static GFXDECODE_START( disco )
 	GFXDECODE_ENTRY( NULL, 0, disco_tile16layout, 0, 4 ) /* sprites */
 GFXDECODE_END
 
+/***************************************************************************
+  Discrete Filtering and Mixing
+  
+  All values taken from Burger King Schematics.
 
+ ****************************************************************************/
 
 static const ay8910_interface ay1_intf =
 {
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
+	AY8910_DISCRETE_OUTPUT,
+	{RES_K(5), RES_K(5), RES_K(5)},
 	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(ay_audio_nmi_enable_w), DEVCB_NULL
 };
+
+static const ay8910_interface ay2_intf =
+{
+	AY8910_DISCRETE_OUTPUT,
+	{RES_K(1), RES_K(5), RES_K(5)},
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+};
+
+static const discrete_mixer_desc btime_sound_mixer_desc =
+	{DISC_MIXER_IS_OP_AMP,
+		{RES_K(100), RES_K(100)},
+		{0,0},	/* no variable resistors   */
+		{0,0},  /* no node capacitors      */
+		0,		/* no RI */ 
+		RES_K(10),
+		CAP_P(150),
+		0,		/* Modelled separately */
+		0, 1};
+
+static const discrete_op_amp_filt_info btime_opamp_desc = 
+	{RES_K(1), 0, RES_K(10), 0, RES_K(4.7), CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
+
+static DISCRETE_SOUND_START( btime_sound )
+
+	DISCRETE_INPUTX_STREAM(NODE_01, 0, 5.0/32767.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_02, 1, 5.0/32767.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_03, 2, 5.0/32767.0, 0)
+
+	DISCRETE_INPUTX_STREAM(NODE_04, 3, 5.0/32767.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_05, 4, 5.0/32767.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_06, 5, 5.0/32767.0, 0)
+
+	/* Mix 5 channels 1A, 1B, 1C, 2B, 2C directly */
+	DISCRETE_ADDER3(NODE_20, 1, NODE_01, NODE_02, NODE_03)
+	DISCRETE_ADDER3(NODE_21, 1, NODE_20, NODE_05, NODE_06)
+	DISCRETE_MULTIPLY(NODE_22, 1, NODE_21, 0.2)
+	
+	/* Filter of channel 2A */
+	DISCRETE_OP_AMP_FILTER(NODE_30, 1, NODE_04, NODE_NC, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &btime_opamp_desc)
+
+	DISCRETE_MIXER2(NODE_40, 1, NODE_22, NODE_30, &btime_sound_mixer_desc)
+	DISCRETE_CRFILTER(NODE_41, 1, NODE_40, RES_K(10), CAP_U(10))
+	/* Amplifier not modelled */
+	/* Assuming a 8 Ohm impedance speaker */
+	DISCRETE_CRFILTER(NODE_42, 1, NODE_41, 6.0, CAP_U(100))
+	
+	DISCRETE_OUTPUT(NODE_42, 32767.0 / 5. * 20.0)
+
+DISCRETE_SOUND_END
+
 
 static MACHINE_DRIVER_START( btime )
 
@@ -1343,13 +1399,22 @@ static MACHINE_DRIVER_START( btime )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
+	
 	MDRV_SOUND_ADD("ay1", AY8910, HCLK2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 	MDRV_SOUND_CONFIG(ay1_intf)
-
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
+	
 	MDRV_SOUND_ADD("ay2", AY8910, HCLK2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	MDRV_SOUND_CONFIG(ay2_intf)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 3)
+	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 4)
+	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 5)
+	
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(btime_sound)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
