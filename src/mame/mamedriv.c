@@ -6061,9 +6061,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( toffy )		/* (c) 1993 Midas */
 	DRIVER( stoffy )	/* (c) 1994 Midas + Unico */
 	DRIVER( ddungeon )	/* Game Room */
+	DRIVER( ddungene )	/* East Coast Coin Company (Melbourne) */
 	DRIVER( darktowr )	/* Game Room */
-	DRIVER( tstrike )	/* Game Room */
-	DRIVER( tstrikea )	/* Game Room */
+	DRIVER( tstrike )	/* East Coast Coin Company (Melbourne) */
+	DRIVER( tstrikea )	/* Game Room  */
 	DRIVER( ctribe )	/* TA-0028 (c) 1990 (US) */
 	DRIVER( ctribe1 )	/* TA-0028 (c) 1990 (US) - Set 1? */
 	DRIVER( ctribeb )	/* bootleg */

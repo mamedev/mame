@@ -1456,7 +1456,7 @@ ROM_START( ddragob2 )
 	ROM_LOAD( "11.bin",       0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
 	ROM_LOAD( "12.bin",       0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
 	ROM_LOAD( "13.bin",       0x20000, 0x10000, CRC(c8b91e17) SHA1(0ce6f6ef68ecc7309a2923f7e756d5e2bf5c7a4a) )
-	ROM_LOAD( "14.bin",       0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )	ROM_LOAD( "15.bin",        0x40000, 0x10000, CRC(a0a0c261) SHA1(25c534d82bd237386d447d72feee8d9541a5ded4) )
+	ROM_LOAD( "14.bin",       0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )
 	ROM_LOAD( "15.bin",       0x40000, 0x10000, CRC(a0a0c261) SHA1(25c534d82bd237386d447d72feee8d9541a5ded4) )
 	ROM_LOAD( "16.bin",       0x50000, 0x10000, CRC(6ba152f6) SHA1(a301ff809be0e1471f4ff8305b30c2fa4aa57fae) )
 	ROM_LOAD( "17.bin",       0x60000, 0x10000, CRC(3220a0b6) SHA1(24a16ea509e9aff82b9ddd14935d61bb71acff84) )
@@ -1774,37 +1774,76 @@ ROM_END
 
 ROM_START( ddungeon )
 	ROM_REGION( 0x30000, "main", 0 ) /* Main CPU? */
-	ROM_LOAD( "dd3.bin", 0x10000, 0x8000, CRC(922e719c) SHA1(d1c73f56913cd368158abc613d7bbab669509742) )
-	ROM_LOAD( "dd2.bin", 0x08000, 0x8000, CRC(a6e7f608) SHA1(83b9301c39bfdc1e50a37f2bdc4d4f65a1111bee) )
+	ROM_LOAD( "dd25.25",    0x10000, 0x8000,  CRC(922e719c) SHA1(d1c73f56913cd368158abc613d7bbab669509742) )
+	ROM_LOAD( "dd26.26",    0x08000, 0x8000,  CRC(a6e7f608) SHA1(83b9301c39bfdc1e50a37f2bdc4d4f65a1111bee) )
 	/* IC23 is replaced with a daughterboard containing a 68705 MCU */
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
-	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
+	ROM_LOAD( "63701.bin",  0xc000,  0x4000,  CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
+
+	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_LOAD( "dd30.30",    0x08000, 0x08000, CRC(ef1af99a) SHA1(7ced695b81ca9efbb7b28b78013e112edac85672) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
+	ROM_LOAD( "dd_mcu.bin", 0x00000, 0x0800,  CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 ) /* GFX? */
+	ROM_LOAD( "dd20.20",    0x00000, 0x08000, CRC(d976b78d) SHA1(e1cd47032a0f91d812c3925d1f1267a9972bf48e) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* GFX */
+	ROM_LOAD( "dd117.117",  0x00000, 0x08000, CRC(e912ca81) SHA1(8c274400170f46f84042f4f9cffba8d2fe9fbc10) )
+	ROM_LOAD( "dd113.113",  0x10000, 0x08000, CRC(43264ad8) SHA1(74f031d6179390bc4fa99f4929a6886db8c2b510) )
+
+	ROM_REGION( 0x20000, "gfx3", 0 ) /* GFX */
+	ROM_LOAD( "dd78.78",    0x00000, 0x08000, CRC(3deacae9) SHA1(6663f054ed3eed50c5cacfa5d22d465dfb179964) )
+	ROM_LOAD( "dd109.109",  0x10000, 0x08000, CRC(5a2f31eb) SHA1(1b85533443e148adb2a9c2c09c43cbf2c35c86bc) )
+
+	ROM_REGION( 0x20000, "adpcm", 0 ) /* adpcm samples */
+	ROM_LOAD( "21j-6",      0x00000, 0x10000, CRC(34755de3) SHA1(57c06d6ce9497901072fa50a92b6ed0d2d4d6528) ) /* at IC95 */
+	ROM_LOAD( "21j-7",      0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) ) /* at IC94 */
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "21j-k-0",    0x0000,  0x0100,  CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) ) /* at IC101 */
+	ROM_LOAD( "21j-l-0",    0x0100,  0x0200,  CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) ) /* at IC16 */
+ROM_END
+
+/* the only differences with this set are 2x graphic roms, and the sound program.
+   this version uses the sound program from double dragon, and as this configuration has been found on at least
+   4 boards it's likely that the updated sound rom in the parent set was only shipped with the 'game room'
+   version of the game */
+ROM_START( ddungene )
+	ROM_REGION( 0x30000, "main", 0 ) /* Main CPU? */
+	ROM_LOAD( "dd25.25",    0x10000, 0x8000,  CRC(922e719c) SHA1(d1c73f56913cd368158abc613d7bbab669509742) ) /* 3 on this board */
+	ROM_LOAD( "dd26.26",    0x08000, 0x8000,  CRC(a6e7f608) SHA1(83b9301c39bfdc1e50a37f2bdc4d4f65a1111bee) ) /* 2 on this board */
+	/* IC23 is replaced with a daughterboard containing a 68705 MCU */
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
+	ROM_LOAD( "63701.bin",  0xc000,  0x4000,  CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
 	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) ) /* from ddragon */
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
-	ROM_LOAD( "dd_mcu.bin",   0x00000, 0x0800, CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
+	ROM_LOAD( "dd_mcu.bin", 0x00000, 0x0800,  CRC(34cbb2d3) SHA1(8e0c3b13c636012d88753d547c639b1a8af85680) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* GFX? */
-	ROM_LOAD( "dd6.bin", 0x00000, 0x08000, CRC(057588ca) SHA1(d4a5dd3ea8cf455b54657473d4d52ab5e838ae15) )
+	ROM_LOAD( "dd6.bin",    0x00000, 0x08000, CRC(057588ca) SHA1(d4a5dd3ea8cf455b54657473d4d52ab5e838ae15) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 ) /* GFX */
-	ROM_LOAD( "dd-7r.bin", 0x00000, 0x08000, CRC(50d6ab5d) SHA1(4c9cbd72d38b631ea2ca231045ef3f3e11cc7c07) ) // 1
-	ROM_LOAD( "dd-7k.bin", 0x10000, 0x08000, CRC(43264ad8) SHA1(74f031d6179390bc4fa99f4929a6886db8c2b510) ) // 1
+	ROM_LOAD( "dd-7r.bin",  0x00000, 0x08000, CRC(50d6ab5d) SHA1(4c9cbd72d38b631ea2ca231045ef3f3e11cc7c07) )
+	ROM_LOAD( "dd113.113",  0x10000, 0x08000, CRC(43264ad8) SHA1(74f031d6179390bc4fa99f4929a6886db8c2b510) ) /* 7K on this board */
 
 	ROM_REGION( 0x20000, "gfx3", 0 ) /* GFX */
-	ROM_LOAD( "dd-6b.bin", 0x00000, 0x08000, CRC(3deacae9) SHA1(6663f054ed3eed50c5cacfa5d22d465dfb179964) ) // 0
-	ROM_LOAD( "dd-7c.bin", 0x10000, 0x08000, CRC(5a2f31eb) SHA1(1b85533443e148adb2a9c2c09c43cbf2c35c86bc) ) // 0
+	ROM_LOAD( "dd78.78",    0x00000, 0x08000, CRC(3deacae9) SHA1(6663f054ed3eed50c5cacfa5d22d465dfb179964) ) /* 6B on this board */
+	ROM_LOAD( "dd109.109",  0x10000, 0x08000, CRC(5a2f31eb) SHA1(1b85533443e148adb2a9c2c09c43cbf2c35c86bc) ) /* 7C on this board */
 
 	ROM_REGION( 0x20000, "adpcm", 0 ) /* adpcm samples */
-	ROM_LOAD( "21j-6",        0x00000, 0x10000, CRC(34755de3) SHA1(57c06d6ce9497901072fa50a92b6ed0d2d4d6528) )
-	ROM_LOAD( "21j-7",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
+	ROM_LOAD( "21j-6",      0x00000, 0x10000, CRC(34755de3) SHA1(57c06d6ce9497901072fa50a92b6ed0d2d4d6528) )
+	ROM_LOAD( "21j-7",      0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
-	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+	ROM_LOAD( "21j-k-0",    0x0000,  0x0100,  CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) ) /* unknown  */
+	ROM_LOAD( "21j-l-0",    0x0100,  0x0200,  CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) ) /* unknown  */
 ROM_END
 
 
@@ -2001,8 +2040,9 @@ GAME( 1988, ddragn2u, ddragon2, ddragon2, ddragon2, ddragon2, ROT0, "Technos", "
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,  0,        darktowr, tstrike,  darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Newer)", GAME_SUPPORTS_SAVE )
-GAME( 1991, tstrikea, tstrike,  darktowr, tstrike,  darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Older)", GAME_SUPPORTS_SAVE )
-GAME( 1992, ddungeon, 0,        darktowr, ddungeon, darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Dangerous Dungeons", GAME_SUPPORTS_SAVE )
+GAME( 1991, tstrikea, tstrike,  darktowr, tstrike,  darktowr, ROT0, "Game Room", "Thunder Strike (Older)", GAME_SUPPORTS_SAVE )
+GAME( 1992, ddungeon, 0,        darktowr, ddungeon, darktowr, ROT0, "Game Room", "Dangerous Dungeons", GAME_SUPPORTS_SAVE )
+GAME( 1992, ddungene, ddungeon, darktowr, ddungeon, darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Dangerous Dungeons (East Coast Coin Company)", GAME_SUPPORTS_SAVE )
 GAME( 1992, darktowr, 0,        darktowr, darktowr, darktowr, ROT0, "Game Room", "Dark Tower", GAME_SUPPORTS_SAVE )
 
 /* these run on their own board, but are basically the same game. Toffy even has 'dangerous dungeons' text in it */
