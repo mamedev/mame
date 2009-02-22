@@ -16,6 +16,7 @@ static struct {
 	UINT8 scntl2;
 	UINT8 scntl3;
 	UINT8 scid;
+	UINT8 sxfer;
 	UINT8 socl;
 	UINT8 istat;
 	UINT8 dstat;
@@ -459,6 +460,8 @@ READ8_HANDLER( lsi53c810_reg_r )
 			return lsi810.scntl3;
 		case 0x04:		/* SCID */
 			return lsi810.scid;
+		case 0x05:		/* SXFER */
+			return lsi810.sxfer;
 		case 0x09:		/* SOCL */
 			return lsi810.socl;
 		case 0x0c:		/* DSTAT */
@@ -544,6 +547,9 @@ WRITE8_HANDLER( lsi53c810_reg_w )
 			break;
 		case 0x04:		/* SCID */
 			lsi810.scid = data;
+			break;
+		case 0x05:		/* SXFER */
+			lsi810.sxfer = data;
 			break;
 		case 0x09:		/* SOCL */
 			lsi810.socl = data;
