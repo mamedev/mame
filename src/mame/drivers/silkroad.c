@@ -146,7 +146,7 @@ static WRITE32_DEVICE_HANDLER(silk_6295_bank_w)
 	{
 		int bank = (data & 0x3000000) >> 24;
 		if(bank < 3)
-			okim6295_set_bank_base(device, 0x40000 * (bank));
+			okim6295_set_bank_base(devtag_get_device(device->machine, SOUND, "oki1"), 0x40000 * (bank));
 	}
 }
 
@@ -168,9 +168,9 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE(silkroad_fgram3_w) AM_BASE(&silkroad_vidram3) // higher layer
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("DSW")
-	AM_RANGE(0xC00024, 0xC00027) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff0000)
-	AM_RANGE(0xC00028, 0xC0002f) AM_DEVREAD8(SOUND, "ym", ym2151_r, 0x00ff0000)
-	AM_RANGE(0xC00030, 0xC00033) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff0000)
+	AM_RANGE(0xc00024, 0xc00027) AM_DEVREADWRITE8(SOUND, "oki1", okim6295_r, okim6295_w, 0x00ff0000)
+	AM_RANGE(0xc00028, 0xc0002f) AM_DEVREADWRITE8(SOUND, "ym", ym2151_r, ym2151_w, 0x00ff0000)
+	AM_RANGE(0xc00030, 0xc00033) AM_DEVREADWRITE8(SOUND, "oki2", okim6295_r, okim6295_w, 0x00ff0000)
 	AM_RANGE(0xc00034, 0xc00037) AM_DEVWRITE(SOUND, "oki1", silk_6295_bank_w)
 	AM_RANGE(0xc00038, 0xc0003b) AM_WRITE(silk_coin_counter_w)
 	AM_RANGE(0xc0010c, 0xc00123) AM_WRITE(SMH_RAM) AM_BASE(&silkroad_regs)
