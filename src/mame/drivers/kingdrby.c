@@ -7,11 +7,12 @@ driver by Andrew Gardner, Angelo Salese & Roberto Fresca
 TODO:
 - remaining video issues, priorities, sprites etc.;
 - inputs;
-- "Hopper timeout" msg if you win;
 - colors (probably needs a color prom);
-- Discrete sound part? (there's a Rossini's "William Tell" bgm on the Chinese bootlegs)
+- Discrete sound part? There's a Rossini's "William Tell" bgm on the Chinese bootlegs,
+  I think it's tied with ay8910 port B.
 - add backup ram emulation;
 - unknown memories;
+- Garbage on the window tilemap if you win, it could be a BTANB (masked by the color prom).
 - the name "King Derby" is a raw guess, there's a chance that it uses a different name
   (but there isn't any title screen on the game?)
 
@@ -69,6 +70,8 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #define CLK_1	XTAL_20MHz
 #define CLK_2	XTAL_3_579545MHz
 
+static UINT8 sound_cmd;
+
 /*************************************
  *
  *  Video Hardware
@@ -82,7 +85,7 @@ static tilemap *sc0_tilemap,*sc0w_tilemap,*sc1_tilemap;
 tile
 xxxx xxxx tile number
 attr
-xxxx ---- basic color
+xxxx ---- basic color?
 ---- x--- priority
 ---- -xx- extra color bank?
 ---- ---x tile bank
@@ -91,10 +94,9 @@ xxxx ---- basic color
 static TILE_GET_INFO( get_sc0_tile_info )
 {
 	int tile = kingdrby_vram[tile_index] | kingdrby_attr[tile_index]<<8;
-	int color = (kingdrby_attr[tile_index] & 0xf0) >> 4;
+	int color = (kingdrby_attr[tile_index] & 0x6)>>1;
 
 	tile&=0x1ff;
-	color = (kingdrby_attr[tile_index] & 0x6)<<3;
 
 	SET_TILE_INFO(
 			1,
@@ -106,10 +108,9 @@ static TILE_GET_INFO( get_sc0_tile_info )
 static TILE_GET_INFO( get_sc1_tile_info )
 {
 	int tile = kingdrby_vram[tile_index] | kingdrby_attr[tile_index]<<8;
-	int color = (kingdrby_attr[tile_index] & 0xf0) >> 4;
+	int color = (kingdrby_attr[tile_index] & 0x6)>>1;
 
 	tile&=0x1ff;
-	color = (kingdrby_attr[tile_index] & 0x6)<<3;
 
 	SET_TILE_INFO(
 			1,
@@ -170,7 +171,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		{
 			for(dy=0;dy<h;dy++)
 				for(dx=0;dx<w;dx++)
-					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,0,0,x+dx*16,y+dy*16,cliprect,TRANSPARENCY_PEN,0);
+					drawgfx(bitmap,machine->gfx[0],spr_offs++,colour,0,0,(x+dx*16),y+dy*16,cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 }
@@ -222,25 +223,35 @@ static WRITE8_HANDLER( sc0_attr_w )
  *
  *************************************/
 
-static WRITE8_DEVICE_HANDLER( outport0_w )
+/* hopper I/O */
+static UINT8 p1_hopper,p2_hopper;
+
+static READ8_DEVICE_HANDLER( hopper_io_r )
 {
-//	printf("PPI0 port C out: %02X\n", data);
+	return (input_port_read(device->machine,"HPIO") & 0x3f) | p1_hopper | p2_hopper;
 }
 
-static WRITE8_DEVICE_HANDLER( outport1_w )
+static WRITE8_DEVICE_HANDLER( hopper_io_w )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
-
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
-	soundlatch_w(space,0, data);
+	p1_hopper = (data & 0x8)<<3;
+	p2_hopper = (data & 0x4)<<5;
 //	printf("%02x\n",data);
+}
+
+static WRITE8_DEVICE_HANDLER( sound_cmd_w )
+{
+	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	sound_cmd = data;
+	/* soundlatch is unneeded since we are already using perfect interleave. */
+	// soundlatch_w(space,0, data);
 }
 
 static UINT8 mux_data;
 
+/* No idea about what's this (if it's really a mux etc.)*/
 static WRITE8_DEVICE_HANDLER( outport2_w )
 {
-//	printf("PPI1 port C(upper) out: %02X\n", data);
+//	popmessage("PPI1 port C(upper) out: %02X", data);
 	mux_data = data & 0x80;
 }
 
@@ -306,9 +317,18 @@ static READ8_DEVICE_HANDLER( key_matrix_r )
 
 static READ8_DEVICE_HANDLER( sound_cmd_r )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
+	return sound_cmd;
+}
 
-	return soundlatch_r(space, 0);
+static WRITE8_HANDLER( led_array_w )
+{
+	/*
+	offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
+	data = xxxx ---- p2 array
+	       ---- xxxx p1 array
+	they goes from 0 to 5, to indicate the number.
+	If one player bets something, the other led will toggle between p1 and p2 bets.
+	*/
 }
 
 /*************************************
@@ -332,14 +352,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
-	AM_RANGE(0x4000, 0x43ff) AM_RAM //backup ram
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) //backup ram
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x7400, 0x75ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x7800, 0x780f) AM_WRITENOP // discrete sound writes?
+	AM_RANGE(0x7801, 0x780f) AM_WRITE(led_array_w)
 	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
@@ -373,12 +393,12 @@ static const ppi8255_interface ppi8255_intf[2] =
 {
 	/* A & B as input, C (all) as output */
 	{
-		DEVCB_INPUT_PORT("IN0"),	/* Port A read */
+		DEVCB_HANDLER(hopper_io_r),	/* Port A read */
 		DEVCB_INPUT_PORT("IN1"),	/* Port B read */
 		DEVCB_NULL,					/* Port C read */
 		DEVCB_NULL,					/* Port A write */
 		DEVCB_NULL,					/* Port B write */
-		DEVCB_HANDLER(outport0_w)   /* Port C write */
+		DEVCB_HANDLER(hopper_io_w)   /* Port C write */
 	},
 
 	/* B & C (lower) as input, A & C (upper) as output */
@@ -386,7 +406,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 		DEVCB_NULL,					/* Port A read */
 		DEVCB_HANDLER(key_matrix_r),/* Port B read */
 		DEVCB_HANDLER(input_mux_r),	/* Port C read */
-		DEVCB_HANDLER(outport1_w),  /* Port A write */
+		DEVCB_HANDLER(sound_cmd_w),  /* Port A write */
 		DEVCB_NULL,					/* Port B write */
 		DEVCB_HANDLER(outport2_w)	/* Port C write */
 	}
@@ -399,36 +419,40 @@ static const ppi8255_interface ppi8255_intf[2] =
  *************************************/
 
 static INPUT_PORTS_START( kingdrby )
-	PORT_START("IN0")	// ppi0 (5000)
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	/*this might be different.*/
+	PORT_START("HPIO")	// ppi0 (5000)
+	PORT_DIPNAME( 0x01, 0x01, "HPIO" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("1P 1C/1C") //service?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P 1C/1C") //service?
-	PORT_DIPNAME( 0x10, 0x10, "1P Hopper I/O" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "2P Hopper I/O" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Advance Button") //TODO: change this
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Advance Button")
-
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //1p hopper i/o
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
 
 	PORT_START("IN1")	// ppi0 (5001)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK ) //?
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )  PORT_NAME( "Analyzer" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("1P 1C/10C")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P 1C/10C")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("1P Coin")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("2P Coin")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -455,21 +479,21 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("KEY_2P")	// ppi1 (6001)
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("2P 1-2") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("2P 1-3") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("2P 1-4") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2P 1-5") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2P 1-6") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("2P 2-3") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("2P 2-4") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("2P 2-5") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("2P 2-6") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("2P 3-4") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("2P 3-5") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("2P 3-6") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("2P 4-5") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("2P 4-6") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("2P 5-6") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("2P 1-2") PORT_CODE(KEYCODE_Q) PORT_COCKTAIL
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("2P 1-3") PORT_CODE(KEYCODE_W) PORT_COCKTAIL
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("2P 1-4") PORT_CODE(KEYCODE_E) PORT_COCKTAIL
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2P 1-5") PORT_CODE(KEYCODE_R) PORT_COCKTAIL
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2P 1-6") PORT_CODE(KEYCODE_T) PORT_COCKTAIL
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("2P 2-3") PORT_CODE(KEYCODE_A) PORT_COCKTAIL
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("2P 2-4") PORT_CODE(KEYCODE_S) PORT_COCKTAIL
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("2P 2-5") PORT_CODE(KEYCODE_D) PORT_COCKTAIL
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("2P 2-6") PORT_CODE(KEYCODE_F) PORT_COCKTAIL
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("2P 3-4") PORT_CODE(KEYCODE_G) PORT_COCKTAIL
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("2P 3-5") PORT_CODE(KEYCODE_H) PORT_COCKTAIL
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("2P 3-6") PORT_CODE(KEYCODE_Z) PORT_COCKTAIL
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("2P 4-5") PORT_CODE(KEYCODE_X) PORT_COCKTAIL
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("2P 4-6") PORT_CODE(KEYCODE_C) PORT_COCKTAIL
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("2P 5-6") PORT_CODE(KEYCODE_V) PORT_COCKTAIL
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("MUX0")	// ppi1 (6002)
@@ -623,7 +647,10 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_HANDLER(sound_cmd_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+	DEVCB_HANDLER(sound_cmd_r),
+	DEVCB_NULL, /* discrete read? */
+	DEVCB_NULL,
+	DEVCB_NULL /* discrete write? */
 };
 
 /* mame default palette doesn't suit well with this game, so we add a dummy color_prom initialization.*/
@@ -670,6 +697,8 @@ static MACHINE_DRIVER_START( kingdrby )
 
 	MDRV_QUANTUM_PERFECT_CPU("master")
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
@@ -679,7 +708,7 @@ static MACHINE_DRIVER_START( kingdrby )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)	/* controlled by CRTC */
@@ -733,4 +762,4 @@ ROM_START( kingdrby )
 	ROM_LOAD( "prom.x", 0x0000, 0x0200, NO_DUMP )
 ROM_END
 
-GAME( 1981, kingdrby,  0,      kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby",   GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1981, kingdrby,  0,      kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
