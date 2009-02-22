@@ -28,7 +28,9 @@ static WRITE8_HANDLER( cowrace_colorram_w )
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 code = videoram[ tile_index ] + (colorram[ tile_index ] << 8) ;
-	SET_TILE_INFO(1, code & 0x1ff, 0, TILE_FLIPYX( 0 ));;
+	UINT8 color = 0;//(colorram[ tile_index ] & 0x3e)>>1;
+
+	SET_TILE_INFO(1, code & 0x1ff, color, TILE_FLIPYX( 0 ));;
 }
 
 static VIDEO_START( cowrace )
@@ -36,12 +38,11 @@ static VIDEO_START( cowrace )
 	tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows,
 							8,8, 0x20,0x20	);
 
-	tilemap_set_transparent_pen(tmap, 0);
+//	tilemap_set_transparent_pen(tmap, 0);
 }
 
 static VIDEO_UPDATE( cowrace )
 {
-	bitmap_fill(bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 	return 0;
 }
@@ -124,16 +125,15 @@ static const gfx_layout layout8x8x2 =
 	8*8
 };
 
+/* seems more suitable with 2bpp?*/
 static const gfx_layout layout16x16x4 =
 {
 	16,16,
-	RGN_FRAC(1,4),
-	4,
+	RGN_FRAC(1,2),
+	2,
 	{
-		RGN_FRAC(0,4),
-		RGN_FRAC(1,4),
-		RGN_FRAC(2,4),
-		RGN_FRAC(3,4)
+		RGN_FRAC(0,2),
+		RGN_FRAC(1,2),
 	},
 	{ 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7,0,1,2,3,4,5,6,7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8  },
@@ -141,8 +141,8 @@ static const gfx_layout layout16x16x4 =
 };
 
 static GFXDECODE_START( cowrace )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, layout16x16x4, 0, 0x1 )
-	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0, 0x1 )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, layout16x16x4, 0, 0x40 )
+	GFXDECODE_ENTRY( "gfx2", 0x000000, layout8x8x2, 0, 0x40 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( cowrace )
@@ -162,6 +162,31 @@ static const ym2203_interface ym2203_interface_1 =
 	NULL
 };
 
+/* format might be wrong */
+static PALETTE_INIT(cowrace)
+{
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x200; ++i)
+	{
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 0) & 0x01;
+		bit2 = (color_prom[0] >> 1) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 2) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		bit2 = (color_prom[0] >> 4) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 5) & 0x01;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
 
 static MACHINE_DRIVER_START( cowrace )
 
@@ -187,7 +212,8 @@ static MACHINE_DRIVER_START( cowrace )
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 
 	MDRV_GFXDECODE(cowrace)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MDRV_PALETTE_LENGTH(0x400)
+	MDRV_PALETTE_INIT(cowrace)
 
 	MDRV_VIDEO_START(cowrace)
 	MDRV_VIDEO_UPDATE(cowrace)
@@ -223,6 +249,9 @@ ROM_START( cowrace )
 
 	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD( "u4.bin", 0x00000, 0x20000, CRC(f92a3ab5) SHA1(fc164492793597eadb8a50154410936edb74fa23) )
+
+	ROM_REGION( 0x20000, "proms", 0 )
+	ROM_LOAD( "u149.bin", 0x00000, 0x200, CRC(f41a5eca) SHA1(797f2d95d4e00f96e5a99604935810e1add59689) )
 ROM_END
 
-GAME( 2000, cowrace, kingdrby, cowrace, cowrace, 0,	ROT0, "bootleg", "Cow Race (hack of King Derby)", GAME_NOT_WORKING )
+GAME( 2000, cowrace, kingdrby, cowrace, cowrace, 0,	ROT0, "bootleg", "Cow Race (hack of King Derby)", GAME_NOT_WORKING | GAME_WRONG_COLORS )
