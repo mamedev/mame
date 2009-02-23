@@ -8600,6 +8600,8 @@ Other Sun games
 
 	/* Aristocrat Mk5 hardware */
 	DRIVER( swthrt2v )	/* (c) 1995 */
+	DRIVER( dmdtouch )	/* (c) 1997 */
+	DRIVER( adonis )	/* (c) 1998 */
 	DRIVER( reelrock )	/* (c) 1998 */
 	DRIVER( indiandr )	/* (c) 1998 */
 	DRIVER( margmgc )	/* (c) 2000 */
