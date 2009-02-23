@@ -387,10 +387,10 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 					if (!decrypted)
 						decrypted = fd1089_get_decrypted_base();
 				}
+
+				memory_configure_bank(machine, banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);
 				if (decrypted)
 					memory_configure_bank_decrypted(machine, banknum, 0, 1, decrypted + region_start, 0);
-				else
-					memory_configure_bank(machine, banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);
 
 				memory_set_bank(machine, banknum, 0);
 			}
