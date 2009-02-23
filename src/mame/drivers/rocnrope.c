@@ -9,6 +9,7 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "machine/konami1.h"
 #include "audio/timeplt.h"
 
+#define MASTER_CLOCK		XTAL_18_432MHz
 
 extern WRITE8_HANDLER( rocnrope_videoram_w );
 extern WRITE8_HANDLER( rocnrope_colorram_w );
@@ -219,7 +220,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( rocnrope )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 1600000)        /* 1.6 MHz??? Attract mode depends on this to work correctly */
+	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
