@@ -6866,6 +6866,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
     */
 
 	/* Kaneko games */
+	DRIVER( hvyunit )		/* (c) 1988 Kaneko */
+	DRIVER( hvyunita )		/* (c) 1988 Kaneko */
+	DRIVER( hvyunitb )		/* (c) 1988 Kaneko */
 	DRIVER( djboy )		/* (c) 1989 Kaneko */
 	DRIVER( djboyj )	/* (c) 1989 Kaneko */
 	DRIVER( djboya )	/* (c) 1989 Kaneko */

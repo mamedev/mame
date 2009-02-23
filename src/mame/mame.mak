@@ -835,6 +835,7 @@ $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/galpanic.o $(VIDEO)/galpanic.o \
 	$(DRIVERS)/galpani2.o $(VIDEO)/galpani2.o \
 	$(DRIVERS)/galpani3.o \
+	$(DRIVERS)/hvyunit.o \
 	$(DRIVERS)/jchan.o \
 	$(DRIVERS)/kaneko16.o $(MACHINE)/kaneko16.o $(VIDEO)/kaneko16.o \
 	$(DRIVERS)/expro02.o \
