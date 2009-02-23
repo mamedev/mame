@@ -992,6 +992,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/galaxian.o $(AUDIO)/galaxian.o $(VIDEO)/galaxian.o \
 	$(DRIVERS)/galaxold.o $(MACHINE)/galaxold.o $(VIDEO)/galaxold.o \
 	$(DRIVERS)/gaplus.o $(MACHINE)/gaplus.o $(VIDEO)/gaplus.o \
+	$(DRIVERS)/kungfur.o \
 	$(DRIVERS)/mappy.o $(VIDEO)/mappy.o \
 	$(DRIVERS)/namcofl.o $(VIDEO)/namcofl.o \
 	$(DRIVERS)/namcoic.o \

@@ -708,6 +708,8 @@ const game_driver * const drivers[] =
 	DRIVER( tceptor )	/* (c) 1986 */
 	DRIVER( tceptor2 )	/* (c) 1986 */
 
+	DRIVER( kungfur )	/* (c) 1987 */
+
 	/* Namco System 1 games */
 	DRIVER( shadowld )	/* (c) 1987 */
 	DRIVER( youkaidk )	/* (c) 1987 (Japan new version) */
@@ -8697,7 +8699,7 @@ Other Sun games
 	DRIVER( robadv2d2 )
 	DRIVER( robadv2d3 )
 	DRIVER( robadv2c2 )
-	DRIVER( robadv2c3 )	
+	DRIVER( robadv2c3 )
 	DRIVER( pirpok2 )
 	DRIVER( pirpok2b )
 	DRIVER( pirpok2d )
