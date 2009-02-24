@@ -46,13 +46,19 @@ ToDo:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
+#include "cpu/z80/z80.h"
 #include "dec0.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/msm5205.h"
+
 
 UINT16 *dec0_ram;
 UINT8 *robocop_shared_ram;
+
+static UINT8 automat_adpcm_byte;
+static int automat_msm5205_vclk_toggle;
 
 /******************************************************************************/
 
@@ -94,6 +100,40 @@ static WRITE16_HANDLER( dec0_control_w )
 			dec0_i8751_reset();
  			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
 			break;
+
+		default:
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
+			break;
+	}
+}
+
+
+static WRITE16_HANDLER( automat_control_w )
+{
+	switch (offset<<1)
+	{
+		case 0xe: /* 6502 sound cpu */
+			if (ACCESSING_BITS_0_7)
+			{
+				soundlatch_w(space,0,data & 0xff);
+				cpu_set_input_line(space->machine->cpu[1], 0 ,HOLD_LINE);
+			}
+			break;
+
+		case 12: /* DMA flag */
+			dec0_update_sprites_w(space,0,0,mem_mask);
+			break;
+#if 0
+		case 8: /* Interrupt ack (VBL - IRQ 6) */
+			break;
+
+		case 0xa: /* Mix Psel(?). */
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
+			break;
+
+		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
+			break;
+#endif
 
 		default:
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(space->cpu),data,0x30c010+(offset<<1));
@@ -343,6 +383,68 @@ static ADDRESS_MAP_START( midres_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( automat_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x05ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x242800, 0x243fff) AM_READ(SMH_RAM) /* Robocop only */
+	AM_RANGE(0x244000, 0x245fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x24a000, 0x24a7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x24c800, 0x24c87f) AM_READ(SMH_RAM)
+	AM_RANGE(0x24d000, 0x24d7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
+	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
+	AM_RANGE(0x310000, 0x3107ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x314000, 0x3147ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xff8000, 0xffbfff) AM_READ(SMH_RAM) /* Main ram */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_READ(SMH_RAM) /* Sprites */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( automat_writemem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf1_control_0_w)	/* text layer */
+	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf1_control_1_w)
+	AM_RANGE(0x242000, 0x24207f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_colscroll)
+	AM_RANGE(0x242400, 0x2427ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf1_rowscroll)
+	AM_RANGE(0x242800, 0x243fff) AM_WRITE(SMH_RAM) /* Robocop only */
+	AM_RANGE(0x244000, 0x245fff) AM_WRITE(dec0_pf1_data_w) AM_BASE(&dec0_pf1_data)
+
+	AM_RANGE(0x246000, 0x246007) AM_WRITE(dec0_pf2_control_0_w)	/* first tile layer */
+	AM_RANGE(0x246010, 0x246017) AM_WRITE(dec0_pf2_control_1_w)
+	AM_RANGE(0x248000, 0x24807f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_colscroll)
+	AM_RANGE(0x248400, 0x2487ff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf2_rowscroll)
+	AM_RANGE(0x24a000, 0x24a7ff) AM_WRITE(dec0_pf2_data_w) AM_BASE(&dec0_pf2_data)
+
+	AM_RANGE(0x24c000, 0x24c007) AM_WRITE(dec0_pf3_control_0_w)	/* second tile layer */
+	AM_RANGE(0x24c010, 0x24c017) AM_WRITE(dec0_pf3_control_1_w)
+	AM_RANGE(0x24c800, 0x24c87f) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_colscroll)
+	AM_RANGE(0x24cc00, 0x24cfff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_pf3_rowscroll)
+	AM_RANGE(0x24d000, 0x24d7ff) AM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
+
+	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE(automat_control_w)	/* Priority, sound, etc. */
+	AM_RANGE(0x310000, 0x3107ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w) // NEW
+	AM_RANGE(0xff8000, 0xffbfff) AM_WRITE(SMH_RAM) AM_BASE(&dec0_ram)
+	AM_RANGE(0xffc000, 0xffc7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
+ADDRESS_MAP_END
+
+
+static WRITE8_HANDLER( automat_adpcm_w )
+{
+	automat_adpcm_byte = data;
+}
+
+static ADDRESS_MAP_START( automat_s_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+//	AM_RANGE(0xc800, 0xc800) AM_WRITE(ym2203_control_port_0_w)
+//	AM_RANGE(0xc801, 0xc801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r)
+//	AM_RANGE(0xd000, 0xd000) AM_WRITE(ym2203_control_port_1_w)
+//	AM_RANGE(0xd001, 0xd001) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(automat_adpcm_w)
+	AM_RANGE(0x0000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
 
 /******************************************************************************/
 
@@ -783,11 +885,53 @@ static const gfx_layout tilelayout =
 	16*16
 };
 
+static const gfx_layout automat_tilelayout =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(1,4), RGN_FRAC(3,4), RGN_FRAC(0,4), RGN_FRAC(2,4) },
+	{ 16*8+7, 16*8+6,16*8+5,16*8+4,16*8+3,16*8+2,16*8+1,16*8+0,7,6,5,4,3,2,1,0},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	16*16
+};
+
+static const gfx_layout automat_tilelayout3 =
+{
+	16,16,
+	0x800,
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7,0x8000*8+0, 0x8000*8+1, 0x8000*8+2, 0x8000*8+3, 0x8000*8+4, 0x8000*8+5, 0x8000*8+6, 0x8000*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0x4000*8+0*8, 0x4000*8+1*8, 0x4000*8+2*8, 0x4000*8+3*8, 0x4000*8+4*8, 0x4000*8+5*8, 0x4000*8+6*8, 0x4000*8+7*8 },
+	8*8
+};
+
+
+static const gfx_layout automat_tilelayout2 =
+{
+	16,16,
+	0x400, // RGN_FRAC(1,16) causes divide by zero?!
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7, 0x4000*8+0, 0x4000*8+1, 0x4000*8+2, 0x4000*8+3, 0x4000*8+4, 0x4000*8+5, 0x4000*8+6, 0x4000*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0x2000*8+0*8, 0x2000*8+1*8, 0x2000*8+2*8, 0x2000*8+3*8, 0x2000*8+4*8, 0x2000*8+5*8, 0x2000*8+6*8, 0x2000*8+7*8 },
+	8*8
+};
+
 static GFXDECODE_START( dec0 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 512, 16 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 768, 16 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 256, 16 )	/* Sprites 16x16 */
+GFXDECODE_END
+
+static GFXDECODE_START( automat )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, automat_tilelayout3, 512, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, automat_tilelayout2, 768, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, automat_tilelayout, 256, 16 )	/* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( midres )
@@ -820,6 +964,73 @@ static const ym3812_interface ym3812b_interface =
 };
 
 /******************************************************************************/
+
+
+static void automat_vclk_cb(const device_config *device)
+{
+	if (automat_msm5205_vclk_toggle == 0)
+	{
+		msm5205_data_w(device, automat_adpcm_byte & 0xf);
+	}
+	else
+	{
+		msm5205_data_w(device, automat_adpcm_byte >> 4);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	}
+
+	automat_msm5205_vclk_toggle ^= 1;
+}
+
+static const msm5205_interface msm5205_config =
+{
+	automat_vclk_cb,
+	MSM5205_S48_4B
+};
+
+
+static MACHINE_DRIVER_START( automat )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", M68000, 10000000)
+	MDRV_CPU_PROGRAM_MAP(automat_readmem, automat_writemem)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
+
+	MDRV_CPU_ADD("audio", Z80, 3000000)// ?
+	MDRV_CPU_PROGRAM_MAP(automat_s_mem, 0)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(57.41)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+
+	MDRV_GFXDECODE(automat)
+	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_VIDEO_START(dec0)
+	MDRV_VIDEO_UPDATE(robocop)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
+	MDRV_SOUND_ROUTE(0, "mono", 0.90)
+	MDRV_SOUND_ROUTE(1, "mono", 0.90)
+	MDRV_SOUND_ROUTE(2, "mono", 0.90)
+	MDRV_SOUND_ROUTE(3, "mono", 0.35)
+
+	MDRV_SOUND_ADD("ym2", YM2203, 1500000)
+	MDRV_SOUND_ROUTE(0, "mono", 0.90)
+	MDRV_SOUND_ROUTE(1, "mono", 0.90)
+	MDRV_SOUND_ROUTE(2, "mono", 0.90)
+	MDRV_SOUND_ROUTE(3, "mono", 0.35)
+
+	MDRV_SOUND_ADD("msm", MSM5205, 384000/2)
+	MDRV_SOUND_CONFIG(msm5205_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( hbarrel )
 
@@ -1639,6 +1850,120 @@ ROM_START( robocopb )
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 ROM_END
 
+/*
+
+AUTOMAT (bootleg ROBOCOP)
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Dumped by Andrew Welburn on the evening of a day 
+of big snow! 02/02/09
+
+http://www.andys-arcade.com
+
+*************************************************
+**Do not seperate this text file from the roms.**
+*************************************************
+
+Take a look at the photos in the archive, the roms 
+should be failry explanatory, and you should be
+able to pick out the chips it uses.
+
+The most striking thing about this bootleg apart 
+from the obviously changed title screen is that 
+the music/melody is not right, they've copied the 
+digital sound effects, but appear to have ripepd 
+the music and circuit design from an earlier 
+capcom game, i can't work out whcih one, but 
+what an odd thing to do!
+
+you can see a youtube video of it runnign here:
+http://uk.youtube.com/watch?v=Y-KvbKtqzaQ
+
+Rom 21 is full of 0's... i cleaned and re-dumped 
+it numerous times, but i just got 0's everytime.
+It contains some of the the graphics for enemies 
+on the opening stage at the very least.
+
+enjoy..
+
+*/
+
+ROM_START( automat )
+	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "5.bin", 0x00000, 0x10000, CRC(fb6faa74) SHA1(0af03c06193b5ba1422571b9504a7f655c608d94) )
+	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x10000, CRC(7ecf8309) SHA1(59dd50bcb528ece42a67154bcc4f432770420986) )
+	ROM_LOAD16_BYTE( "4.bin", 0x20000, 0x10000, CRC(9d7b79e0) SHA1(e0d901b9b3cd62f7c947da04f7447ebfa88bf44a) )
+	ROM_LOAD16_BYTE( "3.bin", 0x20001, 0x10000, CRC(e655f9c3) SHA1(d5e99d542303d009277ccfc245f877e4e28603c9) )
+
+	ROM_REGION( 0x10000, "audio", 0 )	/* Z80 Sound */
+	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(72ea6024) SHA1(debd30219879ec01f43cc116a6cfa17209940ecc) )
+
+	ROM_REGION( 0x40000, "gfxload1", ROMREGION_DISPOSE ) /* chars */
+	ROM_LOAD( "8.bin",  0x00000, 0x10000, CRC(dcfffc7a) SHA1(e250626473917d397381210ef536efbc93c46474) ) // y?
+	ROM_LOAD( "7.bin",  0x10000, 0x10000, CRC(40218082) SHA1(6a5c83d20fe110d642d5730c52e2796655fb66b4) ) // y
+	ROM_LOAD( "10.bin", 0x20000, 0x10000, CRC(957da6dd) SHA1(53490d80ef108e93f13440de13b58761b89a419a) ) // y
+	ROM_LOAD( "12.bin", 0x30000, 0x10000, CRC(00cd0990) SHA1(3fc498fcee2110001e376f5ee38d7dd361bd3ee3) ) // y
+	
+	/* copy out the chars */
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* chars */
+	ROM_COPY( "gfxload1", 0x00000, 0x00000, 0x8000 )
+	ROM_COPY( "gfxload1", 0x10000, 0x08000, 0x8000 )
+	ROM_COPY( "gfxload1", 0x20000, 0x10000, 0x8000 )
+	ROM_COPY( "gfxload1", 0x30000, 0x18000, 0x8000 )
+
+	ROM_REGION( 0x20000, "gfx3", ROMREGION_DISPOSE ) /* tiles */
+	ROM_COPY( "gfxload1", 0x08000, 0x00000, 0x8000 )
+	ROM_COPY( "gfxload1", 0x18000, 0x08000, 0x8000 )
+	ROM_COPY( "gfxload1", 0x28000, 0x10000, 0x8000 )
+	ROM_COPY( "gfxload1", 0x38000, 0x18000, 0x8000 )
+	
+	// we have to rearrange this with ROM_CONTINUE due to the way gfxdecode works */
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE ) /* tiles */
+	ROM_LOAD( "9.bin",  0x00000, 0x2000, CRC(ccf91ce0) SHA1(c976eddcea48da6e7fbd28a4d5c48706d61cabfb) )
+	ROM_CONTINUE(       0x04000, 0x2000 )
+	ROM_CONTINUE(       0x08000, 0x2000 )
+	ROM_CONTINUE(       0x0c000, 0x2000 )
+	ROM_CONTINUE(       0x02000, 0x2000 )
+	ROM_CONTINUE(       0x06000, 0x2000 )
+	ROM_CONTINUE(       0x0a000, 0x2000 )	
+	ROM_CONTINUE(       0x0e000, 0x2000 )	
+	ROM_LOAD( "6.bin",  0x10000, 0x2000, CRC(5a557765) SHA1(f081323dad532fae6ec5d2875ffb1c394ac0bcf9) )
+	ROM_CONTINUE(       0x14000, 0x2000 )
+	ROM_CONTINUE(       0x18000, 0x2000 )
+	ROM_CONTINUE(       0x1c000, 0x2000 )
+	ROM_CONTINUE(       0x12000, 0x2000 )
+	ROM_CONTINUE(       0x16000, 0x2000 )
+	ROM_CONTINUE(       0x1a000, 0x2000 )	
+	ROM_CONTINUE(       0x1e000, 0x2000 )
+	ROM_LOAD( "11.bin", 0x20000, 0x2000, CRC(8b196ab7) SHA1(030dc19f464db072c8dbbf043ae9334aa58510d0) )
+	ROM_CONTINUE(       0x24000, 0x2000 )
+	ROM_CONTINUE(       0x28000, 0x2000 )
+	ROM_CONTINUE(       0x2c000, 0x2000 )
+	ROM_CONTINUE(       0x22000, 0x2000 )
+	ROM_CONTINUE(       0x26000, 0x2000 )
+	ROM_CONTINUE(       0x2a000, 0x2000 )	
+	ROM_CONTINUE(       0x2e000, 0x2000 )	
+	ROM_LOAD( "13.bin", 0x30000, 0x2000, CRC(7f12ed0e) SHA1(9340611b85f9866d086970ed5e9c0c704616c330) )
+	ROM_CONTINUE(       0x34000, 0x2000 )
+	ROM_CONTINUE(       0x38000, 0x2000 )
+	ROM_CONTINUE(       0x3c000, 0x2000 )
+	ROM_CONTINUE(       0x32000, 0x2000 )
+	ROM_CONTINUE(       0x36000, 0x2000 )
+	ROM_CONTINUE(       0x3a000, 0x2000 )	
+	ROM_CONTINUE(       0x3e000, 0x2000 )	
+	
+	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD( "14.bin", 0x00000, 0x10000, CRC(674ad6dc) SHA1(63982b8106f771e9e79cd8dbad42cfd4aad6f16f) )
+	ROM_LOAD( "15.bin", 0x10000, 0x08000, CRC(5e7dd1aa) SHA1(822232a7389708dd5fee4a874a8832e22e7a0a26) )
+	ROM_LOAD( "16.bin", 0x20000, 0x10000, CRC(e42e8675) SHA1(5b964477de8278ea330ffc2366e5fc7e10122ef8) )
+	ROM_LOAD( "17.bin", 0x30000, 0x08000, CRC(9a414c56) SHA1(017eb5a238e24cd6de50afd029c239993fc61a21) )
+	ROM_LOAD( "18.bin", 0x40000, 0x10000, CRC(751e34aa) SHA1(066730a26606a74b9295fc483cb0063c32dc9a14) )
+	ROM_LOAD( "19.bin", 0x50000, 0x08000, CRC(118e7fc7) SHA1(fa6d8eef9da873579e19a9bf982643e061b8ca26) )
+	ROM_LOAD( "20.bin", 0x60000, 0x10000, CRC(7c62a2a1) SHA1(43a40355cdcbb17506f9634e8f12673287e79bd7) )
+	ROM_LOAD( "21.bin", 0x70000, 0x08000, NO_DUMP ) // rom always dumped as empty
+ROM_END
+
+
 ROM_START( hippodrm )
 	ROM_REGION( 0x60000, "main", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ew02",         0x00000, 0x10000, CRC(df0d7dc6) SHA1(a60197ad6f19f730e05cf6a3be9181f28d425344) )
@@ -2258,6 +2583,7 @@ GAME( 1988, robocopj, robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East
 GAME( 1988, robocopu, robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 1)", 0 )
 GAME( 1988, robocpu0, robocop,  robocop,  robocop,  robocop,  ROT0,   "Data East USA",         "Robocop (US revision 0)", 0 )
 GAME( 1988, robocopb, robocop,  robocopb, robocop,  robocop,  ROT0,   "bootleg",               "Robocop (World bootleg)", 0)
+GAME( 1988, automat,  robocop,  automat,  robocop,  robocop,  ROT0,   "bootleg",               "Automat (bootleg of Robocop)", GAME_NOT_WORKING )
 GAME( 1989, hippodrm, 0,        hippodrm, hippodrm, hippodrm, ROT0,   "Data East USA",         "Hippodrome (US)", 0 )
 GAME( 1989, ffantasy, hippodrm, hippodrm, hippodrm, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan revision 2)", 0 )
 GAME( 1989, ffantasa, hippodrm, hippodrm, hippodrm, hippodrm, ROT0,   "Data East Corporation", "Fighting Fantasy (Japan)", 0 )

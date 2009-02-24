@@ -4413,6 +4413,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( robocopu )	/* (c) 1988 Data East USA (US) */
 	DRIVER( robocpu0 )	/* (c) 1988 Data East USA (US) */
 	DRIVER( robocopb )	/* bootleg */
+	DRIVER( automat )	/* bootleg */
 	DRIVER( hippodrm )	/* (c) 1989 Data East USA (US) */
 	DRIVER( ffantasy )	/* (c) 1989 Data East Corporation (Japan) */
 	DRIVER( ffantasa )	/* (c) 1989 Data East Corporation (Japan) */
