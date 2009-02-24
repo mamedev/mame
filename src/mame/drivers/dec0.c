@@ -1633,7 +1633,7 @@ ROM_START( robocop )
 	ROM_LOAD( "ep08", 0x50000, 0x08000, CRC(c45c7b4c) SHA1(70e3e475fe767eefa4cc1d6ca052271a099ff7a8) )
 	ROM_LOAD( "ep13", 0x60000, 0x10000, CRC(8fca9f28) SHA1(cac85bf2b66e49e22c33c85bdb5712feef6aae7e) )
 	ROM_LOAD( "ep12", 0x70000, 0x08000, CRC(3cd1d0c3) SHA1(ca3546cf51ebb10dfa4e78954f0212e8fcdb3d57) )
-
+	
 	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 ROM_END
@@ -1952,15 +1952,17 @@ ROM_START( automat )
 	ROM_CONTINUE(       0x3a000, 0x2000 )	
 	ROM_CONTINUE(       0x3e000, 0x2000 )	
 	
-	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE ) /* sprites */
-	ROM_LOAD( "14.bin", 0x00000, 0x10000, CRC(674ad6dc) SHA1(63982b8106f771e9e79cd8dbad42cfd4aad6f16f) )
-	ROM_LOAD( "15.bin", 0x10000, 0x08000, CRC(5e7dd1aa) SHA1(822232a7389708dd5fee4a874a8832e22e7a0a26) )
-	ROM_LOAD( "16.bin", 0x20000, 0x10000, CRC(e42e8675) SHA1(5b964477de8278ea330ffc2366e5fc7e10122ef8) )
-	ROM_LOAD( "17.bin", 0x30000, 0x08000, CRC(9a414c56) SHA1(017eb5a238e24cd6de50afd029c239993fc61a21) )
-	ROM_LOAD( "18.bin", 0x40000, 0x10000, CRC(751e34aa) SHA1(066730a26606a74b9295fc483cb0063c32dc9a14) )
-	ROM_LOAD( "19.bin", 0x50000, 0x08000, CRC(118e7fc7) SHA1(fa6d8eef9da873579e19a9bf982643e061b8ca26) )
-	ROM_LOAD( "20.bin", 0x60000, 0x10000, CRC(7c62a2a1) SHA1(43a40355cdcbb17506f9634e8f12673287e79bd7) )
-	ROM_LOAD( "21.bin", 0x70000, 0x08000, NO_DUMP ) // rom always dumped as empty
+	// the sprite data is the same as robocop, but with the bits in each byte reversed
+	// 21.bin was repaired with this knowledge as the chip was faulty
+	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE |ROMREGION_INVERT) /* sprites */
+	ROM_LOAD( "16.bin", 0x00000, 0x10000, CRC(e42e8675) SHA1(5b964477de8278ea330ffc2366e5fc7e10122ef8) )
+	ROM_LOAD( "17.bin", 0x10000, 0x08000, CRC(9a414c56) SHA1(017eb5a238e24cd6de50afd029c239993fc61a21) )
+	ROM_LOAD( "20.bin", 0x20000, 0x10000, CRC(7c62a2a1) SHA1(43a40355cdcbb17506f9634e8f12673287e79bd7) )
+	ROM_LOAD( "21.bin", 0x30000, 0x08000, CRC(ae59dccd) SHA1(e4ec6e9441bd7882a14768a7b7d8e79a7781f436) )
+	ROM_LOAD( "14.bin", 0x40000, 0x10000, CRC(674ad6dc) SHA1(63982b8106f771e9e79cd8dbad42cfd4aad6f16f) )
+	ROM_LOAD( "15.bin", 0x50000, 0x08000, CRC(5e7dd1aa) SHA1(822232a7389708dd5fee4a874a8832e22e7a0a26) )
+	ROM_LOAD( "18.bin", 0x60000, 0x10000, CRC(751e34aa) SHA1(066730a26606a74b9295fc483cb0063c32dc9a14) )
+	ROM_LOAD( "19.bin", 0x70000, 0x08000, CRC(118e7fc7) SHA1(fa6d8eef9da873579e19a9bf982643e061b8ca26) )
 ROM_END
 
 
@@ -2570,6 +2572,44 @@ ROM_START( bouldshj )
 	ROM_LOAD( "ta-16.21k",          0x0000, 0x0100, CRC(ad26e8d4) SHA1(827337aeb8904429a1c050279240ae38aa6ce064) )	/* Priority (not used) */
 ROM_END
 
+// helper function
+#if 0
+static void dump_to_file(running_machine* machine, UINT8* ROM, int offset, int size)
+{
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"%s_%08x_%08x", machine->gamedrv->name, offset, size);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(ROM+offset, size, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
+
+static DRIVER_INIT( convert_robocop_gfx4_to_automat )
+{
+	UINT8* R = memory_region(machine,"gfx4");
+	int i;
+	
+	for (i=0;i<0x80000;i++)
+	{
+		R[i] = BITSWAP8(R[i],0,1,2,3,4,5,6,7);
+	}
+	
+	dump_to_file(machine,R, 0x00000, 0x10000);
+	dump_to_file(machine,R, 0x10000, 0x08000);
+	dump_to_file(machine,R, 0x20000, 0x10000);
+	dump_to_file(machine,R, 0x30000, 0x08000);
+	dump_to_file(machine,R, 0x40000, 0x10000);
+	dump_to_file(machine,R, 0x50000, 0x08000);
+	dump_to_file(machine,R, 0x60000, 0x10000);
+	dump_to_file(machine,R, 0x70000, 0x08000);
+}
+#endif
 /******************************************************************************/
 
 GAME( 1987, hbarrel,  0,        hbarrel,  hbarrel,  hbarrel,  ROT270, "Data East USA",         "Heavy Barrel (US)", 0 )
