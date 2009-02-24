@@ -53,9 +53,58 @@ static VIDEO_START( itgambl3 )
 {
 }
 
-
+/* (dirty) debug code for looking 8bpps blitter-based gfxs */
 static VIDEO_UPDATE( itgambl3 )
 {
+	int x,y,count;
+	const UINT8 *blit_ram = memory_region(screen->machine,"gfx1");
+	static int test_x = 256,test_y = 256,start_offs;
+
+	if(input_code_pressed(KEYCODE_Z))
+		test_x++;
+
+	if(input_code_pressed(KEYCODE_X))
+		test_x--;
+
+	if(input_code_pressed(KEYCODE_A))
+		test_y++;
+
+	if(input_code_pressed(KEYCODE_S))
+		test_y--;
+
+	if(input_code_pressed(KEYCODE_Q))
+		start_offs+=0x200;
+
+	if(input_code_pressed(KEYCODE_W))
+		start_offs-=0x200;
+
+	if(input_code_pressed(KEYCODE_E))
+		start_offs++;
+
+	if(input_code_pressed(KEYCODE_R))
+		start_offs--;
+
+	popmessage("%d %d %04x",test_x,test_y,start_offs);
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+
+	count = (start_offs);
+
+	for(y=0;y<test_y;y++)
+	{
+		for(x=0;x<test_x;x++)
+		{
+			UINT32 color;
+
+			color = (blit_ram[count] & 0xff)>>0;
+
+			if((x)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y, x) = screen->machine->pens[color];
+
+			count++;
+		}
+	}
+
 	return 0;
 }
 
@@ -164,6 +213,20 @@ static MACHINE_RESET( itgambl3 )
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
+/* default 444 palette for debug purpose*/
+static PALETTE_INIT( itgambl3 )
+{
+	int x,r,g,b;
+
+	for(x=0;x<0x100;x++)
+	{
+		r = (x & 0xf)*0x10;
+		g = ((x & 0x3c)>>2)*0x10;
+		b = ((x & 0xf0)>>4)*0x10;
+		palette_set_color(machine,x,MAKE_RGB(r,g,b));
+	}
+}
+
 
 /**************************
 *     Machine Drivers     *
@@ -179,10 +242,11 @@ static MACHINE_DRIVER_START( itgambl3 )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MDRV_MACHINE_RESET( itgambl3 )
+	MDRV_PALETTE_INIT( itgambl3 )
 
 	MDRV_GFXDECODE(itgambl3)
 	MDRV_PALETTE_LENGTH(0x200)
