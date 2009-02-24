@@ -10,6 +10,7 @@
 #define CPS3_VOICES		16
 
 static sound_stream *cps3_stream;
+extern UINT8* cps3_user5region;
 
 typedef struct _cps3_voice_
 {
@@ -29,6 +30,10 @@ static STREAM_UPDATE( cps3_stream_update )
 {
 	int i;
 
+	// the actual 'user5' region only exists on the nocd sets, on the others it's allocated in the initialization.
+	// it's a shared gfx/sound region, so can't be allocated as part of the sound device.
+	chip.base = (INT8*)cps3_user5region;
+	
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));
@@ -102,8 +107,6 @@ static DEVICE_START( cps3_sound )
 	cps3_stream = stream_create(device, 0, 2, device->clock / 384, NULL, cps3_stream_update);
 
 	memset(&chip, 0, sizeof(chip));
-
-	chip.base = (INT8*)memory_region(device->machine,"user5");
 }
 
 DEVICE_GET_INFO( cps3_sound )
